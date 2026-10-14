@@ -14,6 +14,11 @@ summary: The system around uno-bot: where it sits relative to GitHub Actions, Sl
 > dispatched to were deleted in the same change. The four that remain were
 > **corrected**; each carries an audit note saying what was verified.
 >
+> **Updated 2026-10-14.** The implement flow is gone: the Worker no longer
+> builds components or scaffolds prototypes, and `figma-implement.yml` no
+> longer exists, so a Figma change reaches code through an intake the team
+> picks up. The tools named below are the ones in `tool-definitions.json`.
+>
 > This is current-state documentation. A claim here that the code contradicts
 > is a bug in this file — file it through `uno-maintain`.
 
@@ -48,7 +53,8 @@ flowchart TB
   end
 
   subgraph github["GitHub - plus-uno repo"]
-    ImplAction["figma-implement.yml<br/>figma-implement-design.yml"]
+    Actions["GitHub Actions workflows<br/>(github_workflow_run)"]
+    Issues["Issues<br/>(github_issue_create / github_issue_update)"]
   end
 
   subgraph baked["Baked at build time"]
@@ -62,79 +68,20 @@ flowchart TB
   Worker <-->|"load + persist<br/>conversation"| DO
   Worker -->|"messages + tool defs"| Claude
   Claude -.->|"tool_use blocks"| Worker
-  Worker -->|"repository_dispatch"| ImplAction
+  Worker -->|"workflow dispatch, after ✅"| Actions
+  Worker -->|"files and updates issues, after ✅"| Issues
   Skills -->|"compiled in — zero subrequests"| Worker
   Worker -->|"chat.postMessage<br/>reactions.add"| Slack
-  ImplAction -->|"posts PR link"| Slack
 ```
 
 Key points:
 - **The Figma poll lives in the Worker.** `src/figma-poll.ts` runs on a Worker cron (`*/15 13-23 * * 1-5`), ported off GitHub Actions in July 2026. `figma-library-poll.yml` no longer exists.
 - **The harness is baked, not fetched.** `bundle-harness.mjs` assembles it at build time from every doc declaring `embodiment: all | uno-bot`, and `src/agent/skills.ts` serves the constant. Zero subrequests, updates on deploy.
-- **Repo side effects route through GitHub Actions.** uno-bot never writes to the repo directly — it dispatches, the Action writes, the draft PR is the audit trail. It does write directly to Notion and Slack.
+- **uno-bot never writes to the repo.** It files and updates issues and dispatches workflows, each behind a ✅. It writes directly to Notion and Slack.
 
 ---
 
-## 1. Implement flow
-
-The most important flow — what designers do most often. A Figma change → uno-bot opens a draft PR.
-
-**Audit 2026-08-24 — corrected in one place, confirmed elsewhere.** The poll
-participant was `figma-library-poll.yml`; it is now the Worker cron. Confirmed
-against code: `figma-implement.yml` exists and is dispatched via
-`src/tools/github-dispatch.ts`; the confirmation gate is real
-(`proposal_resolve` in `tool-definitions.json`).
-
-```mermaid
-sequenceDiagram
-  autonumber
-  actor D as Designer
-  participant F as Figma
-  participant Cron as Worker cron<br/>src/figma-poll.ts (15 min)
-  participant N as Notion (PRD)
-  participant S as Slack #uno-bot
-  participant Bot as UNO Bot (Cloudflare Worker)
-  participant Claude
-  participant GH as figma-implement.yml
-
-  D->>F: Publish Badge change
-  Note over Cron: Polls every 15 min during work hours
-  Cron->>F: Detect changes
-  Cron->>N: Create PRD (Draft status)
-  Cron->>S: Post notification w/ PRD link<br/>+ buttons: [Implement now] [Defer]
-
-  D->>N: Open PRD, add impl notes
-  D->>S: Click "Implement now"<br/>OR type "implement Badge"
-
-  S->>Bot: button click / message event
-  Bot->>S: React :hammer_and_wrench: on user's msg
-  Bot->>Claude: agentic call (system prompt + tools)
-  Claude->>Bot: tool_use: implement(component: "Badge")
-  Bot->>S: Post proposal:<br/>"About to implement Badge — react ✅ to confirm"
-  Bot->>S: React :warning: on proposal msg
-  D->>S: React ✅ on proposal msg
-
-  S->>Bot: reaction_added event
-  Bot->>S: React :handshake: on user's confirm
-  Bot->>S: Progress: ⚙️ Fetching Figma context...
-  Bot->>GH: repository_dispatch (implement-figma-changes)
-  GH->>GH: Create branch, fetch Figma, call Claude,<br/>commit files
-  Bot->>S: Progress: 🤖 Claude is drafting...
-  Bot->>S: Progress: 📝 Opening PR...
-  GH->>S: ✅ Draft PR #47 ready
-  Bot->>S: React :white_check_mark: on user's original msg
-
-  D->>D: Review PR in GitHub, approve, merge
-```
-
-Notes:
-- Steps 8-14 are the **confirmation gate** — explicit user ✅ before the GitHub Action fires. Non-negotiable for side-effect-bearing tools.
-- Progress messages (steps 17-19) come from the Worker as the GitHub Action runs. The Worker doesn't actually know what stage the Action is in — it emits progress at predictable timing points OR (better) the Action posts back to the Worker via a webhook for true progress.
-- The polling-to-Slack chain (steps 1-4) runs inside the Worker, not GitHub Actions — ported July 2026.
-
----
-
-## 2. Q&A flow
+## 1. Q&A flow
 
 The default conversational mode. Designer asks a question; the agent answers, reaching for a tool only when it needs grounding.
 
@@ -181,7 +128,7 @@ Notes:
 
 ---
 
-## 3. Confirmation-gate state machine (cross-cutting)
+## 2. Confirmation-gate state machine (cross-cutting)
 
 How the **confirmation gate** actually works at the platform level. This isn't a use-case flow — it's the orchestration pattern that all side-effect tools share.
 
@@ -197,7 +144,7 @@ stateDiagram-v2
   [*] --> AgentReasoning: user message arrives
   AgentReasoning --> NoToolNeeded: Q&A path
   AgentReasoning --> ReadOnlyTool: search_blueprint / github_read / notion_search
-  AgentReasoning --> SideEffectTool: component_implement / prototype_scaffold /<br/>notion_create / notion_update / shareout_post / email_send
+  AgentReasoning --> SideEffectTool: notion_create / notion_update / shareout_post /<br/>github_issue_create / github_workflow_run / dm_relay
 
   NoToolNeeded --> Replied: post answer
   ReadOnlyTool --> Replied: post results
@@ -209,11 +156,11 @@ stateDiagram-v2
   WaitingForConfirm --> Cancelled: user reacts x OR replies w/ correction
   WaitingForConfirm --> TimedOut: 60 min elapsed (PROPOSAL_TTL_MS)
 
-  Confirmed --> ToolFired: fire repository_dispatch, react handshake on user msg
+  Confirmed --> ToolFired: run the staged operations, react handshake on user msg
   Cancelled --> Replied: react wave, ack
   TimedOut --> ExpiredNotice: post proposal expired
 
-  ToolFired --> Replied: GitHub Action posts PR link
+  ToolFired --> Replied: post what each operation did
   Replied --> [*]
   ExpiredNotice --> [*]
 ```
@@ -227,7 +174,7 @@ Key behaviors:
 
 ## What's NOT diagrammed here
 
-- **Error states.** Each flow has error paths (Claude API fails, GitHub dispatch 404, etc.) — not drawn to keep diagrams readable. The Worker should react `:x:` on user's msg + post error message in thread on any uncaught exception.
+- **Error states.** Each flow has error paths (the model fails, a write is refused, etc.) — not drawn to keep diagrams readable. The Worker should react `:x:` on user's msg + post error message in thread on any uncaught exception.
 - **First-message-in-thread vs follow-up.** The Q&A flow above is a single turn. Multi-turn follow-ups ("now do that for Button") use the same flow with the thread history loaded.
 - **Polling failure modes.** If the cron fails (Figma API down, Notion API down), it logs and retries on next cycle. Not bot-facing.
 
@@ -235,8 +182,7 @@ Key behaviors:
 
 ## Open questions on these diagrams
 
-1. **Progress messages during implement (flow 1, steps 17-19):** are these worth the implementation complexity? The friction-audit doc proposed them but they require either timed emission from the Worker (best-effort) or a webhook back from the GitHub Action (more reliable, more wiring). Decide in Week 2.
-2. ~~**Confirmation TTL (15 min)** — right number?~~ **Settled:** 60 min, in `PROPOSAL_TTL_MS`.
-3. **Should the `:warning:` reaction on the bot's proposal also work the other way — bot proposes → user reacts `:warning:` to mean "yes do it"?** That's confusing UX. Better: ✅ for confirm, ❌ for cancel, everything else ignored.
+1. ~~**Confirmation TTL (15 min)** — right number?~~ **Settled:** 60 min, in `PROPOSAL_TTL_MS`.
+2. **Should the `:warning:` reaction on the bot's proposal also work the other way — bot proposes → user reacts `:warning:` to mean "yes do it"?** That's confusing UX. Better: ✅ for confirm, ❌ for cancel, everything else ignored.
 
 End of flowcharts.

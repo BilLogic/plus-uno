@@ -94,6 +94,7 @@ describe("slack_thread_read on a public-only turn", () => {
     const { executeSlackThreadRead } = await tools();
     const out = await executeSlackThreadRead(env(), { link: `https://plus.slack.com/archives/${PUBLIC}/p1700000000000100` }, { publicOnly: true });
     assert.match(out, /"ok":true/);
+    assert.doesNotMatch(out, /tally|sign-off|verdict/i, "the read returns no reactions, so its note promises no count of them");
   });
 });
 

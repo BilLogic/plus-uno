@@ -1,6 +1,6 @@
 // slack_thread_read executor — READ-ONLY. Read the messages of a Slack thread
-// the user linked (outside this conversation's own memory) — sign-off tallies,
-// reviewer verdicts, source discussions. Runs inline in the agent loop (no gate).
+// the user linked (outside this conversation's own memory): what people said,
+// as text, without reactions. Runs inline in the agent loop (no gate).
 
 //
 // On a `publicOnly` turn (an ask from a Figma comment, whose answer people
@@ -59,7 +59,7 @@ export async function executeSlackThreadRead(
       channel: parsed.channel,
       count: messages.length,
       messages,
-      note: "The thread's messages. Use them to tally sign-offs/verdicts or synthesize; cite by author. Do not @-mention unless asked.",
+      note: "The thread's messages, text only: read or synthesize what people said, cite by author, and @-mention only when asked.",
     });
   } catch (err) {
     return JSON.stringify({ ok: false, error: err instanceof Error ? err.message : String(err) });
