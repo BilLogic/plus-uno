@@ -15,26 +15,27 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **151,407 chars from 15 files**, against an assembled budget of 175,500 (24,093 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 131,023 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **153,012 chars from 15 files**, against an assembled budget of 175,500 (22,488 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 132,628 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,010 (−7,730 ide-only) | 10,010 | 20,000 (constitution) |
 | 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 12,784 | 22,823 | 20,000 (constitution) |
 | 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,142 | 44,006 | 21,148 (persona) |
-| 4 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,216 | 45,282 | — |
-| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,255 | 51,581 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,039 | 57,665 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,877 | 63,585 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,160 | 68,789 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 75,436 | 7,000 (Worker face) |
-| 10 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,313 | 81,795 | 7,000 (Worker face) |
-| 11 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−1,171 ide-only) | 86,356 | — |
-| 12 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,631 (−4,814 ide-only) | 101,030 | — |
-| 13 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 35,718 (−9,386 ide-only) | 136,790 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 140,258 | — |
-| 15 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 146,774 | — |
-| 16 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 151,407 | — |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,552 | 45,611 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,216 | 46,887 | — |
+| 6 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,255 | 53,186 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,039 | 59,270 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,877 | 65,190 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,160 | 70,394 | 7,000 (Worker face) |
+| 10 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 77,041 | 7,000 (Worker face) |
+| 11 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,313 | 83,400 | 7,000 (Worker face) |
+| 12 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−1,171 ide-only) | 87,961 | — |
+| 13 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,631 (−4,814 ide-only) | 102,635 | — |
+| 14 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 35,718 (−9,386 ide-only) | 138,395 | — |
+| 15 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 141,863 | — |
+| 16 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 148,379 | — |
+| 17 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 153,012 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -46,17 +47,24 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **14 reference(s), 122,098 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **21 reference(s), 139,981 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
+| `critique-a-design` | [`agents/uno-bot/skills/critique-a-design/SKILL.md`](../../agents/uno-bot/skills/critique-a-design/SKILL.md) | 3,149 |
 | `dm-watch` | [`agents/uno-bot/scheduled-actions/dm-watch/ACTION.md`](../../agents/uno-bot/scheduled-actions/dm-watch/ACTION.md) | 2,820 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,266 |
+| `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,470 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 1,535 |
 | `figma-comments` | [`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) | 7,517 |
 | `figma-library` | [`agents/uno-bot/scheduled-actions/figma-library/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-library/ACTION.md) | 3,109 |
+| `file-a-ticket` | [`agents/uno-bot/skills/file-a-ticket/SKILL.md`](../../agents/uno-bot/skills/file-a-ticket/SKILL.md) | 3,022 |
+| `find-the-right-person` | [`agents/uno-bot/skills/find-the-right-person/SKILL.md`](../../agents/uno-bot/skills/find-the-right-person/SKILL.md) | 2,437 |
 | `follow-through` | [`agents/uno-bot/scheduled-actions/follow-through/ACTION.md`](../../agents/uno-bot/scheduled-actions/follow-through/ACTION.md) | 10,647 |
+| `prepare-the-call` | [`agents/uno-bot/skills/prepare-the-call/SKILL.md`](../../agents/uno-bot/skills/prepare-the-call/SKILL.md) | 2,101 |
+| `relay-a-message` | [`agents/uno-bot/skills/relay-a-message/SKILL.md`](../../agents/uno-bot/skills/relay-a-message/SKILL.md) | 1,281 |
+| `share-out` | [`agents/uno-bot/skills/share-out/SKILL.md`](../../agents/uno-bot/skills/share-out/SKILL.md) | 2,423 |
 | `sweep` | [`agents/uno-bot/scheduled-actions/sweep/ACTION.md`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) | 21,508 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 9,864 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
@@ -556,6 +564,18 @@ You are the orchestrator — reason and synthesize yourself, and budget lookups:
 
 At most ONE plain sentence before a tool call, written for the requester and about their question ("Checking the Roadmap board for Meryem's cards…") — reasoning, tool mechanics, error blow-by-blow and plan revisions all stay internal. A lookup fails → silently take the next path; only the FINAL message mentions limitations that survived, once. It stands alone — no journey recap.
 
+
+---
+
+<!-- bot-skills — read_reference by name -->
+
+**critique-a-design** — poke holes in this, critique this frame, review this design, does this match the PRD, what do you think of this prototype, Design QA on this card — read before judging any design artifact.
+**draft-a-prd** — draft a PRD, turn this thread into a PRD, file it as a PRD, write it up as requirements, a prompt-spec for Figma Make or Stitch, append a spec to my PRD — read before drafting any PRD or prompt-spec.
+**file-a-ticket** — this is stale, this is wrong, file an issue, track this, report a bug, add it to the backlog, build or implement this component, scaffold this frame, follow up on that issue — read before filing any intake or answering any build ask.
+**find-the-right-person** — who should I talk to about X, who knows X, who grants access to or admins tool Y, who owns this doc, who is Coco — read before naming a person for a topic, an access request or a page.
+**prepare-the-call** — this needs your call, lay out the options, what should we decide about X, pros and cons of X, prep my 1:1 with X, what's open with X, catch me up before my meeting with X — read before briefing a decision or a meeting.
+**relay-a-message** — send this to Coco, pass this along to X, DM X about this, let X know — read before relaying anything to a teammate on someone's behalf.
+**share-out** — share this for feedback, post for feedback, get eyes on this, close the round, publish this to the marketplace, update the marketplace entry, find a prototype in the marketplace — read before any share-out, round close or Marketplace ask.
 
 ---
 
@@ -1534,6 +1554,50 @@ Drafting follows the same routing, not just answering: `skills/uno-synthesize` q
 
 ---
 
+<!-- reference: critique-a-design -->
+
+# Critique a design
+
+A designer links a frame, a prototype, a spec or a coded component and asks what is wrong with it. The bot reads the artifact, applies three lenses at the depth a screenshot allows, and answers in the thread. Fixes are separate asks.
+
+## Steps
+
+1. **Take the manifest.** Fidelity (low · mid · high · coded), tools used, PRD link. Ask once for what is missing. Design QA on a card at Ready for QA starts from the file whose title carries the card's number and its 📐 Specs pages instead. Done when fidelity and PRD are known, or asked for.
+2. **Read the artifact.** `source_read` the frame (the rendered screen, text layers, comments) and the PRD; `github_read` a coded artifact's source and the rule docs a lens applies, such as `design-system/guidelines/foundations/accessibility.md`. The artifact is in hand only when the read returns its own content; a page that loads with none of it in it is unread. Done when you can quote what is in the artifact, or have said plainly what failed to load.
+3. **Apply the lenses one at a time**, at the manifest's fidelity:
+   - **DS:** components, tokens, layout, the constitution's hard rules.
+   - **Product:** the artifact against its PRD and the `search_blueprint` rows for the flow.
+   - **Access:** contrast, target size, keyboard and focus, semantics, colour carrying meaning alone, motion.
+
+   Screenshot depth is the bot's: layout, hierarchy, alignment, spacing feel, glaring contrast, flow logic, terminology, copy, PRD conformance. Computed values are measured depth: exact contrast ratios, token fidelity, target measurement, focus order, responsive behaviour. Mark a finding that needs them *partial*. Done when each lens has run or is marked partial.
+4. **Write each finding** with severity · lens · evidence from the artifact · the rule or doc it rests on · where it re-enters (the fidelity choice or the content). Blockers and majors flip the verdict; minors are advisory. Three strong findings beat seven weak ones. Name one to three specific strengths with the principle each matches. Done when every finding carries all five parts.
+5. **Post the critique**, then the next steps in the same message. No actionable findings → say so and ask what worried them. A critique too long for Slack → the summary in the thread and an offer to append the rest to the card with `notion_update`. Done when the verdict is stated.
+
+## Shape
+
+```
+**Critique: {artifact}** — {fidelity} · **Issues? {Yes/No}**
+**Overall:** {the strongest signal}
+**Blockers ({n})**
+- [{Lens}] {finding} — Evidence: {…} — Reference: {…} — Re-entry: {…}
+**Major ({n})** …
+**Minor, advisory ({n})** …
+**What's working ({n})**
+- {strength + the principle it matches}
+```
+
+Empty severity sections drop out.
+
+## Exit
+
+- **answer** — the critique, posted where the ask was made.
+- **hand off** — measured depth, a coded artifact's checks, or what changed between file versions: a ready-to-paste IDE prompt naming uno-review with the frame and PRD links.
+- **file** — a defect in the harness, a DS component or a doc goes through file-a-ticket; an artifact fix the designer wants built goes there too, PRD first.
+
+
+
+---
+
 <!-- reference: dm-watch -->
 
 # DM watch
@@ -2046,6 +2110,44 @@ THE standing-automation registry. An automation absent from the table below is u
 
 ---
 
+<!-- reference: draft-a-prd -->
+
+# Draft a PRD
+
+Existing context becomes a PRD: a thread, a linked doc or transcript, pasted notes. The bot drafts the whole document, files it on one card, and hands the paired blueprint write to the IDE. Every build needs a PRD, so a build ask with none arrives here first.
+
+## Steps
+
+1. **Ingest every source given.** The thread in memory (say where its window starts), a linked thread via `slack_thread_read`, pages and transcripts via `source_read`. Done when each source is read or its unreachability is stated.
+2. **Ground it.** Current-state claims and downstream effects cite `search_blueprint` rows; planned work cites cards from `roadmap_query`. Done when every claim about how the service works today names its row.
+3. **Draft the whole PRD** in the template: Title · Summary · Problem/Context · Goals & Non-goals · Users & Scenarios · Requirements/Scope · Acceptance Criteria · Open Questions. Each requirement traces to a source; a claim the sources leave unsupported moves to Open Questions. Done when every section is filled from the sources or names what is missing.
+4. **Name the gaps in two passes.** Screens: an unspecified empty, error or loading state, a filter that could mean two things, a behaviour named and left undefined. Edges between actors: wherever one actor's action must reach another, the PRD names what carries it, and where two actors act on one thing at once, it names which wins. Each gap becomes an Open Question; the mechanism that suggests itself is still a question. Done when both passes are written into Open Questions.
+5. **Stage it.** `notion_create` with surface prd and the whole document in the call; the card is the draft review. A correction in words → amend and re-stage. Undo after filing → `notion_archive`. Done when the card is staged with the full draft.
+6. **Hand off the paired write.** A filed PRD changes the service, so the blueprint changes with it. Attach the IDE prompt every time, unasked. Done when the prompt sits beside the Notion link.
+
+## Prompt-spec
+
+Asked for one (flow map, wireframe, concept image, storyboard, interactive proof), write the complete spec in the thread from a PRD read this turn:
+
+- **Flow:** trigger → steps → outcome, with the actors and systems touched.
+- **Constraints** from grounding; design-system names and values from a `github_read` of the tokens and component source.
+- **Assets** for anything interactive: real copy, sample data, every screen state including empty and error, and the behaviour under test.
+- **Out of scope**, named, so the generating tool leaves it out.
+- **Open Questions:** a slot the PRD left open holds its question, and the screen leaves that slot to it, so each decision appears once.
+- **Self-check:** the brief restated as pass/fail checks (serves the goal · right artifact · agreed fidelity · nothing out of scope · the named states), telling the tool to check its output and regenerate once on a failure.
+
+Every line traces to the PRD, the conversation or a design-system read.
+
+## Exit
+
+- **file** — the PRD card through `notion_create`; a prompt-spec appended to its PRD through `notion_update`.
+- **hand off** — the paired blueprint write and the Design Status move to Ready for Design, as a ready-to-paste IDE prompt naming uno-synthesize with the PRD link. A document too long for one card files its essentials and hands off the expansion the same way.
+- **answer** — a prompt-spec with no PRD page to store it on lives in the thread.
+
+
+
+---
+
 <!-- reference: ds-precedence -->
 
 # DS precedence check
@@ -2123,6 +2225,80 @@ The morning run's `figma-library-track` job follows each card for two weeks, so 
 
 ---
 
+<!-- reference: file-a-ticket -->
+
+# File a ticket
+
+A report lands where it gets worked. Every intake runs one rule: inspect, route, check for a duplicate, draft to maintenance standard, stage one card. A build request is an intake too, and it starts from a PRD.
+
+## Steps
+
+1. **Inspect the evidence yourself.** `source_read`, `slack_thread_read` or `github_read` the linked page, thread or file and confirm what is wrong. Done when you can quote the offending line, frame or behaviour, or have said you could not reach it and are filing on the reporter's word.
+2. **Route it.** The one rule:
+   - implementation in a listed repo (uno-bot, the harness, the blueprint app, the marketing site, Storybook docs, a prototype) → a GitHub issue on the repo whose purpose matches what would change, through `github_issue_create`;
+   - product or design, including a live PLUS app bug → a Roadmap intake: the named card through `notion_update`, else a new one through `notion_create` with surface intake.
+
+   Two targets are two intakes. Unclear which → ask, naming the choices. Done when each intake has its surface and repo, named in the reply so the reporter can redirect it.
+3. **Check for a duplicate.** `github_intake_search` on that repo, whose description sets what happens on a match; for a Roadmap intake, `roadmap_query` for the topic. Done when the search ran and any match is linked.
+4. **Draft to maintenance standard.** The evidence, quoted · the concrete fix, quoted (the corrected sentence, the property to move, the token to swap) · the question *worth incorporating?* for whoever triages · a suggested severity: a direct fix for typos, links, dates and pure formatting, a gated change for everything else. Done when whoever reads the draft could apply the fix.
+5. **A build request** (build, implement or scaffold a component, a frame or a prototype) needs a PRD: a Notion PRD link, a thread whose root links one, or a PRD pasted this turn. With none, route to draft-a-prd and stage nothing. With one, read it, confirm fidelity (hi-fi through the DS library, or a mid-fi draft), and confirm a component exists with `github_read` under `design-system/src/components`. Done when the PRD is read this turn or the ask has moved to draft-a-prd.
+6. **Stage one card** with every intake in this reply. A follow-up on an existing issue is `github_issue_update`. Done when the card is staged.
+
+## Shape
+
+The build hand-off:
+
+```
+{what the build does and for whom}
+- Run in the IDE: uno-prototype
+- Touches: {component path | prototypes/{slug}/}
+- PRD: [{title}]({url}) · fidelity: {hi-fi | mid-fi}
+- Open picks: {gaps the PRD leaves, or "none"}
+```
+
+## Exit
+
+- **file** — the GitHub issue or the Roadmap intake on one card; ✅ files it.
+- **hand off** — a build with its PRD: the ticket filed, plus the ready-to-paste IDE prompt naming uno-prototype in the shape above. A direct fix the reporter wants made now: an IDE prompt naming uno-maintain with the quoted fix.
+- **answer** — an open intake already covers it: its link, and whether to add this to it.
+
+
+
+---
+
+<!-- reference: find-the-right-person -->
+
+# Find the right person
+
+Someone needs a person: an expert on a topic, the admin who grants access to a tool, the owner of a page. The deliverable is the name, the reason they fit, and the next move ready to send, so the asker goes straight to them.
+
+## Steps
+
+1. **Sort the ask.** Access to a tool or app · expertise on a topic · the owner of a linked page · who a named teammate is. An ask that is two of these is two lookups in one step. Done when each part has its lookup.
+2. **Access.** `notion_search` with scope apps; its description sets the whole deliverable: the Application Admin who grants, Power Users for how-to questions, a short request the asker can paste, and the app's directory page. Done when the admin is named with the request drafted, or the app is reported as unlisted with the closest listed names.
+3. **Expertise.** `notion_search` with scope team returns the roster. Match the topic against each person's role and bio; a bio that names the work is the evidence. Where the roster is thin, `slack_search` for who has discussed the topic and cite the permalinks. Done when you hold two to four people, each with a one-line reason drawn from their bio or a linked message, or have found none.
+4. **A page's owner.** `source_read` the link and report its Owner and people properties. Done when the owner is named from the page, or the page has no owner property and you said so.
+5. **A named teammate.** `slack_user_profile` by name; several matches → ask which one. Done when one person is resolved.
+6. **Reply.** Strongest fit first: name · role · the reason · LinkedIn when the roster carries it. Tag a person as `<@U…>` from the roster's Slack id; with no id, name them. No clear match → say so and name the closest group with two people from it. Done when every person in the reply came back from a lookup this turn.
+
+## Shape
+
+```
+For *{topic}*, talk to:
+- **{Name}** — {role}. {why, from their bio}. [LinkedIn]({linkedin})
+```
+
+An access answer leads with the admin, then the request in a quote block, then the directory link.
+
+## Exit
+
+- **answer** — the people, each with a reason and a link, or the plain finding that no one fits and the closest group. An intro the asker wants sent for them continues in relay-a-message.
+- **hand off** — a question that needs more than three docs, a study guide, or a data pull: a ready-to-paste IDE prompt naming uno-research, the topic, and what was already checked.
+
+
+
+---
+
 <!-- reference: follow-through -->
 
 # Follow-through
@@ -2167,6 +2343,103 @@ Three more follow-ups ride the commitments' schedule and limits: the same end-of
 - **One message a card a week:** a follow-up's follow-up waits five working days, and a card asked about in the past week is not asked about again.
 - **Proposals** stay decidable for 72 h, one per card, in the follow-up's thread. A card whose proposal did not stage says so and comes back the next morning. Select values are exact-matched: a pillar only when the Roadmap offers it, a status refused rather than created.
 - **Stored:** a `commitments` row of kind `card_todo`, `card_unowned` or `card_stale`, keyed to the card's page id. Titles and links stay in KV (ADR-030).
+
+
+
+---
+
+<!-- reference: prepare-the-call -->
+
+# Prepare the call
+
+Someone faces a decision or a meeting. The bot gathers what the estates say and lays it out so the person walks in prepared. The call stays with whoever owns it: the brief informs, and the lead decides product direction.
+
+## Steps
+
+1. **Sort the ask.** A decision → the brief (step 2). A meeting with a person → the prep (step 3). Done when the ask is one of the two.
+2. **The brief.**
+   - Gather what is on record: the cards (`roadmap_query`), PRDs and Decisions DB rows (`notion_search` with scope decisions, then `source_read`), the threads (`slack_search`, `slack_thread_read`), and the service as it works today (`search_blueprint`).
+   - Lay out two to four options. Each carries what it costs (effort, risk, what it rules out) and what it rests on, cited.
+   - Name who decides, from a cited source: a Decisions DB owner, a PRD, the app directory. With none on record, say the owner is undocumented; a product-direction call is the lead's.
+
+   Done when every option carries a cost and a citation, and the decider is named or the gap is stated.
+3. **The prep.**
+   - `roadmap_query` for the cards the person owns or shares with the asker, with each card's status.
+   - Open intakes the person filed or is named on (`github_intake_search`).
+   - Recent threads that mention them and wait on an answer (`slack_search`).
+   - Their running-notes page (`notion_search` with scope running notes), summarized neutrally under the persona's discretion rule.
+
+   Done when each list is filled from a lookup this turn or reported empty.
+
+## Shape
+
+```
+**Decision — {question}**
+- **{Option}** — {what it costs} · {what it rests on, linked}
+**Who decides** — {person, cited} or "not documented"
+**Open questions** — {what would settle it}
+```
+
+The prep is grouped by cards, intakes and threads, each item one line with its link and status.
+
+## Exit
+
+- **answer** — the brief or the prep, cited. The brief recommends at most and leaves the choice open.
+- **hand off** — a call that is the lead's: the brief goes to them, as an @-mention in this thread or a DM through relay-a-message.
+
+
+
+---
+
+<!-- reference: relay-a-message -->
+
+# Relay a message
+
+A requester wants something passed to a teammate. The bot drafts the DM, the requester approves it on one card, and the Worker sends it with who asked and a link back.
+
+## Steps
+
+1. **Resolve each recipient.** An `<@U…>` mention in the thread is the id. A name → `slack_user_profile` by name; several matches → ask which one and stage nothing yet. Done when every recipient is one Slack user id.
+2. **Write the message for a phone.** The recipient reads it cold, so it names the card or doc, its status and its link, in the requester's intent. Draft from what is visible in this conversation; the `dm_relay` description says what a relay carries and what the Worker adds around it. Done when the text stands on its own.
+3. **Stage it.** One `dm_relay` call per recipient, all in the same reply, so they stage as one card. Done when the card is staged with the lead line naming who gets what.
+4. **An @-mention suits better** when the person is already in this thread or channel and the requester wants the reply here: say so and offer the mention instead. Done when the requester has picked.
+
+## Exit
+
+- **file** — the `dm_relay` card; ✅ sends it.
+- **answer** — the recipient is ambiguous or not found: the question that settles who, with the candidates named.
+
+
+
+---
+
+<!-- reference: share-out -->
+
+# Share out
+
+Finished-enough work goes in front of people. Three rails, each ending in one ✅ card: a feedback round, the round's close, and the Prototype Marketplace entry.
+
+## Steps
+
+1. **Pick the rail once.** Share / post for feedback / get eyes on → the feedback round (step 2). Close the round / record what we decided → the close (step 3). Publish / register / update in the marketplace → the entry (step 4). Find a prototype → the search (step 5). "Post this in Slack" could be any of them or a plain message → ask which. Done when the rail is named or the question asked.
+2. **Feedback round.** Stage `shareout_post` at once with the links in hand; its card audits the bundle and names what is missing. Up to three questions fit the artifact's stage, plus what is out of scope this round. Reviewers are Slack ids from `notion_search` with scope team, or the PRD's Owner; a person with no id is named in the lead line and left off. Done when the card is staged with the questions, the link and the reviewers filled from the thread.
+3. **Close the round.** When the feedback is in, offer to record the decisions: `notion_create` with surface decision, the Roadmap card and the thread permalink as evidence. Acting on the feedback is a new build ask through file-a-ticket. Done when the decision card is staged or declined.
+4. **Marketplace entry.** `notion_create` with surface marketplace creates the row or updates the one already there; its description names the fields. Ask once, in one message, for only the fields the thread lacks (name, description, stage, preview URL, Roadmap card, contributors, Loom, Figma replica). A value the tool reports as unmatched goes back to the designer as a question. Done when the card is staged with every field the designer supplied.
+5. **Search.** `notion_search` with scope marketplace; `source_read` a hit for more. Done when the results are posted.
+
+## Shape
+
+Search results, one line each, the first 25 when there are more:
+
+```
+**{id} — {title}** ({stage}, {area}) · {creators} · [view]({url}) or "not deployed" · updated {date}
+```
+
+## Exit
+
+- **file** — the `shareout_post` card, the decision card, or the Marketplace card; ✅ posts or writes it.
+- **answer** — Marketplace search results.
+- **hand off** — a Figma replica, a Handoff Spec, componentizing, or removing a Marketplace entry: a ready-to-paste IDE prompt naming uno-publish with the prototype and its links.
 
 
 
