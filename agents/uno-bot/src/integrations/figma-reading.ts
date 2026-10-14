@@ -120,10 +120,10 @@ export function collectTextLayers(node: FigmaNode): { texts: string[]; truncated
 /** What `source_read` returns for a figma.com URL, said accurately. */
 export const FIGMA_NOTE =
   "Of the frame itself, this payload carries its name, node type, text layers, Dev Mode annotations " +
-  "and visible fills, each fill as it renders (hex, gradient or image). It carries no token or " +
-  "variable names and no measurements: a fill marked `variable` is bound to a variable whose name " +
-  "is unread. Never state a token name or a measurement from it, and never report one as absent, " +
-  "because they are unread here rather than missing. Visual judgement comes from the frame's " +
+  "and visible fills, each fill as it renders (hex, gradient or image). Token and variable names " +
+  "and measurements are unread: a fill marked `variable` is bound to a variable whose name is " +
+  "unread. Asked for a token, variable names or measurements, say they are unread here rather than " +
+  "missing, and name the route that reads them. Visual judgement comes from the frame's " +
   "rendered image when one is attached to this turn; this text describes no pixels.";
 
 /** Appended when the frame carries annotations. */

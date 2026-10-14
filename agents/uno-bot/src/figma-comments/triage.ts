@@ -12,7 +12,8 @@ import type { FigmaClient, FigmaComment } from "../figma/client";
 import { asksUno, isOwnComment } from "../figma-ask/trigger";
 import { etDayOf, etHourOn } from "../sweep/schedule";
 import { escapeSlackText } from "../slack/mrkdwn";
-import { resolveDestination, routeFinding, type ChannelIds } from "../destination/index";
+import { resolveDestination, routeFinding, type Addressee, type ChannelIds } from "../destination/index";
+import { escapeRegExp } from "../tools/slack-people";
 import { commentUrl } from "./draft";
 import type { FileOwner } from "./queue";
 import type { CommentThread } from "./threads";
@@ -280,10 +281,6 @@ export function namedIn(message: string, asker: string, handles: Record<string, 
   return out;
 }
 
-function escapeRegExp(text: string): string {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 /** Send one question: DMs to the mapped, and the channel card unless everyone
  *  named was DMed. Whether anything was sent, and the channel that refused the
  *  card because uno-bot is not in it. */
@@ -329,7 +326,7 @@ export function questionCard(
   q: Pick<WatchedQuestion, "by" | "section" | "page">,
   message: string,
   link: string,
-  addressee: { slack: string } | { figma: string } | null,
+  addressee: Addressee | null,
   unmapped: readonly string[],
 ): string {
   const to = addressee ? ("slack" in addressee ? `<@${addressee.slack}>, a` : `${escapeSlackText(addressee.figma)}, a`) : "A";

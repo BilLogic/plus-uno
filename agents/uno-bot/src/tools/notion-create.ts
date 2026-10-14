@@ -11,17 +11,11 @@ import type { Env } from "../types";
 import type { SlackContext } from "../types";
 import { postMessage } from "../slack/api";
 import { escapeSlackText } from "../slack/mrkdwn";
-import {
-  MarketplaceQuestion,
-  notionCreate,
-  publishMarketplaceRow,
-  type NotionCreateSurface,
-  type PrdSection,
-} from "../integrations/notion";
+import { notionCreate, type NotionCreateSurface, type PrdSection } from "../integrations/notion";
+import { MarketplaceQuestion, publishMarketplaceRow } from "../integrations/notion-marketplace";
 import { requesterName } from "./requester-name";
 
-type Surface = NotionCreateSurface | "marketplace";
-const SURFACES = new Set<Surface>(["prd", "intake", "decision", "marketplace"]);
+const SURFACES = new Set<NotionCreateSurface>(["prd", "intake", "decision", "marketplace"]);
 
 function asString(v: unknown): string {
   return typeof v === "string" ? v.trim() : "";
@@ -51,7 +45,7 @@ export async function executeNotionCreate(
   input: Record<string, unknown>,
   slack: SlackContext,
 ): Promise<string> {
-  const surface = asString(input.surface).toLowerCase() as Surface;
+  const surface = asString(input.surface).toLowerCase() as NotionCreateSurface;
   const title = asString(input.title);
   if (!SURFACES.has(surface)) {
     return JSON.stringify({ ok: false, error: `unknown or unsupported surface '${surface}'` });
@@ -135,15 +129,6 @@ export async function executeNotionCreate(
   }
 }
 
-/** A `properties` value by any spelling of its key: `deployment_url`,
- *  `Deployment URL` and `deploymentUrl` are one field. */
-function propOf(props: Record<string, unknown>, ...names: string[]): unknown {
-  const squash = (k: string) => k.toLowerCase().replace(/[\s_-]+/g, "");
-  const want = new Set(names.map(squash));
-  const key = Object.keys(props).find((k) => want.has(squash(k)));
-  return key === undefined ? undefined : props[key];
-}
-
 /** Create or update the Marketplace row, and post where it landed. A value the
  *  database cannot take goes back to the requester as a question. */
 async function publishToMarketplace(
@@ -154,8 +139,9 @@ async function publishToMarketplace(
 ): Promise<string> {
   const props =
     input.properties && typeof input.properties === "object" ? (input.properties as Record<string, unknown>) : {};
-  const field = (...names: string[]) => asString(propOf(props, ...names));
-  const people = propOf(props, "contributors");
+  // One name per field, the schema's (`tool-definitions.json`).
+  const field = (name: string) => asString(props[name]);
+  const people = props.contributors;
   const contributors = Array.isArray(people)
     ? asStringArray(people)
     : asString(people).split(",").map((x) => x.trim()).filter(Boolean);
@@ -164,10 +150,10 @@ async function publishToMarketplace(
       name: title,
       description: field("description") || asString(input.summary) || undefined,
       stage: field("stage") || undefined,
-      deploymentUrl: field("deployment_url", "preview_url") || undefined,
-      projectCard: field("project_card", "roadmap_card") || undefined,
+      deploymentUrl: field("deployment_url") || undefined,
+      projectCard: field("project_card") || undefined,
       contributors,
-      loom: field("loom", "loom_url") || undefined,
+      loom: field("loom") || undefined,
       repoPath: field("repo_path") || undefined,
       localPath: field("local_path") || undefined,
       figmaReplica: field("figma_replica") || undefined,
