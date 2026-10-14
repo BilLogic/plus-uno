@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **95,632 chars from 9 files**, against an assembled budget of 175,500 (79,868 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 75,248 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **96,325 chars from 9 files**, against an assembled budget of 175,500 (79,175 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 75,941 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,145 (−7,897 ide-only) | 10,145 | 20,000 (constitution) |
 | 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 14,498 | 24,672 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,066 | 45,779 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 47,425 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,216 | 48,701 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,646 (−203 ide-only) | 54,398 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,748 (−369 ide-only) | 66,198 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 13,910 (−6,223 ide-only) | 80,159 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 83,627 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 90,143 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 94,776 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 95,632 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 20,979 | 45,692 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 47,338 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,216 | 48,614 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,646 (−203 ide-only) | 54,311 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,748 (−369 ide-only) | 66,111 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 14,690 (−5,949 ide-only) | 80,852 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 84,320 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 90,836 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 95,469 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 96,325 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 129,656 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 129,033 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -55,15 +55,15 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,266 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,550 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 1,549 |
-| `figma-comments` | [`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) | 7,602 |
+| `figma-comments` | [`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) | 7,659 |
 | `figma-library` | [`agents/uno-bot/scheduled-actions/figma-library/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-library/ACTION.md) | 3,116 |
-| `file-a-ticket` | [`agents/uno-bot/skills/file-a-ticket/SKILL.md`](../../agents/uno-bot/skills/file-a-ticket/SKILL.md) | 3,142 |
+| `file-a-ticket` | [`agents/uno-bot/skills/file-a-ticket/SKILL.md`](../../agents/uno-bot/skills/file-a-ticket/SKILL.md) | 3,182 |
 | `find-the-right-person` | [`agents/uno-bot/skills/find-the-right-person/SKILL.md`](../../agents/uno-bot/skills/find-the-right-person/SKILL.md) | 2,558 |
 | `follow-through` | [`agents/uno-bot/scheduled-actions/follow-through/ACTION.md`](../../agents/uno-bot/scheduled-actions/follow-through/ACTION.md) | 10,647 |
 | `prepare-the-call` | [`agents/uno-bot/skills/prepare-the-call/SKILL.md`](../../agents/uno-bot/skills/prepare-the-call/SKILL.md) | 2,202 |
 | `relay-a-message` | [`agents/uno-bot/skills/relay-a-message/SKILL.md`](../../agents/uno-bot/skills/relay-a-message/SKILL.md) | 1,462 |
 | `share-out` | [`agents/uno-bot/skills/share-out/SKILL.md`](../../agents/uno-bot/skills/share-out/SKILL.md) | 2,615 |
-| `sweep` | [`agents/uno-bot/scheduled-actions/sweep/ACTION.md`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) | 21,535 |
+| `sweep` | [`agents/uno-bot/scheduled-actions/sweep/ACTION.md`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) | 20,815 |
 
 ## The assembled prompt
 
@@ -551,7 +551,7 @@ Every ✅-gated tool — its description opens by saying so — and zero irrever
 3. **Write the card's lead alongside the call:** one plain line + 2–4 terse `-` bullets. The thread card is a summary line, body size and Review, which opens the whole draft: your lead, *About to {verb}* with every parameter, any caveats — so the lead skips "react with ✅".
 4. **Missing required params → gather them conversationally first;** every param in a staged call is one the user gave you. Complete and unambiguous → act on what they said.
    - **A drafted document goes whole into the call, and the card is the draft review.** Ask once, on the card; a separate prose round of the same content stages nothing, so an "ok" gets eaten by the reaction tier while the person believes they approved.
-   - **A missing prerequisite is a refusal, not a staging decision.** No PRD at all for a build ask → say a PRD is required and route to `draft-a-prd`; stage nothing, and every PRD link you give is one you fetched.
+   - **A missing prerequisite is a refusal, not a staging decision.** A build ask's is its PRD: `file-a-ticket` holds the rule.
    - **A present-but-ambiguous brief is not a refusal.** An unspecified state, an undefined behaviour, a filter whose semantics could go two ways → NAME those gaps, either as a question instead of staging or in the preview bullets beside the card so the ✅ is informed.
 5. **One Proposal per user message, which may hold several operations** — every write you intend goes in the same reply, and the Worker stages them as one card for one ✅, then runs them in that order. A four-document reconciliation is four calls in one reply (read-only extras are fine).
 6. **Resolution:** 60-min expiry. `<pending_proposal>` in context + a decision on it → `proposal_resolve`. **One card, one firing:** `proposal_resolve` is the only call that completes a staged action; an action already staged gets no second card. Its Review pop-up decides: Approve (saved edits ride along), Needs changes (a note to revise from; locked until your revision lands) or Reject; ✅ / ⛔ reactions, a quiet fallback. A card that names who may confirm also takes the deployment's standing confirmers (the lead's), except a card in someone's own DM.
@@ -812,6 +812,17 @@ Useful context for grounding via `notion_search` catalog scopes (or Notion MCP i
 
 Pillar → channel map (group announcements; **all private — uno-bot must be invited before posting/@here**):
 `Universal` → #plus-universal `C072E8SFLKV` · `Admin` → #plus-admin `C089A3E9CCW` · `Toolkit` → #plus-toolkit `C08925VDFF1` · `Training` → #plus-training `C07L5RZV6DR` · `Marketing` → #plus-marketing `C052BG9NE86`. Tutoring + Help Center: unmapped — flag at retro.
+
+## The posting ladder
+
+Every scheduled action sends a finding to the first rung that fits (`agents/uno-bot/src/destination/`):
+
+1. Evidence in a private channel, a group DM or a DM → that place only.
+2. Evidence in a Slack thread → **that thread**.
+3. The team's channel, by the pillar → channel map above. The team is the linked Roadmap card's `Product Pillar`, else the Figma file's team; the card wins when they disagree. The library file is the Universal team's, and `design-system/` code and Storybook take the library's team.
+4. No team, or a pillar with no channel (Tutoring, Help Center) → #plus-design.
+
+The card's design owner is tagged. With no card, the Figma file's creator is named by handle, untagged. #uno-bot is off the ladder, and so is defaulting to the lead.
 
 ## Surfaces
 
@@ -1993,7 +2004,7 @@ A decision settled in a Figma comment reaches the PRD, the Roadmap card or the d
 - **Changing the wording:** Review's **Needs changes** on a card takes its note as the new wording: decision N is drafted again on the same route against its page as it reads now, and the revised card replaces it in place in the carousel, under the same number, as a new proposal with the same confirmers and time left. A typed reply rewords only on an explicit cue — `2: <new wording>`, `#2 …`, or `reword 2: …` — from one of the card's confirmers. Every other reply in the thread, and any reply that @mentions uno-bot, is left to the ordinary path: there uno-bot answers an @mention, and a typed ✅ or ⛔ decides no card.
 - **Key decisions:** a build rule tied to a Roadmap card, settled or concretely proposed, also drafts its Decisions DB row (`docs/connectors/notion/overview.md` § Decisions DB), run by the same card's Review after the update; a swept thread's fix carries one the same way, from a public channel only. The detector weighs it against the card's rows: one row per decision area, so a decision that widens a row renames it and adds a dated line, keeping its Owner and Evidence; one that replaces a row's adds a row linking it and marks the older Superseded; one a row already records adds nothing. Status follows the stage (Proposed, Accepted, Rejected). Owner is the proposer, and Sign-off only someone the evidence shows approving an Accepted decision, each placed through the Notion people map; the row's Evidence is the comment's link or the thread's permalink. The code is `agents/uno-bot/src/decisions-db/row.ts`.
 - **Terms:** a card's confirmers are the file's cards' Contributors (#plus-design's members for a file with no card). It's open for 72 h, with no re-ping. A thread is carded once: a later reply in it is not read again. A morning starts a file only when its budget covers every card; a parent whose cards all failed says so and is reused the next morning, so a file has one parent.
-- **Unanswered questions:** the same night read keeps each open question under Specs or For Review — a root asking something (a `?`), unresolved, with no reply from anyone but its asker; an @uno ask is answered as it is made instead. The first weekday morning after two whole workdays, the morning post re-reads the file's comments and raises a question still unanswered once, through the posting ladder (`docs/connectors/slack/overview.md`, the pillar → channel map): the card's team channel, else the Figma file's team channel, else #plus-design, tagging the card's design owner, else naming the file's creator by Figma handle. A person the question @-names gets a DM when the hand-kept `FIGMA_HANDLE_SLACK_IDS` map has their Figma handle; anyone it does not have is named on the channel card. A question whose every named person was DMed gets no channel card. The code is `agents/uno-bot/src/figma-comments/triage.ts`.
+- **Unanswered questions:** the same night read keeps each open question under Specs or For Review — a root asking something (a `?`), unresolved, with no reply from anyone but its asker; an @uno ask is answered as it is made instead. The first weekday morning after two whole workdays, the morning post re-reads the file's comments and raises a question still unanswered once, through the posting ladder (`docs/connectors/slack/overview.md` § The posting ladder), with the file's cards as its card and the nightly backstop's listing as its Figma team. The channel card goes on the usage record as a Worker-staged card; a channel uno-bot is not in keeps the question until it is invited. A person the question @-names gets a DM when the hand-kept `FIGMA_HANDLE_SLACK_IDS` map has their Figma handle; anyone it does not have is named on the channel card. A question whose every named person was DMed gets no channel card. The code is `agents/uno-bot/src/figma-comments/triage.ts`.
 
 ## Ask inside Figma
 
@@ -2054,7 +2065,7 @@ A report lands where it gets worked. Every intake runs one rule: inspect, route,
    Two targets are two intakes. Unclear which → ask, naming the choices. Done when each intake has its surface and repo, named in the reply so the reporter can redirect it.
 3. **Check for a duplicate.** `github_intake_search` on that repo, whose description sets what happens on a match; for a Roadmap intake, `roadmap_query` for the topic. Done when the search ran and any match is linked.
 4. **Draft to maintenance standard.** The evidence, quoted · the concrete fix, quoted (the corrected sentence, the property to move, the token to swap) · the question *worth incorporating?* for whoever triages · a suggested severity: a direct fix for typos, links, dates and pure formatting, a gated change for everything else. Done when whoever reads the draft could apply the fix.
-5. **A build request** (build, implement or scaffold a component, a frame or a prototype) needs a PRD: a Notion PRD link, a thread whose root links one, or a PRD pasted this turn. With none, route to draft-a-prd and stage nothing. With one, read it, confirm fidelity (hi-fi through the DS library, or a mid-fi draft), and confirm a component exists with `github_read` under `design-system/src/components`. Done when the PRD is read this turn or the ask has moved to draft-a-prd.
+5. **A build request** (build, implement or scaffold a component, a frame or a prototype) needs a PRD: a Notion PRD link, a thread whose root links one, or a PRD pasted this turn. With none, route to draft-a-prd and stage nothing; a PRD link you give is one you fetched. With one, read it, confirm fidelity (hi-fi through the DS library, or a mid-fi draft), and confirm a component exists with `github_read` under `design-system/src/components`. Done when the PRD is read this turn or the ask has moved to draft-a-prd.
 6. **Stage one card** with every intake in this reply. A follow-up on an existing issue is `github_issue_update`. Done when the card is staged.
 
 ## Shape
@@ -2289,16 +2300,7 @@ The **sweep** is uno-bot's end-of-day read of the design channels for **drift**:
 
 ## Where a card goes
 
-Every scheduled action sends a finding to the first rung that fits (the posting ladder, `agents/uno-bot/src/destination/`):
-
-1. Evidence in a private channel, a group DM or a DM → that place only.
-2. Evidence in a Slack thread → **that thread**.
-3. The team's channel, by the pillar → channel map (`docs/connectors/slack/overview.md`). The team is the linked Roadmap card's `Product Pillar`, else the Figma file's team; the card wins when they disagree. The library file is the Universal team's, and `design-system/` code and Storybook take the library's team.
-4. No team, or a pillar with no channel (Tutoring, Help Center) → #plus-design.
-
-The card's design owner is tagged. With no card, the Figma file's creator is named by handle, untagged.
-
-#uno-bot is off the ladder, and so is defaulting to the lead. A finding reaches only people who could already see its evidence (ADR-031):
+A finding takes the posting ladder (`docs/connectors/slack/overview.md` § The posting ladder), and reaches only people who could already see its evidence (ADR-031):
 
 - **Private channel:** the card goes in the source thread there, its owner and confirmers are people in that channel, and its text, links and names appear in no other message.
 - **Group DM:** the report goes back in that group DM, and a fix's Approve applies that fix only. Once a fix has written a page, a separate **share card** follows in the same thread. It shows the exact note and names its channel (rung 3 or 4): the page's name and link, with no quote and no names. It is decided from Review: Approve posts that note, Reject drops it. It has the fix's confirmers and 72 h. A re-staged fix offers no share.

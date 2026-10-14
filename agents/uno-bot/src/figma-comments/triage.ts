@@ -1,35 +1,8 @@
 // Figma comment triage: a question nobody answered, raised once after two
-// workdays, through the posting ladder (`../destination/`).
-//
-// WHAT IS WATCHED. The night's read (`./read.ts`) keeps, per file, each open
-// question it was shown: a root pinned under 📐 Specs or 🔍 For Review, read
-// whole (made after the watermark), unresolved, asking something (a `?`), and
-// with no reply from anyone but its asker. An @uno ask is not one — it was
-// answered as it was made (`../figma-ask/`). Beside the questions, what the
-// ladder reads: the Product Pillar of each card the file's title names, and
-// the file's owner — the card's design owner, else its creator by handle.
-//
-// WHEN IT IS RAISED. On the first morning two whole ET workdays (Monday to
-// Friday) have passed since it was asked: a Tuesday question waits Wednesday
-// and Thursday, and Friday's morning raises it. The morning re-reads the
-// file's comments first, one Figma call a file, and drops a question that was
-// answered, resolved or deleted since.
-//
-// WHERE IT GOES. The ladder, with no Slack evidence: the card's team channel,
-// else the Figma file's team channel (the nightly backstop's listing names
-// each file's team), else #plus-design; the card's design owner is tagged, else
-// the creator named by handle, untagged. A person @-named in the question gets
-// a DM when the hand-kept Figma handle → Slack id map
-// (`FIGMA_HANDLE_SLACK_IDS`) has them, rather than the channel post; a person
-// it does not have is named on the channel card. A question whose every
-// @-named person is mapped is DMed only.
-//
-// ONCE PER THREAD. A raised mark per root, kept 90 days, and the question
-// leaves the watch list as soon as anything about it was sent.
-//
-// ON THE RECORD. A channel card is a Worker-staged card on the usage record
-// (`workerCardEvent`): it runs nothing and ages out after three days. A DM is
-// not a card and writes nothing.
+// workdays. The rule — what is watched, when it is raised, where it goes and
+// whom it names — is the figma-comments scheduled action's
+// (`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`); this file is
+// its code.
 //
 // PURE: every dependency arrives through `TriagePorts`.
 

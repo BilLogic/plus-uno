@@ -1,20 +1,6 @@
-// THE POSTING LADDER: where every scheduled action's finding goes, and whom it
-// names. One decision, `routeFinding`, read by every job that posts with no
-// requester — the sweep, follow-through, commitments, the Figma jobs, the DS
-// precedence check.
-//
-// The first rung that fits wins (ADR-031 and its team-channel addendum):
-//
-//   1. evidence in a private channel, a group DM or a DM → that place only;
-//   2. evidence in a Slack thread → that thread;
-//   3. the team's channel, by the pillar → channel map below: the team is the
-//      linked Roadmap card's Product Pillar, else the Figma file's team, and
-//      the card wins when the two disagree;
-//   4. no team, or a team with no channel → #plus-design.
-//
-// Never #uno-bot, and never a default to the lead. The card's design owner is
-// tagged; with no design owner, the Figma file's creator is named by handle,
-// untagged, since nothing maps a Figma person to a Slack one.
+// THE POSTING LADDER, as code: `routeFinding`, read by every job that posts
+// with no requester. The rule is `docs/connectors/slack/overview.md` § The
+// posting ladder (ADR-031 and its team-channel addendum).
 //
 // A team channel is named by role here and by id in the Worker's config
 // (`resolveDestination`). All four team channels beside #plus-universal are

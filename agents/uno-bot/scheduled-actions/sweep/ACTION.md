@@ -26,16 +26,7 @@ The **sweep** is uno-bot's end-of-day read of the design channels for **drift**:
 
 ## Where a card goes
 
-Every scheduled action sends a finding to the first rung that fits (the posting ladder, `agents/uno-bot/src/destination/`):
-
-1. Evidence in a private channel, a group DM or a DM → that place only.
-2. Evidence in a Slack thread → **that thread**.
-3. The team's channel, by the pillar → channel map (`docs/connectors/slack/overview.md`). The team is the linked Roadmap card's `Product Pillar`, else the Figma file's team; the card wins when they disagree. The library file is the Universal team's, and `design-system/` code and Storybook take the library's team.
-4. No team, or a pillar with no channel (Tutoring, Help Center) → #plus-design.
-
-The card's design owner is tagged. With no card, the Figma file's creator is named by handle, untagged.
-
-#uno-bot is off the ladder, and so is defaulting to the lead. A finding reaches only people who could already see its evidence (ADR-031):
+A finding takes the posting ladder (`docs/connectors/slack/overview.md` § The posting ladder), and reaches only people who could already see its evidence (ADR-031):
 
 - **Private channel:** the card goes in the source thread there, its owner and confirmers are people in that channel, and its text, links and names appear in no other message.
 - **Group DM:** the report goes back in that group DM, and a fix's Approve applies that fix only. Once a fix has written a page, a separate **share card** follows in the same thread. It shows the exact note and names its channel (rung 3 or 4): the page's name and link, with no quote and no names. It is decided from Review: Approve posts that note, Reject drops it. It has the fix's confirmers and 72 h. A re-staged fix offers no share.
