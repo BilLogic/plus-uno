@@ -98,7 +98,7 @@ The design token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.
 2. **Locate the relevant files.** Components live in `design-system/src/components/`, forms in `design-system/src/components/forms-and-inputs/`, specs in `design-system/src/specs/`. Confirm the target component exists in `design-system/agent-views/components/index.md` (or flag it as a new component if not — see [references/new-component-scaffolding.md](references/new-component-scaffolding.md), loaded automatically when `isNewComponent` is true).
 3. **Verify props and styles.** Read the existing `.jsx` and `.stories.jsx` for any component you'll touch. Don't hallucinate props. Don't change a prop's type without flagging it in the PR description.
 4. **Plan the change.** List the files that will be modified — **including** the corresponding stories file. If the change touches a prop or variant, the stories MUST be updated in the same pass; do not ship code-only or stories-only. If >5 files total, stop and escalate to the in-IDE agent.
-5. **Write the change.** Update the component source AND its stories together. Apply the Token Mapping Rules above. Use barrel imports (`@/components/...` not deep paths). Use Plus terminology per `CONTEXT.md`. Follow Storybook conventions from [skills/uno-review/references/storybook.md](../../skills/uno-review/references/storybook.md) (property categorization: Design / Content / Behavior / Development; curated interactive prototypes; preset selectors over raw data editing).
+5. **Write the change.** Update the component source AND its stories together. Apply the Token Mapping Rules above. Use barrel imports (`@/components/...` not deep paths). Use Plus terminology per `GLOSSARY.md`. Follow Storybook conventions from [skills/uno-review/references/storybook.md](../../skills/uno-review/references/storybook.md) (property categorization: Design / Content / Behavior / Development; curated interactive prototypes; preset selectors over raw data editing).
 6. **Commit and open the draft PR.** The orchestration layer (`figma-implement.yml`) handles branch creation and PR opening — you produce the file contents in the exact output format below.
 7. **(Orchestration layer post-step)** Slack reaction emoji swaps to ✅/ℹ️/❌ based on outcome; PR link posts back to the originating thread.
 
@@ -107,7 +107,7 @@ The design token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.
 - `design-system/agent-views/components/index.md` — component existence check (MANDATORY)
 - `design-system/guidelines/composition/layout.md` — page layout formulas (if change touches a page)
 - `docs/engineering/coding.md` — file naming, imports, token usage, git conventions
-- `CONTEXT.md` — Plus vocabulary
+- `GLOSSARY.md` — Plus vocabulary
 
 ## References (Load When Relevant)
 

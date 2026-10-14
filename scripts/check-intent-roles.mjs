@@ -12,7 +12,7 @@
  *
  * A RATCHET, IN BOTH DIRECTIONS. 111 of the 137 uses were migrated on
  * 2026-08-29; the 26 that remain are recorded in
- * `docs/evals/intent-role-adoption.json` with a reason each. A count above its
+ * `scripts/baselines/intent-role-adoption.json` with a reason each. A count above its
  * record is a regression. A count BELOW its record is also a finding: the
  * baseline is the document that says why a remainder is allowed to remain, and
  * one that describes code that no longer exists has stopped being readable.
@@ -30,7 +30,7 @@ import { REPO_ROOT, counts, edgeUses, failures, stylesheets } from './intent-rol
 import { byRoot, main } from './lib/findings.mjs';
 import { isUnreviewed, openRatchet } from './lib/ratchet.mjs';
 
-const BASELINE = 'docs/evals/intent-role-adoption.json';
+const BASELINE = 'scripts/baselines/intent-role-adoption.json';
 const ROLES_FILE = `${TOKEN_DIR}/_color_roles.scss`;
 
 /*

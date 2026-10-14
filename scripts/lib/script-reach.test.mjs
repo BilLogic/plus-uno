@@ -29,7 +29,7 @@ function tree(files) {
   return root;
 }
 
-const RECORD = 'docs/evals/example-baseline.json';
+const RECORD = 'scripts/baselines/example-baseline.json';
 
 test('the record is found through the hop, where the check names it and the lib opens it', () => {
   // The two fallback families' shape exactly: the entry spells the path in the

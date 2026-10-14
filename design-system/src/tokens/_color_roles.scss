@@ -59,7 +59,7 @@
  * pass. Six of the seven roles alias their base, so those 111 changed no pixel —
  * what changed is that an edge now SAYS it is an edge, and the value can move
  * for edges alone. Twenty-six remain, each recorded with a reason in
- * `docs/evals/intent-role-adoption.json`:
+ * `scripts/baselines/intent-role-adoption.json`:
  *
  *   25  focus rings, all `--color-primary`. A focus indicator is its own role —
  *       Atlassian names `color.border.focused` beside `color.border` — and no

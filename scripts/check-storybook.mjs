@@ -67,7 +67,7 @@ import { isEntry } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const BASELINE = path.join(REPO_ROOT, 'docs/evals/a11y-baseline.json');
+const BASELINE = path.join(REPO_ROOT, 'scripts/baselines/a11y-baseline.json');
 /** The same path as the reader sees it, so the verdict's messages need no root. */
 const BASELINE_REL = path.relative(REPO_ROOT, BASELINE);
 

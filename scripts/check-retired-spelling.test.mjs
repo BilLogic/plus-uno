@@ -103,16 +103,23 @@ test('a reintroduced provider-sense "lane" fails the live sweep', () => {
   assert.equal(found[0].text, 'two lanes');
 });
 
-test('the ModelProvider glossary row may name the retired provider spellings', () => {
-  const row = '| **ModelProvider** | uno-bot\'s seam … | "the provider loop", "provider lane", "Gemini lane", "both lanes" (there is one loop) |';
-  assert.deepEqual(findingsIn(row, 'CONTEXT.md'), []);
-  assert.ok(findingsIn(row, 'docs/other.md').length > 0, 'the exemption is the glossary row, not the words');
+test('the ModelProvider glossary entry may name the retired provider spellings', () => {
+  const entry = '**ModelProvider**:\nuno-bot\'s seam …\n_Avoid_: "the provider loop", "provider lane", "Gemini lane", "both lanes" (there is one loop)';
+  assert.deepEqual(findingsIn(entry, 'GLOSSARY.md'), []);
+  assert.ok(findingsIn(entry, 'docs/other.md').length > 0, 'the exemption is the glossary entry, not the words');
 });
 
-test('the glossary row that names the old spelling in its Do NOT use cell is exempt', () => {
-  const row = '| **direct fix / gated change** | the two maintenance severities | "Tier 1 fix", "Tier 2 change" |';
-  assert.deepEqual(findingsIn(row, 'CONTEXT.md'), []);
-  assert.equal(findingsIn(row, 'docs/other.md').length, 1, 'the exemption is the glossary row, not the words');
+test('the glossary entry that names the old spelling in its _Avoid_ line is exempt', () => {
+  const entry = '**direct fix / gated change**:\nThe two maintenance severities.\n_Avoid_: "Tier 1 fix", "Tier 2 change"';
+  assert.deepEqual(findingsIn(entry, 'GLOSSARY.md'), []);
+  assert.equal(findingsIn(entry, 'docs/other.md').length, 1, 'the exemption is the glossary entry, not the words');
+});
+
+test('only the owning entry\'s _Avoid_ line is exempt — a neighbour or its definition is swept', () => {
+  const neighbour = '**sweep**:\nThe end-of-day read.\n_Avoid_: "Tier 1 fix"';
+  assert.equal(findingsIn(neighbour, 'GLOSSARY.md').length, 1);
+  const definition = '**ModelProvider**:\nOne agent loop, no Gemini lane.\n_Avoid_: "the provider loop"';
+  assert.equal(findingsIn(definition, 'GLOSSARY.md').length, 1);
 });
 
 test('history and generated artifacts are skipped by prefix', () => {

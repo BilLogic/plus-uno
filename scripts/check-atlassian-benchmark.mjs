@@ -44,7 +44,7 @@ import { openRatchet } from './lib/ratchet.mjs';
  * and the path `scripts/checks.registry.mjs` declares for this row. One
  * spelling, three readers.
  */
-const BENCHMARK = 'docs/evals/atlassian-benchmark.json';
+const BENCHMARK = 'scripts/baselines/atlassian-benchmark.json';
 
 /**
  * A year. Longer than the Figma snapshots' 180 days on purpose: this one is a

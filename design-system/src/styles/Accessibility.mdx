@@ -82,7 +82,7 @@ was 111 of 114 page stories before #243.
 `page-has-heading-one` is the rule for exactly this, and it never runs here: axe
 evaluates its page-level rules only when the run context is the whole document,
 and `addon-a11y` scopes every run to the story root. No page-level rule appears
-anywhere in `docs/evals/a11y-baseline.json` — not because they pass, because
+anywhere in `scripts/baselines/a11y-baseline.json` — not because they pass, because
 they are never evaluated.
 
 So it is guarded by two things that are not the baseline:
