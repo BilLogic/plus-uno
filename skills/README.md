@@ -70,8 +70,8 @@ lives.
 3. Is it already stated somewhere the reader can reach? → cite it. The IDE face
    has the whole method in context; the Worker face does not hold it and reads
    it by name through `read_reference` when its pointer fires, so a face cites
-   a method section (`method §4`) rather than restating it. `bot.md` is on a
-   7,000-char budget the bundler asserts — restatement is the first thing that
+   a method section (`method §4`) rather than restating it. `bot.md` is on the
+   char budget the bundler asserts (`BUDGETS.botFace`) — restatement is the first thing that
    blows it.
 
 ## What the guard measures

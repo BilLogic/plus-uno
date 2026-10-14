@@ -14,9 +14,8 @@
 // same assembly with the writes withheld, so the only thing it could hand the
 // harness runner was an exit code — the shape every other row in
 // `scripts/checks.registry.mjs` was reduced to under #509. The CLI keeps
-// `--check`, because `scripts/lib/bundled-set.mjs` and
-// `scripts/check-harness-budgets.mjs` spawn it for the manifest; the runner
-// calls this instead, in-process, and renders one banner for it.
+// `--check` for a human at a terminal; the runner calls this instead,
+// in-process, and renders one banner for it.
 //
 // It reads only this package's artifacts and the root docs, but it takes the
 // repo root like every other check on the findings interface (#509), so the

@@ -401,7 +401,7 @@ export function findDisagreements(input: CompareInput): Disagreement[] {
 
 /**
  * The components a library publish is still carrying: those a tracked card
- * dispatched, and those a change set waiting for its morning post touches,
+ * names, and those a change set waiting for its morning post touches,
  * mapped through the registry by set node id or name.
  *
  * @param tracked - The library tracker's cards (`implement` is a name list)

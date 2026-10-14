@@ -164,10 +164,6 @@ const FIELDS: Record<string, FieldSpec[] | ((input: Input) => FieldSpec[])> = {
     { path: "title", label: "Title", kind: "text", required: true },
     { path: "body", label: "Body", kind: "multiline", required: true },
   ],
-  email_send: [
-    { path: "subject", label: "Subject", kind: "text" },
-    { path: "body", label: "Body", kind: "multiline", required: true },
-  ],
   dm_relay: [{ path: "text", label: "Message", kind: "multiline", required: true }],
 };
 

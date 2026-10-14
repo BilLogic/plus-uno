@@ -24,7 +24,7 @@ import {
   auditBundle,
   findSharedAcross,
 } from './check-skill-overlap.mjs';
-import { harnessManifest, membershipMismatchReport, unresolvedReport } from './lib/bundled-set.mjs';
+import { harnessManifest, unresolvedReport } from './lib/bundled-set.mjs';
 
 const doc = (label, text) => ({ label, text });
 
@@ -253,23 +253,9 @@ test('the report for a short corpus names the shortfall and both numbers', () =>
   assert.match(msg, /bundle:harness/, 'must point at the command that fixes it');
 });
 
-test('a marker parse that comes back short is a mismatch, not a pass', () => {
-  // The failure mode the ticket describes: `<!-- path -->` markers shift format,
-  // the parse yields only member 0, and the guard compares one doc against
-  // nothing and exits 0. The bundler's own member count is the second opinion —
-  // a manifest field since #510, where it was a regex over `--check OK (N files`.
-  const msg = membershipMismatchReport({ parsed: 1, declared: 21, tag: 'skill-overlap' });
-  assert.match(msg, /parsed\n?\s*1 doc/, 'must state what the parse found');
-  assert.match(msg, /bundled 21/, 'must state what the bundler declares');
-  assert.match(msg, /bundled-set\.mjs/, 'must point at the parse, not at the corpus');
-});
-
-test("the count the mismatch compares against is the manifest's, not a parsed log line", () => {
+test("the corpus is the manifest's Worker-read rows, every one of them", () => {
   const manifest = harnessManifest({ tag: 'skill-overlap' });
   assert.equal(typeof manifest.census.bundled, 'number');
-  // And it is the number the guard actually measured over, which is the point:
-  // a witness that disagreed with the corpus would fail the check rather than
-  // sit in the manifest unread.
   assert.equal(manifest.census.bundled, auditBundle().declared - manifest.census.disclosed);
 });
 

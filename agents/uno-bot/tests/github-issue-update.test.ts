@@ -344,7 +344,7 @@ test("preflight refuses what the executor would refuse — a triage outcome, not
     [{ issue_number: 688 }, /nothing to do/],
     [{ issue_number: 688, state: "closed" }, /'state' must be one of/],
   ] as const) {
-    const ask = await preflight("github_issue_update", input, { env: PREFLIGHT_ENV, prd: null });
+    const ask = await preflight("github_issue_update", input, { env: PREFLIGHT_ENV });
     assert.ok(ask, JSON.stringify(input));
     assert.match(ask.ask, cause);
   }
@@ -353,13 +353,12 @@ test("preflight refuses what the executor would refuse — a triage outcome, not
 test("preflight asks which listed repo when the named one is off the list, and passes a listed one", async () => {
   const ask = await preflight("github_issue_update", { repo: "someone/else", issue_number: 1, comment: "x" }, {
     env: PREFLIGHT_ENV,
-    prd: null,
   });
   assert.ok(ask);
   assert.match(ask.ask, /someone\/else/);
   assert.ok(ask.ask.includes(SITE), ask.ask);
   for (const repo of [undefined, "plus-marketing-website", "BILLOGIC/PLUS-UNO"]) {
     const input = { issue_number: 1, comment: "x", ...(repo ? { repo } : {}) };
-    assert.equal(await preflight("github_issue_update", input, { env: PREFLIGHT_ENV, prd: null }), null, String(repo));
+    assert.equal(await preflight("github_issue_update", input, { env: PREFLIGHT_ENV }), null, String(repo));
   }
 });

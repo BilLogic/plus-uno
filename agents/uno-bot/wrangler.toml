@@ -241,9 +241,8 @@ UNO_BOT_CHANNEL_ID = "C0ARJ2A3A69"
 # /debug/slack-stream) may post raw test messages besides a DM and the alert
 # channel. Leave blank → DMs and the alert channel only.
 UNO_BOT_SANDBOX_CHANNEL = "C0B4QBWAUJU"
-# #plus-design channel id — reviewable artifacts (component_implement /
-# prototype_scaffold PRs, new PRDs from notion_create) are announced here for
-# team REVIEW (D5). Leave blank to disable fan-out (replies stay in-thread).
+# #plus-design channel id — reviewable artifacts (new PRDs from notion_create)
+# are announced here for team REVIEW (D5). Leave blank to disable fan-out (replies stay in-thread).
 PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
 # Where a change asked for in a Figma comment posts its lead and Review card
 # (src/figma-ask/env.ts), and where the weekly Figma tidy-up posts its Review
@@ -380,12 +379,12 @@ STANDING_CONFIRMER_IDS = "U03FYQJRQHX,U09E652SJ02"
 #   GITHUB_TOKEN
 #       PAT with repo:dispatch + Contents:Read + Issues:Write, on every
 #       repo in GITHUB_REPOS, plus Actions: Read and write on each repo
-#       that lists workflows. Powers component_implement /
-#       prototype_scaffold, which dispatch workflows in BilLogic/plus-uno,
-#       github_issue_create, which files intakes on each listed repo,
-#       github_issue_update, which follows up on issues there,
-#       github_workflow_run, which starts a listed workflow, and
-#       github_read / github_intake_search on each listed repo.
+#       that lists workflows. Powers the Figma snapshot refresh, which
+#       dispatches a workflow in BilLogic/plus-uno, github_issue_create,
+#       which files intakes on each listed repo, github_issue_update,
+#       which follows up on issues there, github_workflow_run, which
+#       starts a listed workflow, and github_read / github_intake_search
+#       on each listed repo.
 #   FIGMA_ACCESS_TOKEN
 #       Figma personal access token, used only through the Figma client
 #       (src/figma/): frame reads and renders, the library poll, the DS
@@ -421,16 +420,6 @@ STANDING_CONFIRMER_IDS = "U03FYQJRQHX,U09E652SJ02"
 #       read-only anon key for the uno-blueprint project. Unset,
 #       search_blueprint reports "not configured" and the bot falls back
 #       to cited docs rather than fabricating.
-#   GMAIL_SENDER [optional]
-#       authorized From mailbox for email_send. The whole Gmail lane is
-#       off unless all four GMAIL_* are set; send_email then fails
-#       gracefully.
-#   GMAIL_CLIENT_ID [optional]
-#       Gmail OAuth client id. See GMAIL_SENDER — all four or none.
-#   GMAIL_CLIENT_SECRET [optional]
-#       Gmail OAuth client secret. See GMAIL_SENDER — all four or none.
-#   GMAIL_REFRESH_TOKEN [optional]
-#       Gmail OAuth refresh token. See GMAIL_SENDER — all four or none.
 #   GEMINI_API_KEY [DO NOT SET]
 #       AI Studio key — must NOT be set on the Worker (ADR-018,
 #       2026-07-16). The Vertex SA above is canonical and takes precedence

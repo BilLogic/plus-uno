@@ -302,26 +302,6 @@ export const TOOL_TABLE = {
       nouns: ["archive", "card", "notion"],
     },
   },
-  component_implement: {
-    access: "gated",
-    retrieval: false,
-    reviewRequest: "component implementation PR",
-    gate: {
-      verb: "implement this component",
-      kind: "dispatch an implementation",
-      nouns: ["component", "implement", "build", "pr"],
-    },
-  },
-  prototype_scaffold: {
-    access: "gated",
-    retrieval: false,
-    reviewRequest: "new prototype scaffold PR",
-    gate: {
-      verb: "scaffold a new prototype from this Figma design",
-      kind: "scaffold a prototype",
-      nouns: ["prototype", "scaffold", "build", "pr"],
-    },
-  },
   shareout_post: {
     access: "gated",
     retrieval: false,
@@ -330,16 +310,6 @@ export const TOOL_TABLE = {
       verb: "share this for feedback in #plus-design-feedback",
       kind: "post a share-out",
       nouns: ["share", "share-out", "shareout", "feedback", "post"],
-    },
-  },
-  email_send: {
-    access: "gated",
-    retrieval: false,
-    reviewRequest: null,
-    gate: {
-      verb: "send an email via Gmail",
-      kind: "send an email",
-      nouns: ["email", "mail", "send"],
     },
   },
   // The relayed DM (GLOSSARY.md). One operation per recipient, so "send this to

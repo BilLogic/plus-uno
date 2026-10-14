@@ -100,15 +100,15 @@ export interface IntakeRow {
 export interface PublishIntake {
   /** The publish's identity: the newest version id, else the detection time. */
   key: string;
-  /** The Figma version a dispatch carries; absent when no version was
-   *  published (a metadata change), and then nothing is dispatched. */
+  /** The newest published Figma version; absent when no version was
+   *  published (a metadata change). */
   versionId?: string;
   /** A hidden line in the body that finds this issue again. */
   marker: string;
   title: string;
   body: string;
   rows: IntakeRow[];
-  /** The registry names an Approve drafts code for, sorted — every mapped
+  /** The registry names with code to bring in line, sorted — every mapped
    *  row the library did not just deprecate. */
   implement: string[];
   /** Figma names with no code mapping, deprecated ones aside. */
@@ -372,10 +372,6 @@ export function draftPublishIntake(changeSet: LibraryChangeSet, registry: Compon
     "- [ ] Storybook stories updated, and visual parity checked against Figma",
     "- [ ] Token changes run through `npm run sync:tokens && npm run generate:tokens`",
     ...(unmapped.length ? ["- [ ] Each \"no code mapping\" row is mapped in its MDX `figmaMeta`, or confirmed Figma-only"] : []),
-    "",
-    implement.length && newest
-      ? `Approving the #plus-universal card dispatches \`figma-implement.yml\` for: ${implement.join(", ")}.`
-      : "Nothing here is dispatched: no changed component has a code mapping, or no version was published.",
   );
 
   return {
@@ -506,7 +502,7 @@ export function releaseItem(changeSet: LibraryChangeSet, intake: PublishIntake, 
     body,
     open: { label: "Open library", url: libraryUrl(changeSet.fileKey) },
     ...(newest ? { also: { label: "View version", url: versionUrl(changeSet.fileKey, newest.id) } } : {}),
-    done: names.length && intake.versionId ? `the intake, and code drafts started for ${namesInWords(names)}.` : "the intake.",
+    done: "the intake.",
   };
 }
 
@@ -548,11 +544,10 @@ export function publishLead(changeSet: LibraryChangeSet, intake: PublishIntake):
  * @param ttlHours - How long the card stays open
  */
 export function libraryCardWords(intake: PublishIntake, ttlHours: number): StatedCardWords {
-  const drafts = intake.implement.length > 0 && !!intake.versionId;
   return {
     cancelled: "Rejected, nothing filed",
     expired:
-      `That card closed after ${windowInWords(ttlHours)} with no decision${drafts ? ", so nothing was drafted" : ""}. ` +
+      `That card closed after ${windowInWords(ttlHours)} with no decision. ` +
       "I file its intake the morning after, so the publish isn't lost.",
   };
 }

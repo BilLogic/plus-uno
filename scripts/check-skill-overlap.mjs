@@ -23,21 +23,17 @@
  * `GLOSSARY.md`, and it took a human reading all three to notice.
  *
  * THE BUNDLED SET IS ASKED OF THE BUNDLER, never re-globbed here — see
- * `scripts/lib/bundled-set.mjs`. A second list of members is a list that can
- * disagree with the first, which is the failure `#159` deleted. The cost is
- * that a stale bundle stops this check before it counts anything; the shared
- * module says so in those words rather than reporting it as an overlap.
+ * `scripts/lib/bundled-set.mjs`, which reads the manifest `assemble()` returns
+ * in-process. A second list of members is a list that can disagree with the
+ * first, which is the failure `#159` deleted. A tree the bundler refuses stops
+ * this check before it counts anything, and the shared module says so in those
+ * words rather than reporting it as an overlap.
  *
- * AND A SHORT SET STOPS IT TOO (#234). Asking the bundler still leaves the
- * answer to be READ BACK, by matching `<!-- path -->` markers in the artifact,
- * and this used to end in `.filter(fs.existsSync)` — every unresolved doc
- * dropped with no error, no warning and no count assertion. Break the marker
- * format and the parse yields one member; 210 pairings become 0; `0 substantive
- * shared line(s)` prints and the check exits 0 having compared nothing. Both
- * halves are now loud: the shared module cross-checks the parse against the
- * bundler's own member count, and the shortfall from disk comes back as
- * `missing` for the report below. The summary says `N of M docs the bundler
- * declares` for the same reason — one number cannot show a narrowing, two can.
+ * A SHORT SET STOPS IT TOO (#234). This used to end in `.filter(fs.existsSync)`
+ * — every unresolved doc dropped with no error, no warning and no count
+ * assertion. The shortfall from disk now comes back as `missing` for the report
+ * below. The summary says `N of M docs the bundler declares` for the same
+ * reason — one number cannot show a narrowing, two can.
  *
  * NOTE THE SCOPES OVERLAP BUT DO NOT NEST. `SKILL.md` is IDE-side and never
  * bundled, so scope one is the only thing that reads it; `AGENTS.md`,

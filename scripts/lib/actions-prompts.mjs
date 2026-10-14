@@ -63,7 +63,7 @@ export function walkPromptDocs(root) {
  * The Actions prompts, as repo-relative paths in the shape `resolveBundled`
  * reads — the same shape the other two scopes hand it.
  *
- * @returns {string[]} sorted, e.g. `scripts/prompts/uno-implement/SKILL.md`.
+ * @returns {string[]} sorted, e.g. `scripts/prompts/uno-integrity-sweep/SKILL.md`.
  */
 export function actionsPromptFiles() {
   return walkPromptDocs(PROMPTS_ROOT).map((rel) => `${ACTIONS_PROMPTS_DIR}/${rel}`);

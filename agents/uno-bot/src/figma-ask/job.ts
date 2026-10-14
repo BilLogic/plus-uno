@@ -431,8 +431,7 @@ export function askInstruction(teammate: boolean): string {
       ? [
           "A change they ask for is a proposal, routed as an intake: call the write that fits in this reply, and it waits as a card in #plus-design for the file's design owner to approve.",
           "Product or design, a bug in the live PLUS app included → the frame's Roadmap card when the file's name has `Card <n>` (`notion_update`, found through `roadmap_query`), else a new Roadmap card (`notion_create`);",
-          "implementation in a listed plus-uno repo — the blueprint, Storybook docs, the harness, prototypes → that repo's GitHub issue (`github_issue_create`);",
-          "a named design-system component change → `component_implement`.",
+          "implementation in a listed plus-uno repo — the blueprint, Storybook docs, the harness, prototypes, a design-system component → that repo's GitHub issue (`github_issue_create`).",
         ].join(" ")
       : "The asker is not on Team Members: answer from public facts only, and propose no change of any kind.",
   ].join(" ");

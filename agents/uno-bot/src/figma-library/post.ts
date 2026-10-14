@@ -21,9 +21,8 @@
 //
 // THE CARD. A publish is one decision, so it is one card, not one per
 // component. Its Review opens the publish in the pop-up: Approve files the
-// intake (`github_issue_create`) and, when any changed component maps to code,
-// dispatches `figma-implement.yml` for every one of them (`component_implement`
-// carrying `library_publish`); Reject files nothing. Open goes to the library,
+// intake (`github_issue_create`) and stages no build — the code change is IDE
+// work; Reject files nothing. Open goes to the library,
 // and View version to the publish. It is staged as the report's one item
 // (`itemProposal`), with no turn behind it, and two terms of its own:
 //   • `confirmers` — the channel's members, read here at staging time. The
@@ -119,25 +118,18 @@ export interface PostResult {
 }
 
 /**
- * Approve's batch: the intake, then the dispatch when anything maps to code.
+ * Approve's batch: the intake, and nothing else.
  *
  * @param intake - The drafted intake
  */
 export function libraryOperations(intake: PublishIntake): ProposalOperation[] {
-  const operations: ProposalOperation[] = [{ toolName: "github_issue_create", input: { title: intake.title, body: intake.body } }];
-  if (intake.implement.length && intake.versionId) {
-    operations.push({
-      toolName: "component_implement",
-      input: { component: intake.implement.join(", "), library_publish: intake.versionId },
-    });
-  }
-  return operations;
+  return [{ toolName: "github_issue_create", input: { title: intake.title, body: intake.body } }];
 }
 
 /**
  * The card as the Review pop-up shows it: a `stated` card whose lead is the
- * publish and its components, with its two operations as fields and no
- * footer — the pop-up's Approve and Reject are the decision.
+ * publish and its components, with its intake as the field and no footer —
+ * the pop-up's Approve and Reject are the decision.
  *
  * @param changeSet - What the poll found
  * @param intake - Its drafted intake
@@ -145,13 +137,10 @@ export function libraryOperations(intake: PublishIntake): ProposalOperation[] {
 export function libraryCard(changeSet: LibraryChangeSet, intake: PublishIntake, operations: ProposalOperation[] = libraryOperations(intake)): ProposalCard {
   return {
     kind: "stated",
-    verb: operations.length > 1 ? "file this intake and start the implementation" : "file this intake",
+    verb: "file this intake",
     lead: publishLead(changeSet, intake),
     footer: "",
-    fields: [
-      { label: "intake", value: intake.title },
-      ...(operations.length > 1 ? [{ label: "implement", value: intake.implement.join(", ") }] : []),
-    ],
+    fields: [{ label: "intake", value: intake.title }],
     caveats: [],
     operations,
   };
@@ -270,7 +259,7 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
       channel: deps.channel,
       ts,
       postedAt: deps.now(),
-      implement: operations.length > 1 ? intake.implement.join(", ") : null,
+      implement: intake.implement.length ? intake.implement.join(", ") : null,
       // Kept for an expiry nobody decides: the tracker files this draft and
       // closes this card (`figma-library/track.ts`).
       draft: { title: intake.title, body: intake.body },

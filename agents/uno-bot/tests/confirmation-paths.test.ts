@@ -1120,7 +1120,7 @@ describe("a stated card answers in its own words", () => {
   const WORDS = {
     cancelled: "Rejected, nothing filed",
     expired:
-      "That card closed after 72 h with no decision, so nothing was drafted. " +
+      "That card closed after 72 h with no decision. " +
       "I file its intake the morning after, so the publish isn't lost.",
   };
   const INTAKE = { toolName: "github_issue_create", input: { title: "Figma publish", body: "…" } };

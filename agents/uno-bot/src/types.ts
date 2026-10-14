@@ -145,12 +145,6 @@ export interface Env {
   // Channel the Slack probes may post raw test messages to besides a DM and the
   // alert channel. Unset → DMs and the alert channel only. See diagnostics/probes/slack.ts.
   UNO_BOT_SANDBOX_CHANNEL?: string;
-  // Gmail send (D6 connector). All optional — when unset, send_email fails
-  // gracefully with a "not configured" error instead of sending.
-  GMAIL_SENDER?: string;
-  GMAIL_CLIENT_ID?: string;
-  GMAIL_CLIENT_SECRET?: string;
-  GMAIL_REFRESH_TOKEN?: string;
   // uno-blueprint Supabase (D8 grounding). Read-only. When unset, search_blueprint
   // reports "not configured" so the bot falls back to cited docs instead of
   // fabricating.
@@ -294,13 +288,6 @@ export interface Env {
   // debug routes return 404. Set via `wrangler secret put DEBUG_TOKEN` and pass
   // it as the `x-debug-token` header. See src/index.ts.
   DEBUG_TOKEN?: string;
-  // email_send authorization (defense beyond the requester-identity gate):
-  // EMAIL_AUTHORIZED_USERS = comma-separated Slack user IDs allowed to trigger
-  // outward email; EMAIL_ALLOWED_DOMAINS = comma-separated recipient domains
-  // (e.g. "andrew.cmu.edu,tutor.plus"). Unset → email_send stays available to
-  // any requester / any recipient (legacy behavior). See tools/send-email.ts.
-  EMAIL_AUTHORIZED_USERS?: string;
-  EMAIL_ALLOWED_DOMAINS?: string;
   /** Comma-separated Slack user ids who may confirm or cancel any card that
    *  names its confirmers, beside the people it names — except a card in
    *  someone's 1:1 DM. Unset, a card's own set is the whole of it

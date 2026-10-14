@@ -533,7 +533,7 @@ describe("a change request", () => {
     assert.match(teammate!, /change they ask for[^.]*is a proposal[^.]*intake/i);
     assert.match(teammate!, /live PLUS app[^;]*frame's Roadmap card[^;]*`notion_update`[^;]*new Roadmap card \(`notion_create`\)/);
     assert.match(teammate!, /plus-uno repo[^;]*blueprint[^;]*Storybook[^;]*harness[^;]*prototypes[^;]*`github_issue_create`/);
-    assert.match(teammate!, /component[^.]*`component_implement`/);
+    assert.match(teammate!, /design-system component → that repo's GitHub issue/);
     assert.doesNotMatch(teammate!, /built product/);
     assert.doesNotMatch(teammate!, /nothing is written/i);
     assert.match(stranger!, /propose no change/);

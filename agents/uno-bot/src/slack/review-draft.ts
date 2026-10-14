@@ -168,14 +168,6 @@ function githubIssue(input: Input): ReadOperation {
   };
 }
 
-function email(input: Input): ReadOperation {
-  const list = (v: unknown) => (Array.isArray(v) ? v.map(str).filter(Boolean).join(", ") : str(v));
-  const properties: Array<[string, string]> = [["To", list(input.to)]];
-  if (list(input.cc)) properties.push(["Cc", list(input.cc)]);
-  properties.push(["Subject", str(input.subject)]);
-  return { headline: "Email", properties, body: str(input.body) ? [{ text: str(input.body) }] : [] };
-}
-
 function dmRelay(input: Input): ReadOperation {
   const id = relayRecipientId(input.recipient);
   return {
@@ -190,7 +182,6 @@ const READERS: Record<string, (input: Input) => ReadOperation> = {
   notion_create: notionCreate,
   notion_update: notionUpdate,
   github_issue_create: githubIssue,
-  email_send: email,
   dm_relay: dmRelay,
 };
 

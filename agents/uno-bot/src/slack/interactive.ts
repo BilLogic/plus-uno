@@ -24,7 +24,7 @@
 import type { Env } from "../types";
 import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
-import { PREVIEW_UNDER_WAIT_UNTIL, restageFor } from "../turn/env-deps";
+import { restageFor } from "../turn/env-deps";
 import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsPush, viewsUpdate } from "./api";
 import { executeVerdict, runVerdict } from "../agent/resolve-proposal";
 import { REVIEW_ACTION_ID } from "./proposal-render";
@@ -253,7 +253,7 @@ function buttonDoorDeps(env: Env, payload: InteractionPayload): ButtonDoorDeps {
     replaceCard: (message) => replaceCard(payload, message),
     // This door runs inside `waitUntil`, so a re-staged card's preview waits
     // only briefly for the Figma rate budget.
-    restage: restageFor(env, threadState, PREVIEW_UNDER_WAIT_UNTIL),
+    restage: restageFor(env, threadState),
   };
 }
 
@@ -420,7 +420,7 @@ function reviewDoorDeps(env: Env): ReviewDoorDeps {
       // announced in the thread.
       if (!res.ok) console.warn(`[interactive] card re-render after review failed on ${channel}/${ts}`);
     },
-    restage: restageFor(env, threadState, PREVIEW_UNDER_WAIT_UNTIL),
+    restage: restageFor(env, threadState),
     revise: (request) => reviseFromReview(env, request),
     fieldOptions: async (source) => {
       const database = optionDatabase(env, source);
