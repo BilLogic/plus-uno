@@ -9,7 +9,7 @@ import { openRatchet } from './lib/ratchet.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BENCHMARK = JSON.parse(
-  fs.readFileSync(path.join(REPO_ROOT, 'docs/evals/atlassian-benchmark.json'), 'utf8'),
+  fs.readFileSync(path.join(REPO_ROOT, 'scripts/baselines/atlassian-benchmark.json'), 'utf8'),
 );
 /**
  * The recorded floor, read the way the check reads it — through
@@ -20,7 +20,7 @@ const BENCHMARK = JSON.parse(
  */
 const floorOf = (ratchet) =>
   Object.fromEntries([...ratchet.entries].map(([key, entry]) => [key, entry.counts.get('count')]));
-const FLOOR = floorOf(openRatchet({ file: 'docs/evals/atlassian-benchmark.json' }));
+const FLOOR = floorOf(openRatchet({ file: 'scripts/baselines/atlassian-benchmark.json' }));
 
 const NOW = new Date('2026-08-29T00:00:00Z');
 const opts = { now: NOW, measuredAt: BENCHMARK.measuredAt, maxAgeDays: 365 };

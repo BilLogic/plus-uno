@@ -106,7 +106,7 @@ SLACK_STREAM_PLAN = "on"
 # Phase 5 context management: derived {goal, constraints, decisions, artifacts},
 # progressive summarisation, drift detection. Off because it changes what the
 # model sees on EVERY turn and its failure mode is subtly worse answers rather
-# than an error. Gated on judged evals compared CASE BY CASE — a stable 19/19
+# than an error. Gated on real answers read CASE BY CASE — a stable 19/19
 # total hid a live BLOCKER once already (r48).
 CONTEXT_STATE = "off"
 GITHUB_REPO = "BilLogic/plus-uno"
@@ -191,8 +191,8 @@ BLUEPRINT_APP_URL = "https://plus-uno.netlify.app/blueprint"
 #
 # OFF by default, same protocol as CONTEXT_STATE above and for the same reason:
 # tool-payload instructions are NOT additive — on 2026-08-06 a slack_search fix
-# displaced an unrelated instruction and broke a different eval case. Turn this
-# on in ONE DM first, then compare the judged evals CASE BY CASE (a stable total
+# displaced an unrelated instruction and broke a different answer. Turn this
+# on in ONE DM first, then read its answers CASE BY CASE (a stable total
 # hides one case breaking as another recovers) before it goes wide.
 #
 # What it buys: "does this scenario have a future state?" becomes a lookup
@@ -346,7 +346,7 @@ CLAUDE_MODEL = "claude-sonnet-5"
 # ── Usage record (src/usage/, ADR-030) ───────────────────────────────────────
 # Channels whose turns are flagged test traffic on the usage record, so they
 # never count toward adoption: #uno-bot-sandbox. Comma-separated channel ids.
-# Every /debug/* and /health/* route (the eval transport included) and a
+# Every /debug/* and /health/* route and a
 # greeting with no ask are test traffic without being listed here.
 #   uno-bot-sandbox C0B4QBWAUJU
 TEST_CHANNEL_IDS = "C0B4QBWAUJU"
@@ -407,8 +407,7 @@ STANDING_CONFIRMER_IDS = "U03FYQJRQHX,U09E652SJ02"
 #       wrong.
 #   DEBUG_TOKEN
 #       gates /debug/*, sent as x-debug-token. Unset those routes 404 —
-#       which is safe, but both eval workflows drive the Worker through
-#       them and would score nothing.
+#       which is safe, but the cutover scripts verify a move through them.
 #   SLACK_MCP_CLIENT_SECRET [optional]
 #       client secret for the static Slack OAuth client whose id is
 #       SLACK_MCP_CLIENT_ID in [vars]. Unset, slack_search reports "not

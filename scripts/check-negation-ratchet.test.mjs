@@ -53,7 +53,7 @@ import { openRatchet } from './lib/ratchet.mjs';
 const scopeBy = (key) => SCOPES.find((s) => s.key === key);
 
 /** The record, the way the check names it: repo-relative, and its key in the shape table. */
-const RECORD = 'docs/evals/negation-baseline.json';
+const RECORD = 'scripts/baselines/negation-baseline.json';
 const BASELINE = path.join(REPO_ROOT, RECORD);
 
 /**
@@ -69,7 +69,7 @@ const BASELINE = path.join(REPO_ROOT, RECORD);
 function withRecord(record, fn) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'negation-record-'));
   if (record) {
-    fs.mkdirSync(path.join(root, 'docs/evals'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'scripts/baselines'), { recursive: true });
     fs.writeFileSync(path.join(root, RECORD), `${JSON.stringify(record, null, 2)}\n`);
   }
   const opened = (key) => ({
@@ -603,7 +603,7 @@ test('no record at all is the one stated absent mode, not an empty baseline', ()
     compare([measureDocs(scope, [])], { actions: opened('actions') }),
   );
   assert.equal(failures.length, 1);
-  assert.match(failures[0], /no baseline is recorded at docs\/evals\/negation-baseline\.json/);
+  assert.match(failures[0], /no baseline is recorded at scripts\/baselines\/negation-baseline\.json/);
   assert.match(failures[0], /node scripts\/check-negation-ratchet\.mjs --update/);
 });
 

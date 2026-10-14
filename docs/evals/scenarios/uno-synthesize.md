@@ -4,7 +4,7 @@ summary: uno-synthesize — eval scenarios
 
 # uno-synthesize — eval scenarios
 
-<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/evals/runs/. Rubric: docs/evals/rubrics/uno-synthesize.md -->
+<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/knowledge/archive/eval-runs/. Rubric: docs/evals/rubrics/uno-synthesize.md -->
 
 ## S1 — three-source synthesis, then STOP
 - **Trigger:** "synthesize these: [Slack thread] + [interview transcript] + [analytics pull]"

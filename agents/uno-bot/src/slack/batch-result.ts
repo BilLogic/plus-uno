@@ -8,7 +8,7 @@
 // seam: writing it in `gate/run-batch.ts` was what made Gate reach into a
 // Slack module for the card's own renderer.
 //
-// A RESULT TABLE (CONTEXT.md § result table): the post is a head line and a
+// A RESULT TABLE (GLOSSARY.md (**result table**)): the post is a head line and a
 // table of where, what and result, a row per operation, with what an
 // operation created linked from its row. The grouped list is the message's
 // text copy — notifications read it — and the whole post when Slack refuses

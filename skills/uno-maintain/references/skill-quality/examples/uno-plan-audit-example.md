@@ -4,6 +4,8 @@ embodiment: ide
 
 # Example Audit: uno-plan
 
+A worked example of the audit format, kept for its shape. `uno-plan` is a retired skill: the `references/consulting.md` it cites lives on only in `docs/knowledge/archive/mode-era/`.
+
 ## Executive Summary
 - Overall result: `Needs Revision`
 - Issues: `4` (`P0: 0`, `P1: 3`, `P2: 1`)

@@ -34,7 +34,7 @@ import { openRatchet } from './lib/ratchet.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const BASELINE = 'docs/evals/button-contrast-baseline.json';
+const BASELINE = 'scripts/baselines/button-contrast-baseline.json';
 
 export const REMEDY =
   '  -> A label under 4.5:1, or two styles that render the same ground. If the\n' +

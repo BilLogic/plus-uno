@@ -1,5 +1,5 @@
 // The presentation step — what rides beneath an answer, chosen by the model and
-// filled by code (CONTEXT.md § result table).
+// filled by code (GLOSSARY.md (**result table**)).
 //
 // ONE STEP BETWEEN A TURN'S LOOKUPS AND ITS POST. Every lookup's result passes
 // through the presenter as it comes back, so it holds what the turn actually

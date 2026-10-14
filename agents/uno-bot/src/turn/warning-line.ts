@@ -1,5 +1,5 @@
 // The ⚠️ line — what the reader must not miss, one sentence under the answer,
-// beside the footer (CONTEXT.md § presentation; spec #982).
+// beside the footer (spec #982).
 //
 // CODE WRITES IT FROM WHAT THE TURN ALREADY KNOWS. Eight triggers, each read off
 // a fact the turn holds rather than off the prose:

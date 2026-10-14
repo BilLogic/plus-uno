@@ -613,7 +613,7 @@ function mergeRows(semantic: BlueprintRow[], keyword: BlueprintRow[]): Blueprint
 // retrievers run inside Postgres and are fused by reciprocal rank.
 //
 // WHY THIS REPLACED THE LADDER. The retrieval baseline (2026-08-19,
-// docs/evals/runs/2026-08-19-retrieval-baseline.json) measured structural-name
+// docs/knowledge/archive/eval-runs/2026-08-19-retrieval-baseline.json) measured structural-name
 // recall at 0/10 while paraphrase and exact-term were both 100%. Every one of
 // the ten returned 15 rows on 2 subrequests — the vector pass and nothing else.
 // The keyword pass never ran: SEMANTIC_THIN_RESULTS short-circuits it whenever
@@ -1047,7 +1047,7 @@ export async function fetchBlueprintIndex(
  * The raw phases→scenarios→paths embed the index is rendered from.
  *
  * Split out of fetchBlueprintIndex so a second caller can have the STRUCTURE
- * without the prose. The eval subject route (#415) needs to know which scenario
+ * without the prose. The eval subject route (#415, removed with the evals) needed to know which scenario
  * carries a non-live path, and the rendered index answers that only as a
  * `[proposed]` marker glued to a scenario name — parsing it back out would be a
  * second, worse copy of a shape this function already has. One select, one
@@ -1357,7 +1357,7 @@ export async function fetchTouchpoints(
   query: string,
   /** How many rows one page holds. 15 is the product read — a Slack reply
    *  quoting more registry rows than that is not a reply anyone reads. The eval
-   *  subject route (#452) asks for more: it reads the registry to find a term
+   *  subject route (#452, removed with the evals) asked for more: it reads the registry to find a term
    *  with a wide footprint in the prose, and rows come back `name.asc`, so a
    *  15-row page silently made the condition "…among the alphabetically-first
    *  fifteen tools" and skipped B4 on a board that satisfies it. */
