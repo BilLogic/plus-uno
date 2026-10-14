@@ -24,7 +24,8 @@
 // file or its old role name is describing a harness that no longer exists, so
 // each such line is a finding. History is left as written — plans, ADRs, todos
 // and the archive — and so are generated files, which regenerate from the
-// sources this guard already reads. `--retired-faces` prints the hits alone.
+// sources this guard already reads. The glossary's `_Avoid_:` lines are where a
+// retired word is meant to be named, so they are the one exemption. `--retired-faces` prints the hits alone.
 //
 // Usage:
 //   npm run check:bot-skills
@@ -61,6 +62,10 @@ const HISTORY = [
   'agents/uno-bot/src/generated/',
   'agents/uno-bot/harness-bundle.md',
 ];
+
+/** The glossary's `_Avoid_:` line is where a retired word is meant to live. */
+const AVOID_LINE = /^_Avoid_:/;
+const GLOSSARY = 'GLOSSARY.md';
 
 /** This check names the vocabulary it guards, so it skips itself. */
 const SELF = ['scripts/check-bot-skills.mjs', 'scripts/check-bot-skills.test.mjs'];
@@ -151,6 +156,7 @@ export function retiredFaceHits({ repoRoot = REPO_ROOT } = {}) {
     fs.readFileSync(path.join(repoRoot, rel), 'utf8')
       .split('\n')
       .forEach((text, i) => {
+        if (rel === GLOSSARY && AVOID_LINE.test(text)) return;
         if (RETIRED_FACE.test(text)) hits.push({ file: rel, line: i + 1, text: text.trim().slice(0, 160) });
       });
   }

@@ -118,6 +118,18 @@ test('the retired-face guard finds the old vocabulary in live files and skips hi
   assert.equal(hits[0].line, 3);
 });
 
+test("the glossary's _Avoid_ line may name a retired face; its other lines may not", () => {
+  const ctx = fixture(
+    {},
+    {
+      'GLOSSARY.md':
+        '# Terms\n\n**bot skill**:\nWhat uno-bot does.\n_Avoid_: "Worker face", "bot.md"\n\nThe Worker face is retired.\n',
+    },
+  );
+  const hits = retiredFaceHits(ctx);
+  assert.deepEqual(hits.map((h) => h.line), [7], 'only the prose line is a hit');
+});
+
 test('a live line naming a retired face is a finding with its file and line', () => {
   const ctx = fixture({}, { 'agents/uno-bot/AGENT.md': '# Persona\n\nRead the Worker face in bot.md.\n' });
   const findings = run(ctx);

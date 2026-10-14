@@ -15,21 +15,21 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **116,554 chars from 9 files**, against an assembled budget of 175,500 (58,946 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 96,170 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **118,259 chars from 9 files**, against an assembled budget of 175,500 (57,241 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 97,875 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,159 (−7,828 ide-only) | 10,159 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 12,784 | 22,972 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,048 | 44,061 | 21,148 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,552 | 45,666 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,216 | 46,942 | — |
-| 6 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−1,171 ide-only) | 51,503 | — |
-| 7 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,631 (−4,814 ide-only) | 66,177 | — |
-| 8 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 35,718 (−9,386 ide-only) | 101,937 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 105,405 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 111,921 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 116,554 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 14,489 | 24,677 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,048 | 45,766 | 21,148 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,552 | 47,371 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,216 | 48,647 | — |
+| 6 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−1,171 ide-only) | 53,208 | — |
+| 7 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,631 (−4,814 ide-only) | 67,882 | — |
+| 8 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 35,718 (−9,386 ide-only) | 103,642 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 107,110 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 113,626 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 118,259 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -252,9 +252,9 @@ A design value: color, spacing, typography, elevation, radius.
 **Foundation**:
 A fundamental design primitive (color palette, type scale, grid).
 
-**replica**:
-The Figma frame mirroring a coded prototype, required in prototype share-outs.
-_Avoid_: "screenshot"
+**Figma replica**:
+A Figma frame a person makes to mirror a coded prototype: an optional link on its Marketplace row and in its share-out.
+_Avoid_: bare "replica", "screenshot"
 
 ### Estates
 
@@ -332,8 +332,15 @@ A gated DM uno-bot sends someone on a requester's behalf, attributed.
 _Avoid_: "proactive DM", "outreach"
 
 **intake**:
-A change request: implementation in a listed plus-uno repo (blueprint, Storybook docs, harness, prototypes) → that repo's GitHub issue; product or design, including a live PLUS app bug → a Roadmap card, the frame's own when named, else a new one.
+A change request, routed by the `file-a-ticket` bot skill: implementation in a listed repo → that repo's GitHub issue; product or design, a live PLUS app bug included → a Roadmap card.
 _Avoid_: "ticket"
+
+**decision card**:
+The Slack shape a **scheduled action** reports on: a parent line, then one card per item with Review and Open, each item its own **proposal card**.
+
+**lead**:
+The design team's lead (Bill today): makes product-direction calls and is the deployment's standing confirmer. Distinct from **Lead Tutor**.
+_Avoid_: "GOAT", "admin"
 
 **agent session**:
 The Slack object a uno-bot conversation runs inside, moving through `active` · `processing` · `suspended` · `closed`; it replaces Slack's deprecated assistant threads.
@@ -365,8 +372,30 @@ _Avoid_: "the AI"
 A runtime uno runs in (the IDE, the uno-bot Worker, headless GitHub Actions), each with its own powers and its own slice of the harness.
 _Avoid_: "mode", "environment"
 
+**uno skill**:
+An IDE workflow under `skills/` (`uno-research` … `uno-maintain`): `SKILL.md` over its method, invoked by a person.
+_Avoid_: bare "skill" where a **bot skill** could be meant
+
+**bot skill**:
+What uno-bot does for one kind of ask, under `agents/uno-bot/skills/`, named for the action (`draft-a-prd`): its description is always loaded as a **pointer**, its body is read by name, and it ends in one **exit**.
+_Avoid_: "Worker face", "bot face", "bot.md"
+
+**exit**:
+How a bot skill ends: **answer** (the reply is the deliverable), **file** (a ✅ card writes or sends), or **hand off**.
+
+**hand off**:
+The exit that passes the rest of the work on: a ready-to-paste IDE prompt naming the uno skill, or the **lead** for a call only they make. Distinct from the **Handoff Spec**, the document a dev handoff carries.
+_Avoid_: "handoff" for the exit
+
+**scheduled action**:
+Work uno-bot does on its own clock whose posts people reply to; one doc per family under `agents/uno-bot/scheduled-actions/`, read by name.
+_Avoid_: "scheduled job", "cron", "skill"
+
+**connector overview**:
+The always-loaded doc for one tool under `docs/connectors/`: what uno reaches in it and the rules for each reach. Anything else about the tool is **disclosed** beside it.
+
 **share-out**:
-A feedback-rail publish: Loom + preview + Decisions DB link (+ replica for prototypes).
+A feedback-rail publish: Loom + preview + Decisions DB link (+ a **Figma replica** when one exists).
 _Avoid_: "post", "update"
 
 **direct fix / gated change**:
@@ -386,7 +415,7 @@ A line held in context that names material outside it and when to reach it: a sk
 _Avoid_: "link", "reference" (a reference is what a pointer points AT)
 
 **ladder** / **disclosed**:
-Where writing sits by how immediately the agent needs it: in-file step · in-file reference · **disclosed** reference, pushed out of the always-loaded tier behind a pointer and loaded only when it fires.
+Where writing sits by how immediately the agent needs it: in-file step · in-file reference · **disclosed** reference, pushed out of the always-loaded tier behind a pointer and loaded only when it fires. For uno-bot, a doc declares `disclosure: reference` and is read through `read_reference`.
 _Avoid_: "hidden" or "optional" for disclosed
 
 **leading word**:
