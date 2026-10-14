@@ -19,6 +19,7 @@ Team filtering, Project-card relations, and Roadmap rollups live in Notion. Prot
 
 Names are exact — Notion silently auto-creates a select option on any mismatch, so
 fetch the schema and exact-match before every write (see `docs/connectors/notion/overview.md`).
+A given field whose column the live schema lacks goes in the page body as a `**Property:** value` line, on create and on update.
 
 | Property | Type | Maps to JS field | Notes |
 |---|---|---|---|
@@ -34,7 +35,7 @@ fetch the schema and exact-match before every write (see `docs/connectors/notion
 | **Loom** | url | `loomVideoUrl` | null → empty |
 | **Repo path** | rich_text | `repoPath` | always ends `/` |
 | **Local path** | rich_text | `localPath` | app route, e.g. `/1025` |
-| **Figma replica** | url | — | optional; the person-made Figma replica of the prototype. While the database has no such column, the link goes in the page body, on create and on update |
+| **Figma replica** | url | — | optional; the person-made Figma replica of the prototype |
 | **Upvotes** | number | `upvotes` | new entries = 0 |
 | **Last updated** | last_edited_time | `lastUpdated` | Notion-managed |
 

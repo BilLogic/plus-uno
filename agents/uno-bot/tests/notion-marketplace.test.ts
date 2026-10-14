@@ -30,11 +30,13 @@ const ENV = {
 const SLACK = { channel: "D1", threadTs: "1700000000.000001", user: "U1" } as unknown as import("../src/types").SlackContext;
 
 /** The live schema, as `GET /databases/{id}` reports it. */
-function schema(opts: { figmaReplica?: boolean } = {}) {
+function schema(opts: { figmaReplica?: boolean; missing?: string[] } = {}) {
   const sel = (names: string[]) => ({ type: "select", select: { options: names.map((name) => ({ name })) } });
+  const without = (props: Record<string, unknown>) =>
+    Object.fromEntries(Object.entries(props).filter(([name]) => !opts.missing?.includes(name)));
   return {
     id: MARKET,
-    properties: {
+    properties: without({
       Name: { type: "title" },
       Description: { type: "rich_text" },
       Stage: sel(["Low-fi", "Mid-fi", "High-fi"]),
@@ -49,7 +51,7 @@ function schema(opts: { figmaReplica?: boolean } = {}) {
       "Local path": { type: "rich_text" },
       Upvotes: { type: "number" },
       ...(opts.figmaReplica === false ? {} : { "Figma replica": { type: "url" } }),
-    },
+    }),
   };
 }
 
@@ -60,7 +62,7 @@ const CARD_PAGE = {
   properties: { Name: { type: "title", title: [{ plain_text: "Session review" }] } },
 };
 
-function routes(extra: Routes = {}, opts: { figmaReplica?: boolean; existing?: unknown[] } = {}): Routes {
+function routes(extra: Routes = {}, opts: { figmaReplica?: boolean; missing?: string[]; existing?: unknown[] } = {}): Routes {
   return {
     [`GET /databases/${MARKET}`]: { body: schema(opts) },
     [`GET /pages/${CARD}`]: { body: CARD_PAGE },
@@ -255,6 +257,47 @@ test("an update appends the Figma replica link once: a page that already holds i
 
   assert.equal(out.status, "updated");
   assert.equal(calls.some((c) => c.method === "PATCH" && c.url.includes("/children")), false);
+});
+
+test("a given field whose property the live schema lacks waits in the body, as the replica link does", async () => {
+  serve(routes({ "POST /pages": { body: { id: ROW, url: `https://www.notion.so/${ROW}` } } }, { missing: ["Loom", "Repo path"] }));
+  const { executeNotionCreate } = await tool();
+
+  const out = JSON.parse(await executeNotionCreate(ENV, INPUT, SLACK));
+
+  assert.equal(out.ok, true);
+  const post = calls.find((c) => c.method === "POST" && c.url.endsWith("/v1/pages"))!;
+  const props = post.body!.properties as Record<string, unknown>;
+  assert.equal("Loom" in props || "Repo path" in props, false);
+  const body = JSON.stringify(post.body!.children);
+  assert.match(body, /Loom:/);
+  assert.match(body, /loom\.com\/share\/abc/);
+  assert.match(body, /Repo path:/);
+  assert.match(body, /prototypes\/session-review\//);
+});
+
+test("an update appends a given field the live schema lacks to the page body, once", async () => {
+  const existing = [{ id: ROW, url: `https://www.notion.so/${ROW}`, properties: { Name: { type: "title", title: [{ plain_text: "Session review" }] } } }];
+  const held = { type: "paragraph", paragraph: { rich_text: [{ plain_text: `Repo path: prototypes/session-review/` }] } };
+  serve(
+    routes(
+      {
+        [`PATCH /pages/${ROW}`]: { body: { id: ROW, url: `https://www.notion.so/${ROW}` } },
+        [`GET /blocks/${ROW}/children`]: { body: { results: [held], has_more: false } },
+        [`PATCH /blocks/${ROW}/children`]: { body: { results: [] } },
+      },
+      { missing: ["Loom", "Repo path"], existing },
+    ),
+  );
+  const { executeNotionCreate } = await tool();
+
+  const out = JSON.parse(await executeNotionCreate(ENV, INPUT, SLACK));
+
+  assert.equal(out.status, "updated");
+  const appends = calls.filter((c) => c.method === "PATCH" && c.url.includes(`/blocks/${ROW}/children`));
+  assert.equal(appends.length, 1, "one append carries every missing field");
+  assert.match(JSON.stringify(appends[0]!.body), /loom\.com\/share\/abc/);
+  assert.doesNotMatch(JSON.stringify(appends[0]!.body), /Repo path/, "a line the page already holds is not added again");
 });
 
 test("before a card is staged, a publish missing its stage and deployment link asks for exactly those", async () => {

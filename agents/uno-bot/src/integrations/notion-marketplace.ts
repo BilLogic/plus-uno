@@ -227,20 +227,31 @@ async function existingMarketplaceRow(env: Env, databaseId: string, input: Marke
   return rows[0] ?? null;
 }
 
-/** On an update, the replica line a create would have written, appended once:
- *  a page whose first blocks already hold the link is left as is. */
-async function keepReplicaInBody(env: Env, pageId: string, replica: string, signal: AbortSignal): Promise<void> {
+/** A given field the live schema has no column for: it goes on the page body instead. */
+interface BodyField {
+  prop: string;
+  shown: string;
+}
+
+const bodyLine = (f: BodyField) => `**${f.prop}:** ${f.shown}`;
+
+/** On an update, the body lines a create would have written for fields with
+ *  no column, appended once each: a line whose value the page's first blocks
+ *  already hold is left out. */
+async function keepFieldsInBody(env: Env, pageId: string, fields: readonly BodyField[], signal: AbortSignal): Promise<void> {
   const read = await countedFetch(`${NOTION_API}/blocks/${pageId}/children?page_size=100`, { headers: notionHeaders(env), signal });
   const held = (await read.json()) as { results?: unknown[]; message?: string; code?: string };
   if (!read.ok) throw notionError(read.status, held, "marketplace body read failed");
-  if (JSON.stringify(held.results ?? []).includes(replica)) return;
+  const page = JSON.stringify(held.results ?? []);
+  const missing = fields.filter((f) => !page.includes(f.shown));
+  if (!missing.length) return;
   const res = await countedFetch(`${NOTION_API}/blocks/${pageId}/children`, {
     method: "PATCH",
     headers: notionHeaders(env, { write: true }),
-    body: JSON.stringify({ children: bodyToBlocks(`**Figma replica:** ${replica}`) }),
+    body: JSON.stringify({ children: bodyToBlocks(missing.map(bodyLine).join("\n\n")) }),
     signal,
   });
-  if (!res.ok) throw notionError(res.status, await res.json(), "marketplace replica append failed");
+  if (!res.ok) throw notionError(res.status, await res.json(), "marketplace body append failed");
 }
 
 /**
@@ -260,28 +271,31 @@ export async function publishMarketplaceRow(env: Env, input: MarketplaceInput): 
 
   const schema = await marketplaceSchema(env, databaseId);
   const properties: Record<string, unknown> = { Name: { title: richText(name) } };
-  // Only a property the live schema carries, and never one Notion computes.
-  const set = (prop: string, value: unknown) => {
+  // Only a property the live schema carries, and never one Notion computes. A
+  // given field with no column stays on the page body, so nothing given vanishes.
+  const inBody: BodyField[] = [];
+  const set = (prop: string, value: unknown, shown?: string) => {
     const type = schema[prop]?.type;
     if (type && type !== "rollup" && type !== "formula") properties[prop] = value;
+    else if (shown) inBody.push({ prop, shown });
   };
   const text = (v: string) => ({ rich_text: richText(v) });
 
   // Preflight asked these before the card was staged; checked again here, for
   // what changed in Notion since.
   const matched = await matchFields(env, input, schema);
-  if (input.description?.trim()) set("Description", text(input.description.trim()));
-  if (matched.stage) set("Stage", { select: { name: matched.stage } });
-  if (matched.card) set("Project card", { relation: [{ id: matched.card }] });
-  if (matched.contributors) set("Contributors", { people: matched.contributors.map((id) => ({ id })) });
-  if (input.deploymentUrl?.trim()) set("Deployment URL", { url: input.deploymentUrl.trim() });
-  if (input.loom?.trim()) set("Loom", { url: input.loom.trim() });
-  if (input.repoPath?.trim()) set("Repo path", text(input.repoPath.trim()));
-  if (input.localPath?.trim()) set("Local path", text(input.localPath.trim()));
+  const description = input.description?.trim();
+  const deployment = input.deploymentUrl?.trim();
+  if (description) set("Description", text(description), description);
+  if (matched.stage) set("Stage", { select: { name: matched.stage } }, matched.stage);
+  if (matched.card) set("Project card", { relation: [{ id: matched.card }] }, input.projectCard!.trim());
+  if (matched.contributors) set("Contributors", { people: matched.contributors.map((id) => ({ id })) }, input.contributors!.join(", "));
+  if (deployment) set("Deployment URL", { url: deployment }, deployment);
+  if (input.loom?.trim()) set("Loom", { url: input.loom.trim() }, input.loom.trim());
+  if (input.repoPath?.trim()) set("Repo path", text(input.repoPath.trim()), input.repoPath.trim());
+  if (input.localPath?.trim()) set("Local path", text(input.localPath.trim()), input.localPath.trim());
   const replica = input.figmaReplica?.trim();
-  if (replica) set("Figma replica", { url: replica });
-  // The replica link stays on the page when the database has no column for it.
-  const replicaInBody = !!replica && !("Figma replica" in properties);
+  if (replica) set("Figma replica", { url: replica }, replica);
 
   const existing = await existingMarketplaceRow(env, databaseId, input);
   const controller = new AbortController();
@@ -296,15 +310,16 @@ export async function publishMarketplaceRow(env: Env, input: MarketplaceInput): 
       });
       const data = (await res.json()) as { id?: string; url?: string; message?: string; code?: string };
       if (!res.ok) throw notionError(res.status, data, "marketplace update failed");
-      if (replicaInBody) await keepReplicaInBody(env, existing, replica!, controller.signal);
+      if (inBody.length) await keepFieldsInBody(env, existing, inBody, controller.signal);
       return { id: existing, url: canonicalNotionUrl(data.url, existing), label: MARKETPLACE_LABEL, status: "updated" };
     }
 
     set("Upvotes", { number: 0 });
+    // A create's body already opens with the description and the Try it link.
     const lines = [
-      input.description?.trim(),
-      input.deploymentUrl?.trim() ? `**Try it:** ${input.deploymentUrl.trim()}` : "",
-      replicaInBody ? `**Figma replica:** ${replica}` : "",
+      description,
+      deployment ? `**Try it:** ${deployment}` : "",
+      ...inBody.filter((f) => f.prop !== "Description" && f.prop !== "Deployment URL").map(bodyLine),
     ].filter(Boolean);
     const children = lines.length ? bodyToBlocks(lines.join("\n\n")) : [];
     if (input.onBehalfOf?.trim()) children.unshift(attributionBlock(input.onBehalfOf.trim()));
