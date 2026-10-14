@@ -58,7 +58,7 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 
 ## The loading contract
 
-**Tier 1 — always loaded.** This file, and nothing else. Soft budget ≤20k chars: an overrun warns rather than fails, and a tier that bloats still defeats the tier.
+**Tier 1 — always loaded.** This file, and nothing else. Soft char budget (`BUDGETS.constitution`): an overrun warns rather than fails, and a tier that bloats still defeats the tier.
 
 **Tier 3 — retrieved live, never cached.** Product truth from `uno-blueprint` (`writers/blueprint` / `search_blueprint`); design-system truth from `uno-storybook` (read the source and stories). Team conventions are *not* Tier 3 — they are canonical in-repo (ADR-017) and load as plain files.
 
@@ -67,7 +67,7 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 <!-- ide-only -->
 **Tier 2 — loaded on demand.** Two or three documents per task. § Progressive loading is the trigger table; beyond it: a skill loads its own `SKILL.md` + `references/method.md` on invocation and its `references/*.md` as linked; an agent loads its `agents/<kind>/<name>.md` plus the conventions it names.
 
-**Bundle mechanics (uno-bot).** Sections, order, `ide-only` stripping and the five char budgets — this file, the persona, each `bot.md`, the assembled ceiling and its floor — are decided in one place, the header of `agents/uno-bot/scripts/bundle-harness.mjs`. `npm run check:harness` names the file and the distance for each: this file's overrun warns, and a stale bundle, any other overrun or a shortfall fails the build. The same run writes a JSON manifest (`--manifest`, gitignored) of what it computed, which is what the root guards read instead of parsing its log lines, and what holds the budget numbers written above to the constants that assert them (`check:harness-budgets`).
+**Bundle mechanics (uno-bot).** Sections, order, `ide-only` stripping and the five char budgets — this file, the persona, each `bot.md`, the assembled ceiling and its floor — are decided in one place, the header of `agents/uno-bot/scripts/bundle-harness.mjs`. `npm run check:harness` names the file and the distance for each: this file's overrun warns, and a stale bundle, any other overrun or a shortfall fails the build. Its `assemble()` returns a manifest of what it computed, and the root checks read that in-process through `scripts/lib/bundled-set.mjs`. A doc cites a budget by its `BUDGETS` key and leaves the number to the bundler; `check:harness-budgets` holds every doc under a section root to that.
 
 **GitHub Actions.** `scripts/lib/skill-loader.js` loads `scripts/prompts/*` with meta-stripping; offline, which is fine because conventions are repo-canonical.
 <!-- /ide-only -->
