@@ -49,11 +49,6 @@ export { FINDINGS_TABLE, EDGE_SELECT_COLUMNS, CELL_FALLBACK_SELECT, TOUCHPOINTS_
 /** One page of the touchpoint registry, as the bot's own tool reads it. */
 export const TOUCHPOINT_PAGE = 15;
 
-/** The registry page the eval subject route reads (#452). Bigger than the
- *  product page on purpose and still one request: `corpus-term` picks a search
- *  term out of these names, and a page that stops at the fifteenth name
- *  alphabetically decides the answer before any probe runs. */
-export const TOUCHPOINT_SUBJECT_PAGE = 100;
 import {
   mapIncludeEdges,
   mapIncludeFindings,

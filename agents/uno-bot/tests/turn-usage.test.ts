@@ -8,10 +8,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { evalTurnRequest } from "../src/eval/turn-case";
-import { evalTurnWiring } from "../src/eval/turn-adapter";
 import { slackTurnWiring } from "../src/slack/turn-adapter";
-import { createInMemoryThreadState } from "../src/thread-state/index";
 import { recordingDelivery, restageExecution, runTurn } from "../src/turn/index";
 import type { Env } from "../src/types";
 import { buildTurnDeps } from "../src/turn/env-deps";
@@ -143,19 +140,14 @@ test("a stopped turn records the stop, and no answer time", async () => {
   assert.equal(row.testTraffic, false);
 });
 
-test("an eval turn is recorded, as test traffic", async () => {
-  const built = evalTurnRequest({ prompt: "how does a call-off reach a fill-in?" });
-  assert.ok(built.ok);
-  const h = harness({ origin: "debug", now: ticking() });
+test("a debug-origin turn is recorded, as test traffic", async () => {
+  const h = harness({ origin: "debug" });
 
-  await runTurn(built.request, h.deps);
+  await runTurn(request(), h.deps);
 
   const row = only(h.usage.records());
   assert.equal(row.testTraffic, true);
   assert.equal(row.disposition, "answered");
-  // The eval conversation's ts is synthetic, so the row is keyed by the run.
-  assert.equal(row.turnId, `${built.request.channel}:${built.request.userMsgTs}@${T}`);
-  assert.equal(row.askedAt, T);
 });
 
 // ── test traffic ─────────────────────────────────────────────────────────────
@@ -166,35 +158,14 @@ test("an ask in the sandbox channel is test traffic", async () => {
   assert.equal(only(h.usage.records()).testTraffic, true);
 });
 
-test("the debug routes' wiring marks its turns as test traffic, and Slack's does not", () => {
-  const env = {} as Env;
-  const delivery = recordingDelivery();
-  const evalWiring = evalTurnWiring(request(), {
-    delivery,
-    threadState: createInMemoryThreadState(),
-    report: { resolutions: [], gateAsk: null, tools: [], calls: delivery.calls, dials: null },
-    filled: new Set<number>(),
-    onResult: () => {},
-  });
-  const slackWiring = slackTurnWiring(env, { type: "message", channel: CHANNEL, user: "U1", ts: "1.2", text: "hi" }, request());
-  assert.equal(evalWiring.origin, "debug");
-  assert.equal(slackWiring.origin, "slack");
-});
-
-test("the debug routes' turns write no proposal events to the production table at all", () => {
-  // The database is bound: a write would reach it. The eval wiring never does.
+test("a debug-origin turn writes no proposal events to the production table at all", () => {
+  // The database is bound: a write would reach it. A debug-origin wiring never does.
   const env = { USAGE_DB: {} } as unknown as Env;
-  const delivery = recordingDelivery();
-  const evalWiring = evalTurnWiring(request(), {
-    delivery,
-    threadState: createInMemoryThreadState(),
-    report: { resolutions: [], gateAsk: null, tools: [], calls: delivery.calls, dials: null },
-    filled: new Set<number>(),
-    onResult: () => {},
-  });
-  assert.equal(buildTurnDeps(env, request(), evalWiring).usage.proposalEvents, NO_PROPOSAL_EVENT_LOG);
   const slackWiring = slackTurnWiring(env, { type: "message", channel: CHANNEL, user: "U1", ts: "1.2", text: "hi" }, request());
+  assert.equal(slackWiring.origin, "slack");
   assert.notEqual(buildTurnDeps(env, request(), slackWiring).usage.proposalEvents, NO_PROPOSAL_EVENT_LOG);
+  const debugWiring = { ...slackWiring, origin: "debug" as const };
+  assert.equal(buildTurnDeps(env, request(), debugWiring).usage.proposalEvents, NO_PROPOSAL_EVENT_LOG);
 });
 
 test("a card staged in the sandbox channel is test traffic on its own row", async () => {
@@ -277,9 +248,9 @@ test("channel asks and test traffic are never classified in the turn", async () 
     replies: [{ text: "", toolCalls: [{ name: "slack_react", args: { emoji: "wave" } }] }, { text: "" }],
   });
   await runTurn(request({ ...DM, text: "morning uno!" }), greeting.deps);
-  // An eval DM is test traffic.
-  const evalDm = harness({ classifyAsk, origin: "debug" });
-  await runTurn(request({ ...DM }), evalDm.deps);
+  // A debug-origin DM is test traffic.
+  const debugDm = harness({ classifyAsk, origin: "debug" });
+  await runTurn(request({ ...DM }), debugDm.deps);
 
   assert.equal(calls, 0);
   const g = only(greeting.usage.records());

@@ -2,7 +2,7 @@
 //
 // The three things the module made shared are exactly the three that were
 // previously re-decided in every probe body, so they are asserted once here
-// rather than trusted fourteen times:
+// rather than trusted twelve times:
 //
 //   the GATE — a token-gated probe answers an unauthenticated caller with the
 //   same `404 not found` the Worker entry's fall-through gave, so a closed
@@ -65,7 +65,7 @@ const ask = (route: ProbeRoute, headers: Record<string, string> = {}) =>
 
 test("every token-gated probe refuses an unauthenticated request with 404 not found", async () => {
   const gated = ROUTE_LIST.filter((r) => r.auth === "debug-token");
-  assert.equal(gated.length, 14, "fourteen /debug/* probes are registered");
+  assert.equal(gated.length, 12, "twelve /debug/* probes are registered");
   for (const route of gated) {
     const probes = [fake(route, { body: { reached: true } })];
     const res = await routeProbes(probes, ask(route), new URL(`https://w${route.path}`), env, ctx());
@@ -158,21 +158,6 @@ test("a probe's status is honoured", async () => {
   assert.equal((await res.json() as { error: string }).error, "channel required");
 });
 
-test("a verbatim report passes through untouched", async () => {
-  // `/debug/eval` already reports build, ms and the meter itself, and the eval
-  // runner reads that shape field by field.
-  const route = DIAGNOSTIC_ROUTES["turn-eval"];
-  const verbatim = Response.json({ outcome: "answered", meter: { subrequests: 41 } });
-  const res = await routeProbes(
-    [fake(route, { verbatim })],
-    ask(route, { "x-debug-token": TOKEN }),
-    new URL(`https://w${route.path}`),
-    env,
-    ctx(),
-  );
-  assert.deepEqual(await res.json(), { outcome: "answered", meter: { subrequests: 41 } });
-});
-
 test("a probe that throws answers in the shared error shape, enveloped", async () => {
   const route = DIAGNOSTIC_ROUTES.blueprint;
   const res = await routeProbes(
@@ -221,7 +206,7 @@ test("an unknown path and a wrong method both get the fall-through 404", async (
 
 test("the probe table claims each address once", () => {
   assert.deepEqual(duplicateRoutes(DIAGNOSTIC_ROUTES), []);
-  assert.equal(Object.keys(DIAGNOSTIC_ROUTES).length, 15, "fourteen /debug/* probes + /health/blueprint");
+  assert.equal(Object.keys(DIAGNOSTIC_ROUTES).length, 13, "twelve /debug/* probes + /health/blueprint");
   assert.deepEqual(DIAGNOSTIC_ROUTES["slack-post"], { method: "GET", path: "/debug/slack-post", auth: "debug-token" });
 
   // The check has teeth: a second claim on one address is reported.
@@ -242,15 +227,13 @@ test("the probe table claims each address once", () => {
   );
 });
 
-test("the contract paths CI and the eval runners read are still the registered ones", () => {
+test("the contract paths CI and scripts read are still the registered ones", () => {
   // These strings live in scripts, workflows and fixtures. A rename here is a
   // rename of somebody else's green build.
   const addresses = ROUTE_LIST.map((r) => `${r.method} ${r.path}`);
   for (const expected of [
     "GET /health/blueprint",
-    "POST /debug/eval",
     "GET /debug/blueprint-search",
-    "GET /debug/blueprint-subject",
     "GET /debug/gemini",
     "GET /debug/gemini-cache",
     "GET /debug/slack-search",

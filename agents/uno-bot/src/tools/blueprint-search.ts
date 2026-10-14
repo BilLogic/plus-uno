@@ -363,9 +363,7 @@ export async function executeBlueprintSearch(
   // sentence and NO `reason`, the only failure of this tool the model could
   // not tell from the others by machine, while the module's own error mode was
   // left with no handler anywhere. One decision point now, and the catch turns
-  // it into a named reason. (`isBlueprintConfigured` still has one other
-  // caller — the /debug/blueprint-subject probe, which REPORTS configuration
-  // as a finding rather than reading rows, so asking is its job.)
+  // it into a named reason.
   try {
     // `fresh` is forced by the Worker on a correction turn (run-agent
     // executeUngatedTool) and may also be requested by the model. Either way it

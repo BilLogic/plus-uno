@@ -582,11 +582,10 @@ export interface RecordingDelivery extends Delivery {
 /**
  * How a recording turns a card and a verdict into the text it reports posting.
  *
- * INJECTED, because the two things a recording is used for want different
- * answers. A turn test is asserting what the turn meant, and reads `calls`; the
- * eval route is measuring a real transcript — the card's words reach the model
- * on the next turn through the thread's history — so it must be spelled exactly
- * as Slack spells it, and `eval/turn-adapter.ts` hands in
+ * INJECTED, because a recording can want different answers. A turn test is
+ * asserting what the turn meant, and reads `calls`; a caller measuring a real
+ * transcript — the card's words reach the model on the next turn through the
+ * thread's history — needs it spelled exactly as Slack spells it, and hands in
  * `slack/proposal-render.ts`'s own renderer to get that.
  *
  * A caller that hands in nothing gets `describeCard` / `describeGateNote`
