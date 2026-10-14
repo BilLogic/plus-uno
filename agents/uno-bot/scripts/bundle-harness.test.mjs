@@ -188,7 +188,9 @@ test("sections stay in declared order: constitution, persona, skills, then docs"
 
   const firstConnector = members.findIndex((m) => m.startsWith("docs/connectors/"));
   const firstEngineering = members.findIndex((m) => m.startsWith("docs/engineering/"));
-  assert.ok(firstConnector < firstEngineering, "connectors must precede engineering");
+  // The engineering section can be empty in the prompt: its one Worker-read
+  // doc, the automations registry, is disclosed.
+  assert.ok(firstEngineering === -1 || firstConnector < firstEngineering, "connectors must precede engineering");
 });
 
 test("frontmatter never reaches the prompt", () => {
@@ -430,7 +432,9 @@ test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
   // test is the bundler's refusal, not the corpus's size.
   //
   // It tripped again when the persona learned the relayed DM, and
-  // `engineering/operations.md` is the sixth member, which buys back ~8.5k.
+  // `engineering/operations.md` became the sixth member. That doc is now a
+  // disclosed reference, so it left the baseline and the fixture together and
+  // the gap to the floor is unchanged; the list no longer needs it.
   const result = withFile(wranglerToml, withRegion("us-central1"), () =>
     withFiles(
       [
@@ -439,7 +443,6 @@ test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
         "docs/connectors/supabase/blueprint-navigation.md",
         "docs/connectors/supabase/overview.md",
         "docs/connectors/figma.md",
-        "docs/engineering/operations.md",
       ],
       frontmatterOnly,
       () => runBundler(["--check"]),

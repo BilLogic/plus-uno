@@ -19,7 +19,7 @@ The default expectation is:
 - everything lives under a single `Components/` top-level prefix; grouped families use a `Components/<Group>/<Name>` sub-path (e.g. `Components/Forms and inputs/<Name>`) rather than a separate top-level category
 - the visible page is usually an MDX docs page, not raw CSF story leaves
 
-That pattern is implemented with colocated `*.mdx` files, shared docs layout primitives in [`design-system/src/storybook-docs/ds-docs-layout.jsx`](../../../design-system/src/storybook-docs/ds-docs-layout.jsx), and `tags: ['!dev']` on the corresponding stories files so the docs page is the main surface. This docs-first pattern is also described in the knowledge/lessons archive (originally `docs/solutions/integration-issues/2026-03-23-storybook-mdx-autodocs-conflict-and-netlify-spa-static-coexistence.md`).
+That pattern is implemented with colocated `*.mdx` files, shared docs layout primitives in [`design-system/src/storybook-docs/ds-docs-layout.jsx`](../../../design-system/src/storybook-docs/ds-docs-layout.jsx), and `tags: ['!dev']` on the corresponding stories files so the docs page is the main surface.
 
 ### Sidebar patterns in the current repo
 
@@ -342,7 +342,6 @@ Avoid making the page read like plugin or implementation documentation. The poin
 
 - [`.storybook/main.js`](../../../.storybook/main.js)
 - [`.storybook/preview.jsx`](../../../.storybook/preview.jsx)
-- `.storybook/FORMS_DOCS_PLAN.md` (removed — see `.storybook/main.js` for current docs config)
 - [`storybook.md`](storybook.md)
 - [`design-system/src/storybook-docs/Introduction.mdx`](../../../design-system/src/storybook-docs/Introduction.mdx)
 - [`design-system/src/storybook-docs/ds-docs-layout.jsx`](../../../design-system/src/storybook-docs/ds-docs-layout.jsx)

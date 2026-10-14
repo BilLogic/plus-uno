@@ -161,7 +161,8 @@ const BUDGETS = {
   // the table ships because an automation absent from it is undocumented by
   // definition. Main stood 51 chars under the old ceiling on 2026-09-30, so no
   // row fit. What the 500 bought: that one ~350-char row, and a little room for
-  // the next.
+  // the next. The registry has since been disclosed (`disclosure: reference`),
+  // so its rows are read through read_reference and spend none of this.
   assembled: 175_500,
   persona: 28_000,
   botFace: 7_000,

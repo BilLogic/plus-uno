@@ -23,5 +23,6 @@ Sweeps this repo (components, stories, tokens, prototypes, knowledge) to answer 
 
 ## Conventions it obeys
 
-- `AGENTS.md` § Hard rules (read-only scope)
+- `agents/README.md` § The three kinds + the embodiment (read-only scope: only `writers/` write)
+- `AGENTS.md` § Hard rules
 - DS truth boundary: component/style documentation lives in uno-storybook — cite stories, don't restate them
