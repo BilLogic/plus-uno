@@ -74,4 +74,4 @@ Investigative one-offs (`inspect_nodes.js`, `debug_token_values.js`, `compare_*_
 
 ## Verify
 
-Storybook renders the touched stories, story paths still resolve under `.storybook/main.js`, `npm run test` passes. Then the draft enters the gate (method §3) and, on yes, the gated-change pipeline (§5) — DS components always need the PR + PRD pair and two approvals.
+Storybook renders the touched stories, story paths still resolve under `.storybook/main.js`, `npm run test` passes. Then the draft enters the gate (method §3) and, on yes, the gated-change pipeline (§5) — DS components always need the PR + PRD pair and an approve verdict.
