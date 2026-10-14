@@ -1229,15 +1229,18 @@ async function postFindings(job: ScheduledJob, deps: SweepDeps): Promise<SweepJo
     // commitment job's, and it hands none over on a dry run.
     const followUps = deps.followUps && !deps.dryRun ? await deps.followUps.waiting() : [];
     let onCards = 0;
+    let refused = 0;
     for (const plan of plans) {
       const to = resolveDestination(plan.destination, deps.config);
       const i = to && !to.threadTs ? followUps.findIndex((f) => f.channel === to.channel) : -1;
       const shared = i >= 0 ? followUps.splice(i, 1)[0] : undefined;
       const posted = await postCard(ctx, plan, postDate, shared);
       onCards += posted.items;
+      refused += posted.refused ?? 0;
       if (shared && !posted.tookFollowUps) followUps.push(shared);
     }
-    const waiting = fresh.length - onCards;
+    // A fix whose channel refused it waits for the invite, its own note said.
+    const waiting = fresh.length - onCards - refused;
     if (waiting > 0) notes.push(`${waiting} fix(es) wait in the queue for a live card to resolve or for room on a card`);
     for (const place of followUps) {
       ensureHeadroom(deps, { subrequests: ALONE_SUBREQUESTS, d1Queries: place.cards.length * FOLLOW_UP_D1_QUERIES });
@@ -1283,7 +1286,7 @@ async function postCard(
   planned: SweepCardPlan,
   postDate: string,
   followUps?: FollowUpCards,
-): Promise<{ items: number; tookFollowUps: boolean }> {
+): Promise<{ items: number; refused?: number; tookFollowUps: boolean }> {
   const { deps, now, notes } = ctx;
   const to = resolveDestination(planned.destination, deps.config);
   if (!to) {
@@ -1348,12 +1351,19 @@ async function postCard(
   if (!sent.ok && sent.error === "not_in_channel") {
     // On the record as failed, never dropped: the outcomes count sees a team
     // channel nobody invited uno-bot to. The finding stays queued and cards
-    // again once it is in.
-    for (const f of plan.items) await deps.store.updateItem(`${plan.key}#${f.blockId}`, { status: "failed", postedAt: now, resolvedAt: now });
+    // again once it is in. Failed ONCE per finding: a finding an earlier
+    // morning's refusal already recorded keeps that row, and this card's are
+    // released. Neither carded nor waiting on a live card.
+    const before = await deps.store.itemsForFindings(plan.items.map((f) => f.id));
+    const refusedBefore = new Set(before.filter((i) => i.status === "failed" && i.proposalTs === null && i.cardKey !== plan.key).map((i) => i.findingId));
+    await deps.store.releaseCard(plan.key);
+    await deps.store.addItems(
+      plan.items.filter((f) => !refusedBefore.has(f.id)).map((f) => ({ ...itemRecord(f, plan, now), status: "failed" as const, postedAt: now, resolvedAt: now })),
+    );
     await deps.store.dropCard(plan.key);
     notes.push(`${plan.key}: uno-bot is not in ${to.channel} — recorded as failed, kept for tomorrow`);
     if (shared) await deps.followUps!.notPosted(followUps!, "uno-bot is not in the channel");
-    return done;
+    return { items: 0, refused: plan.items.length, tookFollowUps: done.tookFollowUps };
   }
   if (!sent.ok || !sent.ts) {
     await release(deps, plan.key);
