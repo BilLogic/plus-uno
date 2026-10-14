@@ -84,6 +84,11 @@ export interface Env {
    *  subscription setup reads them from wrangler.toml; the nightly backstop
    *  (#896) lists their folders. */
   FIGMA_TEAM_IDS?: string;
+  /** The hand-kept Figma handle → Slack id map, `handle=U…` pairs: who a
+   *  question @-naming them in Figma DMs once nobody answered it
+   *  (`figma-comments/triage.ts`). Unset, everyone named is named on the
+   *  channel card instead. */
+  FIGMA_HANDLE_SLACK_IDS?: string;
   /** The passcode Figma echoes in every notification (`POST /figma/events`).
    *  Unset → the route answers 401 to every delivery. */
   FIGMA_WEBHOOK_PASSCODE?: string;
