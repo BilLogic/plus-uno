@@ -66,7 +66,8 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
-| [`docs/connectors/figma/overview.md`](docs/connectors/figma/overview.md) | Figma's connector overview, always loaded — what uno-bot can reach over REST, canvas vs comments, the six annotation labels, How We Fig's stage folders, file titles and page sections, and an agent's duties; the bot's long-form access doc is uno-bot-access.md beside it |
+| [`docs/connectors/figma/annotations.md`](docs/connectors/figma/annotations.md) | Figma's six annotation category labels, disclosed — what each holds, the Logic / data vs Development test, where status, construction notes and analytics go instead, and why a file's list drifts |
+| [`docs/connectors/figma/overview.md`](docs/connectors/figma/overview.md) | Figma's connector overview, always loaded — what uno-bot can reach over REST, canvas vs comments, How We Fig's stage folders, file titles and page sections, and an agent's duties; the six annotation labels are annotations.md beside it, and the bot's long-form access doc is uno-bot-access.md |
 | [`docs/connectors/figma/uno-bot-access.md`](docs/connectors/figma/uno-bot-access.md) | What uno-bot can read and write in Figma over REST, and where it stops — frame renders, comment reads and @uno replies, the library and comment pipelines, a Figma ask's public scope, and each limit with its cause and next route |
 | [`docs/connectors/notion/overview.md`](docs/connectors/notion/overview.md) | Notion's connector overview, always loaded — the one credential and the MCP-write principle, the write surfaces, the Decisions DB, the read radar and the Roadmap card rules; page-writing.md beside it is how a body is written |
 | [`docs/connectors/notion/page-writing.md`](docs/connectors/notion/page-writing.md) | How a Notion page body is written, disclosed — the Markdown the Worker turns into blocks, attribution, the project-hub golden sections, the comments protocol and the API's markdown quirks |
@@ -213,6 +214,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-142 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+143 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

@@ -1033,7 +1033,7 @@ test("the sweep doc is read by its new name only", () => {
 const CONNECTOR_FOLDERS = {
   slack: ["docs/connectors/slack/shapes"],
   notion: ["docs/connectors/notion/page-writing"],
-  figma: [],
+  figma: ["docs/connectors/figma/annotations"],
 };
 
 test("each connector folder bundles its overview and discloses its siblings", () => {

@@ -1,6 +1,6 @@
 ---
 embodiment: all
-summary: Figma's connector overview, always loaded — what uno-bot can reach over REST, canvas vs comments, the six annotation labels, How We Fig's stage folders, file titles and page sections, and an agent's duties; the bot's long-form access doc is uno-bot-access.md beside it
+summary: Figma's connector overview, always loaded — what uno-bot can reach over REST, canvas vs comments, How We Fig's stage folders, file titles and page sections, and an agent's duties; the six annotation labels are annotations.md beside it, and the bot's long-form access doc is uno-bot-access.md
 ---
 
 # Figma Workspace Conventions
@@ -13,7 +13,7 @@ uno-bot reaches Figma over REST alone, through one client (`src/figma/`); the Fi
 
 | Capability | Reach |
 |---|---|
-| Render a frame | read: the first frame link with a `node-id` in a message, at its current version, one per message |
+| Render a frame | read: the first frame link with a `node-id` in a message, one per message, as the frame stands now — the render takes no version, so a past version is read as text through `source_read`'s `since` |
 | Frame text | read: name, node type, text layers and the comment threads pinned to the frame, through `source_read` |
 | Annotations | read, through `source_read`: each Dev Mode annotation with the layer it sits on, its text and the properties it pins |
 | Fills | read, through `source_read`: the frame's distinct visible fills as rendered hex (gradients by stop, images as such); a variable-bound fill is marked, the variable's name is unread |
@@ -21,7 +21,7 @@ uno-bot reaches Figma over REST alone, through one client (`src/figma/`); the Fi
 | Comments | read, post, reply and delete; the one ungated write is the @uno reply (the figma-comments scheduled action) |
 | Reactions | send `":goat:"`, the shortcode — Figma answers the emoji character with a 400 — and read a 🐐 back as `:goat:` |
 | Webhooks, library components, folders, versions | read, by the scheduled actions |
-| Dev Mode links | written from a Review card, on Approve (`src/figma-links/`) |
+| Dev Mode links | written, live: `figma_dev_links` adds a component's Code, Storybook and PR links on Approve of its Review card — one component, or a batch card (`src/figma-links/`) |
 | Variables (token names) | Enterprise only: a binding's id is readable, the name it points at is not; a token value comes from `design-system/src/tokens/` through `github_read` |
 | Canvas writes, file renames and moves, Figma Make | out of the API's reach: the bot writes out the exact change for a person, or files the build through `file-a-ticket` |
 
@@ -29,39 +29,8 @@ Each limit in a reply carries its cause and the next route: what could not be do
 
 ## Canvas vs comments
 
-- **Canvas text + Dev Mode annotations = agent-readable context.** Anything the agent (or a future reader) needs to do the job goes on the canvas; a comment points at it.
+- **Canvas text + Dev Mode annotations = agent-readable context.** Anything the agent (or a future reader) needs to do the job goes on the canvas; a comment points at it. Writing or classifying an annotation: the six category labels are [`annotations.md`](annotations.md).
 - **Comment pins = human dialogue.** uno-bot reads them with a pasted frame (#899) and for decisions (#900), and replies in one only when a comment asks it with @uno (#903).
-
-## Annotation category labels
-
-Every annotation carries exactly one category label. There are six:
-
-| Label | Colour | What it holds |
-|---|---|---|
-| `Development` | green | API, field names, implementation and component-construction constraints |
-| `Interaction` | blue | click, hover, focus, tap; when a thing shows, hides, enables or disables |
-| `Content` | orange | copy, labels, empty states, string templates |
-| `Logic / data` | violet | conditions, what is counted, what is derived, where a number comes from, what is recorded |
-| `Tooltip` | teal | hover and help text |
-| `Accessibility` | pink | focus order, keyboard, labels, contrast |
-
-The first four are Figma's presets, kept at their preset colours; `Logic / data` and `Tooltip` are the file's own. Handoff notes are annotations with the relevant category — written per `docs/conventions/writing.md`.
-
-**`Logic / data` is not `Development`, and the test is the reader.** A product rule a non-engineer can review is `Logic / data`; an endpoint only a developer can review is `Development`. Ask *could a non-engineer tell me this is wrong?* — yes is `Logic / data`.
-
-**Status lives in section names.** Build status, scope and on-hold go there: Figma allows one category per annotation, so a status label would take the type's slot.
-
-<!-- ide-only -->
-**Component construction and usage go in the component's `description`.** Dev Mode already shows name, variant props and token bindings; usage guidance in the description travels with the component instead of one frame.
-
-**Analytics and responsive have no label.** What is recorded sits in `Logic / data`; responsive behaviour sits in its own section, which annotations point at. Add an `Analytics` label only once specs carry event names and payloads.
-
-### Why the list drifts
-
-Annotation categories are per-file; a library does not carry them. Pasting a layer into another file recreates its category there unless the label **and** the colour both match, so a near-duplicate spawns silently. Preferring the presets is the cheapest defence, since every file already has them at a fixed colour.
-
-To retire a category, re-point every annotation off it first, then delete it; `getAnnotationCategoriesAsync` may serve the old list for a while afterwards.
-<!-- /ide-only -->
 
 ## Teams and stage folders
 
