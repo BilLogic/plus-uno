@@ -20,7 +20,7 @@ summary: uno-publish — eval scenarios
   - Componentization → Handoff Spec via writers/notion (template-instantiated)
   - Rails propagation inside the designer-confirmed handoff: storybook direct in-repo; blueprint half via uno-maintain's handoff-pre-authorized path (§6 Q9)
   - DS/UNO/a11y review gate, then the human gate: dev + PM + stakeholder ✅ sign-offs — no sign-off, no publish
-  - Marketplace entry validates against the marketplace schema (validate against the live Notion Prototype Marketplace DB schema — references/notion-marketplace-db.md)
+  - Marketplace entry validates against the marketplace schema (validate against the live Notion Prototype Marketplace DB schema — docs/connectors/notion/marketplace-db.md)
 - **Fails if:** anything publishes without all three sign-offs · rails skipped or not verified landed before marketplace publish · schema-invalid entry lands
 
 ## S3 — routing edge: "post this in slack"

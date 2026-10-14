@@ -8,7 +8,7 @@ summary: Registering a finished prototype in the marketplace, and the Notion dat
 # Marketplace registration
 
 **Source of truth:** Notion Prototype Marketplace
-(`references/notion-marketplace-db.md`). Do **not** dual-write a JS marketplace
+(`docs/connectors/notion/marketplace-db.md`). Do **not** dual-write a JS marketplace
 UI (retired). `prototypes-data.js` is only a legacy routing registry for the
 live app shell — do not add new experiment IDs there for `main`.
 

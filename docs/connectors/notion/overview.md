@@ -41,7 +41,7 @@ The surfaces below are the **common ones with house conventions** — follow the
 | PRD pages | uno drafts; human owns | PRD template, Stage: exploring / converging / committed |
 | Project hub → Research page | uno writes (IDE-only) | deep research findings/study guides land on the hub's Research subpage — a subpage, not a separate DB, and IDE work |
 | Spec pages / Handoff Specs | uno drafts from template | "Figma shows what it looks like; this page holds how it behaves and what done means" |
-| notion-marketplace DB (`397b7cca-4982-8002-826c-c45e2baa8e4f`, data source `397b7cca-4982-80d8-9967-000b69521ce9`) | uno publishes and updates entries, one row per prototype (IDE, or the bot's `notion_create` surface `marketplace`) | ✅ live under Design HQ; schema + publish procedure in `skills/uno-publish/references/notion-marketplace-db.md` |
+| notion-marketplace DB (`397b7cca-4982-8002-826c-c45e2baa8e4f`, data source `397b7cca-4982-80d8-9967-000b69521ce9`) | uno publishes and updates entries, one row per prototype (IDE, or the bot's `notion_create` surface `marketplace`) | ✅ live under Design HQ; schema + publish procedure in `docs/connectors/notion/marketplace-db.md` |
 
 ⚠️ **Obsolete:** per-project **Decision Log** subpages under Pages. A decision goes to the Decisions DB; existing Decision Logs stay under an Obsolete toggle for provenance only.
 

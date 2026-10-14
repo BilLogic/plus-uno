@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **96,325 chars from 9 files**, against an assembled budget of 175,500 (79,175 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 75,941 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **96,311 chars from 9 files**, against an assembled budget of 175,500 (79,189 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 75,927 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -25,12 +25,12 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 47,338 | — |
 | 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,216 | 48,614 | — |
 | 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,646 (−203 ide-only) | 54,311 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,748 (−369 ide-only) | 66,111 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 14,690 (−5,949 ide-only) | 80,852 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 84,320 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 90,836 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 95,469 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 96,325 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 66,097 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 14,690 (−5,949 ide-only) | 80,838 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 84,306 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 90,822 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 95,455 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 96,311 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -725,7 +725,7 @@ The surfaces below are the **common ones with house conventions** — follow the
 | PRD pages | uno drafts; human owns | PRD template, Stage: exploring / converging / committed |
 | Project hub → Research page | uno writes (IDE-only) | deep research findings/study guides land on the hub's Research subpage — a subpage, not a separate DB, and IDE work |
 | Spec pages / Handoff Specs | uno drafts from template | "Figma shows what it looks like; this page holds how it behaves and what done means" |
-| notion-marketplace DB (`397b7cca-4982-8002-826c-c45e2baa8e4f`, data source `397b7cca-4982-80d8-9967-000b69521ce9`) | uno publishes and updates entries, one row per prototype (IDE, or the bot's `notion_create` surface `marketplace`) | ✅ live under Design HQ; schema + publish procedure in `skills/uno-publish/references/notion-marketplace-db.md` |
+| notion-marketplace DB (`397b7cca-4982-8002-826c-c45e2baa8e4f`, data source `397b7cca-4982-80d8-9967-000b69521ce9`) | uno publishes and updates entries, one row per prototype (IDE, or the bot's `notion_create` surface `marketplace`) | ✅ live under Design HQ; schema + publish procedure in `docs/connectors/notion/marketplace-db.md` |
 
 ⚠️ **Obsolete:** per-project **Decision Log** subpages under Pages. A decision goes to the Decisions DB; existing Decision Logs stay under an Obsolete toggle for provenance only.
 

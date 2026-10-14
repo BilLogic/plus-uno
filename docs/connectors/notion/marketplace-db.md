@@ -1,6 +1,6 @@
 ---
 embodiment: ide
-summary: Status: LIVE — Design HQ · Prototype Marketplace
+summary: The Prototype Marketplace database (LIVE under Design HQ) — its schema, deploy URLs and publish procedure, read by the IDE publish skill and the Worker's marketplace write
 ---
 
 # notion-marketplace DB — schema & management

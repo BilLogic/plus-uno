@@ -1420,7 +1420,7 @@ export async function notionCreate(
 // Stage options on the live schema, the card on the Roadmap board — and a value
 // with no match comes back as a question. The rollups (Product Pillar, Design
 // status, Roadmap ID) follow the Project card, so the write never names them.
-// Schema: `skills/uno-publish/references/notion-marketplace-db.md`.
+// Schema: `docs/connectors/notion/marketplace-db.md`.
 
 /** A value the database cannot take as given: the question to put back to the
  *  requester. Thrown before any write. */
