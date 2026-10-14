@@ -130,15 +130,9 @@ export async function runReactionDoor(
   request: ReactionRequest,
   deps: ReactionDoorDeps,
 ): Promise<void> {
-  // A cheap pre-filter, not a second opinion: Gate parses the glyph itself and
-  // is the authority on what it means. This one only decides whether the
-  // reaction is worth the thread-root read below — every 🎉 in every channel
-  // the bot is in arrives here, and a Slack call per party popper is a
-  // subrequest spent on nothing. A reminder's glyphs are not the gate's, so a
-  // reminder looks first.
-  // A thanks is recorded before anything else looks, and changes nothing that
-  // follows: no thanks emoji is a gate glyph. Only on the bot's own message,
-  // from someone other than the bot, so the bot's own 🙏 is never counted.
+  // A thanks is recorded first, and changes nothing that follows: no thanks
+  // emoji is a gate glyph. Only on the bot's own message, from someone other
+  // than the bot, so the bot's own 🙏 is never counted.
   const thanks = deps.recordThanks && request.messageAuthorId ? thanksEmojiOf(request.glyph) : null;
   if (thanks) {
     const self = await deps.botUserId();
@@ -147,6 +141,12 @@ export async function runReactionDoor(
     }
   }
 
+  // Then a reminder looks, since a reminder's glyphs are not the gate's. Then
+  // a cheap pre-filter, not a second opinion: Gate parses the glyph itself and
+  // is the authority on what it means. This one only decides whether the
+  // reaction is worth the thread-root read below — every 🎉 in every channel
+  // the bot is in arrives here, and a Slack call per party popper is a
+  // subrequest spent on nothing.
   if (deps.reminder && (await deps.reminder(request))) return;
   if (!mapReaction(request.glyph)) return;
 
