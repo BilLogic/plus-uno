@@ -60,6 +60,7 @@ const COLUMNS = [
   "pain_category",
   "classified_at",
   "thanks",
+  "references_read",
 ] as const;
 
 type Row = Record<(typeof COLUMNS)[number], unknown>;
@@ -118,6 +119,7 @@ function toRow(r: TurnRecord): unknown[] {
     tokens_cached: r.tokensCached,
     cost_usd: r.costUsd,
     tools_called: JSON.stringify(r.toolsCalled),
+    references_read: JSON.stringify(r.referencesRead),
     sources_cited: JSON.stringify(r.sourcesCited),
     disposition: r.disposition,
     proposal_id: r.proposalId,
@@ -167,6 +169,7 @@ function fromRow(row: Row): TurnRecord {
     tokensCached: num(row.tokens_cached),
     costUsd: numOrNull(row.cost_usd),
     toolsCalled: list(row.tools_called),
+    referencesRead: list(row.references_read),
     sourcesCited: list(row.sources_cited),
     disposition: str(row.disposition),
     proposalId: strOrNull(row.proposal_id),

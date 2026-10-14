@@ -744,6 +744,7 @@ function stagingTurn() {
     tokensCached: 0,
     costUsd: 0,
     toolsCalled: [],
+    referencesRead: [],
     sourcesCited: [],
     disposition: "staged",
     proposalId: "1700000000.000300",
