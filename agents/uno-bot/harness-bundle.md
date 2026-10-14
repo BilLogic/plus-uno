@@ -15,25 +15,25 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **158,367 chars from 15 files**, against an assembled budget of 175,500 (17,133 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 137,983 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **158,384 chars from 15 files**, against an assembled budget of 175,500 (17,116 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 138,000 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,991 (−7,705 ide-only) | 9,991 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 12,784 | 22,804 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,956 | 50,801 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,249 | 57,094 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,911 | 64,050 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,179 | 70,272 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,160 | 75,476 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 82,123 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 88,511 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−1,171 ide-only) | 93,072 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,631 (−4,814 ide-only) | 107,746 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 35,962 (−9,374 ide-only) | 143,750 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 147,218 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 153,734 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 158,367 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,010 (−7,730 ide-only) | 10,010 | 20,000 (constitution) |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 12,784 | 22,823 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,954 | 50,818 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,249 | 57,111 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,911 | 64,067 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,179 | 70,289 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,160 | 75,493 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 82,140 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 88,528 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−1,171 ide-only) | 93,089 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,631 (−4,814 ide-only) | 107,763 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 35,962 (−9,374 ide-only) | 143,767 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 147,235 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 153,751 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 158,384 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -124,7 +124,7 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 
 ## The loading contract
 
-**Tier 1 — always loaded.** This file, and nothing else. Soft budget ≤20k chars: an overrun warns rather than fails, and a tier that bloats still defeats the tier.
+**Tier 1 — always loaded.** This file, and nothing else. Soft char budget (`BUDGETS.constitution`): an overrun warns rather than fails, and a tier that bloats still defeats the tier.
 
 **Tier 3 — retrieved live, never cached.** Product truth from `uno-blueprint` (`writers/blueprint` / `search_blueprint`); design-system truth from `uno-storybook` (read the source and stories). Team conventions are *not* Tier 3 — they are canonical in-repo (ADR-017) and load as plain files.
 
@@ -432,7 +432,7 @@ How frame words render in chat (as `code`) is a Slack and Notion writing convent
 
 <!-- agents/uno-bot/AGENT.md -->
 
-<!-- Worker persona DELTA — bundled after the constitution and before skills/*/bot.md. Restate nothing that loads separately; cite it. Hard rules only, rationale in one clause. Budget ≤28k chars, asserted by the bundler. -->
+<!-- Worker persona DELTA — bundled after the constitution and before skills/*/bot.md. Restate nothing that loads separately; cite it. Hard rules only, rationale in one clause. Budget: `BUDGETS.persona` in the bundler. -->
 # uno-bot — Worker persona delta
 
 ## Identity & voice

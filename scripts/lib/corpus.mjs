@@ -33,9 +33,6 @@
  * defect #159 deleted for membership and #216 deleted for the bundled set, and
  * #503 deletes for reading a document at all.
  *
- * `embodimentOf` in `bundled-set.mjs` reads its one key through this, rather
- * than re-finding the fence with a regex of its own, for the same reason.
- *
  * Every function takes a root or an absolute path and never consults the
  * process's working directory (#469): a checker that takes a root can be
  * tested against a fixture tree instead of having fixtures planted in the live

@@ -135,12 +135,12 @@
  * would have allowed.
  *
  * EACH SCOPE ASSERTS ITS OWN CORPUS, because a ratchet fails only when the
- * count RISES and therefore passes over a corpus that vanished (#234). The
- * bundled scope is witnessed by the bundler's `--check` file count; the IDE
- * scope by the census line the same run prints. On top of both, each scope's
- * baseline records how many docs it measured and this refuses to run against
- * fewer — the case neither witness sees, because a doc genuinely deleted or
- * re-declared shrinks the corpus without either walk being wrong.
+ * count RISES and therefore passes over a corpus that vanished (#234). Both
+ * bundler scopes are the bundler's own rows, read off the manifest `assemble()`
+ * returns, so there is no second walk to drift from it. On top of that, each
+ * scope's baseline records how many docs it measured and this refuses to run
+ * against fewer — a doc genuinely deleted or re-declared shrinks the corpus
+ * without the bundler being wrong.
  *
  * ── THE THIRD SCOPE: THE ACTIONS PROMPTS (#425, built 2026-09-05) ────────────
  *
@@ -348,10 +348,9 @@ export function roseReport({ scope, was, now, counts, baseCounts }) {
  * THIS IS THE PROPERTY THE WHOLE GUARD TURNS ON. A ratchet fails only when the
  * count RISES, so a corpus that lost half its docs clears it every time and
  * reports a smaller, greener number while doing so — the exact bug #234 found
- * in this file's own bundled walk. The bundler's file count and its census line
- * witness the two walks; this witnesses the corpus itself, which neither of
- * them can, because a doc genuinely deleted or re-declared makes both walks
- * agree on a smaller truth.
+ * in this file's own bundled walk. The bundler's rows say what the corpus IS;
+ * this witnesses what it WAS, which the bundler cannot, because a doc genuinely
+ * deleted or re-declared is a smaller truth it reports faithfully.
  *
  * Pure, for the same reason as `roseReport`.
  *
@@ -537,9 +536,9 @@ const totalOf = (counts) => Object.values(counts).reduce((sum, n) => sum + n, 0)
 /**
  * Every scope, measured once per repo root.
  *
- * ONE bundler run answers both of the scopes that read it. Two runs would be
- * two chances for the harness to change underneath a check that is comparing
- * the halves — and `run`, `summary` and `--update` all want the same numbers.
+ * ONE assembly answers both of the scopes that read it. Two would be two
+ * chances for the harness to change underneath a check that is comparing the
+ * halves — and `run`, `summary` and `--update` all want the same numbers.
  */
 const readings = byRoot(() => {
   const sets = harnessSets({ tag: 'negation', notThis: 'the prohibition-token count' });

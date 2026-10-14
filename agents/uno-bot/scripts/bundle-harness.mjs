@@ -166,11 +166,11 @@ const BUDGETS = {
   assembled: 175_500,
   persona: 28_000,
   botFace: 7_000,
-  // Tier 1 — the constitution, always loaded. `AGENTS.md` § The loading contract
-  // states this number in prose ("Soft budget ≤20k chars: an overrun warns"), and
-  // `check:harness-budgets` (#510) reads the manifest this script writes to hold
-  // that sentence to this constant. The budget attaches to the constitution's
-  // ROLE, like the persona's and the face's, so it cannot be lost by a rename.
+  // Tier 1 — the constitution, always loaded. The budget attaches to the
+  // constitution's ROLE, like the persona's and the face's, so it cannot be
+  // lost by a rename. Docs cite these constants by key (`BUDGETS.constitution`)
+  // and never write the number down: `check:harness-budgets` fails a doc under
+  // a section root that does.
   //
   // SOFT since 2026-09-30 (Bill's call). An over-budget constitution file is a
   // WARNING finding — printed in `check:harness` with the overrun — and the
@@ -547,24 +547,14 @@ function renderCompanion({ members, raw, parts, assembled, disclosed, referenceM
 
 // ── The manifest (#510) ──────────────────────────────────────────────────────
 //
-// A BUILD artifact, not a committed one. Everything in it is already computed
-// by the assembly — members and their embodiment, the section they load in, the
-// chars each contributes, the budgets, the census — and until it existed the
-// only way for a root guard to have any of it was to parse the sentences the
-// CLI prints. Three guards did (`scripts/lib/bundled-set.mjs`, and through it
-// `check:negation` and `check:skill-overlap`), which made the wording of a log
-// line load-bearing: reword the census and a guard silently narrows its corpus
-// to nothing, which is the failure #234 built a witness against rather than
-// removed. A datum has no wording to break.
+// What the assembly computed, as data: members and their embodiment, the
+// section they load in and its roots, the chars each contributes, the budgets,
+// the census. `assemble()` returns it, and the root checks read it in-process
+// through `scripts/lib/bundled-set.mjs` — so no guard parses a sentence the CLI
+// prints, keeps a copy of `SECTIONS`, or restates a budget. A datum has no
+// wording to break.
 //
-// THE STDOUT SENTENCES ARE UNCHANGED. They are for a human watching a build and
-// stay exactly as they were; the manifest is for a reader that parses.
-//
-// It is written under `--check` too, and that is not a violation of the "writes
-// nothing" contract: that contract is about the three COMMITTED artifacts a
-// stale-bundle guard compares, and the manifest is neither committed nor
-// compared — it is gitignored build output, and a guard that asks this script
-// `--check` is exactly the caller that needs it.
+// THE STDOUT SENTENCES ARE UNCHANGED. They are for a human watching a build.
 //
 // One row per DECLARED doc — the three answers the walk can give, under one
 // `delivery` key, so a reader asking "who does the Worker read" filters rather
@@ -606,11 +596,12 @@ function renderManifest({ members, raw, parts, assembled, disclosed, referenceMa
 
   // Per-section totals, in SECTIONS order — the bundle's own order, so the
   // table reads the way the prompt loads.
-  const sections = SECTIONS.map(({ name }) => {
+  const sections = SECTIONS.map(({ name, roots }) => {
     const mine = rows.filter((r) => r.section === name);
     const shipped = mine.filter((r) => r.delivery !== "ide-only");
     return {
       name,
+      roots: [...roots],
       docs: mine.length,
       bundled: mine.filter((r) => r.delivery === "bundled").length,
       disclosed: mine.filter((r) => r.delivery === "disclosed").length,
@@ -629,8 +620,8 @@ function renderManifest({ members, raw, parts, assembled, disclosed, referenceMa
       disclosed: disclosed.length,
       ideOnly: ideOnly.length,
     },
-    // The constants, verbatim, so a doc that writes a budget down in prose can
-    // be held to the number the build actually asserts (`check:harness-budgets`).
+    // The constants, verbatim: `check:harness-budgets` reads them to find a doc
+    // that restates one, or cites a key that does not exist.
     budgets: { ...BUDGETS },
     floor: {
       region: floor.region,
@@ -1020,38 +1011,17 @@ export function staleArtifacts({ artifacts, committed }) {
 
 // ═════════════════════════════════════════════════════════════════════════════
 // The CLI. Everything below is presentation and process: it prints the census a
-// human watching a build reads, writes the artifacts, and exits. `--check` and
-// `--manifest` keep the names, messages and exit codes they have always had,
-// because `scripts/lib/bundled-set.mjs` and `scripts/check-harness-budgets.mjs`
-// spawn this file for the manifest and read its exit code.
+// human watching a build reads, writes the artifacts, and exits. `--check`
+// keeps the name, messages and exit codes it has always had. No check spawns
+// this file: the root checks read the manifest `assemble()` returns, through
+// `scripts/lib/bundled-set.mjs`, in their own process.
 // ═════════════════════════════════════════════════════════════════════════════
-
-/** Where `--manifest` writes when it is given no path. */
-const DEFAULT_MANIFEST = path.join(here, "..", ".bundle", "harness-manifest.json");
-
-/** The manifest path this run should write, or null when nothing asked for one. */
-function manifestPath(argv = process.argv, env = process.env) {
-  const i = argv.indexOf("--manifest");
-  if (i !== -1) {
-    const next = argv[i + 1];
-    // `--manifest` alone means "the default path"; a following token that is not
-    // another flag is the path to write.
-    return next && !next.startsWith("-") ? path.resolve(next) : DEFAULT_MANIFEST;
-  }
-  const eq = argv.find((a) => a.startsWith("--manifest="));
-  if (eq) return path.resolve(eq.slice("--manifest=".length));
-  // The env var exists for a caller that cannot add an argv — an npm script
-  // wrapper, a workflow step — and names the same file.
-  if (env.HARNESS_MANIFEST) return path.resolve(env.HARNESS_MANIFEST);
-  return null;
-}
 
 /** One prefix for every line this script says, so a build log stays greppable. */
 const say = (text) => `[bundle-harness] ${text}`;
 
 function cli() {
   const CHECK = process.argv.includes("--check");
-  const MANIFEST = manifestPath();
   const repoRoot = REPO_ROOT;
 
   const assembly = assemble({ repoRoot });
@@ -1076,13 +1046,6 @@ function cli() {
   if (errors.length) {
     for (const error of errors) console.error(say(error.message));
     process.exit(1);
-  }
-
-  // Written BEFORE the `--check` exit below, because the callers that need it are
-  // exactly the guards that ask this script `--check`.
-  if (MANIFEST) {
-    mkdirSync(path.dirname(MANIFEST), { recursive: true });
-    writeFileSync(MANIFEST, `${JSON.stringify(assembly.manifest, null, 2)}\n`, "utf8");
   }
 
   const abs = (rel) => path.join(repoRoot, rel);

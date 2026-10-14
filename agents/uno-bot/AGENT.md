@@ -3,7 +3,7 @@ embodiment: uno-bot
 summary: The Worker persona delta — how uno-bot differs from the constitution.
 ---
 
-<!-- Worker persona DELTA — bundled after the constitution and before skills/*/bot.md. Restate nothing that loads separately; cite it. Hard rules only, rationale in one clause. Budget ≤28k chars, asserted by the bundler. -->
+<!-- Worker persona DELTA — bundled after the constitution and before skills/*/bot.md. Restate nothing that loads separately; cite it. Hard rules only, rationale in one clause. Budget: `BUDGETS.persona` in the bundler. -->
 # uno-bot — Worker persona delta
 
 ## Identity & voice
