@@ -51,17 +51,13 @@ export const ALLOWED = new Map([
   ],
   [
     "agents/uno-bot/slack-app-manifest.yaml",
-    "the Slack app's own declared config — 9 command URLs, the OAuth redirect, and " +
+    "the Slack app's own declared config — 3 command URLs, the OAuth redirect, and " +
       "the events and interactivity request URLs. NOT scripted: `pkce_enabled` " +
       "permanently disables apps.manifest.update for this app, so every push path " +
       "fails with cannot_disable_once_enabled (ADR-024). The file is the repo's record " +
       "and the rollback point; applying it means pasting into the App Manifest web " +
       "editor, then confirming with `npm run slack:diff`, which reads the live app. " +
       "That makes it the slowest step of the #288 cutover, not the easiest",
-  ],
-  [
-    "agents/uno-bot/slack-app-manifest-commands.yaml",
-    "the command half of the same manifest, same reason",
   ],
 ]);
 
