@@ -9,8 +9,8 @@ summary: The constitution — identity, routing, the loading contract, and hard 
 
 The one identity, roster, and routing document for every agent working in this repo — the in-IDE agent, the uno-bot Slack Worker (which bakes this file into its bundle at build time), and headless GitHub Actions runs.
 
-**The interaction contract: humans speak in skills · skills summon agents · agents obey conventions.**
-Users remember six skills (or describe intent and get routed). Skills invoke agents; users never do. Agents point at the conventions they enforce and never restate them.
+**The interaction contract (IDE): humans speak in skills · skills summon agents · agents obey conventions.**
+Users remember six skills; agents point at the conventions they enforce and never restate them. In Slack, bot skills call the Worker's tools instead.
 
 ## Identity
 
@@ -48,7 +48,7 @@ Routing: match intent to the Use-when column; if ambiguous, ask which capability
 
 ## Agents — what skills summon
 
-`agents/` holds three plain kinds plus the embodiment: **researchers/** (gather), **reviewers/** (judge), **writers/** (notion · figma · blueprint — the *only* agents that write to external estates, save the Worker's labelled reply to an @uno Figma comment: `docs/connectors/figma.md`). Roster, anatomy, and the creation rule: `agents/README.md`.
+`agents/` holds three plain kinds plus the embodiment: **researchers/** (gather), **reviewers/** (judge), **writers/** (notion · figma · blueprint — the IDE's only estate writers; uno-bot writes through ✅-gated tools and one ungated @uno Figma reply: `docs/connectors/figma.md`). Roster, anatomy, and the creation rule: `agents/README.md`.
 
 ## Conventions — what agents obey
 
