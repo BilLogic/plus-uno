@@ -1,14 +1,14 @@
 // One dependency builder, for every caller of Turn (#603).
 //
-// `Env`, once, as the dependencies a turn actually reads. Both adapters — the
-// Slack envelope one (`slack/turn-adapter.ts`) and the eval one
-// (`eval/turn-adapter.ts`) — build their `TurnDeps` here and supply only what
-// genuinely differs: their thread store, their Delivery, what a won verdict
-// does, the ts a tool's own posts thread off, and (the eval side only) the
-// reporters an artifact is collected through. Everything else — the agent run,
-// the draft judge, preflight, the three card reads, the antecedent read, the
-// panel context line and the context-state flag — is the same wiring for both,
-// and was hand-copied in two files until it drifted.
+// `Env`, once, as the dependencies a turn actually reads. Each adapter — the
+// Slack envelope one (`slack/turn-adapter.ts`) among them — builds its
+// `TurnDeps` here and supplies only what genuinely differs: its thread store,
+// its Delivery, what a won verdict does, the ts a tool's own posts thread off,
+// and optionally the reporters a headless run is collected through. Everything
+// else — the agent run, the draft judge, preflight, the three card reads, the
+// antecedent read, the panel context line and the context-state flag — is the
+// same wiring for every caller, and was hand-copied in two files until it
+// drifted.
 //
 // WHY THIS FILE TAKES `Env` when the rest of the module refuses to. It is the
 // boundary itself: `Env` enters here and stops here, the way it stops in
@@ -55,9 +55,8 @@ import { restageExecution, type TurnDeps, type TurnRequest } from "./turn";
 /**
  * What a caller reports the run through, beside the outcome.
  *
- * Production passes none of these — it reads its log lines. The eval adapter
- * passes all of them, because an artifact a case is scored from has to carry
- * what the log would have said.
+ * Production passes none of these — it reads its log lines. They are for a
+ * headless caller whose record has to carry what the log would have said.
  */
 export interface TurnReporters {
   /** The dials the last model call was sent with (#421). */
@@ -74,8 +73,8 @@ export interface TurnReporters {
 
 /** The entries that genuinely differ between Turn's callers — and nothing else. */
 export interface TurnWiring {
-  /** Per-thread memory: the Durable Object in production, in-memory for an eval
-   *  conversation that has none. */
+  /** Per-thread memory: the Durable Object in production, in-memory for a
+   *  headless conversation that has none. */
   threadState: ThreadState;
   /** Where what a person sees goes: Slack, or a recording. */
   delivery: Delivery;
@@ -84,12 +83,12 @@ export interface TurnWiring {
    *  thing behind the ✅. Answers with what the batch ran, when it ran one. */
   applyVerdict(verdict: GateVerdict): Promise<OperationOutcome[] | void>;
   /** The REAL ts a tool's own posts thread off: the person's message in Slack,
-   *  the eval conversation's one ts otherwise. Not the conversation key, which
+   *  a headless conversation's one ts otherwise. Not the conversation key, which
    *  the request already carries and cancel reads. Absent for an ask made in
    *  Figma, which has no Slack message to thread under. */
   toolThreadTs?: string;
   /** Where the turn came from: a person in Slack, a Figma comment, or a debug
-   *  route (the eval transport). The usage record's test-traffic rule reads
+   *  route. The usage record's test-traffic rule reads
    *  it, and a Figma turn reads every estate at public scope, because its
    *  answer lands in a file people outside the team can open. */
   origin: TurnOrigin;
@@ -214,8 +213,8 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     // caller's own difference.
     usage: {
       log: usageLogFor(env),
-      // Never for the eval transport: its cards live in an in-memory store and
-      // are nobody's writes, so they stay out of the production table.
+      // Never for a debug-origin turn: its cards are nobody's writes, so they
+      // stay out of the production table.
       proposalEvents: wiring.origin === "debug" ? NO_PROPOSAL_EVENT_LOG : proposalEventLogFor(env),
       origin: wiring.origin,
       testChannelIds: testChannelIdsOf(env),

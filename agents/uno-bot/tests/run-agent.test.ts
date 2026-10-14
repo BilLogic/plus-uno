@@ -4,9 +4,8 @@
 // Env-facing half of the loop by design (the adapter construction, the system
 // prompt, the tool roster, the ungated dispatch, the per-turn scope), so the
 // suites above and below it both go around: `tests/agent-loop.test.ts` drives
-// `runLoop` on named ports, `tests/turn.test.ts` builds its own `LoopDeps`, and
-// `tests/eval-adapter.test.ts` builds the real dependencies but never invokes
-// the closure. The entry itself — one `await` away from a live model call —
+// `runLoop` on named ports, and `tests/turn.test.ts` builds its own `LoopDeps`.
+// The entry itself — one `await` away from a live model call —
 // stays out of reach of a Node suite, and #625 did not change that.
 //
 // WHAT IS REACHABLE is `selectProvider`, and it is the part of this module

@@ -9,7 +9,7 @@
 //
 // WHAT A PROBE KEEPS. Its existing payload is returned as it was, field for
 // field — `/health/blueprint`'s booleans, `/debug/blueprint-search`'s rows,
-// `/debug/gemini`'s sample line — because scripts, CI and the eval runners read
+// `/debug/gemini`'s sample line — because scripts and CI read
 // those fields by name. The envelope is ADDITIVE and merged UNDER the payload,
 // so a probe that already reports `build`, `ms` or `subrequests` from its own
 // inner meter keeps its own value.
@@ -41,16 +41,8 @@ export interface ProbeEnvelope extends MeterReading {
 /** A probe's own payload. */
 export type ProbeBody = Record<string, unknown>;
 
-/**
- * What a probe hands back.
- *
- * `body` is the common case: JSON, wrapped in the envelope. `verbatim` is for a
- * probe that already reports the envelope itself — `/debug/eval`, whose
- * adapter's response shape is read field-by-field by the eval runner.
- */
-export type ProbeReport =
-  | { readonly body: ProbeBody; readonly status?: number }
-  | { readonly verbatim: Response };
+/** What a probe hands back: JSON, wrapped in the envelope. */
+export type ProbeReport = { readonly body: ProbeBody; readonly status?: number };
 
 /** One diagnostic question, at one address. */
 export interface Probe<E extends DebugTokenEnv> extends ProbeRoute {
@@ -119,7 +111,6 @@ export async function routeProbes<E extends DebugTokenEnv>(
 
   try {
     const report = await probe.run(env, url, request);
-    if ("verbatim" in report) return report.verbatim;
     return Response.json({ ...envelope(), ...report.body }, { status: report.status ?? 200 });
   } catch (err) {
     // A probe that throws still answers in the shared shape: the envelope says

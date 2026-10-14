@@ -34,8 +34,7 @@
 // downloads a file, reads a Slack thread, or knows a channel id from a room
 // number. That is what lets `tests/turn.test.ts` drive a whole turn on the
 // recording Delivery, the in-memory ThreadState and the fake ModelProvider —
-// and what lets the eval route (#499) be the second caller rather than a
-// second pipeline.
+// and what lets a second caller reuse it rather than build a second pipeline.
 //
 // PURE by design: no `Env`, no Workers type, no fetch — which is what lets the
 // Node suite DRIVE it rather than read it. (Not a compile property: the test

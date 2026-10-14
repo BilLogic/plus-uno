@@ -2,7 +2,7 @@
 //
 // The module's face is one function: `handle(request, env, url)`. The Worker
 // entry verifies, routes and exports Durable Objects; every question about a
-// credential, a Slack surface, the blueprint schema or a headless turn is
+// credential, a Slack surface or the blueprint schema is
 // answered from here.
 //
 // The table is built by PAIRING the route datum with a body, as a
@@ -22,10 +22,9 @@ import { routeProbes, type MeterReading, type Probe } from "./router";
 import type { ProbeRun } from "./probe";
 import { blueprintHealthProbe } from "./probes/blueprint-health";
 import { geminiCacheProbe, geminiProbe, vertexClaudeProbe } from "./probes/providers";
-import { blueprintProbe, blueprintSearchProbe, blueprintSubjectProbe } from "./probes/blueprint";
+import { blueprintProbe, blueprintSearchProbe } from "./probes/blueprint";
 import { homeProbe, slackPostProbe, slackSearchProbe, slackStreamProbe } from "./probes/slack";
 import { figmaDevLinksProbe, figmaPollProbe } from "./probes/figma";
-import { turnEvalProbe } from "./probes/turn";
 import { sweepProbe } from "./probes/sweep";
 
 const PROBE_BODIES: Record<ProbeName, ProbeRun> = {
@@ -33,14 +32,12 @@ const PROBE_BODIES: Record<ProbeName, ProbeRun> = {
   gemini: geminiProbe,
   "vertex-claude": vertexClaudeProbe,
   "gemini-cache": geminiCacheProbe,
-  "turn-eval": turnEvalProbe,
   "slack-search": slackSearchProbe,
   "slack-stream": slackStreamProbe,
   "slack-post": slackPostProbe,
   home: homeProbe,
   blueprint: blueprintProbe,
   "blueprint-search": blueprintSearchProbe,
-  "blueprint-subject": blueprintSubjectProbe,
   "figma-poll": figmaPollProbe,
   "figma-dev-links": figmaDevLinksProbe,
   sweep: sweepProbe,
