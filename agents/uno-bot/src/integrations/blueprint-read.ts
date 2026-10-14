@@ -50,7 +50,7 @@
 // result can be echoed into Slack, where a variable name reads like a stack
 // trace to a designer. Same split as slack/api.ts.
 //
-// A PURE module, like blueprint-scope.ts and blueprint-subject.ts beside it:
+// A PURE module, like blueprint-scope.ts beside it:
 // no Env, no fetch, no Workers globals. The reads arrive injected, taking the
 // shape `selectSubject(need, reads)` already uses in this domain — so the
 // sequencing, the dispositions and the totals are asserted against fixture

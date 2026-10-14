@@ -1,24 +1,14 @@
-// Blueprint probes: what the deployment supports, what a real search returns,
-// and which live row satisfies a named condition.
+// Blueprint probes: what the deployment supports, and what a real search
+// returns.
 //
-// All three know blueprint schema — the selects, the RPC names, the column
+// Both know blueprint schema — the selects, the RPC names, the column
 // lists — and that knowledge lives here rather than in the Worker entry.
 import { BUILD } from "../../version";
 import { BLUEPRINT_CONTRACT } from "../../generated/blueprint-contract";
 import { countedFetch, runMetered, subrequestsUsed } from "../../net";
 import {
   searchBlueprint,
-  fetchPhaseOutline,
-  fetchTouchpoints,
-  TOUCHPOINT_SUBJECT_PAGE,
-  isBlueprintConfigured,
 } from "../../integrations/blueprint";
-import {
-  SUBJECT_NEEDS,
-  isSubjectNeed,
-  selectSubject,
-  type SubjectReads,
-} from "../../integrations/blueprint-subject";
 import {
   CANDIDATE_RPC,
   isCallableCandidate,
@@ -98,17 +88,16 @@ export const blueprintProbe: ProbeRun = async (env) => {
 
 // GET /debug/blueprint-search?q=…  — the REAL searchBlueprint() result.
 //
-// WHY THIS EXISTS: /debug/eval scores full agent turns, which take ~15s, burn
-// model quota, and judge the PROSE. An answer can read beautifully while the
-// rows behind it are wrong, and the eval suite has no way to tell — it has
-// been 19/19 green while 5% of the index pointed at deleted cells.
+// WHY THIS EXISTS: an answer can read beautifully while the rows behind it are
+// wrong, and a full agent turn takes ~15s, burns model quota and shows only
+// the prose.
 //
 // This route returns row identity (ids, path, scenario, scores, which
-// retrieval path answered) so a retrieval eval can assert recall@k directly:
+// retrieval path answered), so a retrieval question is answered directly:
 // deterministic, model-free, seconds not minutes.
 //
-// `fresh=1` bypasses the 60s result cache — the eval must measure retrieval,
-// not the cache. Token-gated like every /debug route; read-only.
+// `fresh=1` bypasses the 60s result cache, to measure retrieval rather than
+// the cache. Token-gated like every /debug route; read-only.
 export const blueprintSearchProbe: ProbeRun = async (env, url) => {
   const q = (url.searchParams.get("q") ?? "").trim();
   if (!q) return { body: { ok: false, error: "missing ?q=" }, status: 400 };
@@ -210,96 +199,6 @@ export const blueprintSearchProbe: ProbeRun = async (env, url) => {
     // someone tuning the ranker.
     return {
       body: { build: BUILD, q, ms: Date.now() - started, ...probeFailure(err) },
-    };
-  }
-};
-
-// GET /debug/blueprint-subject?need=…  — a row from the LIVE board that
-// satisfies a named condition (#415).
-//
-// WHY THIS EXISTS: an eval scenario that names its subject — "walk me through
-// Goal Setting", "where do we use Zoom" — encodes a fact about the board on
-// the day it was written, and the board is edited daily. A rename turns the
-// case red with nothing wrong, which is the same defect #411 exists to fix,
-// one layer up. So the fixture names a CONDITION, and this route answers it
-// from the database at run time.
-//
-// The runner holds no Supabase credential and must not gain one — the Worker
-// is the only thing here that reads the blueprint, and this route keeps it
-// that way. Selection is a pure module (integrations/blueprint-subject.ts);
-// everything below binds it to the reads the bot already makes.
-//
-// Token-gated like every /debug route; read-only. An unknown `need` gets the
-// known list back, because "no row satisfies your condition" and "that is not
-// a condition" are different answers and only one of them is a finding.
-export const blueprintSubjectProbe: ProbeRun = async (env, url) => {
-  const need = (url.searchParams.get("need") ?? "").trim();
-  if (!isSubjectNeed(need)) {
-    return {
-      body: { ok: false, build: BUILD, need, error: "unknown need", needs: SUBJECT_NEEDS },
-      status: 400,
-    };
-  }
-  if (!isBlueprintConfigured(env)) {
-    return {
-      body: {
-        ok: false,
-        build: BUILD,
-        need,
-        error: "uno-blueprint not configured — missing SUPABASE_URL / SUPABASE_ANON_KEY",
-      },
-    };
-  }
-  const reads: SubjectReads = {
-    outline: () => fetchPhaseOutline(env),
-    // A WIDER page than the bot's own tool reads. Rows come back `name.asc`,
-    // and `corpus-term` picks its search term out of these names — so the
-    // product's 15-row page quietly turned the condition into "…among the
-    // alphabetically-first fifteen tools" and skipped B4 on a board that
-    // satisfies it (#452). Still one request.
-    touchpoints: async () => (await fetchTouchpoints(env, "", TOUCHPOINT_SUBJECT_PAGE)).rows,
-    search: async (query, scope) => {
-      const r = await searchBlueprint(env, query, {
-        fresh: true,
-        scope: {
-          ...(scope.filterScenario ? { filterScenario: scope.filterScenario } : {}),
-          ...(scope.granularity === "cell" ? { granularity: "cell" as const } : {}),
-        },
-      });
-      return { rows: r.rows, ...(r.matched_total === undefined ? {} : { matched: r.matched_total }) };
-    },
-    // Read off the vendored contract, not remembered: `absent-detail` claims
-    // the blueprint has no field for a duration, and the day it grows one the
-    // condition must stop being satisfiable rather than keep asserting that
-    // the bot should refuse an answerable question.
-    cellColumns: BLUEPRINT_CONTRACT.botDirectReadColumns.cells,
-  };
-  const started = Date.now();
-  try {
-    // Metered like the search route: a `corpus-term` pick probes several
-    // terms, and a subject read that quietly ate the turn's budget would be
-    // indistinguishable from a board with no qualifying row.
-    const pick = await runMetered(async () => {
-      const p = await selectSubject(need, reads);
-      return { p, subrequests: subrequestsUsed() };
-    });
-    return {
-      body: {
-        ok: true,
-        build: BUILD,
-        need,
-        ms: Date.now() - started,
-        subrequests: pick.subrequests,
-        subject: pick.p.subject,
-        ...(pick.p.reason ? { reason: pick.p.reason } : {}),
-      },
-    };
-  } catch (err) {
-    // A failed READ is not an unsatisfiable condition. Reporting it as
-    // `subject: null` would skip the case for the wrong reason and hide a
-    // broken blueprint behind a tidy log line.
-    return {
-      body: { build: BUILD, need, ms: Date.now() - started, ...probeFailure(err) },
     };
   }
 };
