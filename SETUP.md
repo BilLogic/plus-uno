@@ -7,7 +7,7 @@ summary: Clone, install, run, and find your way around — without reading the c
 
 Getting plus-uno running, and knowing where you are once it is. If you want the
 rules an agent works under, that is `AGENTS.md`; if you want the estate's
-vocabulary, that is `CONTEXT.md`. Neither is required to get a dev server up.
+vocabulary, that is `GLOSSARY.md`. Neither is required to get a dev server up.
 
 ## Run it
 

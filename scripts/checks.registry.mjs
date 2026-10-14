@@ -257,7 +257,7 @@ export const CHECKS = [
     module: 'scripts/check-glossary.mjs',
     baseline: 'docs/evals/glossary-baseline.json',
     guards:
-      'CONTEXT.md staying a glossary: no fenced code, no third-level headings, every section holding term rows, and prose lines ratcheted against docs/evals/glossary-baseline.json through `scripts/lib/ratchet.mjs` (#601) — the count may fall, never rise, and `--update` merges the one number rather than rewriting the record, so re-recording an unchanged count no longer churns its date. The two sibling repos grew their CONTEXT.md to 40k and 18k chars one "just one more section" at a time (#420); this is what stops it here.',
+      'GLOSSARY.md staying a glossary in the plugin format: no fenced code, no heading deeper than a `###` cluster, every section and cluster holding `**Term**:` entries and every entry a definition, a table only in § Two vocabularies (ADR-023), and prose lines ratcheted against docs/evals/glossary-baseline.json through `scripts/lib/ratchet.mjs` (#601) — the count may fall, never rise, and `--update` merges the one number rather than rewriting the record, so re-recording an unchanged count no longer churns its date. The two sibling repos grew their glossaries to 40k and 18k chars one "just one more section" at a time (#420); this is what stops it here.',
   },
   {
     name: 'check:retired-spelling',

@@ -24,7 +24,7 @@ const CHECK = process.argv.includes('--check');
 
 /** Roots whose docs are routable, in the order they appear in the index. */
 const SECTIONS = [
-  { title: 'Start here', roots: ['README.md', 'SETUP.md', 'AGENTS.md', 'CONTEXT.md'] },
+  { title: 'Start here', roots: ['README.md', 'SETUP.md', 'AGENTS.md', 'GLOSSARY.md'] },
   { title: 'Skills — what humans invoke', roots: ['skills'], depth: 1 },
   { title: 'Agents — what skills summon', roots: ['agents'], depth: 2 },
   { title: 'Connectors — tools an agent can act on', roots: ['docs/connectors'] },
@@ -49,7 +49,7 @@ const NOT_ROUTABLE = [
 
 /** Reading paths — the one part of this file that is a judgement, not a glob. */
 const ROLE_PATHS = [
-  ['New here, any role', ['README.md', 'SETUP.md', 'CONTEXT.md']],
+  ['New here, any role', ['README.md', 'SETUP.md', 'GLOSSARY.md']],
   ['Designer building UI', ['design-system/guidelines/overview.md', 'design-system/agent-views/components/index.md', 'design-system/guidelines/composition/layout.md']],
   ['Agent, any task', ['AGENTS.md', 'INDEX.md']],
   ['Working on the harness', ['AGENTS.md', 'docs/adr/overview.md', 'skills/uno-maintain/SKILL.md']],

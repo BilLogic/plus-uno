@@ -46,7 +46,7 @@ Findings from the repo or Slack:
 - After the designer has talked to people → **uno-synthesize** (summarize the thread, then optionally a PRD).
 - Study-guide drafting, multi-file codebase sweeps, data pulls → the in-IDE **uno-research**.
 - Summarizing an existing study or analysis → **uno-synthesize** (the method's data rule: ingesting prior analysis is synthesis).
-- Plus-fact or project-status questions → default conversational mode, routed by frame words (`CONTEXT.md § Two vocabularies`).
+- Plus-fact or project-status questions → default conversational mode, routed by frame words (`GLOSSARY.md § Two vocabularies`).
 - Should a Slack-handle or email column reach the Team Member DB, intro-posting becomes a gated tool; until then, suggest and link.
 
 **uno-research/method** — the procedure behind these steps: the four gates of the decision spine (inventory · source · report · hand off), the data rule that draws the research/synthesize boundary, the study-guide-first rule for people, the citation and empty-sweep rules, and the findings-brief shape. It is disclosed, not loaded: `read_reference` with name `uno-research/method` as the turn's first move (step 1), and again in a later turn of the same thread if its text is no longer in context.

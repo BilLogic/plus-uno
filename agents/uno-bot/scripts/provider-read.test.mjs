@@ -2,8 +2,8 @@
 // one place (#605).
 //
 // The claim is old — `run-agent.ts`'s `selectProvider` has carried the comment
-// "the ONE place `MODEL_PROVIDER` is read" since #497, and CONTEXT.md §
-// ModelProvider says the same — and it was false for as long as it stood:
+// "the ONE place `MODEL_PROVIDER` is read" since #497, and GLOSSARY.md
+// (**ModelProvider**) says the same — and it was false for as long as it stood:
 // `agent/draft-judge.ts` read the var too and picked its own model and thinking
 // level behind it. Two readers is not a style problem. It is two answers to
 // "which model answered this request", and the second one was assembling a

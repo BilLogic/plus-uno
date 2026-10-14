@@ -1,23 +1,31 @@
 #!/usr/bin/env node
 /**
- * Glossary-only check on CONTEXT.md (#420).
+ * Glossary-only check on GLOSSARY.md (#420).
  *
- * CONTEXT.md is the glossary: one row per term, and nothing else. The failure
+ * GLOSSARY.md is the glossary: one entry per term, and nothing else. The failure
  * this guards against has a shape: a rename map, an interface-to-schema table,
  * a rendering convention — each arrives as "just one more section", each is
  * read by every session that opens the glossary, and the two sibling repos
- * grew their CONTEXT.md to 40k and 18k chars that way before anyone noticed.
+ * grew their glossaries to 40k and 18k chars that way before anyone noticed.
  * Reference belongs behind a pointer; a glossary that carries it is sprawl.
  *
- * What "glossary only" means here, mechanically:
+ * The format is the mattpocock-skills plugin's: a `**Term**:` line, a one- or
+ * two-sentence definition, an optional `_Avoid_:` line, grouped under `###`
+ * clusters. What "glossary only" means here, mechanically:
  *   - no fenced code (a glossary defines words; code is reference);
- *   - no third-level headings (sections are term groups, not chapters);
- *   - every second-level section holds at least one table row (a section with
- *     no terms in it is prose wearing a heading);
- *   - prose lines — anything that is not a heading, a table row, frontmatter or
- *     an HTML comment — are RATCHETED: the count may fall, never rise. A
- *     one-line pointer to where a convention now lives is prose and is allowed;
- *     the ratchet keeps it to one line.
+ *   - no heading deeper than `###` (a cluster is a term group, not a chapter);
+ *   - every `##` section and every `###` cluster holds at least one term entry
+ *     (a heading with no terms under it is prose wearing a heading);
+ *   - a term entry is exactly a definition line and an optional `_Avoid_:`
+ *     line — anything more under a term is reference hiding from the ratchet;
+ *   - a table row belongs only to the
+ *     ONE section that is not a term group: § Two vocabularies, ADR-023's
+ *     only statement, whose table is the rule itself and which pointers across
+ *     the harness cite by that name. It is held to its table instead of terms;
+ *   - prose lines — anything that is not a heading, a term entry, a table row,
+ *     frontmatter or an HTML comment — are RATCHETED: the count may fall, never
+ *     rise. A one-line pointer to where a convention now lives is prose and is
+ *     allowed; the ratchet keeps it to one line.
  *
  * THE RECORD IS THE ONE WITH NO KEYED SET AT ALL — a single number on the
  * record, which is the `scalar` form in `scripts/lib/ratchet-shapes.mjs`. It is
@@ -38,12 +46,20 @@ import { byRoot, main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 
 export { REPO_ROOT };
-export const SUBJECT = 'CONTEXT.md';
+export const SUBJECT = 'GLOSSARY.md';
+/** The one section that holds a table rather than term entries (ADR-023). Matched on its name, before the dash gloss. */
+export const TWO_VOCABULARIES = 'Two vocabularies';
 /** Repo-relative: also this record's key in the shape table, and what the registry row declares. */
 export const BASELINE = 'docs/evals/glossary-baseline.json';
 
 export const REMEDY =
   '  -> a glossary defines terms; move the reference behind a pointer, or re-baseline with --update and say why.';
+
+/**
+ * `**Term**:` — or a paired term, `**ladder** / **disclosed**:`. The colon ends
+ * the line. Exported so every reader of the glossary parses one grammar.
+ */
+export const TERM = /^\*\*[^*]+\*\*(?:\s*\/\s*\*\*[^*]+\*\*)*:$/;
 
 export function measure(text) {
   // The frontmatter is read off by the corpus, not by a second fence-finder
@@ -56,23 +72,55 @@ export function measure(text) {
   let inFence = false;
   let inComment = false;
   let prose = 0;
-  let section = null;
-  const sections = new Map(); // heading -> table rows
+  let entry = null; // the open term entry: { term, line, body } — body counts its lines
+  let section = null; // the open `##` heading
+  let cluster = null; // the open `###` heading
+  const terms = new Map(); // `section` or `section › cluster` -> term entries under it
+  const tables = new Map(); // `##` heading -> table rows under it
+  const isTwoVocabularies = (h) => h !== null && h.startsWith(TWO_VOCABULARIES);
+  const closeEntry = () => {
+    if (entry && entry.body === 0) failures.push(`line ${entry.line}: term "${entry.term}" has no definition`);
+    entry = null;
+  };
   lines.forEach((raw, index) => {
     const i = index + offset;
     const l = raw.trimEnd();
-    if (l.startsWith('```')) { inFence = !inFence; if (inFence) failures.push(`line ${i + 1}: fenced code in the glossary`); return; }
+    if (l.startsWith('```')) { closeEntry(); inFence = !inFence; if (inFence) failures.push(`line ${i + 1}: fenced code in the glossary`); return; }
     if (inFence) return;
     if (l.startsWith('<!--')) inComment = true;
     if (inComment) { if (l.includes('-->')) inComment = false; return; }
-    if (/^###\s/.test(l)) { failures.push(`line ${i + 1}: third-level heading "${l}" — sections are term groups, not chapters`); return; }
-    if (/^##\s/.test(l)) { section = l.replace(/^##\s*/, ''); sections.set(section, 0); return; }
-    if (/^#\s/.test(l)) return;
-    if (l === '') return;
-    if (l.startsWith('|')) { if (section && !/^\|\s*-+/.test(l) && !/^\|\s*(Term|PLUS Term)\s*\|/i.test(l)) sections.set(section, sections.get(section) + 1); return; }
+    if (l === '') { closeEntry(); return; }
+    if (/^#{4,}\s/.test(l)) { closeEntry(); failures.push(`line ${i + 1}: heading "${l}" is deeper than a cluster — clusters are term groups, not chapters`); return; }
+    if (/^###\s/.test(l)) { closeEntry(); cluster = `${section} › ${l.replace(/^###\s*/, '')}`; terms.set(cluster, 0); return; }
+    if (/^##\s/.test(l)) { closeEntry(); section = l.replace(/^##\s*/, ''); cluster = null; terms.set(section, 0); tables.set(section, 0); return; }
+    if (/^#\s/.test(l)) { closeEntry(); return; }
+    if (TERM.test(l)) {
+      closeEntry();
+      entry = { term: l.slice(0, -1), line: i + 1, body: 0 };
+      for (const h of [section, cluster]) if (h !== null) terms.set(h, terms.get(h) + 1);
+      return;
+    }
+    if (entry) {
+      // A term entry's body: its definition line, then at most its `_Avoid_:` line.
+      entry.body += 1;
+      const avoid = /^_Avoid_:/.test(l);
+      if (entry.body === 1 && avoid) failures.push(`line ${i + 1}: term "${entry.term}" lists what to avoid before saying what it is`);
+      else if (entry.body === 2 && !avoid) failures.push(`line ${i + 1}: term "${entry.term}" has a second definition line — one or two sentences, on one line`);
+      else if (entry.body > 2) failures.push(`line ${i + 1}: term "${entry.term}" runs past its \`_Avoid_:\` line — reference belongs behind a pointer`);
+      return;
+    }
+    if (l.startsWith('|')) {
+      if (!isTwoVocabularies(section)) { failures.push(`line ${i + 1}: a table row outside § ${TWO_VOCABULARIES} — a term is a \`**Term**:\` entry`); return; }
+      if (!/^\|\s*-+/.test(l)) tables.set(section, tables.get(section) + 1);
+      return;
+    }
     prose += 1;
   });
-  for (const [h, rows] of sections) if (rows === 0) failures.push(`section "${h}" holds no term rows — prose wearing a heading`);
+  closeEntry();
+  for (const [h, n] of terms) {
+    if (isTwoVocabularies(h)) { if (!tables.get(h)) failures.push(`section "${h}" has lost its table — it is ADR-023's only statement`); continue; }
+    if (n === 0) failures.push(`section "${h}" holds no term entries — prose wearing a heading`);
+  }
   return { failures, prose };
 }
 

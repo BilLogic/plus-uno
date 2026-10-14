@@ -7,7 +7,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ## Reading paths
 
-**New here, any role** → [`README.md`](README.md) → [`SETUP.md`](SETUP.md) → [`CONTEXT.md`](CONTEXT.md)
+**New here, any role** → [`README.md`](README.md) → [`SETUP.md`](SETUP.md) → [`GLOSSARY.md`](GLOSSARY.md)
 
 **Designer building UI** → [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) → [`design-system/agent-views/components/index.md`](design-system/agent-views/components/index.md) → [`design-system/guidelines/composition/layout.md`](design-system/guidelines/composition/layout.md)
 
@@ -26,7 +26,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`README.md`](README.md) | ![Netlify Status](https://app.netlify.com/projects/plus-uno/deploys) |
 | [`SETUP.md`](SETUP.md) | Clone, install, run, and find your way around — without reading the constitution first. |
 | [`AGENTS.md`](AGENTS.md) | The constitution — identity, routing, the loading contract, and hard rules for every embodiment. |
-| [`CONTEXT.md`](CONTEXT.md) | Use these terms consistently across all design system work, prototypes, and documentation |
+| [`GLOSSARY.md`](GLOSSARY.md) | Use these terms consistently across all design system work, prototypes, and documentation |
 
 ## Skills — what humans invoke
 
@@ -178,7 +178,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/020-requester-scoped-slack-visibility-per-user-tokens-own.md`](docs/adr/020-requester-scoped-slack-visibility-per-user-tokens-own.md) | Requester-scoped Slack visibility — per-user tokens, own DMs readable in own bot DM (2026-07-16) |
 | [`docs/adr/021-two-sources-one-time-axis-blueprint-vs-notion.md`](docs/adr/021-two-sources-one-time-axis-blueprint-vs-notion.md) | Two sources, one time axis — blueprint vs Notion authority routed by claim type and card status (2026-07-29) |
 | [`docs/adr/022-enforce-the-subrequest-budget-at-the-boundary-don.md`](docs/adr/022-enforce-the-subrequest-budget-at-the-boundary-don.md) | Enforce the subrequest budget at the boundary; don't estimate it (2026-07-30) |
-| [`docs/adr/023-two-vocabularies-ratified-blueprint-vs-roadmap.md`](docs/adr/023-two-vocabularies-ratified-blueprint-vs-roadmap.md) | The two-vocabularies rule is ratified — blueprint words and Roadmap words never mix, and CONTEXT.md is its only home (2026-08-25) |
+| [`docs/adr/023-two-vocabularies-ratified-blueprint-vs-roadmap.md`](docs/adr/023-two-vocabularies-ratified-blueprint-vs-roadmap.md) | The two-vocabularies rule is ratified — blueprint words and Roadmap words never mix, and the glossary (now GLOSSARY.md) is its only home (2026-08-25) |
 | [`docs/adr/024-slack-app-configuration-is-a-one-way-door.md`](docs/adr/024-slack-app-configuration-is-a-one-way-door.md) | Slack app config only ever widens — narrowing a scope costs a full uninstall, and PKCE forecloses scripted manifest writes (2026-08-06) |
 | [`docs/adr/025-component-docs-page-owns-its-tabs-not-the-storybook-toolbar.md`](docs/adr/025-component-docs-page-owns-its-tabs-not-the-storybook-toolbar.md) | Tabs move from Storybook's manager toolbar into the component docs page, below the title — the toolbar sits in a different document and can never render under in-page content (2026-08-26) |
 | [`docs/adr/026-spacing-tokens-grouped-over-flat.md`](docs/adr/026-spacing-tokens-grouped-over-flat.md) | Semantic spacing tokens are grouped (namespaced), not flat |
