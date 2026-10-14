@@ -37,7 +37,7 @@ How to draft a design-system fix once the intake routes there. Harness maintenan
 1. Read the component source, its co-located `*.stories.jsx`, and SCSS before changing anything.
 2. Update the API and usage; follow existing prop-naming conventions (`style`, `fill`, size props).
 3. Update the co-located stories (controls + examples) in the same change.
-4. Update exports (`design-system/src/components/index.js` or `forms/index.js`) if the surface changed.
+4. Update exports (`design-system/src/components/index.js` or `design-system/src/components/forms-and-inputs/index.js`) if the surface changed.
 5. Validate stories and any affected specs in Storybook.
 
 ## Workflow C — Figma ↔ DS reconcile
