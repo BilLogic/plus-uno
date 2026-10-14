@@ -1543,6 +1543,22 @@ async function existingMarketplaceRow(env: Env, databaseId: string, input: Marke
   return rows[0] ?? null;
 }
 
+/** On an update, the replica line a create would have written, appended once:
+ *  a page whose first blocks already hold the link is left as is. */
+async function keepReplicaInBody(env: Env, pageId: string, replica: string, signal: AbortSignal): Promise<void> {
+  const read = await countedFetch(`${NOTION_API}/blocks/${pageId}/children?page_size=100`, { headers: notionHeaders(env), signal });
+  const held = (await read.json()) as { results?: unknown[]; message?: string; code?: string };
+  if (!read.ok) throw notionError(read.status, held, "marketplace body read failed");
+  if (JSON.stringify(held.results ?? []).includes(replica)) return;
+  const res = await countedFetch(`${NOTION_API}/blocks/${pageId}/children`, {
+    method: "PATCH",
+    headers: notionHeaders(env, { write: true }),
+    body: JSON.stringify({ children: bodyToBlocks(`**Figma replica:** ${replica}`) }),
+    signal,
+  });
+  if (!res.ok) throw notionError(res.status, await res.json(), "marketplace replica append failed");
+}
+
 /**
  * Create or update the Prototype Marketplace row for one prototype.
  *
@@ -1601,6 +1617,7 @@ export async function publishMarketplaceRow(env: Env, input: MarketplaceInput): 
       });
       const data = (await res.json()) as { id?: string; url?: string; message?: string; code?: string };
       if (!res.ok) throw notionError(res.status, data, "marketplace update failed");
+      if (replicaInBody) await keepReplicaInBody(env, existing, replica!, controller.signal);
       return { id: existing, url: canonicalNotionUrl(data.url, existing), label: MARKETPLACE_LABEL, status: "updated" };
     }
 
