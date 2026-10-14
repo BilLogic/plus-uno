@@ -22,8 +22,17 @@
 -- settled, or whose DM half it could not read, have escalated_to_lead null
 -- and are dropped, so it also leans LOW; `lead_unknown` counts them.
 --
+-- Beside it, the bot's side of the same load: asks_to_bot is every real ask
+-- in the window, and asks_to_bot_per_workday divides it by the same
+-- workdays. It splits by pain_category into housekeeping (1–5 and 7: finding,
+-- syncing, access, process and the cards a turn staged), judgment (6, a
+-- design call) and unlabelled (not classified yet, or no category fitted) —
+-- three counts that add up to asks_to_bot.
+--
 -- Window: ask time (turns.asked_at), UTC, the @from date inclusive to the @to
--- date exclusive. Set both with scripts/metric-query.mjs --from/--to.
+-- date exclusive. Set both with scripts/metric-query.mjs --from/--to. The
+-- default runs 2026-09-01 to 2027-01-01, the measurement window; the usage
+-- record begins on 2026-09-29, so nothing before that date is in it.
 -- Excludes: test traffic (test_traffic = 0 only).
 -- Metric sheet: Final — metrics, https://www.notion.so/3eab7cca498281c79119da63b2f2077f
 -- Running and citing: agents/uno-bot/README.md § Metrics.
@@ -46,7 +55,7 @@ WITH RECURSIVE
     WHERE days.d <= last_day.d AND strftime('%w', days.d) NOT IN ('0', '6')
   ),
   real_turns AS (
-    SELECT in_thread, escalated_to_lead FROM turns, win
+    SELECT in_thread, escalated_to_lead, pain_category FROM turns, win
     WHERE test_traffic = 0
       AND asked_at >= win.from_ms AND asked_at < win.to_ms
   ),
@@ -60,7 +69,12 @@ SELECT
   COALESCE(SUM(escalated_to_lead = 1), 0)                                   AS reaching_lead,
   workdays.n                                                                AS workdays,
   ROUND(1.0 * COALESCE(SUM(escalated_to_lead = 1), 0) / NULLIF(workdays.n, 0), 2) AS per_workday,
-  COALESCE(SUM(escalated_to_lead IS NULL), 0)                               AS lead_unknown
+  COALESCE(SUM(escalated_to_lead IS NULL), 0)                               AS lead_unknown,
+  COUNT(*)                                                                  AS asks_to_bot,
+  ROUND(1.0 * COUNT(*) / NULLIF(workdays.n, 0), 2)                          AS asks_to_bot_per_workday,
+  COALESCE(SUM(pain_category IN (1, 2, 3, 4, 5, 7)), 0)                     AS housekeeping,
+  COALESCE(SUM(pain_category = 6), 0)                                       AS judgment,
+  COALESCE(SUM(pain_category IS NULL), 0)                                   AS unlabelled
 FROM units, workdays
 GROUP BY unit, ord
 ORDER BY ord;
