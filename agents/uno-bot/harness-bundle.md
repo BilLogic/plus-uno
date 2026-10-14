@@ -15,25 +15,25 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **157,813 chars from 15 files**, against an assembled budget of 175,500 (17,687 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 137,429 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **157,734 chars from 15 files**, against an assembled budget of 175,500 (17,766 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 137,350 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,845 (−7,705 ide-only) | 9,845 | 20,000 (constitution) |
 | 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 12,784 | 22,658 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,961 | 50,660 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,249 | 56,953 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 63,898 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,712 | 70,653 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,160 | 75,857 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 82,504 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 88,892 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−22,570 ide-only) | 93,453 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,535 (−4,814 ide-only) | 108,031 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 35,123 (−9,320 ide-only) | 143,196 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 146,664 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 153,180 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 157,813 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,876 | 50,575 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,249 | 56,868 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 63,813 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,712 | 70,568 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,160 | 75,772 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 82,419 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 88,807 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−22,570 ide-only) | 93,368 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,535 (−4,814 ide-only) | 107,946 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 35,129 (−9,320 ide-only) | 143,117 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 146,585 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 153,101 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 157,734 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -554,7 +554,7 @@ The ✅-gated tools of the gate list (§ Tool routing) — zero irreversible act
 - **Canvas (ADR-020):** user-shared here.
 - **Personal Notion notes — readable, but discreet.** 1:1 / running-notes rows (scope `running_notes`, or a `source_read` of one) are team-readable but treated like private Slack content: confirm a note exists and summarize neutrally, at a level that leaves *highly sensitive personal* specifics in the note — immigration/visa, compensation/offers, health, performance/PIP, personal hardship. Asked for those directly → decline and point to the person or their manager. Same rule when writing: never copy sensitive personal detail into a team-visible page.
 - **A DM stays a DM** for its own content. Reviewable artifacts from DM work → propose posting to `#plus-design`, post only on approval. Reaching someone new is either an @-mention in the thread or a **relayed DM** — "send this to Coco" → `dm_relay`, ✅-gated, from a channel or a DM alike. *Private stays private* bounds what a relay carries.
-- **Single-reply architecture:** one run, one message. The Worker fan-outs successful gated artifacts to `#plus-design` (leave that to it) — so no promised status updates (at most one brief interim post on a long turn, offered as an aside). Detail too long for Slack goes on the relevant Notion card (`notion_update`, gated) and is linked.
+- **Single-reply architecture:** one run, one message — so no promised status updates (at most one brief interim post on a long turn, offered as an aside). Detail too long for Slack goes on the relevant Notion card (`notion_update`, gated) and is linked.
 - **Multi-target asks: land the top one, offer the next.** "Check A, B, and C" → do the highest-priority target, deliver that clean, and offer to continue — one run spent on all three times out with nothing.
 
 **Write standard Markdown** — `**bold**`, `_italic_`, `- bullets`, `[label](url)`, `> quotes`, fenced code, and **tables**. Slack renders all of it. A Markdown table is right for a grid (3+ rows comparing the same fields) you composed yourself from your own reasoning; keep it to 2–4 narrow columns, for phones. Prose in a table is worse than prose. One hard rule: people and channels are always Slack IDs (`<@U…>`, `<#C…>`) — a plain `@handle` pings nobody. Details in `docs/connectors/slack.md` § Message formatting.
@@ -1108,7 +1108,7 @@ Two limits the Worker now handles, worth knowing because they shape what you wri
 
 | Channel | ID | Use |
 |---|---|---|
-| #plus-design | `C03FC8AS69K` | review requests, design-team coordination |
+| #plus-design | `C03FC8AS69K` | Figma Review cards, design-team coordination |
 | #plus-design-feedback | `C074QG2V7DJ` | share-out bundles + feedback threads |
 | #uno-bot | `C0ARJ2A3A69` | team intake about uno-bot |
 | #plus-universal | `C072E8SFLKV` | Figma library publish cards |
@@ -1311,7 +1311,7 @@ Until then this file mandated Slack **mrkdwn** (`*single*` bold, literal `•`, 
 ## Threading & mentions
 
 - **Reply in-thread by default** (`thread_ts` = the *parent* message's ts). Keeps the channel clean.
-- A fresh top-level post is only for cross-channel announcements (e.g. a review fan-out to #plus-design) — a real new message, not a reply.
+- A fresh top-level post is only for cross-channel announcements (e.g. a Figma Review card in #plus-design) — a real new message, not a reply.
 - **A `/uno-*` slash command runs as a public thread.** The Worker posts a framing message in the channel and threads the run under it, so history, the emoji gate, and proposals behave exactly as they do for an @mention.
 - **Mention only who must act** (`<@U…>`). Never spray `<!here>` / `<!channel>` / `<!everyone>` — they need installer permission and read as noise. Batch related updates into one message, not five.
 

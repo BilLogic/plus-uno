@@ -11,7 +11,7 @@ summary: Pillar → channel map (group announcements; all private — uno-bot mu
 
 | Channel | ID | Use |
 |---|---|---|
-| #plus-design | `C03FC8AS69K` | review requests, design-team coordination |
+| #plus-design | `C03FC8AS69K` | Figma Review cards, design-team coordination |
 | #plus-design-feedback | `C074QG2V7DJ` | share-out bundles + feedback threads |
 | #uno-bot | `C0ARJ2A3A69` | team intake about uno-bot |
 | #plus-universal | `C072E8SFLKV` | Figma library publish cards |
@@ -235,7 +235,7 @@ Until then this file mandated Slack **mrkdwn** (`*single*` bold, literal `•`, 
 ## Threading & mentions
 
 - **Reply in-thread by default** (`thread_ts` = the *parent* message's ts). Keeps the channel clean.
-- A fresh top-level post is only for cross-channel announcements (e.g. a review fan-out to #plus-design) — a real new message, not a reply.
+- A fresh top-level post is only for cross-channel announcements (e.g. a Figma Review card in #plus-design) — a real new message, not a reply.
 - **A `/uno-*` slash command runs as a public thread.** The Worker posts a framing message in the channel and threads the run under it, so history, the emoji gate, and proposals behave exactly as they do for an @mention.
 - **Mention only who must act** (`<@U…>`). Never spray `<!here>` / `<!channel>` / `<!everyone>` — they need installer permission and read as noise. Batch related updates into one message, not five.
 <!-- ide-only -->

@@ -16,9 +16,6 @@
 // decides who is appropriate. A recipient Slack cannot DM — a deactivated
 // account, a bot — fails at step 2 with its cause named.
 //
-// No `#plus-design` fan-out either: the row's `reviewRequest` is null, because
-// a DM is not a reviewable artifact.
-//
 // The Slack client and the memory arrive BY NAME, the way every seam in Turn
 // takes its dependencies, so a test drives a whole approved batch through
 // fakes; `relaySlackFor` and `relayMemoryFor` are the places `Env` is bound.

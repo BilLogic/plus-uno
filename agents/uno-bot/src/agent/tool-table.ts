@@ -12,9 +12,10 @@
 // Eight of the nine are this table now. The union is an alias of `ToolName`
 // (#596) and `agent/types.ts` is gone with the last of it; both dispatches are
 // lookups keyed on `access` (#597), so a tool with no dispatch arm cannot
-// exist; and the columns below answer the other five readers (#598) — none of
+// exist; and the columns below answer the other readers (#598) — none of
 // them keeps a list of tool names any more, so the tests that held their lists
-// equal to these columns are gone with the lists.
+// equal to these columns are gone with the lists. The review-request set had a
+// column too, until the #plus-design post it fed was retired.
 //
 // The ninth is `preflight.ts`, and it stays: its arms are per-tool SUBSTANCE
 // checks (does this component exist, does this PRD url resolve), not a
@@ -31,7 +32,7 @@
 // them, pairing rows with bodies as a `Record`, so a row with no body or a
 // body with no row fails the typecheck.
 //
-// Importing nothing is also what lets the five readers reach it: `confidence.ts`
+// Importing nothing is also what lets its readers reach it: `confidence.ts`
 // and `pending-notice.ts` are pure judgement modules a plain Node test drives
 // directly, and `proposal-render.ts` renders card text without `Env`. A column
 // on a table that dragged the Workers type graph behind it would have been a
@@ -147,12 +148,6 @@ export type ToolRow = {
    * can cite. Read by `agent/confidence.ts`.
    */
   readonly retrieval: boolean;
-  /**
-   * The reviewable artifact a confirmed run leaves — a draft PR, a new PRD —
-   * named as the heads-up in the design channel names it, or null when a run
-   * leaves nothing worth one. Read by `slack/api.ts`.
-   */
-  readonly reviewRequest: string | null;
 } & (
   | {
       readonly access: "ungated";
@@ -187,13 +182,11 @@ export const TOOL_TABLE = {
   roadmap_query: {
     access: "ungated",
     retrieval: true,
-    reviewRequest: null,
     taskCard: { title: "Checking the Roadmap board", estate: "notion" },
   },
   notion_search: {
     access: "ungated",
     retrieval: true,
-    reviewRequest: null,
     taskCard: { title: "Searching Notion", estate: "notion" },
   },
   // A URL of any estate, so the row names `"link"`: which one this call read
@@ -201,78 +194,67 @@ export const TOOL_TABLE = {
   source_read: {
     access: "ungated",
     retrieval: true,
-    reviewRequest: null,
     taskCard: { title: "Reading the link", estate: "link" },
   },
   search_blueprint: {
     access: "ungated",
     retrieval: true,
-    reviewRequest: null,
     taskCard: { title: "Searching the blueprint", estate: "blueprint" },
   },
   github_read: {
     access: "ungated",
     retrieval: true,
-    reviewRequest: null,
     taskCard: { title: "Reading GitHub", estate: "github" },
   },
   // The duplicate check before `github_issue_create`: open intakes by keyword.
   github_intake_search: {
     access: "ungated",
     retrieval: true,
-    reviewRequest: null,
     taskCard: { title: "Checking open intakes on GitHub", estate: "github" },
     offersTable: false,
   },
   slack_user_profile: {
     access: "ungated",
     retrieval: true,
-    reviewRequest: null,
     taskCard: { title: "Looking someone up in Slack", estate: "slack" },
     offersTable: false,
   },
   slack_channel_members: {
     access: "ungated",
     retrieval: true,
-    reviewRequest: null,
     taskCard: { title: "Checking who's in the channel", estate: "slack" },
   },
   slack_thread_read: {
     access: "ungated",
     retrieval: true,
-    reviewRequest: null,
     taskCard: { title: "Reading the Slack thread", estate: "slack" },
     offersTable: false,
   },
-  slack_react: { access: "ungated", retrieval: false, reviewRequest: null, taskCard: null },
+  slack_react: { access: "ungated", retrieval: false, taskCard: null },
   // The answer's shape: a table of rows a lookup already returned this turn.
   // Turn's presentation step answers it from those results
   // (`turn/presentation.ts`), so it fetches nothing and is no checklist step.
-  present: { access: "ungated", retrieval: false, reviewRequest: null, taskCard: null, fetchesNothing: true },
+  present: { access: "ungated", retrieval: false, taskCard: null, fetchesNothing: true },
   // "Remind me": writes only uno-bot's own record, posted back to the asker
   // alone at a morning run (`commitments/remind.ts`).
   reminder_set: {
     access: "ungated",
     retrieval: false,
-    reviewRequest: null,
     taskCard: { title: "Setting your reminder", estate: null },
   },
   slack_search: {
     access: "ungated",
     retrieval: true,
-    reviewRequest: null,
     taskCard: { title: "Searching Slack", estate: "slack" },
   },
   read_reference: {
     access: "ungated",
     retrieval: false,
-    reviewRequest: null,
     taskCard: { title: "Checking my playbook", estate: null },
   },
   notion_create: {
     access: "gated",
     retrieval: false,
-    reviewRequest: "new PRD / intake / decision",
     gate: {
       verb: "create this card in Notion",
       kind: "create row",
@@ -282,7 +264,6 @@ export const TOOL_TABLE = {
   notion_update: {
     access: "gated",
     retrieval: false,
-    reviewRequest: null,
     gate: {
       verb: "update this Notion page",
       // `notion_update` is the one card that names its own operations — a
@@ -295,7 +276,6 @@ export const TOOL_TABLE = {
   notion_archive: {
     access: "gated",
     retrieval: false,
-    reviewRequest: null,
     gate: {
       verb: "archive this Notion card",
       kind: "archive",
@@ -305,7 +285,6 @@ export const TOOL_TABLE = {
   component_implement: {
     access: "gated",
     retrieval: false,
-    reviewRequest: "component implementation PR",
     gate: {
       verb: "implement this component",
       kind: "dispatch an implementation",
@@ -315,7 +294,6 @@ export const TOOL_TABLE = {
   prototype_scaffold: {
     access: "gated",
     retrieval: false,
-    reviewRequest: "new prototype scaffold PR",
     gate: {
       verb: "scaffold a new prototype from this Figma design",
       kind: "scaffold a prototype",
@@ -325,7 +303,6 @@ export const TOOL_TABLE = {
   shareout_post: {
     access: "gated",
     retrieval: false,
-    reviewRequest: null,
     gate: {
       verb: "share this for feedback in #plus-design-feedback",
       kind: "post a share-out",
@@ -335,7 +312,6 @@ export const TOOL_TABLE = {
   email_send: {
     access: "gated",
     retrieval: false,
-    reviewRequest: null,
     gate: {
       verb: "send an email via Gmail",
       kind: "send an email",
@@ -343,12 +319,10 @@ export const TOOL_TABLE = {
     },
   },
   // The relayed DM (GLOSSARY.md). One operation per recipient, so "send this to
-  // Coco and Meryem" is one card of two. No review request: a DM is not a
-  // reviewable artifact, so nothing fans out to `#plus-design`.
+  // Coco and Meryem" is one card of two.
   dm_relay: {
     access: "gated",
     retrieval: false,
-    reviewRequest: null,
     gate: {
       verb: "send a DM on your behalf",
       kind: "send a DM",
@@ -358,9 +332,7 @@ export const TOOL_TABLE = {
   github_issue_create: {
     access: "gated",
     retrieval: false,
-    // Triage is uno-maintain's, through the labels the Worker applies — not a
-    // review heads-up in the design channel.
-    reviewRequest: null,
+    // Triage is uno-maintain's, through the labels the Worker applies.
     gate: {
       // The card adds the resolved repo to this verb, and its visibility as
       // the repo-visibility caveat — read, and never a literal here.
@@ -374,19 +346,17 @@ export const TOOL_TABLE = {
   github_issue_update: {
     access: "gated",
     retrieval: false,
-    reviewRequest: null,
     gate: {
       verb: "update a GitHub issue",
       kind: "update an issue",
       nouns: ["issue", "github", "comment", "close", "reopen", "label"],
     },
   },
-  // A workflow the repo list allows, on a listed repo. No review request: a
-  // run's result is on its runs page, which the thread is handed.
+  // A workflow the repo list allows, on a listed repo. A run's result is on
+  // its runs page, which the thread is handed.
   github_workflow_run: {
     access: "gated",
     retrieval: false,
-    reviewRequest: null,
     gate: {
       verb: "run a GitHub workflow",
       kind: "run a workflow",
@@ -399,7 +369,6 @@ export const TOOL_TABLE = {
   sweep_share_post: {
     access: "worker",
     retrieval: false,
-    reviewRequest: null,
     gate: {
       verb: "post this note in a team channel",
       kind: "post a note",
@@ -412,7 +381,6 @@ export const TOOL_TABLE = {
   ds_precedence_intake: {
     access: "worker",
     retrieval: false,
-    reviewRequest: null,
     gate: {
       verb: "add this to the week's DS precedence intake",
       kind: "file an issue",
@@ -425,7 +393,6 @@ export const TOOL_TABLE = {
   figma_tidy_up: {
     access: "worker",
     retrieval: false,
-    reviewRequest: null,
     gate: {
       verb: "leave this file as is",
       kind: "leave a file as is",
@@ -439,14 +406,13 @@ export const TOOL_TABLE = {
   figma_dev_links: {
     access: "worker",
     retrieval: false,
-    reviewRequest: null,
     gate: {
       verb: "add these Dev Mode links",
       kind: "add Dev Mode links",
       nouns: ["dev mode", "link", "figma"],
     },
   },
-  proposal_resolve: { access: "control", retrieval: false, reviewRequest: null },
+  proposal_resolve: { access: "control", retrieval: false },
 } as const satisfies Record<string, ToolRow>;
 
 /** Every tool uno-bot offers, by name. */
@@ -464,10 +430,10 @@ export function isToolName(name: string): name is ToolName {
  * The row for `name`, or null when `name` names no tool.
  *
  * The readers' one door onto the table: `agent/loop.ts` asks for `access`,
- * `agent/confidence.ts` for `retrieval`, `slack/api.ts` for `reviewRequest`.
- * They take a `string` — a tool name arrives from the model — so the lookup is
- * the membership guard as well, and a name nobody registered answers null
- * rather than reading as a row of falses.
+ * `agent/confidence.ts` for `retrieval`. They take a `string` — a tool name
+ * arrives from the model — so the lookup is the membership guard as well, and
+ * a name nobody registered answers null rather than reading as a row of
+ * falses.
  */
 export function rowFor(name: string): ToolRow | null {
   return isToolName(name) ? TOOL_TABLE[name] : null;
