@@ -23,6 +23,6 @@ Sweeps this repo (components, stories, tokens, prototypes, knowledge) to answer 
 
 ## Conventions it obeys
 
-- Read-only scope: it reads the repo and returns a brief; every write belongs to the summoning skill or a `writers/` agent
+- `agents/README.md` § The three kinds + the embodiment (read-only scope: only `writers/` write)
 - `AGENTS.md` § Hard rules
 - DS truth boundary: component/style documentation lives in uno-storybook — cite stories, don't restate them
