@@ -272,11 +272,11 @@ export const TOOL_TABLE = {
   notion_create: {
     access: "gated",
     retrieval: false,
-    reviewRequest: "new PRD / intake / decision",
+    reviewRequest: "new PRD / intake / decision / Marketplace row",
     gate: {
       verb: "create this card in Notion",
       kind: "create row",
-      nouns: ["card", "prd", "intake", "ticket", "notion", "decision"],
+      nouns: ["card", "prd", "intake", "ticket", "notion", "decision", "marketplace", "row"],
     },
   },
   notion_update: {

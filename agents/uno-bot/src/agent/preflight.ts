@@ -125,6 +125,27 @@ export async function preflight(
           };
         }
       }
+      if (surface === "marketplace") {
+        // The fields a row is useless without; the rest are asked for once
+        // and may legitimately be absent (`tool-definitions.json`).
+        const props =
+          input.properties && typeof input.properties === "object"
+            ? (input.properties as Record<string, unknown>)
+            : {};
+        const has = (...names: string[]) =>
+          Object.entries(props).some(
+            ([k, v]) => names.includes(k.toLowerCase().replace(/[\s-]+/g, "_")) && typeof v === "string" && v.trim(),
+          );
+        const missing = [
+          !title && "*name*",
+          !has("description") && !summary && "*description*",
+          !has("stage") && "*stage* (Low-fi · Mid-fi · High-fi)",
+          !has("deployment_url", "preview_url") && "*deployment URL*",
+        ].filter(Boolean);
+        if (missing.length) {
+          return { ask: `To publish to the Marketplace I still need the ${missing.join(", ")}.` };
+        }
+      }
 
       // Placeholder scan: a genuinely unfilled slot never gets filed, and the
       // refusal names the surface, the field and the text it matched

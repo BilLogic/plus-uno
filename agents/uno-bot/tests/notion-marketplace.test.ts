@@ -209,3 +209,19 @@ test("a Figma replica link waits in the body while the database has no such prop
   assert.equal("Figma replica" in (post.body!.properties as Record<string, unknown>), false);
   assert.match(JSON.stringify(post.body!.children), /figma\.com\/design\/F1/);
 });
+
+test("before a card is staged, a publish missing its stage and deployment link asks for exactly those", async () => {
+  const { preflight } = await import("../src/agent/preflight.js");
+
+  const ask = await preflight(
+    "notion_create",
+    { surface: "marketplace", title: "Session review", properties: { description: "A tutor reviews a session." } },
+    { env: ENV, prd: null },
+  );
+
+  assert.ok(ask);
+  assert.match(ask.ask, /\*stage\*/);
+  assert.match(ask.ask, /\*deployment URL\*/);
+  assert.doesNotMatch(ask.ask, /\*name\*|\*description\*/);
+  assert.equal(await preflight("notion_create", INPUT, { env: ENV, prd: null }), null);
+});

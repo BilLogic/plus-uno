@@ -106,6 +106,8 @@ function notionSurfaceName(input: Record<string, unknown>): string {
       return "decision record";
     case "intake":
       return "intake";
+    case "marketplace":
+      return "Marketplace entry";
     default:
       return "Notion page";
   }
