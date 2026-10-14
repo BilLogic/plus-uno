@@ -1,0 +1,57 @@
+name: figma-comment-probe (throwaway)
+on:
+  pull_request:
+    paths: ['.github/workflows/figma-comment-probe.yml']
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe comment, reaction and dev-resource writes on a Toolkit file
+        env:
+          FIGMA_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+        run: |
+          set -u
+          H="X-Figma-Token: $FIGMA_TOKEN"
+          API=https://api.figma.com
+          TEAM=1279227565411025715   # Toolkit
+          code() { echo "$1 -> $2"; }
+          FOLDERS=$(curl -s -H "$H" "$API/v2/teams/$TEAM/folders")
+          FOLDER=$(echo "$FOLDERS" | jq -r '.folders[0].id // empty')
+          code "list Toolkit folders" "$([ -n "$FOLDER" ] && echo ok || echo none)"
+          [ -z "$FOLDER" ] && exit 1
+          FILE=$(curl -s -H "$H" "$API/v2/folders/$FOLDER/files" | jq -r '[.files[]] | sort_by(.last_modified) | last | .key // empty')
+          code "pick most recent Toolkit file" "$([ -n "$FILE" ] && echo ok || echo none)"
+          [ -z "$FILE" ] && exit 1
+          NODE=$(curl -s -H "$H" "$API/v1/files/$FILE?depth=2" | jq -r '.document.children[0].children[0].id // empty')
+          code "read file tree" "$([ -n "$NODE" ] && echo ok || echo none)"
+          # 1. comment
+          R=$(curl -s -w '\n%{http_code}' -X POST -H "$H" -H 'Content-Type: application/json' \
+            -d '{"message":"uno-bot API probe — this comment deletes itself in a few seconds.","client_meta":{"x":0,"y":0}}' \
+            "$API/v1/files/$FILE/comments")
+          code "POST comment" "$(echo "$R" | tail -1)"
+          CID=$(echo "$R" | sed '$d' | jq -r '.id // empty')
+          # 2. goat reaction, both spellings
+          code "POST reaction 🐐" "$(curl -s -o /dev/null -w '%{http_code}' -X POST -H "$H" -H 'Content-Type: application/json' -d '{"emoji":"🐐"}' "$API/v1/files/$FILE/comments/$CID/reactions")"
+          code "POST reaction :goat:" "$(curl -s -o /dev/null -w '%{http_code}' -X POST -H "$H" -H 'Content-Type: application/json' -d '{"emoji":":goat:"}' "$API/v1/files/$FILE/comments/$CID/reactions")"
+          echo "reaction read back as: $(curl -s -H "$H" "$API/v1/files/$FILE/comments/$CID/reactions" | jq -c '[.reactions[].emoji]')"
+          # 3. reply
+          R2=$(curl -s -w '\n%{http_code}' -X POST -H "$H" -H 'Content-Type: application/json' \
+            -d "{\"message\":\"probe reply\",\"comment_id\":\"$CID\"}" "$API/v1/files/$FILE/comments")
+          code "POST reply" "$(echo "$R2" | tail -1)"
+          RID=$(echo "$R2" | sed '$d' | jq -r '.id // empty')
+          # 4. dev resource
+          R3=$(curl -s -w '\n%{http_code}' -X POST -H "$H" -H 'Content-Type: application/json' \
+            -d "{\"dev_resources\":[{\"name\":\"uno-bot probe\",\"url\":\"https://github.com/BilLogic/plus-uno\",\"file_key\":\"$FILE\",\"node_id\":\"$NODE\"}]}" \
+            "$API/v1/dev_resources")
+          code "POST dev resource" "$(echo "$R3" | tail -1)"
+          DID=$(echo "$R3" | sed '$d' | jq -r '.links_created[0].id // empty')
+          echo "dev resource errors: $(echo "$R3" | sed '$d' | jq -c '.errors // []' | head -c 300)"
+          # cleanup
+          code "DELETE reaction" "$(curl -s -o /dev/null -w '%{http_code}' -X DELETE -H "$H" "$API/v1/files/$FILE/comments/$CID/reactions?emoji=%F0%9F%90%90")"
+          [ -n "$DID" ] && code "DELETE dev resource" "$(curl -s -o /dev/null -w '%{http_code}' -X DELETE -H "$H" "$API/v1/files/$FILE/dev_resources/$DID")"
+          [ -n "$RID" ] && code "DELETE reply" "$(curl -s -o /dev/null -w '%{http_code}' -X DELETE -H "$H" "$API/v1/files/$FILE/comments/$RID")"
+          code "DELETE comment" "$(curl -s -o /dev/null -w '%{http_code}' -X DELETE -H "$H" "$API/v1/files/$FILE/comments/$CID")"
+          LEFT=$(curl -s -H "$H" "$API/v1/files/$FILE/comments" | jq --arg c "$CID" '[.comments[] | select(.id==$c)] | length')
+          code "probe comment left behind" "$LEFT"
