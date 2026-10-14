@@ -18,14 +18,19 @@
 --     expired = still proposed 72 h after it was posted; still live =
 --     proposed and younger than that. A fix dropped by "drop N" is rejected,
 --     so with edits is null.
---   - reminder: a promise the bot reminded about or read (commitments, the
---     thread and self reminders; DM watch's own table is not read). approved
---     = done, snoozed or dropped — the promiser answered; rejected =
+--   - reminders, card follow-ups, DM follow-ups: what the bot nudged someone
+--     about (commitments), one row per group of kinds — reminders are thread
+--     promises and self-reminders (thread_promise, self_reminder); card
+--     follow-ups are a card's open to-do, missing owner or staleness
+--     (card_todo, card_unowned, card_stale); DM follow-ups are DM-sweep asks
+--     (dm_unanswered, dm_disagreement). DM watch's own table
+--     (dm_commitments) is not read. The same mapping for each: approved =
+--     done, snoozed or dropped — the person answered; rejected =
 --     not_promise; expired = lapsed or auto_done — no answer came; still live
 --     = open or nudged.
 --
--- Window: cards by when the last card was staged; upkeep fixes and reminders
--- by the end-of-day run's date (run_date). UTC, the @from date inclusive to
+-- Window: cards by when the last card was staged; upkeep fixes and the
+-- commitment rows by the end-of-day run's date (run_date). UTC, the @from date inclusive to
 -- the @to date exclusive. Set both with scripts/metric-query.mjs --from/--to.
 -- The default runs 2026-09-01 to 2027-01-01, the measurement window; the usage
 -- record begins on 2026-09-29, so nothing before that date is in it. Expired
@@ -61,8 +66,14 @@ WITH
     WHERE s.run_date >= days.from_day AND s.run_date < days.to_day
       AND s.posted_at IS NOT NULL
   ),
+  kinds(kind, grp, ord) AS (VALUES
+    ('thread_promise', 'reminders', 2), ('self_reminder', 'reminders', 2),
+    ('card_todo', 'card follow-ups', 3), ('card_unowned', 'card follow-ups', 3), ('card_stale', 'card follow-ups', 3),
+    ('dm_unanswered', 'dm follow-ups', 4), ('dm_disagreement', 'dm follow-ups', 4)
+  ),
+  groups(grp, ord) AS (SELECT DISTINCT grp, ord FROM kinds),
   promises AS (
-    SELECT c.state FROM commitments c, days
+    SELECT k.grp, c.state FROM commitments c JOIN kinds k ON k.kind = c.kind, days
     WHERE c.run_date >= days.from_day AND c.run_date < days.to_day
   )
 SELECT
@@ -87,13 +98,18 @@ SELECT
   COUNT(*)
 FROM fixes, now_ms
 UNION ALL
-SELECT
-  'reminder',
-  COALESCE(SUM(state IN ('done', 'snoozed', 'dropped')), 0),
-  NULL,
-  COALESCE(SUM(state = 'not_promise'), 0),
-  NULL,
-  COALESCE(SUM(state IN ('lapsed', 'auto_done')), 0),
-  COALESCE(SUM(state IN ('open', 'nudged')), 0),
-  COUNT(*)
-FROM promises;
+SELECT * FROM (
+  SELECT
+    g.grp,
+    COALESCE(SUM(p.state IN ('done', 'snoozed', 'dropped')), 0),
+    NULL,
+    COALESCE(SUM(p.state = 'not_promise'), 0),
+    NULL,
+    COALESCE(SUM(p.state IN ('lapsed', 'auto_done')), 0),
+    COALESCE(SUM(p.state IN ('open', 'nudged')), 0),
+    COUNT(p.state)
+  FROM groups g
+  LEFT JOIN promises p ON p.grp = g.grp
+  GROUP BY g.grp, g.ord
+  ORDER BY g.ord
+);

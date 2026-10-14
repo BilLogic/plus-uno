@@ -4,8 +4,12 @@
 -- load-on-lead.sql describes) that the bot answered with an answer —
 -- disposition `answered`, so not a card, a clarifying question or a failure.
 -- One row per ask: its turn id, the channel and ask ts a Slack link is built
--- from, its surface, and needs_permission = 1 for a DM or group DM, which a
--- grader cannot open: the asker is asked first. No text.
+-- from, its surface, and needs_permission: 0 only for a conversation known
+-- to be a public or private channel (conversation_type 'channel' or
+-- 'group'), 1 for everything else — a DM or group DM, which a grader cannot
+-- open, and a conversation of unknown type, which may be one: a group DM
+-- reached by @mention arrives with no type and a C… id, the same as a
+-- channel. The asker is asked first. No text.
 --
 -- This file lists; it does not sample. scripts/sample-answers.mjs reads its
 -- output and picks a reproducible sample (`--seed <s> --n 50 --second 10`),
@@ -30,7 +34,7 @@ SELECT
   substr(t.turn_id, 1, instr(t.turn_id, ':') - 1)                     AS channel,
   t.ask_ts,
   t.surface,
-  CASE WHEN t.surface = 'assistant' OR t.conversation_type IN ('im', 'mpim') THEN 1 ELSE 0 END AS needs_permission
+  CASE WHEN t.surface = 'channel' AND t.conversation_type IN ('channel', 'group') THEN 0 ELSE 1 END AS needs_permission
 FROM turns t, win
 WHERE t.test_traffic = 0
   AND t.in_thread = 0

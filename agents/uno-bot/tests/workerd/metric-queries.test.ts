@@ -370,13 +370,31 @@ describe("metric queries on the seed", () => {
     // rejected; P5 expired. P7's revision is not in the seed, so P7 is
     // nowhere; P4 is test traffic. P1r's refused write is still a ✅.
     // Fixes carded in the window: f1 confirmed, f2 refused stale (f3 was
-    // never carded). Reminders: k1 done, k4 not a promise, k2 and k3 never
-    // answered.
-    expect(await run("proposal-outcomes")).toEqual([
-      { kind: "card", approved: 4, approved_with_edits: 1, rejected: 1, refused: null, expired: 1, still_live: 0, total: 7 },
-      { kind: "upkeep_fix", approved: 1, approved_with_edits: null, rejected: 0, refused: 1, expired: 0, still_live: 0, total: 2 },
-      { kind: "reminder", approved: 1, approved_with_edits: null, rejected: 1, refused: null, expired: 2, still_live: 0, total: 4 },
-    ]);
+    // never carded). Reminders (the seed's thread promises): k1 done, k4 not
+    // a promise, k2 and k3 never answered. Added for this case: a card
+    // follow-up snoozed and one still nudged; a DM follow-up that lapsed.
+    const extra = [
+      { commitment_id: "C1:x1", kind: "card_todo", run_date: "2026-08-11", state: "snoozed" },
+      { commitment_id: "C1:x2", kind: "card_stale", run_date: "2026-08-12", state: "nudged" },
+      { commitment_id: "D1:x3", kind: "dm_unanswered", run_date: "2026-08-12", state: "lapsed", channel_id: "D1", channel_kind: "dm" },
+    ];
+    for (const c of extra) {
+      await insert("commitments", {
+        channel_id: "C1", thread_ts: "1.1", message_ts: "1.2", promiser_id: "UA", due_at: T(14, 10),
+        confidence: 0.9, promised_at: T(11, 10), detected_at: T(11, 10), ...c,
+      });
+    }
+    try {
+      expect(await run("proposal-outcomes")).toEqual([
+        { kind: "card", approved: 4, approved_with_edits: 1, rejected: 1, refused: null, expired: 1, still_live: 0, total: 7 },
+        { kind: "upkeep_fix", approved: 1, approved_with_edits: null, rejected: 0, refused: 1, expired: 0, still_live: 0, total: 2 },
+        { kind: "reminders", approved: 1, approved_with_edits: null, rejected: 1, refused: null, expired: 2, still_live: 0, total: 4 },
+        { kind: "card follow-ups", approved: 1, approved_with_edits: null, rejected: 0, refused: null, expired: 0, still_live: 1, total: 2 },
+        { kind: "dm follow-ups", approved: 0, approved_with_edits: null, rejected: 0, refused: null, expired: 1, still_live: 0, total: 1 },
+      ]);
+    } finally {
+      await bindings.USAGE_DB.prepare("DELETE FROM commitments WHERE commitment_id IN ('C1:x1', 'C1:x2', 'D1:x3')").run();
+    }
   });
 
   // ── supporting ──
@@ -447,18 +465,30 @@ describe("metric queries on the seed", () => {
 
   metric("sample-answers", async () => {
     // Real asks answered with an answer: not the cards (t7 t8 t9 t13), the
-    // failure (t14), the replies (f1 r1) or test traffic. t6 is a DM.
-    const rows = await run("sample-answers");
-    expect(rows.map((r) => [r.turn_id, r.channel, r.surface, r.needs_permission])).toEqual([
-      ["C1:t1", "C1", "channel", 0],
-      ["C1:t2", "C1", "channel", 0],
-      ["C1:t3", "C1", "channel", 0],
-      ["C1:t4", "C1", "channel", 0],
-      ["D1:t6", "D1", "assistant", 1],
-      ["C1:t10", "C1", "channel", 0],
-      ["C1:t11", "C1", "channel", 0],
-    ]);
-    expect(rows[0]!.ask_ts).toBe(String(T(3, 10) / 1000));
+    // failure (t14), the replies (f1 r1) or test traffic. t6 is a DM. Added
+    // for this case: a group DM reached by @mention, stored with no type and
+    // a C… id like a channel's — it may be private, so it needs permission.
+    await insert("turns", {
+      turn_id: "C9MPIM:g1", build: "test", requester_id: "UB", surface: "channel", in_thread: 0, channel_id: "C9MPIM",
+      conversation_type: null, ask_ts: "1786100000", asked_at: T(7, 12), tier: "default", route_reason: "default-tier",
+      disposition: "answered", test_traffic: 0,
+    });
+    try {
+      const rows = await run("sample-answers");
+      expect(rows.map((r) => [r.turn_id, r.channel, r.surface, r.needs_permission])).toEqual([
+        ["C1:t1", "C1", "channel", 0],
+        ["C1:t2", "C1", "channel", 0],
+        ["C1:t3", "C1", "channel", 0],
+        ["C1:t4", "C1", "channel", 0],
+        ["D1:t6", "D1", "assistant", 1],
+        ["C9MPIM:g1", "C9MPIM", "channel", 1],
+        ["C1:t10", "C1", "channel", 0],
+        ["C1:t11", "C1", "channel", 0],
+      ]);
+      expect(rows[0]!.ask_ts).toBe(String(T(3, 10) / 1000));
+    } finally {
+      await bindings.USAGE_DB.prepare("DELETE FROM turns WHERE turn_id = 'C9MPIM:g1'").run();
+    }
   });
 
   metric("answer-accuracy", async () => {

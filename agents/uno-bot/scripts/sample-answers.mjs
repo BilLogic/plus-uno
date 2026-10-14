@@ -14,8 +14,9 @@
  * a second grader. No text is read or printed: ids, a Slack link, the surface.
  *
  * Output columns: turn_id,slack_link,surface,needs_permission,second_grade.
- * needs_permission is 1 for a DM or group DM, which a grader cannot open: the
- * asker is asked first.
+ * needs_permission is the query's: 1 for anything not known to be a public or
+ * private channel (a DM, a group DM, an unknown type), which a grader may not
+ * be able to open. The asker is asked first.
  */
 
 import { readFileSync } from "node:fs";
