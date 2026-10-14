@@ -12,8 +12,8 @@ summary: How to write code in this repo — barrel imports, tokens over literals
 - **Components**: PascalCase directories and files (e.g., `Button/Button.jsx`, `Alert/Alert.scss`)
 - **Stories**: Co-located with component (e.g., `Button.stories.jsx`)
 - **Prototypes**: kebab-case directories (e.g., `prototypes/home-redesign/`)
-- **Docs**: kebab-case with a date prefix for plans (e.g., `2026-03-21-007-refactor-optimal-repo-structure-plan.md`)
-- **Prompt-specs**: same folder, same date prefix, `-spec` suffix (e.g., `docs/plans/2026-08-02-001-fill-in-coverage-flow-map-spec.md`). `uno-prototype`'s spec-handoff deliverables — text handed to an external design tool, not code, so nothing builds them.
+- **Docs**: kebab-case with a date prefix for plans (e.g., `2026-04-11-001-refactor-three-tier-context-architecture-plan.md`)
+- **Prompt-specs**: same folder, same date prefix, `-spec` suffix (`docs/plans/YYYY-MM-DD-NNN-<slug>-<deliverable>-spec.md`). `uno-prototype`'s spec-handoff deliverables — text handed to an external design tool, not code, so nothing builds them.
 
 ## Imports
 

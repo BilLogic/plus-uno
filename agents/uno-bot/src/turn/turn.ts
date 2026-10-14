@@ -2732,7 +2732,7 @@ function cardFieldOf(label: string, value: unknown): CardField {
  * are reached by READING the staged input, and the renderer only knows how each
  * one reads.
  *
- * THE MISSING-CONTEXT GATE (todo 070): the model is told to name a brief's open
+ * THE MISSING-CONTEXT GATE: the model is told to name a brief's open
  * questions before staging and does so inconsistently. If nothing staged
  * mentions a gap, say so ON the card — the ✅ then knowingly accepts a gap-free
  * reading of the brief instead of silently inheriting one. It covers PRD-shaped
