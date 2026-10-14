@@ -48,7 +48,7 @@ to them through the notion-plus connector, per `docs/connectors/notion.md`.
 
 ## Weekly, each Monday for the week just closed
 
-1. **Run the saved queries.** From `agents/uno-bot/`, for each of `load-on-lead`, `self-serve-rate`, `responsiveness`, `adoption`, `proposal-outcomes` and `appreciation-weekly`:
+1. **Run the saved queries.** From `agents/uno-bot/`, for each of `agents/uno-bot/queries/usage/load-on-lead.sql`, `agents/uno-bot/queries/usage/self-serve-rate.sql`, `agents/uno-bot/queries/usage/responsiveness.sql`, `agents/uno-bot/queries/usage/adoption.sql`, `agents/uno-bot/queries/usage/proposal-outcomes.sql` and `agents/uno-bot/queries/usage/appreciation-weekly.sql` (the metric name is the file name without `.sql`):
 
    ```bash
    npm run metric -- adoption --from 2026-10-05 --to 2026-10-12 --out /tmp/adoption.sql
@@ -57,14 +57,14 @@ to them through the notion-plus connector, per `docs/connectors/notion.md`.
 
    Both steps only read. Run each query twice, once for the week and once for the window to date (from 2026-09-01, and from 2026-10-13 for the after-lock line). Cite every result as `agents/uno-bot/README.md` § Metrics says: query file, commit, window, graded-answers commit, run date.
 2. **Sort the lead's inbox.** Export the week's DMs, channel messages and meeting notes to a local JSONL file outside the repo, then run the pinned sort over it: `node agents/uno-bot/measurement/housekeeping-sort/sort.mjs <export.jsonl> --from YYYY-MM-DD --to YYYY-MM-DD` (other flags in the header of `agents/uno-bot/measurement/housekeeping-sort/sort.mjs`). It prints housekeeping requests per workday, the prompt's sha256 and the model id; record all three. The per-row labels stay where the script writes them, outside the repo.
-3. **Count the thanks.** The D1 counts come from `appreciation-weekly` (reactions on uno-bot's messages, thanks replies to it). Then search the week's channels and Figma comments for shout-outs that were not addressed to the bot, and add each to the **Appreciation log** with Permission unset and Quote empty.
+3. **Count the thanks.** The D1 counts come from `agents/uno-bot/queries/usage/appreciation-weekly.sql` (reactions on uno-bot's messages, thanks replies to it). Then search the week's channels and Figma comments for shout-outs that were not addressed to the bot, and add each to the **Appreciation log** with Permission unset and Quote empty.
 4. **Fill one Weekly snapshot row**: the five numbers, Thanks reactions, Thanks replies, Shout-outs logged, Query commit (`git rev-parse --short HEAD`), Run on, After lock only, and anything odd in Notes.
 
 The checkpoint for each week is that one row, every column filled and every number traceable to a query file and commit.
 
 ## Once, at the close
 
-1. **Draw the answer sample.** From `agents/uno-bot/`, list the eligible answers, then draw from them with a seed:
+1. **Draw the answer sample.** From `agents/uno-bot/`, list the eligible answers with `agents/uno-bot/queries/usage/sample-answers.sql`, then draw from them with `agents/uno-bot/scripts/sample-answers.mjs` and a seed:
 
    ```bash
    npm run metric -- sample-answers --from 2026-09-01 --to <close> --out /tmp/sample-answers.sql
