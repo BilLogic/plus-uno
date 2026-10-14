@@ -42,12 +42,12 @@ import {
 import {
   REVIEW_CALLBACK_ID,
   REVIEW_EDIT_ACTION_ID,
-  REVIEW_EDIT_CALLBACK_ID,
   noticeView,
+  reviewPickOf,
   reviewSubmitOf,
   reviewedCardOf,
 } from "./review-view";
-import { FIELD_ACTION_ID, FIELD_BLOCK_PREFIX, type OptionSource } from "./review-fields";
+import { FIELD_ACTION_ID, type OptionSource } from "./review-fields";
 import { databaseOptions } from "../integrations/notion";
 import { proposalReplyThread, type PendingProposal } from "../thread-state/index";
 import { conversationKey, enqueueAgentJob, replyHandlerAt } from "./events";
@@ -189,7 +189,10 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
   if (actionId.startsWith(DECISION_REVIEW_ACTION_PREFIX)) return openReview(env, payload, actionId);
   if (actionId === REVIEW_EDIT_ACTION_ID) return editInReview(env, payload);
-  if (actionId === FIELD_ACTION_ID && payload.view?.callback_id === REVIEW_EDIT_CALLBACK_ID) return keepPickInReview(env, payload);
+  // A pick under the Review pop-up's Edit fields: kept on the card at once,
+  // so there is nothing to save and going back loses nothing.
+  const pick = actionId === FIELD_ACTION_ID ? reviewPickOf(payload) : null;
+  if (pick) return keepReviewPick(pick, reviewDoorDeps(env));
   if (actionId === DM_WATCH_ACTION_ID) return saveDmWatch(env, payload);
   if (actionId === FEEDBACK_ACTION_ID) return feedbackFromButton(env, payload);
   if (actionId.startsWith(REMINDER_ACTION_PREFIX)) return answerFromButton(env, payload, actionId);
@@ -306,32 +309,6 @@ async function editInReview(env: Env, payload: InteractionPayload): Promise<void
   const userId = payload.user?.id;
   if (!triggerId || !card || !userId) return;
   await runReviewPush({ triggerId, card, userId }, reviewDoorDeps(env));
-}
-
-/** A pick under Edit fields: kept on the draft under it at once, so there is
- *  nothing to save and going back loses nothing. */
-async function keepPickInReview(env: Env, payload: InteractionPayload): Promise<void> {
-  const view = payload.view;
-  const card = reviewedCardOf(view?.private_metadata);
-  const userId = payload.user?.id;
-  const action = payload.actions?.[0];
-  const viewId = view?.id;
-  const rootViewId = view?.root_view_id;
-  if (!view || !card || !userId || !viewId || !rootViewId || rootViewId === viewId) return;
-  const key = action?.block_id?.startsWith(FIELD_BLOCK_PREFIX) ? action.block_id.slice(FIELD_BLOCK_PREFIX.length) : undefined;
-  const value = action?.selected_option?.value;
-  await keepReviewPick(
-    {
-      viewId,
-      rootViewId,
-      card,
-      userId,
-      blocks: Array.isArray(view.blocks) ? view.blocks : [],
-      ...(view.state?.values ? { state: view.state.values } : {}),
-      ...(key && value ? { pick: { key, value } } : {}),
-    },
-    reviewDoorDeps(env),
-  );
 }
 
 /**

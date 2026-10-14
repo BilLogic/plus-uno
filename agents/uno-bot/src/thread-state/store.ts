@@ -955,7 +955,9 @@ export function unfinishedOperations(execution: Execution): ProposalOperation[] 
  * to point at.
  */
 export type ProposalLookup =
-  | { state: "found"; proposal: PendingProposal; createdAt: number }
+  /** `kept` is the picks each person kept on the card's Review pop-up, by
+   *  user id (`keepPick`). */
+  | { state: "found"; proposal: PendingProposal; createdAt: number; kept?: Readonly<Record<string, Readonly<Record<string, string>>>> }
   /** Retired by a newer card staged in the same reply thread, or retired ahead
    *  of one by `retireProposal` — in which case it reads this way from the
    *  moment of retirement, and for the rest of its TTL if the revision it made
@@ -1127,6 +1129,17 @@ export interface ThreadState {
    * the card. A card with no mark, or no record, is a no-op.
    */
   clearRevising(proposalTs: string): Promise<void>;
+
+  /**
+   * Keep one pick a person made under the Review pop-up's Edit fields, merged
+   * into the picks they kept on this card before; a null value drops the key.
+   * Answers that person's kept picks after the merge, or null when the card is
+   * not live. One write per pick, read and written in one transaction, so two
+   * quick picks on two fields both survive whichever lands first. The picks
+   * live on the card's record: a claim takes them with it, and a retirement
+   * drops them. Select option values only — never typed text.
+   */
+  keepPick(proposalTs: string, userId: string, key: string, value: string | null): Promise<Record<string, string> | null>;
 
   /** Look one up by the ts of its card. */
   getProposalByTs(proposalTs: string): Promise<ProposalLookup>;

@@ -233,7 +233,7 @@ async function askedBefore(store: InMemoryCommitmentStore, rm: ReturnType<typeof
  * A decision sent from one card's Review pop-up, through the review door: what
  * it ran, and the report's message as the door redrew it.
  *
- * @param edits - Values kept on the draft, carried to Approve
+ * @param edits - Picks kept on the card under Edit fields, carried to Approve
  */
 async function review(
   threadState: ThreadState,
@@ -257,14 +257,15 @@ async function review(
     revise: async () => {},
     fieldOptions: async (source) => (source.property === "Design Status" ? STATUSES : ["Tutor", "Universal"]),
   };
+  const messageTs = itemProposal(posted.ts, id).proposalTs;
+  for (const [key, value] of Object.entries(opts.edits ?? {})) await threadState.keepPick(messageTs, opts.userId ?? ADE, key, value);
   await runReviewDecision(
     {
       viewId: "V1",
       channel: DESIGN,
-      messageTs: itemProposal(posted.ts, id).proposalTs,
+      messageTs,
       userId: opts.userId ?? ADE,
       decision,
-      ...(opts.edits ? { edits: opts.edits } : {}),
       ...(opts.choice ? { choice: opts.choice } : {}),
     },
     deps,

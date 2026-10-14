@@ -65,6 +65,8 @@ interface ProposalRecord {
    *  card exists to be named. Readable, and out of reach of every lookup that
    *  can lead to an execution. */
   retired?: boolean;
+  /** Picks kept on the card's Review pop-up, by user id (`keepPick`). */
+  kept?: Record<string, Record<string, string>>;
 }
 
 interface AssistantContextRecord {
@@ -209,6 +211,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       if (!rec || rec.retired || rec.supersededBy) return { retired: false };
       if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) return { retired: false };
       rec.retired = true;
+      delete rec.kept;
       return { retired: true };
     },
 
@@ -228,6 +231,17 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       rec.proposal = rest;
     },
 
+    async keepPick(proposalTs, userId, key, value) {
+      const rec = proposals.get(proposalTs);
+      if (!rec || rec.retired || rec.supersededBy) return null;
+      if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) return null;
+      const mine = { ...(rec.kept?.[userId] ?? {}) };
+      if (value === null) delete mine[key];
+      else mine[key] = value;
+      rec.kept = { ...(rec.kept ?? {}), [userId]: mine };
+      return { ...mine };
+    },
+
     async getProposalByTs(proposalTs): Promise<ProposalLookup> {
       const rec = proposals.get(proposalTs);
       if (!rec) return { state: "none" };
@@ -239,7 +253,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         return { state: "expired", ...ownTtl(rec.proposal), ...ownWords(rec.proposal), ...ownText(rec.proposal) };
       }
       if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal) };
-      return { state: "found", proposal: withLiveMark(rec.proposal, now()), createdAt: rec.createdAt };
+      return { state: "found", proposal: withLiveMark(rec.proposal, now()), createdAt: rec.createdAt, ...(rec.kept ? { kept: structuredClone(rec.kept) } : {}) };
     },
 
     async getProposalByThread(ref) {

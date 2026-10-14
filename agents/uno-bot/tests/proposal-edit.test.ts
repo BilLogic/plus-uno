@@ -22,7 +22,8 @@ import {
   type ReviewDoorDeps,
   type ReviewViewState,
 } from "../src/slack/review-door";
-import { reviewSubmitOf, reviewedCardOf } from "../src/slack/review-view";
+import { fitBody, reviewPickOf, reviewSubmitOf } from "../src/slack/review-view";
+import { parseInteraction } from "../src/slack/interactive";
 import { recordingViews } from "./helpers/recording-slack";
 import { CONFIRM_FOOTER, proposalCardBlocks } from "../src/slack/proposal-render";
 import { cardWords } from "./helpers/card-message";
@@ -81,23 +82,24 @@ function harness(threadState: ThreadState, opts: { pillars?: string[] | null } =
 
 const open = (userId = "U2") => ({ triggerId: "T.trigger", channel: CHANNEL, messageTs: CARD_TS, userId });
 
-/** Approve, carrying the edits kept on the draft. */
-const approve = (edits: Record<string, string>, userId = "U2") => ({
-  viewId: "V1",
-  channel: CHANNEL,
-  messageTs: CARD_TS,
-  userId,
-  decision: "confirm" as const,
-  edits,
-});
+/** Approve, with these picks kept on the card first, as Edit fields keeps
+ *  them. */
+async function approveWith(deps: ReviewDoorDeps, kept: Record<string, string>, userId = "U2") {
+  for (const [key, value] of Object.entries(kept)) await deps.threadState.keepPick(CARD_TS, userId, key, value);
+  await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId, decision: "confirm" }, deps);
+}
 
 /** Edit fields, pressed on the draft: the pushed view, filled. */
-async function editFields(deps: ReviewDoorDeps, views: { calls: Array<{ kind: string; view: unknown }> }, edits?: Record<string, string>) {
-  await runReviewPush({ triggerId: "T.edit", card: { channel: CHANNEL, ts: CARD_TS, ...(edits ? { edits } : {}) }, userId: "U2" }, deps);
+async function editFields(deps: ReviewDoorDeps, views: { calls: Array<{ kind: string; view: unknown }> }) {
+  await runReviewPush({ triggerId: "T.edit", card: { channel: CHANNEL, ts: CARD_TS }, userId: "U2" }, deps);
   return views.calls.at(-1)!.view;
 }
 
-const picked = (value: string) => ({ value: { type: "static_select", selected_option: { value } } });
+/** The picks a person kept on the card's record. */
+async function keptOn(threadState: ThreadState, userId = "U2") {
+  const look = await threadState.getProposalByTs(CARD_TS);
+  return look.state === "found" ? (look.kept?.[userId] ?? {}) : null;
+}
 
 type Block = {
   type: string;
@@ -238,16 +240,31 @@ describe("Approve with a field edited in place", () => {
     assert.match(alerts(view)[0]?.text?.text ?? "", /Title is still a placeholder/);
     assert.equal(inputs(view).find((f) => f.block_id === "uno_field:0.title")?.element?.initial_value, "TBD");
     assert.deepEqual(views.refused, []);
+
+    // Approve again with the refused value still in the box: refused again,
+    // since a typed value is measured against the staged one, not against
+    // what the redrawn input opened with.
+    const again = submitDraft(view, { "uno_field:0.title": "TBD" });
+    await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", ...again }, deps);
+    assert.deepEqual(ran, []);
+    assert.match(alerts(views.calls.at(-1)!.view)[0]?.text?.text ?? "", /Title is still a placeholder/);
+  });
+
+  it("never cuts a field in place when a long draft is trimmed to fit", () => {
+    const section = (n: number) => ({ type: "section", text: { type: "mrkdwn", text: `Paragraph ${n}` } });
+    const field = (key: string) => ({ type: "input", block_id: `uno_field:${key}` });
+    const draft = [...Array.from({ length: 60 }, (_, n) => section(n)), field("1.title"), ...Array.from({ length: 60 }, (_, n) => section(60 + n)), field("1.body")];
+    const fitted = fitBody(draft, 40) as Block[];
+    assert.ok(fitted.length <= 40, String(fitted.length));
+    assert.deepEqual(fitted.filter((b) => b.type === "input").map((b) => b.block_id), ["uno_field:1.title", "uno_field:1.body"]);
+    assert.match(JSON.stringify(fitted), /too long for the pop-up/);
   });
 });
 
 describe("Approve with edits", () => {
   it("writes the edited title, and the card says who edited what", async () => {
     const { deps, ran, cardUpdates } = harness(await staged());
-    await runReviewDecision(
-      approve({ "0.title": ("Reflection, shorter form"), "0.summary": (String(PROPOSAL.input.summary)) }),
-      deps,
-    );
+    await approveWith(deps, { "0.title": ("Reflection, shorter form"), "0.summary": (String(PROPOSAL.input.summary)) });
     assert.equal(ran.length, 1);
     assert.equal(ran[0]?.execute?.input.title, "Reflection, shorter form");
     assert.equal(ran[0]?.execute?.operations[0]?.input.title, "Reflection, shorter form");
@@ -269,14 +286,11 @@ describe("Approve with edits", () => {
     ].join("\n");
     const threadState = await staged({ proposalText, input: { ...PROPOSAL.input, summary: "Tutors reflect after each session;\nthe form is too long to finish." } });
     const { deps, views, cardUpdates } = harness(threadState);
-    await runReviewDecision(
-      approve({
+    await approveWith(deps, {
         "0.title": ("Reflection, shorter form"),
         "0.summary": ("One question after each session."),
         "0.properties.product_pillar": ("Universal"),
-      }),
-      deps,
-    );
+      });
     const [update] = cardUpdates;
     assert.match(update!.note, /^<@U2> edited Title, Summary, Product Pillar\n:white_check_mark: Approved by <@U2>$/);
     for (const edited of ["Reflection, shorter form", "One question after each session.", "Universal"]) {
@@ -297,14 +311,14 @@ describe("Approve with edits", () => {
 
   it("writes a picked option under the property the executor reads", async () => {
     const { deps, ran, cardUpdates } = harness(await staged());
-    await runReviewDecision(approve({ "0.properties.product_pillar": ("Universal") }), deps);
+    await approveWith(deps, { "0.properties.product_pillar": ("Universal") });
     assert.deepEqual(ran[0]?.execute?.input.properties, { product_pillar: "Universal" });
     assert.match(cardUpdates[0]!.note, /edited Product Pillar/);
   });
 
   it("approves an untouched draft as staged, with no edit line", async () => {
     const { deps, ran, cardUpdates } = harness(await staged());
-    await runReviewDecision(approve({ "0.title": ("Reflection redesign") }), deps);
+    await approveWith(deps, { "0.title": ("Reflection redesign") });
     assert.deepEqual(ran[0]?.execute?.input, PROPOSAL.input);
     assert.deepEqual(cardUpdates.map((u) => u.note), [":white_check_mark: Approved by <@U2>"]);
   });
@@ -312,10 +326,10 @@ describe("Approve with edits", () => {
   it("lets a standing confirmer's edit run with nobody else asked", async () => {
     const threadState = await staged({ confirmers: ["U07CONFIRM"] });
     const { deps, ran, delivery, cardUpdates } = harness(threadState);
-    await runReviewDecision(approve({ "0.title": ("Reflection v2") }, "U9"), {
+    await approveWith({
       ...deps,
       standingConfirmers: ["U9"],
-    });
+    }, { "0.title": ("Reflection v2") }, "U9");
     assert.equal(ran.length, 1);
     assert.equal(ran[0]?.execute?.input.title, "Reflection v2");
     assert.deepEqual(delivery.gateNotes, [{ kind: "resolved", decision: "confirm" }]);
@@ -328,7 +342,7 @@ describe("an edit the guards refuse", () => {
   it("refuses a placeholder title with an alert in the pop-up, and writes nothing", async () => {
     const threadState = await staged();
     const { deps, views, ran, cardUpdates } = harness(threadState);
-    await runReviewDecision(approve({ "0.title": ("TBD") }), deps);
+    await approveWith(deps, { "0.title": ("TBD") });
     assert.deepEqual(ran, []);
     assert.deepEqual(cardUpdates, []);
     const view = views.calls.at(-1)!.view;
@@ -339,7 +353,7 @@ describe("an edit the guards refuse", () => {
     // The pop-up stays a draft, with the person's own edit still on it and
     // still carried to the next Approve.
     assert.equal(inputs(view).find((f) => f.block_id === "uno_field:0.title")?.element?.initial_value, "TBD");
-    assert.deepEqual(reviewedCardOf((view as { private_metadata: string }).private_metadata)?.edits, { "0.title": "TBD" });
+    assert.deepEqual(await keptOn(threadState), { "0.title": "TBD" });
     assert.equal((view as { submit?: { text: string } }).submit?.text, "Submit");
     assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found");
     assert.deepEqual(views.refused, []);
@@ -347,7 +361,7 @@ describe("an edit the guards refuse", () => {
 
   it("refuses an emptied title", async () => {
     const { deps, views, ran } = harness(await staged());
-    await runReviewDecision(approve({ "0.title": "" }), deps);
+    await approveWith(deps, { "0.title": "" });
     assert.deepEqual(ran, []);
     assert.match(alerts(views.calls.at(-1)!.view)[0]?.text?.text ?? "", /Title/);
   });
@@ -355,7 +369,7 @@ describe("an edit the guards refuse", () => {
   it("refuses an option the database no longer offers", async () => {
     // Offered when the pop-up opened; gone from the schema by the time of Approve.
     const { deps, views, ran } = harness(await staged(), { pillars: ["Tutor Experience", "Universal"] });
-    await runReviewDecision(approve({ "0.properties.product_pillar": ("Student Experience") }), deps);
+    await approveWith(deps, { "0.properties.product_pillar": ("Student Experience") });
     assert.deepEqual(ran, []);
     const alert = alerts(views.calls.at(-1)!.view)[0];
     assert.match(alert?.text?.text ?? "", /Student Experience/);
@@ -365,29 +379,34 @@ describe("an edit the guards refuse", () => {
 
 describe("a pick under Edit fields keeps itself", () => {
   const KEY = "0.properties.product_pillar";
+  const STATUS = "0.properties.Design Status";
+  /** A PRD card with a second select its stager names, so two fields can be
+   *  picked under one Edit fields. */
+  const TWO_SELECTS: Partial<PendingProposal> = {
+    input: { ...PROPOSAL.input, properties: { product_pillar: "Tutor Experience", "Design Status": "In Review" } },
+    selects: [{ path: "properties.Design Status", label: "Design Status", source: { database: "roadmap", property: "Design Status" } }],
+  };
 
-  /** Edit fields opened over the draft V1, and a pick made in it: the state
-   *  Slack sends with the pick holds every select in the view as it stands. */
-  async function pick(value: string, opts: { edits?: Record<string, string> } = {}) {
-    const h = harness(await staged());
+  /** Edit fields opened over the draft V1. */
+  async function opened(over: Partial<PendingProposal> = {}, opts: { pillars?: string[] } = {}) {
+    const h = harness(await staged(over), opts);
     await runReviewOpen(open(), h.deps);
-    const edit = await editFields(h.deps, h.views, opts.edits);
-    await keepReviewPick(
-      {
-        viewId: "V2",
-        rootViewId: "V1",
-        card: reviewedCardOf((edit as { private_metadata: string }).private_metadata)!,
-        userId: "U2",
-        blocks: blocksOf(edit),
-        state: { [`uno_field:${KEY}`]: picked(value) },
-        pick: { key: KEY, value },
-      },
-      h.deps,
-    );
+    const edit = await editFields(h.deps, h.views);
+    return { ...h, edit };
+  }
+
+  /** A pick made in an Edit fields view, as `reviewPickOf` reads it. */
+  const pickIn = (view: unknown, key: string, value: string, userId = "U2") =>
+    ({ viewId: "V2", rootViewId: "V1", card: { channel: CHANNEL, ts: CARD_TS }, userId, blocks: blocksOf(view), pick: { key, value } });
+
+  async function pick(value: string, opts: { keptFirst?: string } = {}) {
+    const h = await opened();
+    if (opts.keptFirst) await h.deps.threadState.keepPick(CARD_TS, "U2", KEY, opts.keptFirst);
+    await keepReviewPick(pickIn(h.edit, KEY, value), h.deps);
     return h;
   }
 
-  it("writes the pick into the draft's metadata and redraws the draft, with no submit pressed", async () => {
+  it("keeps the pick on the card and redraws the draft, with no submit pressed", async () => {
     const { views, deps, ran, cardUpdates } = await pick("Universal");
     const redrawn = views.calls.at(-1)!;
     assert.equal(redrawn.kind === "update" && redrawn.viewId, "V1");
@@ -397,11 +416,13 @@ describe("a pick under Edit fields keeps itself", () => {
     // The draft keeps its fields in place, by the same block ids, so what was
     // typed there survives the redraw.
     assert.deepEqual(inputs(redrawn.view).map((f) => f.block_id), ["uno_field:0.title", "uno_field:0.summary"]);
-    const card = reviewedCardOf((redrawn.view as { private_metadata: string }).private_metadata)!;
-    assert.deepEqual(card.edits, { [KEY]: "Universal" });
+    // Kept on the card's record, not in the view.
+    assert.deepEqual(await keptOn(deps.threadState), { [KEY]: "Universal" });
+    assert.deepEqual(JSON.parse((redrawn.view as { private_metadata: string }).private_metadata), { channel: CHANNEL, ts: CARD_TS });
     assert.deepEqual(views.refused, []);
 
-    // Back from Edit fields, then Approve: the draft's own Submit carries the pick.
+    // Back from Edit fields, then Approve: the draft's own Submit, and the pick
+    // read off the card.
     const request = submitDraft(redrawn.view);
     await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", ...request }, deps);
     assert.deepEqual(ran[0]?.execute?.input.properties, { product_pillar: "Universal" });
@@ -409,19 +430,74 @@ describe("a pick under Edit fields keeps itself", () => {
     assert.match(cardUpdates[0]!.note, /^<@U2> edited Product Pillar\n/);
   });
 
-  it("drops a kept edit when the pick goes back to the draft's own value", async () => {
-    const { views } = await pick("Tutor Experience", { edits: { [KEY]: "Universal" } });
-    const card = reviewedCardOf((views.calls.at(-1)!.view as { private_metadata: string }).private_metadata)!;
-    assert.equal(card.edits, undefined);
+  for (const order of [["pillar", "status"], ["status", "pillar"]] as const) {
+    it(`keeps two quick picks on two fields when the ${order[0]} lands first`, async () => {
+      const h = await opened(TWO_SELECTS, { pillars: [...PILLARS, "In Review", "Shipped"] });
+      // Both made in the same view, before either redraw: neither knows the other.
+      const picks = { pillar: pickIn(h.edit, KEY, "Universal"), status: pickIn(h.edit, STATUS, "Shipped") };
+      for (const which of order) await keepReviewPick(picks[which], h.deps);
+      assert.deepEqual(await keptOn(h.deps.threadState), { [KEY]: "Universal", [STATUS]: "Shipped" });
+      const last = JSON.stringify(blocksOf(h.views.calls.at(-1)!.view));
+      assert.match(last, /\*Product Pillar:\* Universal/);
+
+      await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", decision: "confirm" }, h.deps);
+      assert.deepEqual(h.ran[0]?.execute?.input.properties, { product_pillar: "Universal", "Design Status": "Shipped" });
+    });
+  }
+
+  it("keeps an earlier pick when a later pick carries only its own field", async () => {
+    const h = await opened(TWO_SELECTS, { pillars: [...PILLARS, "In Review", "Shipped"] });
+    await keepReviewPick(pickIn(h.edit, KEY, "Universal"), h.deps);
+    // The second pick's view still shows the pillar as it opened.
+    await keepReviewPick(pickIn(h.edit, STATUS, "Shipped"), h.deps);
+    assert.deepEqual(await keptOn(h.deps.threadState), { [KEY]: "Universal", [STATUS]: "Shipped" });
   });
 
-  it("refuses an option the view did not offer in an alert on Edit fields, and leaves the draft as it was", async () => {
-    const { views } = await pick("Made up");
+  it("keeps each person's picks apart", async () => {
+    const h = await opened();
+    await keepReviewPick(pickIn(h.edit, KEY, "Universal"), h.deps);
+    await keepReviewPick(pickIn(h.edit, KEY, "Student Experience", "U3"), h.deps);
+    assert.deepEqual(await keptOn(h.deps.threadState), { [KEY]: "Universal" });
+    assert.deepEqual(await keptOn(h.deps.threadState, "U3"), { [KEY]: "Student Experience" });
+  });
+
+  it("drops a kept pick when the pick goes back to the draft's own value", async () => {
+    const { deps } = await pick("Tutor Experience", { keptFirst: "Universal" });
+    assert.deepEqual(await keptOn(deps.threadState), {});
+  });
+
+  it("opens Edit fields, and the draft, on the picks already kept", async () => {
+    const h = harness(await staged());
+    await h.deps.threadState.keepPick(CARD_TS, "U2", KEY, "Universal");
+    await runReviewOpen(open(), h.deps);
+    assert.match(JSON.stringify(blocksOf(h.views.calls[1]!.view)), /Edited here: Product Pillar/);
+    const [pillar] = selects(await editFields(h.deps, h.views));
+    assert.equal(accessory(pillar!).initial_option?.value, "Universal");
+  });
+
+  it("refuses an option the view did not offer in an alert that shows the kept value, and leaves the draft as it was", async () => {
+    const { views, deps } = await pick("Made up", { keptFirst: "Universal" });
     const last = views.calls.at(-1)!;
     assert.equal(last.kind === "update" && last.viewId, "V2");
     assert.match(alerts(last.view)[0]?.text?.text ?? "", /Made up/);
+    // The select shows what is kept, not the refused option.
+    assert.equal(accessory(selects(last.view)[0]!).initial_option?.value, "Universal");
     assert.equal(views.calls.filter((c) => c.kind === "update" && c.viewId === "V1").length, 1, "the draft is not redrawn");
+    assert.deepEqual(await keptOn(deps.threadState), { [KEY]: "Universal" });
     assert.deepEqual(views.refused, []);
+  });
+
+  it("clears the alert once a later pick passes", async () => {
+    const h = await opened();
+    await keepReviewPick(pickIn(h.edit, KEY, "Made up"), h.deps);
+    const refused = h.views.calls.at(-1)!.view;
+    assert.equal(alerts(refused).length, 1);
+    await keepReviewPick(pickIn(refused, KEY, "Universal"), h.deps);
+    const [draft, edit] = h.views.calls.slice(-2);
+    assert.equal(draft!.kind === "update" && draft!.viewId, "V1");
+    assert.equal(edit!.kind === "update" && edit!.viewId, "V2");
+    assert.deepEqual(alerts(edit!.view), []);
+    assert.equal(accessory(selects(edit!.view)[0]!).initial_option?.value, "Universal");
   });
 
   it("still holds a kept pick to the database's options on Approve", async () => {
@@ -433,6 +509,35 @@ describe("a pick under Edit fields keeps itself", () => {
     );
     assert.deepEqual(ran, []);
     assert.match(alerts(views.calls.at(-1)!.view)[0]?.text?.text ?? "", /Universal/);
+  });
+
+  it("is read off a Slack block_actions payload, as the endpoint routes it", async () => {
+    const h = await opened();
+    const body = new URLSearchParams({
+      payload: JSON.stringify({
+        type: "block_actions",
+        user: { id: "U2" },
+        actions: [{ type: "static_select", action_id: "value", block_id: `uno_field:${KEY}`, selected_option: { text: { type: "plain_text", text: "Universal" }, value: "Universal" } }],
+        view: { id: "V2", root_view_id: "V1", previous_view_id: "V1", callback_id: "uno_review_edit_fields", private_metadata: (h.edit as { private_metadata: string }).private_metadata, blocks: blocksOf(h.edit), state: { values: {} } },
+      }),
+    }).toString();
+    const payload = parseInteraction(body)!;
+    const parsed = reviewPickOf(payload);
+    assert.deepEqual(parsed && { ...parsed, blocks: parsed.blocks.length }, {
+      viewId: "V2",
+      rootViewId: "V1",
+      card: { channel: CHANNEL, ts: CARD_TS },
+      userId: "U2",
+      blocks: blocksOf(h.edit).length,
+      pick: { key: KEY, value: "Universal" },
+    });
+    await keepReviewPick(parsed!, h.deps);
+    assert.deepEqual(await keptOn(h.deps.threadState), { [KEY]: "Universal" });
+
+    // Not a pick: the draft's own button, or a select in another view.
+    assert.equal(reviewPickOf({ ...payload, actions: [{ action_id: "uno_review_edit" }] }), null);
+    assert.equal(reviewPickOf({ ...payload, view: { ...payload.view, callback_id: "uno_review_draft" } }), null);
+    assert.equal(reviewPickOf({ ...payload, view: { ...payload.view, root_view_id: "V2" } }), null);
   });
 });
 
@@ -498,11 +603,11 @@ describe("a notion_update draft", () => {
 
   it("writes a picked value of a stager's select, and refuses one the database lacks", async () => {
     const { deps, ran } = harness(await staged(WITH_SELECT), { pillars: STATUSES });
-    await runReviewDecision(approve({ "0.properties.Design Status": "Archived" }), deps);
+    await approveWith(deps, { "0.properties.Design Status": "Archived" });
     assert.deepEqual(ran[0]?.execute?.input.properties, { Name: "Reflection redesign v2", "Design Status": "Archived" });
 
     const refused = harness(await staged(WITH_SELECT), { pillars: STATUSES });
-    await runReviewDecision(approve({ "0.properties.Design Status": "Ready for QA" }), refused.deps);
+    await approveWith(refused.deps, { "0.properties.Design Status": "Ready for QA" });
     assert.equal(refused.ran.length, 0);
   });
 
@@ -516,13 +621,10 @@ describe("a notion_update draft", () => {
 
   it("writes the edited text to the same page, and the card says who edited what", async () => {
     const { deps, ran, cardUpdates } = harness(await staged(UPDATE));
-    await runReviewDecision(
-      approve({
+    await approveWith(deps, {
         "0.append.text": ("Progress: the form is down to two questions."),
         "0.replace.0.content": ("Tutors answer two questions."),
-      }),
-      deps,
-    );
+      });
     assert.equal(ran.length, 1);
     const input = ran[0]!.execute!.input as {
       page_url: string;
@@ -542,18 +644,18 @@ describe("a notion_update draft", () => {
 
   it("writes an edited title under the property the update names", async () => {
     const { deps, ran } = harness(await staged(UPDATE));
-    await runReviewDecision(approve({ "0.properties.Name": ("Reflection, shorter form") }), deps);
+    await approveWith(deps, { "0.properties.Name": ("Reflection, shorter form") });
     assert.deepEqual(ran[0]?.execute?.input.properties, { Name: "Reflection, shorter form", "Design Status": "In Review" });
   });
 
   it("refuses a placeholder or an emptied text with the same guards a create has", async () => {
     const placeholder = harness(await staged(UPDATE));
-    await runReviewDecision(approve({ "0.replace.0.content": ("TBD") }), placeholder.deps);
+    await approveWith(placeholder.deps, { "0.replace.0.content": ("TBD") });
     assert.deepEqual(placeholder.ran, []);
     assert.match(alerts(placeholder.views.calls.at(-1)!.view)[0]?.text?.text ?? "", /Replacement text is still a placeholder/);
 
     const emptied = harness(await staged(UPDATE));
-    await runReviewDecision(approve({ "0.append.text": ("  ") }), emptied.deps);
+    await approveWith(emptied.deps, { "0.append.text": ("  ") });
     assert.deepEqual(emptied.ran, []);
     assert.match(alerts(emptied.views.calls.at(-1)!.view)[0]?.text?.text ?? "", /Text to append can't be empty/);
   });
@@ -568,7 +670,7 @@ describe("an approved edit, written onto the card", () => {
   it("replaces a field line only when its whole value is the old one", async () => {
     const threadState = await staged({ proposalText: goalText("Goal"), input: { ...PROPOSAL.input, title: "Goal" } });
     const { deps, cardUpdates } = harness(threadState);
-    await runReviewDecision(approve({ "0.title": ("Retention") }), deps);
+    await approveWith(deps, { "0.title": ("Retention") });
     const words = cardUpdates[0]!.text;
     assert.match(words, /• \*Title:\* Retention\n/);
     assert.match(words, /• \*Summary:\* Goal cycles reset per session\./);
@@ -578,7 +680,7 @@ describe("an approved edit, written onto the card", () => {
     // The card shows "Goal cycles"; the draft's title was "Goal".
     const threadState = await staged({ proposalText: goalText("Goal cycles"), input: { ...PROPOSAL.input, title: "Goal" } });
     const { deps, cardUpdates } = harness(threadState);
-    await runReviewDecision(approve({ "0.title": ("Retention") }), deps);
+    await approveWith(deps, { "0.title": ("Retention") });
     const words = cardUpdates[0]!.text;
     assert.doesNotMatch(words, /Retention cycles/);
     assert.match(words, /• \*Title:\* Goal cycles\n/);
@@ -598,7 +700,7 @@ describe("an approved edit, written onto the card", () => {
     const { deps } = harness(await staged({ proposalBlocks: ownLayout }));
     const updates: unknown[][] = [];
     deps.updateCard = async (_channel, _ts, message) => void updates.push(message.blocks);
-    await runReviewDecision(approve({ "0.title": ("Reflection, shorter form") }), deps);
+    await approveWith(deps, { "0.title": ("Reflection, shorter form") });
     const shown = JSON.stringify(updates[0]);
     assert.doesNotMatch(shown, /own_layout/);
     assert.doesNotMatch(shown, /Reflection redesign/);
@@ -609,7 +711,7 @@ describe("an approved edit, written onto the card", () => {
     const { deps } = harness(await staged({ proposalBlocks: ownLayout }));
     const updates: unknown[][] = [];
     deps.updateCard = async (_channel, _ts, message) => void updates.push(message.blocks);
-    await runReviewDecision(approve({ "0.title": ("Reflection redesign") }), deps);
+    await approveWith(deps, { "0.title": ("Reflection redesign") });
     assert.match(JSON.stringify(updates[0]), /own_layout/);
   });
 });
@@ -631,7 +733,7 @@ describe("Approve reads only what an edit needs", () => {
   it("reads no options or live page when nothing was edited", async () => {
     const { store, reads } = counted(await staged());
     const { deps, ran, optionReads } = harness(store);
-    await runReviewDecision(approve({}), deps);
+    await approveWith(deps, {});
     assert.equal(ran.length, 1);
     assert.deepEqual(ran[0]?.execute?.input, PROPOSAL.input);
     assert.deepEqual(optionReads, []);
@@ -641,21 +743,21 @@ describe("Approve reads only what an edit needs", () => {
 
   it("reads no options when only a text was edited", async () => {
     const { deps, ran, optionReads } = harness(await staged());
-    await runReviewDecision(approve({ "0.title": "Reflection v2" }), deps);
+    await approveWith(deps, { "0.title": "Reflection v2" });
     assert.equal(ran[0]?.execute?.input.title, "Reflection v2");
     assert.deepEqual(optionReads, []);
   });
 
   it("still holds a saved option to the database's live options", async () => {
     const { deps, ran, optionReads } = harness(await staged(), { pillars: ["Tutor Experience", "Student Experience"] });
-    await runReviewDecision(approve({ "0.properties.product_pillar": "Universal" }), deps);
+    await approveWith(deps, { "0.properties.product_pillar": "Universal" });
     assert.deepEqual(ran, []);
     assert.deepEqual(optionReads, ["roadmap/Product Pillar"]);
   });
 
   it("ignores a saved key that names no field, so nothing outside the table is written", async () => {
     const { deps, ran } = harness(await staged());
-    await runReviewDecision(approve({ "0.surface": "decision", "0.properties.roadmap_card": "x" }), deps);
+    await approveWith(deps, { "0.surface": "decision", "0.properties.roadmap_card": "x" });
     assert.deepEqual(ran[0]?.execute?.input, PROPOSAL.input);
   });
 });

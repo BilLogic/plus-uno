@@ -615,6 +615,31 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByTs("1700.2")).state, "found");
   });
 
+  // The Review pop-up's Edit fields keeps each pick on the card's record, per
+  // person, merged pick by pick so quick picks on two fields never race.
+  it("keeps picks per person, merged pick by pick, and hands them back on the lookup", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await Promise.all([store.keepPick("1700.2", "U2", "0.a", "One"), store.keepPick("1700.2", "U2", "0.b", "Two")]);
+    assert.deepEqual(await store.keepPick("1700.2", "U3", "0.a", "Other"), { "0.a": "Other" });
+    assert.deepEqual(await store.keepPick("1700.2", "U2", "0.a", null), { "0.b": "Two" });
+    const found = await store.getProposalByTs("1700.2");
+    assert.deepEqual(found.state === "found" && found.kept, { U2: { "0.b": "Two" }, U3: { "0.a": "Other" } });
+  });
+
+  it("keeps no pick on a card that is not live, and a retired card drops its picks", async () => {
+    const { store } = setup();
+    assert.equal(await store.keepPick("1700.9", "U2", "0.a", "One"), null);
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.keepPick("1700.2", "U2", "0.a", "One");
+    assert.deepEqual(await store.retireProposal("1700.2"), { retired: true });
+    assert.equal(await store.keepPick("1700.2", "U2", "0.a", "Two"), null);
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    await store.keepPick("1700.3", "U2", "0.a", "One");
+    assert.equal(await store.claimProposal("1700.3"), true);
+    assert.equal(await store.keepPick("1700.3", "U2", "0.a", "Two"), null);
+  });
+
   it("a cleared mark leaves the card claimable, as it was", async () => {
     const { store } = setup();
     await store.putProposal(proposal({ proposalTs: "1700.2" }));
