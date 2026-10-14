@@ -30,7 +30,8 @@ THE standing-automation registry. An automation absent from the table below is u
 
 | Automation | Trigger | Owner | Link |
 |---|---|---|---|
-| Figma library sync | end-of-day run: `figma-library-poll`; morning run: `figma-library-post`, `figma-library-track`, then `figma-dev-links-pr` | Bill | [`figma-library`](../../agents/uno-bot/scheduled-actions/figma-library/ACTION.md) |
+| Figma library sync | end-of-day run: `figma-library-poll`; morning run: `figma-library-post`, `figma-library-track` | Bill | [`figma-library`](../../agents/uno-bot/scheduled-actions/figma-library/ACTION.md) |
+| Dev Mode links for merged PRs | morning run: `figma-dev-links-pr` — each PR merged into main since the last run that changed `design-system/src/components/` | Bill | [`src/figma-links/`](../../agents/uno-bot/src/figma-links/) |
 | Figma snapshot refresh | each publish (the end-of-day `figma-snapshot-refresh` job's `repository_dispatch`) or `workflow_dispatch` | Bill | [`figma-snapshot-refresh.yml`](../../.github/workflows/figma-snapshot-refresh.yml) |
 | Figma notifications | each comment or change on a subscribed team's file, at `POST /figma/events` | Bill | [`src/figma-notify/`](../../agents/uno-bot/src/figma-notify/) |
 | Figma notification subscriptions | on demand (`workflow_dispatch` from `main`; `create` waits for the `uno-bot-production` reviewer) | Bill | [`figma-subscriptions.yml`](../../.github/workflows/figma-subscriptions.yml) |

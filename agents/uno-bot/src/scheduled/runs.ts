@@ -92,8 +92,9 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * the end-of-day `dm-capture-read` reads their DMs for drift and undocumented
  * answers, and the morning `dm-capture-post` offers each fix on a decision card in
  * their DM with uno-bot that only they can decide (src/dm-watch/capture.ts).
- * The morning `figma-dev-links-pr`, after the tracker, posts a Dev Mode links
- * card for each merged library PR it queued (src/figma-links/).
+ * The morning `figma-dev-links-pr` queues each PR merged into main since its
+ * last run that changed a design-system component, and posts a Dev Mode links
+ * card for each queued PR (src/figma-links/).
  * The weekly Figma tidy-up's two, Monday morning: `figma-tidy-read` lists the
  * teams' stage folders, and `figma-tidy-post` checks each file against its
  * cards and posts the week's Review cards (src/figma-tidy/).

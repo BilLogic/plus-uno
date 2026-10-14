@@ -1,9 +1,10 @@
-// A merged library PR's link, waiting for its Review card.
+// A merged component PR's link, waiting for its Review card.
 //
-// The morning tracker sees a library PR merge (`figma-library/track.ts`) and
-// queues it with the components its card dispatched; the `figma-dev-links-pr`
-// job, after the tracker, posts one card per queued PR that adds its link to
-// those components in Dev Mode (`runDevLinksPost`). While `FIGMA_DEV_LINKS`
+// The morning `figma-dev-links-pr` job first feeds the queue (`./feed.ts`):
+// each PR merged into main since its last run that changed a design-system
+// component, with the components it changed. It then posts one card per
+// queued PR that adds its link to those components in Dev Mode
+// (`runDevLinksPost`). While `FIGMA_DEV_LINKS`
 // is not on (`./gate.ts`) the queue only waits, so nothing posts before the
 // live check on one component.
 //
