@@ -1,16 +1,14 @@
 // The Figma library's jobs, bound to `Env` — the only file in the folder that
 // names it. The snapshot refresh (`./snapshot-refresh.ts`) reads what the poll
 // left owed in HARNESS_KV, reads the repo's snapshot from GitHub, and sends
-// `repository_dispatch` with GITHUB_TOKEN, the way `component_implement`
-// starts `figma-implement.yml`. The post reads the registry from GitHub and the
+// `repository_dispatch` with GITHUB_TOKEN. The post reads the registry from GitHub and the
 // channel's members from Slack, posts the card, and keeps its report and
-// stages it in ThreadState; the tracker reads GitHub and posts in the card's
-// thread, and files and closes a card nobody decided. Findings and the tracked cards are JSON in HARNESS_KV
+// stages it in ThreadState; the tracker reads GitHub's intakes, and files and
+// closes a card nobody decided. Findings and the tracked cards are JSON in HARNESS_KV
 // beside the poll's snapshot.
 //
 // The repo is `GITHUB_REPO`, the harness repo: the registry lives there, the
-// intake is filed there (`github_issue_create` with no `repo`), and
-// `figma-implement.yml` opens its PR there.
+// intake is filed there (`github_issue_create` with no `repo`).
 
 import type { Env } from "../types";
 import { getPermalink, postMessage, updateMessage } from "../slack/api";
@@ -23,8 +21,6 @@ import { proposalEventLogFor } from "../usage/production";
 import { GithubRequestError, githubIssueClient, githubIssueUpdateClient, githubLibraryReads, resolveRepoFor } from "../integrations/github";
 import { INTAKE_LABELS, renderIssueBody } from "../tools/github-issue-render";
 import { FINDINGS_KV_KEY, kvJson } from "../figma-poll";
-import { queuePrLinks } from "../figma-links/queue";
-import { prQueueFor } from "../figma-links/env";
 import { repositoryDispatch } from "../tools/github-dispatch";
 import {
   BLOCKED_LABEL,
@@ -111,27 +107,20 @@ export async function runLibraryPost(env: Env, opts: { dryRun: boolean }): Promi
 /**
  * The tracker job on `Env`.
  * @param env - Worker bindings
- * @param opts - `dryRun` comments, closes, posts and writes nothing
+ * @param opts - `dryRun` files, edits, posts and writes nothing
  */
 export async function runLibraryTrack(env: Env, opts: { dryRun: boolean }): Promise<TrackResult> {
   const target = resolveRepoFor(env, undefined);
   if (!target.ok) {
-    return { linked: 0, closed: 0, dropped: 0, expired: 0, remaining: 0, summary: `no repo: ${target.error}` };
+    return { dropped: 0, expired: 0, remaining: 0, summary: `no repo: ${target.error}` };
   }
   const reads = githubLibraryReads(env, target.entry);
-  const writes = githubIssueUpdateClient(env, target.entry);
   const issues = githubIssueClient(env, target.entry);
   return trackLibraryIntakes(
     {
       tracked: trackedStore(env),
       github: {
         recentIntakes: (since) => reads.recentIntakes(since),
-        recentPulls: () => reads.recentPulls(),
-        pull: (number) => reads.pull(number),
-        comment: async (issue, body) => {
-          await writes.comment(issue, body);
-        },
-        close: (issue) => writes.setState(issue, "closed", "completed"),
         intakesSince: (since) => reads.intakesSince(since),
         // Approve's filing, with no Approve: the same labels, and the same
         // footer naming where it came from.
@@ -155,8 +144,6 @@ export async function runLibraryTrack(env: Env, opts: { dryRun: boolean }): Prom
         const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
         if (!res.ok) throw new Error(res.error ?? "chat.update failed");
       },
-      // A merged PR's link waits for its Dev Mode links card (src/figma-links/).
-      merged: (pr, components) => queuePrLinks(prQueueFor(env), { pr, components }),
       now: () => Date.now(),
     },
     opts,

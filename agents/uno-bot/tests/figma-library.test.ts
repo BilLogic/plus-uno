@@ -1,7 +1,7 @@
 // A Figma library publish, end to end on fakes: the end-of-day poll finds it,
 // the morning post drafts one intake and one #plus-universal card, the Gate
-// resolves that card for the channel's members only, and the tracker links
-// the implementation PR back and closes the intake on merge.
+// resolves that card for the channel's members only, and the tracker files the
+// intake of a card nobody decides.
 //
 // The Figma side is a recorded /components + /versions pair served by the
 // shared fake Figma (`src/figma/in-memory.ts`), and run through the same
@@ -17,10 +17,9 @@ import type { FigmaNode } from "../src/integrations/figma-reading";
 import { SubrequestBudgetError } from "../src/net";
 import { draftPublishIntake, type ComponentRegistry, type LibraryChangeSet } from "../src/figma-library/draft";
 import { LIBRARY_CARD_TTL_MS, postLibraryFindings, type PostDeps } from "../src/figma-library/post";
-import { implementPrTitle, trackLibraryIntakes, type TrackDeps, type TrackedPublish } from "../src/figma-library/track";
+import { trackLibraryIntakes, type TrackDeps, type TrackedPublish } from "../src/figma-library/track";
 import { resolveSignal, type GateSignal, type GateVerdict } from "../src/gate/index";
 import { createInMemoryThreadState, type PendingProposal, type ReportItemState, type ThreadState } from "../src/thread-state/index";
-import { implementPayload } from "../src/tools/implement";
 import type { RefreshOwed } from "../src/figma-library/snapshot-refresh";
 import type { CardMessage } from "../src/slack/button-door";
 import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
@@ -629,7 +628,7 @@ describe("the morning post", () => {
     assert.deepEqual(morning.store.findings.value, []);
   });
 
-  it("stages the card as the report's one item: Approve files the intake and drafts every mapped component", async () => {
+  it("stages the card as the report's one item: Approve files the intake and stages no build", async () => {
     const morning = postDeps([await foundPublish()]);
     await postLibraryFindings(morning.deps);
     const ts = "1790000000.000001";
@@ -637,8 +636,7 @@ describe("the morning post", () => {
     assert.deepEqual(card.item, { messageTs: ts, id: VERSION });
     assert.equal(card.proposalTs, `${ts}#${VERSION}`);
     assert.equal(card.channel, CHANNEL);
-    assert.deepEqual(card.operations?.map((op) => op.toolName), ["github_issue_create", "component_implement"]);
-    assert.deepEqual(card.operations?.[1]!.input, { component: "Accordion, Badge", library_publish: VERSION });
+    assert.deepEqual(card.operations?.map((op) => op.toolName), ["github_issue_create"]);
     assert.equal("onCancel" in card, false, "Reject runs nothing");
     assert.deepEqual(card.confirmers, MEMBERS);
     assert.equal(card.ttlMs, LIBRARY_CARD_TTL_MS);
@@ -646,7 +644,7 @@ describe("the morning post", () => {
     assert.deepEqual(card.stated, {
       cancelled: "Rejected, nothing filed",
       expired:
-        "That card closed after 72 h with no decision, so nothing was drafted. " +
+        "That card closed after 72 h with no decision. " +
         "I file its intake the morning after, so the publish isn't lost.",
     });
     // The pop-up's text: the publish and its components, with no footer.
@@ -658,7 +656,7 @@ describe("the morning post", () => {
     assert.equal(record?.entries[0]!.id, VERSION);
     assert.equal((record?.after?.[0] as { type?: string })?.type, "data_table");
 
-    // Tracked to its outcome: the item, the components it dispatches and the
+    // Tracked to its outcome: the item, the components in flight and the
     // draft an expiry files.
     const tracked = morning.store.tracked.value[0]!;
     assert.equal(tracked.item, VERSION);
@@ -712,9 +710,8 @@ describe("the morning post", () => {
     const blocks = day2.posts[0]!.blocks as Array<Record<string, any>>;
     assert.match(blocks[0]!.text.text, /: 4 components changed, 3 of them have code\.$/);
     assert.equal(blocks[1]!.body.text, "1 new, 3 updated. Accordion, Badge and Tooltip have code that can be drafted to match.");
-    // The intake and the dispatch carry it too, and nothing waits any more.
+    // The intake carries it too, and nothing waits any more.
     assert.match(String(day2.staged[0]!.operations![0]!.input.body), /tooltip/);
-    assert.equal(day2.staged[0]!.operations![1]!.input.component, "Accordion, Badge, Tooltip");
     assert.equal(day2.store.unpublished.value, null);
   });
 
@@ -862,27 +859,13 @@ describe("the library card in Review", () => {
     assert.equal((await threadState.getProposalByTs(card.proposalTs)).state, "found");
   });
 
-  it("Approve files the intake and dispatches the implementation for every mapped component", async () => {
+  it("Approve files the intake and stages no build", async () => {
     const { threadState, card } = await stagedCard();
     const { ran, updates } = await submit(threadState, card, "confirm");
     const execute = ran[0]!.execute!;
-    assert.deepEqual(execute.operations.map((op) => op.toolName), ["github_issue_create", "component_implement"]);
+    assert.deepEqual(execute.operations.map((op) => op.toolName), ["github_issue_create"]);
     assert.match(String(execute.operations[0]!.input.body), /uno-bot:figma-publish:2210000000000000002/);
-
-    // The dispatch the executor would send, from where the card was approved.
     const ts = card.item!.messageTs;
-    assert.deepEqual(implementPayload(execute.operations[1]!.input, execute), {
-      ok: true,
-      component: "Accordion, Badge",
-      payload: {
-        component: "Accordion, Badge",
-        notes: undefined,
-        thread_ts: ts,
-        channel: CHANNEL,
-        message_ts: ts,
-        figma_version_id: "2210000000000000002",
-      },
-    });
 
     // The report's message, drawn again: who approved, View, and the table.
     assert.equal(updates.length, 1);
@@ -890,7 +873,7 @@ describe("the library card in Review", () => {
     const blocks = updates[0]!.message.blocks as Array<Record<string, any>>;
     assert.deepEqual(blocks.map((b) => b.type), ["section", "card", "data_table"]);
     assert.match(blocks[1]!.subtitle.text, /^Approved by <@U0MEMBER1> · written/);
-    assert.equal(blocks[1]!.body.text, "Written: the intake, and code drafts started for Accordion and Badge.");
+    assert.equal(blocks[1]!.body.text, "Written: the intake.");
     assert.deepEqual(blocks[1]!.actions.map((a: any) => a.text.text), ["View", "Open library", "View version"]);
   });
 
@@ -907,27 +890,6 @@ describe("the library card in Review", () => {
   });
 });
 
-describe("the implement payload", () => {
-  const slack = { channel: "C1", threadTs: "1.1", userMsgTs: "1.2" };
-
-  it("still needs a PRD when the model asks for a component", () => {
-    assert.equal(implementPayload({ component: "Badge" }, slack).ok, false);
-    assert.equal(implementPayload({ component: "Badge", notion_prd_url: "https://www.notion.so/x-0123456789abcdef0123456789abcdef" }, slack).ok, true);
-  });
-
-  it("ignores library_publish on a card someone requested — the model cannot skip its PRD", () => {
-    const fromModel = { ...slack, requestedBy: "U0DESIGNR" };
-    const built = implementPayload({ component: "Badge", library_publish: "123" }, fromModel);
-    assert.equal(built.ok, false);
-  });
-
-  it("refuses a list from the model, and a malformed name or version on the library path", () => {
-    assert.equal(implementPayload({ component: "Badge, Button", notion_prd_url: "https://www.notion.so/0123456789abcdef0123456789abcdef" }, slack).ok, false);
-    assert.equal(implementPayload({ component: "Badge; rm -rf", library_publish: "1" }, slack).ok, false);
-    assert.equal(implementPayload({ component: "Badge", library_publish: "abc" }, slack).ok, false);
-  });
-});
-
 // ── The tracker ──────────────────────────────────────────────────────────────
 
 describe("the morning tracker", () => {
@@ -941,30 +903,19 @@ describe("the morning tracker", () => {
     implement: "Accordion, Badge",
   });
 
-  type Pulls = Awaited<ReturnType<TrackDeps["github"]["recentPulls"]>>;
   type Intakes = Awaited<ReturnType<TrackDeps["github"]["recentIntakes"]>>;
-  /** The card's intake, filed by a ✅ or a ⛔ — and one that is not its. */
+  /** The card's intake, filed by Approve — and one that is not its. */
   const DECIDED: Intakes = [
     { number: 801, url: "https://github.com/o/r/issues/801", body: "unrelated" },
     { number: 870, url: "https://github.com/o/r/issues/870", body: `${card().marker}\n\n## What was published` },
   ];
-  /** `pulls` is the recent-pulls window; `byNumber` is every PR GitHub has. */
-  function trackDeps(pulls: Pulls, tracked = [card()], byNumber: Pulls = pulls, intakes: Intakes = DECIDED) {
+  function trackDeps(intakes: Intakes = DECIDED, tracked = [card()]) {
     const calls: string[] = [];
-    const edits: Array<{ text: string; note: string }> = [];
     const store = kv(tracked);
     const deps: TrackDeps = {
       tracked: store,
       github: {
         recentIntakes: async () => intakes,
-        recentPulls: async () => pulls,
-        pull: async (number) => byNumber.find((p) => p.number === number) ?? null,
-        comment: async (issue, body) => {
-          calls.push(`comment #${issue}: ${body}`);
-        },
-        close: async (issue) => {
-          calls.push(`close #${issue}`);
-        },
         intakesSince: async () => ({ intakes, complete: true }),
         fileIntake: async (draft, from) => {
           calls.push(`file "${draft.title}" from ${from.channel}/${from.ts}`);
@@ -975,99 +926,30 @@ describe("the morning tracker", () => {
       postToThread: async (channel, ts, text) => {
         calls.push(`thread ${channel}/${ts}: ${text}`);
       },
-      closeCard: async (channel, ts, message) => {
-        const { text, note } = cardWords(message);
-        calls.push(`edit ${channel}/${ts}: ${note}`);
-        edits.push({ text, note });
+      closeCard: async (channel, ts) => {
+        calls.push(`edit ${channel}/${ts}`);
       },
       now: () => POSTED_AT + 24 * 60 * 60 * 1000,
     };
-    return { deps, calls, edits, store };
+    return { deps, calls, store };
   }
-  const pr = (over: Partial<{ state: "open" | "closed"; merged: boolean; title: string; createdAt: string }> = {}) => ({
-    number: 880,
-    title: implementPrTitle("Accordion, Badge"),
-    url: "https://github.com/o/r/pull/880",
-    createdAt: "2026-09-30T15:00:00Z",
-    state: "open" as const,
-    merged: false,
-    ...over,
-  });
 
-  it("links the opened PR in the intake and in the thread, once", async () => {
-    const { deps, calls, store } = trackDeps([pr()]);
-    const result = await trackLibraryIntakes(deps);
-    assert.equal(result.linked, 1);
-    assert.deepEqual(calls, [
-      "comment #870: The implementation PR is open: https://github.com/o/r/pull/880",
-      `thread ${CHANNEL}/1790000000.000001: PR open: <https://github.com/o/r/pull/880|#880>. Linked from the <https://github.com/o/r/issues/870|intake>.`,
-    ]);
-    assert.deepEqual(store.value[0]!.pr, { number: 880, url: "https://github.com/o/r/pull/880" });
-
-    // The next morning says nothing new about the same open PR.
-    const again = trackDeps([pr()], store.value);
-    await trackLibraryIntakes(again.deps);
-    assert.deepEqual(again.calls, []);
-  });
-
-  it("closes the intake as incorporated when the PR merges, and stops tracking", async () => {
-    const { deps, calls, store } = trackDeps([pr({ state: "closed", merged: true })]);
-    const result = await trackLibraryIntakes(deps);
-    assert.equal(result.closed, 1);
-    assert.ok(calls.includes("close #870"));
-    assert.ok(calls.some((c) => c.startsWith("comment #870: Incorporated by")));
-    // One 🎉, naming what now matches the library.
-    assert.ok(
-      calls.includes(
-        `thread ${CHANNEL}/1790000000.000001: :tada: <https://github.com/o/r/pull/880|#880> merged, so Accordion and Badge match the library. Closed the <https://github.com/o/r/issues/870|intake>.`,
-      ),
-      calls.join("\n"),
-    );
-    assert.deepEqual(store.value, []);
-  });
-
-  it("says a PR closed without merging leaves the intake open, and stops tracking", async () => {
-    const { deps, calls, store } = trackDeps([pr({ state: "closed", merged: false })]);
-    const result = await trackLibraryIntakes(deps);
-    assert.equal(result.dropped, 1);
-    assert.equal(
-      calls.at(-1),
-      `thread ${CHANNEL}/1790000000.000001: <https://github.com/o/r/pull/880|#880> closed without merging. The <https://github.com/o/r/issues/870|intake> stays open for the next try.`,
-    );
-    assert.ok(!calls.includes("close #870"));
-    assert.deepEqual(store.value, []);
-  });
-
-  it("ignores a PR for another list, or one opened before the card", async () => {
-    const { deps, calls } = trackDeps([pr({ title: implementPrTitle("Badge") }), pr({ createdAt: "2026-09-01T00:00:00Z" })]);
+  it("watches for no PR: an approved card posts nothing and is followed until it ages out", async () => {
+    const { deps, calls, store } = trackDeps();
     await trackLibraryIntakes(deps);
     assert.deepEqual(calls, []);
+    assert.deepEqual(store.value[0]!.intake, { number: 870, url: "https://github.com/o/r/issues/870" });
   });
 
-  it("sees a linked PR merge after it has left the recent-pulls window", async () => {
-    const linkedCard = { ...card(), intake: { number: 870, url: "https://github.com/o/r/issues/870" }, pr: { number: 880, url: "https://github.com/o/r/pull/880" } };
-    const { deps, calls, store } = trackDeps([], [linkedCard], [pr({ state: "closed", merged: true })]);
-    const result = await trackLibraryIntakes(deps);
-    assert.equal(result.closed, 1);
-    assert.ok(calls.includes("close #870"));
-    assert.deepEqual(store.value, []);
-  });
-
-  it("gives each PR to one card when two publishes dispatch the same components", async () => {
-    const older = card();
-    const newer = { ...card(), key: "2210000000000000009", marker: "<!-- uno-bot:figma-publish:2210000000000000009 -->", ts: "1790000000.000002", postedAt: POSTED_AT + 60 * 60 * 1000 };
-    const first = pr();
-    const second = { ...pr({ createdAt: "2026-09-30T16:30:00Z" }), number: 881, url: "https://github.com/o/r/pull/881" };
-    const { deps, store } = trackDeps([second, first], [older, newer]);
+  it("keeps an undecided card while it can still be decided", async () => {
+    const { deps, calls, store } = trackDeps([]);
     await trackLibraryIntakes(deps);
-    assert.deepEqual(store.value.map((t) => [t.key, t.pr?.number]), [
-      [older.key, 880],
-      [newer.key, 881],
-    ]);
+    assert.deepEqual(calls, []);
+    assert.equal(store.value.length, 1);
   });
 
-  it("lets a card with no PR go after two weeks", async () => {
-    const { deps, store } = trackDeps([]);
+  it("lets a card go after two weeks", async () => {
+    const { deps, store } = trackDeps();
     deps.now = () => POSTED_AT + 15 * 24 * 60 * 60 * 1000;
     const result = await trackLibraryIntakes(deps);
     assert.equal(result.dropped, 1);
@@ -1101,14 +983,6 @@ describe("a library card nobody decides", () => {
       tracked: store,
       github: {
         recentIntakes: async () => [{ number: 801, url: "https://github.com/o/r/issues/801", body: "unrelated" }],
-        recentPulls: async () => [],
-        pull: async () => null,
-        comment: async (issue, body) => {
-          calls.push(`comment #${issue}: ${body}`);
-        },
-        close: async (issue) => {
-          calls.push(`close #${issue}`);
-        },
         intakesSince: async () => ({ intakes: [{ number: 801, url: "https://github.com/o/r/issues/801", body: "unrelated" }], complete: true }),
         fileIntake: async (draft, from) => {
           calls.push(`file "${draft.title}" from ${from.channel}/${from.ts}`);
