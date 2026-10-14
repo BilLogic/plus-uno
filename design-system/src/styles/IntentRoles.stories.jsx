@@ -46,7 +46,7 @@ import { contrast as contrastOf, parseColour } from '../lib/tokens.mjs';
  * THE BORDERS ARE REPOINTED NOW. 111 of the 137 border declarations moved onto
  * `-border` on 2026-08-29, and `npm run check:intent-roles` keeps them there;
  * the remaining 26 are recorded with a reason in
- * `docs/evals/intent-role-adoption.json`. Six of the seven roles alias their
+ * `scripts/baselines/intent-role-adoption.json`. Six of the seven roles alias their
  * base, so those 111 changed no pixel — what changed is that an edge now says
  * it is an edge, and the value can move for edges alone. The `-icon` roles
  * still have no users: an icon colour is usually set by `color:` on a glyph,

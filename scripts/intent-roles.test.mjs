@@ -156,7 +156,7 @@ test('an intent base on an edge in a fixture tree is a finding', () => {
   const { root, done } = policyTree({
     [`${TOKEN_DIR}/_color_roles.scss`]: ROLES_SCSS,
     'design-system/src/a.scss': '.a { border-color: var(--color-danger); }\n',
-    'docs/evals/intent-role-adoption.json': INTENT_BASELINE,
+    'scripts/baselines/intent-role-adoption.json': INTENT_BASELINE,
   });
   try {
     const found = messagesOf(run, root);
@@ -172,7 +172,7 @@ test('an intent base on an edge in a fixture tree is a finding', () => {
 test('an empty token directory fires the sentinel floor, not a clean sweep', () => {
   const { root, done } = policyTree({
     'design-system/src/a.scss': '.a { border-color: var(--color-danger); }\n',
-    'docs/evals/intent-role-adoption.json': INTENT_BASELINE,
+    'scripts/baselines/intent-role-adoption.json': INTENT_BASELINE,
   });
   try {
     const found = messagesOf(run, root);

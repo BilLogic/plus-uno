@@ -53,10 +53,10 @@ Every finding carries **severity · lens · evidence (what's in the artifact) ·
 
 - **Stage-lens:** `Issues? = Yes` **only when at least one finding is major or above.** Yes → re-enter `uno-prototype` at the reflection (`reflect_learn`) — a failed review can invalidate the approach, not just the artifact; each finding's re-entry point says which (re-choose fidelity vs. content fix). No → "Ready to share?" stays the designer's call; review passing is necessary, not sufficient.
 - **Handoff gate:** any major+ finding holds the publish; clean or minors-only → proceed to dev / PM / stakeholder sign-off.
-- **Design QA:** findings go to dev as annotated issues *before* `Ready for Prod`; blockers hold it. The run is logged for the drift-catch metric.
+- **Design QA:** findings go to dev as annotated issues *before* `Ready for Prod`; blockers hold it.
 - Verdicts and sign-offs posted in Slack follow `docs/connectors/slack.md` (channels + the two gates — never conflate them).
 - Pushback on a finding → re-read the cited doc; concede or stand by it with reasoning. Never dig in on thin evidence.
 
 ## Quality bar
 
-`reviewers/rubric-applier` scores each run against `docs/evals/rubrics/uno-review.md` and appends it to the eval log: recall ≥80% and precision ≥80% on the golden defect set, 0 out-of-lens findings, diagnose-only hard gate. Design QA target: ≥80% of spec-vs-implementation drift caught at Ready-for-QA rather than post-ship.
+`reviewers/rubric-applier` scores each run against `docs/evals/rubrics/uno-review.md`: recall ≥80% and precision ≥80% on the golden defect set, 0 out-of-lens findings, diagnose-only hard gate. Design QA target: ≥80% of spec-vs-implementation drift caught at Ready-for-QA rather than post-ship.

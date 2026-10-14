@@ -13,7 +13,7 @@ This repo is the design system, prototyping workspace, and agent infrastructure 
 - **Prototypes** (`prototypes/`) — on `main`: live app + Full Demo Walkthrough (`/demo/demo.html`, id `1028`) via `home-redesign/` (+ content modules). Branch experiments catalogued in Notion.
 - **Storybook** (`.storybook/`) — Interactive component documentation. Site landing at `/storybook/`.
 - **Agent Harness** (`AGENTS.md`, `skills/`, `agents/`) — the constitution, six dual-face skills, and the agent roster incl. the uno-bot Slack Worker (`agents/uno-bot/`).
-- **Product Documentation** (`docs/`) — context (descriptive), conventions (normative), evals, knowledge, plans.
+- **Product Documentation** (`docs/`) — context (descriptive), conventions (normative), rubrics, knowledge, plans.
 
 ## Tech Stack
 
@@ -39,7 +39,7 @@ plus-vibe-coding-starting-kit/
 ├── docs/
 │   ├── context/               Descriptive — product, design-system foundation, onboarding
 │   ├── conventions/           Normative — notion, figma-workspace, slack, supabase, writing-style, automations
-│   ├── evals/                 rubrics/ + scenarios/ + runs/ (one quality loop)
+│   ├── evals/                 rubrics/ + scenarios/ + fixtures/
 │   ├── knowledge/             Long-term memory (lessons, ADRs, changelog, archive/)
 │   └── plans/                 Dated implementation plans
 ├── .storybook/                Storybook configuration

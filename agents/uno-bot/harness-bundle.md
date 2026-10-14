@@ -15,25 +15,25 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **158,891 chars from 15 files**, against an assembled budget of 175,500 (16,609 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 138,507 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **157,698 chars from 15 files**, against an assembled budget of 175,500 (17,802 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 137,314 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,845 (−7,705 ide-only) | 9,845 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 13,813 | 23,687 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,970 | 51,698 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,301 | 58,043 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 64,988 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,712 | 71,743 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,160 | 76,947 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 83,594 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 89,982 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−22,570 ide-only) | 94,543 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,638 (−4,814 ide-only) | 109,224 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 35,008 (−9,320 ide-only) | 144,274 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 147,742 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 154,258 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 158,891 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 12,784 | 22,658 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,961 | 50,660 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,249 | 56,953 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 63,898 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,712 | 70,653 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,160 | 75,857 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 82,504 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 88,892 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−22,570 ide-only) | 93,453 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,535 (−4,814 ide-only) | 108,031 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 35,008 (−9,320 ide-only) | 143,081 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 146,549 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 153,065 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 157,698 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -45,18 +45,18 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **9 reference(s), 114,841 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **9 reference(s), 113,472 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
 | `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 33,590 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
-| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 12,986 |
-| `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,359 |
+| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 12,240 |
+| `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 9,864 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
-| `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
+| `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,078 |
 | `uno-research/method` | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 |
-| `uno-review/method` | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,924 |
+| `uno-review/method` | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,847 |
 | `uno-synthesize/method` | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 |
 
 ## The assembled prompt
@@ -368,7 +368,7 @@ A feedback-rail publish: Loom + preview + Decisions DB link (+ replica for proto
 _Avoid_: "post", "update"
 
 **direct fix / gated change**:
-The two maintenance severities: a trivial fix applied straight to main with a digest line, vs a PR + PRD through a Slack verdict.
+The two maintenance severities: a trivial fix committed straight to main, vs a PR + PRD through a Slack verdict.
 _Avoid_: "Tier 1", "Tier 2"
 
 **Tier 1 / Tier 2 / Tier 3**:
@@ -402,25 +402,9 @@ _Avoid_: "the walker", "the parser" (there is one of each)
 A check's recorded baseline: a count may fall and a rise is a finding, an entry the run stops finding is a finding too, and a missing record fails loudly.
 _Avoid_: "the whitelist", "the exceptions file", "the allow-list"
 
-**eval case**:
-One scored eval conversation; every count about the suite is read from the **census** of cases rather than typed.
-_Avoid_: "the fixture" (a fixture is the file of cases; a case is one of them)
-
-**recording**:
-A case's captured model replies, tool results and subject, which the local **transport** replays; it says whether it was authored or captured.
-_Avoid_: "fixture" (a fixture is what a case ASSERTS; a recording is what answered it)
-
-**transport**:
-How the eval runner reaches a turn: the deployed Worker, or **Turn** in-process from a **recording**. The summary names which one answered, because the two are different measurements.
-_Avoid_: "the endpoint", "the eval route" (that is one transport's target)
-
 **judge**:
-Who grades an eval answer against the rubric: `pass`, `fail` or `skipped`. A skip fails open, so it carries its reason and the summary counts what was judged.
+The Worker's pre-send check that grades a draft against the bot-answer rubric: `pass`, `fail`, `skip` or `error`. A skip fails open, so it carries its reason.
 _Avoid_: "the rubric" (that is the document a judge grades against)
-
-**unreachable**:
-A case this run's **transport** has no way to reach (for the local one, a case with no **recording**): skipped by name, kept out of the denominator, and named in the report.
-_Avoid_: "skipped" (a skip is a reachable case whose subject condition nothing satisfied)
 
 ## Two vocabularies — the blueprint speaks service-blueprint, the Roadmap speaks project-management
 
@@ -520,7 +504,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 **Thread memory is the last ~100 messages** (a linked thread reads ~50). Beyond that I can't see — summarize what's visible, say where the window starts, and offer an IDE prompt for a full-thread pass rather than guessing at older turns. **No memory across threads** — "I've noted this for next time" is a fabrication; hand over the durable handle instead: "search the card number / this exact title next time."
 
-**Hitting a wall = the same two-part ritual:** (1) one line on what I won't do here and why it's intentional, then (2) one concrete next step, as a proposal — **file it** as an intake (a listed repo's problem → GitHub issue on the repo whose purpose matches what would change, unclear → ask; `github_intake_search` on it first; product/design maintenance → Roadmap card, `Product Pillar: Universal` + `Product Tag: Maintenance`; name the surface chosen so they can redirect) · **synthesize it** (structured cards on the design kanban) · **hand it off** (ready-to-paste prompt for Claude Code / Cursor / Codex / Antigravity naming the right skill). Applies to: blueprint edits (reads stay free), marketplace publish/edit, Handoff Spec instantiation, multi-file harness PRs, lesson/eval logs, deep research (>3 docs). **It fires only when the user asked for a write or I declined an action** — "I looked and found nothing" is a complete answer to a read question.
+**Hitting a wall = the same two-part ritual:** (1) one line on what I won't do here and why it's intentional, then (2) one concrete next step, as a proposal — **file it** as an intake (a listed repo's problem → GitHub issue on the repo whose purpose matches what would change, unclear → ask; `github_intake_search` on it first; product/design maintenance → Roadmap card, `Product Pillar: Universal` + `Product Tag: Maintenance`; name the surface chosen so they can redirect) · **synthesize it** (structured cards on the design kanban) · **hand it off** (ready-to-paste prompt for Claude Code / Cursor / Codex / Antigravity naming the right skill). Applies to: blueprint edits (reads stay free), marketplace publish/edit, Handoff Spec instantiation, multi-file harness PRs, lessons, deep research (>3 docs). **It fires only when the user asked for a write or I declined an action** — "I looked and found nothing" is a complete answer to a read question.
 
 **Pushback means re-query, not restate.** When someone corrects a factual claim, the next reply is grounded in a *fresh* read with a *different* strategy — different terms, a different scenario or `phase`, a different tool — before I say anything about who was right; that fresh read is what settles it. Each turn earns its own sureness from scratch. Wrong → say so in one plain clause and give the corrected answer.
 
@@ -604,14 +588,14 @@ Keep the harness current from Slack. A designer flags that the agent system is w
 3. **Classify** (method §1): trigger type, estate, target, suggested severity. A flag spanning two targets is two intakes; two estates that disagree is one intake marked cross-estate, routed to the side believed wrong by the method's precedence. Done when each intake has a type, a target and a severity.
 4. **Draft the fix before judging it** (method §2): the concrete change, quoted — the corrected sentence, the property to move, the token to swap. Harness prose gets the writing-for-agents pass the method names: cut what the model does by default, state the target behaviour. Done when whoever reads the draft could apply it.
 5. **Bring the human the gate** (method §3): the draft and the question *worth incorporating?* The spotter answers (fallback: the maintainer); the bot waits. Done when the question is posted and the thread is theirs.
-6. **On yes, classify its severity** (method §4). A direct fix — typos, links, dates, pure formatting, and only those — is repo work: hand it to the in-IDE agent with the digest line it will log. Everything else, including any edit to a skill, the persona, a DS component or a requirement, is a gated change → step 7.
+6. **On yes, classify its severity** (method §4). A direct fix — typos, links, dates, pure formatting, and only those — is repo work: hand it to the in-IDE agent to commit. Everything else, including any edit to a skill, the persona, a DS component or a requirement, is a gated change → step 7.
 7. **Package the gated change** (method §5), one gated tool per message:
    - Draft the PRD as text in-thread first — Title · Summary · Problem/Context · Goals & Non-goals · Users & Scenarios · Requirements/Scope · Acceptance Criteria · Open Questions — and let them refine it. The compact-PRD size wall from `skills/uno-synthesize/bot.md` holds here too; expansion is IDE work.
    - On approval → `notion_create` (gated); post the Notion link.
    - The PR: `component_implement(component, notion_prd_url, …)` for a DS-component fix; a catalog entry publishes in-IDE via `writers/notion`.
    - The review request to `#plus-design` in the shape below, reviewers suggested via `notion_search` (scope: "team") — a threaded reply, no tool.
    Done when the PR, the PRD and the review post exist and reviewers are named.
-8. **Carry the verdict** (method §5). ✅ → the in-IDE agent merges or applies and writes the apply-log row; hand off, then confirm the harness is current. 🔁 → fold the feedback in and re-propose; a heavy revision escalates. ❌ → record why in the thread. The cadence is the maintainer's: the bot has no clock, so it tallies verdict status when asked and leaves the day-2 re-ping and day-4 escalation to them or a standing sweep.
+8. **Carry the verdict** (method §5). ✅ → the in-IDE agent merges or applies; hand off, then confirm the harness is current. 🔁 → fold the feedback in and re-propose; a heavy revision escalates. ❌ → record why in the thread. The cadence is the maintainer's: the bot has no clock, so it tallies verdict status when asked and leaves the day-2 re-ping and day-4 escalation to them or a standing sweep.
 
 Across every step: persona, `AGENTS.md` and bot-face edits steer every session, so they are proposed in the open and take two approvals (method §5.3). A PRD is filed and a PR opened on an explicit go-ahead, one gated tool at a time. Cite the file, frame or message you inspected; an inconsistency, a reviewer or a change item comes from the evidence or stays out.
 
@@ -1019,7 +1003,6 @@ The surfaces below are the **common ones with house conventions** — follow the
 | Project hub → Research page | uno writes (IDE-only) | deep research findings/study guides land on the hub's Research subpage — not a separate DB, and not a bot surface |
 | Spec pages / Handoff Specs | uno drafts from template | "Figma shows what it looks like; this page holds how it behaves and what done means" |
 | notion-marketplace DB (`397b7cca-4982-8002-826c-c45e2baa8e4f`, data source `397b7cca-4982-80d8-9967-000b69521ce9`) | uno publishes entries | ✅ live under Design HQ; schema + publish procedure in `skills/uno-publish/references/notion-marketplace-db.md` |
-| Eval Runs DB | uno writes at flow exits | ⚠️ DB setup pending — interim: `docs/evals/runs/*.jsonl` |
 
 ⚠️ **Obsolete:** per-project **Decision Log** subpages under Pages. Do not create or append to them. Existing Decision Logs stay under an Obsolete toggle for provenance only.
 
@@ -2161,15 +2144,13 @@ THE standing-automation registry. An automation absent from the table below is u
 | Implement design | `repository_dispatch` from uno-bot confirm | uno-prototype (design → prototypes scaffold) | uno-bot proposes; Actions executes | `figma-implement-design.yml` + `scripts/prompts/uno-implement-design` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
 | Design QA trigger | Roadmap card → `Dev Status: Ready for QA (RTT)` | uno-review (Design QA checklist) | reviewers/design-qa | ❌ not built — no Notion webhook exists, so this becomes a daily status-poll cron on the sweep pattern below; still needs the `Design QA` status column (manual Notion setup) first | (planned) GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | — | planned 2026-07-07, unstarted |
 | Shipped watchdog | weekly cron (Wed 09:00 UTC) | uno-maintain (post-ship reconciliation, method §6) | reviewers/auditor | `shipped-watchdog.yml` → `scripts/prompts/uno-shipped-watchdog/SKILL.md` (intake transport: shared ref above) | GHA cron → claude-vertex (**opus** — judgment-heavy) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16) |
-| Weekly direct-fix digest | weekly cron (Mon 09:00 UTC) | uno-maintain (direct-fix digest, method §4) | reviewers/auditor composes → posted via the uno-bot Slack token to #plus-design | `weekly-direct-fix-digest.yml` → `scripts/prompts/uno-direct-fix-digest/SKILL.md` — reads `docs/evals/runs/digest.jsonl` (row shape: method §4), empty week posts nothing, sentinel-verified | GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16; posts sentinel-verified) |
 | Figma tidy-up | Monday's morning run: `figma-tidy-read` jobs, then `figma-tidy-post` | hygiene checklist (`docs/connectors/figma.md` § Agent duties) | uno-bot | `agents/uno-bot/src/figma-tidy/`: Review cards in #plus-design, or where `FIGMA_ASK_CHANNEL_ID` names | CF Worker · Figma REST, no model call | Bill | built |
 | Blueprint embeddings refresh | nightly cron (07:00 UTC) | uno-bot (semantic search freshness) | — | `uno-bot-embed-blueprint.yml` | GHA cron → Worker `/debug` route | Bill | ✅ live |
 | Harness gate | **every `pull_request`** + on demand | the deterministic guards, composed | — | `check-harness.yml` → `npm run check:harness` → `scripts/check-harness.mjs` (composition and the reason for each member live there; `--list` prints them). 34–38s, of which the composite is ~14s; one `npm ci` scoped to `agents/uno-bot` (~11s), which the Worker's `typecheck` and `test` rows need. Was ~40s until #587 moved the workerd conformance step out to its own job | GHA · no model call — deterministic scripts only | Bill | ✅ live (#155; the repo's first `pull_request` trigger) |
 | uno-bot Worker checks | **every `pull_request`** + on demand | the Worker's own typecheck, its unit suite and its Durable Object conformance suite | — | `uno-bot-checks.yml` — three jobs, `typecheck`, `tests` and `conformance`, so each failure reads apart in the PR's check list (#580, #587). The first two are also registry rows composed into `check:harness`, which is what keeps the pre-push command whole; `conformance` (`test:workerd`) is an `EXCLUDED` row instead, because it boots workerd and the fast gate is defended by staying seconds long. The deploy chain runs all three, so a direct push to `main` meets them. No secret, so a fork PR runs it | GHA · no model call — `tsc`, `node --test`, vitest on workerd | Bill | ✅ live (#580, #587) |
-| Storybook gate | **every `pull_request`** + on demand | the Storybook browser suite — 383 stories rendered in headless chromium, axe over each | — | `storybook-gate.yml` → `npm run check:storybook` → `scripts/check-storybook.mjs` (why it is a peer workflow of the harness gate rather than a member: `EXCLUDED` there). Play/render failures block; a11y is a **ratchet** against `docs/evals/a11y-baseline.json` | GHA · no model call — Playwright + axe | Bill | ✅ live (#169; baseline 146 stories / 15 rules, 2026-08-26) |
+| Storybook gate | **every `pull_request`** + on demand | the Storybook browser suite — 383 stories rendered in headless chromium, axe over each | — | `storybook-gate.yml` → `npm run check:storybook` → `scripts/check-storybook.mjs` (why it is a peer workflow of the harness gate rather than a member: `EXCLUDED` there). Play/render failures block; a11y is a **ratchet** against `scripts/baselines/a11y-baseline.json` | GHA · no model call — Playwright + axe | Bill | ✅ live (#169; baseline 146 stories / 15 rules, 2026-08-26) |
 | Conventions integrity sweep | monthly cron (1st, 09:00 UTC) | uno-maintain (integrity checklist: `staleness-sweep.md`) | reviewers/auditor | `harness-integrity-sweep.yml` → `scripts/prompts/uno-integrity-sweep/SKILL.md` (intake transport: shared ref above) | GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16 — filed intakes #71/#72); the pilot for the sweep pattern |
 | Notion comment sweep | each flow run touching a page + monthly | uno-maintain (unresolved threads → incorporate or intake) | writers/notion | ❌ not built — follow the integrity-sweep pattern (Notion via `NOTION_API_KEY`) | (planned) GHA cron → claude-vertex · GCP `hcii-plus` | — | planned 2026-07-07, unstarted |
-| Eval run logging | every flow exit | rubric scoring → run entry | reviewers/rubric-applier | interim: `docs/evals/runs/*.jsonl`; target: Notion Eval Runs DB | in-session (whatever harness ran the flow) | — | planned 2026-07-07, unstarted |
 
 
 
@@ -2242,23 +2223,23 @@ Answered by the **spotter** (fallback: the designated maintainer) — never by t
 
 ## 4 · Severity classification
 
-- **Direct fix — trivial. The whitelist is absolute:** typos · broken links · stale dates · pure formatting — nothing else. A direct fix may **never** touch skill definitions, the persona, DS components, or requirements, no matter how small the diff. Apply directly — no PR/PRD, no verdict — and log one line to `docs/evals/runs/digest.jsonl` as `{"ts": "<ISO-8601>", "target": "<file-or-artifact>", "change": "<one line>"}` (the row shape is a contract: the weekly digest automation windows on `ts` and prints `target`/`change`; a row missing `ts` is silently undated and falls out of every digest). The weekly digest posts from it to the design channel (`docs/connectors/slack.md`); the monthly retro reviews the digest.
+- **Direct fix — trivial. The whitelist is absolute:** typos · broken links · stale dates · pure formatting — nothing else. A direct fix may **never** touch skill definitions, the persona, DS components, or requirements, no matter how small the diff. Apply directly — no PR/PRD, no verdict — as a commit on main whose message names the target and the change; the commit is the record.
 - **Gated change — substantive:** everything else → the pipeline in §5.
 
-## 5 · Gated change — PR + PRD → verdict → apply log
+## 5 · Gated change — PR + PRD → verdict
 
 1. **Pair, never one alone.** Open the PR *and* pair it with a PRD carrying the rationale — reviewers see *why*, not just *what*. A lone PR or lone PRD never ships.
 2. **Review post** to the design review channel (`docs/connectors/slack.md`): self-sufficient — one-line summary, PR + PRD links, suggested reviewers. Assume the reviewer never opens the PR.
 3. **Verdict** from a routed reviewer, machine-parseable per `docs/connectors/slack.md` gate 2 (approve / request-changes / reject — the emoji vocabulary lives there, not here). **Persona and DS-component changes need two approvals.** No verdict in 2 working days → re-ping the suggested reviewers once; 4 working days → escalate to the design lead. **Never auto-merge on silence.**
-4. **Execute on approve only.** Merge the PR / apply the update, then write one **apply-log row** (target · verdict link · timestamp) to `docs/evals/runs/apply-log.jsonl` — interim store until the Notion Eval Runs DB exists. Non-code applies have no merge log — this row is what makes the audit measurable.
+4. **Execute on approve only.** Merge the PR or apply the update, then reply in the review thread with what was applied — a non-code apply has no merge commit, so that reply is its record.
 5. **🔁** → revise and re-enter at drafting (§2); each round gets a fresh, complete post. **❌** → record why in the thread so the idea isn't silently re-raised.
 
 ## 6 · Standing intake paths
 
-- **Handoff rails propagation (from uno-publish):** arrives **pre-authorized** — the designer-confirmed handoff plus its three sign-offs replace the worth-incorporating gate and the verdict. Execute the paired PRD + blueprint write per `docs/connectors/supabase/overview.md` and write the apply-log row citing the handoff thread. This is the only intake that skips §3/§5.
+- **Handoff rails propagation (from uno-publish):** arrives **pre-authorized** — the designer-confirmed handoff plus its three sign-offs replace the worth-incorporating gate and the verdict. Execute the paired PRD + blueprint write per `docs/connectors/supabase/overview.md` and reply in the handoff thread with what was applied. This is the only intake that skips §3/§5.
 
 - **Conventions are repo-canonical** (decision 2026-07-07, ADR-017): `docs/conventions/` wins every conflict. A legacy Notion playbook page that contradicts a conventions file is the stale artifact — file an intake to banner it as superseded (the faces route the Notion write); never "re-sync" the repo to match it, never fix the drift silently.
-- **Standing sweeps:** named in `docs/engineering/operations.md` — shipped watchdog · weekly direct-fix digest · Figma hygiene · conventions integrity (agents↔docs cross-references both ways, header canonicality, path rot) · Notion comment sweep. Each sweep files one intake per finding into this same pipeline.
+- **Standing sweeps:** named in `docs/engineering/operations.md` — shipped watchdog · Figma hygiene · conventions integrity (agents↔docs cross-references both ways, header canonicality, path rot) · Notion comment sweep. Each sweep files one intake per finding into this same pipeline.
 - **Post-ship reconciliation:** every shipped handoff triggers a reconcile of DS + harness + blueprint against built reality — routine, not exceptional. The check set, per shipped card:
   - `design-system/` stories/MDX reflect the shipped surface where they reference it;
   - harness docs (`docs/product-and-service/*`, conventions, skill references) don't describe pre-ship behavior as current;
@@ -2529,11 +2510,10 @@ Linear and gated; the order is load-bearing.
 3. **Rails propagation.** Update both sources of truth — `uno-storybook` (design system) and `uno-blueprint` (product) — **before** review and publish, so the next project grounds on what this one shipped. Gate rules (docs/plans/2026-07-07-001-harness-six-skill-revision-plan.md § Q9):
    - The **storybook half** is a direct in-repo write by this skill, pre-authorized only inside an active, designer-confirmed handoff — the rail decision is the authorization.
    - The **blueprint half always routes through `skills/uno-maintain`** (this skill holds no blueprint write access), citing the confirmed handoff as pre-authorization — maintain's handoff-pre-authorized path applies (its method §6). Paired-write rules: `docs/connectors/supabase/overview.md`.
-   - Every propagation gets an apply-log row.
    - Rails writes with **no** live handoff are ordinary maintain intakes — full human gate, no pre-authorization.
 4. **Review gate — DS / UNO / a11y.** Run through `skills/uno-review`: design-system compliance, harness consistency (the spec agrees with what step 3 just wrote), accessibility. Review diagnoses; fixes go back through prototyping — they don't happen here.
 5. **Sign-off — the human gate.** The developer, the PM, and the stakeholder each ✅ in the handoff thread (reviewer-verdict convention: `docs/connectors/slack.md`). **No sign-off, no publish.** Two of three is not enough, and nobody proxies a missing one.
-6. **Marketplace entry.** First verify step 3 **landed** — storybook committed, blueprint update applied (or its maintain intake shows applied in the apply log); propagation in flight blocks registration. Then register the finished package in the notion-marketplace DB (live; schema + publish procedure: `skills/uno-publish/references/notion-marketplace-db.md`, conventions: `docs/connectors/notion.md`). The entry is schema-validated before it lands — all required fields present, enums exact-match. Registration runs in-IDE via `writers/notion`; the Worker only searches the catalog.
+6. **Marketplace entry.** First verify step 3 **landed** — storybook committed, blueprint update applied (or its maintain intake's thread shows it applied); propagation in flight blocks registration. Then register the finished package in the notion-marketplace DB (live; schema + publish procedure: `skills/uno-publish/references/notion-marketplace-db.md`, conventions: `docs/connectors/notion.md`). The entry is schema-validated before it lands — all required fields present, enums exact-match. Registration runs in-IDE via `writers/notion`; the Worker only searches the catalog.
 
 ## Boundaries
 
@@ -2708,13 +2688,13 @@ Every finding carries **severity · lens · evidence (what's in the artifact) ·
 
 - **Stage-lens:** `Issues? = Yes` **only when at least one finding is major or above.** Yes → re-enter `uno-prototype` at the reflection (`reflect_learn`) — a failed review can invalidate the approach, not just the artifact; each finding's re-entry point says which (re-choose fidelity vs. content fix). No → "Ready to share?" stays the designer's call; review passing is necessary, not sufficient.
 - **Handoff gate:** any major+ finding holds the publish; clean or minors-only → proceed to dev / PM / stakeholder sign-off.
-- **Design QA:** findings go to dev as annotated issues *before* `Ready for Prod`; blockers hold it. The run is logged for the drift-catch metric.
+- **Design QA:** findings go to dev as annotated issues *before* `Ready for Prod`; blockers hold it.
 - Verdicts and sign-offs posted in Slack follow `docs/connectors/slack.md` (channels + the two gates — never conflate them).
 - Pushback on a finding → re-read the cited doc; concede or stand by it with reasoning. Never dig in on thin evidence.
 
 ## Quality bar
 
-`reviewers/rubric-applier` scores each run against `docs/evals/rubrics/uno-review.md` and appends it to the eval log: recall ≥80% and precision ≥80% on the golden defect set, 0 out-of-lens findings, diagnose-only hard gate. Design QA target: ≥80% of spec-vs-implementation drift caught at Ready-for-QA rather than post-ship.
+`reviewers/rubric-applier` scores each run against `docs/evals/rubrics/uno-review.md`: recall ≥80% and precision ≥80% on the golden defect set, 0 out-of-lens findings, diagnose-only hard gate. Design QA target: ≥80% of spec-vs-implementation drift caught at Ready-for-QA rather than post-ship.
 
 
 

@@ -97,7 +97,7 @@
 /** @type {RatchetShape[]} */
 export const SHAPES = [
   {
-    file: 'docs/evals/a11y-baseline.json',
+    file: 'scripts/baselines/a11y-baseline.json',
     check: 'check:storybook',
     command: 'npm run check:storybook -- --update',
     prose: 'measured',
@@ -110,7 +110,7 @@ export const SHAPES = [
     ],
   },
   {
-    file: 'docs/evals/atlassian-benchmark.json',
+    file: 'scripts/baselines/atlassian-benchmark.json',
     check: 'check:atlassian-benchmark',
     command: 'npm run benchmark:atlassian -- --update',
     prose: 'note',
@@ -128,7 +128,7 @@ export const SHAPES = [
     ],
   },
   {
-    file: 'docs/evals/button-contrast-baseline.json',
+    file: 'scripts/baselines/button-contrast-baseline.json',
     check: 'check:button-contrast',
     command: null,
     prose: 'why',
@@ -138,7 +138,7 @@ export const SHAPES = [
     ],
   },
   {
-    file: 'docs/evals/colour-fallback-baseline.json',
+    file: 'scripts/baselines/colour-fallback-baseline.json',
     check: 'check:colour-fallbacks',
     command: 'npm run check:colour-fallbacks -- --update',
     prose: 'why',
@@ -148,7 +148,7 @@ export const SHAPES = [
     ],
   },
   {
-    file: 'docs/evals/focus-ring.json',
+    file: 'scripts/baselines/focus-ring.json',
     check: 'check:focus-ring',
     command: null,
     prose: 'note',
@@ -157,7 +157,7 @@ export const SHAPES = [
     sets: [{ name: 'exceptions', at: 'exceptions', form: 'reasons', reason: { is: 'value' } }],
   },
   {
-    file: 'docs/evals/glossary-baseline.json',
+    file: 'scripts/baselines/glossary-baseline.json',
     check: 'check:glossary',
     command: 'node scripts/check-glossary.mjs --update',
     prose: 'note',
@@ -165,14 +165,14 @@ export const SHAPES = [
     sets: [{ name: 'proseLines', at: '', form: 'scalar', fields: ['proseLines'] }],
   },
   {
-    file: 'docs/evals/icon-button-name.json',
+    file: 'scripts/baselines/icon-button-name.json',
     check: 'check:icon-button-name',
     command: null,
     prose: 'note',
     sets: [{ name: 'exceptions', at: 'exceptions', form: 'reasons', reason: { is: 'value' } }],
   },
   {
-    file: 'docs/evals/intent-role-adoption.json',
+    file: 'scripts/baselines/intent-role-adoption.json',
     check: 'check:intent-roles',
     command: null,
     prose: 'note',
@@ -191,7 +191,7 @@ export const SHAPES = [
     ],
   },
   {
-    file: 'docs/evals/negation-baseline.json',
+    file: 'scripts/baselines/negation-baseline.json',
     check: 'check:negation',
     command: 'node scripts/check-negation-ratchet.mjs --update',
     prose: 'metric.note',
@@ -209,14 +209,14 @@ export const SHAPES = [
     ],
   },
   {
-    file: 'docs/evals/size-fallback-baseline.json',
+    file: 'scripts/baselines/size-fallback-baseline.json',
     check: 'check:size-fallbacks',
     command: 'npm run check:size-fallbacks -- --update',
     prose: 'why',
     sets: [{ name: 'disagreements', at: 'disagreements', form: 'keys' }],
   },
   {
-    file: 'docs/evals/text-contrast-baseline.json',
+    file: 'scripts/baselines/text-contrast-baseline.json',
     check: 'check:text-contrast',
     command: 'npm run check:text-contrast -- --update',
     prose: 'measured',
@@ -225,7 +225,7 @@ export const SHAPES = [
     ],
   },
   {
-    file: 'docs/evals/undefined-token-baseline.json',
+    file: 'scripts/baselines/undefined-token-baseline.json',
     check: 'check:undefined-tokens',
     command: 'npm run check:undefined-tokens -- --update',
     prose: 'note',

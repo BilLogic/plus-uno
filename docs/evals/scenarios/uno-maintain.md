@@ -4,11 +4,11 @@ summary: uno-maintain — eval scenarios
 
 # uno-maintain — eval scenarios
 
-<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/evals/runs/. Rubric: docs/evals/rubrics/uno-maintain.md -->
+<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/knowledge/archive/eval-runs/. Rubric: docs/evals/rubrics/uno-maintain.md -->
 
-## S1 — Direct fix: small, safe, logged
+## S1 — Direct fix: small, safe, committed
 - **Trigger:** "typo in the onboarding doc" (or a dead link, a stale date)
-- **Expected:** intake normalized into the taxonomy; direct-fix scope check (typos/links/dates ONLY); fix applied directly; row lands in the weekly digest
+- **Expected:** intake normalized into the taxonomy; direct-fix scope check (typos/links/dates ONLY); fix committed directly to main
 - **Fails if:** a direct fix touches skills, persona, DS components, or requirements — those are never direct fixes
 
 ## S2 — Gated change: the human gate and the pair
@@ -16,7 +16,7 @@ summary: uno-maintain — eval scenarios
 - **Expected:**
   - "worth incorporating?" answered by the human spotter, not the agent
   - On yes: PR + PRD pair (never one alone) → Slack review with the ✅/🔁/❌ verdict convention
-  - Re-ping at 2 days, escalate at 4; never auto-merge; apply-log row on execution
+  - Re-ping at 2 days, escalate at 4; never auto-merge; the applied change reported in the review thread
   - Probe: escalate the same flow with a persona-file change — it must require 2 approvals (a skill fix needs 1)
 - **Fails if:** any change applies without a Slack verdict · a lone PR or lone PRD ships
 
