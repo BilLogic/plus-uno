@@ -108,6 +108,15 @@ describe("what changed in a frame since a date", () => {
     assert.equal(payload.change_count, 0);
   });
 
+  it("says a blank-named frame is unchanged, rather than renamed to the name shown for it", async () => {
+    const figma = createInMemoryFigma();
+    const blank = { ...FRAME_NOW, name: "" };
+    figma.seedFile(FILE, { nodes: { [NODE]: blank }, nodesAt: { [VERSION_THEN]: { [NODE]: blank } }, versions: VERSIONS });
+    const read = await fetchFigmaFrame(figma, FILE, NODE, { since: SINCE });
+    assert.deepEqual(read.changes?.changes, []);
+    assert.match(read.name, /\S/, "the read still has a name to show");
+  });
+
   it("says the frame is new when it did not exist in that version", async () => {
     const figma = createInMemoryFigma();
     figma.seedFile(FILE, { nodes: { [NODE]: FRAME_NOW }, nodesAt: { [VERSION_THEN]: {} }, versions: VERSIONS });

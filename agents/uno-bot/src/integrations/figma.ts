@@ -54,7 +54,8 @@ export async function fetchFigmaNode(
   nodeId: string,
 ): Promise<FigmaNodeContent> {
   if (!figma) throw new Error("FIGMA_ACCESS_TOKEN not configured on the Worker");
-  return contentOf(await readFrameDoc(figma, fileKey, nodeId));
+  const { doc, shown } = await readFrameDoc(figma, fileKey, nodeId);
+  return contentOf(doc, shown);
 }
 
 /**
@@ -89,8 +90,10 @@ export async function fetchFigmaFrame(
 ): Promise<FigmaFrameRead> {
   if (!figma) throw new Error("FIGMA_ACCESS_TOKEN not configured on the Worker");
 
-  const doc = await readFrameDoc(figma, fileKey, nodeId);
-  let frame: FigmaFrameRead = { ...contentOf(doc), annotations: collectAnnotations(doc), fills: collectFills(doc) };
+  const { doc, shown } = await readFrameDoc(figma, fileKey, nodeId);
+  // The name shown labels what the read lists; the diff below takes `doc` as Figma holds it.
+  const named = { ...doc, name: shown };
+  let frame: FigmaFrameRead = { ...contentOf(doc, shown), annotations: collectAnnotations(named), fills: collectFills(named) };
 
   if (opts.comments !== false) {
     const read = await figma
@@ -104,7 +107,7 @@ export async function fetchFigmaFrame(
       frame = { ...frame, commentsUnread: read.error };
     } else {
       // The id the link named is the frame's, whether or not the node echoes it.
-      frame = { ...frame, comments: pinnedThreads({ ...doc, id: doc.id ?? nodeId }, read.list) };
+      frame = { ...frame, comments: pinnedThreads({ ...named, id: doc.id ?? nodeId }, read.list) };
     }
   }
 
@@ -185,18 +188,20 @@ function messageOf(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
 
-/** The frame's node, or a throw the caller reports as "couldn't read it". */
-async function readFrameDoc(figma: Pick<FigmaClient, "nodes">, fileKey: string, nodeId: string): Promise<FigmaNode> {
+/** The frame's node as Figma holds it, and the name to show for it — a blank
+ *  name falls back to the file's — or a throw the caller reports as "couldn't
+ *  read it". A diff compares the node, never the name shown. */
+async function readFrameDoc(figma: Pick<FigmaClient, "nodes">, fileKey: string, nodeId: string): Promise<{ doc: FigmaNode; shown: string }> {
   const data = await figma.nodes(fileKey, [nodeId], { timeoutMs: NODE_FETCH_TIMEOUT_MS });
   const doc = data.nodes?.[nodeId]?.document;
   if (!doc) throw new Error(`Figma node ${nodeId} not found in file ${fileKey}`);
-  return { ...doc, name: doc.name?.trim() || data.name?.trim() || "Figma frame" };
+  return { doc, shown: doc.name?.trim() || data.name?.trim() || "Figma frame" };
 }
 
 /** A node's name, type and text layers. */
-function contentOf(doc: FigmaNode): FigmaNodeContent {
+function contentOf(doc: FigmaNode, name: string): FigmaNodeContent {
   const { texts, truncated } = collectTextLayers(doc);
-  return { name: doc.name ?? "(unnamed)", type: doc.type ?? "NODE", texts, truncated };
+  return { name, type: doc.type ?? "NODE", texts, truncated };
 }
 
 export { parseFigmaUrl, type FigmaUrlParts } from "./figma-reading";
