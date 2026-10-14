@@ -1,9 +1,7 @@
 // Read from the GitHub repos on the Worker's repo list via the contents API
 // (for github_read): fetch a file's decoded text, or list a directory's
 // entries. GITHUB_TOKEN is already on the Worker for repository_dispatch; this
-// reuses it read-only. Fail-loud (throws) so the tool can report honestly —
-// unlike ds-components.ts, which fails-open because it's a preflight guard,
-// not a user-facing read.
+// reuses it read-only. Fail-loud (throws) so the tool can report honestly.
 //
 // EVERY CALL HERE TAKES A RESOLVED REPO — a `RepoEntry` off the list, never a
 // string the model wrote. `resolveRepoFor` is the one way to get one: it reads

@@ -154,7 +154,7 @@
   },
   {
     "name": "github_read",
-    "description": "Read-only, ungated. Read a GitHub repo on the bot's repo list by repo-relative path: a file's contents (DS agent-views, rule docs, AGENTS.md, a component's source, token values under design-system/src/tokens/) or a directory listing (a directory path returns its entries). Use it for any DS component / token / prop / rule-doc fact, to confirm a component exists under design-system/src/components before proposing component_implement, and to ground a review in the actual rule docs. `search` finds where something lives when the path is unknown. `repo` picks the repo; omitted, it is plus-uno. For a GitHub URL a designer pasted, source_read reads it directly.",
+    "description": "Read-only, ungated. Read a GitHub repo on the bot's repo list by repo-relative path: a file's contents (DS agent-views, rule docs, AGENTS.md, a component's source, token values under design-system/src/tokens/) or a directory listing (a directory path returns its entries). Use it for any DS component / token / prop / rule-doc fact, to confirm a component exists under design-system/src/components, and to ground a review in the actual rule docs. `search` finds where something lives when the path is unknown. `repo` picks the repo; omitted, it is plus-uno. For a GitHub URL a designer pasted, source_read reads it directly.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -460,7 +460,7 @@
         },
         "acceptance_criteria": {
           "type": "array",
-          "description": "For 'prd'/'prd' (component PRDs included): checklist rendered as Notion to-do checkboxes (read downstream by component_implement / prototype_scaffold). Inline Markdown renders: **bold**, `code`, [label](url).",
+          "description": "For 'prd'/'prd' (component PRDs included): checklist rendered as Notion to-do checkboxes. Inline Markdown renders: **bold**, `code`, [label](url).",
           "items": {
             "type": "string"
           }
@@ -575,60 +575,6 @@
     }
   },
   {
-    "name": "component_implement",
-    "description": "SIDE EFFECT, routed through the confirmation gate. Open a draft PR that implements a named design-system component change, by triggering the figma-implement GitHub Action. Use it when the designer names a specific DS-library component with clear build/update intent ('implement Badge', 'go ahead with the Badge change') — the ask names a component, so the call carries a component name, a PRD and optional notes. Two prerequisites, checked before staging: the component exists under design-system/src/components (github_read confirms it), and a Notion PRD is in hand — if the thread's root links one the Worker reads it from there, otherwise ask for the PRD link and pass it as notion_prd_url. A Figma library publish is not this tool's ask: uno-bot posts its own card for that in #plus-universal. With either missing, say which and stage nothing. 'Check / look at / compare' a component is a question, answered in words.",
-    "input_schema": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "component"
-      ],
-      "properties": {
-        "component": {
-          "type": "string",
-          "description": "The component name as it appears in the Figma library, exact casing (e.g. 'Badge', 'Button', 'CardSurface')."
-        },
-        "notion_prd_url": {
-          "type": "string",
-          "description": "The Notion PRD link for this change. Read automatically when the thread's root links a PRD — only set this when the designer pastes a PRD link themselves."
-        },
-        "notes": {
-          "type": "string",
-          "description": "Optional free-form implementation notes from the designer. Pass through verbatim if present; omit otherwise."
-        }
-      }
-    }
-  },
-  {
-    "name": "prototype_scaffold",
-    "description": "SIDE EFFECT, routed through the confirmation gate. Scaffold a NEW prototype under prototypes/{slug}/ from a Figma design (page, screen or flow), by triggering the figma-implement-design GitHub Action to open a draft PR. Use it when the designer pastes a Figma URL and asks to build or prototype it ('build this <figma.com/…>', 'scaffold a prototype for this frame'); the URL must carry a node-id. A PRD is required at every fidelity (method §0): a Notion PRD URL goes in notion_prd_url; an inline PRD pasted this turn satisfies the gate with the parameter omitted. With no PRD, say one is required and route to uno-synthesize. Confirm fidelity first ('hi-fi via the DS library, or a quick mid-fi draft?'), and name what the brief leaves open (an unspecified state, a filter whose semantics could go two ways) either as a question or in the preview bullets so the ✅ is informed.",
-    "input_schema": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "figma_url"
-      ],
-      "properties": {
-        "figma_url": {
-          "type": "string",
-          "description": "Full Figma URL the designer pasted, e.g. 'https://www.figma.com/design/NUcRDZUzUiuVmx1ydNXpl3/APPLICATION-PROTOTYPES?node-id=158-21725'. Must contain a node-id query param."
-        },
-        "notion_prd_url": {
-          "type": "string",
-          "description": "Optional. Full notion.so URL of a PRD for this prototype, if the designer has one. Never invent it; omit if they choose to skip."
-        },
-        "slug": {
-          "type": "string",
-          "description": "Optional kebab-case folder name for prototypes/{slug}/. Must match ^[a-z0-9][a-z0-9-]{1,40}$. If omitted, derived from the Figma node name."
-        },
-        "notes": {
-          "type": "string",
-          "description": "Optional free-form implementation notes from the designer. Pass through verbatim."
-        }
-      }
-    }
-  },
-  {
     "name": "shareout_post",
     "description": "SIDE EFFECT (it pings people), routed through the confirmation gate. Share a prototype, design or PRD with the team FOR FEEDBACK — the 'publish' / 'share out' / 'post for feedback' / 'surface this for review' action. Posts the share-out to #plus-design-feedback in the team's documented shape (docs/connectors/slack.md § Share-out post): project + artifact + fidelity + round, what it is, what changed, up to three specific questions, what is out of scope, the link, and @-mentioned reviewers. Stage IMMEDIATELY with whatever links are in hand: the confirmation card itself flags anything missing from the bundle (Loom / live preview / Decisions link) and the user's ✅ is informed consent to post without them (policy 2026-07-16).",
     "input_schema": {
@@ -693,44 +639,6 @@
         "deadline": {
           "type": "string",
           "description": "Optional human-readable feedback deadline, e.g. 'EOD Friday'."
-        }
-      }
-    }
-  },
-  {
-    "name": "email_send",
-    "description": "SIDE EFFECT (sends a real email), routed through the confirmation gate. Send an email via Gmail on the design team's behalf. Use it to reach someone outside Slack: an external SME or collaborator, a stakeholder who wants a PRD or prototype summary by mail, or a follow-up the designer explicitly asks to send by email. Anything that can stay in Slack stays in Slack. Draft the email conversationally first (recipient, subject, body) and let the designer refine it; invoke once they approve. Recipient addresses come from the designer — ask when unknown.",
-    "input_schema": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "to",
-        "subject",
-        "body"
-      ],
-      "properties": {
-        "to": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "minItems": 1,
-          "description": "Recipient email address(es). Never invent — use addresses the designer provided."
-        },
-        "cc": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Optional CC email address(es)."
-        },
-        "subject": {
-          "type": "string",
-          "description": "Email subject line."
-        },
-        "body": {
-          "type": "string",
-          "description": "Email body, written in standard Markdown — the same dialect as everywhere else. The Worker sends it as both plain text and HTML, so **bold**, _italic_, `code`, - bullets, 1. numbered, [label](url) links, > quotes, ```fenced code``` and --- dividers all render. Write it out fully — no placeholders. This is outward mail to someone outside the team: greeting, the point up front, and a sign-off."
         }
       }
     }
@@ -843,7 +751,7 @@
   },
   {
     "name": "github_workflow_run",
-    "description": "SIDE EFFECT (starts a real GitHub Actions run), routed through the confirmation gate. Run a workflow the bot's repo list allows on a listed repo — 're-sync Notion on the marketing site' (sync-notion.yml on plus-marketing-website), 'run the render walk on the blueprint' (render-walk.yml on plus-uno-blueprint). Only a workflow named for that repo on the list can run; anything else is refused before a card, and the refusal names the allowed ones. Never a stand-in for component_implement or prototype_scaffold. It always runs on the repo's default branch and takes no inputs. The card shows the repo, the workflow and that branch; past the ✅ the thread gets the workflow's runs page.",
+    "description": "SIDE EFFECT (starts a real GitHub Actions run), routed through the confirmation gate. Run a workflow the bot's repo list allows on a listed repo — 're-sync Notion on the marketing site' (sync-notion.yml on plus-marketing-website), 'run the render walk on the blueprint' (render-walk.yml on plus-uno-blueprint). Only a workflow named for that repo on the list can run; anything else is refused before a card, and the refusal names the allowed ones. It always runs on the repo's default branch and takes no inputs. The card shows the repo, the workflow and that branch; past the ✅ the thread gets the workflow's runs page.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

@@ -7,17 +7,13 @@
 // gating never depends on Claude remembering to ask. When everything needed is
 // present, return null and the proposal proceeds (act when sufficient).
 //
-// This generalizes the original `implement`-only PRD check.
-//
 // The one seam beside the tool table that keeps a switch on tool names, and it
-// keeps it on purpose (#598): each arm is a SUBSTANCE check — does this
-// component exist in the library, does this PRD resolve, is that a real email
-// address — not a restatement of which tools are gated, which is the table's
+// keeps it on purpose (#598): each arm is a SUBSTANCE check — is this PRD
+// filled in, is that recipient resolved — not a restatement of which tools are gated, which is the table's
 // `access` column. A tool with no arm here is a tool with nothing to check,
 // which `default` already says, so a new row needs no edit in this file.
 
 import type { Env } from "../types";
-import { listDsComponents, matchComponent, closestComponents } from "../integrations/ds-components";
 // Placeholder detection lives next door, import-free, so the loop and a plain
 // Node test can both reach it without dragging `Env` behind them.
 import { placeholderRefusal } from "./placeholder";
@@ -28,10 +24,6 @@ import { checkWorkflowRun } from "../tools/github-workflow-render";
 
 export interface PreflightCtx {
   env: Env;
-  /** Notion PRD resolved from the thread root, if any. */
-  prd: { id?: string; url?: string } | null;
-  /** For `implement`: the PRD url resolved from the thread or pasted by the designer. */
-  implementPrdUrl?: string;
 }
 
 export interface PreflightAsk {
@@ -46,56 +38,12 @@ export interface PreflightAsk {
 // (slack/proposal-render.ts, the share-out bundle audit) reach for it here.
 export { collectStrings } from "./tool-input";
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export async function preflight(
   toolName: string,
   input: Record<string, unknown>,
   ctx: PreflightCtx,
 ): Promise<PreflightAsk | null> {
   switch (toolName) {
-    case "component_implement": {
-      // The component must actually exist in the DS library — R2 staged confirm
-      // cards for invented names ("Surface", "SpacingToken"). Fail-open when the
-      // list can't be fetched: this is a guard, not a wall.
-      const component = typeof input.component === "string" ? input.component.trim() : "";
-      const known = await listDsComponents(ctx.env);
-      if (component && known && !matchComponent(component, known)) {
-        const near = closestComponents(component, known);
-        return {
-          ask:
-            `I don't find a *${component}* component in the design-system library` +
-            (near.length ? ` — closest matches: ${near.map((n) => `\`${n}\``).join(", ")}.` : ".") +
-            "\nWhich component did you mean? (If this is genuinely new, it needs a PRD + review first — I won't scaffold a library component from scratch.)",
-        };
-      }
-
-      // A component implement MUST be tied to a Notion PRD (thread root or pasted).
-      if (!ctx.prd?.id && !ctx.implementPrdUrl) {
-        return {
-          ask:
-            "Before I implement a component I need its *Notion PRD*.\n" +
-            "• Ask from a thread whose first message links the PRD, or\n" +
-            "• paste the PRD link here and I'll use it.\n\n" +
-            "I won't implement a component without a PRD.",
-        };
-      }
-      return null;
-    }
-
-    case "prototype_scaffold": {
-      // Need a Figma frame with a specific node selected, else the scaffold has nothing to build.
-      const figmaUrl = typeof input.figma_url === "string" ? input.figma_url.trim() : "";
-      if (!figmaUrl || !/node-id=/.test(figmaUrl)) {
-        return {
-          ask:
-            "To scaffold a prototype I need a *Figma link with a specific frame selected* — the URL should contain a `node-id`.\n" +
-            "Paste that frame link and I'll build straight from it.",
-        };
-      }
-      return null;
-    }
-
     case "notion_create": {
       // Only PRD-shaped surfaces need the substance check — an intake or a
       // decision can legitimately be short.
@@ -154,36 +102,6 @@ export async function preflight(
           ask:
             "That PRD is very large for a Slack-filed card — thread drafts are for alignment; the full document of record is edited in Notion or the IDE. " +
             "Two options: I trim it to the essentials, file that card, and hand you a ready-to-paste IDE prompt for `skills/uno-synthesize` to expand it there — or we tighten it together first. Which do you want?",
-        };
-      }
-      return null;
-    }
-
-    case "email_send": {
-      // Sanity only — never invent addresses, never send a stub body.
-      const rawRecipients = [
-        ...(typeof input.to === "string" ? [input.to] : Array.isArray(input.to) ? input.to : []),
-        ...(typeof input.cc === "string" ? [input.cc] : Array.isArray(input.cc) ? input.cc : []),
-      ];
-      const bad = rawRecipients.filter(
-        (r) => typeof r !== "string" || !EMAIL_RE.test(r.trim()),
-      );
-      if (rawRecipients.length === 0 || bad.length > 0) {
-        const badList = bad
-          .filter((r): r is string => typeof r === "string")
-          .map((r) => `\`${r}\``)
-          .join(", ");
-        return {
-          ask:
-            `I can't send that yet — ${rawRecipients.length === 0 ? "there's no recipient" : `these recipients don't look like real email addresses: ${badList || "(non-string values)"}`}. ` +
-            "Give me the exact address(es) to send to — I never guess or invent one.",
-        };
-      }
-      const body = typeof input.body === "string" ? input.body.trim() : "";
-      if (body.length < 40) {
-        return {
-          ask:
-            "That email body is too thin to send. Write out (or dictate) the full message — a couple of real sentences minimum — and I'll stage it.",
         };
       }
       return null;

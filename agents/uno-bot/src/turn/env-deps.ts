@@ -34,7 +34,6 @@ import { buildNotionBefore, buildNotionRevision, buildNotionTarget } from "../sl
 import { renderDeliveredBody } from "../slack/render";
 import { standingConfirmersOf } from "../slack/standing-confirmers";
 import { recordSweepRestageFor } from "../sweep/env";
-import { fetchFigmaImagePngUrl, parseFigmaUrl, type FigmaRenderOptions } from "../integrations/figma";
 import { figmaClientFor } from "../figma/production";
 import { githubRepoVisibility, githubWorkflowClient, resolveRepoFor } from "../integrations/github";
 import type { PendingProposal, ThreadState } from "../thread-state/index";
@@ -196,12 +195,8 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     // `MODEL_PROVIDER` is `selectProvider`'s to read, not the judge's.
     reviewDraft: (args) => reviewDraft(selectProvider(env), args),
 
-    async preflight(toolName, input, ctx) {
-      const ask = await preflight(toolName, input, {
-        env,
-        prd: ctx.prd,
-        ...(ctx.implementPrdUrl ? { implementPrdUrl: ctx.implementPrdUrl } : {}),
-      });
+    async preflight(toolName, input) {
+      const ask = await preflight(toolName, input, { env });
       reporters.onGateAsk?.(ask?.ask ?? null);
       return ask;
     },
@@ -266,22 +261,6 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
 }
 
 /**
- * A card's Figma preview where a turn builds it: the AgentRunner's alarm,
- * which has no 30 s cap, so a first 429 is waited out (up to the client's
- * 60 s) like the frame read's, rather than read as "no preview" (#892).
- */
-const PREVIEW_IN_RUNNER: FigmaRenderOptions = { attempts: 2 };
-
-/**
- * The same preview rebuilt by the button door's `restage`, which runs inside
- * `waitUntil`'s 30 s (`slack/interactive.ts`): one retry, and at most 5 s of
- * waiting for the rate budget. At worst two 8 s attempts and a 1 s backoff,
- * so the re-staged card and its ✅ still post in time; a longer Retry-After
- * posts the card without its preview.
- */
-export const PREVIEW_UNDER_WAIT_UNTIL: FigmaRenderOptions = { maxWaitMs: 5_000, attempts: 2 };
-
-/**
  * The reads a card needs and Turn may not make itself, bound to `Env`. Each
  * answers with a STRUCTURE the turn puts on the card; the words are the Slack
  * adapter's (#623).
@@ -290,23 +269,11 @@ export const PREVIEW_UNDER_WAIT_UNTIL: FigmaRenderOptions = { maxWaitMs: 5_000, 
  * reaction and button doors re-stage what a cut-off run never finished
  * (`restageFor`), and that card is read the way a turn's is.
  */
-export function cardReadsFor(env: Env, preview: FigmaRenderOptions = PREVIEW_IN_RUNNER): TurnDeps["cards"] {
+export function cardReadsFor(env: Env): TurnDeps["cards"] {
   return {
     notionRevision: (input) => buildNotionRevision(env, input),
     notionBefore: (input, opts) => buildNotionBefore(env, input, opts),
     notionTarget: (input) => buildNotionTarget(env, input),
-    // The Figma render behind a `prototype_scaffold` card. Best-effort by
-    // contract: no url, an unparseable one or a failed render all mean no
-    // preview, and the card posts as every other card does. It used to build
-    // the whole card — text, image block, footer and buttons — in
-    // `slack/proposal-figma.ts`, which is a module this one line replaced.
-    // How long the render may wait for the Figma rate budget is the caller's
-    // (`preview`): it depends on where the card is built.
-    async designPreviewImage(input) {
-      const figmaUrl = typeof input.figma_url === "string" ? input.figma_url : "";
-      const parts = figmaUrl ? parseFigmaUrl(figmaUrl) : null;
-      return parts ? await fetchFigmaImagePngUrl(figmaClientFor(env), parts.fileKey, parts.nodeId, preview) : null;
-    },
     // The repo a GitHub intake lands in, resolved from its `repo` input as
     // the executor resolves it, and whether that repo is public — asked of
     // GitHub once per isolate. Preflight has already turned every refusal —
@@ -341,9 +308,8 @@ export function cardReadsFor(env: Env, preview: FigmaRenderOptions = PREVIEW_IN_
 export function restageFor(
   env: Env,
   threadState: ThreadState,
-  preview: FigmaRenderOptions = PREVIEW_IN_RUNNER,
 ): (restage: GateRestage, delivery: Delivery) => Promise<void> {
-  const cards = cardReadsFor(env, preview);
+  const cards = cardReadsFor(env);
   const proposalEvents = proposalEventLogFor(env);
   return async (restage, delivery) => {
     await restageExecution(restage, {

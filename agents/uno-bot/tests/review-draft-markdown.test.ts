@@ -115,11 +115,6 @@ describe("text the pop-up previews as it is sent", () => {
   const sectionsOf = (blocks: unknown[] | null) =>
     (blocks as Block[]).filter((b) => b.type === "section").map((b) => b.text!.text);
 
-  it("an email body", () => {
-    const blocks = readableDraft([{ toolName: "email_send", input: { to: "a@example.com", subject: "Hi", body: SENT_AS_WRITTEN } }]);
-    assert.deepEqual(sectionsOf(blocks).slice(1), plain(SENT_AS_WRITTEN));
-  });
-
   it("a relayed DM", () => {
     const blocks = readableDraft([{ toolName: "dm_relay", input: { recipient: "U0123456789", text: SENT_AS_WRITTEN } }]);
     assert.deepEqual(sectionsOf(blocks).slice(1), plain(SENT_AS_WRITTEN));

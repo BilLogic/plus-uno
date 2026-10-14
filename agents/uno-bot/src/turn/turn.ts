@@ -499,7 +499,6 @@ export interface TurnDeps {
   preflight(
     toolName: string,
     input: Record<string, unknown>,
-    ctx: { prd: { id?: string; url?: string } | null; implementPrdUrl?: string },
   ): Promise<{ ask: string } | null>;
 
   /**
@@ -539,9 +538,6 @@ export interface TurnDeps {
     ): Promise<{ before: Record<string, string>; read: boolean }>;
     /** The `notion_archive` target: page title and parent database. */
     notionTarget(input: Record<string, unknown>): Promise<CardTarget | undefined>;
-    /** A render of the Figma node a `prototype_scaffold` implements, or null
-     *  where there is no node or the render failed. Best-effort by contract. */
-    designPreviewImage(input: Record<string, unknown>): Promise<string | null>;
     /** The listed repo a `github_issue_create` files into (or a
      *  `github_issue_update` writes to), resolved from its
      *  `repo` input as the executor will resolve it, and that repo's
@@ -1261,13 +1257,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   const preflightCall = (
     toolName: string,
     input: Record<string, unknown>,
-  ): Promise<{ ask: string } | null> => {
-    const prdUrl = implementPrdUrlFor(toolName, input, prd);
-    return deps.preflight(toolName, input, {
-      prd,
-      ...(prdUrl ? { implementPrdUrl: prdUrl } : {}),
-    });
-  };
+  ): Promise<{ ask: string } | null> => deps.preflight(toolName, input);
 
   const reviseLookupResult = (name: string, args: Record<string, unknown>, text: string): string =>
     presenting.revise(name, args, text);
@@ -1585,12 +1575,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     );
   await recordSuperseded(retiredAhead);
 
-  const built = await buildCard(
-    result,
-    deps,
-    implementPrdUrlFor(result.toolName, result.input, prd),
-    request.surface === "assistant",
-  );
+  const built = await buildCard(result, deps, request.surface === "assistant");
   // A revision of a sweep card is still one, so replies under it are read by
   // the sweep's rule.
   // A report's fix is redrawn in its report instead.
@@ -1842,7 +1827,6 @@ async function dropFromSweepCard(
     await buildCard(
       { kind: "proposal", operations, toolName: first.toolName, input: first.input },
       deps,
-      undefined,
       request.surface === "assistant",
     ),
   );
@@ -2008,10 +1992,6 @@ export async function restageExecution(
       : await buildCard(
           { kind: "proposal", operations: restage.operations, toolName: first.toolName, input: first.input },
           deps,
-          implementPrdUrlFor(first.toolName, first.input, {
-            ...(original.notionPrdId ? { id: original.notionPrdId } : {}),
-            ...(original.notionPrdUrl ? { url: original.notionPrdUrl } : {}),
-          }),
           // The card's DM caveats follow the surface, and a DM channel is the one
           // the proposal record can still name.
           original.channel.startsWith("D"),
@@ -2378,24 +2358,6 @@ function threadMemory(
   return memory;
 }
 
-/**
- * The PRD url an `implement` runs against: the thread-root notification, or the
- * link the designer pasted into the call.
- *
- * Read twice — by the clarify gate and by the card preview — and derived rather
- * than held, so the mid-turn check and the staged card cannot disagree about
- * which PRD this is.
- */
-function implementPrdUrlFor(
-  toolName: string,
-  input: Record<string, unknown>,
-  prd: { id?: string; url?: string } | null,
-): string | undefined {
-  if (toolName !== "component_implement") return undefined;
-  const pasted = typeof input.notion_prd_url === "string" ? input.notion_prd_url.trim() : "";
-  return prd?.url ?? (pasted || undefined);
-}
-
 // ── Cards ────────────────────────────────────────────────────────────────────
 
 /**
@@ -2418,10 +2380,9 @@ function implementPrdUrlFor(
 async function buildCard(
   result: Extract<AgentResult, { kind: "proposal" }>,
   deps: Pick<TurnDeps, "cards">,
-  implementPrdUrl: string | undefined,
   fromDm: boolean,
 ): Promise<ProposalCard> {
-  const card = await cardOf(result, deps, implementPrdUrl, fromDm);
+  const card = await cardOf(result, deps, fromDm);
   // Who wrote the opening line, for the eval envelope: the model when its own
   // reply leads, the Worker for everything else — its ask, its PRD line, or a
   // lead that is only its "I could not stage …" note.
@@ -2433,7 +2394,6 @@ async function buildCard(
 async function cardOf(
   result: Extract<AgentResult, { kind: "proposal" }>,
   deps: Pick<TurnDeps, "cards">,
-  implementPrdUrl: string | undefined,
   fromDm: boolean,
 ): Promise<ProposalCard> {
   const { toolName, input, operations } = result;
@@ -2508,18 +2468,6 @@ async function cardOf(
       : card;
   }
 
-  if (toolName === "prototype_scaffold") {
-    // The Figma render, when one can be fetched — a URL on the card, not a
-    // block: what Slack does with an image is the adapter's.
-    const previewImageUrl = await deps.cards.designPreviewImage(input);
-    return previewImageUrl ? { ...card, previewImageUrl } : card;
-  }
-  if (toolName === "component_implement") {
-    // Show which PRD this implement is tied to, so the requester can see it.
-    return implementPrdUrl
-      ? { ...card, lead: `Using the PRD for this change: ${implementPrdUrl}` }
-      : card;
-  }
   if (toolName === "notion_update") {
     // The conversational card: the diff leads, and there is no ⚠️ preamble —
     // the lead, the named page and the `current → new` lines speak for
@@ -2736,11 +2684,7 @@ function cardFieldOf(label: string, value: unknown): CardField {
  * questions before staging and does so inconsistently. If nothing staged
  * mentions a gap, say so ON the card — the ✅ then knowingly accepts a gap-free
  * reading of the brief instead of silently inheriting one. It covers PRD-shaped
- * `notion_create` as well as `prototype_scaffold` since 2026-08-22: eval P3
- * regressed 3/3 → 2/3 the moment AGENT.md rule 4 started steering a
- * build-from-this-brief ask toward staging the PRD card, because the flag
- * existed for one tool and the model reached for the other. A gate that depends
- * on which tool the model picked is not a gate.
+ * `notion_create`: a PRD card is where a build-from-this-brief ask is staged.
  *
  * THE BUNDLE AUDIT is "stage, but flag gaps loudly" (Bill, 2026-07-16): a
  * share-out stages immediately with whatever is in hand, and the CARD carries
@@ -2771,10 +2715,7 @@ function caveatsFor(
     }
     return missing.length ? [{ kind: "bundle-incomplete", missing }] : [];
   }
-  const gapGated =
-    toolName === "prototype_scaffold" ||
-    (toolName === "notion_create" && input.surface === "prd");
-  if (!gapGated) return [];
+  if (!(toolName === "notion_create" && input.surface === "prd")) return [];
   const staged = [
     previewText ?? "",
     typeof input.notes === "string" ? input.notes : "",
