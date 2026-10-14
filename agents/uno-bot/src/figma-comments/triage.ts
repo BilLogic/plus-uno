@@ -27,9 +27,14 @@
 // ONCE PER THREAD. A raised mark per root, kept 90 days, and the question
 // leaves the watch list as soon as anything about it was sent.
 //
+// ON THE RECORD. A channel card is a Worker-staged card on the usage record
+// (`workerCardEvent`): it runs nothing and ages out after three days. A DM is
+// not a card and writes nothing.
+//
 // PURE: every dependency arrives through `TriagePorts`.
 
 import { rethrowIfBudget } from "../net";
+import { workerCardEvent, type ProposalEvent } from "../usage/proposal-events";
 import type { FigmaClient, FigmaComment } from "../figma/client";
 import { asksUno, isOwnComment } from "../figma-ask/trigger";
 import { etDayOf, etHourOn } from "../sweep/schedule";
@@ -48,6 +53,8 @@ export const TRIAGE_WORKDAYS = 2;
 export const REREAD_COST = 3;
 /** Subrequests a DM costs: opening the conversation, and the post. */
 export const DM_COST = 2;
+/** How long a channel card stays on the usage record as live before it ages out. */
+export const TRIAGE_CARD_TTL_MS = 72 * 60 * 60 * 1000;
 
 /** A post's answer: its ts, or Slack's error code when it was refused. */
 export type Posted = { ok: true; ts: string } | { ok: false; error?: string };
@@ -97,6 +104,9 @@ export interface TriagePorts {
   post(channel: string, text: string): Promise<Posted>;
   /** DM a person; whether it posted. */
   dm(slackId: string, text: string): Promise<boolean>;
+  /** Put a channel card on the usage record (`workerCardEvent`). Best-effort:
+   *  a failed write never unsends the card. */
+  recordCard(event: ProposalEvent): Promise<void>;
 }
 
 /**
@@ -233,7 +243,7 @@ export async function raiseUnanswered(
         result.raised += 1;
         continue;
       }
-      const sent = await raise(file, q, root, named, ports);
+      const sent = await raise(file, q, root, named, ports, opts.now);
       if (sent.ok) {
         await ports.raised.add(q.commentId);
         done.add(q.commentId);
@@ -310,6 +320,7 @@ async function raise(
   root: FigmaComment,
   named: Named,
   ports: TriagePorts,
+  now: number,
 ): Promise<{ ok: boolean; notIn?: string }> {
   const link = commentUrl(file.fileKey, q.nodeId, q.commentId);
   let sent = false;
@@ -327,7 +338,15 @@ async function raise(
   const where = resolveDestination(destination, ports.channels);
   if (!where) return { ok: sent };
   const card = await ports.post(where.channel, questionCard(file, q, root.message, link, addressee, named.unmapped));
-  if (card.ok) return { ok: true };
+  if (card.ok) {
+    await ports
+      .recordCard(workerCardEvent({ proposalId: card.ts, channelId: where.channel, at: now, ttlMs: TRIAGE_CARD_TTL_MS }))
+      .catch((err: unknown) => {
+        rethrowIfBudget(err);
+        console.error(`[figma-triage] ${card.ts} posted but is not on the usage record: ${err instanceof Error ? err.message : String(err)}`);
+      });
+    return { ok: true };
+  }
   return { ok: sent, ...(card.error === "not_in_channel" ? { notIn: where.channel } : {}) };
 }
 

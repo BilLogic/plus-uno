@@ -22,7 +22,7 @@ import { createInMemoryThreadState, type PendingProposal, type ThreadState } fro
 import { modelCaptureDetector } from "../../src/sweep/capture-detector";
 import type { EditedRecordRow, RecordComment } from "../../src/sweep/records";
 import type { SearchHit } from "../../src/sweep/search";
-import { createInMemoryProposalEventLog, type InMemoryProposalEventLog } from "../../src/usage/index";
+import { createInMemoryProposalEventLog, type InMemoryProposalEventLog, type ProposalEvent } from "../../src/usage/index";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../../src/usage/index";
 import type { InMemoryFigma } from "../../src/figma/in-memory";
 import type { DecisionRow } from "../../src/integrations/notion";
@@ -186,6 +186,8 @@ export interface FigmaRecords {
     raised: Set<string>;
     posts: Array<{ channel: string; text: string }>;
     dms: Array<{ to: string; text: string }>;
+    /** The usage record's rows for each channel card, as the Worker stages them. */
+    events: ProposalEvent[];
   };
 }
 
@@ -325,7 +327,7 @@ export function sweepHarness(opts: {
     threads: new Map(),
     messages: [],
     listed: [],
-    triage: { watch: new Map(), raised: new Set(), posts: [], dms: [] },
+    triage: { watch: new Map(), raised: new Set(), posts: [], dms: [], events: [] },
   };
   const triageOpts = opts.figma?.triage;
   const triage: TriagePorts | undefined = triageOpts
@@ -352,6 +354,7 @@ export function sweepHarness(opts: {
           figmaRecords.triage.dms.push({ to, text });
           return true;
         },
+        recordCard: async (event) => void figmaRecords.triage.events.push(event),
       }
     : undefined;
   const figmaComments: SweepFigmaComments | undefined = opts.figma

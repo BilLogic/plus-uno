@@ -20,7 +20,8 @@
 //     raised marks in HARNESS_KV with an expiry; each file's Figma team from
 //     the nightly backstop's state, one KV read a morning; the hand-kept
 //     handle map, `FIGMA_HANDLE_SLACK_IDS`; the ladder's channel ids; and
-//     `chat.postMessage`, to a channel or, after `conversations.open`, a DM.
+//     `chat.postMessage`, to a channel or, after `conversations.open`, a DM;
+//     a channel card goes on the usage record as staged by the Worker.
 //   • New wording for a decision (`./revise.ts`) — Review's Needs changes, or
 //     a reply on an explicit cue: the thread's record, the card in
 //     ThreadState and its Needs changes lock, the page read fresh as the
@@ -265,6 +266,7 @@ export function triageOn(env: Env, kv: KVNamespace): TriagePorts {
       const open = await openConversation(env, slackId);
       return open.ok ? (await post(open.channel, text)).ok : false;
     },
+    recordCard: (event) => recordProposalEvents(proposalEventLogFor(env), [event]),
   };
 }
 
