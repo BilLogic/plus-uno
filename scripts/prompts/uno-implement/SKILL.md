@@ -4,12 +4,11 @@ description: >
   Implements a design-system change end-to-end: both the component source
   (.jsx, .scss) and its Storybook docs (.stories.jsx, .mdx) update together
   in one Claude pass. Use when figma-implement.yml fires via
-  repository_dispatch — from a ✅ on the Figma library card in #plus-universal,
-  or a designer's approved implement in Slack — or a manual workflow run.
+  repository_dispatch — from a designer's approved implement in Slack — or a
+  manual workflow run.
 trigger_types:
   - github_dispatch        # repository_dispatch from the uno-bot Worker OR manual workflow_dispatch
-                           # (the library poll itself dispatches nothing — a person's ✅ on its
-                           # #plus-universal card does)
+                           # (the library poll dispatches nothing)
 model_default: claude-sonnet-4-6
 status: migration-draft
 references_when:
@@ -38,11 +37,10 @@ You are not a generalist coding assistant. You know Plus's specific stack, conve
 
 ## When to Use
 
-- A #plus-universal member ✅s the Figma library card for a publish (the primary live trigger — registry row in [docs/engineering/operations.md](../../../docs/engineering/operations.md)). The spec is the `harness-intake` issue the same card files; the dispatch carries every mapped component as one comma-separated `component` list, and the PR title lists them.
 - A designer's component implement in Slack — **tied to its Notion PRD** (pasted, or linked from the thread root). A designer's implement is never done without a PRD; if none is in hand, the bot asks for the link first.
 - A `repository_dispatch` event with `event_type: implement-figma-changes` arrives at `figma-implement.yml`, whether dispatched by the uno-bot Worker (downstream of Slack) or a manual GitHub-UI workflow run
 
-> **Note:** the Figma library poll (the end-of-day job in `agents/uno-bot/src/figma-poll.ts` — registry row 1 of `docs/engineering/operations.md`) does **not** invoke this skill directly. It finds the publish; the next morning's card drafts the intake, and a person's ✅ on it dispatches the run.
+> **Note:** the Figma library poll (the end-of-day job in `agents/uno-bot/src/figma-poll.ts`, in `docs/engineering/operations.md`) does **not** invoke this skill. It finds a publish and starts the snapshot refresh; nothing it finds dispatches a run.
 
 **Do NOT use this skill for:**
 
@@ -54,8 +52,8 @@ You are not a generalist coding assistant. You know Plus's specific stack, conve
 
 | Input | Source | Required? |
 |-------|--------|-----------|
-| Component name, or a comma-separated list from a library publish, OR direct spec (PRD link, change description) | an approved uno-bot card → `repository_dispatch`, OR a manual GitHub-UI workflow run | Yes |
-| The spec: for a library publish, its `harness-intake` issue (found by the `uno-bot:figma-publish:<version>` marker; the payload's `figma_version_id`); otherwise the Notion PRD (the designer's link or the thread root's; the Action falls back to `findPRDByComponent()` only on this path) | GitHub issues / Notion database | **Yes — required** |
+| Component name, or a comma-separated list, OR direct spec (PRD link, change description) | an approved uno-bot card → `repository_dispatch`, OR a manual GitHub-UI workflow run | Yes |
+| The spec: the Notion PRD (the designer's link or the thread root's; the Action falls back to `findPRDByComponent()`); a payload that names a `figma_version_id` reads that publish's `harness-intake` issue instead, by its `uno-bot:figma-publish:<version>` marker | GitHub issues / Notion database | **Yes — required** |
 | Target branch | Always a new `ds-review/{component}-{date}-{time}` branch (uniform with the live `figma-implement.yml` convention — do NOT diverge) | No |
 
 ## PLUS Design System Conventions
