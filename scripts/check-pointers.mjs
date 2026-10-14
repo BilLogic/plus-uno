@@ -77,7 +77,7 @@ export const FILLER = new Set(['a', 'an', 'the', 'any', 'when', 'if', 'need', 'n
  * The heading runs to the first character that belongs to the SENTENCE rather
  * than to the section: a bracket either side of it, a dash or an arrow handing
  * over to the instruction, a colon or a semicolon. A pointer written inside a
- * parenthetical — "(the values: `CONTEXT.md` § Two vocabularies)" — ends at the
+ * parenthetical — "(the values: `GLOSSARY.md` § Two vocabularies)" — ends at the
  * bracket that closes it, which the opening bracket's absence used not to say.
  */
 const POINTER = /`([A-Za-z0-9_@./-]+\.(?:md|json|mjs|js|ts|yml|yaml|toml|sh))`(?:\s*§\s*([^`|\n()—–→:;]+))?/g;
@@ -124,7 +124,7 @@ export function pointersIn(text, root = REPO_ROOT) {
     const rel = m[1];
     if (/[*{}<>]/.test(rel)) continue; // a glob or a placeholder, not a pointer
     // A bare filename (`SKILL.md`, `bot.md`) names a SHAPE every skill has, not a place;
-    // it is a pointer only if it sits at the repo root (AGENTS.md, CONTEXT.md).
+    // it is a pointer only if it sits at the repo root (AGENTS.md, GLOSSARY.md).
     if (!rel.includes('/') && !existsSync(path.join(root, rel))) continue;
     if (rel.includes('/') && !isRepoRelative(root, rel)) continue; // a relative fragment, not a place
     // "when `path` exists" / "when the gate is active, load `path`" is a CONDITIONAL

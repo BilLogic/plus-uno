@@ -11,7 +11,7 @@
 // the SAME assembly — `src/generated/references.ts`, a name → text map the
 // `read_reference` tool serves at zero subrequests — so the Worker reaches it
 // only on the turns whose pointer fires. The key is `disclosure` because that
-// is the glossary word (CONTEXT.md: *disclosed* — reference pushed out of the
+// is the glossary word (GLOSSARY.md: *disclosed* — reference pushed out of the
 // always-loaded tier behind a pointer), and its one value is `reference`, the
 // ladder rung it names. Absent means loaded: the default is the prompt, and a
 // doc has to say so to leave it. `embodiment` still decides WHO reads a doc;
@@ -119,7 +119,7 @@ export const REPO_ROOT = path.resolve(here, "../../.."); // two levels above age
  * doc under them whose frontmatter says `embodiment: uno-bot` or `all`.
  */
 const SECTIONS = [
-  { name: "constitution", roots: ["AGENTS.md", "CONTEXT.md"] },
+  { name: "constitution", roots: ["AGENTS.md", "GLOSSARY.md"] },
   { name: "persona", roots: ["agents/uno-bot/AGENT.md"] },
   { name: "skills", roots: ["skills"] },
   { name: "connectors", roots: ["docs/connectors"] },
@@ -682,7 +682,7 @@ export function assemble({ repoRoot = REPO_ROOT } = {}) {
   // trust any path. Structural sentinels only — naming a member file here would
   // make the check die confusingly the day that file is renamed, and would put
   // a filename back in the one script that is supposed to hold none.
-  for (const sentinel of ["AGENTS.md", "CONTEXT.md", "skills"]) {
+  for (const sentinel of ["AGENTS.md", "GLOSSARY.md", "skills"]) {
     if (!existsSync(path.join(repoRoot, sentinel))) {
       findings.push({ message: `repo root check failed: ${sentinel} not found under ${repoRoot}` });
       return result();

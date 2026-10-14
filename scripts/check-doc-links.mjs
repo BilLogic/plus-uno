@@ -172,7 +172,7 @@ const inputs = byRoot((repoRoot) => {
 
   for (const file of md(LINK_DIRS, {
     exclude: [TRANSCRIPTS, GENERATED_BUNDLE],
-    plus: ['AGENTS.md', 'CONTEXT.md', 'SETUP.md', 'README.md'],
+    plus: ['AGENTS.md', 'GLOSSARY.md', 'SETUP.md', 'README.md'],
   })) {
     for (const { target } of links(file, { root: repoRoot })) {
       if (/^(https?:\/\/|mailto:|#)/.test(target)) continue;
@@ -197,7 +197,7 @@ const inputs = byRoot((repoRoot) => {
 
   for (const file of md(POINTER_DIRS, {
     exclude: [GENERATED_BUNDLE, ...VENDORED_POINTERS],
-    plus: ['AGENTS.md', 'CONTEXT.md', 'SETUP.md'],
+    plus: ['AGENTS.md', 'GLOSSARY.md', 'SETUP.md'],
   })) {
     for (const raw of codeSpans(file)) {
       if (!ROOTED.test(raw)) continue;
@@ -241,7 +241,7 @@ const inputs = byRoot((repoRoot) => {
 
   for (const file of md(POINTER_DIRS, {
     exclude: [GENERATED_BUNDLE],
-    plus: ['AGENTS.md', 'CONTEXT.md', 'SETUP.md'],
+    plus: ['AGENTS.md', 'GLOSSARY.md', 'SETUP.md'],
   })) {
     for (const raw of codeSpans(file)) {
       if (!BARE_MD.test(raw)) continue;

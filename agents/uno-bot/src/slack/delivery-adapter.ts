@@ -12,7 +12,7 @@
 //     `setWorking` below: a channel turn gets 👀 AND a session status, and that
 //     status is what makes Slack's native stop button available in a channel
 //     thread at all (#576);
-//   • the checklist (CONTEXT.md). With the plan-stream switch on, a substantive
+//   • the checklist (GLOSSARY.md). With the plan-stream switch on, a substantive
 //     turn opens a stream in `task_display_mode: "plan"` with its first group
 //     of lookups, and each lookup lands as a task card — in progress with its
 //     group, complete when the next group starts or the turn answers — with

@@ -18,7 +18,7 @@
       "docs": 24,
       "counts": {
         "AGENTS.md": 5,
-        "CONTEXT.md": 7,
+        "GLOSSARY.md": 5,
         "agents/uno-bot/AGENT.md": 3,
         "skills/uno-maintain/bot.md": 2,
         "docs/connectors/figma.md": 2,

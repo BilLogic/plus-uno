@@ -36,7 +36,7 @@ const checkout = path.resolve(here, "../../..");
 // visible to nothing outside this file.
 const COPIED = [
   "AGENTS.md",
-  "CONTEXT.md",
+  "GLOSSARY.md",
   "skills",
   "docs",
   "scripts/lib",
@@ -133,9 +133,9 @@ const runBundler = (args = []) => {
 };
 
 test("a doc marked `all` is present in the Worker bundle", () => {
-  assert.equal(embodimentOf("CONTEXT.md"), "all");
+  assert.equal(embodimentOf("GLOSSARY.md"), "all");
   assert.ok(
-    memberOrder(assembled()).includes("CONTEXT.md"),
+    memberOrder(assembled()).includes("GLOSSARY.md"),
     "terminology.md declares `all` but is not in the bundle",
   );
 });
@@ -177,9 +177,9 @@ test("a skill's method.md precedes its bot.md, or is disclosed behind read_refer
 
 test("sections stay in declared order: constitution, persona, skills, then docs", () => {
   const members = memberOrder(assembled());
-  // AGENTS.md is member 0 and carries no path comment, so CONTEXT.md — the
+  // AGENTS.md is member 0 and carries no path comment, so GLOSSARY.md — the
   // constitution section's second member — is the first commented one.
-  assert.equal(members[0], "CONTEXT.md", "the constitution section must come first");
+  assert.equal(members[0], "GLOSSARY.md", "the constitution section must come first");
   assert.equal(members[1], "agents/uno-bot/AGENT.md", "the persona must follow the constitution");
 
   const lastSkill = members.map((m, i) => (m.startsWith("skills/") ? i : -1)).filter((i) => i >= 0).pop();
@@ -420,7 +420,7 @@ test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
   //
   // IT WAS THREE UNTIL #576, FOUR UNTIL #593. The corpus grows, and each time
   // the margin is ground away this fixture fails for a reason that has nothing
-  // to do with the floor logic it guards: in #576 two rows added to `CONTEXT.md`
+  // to do with the floor logic it guards: in #576 two rows added to the glossary
   // put the emptied bundle back over the floor, and the deep-module batch
   // #592-#625 did it again by adding a glossary row per module landed.
   // `figma.md` is the fifth member for the reason `supabase/overview.md` was the
@@ -796,7 +796,7 @@ function fixtureRoot() {
   };
   const doc = (body) => `---\nembodiment: all\n---\n\n${body}`;
   write("AGENTS.md", doc("# Constitution\n\nOne rule.\n"));
-  write("CONTEXT.md", doc("# Glossary\n\nOne word.\n"));
+  write("GLOSSARY.md", doc("# Glossary\n\nOne word.\n"));
   write("agents/uno-bot/AGENT.md", doc("# Persona\n\nOne voice.\n"));
   write("agents/uno-bot/wrangler.toml", 'GEMINI_REGION = "global"\n');
   mkdirSync(path.join(root, "skills"), { recursive: true });

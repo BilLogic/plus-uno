@@ -29,7 +29,7 @@ const INDEXES = [
 ];
 
 /** The root files passes 1–4 read by name, whether or not a test cares. */
-const ROOT_FILES = ['AGENTS.md', 'CONTEXT.md', 'SETUP.md', 'README.md'];
+const ROOT_FILES = ['AGENTS.md', 'GLOSSARY.md', 'SETUP.md', 'README.md'];
 
 /**
  * A throwaway repo shaped enough for all seven passes to run on it: the four
