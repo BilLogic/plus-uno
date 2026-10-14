@@ -6,7 +6,7 @@
 // are limited to a known set (see notionUpdate) so we never guess a property's
 // type or trip the silent select auto-create; unknown props are reported back.
 // An append opens with the attribution line naming the requester; a replace,
-// an insert and a property change carry none (`docs/connectors/notion.md`).
+// an insert and a property change carry none (`docs/connectors/notion/overview.md`).
 
 import type { Env } from "../types";
 import type { SlackContext } from "../types";

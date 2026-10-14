@@ -1,63 +1,23 @@
 ---
 embodiment: all
-summary: Pillar → channel map (group announcements; all private — uno-bot must be invited before posting/@here): Universal → #plus-universal C072E8SFLKV · Admin → #plus-admin C089A3E9CCW ·
+disclosure: reference
+summary: Slack's output shapes, disclosed — the share-out post, the answer shapes `present` builds (result table, chart, answer cards, ⚠️ line, Sources box), the render path each part takes, and the copy rules for the Worker's own Figma messages
+description: the share-out post, a result table, a chart, answer cards, a ⚠️ line, the Sources box, how a reply renders and falls back — read before composing any of them or explaining how one rendered.
 ---
 
-# Slack Conventions
+# Slack output shapes
 
-<!-- canonical per ADR-017 (docs/adr/); supersedes the Notion 🧭 Flow 3/5 docs + 🧩 Templates #4 for conventions. Distilled 2026-07-07 · applied by agents/uno-bot. -->
+<!-- canonical per ADR-017 (docs/adr/) · split 2026-10-14 out of the Slack connector doc, whose always-loaded half is overview.md beside this file · applied by agents/uno-bot. -->
 
-## Channels
+Each shape the bot's Slack output takes, and which bot skill produces it. The rules every message follows — the dialect, mentions, threading, writing style — are the overview's (`overview.md`, always loaded).
 
-| Channel | ID | Use |
-|---|---|---|
-| #plus-design | `C03FC8AS69K` | review requests, design-team coordination |
-| #plus-design-feedback | `C074QG2V7DJ` | share-out bundles + feedback threads |
-| #uno-bot | `C0ARJ2A3A69` | team intake about uno-bot |
-| #plus-universal | `C072E8SFLKV` | Figma library publish cards |
-
-#uno-bot is where the team reports problems with uno-bot and asks for changes. A top-level post engages with no @mention. A report or change request becomes a drafted GitHub intake (`harness-intake`), or a comment on the open intake it matches, staged in the post's thread; a ✅ from the poster or anyone who has replied there files it. A plain question is just answered. #uno-bot-sandbox posts stay test traffic.
-
-Pillar → channel map (group announcements; **all private — uno-bot must be invited before posting/@here**):
-`Universal` → #plus-universal `C072E8SFLKV` · `Admin` → #plus-admin `C089A3E9CCW` · `Toolkit` → #plus-toolkit `C08925VDFF1` · `Training` → #plus-training `C07L5RZV6DR` · `Marketing` → #plus-marketing `C052BG9NE86`. Tutoring + Help Center: unmapped — flag at retro.
-
-## Surfaces
-
-Every way into uno-bot from Slack. Skills run from a DM or an @mention; the other surfaces each do one thing.
-
-| Surface | What it does |
+| Shape | Produced by |
 |---|---|
-| DM · @mention · a thread uno-bot is in | any ask; every skill runs here |
-| Five message shortcuts (a message → *More actions*) | *Catch me up from here* · *Where was this decided?* · *Help me reply* · *Think harder about this* · *Is this still true?* |
-| Home tab | how to reach uno-bot, what it can do, and the button that stops your running turn |
-| `/grind` · `/chill` | run a question on the deep model, or cheap and short |
-| `/stop` | stop the turn uno-bot is running for you |
-
-Slack delivers slash commands only from a channel or DM composer, so inside a thread *Think harder about this* stands in for `/grind` and the Home tab's button for `/stop`. The app manifest is edited by hand in app settings (ADR-024); `agents/uno-bot/slack-app-manifest.yaml` is the record to diff against.
-
-**Automations registry.** What runs on its own — each morning and end-of-day job, cron and PR gate, with its trigger and owner — is `read_reference` name `docs/engineering/operations`. Read it before answering what runs when, or who owns an automated post.
-
-<!-- ide-only -->
-## The end-of-day sweep — read path and audience rule
-
-The Worker's one proactive read of channels, whose rules are the `sweep` scheduled action (`agents/uno-bot/scheduled-actions/sweep/ACTION.md`):
-
-- **Read path.** At the 00:00 ET end-of-day run, dated to the workday that just ended, one job per channel on `SWEEP_CHANNELS` (`agents/uno-bot/wrangler.toml`) reads with the **bot token**:
-  - `conversations.info` first: a private channel is read only when it is also on `SLACK_SEARCH_PRIVATE_ALLOWLIST`, and a DM stays unread;
-  - one more job reads every group DM uno-bot is in (`users.conversations`, `types=mpim`); a retry passes over those already handled today, and one that fails is counted while the rest are read;
-  - then `conversations.history` since the channel's cursor, in pages of 200, plus `conversations.replies` for every thread active since then, also in pages of 200.
-  - The cursor lives in D1 (`sweep_cursors`) and moves after each thread, so a job stopped by the budget resumes where it stopped. A history read that reaches its page cap holds the cursor at the oldest root it read, and a thread past the reply-page cap is left with a note in `sweep_runs`.
-  - #uno-bot stays off the read path, whatever the list says.
-- **Audience rule.** A finding reaches only people who could already see its evidence:
-  - a public thread's finding is posted in that thread;
-  - a private channel's stays there, with an owner and confirmers from that channel, and a group DM's goes back to that group DM. After a group-DM fix writes a page, a separate share card there offers a reworded note (page name only, no quote, no names) for rung 3 or 4, and only its own Approve posts it (`sweep_share_post`, a `worker` tool only the Worker stages);
-  - a fix found in both a public thread and a private place goes only on the private card (ADR-031);
-  - findings in no thread go to the team channel the map above names for the card's pillar, else the Figma file's team, and to #plus-design when there is none (the posting ladder, `agents/uno-bot/src/destination/`).
-  - Proactive output stays out of #uno-bot, and the owner it mentions comes from the thread or the card, not a default to the lead.
-- **Reports** post at the next weekday 9 am ET run on the shared decision card: one live report per thread, up to 10 fixes, each its own proposal, and the rest queued until every fix on it is decided or lapses. A thread is taken while any fix of its report is live by the records or in ThreadState. Owners and thread posters can decide; a fix lapses after 72 h with no re-ping.
-- **Posted means staged.** A report starts only when the invocation's budget covers it. Its snapshot (the fixes as shown) goes to KV and its items to D1; it is posted tagged with its key and its operations' digest in message metadata, its record kept with that tag and every redraw sends it again, each fix staged, then marked posted. A retry stages only from the snapshot, and only when the posted report's digest matches; a report the search comes back unsure about is held. On a retry, each fix an earlier try already staged is recorded as it stands, resolved or live, and only the rest are staged. Staging puts each fix on the proposal record, as any card's staging does. A fix whose staging fails outright says so on its card and stays queued; a report none of whose fixes staged is edited to say it did not go through, and its items are released. Where Slack refuses cards, the report posts as sections with a Review each, and every redraw stays plain.
-- **A failing thread** (replies, a linked page, or the detector) holds the cursor; on its second night running it is skipped with a note, so one thread holds a channel back two nights at most. A quota stop, the model's or Notion's 429, holds without counting.
-<!-- /ide-only -->
+| Share-out post | share-out (`shareout_post`) |
+| Result table, chart, answer cards, ⚠️ line | any skill answering from a lookup (`present`, `roadmap_query` with `as_table`) |
+| Sources box | code, from the links an answer used |
+| Render paths | the Worker, on every reply |
+| Figma messages | the Worker's own code |
 
 ## Share-out post
 
@@ -82,48 +42,11 @@ Until 2026-08-22 the tool had no fields for fidelity, round, what-changed, the q
 
 Bundle links (Loom · live preview · Figma replica · Decisions DB) go in `link` and the surrounding thread; the confirmation card audits them and names anything missing before ✅.
 
-## Two gates — never conflate
+## Answer shapes
 
-1. **Proposal-confirmation gate** (uno-bot side-effect proposals): the card in the thread is short — a ⚠️ *Ready to {verb}* summary line (title · key fields), the body's size, the LLM-written line and one Review button — while its message text carries the whole draft for notifications and history. Review opens the draft in a pop-up, written for a person: key properties by their database names (Design Status is the value the create writes, *not set* where it writes none), then the body as headings and paragraphs, then the card's ⚠️ caveats; the thread summary uses the same key properties. A view footer holds only submit and close, so the decision is an input: a confirmer's draft ends with a Decision choice (**Approve** · Needs changes · Reject) and a Note (required for Needs changes, an optional reason for Reject), and the footer's **Submit** decides it beside Close. A page change reads Current content (as staged), Issue (its reason, if any), New content (editable); other fields sit under Edit fields, a pushed view whose Save edits rides `private_metadata` until Approve checks it again. A non-confirmer sees the draft with Close only. Approve with edits leaves the card showing the edited values under a ✏️ line naming who edited which fields. Needs changes requires a note and locks the card ("being revised" to every other signal, a second Needs changes included) until the revision turn supersedes it, or unlocks it if that turn stages nothing; Reject takes an optional reason. A decided card stays short, with its outcome and View; an item of a decision report redraws its report instead. A note on a card still live keeps its Review; a card posted without the button gains neither. A ✅ (or 👍) / ⛔ (or ❌) reaction on the card, or that emoji typed alone, is the quiet, unadvertised fallback; a typed reply in words goes to the model, which reads it in context. Anyone in the thread may confirm or cancel (no requester lock), unless the card names its confirmers, as a #uno-bot intake does. 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state/store.ts` is the source of truth). **One live card per reply thread:** staging a revised card retires the one it replaces — a ✅ or ⛔ on the superseded card executes nothing and says it was replaced, which is a different answer from the expired one. Both answers, and a refusal that names who can confirm a gesture made on the card (reaction, button, pop-up), are one line edited onto the card itself rather than a new message; a typed emoji or the model's resolve from someone else is answered near their message. The grain is the reply thread rather than the conversation, so two independent asks in one DM each keep their own card. The Figma library card is a decision report (one card, its table under it): 72 hours, #plus-universal members only; Reject files nothing, and a card nobody decides has its intake filed the morning after. A library edited but not published posts with no card.
-   **A report's decision card** (`agents/uno-bot/src/slack/decision-cards.ts`): a plain parent line, then one card per item (ten at most), each with Review and one or two Open buttons. Each item is its own proposal, decided only in its pop-up.
-2. **Reviewer-verdict gate** (Flow 5 maintenance review, routed reviewers in #plus-design): ✅ approve · 🔁 request changes · ❌ reject. Never auto-merge; 🔁 loops the proposal with changes.
+Code builds each of these from the rows a lookup returned this turn; the model chooses the shape and writes the prose around it.
 
-Shared report items redraw to **Closed, no decision** when their window ends, with View instead of Review. The alarm queues the edit; failed edits retry, while decided items and message metadata stay intact.
-
-Decisions reached in threads are written to **Decisions DB** (row with **Roadmap Card** = the project + **Evidence** = Slack permalink) **before** the thread is considered resolved. Do not append to obsolete Decision Log subpages.
-
-**Reactions outside the gates are the bot's wit channel.** Code adds 👀 when a message arrives and ❌ when a turn fails, and no other reaction. The model adds at most one per message, any workspace emoji, standard or custom, matched to the content (the budget: `agents/uno-bot/AGENT.md § Emoji budget`; the register: § Slack etiquette). Only the gate semantics above are reserved: ✅ (and 👍) and ⛔ (and ❌) carry meaning on proposal cards, and ✅/🔁/❌ on review verdicts, so `slack_react` refuses the card set and the ❌ on a failure is code's.
-
-## Message formatting — write standard Markdown
-
-**Write standard Markdown.** `**bold**`, `_italic_`, `- bullets`, `1. numbered`, `[label](url)`, `> quote`, `` `code` ``, fenced blocks with a language tag. Slack's agent message field (`markdown_text`) renders it directly, and the Worker converts on the paths that need a different form. *(Rule changed 2026-08-22 — see the note at the end of this section.)*
-
-**Two things Markdown cannot express** — Slack has its own syntax for these:
-
-| Thing | Write | Why |
-|---|---|---|
-| A person | `<@U01ABCDEF>` | the **user ID**, never `@handle` — a handle is plain text and pings nobody |
-| A channel | `<#C0ARJ2A3A69>` | the channel **ID** in angle brackets |
-| A broadcast | `<!here>` / `<!channel>` | needs installer permission, reads as noise — use almost never |
-
-### Tables work. Use them when the content is a grid.
-
-Confirmed visually 2026-08-22: a Markdown table posted to Slack renders as a **real table** — ruled header row, aligned columns, the lot.
-
-Reach for one when the content genuinely is a grid: three or more rows compared across the same fields, like a lane × step matrix. Roadmap cards have their own table, below. Keep it to **2–4 narrow columns** — Slack does not wrap a cell gracefully and a wide table is unreadable on a phone. Prose in a table is worse than prose.
-
-```
-| Lane | Step | Owner |
-|---|---|---|
-| Tutor | Session prep | Ops |
-| System | Day-of | — |
-```
-
-**A table renders as a table on every answer path**: the streamed part goes out as `markdown_text`, and every posted part (channel answers, continuation parts, every answer while streaming is off) as a `markdown` block. The one rung where a table degrades is the `section` fallback, reached only when Slack refuses the `markdown` block: a `section` cannot hold a table, so each row becomes `• a — b — c` and the header row is dropped. A refusal is logged, so a degraded table is a line in the tail.
-
-*(This section read "No tables. Ever." for about an hour on 2026-08-22. That was a bad inference: a probe message's **stored text** contained no table, so the table looked deleted. It was not — Slack keeps it as a block and only the plain-text fallback omits it. Corrected by looking at the rendered message. The lesson: **a Slack message's stored text is not what a reader sees** — verify rendering by looking at it.)*
-
-#### Lookup rows: the result table
+### Lookup rows: the result table
 
 **Rows a lookup returned go in the result table, not a Markdown table.** Code builds a Slack `data_table` from the rows that lookup returned this turn, so every cell is a real value and every link works. The model only chooses: for Roadmap cards it sets `as_table` on `roadmap_query` (the Roadmap preset); for any other lookup it calls `present` with the lookup, up to 4 of its rows' fields and a one-line takeaway. The persona asks for a table at 2 or more rows, the threshold code builds one at (`MIN_ROWS`); one row stays in the prose.
 
@@ -139,7 +62,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 - **Placement and fallback:** the table sits after the `markdown` block and before the footer, on the last part of a split answer, and an answer carrying one always posts as an ordinary message. If Slack refuses the blocks, the answer goes out again without the table, its plain list appended to the Markdown, and then the usual rungs below apply. The step down is logged.
 - **Worker posts:** a batch result is a result table too, under a head line, falling back to its plain list when Slack refuses the table. A **batch result** (two or more operations) has a Where, What and Result row per operation: Result reads `done` or `failed: <reason>`, Where links the target and What links the item the operation created. A batch of more than 30 operations posts the list alone, and one operation posts no table.
 
-#### Numbers that compare or trend: charts
+### Numbers that compare or trend: charts
 
 **A count or sum per group is a chart, computed by code.** The model calls `present` with shape `chart`, the lookup, the kind (`bar` to compare, `line` or `area` for a trend, `pie` for parts of a whole), `group_by`, and `measure` to sum a numeric field instead of counting rows. Code groups that lookup's rows and posts a Slack `data_visualization` block; the result hands the model the same `values` and `total`, so every number about the chart is grounded like a fetched one.
 
@@ -149,11 +72,11 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 - **Text copy:** each chart adds a line of its top 5 values (`Cards by Design Status: WIP 3 · Under Review 2 · Shipped 1`), and a ⚠️ line adds its sentence, so a notification carries the gist.
 - **Placement and fallback:** charts sit after the `markdown` block, before any table, ⚠️ line, Sources box and footer, and the answer posts as an ordinary message. If Slack refuses the blocks, the answer goes out again without charts or table, their text in the Markdown.
 
-#### Sources box and link previews
+### Sources box and link previews
 
 **Code lists the links an answer used; the prose ends on its last point.** Used means the Roadmap board or scoped Notion database a lookup queried, or a page it read whole, once, plus the rows the prose names: by whole link, a card's number (`#412`), or a title of 2+ words no other row shares (`slack/sources-box.ts`). The ones a thread may see fold into a closed `container` titled `Sources (n)` after any table, at most 10. A box needs 3+ used links, except that an unlinked board or database opens one alone, listing only links the prose leaves out. The title is the count alone. The links also ride the text copy as one `Sources:` line, and a refused box steps down to the answer with that line in its Markdown. Every answer post sets `unfurl_links` and `unfurl_media` to false.
 
-#### Linkable items: answer cards
+### Linkable items: answer cards
 
 **Items the reader will open go in cards.** The model calls `present` with `shape: "cards"`, the lookup, its title field and optionally a subtitle field; code builds every card from that lookup's rows (`turn/answer-cards.ts`, block in `slack/answer-cards-block.ts`).
 
@@ -162,7 +85,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 - **Logos:** a card's icon is the logo of the estate its first link leads to (`estateOfUrl`), as a PNG image Slack fetches by URL; an SVG image does not render. PLUS, uno-blueprint, GitHub and Slack are served from `public/uno-bot/logos/` on plus-uno.netlify.app; Storybook, our own design system, carries the PLUS mark; Figma and Notion use Google's favicon service for their domain. A link on no estate's host carries the PLUS mark. Task cards keep Slack's named icons, since Slack refuses images there.
 - **Placement and fallback:** as the table's: after the `markdown` block, before the footer, always as an ordinary message. If Slack refuses the blocks, the answer goes out again without them, each card a linked Markdown line in the prose. The text copy carries the same lines.
 
-#### The ⚠️ line: what the reader has to see
+### The ⚠️ line: what the reader has to see
 
 **A caution goes on its own line under the answer, apart from the prose.** Each ⚠️ line is a `context` block after any charts, table and cards, before the Sources box and footer: one sentence, at most two lines per answer. Slack's `alert` block is not used, because Slack refuses it in a message.
 
@@ -170,6 +93,10 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 - **The model adds one, for an estate conflict:** two sources it read this turn disagree (the blueprint says one thing, a Roadmap card or PRD another). It calls `present` with shape `conflict` and the disagreement as one sentence in `line`; code places the ⚠️. Refused, in the call's own result: fewer than two sources answered this turn, more than one sentence, an emoji, over 240 characters, a second conflict, or two lines already held. A ⚠️ the model typed at the start of `line` is dropped.
 - **Order and cap:** lines keep the order their triggers were first met; a third is dropped.
 - **Text copy:** each line, sign first, after the prose and any chart, table or card lists, so notifications carry it. An answer with a ⚠️ line posts as an ordinary message rather than a stream, which has no text copy. A refused ⚠️ block steps down to its sentence in the Markdown, like any other block beneath the answer.
+
+## Render paths
+
+**A table renders as a table on every answer path**: the streamed part goes out as `markdown_text`, and every posted part (channel answers, continuation parts, every answer while streaming is off) as a `markdown` block. The one rung where a table degrades is the `section` fallback, reached only when Slack refuses the `markdown` block: a `section` cannot hold a table, so each row becomes `• a — b — c` and the header row is dropped. A refusal is logged, so a degraded table is a line in the tail.
 
 ### What the Worker does on each path
 
@@ -185,15 +112,13 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading` → `*Heading*`, `[label](url)` → `<url|label>`, tables → `•` lines, and strips the fence language tag (mrkdwn code blocks take no info string).
 
-**Don't hand-escape `&` `<` `>` in prose.** Posted `text` and every mrkdwn block pass `sanitizeSlackMarkup`: valid markup (a real `<@U…>`, `<#C…>`, `<!here>`, `<https://…|label>`) stays, every other `<` `>` and bare `&` is escaped, since markup Slack can't parse blanks the message (live 2026-09-22). A `markdown` block gets no pass: Slack converts it to rich text, so an unparseable `<…>` shows as plain text rather than blanking the message, and an escaped `&lt;` would show as those characters (live 2026-10-07). Worker code escapes a title inside a link label (`escapeSlackText`).
-
-#### Streamed text
+### Streamed text
 
 **The stream takes the same rule**, across append boundaries: `<@team` ending one append and `mate>` starting the next are one token, so an unclosed `<…` is held until the next append or the close (`sanitizeStreamChunk`). Slack documents `markdown_text` only as "message text formatted in markdown", not whether it parses or blanks on `<…>`; until seen, the proven rule stands.
 
 **Streaming stays off until a live probe passes.** Either flag is refused unless `SLACK_STREAM_MARKUP_PROBE` records `pass:YYYY-MM-DD`: stream a body with a bare `<@teammate>` and one in a code fence to a test DM, raw, via `/debug/slack-stream?…&text=`, and check it isn't blank. Note too whether the fence shows `&lt;` and whether a real `<@U…>` pings.
 
-#### Task cards
+### Task cards
 
 **A task card's icon is a named Slack icon, and nothing else.** The shape is `icon: {type: "icon", name}` with one of Slack's built-in names, on the `task_update` chunk and on a static plan's `task_card` alike. Production took `globe`, `book`, `map`, `code`, `comment`, `folder`, `cube` and `image` on 2026-10-07, and refused with `invalid_arguments` (`failed to match exactly one allowed schema [json-pointer:/chunks/0]`) an image URL as `name`, a `url`, an `image` element, an emoji and an unknown name; `call`, `email`, `file`, `link` and `user` fail the validator too. Each card shows its estate's glyph — Notion `book`, blueprint `map`, GitHub `code`, Slack `comment`, Storybook `cube`, Figma `image`, and a link on no estate `globe`; on `plus-uno.netlify.app` the path decides, so `/storybook/…` is Storybook, `/blueprint/…` the blueprint, and any other path `globe` — and a card reading no estate shows none (`agents/uno-bot/src/slack/estate-glyphs.ts`). To recheck, send raw chunks to a test DM through `/debug/slack-stream?…&chunks=`.
 
@@ -201,29 +126,14 @@ Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading`
 
 Block Kit **is** wired (`delivery.ts` posts a `markdown` block with a `section` and a bare-text fallback; proposal cards carry buttons via `interactive.ts`) — the claim that it wasn't stood in this file until 2026-08-22. `reply_broadcast` exists on `PostMessageInput` but is used only by a test route.
 
-### The same Markdown goes everywhere else too
-
-One dialect, three destinations — you write Markdown, the Worker renders it per surface:
-
-| Destination | Renderer | Notes |
-|---|---|---|
-| Slack | `slack/mrkdwn.ts` (mrkdwn paths only) | this file — tables render |
-| Notion (`notion_create`, `notion_update`) | `integrations/notion-blocks.ts` | real blocks, annotations **and real tables** — `notion.md` § Writing a body |
-| GitHub issue body (`github_issue_create`) | none — sent as written, plus a footer from `tools/github-issue-render.ts` | GitHub renders Markdown natively, tables included; the repo may be public |
-| GitHub issue comment (`github_issue_update`) | none — sent as written, plus the same footer | as above |
-
-**Tables are the one construct that differs by destination, and every one handles it well.** Slack renders a real table; Notion gets a real `table` block; GitHub renders the table as written. Write the table whenever the content is a grid — nothing is lost anywhere.
-
 ### What Slack's Markdown parser actually does — measured, not assumed
-
-Sent one message through and read back what Slack stored (2026-08-22). This is the mapping, and it is why the rules above are what they are:
 
 Sent one message through and **looked at how it rendered** (2026-08-22):
 
 | You write | How it renders | |
 |---|---|---|
 | `**bold**` | bold | ✅ |
-| `*single*` | *italic* | ⚠️ never use a single `*` for bold |
+| `*single*` | *italic* | ⚠️ bold is `**`, two stars |
 | `_italic_` · `~~strike~~` · `` `code` `` | italic · strikethrough · code | ✅ |
 | `- item`, nested by two spaces | bulleted list, indented sub-items | ✅ |
 | `1. item` | numbered list | ✅ |
@@ -245,50 +155,7 @@ Since a `##` heading renders as plain bold, there is no reason to prefer it over
 Until then this file mandated Slack **mrkdwn** (`*single*` bold, literal `•`, `<url|label>`), the Worker's converter assumed Markdown *in* and mrkdwn *out*, and the live streaming path sent the body to Slack's `markdown_text` field — which is standard Markdown. Three layers, three assumed formats. A model that obeyed the prompt perfectly rendered *worst* (in Markdown, `*bold*` is italic — since confirmed by measurement — and `<url|label>` is nothing); a model that "slipped" into `**bold**` rendered correctly. The bot was fighting its own instructions. Fixed by picking the dialect the model writes best and Slack's agent field takes natively, and converting in code wherever something else is needed.
 </details>
 
-## Threading & mentions
-
-- **Reply in-thread by default** (`thread_ts` = the *parent* message's ts). Keeps the channel clean.
-- A fresh top-level post is only for cross-channel announcements (e.g. a review fan-out to #plus-design) — a real new message, not a reply.
-- **A `/grind` or `/chill` run is a public thread.** The Worker posts a framing message in the channel and threads the run under it, so history, the emoji gate, and proposals behave exactly as they do for an @mention.
-- **Mention only who must act** (`<@U…>`). Never spray `<!here>` / `<!channel>` / `<!everyone>` — they need installer permission and read as noise. Batch related updates into one message, not five.
-<!-- ide-only -->
-
-### Who a Worker card pings
-
-Slack notifies from a message's main text, not from a card's subtitle. A card kind passes whom each item is for as `ReportItem.owners`, and the shared decision card (`decisionReport` in `agents/uno-bot/src/slack/decision-cards.ts`) builds the opener from them, so the ping lives in one place:
-
-- **Who:** the owner whose answer the card needs: the page owner on a sweep fix, the file owner on Figma drift and comment decisions, the tidy-up owner, the person a follow-up asks. A Figma drift card's other publisher is named in its subtitle in plain text.
-- **Anyone-can-settle cards** (library publish, DS precedence, Dev Mode links) carry no owners, so they tag nobody.
-- **Shape:** one card for one owner reads `<@owner>, <parent line>`. Otherwise the parent line, then one bullet per owner listing that owner's cards (`• <@Max> — Tutor profile cleanup + Tutor Admin tutor detail`), each owner tagged once, in one message. A report that counts per owner passes `ownerLines` and the bullets carry its words (`• <@Coco>, 4 files need a tidy.`); one such bullet alone reads `<@Coco>, 4 files need a tidy.` A bulleted list, since mrkdwn has no tables.
-- **The subtitle shows whose card it is.** An open card's subtitle leads with its owners' tags (`<@owner> · from this thread`), drawn by the shared card from the same `owners`. Slack notifies nobody from a subtitle, so the opener does the notifying and the tag is for the reader. The exception is the plain rung (sections, where cards are refused): sections notify, so it drops the opener's tags. Once decided, the subtitle says who decided instead.
-- **A DM** (channel `D…`) tags nobody, in the opener or the subtitle; a named owner still shows in plain text. **An owner Team Members does not map** is `{ name }`, written in plain text in both places; the Monday unmatched-people DM covers them.
-- **One ping per card.** Redraws edit the message, which notifies nobody, and a card that lapses at 72 h is not posted again.
-<!-- /ide-only -->
-
-## Writing style (all Slack output)
-
-Uses the model's default voice for chat; the bot's specific register lives in `agents/uno-bot/AGENT.md § Identity & voice`, and its emoji budget in § Emoji budget there.
-
-- **Lead with the answer / outcome** — the first line is one `**bold**` sentence that answers; no preamble, no restating the ask back.
-- **Glanceable, not paragraphs.** `**Bold label**` lines in place of `#` headings, `-` bullets two levels deep at most, and a table for any grid of three or more rows.
-- **Summarize, link the artifact** — the link sits on the name of the thing (`[the Roadmap card](url)`); steps are summarized, not transcribed.
-- **Human, contraction-y, low ceremony.** Brief and clear over formal; no jokes that don't serve the task.
-- **A failure says what did not change and names one next step** (retry, adjust or escalate) — a bare "something went wrong" helps nobody. The Worker's own failure post is that shape in blocks: a bold progress line with the next step, a ⚠️ line, and a Try again button that asks the question again as the person.
-- **Confirm before real-world side-effects** (the proposal gate) — but gate only genuinely risky ops; no confirmation fatigue.
-- **On behalf of** — acting for a person, say so, and surface what was done + a link.
-- **A post in a channel** — top level rather than a thread reply — is a summary plus a link; the detail goes in its thread or on the linked page.
-- **One length rule, and it lives here.** Past ~600 characters of prose (lists are exempt — they stay scannable at any length), lead with a 2–3 line summary and put the detail after it. One message holds **11,000 characters** — the `markdown` block's 12,000 with headroom, `MAX_POST_CHARS` in `agents/uno-bot/src/slack/answer-posts.ts`. Past that the Worker splits the answer into continuation messages in the same thread, at paragraph boundaries, each one led by `_(i/n)_`; nothing is cut and nothing is lost. That is a fallback, not a licence to write long: a reply that runs to three messages is usually a reply that should have threaded the detail or put it on the relevant Notion card with a link. There is no Gist tool. *(Every other number that used to float around — "~4,000" here, ">3000" in `AGENT.md` — now points at this one.)*
-
-<!-- Grounded in Slack's own docs (fetched 2026-07-08): Formatting message text · Block Kit · chat.postMessage · Agent design · App design guidelines. -->
-
-## Frame words render as code
-
-When uno-bot (or any agent) writes to Slack or Notion, the estates' FRAME words render as `code` so designers learn to recognize them as system vocabulary, not casual English — Bill, Jul 2026:
-
-- **Blueprint frame words:** `phase` · `scenario` · `path` · `step` · `lane` · `cell`, plus the lane (actor-row) names as the board spells them.
-- **Roadmap frame words:** `card` · `RM-ID` · `Design Status` · `Dev Status` · `Product Pillar` · `Product Tag` · `Intake Status`.
-
-Scenario and project *names* (Goal Setting, Warm-Up, Session Sign Up) stay `*bold*` — they're topics, not frame words. Codify a frame word when it's used AS the system term ("the `Regular Tutor` `lane`"), not in ordinary prose ("a tutor joins the call").
+*(This section read "No tables. Ever." for about an hour on 2026-08-22. That was a bad inference: a probe message's **stored text** contained no table, so the table looked deleted. It was not — Slack keeps it as a block and only the plain-text fallback omits it. Corrected by looking at the rendered message. The lesson: **a Slack message's stored text is not what a reader sees** — verify rendering by looking at it.)*
 
 <!-- ide-only -->
 ## Figma messages

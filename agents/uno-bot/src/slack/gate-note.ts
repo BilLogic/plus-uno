@@ -32,7 +32,7 @@
 //     wrong on it, so it carries its own words for a ⛔ and a late
 //     decision (`PendingProposal.stated`, written beside each card's copy),
 //     and a replaced card or a gesture beside it gets a stated line here.
-//     These follow the Figma copy rules (`docs/connectors/slack.md` § Figma
+//     These follow the Figma copy rules (`docs/connectors/slack/shapes.md` § Figma
 //     messages), and `tests/figma-copy.test.ts` holds them to it.
 //
 // Import-free and Env-free: it renders and posts nothing.

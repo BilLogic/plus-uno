@@ -8,7 +8,7 @@
 // A tool with no row offers nothing to edit and approves as staged.
 //
 // SELECTS OFFER ONLY WHAT THE DATABASE OFFERS. Notion silently creates any
-// option it is handed (`docs/connectors/notion.md`), so a select reads the
+// option it is handed (`docs/connectors/notion/overview.md`), so a select reads the
 // target database's live options when the pop-up opens and again when Approve
 // is pressed: an option removed in between is refused, not created. A select
 // whose options cannot be read is left out rather than offered as free text.

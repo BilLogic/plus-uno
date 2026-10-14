@@ -38,7 +38,7 @@ The window's number 1 must be built the same way: the same three parts, with the
 
 All three databases live under the *Measurement window* page in the PLUS Notion
 article hub (<https://app.notion.com/p/650c205f416f4c2ea49826b10cf2eeed>). Write
-to them through the notion-plus connector, per `docs/connectors/notion.md`.
+to them through the notion-plus connector, per `docs/connectors/notion/overview.md`.
 
 | Database | Data source | One row per |
 |---|---|---|

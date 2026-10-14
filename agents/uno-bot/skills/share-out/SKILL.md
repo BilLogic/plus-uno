@@ -20,6 +20,8 @@ Finished-enough work goes in front of people. Three rails, each ending in one โ
 
 ## Shape
 
+The feedback round's post is `shareout_post`'s, field by field: `docs/connectors/slack/shapes` ยง Share-out post. A decision or Marketplace body follows `docs/connectors/notion/page-writing`.
+
 Search results, one line each, the first 25 when there are more:
 
 ```

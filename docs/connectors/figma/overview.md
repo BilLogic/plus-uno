@@ -1,15 +1,35 @@
 ---
 embodiment: all
-summary: PLUS Figma files follow How We Fig — five stage folders per team, `<Project> / Card <n> & <m> / <designers>` titles, six divider page sections; an agent suggests a rename or a move and a person makes it
+summary: Figma's connector overview, always loaded — what uno-bot can reach over REST, canvas vs comments, the six annotation labels, How We Fig's stage folders, file titles and page sections, and an agent's duties; the bot's long-form access doc is uno-bot-access.md beside it
 ---
 
 # Figma Workspace Conventions
 
-<!-- canonical per ADR-017 (docs/adr/) · supersedes the Notion 🎨 Figma Workspace Playbook · distilled 2026-07-07, rewritten 2026-10-01 to the team's How We Fig guide from #881's probe of the six teams and #891 · applied by writers/figma · annotation categories consolidated 2026-10-09. -->
+<!-- canonical per ADR-017 (docs/adr/) · supersedes the Notion 🎨 Figma Workspace Playbook · distilled 2026-07-07, rewritten 2026-10-01 to the team's How We Fig guide from #881's probe of the six teams and #891 · applied by writers/figma · annotation categories consolidated 2026-10-09 · became the folder's overview 2026-10-14, with the REST reach table. -->
+
+## What uno-bot can reach in Figma
+
+uno-bot reaches Figma over REST alone, through one client (`src/figma/`); the Figma MCP needs a browser login, so it is the IDE's. Figma's published REST API has no operation that creates a file, frame, shape, text or wireframe, so a canvas change is a person's or the IDE's.
+
+| Capability | Reach |
+|---|---|
+| Render a frame | read: the first frame link with a `node-id` in a message, at its current version, one per message |
+| Frame text | read: name, node type, text layers and the comment threads pinned to the frame, through `source_read` |
+| Annotations | read, through `source_read`: each Dev Mode annotation with the layer it sits on, its text and the properties it pins |
+| Fills | read, through `source_read`: the frame's distinct visible fills as rendered hex (gradients by stop, images as such); a variable-bound fill is marked, the variable's name is unread |
+| Version diffs | read, through `source_read` with an optional `since` date: a plain-sentence diff against the newest version saved at or before it, positions not compared; `changes_unread` says why when the diff could not be read |
+| Comments | read, post, reply and delete; the one ungated write is the @uno reply (the figma-comments scheduled action) |
+| Reactions | send `":goat:"`, the shortcode — Figma answers the emoji character with a 400 — and read a 🐐 back as `:goat:` |
+| Webhooks, library components, folders, versions | read, by the scheduled actions |
+| Dev Mode links | written from a Review card, on Approve (`src/figma-links/`) |
+| Variables (token names) | Enterprise only: a binding's id is readable, the name it points at is not; a token value comes from `design-system/src/tokens/` through `github_read` |
+| Canvas writes, file renames and moves, Figma Make | out of the API's reach: the bot writes out the exact change for a person, or files the build through `file-a-ticket` |
+
+Each limit in a reply carries its cause and the next route: what could not be done, the hard reason, what the person can do instead.
 
 ## Canvas vs comments
 
-- **Canvas text + Dev Mode annotations = agent-readable context.** Anything the agent (or a future reader) needs to do the job goes on the canvas, never only in a comment.
+- **Canvas text + Dev Mode annotations = agent-readable context.** Anything the agent (or a future reader) needs to do the job goes on the canvas; a comment points at it.
 - **Comment pins = human dialogue.** uno-bot reads them with a pasted frame (#899) and for decisions (#900), and replies in one only when a comment asks it with @uno (#903).
 
 ## Annotation category labels
@@ -74,7 +94,7 @@ Inside a file, pages sit under six divider pages, named exactly `- - - 🖼️ C
 
 ## Agent duties in the workspace
 
-- Cite a frame by its node-id deep link, never the file root.
+- Cite a frame by its node-id deep link, rather than the file root.
 - Put new work on a page under the divider for its stage.
 - A person renames or moves a file. An agent that finds a title or folder wrong writes out the exact new one, ready to paste, because no Figma API renames or moves a file.
 
@@ -86,7 +106,7 @@ The hygiene checklist covers every file outside MISC and `/ Marketing /`:
 4. A file with no active card goes to Archive, unless it is a library, template or reference kit.
 
 <!-- ide-only -->
-## uno-bot's Figma reach
+## uno-bot's Figma reach, long form
 
-What the Worker can read and write in Figma, and where it stops: [`figma/uno-bot-access.md`](figma/uno-bot-access.md).
+Each capability with its endpoint, limits and history, and a Figma ask's public scope: [`uno-bot-access.md`](uno-bot-access.md).
 <!-- /ide-only -->

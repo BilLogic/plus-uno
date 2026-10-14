@@ -10,7 +10,7 @@
 // a file.
 //
 // THE LEAD in #plus-design is a Figma message like the rest
-// (docs/connectors/slack.md § Figma messages): one line asking one named
+// (docs/connectors/slack/shapes.md § Figma messages): one line asking one named
 // person — the file's design owner, else the asker — to review the draft,
 // with the ask quoted. The card under it carries the gate.
 //

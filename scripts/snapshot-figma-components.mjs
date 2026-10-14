@@ -368,7 +368,7 @@ export const MISSING_TOKEN =
   'FIGMA_ACCESS_TOKEN is not set. This snapshot records the components PUBLISHED to the\n' +
   'library, and only the REST API reports that set — the Figma MCP sees the canvas, and\n' +
   "Code Connect's listing needs an Organization/Enterprise seat this account does not have.\n" +
-  'Set FIGMA_ACCESS_TOKEN (a Figma REST personal token; see docs/connectors/figma.md) and\n' +
+  'Set FIGMA_ACCESS_TOKEN (a Figma REST personal token; see docs/connectors/figma/overview.md) and\n' +
   're-run. Nothing was written.';
 
 async function main() {

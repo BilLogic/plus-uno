@@ -36,7 +36,7 @@ Someone faces a decision or a meeting. The bot gathers what the estates say and 
 **Open questions** — {what would settle it}
 ```
 
-The prep is grouped by cards, intakes and threads, each item one line with its link and status.
+The prep is grouped by cards, intakes and threads, each item one line with its link and status. A list of cards from one lookup is the result table: `docs/connectors/slack/shapes` § Answer shapes.
 
 ## Exit
 

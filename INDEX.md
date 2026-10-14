@@ -15,7 +15,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 **Working on the harness** → [`AGENTS.md`](AGENTS.md) → [`docs/adr/overview.md`](docs/adr/overview.md) → [`skills/uno-maintain/SKILL.md`](skills/uno-maintain/SKILL.md)
 
-**Working on uno-bot** → [`agents/uno-bot/AGENT.md`](agents/uno-bot/AGENT.md) → [`docs/connectors/slack.md`](docs/connectors/slack.md) → [`docs/engineering/operations.md`](docs/engineering/operations.md)
+**Working on uno-bot** → [`agents/uno-bot/AGENT.md`](agents/uno-bot/AGENT.md) → [`docs/connectors/slack/overview.md`](docs/connectors/slack/overview.md) → [`docs/engineering/operations.md`](docs/engineering/operations.md)
 
 **Writing something long** → [`docs/conventions/writing.md`](docs/conventions/writing.md) → [`docs/connectors/overview.md`](docs/connectors/overview.md)
 
@@ -66,11 +66,13 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
+| [`docs/connectors/figma/overview.md`](docs/connectors/figma/overview.md) | Figma's connector overview, always loaded — what uno-bot can reach over REST, canvas vs comments, the six annotation labels, How We Fig's stage folders, file titles and page sections, and an agent's duties; the bot's long-form access doc is uno-bot-access.md beside it |
 | [`docs/connectors/figma/uno-bot-access.md`](docs/connectors/figma/uno-bot-access.md) | What uno-bot can read and write in Figma over REST, and where it stops — frame renders, comment reads and @uno replies, the library and comment pipelines, a Figma ask's public scope, and each limit with its cause and next route |
-| [`docs/connectors/figma.md`](docs/connectors/figma.md) | PLUS Figma files follow How We Fig — five stage folders per team, `<Project> / Card <n> & <m> / <designers>` titles, six divider page sections; an agent suggests a rename or a move and a person makes it |
-| [`docs/connectors/notion.md`](docs/connectors/notion.md) | How agents write to Notion — the MCP-write principle, convention surfaces, the gated tools, and body shape. |
+| [`docs/connectors/notion/overview.md`](docs/connectors/notion/overview.md) | Notion's connector overview, always loaded — the one credential and the MCP-write principle, the write surfaces, the Decisions DB, the read radar and the Roadmap card rules; page-writing.md beside it is how a body is written |
+| [`docs/connectors/notion/page-writing.md`](docs/connectors/notion/page-writing.md) | How a Notion page body is written, disclosed — the Markdown the Worker turns into blocks, attribution, the project-hub golden sections, the comments protocol and the API's markdown quirks |
 | [`docs/connectors/overview.md`](docs/connectors/overview.md) | One row per connected tool: where its conventions live, what touches it |
-| [`docs/connectors/slack.md`](docs/connectors/slack.md) | Pillar → channel map (group announcements; all private — uno-bot must be invited before posting/@here): Universal → #plus-universal C072E8SFLKV · Admin → #plus-admin C089A3E9CCW · |
+| [`docs/connectors/slack/overview.md`](docs/connectors/slack/overview.md) | Slack's connector overview, always loaded — channels, the pillar → channel map, surfaces, the two gates, message formatting, threading, writing style and frame words; the output shapes are shapes.md beside it |
+| [`docs/connectors/slack/shapes.md`](docs/connectors/slack/shapes.md) | Slack's output shapes, disclosed — the share-out post, the answer shapes `present` builds (result table, chart, answer cards, ⚠️ line, Sources box), the render path each part takes, and the copy rules for the Worker's own Figma messages |
 | [`docs/connectors/storybook-mcp.md`](docs/connectors/storybook-mcp.md) | The Storybook MCP endpoint — the primary interface to the design system while Storybook runs, plus the story-authoring conventions that keep it useful. |
 | [`docs/connectors/supabase/blueprint-direct-access.md`](docs/connectors/supabase/blueprint-direct-access.md) | Query recipes and service-key notes for agents that read the blueprint's database directly rather than through the portal — the supplement to blueprint.md, which it adds to |
 | [`docs/connectors/supabase/blueprint-navigation.md`](docs/connectors/supabase/blueprint-navigation.md) | uno-bot's voice over the blueprint — citation shape, confidence language, absence behaviour and source routing; the blueprint's own account of its shape is blueprint.md beside this file, its schema blueprint-schema.md |
@@ -211,6 +213,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-140 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+142 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

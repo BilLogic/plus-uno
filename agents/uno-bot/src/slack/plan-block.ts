@@ -20,7 +20,7 @@
 // with one of its built-in names — globe, book, map, code, comment, folder,
 // cube and image were all accepted live on 2026-10-07, on the stream chunk.
 // An image URL, a `url`, an `image` element, an emoji or an unknown name is
-// refused with `invalid_arguments` (docs/connectors/slack.md § Task cards).
+// refused with `invalid_arguments` (docs/connectors/slack/shapes.md § Task cards).
 //
 // PURE: no `Env`, so the adapter can import it without importing `api.ts`.
 

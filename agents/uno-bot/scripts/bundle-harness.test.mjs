@@ -284,7 +284,7 @@ test("an assembled bundle over its char budget fails the build", () => {
   // because it is always in the prompt: a method padded here would land in the
   // reference map instead once it is disclosed (#424), and the ceiling would
   // never see it.
-  const rel = "docs/connectors/figma.md";
+  const rel = "docs/connectors/figma/overview.md";
   const result = withFile(rel, (abs, original) => writeFileSync(abs, original + padding(200_000)), () =>
     runBundler(["--check"]),
   );
@@ -300,7 +300,7 @@ test("an assembled bundle over its char budget fails the build", () => {
 // constitution that swells the whole bundle past 175,500 still fails.
 
 /** An always-loaded doc with a long bundled middle, to take padding back out of. */
-const OFFSET_DOC = "docs/connectors/slack.md";
+const OFFSET_DOC = "docs/connectors/slack/overview.md";
 
 /** `text` with `n` chars cut from the line break nearest its middle — inside the
  *  bundled body, clear of the frontmatter and of the ide-only blocks at either end. */
@@ -434,7 +434,7 @@ test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
   // to do with the floor logic it guards: in #576 two rows added to the glossary
   // put the emptied bundle back over the floor, and the deep-module batch
   // #592-#625 did it again by adding a glossary row per module landed.
-  // `figma.md` is the fifth member for the reason `supabase/overview.md` was the
+  // `figma/overview.md` is the fifth member for the reason `supabase/overview.md` was the
   // fourth: about 6.8k of real headroom rather than the next hairline. If this
   // trips again, add another member rather than trimming prose to fit a
   // fixture — the bundle growing is the healthy direction, and the thing under
@@ -447,11 +447,11 @@ test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
   const result = withFile(wranglerToml, withRegion("us-central1"), () =>
     withFiles(
       [
-        "docs/connectors/notion.md",
-        "docs/connectors/slack.md",
+        "docs/connectors/notion/overview.md",
+        "docs/connectors/slack/overview.md",
         "docs/connectors/supabase/blueprint-navigation.md",
         "docs/connectors/supabase/overview.md",
-        "docs/connectors/figma.md",
+        "docs/connectors/figma/overview.md",
       ],
       frontmatterOnly,
       () => runBundler(["--check"]),
@@ -527,8 +527,10 @@ test("the manifest lists every member in load order, ending at the assembled len
   // The running total is the assembled prompt's length through that row, so the
   // last one is the whole prompt. That is what ties the manifest to the text
   // below it: a manifest whose arithmetic did not land on the real total would
-  // be a table of plausible numbers.
-  const cells = rows[rows.length - 1][3].split("|").map((c) => c.trim());
+  // be a table of plausible numbers. The last row may be a section's pointer
+  // block rather than a file, so it is read from every numbered row.
+  const numbered = [...manifest.matchAll(/^\| \d+ \| \S+ \| [^|]+ \|(.*)\|$/gm)];
+  const cells = numbered[numbered.length - 1][1].split("|").map((c) => c.trim());
   assert.equal(
     Number(cells[1].replace(/,/g, "")),
     assembled().length,
@@ -555,7 +557,7 @@ test("--check fails on a stale companion, names it, and writes nothing", () => {
 
 test("a bundled doc changed without regenerating fails and names the companion", () => {
   const result = withFile(
-    "docs/connectors/figma.md",
+    "docs/connectors/figma/overview.md",
     (abs, original) => writeFileSync(abs, `${original}\nA probe line.\n`),
     () => runBundler(["--check"]),
   );
@@ -1007,4 +1009,47 @@ test("each scheduled-action family is disclosed under its folder name, with a ge
 test("the sweep doc is read by its new name only", () => {
   assert.ok(!("docs/connectors/slack-sweep" in references()), "the old name must leave the map");
   assert.ok(!assembled().includes("slack-sweep"), "the prompt must not name the old doc");
+});
+
+// ── Connector folders: the overview always loaded, the rest on demand ─────────
+
+const CONNECTOR_FOLDERS = {
+  slack: ["docs/connectors/slack/shapes"],
+  notion: ["docs/connectors/notion/page-writing"],
+  figma: [],
+};
+
+test("each connector folder bundles its overview and discloses its siblings", () => {
+  const { members } = manifestOf();
+  const prompt = assembled();
+  for (const [folder, disclosed] of Object.entries(CONNECTOR_FOLDERS)) {
+    const root = `docs/connectors/${folder}/`;
+    const rows = members.filter((m) => m.path.startsWith(root));
+    const overview = rows.find((m) => m.path === `${root}overview.md`);
+    assert.equal(overview?.delivery, "bundled", `${root}overview.md must be always loaded`);
+    for (const row of rows.filter((m) => m !== overview)) {
+      assert.notEqual(row.delivery, "bundled", `${row.path} must be disclosed or IDE-only, not always loaded`);
+    }
+    assert.deepEqual(
+      rows.filter((m) => m.delivery === "disclosed").map((m) => m.name).sort(),
+      disclosed,
+      `${root} discloses exactly its named siblings`,
+    );
+    for (const name of disclosed) {
+      assert.ok(prompt.split("\n").some((l) => l.startsWith(`**${name}** — `)), `\`${name}\` must leave a pointer line`);
+    }
+    assert.ok(!existsSync(path.join(repoRoot, `docs/connectors/${folder}.md`)), `docs/connectors/${folder}.md must be gone`);
+  }
+});
+
+test("the Figma overview carries the REST reach table", () => {
+  const prompt = assembled();
+  const start = prompt.indexOf("<!-- docs/connectors/figma/overview.md -->");
+  assert.ok(start !== -1, "the Figma overview is in the prompt");
+  const end = prompt.indexOf("<!-- docs/connectors/", start + 10);
+  const body = prompt.slice(start, end === -1 ? undefined : end);
+  assert.match(body, /## What uno-bot can reach in Figma/);
+  for (const row of ["Render a frame", "Comments", "Reactions", "Variables", "Canvas writes"]) {
+    assert.match(body, new RegExp(`\\| ${row}`), `the reach table has a ${row} row`);
+  }
 });

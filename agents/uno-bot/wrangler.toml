@@ -87,7 +87,7 @@ crons = ["0 4,5 * * TUE-SAT", "0 13,14 * * MON-FRI"]
 # blank. On a pass, set SLACK_STREAM_MARKUP_PROBE HERE in [vars] — a dashboard
 # value is wiped by the next deploy — as "pass:YYYY-MM-DD" plus any note. Until
 # then "on" is refused at runtime, logged once per isolate —
-# docs/connectors/slack.md § Streamed text.
+# docs/connectors/slack/shapes.md § Streamed text.
 SLACK_STREAM_MARKUP_PROBE = "pass:2026-09-22 r393 DM: raw bare <@teammate> + fenced <@teammate> <@U…> streamed via markdown_text, not blank; both shown literally, fenced one as code, real id in code did not ping"
 SLACK_STREAMING = "off"
 #
@@ -225,7 +225,7 @@ FIGMA_HANDLE_SLACK_IDS = ""
 PLUS_UNIVERSAL_CHANNEL_ID = "C072E8SFLKV"
 # The other team channels of the posting ladder (src/destination/): a finding
 # with no thread goes to the channel of its card's Product Pillar, else its
-# Figma file's team (docs/connectors/slack.md). Each is private, so uno-bot
+# Figma file's team (docs/connectors/slack/overview.md). Each is private, so uno-bot
 # needs an invite before it can post there. Leave one blank → that team's
 # findings are not posted.
 PLUS_ADMIN_CHANNEL_ID = "C089A3E9CCW"

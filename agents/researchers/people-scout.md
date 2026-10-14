@@ -23,5 +23,5 @@ Identifies who holds the knowledge (SME) or who fits the participant criteria, u
 
 ## Conventions it obeys
 
-- `docs/connectors/notion.md` — Team DB is read-only for this agent
+- `docs/connectors/notion/overview.md` — Team DB is read-only for this agent
 - Rubric dimension it serves: `docs/evals/rubrics/uno-research.md` → sme-precision

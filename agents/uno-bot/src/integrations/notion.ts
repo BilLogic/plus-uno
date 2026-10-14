@@ -102,7 +102,7 @@ function todo(content: string) {
  *
  * Was `bodyToParagraphs`: split on blank lines, one `paragraph` block each, no
  * markup parsing at all. The model writes standard Markdown (`AGENT.md`, and
- * `notion.md` § Decisions shows a body as `**Decision:** one sentence`), so
+ * `docs/connectors/notion/overview.md` § Decisions DB shows a body as `**Decision:** one sentence`), so
  * bullets arrived as literal hyphens, bold as literal asterisks, and links as
  * literal `[label](url)`. See `notion-blocks.ts` for the mapping.
  */
@@ -1630,7 +1630,7 @@ export async function publishMarketplaceRow(env: Env, input: MarketplaceInput): 
 /**
  * The options a database's select, status or multi-select property offers, in
  * their stored spelling — what a write exact-matches against, since Notion
- * silently creates any option it is handed (`docs/connectors/notion.md`).
+ * silently creates any option it is handed (`docs/connectors/notion/overview.md`).
  * Null when the property is not one of those types or is not on the schema.
  *
  * @param env - Worker bindings

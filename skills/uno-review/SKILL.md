@@ -53,9 +53,9 @@ Suggest proactively when the user says "done", "ready to share", or is about to 
 | always | `references/method.md` |
 | coded artifact | `references/catch-patterns.md` (+ the script above) · sample report shape: `examples/review-output-example.md` |
 | artifact touches Storybook stories/MDX | `references/storybook.md` · `references/storybook-component-docs.md` |
-| posting verdicts / sign-offs to Slack | `docs/connectors/slack.md` |
+| posting verdicts / sign-offs to Slack | `docs/connectors/slack/overview.md` |
 
-Lens rule docs (DS agent-views, `foundations/accessibility.md`, `docs/connectors/figma.md`) are loaded by the summoned agents, not here.
+Lens rule docs (DS agent-views, `foundations/accessibility.md`, `docs/connectors/figma/overview.md`) are loaded by the summoned agents, not here.
 
 ## Quality bar
 

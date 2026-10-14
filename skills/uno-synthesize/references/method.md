@@ -85,7 +85,7 @@ problem / goals; user flows + screen list → requirements & scope; action items
 acceptance criteria; open questions carry over. Every key PRD claim traces to a
 documented finding (target: 100%).
 
-Instantiate from the Notion PRD template (see `docs/connectors/notion.md` —
+Instantiate from the Notion PRD template (see `docs/connectors/notion/page-writing.md` —
 templates are referenced, never duplicated). Draft first and let the designer
 refine; instantiate/file only on approval.
 
@@ -99,7 +99,7 @@ On PRD acceptance, **in the same action**:
    rubric hard-gate failure.
 3. Move the project's Roadmap card to `Design Status: Ready for Design` —
    exact-match existing select options; never create options, pillars, features, or
-   OKR relations (`docs/connectors/notion.md`).
+   OKR relations (`docs/connectors/notion/overview.md`).
 
 Blueprint writes in an accepted-PRD context are pre-authorized; any other blueprint
 edit routes through uno-maintain.

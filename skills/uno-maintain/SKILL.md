@@ -53,8 +53,8 @@ need it.
 
 ## Tier-2 loads
 
-- `docs/connectors/notion.md` — intake card + PRD mechanics
-- `docs/connectors/slack.md` — the two gates; verdict convention is gate 2
+- `docs/connectors/notion/overview.md` — intake card + PRD mechanics
+- `docs/connectors/slack/overview.md` — the two gates; verdict convention is gate 2
 - `docs/engineering/operations.md` — before touching anything a standing automation owns
 
 ## Quality bar

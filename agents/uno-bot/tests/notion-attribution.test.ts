@@ -1,5 +1,5 @@
 // The Notion attribution line's words, pinned twice: as the literal a reader
-// sees, and against `docs/connectors/notion.md` § Attribution, which states
+// sees, and against `docs/connectors/notion/page-writing.md` § Attribution, which states
 // the same sentence to the model. A rewording in one place is a failure here
 // until the other says it too.
 import { test } from "node:test";
@@ -26,6 +26,6 @@ test("the attribution block carries exactly the line, as one quiet paragraph", (
 
 test("the Notion connector doc states the same line the Worker writes", () => {
   // The suite runs from `agents/uno-bot`, as `figma-copy.test.ts` reads its doc.
-  const doc = readFileSync(join(process.cwd(), "..", "..", "docs", "connectors", "notion.md"), "utf8");
-  assert.ok(doc.includes(`"${notionAttribution("{name}")}"`), "notion.md § Attribution quotes the line");
+  const doc = readFileSync(join(process.cwd(), "..", "..", "docs", "connectors", "notion", "page-writing.md"), "utf8");
+  assert.ok(doc.includes(`"${notionAttribution("{name}")}"`), "notion/page-writing.md § Attribution quotes the line");
 });

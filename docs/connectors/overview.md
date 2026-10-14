@@ -11,9 +11,9 @@ One row per connected tool: where its conventions live, what touches it. Concret
 
 | Tool | Conventions | Primary access | Written by |
 |---|---|---|---|
-| Notion | `docs/connectors/notion.md` | MCP: `notion-plus` · `notion-parsnip` · `notion-personal` | `writers/notion` only |
-| Figma | `docs/connectors/figma.md` (workspace) · `design-system/guidelines/figma/mcp-guide.md` (MCP pipeline) | MCP: `figma-plus` · `figma-parsnip` (+ Cursor Figma plugin / Dev Mode) | `writers/figma` only |
-| Slack | `docs/connectors/slack.md` | IDE MCP: `slack-plus` · `slack-parsnip` (separate OAuth each); bot: uno-bot Worker | the uno-bot embodiment |
+| Notion | `docs/connectors/notion/` — `overview.md`, `page-writing.md` | MCP: `notion-plus` · `notion-parsnip` · `notion-personal` | `writers/notion` only |
+| Figma | `docs/connectors/figma/` — `overview.md` (workspace + uno-bot reach), `uno-bot-access.md` · `design-system/guidelines/figma/mcp-guide.md` (MCP pipeline) | MCP: `figma-plus` · `figma-parsnip` (+ Cursor Figma plugin / Dev Mode) | `writers/figma` only |
+| Slack | `docs/connectors/slack/` — `overview.md`, `shapes.md` | IDE MCP: `slack-plus` · `slack-parsnip` (separate OAuth each); bot: uno-bot Worker | the uno-bot embodiment |
 | Supabase (`uno-blueprint`) | `docs/connectors/supabase/overview.md` | `search_blueprint` / PostgREST | `writers/blueprint` only |
 | Storybook (`uno-storybook`) | `docs/connectors/storybook-mcp.md`; source of truth in `design-system/` stories, setup `.storybook/main.js` | MCP `storybook` at `http://localhost:4200/mcp` while `npm run storybook` runs | skills (component work) |
 | Netlify | deploy notes: `docs/product-and-service/plus-uno.md` + `skills/uno-publish/references/deployment-guide.md` | MCP `netlify` · `netlify.toml` | uno-publish |
@@ -21,7 +21,7 @@ One row per connected tool: where its conventions live, what touches it. Concret
 | GitHub | — | MCP `github` | skills / maintain |
 | Amplitude | — | MCP `Amplitude` (OAuth) | research |
 | NotebookLM | — | MCP `notebooklm` | research |
-| Loom | share-out role: `docs/connectors/slack.md` (bundle) | manual recording; URL in bundle | humans |
+| Loom | share-out role: `docs/connectors/slack/shapes.md` (bundle) | manual recording; URL in bundle | humans |
 | Stitch MCP | wireframe generation for exploration | MCP | — |
 | Playwright MCP | external-site capture ("HTML to Design"), browser e2e | global `.claude.json` | — |
 

@@ -8,7 +8,7 @@ summary: Catches spec-vs-implementation drift before ship: walks the QA site aga
 
 ## Role & responsibility
 
-Catches spec-vs-implementation drift before ship: walks the QA site against the 📐 Specs pages of the Roadmap card's Figma file, using the Design QA checklist. Diagnose-only — files findings with severity verdicts; devs fix. Spec-file resolution and the drift-catch target are owned by `docs/connectors/figma.md` (`Card <n>` titles, page sections) and `docs/evals/rubrics/uno-review.md`.
+Catches spec-vs-implementation drift before ship: walks the QA site against the 📐 Specs pages of the Roadmap card's Figma file, using the Design QA checklist. Diagnose-only — files findings with severity verdicts; devs fix. Spec-file resolution and the drift-catch target are owned by `docs/connectors/figma/overview.md` (`Card <n>` titles, page sections) and `docs/evals/rubrics/uno-review.md`.
 
 ## Invoked by
 
@@ -17,12 +17,12 @@ Catches spec-vs-implementation drift before ship: walks the QA site against the 
 
 ## Workflow
 
-1. Resolve the Roadmap card → the Figma file whose title lists its number (`Card <n> & <m>`) → the pages under its 📐 Specs divider (per `docs/connectors/figma.md`).
+1. Resolve the Roadmap card → the Figma file whose title lists its number (`Card <n> & <m>`) → the pages under its 📐 Specs divider (per `docs/connectors/figma/overview.md`).
 2. Walk the QA build against the spec: layout, tokens, states, behaviors, content; run the H7 checklist (Notion Templates).
 3. Post findings with severity (blocker / major / minor — the review method's vocabulary) + screenshots/links.
 
 ## Conventions it obeys
 
-- `docs/connectors/figma.md` — `Card <n>` file titles, page sections
-- `docs/connectors/notion.md` — Roadmap DB statuses
+- `docs/connectors/figma/overview.md` — `Card <n>` file titles, page sections
+- `docs/connectors/notion/overview.md` — Roadmap DB statuses
 - Scored by: `docs/evals/rubrics/uno-review.md` (design_qa_drift_catch)

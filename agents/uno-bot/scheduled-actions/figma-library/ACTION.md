@@ -7,7 +7,7 @@ description: the library publish card — read before answering a reply on a #pl
 
 # Figma library sync
 
-<!-- canonical per ADR-017 (docs/adr/) · a scheduled action, read through read_reference as `figma-library` · moved 2026-10-14 out of docs/connectors/figma/uno-bot-access.md · the code is agents/uno-bot/src/figma-poll.ts and src/figma-library/; its copy follows docs/connectors/slack.md § Figma messages. -->
+<!-- canonical per ADR-017 (docs/adr/) · a scheduled action, read through read_reference as `figma-library` · moved 2026-10-14 out of docs/connectors/figma/uno-bot-access.md · the code is agents/uno-bot/src/figma-poll.ts and src/figma-library/; its copy follows docs/connectors/slack/shapes.md § Figma messages. -->
 
 ## From a publish to a filed intake
 

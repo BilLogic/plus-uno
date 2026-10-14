@@ -3,7 +3,7 @@
 // A PLUS file's pages sit under six divider pages, named exactly
 // `- - - 🖼️ Cover - - -`, `- - - 📐 Specs - - -`, `- - - ⏳ WIP - - -`,
 // `- - - 🕹️ Playground - - -`, `- - - 🔍 For Review - - -` and
-// `- - - 🗂️ Archive - - -` (`docs/connectors/figma.md` § Page sections). A
+// `- - - 🗂️ Archive - - -` (`docs/connectors/figma/overview.md` § Page sections). A
 // page belongs to the section of the last divider above it; a page above every
 // divider, or in a file with none, belongs to no section. Only Specs and For
 // Review hold decisions worth carrying out of Figma.

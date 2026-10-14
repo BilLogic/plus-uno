@@ -18,7 +18,7 @@ Team filtering, Project-card relations, and Roadmap rollups live in Notion. Prot
 ## Properties
 
 Names are exact — Notion silently auto-creates a select option on any mismatch, so
-fetch the schema and exact-match before every write (see `notion.md`).
+fetch the schema and exact-match before every write (see `docs/connectors/notion/overview.md`).
 
 | Property | Type | Maps to JS field | Notes |
 |---|---|---|---|

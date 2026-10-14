@@ -21,7 +21,7 @@
 /** The emoji the label is, and the whole of the label comments carried before it took the colon. */
 const GOAT = "🐐";
 
-/** What everything uno-bot writes into Figma opens with, its first line beside it (docs/connectors/slack.md § Figma messages, rule 7). */
+/** What everything uno-bot writes into Figma opens with, its first line beside it (docs/connectors/slack/shapes.md § Figma messages, rule 7). */
 export const FIGMA_LABEL = `${GOAT}:`;
 
 /** The label replies carried before it was the emoji alone, still on comments already posted. */

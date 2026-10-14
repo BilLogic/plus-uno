@@ -25,6 +25,8 @@ A report lands where it gets worked. Every intake runs one rule: inspect, route,
 
 ## Shape
 
+A Roadmap intake's body follows `docs/connectors/notion/page-writing`; a GitHub issue renders its Markdown as written.
+
 The build hand-off:
 
 ```

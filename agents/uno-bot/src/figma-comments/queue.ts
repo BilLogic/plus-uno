@@ -10,7 +10,7 @@
 //
 // THE CARDED MARKS are ids only: a thread whose decision was carded is never
 // carded again, whatever later replies say (a known limit, stated in
-// `docs/connectors/figma.md`).
+// `docs/connectors/figma/overview.md`).
 //
 // PURE: types and one merge.
 

@@ -5,7 +5,7 @@
 // ── Annotations ────────────────────────────────────────────────────────────
 //
 // The team writes agent-readable context as annotations (docs/connectors/
-// figma.md), so a frame's annotations are as quotable as its text. Each comes
+// figma/overview.md), so a frame's annotations are as quotable as its text. Each comes
 // back with the layer it sits on, its text and the properties it pins. Its
 // category is a per-file id that REST cannot name, so it is left out rather
 // than shown as a bare id.

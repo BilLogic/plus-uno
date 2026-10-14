@@ -10,7 +10,7 @@
 //
 // NAMED ICONS ONLY. Slack takes `{type: "icon", name}` with a built-in name and
 // refuses everything else — an image URL, a `url`, an `image` element, an
-// emoji, a name it does not know (docs/connectors/slack.md § Task cards). Every
+// emoji, a name it does not know (docs/connectors/slack/shapes.md § Task cards). Every
 // name below was accepted by production Slack on 2026-10-07.
 //
 // A PURE module: no Env.
