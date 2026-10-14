@@ -5,7 +5,7 @@
 // A KEY DECISION is a build rule tied to a Roadmap card, settled or concretely
 // proposed. The detector that found it says which row it belongs to, against
 // the card's existing rows it was shown; this module holds it to the rules
-// (`docs/connectors/notion.md` § Decisions DB):
+// (`docs/connectors/notion/overview.md` § Decisions DB):
 //   • ONE ROW PER DECISION AREA. A decision that widens a row updates that
 //     row — its Name, and a dated line in its body with the evidence — and
 //     keeps its Owner and its primary Evidence. A row named as an existing

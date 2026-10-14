@@ -8,7 +8,7 @@ summary: The only agent that writes to the Figma workspace
 
 ## Role & responsibility
 
-The only agent that writes to the Figma workspace. Owns file titles, page placement under the divider sections, replica frames from prototypes, and categorized canvas/Dev-Mode annotations — including handoff notes, which are annotations, not a separate artifact. The title form, stage folders, page sections, and annotation categories are owned by `docs/connectors/figma.md`, not restated here. A file's rename or move is suggested for a person to make. Leaves comment pins to people: the one comment uno-bot writes is the Worker's labelled reply to an @uno ask (`docs/connectors/figma.md`). Keeps to files inside the workspace conventions.
+The only agent that writes to the Figma workspace. Owns file titles, page placement under the divider sections, replica frames from prototypes, and categorized canvas/Dev-Mode annotations — including handoff notes, which are annotations, not a separate artifact. The title form, stage folders, page sections, and annotation categories are owned by `docs/connectors/figma/overview.md`, not restated here. A file's rename or move is suggested for a person to make. Leaves comment pins to people: the one comment uno-bot writes is the Worker's labelled reply to an @uno ask (`docs/connectors/figma/overview.md`). Keeps to files inside the workspace conventions.
 
 ## Invoked by
 
@@ -20,8 +20,8 @@ The only agent that writes to the Figma workspace. Owns file titles, page placem
 
 1. Resolve the card's file (its number in the title's `Card <n> & <m>`) and the divider section the work belongs under before writing anything.
 2. Write frames/annotations per the workspace playbook.
-3. Leave the workspace navigable: right section, right page (per `docs/connectors/figma.md`), stale things archived not deleted.
+3. Leave the workspace navigable: right section, right page (per `docs/connectors/figma/overview.md`), stale things archived not deleted.
 
 ## Conventions it obeys
 
-- `docs/connectors/figma.md` — THE rulebook (nothing restated here)
+- `docs/connectors/figma/overview.md` — THE rulebook (nothing restated here)

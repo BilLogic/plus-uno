@@ -48,7 +48,7 @@ Routing: match intent to the Use-when column; if ambiguous, ask which capability
 
 ## Agents — what skills summon
 
-`agents/` holds three plain kinds plus the embodiment: **researchers/** (gather), **reviewers/** (judge), **writers/** (notion · figma · blueprint — the *only* agents that write to external estates, save the Worker's labelled reply to an @uno Figma comment: `docs/connectors/figma.md`). Roster, anatomy, and the creation rule: `agents/README.md`.
+`agents/` holds three plain kinds plus the embodiment: **researchers/** (gather), **reviewers/** (judge), **writers/** (notion · figma · blueprint — the *only* agents that write to external estates, save the Worker's labelled reply to an @uno Figma comment: `docs/connectors/figma/overview.md`). Roster, anatomy, and the creation rule: `agents/README.md`.
 
 ## Conventions — what agents obey
 
@@ -82,7 +82,7 @@ The name in parentheses is how the rest of the harness cites each rule, so renum
 1. **The design system's generated index is the existence law** (`DS-knowledge-is-law`, `no-duplicate-components`). Start at `design-system/guidelines/overview.md`, then load only what the task needs (e.g. `design-system/agent-views/components/index.md`, `design-system/agent-views/tokens/tokens.md`). A component absent from the index does not exist — propose creating it rather than asserting it, and check the index before creating one so you do not duplicate what is there.
 2. **Read the source for every name you use** (`read-source-first`, `no-hallucinated-props`). Props, variants and types come from the component `.jsx` / `.stories.jsx` — or from `get-documentation` on the Storybook MCP endpoint (`docs/connectors/storybook-mcp.md`) — before you write them.
 3. **Icons are Font Awesome Free** (`FA-Free-only`): `fa-solid`, `fa-regular`, `fa-brands` — including the brand glyphs (`fa-brands fa-notion`, `fa-brands fa-figma`). Pro families and Pro-only names (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, `fa-grid-2`) are not licensed here and render as blanks.
-4. **Notion writes follow `docs/connectors/notion.md`** — the convention surfaces and the ✅-gated tools. Select options, pillars, features and OKRs are exact-matched against what the database already offers; a value that does not exist is a question for the requester. Safety is the gate + schema match, not a hardcoded database fence.
+4. **Notion writes follow `docs/connectors/notion/`** — the convention surfaces and the ✅-gated tools. Select options, pillars, features and OKRs are exact-matched against what the database already offers; a value that does not exist is a question for the requester. Safety is the gate + schema match, not a hardcoded database fence.
 5. **PLUS components first** (`PLUS-components-first`), then generic React-Bootstrap where no PLUS equivalent exists (ADR-009). Bootstrap is the UI framework for product UI; Tailwind is present but scoped to the Storybook documentation chrome in `design-system/src/storybook-docs/`, so it is not a precedent for product code.
 
 <!-- ide-only -->
@@ -121,7 +121,7 @@ Finished work leaves behind a **rule** in the doc that already owns the subject,
 | Implementation setup (aliases, prototypes, Vite) | `docs/engineering/setup.md` |
 | Figma link, implement-design, design-to-code mapping, or **code write-back to Figma** | `design-system/figma/component-registry.json` + `token-registry.json` (MANDATORY — load first); then `design-system/guidelines/figma/component-alignment.md`. When the gate is active, write-back also loads `.cursor/hooks/briefings/active-writeback-gate.json`. |
 | Figma node id or link for a specific component | `design-system/figma/component-figma-links.md` (generated from component MDX; run `npm run generate:figma-links`) |
-| Writing to Notion / Figma / Slack / blueprint | the matching `docs/connectors/*.md` |
+| Writing to Notion / Figma / Slack / blueprint | the matching connector folder's `docs/connectors/<tool>/overview.md`, then the sibling its pointer names |
 | Reading or reasoning over the blueprint | `docs/connectors/supabase/blueprint.md` first — the blueprint's own account (shape, status vocabulary, retrieval modes; the schema is `blueprint-schema.md` beside it), vendored from plus-uno-blueprint, so a schema fix belongs there — then `docs/connectors/supabase/blueprint-navigation.md` for citation shape, confidence and absence; `docs/connectors/supabase/blueprint-direct-access.md` for SQL and PostgREST recipes. Load BEFORE querying; un-guided blueprint reads fail on navigation and lane attribution (the Worker carries the first two) |
 | Long-form — a README, a recap, a findings page | `docs/conventions/writing.md`. Ordinary replies, commits and PRDs need no doc: the model's default is the house voice. |
 | Writing or editing a bot skill | `skills/README.md` § Bot skills, then `npm run check:bot-skills` |

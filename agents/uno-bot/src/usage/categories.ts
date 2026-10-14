@@ -6,7 +6,7 @@
 // Sub-type, and bot-era asks are tagged on the same axis so the article can
 // compare before and after. `SUB_TYPES` is that data source's option list,
 // checked in: a classifier's answer is exact-matched against it, the way every
-// select value is (`docs/connectors/notion.md`),
+// select value is (`docs/connectors/notion/overview.md`),
 // and anything else is stored as blank. If an option is added or renamed in
 // Notion, it changes here, with its row in the map.
 //

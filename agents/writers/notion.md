@@ -22,11 +22,11 @@ The only agent that writes to Notion. Owns hub golden sections (New Project temp
 
 ## Workflow
 
-1. Before any write: confirm the target surface's convention in `docs/connectors/notion.md` and which template applies (New Project vs Maintenance Intake).
+1. Before any write: confirm the target surface's convention in `docs/connectors/notion/overview.md` and which template applies (New Project vs Maintenance Intake).
 2. Write per the conventions (golden sections, Decisions DB schema, exact-match selects, markdown quirks, ⏳-vs-comment rule); long-form prose per `docs/conventions/writing.md`.
 3. For decisions: create a **Decisions DB** row with **Roadmap Card** set and **Evidence** URL when available; put secondary sources in the page body — never append to a Decision Log subpage.
 4. Log the touch in the page's Doc Changelog when the conventions require it; sweep unresolved comments on pages it touches.
 
 ## Conventions it obeys
 
-- `docs/connectors/notion.md` — write surfaces, Decisions DB, hub golden sections (THE rulebook; nothing restated here)
+- `docs/connectors/notion/` — `overview.md` (write surfaces, Decisions DB) and `page-writing.md` (body, hub golden sections): THE rulebook; nothing restated here

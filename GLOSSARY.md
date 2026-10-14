@@ -304,4 +304,4 @@ Two estates describe the product in **different languages**, and the words are N
 
 **Attribution rule:** when reporting findings, name the estate you actually read, in its own words — "on the Roadmap board" ONLY for Notion Roadmap cards; "in the service blueprint" ONLY for blueprint rows.
 
-How frame words render in chat (as `code`) is a Slack and Notion writing convention: `docs/connectors/slack.md` § Frame words render as code.
+How frame words render in chat (as `code`) is a Slack and Notion writing convention: `docs/connectors/slack/overview.md` § Frame words render as code.

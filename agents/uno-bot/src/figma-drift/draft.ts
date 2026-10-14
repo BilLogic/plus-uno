@@ -7,7 +7,7 @@
 //     (`github_issue_create`), for code, Storybook or a repo file. The tool
 //     adds the labels and the footer itself.
 //
-// SELECT VALUES ARE EXACT-MATCHED (hard rule 4, `docs/connectors/notion.md`).
+// SELECT VALUES ARE EXACT-MATCHED (hard rule 4, `docs/connectors/notion/overview.md`).
 // The only select the draft sets is the card's Product Pillar, and only to a
 // value the Roadmap already offers: the candidates are the pillars of Roadmap
 // cards the thread linked (and Universal for the design-system library), each

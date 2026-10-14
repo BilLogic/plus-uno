@@ -25,7 +25,7 @@
 /** What kind of conversation the evidence was read in. */
 export type ChannelKind = "public" | "private" | "group-dm" | "dm";
 
-/** The pillar → channel map, as `docs/connectors/slack.md` states it. Tutoring
+/** The pillar → channel map, as `docs/connectors/slack/overview.md` states it. Tutoring
  *  and Help Center have no channel. */
 export const PILLAR_CHANNELS = {
   Universal: "plus-universal",

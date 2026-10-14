@@ -36,7 +36,7 @@ What each lens applies (the rules live in the docs, not here):
 - `reviewers/ds-lens` — components / tokens / layout vs the DS agent-views and `AGENTS.md` § Hard rules. Coded artifacts: also the catch-pattern greps (`references/catch-patterns.md`, automated by `skills/uno-review/scripts/run-review-checks.sh`).
 - `reviewers/uno-lens` — artifact vs PRD + uno-blueprint constraints, queried live at review time.
 - `reviewers/a11y-lens` — `design-system/guidelines/foundations/accessibility.md`: WCAG AA contrast, 44×44 targets, keyboard reach, focus order + visibility, semantic HTML / screen readers, color-not-alone, reduced motion.
-- `reviewers/design-qa` — the 📐 Specs pages' Dev Mode annotations (`docs/connectors/figma.md`) + the Design QA checklist (Notion 🧩 Templates): components, tokens, spacing, typography, states, interaction behavior.
+- `reviewers/design-qa` — the 📐 Specs pages' Dev Mode annotations (`docs/connectors/figma/overview.md`) + the Design QA checklist (Notion 🧩 Templates): components, tokens, spacing, typography, states, interaction behavior.
 
 ## Findings & severity
 
@@ -53,7 +53,7 @@ Every finding carries **severity · lens · evidence (what's in the artifact) ·
 - **Stage-lens:** `Issues? = Yes` **only when at least one finding is major or above.** Yes → re-enter `uno-prototype` at the reflection (`reflect_learn`) — a failed review can invalidate the approach, not just the artifact; each finding's re-entry point says which (re-choose fidelity vs. content fix). No → "Ready to share?" stays the designer's call; review passing is necessary, not sufficient.
 - **Handoff gate:** any major+ finding holds the publish; clean or minors-only → proceed to dev / PM / stakeholder sign-off.
 - **Design QA:** findings go to dev as annotated issues *before* `Ready for Prod`; blockers hold it.
-- Verdicts and sign-offs posted in Slack follow `docs/connectors/slack.md` (channels + the two gates — never conflate them).
+- Verdicts and sign-offs posted in Slack follow `docs/connectors/slack/overview.md` (channels + the two gates — never conflate them).
 - Pushback on a finding → re-read the cited doc; concede or stand by it with reasoning. Never dig in on thin evidence.
 
 ## Quality bar

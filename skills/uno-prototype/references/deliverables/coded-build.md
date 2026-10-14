@@ -42,7 +42,7 @@ d. **Gate — DS gap (method §4):** needed component not in
    nearest existing composition, file a uno-maintain intake. Never hand-roll a
    lookalike.
 e. Playground or WIP pages in Figma → summon **writers/figma**
-   (obeys `docs/connectors/figma.md`).
+   (obeys `docs/connectors/figma/overview.md`).
 
 Hi-fi hard rules (`AGENTS.md` § Hard rules in full): tokens over literals ·
 official layout formulas · PLUS components before generic primitives · no deep

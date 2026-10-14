@@ -53,7 +53,7 @@ export type { SlackDeliveryTarget } from "./delivery-adapter";
  * Streamed text passes the same markup pass as posted text (`api.ts` § The
  * stream's markup pass), but whether Slack's `markdown_text` blanks on markup
  * it cannot parse, as `text` does, has not been seen live. The probe that
- * settles it is in docs/connectors/slack.md. A flag set without a recorded
+ * settles it is in docs/connectors/slack/overview.md. A flag set without a recorded
  * pass — unset, a failure, anything else — stays off, and says so once per
  * isolate rather than on every turn.
  */
@@ -68,7 +68,7 @@ export function streamFlagOn(
     console.warn(
       `[slack] ${flag} is "on" but SLACK_STREAM_MARKUP_PROBE records no pass` +
         ` (want "pass:YYYY-MM-DD", have ${JSON.stringify(env.SLACK_STREAM_MARKUP_PROBE ?? null)})` +
-        " — streaming stays off until the markup probe in docs/connectors/slack.md has passed",
+        " — streaming stays off until the markup probe in docs/connectors/slack/shapes.md has passed",
     );
   }
   return false;

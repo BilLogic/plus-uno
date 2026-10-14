@@ -7,7 +7,7 @@
 // Two things are pinned, the way tests/share-out.test.ts pins its post:
 //   • each renderer's words, as literals: its first line, its counts against
 //     its names, and its one footer;
-//   • `docs/connectors/slack.md` § Figma messages, read from the file: its
+//   • `docs/connectors/slack/shapes.md` § Figma messages, read from the file: its
 //     Not column is the list of words no message may use, and its checklist
 //     is what every message below is held to. A rule rewritten there is a
 //     test that changes here.
@@ -88,7 +88,7 @@ import {
 // ── The doc ──────────────────────────────────────────────────────────────────
 
 const root = join(process.cwd(), "..", "..");
-const doc = readFileSync(join(root, "docs", "connectors", "slack.md"), "utf8");
+const doc = readFileSync(join(root, "docs", "connectors", "slack", "shapes.md"), "utf8");
 const start = doc.indexOf("## Figma messages");
 const section = doc.slice(start, doc.indexOf("<!-- /ide-only -->", start));
 
@@ -102,7 +102,7 @@ const RETIRED: string[] = section
 
 describe("the doc the messages answer to", () => {
   it("holds the vocabulary table and the eight-point checklist", () => {
-    assert.ok(start > -1, "slack.md has a § Figma messages");
+    assert.ok(start > -1, "slack/shapes.md has a § Figma messages");
     // Guard the guard: an emptied table would let every message pass.
     assert.ok(RETIRED.length >= 12, RETIRED.join(" | "));
     for (const word of ["metadata changed", "dispute", "unmapped", "RM-2482", "Foundation library"]) {
@@ -165,7 +165,7 @@ function retiredPattern(retired: string): RegExp {
 function assertVocabulary(text: string): void {
   const words = readable(text).toLowerCase();
   for (const retired of RETIRED) {
-    assert.doesNotMatch(words, retiredPattern(retired), `"${retired}" is retired (slack.md § Figma messages)`);
+    assert.doesNotMatch(words, retiredPattern(retired), `"${retired}" is retired (slack/shapes.md § Figma messages)`);
   }
 }
 

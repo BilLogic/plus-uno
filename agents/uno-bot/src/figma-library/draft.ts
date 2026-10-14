@@ -394,7 +394,7 @@ export function firstLine(text: string): string {
 
 // ── The #plus-universal messages (#886 § 3.1, approved 2026-09-30) ──────────
 //
-// The words are the approved copy's, and `docs/connectors/slack.md` § Figma
+// The words are the approved copy's, and `docs/connectors/slack/shapes.md` § Figma
 // messages holds the rules they follow; tests/figma-copy.test.ts pins both.
 // Every Figma-sourced string is escaped.
 

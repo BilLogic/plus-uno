@@ -460,7 +460,7 @@ export async function startStream(
 // formatted in markdown" — not whether it parses `<…>` the way `text` does, and
 // on `text` markup it cannot parse blanked a whole message (live 2026-09-22).
 // So the stream takes the same pass until a live probe says otherwise; the
-// probe and what it settles are in docs/connectors/slack.md.
+// probe and what it settles are in docs/connectors/slack/shapes.md § Streamed text.
 //
 // The pass holds back a tail the next append could complete, keyed by stream
 // ts; `stopStream` sends whatever is still held and forgets the stream.

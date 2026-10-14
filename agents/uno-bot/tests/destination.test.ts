@@ -129,7 +129,7 @@ test("a place resolves to its configured channel id, or null when it is unset or
 });
 
 test("the pillar map is the Slack connector's", () => {
-  const doc = readFileSync(join(process.cwd(), "..", "..", "docs", "connectors", "slack.md"), "utf8");
+  const doc = readFileSync(join(process.cwd(), "..", "..", "docs", "connectors", "slack", "overview.md"), "utf8");
   const line = doc.split("\n").find((l) => l.startsWith("`Universal` →"));
   assert.ok(line, "the connector states the map");
   const stated = [...line!.matchAll(/`(\w[\w ]*)` → #([\w-]+)/g)].map(([, pillar, channel]) => [pillar, channel]);

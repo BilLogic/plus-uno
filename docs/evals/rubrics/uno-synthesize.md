@@ -10,7 +10,7 @@ dimensions:
   - id: coverage
     definition: all key source inputs represented in the synthesis
   - id: template-conformance
-    definition: PRD follows the Notion PRD template (Templates #, see docs/connectors/notion.md)
+    definition: PRD follows the Notion PRD template (Templates #, see docs/connectors/notion/page-writing.md)
   - id: traceability
     definition: PRD claims trace to documented findings (target 100% of key claims)
 hard_gates:
