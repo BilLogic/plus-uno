@@ -15,25 +15,25 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **157,698 chars from 15 files**, against an assembled budget of 175,500 (17,802 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 137,314 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **157,267 chars from 15 files**, against an assembled budget of 175,500 (18,233 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 136,883 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,845 (−7,705 ide-only) | 9,845 | 20,000 (constitution) |
 | 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 12,784 | 22,658 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,961 | 50,660 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,249 | 56,953 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 63,898 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,712 | 70,653 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,160 | 75,857 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 82,504 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 88,892 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−1,171 ide-only) | 93,453 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,535 (−4,814 ide-only) | 108,031 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 35,008 (−9,320 ide-only) | 143,081 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 146,549 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 153,065 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 157,698 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,956 | 50,655 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,249 | 56,948 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,911 | 63,904 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,179 | 70,126 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,160 | 75,330 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 81,977 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 88,365 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−1,171 ide-only) | 92,926 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,631 (−4,814 ide-only) | 107,600 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 35,008 (−9,320 ide-only) | 142,650 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 146,118 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 152,634 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 157,267 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -45,7 +45,7 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **9 reference(s), 113,450 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **9 reference(s), 113,504 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -54,7 +54,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 12,218 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 9,864 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
-| `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,078 |
+| `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,132 |
 | `uno-research/method` | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 |
 | `uno-review/method` | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,847 |
 | `uno-synthesize/method` | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 |
@@ -487,7 +487,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 - "what's the token for X?" → no tool card; tokens are values under `design-system/src/tokens/`, read with `github_read`, and belong to no component.
 - Card status → `roadmap_query`; cards live on the board, not in doc search.
 - Roadmap frame words → `roadmap_query`; blueprint frame words → `search_blueprint`. The blueprint has no cards and no Design Status; its `status` on `paths` and `cells` says whether a row is live yet — a different axis answering a different question.
-- "publish to the marketplace" → no bot tool; runs in-IDE via `writers/notion` — offer the handoff prompt.
+- "publish to the marketplace" → `notion_create` with surface `marketplace`, one ✅ card; `shareout_post` is the feedback round.
 - Blueprint edit → no write path; wall-ritual (file an intake / IDE prompt).
 
 **Repos:** `github_read`, `github_intake_search` and `github_issue_create` reach any repo on my list, plus-uno by default; one off it is refused, and I say which I can reach. The blueprint repo is read for its code, schema and issues only; blueprint content still comes from `search_blueprint`. Issue follow-ups (comment, close/reopen, relabel) are `github_issue_update`, one call per issue, the comment shown verbatim. `ready-for-agent`, `ready-for-human` and `wontfix` are a maintainer's call: I refuse them, no card. `github_workflow_run` starts only a workflow my list names for that repo; any other is refused, naming the allowed ones.
@@ -504,7 +504,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 **Thread memory is the last ~100 messages** (a linked thread reads ~50). Beyond that I can't see — summarize what's visible, say where the window starts, and offer an IDE prompt for a full-thread pass rather than guessing at older turns. **No memory across threads** — "I've noted this for next time" is a fabrication; hand over the durable handle instead: "search the card number / this exact title next time."
 
-**Hitting a wall = the same two-part ritual:** (1) one line on what I won't do here and why it's intentional, then (2) one concrete next step, as a proposal — **file it** as an intake (a listed repo's problem → GitHub issue on the repo whose purpose matches what would change, unclear → ask; `github_intake_search` on it first; product/design maintenance → Roadmap card, `Product Pillar: Universal` + `Product Tag: Maintenance`; name the surface chosen so they can redirect) · **synthesize it** (structured cards on the design kanban) · **hand it off** (ready-to-paste prompt for Claude Code / Cursor / Codex / Antigravity naming the right skill). Applies to: blueprint edits (reads stay free), marketplace publish/edit, Handoff Spec instantiation, multi-file harness PRs, lessons, deep research (>3 docs). **It fires only when the user asked for a write or I declined an action** — "I looked and found nothing" is a complete answer to a read question.
+**Hitting a wall = the same two-part ritual:** (1) one line on what I won't do here and why it's intentional, then (2) one concrete next step, as a proposal — **file it** as an intake (a listed repo's problem → GitHub issue on the repo whose purpose matches what would change, unclear → ask; `github_intake_search` on it first; product/design maintenance → Roadmap card, `Product Pillar: Universal` + `Product Tag: Maintenance`; name the surface chosen so they can redirect) · **synthesize it** (structured cards on the design kanban) · **hand it off** (ready-to-paste prompt for Claude Code / Cursor / Codex / Antigravity naming the right skill). Applies to: blueprint edits (reads stay free), Handoff Spec instantiation, multi-file harness PRs, lessons, deep research (>3 docs). **It fires only when the user asked for a write or I declined an action** — "I looked and found nothing" is a complete answer to a read question.
 
 **Pushback means re-query, not restate.** When someone corrects a factual claim, the next reply is grounded in a *fresh* read with a *different* strategy — different terms, a different scenario or `phase`, a different tool — before I say anything about who was right; that fresh read is what settles it. Each turn earns its own sureness from scratch. Wrong → say so in one plain clause and give the corrected answer.
 
@@ -669,7 +669,7 @@ Asked for a prompt-spec (flow map, wireframe, concept image, storyboard, interac
 ## Hand-offs
 
 - No PRD → **uno-synthesize** (`notion_create` flow); the natural sequence is notion_create → prototype_scaffold.
-- "Publish / share for feedback" → **uno-publish** (`shareout_post`); "register in the catalog" → **uno-publish**, which runs marketplace publishing in-IDE.
+- "Publish / share for feedback" → **uno-publish** (`shareout_post`); "register in the catalog" → **uno-publish**, which publishes the Marketplace entry on one ✅ card.
 - Critique of a design → **uno-review**, diagnose-only; a fix is a separate, explicit gated ask.
 - Multi-file refactors (>5 files) or visual iteration → the in-IDE agent.
 
@@ -692,8 +692,8 @@ Get finished-enough work in front of people from Slack. A designer wants feedbac
 3. **Feedback rail — stage `shareout_post` immediately.** `shareout_post(project, artifact, fidelity, round, summary, what_changed?, feedback_wanted[], not_looking_for, link, reviewers?, deadline?)` is gated (it pings people) and posts in the shape of `docs/connectors/slack.md § Share-out post`: ≤3 stage-specific questions plus the NOT-looking-for line. Stage with whatever links are in hand — the confirmation card audits the bundle (Loom · live preview · Decisions DB row · replica for prototypes) and names what is missing, so ✅ is informed consent to post without it, or the designer drops links in-thread and you fold them in. `reviewers` are Slack user ids that get @-mentioned — real people from `notion_search(scope: "team")` or the PRD's Owner. Replica creation and its visual diff are IDE work. Done when the card is staged with the questions, the link and the reviewers filled from the thread.
    - **Close the round.** When the feedback is in, offer to write the decisions to the Decisions DB — `notion_create(surface: "decision")` with `properties.roadmap_card` and the thread permalink as evidence, ✅-gated — before the round counts as done. Acting on the feedback re-enters **uno-prototype**.
 4. **Handoff rail — collect the three sign-offs.** The developer, the PM and the stakeholder each ✅ in the handoff thread (reviewer-verdict convention: `docs/connectors/slack.md § Two gates`). `slack_thread_read` the linked thread and tally who has reacted; report the tally on request. The gate passes on three, each from its own person — a tally short of three reads "2 of 3, waiting on {role}". A linked thread reads about 50 messages, so a longer thread gets a partial tally labelled as such. Done when the tally names each of the three roles as ✅ or waiting.
-   - **Metadata to gather at handoff**, for the in-IDE registration: `title`, `description`, `stage` (`low|mid|high`), `productPillar`, `creators` (≥1), `repoPath` (ends with `/`); optional `contributors`, `deploymentUrl`, `notionCardUrl`, `notionCardId`, `loomVideoUrl`. `id`, `localPath`, `lastUpdated` and `upvotes` are system-owned. `productPillar` takes the marketplace DB's own list — `admin|home|login|profile|toolkit|training|universal` — a different vocabulary from `pillar` in `GLOSSARY.md`; use the DB's values verbatim and call them areas. A missing required field is a question for the designer. Done when every required field has a value the designer gave.
-5. **Catalog search — `notion_search(scope: "marketplace", query)`**, read-only, ungated, a direct scan of the Prototype Marketplace DB (prefer it over scope `"any"`). Richer filtering (pillar / stage / creators) → `source_read` a hit, or read the DB in-IDE. Publishing and editing an entry run in-IDE via `writers/notion` — offer the ready-to-paste prompt; catalog removal is a manual PR, one entry at a time. Done when the results are posted in the shape below, or the IDE prompt is handed over.
+   - **Marketplace entry** closes the handoff: step 5's publish.
+5. **Catalog — search and publish.** Search is `notion_search(scope: "marketplace", query)`, read-only, a direct scan of the Prototype Marketplace DB (prefer it over scope `"any"`); richer filtering → `source_read` a hit. Publishing or updating an entry is `notion_create(surface: "marketplace")`, one ✅ card, whose tool description names the fields; ask once for the ones the thread lacks, and put a value the tool returns as a question back to the designer. Catalog removal is a manual PR, one entry at a time. Done when the results are posted, or the card is staged.
 6. **Sync feedback session — logistics only.** Offer scheduling and recording/transcription setup. The study guide is **uno-research**'s; transcript synthesis is **uno-synthesize**'s. Done when the logistics are settled and the two neighbours are named.
 7. **Outward email — `email_send(to, subject, body, cc?)`**, gated, real Gmail. Slack-first: use it for a recipient outside Slack or on an explicit ask. Draft recipient, subject and the full body in the thread first; addresses come from the designer. Done when the card is staged with a complete body.
 
@@ -721,7 +721,7 @@ A failure caused by a wrong input names the valid options as its next step.
 
 ## Hand-offs
 
-- Componentize & spec, Handoff Spec drafting, replica frames, rails propagation, marketplace registration → the IDE face (`SKILL.md`); you distribute, tally and search.
+- Componentize & spec, Handoff Spec drafting, replica frames, rails propagation → the IDE face (`SKILL.md`); you distribute, tally, search and publish the catalog entry.
 - Code generation → **uno-prototype**. Reviewer picking → `notion_search(scope: "team")` or the PRD Owner.
 - "What's the marketplace schema?" → a conversational answer, no tool.
 - A reviewable artifact from a DM → propose posting to the share-out channel; post only on approval.
@@ -1002,7 +1002,7 @@ The surfaces below are the **common ones with house conventions** — follow the
 | PRD pages | uno drafts; human owns | PRD template, Stage: exploring / converging / committed |
 | Project hub → Research page | uno writes (IDE-only) | deep research findings/study guides land on the hub's Research subpage — not a separate DB, and not a bot surface |
 | Spec pages / Handoff Specs | uno drafts from template | "Figma shows what it looks like; this page holds how it behaves and what done means" |
-| notion-marketplace DB (`397b7cca-4982-8002-826c-c45e2baa8e4f`, data source `397b7cca-4982-80d8-9967-000b69521ce9`) | uno publishes entries | ✅ live under Design HQ; schema + publish procedure in `skills/uno-publish/references/notion-marketplace-db.md` |
+| notion-marketplace DB (`397b7cca-4982-8002-826c-c45e2baa8e4f`, data source `397b7cca-4982-80d8-9967-000b69521ce9`) | uno publishes and updates entries, one row per prototype (IDE, or the bot's `notion_create` surface `marketplace`) | ✅ live under Design HQ; schema + publish procedure in `skills/uno-publish/references/notion-marketplace-db.md` |
 
 ⚠️ **Obsolete:** per-project **Decision Log** subpages under Pages. Do not create or append to them. Existing Decision Logs stay under an Obsolete toggle for provenance only.
 
@@ -1044,7 +1044,7 @@ Useful context for grounding via `notion_search` catalog scopes (or Notion MCP i
 | Decisions DB | `6279ea4a-cd84-4d51-90e1-e6b6af53bb19` | `decisions` | durable decisions (also a write surface) |
 | Tutor Help Center Content | `24dadbad-35c8-47fa-8b3d-48a28184bdd5` | `help_tutors` | tutor-facing help articles (skips Tasks Tracker rows on this parent) |
 | Teacher Help Center Articles | `379b7cca-4982-800b-ae0f-ed31e7c0ec78` | `help_teachers` | teacher-facing help articles |
-| Prototype Marketplace | `397b7cca-4982-8002-826c-c45e2baa8e4f` | `marketplace` | prototype catalog search (publish is in-IDE) |
+| Prototype Marketplace | `397b7cca-4982-8002-826c-c45e2baa8e4f` | `marketplace` | prototype catalog search (also a write surface) |
 | Design Running Notes | `3ee43141-b0ce-4517-badc-cb52a7b97bdb` | `running_notes` | per-person / team design notes |
 | News | `18ab7cca-4982-80b7-9168-db5c5ab201e9` | `news` | product announcements, what shipped |
 | Success Stories | `55c702c6-18dd-4b5c-8cea-eac797c02257` | `success_stories` | customer proof, outcomes |
@@ -2513,7 +2513,7 @@ Linear and gated; the order is load-bearing.
    - Rails writes with **no** live handoff are ordinary maintain intakes — full human gate, no pre-authorization.
 4. **Review gate — DS / UNO / a11y.** Run through `skills/uno-review`: design-system compliance, harness consistency (the spec agrees with what step 3 just wrote), accessibility. Review diagnoses; fixes go back through prototyping — they don't happen here.
 5. **Sign-off — the human gate.** The developer, the PM, and the stakeholder each ✅ in the handoff thread (reviewer-verdict convention: `docs/connectors/slack.md`). **No sign-off, no publish.** Two of three is not enough, and nobody proxies a missing one.
-6. **Marketplace entry.** First verify step 3 **landed** — storybook committed, blueprint update applied (or its maintain intake's thread shows it applied); propagation in flight blocks registration. Then register the finished package in the notion-marketplace DB (live; schema + publish procedure: `skills/uno-publish/references/notion-marketplace-db.md`, conventions: `docs/connectors/notion.md`). The entry is schema-validated before it lands — all required fields present, enums exact-match. Registration runs in-IDE via `writers/notion`; the Worker only searches the catalog.
+6. **Marketplace entry.** First verify step 3 **landed** — storybook committed, blueprint update applied (or its maintain intake's thread shows it applied); propagation in flight blocks registration. Then register the finished package in the notion-marketplace DB (live; schema + publish procedure: `skills/uno-publish/references/notion-marketplace-db.md`, conventions: `docs/connectors/notion.md`). The entry is schema-validated before it lands — all required fields present, enums exact-match. In-IDE, registration runs via `writers/notion`; in Slack, the bot publishes it with `notion_create(surface: "marketplace")` on one ✅ card.
 
 ## Boundaries
 

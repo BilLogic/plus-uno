@@ -98,8 +98,10 @@ function notionCreate(input: Input): ReadOperation {
     ["status", "roadmapcard"].forEach((k) => shown.add(k));
   }
   for (const [key, value] of Object.entries(props)) {
-    if (shown.has(squash(key)) || !str(value)) continue;
-    properties.push([labelOf(key), str(value)]);
+    // A list (a Marketplace row's contributors) reads as one line.
+    const shownValue = Array.isArray(value) ? value.map(str).filter(Boolean).join(", ") : str(value);
+    if (shown.has(squash(key)) || !shownValue) continue;
+    properties.push([labelOf(key), shownValue]);
   }
   const summary = str(input.summary);
   if (summary) properties.push(["Summary", summary]);
@@ -117,7 +119,9 @@ function notionCreate(input: Input): ReadOperation {
         ? "New intake card on the Roadmap"
         : surface === "decision"
           ? "New decision in the Decisions database"
-          : "New Notion page";
+          : surface === "marketplace"
+            ? "Prototype Marketplace row (updated if it already exists)"
+            : "New Notion page";
   return { headline, properties, body };
 }
 
