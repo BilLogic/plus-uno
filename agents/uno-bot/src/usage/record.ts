@@ -60,7 +60,7 @@ export interface TurnRecordFacts {
    *  (as `requestText`) for a real channel ask only, until it is classified. */
   question: string;
   /** The clock when the turn began, epoch ms — the ask time when `askTs` is
-   *  not a Slack ts (an eval conversation's synthetic one). */
+   *  not a Slack ts (a headless conversation's synthetic one). */
   startedAt: number;
   firstAnswerAt: number | null;
   tier: ModelTier;
@@ -162,8 +162,8 @@ export function selfFiledTicketOf(executed: readonly ExecutedOperation[] | undef
 /**
  * The row's key. A Slack ask is keyed by its channel and message ts, which a
  * retried run shares — so the retry rewrites the row instead of adding one. An
- * ask with no Slack ts (every eval conversation shares one synthetic ts) is
- * keyed by when it began as well, or every eval turn would land on one row.
+ * ask with no Slack ts (a headless conversation shares one synthetic ts) is
+ * keyed by when it began as well, or every such turn would land on one row.
  */
 export function turnIdOf(channel: string, askTs: string, startedAt: number): string {
   return SLACK_TS.test(askTs) ? `${channel}:${askTs}` : `${channel}:${askTs}@${startedAt}`;

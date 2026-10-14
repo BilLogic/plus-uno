@@ -85,9 +85,9 @@ export const RETIRED = [
   { re: /\bTier[- ]?1 (?:only|auto-apply)\b/g, why: 'the direct-fix whitelist' },
   { re: /\bsuggested tier\b/gi, why: 'the intake field is "suggested severity"' },
   { re: /\btier it\b/g, why: '"classify its severity"' },
-  { re: /\buno-tier1-digest\b/g, why: 'the headless skill is scripts/prompts/uno-direct-fix-digest' },
-  { re: /\bweekly-tier1-digest\b/g, why: 'the workflow is weekly-direct-fix-digest.yml' },
-  { re: /\bNO_TIER1_THIS_WEEK\b/g, why: 'the digest sentinel is NO_DIRECT_FIXES_THIS_WEEK' },
+  { re: /\buno-tier1-digest\b/g, why: 'the direct-fix digest is retired; a direct fix leaves its commit' },
+  { re: /\bweekly-tier1-digest\b/g, why: 'the direct-fix digest is retired; a direct fix leaves its commit' },
+  { re: /\bNO_TIER1_THIS_WEEK\b/g, why: 'the direct-fix digest is retired; a direct fix leaves its commit' },
   // "lane" in the model-provider sense. Anchored on the provider word beside it,
   // so the blueprint's actor row — the only surviving meaning — always passes.
   {

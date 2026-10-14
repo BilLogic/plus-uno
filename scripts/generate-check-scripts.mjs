@@ -227,7 +227,7 @@ const SHAPE_TABLE = 'scripts/lib/ratchet-shapes.mjs';
  * #600 listed "the a11y baseline" among the records that would read the module
  * and migrated the other seven; #601's message says "not one check parses a
  * record any more", and this one does — `check-storybook.mjs` reads
- * `docs/evals/a11y-baseline.json` with `JSON.parse` and rebuilds the whole
+ * `scripts/baselines/a11y-baseline.json` with `JSON.parse` and rebuilds the whole
  * record on `--update`, which is the rewrite `update()` exists not to be. It is
  * the one check whose measurement needs a browser and a built Storybook, so its
  * migration is a piece of work with its own verification and not a line of this

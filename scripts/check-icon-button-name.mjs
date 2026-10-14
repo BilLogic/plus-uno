@@ -33,7 +33,7 @@ import { REPO_ROOT, failures, nameless, sites, sources } from './icon-button-nam
 import { byRoot, main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 
-const RECORD = 'docs/evals/icon-button-name.json';
+const RECORD = 'scripts/baselines/icon-button-name.json';
 
 /*
  * A resolver that stopped finding files reports a clean sweep. The floor is the

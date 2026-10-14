@@ -274,8 +274,7 @@ export interface JudgeOutcome {
   /** Why, on a verdict that graded nothing. A skip fails open — the draft ships
    *  either way — so an unexplained one is indistinguishable in the logs from a
    *  draft the judge read and approved. `judgeSkipped` below is the only
-   *  constructor for a skip, so no path can forget it; the same rule the eval
-   *  judge keeps with its own `judgeSkipped` (#618). */
+   *  constructor for a skip, so no path can forget it (#618). */
   reason?: string;
 }
 

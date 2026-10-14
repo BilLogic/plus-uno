@@ -33,16 +33,16 @@ const SECTIONS = [
   { title: 'Product and service', roots: ['docs/product-and-service'] },
   { title: 'Decisions', roots: ['docs/adr'] },
   { title: 'Conventions', roots: ['docs/conventions'] },
-  { title: 'Evals', roots: ['docs/evals/rubrics', 'docs/evals/scenarios'] },
+  { title: 'Rubrics and golden scenarios', roots: ['docs/evals/rubrics', 'docs/evals/scenarios'] },
 ];
 
 /**
  * History and raw material, deliberately unrouted: plans record what was
- * decided, `knowledge/` is being dissolved into rules and ADRs (#172), and eval
- * runs and fixtures are data. Requiring a summary of each would be ceremony.
+ * decided, `knowledge/` is being dissolved into rules and ADRs (#172), and
+ * fixtures are data. Requiring a summary of each would be ceremony.
  */
 const NOT_ROUTABLE = [
-  'docs/plans', 'docs/knowledge', 'docs/evals/runs', 'docs/evals/fixtures',
+  'docs/plans', 'docs/knowledge', 'docs/evals/fixtures',
   'skills/uno-prototype/examples', 'skills/uno-review/examples',
   'skills/uno-publish/examples', 'skills/uno-maintain/references/skill-quality/examples',
 ];
@@ -122,7 +122,7 @@ for (const section of SECTIONS) {
 }
 
 doc += `---\n\n${count} routable documents. History (\`docs/plans/\`, \`docs/knowledge/\`) and\n`;
-doc += `raw eval data are deliberately not indexed — they record what happened rather\n`;
+doc += `frozen fixtures are deliberately not indexed — they record what happened rather\n`;
 doc += `than telling you what to do.\n`;
 
 if (missing.length) {

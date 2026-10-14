@@ -199,7 +199,7 @@ export function supersededEvents(
  * the role of whoever the ask named, and when the thread began.
  *
  * Dated by the card's own ts, which is when Slack took it; `at` is only for a
- * card whose ts is not a Slack one (an eval conversation's). `askText` is read
+ * card whose ts is not a Slack one (a headless conversation's). `askText` is read
  * for the person it names and never kept; with no text (a card the Worker
  * staged itself, or a re-stage) nobody was named. `channelStored` is the
  * staging conversation read by `turns`' rule (`./record.ts` `storesChannel`):

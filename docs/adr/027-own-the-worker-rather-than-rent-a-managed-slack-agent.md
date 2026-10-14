@@ -68,3 +68,21 @@ proceeds on the Worker without hedging for a platform move. Recorded under
 from the constitution's identity section is #420's.
 
 — Bill, Sep 2026 (decided in the #417 spec; recorded by uno under #422, and the bound is still his to set)
+
+## Addendum (2026-10-13): the measurement window replaces the eval suite
+
+The eval suite this ADR names as the yardstick is gone: the uno-bot answer
+evals, `agents/uno-bot/scripts/run-evals.mjs` among them, were removed on
+2026-10-13 (#1181), because the judged run cost far more in bot spend than the
+bot's real use. The first trigger and the Consequences now read against the
+**measurement window** instead: `docs/engineering/measurement-window.md`
+([#1178](https://github.com/BilLogic/plus-uno/issues/1178), landing in PR #1180).
+
+"Shown" now means a managed agent, spiked on the same asks, meets the minimums
+the window holds the Worker to — housekeeping reaching the lead, asks settled
+without the lead and graded correct, asks left to the next day, and repeat
+askers — while the proposal gate and the blueprint and Notion reach still hold.
+The spike's five numbers beside the Worker's are the scorecard a superseding
+ADR would carry. The decision itself and the second trigger are unchanged.
+
+— recorded by uno under #1189, on Bill's call to retire the eval runner

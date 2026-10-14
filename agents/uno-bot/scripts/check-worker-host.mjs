@@ -3,7 +3,7 @@
 //
 // #288 moves this Worker to another Cloudflare account, which changes the
 // hostname. Before this check the host was written out in five places, and the
-// cost of missing one is silent: an eval run pointed at the OLD deployment
+// cost of missing one is silent: a run pointed at the OLD deployment
 // scores the wrong Worker and reports a clean pass. That is the failure #249
 // already cost this repo, and the reason the build stamp now derives from the
 // deploy instead of being typed.
@@ -68,10 +68,10 @@ export const ALLOWED = new Map([
 /**
  * Recorded history, which must NOT be rewritten when the host changes.
  *
- * An eval run artifact says which Worker it scored. Editing that to the new
+ * A recorded run says which Worker it scored. Editing that to the new
  * host would be falsifying the record — the run really did hit the old one.
  */
-const HISTORY = [/^docs\/evals\/runs\//, /^docs\/plans\//];
+const HISTORY = [/^docs\/knowledge\/archive\//, /^docs\/plans\//];
 
 const SKIP_DIRS = new Set(["node_modules", ".git", "dist", "storybook-static", ".test-build"]);
 

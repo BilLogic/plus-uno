@@ -236,7 +236,7 @@ export interface ProposalCard {
   ask?: CardAsk;
   /** Who wrote the line the card opens with: the model's own reply, or the
    *  Worker (its ask, its note, its PRD line). Absent when the card has no
-   *  lead. Not rendered — the eval envelope reports it, so a judge can tell a
+   *  lead. Not rendered — the debug envelope reports it, so a reader can tell a
    *  model that followed the reply rule from a Worker that covered for it. */
   leadBy?: "model" | "worker";
   /** The concrete page a write lands on, where a read resolved one. */

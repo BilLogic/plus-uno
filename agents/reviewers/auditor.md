@@ -13,7 +13,7 @@ The standing-sweep role: given a named checklist (shipped watchdog, conventions 
 ## Invoked by
 
 - `skills/uno-maintain` — sweeps and retro audits
-- Automations: shipped watchdog · weekly direct-fix digest · Figma hygiene sweep · conventions integrity sweep (`docs/engineering/operations.md`)
+- Automations: shipped watchdog · Figma hygiene sweep · conventions integrity sweep (`docs/engineering/operations.md`)
 
 ## Workflow
 

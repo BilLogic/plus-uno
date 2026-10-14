@@ -112,7 +112,7 @@ export type AgentResult =
       operations: ProposalOperation[];
       /** The FIRST operation, kept populated for one release so readers that
        *  have not moved to `operations` yet — the card's tool routing, the
-       *  preflight, the eval scripts — keep working unchanged. */
+       *  preflight — keep working unchanged. */
       toolName: string;
       input: Record<string, unknown>;
       /** Brief structural preview the model wrote alongside the tool call, if
@@ -210,7 +210,7 @@ export interface LoopInput {
 
   /**
    * Where `/stop` would have been written, or null for a turn that cannot be
-   * cancelled (a headless eval run has no Slack conversation).
+   * cancelled (a turn with no Slack conversation behind it).
    *
    * Passed in rather than derived: the writer and this reader drifted once
    * already — an explicitly threaded DM resolves to the thread, not to "dm",
@@ -225,7 +225,7 @@ export interface LoopInput {
    * Anchored at the START of the turn rather than here, because the gather that
    * runs before the loop takes real time and a press during it is a real press
    * (`turn/turn.ts` passes its own clock through `run-agent.ts`). Omitted, every
-   * flag counts, which is the old behaviour and what the eval path wants.
+   * flag counts, which is the old behaviour.
    */
   cancelSince?: number;
 
@@ -366,7 +366,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
           refused(text);
         }
       }
-      // The result's own honesty fields, for the eval transcript. Reported for
+      // The result's own honesty fields, for the debug transcript. Reported for
       // every outcome including the budget refusal above — "the lookup never
       // ran" is the answer to a whole class of failure (#452).
       input.onToolResult?.(toolResultDigest(call.name, text));

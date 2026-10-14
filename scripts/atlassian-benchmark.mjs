@@ -4,7 +4,7 @@
  * WHY A BENCHMARK IS A FILE AND NOT A MEMORY. "Benchmarked against Atlassian"
  * is the kind of claim that decays silently: the comparison is made once, the
  * numbers move, and the sentence stays. So the Atlassian side is a dated
- * MEASUREMENT in `docs/evals/atlassian-benchmark.json`, read from
+ * MEASUREMENT in `scripts/baselines/atlassian-benchmark.json`, read from
  * atlassian.design rather than remembered, and our side is counted from the
  * token files on every run.
  *

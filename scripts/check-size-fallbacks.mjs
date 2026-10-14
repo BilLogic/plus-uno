@@ -52,7 +52,7 @@ const ANY_TOKEN = '--';
 const SIZE = fallbackCheck({
   check: 'check:size-fallbacks',
   label: '[size]',
-  baseline: 'docs/evals/size-fallback-baseline.json',
+  baseline: 'scripts/baselines/size-fallback-baseline.json',
   noun: 'dimension',
   absent: 'dimension',
   census: 'dimension',
@@ -66,7 +66,7 @@ const SIZE = fallbackCheck({
   reportUndefined: false,
   why:
     'Literal fallbacks that disagree with their own DIMENSION token (#268). The colour ' +
-    'half is docs/evals/colour-fallback-baseline.json; this is the bigger one. Keyed on ' +
+    'half is scripts/baselines/colour-fallback-baseline.json; this is the bigger one. Keyed on ' +
     '"<token> <literal>" rather than file and line, because a line number churns on ' +
     'every edit above it while the pair is the actual decision. The set may shrink and ' +
     'never grow; delete an entry when it is fixed, and the check reports any recorded ' +

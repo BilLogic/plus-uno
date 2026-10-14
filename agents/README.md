@@ -11,7 +11,7 @@ Agents are roles skills summon — **never taught to users, never invoked direct
 | Kind | Does | Roster (defined 2026-07-07, at their first invocation sites — the Phase-1 skill bodies) |
 |---|---|---|
 | `researchers/` | gather — isolated heavy reads, return findings not file dumps | `explorer` (codebase) · `source-miner` (Slack/analytics/research-DB) · `people-scout` (SME + participant sourcing) |
-| `reviewers/` | judge — parallel lenses, checklists, rubrics | `ds-lens` · `uno-lens` · `a11y-lens` · `design-qa` (Figma spec vs QA site) · `rubric-applier` (any rubric → scored verdict → eval run) · `auditor` (registry checklists → intakes) |
+| `reviewers/` | judge — parallel lenses, checklists, rubrics | `ds-lens` · `uno-lens` · `a11y-lens` · `design-qa` (Figma spec vs QA site) · `rubric-applier` (any rubric → scored verdict) · `auditor` (registry checklists → intakes) |
 | `writers/` | write to external estates — **the only agents allowed to** | `notion` · `figma` · `blueprint` (paired PRD+blueprint writes, never one alone; also the single access point for blueprint *reads*) |
 | `uno-bot/` | the Slack embodiment — definition (AGENT.md) + body (Worker code) in one folder | active |
 

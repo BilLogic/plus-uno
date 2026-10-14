@@ -40,7 +40,7 @@ import { openRatchet } from './lib/ratchet.mjs';
 export { REPO_ROOT };
 export const SUBJECT = 'CONTEXT.md';
 /** Repo-relative: also this record's key in the shape table, and what the registry row declares. */
-export const BASELINE = 'docs/evals/glossary-baseline.json';
+export const BASELINE = 'scripts/baselines/glossary-baseline.json';
 
 export const REMEDY =
   '  -> a glossary defines terms; move the reference behind a pointer, or re-baseline with --update and say why.';

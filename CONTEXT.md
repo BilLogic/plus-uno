@@ -60,7 +60,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **Decisions DB** | centralized decision log under Design HQ — Status / Owner / Sign-off / Date / Roadmap Card / Evidence | "Decision Log" (obsolete per-project subpage) |
 | **pillar** | product area (Universal · Admin · Toolkit · Training · Marketing …) — maps to a Slack channel | "category" |
 | **replica** | the Figma frame mirroring a coded prototype — required in prototype share-outs | "screenshot" |
-| **direct fix / gated change** | the two maintenance severities: a trivial fix applied straight to main with a digest line, vs a PR + PRD through a Slack verdict. | "Tier 1", "Tier 2" |
+| **direct fix / gated change** | the two maintenance severities: a trivial fix committed straight to main, vs a PR + PRD through a Slack verdict. | "Tier 1", "Tier 2" |
 | **Tier 1 / Tier 2 / Tier 3** | the loading tiers: always-loaded · on demand · retrieved live. *Tier* means loading and nothing else | "Tier" for a maintenance severity |
 | **RM-ID** | Roadmap card id (`RM-<n>`; `Card <n>` in Figma titles) — the join key | — |
 | **embodiment** | a runtime uno runs in (the IDE, the uno-bot Worker, headless GitHub Actions), each with its own powers and its own slice of the harness | "mode", "environment" |
@@ -88,11 +88,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **source** / **Sources box** | a **source** is a link a lookup of the same turn returned, which an answer stands on; the **Sources box** lists them beneath the answer in Slack, and is a single `Source:` line in Figma | "citation", "reference", "Sources:" line in the answer text |
 | **corpus** | the harness's one reader of repo files: what documents exist and what each one says. Checks ask it rather than the filesystem | "the walker", "the parser" (there is one of each) |
 | **ratchet** | a check's recorded baseline: a count may fall and a rise is a finding, an entry the run stops finding is a finding too, and a missing record fails loudly | "the whitelist", "the exceptions file", "the allow-list" |
-| **eval case** | one scored eval conversation; every count about the suite is read from the **census** of cases rather than typed | "the fixture" (a fixture is the file of cases; a case is one of them) |
-| **recording** | a case's captured model replies, tool results and subject, which the local **transport** replays; it says whether it was authored or captured | "fixture" (a fixture is what a case ASSERTS; a recording is what answered it) |
-| **transport** | how the eval runner reaches a turn: the deployed Worker, or **Turn** in-process from a **recording**. The summary names which one answered, because the two are different measurements | "the endpoint", "the eval route" (that is one transport's target) |
-| **judge** | who grades an eval answer against the rubric: `pass`, `fail` or `skipped`. A skip fails open, so it carries its reason and the summary counts what was judged | "the rubric" (that is the document a judge grades against) |
-| **unreachable** | a case this run's **transport** has no way to reach (for the local one, a case with no **recording**): skipped by name, kept out of the denominator, and named in the report | "skipped" (a skip is a reachable case whose subject condition nothing satisfied) |
+| **judge** | the Worker's pre-send check that grades a draft against the bot-answer rubric: `pass`, `fail` or `skip`. A skip fails open, so it carries its reason | "the rubric" (that is the document a judge grades against) |
 
 ## Two vocabularies — the blueprint speaks service-blueprint, the Roadmap speaks project-management
 

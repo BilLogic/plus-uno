@@ -24,8 +24,8 @@ import type { PainCategory, SubType } from "./categories";
 export interface TurnRecord {
   // ── identity and place ──
   /** `<channel>:<the asker's message ts>` — stable across a retried alarm, so
-   *  a turn that runs twice still leaves one row. An ask with no Slack ts (an
-   *  eval conversation) adds `@<when it began>` (`./record.ts` `turnIdOf`). */
+   *  a turn that runs twice still leaves one row. An ask with no Slack ts (a
+   *  headless conversation) adds `@<when it began>` (`./record.ts` `turnIdOf`). */
   turnId: string;
   /** The deployed build stamp (`version.ts`). */
   build: string;
@@ -85,7 +85,7 @@ export interface TurnRecord {
   stopUsed: boolean;
   /** A GitHub issue this turn filed on the bot's own repo. */
   selfFiledTicketUrl: string | null;
-  /** Evals, debug probes, the sandbox channel, bare greetings (`./record.ts`). */
+  /** Debug probes, the sandbox channel, bare greetings (`./record.ts`). */
   testTraffic: boolean;
 
   // ── corpus categories (`./categories.ts`) ──

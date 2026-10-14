@@ -21,6 +21,6 @@ summary: Scores the research skill's outputs
 
 # uno-research rubric
 
-Scores the research skill's outputs. Scored 1–5 per dimension by one human reviewer (two at the annual calibration run); results land in `docs/evals/runs/` until the Notion Eval Runs DB exists. Golden scenarios: `docs/evals/scenarios/uno-research.md`.
+Scores the research skill's outputs. Scored 1–5 per dimension by one human reviewer (two at the annual calibration run). Golden scenarios: `docs/evals/scenarios/uno-research.md`.
 
 Canonical here (ADR-017): the Notion source is lineage, not law — a conflicting legacy page gets a superseded banner via uno-maintain, never a repo re-sync.

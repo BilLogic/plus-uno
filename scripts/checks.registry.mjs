@@ -236,7 +236,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-negation-ratchet.mjs',
-    baseline: 'docs/evals/negation-baseline.json',
+    baseline: 'scripts/baselines/negation-baseline.json',
     guards:
       "the negation ratchet — the density of five imperative-ban tokens (never / don't / do not / cannot / must not) not climbing, over THREE scopes ratcheted separately from one baseline file: the bundled harness docs; since #174, the hand-authored IDE-side docs (the `embodiment: ide` complement of the bundled set within the bundler's own section roots, so docs/adr/ and the generated .claude/skills/ surfaces are out by structure); and since #425 the headless GitHub Actions prompts under scripts/prompts/, the third embodiment, which declare no embodiment: and are never bundled, so they are listed by where they live rather than found through the bundler. It counts PROHIBITION TOKENS, not negation as written: the two differ by roughly 3x and #234 chose the narrow, unarguable one on the evidence. Each scope also refuses to run against fewer docs than its baseline was recorded over — a ratchet only fails on a RISE, so a corpus that vanished otherwise passes with a smaller number. Since #601 the record is read and written through `scripts/lib/ratchet.mjs`: six sets, a counts map and a corpus FLOOR per scope, and a scope's total is the sum of its counts rather than a second number stored beside them. The script header carries the measurement.",
   },
@@ -255,9 +255,9 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-glossary.mjs',
-    baseline: 'docs/evals/glossary-baseline.json',
+    baseline: 'scripts/baselines/glossary-baseline.json',
     guards:
-      'CONTEXT.md staying a glossary: no fenced code, no third-level headings, every section holding term rows, and prose lines ratcheted against docs/evals/glossary-baseline.json through `scripts/lib/ratchet.mjs` (#601) — the count may fall, never rise, and `--update` merges the one number rather than rewriting the record, so re-recording an unchanged count no longer churns its date. The two sibling repos grew their CONTEXT.md to 40k and 18k chars one "just one more section" at a time (#420); this is what stops it here.',
+      'CONTEXT.md staying a glossary: no fenced code, no third-level headings, every section holding term rows, and prose lines ratcheted against scripts/baselines/glossary-baseline.json through `scripts/lib/ratchet.mjs` (#601) — the count may fall, never rise, and `--update` merges the one number rather than rewriting the record, so re-recording an unchanged count no longer churns its date. The two sibling repos grew their CONTEXT.md to 40k and 18k chars one "just one more section" at a time (#420); this is what stops it here.',
   },
   {
     name: 'check:retired-spelling',
@@ -283,9 +283,9 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-button-contrast.mjs',
-    baseline: 'docs/evals/button-contrast-baseline.json',
+    baseline: 'scripts/baselines/button-contrast-baseline.json',
     guards:
-      "every combination Button's `$btn-themes` map GENERATES — 8 styles x 5 fills — rather than the ones a story happens to render. `check:storybook`'s a11y ratchet measures the DOM, and nothing renders a filled `warning` button, so a 3.70:1 label sat in the map unseen for the life of it (#312). It also asserts no two styles resolve to the same filled ground: `--color-info` is `var(--color-tertiary)`, so two names render one appearance, and no accessibility tool compares token values for equality because none knows they were meant to differ. Both current findings are colour-token decisions (#268) rather than Button's, so they are ratcheted in `docs/evals/button-contrast-baseline.json` — which may shrink and never grow, and reports an entry that has stopped failing. Two sets with one `notes` map beside them, read through `scripts/lib/ratchet.mjs` (#601), which also reports an entry recorded with no reason at all.",
+      "every combination Button's `$btn-themes` map GENERATES — 8 styles x 5 fills — rather than the ones a story happens to render. `check:storybook`'s a11y ratchet measures the DOM, and nothing renders a filled `warning` button, so a 3.70:1 label sat in the map unseen for the life of it (#312). It also asserts no two styles resolve to the same filled ground: `--color-info` is `var(--color-tertiary)`, so two names render one appearance, and no accessibility tool compares token values for equality because none knows they were meant to differ. Both current findings are colour-token decisions (#268) rather than Button's, so they are ratcheted in `scripts/baselines/button-contrast-baseline.json` — which may shrink and never grow, and reports an entry that has stopped failing. Two sets with one `notes` map beside them, read through `scripts/lib/ratchet.mjs` (#601), which also reports an entry recorded with no reason at all.",
   },
   {
     name: 'check:token-collision',
@@ -303,7 +303,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-colour-fallbacks.mjs',
-    baseline: 'docs/evals/colour-fallback-baseline.json',
+    baseline: 'scripts/baselines/colour-fallback-baseline.json',
     guards:
       'the literal beside a colour token agreeing with that token (#268). `var(--color-on-surface-variant, #5c5c5c)` reads as one decision and is two — that token is `#3f484a`, and it carries TEN different fallbacks across its uses, none of them the token. 191 of 473 comparable fallbacks disagree, so the recorded set is ratcheted and only a NEW one fails. It also holds 27 `--color-*` names that are referenced and defined nowhere, where the fallback IS the colour. Static and sub-second, which is why it composes here while the browser checks do not.',
   },
@@ -313,7 +313,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-size-fallbacks.mjs',
-    baseline: 'docs/evals/size-fallback-baseline.json',
+    baseline: 'scripts/baselines/size-fallback-baseline.json',
     guards:
       "the same rule as check:colour-fallbacks, over the tokens that decide layout rather than colour — and it is the bigger half. 454 of 1075 comparable fallbacks disagree with their token: `var(--size-section-gap-sm, 16px)` is written 61 times for a token that is `8px`, and `var(--size-element-pad-y-lg, 12px)` 52 times for one that is `8px`. Colour's version of this defect paints a wrong shade when the token sheet is late; this one lays out a different page. Ratcheted at 68 distinct pairs. One implementation (`scripts/lib/fallback-check.mjs`) and two entry points, because the families genuinely differ: dimensions have no shared name prefix and are selected by value, and an undefined dimension name is usually a component-local custom property rather than a defect.",
   },
@@ -324,7 +324,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-undefined-tokens.mjs',
     floors: { MIN_FILES: 1300 },
-    baseline: 'docs/evals/undefined-token-baseline.json',
+    baseline: 'scripts/baselines/undefined-token-baseline.json',
     guards:
       "design tokens that are USED and defined nowhere. A bare `var(--x)` on a token that does not exist DROPS the whole declaration: `var(--font-weight-light)` was in six shipped components against a system that defines `--font-weight-normal: 300`, so text designed at 300 rendered at its inherited weight, and Tooltip's small variant reached for `--font-size-body4`, which does not exist, so its text had no size of its own. Nothing saw either — check:colour-fallbacks and check:size-fallbacks only read tokens written WITH a fallback and only in two namespaces, and check:doc-identifiers resolves names in docs pages, not in stylesheets. A ratchet: 145 names over 508 uses when it was written, and the count may fall and never rise, with the BARE count held down separately so converting a fallback into a bare use cannot pass by keeping the total flat.",
   },
@@ -355,7 +355,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-intent-roles.mjs',
     floors: { MIN_FILES: 150 },
-    baseline: 'docs/evals/intent-role-adoption.json',
+    baseline: 'scripts/baselines/intent-role-adoption.json',
     guards:
       "the vocabulary of every intent-coloured EDGE in the design system. `_color_roles.scss` minted `--color-X-icon` and `--color-X-border` on 2026-08-29 and closed with the sentence that these tokens had no users yet \u2014 111 of the 137 border declarations now name the role, and this is the ratchet that keeps them there. The rename changes no pixel for six of the seven intents, which is the point: `border-color: var(--color-danger)` is a use of the bold FILL colour that happens to land on an edge, and `var(--color-danger-border)` is a declaration that an edge was intended and 3:1 was the bar. Only the second can move on its own, and warning must \u2014 #9f8205 is 2.87:1 on the darkest surface step, under even WCAG 1.4.11's non-text bar. It ratchets in BOTH directions: a count below its record is a finding too, because a baseline that describes code that no longer exists has stopped being readable. It also asserts the seven role tokens still EXIST, since a regeneration that removed `_color_roles.scss` would leave 111 call sites resolving to nothing while this check, which counts BASE uses, reported green. Mutation-tested four ways: a reverted call site, a deleted role, a baselined file with its reason removed, and a recorded remainder fixed without lowering the record — each driven through `scripts/lib/ratchet.mjs`, which has owned both directions since #601. 0.1s, measured 2026-08-29.",
   },
@@ -366,7 +366,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-focus-ring.mjs',
     floors: { MIN_FILES: 150, MIN_RULES: 60 },
-    baseline: 'docs/evals/focus-ring.json',
+    baseline: 'scripts/baselines/focus-ring.json',
     guards:
       "the one thing that tells a keyboard user where they are. Of the 84 focus rules in the design system, 29 had NO affordance reaching WCAG 1.4.11's 3:1 \u2014 `.plus-input:focus` announced itself with a #84cfff border at 1.62:1, the AM/PM toggle and the file drop zone with an 8% primary tint at 1.13:1, four textarea states at 2.22:1, and six readonly fields with the same grey they wear at rest. axe cannot catch this: it has no focus-appearance rule, so `check:storybook` swept all 416 story files and reported none of it. A rule is scored on its STRONGEST affordance, which is the correction that made the check right \u2014 eleven rules pair a 1.13:1 glow with a 5.02:1 border, and there the border is the indicator. No ratchet and no exceptions: a ring nobody can see is a defect, not a vocabulary to migrate at leisure. A ring on a ground its caller paints is not an exception either: its rule DECLARES the grounds (`// @grounds: --color-…`, opening the block) and is held to 3:1 on every one, so CloseButton's inverse ring is measured on the eight fills it is for rather than excused; a misplaced, duplicated, empty or unknown declaration is itself a failure. Mutation-tested three ways: one ring reverted, the `--color-focus-ring` role deleted, and a stale exception left behind. 0.2s, measured 2026-08-29.",
   },
@@ -377,7 +377,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-icon-button-name.mjs',
     floors: { MIN_FILES: 400 },
-    baseline: 'docs/evals/icon-button-name.json',
+    baseline: 'scripts/baselines/icon-button-name.json',
     guards:
       "a button that is only an icon still telling you what it does. 20 of them across the design system had no `aria-label`, no `title` and no text \u2014 a screen reader announces \"button\" and nothing else for a control that dismisses an alert, expands a lesson row or opens the session menu. axe reports 23 of these across the story suite, and the two populations overlap without either containing the other: axe counts RENDERED instances, so one component in a loop is many findings and a component nobody storied is none, where this counts SOURCE sites and sees the page nobody wrote a story for. Two of the 20 were not about names at all \u2014 `LessonsSpec` and `OnboardingSpec` call Button with `btnStyle`, `btnFill`, `label` and `icon`, none of which Button has, so those buttons were rendering EMPTY and the missing name was the symptom that surfaced it. No ratchet: the bar is zero and the exception map is empty. Mutation-tested three ways \u2014 a name removed, a stale exception, and `text=\"\"`, which an attribute-presence test reads as a name and which four real call sites are written with. 0.2s, measured 2026-08-29.",
   },
@@ -425,7 +425,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-atlassian-benchmark.mjs',
     floors: { MAX_AGE_DAYS: 365 },
-    baseline: 'docs/evals/atlassian-benchmark.json',
+    baseline: 'scripts/baselines/atlassian-benchmark.json',
     guards:
       "the comparison against Atlassian staying a MEASUREMENT rather than a memory, and the three gaps it found staying closed once they close. Their published surface was read live on 2026-08-29: 515 tokens, of which 441 are colour, split by role into `background` 208, `text` 49, `border` 39 and `icon` 23. Ours are 479 and 195. The first draft of this check recorded that we have no role split at all, which is false and the correction is the finding: `--color-surface*` (36) IS the background role and `--color-outline*` (8) IS the border role, under Material's names. What is true is sharper. Our FOREGROUND role is undivided — one `--color-on-*` family (32) where they keep text and icon apart because the bars differ, 4.5:1 against 3:1 — so no token records which bar its value was checked against. And all seven intents carry the identical 9-token shape (base, container, -text, six state overlays), naming two roles while using three: there is no `--color-warning-border` and no `--color-warning-icon`, so an intent-coloured stroke borrows the fill. That is the gap #312 lived in — `--color-warning` is 3.70:1 on white, legal as an icon and illegal as text, and its name says neither. The type row was ALSO wrong at first and is corrected here: counting `--font-size-*` gave 44 and read as bloat, but 27 of those are FontAwesome icon sizes and five are aliases, leaving TWELVE distinct text sizes against their fourteen steps, which is parity. The defect is the spacing rather than the count — the twelve run 12·14·16·20·24·28·32·40·56·64·72·80, giving seven distinct ratios across eleven steps (1.111, 1.125, 1.143, 1.167, 1.200, 1.250, 1.400), a list and not a scale (#267). Four rows are ratcheted by DIRECTION, never by distance: intent border and icon tokens may only rise from zero, the ratio count and the 46 line-heights (against their zero, since line-height travels inside each step — #346) may only fall. Nine more are recorded and not enforced, because 36 surface tokens against 208 backgrounds is a difference and not a defect. `--update` refuses to record a backwards move — and since #601 it is a MERGE through `scripts/lib/ratchet.mjs`, so Atlassian's whole published half survives a re-record, and a recorded floor no argued row measures any more is itself a finding. The whole thing fails when the recording goes a year unread.",
   },
@@ -564,7 +564,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'agents/uno-bot/scripts/check-worker-host.mjs',
     guards:
-      'the single definition of the Worker\'s hostname. Its inputs are repo-root files — the eval workflows and docs/ — so a PR that never touches agents/uno-bot/ can still break it. A second hardcoded host is silent until a cutover (#288) misses one, and an eval pointed at the OLD deployment reports a clean pass, which is the shape of failure #249 already cost this repo.',
+      'the single definition of the Worker\'s hostname. Its inputs are repo-root files — workflows and docs/ — so a PR that never touches agents/uno-bot/ can still break it. A second hardcoded host is silent until a cutover (#288) misses one, and anything pointed at the OLD deployment reads a dead Worker as the live one, which is the shape of failure #249 already cost this repo.',
   },
   {
     name: 'check:typography-classes',
@@ -581,7 +581,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-text-contrast.mjs',
-    baseline: 'docs/evals/text-contrast-baseline.json',
+    baseline: 'scripts/baselines/text-contrast-baseline.json',
     guards:
       "every `color:` declaration in the design system's stylesheets against the ground its own rule puts it on, compositing translucent state layers first. `--color-warning` is 3.52:1 on the page \u2014 below AA \u2014 and was the declared text colour in seven places including a `.color-warning` utility anyone could reach for, while `--color-warning-text` (8.24:1) sat in the token file unused. Nothing rendered any of the seven in a story, so `check:storybook`'s axe pass never measured one. Ratchet, because the remaining findings are open #268 token decisions and WCAG's inactive-component exemption, both recorded with a reason \u2014 and since #599 the ratchet itself is `scripts/lib/ratchet.mjs` rather than this check's own read and write, so an absent record now fails loudly instead of throwing ENOENT. Two block annotations, placed as the first thing in their block, teach it what a stylesheet cannot say: `// @grounds: --color-…` names the grounds a caller paints under the rule, each measured instead of the page (the rule's own background still wins), and `// @contrast: non-text` holds an icon glyph to WCAG 1.4.11's 3:1, allowed only on an icon selector. A misplaced, duplicated, empty or unknown annotation is itself a failure. 0.2s, measured 2026-08-29.",
   },
@@ -727,7 +727,7 @@ export const EXCLUDED = [
     spawnReason:
       'it drives a real Chromium over the story suite. The result is a browser run\'s exit ' +
       'code and a Playwright report, not a set of findings this process could compute.',
-    baseline: 'docs/evals/a11y-baseline.json',
+    baseline: 'scripts/baselines/a11y-baseline.json',
     reason:
 'the only sub-check that is not dependency-free: it needs `npm ci` and a Playwright ' +
     'chromium download, and the browser suite itself is ~130s against this gate\'s ~14s ' +
@@ -903,7 +903,7 @@ export const WORKFLOW_STEPS = [
     note: [
       "One command, one exit code. A `play` failure or a render error fails the",
       "job outright; an accessibility violation fails it only if the story did",
-      "not already carry that rule in `docs/evals/a11y-baseline.json`.",
+      "not already carry that rule in `scripts/baselines/a11y-baseline.json`.",
     ],
     runs: ["check:storybook"],
   },
