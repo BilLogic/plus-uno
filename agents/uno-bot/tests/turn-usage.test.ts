@@ -432,15 +432,15 @@ test("a turn that read two references records both names, in the order read", as
       {
         text: "",
         toolCalls: [
-          { name: "read_reference", args: { name: "uno-maintain/method" } },
-          { name: "read_reference", args: { name: "uno-review/method" } },
+          { name: "read_reference", args: { name: "draft-a-prd" } },
+          { name: "read_reference", args: { name: "critique-a-design" } },
         ],
       },
       { text: "File it as an intake." },
     ],
   });
   await runTurn(request(), h.deps);
-  assert.deepEqual(only(h.usage.records()).referencesRead, ["uno-maintain/method", "uno-review/method"]);
+  assert.deepEqual(only(h.usage.records()).referencesRead, ["draft-a-prd", "critique-a-design"]);
 });
 
 test("a turn that read no reference, or asked for one that does not exist, records none", async () => {
@@ -450,7 +450,7 @@ test("a turn that read no reference, or asked for one that does not exist, recor
 
   const miss = harness({
     replies: [
-      { text: "", toolCalls: [{ name: "read_reference", args: { name: "uno-maintain/methods" } }] },
+      { text: "", toolCalls: [{ name: "read_reference", args: { name: "draft-a-prds" } }] },
       { text: "No such document." },
     ],
   });

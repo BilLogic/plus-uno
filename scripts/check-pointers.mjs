@@ -123,7 +123,7 @@ export function pointersIn(text, root = REPO_ROOT) {
   for (const m of stripFences(text).matchAll(POINTER)) {
     const rel = m[1];
     if (/[*{}<>]/.test(rel)) continue; // a glob or a placeholder, not a pointer
-    // A bare filename (`SKILL.md`, `bot.md`) names a SHAPE every skill has, not a place;
+    // A bare filename (`SKILL.md`, `method.md`) names a SHAPE every skill has, not a place;
     // it is a pointer only if it sits at the repo root (AGENTS.md, GLOSSARY.md).
     if (!rel.includes('/') && !existsSync(path.join(root, rel))) continue;
     if (rel.includes('/') && !isRepoRelative(root, rel)) continue; // a relative fragment, not a place

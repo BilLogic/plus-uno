@@ -142,7 +142,7 @@ test("images from both sides of a merge survive, in turn order", () => {
 test("a reference read in a prior turn reaches the next turn as a one-line stub, never as its text", () => {
   const conversation = buildProviderConversation(
     [
-      { role: "user", content: "this doc is stale — file an intake", ts: "1", references: ["uno-maintain/method"] },
+      { role: "user", content: "this doc is stale — file an intake", ts: "1", references: ["draft-a-prd"] },
       { role: "assistant", content: "Classified as an inaccuracy; here is the drafted fix." },
     ],
     "go ahead",
@@ -154,7 +154,7 @@ test("a reference read in a prior turn reaches the next turn as a one-line stub,
   );
   assert.equal(
     conversation[0]!.text,
-    "this doc is stale — file an intake\n\n[reference uno-maintain/method was read this turn]",
+    "this doc is stale — file an intake\n\n[reference draft-a-prd was read this turn]",
   );
   assert.equal(conversation[1]!.text, "Classified as an inaccuracy; here is the drafted fix.");
   for (const turn of conversation) {
@@ -164,12 +164,12 @@ test("a reference read in a prior turn reaches the next turn as a one-line stub,
 
 test("several references read in one turn stub one line each, in read order", () => {
   const conversation = buildProviderConversation(
-    [{ role: "user", content: "ask", ts: "1", references: ["uno-maintain/method", "docs/connectors/notion"] }],
+    [{ role: "user", content: "ask", ts: "1", references: ["draft-a-prd", "docs/connectors/notion"] }],
     "follow-up",
   );
   assert.equal(
     conversation[0]!.text,
-    "ask\n\n[reference uno-maintain/method was read this turn]\n[reference docs/connectors/notion was read this turn]\n\nfollow-up",
+    "ask\n\n[reference draft-a-prd was read this turn]\n[reference docs/connectors/notion was read this turn]\n\nfollow-up",
   );
 });
 

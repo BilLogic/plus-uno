@@ -1,10 +1,9 @@
 ---
-embodiment: all
-disclosure: reference
-summary: uno-review — the shared procedure both faces load.
+embodiment: ide
+summary: uno-review — the procedure SKILL.md loads on invocation.
 ---
 
-<!-- Shared procedure — loaded by both faces (SKILL.md in the IDE, bot.md in the Worker). Runtime-neutral: no tool calls, no surface formatting. -->
+<!-- The procedure, loaded by SKILL.md on invocation. Runtime-neutral: no tool calls, no surface formatting. -->
 
 # uno-review — method
 

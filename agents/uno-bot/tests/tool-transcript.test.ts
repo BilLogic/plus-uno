@@ -85,7 +85,7 @@ test("no single field can carry a payload", () => {
 
 test("the result lands on the call it answers", () => {
   const tools: ToolCall[] = [
-    { name: "read_reference", args: { name: "uno-maintain/method" } },
+    { name: "read_reference", args: { name: "draft-a-prd" } },
     { name: "slack_search", args: { query: "migration deadline" } },
   ];
   const filled = new Set<number>();

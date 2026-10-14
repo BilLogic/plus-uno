@@ -95,14 +95,18 @@ test('a bot skill with no description is a finding', () => {
   assert.match(findings[0].message, /description/);
 });
 
-test('the retired-face guard finds the old vocabulary in live files and skips plans and the archive', () => {
+test('the retired-face guard finds the old vocabulary in live files and skips history and generated files', () => {
   const ctx = fixture(
     {},
     {
       'agents/uno-bot/AGENT.md': '# Persona\n\nRead the Worker face in skills/uno-review/bot.md.\n',
       'docs/plans/old-plan.md': 'The bot.md faces were the plan.\n',
       'docs/knowledge/archive/old.md': 'Each Worker face was 7k.\n',
-      'docs/connectors/slack.md': '# Slack\n\nNothing retired here.\n',
+      'docs/adr/013-old.md': 'Six dual-face skills: SKILL.md + bot.md.\n',
+      'todos/001-old.md': 'Trim each bot.md.\n',
+      'agents/uno-bot/harness-bundle.md': 'A regenerated copy naming bot.md.\n',
+      'agents/uno-bot/src/generated/harness.ts': 'export const HARNESS = "bot.md";\n',
+      'docs/connectors/slack.md': '# Slack\n\nNothing retired here; docs/evals/rubrics/uno-bot.md is another file.\n',
     },
   );
   const hits = retiredFaceHits(ctx);
@@ -114,9 +118,25 @@ test('the retired-face guard finds the old vocabulary in live files and skips pl
   assert.equal(hits[0].line, 3);
 });
 
-test('the retired-face guard is ready but not yet part of the findings', () => {
-  const ctx = fixture({}, { 'agents/uno-bot/AGENT.md': 'Read the Worker face in bot.md.\n' });
-  assert.deepEqual(run(ctx), []);
+test("the glossary's _Avoid_ line may name a retired face; its other lines may not", () => {
+  const ctx = fixture(
+    {},
+    {
+      'GLOSSARY.md':
+        '# Terms\n\n**bot skill**:\nWhat uno-bot does.\n_Avoid_: "Worker face", "bot.md"\n\nThe Worker face is retired.\n',
+    },
+  );
+  const hits = retiredFaceHits(ctx);
+  assert.deepEqual(hits.map((h) => h.line), [7], 'only the prose line is a hit');
+});
+
+test('a live line naming a retired face is a finding with its file and line', () => {
+  const ctx = fixture({}, { 'agents/uno-bot/AGENT.md': '# Persona\n\nRead the Worker face in bot.md.\n' });
+  const findings = run(ctx);
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].file, 'agents/uno-bot/AGENT.md');
+  assert.equal(findings[0].line, 3);
+  assert.match(findings[0].message, /retired/);
 });
 
 test('this repo passes', () => {

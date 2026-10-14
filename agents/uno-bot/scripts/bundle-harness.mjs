@@ -36,8 +36,9 @@
 // A reference is NAMED by its row's rule. `folder`: the doc's folder, so
 // `agents/uno-bot/skills/draft-a-prd/SKILL.md` is `draft-a-prd`. `path`: its
 // path sans `.md` with the shape words removed — `skills/` and `references/`
-// carry no meaning to the model — so `skills/uno-maintain/references/method.md`
-// is `uno-maintain/method` and `docs/engineering/operations.md` keeps its path.
+// carry no meaning to the model — so `docs/engineering/operations.md` is
+// `docs/engineering/operations`, and a `references/` folder under a connector
+// would drop out of its name.
 //
 // ORDER IS A BUNDLE-LEVEL FACT no single document can know, so it is declared
 // once, by the order of the rows in SECTIONS, and nowhere else. Within a
@@ -137,7 +138,7 @@ export const REPO_ROOT = path.resolve(here, "../../.."); // two levels above age
  * assembly, so it costs the prompt nothing, and charging a doc ~100 chars for
  * declaring where it belongs would tax the very thing #159 made mandatory.
  * An `ide-only` region still counts against a per-file budget — no budgeted file
- * carries one today, and a persona or face that grew one would be worth seeing.
+ * carries one today, and a persona or bot skill that grew one would be worth seeing.
  *
  * A per-doc budget attaches to a section ROW (SECTIONS below) — never to a
  * path — so renaming a doc cannot silently drop its budget, and a new row with
@@ -169,15 +170,19 @@ const BUDGETS = {
   // wording is generated from the tool table. Measured at 22,148 once the
   // per-tool rules had moved; the budget is that minus 1k, so the move also
   // paid for 1k of cuts and the persona starts with no room to regrow.
-  persona: 21_148,
-  botFace: 7_000,
+  //
+  // RESET to 22,048 at the bot-skills cut. The persona now routes build asks
+  // and intakes through `file-a-ticket` and tells the bot to read a bot skill
+  // before acting, and it measured 21,048 once those edits were done; the
+  // budget is that plus 1k, room for the next cross-tool rule and no more.
+  persona: 22_048,
   // A bot skill: its body, read through read_reference, and its description,
   // which ships in the prompt as the skill's pointer line. The bundler holds the
   // body; `check:bot-skills` holds the description.
   botSkill: 5_000,
   botSkillDescription: 400,
   // Tier 1 — the constitution, always loaded. The budget attaches to the
-  // constitution's ROLE, like the persona's and the face's, so it cannot be
+  // constitution's ROLE, like the persona's and a bot skill's, so it cannot be
   // lost by a rename. Docs cite these constants by key (`BUDGETS.constitution`)
   // and never write the number down: `check:harness-budgets` fails a doc under
   // a section root that does.
@@ -242,17 +247,12 @@ const BUDGETS = {
  *           unless `delivery` narrows it to `bundled` or `disclosed`.
  *   nameBy  `folder` | `path` — how a disclosed doc under the row is named in
  *           the reference map (see the header).
- *
- * The `skills` row holds the uno skills' Worker faces until the bot skills
- * replace them; its budget holds only what ships in the prompt, because the
- * methods beside the faces are disclosed and read on demand.
  */
 const SECTIONS = [
   { name: "constitution", roots: ["AGENTS.md", "GLOSSARY.md"], budget: { role: "constitution", limit: BUDGETS.constitution, soft: true }, nameBy: "path" },
   { name: "persona", roots: ["agents/uno-bot/AGENT.md"], budget: { role: "persona", limit: BUDGETS.persona, soft: false }, nameBy: "path" },
   { name: "bot-skills", roots: ["agents/uno-bot/skills"], budget: { role: "botSkill", limit: BUDGETS.botSkill, soft: false }, nameBy: "folder" },
   { name: "scheduled-actions", roots: ["agents/uno-bot/scheduled-actions"], budget: null, nameBy: "folder" },
-  { name: "skills", roots: ["skills"], budget: { role: "Worker face", limit: BUDGETS.botFace, soft: false, delivery: "bundled" }, nameBy: "path" },
   { name: "connectors", roots: ["docs/connectors"], budget: null, nameBy: "path" },
   { name: "engineering", roots: ["docs/engineering"], budget: null, nameBy: "path" },
   { name: "conventions", roots: ["docs/conventions"], budget: null, nameBy: "path" },
@@ -551,7 +551,7 @@ function renderCompanion({ members, pieces, assembled, disclosed, referenceMap, 
     "row, so it also carries the `---` divider and path comment every member after the first adds —\n" +
     "which is why the last running total exceeds the sum of the chars column. Only a constitution row\n" +
     "can be marked over budget: that budget is soft and warns, while the bundler refuses to write any\n" +
-    "artifact once a persona or Worker-face budget is blown.\n\n" +
+    "artifact once a persona or bot-skill budget is blown.\n\n" +
     "## Disclosed references\n\n" +
     (disclosed.length
       ? `These docs declare \`disclosure: reference\` and ship in \`agents/uno-bot/src/generated/references.ts\` ` +

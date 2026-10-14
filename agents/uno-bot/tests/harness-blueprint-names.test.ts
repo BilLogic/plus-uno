@@ -421,7 +421,7 @@ test("the allowlist bites — a column the schema lacks is caught, on a table it
     "planted:1 names `cells.colour`, which the schema lacks",
   ]);
   // A live column passes; a `file.ext` span is not an identifier claim.
-  assert.deepEqual(unresolved("read `cells.frame`; see `AGENT.md` and `bot.md`.", schema, "planted"), []);
+  assert.deepEqual(unresolved("read `cells.frame`; see `AGENT.md` and `SKILL.md`.", schema, "planted"), []);
 });
 
 test("the blocklist bites in the account's hand-written part, and is silent inside its catalog", () => {

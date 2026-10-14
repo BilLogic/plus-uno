@@ -3,7 +3,7 @@ embodiment: ide
 summary: How to draft a design-system fix once the intake routes there
 ---
 
-<!-- Load for: drafting the fix (method.md §2) when the intake targets "Storybook inconsistent / bug" or "Figma components out of date". IDE face only — the Worker files and proposes, never edits repo files (bot.md). DS components are always gated changes: this runbook produces the draft; the gates in method §3–5 still apply. -->
+<!-- Load for: drafting the fix (method.md §2) when the intake targets "Storybook inconsistent / bug" or "Figma components out of date". IDE only — uno-bot files the intake and hands the edit here (`file-a-ticket`). DS components are always gated changes: this runbook produces the draft; the gates in method §3–5 still apply. -->
 
 # DS fix — execution runbook
 

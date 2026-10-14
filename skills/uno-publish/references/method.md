@@ -1,11 +1,10 @@
 ---
-embodiment: all
-disclosure: reference
-summary: uno-publish — the shared procedure both faces load.
+embodiment: ide
+summary: uno-publish — the procedure SKILL.md loads on invocation.
 ---
 
-<!-- Runtime-neutral core — loaded by both faces (SKILL.md in the IDE, bot.md on the Worker).
-     WHAT must happen and which gates hold; WHO executes each step lives in the faces. -->
+<!-- Runtime-neutral core — loaded by SKILL.md on invocation.
+     WHAT must happen and which gates hold; WHO executes each step lives in SKILL.md. -->
 
 # uno-publish — method
 

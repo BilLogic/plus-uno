@@ -48,7 +48,7 @@ You either name a skill or just describe what you want — uno routes. In plain 
 | `uno-review` | design-system / product-intent / accessibility review, or Design QA vs the Figma spec |
 | `uno-maintain` | something's off — file it; small fixes auto-apply, big ones become PR + PRD |
 
-The canonical routing table (Use-when triggers + which agents each skill summons) lives in `AGENTS.md` § Skills — single source, deliberately not restated here. Each skill folder has two faces: `SKILL.md` (IDE) and `bot.md` (Slack Worker), both built on the same `references/method.md`.
+The canonical routing table (Use-when triggers + which agents each skill summons) lives in `AGENTS.md` § Skills — single source, deliberately not restated here. Each skill is an IDE workflow: `SKILL.md` over its `references/method.md`. uno-bot runs its own bot skills, under `agents/uno-bot/skills/`.
 
 ### The agents (what skills summon — internal, never invoked by users)
 
@@ -80,7 +80,7 @@ plus-uno/
 │   ├── knowledge/                 # Append-only — lessons, ADRs, research, archive
 │   └── plans/                     # Dated implementation plans
 │
-├── skills/                        # HOW — six capabilities, each with SKILL.md (IDE) + bot.md (Worker)
+├── skills/                        # HOW — six IDE workflows, each SKILL.md + references/method.md
 └── agents/                        # WHO — researchers/ · reviewers/ · writers/ + uno-bot/ (Slack Worker)
 ```
 

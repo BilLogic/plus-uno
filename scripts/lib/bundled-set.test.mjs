@@ -28,8 +28,8 @@ function fixtureRoot() {
   write('GLOSSARY.md', doc('embodiment: all', '# Glossary\n\nOne word.\n'));
   write('agents/uno-bot/AGENT.md', doc('embodiment: uno-bot', '# Persona\n\nOne voice.\n'));
   write('agents/uno-bot/wrangler.toml', 'GEMINI_REGION = "global"\n');
-  write('skills/README.md', doc('embodiment: ide', '# Skills\n\nFor the IDE.\n'));
-  write('skills/uno-x/references/method.md', doc('embodiment: all\ndisclosure: reference', '# Method\n\nRead on demand.\n'));
+  write('docs/conventions/ide.md', doc('embodiment: ide', '# Conventions\n\nFor the IDE.\n'));
+  write('agents/uno-bot/skills/do-x/SKILL.md', doc('embodiment: uno-bot\ndisclosure: reference', '# Do X\n\nRead on demand.\n'));
   write('docs/connectors/pad.md', doc('embodiment: all', `# Pad\n\n${'padding padding padding padding\n'.repeat(800)}`));
   return root;
 }
@@ -47,8 +47,8 @@ test('the sets come from the tree the caller names, in load order', () => {
   withFixture((repoRoot) => {
     const sets = harnessSets({ tag: 'test', repoRoot });
     assert.deepEqual(sets.bundled, ['AGENTS.md', 'GLOSSARY.md', 'agents/uno-bot/AGENT.md', 'docs/connectors/pad.md']);
-    assert.deepEqual(sets.disclosed, ['skills/uno-x/references/method.md']);
-    assert.deepEqual(sets.ide, ['skills/README.md']);
+    assert.deepEqual(sets.disclosed, ['agents/uno-bot/skills/do-x/SKILL.md']);
+    assert.deepEqual(sets.ide, ['docs/conventions/ide.md']);
     assert.deepEqual(workerFiles({ tag: 'test', repoRoot }), [...sets.bundled, ...sets.disclosed]);
   });
 });

@@ -209,7 +209,7 @@ const ROWS: Row[] = [
   },
   { name: "slack_search", args: { query: "zz" }, details: "zz", result: ok({ visibility: "public-only", results: [] }), output: "no matches", sources: [] },
   // read_reference
-  { name: "read_reference", args: { name: "uno-maintain/method" }, details: "uno-maintain/method", result: ok({ name: "uno-maintain/method", chars: 900, text: "…" }), output: "Read uno-maintain/method" },
+  { name: "read_reference", args: { name: "draft-a-prd" }, details: "draft-a-prd", result: ok({ name: "draft-a-prd", chars: 900, text: "…" }), output: "Read draft-a-prd" },
 ];
 
 describe("a task card's readout", () => {

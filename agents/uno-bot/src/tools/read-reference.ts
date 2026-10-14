@@ -5,9 +5,10 @@
 // references.ts, a name → text map baked beside the prompt from the same
 // assembly, so serving one is a property lookup: no subrequest, nothing to
 // fail on a cold start, nothing to go stale between deploys independently of
-// the prompt. The name is the path with the shape words removed —
-// `skills/uno-maintain/references/method.md` is `uno-maintain/method` — and
-// the bundler header is where that rule lives.
+// the prompt. The name follows the doc's section row — a bot skill by its
+// folder (`agents/uno-bot/skills/draft-a-prd/SKILL.md` is `draft-a-prd`), a
+// connector or engineering doc by its path — and the bundler header is where
+// that rule lives.
 //
 // PURE BY DESIGN: the map is a parameter with the baked one as its default, so
 // the unit suite asserts the contract on a map of its own and the tracer on
@@ -29,7 +30,7 @@ export type ReferenceMap = Record<string, string>;
  * like every other ungated tool in agent/run-agent.ts.
  *
  * On a miss the payload carries `known` — every name the map holds, sorted —
- * because the model that asked for `uno-maintain/methods` needs the right
+ * because the model that asked for `draft-a-prds` needs the right
  * spelling more than it needs an apology, and a second call with a name off
  * this list is one lookup.
  */
