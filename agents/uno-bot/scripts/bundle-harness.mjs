@@ -164,7 +164,12 @@ const BUDGETS = {
   // the next. The registry has since been disclosed (`disclosure: reference`),
   // so its rows are read through read_reference and spend none of this.
   assembled: 175_500,
-  persona: 28_000,
+  // LOWERED 28k -> 21,148. The persona keeps cross-tool rules only: each tool's
+  // own rules, its ✅ gate among them, live in its description, and the gate
+  // wording is generated from the tool table. Measured at 22,148 once the
+  // per-tool rules had moved; the budget is that minus 1k, so the move also
+  // paid for 1k of cuts and the persona starts with no room to regrow.
+  persona: 21_148,
   botFace: 7_000,
   // A bot skill: its body, read through read_reference, and its description,
   // which ships in the prompt as the skill's pointer line. The bundler holds the

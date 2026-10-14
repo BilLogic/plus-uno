@@ -176,7 +176,7 @@ sequenceDiagram
 
 Notes:
 - Steps 4-5 are the **thread memory** — every Q&A call loads prior turns so "now do the same for Button" works.
-- Steps 6-11 are **one tool-use loop**, not two passes. The model calls a tool, the Worker executes it, results return to the same conversation. Which tool for which question is `AGENT.md` § Tool routing.
+- Steps 6-11 are **one tool-use loop**, not two passes. The model calls a tool, the Worker executes it, results return to the same conversation. Which tool for which question is each tool's description in `agents/uno-bot/tool-definitions.json`.
 - No tool call = no confirmation gate. Q&A is the bot's "default" mode.
 
 ---
