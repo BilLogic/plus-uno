@@ -680,27 +680,17 @@ test("a disclosed doc does not count toward the assembled prompt, and the prompt
 
 // ── The manifest (#510) ──────────────────────────────────────────────────────
 //
-// The datum the root guards read instead of parsing this script's log lines.
-// What is asserted here is its SHAPE and its agreement with the artifacts of
-// the same run: the manifest is only worth reading if a guard can trust the
-// census, the budgets and the delivery of every row.
+// The datum the root guards read in-process instead of parsing this script's
+// log lines. What is asserted here is its SHAPE and its agreement with the
+// artifacts of the same assembly: the manifest is only worth reading if a guard
+// can trust the census, the budgets and the delivery of every row.
 
-/** Run the bundler with `--manifest` into a throwaway path, and parse what it wrote. */
-const runWithManifest = (args = ["--check"]) => {
-  const dir = mkdtempSync(path.join(tmpdir(), "harness-manifest-"));
-  const file = path.join(dir, "manifest.json");
-  try {
-    const r = runBundler([...args, "--manifest", file]);
-    return { ...r, manifest: existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : null };
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
-};
+/** The manifest `assemble()` returns for the copied tree. */
+const manifestOf = () => assemble({ repoRoot }).manifest;
 
-test("--manifest writes a manifest whose census, budgets and members agree with the bundle", () => {
-  const { code, manifest } = runWithManifest();
-  assert.equal(code, 0);
-  assert.ok(manifest, "--check must still write the manifest: the guards that read it ask for --check");
+test("the manifest's census, budgets and members agree with the bundle", () => {
+  const manifest = manifestOf();
+  assert.ok(manifest, "a tree that assembles has a manifest");
 
   // The census, as four numbers rather than as a sentence.
   const { census } = manifest;
@@ -761,8 +751,8 @@ test("the stdout census sentence is unchanged, and the manifest agrees with it",
   // The sentence stays for humans (#510). No guard parses it any more, so this
   // is the one place left that reads it — precisely to prove that the datum and
   // the prose still say the same thing.
-  const { out, manifest } = runWithManifest();
-  const { census } = manifest;
+  const { out } = runBundler(["--check"]);
+  const { census } = manifestOf();
   assert.match(
     out,
     new RegExp(
@@ -772,12 +762,11 @@ test("the stdout census sentence is unchanged, and the manifest agrees with it",
   );
 });
 
-test("--manifest disturbs neither committed artifact", () => {
-  const before = { ts: readFileSync(harnessTs, "utf8"), md: readFileSync(companionMd, "utf8") };
-  assert.equal(runBundler(["--check"]).code, 0, "the plain --check must still pass");
-  assert.equal(runWithManifest().code, 0);
-  assert.equal(readFileSync(harnessTs, "utf8"), before.ts, "--check --manifest must not write harness.ts");
-  assert.equal(readFileSync(companionMd, "utf8"), before.md, "--check --manifest must not write the companion");
+test("each section row names the roots it scans", () => {
+  const roots = Object.fromEntries(manifestOf().sections.map((x) => [x.name, x.roots]));
+  assert.deepEqual(roots.constitution, ["AGENTS.md", "GLOSSARY.md"]);
+  assert.deepEqual(roots.persona, ["agents/uno-bot/AGENT.md"]);
+  for (const [name, list] of Object.entries(roots)) assert.ok(list.length, `${name} must scan a root`);
 });
 
 // ── The assemble function, and the check module over it (#537) ────────────────
