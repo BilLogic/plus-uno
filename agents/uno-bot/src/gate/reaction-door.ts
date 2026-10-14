@@ -29,6 +29,7 @@
 
 import { mapReaction } from "./reactions";
 import { isResolvingReaction, type AnswerReaction } from "../usage/resolution";
+import { thanksEmojiOf } from "../usage/appreciation";
 import type { ThreadState } from "../thread-state/index";
 import { withWorkingSignal, type Delivery } from "../turn/index";
 import { resolveSignal, type GateRestage, type GateVerdict } from "./gate";
@@ -109,6 +110,14 @@ export interface ReactionDoorDeps {
   recordReaction?(reaction: AnswerReaction): Promise<void>;
 
   /**
+   * Put a person's thanks on one of the bot's own messages on the usage
+   * record (`usage/appreciation.ts`): a 🙏, 🐐, 👏 and the like, never a gate
+   * glyph. The door has checked the author and the reactor; the adapter
+   * writes one row. Must not throw — the envelope logs and swallows.
+   */
+  recordThanks?(reaction: { channel: string; itemTs: string; userId: string; emoji: string }): Promise<void>;
+
+  /**
    * A commitment reminder's own look, ahead of everything else: true when the
    * reacted message is a reminder, which then owns the reaction whatever its
    * glyph — so a ✅ there never reaches a card (`commitments/run.ts`
@@ -121,12 +130,23 @@ export async function runReactionDoor(
   request: ReactionRequest,
   deps: ReactionDoorDeps,
 ): Promise<void> {
-  // A cheap pre-filter, not a second opinion: Gate parses the glyph itself and
+  // A thanks is recorded first, and changes nothing that follows: no thanks
+  // emoji is a gate glyph. Only on the bot's own message, from someone other
+  // than the bot, so the bot's own 🙏 is never counted.
+  const thanks = deps.recordThanks && request.messageAuthorId ? thanksEmojiOf(request.glyph) : null;
+  if (thanks) {
+    const self = await deps.botUserId();
+    if (self && request.messageAuthorId === self && request.userId !== self) {
+      await deps.recordThanks!({ channel: request.channel, itemTs: request.messageTs, userId: request.userId, emoji: thanks });
+    }
+  }
+
+  // Then a reminder looks, since a reminder's glyphs are not the gate's. Then
+  // a cheap pre-filter, not a second opinion: Gate parses the glyph itself and
   // is the authority on what it means. This one only decides whether the
   // reaction is worth the thread-root read below — every 🎉 in every channel
   // the bot is in arrives here, and a Slack call per party popper is a
-  // subrequest spent on nothing. A reminder's glyphs are not the gate's, so a
-  // reminder looks first.
+  // subrequest spent on nothing.
   if (deps.reminder && (await deps.reminder(request))) return;
   if (!mapReaction(request.glyph)) return;
 

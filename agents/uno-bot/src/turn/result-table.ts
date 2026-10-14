@@ -1,5 +1,5 @@
 // The result table — the sortable table of a lookup's rows beneath an answer
-// (CONTEXT.md § result table).
+// (GLOSSARY.md (**result table**)).
 //
 // BUILT FROM THE LOOKUP, NEVER FROM THE MODEL. The model chooses the lookup and
 // up to 4 of its fields; every cell is the value a row of that lookup really

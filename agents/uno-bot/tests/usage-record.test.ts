@@ -10,6 +10,7 @@ import {
   buildTurnRecord,
   estimateCostUsd,
   isTestTraffic,
+  isThanks,
   MAX_REQUEST_TEXT_CHARS,
   keepsRequestText,
   ratesFor,
@@ -190,6 +191,46 @@ test("test traffic: a debug route, a sandbox channel, a bare greeting — and no
   assert.equal(isTestTraffic({ ...base, disposition: "reacted", question: "thanks!" }), true);
   // A reaction to a real question is still a real ask.
   assert.equal(isTestTraffic({ ...base, disposition: "reacted", question: "is this right?" }), false);
+});
+
+// ── unprompted thanks ────────────────────────────────────────────────────────
+
+test("a thanks is any of the words, the shortcode or the glyph, alone or in a sentence", () => {
+  for (const text of [
+    "thanks!",
+    "Thank you so much",
+    "thx",
+    "ty",
+    "TYSM <@U0BOT>",
+    "really appreciate it",
+    "you're the goat",
+    ":goat:",
+    "🐐",
+    "🙏",
+    ":pray: that's it",
+    "perfect, thanks — one more: where is the PRD?",
+  ]) {
+    assert.equal(isThanks(text), true, text);
+  }
+});
+
+test("a word that only contains a thanks word is not one", () => {
+  for (const text of ["", "type the title", "goats are not on the roadmap", "thankless job", "I appreciate the context, but", "pretty sure", "goatee"]) {
+    assert.equal(isThanks(text), false, text);
+  }
+});
+
+test("thanks is set on a person's turn, never on the debug route or in the sandbox", () => {
+  const thanks = facts({ question: "thanks!", disposition: "reacted" });
+  const row = buildTurnRecord(thanks);
+  assert.equal(row.thanks, true);
+  // A thanks-only message is still a greeting by the test-traffic rule; the
+  // flag is what counts it.
+  assert.equal(row.testTraffic, true);
+  assert.equal(buildTurnRecord({ ...thanks, origin: "figma" }).thanks, true);
+  assert.equal(buildTurnRecord({ ...thanks, origin: "debug" }).thanks, false);
+  assert.equal(buildTurnRecord({ ...thanks, testChannelIds: ["C1"] }).thanks, false);
+  assert.equal(buildTurnRecord(facts()).thanks, false);
 });
 
 // ── corpus categories ────────────────────────────────────────────────────────

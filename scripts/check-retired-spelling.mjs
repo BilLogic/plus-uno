@@ -2,7 +2,7 @@
 /**
  * Retired-spelling sweep (#429, the contract step of an expand–contract).
  *
- * CONTEXT.md renamed the two maintenance severities: "Tier 1 / Tier 2
+ * The glossary renamed the two maintenance severities: "Tier 1 / Tier 2
  * (maintenance)" became **direct fix / gated change**, and *Tier* now means the
  * loading tiers and nothing else. The old spelling fanned across 33 files,
  * including a skill directory and a workflow file, so it was migrated in three
@@ -17,8 +17,8 @@
  * rule: docs/plans/ and todos/ (a plan keeps the words it was written in),
  * docs/adr/ (a decision record keeps the spelling it decided in),
  * docs/knowledge/archive/ (the graveyard), generated artifacts (the bundle is
- * regenerated from the swept sources), and the glossary's own "Do NOT use"
- * column, which names the old spelling precisely so this sweep has something
+ * regenerated from the swept sources), and the glossary's own `_Avoid_:`
+ * lines, which name the old spelling precisely so this sweep has something
  * to point at.
  *
  * Each pattern is a MAINTENANCE-only shape: the word beside "Tier" is one only
@@ -30,7 +30,7 @@
  * two agent loops called the "Gemini lane" and the "Claude lane" until #495/#496
  * collapsed them into one loop behind the ModelProvider seam; the word is now
  * "provider" or "adapter". **lane** keeps one meaning and it is the blueprint's:
- * the actor row a cell sits on (CONTEXT.md § Two vocabularies, ADR-023), which
+ * the actor row a cell sits on (GLOSSARY.md § Two vocabularies, ADR-023), which
  * is a CONTRACT name — `filter_lane_role`, a `lane` column, "| Lane | Step |".
  * So the shapes below are the provider PHRASES and never the bare word: "Gemini
  * lane", "model lane", "both lanes". A blueprint lane, a review lens that stays
@@ -45,12 +45,13 @@ import { fileURLToPath } from 'node:url';
 
 import { documents } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
+import { TERM } from './check-glossary.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(here, '..');
 
 export const REMEDY =
-  '  -> CONTEXT.md § Harness & workflow terms names the current words. The old\n' +
+  '  -> GLOSSARY.md (**direct fix / gated change**, **ModelProvider**) names the current words. The old\n' +
   '     spelling may fall out of live docs and may not come back: a maintenance\n' +
   '     "Tier 1" now reads as a LOADING tier to every agent that opens the glossary.';
 
@@ -58,7 +59,7 @@ export const REMEDY =
 export const ROOTS = [
   'AGENTS.md',
   'README.md',
-  'CONTEXT.md',
+  'GLOSSARY.md',
   'agents',
   'skills',
   'docs',
@@ -108,14 +109,15 @@ export const RETIRED = [
 ];
 
 /**
- * The glossary rows that OWN a retired spelling: their "Do NOT use" cell names
+ * The glossary entries that OWN a retired spelling: their `_Avoid_:` line names
  * it precisely so this sweep has something to point at, and so cannot be swept.
- * One row per retirement — the maintenance severities, and the ModelProvider
- * seam that retired the provider sense of "lane".
+ * One entry per retirement — the maintenance severities, and the ModelProvider
+ * seam that retired the provider sense of "lane". Matched on the entry's
+ * `**Term**:` line; the exemption is that entry's `_Avoid_:` line and no other.
  */
-const GLOSSARY_ROWS = [
-  /^\| \*\*direct fix \/ gated change\*\* \|/,
-  /^\| \*\*ModelProvider\*\* \|/,
+const GLOSSARY_OWNERS = [
+  /^\*\*direct fix \/ gated change\*\*:$/,
+  /^\*\*ModelProvider\*\*:$/,
 ];
 
 /** The file types an agent reads. Tested against the name, as the walk hands it. */
@@ -141,8 +143,13 @@ const skipEntry = (name) => name === 'node_modules' || name.startsWith('.') || n
 export function findingsIn(text, rel = '') {
   const out = [];
   const lines = text.split('\n');
+  let owner = false; // inside a glossary entry that owns a retired spelling
   lines.forEach((line, i) => {
-    if (rel === 'CONTEXT.md' && GLOSSARY_ROWS.some((re) => re.test(line))) return;
+    if (rel === 'GLOSSARY.md') {
+      if (TERM.test(line)) owner = GLOSSARY_OWNERS.some((re) => re.test(line));
+      else if (line.trim() === '') owner = false;
+      else if (owner && line.startsWith('_Avoid_:')) return;
+    }
     for (const { re, why } of RETIRED) {
       re.lastIndex = 0;
       const m = re.exec(line);

@@ -329,6 +329,13 @@ export interface PendingProposal {
    */
   originProposalTs?: string;
   /**
+   * The card this one replaced by revision: a turn's revision of the pending
+   * card, or a sweep card's "drop N". A re-stage copies it, so a re-staged
+   * revision is still one. Read only by the usage record
+   * (`ProposalEvent.revisesProposalId`).
+   */
+  revisesProposalTs?: string;
+  /**
    * Set on one item of a decision report (`slack/decision-cards.ts`): the
    * message its card is in, and its id there. Several items share one
    * message, so `proposalTs` is a key built from both rather than the ts; an

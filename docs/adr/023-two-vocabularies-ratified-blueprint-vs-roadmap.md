@@ -1,11 +1,13 @@
 ---
 embodiment: ide
-summary: The two-vocabularies rule is ratified — blueprint words and Roadmap words never mix, and CONTEXT.md is its only home (2026-08-25)
+summary: The two-vocabularies rule is ratified — blueprint words and Roadmap words never mix, and the glossary (now GLOSSARY.md) is its only home (2026-08-25)
 status: active
 verified: 2026-08-25 (#164)
 ---
 
 # ADR-023: The two-vocabularies rule is ratified (2026-08-25)
+
+**Amendment (2026-10-13).** The glossary was renamed `CONTEXT.md` → `GLOSSARY.md` to follow the mattpocock-skills plugin, so the rule's home is now `GLOSSARY.md` § Two vocabularies. The body below is left as written and names the old file.
 
 **Decision.** The rule stands: `uno-blueprint` speaks service-blueprint vocabulary
 (`phase` · `scenario` · `path` · `step` · `lane` · `cell`) and the Notion Roadmap

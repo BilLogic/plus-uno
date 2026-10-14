@@ -25,7 +25,7 @@ human-gated pipeline.
 1. Read `skills/uno-maintain/references/method.md` §6 — the post-ship
    reconciliation duty and its check set (what to verify per shipped card)
    live there — and §1 for the intake shape each finding must carry.
-2. Read `docs/connectors/notion.md` and `CONTEXT.md` to
+2. Read `docs/connectors/notion.md` and `GLOSSARY.md` to
    get the Roadmap database id and the exact status property names — Roadmap
    vocabulary only ("card", "Dev Status"); never blueprint words. Query the
    database id directly (`databases/{id}/query`) — workspace search is weak

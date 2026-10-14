@@ -92,6 +92,13 @@ export interface ProposalEvent {
    * breaks nothing.
    */
   originProposalId: string | null;
+  /**
+   * Staged rows only: the card this one replaced by revision — what "approved
+   * with edits" is counted from — from `PendingProposal.revisesProposalTs`. A
+   * re-staged revision keeps its original's, so it resolves to the same
+   * chain. Null on a card that revised nothing.
+   */
+  revisesProposalId: string | null;
 
   // ── staged ──
   /** The staging turn, when a turn staged it — the join to `turns`. */
@@ -161,6 +168,7 @@ const EMPTY: Omit<ProposalEvent, "proposalId" | "event" | "at" | "via"> = {
   channelId: null,
   testTraffic: null,
   originProposalId: null,
+  revisesProposalId: null,
   turnId: null,
   requesterId: null,
   tools: [],
@@ -234,6 +242,7 @@ export function stagedEvent(input: {
     turnId: input.turnId ?? null,
     testTraffic: input.testTraffic ?? null,
     originProposalId: proposal.originProposalTs ?? null,
+    revisesProposalId: proposal.revisesProposalTs ?? null,
     requesterId: requester,
     tools: proposalOperations(proposal).map((op) => op.toolName),
     ttlMs: proposalTtlMs(proposal),

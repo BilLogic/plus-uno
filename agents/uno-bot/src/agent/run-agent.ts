@@ -67,7 +67,7 @@
 // Gemini adapter when its service-account credentials are absent, so a mis-set
 // flag costs the opt-in rather than the turn. Everything downstream — the
 // proposal gate, delivery, history — is provider-blind because both adapters
-// answer the same `ModelProvider` seam (CONTEXT.md § ModelProvider).
+// answer the same `ModelProvider` seam (GLOSSARY.md (**ModelProvider**)).
 
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { AbsenceContext } from "./absence";

@@ -50,7 +50,7 @@ export type InterimKind = "narration" | "backstop";
  * What the finished work left behind, in the port's own words: whether a
  * person now has to act before this thread can go anywhere.
  *
- * Deliberately NOT glossed in CONTEXT.md: `TurnDisposition` is not either, and
+ * Deliberately NOT glossed in GLOSSARY.md: `TurnDisposition` is not either, and
  * the vocabulary is internal.
  *
  * Two words rather than Slack's four-value lifecycle, because this is the only

@@ -1,7 +1,7 @@
 // The library publish report's table of changed components — the block under
 // its decision card on the #plus-universal post.
 //
-// A result table (CONTEXT.md § result table) of every changed component: its
+// A result table (GLOSSARY.md (**result table**)) of every changed component: its
 // name linked to its Figma node, what happened to it, and the code it maps
 // to, built from the drafted intake, so every name and link is one the poll
 // found. The report keeps it on its record (`DecisionReportRecord.after`), so

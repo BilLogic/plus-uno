@@ -15,26 +15,25 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **166,560 chars from 16 files**, against an assembled budget of 175,500 (8,940 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 146,176 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **157,698 chars from 15 files**, against an assembled budget of 175,500 (17,802 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 137,314 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,310 (−7,704 ide-only) | 10,310 | 20,000 (constitution) |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 12,700 | 23,038 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,959 | 51,038 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,249 | 57,331 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 64,276 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 71,030 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 76,233 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 82,880 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 89,268 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−22,570 ide-only) | 93,829 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,535 (−4,814 ide-only) | 108,407 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,750 (−9,320 ide-only) | 143,199 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 146,667 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 153,183 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 157,816 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,696 (−605 ide-only) | 166,560 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,845 (−7,705 ide-only) | 9,845 | 20,000 (constitution) |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 12,784 | 22,658 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,961 | 50,660 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,249 | 56,953 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 63,898 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,712 | 70,653 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,160 | 75,857 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 82,504 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 88,892 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−22,570 ide-only) | 93,453 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,535 (−4,814 ide-only) | 108,031 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 35,008 (−9,320 ide-only) | 143,081 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 146,549 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 153,065 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 157,698 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -46,13 +45,14 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 101,231 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **9 reference(s), 113,472 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
 | `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 33,590 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
-| `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 9,863 |
+| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 12,240 |
+| `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 9,864 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,078 |
 | `uno-research/method` | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 |
@@ -84,7 +84,7 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 
 - Ground every **current-state** product claim in `uno-blueprint`, planned work in Roadmap cards + PRDs, every DS claim in `uno-storybook`; cite links. Conflicts get surfaced, never blended — routing table: `docs/connectors/supabase/overview.md` § Two sources, one time axis (ADR-021).
 - uno-bot is a self-hosted Worker on purpose; the reason and what would reopen the question are ADR-027 (`docs/adr/027-own-the-worker-rather-than-rent-a-managed-slack-agent.md`).
-- The blueprint and the Notion Roadmap speak **different vocabularies** — service-blueprint vs project-management. Speak each estate's own words, and route a question by its frame words: `CONTEXT.md` § Two vocabularies is the law (ratified in ADR-023).
+- The blueprint and the Notion Roadmap speak **different vocabularies** — service-blueprint vs project-management. Speak each estate's own words, and route a question by its frame words: `GLOSSARY.md` § Two vocabularies is the law (ratified in ADR-023).
 - Bill makes product-direction calls: requirements, pillars and roadmap options come from him or from a cited estate, so escalate rather than fill the gap.
 - Embodiment deltas live in `agents/` — e.g. `agents/uno-bot/AGENT.md` holds only what differs in Slack.
 
@@ -124,7 +124,7 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 
 ## The loading contract
 
-**Tier 1 — always loaded.** This file, and nothing else. Soft budget ≤20k chars: an overrun warns rather than fails, and a tier that bloats still defeats the tier. **A module's glossary row REPLACES rather than adds**: when a module takes over what another one did, its row absorbs that row instead of sitting beside it, so the glossary stays a vocabulary rather than a ledger of everything that has ever been built. The budget is what makes that a rule rather than a preference — a wave of tickets each adding a row spends it, and the honest answer is a shorter glossary, not a bigger tier.
+**Tier 1 — always loaded.** This file, and nothing else. Soft budget ≤20k chars: an overrun warns rather than fails, and a tier that bloats still defeats the tier.
 
 **Tier 3 — retrieved live, never cached.** Product truth from `uno-blueprint` (`writers/blueprint` / `search_blueprint`); design-system truth from `uno-storybook` (read the source and stories). Team conventions are *not* Tier 3 — they are canonical in-repo (ADR-017) and load as plain files.
 
@@ -144,101 +144,267 @@ Every embodiment, including Slack.
 
 ## Knowledge
 
-Finished work leaves behind one of three things: a **rule** in the doc that already owns the subject, an **ADR** under `docs/adr/` when the call is hard to reverse, or **nothing** — git keeps the trail, and a finding worth less than the context it costs is worth dropping. `docs/knowledge/INDEX.md` is the contract, `npm run check:knowledge-disposition` enforces it, and `docs/knowledge/changelog.md` is the ledger of what was promoted. Capture runs through `skills/uno-maintain`; land the note and its disposition in the same change. `docs/knowledge/archive/` is the graveyard for superseded docs — archive rather than delete when a decision's own trail matters, and what is already there stays as it is (#172).
+Finished work leaves behind a **rule** in the doc that already owns the subject, an **ADR** under `docs/adr/` when the call is hard to reverse, an **archive** entry in `docs/knowledge/archive/` when a superseded era's own trail matters, or — most often — **nothing**: git keeps the trail, and a finding worth less than the context it costs is worth deleting. `docs/knowledge/INDEX.md` is the contract, `npm run check:knowledge-disposition` enforces it, and `docs/knowledge/changelog.md` is the ledger of what was promoted. Capture runs through `skills/uno-maintain`; land the note and its disposition in the same change. What is already in the archive stays as it is (#172).
 
 
 
 
 ---
 
-<!-- CONTEXT.md -->
+<!-- GLOSSARY.md -->
 
 # PLUS Terminology
 
-<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand) · distilled 2026-07-07 · applied by every agent naming a product, org, design-system, or harness term. -->
+<!-- canonical per ADR-017 (docs/adr/) · Tier 1 in uno-bot's prompt (its constitution section), read on demand in the IDE · distilled 2026-07-07 · applied by every agent naming a product, org, design-system, or harness term. -->
 
 Use these terms consistently across all design system work, prototypes, and documentation. Do not substitute generic web terms.
 
-## Product terms
+## Language
 
-| PLUS Term | Meaning | Do NOT use |
-|-----------|---------|------------|
-| **Session** | A scheduled tutoring slot (Zoom or Pencil) | "class", "meeting", "appointment" |
-| **Reflection** | Post-session tutor self-report | "survey", "feedback form", "review" |
-| **Escalation** | Tutor flags session for supervisor review | "report", "incident", "alert" |
-| **Call-Off** | Tutor cancels a session | "cancel", "absence", "no-show" (no-show is a separate behavior) |
-| **Fill-In** | Tutor covers an open session slot | "substitute", "replacement" |
-| **Strike** | Compliance violation (3-strike threshold) | "warning point", "demerit" |
-| **TIP** | Tutor Improvement Plan | "probation", "warning" |
-| **PIP** | Performance Improvement Plan (escalated from TIP) | "final warning" |
-| **Tutor Coach** | AI weekly compliance monitoring system | "monitor", "tracker" |
-| **TACT** | Tutor motivation + growth feedback system | "dashboard", "report" |
-| **Student Card** | UI component showing student info during session | "student profile", "student row" |
-| **Student Insight** | AI-generated student engagement summary | "student report", "analytics" |
+### Product
 
-## Organizational terms
+**Session**:
+A scheduled tutoring slot (Zoom or Pencil).
+_Avoid_: "class", "meeting", "appointment"
 
-| Term | Meaning |
-|------|---------|
-| **Affiliation** | University: CMU, Pitt, or Duquesne |
-| **Site** | School location where students are based |
-| **Lead Tutor** | Senior tutor with mentoring + attendance duties |
-| **SMART** | PLUS training system |
-| **Breakout Room** | Zoom sub-room for one-on-one tutoring |
+**Reflection**:
+A post-session tutor self-report.
+_Avoid_: "survey", "feedback form", "review"
 
-## Design-system terms
+**Escalation**:
+A tutor flagging a session for supervisor review.
+_Avoid_: "report", "incident", "alert"
 
-| Term | Meaning |
-|------|---------|
-| **Context Level** | Atomic hierarchy: Element → Card → Section → Page |
-| **Spec** | Full page composition |
-| **Prompt-spec** | The engineered prompt handed to an external generative tool (Stitch, Figma Make, v0): the deliverable of the low/mid-fi lane, not the artifact the tool returns. Distinct from **Spec** and from the **PRD** it is written from. Avoid bare "spec" |
-| **Component docs page** | The tabbed page a human reads for one component. Distinct from **Page** (a Context Level), from **Spec**, and from a page story. Avoid bare "docs page" |
-| **Token** | Design value: color, spacing, typography, elevation, radius |
-| **Foundation** | Fundamental design primitive (color palette, type scale, grid) |
+**Call-Off**:
+A tutor cancelling a session.
+_Avoid_: "cancel", "absence", "no-show" (no-show is a separate behavior)
 
-## Harness & workflow terms
+**Fill-In**:
+A tutor covering an open session slot.
+_Avoid_: "substitute", "replacement"
 
-| Term | Meaning | Do NOT use |
-|---|---|---|
-| **uno** | the design agent, in every embodiment | "the AI" |
-| **uno-bot** | uno's Slack embodiment, a self-hosted Cloudflare Worker | "Slackbot" |
-| **uno-blueprint** | the product source of truth for the current service (Supabase), retrieved live. Not the `uno-blueprint` devDependency, which is the sb template kit | "the database" |
-| **Diagnostics** | uno-bot's probes: the public blueprint health probe and the token-gated debug probes, sharing one report shape. Separate from the plain uptime check | "the debug routes" |
-| **uno-storybook** | design-system source of truth (stories + MDX → /storybook) | "the docs site" |
-| **share-out** | a feedback-rail publish: Loom + preview + Decisions DB link (+ replica for prototypes) | "post", "update" |
-| **Decisions DB** | centralized decision log under Design HQ — Status / Owner / Sign-off / Date / Roadmap Card / Evidence | "Decision Log" (obsolete per-project subpage) |
-| **pillar** | product area (Universal · Admin · Toolkit · Training · Marketing …) — maps to a Slack channel | "category" |
-| **replica** | the Figma frame mirroring a coded prototype — required in prototype share-outs | "screenshot" |
-| **direct fix / gated change** | the two maintenance severities: a trivial fix committed straight to main, vs a PR + PRD through a Slack verdict. | "Tier 1", "Tier 2" |
-| **Tier 1 / Tier 2 / Tier 3** | the loading tiers: always-loaded · on demand · retrieved live. *Tier* means loading and nothing else | "Tier" for a maintenance severity |
-| **RM-ID** | Roadmap card id (`RM-<n>`; `Card <n>` in Figma titles) — the join key | — |
-| **embodiment** | a runtime uno runs in (the IDE, the uno-bot Worker, headless GitHub Actions), each with its own powers and its own slice of the harness | "mode", "environment" |
-| **check registry** | the one list of the repo's checks: each row says what a check runs and where it runs, and every place that runs checks is held to agree with it | "the check list", "COMPOSED" |
-| **persona** | uno-bot's own always-loaded document: voice, audience, gate and etiquette, beside what every embodiment obeys | "system prompt", "soul" |
-| **pointer** | a line held in context that names material outside it and when to reach it — a skill description, a progressive-loading row. Its wording, not its target, decides whether the agent gets there | "link", "reference" (a reference is what a pointer points AT) |
-| **ladder** / **disclosed** | where writing sits by how immediately the agent needs it: in-file step · in-file reference · **disclosed** reference, pushed out of the always-loaded tier behind a pointer and loaded only when it fires | "hidden" or "optional" for disclosed |
-| **leading word** | a compact pretrained concept an agent thinks with (*tracer bullet*, *red*, *ratchet*): repeated as a token, kept out of sentence form; front-loaded in a pointer so it triggers | — |
-| **sprawl** | a document too long even when every line is live — attention thins across it; the cure is the ladder, not a shorter sentence | "bloat" (bloat is dead weight; sprawl is live weight) |
-| **ThreadState** | uno-bot's memory of one thread, behind one typed interface: its history, the pending proposal, the assistant context, the cancel flag, the events already handled and the run lease | "the DO", "thread-state client" |
-| **ModelProvider** | the seam between uno-bot's one agent loop and a model: one adapter per model, each answering a turn or a one-shot prompt on a named tier | "the provider loop", "provider lane", "Gemini lane", "Claude lane", "model lane", "both lanes" (there is one loop, adapters behind one seam — and **lane** is the blueprint's actor row) |
-| **tool table** | the one typed row per uno-bot tool: its **access**, which says whether a call runs at once, waits for approval on a proposal card, or settles a card already standing (a dispatch distinction, not read/write), plus what the rest of the bot reads off it: the words on its task or proposal card, whether an answer can cite it, and what review a run asks for | "the tool registry", "the tool list" |
-| **Turn** | one uno-bot turn: one request in (who, where, the text, the images, the pending proposal), one outcome out (what was posted, what is staged, what the conversation remembers). What a person sees while it runs goes through its **Delivery** port | "the handler", "the message pipeline" |
-| **Gate** | the one place a staged proposal is resolved: any of five approval signals in, one verdict out (won, stale or none), and only a won verdict runs the tool | "the confirmation gate", "the ✅ handler" |
-| **proposal card** | the ⚠️ card holding a side-effect tool call until someone approves it — what **Gate**'s signals resolve; short in the thread, decided in its Review pop-up | "confirmation dialog", "prompt" |
-| **superseded card** | a proposal card retired by a revision staged later in the same thread, or the moment a turn commits to writing one: it executes nothing and answers that it was replaced. Expired is different: the card's TTL ran out | "expired card" |
-| **sweep** | the end-of-day read of every source uno-bot watches for **drift** and each **commitment**, a task someone took on; fixes post next morning as **proposal cards** | "digest", "scan" |
-| **drift** | a source of truth a later decision overruled — a Notion page or a Figma file | "out of sync" |
-| **relayed DM** | a gated DM uno-bot sends someone on a requester's behalf, attributed | "proactive DM", "outreach" |
-| **intake** | a change request: implementation in a listed plus-uno repo (blueprint, Storybook docs, harness, prototypes) → that repo's GitHub issue; product or design, including a live PLUS app bug → a Roadmap card, the frame's own when named, else a new one | "ticket" |
-| **agent session** | the Slack object a uno-bot conversation runs inside, moving through `active` · `processing` · `suspended` · `closed`; it replaces Slack's deprecated assistant threads | "assistant thread", "the panel thread" |
-| **working signal** | what tells a person a turn is in flight: the **agent session** shown as processing from the start of the work until the turn settles, on every exit. Posting the answer does not take it down | "the thinking indicator", "the status line" (the status is what Slack is told; the signal is what the person sees) |
-| **checklist** | the Slack plan a person watches while a turn's lookups run: a **task card** per run of like lookups or per routing choice, the answer posted beneath. A task card is neither a Roadmap card nor a **proposal card**: it approves nothing | "plan stream", "progress surface", "steps" |
-| **result table** | the sortable table beneath an answer, filled by code from one lookup's rows on fields the model picked. One per answer. Not a Markdown table or the **tool table** | "card table", "data table" |
-| **source** / **Sources box** | a **source** is a link a lookup of the same turn returned, which an answer stands on; the **Sources box** lists them beneath the answer in Slack, and is a single `Source:` line in Figma | "citation", "reference", "Sources:" line in the answer text |
-| **corpus** | the harness's one reader of repo files: what documents exist and what each one says. Checks ask it rather than the filesystem | "the walker", "the parser" (there is one of each) |
-| **ratchet** | a check's recorded baseline: a count may fall and a rise is a finding, an entry the run stops finding is a finding too, and a missing record fails loudly | "the whitelist", "the exceptions file", "the allow-list" |
-| **judge** | the Worker's pre-send check that grades a draft against the bot-answer rubric: `pass`, `fail`, `skip` or `error`. A skip fails open, so it carries its reason | "the rubric" (that is the document a judge grades against) |
+**Strike**:
+A compliance violation (3-strike threshold).
+_Avoid_: "warning point", "demerit"
+
+**TIP**:
+Tutor Improvement Plan.
+_Avoid_: "probation", "warning"
+
+**PIP**:
+Performance Improvement Plan (escalated from TIP).
+_Avoid_: "final warning"
+
+**Tutor Coach**:
+The AI weekly compliance monitoring system.
+_Avoid_: "monitor", "tracker"
+
+**TACT**:
+The tutor motivation + growth feedback system.
+_Avoid_: "dashboard", "report"
+
+**Student Card**:
+The UI component showing student info during a session.
+_Avoid_: "student profile", "student row"
+
+**Student Insight**:
+An AI-generated student engagement summary.
+_Avoid_: "student report", "analytics"
+
+### Organization
+
+**Affiliation**:
+A university: CMU, Pitt, or Duquesne.
+
+**Site**:
+The school location where students are based.
+
+**Lead Tutor**:
+A senior tutor with mentoring + attendance duties.
+
+**SMART**:
+The PLUS training system.
+
+**Breakout Room**:
+A Zoom sub-room for one-on-one tutoring.
+
+### Design system
+
+**Context Level**:
+The atomic hierarchy: Element → Card → Section → Page.
+
+**Spec**:
+A full page composition.
+
+**Prompt-spec**:
+The engineered prompt handed to an external generative tool (Stitch, Figma Make, v0): the deliverable of the low/mid-fi lane, not the artifact the tool returns. Distinct from **Spec** and from the **PRD** it is written from.
+_Avoid_: bare "spec"
+
+**Component docs page**:
+The tabbed page a human reads for one component. Distinct from **Page** (a Context Level), from **Spec**, and from a page story.
+_Avoid_: bare "docs page"
+
+**Token**:
+A design value: color, spacing, typography, elevation, radius.
+
+**Foundation**:
+A fundamental design primitive (color palette, type scale, grid).
+
+**replica**:
+The Figma frame mirroring a coded prototype, required in prototype share-outs.
+_Avoid_: "screenshot"
+
+### Estates
+
+**uno-blueprint**:
+The product source of truth for the current service (Supabase), retrieved live. Not the `uno-blueprint` devDependency, which is the sb template kit.
+_Avoid_: "the database"
+
+**uno-storybook**:
+The design-system source of truth (stories + MDX → /storybook).
+_Avoid_: "the docs site"
+
+**Decisions DB**:
+The centralized decision log under Design HQ: Status / Owner / Sign-off / Date / Roadmap Card / Evidence.
+_Avoid_: "Decision Log" (obsolete per-project subpage)
+
+**pillar**:
+A product area (Universal · Admin · Toolkit · Training · Marketing …), mapping to a Slack channel.
+_Avoid_: "category"
+
+**RM-ID**:
+A Roadmap card id (`RM-<n>`; `Card <n>` in Figma titles), the join key.
+
+**drift**:
+A source of truth a later decision overruled: a Notion page or a Figma file.
+_Avoid_: "out of sync"
+
+### uno-bot
+
+**uno-bot**:
+uno's Slack embodiment, a self-hosted Cloudflare Worker.
+_Avoid_: "Slackbot"
+
+**persona**:
+uno-bot's own always-loaded document: voice, audience, gate and etiquette, beside what every embodiment obeys.
+_Avoid_: "system prompt", "soul"
+
+**Diagnostics**:
+uno-bot's probes: the public blueprint health probe and the token-gated debug probes, sharing one report shape. Separate from the plain uptime check.
+_Avoid_: "the debug routes"
+
+**ThreadState**:
+uno-bot's memory of one thread, behind one typed interface: its history, the pending proposal, the assistant context, the cancel flag, the events already handled and the run lease.
+_Avoid_: "the DO", "thread-state client"
+
+**ModelProvider**:
+The seam between uno-bot's one agent loop and a model: one adapter per model, each answering a turn or a one-shot prompt on a named tier.
+_Avoid_: "the provider loop", "provider lane", "Gemini lane", "Claude lane", "model lane", "both lanes" (there is one loop, adapters behind one seam — and **lane** is the blueprint's actor row)
+
+**tool table**:
+The one typed row per uno-bot tool: its **access**, which says whether a call runs at once, waits for approval on a proposal card, or settles a card already standing (a dispatch distinction, not read/write), plus what the rest of the bot reads off it: the words on its task or proposal card, whether an answer can cite it, and what review a run asks for.
+_Avoid_: "the tool registry", "the tool list"
+
+**Turn**:
+One uno-bot turn: one request in (who, where, the text, the images, the pending proposal), one outcome out (what was posted, what is staged, what the conversation remembers). What a person sees while it runs goes through its **Delivery** port.
+_Avoid_: "the handler", "the message pipeline"
+
+**Gate**:
+The one place a staged proposal is resolved: any of five approval signals in, one verdict out (won, stale or none), and only a won verdict runs the tool.
+_Avoid_: "the confirmation gate", "the ✅ handler"
+
+**proposal card**:
+The ⚠️ card holding a side-effect tool call until someone approves it: what **Gate**'s signals resolve. Short in the thread, decided in its Review pop-up.
+_Avoid_: "confirmation dialog", "prompt"
+
+**superseded card**:
+A proposal card retired by a revision staged later in the same thread, or the moment a turn commits to writing one: it executes nothing and answers that it was replaced. Expired is different: the card's TTL ran out.
+_Avoid_: "expired card"
+
+**sweep**:
+The end-of-day read of every source uno-bot watches for **drift** and each **commitment**, a task someone took on; fixes post next morning as **proposal cards**.
+_Avoid_: "digest", "scan"
+
+**relayed DM**:
+A gated DM uno-bot sends someone on a requester's behalf, attributed.
+_Avoid_: "proactive DM", "outreach"
+
+**intake**:
+A change request: implementation in a listed plus-uno repo (blueprint, Storybook docs, harness, prototypes) → that repo's GitHub issue; product or design, including a live PLUS app bug → a Roadmap card, the frame's own when named, else a new one.
+_Avoid_: "ticket"
+
+**agent session**:
+The Slack object a uno-bot conversation runs inside, moving through `active` · `processing` · `suspended` · `closed`; it replaces Slack's deprecated assistant threads.
+_Avoid_: "assistant thread", "the panel thread"
+
+**working signal**:
+What tells a person a turn is in flight: the **agent session** shown as processing from the start of the work until the turn settles, on every exit. Posting the answer does not take it down.
+_Avoid_: "the thinking indicator", "the status line" (the status is what Slack is told; the signal is what the person sees)
+
+**checklist**:
+The Slack plan a person watches while a turn's lookups run: a **task card** per run of like lookups or per routing choice, the answer posted beneath. A task card is neither a Roadmap card nor a **proposal card**: it approves nothing.
+_Avoid_: "plan stream", "progress surface", "steps"
+
+**result table**:
+The sortable table beneath an answer, filled by code from one lookup's rows on fields the model picked. One per answer; not a Markdown table or the **tool table**.
+_Avoid_: "card table", "data table"
+
+**source** / **Sources box**:
+A **source** is a link a lookup of the same turn returned, which an answer stands on; the **Sources box** lists them beneath the answer in Slack, and is a single `Source:` line in Figma.
+_Avoid_: "citation", "reference", "Sources:" line in the answer text
+
+### Harness
+
+**uno**:
+The design agent, in every embodiment.
+_Avoid_: "the AI"
+
+**embodiment**:
+A runtime uno runs in (the IDE, the uno-bot Worker, headless GitHub Actions), each with its own powers and its own slice of the harness.
+_Avoid_: "mode", "environment"
+
+**share-out**:
+A feedback-rail publish: Loom + preview + Decisions DB link (+ replica for prototypes).
+_Avoid_: "post", "update"
+
+**direct fix / gated change**:
+The two maintenance severities: a trivial fix committed straight to main, vs a PR + PRD through a Slack verdict.
+_Avoid_: "Tier 1", "Tier 2"
+
+**Tier 1 / Tier 2 / Tier 3**:
+The loading tiers: always-loaded · on demand · retrieved live. *Tier* means loading and nothing else.
+_Avoid_: "Tier" for a maintenance severity
+
+**check registry**:
+The one list of the repo's checks: each row says what a check runs and where it runs, and every place that runs checks is held to agree with it.
+_Avoid_: "the check list", "COMPOSED"
+
+**pointer**:
+A line held in context that names material outside it and when to reach it: a skill description, a progressive-loading row. Its wording, not its target, decides whether the agent gets there.
+_Avoid_: "link", "reference" (a reference is what a pointer points AT)
+
+**ladder** / **disclosed**:
+Where writing sits by how immediately the agent needs it: in-file step · in-file reference · **disclosed** reference, pushed out of the always-loaded tier behind a pointer and loaded only when it fires.
+_Avoid_: "hidden" or "optional" for disclosed
+
+**leading word**:
+A compact pretrained concept an agent thinks with (*tracer bullet*, *red*, *ratchet*): repeated as a token, kept out of sentence form; front-loaded in a pointer so it triggers.
+
+**sprawl**:
+A document too long even when every line is live: attention thins across it. The cure is the ladder, not a shorter sentence.
+_Avoid_: "bloat" (bloat is dead weight; sprawl is live weight)
+
+**corpus**:
+The harness's one reader of repo files: what documents exist and what each one says. Checks ask it rather than the filesystem.
+_Avoid_: "the walker", "the parser" (there is one of each)
+
+**ratchet**:
+A check's recorded baseline: a count may fall and a rise is a finding, an entry the run stops finding is a finding too, and a missing record fails loudly.
+_Avoid_: "the whitelist", "the exceptions file", "the allow-list"
+
+**judge**:
+The Worker's pre-send check that grades a draft against the bot-answer rubric: `pass`, `fail`, `skip` or `error`. A skip fails open, so it carries its reason.
+_Avoid_: "the rubric" (that is the document a judge grades against)
 
 ## Two vocabularies — the blueprint speaks service-blueprint, the Roadmap speaks project-management
 
@@ -344,8 +510,8 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 ## Grounding (no claims without a fetched source)
 
-- **Roadmap ≠ blueprint — two different languages** (`CONTEXT.md` is the law; route by FRAME words, not topic words). Blueprint answers cite the rows and attribute each activity to its `lane` actor. Report in the vocabulary of the estate actually read; empty result → say WHICH estate. Deeper card content than `roadmap_query` returns → `source_read` on its url.
-- **Two sources, one time axis (ADR-021).** Blueprint = how it works *today*; cards + PRDs = what's *planned*. **One carve-out:** the blueprint also carries a labelled future layer, marked by **`status`** on both `paths` and `cells` (the values: `CONTEXT.md` § Two vocabularies). **Only `status: live` describes how the service works today** — report every other status as future or as fading. Check THAT scenario for rows with `status <> 'live'` before telling anyone it has no future state. (Path names no longer carry `Planned:` / `Prototype:` prefixes — matching on one finds nothing.) A conflicting in-flight card is a planned change, not an error — word it by decision status ("this is changing" only if decided, "might change" if exploratory). **Surface a conflict as one sentence naming both sources, via `present` shape `conflict`.** Full routing table: `docs/connectors/supabase/overview.md` § Two sources, one time axis — read it before answering a conflict.
+- **Roadmap ≠ blueprint — two different languages** (`GLOSSARY.md` is the law; route by FRAME words, not topic words). Blueprint answers cite the rows and attribute each activity to its `lane` actor. Report in the vocabulary of the estate actually read; empty result → say WHICH estate. Deeper card content than `roadmap_query` returns → `source_read` on its url.
+- **Two sources, one time axis (ADR-021).** Blueprint = how it works *today*; cards + PRDs = what's *planned*. **One carve-out:** the blueprint also carries a labelled future layer, marked by **`status`** on both `paths` and `cells` (the values: `GLOSSARY.md` § Two vocabularies). **Only `status: live` describes how the service works today** — report every other status as future or as fading. Check THAT scenario for rows with `status <> 'live'` before telling anyone it has no future state. (Path names no longer carry `Planned:` / `Prototype:` prefixes — matching on one finds nothing.) A conflicting in-flight card is a planned change, not an error — word it by decision status ("this is changing" only if decided, "might change" if exploratory). **Surface a conflict as one sentence naming both sources, via `present` shape `conflict`.** Full routing table: `docs/connectors/supabase/overview.md` § Two sources, one time axis — read it before answering a conflict.
 - **Every card lookup ends in a match or in named candidates.** Vague description, no clear match → offer the closest candidates (name + status + link) from `roadmap_query`'s ranked matches; asking for the Notion link is the LAST resort. When the user names a *specific* artifact, find THAT one — **a named thing is often a PRD or doc, not a card**, so no exact card match → search the doc surfaces too (`notion_search`) before concluding. Still nothing → list candidates AS candidates, naming which estates you checked. Presenting neighbors as if they were the asked-for thing is a wrong answer.
 - **Read every linked source** (`source_read` on any URL/PRD/Figma frame in the request) and answer from the fetched content, cited. Fetch fails → say you couldn't open it and why. "Who owns this?" → the page's people property, not roles or LinkedIn.
 - **Unreachable Notion link — exhaust fallbacks before asking:** (1) try it as a public web page; (2) search the team workspace for the same title; (3) only then grant steps, with the caveat that only pages IN the PLUS team workspace can be shared with the bot.
@@ -526,7 +692,7 @@ Get finished-enough work in front of people from Slack. A designer wants feedbac
 3. **Feedback rail — stage `shareout_post` immediately.** `shareout_post(project, artifact, fidelity, round, summary, what_changed?, feedback_wanted[], not_looking_for, link, reviewers?, deadline?)` is gated (it pings people) and posts in the shape of `docs/connectors/slack.md § Share-out post`: ≤3 stage-specific questions plus the NOT-looking-for line. Stage with whatever links are in hand — the confirmation card audits the bundle (Loom · live preview · Decisions DB row · replica for prototypes) and names what is missing, so ✅ is informed consent to post without it, or the designer drops links in-thread and you fold them in. `reviewers` are Slack user ids that get @-mentioned — real people from `notion_search(scope: "team")` or the PRD's Owner. Replica creation and its visual diff are IDE work. Done when the card is staged with the questions, the link and the reviewers filled from the thread.
    - **Close the round.** When the feedback is in, offer to write the decisions to the Decisions DB — `notion_create(surface: "decision")` with `properties.roadmap_card` and the thread permalink as evidence, ✅-gated — before the round counts as done. Acting on the feedback re-enters **uno-prototype**.
 4. **Handoff rail — collect the three sign-offs.** The developer, the PM and the stakeholder each ✅ in the handoff thread (reviewer-verdict convention: `docs/connectors/slack.md § Two gates`). `slack_thread_read` the linked thread and tally who has reacted; report the tally on request. The gate passes on three, each from its own person — a tally short of three reads "2 of 3, waiting on {role}". A linked thread reads about 50 messages, so a longer thread gets a partial tally labelled as such. Done when the tally names each of the three roles as ✅ or waiting.
-   - **Metadata to gather at handoff**, for the in-IDE registration: `title`, `description`, `stage` (`low|mid|high`), `productPillar`, `creators` (≥1), `repoPath` (ends with `/`); optional `contributors`, `deploymentUrl`, `notionCardUrl`, `notionCardId`, `loomVideoUrl`. `id`, `localPath`, `lastUpdated` and `upvotes` are system-owned. `productPillar` takes the marketplace DB's own list — `admin|home|login|profile|toolkit|training|universal` — a different vocabulary from `pillar` in `CONTEXT.md`; use the DB's values verbatim and call them areas. A missing required field is a question for the designer. Done when every required field has a value the designer gave.
+   - **Metadata to gather at handoff**, for the in-IDE registration: `title`, `description`, `stage` (`low|mid|high`), `productPillar`, `creators` (≥1), `repoPath` (ends with `/`); optional `contributors`, `deploymentUrl`, `notionCardUrl`, `notionCardId`, `loomVideoUrl`. `id`, `localPath`, `lastUpdated` and `upvotes` are system-owned. `productPillar` takes the marketplace DB's own list — `admin|home|login|profile|toolkit|training|universal` — a different vocabulary from `pillar` in `GLOSSARY.md`; use the DB's values verbatim and call them areas. A missing required field is a question for the designer. Done when every required field has a value the designer gave.
 5. **Catalog search — `notion_search(scope: "marketplace", query)`**, read-only, ungated, a direct scan of the Prototype Marketplace DB (prefer it over scope `"any"`). Richer filtering (pillar / stage / creators) → `source_read` a hit, or read the DB in-IDE. Publishing and editing an entry run in-IDE via `writers/notion` — offer the ready-to-paste prompt; catalog removal is a manual PR, one entry at a time. Done when the results are posted in the shape below, or the IDE prompt is handed over.
 6. **Sync feedback session — logistics only.** Offer scheduling and recording/transcription setup. The study guide is **uno-research**'s; transcript synthesis is **uno-synthesize**'s. Done when the logistics are settled and the two neighbours are named.
 7. **Outward email — `email_send(to, subject, body, cc?)`**, gated, real Gmail. Slack-first: use it for a recipient outside Slack or on an explicit ask. Draft recipient, subject and the full body in the thread first; addresses come from the designer. Done when the card is staged with a complete body.
@@ -610,7 +776,7 @@ Findings from the repo or Slack:
 - After the designer has talked to people → **uno-synthesize** (summarize the thread, then optionally a PRD).
 - Study-guide drafting, multi-file codebase sweeps, data pulls → the in-IDE **uno-research**.
 - Summarizing an existing study or analysis → **uno-synthesize** (the method's data rule: ingesting prior analysis is synthesis).
-- Plus-fact or project-status questions → default conversational mode, routed by frame words (`CONTEXT.md § Two vocabularies`).
+- Plus-fact or project-status questions → default conversational mode, routed by frame words (`GLOSSARY.md § Two vocabularies`).
 - Should a Slack-handle or email column reach the Team Member DB, intro-posting becomes a gated tool; until then, suggest and link.
 
 **uno-research/method** — the procedure behind these steps: the four gates of the decision spine (inventory · source · report · hand off), the data rule that draws the research/synthesize boundary, the study-guide-first rule for people, the citation and empty-sweep rules, and the findings-brief shape. It is disclosed, not loaded: `read_reference` with name `uno-research/method` as the turn's first move (step 1), and again in a later turn of the same thread if its text is no longer in context.
@@ -951,6 +1117,8 @@ Two limits the Worker now handles, worth knowing because they shape what you wri
 
 Pillar → channel map (group announcements; **all private — uno-bot must be invited before posting/@here**):
 `Universal` → #plus-universal `C072E8SFLKV` · `Admin` → #plus-admin `C089A3E9CCW` · `Toolkit` → #plus-toolkit `C08925VDFF1` · `Training` → #plus-training `C07L5RZV6DR` · `Marketing` → #plus-marketing `C052BG9NE86`. Tutoring + Help Center: unmapped — flag at retro.
+
+**Automations registry.** What runs on its own — each morning and end-of-day job, cron and PR gate, with its trigger and owner — is `read_reference` name `docs/engineering/operations`. Read it before answering what runs when, or who owns an automated post.
 
 
 ## Share-out post
@@ -1357,46 +1525,6 @@ Two hard rules, every row: **never merge two sources into one unattributed answe
 
 Drafting follows the same routing, not just answering: `skills/uno-synthesize` queries the blueprint for the current-state and downstream-effects sections before writing a PRD.
 
-
-
----
-
-<!-- docs/engineering/operations.md -->
-
-# Automations Registry
-
-<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand) · distilled 2026-07-07 from 📓 playbook §6, now superseded · applied by uno-maintain. -->
-
-THE standing-automation registry. An automation absent from the table below is undocumented by definition.
-
-## Rules
-
-- **Every automation names its agent.** An automation without one is unowned by definition.
-- **An automation invokes a skill's method; it never embeds its own copy of the logic.** Migrate opportunistically as each is next touched.
-- **Every automation is a loop, and declares its loop mechanics.** Stop condition and issue caps go in its prompt adapter (`scripts/prompts/<name>/SKILL.md`); trigger cadence and the hard turn cap go in its workflow file. The procedure itself stays in the skill's method. Portable by construction: any model can execute the written loop, and harness loop primitives are optional accelerators. Pre-rule adapters (uno-implement, uno-implement-design) migrate as each is next touched. *(rule added 2026-07-16)*
-- **Every automation names where it runs and who pays.** Scheduled sweeps run as GitHub Actions cron → the claude-vertex composite action (`.github/actions/claude-vertex`) → Claude-on-Vertex, billed to the `hcii-plus` GCP project via the uno-bot service account (ADR-018 — the `GEMINI_SA_*` secret names are that same account, so rotating "the Gemini secrets" rotates every Claude cron too). Never a personal Anthropic seat. Model routed by difficulty per the bot's tier table: sonnet default · opus for reconciliation-grade judgment · haiku candidate for trivia. *(rule added 2026-07-16)*
-
-**Sweep intake transport** (labels, dedupe, caps, injection rule): `scripts/prompts/references/headless-intake.md` — one copy; every adapter points at it.
-
-
-| Automation | Trigger | Skill / method it runs | Agent | Implementation | Runs on · billed to | Owner | Status |
-|---|---|---|---|---|---|---|---|
-| Figma library sync | Worker scheduled runs: poll at end of day, post + track next morning | uno-maintain (intake) | uno-bot | `agents/uno-bot/src/figma-poll.ts` → `src/figma-library/`: one `harness-intake` + one ✅-gated card in `#plus-universal` (details: `docs/connectors/figma.md`). Manual: `GET /debug/figma-poll`. Legacy: `scripts/poll-figma-library.js` | CF Worker · no model call — Figma REST diff → drafted intake → Slack card | Bill | ✅ live (on deploy) |
-| Figma snapshot refresh | each publish (uno-bot `repository_dispatch`, #898) or `workflow_dispatch` | uno-maintain (ds-fix) | Actions executes; a human reviews the PR | `figma-snapshot-refresh.yml` → `npm run snapshot:figma-components`; a change opens a draft PR (close and reopen it to run checks) | GHA · Figma REST, no model call | Bill | built |
-| Figma notifications | each comment on a subscribed team's file, delivered to `POST /figma/events` | — (queues the event; the drift re-check #897, comment decisions #900 read it, in `src/figma-comments/`) | uno-bot | `agents/uno-bot/src/figma-notify/`: passcode check, one job per event on the `figma/events` runner, KV notes as ids and times | CF Worker · no model call | Bill | built (live once subscribed, #895) |
-| Figma notification subscriptions | on demand (`workflow_dispatch` from `main`) | uno-maintain (cross-estate sync) | Actions executes; `create` waits for the `uno-bot-production` reviewer | `figma-subscriptions.yml` → `agents/uno-bot/scripts/figma-subscriptions.mjs`: `list`, `create` (only what is missing; stops at the first failure), `status` (each subscription's newest deliveries). Defaults: FILE_COMMENT and FILE_UPDATE on all six teams, the 12 of #896 | GHA · Figma REST, no model call | Bill | built |
-| Implement component | `repository_dispatch` from uno-bot confirm | uno-prototype (codegen) | uno-bot proposes; Actions executes | `figma-implement.yml` → `scripts/implement-figma-changes.js` + `scripts/prompts/uno-implement` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
-| Implement design | `repository_dispatch` from uno-bot confirm | uno-prototype (design → prototypes scaffold) | uno-bot proposes; Actions executes | `figma-implement-design.yml` + `scripts/prompts/uno-implement-design` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
-| Marketplace add/edit | — | uno-publish (registration) | — | ❌ **not built.** The two stub workflows (`marketplace-add.yml` / `marketplace-edit.yml`) were deleted in #158 — they logged a payload and posted a construction notice, and nothing dispatched them. No Worker tool exists. The open product question — repo data file (`src/pages/PrototypeMarket/prototypes-data.js`) versus the Notion database when they disagree — is tracked in #173 and must be answered before this is built | (planned) | — | planned |
-| Design QA trigger | Roadmap card → `Dev Status: Ready for QA (RTT)` | uno-review (Design QA checklist) | reviewers/design-qa | ❌ not built — no Notion webhook exists, so this becomes a daily status-poll cron on the sweep pattern below; still needs the `Design QA` status column (manual Notion setup) first | (planned) GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | — | planned |
-| Shipped watchdog | weekly cron (Wed 09:00 UTC) | uno-maintain (post-ship reconciliation, method §6) | reviewers/auditor | `shipped-watchdog.yml` → `scripts/prompts/uno-shipped-watchdog/SKILL.md` (intake transport: shared ref above) | GHA cron → claude-vertex (**opus** — judgment-heavy) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16) |
-| Figma tidy-up | weekly, Monday's morning run | hygiene checklist (`docs/connectors/figma.md` § Agent duties) | uno-bot | `agents/uno-bot/src/figma-tidy/`: Review cards in #plus-design, or where `FIGMA_ASK_CHANNEL_ID` names | CF Worker · Figma REST, no model call | Bill | built |
-| Blueprint embeddings refresh | nightly cron (07:00 UTC) | uno-bot (semantic search freshness) | — | `uno-bot-embed-blueprint.yml` | GHA cron → Worker `/debug` route | Bill | ✅ live |
-| Harness gate | **every `pull_request`** + on demand | the deterministic guards, composed | — | `check-harness.yml` → `npm run check:harness` → `scripts/check-harness.mjs` (composition and the reason for each member live there; `--list` prints them). 34–38s, of which the composite is ~14s; one `npm ci` scoped to `agents/uno-bot` (~11s), which the Worker's `typecheck` and `test` rows need. Was ~40s until #587 moved the workerd conformance step out to its own job | GHA · no model call — deterministic scripts only | Bill | ✅ live (#155; the repo's first `pull_request` trigger) |
-| uno-bot Worker checks | **every `pull_request`** + on demand | the Worker's own typecheck, its unit suite and its Durable Object conformance suite | — | `uno-bot-checks.yml` — three jobs, `typecheck`, `tests` and `conformance`, so each failure reads apart in the PR's check list (#580, #587). The first two are also registry rows composed into `check:harness`, which is what keeps the pre-push command whole; `conformance` (`test:workerd`) is an `EXCLUDED` row instead, because it boots workerd and the fast gate is defended by staying seconds long. The deploy chain runs all three, so a direct push to `main` meets them. No secret, so a fork PR runs it | GHA · no model call — `tsc`, `node --test`, vitest on workerd | Bill | ✅ live (#580, #587) |
-| Storybook gate | **every `pull_request`** + on demand | the Storybook browser suite — 383 stories rendered in headless chromium, axe over each | — | `storybook-gate.yml` → `npm run check:storybook` → `scripts/check-storybook.mjs` (why it is a peer workflow of the harness gate rather than a member: `EXCLUDED` there). Play/render failures block; a11y is a **ratchet** against `scripts/baselines/a11y-baseline.json` | GHA · no model call — Playwright + axe | Bill | ✅ live (#169; baseline 146 stories / 15 rules, 2026-08-26) |
-| Conventions integrity sweep | monthly cron (1st, 09:00 UTC) | uno-maintain (integrity checklist: `staleness-sweep.md`) | reviewers/auditor | `harness-integrity-sweep.yml` → `scripts/prompts/uno-integrity-sweep/SKILL.md` (intake transport: shared ref above) | GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16 — filed intakes #71/#72); the pilot for the sweep pattern |
-| Notion comment sweep | each flow run touching a page + monthly | uno-maintain (unresolved threads → incorporate or intake) | writers/notion | ❌ not built — follow the integrity-sweep pattern (Notion via `NOTION_API_KEY`) | (planned) GHA cron → claude-vertex · GCP `hcii-plus` | — | planned |
 
 
 
@@ -1978,6 +2106,56 @@ These exist and a service key reads them. What each is for:
 
 ---
 
+<!-- reference: docs/engineering/operations -->
+
+# Automations Registry
+
+<!-- canonical per ADR-017 (docs/adr/) · disclosed reference: the Worker reads it through read_reference as `docs/engineering/operations`, the IDE opens it on demand · distilled 2026-07-07 from 📓 playbook §6, now superseded · applied by uno-maintain. -->
+
+THE standing-automation registry. An automation absent from the table below is undocumented by definition.
+
+## Rules
+
+- **Every automation that judges names its agent.** One that asks a model to judge with no agent named is unowned by definition. A deterministic automation — scripts, REST, diffs, an embedding call — may read `—` in the Agent column, and its Owner answers for it.
+- **An automation invokes a skill's method; it never embeds its own copy of the logic.** Migrate opportunistically as each is next touched.
+- **Every automation is a loop, and declares its loop mechanics.** Stop condition and issue caps go in its prompt adapter (`scripts/prompts/<name>/SKILL.md`); trigger cadence and the hard turn cap go in its workflow file. The procedure itself stays in the skill's method. Portable by construction: any model can execute the written loop, and harness loop primitives are optional accelerators. Pre-rule adapters (uno-implement, uno-implement-design) migrate as each is next touched. *(rule added 2026-07-16)*
+- **Every automation names where it runs and who pays.** Scheduled sweeps run as GitHub Actions cron → the claude-vertex composite action (`.github/actions/claude-vertex`) → Claude-on-Vertex, billed to the `hcii-plus` GCP project via the uno-bot service account (ADR-018 — the `GEMINI_SA_*` secret names are that same account, so rotating "the Gemini secrets" rotates every Claude cron too). Never a personal Anthropic seat. Model routed by difficulty per the bot's tier table: sonnet default · opus for reconciliation-grade judgment · haiku candidate for trivia. *(rule added 2026-07-16)*
+
+**The Worker's scheduled runs.** Two wrangler crons (`agents/uno-bot/wrangler.toml` `[triggers]`) start two runs each weekday: the **end-of-day run** at 00:00 ET, Tuesday to Saturday, dated to the workday that just ended, and the **morning run** at 09:00 ET, Monday to Friday. The handler only enqueues; the AgentRunner runs one job per alarm. `agents/uno-bot/src/scheduled/runs.ts` plans which job kinds each run holds, and `src/scheduled/jobs.ts` pairs each kind with its body. Every kind but `noop` (which proves the path and is planned in no run) is named in a row below. Rehearse a run with `GET /debug/sweep?dry_run=1`; it writes nothing.
+
+**Sweep intake transport** (labels, dedupe, caps, injection rule): `scripts/prompts/references/headless-intake.md` — one copy; every adapter points at it.
+
+
+| Automation | Trigger | Skill / method it runs | Agent | Implementation | Runs on · billed to | Owner | Status |
+|---|---|---|---|---|---|---|---|
+| Figma library sync | Worker scheduled runs: end of day `figma-library-poll`; morning `figma-library-post`, `figma-library-track`, then `figma-dev-links-pr` | uno-maintain (intake) | uno-bot | `agents/uno-bot/src/figma-poll.ts` → `src/figma-library/`: one `harness-intake` + one ✅-gated card in `#plus-universal` (details: `docs/connectors/figma.md`). Manual: `GET /debug/figma-poll`. Legacy: `scripts/poll-figma-library.js` | CF Worker · no model call — Figma REST diff → drafted intake → Slack card | Bill | ✅ live (on deploy) |
+| Figma snapshot refresh | each publish (the end-of-day `figma-snapshot-refresh` job's `repository_dispatch`, #898) or `workflow_dispatch` | uno-maintain (ds-fix) | Actions executes; a human reviews the PR | `figma-snapshot-refresh.yml` → `npm run snapshot:figma-components`; a change opens a draft PR (close and reopen it to run checks) | GHA · Figma REST, no model call | Bill | built |
+| Figma notifications | each comment on a subscribed team's file, delivered to `POST /figma/events` | — (queues the event; the drift re-check #897, comment decisions #900 read it, in `src/figma-comments/`) | uno-bot | `agents/uno-bot/src/figma-notify/`: passcode check, one job per event on the `figma/events` runner, KV notes as ids and times | CF Worker · no model call | Bill | built (live once subscribed, #895) |
+| Figma notification subscriptions | on demand (`workflow_dispatch` from `main`) | uno-maintain (cross-estate sync) | Actions executes; `create` waits for the `uno-bot-production` reviewer | `figma-subscriptions.yml` → `agents/uno-bot/scripts/figma-subscriptions.mjs`: `list`, `create` (only what is missing; stops at the first failure), `status` (each subscription's newest deliveries). Defaults: FILE_COMMENT and FILE_UPDATE on all six teams, the 12 of #896 | GHA · Figma REST, no model call | Bill | built |
+| Figma backstop | end-of-day run: three `figma-backstop` jobs | — (queues the change a missed notification would have queued) | — | `agents/uno-bot/src/figma-notify/backstop.ts`: lists every team's folders, cursor in KV `figma-notify:backstop` (details: `docs/connectors/figma.md`, the nightly backstop) | CF Worker · Figma REST, no model call | Bill | built |
+| End-of-day sweep | end-of-day run: `sweep-channel` (one per `SWEEP_CHANNELS` entry), `sweep-group-dms`, `sweep-dms`, `sweep-notes`, `sweep-cards`; morning run: `sweep-post` | uno-maintain (cross-estate sync) | uno-bot | `agents/uno-bot/src/sweep/`, `src/dm-sweep/`; instructions: `docs/connectors/slack-sweep.md` | CF Worker · Gemini on Vertex · GCP `hcii-plus` | Bill | ✅ live |
+| Figma comment decisions | end-of-day run: `sweep-figma-comments`; morning run: `sweep-figma-post` | uno-maintain (cross-estate sync) | uno-bot | `agents/uno-bot/src/figma-comments/`; instructions: `docs/connectors/slack-sweep.md` § Figma comment decisions | CF Worker · Figma REST + Gemini on Vertex · GCP `hcii-plus` | Bill | built |
+| Commitment reminders + card follow-ups | end-of-day run: `card-follow-through`; morning run: `commitment-nudge` | uno-maintain (cross-estate sync) | uno-bot | `agents/uno-bot/src/commitments/`, `src/follow-through/`; instructions: `docs/connectors/slack-sweep.md` § Commitment reminders, § Card follow-ups | CF Worker · Gemini on Vertex · GCP `hcii-plus` | Bill | ✅ live |
+| Figma drift asks | morning run: `figma-drift-post`; both runs: `figma-drift-recheck` | uno-maintain (intake) | uno-bot | `agents/uno-bot/src/figma-drift/`; instructions: `docs/connectors/slack-sweep.md` § Drift in a read-only file | CF Worker · Figma REST + Gemini on Vertex · GCP `hcii-plus` | Bill | built |
+| DS precedence check | Friday's end-of-day run: `ds-precedence-check`; morning run: `ds-precedence-post` | uno-maintain (intake) | — | `agents/uno-bot/src/ds-precedence/`; instructions: `docs/connectors/figma.md` (weekly, when nobody published) | CF Worker · Figma REST, no model call | Bill | built |
+| DM watch + DM Capture | per person who switched it on — end-of-day run: `dm-promise-read`, `dm-capture-read`; morning run: `dm-promise-nudge`, `dm-capture-post` | uno-maintain (cross-estate sync) | uno-bot | `agents/uno-bot/src/dm-watch/`, read with the person's own token (ADR-032, which is the instruction until a connector section exists) | CF Worker · Gemini on Vertex · GCP `hcii-plus` | Bill | built |
+| Usage record upkeep | end-of-day run: `usage-classify`, `ask-resolution`, `proposal-expiry`; morning run: `team-roles-sync`; both runs: `usage-text-purge` | — (measurement, ADR-030) | uno-bot (`usage-classify` labels asks; the rest are deterministic) | `agents/uno-bot/src/usage/`; instructions: `agents/uno-bot/README.md` (usage record) | CF Worker · D1 `uno-bot-usage`; one model call per classify batch, Gemini on Vertex · GCP `hcii-plus` | Bill | ✅ live |
+| Implement component | `repository_dispatch` from uno-bot confirm | uno-prototype (codegen) | uno-bot proposes; Actions executes | `figma-implement.yml` → `scripts/implement-figma-changes.js` + `scripts/prompts/uno-implement` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
+| Implement design | `repository_dispatch` from uno-bot confirm | uno-prototype (design → prototypes scaffold) | uno-bot proposes; Actions executes | `figma-implement-design.yml` + `scripts/prompts/uno-implement-design` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
+| Design QA trigger | Roadmap card → `Dev Status: Ready for QA (RTT)` | uno-review (Design QA checklist) | reviewers/design-qa | ❌ not built — no Notion webhook exists, so this becomes a daily status-poll cron on the sweep pattern below; still needs the `Design QA` status column (manual Notion setup) first | (planned) GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | — | planned 2026-07-07, unstarted |
+| Shipped watchdog | weekly cron (Wed 09:00 UTC) | uno-maintain (post-ship reconciliation, method §6) | reviewers/auditor | `shipped-watchdog.yml` → `scripts/prompts/uno-shipped-watchdog/SKILL.md` (intake transport: shared ref above) | GHA cron → claude-vertex (**opus** — judgment-heavy) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16) |
+| Figma tidy-up | Monday's morning run: `figma-tidy-read` jobs, then `figma-tidy-post` | hygiene checklist (`docs/connectors/figma.md` § Agent duties) | uno-bot | `agents/uno-bot/src/figma-tidy/`: Review cards in #plus-design, or where `FIGMA_ASK_CHANNEL_ID` names | CF Worker · Figma REST, no model call | Bill | built |
+| Blueprint embeddings refresh | nightly cron (07:00 UTC) | uno-bot (semantic search freshness) | — | `uno-bot-embed-blueprint.yml` | GHA cron → Worker `/debug` route | Bill | ✅ live |
+| Harness gate | **every `pull_request`** + on demand | the deterministic guards, composed | — | `check-harness.yml` → `npm run check:harness` → `scripts/check-harness.mjs` (composition and the reason for each member live there; `--list` prints them). 34–38s, of which the composite is ~14s; one `npm ci` scoped to `agents/uno-bot` (~11s), which the Worker's `typecheck` and `test` rows need. Was ~40s until #587 moved the workerd conformance step out to its own job | GHA · no model call — deterministic scripts only | Bill | ✅ live (#155; the repo's first `pull_request` trigger) |
+| uno-bot Worker checks | **every `pull_request`** + on demand | the Worker's own typecheck, its unit suite and its Durable Object conformance suite | — | `uno-bot-checks.yml` — three jobs, `typecheck`, `tests` and `conformance`, so each failure reads apart in the PR's check list (#580, #587). The first two are also registry rows composed into `check:harness`, which is what keeps the pre-push command whole; `conformance` (`test:workerd`) is an `EXCLUDED` row instead, because it boots workerd and the fast gate is defended by staying seconds long. The deploy chain runs all three, so a direct push to `main` meets them. No secret, so a fork PR runs it | GHA · no model call — `tsc`, `node --test`, vitest on workerd | Bill | ✅ live (#580, #587) |
+| Storybook gate | **every `pull_request`** + on demand | the Storybook browser suite — 383 stories rendered in headless chromium, axe over each | — | `storybook-gate.yml` → `npm run check:storybook` → `scripts/check-storybook.mjs` (why it is a peer workflow of the harness gate rather than a member: `EXCLUDED` there). Play/render failures block; a11y is a **ratchet** against `scripts/baselines/a11y-baseline.json` | GHA · no model call — Playwright + axe | Bill | ✅ live (#169; baseline 146 stories / 15 rules, 2026-08-26) |
+| Conventions integrity sweep | monthly cron (1st, 09:00 UTC) | uno-maintain (integrity checklist: `staleness-sweep.md`) | reviewers/auditor | `harness-integrity-sweep.yml` → `scripts/prompts/uno-integrity-sweep/SKILL.md` (intake transport: shared ref above) | GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16 — filed intakes #71/#72); the pilot for the sweep pattern |
+| Notion comment sweep | each flow run touching a page + monthly | uno-maintain (unresolved threads → incorporate or intake) | writers/notion | ❌ not built — follow the integrity-sweep pattern (Notion via `NOTION_API_KEY`) | (planned) GHA cron → claude-vertex · GCP `hcii-plus` | — | planned 2026-07-07, unstarted |
+
+
+
+---
+
 <!-- reference: uno-maintain/method -->
 
 <!-- Shared core, loaded by both faces (SKILL.md + bot.md). Runtime-neutral: no IDE tool names, no Slack mechanics; where a role is named (writers/*, auditor) the faces own HOW it's dispatched. -->
@@ -1993,7 +2171,7 @@ Every intake is one of four **trigger types** — improvement (could be better) 
 
 | Estate | Target | Fix action |
 |---|---|---|
-| Codebase | product context / stories | fix `docs/product-and-service/*` + `CONTEXT.md` |
+| Codebase | product context / stories | fix `docs/product-and-service/*` + `GLOSSARY.md` |
 | Codebase | harness doc stale / wrong | fix `docs/product-and-service/*` (non-product) + `docs/conventions/*` — repo-canonical, ADR-017 |
 | Codebase | a skill isn't useful | refine the skill (`skills/*` — both faces if shared) |
 | Codebase | UNO off-role / personality | tune persona / instructions (AGENTS.md, embodiment deltas) |

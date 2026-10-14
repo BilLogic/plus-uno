@@ -24,6 +24,8 @@ import { createD1ProposalEventLog } from "../../src/usage/proposal-events-d1";
 import { createD1AnswerFeedbackLog } from "../../src/usage/feedback-d1";
 import { runAnswerFeedbackConformance } from "../helpers/answer-feedback-conformance";
 import { runProposalEventConformance, stagedRow } from "../helpers/proposal-events-conformance";
+import { createD1AppreciationLog } from "../../src/usage/appreciation-d1";
+import { runAppreciationConformance, thanks } from "../helpers/appreciation-conformance";
 
 const bindings = env as unknown as {
   USAGE_DB: D1Database;
@@ -38,6 +40,7 @@ beforeEach(async () => {
   await bindings.USAGE_DB.prepare("DELETE FROM turns").run();
   await bindings.USAGE_DB.prepare("DELETE FROM proposal_events").run();
   await bindings.USAGE_DB.prepare("DELETE FROM answer_feedback").run();
+  await bindings.USAGE_DB.prepare("DELETE FROM appreciation").run();
 });
 
 runUsageLogConformance("d1", () => createD1UsageLog({ db: bindings.USAGE_DB }), {
@@ -78,6 +81,54 @@ runProposalEventConformance(
 
 runAnswerFeedbackConformance("d1", () => createD1AnswerFeedbackLog({ db: bindings.USAGE_DB }), {
   it: (name, fn) => it(name, fn),
+});
+
+// A message is known to the D1 log through the rows its one statement reads:
+// the answer's feedback naming its turn, and that turn's own row.
+runAppreciationConformance(
+  "d1",
+  () => ({
+    log: createD1AppreciationLog({ db: bindings.USAGE_DB }),
+    async know(channel, itemTs, known) {
+      await createD1AnswerFeedbackLog({ db: bindings.USAGE_DB }).record({
+        channel, answerTs: itemTs, userId: "U0RATER", turnId: known.turnId, rating: "up", reason: null, hasNote: false, at: 1,
+      });
+      await createD1UsageLog({ db: bindings.USAGE_DB }).record(
+        turnRecord({ turnId: known.turnId, conversationType: known.conversationType, proposalId: null }),
+      );
+    },
+  }),
+  { it: (name, fn) => it(name, fn) },
+);
+
+describe("[d1] appreciation", () => {
+  it("a thanks on a card a turn staged in that channel joins the turn, and only in that channel", async () => {
+    await createD1UsageLog({ db: bindings.USAGE_DB }).record(
+      turnRecord({ turnId: "C1:1700000000.000200", proposalId: "1700000000.000300", conversationType: "channel" }),
+    );
+    const log = createD1AppreciationLog({ db: bindings.USAGE_DB });
+    await log.record(thanks({ itemTs: "1700000000.000300" }));
+    await log.record(thanks({ channel: "C10", itemTs: "1700000000.000300" }));
+    expect((await log.get("C1", "1700000000.000300", "U1", "pray"))?.turnId).toBe("C1:1700000000.000200");
+    expect((await log.get("C10", "1700000000.000300", "U1", "pray"))?.turnId).toBeNull();
+  });
+
+  it("a thanks costs one D1 query, whatever it looks up", async () => {
+    const log = createD1AppreciationLog({ db: bindings.USAGE_DB });
+    const spent = await runMetered(async () => {
+      await log.record(thanks());
+      return d1QueriesUsed();
+    });
+    expect(spent).toBe(1);
+  });
+
+  it("turns.thanks and proposal_events.revises_proposal_id are on the schema", async () => {
+    await createD1UsageLog({ db: bindings.USAGE_DB }).record(turnRecord({ thanks: true }));
+    await expect(bindings.USAGE_DB.prepare("UPDATE turns SET thanks = 2").run()).rejects.toThrow(/CHECK/);
+    const events = createD1ProposalEventLog({ db: bindings.USAGE_DB });
+    await events.record(stagedRow({ revisesProposalId: "1700000000.000250" }));
+    expect((await events.eventsOf(stagedRow().proposalId))[0]?.revisesProposalId).toBe("1700000000.000250");
+  });
 });
 
 describe("[d1] answer feedback", () => {
