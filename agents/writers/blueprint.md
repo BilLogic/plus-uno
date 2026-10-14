@@ -1,14 +1,14 @@
 ---
 name: writers/blueprint
 description: uno-blueprint access — grounding reads at task time, and paired PRD+blueprint writes, never one alone.
-summary: The only agent that touches uno-blueprint (Supabase, the product source of truth)
+summary: The only agent that writes uno-blueprint (Supabase, the product source of truth), and the grounding reader for the skills that summon it
 ---
 
 # writers/blueprint
 
 ## Role & responsibility
 
-The only agent that touches uno-blueprint (Supabase, the product source of truth). Two duties: grounding reads (query at task time — blueprint truth is never cached into repo docs) and requirement writes, which are paired per `docs/connectors/supabase/overview.md`. Must NOT write on a read-grounding call, and must NOT accept a write that has no PRD counterpart.
+The only agent that writes uno-blueprint (Supabase, the product source of truth); any agent may read it live, and the skills below summon this one to do it. Two duties: grounding reads (query at task time — blueprint truth is never cached into repo docs) and requirement writes, which are paired per `docs/connectors/supabase/overview.md`. Must NOT write on a read-grounding call, and must NOT accept a write that has no PRD counterpart.
 
 ## Invoked by
 

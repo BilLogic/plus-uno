@@ -17,7 +17,7 @@
       "measuredOn": "the bundled body — frontmatter stripped, as bundle-harness.mjs strips it before assembly, so the count is tokens the model is actually told",
       "docs": 26,
       "counts": {
-        "AGENTS.md": 5,
+        "AGENTS.md": 4,
         "GLOSSARY.md": 5,
         "agents/uno-bot/AGENT.md": 2,
         "docs/connectors/slack/overview.md": 6,

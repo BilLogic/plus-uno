@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **95,920 chars from 9 files**, against an assembled budget of 175,500 (79,580 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 75,536 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **95,899 chars from 9 files**, against an assembled budget of 175,500 (79,601 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 75,515 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,166 (−7,897 ide-only) | 10,166 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 14,498 | 24,693 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,066 | 45,800 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,552 | 47,405 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,216 | 48,681 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 6,229 (−1,192 ide-only) | 54,961 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,748 (−369 ide-only) | 66,761 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 13,910 (−6,223 ide-only) | 80,722 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 84,190 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 90,706 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 95,339 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 528 | 95,920 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,145 (−7,897 ide-only) | 10,145 | 20,000 (constitution) |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 14,498 | 24,672 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,066 | 45,779 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,552 | 47,384 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,216 | 48,660 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 6,229 (−1,192 ide-only) | 54,940 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,748 (−369 ide-only) | 66,740 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 13,910 (−6,223 ide-only) | 80,701 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 84,169 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 90,685 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 95,318 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 528 | 95,899 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -80,8 +80,8 @@ everything the bot can be told.
 
 The one identity, roster, and routing document for every agent working in this repo — the in-IDE agent, the uno-bot Slack Worker (which bakes this file into its bundle at build time), and headless GitHub Actions runs.
 
-**The interaction contract: humans speak in skills · skills summon agents · agents obey conventions.**
-Users remember six skills (or describe intent and get routed). Skills invoke agents; users never do. Agents point at the conventions they enforce and never restate them.
+**The interaction contract (IDE): humans speak in skills · skills summon agents · agents obey conventions.**
+Users remember six skills; agents point at the conventions they enforce and never restate them. In Slack, bot skills call the Worker's tools instead.
 
 ## Identity
 
@@ -119,7 +119,7 @@ Routing: match intent to the Use-when column; if ambiguous, ask which capability
 
 ## Agents — what skills summon
 
-`agents/` holds three plain kinds plus the embodiment: **researchers/** (gather), **reviewers/** (judge), **writers/** (notion · figma · blueprint — the *only* agents that write to external estates, save the Worker's labelled reply to an @uno Figma comment: `docs/connectors/figma/overview.md`). Roster, anatomy, and the creation rule: `agents/README.md`.
+`agents/` holds three plain kinds plus the embodiment: **researchers/** (gather), **reviewers/** (judge), **writers/** (notion · figma · blueprint — the IDE's only estate writers; uno-bot writes through ✅-gated tools and one ungated @uno Figma reply: `docs/connectors/figma/overview.md`). Roster, anatomy, and the creation rule: `agents/README.md`.
 
 ## Conventions — what agents obey
 
