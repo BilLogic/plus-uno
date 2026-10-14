@@ -39,6 +39,7 @@ import {
   type SectionDeps,
 } from "../src/ds-precedence/jobs";
 import { runSweepJob } from "../src/sweep/index";
+import { isSubrequestBudgetError, SubrequestBudgetError } from "../src/net";
 import { sectionHandOffIn } from "../src/sweep/sections";
 import { sweepHarness } from "./helpers/sweep-harness";
 import { isWeeklyPrecedenceThread } from "../src/ds-precedence/env";
@@ -679,6 +680,14 @@ describe("the morning post", () => {
       ["Component11", "Component12"],
       "the two that did not show wait for the next morning",
     );
+  });
+
+  it("a budget stop while a card stages is thrown, not taken for a card that failed, and the report stays", async () => {
+    const { morning, deps, edits, reportBox } = postDeps(await weekReport());
+    deps.stage = async () => Promise.reject(new SubrequestBudgetError(48));
+    await assert.rejects(morning(), isSubrequestBudgetError);
+    assert.deepEqual(edits, [], "no card marked as failed");
+    assert.notEqual(reportBox.box.value, null);
   });
 
   it("a card that does not stage says so with nothing to review", async () => {

@@ -4,9 +4,10 @@
 // THE SOURCE is the one the old morning job read: a library PR that
 // `figma-implement.yml` opened ("feat: Figma DS update — <components>") and
 // that has since merged. Its components may need their Code and Storybook
-// links in Dev Mode. One read of the repo's recently closed pulls a morning
-// finds those merged since the last one carded (`MERGED_THROUGH_KV_KEY`); the
-// first morning only sets that mark, so nothing from before it is offered.
+// links in Dev Mode. A read of the repo's recently closed pulls a morning
+// (paged until it reaches back past the mark) finds those merged since the
+// last one carded (`MERGED_THROUGH_KV_KEY`); the first morning only sets that
+// mark, so nothing from before it is offered.
 //
 // THE HAND-OVER, before the sweep's post, while `FIGMA_DEV_LINKS` is on: the
 // components those PRs named, planned as one card (`planDevLinksCard` — a
@@ -61,8 +62,8 @@ export interface DevLinksHanded extends PlannedDevLinks {
 export interface DevLinksMorningDeps {
   /** Whether `FIGMA_DEV_LINKS` is on: until it is, the PRs wait. */
   on: boolean;
-  /** The repo's recently closed pulls, newest first. */
-  closedPulls(): Promise<ClosedPull[]>;
+  /** The repo's pulls closed and updated since an ISO time, newest first. */
+  closedPulls(since: string): Promise<ClosedPull[]>;
   mergedThrough: Store<string | null>;
   plan(request: DevLinksRequest): Promise<DevLinksPlan>;
   /** #plus-design's member ids, or null when Slack would not say. */
@@ -96,7 +97,7 @@ export async function handOverDevLinks(deps: DevLinksMorningDeps, opts: { dryRun
     if (!opts.dryRun) await deps.mergedThrough.write(new Date(deps.now()).toISOString());
     return { summary: "started watching merged library PRs" };
   }
-  const merged = (await deps.closedPulls()).filter((p) => p.mergedAt && p.mergedAt > through && implementComponents(p.title).length);
+  const merged = (await deps.closedPulls(through)).filter((p) => p.mergedAt && p.mergedAt > through && implementComponents(p.title).length);
   if (!merged.length) return { summary: "no library PR merged since the last card" };
   const latest = merged.map((p) => p.mergedAt!).sort().at(-1)!;
   const components = [...new Set(merged.flatMap((p) => implementComponents(p.title)))];

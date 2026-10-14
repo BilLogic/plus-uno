@@ -277,7 +277,11 @@ async function drainScheduledJob(storage: RunnerStorage, deps: RunnerDeps): Prom
   }
   const [key, queued] = entries[index]!;
   const label = `${queued.run} ${queued.date} ${queued.job.key}`;
-  const spawn = (jobs: readonly ScheduledJob[]) => spawnJobs(storage, key, queued, jobs);
+  let spawned = false;
+  const spawn = (jobs: readonly ScheduledJob[]) => {
+    spawned = true;
+    return spawnJobs(storage, key, queued, jobs);
+  };
   const outcome = await runWithinCeiling(() => deps.runScheduledJob(queued.job, queued.date, spawn));
 
   if (outcome === "deferred" && queued.deferrals + 1 < MAX_JOB_DEFERRALS) {
@@ -290,7 +294,10 @@ async function drainScheduledJob(storage: RunnerStorage, deps: RunnerDeps): Prom
   }
   if (outcome === "deferred") {
     console.error(`[runner] ${label} given up after ${MAX_JOB_DEFERRALS} budget stops`);
-  } else if (outcome === "handled") {
+  } else if (outcome === "handled" && !spawned) {
+    // A job that spread its work keeps no done marker: queuing its run again
+    // runs it again, and it spawns again each child not done — one that
+    // failed among them — and skips the rest.
     await storage.put(doneKey(queued.date, queued.job.key), true);
   }
   // A failed job is dropped without a done marker: re-enqueuing its run is how
@@ -303,11 +310,12 @@ async function drainScheduledJob(storage: RunnerStorage, deps: RunnerDeps): Prom
 
 /**
  * Queue jobs a running job spreads its work over, in its run, right behind it:
- * under its own storage key, so they sort after it and before every later job
- * of the run, in the order given. Each is a job like any other — its own
- * alarm, its own budget, its own three tries — so one that is given up loses
- * only its own share. A job already pending or done today is not queued
- * again, so a retried job spawns nothing twice.
+ * each under its parent's storage key and its own job key, so they sort after
+ * the parent and before every later job of the run, and a retried parent
+ * whose list has shifted never writes one child over another. Each is a job
+ * like any other — its own alarm, its own budget, its own three tries — so
+ * one that is given up loses only its own share. A job already pending or
+ * done today is not queued again, so a retried job spawns nothing twice.
  *
  * @param storage - The run's runner's storage
  * @param parentKey - The spawning job's storage key
@@ -318,10 +326,10 @@ async function spawnJobs(storage: RunnerStorage, parentKey: string, parent: Queu
   const pending = new Set(
     [...(await storage.list<QueuedRunJob>({ prefix: `${RUN_PREFIX}${parent.date}:` })).values()].map((q) => q.job.key),
   );
-  for (const [i, job] of jobs.entries()) {
+  for (const job of jobs) {
     if (pending.has(job.key) || (await storage.get(doneKey(parent.date, job.key))) !== undefined) continue;
     const entry: QueuedRunJob = { run: parent.run, date: parent.date, job, deferrals: 0 };
-    await storage.put(`${parentKey}/${String(i).padStart(4, "0")}`, entry);
+    await storage.put(`${parentKey}/${job.key}`, entry);
     pending.add(job.key);
   }
 }

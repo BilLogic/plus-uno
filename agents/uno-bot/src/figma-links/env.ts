@@ -139,7 +139,7 @@ export async function runDevLinksMorningOnEnv(env: Env, ctx: JobContext): Promis
   return handOverDevLinks(
     {
       on: devLinksOn(env.FIGMA_DEV_LINKS),
-      closedPulls: () => githubLibraryReads(env, target.entry).closedPulls(),
+      closedPulls: (since) => githubLibraryReads(env, target.entry).closedPulls(since),
       mergedThrough: kvJson<string | null>(env, MERGED_THROUGH_KV_KEY, null),
       plan: (request) => planDevLinksCard(deps, request),
       members: deps.members,
