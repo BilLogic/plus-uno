@@ -8,8 +8,8 @@
 //   • The marks: HARNESS_KV under `figma-ask:<comment id>`, with an expiry. A
 //     drafted mark holds the reply's words until it is posted, so never D1
 //     (ADR-030).
-//   • The turn: `runTurn` on the shared dependency builder, as Slack's and the
-//     eval's turns are, with the ThreadState Durable Object and a verdict that
+//   • The turn: `runTurn` on the shared dependency builder, as Slack's turns
+//     are, with the ThreadState Durable Object and a verdict that
 //     executes. It runs in #plus-design with the `figma` origin, so every
 //     tool reads at public scope, and an unmapped asker's at public facts
 //     alone (`agent/public-scope.ts`).

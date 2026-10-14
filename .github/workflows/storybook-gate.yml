@@ -85,7 +85,7 @@ jobs:
       # >>> GENERATED (storybook-checks) by scripts/generate-check-scripts.mjs from scripts/checks.registry.mjs — do not edit between the markers; run `npm run generate:check-registry`.
       # One command, one exit code. A `play` failure or a render error fails the
       # job outright; an accessibility violation fails it only if the story did
-      # not already carry that rule in `docs/evals/a11y-baseline.json`.
+      # not already carry that rule in `scripts/baselines/a11y-baseline.json`.
       - name: npm run check:storybook
         run: npm run check:storybook
 

@@ -228,6 +228,21 @@ test('a recorded pair absorbs what it recorded, refuses a rise, and fails when i
   }
 });
 
+test('the recorded glossary pair holds under either name, so a sibling\'s rename is not a finding', () => {
+  const rec = RECORDED.find((r) => r.a === 'blueprint:CONTEXT.md' && r.b === 'sb:CONTEXT.md');
+  const under = passage('the writing vocabulary');
+  assert.ok(wordsOf(under).length <= rec.words);
+  const renamed = estate({ 'blueprint:GLOSSARY.md': under, 'sb:CONTEXT.md': under });
+  try {
+    const r = sweep(renamed.roots);
+    assert.deepEqual(r.findings, [], 'GLOSSARY.md is read and matched to the recorded pair');
+    assert.deepEqual(r.rises, []);
+    assert.deepEqual(r.stale.filter((s) => s.includes('CONTEXT.md')), [], 'and the pair is not reported as gone');
+  } finally {
+    renamed.done();
+  }
+});
+
 test('THE TWO RENAME MAPS WOULD HAVE FAILED IT: the ceiling sits where they crossed', () => {
   // The glossaries as they stood before plus-uno-blueprint#365 and
   // agentic-service-blueprinting#137 shared 771 words. Rebuilt here at scale

@@ -4,7 +4,7 @@ summary: uno-publish — eval scenarios
 
 # uno-publish — eval scenarios
 
-<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/evals/runs/. Rubric: docs/evals/rubrics/uno-publish.md · Decisions DB scenario added 2026-07-13 -->
+<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/knowledge/archive/eval-runs/. Rubric: docs/evals/rubrics/uno-publish.md · Decisions DB scenario added 2026-07-13 -->
 
 ## S1 — feedback rail: the complete bundle
 - **Trigger:** "share the coach-dashboard prototype for feedback"
@@ -18,7 +18,7 @@ summary: uno-publish — eval scenarios
 - **Trigger:** "this one's approved — hand it off to dev"
 - **Expected:**
   - Componentization → Handoff Spec via writers/notion (template-instantiated)
-  - Rails propagation inside the designer-confirmed handoff, logged: storybook direct in-repo; blueprint half via uno-maintain's handoff-pre-authorized path (§6 Q9)
+  - Rails propagation inside the designer-confirmed handoff: storybook direct in-repo; blueprint half via uno-maintain's handoff-pre-authorized path (§6 Q9)
   - DS/UNO/a11y review gate, then the human gate: dev + PM + stakeholder ✅ sign-offs — no sign-off, no publish
   - Marketplace entry validates against the marketplace schema (validate against the live Notion Prototype Marketplace DB schema — references/notion-marketplace-db.md)
 - **Fails if:** anything publishes without all three sign-offs · rails skipped or not verified landed before marketplace publish · schema-invalid entry lands

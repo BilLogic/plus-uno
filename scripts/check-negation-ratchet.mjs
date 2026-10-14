@@ -219,7 +219,7 @@ import { openRatchet } from './lib/ratchet.mjs';
  * and the path `scripts/checks.registry.mjs` declares for this row. One
  * spelling, three readers.
  */
-export const BASELINE = 'docs/evals/negation-baseline.json';
+export const BASELINE = 'scripts/baselines/negation-baseline.json';
 
 /**
  * The five tokens, in one place, so the regex and the label the report prints

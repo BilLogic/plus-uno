@@ -424,8 +424,8 @@ export interface TurnJudgement {
  */
 export interface TurnUsage {
   log: UsageLog;
-  /** `debug` for anything reached through a debug or health route — the eval
-   *  transport among them — which is test traffic by definition. */
+  /** `debug` for anything reached through a debug or health route, which is
+   *  test traffic by definition. */
   origin: TurnOrigin;
   /** `TEST_CHANNEL_IDS`, parsed: #uno-bot-sandbox. */
   testChannelIds: readonly string[];
@@ -2423,7 +2423,7 @@ async function buildCard(
   fromDm: boolean,
 ): Promise<ProposalCard> {
   const card = await cardOf(result, deps, implementPrdUrl, fromDm);
-  // Who wrote the opening line, for the eval envelope: the model when its own
+  // Who wrote the opening line (no reader since the eval envelope went): the model when its own
   // reply leads, the Worker for everything else — its ask, its PRD line, or a
   // lead that is only its "I could not stage …" note.
   const modelLed = !card.ask && !!result.replyText && card.lead === result.previewText;

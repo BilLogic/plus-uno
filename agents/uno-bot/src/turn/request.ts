@@ -12,7 +12,7 @@
 // string, an empty array and an absent field all mean the same thing to the
 // turn — but they are three different objects to a test comparing two requests.
 // Normalising here is what lets the parity test compare the Slack builder's
-// request to the eval builder's field for field and mean it.
+// request to another builder's field for field and mean it.
 //
 // PURE, like the rest of the module: no `Env`, no fetch, no Slack client.
 

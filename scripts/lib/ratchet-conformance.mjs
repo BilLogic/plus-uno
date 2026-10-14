@@ -11,7 +11,7 @@
  * for the Durable Object only because one suite runs against both.
  *
  * IT RUNS AGAINST THE LIVE RECORDS, NOT A SYNTHETIC ONE. Every case copies the
- * real `docs/evals/*.json` into a scratch tree and drives the ratchet over it,
+ * real `scripts/baselines/*.json` into a scratch tree and drives the ratchet over it,
  * once per declared set of all twelve. A synthetic fixture would have passed the
  * first attempt at #599, which mis-read six of the twelve shapes and deleted the
  * reasons block of three: the record on disk is the specification, and a suite

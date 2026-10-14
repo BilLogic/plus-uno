@@ -11,7 +11,7 @@ Agents are roles skills summon — **never taught to users, never invoked direct
 | Kind | Does | Roster (defined 2026-07-07, at their first invocation sites — the Phase-1 skill bodies) |
 |---|---|---|
 | `researchers/` | gather — isolated heavy reads, return findings not file dumps | `explorer` (codebase) · `source-miner` (Slack/analytics/research-DB) · `people-scout` (SME + participant sourcing) |
-| `reviewers/` | judge — parallel lenses, checklists, rubrics | `ds-lens` · `uno-lens` · `a11y-lens` · `design-qa` (Figma spec vs QA site) · `rubric-applier` (any rubric → scored verdict → eval run) · `auditor` (registry checklists → intakes) |
+| `reviewers/` | judge — parallel lenses, checklists, rubrics | `ds-lens` · `uno-lens` · `a11y-lens` · `design-qa` (Figma spec vs QA site) · `rubric-applier` (any rubric → scored verdict) · `auditor` (registry checklists → intakes) |
 | `writers/` | write to external estates — **the only agents allowed to** | `notion` · `figma` · `blueprint` (paired PRD+blueprint writes, never one alone; also the single access point for blueprint *reads*) |
 | `uno-bot/` | the Slack embodiment — definition (AGENT.md) + body (Worker code) in one folder | active |
 
@@ -30,9 +30,9 @@ agents/<kind>/<name>.md         (a folder when the agent has an executable body 
 
 ## Rules
 
-1. **Creation rule:** a new agent needs ≥2 invocation sites or a demonstrated isolated-context benefit (heavy reads, parallel lenses, headless execution). Never speculative — every file in this folder names its invocation sites; a role that loses all of them gets archived.
+1. **Creation rule:** a new agent needs ≥2 invocation sites or a demonstrated isolated-context benefit (heavy reads, parallel lenses — which is what carries the one-site `reviewers/a11y-lens` and `reviewers/uno-lens` — headless execution). Never speculative — every file in this folder names its invocation sites; a role that loses all of them gets archived.
 2. **Voice is the model's default, not a role:** no agent loads a voice doc. uno-bot's deliberate persona is `agents/uno-bot/AGENT.md` § Identity & voice; long-form craft is `docs/conventions/writing.md`. There is no copywriter agent.
 3. **The auditor inspects and files; writers fix.**
 4. **Agents ↔ docs, no duplication:** agents point to the docs they enforce; docs may carry a one-line "applied by `agents/<kind>/<name>`" pointer back. A rule lives exactly once. The uno-maintain staleness sweep checks these cross-references both ways.
-5. Every row in `docs/engineering/operations.md` names its agent — an automation without one is unowned by definition.
+5. Which automations must name an agent, and what a deterministic one writes instead: `docs/engineering/operations.md` § Rules.
 6. **Frontmatter `tools`/`model` are optional** — declare `tools` when a role is read-only (makes the Must-NOT mechanical if the roster is ever registered as real subagents) and `model` when a sweep is cheap enough for a smaller tier. The uno-bot embodiment (AGENT.md + Worker code) is exempt from the file anatomy above — it is a concatenated persona delta, not a Task-dispatched role.

@@ -43,9 +43,9 @@ test('the table holds a row for every baseline the registry declares', async () 
 });
 
 test('a record with no row is refused rather than read on a guessed shape', () => {
-  assert.throws(() => shapeOf('docs/evals/invented.json'), /has no row in scripts\/lib\/ratchet-shapes.mjs/);
+  assert.throws(() => shapeOf('scripts/baselines/invented.json'), /has no row in scripts\/lib\/ratchet-shapes.mjs/);
   assert.throws(
-    () => openRatchet({ file: 'docs/evals/invented.json' }),
+    () => openRatchet({ file: 'scripts/baselines/invented.json' }),
     /has no row in scripts\/lib\/ratchet-shapes.mjs/,
   );
 });
@@ -61,7 +61,7 @@ test('a record with two sets has to be asked for one by name', () => {
 test('an absent record stops being absent once it is written', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ratchet-write-'));
   try {
-    const file = 'docs/evals/text-contrast-baseline.json';
+    const file = 'scripts/baselines/text-contrast-baseline.json';
     const opened = openRatchet({ file, repoRoot: root });
     assert.equal(opened.absent, true);
     const written = opened.update(
@@ -102,7 +102,7 @@ test('the envelope is read through the module, at any depth, and is a clone', ()
   // reading, glossary on the date, the benchmark on Atlassian's own surface —
   // and without a read for it each would open the file a second time, which is
   // the defect the module exists to end.
-  const opened = openRatchet({ file: 'docs/evals/negation-baseline.json', set: 'bundled' });
+  const opened = openRatchet({ file: 'scripts/baselines/negation-baseline.json', set: 'bundled' });
   assert.equal(
     opened.envelope('scopes.bundled.measuredOn'),
     opened.envelope().scopes.bundled.measuredOn,
@@ -113,19 +113,19 @@ test('the envelope is read through the module, at any depth, and is a clone', ()
   const record = opened.envelope();
   record.scopes.bundled.measuredOn = 'edited';
   assert.notEqual(
-    openRatchet({ file: 'docs/evals/negation-baseline.json', set: 'bundled' }).envelope('scopes.bundled.measuredOn'),
+    openRatchet({ file: 'scripts/baselines/negation-baseline.json', set: 'bundled' }).envelope('scopes.bundled.measuredOn'),
     'edited',
     'the envelope is a clone: a reader of it cannot edit the module\u2019s reading',
   );
 
-  const absent = openRatchet({ file: 'docs/evals/glossary-baseline.json', repoRoot: os.tmpdir() });
+  const absent = openRatchet({ file: 'scripts/baselines/glossary-baseline.json', repoRoot: os.tmpdir() });
   assert.equal(absent.envelope(), undefined, 'and there is nothing to read where there is no record');
 });
 
 test('a seed is a dotted path, and still never restates what the record holds', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ratchet-seed-'));
   try {
-    const file = 'docs/evals/negation-baseline.json';
+    const file = 'scripts/baselines/negation-baseline.json';
     // The envelope this record wants is three levels in — one corpus sentence
     // and one reading per SCOPE — so a seed that could only reach the top level
     // would leave a record written from nothing failing its own reading
@@ -154,7 +154,7 @@ test('a seed is a dotted path, and still never restates what the record holds', 
 test('a seeded key inside an ignored slot survives the container write', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ratchet-ignored-'));
   try {
-    const file = 'docs/evals/atlassian-benchmark.json';
+    const file = 'scripts/baselines/atlassian-benchmark.json';
     // `ours` keeps `note` and `recordedAt` in among its four numbers, declared
     // IGNORED. On a brand-new record they arrive by seed, and a container write
     // that read the ignored keys off the record rather than off the merge target
