@@ -58,7 +58,7 @@ import type { SweepSource } from "../sweep/finding";
 import type { SweepRunOutcome } from "../sweep/store";
 import { contributorsOf, MAX_FAILED_NIGHTS, readMeter, recordRun, type SweepDeps, type SweepJobReport } from "../sweep/run";
 import { candidateThreads, readComments, type CommentThread, type ReadWindow } from "./threads";
-import { roleOf, type TeamRoles } from "../usage/roles";
+import { designerAmong, type TeamRoles } from "../usage/roles";
 import { DECISION_SECTIONS, pageOf, pagesOf, type FilePage, type NodePlace } from "./sections";
 import { cardNumbersOf } from "./title";
 import { isDecisionField, type ShownCard, type ShownThread } from "./detector";
@@ -438,10 +438,6 @@ async function designOwnerOf(fc: SweepFigmaComments, contributors: readonly stri
   return designerAmong(contributors, await fc.roles());
 }
 
-/** The first of a card's Contributors, as Slack ids, the roles name a designer. */
-export function designerAmong(contributors: readonly string[], roles: TeamRoles): string | null {
-  return contributors.find((id) => roleOf(id, roles) === "design") ?? null;
-}
 
 /** What finding a file's design owner reads, outside the night's read. */
 export interface DesignOwnerReads {

@@ -62,6 +62,11 @@ export function notionPersonOfSlack(slackUserId: string | null | undefined, peop
 }
 
 /** A person's role, or null when they are not on the map. */
+/** The first of a card's Contributors, as Slack ids, the roles name a designer. */
+export function designerAmong(contributors: readonly string[], roles: TeamRoles): string | null {
+  return contributors.find((id) => roleOf(id, roles) === "design") ?? null;
+}
+
 export function roleOf(userId: string | null | undefined, roles: TeamRoles = {}): TeamRole | null {
   return entryOf(userId, roles);
 }

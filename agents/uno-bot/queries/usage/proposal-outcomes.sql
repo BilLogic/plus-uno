@@ -7,14 +7,21 @@
 --   - card: a card staged for a ✅ (proposal_events). A card replaced by
 --     another is counted once, as the card that replaced it: a re-stage after
 --     a cut-off is the same card, and so is a revision. The outcome is the
---     last card's. approved = ✅ on a card that revised nothing; approved
---     with edits = ✅ on a card whose staged row names the card it revised
---     (revises_proposal_id, which a re-staged revision keeps); rejected = ⛔;
---     expired = aged out; still live = none of these yet. A write refused
---     after its ✅ is still approved: gated-writes.sql counts refusals.
+--     last card's. approved with edits = ✅ on a card whose staged row names
+--     the card it revised (revises_proposal_id, which a re-staged revision
+--     keeps: Needs changes), or whose confirmed row says the Review pop-up's
+--     Edit fields changed the batch (confirmed_edited = 1, migration 0014);
+--     approved = any other ✅; rejected = ⛔; expired = aged out; still live
+--     = none of these yet. A write refused after its ✅ is still approved:
+--     gated-writes.sql counts refusals. A card confirmed before 0014 was
+--     deployed has confirmed_edited null and counts as approved: a pop-up
+--     edit made before that deploy cannot be split out, so a window that
+--     spans it undercounts approved with edits.
 --   - upkeep_fix: one fix on an end-of-day card (sweep_items) that was carded
 --     (posted_at set). approved = confirmed; rejected = dropped; refused =
---     refused_stale, refused_unwritable or failed (approved, not written);
+--     refused_stale, refused_unwritable or failed (approved, not written; or
+--     its report refused by a channel uno-bot is not in, posted_at then the
+--     time it was tried);
 --     expired = still proposed 72 h after it was posted; still live =
 --     proposed and younger than that. A fix dropped by "drop N" is rejected,
 --     so with edits is null.
@@ -51,9 +58,11 @@ WITH
   now_ms(ms) AS (SELECT CAST(strftime('%s', 'now') AS INTEGER) * 1000),
   -- The last card of each chain: staged, and never replaced.
   cards AS (
-    SELECT s.proposal_id, s.revises_proposal_id,
+    SELECT s.proposal_id,
       (SELECT GROUP_CONCAT(o.event) FROM proposal_events o
-        WHERE o.proposal_id = s.proposal_id AND o.event IN ('confirmed', 'cancelled', 'expired')) AS outcome
+        WHERE o.proposal_id = s.proposal_id AND o.event IN ('confirmed', 'cancelled', 'expired')) AS outcome,
+      s.revises_proposal_id IS NOT NULL OR EXISTS (SELECT 1 FROM proposal_events c
+        WHERE c.proposal_id = s.proposal_id AND c.event = 'confirmed' AND c.confirmed_edited = 1) AS with_edits
     FROM proposal_events s, win
     WHERE s.event = 'staged'
       AND s.test_traffic = 0
@@ -78,8 +87,8 @@ WITH
   )
 SELECT
   'card'                                                                  AS kind,
-  COALESCE(SUM(outcome = 'confirmed' AND revises_proposal_id IS NULL), 0)     AS approved,
-  COALESCE(SUM(outcome = 'confirmed' AND revises_proposal_id IS NOT NULL), 0) AS approved_with_edits,
+  COALESCE(SUM(outcome = 'confirmed' AND NOT with_edits), 0)            AS approved,
+  COALESCE(SUM(outcome = 'confirmed' AND with_edits), 0)                AS approved_with_edits,
   COALESCE(SUM(outcome = 'cancelled'), 0)                                 AS rejected,
   NULL                                                                    AS refused,
   COALESCE(SUM(outcome = 'expired'), 0)                                   AS expired,

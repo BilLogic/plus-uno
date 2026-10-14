@@ -86,7 +86,7 @@ import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render
 import { refusedForBlocks } from "../slack/delivery";
 import { parseSlackCanvasId } from "../slack/canvas-reference";
 import { threadStateFor } from "../thread-state/production";
-import { notionPeopleFor, proposalEventLogFor } from "../usage/production";
+import { notionPeopleFor, proposalEventLogFor, teamRolesFor } from "../usage/production";
 import { executeReadSource } from "../tools/read-source";
 import { figmaCommentsFor } from "../figma-comments/env";
 import { findSlackUsers, slackDirectoryFor } from "../tools/slack-people";
@@ -275,7 +275,7 @@ async function sweepDepsFor(
           });
         const res = await send(message.blocks);
         if (res.ok && res.ts) return { ok: true, ts: res.ts };
-        return { ok: false, ...(refusedForBlocks(res) ? { refusedBlocks: true } : {}) };
+        return { ok: false, ...(refusedForBlocks(res) ? { refusedBlocks: true } : {}), ...(typeof res.error === "string" ? { error: res.error } : {}) };
       },
       async edit(channel, ts, message) {
         // Its tag rides every edit, so a later search by its key still finds it.
@@ -390,6 +390,7 @@ function sweepNotionFor(env: Env): SweepNotion {
     edited: (databaseId, since, after) =>
       measured(() => queryEditedSince(env, databaseId, since, RECORDS_PER_JOB, after)),
     comments: (pageId) => measured(() => listPageComments(env, pageId)),
+    roles: () => teamRolesFor(env),
   };
 }
 

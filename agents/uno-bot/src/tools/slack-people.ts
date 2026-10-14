@@ -182,7 +182,8 @@ function fold(text: string): string {
   return text.normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase();
 }
 
-function escapeRegExp(text: string): string {
+/** A string as a RegExp source that matches it literally. */
+export function escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 

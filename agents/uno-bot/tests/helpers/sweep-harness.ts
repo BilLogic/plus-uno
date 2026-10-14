@@ -22,7 +22,7 @@ import { createInMemoryThreadState, type PendingProposal, type ThreadState } fro
 import { modelCaptureDetector } from "../../src/sweep/capture-detector";
 import type { EditedRecordRow, RecordComment } from "../../src/sweep/records";
 import type { SearchHit } from "../../src/sweep/search";
-import { createInMemoryProposalEventLog, type InMemoryProposalEventLog } from "../../src/usage/index";
+import { createInMemoryProposalEventLog, type InMemoryProposalEventLog, type ProposalEvent } from "../../src/usage/index";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../../src/usage/index";
 import type { InMemoryFigma } from "../../src/figma/in-memory";
 import type { DecisionRow } from "../../src/integrations/notion";
@@ -141,6 +141,8 @@ export interface SweepHarness {
   staged: PendingProposal[];
   /** Set on, Slack refuses a post holding `card` blocks. */
   cardsRefused: { on: boolean };
+  /** Channels uno-bot is not in: a post there answers `not_in_channel`. */
+  notInChannel: Set<string>;
   /** Every Slack read, as `method channel [ts]`. */
   reads: string[];
   clock: { now: number };
@@ -184,6 +186,8 @@ export interface FigmaRecords {
     raised: Set<string>;
     posts: Array<{ channel: string; text: string }>;
     dms: Array<{ to: string; text: string }>;
+    /** The usage record's rows for each channel card, as the Worker stages them. */
+    events: ProposalEvent[];
   };
 }
 
@@ -192,6 +196,8 @@ export interface FigmaRecords {
  *  and `C0TOOLKIT` unless set). */
 export interface TriageOptions {
   handles?: string;
+  /** Channels uno-bot is not in: a post there answers `not_in_channel`. */
+  notIn?: string[];
   fileTeams?: Record<string, string>;
   channels?: ChannelIds;
 }
@@ -230,6 +236,8 @@ export function sweepHarness(opts: {
     comments?: Record<string, RecordComment[]>;
     /** Rows per query page; 25 unless set. */
     pageSize?: number;
+    /** The team's roles by Slack id; none unless set. */
+    roles?: TeamRoles;
   };
   /** Each Roadmap card's Decisions DB rows by card URL, and the Notion people
    *  map. Unset, no fix carries a row. */
@@ -276,6 +284,7 @@ export function sweepHarness(opts: {
   const reads: string[] = [];
   const budget = { replies: Infinity };
   const cardsRefused = { on: false };
+  const notInChannel = new Set<string>();
   const headroom = { subrequests: Infinity, d1Queries: Infinity };
   const broken = new Set<string>();
   const rateLimited = new Set<string>();
@@ -318,7 +327,7 @@ export function sweepHarness(opts: {
     threads: new Map(),
     messages: [],
     listed: [],
-    triage: { watch: new Map(), raised: new Set(), posts: [], dms: [] },
+    triage: { watch: new Map(), raised: new Set(), posts: [], dms: [], events: [] },
   };
   const triageOpts = opts.figma?.triage;
   const triage: TriagePorts | undefined = triageOpts
@@ -337,13 +346,15 @@ export function sweepHarness(opts: {
         handles: figmaHandlesFrom(triageOpts.handles),
         channels: triageOpts.channels ?? { plusDesign: DESIGN, plusUniversal: UNIVERSAL, plusToolkit: "C0TOOLKIT" },
         post: async (channel, text) => {
+          if (triageOpts.notIn?.includes(channel)) return { ok: false, error: "not_in_channel" };
           figmaRecords.triage.posts.push({ channel, text });
-          return true;
+          return { ok: true, ts: `${Math.floor(clock.now / 1000)}.${String(800000 + figmaRecords.triage.posts.length)}` };
         },
         dm: async (to, text) => {
           figmaRecords.triage.dms.push({ to, text });
           return true;
         },
+        recordCard: async (event) => void figmaRecords.triage.events.push(event),
       }
     : undefined;
   const figmaComments: SweepFigmaComments | undefined = opts.figma
@@ -493,6 +504,7 @@ export function sweepHarness(opts: {
             async comments(pageId: string) {
               return opts.notion!.comments?.[pageId] ?? [];
             },
+            roles: async () => opts.notion!.roles ?? {},
           },
         }
       : {}),
@@ -508,6 +520,7 @@ export function sweepHarness(opts: {
     store: faultyStore,
     delivery: {
       async post(to, message, tag) {
+        if (notInChannel.has(to.channel)) return { ok: false, error: "not_in_channel" };
         // A workspace that refuses `card` blocks, as Slack answers one.
         if (cardsRefused.on && message.blocks.some((b) => ["card", "carousel"].includes(String((b as { type?: string }).type)))) {
           return { ok: false, refusedBlocks: true };
@@ -595,6 +608,7 @@ export function sweepHarness(opts: {
     posted,
     staged,
     cardsRefused,
+    notInChannel,
     reads,
     clock,
     budget,

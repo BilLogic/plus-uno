@@ -216,6 +216,22 @@ test("a doc under a section root with no embodiment fails the build", () => {
   assert.match(result.out, /zz-test-undeclared\.md/);
 });
 
+test("a doc under skills/ with no embodiment fails the build", () => {
+  const rel = "skills/uno-review/references/zz-test-undeclared.md";
+  const result = withFile(rel, (abs) => writeFileSync(abs, "# probe\n\nno frontmatter here\n"), () => runBundler());
+  assert.equal(result.code, 1, "skills/ is walked for the declaration rule, though it ships nothing");
+  assert.match(result.out, /declare no `embodiment`/);
+  assert.match(result.out, /zz-test-undeclared\.md/);
+});
+
+test("a doc under skills/ that asks to ship fails the build: those docs are IDE-only", () => {
+  const rel = "skills/uno-review/references/zz-test-ships.md";
+  const result = withFile(rel, (abs) => writeFileSync(abs, "---\nembodiment: all\n---\n# probe\n"), () => runBundler());
+  assert.equal(result.code, 1);
+  assert.match(result.out, /zz-test-ships\.md/);
+  assert.match(result.out, /embodiment: ide/);
+});
+
 test("--check fails on a stale artifact and writes nothing", () => {
   const before = readFileSync(harnessTs, "utf8");
   const result = withFile(
@@ -755,8 +771,9 @@ test("the manifest's census, budgets and members agree with the bundle", () => {
     manifest.sections.map((s) => s.name),
     ["constitution", "persona", "bot-skills", "scheduled-actions", "connectors", "engineering", "conventions"],
   );
+  assert.deepEqual(manifest.ideRoots.map((r) => r.root), ["skills"], "walked for the census, never a section");
   assert.equal(
-    manifest.sections.reduce((t, s) => t + s.docs, 0),
+    manifest.sections.reduce((t, s) => t + s.docs, 0) + manifest.ideRoots.reduce((t, r) => t + r.docs, 0),
     census.underRoots,
   );
 });
@@ -1016,7 +1033,7 @@ test("the sweep doc is read by its new name only", () => {
 const CONNECTOR_FOLDERS = {
   slack: ["docs/connectors/slack/shapes"],
   notion: ["docs/connectors/notion/page-writing"],
-  figma: [],
+  figma: ["docs/connectors/figma/annotations"],
 };
 
 test("each connector folder bundles its overview and discloses its siblings", () => {

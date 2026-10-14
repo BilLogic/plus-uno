@@ -80,15 +80,12 @@ export async function preflight(
           input.properties && typeof input.properties === "object"
             ? (input.properties as Record<string, unknown>)
             : {};
-        const has = (...names: string[]) =>
-          Object.entries(props).some(
-            ([k, v]) => names.includes(k.toLowerCase().replace(/[\s-]+/g, "_")) && typeof v === "string" && v.trim(),
-          );
+        const has = (name: string) => typeof props[name] === "string" && !!(props[name] as string).trim();
         const missing = [
           !title && "*name*",
           !has("description") && !summary && "*description*",
           !has("stage") && "*stage* (Low-fi · Mid-fi · High-fi)",
-          !has("deployment_url", "preview_url") && "*deployment URL*",
+          !has("deployment_url") && "*deployment URL*",
         ].filter(Boolean);
         if (missing.length) {
           return { ask: `To publish to the Marketplace I still need the ${missing.join(", ")}.` };

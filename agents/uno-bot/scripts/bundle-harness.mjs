@@ -261,6 +261,15 @@ const SECTIONS = [
 const ROWS = new Map(SECTIONS.map((row) => [row.name, row]));
 
 /**
+ * Roots walked for the declaration rule and the IDE census, never for the
+ * prompt or the map: every doc under them declares `embodiment: ide`. The uno
+ * skills live here — IDE workflows the guards over agent-read text still
+ * count. A doc here asking to ship is a finding, so nothing reaches the Worker
+ * from these roots without becoming a section row first.
+ */
+const IDE_ROOTS = ["skills"];
+
+/**
  * The budget a doc is held to: its row's, when the row carries one for the
  * doc's delivery, or null.
  *
@@ -674,6 +683,8 @@ function renderManifest({ members, raw, parts, assembled, disclosed, referenceMa
     assembled: { chars: assembled.length, files: members.length, budget: BUDGETS.assembled },
     references: { count: disclosed.length, chars: Object.values(referenceMap).reduce((t, x) => t + x.length, 0) },
     sections,
+    // The IDE-only roots, walked for the census and never shipped.
+    ideRoots: IDE_ROOTS.map((root) => ({ root, docs: rows.filter((r) => r.section === root).length })),
     members: rows,
   };
 }
@@ -787,6 +798,25 @@ export function assemble({ repoRoot = REPO_ROOT } = {}) {
     }
     found.sort((a, b) => a.rel.localeCompare(b.rel));
     members.push(...found.map(({ rel, embodiment }) => ({ rel, section: section.name, embodiment })));
+  }
+  const shipsFromIde = [];
+  for (const root of IDE_ROOTS) {
+    for (const rel of walk(repoRoot, root)) {
+      const { meta, body } = frontmatter(readFileSync(path.join(repoRoot, rel), "utf8").replace(/\r\n/g, "\n"));
+      if (!meta.embodiment) undeclared.push(rel);
+      else if (meta.embodiment !== "ide" || meta.disclosure !== undefined) shipsFromIde.push(rel);
+      else ideOnly.push({ rel, section: root, chars: body.length });
+    }
+  }
+  if (shipsFromIde.length) {
+    findings.push({
+      message:
+        `${shipsFromIde.length} doc(s) under an IDE-only root ask to reach the Worker:\n` +
+        shipsFromIde.map((p) => `  ${p}`).join("\n") +
+        `\n  -> every doc under ${IDE_ROOTS.join(", ")} declares \`embodiment: ide\` and no \`disclosure\`.` +
+        "\n     A doc the Worker should read moves under a section root.",
+    });
+    return result({ committed });
   }
   disclosed.sort((a, b) => a.name.localeCompare(b.name));
   // One name, one doc: the map is keyed by name, so a second doc under the same

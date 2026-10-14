@@ -111,6 +111,12 @@ export interface FindingTarget {
   writable: boolean;
   title: string;
   pillars: string[];
+  /** The Roadmap card's design owner as a Slack id, when known: whom the
+   *  ladder tags. */
+  designOwner?: string | null;
+  /** The Figma file's creator by handle, when known: whom the ladder names
+   *  when there is no card. */
+  creatorHandle?: string | null;
   /** `search` when a search found the page, so the card says so. */
   foundBy?: "search";
 }
@@ -221,7 +227,12 @@ export function routeOwner(input: {
  * the finding's evidence and its target (`ladderTarget`).
  */
 export function pickDestination(finding: Pick<DriftFinding, "evidence" | "target">): Destination {
-  return routeFinding({ evidence: finding.evidence, ...ladderTarget(finding.target) }).destination;
+  return pickRoute(finding).destination;
+}
+
+/** Where a sweep finding goes and whom it names: the whole ladder answer. */
+export function pickRoute(finding: Pick<DriftFinding, "evidence" | "target">): ReturnType<typeof routeFinding> {
+  return routeFinding({ evidence: finding.evidence, ...ladderTarget(finding.target) });
 }
 
 /** The Figma team the design-system library file lives in. */
@@ -233,11 +244,15 @@ export const LIBRARY_TEAM = "Universal";
  * design-system code and Storybook are that library's code, so they take its
  * team. Any other target names no team.
  */
-function ladderTarget(target: Pick<FindingTarget, "kind" | "pillars">): Pick<FindingContext, "card" | "figmaFile"> {
-  if (target.kind === "notion") return { card: { pillars: target.pillars } };
+function ladderTarget(
+  target: Pick<FindingTarget, "kind" | "pillars" | "designOwner" | "creatorHandle">,
+): Pick<FindingContext, "card" | "figmaFile"> {
+  const creatorHandle = target.creatorHandle ?? null;
+  if (target.kind === "notion") return { card: { pillars: target.pillars, designOwner: target.designOwner ?? null } };
   if (target.kind === "figma-library" || target.kind === "design-system-code" || target.kind === "storybook") {
-    return { figmaFile: { team: LIBRARY_TEAM } };
+    return { figmaFile: { team: LIBRARY_TEAM, creatorHandle } };
   }
+  if (target.kind === "figma") return { figmaFile: { creatorHandle } };
   return {};
 }
 

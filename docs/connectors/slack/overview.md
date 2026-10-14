@@ -25,6 +25,17 @@ This folder is Slack's connector: this overview ships in uno-bot's prompt, and [
 Pillar → channel map (group announcements; **all private — uno-bot must be invited before posting/@here**):
 `Universal` → #plus-universal `C072E8SFLKV` · `Admin` → #plus-admin `C089A3E9CCW` · `Toolkit` → #plus-toolkit `C08925VDFF1` · `Training` → #plus-training `C07L5RZV6DR` · `Marketing` → #plus-marketing `C052BG9NE86`. Tutoring + Help Center: unmapped — flag at retro.
 
+## The posting ladder
+
+Every scheduled action sends a finding to the first rung that fits (`agents/uno-bot/src/destination/`):
+
+1. Evidence in a private channel, a group DM or a DM → that place only.
+2. Evidence in a Slack thread → **that thread**.
+3. The team's channel, by the pillar → channel map above. The team is the linked Roadmap card's `Product Pillar`, else the Figma file's team; the card wins when they disagree. The library file is the Universal team's, and `design-system/` code and Storybook take the library's team.
+4. No team, or a pillar with no channel (Tutoring, Help Center) → #plus-design.
+
+The card's design owner is tagged. With no card, the Figma file's creator is named by handle, untagged. #uno-bot is off the ladder, and so is defaulting to the lead.
+
 ## Surfaces
 
 Every way into uno-bot from Slack. Skills run from a DM or an @mention; the other surfaces each do one thing.
@@ -56,8 +67,7 @@ The Worker's one proactive read of channels, whose rules are the `sweep` schedul
   - a public thread's finding is posted in that thread;
   - a private channel's stays there, with an owner and confirmers from that channel, and a group DM's goes back to that group DM. After a group-DM fix writes a page, a separate share card there offers a reworded note (page name only, no quote, no names) for rung 3 or 4, and only its own Approve posts it (`sweep_share_post`, a `worker` tool only the Worker stages);
   - a fix found in both a public thread and a private place goes only on the private card (ADR-031);
-  - findings in no thread go to the team channel the map above names for the card's pillar, else the Figma file's team, and to #plus-design when there is none (the posting ladder, `agents/uno-bot/src/destination/`).
-  - Proactive output stays out of #uno-bot, and the owner it mentions comes from the thread or the card, not a default to the lead.
+  - findings in no thread take the posting ladder (§ The posting ladder).
 - **Reports** post at the next weekday 9 am ET run on the shared decision card: one live report per thread, up to 10 fixes, each its own proposal, and the rest queued until every fix on it is decided or lapses. A thread is taken while any fix of its report is live by the records or in ThreadState. Owners and thread posters can decide; a fix lapses after 72 h with no re-ping.
 - **Posted means staged.** A report starts only when the invocation's budget covers it. Its snapshot (the fixes as shown) goes to KV and its items to D1; it is posted tagged with its key and its operations' digest in message metadata, its record kept with that tag and every redraw sends it again, each fix staged, then marked posted. A retry stages only from the snapshot, and only when the posted report's digest matches; a report the search comes back unsure about is held. On a retry, each fix an earlier try already staged is recorded as it stands, resolved or live, and only the rest are staged. Staging puts each fix on the proposal record, as any card's staging does. A fix whose staging fails outright says so on its card and stays queued; a report none of whose fixes staged is edited to say it did not go through, and its items are released. Where Slack refuses cards, the report posts as sections with a Review each, and every redraw stays plain.
 - **A failing thread** (replies, a linked page, or the detector) holds the cursor; on its second night running it is skipped with a note, so one thread holds a channel back two nights at most. A quota stop, the model's or Notion's 429, holds without counting.

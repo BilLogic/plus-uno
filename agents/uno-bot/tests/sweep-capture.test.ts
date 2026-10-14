@@ -170,6 +170,44 @@ test("a Universal-pillar card's comment contradicting its PRD lands in #plus-uni
   assert.match(JSON.stringify(h.posted[0]!.blocks), /"<@U0CY>, a card comment settled.*"<@U0CY> · from a card comment"/);
 });
 
+test("a card's design owner is tagged when the roles name a designer among its Contributors", async () => {
+  const CARD_ID = "dddddddddddddddddddddddddddddddd";
+  const card = notionPage(CARD_ID, {
+    title: "Button refresh",
+    pillars: ["Universal"],
+    contributors: ["Cy Contributor", "Ade Okafor"],
+    blocks: [{ id: "c-spec", lastEditedTime: OLD, text: "Buttons use the primary style." }],
+  });
+  const h = sweepHarness({
+    channels: quiet,
+    sources: [card],
+    capture: true,
+    notion: {
+      cards: [
+        {
+          id: CARD_ID,
+          url: card.url,
+          title: card.title,
+          lastEditedTime: TONIGHT,
+          parentDatabaseId: ROADMAP_DB,
+          properties: { "Product Pillar": "Universal", "Current Team": "Design" },
+          people: { Contributor: ["Cy Contributor", "Ade Okafor"] },
+        },
+      ],
+      comments: { [CARD_ID]: [{ id: "cm-1", createdTime: TONIGHT, text: "Decided in crit: secondary style.", links: [], byBot: false }] },
+      roles: { U0CY: "dev", U0ADE: "design" },
+    },
+    people: PEOPLE,
+    detectorReplies: [recordReply({ source: card, block: "c-spec", evidence: ["comment:cm-1"], replacement: "Buttons use the secondary style." })],
+    now: at(29, 22),
+  });
+  await runSweepJob(CARDS, h.deps);
+  h.clock.now = at(30, 14);
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted[0]!.channel, UNIVERSAL);
+  assert.match(JSON.stringify(h.posted[0]!.blocks), /"<@U0ADE>, a card comment settled/, "the designer, not the first Contributor");
+});
+
 test("a thread's answer no page holds becomes a card in that thread naming the page, the section and the text", async () => {
   const training = notionPage("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", {
     title: "Tutor Training PRD",

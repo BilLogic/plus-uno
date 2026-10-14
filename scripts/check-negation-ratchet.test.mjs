@@ -278,6 +278,12 @@ test('the IDE corpus excludes ADRs and generated surfaces by where they live', (
   );
 });
 
+test('the IDE corpus counts the uno skills under skills/', () => {
+  const { ide } = harnessSets({ tag: 'negation' });
+  assert.ok(ide.includes('skills/uno-maintain/SKILL.md'), 'an uno skill is IDE-side text the ratchet must see');
+  assert.ok(ide.includes('skills/uno-review/references/method.md'));
+});
+
 test('every doc in the IDE corpus declares itself IDE-side', () => {
   // The scopes must partition, never overlap: a doc counted in both would be
   // double-counted, and one counted in neither would be unguarded.

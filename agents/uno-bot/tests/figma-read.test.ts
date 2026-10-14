@@ -139,6 +139,7 @@ describe("the note the model is handed", () => {
       assert.ok(FIGMA_NOTE.includes(dropped), `note should name ${dropped}`);
     }
     assert.match(FIGMA_NOTE, /unread here rather than missing/i);
+    assert.doesNotMatch(FIGMA_NOTE, /\bnever\b/i, "the target behaviour, stated positively");
   });
 
   it("the truncation note says the missing part is unknown, not absent", () => {

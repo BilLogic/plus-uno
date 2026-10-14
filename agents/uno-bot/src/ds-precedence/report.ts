@@ -22,6 +22,7 @@
 import type { ProposalOperation, ReportItem, StatedCardWords } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
+import type { Addressee } from "../destination/index";
 import { shortDate, windowInWords } from "../slack/copy-words";
 import { SOURCE_NAMES, type Disagreement, type DsSource } from "./compare";
 
@@ -96,9 +97,11 @@ function differs(finding: ComponentFinding): string {
  * @param components - How many components disagree, held-back ones included
  * @param ruleUrl - Where the precedence rule is written (`precedenceRuleUrl`)
  */
-export function precedenceParent(components: number, ruleUrl: string): string {
+export function precedenceParent(components: number, ruleUrl: string, addressee: Addressee | null = null): string {
   const what = components === 1 ? "1 component" : `${components} components`;
-  return `Code and the library disagree on ${what}. <${ruleUrl}|Code wins> unless a difference is deliberate.`;
+  const line = `ode and the library disagree on ${what}. <${ruleUrl}|Code wins> unless a difference is deliberate.`;
+  if (!addressee) return `C${line}`;
+  return `${"slack" in addressee ? `<@${addressee.slack}>` : escapeSlackText(addressee.figma)}, c${line}`;
 }
 
 /**

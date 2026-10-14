@@ -1,5 +1,6 @@
 // The D1 ProposalEventLog — production's `proposal_events` table
-// (migrations/usage/0003_proposal_events.sql).
+// (migrations/usage/0003_proposal_events.sql, with the columns later
+// migrations added: 0013's revises_proposal_id, 0014's confirmed_edited).
 //
 // As `./d1.ts`: every statement prepared with bound parameters, never
 // assembled from values, and charged to the meter before it is sent
@@ -48,6 +49,7 @@ const COLUMNS = [
   "ticket_url",
   "actor_id",
   "confirmed_by_other",
+  "confirmed_edited",
 ] as const;
 
 type Row = Record<(typeof COLUMNS)[number], unknown>;
@@ -145,6 +147,7 @@ function mapRow(e: ProposalEvent): Record<(typeof COLUMNS)[number], unknown[]> {
     ticket_url: e.ticketUrl,
     actor_id: e.actorId,
     confirmed_by_other: boolOrNull(e.confirmedByOther),
+    confirmed_edited: boolOrNull(e.confirmedEdited),
   };
   return Object.fromEntries(COLUMNS.map((c) => [c, [row[c]]])) as Record<(typeof COLUMNS)[number], unknown[]>;
 }
@@ -177,6 +180,7 @@ function fromRow(row: Row): ProposalEvent {
     ticketUrl: strOrNull(row.ticket_url),
     actorId: strOrNull(row.actor_id),
     confirmedByOther: row.confirmed_by_other == null ? null : Number(row.confirmed_by_other) === 1,
+    confirmedEdited: row.confirmed_edited == null ? null : Number(row.confirmed_edited) === 1,
   };
 }
 

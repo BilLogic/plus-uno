@@ -27,8 +27,9 @@
 //
 // Subrequest math (each job an alarm with a fresh 50; lookups stop at 38):
 //   check: the index + the registry from GitHub + the library's /components
-//          from Figma = 3 external; the in-flight read and the report are KV,
-//          the internal bucket.
+//          and its meta (the creator the report names) from Figma = 4
+//          external; the in-flight read and the report are KV, the internal
+//          bucket.
 //   post:  members (at most 3 pages) + the message (1) + an edit when a card
 //          did not stage (1) = 5; the report's record and each card's staging
 //          are Durable Object hops.
@@ -39,7 +40,9 @@ import type { PendingProposal, ThreadState } from "../thread-state/index";
 import { renderProposalCard } from "../slack/proposal-render";
 import { decisionReport, itemProposal, markNotStaged, reportRecord, type ReportMessage, type ReportStore } from "../slack/decision-cards";
 import { textSections } from "../slack/render";
-import { pickDestination, resolveDestination, type ChannelIds } from "../sweep/finding";
+import { pickRoute, resolveDestination, type ChannelIds } from "../sweep/finding";
+import type { Addressee } from "../destination/index";
+import { rethrowIfBudget } from "../net";
 import type { FigmaClient } from "../figma/client";
 import type { JobContext } from "../scheduled/runs";
 import {
@@ -70,11 +73,30 @@ import {
  * @param channels - The Worker's team channel ids
  */
 export function precedenceChannel(channels: ChannelIds): string | null {
-  const destination = pickDestination({
+  return resolveDestination(precedenceRoute(null).destination, channels)?.channel ?? null;
+}
+
+/** Whom the weekly report names: the ladder's addressee for the library file. */
+export function precedenceAddressee(report: Pick<PrecedenceReport, "creatorHandle">): Addressee | null {
+  return precedenceRoute(report.creatorHandle ?? null).addressee;
+}
+
+function precedenceRoute(creatorHandle: string | null): ReturnType<typeof pickRoute> {
+  return pickRoute({
     evidence: { channel: "", channelKind: "public", threadTs: null, messageTs: [], permalinks: [] },
-    target: { url: "", kind: "figma-library", writable: false, title: "", pillars: [] },
+    target: { url: "", kind: "figma-library", writable: false, title: "", pillars: [], creatorHandle },
   });
-  return resolveDestination(destination, channels)?.channel ?? null;
+}
+
+/** The library file's creator by handle; null when its meta cannot be read, which never stops the check. */
+async function creatorOf(deps: Pick<CheckDeps, "figma" | "fileKey">): Promise<string | null> {
+  try {
+    return (await deps.figma.fileMeta(deps.fileKey)).file.creator?.handle ?? null;
+  } catch (err) {
+    rethrowIfBudget(err);
+    console.warn(`[ds-precedence] the library's creator was not read: ${err instanceof Error ? err.message : String(err)}`);
+    return null;
+  }
 }
 
 /** How long a weekly card stays confirmable: gone before next week's. */
@@ -92,6 +114,9 @@ export interface PrecedenceReport {
    *  with. Absent from a report kept before it was recorded; `checkedAt`'s
    *  date stands in. */
   weekOf?: string;
+  /** The library file's creator by Figma handle: whom the report names, as
+   *  the ladder names a file with no card. Absent when the meta was unread. */
+  creatorHandle?: string | null;
   items: Disagreement[];
 }
 
@@ -115,8 +140,8 @@ export interface CheckDeps extends Pick<JobContext, "runDate"> {
     /** design-system/figma/component-registry.json */
     registry(): Promise<PrecedenceRegistry>;
   };
-  /** The Figma client: the library file's components. */
-  figma: Pick<FigmaClient, "components">;
+  /** The Figma client: the library file's components, and its creator. */
+  figma: Pick<FigmaClient, "components" | "fileMeta">;
   report: Store<PrecedenceReport | null>;
   /** Components a library publish is still carrying. */
   inFlight(registry: PrecedenceRegistry): Promise<Set<string>>;
@@ -137,10 +162,11 @@ export interface CheckResult {
  * @param opts - `dryRun` compares and writes nothing
  */
 export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boolean } = {}): Promise<CheckResult> {
-  const [markdown, registry, components] = await Promise.all([
+  const [markdown, registry, components, creatorHandle] = await Promise.all([
     deps.github.indexMarkdown(),
     deps.github.registry(),
     deps.figma.components(deps.fileKey),
+    creatorOf(deps),
   ]);
   const index = parseComponentIndex(markdown);
   if (!index.length) throw new Error("the component index listed no components — refusing to report every one missing");
@@ -165,7 +191,9 @@ export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boole
     inFlight: await deps.inFlight(registry),
   });
   if (!opts.dryRun) {
-    await deps.report.write(items.length ? { checkedAt: new Date(deps.now()).toISOString(), weekOf: deps.runDate, items } : null);
+    await deps.report.write(
+      items.length ? { checkedAt: new Date(deps.now()).toISOString(), weekOf: deps.runDate, creatorHandle, items } : null,
+    );
   }
   return {
     found: items.length,
@@ -256,7 +284,7 @@ export async function postPrecedenceReport(deps: PostDeps, opts: { dryRun?: bool
 
   const weekOf = report.weekOf ?? report.checkedAt.slice(0, 10);
   const findings = byComponent(report.items);
-  const built = decisionReport(findings.map(precedenceItem), precedenceParent(findings.length, deps.ruleUrl));
+  const built = decisionReport(findings.map(precedenceItem), precedenceParent(findings.length, deps.ruleUrl, precedenceAddressee(report)));
   const shown = findings.slice(0, built.shown.length);
   const held = findings.slice(built.shown.length);
   if (opts.dryRun) return { posted: false, summary: `would post ${shown.length} component card(s)` };

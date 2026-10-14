@@ -746,6 +746,21 @@ describe("an unanswered question, raised after two workdays", () => {
     await morning(h, MONDAY);
     assert.equal(h.figma.triage.posts.length, 1, "never raised again");
     assert.deepEqual(h.figma.triage.dms, []);
+    const [event] = h.figma.triage.events;
+    assert.equal(h.figma.triage.events.length, 1, "the card is on the usage record once, as a Worker-staged card");
+    assert.equal(event!.event, "staged");
+    assert.equal(event!.via, "worker");
+    assert.equal(event!.channelId, TOOLKIT);
+    assert.deepEqual(event!.tools, [], "a question card runs nothing");
+  });
+
+  it("keeps a question whose team channel uno-bot is not in, and says which channel", async () => {
+    const { h } = await nightHarness({ cards: TOOLKIT_CARD, triage: { notIn: [TOOLKIT] } });
+    await runSweepJob(NIGHT, h.deps);
+    const report = await morning(h, FRIDAY);
+    assert.deepEqual(h.figma.triage.posts, []);
+    assert.match(report.summary, new RegExp(`uno-bot is not in ${TOOLKIT}`));
+    assert.equal(h.figma.triage.watch.get(FILE)?.questions.length, 1, "never dropped: it waits for the invite");
   });
 
   it("leaves a question on any other page alone", async () => {

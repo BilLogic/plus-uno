@@ -123,6 +123,14 @@ export interface ProposalEvent {
   actorId: string | null;
   /** Confirmed only: true when the confirmer was not the requester. */
   confirmedByOther: boolean | null;
+  /**
+   * Confirmed only: true when the ✅ came from the Review pop-up with its Edit
+   * fields having changed the batch (`GateVerdict.edited`), false for every
+   * other ✅ — an unchanged pop-up Approve, a reaction, a button, a typed or
+   * the model's confirm. With `revisesProposalId`, what "approved with edits"
+   * is counted from. Only the 0/1: no field, value or text of the edit.
+   */
+  confirmedEdited: boolean | null;
 }
 
 /** A card that aged out untouched, as the expiry pass finds it. */
@@ -179,6 +187,7 @@ const EMPTY: Omit<ProposalEvent, "proposalId" | "event" | "at" | "via"> = {
   ticketUrl: null,
   actorId: null,
   confirmedByOther: null,
+  confirmedEdited: null,
 };
 
 /** A bare event: the four columns every row has. */
@@ -189,6 +198,20 @@ export function proposalEvent(
   via: ProposalEventVia,
 ): ProposalEvent {
   return { ...EMPTY, proposalId, event, at, via };
+}
+
+/**
+ * The staged row of a card the Worker posted with nothing to confirm — a
+ * Figma question raised in a team channel: in the channel it went to, running
+ * no tools, for `ttlMs`, after which the expiry pass ages it out. It counts
+ * among the Worker-staged cards like any other.
+ */
+export function workerCardEvent(input: { proposalId: string; channelId: string; at: number; ttlMs: number }): ProposalEvent {
+  return {
+    ...proposalEvent(input.proposalId, "staged", askedAtOf(input.proposalId, input.at), "worker"),
+    channelId: input.channelId,
+    ttlMs: input.ttlMs,
+  };
 }
 
 /** `superseded` for each card a staging retired — the ts the store reported,
@@ -271,6 +294,7 @@ export function verdictEvents(verdict: GateVerdict, at: number): ProposalEvent[]
       // has no requester to compare with (one the Worker staged itself).
       confirmedByOther:
         confirmed && actor !== null && proposal.requesterUserId ? actor !== proposal.requesterUserId : null,
+      confirmedEdited: confirmed ? verdict.edited === true : null,
     },
   ];
 }

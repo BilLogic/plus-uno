@@ -210,6 +210,53 @@ test("a Figma replica link waits in the body while the database has no such prop
   assert.match(JSON.stringify(post.body!.children), /figma\.com\/design\/F1/);
 });
 
+test("an update keeps the Figma replica link on the page while the database has no such property", async () => {
+  const existing = [{ id: ROW, url: `https://www.notion.so/${ROW}`, properties: { Name: { type: "title", title: [{ plain_text: "Session review" }] } } }];
+  serve(
+    routes(
+      {
+        [`PATCH /pages/${ROW}`]: { body: { id: ROW, url: `https://www.notion.so/${ROW}` } },
+        [`GET /blocks/${ROW}/children`]: { body: { results: [], has_more: false } },
+        [`PATCH /blocks/${ROW}/children`]: { body: { results: [] } },
+      },
+      { figmaReplica: false, existing },
+    ),
+  );
+  const { executeNotionCreate } = await tool();
+
+  const out = JSON.parse(await executeNotionCreate(ENV, INPUT, SLACK));
+
+  assert.equal(out.status, "updated");
+  const patch = calls.find((c) => c.method === "PATCH" && c.url.includes(`/pages/${ROW}`))!;
+  assert.equal("Figma replica" in (patch.body!.properties as Record<string, unknown>), false);
+  const append = calls.find((c) => c.method === "PATCH" && c.url.includes(`/blocks/${ROW}/children`));
+  assert.ok(append, "the link is appended to the page body");
+  assert.match(JSON.stringify(append!.body), /figma\.com\/design\/F1/);
+});
+
+test("an update appends the Figma replica link once: a page that already holds it is left as is", async () => {
+  const existing = [{ id: ROW, url: `https://www.notion.so/${ROW}`, properties: { Name: { type: "title", title: [{ plain_text: "Session review" }] } } }];
+  const held = {
+    type: "paragraph",
+    paragraph: { rich_text: [{ plain_text: `Figma replica: ${INPUT.properties.figma_replica}`, text: { content: "x" } }] },
+  };
+  serve(
+    routes(
+      {
+        [`PATCH /pages/${ROW}`]: { body: { id: ROW, url: `https://www.notion.so/${ROW}` } },
+        [`GET /blocks/${ROW}/children`]: { body: { results: [held], has_more: false } },
+      },
+      { figmaReplica: false, existing },
+    ),
+  );
+  const { executeNotionCreate } = await tool();
+
+  const out = JSON.parse(await executeNotionCreate(ENV, INPUT, SLACK));
+
+  assert.equal(out.status, "updated");
+  assert.equal(calls.some((c) => c.method === "PATCH" && c.url.includes("/children")), false);
+});
+
 test("before a card is staged, a publish missing its stage and deployment link asks for exactly those", async () => {
   const { preflight } = await import("../src/agent/preflight.js");
 

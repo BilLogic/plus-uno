@@ -1,6 +1,6 @@
 ---
 embodiment: ide
-summary: Status: LIVE — Design HQ · Prototype Marketplace
+summary: The Prototype Marketplace database (LIVE under Design HQ) — its schema, deploy URLs and publish procedure, read by the IDE publish skill and the Worker's marketplace write
 ---
 
 # notion-marketplace DB — schema & management
@@ -34,7 +34,7 @@ fetch the schema and exact-match before every write (see `docs/connectors/notion
 | **Loom** | url | `loomVideoUrl` | null → empty |
 | **Repo path** | rich_text | `repoPath` | always ends `/` |
 | **Local path** | rich_text | `localPath` | app route, e.g. `/1025` |
-| **Figma replica** | url | — | optional; the person-made Figma replica of the prototype |
+| **Figma replica** | url | — | optional; the person-made Figma replica of the prototype. While the database has no such column, the link goes in the page body, on create and on update |
 | **Upvotes** | number | `upvotes` | new entries = 0 |
 | **Last updated** | last_edited_time | `lastUpdated` | Notion-managed |
 

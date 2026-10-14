@@ -23,7 +23,7 @@ import { figmaReviewChannel } from "../figma-ask/env";
 import { queryRoadmapByNumbers, queryRoadmapCards } from "../integrations/notion";
 import { storedTeamRoles } from "../usage/production";
 import { roleOf, slackPersonOfNotion, type NotionPeople, type TeamRoles } from "../usage/roles";
-import { designerAmong } from "../figma-comments/read";
+import { designerAmong } from "../usage/roles";
 import { markSweepThread } from "../sweep/thread-mark";
 import { threadStateFor } from "../thread-state/production";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";

@@ -1,40 +1,19 @@
 // Figma comment triage: a question nobody answered, raised once after two
-// workdays, through the posting ladder (`../destination/`).
-//
-// WHAT IS WATCHED. The night's read (`./read.ts`) keeps, per file, each open
-// question it was shown: a root pinned under 📐 Specs or 🔍 For Review, read
-// whole (made after the watermark), unresolved, asking something (a `?`), and
-// with no reply from anyone but its asker. An @uno ask is not one — it was
-// answered as it was made (`../figma-ask/`). Beside the questions, what the
-// ladder reads: the Product Pillar of each card the file's title names, and
-// the file's owner — the card's design owner, else its creator by handle.
-//
-// WHEN IT IS RAISED. On the first morning two whole ET workdays (Monday to
-// Friday) have passed since it was asked: a Tuesday question waits Wednesday
-// and Thursday, and Friday's morning raises it. The morning re-reads the
-// file's comments first, one Figma call a file, and drops a question that was
-// answered, resolved or deleted since.
-//
-// WHERE IT GOES. The ladder, with no Slack evidence: the card's team channel,
-// else the Figma file's team channel (the nightly backstop's listing names
-// each file's team), else #plus-design; the card's design owner is tagged, else
-// the creator named by handle, untagged. A person @-named in the question gets
-// a DM when the hand-kept Figma handle → Slack id map
-// (`FIGMA_HANDLE_SLACK_IDS`) has them, rather than the channel post; a person
-// it does not have is named on the channel card. A question whose every
-// @-named person is mapped is DMed only.
-//
-// ONCE PER THREAD. A raised mark per root, kept 90 days, and the question
-// leaves the watch list as soon as anything about it was sent.
+// workdays. The rule — what is watched, when it is raised, where it goes and
+// whom it names — is the figma-comments scheduled action's
+// (`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`); this file is
+// its code.
 //
 // PURE: every dependency arrives through `TriagePorts`.
 
 import { rethrowIfBudget } from "../net";
+import { workerCardEvent, type ProposalEvent } from "../usage/proposal-events";
 import type { FigmaClient, FigmaComment } from "../figma/client";
 import { asksUno, isOwnComment } from "../figma-ask/trigger";
 import { etDayOf, etHourOn } from "../sweep/schedule";
 import { escapeSlackText } from "../slack/mrkdwn";
-import { resolveDestination, routeFinding, type ChannelIds } from "../destination/index";
+import { resolveDestination, routeFinding, type Addressee, type ChannelIds } from "../destination/index";
+import { escapeRegExp } from "../tools/slack-people";
 import { commentUrl } from "./draft";
 import type { FileOwner } from "./queue";
 import type { CommentThread } from "./threads";
@@ -48,6 +27,11 @@ export const TRIAGE_WORKDAYS = 2;
 export const REREAD_COST = 3;
 /** Subrequests a DM costs: opening the conversation, and the post. */
 export const DM_COST = 2;
+/** How long a channel card stays on the usage record as live before it ages out. */
+export const TRIAGE_CARD_TTL_MS = 72 * 60 * 60 * 1000;
+
+/** A post's answer: its ts, or Slack's error code when it was refused. */
+export type Posted = { ok: true; ts: string } | { ok: false; error?: string };
 
 /** One open question, as the night read it. */
 export interface WatchedQuestion {
@@ -90,10 +74,13 @@ export interface TriagePorts {
   handles: Record<string, string>;
   /** The ladder's channel ids. */
   channels: ChannelIds;
-  /** Post a top-level message; whether it posted. */
-  post(channel: string, text: string): Promise<boolean>;
+  /** Post a top-level message: its ts, or Slack's refusal (`not_in_channel`). */
+  post(channel: string, text: string): Promise<Posted>;
   /** DM a person; whether it posted. */
   dm(slackId: string, text: string): Promise<boolean>;
+  /** Put a channel card on the usage record (`workerCardEvent`). Best-effort:
+   *  a failed write never unsends the card. */
+  recordCard(event: ProposalEvent): Promise<void>;
 }
 
 /**
@@ -230,10 +217,13 @@ export async function raiseUnanswered(
         result.raised += 1;
         continue;
       }
-      if (await raise(file, q, root, named, ports)) {
+      const sent = await raise(file, q, root, named, ports, opts.now);
+      if (sent.ok) {
         await ports.raised.add(q.commentId);
         done.add(q.commentId);
         result.raised += 1;
+      } else if (sent.notIn) {
+        result.notes.push(`uno-bot is not in ${sent.notIn}, so the question ${q.commentId} on ${file.fileKey} waits for the invite`);
       } else {
         result.notes.push(`the question ${q.commentId} on ${file.fileKey} did not post, so it waits for tomorrow`);
       }
@@ -291,18 +281,23 @@ export function namedIn(message: string, asker: string, handles: Record<string, 
   return out;
 }
 
-function escapeRegExp(text: string): string {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-/** Send one question: DMs to the mapped, and the channel card unless everyone named was DMed. Whether anything was sent. */
-async function raise(file: WatchedFile, q: WatchedQuestion, root: FigmaComment, named: Named, ports: TriagePorts): Promise<boolean> {
+/** Send one question: DMs to the mapped, and the channel card unless everyone
+ *  named was DMed. Whether anything was sent, and the channel that refused the
+ *  card because uno-bot is not in it. */
+async function raise(
+  file: WatchedFile,
+  q: WatchedQuestion,
+  root: FigmaComment,
+  named: Named,
+  ports: TriagePorts,
+  now: number,
+): Promise<{ ok: boolean; notIn?: string }> {
   const link = commentUrl(file.fileKey, q.nodeId, q.commentId);
   let sent = false;
   for (const person of named.mapped) {
     if (await ports.dm(person.slack, questionDm(file, q, root.message, link))) sent = true;
   }
-  if (named.mapped.length && !named.unmapped.length) return sent;
+  if (named.mapped.length && !named.unmapped.length) return { ok: sent };
 
   const team = file.pillars.length ? null : await ports.fileTeam(file.fileKey);
   const { destination, addressee } = routeFinding({
@@ -311,9 +306,18 @@ async function raise(file: WatchedFile, q: WatchedQuestion, root: FigmaComment, 
     figmaFile: { team, creatorHandle: file.owner && "figma" in file.owner ? file.owner.figma : null },
   });
   const where = resolveDestination(destination, ports.channels);
-  if (!where) return sent;
-  if (await ports.post(where.channel, questionCard(file, q, root.message, link, addressee, named.unmapped))) sent = true;
-  return sent;
+  if (!where) return { ok: sent };
+  const card = await ports.post(where.channel, questionCard(file, q, root.message, link, addressee, named.unmapped));
+  if (card.ok) {
+    await ports
+      .recordCard(workerCardEvent({ proposalId: card.ts, channelId: where.channel, at: now, ttlMs: TRIAGE_CARD_TTL_MS }))
+      .catch((err: unknown) => {
+        rethrowIfBudget(err);
+        console.error(`[figma-triage] ${card.ts} posted but is not on the usage record: ${err instanceof Error ? err.message : String(err)}`);
+      });
+    return { ok: true };
+  }
+  return { ok: sent, ...(card.error === "not_in_channel" ? { notIn: where.channel } : {}) };
 }
 
 /** The channel card: whom it is for, the file, the question, its asker and place, anyone unmapped, and the link. */
@@ -322,7 +326,7 @@ export function questionCard(
   q: Pick<WatchedQuestion, "by" | "section" | "page">,
   message: string,
   link: string,
-  addressee: { slack: string } | { figma: string } | null,
+  addressee: Addressee | null,
   unmapped: readonly string[],
 ): string {
   const to = addressee ? ("slack" in addressee ? `<@${addressee.slack}>, a` : `${escapeSlackText(addressee.figma)}, a`) : "A";
