@@ -77,9 +77,10 @@ export interface RunnerDeps {
   now(): number;
   /** A person's turn, a reaction or a cut-off run. */
   runThreadJob(job: RunnerJobPayload): Promise<ThreadJobOutcome>;
-  /** One scheduled job, with the date of the run it was queued under.
-   *  Resolving is done; a budget stop is caught here. */
-  runScheduledJob(job: ScheduledJob, runDate: string): Promise<void>;
+  /** One scheduled job, with the date of the run it was queued under, and
+   *  how it spreads its work over jobs of its own (`spawnJobs`). Resolving is
+   *  done; a budget stop is caught here. */
+  runScheduledJob(job: ScheduledJob, runDate: string, spawn: (jobs: readonly ScheduledJob[]) => Promise<void>): Promise<void>;
 }
 
 /**
@@ -276,7 +277,8 @@ async function drainScheduledJob(storage: RunnerStorage, deps: RunnerDeps): Prom
   }
   const [key, queued] = entries[index]!;
   const label = `${queued.run} ${queued.date} ${queued.job.key}`;
-  const outcome = await runWithinCeiling(() => deps.runScheduledJob(queued.job, queued.date));
+  const spawn = (jobs: readonly ScheduledJob[]) => spawnJobs(storage, key, queued, jobs);
+  const outcome = await runWithinCeiling(() => deps.runScheduledJob(queued.job, queued.date, spawn));
 
   if (outcome === "deferred" && queued.deferrals + 1 < MAX_JOB_DEFERRALS) {
     // Kept under the same key, so it is still first in line: it runs again
@@ -295,7 +297,33 @@ async function drainScheduledJob(storage: RunnerStorage, deps: RunnerDeps): Prom
   // it is tried again.
   await storage.delete(key);
 
-  if (entries.length > 1) await storage.setAlarm(deps.now());
+  // Read again: the job may have spawned jobs of its own.
+  if ((await storage.list({ prefix: RUN_PREFIX, limit: 1 })).size > 0) await storage.setAlarm(deps.now());
+}
+
+/**
+ * Queue jobs a running job spreads its work over, in its run, right behind it:
+ * under its own storage key, so they sort after it and before every later job
+ * of the run, in the order given. Each is a job like any other — its own
+ * alarm, its own budget, its own three tries — so one that is given up loses
+ * only its own share. A job already pending or done today is not queued
+ * again, so a retried job spawns nothing twice.
+ *
+ * @param storage - The run's runner's storage
+ * @param parentKey - The spawning job's storage key
+ * @param parent - The spawning job, as queued
+ * @param jobs - What it spreads its work over, each key unique in the run
+ */
+async function spawnJobs(storage: RunnerStorage, parentKey: string, parent: QueuedRunJob, jobs: readonly ScheduledJob[]): Promise<void> {
+  const pending = new Set(
+    [...(await storage.list<QueuedRunJob>({ prefix: `${RUN_PREFIX}${parent.date}:` })).values()].map((q) => q.job.key),
+  );
+  for (const [i, job] of jobs.entries()) {
+    if (pending.has(job.key) || (await storage.get(doneKey(parent.date, job.key))) !== undefined) continue;
+    const entry: QueuedRunJob = { run: parent.run, date: parent.date, job, deferrals: 0 };
+    await storage.put(`${parentKey}/${String(i).padStart(4, "0")}`, entry);
+    pending.add(job.key);
+  }
 }
 
 function doneKey(date: string, key: string): string {

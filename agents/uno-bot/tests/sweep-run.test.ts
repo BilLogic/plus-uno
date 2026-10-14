@@ -1186,3 +1186,42 @@ test("a section is costed by the cards that show this morning, never by its whol
   assert.equal(h.posted.length, 1);
   assert.deepEqual(counted, [10]);
 });
+
+test("the run's post spreads over one job a place, and posts nothing itself", async () => {
+  const h = await fixAt({ channel: DESIGN, channelKind: "public" });
+  const report = handedOff(weekly(UNIVERSAL, 2));
+  h.deps.sections = [report.port];
+  const spawned: ScheduledJob[] = [];
+  h.deps.spawn = async (jobs) => void spawned.push(...jobs);
+  const planned = await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 0);
+  assert.deepEqual(report.calls, []);
+  assert.match(planned.summary, /spread over 2 place job\(s\)/);
+  const places = spawned.map((j) => j.place);
+  assert.ok(spawned.every((j) => j.kind === "sweep-post" && j.key === `sweep-post:${j.place!.channel}:${j.place!.threadTs ?? ""}`));
+  assert.ok(places.some((p) => p!.channel === UNIVERSAL && p!.threadTs === null));
+  assert.equal(new Set(places.map((p) => p!.channel)).size, 2, "the fix's place and the section's");
+
+  // Each place's job posts that place's one message, and nothing elsewhere.
+  for (const job of spawned) await runSweepJob(job, h.deps);
+  assert.equal(h.posted.length, 2);
+  assert.deepEqual(new Set(h.posted.map((p) => p.channel)), new Set(places.map((p) => p!.channel)));
+  assert.equal(report.calls.length, 2, "claimed, then posted");
+});
+
+test("a place's job that runs out of budget holds up no other place", async () => {
+  const h = await fixAt({ channel: DESIGN, channelKind: "public" });
+  const report = handedOff({ ...weekly(UNIVERSAL, 2), cost: () => ({ subrequests: 30, d1Queries: 0 }) });
+  h.deps.sections = [report.port];
+  const spawned: ScheduledJob[] = [];
+  h.deps.spawn = async (jobs) => void spawned.push(...jobs);
+  await runSweepJob(MORNING, h.deps);
+  h.headroom.subrequests = 20;
+  const heavy = spawned.find((j) => j.place!.channel === UNIVERSAL)!;
+  const light = spawned.find((j) => j !== heavy)!;
+  await assert.rejects(runSweepJob(heavy, h.deps), isSubrequestBudgetError);
+  await runSweepJob(light, h.deps);
+  assert.equal(h.posted.length, 1);
+  assert.notEqual(h.posted[0]!.channel, UNIVERSAL);
+  assert.deepEqual(report.calls, [], "the heavy place's section waits for its job's retry");
+});

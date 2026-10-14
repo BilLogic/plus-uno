@@ -363,6 +363,7 @@ async function sweepDepsFor(
     now: () => Date.now(),
     dryRun: opts.dryRun,
     runDate: opts.runDate,
+    ...(opts.spawn ? { spawn: opts.spawn } : {}),
   };
 }
 

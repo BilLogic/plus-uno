@@ -148,6 +148,9 @@ export interface ScheduledJob {
   /** The UTC weekday (0 Sunday … 6 Saturday) the job is planned on; absent,
    *  every day its run fires. */
   readonly weekday?: number;
+  /** The one place a `sweep-post` job spawned for a place posts to: a
+   *  channel's top (`threadTs: null`), or a thread (src/sweep/run.ts). */
+  readonly place?: { readonly channel: string; readonly threadTs: string | null };
 }
 
 /**
@@ -171,6 +174,13 @@ export interface JobContext {
    * a rehearsal.
    */
   readonly runStorage?: Pick<RunnerStorage, "get" | "put" | "delete">;
+  /**
+   * Queue jobs of this run that the job spreads its work over, to run right
+   * after it, each on its own alarm with its own budget and retries (the
+   * sweep's post, one job a place). Absent on a rehearsal, where the job does
+   * all its work itself.
+   */
+  readonly spawn?: (jobs: readonly ScheduledJob[]) => Promise<void>;
 }
 
 /** A run, planned for one date. */

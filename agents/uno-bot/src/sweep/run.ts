@@ -376,7 +376,7 @@ export interface SweepConfig {
   teamSurfaceDbs?: readonly string[];
 }
 
-export interface SweepDeps extends Pick<JobContext, "runDate"> {
+export interface SweepDeps extends Pick<JobContext, "runDate" | "spawn"> {
   slack: SweepSlack;
   sources: { read(url: string, kind: TargetKind): Promise<SweepSource | null> };
   /** A Contributor's name as a Slack id, when exactly one person has it. */
@@ -1141,8 +1141,56 @@ export async function contributorsOf(
 }
 
 // ── Morning: card and stage ──────────────────────────────────────────────────
+//
+// ONE JOB A PLACE. The run's `sweep-post` only looks: every place with a fix
+// due, a report an earlier try left unfinished, or a section handed over, and
+// spawns one `sweep-post:<place>` job for each (`JobContext.spawn`). Each of
+// those posts its one place's one message on an alarm of its own, with its
+// own budget and retries, so a heavy place never starves the others and a
+// place given up loses only its own message that morning. A rehearsal, and a
+// caller with no runner to spawn on, does every place in the one job.
 
+/** The morning's post: spread over its places, one place's, or every place's. */
 async function postFindings(job: ScheduledJob, deps: SweepDeps): Promise<SweepJobReport> {
+  if (!job.place && deps.spawn && !deps.dryRun) return spreadMorning(job, deps);
+  return postPlaces(job, deps, job.place ?? null);
+}
+
+/**
+ * The places the morning has a message for, each spawned as its own job: a
+ * place with a fix due (whether or not its report is still live — its own job
+ * reads that), with a report an earlier try recorded and never finished, or
+ * with a section handed over or stranded. Reads the queue and the hand-offs;
+ * posts nothing.
+ */
+async function spreadMorning(job: ScheduledJob, deps: SweepDeps): Promise<SweepJobReport> {
+  const now = deps.now();
+  const places = new Map<string, SectionPlace>();
+  const add = (place: SectionPlace | null) => {
+    if (place) places.set(placeKeyOf(place), { channel: place.channel, threadTs: place.threadTs });
+  };
+  const due = (await deps.store.pendingFindings()).filter((f) => postableAt(f.detectedAt) <= now);
+  for (const plan of planSweepCards(due, deps.runDate)) add(resolveDestination(plan.destination, deps.config));
+  for (const item of await deps.store.openItems()) if (item.proposalTs === null) add(placeOf(item.destination, deps.config));
+  for (const section of deps.sections ?? []) {
+    for (const place of await section.waiting()) add(place);
+    for (const { place } of await section.stranded(deps.runDate)) add(place);
+  }
+  const jobs = [...places.values()].map((place): ScheduledJob => ({ key: `${job.key}:${placeKeyOf(place)}`, kind: "sweep-post", place }));
+  await deps.spawn!(jobs);
+  const summary = jobs.length ? `spread over ${jobs.length} place job(s)` : "nothing due this morning";
+  return { kind: "sweep-post", key: job.key, outcome: "handled", note: null, threads: 0, findings: [], cards: [], summary };
+}
+
+/**
+ * Post the morning's messages: one place's (`scope`), or every place's.
+ *
+ * @param scope - The one place this job posts to; null for every place
+ */
+async function postPlaces(job: ScheduledJob, deps: SweepDeps, scope: SectionPlace | null): Promise<SweepJobReport> {
+  const here = (place: SectionPlace | null): boolean => !scope || (!!place && placeKeyOf(place) === placeKeyOf(scope));
+  const fixHere = (f: PendingFinding) => here(resolveDestination(pickDestination(f), deps.config));
+  const itemHere = (i: SweepItemRecord) => here(placeOf(i.destination, deps.config));
   const startedAt = deps.now();
   const meterStart = readMeter(deps);
   const now = deps.now();
@@ -1167,8 +1215,8 @@ async function postFindings(job: ScheduledJob, deps: SweepDeps): Promise<SweepJo
   let due: PendingFinding[] = [];
   try {
     const queued = await deps.store.pendingFindings();
-    due = queued.filter((f) => postableAt(f.detectedAt) <= now);
-    const open = deps.dryRun ? [] : await deps.store.openItems();
+    due = queued.filter((f) => postableAt(f.detectedAt) <= now && fixHere(f));
+    const open = deps.dryRun ? [] : (await deps.store.openItems()).filter(itemHere);
 
     // First, any card an earlier try recorded and never marked posted: find it
     // by its tag and finish staging it, or release it to be carded again.
@@ -1201,7 +1249,7 @@ async function postFindings(job: ScheduledJob, deps: SweepDeps): Promise<SweepJo
     const plans = planSweepCards(fresh, postDate, (where) => live.has(where));
     // A rehearsal shows the sweep's own part: the sections are the other
     // jobs', and none hands any over on a dry run.
-    const handed = deps.dryRun ? [] : await waitingSections(ctx, postDate);
+    const handed = deps.dryRun ? [] : await waitingSections(ctx, postDate, here);
     let onCards = 0;
     for (const plan of plans) {
       const to = resolveDestination(plan.destination, deps.config);
@@ -1247,11 +1295,11 @@ interface MorningCtx {
  * message of sections alone that a stop left unfinished is finished, or given
  * back to wait again.
  */
-async function waitingSections(ctx: MorningCtx, postDate: string): Promise<Handed[]> {
+async function waitingSections(ctx: MorningCtx, postDate: string, here: (place: SectionPlace) => boolean): Promise<Handed[]> {
   const sections = ctx.deps.sections ?? [];
-  await finishStranded(ctx, postDate);
+  await finishStranded(ctx, postDate, here);
   const handed: Handed[] = [];
-  for (const section of sections) for (const place of await section.waiting()) handed.push({ section, place });
+  for (const section of sections) for (const place of await section.waiting()) if (here(place)) handed.push({ section, place });
   return handed;
 }
 
@@ -1494,11 +1542,11 @@ export const SECTIONS_WITHDRAWN_TEXT = "This morning's report didn't go through,
  * sections are given back to wait; not known, they stay claimed for the next
  * try. Counted whole first — the look, and what its sections still spend.
  */
-async function finishStranded(ctx: MorningCtx, postDate: string): Promise<void> {
+async function finishStranded(ctx: MorningCtx, postDate: string, here: (place: SectionPlace) => boolean): Promise<void> {
   const { deps, notes } = ctx;
   const stranded: Array<Handed & { cardKey: string }> = [];
   for (const section of deps.sections ?? []) {
-    for (const { cardKey, place } of await section.stranded(postDate)) stranded.push({ section, place, cardKey });
+    for (const { cardKey, place } of await section.stranded(postDate)) if (here(place)) stranded.push({ section, place, cardKey });
   }
   for (const [cardKey, handed] of groupBy(stranded, (h) => h.cardKey)) {
     const first = handed[0]!.place;
