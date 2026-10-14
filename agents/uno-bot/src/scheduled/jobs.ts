@@ -117,8 +117,9 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "figma-library-track": async (env, _job, { dryRun }) => {
     console.log(`[figma-library] track: ${(await runLibraryTrack(env, { dryRun })).summary}`);
   },
-  // Morning, after the tracker: a Dev Mode links card for each merged
-  // library PR it queued, once FIGMA_DEV_LINKS is on (src/figma-links/).
+  // Morning: queue each PR merged into main that changed a design-system
+  // component, then a Dev Mode links card for each queued PR, once
+  // FIGMA_DEV_LINKS is on (src/figma-links/).
   "figma-dev-links-pr": async (env, _job, { dryRun }) => {
     console.log(`[figma-links] PR links: ${(await runQueuedPrLinksOnEnv(env, { dryRun })).summary}`);
   },

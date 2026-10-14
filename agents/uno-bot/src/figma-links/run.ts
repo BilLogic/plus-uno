@@ -6,7 +6,7 @@
 //     components' library components already carry (one Tier 2 read per file:
 //     two files hold all 68), then post ONE Review card: a named component's,
 //     a batch card listing every component a run of several still has to
-//     link, or a merged library PR's. Cards post where the Figma Review-card
+//     link, or a merged component PR's. Cards post where the Figma Review-card
 //     setting says. Posting writes nothing to Figma.
 //   • THE WRITE — `writeDevLinks`, the card's one operation past Approve:
 //     read the nodes' links again, rename a Code link still under its old

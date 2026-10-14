@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 128,944 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 129,147 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -52,7 +52,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,697 |
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 22,655 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
-| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,266 |
+| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,469 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,550 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 1,549 |
 | `figma-comments` | [`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) | 7,659 |
@@ -1908,7 +1908,8 @@ THE standing-automation registry. An automation absent from the table below is u
 
 | Automation | Trigger | Owner | Link |
 |---|---|---|---|
-| Figma library sync | end-of-day run: `figma-library-poll`; morning run: `figma-library-post`, `figma-library-track`, then `figma-dev-links-pr` | Bill | [`figma-library`](../../agents/uno-bot/scheduled-actions/figma-library/ACTION.md) |
+| Figma library sync | end-of-day run: `figma-library-poll`; morning run: `figma-library-post`, `figma-library-track` | Bill | [`figma-library`](../../agents/uno-bot/scheduled-actions/figma-library/ACTION.md) |
+| Dev Mode links for merged PRs | morning run: `figma-dev-links-pr` — each PR merged into main since the last run that changed `design-system/src/components/` | Bill | [`src/figma-links/`](../../agents/uno-bot/src/figma-links/) |
 | Figma snapshot refresh | each publish (the end-of-day `figma-snapshot-refresh` job's `repository_dispatch`) or `workflow_dispatch` | Bill | [`figma-snapshot-refresh.yml`](../../.github/workflows/figma-snapshot-refresh.yml) |
 | Figma notifications | each comment or change on a subscribed team's file, at `POST /figma/events` | Bill | [`src/figma-notify/`](../../agents/uno-bot/src/figma-notify/) |
 | Figma notification subscriptions | on demand (`workflow_dispatch` from `main`; `create` waits for the `uno-bot-production` reviewer) | Bill | [`figma-subscriptions.yml`](../../.github/workflows/figma-subscriptions.yml) |

@@ -7,10 +7,12 @@
 //   • Figma: the one client (`figmaClientFor`), paced and backing off on 429;
 //   • Slack: where the Figma Review cards post (`figmaReviewChannel`) — #plus-design
 //     unless `FIGMA_ASK_CHANNEL_ID` names another; its members decide;
+//   • GitHub: the PRs merged into main and their changed files, read through
+//     the metered client (`githubLibraryReads`) by the feed (`./feed.ts`);
 //   • KV: the cards posted and the message each is in, so a later run never
-//     offers one twice while it is undecided (`./run.ts` reads its report), and
-//     merged library PRs waiting for their card (`./queue.ts`), queued by the
-//     library tracker (`figma-library/env.ts`, through `prQueueFor`);
+//     offers one twice while it is undecided (`./run.ts` reads its report),
+//     merged PRs waiting for their card (`./queue.ts`), and the last merged
+//     PR the feed has seen;
 //   • the meter: a run stages its one card only when its D1 and subrequest
 //     budget allow (`budgetHeadroom`), and Approve writes only the Figma calls
 //     this invocation has room for;
@@ -18,7 +20,7 @@
 //     (`runDevLinksWriteJobOnEnv`), so it never queues behind a person's turn.
 
 import type { Env } from "../types";
-import { budgetHeadroom } from "../net";
+import { budgetHeadroom, rethrowIfBudget } from "../net";
 import { devLinksStopped } from "./copy";
 import { postMessage, updateMessage } from "../slack/api";
 import { figmaClientFor } from "../figma/production";
@@ -32,6 +34,7 @@ import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/in
 import { proposalEventLogFor } from "../usage/production";
 import { devLinksOn } from "./gate";
 import { PR_QUEUE_KV_KEY, runQueuedPrLinks, type QueuedPrLinks } from "./queue";
+import { feedMergedPrs, type SeenMark } from "./feed";
 import {
   runDevLinksPost,
   runDevLinksWriteJob,
@@ -46,8 +49,11 @@ import {
 /** The cards posted, by card id: when each closes, and its message. */
 const CARDED_KV_KEY = "figma-links:carded";
 
-/** Where merged library PRs wait for their card. */
-export function prQueueFor(env: Env) {
+/** The last merged PR the feed has seen. */
+const SEEN_KV_KEY = "figma-links:prs-seen";
+
+/** Where merged PRs wait for their card. */
+function prQueueFor(env: Env) {
   return kvJson<QueuedPrLinks[]>(env, PR_QUEUE_KV_KEY, []);
 }
 
@@ -109,12 +115,41 @@ export async function runDevLinksOnEnv(env: Env, request: DevLinksRequest, opts:
 }
 
 /**
- * The morning `figma-dev-links-pr` job on `Env`.
+ * The morning `figma-dev-links-pr` job on `Env`: queue what merged since the
+ * last run (`./feed.ts`), then post the queue's cards (`./queue.ts`).
  *
  * @param env - Worker bindings
- * @param opts - `dryRun` posts nothing and keeps the queue
+ * @param opts - `dryRun` posts nothing, and keeps the queue and the mark
  */
-export function runQueuedPrLinksOnEnv(env: Env, opts: { dryRun?: boolean }): Promise<{ summary: string }> {
+export async function runQueuedPrLinksOnEnv(env: Env, opts: { dryRun?: boolean }): Promise<{ summary: string }> {
+  const fed = await feedOnEnv(env, opts);
+  const posted = await postQueuedPrLinks(env, opts);
+  return { summary: `feed: ${fed} · cards: ${posted.summary}` };
+}
+
+async function feedOnEnv(env: Env, opts: { dryRun?: boolean }): Promise<string> {
+  const target = resolveRepoFor(env, undefined);
+  if (!target.ok) return `no repo: ${target.error}`;
+  const reads = githubLibraryReads(env, target.entry);
+  try {
+    const fed = await feedMergedPrs(
+      {
+        mergedPulls: () => reads.mergedPulls("main"),
+        pullFiles: (n) => reads.pullFiles(n),
+        registry: async () => JSON.parse(await reads.rawFile(REGISTRY_PATH)) as DevLinkRegistry,
+        queue: prQueueFor(env),
+        mark: kvJson<SeenMark | null>(env, SEEN_KV_KEY, null),
+      },
+      opts,
+    );
+    return fed.summary;
+  } catch (err) {
+    rethrowIfBudget(err);
+    return `merged PRs not read — ${err instanceof Error ? err.message : String(err)}`;
+  }
+}
+
+function postQueuedPrLinks(env: Env, opts: { dryRun?: boolean }): Promise<{ summary: string }> {
   let deps: ReturnType<typeof devLinksDepsFor> | undefined;
   return runQueuedPrLinks(
     {
