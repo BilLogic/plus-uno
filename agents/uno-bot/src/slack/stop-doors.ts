@@ -168,8 +168,8 @@ export function homeStopReceipt(cancelled: boolean): string {
  * `/stop`, resolved.
  *
  * Resolved by PERSON, not by channel. The channel-derived key this used to
- * compute was wrong for channel runs: a `/uno-*` run lives in a THREAD under
- * the framing message, so the loop reads `cancel:<channel>:<thread_ts>` while
+ * compute was wrong for channel runs: a slash-command run lives in a THREAD
+ * under the framing message, so the loop reads `cancel:<channel>:<thread_ts>` while
  * `/stop` was writing `cancel:<channel>:<channel>`. The flag landed on a key
  * nothing looks at and `/stop` silently did nothing there. The person's
  * active-run pointer knows the conversation exactly, and it is the one thing

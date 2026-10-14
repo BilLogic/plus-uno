@@ -15,25 +15,25 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **157,267 chars from 15 files**, against an assembled budget of 175,500 (18,233 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 136,883 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **158,217 chars from 15 files**, against an assembled budget of 175,500 (17,283 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 137,833 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,845 (−7,705 ide-only) | 9,845 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 12,784 | 22,658 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,956 | 50,655 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,249 | 56,948 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,911 | 63,904 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,179 | 70,126 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,160 | 75,330 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 81,977 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 88,365 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−1,171 ide-only) | 92,926 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,631 (−4,814 ide-only) | 107,600 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 35,008 (−9,320 ide-only) | 142,650 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 146,118 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 152,634 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 157,267 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,841 (−7,705 ide-only) | 9,841 | 20,000 (constitution) |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 12,784 | 22,654 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,956 | 50,651 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,249 | 56,944 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,911 | 63,900 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,179 | 70,122 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,160 | 75,326 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 81,973 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 88,361 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−1,171 ide-only) | 92,922 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,631 (−4,814 ide-only) | 107,596 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 35,962 (−9,320 ide-only) | 143,600 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 147,068 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 153,584 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 158,217 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -110,7 +110,7 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 
 Routing: match intent to the Use-when column; if ambiguous, ask which capability is meant. Each skill's `SKILL.md` is the IDE face, `bot.md` the Worker face; the IDE loads `references/method.md` on invocation, and the Worker reads it by name through `read_reference` when the face's pointer fires. Which content belongs in which of the three — and the guard that holds the split — is `skills/README.md`.
 
-**A skill's discovery surfaces are generated.** Claude Code, Cursor and Slack each read their own path, and `npm run generate:skill-surfaces` publishes all three from the canonical frontmatter — so edit `skills/<name>/SKILL.md` and regenerate; `npm run check:skill-surfaces` fails the harness gate on drift. What is generated where: `docs/engineering/setup.md` § Generated skill surfaces.
+**A skill's IDE discovery surface is generated.** Claude Code and Cursor read `.claude/skills/`, and `npm run generate:skill-surfaces` publishes a stub there from the canonical frontmatter — so edit `skills/<name>/SKILL.md` and regenerate; `npm run check:skill-surfaces` fails the harness gate on drift. What is generated where: `docs/engineering/setup.md` § Generated skill surfaces.
 
 ## Agents — what skills summon
 
@@ -1118,6 +1118,20 @@ Two limits the Worker now handles, worth knowing because they shape what you wri
 Pillar → channel map (group announcements; **all private — uno-bot must be invited before posting/@here**):
 `Universal` → #plus-universal `C072E8SFLKV` · `Admin` → #plus-admin `C089A3E9CCW` · `Toolkit` → #plus-toolkit `C08925VDFF1` · `Training` → #plus-training `C07L5RZV6DR` · `Marketing` → #plus-marketing `C052BG9NE86`. Tutoring + Help Center: unmapped — flag at retro.
 
+## Surfaces
+
+Every way into uno-bot from Slack. Skills run from a DM or an @mention; the other surfaces each do one thing.
+
+| Surface | What it does |
+|---|---|
+| DM · @mention · a thread uno-bot is in | any ask; every skill runs here |
+| Five message shortcuts (a message → *More actions*) | *Catch me up from here* · *Where was this decided?* · *Help me reply* · *Think harder about this* · *Is this still true?* |
+| Home tab | how to reach uno-bot, what it can do, and the button that stops your running turn |
+| `/grind` · `/chill` | run a question on the deep model, or cheap and short |
+| `/stop` | stop the turn uno-bot is running for you |
+
+Slack delivers slash commands only from a channel or DM composer, so inside a thread *Think harder about this* stands in for `/grind` and the Home tab's button for `/stop`. The app manifest is edited by hand in app settings (ADR-024); `agents/uno-bot/slack-app-manifest.yaml` is the record to diff against.
+
 **Automations registry.** What runs on its own — each morning and end-of-day job, cron and PR gate, with its trigger and owner — is `read_reference` name `docs/engineering/operations`. Read it before answering what runs when, or who owns an automated post.
 
 
@@ -1312,7 +1326,7 @@ Until then this file mandated Slack **mrkdwn** (`*single*` bold, literal `•`, 
 
 - **Reply in-thread by default** (`thread_ts` = the *parent* message's ts). Keeps the channel clean.
 - A fresh top-level post is only for cross-channel announcements (e.g. a review fan-out to #plus-design) — a real new message, not a reply.
-- **A `/uno-*` slash command runs as a public thread.** The Worker posts a framing message in the channel and threads the run under it, so history, the emoji gate, and proposals behave exactly as they do for an @mention.
+- **A `/grind` or `/chill` run is a public thread.** The Worker posts a framing message in the channel and threads the run under it, so history, the emoji gate, and proposals behave exactly as they do for an @mention.
 - **Mention only who must act** (`<@U…>`). Never spray `<!here>` / `<!channel>` / `<!everyone>` — they need installer permission and read as noise. Batch related updates into one message, not five.
 
 ## Writing style (all Slack output)
