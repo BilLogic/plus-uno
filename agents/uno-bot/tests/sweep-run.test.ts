@@ -9,7 +9,7 @@ import assert from "node:assert/strict";
 
 import { isSubrequestBudgetError, SubrequestBudgetError } from "../src/net";
 import type { ScheduledJob } from "../src/scheduled/runs";
-import { itemProposalKey } from "../src/slack/decision-cards";
+import { itemProposal, itemProposalKey } from "../src/slack/decision-cards";
 import { MAX_ITEMS_PER_CARD, MAX_REPLY_PAGES, runSweepJob, SWEEP_CARD_TTL_MS } from "../src/sweep/index";
 import type { SectionCards, SweepSection } from "../src/sweep/sections";
 import { recordSweepResolution } from "../src/sweep/outcomes";
@@ -275,6 +275,25 @@ test("a place is live while ThreadState holds its card, even after the records' 
   h.clock.now = at(30, 13) + SWEEP_CARD_TTL_MS + 60_000;
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 1, "the re-staged card still holds the thread");
+});
+
+// A weekly card staged on the same message — the DS report's, the tidy-up's —
+// lives longer than the fixes beside it, and is not the sweep's: it never
+// keeps the place from the sweep's next report.
+test("a section's card still live on the shared message does not hold the place", async () => {
+  const { page, t, found } = manyEdits("w", 12);
+  const h = sweepHarness({ channels: channelOf(t), sources: [page], detectorReplies: [found], now: at(29, 22) });
+  await runSweepJob(END_OF_DAY, h.deps);
+  h.clock.now = at(30, 13);
+  await runSweepJob(MORNING, h.deps);
+  const card = h.staged[0]!;
+  // A week-long card on the report's thread, staged by another job.
+  const { sweepRun: _sweep, ...theirs } = card;
+  await h.threadState.putProposal({ ...theirs, ...itemProposal(h.posted[0]!.ts, "ds-Button"), ttlMs: 7 * 24 * 3_600_000 });
+
+  h.clock.now = at(30, 13) + SWEEP_CARD_TTL_MS + 60_000;
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 2, "the fixes that waited go up");
 });
 
 test("owner routing falls through all three rungs", async () => {

@@ -1985,8 +1985,10 @@ export async function stageSweepCard(
  * live: a revision or a re-staged card whose record never landed. A card
  * lives in its place's reply thread — a thread place's own thread, or the
  * first card's thread for one posted at a channel's top — so any live sweep
- * card in that thread occupies the place. A failed read leaves the records'
- * answer standing.
+ * card in that thread occupies the place. Only the sweep's own fix cards
+ * (`liveCards`, by `sweepRun`): a section's card on the same message — a
+ * weekly DS or tidy-up card, a follow-up — never holds the place. A failed
+ * read leaves the records' answer standing.
  */
 async function placesLiveInThreadState(
   deps: SweepDeps,
