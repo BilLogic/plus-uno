@@ -66,7 +66,7 @@
   },
   {
     "name": "source_read",
-    "description": "Read-only. Fetch the content of a URL: a Notion page (title + properties including Owner/people + block text), a Figma frame (node name/type, text layers and the comment threads pinned to it or a layer inside it), a Slack Canvas shared into this conversation, a GitHub or raw file, or any web page (text). Use it whenever the request contains or refers to a URL, a linked PRD/doc/guide, or a Figma frame — read it, ground the answer in the returned content, and cite it. A Canvas attachment appears in the user turn as a source URL; read that URL when the request refers to the attachment. Canvas access is conversation-scoped, so the Worker serves only Canvases shared here. 'Who owns / should review this' reads the page's Owner/people property. A failed fetch is reported with its cause. For a repo file you know by path, or a directory listing, github_read is the direct route. An unreachable Notion link: try it as a public web page, then notion_search the same title, and only then give grant steps — only pages IN the PLUS team workspace can be shared with the bot.",
+    "description": "Read-only. Fetch the content of a URL: a Notion page (title + properties including Owner/people + block text), a Figma frame (node name/type, text layers, Dev Mode annotations, fills, and the comment threads pinned to it or a layer inside it; with `since`, what changed in it since that date), a Slack Canvas shared into this conversation, a GitHub or raw file, or any web page (text). Use it whenever the request contains or refers to a URL, a linked PRD/doc/guide, or a Figma frame — read it, ground the answer in the returned content, and cite it. A Canvas attachment appears in the user turn as a source URL; read that URL when the request refers to the attachment. Canvas access is conversation-scoped, so the Worker serves only Canvases shared here. 'Who owns / should review this' reads the page's Owner/people property. A failed fetch is reported with its cause. For a repo file you know by path, or a directory listing, github_read is the direct route. An unreachable Notion link: try it as a public web page, then notion_search the same title, and only then give grant steps — only pages IN the PLUS team workspace can be shared with the bot.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -77,6 +77,10 @@
         "url": {
           "type": "string",
           "description": "The full http(s) URL to read (Notion, Figma, GitHub, or any web page)."
+        },
+        "since": {
+          "type": "string",
+          "description": "Figma links only: a date (2026-10-01) or ISO time. The read then also says what changed in the frame between the version saved at or before it and now. Set it for 'what changed since…' / 'what's new in this frame since…' asks."
         }
       }
     }
