@@ -13,12 +13,14 @@ import {
   NOTION_API,
   notionError,
   notionHeaders,
-  notionUserIdForName,
+  notionUserIdsForNames,
   queryDatabaseRows,
   queryRoadmapCards,
   readPageRow,
   REQUEST_TIMEOUT_MS,
   richText,
+  ROADMAP_MAX_PAGES,
+  USER_LIST_PAGES,
   type OptionList,
 } from "./notion";
 
@@ -114,9 +116,11 @@ async function matchRoadmapCard(env: Env, raw: string): Promise<string> {
 async function matchContributors(env: Env, raw: string[]): Promise<string[]> {
   const ids: string[] = [];
   const unknown: string[] = [];
+  const byName = raw.filter((v) => !extractNotionIds(v).length);
+  const named = byName.length ? await notionUserIdsForNames(env, byName, normalizeName) : new Map<string, string | null>();
   for (const value of raw) {
     const [id] = extractNotionIds(value);
-    const resolved = id ?? (await notionUserIdForName(env, value, normalizeName));
+    const resolved = id ?? named.get(value) ?? null;
     if (resolved) ids.push(resolved);
     else unknown.push(value);
   }
@@ -126,6 +130,76 @@ async function matchContributors(env: Env, raw: string[]): Promise<string[]> {
     );
   }
   return [...new Set(ids)];
+}
+
+/** Stage, the Project card and Contributors as the database holds them. */
+interface MatchedFields {
+  stage?: string;
+  card?: string;
+  contributors?: string[];
+}
+
+/** Exact-match the three checked fields; a MarketplaceQuestion for the first that has no match. */
+async function matchFields(env: Env, input: MarketplaceInput, schema: Record<string, SchemaDef> | null): Promise<MatchedFields> {
+  const out: MatchedFields = {};
+  if (input.stage?.trim() && schema) {
+    const options = (schema.Stage?.select?.options ?? []).map((o) => o.name ?? "").filter(Boolean);
+    out.stage = matchStage(input.stage.trim(), options);
+  }
+  if (input.projectCard?.trim()) out.card = await matchRoadmapCard(env, input.projectCard);
+  const contributors = (input.contributors ?? []).map((c) => c.trim()).filter(Boolean);
+  if (contributors.length) out.contributors = await matchContributors(env, contributors);
+  return out;
+}
+
+/** The most subrequests `marketplaceQuestion` takes: the schema read, the
+ *  Project card (one read for a link, a Roadmap search for a title or number),
+ *  and one member listing for every contributor named. Usually two or three. */
+export const MARKETPLACE_CHECK_COST = 1 + ROADMAP_MAX_PAGES + USER_LIST_PAGES;
+
+/**
+ * The question a publish would come back with over Stage, the Project card or
+ * Contributors — asked before the card is staged; null when all three match.
+ * Reads only. The publish runs the same checks again when it executes.
+ *
+ * @param env - Worker bindings
+ * @param input - The row's fields
+ */
+export async function marketplaceQuestion(env: Env, input: MarketplaceInput): Promise<string | null> {
+  const databaseId = (env.NOTION_MARKETPLACE_DB_ID ?? "").replace(/-/g, "");
+  if (!env.NOTION_API_KEY || !databaseId) return null;
+  try {
+    const schema = input.stage?.trim() ? await marketplaceSchema(env, databaseId) : null;
+    await matchFields(env, input, schema);
+    return null;
+  } catch (err) {
+    if (err instanceof MarketplaceQuestion) return err.message;
+    throw err;
+  }
+}
+
+/** The `notion_create(marketplace)` arguments as the row's fields: one name per
+ *  field, the schema's (`tool-definitions.json`). */
+export function marketplaceInputOf(input: Record<string, unknown>): MarketplaceInput {
+  const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
+  const props = input.properties && typeof input.properties === "object" ? (input.properties as Record<string, unknown>) : {};
+  const field = (name: string) => str(props[name]) || undefined;
+  const people = props.contributors;
+  const contributors = Array.isArray(people)
+    ? people.map(str).filter(Boolean)
+    : str(people).split(",").map((x) => x.trim()).filter(Boolean);
+  return {
+    name: str(input.title),
+    description: field("description") || str(input.summary) || undefined,
+    stage: field("stage"),
+    deploymentUrl: field("deployment_url"),
+    projectCard: field("project_card"),
+    contributors,
+    loom: field("loom"),
+    repoPath: field("repo_path"),
+    localPath: field("local_path"),
+    figmaReplica: field("figma_replica"),
+  };
 }
 
 /** The row already holding this prototype, by name or deployment link. */
@@ -193,18 +267,13 @@ export async function publishMarketplaceRow(env: Env, input: MarketplaceInput): 
   };
   const text = (v: string) => ({ rich_text: richText(v) });
 
+  // Preflight asked these before the card was staged; checked again here, for
+  // what changed in Notion since.
+  const matched = await matchFields(env, input, schema);
   if (input.description?.trim()) set("Description", text(input.description.trim()));
-  if (input.stage?.trim()) {
-    const options = (schema.Stage?.select?.options ?? []).map((o) => o.name ?? "").filter(Boolean);
-    set("Stage", { select: { name: matchStage(input.stage.trim(), options) } });
-  }
-  if (input.projectCard?.trim()) {
-    set("Project card", { relation: [{ id: await matchRoadmapCard(env, input.projectCard) }] });
-  }
-  const contributors = (input.contributors ?? []).map((c) => c.trim()).filter(Boolean);
-  if (contributors.length) {
-    set("Contributors", { people: (await matchContributors(env, contributors)).map((id) => ({ id })) });
-  }
+  if (matched.stage) set("Stage", { select: { name: matched.stage } });
+  if (matched.card) set("Project card", { relation: [{ id: matched.card }] });
+  if (matched.contributors) set("Contributors", { people: matched.contributors.map((id) => ({ id })) });
   if (input.deploymentUrl?.trim()) set("Deployment URL", { url: input.deploymentUrl.trim() });
   if (input.loom?.trim()) set("Loom", { url: input.loom.trim() });
   if (input.repoPath?.trim()) set("Repo path", text(input.repoPath.trim()));

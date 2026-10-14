@@ -270,5 +270,65 @@ test("before a card is staged, a publish missing its stage and deployment link a
   assert.match(ask.ask, /\*stage\*/);
   assert.match(ask.ask, /\*deployment URL\*/);
   assert.doesNotMatch(ask.ask, /\*name\*|\*description\*/);
+  serve(routes());
   assert.equal(await preflight("notion_create", INPUT, { env: ENV }), null);
+});
+
+test("before a card is staged, a Stage the database does not offer is the ask, and nothing is written", async () => {
+  serve(routes());
+  const { preflight } = await import("../src/agent/preflight.js");
+
+  const ask = await preflight("notion_create", { ...INPUT, properties: { ...INPUT.properties, stage: "Polished" } }, { env: ENV });
+
+  assert.ok(ask);
+  assert.match(ask.ask, /Stage "Polished"/);
+  assert.match(ask.ask, /Low-fi · Mid-fi · High-fi/);
+  assert.equal(calls.some((c) => c.method !== "GET" && !c.url.includes("/query")), false, "preflight reads, never writes");
+});
+
+test("before a card is staged, a Project card that is not a Roadmap card is the ask", async () => {
+  serve(routes({ [`GET /pages/${CARD}`]: { body: { ...CARD_PAGE, parent: { type: "database_id", database_id: MARKET } } } }));
+  const { preflight } = await import("../src/agent/preflight.js");
+
+  const ask = await preflight("notion_create", INPUT, { env: ENV });
+
+  assert.ok(ask);
+  assert.match(ask.ask, /Roadmap card/);
+});
+
+test("before a card is staged, a contributor no workspace member is called is the ask", async () => {
+  serve(routes({ "GET /users": { body: { results: [{ id: PERSON, type: "person", name: "Sarah Kim" }], has_more: false } } }));
+  const { preflight } = await import("../src/agent/preflight.js");
+
+  const ask = await preflight(
+    "notion_create",
+    { ...INPUT, properties: { ...INPUT.properties, contributors: ["Sarah Kim", "Nobody Here"] } },
+    { env: ENV },
+  );
+
+  assert.ok(ask);
+  assert.match(ask.ask, /"Nobody Here"/);
+  assert.doesNotMatch(ask.ask, /Sarah Kim/);
+  assert.equal(calls.filter((c) => c.url.includes("/users")).length, 1, "one member listing serves every name");
+});
+
+test("the exact-match checks cost preflight the schema and the card read, and are skipped when the budget cannot cover them", async () => {
+  serve(routes());
+  const { preflight } = await import("../src/agent/preflight.js");
+  const { runMetered, withSubrequestLimit } = await import("../src/net.js");
+  const { MARKETPLACE_CHECK_COST } = await import("../src/integrations/notion-marketplace.js");
+
+  assert.equal(await preflight("notion_create", INPUT, { env: ENV }), null);
+  assert.deepEqual(
+    calls.map((c) => `${c.method} ${new URL(c.url).pathname}`),
+    [`GET /v1/databases/${MARKET}`, `GET /v1/pages/${CARD}`],
+  );
+
+  serve(routes());
+  const polished = { ...INPUT, properties: { ...INPUT.properties, stage: "Polished" } };
+  const skipped = await runMetered(() =>
+    withSubrequestLimit(MARKETPLACE_CHECK_COST - 1, () => preflight("notion_create", polished, { env: ENV })),
+  );
+  assert.equal(skipped, null, "too little budget: execution's own check is the net");
+  assert.deepEqual(calls, []);
 });

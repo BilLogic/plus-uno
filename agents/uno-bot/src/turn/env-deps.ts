@@ -140,6 +140,7 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
   const reporters = wiring.reporters ?? {};
 
   const slack = toolSlackContextFor(request, wiring);
+  const preflightAsked = new Map<string, Promise<{ ask: string } | null>>();
 
   return {
     threadState: wiring.threadState,
@@ -196,7 +197,12 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     reviewDraft: (args) => reviewDraft(selectProvider(env), args),
 
     async preflight(toolName, input) {
-      const ask = await preflight(toolName, input, { env });
+      // The loop and the turn both ask about the same staged call: one Notion
+      // check between them (`agent/preflight.ts`).
+      const key = `${toolName}:${JSON.stringify(input)}`;
+      let pending = preflightAsked.get(key);
+      if (!pending) preflightAsked.set(key, (pending = preflight(toolName, input, { env })));
+      const ask = await pending;
       reporters.onGateAsk?.(ask?.ask ?? null);
       return ask;
     },

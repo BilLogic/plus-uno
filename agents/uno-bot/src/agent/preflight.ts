@@ -21,6 +21,8 @@ import { relayRecipientId } from "../tools/relayed-dm-render";
 import { resolveRepoFor } from "../integrations/github";
 import { issueUpdateFromInput } from "../tools/github-issue-update-render";
 import { checkWorkflowRun } from "../tools/github-workflow-render";
+import { budgetHeadroom } from "../net";
+import { MARKETPLACE_CHECK_COST, marketplaceInputOf, marketplaceQuestion } from "../integrations/notion-marketplace";
 
 export interface PreflightCtx {
   env: Env;
@@ -97,6 +99,20 @@ export async function preflight(
       // (`agent/placeholder.ts`).
       const placeholder = placeholderRefusal(toolName, input);
       if (placeholder) return { ask: placeholder };
+
+      // Stage, the Project card and Contributors are exact-matched against
+      // Notion here, so the question comes back before a card is staged. Run
+      // only when the budget covers the worst case (`MARKETPLACE_CHECK_COST`,
+      // usually two or three reads); otherwise, or when Notion fails, the
+      // publish's own check at execution asks instead.
+      if (surface === "marketplace" && budgetHeadroom().subrequests >= MARKETPLACE_CHECK_COST) {
+        try {
+          const question = await marketplaceQuestion(ctx.env, marketplaceInputOf(input));
+          if (question) return { ask: question };
+        } catch (err) {
+          console.error(`[preflight] marketplace check skipped: ${err instanceof Error ? err.message : String(err)}`);
+        }
+      }
 
       const sections = Array.isArray(input.sections) ? input.sections : [];
       const sectionStrings = sections.flatMap((s) => {

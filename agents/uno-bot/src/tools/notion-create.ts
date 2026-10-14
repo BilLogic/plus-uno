@@ -12,7 +12,7 @@ import type { SlackContext } from "../types";
 import { postMessage } from "../slack/api";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { notionCreate, type NotionCreateSurface, type PrdSection } from "../integrations/notion";
-import { MarketplaceQuestion, publishMarketplaceRow } from "../integrations/notion-marketplace";
+import { MarketplaceQuestion, marketplaceInputOf, publishMarketplaceRow } from "../integrations/notion-marketplace";
 import { requesterName } from "./requester-name";
 
 const SURFACES = new Set<NotionCreateSurface>(["prd", "intake", "decision", "marketplace"]);
@@ -137,26 +137,10 @@ async function publishToMarketplace(
   title: string,
   slack: SlackContext,
 ): Promise<string> {
-  const props =
-    input.properties && typeof input.properties === "object" ? (input.properties as Record<string, unknown>) : {};
-  // One name per field, the schema's (`tool-definitions.json`).
-  const field = (name: string) => asString(props[name]);
-  const people = props.contributors;
-  const contributors = Array.isArray(people)
-    ? asStringArray(people)
-    : asString(people).split(",").map((x) => x.trim()).filter(Boolean);
   try {
     const row = await publishMarketplaceRow(env, {
+      ...marketplaceInputOf(input),
       name: title,
-      description: field("description") || asString(input.summary) || undefined,
-      stage: field("stage") || undefined,
-      deploymentUrl: field("deployment_url") || undefined,
-      projectCard: field("project_card") || undefined,
-      contributors,
-      loom: field("loom") || undefined,
-      repoPath: field("repo_path") || undefined,
-      localPath: field("local_path") || undefined,
-      figmaReplica: field("figma_replica") || undefined,
       onBehalfOf: await requesterName(env, slack),
     });
     const verb = row.status === "updated" ? "Updated" : "Created";

@@ -1120,28 +1120,45 @@ export async function notionUserName(env: Env, userId: string): Promise<string |
 }
 
 /** Notion users pages read looking for a name. */
-const USER_LIST_PAGES = 3;
+export const USER_LIST_PAGES = 3;
 
 /**
  * The one Notion person whose name, compared by `normalise`, is this one; null
  * for none or several. Up to `USER_LIST_PAGES` subrequests.
  */
 export async function notionUserIdForName(env: Env, name: string, normalise: (s: string) => string): Promise<string | null> {
+  return (await notionUserIdsForNames(env, [name], normalise)).get(name) ?? null;
+}
+
+/**
+ * Each name's one Notion person, compared by `normalise`; null for none or
+ * several. One listing serves every name: up to `USER_LIST_PAGES` subrequests.
+ */
+export async function notionUserIdsForNames(
+  env: Env,
+  names: readonly string[],
+  normalise: (s: string) => string,
+): Promise<Map<string, string | null>> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
-  const wanted = normalise(name);
-  if (!wanted) return null;
-  const hits = new Set<string>();
-  let cursor: string | undefined;
-  for (let page = 0; page < USER_LIST_PAGES; page++) {
-    const q = new URLSearchParams({ page_size: "100", ...(cursor ? { start_cursor: cursor } : {}) });
-    const res = await countedFetch(`${NOTION_API}/users?${q.toString()}`, { headers: notionHeaders(env) });
-    const data = (await res.json()) as { results?: { id?: string; name?: string; type?: string }[]; has_more?: boolean; next_cursor?: string | null; message?: string; code?: string };
-    if (!res.ok) throw notionError(res.status, data, "user list failed");
-    for (const u of data.results ?? []) if (u.id && u.type === "person" && u.name && normalise(u.name) === wanted) hits.add(u.id);
-    if (!data.has_more || !data.next_cursor) break;
-    cursor = data.next_cursor;
+  const wanted = names.map((n) => [n, normalise(n)] as const).filter(([, w]) => w);
+  const hits = new Map(names.map((n) => [n, new Set<string>()] as const));
+  if (wanted.length) {
+    let cursor: string | undefined;
+    for (let page = 0; page < USER_LIST_PAGES; page++) {
+      const q = new URLSearchParams({ page_size: "100", ...(cursor ? { start_cursor: cursor } : {}) });
+      const res = await countedFetch(`${NOTION_API}/users?${q.toString()}`, { headers: notionHeaders(env) });
+      const data = (await res.json()) as { results?: { id?: string; name?: string; type?: string }[]; has_more?: boolean; next_cursor?: string | null; message?: string; code?: string };
+      if (!res.ok) throw notionError(res.status, data, "user list failed");
+      for (const u of data.results ?? []) {
+        if (!u.id || u.type !== "person" || !u.name) continue;
+        const key = normalise(u.name);
+        for (const [n, w] of wanted) if (w === key) hits.get(n)!.add(u.id);
+      }
+      if (!data.has_more || !data.next_cursor) break;
+      cursor = data.next_cursor;
+    }
   }
-  return hits.size === 1 ? [...hits][0]! : null;
+  return new Map(names.map((n) => [n, hits.get(n)!.size === 1 ? [...hits.get(n)!][0]! : null] as const));
 }
 
 /**
