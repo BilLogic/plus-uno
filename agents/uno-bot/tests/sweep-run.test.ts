@@ -11,7 +11,7 @@ import { isSubrequestBudgetError, SubrequestBudgetError } from "../src/net";
 import type { ScheduledJob } from "../src/scheduled/runs";
 import { itemProposalKey } from "../src/slack/decision-cards";
 import { MAX_ITEMS_PER_CARD, MAX_REPLY_PAGES, runSweepJob, SWEEP_CARD_TTL_MS } from "../src/sweep/index";
-import type { FollowUpCards, SweepFollowUps } from "../src/sweep/run";
+import type { SectionCards, SweepSection } from "../src/sweep/sections";
 import { recordSweepResolution } from "../src/sweep/outcomes";
 import { resolveSignal } from "../src/gate/index";
 import { recordProposalEvents, verdictEvents } from "../src/usage/index";
@@ -24,6 +24,7 @@ import {
   reply,
   sweepHarness,
   ts,
+  UNIVERSAL,
   UNO_BOT,
   type FakeChannel,
 } from "./helpers/sweep-harness";
@@ -970,21 +971,23 @@ test("a dry run returns the findings and the card text, and writes and posts not
   assert.equal((await real.store.pendingFindings()).length, 1, "the queue is untouched");
 });
 
-// ── A channel's card follow-ups on its report ────────────────────────────────
+// ── A place's sections on its report ────────────────────────────────────────
 
-/** One channel's handed-off follow-ups, as the commitment job leaves them,
- *  and what the morning did with them. */
-function handedOff(place: FollowUpCards) {
+/** One job's handed-off cards for one place, as the job leaves them, and what
+ *  the morning did with them. */
+function handedOff(place: SectionCards, source = place.source) {
   const calls: string[] = [];
   let waiting = true;
-  const port: SweepFollowUps = {
-    waiting: async () => (waiting ? [place] : []),
-    claim: async (_place, cardKey) => void calls.push(`claim ${cardKey}`),
-    claimed: async () => null,
-    unclaim: async () => {},
-    postAlone: async () => void ((waiting = false), calls.push("alone")),
-    posted: async (_place, shown) => void ((waiting = false), calls.push(`posted ${shown.join(",")}`)),
-    notPosted: async () => void ((waiting = false), calls.push("not posted")),
+  let claimedBy: string | null = null;
+  const port: SweepSection = {
+    source,
+    waiting: async () => (waiting && !claimedBy ? [place] : []),
+    claim: async (_place, cardKey) => void ((claimedBy = cardKey), calls.push(`claim ${cardKey}`)),
+    claimed: async (cardKey) => (claimedBy === cardKey ? place : null),
+    unclaim: async () => void (claimedBy = null),
+    stranded: async () => (claimedBy && waiting && claimedBy.includes(":sections:") ? [{ cardKey: claimedBy, place }] : []),
+    posted: async (_place, shown, report) => void ((waiting = false), calls.push(`posted ${shown.join(",")} on ${report.ts}`)),
+    notPosted: async (_place, why) => void ((waiting = false), calls.push(`not posted: ${why}`)),
   };
   return { port, calls };
 }
@@ -1005,9 +1008,11 @@ async function fixAt(where: { channel: string; channelKind: "public" | "dm" }) {
   return h;
 }
 
-const cardFor = (channel: string, owners: string[]): FollowUpCards => ({
+const cardFor = (channel: string, owners: string[]): SectionCards => ({
+  source: "follow-ups",
   date: "2026-09-30",
   channel,
+  threadTs: null,
   cards: [{ person: owners[0]!, item: { id: "card-a", title: "Card a", body: "Worked for a week.", owners: owners.map((slack) => ({ slack })), open: { label: "Open card", url: "https://www.notion.so/a" } } }],
   says: () => "A Roadmap card has been worked for over a week with no Contributor.",
 });
@@ -1015,7 +1020,7 @@ const cardFor = (channel: string, owners: string[]): FollowUpCards => ({
 test("a follow-up card's co-owners each get a bullet on the channel's report, as its owner does", async () => {
   const h = await fixAt({ channel: DESIGN, channelKind: "public" });
   const { port, calls } = handedOff(cardFor(DESIGN, ["U0BEA", "U0MAYA"]));
-  h.deps.followUps = port;
+  h.deps.sections = [port];
   await runSweepJob(MORNING, h.deps);
 
   assert.equal(h.posted.length, 1);
@@ -1023,18 +1028,124 @@ test("a follow-up card's co-owners each get a bullet on the channel's report, as
   assert.deepEqual(head.map((l) => /^• <@(U[A-Z0-9]+)>/.exec(l)![1]), ["U0ADE", "U0BEA", "U0MAYA"]);
   assert.equal(head[2], "• <@U0MAYA>, a Roadmap card has been worked for over a week with no Contributor.");
   // Claimed before it posted, staged once it did.
-  assert.deepEqual(calls, [`claim ${h.posted[0]!.cardKey}`, "posted card-a"]);
+  assert.deepEqual(calls, [`claim ${h.posted[0]!.cardKey}`, `posted card-a on ${h.posted[0]!.ts}`]);
 });
 
 test("a DM's report with a follow-up on it tags nobody", async () => {
   const h = await fixAt({ channel: "D0DM", channelKind: "dm" });
   const { port, calls } = handedOff(cardFor("D0DM", ["U0BEA"]));
-  h.deps.followUps = port;
+  h.deps.sections = [port];
   await runSweepJob(MORNING, h.deps);
 
   assert.equal(h.posted.length, 1);
   assert.equal(h.posted[0]!.channel, "D0DM");
   assert.doesNotMatch(h.posted[0]!.text, /<@/);
   assert.doesNotMatch(JSON.stringify(h.posted[0]!.blocks), /<@/);
-  assert.equal(calls.at(-1), "posted card-a");
+  assert.equal(calls.at(-1), `posted card-a on ${h.posted[0]!.ts}`);
+});
+
+/** A section of `n` cards nobody owns, at a channel's top: a weekly report. */
+const weekly = (channel: string, n: number, whole = true): SectionCards => ({
+  source: "weekly",
+  date: "2026-09-30",
+  channel,
+  threadTs: null,
+  cards: Array.from({ length: n }, (_, i) => ({
+    person: null,
+    item: { id: `weekly:${i}`, title: `Component ${i}`, body: "Code and Figma disagree.", open: { label: "Open", url: `https://example.com/${i}` } },
+  })),
+  ...(whole ? { whole: true } : {}),
+  lines: ["The rest of the library agrees."],
+  says: (ids) => `The weekly check found ${ids.length} disagreement(s).`,
+});
+
+/** A quiet morning: nothing of the sweep's own is due. */
+const quietMorning = () => sweepHarness({ channels: {}, now: at(30, 13) });
+
+test("a place the sweep has nothing for gets its sections alone, on one message", async () => {
+  const h = quietMorning();
+  const follow = handedOff(cardFor(UNIVERSAL, ["U0BEA"]));
+  const report = handedOff(weekly(UNIVERSAL, 2));
+  h.deps.sections = [follow.port, report.port];
+  await runSweepJob(MORNING, h.deps);
+
+  assert.equal(h.posted.length, 1, "one message for the place");
+  const [post] = h.posted;
+  assert.equal(post!.channel, UNIVERSAL);
+  assert.equal(post!.threadTs, null);
+  assert.equal(post!.cardKey, "2026-09-30:sections:C0UNIVERSAL:");
+  assert.match(post!.text, /• <@U0BEA>, a Roadmap card/);
+  assert.match(post!.text, /The weekly check found 2 disagreement\(s\)\./);
+  assert.match(post!.text, /The rest of the library agrees\./);
+  // Its record is kept before either section stages, so Review opens.
+  assert.ok(await h.threadState.getReport(post!.ts));
+  assert.deepEqual(follow.calls, [`claim ${post!.cardKey}`, `posted card-a on ${post!.ts}`]);
+  assert.deepEqual(report.calls, [`claim ${post!.cardKey}`, `posted weekly:0,weekly:1 on ${post!.ts}`]);
+});
+
+test("a whole section goes first and is never split; past the ten it says how many show", async () => {
+  const h = await fixAt({ channel: DESIGN, channelKind: "public" });
+  const report = handedOff({ ...weekly(DESIGN, 12), lines: [] });
+  h.deps.sections = [report.port];
+  await runSweepJob(MORNING, h.deps);
+
+  assert.equal(h.posted.length, 1);
+  // Nine of the report's, one slot kept for the fix.
+  assert.equal(report.calls.at(-1), `posted ${Array.from({ length: 9 }, (_, i) => `weekly:${i}`).join(",")} on ${h.posted[0]!.ts}`);
+  assert.match(h.posted[0]!.text, /The weekly check found 12 disagreement\(s\)\. Showing 9 of 12\./);
+  assert.match(h.posted[0]!.text, /<@U0ADE>/, "the fix still has its bullet");
+});
+
+test("a section's cards nobody owns share the carousel when not whole", async () => {
+  const h = quietMorning();
+  const report = handedOff(weekly(DESIGN, 12, false));
+  h.deps.sections = [report.port];
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 1);
+  assert.match(h.posted[0]!.text, /Showing 10 of 12\./);
+});
+
+test("a thread's sections go up in that thread", async () => {
+  const h = quietMorning();
+  const report = handedOff({ ...weekly(DESIGN, 1), threadTs: "1759000000.000100" });
+  h.deps.sections = [report.port];
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 1);
+  assert.equal(h.posted[0]!.threadTs, "1759000000.000100");
+  assert.equal(h.posted[0]!.cardKey, "2026-09-30:sections:C0DESIGN:1759000000.000100");
+});
+
+test("sections are never posted in #uno-bot: they go back to their job", async () => {
+  const h = quietMorning();
+  const report = handedOff(weekly(UNO_BOT, 1));
+  h.deps.sections = [report.port];
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 0);
+  assert.deepEqual(report.calls, ["not posted: never posted in #uno-bot"]);
+});
+
+test("sections alone that a stop left unfinished are finished as they posted, never posted twice", async () => {
+  const h = quietMorning();
+  const report = handedOff(weekly(UNIVERSAL, 1));
+  h.deps.sections = [report.port];
+  // Slack took the post; the job heard nothing back.
+  h.faults.post = new SubrequestBudgetError(48);
+  await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
+  assert.equal(h.posted.length, 1);
+  assert.deepEqual(report.calls, [`claim ${h.posted[0]!.cardKey}`]);
+
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 1, "found by its tag, not posted again");
+  assert.equal(report.calls.at(-1), `posted weekly:0 on ${h.posted[0]!.ts}`);
+  assert.ok(await h.threadState.getReport(h.posted[0]!.ts));
+});
+
+test("a section that cannot be afforded defers the morning before anything posts", async () => {
+  const h = quietMorning();
+  const report = handedOff({ ...weekly(UNIVERSAL, 1), cost: { subrequests: 5, d1Queries: 0 } });
+  h.deps.sections = [report.port];
+  h.headroom.subrequests = 6;
+  await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
+  assert.equal(h.posted.length, 0);
+  assert.deepEqual(report.calls, []);
 });

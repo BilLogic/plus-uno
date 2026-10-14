@@ -23,6 +23,7 @@ import { commitmentThreadHookFor, runCommitmentNudgesOnEnv } from "../commitment
 import { cardTodoNoteHookFor, cardTodoThreadHookFor, morningFollowUpsFor, runCardFollowThroughOnEnv } from "../follow-through/env";
 import type { SweepThread } from "../sweep/finding";
 import type { SweepDeps } from "../sweep/run";
+import type { SweepSection } from "../sweep/sections";
 import { fileDriftSinkFor, runDriftAsksOnEnv, runDriftRecheckOnEnv } from "../figma-drift/env";
 import { runBackstopOnEnv } from "../figma-notify/env";
 import { runTidyPostOnEnv, runTidyReadOnEnv } from "../figma-tidy/env";
@@ -56,17 +57,26 @@ const sweepBody: JobBody = async (env, job, ctx) => {
     job.kind === "sweep-post" || job.kind === "sweep-dms" || job.kind === "sweep-figma-comments" || job.kind === "sweep-figma-post"
       ? undefined
       : fileDriftSinkFor(env);
-  // The morning's post takes the card follow-ups handed off for a channel's
-  // top, so the channel gets one message (src/follow-through/).
-  const followUps = job.kind === "sweep-post" ? morningFollowUpsFor(env, ctx) : undefined;
+  // The morning's post takes what the other morning jobs handed off for a
+  // place, so each place gets one message (src/sweep/sections.ts).
+  const sections = job.kind === "sweep-post" ? morningSectionsFor(env, ctx) : undefined;
   const report = await runSweepJobOnEnv(env, job, ctx, {
     ...sweepHooks(env, job, ctx),
     ...(fileDrift ? { fileDrift } : {}),
-    ...(followUps ? { followUps } : {}),
+    ...(sections?.length ? { sections } : {}),
   });
   console.log(`[sweep] ${job.key}: ${report.summary}`);
   return report;
 };
+
+/**
+ * What the morning's other jobs handed the sweep's post, one port a job: the
+ * card follow-ups (src/sweep/sections.ts). Each is absent without its
+ * bindings or the run's storage.
+ */
+export function morningSectionsFor(env: Env, ctx: JobContext): SweepSection[] {
+  return [morningFollowUpsFor(env, ctx)].filter((s): s is SweepSection => !!s);
+}
 
 /** The hooks a sweep job feeds: per thread for a channel read, per note for
  *  the notes job, per DM thread for the DM job, none otherwise. */

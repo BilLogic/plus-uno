@@ -2186,7 +2186,7 @@ describe("the morning's one message a channel", () => {
     const nudged = await m.run();
     assert.equal(m.posts.length, 0, "the commitment job posts none of a channel's top cards");
     assert.ok(nudged.actions.length > 0);
-    h.deps.followUps = followUpsForSweep(m.due, now, utcDay(now));
+    h.deps.sections = [followUpsForSweep(m.due, now, utcDay(now))];
     await runSweepJob(SWEEP_POST, h.deps);
     return { m, stage };
   }
@@ -2225,15 +2225,17 @@ describe("the morning's one message a channel", () => {
     assert.equal((await stage.places(utcDay(now))).size, 0, "the hand-off is spent");
   });
 
-  it("a morning with only the cards posts them as one message, as they read before", async () => {
+  it("a morning with only the cards posts them as the sweep's one message, as they read before", async () => {
     const now = at(30, 13);
     const { store, rm } = await beasCards();
     const h = await fixesAtTop(0, now);
     const { m } = await morningOf(store, rm, h, now);
-    assert.equal(h.posted.length, 0);
-    assert.equal(m.posts.length, 1);
-    assert.match(m.posts[0]!.text, /^<@U0BEA>, a Roadmap card has been worked for over a week with no Contributor\./);
-    assert.equal(only(store).nudgeTs, m.posts[0]!.ts);
+    assert.equal(m.posts.length, 0, "the sweep's post puts them up");
+    assert.equal(h.posted.length, 1);
+    assert.match(h.posted[0]!.text, /^<@U0BEA>, a Roadmap card has been worked for over a week with no Contributor\./);
+    assert.equal(m.staged.length, 1);
+    assert.equal(m.staged[0]!.item?.messageTs, h.posted[0]!.ts);
+    assert.equal(only(store).nudgeTs, h.posted[0]!.ts);
   });
 
   it("past ten cards: ten show, filled round-robin, and each bullet says how many wait", async () => {
@@ -2265,7 +2267,7 @@ describe("the morning's one message a channel", () => {
     const stage = handOffIn(createInMemoryRunnerStorage());
     const m = morning(store, rm, now, { handOff: stage, threadState: h.threadState });
     await m.run();
-    h.deps.followUps = followUpsForSweep(m.due, now, utcDay(now));
+    h.deps.sections = [followUpsForSweep(m.due, now, utcDay(now))];
     // Slack took the post; the job heard nothing back.
     h.faults.post = new SubrequestBudgetError(38);
     await assert.rejects(runSweepJob(SWEEP_POST, h.deps), SubrequestBudgetError);
@@ -2273,7 +2275,7 @@ describe("the morning's one message a channel", () => {
     assert.equal(m.staged.length, 0);
     assert.equal(only(store).state, "open", "not asked until it is staged");
 
-    h.deps.followUps = followUpsForSweep(m.due, now, utcDay(now));
+    h.deps.sections = [followUpsForSweep(m.due, now, utcDay(now))];
     await runSweepJob(SWEEP_POST, h.deps);
     assert.equal(h.posted.length + m.posts.length, 1, "nothing goes up twice");
     const [post] = h.posted;

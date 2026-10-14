@@ -82,7 +82,7 @@ import type { ProposalCard } from "../turn/index";
 import type { PendingProposal, ProposalOperation, ProposalSelect, ReportItem, ReviewChoice, ThreadState } from "../thread-state/index";
 import { decisionReport, itemProposal, markNotStaged, MAX_REPORT_ITEMS, reportRecord, roundRobin, type ReportStore } from "../slack/decision-cards";
 import type { RunnerStorage } from "../runner/storage";
-import type { FollowUpCards, SweepFollowUps } from "../sweep/run";
+import { FOLLOW_UPS_SECTION, isAloneKey, type SectionCards, type SweepSection } from "../sweep/sections";
 import { renderProposalCard } from "../slack/proposal-render";
 import { reminderBlocks, TAP_REFUSED, type TapAnswer } from "../commitments/copy";
 import { addWorkingDays, commitmentDueAt, endOfEtDay, etDayOf, maySnooze, TEXT_KEEP_MS } from "../commitments/due";
@@ -1098,13 +1098,16 @@ const HANDED_OFF = "handed to the sweep's morning post";
  * @param now - Now, epoch ms
  * @param runDate - The morning's date
  */
-export function followUpsForSweep(deps: DueDeps, now: number, runDate: string): SweepFollowUps {
+export function followUpsForSweep(deps: DueDeps, now: number, runDate: string): SweepSection {
   const handOff = deps.handOff;
   const dateOf = (cardKey: string) => cardKey.slice(0, 10);
-  const cardsOf = (date: string, group: FollowUpGroup): FollowUpCards => ({
+  const cardsOf = (date: string, group: FollowUpGroup): SectionCards => ({
+    source: FOLLOW_UPS_SECTION,
     date,
     channel: group.to.channel,
+    threadTs: group.to.threadTs,
     cards: group.asked.map((a) => ({ person: a.c.promiserId, item: a.item })),
+    ttlMs: FOLLOW_THROUGH_CARD_TTL_MS,
     says(ids) {
       const mine = group.asked.filter((a) => ids.includes(a.c.id));
       return followUpParent(
@@ -1114,13 +1117,14 @@ export function followUpsForSweep(deps: DueDeps, now: number, runDate: string): 
     },
   });
   /** The place's cards, out of the hand-off; null when already taken. */
-  const take = async (place: FollowUpCards): Promise<FollowUpGroup | null> => {
+  const take = async (place: SectionCards): Promise<FollowUpGroup | null> => {
     const kept = (await handOff?.places(place.date))?.get(place.channel);
     if (!kept) return null;
     await handOff!.clear(place.date, place.channel);
     return kept.group;
   };
   return {
+    source: FOLLOW_UPS_SECTION,
     async waiting() {
       const places = (await handOff?.places(runDate)) ?? new Map<string, HandedOff>();
       return [...places.values()].filter((p) => !p.claimedBy).map((p) => cardsOf(runDate, p.group));
@@ -1132,11 +1136,9 @@ export function followUpsForSweep(deps: DueDeps, now: number, runDate: string): 
       return place ? cardsOf(date, place.group) : null;
     },
     unclaim: (cardKey) => handOff?.unclaim(dateOf(cardKey), cardKey) ?? Promise.resolve(),
-    async postAlone(place) {
-      const group = await take(place);
-      if (!group) return;
-      const actions = await postGroup(deps, group, now, runDate);
-      await noteUntagged(deps, group, actions);
+    async stranded(date) {
+      const places = [...((await handOff?.places(date))?.values() ?? [])];
+      return places.flatMap((p) => (p.claimedBy && isAloneKey(p.claimedBy) ? [{ cardKey: p.claimedBy, place: cardsOf(date, p.group) }] : []));
     },
     async posted(place, shown, posted) {
       const group = await take(place);

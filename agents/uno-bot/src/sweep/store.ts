@@ -150,8 +150,11 @@ export interface CardSnapshot {
   items: PendingFinding[];
   /** `operationsDigest` of the card's operations, also on its Slack tag. */
   digest: string;
-  /** The card follow-ups it showed beside its fixes, by item id
-   *  (`SweepFollowUps`): what a retry stages again. */
+  /** Each section's cards it showed beside its fixes, by section and item id
+   *  (`./sections.ts`): what a retry stages again. */
+  sections?: Record<string, string[]>;
+  /** The card follow-ups it showed, kept by a report from before the
+   *  sections: read as the follow-ups' section. */
   followUps?: string[];
 }
 

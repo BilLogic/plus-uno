@@ -140,7 +140,7 @@ export async function runSweepJobOnEnv(
   env: Env,
   job: ScheduledJob,
   opts: JobContext,
-  extra: Pick<SweepDeps, "onThread" | "onNote" | "onDmThread" | "fileDrift" | "followUps"> = {},
+  extra: Pick<SweepDeps, "onThread" | "onNote" | "onDmThread" | "fileDrift" | "sections"> = {},
 ): Promise<SweepJobReport | { summary: string }> {
   if (!env.USAGE_DB || !env.HARNESS_KV) {
     // No cursor store means every run would re-read the day; nothing is safer.
