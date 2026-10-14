@@ -332,8 +332,7 @@ export const TOOL_TABLE = {
   github_issue_create: {
     access: "gated",
     retrieval: false,
-    // Triage is uno-maintain's, through the labels the Worker applies — not a
-    // review heads-up in the design channel.
+    // Triage is uno-maintain's, through the labels the Worker applies.
     gate: {
       // The card adds the resolved repo to this verb, and its visibility as
       // the repo-visibility caveat — read, and never a literal here.
@@ -431,9 +430,10 @@ export function isToolName(name: string): name is ToolName {
  * The row for `name`, or null when `name` names no tool.
  *
  * The readers' one door onto the table: `agent/loop.ts` asks for `access`,
- * `agent/confidence.ts` for `retrieval`. They take a `string` — a tool name arrives from the model — so the lookup is
- * the membership guard as well, and a name nobody registered answers null
- * rather than reading as a row of falses.
+ * `agent/confidence.ts` for `retrieval`. They take a `string` — a tool name
+ * arrives from the model — so the lookup is the membership guard as well, and
+ * a name nobody registered answers null rather than reading as a row of
+ * falses.
  */
 export function rowFor(name: string): ToolRow | null {
   return isToolName(name) ? TOOL_TABLE[name] : null;

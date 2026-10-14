@@ -227,8 +227,9 @@ UNO_BOT_CHANNEL_ID = "C0ARJ2A3A69"
 # /debug/slack-stream) may post raw test messages besides a DM and the alert
 # channel. Leave blank → DMs and the alert channel only.
 UNO_BOT_SANDBOX_CHANNEL = "C0B4QBWAUJU"
-# #plus-design channel id — the design team's channel, where the Figma Review
-# cards post when FIGMA_ASK_CHANNEL_ID is unset.
+# #plus-design channel id — the design team's channel. Read by the Figma Review
+# cards when FIGMA_ASK_CHANNEL_ID is unset, figma-comments, the sweeps,
+# follow-through, and the sweep_share_post allowlist.
 PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
 # Where a change asked for in a Figma comment posts its lead and Review card
 # (src/figma-ask/env.ts), and where the weekly Figma tidy-up posts its Review

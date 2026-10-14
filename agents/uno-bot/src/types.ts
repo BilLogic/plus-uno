@@ -109,8 +109,9 @@ export interface Env {
   NOTION_RESEARCH_PAPERS_DB_ID?: string;
   /** Banners — notion_search scope "banners". */
   NOTION_BANNERS_DB_ID?: string;
-  // #plus-design — the design team's channel, which the Figma Review cards
-  // and several sweeps use.
+  // #plus-design — the design team's channel. Read by the Figma Review cards
+  // when FIGMA_ASK_CHANNEL_ID is unset, figma-comments, the sweeps,
+  // follow-through, and the sweep_share_post allowlist.
   PLUS_DESIGN_CHANNEL_ID?: string;
   /** Where Figma Review cards post (`figma-ask/env.ts` `figmaReviewChannel`):
    *  a change asked for in a Figma comment (`figma-ask/`) and the weekly
