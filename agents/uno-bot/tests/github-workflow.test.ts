@@ -71,7 +71,7 @@ const RUNS = (repo: string, file: string) => `https://github.com/${repo}/actions
 
 // ── preflight: nothing unlisted is staged ─────────────────────────────────────
 
-const ctx = { env: { GITHUB_REPO: HARNESS, GITHUB_REPOS: REPOS } as Env, prd: null };
+const ctx = { env: { GITHUB_REPO: HARNESS, GITHUB_REPOS: REPOS } as Env };
 
 test("a workflow off the repo's list is refused before staging, naming the ones allowed there", async () => {
   const ask = await preflight("github_workflow_run", { repo: BLUEPRINT, workflow: "live-schema.yml" }, ctx);

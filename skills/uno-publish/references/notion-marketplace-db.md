@@ -34,6 +34,7 @@ fetch the schema and exact-match before every write (see `notion.md`).
 | **Loom** | url | `loomVideoUrl` | null → empty |
 | **Repo path** | rich_text | `repoPath` | always ends `/` |
 | **Local path** | rich_text | `localPath` | app route, e.g. `/1025` |
+| **Figma replica** | url | — | optional; the person-made Figma replica of the prototype |
 | **Upvotes** | number | `upvotes` | new entries = 0 |
 | **Last updated** | last_edited_time | `lastUpdated` | Notion-managed |
 
@@ -59,7 +60,7 @@ Landing page (`/`) redirects to **Storybook** (`/storybook/`). Discovery lives i
 1. Build the entry (title, description, stage, repo/local paths).
 2. Set **Deployment URL** to the live Netlify URL (preview or production).
 3. Link **Project card** when a Roadmap card exists (unlocks Product Pillar rollup).
-4. Write the Notion row (no dual-write to a marketplace UI).
+4. Write the Notion row: update the row already carrying the prototype's name or Deployment URL, create one only when none does. The rollups fill themselves from **Project card**.
 5. Keep `prototypes-data.js` in sync **only** when the prototype is embedded in the Netlify SPA router.
 
 ## Entry page body (template shape)

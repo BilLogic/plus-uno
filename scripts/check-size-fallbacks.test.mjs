@@ -24,7 +24,7 @@ test('a disagreeing size fallback in a fixture tree is a finding', () => {
     {
       'design-system/src/tokens/_spacing.scss': ':root { --size-gap: 8px; }\n',
       'design-system/src/a.scss': '.a { gap: var(--size-gap, 16px); }\n',
-      'docs/evals/size-fallback-baseline.json': BASELINE,
+      'scripts/baselines/size-fallback-baseline.json': BASELINE,
     },
     { git: true },
   );
@@ -43,7 +43,7 @@ test('an empty token directory fires the sentinel floor, not a clean sweep', () 
   const { root, done } = policyTree(
     {
       'design-system/src/a.scss': '.a { gap: var(--size-gap, 16px); }\n',
-      'docs/evals/size-fallback-baseline.json': BASELINE,
+      'scripts/baselines/size-fallback-baseline.json': BASELINE,
     },
     { git: true },
   );

@@ -3,7 +3,7 @@
 //
 // #288 moves this Worker to another Cloudflare account, which changes the
 // hostname. Before this check the host was written out in five places, and the
-// cost of missing one is silent: an eval run pointed at the OLD deployment
+// cost of missing one is silent: a run pointed at the OLD deployment
 // scores the wrong Worker and reports a clean pass. That is the failure #249
 // already cost this repo, and the reason the build stamp now derives from the
 // deploy instead of being typed.
@@ -51,7 +51,7 @@ export const ALLOWED = new Map([
   ],
   [
     "agents/uno-bot/slack-app-manifest.yaml",
-    "the Slack app's own declared config — 9 command URLs, the OAuth redirect, and " +
+    "the Slack app's own declared config — 3 command URLs, the OAuth redirect, and " +
       "the events and interactivity request URLs. NOT scripted: `pkce_enabled` " +
       "permanently disables apps.manifest.update for this app, so every push path " +
       "fails with cannot_disable_once_enabled (ADR-024). The file is the repo's record " +
@@ -59,19 +59,15 @@ export const ALLOWED = new Map([
       "editor, then confirming with `npm run slack:diff`, which reads the live app. " +
       "That makes it the slowest step of the #288 cutover, not the easiest",
   ],
-  [
-    "agents/uno-bot/slack-app-manifest-commands.yaml",
-    "the command half of the same manifest, same reason",
-  ],
 ]);
 
 /**
  * Recorded history, which must NOT be rewritten when the host changes.
  *
- * An eval run artifact says which Worker it scored. Editing that to the new
+ * A recorded run says which Worker it scored. Editing that to the new
  * host would be falsifying the record — the run really did hit the old one.
  */
-const HISTORY = [/^docs\/evals\/runs\//, /^docs\/plans\//];
+const HISTORY = [/^docs\/knowledge\/archive\//, /^docs\/plans\//];
 
 const SKIP_DIRS = new Set(["node_modules", ".git", "dist", "storybook-static", ".test-build"]);
 

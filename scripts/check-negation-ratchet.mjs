@@ -158,13 +158,11 @@
  * the loader's own root, and the harness name sweep reads the same list.
  *
  * IT READS WHOLE FILES, like the IDE scope, and for the same kind of reason:
- * three of the five adapters reach the model as a `prompt-file:` handed over
- * whole by the sweep workflows, frontmatter included, so a ban in a
- * `description:` there is text the model is told. The two implement adapters go
- * through `skill-loader.js`, which strips frontmatter and meta sections — a
- * narrower route. The scope reads the widest route, because a count that
- * missed a ban the model reads on three workflows to be exact about two is
- * the wrong trade. Measured at #425: 7 docs carrying 68 prohibition tokens —
+ * the adapters reach the model as a `prompt-file:` handed over whole by the
+ * sweep workflows, frontmatter included, so a ban in a `description:` there is
+ * text the model is told. (The two implement adapters, which went through
+ * `skill-loader.js`'s narrower route, were deleted with their build Actions.)
+ * Measured at #425: 7 docs carrying 68 prohibition tokens —
  * 42 of them in the two implement adapters, which predate the operations rule
  * that adapters carry loop mechanics only and are due a rewrite when next
  * touched (`docs/engineering/operations.md`). The other two scopes were
@@ -219,7 +217,7 @@ import { openRatchet } from './lib/ratchet.mjs';
  * and the path `scripts/checks.registry.mjs` declares for this row. One
  * spelling, three readers.
  */
-export const BASELINE = 'docs/evals/negation-baseline.json';
+export const BASELINE = 'scripts/baselines/negation-baseline.json';
 
 /**
  * The five tokens, in one place, so the regex and the label the report prints
@@ -316,7 +314,7 @@ export const SCOPES = [
     read: (text) => text,
     measuredOn:
       'whole files, frontmatter included — the sweep workflows hand a SKILL.md to the model as a ' +
-      'prompt-file: with nothing stripped, and the loader route the implement adapters take is narrower',
+      'prompt-file: with nothing stripped',
   },
 ];
 

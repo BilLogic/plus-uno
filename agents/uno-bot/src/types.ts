@@ -158,8 +158,8 @@ export interface Env {
   //
   // FLAGGED OFF BY DEFAULT on purpose. Tool-payload instructions are not
   // additive: on 2026-08-06 a slack_search fix displaced an unrelated
-  // instruction and broke a different eval case. This one is enabled in ONE DM
-  // first, and the judged evals are compared CASE BY CASE (a stable total hides
+  // instruction and broke a different answer. This one is enabled in ONE DM
+  // first, and its answers are read CASE BY CASE (a stable total hides
   // one case breaking as another recovers) before it goes wide.
   BLUEPRINT_INDEX?: string;
   THREAD_STATE: DurableObjectNamespace<ThreadStateDurableObject>;
@@ -221,8 +221,8 @@ export interface Env {
    *  answer while looking fine. Verify once on a real answer, then default it. */
   /** "on" enables Phase 5 context management: the derived {goal, constraints,
    *  decisions, artifacts} block, progressive summarisation of long histories,
-   *  and drift detection. OFF by default and gated on case-by-case judged-eval
-   *  comparison — it changes what the model sees on EVERY turn, and its failure
+   *  and drift detection. OFF by default and gated on reading real answers
+   *  case by case — it changes what the model sees on EVERY turn, and its failure
    *  mode is subtly worse answers rather than an error. See context-state.ts. */
   CONTEXT_STATE?: string;
 

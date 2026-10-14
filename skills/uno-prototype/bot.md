@@ -38,7 +38,7 @@ Asked for a prompt-spec (flow map, wireframe, concept image, storyboard, interac
 ## Hand-offs
 
 - No PRD → **uno-synthesize** (`notion_create` flow); the natural sequence is notion_create → an IDE build.
-- "Publish / share for feedback" → **uno-publish** (`shareout_post`); "register in the catalog" → **uno-publish**, which runs marketplace publishing in-IDE.
+- "Publish / share for feedback" → **uno-publish** (`shareout_post`); "register in the catalog" → **uno-publish**, which publishes the Marketplace entry on one ✅ card.
 - Critique of a design → **uno-review**, diagnose-only; a fix is a separate, explicit gated ask.
 - Multi-file refactors (>5 files) or visual iteration → the in-IDE agent.
 

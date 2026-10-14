@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 //
-// generate-uno-skill-surfaces.mjs — publish the six uno skills to the two
-// surfaces that can't read `skills/` directly.
+// generate-uno-skill-surfaces.mjs — publish the six uno skills to the IDE
+// discovery path, which can't read `skills/` directly.
 //
 // WHY THIS EXISTS
 // ---------------
@@ -13,19 +13,10 @@
 //   Cursor       → `.cursor/skills/`, `.agents/skills/`, and the Claude/Codex
 //                  directories (so `.claude/skills/` covers Cursor too)
 //
-// Nor for Slack, whose slash commands are declared in the app manifest.
-//
-// So one scan of the canonical files emits three artifacts. Every surface is
-// generated from the same frontmatter, which is why the descriptions can't
-// drift apart:
-//
-//   1. `.claude/skills/<name>/SKILL.md`  — thin stub, real frontmatter, body
-//      points at the canonical file. Makes `/uno-prototype` appear in the slash
-//      menu of both IDEs.
-//   2. `agents/uno-bot/src/generated/slack-commands.ts` — the command → skill
-//      map the Worker's /slack/commands route dispatches on.
-//   3. `agents/uno-bot/slack-app-manifest-commands.yaml` — paste block for
-//      api.slack.com (app manifest → `features.slash_commands`).
+// So one scan of the canonical files emits one stub per skill:
+// `.claude/skills/<name>/SKILL.md` — real frontmatter, body points at the
+// canonical file. It puts the skill in the slash menu of both IDEs. Slack has
+// no skill commands: there, skills are reached by DM, @mention and shortcuts.
 //
 // Usage:
 //   node scripts/generate-uno-skill-surfaces.mjs           # write
@@ -40,35 +31,6 @@ import { byRoot, isEntry, main } from "./lib/findings.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-// The slash-command Request URL Slack posts to. Derived from the OAuth redirect
-// already in wrangler.toml rather than written twice: the Worker has exactly one
-// public origin, and a manifest pointing at the wrong one fails as
-// dispatch_failed with nothing in the Worker logs to explain it.
-function workerOrigin(root) {
-  const toml = readFileSync(join(root, "agents/uno-bot/wrangler.toml"), "utf8");
-  const m = /SLACK_OAUTH_REDIRECT_URI\s*=\s*"(https:\/\/[^/"]+)/.exec(toml);
-  if (!m) throw new Error("wrangler.toml: no SLACK_OAUTH_REDIRECT_URI to read the Worker origin from");
-  return m[1];
-}
-
-// Slack shows one short line in the / menu. The canonical `description` is
-// written for a MODEL deciding whether to load the skill — it opens with
-// capability prose and runs several sentences, and machine-clipping it to width
-// produced mid-word stumps ("…grounds the brief against un…"). So the menu line
-// is authored here, once, for a human scanning a dropdown. The guard below
-// fails the build if a new skill lands without one, which is the only failure
-// mode a derived string was protecting against.
-const SLACK_MENU_LINE = {
-  "uno-research": "Gather context that doesn't exist yet — evidence sweeps, study guides, discovery",
-  "uno-synthesize": "Distill gathered context into findings, takeaways, and — on your go — a PRD",
-  "uno-prototype": "Turn a PRD into a design artifact at the fidelity you pick, grounded on the blueprint",
-  "uno-review": "Diagnose-only design review: design-system, product-intent, and accessibility lenses",
-  "uno-publish": "Share finished-enough work for feedback, or hand it off to development",
-  "uno-maintain": "File an intake, run a standing sweep, or capture a lesson into the harness",
-};
-// Slack rejects a slash-command description over 100 characters.
-const SLACK_DESC_MAX = 100;
-
 // Line endings are a checkout artifact, not content: this repo has no
 // .gitattributes and core.autocrlf is on by default on Windows, so every
 // SKILL.md arrives CRLF there. Splitting on "\n" alone left a trailing \r on
@@ -82,7 +44,7 @@ const NORM = (text) => text.replace(/\r\n/g, "\n");
 
 /**
  * A SKILL.md's frontmatter, both ways this generator needs it: the parsed
- * fields, and the block's own LINES — because artifact 1 re-emits the
+ * fields, and the block's own LINES — because the stub re-emits the
  * frontmatter verbatim, and `argument-hint`, `allowed-tools` and `context:
  * fork` are load-bearing there.
  *
@@ -90,8 +52,8 @@ const NORM = (text) => text.replace(/\r\n/g, "\n");
  * reader. The parser deleted from here was its own fence search plus its own
  * minimal YAML — including the bracket refusal that `argument-hint: [a] [b]`
  * earned, now a corpus test. Where a fence closes decides the Worker's char
- * budgets (#238) and now also decides what these three surfaces say, so it is
- * answered once.
+ * budgets (#238) and also decides what the stubs say, so it is answered
+ * once.
  */
 function readSkillFrontmatter(path) {
   const { meta, raw } = frontmatter(readFileSync(path, "utf8"));
@@ -99,24 +61,9 @@ function readSkillFrontmatter(path) {
   return { fields: meta, fmLines: LINES(raw) };
 }
 
-function slackDescription(name) {
-  const line = SLACK_MENU_LINE[name];
-  if (!line) {
-    throw new Error(
-      `no Slack menu line for "${name}" — add one to SLACK_MENU_LINE in this script. ` +
-        `It is the text teammates read in the / dropdown, so it is written, not derived.`,
-    );
-  }
-  if (line.length > SLACK_DESC_MAX) {
-    throw new Error(`Slack menu line for "${name}" is ${line.length} chars; Slack's limit is ${SLACK_DESC_MAX}`);
-  }
-  return line;
-}
-
-// The canonical skills, and the origin the manifest points at. Read through
-// `byRoot` rather than at module scope: the harness runner IMPORTS this module
-// to call `run` below, and a scan that ran on import would read wrangler.toml
-// and six SKILL.mds inside the runner's own process — and throw there, not
+// The canonical skills. Read through `byRoot` rather than at module scope: the
+// harness runner IMPORTS this module to call `run` below, and a scan that ran
+// on import would read six SKILL.mds inside the runner's own process — and throw there, not
 // here, when one of them is malformed (#509).
 const inputs = byRoot((root) => {
   const skills = directories("skills", { root, recursive: false })
@@ -135,11 +82,9 @@ const inputs = byRoot((root) => {
 
   if (skills.length === 0) throw new Error("no skills/uno-* found — refusing to emit empty surfaces");
 
-  return { skills, requestUrl: `${workerOrigin(root)}/slack/commands` };
+  return { skills };
 });
 
-// ── artifact 1: IDE stubs ────────────────────────────────────────────────────
-//
 // The stub carries the canonical frontmatter VERBATIM (argument-hint,
 // allowed-tools, context: fork are all load-bearing) minus `user-invocable`,
 // which defaults to true — declaring it did nothing, and leaving it next to a
@@ -166,81 +111,8 @@ function stubFor(skill) {
   ].join("\n");
 }
 
-// ── artifact 2: the Worker's command map ─────────────────────────────────────
-function commandsModule(skills) {
-  const rows = skills
-    .map(
-      (s) =>
-        `  "/${s.name}": {\n` +
-        `    skill: ${JSON.stringify(s.name)},\n` +
-        `    usageHint: ${JSON.stringify(s.fields["argument-hint"] ?? "")},\n` +
-        `  },`,
-    )
-    .join("\n");
-  return [
-    "// GENERATED by scripts/generate-uno-skill-surfaces.mjs — do not edit.",
-    "// Source of truth: skills/uno-*/SKILL.md frontmatter.",
-    "// Regenerate: npm run generate:skill-surfaces",
-    "//",
-    "// The map the /slack/commands route dispatches on. Keys match the commands",
-    "// declared in slack-app-manifest-commands.yaml — if they drift, Slack posts",
-    "// to a command the Worker doesn't know and the caller gets the unknown-command",
-    "// reply, so both artifacts come from the same scan.",
-    "",
-    "export interface SlashCommandTarget {",
-    "  /** Skill name, as the harness knows it. */",
-    "  skill: string;",
-    "  /** argument-hint from the canonical SKILL.md; shown in the usage reply. */",
-    "  usageHint: string;",
-    "}",
-    "",
-    "export const SLASH_COMMANDS: Record<string, SlashCommandTarget> = {",
-    rows,
-    "};",
-    "",
-  ].join("\n");
-}
-
-// ── artifact 3: the manifest paste block ─────────────────────────────────────
-function manifestYaml(skills, requestUrl) {
-  const rows = skills
-    .map((s) => {
-      const hint = s.fields["argument-hint"] ?? "";
-      return [
-        `  - command: /${s.name}`,
-        `    url: ${requestUrl}`,
-        `    description: ${JSON.stringify(slackDescription(s.name))}`,
-        ...(hint ? [`    usage_hint: ${JSON.stringify(hint)}`] : []),
-        `    should_escape: false`,
-      ].join("\n");
-    })
-    .join("\n");
-  return [
-    "# THIS IS A FRAGMENT, NOT A MANIFEST. Pasting the whole file into Slack's",
-    "# App Manifest editor fails with:  Invalid additional property: slash_commands",
-    "# — because `slash_commands` belongs UNDER `features:`, and at the top level",
-    "# there is no such key. Paste slack-app-manifest.yaml instead; it already",
-    "# carries these commands in the right place.",
-    "#",
-    "# GENERATED by scripts/generate-uno-skill-surfaces.mjs — do not edit.",
-    "# Source of truth: skills/uno-*/SKILL.md frontmatter.",
-    "# Regenerate: npm run generate:skill-surfaces",
-    "#",
-    "# What it is FOR: the rows to merge under `features:` when a uno-* skill is",
-    "# added or renamed, so the manifest and the skills cannot drift.",
-    "# Declaring a slash command also requires the `commands` bot scope; adding",
-    "# it prompts a workspace reinstall.",
-    "#",
-    "# The Worker must be deployed with the /slack/commands route BEFORE these",
-    "# land, or every invocation returns Slack's dispatch_failed to the caller.",
-    "slash_commands:",
-    rows,
-    "",
-  ].join("\n");
-}
-
 /**
- * The would-be bytes of all three surfaces, rendered and not written.
+ * The would-be bytes of every stub, rendered and not written.
  *
  * Same split as `scripts/generate-check-scripts.mjs`: this renders, `run`
  * compares, and only the CLI entry writes. A `--check` that regenerated its own
@@ -250,12 +122,8 @@ function manifestYaml(skills, requestUrl) {
  * @returns {{path: string, content: string}[]}
  */
 export function artifacts({ repoRoot = ROOT } = {}) {
-  const { skills, requestUrl } = inputs(repoRoot);
-  return [
-    ...skills.map((s) => ({ path: `.claude/skills/${s.name}/SKILL.md`, content: stubFor(s) })),
-    { path: "agents/uno-bot/src/generated/slack-commands.ts", content: commandsModule(skills) },
-    { path: "agents/uno-bot/slack-app-manifest-commands.yaml", content: manifestYaml(skills, requestUrl) },
-  ];
+  const { skills } = inputs(repoRoot);
+  return skills.map((s) => ({ path: `.claude/skills/${s.name}/SKILL.md`, content: stubFor(s) }));
 }
 
 /**
@@ -277,9 +145,9 @@ function matches(abs, content) {
  * The drift check. Reports and never writes.
  *
  * A malformed source — a name that disagrees with its directory, a missing
- * description, a wrangler.toml with no redirect URI — comes back as a finding
- * rather than a thrown stack, because the runner calls this in its own process
- * and a throw there says nothing about which surface is wrong.
+ * description — comes back as a finding rather than a thrown stack, because
+ * the runner calls this in its own process and a throw there says nothing
+ * about which surface is wrong.
  *
  * @returns {import('./lib/findings.mjs').Finding[]}
  */

@@ -102,6 +102,6 @@ the reasoning behind both are in `scripts/check-skill-overlap.mjs`.
 ## Discovery surfaces are generated
 
 `skills/<name>/SKILL.md` frontmatter is canonical; `npm run
-generate:skill-surfaces` publishes the Claude Code / Cursor stubs and the Slack
-slash commands from it, and `npm run check:skill-surfaces` fails on drift.
+generate:skill-surfaces` publishes the Claude Code / Cursor stubs from it, and
+`npm run check:skill-surfaces` fails on drift.
 Details: `docs/engineering/setup.md` § Generated skill surfaces.

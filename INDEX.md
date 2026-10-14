@@ -7,7 +7,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ## Reading paths
 
-**New here, any role** → [`README.md`](README.md) → [`SETUP.md`](SETUP.md) → [`CONTEXT.md`](CONTEXT.md)
+**New here, any role** → [`README.md`](README.md) → [`SETUP.md`](SETUP.md) → [`GLOSSARY.md`](GLOSSARY.md)
 
 **Designer building UI** → [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) → [`design-system/agent-views/components/index.md`](design-system/agent-views/components/index.md) → [`design-system/guidelines/composition/layout.md`](design-system/guidelines/composition/layout.md)
 
@@ -26,7 +26,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`README.md`](README.md) | ![Netlify Status](https://app.netlify.com/projects/plus-uno/deploys) |
 | [`SETUP.md`](SETUP.md) | Clone, install, run, and find your way around — without reading the constitution first. |
 | [`AGENTS.md`](AGENTS.md) | The constitution — identity, routing, the loading contract, and hard rules for every embodiment. |
-| [`CONTEXT.md`](CONTEXT.md) | Use these terms consistently across all design system work, prototypes, and documentation |
+| [`GLOSSARY.md`](GLOSSARY.md) | Use these terms consistently across all design system work, prototypes, and documentation |
 
 ## Skills — what humans invoke
 
@@ -58,7 +58,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`agents/reviewers/auditor.md`](agents/reviewers/auditor.md) | The standing-sweep role: given a named checklist (shipped watchdog, conventions staleness, Figma hygiene, agents↔docs cross-references), walks the estate and files an intake per di |
 | [`agents/reviewers/design-qa.md`](agents/reviewers/design-qa.md) | Catches spec-vs-implementation drift before ship: walks the QA site against the 📐 Specs pages of the Roadmap card's Figma file, using the Design QA checklist |
 | [`agents/reviewers/ds-lens.md`](agents/reviewers/ds-lens.md) | Judges an artifact against the design system — components, tokens, layout, and the hard rules. |
-| [`agents/reviewers/rubric-applier.md`](agents/reviewers/rubric-applier.md) | The one agent that turns 'is this good?' into numbers: given an artifact + a rubric name, scores every dimension 1–5, checks every hard gate pass/fail, and appends the run entry |
+| [`agents/reviewers/rubric-applier.md`](agents/reviewers/rubric-applier.md) | The one agent that turns 'is this good?' into numbers: given an artifact + a rubric name, scores every dimension 1–5, checks every hard gate pass/fail, and returns the scored verdict |
 | [`agents/reviewers/uno-lens.md`](agents/reviewers/uno-lens.md) | Judges whether the artifact does what the PRD says and violates no known blueprint constraint (target: docs/evals/rubrics/uno-review.md → groundingfidelity) |
 | [`agents/uno-bot/AGENT.md`](agents/uno-bot/AGENT.md) | The Worker persona delta — how uno-bot differs from the constitution. |
 | [`agents/uno-bot/harness-bundle.md`](agents/uno-bot/harness-bundle.md) | Generated readable companion to the baked Worker prompt — the load-order manifest plus the assembled harness as markdown. |
@@ -72,6 +72,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
+| [`docs/connectors/figma/uno-bot-access.md`](docs/connectors/figma/uno-bot-access.md) | What uno-bot can read and write in Figma over REST, and where it stops — frame renders, comment reads and @uno replies, the library and comment pipelines, a Figma ask's public scope, and each limit with its cause and next route |
 | [`docs/connectors/figma.md`](docs/connectors/figma.md) | PLUS Figma files follow How We Fig — five stage folders per team, `<Project> / Card <n> & <m> / <designers>` titles, six divider page sections; an agent suggests a rename or a move and a person makes it |
 | [`docs/connectors/notion.md`](docs/connectors/notion.md) | How agents write to Notion — the MCP-write principle, convention surfaces, the gated tools, and body shape. |
 | [`docs/connectors/overview.md`](docs/connectors/overview.md) | One row per connected tool: where its conventions live, what touches it |
@@ -137,7 +138,7 @@ Adding a doc changes this file; editing this file changes nothing.
 |-----|---------|
 | [`docs/engineering/coding.md`](docs/engineering/coding.md) | How to write code in this repo — barrel imports, tokens over literals, styling conventions, and what not to reach for. |
 | [`docs/engineering/measurement-window.md`](docs/engineering/measurement-window.md) | How to run uno-bot's measurement window each week and close it — the five numbers, where each comes from, where it is recorded, and what stays private. |
-| [`docs/engineering/operations.md`](docs/engineering/operations.md) | THE standing-automation registry |
+| [`docs/engineering/operations.md`](docs/engineering/operations.md) | THE standing-automation registry — every cron, scheduled Worker job, webhook and PR gate, with its trigger, agent, implementation and who pays. |
 | [`docs/engineering/setup.md`](docs/engineering/setup.md) | Aliases, package structure, prototype conventions, token workflow, local preview. |
 
 ## Product and service
@@ -178,7 +179,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/020-requester-scoped-slack-visibility-per-user-tokens-own.md`](docs/adr/020-requester-scoped-slack-visibility-per-user-tokens-own.md) | Requester-scoped Slack visibility — per-user tokens, own DMs readable in own bot DM (2026-07-16) |
 | [`docs/adr/021-two-sources-one-time-axis-blueprint-vs-notion.md`](docs/adr/021-two-sources-one-time-axis-blueprint-vs-notion.md) | Two sources, one time axis — blueprint vs Notion authority routed by claim type and card status (2026-07-29) |
 | [`docs/adr/022-enforce-the-subrequest-budget-at-the-boundary-don.md`](docs/adr/022-enforce-the-subrequest-budget-at-the-boundary-don.md) | Enforce the subrequest budget at the boundary; don't estimate it (2026-07-30) |
-| [`docs/adr/023-two-vocabularies-ratified-blueprint-vs-roadmap.md`](docs/adr/023-two-vocabularies-ratified-blueprint-vs-roadmap.md) | The two-vocabularies rule is ratified — blueprint words and Roadmap words never mix, and CONTEXT.md is its only home (2026-08-25) |
+| [`docs/adr/023-two-vocabularies-ratified-blueprint-vs-roadmap.md`](docs/adr/023-two-vocabularies-ratified-blueprint-vs-roadmap.md) | The two-vocabularies rule is ratified — blueprint words and Roadmap words never mix, and the glossary (now GLOSSARY.md) is its only home (2026-08-25) |
 | [`docs/adr/024-slack-app-configuration-is-a-one-way-door.md`](docs/adr/024-slack-app-configuration-is-a-one-way-door.md) | Slack app config only ever widens — narrowing a scope costs a full uninstall, and PKCE forecloses scripted manifest writes (2026-08-06) |
 | [`docs/adr/025-component-docs-page-owns-its-tabs-not-the-storybook-toolbar.md`](docs/adr/025-component-docs-page-owns-its-tabs-not-the-storybook-toolbar.md) | Tabs move from Storybook's manager toolbar into the component docs page, below the title — the toolbar sits in a different document and can never render under in-page content (2026-08-26) |
 | [`docs/adr/026-spacing-tokens-grouped-over-flat.md`](docs/adr/026-spacing-tokens-grouped-over-flat.md) | Semantic spacing tokens are grouped (namespaced), not flat |
@@ -196,7 +197,7 @@ Adding a doc changes this file; editing this file changes nothing.
 |-----|---------|
 | [`docs/conventions/writing.md`](docs/conventions/writing.md) | How agents and humans write long-form prose and findings pages here. |
 
-## Evals
+## Rubrics and golden scenarios
 
 | Doc | Summary |
 |-----|---------|
@@ -216,6 +217,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-145 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
-raw eval data are deliberately not indexed — they record what happened rather
+146 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

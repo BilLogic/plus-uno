@@ -4,7 +4,7 @@ summary: uno-prototype — eval scenarios
 
 # uno-prototype — eval scenarios
 
-<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/evals/runs/. Rubric: docs/evals/rubrics/uno-prototype.md -->
+<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/knowledge/archive/eval-runs/. Rubric: docs/evals/rubrics/uno-prototype.md -->
 
 ## S0 — PRD required gate (entry)
 - **Trigger:** "prototype this tutor-onboarding idea" (no PRD link, file, or inline body)

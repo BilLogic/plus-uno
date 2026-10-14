@@ -3,8 +3,8 @@
 // `src/version.ts` used to hold a hand-edited constant with "bump on every
 // release round" written above it. That is an instruction, not a mechanism, and
 // it was not followed: r73 stood through 24 commits to src/ and 54 successful
-// deploys, and r75 then stood through three more. Eval runs across different
-// builds all reported the same string, so nothing in eval-results.json could
+// deploys, and r75 then stood through three more. Runs across different
+// builds all reported the same string, so nothing in their results could
 // tell them apart — the exact failure the constant was introduced to prevent,
 // pointing the other way (#249).
 //

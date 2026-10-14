@@ -60,13 +60,15 @@ export interface TurnRecordFacts {
    *  (as `requestText`) for a real channel ask only, until it is classified. */
   question: string;
   /** The clock when the turn began, epoch ms — the ask time when `askTs` is
-   *  not a Slack ts (an eval conversation's synthetic one). */
+   *  not a Slack ts (the removed eval runner's synthetic one, on rows it wrote). */
   startedAt: number;
   firstAnswerAt: number | null;
   tier: ModelTier;
   routeReason: string;
   spend?: RecordedSpend;
   toolsCalled: readonly string[];
+  /** The names `read_reference` served this turn. */
+  referencesRead: readonly string[];
   /** What the person was finally shown, for the sources it links. */
   posted?: string;
   disposition: TurnDisposition;
@@ -176,8 +178,8 @@ export function selfFiledTicketOf(executed: readonly ExecutedOperation[] | undef
 /**
  * The row's key. A Slack ask is keyed by its channel and message ts, which a
  * retried run shares — so the retry rewrites the row instead of adding one. An
- * ask with no Slack ts (every eval conversation shares one synthetic ts) is
- * keyed by when it began as well, or every eval turn would land on one row.
+ * ask with no Slack ts (the removed eval runner's conversations shared one synthetic ts) is
+ * keyed by when it began as well, or every such turn would land on one row.
  */
 export function turnIdOf(channel: string, askTs: string, startedAt: number): string {
   return SLACK_TS.test(askTs) ? `${channel}:${askTs}` : `${channel}:${askTs}@${startedAt}`;
@@ -241,6 +243,7 @@ export function buildTurnRecord(facts: TurnRecordFacts): TurnRecord {
       ? estimateCostUsd(facts.spend.provider, facts.spend.model, facts.spend.usage, askedAt)
       : 0,
     toolsCalled: [...facts.toolsCalled],
+    referencesRead: [...facts.referencesRead],
     sourcesCited: sourcesCitedIn(facts.posted),
     disposition: facts.disposition,
     proposalId: facts.proposalId ?? null,

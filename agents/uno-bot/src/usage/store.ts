@@ -24,8 +24,8 @@ import type { PainCategory, SubType } from "./categories";
 export interface TurnRecord {
   // ── identity and place ──
   /** `<channel>:<the asker's message ts>` — stable across a retried alarm, so
-   *  a turn that runs twice still leaves one row. An ask with no Slack ts (an
-   *  eval conversation) adds `@<when it began>` (`./record.ts` `turnIdOf`). */
+   *  a turn that runs twice still leaves one row. An ask with no Slack ts (a row the
+   *  removed eval runner wrote) adds `@<when it began>` (`./record.ts` `turnIdOf`). */
   turnId: string;
   /** The deployed build stamp (`version.ts`). */
   build: string;
@@ -72,6 +72,9 @@ export interface TurnRecord {
   // ── behaviour ──
   /** Ungated tools the loop ran, in call order. */
   toolsCalled: string[];
+  /** The references `read_reference` served this turn, by name, in the order
+   *  first read. A miss read nothing and is not listed. */
+  referencesRead: string[];
   /** Which kinds of source the answer linked to (`./record.ts` `sourcesCitedIn`). */
   sourcesCited: string[];
   /** How the turn ended — `TurnDisposition` in `turn/turn.ts`. */
@@ -85,7 +88,7 @@ export interface TurnRecord {
   stopUsed: boolean;
   /** A GitHub issue this turn filed on the bot's own repo. */
   selfFiledTicketUrl: string | null;
-  /** Evals, debug probes, the sandbox channel, bare greetings (`./record.ts`). */
+  /** Debug probes, the sandbox channel, bare greetings (`./record.ts`). */
   testTraffic: boolean;
   /** The asker's message thanked the bot (`./record.ts` `isThanks`) — on a
    *  person's turn only, and whatever `testTraffic` says: a thanks-only

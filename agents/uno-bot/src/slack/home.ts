@@ -96,7 +96,6 @@ const homeBody = (connected: boolean, carousel: boolean) => [
           "• *DM me* — right here in the *Messages* tab ↑. It's an ordinary chat: no threads to start, just keep talking\n" +
           "• *In a channel* — `@le goat` your question; I'll answer in a thread\n" +
           "• *In a thread* — once I'm in, just reply; no need to re-tag. Or right-click any message → *More actions* for the shortcuts\n" +
-          "• *Slash commands* — `/uno-research`, `/uno-synthesize`, `/uno-prototype`, `/uno-review`, `/uno-publish`, `/uno-maintain`\n" +
           "• *Change the effort* — `/grind` runs it on the deep model, `/chill` keeps it short and cheap",
       },
     },

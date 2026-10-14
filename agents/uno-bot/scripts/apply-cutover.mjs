@@ -26,7 +26,7 @@
 //     Slack agree.
 //   * Secrets. Cloudflare stores them write-only; `npm run secrets:set` is how
 //     they are re-entered, on the human's own terminal, never through here.
-//   * `docs/plans/` and `docs/evals/runs/`. Those are history — they describe a
+//   * `docs/plans/` and `docs/knowledge/archive/`. Those are history — they describe a
 //     deployment that existed on the day they were written.
 //
 // Usage:
@@ -110,9 +110,7 @@ export function edits(values) {
     { file: ".github/workflows/uno-bot-deploy.yml", from: `"${OLD.account}"`, to: `"${values.account}"`, count: 1,
       why: "CLOUDFLARE_ACCOUNT_ID on the deploy job" },
     { file: "agents/uno-bot/slack-app-manifest.yaml", from: OLD.host, to: host, count: null,
-      why: "the OAuth redirect plus the events and interactivity request URLs — pasted by hand into Slack afterwards (ADR-024)" },
-    { file: "agents/uno-bot/slack-app-manifest-commands.yaml", from: OLD.host, to: host, count: null,
-      why: "the nine command URLs, same paste" },
+      why: "the OAuth redirect, the events and interactivity request URLs and the three command URLs — pasted by hand into Slack afterwards (ADR-024)" },
   ];
 }
 

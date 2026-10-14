@@ -67,7 +67,7 @@
 // Gemini adapter when its service-account credentials are absent, so a mis-set
 // flag costs the opt-in rather than the turn. Everything downstream — the
 // proposal gate, delivery, history — is provider-blind because both adapters
-// answer the same `ModelProvider` seam (CONTEXT.md § ModelProvider).
+// answer the same `ModelProvider` seam (GLOSSARY.md (**ModelProvider**)).
 
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { AbsenceContext } from "./absence";
@@ -619,11 +619,21 @@ export async function executeUngatedTool(
  */
 function recordReferenceHit(resultJson: string): void {
   const store = turnScope.getStore();
-  if (!store) return;
+  const name = store ? referenceHitOf(resultJson) : null;
+  if (store && name) store.references.push(name);
+}
+
+/**
+ * The name a `read_reference` result served, or null for a miss or a result
+ * that does not parse. Exported for the turn harness, which collects a turn's
+ * references the way this module does.
+ */
+export function referenceHitOf(resultJson: string): string | null {
   try {
     const parsed = JSON.parse(resultJson) as { ok?: unknown; name?: unknown };
-    if (parsed.ok === true && typeof parsed.name === "string") store.references.push(parsed.name);
+    return parsed.ok === true && typeof parsed.name === "string" ? parsed.name : null;
   } catch {
     // the receipt is a courtesy to the next turn, never load-bearing
+    return null;
   }
 }

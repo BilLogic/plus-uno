@@ -26,7 +26,7 @@ test('a disagreeing colour fallback in a fixture tree is a finding', () => {
     {
       'design-system/src/tokens/_colors.scss': ':root { --color-primary: #0472a8; }\n',
       'design-system/src/a.scss': '.a { color: var(--color-primary, #000000); }\n',
-      'docs/evals/colour-fallback-baseline.json': BASELINE,
+      'scripts/baselines/colour-fallback-baseline.json': BASELINE,
     },
     { git: true },
   );
@@ -49,7 +49,7 @@ test('a stale rgba() wash in a fixture tree is a finding', () => {
         ':root { --color-tertiary-state-08: rgba(14, 129, 117, 0.08); }\n',
       'design-system/src/a.scss':
         '.a { background: var(--color-tertiary-state-08, rgba(0, 82, 221, 0.08)); }\n',
-      'docs/evals/colour-fallback-baseline.json': BASELINE,
+      'scripts/baselines/colour-fallback-baseline.json': BASELINE,
     },
     { git: true },
   );
@@ -68,7 +68,7 @@ test('an empty token directory fires the sentinel floor, not a clean sweep', () 
   const { root, done } = policyTree(
     {
       'design-system/src/a.scss': '.a { color: var(--color-primary, #000000); }\n',
-      'docs/evals/colour-fallback-baseline.json': BASELINE,
+      'scripts/baselines/colour-fallback-baseline.json': BASELINE,
     },
     { git: true },
   );

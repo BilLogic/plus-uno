@@ -40,7 +40,7 @@
  *
  * WHY IT REACHES INTO `agents/uno-bot`. For exactly one check, on one rule: a
  * sub-package check is composed here when its INPUTS live at the repo root.
- * `check:harness-bundle` reads `AGENTS.md`, `CONTEXT.md`, `skills/`,
+ * `check:harness-bundle` reads `AGENTS.md`, `GLOSSARY.md`, `skills/`,
  * `docs/connectors`, `docs/engineering` and `docs/conventions` — so a PR that
  * touches nothing under `agents/` can still invalidate it, and did (#196).
  * `check:fetch` and `check:contract` read only `agents/uno-bot/`, and are gated

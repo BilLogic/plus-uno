@@ -86,7 +86,7 @@ test('a tonal ground is composited, so an 8% state layer is not read as paint', 
 
 test('the measured side is the record shape, and the failure is in it', () => {
   // What the ratchet is handed (#600): two arrays of keys, the shape
-  // `docs/evals/button-contrast-baseline.json` holds.
+  // `scripts/baselines/button-contrast-baseline.json` holds.
   assert.deepEqual(measured(FAILING.themes, FAILING.values), { contrast: ['bad/filled'], duplicates: [] });
 });
 

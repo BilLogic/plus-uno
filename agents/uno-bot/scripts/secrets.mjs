@@ -71,7 +71,7 @@ export const SECRETS = [
   {
     name: "DEBUG_TOKEN",
     required: true,
-    why: "gates /debug/*, sent as x-debug-token. Unset those routes 404 — which is safe, but both eval workflows drive the Worker through them and would score nothing.",
+    why: "gates /debug/*, sent as x-debug-token. Unset those routes 404 — which is safe, but the cutover scripts verify a move through them.",
   },
   {
     name: "SLACK_MCP_CLIENT_SECRET",

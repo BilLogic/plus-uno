@@ -44,7 +44,7 @@ import { audit, corpus, ratchetFailures } from './undefined-tokens.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const ROOTS = ['design-system/src', '.storybook', 'prototypes'];
-const BASELINE = 'docs/evals/undefined-token-baseline.json';
+const BASELINE = 'scripts/baselines/undefined-token-baseline.json';
 
 /**
  * The floor. 1349 searched files, measured 2026-08-29. A walk that quietly

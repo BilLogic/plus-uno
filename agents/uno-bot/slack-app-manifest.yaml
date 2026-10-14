@@ -1,20 +1,27 @@
 # Uno-bot Slack app manifest — app A0APS0L8HJR, CMU Simon Initiative workspace.
 #
-# Captured from api.slack.com on 2026-08-04, after the six /uno-* slash commands
-# were created. Hand-maintained: nothing generates or applies this file. It is
-# the repo's record of what production actually runs on, and the rollback point
-# if a manifest save goes wrong — before this, the app's configuration existed
-# only in Slack's UI, so there was nothing to restore from.
+# Captured from api.slack.com on 2026-08-04. Hand-maintained: nothing generates
+# or applies this file. It is the repo's record of what production actually
+# runs on, and the rollback point if a manifest save goes wrong — before this,
+# the app's configuration existed only in Slack's UI, so there was nothing to
+# restore from.
 #
 # Refresh it by hand (api.slack.com -> Uno-bot -> App Manifest -> YAML) after any
 # deliberate config change. Pasting it back REPLACES the whole manifest, so read
 # the diff first; additive changes are safer made through the feature pages.
 #
-# ── ONE PENDING DIFFERENCE: agent_session_stopped (#576, 2026-09-17) ────────
-# This file subscribes to `agent_session_stopped`; the live app does not yet.
-# `npm run slack:diff` therefore reports exactly that one difference, and it is
-# the expected reading until the YAML is pasted into the App Manifest page by
-# hand. Everything below this line was in sync when it was written.
+# ── PENDING DIFFERENCES ──────────────────────────────────────────────────────
+# Until the YAML is pasted into the App Manifest page by hand, `npm run
+# slack:diff` reports these two, and they are the expected reading. Everything
+# else below was in sync when it was written.
+#
+# agent_session_stopped (#576, 2026-09-17): this file subscribes to it; the
+# live app does not yet.
+#
+# The six skill commands: `features.slash_commands` here holds /grind, /chill
+# and /stop only; the live app still declares the six skill commands, and the
+# Worker answers each with its unknown-command reply. The `commands` bot scope
+# stays: the three remaining commands need it.
 #
 # ── IN SYNC WITH LIVE (verified `npm run slack:diff`, 2026-08-06) ────────────
 # `messages_tab_enabled: true` and the `app_context_changed` subscription are
@@ -43,8 +50,8 @@
 # ── SCOPE: THIS CHANGES DMs ONLY ─────────────────────────────────────────────
 # agent_view governs the app's own DM / Messages surface. Channels are
 # untouched: an @mention still opens a thread and the bot still answers inside
-# it, the emoji proposal gate still keys off the reacted message, and a /uno-*
-# slash command still posts a framing message and threads its run beneath.
+# it, the emoji proposal gate still keys off the reacted message, and a /grind or
+# /chill run still posts a framing message and threads its run beneath.
 #
 # DM replies are THREADED (changed 2026-08-06, reversing 74f1b17c's "chat, not
 # threads"). Both thinking-indicator mechanisms Slack offers —
@@ -97,7 +104,7 @@ display_information:
     • Creates, with your approval. Drafts a PRD, files or updates a Roadmap card, kicks off a component build or a prototype, shares work for feedback. Anything that writes waits for your ✅ first — the friction is the feature.
     • Hands off. Work that needs real code comes back as a ready-to-paste prompt for your IDE agent.
 
-    Reach it by DM, by @mention in a channel, in a thread it is already part of, or through the /uno-* slash commands (research, synthesize, prototype, review, publish, maintain).
+    Reach it by DM, by @mention in a channel, in a thread it is already part of, or through the message shortcuts. /grind and /chill set how hard it works on a question; /stop cancels what it is running.
 
     Searching Slack runs on your own credentials once you link them, so results are scoped to what you can already see. Until then it searches public channels only. Nothing retrieved is stored: metadata is kept, content is re-read live each time.
   background_color: "#1f1f1f"
@@ -142,31 +149,6 @@ features:
       callback_id: verify
       description: Check the claim against the blueprint and Notion
   slash_commands:
-    - command: /uno-prototype
-      url: https://uno-bot.plus-uno.workers.dev/slack/commands
-      description: Turn a PRD into a design artifact at the fidelity you pick, grounded on the blueprint
-      usage_hint: "[prd-required] [fidelity]"
-      should_escape: false
-    - command: /uno-research
-      url: https://uno-bot.plus-uno.workers.dev/slack/commands
-      description: Gather context that doesn't exist yet — evidence sweeps, study guides, discovery
-      usage_hint: "[question / hunch / who-knows-X]"
-      should_escape: false
-    - command: /uno-synthesize
-      url: https://uno-bot.plus-uno.workers.dev/slack/commands
-      description: Distill gathered context into findings, takeaways, and — on your go — a PRD
-      usage_hint: '[sources-to-distill | "draft the PRD"]'
-      should_escape: false
-    - command: /uno-review
-      url: https://uno-bot.plus-uno.workers.dev/slack/commands
-      description: "Diagnose-only design review: design-system, product-intent, and accessibility lenses"
-      usage_hint: "[artifact + manifest (fidelity / tools / PRD link)]"
-      should_escape: false
-    - command: /uno-publish
-      url: https://uno-bot.plus-uno.workers.dev/slack/commands
-      description: Share finished-enough work for feedback, or hand it off to development
-      usage_hint: "[prototype-or-project]"
-      should_escape: false
     - command: /grind
       url: https://uno-bot.plus-uno.workers.dev/slack/commands
       description: Run this question harder — deep model, checks the claims
@@ -181,11 +163,6 @@ features:
       url: https://uno-bot.plus-uno.workers.dev/slack/commands
       description: Stop the turn I'm working on right now
       usage_hint: "[no arguments]"
-      should_escape: false
-    - command: /uno-maintain
-      url: https://uno-bot.plus-uno.workers.dev/slack/commands
-      description: File an intake, run a standing sweep, or capture a lesson into the harness
-      usage_hint: "[intake / sweep-name / lesson-to-capture]"
       should_escape: false
   agent_view:
     agent_description: "Your 🐐 PLUS design teammate: I pull live, cited answers on roadmap cards, product flows, and design-system assets across Notion, Figma, and Slack. I flag anything outdated or unbuilt, and can draft PRDs, update cards, or start prototypes—with your approval first."

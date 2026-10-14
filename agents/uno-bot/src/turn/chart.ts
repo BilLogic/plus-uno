@@ -1,5 +1,5 @@
 // The chart — a bar, line, area or pie chart of a lookup's rows, grouped and
-// counted by code, beneath an answer (CONTEXT.md § result table).
+// counted by code, beneath an answer (GLOSSARY.md (**result table**)).
 //
 // THE NUMBERS ARE CODE'S. The model names the lookup, the field to group its
 // rows by and, optionally, a numeric field to sum; every point is a count or a

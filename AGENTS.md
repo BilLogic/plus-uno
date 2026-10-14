@@ -18,7 +18,7 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 
 - Ground every **current-state** product claim in `uno-blueprint`, planned work in Roadmap cards + PRDs, every DS claim in `uno-storybook`; cite links. Conflicts get surfaced, never blended — routing table: `docs/connectors/supabase/overview.md` § Two sources, one time axis (ADR-021).
 - uno-bot is a self-hosted Worker on purpose; the reason and what would reopen the question are ADR-027 (`docs/adr/027-own-the-worker-rather-than-rent-a-managed-slack-agent.md`).
-- The blueprint and the Notion Roadmap speak **different vocabularies** — service-blueprint vs project-management. Speak each estate's own words, and route a question by its frame words: `CONTEXT.md` § Two vocabularies is the law (ratified in ADR-023).
+- The blueprint and the Notion Roadmap speak **different vocabularies** — service-blueprint vs project-management. Speak each estate's own words, and route a question by its frame words: `GLOSSARY.md` § Two vocabularies is the law (ratified in ADR-023).
 - Bill makes product-direction calls: requirements, pillars and roadmap options come from him or from a cited estate, so escalate rather than fill the gap.
 - Embodiment deltas live in `agents/` — e.g. `agents/uno-bot/AGENT.md` holds only what differs in Slack.
 
@@ -44,7 +44,7 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 
 Routing: match intent to the Use-when column; if ambiguous, ask which capability is meant. Each skill's `SKILL.md` is the IDE face, `bot.md` the Worker face; the IDE loads `references/method.md` on invocation, and the Worker reads it by name through `read_reference` when the face's pointer fires. Which content belongs in which of the three — and the guard that holds the split — is `skills/README.md`.
 
-**A skill's discovery surfaces are generated.** Claude Code, Cursor and Slack each read their own path, and `npm run generate:skill-surfaces` publishes all three from the canonical frontmatter — so edit `skills/<name>/SKILL.md` and regenerate; `npm run check:skill-surfaces` fails the harness gate on drift. What is generated where: `docs/engineering/setup.md` § Generated skill surfaces.
+**A skill's IDE discovery surface is generated.** Claude Code and Cursor read `.claude/skills/`, and `npm run generate:skill-surfaces` publishes a stub there from the canonical frontmatter — so edit `skills/<name>/SKILL.md` and regenerate; `npm run check:skill-surfaces` fails the harness gate on drift. What is generated where: `docs/engineering/setup.md` § Generated skill surfaces.
 
 ## Agents — what skills summon
 
@@ -58,7 +58,7 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 
 ## The loading contract
 
-**Tier 1 — always loaded.** This file, and nothing else. Soft budget ≤20k chars: an overrun warns rather than fails, and a tier that bloats still defeats the tier. **A module's glossary row REPLACES rather than adds**: when a module takes over what another one did, its row absorbs that row instead of sitting beside it, so the glossary stays a vocabulary rather than a ledger of everything that has ever been built. The budget is what makes that a rule rather than a preference — a wave of tickets each adding a row spends it, and the honest answer is a shorter glossary, not a bigger tier.
+**Tier 1 — always loaded.** This file, and nothing else. Soft budget ≤20k chars: an overrun warns rather than fails, and a tier that bloats still defeats the tier.
 
 **Tier 3 — retrieved live, never cached.** Product truth from `uno-blueprint` (`writers/blueprint` / `search_blueprint`); design-system truth from `uno-storybook` (read the source and stories). Team conventions are *not* Tier 3 — they are canonical in-repo (ADR-017) and load as plain files.
 
@@ -104,7 +104,7 @@ Each rule is one line here and its body lives in the document it names; the lead
 
 ## Knowledge
 
-Finished work leaves behind one of three things: a **rule** in the doc that already owns the subject, an **ADR** under `docs/adr/` when the call is hard to reverse, or **nothing** — git keeps the trail, and a finding worth less than the context it costs is worth dropping. `docs/knowledge/INDEX.md` is the contract, `npm run check:knowledge-disposition` enforces it, and `docs/knowledge/changelog.md` is the ledger of what was promoted. Capture runs through `skills/uno-maintain`; land the note and its disposition in the same change. `docs/knowledge/archive/` is the graveyard for superseded docs — archive rather than delete when a decision's own trail matters, and what is already there stays as it is (#172).
+Finished work leaves behind a **rule** in the doc that already owns the subject, an **ADR** under `docs/adr/` when the call is hard to reverse, an **archive** entry in `docs/knowledge/archive/` when a superseded era's own trail matters, or — most often — **nothing**: git keeps the trail, and a finding worth less than the context it costs is worth deleting. `docs/knowledge/INDEX.md` is the contract, `npm run check:knowledge-disposition` enforces it, and `docs/knowledge/changelog.md` is the ledger of what was promoted. Capture runs through `skills/uno-maintain`; land the note and its disposition in the same change. What is already in the archive stays as it is (#172).
 
 <!-- ide-only -->
 ## Progressive loading
@@ -162,7 +162,7 @@ See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
-Single-context. `CONTEXT.md` at the root is the glossary (`npm run check:glossary`
+Single-context. `GLOSSARY.md` at the root is the glossary (`npm run check:glossary`
 keeps it glossary-only); `docs/adr/` holds the decisions, indexed by
 `docs/adr/overview.md`. See `docs/agents/domain.md`.
 <!-- /ide-only -->

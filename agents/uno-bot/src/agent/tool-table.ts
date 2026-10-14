@@ -109,7 +109,7 @@ export type Estate = "notion" | "figma" | "github" | "blueprint" | "slack" | "st
 
 /**
  * How a lookup is SHOWN while it runs — its task card on the checklist
- * (CONTEXT.md § checklist), which only an ungated tool is ever given.
+ * (GLOSSARY.md (**checklist**)), which only an ungated tool is ever given.
  *
  * Words and an estate, and nothing Slack-shaped: no URL, no chunk, no icon.
  * The table has five readers that are not Slack, and a column that held a
@@ -272,11 +272,11 @@ export const TOOL_TABLE = {
   notion_create: {
     access: "gated",
     retrieval: false,
-    reviewRequest: "new PRD / intake / decision",
+    reviewRequest: "new PRD / intake / decision / Marketplace row",
     gate: {
       verb: "create this card in Notion",
       kind: "create row",
-      nouns: ["card", "prd", "intake", "ticket", "notion", "decision"],
+      nouns: ["card", "prd", "intake", "ticket", "notion", "decision", "marketplace", "row"],
     },
   },
   notion_update: {
@@ -312,7 +312,7 @@ export const TOOL_TABLE = {
       nouns: ["share", "share-out", "shareout", "feedback", "post"],
     },
   },
-  // The relayed DM (CONTEXT.md). One operation per recipient, so "send this to
+  // The relayed DM (GLOSSARY.md). One operation per recipient, so "send this to
   // Coco and Meryem" is one card of two. No review request: a DM is not a
   // reviewable artifact, so nothing fans out to `#plus-design`.
   dm_relay: {

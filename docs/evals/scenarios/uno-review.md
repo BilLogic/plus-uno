@@ -4,7 +4,7 @@ summary: uno-review — eval scenarios
 
 # uno-review — eval scenarios
 
-<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/evals/runs/. Rubric: docs/evals/rubrics/uno-review.md -->
+<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/knowledge/archive/eval-runs/. Rubric: docs/evals/rubrics/uno-review.md -->
 
 ## S1 — stage-lens review, stage-appropriate
 - **Trigger:** "review this" + a mid-fi prototype
@@ -16,7 +16,7 @@ summary: uno-review — eval scenarios
 
 ## S2 — Design QA at Ready-for-QA
 - **Trigger:** Roadmap card flips to `Dev Status: Ready for QA (RTT)`
-- **Expected:** reviewers/design-qa resolves the card's Figma file (its number in the title's `Card <n> & <m>`) → its 📐 Specs pages; walks the QA build against them with the Design QA checklist; blockers hold Ready-for-Prod; run logged for the drift-catch metric
+- **Expected:** reviewers/design-qa resolves the card's Figma file (its number in the title's `Card <n> & <m>`) → its 📐 Specs pages; walks the QA build against them with the Design QA checklist; blockers hold Ready-for-Prod
 - **Fails if:** QA runs against the wrong spec file · findings lack severity verdicts
 
 ## S3 — diagnose-only guard
