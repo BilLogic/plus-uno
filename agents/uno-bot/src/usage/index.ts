@@ -27,3 +27,6 @@ export { decideAsk, runResolutionPass, type ResolutionPassDeps } from "./resolut
 // What people said of an answer: a third port, wired from `Env` in `./feedback-env.ts`.
 export * from "./feedback";
 export { createD1AnswerFeedbackLog, type AnswerFeedbackDatabase } from "./feedback-d1";
+// Thanks given as a reaction: a fourth port, wired from `Env` in `./appreciation-env.ts`.
+export * from "./appreciation";
+export { createD1AppreciationLog, type AppreciationDatabase } from "./appreciation-d1";

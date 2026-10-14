@@ -29,6 +29,7 @@ import { conversationsReplies, getBotIdentity } from "./api";
 import { slackDelivery } from "./slack-delivery";
 import { standingConfirmersOf } from "./standing-confirmers";
 import { reactionRecorderFor } from "../usage/resolution-env";
+import { thanksRecorderFor } from "../usage/appreciation-env";
 import { reminderDoorFor } from "../commitments/env";
 import { dmReminderDoorFor } from "../dm-watch/env";
 import type { ReminderOutcome } from "../commitments/copy";
@@ -99,6 +100,8 @@ function reactionDoorDeps(env: Env): ReactionDoorDeps {
     restage: restageFor(env, threadState),
 
     recordReaction: reactionRecorderFor(env),
+
+    recordThanks: thanksRecorderFor(env),
 
     ...withReminder(claimedOf(eitherDoor(dmReminderDoorFor(env), reminderDoorFor(env)))),
   };

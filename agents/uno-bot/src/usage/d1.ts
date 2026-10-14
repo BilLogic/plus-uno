@@ -59,6 +59,7 @@ const COLUMNS = [
   "sub_type",
   "pain_category",
   "classified_at",
+  "thanks",
 ] as const;
 
 type Row = Record<(typeof COLUMNS)[number], unknown>;
@@ -128,6 +129,7 @@ function toRow(r: TurnRecord): unknown[] {
     sub_type: r.subType,
     pain_category: r.painCategory,
     classified_at: r.classifiedAt,
+    thanks: bool(r.thanks),
   };
   return COLUMNS.map((c) => row[c]);
 }
@@ -176,6 +178,7 @@ function fromRow(row: Row): TurnRecord {
     subType: subTypeOf(row.sub_type),
     painCategory: numOrNull(row.pain_category) as PainCategory | null,
     classifiedAt: numOrNull(row.classified_at),
+    thanks: num(row.thanks) === 1,
   };
 }
 
