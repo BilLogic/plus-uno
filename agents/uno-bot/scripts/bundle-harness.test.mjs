@@ -46,6 +46,8 @@ const COPIED = [
   "agents/uno-bot/src/generated",
   "agents/uno-bot/scripts/bundle-harness.mjs",
 ];
+/** Copied when present: a section root may hold nothing yet, and an empty section is legal. */
+const COPIED_IF_PRESENT = ["agents/uno-bot/skills"];
 
 let repoRoot, bundler, harnessTs, companionMd, referencesTs;
 
@@ -56,6 +58,9 @@ before(() => {
   // having done nothing — which every test below would read as a pass.
   repoRoot = realpathSync(mkdtempSync(path.join(tmpdir(), "harness-tree-")));
   for (const rel of COPIED) cpSync(path.join(checkout, rel), path.join(repoRoot, rel), { recursive: true });
+  for (const rel of COPIED_IF_PRESENT) {
+    if (existsSync(path.join(checkout, rel))) cpSync(path.join(checkout, rel), path.join(repoRoot, rel), { recursive: true });
+  }
   bundler = path.join(repoRoot, "agents/uno-bot/scripts/bundle-harness.mjs");
   harnessTs = path.join(repoRoot, "agents/uno-bot/src/generated/harness.ts");
   companionMd = path.join(repoRoot, "agents/uno-bot/harness-bundle.md");
@@ -155,23 +160,16 @@ test("every skill's bot.md is bundled and every SKILL.md is not", () => {
   }
 });
 
-test("a skill's method.md precedes its bot.md, or is disclosed behind read_reference", () => {
-  // Two deliveries, one rule per skill (#423): a method that ships in the prompt
-  // loads before its face, because it is meaningless read second; a method
-  // that declares `disclosure: reference` leaves the prompt entirely and is
-  // reachable only through the baked map, under the skill's own name.
+test("every skill's method is disclosed behind read_reference under the skill's name", () => {
+  // A method is read on the turns whose face points at it, never in the prompt
+  // (#423). Order within a section is path order, so a method that came back
+  // into the prompt would load AFTER its face — which is why it stays disclosed.
   const members = memberOrder(assembled());
   const map = references();
   for (const skill of ["research", "synthesize", "prototype", "publish", "review", "maintain"]) {
-    const method = members.indexOf(`skills/uno-${skill}/references/method.md`);
-    const bot = members.indexOf(`skills/uno-${skill}/bot.md`);
-    assert.ok(bot !== -1, `uno-${skill} is missing its Worker face`);
-    if (`uno-${skill}/method` in map) {
-      assert.equal(method, -1, `uno-${skill}: a disclosed method must be absent from the prompt`);
-    } else {
-      assert.ok(method !== -1, `uno-${skill} is missing a method — neither bundled nor disclosed`);
-      assert.ok(method < bot, `uno-${skill}: method.md must load before bot.md`);
-    }
+    assert.ok(members.includes(`skills/uno-${skill}/bot.md`), `uno-${skill} is missing its Worker face`);
+    assert.ok(!members.includes(`skills/uno-${skill}/references/method.md`), `uno-${skill}: its method reached the prompt`);
+    assert.ok(`uno-${skill}/method` in map, `uno-${skill}: its method is missing from the reference map`);
   }
 });
 
@@ -739,7 +737,7 @@ test("the manifest's census, budgets and members agree with the bundle", () => {
   // Per-section totals, in the bundle's own order.
   assert.deepEqual(
     manifest.sections.map((s) => s.name),
-    ["constitution", "persona", "skills", "connectors", "engineering", "conventions"],
+    ["constitution", "persona", "bot-skills", "skills", "connectors", "engineering", "conventions"],
   );
   assert.equal(
     manifest.sections.reduce((t, s) => t + s.docs, 0),
@@ -864,4 +862,115 @@ test("run({ repoRoot }) returns the assembly's own findings, not a staleness ver
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+// ── Section rows carry their own delivery rules ───────────────────────────────
+//
+// Budget, sort and reference naming each read the section row a doc sits under
+// and nothing else. So a new shape of section is one row: these tests add a row,
+// or a doc under an existing one, and change nothing else.
+
+/** A doc's source: frontmatter fields, then a body. */
+const docSource = (fields, body) =>
+  `---\n${Object.entries(fields).map(([k, v]) => `${k}: ${v}`).join("\n")}\n---\n\n${body}`;
+
+/** The two baked strings out of an in-process assembly. */
+const bakedOf = (assembly, rel) => {
+  const ts = assembly.artifacts[rel];
+  return JSON.parse(ts.slice(ts.indexOf("= ") + 2, ts.lastIndexOf(";")));
+};
+const promptOf = (assembly) => bakedOf(assembly, "agents/uno-bot/src/generated/harness.ts");
+const mapOf = (assembly) => bakedOf(assembly, "agents/uno-bot/src/generated/references.ts");
+
+/** Write a file in the copy, creating its folder; withFile removes the file afterwards. */
+const writeIn = (abs, text) => {
+  mkdirSync(path.dirname(abs), { recursive: true });
+  writeFileSync(abs, text);
+};
+
+test("a new section row with a budget role fails an over-budget doc under it, with no other edit", () => {
+  const rowRel = "agents/uno-bot/scripts/bundle-harness.mjs";
+  const docRel = "docs/zz-probe-section/over.md";
+  const result = withFile(
+    rowRel,
+    (abs, original) => {
+      const persona = original.match(/^\s*\{ name: "persona".*$/m);
+      assert.ok(persona, "the persona row must be one line the probe can sit after");
+      writeFileSync(
+        abs,
+        original.replace(
+          persona[0],
+          `${persona[0]}\n  { name: "zz-probe", roots: ["docs/zz-probe-section"], budget: { role: "probe", limit: 1_000, soft: false }, nameBy: "path" },`,
+        ),
+      );
+    },
+    () =>
+      withFile(docRel, (abs) => writeIn(abs, docSource({ embodiment: "all" }, padding(2_000))), () =>
+        runBundler(["--check"]),
+      ),
+  );
+  assert.equal(result.code, 1, "a doc over its row's budget must fail the build");
+  assert.match(result.out, /zz-probe-section\/over\.md \(probe\)/);
+  assert.match(result.out, /1,000/, "the failure must name the row's limit");
+  assert.match(result.out, /over by [\d,]+/);
+});
+
+const PROBE_SKILL = "agents/uno-bot/skills/zz-probe-skill/SKILL.md";
+const probeSkill = (body) =>
+  docSource(
+    {
+      embodiment: "uno-bot",
+      disclosure: "reference",
+      description: "Probe trigger words — use when testing the bundler.",
+    },
+    body,
+  );
+
+test("a disclosed bot skill emits its pointer after the persona, and its body lands in the map under its folder", () => {
+  const assembly = withFile(PROBE_SKILL, (abs) => writeIn(abs, probeSkill("# Probe\n\nThe body.\n")), () =>
+    assemble({ repoRoot }),
+  );
+  assert.deepEqual(assembly.findings.filter((f) => (f.severity ?? "error") === "error"), []);
+  const prompt = promptOf(assembly);
+  const pointer = "**zz-probe-skill** — Probe trigger words — use when testing the bundler.";
+  const at = prompt.indexOf(pointer);
+  assert.ok(at !== -1, "the pointer line must be in the prompt");
+  assert.ok(at > prompt.indexOf("<!-- agents/uno-bot/AGENT.md -->"), "bot skills sort after the persona");
+  assert.ok(at < prompt.indexOf("<!-- skills/"), "bot skills sort before the uno skill faces");
+  assert.ok(!prompt.includes("The body."), "the body stays out of the prompt");
+  assert.equal(mapOf(assembly)["zz-probe-skill"], "# Probe\n\nThe body.\n", "the body is in the map by folder name");
+  const row = assembly.manifest.members.find((m) => m.path === PROBE_SKILL);
+  assert.equal(row.section, "bot-skills");
+  assert.equal(row.name, "zz-probe-skill");
+  assert.equal(row.pointer, pointer);
+});
+
+test("a disclosed doc with no description emits no pointer", () => {
+  // Today's disclosed docs carry a `summary` and no `description`; their
+  // pointers are written in the docs that fire them, so the prompt is the
+  // committed one, byte for byte.
+  const assembly = assemble({ repoRoot });
+  assert.equal(promptOf(assembly), assembled());
+  assert.deepEqual(mapOf(assembly), references());
+});
+
+test("a bot skill body over its budget fails the build, naming the role and the limit", () => {
+  const assembly = withFile(PROBE_SKILL, (abs) => writeIn(abs, probeSkill(`# Probe\n${padding(5_000)}`)), () =>
+    assemble({ repoRoot }),
+  );
+  const errors = assembly.findings.filter((f) => (f.severity ?? "error") === "error");
+  assert.equal(errors.length, 1);
+  assert.match(errors[0].message, /zz-probe-skill\/SKILL\.md \(botSkill\)/);
+  assert.match(errors[0].message, /5,000/);
+});
+
+test("budget, sort and reference naming read only the section row — no path-suffix rule remains", () => {
+  const code = readFileSync(bundler, "utf8")
+    .split("\n")
+    .filter((l) => !l.trim().startsWith("//") && !l.trim().startsWith("*"))
+    .join("\n");
+  assert.ok(!/endsWith\(["'`]\//.test(code), "a path-suffix test decides something");
+  assert.ok(!/method\.md|bot\.md/.test(code), "the bundler names a skill file shape");
+  assert.ok(!/\\\/references\\\//.test(code), "the bundler matches a references/ path");
+  assert.ok(!/section === ["']/.test(code), "the bundler branches on a section's name");
 });
