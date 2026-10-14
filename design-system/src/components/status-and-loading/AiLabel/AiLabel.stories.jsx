@@ -13,7 +13,7 @@ import AiLabel, { AI_ORIGINS } from './AiLabel';
  * present.
  *
  * The contrast half is covered elsewhere and is not re-asserted: the a11y
- * ratchet in `docs/evals/a11y-baseline.json` tracks `color-contrast` over every
+ * ratchet in `scripts/baselines/a11y-baseline.json` tracks `color-contrast` over every
  * story rendered, and may fall but never rise.
  */
 export default {

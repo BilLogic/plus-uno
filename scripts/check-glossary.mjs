@@ -50,7 +50,7 @@ export const SUBJECT = 'GLOSSARY.md';
 /** The one section that holds a table rather than term entries (ADR-023). Matched on its name, before the dash gloss. */
 export const TWO_VOCABULARIES = 'Two vocabularies';
 /** Repo-relative: also this record's key in the shape table, and what the registry row declares. */
-export const BASELINE = 'docs/evals/glossary-baseline.json';
+export const BASELINE = 'scripts/baselines/glossary-baseline.json';
 
 export const REMEDY =
   '  -> a glossary defines terms; move the reference behind a pointer, or re-baseline with --update and say why.';

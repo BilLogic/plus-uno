@@ -9,7 +9,7 @@
  * itself with a #84cfff border at 1.62:1, the AM/PM toggle and the file drop
  * zone with an 8% tint at 1.13:1, four textarea states at 2.22:1, and six
  * readonly fields with the same grey they wear at rest. All 29 are fixed, and
- * `docs/evals/focus-ring.json` records the sweep with no exceptions.
+ * `scripts/baselines/focus-ring.json` records the sweep with no exceptions.
  *
  * A RING ON A GROUND ITS CALLER PAINTS is measured, not excused. A rule can
  * declare the grounds it sits on with `// @grounds: --color-x --color-y` as
@@ -46,7 +46,7 @@ import { NON_TEXT, declarationErrors } from './lib/declared-grounds.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 
-const RECORD = 'docs/evals/focus-ring.json';
+const RECORD = 'scripts/baselines/focus-ring.json';
 const ROLES_FILE = `${TOKEN_DIR}/_color_roles.scss`;
 
 /*

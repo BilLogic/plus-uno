@@ -69,23 +69,23 @@ Answered by the **spotter** (fallback: the designated maintainer) — never by t
 
 ## 4 · Severity classification
 
-- **Direct fix — trivial. The whitelist is absolute:** typos · broken links · stale dates · pure formatting — nothing else. A direct fix may **never** touch skill definitions, the persona, DS components, or requirements, no matter how small the diff. Apply directly — no PR/PRD, no verdict — and log one line to `docs/evals/runs/digest.jsonl` as `{"ts": "<ISO-8601>", "target": "<file-or-artifact>", "change": "<one line>"}` (the row shape is a contract: the weekly digest automation windows on `ts` and prints `target`/`change`; a row missing `ts` is silently undated and falls out of every digest). The weekly digest posts from it to the design channel (`docs/connectors/slack.md`); the monthly retro reviews the digest.
+- **Direct fix — trivial. The whitelist is absolute:** typos · broken links · stale dates · pure formatting — nothing else. A direct fix may **never** touch skill definitions, the persona, DS components, or requirements, no matter how small the diff. Apply directly — no PR/PRD, no verdict — as a commit on main whose message names the target and the change; the commit is the record.
 - **Gated change — substantive:** everything else → the pipeline in §5.
 
-## 5 · Gated change — PR + PRD → verdict → apply log
+## 5 · Gated change — PR + PRD → verdict
 
 1. **Pair, never one alone.** Open the PR *and* pair it with a PRD carrying the rationale — reviewers see *why*, not just *what*. A lone PR or lone PRD never ships.
 2. **Review post** to the design review channel (`docs/connectors/slack.md`): self-sufficient — one-line summary, PR + PRD links, suggested reviewers. Assume the reviewer never opens the PR.
 3. **Verdict** from a routed reviewer, machine-parseable per `docs/connectors/slack.md` gate 2 (approve / request-changes / reject — the emoji vocabulary lives there, not here). **Persona and DS-component changes need two approvals.** No verdict in 2 working days → re-ping the suggested reviewers once; 4 working days → escalate to the design lead. **Never auto-merge on silence.**
-4. **Execute on approve only.** Merge the PR / apply the update, then write one **apply-log row** (target · verdict link · timestamp) to `docs/evals/runs/apply-log.jsonl` — interim store until the Notion Eval Runs DB exists. Non-code applies have no merge log — this row is what makes the audit measurable.
+4. **Execute on approve only.** Merge the PR or apply the update, then reply in the review thread with what was applied — a non-code apply has no merge commit, so that reply is its record.
 5. **🔁** → revise and re-enter at drafting (§2); each round gets a fresh, complete post. **❌** → record why in the thread so the idea isn't silently re-raised.
 
 ## 6 · Standing intake paths
 
-- **Handoff rails propagation (from uno-publish):** arrives **pre-authorized** — the designer-confirmed handoff plus its three sign-offs replace the worth-incorporating gate and the verdict. Execute the paired PRD + blueprint write per `docs/connectors/supabase/overview.md` and write the apply-log row citing the handoff thread. This is the only intake that skips §3/§5.
+- **Handoff rails propagation (from uno-publish):** arrives **pre-authorized** — the designer-confirmed handoff plus its three sign-offs replace the worth-incorporating gate and the verdict. Execute the paired PRD + blueprint write per `docs/connectors/supabase/overview.md` and reply in the handoff thread with what was applied. This is the only intake that skips §3/§5.
 
 - **Conventions are repo-canonical** (decision 2026-07-07, ADR-017): `docs/conventions/` wins every conflict. A legacy Notion playbook page that contradicts a conventions file is the stale artifact — file an intake to banner it as superseded (the faces route the Notion write); never "re-sync" the repo to match it, never fix the drift silently.
-- **Standing sweeps:** named in `docs/engineering/operations.md` — shipped watchdog · weekly direct-fix digest · Figma hygiene · conventions integrity (agents↔docs cross-references both ways, header canonicality, path rot) · Notion comment sweep. Each sweep files one intake per finding into this same pipeline.
+- **Standing sweeps:** named in `docs/engineering/operations.md` — shipped watchdog · Figma hygiene · conventions integrity (agents↔docs cross-references both ways, header canonicality, path rot) · Notion comment sweep. Each sweep files one intake per finding into this same pipeline.
 - **Post-ship reconciliation:** every shipped handoff triggers a reconcile of DS + harness + blueprint against built reality — routine, not exceptional. The check set, per shipped card:
   - `design-system/` stories/MDX reflect the shipped surface where they reference it;
   - harness docs (`docs/product-and-service/*`, conventions, skill references) don't describe pre-ship behavior as current;

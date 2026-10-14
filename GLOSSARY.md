@@ -218,7 +218,7 @@ A feedback-rail publish: Loom + preview + Decisions DB link (+ replica for proto
 _Avoid_: "post", "update"
 
 **direct fix / gated change**:
-The two maintenance severities: a trivial fix applied straight to main with a digest line, vs a PR + PRD through a Slack verdict.
+The two maintenance severities: a trivial fix committed straight to main, vs a PR + PRD through a Slack verdict.
 _Avoid_: "Tier 1", "Tier 2"
 
 **Tier 1 / Tier 2 / Tier 3**:
@@ -252,25 +252,9 @@ _Avoid_: "the walker", "the parser" (there is one of each)
 A check's recorded baseline: a count may fall and a rise is a finding, an entry the run stops finding is a finding too, and a missing record fails loudly.
 _Avoid_: "the whitelist", "the exceptions file", "the allow-list"
 
-**eval case**:
-One scored eval conversation; every count about the suite is read from the **census** of cases rather than typed.
-_Avoid_: "the fixture" (a fixture is the file of cases; a case is one of them)
-
-**recording**:
-A case's captured model replies, tool results and subject, which the local **transport** replays; it says whether it was authored or captured.
-_Avoid_: "fixture" (a fixture is what a case ASSERTS; a recording is what answered it)
-
-**transport**:
-How the eval runner reaches a turn: the deployed Worker, or **Turn** in-process from a **recording**. The summary names which one answered, because the two are different measurements.
-_Avoid_: "the endpoint", "the eval route" (that is one transport's target)
-
 **judge**:
-Who grades an eval answer against the rubric: `pass`, `fail` or `skipped`. A skip fails open, so it carries its reason and the summary counts what was judged.
+The Worker's pre-send check that grades a draft against the bot-answer rubric: `pass`, `fail`, `skip` or `error`. A skip fails open, so it carries its reason.
 _Avoid_: "the rubric" (that is the document a judge grades against)
-
-**unreachable**:
-A case this run's **transport** has no way to reach (for the local one, a case with no **recording**): skipped by name, kept out of the denominator, and named in the report.
-_Avoid_: "skipped" (a skip is a reachable case whose subject condition nothing satisfied)
 
 ## Two vocabularies — the blueprint speaks service-blueprint, the Roadmap speaks project-management
 
