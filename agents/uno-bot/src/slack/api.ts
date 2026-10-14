@@ -12,7 +12,6 @@ import {
 } from "./mrkdwn";
 import { countedFetch, rethrowIfBudget } from "../net";
 import type { SlackEventFile } from "./types";
-import { rowFor } from "../agent/tool-table";
 import { cardLinks } from "./plan-block";
 import type { SlackIcon } from "./estate-glyphs";
 
@@ -598,49 +597,6 @@ export async function addReaction(
   name: string,
 ) {
   return slackCall<SlackResponse>(env, "reactions.add", { channel, timestamp: ts, name });
-}
-
-/**
- * True when a confirmed run leaves a reviewable artifact — a draft PR, a new
- * PRD — and so warrants a heads-up in #plus-design for team review (D5).
- *
- * The roster and the artifact's name are both the tool table's `reviewRequest`
- * column (`agent/tool-table.ts`): this module kept a set of three names and a
- * second map of three labels beside it, so a new tool that opened a PR was
- * announced nowhere, and one that was in the set but not the map announced
- * itself by its raw tool name. An archive or an update is not in the column —
- * a removal has nothing to review.
- */
-export function warrantsReviewRequest(toolName: string): boolean {
-  return rowFor(toolName)?.reviewRequest != null;
-}
-
-export interface ReviewRequestInput {
-  toolName: string;
-  requesterUserId: string;
-  /** Channel/thread where the work was requested, for a back-link. */
-  originChannel: string;
-  /** Artifact link (PR/Notion url) if the executor surfaced one. */
-  artifactUrl?: string;
-  /** Optional reviewer Slack ids to tag (from find_experts, when available). */
-  reviewerUserIds?: string[];
-}
-
-// Announce a reviewable artifact to #plus-design: right place (the design
-// channel), right person (@-mention the requester + any reviewers), right time
-// (fired at completion). No-ops when PLUS_DESIGN_CHANNEL_ID is unset.
-export async function postReviewRequest(env: Env, input: ReviewRequestInput) {
-  const channel = env.PLUS_DESIGN_CHANNEL_ID?.trim();
-  if (!channel) return; // fan-out disabled
-  const what = rowFor(input.toolName)?.reviewRequest ?? input.toolName;
-  const reviewers = (input.reviewerUserIds ?? []).map((id) => `<@${id}>`).join(" ");
-  const lines = [
-    `*Review request* — a ${what} is ready.`,
-    input.artifactUrl ? `Artifact: ${input.artifactUrl}` : "",
-    `Requested by <@${input.requesterUserId}> · thread in <#${input.originChannel}>`,
-    reviewers ? `Suggested reviewers: ${reviewers}` : "",
-  ].filter(Boolean);
-  return postMessage(env, { channel, text: lines.join("\n") });
 }
 
 export interface ConversationsRepliesResult extends SlackOk {

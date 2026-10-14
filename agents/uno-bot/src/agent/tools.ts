@@ -25,8 +25,7 @@
 // It re-exports nothing: a reader that wants a row's standing, the `ToolName`
 // union, `isToolName` or `rowFor` imports `./tool-table`, which is cheaper to
 // reach and loadable everywhere — which is how the confidence check, the
-// pending notice, the proposal card and the review-request fan-out read their
-// rosters off a row (#598). A pass-through bag over two modules everyone can
+// pending notice and the proposal card read their rosters off a row (#598). A pass-through bag over two modules everyone can
 // already import is what `loop-shared.ts` was (#497).
 import toolsJson from "../../tool-definitions.json";
 import { TOOL_BODIES, type ToolBody } from "./tool-bodies";
