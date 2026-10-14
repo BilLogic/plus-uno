@@ -15,6 +15,10 @@
 //      author is Bill, so the author proves nothing) or that names no trigger
 //      gets nothing. A mention picked from Figma's list is spelled "@Name" in
 //      the comment's `message`, so this is where a mention is decided.
+//   2a. THE 🐐. The ask gets a `:goat:` reaction before anything else is
+//      done, so the asker sees it was picked up before the reply lands. Sent
+//      once — the mark says so — and a refusal is logged and passed over: the
+//      reply matters more than the acknowledgement.
 //   3. WHO ASKED. Figma's user id, through the Team Members map
 //      (`usage/roles.ts`). A teammate's change request is drafted as a card in
 //      #plus-design; anyone the map does not know gets no card, and a turn
@@ -65,7 +69,7 @@ import { slackPersonOfFigma, type FigmaPeople } from "../usage/roles";
 import type { GapNotes } from "../usage/gap-notes";
 import { askLeadText, figmaReplyLines, figmaReplyText, plainAnswer, type FigmaReply, type FigmaSource } from "./copy";
 import { figmaAskDelivery, type FigmaAskDelivery } from "./delivery";
-import { askText, asksUno, asPosted, isOwnComment } from "./trigger";
+import { askText, asksUno, asPosted, GOAT_REACTION, isOwnComment } from "./trigger";
 import { figmaFileUrl } from "../figma/links";
 
 /** How long a comment's mark is kept: past every Figma redelivery and runner retry. */
@@ -102,6 +106,8 @@ export type AskMark =
       card?: PostedCard;
       /** The reply, drafted and not yet posted. */
       reply?: string;
+      /** The 🐐 is on the ask, or Figma refused it: never sent twice. */
+      reacted?: true;
     }
   | { state: "replied"; at: number };
 
@@ -131,7 +137,7 @@ export interface AskDesign {
 }
 
 export interface FigmaAskDeps {
-  figma: Pick<FigmaClient, "comments" | "fileMeta" | "replyToComment">;
+  figma: Pick<FigmaClient, "comments" | "fileMeta" | "replyToComment" | "postReaction">;
   /** The Figma user id → Slack id map. Throws a budget stop. */
   people(): Promise<FigmaPeople>;
   marks: {
@@ -219,6 +225,7 @@ async function answer(job: FigmaAskJob, deps: FigmaAskDeps, pending: Pending, ro
   if (!asksUno(comment.message)) return { outcome: "handled", said: "no @uno in it" };
   const rootId = comment.parent_id || comment.id;
   rootOf.id = rootId;
+  await acknowledge(job, deps, pending);
 
   let reply = pending.reply ?? null;
   let said = "the drafted reply";
@@ -244,6 +251,23 @@ async function answer(job: FigmaAskJob, deps: FigmaAskDeps, pending: Pending, ro
   await deps.figma.replyToComment(job.fileKey, rootId, reply);
   await deps.marks.put(job.commentId, { state: "replied", at: deps.now() });
   return { outcome: "handled", said: `replied: ${said}` };
+}
+
+/**
+ * The 🐐 on the ask, once. A budget stop or a rate limit defers the ask like
+ * any stop; any other refusal is logged, and the reply goes ahead without it.
+ */
+async function acknowledge(job: FigmaAskJob, deps: FigmaAskDeps, pending: Pending): Promise<void> {
+  if (pending.reacted) return;
+  try {
+    await deps.figma.postReaction(job.fileKey, job.commentId, GOAT_REACTION);
+  } catch (err) {
+    if (waitable(err)) throw err;
+    console.warn(`[figma-ask] no 🐐 on ${job.commentId}: ${messageOf(err)}`);
+  }
+  pending.reacted = true;
+  pending.at = deps.now();
+  await deps.marks.put(job.commentId, pending);
 }
 
 /** The reply the ask comes to — from a card already posted, or a turn — and null to post nothing. */

@@ -50,6 +50,13 @@ const TRIGGERS = new RegExp(TRIGGER.source, "gi");
 const LABEL_READ_BACK = ":goat:";
 
 /**
+ * The reaction on an ask uno-bot picked up, as Figma's reactions call takes
+ * it: the shortcode. The emoji character is refused with a 400, and the
+ * reaction reads back as `:goat:` (probed live, 2026-10-14).
+ */
+export const GOAT_REACTION = LABEL_READ_BACK;
+
+/**
  * A comment as uno-bot posted it: the label Figma hands back as its shortcode
  * becomes the emoji again. Anything after the label is left as Figma has it.
  *

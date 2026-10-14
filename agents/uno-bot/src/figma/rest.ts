@@ -75,6 +75,7 @@ import {
   type FigmaFolderFilesResponse,
   type FigmaImagesResponse,
   type FigmaNodesResponse,
+  type FigmaReactionsResponse,
   type FigmaTeamFoldersResponse,
   type FigmaTier,
   type FigmaVersionsResponse,
@@ -284,6 +285,23 @@ export function createFigmaRestClient(deps: FigmaRestDeps): FigmaClient {
         },
         opts,
       ),
+    reactions: (key, commentId, opts) =>
+      call<FigmaReactionsResponse>(
+        { what: "comment reactions", tier: 2, method: "GET", path: `${file(key)}/comments/${encodeURIComponent(commentId)}/reactions` },
+        opts,
+      ),
+    postReaction: async (key, commentId, emoji, opts) => {
+      await call<unknown>(
+        {
+          what: "comment reaction",
+          tier: 2,
+          method: "POST",
+          path: `${file(key)}/comments/${encodeURIComponent(commentId)}/reactions`,
+          body: { emoji },
+        },
+        opts,
+      );
+    },
     teamFolders: (teamId, opts) =>
       call<FigmaTeamFoldersResponse>(
         { what: "team folders", tier: 2, method: "GET", path: `/v2/teams/${encodeURIComponent(teamId)}/folders` },
