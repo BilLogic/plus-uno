@@ -68,6 +68,6 @@ export function isWithheldRepoPath(path: string): boolean {
 
 /** The refusal, in the shape the bot is asked to speak: cause, then route. */
 export const WITHHELD_NOTE =
-  "docs/evals/ holds the grader instructions for the cases I am measured on, so I do not read it — " +
+  "docs/evals/ holds grader instructions and answer keys for the cases my detectors and skills are checked against, so I do not read it — " +
   "an answer written from the marking scheme measures nothing. Say that plainly if someone asks for " +
   "it, and point them at the file on github.com, which they can open themselves.";

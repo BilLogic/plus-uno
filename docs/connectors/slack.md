@@ -21,6 +21,8 @@ summary: Pillar → channel map (group announcements; all private — uno-bot mu
 Pillar → channel map (group announcements; **all private — uno-bot must be invited before posting/@here**):
 `Universal` → #plus-universal `C072E8SFLKV` · `Admin` → #plus-admin `C089A3E9CCW` · `Toolkit` → #plus-toolkit `C08925VDFF1` · `Training` → #plus-training `C07L5RZV6DR` · `Marketing` → #plus-marketing `C052BG9NE86`. Tutoring + Help Center: unmapped — flag at retro.
 
+**Automations registry.** What runs on its own — each morning and end-of-day job, cron and PR gate, with its trigger and owner — is `read_reference` name `docs/engineering/operations`. Read it before answering what runs when, or who owns an automated post.
+
 <!-- ide-only -->
 ## The end-of-day sweep — read path and audience rule
 

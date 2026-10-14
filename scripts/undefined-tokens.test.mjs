@@ -164,7 +164,7 @@ test('the real corpus is walked, and the real baseline matches it', () => {
   // side is `{ name: { uses, bare } }` and nothing else, which is also what
   // `--update` writes back.
   const { undefinedTokens } = audit(files);
-  const entries = openRatchet({ file: 'docs/evals/undefined-token-baseline.json', set: 'tokens', repoRoot: REPO_ROOT });
+  const entries = openRatchet({ file: 'scripts/baselines/undefined-token-baseline.json', set: 'tokens', repoRoot: REPO_ROOT });
   const side = Object.fromEntries(
     Object.entries(undefinedTokens).map(([name, entry]) => [name, { uses: entry.uses, bare: entry.bare }]),
   );
@@ -238,7 +238,7 @@ test('a used-and-undefined token in a fixture tree is a finding', () => {
   const { root, done } = policyTree({
     'design-system/src/tokens/_fonts.scss': ':root { --font-weight-normal: 300; }\n',
     'design-system/src/Select.scss': '.x { font-weight: var(--font-weight-light); }\n',
-    'docs/evals/undefined-token-baseline.json': UNDEFINED_BASELINE,
+    'scripts/baselines/undefined-token-baseline.json': UNDEFINED_BASELINE,
   });
   try {
     const found = messagesOf(run, root);
@@ -253,7 +253,7 @@ test('a used-and-undefined token in a fixture tree is a finding', () => {
 
 test('an empty token directory fires the sentinel floor, not a clean sweep', () => {
   const { root, done } = policyTree({
-    'docs/evals/undefined-token-baseline.json': UNDEFINED_BASELINE,
+    'scripts/baselines/undefined-token-baseline.json': UNDEFINED_BASELINE,
   });
   try {
     const found = messagesOf(run, root);

@@ -1,7 +1,7 @@
 // The relayed DM, rendered.
 //
 // A relayed DM is a Slack DM to a named person, sent on a requester's behalf
-// once the card is approved (CONTEXT.md). What the recipient reads is the
+// once the card is approved (GLOSSARY.md). What the recipient reads is the
 // message the requester approved, between two lines the WORKER adds: who asked
 // for it, and the link back to where they asked. Both are written here and not
 // by the model, so a model that forgets them cannot send an anonymous DM or one

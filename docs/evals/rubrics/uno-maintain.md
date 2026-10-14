@@ -12,7 +12,7 @@ dimensions:
   - id: self-sufficiency
     definition: reviewer follow-up questions before verdict — target median 0
 hard_gates:
-  - 0 gated changes applied without a Slack verdict (audit merge log vs #plus-design; the direct-fix whitelist applies verdict-free by design, logged to the digest)
+  - 0 gated changes applied without a Slack verdict (audit merge log vs #plus-design; the direct-fix whitelist applies verdict-free by design, its commit the record)
   - accepted changes ship as a PR+PRD PAIR, never one alone (100%)
 benchmark: >
   Seeded issue set (one per taxonomy target, 11 total) → measure routing

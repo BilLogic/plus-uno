@@ -11,8 +11,7 @@
 // carries (`slack/events.ts`).
 //
 // SO THIS FILE HOLDS ONLY SLACK'S DIFFERENCES. The request is built by
-// `slack/turn-request.ts` — pure, and driven by the parity test beside the eval
-// builder — and the dependencies by `turn/env-deps.ts`, which both callers
+// `slack/turn-request.ts` — pure, and driven by its parity test — and the dependencies by `turn/env-deps.ts`, which both callers
 // share. What is named here is the five entries that are Slack's alone: the
 // Durable Object store, the posting Delivery, a verdict that actually EXECUTES,
 // the real ts a tool's own posts thread off, and where the turn came from.

@@ -52,7 +52,7 @@ Say what happened, what the user can do, and never assign blame.
 
 ## Terminology
 
-Use PLUS vocabulary consistently. See `CONTEXT.md` for the canonical list. When in doubt, use the term students and tutors already use in conversation.
+Use PLUS vocabulary consistently. See `GLOSSARY.md` for the canonical list. When in doubt, use the term students and tutors already use in conversation.
 
 ## Capitalization
 

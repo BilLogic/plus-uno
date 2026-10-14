@@ -2,13 +2,13 @@
 // drawn from.
 //
 // WHY A HOOK OF ITS OWN. The loop already reported tool calls twice, for the
-// eval transcript: `onToolCall` before dispatch and `onToolResult` after. Both
+// eval transcript (since removed): `onToolCall` before dispatch and `onToolResult` after. Both
 // were built for an artifact a person reads weeks later, so the result digest
 // carries no arguments and, by design, no content (`tool-transcript.ts` says
 // why). A task card needs exactly what that digest refuses — what the call
 // searched for, what came back, the links it read — and it needs to know WHEN
 // a call starts, which neither hook says. Widening the digest would have put
-// content into the eval artifact; a second event keeps the two promises apart.
+// content into that transcript; a second event keeps the two promises apart.
 //
 // THE PHASES. Every call a batch of lookups holds is `announced` before any of
 // them runs, so a person sees the whole batch queued. Lookups run one at a
@@ -62,7 +62,7 @@ export type ToolProgressEvent =
        *  them. Absent when it named none. */
       readonly sources?: readonly TaskCardSource[];
       /** The tool's own error, when its result says it failed — the same field
-       *  the eval transcript reads, so a card and the artifact never disagree
+       *  the tool-result digest carries, so a card and the artifact never disagree
        *  about whether a lookup failed. */
       readonly error?: string;
     })

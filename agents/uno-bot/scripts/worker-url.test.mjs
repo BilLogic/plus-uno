@@ -126,10 +126,10 @@ test("the documented exceptions are exempt, and only they are", () => {
   });
 });
 
-test("recorded eval runs are left alone — rewriting them would falsify the record", () => {
+test("recorded runs are left alone — rewriting them would falsify the record", () => {
   // A run artifact says which Worker it scored. That run really did hit the old
   // one; editing it to the new host would be a lie about history.
-  withRepo("docs/evals/runs/2026-08-19-baseline.json", `{"worker":"https://${HOST}"}\n`, (root) => {
+  withRepo("docs/knowledge/archive/eval-runs/2026-08-19-baseline.json", `{"worker":"https://${HOST}"}\n`, (root) => {
     assert.deepEqual(findStrays(root), []);
   });
   withRepo("docs/plans/2026-08-19-001-plan.md", `curl https://${HOST}/health\n`, (root) => {
@@ -220,7 +220,7 @@ test("--host asks about a FOREIGN host, and ALLOWED does not apply there", () =>
   });
 
   // Recorded history stays exempt in both modes: those runs really did hit it.
-  withRepo("docs/evals/runs/2026-08-19.json", `{"worker":"https://${OLD}"}\n`, (root) => {
+  withRepo("docs/knowledge/archive/eval-runs/2026-08-19.json", `{"worker":"https://${OLD}"}\n`, (root) => {
     assert.deepEqual(findStrays(root, OLD), []);
   });
 });
