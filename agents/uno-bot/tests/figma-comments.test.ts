@@ -15,12 +15,12 @@ import { fakeProvider } from "../src/agent/providers/fake";
 import { createInMemoryFigma, type InMemoryFigma } from "../src/figma/in-memory";
 import type { FigmaComment } from "../src/figma/client";
 import type { FigmaNode } from "../src/integrations/figma-reading";
-import { SubrequestBudgetError } from "../src/net";
+import { isSubrequestBudgetError, SubrequestBudgetError } from "../src/net";
 import { runSweepJob, type SweepSource } from "../src/sweep/index";
 import type { ScheduledJob } from "../src/scheduled/runs";
 import { isWithheldRepoPath } from "../src/integrations/repo-read-guard";
 import { COMMENTS_CURSOR, etDatesOf, quoteOf, readCommentsCursor, writeCommentsCursor } from "../src/figma-comments/read";
-import { DECISION_CARD_TTL_MS } from "../src/figma-comments/post";
+import { DECISION_CARD_TTL_MS, figmaDecisionsSection } from "../src/figma-comments/post";
 import { candidateThreads, readable } from "../src/figma-comments/threads";
 import { dividerSection, pageOf, pagesOf } from "../src/figma-comments/sections";
 import { cardNumbersOf } from "../src/figma-comments/title";
@@ -35,7 +35,7 @@ import { replyHandlerAt } from "../src/slack/events";
 import type { SlackMessageEvent } from "../src/slack/types";
 import type { Env } from "../src/types";
 import type { DecisionRow } from "../src/integrations/notion";
-import { at, DESIGN, notionPage, ROADMAP_DB, sweepHarness } from "./helpers/sweep-harness";
+import { at, DESIGN, notionPage, ROADMAP_DB, sweepHarness, type SweepHarness } from "./helpers/sweep-harness";
 import { mentionCount, notified } from "./helpers/notified";
 
 /** One card of a decision report, as Slack is handed it. */
@@ -49,6 +49,22 @@ type Card = {
 
 const NIGHT: ScheduledJob ={ key: "sweep:figma-comments", kind: "sweep-figma-comments" };
 const MORNING: ScheduledJob = { key: "sweep:figma-post", kind: "sweep-figma-post" };
+const SWEEP_POST: ScheduledJob = { key: "sweep-post", kind: "sweep-post" };
+
+/** A morning: the hand-over, then the sweep's post with the decisions as its section. */
+async function morning(h: SweepHarness) {
+  const report = await runSweepJob(MORNING, h.deps);
+  h.deps.sections = [figmaDecisionsSection(h.deps.figmaComments!, h.deps.runDate, h.deps.now)!];
+  await runSweepJob(SWEEP_POST, h.deps);
+  return report;
+}
+
+/** The morning's message in #plus-design: the sweep's, at the channel's top. */
+function parentOf(h: SweepHarness) {
+  const parent = h.posted.filter((p) => p.channel === DESIGN && p.threadTs === null).at(-1);
+  assert.ok(parent, "the morning posted in #plus-design");
+  return parent;
+}
 
 const FILE = "GoalFile1";
 const CARD_ID = "24820000000000000000000000000001";
@@ -428,29 +444,36 @@ describe("the night's read of Figma comments (#900)", () => {
   });
 });
 
-describe("the morning's thread in #plus-design (#900)", () => {
+describe("the morning's decisions on the sweep's message in #plus-design (#900)", () => {
   async function postedMorning() {
     const { h, client } = await nightHarness();
     await runSweepJob(NIGHT, h.deps);
     h.clock.now = at(30, 13);
-    const report = await runSweepJob(MORNING, h.deps);
+    const report = await morning(h);
     return { h, client, report };
   }
 
-  it("opens one thread for the file: the parent line for its owner, and a card per decision in a carousel", async () => {
-    const { h, report } = await postedMorning();
-    assert.equal(report.summary, "posted 1 Figma decision thread(s), 4 card(s)");
-    assert.equal(h.figma.messages.length, 1, "one message: the parent line and its cards");
-    const [parent] = h.figma.messages;
-    assert.equal(parent!.threadTs, null);
-    const blocks = parent!.blocks as Array<{ type: string; text?: { text: string }; elements?: Card[] }>;
-    assert.equal(
-      blocks[0]!.text!.text,
-      "4 comments in <https://www.figma.com/design/GoalFile1|Goal Setting / Card 2482 / Sarah> read like decisions.\n• <@U0SARAH> — 1 · Keep the progress bar hidden until the first goal is set + 2 · States are all in, moving this card to Under Review + 3 · Goal chips use Badge's pill variant everywhere + 4 · Show the bar only once there is a goal",
-      "the owner's bullet lists their cards",
-    );
-    assert.deepEqual(notified(parent!), ["U0SARAH"]);
-    assert.equal(mentionCount(parent!, "U0SARAH"), 1, "pinged once");
+  it("hands the decisions over and posts nothing of its own", async () => {
+    const { h } = await nightHarness();
+    await runSweepJob(NIGHT, h.deps);
+    h.clock.now = at(30, 13);
+    const report = await runSweepJob(MORNING, h.deps);
+    assert.equal(report.summary, "handed 4 Figma decision card(s) on 1 file(s) to the morning post");
+    assert.deepEqual(h.figma.messages, []);
+    assert.deepEqual(h.posted, []);
+    assert.equal(h.figma.queue.size, 1, "queued until the message is up");
+  });
+
+  it("is a section of the one message: its owner's bullet, and a card per decision in the carousel", async () => {
+    const { h } = await postedMorning();
+    assert.equal(h.posted.length, 1, "one message in #plus-design");
+    assert.deepEqual(h.figma.messages, [], "nothing of its own");
+    const parent = parentOf(h);
+    assert.equal(parent.channel, DESIGN);
+    const blocks = parent.blocks as Array<{ type: string; text?: { text: string }; elements?: Card[] }>;
+    assert.match(blocks[0]!.text!.text, /<@U0SARAH>, 4 comments in <https:\/\/www\.figma\.com\/design\/GoalFile1\|Goal Setting \/ Card 2482 \/ Sarah> read like decisions\./);
+    assert.deepEqual(notified(parent), ["U0SARAH"]);
+    assert.equal(mentionCount(parent, "U0SARAH"), 1, "pinged once");
     assert.equal(blocks[1]!.type, "carousel");
     const cards = blocks[1]!.elements!;
     assert.deepEqual(
@@ -472,7 +495,7 @@ describe("the morning's thread in #plus-design (#900)", () => {
     assert.deepEqual(cards[1]!.actions.map((a) => a.text.text), ["Review", "Open comment", "Open card"]);
     assert.deepEqual(cards[2]!.actions.map((a) => a.text.text), ["Review", "Open comment"]);
     // Nothing to type or react: no gate footer anywhere it posted or staged.
-    for (const text of [parent!.text, JSON.stringify(blocks), ...h.staged.map((p) => p.proposalText)]) {
+    for (const text of [parent.text, JSON.stringify(blocks), ...h.staged.map((p) => p.proposalText)]) {
       assert.doesNotMatch(text, /white_check_mark|no_entry|✅|⛔|\bdrop \d|\bskip\b|react/);
     }
   });
@@ -485,8 +508,8 @@ describe("the morning's thread in #plus-design (#900)", () => {
     const { h } = await nightHarness({ replies: [reply] });
     await runSweepJob(NIGHT, h.deps);
     h.clock.now = at(30, 13);
-    await runSweepJob(MORNING, h.deps);
-    const posted = h.figma.messages[0]!;
+    await morning(h);
+    const posted = parentOf(h);
     assert.ok(h.staged[0]!.proposalText.includes(long), "Review shows every word the write makes");
     const card = (posted.blocks as Card[])[1]!;
     assert.equal(card.body.text.length, 200);
@@ -495,7 +518,7 @@ describe("the morning's thread in #plus-design (#900)", () => {
 
   it("stages each decision on its own, for the card's people, for 72 hours — and writes nothing (AC 3)", async () => {
     const { h, client } = await postedMorning();
-    const parent = h.figma.messages[0]!;
+    const parent = parentOf(h);
     assert.equal(h.staged.length, 4);
     for (const [i, p] of h.staged.entries()) {
       const id = ["c1", "c3", "c4", "c9"][i]!;
@@ -515,12 +538,12 @@ describe("the morning's thread in #plus-design (#900)", () => {
     assert.deepEqual([...h.figma.carded].sort(), ["c1", "c3", "c4", "c9"]);
     assert.equal(h.figma.queue.size, 0);
     assert.deepEqual(
-      h.figma.threads.get(parent.ts)?.decisions.map((d) => [d.n, d.commentId]),
+      h.figma.threads.get(parent.ts)?.decisions.map((d) => [d.n, d.commentId, d.file?.fileKey]),
       [
-        [1, "c1"],
-        [2, "c3"],
-        [3, "c4"],
-        [4, "c9"],
+        [1, "c1", FILE],
+        [2, "c3", FILE],
+        [3, "c4", FILE],
+        [4, "c9", FILE],
       ],
     );
   });
@@ -551,7 +574,7 @@ describe("the morning's thread in #plus-design (#900)", () => {
     assert.equal(h.provider.generated.length, 1, "the carded thread's new reply asks the detector nothing");
   });
 
-  it("asks a card-less file's creator by Figma handle, and #plus-design's members decide", async () => {
+  it("names a card-less file's creator by Figma handle, and #plus-design's members decide", async () => {
     const client = createInMemoryFigma();
     client.seedFile("LibFile1", {
       name: "Design System (S23)",
@@ -573,8 +596,8 @@ describe("the morning's thread in #plus-design (#900)", () => {
     await runSweepJob(NIGHT, h.deps);
     assert.deepEqual(h.figma.queue.get("LibFile1")?.owner, { figma: "bea" });
     h.clock.now = at(30, 13);
-    await runSweepJob(MORNING, h.deps);
-    assert.match(h.figma.messages[0]!.text, /^bea, 1 comment in <https:\/\/www\.figma\.com\/design\/LibFile1\|Design System \(S23\)> reads like a decision\.\n/);
+    await morning(h);
+    assert.match(parentOf(h).text, /bea, 1 comment in <https:\/\/www\.figma\.com\/design\/LibFile1\|Design System \(S23\)> reads like a decision\./);
     assert.deepEqual(h.staged[0]!.confirmers, ["U0A", "U0B"]);
   });
 
@@ -583,69 +606,38 @@ describe("the morning's thread in #plus-design (#900)", () => {
     await runSweepJob(NIGHT, h.deps);
     h.clock.now = at(30, 13);
     h.faults.stage = new Error("ThreadState unavailable");
-    const report = await runSweepJob(MORNING, h.deps);
-    assert.match(report.summary, /1 decision\(s\) on GoalFile1 did not go through and wait for tomorrow$/);
-    const parent = h.figma.messages[0]!;
+    await morning(h);
+    const parent = parentOf(h);
     const cards = (parent.editedBlocks as Array<{ elements?: Card[] }>)[1]!.elements!;
     assert.equal(cards[0]!.subtitle!.text, "Didn't go through, so it's queued again for tomorrow morning.");
     assert.deepEqual(cards[0]!.actions.map((a) => a.text.text), ["Open comment", "Open page"], "nothing to review");
     assert.deepEqual(cards.slice(1).map((c) => c.actions[0]!.text.text), ["Review", "Review", "Review"], "the others stand");
-    assert.deepEqual(
-      h.figma.queue.get(FILE)?.decisions.map((d) => d.commentId),
-      ["c1"],
-    );
-    // The next morning posts it in the same thread, numbered after every card shown.
+    assert.deepEqual(h.figma.queue.get(FILE)?.decisions.map((d) => d.commentId), ["c1"]);
+    // The next morning's message carries it, numbered from 1 there.
     h.clock.now = at(31, 13);
-    await runSweepJob(MORNING, h.deps);
-    const last = h.figma.messages.at(-1)!;
-    assert.equal(last.threadTs, parent.ts, "no second parent");
-    assert.equal(h.figma.messages.filter((m) => m.threadTs === null).length, 1);
-    assert.equal((last.blocks as Card[])[1]!.title.text, "5 · Keep the progress bar hidden until the first goal is set");
+    await morning(h);
+    assert.equal(h.posted.length, 2, "one message each morning");
+    assert.equal((h.posted[1]!.blocks as Card[])[1]!.title.text, "1 · Keep the progress bar hidden until the first goal is set");
     assert.equal(h.figma.queue.size, 0);
   });
 
-  it("starts a file only when the budget left covers its message, one edit and two subrequests a card", async () => {
+  it("defers the morning's message when the budget left cannot cover the cards' staging", async () => {
     const { h } = await nightHarness();
     await runSweepJob(NIGHT, h.deps);
     h.clock.now = at(30, 13);
-    // Four cards: the message, its edit and 4 × (stage, usage row) = 10.
-    let left = 9;
-    h.deps.meter = { subrequests: () => 0, d1Queries: () => 0, headroom: () => ({ subrequests: left, d1Queries: 40 }) };
-    const stopped = await runSweepJob(MORNING, h.deps);
-    assert.match(stopped.summary, /the budget left could not post a whole thread, so 1 file\(s\) wait for tomorrow/);
-    assert.equal(h.figma.messages.length, 0, "nothing posted, so no thread is left half done");
-    left = 10;
-    const posted = await runSweepJob(MORNING, h.deps);
-    assert.equal(posted.summary, "posted 1 Figma decision thread(s), 4 card(s)");
-  });
-
-  it("leaves no dead cards standing: a message none of whose cards staged says so, and the next morning fills its thread", async () => {
-    const { h } = await nightHarness();
-    await runSweepJob(NIGHT, h.deps);
-    h.clock.now = at(30, 13);
-    const slack = h.deps.figmaComments!.slack!;
-    const stage = slack.stage.bind(slack);
-    slack.stage = async () => {
-      throw new Error("ThreadState unavailable");
-    };
     await runSweepJob(MORNING, h.deps);
-    const parent = h.figma.messages[0]!;
-    assert.equal(h.figma.messages.length, 1);
-    assert.match(parent.edited!, /Their cards didn't go through this morning, so they'll post here tomorrow morning\.$/);
-    assert.equal(JSON.stringify(parent.editedBlocks).includes('"card"'), false, "no card left to press");
-    assert.equal(h.figma.queue.get(FILE)?.threadTs, parent.ts, "the thread is recorded, so a retry opens no second parent");
-
-    slack.stage = stage;
-    h.clock.now = at(31, 13);
-    await runSweepJob(MORNING, h.deps);
-    assert.equal(h.figma.messages.filter((m) => m.threadTs === null).length, 1);
-    const next = h.figma.messages.filter((m) => m.threadTs === parent.ts);
-    assert.equal(next.length, 1, "the morning's message, in the same thread");
-    assert.equal((next[0]!.blocks as Array<{ elements?: Card[] }>)[1]!.elements![0]!.title.text.startsWith("1 · "), true);
+    h.deps.sections = [figmaDecisionsSection(h.deps.figmaComments!, h.deps.runDate, h.deps.now)!];
+    let d1 = 11;
+    h.deps.meter = { subrequests: () => 0, d1Queries: () => 0, headroom: () => ({ subrequests: 40, d1Queries: d1 }) };
+    await assert.rejects(runSweepJob(SWEEP_POST, h.deps), isSubrequestBudgetError);
+    assert.deepEqual(h.posted, [], "nothing posted, so no message is left half done");
+    d1 = 40;
+    await runSweepJob(SWEEP_POST, h.deps);
+    assert.equal(h.posted.length, 1);
     assert.equal(h.staged.length, 4);
   });
 
-  it("counts in its parent line the cards it carries, not the decisions said as plain replies", async () => {
+  it("counts in its line the cards it carries, and says a decision with no PRD in a line and a reply in the thread", async () => {
     const noPrd: SweepSource = { ...CARD, subpages: [] };
     const reply = JSON.stringify({
       decisions: [
@@ -656,15 +648,17 @@ describe("the morning's thread in #plus-design (#900)", () => {
     const { h } = await nightHarness({ sources: [noPrd, PRD], replies: [reply] });
     await runSweepJob(NIGHT, h.deps);
     h.clock.now = at(30, 13);
-    await runSweepJob(MORNING, h.deps);
-    const [parent, ...notes] = h.figma.messages;
-    const blocks = parent!.blocks as Array<{ type: string; text?: { text: string } }>;
+    await morning(h);
+    const parent = parentOf(h);
+    const blocks = parent.blocks as Array<{ type: string; text?: { text: string } }>;
     assert.equal(blocks[1]!.type, "card", "the status decision carries the one card");
-    assert.match(blocks[0]!.text!.text, /, 1 comment in .* reads like a decision\.$/);
-    assert.equal(notes.length, 1, "the PRD decision with no PRD is a plain reply, not counted");
+    assert.match(blocks[0]!.text!.text, /, 1 comment in .* reads like a decision\./);
+    assert.match(blocks[0]!.text!.text, /1 comment in .* reads like a PRD change with no PRD page to draft on; the details are in this thread\./);
+    assert.equal(h.figma.messages.length, 1, "the PRD decision with no PRD is a plain reply");
+    assert.equal(h.figma.messages[0]!.threadTs, parent.ts);
   });
 
-  it("shows ten cards a morning and holds the rest in the file's queue for the next", async () => {
+  it("shares the carousel's ten and holds the rest in the file's queue for the next morning", async () => {
     const twelve = Array.from({ length: 12 }, (_, i) =>
       comment(`m${i + 1}`, { created_at: `2026-09-29T16:${String(10 + i).padStart(2, "0")}:00Z`, message: `Decision ${i + 1}`, client_meta: pin("4:2") }),
     );
@@ -676,19 +670,19 @@ describe("the morning's thread in #plus-design (#900)", () => {
     const { h } = await nightHarness({ figma, replies: [reply] });
     await runSweepJob(NIGHT, h.deps);
     h.clock.now = at(30, 13);
-    await runSweepJob(MORNING, h.deps);
-    const [first] = h.figma.messages;
+    await morning(h);
+    const [first] = h.posted;
     const blocks = first!.blocks as Array<{ text?: { text: string }; elements?: Card[] }>;
-    assert.match(blocks[0]!.text!.text, /12 comments in .* read like decisions\. Showing 10 of 12; the rest come in the next report\.\n• <@U0SARAH> — 1 · Decision 1 \+ .* \+ 10 · Decision 10$/);
-    assert.equal(blocks[1]!.elements!.length, 10);
+    assert.match(blocks[0]!.text!.text, /<@U0SARAH>, 12 comments in .* read like decisions\. Here are 10; 2 more come in the next report\./);
+    assert.deepEqual(blocks[1]!.elements!.map((c) => c.title.text), Array.from({ length: 10 }, (_, i) => `${i + 1} · Decision ${i + 1}`));
     assert.equal(h.staged.length, 10);
     assert.deepEqual(h.figma.queue.get(FILE)?.decisions.map((d) => d.commentId), ["m11", "m12"], "held in the file's queue entry");
 
     h.clock.now = at(31, 13);
-    await runSweepJob(MORNING, h.deps);
-    const second = h.figma.messages.at(-1)!;
-    assert.equal(second.threadTs, first!.ts);
-    assert.deepEqual((second.blocks as Array<{ elements?: Card[] }>)[1]!.elements!.map((c) => c.title.text), ["11 · Decision 11", "12 · Decision 12"]);
+    await morning(h);
+    const second = h.posted.at(-1)!;
+    assert.notEqual(second.ts, first!.ts);
+    assert.deepEqual((second.blocks as Array<{ elements?: Card[] }>)[1]!.elements!.map((c) => c.title.text), ["1 · Decision 11", "2 · Decision 12"]);
     assert.equal(h.figma.queue.size, 0);
   });
 
@@ -703,9 +697,11 @@ describe("the morning's thread in #plus-design (#900)", () => {
     assert.match(prompt, /^PRD: none/m, "the card's own body is not offered as its PRD");
     assert.deepEqual(h.figma.queue.get(FILE)?.decisions.map((d) => [d.update, d.operation]), [[{ kind: "no-prd", card: 2482 }, null]]);
     h.clock.now = at(30, 13);
-    await runSweepJob(MORNING, h.deps);
+    await morning(h);
     assert.equal(h.staged.length, 0, "nothing is staged");
-    assert.match(h.figma.messages[1]!.text, /This reads like a PRD change, but Card 2482 has no PRD page, so I haven't drafted it anywhere: The progress bar stays hidden/);
+    assert.equal(h.posted.length, 1, "the morning's message says it in a line");
+    assert.match(h.figma.messages[0]!.text, /This reads like a PRD change, but Card 2482 has no PRD page, so I haven't drafted it anywhere: The progress bar stays hidden/);
+    assert.equal(h.figma.messages[0]!.threadTs, h.posted[0]!.ts);
     assert.deepEqual([...h.figma.carded], ["c1"]);
     assert.equal(h.figma.queue.size, 0);
   });
@@ -890,9 +886,9 @@ describe("a reply with new wording revises a decision's draft (#900 AC 4)", () =
     const { h, client } = await nightHarness({ replies: [REPLY, ...replies] });
     await runSweepJob(NIGHT, h.deps);
     h.clock.now = at(30, 13);
-    await runSweepJob(MORNING, h.deps);
+    await morning(h);
     h.clock.now = at(30, 15);
-    const parent = h.figma.messages[0]!;
+    const parent = parentOf(h);
     const fc = h.deps.figmaComments!;
     const deps: ReviseDeps = {
       thread: { read: () => fc.threads!.read(parent.ts), write: (t) => fc.threads!.write(t) },
@@ -1213,14 +1209,14 @@ describe("a key decision gets a Decisions DB row tagged with its card", () => {
   it("puts the row on the decision's own card, decided by the same Review", async () => {
     const { h } = await night({ name: "Progress bar visibility", stage: "Accepted", proposer: "sarah", approvers: ["meryem"], relation: "new" });
     h.clock.now = at(30, 13);
-    await runSweepJob(MORNING, h.deps);
+    await morning(h);
     assert.equal(h.staged.length, 1, "one card per decision");
     assert.deepEqual(
       h.staged[0]!.operations?.map((o) => o.toolName),
       ["notion_update", "notion_create"],
     );
     assert.match(h.staged[0]!.proposalText, /Decisions DB: new row "Progress bar visibility" · Accepted/);
-    const card = (h.figma.messages[0]!.blocks as Card[])[1]!;
+    const card = (parentOf(h).blocks as Card[])[1]!;
     assert.match(card.body.text, /Decisions DB: new row "Progress bar visibility" · Accepted/);
   });
 });

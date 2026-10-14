@@ -29,6 +29,19 @@ import type { DecisionRow } from "../../src/integrations/notion";
 import type { TeamRoles } from "../../src/usage/roles";
 import { modelDecisionDetector } from "../../src/figma-comments/detector";
 import type { DecisionThread, QueuedFile, SweepFigmaComments } from "../../src/figma-comments/queue";
+import { FIGMA_DECISIONS_SECTION, type FigmaDecisionsHanded } from "../../src/figma-comments/post";
+import { sectionHandOffIn } from "../../src/sweep/sections";
+
+/** A morning run's own storage, in memory. */
+export function memoryRunStorage() {
+  const map = new Map<string, unknown>();
+  return {
+    map,
+    get: async <T>(key: string) => structuredClone(map.get(key)) as T | undefined,
+    put: async (key: string, value: unknown) => void map.set(key, structuredClone(value)),
+    delete: async (key: string) => map.delete(key),
+  };
+}
 
 export const DESIGN = "C0DESIGN";
 export const UNIVERSAL = "C0UNIVERSAL";
@@ -339,7 +352,7 @@ export function sweepHarness(opts: {
             return { ok: true, ts };
           },
           async edit(ts, message) {
-            const m = figmaRecords.messages.find((x) => x.ts === ts);
+            const m = figmaRecords.messages.find((x) => x.ts === ts) ?? posted.find((x) => x.channel === DESIGN && x.ts === ts);
             if (m) m.edited = message.text;
             if (m && message.blocks) m.editedBlocks = message.blocks;
           },
@@ -359,6 +372,8 @@ export function sweepHarness(opts: {
           read: async (ts) => structuredClone(figmaRecords.threads.get(ts) ?? null),
           write: async (thread) => void figmaRecords.threads.set(thread.ts, structuredClone(thread)),
         },
+        // The morning run's storage, which the hand-over and the sweep's post share.
+        handOff: sectionHandOffIn<FigmaDecisionsHanded>(memoryRunStorage(), FIGMA_DECISIONS_SECTION),
       }
     : undefined;
 

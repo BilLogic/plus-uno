@@ -69,8 +69,9 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * decisions under Specs and For Review, and the morning `sweep-figma-post`
  * opens one #plus-design thread per file, a card per decision
  * (src/figma-comments/).
- * The weekly DS precedence check's two: Friday's end-of-day check, and the morning
- * post that opens its thread in #plus-universal (src/ds-precedence/).
+ * The weekly DS precedence check's two: Friday's end-of-day check, and the
+ * morning hand-over that puts its report on the sweep's message in
+ * #plus-universal (src/ds-precedence/).
  * The morning `commitment-nudge` reminds each promiser whose commitment is due,
  * in the promise's thread (src/commitments/).
  * The morning `figma-drift-post` asks each thread whose decision may have left
@@ -204,17 +205,18 @@ const FRIDAY = 5;
  * that fires at Saturday 00:00 ET and is dated Friday: the week's merges and
  * any library publish have landed, so it reads where the week ended, and its
  * report opens Monday's morning run — the start of the week the team has to
- * act on it, with the cards live until the next check. Its post is on every
- * morning, not only Monday's: a report waits in KV until a morning posts it.
+ * act on it, with the cards live until the next check. Its hand-over is on
+ * every morning, not only Monday's: a report waits in KV until a morning's
+ * message carries it.
  */
 const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
   morning: [
-    // Before the sweep's post, which puts the card follow-ups it hands off
-    // for a channel's top on that channel's one message.
+    // Before the sweep's post, which puts what each hands off for a place on
+    // that place's one message (src/sweep/sections.ts).
     { key: "commitment-nudge", kind: "commitment-nudge" },
-    { key: "sweep-post", kind: "sweep-post", after: ["commitment-nudge"] },
-    { key: FIGMA_DECISIONS_POST_KEY, kind: "sweep-figma-post" },
     { key: "ds-precedence-post", kind: "ds-precedence-post" },
+    { key: "sweep-post", kind: "sweep-post", after: ["commitment-nudge", "ds-precedence-post"] },
+    { key: FIGMA_DECISIONS_POST_KEY, kind: "sweep-figma-post" },
     // Before the post, so a question its file caught up with overnight is
     // withdrawn first.
     { key: "figma-drift-recheck", kind: "figma-drift-recheck" },

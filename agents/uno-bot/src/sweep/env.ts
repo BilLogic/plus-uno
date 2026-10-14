@@ -88,6 +88,8 @@ import { threadStateFor } from "../thread-state/production";
 import { notionPeopleFor, proposalEventLogFor } from "../usage/production";
 import { executeReadSource } from "../tools/read-source";
 import { figmaCommentsFor } from "../figma-comments/env";
+import { FIGMA_DECISIONS_SECTION, type FigmaDecisionsHanded } from "../figma-comments/post";
+import { sectionHandOffIn } from "./sections";
 import { findSlackUsers, slackDirectoryFor } from "../tools/slack-people";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import type { OperationOutcome } from "../gate/index";
@@ -227,6 +229,8 @@ async function sweepDepsFor(
   const fc = figmaCommentsFor(env, kv, provider);
   const figmaComments = fc && {
     ...fc,
+    // The morning's hand-over leaves its decisions for the sweep's post.
+    ...(opts.runStorage ? { handOff: sectionHandOffIn<FigmaDecisionsHanded>(opts.runStorage, FIGMA_DECISIONS_SECTION) } : {}),
     card: (n: number) => measured(() => fc.card(n)),
     ...(fc.decisionRows ? { decisionRows: (url: string) => measured(() => fc.decisionRows!(url)) } : {}),
     detector: { detect: (input: Parameters<typeof fc.detector.detect>[0]) => measured(() => fc.detector.detect(input)) },

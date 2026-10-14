@@ -14,8 +14,11 @@
 //   • The queue, the carded marks, MISC's list and each thread's record:
 //     HARNESS_KV, with an expiry. The queue holds words, so never D1 (ADR-030).
 //   • Slack: `chat.postMessage` and `chat.update` in #plus-design
-//     (`PLUS_DESIGN_CHANNEL_ID`), its members, and a card staged in ThreadState
-//     and put on the usage record as staged by the Worker.
+//     (`PLUS_DESIGN_CHANNEL_ID`) — a reply in the thread of the sweep's
+//     morning message, and an edit of it — its members, and a card staged in
+//     ThreadState and put on the usage record as staged by the Worker.
+//   • The hand-off: the morning run's own storage (`JobContext.runStorage`),
+//     read by the sweep's post (`figmaDecisionsSectionFor`).
 //   • New wording for a decision (`./revise.ts`) — Review's Needs changes, or
 //     a reply on an explicit cue: the thread's record, the card in
 //     ThreadState and its Needs changes lock, the page read fresh as the
@@ -39,8 +42,11 @@ import type { PendingProposal } from "../thread-state/index";
 import { figmaPeopleFor, notionPeopleFor, proposalEventLogFor, teamRolesFor } from "../usage/production";
 import { getBotIdentity } from "../slack/api";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
+import type { JobContext } from "../scheduled/runs";
+import { sectionHandOffIn, type SweepSection } from "../sweep/sections";
 import { modelDecisionDetector } from "./detector";
 import { reviseDecision } from "./revise";
+import { figmaDecisionsSection, FIGMA_DECISIONS_SECTION, type FigmaDecisionsHanded } from "./post";
 import type { DecisionThread, QueuedFile, SweepFigmaComments } from "./queue";
 
 const DAY_S = 24 * 60 * 60;
@@ -177,6 +183,21 @@ export function figmaCommentsFor(env: Env, kv: KVNamespace, provider: ModelProvi
       : {}),
     threads: decisionThreadsOn(kv),
   };
+}
+
+/**
+ * The morning's comment decisions as a section of the sweep's message in
+ * #plus-design, or undefined without the bindings or the run's storage.
+ *
+ * @param env - Worker bindings
+ * @param ctx - The morning run
+ */
+export function figmaDecisionsSectionFor(env: Env, ctx: JobContext): SweepSection | undefined {
+  if (!env.HARNESS_KV || !ctx.runStorage) return undefined;
+  const fc = figmaCommentsFor(env, env.HARNESS_KV, selectProvider(env));
+  if (!fc) return undefined;
+  const handOff = sectionHandOffIn<FigmaDecisionsHanded>(ctx.runStorage, FIGMA_DECISIONS_SECTION);
+  return figmaDecisionsSection({ ...fc, handOff }, ctx.runDate, () => Date.now());
 }
 
 /** Each decision thread's record in HARNESS_KV. */

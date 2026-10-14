@@ -190,7 +190,7 @@ describe("the weekly precedence report", () => {
   it("gives each component a card: its name, the side that needs the fix, and what differs, plainly", () => {
     const button = precedenceItem(THREE[0]!);
     assert.deepEqual(button, {
-      id: "Button",
+      id: "ds-Button",
       title: "Button",
       subtitle: "Library side",
       body: 'Code has size="xs", the library doesn\'t.',

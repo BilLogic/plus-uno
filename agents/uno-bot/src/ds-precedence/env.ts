@@ -1,14 +1,16 @@
 // The weekly DS precedence check bound to `Env` — the only file in the folder
 // that names it. The code side is read from `GITHUB_REPO`, the harness repo,
 // where the intake is filed too; the library is `FIGMA_FILE_KEY` over REST;
-// the report goes to #plus-universal (`PLUS_UNIVERSAL_CHANNEL_ID`), as the
-// sweep's morning post does. The report and each posted message's record are JSON
+// the report goes up in #plus-universal (`PLUS_UNIVERSAL_CHANNEL_ID`) as a
+// section of the sweep's morning message there. The report and each posted message's record are JSON
 // in HARNESS_KV beside the library poll's keys; each report's cards and their
 // decisions are on ThreadState, as every decision report's are.
 
 import type { Env } from "../types";
 import { charge } from "../net";
 import { postMessage, updateMessage } from "../slack/api";
+import type { SweepSection } from "../sweep/sections";
+import { sectionHandOffIn } from "../sweep/sections";
 import { REVIEW_ONLY_POST } from "../slack/gate-note";
 import type { SlackMessageEvent } from "../slack/types";
 import { typedEmojiDecision } from "../gate/reactions";
@@ -25,12 +27,15 @@ import type { JobContext } from "../scheduled/runs";
 import type { PrecedenceRegistry } from "./compare";
 import { precedenceRuleUrl } from "./report";
 import {
-  postPrecedenceReport,
+  handOverPrecedenceReport,
   precedenceChannel,
+  precedenceSection,
+  PRECEDENCE_SECTION,
   runPrecedenceCheck,
   type CheckResult,
   type PostedThread,
   type PostResult,
+  type PrecedenceHanded,
   type PrecedenceReport,
 } from "./jobs";
 
@@ -75,28 +80,49 @@ export async function runDsPrecedenceCheck(env: Env, opts: JobContext): Promise<
   );
 }
 
-/**
- * The morning post on `Env`.
- * @param env - Worker bindings
- * @param opts - `dryRun` posts, stages and writes nothing
- */
-export async function runDsPrecedencePost(env: Env, opts: { dryRun: boolean }): Promise<PostResult> {
-  const channel = precedenceChannel({
+/** #plus-universal, where the report goes up; null when not configured. */
+function channelOf(env: Env): string | null {
+  return precedenceChannel({
     plusUniversal: env.PLUS_UNIVERSAL_CHANNEL_ID?.trim() || undefined,
     plusDesign: env.PLUS_DESIGN_CHANNEL_ID?.trim() || undefined,
   });
-  if (!channel) return { posted: false, summary: "PLUS_UNIVERSAL_CHANNEL_ID not set — nothing posted" };
+}
+
+/**
+ * The morning hand-over on `Env`: the waiting report, to the sweep's post.
+ * @param env - Worker bindings
+ * @param opts - The morning run: `dryRun` hands nothing over, and a run with
+ *   no storage has nowhere to
+ */
+export async function runDsPrecedencePost(env: Env, opts: JobContext): Promise<PostResult> {
+  const channel = channelOf(env);
+  if (!channel) return { posted: false, summary: "PLUS_UNIVERSAL_CHANNEL_ID not set — nothing handed over" };
+  return handOverPrecedenceReport(
+    {
+      report: kvJson<PrecedenceReport | null>(env, REPORT_KV_KEY, null),
+      members: () => channelMembers(env, channel),
+      ...(opts.runStorage ? { handOff: sectionHandOffIn<PrecedenceHanded>(opts.runStorage, PRECEDENCE_SECTION) } : {}),
+      channel,
+      date: opts.runDate,
+    },
+    opts,
+  );
+}
+
+/**
+ * The report's section of the sweep's morning message, or undefined without
+ * the channel, the repo or the run's storage.
+ * @param env - Worker bindings
+ * @param opts - The morning run
+ */
+export function dsPrecedenceSectionFor(env: Env, opts: JobContext): SweepSection | undefined {
+  const channel = channelOf(env);
   const target = resolveRepoFor(env, undefined);
-  if (!target.ok) return { posted: false, summary: `no repo: ${target.error}` };
-  return postPrecedenceReport(
+  if (!channel || !target.ok || !opts.runStorage) return undefined;
+  return precedenceSection(
     {
       report: kvJson<PrecedenceReport | null>(env, REPORT_KV_KEY, null),
       recordThread: (thread) => threadRecord(env, thread.ts).write(thread),
-      members: () => channelMembers(env, channel),
-      async post(message) {
-        const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks });
-        return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
-      },
       async edit(ts, message) {
         await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
       },
@@ -104,9 +130,9 @@ export async function runDsPrecedencePost(env: Env, opts: { dryRun: boolean }): 
       stage: (proposal) => stageWeeklyCard(env, proposal),
       channel,
       ruleUrl: precedenceRuleUrl(target.entry.repo),
-      now: () => Date.now(),
     },
-    opts,
+    sectionHandOffIn<PrecedenceHanded>(opts.runStorage, PRECEDENCE_SECTION),
+    opts.runDate,
   );
 }
 

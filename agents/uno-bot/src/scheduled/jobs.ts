@@ -17,7 +17,8 @@ import { selectProvider } from "../agent/run-agent";
 import { runClassifyBatch, runTextPurge } from "../usage/classify-run";
 import { askCategoriesFor, proposalEventLogFor, runTeamRolesSync } from "../usage/production";
 import { runSnapshotRefreshOnEnv } from "../figma-library/env";
-import { runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
+import { dsPrecedenceSectionFor, runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
+import { figmaDecisionsSectionFor } from "../figma-comments/env";
 import { runSweepJobOnEnv } from "../sweep/env";
 import { commitmentThreadHookFor, runCommitmentNudgesOnEnv } from "../commitments/env";
 import { cardTodoNoteHookFor, cardTodoThreadHookFor, morningFollowUpsFor, runCardFollowThroughOnEnv } from "../follow-through/env";
@@ -71,11 +72,14 @@ const sweepBody: JobBody = async (env, job, ctx) => {
 
 /**
  * What the morning's other jobs handed the sweep's post, one port a job: the
- * card follow-ups (src/sweep/sections.ts). Each is absent without its
- * bindings or the run's storage.
+ * card follow-ups, the weekly DS precedence report and the Figma comment
+ * decisions (src/sweep/sections.ts). Each is absent without its bindings or
+ * the run's storage.
  */
 export function morningSectionsFor(env: Env, ctx: JobContext): SweepSection[] {
-  return [morningFollowUpsFor(env, ctx)].filter((s): s is SweepSection => !!s);
+  return [morningFollowUpsFor(env, ctx), dsPrecedenceSectionFor(env, ctx), figmaDecisionsSectionFor(env, ctx)].filter(
+    (s): s is SweepSection => !!s,
+  );
 }
 
 /** The hooks a sweep job feeds: per thread for a channel read, per note for
@@ -254,8 +258,8 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
     return report;
   },
   // Morning: a waiting report becomes one thread and one card in #plus-universal.
-  "ds-precedence-post": async (env, _job, { dryRun }) => {
-    console.log(`[ds-precedence] post: ${(await runDsPrecedencePost(env, { dryRun })).summary}`);
+  "ds-precedence-post": async (env, _job, ctx) => {
+    console.log(`[ds-precedence] hand-over: ${(await runDsPrecedencePost(env, ctx)).summary}`);
   },
   // Monday morning: the next stretch of the teams' folder listing, then the
   // week's tidy-up cards in #plus-design (src/figma-tidy/).

@@ -75,9 +75,10 @@ export function byComponent(items: readonly Disagreement[]): ComponentFinding[] 
   return out;
 }
 
-/** A card's id: the component's name, with only Slack-safe characters. */
+/** A card's id: the component's name, with only Slack-safe characters, kept
+ *  apart from the other cards on the sweep's morning message by its prefix. */
 export function componentId(component: string): string {
-  return component.replace(/[^A-Za-z0-9_-]+/g, "-") || "component";
+  return `ds-${component.replace(/[^A-Za-z0-9_-]+/g, "-") || "component"}`;
 }
 
 /** The side that needs the fix, as a card's subtitle names it. */
