@@ -31,9 +31,11 @@
  *     record. `design-system/guidelines/components/overview.md` carries its own
  *     staleness banner (#165/#166 own its rebuild) and the two vendored
  *     blueprint pages name their SOURCE repo's paths. A `read_reference` NAME
- *     resolves too: `docs/engineering/operations` is the name the Worker reads
- *     `docs/engineering/operations.md` by, so it passes when that file exists
- *     and declares `disclosure: reference` (the bundler's naming rule).
+ *     resolves too: outside `skills/` a disclosed doc's name is its path
+ *     without `.md` (`docs/engineering/operations`), so it passes when that
+ *     file exists and its frontmatter declares `disclosure: reference`. A skill
+ *     method's name (`uno-maintain/method`) is not rooted and never reaches
+ *     this pass.
  *  3. Backticked BARE filenames name a file that exists somewhere. The rule is
  *     deliberately weak — `method.md`, `bot.md` and `SKILL.md` each name many
  *     real files — and weak still catches the class: a retired file resolves to
@@ -167,9 +169,11 @@ const inputs = byRoot((repoRoot) => {
   const exists = (rel) => existsSync(path.join(repoRoot, rel));
   // A disclosed doc's read_reference name: its path without `.md`, on a doc
   // whose frontmatter declares `disclosure: reference`.
-  const isReferenceName = (rel) =>
-    exists(`${rel}.md`) &&
-    /^---\n[\s\S]*?^disclosure:\s*reference\s*$[\s\S]*?^---$/m.test(readFileSync(path.join(repoRoot, `${rel}.md`), 'utf8'));
+  const isReferenceName = (rel) => {
+    if (!exists(`${rel}.md`)) return false;
+    const front = readFileSync(path.join(repoRoot, `${rel}.md`), 'utf8').match(/^---\n([\s\S]*?)\n---/)?.[1] ?? '';
+    return /^disclosure:\s*reference\s*$/m.test(front);
+  };
   const md = (dirs, opts) => markdownUnder(dirs, { ...opts, root: repoRoot });
 
   // ── 1. relative markdown links ────────────────────────────────────────────
