@@ -1,49 +1,53 @@
 ---
 embodiment: all
-summary: How agents write to Notion — the MCP-write principle, convention surfaces, the gated tools, and body shape.
+summary: Notion's connector overview, always loaded — the one credential and the MCP-write principle, the write surfaces, the Decisions DB, the read radar and the Roadmap card rules; page-writing.md beside it is how a body is written
 ---
 
 # Notion Conventions
 
-<!-- canonical per ADR-017 (docs/adr/): this file IS the convention; the legacy Notion 📓 Doc-Management Playbook is superseded and loses on conflict. Distilled 2026-07-07 · Decisions DB + New Project hub aligned 2026-07-13 · read-radar catalog scopes 2026-07-13 · applied by writers/notion. -->
+<!-- canonical per ADR-017 (docs/adr/): this folder IS the convention; the legacy Notion 📓 Doc-Management Playbook is superseded and loses on conflict. Distilled 2026-07-07 · Decisions DB + New Project hub aligned 2026-07-13 · read-radar catalog scopes 2026-07-13 · split 2026-10-14 into this overview and page-writing.md · applied by writers/notion. -->
+
+<!-- ide-only -->
+This folder is Notion's connector: this overview ships in uno-bot's prompt, and [`page-writing.md`](page-writing.md) — the body dialect, attribution, the project-hub golden sections, the comments protocol and the API's markdown quirks — is disclosed, read through `read_reference` by the name `docs/connectors/notion/page-writing`.
+<!-- /ide-only -->
 
 ## Access paths — reads vs writes (uno-bot Worker)
 
 **One credential, REST for both** — the `ntn_` internal integration key (`NOTION_API_KEY`), workspace-scoped and non-expiring:
 
-- **Reads** (grounding: `notion_search`, `roadmap_query`, source lookups) → the bot's REST read code. No gate needed — reads never mutate state.
-- **Writes** (`notion_create`, `notion_update`, `notion_archive`) → the bot's **own gated tools**, intercepted by the proposal gate — nothing writes without the requester's ✅.
+- **Reads** (grounding: `notion_search`, `roadmap_query`, source lookups) → the bot's REST read code, ungated, since a read changes nothing.
+- **Writes** (`notion_create`, `notion_update`, `notion_archive`) → the bot's **own gated tools**, intercepted by the proposal gate: each write waits for the requester's ✅.
 
-**No hosted MCP on the Worker.** A hosted-Notion-MCP read path was adopted 2026-07-09 and has since been removed — both model adapters log `mcp=off` and neither passes an `mcp_toolset`. Every Notion read and write the bot makes goes through the REST paths above. In-IDE, the Notion MCP connectors (`notion-plus` · `notion-parsnip` · `notion-personal`) are the read surface; that is an IDE capability, not a bot one.
+**The Worker reaches Notion over REST alone.** A hosted-Notion-MCP read path was adopted 2026-07-09 and has since been removed — both model adapters log `mcp=off` and pass no `mcp_toolset`. In-IDE, the Notion MCP connectors (`notion-plus` · `notion-parsnip` · `notion-personal`) are the read surface; that is an IDE capability, not a bot one.
 
-⚠️ **The MCP-write principle (cross-service, not just Notion).** Inline MCP tools execute server-side during the turn, so any tool exposed via MCP bypasses the ✅ proposal gate. Therefore a write goes **direct via MCP only if it wouldn't need the gate anyway** — i.e. reversible + low-blast-radius, like Slack messaging (the bot's native medium, already ungated for replies). **Consequential / outward / irreversible writes stay hard-gated bot tools, never MCP:** Notion artifacts (`notion_create`/`update`/`archive`) and email. The rule stands for any future MCP attachment, in either runtime: **Slack** = reads + messaging writes may go direct; **Notion** = reads may go direct, writes stay gated; **Supabase** = reads only (the MCP URL pins server-enforced `read_only=true`) — **the bot has NO blueprint write path at all**: a blueprint-change ask becomes a maintenance intake ticket (`notion_create` intake, ✅-gated) or an IDE handoff (`uno-maintain`, where migrations/diff/review live); **Figma** = *no MCP at all* — its hosted MCP is a closed catalog (only Figma-approved clients like Claude Code/Cursor/VS Code connect; a custom Worker 403s) and the local MCP needs a desktop app, so the bot grounds Figma from the Notion docs that reference it and routes real Figma work to the IDE. The `ntn_` REST key remains Notion's write path + the read fallback when the MCP token isn't set.
+⚠️ **The MCP-write principle (cross-service, not just Notion).** Inline MCP tools execute server-side during the turn, so any tool exposed via MCP bypasses the ✅ proposal gate. Therefore a write goes **direct via MCP only when it needs no gate anyway** — reversible and low-blast-radius, like Slack messaging (the bot's native medium, already ungated for replies). **Consequential, outward or irreversible writes stay hard-gated bot tools:** Notion artifacts (`notion_create`/`update`/`archive`) and email. The rule stands for any future MCP attachment, in either runtime: **Slack** = reads and messaging writes may go direct; **Notion** = reads may go direct, writes stay gated; **Supabase** = reads only (the MCP URL pins server-enforced `read_only=true`) — **the bot's blueprint path is read-only**: a blueprint-change ask becomes a maintenance intake ticket (`notion_create` intake, ✅-gated) or an IDE handoff (`uno-maintain`, where migrations, diff and review live); **Figma** = REST, with its own reach (`docs/connectors/figma/overview.md` § What uno-bot can reach in Figma). The `ntn_` REST key remains Notion's write path and the read fallback when the MCP token is unset.
 
 ## Write surfaces
 
-uno can update properties, append content, and rewrite a named block **in place** on **any page or database it's shared on** (Roadmap cards, Decisions DB rows, per-person running-notes pages, any DB) via `notion_update` / `notion_archive` — always behind the requester's ✅. `notion_update` reads the target's live schema and writes each property by its real type (status, select, multi_select, date, people, relation, number, checkbox, url, text…), matching your property name case/space/underscore-insensitively — so there's no hardcoded surface fence and no need to guess a type. It still never invents a select/status option: a value that isn't an existing option is reported back, not created.
+uno can update properties, append content, and rewrite a named block **in place** on **any page or database it's shared on** (Roadmap cards, Decisions DB rows, per-person running-notes pages, any DB) via `notion_update` / `notion_archive` — always behind the requester's ✅. `notion_update` reads the target's live schema and writes each property by its real type (status, select, multi_select, date, people, relation, number, checkbox, url, text…), matching your property name case/space/underscore-insensitively — so the safety is the gate and the schema, not a surface fence, and the type is read rather than guessed. A select or status value is written only when it is an existing option; any other value is reported back as a question.
 
-**Bodies are no longer append-only** (ADR-029, 2026-09-15). `notion_update` takes a `replace` operation: a block id and the `last_edited_time` that the page read reported for that block, plus the new content in the same Markdown shape as an `append`. The write re-reads the block first and **refuses, without writing, when the stamp has moved** — the replacement was composed against text that no longer exists, so the answer is "read it again", not "overwrite it". A replacement that renders to several blocks rewrites the first where it stands and places the rest directly after it. Everything outside the named blocks is untouched, **nothing is ever deleted**, and the ✅ gate still stands in front of all of it — the proposal card names how many blocks a replace would rewrite.
+**Bodies can be corrected in place** (ADR-029, 2026-09-15). `notion_update` takes a `replace` operation: a block id and the `last_edited_time` that the page read reported for that block, plus the new content in the same Markdown shape as an `append`. The write re-reads the block first and **refuses, writing nothing, when the stamp has moved** — the replacement was composed against text that no longer exists, so the answer is "read it again". A replacement that renders to several blocks rewrites the first where it stands and places the rest directly after it. Everything outside the named blocks stays as it was, every block survives, and the ✅ gate stands in front of all of it — the proposal card names how many blocks a replace would rewrite.
 
-Use `replace` when the ask is to *correct* what the page says and `append` when it is to *add* something the page doesn't say yet. Appending a correction is what leaves a page holding two contradictory readings.
+Use `replace` when the ask is to *correct* what the page says and `append` when it is to *add* something the page doesn't say yet. A correction made with `replace` leaves the page holding one reading.
 
-**Still OUT of scope from Slack** (no Notion-API path, or too structural for a one-shot gated write) — creating a **database**, creating or editing a **view** (the API can't make views at all), creating select options / pillars / OKRs, and any **blueprint** write. Those become a maintenance intake ticket (✅-gated `notion_create`) or an `uno-maintain` IDE handoff — offer that, don't attempt it inline.
+**IDE work, offered as a hand-off** (no Notion-API path, or too structural for a one-shot gated write): creating a **database**, creating or editing a **view** (the API can't make views at all), creating select options, pillars or OKRs, and any **blueprint** write. Each becomes a maintenance intake ticket (✅-gated `notion_create`) or an `uno-maintain` IDE handoff.
 
-The surfaces below are the **common ones with house conventions** — follow the convention when writing them; the table is guidance, not a permission fence. Safety is the ✅ gate + exact-match selects — not a hardcoded DB allowlist.
+The surfaces below are the **common ones with house conventions** — follow the convention when writing them; the table is guidance, and safety is the ✅ gate plus exact-match selects.
 
 | Surface | Who writes | Notes |
 |---|---|---|
 | Roadmap DB (`2fc01241-1bb5-4770-af51-d5a050bddb75`, data source `7fba5c35-da73-4c40-ac42-1c13db7794de`) | human creates; uno updates status/properties/links | the single task board; design + dev kanbans are views |
 | Decisions DB (`6279ea4a-cd84-4d51-90e1-e6b6af53bb19`, data source `b71eb1af-550a-482a-b6b5-103c1d2e0a1e`) | uno logs at publish / thread close; human owns | under Design HQ; dual relation → Roadmap card **Decisions**; see § Decisions DB |
 | PRD pages | uno drafts; human owns | PRD template, Stage: exploring / converging / committed |
-| Project hub → Research page | uno writes (IDE-only) | deep research findings/study guides land on the hub's Research subpage — not a separate DB, and not a bot surface |
+| Project hub → Research page | uno writes (IDE-only) | deep research findings/study guides land on the hub's Research subpage — a subpage, not a separate DB, and IDE work |
 | Spec pages / Handoff Specs | uno drafts from template | "Figma shows what it looks like; this page holds how it behaves and what done means" |
 | notion-marketplace DB (`397b7cca-4982-8002-826c-c45e2baa8e4f`, data source `397b7cca-4982-80d8-9967-000b69521ce9`) | uno publishes and updates entries, one row per prototype (IDE, or the bot's `notion_create` surface `marketplace`) | ✅ live under Design HQ; schema + publish procedure in `skills/uno-publish/references/notion-marketplace-db.md` |
 
-⚠️ **Obsolete:** per-project **Decision Log** subpages under Pages. Do not create or append to them. Existing Decision Logs stay under an Obsolete toggle for provenance only.
+⚠️ **Obsolete:** per-project **Decision Log** subpages under Pages. A decision goes to the Decisions DB; existing Decision Logs stay under an Obsolete toggle for provenance only.
 
 ## Decisions DB
 
-Canonical decision log for the design org. One row per durable decision; lineage via **Roadmap Card** (pillar / card ID live on the Roadmap card — not duplicated on the decision).
+Canonical decision log for the design org. One row per durable decision; lineage via **Roadmap Card** (pillar and card ID live on the Roadmap card, once).
 
 | Property | Type | Rules |
 |---|---|---|
@@ -64,13 +68,13 @@ Canonical decision log for the design org. One row per durable decision; lineage
 
 **Bot:** `notion_create` surface `decision` (✅-gated) — requires `title` + `properties.roadmap_card` (page URL/id); sets `status` (default `Proposed`), `evidence`, `owner` and `sign_off` (Notion user ids) and body sections. **IDE:** `writers/notion`, same schema via Notion MCP.
 
-**Hub embeds:** linked Decisions views filter **Roadmap Card contains This page** (set once in Notion UI — API can't set self-page filters). Running notes: team template filters Status = Proposed; 1:1 filters Active (Proposed + Accepted) ± Owner.
+**Hub embeds:** linked Decisions views filter **Roadmap Card contains This page** (set once in Notion UI — the API can't set self-page filters). Running notes: team template filters Status = Proposed; 1:1 filters Active (Proposed + Accepted) ± Owner.
 
 ## Read radar — other workspace DBs (READ-only grounding)
 
-Useful context for grounding via `notion_search` catalog scopes (or Notion MCP in-IDE). uno reads these as a matter of course and doesn't write them unless a human explicitly asks (✅-gated). Each row lists the **DATABASE id** (what the Worker queries) — not the data-source id.
+Useful context for grounding via `notion_search` catalog scopes (or Notion MCP in-IDE). uno reads these as a matter of course and writes one only when a human explicitly asks (✅-gated). Each row lists the **DATABASE id** (what the Worker queries), the one to use over the data-source id.
 
-⚠️ **`running_notes` is team-readable but personal.** 1:1 / running-notes rows get the same discretion as private Slack content (AGENT.md "Personal Notion notes"): summarize neutrally, but never surface highly sensitive personal specifics (visa/immigration, comp, health, performance/PIP, hardship) — decline and point to the person/manager instead.
+⚠️ **`running_notes` is team-readable but personal.** 1:1 / running-notes rows get the same discretion as private Slack content (AGENT.md "Personal Notion notes"): summarize neutrally, and for highly sensitive personal specifics (visa/immigration, comp, health, performance/PIP, hardship) decline and point to the person or their manager.
 
 | DB | Database ID | `notion_search` scope | Use when grounding |
 |---|---|---|---|
@@ -88,83 +92,15 @@ Useful context for grounding via `notion_search` catalog scopes (or Notion MCP i
 
 **Team Member Database › Figma User ID** (rich_text) is optional, and each member fills in their own. It lets a Figma commenter be matched to a teammate. To find your id, open figma.com signed in and copy the number after `fuid=` in the address bar; pasting the whole URL works too.
 
-**Not tracked** (deliberate — noise or wrong owner for bot grounding): Help Center Articles Dev Page, Tasks Tracker on HC Content, Content HQ editorial / meeting / social DBs, demo pages. Use `scope: "any"` only as a last resort when the surface is unknown.
+**Untracked on purpose** (noise, or the wrong owner for bot grounding): Help Center Articles Dev Page, Tasks Tracker on HC Content, Content HQ editorial / meeting / social DBs, demo pages. `scope: "any"` is the last resort, for a surface that is unknown.
 
-**Findability rule:** access ≠ search. Workspace `/v1/search` is weak inside known DBs — prefer the catalog scope (direct `databases/{id}/query`). Empty results usually mean the DB isn't shared with the uno-bot Notion integration (Connections), not that the row doesn't exist.
+**Findability rule:** access ≠ search. Workspace `/v1/search` is weak inside known DBs — prefer the catalog scope (direct `databases/{id}/query`). Empty results usually mean the DB is unshared with the uno-bot Notion integration (Connections), rather than that the row is missing.
 
 ## Roadmap DB rules (every card write)
 
-- `Contributor` — mandatory, never blank. Default: Bill + everyone mentioned in the source context.
-- `Product Pillar` — always tag the most relevant existing pillar(s); the pillar maps to a Slack channel (`slack.md`).
-- `Feature / Initiative` + `OKR` — link the most relevant **existing** entry. If nothing fits, leave blank + flag in the body.
-- **Never create select options, pillars, features, or OKRs.** ⚠️ Notion silently auto-creates select options on any name mismatch — fetch the schema and exact-match option names before every write.
+- `Contributor` — mandatory and filled. Default: Bill + everyone mentioned in the source context.
+- `Product Pillar` — always tag the most relevant existing pillar(s); the pillar maps to a Slack channel (`docs/connectors/slack/overview.md` § Channels).
+- `Feature / Initiative` + `OKR` — link the most relevant **existing** entry. If nothing fits, leave it blank and flag it in the body.
+- **Select options, pillars, features and OKRs are exact-matched against what the schema already offers.** ⚠️ Notion silently auto-creates a select option on any name mismatch, so fetch the schema and match option names exactly before every write.
 - `Current Team` routes the card to kanbans; PRD accepted → move to `Design Status: Ready for Design`.
-- Urgency = existing `Priority: Critical` — no separate lane. Maintenance intake = card on this DB with `Product Pillar: Universal` + `Product Tag: Maintenance`, surfaced via a filtered view — **not** a separate DB. ⚠️ Both `Universal` and `Maintenance` must already exist as options on the schema (add `Maintenance` to the `Product Tag` multi-select in the Notion UI once); the bot exact-matches them and never auto-creates.
-
-## Writing a body — bot tools (`notion_create`, `notion_update`)
-
-**Write standard Markdown**, the same dialect as everywhere else (`slack.md` § Message formatting). The Worker parses it into real Notion blocks — `agents/uno-bot/src/integrations/notion-blocks.ts`.
-
-| Write | Becomes |
-|---|---|
-| `**bold**` · `_italic_` · `` `code` `` · `~~strike~~` | rich-text annotations |
-| `[label](url)` | a real link (http/https/mailto only — anything else degrades to `label (url)`) |
-| `- item` / `* item` | `bulleted_list_item` (indent two spaces for one level of nesting) |
-| `1. item` | `numbered_list_item` |
-| `- [ ]` / `- [x]` | `to_do`, unchecked / checked |
-| `> quote` | `quote` (consecutive `>` lines merge into one) |
-| ```` ```ts ```` fenced | `code` with the language set (unknown tag → plain text) |
-| `---` | `divider` |
-| `#`, `##`, `###` | `heading_3` — one level below the section heading containing it |
-| blank line | a new paragraph block |
-| a `\|` table | **a real Notion table** — header row flagged, cells parsed for inline markup |
-
-**This was a real bug, not a nicety.** Until 2026-08-22 a body was split on blank lines into plain paragraphs with no parsing at all — so the `**Decision:** one sentence` shape prescribed above landed on the page as literal asterisks, and every bullet as a literal hyphen.
-
-Two limits the Worker now handles, worth knowing because they shape what you write: a single text run caps at ~1,900 characters (long paragraphs split across blocks), and Notion accepts 100 blocks per request (a long PRD is created in batches). Neither is a reason to write less — write the full document.
-
-**Tables land as real tables** (2026-08-22). The header row sets the column count and every data row is padded or truncated to match — Notion rejects the *entire request* if any row's cell count differs from `table_width`, and a ragged row is what an unescaped `|` inside a cell produces.
-
-**Attribution.** A page the bot creates, and each run of blocks it appends, opens with the line "Written by le goat on behalf of {name}", {name} being the requester's Slack display name (on a Worker-staged card, whoever pressed ✅). The Worker adds it, so a body starts with its own first line. A `replace` or `insert` edits a human's text where it stands and a property change writes no body, so those carry no line.
-
-**Headings inside a body are `heading_3` on purpose.** Section headings own `heading_2`, and `fetchNotionPRD` walks that outline downstream to find Acceptance Criteria and Implementation Notes. A `##` inside a section body is subordinate to its section and renders that way.
-
-<!-- ide-only -->
-<!-- Project-hub authoring + Notion-block/enhanced-markdown mechanics below are
-     writers/notion (in-IDE) concerns — the bot writes only structured
-     notion_create/update params, never raw hub blocks. Stripped from the bot's
-     system prompt at assembly (agents/uno-bot/scripts/bundle-harness.mjs stripIdeOnly); kept here as
-     the single source for the IDE agent. The BOT-facing body contract is the
-     section immediately above this fence, deliberately outside it: leaving the
-     bot with no guidance at all is what let the literal-asterisk bug run. -->
-## Project-hub golden sections (in order)
-
-Live template: **New Project** (Roadmap 🧩 Templates). Maintenance Intake is the thinner sibling for Universal/Maintenance cards.
-
-**TLDR** (2–4 sentences — what it is · for whom · where it stands · what direction changed; orientation only — no people, no links) → **People** (role-labelled @-mentions, one per line) → **Latest progress** (**Now** / **Next** / **Blocked** as bold-labelled lines, then a *Past progress* accordion of dated status-pulse bullets — nothing spills) → **Pages** (contiguous inline subpages: PRD · Handoff Spec · Rollout · Meeting Notes · Research · Archive — **no Decision Log**) → **Decisions** (linked Decisions DB view filtered to this card; tip: Roadmap Card → Contains → This page) → **Key references** (fit-page-width table: Type · Link · Notes) → **Doc Changelog** (*Show history* toggle).
-
-- **TLDR is the top anchor** — the single thing a card-picker must read. No placeholder callout above it.
-- **Latest progress = status pulse, not rationale.** What changed / where it stands — no *whys*. Durable whys and rejected alternatives live in **Decisions DB** (cited by R-ID at handoff). A bullet that explains *why* belongs there, not here.
-- **Decisions** is the canonical decision log — not a Pages subpage. Do not recreate Decision Log under Pages; mark any leftover Decision Log under Obsolete.
-- **Pages** pre-creates subpages (PRD · Handoff Spec · Rollout · Meeting Notes · Research · Archive), each seeded with its skeleton. **Meeting Notes** holds raw capture — recordings, Zoom links, AI summaries, scratch — distinct from PRD/Findings and Decisions. Mark a not-yet-relevant subpage "N/A until [stage]" rather than deleting it.
-- **Doc Changelog** records the *document's* maintenance (restructures, pages added/moved/superseded) — never project progress, never formatting polish.
-- **Toggles:** title them plainly ("Show history" / "Past progress") — Notion renders the arrow itself, so never prefix a ▸.
-- Status lives in card **properties**, never a body callout or a header dot-spacer block.
-- People = @-mentions, **one role per line**; only workspace members are mentionable.
-- Structure with **dividers** between sections. A **callout** is reserved for a single **atomic** live alert inline in Latest progress — never a standing placeholder, never multi-line.
-- Templates live in Notion 🧩 Templates; the live **New Project** template carries the real blocks. Reference them, never duplicate their bodies.
-
-## Comments protocol
-
-Suggestions *about* existing content (including the agent's own) go in **comments anchored to the block** — resolvable: accept → apply + resolve; reject → reply why + resolve. The agent sweeps unresolved threads on each flow run touching the page + at the monthly retro. Proposed *content* that must be readable in place = yellow highlight + `⏳ PENDING REVIEW:` text marker (yellow is invisible via API — the marker is the binding signal). **Binding information never lives only in a comment.**
-
-## Enhanced-markdown quirks (API writes)
-
-- **Page titles never carry an emoji** — set the page/DB **icon** field instead (the title text stays clean; the icon renders separately). Same for database titles. Emoji in section *headings* (body blocks) is fine — those have no icon field.
-- **Link to internal pages/docs with a page reference (mention), never a raw hyperlink.** Notion's page-mention styling (icon + live title, updates on rename) reads far better than a bare URL and never goes stale. Reserve markdown hyperlinks for external URLs.
-- Mentions: `<mention-user url="user://<user-id>"/>` — the `id=` attribute silently drops. Verify membership via the users API first.
-- Embeds are manual-only via API — write a plain link + 📌 placeholder; a human converts to embed. Always pair any embed with a plain link (embeds are unreadable via API).
-- Child-page blocks cannot interleave with text — group inline subpages in one contiguous run (the Pages section).
-- Multi-line callout text writes back as stacked one-line fragments — keep callouts atomic.
-- Databases for tracked items with a lifecycle; inline simple tables for static reference (fit-to-page-width is a manual toggle).
-<!-- /ide-only -->
+- Urgency = existing `Priority: Critical`, the one urgency lane. Maintenance intake = card on this DB with `Product Pillar: Universal` + `Product Tag: Maintenance`, surfaced via a filtered view of this board. ⚠️ Both `Universal` and `Maintenance` must already exist as options on the schema (add `Maintenance` to the `Product Tag` multi-select in the Notion UI once); the bot exact-matches them.

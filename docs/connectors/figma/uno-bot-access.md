@@ -5,9 +5,9 @@ summary: What uno-bot can read and write in Figma over REST, and where it stops 
 
 # uno-bot's Figma reach — what it has, and where it stops
 
-<!-- canonical per ADR-017 (docs/adr/) · moved 2026-10-14 out of the IDE-only region of docs/connectors/figma.md, so the doc lives with its subject · the operative sentences the bot needs ship in agents/uno-bot/AGENT.md § My lane; this is the long form for humans and the in-IDE agent. -->
+<!-- canonical per ADR-017 (docs/adr/) · moved 2026-10-14 out of the IDE-only region of docs/connectors/figma/overview.md, so the doc lives with its subject · the operative sentences the bot needs ship in agents/uno-bot/AGENT.md § My lane; this is the long form for humans and the in-IDE agent. -->
 
-The workspace's conventions are [`../figma.md`](../figma.md). This doc is the Worker's, and it exists because the harness said three things about it that were not true: that Figma was IDE-only (the *MCP* is; Figma is not), that a pasted frame arrives as a human's screenshot (the Worker renders it itself), and that every exact-value limit had the same cause. A capability written down wrong is worse than one not written down — a reader argues with the second and obeys the first.
+The workspace's conventions, and the short reach table the bot carries, are [`overview.md`](overview.md). This doc is the Worker's, and it exists because the harness said three things about it that were not true: that Figma was IDE-only (the *MCP* is; Figma is not), that a pasted frame arrives as a human's screenshot (the Worker renders it itself), and that every exact-value limit had the same cause. A capability written down wrong is worse than one not written down — a reader argues with the second and obeys the first.
 
 **Auth:** `FIGMA_ACCESS_TOKEN`, a REST personal token, plus `FIGMA_FILE_KEY` for the DS library. **No MCP anywhere.** Every call goes through one client, `src/figma/` (#892). Every personal token on Bill's account shares one Figma budget per rate-limit tier, so the client paces each tier at half that budget and backs off on a 429; `check:fetch` fails any other file that calls Figma. The reach below uses its endpoint families for images, nodes, comments, components, versions, folders and webhooks.
 
