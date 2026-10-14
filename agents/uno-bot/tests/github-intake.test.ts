@@ -291,7 +291,7 @@ test("preflight refuses an intake aimed at a repo off the list, naming the list,
   const ask = await preflight(
     "github_issue_create",
     { ...DRAFT, repo: "someone/else" },
-    { env: LISTED_ENV, prd: null },
+    { env: LISTED_ENV },
   );
   assert.ok(ask, "an unlisted repo must not reach the card");
   assert.match(ask.ask, /someone\/else/);
@@ -302,7 +302,7 @@ test("preflight refuses an intake aimed at a repo off the list, naming the list,
 test("preflight refuses plainly when the repo list itself is broken — no repo to choose, so no question", async () => {
   const broken = { GITHUB_REPO: REPO, GITHUB_REPOS: "[not json" } as unknown as Env;
   for (const input of [{ ...DRAFT }, { ...DRAFT, repo: "BilLogic/plus-marketing-website" }]) {
-    const ask = await preflight("github_issue_create", input, { env: broken, prd: null });
+    const ask = await preflight("github_issue_create", input, { env: broken });
     assert.ok(ask, JSON.stringify(input));
     assert.match(ask.ask, /misconfigured/);
     assert.match(ask.ask, /Tell Bill the repo list is broken/);
@@ -313,14 +313,14 @@ test("preflight refuses plainly when the repo list itself is broken — no repo 
 test("an omitted repo is the default, with or without a list", async () => {
   const unset = { GITHUB_REPO: REPO } as unknown as Env;
   for (const env of [unset, LISTED_ENV]) {
-    assert.equal(await preflight("github_issue_create", { ...DRAFT }, { env, prd: null }), null);
-    assert.equal(await preflight("github_issue_create", { ...DRAFT, repo: "  " }, { env, prd: null }), null);
+    assert.equal(await preflight("github_issue_create", { ...DRAFT }, { env }), null);
+    assert.equal(await preflight("github_issue_create", { ...DRAFT, repo: "  " }, { env }), null);
   }
 });
 
 test("preflight lets a listed repo, or none, through to the card", async () => {
   for (const repo of ["BilLogic/plus-marketing-website", "plus-marketing-website", undefined]) {
     const input = repo === undefined ? { ...DRAFT } : { ...DRAFT, repo };
-    assert.equal(await preflight("github_issue_create", input, { env: LISTED_ENV, prd: null }), null, String(repo));
+    assert.equal(await preflight("github_issue_create", input, { env: LISTED_ENV }), null, String(repo));
   }
 });

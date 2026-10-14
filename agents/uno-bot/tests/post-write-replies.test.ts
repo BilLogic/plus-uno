@@ -106,23 +106,6 @@ test("creating a Notion page is confirmed as one plain sentence that links it", 
   assert.deepEqual(posted, [`Created <${url}|Tutor import> in ${label}.`]);
 });
 
-test("a sent email is confirmed as one plain sentence", async () => {
-  serve({
-    "POST oauth2.googleapis.com/token": { body: { access_token: "test-access" } },
-    "POST /messages/send": { body: { id: "m1", threadId: "t1" } },
-  });
-  const { executeSendEmail } = await import("../src/tools/send-email.js");
-  const gmail = { GMAIL_SENDER: "uno@example.com", GMAIL_CLIENT_ID: "id", GMAIL_CLIENT_SECRET: "s", GMAIL_REFRESH_TOKEN: "r" };
-
-  await executeSendEmail(
-    { ...ENV, ...gmail } as typeof ENV,
-    { to: "coco@example.com", subject: "Session notes", body: "Here they are." },
-    SLACK,
-  );
-
-  assert.deepEqual(posted, ['Sent "Session notes" to coco@example.com.']);
-});
-
 // ── a write that only partly landed ──────────────────────────────────────────
 
 /** A database page whose schema has one settable status, "Design Status". */

@@ -1,20 +1,13 @@
 // The morning run's `figma-library-track` job: follow each posted library card
-// through to its outcome. When the implementation PR opens, link it in the
-// intake and in the #plus-universal thread; when it merges, close the intake as
-// incorporated.
+// for `TRACK_DAYS`, so a card nobody decides still gets its intake filed. Approve
+// files the intake at once and stages no build — the code change is IDE work —
+// so nothing here watches for a PR. While a card is followed, the components it
+// names count as in flight for the precedence check (`ds-precedence/`).
 //
 // A POLL, NOT A WEBHOOK. The Worker has no GitHub webhook route, so this looks
-// once a morning: a PR opened after an Approve is linked the next morning, and one
-// merged is closed out the morning after that. Two reads a run find what is
-// new — the repo's recent pulls, and its `harness-intake` issues updated since
-// the oldest card — and each card is matched in memory:
-//   • the intake by the hidden marker its body opens with (`publishMarker`);
-//   • the PR by the title `figma-implement.yml` gives it — "feat: Figma DS
-//     update — <component list>", the list the card dispatched — opened after
-//     the card was posted. Oldest card first, each PR goes to one card only, so
-//     two publishes of the same components get a PR each rather than sharing.
-// A PR once linked is read back by its number, so one that stays open past the
-// recent-pulls window is still seen merging.
+// once a morning: one read finds the repo's `harness-intake` issues updated
+// since the oldest card, and each card is matched in memory by the hidden
+// marker its intake's body opens with (`publishMarker`).
 //
 // AN EXPIRED CARD IS CLOSED OUT (#886 § 3.1). An Approve files the intake,
 // marker and all, and a Reject files nothing and says so on the report's
@@ -35,27 +28,25 @@
 // waits for ever; an edit it cannot make ages out after `TRACK_DAYS`. A card
 // tracked before the shared card has no item; its intake
 // files the same way, and its own text is edited to a closing line. A card
-// tracked before the card kept its draft has nothing to file from, and ages
-// out as before. A card whose PR never appears (a Reject, a failed run) is
-// dropped after `TRACK_DAYS`.
+// tracked before the card kept its draft has nothing to file from. Every card
+// is dropped after `TRACK_DAYS`.
 //
-// Subrequest math, per job: 2 reads, then per card at most 1 read (its linked
-// PR) and 5 writes (a PR linked and merged in one look: intake comment, thread
-// post, intake comment, close, thread post; an expiry is 5: the wider look, a
-// permalink, the filing, the edit and the thread line) for at most
-// `MAX_TRACKED_PER_RUN` cards — 2 + 6 × 5 = 32, under the lookup ceiling of 38.
+// Subrequest math, per job: 1 read, then per card at most 5 (an expiry: the
+// wider look, a permalink, the filing, the edit and the thread line) for at
+// most `MAX_TRACKED_PER_RUN` cards — 1 + 5 × 5 = 26, under the lookup ceiling
+// of 38.
 // The report's record is a Durable Object hop; KV is the internal bucket.
 //
 // Named dependencies; `Env` enters in `figma-library/env.ts`.
 
-import { namesInWords, windowInWords } from "../slack/copy-words";
+import { windowInWords } from "../slack/copy-words";
 import { rethrowIfBudget } from "../net";
 import { LIBRARY_CARD_TTL_MS } from "./post";
 import { notedCardBlocks } from "../slack/proposal-render";
 import { expireItem, type ReportStore } from "../slack/decision-cards";
 import type { ReportItemState } from "../thread-state/index";
 
-/** A posted library card, followed until its PR merges or it ages out. */
+/** A posted library card, followed until it ages out. */
 export interface TrackedPublish {
   /** The publish's identity (`PublishIntake.key`). */
   key: string;
@@ -65,10 +56,10 @@ export interface TrackedPublish {
   /** The card's message ts — the thread to post in. */
   ts: string;
   postedAt: number;
-  /** The component list Approve dispatches, or null when it dispatches nothing. */
+  /** The publish's components with code, comma-joined, or null when none has
+   *  code: what the precedence check holds as in flight. */
   implement: string | null;
   intake?: { number: number; url: string };
-  pr?: { number: number; url: string };
   /** The intake as drafted: what an expired card files. Absent on a card
    *  tracked before it was kept. */
   draft?: { title: string; body: string };
@@ -90,26 +81,11 @@ export interface IntakeRef {
   body: string;
 }
 
-export interface PullRef {
-  number: number;
-  title: string;
-  url: string;
-  createdAt: string;
-  state: "open" | "closed";
-  merged: boolean;
-}
-
 export interface TrackDeps {
   tracked: { read(): Promise<TrackedPublish[]>; write(tracked: TrackedPublish[]): Promise<void> };
   github: {
     /** `harness-intake` issues updated since `since` (ISO), bodies included. */
     recentIntakes(since: string): Promise<IntakeRef[]>;
-    /** The repo's most recently opened pulls, any state. */
-    recentPulls(): Promise<PullRef[]>;
-    /** One pull by number, as it stands now; null when GitHub has none. */
-    pull(number: number): Promise<PullRef | null>;
-    comment(issue: number, body: string): Promise<void>;
-    close(issue: number): Promise<void>;
     /** Every intake updated since `since`, up to a page of 100, and whether
      *  that was all of them. */
     intakesSince(since: string): Promise<{ intakes: IntakeRef[]; complete: boolean }>;
@@ -123,9 +99,6 @@ export interface TrackDeps {
   /** Edit a card's message in place: its report redrawn closed, or a
    *  pre-shared card's own blocks with a closing line and no buttons. */
   closeCard(channel: string, ts: string, message: { text: string; blocks: unknown[] }): Promise<void>;
-  /** A card's PR merged: its link is offered on the components it changed,
-   *  in Dev Mode (`figma-links/queue.ts`). */
-  merged?(pr: { number: number; url: string }, components: string[]): Promise<void>;
   now(): number;
 }
 
@@ -146,50 +119,15 @@ export function failedFiledLine(intakeUrl: string): string {
   return `The approved filing didn't go through, so I filed the <${intakeUrl}|intake> now.`;
 }
 
-// ── The card's thread, as the PR moves (#886 § 3.2) ──────────────────────────
-// Plain links, and one 🎉 — on the merge, naming what now matches.
-
-type Link = { number: number; url: string };
-
-/** The PR opened. */
-export function prOpenedLine(pr: Link, intake?: Link): string {
-  return `PR open: <${pr.url}|#${pr.number}>.${intake ? ` Linked from the <${intake.url}|intake>.` : ""}`;
-}
-
-/**
- * The PR merged: what now matches the library, by name.
- *
- * @param implement - The component list the card dispatched, comma-joined
- */
-export function prMergedLine(pr: Link, implement: string | null, intake?: Link): string {
-  const names = (implement ?? "").split(",").map((n) => n.trim()).filter(Boolean);
-  const matches = names.length ? `, so ${namesInWords(names)} ${names.length === 1 ? "matches" : "match"} the library` : "";
-  return `:tada: <${pr.url}|#${pr.number}> merged${matches}.${intake ? ` Closed the <${intake.url}|intake>.` : ""}`;
-}
-
-/** The PR closed without merging: the intake stays for the next try. */
-export function prClosedLine(pr: Link, intake?: Link): string {
-  return `<${pr.url}|#${pr.number}> closed without merging.${intake ? ` The <${intake.url}|intake> stays open for the next try.` : ""}`;
-}
-
-/** A card whose PR has not appeared by now is let go. */
+/** A card is let go this long after it posted. */
 export const TRACK_DAYS = 14;
-/** A card whose PR is open but unmerged is let go after this. */
-export const TRACK_MAX_DAYS = 45;
 /** Cards looked at per run, oldest first; the rest wait a morning. */
 export const MAX_TRACKED_PER_RUN = 5;
-/** A PR opened this long before the card counts too — clocks disagree. */
+/** An intake updated this long before the card counts too — clocks disagree. */
 const CLOCK_SLACK_MS = 5 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/** The title figma-implement.yml gives the PR for this component list. */
-export function implementPrTitle(components: string): string {
-  return `feat: Figma DS update — ${components}`;
-}
-
 export interface TrackResult {
-  linked: number;
-  closed: number;
   dropped: number;
   /** Cards past their window with no decision, whose intake this run filed. */
   expired: number;
@@ -256,19 +194,13 @@ async function closeExpired(deps: TrackDeps, card: TrackedPublish, intake: { num
  */
 export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: boolean } = {}): Promise<TrackResult> {
   const tracked = await deps.tracked.read();
-  if (!tracked.length) return { linked: 0, closed: 0, dropped: 0, expired: 0, remaining: 0, summary: "nothing tracked" };
+  if (!tracked.length) return { dropped: 0, expired: 0, remaining: 0, summary: "nothing tracked" };
 
   const batch = [...tracked].sort((a, b) => a.postedAt - b.postedAt).slice(0, MAX_TRACKED_PER_RUN);
   const since = new Date(Math.min(...batch.map((t) => t.postedAt)) - CLOCK_SLACK_MS).toISOString();
-  const [intakes, pulls] = await Promise.all([deps.github.recentIntakes(since), deps.github.recentPulls()]);
+  const intakes = await deps.github.recentIntakes(since);
 
   const done = new Set<string>();
-  // A PR belongs to one card: every PR already linked is taken, and a new
-  // match goes to the oldest card that wants it, earliest PR first.
-  const taken = new Set(tracked.flatMap((t) => (t.pr ? [t.pr.number] : [])));
-  const oldestFirst = [...pulls].sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
-  let linked = 0;
-  let closed = 0;
   let dropped = 0;
   let expired = 0;
   for (const card of batch) {
@@ -276,19 +208,6 @@ export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: bool
     if (!card.intake) {
       const intake = intakes.find((i) => i.body.includes(card.marker));
       if (intake) card.intake = { number: intake.number, url: intake.url };
-    }
-
-    let pr: PullRef | null | undefined;
-    if (card.pr) {
-      pr = await deps.github.pull(card.pr.number);
-    } else if (card.implement) {
-      pr = oldestFirst.find(
-        (p) =>
-          !taken.has(p.number) &&
-          p.title.trim() === implementPrTitle(card.implement!) &&
-          Date.parse(p.createdAt) >= card.postedAt - CLOCK_SLACK_MS,
-      );
-      if (pr) taken.add(pr.number);
     }
 
     // An expired card whose intake this job already filed: only the edit is
@@ -300,10 +219,10 @@ export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: bool
       continue;
     }
 
-    // Past its window with no intake and no PR: nobody decided — unless its
+    // Past its window with no intake: nobody decided — unless its
     // record says rejected, and once a wider look agrees. File the intake
     // Approve would have filed, write that down, then close the card.
-    if (!pr && !card.intake && age >= LIBRARY_CARD_TTL_MS && card.draft && (card.item || card.cardText)) {
+    if (!card.intake && age >= LIBRARY_CARD_TTL_MS && card.draft && (card.item || card.cardText)) {
       if (card.item) {
         let decided: ReportItemState["kind"] | undefined;
         try {
@@ -364,46 +283,7 @@ export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: bool
       }
     }
 
-    if (pr && !card.pr) {
-      card.pr = { number: pr.number, url: pr.url };
-      linked += 1;
-      if (!opts.dryRun) {
-        if (card.intake) {
-          await deps.github.comment(card.intake.number, `The implementation PR is open: ${pr.url}`);
-        }
-        await deps.postToThread(card.channel, card.ts, prOpenedLine(pr, card.intake));
-      }
-    }
-
-    if (pr?.merged) {
-      closed += 1;
-      done.add(card.key);
-      if (!opts.dryRun) {
-        if (card.intake) {
-          await deps.github.comment(card.intake.number, `Incorporated by ${pr.url}, merged.`);
-          await deps.github.close(card.intake.number);
-        }
-        await deps.postToThread(card.channel, card.ts, prMergedLine(pr, card.implement, card.intake));
-        const components = (card.implement ?? "").split(",").map((n) => n.trim()).filter(Boolean);
-        if (deps.merged && components.length) {
-          await deps.merged({ number: pr.number, url: pr.url }, components).catch((err: unknown) => {
-            rethrowIfBudget(err);
-            console.error(`[figma-library] PR #${pr.number}: Dev Mode link not queued — ${err instanceof Error ? err.message : String(err)}`);
-          });
-        }
-      }
-      continue;
-    }
-    if (pr && pr.state === "closed") {
-      // Closed without merging: the intake stays open for a person to pick up.
-      dropped += 1;
-      done.add(card.key);
-      if (!opts.dryRun) {
-        await deps.postToThread(card.channel, card.ts, prClosedLine(pr, card.intake));
-      }
-      continue;
-    }
-    if ((!card.pr && age > TRACK_DAYS * DAY_MS) || age > TRACK_MAX_DAYS * DAY_MS) {
+    if (age > TRACK_DAYS * DAY_MS) {
       dropped += 1;
       done.add(card.key);
     }
@@ -412,11 +292,9 @@ export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: bool
   const remaining = tracked.filter((t) => !done.has(t.key));
   if (!opts.dryRun) await deps.tracked.write(remaining);
   return {
-    linked,
-    closed,
     dropped,
     expired,
     remaining: remaining.length,
-    summary: `linked ${linked}, closed ${closed}, dropped ${dropped}, expired ${expired}, tracking ${remaining.length}`,
+    summary: `dropped ${dropped}, expired ${expired}, tracking ${remaining.length}`,
   };
 }

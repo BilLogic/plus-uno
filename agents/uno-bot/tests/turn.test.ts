@@ -2087,15 +2087,15 @@ test("a tool call that is missing what it needs asks instead of staging", async 
   // refusal that the person hears.
   const h = harness({
     replies: [
-      { toolCalls: [{ name: "component_implement", args: { component: "Button" } }] },
-      { toolCalls: [{ name: "component_implement", args: { component: "Button" } }] },
+      { toolCalls: [{ name: "github_issue_create", args: { title: "Button drift", body: "b", repo: "elsewhere" } }] },
+      { toolCalls: [{ name: "github_issue_create", args: { title: "Button drift", body: "b", repo: "elsewhere" } }] },
     ],
-    preflightAsk: "Which PRD is this implementing?",
+    preflightAsk: "Which repo should this intake go on?",
   });
-  const outcome = await runTurn(request({ text: "implement the Button change" }), h.deps);
+  const outcome = await runTurn(request({ text: "file the Button drift" }), h.deps);
 
   assert.equal(outcome.disposition, "asked");
-  assert.equal(outcome.posted, "Which PRD is this implementing?");
+  assert.equal(outcome.posted, "Which repo should this intake go on?");
   assert.equal(h.delivery.calls.filter((c) => c.kind === "proposal").length, 0);
   assert.equal(await h.threadState.getProposalByThread(REF), null);
 });
@@ -2290,14 +2290,14 @@ const EXITS: Array<{
       // caught: a check on the clear's presence alone could not see it.
       const h = harness({
         replies: [
-          { toolCalls: [{ name: "component_implement", args: { component: "Button" } }] },
-          { toolCalls: [{ name: "component_implement", args: { component: "Button" } }] },
+          { toolCalls: [{ name: "github_issue_create", args: { title: "Button drift", body: "b", repo: "elsewhere" } }] },
+          { toolCalls: [{ name: "github_issue_create", args: { title: "Button drift", body: "b", repo: "elsewhere" } }] },
         ],
-        preflightAsk: "Which PRD is this implementing?",
+        preflightAsk: "Which repo should this intake go on?",
       });
       return {
         h,
-        outcome: await runTurn(request({ surface, text: "implement the Button change" }), h.deps),
+        outcome: await runTurn(request({ surface, text: "file the Button drift" }), h.deps),
       };
     },
   },
@@ -2661,22 +2661,22 @@ test("a brief staged with no named gap carries that caveat as data, not as Slack
   const h = harness({
     replies: [
       {
-        text: "I'll scaffold this.",
+        text: "I'll draft the PRD.",
         toolCalls: [
           {
-            name: "prototype_scaffold",
-            args: { figma_url: "https://figma.com/file/x", notes: "Build the roster view." },
+            name: "notion_create",
+            args: { surface: "prd", title: "Roster view", summary: "Build the roster view tutors open first." },
           },
         ],
       },
     ],
   });
-  const outcome = await runTurn(request({ text: "build this figma" }), h.deps);
+  const outcome = await runTurn(request({ text: "write up a PRD for the roster view" }), h.deps);
 
   assert.equal(outcome.disposition, "staged");
   assert.deepEqual(outcome.staged?.card.caveats, [{ kind: "no-open-questions" }]);
   assert.equal(outcome.staged?.card.kind, "confirm");
-  assert.equal(outcome.staged?.card.verb, "scaffold a new prototype from this Figma design");
+  assert.equal(outcome.staged?.card.verb, "create this card on the Roadmap board");
 });
 
 test("Turn does not import a Slack module", () => {

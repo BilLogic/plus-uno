@@ -363,9 +363,6 @@ export function harness(opts: {
       async notionTarget() {
         return { title: "A card", parent: "Roadmap" };
       },
-      async designPreviewImage() {
-        return "https://figma.example/preview.png";
-      },
       async issueTarget(input) {
         return opts.issueTarget?.(input) ?? { repo: ISSUE_REPO, visibility: "public" };
       },

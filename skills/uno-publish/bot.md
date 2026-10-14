@@ -18,7 +18,6 @@ Get finished-enough work in front of people from Slack. A designer wants feedbac
    - **Marketplace entry** closes the handoff: step 5's publish.
 5. **Catalog — search and publish.** Search is `notion_search(scope: "marketplace", query)`, read-only, a direct scan of the Prototype Marketplace DB (prefer it over scope `"any"`); richer filtering → `source_read` a hit. Publishing or updating an entry is `notion_create(surface: "marketplace")`, one ✅ card, whose tool description names the fields; ask once for the ones the thread lacks, and put a value the tool returns as a question back to the designer. Catalog removal is a manual PR, one entry at a time. Done when the results are posted, or the card is staged.
 6. **Sync feedback session — logistics only.** Offer scheduling and recording/transcription setup. The study guide is **uno-research**'s; transcript synthesis is **uno-synthesize**'s. Done when the logistics are settled and the two neighbours are named.
-7. **Outward email — `email_send(to, subject, body, cc?)`**, gated, real Gmail. Slack-first: use it for a recipient outside Slack or on an explicit ask. Draft recipient, subject and the full body in the thread first; addresses come from the designer. Done when the card is staged with a complete body.
 
 Across every step: the confirmation gate holds on a fully-specified request — the friction is the feature; ❌ or a correction → fix and re-propose. Success messages (post link, PR link) are the Worker's; describe outcomes in future or conditional tense.
 

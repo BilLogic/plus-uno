@@ -43,7 +43,6 @@ import { FigmaRateLimitError, FigmaRequestError, type FigmaComment } from "../sr
 import { createInMemoryFigma } from "../src/figma/in-memory";
 import { createFigmaRestClient } from "../src/figma/rest";
 import { SubrequestBudgetError } from "../src/net";
-import { PREVIEW_UNDER_WAIT_UNTIL } from "../src/turn/env-deps";
 
 
 /** A frame with `n` TEXT descendants, nested so the walk has to recurse. */
@@ -252,23 +251,23 @@ describe("a render's first 429", () => {
     return { figma, sentAt };
   }
 
-  it("is waited out where a turn renders — vision, and a turn's card preview", async () => {
-    // Both pass two attempts and the client's 60 s wait (`slack/vision.ts`,
-    // `turn/env-deps.ts`), so a 30 s Retry-After still renders.
+  it("is waited out where vision renders", async () => {
+    // Two attempts and the client's 60 s wait (`slack/vision.ts`), so a 30 s
+    // Retry-After still renders.
     const { figma, sentAt } = rateLimitedOnce("30");
     assert.equal(await fetchFigmaImagePngUrl(figma, FILE, NODE, { attempts: 2 }), RENDERED);
     assert.deepEqual(sentAt, [0, 30000]);
   });
 
-  it("is waited out briefly where the button door re-stages a card inside waitUntil", async () => {
+  it("is waited out briefly under a short wait budget", async () => {
     const { figma, sentAt } = rateLimitedOnce("3");
-    assert.equal(await fetchFigmaImagePngUrl(figma, FILE, NODE, PREVIEW_UNDER_WAIT_UNTIL), RENDERED);
+    assert.equal(await fetchFigmaImagePngUrl(figma, FILE, NODE, { maxWaitMs: 5_000, attempts: 2 }), RENDERED);
     assert.deepEqual(sentAt, [0, 3000]);
   });
 
-  it("gives the re-staged card no preview at once when the wait would run past waitUntil", async () => {
+  it("gives up at once when the wait would run past a short budget", async () => {
     const { figma, sentAt } = rateLimitedOnce("30");
-    assert.equal(await fetchFigmaImagePngUrl(figma, FILE, NODE, PREVIEW_UNDER_WAIT_UNTIL), null);
+    assert.equal(await fetchFigmaImagePngUrl(figma, FILE, NODE, { maxWaitMs: 5_000, attempts: 2 }), null);
     assert.deepEqual(sentAt, [0], "no second attempt, and no sleep");
   });
 });

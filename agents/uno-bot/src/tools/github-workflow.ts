@@ -2,10 +2,6 @@
 // then posts that workflow's runs page back in the thread. Side effect → runs
 // only past the ✅ gate, from `agent/resolve-proposal.ts`.
 //
-// The generic dispatch the two named Actions tools deferred until a third
-// Action appeared. `component_implement` and `prototype_scaffold` stay as they
-// are: they carry structured payloads (a PRD, a Figma frame, the transcript).
-//
 // What may run is the repo list's, not the model's: the repo resolves through
 // the one resolver, and the workflow must be on that entry's `workflows`
 // (`github-workflow-render.ts`). Preflight refuses anything else before a card
