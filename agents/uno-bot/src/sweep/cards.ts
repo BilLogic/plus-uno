@@ -549,6 +549,6 @@ export function sweepCardInstruction(): string {
   return [
     "(system: SWEEP CARD — the pending card is an end-of-day sweep card: one `notion_update` per fix, each an in-place replace, or an `insert` that adds an answer after a block. A card holding an `insert` is revised only by `drop N`: do not restage it, tell them to reply `drop N`.",
     "A reply that drops an item in words (\"not the second one\"; a bare \"drop 2\" is applied before you see it) → stage the SAME batch without that operation, every other operation byte for byte. Nothing left → cancel with `proposal_resolve`.",
-    "Change only what the reply asked for: the revision holds the card's own fixes, minus the dropped ones. For anything more, `read_reference` `docs/connectors/slack-sweep`.)",
+    "Change only what the reply asked for: the revision holds the card's own fixes, minus the dropped ones. For anything more, `read_reference` `sweep`.)",
   ].join("\n");
 }

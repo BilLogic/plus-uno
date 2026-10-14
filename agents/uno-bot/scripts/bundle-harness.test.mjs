@@ -47,7 +47,7 @@ const COPIED = [
   "agents/uno-bot/scripts/bundle-harness.mjs",
 ];
 /** Copied when present: a section root may hold nothing yet, and an empty section is legal. */
-const COPIED_IF_PRESENT = ["agents/uno-bot/skills"];
+const COPIED_IF_PRESENT = ["agents/uno-bot/skills", "agents/uno-bot/scheduled-actions"];
 
 let repoRoot, bundler, harnessTs, companionMd, referencesTs;
 
@@ -506,8 +506,10 @@ test("the manifest lists every member in load order, ending at the assembled len
 
   const order = ["AGENTS.md", ...memberOrder(assembled())];
   assert.equal(rows.length, order.length, "the manifest must carry one row per bundled file");
+  // A section's pointer block is a numbered row too, with no file to name, so
+  // the file rows' numbers rise in load order with a gap where one sits.
   rows.forEach((row, i) => {
-    assert.equal(Number(row[1]), i + 1, "manifest rows must be numbered in load order");
+    assert.ok(i === 0 ? Number(row[1]) === 1 : Number(row[1]) > Number(rows[i - 1][1]), "manifest rows must be numbered in load order");
     assert.equal(row[2], order[i], `manifest row ${i + 1} must name the file loaded in that position`);
   });
 
@@ -593,13 +595,13 @@ test("the census names the disclosed count beside the bundled and ide-only ones"
   // The expected count is read off the docs themselves, so a method moving in
   // or out of the map (#423 moved one, #424 four more) changes this test's
   // expectation and the bundler's answer together. A connector doc can be
-  // disclosed too (the sweep's rules are), so the docs roots are read as well.
+  // disclosed too, and so is every scheduled action, so those roots are read as well.
   const disclosed = (abs) => existsSync(abs) && /^disclosure:\s*reference$/m.test(readFileSync(abs, "utf8"));
   const methods = readdirSync(path.join(repoRoot, "skills"), { withFileTypes: true })
     .filter((d) => d.isDirectory() && d.name.startsWith("uno-"))
     .map((d) => path.join(repoRoot, "skills", d.name, "references", "method.md"))
     .filter(disclosed).length;
-  const docs = ["docs/connectors", "docs/engineering", "docs/conventions"]
+  const docs = ["agents/uno-bot/scheduled-actions", "docs/connectors", "docs/engineering", "docs/conventions"]
     .flatMap((root) => Object.keys(treeSnapshot(repoRoot, root)))
     .filter((rel) => rel.endsWith(".md") && disclosed(path.join(repoRoot, rel))).length;
   const disclosedOnDisk = methods + docs;
@@ -737,7 +739,7 @@ test("the manifest's census, budgets and members agree with the bundle", () => {
   // Per-section totals, in the bundle's own order.
   assert.deepEqual(
     manifest.sections.map((s) => s.name),
-    ["constitution", "persona", "bot-skills", "skills", "connectors", "engineering", "conventions"],
+    ["constitution", "persona", "bot-skills", "scheduled-actions", "skills", "connectors", "engineering", "conventions"],
   );
   assert.equal(
     manifest.sections.reduce((t, s) => t + s.docs, 0),
@@ -946,9 +948,9 @@ test("a disclosed bot skill emits its pointer after the persona, and its body la
 });
 
 test("a disclosed doc with no description emits no pointer", () => {
-  // Today's disclosed docs carry a `summary` and no `description`; their
-  // pointers are written in the docs that fire them, so the prompt is the
-  // committed one, byte for byte.
+  // The methods and the disclosed connector and engineering docs carry a
+  // `summary` and no `description`; their pointers are written in the docs that
+  // fire them, so the prompt is the committed one, byte for byte.
   const assembly = assemble({ repoRoot });
   assert.equal(promptOf(assembly), assembled());
   assert.deepEqual(mapOf(assembly), references());
@@ -973,4 +975,26 @@ test("budget, sort and reference naming read only the section row — no path-su
   assert.ok(!/method\.md|bot\.md/.test(code), "the bundler names a skill file shape");
   assert.ok(!/\\\/references\\\//.test(code), "the bundler matches a references/ path");
   assert.ok(!/section === ["']/.test(code), "the bundler branches on a section's name");
+});
+
+// ── Scheduled actions: one doc per family whose posts people reply to ─────────
+
+const FAMILIES = ["sweep", "follow-through", "dm-watch", "figma-comments", "figma-library", "ds-precedence"];
+
+test("each scheduled-action family is disclosed under its folder name, with a generated pointer", () => {
+  const prompt = assembled();
+  const map = references();
+  for (const family of FAMILIES) {
+    assert.ok(typeof map[family] === "string" && map[family].length > 0, `\`${family}\` must be in the reference map`);
+    const pointer = prompt.split("\n").find((l) => l.startsWith(`**${family}** — `));
+    assert.ok(pointer, `\`${family}\` must leave a pointer line in the prompt`);
+  }
+  const block = prompt.indexOf("<!-- scheduled-actions — read_reference by name -->");
+  assert.ok(block !== -1, "the pointer lines are the scheduled-actions section's generated block");
+  assert.ok(block > prompt.indexOf("<!-- agents/uno-bot/AGENT.md -->"), "scheduled actions sort after the persona");
+});
+
+test("the sweep doc is read by its new name only", () => {
+  assert.ok(!("docs/connectors/slack-sweep" in references()), "the old name must leave the map");
+  assert.ok(!assembled().includes("slack-sweep"), "the prompt must not name the old doc");
 });

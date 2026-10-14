@@ -76,7 +76,6 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/connectors/figma.md`](docs/connectors/figma.md) | PLUS Figma files follow How We Fig — five stage folders per team, `<Project> / Card <n> & <m> / <designers>` titles, six divider page sections; an agent suggests a rename or a move and a person makes it |
 | [`docs/connectors/notion.md`](docs/connectors/notion.md) | How agents write to Notion — the MCP-write principle, convention surfaces, the gated tools, and body shape. |
 | [`docs/connectors/overview.md`](docs/connectors/overview.md) | One row per connected tool: where its conventions live, what touches it |
-| [`docs/connectors/slack-sweep.md`](docs/connectors/slack-sweep.md) | The end-of-day sweep — what it reads, where its drift reports go, who may decide a fix, how it asks about a read-only file, how its commitment reminders nudge a promiser, its card follow-ups, and what it asks in a person's DM with uno-bot. |
 | [`docs/connectors/slack.md`](docs/connectors/slack.md) | Pillar → channel map (group announcements; all private — uno-bot must be invited before posting/@here): Universal → #plus-universal C072E8SFLKV · Admin → #plus-admin C089A3E9CCW · |
 | [`docs/connectors/storybook-mcp.md`](docs/connectors/storybook-mcp.md) | The Storybook MCP endpoint — the primary interface to the design system while Storybook runs, plus the story-authoring conventions that keep it useful. |
 | [`docs/connectors/supabase/blueprint-direct-access.md`](docs/connectors/supabase/blueprint-direct-access.md) | Query recipes and service-key notes for agents that read the blueprint's database directly rather than through the portal — the supplement to blueprint.md, which it adds to |
@@ -138,7 +137,7 @@ Adding a doc changes this file; editing this file changes nothing.
 |-----|---------|
 | [`docs/engineering/coding.md`](docs/engineering/coding.md) | How to write code in this repo — barrel imports, tokens over literals, styling conventions, and what not to reach for. |
 | [`docs/engineering/measurement-window.md`](docs/engineering/measurement-window.md) | How to run uno-bot's measurement window each week and close it — the five numbers, where each comes from, where it is recorded, and what stays private. |
-| [`docs/engineering/operations.md`](docs/engineering/operations.md) | THE standing-automation registry — every cron, scheduled Worker job, webhook and PR gate, with its trigger, agent, implementation and who pays. |
+| [`docs/engineering/operations.md`](docs/engineering/operations.md) | THE standing-automation registry — every cron, scheduled Worker job, webhook and PR gate, with its trigger, owner and a link to its home. |
 | [`docs/engineering/setup.md`](docs/engineering/setup.md) | Aliases, package structure, prototype conventions, token workflow, local preview. |
 
 ## Product and service
@@ -217,6 +216,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-146 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+145 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

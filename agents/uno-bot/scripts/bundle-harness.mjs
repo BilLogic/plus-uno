@@ -37,7 +37,7 @@
 // `agents/uno-bot/skills/draft-a-prd/SKILL.md` is `draft-a-prd`. `path`: its
 // path sans `.md` with the shape words removed — `skills/` and `references/`
 // carry no meaning to the model — so `skills/uno-maintain/references/method.md`
-// is `uno-maintain/method` and `docs/connectors/slack-sweep.md` keeps its path.
+// is `uno-maintain/method` and `docs/engineering/operations.md` keeps its path.
 //
 // ORDER IS A BUNDLE-LEVEL FACT no single document can know, so it is declared
 // once, by the order of the rows in SECTIONS, and nowhere else. Within a
@@ -246,6 +246,7 @@ const SECTIONS = [
   { name: "constitution", roots: ["AGENTS.md", "GLOSSARY.md"], budget: { role: "constitution", limit: BUDGETS.constitution, soft: true }, nameBy: "path" },
   { name: "persona", roots: ["agents/uno-bot/AGENT.md"], budget: { role: "persona", limit: BUDGETS.persona, soft: false }, nameBy: "path" },
   { name: "bot-skills", roots: ["agents/uno-bot/skills"], budget: { role: "botSkill", limit: BUDGETS.botSkill, soft: false }, nameBy: "folder" },
+  { name: "scheduled-actions", roots: ["agents/uno-bot/scheduled-actions"], budget: null, nameBy: "folder" },
   { name: "skills", roots: ["skills"], budget: { role: "Worker face", limit: BUDGETS.botFace, soft: false, delivery: "bundled" }, nameBy: "path" },
   { name: "connectors", roots: ["docs/connectors"], budget: null, nameBy: "path" },
   { name: "engineering", roots: ["docs/engineering"], budget: null, nameBy: "path" },

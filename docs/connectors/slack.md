@@ -40,7 +40,7 @@ Slack delivers slash commands only from a channel or DM composer, so inside a th
 <!-- ide-only -->
 ## The end-of-day sweep — read path and audience rule
 
-The Worker's one proactive read of channels, whose rules the bot reads through `read_reference` (`docs/connectors/slack-sweep.md`):
+The Worker's one proactive read of channels, whose rules are the `sweep` scheduled action (`agents/uno-bot/scheduled-actions/sweep/ACTION.md`):
 
 - **Read path.** At the 00:00 ET end-of-day run, dated to the workday that just ended, one job per channel on `SWEEP_CHANNELS` (`agents/uno-bot/wrangler.toml`) reads with the **bot token**:
   - `conversations.info` first: a private channel is read only when it is also on `SLACK_SEARCH_PRIVATE_ALLOWLIST`, and a DM stays unread;
