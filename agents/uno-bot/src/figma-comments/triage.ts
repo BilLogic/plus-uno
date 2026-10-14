@@ -43,6 +43,10 @@ export interface WatchedQuestion {
   createdAt: string;
   section: Section;
   page: string;
+  /** The Slack ids an earlier morning's DM reached for it: never DMed again. */
+  dmed?: string[];
+  /** Whether an earlier morning's channel card posted: never posted again. */
+  carded?: boolean;
 }
 
 /** A file's open questions, and what the ladder reads about it. */
@@ -158,8 +162,14 @@ export async function keepOpenQuestions(ports: TriagePorts, file: WatchedFile): 
   for (const q of file.questions) if (!(await ports.raised.has(q.commentId))) fresh.push(q);
   if (!fresh.length) return;
   const older = await ports.watch.read(file.fileKey);
+  const kept = new Map((older?.questions ?? []).map((q) => [q.commentId, q]));
+  // Tonight's read replaces what a question says, never whom a morning already reached.
+  const merged = fresh.map((q) => {
+    const was = kept.get(q.commentId);
+    return was ? { ...q, ...(was.dmed ? { dmed: was.dmed } : {}), ...(was.carded ? { carded: true } : {}) } : q;
+  });
   const ids = new Set(fresh.map((q) => q.commentId));
-  await ports.watch.write({ ...file, questions: [...(older?.questions ?? []).filter((q) => !ids.has(q.commentId)), ...fresh] });
+  await ports.watch.write({ ...file, questions: [...(older?.questions ?? []).filter((q) => !ids.has(q.commentId)), ...merged] });
 }
 
 /** What a morning's triage did. */
@@ -199,6 +209,7 @@ export async function raiseUnanswered(
       continue;
     }
     const done = new Set<string>();
+    const progressed = new Map<string, WatchedQuestion>();
     let stopped = false;
     for (const q of due) {
       const root = comments.find((c) => c.id === q.commentId && !c.parent_id);
@@ -222,14 +233,17 @@ export async function raiseUnanswered(
         await ports.raised.add(q.commentId);
         done.add(q.commentId);
         result.raised += 1;
-      } else if (sent.notIn) {
+        continue;
+      }
+      progressed.set(q.commentId, sent.question);
+      if (sent.notIn) {
         result.notes.push(`uno-bot is not in ${sent.notIn}, so the question ${q.commentId} on ${file.fileKey} waits for the invite`);
       } else {
         result.notes.push(`the question ${q.commentId} on ${file.fileKey} did not post, so it waits for tomorrow`);
       }
     }
-    if (!opts.dryRun && done.size) {
-      const rest = file.questions.filter((q) => !done.has(q.commentId));
+    if (!opts.dryRun && (done.size || progressed.size)) {
+      const rest = file.questions.filter((q) => !done.has(q.commentId)).map((q) => progressed.get(q.commentId) ?? q);
       if (rest.length) await ports.watch.write({ ...file, questions: rest });
       else await ports.watch.remove(file.fileKey);
     }
@@ -281,8 +295,10 @@ export function namedIn(message: string, asker: string, handles: Record<string, 
   return out;
 }
 
-/** Send one question: DMs to the mapped, and the channel card unless everyone
- *  named was DMed. Whether anything was sent, and the channel that refused the
+/** Send one question: a DM to each mapped person no earlier morning reached,
+ *  and the channel card — unless everyone named is mapped, or it posted before.
+ *  Raised (`ok`) once every one of those is reached; otherwise the question
+ *  with whom it reached, to keep watching, and the channel that refused the
  *  card because uno-bot is not in it. */
 async function raise(
   file: WatchedFile,
@@ -291,13 +307,20 @@ async function raise(
   named: Named,
   ports: TriagePorts,
   now: number,
-): Promise<{ ok: boolean; notIn?: string }> {
+): Promise<{ ok: true } | { ok: false; question: WatchedQuestion; notIn?: string }> {
   const link = commentUrl(file.fileKey, q.nodeId, q.commentId);
+  const dmed = new Set(q.dmed ?? []);
   let sent = false;
   for (const person of named.mapped) {
-    if (await ports.dm(person.slack, questionDm(file, q, root.message, link))) sent = true;
+    if (dmed.has(person.slack)) continue;
+    if (await ports.dm(person.slack, questionDm(file, q, root.message, link))) {
+      dmed.add(person.slack);
+      sent = true;
+    }
   }
-  if (named.mapped.length && !named.unmapped.length) return { ok: sent };
+  const reached = (carded: boolean): WatchedQuestion => ({ ...q, ...(dmed.size ? { dmed: [...dmed] } : {}), ...(carded ? { carded: true } : {}) });
+  const cardDue = !(named.mapped.length && !named.unmapped.length) && !q.carded;
+  if (!cardDue) return sent || q.carded || dmed.size ? { ok: true } : { ok: false, question: reached(!!q.carded) };
 
   const team = file.pillars.length ? null : await ports.fileTeam(file.fileKey);
   const { destination, addressee } = routeFinding({
@@ -306,7 +329,7 @@ async function raise(
     figmaFile: { team, creatorHandle: file.owner && "figma" in file.owner ? file.owner.figma : null },
   });
   const where = resolveDestination(destination, ports.channels);
-  if (!where) return { ok: sent };
+  if (!where) return { ok: false, question: reached(false) };
   const card = await ports.post(where.channel, questionCard(file, q, root.message, link, addressee, named.unmapped));
   if (card.ok) {
     await ports
@@ -317,7 +340,7 @@ async function raise(
       });
     return { ok: true };
   }
-  return { ok: sent, ...(card.error === "not_in_channel" ? { notIn: where.channel } : {}) };
+  return { ok: false, question: reached(false), ...(card.error === "not_in_channel" ? { notIn: where.channel } : {}) };
 }
 
 /** The channel card: whom it is for, the file, the question, its asker and place, anyone unmapped, and the link. */

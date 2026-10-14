@@ -198,6 +198,8 @@ export interface TriageOptions {
   handles?: string;
   /** Channels uno-bot is not in: a post there answers `not_in_channel`. */
   notIn?: string[];
+  /** Slack ids whose DM does not send. */
+  dmFails?: string[];
   fileTeams?: Record<string, string>;
   channels?: ChannelIds;
 }
@@ -351,6 +353,7 @@ export function sweepHarness(opts: {
           return { ok: true, ts: `${Math.floor(clock.now / 1000)}.${String(800000 + figmaRecords.triage.posts.length)}` };
         },
         dm: async (to, text) => {
+          if (triageOpts.dmFails?.includes(to)) return false;
           figmaRecords.triage.dms.push({ to, text });
           return true;
         },

@@ -836,6 +836,33 @@ describe("an unanswered question, raised after two workdays", () => {
     assert.equal(h.figma.triage.dms.length, 1, "never DMed twice");
   });
 
+  it("waits for the invite when the card is refused, and never DMs again the people it already reached", async () => {
+    const client = seededFigma();
+    client.seedFile(FILE, {
+      comments: COMMENTS.map((c) => (c.id === "c10" ? { ...c, message: "@Sarah K should the bar animate? cc @bea" } : c)),
+    });
+    const notIn = [TOOLKIT];
+    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { handles: "Sarah K=U0SARAH", notIn } });
+    await runSweepJob(NIGHT, h.deps);
+    const friday = await morning(h, FRIDAY);
+    assert.deepEqual(h.figma.triage.dms.map((d) => d.to), ["U0SARAH"]);
+    assert.deepEqual(h.figma.triage.posts, []);
+    assert.doesNotMatch(friday.summary, /raised 1 unanswered/, "a refused card is not raised");
+    assert.match(friday.summary, new RegExp(`uno-bot is not in ${TOOLKIT}.*waits for the invite`));
+    assert.equal(h.figma.triage.watch.get(FILE)?.questions.length, 1, "still watched");
+
+    await morning(h, MONDAY);
+    assert.equal(h.figma.triage.dms.length, 1, "Sarah is not DMed again while the card waits");
+    assert.deepEqual(h.figma.triage.posts, []);
+
+    notIn.length = 0;
+    const invited = await morning(h, at(36, 13));
+    assert.equal(h.figma.triage.posts.length, 1, "the card goes once uno-bot is invited");
+    assert.equal(h.figma.triage.dms.length, 1, "and Sarah still has one DM");
+    assert.match(invited.summary, /raised 1 unanswered Figma question\(s\)/);
+    assert.equal(h.figma.triage.watch.size, 0);
+  });
+
   it("with no card, goes to the Figma file's team channel and names its creator by handle, untagged", async () => {
     const client = createInMemoryFigma();
     client.seedFile("ToolFile1", {
