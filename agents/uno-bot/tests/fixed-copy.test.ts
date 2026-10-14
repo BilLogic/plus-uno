@@ -110,12 +110,11 @@ const FIXED_COPY: Record<string, string[]> = {
   "follow-through/run.ts": [],
   "commitments/copy.ts": [],
   "commitments/remind.ts": [],
-  // Figma library, drift and the weekly precedence thread. 🎉 marks a merged
-  // PR, the one ship tests/figma-copy.test.ts allows.
+  // Figma library, drift and the weekly precedence thread.
   "figma-library/draft.ts": [],
   "figma-library/post.ts": [],
   "figma-library/release.ts": [],
-  "figma-library/track.ts": ["🎉"],
+  "figma-library/track.ts": [],
   "figma-drift/copy.ts": [],
   "ds-precedence/report.ts": [],
   // What a write tool says once it has run, and what it asks before staging
@@ -124,7 +123,6 @@ const FIXED_COPY: Record<string, string[]> = {
   "tools/notion-create.ts": [],
   "tools/notion-update.ts": [],
   "tools/notion-archive.ts": [],
-  "tools/send-email.ts": [],
   "tools/relay-dm.ts": [],
   "tools/relayed-dm-render.ts": [],
   "tools/github-issue.ts": [],

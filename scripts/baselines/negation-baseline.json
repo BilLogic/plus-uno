@@ -27,8 +27,8 @@
         "docs/connectors/supabase/blueprint-navigation.md": 3,
         "docs/connectors/supabase/blueprint.md": 4,
         "docs/connectors/supabase/overview.md": 9,
-        "docs/engineering/operations.md": 2,
         "docs/connectors/supabase/blueprint-schema.md": 12,
+        "docs/engineering/operations.md": 2,
         "skills/uno-maintain/references/method.md": 13,
         "skills/uno-prototype/references/method.md": 14,
         "skills/uno-publish/references/method.md": 8,
@@ -40,7 +40,7 @@
     "ide": {
       "corpus": "hand-authored docs under the bundler section roots declaring embodiment: ide — docs/adr/ and the generated .claude/skills/ surfaces are not section roots and so are out",
       "measuredOn": "whole files, frontmatter included — there is no bundler here, and a SKILL.md's description: is agent-facing routing text that steers exactly as the body does",
-      "docs": 47,
+      "docs": 49,
       "counts": {
         "docs/conventions/writing.md": 8,
         "docs/engineering/coding.md": 3,
@@ -75,13 +75,10 @@
     },
     "actions": {
       "corpus": "the headless GitHub Actions prompts under scripts/prompts/ — every .md the skill-loader root holds: the adapter SKILL.mds, their references/, and the shared headless-intake contract. Listed by where they live, since they carry no embodiment: and are never bundled (#425)",
-      "measuredOn": "whole files, frontmatter included — the sweep workflows hand a SKILL.md to the model as a prompt-file: with nothing stripped, and the loader route the implement adapters take is narrower",
-      "docs": 6,
+      "measuredOn": "whole files, frontmatter included — the sweep workflows hand a SKILL.md to the model as a prompt-file: with nothing stripped",
+      "docs": 3,
       "counts": {
         "scripts/prompts/references/headless-intake.md": 4,
-        "scripts/prompts/uno-implement-design/SKILL.md": 20,
-        "scripts/prompts/uno-implement/SKILL.md": 22,
-        "scripts/prompts/uno-implement/references/new-component-scaffolding.md": 7,
         "scripts/prompts/uno-integrity-sweep/SKILL.md": 7,
         "scripts/prompts/uno-shipped-watchdog/SKILL.md": 5
       }

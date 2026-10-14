@@ -37,7 +37,6 @@ import { recordingDelivery } from "../src/turn/index";
 import { recordingViews } from "./helpers/recording-slack";
 import { notified } from "./helpers/notified";
 import { createInMemoryThreadState, type PendingProposal, type ReportItemState } from "../src/thread-state/index";
-import { trackLibraryIntakes, implementPrTitle, type TrackDeps, type TrackedPublish } from "../src/figma-library/track";
 import { runQueuedPrLinks, type QueuedPrLinks } from "../src/figma-links/queue";
 
 const CHANNEL = "D0APTB20SK0";
@@ -665,31 +664,6 @@ describe("Approve on the batch card", () => {
 
 describe("a merged library PR", () => {
   const PR = { number: 1200, url: "https://github.com/BilLogic/plus-uno/pull/1200" };
-
-  it("the tracker hands the merged PR and its components on", async () => {
-    const card: TrackedPublish = { key: "k", marker: "m", channel: "C1", ts: "1.1", postedAt: NOW - 86_400_000, implement: "Button, Badge", pr: PR };
-    const handed: unknown[] = [];
-    let tracked = [card];
-    const deps: TrackDeps = {
-      tracked: { read: async () => tracked, write: async (t) => void (tracked = t) },
-      github: {
-        recentIntakes: async () => [],
-        recentPulls: async () => [],
-        pull: async () => ({ ...PR, title: implementPrTitle("Button, Badge"), createdAt: "2026-10-10T00:00:00Z", state: "closed", merged: true }),
-        comment: async () => {},
-        close: async () => {},
-        intakesSince: async () => ({ intakes: [], complete: true }),
-        fileIntake: async () => ({ number: 1, url: "u" }),
-      },
-      postToThread: async () => {},
-      reports: createInMemoryThreadState({ now: () => NOW }),
-      closeCard: async () => {},
-      merged: async (pr, components) => void handed.push({ pr, components }),
-      now: () => NOW,
-    };
-    await trackLibraryIntakes(deps);
-    assert.deepEqual(handed, [{ pr: PR, components: ["Button", "Badge"] }]);
-  });
 
   it("one card adds the PR's link to each mapped component it names, plainly named", async () => {
     const w = world();

@@ -216,12 +216,12 @@ test("before a card is staged, a publish missing its stage and deployment link a
   const ask = await preflight(
     "notion_create",
     { surface: "marketplace", title: "Session review", properties: { description: "A tutor reviews a session." } },
-    { env: ENV, prd: null },
+    { env: ENV },
   );
 
   assert.ok(ask);
   assert.match(ask.ask, /\*stage\*/);
   assert.match(ask.ask, /\*deployment URL\*/);
   assert.doesNotMatch(ask.ask, /\*name\*|\*description\*/);
-  assert.equal(await preflight("notion_create", INPUT, { env: ENV, prd: null }), null);
+  assert.equal(await preflight("notion_create", INPUT, { env: ENV }), null);
 });

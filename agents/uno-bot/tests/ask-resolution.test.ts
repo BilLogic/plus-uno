@@ -814,9 +814,6 @@ describe("a re-staged card still resolves the ask that staged the first one", ()
         async notionTarget() {
           return null;
         },
-        async designPreviewImage() {
-          return null;
-        },
         async issueTarget() {
           return { repo: "BilLogic/plus-uno", visibility: "public" as const };
         },

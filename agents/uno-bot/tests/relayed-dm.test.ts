@@ -114,7 +114,7 @@ describe("relayFailure", () => {
 describe("preflight on a relay", () => {
   // The substance check before a card is staged: a name is not a recipient.
   // The dm_relay arm reads nothing from `Env`, so none is supplied.
-  const ctx = { env: {} as Env, prd: null };
+  const ctx = { env: {} as Env };
 
   it("asks rather than stages when the recipient is a name, not a person", async () => {
     const ask = await preflight("dm_relay", { recipient: "Coco", text: "RM-2436 is Ready for QA." }, ctx);

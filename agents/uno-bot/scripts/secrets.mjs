@@ -40,7 +40,7 @@ export const SECRETS = [
   {
     name: "GITHUB_TOKEN",
     required: true,
-    why: "PAT with repo:dispatch + Contents:Read + Issues:Write, on every repo in GITHUB_REPOS, plus Actions: Read and write on each repo that lists workflows. Powers component_implement / prototype_scaffold, which dispatch workflows in BilLogic/plus-uno, github_issue_create, which files intakes on each listed repo, github_issue_update, which follows up on issues there, github_workflow_run, which starts a listed workflow, and github_read / github_intake_search on each listed repo.",
+    why: "PAT with repo:dispatch + Contents:Read + Issues:Write, on every repo in GITHUB_REPOS, plus Actions: Read and write on each repo that lists workflows. Powers the Figma snapshot refresh, which dispatches a workflow in BilLogic/plus-uno, github_issue_create, which files intakes on each listed repo, github_issue_update, which follows up on issues there, github_workflow_run, which starts a listed workflow, and github_read / github_intake_search on each listed repo.",
   },
   {
     name: "FIGMA_ACCESS_TOKEN",
@@ -82,26 +82,6 @@ export const SECRETS = [
     name: "SUPABASE_ANON_KEY",
     required: false,
     why: "read-only anon key for the uno-blueprint project. Unset, search_blueprint reports \"not configured\" and the bot falls back to cited docs rather than fabricating.",
-  },
-  {
-    name: "GMAIL_SENDER",
-    required: false,
-    why: "authorized From mailbox for email_send. The whole Gmail lane is off unless all four GMAIL_* are set; send_email then fails gracefully.",
-  },
-  {
-    name: "GMAIL_CLIENT_ID",
-    required: false,
-    why: "Gmail OAuth client id. See GMAIL_SENDER — all four or none.",
-  },
-  {
-    name: "GMAIL_CLIENT_SECRET",
-    required: false,
-    why: "Gmail OAuth client secret. See GMAIL_SENDER — all four or none.",
-  },
-  {
-    name: "GMAIL_REFRESH_TOKEN",
-    required: false,
-    why: "Gmail OAuth refresh token. See GMAIL_SENDER — all four or none.",
   },
   {
     name: "GEMINI_API_KEY",

@@ -2,8 +2,8 @@
  * scripts/lib/skill-loader.js
  *
  * Loads a SKILL.md file and returns its content as a runtime system prompt
- * for Claude API calls. Used by scripts/implement-figma-changes.js and
- * (eventually, via copy-paste) Pipedream code steps.
+ * for Claude API calls. Its `PROMPTS_ROOT` is where the prompt checks look
+ * (`scripts/lib/actions-prompts.mjs`).
  *
  * Anthropic Agent Skills convention:
  *   scripts/prompts/{skill}/SKILL.md         — entry point, always loaded
@@ -11,9 +11,7 @@
  *
  * Usage:
  *   import { loadSkill } from './lib/skill-loader.js';
- *   const systemPrompt = await loadSkill('uno-implement', {
- *     isNewComponent: false
- *   });
+ *   const systemPrompt = await loadSkill('uno-integrity-sweep');
  *
  * This loader does three things:
  *   1. Read the SKILL.md YAML frontmatter through the corpus reader

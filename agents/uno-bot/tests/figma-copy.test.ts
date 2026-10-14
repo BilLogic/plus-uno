@@ -29,7 +29,7 @@ import {
   type LibraryComponent,
 } from "../src/figma-library/draft";
 import { libraryCard, LIBRARY_CARD_TTL_MS } from "../src/figma-library/post";
-import { expiredCardNote, expiredThreadLine, failedFiledLine, prClosedLine, prMergedLine, prOpenedLine } from "../src/figma-library/track";
+import { expiredCardNote, expiredThreadLine, failedFiledLine } from "../src/figma-library/track";
 import {
   byComponent,
   precedenceCard,
@@ -240,7 +240,7 @@ describe("the library publish report", () => {
       body: "2 new, 5 updated. Badge, Button and Card have code that can be drafted to match.",
       open: { label: "Open library", url: `https://www.figma.com/design/${FILE_KEY}` },
       also: { label: "View version", url: `https://www.figma.com/design/${FILE_KEY}?version-id=2210` },
-      done: "the intake, and code drafts started for Badge, Button and Card.",
+      done: "the intake.",
     });
     passesChecklist(item.body);
     // The library file's name, when Figma gives it, sits between who and when.
@@ -361,21 +361,15 @@ describe("a library edited, not published", () => {
 describe("the consent a stated card's footer carries", () => {
   // The footer stands in for the operation plan, so it names every operation
   // the ✅ runs — pinned here, where a new operation would have to be named.
-  it("the library card names both of its operations as fields, and carries no footer", () => {
-    const seven = changeSet({ modified: [component("Button"), component("Toast")] });
-    const intake = draftPublishIntake(seven, REGISTRY);
-    const built = libraryCard(seven, intake);
-    assert.deepEqual(built.operations.map((o) => o.toolName), ["github_issue_create", "component_implement"]);
-    assert.deepEqual(built.fields, [
-      { label: "intake", value: intake.title },
-      { label: "implement", value: "Button" },
-    ]);
-    assert.equal(built.footer, "");
-
-    const noCode = changeSet({ modified: [component("Toast")] });
-    const alone = libraryCard(noCode, draftPublishIntake(noCode, REGISTRY));
-    assert.deepEqual(alone.operations.map((o) => o.toolName), ["github_issue_create"]);
-    assert.deepEqual(alone.fields.map((f) => f.label), ["intake"]);
+  it("the library card files its intake and stages no build, and carries no footer", () => {
+    for (const modified of [[component("Button"), component("Toast")], [component("Toast")]]) {
+      const cs = changeSet({ modified });
+      const intake = draftPublishIntake(cs, REGISTRY);
+      const built = libraryCard(cs, intake);
+      assert.deepEqual(built.operations.map((o) => o.toolName), ["github_issue_create"]);
+      assert.deepEqual(built.fields, [{ label: "intake", value: intake.title }]);
+      assert.equal(built.footer, "");
+    }
   });
 });
 
@@ -411,33 +405,7 @@ describe("the full list in the card's thread", () => {
 });
 
 describe("the library card's thread (#886 § 3.2)", () => {
-  const PR = { number: 123, url: "https://github.com/o/r/pull/123" };
   const INTAKE = { number: 45, url: "https://github.com/o/r/issues/45" };
-
-  it("links the PR plainly when it opens", () => {
-    assert.equal(prOpenedLine(PR, INTAKE), "PR open: <https://github.com/o/r/pull/123|#123>. Linked from the <https://github.com/o/r/issues/45|intake>.");
-    assert.equal(prOpenedLine(PR), "PR open: <https://github.com/o/r/pull/123|#123>.");
-    passesChecklist(prOpenedLine(PR, INTAKE));
-  });
-
-  it("marks the merge with one 🎉 and names what now matches", () => {
-    const line = prMergedLine(PR, "Badge, Button, Card", INTAKE);
-    assert.equal(
-      line,
-      ":tada: <https://github.com/o/r/pull/123|#123> merged, so Badge, Button and Card match the library. Closed the <https://github.com/o/r/issues/45|intake>.",
-    );
-    assert.equal(prMergedLine(PR, "Badge"), ":tada: <https://github.com/o/r/pull/123|#123> merged, so Badge matches the library.");
-    passesChecklist(line, { ship: true });
-  });
-
-  it("says a PR closed without merging leaves the intake for the next try", () => {
-    assert.equal(
-      prClosedLine(PR, INTAKE),
-      "<https://github.com/o/r/pull/123|#123> closed without merging. The <https://github.com/o/r/issues/45|intake> stays open for the next try.",
-    );
-    assert.equal(prClosedLine(PR), "<https://github.com/o/r/pull/123|#123> closed without merging.");
-    passesChecklist(prClosedLine(PR, INTAKE));
-  });
 
   it("tells an expired card's thread what it filed, in one plain sentence", () => {
     const line = expiredThreadLine(INTAKE.url);
@@ -580,12 +548,10 @@ describe("what a stated card says at the gate", () => {
 
   it("the library card: Reject files nothing, and a late decision is told the intake still lands", () => {
     assert.equal(drafting.cancelled, "Rejected, nothing filed");
-    assert.equal(
-      drafting.expired,
-      "That card closed after 72 h with no decision, so nothing was drafted. I file its intake the morning after, so the publish isn't lost.",
-    );
-    // Nothing had code, so there was nothing to draft and the line says less.
-    assert.equal(noCode.expired, "That card closed after 72 h with no decision. I file its intake the morning after, so the publish isn't lost.");
+    // Nothing is ever drafted, so a card with code says the same as one without.
+    for (const words of [drafting, noCode]) {
+      assert.equal(words.expired, "That card closed after 72 h with no decision. I file its intake the morning after, so the publish isn't lost.");
+    }
   });
 
   it("a precedence card: a Reject leaves the difference as deliberate, and its window is the whole six days", () => {

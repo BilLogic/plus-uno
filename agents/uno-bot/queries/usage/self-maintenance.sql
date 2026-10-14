@@ -12,8 +12,8 @@
 --     'worker') whose every operation is one of Reconcile's own tools —
 --     ds_precedence_intake (the weekly DS precedence check,
 --     src/ds-precedence/, whose older cards ran github_issue_create and
---     github_issue_update), and github_issue_create and component_implement
---     (the library watcher, src/figma-library/). Capture's worker cards run notion_update
+--     github_issue_update), and github_issue_create (the library watcher,
+--     src/figma-library/, whose older cards also ran component_implement). Capture's worker cards run notion_update
 --     or sweep_share_post and never count. The residual: a future Capture
 --     card that only files a GitHub intake would read as Reconcile.
 --     proposed = those cards; accepted = those with a ✅ (a re-stage's
