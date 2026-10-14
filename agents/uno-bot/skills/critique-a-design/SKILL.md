@@ -36,7 +36,7 @@ A designer links a frame, a prototype, a spec or a coded component and asks what
 - {strength + the principle it matches}
 ```
 
-Empty severity sections drop out.
+Empty severity sections drop out. How the critique renders, and how a long one splits, is `docs/connectors/slack/shapes` § Render paths.
 
 ## Exit
 

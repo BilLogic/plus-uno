@@ -26,7 +26,7 @@ For *{topic}*, talk to:
 - **{Name}** — {role}. {why, from their bio}. [LinkedIn]({linkedin})
 ```
 
-An access answer leads with the admin, then the request in a quote block, then the directory link.
+An access answer leads with the admin, then the request in a quote block, then the directory link. Two or more people from one lookup go in a result table or answer cards: `docs/connectors/slack/shapes` § Answer shapes.
 
 ## Exit
 

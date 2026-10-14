@@ -17,6 +17,10 @@ A requester wants something passed to a teammate. The bot drafts the DM, the req
 3. **Stage it.** One `dm_relay` call per recipient, all in the same reply, so they stage as one card. Done when the card is staged with the lead line naming who gets what.
 4. **An @-mention suits better** when the person is already in this thread or channel and the requester wants the reply here: say so and offer the mention instead. Done when the requester has picked.
 
+## Shape
+
+The DM is ordinary Slack Markdown, people as `<@U…>` ids (`docs/connectors/slack/overview.md` § Message formatting, always loaded); the `dm_relay` card shows it as sent.
+
 ## Exit
 
 - **file** — the `dm_relay` card; ✅ sends it.
