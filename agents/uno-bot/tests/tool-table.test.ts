@@ -86,6 +86,41 @@ describe("the tool table", () => {
   });
 });
 
+describe("a tool's description is the one place its rules live", () => {
+  // The gate is a column, so its wording is generated from the column: a
+  // gated tool is offered with the gate lead in front of its description, an
+  // ungated one with none, and the schema file says nothing about the gate at
+  // all — a hand-written line there is a second home that could disagree.
+  it("opens every gated tool's offered description with the generated gate wording, and no other", () => {
+    const rows = withSchemas(schemasFromDisk());
+    for (const name of TOOL_NAMES) {
+      const description = rows[name].schema?.description;
+      if (description === undefined) continue;
+      if (TOOL_TABLE[name].access === "gated") {
+        assert.ok(description.startsWith("✅-gated"), `${name} is gated but its description does not say so first`);
+      } else {
+        assert.doesNotMatch(description, /✅-gated/, `${name} is not gated but its description says it is`);
+      }
+    }
+  });
+
+  it("keeps the gate out of the schema file, so the table is its only source", () => {
+    for (const schema of schemasFromDisk()) {
+      assert.doesNotMatch(
+        schema.description,
+        /✅-gated|confirmation gate|\bungated\b/i,
+        `${schema.name} restates its gate standing by hand`,
+      );
+    }
+  });
+
+  it("promises no tally from slack_thread_read, which returns no reactions", () => {
+    const offered = schemasFromDisk().find((s) => s.name === "slack_thread_read");
+    assert.ok(offered);
+    assert.doesNotMatch(offered.description, /tally|sign-off/i);
+  });
+});
+
 describe("the access column partitions the tools across the two dispatches", () => {
   // What #597 rests on. Both dispatches are `TOOLS_BY_NAME[name]` filtered on
   // `access` — `agent/run-agent.ts` runs `ungated` inside the turn,

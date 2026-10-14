@@ -467,6 +467,26 @@ export function taskCardFor(name: string): TaskCardWords | null {
   return row?.access === "ungated" ? row.taskCard : null;
 }
 
+/**
+ * The gate wording a gated tool's description opens with, generated from the
+ * row so the schema file never states a tool's standing: the table is the one
+ * place it is written, and the model reads it here.
+ *
+ * Built from the card words, so it says what a person will see on the card.
+ */
+export function gateLeadFor(name: string): string | null {
+  const row = rowFor(name);
+  if (row?.access !== "gated") return null;
+  return `✅-gated: calling it stages a card ("About to ${row.gate.verb}") and nothing happens until someone confirms it.`;
+}
+
+/** The description the model is offered: the schema's own, behind the gate
+ *  lead when the row is gated. */
+function offeredDescription(name: ToolName, description: string): string {
+  const lead = gateLeadFor(name);
+  return lead ? `${lead} ${description}` : description;
+}
+
 /** One row with the schema it is offered under — null for a `worker` row,
  *  which is offered to no one. */
 export type SchemaRow = ToolRow & {
@@ -475,7 +495,8 @@ export type SchemaRow = ToolRow & {
 };
 
 /**
- * Join the rows to the schemas, refusing either one without the other.
+ * Join the rows to the schemas, refusing either one without the other. A
+ * gated row's description gains its gate lead here (`gateLeadFor`).
  *
  * A schema with no row would be offered to the model and come back refused by
  * the dispatch it has no row for; a row with no schema is a column five
@@ -505,7 +526,7 @@ export function withSchemas(schemas: readonly ToolSchema[]): Record<ToolName, Sc
       schemaless.push(name);
       continue;
     }
-    rows[name] = { name, ...TOOL_TABLE[name], schema };
+    rows[name] = { name, ...TOOL_TABLE[name], schema: { ...schema, description: offeredDescription(name, schema.description) } };
   }
   if (offered.length) {
     throw new Error(`worker tools must have no schema, since no one is offered them: ${offered.sort().join(", ")}`);
