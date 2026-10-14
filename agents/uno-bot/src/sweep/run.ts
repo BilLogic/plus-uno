@@ -315,8 +315,9 @@ export type PostedCard =
 /** Posting and staging, and the reads the morning needs. */
 export interface SweepDelivery {
   /** Post the report, tagged with its key and digest. `refusedBlocks` when
-   *  Slack refused its blocks, so it may step down to plain sections. */
-  post(to: CardPlace, message: SweepReportMessage, tag: CardTag): Promise<{ ok: boolean; ts?: string; refusedBlocks?: boolean }>;
+   *  Slack refused its blocks, so it may step down to plain sections; `error`
+   *  is Slack's own code for a refusal (`not_in_channel`). */
+  post(to: CardPlace, message: SweepReportMessage, tag: CardTag): Promise<{ ok: boolean; ts?: string; refusedBlocks?: boolean; error?: string }>;
   /** Edit a posted report in place (`chat.update`): a fix that did not stage
    *  says so on its card. */
   edit(channel: string, ts: string, message: SweepReportMessage): Promise<void>;
@@ -1344,6 +1345,16 @@ async function postCard(
   // the report's record keeps every redraw plain from then on.
   const plain = !sent.ok && sent.refusedBlocks === true;
   if (plain) sent = await deps.delivery.post(to, { text: report.text, blocks: plainReportBlocks(report.blocks) }, tag);
+  if (!sent.ok && sent.error === "not_in_channel") {
+    // On the record as failed, never dropped: the outcomes count sees a team
+    // channel nobody invited uno-bot to. The finding stays queued and cards
+    // again once it is in.
+    for (const f of plan.items) await deps.store.updateItem(`${plan.key}#${f.blockId}`, { status: "failed", postedAt: now, resolvedAt: now });
+    await deps.store.dropCard(plan.key);
+    notes.push(`${plan.key}: uno-bot is not in ${to.channel} — recorded as failed, kept for tomorrow`);
+    if (shared) await deps.followUps!.notPosted(followUps!, "uno-bot is not in the channel");
+    return done;
+  }
   if (!sent.ok || !sent.ts) {
     await release(deps, plan.key);
     notes.push(`${plan.key}: the post failed — kept for tomorrow`);

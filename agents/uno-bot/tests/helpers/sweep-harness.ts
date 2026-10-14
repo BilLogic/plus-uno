@@ -141,6 +141,8 @@ export interface SweepHarness {
   staged: PendingProposal[];
   /** Set on, Slack refuses a post holding `card` blocks. */
   cardsRefused: { on: boolean };
+  /** Channels uno-bot is not in: a post there answers `not_in_channel`. */
+  notInChannel: Set<string>;
   /** Every Slack read, as `method channel [ts]`. */
   reads: string[];
   clock: { now: number };
@@ -192,6 +194,8 @@ export interface FigmaRecords {
  *  and `C0TOOLKIT` unless set). */
 export interface TriageOptions {
   handles?: string;
+  /** Channels uno-bot is not in: a post there answers `not_in_channel`. */
+  notIn?: string[];
   fileTeams?: Record<string, string>;
   channels?: ChannelIds;
 }
@@ -276,6 +280,7 @@ export function sweepHarness(opts: {
   const reads: string[] = [];
   const budget = { replies: Infinity };
   const cardsRefused = { on: false };
+  const notInChannel = new Set<string>();
   const headroom = { subrequests: Infinity, d1Queries: Infinity };
   const broken = new Set<string>();
   const rateLimited = new Set<string>();
@@ -337,8 +342,9 @@ export function sweepHarness(opts: {
         handles: figmaHandlesFrom(triageOpts.handles),
         channels: triageOpts.channels ?? { plusDesign: DESIGN, plusUniversal: UNIVERSAL, plusToolkit: "C0TOOLKIT" },
         post: async (channel, text) => {
+          if (triageOpts.notIn?.includes(channel)) return { ok: false, error: "not_in_channel" };
           figmaRecords.triage.posts.push({ channel, text });
-          return true;
+          return { ok: true, ts: `${Math.floor(clock.now / 1000)}.${String(800000 + figmaRecords.triage.posts.length)}` };
         },
         dm: async (to, text) => {
           figmaRecords.triage.dms.push({ to, text });
@@ -508,6 +514,7 @@ export function sweepHarness(opts: {
     store: faultyStore,
     delivery: {
       async post(to, message, tag) {
+        if (notInChannel.has(to.channel)) return { ok: false, error: "not_in_channel" };
         // A workspace that refuses `card` blocks, as Slack answers one.
         if (cardsRefused.on && message.blocks.some((b) => ["card", "carousel"].includes(String((b as { type?: string }).type)))) {
           return { ok: false, refusedBlocks: true };
@@ -595,6 +602,7 @@ export function sweepHarness(opts: {
     posted,
     staged,
     cardsRefused,
+    notInChannel,
     reads,
     clock,
     budget,

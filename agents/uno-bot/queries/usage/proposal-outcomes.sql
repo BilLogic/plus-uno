@@ -19,7 +19,9 @@
 --     spans it undercounts approved with edits.
 --   - upkeep_fix: one fix on an end-of-day card (sweep_items) that was carded
 --     (posted_at set). approved = confirmed; rejected = dropped; refused =
---     refused_stale, refused_unwritable or failed (approved, not written);
+--     refused_stale, refused_unwritable or failed (approved, not written; or
+--     its report refused by a channel uno-bot is not in, posted_at then the
+--     time it was tried);
 --     expired = still proposed 72 h after it was posted; still live =
 --     proposed and younger than that. A fix dropped by "drop N" is rejected,
 --     so with edits is null.

@@ -40,7 +40,7 @@ import { decisionRowsOf, queryRoadmapCards } from "../integrations/notion";
 import { openConversation, postMessage, updateMessage } from "../slack/api";
 import { channelIdsFor } from "../destination/env";
 import { BACKSTOP_STATE_KEY, type BackstopState } from "../figma-notify/backstop";
-import { figmaHandlesFrom, type TriagePorts, type WatchedFile } from "./triage";
+import { figmaHandlesFrom, type Posted, type TriagePorts, type WatchedFile } from "./triage";
 import { channelMembers } from "../slack/channel-members";
 import { threadStateFor } from "../thread-state/production";
 import type { PendingProposal } from "../thread-state/index";
@@ -205,7 +205,11 @@ export function triageOn(env: Env, kv: KVNamespace): TriagePorts {
     console.warn(`[figma-comments] FIGMA_HANDLE_SLACK_IDS unread, so nobody is DMed: ${err instanceof Error ? err.message : String(err)}`);
   }
   let teams: Promise<Record<string, string>> | null = null;
-  const post = async (channel: string, text: string) => (await postMessage(env, { channel, text })).ok;
+  const post = async (channel: string, text: string): Promise<Posted> => {
+    const res = await postMessage(env, { channel, text });
+    if (res.ok && res.ts) return { ok: true, ts: res.ts };
+    return { ok: false, ...(typeof res.error === "string" ? { error: res.error } : {}) };
+  };
   return {
     watch: {
       async list() {
@@ -259,7 +263,7 @@ export function triageOn(env: Env, kv: KVNamespace): TriagePorts {
     post,
     async dm(slackId, text) {
       const open = await openConversation(env, slackId);
-      return open.ok ? post(open.channel, text) : false;
+      return open.ok ? (await post(open.channel, text)).ok : false;
     },
   };
 }

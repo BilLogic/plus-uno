@@ -275,7 +275,7 @@ async function sweepDepsFor(
           });
         const res = await send(message.blocks);
         if (res.ok && res.ts) return { ok: true, ts: res.ts };
-        return { ok: false, ...(refusedForBlocks(res) ? { refusedBlocks: true } : {}) };
+        return { ok: false, ...(refusedForBlocks(res) ? { refusedBlocks: true } : {}), ...(typeof res.error === "string" ? { error: res.error } : {}) };
       },
       async edit(channel, ts, message) {
         // Its tag rides every edit, so a later search by its key still finds it.

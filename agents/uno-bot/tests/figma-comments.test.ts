@@ -748,6 +748,15 @@ describe("an unanswered question, raised after two workdays", () => {
     assert.deepEqual(h.figma.triage.dms, []);
   });
 
+  it("keeps a question whose team channel uno-bot is not in, and says which channel", async () => {
+    const { h } = await nightHarness({ cards: TOOLKIT_CARD, triage: { notIn: [TOOLKIT] } });
+    await runSweepJob(NIGHT, h.deps);
+    const report = await morning(h, FRIDAY);
+    assert.deepEqual(h.figma.triage.posts, []);
+    assert.match(report.summary, new RegExp(`uno-bot is not in ${TOOLKIT}`));
+    assert.equal(h.figma.triage.watch.get(FILE)?.questions.length, 1, "never dropped: it waits for the invite");
+  });
+
   it("leaves a question on any other page alone", async () => {
     const client = seededFigma();
     client.seedFile(FILE, {

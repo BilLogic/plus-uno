@@ -49,6 +49,9 @@ export const REREAD_COST = 3;
 /** Subrequests a DM costs: opening the conversation, and the post. */
 export const DM_COST = 2;
 
+/** A post's answer: its ts, or Slack's error code when it was refused. */
+export type Posted = { ok: true; ts: string } | { ok: false; error?: string };
+
 /** One open question, as the night read it. */
 export interface WatchedQuestion {
   /** The root comment: the thread's identity. */
@@ -90,8 +93,8 @@ export interface TriagePorts {
   handles: Record<string, string>;
   /** The ladder's channel ids. */
   channels: ChannelIds;
-  /** Post a top-level message; whether it posted. */
-  post(channel: string, text: string): Promise<boolean>;
+  /** Post a top-level message: its ts, or Slack's refusal (`not_in_channel`). */
+  post(channel: string, text: string): Promise<Posted>;
   /** DM a person; whether it posted. */
   dm(slackId: string, text: string): Promise<boolean>;
 }
@@ -230,10 +233,13 @@ export async function raiseUnanswered(
         result.raised += 1;
         continue;
       }
-      if (await raise(file, q, root, named, ports)) {
+      const sent = await raise(file, q, root, named, ports);
+      if (sent.ok) {
         await ports.raised.add(q.commentId);
         done.add(q.commentId);
         result.raised += 1;
+      } else if (sent.notIn) {
+        result.notes.push(`uno-bot is not in ${sent.notIn}, so the question ${q.commentId} on ${file.fileKey} waits for the invite`);
       } else {
         result.notes.push(`the question ${q.commentId} on ${file.fileKey} did not post, so it waits for tomorrow`);
       }
@@ -295,14 +301,22 @@ function escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-/** Send one question: DMs to the mapped, and the channel card unless everyone named was DMed. Whether anything was sent. */
-async function raise(file: WatchedFile, q: WatchedQuestion, root: FigmaComment, named: Named, ports: TriagePorts): Promise<boolean> {
+/** Send one question: DMs to the mapped, and the channel card unless everyone
+ *  named was DMed. Whether anything was sent, and the channel that refused the
+ *  card because uno-bot is not in it. */
+async function raise(
+  file: WatchedFile,
+  q: WatchedQuestion,
+  root: FigmaComment,
+  named: Named,
+  ports: TriagePorts,
+): Promise<{ ok: boolean; notIn?: string }> {
   const link = commentUrl(file.fileKey, q.nodeId, q.commentId);
   let sent = false;
   for (const person of named.mapped) {
     if (await ports.dm(person.slack, questionDm(file, q, root.message, link))) sent = true;
   }
-  if (named.mapped.length && !named.unmapped.length) return sent;
+  if (named.mapped.length && !named.unmapped.length) return { ok: sent };
 
   const team = file.pillars.length ? null : await ports.fileTeam(file.fileKey);
   const { destination, addressee } = routeFinding({
@@ -311,9 +325,10 @@ async function raise(file: WatchedFile, q: WatchedQuestion, root: FigmaComment, 
     figmaFile: { team, creatorHandle: file.owner && "figma" in file.owner ? file.owner.figma : null },
   });
   const where = resolveDestination(destination, ports.channels);
-  if (!where) return sent;
-  if (await ports.post(where.channel, questionCard(file, q, root.message, link, addressee, named.unmapped))) sent = true;
-  return sent;
+  if (!where) return { ok: sent };
+  const card = await ports.post(where.channel, questionCard(file, q, root.message, link, addressee, named.unmapped));
+  if (card.ok) return { ok: true };
+  return { ok: sent, ...(card.error === "not_in_channel" ? { notIn: where.channel } : {}) };
 }
 
 /** The channel card: whom it is for, the file, the question, its asker and place, anyone unmapped, and the link. */
