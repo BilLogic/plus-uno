@@ -52,8 +52,14 @@ let nodeName: string | undefined = FRAME.name;
 globalThis.fetch = (async (input: unknown) => {
   const url = String(input);
   requests.push(url);
+  if (url.includes(`/v1/files/${FILE}/nodes`) && url.includes("version=v1")) {
+    return Response.json({ name: "Sessions", nodes: { [NODE]: { document: { ...FRAME, children: [{ ...FRAME.children[0]!, characters: "Your session" }] } } } });
+  }
   if (url.includes(`/v1/files/${FILE}/nodes`)) {
     return Response.json({ name: "Sessions", nodes: { [NODE]: { document: { ...FRAME, name: nodeName } } } });
+  }
+  if (url.includes(`/v1/files/${FILE}/versions`)) {
+    return Response.json({ versions: [{ id: "v1", label: "Handoff", description: null, created_at: "2026-09-30T12:00:00Z", user: { handle: "coco", id: "u1" } }] });
   }
   if (url.includes(`/v1/files/${FILE}/comments`)) return Response.json({ comments: COMMENTS });
   throw new Error(`no stub for ${url}`);
@@ -73,6 +79,32 @@ describe("a pasted frame link, read end to end", () => {
       nodeName = FRAME.name;
     }
   });
+  it("with `since`, says what changed in the frame since that date, over four Figma calls", async () => {
+    requests = [];
+    const { executeReadSource } = await import("../src/tools/read-source.js");
+    const payload = JSON.parse(await executeReadSource(env(), { url: LINK, since: "2026-10-01" })) as Record<string, unknown>;
+    assert.equal(payload.ok, true);
+    assert.deepEqual(payload.changes, [`Text of "Title" changed from "Your session" to "Today's session".`, `Added instance "Join button".`]);
+    assert.deepEqual(
+      requests.map((u) => new URL(u).pathname + new URL(u).search),
+      [
+        `/v1/files/${FILE}/nodes?ids=158%3A21725`,
+        `/v1/files/${FILE}/comments`,
+        `/v1/files/${FILE}/versions?page_size=50`,
+        `/v1/files/${FILE}/nodes?ids=158%3A21725&version=v1`,
+      ],
+    );
+  });
+
+  it("refuses a `since` that is not a date before calling Figma", async () => {
+    requests = [];
+    const { executeReadSource } = await import("../src/tools/read-source.js");
+    const payload = JSON.parse(await executeReadSource(env(), { url: LINK, since: "last sprint" })) as Record<string, unknown>;
+    assert.equal(payload.ok, false);
+    assert.match(String(payload.error), /since must be a date/);
+    assert.deepEqual(requests, []);
+  });
+
   it("brings the threads pinned to the frame into the turn's source_read", async () => {
     requests = [];
     const { executeReadSource } = await import("../src/tools/read-source.js");

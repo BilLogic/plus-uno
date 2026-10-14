@@ -243,7 +243,7 @@ export function createFigmaRestClient(deps: FigmaRestDeps): FigmaClient {
           what: "nodes",
           tier: 1,
           method: "GET",
-          path: `${file(key)}/nodes${query({ ids, depth: opts.depth, geometry: opts.geometry })}`,
+          path: `${file(key)}/nodes${query({ ids, depth: opts.depth, geometry: opts.geometry, version: opts.version })}`,
         },
         opts,
       ),
@@ -259,8 +259,16 @@ export function createFigmaRestClient(deps: FigmaRestDeps): FigmaClient {
       ),
     components: (key, opts) =>
       call<FigmaComponentsResponse>({ what: "components", tier: 3, method: "GET", path: `${file(key)}/components` }, opts),
-    versions: (key, opts) =>
-      call<FigmaVersionsResponse>({ what: "versions", tier: 2, method: "GET", path: `${file(key)}/versions` }, opts),
+    versions: (key, opts = {}) =>
+      call<FigmaVersionsResponse>(
+        {
+          what: "versions",
+          tier: 2,
+          method: "GET",
+          path: `${file(key)}/versions${query({ page_size: opts.pageSize, before: opts.before })}`,
+        },
+        opts,
+      ),
     comments: (key, opts) =>
       call<FigmaCommentsResponse>({ what: "comments", tier: 2, method: "GET", path: `${file(key)}/comments` }, opts),
     postComment: (key, message, at, opts) =>

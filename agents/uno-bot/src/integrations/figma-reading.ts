@@ -23,6 +23,10 @@
 // name, the type and the text and drops the rest. "No token on this frame"
 // would be a claim about our reader, stated as a claim about the design.
 //
+// Since then the reader keeps two more of those fields, annotations and
+// fills (`./figma-frame-detail.ts`); token names and measurements are still
+// unread, and the note still says so.
+//
 // ── 3. The discussion pinned to the frame (#899) ──────────────────────────
 //
 // A pasted frame also brings the comment threads pinned to it or to a layer
@@ -36,13 +40,49 @@
 // comments here" therefore means none pinned to this frame, and a comments
 // read that failed says unread, never none.
 
-/** The subset of a Figma node the text and comment walks look at. */
+import type { FrameAnnotation, FrameFill } from "./figma-frame-detail";
+
+/** An RGBA colour, each channel 0–1, as Figma's REST API sends it. */
+export interface FigmaColor {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
+
+/** A Figma Paint, as far as the fills walk reads it. */
+export interface FigmaPaint {
+  type?: string;
+  /** False on a fill hidden in the layer's fill list; absent means visible. */
+  visible?: boolean;
+  opacity?: number;
+  blendMode?: string;
+  color?: FigmaColor;
+  gradientStops?: { color: FigmaColor; position: number }[];
+  /** Set when a variable binds the paint; only its id, never its name. */
+  boundVariables?: Record<string, unknown>;
+}
+
+/** A Dev Mode annotation, as Figma's REST spec types it. */
+export interface FigmaAnnotation {
+  label?: string;
+  labelMarkdown?: string;
+  /** The layer properties the annotation pins, e.g. `width`, `fills`. */
+  properties?: { type?: string }[];
+  /** A per-file category id; REST has no endpoint that names it. */
+  categoryId?: string;
+}
+
+/** The subset of a Figma node the text, comment, fill and annotation walks look at. */
 export interface FigmaNode {
   /** Figma's node id, e.g. "158:21725"; on every node a read returns. */
   id?: string;
   name?: string;
   type?: string;
   characters?: string;
+  fills?: FigmaPaint[];
+  annotations?: FigmaAnnotation[];
+  absoluteBoundingBox?: { x: number; y: number; width: number; height: number } | null;
   children?: FigmaNode[];
 }
 
@@ -79,10 +119,35 @@ export function collectTextLayers(node: FigmaNode): { texts: string[]; truncated
 
 /** What `source_read` returns for a figma.com URL, said accurately. */
 export const FIGMA_NOTE =
-  "Of the frame itself, this payload carries its name, node type and text layers only: no fills, " +
-  "tokens, variable bindings or measurements. Never state one from it, and never report one as " +
-  "absent, because they are unread here rather than missing. Visual judgement comes from the " +
-  "frame's rendered image when one is attached to this turn; this text describes no pixels.";
+  "Of the frame itself, this payload carries its name, node type, text layers, Dev Mode annotations " +
+  "and visible fills, each fill as it renders (hex, gradient or image). It carries no token or " +
+  "variable names and no measurements: a fill marked `variable` is bound to a variable whose name " +
+  "is unread. Never state a token name or a measurement from it, and never report one as absent, " +
+  "because they are unread here rather than missing. Visual judgement comes from the frame's " +
+  "rendered image when one is attached to this turn; this text describes no pixels.";
+
+/** Appended when the frame carries annotations. */
+export const FIGMA_ANNOTATIONS_NOTE =
+  "`annotations` are the Dev Mode notes on the frame or a layer inside it (`layer` names which; " +
+  "absent means the frame itself), with the properties each pins: the designer's own spec, so " +
+  "quote one as written when it bears on the ask.";
+
+/** Appended when a list was capped: what is listed is the first, the rest unread. */
+export function figmaListCapNote(what: "annotations" | "fills" | "changes", listed: number, total: number): string {
+  return `Only ${listed} of the ${total} ${what} are listed; the rest are unread rather than absent.`;
+}
+
+/** Appended when a `since` diff was read. */
+export const FIGMA_CHANGES_NOTE =
+  "`changes` says, one sentence each, what changed in this frame between the version named in " +
+  "`changes_since` (the newest saved at or before the date asked about) and now: text, names, " +
+  "fills, sizes, annotations, layers added or removed. Positions are not compared. Report them in " +
+  "plain words with the version's date; an empty list means the frame is unchanged since then.";
+
+/** Appended when a `since` diff was asked for and could not be read. */
+export const FIGMA_CHANGES_UNREAD_NOTE =
+  "What changed since the date asked about couldn't be read this time (`changes_unread` says " +
+  "why), so whether the frame changed is unknown: say that, and never say it is unchanged.";
 
 /** Appended when the walk hit its cap — a partial frame says so. */
 export const FIGMA_TRUNCATION_NOTE =
@@ -271,6 +336,27 @@ function fitToCap(thread: PinnedThread): PinnedThread {
   };
 }
 
+/** The version a `since` diff compared with. */
+export interface FigmaVersionCompared {
+  id: string;
+  /** Its name, when the designer named it; autosaves have none. */
+  label?: string;
+  /** When it was saved, ISO. */
+  at: string;
+  /** Who saved it: their Figma handle. */
+  by?: string;
+}
+
+/** What changed in a frame since a date. */
+export interface FigmaFrameChanges {
+  /** The moment asked about, ISO. */
+  since: string;
+  version: FigmaVersionCompared;
+  /** One plain sentence per change, capped at MAX_CHANGES. */
+  changes: string[];
+  total: number;
+}
+
 /** A pasted frame's read: what the node walk found and, when asked for, the comments pinned in it. */
 export interface FigmaFrameRead {
   name: string;
@@ -279,16 +365,24 @@ export interface FigmaFrameRead {
   texts: string[];
   /** The text walk stopped at its cap with more text in the frame. */
   truncated: boolean;
+  /** The Dev Mode annotations in the frame, capped, and how many there are. */
+  annotations: { annotations: FrameAnnotation[]; total: number };
+  /** The distinct visible fills in the frame, capped, and how many there are. */
+  fills: { fills: FrameFill[]; total: number };
   /** The threads pinned to the frame or a layer inside it; absent when not asked for, or not read. */
   comments?: PinnedComments;
   /** Why the comments couldn't be read, when they were asked for and weren't. */
   commentsUnread?: string;
+  /** What changed since `since`; absent when no date was asked about, or the diff wasn't read. */
+  changes?: FigmaFrameChanges;
+  /** Why the diff couldn't be read, when a date was asked about and it wasn't. */
+  changesUnread?: string;
 }
 
 /**
- * What `source_read` returns for a pasted frame. A frame with no pinned
- * comments carries today's fields and nothing more; the note says which of
- * pinned, none pinned, or unread the comments were.
+ * What `source_read` returns for a pasted frame. The note says which of
+ * pinned, none pinned, or unread the comments were, and — when a date was
+ * asked about — whether the diff was read.
  *
  * @param url - The link as pasted
  * @param frame - The read, from `fetchFigmaFrame`
@@ -305,7 +399,16 @@ export function describeFigmaFrame(url: string, frame: FigmaFrameRead): Record<s
     content: frame.texts.join("\n"),
     text_layers: frame.texts.length,
     text_layers_truncated: frame.truncated,
+    annotations: frame.annotations.annotations,
+    fills: frame.fills.fills,
   };
+  if (frame.annotations.total) notes.push(FIGMA_ANNOTATIONS_NOTE);
+  if (frame.annotations.annotations.length < frame.annotations.total) {
+    notes.push(figmaListCapNote("annotations", frame.annotations.annotations.length, frame.annotations.total));
+  }
+  if (frame.fills.fills.length < frame.fills.total) {
+    notes.push(figmaListCapNote("fills", frame.fills.fills.length, frame.fills.total));
+  }
   if (frame.commentsUnread !== undefined) {
     payload.comments_unread = frame.commentsUnread;
     notes.push(FIGMA_COMMENTS_UNREAD_NOTE);
@@ -319,6 +422,17 @@ export function describeFigmaFrame(url: string, frame: FigmaFrameRead): Record<s
     if (threads.some((t) => t.text_truncated || t.replies_unread)) notes.push(FIGMA_REPLIES_CAP_NOTE);
   } else if (frame.comments) {
     notes.push(FIGMA_NO_COMMENTS_NOTE);
+  }
+  if (frame.changesUnread !== undefined) {
+    payload.changes_unread = frame.changesUnread;
+    notes.push(FIGMA_CHANGES_UNREAD_NOTE);
+  } else if (frame.changes) {
+    const { since, version, changes, total } = frame.changes;
+    payload.changes_since = { since, version };
+    payload.changes = changes;
+    payload.change_count = total;
+    notes.push(FIGMA_CHANGES_NOTE);
+    if (changes.length < total) notes.push(figmaListCapNote("changes", changes.length, total));
   }
   payload.note = notes.join(" ");
   return payload;

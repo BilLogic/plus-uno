@@ -17,6 +17,10 @@
 //     posted `🐐` comes back `:goat:` (seen live, 2026-10-12);
 //   • a reaction is sent as a shortcode: the emoji character is a 400, and
 //     `:goat:` is taken and reads back as `:goat:` (probed live, 2026-10-14);
+//   • a node read at a `version` answers from what was seeded for that
+//     version, and a version the file never listed is a 400;
+//   • a version-history read is one page, newest first: `pageSize` of them
+//     (30 when not given), older than `before` when given;
 //   • a file read to a `depth` stops that many levels below the document (1
 //     is the pages alone), and one read for `ids` holds only the paths down to
 //     those nodes, with their subtrees.
@@ -59,6 +63,8 @@ export interface SeedFile {
   document?: FigmaNode;
   /** The nodes `/nodes` and `/images` answer for, by id. */
   nodes?: Record<string, FigmaNode>;
+  /** The nodes `/nodes?version=` answers for, by version id, then node id. */
+  nodesAt?: Record<string, Record<string, FigmaNode>>;
   /** The `/components` body. */
   components?: FigmaComponentsResponse;
   /** The `/versions` body. */
@@ -107,6 +113,7 @@ interface StoredFile {
   lastModified: string;
   document: FigmaNode;
   nodes: Record<string, FigmaNode>;
+  nodesAt: Record<string, Record<string, FigmaNode>>;
   components: FigmaComponentsResponse;
   versions: FigmaVersionsResponse;
   comments: FigmaComment[];
@@ -181,6 +188,7 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
         lastModified: new Date(now()).toISOString(),
         document: { name: "Document", type: "DOCUMENT", children: [] },
         nodes: {},
+        nodesAt: {},
         components: { meta: { components: [] } },
         versions: { versions: [] },
         comments: [],
@@ -193,6 +201,7 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
         lastModified: seed.lastModified ?? current.lastModified,
         document: clone(seed.document ?? current.document),
         nodes: clone(seed.nodes ?? current.nodes),
+        nodesAt: clone(seed.nodesAt ?? current.nodesAt),
         components: clone(seed.components ?? current.components),
         versions: clone(seed.versions ?? current.versions),
         comments: clone(seed.comments ?? current.comments),
@@ -232,8 +241,14 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
     async nodes(key, ids, o) {
       const entry = enter("nodes", [key, ids, o]);
       const f = fileOf("nodes", key);
+      let held = f.nodes;
+      if (o?.version !== undefined) {
+        const listed = o.version in f.nodesAt || (f.versions.versions ?? []).some((v) => v.id === o.version);
+        if (!listed) throw new FigmaRequestError(400, "Figma nodes 400: Invalid version");
+        held = f.nodesAt[o.version] ?? {};
+      }
       // An id the file does not hold comes back null, as Figma's does.
-      const nodes = Object.fromEntries(ids.map((id) => [id, f.nodes[id] ? { document: f.nodes[id] } : null]));
+      const nodes = Object.fromEntries(ids.map((id) => [id, held[id] ? { document: held[id] } : null]));
       return landed(entry, { name: f.name, lastModified: f.lastModified, err: null, nodes });
     },
     async images(key, ids, o) {
@@ -251,7 +266,11 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
     },
     async versions(key, o) {
       const entry = enter("versions", [key, o]);
-      return landed(entry, fileOf("versions", key).versions);
+      const all = fileOf("versions", key).versions.versions ?? [];
+      const from = o?.before === undefined ? 0 : all.findIndex((v) => v.id === o.before) + 1;
+      if (from === 0 && o?.before !== undefined) throw new FigmaRequestError(400, "Figma versions 400: Invalid before");
+      const page = all.slice(from, from + (o?.pageSize ?? 30));
+      return landed(entry, { versions: page });
     },
     async comments(key, o) {
       const entry = enter("comments", [key, o]);
