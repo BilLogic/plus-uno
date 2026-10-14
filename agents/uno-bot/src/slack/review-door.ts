@@ -31,7 +31,7 @@
 // Takes named dependencies, as the button door does; `Env` is turned into
 // `ReviewDoorDeps` once, in `slack/interactive.ts`. PURE by design: no `Env`,
 // no Workers global, no fetch — so `tests/proposal-review.test.ts` drives it.
-import { proposalOperations, type PendingProposal, type ReviewChoice, type ThreadState } from "../thread-state/index";
+import { proposalOperations, withArgs, type PendingProposal, type ReviewChoice, type ThreadState } from "../thread-state/index";
 import { currentReport, itemText, settleItem } from "./decision-cards";
 import type { OperationOutcome } from "../gate/run-batch";
 import type { Delivery } from "../turn/index";
@@ -537,26 +537,6 @@ function ownLine(own: ReviewChoice): string {
   return own.verdict === "confirm"
     ? `${own.label}. I'm running it now, and the outcome posts in the thread.`
     : `${own.label}. Nothing will run.`;
-}
-
-/**
- * Each operation with a card's own answer's args merged into its input:
- * objects key by key, anything else replaced.
- */
-export function withArgs(operations: readonly ProposalOperation[], args: Record<string, unknown>): ProposalOperation[] {
-  return operations.map((op) => ({ ...op, input: merged(op.input, args) }));
-}
-
-function merged(base: Record<string, unknown>, over: Record<string, unknown>): Record<string, unknown> {
-  const out: Record<string, unknown> = { ...base };
-  for (const [key, value] of Object.entries(over)) {
-    const was = out[key];
-    out[key] =
-      value && typeof value === "object" && !Array.isArray(value) && was && typeof was === "object" && !Array.isArray(was)
-        ? merged(was as Record<string, unknown>, value as Record<string, unknown>)
-        : value;
-  }
-  return out;
 }
 
 function decidedLine(decision: "confirm" | "cancel"): string {

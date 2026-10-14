@@ -23,7 +23,7 @@ import { runCategoryConformance, runUsageLogConformance, turnRecord } from "../h
 import { createD1ProposalEventLog } from "../../src/usage/proposal-events-d1";
 import { createD1AnswerFeedbackLog } from "../../src/usage/feedback-d1";
 import { runAnswerFeedbackConformance } from "../helpers/answer-feedback-conformance";
-import { runProposalEventConformance, stagedRow } from "../helpers/proposal-events-conformance";
+import { eventRow, runProposalEventConformance, stagedRow } from "../helpers/proposal-events-conformance";
 import { createD1AppreciationLog } from "../../src/usage/appreciation-d1";
 import { runAppreciationConformance, thanks } from "../helpers/appreciation-conformance";
 
@@ -128,6 +128,15 @@ describe("[d1] appreciation", () => {
     const events = createD1ProposalEventLog({ db: bindings.USAGE_DB });
     await events.record(stagedRow({ revisesProposalId: "1700000000.000250" }));
     expect((await events.eventsOf(stagedRow().proposalId))[0]?.revisesProposalId).toBe("1700000000.000250");
+  });
+
+  it("proposal_events.confirmed_edited is on the schema, and holds only 0 or 1", async () => {
+    const events = createD1ProposalEventLog({ db: bindings.USAGE_DB });
+    await events.record(eventRow("confirmed", { proposalId: "1700000000.000700", via: "review", confirmedEdited: true }));
+    expect((await events.eventsOf("1700000000.000700"))[0]?.confirmedEdited).toBe(true);
+    await expect(
+      bindings.USAGE_DB.prepare("UPDATE proposal_events SET confirmed_edited = 2 WHERE proposal_id = '1700000000.000700'").run(),
+    ).rejects.toThrow(/CHECK/);
   });
 });
 
