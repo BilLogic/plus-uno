@@ -30,7 +30,10 @@
  *     that was retired, and rewriting those would erase the decision's own
  *     record. `design-system/guidelines/components/overview.md` carries its own
  *     staleness banner (#165/#166 own its rebuild) and the two vendored
- *     blueprint pages name their SOURCE repo's paths.
+ *     blueprint pages name their SOURCE repo's paths. A `read_reference` NAME
+ *     resolves too: `docs/engineering/operations` is the name the Worker reads
+ *     `docs/engineering/operations.md` by, so it passes when that file exists
+ *     and declares `disclosure: reference` (the bundler's naming rule).
  *  3. Backticked BARE filenames name a file that exists somewhere. The rule is
  *     deliberately weak — `method.md`, `bot.md` and `SKILL.md` each name many
  *     real files — and weak still catches the class: a retired file resolves to
@@ -162,6 +165,11 @@ const inputs = byRoot((repoRoot) => {
   const notes = [];
   const fail = (line) => found.push(line);
   const exists = (rel) => existsSync(path.join(repoRoot, rel));
+  // A disclosed doc's read_reference name: its path without `.md`, on a doc
+  // whose frontmatter declares `disclosure: reference`.
+  const isReferenceName = (rel) =>
+    exists(`${rel}.md`) &&
+    /^---\n[\s\S]*?^disclosure:\s*reference\s*$[\s\S]*?^---$/m.test(readFileSync(path.join(repoRoot, `${rel}.md`), 'utf8'));
   const md = (dirs, opts) => markdownUnder(dirs, { ...opts, root: repoRoot });
 
   // ── 1. relative markdown links ────────────────────────────────────────────
@@ -212,7 +220,7 @@ const inputs = byRoot((repoRoot) => {
       // the punctuation that belongs to the sentence rather than to the path.
       const token = raw.split('#')[0].split(':')[0].replace(/[,.)]$/, '');
       if (!token) continue;
-      if (!exists(token)) {
+      if (!exists(token) && !isReferenceName(token)) {
         fail(`[missing] ${file} -> \`${token}\``);
       }
     }

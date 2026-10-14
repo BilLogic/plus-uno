@@ -135,6 +135,21 @@ test('a backticked repo path that resolves to nothing fails — a pointer is not
   }
 });
 
+test("a disclosed doc's read_reference name resolves; the same name on an undisclosed doc does not", () => {
+  const r = repo({
+    'docs/engineering/ops.md': '---\nembodiment: all\ndisclosure: reference\n---\n# Ops\n',
+    'docs/engineering/plain.md': '---\nembodiment: all\n---\n# Plain\n',
+    'docs/connectors/a.md': 'Read `docs/engineering/ops`, then `docs/engineering/plain`.\n',
+  });
+  try {
+    const found = messages(r.root);
+    assert.equal(found.length, 1);
+    assert.match(found[0], /-> `docs\/engineering\/plain`/);
+  } finally {
+    r.done();
+  }
+});
+
 test('a glob, a placeholder and a line reference are not claims that a file exists', () => {
   const r = repo({
     'docs/conventions/a.md':
