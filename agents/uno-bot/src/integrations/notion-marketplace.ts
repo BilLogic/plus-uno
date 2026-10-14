@@ -217,14 +217,27 @@ async function existingMarketplaceRow(env: Env, databaseId: string, input: Marke
       filter: clauses.length > 1 ? { or: clauses } : clauses[0],
       errorLabel: "marketplace lookup failed",
     },
-    (r) => (r.id && !r.archived ? r.id.replace(/-/g, "") : null),
+    (r) => {
+      if (!r.id || r.archived) return null;
+      const title = Object.values(r.properties ?? {}).find((p) => p.type === "title") as { title?: Array<{ plain_text?: string }> } | undefined;
+      return { id: r.id.replace(/-/g, ""), name: (title?.title ?? []).map((t) => t.plain_text ?? "").join("").trim() };
+    },
   );
   if (rows.length > 1) {
     throw new MarketplaceQuestion(
       `${rows.length} Marketplace rows already carry this name or deployment link. Which one should I update?`,
     );
   }
-  return rows[0] ?? null;
+  const [row] = rows;
+  if (!row) return null;
+  // Found by its deployment link alone: another prototype's row, or this one
+  // renamed. Asked, never renamed on a guess.
+  if (normalizeName(row.name) !== normalizeName(input.name)) {
+    throw new MarketplaceQuestion(
+      `The Marketplace row "${row.name}" already carries this deployment link. Is "${input.name.trim()}" that prototype — publish it as "${row.name}" to update that row — or a different one, with its own deployment link?`,
+    );
+  }
+  return row.id;
 }
 
 /** A given field the live schema has no column for: it goes on the page body instead. */

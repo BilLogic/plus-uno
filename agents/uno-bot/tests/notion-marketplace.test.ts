@@ -143,6 +143,20 @@ test("publishing a prototype already in the catalogue updates its row instead of
   for (const rollup of ROLLUPS) assert.equal(rollup in props, false);
 });
 
+test("a row found only by its deployment link under another name is asked about, never renamed", async () => {
+  const existing = [{ id: ROW, url: `https://www.notion.so/${ROW}`, properties: { Name: { type: "title", title: [{ plain_text: "Tutor notes" }] } } }];
+  serve(routes({}, { existing }));
+  const { executeNotionCreate } = await tool();
+
+  const out = JSON.parse(await executeNotionCreate(ENV, INPUT, SLACK));
+
+  assert.equal(out.ok, false);
+  assert.equal(out.status, "needs_input");
+  assert.match(out.question, /Tutor notes/);
+  assert.match(out.question, /Session review/);
+  assert.equal(calls.some((c) => c.method === "PATCH" || c.url.endsWith("/v1/pages")), false);
+});
+
 test("a Stage the database does not offer comes back as a question, and nothing is written", async () => {
   serve(routes());
   const { executeNotionCreate } = await tool();
