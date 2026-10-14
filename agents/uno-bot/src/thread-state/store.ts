@@ -196,7 +196,7 @@ export interface PendingProposal {
    * reader goes through `proposalOperations`, which reads an old record as a
    * one-operation batch. `toolName`/`input` below stay populated with the
    * FIRST operation for one release, so a reader that has not moved across
-   * yet — the eval scripts' `r.toolName`, the card's tool routing, the
+   * yet — the card's tool routing, the
    * pending-notice vocabulary — keeps working unchanged.
    */
   operations?: ProposalOperation[];

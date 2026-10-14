@@ -1,5 +1,5 @@
 // The prose budget — how long an answer may run above a table or cards that
-// already show its rows (CONTEXT.md § result table).
+// already show its rows (GLOSSARY.md (**result table**)).
 //
 // THE RULE. With rows beneath it, the answer is the takeaway, what stands out
 // and what to act on, naming at most 3 rows; the rows are the table's. Live on

@@ -18,7 +18,7 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 
 - Ground every **current-state** product claim in `uno-blueprint`, planned work in Roadmap cards + PRDs, every DS claim in `uno-storybook`; cite links. Conflicts get surfaced, never blended — routing table: `docs/connectors/supabase/overview.md` § Two sources, one time axis (ADR-021).
 - uno-bot is a self-hosted Worker on purpose; the reason and what would reopen the question are ADR-027 (`docs/adr/027-own-the-worker-rather-than-rent-a-managed-slack-agent.md`).
-- The blueprint and the Notion Roadmap speak **different vocabularies** — service-blueprint vs project-management. Speak each estate's own words, and route a question by its frame words: `CONTEXT.md` § Two vocabularies is the law (ratified in ADR-023).
+- The blueprint and the Notion Roadmap speak **different vocabularies** — service-blueprint vs project-management. Speak each estate's own words, and route a question by its frame words: `GLOSSARY.md` § Two vocabularies is the law (ratified in ADR-023).
 - Bill makes product-direction calls: requirements, pillars and roadmap options come from him or from a cited estate, so escalate rather than fill the gap.
 - Embodiment deltas live in `agents/` — e.g. `agents/uno-bot/AGENT.md` holds only what differs in Slack.
 
@@ -58,7 +58,7 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 
 ## The loading contract
 
-**Tier 1 — always loaded.** This file, and nothing else. Soft budget ≤20k chars: an overrun warns rather than fails, and a tier that bloats still defeats the tier. **A module's glossary row REPLACES rather than adds**: when a module takes over what another one did, its row absorbs that row instead of sitting beside it, so the glossary stays a vocabulary rather than a ledger of everything that has ever been built. The budget is what makes that a rule rather than a preference — a wave of tickets each adding a row spends it, and the honest answer is a shorter glossary, not a bigger tier.
+**Tier 1 — always loaded.** This file, and nothing else. Soft budget ≤20k chars: an overrun warns rather than fails, and a tier that bloats still defeats the tier.
 
 **Tier 3 — retrieved live, never cached.** Product truth from `uno-blueprint` (`writers/blueprint` / `search_blueprint`); design-system truth from `uno-storybook` (read the source and stories). Team conventions are *not* Tier 3 — they are canonical in-repo (ADR-017) and load as plain files.
 
@@ -104,7 +104,7 @@ Each rule is one line here and its body lives in the document it names; the lead
 
 ## Knowledge
 
-Finished work leaves behind one of three things: a **rule** in the doc that already owns the subject, an **ADR** under `docs/adr/` when the call is hard to reverse, or **nothing** — git keeps the trail, and a finding worth less than the context it costs is worth dropping. `docs/knowledge/INDEX.md` is the contract, `npm run check:knowledge-disposition` enforces it, and `docs/knowledge/changelog.md` is the ledger of what was promoted. Capture runs through `skills/uno-maintain`; land the note and its disposition in the same change. The same test clears `docs/plans/`, `todos/` and the knowledge archive: a plan, todo or archived doc whose work has landed or been abandoned is deleted, and stays only while a live doc, ADR or code comment cites it as its decision trail.
+Finished work leaves behind a **rule** in the doc that already owns the subject, an **ADR** under `docs/adr/` when the call is hard to reverse, an **archive** entry in `docs/knowledge/archive/` while a live doc, ADR or code comment cites it as its decision trail, or — most often — **nothing**: git keeps the trail, and a finding worth less than the context it costs is worth deleting. `docs/knowledge/INDEX.md` is the contract, `npm run check:knowledge-disposition` enforces it, and `docs/knowledge/changelog.md` is the ledger of what was promoted. Capture runs through `skills/uno-maintain`; land the note and its disposition in the same change. The same test clears `docs/plans/`, `todos/` and the archive itself: a plan, todo or archived doc whose work has landed or been abandoned is deleted once nothing live cites it.
 
 <!-- ide-only -->
 ## Progressive loading
@@ -162,7 +162,7 @@ See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
-Single-context. `CONTEXT.md` at the root is the glossary (`npm run check:glossary`
+Single-context. `GLOSSARY.md` at the root is the glossary (`npm run check:glossary`
 keeps it glossary-only); `docs/adr/` holds the decisions, indexed by
 `docs/adr/overview.md`. See `docs/agents/domain.md`.
 <!-- /ide-only -->

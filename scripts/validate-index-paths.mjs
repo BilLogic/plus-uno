@@ -36,7 +36,7 @@ const INDEXES = [
 // script, or another repo's path — and guessing at those is how a check earns
 // a hundred false positives and gets switched off in a week.
 const ROOTED =
-  /^(AGENTS\.md|CONTEXT\.md|README\.md|SETUP\.md|INDEX\.md|docs\/|skills\/|agents\/|scripts\/|design-system\/|prototypes\/|src\/|public\/|todos\/|\.storybook\/|\.github\/|\.cursor\/)/;
+  /^(AGENTS\.md|GLOSSARY\.md|README\.md|SETUP\.md|INDEX\.md|docs\/|skills\/|agents\/|scripts\/|design-system\/|prototypes\/|src\/|public\/|todos\/|\.storybook\/|\.github\/|\.cursor\/)/;
 
 // Generated `githubLink` values mirror an on-disk path through a GitHub tree
 // URL. The suffix after /tree/<ref>/ is this repo's own layout, so it resolves

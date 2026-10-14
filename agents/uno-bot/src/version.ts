@@ -1,14 +1,14 @@
 // Build tag baked into the Worker bundle at deploy time. Surfaced at GET
 // /health, in the per-request telemetry line, and in the JSON of half a dozen
-// routes, so an eval run (or anyone) can verify WHICH code is actually live —
-// round 2 of the MVP eval accidentally tested a stale deployment because
+// routes, so anyone can verify WHICH code is actually live —
+// an early test round accidentally tested a stale deployment because
 // nothing exposed this.
 //
 // IT IS NO LONGER TYPED BY HAND. This was `export const BUILD = "r75-..."` with
 // "bump on every release round" written above it, and that instruction was not
 // followed: r73 stood through 24 commits to src/ and 54 successful deploys, and
-// r75 then stood through three more. Eval runs against three different builds
-// all reported the same string, so nothing in eval-results.json distinguished
+// r75 then stood through three more. Runs against three different builds
+// all reported the same string, so nothing in their results distinguished
 // them — the same failure the paragraph above describes, pointing the other
 // way. Nothing was stale except the label (#249).
 //

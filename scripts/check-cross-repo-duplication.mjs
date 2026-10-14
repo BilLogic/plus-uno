@@ -76,7 +76,7 @@
  * a corpus too large to fix in this repo still gets a binding direction.
  *
  * THE CEILING IS WHY THE GLOSSARY PAIR IS SAFE TO RECORD, and the number says
- * so. `CONTEXT.md ↔ CONTEXT.md` shares 98 words today — #417's writing
+ * so. The two siblings' glossaries share 98 words today — #417's writing
  * vocabulary (*ladder*, *sprawl*, *evidence*), which each repo's glossary must
  * define locally, since a session in one repo never opens another's glossary.
  * Run against the same two files as they stood BEFORE #365 and #137, with the
@@ -153,22 +153,28 @@ export const VENDORED = /^vendored_from:|<!-- VENDORED from /m;
  * `roots` differ because the layouts do: sb keeps its disclosed references under
  * `references/`, the other two under `docs/`. What is common is the shape #417
  * settled on — a router, a glossary, and the trees the router points into.
+ *
+ * The glossary goes by EITHER name. The mattpocock-skills plugin renamed it
+ * `CONTEXT.md` → `GLOSSARY.md` and each repo moves on its own schedule, so every
+ * repo lists both and the corpus walk returns whichever is there.
  */
+export const GLOSSARIES = ['GLOSSARY.md', 'CONTEXT.md'];
+
 export const REPOS = [
   {
     key: 'plus-uno',
     label: 'BilLogic/plus-uno',
-    roots: ['AGENTS.md', 'CONTEXT.md', 'README.md', 'docs', 'skills'],
+    roots: ['AGENTS.md', ...GLOSSARIES, 'README.md', 'docs', 'skills'],
   },
   {
     key: 'blueprint',
     label: 'BilLogic/plus-uno-blueprint',
-    roots: ['AGENTS.md', 'CONTEXT.md', 'README.md', 'docs', 'skills'],
+    roots: ['AGENTS.md', ...GLOSSARIES, 'README.md', 'docs', 'skills'],
   },
   {
     key: 'sb',
     label: 'BilLogic/uno-blueprint (sb template kit)',
-    roots: ['AGENTS.md', 'CONTEXT.md', 'README.md', 'docs', 'skills', 'references'],
+    roots: ['AGENTS.md', ...GLOSSARIES, 'README.md', 'docs', 'skills', 'references'],
   },
 ];
 
@@ -190,7 +196,7 @@ export const SKIP = [
 export const COPIES = new Map([
   [
     'docs/agents/domain.md',
-    'installed by the mattpocock-skills setup skill, identically in all three repos. Its home is the plugin; a divergent copy is the defect, and the plugin owns that.',
+    'installed by the mattpocock-skills setup skill in all three repos. Its home is the plugin; a divergent copy is the defect, and the plugin owns that. plus-uno appends one local section, its glossary-editing rule.',
   ],
   [
     'docs/agents/issue-tracker.md',
@@ -207,7 +213,9 @@ export const COPIES = new Map([
  *
  * `words` is a CEILING, not a permission: shared words may fall and never rise,
  * so a recorded pair cannot absorb a new copy-paste. `why` has to say what
- * closing it would take, so an entry cannot quietly become permanent.
+ * closing it would take, so an entry cannot quietly become permanent. A side
+ * naming a repo's glossary matches it under either name ({@link GLOSSARIES}),
+ * so a sibling's rename does not turn the glossary pair into a finding.
  */
 export const RECORDED = [
   {
@@ -215,7 +223,7 @@ export const RECORDED = [
     b: 'sb:CONTEXT.md',
     words: 98,
     why:
-      "#417's shared writing vocabulary — *ladder*, *sprawl*, *evidence*. A glossary is a LOCAL dictionary: a session in one repo never opens another's CONTEXT.md, so one word must carry one definition in all three. Closing it means a vendored glossary, i.e. the extra vendoring edge #417 § The Worker stays in the monorepo refuses — so this one is expected to stay, and the ceiling is what keeps it from growing back into a rename map.",
+      "#417's shared writing vocabulary — *ladder*, *sprawl*, *evidence*. A glossary is a LOCAL dictionary: a session in one repo never opens another's glossary, so one word must carry one definition in all three. Closing it means a vendored glossary, i.e. the extra vendoring edge #417 § The Worker stays in the monorepo refuses — so this one is expected to stay, and the ceiling is what keeps it from growing back into a rename map.",
   },
   {
     a: 'blueprint:docs/reference/interface-schema-map.md',
@@ -444,6 +452,13 @@ export function locateRepos(overrides = {}) {
   return found;
 }
 
+/** A `repo:path` side, with a root glossary named one way whatever the repo calls it. */
+const documentKey = (side) => {
+  const [repo, ...rest] = String(side).split(':');
+  const rel = rest.join(':');
+  return GLOSSARIES.includes(rel) ? `${repo}:<glossary>` : side;
+};
+
 /**
  * The sweep.
  *
@@ -478,9 +493,11 @@ export function sweep(overrides = {}) {
   const shared = new Map(RECORDED.map((r) => [`${r.a}|${r.b}`, 0]));
   const findings = [];
   for (const p of passages) {
-    const rec = RECORDED.find(
-      (r) => (r.a === p.a && r.b === p.b) || (r.a === p.b && r.b === p.a),
-    );
+    const [pa, pb] = [documentKey(p.a), documentKey(p.b)];
+    const rec = RECORDED.find((r) => {
+      const [ra, rb] = [documentKey(r.a), documentKey(r.b)];
+      return (ra === pa && rb === pb) || (ra === pb && rb === pa);
+    });
     if (rec) {
       const key = `${rec.a}|${rec.b}`;
       shared.set(key, shared.get(key) + p.words);

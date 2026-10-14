@@ -134,7 +134,7 @@ test('an invisible focus ring in a fixture tree is a finding', () => {
       ':root { --color-surface: #f9f9fc; --color-inverse-primary: #84cfff; --color-focus-ring: #0472a8; }\n',
     'design-system/src/tokens/_color_roles.scss': ':root { --color-focus-ring: var(--color-primary); }\n',
     'design-system/src/a.scss': '.a:focus { outline: 2px solid var(--color-inverse-primary); }\n',
-    'docs/evals/focus-ring.json': FOCUS_BASELINE,
+    'scripts/baselines/focus-ring.json': FOCUS_BASELINE,
   });
   try {
     const found = messagesOf(run, root);
@@ -150,7 +150,7 @@ test('an invisible focus ring in a fixture tree is a finding', () => {
 test('an empty token directory fires the sentinel floor, not a clean sweep', () => {
   const { root, done } = policyTree({
     'design-system/src/a.scss': '.a:focus { outline: 2px solid var(--color-inverse-primary); }\n',
-    'docs/evals/focus-ring.json': FOCUS_BASELINE,
+    'scripts/baselines/focus-ring.json': FOCUS_BASELINE,
   });
   try {
     const found = messagesOf(run, root);
@@ -244,7 +244,7 @@ test('@grounds: a bad declaration fails the whole check', () => {
       ':root { --color-surface: #f9f9fc; --color-primary: #0472a8; --color-focus-ring: #0472a8; }\n',
     'design-system/src/tokens/_color_roles.scss': ':root { --color-focus-ring: var(--color-primary); }\n',
     [A]: inverseRing('--color-primary --color-nope'),
-    'docs/evals/focus-ring.json': FOCUS_BASELINE,
+    'scripts/baselines/focus-ring.json': FOCUS_BASELINE,
   });
   try {
     const found = messagesOf(run, root);

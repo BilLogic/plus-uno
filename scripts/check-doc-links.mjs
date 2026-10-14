@@ -30,7 +30,12 @@
  *     that was retired, and rewriting those would erase the decision's own
  *     record. `design-system/guidelines/components/overview.md` carries its own
  *     staleness banner (#165/#166 own its rebuild) and the two vendored
- *     blueprint pages name their SOURCE repo's paths.
+ *     blueprint pages name their SOURCE repo's paths. A `read_reference` NAME
+ *     resolves too: outside `skills/` a disclosed doc's name is its path
+ *     without `.md` (`docs/engineering/operations`), so it passes when that
+ *     file exists and its frontmatter declares `disclosure: reference`. A skill
+ *     method's name (`uno-maintain/method`) is not rooted and never reaches
+ *     this pass.
  *  3. Backticked BARE filenames name a file that exists somewhere. The rule is
  *     deliberately weak — `method.md`, `bot.md` and `SKILL.md` each name many
  *     real files — and weak still catches the class: a retired file resolves to
@@ -162,6 +167,13 @@ const inputs = byRoot((repoRoot) => {
   const notes = [];
   const fail = (line) => found.push(line);
   const exists = (rel) => existsSync(path.join(repoRoot, rel));
+  // A disclosed doc's read_reference name: its path without `.md`, on a doc
+  // whose frontmatter declares `disclosure: reference`.
+  const isReferenceName = (rel) => {
+    if (!exists(`${rel}.md`)) return false;
+    const front = readFileSync(path.join(repoRoot, `${rel}.md`), 'utf8').match(/^---\n([\s\S]*?)\n---/)?.[1] ?? '';
+    return /^disclosure:\s*reference\s*$/m.test(front);
+  };
   const md = (dirs, opts) => markdownUnder(dirs, { ...opts, root: repoRoot });
 
   // ── 1. relative markdown links ────────────────────────────────────────────
@@ -172,7 +184,7 @@ const inputs = byRoot((repoRoot) => {
 
   for (const file of md(LINK_DIRS, {
     exclude: [TRANSCRIPTS, GENERATED_BUNDLE],
-    plus: ['AGENTS.md', 'CONTEXT.md', 'SETUP.md', 'README.md'],
+    plus: ['AGENTS.md', 'GLOSSARY.md', 'SETUP.md', 'README.md'],
   })) {
     for (const { target } of links(file, { root: repoRoot })) {
       if (/^(https?:\/\/|mailto:|#)/.test(target)) continue;
@@ -197,7 +209,7 @@ const inputs = byRoot((repoRoot) => {
 
   for (const file of md(POINTER_DIRS, {
     exclude: [GENERATED_BUNDLE, ...VENDORED_POINTERS],
-    plus: ['AGENTS.md', 'CONTEXT.md', 'SETUP.md'],
+    plus: ['AGENTS.md', 'GLOSSARY.md', 'SETUP.md'],
   })) {
     for (const raw of codeSpans(file)) {
       if (!ROOTED.test(raw)) continue;
@@ -212,7 +224,7 @@ const inputs = byRoot((repoRoot) => {
       // the punctuation that belongs to the sentence rather than to the path.
       const token = raw.split('#')[0].split(':')[0].replace(/[,.)]$/, '');
       if (!token) continue;
-      if (!exists(token)) {
+      if (!exists(token) && !isReferenceName(token)) {
         fail(`[missing] ${file} -> \`${token}\``);
       }
     }
@@ -241,7 +253,7 @@ const inputs = byRoot((repoRoot) => {
 
   for (const file of md(POINTER_DIRS, {
     exclude: [GENERATED_BUNDLE],
-    plus: ['AGENTS.md', 'CONTEXT.md', 'SETUP.md'],
+    plus: ['AGENTS.md', 'GLOSSARY.md', 'SETUP.md'],
   })) {
     for (const raw of codeSpans(file)) {
       if (!BARE_MD.test(raw)) continue;

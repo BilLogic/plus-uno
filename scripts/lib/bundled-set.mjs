@@ -127,7 +127,7 @@ export function bundlerFailureReport({ status, signal, stderr }, caller = {}) {
  */
 export const SECTION_ROOTS = [
   'AGENTS.md',
-  'CONTEXT.md',
+  'GLOSSARY.md',
   'agents/uno-bot/AGENT.md',
   'skills',
   'docs/connectors',

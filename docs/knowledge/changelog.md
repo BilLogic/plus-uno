@@ -56,4 +56,5 @@ deleted — `bot-v1`, `mode-era`, `uno-compound`, `uno-review`,
 `figma-vendor-notes`, the agent persona, the v2 Figma sync workflow, and both
 audits above. The harness audit's request to be kept is overruled by that rule;
 its P2 finding survives as the quote that opens this ledger. Git keeps every
-file.
+file. `archive/eval-runs/`, archived the same week, stays: `docs/evals/` and
+the blueprint integration cite it.

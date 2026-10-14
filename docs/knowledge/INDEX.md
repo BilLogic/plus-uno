@@ -2,7 +2,7 @@
 # docs/knowledge/ — the disposition rule
 
 This folder is a staging area, not a library. Work that produces a durable
-finding leaves behind **a rule, an ADR, or nothing**, and a file that lands here
+finding leaves behind **a rule, an ADR, an archive entry, or nothing**, and a file that lands here
 is a note in transit between those states.
 
 It reads as sediment when nobody says which. Before #172 it held 15 live files

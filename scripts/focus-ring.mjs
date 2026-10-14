@@ -238,7 +238,7 @@ export function indicators(rules, values) {
 }
 
 /**
- * The measured side, in the shape `docs/evals/focus-ring.json` holds its
+ * The measured side, in the shape `scripts/baselines/focus-ring.json` holds its
  * exceptions: one key per rule under the bar, `file:line`, and the rule itself
  * beside it for the wording. That map is what `scripts/lib/ratchet.mjs` is
  * handed (#600); the record's VALUE is the reason a person wrote, so the

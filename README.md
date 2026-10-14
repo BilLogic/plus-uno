@@ -76,7 +76,7 @@ plus-uno/
 ├── docs/
 │   ├── context/                   # Descriptive — product, design-system foundations, onboarding
 │   ├── conventions/               # Normative rules — notion, figma, slack, supabase, writing style, automations
-│   ├── evals/                     # Quality loop — rubrics, scenarios, runs
+│   ├── evals/                     # Rubrics, golden scenarios, frozen fixtures
 │   ├── knowledge/                 # Append-only — lessons, ADRs, research, archive
 │   └── plans/                     # Dated implementation plans
 │

@@ -29,7 +29,7 @@
     "design-system/src/components/status-and-loading/Progress/Progress.scss|--color-on-warning|--color-warning": {
       "count": 1,
       "ratio": 3.7,
-      "why": "OPEN DECISION, ALREADY RECORDED — 3.7:1, the same pair in docs/evals/button-contrast-baseline.json. Does --color-warning need a darker filled variant, or --color-on-warning a darker on-colour? That is #268 and Bill's. Two checks reaching the same fact from different directions is the system working; it is one decision, not two."
+      "why": "OPEN DECISION, ALREADY RECORDED — 3.7:1, the same pair in scripts/baselines/button-contrast-baseline.json. Does --color-warning need a darker filled variant, or --color-on-warning a darker on-colour? That is #268 and Bill's. Two checks reaching the same fact from different directions is the system working; it is one decision, not two."
     },
     "design-system/src/specs/Admin/Session/Tables/SessionBreakdownTable/SessionBreakdownTable.scss|--color-outline-variant|--color-surface": {
       "count": 1,

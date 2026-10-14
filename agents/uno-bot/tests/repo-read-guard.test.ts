@@ -21,7 +21,7 @@ describe("the eval corpus is withheld from the bot", () => {
       "docs/evals/fixtures/sweep-drift-cases.json",
       "docs/evals/fixtures/uno-prototype-seeds/seed-1-lowfi.md",
       "docs/evals/rubrics/uno-bot.md",
-      "docs/evals/runs/2026-08-02-cursor-scenario-map/README.md",
+      "docs/evals/fixtures/uno-review-golden-run.jsonl",
     ]) {
       assert.equal(isWithheldRepoPath(path), true, path);
     }

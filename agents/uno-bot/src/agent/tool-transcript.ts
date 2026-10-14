@@ -1,7 +1,7 @@
-// What the eval transcript records about a tool call — the ARGUMENTS the model
+// What a turn's transcript records about a tool call — the ARGUMENTS the model
 // sent, and the small honesty fields the tool sent back.
 //
-// WHY THIS EXISTS. /debug/eval used to record tool calls and nothing about
+// WHY THIS EXISTS. The eval transcript (since removed) used to record tool calls and nothing about
 // their results, so a search-shaped failure was undiagnosable from the
 // artifact. S3 (the connect-link case) read 0/3 across three samples with all
 // three replies saying workspace search "isn't available on this turn" — and
@@ -12,7 +12,7 @@
 //
 // WHAT IS RECORDED, and what is NOT. `note`, `visibility` and `error` — the
 // fields a tool writes ABOUT its own answer. Never `results`, never `rows`,
-// never a snippet. An eval artifact is written to a file, attached to a run and
+// never a snippet. A transcript artifact is written to a file, attached to a run and
 // read weeks later by whoever is on the failure; putting message content or
 // blueprint prose in it would turn a diagnostic into a disclosure, which is the
 // same mistake S2 exists to catch one layer down. The size cap is the second

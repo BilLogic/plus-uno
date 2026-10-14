@@ -154,7 +154,7 @@ export const blueprintSearchProbe: ProbeRun = async (env, url) => {
 
   const started = Date.now();
   try {
-    // Metered so the eval can report subrequest cost per query — the number
+    // Metered so the probe can report subrequest cost per query — the number
     // Phase 3 is meant to move (worst case 8 -> 2 against a 50 cap).
     const result = await runMetered(async () => {
       const r = await searchBlueprint(env, q, {
@@ -169,7 +169,7 @@ export const blueprintSearchProbe: ProbeRun = async (env, url) => {
         ok: true,
         build: BUILD,
         q,
-        // Echoed ALWAYS, not only when overridden: an eval artifact that does
+        // Echoed ALWAYS, not only when overridden: a probe result that does
         // not say which function produced it can be read as the live result a
         // week later, which is the mistake this parameter exists to prevent.
         rpc: rpcParam ?? BLUEPRINT_CONTRACT.rpcs.searchBlueprint,
@@ -194,7 +194,7 @@ export const blueprintSearchProbe: ProbeRun = async (env, url) => {
       },
     };
   } catch (err) {
-    // Report the failure as a failure. A retrieval eval that reads an error
+    // Report the failure as a failure. A retrieval measurement that reads an error
     // as "no rows" would score a broken path as a recall miss and send
     // someone tuning the ranker.
     return {
