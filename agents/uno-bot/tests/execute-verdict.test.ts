@@ -755,6 +755,7 @@ function stagingTurn() {
     subType: null,
     painCategory: null,
     classifiedAt: null,
+    thanks: false,
   };
 }
 

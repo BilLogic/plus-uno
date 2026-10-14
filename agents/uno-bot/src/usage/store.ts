@@ -87,6 +87,10 @@ export interface TurnRecord {
   selfFiledTicketUrl: string | null;
   /** Evals, debug probes, the sandbox channel, bare greetings (`./record.ts`). */
   testTraffic: boolean;
+  /** The asker's message thanked the bot (`./record.ts` `isThanks`) — on a
+   *  person's turn only, and whatever `testTraffic` says: a thanks-only
+   *  message is a greeting by that rule, and this flag is what counts it. */
+  thanks: boolean;
 
   // ── corpus categories (`./categories.ts`) ──
   /** What a CHANNEL ask said, kept only until the end-of-day classifier labels
