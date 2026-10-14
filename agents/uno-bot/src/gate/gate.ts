@@ -564,7 +564,8 @@ function notAConfirmer(
  * is open.
  */
 export type ProposalLook =
-  | { state: "live"; proposal: PendingProposal; mayDecide: boolean; confirmers: string[] }
+  /** `kept` is the picks this person kept on the card's Review pop-up. */
+  | { state: "live"; proposal: PendingProposal; mayDecide: boolean; confirmers: string[]; kept: Readonly<Record<string, string>> }
   | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
   | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
   /** Decided, cut off, or never a card: nothing here is waiting on anyone. */
@@ -579,6 +580,7 @@ export async function lookAtProposal(messageTs: string, userId: string, deps: Ga
       proposal,
       mayDecide: mayConfirm(proposal, userId, deps.standingConfirmers),
       confirmers: cardConfirmers(proposal, deps.standingConfirmers) ?? [],
+      kept: byTs.kept?.[userId] ?? {},
     };
   }
   if (byTs.state === "superseded" || byTs.state === "expired") return byTs;

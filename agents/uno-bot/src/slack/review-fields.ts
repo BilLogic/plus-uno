@@ -69,9 +69,10 @@ export type CheckedEdits =
   | { ok: true; operations: ProposalOperation[]; edited: string[]; changes: FieldChange[] }
   | { ok: false; alert: string };
 
-/** Every input's block id starts with this; the rest is the field's key. */
+/** Every field's block id starts with this; the rest is the field's key. */
 export const FIELD_BLOCK_PREFIX = "uno_field:";
-const FIELD_ACTION_ID = "value";
+/** Every field's element answers to this action id, inside its own block. */
+export const FIELD_ACTION_ID = "value";
 
 /** `plain_text_input`'s own cap; a longer value is not offered for editing. */
 export const MAX_INPUT_CHARS = 3000;
@@ -242,20 +243,16 @@ function draftFields(proposal: PendingProposal): Array<{ field: EditableField; s
   return out;
 }
 
-/** The tools whose text fields the draft holds as inputs in place: a change
- *  to a page that already exists. A create's fields stay under Edit fields. */
-const IN_PLACE_TOOLS = new Set(["notion_update"]);
-
 /**
  * The fields the Review draft holds as inputs in place, each with the draft's
- * value, with nothing read: every text field of a change to an existing page.
- * Selects need their options read, so they stay under Edit fields.
+ * value, with nothing read: every text field, a create's as much as a
+ * change's, so what is typed rides the draft's own Submit. Selects need their
+ * options read, so they stay under Edit fields.
  */
 export function inlineFields(proposal: PendingProposal): EditableField[] {
-  const operations = proposalOperations(proposal);
   return draftFields(proposal)
     .map(({ field }) => field)
-    .filter((field) => field.kind !== "select" && IN_PLACE_TOOLS.has(operations[Number(field.key.split(".")[0])]?.toolName ?? ""));
+    .filter((field) => field.kind !== "select");
 }
 
 /**
@@ -325,16 +322,49 @@ export function fieldInputBlocks(fields: readonly EditableField[], values: Reado
   });
 }
 
+/**
+ * One section per select, the select its accessory: what Edit fields offers.
+ * Not an input, so the view needs no submit and each pick reaches the Worker
+ * as it is made (`block_actions`), to be kept on the draft at once.
+ */
+export function fieldSelectBlocks(fields: readonly EditableField[], values: ReadonlyMap<string, string> = new Map()): unknown[] {
+  return fields
+    .filter((field) => field.kind === "select" && field.options?.length)
+    .map((field) => {
+      const value = values.get(field.key) ?? field.value;
+      const options = field.options!;
+      return {
+        type: "section",
+        block_id: `${FIELD_BLOCK_PREFIX}${field.key}`,
+        text: { type: "mrkdwn", text: `*${field.label}*` },
+        accessory: {
+          type: "static_select",
+          action_id: FIELD_ACTION_ID,
+          options: options.map(option),
+          ...(options.includes(value) ? { initial_option: option(value) } : {}),
+        },
+      };
+    });
+}
+
 function option(value: string) {
   return { text: { type: "plain_text", text: value }, value };
 }
 
 /**
- * The fields an input block list offers, read back off the blocks — what a
- * submitted view carries, with nothing re-read. The draft value is the
- * block's initial one.
+ * The fields a block list offers, read back off the blocks — what a submitted
+ * view or a pick carries, with nothing re-read: each input, and each select
+ * Edit fields offers as a section's accessory. The draft value is the block's
+ * initial one.
  */
 export function fieldsFromBlocks(blocks: readonly unknown[]): EditableField[] {
+  type Element = {
+    type?: string;
+    multiline?: boolean;
+    initial_value?: string;
+    initial_option?: { value?: string };
+    options?: Array<{ value?: string }>;
+  };
   const fields: EditableField[] = [];
   for (const block of blocks) {
     const b = block as {
@@ -342,12 +372,27 @@ export function fieldsFromBlocks(blocks: readonly unknown[]): EditableField[] {
       block_id?: string;
       optional?: boolean;
       label?: { text?: string };
-      element?: { type?: string; multiline?: boolean; initial_value?: string; initial_option?: { value?: string }; options?: Array<{ value?: string }> };
+      text?: { text?: string };
+      element?: Element;
+      accessory?: Element;
     };
-    if (b.type !== "input" || !b.block_id?.startsWith(FIELD_BLOCK_PREFIX)) continue;
+    if (!b.block_id?.startsWith(FIELD_BLOCK_PREFIX)) continue;
+    const key = b.block_id.slice(FIELD_BLOCK_PREFIX.length);
+    if (b.type === "section" && b.accessory?.type === "static_select") {
+      fields.push({
+        key,
+        label: (b.text?.text ?? "").replace(/^\*|\*$/g, ""),
+        kind: "select",
+        required: true,
+        value: b.accessory.initial_option?.value ?? "",
+        options: (b.accessory.options ?? []).map((o) => o.value ?? ""),
+      });
+      continue;
+    }
+    if (b.type !== "input") continue;
     const select = b.element?.type === "static_select";
     fields.push({
-      key: b.block_id.slice(FIELD_BLOCK_PREFIX.length),
+      key,
       label: b.label?.text ?? "",
       kind: select ? "select" : b.element?.multiline ? "multiline" : "text",
       required: b.optional === false,

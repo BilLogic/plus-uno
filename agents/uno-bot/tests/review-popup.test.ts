@@ -119,7 +119,8 @@ describe("the draft reads as a draft", () => {
     const all = lines(await draftOf());
     const words = all.join("\n");
     assert.match(all[0]!, /New PRD card on the Roadmap/);
-    const order = [/\*Title:\* Goal cycle resets per session/, /\*Product Pillar:\* Toolkit/, /\*Design Status:\* Need PRD \/ Under Playground/, /\*Summary:\* Tutors read/];
+    // Title and Summary are typed in place, each where the draft reads it.
+    const order = [/input: Title = Goal cycle resets per session/, /\*Product Pillar:\* Toolkit/, /\*Design Status:\* Need PRD \/ Under Playground/, /input: Summary = Tutors read/];
     const at = order.map((p) => words.search(p));
     assert.ok(at.every((i) => i >= 0), JSON.stringify(at));
     assert.deepEqual([...at].sort((a, b) => a - b), at, "Title, Product Pillar, Design Status, Summary");
@@ -182,12 +183,13 @@ describe("the draft reads as a draft", () => {
   it("reads a GitHub issue and a DM by what a person checks", async () => {
     const issue = lines(await draftOf({ toolName: "github_issue_create", input: { title: "Badge drift", body: "The badge differs." }, proposalText: "x" })).join("\n");
     assert.match(issue, /New GitHub issue on BilLogic\/plus-uno/);
-    assert.match(issue, /\*Title:\* Badge drift\n\*Repository:\* BilLogic\/plus-uno/);
-    assert.match(issue, /section: The badge differs\./);
+    // What a confirmer may change is typed in place.
+    assert.match(issue, /input: Title = Badge drift\nsection: \*Repository:\* BilLogic\/plus-uno/);
+    assert.match(issue, /input: Body = The badge differs\./);
 
     const dm = lines(await draftOf({ toolName: "dm_relay", input: { recipient: "U07ABC", text: "Card is ready." }, proposalText: "x" })).join("\n");
     assert.match(dm, /\*To:\* <@U07ABC>/);
-    assert.match(dm, /section: Card is ready\./);
+    assert.match(dm, /input: Message = Card is ready\./);
     assert.doesNotMatch(dm, /recipient/);
   });
 

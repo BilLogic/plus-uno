@@ -14,11 +14,14 @@
 // loading view first, with nothing read, and fills it with `views.update`
 // once the Gate has looked at the card. A failed open stops there.
 //
-// EDITS ARE SAVED ON THE DRAFT, AND CHECKED AGAIN ON APPROVE. Edit fields
-// pushes the draft's fields (`review-fields.ts`); Save edits holds what
-// changed to the draft's own guards, writes the values that differ from the
-// draft into the draft view's `private_metadata`, and redraws it. Approve
-// reads them back and `reviewEdits` holds them to the guards again, against
+// EDITS KEEP THEMSELVES, AND ARE CHECKED AGAIN ON APPROVE. Text is typed into
+// the draft itself and rides its Submit. Edit fields pushes the draft's
+// selects (`review-fields.ts`), and each pick is kept as it is made: held to
+// the options the view offered, merged into the person's kept picks on the
+// card's record (`ThreadState.keepPick`), and the draft redrawn from them —
+// so going back from Edit fields loses nothing. Approve reads the kept picks
+// off the same record, with what was typed in place, and `reviewEdits` holds
+// them all to the guards again, against
 // the card and the database's options as they stand then. A refusal redraws
 // the draft around an alert and leaves the card decidable; a pass hands the
 // Gate the edited batch, so what was checked is what runs.
@@ -49,9 +52,8 @@ import {
   inlineKeysOf,
   loadingView,
   noticeView,
-  reviewMetadata,
-  METADATA_MAX_CHARS,
   type ReviewedCard,
+  type ReviewPick,
 } from "./review-view";
 import {
   checkEdits,
@@ -62,7 +64,6 @@ import {
   reviewFields,
   stateOf,
   stateValues,
-  FIELD_BLOCK_PREFIX,
   type EditableField,
   type ReadOptions,
   type FieldChange,
@@ -71,6 +72,7 @@ import {
 import type { ProposalOperation } from "../thread-state/index";
 
 export type { ReviewViewState } from "./review-fields";
+export type { ReviewPick } from "./review-view";
 
 /** Slack's views methods, as the door needs them. */
 export interface ReviewViews {
@@ -148,9 +150,6 @@ export interface ReviewDecisionRequest {
   /** One of the card's own answers (`PendingProposal.choices`), by value:
    *  its verdict decides in place of `decision`, and its args ride the write. */
   choice?: string;
-  /** The edits Save edits kept on the draft (field key → value). Approve
-   *  checks them again before the claim. */
-  edits?: Readonly<Record<string, string>>;
   /** A pop-up state holding field values, as Slack sends one. */
   state?: ReviewViewState;
   /** The fields `state` was offered with, each with its draft value. Present,
@@ -186,7 +185,7 @@ export async function runReviewOpen(request: ReviewOpenRequest, deps: ReviewDoor
           card,
           look.proposal,
           { mayDecide: look.mayDecide, confirmers: look.confirmers, ...(await itemClosesAt(look.proposal, deps)) },
-          { editable: draftValuesOf(look.proposal).size > 0 },
+          { editable: draftValuesOf(look.proposal).size > 0, edits: look.kept },
         )
       : look.state === "gone" && request.cardText
         ? decidedView(card, request.cardText)
@@ -216,16 +215,15 @@ async function reportItem(channel: string, item: { messageTs: string; id: string
 /** Edit fields, pressed on the draft: the view that holds the fields. */
 export interface ReviewPushRequest {
   triggerId: string;
-  /** The card, as the draft's `private_metadata` names it, with its saved
-   *  edits. */
+  /** The card, as the draft's `private_metadata` names it. */
   card: ReviewedCard;
   userId: string;
 }
 
 /**
  * Edit fields, pressed on the draft: a loading view pushed over it, then
- * filled with the fields and the live options their selects may take, each
- * holding the value the draft shows.
+ * filled with the selects and the live options they may take, each holding
+ * the value the draft shows: the person's kept pick, or the draft's own.
  */
 export async function runReviewPush(request: ReviewPushRequest, deps: ReviewDoorDeps): Promise<void> {
   const { card } = request;
@@ -246,73 +244,72 @@ export async function runReviewPush(request: ReviewPushRequest, deps: ReviewDoor
   // What the draft holds in place is edited there, not here.
   const inPlace = inlineKeysOf(look.proposal);
   const fields = (await reviewFields(look.proposal, deps.fieldOptions)).filter((f) => !inPlace.has(f.key));
-  await deps.views.update(viewId, editView(card, fields, new Map(Object.entries(card.edits ?? {}))));
+  await deps.views.update(viewId, editView(card, fields, new Map(Object.entries(look.kept))));
 }
-
-/** Save edits, submitted from the Edit fields view. */
-export interface ReviewSaveRequest {
-  /** The draft under the Edit fields view. */
-  rootViewId: string;
-  /** The card, as the Edit fields view's `private_metadata` names it, with the
-   *  edits the draft held when it was pushed. */
-  card: ReviewedCard;
-  userId: string;
-  /** The Edit fields view's blocks, as the submit carries them. */
-  blocks: readonly unknown[];
-  state?: ReviewViewState;
-}
-
-/** What a view_submission is answered with; null is an empty ack, which closes
- *  the pushed view onto the one under it. */
-export type ReviewAck = { response_action: "errors"; errors: Record<string, string> } | null;
 
 /**
- * Save edits: the changed fields held to the draft's guards, then the values
- * that differ from the draft written into the draft view and its
- * `private_metadata`, where Approve finds them. Answered inside the submit's
- * ack, so a refusal is Slack's own error under the field and a pass closes
- * this view onto the redrawn draft.
+ * A pick under Edit fields, kept at once: held to the options the view
+ * offered, then merged into the person's kept picks on the card's record
+ * (`ThreadState.keepPick`, one transaction per pick, so two quick picks on two
+ * fields both survive whichever lands first) and the draft redrawn from the
+ * merged set. Nothing to press, so going back loses nothing. A pick back to
+ * the draft's own value drops it. A refusal is an alert on Edit fields, which
+ * shows the kept values again rather than the refused one; the next pick that
+ * passes clears it.
  *
- * The guards run on what the view offered, with nothing read; Approve checks
- * every saved value again against the live card and options, so a save is
- * never the decision.
+ * The draft is redrawn with the input blocks it already had, so Slack keeps
+ * whatever was typed into them. The update names the draft by the root view
+ * id the pick carries, with no hash: the record is the truth, and every
+ * redraw shows its latest. Approve checks every kept value again against the
+ * live card and options, so a pick is never the decision.
  */
-export async function saveReviewEdits(request: ReviewSaveRequest, deps: ReviewDoorDeps): Promise<ReviewAck> {
-  const { card } = request;
-  const fields = fieldsFromBlocks(request.blocks);
-  const checked = checkFieldEdits(fields, request.state);
-  if (!checked.ok) return { response_action: "errors", errors: { [`${FIELD_BLOCK_PREFIX}${checked.key}`]: checked.alert } };
-
+export async function keepReviewPick(request: ReviewPick, deps: ReviewDoorDeps): Promise<void> {
+  const { card, pick } = request;
   const look = await lookAtProposal(card.ts, request.userId, {
     threadState: deps.threadState,
     standingConfirmers: deps.standingConfirmers,
   });
+  const cannot = async (why: Record<string, unknown>) => {
+    await deps.views.update(request.viewId, why);
+    await deps.views.update(request.rootViewId, why);
+  };
   if (look.state !== "live" || !look.mayDecide || look.proposal.revising) {
-    await deps.views.update(request.rootViewId, look.state === "live" ? noticeView(card, "This proposal can't be edited from here now.") : closedView(card, look));
-    return null;
+    await cannot(look.state === "live" ? noticeView(card, CANNOT_EDIT) : closedView(card, look));
+    return;
   }
   const drafts = draftValuesOf(look.proposal);
-  const values = new Map(Object.entries(card.edits ?? {}));
-  for (const [key, value] of stateValues(fields, request.state)) values.set(key, value);
-  const edits: Record<string, string> = {};
-  for (const [key, value] of values) if (drafts.has(key) && drafts.get(key) !== value) edits[key] = value;
+  const fields = fieldsFromBlocks(request.blocks).filter((f) => f.kind === "select");
+  const shown = (kept: Readonly<Record<string, string>>) =>
+    new Map(fields.map((f) => [f.key, kept[f.key] ?? drafts.get(f.key) ?? f.value] as const));
 
-  // Slack caps `private_metadata`; edits past it cannot ride to Approve.
-  if (reviewMetadata({ channel: card.channel, ts: card.ts, edits }).length > METADATA_MAX_CHARS) {
-    const longest = Object.keys(edits).sort((a, b) => edits[b]!.length - edits[a]!.length)[0]!;
-    const blockId = fields.some((f) => f.key === longest) ? `${FIELD_BLOCK_PREFIX}${longest}` : `${FIELD_BLOCK_PREFIX}${fields[0]!.key}`;
-    return {
-      response_action: "errors",
-      errors: { [blockId]: "These edits are too long to carry to Approve together. Shorten this one, or ask for changes instead." },
-    };
+  // Held as a change from nothing, so a pick is always checked against the
+  // options the view offered, whatever it showed before.
+  const field = fields.find((f) => f.key === pick.key);
+  const checked = field && drafts.has(pick.key) ? checkFieldEdits([{ ...field, value: "" }], stateOf({ [pick.key]: pick.value })) : null;
+  if (!checked?.ok) {
+    const alert = checked?.alert ?? "That field can't be edited here now. Use Needs changes to ask for a revision.";
+    await deps.views.update(request.viewId, editView(card, fields, shown(look.kept), alert));
+    return;
+  }
+  const kept = await deps.threadState
+    .keepPick(card.ts, request.userId, pick.key, drafts.get(pick.key) === pick.value ? null : pick.value)
+    .catch(() => null);
+  if (!kept) {
+    await cannot(noticeView(card, CANNOT_EDIT));
+    return;
   }
   await deps.views.update(
     request.rootViewId,
-    draftView(card, look.proposal, { mayDecide: true, confirmers: look.confirmers }, { edits, editable: true }),
+    draftView(card, look.proposal, { mayDecide: true, confirmers: look.confirmers }, { edits: kept, editable: true }),
   );
-  console.log(`[review] edits saved on ${card.channel}/${card.ts} by=${request.userId} fields=${Object.keys(edits).length}`);
-  return null;
+  // An alert from a refused pick goes once a pick passes.
+  if (request.blocks.some((b: unknown) => (b as { type?: string }).type === "alert")) {
+    await deps.views.update(request.viewId, editView(card, fields, shown(kept)));
+  }
+  console.log(`[review] pick kept on ${card.channel}/${card.ts} by=${request.userId} fields=${Object.keys(kept).length}`);
 }
+
+const CANNOT_EDIT = "This proposal can't be edited from here now.";
 
 /** A decision from the pop-up: the Gate's `review` signal, applied as a press —
  *  or, for Needs changes, handed to a revision. */
@@ -348,9 +345,13 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
   }
   const decision: ReviewDecision = own?.verdict ?? request.decision;
 
-  // Only Approve writes, so only Approve's edits are checked and carried.
+  // Only Approve writes, so only Approve's edits are checked and carried: the
+  // picks this person kept on the card's record, and what was typed in place.
+  const kept = look?.state === "found" ? look.kept?.[request.userId] : undefined;
   const edits =
-    decision === "confirm" ? await reviewEdits(request, deps) : { ok: true as const, edited: [], changes: [] };
+    decision === "confirm"
+      ? await reviewEdits({ ...request, ...(kept ? { kept } : {}), ...(live ? { staged: live } : {}) }, deps)
+      : { ok: true as const, edited: [], changes: [] };
   if (!edits.ok) {
     console.log(`[review] edit refused on ${request.channel}/${request.messageTs} by=${request.userId}`);
     await show(edits.view);
@@ -557,26 +558,34 @@ function decidedLine(decision: "confirm" | "cancel"): string {
  * so what is checked here is what the claim wins.
  *
  * The seam every decision that writes from the pop-up reads its edits through.
- * The edits arrive as Save edits kept them (`edits`) or as a state with the
- * fields it was offered with (`state`, `fields`).
+ * The edits arrive as the picks the person kept on the card's record (`kept`)
+ * and as a state with the fields it was offered with (`state`, `fields`).
+ *
+ * A TYPED VALUE IS MEASURED AGAINST THE STAGED ONE (`staged`, the card as the
+ * decision read it), never against what its input opened with: a draft
+ * redrawn around a refused value opens with that value, and pressing Approve
+ * again without touching it must be refused again, not read as no edit.
  *
  * READS ONLY FOR WHAT CHANGED. No edit costs no read beyond the claim's own;
  * otherwise only a select an edit names has its options read again.
  */
 export async function reviewEdits(
-  request: Pick<ReviewDecisionRequest, "channel" | "messageTs" | "userId" | "state" | "fields" | "edits">,
+  request: Pick<ReviewDecisionRequest, "channel" | "messageTs" | "userId" | "state" | "fields"> & {
+    kept?: Readonly<Record<string, string>>;
+    staged?: PendingProposal;
+  },
   deps: Pick<ReviewDoorDeps, "threadState" | "standingConfirmers" | "fieldOptions">,
 ): Promise<
   | { ok: true; operations?: ProposalOperation[]; edited: string[]; changes: FieldChange[] }
   | { ok: false; view: Record<string, unknown> }
 > {
-  const saved = request.edits && Object.keys(request.edits).length ? request.edits : undefined;
+  const saved = request.kept && Object.keys(request.kept).length ? request.kept : undefined;
   if (!saved && !request.state) return { ok: true, edited: [], changes: [] };
-  // Saved edits and the fields in place together; a field in place wins.
+  // Kept picks and the fields in place together; a field in place wins.
   const state: ReviewViewState = { ...(saved ? stateOf(saved) : {}), ...(request.state ?? {}) };
   const changed =
     saved || request.fields
-      ? new Set([...Object.keys(saved ?? {}), ...(request.fields && request.state ? changedKeys(request.fields, request.state) : [])])
+      ? new Set([...Object.keys(saved ?? {}), ...(request.fields && request.state ? changedKeys(request.fields, request.state, request.staged) : [])])
       : undefined;
   if (changed && !changed.size) return { ok: true, edited: [], changes: [] };
   const look = await lookAtProposal(request.messageTs, request.userId, {
@@ -608,9 +617,10 @@ export async function reviewEdits(
     : { ok: true, edited: [], changes: [] };
 }
 
-/** The keys of the fields `state` holds at something other than the value the
- *  pop-up opened with. */
-function changedKeys(fields: readonly EditableField[], state: ReviewViewState): Set<string> {
+/** The keys of the fields `state` holds at something other than the staged
+ *  value, or, with no card to read it from, the value the pop-up opened with. */
+function changedKeys(fields: readonly EditableField[], state: ReviewViewState, staged?: PendingProposal): Set<string> {
   const values = stateValues(fields, state);
-  return new Set(fields.filter((f) => values.has(f.key) && values.get(f.key) !== f.value).map((f) => f.key));
+  const drafts = staged ? draftValuesOf(staged) : undefined;
+  return new Set(fields.filter((f) => values.has(f.key) && values.get(f.key) !== (drafts?.get(f.key) ?? f.value)).map((f) => f.key));
 }
