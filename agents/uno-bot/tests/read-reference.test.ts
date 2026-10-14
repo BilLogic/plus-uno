@@ -2,6 +2,9 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readReference, referenceStub } from "../src/tools/read-reference";
 import { REFERENCES } from "../src/generated/references";
+import { sweepCardInstruction } from "../src/sweep/cards";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 // read_reference is a pure function over a map baked at build time (#423): no
 // fetch, no subrequest, nothing that can fail on a cold start. These tests hand
@@ -58,4 +61,15 @@ test("the stub that replaces a read at turn end names the reference on one line"
   const stub = referenceStub("uno-maintain/method");
   assert.equal(stub, "[reference uno-maintain/method was read this turn]");
   assert.ok(!stub.includes("\n"));
+});
+
+test("the sweep card's instruction names a reference the baked map serves", () => {
+  const names = [...sweepCardInstruction().matchAll(/`read_reference` `([^`]+)`/g)].map((m) => m[1] ?? "");
+  assert.ok(names.length > 0, "the instruction points at the sweep's doc");
+  for (const name of names) assert.equal(JSON.parse(readReference({ name })).ok, true, `${name} must be in the map`);
+});
+
+test("no tool description names the sweep doc by its old path", () => {
+  const tools = readFileSync(resolve(process.cwd(), "tool-definitions.json"), "utf8");
+  assert.ok(!tools.includes("slack-sweep"));
 });
