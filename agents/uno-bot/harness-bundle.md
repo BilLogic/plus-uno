@@ -15,26 +15,25 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **168,423 chars from 16 files**, against an assembled budget of 175,500 (7,077 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 148,039 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **159,275 chars from 15 files**, against an assembled budget of 175,500 (16,225 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 138,891 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,272 (−7,704 ide-only) | 10,272 | 20,000 (constitution) |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 13,713 | 24,013 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,968 | 52,022 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,301 | 58,367 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 65,312 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 72,066 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 77,269 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 83,916 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 90,304 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−22,570 ide-only) | 94,865 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,638 (−4,814 ide-only) | 109,546 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 34,750 (−9,320 ide-only) | 144,338 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 147,806 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 154,322 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 158,955 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 9,420 (−605 ide-only) | 168,423 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 13,775 | 24,075 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,968 | 52,084 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,301 | 58,429 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,900 | 65,374 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,711 | 72,128 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,159 | 77,331 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,605 | 83,978 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,342 | 90,366 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−22,570 ide-only) | 94,927 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 14,638 (−4,814 ide-only) | 109,608 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 35,008 (−9,320 ide-only) | 144,658 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 148,126 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 154,642 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 159,275 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -46,12 +45,13 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **8 reference(s), 101,854 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **9 reference(s), 114,840 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
 | `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 33,590 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
+| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 12,986 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,358 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
@@ -155,7 +155,7 @@ Finished work leaves behind a **rule** in the doc that already owns the subject,
 
 # PLUS Terminology
 
-<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand) · distilled 2026-07-07 · applied by every agent naming a product, org, design-system, or harness term. -->
+<!-- canonical per ADR-017 (docs/adr/) · Tier 1 in uno-bot's prompt (its constitution section), read on demand in the IDE · distilled 2026-07-07 · applied by every agent naming a product, org, design-system, or harness term. -->
 
 Use these terms consistently across all design system work, prototypes, and documentation. Do not substitute generic web terms.
 
@@ -957,6 +957,8 @@ Two limits the Worker now handles, worth knowing because they shape what you wri
 Pillar → channel map (group announcements; **all private — uno-bot must be invited before posting/@here**):
 `Universal` → #plus-universal `C072E8SFLKV` · `Admin` → #plus-admin `C089A3E9CCW` · `Toolkit` → #plus-toolkit `C08925VDFF1` · `Training` → #plus-training `C07L5RZV6DR` · `Marketing` → #plus-marketing `C052BG9NE86`. Tutoring + Help Center: unmapped — flag at retro.
 
+**Automations registry.** What runs on its own — each morning and end-of-day job, cron and PR gate, with its trigger and owner — is `read_reference` name `docs/engineering/operations`. Read it before answering what runs when, or who owns an automated post.
+
 
 ## Share-out post
 
@@ -1362,48 +1364,6 @@ Two hard rules, every row: **never merge two sources into one unattributed answe
 
 Drafting follows the same routing, not just answering: `skills/uno-synthesize` queries the blueprint for the current-state and downstream-effects sections before writing a PRD.
 
-
-
----
-
-<!-- docs/engineering/operations.md -->
-
-# Automations Registry
-
-<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand) · distilled 2026-07-07 from 📓 playbook §6, now superseded · applied by uno-maintain. -->
-
-THE standing-automation registry. An automation absent from the table below is undocumented by definition.
-
-## Rules
-
-- **Every automation names its agent.** An automation without one is unowned by definition.
-- **An automation invokes a skill's method; it never embeds its own copy of the logic.** Migrate opportunistically as each is next touched.
-- **Every automation is a loop, and declares its loop mechanics.** Stop condition and issue caps go in its prompt adapter (`scripts/prompts/<name>/SKILL.md`); trigger cadence and the hard turn cap go in its workflow file. The procedure itself stays in the skill's method. Portable by construction: any model can execute the written loop, and harness loop primitives are optional accelerators. Pre-rule adapters (uno-implement, uno-implement-design) migrate as each is next touched. *(rule added 2026-07-16)*
-- **Every automation names where it runs and who pays.** Scheduled sweeps run as GitHub Actions cron → the claude-vertex composite action (`.github/actions/claude-vertex`) → Claude-on-Vertex, billed to the `hcii-plus` GCP project via the uno-bot service account (ADR-018 — the `GEMINI_SA_*` secret names are that same account, so rotating "the Gemini secrets" rotates every Claude cron too). Never a personal Anthropic seat. Model routed by difficulty per the bot's tier table: sonnet default · opus for reconciliation-grade judgment · haiku candidate for trivia. *(rule added 2026-07-16)*
-
-**Sweep intake transport** (labels, dedupe, caps, injection rule): `scripts/prompts/references/headless-intake.md` — one copy; every adapter points at it.
-
-
-| Automation | Trigger | Skill / method it runs | Agent | Implementation | Runs on · billed to | Owner | Status |
-|---|---|---|---|---|---|---|---|
-| Figma library sync | Worker scheduled runs: poll at end of day, post + track next morning | uno-maintain (intake) | uno-bot | `agents/uno-bot/src/figma-poll.ts` → `src/figma-library/`: one `harness-intake` + one ✅-gated card in `#plus-universal` (details: `docs/connectors/figma.md`). Manual: `GET /debug/figma-poll`. Legacy: `scripts/poll-figma-library.js` | CF Worker · no model call — Figma REST diff → drafted intake → Slack card | Bill | ✅ live (on deploy) |
-| Figma snapshot refresh | each publish (uno-bot `repository_dispatch`, #898) or `workflow_dispatch` | uno-maintain (ds-fix) | Actions executes; a human reviews the PR | `figma-snapshot-refresh.yml` → `npm run snapshot:figma-components`; a change opens a draft PR (close and reopen it to run checks) | GHA · Figma REST, no model call | Bill | built |
-| Figma notifications | each comment on a subscribed team's file, delivered to `POST /figma/events` | — (queues the event; the drift re-check #897, comment decisions #900 read it, in `src/figma-comments/`) | uno-bot | `agents/uno-bot/src/figma-notify/`: passcode check, one job per event on the `figma/events` runner, KV notes as ids and times | CF Worker · no model call | Bill | built (live once subscribed, #895) |
-| Figma notification subscriptions | on demand (`workflow_dispatch` from `main`) | uno-maintain (cross-estate sync) | Actions executes; `create` waits for the `uno-bot-production` reviewer | `figma-subscriptions.yml` → `agents/uno-bot/scripts/figma-subscriptions.mjs`: `list`, `create` (only what is missing; stops at the first failure), `status` (each subscription's newest deliveries). Defaults: FILE_COMMENT and FILE_UPDATE on all six teams, the 12 of #896 | GHA · Figma REST, no model call | Bill | built |
-| Implement component | `repository_dispatch` from uno-bot confirm | uno-prototype (codegen) | uno-bot proposes; Actions executes | `figma-implement.yml` → `scripts/implement-figma-changes.js` + `scripts/prompts/uno-implement` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
-| Implement design | `repository_dispatch` from uno-bot confirm | uno-prototype (design → prototypes scaffold) | uno-bot proposes; Actions executes | `figma-implement-design.yml` + `scripts/prompts/uno-implement-design` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
-| Marketplace add/edit | — | uno-publish (registration) | — | ❌ **not built.** The two stub workflows (`marketplace-add.yml` / `marketplace-edit.yml`) were deleted in #158 — they logged a payload and posted a construction notice, and nothing dispatched them. No Worker tool exists. The open product question — repo data file (`src/pages/PrototypeMarket/prototypes-data.js`) versus the Notion database when they disagree — is tracked in #173 and must be answered before this is built | (planned) | — | planned |
-| Design QA trigger | Roadmap card → `Dev Status: Ready for QA (RTT)` | uno-review (Design QA checklist) | reviewers/design-qa | ❌ not built — no Notion webhook exists, so this becomes a daily status-poll cron on the sweep pattern below; still needs the `Design QA` status column (manual Notion setup) first | (planned) GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | — | planned |
-| Shipped watchdog | weekly cron (Wed 09:00 UTC) | uno-maintain (post-ship reconciliation, method §6) | reviewers/auditor | `shipped-watchdog.yml` → `scripts/prompts/uno-shipped-watchdog/SKILL.md` (intake transport: shared ref above) | GHA cron → claude-vertex (**opus** — judgment-heavy) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16) |
-| Weekly direct-fix digest | weekly cron (Mon 09:00 UTC) | uno-maintain (direct-fix digest, method §4) | reviewers/auditor composes → posted via the uno-bot Slack token to #plus-design | `weekly-direct-fix-digest.yml` → `scripts/prompts/uno-direct-fix-digest/SKILL.md` — reads `docs/evals/runs/digest.jsonl` (row shape: method §4), empty week posts nothing, sentinel-verified | GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16; posts sentinel-verified) |
-| Figma tidy-up | weekly, Monday's morning run | hygiene checklist (`docs/connectors/figma.md` § Agent duties) | uno-bot | `agents/uno-bot/src/figma-tidy/`: Review cards in #plus-design, or where `FIGMA_ASK_CHANNEL_ID` names | CF Worker · Figma REST, no model call | Bill | built |
-| Blueprint embeddings refresh | nightly cron (07:00 UTC) | uno-bot (semantic search freshness) | — | `uno-bot-embed-blueprint.yml` | GHA cron → Worker `/debug` route | Bill | ✅ live |
-| Harness gate | **every `pull_request`** + on demand | the deterministic guards, composed | — | `check-harness.yml` → `npm run check:harness` → `scripts/check-harness.mjs` (composition and the reason for each member live there; `--list` prints them). 34–38s, of which the composite is ~14s; one `npm ci` scoped to `agents/uno-bot` (~11s), which the Worker's `typecheck` and `test` rows need. Was ~40s until #587 moved the workerd conformance step out to its own job | GHA · no model call — deterministic scripts only | Bill | ✅ live (#155; the repo's first `pull_request` trigger) |
-| uno-bot Worker checks | **every `pull_request`** + on demand | the Worker's own typecheck, its unit suite and its Durable Object conformance suite | — | `uno-bot-checks.yml` — three jobs, `typecheck`, `tests` and `conformance`, so each failure reads apart in the PR's check list (#580, #587). The first two are also registry rows composed into `check:harness`, which is what keeps the pre-push command whole; `conformance` (`test:workerd`) is an `EXCLUDED` row instead, because it boots workerd and the fast gate is defended by staying seconds long. The deploy chain runs all three, so a direct push to `main` meets them. No secret, so a fork PR runs it | GHA · no model call — `tsc`, `node --test`, vitest on workerd | Bill | ✅ live (#580, #587) |
-| Storybook gate | **every `pull_request`** + on demand | the Storybook browser suite — 383 stories rendered in headless chromium, axe over each | — | `storybook-gate.yml` → `npm run check:storybook` → `scripts/check-storybook.mjs` (why it is a peer workflow of the harness gate rather than a member: `EXCLUDED` there). Play/render failures block; a11y is a **ratchet** against `docs/evals/a11y-baseline.json` | GHA · no model call — Playwright + axe | Bill | ✅ live (#169; baseline 146 stories / 15 rules, 2026-08-26) |
-| Conventions integrity sweep | monthly cron (1st, 09:00 UTC) | uno-maintain (integrity checklist: `staleness-sweep.md`) | reviewers/auditor | `harness-integrity-sweep.yml` → `scripts/prompts/uno-integrity-sweep/SKILL.md` (intake transport: shared ref above) | GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16 — filed intakes #71/#72); the pilot for the sweep pattern |
-| Notion comment sweep | each flow run touching a page + monthly | uno-maintain (unresolved threads → incorporate or intake) | writers/notion | ❌ not built — follow the integrity-sweep pattern (Notion via `NOTION_API_KEY`) | (planned) GHA cron → claude-vertex · GCP `hcii-plus` | — | planned |
-| Eval run logging | every flow exit | rubric scoring → run entry | reviewers/rubric-applier | interim: `docs/evals/runs/*.jsonl`; target: Notion Eval Runs DB | in-session (whatever harness ran the flow) | — | planned |
 
 
 
@@ -1980,6 +1940,58 @@ These exist and a service key reads them. What each is for:
 - `business_models` — How the service is funded, priced and delivered. One row per service. Renamed from `propositions` on 2026-08-21 — that word already meant a cell's value proposition, which is a different thing at a different level.
 
 <!-- /generated:schema -->
+
+
+
+---
+
+<!-- reference: docs/engineering/operations -->
+
+# Automations Registry
+
+<!-- canonical per ADR-017 (docs/adr/) · disclosed reference: the Worker reads it through read_reference as `docs/engineering/operations`, the IDE opens it on demand · distilled 2026-07-07 from 📓 playbook §6, now superseded · applied by uno-maintain. -->
+
+THE standing-automation registry. An automation absent from the table below is undocumented by definition.
+
+## Rules
+
+- **Every automation that judges names its agent.** One that asks a model to judge with no agent named is unowned by definition. A deterministic automation — scripts, REST, diffs, an embedding call — may read `—` in the Agent column, and its Owner answers for it.
+- **An automation invokes a skill's method; it never embeds its own copy of the logic.** Migrate opportunistically as each is next touched.
+- **Every automation is a loop, and declares its loop mechanics.** Stop condition and issue caps go in its prompt adapter (`scripts/prompts/<name>/SKILL.md`); trigger cadence and the hard turn cap go in its workflow file. The procedure itself stays in the skill's method. Portable by construction: any model can execute the written loop, and harness loop primitives are optional accelerators. Pre-rule adapters (uno-implement, uno-implement-design) migrate as each is next touched. *(rule added 2026-07-16)*
+- **Every automation names where it runs and who pays.** Scheduled sweeps run as GitHub Actions cron → the claude-vertex composite action (`.github/actions/claude-vertex`) → Claude-on-Vertex, billed to the `hcii-plus` GCP project via the uno-bot service account (ADR-018 — the `GEMINI_SA_*` secret names are that same account, so rotating "the Gemini secrets" rotates every Claude cron too). Never a personal Anthropic seat. Model routed by difficulty per the bot's tier table: sonnet default · opus for reconciliation-grade judgment · haiku candidate for trivia. *(rule added 2026-07-16)*
+
+**The Worker's scheduled runs.** Two wrangler crons (`agents/uno-bot/wrangler.toml` `[triggers]`) start two runs each weekday: the **end-of-day run** at 00:00 ET, Tuesday to Saturday, dated to the workday that just ended, and the **morning run** at 09:00 ET, Monday to Friday. The handler only enqueues; the AgentRunner runs one job per alarm. `agents/uno-bot/src/scheduled/runs.ts` plans which job kinds each run holds, and `src/scheduled/jobs.ts` pairs each kind with its body. Every kind but `noop` (which proves the path and is planned in no run) is named in a row below. Rehearse a run with `GET /debug/sweep?dry_run=1`; it writes nothing.
+
+**Sweep intake transport** (labels, dedupe, caps, injection rule): `scripts/prompts/references/headless-intake.md` — one copy; every adapter points at it.
+
+
+| Automation | Trigger | Skill / method it runs | Agent | Implementation | Runs on · billed to | Owner | Status |
+|---|---|---|---|---|---|---|---|
+| Figma library sync | Worker scheduled runs: end of day `figma-library-poll`; morning `figma-library-post`, `figma-library-track`, then `figma-dev-links-pr` | uno-maintain (intake) | uno-bot | `agents/uno-bot/src/figma-poll.ts` → `src/figma-library/`: one `harness-intake` + one ✅-gated card in `#plus-universal` (details: `docs/connectors/figma.md`). Manual: `GET /debug/figma-poll`. Legacy: `scripts/poll-figma-library.js` | CF Worker · no model call — Figma REST diff → drafted intake → Slack card | Bill | ✅ live (on deploy) |
+| Figma snapshot refresh | each publish (the end-of-day `figma-snapshot-refresh` job's `repository_dispatch`, #898) or `workflow_dispatch` | uno-maintain (ds-fix) | Actions executes; a human reviews the PR | `figma-snapshot-refresh.yml` → `npm run snapshot:figma-components`; a change opens a draft PR (close and reopen it to run checks) | GHA · Figma REST, no model call | Bill | built |
+| Figma notifications | each comment on a subscribed team's file, delivered to `POST /figma/events` | — (queues the event; the drift re-check #897, comment decisions #900 read it, in `src/figma-comments/`) | uno-bot | `agents/uno-bot/src/figma-notify/`: passcode check, one job per event on the `figma/events` runner, KV notes as ids and times | CF Worker · no model call | Bill | built (live once subscribed, #895) |
+| Figma notification subscriptions | on demand (`workflow_dispatch` from `main`) | uno-maintain (cross-estate sync) | Actions executes; `create` waits for the `uno-bot-production` reviewer | `figma-subscriptions.yml` → `agents/uno-bot/scripts/figma-subscriptions.mjs`: `list`, `create` (only what is missing; stops at the first failure), `status` (each subscription's newest deliveries). Defaults: FILE_COMMENT and FILE_UPDATE on all six teams, the 12 of #896 | GHA · Figma REST, no model call | Bill | built |
+| Figma backstop | end-of-day run: three `figma-backstop` jobs | — (queues the change a missed notification would have queued) | — | `agents/uno-bot/src/figma-notify/backstop.ts`: lists every team's folders, cursor in KV `figma-notify:backstop` (details: `docs/connectors/figma.md`, the nightly backstop) | CF Worker · Figma REST, no model call | Bill | built |
+| End-of-day sweep | end-of-day run: `sweep-channel` (one per `SWEEP_CHANNELS` entry), `sweep-group-dms`, `sweep-dms`, `sweep-notes`, `sweep-cards`; morning run: `sweep-post` | uno-maintain (cross-estate sync) | uno-bot | `agents/uno-bot/src/sweep/`, `src/dm-sweep/`; instructions: `docs/connectors/slack-sweep.md` | CF Worker · Gemini on Vertex · GCP `hcii-plus` | Bill | ✅ live |
+| Figma comment decisions | end-of-day run: `sweep-figma-comments`; morning run: `sweep-figma-post` | uno-maintain (cross-estate sync) | uno-bot | `agents/uno-bot/src/figma-comments/`; instructions: `docs/connectors/slack-sweep.md` § Figma comment decisions | CF Worker · Figma REST + Gemini on Vertex · GCP `hcii-plus` | Bill | built |
+| Commitment reminders + card follow-ups | end-of-day run: `card-follow-through`; morning run: `commitment-nudge` | uno-maintain (cross-estate sync) | uno-bot | `agents/uno-bot/src/commitments/`, `src/follow-through/`; instructions: `docs/connectors/slack-sweep.md` § Commitment reminders, § Card follow-ups | CF Worker · Gemini on Vertex · GCP `hcii-plus` | Bill | ✅ live |
+| Figma drift asks | morning run: `figma-drift-post`; both runs: `figma-drift-recheck` | uno-maintain (intake) | uno-bot | `agents/uno-bot/src/figma-drift/`; instructions: `docs/connectors/slack-sweep.md` § Drift in a read-only file | CF Worker · Figma REST + Gemini on Vertex · GCP `hcii-plus` | Bill | built |
+| DS precedence check | Friday's end-of-day run: `ds-precedence-check`; morning run: `ds-precedence-post` | uno-maintain (intake) | — | `agents/uno-bot/src/ds-precedence/`; instructions: `docs/connectors/figma.md` (weekly, when nobody published) | CF Worker · Figma REST, no model call | Bill | built |
+| DM watch + DM Capture | per person who switched it on — end-of-day run: `dm-promise-read`, `dm-capture-read`; morning run: `dm-promise-nudge`, `dm-capture-post` | uno-maintain (cross-estate sync) | uno-bot | `agents/uno-bot/src/dm-watch/`, read with the person's own token (ADR-032, which is the instruction until a connector section exists) | CF Worker · Gemini on Vertex · GCP `hcii-plus` | Bill | built |
+| Usage record upkeep | end-of-day run: `usage-classify`, `ask-resolution`, `proposal-expiry`; morning run: `team-roles-sync`; both runs: `usage-text-purge` | — (measurement, ADR-030) | uno-bot (`usage-classify` labels asks; the rest are deterministic) | `agents/uno-bot/src/usage/`; instructions: `agents/uno-bot/README.md` (usage record) | CF Worker · D1 `uno-bot-usage`; one model call per classify batch, Gemini on Vertex · GCP `hcii-plus` | Bill | ✅ live |
+| Implement component | `repository_dispatch` from uno-bot confirm | uno-prototype (codegen) | uno-bot proposes; Actions executes | `figma-implement.yml` → `scripts/implement-figma-changes.js` + `scripts/prompts/uno-implement` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
+| Implement design | `repository_dispatch` from uno-bot confirm | uno-prototype (design → prototypes scaffold) | uno-bot proposes; Actions executes | `figma-implement-design.yml` + `scripts/prompts/uno-implement-design` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
+| Design QA trigger | Roadmap card → `Dev Status: Ready for QA (RTT)` | uno-review (Design QA checklist) | reviewers/design-qa | ❌ not built — no Notion webhook exists, so this becomes a daily status-poll cron on the sweep pattern below; still needs the `Design QA` status column (manual Notion setup) first | (planned) GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | — | planned 2026-07-07, unstarted |
+| Shipped watchdog | weekly cron (Wed 09:00 UTC) | uno-maintain (post-ship reconciliation, method §6) | reviewers/auditor | `shipped-watchdog.yml` → `scripts/prompts/uno-shipped-watchdog/SKILL.md` (intake transport: shared ref above) | GHA cron → claude-vertex (**opus** — judgment-heavy) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16) |
+| Weekly direct-fix digest | weekly cron (Mon 09:00 UTC) | uno-maintain (direct-fix digest, method §4) | reviewers/auditor composes → posted via the uno-bot Slack token to #plus-design | `weekly-direct-fix-digest.yml` → `scripts/prompts/uno-direct-fix-digest/SKILL.md` — reads `docs/evals/runs/digest.jsonl` (row shape: method §4), empty week posts nothing, sentinel-verified | GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16; posts sentinel-verified) |
+| Figma tidy-up | Monday's morning run: `figma-tidy-read` jobs, then `figma-tidy-post` | hygiene checklist (`docs/connectors/figma.md` § Agent duties) | uno-bot | `agents/uno-bot/src/figma-tidy/`: Review cards in #plus-design, or where `FIGMA_ASK_CHANNEL_ID` names | CF Worker · Figma REST, no model call | Bill | built |
+| Blueprint embeddings refresh | nightly cron (07:00 UTC) | uno-bot (semantic search freshness) | — | `uno-bot-embed-blueprint.yml` | GHA cron → Worker `/debug` route | Bill | ✅ live |
+| Harness gate | **every `pull_request`** + on demand | the deterministic guards, composed | — | `check-harness.yml` → `npm run check:harness` → `scripts/check-harness.mjs` (composition and the reason for each member live there; `--list` prints them). 34–38s, of which the composite is ~14s; one `npm ci` scoped to `agents/uno-bot` (~11s), which the Worker's `typecheck` and `test` rows need. Was ~40s until #587 moved the workerd conformance step out to its own job | GHA · no model call — deterministic scripts only | Bill | ✅ live (#155; the repo's first `pull_request` trigger) |
+| uno-bot Worker checks | **every `pull_request`** + on demand | the Worker's own typecheck, its unit suite and its Durable Object conformance suite | — | `uno-bot-checks.yml` — three jobs, `typecheck`, `tests` and `conformance`, so each failure reads apart in the PR's check list (#580, #587). The first two are also registry rows composed into `check:harness`, which is what keeps the pre-push command whole; `conformance` (`test:workerd`) is an `EXCLUDED` row instead, because it boots workerd and the fast gate is defended by staying seconds long. The deploy chain runs all three, so a direct push to `main` meets them. No secret, so a fork PR runs it | GHA · no model call — `tsc`, `node --test`, vitest on workerd | Bill | ✅ live (#580, #587) |
+| Storybook gate | **every `pull_request`** + on demand | the Storybook browser suite — 383 stories rendered in headless chromium, axe over each | — | `storybook-gate.yml` → `npm run check:storybook` → `scripts/check-storybook.mjs` (why it is a peer workflow of the harness gate rather than a member: `EXCLUDED` there). Play/render failures block; a11y is a **ratchet** against `docs/evals/a11y-baseline.json` | GHA · no model call — Playwright + axe | Bill | ✅ live (#169; baseline 146 stories / 15 rules, 2026-08-26) |
+| Conventions integrity sweep | monthly cron (1st, 09:00 UTC) | uno-maintain (integrity checklist: `staleness-sweep.md`) | reviewers/auditor | `harness-integrity-sweep.yml` → `scripts/prompts/uno-integrity-sweep/SKILL.md` (intake transport: shared ref above) | GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16 — filed intakes #71/#72); the pilot for the sweep pattern |
+| Notion comment sweep | each flow run touching a page + monthly | uno-maintain (unresolved threads → incorporate or intake) | writers/notion | ❌ not built — follow the integrity-sweep pattern (Notion via `NOTION_API_KEY`) | (planned) GHA cron → claude-vertex · GCP `hcii-plus` | — | planned 2026-07-07, unstarted |
+| Eval run logging | every flow exit | rubric scoring → run entry | reviewers/rubric-applier | interim: `docs/evals/runs/*.jsonl`; target: Notion Eval Runs DB | in-session (whatever harness ran the flow) | — | planned 2026-07-07, unstarted |
 
 
 

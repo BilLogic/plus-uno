@@ -17,7 +17,7 @@ The only agent that writes to Notion. Owns hub golden sections (New Project temp
 - `skills/uno-maintain` — doc fixes, comment-sweep incorporation
 - `skills/uno-research` — study guide + research notes
 - `agents/uno-bot` — the `notion_create` / `notion_update` tools (the Worker tool embodies this role)
-- Automations (live): Figma library sync (DS-component PRD creation) · marketplace add/edit entries (`docs/engineering/operations.md`)
+- Automation (live): Figma library sync (DS-component PRD creation) (`docs/engineering/operations.md`)
 - Automation: Notion comment sweep (`docs/engineering/operations.md` — planned)
 
 ## Workflow
