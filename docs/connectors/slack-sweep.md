@@ -25,12 +25,14 @@ The **sweep** is uno-bot's end-of-day read of the design channels for **drift**:
 
 ## Where a card goes
 
-Every proactive job sends a finding to the first rung that fits (`pickDestination`):
+Every scheduled action sends a finding to the first rung that fits (the posting ladder, `agents/uno-bot/src/destination/`):
 
 1. Evidence in a private channel, a group DM or a DM → that place only.
 2. Evidence in a Slack thread → **that thread**.
-3. A design-system target (the Figma library, `design-system/` code, Storybook, a `Universal`-pillar card) → #plus-universal.
-4. Anything else → #plus-design.
+3. The team's channel, by the pillar → channel map (`docs/connectors/slack.md`). The team is the linked Roadmap card's `Product Pillar`, else the Figma file's team; the card wins when they disagree. The library file is the Universal team's, and `design-system/` code and Storybook take the library's team.
+4. No team, or a pillar with no channel (Tutoring, Help Center) → #plus-design.
+
+The card's design owner is tagged. With no card, the Figma file's creator is named by handle, untagged.
 
 #uno-bot is off the ladder, and so is defaulting to the lead. A finding reaches only people who could already see its evidence (ADR-031):
 
@@ -59,7 +61,7 @@ Every proactive job sends a finding to the first rung that fits (`pickDestinatio
 ## Answers and decisions no page holds yet
 
 - **An answer given only in chat (C3):** a thread asks a question, someone answers it, and no page it links or a search finds states that answer. The card goes in that thread, mentions whoever answered, and proposes the exact page, the section and the line: "add under *Tutor Training PRD › Session setup*: 'Ratio is 1 tutor to 4–5 students.'" When no section fits, it opens a new section at the end of the closest page. Its Approve writes the line after the section's last block, stamped like a replace: if that block has moved since the read, nothing is written. It is always a fix in a sweep report, and it files no intake and no ticket.
-- **A decision in a note or on a card (C4):** a running note, or a card's comment or edit, records a decision a page still states the old way. It has no thread, so the card goes by its target: #plus-universal for a design-system target (a `Universal`-pillar card), #plus-design for anything else. The owner is the target card's `Contributor`, then the note's takers or the card's own Contributors. Those people can decide. The fix's Review links the note block or the card it came from.
+- **A decision in a note or on a card (C4):** a running note, or a card's comment or edit, records a decision a page still states the old way. It has no thread, so the card goes by its target: the target card's team channel (rung 3), else #plus-design. The owner is the target card's `Contributor`, then the note's takers or the card's own Contributors. Those people can decide. The fix's Review links the note block or the card it came from.
 - **Discussion is not a decision:** options weighed, a question, a proposal or a to-do in a note produces nothing.
 
 ## Deciding, and replies in the thread
@@ -121,7 +123,7 @@ Three more follow-ups ride the commitments' schedule and limits: the same end-of
 - **F4, an active card with no owner.** A card in WIP or Under Review with an empty Contributor and no edit for 7 days; a card waiting in Need PRD / Under Playground or Ready for Design is queued work, and is passed over. Its card mentions the card's creator. Review offers Assign (the creator becomes its Contributor) or Leave it (nobody is set, and it is not asked about again until the card changes). Another owner is set on the card itself. A creator with no Notion match gets no card that morning; the follow-up is checked again the next, and lapses after three such mornings like any hold. The follow-up closes once the card shows a Contributor; one nobody answers is open for its follow-up. Cards uno-bot's own integration created are passed over.
 - **F5, a stuck card.** An active card with a Contributor, unedited and uncommented for 3 weeks. Its card mentions the Contributors, with two buttons, Review and Open card. Review offers Done (moves it to the Design Status in its select, the board's next status after its own by default), Still on it (nothing is written, and it is checked again 3 weeks from that card, at most twice, as a promise's ⏳; the card says the date) and Drop it (archived).
 - **Who answers:** anyone. A card is the team's, so whoever knows where it stands decides it in Review.
-- **Where:** a thread's to-do is answered in that thread; a card or a note has none, so a Universal-pillar card goes to #plus-universal and anything else to #plus-design, at most two new card questions a channel each morning; the rest wait for the next. Every follow-up is a Slack post outside #uno-bot, mentioning the owner; with no owner found in Slack, nothing is posted.
+- **Where:** a thread's to-do is answered in that thread; a card has none, so it goes to its pillar's team channel (rung 3), and a note's to-do and a card with no mapped pillar to #plus-design, at most two new card questions a channel each morning; the rest wait for the next. Every follow-up is a Slack post outside #uno-bot, mentioning the owner; with no owner found in Slack, nothing is posted.
 - **Replies:** a follow-up at a channel's top starts uno-bot's own thread, so any reply there engages uno-bot, @mention or not. One posted into a to-do's thread marks it as a sweep card does, and that thread stays the team's.
 - **Posted before the shared card:** a follow-up that went up with buttons (Draft it, Drop it; Done, Still on it, Drop it) or asked for a typed owner or Design Status keeps those answers until it closes. Anyone's tap counts; a reaction counts only from someone it mentioned. Its thread carries a KV mark while it waits for a typed reply, so a short reply anywhere else costs no database read. Once its follow-up goes up on the shared card, the old message's buttons and reactions answer nothing and say to press Review on the card.
 - **A stopped morning:** follow-ups held for the morning's post and not yet posted when the run stops for its budget go back to due, so the retry posts them.
