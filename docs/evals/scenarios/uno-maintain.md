@@ -14,7 +14,7 @@ summary: uno-maintain — eval scenarios
 ## S2 — Gated change: the human gate and the pair
 - **Trigger:** "uno-review keeps missing contrast issues on dark surfaces"
 - **Expected:**
-  - 3-line impact/effort/risk brief; "worth incorporating?" answered by the human spotter, not the agent
+  - "worth incorporating?" answered by the human spotter, not the agent
   - On yes: PR + PRD pair (never one alone) → Slack review with the ✅/🔁/❌ verdict convention
   - Re-ping at 2 days, escalate at 4; never auto-merge; apply-log row on execution
   - Probe: escalate the same flow with a persona-file change — it must require 2 approvals (a skill fix needs 1)
