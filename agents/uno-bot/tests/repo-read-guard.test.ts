@@ -18,7 +18,7 @@ import { isWithheldRepoPath, WITHHELD_NOTE } from "../src/integrations/repo-read
 describe("the eval corpus is withheld from the bot", () => {
   it("withholds the answer key and the cases beside it", () => {
     for (const path of [
-      "docs/evals/fixtures/uno-bot-cases.json",
+      "docs/evals/fixtures/sweep-drift-cases.json",
       "docs/evals/fixtures/uno-prototype-seeds/seed-1-lowfi.md",
       "docs/evals/rubrics/uno-bot.md",
       "docs/evals/runs/2026-08-02-cursor-scenario-map/README.md",
@@ -32,12 +32,12 @@ describe("the eval corpus is withheld from the bot", () => {
     // `blob/<ref>/` form matters most: it is how a github.com URL names a
     // HISTORICAL read, which is the route encryption never closed.
     for (const path of [
-      "/docs/evals/fixtures/uno-bot-cases.json",
-      "./docs/evals/fixtures/uno-bot-cases.json",
-      "docs//evals//fixtures/uno-bot-cases.json",
-      "https://github.com/BilLogic/plus-uno/blob/main/docs/evals/fixtures/uno-bot-cases.json",
-      "https://github.com/BilLogic/plus-uno/blob/02776be3/docs/evals/fixtures/uno-bot-cases.json",
-      "https://raw.githubusercontent.com/BilLogic/plus-uno/02776be3/docs/evals/fixtures/uno-bot-cases.json",
+      "/docs/evals/fixtures/sweep-drift-cases.json",
+      "./docs/evals/fixtures/sweep-drift-cases.json",
+      "docs//evals//fixtures/sweep-drift-cases.json",
+      "https://github.com/BilLogic/plus-uno/blob/main/docs/evals/fixtures/sweep-drift-cases.json",
+      "https://github.com/BilLogic/plus-uno/blob/02776be3/docs/evals/fixtures/sweep-drift-cases.json",
+      "https://raw.githubusercontent.com/BilLogic/plus-uno/02776be3/docs/evals/fixtures/sweep-drift-cases.json",
     ]) {
       assert.equal(isWithheldRepoPath(path), true, path);
     }
@@ -62,7 +62,7 @@ describe("the eval corpus is withheld from the bot", () => {
   it("a path that merely mentions the words is not the corpus", () => {
     assert.equal(isWithheldRepoPath("docs/evaluation/notes.md"), false);
     assert.equal(isWithheldRepoPath("src/docs-evals-helper.ts"), false);
-    assert.equal(isWithheldRepoPath("agents/uno-bot/scripts/run-evals.mjs"), false);
+    assert.equal(isWithheldRepoPath("agents/uno-bot/scripts/evals.mjs"), false);
   });
 
   it("empty and malformed input is not withheld", () => {
@@ -74,10 +74,8 @@ describe("the eval corpus is withheld from the bot", () => {
   });
 
   it("covers every file that actually sits in the eval corpus today", () => {
-    // The pairing rule lives in scripts/eval-fixture.test.mjs, which is plain
-    // .mjs and cannot import this module. This is the other half: the answer
-    // keys are kept in PLAIN TEXT, and the only thing making that safe is the
-    // guard. If it ever stops covering the directory, this goes red before the
+    // The answer keys are kept in PLAIN TEXT, and the only thing making that
+    // safe is the guard. If it ever stops covering the directory, this goes red before the
     // rubric goes readable to the thing being graded.
     // Resolved from the working directory, not import.meta: the test build is
     // CommonJS, and `npm test` runs at agents/uno-bot. Same convention as
@@ -88,7 +86,7 @@ describe("the eval corpus is withheld from the bot", () => {
     for (const name of names) {
       assert.equal(isWithheldRepoPath(`${seeds}/${name}`), true, name);
     }
-    assert.equal(isWithheldRepoPath("docs/evals/fixtures/uno-bot-cases.json"), true);
+    assert.equal(isWithheldRepoPath("docs/evals/fixtures/sweep-drift-cases.json"), true);
   });
 
   it("the refusal names its cause and a route, per AGENT.md § My lane", () => {

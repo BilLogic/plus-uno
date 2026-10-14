@@ -39,7 +39,7 @@ Fix the harness, not project design work. The shared procedure — taxonomy, sev
 2. **Draft the fix** (method §2), fix-first judge-second:
    - Repo targets (context docs, skills, persona, DS source, bot) — edit files directly in a branch. DS-source and Figma↔DS reconcile targets: execution runbook [`references/ds-fix.md`](references/ds-fix.md) (who executes what · workflows · script inventory).
    - Notion writes → `writers/notion` · Figma writes → `writers/figma` · requirement changes → `writers/blueprint` (paired PRD+blueprint, never one alone) · blueprint-stale-vs-reality (no requirement doc) → `writers/blueprint` solo, PRD only when one exists for the flow.
-3. **Human gate** (method §3): present the 3-line impact / effort / risk brief; the spotter answers. Never answer it yourself.
+3. **Human gate** (method §3): put the drafted fix to the spotter as *worth incorporating?*; the spotter answers. Never answer it yourself.
 4. **Classify severity and apply** (method §4–5):
    - **Direct fix** (whitelist absolute): apply, then add the one-line row for the weekly digest.
    - **Gated change**: open the PR (git), pair the PRD (`writers/notion`), post the review request, wait for the ✅/🔁/❌ verdict. On ✅: merge/apply and write the apply-log row. Never auto-merge.

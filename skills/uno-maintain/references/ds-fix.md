@@ -49,7 +49,7 @@ How to draft a design-system fix once the intake routes there. Harness maintenan
 
 ## The draft package
 
-The drafted fix is what the spotter judges (method §3). Summarize it concretely — this detail backs the three-line impact / effort / risk brief:
+The drafted fix is what the spotter judges (method §3). Summarize it concretely:
 
 ```text
 Current state:   {what is wrong, with the evidence link}

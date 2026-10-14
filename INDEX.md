@@ -207,7 +207,6 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/evals/rubrics/uno-research.md`](docs/evals/rubrics/uno-research.md) | Scores the research skill's outputs |
 | [`docs/evals/rubrics/uno-review.md`](docs/evals/rubrics/uno-review.md) | The core eval is the golden defect set: recall says the lenses see enough, precision says they don't cry wolf, stage-appropriateness says each lens stays in its lane |
 | [`docs/evals/rubrics/uno-synthesize.md`](docs/evals/rubrics/uno-synthesize.md) | Scores synthesis outputs |
-| [`docs/evals/scenarios/uno-bot.md`](docs/evals/scenarios/uno-bot.md) | uno-bot — regression scenarios |
 | [`docs/evals/scenarios/uno-maintain.md`](docs/evals/scenarios/uno-maintain.md) | uno-maintain — eval scenarios |
 | [`docs/evals/scenarios/uno-prototype.md`](docs/evals/scenarios/uno-prototype.md) | uno-prototype — eval scenarios |
 | [`docs/evals/scenarios/uno-publish.md`](docs/evals/scenarios/uno-publish.md) | uno-publish — eval scenarios |
@@ -217,6 +216,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-146 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+145 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 raw eval data are deliberately not indexed — they record what happened rather
 than telling you what to do.

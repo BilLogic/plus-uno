@@ -153,13 +153,6 @@ jobs:
         working-directory: agents/uno-bot
         run: npm run test:bundle
 
-      # The eval suite through the local transport used to be spelled out here,
-      # as its own step, while `npm run check:harness` did not run it — the
-      # same local-is-a-subset-of-remote gap `test:bundle`'s registry row
-      # records paying for. It is a composed row now (`evals:local`), so the
-      # composite above runs it and this file no longer restates it. Its
-      # reasons live with the row, per the rule at the top of this file.
-
       # The ThreadState conformance suite under workerd used to be spelled out
       # here too, from #493 until #587. It is still uncomposed — a runtime in
       # this gate is what the header above refuses — but it is a registry row

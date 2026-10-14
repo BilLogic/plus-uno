@@ -62,7 +62,7 @@ the no-op test is judgement and lives here.
 
 ## 3 · The human gate — "worth incorporating?"
 
-Answered by the **spotter** (fallback: the designated maintainer) — never by the agent. Present the drafted fix with a **three-line brief: impact / effort / risk**.
+Answered by the **spotter** (fallback: the designated maintainer) — never by the agent. Present the drafted fix and ask it.
 
 - **No** → end: no change needed. Discard the draft; keep the intake card trail.
 - **Yes** → classify its severity (§4).

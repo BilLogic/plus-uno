@@ -189,7 +189,7 @@ test("every exception carries a reason, so the list cannot grow silently", () =>
 });
 
 test("a gitignored artifact is not a finding — it is not part of the repo", () => {
-  // `npm run evals` writes eval-results.json to the root, and it records the
+  // The eval runner used to write eval-results.json to the root, recording the
   // WORKER_URL it hit. Walking the working copy flagged it on the one machine
   // that had run evals, and nowhere else.
   const root = mkdtempSync(path.join(tmpdir(), "worker-host-git-"));
@@ -209,9 +209,9 @@ test("a gitignored artifact is not a finding — it is not part of the repo", ()
 
 test("--host asks about a FOREIGN host, and ALLOWED does not apply there", () => {
   // The cutover audit. ALLOWED exempts the files that may hold the CURRENT host;
-  // those same files — wrangler.toml, both Slack manifests, both workflow
-  // fallbacks — are exactly what a move has to rewrite. Exempting them here
-  // would report the move complete with five files pointing at a dead account.
+  // those same files — wrangler.toml and both Slack manifests — are exactly
+  // what a move has to rewrite. Exempting them here would report the move
+  // complete with three files pointing at a dead account.
   const OLD = "uno-bot.old-account.workers.dev";
   withRepo("agents/uno-bot/wrangler.toml", `redirect = "https://${OLD}/slack/oauth"\n`, (root) => {
     assert.deepEqual(findStrays(root, OLD), ["agents/uno-bot/wrangler.toml"]);

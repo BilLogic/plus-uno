@@ -7,7 +7,7 @@
 // read therefore names every DM worth sweeping and its person, however many
 // DMs uno-bot has — and lists nothing Slack would need `im:read` to list. A
 // DM nobody asked anything in since has nothing uno-bot answered, so nothing
-// the DM sweep looks for. Test traffic (the eval route, the test channels) is
+// the DM sweep looks for. Test traffic (debug routes, the test channels) is
 // left out.
 //
 // PURE of `Env`: the database is handed in, typed as the one call made here,
