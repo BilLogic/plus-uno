@@ -57,6 +57,8 @@ const HOUR = 3_600_000;
 // t14's event did not say its conversation type.
 //
 // t9 filed https://github.com/BilLogic/plus-uno/issues/901 on the bot itself.
+// Thanks typed as a message: t15 and t12, both greetings and so test traffic,
+// and the eval turn, which never counts.
 // Outside it: t0 (B, Jul 20), t99 (A, Mon 17) and the test traffic — t5 (a
 // sandbox ask that looks like a perfect answer), t12 and t15 (greetings the
 // model only reacted to) and an eval turn.
@@ -81,6 +83,8 @@ interface TurnSeed {
   card?: string | null;
   ticket?: string | null;
   test?: 0 | 1;
+  /** The asker's message thanked the bot (turns.thanks). */
+  thanks?: 1;
 }
 
 const TURNS: TurnSeed[] = [
@@ -96,13 +100,13 @@ const TURNS: TurnSeed[] = [
   { id: "C1:t9", who: "UA", at: T(11, 10), wait: 240_000, pain: 7, lead: 0, resolution: "task_completed", cost: 0.02, card: "P8", disposition: "staged", ticket: "https://github.com/BilLogic/plus-uno/issues/901" },
   { id: "C1:t10", who: "UA", at: T(12, 10), wait: 25 * HOUR, pain: 1, subType: "Artifact location", lead: 1, cost: 0.02 },
   { id: "C1:t11", who: "UA", at: T(13, 10), wait: HOUR, pain: 6, subType: "Design judgment", lead: 1, cost: 0.04 },
-  { id: "C1:t12", who: "UA", at: T(14, 9), wait: 2_000, tier: "chill", disposition: "reacted", tools: ["slack_react"], cost: 0.001, test: 1 },
+  { id: "C1:t12", who: "UA", at: T(14, 9), wait: 2_000, tier: "chill", disposition: "reacted", tools: ["slack_react"], cost: 0.001, test: 1, thanks: 1 },
   { id: "C1:t13", who: "UA", at: T(14, 15), wait: 20_000, pain: 7, lead: 0, resolution: "none", cost: 0.01, card: "P3", disposition: "staged" },
   { id: "C1:t14", who: "UD", at: T(12, 11), wait: null, pain: 4, subType: "Access request", lead: 0, resolution: "none", cost: 0, disposition: "failed", conversationType: null },
   { id: "C1:f1", who: "UA", at: T(4, 10, 30), wait: 60_000, inThread: 1, classifiedAt: T(5, 0), lead: 1, cost: 0.01 },
   { id: "C1:r1", who: "UB", at: T(12, 15), wait: 10_000, inThread: 1, pain: 7, lead: 0, resolution: "reaction", cost: 0.01, card: "P6r", disposition: "staged" },
-  { id: "C1:t15", who: "UE", at: T(7, 9), wait: 3_000, disposition: "reacted", tools: ["slack_react", "source_read"], cost: 0.02, test: 1 },
-  { id: "C1:1.0@1786442400000", who: "UA", at: T(7, 10), wait: 1_000, tier: "chill", disposition: "reacted", tools: [], cost: 0, test: 1 },
+  { id: "C1:t15", who: "UE", at: T(7, 9), wait: 3_000, disposition: "reacted", tools: ["slack_react", "source_read"], cost: 0.02, test: 1, thanks: 1 },
+  { id: "C1:1.0@1786442400000", who: "UA", at: T(7, 10), wait: 1_000, tier: "chill", disposition: "reacted", tools: [], cost: 0, test: 1, thanks: 1 },
   { id: "C1:t99", who: "UA", at: T(17, 10), wait: 1, pain: 6, subType: "Design judgment", lead: 1, cost: 1 },
 ];
 
@@ -118,7 +122,8 @@ const TURNS: TurnSeed[] = [
 //   P2  a Reconcile card (the worker, an intake): staged 14:00, ✅ 16:00.
 //   P5  a Capture card (the worker, a Notion edit): staged, then aged out.
 //   P6  a Capture card revised by r1's "drop 2": P6r stages through a turn
-//       (via 'turn') with P6 as its origin, and is ✅ by someone else.
+//       (via 'turn') with P6 as its origin and as the card it revises, and
+//       is ✅ by someone else.
 //   P9  a Capture share card (the worker, sweep_share_post), ✅ — not Reconcile.
 const EVENTS: Record<string, unknown>[] = [
   { proposal_id: "P1", event: "staged", at: T(6, 14, 1), via: "turn", turn_id: "C1:t7", requester_id: "UA", tools: '["notion_update"]', ttl_ms: HOUR, thread_started_at: T(6, 13), ticket_url: "https://github.com/BilLogic/plus-uno/issues/902" },
@@ -140,7 +145,7 @@ const EVENTS: Record<string, unknown>[] = [
   { proposal_id: "P5", event: "expired", at: T(14, 14), via: "end-of-day" },
   { proposal_id: "P6", event: "staged", at: T(12, 14), via: "worker", tools: '["notion_update"]', ttl_ms: 72 * HOUR },
   { proposal_id: "P6", event: "superseded", at: T(12, 15, 1), via: "revision" },
-  { proposal_id: "P6r", event: "staged", at: T(12, 15, 1), via: "turn", origin_proposal_id: "P6", turn_id: "C1:r1", requester_id: "UB", tools: '["notion_update"]', ttl_ms: 71 * HOUR, thread_started_at: T(12, 14) },
+  { proposal_id: "P6r", event: "staged", at: T(12, 15, 1), via: "turn", origin_proposal_id: "P6", revises_proposal_id: "P6", turn_id: "C1:r1", requester_id: "UB", tools: '["notion_update"]', ttl_ms: 71 * HOUR, thread_started_at: T(12, 14) },
   { proposal_id: "P6r", event: "confirmed", at: T(12, 16), via: "reaction", actor_id: "UA", confirmed_by_other: 1 },
   { proposal_id: "P9", event: "staged", at: T(12, 15, 30), via: "worker", tools: '["sweep_share_post"]', ttl_ms: 72 * HOUR },
   { proposal_id: "P9", event: "confirmed", at: T(12, 17), via: "reaction", actor_id: "UA" },
@@ -187,6 +192,15 @@ e,2025-02-05T10:00:00Z,2025-02-06T16:00:00Z,1
 f,2025-02-05T11:00:00Z,,0
 `;
 
+// Thanks reactions (appreciation): UA's 🙏 and 🐐 on one answer, one thanks;
+// UB's 👏 on another; UC's ❤️ in July, outside the window.
+const APPRECIATION: Record<string, unknown>[] = [
+  { channel: "C1", item_ts: "1786010000.000100", user_id: "UA", emoji: "pray", at: T(4, 11), turn_id: "C1:t2" },
+  { channel: "C1", item_ts: "1786010000.000100", user_id: "UA", emoji: "goat", at: T(4, 11, 5), turn_id: "C1:t2" },
+  { channel: "C1", item_ts: "1786700000.000100", user_id: "UB", emoji: "clap", at: T(12, 16) },
+  { channel: "D1", item_ts: "1784500000.000100", user_id: "UC", emoji: "heart", at: Date.UTC(2026, 6, 21, 10), conversation_type: "im" },
+];
+
 // GitHub's own export shape (`gh issue list --json url,closedAt`).
 const CLOSURES = [
   { url: "https://github.com/BilLogic/plus-uno/issues/901", closedAt: "2026-08-13T10:00:00Z" },
@@ -232,8 +246,10 @@ async function seed() {
       classified_at: t.classifiedAt ?? (t.pain === undefined || t.pain === null ? null : t.at + 12 * HOUR),
       escalated_to_lead: t.lead === undefined ? null : t.lead,
       resolution: t.resolution ?? null,
+      thanks: t.thanks ?? 0,
     });
   }
+  for (const a of APPRECIATION) await insert("appreciation", a);
   for (const e of EVENTS) await insert("proposal_events", { test_traffic: 0, ...e });
   for (const s of SWEEP_ITEMS) {
     await insert("sweep_items", {
@@ -268,10 +284,11 @@ const INPUTS = {
 };
 
 /** A query file's rows over the seed's two weeks. */
-async function run(name: string, window = true): Promise<Record<string, unknown>[]> {
+async function run(name: string, window: boolean | { from: string; to: string } = true): Promise<Record<string, unknown>[]> {
   const sql = bindings.METRIC_QUERIES[name];
   if (!sql) throw new Error(`no query file queries/usage/${name}.sql`);
-  const rendered = renderMetricQuery(sql, window ? { from: "2026-08-03", to: "2026-08-17", inputs: INPUTS } : { inputs: INPUTS });
+  const dates = window === true ? { from: "2026-08-03", to: "2026-08-17" } : window || {};
+  const rendered = renderMetricQuery(sql, { ...dates, inputs: INPUTS });
   return (await bindings.USAGE_DB.prepare(rendered).all<Record<string, unknown>>()).results;
 }
 
@@ -295,10 +312,11 @@ describe("metric queries on the seed", () => {
     // correct: t1 1 m, t9 4 m, t2 10 m, t11 1 h — the median is the 2nd of 4,
     // the p90 the 4th. Ungraded: r1 10 s, t13 20 s, t8 45 s, f1 1 m, t4 2 m,
     // t6 5 m, t10 25 h — the 4th and the 7th of 7. t3 (graded wrong) is in
-    // neither; t5 (test) and t99 (after) nowhere.
+    // neither; t5 (test) and t99 (after) nowhere. t14 failed before any
+    // answer: it has no wait, and shows as the one unanswered ask.
     expect(await run("responsiveness")).toEqual([
-      { cohort: "correct", answers: 4, median_ms: 240_000, p90_ms: HOUR, next_day_share: 0 },
-      { cohort: "ungraded", answers: 7, median_ms: 60_000, p90_ms: 25 * HOUR, next_day_share: 0.1429 },
+      { cohort: "correct", answers: 4, median_ms: 240_000, p90_ms: HOUR, next_day_share: 0, unanswered: 1 },
+      { cohort: "ungraded", answers: 7, median_ms: 60_000, p90_ms: 25 * HOUR, next_day_share: 0.1429, unanswered: 1 },
     ]);
   });
 
@@ -315,10 +333,68 @@ describe("metric queries on the seed", () => {
   metric("load-on-lead", async () => {
     // Four asks reached the lead over ten weekdays. f1, a follow-up in t2's
     // thread, is a fifth turn but not a fifth ask.
+    // Twelve asks reached the bot: judgment t2 t4 t11; unlabelled t6 (a DM
+    // not yet labelled); housekeeping the other eight. Turns add f1
+    // (classified blank: unlabelled) and r1 (a staged revision: 7).
     expect(await run("load-on-lead")).toEqual([
-      { unit: "ask", reaching_lead: 4, workdays: 10, per_workday: 0.4, lead_unknown: 1 },
-      { unit: "turn", reaching_lead: 5, workdays: 10, per_workday: 0.5, lead_unknown: 1 },
+      { unit: "ask", reaching_lead: 4, workdays: 10, per_workday: 0.4, lead_unknown: 1, asks_to_bot: 12, asks_to_bot_per_workday: 1.2, housekeeping: 8, judgment: 3, unlabelled: 1 },
+      { unit: "turn", reaching_lead: 5, workdays: 10, per_workday: 0.5, lead_unknown: 1, asks_to_bot: 14, asks_to_bot_per_workday: 1.4, housekeeping: 9, judgment: 3, unlabelled: 2 },
     ]);
+  });
+
+  metric("adoption", async () => {
+    // Read over July and August, so a third week shows. Askers: A, B, C, D —
+    // and the lead, whose ask is added for this case and never counted. A
+    // asked in the weeks of 08-03, 08-10 and 08-17 (t99): a regular. B asked
+    // in July and 08-03 (r1 is a reply): two weeks. C and D one each.
+    await insert("turns", {
+      turn_id: "C1:lead1", build: "test", requester_id: "U03FYQJRQHX", surface: "channel", in_thread: 0, channel_id: "C1",
+      ask_ts: "1", asked_at: T(5, 12), tier: "default", route_reason: "default-tier", disposition: "answered", test_traffic: 0,
+    });
+    try {
+      expect(await run("adoption", { from: "2026-07-01", to: "2026-09-01" })).toEqual([
+        { period: "window", askers: 4, regular_askers: 1 },
+        { period: "2026-07-20", askers: 1, regular_askers: null },
+        { period: "2026-08-03", askers: 3, regular_askers: null },
+        { period: "2026-08-10", askers: 2, regular_askers: null },
+        { period: "2026-08-17", askers: 1, regular_askers: null },
+      ]);
+    } finally {
+      await bindings.USAGE_DB.prepare("DELETE FROM turns WHERE turn_id = 'C1:lead1'").run();
+    }
+  });
+
+  metric("proposal-outcomes", async () => {
+    // Cards, counted as the last of each chain: P1r (P1 re-staged), P8, P2
+    // and P9 approved; P6r — r1's "drop 2" of P6 — approved with edits; P3
+    // rejected; P5 expired. P7's revision is not in the seed, so P7 is
+    // nowhere; P4 is test traffic. P1r's refused write is still a ✅.
+    // Fixes carded in the window: f1 confirmed, f2 refused stale (f3 was
+    // never carded). Reminders (the seed's thread promises): k1 done, k4 not
+    // a promise, k2 and k3 never answered. Added for this case: a card
+    // follow-up snoozed and one still nudged; a DM follow-up that lapsed.
+    const extra = [
+      { commitment_id: "C1:x1", kind: "card_todo", run_date: "2026-08-11", state: "snoozed" },
+      { commitment_id: "C1:x2", kind: "card_stale", run_date: "2026-08-12", state: "nudged" },
+      { commitment_id: "D1:x3", kind: "dm_unanswered", run_date: "2026-08-12", state: "lapsed", channel_id: "D1", channel_kind: "dm" },
+    ];
+    for (const c of extra) {
+      await insert("commitments", {
+        channel_id: "C1", thread_ts: "1.1", message_ts: "1.2", promiser_id: "UA", due_at: T(14, 10),
+        confidence: 0.9, promised_at: T(11, 10), detected_at: T(11, 10), ...c,
+      });
+    }
+    try {
+      expect(await run("proposal-outcomes")).toEqual([
+        { kind: "card", approved: 4, approved_with_edits: 1, rejected: 1, refused: null, expired: 1, still_live: 0, total: 7 },
+        { kind: "upkeep_fix", approved: 1, approved_with_edits: null, rejected: 0, refused: 1, expired: 0, still_live: 0, total: 2 },
+        { kind: "reminders", approved: 1, approved_with_edits: null, rejected: 1, refused: null, expired: 2, still_live: 0, total: 4 },
+        { kind: "card follow-ups", approved: 1, approved_with_edits: null, rejected: 0, refused: null, expired: 0, still_live: 1, total: 2 },
+        { kind: "dm follow-ups", approved: 0, approved_with_edits: null, rejected: 0, refused: null, expired: 1, still_live: 0, total: 1 },
+      ]);
+    } finally {
+      await bindings.USAGE_DB.prepare("DELETE FROM commitments WHERE commitment_id IN ('C1:x1', 'C1:x2', 'D1:x3')").run();
+    }
   });
 
   // ── supporting ──
@@ -375,6 +451,44 @@ describe("metric queries on the seed", () => {
       { week_of: "2026-08-03", askers: 3, returning_askers: 1, asks: 6, asks_per_asker: 2, heavy_users: 0, dm_asks: 1, channel_asks: 5, unknown_asks: 0, turns: 7 },
       { week_of: "2026-08-10", askers: 2, returning_askers: 1, asks: 6, asks_per_asker: 3, heavy_users: 1, dm_asks: 0, channel_asks: 5, unknown_asks: 1, turns: 7 },
     ]);
+  });
+
+  metric("appreciation-weekly", async () => {
+    // Week of 08-03: UA's 🙏 and 🐐 on one answer are one thanks; t15's
+    // message, a greeting, is a thanks reply all the same. Week of 08-10: UB's
+    // 👏, and t12's. The eval turn's thanks and UC's July ❤️ are not counted.
+    expect(await run("appreciation-weekly")).toEqual([
+      { week_of: "2026-08-03", thanks_reactions: 1, thanks_replies: 1, total: 2 },
+      { week_of: "2026-08-10", thanks_reactions: 1, thanks_replies: 1, total: 2 },
+    ]);
+  });
+
+  metric("sample-answers", async () => {
+    // Real asks answered with an answer: not the cards (t7 t8 t9 t13), the
+    // failure (t14), the replies (f1 r1) or test traffic. t6 is a DM. Added
+    // for this case: a group DM reached by @mention, stored with no type and
+    // a C… id like a channel's — it may be private, so it needs permission.
+    await insert("turns", {
+      turn_id: "C9MPIM:g1", build: "test", requester_id: "UB", surface: "channel", in_thread: 0, channel_id: "C9MPIM",
+      conversation_type: null, ask_ts: "1786100000", asked_at: T(7, 12), tier: "default", route_reason: "default-tier",
+      disposition: "answered", test_traffic: 0,
+    });
+    try {
+      const rows = await run("sample-answers");
+      expect(rows.map((r) => [r.turn_id, r.channel, r.surface, r.needs_permission])).toEqual([
+        ["C1:t1", "C1", "channel", 0],
+        ["C1:t2", "C1", "channel", 0],
+        ["C1:t3", "C1", "channel", 0],
+        ["C1:t4", "C1", "channel", 0],
+        ["D1:t6", "D1", "assistant", 1],
+        ["C9MPIM:g1", "C9MPIM", "channel", 1],
+        ["C1:t10", "C1", "channel", 0],
+        ["C1:t11", "C1", "channel", 0],
+      ]);
+      expect(rows[0]!.ask_ts).toBe(String(T(3, 10) / 1000));
+    } finally {
+      await bindings.USAGE_DB.prepare("DELETE FROM turns WHERE turn_id = 'C9MPIM:g1'").run();
+    }
   });
 
   metric("answer-accuracy", async () => {

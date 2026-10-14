@@ -58,6 +58,7 @@ export function turnRecord(over: Partial<TurnRecord> = {}): TurnRecord {
     subType: null,
     painCategory: 7,
     classifiedAt: null,
+    thanks: true,
     ...over,
   };
 }
@@ -109,6 +110,7 @@ export function runUsageLogConformance(
       subType: null,
       painCategory: null,
       classifiedAt: null,
+      thanks: false,
     });
     await log.record(turn);
     assert.deepEqual(await log.get(turn.turnId), turn);
