@@ -31,7 +31,7 @@ mode this automation exists to prevent.
 2. **Zero rows → post nothing.** Emit the `NO_DIRECT_FIXES_THIS_WEEK`
    sentinel (step 5) and stop. An empty digest posted anyway trains people to
    ignore the real ones.
-3. Read `docs/connectors/slack.md` and follow its mrkdwn + writing-style
+3. Read `docs/connectors/slack.md` and follow its mrkdwn
    rules for everything you compose.
 4. Compose the digest: a `*Direct-fix digest — <date range>*` header line,
    then one line per fix (target · what changed · timestamp). Close with a
