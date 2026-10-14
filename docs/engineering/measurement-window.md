@@ -28,6 +28,12 @@ Notion each week.
 | 4 | Askers, and askers with asks in 3+ window weeks | — | at least 10; half of them |
 | 5 | Proposals approved / approved with edits / rejected — cards, upkeep fixes, reminders | — | tracked, not published |
 
+### How number 1 is counted
+
+The baseline of about nine is three parts with one filter. The parts are the lead's DM asks (6.4 per workday) and channel-mention asks (0.8), both from the lead's inbox count, plus meeting asks (3.6), from the corpus. Their sum, 10.8, is multiplied by the non-judgment share, 0.88, which gives 9.5. A workday is Monday to Friday with no holidays removed. The baseline period is Spring 2026, 2026-01-12 to 2026-05-01, which is 80 workdays. The corpus alone gives 6.5 per workday, and the sort's calibration mode reproduces that figure. The derivation is in the header of the sort's `lib.mjs`.
+
+The window's number 1 must be built the same way: the same three parts, with the same non-judgment filter applied to their sum. Report each part beside the total in the Weekly snapshot's Notes, so the comparison with nine is like for like.
+
 ## Where it is recorded
 
 All three databases live under the *Measurement window* page in the PLUS Notion
