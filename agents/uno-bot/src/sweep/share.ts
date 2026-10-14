@@ -5,8 +5,8 @@
 // and nothing more. When that batch has written at least one page, the Worker
 // stages a SHARE CARD in the same group DM. It shows the note's exact text and
 // names the team channel it would go to — the rung the finding would take with
-// its evidence set aside (`shareDestination`): #plus-universal for the design
-// system, #plus-design otherwise, never #uno-bot. It is decided from Review:
+// its evidence set aside (`shareDestination`): its team's channel, else
+// #plus-design, never #uno-bot. It is decided from Review:
 // Approve posts exactly that text there (`sweep_share_post`, a `worker`
 // tool); Reject drops it. It has the
 // fix card's confirmers, 72 h, and its own slot in the thread
@@ -26,6 +26,7 @@
 // PURE of `Env`: Slack, ThreadState and the usage record arrive by name
 // (`stageSweepShare`); `./env.ts` binds them.
 
+import { CHANNEL_ROLES, channelIdOf, type ChannelIds } from "../destination/index";
 import type { OperationOutcome } from "../gate/index";
 import { rethrowIfBudget } from "../net";
 import { escapeSlackText } from "../slack/mrkdwn";
@@ -46,12 +47,8 @@ export interface SweepShareNote {
   text: string;
 }
 
-/** The Worker's ids for the two team channels, and #uno-bot's. */
-export interface ShareChannels {
-  plusDesign?: string;
-  plusUniversal?: string;
-  unoBot?: string;
-}
+/** The Worker's ids for #plus-design and the team channels, and #uno-bot's. */
+export type ShareChannels = ChannelIds;
 
 /**
  * The notes a group DM's fix batch earns: one per team channel, naming the
@@ -68,7 +65,7 @@ export function sweepShareNotes(share: SweepShare, outcomes: readonly OperationO
       .map((o) => o.input!.page_url as string),
   );
   const notes: SweepShareNote[] = [];
-  for (const to of ["plus-design", "plus-universal"] as const) {
+  for (const to of CHANNEL_ROLES) {
     const pages = share.pages.filter((p) => p.to === to && applied.has(p.url));
     if (!pages.length) continue;
     const text =
@@ -89,8 +86,7 @@ export function sweepShareOffer(
 ): { card: ProposalCard; operations: ProposalOperation[] } | null {
   if (!share) return null;
   const idOf = (to: SweepShareNote["to"]): string | undefined => {
-    const id = (to === "plus-universal" ? channels.plusUniversal : channels.plusDesign)?.trim();
-    return id && id !== channels.unoBot?.trim() ? id : undefined;
+    return channelIdOf(to, channels) ?? undefined;
   };
   const notes = sweepShareNotes(share, outcomes).flatMap((n) => {
     const channel = idOf(n.to);

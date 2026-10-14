@@ -27,6 +27,7 @@
 //
 // A Worker missing a binding keeps no follow-ups and sends nothing.
 
+import { channelIdsFor, ladderChannelsFor } from "../destination/env";
 import type { Env } from "../types";
 import { selectProvider } from "../agent/run-agent";
 import { budgetHeadroom } from "../net";
@@ -82,9 +83,7 @@ import { modelCardTodoDetector } from "./todo";
 
 function configFor(env: Env, botUserId?: string | null): FollowThroughConfig {
   return {
-    plusDesign: env.PLUS_DESIGN_CHANNEL_ID?.trim() || undefined,
-    plusUniversal: env.PLUS_UNIVERSAL_CHANNEL_ID?.trim() || undefined,
-    unoBot: env.UNO_BOT_CHANNEL_ID?.trim() || undefined,
+    ...channelIdsFor(env),
     botUserId: botUserId ?? null,
   };
 }
@@ -341,7 +340,7 @@ const SHORT_REPLY_CHARS = 60;
 
 /**
  * Whether a message could answer a card follow-up, by its shape alone: a
- * person's reply in a #plus-design or #plus-universal thread that @-mentions
+ * person's reply in a thread of #plus-design or a team channel that @-mentions
  * someone (F4's owner) or is one short line (F5's pick). Reads nothing; the
  * dispatch also asks the thread's reply mark (`mayBeCardReply`), and
  * `handleCardReplyOnEnv` asks it again before any D1 read.
@@ -350,7 +349,7 @@ const SHORT_REPLY_CHARS = 60;
  * @param event - The message
  */
 export function isCardReplyCandidate(env: Env, event: SlackMessageEvent): boolean {
-  const channels = [env.PLUS_DESIGN_CHANNEL_ID?.trim(), env.PLUS_UNIVERSAL_CHANNEL_ID?.trim()].filter(Boolean);
+  const channels = ladderChannelsFor(env);
   if (!event.thread_ts || event.thread_ts === event.ts || !channels.includes(event.channel)) return false;
   if (event.bot_id || !event.user || (event.subtype && event.subtype !== "thread_broadcast")) return false;
   if (!env.USAGE_DB || !env.HARNESS_KV) return false;

@@ -218,6 +218,15 @@ FIGMA_TEAM_IDS = "Universal=1279226364199713409,Training=1279227480162592555,Too
 # (drafted intake + implementation), and its members are who may confirm it.
 # Leave blank → the findings wait in KV and nothing is posted.
 PLUS_UNIVERSAL_CHANNEL_ID = "C072E8SFLKV"
+# The other team channels of the posting ladder (src/destination/): a finding
+# with no thread goes to the channel of its card's Product Pillar, else its
+# Figma file's team (docs/connectors/slack.md). Each is private, so uno-bot
+# needs an invite before it can post there. Leave one blank → that team's
+# findings are not posted.
+PLUS_ADMIN_CHANNEL_ID = "C089A3E9CCW"
+PLUS_TOOLKIT_CHANNEL_ID = "C08925VDFF1"
+PLUS_TRAINING_CHANNEL_ID = "C07L5RZV6DR"
+PLUS_MARKETING_CHANNEL_ID = "C052BG9NE86"
 # #uno-bot channel id — the intake channel (src/turn/intake-channel.ts): a
 # top-level post there engages with no @mention and becomes a drafted intake.
 # Nothing about the Figma library posts here any more. Leave blank → there is

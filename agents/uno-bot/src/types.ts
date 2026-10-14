@@ -73,6 +73,13 @@ export interface Env {
   // and whose members may confirm it.
   FIGMA_FILE_KEY?: string;
   PLUS_UNIVERSAL_CHANNEL_ID?: string;
+  /** The other team channels of the posting ladder's pillar → channel map
+   *  (`destination/`), each private: unset or uninvited, that team's findings
+   *  are not posted. */
+  PLUS_ADMIN_CHANNEL_ID?: string;
+  PLUS_TOOLKIT_CHANNEL_ID?: string;
+  PLUS_TRAINING_CHANNEL_ID?: string;
+  PLUS_MARKETING_CHANNEL_ID?: string;
   /** The six PLUS Figma teams, `name=id` pairs (`figma-notify/teams.ts`). The
    *  subscription setup reads them from wrangler.toml; the nightly backstop
    *  (#896) lists their folders. */

@@ -116,6 +116,7 @@
 // suite runs whole days against fakes (tests/sweep-run.test.ts). `Env` enters
 // in `./env.ts`.
 
+import { CHANNEL_ROLES, channelIdOf, type ChannelIds } from "../destination/index";
 import { D1QueryBudgetError, isSubrequestBudgetError, rethrowIfBudget, SubrequestBudgetError } from "../net";
 import type { HistoryMessage } from "../slack/api";
 import { proposalReplyThread, type OwnerLine, type PendingProposal, type ProposalOperation, type ReportItem, type ThreadState } from "../thread-state/index";
@@ -383,9 +384,7 @@ const FOLLOW_UP_D1_QUERIES = 3;
  *  edit held back for a card that does not stage. */
 const ALONE_SUBREQUESTS = 2;
 
-export interface SweepConfig {
-  plusDesign?: string;
-  plusUniversal?: string;
+export interface SweepConfig extends ChannelIds {
   /** #uno-bot: never swept, never posted in. */
   unoBot?: string;
   /** The DS library file key, so a link to it counts as the design system. */
@@ -1797,8 +1796,11 @@ async function placesLiveInThreadState(
 
 /** A place's channel and thread, back from its key (`destinationKey`). */
 function placeOf(key: string, config: SweepConfig): { channel: string; threadTs: string | null } | null {
-  if (key === "plus-design") return config.plusDesign ? { channel: config.plusDesign, threadTs: null } : null;
-  if (key === "plus-universal") return config.plusUniversal ? { channel: config.plusUniversal, threadTs: null } : null;
+  const role = CHANNEL_ROLES.find((r) => r === key);
+  if (role) {
+    const channel = channelIdOf(role, config);
+    return channel ? { channel, threadTs: null } : null;
+  }
   const [channel, threadTs] = key.split(":");
   return channel ? { channel, threadTs: threadTs || null } : null;
 }

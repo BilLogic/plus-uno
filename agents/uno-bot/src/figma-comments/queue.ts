@@ -14,6 +14,7 @@
 //
 // PURE: types and one merge.
 
+import type { Addressee } from "../destination/index";
 import type { FigmaClient } from "../figma/client";
 import type { PendingProposal, ProposalOperation, ThreadState } from "../thread-state/index";
 import type { ReportStore } from "../slack/decision-cards";
@@ -51,13 +52,9 @@ export interface QueuedDecision {
   row?: { operations: ProposalOperation[]; update: RowUpdate };
 }
 
-/** Who a file's thread asks. */
-export type FileOwner =
-  /** The card's design owner, as a Slack id. */
-  | { slack: string }
-  /** No design owner in Slack: the file's creator, by Figma handle, since
-   *  nothing maps a Figma person to a Slack one. */
-  | { figma: string };
+/** Who a file's thread asks: the posting ladder's addressee — the card's
+ *  design owner as a Slack id, else the file's creator by Figma handle. */
+export type FileOwner = Addressee;
 
 /** One file's decisions, waiting for the morning. */
 export interface QueuedFile {
