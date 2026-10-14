@@ -146,7 +146,7 @@ test('every document pairs with every other, and a copy is named on both sides',
   const rule = 'A rule states itself once, and every other mention of it is a citation.';
   const { findings, pairings } = findSharedAcross([
     doc('AGENTS.md', `# constitution\n\n${rule}\n`),
-    doc('CONTEXT.md', '# context\n\nNothing in common with either neighbouring document.\n'),
+    doc('GLOSSARY.md', '# context\n\nNothing in common with either neighbouring document.\n'),
     doc('docs/connectors/slack.md', `# slack\n\nSome delta.\n\n${rule}\n`),
   ]);
   assert.equal(pairings, 3, 'three documents make three pairs');
