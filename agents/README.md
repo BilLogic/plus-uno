@@ -4,7 +4,7 @@ summary: Agents are roles skills summon — never taught to users, never invoked
 
 # agents/ — WHO does the work
 
-Agents are roles skills summon — **never taught to users, never invoked directly**. The interaction contract: humans speak in skills · skills summon agents · agents obey conventions.
+Agents are roles skills summon — **never taught to users, never invoked directly**. The interaction contract, in the IDE: humans speak in skills · skills summon agents · agents obey conventions. uno-bot runs bot skills over the Worker's tools instead.
 
 ## The three kinds + the embodiment
 
@@ -12,7 +12,7 @@ Agents are roles skills summon — **never taught to users, never invoked direct
 |---|---|---|
 | `researchers/` | gather — isolated heavy reads, return findings not file dumps | `explorer` (codebase) · `source-miner` (Slack/analytics/research-DB) · `people-scout` (SME + participant sourcing) |
 | `reviewers/` | judge — parallel lenses, checklists, rubrics | `ds-lens` · `uno-lens` · `a11y-lens` · `design-qa` (Figma spec vs QA site) · `rubric-applier` (any rubric → scored verdict) · `auditor` (registry checklists → intakes) |
-| `writers/` | write to external estates — **the only agents allowed to** | `notion` · `figma` · `blueprint` (paired PRD+blueprint writes, never one alone; also the single access point for blueprint *reads*) |
+| `writers/` | write to external estates — **the IDE's only writers**; uno-bot writes through its ✅-gated tools | `notion` · `figma` · `blueprint` (paired PRD+blueprint writes, never one alone) |
 | `uno-bot/` | the Slack embodiment — definition (AGENT.md) + body (Worker code) in one folder | active |
 
 Slack needs no writer: the uno-bot embodiment IS the Slack actor.
