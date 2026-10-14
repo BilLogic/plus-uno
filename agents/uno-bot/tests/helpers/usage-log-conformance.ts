@@ -48,6 +48,7 @@ export function turnRecord(over: Partial<TurnRecord> = {}): TurnRecord {
     tokensCached: 30_000,
     costUsd: 0.014_137_5,
     toolsCalled: ["search_blueprint", "read_reference"],
+    referencesRead: ["uno-maintain/method", "uno-review/method"],
     sourcesCited: ["blueprint", "notion"],
     disposition: "answered",
     proposalId: "1700000000.000300",

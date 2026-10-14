@@ -791,6 +791,7 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
     routeReason: outcome.telemetry.route,
     ...(outcome.telemetry.spend ? { spend: outcome.telemetry.spend } : {}),
     toolsCalled: outcome.telemetry.tools,
+    referencesRead: outcome.telemetry.references,
     ...(outcome.posted !== undefined ? { posted: outcome.posted } : {}),
     disposition: outcome.disposition,
     ...(outcome.staged ? { proposalId: outcome.staged.proposal.proposalTs } : {}),

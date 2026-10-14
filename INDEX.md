@@ -72,6 +72,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
+| [`docs/connectors/figma/uno-bot-access.md`](docs/connectors/figma/uno-bot-access.md) | What uno-bot can read and write in Figma over REST, and where it stops — frame renders, comment reads and @uno replies, the library and comment pipelines, a Figma ask's public scope, and each limit with its cause and next route |
 | [`docs/connectors/figma.md`](docs/connectors/figma.md) | PLUS Figma files follow How We Fig — five stage folders per team, `<Project> / Card <n> & <m> / <designers>` titles, six divider page sections; an agent suggests a rename or a move and a person makes it |
 | [`docs/connectors/notion.md`](docs/connectors/notion.md) | How agents write to Notion — the MCP-write principle, convention surfaces, the gated tools, and body shape. |
 | [`docs/connectors/overview.md`](docs/connectors/overview.md) | One row per connected tool: where its conventions live, what touches it |
@@ -216,6 +217,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-145 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+146 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

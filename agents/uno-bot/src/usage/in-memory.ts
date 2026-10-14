@@ -15,6 +15,7 @@ export interface InMemoryUsageLog extends UsageLog {
 const copy = (r: TurnRecord): TurnRecord => ({
   ...r,
   toolsCalled: [...r.toolsCalled],
+  referencesRead: [...r.referencesRead],
   sourcesCited: [...r.sourcesCited],
 });
 
