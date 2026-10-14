@@ -69,7 +69,7 @@ to them through the notion-plus connector, per `docs/connectors/notion.md`.
       ```
 
       It writes one batch file per 25 rows outside the repo, and prints the prompt's sha256 and the labels file to append to. An `--out-dir` inside a git working tree is refused. Other flags are in the header of `agents/uno-bot/measurement/housekeeping-sort/sort.mjs`.
-   3. Label in a Claude Code session. Read each batch file and label its `user` rows by its `system` prompt, verbatim, with nothing added. Append each batch's `{"labels": [...]}` to the labels file as one line. Message text stays in the batch files and the export.
+   3. Label in a Claude Code session, one fresh sub-agent per batch. Give each sub-agent the batch's `system` text, unchanged, as its instructions and the batch's `user` text as the rows, and nothing else. Every batch then runs under the same pinned conditions, so a re-run is comparable. The session appends each result to the labels file as one compact JSON line with shell `>>`, so earlier lines are kept. Message text stays in the batch files and the export.
    4. Count:
 
       ```bash

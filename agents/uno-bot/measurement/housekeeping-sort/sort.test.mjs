@@ -9,7 +9,7 @@ import test from "node:test";
 import {
   BOT_FIT_TO_WHAT_IT_TOOK, JUDGMENT, KINDS, LABEL_SCHEMA, NOT_A_REQUEST, SPRING_2026,
   buildBatch, calibrationReport, corpusCalibrationRows, countPerWorkday,
-  localDate, parseExport, parseLabels, toBatches, workdays,
+  localDate, parseExport, parseLabelLines, toBatches, workdays,
 } from "./lib.mjs";
 import { PROMPT_FILE, gitRootOf, run, sha256 } from "./sort.mjs";
 
@@ -38,17 +38,18 @@ test("localDate puts a late-evening UTC timestamp on its Eastern date", () => {
   assert.equal(localDate("2026-02-30"), null);
 });
 
-test("parseLabels holds a response to its batch", () => {
-  const ok = JSON.stringify({ labels: [label("b", false, NOT_A_REQUEST), label("a", true, "Could be looked up")] });
-  const got = parseLabels(ok, ["a", "b"]);
-  assert.deepEqual(got.map((l) => l.id), ["a", "b"], "returned in batch order");
+test("parseLabelLines holds a session's labels to the ids", () => {
+  const one = (labels) => JSON.stringify({ labels });
+  const got = parseLabelLines(one([label("b", false, NOT_A_REQUEST), label("a", true, "Could be looked up")]), ["a", "b"]);
+  assert.deepEqual(got.map((l) => l.id), ["a", "b"], "returned in id order");
   assert.equal(got[1].what_it_took, null, "a non-request carries no What it took");
 
-  assert.throws(() => parseLabels("not json", ["a"]), /not JSON/);
-  assert.throws(() => parseLabels(JSON.stringify({ labels: [] }), ["a"]), /no label for 1 id/);
-  assert.throws(() => parseLabels(JSON.stringify({ labels: [label("z", true, "Could be looked up")] }), ["a"]), /unknown id z/);
-  assert.throws(() => parseLabels(JSON.stringify({ labels: [label("a", true, NOT_A_REQUEST)] }), ["a"]), /needs a What it took/);
-  assert.throws(() => parseLabels(JSON.stringify({ labels: [label("a", true, "Could be looked up", { kinds: ["Gossip"] })] }), ["a"]), /unknown kind/);
+  assert.throws(() => parseLabelLines("not json", ["a"]), /line 1: not JSON/);
+  assert.throws(() => parseLabelLines('{"note": 1}', ["a"]), /neither a label nor a labels array/);
+  assert.throws(() => parseLabelLines(one([]), ["a"]), /no label for 1 id/);
+  assert.throws(() => parseLabelLines(one([label("z", true, "Could be looked up")]), ["a"]), /unknown id z/);
+  assert.throws(() => parseLabelLines(one([label("a", true, NOT_A_REQUEST)]), ["a"]), /needs a What it took/);
+  assert.throws(() => parseLabelLines(one([label("a", true, "Could be looked up", { kinds: ["Gossip"] })]), ["a"]), /unknown kind/);
 });
 
 test("the kinds are the corpus Sub-type options, and every bot_fit folds to a legend word", () => {
@@ -194,9 +195,9 @@ test("--prepare writes one batch file per batch, holding the prompt and the rows
   assert.match(text, new RegExp(`prompt sha256 ${promptHash()}`));
   assert.match(text, /3 rows, 2 batches; window 2026-10-12 to 2026-10-13/);
   const files = Object.keys(written).sort();
-  assert.deepEqual(files, ["/out/batches-2026-10-20T12-00-00-000Z/batch-1-of-2.json", "/out/batches-2026-10-20T12-00-00-000Z/batch-2-of-2.json"]);
-  assert.match(text, /\/out\/batches-2026-10-20T12-00-00-000Z/);
-  assert.match(text, /\/out\/labels-2026-10-20T12-00-00-000Z\.jsonl/, "names the labels file to append to");
+  assert.deepEqual(files, ["/out/inbox-batches-2026-10-20T12-00-00-000Z/batch-1-of-2.json", "/out/inbox-batches-2026-10-20T12-00-00-000Z/batch-2-of-2.json"]);
+  assert.match(text, /\/out\/inbox-batches-2026-10-20T12-00-00-000Z/);
+  assert.match(text, /\/out\/inbox-labels-2026-10-20T12-00-00-000Z\.jsonl/, "names the labels file to append to");
   const first = JSON.parse(written[files[0]]);
   assert.equal(first.prompt_sha256, promptHash());
   assert.deepEqual(first.ids, ["a", "b"]);
@@ -221,6 +222,29 @@ test("--calibrate --prepare batches the Spring 2026 corpus rows", async () => {
   await run(["--calibrate", "--prepare", "rows.jsonl", "--batch-size", "2", "--out-dir", "/out"], io);
   assert.match(lines.join("\n"), /3 rows, 2 batches; window 2026-01-12 to 2026-05-01/);
   assert.ok(Object.keys(written).every((f) => f.startsWith("/out/calibration-batches-")));
+  assert.match(lines.join("\n"), /\/out\/calibration-labels-.*\.jsonl/);
+});
+
+test("--calibrate refuses --from and --to: its window is fixed", async () => {
+  const { io } = fakeIo({ "rows.jsonl": corpusLine({ _id: 1, bot_fit: "Lookup" }) });
+  await assert.rejects(run(["--calibrate", "--prepare", "rows.jsonl", "--from", "2026-02-01", "--out-dir", "/out"], io), /fixed Spring 2026 window/);
+  await assert.rejects(run(["--calibrate", "--count", "/out/cal.jsonl", "rows.jsonl", "--to", "2026-03-01"], io), /fixed Spring 2026 window/);
+});
+
+test("calibration counts a Spring 2026 corpus row dated before the window opens, and needs its label", async () => {
+  // The corpus's semester label decides membership, not the date (lib.mjs
+  // corpusCalibrationRows), so a row dated 2026-01-05 is in the report.
+  const corpus = [corpusLine({ _id: 1, bot_fit: "Lookup", date: "2026-01-05" }), corpusLine({ _id: 2, bot_fit: "Lookup" })].join("\n");
+  const both = asLines([label("1", true, "Could be looked up"), label("2", true, "Could be looked up")]);
+  const { io } = fakeIo({ "rows.jsonl": corpus, "/out/cal.jsonl": both });
+  const out = /** @type {any} */ (await run(["--calibrate", "--count", "/out/cal.jsonl", "rows.jsonl"], io));
+  assert.equal(out.result.rows, 2);
+  assert.equal(out.result.labelled, 2);
+  assert.equal(out.result.corpus.housekeeping, 2);
+  assert.equal(out.result.model.housekeeping, 2);
+
+  const missing = fakeIo({ "rows.jsonl": corpus, "/out/cal.jsonl": asLines([label("2", true, "Could be looked up")]) });
+  await assert.rejects(run(["--calibrate", "--count", "/out/cal.jsonl", "rows.jsonl"], missing.io), /no label for 1 id\(s\): 1/);
 });
 
 test("--count prints housekeeping requests per workday and the prompt sha256", async () => {

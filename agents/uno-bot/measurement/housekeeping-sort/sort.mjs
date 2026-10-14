@@ -104,6 +104,7 @@ export async function run(argv, io = {}) {
     },
   });
   if (values.prepare === (values.count !== undefined)) throw new Error(`name one of --prepare or --count. ${USAGE}`);
+  if (values.calibrate && (values.from || values.to)) throw new Error(`--calibrate runs over the fixed Spring 2026 window (${SPRING_2026.from} to ${SPRING_2026.to}); drop --from and --to`);
   /** @param {string} p @param {string} what */
   const outsideGit = (p, what) => {
     const repo = x.gitRootOf(p);
@@ -132,9 +133,9 @@ export async function run(argv, io = {}) {
     if (!rows.length) throw new Error("no rows to sort");
     const batches = toBatches(rows, batchSize);
     const stamp = x.now().toISOString().replace(/[:.]/g, "-");
-    const kind = values.calibrate ? "calibration" : "labels";
-    const batchDir = path.join(outDir, `${values.calibrate ? "calibration-batches" : "batches"}-${stamp}`);
-    const labelsFile = path.join(outDir, `${kind}-${stamp}.jsonl`);
+    const kind = values.calibrate ? "calibration" : "inbox";
+    const batchDir = path.join(outDir, `${kind}-batches-${stamp}`);
+    const labelsFile = path.join(outDir, `${kind}-labels-${stamp}.jsonl`);
     x.mkdir(batchDir);
     for (const [i, batch] of batches.entries()) {
       const name = `batch-${i + 1}-of-${batches.length}.json`;

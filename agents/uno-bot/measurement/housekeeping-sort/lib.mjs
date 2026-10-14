@@ -235,25 +235,6 @@ export function buildBatch(batch, prompt) {
  */
 
 /**
- * Reads one batch's labels, as the prompt returns them, and holds them to the
- * batch (see checkLabels).
- * @param {string} text the batch's `{"labels": [...]}`
- * @param {string[]} ids the batch's ids, in order
- * @returns {Label[]}
- */
-export function parseLabels(text, ids) {
-  let o;
-  try {
-    o = JSON.parse(text);
-  } catch {
-    throw new Error("response is not JSON");
-  }
-  const list = Array.isArray(o) ? o : o?.labels;
-  if (!Array.isArray(list)) throw new Error("response has no labels array");
-  return checkLabels(list, ids);
-}
-
-/**
  * Reads the labels file a session wrote, one JSON object a line: either one
  * batch's whole `{"labels": [...]}` or a single label. Blank lines are skipped.
  * The labels are held to every id the count needs (see checkLabels).
