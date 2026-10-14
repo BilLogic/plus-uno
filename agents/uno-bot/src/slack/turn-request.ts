@@ -7,10 +7,9 @@
 // bytes, the thread read, the dependencies — is `slack/turn-adapter.ts`, which
 // this file knows nothing about.
 //
-// That split is what lets the parity test drive the REAL Slack request builder
-// beside the real eval one (`eval/turn-case.ts`, the same split from the other
-// side) in the Workers-global-free compile, instead of comparing one builder to
-// a hand-written copy of it that can quietly stop matching.
+// That split is what lets a test drive the REAL Slack request builder in the
+// Workers-global-free compile, instead of a hand-written copy of it that can
+// quietly stop matching.
 
 import { parseScope, type ScopedRequest } from "../agent/scope-keywords";
 import { buildTurnRequest, type IntakeThread, type TurnRequest } from "../turn/index";

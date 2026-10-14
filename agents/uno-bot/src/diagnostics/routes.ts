@@ -1,11 +1,9 @@
 // The diagnostic route table — one datum every other part of Diagnostics reads.
 //
 // Paths here are a CONTRACT, not an implementation detail: `/health/blueprint`
-// is polled by the product repository's CI, `/debug/eval` drives the eval suite
-// and the GitHub Action behind it, `/debug/blueprint-search` and
-// `/debug/blueprint-subject` are read by the retrieval evals, and monitoring
-// watches `/health` (which stays in the Worker entry as the uptime route). So
-// the table is declared apart from the probe bodies: a module that imports
+// is polled by the product repository's CI, and monitoring watches `/health`
+// (which stays in the Worker entry as the uptime route). So the table is
+// declared apart from the probe bodies: a module that imports
 // nothing, which the Node suite reads as the one place a path, a method or an
 // auth posture is written down. The probe bodies take an `Env` and make real
 // calls through it, so they are the half a test cannot drive — not the half a
@@ -32,14 +30,12 @@ export const DIAGNOSTIC_ROUTES = {
   gemini: { method: "GET", path: "/debug/gemini", auth: "debug-token" },
   "vertex-claude": { method: "GET", path: "/debug/vertex-claude", auth: "debug-token" },
   "gemini-cache": { method: "GET", path: "/debug/gemini-cache", auth: "debug-token" },
-  "turn-eval": { method: "POST", path: "/debug/eval", auth: "debug-token" },
   "slack-search": { method: "GET", path: "/debug/slack-search", auth: "debug-token" },
   "slack-stream": { method: "GET", path: "/debug/slack-stream", auth: "debug-token" },
   "slack-post": { method: "GET", path: "/debug/slack-post", auth: "debug-token" },
   home: { method: "GET", path: "/debug/home", auth: "debug-token" },
   blueprint: { method: "GET", path: "/debug/blueprint", auth: "debug-token" },
   "blueprint-search": { method: "GET", path: "/debug/blueprint-search", auth: "debug-token" },
-  "blueprint-subject": { method: "GET", path: "/debug/blueprint-subject", auth: "debug-token" },
   "figma-poll": { method: "GET", path: "/debug/figma-poll", auth: "debug-token" },
   "figma-dev-links": { method: "GET", path: "/debug/figma-dev-links", auth: "debug-token" },
   sweep: { method: "GET", path: "/debug/sweep", auth: "debug-token" },

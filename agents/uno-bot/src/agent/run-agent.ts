@@ -171,22 +171,17 @@ export interface AgentInput {
   cancelSince?: number;
   /** Called once, as the turn finishes, with the tier it was routed to and the
    *  model + thinking level the last model call was sent with — the same facts
-   *  the `[uno-bot] request done` log line carries. The headless eval route
-   *  reports these so a scenario can assert the level, not just the model
-   *  (#421). Absent on production turns, which read the log. */
+   *  the `[uno-bot] request done` log line carries. Absent on production
+   *  turns, which read the log. */
   onDials?: (dials: TurnDials) => void;
   /** Called for every tool call the model makes, in order, with the arguments
    *  it sent — before dispatch, so gated proposals and budget-refused lookups
-   *  are reported too. The headless eval route lists these so a scenario can
-   *  assert a call was made and what it named — a `read_reference` for the
-   *  skill's method, say (#423). Absent on production turns, which read the
+   *  are reported too. Absent on production turns, which read the
    *  `tools=[…]` log. */
   onToolCall?: (call: ToolCall) => void;
   /** Called after a tool RESULT comes back, with the small honesty fields it
    *  carries — `note`, `visibility`, `error`, never rows and never content.
-   *  The eval route attaches these to the call they answer, so a search-shaped
-   *  failure is diagnosable from the artifact instead of only from a live
-   *  re-run (#452). Absent on production turns. */
+   *  Absent on production turns. */
   onToolResult?: (result: ToolResultNote) => void;
   /** Where each lookup is in its life, for the checklist — see `loop.ts`
    *  `onToolProgress`. Turn wires it on every turn; Delivery decides whether

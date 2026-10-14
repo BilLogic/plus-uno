@@ -21,8 +21,8 @@ export const SELF_REPO = "BilLogic/plus-uno";
  *
  * `slack` is a person in Slack, and `figma` a person asking @uno in a Figma
  * comment (`figma-ask/`). `debug` is anything reached through a `/debug/*` or
- * `/health/*` route — which is where the eval transport lives — and is test
- * traffic by definition.
+ * `/health/*` route, and is test traffic by definition — the headless eval
+ * turns already on record carry it, and stay excluded.
  */
 export type TurnOrigin = "slack" | "figma" | "debug";
 
@@ -86,7 +86,7 @@ export function askedAtOf(askTs: string, startedAt: number): number {
 
 /**
  * Test traffic, by the rule #742 adopted from the metric definitions. Any one of:
- *   - a debug or health route, the eval transport included;
+ *   - a debug or health route;
  *   - a channel on `TEST_CHANNEL_IDS` (#uno-bot-sandbox);
  *   - a greeting with no ask: the model only reacted, and nothing was asked.
  * Anyone's genuine ask counts, the lead's included.

@@ -121,11 +121,11 @@ uno-bot/
     └── version.ts        BUILD string returned by /health
 ```
 
-Every module seam here — Turn, Gate, ThreadState, the stop doors — keeps one pattern: dependencies arrive by name, `Env` stops at the Slack envelope that builds them, and the Node suite drives the module rather than matching its source. Turn has two callers built the same way — the Slack envelope (`agents/uno-bot/src/slack/turn-adapter.ts`) and the eval adapter (`agents/uno-bot/src/eval/turn-adapter.ts`), both through `agents/uno-bot/src/turn/request.ts` and `agents/uno-bot/src/turn/env-deps.ts` — and one parity test drives both (`agents/uno-bot/tests/eval-adapter.test.ts`).
+Every module seam here — Turn, Gate, ThreadState, the stop doors — keeps one pattern: dependencies arrive by name, `Env` stops at the Slack envelope that builds them, and the Node suite drives the module rather than matching its source. Turn's Slack caller (`agents/uno-bot/src/slack/turn-adapter.ts`) builds its request and dependencies through `agents/uno-bot/src/turn/request.ts` and `agents/uno-bot/src/turn/env-deps.ts`, so a second caller supplies only what genuinely differs.
 
-Regression tests, two layers:
-- **Automated:** the `uno-bot — evals` GitHub Action drives `docs/evals/fixtures/uno-bot-cases.json` (machine-readable R-scenarios) through the live Worker's `/debug/eval` route — headless agent turns, deterministic checks + a Gemini judge against the D1–D9 rubric; blocker failures fail the job, full transcripts upload as an artifact. Run it after every deploy.
-- **Manual:** the **UNO-Bot Test Plan** in Notion (13 `TC-*` cases run one-per-thread in `#uno-bot-sandbox`, hand- or judge-scored 0–3; latest round 2026-07-11 averaged 2.48). Source prompts in `docs/evals/scenarios/uno-bot.md`.
+Regression tests:
+- **Automated:** the Worker's unit suite (`npm test`), the Durable Object conformance suite (`npm run test:workerd`) and the script tests (`npm run test:bundle`), all on every pull request.
+- **Manual:** the **UNO-Bot Test Plan** in Notion (13 `TC-*` cases run one-per-thread in `#uno-bot-sandbox`, hand- or judge-scored 0–3; latest round 2026-07-11 averaged 2.48).
 
 ## Local dev
 

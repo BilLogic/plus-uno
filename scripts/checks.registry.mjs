@@ -630,24 +630,6 @@ export const CHECKS = [
     guards:
       "the Worker's unit suite — 723 tests across 65 suites at 2026-09-17, the largest in this repository, and gated by nothing at all until it was composed here: it ran in no workflow, and `npm run deploy` chose `test:bundle` and stopped. 2.2s, measured 2026-09-17. Found while verifying the TypeScript 7 bump (#298), which is exactly the change that needed them. #580 finished the job in both directions: `npm test` is in the deploy chain now, so a direct push to unprotected `main` meets it too, and the suite has its own named pull-request job (.github/workflows/uno-bot-checks.yml § tests) so its red is legible from the check list rather than only from a 40-second log. Among them is the harness name sweep (tests/harness-blueprint-names.test.ts), which reads the assembled prompt, the tool schemas and — since #425 — the Actions prompts under scripts/prompts/ for blueprint identifiers and conventions the schema no longer has; its inputs are repo-root files, which is the rule that composes a sub-package check here.",
   },
-  {
-    name: 'evals:local',
-    script: 'cd ../.. && node agents/uno-bot/scripts/run-evals.mjs --transport=local',
-    pkg: 'bot',
-    trigger: 'pull_request',
-    kind: 'spawn',
-    spawnReason:
-      'the eval runner. A walk of the committed recordings that reports its census and then ' +
-      'a LINE PER CASE — the shape this interface would flatten into one, which is the half ' +
-      'that cannot move. The other half did (#617): the runner renders its findings and takes ' +
-      'its exit code from `scripts/lib/findings.mjs` like every composed check, so a failing ' +
-      'blocker is an error and a failing non-blocker a warning. ' +
-      "The `cd ../..` is the runner's own contract: its " +
-      'fixture and recording paths are repo-relative, as every documented invocation of it ' +
-      'is, and the alternative is a second copy of those paths in a manifest.',
-    guards:
-      "the eval suite through the LOCAL transport: the Worker's Turn module in-process, on the recorded model replies in docs/evals/fixtures/recordings/. No WORKER_URL, no DEBUG_TOKEN, no judge credential and no model spend, which is what lets it run on a pull request at all — before the local transport (#512) the suite ran for the FIRST time on the Monday cron, against whatever was already deployed, so a turn-level regression reached main and sat there for up to a week. WHAT A RED MEANS: a Turn, routing or pointer regression on a FIXED DRAW — the dispositions, the gate's idempotency, the cancel bounce, the history write, the proposal routing the loop performs on a side-effect call, the reference a `read_reference` was asked for. Never a model that answered differently: nothing in-process measures the model, that stays with `uno-bot-evals.yml`'s Monday `--transport=worker` cron, and the summary's `transport` field is what keeps the two from being read as one number. The judge is absent by construction, so only the deterministic checks decide. A case with no recording is reported UNREACHABLE — named in the run's opening census, named again where it is reached, counted apart and never failed. Failing those would turn a cheap gate into a wall of reds that all mean \"no recording\", which is the fastest way to have a gate switched off; but a skip nobody counts is a blocker that gates nothing while reading as though it did, so the word and the count are the compromise. A blocker that genuinely fails still exits 1. check-harness.yml has run this as a hand-written step since #512 while `npm run check:harness` did not, which is exactly the local-gate-is-a-subset-of-the-remote-one gap `test:bundle` above records paying for; that step is now this row. 0.3s on a warm .test-build, measured 2026-09-14.",
-  },
 ];
 
 /**
