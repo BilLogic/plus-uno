@@ -456,8 +456,9 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
       const reason = signal.note?.trim();
       return claim(proposal, decision, signal.userId, deps, { byCard: true, rejected: reason ? { reason } : {} });
     }
+    const changed = editedOnConfirm(proposal, signal.operations);
     const verdict = await claim(edited(proposal, signal.operations), decision, signal.userId, deps, { byCard: true });
-    return verdict.outcome === "won" && editedOnConfirm(proposal, signal.operations) ? { ...verdict, edited: true } : verdict;
+    return changed && verdict.outcome === "won" ? { ...verdict, edited: true } : verdict;
   }
   return claim(proposal, decision, signal.userId, deps, { byCard: signal.kind !== "typed" });
 }

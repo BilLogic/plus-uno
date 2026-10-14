@@ -366,8 +366,8 @@ describe("metric queries on the seed", () => {
 
   metric("proposal-outcomes", async () => {
     // Cards, counted as the last of each chain: P1r (P1 re-staged), P8, P2
-    // and P9 approved (and P11, below); P6r — r1's "drop 2" of P6 — approved with edits; P3
-    // rejected; P5 expired. P7's revision is not in the seed, so P7 is
+    // and P9 approved (and P11, below); P6r — r1's "drop 2" of P6 —
+    // approved with edits; P3 rejected; P5 expired. P7's revision is not in the seed, so P7 is
     // nowhere; P4 is test traffic. P1r's refused write is still a ✅.
     // Fixes carded in the window: f1 confirmed, f2 refused stale (f3 was
     // never carded). Reminders (the seed's thread promises): k1 done, k4 not
