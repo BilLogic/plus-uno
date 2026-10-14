@@ -42,7 +42,7 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 | `skills/uno-review` | DS / UNO / a11y lens review · Design QA at Ready-for-QA | reviewers/* (except auditor — uno-maintain's) |
 | `skills/uno-maintain` | intake · direct fixes · gated changes · cross-estate sync · knowledge capture | reviewers/auditor · researchers/source-miner · reviewers/rubric-applier · writers/* |
 
-Routing: match intent to the Use-when column; if ambiguous, ask which capability is meant. Each skill's `SKILL.md` is the IDE face, `bot.md` the Worker face; the IDE loads `references/method.md` on invocation, and the Worker reads it by name through `read_reference` when the face's pointer fires. Which content belongs in which of the three — and the guard that holds the split — is `skills/README.md`.
+Routing: match intent to the Use-when column; if ambiguous, ask which capability is meant. These six are **uno skills**, IDE workflows: `SKILL.md` loads `references/method.md` on invocation. uno-bot runs its own **bot skills** under `agents/uno-bot/skills/`, named for what the bot does, each ending in an **exit** — answer, file or hand off (a ready-to-paste IDE prompt naming an uno skill); a bot skill's description is its always-loaded pointer and its body is read by name through `read_reference`. What goes in which file, for both, is `skills/README.md`.
 
 **A skill's IDE discovery surface is generated.** Claude Code and Cursor read `.claude/skills/`, and `npm run generate:skill-surfaces` publishes a stub there from the canonical frontmatter — so edit `skills/<name>/SKILL.md` and regenerate; `npm run check:skill-surfaces` fails the harness gate on drift. What is generated where: `docs/engineering/setup.md` § Generated skill surfaces.
 
@@ -62,12 +62,12 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 
 **Tier 3 — retrieved live, never cached.** Product truth from `uno-blueprint` (`writers/blueprint` / `search_blueprint`); design-system truth from `uno-storybook` (read the source and stories). Team conventions are *not* Tier 3 — they are canonical in-repo (ADR-017) and load as plain files.
 
-**uno-bot's Tier 2 is `read_reference`.** A doc that declares `disclosure: reference` leaves the always-loaded bundle for a map baked beside it, and the Worker reads it by name — `uno-maintain/method` — on the turns whose pointer fires; the text lasts the turn and a later turn re-reads it in one call. Everything else in the bundle is always in context.
+**uno-bot's Tier 2 is `read_reference`.** A doc that declares `disclosure: reference` leaves the always-loaded bundle for a map baked beside it, and the Worker reads it by name — `draft-a-prd` — on the turns whose pointer fires; the text lasts the turn and a later turn re-reads it in one call. Everything else in the bundle is always in context.
 
 <!-- ide-only -->
 **Tier 2 — loaded on demand.** Two or three documents per task. § Progressive loading is the trigger table; beyond it: a skill loads its own `SKILL.md` + `references/method.md` on invocation and its `references/*.md` as linked; an agent loads its `agents/<kind>/<name>.md` plus the conventions it names.
 
-**Bundle mechanics (uno-bot).** Sections, order, `ide-only` stripping and the five char budgets — this file, the persona, each `bot.md`, the assembled ceiling and its floor — are decided in one place, the header of `agents/uno-bot/scripts/bundle-harness.mjs`. `npm run check:harness` names the file and the distance for each: this file's overrun warns, and a stale bundle, any other overrun or a shortfall fails the build. Its `assemble()` returns a manifest of what it computed, and the root checks read that in-process through `scripts/lib/bundled-set.mjs`. A doc cites a budget by its `BUDGETS` key and leaves the number to the bundler; `check:harness-budgets` holds every doc under a section root to that.
+**Bundle mechanics (uno-bot).** Sections, order, `ide-only` stripping and the char budgets — this file, the persona, each bot skill, the assembled ceiling and its floor — are decided in one place, the header of `agents/uno-bot/scripts/bundle-harness.mjs`. `npm run check:harness` names the file and the distance for each: this file's overrun warns, and a stale bundle, any other overrun or a shortfall fails the build. Its `assemble()` returns a manifest of what it computed, and the root checks read that in-process through `scripts/lib/bundled-set.mjs`. A doc cites a budget by its `BUDGETS` key and leaves the number to the bundler; `check:harness-budgets` holds every doc under a section root to that.
 
 **GitHub Actions.** `scripts/lib/skill-loader.js` loads `scripts/prompts/*` with meta-stripping; offline, which is fine because conventions are repo-canonical.
 <!-- /ide-only -->
@@ -124,6 +124,7 @@ Finished work leaves behind a **rule** in the doc that already owns the subject,
 | Writing to Notion / Figma / Slack / blueprint | the matching `docs/connectors/*.md` |
 | Reading or reasoning over the blueprint | `docs/connectors/supabase/blueprint.md` first — the blueprint's own account (shape, status vocabulary, retrieval modes; the schema is `blueprint-schema.md` beside it), vendored from plus-uno-blueprint, so a schema fix belongs there — then `docs/connectors/supabase/blueprint-navigation.md` for citation shape, confidence and absence; `docs/connectors/supabase/blueprint-direct-access.md` for SQL and PostgREST recipes. Load BEFORE querying; un-guided blueprint reads fail on navigation and lane attribution (the Worker carries the first two) |
 | Long-form — a README, a recap, a findings page | `docs/conventions/writing.md`. Ordinary replies, commits and PRDs need no doc: the model's default is the house voice. |
+| Writing or editing a bot skill | `skills/README.md` § Bot skills, then `npm run check:bot-skills` |
 | Editing anything an agent reads — this file, a skill, a convention, an agent doc | load the `writing-for-agents` skill first. It is the standard harness prose is reviewed against, and it lives upstream so there is no second copy here to drift. |
 | Product / in-app UI copy (labels, errors, empty states) | `design-system/guidelines/foundations/content/` — what a tutor reads inside the app |
 | Component architecture questions | `design-system/guidelines/components/overview.md` |

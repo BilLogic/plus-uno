@@ -37,7 +37,7 @@
  *     method's name (`uno-maintain/method`) is not rooted and never reaches
  *     this pass.
  *  3. Backticked BARE filenames name a file that exists somewhere. The rule is
- *     deliberately weak — `method.md`, `bot.md` and `SKILL.md` each name many
+ *     deliberately weak — `method.md`, `SKILL.md` and `ACTION.md` each name many
  *     real files — and weak still catches the class: a retired file resolves to
  *     nothing at all. That is how `figma-workspace.md` rotted for twelve days
  *     after moving to docs/connectors/figma.md (#408).

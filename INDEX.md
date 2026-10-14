@@ -32,18 +32,12 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
-| [`skills/README.md`](skills/README.md) | Skill anatomy — which content belongs in method.md, which in a face, and the guard that holds the split |
-| [`skills/uno-maintain/bot.md`](skills/uno-maintain/bot.md) | uno-maintain — the Worker's maintain turn, complete in-file; the method is disclosed behind read_reference. |
+| [`skills/README.md`](skills/README.md) | Skill anatomy — what goes in an uno skill's method and its SKILL.md, what goes in a bot skill, and the guards that hold each |
 | [`skills/uno-maintain/SKILL.md`](skills/uno-maintain/SKILL.md) | Fix the harness, not project design work |
-| [`skills/uno-prototype/bot.md`](skills/uno-prototype/bot.md) | uno-prototype — the Worker's prototype turn, complete in-file; the method is disclosed behind read_reference. |
 | [`skills/uno-prototype/SKILL.md`](skills/uno-prototype/SKILL.md) | PRD → design artifact |
-| [`skills/uno-publish/bot.md`](skills/uno-publish/bot.md) | uno-publish — the Worker's publish turn, complete in-file; the method is disclosed behind read_reference. |
 | [`skills/uno-publish/SKILL.md`](skills/uno-publish/SKILL.md) | The method — rails, gates, contracts — is references/method.md |
-| [`skills/uno-research/bot.md`](skills/uno-research/bot.md) | uno-research — the Worker's research turn, complete in-file; the method is disclosed behind read_reference. |
 | [`skills/uno-research/SKILL.md`](skills/uno-research/SKILL.md) | Gather context that doesn't exist yet |
-| [`skills/uno-review/bot.md`](skills/uno-review/bot.md) | uno-review — the Worker's review turn, complete in-file; the method is disclosed behind read_reference. |
 | [`skills/uno-review/SKILL.md`](skills/uno-review/SKILL.md) | reviewers/ds-lens · reviewers/uno-lens · reviewers/a11y-lens · reviewers/design-qa · reviewers/rubric-applier — defined in agents/ (see agents/README.md) |
-| [`skills/uno-synthesize/bot.md`](skills/uno-synthesize/bot.md) | uno-synthesize — the Worker's synthesize turn, complete in-file; the method is disclosed behind read_reference. |
 | [`skills/uno-synthesize/SKILL.md`](skills/uno-synthesize/SKILL.md) | The procedure lives in references/method.md (always load): ingest → findings toll gate → STOP at the designer's two gates → PRD → paired |
 
 ## Agents — what skills summon
@@ -216,6 +210,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-145 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+139 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

@@ -306,7 +306,7 @@ function transformSegment(seg: string): string {
     // these patterns can't touch real links.
     .replace(/ ?\[\d+(?:,\s*\d+)*\]/g, "")
     .replace(/ ?\[(?:docs|skills|agents|design-system)\/[^\]\n]*\]/g, "")
-    // Bare harness-file citations ("[method.md]", "[bot.md]") and bracketed
+    // Bare harness-file citations ("[method.md]", "[SKILL.md]") and bracketed
     // row-UUID citations ("[a0000000-…]", "[id1, id2]") — both reached
     // designers in the 2026-07-11 test round despite the prompt ban.
     .replace(/ ?\[[a-z0-9_-]+\.md\]/gi, "")

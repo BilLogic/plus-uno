@@ -394,7 +394,7 @@
   },
   {
     "name": "read_reference",
-    "description": "Read-only, zero network cost. Returns one harness document by name from a map baked into the Worker at build time — the skill methods and references that are disclosed behind this tool instead of loaded into every turn. Reach for it when a skill's Worker face names its method (for example `uno-maintain/method`) at the point the turn needs the full procedure, or when a question the loaded documents leave open names a reference. The answer is already in context when the loaded skill face, the persona or the connector docs settle it; a document read this turn stays available for the rest of the turn and is dropped when the turn ends, so a later turn reads it again with one call. A miss returns the map's names, so a second call with one of them is one lookup.",
+    "description": "Read-only, zero network cost. Returns one harness document by name from a map baked into the Worker at build time — the bot skills, scheduled actions and references disclosed behind this tool instead of loaded into every turn. Reach for it when an ask matches a bot skill's or a scheduled action's pointer line (read it by the bold name that opens the line, for example `draft-a-prd`), or when a question the loaded documents leave open names a reference. A document read this turn stays available for the rest of the turn and is dropped when the turn ends, so a later turn reads it again with one call. A miss returns the map's names, so a second call with one of them is one lookup.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -404,7 +404,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "The reference's name: the skill and document, e.g. `uno-maintain/method`. A name the map lacks returns the known names."
+          "description": "The reference's name, as its pointer line gives it: a bot skill or scheduled action by its folder (`draft-a-prd`, `sweep`), any other doc by its path (`docs/engineering/operations`). A name the map lacks returns the known names."
         }
       }
     }

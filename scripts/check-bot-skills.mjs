@@ -19,10 +19,12 @@
 //   three exits: answer (the reply is the deliverable), file (a ✅ card writes or
 //   sends), hand off (a ready-to-paste IDE prompt).
 //
-// THE RETIRED-FACE GUARD is ready and not yet enforced: `retiredFaceHits()`
-// finds the vocabulary of the uno skills' Worker faces in live files (plans and
-// the archive excluded), and `--retired-faces` prints them. It joins `run()`
-// when the faces are deleted; until then every live mention of them is true.
+// THE RETIRED-FACE GUARD: the uno skills once carried a second, Slack-side file
+// each, and the bot skills replaced them. A live file that still names that
+// file or its old role name is describing a harness that no longer exists, so
+// each such line is a finding. History is left as written — plans, ADRs, todos
+// and the archive — and so are generated files, which regenerate from the
+// sources this guard already reads. `--retired-faces` prints the hits alone.
 //
 // Usage:
 //   npm run check:bot-skills
@@ -47,14 +49,18 @@ const TOOL_TABLE = 'agents/uno-bot/tool-definitions.json';
 /** The three exits, each the opening word(s) of an Exit item. */
 export const EXITS = ['answer', 'file', 'hand off'];
 
-/** Joins `run()` when the uno skills' Worker faces are deleted. */
-const ENFORCE_RETIRED_FACES = false;
+/** The vocabulary of the retired faces. `uno-bot.md` and its kin are other files. */
+const RETIRED_FACE = /(?<![\w-])bot\.md\b|\bWorker faces?\b/i;
 
-/** The vocabulary of the retired faces. */
-const RETIRED_FACE = /\bbot\.md\b|\bWorker faces?\b/i;
-
-/** Live-file roots the guard skips: history, kept as it was written. */
-const HISTORY = ['docs/plans/', 'docs/knowledge/archive/'];
+/** Roots the guard skips: history, kept as it was written, and generated copies. */
+const HISTORY = [
+  'docs/plans/',
+  'docs/knowledge/archive/',
+  'docs/adr/',
+  'todos/',
+  'agents/uno-bot/src/generated/',
+  'agents/uno-bot/harness-bundle.md',
+];
 
 /** This check names the vocabulary it guards, so it skips itself. */
 const SELF = ['scripts/check-bot-skills.mjs', 'scripts/check-bot-skills.test.mjs'];
@@ -62,7 +68,9 @@ const SELF = ['scripts/check-bot-skills.mjs', 'scripts/check-bot-skills.test.mjs
 export const REMEDY =
   '  A bot skill names tools exactly as the tool table does, ends in one `## Exit` section\n' +
   `  whose items each open with ${EXITS.join(' / ')}, and carries a one-line description\n` +
-  '  within `BUDGETS.botSkillDescription` (agents/uno-bot/scripts/bundle-harness.mjs).';
+  '  within `BUDGETS.botSkillDescription` (agents/uno-bot/scripts/bundle-harness.mjs).\n' +
+  '  A live line naming a retired face names the bot skill that does the work now\n' +
+  '  (agents/uno-bot/skills/<name>/SKILL.md) or the uno skill\'s SKILL.md.';
 
 /** A backticked snake_case name: the shape every tool name has. */
 const NAMED_TOOL = /`([a-z][a-z0-9]*(?:_[a-z0-9]+)+)`/g;
@@ -163,10 +171,8 @@ export function run({ repoRoot = REPO_ROOT, manifest } = {}) {
   const asked = manifestFor(manifest, repoRoot);
   if (asked.error) return [{ message: asked.error, severity: 'error' }];
   const findings = compare({ repoRoot, manifest: asked.manifest });
-  if (ENFORCE_RETIRED_FACES) {
-    for (const { file, line, text } of retiredFaceHits({ repoRoot })) {
-      findings.push({ file, line, severity: 'error', message: `names a retired Worker face: ${text}` });
-    }
+  for (const { file, line, text } of retiredFaceHits({ repoRoot })) {
+    findings.push({ file, line, severity: 'error', message: `names a retired skill face: ${text}` });
   }
   return findings;
 }
@@ -176,14 +182,14 @@ export function summary({ repoRoot = REPO_ROOT, manifest } = {}) {
   const asked = manifestFor(manifest, repoRoot);
   if (asked.error) return 'the manifest could not be read';
   const n = asked.manifest.members.filter((m) => m.section === SECTION && m.delivery !== 'ide-only').length;
-  return `${n} bot skill(s) name real tools, end in ${EXITS.join(' / ')}, and carry a one-line description.`;
+  return `${n} bot skill(s) name real tools, end in ${EXITS.join(' / ')}, and carry a one-line description; no live file names a retired face.`;
 }
 
 /** Print the retired-face hits, for the run that decides when to enforce them. */
 function printRetiredFaces() {
   const hits = retiredFaceHits();
   for (const { file, line, text } of hits) console.log(`${file}:${line}  ${text}`);
-  console.log(`[bot-skills] ${hits.length} live line(s) name a retired Worker face (not yet enforced).`);
+  console.log(`[bot-skills] ${hits.length} live line(s) name a retired skill face.`);
 }
 
 // Imported by the harness runner, so it must do nothing on import.

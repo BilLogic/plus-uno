@@ -41,7 +41,7 @@ test('structural lines are discounted, not counted as drift', () => {
     '# uno-publish — method',
     '|---|---|',
     '| --- | :---: | ---: |',
-    '<!-- Worker face — bundled by uno-bot -->',
+    '<!-- bundled by uno-bot -->',
     '',
     '   ',
   ]) {
@@ -66,20 +66,20 @@ test('today\'s real coincidences produce no finding', () => {
   const shared = ['---', '```', '|---|---|', '## Quality bar', '## Hand-offs'].join('\n');
   const found = findSharedLines(
     doc('method.md', `# heading\n${shared}\nA procedure step that lives only in the method.`),
-    doc('bot.md', `# heading\n${shared}\nA Slack delta that lives only in the bot face.`),
+    doc('SKILL.md', `# heading\n${shared}\nAn IDE delta that lives only in SKILL.md.`),
   );
   assert.deepEqual(found, []);
 });
 
-test('a rule copied from method.md into bot.md is found, and both files are named', () => {
+test('a rule copied from method.md into SKILL.md is found, and both files are named', () => {
   const rule = 'The confirmation gate is non-negotiable even for fully-specified requests — the friction is the feature.';
   const found = findSharedLines(
     doc('skills/x/references/method.md', `# method\n\n- ${rule}\n`),
-    doc('skills/x/bot.md', `# bot\n\nSlack delta only.\n\n${rule}\n`),
+    doc('skills/x/SKILL.md', `# skill\n\nIDE delta only.\n\n${rule}\n`),
   );
   assert.equal(found.length, 1);
   assert.equal(found[0].a.label, 'skills/x/references/method.md');
-  assert.equal(found[0].b.label, 'skills/x/bot.md');
+  assert.equal(found[0].b.label, 'skills/x/SKILL.md');
   assert.equal(found[0].a.line, 3);
   assert.equal(found[0].b.line, 5);
 });
@@ -103,7 +103,7 @@ test('a line repeated inside one file is not an overlap with the other', () => {
 test('all six shipped skills pass at the chosen threshold', () => {
   const { findings, skills, pairings } = auditSkills();
   assert.equal(skills.length, 6, 'expected six uno-* skills');
-  assert.equal(pairings, 18, 'three pairings per skill');
+  assert.equal(pairings, 6, 'one pairing per skill');
   assert.ok(
     findings.length <= MAX_SHARED_LINES,
     `expected no substantive overlap, got:\n${findings.map((f) => `${f.a.label}:${f.a.line} == ${f.b.label}:${f.b.line}  ${f.text}`).join('\n')}`,
@@ -114,15 +114,15 @@ test('all six shipped skills pass at the chosen threshold', () => {
 //
 // The same invariant, one scope out: a rule that lives in the persona and again
 // in the constitution is the same defect as one living in a method and again in
-// a face, and until this landed nothing compared two bundled docs to each other.
+// its SKILL.md, and until this landed nothing compared two bundled docs to each other.
 
 test('a multi-line HTML comment is discounted whole, not just its opening line', () => {
   // The 2026-08-26 measurement's only cross-document hit: four method.md files
   // open with the same two-line authoring banner. Line 1 was discounted as a
   // comment and line 2 was not, which is a classifier artefact, not drift.
   const banner =
-    '<!-- Runtime-neutral core — loaded by BOTH faces (SKILL.md in the IDE, bot.md in the Worker).\n' +
-    '     No IDE tool names, no Slack formatting here; execution specifics live in the faces. -->';
+    '<!-- Runtime-neutral core — loaded by SKILL.md on invocation.\n' +
+    '     No IDE tool names, no Slack formatting here; execution specifics live in SKILL.md. -->';
   const found = findSharedLines(
     doc('skills/a/references/method.md', `---\nembodiment: all\n---\n\n${banner}\n\nA procedure step that only skill A performs.`),
     doc('skills/b/references/method.md', `---\nembodiment: all\n---\n\n${banner}\n\nA procedure step that only skill B performs.`),
@@ -162,56 +162,44 @@ test('a citation is not a duplication', () => {
   // apart without a similarity number to argue about.
   const found = findSharedLines(
     doc('AGENTS.md', 'Every deliverable carries the evidence it was judged against, in the same message.'),
-    doc('skills/uno-review/bot.md', 'Evidence travels with the deliverable — `AGENTS.md` § The loading contract.'),
+    doc('agents/uno-bot/skills/critique-a-design/SKILL.md', 'Evidence travels with the deliverable — `AGENTS.md` § The loading contract.'),
   );
   assert.deepEqual(found, []);
 });
 
-// ── A disclosed method is still compared (#424) ──────────────────────────────
+// ── A disclosed bot skill is still compared ──────────────────────────────────
 //
-// `disclosure: reference` moves a method out of the prompt and into the
-// reference map. It does not move it out of the Worker's reading, so it must
-// not move it out of this guard: a face that restates its own disclosed method
-// is still one rule in two homes the bot reads, on the turn that fetches it.
+// `disclosure: reference` moves a bot skill's body out of the prompt and into
+// the reference map. It does not move it out of the Worker's reading, so it
+// must not move it out of this guard: a skill that restates the persona is
+// still one rule in two homes the bot reads, on the turn that fetches it.
 
-test('a face that restates its disclosed method is found, in both scopes', () => {
-  const rule = 'The study guide exists in Notion before any SME or participant conversation.';
-  const method = doc(
-    'skills/x/references/method.md',
-    `---\nembodiment: all\ndisclosure: reference\n---\n\n# x — method\n\n${rule}\n`,
+test('a bot skill that restates the persona is found in the bundle scope', () => {
+  const rule = 'Every link you present came back from a tool this turn, so none is constructed.';
+  const skill = doc(
+    'agents/uno-bot/skills/x/SKILL.md',
+    `---\nembodiment: uno-bot\ndisclosure: reference\ndescription: x\n---\n\n# x\n\n- **${rule}**\n`,
   );
-  const face = doc('skills/x/bot.md', `---\nembodiment: uno-bot\n---\n\n# x — bot face\n\nSlack steps.\n\n- **${rule}**\n`);
-  // Scope one reads the skill's three files off disk, disclosure or not.
-  assert.equal(findSharedLines(method, face).length, 1, 'the within-skill pairing sees through disclosure');
-  // Scope two compares the whole Worker corpus — prompt plus map — so the same
-  // pair is found there too, and the frontmatter that moved the method is
-  // discounted as structure rather than read as a rule.
-  const { findings, pairings } = findSharedAcross([method, face, doc('AGENTS.md', '# constitution\n\nUnrelated.\n')]);
+  const persona = doc('agents/uno-bot/AGENT.md', `# persona\n\n${rule}\n`);
+  const { findings, pairings } = findSharedAcross([persona, skill, doc('AGENTS.md', '# constitution\n\nUnrelated.\n')]);
   assert.equal(pairings, 3);
-  assert.equal(findings.length, 1);
-  assert.equal(findings[0].a.label, 'skills/x/references/method.md');
-  assert.equal(findings[0].b.label, 'skills/x/bot.md');
+  assert.equal(findings.length, 1, 'the frontmatter is structure; the copied rule is the finding');
+  assert.equal(findings[0].b.label, 'agents/uno-bot/skills/x/SKILL.md');
 });
 
-test('every disclosed method is inside the corpus the bundle scope compares', () => {
-  // The real run: each method that declares `disclosure: reference` on disk is
-  // one of the docs `auditBundle` collected. A method that left the prompt and
-  // fell out of the comparison would let its face restate it unseen.
+test('every bot skill is inside the corpus the bundle scope compares, and no uno skill file is', () => {
+  // The real run: each bot skill on disk is one of the docs `auditBundle`
+  // collected, and the uno skills, IDE workflows now, are none of them.
   const { files } = auditBundle();
-  const disclosed = fs
-    .readdirSync(SKILLS_ROOT, { withFileTypes: true })
-    .filter((d) => d.isDirectory() && d.name.startsWith('uno-'))
-    .map((d) => `skills/${d.name}/references/method.md`)
-    .filter((rel) => /^disclosure:\s*reference$/m.test(fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8')));
-  assert.ok(disclosed.length >= 1, 'expected at least one disclosed method on disk');
-  for (const rel of disclosed) {
-    assert.ok(files.includes(rel), `${rel} is disclosed but absent from the bundle scope's corpus`);
+  const botSkills = fs
+    .readdirSync(path.join(REPO_ROOT, 'agents/uno-bot/skills'), { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .map((d) => `agents/uno-bot/skills/${d.name}/SKILL.md`);
+  assert.ok(botSkills.length >= 1, 'expected at least one bot skill on disk');
+  for (const rel of botSkills) {
+    assert.ok(files.includes(rel), `${rel} is absent from the bundle scope's corpus`);
   }
-  // And every face is compared against every method, whichever delivery the method has.
-  for (const rel of disclosed) {
-    const face = rel.replace('/references/method.md', '/bot.md');
-    assert.ok(files.includes(face), `${face} must be in the same corpus as its method`);
-  }
+  assert.deepEqual(files.filter((f) => f.startsWith('skills/')), [], 'an uno skill file reached the Worker corpus');
 });
 
 test('the bundled set today has no substantive cross-document overlap', () => {

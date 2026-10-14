@@ -27,7 +27,7 @@ function fixture(docs) {
     fs.writeFileSync(path.join(repoRoot, rel), text);
   }
   const manifest = {
-    budgets: { assembled: 175_500, persona: 28_000, botFace: 7_000, constitution: 20_000 },
+    budgets: { assembled: 175_500, persona: 28_000, botSkill: 5_000, constitution: 20_000 },
     members: Object.keys(docs).map((p) => ({ path: p })),
   };
   return { repoRoot, manifest };
@@ -42,14 +42,14 @@ test('a doc that cites the constant by key is no finding', () => {
 
 test('a doc that writes a budget number down is a finding naming the constant it copies', () => {
   const ctx = fixture({
-    'skills/README.md': '# Skills\n\nA face is short.\n`bot.md` is on a 7,000-char budget the bundler asserts.\n',
+    'skills/README.md': '# Skills\n\nA bot skill is short.\n`SKILL.md` is on a 5,000-char budget the bundler asserts.\n',
   });
   const findings = run(ctx);
   assert.equal(findings.length, 1);
   assert.equal(findings[0].file, 'skills/README.md');
   assert.equal(findings[0].line, 4, 'must name the line the number is on');
-  assert.match(findings[0].message, /7,000/);
-  assert.match(findings[0].message, /BUDGETS\.botFace/, 'must cite the constant to use instead');
+  assert.match(findings[0].message, /5,000/);
+  assert.match(findings[0].message, /BUDGETS\.botSkill/, 'must cite the constant to use instead');
 });
 
 test('a number in k is read as chars', () => {
@@ -73,11 +73,11 @@ test('a char count on a line about something other than a budget is no finding',
 });
 
 test('a doc that cites a constant the bundler does not have is a finding', () => {
-  const ctx = fixture({ 'skills/README.md': '`bot.md` is held to `BUDGETS.botFase`.\n' });
+  const ctx = fixture({ 'skills/README.md': '`SKILL.md` is held to `BUDGETS.botSkil`.\n' });
   const findings = run(ctx);
   assert.equal(findings.length, 1);
-  assert.match(findings[0].message, /BUDGETS\.botFase/);
-  assert.match(findings[0].message, /botFace/, 'must list the keys that do exist');
+  assert.match(findings[0].message, /BUDGETS\.botSkil/);
+  assert.match(findings[0].message, /botSkill/, 'must list the keys that do exist');
 });
 
 test('only docs the manifest declares are read', () => {

@@ -1,10 +1,9 @@
 ---
-embodiment: all
-disclosure: reference
-summary: uno-maintain — the shared procedure both faces load.
+embodiment: ide
+summary: uno-maintain — the procedure SKILL.md loads on invocation.
 ---
 
-<!-- Shared core, loaded by both faces (SKILL.md + bot.md). Runtime-neutral: no IDE tool names, no Slack mechanics; where a role is named (writers/*, auditor) the faces own HOW it's dispatched. -->
+<!-- The procedure, loaded by SKILL.md on invocation. Runtime-neutral: no IDE tool names, no Slack mechanics; where a role is named (writers/*, auditor) SKILL.md owns HOW it's dispatched. -->
 <!-- Source flows: Flow 4 (intake & proposal) + Flow 5 (review & approval), PLUS UNO Workflow board. -->
 
 # uno-maintain — method
@@ -19,10 +18,10 @@ Every intake is one of four **trigger types** — improvement (could be better) 
 |---|---|---|
 | Codebase | product context / stories | fix `docs/product-and-service/*` + `GLOSSARY.md` |
 | Codebase | harness doc stale / wrong | fix `docs/product-and-service/*` (non-product) + `docs/conventions/*` — repo-canonical, ADR-017 |
-| Codebase | a skill isn't useful | refine the skill (`skills/*` — both faces if shared) |
+| Codebase | a skill isn't useful | refine the skill (`skills/*`) |
 | Codebase | UNO off-role / personality | tune persona / instructions (AGENTS.md, embodiment deltas) |
 | Codebase | Storybook inconsistent / bug | fix the design system (`design-system/src/**`) |
-| Codebase | uno-bot misbehaving | fix uno-bot (`agents/uno-bot/**`, bot faces) |
+| Codebase | uno-bot misbehaving | fix uno-bot (`agents/uno-bot/**`, its bot skills) |
 | Figma | spec out of date | update the Figma spec pages |
 | Figma | components out of date | update the Figma component library |
 | Notion | requirement / story changed | update PRD **+ blueprint together** — paired, never one alone |

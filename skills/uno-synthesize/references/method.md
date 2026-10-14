@@ -1,12 +1,11 @@
 ---
-embodiment: all
-disclosure: reference
-summary: uno-synthesize — the shared procedure both faces load.
+embodiment: ide
+summary: uno-synthesize — the procedure SKILL.md loads on invocation.
 ---
 
 # uno-synthesize — method
 
-<!-- Runtime-neutral core, loaded by both faces (SKILL.md in the IDE, bot.md in the Worker).
+<!-- Runtime-neutral core, loaded by SKILL.md on invocation.
      Golden scenarios: docs/evals/scenarios/uno-synthesize.md · rubric: docs/evals/rubrics/uno-synthesize.md -->
 
 Distill context that already exists into documented findings, then — only on the
