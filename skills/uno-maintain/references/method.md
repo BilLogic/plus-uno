@@ -75,7 +75,7 @@ Answered by the **spotter** (fallback: the designated maintainer) — never by t
 
 1. **Pair, never one alone.** Open the PR *and* pair it with a PRD carrying the rationale — reviewers see *why*, not just *what*. A lone PR or lone PRD never ships.
 2. **Review post** to the design review channel (`docs/connectors/slack.md`): self-sufficient — one-line summary, PR + PRD links, suggested reviewers. Assume the reviewer never opens the PR.
-3. **Verdict** from a routed reviewer, machine-parseable per `docs/connectors/slack.md` gate 2 (approve / request-changes / reject — the emoji vocabulary lives there, not here). **Persona and DS-component changes need two approvals.** No verdict in 2 working days → re-ping the suggested reviewers once; 4 working days → escalate to the design lead. **Never auto-merge on silence.**
+3. **Verdict** from a routed reviewer, machine-parseable per `docs/connectors/slack.md` gate 2 (approve / request-changes / reject — the emoji vocabulary lives there, not here). One approve applies any change, persona and DS components included. No verdict in 2 working days → re-ping the suggested reviewers once; 4 working days → escalate to the design lead. **Never auto-merge on silence.**
 4. **Execute on approve only.** Merge the PR or apply the update, then reply in the review thread with what was applied — a non-code apply has no merge commit, so that reply is its record.
 5. **🔁** → revise and re-enter at drafting (§2); each round gets a fresh, complete post. **❌** → record why in the thread so the idea isn't silently re-raised.
 

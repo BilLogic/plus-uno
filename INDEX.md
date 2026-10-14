@@ -58,7 +58,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`agents/uno-bot/harness-bundle.md`](agents/uno-bot/harness-bundle.md) | Generated readable companion to the baked Worker prompt — the load-order manifest plus the assembled harness as markdown. |
 | [`agents/uno-bot/migrations/README.md`](agents/uno-bot/migrations/README.md) | The Worker's own database migrations — the uno-bot-usage D1 schema under usage/ and how to apply it — and why the blueprint's retrieval schema is not here. |
 | [`agents/uno-bot/README.md`](agents/uno-bot/README.md) | A Cloudflare Worker that puts uno (the PLUS design agent) in Slack as @uno-bot: it receives Slack events, runs an agentic tool-use loop, answers grounded questions across Notion / |
-| [`agents/writers/blueprint.md`](agents/writers/blueprint.md) | The only agent that touches uno-blueprint (Supabase, the product source of truth) |
+| [`agents/writers/blueprint.md`](agents/writers/blueprint.md) | The only agent that writes uno-blueprint (Supabase, the product source of truth), and the grounding reader for the skills that summon it |
 | [`agents/writers/figma.md`](agents/writers/figma.md) | The only agent that writes to the Figma workspace |
 | [`agents/writers/notion.md`](agents/writers/notion.md) | The only agent that writes to Notion |
 
