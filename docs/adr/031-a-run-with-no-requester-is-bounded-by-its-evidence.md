@@ -27,7 +27,7 @@ verified: 2026-09-29 (#751)
 
 1. Evidence in a private channel, a group DM or a DM → that place.
 2. Evidence in a Slack thread → that thread.
-3. The team's channel, by the pillar → channel map in `docs/connectors/slack/overview.md`: `Universal` → #plus-universal, `Admin` → #plus-admin, `Toolkit` → #plus-toolkit, `Training` → #plus-training, `Marketing` → #plus-marketing. The team is the linked Roadmap card's `Product Pillar`, else the Figma file's team. The card wins when the two disagree, and its first mapped pillar decides when it has several. The DS library file is the Universal team's, and `design-system/` code and Storybook take the library's team.
+3. The team's channel, by the pillar → channel map in `docs/connectors/slack/overview.md`: `Universal` → #plus-universal, `Admin` → #plus-admin, `Toolkit` → #plus-toolkit, `Training` → #plus-training, `Marketing` → #plus-marketing. The team is the linked Roadmap card's `Product Pillar`, else the Figma file's team. The card wins when the two disagree, and its first mapped pillar decides when it has several. When none of its pillars has a channel (only Tutoring or Help Center), the Figma file's team decides before #plus-design (Bill, 2026-10-14). The DS library file is the Universal team's, and `design-system/` code and Storybook take the library's team.
 4. No team, or a pillar with no channel (Tutoring, Help Center) → #plus-design.
 
 The card's design owner is tagged. With no design owner, the Figma file's creator is named by Figma handle, untagged. This replaces rung 3's "design-system target → #plus-universal", and a group DM's share card names the same team channel the finding would take with its evidence set aside.

@@ -67,13 +67,18 @@ test("with no card, the Figma file's team is the fallback", () => {
   });
 });
 
-test("the card wins when it and the Figma file disagree, even when its pillar is unmapped", () => {
+test("the card wins when its pillar has a channel; when none of its pillars has one, the Figma file's team does", () => {
   assert.deepEqual(routeFinding({ evidence: null, card: { pillars: ["Admin"] }, figmaFile: { team: "Toolkit" } }).destination, {
     rung: "team",
     team: "Admin",
     channel: "plus-admin",
   });
-  assert.deepEqual(routeFinding({ evidence: null, card: { pillars: ["Tutoring"] }, figmaFile: { team: "Toolkit" } }).destination, {
+  assert.deepEqual(routeFinding({ evidence: null, card: { pillars: ["Tutoring", "Help Center"] }, figmaFile: { team: "Toolkit" } }).destination, {
+    rung: "team",
+    team: "Toolkit",
+    channel: "plus-toolkit",
+  });
+  assert.deepEqual(routeFinding({ evidence: null, card: { pillars: ["Tutoring"] }, figmaFile: { team: "MISC" } }).destination, {
     rung: "design",
     channel: "plus-design",
   });

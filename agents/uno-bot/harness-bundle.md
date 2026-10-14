@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **96,426 chars from 9 files**, against an assembled budget of 175,500 (79,074 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 76,042 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **96,519 chars from 9 files**, against an assembled budget of 175,500 (78,981 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 76,135 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -26,11 +26,11 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,216 | 48,614 | — |
 | 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,646 (−203 ide-only) | 54,311 | — |
 | 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 66,097 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 14,805 (−5,949 ide-only) | 80,953 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 84,421 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 90,937 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 95,570 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 96,426 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 14,898 (−5,949 ide-only) | 81,046 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 84,514 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 91,030 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 95,663 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 96,519 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -819,7 +819,7 @@ Every scheduled action sends a finding to the first rung that fits (`agents/uno-
 
 1. Evidence in a private channel, a group DM or a DM → that place only.
 2. Evidence in a Slack thread → **that thread**.
-3. The team's channel, by the pillar → channel map above. The team is the linked Roadmap card's `Product Pillar`, else the Figma file's team; the card wins when they disagree. The library file is the Universal team's, and `design-system/` code and Storybook take the library's team.
+3. The team's channel, by the pillar → channel map above. The team is the linked Roadmap card's `Product Pillar`, else the Figma file's team; the card wins when one of its pillars has a channel, and when none does (Tutoring, Help Center) the Figma file's team decides. The library file is the Universal team's, and `design-system/` code and Storybook take the library's team.
 4. No team, or a pillar with no channel (Tutoring, Help Center) → #plus-design.
 
 The card's design owner is tagged. With no card, the Figma file's creator is named by handle, untagged. #uno-bot is off the ladder, and so is defaulting to the lead.

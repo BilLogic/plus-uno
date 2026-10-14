@@ -12,7 +12,7 @@ import type { FigmaClient, FigmaComment } from "../figma/client";
 import { asksUno, isOwnComment } from "../figma-ask/trigger";
 import { etDayOf, etHourOn } from "../sweep/schedule";
 import { escapeSlackText } from "../slack/mrkdwn";
-import { resolveDestination, routeFinding, type Addressee, type ChannelIds } from "../destination/index";
+import { resolveDestination, routeFinding, teamNamed, type Addressee, type ChannelIds } from "../destination/index";
 import { escapeRegExp } from "../tools/slack-people";
 import { commentUrl } from "./draft";
 import type { FileOwner } from "./queue";
@@ -320,7 +320,8 @@ async function raise(
   const cardDue = !(named.mapped.length && !named.unmapped.length) && !q.carded;
   if (!cardDue) return allDmed ? { ok: true } : { ok: false, question: reached(!!q.carded) };
 
-  const team = file.pillars.length ? null : await ports.fileTeam(file.fileKey);
+  // The file's team is read only when no card pillar has a channel: then it decides.
+  const team = file.pillars.some((p) => teamNamed(p)) ? null : await ports.fileTeam(file.fileKey);
   const { destination, addressee } = routeFinding({
     evidence: null,
     card: file.pillars.length ? { pillars: file.pillars, designOwner: file.owner && "slack" in file.owner ? file.owner.slack : null } : null,

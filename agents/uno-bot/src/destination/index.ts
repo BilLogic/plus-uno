@@ -67,7 +67,8 @@ function destinationOf({ evidence, card, figmaFile }: FindingContext): Destinati
     return { rung: "private", channel: evidence.channel, threadTs: evidence.threadTs };
   }
   if (evidence?.threadTs) return { rung: "thread", channel: evidence.channel, threadTs: evidence.threadTs };
-  const named = card?.pillars.length ? card.pillars : figmaFile?.team ? [figmaFile.team] : [];
+  // The card's first pillar with a channel; when none has one, the Figma file's team.
+  const named = [...(card?.pillars ?? []), ...(figmaFile?.team ? [figmaFile.team] : [])];
   const team = named.map(teamNamed).find((t): t is Team => t !== null);
   return team ? { rung: "team", team, channel: PILLAR_CHANNELS[team] } : { rung: "design", channel: "plus-design" };
 }

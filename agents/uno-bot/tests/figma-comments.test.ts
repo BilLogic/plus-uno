@@ -885,6 +885,16 @@ describe("an unanswered question, raised after two workdays", () => {
     assert.equal(h.figma.triage.dms.length, 2);
   });
 
+  it("with a card whose pillars have no channel, goes to the Figma file's team channel, tagging its design owner", async () => {
+    const tutoring = { 2482: { url: CARD_URL, title: "Goal Setting", pillars: ["Tutoring"] } };
+    const { h } = await nightHarness({ cards: tutoring, triage: { fileTeams: { [FILE]: "Toolkit" } } });
+    await runSweepJob(NIGHT, h.deps);
+    await morning(h, FRIDAY);
+    assert.equal(h.figma.triage.posts.length, 1);
+    assert.equal(h.figma.triage.posts[0]!.channel, TOOLKIT);
+    assert.match(h.figma.triage.posts[0]!.text, /^<@U0SARAH>, a question/);
+  });
+
   it("with no card, goes to the Figma file's team channel and names its creator by handle, untagged", async () => {
     const client = createInMemoryFigma();
     client.seedFile("ToolFile1", {

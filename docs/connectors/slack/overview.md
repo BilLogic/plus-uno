@@ -31,7 +31,7 @@ Every scheduled action sends a finding to the first rung that fits (`agents/uno-
 
 1. Evidence in a private channel, a group DM or a DM → that place only.
 2. Evidence in a Slack thread → **that thread**.
-3. The team's channel, by the pillar → channel map above. The team is the linked Roadmap card's `Product Pillar`, else the Figma file's team; the card wins when they disagree. The library file is the Universal team's, and `design-system/` code and Storybook take the library's team.
+3. The team's channel, by the pillar → channel map above. The team is the linked Roadmap card's `Product Pillar`, else the Figma file's team; the card wins when one of its pillars has a channel, and when none does (Tutoring, Help Center) the Figma file's team decides. The library file is the Universal team's, and `design-system/` code and Storybook take the library's team.
 4. No team, or a pillar with no channel (Tutoring, Help Center) → #plus-design.
 
 The card's design owner is tagged. With no card, the Figma file's creator is named by handle, untagged. #uno-bot is off the ladder, and so is defaulting to the lead.
