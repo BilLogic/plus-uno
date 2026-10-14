@@ -20,17 +20,30 @@
 // a reader that does not exist, and the build fails rather than bake a map
 // entry nobody can reach.
 //
-// A reference is NAMED by its path with the shape words removed — `skills/` and
-// `references/` carry no meaning to the model — so `skills/uno-maintain/
-// references/method.md` is `uno-maintain/method`: the skill's own name leads,
-// which is the word the face's pointer fires on. A doc outside `skills/` keeps
-// its path sans `.md`.
+// A disclosed doc that carries a `description` also leaves a POINTER in the
+// prompt — `**<name>** — <description>` — at its section's position, after the
+// section's loaded docs. That is how a bot skill's trigger words stay always
+// loaded while its body waits in the map. A disclosed doc with no description
+// leaves no line: its pointer is written in the doc that fires it.
+//
+// HOW A SECTION'S DOCS SHIP IS THE SECTION ROW'S, and only the row's. Each row
+// in SECTIONS below states its roots, its budget (role, limit, whether an
+// overrun warns, and which delivery it holds) and how its references are
+// named, so a new shape of section is one row and no rule reads a path suffix.
+// Delivery itself stays per doc, in frontmatter, because one folder can mix an
+// always-loaded overview with disclosed siblings.
+//
+// A reference is NAMED by its row's rule. `folder`: the doc's folder, so
+// `agents/uno-bot/skills/draft-a-prd/SKILL.md` is `draft-a-prd`. `path`: its
+// path sans `.md` with the shape words removed — `skills/` and `references/`
+// carry no meaning to the model — so `skills/uno-maintain/references/method.md`
+// is `uno-maintain/method` and `docs/connectors/slack-sweep.md` keeps its path.
 //
 // ORDER IS A BUNDLE-LEVEL FACT no single document can know, so it is declared
-// once, in SECTIONS below, and nowhere else. Within a section, members sort by
-// path — except a skill's `method.md`, which precedes its `bot.md` by rule.
-// A per-doc sort weight was rejected: it spreads one global decision across
-// twenty files and turns a missing weight into a silent misplacement.
+// once, by the order of the rows in SECTIONS, and nowhere else. Within a
+// section, members sort by path. A per-doc sort weight was rejected: it spreads
+// one global decision across twenty files and turns a missing weight into a
+// silent misplacement.
 //
 // ── ONE FUNCTION, TWO CALLERS ────────────────────────────────────────────────
 //
@@ -114,20 +127,6 @@ const here = path.dirname(fileURLToPath(import.meta.url)); // agents/uno-bot/scr
 export const REPO_ROOT = path.resolve(here, "../../.."); // two levels above agents/uno-bot
 
 /**
- * The bundle's sections, in order. This list is the ONLY place order is stated.
- * Each section names roots to scan — never an individual file — and takes every
- * doc under them whose frontmatter says `embodiment: uno-bot` or `all`.
- */
-const SECTIONS = [
-  { name: "constitution", roots: ["AGENTS.md", "GLOSSARY.md"] },
-  { name: "persona", roots: ["agents/uno-bot/AGENT.md"] },
-  { name: "skills", roots: ["skills"] },
-  { name: "connectors", roots: ["docs/connectors"] },
-  { name: "engineering", roots: ["docs/engineering"] },
-  { name: "conventions", roots: ["docs/conventions"] },
-];
-
-/**
  * Char budgets, in chars because these files have paragraph-length lines. The
  * contract they enforce is stated in `AGENTS.md` § The loading contract; this is
  * the assertion of it, so an edit that blows a budget fails the build instead of
@@ -140,8 +139,9 @@ const SECTIONS = [
  * An `ide-only` region still counts against a per-file budget — no budgeted file
  * carries one today, and a persona or face that grew one would be worth seeing.
  *
- * Budgets attach to a doc's ROLE — the persona, a Worker face — never to a path,
- * so renaming a skill cannot silently drop its budget.
+ * A per-doc budget attaches to a section ROW (SECTIONS below) — never to a
+ * path — so renaming a doc cannot silently drop its budget, and a new row with
+ * a budget holds every doc under it with no other edit.
  */
 const BUDGETS = {
   // Headroom over today's ~170k, sized to absorb ordinary authoring and to fail
@@ -166,6 +166,11 @@ const BUDGETS = {
   assembled: 175_500,
   persona: 28_000,
   botFace: 7_000,
+  // A bot skill: its body, read through read_reference, and its description,
+  // which ships in the prompt as the skill's pointer line. The bundler holds the
+  // body; `check:bot-skills` holds the description.
+  botSkill: 5_000,
+  botSkillDescription: 400,
   // Tier 1 — the constitution, always loaded. The budget attaches to the
   // constitution's ROLE, like the persona's and the face's, so it cannot be
   // lost by a rename. Docs cite these constants by key (`BUDGETS.constitution`)
@@ -174,7 +179,8 @@ const BUDGETS = {
   //
   // SOFT since 2026-09-30 (Bill's call). An over-budget constitution file is a
   // WARNING finding — printed in `check:harness` with the overrun — and the
-  // build goes on; `softBudget()` below is the one place that says so. The
+  // build goes on; the constitution's row in SECTIONS is the one place that
+  // says so. The
   // assembled ceiling still fails, so constitution growth is still paid for
   // out of the same 175.5k every other doc spends.
   constitution: 20_000,
@@ -219,17 +225,45 @@ const BUDGETS = {
 };
 
 /**
- * Whether an overrun of this role's budget warns rather than fails. The
- * constitution only: the persona, a Worker face, the ceiling and the floor fail.
+ * The bundle's sections, in order. This list is the ONLY place order is stated.
+ * Each section names roots to scan — never an individual file — and takes every
+ * doc under them whose frontmatter says `embodiment: uno-bot` or `all`.
+ *
+ * A ROW SAYS HOW ITS DOCS SHIP:
+ *   budget  null, or `{ role, limit, soft }` — the role names the budget in
+ *           every message, `limit` is a `BUDGETS` key's value, and `soft` makes
+ *           an overrun a warning instead of a failure. It holds the body of
+ *           every doc under the row the Worker reads, whichever its delivery,
+ *           unless `delivery` narrows it to `bundled` or `disclosed`.
+ *   nameBy  `folder` | `path` — how a disclosed doc under the row is named in
+ *           the reference map (see the header).
+ *
+ * The `skills` row holds the uno skills' Worker faces until the bot skills
+ * replace them; its budget holds only what ships in the prompt, because the
+ * methods beside the faces are disclosed and read on demand.
  */
-const softBudget = (role) => role === "constitution";
+const SECTIONS = [
+  { name: "constitution", roots: ["AGENTS.md", "GLOSSARY.md"], budget: { role: "constitution", limit: BUDGETS.constitution, soft: true }, nameBy: "path" },
+  { name: "persona", roots: ["agents/uno-bot/AGENT.md"], budget: { role: "persona", limit: BUDGETS.persona, soft: false }, nameBy: "path" },
+  { name: "bot-skills", roots: ["agents/uno-bot/skills"], budget: { role: "botSkill", limit: BUDGETS.botSkill, soft: false }, nameBy: "folder" },
+  { name: "skills", roots: ["skills"], budget: { role: "Worker face", limit: BUDGETS.botFace, soft: false, delivery: "bundled" }, nameBy: "path" },
+  { name: "connectors", roots: ["docs/connectors"], budget: null, nameBy: "path" },
+  { name: "engineering", roots: ["docs/engineering"], budget: null, nameBy: "path" },
+  { name: "conventions", roots: ["docs/conventions"], budget: null, nameBy: "path" },
+];
 
-/** The budget a member is held to, or null when its role carries none. */
-function budgetFor({ rel, section }) {
-  if (section === "constitution") return { limit: BUDGETS.constitution, role: "constitution" };
-  if (section === "persona") return { limit: BUDGETS.persona, role: "persona" };
-  if (rel.endsWith("/bot.md")) return { limit: BUDGETS.botFace, role: "Worker face" };
-  return null;
+const ROWS = new Map(SECTIONS.map((row) => [row.name, row]));
+
+/**
+ * The budget a doc is held to: its row's, when the row carries one for the
+ * doc's delivery, or null.
+ *
+ * @param {{section: string, delivery: "bundled" | "disclosed"}} doc
+ */
+function budgetFor({ section, delivery }) {
+  const { budget } = ROWS.get(section);
+  if (!budget || (budget.delivery && budget.delivery !== delivery)) return null;
+  return budget;
 }
 
 const n = (x) => x.toLocaleString("en-US");
@@ -286,26 +320,23 @@ function walk(repoRoot, rel) {
   return out;
 }
 
+/** Path segments that carry no meaning to the model, dropped from a `path` name. */
+const SHAPE_WORDS = new Set(["skills", "references"]);
+
 /**
- * Sort key. Paths sort lexically, except that a skill's shared procedure loads
- * before its Worker face — the one ordering rule a document does own, because
- * `method.md` is meaningless read second. A disclosed method never reaches this
- * sort: it is in the map, not the prompt, and the face points at it.
+ * The name read_reference knows a disclosed doc by, under its row's rule.
+ * Stated once; see the header.
  */
-function sortKey(rel) {
-  const skill = rel.match(/^skills\/([^/]+)\//);
-  if (!skill) return rel;
-  const face = rel.endsWith("/references/method.md") ? "0" : "1";
-  // `rel` is appended so two docs in the same skill and face can never tie —
-  // a tie would leave their order up to the sort's stability, which is a
-  // silent way for the prompt to differ between runs.
-  return `skills/${skill[1]}/${face}/${rel}`;
+function referenceName(rel, nameBy) {
+  const segments = rel.replace(/\.md$/, "").split("/");
+  if (nameBy === "folder") return segments[segments.length - 2];
+  if (nameBy === "path") return segments.filter((s) => !SHAPE_WORDS.has(s)).join("/");
+  throw new Error(`a section row names its references by \`${nameBy}\`; the rules are \`folder\` and \`path\``);
 }
 
-/** The name read_reference knows a disclosed doc by. Stated once; see the header. */
-function referenceName(rel) {
-  return rel.replace(/\.md$/, "").replace(/^skills\//, "").replace(/\/references\//, "/");
-}
+/** The line a disclosed doc with a description leaves in the prompt, or null. */
+const pointerLine = (name, description) =>
+  typeof description === "string" && description.trim() ? `**${name}** — ${description.trim()}` : null;
 
 // Drop `<!-- ide-only -->…<!-- /ide-only -->` regions — replicated EXACTLY from
 // the old src/agent/skills.ts stripIdeOnly so the baked prompt matches.
@@ -453,21 +484,21 @@ const INSTANCE_DATA_GUARD_BLOCKING = false;
 // member after the first contributes and the last row equals the whole prompt.
 // The two columns therefore differ by the dividers, which is the point: the
 // budget column is measured on the body, the running total on the prompt.
-function renderCompanion({ members, raw, parts, assembled, disclosed, referenceMap, floor, floorLine }) {
+function renderCompanion({ members, pieces, assembled, disclosed, referenceMap, floor, floorLine }) {
   let running = 0;
-  const rows = parts.map((body, i) => {
-    const { rel, section } = members[i];
-    const piece = body ? (i === 0 ? body : `\n\n---\n\n<!-- ${rel} -->\n\n${body}`) : "";
+  const rows = pieces.map(({ label, section, text: body, raw, member }, i) => {
+    const piece = body ? (i === 0 ? body : `\n\n---\n\n<!-- ${label} -->\n\n${body}`) : "";
     running += piece.length;
-    const budget = budgetFor(members[i]);
+    // A pointer block is held by `check:bot-skills`, line by line, not here.
+    const budget = member === null ? null : budgetFor({ section, delivery: "bundled" });
     // Budgets are asserted on the pre-strip body, so an `ide-only` region still
     // counts — the manifest marks the same rows the assertion would.
-    const over = budget && raw[i].length > budget.limit ? raw[i].length - budget.limit : 0;
-    const stripped = raw[i].length - body.length;
+    const over = budget && raw.length > budget.limit ? raw.length - budget.limit : 0;
+    const stripped = raw.length - body.length;
     return {
       order: i + 1,
       section,
-      rel,
+      doc: member === null ? `pointer lines (${label})` : `[\`${label}\`](../../${label})`,
       chars: body.length ? `${n(body.length)}${stripped ? ` (−${n(stripped)} ide-only)` : ""}` : "empty after strip",
       running: n(running),
       budget: budget ? `${n(budget.limit)} (${budget.role})${over ? ` ⚠️ **over by ${n(over)}**` : ""}` : "—",
@@ -504,7 +535,7 @@ function renderCompanion({ members, raw, parts, assembled, disclosed, referenceM
     rows
       .map(
         (r) =>
-          `| ${r.order} | ${r.section} | [\`${r.rel}\`](../../${r.rel}) | ${r.chars} | ${r.running} | ${r.budget} |`,
+          `| ${r.order} | ${r.section} | ${r.doc} | ${r.chars} | ${r.running} | ${r.budget} |`,
       )
       .join("\n") +
     "\n\n" +
@@ -571,9 +602,9 @@ function renderManifest({ members, raw, parts, assembled, disclosed, referenceMa
     order: i + 1,
     chars: raw[i].length,
     shippedChars: parts[i].length,
-    budget: budgetFor({ rel, section }),
+    budget: budgetFor({ section, delivery: "bundled" }),
   }));
-  const disclosedRows = disclosed.map(({ rel, section, name, embodiment }) => ({
+  const disclosedRows = disclosed.map(({ rel, section, name, embodiment, pointer }) => ({
     path: rel,
     embodiment,
     section,
@@ -581,7 +612,8 @@ function renderManifest({ members, raw, parts, assembled, disclosed, referenceMa
     name,
     chars: referenceMap[name].length,
     shippedChars: referenceMap[name].length,
-    budget: budgetFor({ rel, section }),
+    budget: budgetFor({ section, delivery: "disclosed" }),
+    pointer,
   }));
   const ideRows = ideOnly.map(({ rel, section, chars }) => ({
     path: rel,
@@ -596,12 +628,14 @@ function renderManifest({ members, raw, parts, assembled, disclosed, referenceMa
 
   // Per-section totals, in SECTIONS order — the bundle's own order, so the
   // table reads the way the prompt loads.
-  const sections = SECTIONS.map(({ name, roots }) => {
+  const sections = SECTIONS.map(({ name, roots, budget, nameBy }) => {
     const mine = rows.filter((r) => r.section === name);
     const shipped = mine.filter((r) => r.delivery !== "ide-only");
     return {
       name,
       roots: [...roots],
+      budget: budget ? { ...budget } : null,
+      nameBy,
       docs: mine.length,
       bundled: mine.filter((r) => r.delivery === "bundled").length,
       disclosed: mine.filter((r) => r.delivery === "disclosed").length,
@@ -673,8 +707,9 @@ export function assemble({ repoRoot = REPO_ROOT } = {}) {
   // Verify the repo root is the one that actually holds the harness before we
   // trust any path. Structural sentinels only — naming a member file here would
   // make the check die confusingly the day that file is renamed, and would put
-  // a filename back in the one script that is supposed to hold none.
-  for (const sentinel of ["AGENTS.md", "GLOSSARY.md", "skills"]) {
+  // a filename back in the one script that is supposed to hold none. The first
+  // row's roots are the always-loaded tier, which every harness has.
+  for (const sentinel of SECTIONS[0].roots) {
     if (!existsSync(path.join(repoRoot, sentinel))) {
       findings.push({ message: `repo root check failed: ${sentinel} not found under ${repoRoot}` });
       return result();
@@ -729,7 +764,14 @@ export function assemble({ repoRoot = REPO_ROOT } = {}) {
           } else if (!workerReads) {
             misdisclosed.push({ rel, why: `\`disclosure: reference\` on an \`embodiment: ${meta.embodiment}\` doc names a Worker delivery for a doc the Worker never reads` });
           } else {
-            disclosed.push({ rel, section: section.name, name: referenceName(rel), embodiment: meta.embodiment });
+            const name = referenceName(rel, section.nameBy);
+            disclosed.push({
+              rel,
+              section: section.name,
+              name,
+              embodiment: meta.embodiment,
+              pointer: pointerLine(name, meta.description),
+            });
           }
           continue;
         }
@@ -737,10 +779,16 @@ export function assemble({ repoRoot = REPO_ROOT } = {}) {
         else if (meta.embodiment === "ide") ideOnly.push({ rel, section: section.name, chars: body.length });
       }
     }
-    found.sort((a, b) => sortKey(a.rel).localeCompare(sortKey(b.rel)));
+    found.sort((a, b) => a.rel.localeCompare(b.rel));
     members.push(...found.map(({ rel, embodiment }) => ({ rel, section: section.name, embodiment })));
   }
   disclosed.sort((a, b) => a.name.localeCompare(b.name));
+  // One name, one doc: the map is keyed by name, so a second doc under the same
+  // name would silently replace the first.
+  disclosed.forEach((d, i) => {
+    const first = disclosed.findIndex((x) => x.name === d.name);
+    if (first !== i) misdisclosed.push({ rel: d.rel, why: `its reference name \`${d.name}\` is already ${disclosed[first].rel}'s` });
+  });
 
   if (misdisclosed.length) {
     findings.push({
@@ -810,26 +858,28 @@ export function assemble({ repoRoot = REPO_ROOT } = {}) {
   // The disclosed docs, read the same way: frontmatter off, endings normalised,
   // `ide-only` regions dropped — the Worker is the reader, so the IDE's regions
   // are as foreign here as in the prompt. Keyed by name for the map.
-  const referenceMap = Object.fromEntries(
-    disclosed.map(({ rel, name }) => {
-      const text = readFileSync(path.join(repoRoot, rel), "utf8").replace(/\r\n/g, "\n");
-      return [name, stripIdeOnly(frontmatter(text).body)];
-    }),
-  );
+  const disclosedRaw = disclosed.map(({ rel }) => {
+    const text = readFileSync(path.join(repoRoot, rel), "utf8").replace(/\r\n/g, "\n");
+    return frontmatter(text).body;
+  });
+  const referenceMap = Object.fromEntries(disclosed.map(({ name }, i) => [name, stripIdeOnly(disclosedRaw[i])]));
 
   // ── Char budgets, per file ─────────────────────────────────────────────────
+  //
+  // Each doc is held to its row's budget, measured on the body before the
+  // `ide-only` strip, whichever delivery the doc takes.
   const overBudget = [];
-  raw.forEach((body, i) => {
-    const budget = budgetFor(members[i]);
-    if (budget && body.length > budget.limit) {
-      overBudget.push({ rel: members[i].rel, ...budget, size: body.length });
-    }
-  });
+  const hold = (doc, delivery, body) => {
+    const budget = budgetFor({ section: doc.section, delivery });
+    if (budget && body.length > budget.limit) overBudget.push({ rel: doc.rel, ...budget, size: body.length });
+  };
+  raw.forEach((body, i) => hold(members[i], "bundled", body));
+  disclosedRaw.forEach((body, i) => hold(disclosed[i], "disclosed", body));
 
   // A soft overrun is reported and the assembly continues; the ceiling below
   // still measures every char it added.
-  const softOver = overBudget.filter(({ role }) => softBudget(role));
-  const hardOver = overBudget.filter(({ role }) => !softBudget(role));
+  const softOver = overBudget.filter(({ soft }) => soft);
+  const hardOver = overBudget.filter(({ soft }) => !soft);
   if (softOver.length) {
     findings.push({
       message:
@@ -862,13 +912,27 @@ export function assemble({ repoRoot = REPO_ROOT } = {}) {
     return partial();
   }
 
-  // Assembly: first member raw, every other prefixed with a path comment so the
-  // bundle stays traceable back to a file; empty (post-strip) members skipped.
+  // Assembly: the prompt is a list of PIECES in section order — each member's
+  // body, then the section's pointer lines as one block when any of its
+  // disclosed docs carries a description. The first piece is raw, every other
+  // prefixed with a comment so the bundle stays traceable back to a file (a
+  // pointer block names its section); empty (post-strip) pieces are skipped.
   const parts = raw.map(stripIdeOnly);
-  const assembled = parts
-    .map((text, i) => {
+  const pieces = SECTIONS.flatMap(({ name }) => {
+    const own = members.flatMap((m, i) =>
+      m.section === name ? [{ label: m.rel, section: name, text: parts[i], raw: raw[i], member: i }] : [],
+    );
+    const pointers = disclosed.filter((d) => d.section === name && d.pointer).map((d) => d.pointer);
+    if (pointers.length) {
+      const text = pointers.join("\n");
+      own.push({ label: `${name} — read_reference by name`, section: name, text, raw: text, member: null });
+    }
+    return own;
+  });
+  const assembled = pieces
+    .map(({ label, text }, i) => {
       if (!text) return "";
-      return i === 0 ? text : `\n\n---\n\n<!-- ${members[i].rel} -->\n\n${text}`;
+      return i === 0 ? text : `\n\n---\n\n<!-- ${label} -->\n\n${text}`;
     })
     .join("");
 
@@ -963,7 +1027,7 @@ export function assemble({ repoRoot = REPO_ROOT } = {}) {
     "// the read_reference tool takes. Same assembly as harness.ts; held to the same --check.\n" +
     `export const REFERENCES: Record<string, string> = ${JSON.stringify(referenceMap)};\n`;
 
-  const rendered = { members, raw, parts, assembled, disclosed, referenceMap, ideOnly, floor, floorLine };
+  const rendered = { members, raw, parts, pieces, assembled, disclosed, referenceMap, ideOnly, floor, floorLine };
 
   return result({
     members,
