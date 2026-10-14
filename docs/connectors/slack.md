@@ -35,6 +35,8 @@ Every way into uno-bot from Slack. Skills run from a DM or an @mention; the othe
 
 Slack delivers slash commands only from a channel or DM composer, so inside a thread *Think harder about this* stands in for `/grind` and the Home tab's button for `/stop`. The app manifest is edited by hand in app settings (ADR-024); `agents/uno-bot/slack-app-manifest.yaml` is the record to diff against.
 
+**Automations registry.** What runs on its own — each morning and end-of-day job, cron and PR gate, with its trigger and owner — is `read_reference` name `docs/engineering/operations`. Read it before answering what runs when, or who owns an automated post.
+
 <!-- ide-only -->
 ## The end-of-day sweep — read path and audience rule
 

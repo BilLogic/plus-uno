@@ -24,7 +24,7 @@
  *                 (`&--created`), and a carousel control on `--color-scrim`
  *                 over a photograph. Both real; neither measurable here.
  *   DECISION      `--color-on-warning` on `--color-warning` at 3.7:1 — already
- *                 recorded in `docs/evals/button-contrast-baseline.json` as an
+ *                 recorded in `scripts/baselines/button-contrast-baseline.json` as an
  *                 open #268 token question. The same fact, reached twice.
  *   MARGINAL      `--color-primary` at 4.46:1 on its own 8% state layer, and
  *                 `--color-outline` at 4.26:1. Real, and a hair under.
@@ -60,7 +60,7 @@ import {
  * and the path `scripts/checks.registry.mjs` declares for this row. One
  * spelling, three readers.
  */
-const BASELINE = 'docs/evals/text-contrast-baseline.json';
+const BASELINE = 'scripts/baselines/text-contrast-baseline.json';
 
 /**
  * The paragraph `scripts/text-contrast.mjs` closed its own report with, kept

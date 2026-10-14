@@ -144,8 +144,8 @@ export interface ModelPrompt {
  * The third arm landed in #605 (it was left open by #604) for the draft judge,
  * whose two outcomes are not interchangeable: a judge that errored should be
  * reported as an error, and a judge that was never configured should be
- * reported as a skip. Collapsing them is the fail-open blindness the eval
- * judge's own skip reasons exist to prevent.
+ * reported as a skip. Collapsing them is the fail-open blindness a
+ * judge's skip reasons exist to prevent.
  *
  * WHICH ADAPTER DECIDES IS THE POINT. How a provider authenticates is exactly
  * what this seam hides, so the alternative — the caller checking credentials

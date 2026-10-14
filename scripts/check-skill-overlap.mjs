@@ -20,7 +20,7 @@
  * way, and until this landed nothing compared two bundled docs to each other.
  * That gap is what the ticket that filed this guard actually pointed at: a
  * convention doc was found carrying four rules already stated in `AGENT.md` and
- * `CONTEXT.md`, and it took a human reading all three to notice.
+ * `GLOSSARY.md`, and it took a human reading all three to notice.
  *
  * THE BUNDLED SET IS ASKED OF THE BUNDLER, never re-globbed here — see
  * `scripts/lib/bundled-set.mjs`. A second list of members is a list that can
@@ -41,7 +41,7 @@
  *
  * NOTE THE SCOPES OVERLAP BUT DO NOT NEST. `SKILL.md` is IDE-side and never
  * bundled, so scope one is the only thing that reads it; `AGENTS.md`,
- * `CONTEXT.md`, `AGENT.md` and the connector docs are bundled and belong to no
+ * `GLOSSARY.md`, `AGENT.md` and the connector docs are bundled and belong to no
  * skill, so scope two is the only thing that reads them. Six `bot.md` files and
  * six `method.md` files sit in both, compared to their own skill by scope one
  * and to the other nineteen docs by scope two.

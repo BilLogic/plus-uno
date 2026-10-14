@@ -26,7 +26,7 @@
 // `MODEL_PROVIDER` itself and then pick a model and a thinking level per
 // provider — the active GEMINI_MODEL at `low`, or Claude's chill model. Two
 // things were wrong with that. `MODEL_PROVIDER` was read in two places while
-// the code and CONTEXT.md both claimed one (`run-agent.ts`'s `selectProvider`,
+// the code and GLOSSARY.md both claimed one (`run-agent.ts`'s `selectProvider`,
 // now the only reader and this module's supplier). And a model plus a level the
 // caller chose is not a tier (ADR-028), so the judge was assembling a
 // configuration nobody had named or measured.
@@ -274,8 +274,7 @@ export interface JudgeOutcome {
   /** Why, on a verdict that graded nothing. A skip fails open — the draft ships
    *  either way — so an unexplained one is indistinguishable in the logs from a
    *  draft the judge read and approved. `judgeSkipped` below is the only
-   *  constructor for a skip, so no path can forget it; the same rule the eval
-   *  judge keeps with its own `judgeSkipped` (#618). */
+   *  constructor for a skip, so no path can forget it (#618). */
   reason?: string;
 }
 

@@ -362,5 +362,5 @@ test('a missing baseline is a failure with the one-off remedy, not a silent pass
   const rep = report([file('a.stories.jsx', [story('Default', 'passed')])]);
   const { status, lines } = decide(rep, null);
   assert.equal(status, 1);
-  assert.match(printed(lines, 'err'), /no a11y baseline at docs\/evals\/a11y-baseline\.json/);
+  assert.match(printed(lines, 'err'), /no a11y baseline at scripts\/baselines\/a11y-baseline\.json/);
 });

@@ -209,7 +209,7 @@ export function nameless(files, root = REPO_ROOT) {
 }
 
 /**
- * The measured side, in the shape `docs/evals/icon-button-name.json` holds its
+ * The measured side, in the shape `scripts/baselines/icon-button-name.json` holds its
  * exceptions: one key per nameless control, `file:line`, with the hit beside it
  * for the wording. That map is what `scripts/lib/ratchet.mjs` is handed (#600);
  * the record's VALUE is the argument a person wrote for the entry, and a

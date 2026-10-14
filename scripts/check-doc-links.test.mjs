@@ -29,7 +29,7 @@ const INDEXES = [
 ];
 
 /** The root files passes 1–4 read by name, whether or not a test cares. */
-const ROOT_FILES = ['AGENTS.md', 'CONTEXT.md', 'SETUP.md', 'README.md'];
+const ROOT_FILES = ['AGENTS.md', 'GLOSSARY.md', 'SETUP.md', 'README.md'];
 
 /**
  * A throwaway repo shaped enough for all seven passes to run on it: the four
@@ -130,6 +130,21 @@ test('a backticked repo path that resolves to nothing fails — a pointer is not
     const found = messages(r.root);
     assert.equal(found.length, 1);
     assert.match(found[0], /docs\/conventions\/a\.md -> `docs\/conventions\/retired\.md`/);
+  } finally {
+    r.done();
+  }
+});
+
+test("a disclosed doc's read_reference name resolves; the same name on an undisclosed doc does not", () => {
+  const r = repo({
+    'docs/engineering/ops.md': '---\nembodiment: all\ndisclosure: reference\n---\n# Ops\n',
+    'docs/engineering/plain.md': '---\nembodiment: all\n---\n# Plain\n',
+    'docs/connectors/a.md': 'Read `docs/engineering/ops`, then `docs/engineering/plain`.\n',
+  });
+  try {
+    const found = messages(r.root);
+    assert.equal(found.length, 1);
+    assert.match(found[0], /-> `docs\/engineering\/plain`/);
   } finally {
     r.done();
   }

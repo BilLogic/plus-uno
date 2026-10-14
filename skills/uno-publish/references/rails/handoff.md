@@ -13,8 +13,7 @@ summary: The handoff rail — componentize, Handoff Spec, review gates, and dev 
 2. **Handoff Spec** — summon `writers/notion` to instantiate the team's Handoff
    Spec template on the project hub (template pointers:
    `docs/connectors/notion.md`).
-3. **Rails propagation** — inside the designer-confirmed handoff only,
-   apply-logged:
+3. **Rails propagation** — inside the designer-confirmed handoff only:
    - `uno-storybook`: update stories/MDX in `design-system/` directly (in-repo
      write; validate in Storybook).
    - `uno-blueprint`: this skill holds no blueprint write access

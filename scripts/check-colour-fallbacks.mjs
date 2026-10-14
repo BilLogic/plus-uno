@@ -31,7 +31,7 @@ import { main } from './lib/findings.mjs';
 const COLOUR = fallbackCheck({
   check: 'check:colour-fallbacks',
   label: '[colour]',
-  baseline: 'docs/evals/colour-fallback-baseline.json',
+  baseline: 'scripts/baselines/colour-fallback-baseline.json',
   noun: 'colour',
   absent: '--color-*',
   prefix: '--color-',

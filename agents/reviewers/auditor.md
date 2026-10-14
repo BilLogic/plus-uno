@@ -13,15 +13,15 @@ The standing-sweep role: given a named checklist (shipped watchdog, conventions 
 ## Invoked by
 
 - `skills/uno-maintain` — sweeps and retro audits
-- Automations: shipped watchdog · weekly direct-fix digest · Figma hygiene sweep · conventions integrity sweep (`docs/engineering/operations.md`)
+- Automations: shipped watchdog · Figma hygiene sweep · conventions integrity sweep (`docs/engineering/operations.md`)
 
 ## Workflow
 
 1. Load the named checklist (each sweep's checklist lives with its convention file — e.g. hygiene in `docs/connectors/figma.md` § Agent duties in the workspace, integrity in `skills/uno-maintain/references/staleness-sweep.md`).
 2. Walk the estate; for the conventions integrity sweep check canonicality headers, agents↔docs cross-references both ways, and superseded banners on legacy Notion playbook pages (conventions are repo-canonical, ADR-017).
-3. File one uno-maintain intake per finding; produce the digest summary when the sweep is digest-bearing.
+3. File one uno-maintain intake per finding.
 
-**Headless embodiment:** when a sweep runs on cron (no Notion access), intakes are GitHub issues labeled `harness-intake` per `scripts/prompts/references/headless-intake.md`, and the digest-bearing sweep's post goes out via the uno-bot Slack token — the auditor composes; the token is the Slack actor, consistent with `agents/README.md` (Slack needs no writer). The inspect-only rule is unchanged in every embodiment.
+**Headless embodiment:** when a sweep runs on cron (no Notion access), intakes are GitHub issues labeled `harness-intake` per `scripts/prompts/references/headless-intake.md`. The inspect-only rule is unchanged in every embodiment.
 
 ## Conventions it obeys
 

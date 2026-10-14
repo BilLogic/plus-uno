@@ -271,7 +271,7 @@ Two kinds of failure, two mechanisms:
   `PageAndTabSelection` and `SelectCommit` (#209), which cover the four
   highest-usage components whose behaviour is the product. Everything else in
   the corpus is asserted to render, and to survive axe, and nothing more.)
-- **Accessibility is a ratchet**, not a threshold. `docs/evals/a11y-baseline.json`
+- **Accessibility is a ratchet**, not a threshold. `scripts/baselines/a11y-baseline.json`
   records which axe rules each story already violates (54 stories, 8 rules at
   2026-08-29). A story violating a rule it did not carry before fails the gate; a
   count that falls does not. Re-record a genuine improvement with

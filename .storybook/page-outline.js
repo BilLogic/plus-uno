@@ -18,7 +18,7 @@
  * rules — `page-has-heading-one`, `landmark-one-main`, `region` — only when the
  * run context is the whole document. `addon-a11y` scopes every run to the story
  * root. That is why no page-level rule appears anywhere in
- * `docs/evals/a11y-baseline.json` while 13 element-level rules do: not because
+ * `scripts/baselines/a11y-baseline.json` while 13 element-level rules do: not because
  * they pass, because they are never evaluated. With 388 story files and 5
  * `<h1>`s, `page-has-heading-one` would otherwise have fired on hundreds.
  * Re-recording the baseline therefore cannot lock this in, and widening the axe

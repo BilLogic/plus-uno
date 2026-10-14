@@ -185,7 +185,7 @@ export function blueprintSearchPayload({
 
   // One obligation per field, not one paragraph carrying five. Instructions
   // in a tool payload are not additive — a fix to slack_search on 2026-08-06
-  // displaced an unrelated instruction and broke a different eval case — so
+  // displaced an unrelated instruction and broke a different answer — so
   // each rule now travels with the data that triggers it, and only appears
   // when it applies. The ones with a FIXED text live in
   // blueprint-search-notes.ts, where the harness name sweep can read them
@@ -385,8 +385,8 @@ export async function executeBlueprintSearch(
       : [];
     // FLAGGED OFF by default: tool-payload instructions are not additive — on
     // 2026-08-06 a slack_search fix displaced an unrelated instruction and
-    // broke a different eval case — so the automatic index is enabled in ONE
-    // DM first and the judged evals are compared CASE BY CASE before it goes
+    // broke a different answer — so the automatic index is enabled in ONE
+    // DM first and its answers are read CASE BY CASE before it goes
     // wide.
     const autoIndex = env.BLUEPRINT_INDEX === "on";
 

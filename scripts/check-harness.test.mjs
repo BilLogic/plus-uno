@@ -293,7 +293,7 @@ test('every baseline row reaches its record and offers exactly the flag its tabl
 });
 
 test('a row pointing at a record its check never opens fails, however the check is named', () => {
-  const row = { ...byName('check:glossary'), baseline: 'docs/evals/focus-ring.json' };
+  const row = { ...byName('check:glossary'), baseline: 'scripts/baselines/focus-ring.json' };
   const messages = registryGenerator.baselineFindings(row, rootScripts()).map((f) => f.message);
   assert.ok(
     messages.some((m) => /opens\s+through scripts\/lib\/ratchet\.mjs/.test(m)),
@@ -353,7 +353,7 @@ test('a record that will not parse on its declared shape is reported, never read
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'baseline-shape-'));
   try {
     const row = byName('check:focus-ring');
-    fs.mkdirSync(path.join(root, 'docs/evals'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'scripts/baselines'), { recursive: true });
     // The declared container is an object of reasons. As an array it reads as
     // no entries at all, and an empty baseline is a green ratchet.
     fs.writeFileSync(path.join(root, row.baseline), JSON.stringify({ note: 'x', exceptions: [] }));

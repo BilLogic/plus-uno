@@ -44,7 +44,7 @@ Suggest proactively when the user says "done", "ready to share", or is about to 
 4b. **Figma write-back artifacts:** run `npm run validate:figma-writeback` + `npm run audit:figma-writeback` on the prototype manifest; fail the review if either fails.
 5. **Merge findings** — dedupe cross-lens overlaps, keep each finding's severity · lens · evidence · reference · re-entry point (method.md § Findings & severity).
 6. **Verdict** per method.md § Verdict & re-entry: `Issues? = Yes` only at severity major+; minors travel as advisory; Design QA blockers hold `Ready for Prod`.
-7. **Log the run** — summon **reviewers/rubric-applier** with `docs/evals/rubrics/uno-review.md`; it scores the dimensions and appends the eval-run entry. Golden scenarios this skill must pass: `docs/evals/scenarios/uno-review.md`.
+7. **Score the run** — summon **reviewers/rubric-applier** with `docs/evals/rubrics/uno-review.md`; it scores the dimensions and checks the gates. Golden scenarios this skill must pass: `docs/evals/scenarios/uno-review.md`.
 
 ## Tier-2 loads
 
