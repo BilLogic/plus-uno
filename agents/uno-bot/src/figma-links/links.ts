@@ -9,8 +9,8 @@
 // docs page whose id the registry carries, as Storybook derives it from the
 // stories file's title.
 //
-// THE NAMES are plain — `Code (plus-uno): Button`, `Storybook: Button`,
-// `PR #123: Button` — with no bot marker (Bill, 2026-10-11): only uno-bot
+// THE NAMES are plain — `Code (plus-uno): Button`, `Storybook: Button` —
+// with no bot marker (Bill, 2026-10-11): only uno-bot
 // writes these links. The Code link was `Code: Button` until 2026-10-12; a
 // link still carrying that name, on the same URL, is renamed in place.
 //
@@ -98,8 +98,8 @@ export function devLinkTargets(registry: DevLinkRegistry, repo: string): Map<str
   return targets;
 }
 
-/** What a link is: the component's source, its docs page, or a merged PR. */
-export type DevLinkKind = { kind: "code" } | { kind: "storybook" } | { kind: "pr"; number: number; url: string };
+/** What a link is: the component's source, or its docs page. */
+export type DevLinkKind = { kind: "code" } | { kind: "storybook" };
 
 const CODE_PREFIX = "Code (plus-uno): ";
 /** The Code link's name before 2026-10-12: a link uno-bot added, and renames. */
@@ -122,8 +122,6 @@ export function devLinkName(component: string, link: DevLinkKind): string {
       return `${CODE_PREFIX}${component}`;
     case "storybook":
       return `Storybook: ${component}`;
-    case "pr":
-      return `PR #${link.number}: ${component}`;
   }
 }
 
@@ -136,7 +134,7 @@ export function devLinkName(component: string, link: DevLinkKind): string {
 export function wantedLinks(target: DevLinkTarget, kinds: readonly DevLinkKind[]): DevLink[] {
   return target.nodeIds.flatMap((node) =>
     kinds.flatMap((k) => {
-      const url = k.kind === "code" ? target.code : k.kind === "storybook" ? target.storybook : k.url;
+      const url = k.kind === "code" ? target.code : target.storybook;
       return url ? [{ file_key: target.fileKey, node_id: node, name: devLinkName(target.component, k), url }] : [];
     }),
   );

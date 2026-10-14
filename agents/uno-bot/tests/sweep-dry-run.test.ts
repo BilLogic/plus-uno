@@ -21,7 +21,7 @@ const plan: ScheduledRun = {
   date: "2026-09-29",
   jobs: [
     // Two kinds: a rehearsal runs one job per kind.
-    { key: "assemble", kind: "figma-library-post", after: ["a"] },
+    { key: "assemble", kind: "team-roles-sync", after: ["a"] },
     { key: "a", kind: "noop" },
   ],
 };
@@ -87,7 +87,7 @@ test("the rehearsal stops before the invocation's budget is gone", async () => {
   const greedy: ScheduledRun = {
     name: "morning",
     date: "2026-09-29",
-    jobs: [{ key: "a", kind: "noop" }, { key: "b", kind: "figma-library-post" }],
+    jobs: [{ key: "a", kind: "noop" }, { key: "b", kind: "team-roles-sync" }],
   };
   const report = await runMetered(() =>
     dryRunScheduledRun(greedy, async () => {
@@ -140,12 +140,8 @@ test("the probe dry-runs the named run's jobs", async () => {
   const body = report.body as { ok: boolean; run: string; planned: unknown[]; jobs: { key: string; outcome: string; subrequests: number }[] };
   assert.equal(body.ok, true);
   assert.equal(body.run, "morning");
-  assert.equal(body.planned.length, 11);
+  assert.equal(body.planned.length, 8);
   assert.deepEqual(body.jobs.map((j) => [j.key, j.outcome, j.subrequests]), [
-    ["figma-library-post", "handled", 0],
-    ["figma-library-track", "handled", 0],
-    // No KV bound: no merged PR waits for its Dev Mode links card.
-    ["figma-dev-links-pr", "handled", 0],
     ["commitment-nudge", "handled", 0],
     ["sweep-post", "handled", 0],
     // No sweep store bound: the Figma decision post says so and spends nothing.
@@ -172,7 +168,8 @@ test("Monday's morning plans the role-map sync and no weekly gaps DM", async () 
 
 test("the probe rehearses another weekday's jobs: Friday's DS precedence check on any day", async () => {
   // Unconfigured, so the check says so and spends nothing — what matters is
-  // that it is planned right after the library poll and rehearsed, not skipped.
+  // that it is planned second, right after the library poll, and rehearsed,
+  // not skipped.
   const url = new URL("https://w/debug/sweep?dry_run=1&run=end-of-day&weekday=fri");
   const report = await runMetered(() => sweepProbe({} as Env, url, new Request(url)));
   assert.ok("body" in report);
@@ -184,7 +181,7 @@ test("the probe rehearses another weekday's jobs: Friday's DS precedence check o
   assert.equal(body.ok, true);
   assert.deepEqual(body.planned.slice(0, 2).map((j) => [j.key, j.after]), [
     ["figma-library-poll", []],
-    ["ds-precedence-check", ["figma-library-poll"]],
+    ["ds-precedence-check", []],
   ]);
   const check = body.jobs.find((j) => j.key === "ds-precedence-check");
   assert.deepEqual([check?.outcome, check?.skipped_because], ["handled", undefined]);

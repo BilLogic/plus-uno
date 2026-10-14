@@ -66,11 +66,11 @@ export interface Env {
    *  `integrations/repo-list.mjs`. Unset → `GITHUB_REPO` alone. */
   GITHUB_REPOS?: string;
   FIGMA_ACCESS_TOKEN: string;
-  // Figma library jobs (figma-poll.ts at end of day, figma-library/ in the
-  // morning). Both optional — unset → the job logs a skip and does nothing.
-  // FIGMA_FILE_KEY is the DS file (non-secret: it's in every shared Figma URL);
-  // PLUS_UNIVERSAL_CHANNEL_ID is #plus-universal, where a publish's card lands
-  // and whose members may confirm it.
+  // FIGMA_FILE_KEY is the DS file (non-secret: it's in every shared Figma
+  // URL): the library poll (figma-poll.ts) and the weekly DS precedence check
+  // read it. PLUS_UNIVERSAL_CHANNEL_ID is #plus-universal, where the sweep's
+  // design-system report goes, the weekly DS precedence section among it.
+  // Both optional — unset → the job logs a skip and does nothing.
   FIGMA_FILE_KEY?: string;
   PLUS_UNIVERSAL_CHANNEL_ID?: string;
   /** The six PLUS Figma teams, `name=id` pairs (`figma-notify/teams.ts`). The
@@ -117,9 +117,8 @@ export interface Env {
    *  a change asked for in a Figma comment (`figma-ask/`) and the weekly
    *  tidy-up (`figma-tidy/`). Blank or unset → #plus-design. */
   FIGMA_ASK_CHANNEL_ID?: string;
-  /** `on` lets Dev Mode links run for every registry component and post a
-   *  merged library PR's card (`figma-links/gate.ts`). Unset → one component
-   *  per manual run, and merged PRs wait. */
+  /** `on` lets Dev Mode links run for every registry component
+   *  (`figma-links/gate.ts`). Unset → one component per manual run. */
   FIGMA_DEV_LINKS?: string;
   /** The channels the end-of-day sweep reads, comma-separated ids
    *  (`scheduled/runs.ts` `sweepChannelsFrom`). Unset → nothing is swept. */

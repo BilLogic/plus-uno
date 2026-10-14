@@ -5,9 +5,8 @@
 //   • THE POST — `runDevLinksPost`: read the registry and the links the
 //     components' library components already carry (one Tier 2 read per file:
 //     two files hold all 68), then post ONE Review card: a named component's,
-//     a batch card listing every component a run of several still has to
-//     link, or a merged library PR's. Cards post where the Figma Review-card
-//     setting says. Posting writes nothing to Figma.
+//     or a batch card listing every component a run of several still has to
+//     link. Posting writes nothing to Figma.
 //   • THE WRITE — `writeDevLinks`, the card's one operation past Approve:
 //     read the nodes' links again, rename a Code link still under its old
 //     name, add only what is still missing (a re-run or a second card never
@@ -82,8 +81,7 @@ export const DEV_LINKS_CARD_TTL_MS = 3 * 24 * 60 * 60 * 1000;
 /** What a run is asked for. */
 export type DevLinksRequest =
   | { components: readonly string[] }
-  | { all: true }
-  | { pr: { number: number; url: string }; components: readonly string[] };
+  | { all: true };
 
 export interface DevLinksDeps {
   /** component-registry.json, as the repo has it. */
@@ -194,7 +192,7 @@ const changesOf = (plan: DevLinkPlan): DevLink[] => [
  * Post the Review card a request needs.
  *
  * @param deps - The registry, the Figma client, the channel and the store
- * @param request - One component, several or all of them (one batch card), or a merged PR's
+ * @param request - One component, or several or all of them (one batch card)
  * @param opts - `dryRun` reads and plans, and posts and stages nothing
  */
 export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksRequest, opts: { dryRun?: boolean } = {}): Promise<DevLinksResult> {
@@ -223,51 +221,35 @@ export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksReque
   const already: string[] = [];
   const atCap: string[] = [];
   const open: string[] = [];
-  if ("pr" in request) {
-    const links: DevLink[] = [];
-    const named: string[] = [];
-    for (const t of chosen) {
-      const plan = planDevLinks(wantedLinks(t, [{ kind: "pr", ...request.pr }]), existing);
-      if (plan.atCap.length) atCap.push(t.component);
-      if (plan.add.length) {
-        links.push(...plan.add);
-        named.push(t.component);
-      } else if (!plan.atCap.length) already.push(t.component);
+  // A run naming one component gets that component's card; any more, one batch card.
+  const single = "components" in request && chosen.length === 1;
+  const batch: Required<DevLinksWrite> = { links: [], introduce: [], renames: 0 };
+  const entries: DevLinksBatchEntry[] = [];
+  let figmaUrl = "";
+  for (const t of chosen) {
+    const plan = planDevLinks(wantedLinks(t, [{ kind: "code" }, { kind: "storybook" }]), existing);
+    if (plan.atCap.length) atCap.push(t.component);
+    const changes = changesOf(plan);
+    if (!changes.length) {
+      if (!plan.atCap.length) already.push(t.component);
+      continue;
     }
-    const subject: DevLinksSubject = { kind: "pr", ...request.pr, components: named };
-    if (links.length && carded[devLinksItemId(subject)]) open.push(`PR #${request.pr.number}`);
-    else if (links.length) planned = { subject, write: { links, introduce: [] } };
-  } else {
-    // A run naming one component gets that component's card; any more, one batch card.
-    const single = "components" in request && chosen.length === 1;
-    const write: Required<DevLinksWrite> = { links: [], introduce: [], renames: 0 };
-    const entries: DevLinksBatchEntry[] = [];
-    let figmaUrl = "";
-    for (const t of chosen) {
-      const plan = planDevLinks(wantedLinks(t, [{ kind: "code" }, { kind: "storybook" }]), existing);
-      if (plan.atCap.length) atCap.push(t.component);
-      const changes = changesOf(plan);
-      if (!changes.length) {
-        if (!plan.atCap.length) already.push(t.component);
-        continue;
-      }
-      const own: DevLinksSubject = { kind: "component", component: t.component, figmaUrl: t.figmaUrl, storybook: t.storybook };
-      if (carded[devLinksItemId(own)]) {
-        open.push(t.component);
-        continue;
-      }
-      figmaUrl ||= t.figmaUrl;
-      write.links.push(...changes);
-      write.renames += plan.rename.length;
-      if (!linkedBefore(t.component, existing, t.nodeIds)) write.introduce.push({ file_key: t.fileKey, node_id: changes[0]!.node_id, component: t.component });
-      entries.push({ component: t.component, adds: [...new Map(plan.add.map((l) => [l.name, { name: l.name, url: l.url }])).values()], renamed: plan.rename.length > 0 });
-      if (single) planned = { subject: own, write };
+    const own: DevLinksSubject = { kind: "component", component: t.component, figmaUrl: t.figmaUrl, storybook: t.storybook };
+    if (carded[devLinksItemId(own)]) {
+      open.push(t.component);
+      continue;
     }
-    if (!single && entries.length) {
-      const subject: DevLinksSubject = { kind: "batch", figmaUrl, components: entries };
-      if (carded[devLinksItemId(subject)]) open.push("the batch");
-      else planned = { subject, write };
-    }
+    figmaUrl ||= t.figmaUrl;
+    batch.links.push(...changes);
+    batch.renames += plan.rename.length;
+    if (!linkedBefore(t.component, existing, t.nodeIds)) batch.introduce.push({ file_key: t.fileKey, node_id: changes[0]!.node_id, component: t.component });
+    entries.push({ component: t.component, adds: [...new Map(plan.add.map((l) => [l.name, { name: l.name, url: l.url }])).values()], renamed: plan.rename.length > 0 });
+    if (single) planned = { subject: own, write: batch };
+  }
+  if (!single && entries.length) {
+    const subject: DevLinksSubject = { kind: "batch", figmaUrl, components: entries };
+    if (carded[devLinksItemId(subject)]) open.push("the batch");
+    else planned = { subject, write: batch };
   }
   if (already.length) notes.push(`already linked: ${already.join(", ")}`);
   if (atCap.length) notes.push(`at Figma's 10 links, so some held back: ${atCap.join(", ")}`);

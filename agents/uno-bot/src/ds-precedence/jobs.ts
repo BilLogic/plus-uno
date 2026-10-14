@@ -118,8 +118,6 @@ export interface CheckDeps extends Pick<JobContext, "runDate"> {
   /** The Figma client: the library file's components. */
   figma: Pick<FigmaClient, "components">;
   report: Store<PrecedenceReport | null>;
-  /** Components a library publish is still carrying. */
-  inFlight(registry: PrecedenceRegistry): Promise<Set<string>>;
   fileKey: string;
   repo: string;
   now(): number;
@@ -162,7 +160,6 @@ export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boole
     library,
     fileKey: deps.fileKey,
     repo: deps.repo,
-    inFlight: await deps.inFlight(registry),
   });
   if (!opts.dryRun) {
     await deps.report.write(items.length ? { checkedAt: new Date(deps.now()).toISOString(), weekOf: deps.runDate, items } : null);

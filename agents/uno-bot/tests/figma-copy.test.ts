@@ -1,8 +1,7 @@
 // Every Figma message uno-bot's code writes, against the copy Bill approved in
-// #886 (2026-09-30) — the library publish card, its thread, the post for a
-// library edited but not published, the weekly precedence report, the drift
-// question and its withdrawal, the comment-decision thread (#900), and what
-// each card says at the gate.
+// #886 (2026-09-30) — the weekly precedence report, the drift question and its
+// withdrawal, the comment-decision thread (#900), and what each card says at
+// the gate.
 //
 // Two things are pinned, the way tests/share-out.test.ts pins its post:
 //   • each renderer's words, as literals: its first line, its counts against
@@ -16,20 +15,6 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import {
-  componentListMessages,
-  draftPublishIntake,
-  editedNotPublished,
-  libraryCardWords,
-  publishLead,
-  releaseItem,
-  releaseParent,
-  type ComponentRegistry,
-  type LibraryChangeSet,
-  type LibraryComponent,
-} from "../src/figma-library/draft";
-import { libraryCard, LIBRARY_CARD_TTL_MS } from "../src/figma-library/post";
-import { expiredCardNote, expiredThreadLine, failedFiledLine, prClosedLine, prMergedLine, prOpenedLine } from "../src/figma-library/track";
 import {
   byComponent,
   precedenceCard,
@@ -169,297 +154,9 @@ function assertVocabulary(text: string): void {
   }
 }
 
-/** The library card's count, against the names under it. */
-function countMatchesNames(text: string): void {
-  const m = /^(\d+) components? changed: (.+)\.$/m.exec(text);
-  assert.ok(m, text);
-  const total = Number(m[1]);
-  const parts = m[2]!.split(", ").map((p) => Number(p.split(" ")[0]));
-  assert.equal(parts.reduce((a, b) => a + b, 0), total, "new + updated + removed is the count");
-  let named = 0;
-  for (const line of text.split("\n").filter((l) => l.startsWith("• *"))) {
-    const list = line.replace(/^• \*[^*]+:\* /, "");
-    const more = /(.*) and (\d+) more$/.exec(list);
-    named += more ? more[1]!.split(", ").length + Number(more[2]) : list.split(", ").length;
-  }
-  assert.equal(named, total, `${total} counted, ${named} named:\n${text}`);
-}
-
-// ── The library publish card (#886 § 3.1) ────────────────────────────────────
-
-const FILE_KEY = "LIBFILEKEY";
-const VERSION = { id: "2210", label: "Button focus ring", description: "Adds a visible focus ring to Button and Badge.", createdAt: "2026-09-29T20:00:00Z", user: "sarah" };
-
-let nodes = 0;
-function component(set: string, variant = "Default"): LibraryComponent {
-  nodes += 1;
-  return { key: `k-${set}-${variant}`, name: variant, description: "", nodeId: `1:${nodes}`, containingFrame: set, setNodeId: `9:${set}` };
-}
-
-const REGISTRY: ComponentRegistry = {
-  components: Object.fromEntries(
-    ["Badge", "Button", "Card"].map((name) => [
-      name,
-      { code: { mdxPath: `design-system/src/components/${name}/${name}.mdx` }, figma: { sets: [{ name, componentSetNodeId: `9:${name}` }] } },
-    ]),
-  ),
-};
-
-function changeSet(over: Partial<LibraryChangeSet>): LibraryChangeSet {
-  return { detectedAt: "2026-09-29T22:00:00Z", fileKey: FILE_KEY, versions: [VERSION], created: [], modified: [], deleted: [], newComponentIds: [], removedComponentIds: [], ...over };
-}
-
-/** What Review shows of a publish. */
-function card(cs: LibraryChangeSet): string {
-  const intake = draftPublishIntake(cs, REGISTRY);
-  return renderProposalCard(libraryCard(cs, intake)).text;
-}
-
-/** The report's words for a publish: its parent line and its one card. */
-function report(cs: LibraryChangeSet) {
-  const intake = draftPublishIntake(cs, REGISTRY);
-  return { parent: releaseParent(cs, intake), item: releaseItem(cs, intake) };
-}
-
-describe("the library publish report", () => {
-  // #886's own example: seven components, two of them new, three with code.
-  const SEVEN = changeSet({
-    created: [component("Chip"), component("Tag")],
-    modified: ["Badge", "Button", "Card", "Toast", "Tooltip"].map((s) => component(s)),
-    newComponentIds: ["9:Chip", "9:Tag"],
-  });
-
-  it("says who published what in one plain sentence, and puts the publish on one card", () => {
-    const { parent, item } = report(SEVEN);
-    assert.equal(parent, 'sarah published "Button focus ring" to the library: 7 components changed, 3 of them have code.');
-    passesChecklist(parent);
-    assert.deepEqual(item, {
-      id: "2210",
-      title: "Button focus ring",
-      subtitle: "sarah · Sep 29",
-      body: "2 new, 5 updated. Badge, Button and Card have code that can be drafted to match.",
-      open: { label: "Open library", url: `https://www.figma.com/design/${FILE_KEY}` },
-      also: { label: "View version", url: `https://www.figma.com/design/${FILE_KEY}?version-id=2210` },
-      done: "the intake, and code drafts started for Badge, Button and Card.",
-    });
-    passesChecklist(item.body);
-    // The library file's name, when Figma gives it, sits between who and when.
-    const named = releaseItem(SEVEN, draftPublishIntake(SEVEN, REGISTRY), "PLUS BS4 Foundation");
-    assert.equal(named.subtitle, "sarah · PLUS BS4 Foundation · Sep 29");
-  });
-
-  it("what Review shows: the publish, every component under its group, and no footer", () => {
-    const text = card(SEVEN);
-    assert.equal(
-      text,
-      [
-        `*Library published: "Button focus ring"* by sarah · <https://www.figma.com/design/${FILE_KEY}?version-id=2210|view version>`,
-        "> Adds a visible focus ring to Button and Badge.",
-        "",
-        "7 components changed: 2 new, 5 updated.",
-        "• *Has code:* Badge, Button, Card",
-        "• *No code mapping yet:* Chip, Tag, Toast, Tooltip",
-      ].join("\n"),
-    );
-    countMatchesNames(text);
-    passesChecklist(text);
-  });
-
-  it("counts two sets that share a name as one component, so the count still matches", () => {
-    const twins = changeSet({
-      modified: [component("Button"), { ...component("Button", "Other"), setNodeId: "9:Button-2" }],
-    });
-    const text = card(twins);
-    assert.match(text, /^1 component changed: 1 updated\.$/m);
-    countMatchesNames(text);
-  });
-
-  it("says plainly when nothing has code, so Approve files the intake alone", () => {
-    const cs = changeSet({ created: [component("Chip"), component("Tag")], newComponentIds: ["9:Chip", "9:Tag"] });
-    const { parent, item } = report(cs);
-    assert.match(parent, /: 2 components changed, none of them has code yet\.$/);
-    assert.equal(item.body, "2 new. Nothing here has code yet, so there's nothing to draft.");
-    assert.equal(item.done, "the intake.");
-    countMatchesNames(card(cs));
-    passesChecklist(parent);
-  });
-
-  it("says so when a version changed no component it can see", () => {
-    const { parent, item } = report(changeSet({}));
-    assert.equal(parent, 'sarah published "Button focus ring" to the library, with no changed components found.');
-    assert.equal(item.body, "No changed components found. The version has the details.");
-    assert.match(card(changeSet({})), /^No changed components found\. The version has the details\.$/m);
-  });
-
-  it("counts a removed component, and only when none of it is left", () => {
-    const text = card(changeSet({ deleted: [component("Toast")], modified: [component("Badge")], removedComponentIds: ["9:Toast"] }));
-    assert.match(text, /^2 components changed: 1 updated, 1 removed\.$/m);
-    countMatchesNames(text);
-  });
-
-  it("past 1,500 characters, Review ends each group with \"and N more\", and the whole list fits the thread", () => {
-    const many = Array.from({ length: 80 }, (_, i) => component(`Extra component ${String(i).padStart(2, "0")}`));
-    const big = changeSet({ created: many, newComponentIds: many.map((c) => c.setNodeId!) });
-    const text = card(big);
-    passesChecklist(text);
-    countMatchesNames(text);
-    assert.match(text, / and \d+ more$/m);
-    const intake = draftPublishIntake(big, REGISTRY);
-    assert.equal(publishLead(big, intake), text);
-    const thread = componentListMessages(intake).join("\n");
-    assert.match(thread, /^All 80 components in this publish:/);
-    for (const c of many) assert.ok(thread.includes(c.containingFrame), c.containingFrame);
-  });
-
-  it("names how many have code when their names would not fit the card", () => {
-    const names = Array.from({ length: 30 }, (_, i) => `Mapped component number ${i}`);
-    const registry: ComponentRegistry = {
-      components: Object.fromEntries(names.map((name) => [name, { code: { mdxPath: `x/${name}/${name}.mdx` }, figma: { sets: [{ name, componentSetNodeId: `9:${name}` }] } }])),
-    };
-    const cs = changeSet({ modified: names.map((n) => component(n)) });
-    const item = releaseItem(cs, draftPublishIntake(cs, registry));
-    assert.equal(item.body, "30 updated. 30 components have code that can be drafted to match.");
-  });
-
-  it("keeps its 72 hours where the card says them", () => {
-    assert.equal(LIBRARY_CARD_TTL_MS, 72 * 60 * 60 * 1000);
-  });
-});
-
-describe("a library edited, not published", () => {
-  it("says so plainly, offers no ✅, and promises the next post", () => {
-    const cs = changeSet({ versions: [], modified: [component("Button")] });
-    const text = editedNotPublished(cs, draftPublishIntake(cs, REGISTRY));
-    assert.equal(
-      text,
-      [
-        `*Library edited, not published.* 1 component's name or description changed in the <https://www.figma.com/design/${FILE_KEY}|library>, with no new version: Button.`,
-        "Nothing to build yet. I'll post again when a version is published.",
-      ].join("\n"),
-    );
-    passesChecklist(text);
-  });
-
-  it("counts components plainly when some were added or removed, and names them", () => {
-    const cs = changeSet({ versions: [], modified: [component("Button")], created: [component("Chip")] });
-    const text = editedNotPublished(cs, draftPublishIntake(cs, REGISTRY));
-    assert.match(text, /^\*Library edited, not published\.\* 2 components changed in the <[^>]+\|library>, with no new version: Button and Chip\.$/m);
-    passesChecklist(text);
-  });
-
-  it("past 1,500 characters, names as many as fit and counts the rest", () => {
-    const many = Array.from({ length: 90 }, (_, i) => component(`Edited component ${String(i).padStart(2, "0")}`));
-    const cs = changeSet({ versions: [], modified: many });
-    const text = editedNotPublished(cs, draftPublishIntake(cs, REGISTRY));
-    passesChecklist(text);
-    const m = /no new version: (.*) and (\d+) more\.$/m.exec(text);
-    assert.ok(m, text);
-    assert.equal(m[1]!.split(", ").length + Number(m[2]), 90);
-  });
-});
-
-describe("the consent a stated card's footer carries", () => {
-  // The footer stands in for the operation plan, so it names every operation
-  // the ✅ runs — pinned here, where a new operation would have to be named.
-  it("the library card names both of its operations as fields, and carries no footer", () => {
-    const seven = changeSet({ modified: [component("Button"), component("Toast")] });
-    const intake = draftPublishIntake(seven, REGISTRY);
-    const built = libraryCard(seven, intake);
-    assert.deepEqual(built.operations.map((o) => o.toolName), ["github_issue_create", "component_implement"]);
-    assert.deepEqual(built.fields, [
-      { label: "intake", value: intake.title },
-      { label: "implement", value: "Button" },
-    ]);
-    assert.equal(built.footer, "");
-
-    const noCode = changeSet({ modified: [component("Toast")] });
-    const alone = libraryCard(noCode, draftPublishIntake(noCode, REGISTRY));
-    assert.deepEqual(alone.operations.map((o) => o.toolName), ["github_issue_create"]);
-    assert.deepEqual(alone.fields.map((f) => f.label), ["intake"]);
-  });
-});
-
-describe("the full list in the card's thread", () => {
-  it("never ends a reply on an empty group heading, and never opens one on a blank line", () => {
-    // Enough Has-code names to fill most of a reply, then a few without code:
-    // the second group's heading lands right at the boundary.
-    const registry: ComponentRegistry = {
-      components: Object.fromEntries(
-        Array.from({ length: 400 }, (_, i) => {
-          const name = `Mapped component ${String(i).padStart(3, "0")}`;
-          return [name, { code: { mdxPath: `x/${i}/${i}.mdx` }, figma: { sets: [{ name, componentSetNodeId: `9:${name}` }] } }];
-        }),
-      ),
-    };
-    for (const mapped of [150, 160, 170, 400]) {
-      const rows = [
-        ...Array.from({ length: mapped }, (_, i) => component(`Mapped component ${String(i).padStart(3, "0")}`)),
-        ...Array.from({ length: 300 }, (_, i) => component(`Loose component ${String(i).padStart(3, "0")}`)),
-      ];
-      const intake = draftPublishIntake(changeSet({ modified: rows }), registry);
-      const replies = componentListMessages(intake);
-      for (const reply of replies) {
-        assert.ok(reply.length <= 3500, `${reply.length} chars`);
-        assert.doesNotMatch(reply, /^\n/);
-        assert.doesNotMatch(reply, /:\* $/m, "a heading with no names after it");
-      }
-      const named = replies.join("\n").split("\n").flatMap((l) => (l.startsWith("• *") ? l.replace(/^• \*[^*]+:\* /, "").split(", ") : []));
-      assert.equal(named.length, rows.length, `${mapped} mapped`);
-      assert.equal(new Set(named).size, rows.length);
-    }
-  });
-});
-
-describe("the library card's thread (#886 § 3.2)", () => {
-  const PR = { number: 123, url: "https://github.com/o/r/pull/123" };
-  const INTAKE = { number: 45, url: "https://github.com/o/r/issues/45" };
-
-  it("links the PR plainly when it opens", () => {
-    assert.equal(prOpenedLine(PR, INTAKE), "PR open: <https://github.com/o/r/pull/123|#123>. Linked from the <https://github.com/o/r/issues/45|intake>.");
-    assert.equal(prOpenedLine(PR), "PR open: <https://github.com/o/r/pull/123|#123>.");
-    passesChecklist(prOpenedLine(PR, INTAKE));
-  });
-
-  it("marks the merge with one 🎉 and names what now matches", () => {
-    const line = prMergedLine(PR, "Badge, Button, Card", INTAKE);
-    assert.equal(
-      line,
-      ":tada: <https://github.com/o/r/pull/123|#123> merged, so Badge, Button and Card match the library. Closed the <https://github.com/o/r/issues/45|intake>.",
-    );
-    assert.equal(prMergedLine(PR, "Badge"), ":tada: <https://github.com/o/r/pull/123|#123> merged, so Badge matches the library.");
-    passesChecklist(line, { ship: true });
-  });
-
-  it("says a PR closed without merging leaves the intake for the next try", () => {
-    assert.equal(
-      prClosedLine(PR, INTAKE),
-      "<https://github.com/o/r/pull/123|#123> closed without merging. The <https://github.com/o/r/issues/45|intake> stays open for the next try.",
-    );
-    assert.equal(prClosedLine(PR), "<https://github.com/o/r/pull/123|#123> closed without merging.");
-    passesChecklist(prClosedLine(PR, INTAKE));
-  });
-
-  it("tells an expired card's thread what it filed, in one plain sentence", () => {
-    const line = expiredThreadLine(INTAKE.url);
-    assert.equal(line, "No decision in 72 h. I filed the <https://github.com/o/r/issues/45|intake> so the publish isn't lost.");
-    passesChecklist(line);
-  });
-
-  it("tells the thread when it filed an intake an approved write had failed to", () => {
-    const line = failedFiledLine(INTAKE.url);
-    assert.equal(line, "The approved filing didn't go through, so I filed the <https://github.com/o/r/issues/45|intake> now.");
-    passesChecklist(line);
-  });
-
-  it("closes a card posted before the shared card with #886's last line", () => {
-    const note = expiredCardNote(INTAKE.url);
-    assert.equal(note, "_No decision in 72 h. Filed the <https://github.com/o/r/issues/45|intake> so it isn't lost._");
-    passesChecklist(note);
-  });
-});
-
 // ── The weekly precedence report (shared decision card) ──────────────────────
 
+const FILE_KEY = "LIBFILEKEY";
 const REPO = "BilLogic/plus-uno";
 const RULE_URL = precedenceRuleUrl(REPO);
 
@@ -570,23 +267,7 @@ function passesGateAnswer(text: string, glyphs: readonly string[] = []): void {
 }
 
 describe("what a stated card says at the gate", () => {
-  const ttlHours = LIBRARY_CARD_TTL_MS / 3_600_000;
-  const drafting = libraryCardWords(draftPublishIntake(changeSet({ modified: [component("Button"), component("Chip")] }), REGISTRY), ttlHours);
-  const noCode = libraryCardWords(
-    draftPublishIntake(changeSet({ created: [component("Chip")], newComponentIds: ["9:Chip"] }), REGISTRY),
-    ttlHours,
-  );
   const weekly = precedenceCardWords(PRECEDENCE_CARD_TTL_MS / 3_600_000);
-
-  it("the library card: Reject files nothing, and a late decision is told the intake still lands", () => {
-    assert.equal(drafting.cancelled, "Rejected, nothing filed");
-    assert.equal(
-      drafting.expired,
-      "That card closed after 72 h with no decision, so nothing was drafted. I file its intake the morning after, so the publish isn't lost.",
-    );
-    // Nothing had code, so there was nothing to draft and the line says less.
-    assert.equal(noCode.expired, "That card closed after 72 h with no decision. I file its intake the morning after, so the publish isn't lost.");
-  });
 
   it("a precedence card: a Reject leaves the difference as deliberate, and its window is the whole six days", () => {
     assert.deepEqual(weekly, {
@@ -595,20 +276,16 @@ describe("what a stated card says at the gate", () => {
     });
   });
 
-  it("a ⛔ closes either card with what it did and who decided", () => {
-    assert.equal(statedCancelledNote(drafting, "U0AAAAAA2"), ":no_entry: Rejected, nothing filed, decided by <@U0AAAAAA2>.");
+  it("a ⛔ closes the card with what it did and who decided", () => {
     assert.equal(statedCancelledNote(weekly, "U0AAAAAA2"), ":no_entry: Left as deliberate, nothing filed, decided by <@U0AAAAAA2>.");
     // Only a Slack id is mentioned; anything else would blank the post.
     assert.equal(statedCancelledNote(weekly, "someone"), ":no_entry: Left as deliberate, nothing filed.");
-    passesGateAnswer(statedCancelledNote(drafting, "U0AAAAAA2"), [":no_entry:"]);
     passesGateAnswer(statedCancelledNote(weekly, "U0AAAAAA2"), [":no_entry:"]);
   });
 
   it("every answer the gate gives a stated card holds to the copy rules, and names no tool", () => {
     const answers: Array<[GateNote, string[]]> = [
-      [{ kind: "resolved", decision: "cancel", cancelled: drafting.cancelled }, []],
       [{ kind: "resolved", decision: "cancel", cancelled: weekly.cancelled }, []],
-      [{ kind: "expired", ttlMs: LIBRARY_CARD_TTL_MS, words: drafting.expired }, []],
       [{ kind: "expired", ttlMs: PRECEDENCE_CARD_TTL_MS, words: weekly.expired }, []],
       [{ kind: "superseded", stated: true }, []],
       [{ kind: "not-on-the-card", toolName: "github_issue_create", glyph: "no_entry", userId: "U0AAAAAA2", stated: true }, [":no_entry:"]],
@@ -618,8 +295,7 @@ describe("what a stated card says at the gate", () => {
       passesGateAnswer(text, glyphs);
       assert.doesNotMatch(text, /github_issue_create|an issue/, text);
     }
-    assert.equal(renderGateNote(answers[0]![0]), "Rejected, nothing filed.");
-    assert.equal(renderGateNote(answers[1]![0]), "Left as deliberate, nothing filed.");
+    assert.equal(renderGateNote(answers[0]![0]), "Left as deliberate, nothing filed.");
   });
 });
 
@@ -933,7 +609,6 @@ describe("the weekly Figma tidy-up (#886 § 3.6)", () => {
 
 describe("Dev Mode links (#904)", () => {
   const button: DevLinksSubject = { kind: "component", component: "Button", figmaUrl: "https://www.figma.com/design/L?node-id=33-2470", storybook: "https://sb/button" };
-  const pr: DevLinksSubject = { kind: "pr", number: 1200, url: "https://github.com/o/r/pull/1200", components: ["Button", "Card"] };
   const links = (name: string) => [
     { file_key: "L", node_id: "33:2470", name: `Code (plus-uno): ${name}`, url: "https://gh/code" },
     { file_key: "L", node_id: "979:1", name: `Code (plus-uno): ${name}`, url: "https://gh/code" },
@@ -951,7 +626,6 @@ describe("Dev Mode links (#904)", () => {
   it("the parent lines, the cards and what Review shows hold to the checklist", () => {
     passesChecklist(devLinksParent(button));
     passesChecklist(devLinksParent(batch));
-    passesChecklist(devLinksParent(pr));
     for (const line of [
       devLinksCarryOn(12, 2),
       devLinksNotCarried("the runner refused it (500)"),
@@ -964,7 +638,6 @@ describe("Dev Mode links (#904)", () => {
       [button, first],
       [button, { links: links("Button"), introduce: [], renames: 2 }],
       [batch, { links: [...links("Badge"), ...links("Button")], introduce: [{ file_key: "L", node_id: "25:568", component: "Badge" }], renames: 2 }],
-      [pr, { links: links("Button"), introduce: [] }],
     ];
     for (const [subject, write] of cases) {
       const item = devLinksItem(subject, write);

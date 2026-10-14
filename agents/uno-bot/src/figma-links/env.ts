@@ -8,9 +8,7 @@
 //   • Slack: where the Figma Review cards post (`figmaReviewChannel`) — #plus-design
 //     unless `FIGMA_ASK_CHANNEL_ID` names another; its members decide;
 //   • KV: the cards posted and the message each is in, so a later run never
-//     offers one twice while it is undecided (`./run.ts` reads its report), and
-//     merged library PRs waiting for their card (`./queue.ts`), queued by the
-//     library tracker (`figma-library/env.ts`, through `prQueueFor`);
+//     offers one twice while it is undecided (`./run.ts` reads its report);
 //   • the meter: a run stages its one card only when its D1 and subrequest
 //     budget allow (`budgetHeadroom`), and Approve writes only the Figma calls
 //     this invocation has room for;
@@ -30,8 +28,6 @@ import { kvJson } from "../figma-poll";
 import { threadStateFor } from "../thread-state/production";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
 import { proposalEventLogFor } from "../usage/production";
-import { devLinksOn } from "./gate";
-import { PR_QUEUE_KV_KEY, runQueuedPrLinks, type QueuedPrLinks } from "./queue";
 import {
   runDevLinksPost,
   runDevLinksWriteJob,
@@ -45,11 +41,6 @@ import {
 
 /** The cards posted, by card id: when each closes, and its message. */
 const CARDED_KV_KEY = "figma-links:carded";
-
-/** Where merged library PRs wait for their card. */
-export function prQueueFor(env: Env) {
-  return kvJson<QueuedPrLinks[]>(env, PR_QUEUE_KV_KEY, []);
-}
 
 /**
  * The run's dependencies on `Env`, or why there are none. The registry and
@@ -106,28 +97,6 @@ export async function runDevLinksOnEnv(env: Env, request: DevLinksRequest, opts:
   const deps = devLinksDepsFor(env);
   if ("refused" in deps) return { posted: false, cards: 0, retry: true, summary: deps.refused };
   return runDevLinksPost(deps, request, opts);
-}
-
-/**
- * The morning `figma-dev-links-pr` job on `Env`.
- *
- * @param env - Worker bindings
- * @param opts - `dryRun` posts nothing and keeps the queue
- */
-export function runQueuedPrLinksOnEnv(env: Env, opts: { dryRun?: boolean }): Promise<{ summary: string }> {
-  let deps: ReturnType<typeof devLinksDepsFor> | undefined;
-  return runQueuedPrLinks(
-    {
-      queue: prQueueFor(env),
-      on: devLinksOn(env.FIGMA_DEV_LINKS),
-      async post(request, o) {
-        deps ??= devLinksDepsFor(env);
-        if ("refused" in deps) return { posted: false, cards: 0, retry: true, summary: deps.refused };
-        return runDevLinksPost(deps, request, o);
-      },
-    },
-    opts,
-  );
 }
 
 /** Subrequests a runner step leaves for its reply. */

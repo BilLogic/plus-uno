@@ -14,7 +14,6 @@ import type { FigmaComponentsResponse } from "../src/figma/client";
 import { createInMemoryFigma } from "../src/figma/in-memory";
 import {
   findDisagreements,
-  inFlightComponents,
   liveLibraryFrom,
   losingSide,
   parseComponentIndex,
@@ -139,14 +138,13 @@ const REGISTRY: PrecedenceRegistry = {
   },
 };
 
-function check(inFlight: ReadonlySet<string> = new Set()) {
+function check() {
   return findDisagreements({
     index: parseComponentIndex(INDEX_MD),
     registry: REGISTRY,
     library: liveLibraryFrom(LIBRARY),
     fileKey: FILE_KEY,
     repo: REPO,
-    inFlight,
   });
 }
 
@@ -224,7 +222,6 @@ function textareaCheck(registry: PrecedenceRegistry = textareaRegistry()) {
     library: liveLibraryFrom(TEXTAREA_LIBRARY),
     fileKey: FILE_KEY,
     repo: REPO,
-    inFlight: new Set(),
   });
 }
 
@@ -285,7 +282,6 @@ describe("the comparison", () => {
       library: liveLibraryFrom(LIBRARY),
       fileKey: FILE_KEY,
       repo: REPO,
-      inFlight: new Set(),
     }).filter((d) => d.component === "Tooltip");
     assert.equal(found.length, 1);
     assert.equal(found[0]!.kind, "axis-values");
@@ -359,7 +355,6 @@ describe("the comparison", () => {
         library: liveLibraryFrom(library),
         fileKey: FILE_KEY,
         repo: REPO,
-        inFlight: new Set(),
       }).filter((d) => d.component === "Tooltip");
       assert.deepEqual(found, [], spelling);
     }
@@ -377,22 +372,6 @@ describe("the comparison", () => {
       textareaCheck(registry).map((d) => d.key),
       ["Textarea:size:missing-axis"],
     );
-  });
-
-  it("leaves out a component a library publish is still carrying, where code follows", () => {
-    const inFlight = inFlightComponents(
-      [{ implement: "Button, Tooltip" }],
-      [
-        {
-          created: [],
-          modified: [{ key: "k", name: "placement=top", description: "", nodeId: "500:1", containingFrame: "Tooltip", setNodeId: "300:1" }],
-          deleted: [],
-        },
-      ],
-      REGISTRY,
-    );
-    assert.deepEqual([...inFlight].sort(), ["Button", "Tooltip"]);
-    assert.deepEqual(check(inFlight).map((d) => d.component), ["TreeSelect"]);
   });
 });
 
@@ -419,7 +398,6 @@ function checkDeps(library: FigmaComponentsResponse, report = kv<PrecedenceRepor
     github: { indexMarkdown: async () => INDEX_MD, registry: async () => REGISTRY },
     figma,
     report: report.store,
-    inFlight: async () => new Set<string>(),
     fileKey: FILE_KEY,
     repo: REPO,
     now: () => Date.UTC(2026, 9, 2, 22, 0),

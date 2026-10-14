@@ -159,7 +159,7 @@ export function intakeBody(weekOf: string, section: string): string {
     "",
     "## What disagrees",
     "",
-    `uno-bot's weekly check compares the component index and each component's props (\`component-registry.json\`) with the published ${SOURCE_NAMES.library}, when no library publish is carrying the component. ` +
+    `uno-bot's weekly check compares the component index and each component's props (\`component-registry.json\`) with the published ${SOURCE_NAMES.library}. ` +
       `Where they disagree, the DS precedence rule decides — ${RULE} — and the losing artifact is listed here. Existence and variant axes only; token values are out of scope.`,
     "",
     `Each component below was approved in #plus-universal, or disputed there with a note. One rejected there was left as deliberate, and is not listed.`,

@@ -113,7 +113,7 @@ export interface PostedCard {
  * decision came to.
  *
  * A card posted with blocks of its own — a sweep card's carousel, a Figma
- * library card's release card and table, a Figma preview — keeps them: its
+ * preview — keeps them: its
  * button row comes off, the note goes on, and the row comes back with `button`
  * where it had one. Decisions are made in the Review pop-up, so a card still
  * live keeps Review and a decided one offers View; a card posted without the

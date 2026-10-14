@@ -2,7 +2,7 @@
 // that names it. The code side is read from `GITHUB_REPO`, the harness repo,
 // where the intake is filed too; the library is `FIGMA_FILE_KEY` over REST;
 // the report goes to #plus-universal (`PLUS_UNIVERSAL_CHANNEL_ID`), as the
-// library card's does. The report and each posted message's record are JSON
+// sweep's morning post does. The report and each posted message's record are JSON
 // in HARNESS_KV beside the library poll's keys; each report's cards and their
 // decisions are on ThreadState, as every decision report's are.
 
@@ -17,15 +17,12 @@ import { proposalEventLogFor } from "../usage/production";
 import type { PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { githubLibraryReads, resolveRepoFor } from "../integrations/github";
-import { FINDINGS_KV_KEY, kvJson } from "../figma-poll";
+import { kvJson } from "../figma-poll";
 import { figmaClientFor } from "../figma/production";
-import { TRACKED_KV_KEY } from "../figma-library/env";
 import { channelMembers } from "../slack/channel-members";
 import { REGISTRY_PATH } from "../figma/registry";
-import type { LibraryChangeSet } from "../figma-library/draft";
-import type { TrackedPublish } from "../figma-library/track";
 import type { JobContext } from "../scheduled/runs";
-import { inFlightComponents, type PrecedenceRegistry } from "./compare";
+import type { PrecedenceRegistry } from "./compare";
 import { precedenceRuleUrl } from "./report";
 import {
   postPrecedenceReport,
@@ -69,12 +66,6 @@ export async function runDsPrecedenceCheck(env: Env, opts: JobContext): Promise<
       },
       figma,
       report: kvJson<PrecedenceReport | null>(env, REPORT_KV_KEY, null),
-      inFlight: async (registry) =>
-        inFlightComponents(
-          await kvJson<TrackedPublish[]>(env, TRACKED_KV_KEY, []).read(),
-          await kvJson<LibraryChangeSet[]>(env, FINDINGS_KV_KEY, []).read(),
-          registry,
-        ),
       fileKey,
       repo: target.entry.repo,
       now: () => Date.now(),
@@ -169,7 +160,7 @@ export async function handlePrecedenceGateReply(env: Env, event: SlackMessageEve
 /**
  * Stage a weekly card the Worker posted, and put it on the usage record like
  * any card — a staged row via the Worker in #plus-universal, and a superseded
- * row for any card the staging retired — as the sweep and the library card do.
+ * row for any card the staging retired — as the sweep does.
  */
 async function stageWeeklyCard(env: Env, proposal: PendingProposal): Promise<void> {
   const { retired } = await threadStateFor(env).putProposal(proposal);

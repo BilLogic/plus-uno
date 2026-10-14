@@ -1,8 +1,7 @@
 // Manual firing of the Figma library poll (the end-of-day job's code path).
-// `?dry_run=1` diffs and reports without writing KV. Token-gated: a live run
-// advances the snapshot and queues what changed for the morning run's post —
-// it posts nothing itself. `/debug/sweep?dry_run=1&run=morning` rehearses the
-// post and the tracker.
+// `?dry_run=1` reads and reports without writing KV. Token-gated: a live run
+// advances the snapshot and records any refresh a publish owes the repo's
+// snapshot — it posts nothing.
 import { runFigmaPoll } from "../../figma-poll";
 import { devLinksRequestOf } from "../../figma-links/gate";
 import { runDevLinksOnEnv } from "../../figma-links/env";

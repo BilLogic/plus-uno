@@ -206,7 +206,7 @@ export interface ProposalCard {
    * then the staged parameters. `revision` is `notion_update`'s — the diff
    * leads and there is no preamble, because the named page and the
    * `current → new` lines say it better than a warning would. `stated` is a
-   * card the Worker posts on its own — the library publish card, the weekly
+   * card the Worker posts on its own — the Dev Mode links card, the weekly
    * precedence card — whose `lead` states the whole proposal and whose
    * `footer` says what ✅ and ⛔ each do: one footer, no preamble, no plan
    * (#886).

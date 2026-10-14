@@ -3,20 +3,10 @@
 // Payload contract verified against .github/workflows/figma-implement.yml:
 //   { component, notion_prd_id?, notion_prd_url?, thread_ts, channel, message_ts }
 // The workflow uses message_ts for its own :gear: / :white_check_mark: reactions
-// on the user's original message — we pass userMsgTs there. `component` may be
-// a comma-separated list: the workflow titles its PR "feat: Figma DS update —
-// <component>" and `scripts/implement-figma-changes.js` splits that title on
-// commas, so one run covers every component a library publish changed.
+// on the user's original message — we pass userMsgTs there.
 //
-// TWO WAYS IN, and each needs a spec. A designer's ask ("implement Badge")
-// names one component and needs its Notion PRD — pasted, or read off a thread
-// root that links one. The Figma library card (`figma-library/post.ts`) names
-// every mapped component of one publish and carries `library_publish`, the
-// Figma version it came from: its spec is the intake the same card files, so it
-// needs no PRD. `library_publish` is not in the model's schema, but a provider
-// may not enforce that, so it is honoured only on a card nobody requested — the
-// Worker's own (`requestedBy` unset). A model-staged card always has a
-// requester, so the model's path always needs its PRD.
+// A designer's ask ("implement Badge") names one component and needs its
+// Notion PRD — pasted, or read off a thread root that links one.
 
 import type { Env } from "../types";
 import { repositoryDispatch } from "./github-dispatch";
@@ -26,10 +16,6 @@ import { fetchThreadTranscript, withThreadTranscript } from "../slack/thread-tra
 
 /** A DS component name: a plain PascalCase identifier (Badge, CardSurface). */
 const COMPONENT_NAME = /^[A-Za-z][A-Za-z0-9]{0,49}$/;
-/** A Figma version id is numeric. */
-const FIGMA_VERSION_ID = /^\d{1,24}$/;
-/** More than this in one run is a publish that should be split by hand. */
-const MAX_COMPONENTS = 20;
 
 /** What a dispatch would send, or why it is refused. */
 export type ImplementPayload =
@@ -52,22 +38,14 @@ export function implementPayload(input: Record<string, unknown>, slack: SlackCon
   const raw = typeof input.component === "string" ? input.component.trim() : "";
   const notes = typeof input.notes === "string" ? input.notes.slice(0, 2000) : undefined;
   const inputPrdUrl = typeof input.notion_prd_url === "string" ? input.notion_prd_url.trim() : "";
-  const libraryPublish =
-    !slack.requestedBy && typeof input.library_publish === "string" ? input.library_publish.trim() : "";
   if (!raw) return { ok: false, error: "missing 'component' in input" };
-
-  const names = libraryPublish ? raw.split(",").map((n) => n.trim()).filter(Boolean) : [raw];
-  const bad = names.find((n) => !COMPONENT_NAME.test(n));
-  if (bad !== undefined) {
+  if (!COMPONENT_NAME.test(raw)) {
     return {
       ok: false,
-      error: `invalid component name '${bad}' — expected a plain DS component identifier like 'Badge' or 'CardSurface'.`,
+      error: `invalid component name '${raw}' — expected a plain DS component identifier like 'Badge' or 'CardSurface'.`,
     };
   }
-  if (names.length > MAX_COMPONENTS) {
-    return { ok: false, error: `${names.length} components in one run — at most ${MAX_COMPONENTS}.` };
-  }
-  const component = names.join(", ");
+  const component = raw;
 
   const base = {
     component,
@@ -76,13 +54,6 @@ export function implementPayload(input: Record<string, unknown>, slack: SlackCon
     channel: slack.channel,
     message_ts: slack.userMsgTs,
   };
-
-  if (libraryPublish) {
-    if (!FIGMA_VERSION_ID.test(libraryPublish)) {
-      return { ok: false, error: `invalid Figma version id '${libraryPublish}'` };
-    }
-    return { ok: true, component, payload: { ...base, figma_version_id: libraryPublish } };
-  }
 
   // A designer's implement is tied to a Notion PRD: one on the thread root, or
   // one they pasted. With neither, refuse so the bot asks for it rather than

@@ -46,12 +46,11 @@ export type ScheduledRunName = "morning" | "end-of-day";
 
 /**
  * What a scheduled job does. `noop` proves the path and does nothing else.
- * The Figma library's four: the end-of-day poll finds a publish, the morning
- * post turns it into a card in #plus-universal, the morning track follows
- * each posted card to its PR, and `figma-snapshot-refresh` — at the end of
- * the end-of-day run, once its Figma reads are done — starts the refresh of
- * the repo's library snapshot once per publish, and again each night until it
- * lands (src/figma-poll.ts, src/figma-library/). The
+ * The Figma library's two: the end-of-day poll finds a publish, and
+ * `figma-snapshot-refresh` — at the end of the end-of-day run, once its Figma
+ * reads are done — starts the refresh of the repo's library snapshot once per
+ * publish, and again each night until it lands (src/figma-poll.ts,
+ * src/figma-library/). The
  * usage record's two: the end-of-day classify jobs label a batch of channel
  * asks each, and the purge — in both runs — keeps text under its 14 days
  * (src/usage/classify-run.ts). `ask-resolution` is the end-of-day 24 h pass
@@ -92,8 +91,6 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * the end-of-day `dm-capture-read` reads their DMs for drift and undocumented
  * answers, and the morning `dm-capture-post` offers each fix on a decision card in
  * their DM with uno-bot that only they can decide (src/dm-watch/capture.ts).
- * The morning `figma-dev-links-pr`, after the tracker, posts a Dev Mode links
- * card for each merged library PR it queued (src/figma-links/).
  * The weekly Figma tidy-up's two, Monday morning: `figma-tidy-read` lists the
  * teams' stage folders, and `figma-tidy-post` checks each file against its
  * cards and posts the week's Review cards (src/figma-tidy/).
@@ -101,8 +98,6 @@ export type ScheduledRunName = "morning" | "end-of-day";
 export type ScheduledJobKind =
   | "noop"
   | "figma-library-poll"
-  | "figma-library-post"
-  | "figma-library-track"
   | "figma-snapshot-refresh"
   | "usage-classify"
   | "usage-text-purge"
@@ -129,8 +124,7 @@ export type ScheduledJobKind =
   | "dm-capture-read"
   | "dm-capture-post"
   | "figma-tidy-read"
-  | "figma-tidy-post"
-  | "figma-dev-links-pr";
+  | "figma-tidy-post";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -203,23 +197,18 @@ const MONDAY = 1;
 const FRIDAY = 5;
 
 /**
- * Every run's jobs. A publish found at the end of the day is posted the next
- * morning, like every proactive job; the tracker follows cards already posted.
+ * Every run's jobs. What the end of the day finds is posted the next
+ * morning, like every proactive job.
  *
  * The DS precedence check is weekly, on FRIDAY's end-of-day run — the one
  * that fires at Saturday 00:00 ET and is dated Friday: the week's merges and
  * any library publish have landed, so it reads where the week ended, and its
- * thread opens Monday's morning run — the start of the week
- * the team has to act on it, with the card live until the next check. It runs
- * after the library poll, so a publish found that evening is already among
- * the components it leaves to the library flow. Its post is on every morning,
- * not only Monday's: a report waits in KV until a morning posts it.
+ * report opens Monday's morning run — the start of the week the team has to
+ * act on it, with the cards live until the next check. Its post is on every
+ * morning, not only Monday's: a report waits in KV until a morning posts it.
  */
 const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
   morning: [
-    { key: "figma-library-post", kind: "figma-library-post" },
-    { key: "figma-library-track", kind: "figma-library-track" },
-    { key: "figma-dev-links-pr", kind: "figma-dev-links-pr", after: ["figma-library-track"] },
     // Before the sweep's post, which puts the card follow-ups it hands off
     // for a channel's top on that channel's one message.
     { key: "commitment-nudge", kind: "commitment-nudge" },
@@ -246,7 +235,7 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
   "end-of-day": [
     { key: "figma-library-poll", kind: "figma-library-poll" },
     // Second, so a rehearsal reaches it before the batches spend the ceiling.
-    { key: "ds-precedence-check", kind: "ds-precedence-check", after: ["figma-library-poll"], weekday: FRIDAY },
+    { key: "ds-precedence-check", kind: "ds-precedence-check", weekday: FRIDAY },
     // Early too, for the same reason: one Roadmap read, a few lookups a card.
     { key: "card-follow-through", kind: "card-follow-through" },
     // A live drift question is looked at again in both runs, so a file that

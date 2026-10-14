@@ -37,8 +37,6 @@ import { recordingDelivery } from "../src/turn/index";
 import { recordingViews } from "./helpers/recording-slack";
 import { notified } from "./helpers/notified";
 import { createInMemoryThreadState, type PendingProposal, type ReportItemState } from "../src/thread-state/index";
-import { trackLibraryIntakes, implementPrTitle, type TrackDeps, type TrackedPublish } from "../src/figma-library/track";
-import { runQueuedPrLinks, type QueuedPrLinks } from "../src/figma-links/queue";
 
 const CHANNEL = "D0APTB20SK0";
 const BILL = "U03FYQJRQHX";
@@ -496,16 +494,6 @@ describe("a decided card stops counting as open", () => {
     assert.ok(linksOf(w.staged[1]!).some((l) => l.name.endsWith(": Button")));
   });
 
-  it("a merged PR's card decided lets the PR's links be offered again", async () => {
-    const pr = { number: 77, url: "https://github.com/BilLogic/plus-uno/pull/77" };
-    const w = world();
-    await runDevLinksPost(w.deps, { pr, components: ["Button"] });
-    assert.match((await runDevLinksPost(w.deps, { pr, components: ["Button"] })).summary, /card already open: PR #77/);
-    await settle(w, FIRST_TS, "pr-77", { kind: "rejected", by: BILL });
-    const again = await runDevLinksPost(w.deps, { pr, components: ["Button"] });
-    assert.equal(again.cards, 1, again.summary);
-  });
-
   it("a card past its time stops counting as open", async () => {
     const w = world();
     await runDevLinksPost(w.deps, { components: ["Button"] });
@@ -660,66 +648,5 @@ describe("Approve on the batch card", () => {
     assert.deepEqual(w.figma.writes(), []);
     assert.equal(replies.length, 1);
     assert.match(replies[0]!, /stopped after a day/);
-  });
-});
-
-describe("a merged library PR", () => {
-  const PR = { number: 1200, url: "https://github.com/BilLogic/plus-uno/pull/1200" };
-
-  it("the tracker hands the merged PR and its components on", async () => {
-    const card: TrackedPublish = { key: "k", marker: "m", channel: "C1", ts: "1.1", postedAt: NOW - 86_400_000, implement: "Button, Badge", pr: PR };
-    const handed: unknown[] = [];
-    let tracked = [card];
-    const deps: TrackDeps = {
-      tracked: { read: async () => tracked, write: async (t) => void (tracked = t) },
-      github: {
-        recentIntakes: async () => [],
-        recentPulls: async () => [],
-        pull: async () => ({ ...PR, title: implementPrTitle("Button, Badge"), createdAt: "2026-10-10T00:00:00Z", state: "closed", merged: true }),
-        comment: async () => {},
-        close: async () => {},
-        intakesSince: async () => ({ intakes: [], complete: true }),
-        fileIntake: async () => ({ number: 1, url: "u" }),
-      },
-      postToThread: async () => {},
-      reports: createInMemoryThreadState({ now: () => NOW }),
-      closeCard: async () => {},
-      merged: async (pr, components) => void handed.push({ pr, components }),
-      now: () => NOW,
-    };
-    await trackLibraryIntakes(deps);
-    assert.deepEqual(handed, [{ pr: PR, components: ["Button", "Badge"] }]);
-  });
-
-  it("one card adds the PR's link to each mapped component it names, plainly named", async () => {
-    const w = world();
-    const result = await runDevLinksPost(w.deps, { pr: PR, components: ["Button", "Banner"] });
-    assert.equal(result.cards, 1);
-    assert.match(result.summary, /not in the registry, so no links: Banner/);
-    assert.equal(w.posts[0]!.text.split("\n")[0], "PR #1200 merged, so its link is ready for Review on Button in Dev Mode.");
-    assert.deepEqual(linksOf(w.staged[0]!), [
-      { file_key: LIB, node_id: "33:2470", name: "PR #1200: Button", url: PR.url },
-      { file_key: LIB, node_id: "979:20977", name: "PR #1200: Button", url: PR.url },
-    ]);
-  });
-
-  it("the queue waits while FIGMA_DEV_LINKS is off, and posts and empties once it is on", async () => {
-    let queue: QueuedPrLinks[] = [{ pr: PR, components: ["Button"] }];
-    const asked: unknown[] = [];
-    const deps = {
-      queue: { read: async () => queue, write: async (q: QueuedPrLinks[]) => void (queue = q) },
-      post: async (request: unknown) => {
-        asked.push(request);
-        return { posted: true, cards: 1, summary: "posted 1 card(s)" };
-      },
-    };
-    const held = await runQueuedPrLinks({ ...deps, on: false });
-    assert.match(held.summary, /1 merged PR waiting/);
-    assert.deepEqual(asked, []);
-    assert.equal(queue.length, 1);
-
-    await runQueuedPrLinks({ ...deps, on: true });
-    assert.deepEqual(asked, [{ pr: PR, components: ["Button"] }]);
-    assert.deepEqual(queue, []);
   });
 });
