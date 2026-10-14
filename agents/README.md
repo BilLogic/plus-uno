@@ -34,5 +34,5 @@ agents/<kind>/<name>.md         (a folder when the agent has an executable body 
 2. **Voice is the model's default, not a role:** no agent loads a voice doc. uno-bot's deliberate persona is `agents/uno-bot/AGENT.md` § Identity & voice; long-form craft is `docs/conventions/writing.md`. There is no copywriter agent.
 3. **The auditor inspects and files; writers fix.**
 4. **Agents ↔ docs, no duplication:** agents point to the docs they enforce; docs may carry a one-line "applied by `agents/<kind>/<name>`" pointer back. A rule lives exactly once. The uno-maintain staleness sweep checks these cross-references both ways.
-5. Every row in `docs/engineering/operations.md` names its agent — an automation without one is unowned by definition.
+5. Which automations must name an agent, and what a deterministic one writes instead: `docs/engineering/operations.md` § Rules.
 6. **Frontmatter `tools`/`model` are optional** — declare `tools` when a role is read-only (makes the Must-NOT mechanical if the roster is ever registered as real subagents) and `model` when a sweep is cheap enough for a smaller tier. The uno-bot embodiment (AGENT.md + Worker code) is exempt from the file anatomy above — it is a concatenated persona delta, not a Task-dispatched role.
