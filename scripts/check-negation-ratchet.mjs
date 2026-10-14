@@ -293,8 +293,8 @@ export const SCOPES = [
     key: 'ide',
     noun: 'IDE-side docs',
     corpus:
-      'hand-authored docs under the bundler section roots declaring embodiment: ide — ' +
-      'docs/adr/ and the generated .claude/skills/ surfaces are not section roots and so are out',
+      'hand-authored docs under the bundler section roots and its IDE-only roots (skills/) declaring ' +
+      'embodiment: ide — docs/adr/ and the generated .claude/skills/ surfaces are walked by neither and so are out',
     files: (sets) => sets.ide,
     read: (text) => text,
     measuredOn:
