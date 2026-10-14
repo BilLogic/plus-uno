@@ -1652,6 +1652,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     // A revision is held to the terms of the card it replaces — its lifetime
     // and who may confirm it. A fresh card has none and gets the defaults.
     ...inheritedTerms(replaced),
+    // And names it, for the usage record's "approved with edits".
+    ...(replaced ? { revisesProposalTs: replaced.proposalTs } : {}),
     // A revision of a keyed card stays in the card's slot.
     ...(replaced?.supersedeKey ? { supersedeKey: replaced.supersedeKey } : {}),
     // A revision of a sweep card stays a sweep card, in the sweep's slot, so
@@ -1872,6 +1874,7 @@ async function dropFromSweepCard(
     // The Worker staged the card this revises: its usage row is the root
     // every later outcome joins to.
     originProposalTs: stagingCardOf(pending),
+    revisesProposalTs: pending.proposalTs,
   };
   const { retired: retiredByStaging } = await threadState.putProposal(proposal);
   await recordSuperseded(retiredByStaging);

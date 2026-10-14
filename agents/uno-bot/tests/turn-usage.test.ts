@@ -102,6 +102,7 @@ test("an answered turn records who, where, when, what ran and what it cost", asy
     subType: null,
     painCategory: null,
     classifiedAt: null,
+    thanks: false,
   });
   assert.ok(row.firstAnswerAt! > T, "the answer time is read after the turn began");
 });
@@ -395,6 +396,87 @@ test("a superseding revision records the card it replaced, then the one it stage
       [outcome.staged!.proposal.proposalTs, "staged", "turn"],
     ],
   );
+});
+
+test("a revision's staged row names the card it revised; a fresh card's names none", async () => {
+  const h = harness({ replies: [REVISION, REVISION] });
+  await h.threadState.putProposal(PENDING);
+  const revised = await runTurn(request({ text: "change the title to v2", pending: PENDING }), h.deps);
+  const [row] = await h.proposalEvents.eventsOf(revised.staged!.proposal.proposalTs);
+  assert.equal(row?.revisesProposalId, PENDING.proposalTs);
+
+  const fresh = harness({ replies: [REVISION] });
+  const staged = await runTurn(request({ text: "file it" }), fresh.deps);
+  const [freshRow] = await fresh.proposalEvents.eventsOf(staged.staged!.proposal.proposalTs);
+  assert.equal(freshRow?.revisesProposalId, null);
+});
+
+test("a sweep card revised by \"drop 2\" names the card it revised", async () => {
+  const fix = (block: string) => ({
+    toolName: "notion_update",
+    input: {
+      page_url: "https://www.notion.so/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      replace: [{ block_id: block, last_edited_time: "2026-09-01T10:00:00.000Z", content: block }],
+    },
+  });
+  const sweepCard = {
+    ...PENDING,
+    operations: [fix("blk-1"), fix("blk-2")],
+    toolName: "notion_update",
+    input: fix("blk-1").input,
+    ttlMs: 72 * 60 * 60 * 1000,
+    confirmers: ["U0OWNER"],
+    sweepRun: "2026-09-30",
+  };
+  const h = harness();
+  await h.threadState.putProposal(sweepCard);
+  const outcome = await runTurn(request({ text: "drop 2", pending: sweepCard, userId: "U0OWNER" }), h.deps);
+  assert.equal(outcome.disposition, "staged");
+  const [row] = await h.proposalEvents.eventsOf(outcome.staged!.proposal.proposalTs);
+  assert.equal(row?.revisesProposalId, sweepCard.proposalTs);
+});
+
+test("a re-staged revision still names the card the revision replaced", async () => {
+  // A cut-off re-stage is the same card on the record: it keeps its chain.
+  const h = harness({ replies: [REVISION] });
+  await h.threadState.putProposal(PENDING);
+  const revised = await runTurn(request({ text: "change the title to v2", pending: PENDING }), h.deps);
+  const restaged = await restageExecution(
+    { proposal: revised.staged!.proposal, operations: [{ toolName: "notion_create", input: { title: "again" } }] },
+    { threadState: h.threadState, delivery: h.delivery, cards: h.deps.cards, proposalEvents: h.proposalEvents },
+  );
+  const [row] = await h.proposalEvents.eventsOf(restaged!.proposal.proposalTs);
+  assert.deepEqual(
+    [row?.via, row?.originProposalId, row?.revisesProposalId],
+    ["restage", revised.staged!.proposal.proposalTs, PENDING.proposalTs],
+  );
+});
+
+// ── unprompted thanks ────────────────────────────────────────────────────────
+
+test("a thanks-only message is flagged thanks, and stays test traffic by the greeting rule", async () => {
+  const h = harness({
+    replies: [{ text: "", toolCalls: [{ name: "slack_react", args: { emoji: "pray" } }] }, { text: "" }],
+  });
+  await runTurn(request({ text: "thank you!!" }), h.deps);
+  const row = only(h.usage.records());
+  assert.deepEqual([row.thanks, row.testTraffic], [true, true]);
+});
+
+test("an eval's thanks and a sandbox thanks are not counted; an ordinary ask is not thanks", async () => {
+  const built = evalTurnRequest({ prompt: "thanks!" });
+  assert.ok(built.ok);
+  const evals = harness({ origin: "debug" });
+  await runTurn(built.request, evals.deps);
+  assert.equal(only(evals.usage.records()).thanks, false);
+
+  const sandbox = harness({ testChannelIds: [CHANNEL] });
+  await runTurn(request({ text: "thanks!" }), sandbox.deps);
+  assert.equal(only(sandbox.usage.records()).thanks, false);
+
+  const ask = harness();
+  await runTurn(request(), ask.deps);
+  assert.equal(only(ask.usage.records()).thanks, false);
 });
 
 test("a revision Slack refused still records the card it retired as superseded", async () => {

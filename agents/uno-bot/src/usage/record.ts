@@ -103,6 +103,20 @@ export function isTestTraffic(facts: {
   return facts.disposition === "reacted" && !facts.question.includes("?");
 }
 
+/** A thanks word, standing as a word of its own: "type" and "goatee" are not
+ *  one. Slack sends a typed 🐐 or 🙏 as the glyph or as its shortcode. */
+const THANKS_WORDS = /(?<![\p{L}\p{N}_])(?:thanks|thank\s+you|thx|tysm|ty|appreciate\s+it|goat)(?![\p{L}\p{N}_])/iu;
+const THANKS_GLYPHS = /🙏|🐐|:pray:/u;
+
+/**
+ * Whether a message thanks the bot, unprompted: thanks, thank you, thx, ty,
+ * tysm, appreciate it, goat, 🙏. Read in memory as the turn ends; the record
+ * keeps the 0/1 and never the words (ADR-030).
+ */
+export function isThanks(text: string): boolean {
+  return THANKS_WORDS.test(text) || THANKS_GLYPHS.test(text);
+}
+
 /** A link target, in Slack's `<url|label>` form or bare. */
 const LINK = /https?:\/\/[^\s<>|)]+/g;
 
@@ -233,6 +247,10 @@ export function buildTurnRecord(facts: TurnRecordFacts): TurnRecord {
     stopUsed: facts.disposition === "stopped",
     selfFiledTicketUrl: selfFiledTicketOf(facts.executed),
     testTraffic,
+    // A person's thanks, counted whatever the greeting rule made of the turn:
+    // never on the debug route, which the evals use, nor in the sandbox.
+    thanks:
+      facts.origin !== "debug" && !facts.testChannelIds.includes(facts.channel) && isThanks(facts.question),
     // Only a real ask in a known channel keeps its text, for the end-of-day
     // classifier, which nulls it in the same write that labels it. A DM, a
     // group DM, an unknown conversation and test traffic never store any.
