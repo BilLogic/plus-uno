@@ -29,6 +29,7 @@
 // A Worker without HARNESS_KV asks nothing, and the sweep counts file drift
 // and leaves it, as it did before.
 
+import { channelIdsFor } from "../destination/env";
 import type { Env } from "../types";
 import { budgetHeadroom, charge } from "../net";
 import { getPermalink, postMessage, updateMessage, type SlackMessageMetadata } from "../slack/api";
@@ -146,11 +147,7 @@ export async function runDriftAsksOnEnv(
       return measured(() => databaseOptions(env, roadmap, "Product Pillar"));
     },
     figmaPeople: () => figmaPeopleFor(env),
-    config: {
-      plusDesign: env.PLUS_DESIGN_CHANNEL_ID?.trim() || undefined,
-      plusUniversal: env.PLUS_UNIVERSAL_CHANNEL_ID?.trim() || undefined,
-      unoBot: env.UNO_BOT_CHANNEL_ID?.trim() || undefined,
-    },
+    config: channelIdsFor(env),
     meter: { headroom: budgetHeadroom },
     now: () => Date.now(),
     dryRun: opts.dryRun,

@@ -39,7 +39,7 @@ import type { PendingProposal, ThreadState } from "../thread-state/index";
 import { renderProposalCard } from "../slack/proposal-render";
 import { decisionReport, itemProposal, markNotStaged, reportRecord, type ReportMessage, type ReportStore } from "../slack/decision-cards";
 import { textSections } from "../slack/render";
-import { pickDestination, resolveDestination, type TeamChannels } from "../sweep/finding";
+import { pickDestination, resolveDestination, type ChannelIds } from "../sweep/finding";
 import type { FigmaClient } from "../figma/client";
 import type { JobContext } from "../scheduled/runs";
 import {
@@ -64,12 +64,12 @@ import {
 /**
  * The channel the weekly report posts in, by the rule every proactive job
  * shares (`pickDestination`): the check reads no conversation, so there is no
- * private place or thread to answer in, and its target is the Figma library —
- * a design-system target. Null when that role's channel is not configured.
+ * private place or thread to answer in, and its target is the Figma library,
+ * the Universal team's file. Null when that channel is not configured.
  *
  * @param channels - The Worker's team channel ids
  */
-export function precedenceChannel(channels: TeamChannels): string | null {
+export function precedenceChannel(channels: ChannelIds): string | null {
   const destination = pickDestination({
     evidence: { channel: "", channelKind: "public", threadTs: null, messageTs: [], permalinks: [] },
     target: { url: "", kind: "figma-library", writable: false, title: "", pillars: [] },

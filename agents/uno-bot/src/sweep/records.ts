@@ -35,8 +35,7 @@
 // block, in a team channel whose members could read the note already.
 //
 // WHERE IT GOES. A record has no Slack thread, so `pickDestination` sends its
-// finding by its target: #plus-universal for a design-system target (a
-// Universal-pillar card), #plus-design for anything else. The owner is the
+// finding by its target: the target card's team channel, else #plus-design. The owner is the
 // target card's Contributor, then the record's own people (a note's Note
 // Takers, a card's Contributors); a finding with nobody to name is left.
 // Everything after the queue — the morning post, one card per destination per

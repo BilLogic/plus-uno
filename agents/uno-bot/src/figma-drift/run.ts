@@ -48,7 +48,7 @@
 import { D1QueryBudgetError, rethrowIfBudget, SubrequestBudgetError, isSubrequestBudgetError } from "../net";
 import type { PendingProposal, ProposalOperation, ThreadState } from "../thread-state/index";
 import type { ChannelKind, TargetKind } from "../sweep/finding";
-import { pickDestination, resolveDestination, type TeamChannels } from "../sweep/finding";
+import { pickDestination, resolveDestination, type ChannelIds } from "../sweep/finding";
 import { postableAt } from "../sweep/schedule";
 import type { FigmaClient, FigmaVersionsResponse } from "../figma/client";
 import { versionsFrom } from "../figma-poll";
@@ -254,7 +254,7 @@ export interface DriftPostDeps {
   /** The Team Members directory's Figma user id → Slack id map, so a card can
    *  name its file's publisher. Without one, no publisher is named. */
   figmaPeople?(): Promise<FigmaPeople>;
-  config: TeamChannels & { unoBot?: string };
+  config: ChannelIds & { unoBot?: string };
   meter?: { headroom(): { subrequests: number; d1Queries: number } };
   now(): number;
   dryRun?: boolean;

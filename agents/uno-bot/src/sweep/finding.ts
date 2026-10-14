@@ -13,17 +13,15 @@
 //   • `routeOwner` — who is @-mentioned: whoever claimed or did the work in the
 //     thread, then the linked Roadmap card's Contributor, then the thread
 //     starter. Never a default to the lead.
-//   • `pickDestination` — where a finding is posted. Four rungs, in order:
-//     evidence in a private channel, group DM or DM goes back there only; a
-//     Slack thread gets the reply in that thread; a design-system target goes
-//     to #plus-universal; anything else to #plus-design. Never #uno-bot.
+//   • `pickDestination` — where a finding is posted: the posting ladder
+//     (`../destination/`) read with the finding's evidence and target.
 //
 // PURE: no `Env`, no Slack module, no Workers global.
 
 import type { KeyDecision } from "../decisions-db/row";
+import { routeFinding, type ChannelKind, type Destination, type FindingContext } from "../destination/index";
 
-/** What kind of conversation a message was read in. */
-export type ChannelKind = "public" | "private" | "group-dm" | "dm";
+export { resolveDestination, type ChannelIds, type ChannelKind, type Destination } from "../destination/index";
 
 /** The turn record's name for a kind of conversation (`ConversationType`),
  *  so the usage record's rules read a sweep place as they read a turn's. */
@@ -120,7 +118,7 @@ export interface FindingTarget {
 /**
  * Evidence that is not a Slack message: a running note's blocks, or a Roadmap
  * card's comments and body edits (`./records.ts`). Its finding has no thread,
- * so it goes to a team channel by its target (`pickDestination` rungs 3–4).
+ * so it goes to its team's channel, or #plus-design (`pickDestination`).
  */
 export interface RecordEvidence {
   kind: "note" | "card";
@@ -219,84 +217,41 @@ export function routeOwner(input: {
 // ── Where it posts ───────────────────────────────────────────────────────────
 
 /**
- * Where a finding is posted. A private place or a thread is named by id; the
- * two team channels are named by role, and the Worker's config maps each to
- * its id (`resolveDestination`).
- */
-export type Destination =
-  | { rung: "private"; channel: string; threadTs: string | null }
-  | { rung: "thread"; channel: string; threadTs: string }
-  | { rung: "design-system"; channel: "plus-universal" }
-  | { rung: "design"; channel: "plus-design" };
-
-/**
- * True when the target is the design system: the Figma library file,
- * `design-system/` code, Storybook, or a Roadmap card whose Product Pillar is
- * Universal.
- */
-export function isDesignSystemTarget(target: Pick<FindingTarget, "kind" | "pillars">): boolean {
-  if (target.kind === "figma-library" || target.kind === "design-system-code" || target.kind === "storybook") {
-    return true;
-  }
-  return target.kind === "notion" && target.pillars.some((p) => p.trim().toLowerCase() === "universal");
-}
-
-/**
- * Where a finding goes, for every proactive job. The first rung that matches
- * wins:
- *   1. evidence in a private channel, a group DM or a DM → that place only;
- *   2. evidence in a Slack thread → that thread;
- *   3. a design-system target → #plus-universal;
- *   4. otherwise → #plus-design.
- * Never #uno-bot, and never a default to the lead.
+ * Where a sweep finding goes: the posting ladder (`../destination/`), read with
+ * the finding's evidence and its target (`ladderTarget`).
  */
 export function pickDestination(finding: Pick<DriftFinding, "evidence" | "target">): Destination {
-  const { evidence } = finding;
-  if (evidence.channelKind !== "public") {
-    return { rung: "private", channel: evidence.channel, threadTs: evidence.threadTs };
+  return routeFinding({ evidence: finding.evidence, ...ladderTarget(finding.target) }).destination;
+}
+
+/** The Figma team the design-system library file lives in. */
+export const LIBRARY_TEAM = "Universal";
+
+/**
+ * What the ladder reads from a target: a Notion page's pillars are its card's
+ * (empty off the Roadmap); the library file is in the Universal team, and
+ * design-system code and Storybook are that library's code, so they take its
+ * team. Any other target names no team.
+ */
+function ladderTarget(target: Pick<FindingTarget, "kind" | "pillars">): Pick<FindingContext, "card" | "figmaFile"> {
+  if (target.kind === "notion") return { card: { pillars: target.pillars } };
+  if (target.kind === "figma-library" || target.kind === "design-system-code" || target.kind === "storybook") {
+    return { figmaFile: { team: LIBRARY_TEAM } };
   }
-  if (evidence.threadTs) return { rung: "thread", channel: evidence.channel, threadTs: evidence.threadTs };
-  return shareDestination(finding.target);
+  return {};
 }
 
 /**
  * Where a group-DM finding's reworded note goes once someone in the group DM
- * ✅s it: the rung the finding would take with its evidence set aside — rung 3
- * or 4, by its target alone. Never a thread, never the group DM, never
+ * ✅s it: the rung the finding would take with its evidence set aside — its
+ * team's channel, or #plus-design. Never a thread, never the group DM, never
  * #uno-bot.
  */
 export function shareDestination(
   target: Pick<FindingTarget, "kind" | "pillars">,
-): Extract<Destination, { rung: "design-system" | "design" }> {
-  return isDesignSystemTarget(target)
-    ? { rung: "design-system", channel: "plus-universal" }
-    : { rung: "design", channel: "plus-design" };
-}
-
-/** The Worker's channel ids for the two roles `pickDestination` names. */
-export interface TeamChannels {
-  plusUniversal?: string;
-  plusDesign?: string;
-}
-
-/**
- * A destination as a channel id and the thread to post under, or null when the
- * role's channel is not configured.
- */
-export function resolveDestination(
-  destination: Destination,
-  channels: TeamChannels,
-): { channel: string; threadTs: string | null } | null {
-  switch (destination.rung) {
-    case "private":
-      return { channel: destination.channel, threadTs: destination.threadTs };
-    case "thread":
-      return { channel: destination.channel, threadTs: destination.threadTs };
-    case "design-system":
-      return channels.plusUniversal ? { channel: channels.plusUniversal, threadTs: null } : null;
-    case "design":
-      return channels.plusDesign ? { channel: channels.plusDesign, threadTs: null } : null;
-  }
+): Extract<Destination, { rung: "team" | "design" }> {
+  const { destination } = routeFinding({ evidence: null, ...ladderTarget(target) });
+  return destination.rung === "team" ? destination : { rung: "design", channel: "plus-design" };
 }
 
 // ── Links ────────────────────────────────────────────────────────────────────

@@ -46,6 +46,7 @@
 // here is measured by the meter's own trip counter, and one that tripped is
 // thrown as the budget stop the job saves and defers on.
 
+import { channelIdsFor } from "../destination/env";
 import { teamSurfacesFor } from "./team-surfaces";
 import type { Env } from "../types";
 import { LOOKUP_CEILING } from "../agent/loop-policy";
@@ -341,9 +342,7 @@ async function sweepDepsFor(
       permalink: (channel, ts) => getPermalink(env, channel, ts),
     },
     config: {
-      plusDesign: env.PLUS_DESIGN_CHANNEL_ID?.trim() || undefined,
-      plusUniversal: env.PLUS_UNIVERSAL_CHANNEL_ID?.trim() || undefined,
-      unoBot: env.UNO_BOT_CHANNEL_ID?.trim() || undefined,
+      ...channelIdsFor(env),
       figmaLibraryKey: env.FIGMA_FILE_KEY?.trim() || undefined,
       botUserId: bot?.userId ?? null,
       roadmapDb: env.NOTION_ROADMAP_DB_ID?.trim() || undefined,
@@ -432,11 +431,7 @@ export async function offerSweepShareFor(
 ): Promise<void> {
   if (!proposal.sweepShare) return;
   await stageSweepShare(proposal, outcomes, {
-    channels: {
-      plusDesign: env.PLUS_DESIGN_CHANNEL_ID,
-      plusUniversal: env.PLUS_UNIVERSAL_CHANNEL_ID,
-      unoBot: env.UNO_BOT_CHANNEL_ID,
-    },
+    channels: channelIdsFor(env),
     async post(to, card) {
       const rendered = renderProposalCard(card);
       const res = await postMessage(env, {

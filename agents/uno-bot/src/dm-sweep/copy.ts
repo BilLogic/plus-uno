@@ -11,6 +11,7 @@
 //
 // PURE: no `Env`, no Slack module, no Workers global.
 
+import type { ChannelRole } from "../destination/index";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { SHARE_CHANNEL_NAMES, SWEEP_CARD_TTL_MS, shareCard } from "../sweep/cards";
 import type { ProposalCard } from "../turn/index";
@@ -21,11 +22,11 @@ import type { ProposalOperation } from "../thread-state/index";
 export const DM_RAISE_EVENT = "uno_dm_raise";
 
 /** The tool the raise card runs: the group-DM share's, which posts only to
- *  #plus-design or #plus-universal (`tools/sweep-share-post.ts`). */
+ *  #plus-design or a team channel (`tools/sweep-share-post.ts`). */
 export const RAISE_TOOL = "sweep_share_post";
 
 /** The team channel a raise note goes to, by role. */
-export type RaiseTo = "plus-design" | "plus-universal";
+export type RaiseTo = ChannelRole;
 
 /** What sits under the ask about a missed question: a button to let it go, and
  *  the way to answer it, which is a typed reply. */

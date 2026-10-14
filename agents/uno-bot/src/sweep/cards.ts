@@ -29,6 +29,7 @@
 // PURE: no `Env`, no Slack call. A report is data (`ReportItem`); the shared
 // builder draws it.
 
+import { CHANNEL_ROLES, type ChannelRole } from "../destination/index";
 import { typedEmojiDecision } from "../gate/reactions";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { clip } from "../slack/decision-cards";
@@ -181,11 +182,8 @@ function stable(v: unknown): string {
   return JSON.stringify(v);
 }
 
-/** Slack's names for the two team channels a group DM's share goes to. */
-export const SHARE_CHANNEL_NAMES: Record<SweepShare["pages"][number]["to"], string> = {
-  "plus-universal": "#plus-universal",
-  "plus-design": "#plus-design",
-};
+/** Slack's names for the channels a group DM's share goes to. */
+export const SHARE_CHANNEL_NAMES = Object.fromEntries(CHANNEL_ROLES.map((role) => [role, `#${role}`])) as Record<ChannelRole, string>;
 
 /** What a share card — a group DM's share, or the DM sweep's raise note —
  *  says at the gate (`PendingProposal.stated`). */
