@@ -11,7 +11,7 @@ import {
   buildRequest, calibrationReport, corpusCalibrationRows, countPerWorkday,
   estimateCost, localDate, parseExport, parseLabels, toBatches, workdays,
 } from "./lib.mjs";
-import { PROMPT_FILE, run, sha256 } from "./sort.mjs";
+import { PROMPT_FILE, gitRootOf, run, sha256 } from "./sort.mjs";
 
 const row = (id, source, sent_at, text = "placeholder text") => JSON.stringify({ id, source, sent_at, sender: "Someone", text });
 const label = (id, is_request, what_it_took, extra = {}) => ({ id, is_request, is_thanks: false, what_it_took, kinds: is_request ? ["Artifact location"] : [], ...extra });
@@ -183,6 +183,7 @@ const fakeIo = (files, extra = {}) => {
       mkdir: () => {},
       fetch: () => { throw new Error("network touched"); },
       now: () => new Date("2026-10-20T12:00:00Z"),
+      gitRootOf: () => null,
       ...extra,
     },
   };
@@ -244,4 +245,22 @@ test("a real run refuses without a key, and never prints one", async () => {
   assert.doesNotMatch(run2.written[labelsFile], /where is the file/, "labels carry no message text");
   assert.equal(/** @type {any} */ (out.result).housekeeping, 2);
   assert.equal(/** @type {any} */ (out.result).housekeepingPerWorkday, 1);
+});
+
+test("gitRootOf finds the nearest ancestor holding .git, as a directory or a worktree's file", () => {
+  const has = new Set(["/repo/.git"]);
+  assert.equal(gitRootOf("/repo/a/b", (p) => has.has(p)), "/repo");
+  assert.equal(gitRootOf("/elsewhere/out", (p) => has.has(p)), null);
+});
+
+test("an --out-dir inside a git working tree is refused before anything is read or sent", async () => {
+  const { io, written } = fakeIo({ "export.jsonl": exportText }, { env: { ANTHROPIC_API_KEY: "test-key-not-real" }, gitRootOf: (p) => (p.startsWith("/repo") ? "/repo" : null) });
+  await assert.rejects(run(["export.jsonl", "--out-dir", "/repo/agents/uno-bot/out"], io), /inside the git working tree \/repo/);
+  assert.deepEqual(written, {});
+});
+
+test("this repo itself is refused as an --out-dir, with the real git lookup", async () => {
+  const here = new URL(".", import.meta.url).pathname;
+  const { io } = fakeIo({ "export.jsonl": exportText }, { gitRootOf: (p) => gitRootOf(p) });
+  await assert.rejects(run(["export.jsonl", "--dry-run", "--out-dir", here], io), /inside the git working tree/);
 });

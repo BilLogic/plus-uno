@@ -13,7 +13,8 @@
  * The export is one JSON object a line: id, source (dm|channel|meeting),
  * sent_at, sender, text. Labels and the summary are written to --out-dir,
  * which defaults OUTSIDE the repo (~/Documents/Claude/Projects/PLUS/
- * uno-bot-measurement/): message text, labels and exports never go in git.
+ * uno-bot-measurement/) and is refused when it falls inside a git working
+ * tree: message text, labels and exports never go in git.
  *
  * --dry-run prints the request it would send for the first 2 rows and an
  * estimated cost, and touches no network. A real run reads ANTHROPIC_API_KEY
@@ -21,7 +22,7 @@
  */
 
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -40,6 +41,19 @@ export const DEFAULT_OUT_DIR = path.join(PLUS, "uno-bot-measurement");
 export const DEFAULT_CORPUS = path.join(PLUS, "uno-bot-corpus", "recovered-rows.jsonl");
 const API = "https://api.anthropic.com/v1/messages";
 
+/**
+ * The git working tree a path sits in (the nearest ancestor holding `.git`,
+ * a directory in a checkout or a file in a worktree), or null.
+ * @param {string} p
+ * @param {(p: string) => boolean} [exists]
+ */
+export function gitRootOf(p, exists = existsSync) {
+  for (let dir = path.resolve(p); ; dir = path.dirname(dir)) {
+    if (exists(path.join(dir, ".git"))) return dir;
+    if (path.dirname(dir) === dir) return null;
+  }
+}
+
 /** @param {string} text */
 export const sha256 = (text) => createHash("sha256").update(text, "utf8").digest("hex");
 
@@ -52,6 +66,7 @@ export const sha256 = (text) => createHash("sha256").update(text, "utf8").digest
  *   mkdir: (p: string) => void,
  *   fetch: typeof fetch,
  *   now: () => Date,
+ *   gitRootOf: (p: string) => string | null,
  * }} Io
  */
 
@@ -64,6 +79,7 @@ const realIo = {
   mkdir: (p) => mkdirSync(p, { recursive: true }),
   fetch: (input, init) => fetch(input, init),
   now: () => new Date(),
+  gitRootOf: (p) => gitRootOf(p),
 };
 
 /**
@@ -86,6 +102,9 @@ export async function run(argv, io = {}) {
   });
   const batchSize = Number(values["batch-size"]);
   if (!Number.isInteger(batchSize) || batchSize < 1) throw new Error("--batch-size must be a positive integer");
+  const outDir = path.resolve(/** @type {string} */ (values["out-dir"]));
+  const repo = x.gitRootOf(outDir);
+  if (repo) throw new Error(`--out-dir ${outDir} is inside the git working tree ${repo}; labels and summaries must stay out of git`);
 
   const prompt = x.readFile(PROMPT_FILE);
   const header = {
@@ -140,7 +159,6 @@ export async function run(argv, io = {}) {
   }
 
   const stamp = x.now().toISOString().replace(/[:.]/g, "-");
-  const outDir = /** @type {string} */ (values["out-dir"]);
   x.mkdir(outDir);
   const fullHeader = { ...header, input: inputName, rows: rows.length, window, run_at: x.now().toISOString(), usage };
   const labelsFile = path.join(outDir, `${values.calibrate ? "calibration" : "labels"}-${stamp}.jsonl`);

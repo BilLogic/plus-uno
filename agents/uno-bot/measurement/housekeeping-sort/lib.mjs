@@ -6,28 +6,28 @@
 // the Messages API.
 //
 // WHERE THE DEFINITIONS COME FROM. The baseline this re-counts is "about nine
-// housekeeping requests a workday in a busy semester (Spring 2026)". It was
-// worked out in the case-study session of 2026-10-03 (Claude Code session
-// c7f1a91f, against the recovered corpus at
-// ~/Documents/Claude/Projects/PLUS/uno-bot-corpus/), and its parts are:
+// housekeeping requests a workday in a busy semester (Spring 2026)". Its
+// derivation was reconstructed from the recovered corpus, which is kept outside
+// the repo because it holds private messages. The published sources are the
+// Notion "Data analysis" page
+// (https://app.notion.com/p/3ecb7cca498281b0a3dbd2253d1fa198) and the Asks
+// corpus database (https://app.notion.com/p/3b899ab32d1e402192278ede0455d56e),
+// whose "What it took" and "Where it arrived" columns carry the fields below.
 //
 //   HOUSEKEEPING  = an ask whose "What it took" is NOT "Needs the lead's
-//                   judgment". The corpus code is `took(r) != 'judgment'` in
-//                   _analysis/bottom-up/common.py, and the published Notion
-//                   chart filter is HK_FILTER in _notion/charts.py. 2,125 of
-//                   the 2,413 asks (88%) were housekeeping.
-//   WHAT IT TOOK  = the corpus `bot_fit`, folded three ways (common.py `took`):
+//                   judgment" (the filter on the Data analysis page's monthly
+//                   housekeeping chart). 2,125 of the 2,413 asks (88%) were
+//                   housekeeping.
+//   WHAT IT TOOK  = the corpus `bot_fit`, folded three ways:
 //                   Lookup / Automation / Lookup + Automation -> "Could be
 //                   looked up"; Human + bot prep -> "Needs prep, then a
 //                   person"; Stays human -> "Needs the lead's judgment".
 //   WORKDAY       = a Monday-to-Friday date inside the semester window, with no
 //                   holiday taken out. Spring 2026 is 2026-01-12 to 2026-05-01,
-//                   80 workdays (the session's SEM table, and the inbox count
-//                   artifacts/reports/inbox-count-pings-per-day.md, which counts
-//                   80 weekdays for the same window). The numerator counts
-//                   every ask dated in the window, weekend ones included,
-//                   because the corpus count did; the weekend ones are also
-//                   reported apart so nothing is hidden.
+//                   80 workdays. The numerator counts every ask dated in the
+//                   window, weekend ones included, because the corpus count
+//                   did; the weekend ones are also reported apart so nothing
+//                   is hidden.
 //   THE NINE      = (6.4 DM asks + 0.8 channel-mention asks a workday, from the
 //                   inbox count, + 3.6 meeting asks a workday, from the corpus)
 //                   x 0.88 housekeeping share = 9.5, which Bill rounded to
@@ -70,8 +70,7 @@ export const NOT_A_REQUEST = "Not a request";
 
 /**
  * The corpus Sub-type options, exactly as the Asks corpus spells them (the
- * `Sub-type` column of notion-load/corpus-all-2588.csv, which matches the list
- * in artifacts/briefs/dm-sweep-BRIEF.md). These are the "kinds".
+ * Asks corpus database's `Sub-type` options). These are the "kinds".
  */
 export const KINDS = /** @type {const} */ ([
   "Access request",
@@ -105,7 +104,7 @@ export const KINDS = /** @type {const} */ ([
   "Tooling onboarding",
 ]);
 
-/** The corpus `bot_fit` folded to "What it took" (common.py `took`). */
+/** The corpus `bot_fit` folded to "What it took". */
 export const BOT_FIT_TO_WHAT_IT_TOOK = {
   Lookup: "Could be looked up",
   Automation: "Could be looked up",
@@ -169,7 +168,7 @@ const ET_DATE = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York",
 
 /**
  * The US Eastern calendar date of a timestamp (the corpus dates Slack asks in
- * Eastern time: common.py `slack_dt`). A bare YYYY-MM-DD is taken as given.
+ * Eastern time). A bare YYYY-MM-DD is taken as given.
  * @param {string} sentAt
  * @returns {string | null}
  */

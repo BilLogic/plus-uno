@@ -204,7 +204,7 @@ Four files read something that is not in the database, and render it in as a tab
 
 A file that reads an input fails with `no such table` if you run it without rendering, so an ungraded run cannot pass for a graded one.
 
-**The lead's inbox** is counted outside the usage record, by the pinned housekeeping sort in `measurement/housekeeping-sort/`: one model and one rubric (`prompt.md`), so the "housekeeping requests reaching the lead per workday" count can be re-run the way the baseline was. `node measurement/housekeeping-sort/sort.mjs <export.jsonl> --dry-run` shows the request and the cost and sends nothing; a real run needs `ANTHROPIC_API_KEY` and writes its labels outside the repo, to `~/Documents/Claude/Projects/PLUS/uno-bot-measurement/`. The definitions of housekeeping and workday, and where each came from, head `lib.mjs`. Cite a count with the model id and prompt sha256 its header records.
+**The lead's inbox** is counted outside the usage record, by the pinned housekeeping sort in `measurement/housekeeping-sort/`: one model and one rubric (`prompt.md`), so the "housekeeping requests reaching the lead per workday" count can be re-run the way the baseline was. `node measurement/housekeeping-sort/sort.mjs <export.jsonl> --dry-run` shows the request and the cost and sends nothing; a real run needs `ANTHROPIC_API_KEY` and writes its labels outside the repo, to `~/Documents/Claude/Projects/PLUS/uno-bot-measurement/` unless `--out-dir` names another place; a place inside a git working tree is refused. The definitions of housekeeping and workday, and where each came from, head `lib.mjs`. Cite a count with the model id and prompt sha256 its header records.
 
 **Cite a result** with:
 
