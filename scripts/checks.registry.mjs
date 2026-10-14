@@ -187,7 +187,7 @@ export const CHECKS = [
     trigger: ['pull_request', 'sweep'],
     module: 'scripts/generate-uno-skill-surfaces.mjs',
     guards:
-      'the generated skill surfaces — .claude/skills/ stubs, the Worker command map, the Slack app-manifest block — against each SKILL.md.',
+      'the generated .claude/skills/ stubs against each SKILL.md.',
   },
   {
     name: 'check:check-registry',
