@@ -19,7 +19,7 @@ Identifies who holds the knowledge (SME) or who fits the participant criteria, u
 
 1. Parse the need: what knowledge/criteria, how many people, by when.
 2. Query the Team DB; rank candidates with a one-line why per person.
-3. Draft the intro message (per writing-style) and return candidates + draft; flag when no good match exists rather than stretching.
+3. Draft the intro message (per `docs/conventions/writing.md`) and return candidates + draft; flag when no good match exists rather than stretching.
 
 ## Conventions it obeys
 

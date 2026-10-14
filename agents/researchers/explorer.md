@@ -23,5 +23,6 @@ Sweeps this repo (components, stories, tokens, prototypes, knowledge) to answer 
 
 ## Conventions it obeys
 
-- `AGENTS.md` § Hard rules (read-only scope)
+- Read-only scope: it reads the repo and returns a brief; every write belongs to the summoning skill or a `writers/` agent
+- `AGENTS.md` § Hard rules
 - DS truth boundary: component/style documentation lives in uno-storybook — cite stories, don't restate them

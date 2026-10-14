@@ -30,8 +30,8 @@ avoid the delete is how the folder filled up the first time.
 carries no `disposition:`. Two exclusions, both structural:
 
 - **`docs/knowledge/archive/`** is out of scope. It is the graveyard for
-  superseded docs — 30 files across `bot-v1`, `mode-era`, `uno-compound` and
-  `uno-review` — and "promote, convert or delete" means nothing there. Archiving
+  superseded docs, a folder per retired era plus a few loose files, and
+  "promote, convert or delete" means nothing there. Archiving
   *is* a disposition; the archive's own contents do not need one.
 - **This file and `changelog.md`** govern the folder rather than sitting in it.
   They are named in the script, not exempted by a magic frontmatter value, so
