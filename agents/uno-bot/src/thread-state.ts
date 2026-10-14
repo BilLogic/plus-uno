@@ -16,7 +16,7 @@
 //
 // Every public method below is Durable Object RPC and its signature IS the
 // `src/thread-state` interface: `readHistory`, `appendHistory`,
-// `compactHistory`, `putProposal`, `retireProposal`, `getProposalByTs`,
+// `compactHistory`, `putProposal`, `retireProposal`, `keepPick`, `getProposalByTs`,
 // `getProposalByThread`, `getProposalsByChannel`, `claimProposal`,
 // `putReport`, `getReport`, `updateReport`, `beginExecution`, `settleOperation`, `endExecution`, `takeCutOffExecution`,
 // `takeCutOffExecutionInThread`, `findCutOffExecutions`,
@@ -104,6 +104,8 @@ interface ProposalRecord {
    *  card exists to be named. Readable, and out of reach of every lookup that
    *  can lead to an execution. */
   retired?: boolean;
+  /** Picks kept on the card's Review pop-up, by user id (`keepPick`). */
+  kept?: Record<string, Record<string, string>>;
 }
 
 // Latest assistant-panel context (what surface the user has open) per thread.
@@ -400,7 +402,8 @@ export class ThreadState extends DurableObject<Env> {
       // retired nothing, and says so.
       if (!rec || rec.retired || rec.supersededBy) return { retired: false };
       if (at - rec.createdAt > recordTtlMs(rec)) return { retired: false };
-      await txn.put<ProposalRecord>(key, { ...rec, retired: true });
+      const { kept: _, ...settled } = rec;
+      await txn.put<ProposalRecord>(key, { ...settled, retired: true });
       return { retired: true };
     });
   }
@@ -434,6 +437,22 @@ export class ThreadState extends DurableObject<Env> {
     });
   }
 
+  // A pick kept on the Review pop-up — the contract is on the interface. Read
+  // and written in one transaction, so two quick picks merge.
+  async keepPick(proposalTs: string, userId: string, key: string, value: string | null, at: number): Promise<Record<string, string> | null> {
+    const recKey = proposalKey(proposalTs);
+    return this.storage.transaction(async (txn) => {
+      const rec = await txn.get<ProposalRecord>(recKey);
+      if (!rec || rec.retired || rec.supersededBy) return null;
+      if (at - rec.createdAt > recordTtlMs(rec)) return null;
+      const mine = { ...(rec.kept?.[userId] ?? {}) };
+      if (value === null) delete mine[key];
+      else mine[key] = value;
+      await txn.put<ProposalRecord>(recKey, { ...rec, kept: { ...(rec.kept ?? {}), [userId]: mine } });
+      return mine;
+    });
+  }
+
   // Is the card that retired another one still around to be looked at? Its own
   // retirement does not matter: a chain still ends in a live newest card.
   private async successorIsLive(ts: string, at: number, store: Txn): Promise<boolean> {
@@ -463,6 +482,7 @@ export class ThreadState extends DurableObject<Env> {
         state: "found",
         proposal: withLiveMark(rec.payload as PendingProposal, at),
         createdAt: rec.createdAt,
+        ...(rec.kept ? { kept: rec.kept } : {}),
       };
     });
   }

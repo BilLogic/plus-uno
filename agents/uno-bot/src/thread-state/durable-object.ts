@@ -120,6 +120,12 @@ export function createDurableObjectThreadState(
       return hop().clearRevising(proposalTs);
     },
 
+    // A pick kept on the Review pop-up: one hop, one transaction, so two quick
+    // picks merge rather than race.
+    keepPick(proposalTs: string, userId: string, key: string, value: string | null): Promise<Record<string, string> | null> {
+      return hop().keepPick(proposalTs, userId, key, value, now());
+    },
+
     getProposalByTs(proposalTs: string): Promise<ProposalLookup> {
       return hop().getProposalByTs(proposalTs, now());
     },
