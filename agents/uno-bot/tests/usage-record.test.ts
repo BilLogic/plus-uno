@@ -41,6 +41,7 @@ const facts = (over: Partial<TurnRecordFacts> = {}): TurnRecordFacts => ({
   tier: "default",
   routeReason: "default",
   toolsCalled: [],
+  referencesRead: [],
   disposition: "answered",
   ...over,
 });

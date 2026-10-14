@@ -72,6 +72,9 @@ export interface TurnRecord {
   // ── behaviour ──
   /** Ungated tools the loop ran, in call order. */
   toolsCalled: string[];
+  /** The references `read_reference` served this turn, by name, in the order
+   *  first read. A miss read nothing and is not listed. */
+  referencesRead: string[];
   /** Which kinds of source the answer linked to (`./record.ts` `sourcesCitedIn`). */
   sourcesCited: string[];
   /** How the turn ended — `TurnDisposition` in `turn/turn.ts`. */
