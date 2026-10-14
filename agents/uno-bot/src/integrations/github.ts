@@ -621,6 +621,9 @@ export interface GithubLibraryReads {
    *  whether that was all of them — so a caller about to file can tell "none
    *  carries the marker" from "the page ran out". */
   intakesSince(since: string): Promise<{ intakes: Array<{ number: number; url: string; body: string }>; complete: boolean }>;
+  /** The 30 pulls closed most recently, newest first, each with when it
+   *  merged — null for one closed unmerged. */
+  closedPulls(): Promise<Array<{ number: number; title: string; url: string; mergedAt: string | null }>>;
 }
 
 /**
@@ -674,6 +677,20 @@ export function githubLibraryReads(env: Env, target: RepoEntry): GithubLibraryRe
         ),
         complete: page.length < 100,
       };
+    },
+    async closedPulls() {
+      const url = `https://api.github.com/repos/${repo}/pulls?state=closed&sort=updated&direction=desc&per_page=30`;
+      const data = (await (await get("pull list", url)).json().catch(() => [])) as Array<{
+        number?: unknown;
+        title?: unknown;
+        html_url?: unknown;
+        merged_at?: unknown;
+      }>;
+      return (Array.isArray(data) ? data : []).flatMap((p) =>
+        typeof p.number === "number" && typeof p.title === "string" && typeof p.html_url === "string"
+          ? [{ number: p.number, title: p.title, url: p.html_url, mergedAt: typeof p.merged_at === "string" ? p.merged_at : null }]
+          : [],
+      );
     },
   };
 }

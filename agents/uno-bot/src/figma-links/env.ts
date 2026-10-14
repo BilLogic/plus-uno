@@ -5,9 +5,10 @@
 //   • the registry: `component-registry.json` read from the harness repo
 //     (`GITHUB_REPO`), which is also where the Code links point;
 //   • Figma: the one client (`figmaClientFor`), paced and backing off on 429;
-//   • Slack: only a debug route asks for a card, so it posts in a test channel
-//     (`TEST_CHANNEL_IDS`, `devLinksDebugChannel`), never the Figma Review-card
-//     channel; that channel's members decide;
+//   • Slack: a debug route's card posts in a test channel (`TEST_CHANNEL_IDS`,
+//     `devLinksDebugChannel`), never a team channel; the morning's card, for
+//     the library PRs merged since the last, goes on the sweep's #plus-design
+//     message (`./morning.ts`), and #plus-design's members decide it;
 //   • KV: the cards posted and the message each is in, so a later run never
 //     offers one twice while it is undecided (`./run.ts` reads its report);
 //   • the meter: a run stages its one card only when its D1 and subrequest
@@ -29,7 +30,12 @@ import { threadStateFor } from "../thread-state/production";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
 import { proposalEventLogFor, testChannelIdsOf } from "../usage/production";
 import { teamPostChannel } from "../usage/record";
+import type { JobContext } from "../scheduled/runs";
+import { sectionHandOffIn, type SweepSection } from "../sweep/sections";
+import { devLinksOn } from "./gate";
+import { DEV_LINKS_SECTION, devLinksSection, handOverDevLinks, MERGED_THROUGH_KV_KEY, type DevLinksHanded } from "./morning";
 import {
+  planDevLinksCard,
   runDevLinksPost,
   runDevLinksWriteJob,
   type CardedMark,
@@ -114,6 +120,71 @@ export async function runDevLinksOnEnv(env: Env, request: DevLinksRequest, opts:
   const deps = devLinksDepsFor(env, typeof channel === "string" ? channel : "");
   if ("refused" in deps) return { posted: false, cards: 0, retry: true, summary: deps.refused };
   return runDevLinksPost(deps, request, opts);
+}
+
+/**
+ * The morning's hand-over of a Dev Mode links card for the library PRs merged
+ * since the last, on `Env`.
+ *
+ * @param env - Worker bindings
+ * @param ctx - The morning run
+ */
+export async function runDevLinksMorningOnEnv(env: Env, ctx: JobContext): Promise<{ summary: string }> {
+  const channel = env.PLUS_DESIGN_CHANNEL_ID?.trim();
+  if (!channel || !env.HARNESS_KV) return { summary: "PLUS_DESIGN_CHANNEL_ID or HARNESS_KV not set — nothing handed over" };
+  const deps = devLinksDepsFor(env, channel);
+  if ("refused" in deps) return { summary: deps.refused };
+  const target = resolveRepoFor(env, undefined);
+  if (!target.ok) return { summary: `no repo: ${target.error}` };
+  return handOverDevLinks(
+    {
+      on: devLinksOn(env.FIGMA_DEV_LINKS),
+      closedPulls: () => githubLibraryReads(env, target.entry).closedPulls(),
+      mergedThrough: kvJson<string | null>(env, MERGED_THROUGH_KV_KEY, null),
+      plan: (request) => planDevLinksCard(deps, request),
+      members: deps.members,
+      ...(ctx.runStorage ? { handOff: sectionHandOffIn<DevLinksHanded>(ctx.runStorage, DEV_LINKS_SECTION) } : {}),
+      channel,
+      date: ctx.runDate,
+      now: () => Date.now(),
+    },
+    { dryRun: ctx.dryRun },
+  );
+}
+
+/**
+ * The Dev Mode links card as a section of the sweep's #plus-design message,
+ * or undefined without the channel, HARNESS_KV or the run's storage.
+ *
+ * @param env - Worker bindings
+ * @param ctx - The morning run
+ */
+export function devLinksSectionFor(env: Env, ctx: JobContext): SweepSection | undefined {
+  const channel = env.PLUS_DESIGN_CHANNEL_ID?.trim();
+  if (!channel || !env.HARNESS_KV || !ctx.runStorage) return undefined;
+  const threadState = threadStateFor(env);
+  return devLinksSection(
+    {
+      reports: threadState,
+      async stage(proposal) {
+        const { retired } = await threadState.putProposal(proposal);
+        const now = Date.now();
+        await recordProposalEvents(proposalEventLogFor(env), [
+          ...supersededEvents(retired, now, "worker"),
+          stagedEvent({ proposal, at: now, via: "worker", channelStored: true }),
+        ]);
+      },
+      async edit(ts, message) {
+        // The message's own tag, kept: it is the sweep's.
+        await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks, ...(message.metadata ? { metadata: message.metadata } : {}) });
+      },
+      carded: kvJson<Record<string, CardedMark> | null>(env, CARDED_KV_KEY, null),
+      mergedThrough: kvJson<string | null>(env, MERGED_THROUGH_KV_KEY, null),
+      now: () => Date.now(),
+    },
+    sectionHandOffIn<DevLinksHanded>(ctx.runStorage, DEV_LINKS_SECTION),
+    ctx.runDate,
+  );
 }
 
 /** Subrequests a runner step leaves for its reply. */

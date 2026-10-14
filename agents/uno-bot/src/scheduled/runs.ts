@@ -97,6 +97,9 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * teams' stage folders, and `figma-tidy-post` checks each file against its
  * cards and hands the week's Review cards to the sweep's post — and on the
  * other mornings, the week's cards that had no room yet (src/figma-tidy/).
+ * The morning `figma-dev-links-post` hands the sweep's #plus-design message a
+ * Dev Mode links card for the library PRs merged since the last one, while
+ * `FIGMA_DEV_LINKS` is on (src/figma-links/morning.ts).
  * Every morning job that finds cards for a team channel hands them to
  * `sweep-post`, which runs after them all, so a place gets one message.
  */
@@ -129,7 +132,8 @@ export type ScheduledJobKind =
   | "dm-capture-read"
   | "dm-capture-post"
   | "figma-tidy-read"
-  | "figma-tidy-post";
+  | "figma-tidy-post"
+  | "figma-dev-links-post";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -209,7 +213,7 @@ export const TIDY_JOBS = 5;
 
 /** The morning jobs that hand their cards to the sweep's post, which runs
  *  after them all (src/sweep/sections.ts). */
-const MORNING_SECTIONS = ["commitment-nudge", "ds-precedence-post", FIGMA_DECISIONS_POST_KEY, "figma-drift-post", "figma-tidy-post"] as const;
+const MORNING_SECTIONS = ["commitment-nudge", "ds-precedence-post", FIGMA_DECISIONS_POST_KEY, "figma-drift-post", "figma-tidy-post", "figma-dev-links-post"] as const;
 
 /** Monday and Friday, as `Date.getUTCDay` numbers them. */
 const MONDAY = 1;
@@ -247,6 +251,7 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
       kind: "figma-tidy-post",
       after: Array.from({ length: TIDY_JOBS }, (_, i) => `figma-tidy-read-${i + 1}`),
     },
+    { key: "figma-dev-links-post", kind: "figma-dev-links-post" },
     // After every hand-over: a job not planned today counts as done.
     { key: "sweep-post", kind: "sweep-post", after: [...MORNING_SECTIONS] },
     { key: "team-roles-sync", kind: "team-roles-sync" },

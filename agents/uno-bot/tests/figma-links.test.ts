@@ -28,6 +28,11 @@ import {
 } from "../src/figma-links/run";
 import { devLinksRequestOf } from "../src/figma-links/gate";
 import { devLinksDebugChannel } from "../src/figma-links/env";
+import { DEV_LINKS_SECTION, devLinksSection, handOverDevLinks, implementComponents, type ClosedPull, type DevLinksHanded, type DevLinksMorningDeps } from "../src/figma-links/morning";
+import { planDevLinksCard } from "../src/figma-links/run";
+import { sectionHandOffIn } from "../src/sweep/sections";
+import { runSweepJob } from "../src/sweep/run";
+import { memoryRunStorage, sweepHarness } from "./helpers/sweep-harness";
 import { figmaDevLinksProbe } from "../src/diagnostics/probes/figma";
 import type { Env } from "../src/types";
 import { isOwnComment } from "../src/figma-ask/trigger";
@@ -655,5 +660,79 @@ describe("Approve on the batch card", () => {
     assert.deepEqual(w.figma.writes(), []);
     assert.equal(replies.length, 1);
     assert.match(replies[0]!, /stopped after a day/);
+  });
+});
+
+describe("the morning's card, on the sweep's #plus-design message", () => {
+  const DESIGN = "C0DESIGN";
+  const DATE = "2026-10-14";
+  const merged = (number: number, title: string, mergedAt: string | null): ClosedPull => ({ number, title, url: `https://github.com/${REPO}/pull/${number}`, mergedAt });
+
+  function morningWorld(opts: { pulls?: ClosedPull[]; through?: string | null; on?: boolean } = {}) {
+    const w = world();
+    const through = { value: opts.through === undefined ? "2026-10-10T00:00:00Z" : opts.through };
+    const mark = { read: async () => through.value, write: async (v: string | null) => void (through.value = v) };
+    const handOff = sectionHandOffIn<DevLinksHanded>(memoryRunStorage(), DEV_LINKS_SECTION);
+    const deps: DevLinksMorningDeps = {
+      on: opts.on ?? true,
+      closedPulls: async () => opts.pulls ?? [merged(7, "feat: Figma DS update — Button", "2026-10-13T15:00:00Z")],
+      mergedThrough: mark,
+      plan: (request) => planDevLinksCard(w.deps, request),
+      members: async () => [BILL],
+      handOff,
+      channel: DESIGN,
+      date: DATE,
+      now: () => NOW,
+    };
+    const section = devLinksSection({ reports: w.store, stage: (p) => w.deps.stage(p), edit: async () => {}, carded: w.deps.carded, mergedThrough: mark, now: () => NOW }, handOff, DATE);
+    const h = sweepHarness({ channels: {}, now: NOW, runDate: DATE, threadState: w.store });
+    h.deps.sections = [section];
+    const run = async () => {
+      const handed = await handOverDevLinks(deps);
+      await runSweepJob({ key: "sweep-post", kind: "sweep-post" }, h.deps);
+      return handed;
+    };
+    return { w, h, deps, through, run };
+  }
+
+  it("names the components a figma-implement PR's title lists, and no other PR's", () => {
+    assert.deepEqual(implementComponents("feat: Figma DS update — Badge, Button"), ["Badge", "Button"]);
+    assert.deepEqual(implementComponents("fix: something else"), []);
+  });
+
+  it("a library PR merged since the last card goes up as one card on the morning's one message, and the mark moves past it", async () => {
+    const m = morningWorld();
+    const handed = await m.run();
+    assert.match(handed.summary, /handed a card for 4 link\(s\) from 1 merged PR/);
+    assert.equal(m.h.posted.length, 1);
+    assert.equal(m.h.posted[0]!.channel, DESIGN);
+    assert.match(m.h.posted[0]!.text, /Dev Mode links for Button are ready for Review\./);
+    assert.equal(m.w.staged.length, 1);
+    assert.deepEqual(m.w.staged[0]!.confirmers, [BILL]);
+    assert.equal(m.through.value, "2026-10-13T15:00:00Z");
+    assert.ok(m.w.carded.value?.["links-Button"]);
+
+    // The next morning: nothing new merged, nothing goes up.
+    const again = await handOverDevLinks(m.deps);
+    assert.match(again.summary, /no library PR merged since the last card/);
+  });
+
+  it("waits while FIGMA_DEV_LINKS is off, and the first morning only starts watching", async () => {
+    const off = morningWorld({ on: false });
+    assert.match((await off.run()).summary, /wait until FIGMA_DEV_LINKS is on/);
+    assert.equal(off.h.posted.length, 0);
+
+    const first = morningWorld({ through: null });
+    assert.match((await first.run()).summary, /started watching/);
+    assert.equal(first.h.posted.length, 0);
+    assert.equal(first.through.value, new Date(NOW).toISOString());
+  });
+
+  it("a card that does not stage leaves the mark, so the next morning plans it again", async () => {
+    const m = morningWorld();
+    m.w.deps.stage = async () => Promise.reject(new Error("DO down"));
+    await m.run();
+    assert.equal(m.h.posted.length, 1);
+    assert.equal(m.through.value, "2026-10-10T00:00:00Z");
   });
 });

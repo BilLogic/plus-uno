@@ -164,6 +164,8 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
     ["figma-drift-post", "figma-drift-post"],
     // The week's tidy-up cards an earlier message had no room for.
     ["figma-tidy-post", "figma-tidy-post"],
+    // A Dev Mode links card for the library PRs merged since the last.
+    ["figma-dev-links-post", "figma-dev-links-post"],
     ["sweep-post", "sweep-post"],
     ["team-roles-sync", "team-roles-sync"],
     // Both runs purge, so text never outlives its 14 days over a weekend.
@@ -356,7 +358,7 @@ test("the sweep's post runs after every morning job that hands it cards, Monday'
   const monday = planRun("morning", Date.parse("2026-10-12T13:00:00Z"));
   const keys = monday.jobs.map((j) => j.key);
   const post = monday.jobs.find((j) => j.kind === "sweep-post")!;
-  const handOvers = ["commitment-nudge", "ds-precedence-post", "sweep:figma-post", "figma-drift-post", "figma-tidy-post"];
+  const handOvers = ["commitment-nudge", "ds-precedence-post", "sweep:figma-post", "figma-drift-post", "figma-tidy-post", "figma-dev-links-post"];
   assert.deepEqual(post.after, handOvers);
   for (const key of handOvers) assert.ok(keys.indexOf(key) < keys.indexOf("sweep-post"), `${key} is planned before the post`);
 });

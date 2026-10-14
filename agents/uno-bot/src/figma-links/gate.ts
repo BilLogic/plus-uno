@@ -5,9 +5,10 @@
 // reaches its variants is Figma behaviour no fixture can show. Bill named the
 // component: Button. So until the `FIGMA_DEV_LINKS` setting reads `on`, a run
 // names Button alone, and the 68 do not run. Bill confirmed the check on 2026-10-12, and the setting is on:
-// `all=1` posts the rest on one batch card. Only a manual run asks for it —
-// no scheduled job does. Every run still posts a Review card and writes
-// nothing until it is approved.
+// `all=1` posts the rest on one batch card. Only a manual run asks for it;
+// the one scheduled job, the morning's (`./morning.ts`), asks only for the
+// components a merged library PR named, and only while the setting is on.
+// Every run still posts a Review card and writes nothing until it is approved.
 //
 // PURE.
 

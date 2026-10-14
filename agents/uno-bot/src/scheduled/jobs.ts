@@ -28,6 +28,7 @@ import type { SweepSection } from "../sweep/sections";
 import { driftSectionFor, fileDriftSinkFor, runDriftAsksOnEnv, runDriftRecheckOnEnv } from "../figma-drift/env";
 import { runBackstopOnEnv } from "../figma-notify/env";
 import { runTidyPostOnEnv, runTidyReadOnEnv, tidySectionFor } from "../figma-tidy/env";
+import { devLinksSectionFor, runDevLinksMorningOnEnv } from "../figma-links/env";
 import { dmThreadHookFor } from "../dm-sweep/env";
 import { runProposalExpiry } from "../usage/index";
 import { runDmPromiseNudgesOnEnv, runDmPromiseReadOnEnv } from "../dm-watch/env";
@@ -73,7 +74,8 @@ const sweepBody: JobBody = async (env, job, ctx) => {
 /**
  * What the morning's other jobs handed the sweep's post, one port a job: the
  * card follow-ups, the weekly DS precedence report, the Figma comment
- * decisions, the weekly Figma tidy-up and the Figma drift questions
+ * decisions, the weekly Figma tidy-up, the Figma drift questions and the Dev
+ * Mode links card
  * (src/sweep/sections.ts). Each is absent without its bindings or
  * the run's storage.
  */
@@ -84,6 +86,7 @@ export function morningSectionsFor(env: Env, ctx: JobContext): SweepSection[] {
     figmaDecisionsSectionFor(env, ctx),
     tidySectionFor(env, ctx),
     driftSectionFor(env, ctx),
+    devLinksSectionFor(env, ctx),
   ].filter(
     (s): s is SweepSection => !!s,
   );
@@ -278,6 +281,13 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "figma-tidy-post": async (env, job, ctx) => {
     const report = await runTidyPostOnEnv(env, ctx);
     console.log(`[figma-tidy] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // Morning: a Dev Mode links card for the library PRs merged since the last,
+  // handed to the sweep's #plus-design message (src/figma-links/morning.ts).
+  "figma-dev-links-post": async (env, job, ctx) => {
+    const report = await runDevLinksMorningOnEnv(env, ctx);
+    console.log(`[figma-links] ${job.key}: ${report.summary}`);
     return report;
   },
 };
