@@ -1,9 +1,9 @@
 // @ts-check
-// The housekeeping sort's pure half: parsing, batching, the request it would
-// send, the labels it reads back, and the counting. Nothing here touches the
-// network or the filesystem, so every number the sort prints is testable
-// offline (sort.test.mjs). sort.mjs is the CLI that wires this to disk and to
-// the Messages API.
+// The housekeeping sort's pure half: parsing, batching, the batch a Claude Code
+// session labels, the labels it reads back, and the counting. Nothing here
+// touches the network or the filesystem, so every number the sort prints is
+// testable offline (sort.test.mjs). sort.mjs is the CLI that wires this to
+// disk.
 //
 // WHERE THE DEFINITIONS COME FROM. The baseline this re-counts is "about nine
 // housekeeping requests a workday in a busy semester (Spring 2026)". Its
@@ -36,25 +36,8 @@
 //                   the inbox count saw), so calibration compares against 6.5,
 //                   the figure its own rows can reproduce.
 
-/** The one model the sort runs on. Pinned: a re-run must name the same id. */
-export const MODEL = "claude-sonnet-5-5";
-
-/** Rows per request. Big enough that the rubric is paid for once per 25 rows. */
+/** Rows per batch file. Big enough that the rubric is read once per 25 rows. */
 export const DEFAULT_BATCH_SIZE = 25;
-
-/** Effort for the call. Classification gains nothing from more. */
-export const EFFORT = "low";
-
-/**
- * Sampling. The brief asked for temperature 0, but Claude Sonnet 5.5 rejects
- * any non-default `temperature` with a 400, so none is sent; the run is pinned
- * by model id, prompt hash and batch size instead, and thinking is held at its
- * lowest setting (`between_tools`).
- */
-export const TEMPERATURE = null;
-
-/** First-party list prices, USD per million tokens, for the pinned model. */
-export const PRICE_PER_MTOK = { input: 2, output: 10 };
 
 export const SOURCES = /** @type {const} */ (["dm", "channel", "meeting"]);
 
@@ -186,7 +169,7 @@ function isRealDate(ymd) {
 }
 
 // ---------------------------------------------------------------------------
-// Batching and the request
+// Batching and the batch file
 
 /**
  * @template T
@@ -202,7 +185,7 @@ export function toBatches(rows, size = DEFAULT_BATCH_SIZE) {
   return out;
 }
 
-/** The JSON schema the response is held to (structured outputs). */
+/** The JSON schema the labels are held to; the prompt's Output section points at it. */
 export const LABEL_SCHEMA = {
   type: "object",
   additionalProperties: false,
@@ -227,27 +210,20 @@ export const LABEL_SCHEMA = {
 };
 
 /**
- * The Messages API body for one batch. The sender is passed as it is in the
- * export; the rows go in the user turn, the rubric in the system prompt so its
- * prefix can be cached across batches.
+ * One batch for a Claude Code session to label: the rubric verbatim as
+ * `system`, the rows as `user`, and the schema the labels are held to. The
+ * sender is passed as it is in the export. The model is the session's, so the
+ * batch names none.
  * @param {ExportRow[]} batch
  * @param {string} prompt
- * @param {{ model?: string }} [opts]
  */
-export function buildRequest(batch, prompt, { model = MODEL } = {}) {
+export function buildBatch(batch, prompt) {
   const rows = batch.map((r) => JSON.stringify({ id: r.id, source: r.source, sent_at: r.sent_at, sender: r.sender, text: r.text }));
   return {
-    model,
-    max_tokens: 4096,
-    thinking: { type: "between_tools" },
-    output_config: { effort: EFFORT, format: { type: "json_schema", schema: LABEL_SCHEMA } },
-    system: [{ type: "text", text: prompt, cache_control: { type: "ephemeral" } }],
-    messages: [
-      {
-        role: "user",
-        content: `Label each of these ${batch.length} messages. One label per id, every id exactly once.\n\n${rows.join("\n")}`,
-      },
-    ],
+    ids: batch.map((r) => r.id),
+    system: prompt,
+    user: `Label each of these ${batch.length} messages. One label per id, every id exactly once.\n\n${rows.join("\n")}`,
+    output_schema: LABEL_SCHEMA,
   };
 }
 
@@ -259,22 +235,41 @@ export function buildRequest(batch, prompt, { model = MODEL } = {}) {
  */
 
 /**
- * Reads one response's labels and holds them to the batch: every id once, no
- * stranger, values from the rubric. A request with no "What it took", or a
- * non-request with one, is an error rather than a guess.
- * @param {string} text the response's text block
- * @param {string[]} ids the batch's ids, in order
+ * Reads the labels file a session wrote, one JSON object a line: either one
+ * batch's whole `{"labels": [...]}` or a single label. Blank lines are skipped.
+ * The labels are held to every id the count needs (see checkLabels).
+ * @param {string} jsonl
+ * @param {string[]} ids every id to be labelled, in order
  * @returns {Label[]}
  */
-export function parseLabels(text, ids) {
-  let o;
-  try {
-    o = JSON.parse(text);
-  } catch {
-    throw new Error("response is not JSON");
-  }
-  const list = Array.isArray(o) ? o : o?.labels;
-  if (!Array.isArray(list)) throw new Error("response has no labels array");
+export function parseLabelLines(jsonl, ids) {
+  /** @type {unknown[]} */
+  const list = [];
+  jsonl.split(/\r?\n/).forEach((line, i) => {
+    if (!line.trim()) return;
+    let o;
+    try {
+      o = JSON.parse(line);
+    } catch {
+      throw new Error(`labels line ${i + 1}: not JSON`);
+    }
+    if (Array.isArray(o)) list.push(...o);
+    else if (Array.isArray(o?.labels)) list.push(...o.labels);
+    else if (o && typeof o === "object" && "id" in o) list.push(o);
+    else throw new Error(`labels line ${i + 1}: neither a label nor a labels array`);
+  });
+  return checkLabels(list, ids);
+}
+
+/**
+ * Holds labels to their ids: every id once, no stranger, values from the
+ * rubric. A request with no "What it took", or a non-request with one, is an
+ * error rather than a guess.
+ * @param {any[]} list
+ * @param {string[]} ids
+ * @returns {Label[]}
+ */
+function checkLabels(list, ids) {
   const want = new Set(ids);
   /** @type {Map<string, Label>} */
   const got = new Map();
@@ -466,23 +461,4 @@ export function calibrationReport(rows, expected, labels, workdayCount = workday
     confusion,
     published: PUBLISHED_BASELINE,
   };
-}
-
-// ---------------------------------------------------------------------------
-// Cost
-
-/**
- * A rough cost for a run, from character counts (about four characters a
- * token) and a fixed output per row. It is for planning, not billing: the
- * header records the real usage after a run.
- * @param {{ promptChars: number, rowChars: number[], batchSize: number, outputTokensPerRow?: number }} p
- */
-export function estimateCost({ promptChars, rowChars, batchSize, outputTokensPerRow = 45 }) {
-  const promptTokens = Math.ceil(promptChars / 4);
-  const rowTokens = rowChars.reduce((a, c) => a + Math.ceil(c / 4) + 25, 0);
-  const requests = Math.ceil(rowChars.length / batchSize);
-  const inputTokens = requests * promptTokens + rowTokens;
-  const outputTokens = rowChars.length * outputTokensPerRow;
-  const usd = (inputTokens * PRICE_PER_MTOK.input + outputTokens * PRICE_PER_MTOK.output) / 1e6;
-  return { requests, inputTokens, outputTokens, usd: Math.round(usd * 100) / 100 };
 }

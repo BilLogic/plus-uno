@@ -60,7 +60,26 @@ to them through the notion-plus connector, per `docs/connectors/notion.md`.
    ```
 
    Both steps only read. Run each query twice, once for the week and once for the window to date (from 2026-09-01, and from 2026-10-13 for the after-lock line). Cite every result as `agents/uno-bot/README.md` § Metrics says: query file, commit, window, graded-answers commit, run date.
-2. **Sort the lead's inbox.** Export the week's DMs, channel messages and meeting notes to a local JSONL file outside the repo, then run the pinned sort over it: `node agents/uno-bot/measurement/housekeeping-sort/sort.mjs <export.jsonl> --from YYYY-MM-DD --to YYYY-MM-DD` (other flags in the header of `agents/uno-bot/measurement/housekeeping-sort/sort.mjs`). It prints housekeeping requests per workday, the prompt's sha256 and the model id; record all three. The per-row labels stay where the script writes them, outside the repo.
+2. **Sort the lead's inbox.** The sort calls no model and needs no API key. A Claude Code session does the labelling, by the pinned prompt.
+   1. Export the week's DMs, channel messages and meeting notes to a local JSONL file outside the repo.
+   2. Prepare the batches:
+
+      ```bash
+      node agents/uno-bot/measurement/housekeeping-sort/sort.mjs --prepare <export.jsonl> --from YYYY-MM-DD --to YYYY-MM-DD
+      ```
+
+      It writes one batch file per 25 rows outside the repo, and prints the prompt's sha256 and the labels file to append to. An `--out-dir` inside a git working tree is refused. Other flags are in the header of `agents/uno-bot/measurement/housekeeping-sort/sort.mjs`.
+   3. Label in a Claude Code session, one fresh sub-agent per batch. Give each sub-agent the batch's `system` text, unchanged, as its instructions and the batch's `user` text as the rows, and nothing else. Every batch then runs under the same pinned conditions, so a re-run is comparable. The session appends each result to the labels file as one compact JSON line with shell `>>`, so earlier lines are kept. Message text stays in the batch files and the export.
+   4. Count:
+
+      ```bash
+      node agents/uno-bot/measurement/housekeeping-sort/sort.mjs --count <labels.jsonl> <export.jsonl> --from YYYY-MM-DD --to YYYY-MM-DD
+      ```
+
+      It refuses a labels file with a missing, a repeated or an unknown id. It prints housekeeping requests per workday and the prompt's sha256.
+   5. Record the count, the sha256, "labelled in a Claude Code session" and the session's model id.
+
+   The batch files and labels stay where they were written, outside the repo.
 3. **Count the thanks.** The D1 counts come from `agents/uno-bot/queries/usage/appreciation-weekly.sql` (reactions on uno-bot's messages, thanks replies to it). Then search the week's channels and Figma comments for shout-outs that were not addressed to the bot, and add each to the **Appreciation log** with Permission unset and Quote empty.
 4. **Fill one Weekly snapshot row**: the five numbers, Thanks reactions, Thanks replies, Shout-outs logged, Query commit (`git rev-parse --short HEAD`), Run on, After lock only, and anything odd in Notes.
 
