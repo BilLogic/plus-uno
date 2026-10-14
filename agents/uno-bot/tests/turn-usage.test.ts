@@ -434,12 +434,10 @@ test("a thanks-only message is flagged thanks, and stays test traffic by the gre
   assert.deepEqual([row.thanks, row.testTraffic], [true, true]);
 });
 
-test("an eval's thanks and a sandbox thanks are not counted; an ordinary ask is not thanks", async () => {
-  const built = evalTurnRequest({ prompt: "thanks!" });
-  assert.ok(built.ok);
-  const evals = harness({ origin: "debug" });
-  await runTurn(built.request, evals.deps);
-  assert.equal(only(evals.usage.records()).thanks, false);
+test("a debug-origin thanks and a sandbox thanks are not counted; an ordinary ask is not thanks", async () => {
+  const debug = harness({ origin: "debug" });
+  await runTurn(request({ text: "thanks!" }), debug.deps);
+  assert.equal(only(debug.usage.records()).thanks, false);
 
   const sandbox = harness({ testChannelIds: [CHANNEL] });
   await runTurn(request({ text: "thanks!" }), sandbox.deps);

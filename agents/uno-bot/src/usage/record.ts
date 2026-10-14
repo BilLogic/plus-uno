@@ -248,7 +248,7 @@ export function buildTurnRecord(facts: TurnRecordFacts): TurnRecord {
     selfFiledTicketUrl: selfFiledTicketOf(facts.executed),
     testTraffic,
     // A person's thanks, counted whatever the greeting rule made of the turn:
-    // never on the debug route, which the evals use, nor in the sandbox.
+    // never on a debug route, nor in the sandbox.
     thanks:
       facts.origin !== "debug" && !facts.testChannelIds.includes(facts.channel) && isThanks(facts.question),
     // Only a real ask in a known channel keeps its text, for the end-of-day
