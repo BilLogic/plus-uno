@@ -170,7 +170,12 @@ const BUDGETS = {
   // wording is generated from the tool table. Measured at 22,148 once the
   // per-tool rules had moved; the budget is that minus 1k, so the move also
   // paid for 1k of cuts and the persona starts with no room to regrow.
-  persona: 21_148,
+  //
+  // RESET to 22,048 at the bot-skills cut. The persona now routes build asks
+  // and intakes through `file-a-ticket` and tells the bot to read a bot skill
+  // before acting, and it measured 21,048 once those edits were done; the
+  // budget is that plus 1k, room for the next cross-tool rule and no more.
+  persona: 22_048,
   // A bot skill: its body, read through read_reference, and its description,
   // which ships in the prompt as the skill's pointer line. The bundler holds the
   // body; `check:bot-skills` holds the description.

@@ -21,7 +21,7 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,159 (−7,828 ide-only) | 10,159 | 20,000 (constitution) |
 | 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 14,489 | 24,677 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,048 | 45,766 | 21,148 (persona) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,048 | 45,766 | 22,048 (persona) |
 | 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,552 | 47,371 | — |
 | 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,216 | 48,647 | — |
 | 6 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 4,519 (−1,171 ide-only) | 53,208 | — |

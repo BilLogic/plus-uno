@@ -262,7 +262,7 @@ test("a persona over its char budget fails the build", () => {
   assert.equal(result.code, 1, "a persona over budget must fail the build");
   assert.match(result.out, /over its char budget/i);
   assert.match(result.out, /AGENT\.md/);
-  assert.match(result.out, /21,148/, "the failure must name the budget");
+  assert.match(result.out, /22,048/, "the failure must name the budget");
   assert.match(result.out, /over by [\d,]+/, "the failure must name the overrun");
   assert.equal(readFileSync(harnessTs, "utf8"), before, "a failing budget must not write the artifact");
 });
