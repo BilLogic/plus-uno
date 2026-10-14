@@ -24,7 +24,7 @@
     "test:workerd": "vitest run --config vitest.workerd.config.mts",
     "slack:diff": "slack manifest diff --team T0C5GFUPJ --app A0APS0L8HJR",
     "slack:manifest": "slack manifest info --source remote --team T0C5GFUPJ --app A0APS0L8HJR",
-    "test:bundle": "node --test scripts/*.test.mjs",
+    "test:bundle": "node --test scripts/*.test.mjs measurement/*/*.test.mjs",
     "metric": "node scripts/metric-query.mjs"
   },
   "devDependencies": {

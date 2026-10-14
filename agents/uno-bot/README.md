@@ -222,6 +222,8 @@ node scripts/sample-answers.mjs --rows /tmp/eligible.json --seed fall-2026 --n 5
 
 The same rows and seed always give the same picks. The output is CSV: `turn_id,slack_link,surface,needs_permission,second_grade`. `needs_permission` is 1 for anything not known to be a public or private channel, such as a DM, a group DM, or a conversation of unknown type: ask the asker before you open it. `second_grade` marks the answers a second grader also grades.
 
+**The lead's inbox** is counted outside the usage record, by the pinned housekeeping sort in `measurement/housekeeping-sort/`: one model and one rubric (`prompt.md`), so the "housekeeping requests reaching the lead per workday" count can be re-run the way the baseline was. `node measurement/housekeeping-sort/sort.mjs <export.jsonl> --dry-run` shows the request and the cost and sends nothing; a real run needs `ANTHROPIC_API_KEY` and writes its labels outside the repo, to `~/Documents/Claude/Projects/PLUS/uno-bot-measurement/` unless `--out-dir` names another place; a place inside a git working tree is refused. The definitions of housekeeping and workday, and where each came from, head `lib.mjs`. Cite a count with the model id and prompt sha256 its header records.
+
 **Cite a result** with:
 
 - the query file and the commit it was run from (`git rev-parse --short HEAD`);
