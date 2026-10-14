@@ -2,9 +2,10 @@
 //
 // Driven at the review door the interactive endpoint hands a Slack payload to,
 // as `tests/proposal-review.test.ts` drives it: the in-memory ThreadState, the
-// recording Delivery and a views client that refuses what Slack refuses. Edit
-// fields is a view pushed over the draft; Save edits keeps the values on the
-// draft's `private_metadata`, and Approve carries them from there. Every case
+// recording Delivery and a views client that refuses what Slack refuses. Text
+// fields sit in the draft itself and ride its Submit; a select sits under Edit
+// fields, a view pushed over the draft, and each pick keeps itself on the
+// draft's `private_metadata`, where Approve carries it from. Every case
 // asserts what was written, what Slack was handed, or what the card was left
 // saying.
 import { describe, it } from "node:test";
@@ -17,11 +18,11 @@ import {
   runReviewDecision,
   runReviewOpen,
   runReviewPush,
-  saveReviewEdits,
+  keepReviewPick,
   type ReviewDoorDeps,
   type ReviewViewState,
 } from "../src/slack/review-door";
-import { reviewedCardOf } from "../src/slack/review-view";
+import { reviewSubmitOf, reviewedCardOf } from "../src/slack/review-view";
 import { recordingViews } from "./helpers/recording-slack";
 import { CONFIRM_FOOTER, proposalCardBlocks } from "../src/slack/proposal-render";
 import { cardWords } from "./helpers/card-message";
@@ -80,7 +81,7 @@ function harness(threadState: ThreadState, opts: { pillars?: string[] | null } =
 
 const open = (userId = "U2") => ({ triggerId: "T.trigger", channel: CHANNEL, messageTs: CARD_TS, userId });
 
-/** Approve, carrying the edits Save edits kept on the draft. */
+/** Approve, carrying the edits kept on the draft. */
 const approve = (edits: Record<string, string>, userId = "U2") => ({
   viewId: "V1",
   channel: CHANNEL,
@@ -96,7 +97,6 @@ async function editFields(deps: ReviewDoorDeps, views: { calls: Array<{ kind: st
   return views.calls.at(-1)!.view;
 }
 
-const text = (value: string) => ({ value: { type: "plain_text_input", value } });
 const picked = (value: string) => ({ value: { type: "static_select", selected_option: { value } } });
 
 type Block = {
@@ -114,30 +114,75 @@ const inputs = (view: unknown) =>
   blocksOf(view).filter((b) => b.type === "input" && (b.block_id ?? "").startsWith("uno_field:"));
 const alerts = (view: unknown) => blocksOf(view).filter((b) => b.type === "alert");
 
+/** The field selects Edit fields offers: each a section with its select. */
+const selects = (view: unknown) =>
+  blocksOf(view).filter(
+    (b) => (b.block_id ?? "").startsWith("uno_field:") && (b as { accessory?: { type: string } }).accessory?.type === "static_select",
+  );
+const accessory = (block: Block) =>
+  (block as unknown as { accessory: { initial_option?: { value: string }; options: Array<{ value: string }> } }).accessory;
+
+/** The draft's Submit, pressed with Approve and these values in its fields. */
+function submitDraft(draft: unknown, values: Record<string, string> = {}) {
+  const state: ReviewViewState = { uno_review_choice: { uno_review_choice_input: { selected_option: { value: "confirm" } } } };
+  for (const [blockId, value] of Object.entries(values)) state[blockId] = { value: { type: "plain_text_input", value } };
+  const submit = reviewSubmitOf({ ...(draft as object), state: { values: state } });
+  assert.ok(submit.ok);
+  return submit.request;
+}
+
 describe("the pop-up offers the draft's fields", () => {
-  it("gives a confirmer each field with the draft's value, and selects from the live options", async () => {
+  it("holds a create's text fields in the draft, and leaves only its select for Edit fields", async () => {
     const { deps, views, optionReads } = harness(await staged());
     await runReviewOpen(open(), deps);
-    // The draft holds no input and reads no option: Edit fields does both.
-    assert.deepEqual(inputs(views.calls[1]!.view), []);
-    assert.deepEqual(optionReads, []);
-    const view = await editFields(deps, views);
-    assert.deepEqual(views.calls.map((c) => c.kind), ["open", "update", "push", "update"]);
-    assert.equal((view as { submit: { text: string } }).submit.text, "Save edits");
-    const fields = inputs(view);
+    const draft = views.calls[1]!.view;
     assert.deepEqual(
-      fields.map((f) => [f.label?.text, f.element?.type]),
+      inputs(draft).map((f) => [f.block_id, f.label?.text, f.element?.initial_value]),
       [
-        ["Title", "plain_text_input"],
-        ["Summary", "plain_text_input"],
-        ["Product Pillar", "static_select"],
+        ["uno_field:0.title", "Title", "Reflection redesign"],
+        ["uno_field:0.summary", "Summary", PROPOSAL.input.summary],
       ],
     );
-    assert.equal(fields[0]!.element?.initial_value, "Reflection redesign");
-    const pillar = fields[2]!.element!;
-    assert.deepEqual(pillar.options?.map((o) => o.value), PILLARS);
-    assert.equal(pillar.initial_option?.value, "Tutor Experience");
+    // A select needs its options read, so the draft reads none and offers it
+    // under Edit fields.
+    assert.deepEqual(optionReads, []);
+    assert.match(JSON.stringify(draft), /"uno_review_edit"/);
+
+    const view = await editFields(deps, views);
+    assert.deepEqual(views.calls.map((c) => c.kind), ["open", "update", "push", "update"]);
+    // No Save edits: a pick keeps itself, and the close goes back to the draft.
+    assert.equal((view as { submit?: unknown }).submit, undefined);
+    assert.equal((view as { close: { text: string } }).close.text, "Done");
+    assert.deepEqual(inputs(view), []);
+    const [pillar] = selects(view);
+    assert.equal(pillar?.block_id, "uno_field:0.properties.product_pillar");
+    assert.match(pillar?.text?.text ?? "", /Product Pillar/);
+    assert.deepEqual(accessory(pillar!).options.map((o) => o.value), PILLARS);
+    assert.equal(accessory(pillar!).initial_option?.value, "Tutor Experience");
     assert.deepEqual(optionReads, ["roadmap/Product Pillar"]);
+    assert.deepEqual(views.refused, []);
+  });
+
+  it("still holds a text field in place when the batch has a tool the draft cannot read", async () => {
+    const { deps, views } = harness(
+      await staged({
+        operations: [
+          { toolName: "figma_comment_reply", input: { text: "Thanks" } },
+          { toolName: "github_issue_create", input: { title: "Badge drift", body: "The badge differs." } },
+        ],
+      }),
+    );
+    await runReviewOpen(open(), deps);
+    const draft = views.calls[1]!.view;
+    assert.deepEqual(
+      inputs(draft).map((f) => [f.block_id, f.element?.initial_value]),
+      [
+        ["uno_field:1.title", "Badge drift"],
+        ["uno_field:1.body", "The badge differs."],
+      ],
+    );
+    // Nothing is left behind Edit fields.
+    assert.doesNotMatch(JSON.stringify(draft), /"uno_review_edit"/);
     assert.deepEqual(views.refused, []);
   });
 
@@ -150,7 +195,49 @@ describe("the pop-up offers the draft's fields", () => {
 
   it("leaves out a select whose options cannot be read, rather than offering a free guess", async () => {
     const { deps, views } = harness(await staged(), { pillars: null });
-    assert.deepEqual(inputs(await editFields(deps, views)).map((f) => f.label?.text), ["Title", "Summary"]);
+    const view = await editFields(deps, views);
+    assert.deepEqual(selects(view), []);
+    assert.match(JSON.stringify(view), /Nothing in this draft can be edited here/);
+  });
+});
+
+describe("Approve with a field edited in place", () => {
+  it("writes the title typed into the draft, and counts the approval as edited", async () => {
+    const { deps, views, ran, cardUpdates } = harness(await staged());
+    await runReviewOpen(open(), deps);
+    const request = submitDraft(views.calls[1]!.view, { "uno_field:0.title": "Reflection, shorter form" });
+    await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", ...request }, deps);
+    assert.equal(ran.length, 1);
+    assert.equal(ran[0]?.execute?.input.title, "Reflection, shorter form");
+    assert.equal(ran[0]?.execute?.input.summary, PROPOSAL.input.summary);
+    // What the usage record reads as approved with edits.
+    assert.equal(ran[0]?.edited, true);
+    assert.match(cardUpdates[0]!.note, /^<@U2> edited Title\n/);
+  });
+
+  it("approves the fields left alone as staged, and does not count an edit", async () => {
+    const { deps, views, ran, cardUpdates } = harness(await staged());
+    await runReviewOpen(open(), deps);
+    const request = submitDraft(views.calls[1]!.view, {
+      "uno_field:0.title": "Reflection redesign",
+      "uno_field:0.summary": String(PROPOSAL.input.summary),
+    });
+    await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", ...request }, deps);
+    assert.deepEqual(ran[0]?.execute?.input, PROPOSAL.input);
+    assert.equal(ran[0]?.edited, undefined);
+    assert.deepEqual(cardUpdates.map((u) => u.note), [":white_check_mark: Approved by <@U2>"]);
+  });
+
+  it("holds a field typed in place to the guards, and keeps the typing on the redrawn draft", async () => {
+    const { deps, views, ran } = harness(await staged());
+    await runReviewOpen(open(), deps);
+    const request = submitDraft(views.calls[1]!.view, { "uno_field:0.title": "TBD" });
+    await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", ...request }, deps);
+    assert.deepEqual(ran, []);
+    const view = views.calls.at(-1)!.view;
+    assert.match(alerts(view)[0]?.text?.text ?? "", /Title is still a placeholder/);
+    assert.equal(inputs(view).find((f) => f.block_id === "uno_field:0.title")?.element?.initial_value, "TBD");
+    assert.deepEqual(views.refused, []);
   });
 });
 
@@ -251,7 +338,7 @@ describe("an edit the guards refuse", () => {
     assert.match(alert?.text?.text ?? "", /TBD/);
     // The pop-up stays a draft, with the person's own edit still on it and
     // still carried to the next Approve.
-    assert.match(JSON.stringify(blocksOf(view)), /\*Title:\* TBD/);
+    assert.equal(inputs(view).find((f) => f.block_id === "uno_field:0.title")?.element?.initial_value, "TBD");
     assert.deepEqual(reviewedCardOf((view as { private_metadata: string }).private_metadata)?.edits, { "0.title": "TBD" });
     assert.equal((view as { submit?: { text: string } }).submit?.text, "Submit");
     assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found");
@@ -276,61 +363,76 @@ describe("an edit the guards refuse", () => {
   });
 });
 
-describe("Save edits, the Edit fields view's submit", () => {
-  const text = (value: string) => ({ value: { type: "plain_text_input", value } });
-  const picked = (value: string) => ({ value: { type: "static_select", selected_option: { value } } });
+describe("a pick under Edit fields keeps itself", () => {
+  const KEY = "0.properties.product_pillar";
 
-  /** Edit fields opened over the draft V1, and Save edits pressed with `state`. */
-  async function save(state: ReviewViewState, opts: { edits?: Record<string, string> } = {}) {
+  /** Edit fields opened over the draft V1, and a pick made in it: the state
+   *  Slack sends with the pick holds every select in the view as it stands. */
+  async function pick(value: string, opts: { edits?: Record<string, string> } = {}) {
     const h = harness(await staged());
     await runReviewOpen(open(), h.deps);
     const edit = await editFields(h.deps, h.views, opts.edits);
-    const ack = await saveReviewEdits(
-      { rootViewId: "V1", card: reviewedCardOf((edit as { private_metadata: string }).private_metadata)!, userId: "U2", blocks: blocksOf(edit), state },
+    await keepReviewPick(
+      {
+        viewId: "V2",
+        rootViewId: "V1",
+        card: reviewedCardOf((edit as { private_metadata: string }).private_metadata)!,
+        userId: "U2",
+        blocks: blocksOf(edit),
+        state: { [`uno_field:${KEY}`]: picked(value) },
+        pick: { key: KEY, value },
+      },
       h.deps,
     );
-    return { ...h, ack };
+    return h;
   }
 
-  it("refuses a placeholder under the field, in Slack's own error, and leaves the draft as it was", async () => {
-    const { ack, views } = await save({ "uno_field:0.title": text("[insert title]") });
-    assert.equal(ack?.response_action, "errors");
-    assert.match(ack!.errors["uno_field:0.title"]!, /Title is still a placeholder/);
-    assert.deepEqual(views.calls.map((c) => c.kind), ["open", "update", "push", "update"], "the draft is not redrawn");
-  });
-
-  it("closes onto the draft, redrawn with the edit and carrying it to Approve", async () => {
-    const { ack, views, deps, ran, cardUpdates } = await save({
-      "uno_field:0.title": text("Reflection v2"),
-      "uno_field:0.summary": text(String(PROPOSAL.input.summary)),
-      "uno_field:0.properties.product_pillar": picked("Universal"),
-    });
-    assert.equal(ack, null, "an empty ack closes Edit fields onto the draft");
+  it("writes the pick into the draft's metadata and redraws the draft, with no submit pressed", async () => {
+    const { views, deps, ran, cardUpdates } = await pick("Universal");
     const redrawn = views.calls.at(-1)!;
     assert.equal(redrawn.kind === "update" && redrawn.viewId, "V1");
     const words = JSON.stringify(blocksOf(redrawn.view));
-    assert.match(words, /\*Title:\* Reflection v2/);
     assert.match(words, /\*Product Pillar:\* Universal/);
-    assert.match(words, /Edited here: Title, Product Pillar/);
-    // Only what differs from the draft rides along.
+    assert.match(words, /Edited here: Product Pillar/);
+    // The draft keeps its fields in place, by the same block ids, so what was
+    // typed there survives the redraw.
+    assert.deepEqual(inputs(redrawn.view).map((f) => f.block_id), ["uno_field:0.title", "uno_field:0.summary"]);
     const card = reviewedCardOf((redrawn.view as { private_metadata: string }).private_metadata)!;
-    assert.deepEqual(card.edits, { "0.title": "Reflection v2", "0.properties.product_pillar": "Universal" });
+    assert.deepEqual(card.edits, { [KEY]: "Universal" });
     assert.deepEqual(views.refused, []);
 
-    // Approve, from the redrawn draft, writes what was saved.
-    await runReviewDecision({ ...approve(card.edits!), viewId: "V1" }, deps);
-    assert.equal(ran[0]?.execute?.input.title, "Reflection v2");
+    // Back from Edit fields, then Approve: the draft's own Submit carries the pick.
+    const request = submitDraft(redrawn.view);
+    await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", ...request }, deps);
     assert.deepEqual(ran[0]?.execute?.input.properties, { product_pillar: "Universal" });
-    assert.match(cardUpdates[0]!.note, /^<@U2> edited Title, Product Pillar\n/);
+    assert.equal(ran[0]?.edited, true);
+    assert.match(cardUpdates[0]!.note, /^<@U2> edited Product Pillar\n/);
   });
 
-  it("opens Edit fields on the values already saved, and keeps them through a second save", async () => {
-    const { views, ack } = await save({ "uno_field:0.summary": text("One question after each session.") }, { edits: { "0.title": "Reflection v2" } });
-    const edit = views.calls.find((c) => c.kind === "update" && c.viewId === "V2")!.view;
-    assert.equal(inputs(edit)[0]?.element?.initial_value, "Reflection v2");
-    assert.equal(ack, null);
+  it("drops a kept edit when the pick goes back to the draft's own value", async () => {
+    const { views } = await pick("Tutor Experience", { edits: { [KEY]: "Universal" } });
     const card = reviewedCardOf((views.calls.at(-1)!.view as { private_metadata: string }).private_metadata)!;
-    assert.deepEqual(card.edits, { "0.title": "Reflection v2", "0.summary": "One question after each session." });
+    assert.equal(card.edits, undefined);
+  });
+
+  it("refuses an option the view did not offer in an alert on Edit fields, and leaves the draft as it was", async () => {
+    const { views } = await pick("Made up");
+    const last = views.calls.at(-1)!;
+    assert.equal(last.kind === "update" && last.viewId, "V2");
+    assert.match(alerts(last.view)[0]?.text?.text ?? "", /Made up/);
+    assert.equal(views.calls.filter((c) => c.kind === "update" && c.viewId === "V1").length, 1, "the draft is not redrawn");
+    assert.deepEqual(views.refused, []);
+  });
+
+  it("still holds a kept pick to the database's options on Approve", async () => {
+    const { views, deps, ran } = await pick("Universal");
+    const request = submitDraft(views.calls.at(-1)!.view);
+    await runReviewDecision(
+      { viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", ...request },
+      { ...deps, fieldOptions: async () => ["Tutor Experience"] },
+    );
+    assert.deepEqual(ran, []);
+    assert.match(alerts(views.calls.at(-1)!.view)[0]?.text?.text ?? "", /Universal/);
   });
 });
 
@@ -386,11 +488,10 @@ describe("a notion_update draft", () => {
 
   it("offers a select its stager names, from the database's live options", async () => {
     const { deps, views, optionReads } = harness(await staged(WITH_SELECT), { pillars: STATUSES });
-    const fields = inputs(await editFields(deps, views));
-    const status = fields.find((f) => f.block_id === "uno_field:0.properties.Design Status")!;
-    assert.equal(status.label?.text, "Design Status");
-    assert.deepEqual(status.element?.options?.map((o) => o.value), STATUSES);
-    assert.equal(status.element?.initial_option?.value, "In Review");
+    const status = selects(await editFields(deps, views)).find((f) => f.block_id === "uno_field:0.properties.Design Status")!;
+    assert.equal(status.text?.text, "*Design Status*");
+    assert.deepEqual(accessory(status).options.map((o) => o.value), STATUSES);
+    assert.equal(accessory(status).initial_option?.value, "In Review");
     assert.deepEqual(optionReads, ["roadmap/Design Status"]);
     assert.deepEqual(views.refused, []);
   });

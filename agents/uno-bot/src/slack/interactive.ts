@@ -34,7 +34,7 @@ import {
   runReviewDecision,
   runReviewOpen,
   runReviewPush,
-  saveReviewEdits,
+  keepReviewPick,
   startRevision,
   type ReviewDoorDeps,
   type ReviewViewState,
@@ -47,7 +47,7 @@ import {
   reviewSubmitOf,
   reviewedCardOf,
 } from "./review-view";
-import type { OptionSource } from "./review-fields";
+import { FIELD_ACTION_ID, FIELD_BLOCK_PREFIX, type OptionSource } from "./review-fields";
 import { databaseOptions } from "../integrations/notion";
 import { proposalReplyThread, type PendingProposal } from "../thread-state/index";
 import { conversationKey, enqueueAgentJob, replyHandlerAt } from "./events";
@@ -78,7 +78,13 @@ interface InteractionPayload {
   user?: { id?: string };
   channel?: { id?: string };
   message?: { ts?: string; thread_ts?: string; text?: string };
-  actions?: Array<{ action_id?: string; value?: string; selected_options?: { value?: string }[] }>;
+  actions?: Array<{
+    action_id?: string;
+    block_id?: string;
+    value?: string;
+    selected_option?: { value?: string } | null;
+    selected_options?: { value?: string }[];
+  }>;
   callback_id?: string;
   /** A click's one-use, three-second key to `views.open`. */
   trigger_id?: string;
@@ -90,6 +96,7 @@ interface InteractionPayload {
     root_view_id?: string;
     private_metadata?: string;
     callback_id?: string;
+    blocks?: unknown[];
     state?: { values?: ReviewViewState };
   } & Record<
     string,
@@ -182,6 +189,7 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
   if (actionId.startsWith(DECISION_REVIEW_ACTION_PREFIX)) return openReview(env, payload, actionId);
   if (actionId === REVIEW_EDIT_ACTION_ID) return editInReview(env, payload);
+  if (actionId === FIELD_ACTION_ID && payload.view?.callback_id === REVIEW_EDIT_CALLBACK_ID) return keepPickInReview(env, payload);
   if (actionId === DM_WATCH_ACTION_ID) return saveDmWatch(env, payload);
   if (actionId === FEEDBACK_ACTION_ID) return feedbackFromButton(env, payload);
   if (actionId.startsWith(REMINDER_ACTION_PREFIX)) return answerFromButton(env, payload, actionId);
@@ -300,12 +308,36 @@ async function editInReview(env: Env, payload: InteractionPayload): Promise<void
   await runReviewPush({ triggerId, card, userId }, reviewDoorDeps(env));
 }
 
+/** A pick under Edit fields: kept on the draft under it at once, so there is
+ *  nothing to save and going back loses nothing. */
+async function keepPickInReview(env: Env, payload: InteractionPayload): Promise<void> {
+  const view = payload.view;
+  const card = reviewedCardOf(view?.private_metadata);
+  const userId = payload.user?.id;
+  const action = payload.actions?.[0];
+  const viewId = view?.id;
+  const rootViewId = view?.root_view_id;
+  if (!view || !card || !userId || !viewId || !rootViewId || rootViewId === viewId) return;
+  const key = action?.block_id?.startsWith(FIELD_BLOCK_PREFIX) ? action.block_id.slice(FIELD_BLOCK_PREFIX.length) : undefined;
+  const value = action?.selected_option?.value;
+  await keepReviewPick(
+    {
+      viewId,
+      rootViewId,
+      card,
+      userId,
+      blocks: Array.isArray(view.blocks) ? view.blocks : [],
+      ...(view.state?.values ? { state: view.state.values } : {}),
+      ...(key && value ? { pick: { key, value } } : {}),
+    },
+    reviewDoorDeps(env),
+  );
+}
+
 /**
- * A Review view's submit: the draft's Submit, which decides it, or Save
- * edits. A decision is acked at once with a line that says it is under way,
- * and the door answers in the same view once the Gate has (`showIn`). Save
- * edits is answered in the ack: Slack's error under a refused field, or an
- * empty ack that closes the view onto the redrawn draft.
+ * A Review view's submit: the draft's Submit, which decides it. A decision is
+ * acked at once with a line that says it is under way, and the door answers
+ * in the same view once the Gate has (`showIn`).
  */
 async function submitReview(env: Env, payload: InteractionPayload, ctx: ExecutionContext): Promise<Response> {
   const view = payload.view;
@@ -313,22 +345,15 @@ async function submitReview(env: Env, payload: InteractionPayload, ctx: Executio
   const card = reviewedCardOf(view?.private_metadata);
   const userId = payload.user?.id;
   const viewId = view?.id;
-  const known = [REVIEW_CALLBACK_ID, REVIEW_EDIT_CALLBACK_ID];
-  if (!view || !callbackId || !known.includes(callbackId) || !card || !userId || !viewId) {
+  // Edit fields has no submit, so the draft is the one view that sends one.
+  if (!view || callbackId !== REVIEW_CALLBACK_ID || !card || !userId || !viewId) {
     console.log(`[interactive] unhandled view_submission ${callbackId ?? "(none)"}`);
     return new Response("", { status: 200 });
   }
   const rootViewId = view.root_view_id && view.root_view_id !== viewId ? view.root_view_id : undefined;
   const deps = reviewDoorDeps(env);
 
-  if (callbackId === REVIEW_EDIT_CALLBACK_ID) {
-    if (!rootViewId) return new Response("", { status: 200 });
-    const blocks = Array.isArray(view.blocks) ? view.blocks : [];
-    const ack = await saveReviewEdits({ rootViewId, card, userId, blocks, ...(view.state?.values ? { state: view.state.values } : {}) }, deps);
-    return ack ? Response.json(ack) : new Response("", { status: 200 });
-  }
-
-  // The decision, its note and — on Approve only — the saved edits and the
+  // The decision, its note and — on Approve only — the kept picks and the
   // fields the draft holds in place.
   const submitted = reviewSubmitOf(view);
   if (!submitted.ok) return Response.json({ response_action: "errors", errors: submitted.errors });

@@ -39,6 +39,10 @@ const DEFAULT_REPO = "BilLogic/plus-uno";
 interface ReadOperation {
   /** What it does and where, one line. */
   headline: string;
+  /** A change to what a page already says, so a keyed value reads as Current
+   *  content, Issue and New content. Anything else writes something new, and
+   *  a keyed value is only where its field is drawn in place. */
+  changes?: boolean;
   /** Label → value, in the order a person checks them, and the value's path
    *  in the tool input where it has one. */
   properties: Array<[string, string, string?]>;
@@ -81,7 +85,7 @@ function notionCreate(input: Input): ReadOperation {
     return key ? str(props[key]) : "";
   };
   const shown = new Set<string>();
-  const properties: Array<[string, string]> = [["Title", str(input.title)]];
+  const properties: ReadOperation["properties"] = [["Title", str(input.title), "title"]];
   if (surface === "prd" || surface === "intake") {
     const pillar = prop("product_pillar") || str(input.product_pillar);
     if (pillar) properties.push(["Product Pillar", pillar]);
@@ -102,7 +106,7 @@ function notionCreate(input: Input): ReadOperation {
     properties.push([labelOf(key), str(value)]);
   }
   const summary = str(input.summary);
-  if (summary) properties.push(["Summary", summary]);
+  if (summary) properties.push(["Summary", summary, "summary"]);
   const source = str(input.source_url);
   if (source) properties.push(["Source", source]);
 
@@ -148,7 +152,7 @@ function notionUpdate(input: Input): ReadOperation {
   });
   const note = str(append.text);
   if (note) body.push({ heading: "Added to the end of the page", text: note, key: "append.text" });
-  return { headline: "Changes to a Notion page", properties, body };
+  return { headline: "Changes to a Notion page", changes: true, properties, body };
 }
 
 function githubIssue(input: Input): ReadOperation {
@@ -156,20 +160,20 @@ function githubIssue(input: Input): ReadOperation {
   return {
     headline: `New GitHub issue on ${repo}`,
     properties: [
-      ["Title", str(input.title)],
+      ["Title", str(input.title), "title"],
       ["Repository", repo],
     ],
     // Markdown GitHub renders itself, so the pop-up tidies it the same way.
-    body: str(input.body) ? [{ text: str(input.body), markdown: true }] : [],
+    body: str(input.body) ? [{ text: str(input.body), key: "body", markdown: true }] : [],
   };
 }
 
 function email(input: Input): ReadOperation {
   const list = (v: unknown) => (Array.isArray(v) ? v.map(str).filter(Boolean).join(", ") : str(v));
-  const properties: Array<[string, string]> = [["To", list(input.to)]];
+  const properties: ReadOperation["properties"] = [["To", list(input.to)]];
   if (list(input.cc)) properties.push(["Cc", list(input.cc)]);
-  properties.push(["Subject", str(input.subject)]);
-  return { headline: "Email", properties, body: str(input.body) ? [{ text: str(input.body) }] : [] };
+  properties.push(["Subject", str(input.subject), "subject"]);
+  return { headline: "Email", properties, body: str(input.body) ? [{ text: str(input.body), key: "body" }] : [] };
 }
 
 function dmRelay(input: Input): ReadOperation {
@@ -178,7 +182,7 @@ function dmRelay(input: Input): ReadOperation {
     headline: "Direct message",
     // A mention, so Slack shows the person's name; never a raw id.
     properties: [["To", id ? `<@${id}>` : str(input.recipient)]],
-    body: str(input.text) ? [{ text: str(input.text) }] : [],
+    body: str(input.text) ? [{ text: str(input.text), key: "text" }] : [],
   };
 }
 
@@ -255,7 +259,8 @@ export function readableDraft(
     }
     const keyOf = (path?: string) => (path ? `${i}.${path}` : undefined);
     const at = (key?: string) => ({ ...detail, issueHere: key !== undefined && key === issueAt });
-    blocks.push(...propertyBlocks(op!.properties.map(([label, value, path]) => [label, value, keyOf(path)]), detail, issueAt));
+    const properties = op!.properties.map(([label, value, path]): [string, string, string?] => [label, value, keyOf(path)]);
+    blocks.push(...(op!.changes ? propertyBlocks(properties, detail, issueAt) : newPropertyBlocks(properties, detail)));
     for (const part of op!.body) blocks.push(...partBlocks({ ...part, key: keyOf(part.key) }, at(keyOf(part.key))));
   });
   if (caveats.length) blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: caveats.join("\n") }] });
@@ -281,7 +286,7 @@ function firstChange(read: readonly ReadOperation[]): string | undefined {
     if (part) return keyed(i, part.key);
   }
   for (const [i, op] of read.entries()) {
-    const prop = op.properties.find(([, , path]) => path);
+    const prop = op.changes ? op.properties.find(([, , path]) => path) : undefined;
     if (prop) return keyed(i, prop[2]);
   }
   return undefined;
@@ -373,6 +378,24 @@ function propertyBlocks(
   }
   flush();
   return blocks;
+}
+
+/** The key properties of a write that makes something new: `*Label:* value`
+ *  lines as `propertyBlocks` draws an unkeyed one, and a field in place an
+ *  input under its own label. */
+function newPropertyBlocks(properties: ReadonlyArray<[string, string, string?]>, detail: DraftDetail): unknown[] {
+  const blocks: unknown[] = [];
+  let run: Array<[string, string]> = [];
+  for (const [label, value, key] of properties) {
+    const field = key === undefined ? undefined : detail.inline?.get(key);
+    if (!field) {
+      run.push([label, value]);
+      continue;
+    }
+    blocks.push(...propertyBlocks(run), inputOf(field, label));
+    run = [];
+  }
+  return [...blocks, ...propertyBlocks(run)];
 }
 
 /** A property's value as mrkdwn: a mention or a link kept live, anything else

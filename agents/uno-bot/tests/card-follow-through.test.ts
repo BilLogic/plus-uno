@@ -233,7 +233,7 @@ async function askedBefore(store: InMemoryCommitmentStore, rm: ReturnType<typeof
  * A decision sent from one card's Review pop-up, through the review door: what
  * it ran, and the report's message as the door redrew it.
  *
- * @param edits - Values Save edits kept, carried to Approve
+ * @param edits - Values kept on the draft, carried to Approve
  */
 async function review(
   threadState: ThreadState,

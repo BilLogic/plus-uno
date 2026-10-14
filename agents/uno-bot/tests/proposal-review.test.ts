@@ -212,7 +212,10 @@ describe("Review opens the draft", () => {
   });
 
   it("ends with the decision and a note, and Submit in the footer beside Close", async () => {
-    const { deps, views } = harness(await staged());
+    // A select to pick, so the draft has Edit fields to offer.
+    const { deps, views } = harness(
+      await staged({ input: { surface: "prd", title: "Reflection redesign", properties: { product_pillar: "Universal" } } }),
+    );
     await runReviewOpen(open(), deps);
     const draft = views.calls[1]!.view as {
       blocks: Array<{
@@ -227,8 +230,12 @@ describe("Review opens the draft", () => {
     };
     assert.equal(draft.submit?.text, "Submit");
     assert.equal(draft.close?.text, "Close");
-    const inputs = draft.blocks.filter((b) => b.type === "input");
-    assert.deepEqual(inputs.map((b) => b.block_id), ["uno_review_choice", "uno_review_note"]);
+    // The title is typed in place; the decision and the note close the draft.
+    assert.deepEqual(
+      draft.blocks.filter((b) => b.type === "input").map((b) => b.block_id),
+      ["uno_field:0.title", "uno_review_choice", "uno_review_note"],
+    );
+    const inputs = draft.blocks.filter((b) => b.type === "input" && !b.block_id?.startsWith("uno_field:"));
     assert.equal(inputs[0]!.element?.type, "radio_buttons");
     assert.deepEqual(
       inputs[0]!.element?.options?.map((o) => [o.value, o.text.text]),

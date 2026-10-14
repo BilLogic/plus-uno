@@ -15,19 +15,21 @@
 // own (`PendingProposal.choices`: a follow-up's Done · Still on it · Drop it)
 // offers those in the same input instead, each deciding as its verdict.
 //
-// A CHANGE TO A PAGE IS EDITED IN PLACE. Its text fields are inputs in the
-// draft itself, prefilled, each under the value it replaces (`review-draft.ts`
-// § Before and after), and they ride the Submit with the decision; Approve
-// holds what changed to the same guards as Edit fields. Every other field — a
-// create's, and every select — sits behind an Edit fields button at the top,
-// which pushes a view of its own (`views.push`) with Save edits as its submit.
+// TEXT IS EDITED IN PLACE, AND NOTHING IS SAVED BY HAND. Every text field is
+// an input in the draft itself, prefilled — a change's under the value it
+// replaces (`review-draft.ts` § Before and after), a create's under its own
+// label — and rides the Submit with the decision; a field the reading does not
+// draw is added after the draft. A select needs its options read, so it sits
+// behind an Edit fields button at the top, which pushes a view of its own
+// (`views.push`) with no submit: each pick keeps itself, and its close, Done,
+// goes back to the draft.
 //
-// SAVED EDITS RIDE IN THE DRAFT'S `private_metadata`. Edit fields' Save edits
-// writes the values that differ from the draft into the parent view's
-// metadata and redraws its draft with them; Approve reads them back from
-// there. Slack hands metadata back exactly as the Worker wrote it, and Approve
-// still holds every value to the live card and the database's options
-// (`reviewEdits`), so nothing a view carries is trusted to run.
+// KEPT PICKS RIDE IN THE DRAFT'S `private_metadata`. Each pick writes the
+// values that differ from the draft into the parent view's metadata and
+// redraws its draft with them; Approve reads them back from there. Slack
+// hands metadata back exactly as the Worker wrote it, and Approve still holds
+// every value to the live card and the database's options (`reviewEdits`), so
+// nothing a view carries is trusted to run.
 //
 // Every view carries the card it is about in `private_metadata`, as the
 // card's own buttons carry it in the message they sit on: that ts is the
@@ -37,7 +39,9 @@ import { CONFIRM_FOOTER } from "./proposal-render";
 import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
 import {
   draftValuesOf,
+  FIELD_BLOCK_PREFIX,
   fieldInputBlocks,
+  fieldSelectBlocks,
   fieldsFromBlocks,
   inlineFields,
   labelsOf,
@@ -45,7 +49,7 @@ import {
   type EditableField,
   type ReviewViewState,
 } from "./review-fields";
-import { caveatsOf, draftHeadline, isReadable, readableDraft } from "./review-draft";
+import { caveatsOf, draftHeadline, readableDraft } from "./review-draft";
 import type { PendingProposal, ReviewChoice, StatedCardWords } from "../thread-state/index";
 import type { ReviewDecision } from "../gate/index";
 
@@ -71,8 +75,8 @@ const NOTE_MAX_CHARS = 3000;
 /** Slack's cap on a view's `private_metadata`. */
 export const METADATA_MAX_CHARS = 3000;
 
-/** The card a view is about, as `private_metadata` carries it, with the edits
- *  Save edits kept on the draft: field key → value. */
+/** The card a view is about, as `private_metadata` carries it, with the picks
+ *  kept on the draft: field key → value. */
 export interface ReviewedCard {
   channel: string;
   ts: string;
@@ -101,13 +105,13 @@ export function reviewMetadata(card: ReviewedCard): string {
 function modal(
   card: ReviewedCard,
   blocks: unknown[],
-  opts: { submit?: string; callbackId?: string; title?: string } = {},
+  opts: { submit?: string; close?: string; callbackId?: string; title?: string } = {},
 ): View {
   return {
     type: "modal",
     callback_id: opts.callbackId ?? REVIEW_CALLBACK_ID,
     title: { type: "plain_text", text: opts.title ?? TITLE },
-    close: { type: "plain_text", text: "Close" },
+    close: { type: "plain_text", text: opts.close ?? "Close" },
     ...(opts.submit ? { submit: { type: "plain_text", text: opts.submit } } : {}),
     private_metadata: reviewMetadata(card),
     blocks: blocks.slice(0, MAX_VIEW_BLOCKS),
@@ -157,8 +161,9 @@ export interface DraftAccess {
  * edit, ends with the decision and a note, and has Submit as its footer. `mayDecide` false is the same draft read-only: Close alone, and a
  * line naming who can decide.
  *
- * `opts.edits` are the values Save edits kept: the draft shows them in place,
- * says which fields they are, and carries them to Approve in the metadata.
+ * `opts.edits` are the values kept under Edit fields: the draft shows them in
+ * place, says which fields they are, and carries them to Approve in the
+ * metadata.
  */
 export function draftView(
   card: ReviewedCard,
@@ -188,7 +193,12 @@ export function draftView(
     inline: inPlace,
     editing: access.mayDecide,
   };
-  const body = readableDraft(operations, caveatsOf(text), detail) ?? textSections(text);
+  const read = readableDraft(operations, caveatsOf(text), detail) ?? textSections(text);
+  // A field the reading did not draw — the batch has a tool it cannot read —
+  // still goes in place, after the draft, so it is never left uneditable.
+  const drawn = new Set(read.map((b) => (b as { block_id?: string }).block_id));
+  const rest = [...inPlace.values()].filter((f) => !drawn.has(`${FIELD_BLOCK_PREFIX}${f.key}`));
+  const body = rest.length ? [...read, { type: "divider" }, ...fieldInputBlocks(rest)] : read;
 
   const headline = draftHeadline(operations);
   const head: unknown[] = [];
@@ -215,10 +225,10 @@ export function draftView(
   );
 }
 
-/** The keys of the fields the draft holds as inputs in place: none unless the
- *  whole batch has a reading to draw them in. */
+/** The keys of the fields the draft holds as inputs in place: every text
+ *  field, drawn where the reading puts it or after the draft. */
 export function inlineKeysOf(proposal: PendingProposal): Set<string> {
-  return isReadable(withValues(proposal, new Map())) ? new Set(inlineFields(proposal).map((f) => f.key)) : new Set();
+  return new Set(inlineFields(proposal).map((f) => f.key));
 }
 
 /** The draft's footer submit, which decides it. */
@@ -305,7 +315,7 @@ export interface ReviewSubmit {
   decision: ReviewDecision;
   note?: string;
   choice?: string;
-  /** Approve only: the edits Save edits kept on the draft. */
+  /** Approve only: the picks kept on the draft. */
   edits?: Readonly<Record<string, string>>;
   /** Approve only: the state holding the fields in place, and those fields
    *  with the values they opened with. */
@@ -315,7 +325,7 @@ export interface ReviewSubmit {
 
 /**
  * The draft's Submit, read off the submitted view: the decision and its note,
- * and for Approve every edit it carries — saved ones from the metadata, and
+ * and for Approve every edit it carries — kept picks from the metadata, and
  * the fields in place from the state, read against the blocks they were
  * offered in. Only Approve writes, so only Approve carries edits. Or the
  * errors Slack shows under the input that needs one.
@@ -339,25 +349,31 @@ export function reviewSubmitOf(
 
 /** Edit fields, pushed over the draft, while the fields' options are read. */
 export function editLoadingView(card: ReviewedCard): View {
-  return modal({ channel: card.channel, ts: card.ts }, [line("Loading the fields…")], { title: "Edit fields" });
+  return modal({ channel: card.channel, ts: card.ts }, [line("Loading the fields…")], EDIT_VIEW);
 }
 
+/** Edit fields has no submit: every pick keeps itself, so its close only goes
+ *  back to the draft. */
+const EDIT_VIEW = { callbackId: REVIEW_EDIT_CALLBACK_ID, title: "Edit fields", close: "Done" };
+
 /**
- * Edit fields: the draft's fields as inputs, each holding the value the draft
- * shows now (saved edits included), with Save edits as the submit. A draft
- * with no field it can offer says so, with no submit.
+ * Edit fields: the draft's selects, each holding the value the draft shows
+ * now (kept picks included), each pick kept on the draft as it is made. A
+ * draft with no select it can offer says so. `alert` is a pick refused.
  */
-export function editView(card: ReviewedCard, fields: readonly EditableField[], values?: ReadonlyMap<string, string>): View {
-  // The saved edits ride along, so a field this view does not offer keeps
-  // its edit when Save edits writes them back to the draft.
-  const meta = card;
-  if (!fields.length) {
-    return modal(meta, [line("Nothing in this draft can be edited here. Use Needs changes to ask for a revision.")], {
-      callbackId: REVIEW_EDIT_CALLBACK_ID,
-      title: "Edit fields",
-    });
+export function editView(
+  card: ReviewedCard,
+  fields: readonly EditableField[],
+  values?: ReadonlyMap<string, string>,
+  alert?: string,
+): View {
+  // The kept picks ride along, so a pick here is written back to the draft
+  // with every other one.
+  const selects = fieldSelectBlocks(fields, values);
+  if (!selects.length) {
+    return modal(card, [line("Nothing in this draft can be edited here. Use Needs changes to ask for a revision.")], EDIT_VIEW);
   }
-  return modal(meta, fieldInputBlocks(fields, values), { submit: "Save edits", callbackId: REVIEW_EDIT_CALLBACK_ID, title: "Edit fields" });
+  return modal(card, [...(alert ? [alertBlock("error", alert)] : []), ...selects], EDIT_VIEW);
 }
 
 /** What the note input holds, from a submit's `view.state` — trimmed, and
@@ -418,7 +434,7 @@ export function noticeView(card: ReviewedCard, text: string): View {
   return modal({ channel: card.channel, ts: card.ts }, [line(text)]);
 }
 
-/** The card a view's `private_metadata` names, with any saved edits, or null
+/** The card a view's `private_metadata` names, with any kept picks, or null
  *  for one this Worker did not write. */
 export function reviewedCardOf(privateMetadata: string | undefined): ReviewedCard | null {
   if (!privateMetadata) return null;
