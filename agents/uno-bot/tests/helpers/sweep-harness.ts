@@ -234,6 +234,8 @@ export function sweepHarness(opts: {
     comments?: Record<string, RecordComment[]>;
     /** Rows per query page; 25 unless set. */
     pageSize?: number;
+    /** The team's roles by Slack id; none unless set. */
+    roles?: TeamRoles;
   };
   /** Each Roadmap card's Decisions DB rows by card URL, and the Notion people
    *  map. Unset, no fix carries a row. */
@@ -499,6 +501,7 @@ export function sweepHarness(opts: {
             async comments(pageId: string) {
               return opts.notion!.comments?.[pageId] ?? [];
             },
+            roles: async () => opts.notion!.roles ?? {},
           },
         }
       : {}),

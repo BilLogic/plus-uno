@@ -69,6 +69,7 @@ import { postableAt } from "./schedule";
 import { findBySearch, namedThings } from "./search";
 import { isTeamNote, readUsable, searchGate } from "./surfaces";
 import type { PendingFinding, SweepRunOutcome } from "./store";
+import { designerAmong, type TeamRoles } from "../usage/roles";
 import {
   contributorsOf,
   FIRST_SWEEP_WINDOW_MS,
@@ -117,6 +118,9 @@ export interface SweepNotion {
   ): Promise<{ rows: EditedRecordRow[]; more: boolean; next: string | null }>;
   /** A page's open comments. */
   comments(pageId: string): Promise<RecordComment[]>;
+  /** The team's roles by Slack id (`../usage/roles.ts`): which Contributor
+   *  owns a card's design. */
+  roles(): Promise<TeamRoles>;
 }
 
 /** Which source a job reads, and what it keeps its place and queue under. */
@@ -388,9 +392,13 @@ async function sweepRecord(
   const people = await contributorsOf(deps, row.people[source.people] ?? (kind === "card" ? page.contributors : []), r.resolved);
   const findings: PendingFinding[] = [];
   let unowned = 0;
+  let roles: TeamRoles | undefined;
   for (const d of detected.findings) {
     const contributors = await contributorsOf(deps, d.source.contributors, r.resolved);
-    const owner = contributors[0] ?? people[0];
+    // The ladder's addressee: the card's design owner, tagged, when the roles
+    // name a designer among its Contributors (`../destination/`).
+    if (contributors.length) roles ??= await deps.notion!.roles();
+    const owner = designerAmong(contributors, roles ?? {}) ?? contributors[0] ?? people[0];
     if (!owner) {
       unowned += 1;
       continue;
