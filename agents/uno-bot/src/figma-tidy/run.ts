@@ -75,6 +75,7 @@ import {
   tidyCardWords,
   tidyChoices,
   tidyItem,
+  tidyCarriedParent,
   tidyParent,
   TIDY_NOT_STAGED,
   TIDY_REVISION_REFUSAL,
@@ -286,10 +287,12 @@ export interface TidyPostDeps {
   };
   /** The channel's member ids — who may answer a card — or null when Slack would not say. */
   members(): Promise<string[] | null>;
+  /** The week's cards that did not show on an earlier morning's message. */
+  waiting: Store<TidyHanded | null>;
   /** The morning run's hand-off; absent on a rehearsal. */
   handOff?: SectionHandOff<TidyHanded>;
   channel: string;
-  /** The Monday, `YYYY-MM-DD`. */
+  /** The morning's date: the Monday, on the week's own run. */
   runDate: string;
   now(): number;
 }
@@ -320,6 +323,9 @@ export interface TidyHanded {
   confirmers: string[];
   /** Items fixed since last week, when this week is the all-clear. */
   allClear?: number;
+  /** The Monday whose week these are, on a later morning carrying the cards
+   *  an earlier message had no room for. */
+  carriedFrom?: string;
 }
 
 /** The section's name on the sweep's morning post. */
@@ -328,15 +334,18 @@ export const TIDY_SECTION = "figma-tidy";
 /**
  * The week's hand-over: the checks, then what is new handed to the sweep's
  * morning message in the Figma Review channel, as a section of it. It posts
- * nothing of its own.
+ * nothing of its own. On a morning with no listing of its own, the week's
+ * cards an earlier message had no room for are handed over instead.
  *
  * @param deps - The listing, the memory, the Roadmap, the members and the hand-off
  * @param opts - `dryRun` reads and drafts, and hands over and keeps nothing
  */
 export async function runTidyPost(deps: TidyPostDeps, opts: { dryRun?: boolean } = {}): Promise<TidyPostResult> {
   const listing = await deps.listing.read();
-  if (!listing || listing.runDate !== deps.runDate) return { posted: false, summary: "no listing for this week" };
+  if (!listing || listing.runDate !== deps.runDate) return handOverWaiting(deps, opts);
   if (listing.tasks.length) return { posted: false, summary: `the listing stopped short (${listing.tasks.length} left) — no report this week` };
+  // A new week: what an earlier week left waiting is replaced by its own.
+  if (!opts.dryRun) await deps.waiting.write(null);
 
   const refs = Object.fromEntries(Object.entries((await deps.refs.read()) ?? {}).map(([key, r]) => [key, r.cards]));
   const numbers = cardsNamed(listing.files, listing.folders, refs);
@@ -389,8 +398,20 @@ export async function runTidyPost(deps: TidyPostDeps, opts: { dryRun?: boolean }
   return { posted: false, summary: `handed ${counted} to the morning post` };
 }
 
+/** A later morning's hand-over: the week's cards that did not show yet. */
+async function handOverWaiting(deps: TidyPostDeps, opts: { dryRun?: boolean }): Promise<TidyPostResult> {
+  const waiting = await deps.waiting.read();
+  if (!waiting?.shown.length) return { posted: false, summary: "no listing for this week" };
+  const counted = `${waiting.shown.length} card(s) still waiting from the week`;
+  if (opts.dryRun || !deps.handOff) return { posted: false, summary: `would hand ${counted} to the morning post` };
+  await deps.handOff.put(deps.runDate, { channel: deps.channel, threadTs: null }, waiting);
+  return { posted: false, summary: `handed ${counted} to the morning post` };
+}
+
 export interface TidySectionDeps {
   memory: Store<TidyMemory | null>;
+  /** Where the week's cards that did not show wait for the next morning. */
+  waiting: Store<TidyHanded | null>;
   /** Edit the morning's message in place. */
   edit(ts: string, message: ReportMessage): Promise<void>;
   reports: ReportStore;
@@ -404,8 +425,9 @@ export interface TidySectionDeps {
  * the week, a bullet per owner (the files with no owner the Roadmap names
  * last), then a card per finding, sharing the carousel's ten. Each card shown
  * is its own proposal, answered in its Review pop-up with "Moved it" or
- * "Leave as is", and remembered; one that did not show is new again next
- * week. The all-clear is a section of one line and no card.
+ * "Leave as is", and remembered; one that did not show, or did not stage,
+ * waits for the next morning's message, until the next Monday's week
+ * replaces it. The all-clear is a section of one line and no card.
  *
  * @param deps - The memory, the edit and the staging
  * @param handOff - The morning run's hand-off
@@ -417,40 +439,59 @@ export function tidySection(deps: TidySectionDeps, handOff: SectionHandOff<TidyH
     date,
     handOff,
     cardsOf(value) {
-      if (value.allClear !== undefined) return { cards: [], lines: [allClearText(value.allClear)], cost: { subrequests: 0, d1Queries: 1 }, says: () => "" };
+      if (value.allClear !== undefined) return { cards: [], lines: [allClearText(value.allClear)], cost: () => ({ subrequests: 2, d1Queries: 0 }), says: () => "" };
       return {
         cards: value.shown.map((s) => ({ person: s.finding.owner, item: tidyItem(s.finding, s.likely, s.ownerName) })),
         ttlMs: TIDY_CARD_TTL_MS,
-        lines: [tidyParent(date, value.fresh, value.stillOpen)],
-        // The edit, when a card did not stage.
-        cost: { subrequests: 1, d1Queries: value.shown.length * 3 + 1 },
+        lines: [value.carriedFrom ? tidyCarriedParent(value.carriedFrom, value.shown.length) : tidyParent(date, value.fresh, value.stillOpen)],
+        // The memory and the waiting cards, an edit when a card did not
+        // stage, and each card that shows, a staging.
+        cost: (shown) => ({ subrequests: 5, d1Queries: shown.length * 3 + 1 }),
         says: (ids, person) => ownerLine(person, ids.length, ids.length),
       };
     },
-    async posted(value, place, shown, report) {
+    async posted(value, place, shown, report, progress) {
       const memory = remembered(await deps.memory.read(), date);
       if (value.allClear !== undefined) {
         await deps.memory.write({ ...memory, open: 0 });
         return;
       }
       await deps.markThread(report.ts).catch((err: unknown) => rethrowIfBudget(err));
-      const next: TidyMemory = { shown: { ...memory.shown }, open: value.open };
+      const next: TidyMemory = { shown: { ...memory.shown }, open: value.carriedFrom ? memory.open : value.open };
       const failed: string[] = [];
+      const rest: Shown[] = [];
       for (const s of value.shown) {
         const id = tidyItem(s.finding, s.likely).id;
-        if (!shown.includes(id)) continue;
-        try {
-          await deps.stage(stagedFinding(place.channel, report.ts, s, value.confirmers));
-          next.shown[s.finding.fingerprint] = date;
-        } catch (err) {
-          rethrowIfBudget(err);
+        if (!shown.includes(id)) {
+          rest.push(s);
+          continue;
+        }
+        let staged = progress.done.get(id);
+        if (staged === undefined) {
+          try {
+            await deps.stage(stagedFinding(place.channel, report.ts, s, value.confirmers));
+            staged = true;
+          } catch (err) {
+            rethrowIfBudget(err);
+            staged = false;
+          }
+          await progress.mark(id, staged);
+        }
+        if (staged) next.shown[s.finding.fingerprint] = date;
+        else {
           failed.push(id);
+          rest.push(s);
         }
       }
       await deps.memory.write(next);
+      // What did not show, or did not stage, comes on the next morning's message.
+      await deps.waiting.write(rest.length ? { ...value, shown: rest, carriedFrom: value.carriedFrom ?? date } : null);
       if (!failed.length) return;
-      const marked = await markNotStaged(deps.reports, report.ts, failed, TIDY_NOT_STAGED).catch(() => null);
-      if (marked) await deps.edit(report.ts, marked).catch(() => {});
+      const marked = await markNotStaged(deps.reports, report.ts, failed, TIDY_NOT_STAGED).catch((err: unknown) => {
+        rethrowIfBudget(err);
+        return null;
+      });
+      if (marked) await deps.edit(report.ts, marked).catch(rethrowIfBudget);
     },
     async notPosted(_value, _place, why) {
       // Nothing shown is remembered: next week's finds it new again.

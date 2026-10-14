@@ -20,7 +20,7 @@ import { runSweepJob, type SweepSource } from "../src/sweep/index";
 import type { ScheduledJob } from "../src/scheduled/runs";
 import { isWithheldRepoPath } from "../src/integrations/repo-read-guard";
 import { COMMENTS_CURSOR, etDatesOf, quoteOf, readCommentsCursor, writeCommentsCursor } from "../src/figma-comments/read";
-import { DECISION_CARD_TTL_MS, figmaDecisionsSection } from "../src/figma-comments/post";
+import { DECISION_CARD_TTL_MS, figmaDecisionsSection, MAX_NO_PRD_REPLIES } from "../src/figma-comments/post";
 import { candidateThreads, readable } from "../src/figma-comments/threads";
 import { dividerSection, pageOf, pagesOf } from "../src/figma-comments/sections";
 import { cardNumbersOf } from "../src/figma-comments/title";
@@ -683,6 +683,26 @@ describe("the morning's decisions on the sweep's message in #plus-design (#900)"
     const second = h.posted.at(-1)!;
     assert.notEqual(second.ts, first!.ts);
     assert.deepEqual((second.blocks as Array<{ elements?: Card[] }>)[1]!.elements!.map((c) => c.title.text), ["1 · Decision 11", "2 · Decision 12"]);
+    assert.equal(h.figma.queue.size, 0);
+  });
+
+  it("replies about at most MAX_NO_PRD_REPLIES decisions with no PRD a morning, and keeps the rest queued", async () => {
+    const seven = Array.from({ length: MAX_NO_PRD_REPLIES + 2 }, (_, i) =>
+      comment(`p${i + 1}`, { created_at: `2026-09-29T16:${String(10 + i).padStart(2, "0")}:00Z`, message: `Behaviour ${i + 1}`, client_meta: pin("4:2") }),
+    );
+    const figma = createInMemoryFigma();
+    figma.seedFile(FILE, { name: "Goal Setting / Card 2482 / Sarah", document: DOCUMENT, comments: seven });
+    const reply = JSON.stringify({ decisions: seven.map((c, i) => ({ thread_id: c.id, route: "prd", decision: `Behaviour ${i + 1}.`, confidence: 0.9 })) });
+    const { h } = await nightHarness({ figma, sources: [{ ...CARD, subpages: [] }, PRD], replies: [reply] });
+    await runSweepJob(NIGHT, h.deps);
+    h.clock.now = at(30, 13);
+    await morning(h);
+    assert.equal(h.figma.messages.length, MAX_NO_PRD_REPLIES);
+    assert.deepEqual(h.figma.queue.get(FILE)?.decisions.map((d) => d.commentId), ["p6", "p7"], "the rest wait for the next morning");
+
+    h.clock.now = at(31, 13);
+    await morning(h);
+    assert.equal(h.figma.messages.length, MAX_NO_PRD_REPLIES + 2);
     assert.equal(h.figma.queue.size, 0);
   });
 

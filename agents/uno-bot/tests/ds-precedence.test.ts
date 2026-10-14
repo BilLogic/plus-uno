@@ -667,23 +667,28 @@ describe("the morning post", () => {
     assert.match(String(staged[0]!.operations![0]!.input.section), /xs/);
   });
 
-  it("never splits over two messages: past ten it shows ten, says so, and the rest come with next week's check", async () => {
+  it("past ten it shows ten, says so, and the rest wait in the report for the next morning", async () => {
     const { morning, posts, staged, reportBox } = postDeps(reportOf(12));
     await morning();
     assert.equal(posts.length, 1);
     assert.equal(cardsIn(posts[0]!.blocks).length, 10);
-    assert.match(JSON.stringify(posts[0]!.blocks[0]), /disagree on 12 components\..*Showing 10 of 12\./);
+    assert.match(JSON.stringify(posts[0]!.blocks[0]), /disagree on 12 components\..*Showing 10 of 12; the rest come in the next report\./);
     assert.equal(staged.length, 10);
-    assert.equal(reportBox.box.value, null, "nothing held for a second message");
+    assert.deepEqual(
+      reportBox.box.value!.items.map((i) => i.component),
+      ["Component11", "Component12"],
+      "the two that did not show wait for the next morning",
+    );
   });
 
   it("a card that does not stage says so with nothing to review", async () => {
-    const { morning, deps, edits } = postDeps(await weekReport());
+    const { morning, deps, edits, reportBox } = postDeps(await weekReport());
     const stage = deps.stage;
     deps.stage = async (p) => (p.item?.id === "ds-TreeSelect" ? Promise.reject(new Error("DO down")) : stage(p));
     await morning();
     assert.equal(edits.length, 1);
     assert.equal(edits[0]!.ts, MSG);
+    assert.deepEqual(reportBox.box.value!.items.map((i) => i.component), ["TreeSelect"], "it waits for the next morning");
     const [, tree] = cardsIn(edits[0]!.message.blocks!);
     assert.equal(tree!.subtitle!.text, NOT_STAGED);
     assert.deepEqual(tree!.actions.map((a) => a.text.text), ["Code", "Figma"], "no Review");

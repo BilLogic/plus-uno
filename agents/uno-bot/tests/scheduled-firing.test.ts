@@ -162,6 +162,8 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
     // A live drift question is looked at again before the morning asks anew.
     ["figma-drift-recheck", "figma-drift-recheck"],
     ["figma-drift-post", "figma-drift-post"],
+    // The week's tidy-up cards an earlier message had no room for.
+    ["figma-tidy-post", "figma-tidy-post"],
     ["sweep-post", "sweep-post"],
     ["team-roles-sync", "team-roles-sync"],
     // Both runs purge, so text never outlives its 14 days over a weekend.

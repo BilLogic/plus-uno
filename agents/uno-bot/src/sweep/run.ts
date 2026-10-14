@@ -1263,13 +1263,15 @@ function takeHanded(handed: Handed[], to: SectionPlace): Handed[] {
   return here;
 }
 
-/** What a place's sections spend once their message is up. */
-function sectionsCost(handed: readonly Handed[]): { subrequests: number; d1Queries: number } {
+/** What a place's sections spend once their message is up: only the cards
+ *  it shows, by section, never what waits for a later morning. */
+function sectionsCost(handed: readonly Handed[], shown: Readonly<Record<string, readonly string[]>>): { subrequests: number; d1Queries: number } {
   return handed.reduce(
-    (sum, h) => ({
-      subrequests: sum.subrequests + (h.place.cost?.subrequests ?? 0),
-      d1Queries: sum.d1Queries + (h.place.cost?.d1Queries ?? h.place.cards.length * SECTION_CARD_D1_QUERIES),
-    }),
+    (sum, h) => {
+      const ids = shown[h.section.source] ?? [];
+      const cost = h.place.cost?.(ids) ?? { subrequests: 0, d1Queries: ids.length * SECTION_CARD_D1_QUERIES };
+      return { subrequests: sum.subrequests + cost.subrequests, d1Queries: sum.d1Queries + cost.d1Queries };
+    },
     { subrequests: 0, d1Queries: 0 },
   );
 }
@@ -1313,7 +1315,7 @@ async function postCard(
   const links = plan.items.filter((f) => f.evidence.messageTs[0]).length;
   const affordable = Math.min(links, MAX_PERMALINKS - ctx.permalinks);
   if (!deps.dryRun) {
-    const theirs = sectionsCost(handed);
+    const theirs = sectionsCost(handed, shared?.shown ?? {});
     ensureHeadroom(deps, {
       subrequests: affordable + posts + CARD_COST.reserveSubrequests + theirs.subrequests,
       d1Queries: CARD_COST.d1Queries + theirs.d1Queries,
@@ -1348,7 +1350,7 @@ async function postCard(
   const digest = operationsDigest(plan.operations);
   await deps.store.saveCard({ key: plan.key, destination: plan.destination, items: plan.items, digest, ...(shared ? { sections: shared.shown } : {}) });
   // Claimed before the post: a retry finds them by the card's key.
-  for (const h of handed) await h.section.claim(h.place, plan.key);
+  for (const h of handed) await h.section.claim(h.place, plan.key, shared?.shown[h.section.source] ?? []);
   await deps.store.addItems(plan.items.map((f) => itemRecord(f, plan, now)));
   const tag = { cardKey: plan.key, digest };
   let sent = await deps.delivery.post(to, { text: report.text, blocks: report.blocks }, tag);
@@ -1416,9 +1418,9 @@ async function postSectionsAlone(ctx: MorningCtx, handed: readonly Handed[], pos
     return;
   }
   const built = sectionsReport(handed, to.channel);
-  const theirs = sectionsCost(handed);
+  const theirs = sectionsCost(handed, built.shown);
   ensureHeadroom(deps, { subrequests: ALONE_SUBREQUESTS + theirs.subrequests, d1Queries: theirs.d1Queries });
-  for (const h of handed) await h.section.claim(h.place, cardKey);
+  for (const h of handed) await h.section.claim(h.place, cardKey, built.shown[h.section.source] ?? []);
   const tag = { cardKey, digest: "" };
   let sent = await deps.delivery.post(to, { text: built.report.text, blocks: built.report.blocks }, tag);
   const plain = !sent.ok && sent.refusedBlocks === true;
@@ -1486,9 +1488,11 @@ export const SECTIONS_WITHDRAWN_TEXT = "This morning's report didn't go through,
 
 /**
  * Messages of sections alone that an earlier try claimed and never finished
- * — a stop between the claim and the staging. Each is looked for by its tag:
- * found, it is finished as it posted; surely not there, its sections are
- * given back to wait; not known, they stay claimed for the next try.
+ * — a stop between the claim and the end of the staging. Each is looked for
+ * by its tag: found, it is rebuilt from the cards it showed and finished,
+ * each section carrying on from the cards it marked; surely not there, its
+ * sections are given back to wait; not known, they stay claimed for the next
+ * try. Counted whole first — the look, and what its sections still spend.
  */
 async function finishStranded(ctx: MorningCtx, postDate: string): Promise<void> {
   const { deps, notes } = ctx;
@@ -1499,7 +1503,10 @@ async function finishStranded(ctx: MorningCtx, postDate: string): Promise<void> 
   for (const [cardKey, handed] of groupBy(stranded, (h) => h.cardKey)) {
     const first = handed[0]!.place;
     const to: SectionPlace = { channel: first.channel, threadTs: first.threadTs };
-    ensureHeadroom(deps, { subrequests: FIND_POSTED_PAGES + ALONE_SUBREQUESTS, d1Queries: sectionsCost(handed).d1Queries });
+    // Rebuilt as it posted: what it shows is what its sections still stage.
+    const built = sectionsReport(handed, to.channel);
+    const theirs = sectionsCost(handed, built.shown);
+    ensureHeadroom(deps, { subrequests: FIND_POSTED_PAGES + ALONE_SUBREQUESTS + theirs.subrequests, d1Queries: theirs.d1Queries });
     const found = await deps.delivery.findPosted(to, cardKey, tsOf(Date.parse(`${postDate}T00:00:00Z`)));
     if (found.state === "unknown") {
       notes.push(`${cardKey}: could not tell whether it went up (${found.why}) — held for the next try`);
@@ -1510,7 +1517,7 @@ async function finishStranded(ctx: MorningCtx, postDate: string): Promise<void> 
       continue;
     }
     notes.push(`${cardKey}: finished a report an earlier try posted`);
-    await finishAlone(ctx, handed, to, cardKey, { ts: found.ts, text: found.text, plain: found.plain === true }, sectionsReport(handed, to.channel));
+    await finishAlone(ctx, handed, to, cardKey, { ts: found.ts, text: found.text, plain: found.plain === true }, built);
   }
 }
 
@@ -1625,7 +1632,7 @@ function composeReport(
     if (theirs.length) {
       const here = theirs.filter((e) => shown.has(e)).length;
       const line = h.place.says(theirs.map((e) => e.card.item.id), null);
-      ownerLines.push({ owner: null, says: here < theirs.length ? `${line} Showing ${here} of ${theirs.length}.` : line });
+      ownerLines.push({ owner: null, says: here < theirs.length ? `${line} Showing ${here} of ${theirs.length}; the rest come in the next report.` : line });
     }
     for (const line of h.place.lines ?? []) ownerLines.push({ owner: null, says: line });
   });

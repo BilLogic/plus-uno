@@ -1083,7 +1083,7 @@ test("a place the sweep has nothing for gets its sections alone, on one message"
   assert.deepEqual(report.calls, [`claim ${post!.cardKey}`, `posted weekly:0,weekly:1 on ${post!.ts}`]);
 });
 
-test("a whole section goes first and is never split; past the ten it says how many show", async () => {
+test("a whole section goes first; past the ten it says how many show, and the rest wait", async () => {
   const h = await fixAt({ channel: DESIGN, channelKind: "public" });
   const report = handedOff({ ...weekly(DESIGN, 12), lines: [] });
   h.deps.sections = [report.port];
@@ -1092,7 +1092,7 @@ test("a whole section goes first and is never split; past the ten it says how ma
   assert.equal(h.posted.length, 1);
   // Nine of the report's, one slot kept for the fix.
   assert.equal(report.calls.at(-1), `posted ${Array.from({ length: 9 }, (_, i) => `weekly:${i}`).join(",")} on ${h.posted[0]!.ts}`);
-  assert.match(h.posted[0]!.text, /The weekly check found 12 disagreement\(s\)\. Showing 9 of 12\./);
+  assert.match(h.posted[0]!.text, /The weekly check found 12 disagreement\(s\)\. Showing 9 of 12; the rest come in the next report\./);
   assert.match(h.posted[0]!.text, /<@U0ADE>/, "the fix still has its bullet");
 });
 
@@ -1102,7 +1102,7 @@ test("a section's cards nobody owns share the carousel when not whole", async ()
   h.deps.sections = [report.port];
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 1);
-  assert.match(h.posted[0]!.text, /Showing 10 of 12\./);
+  assert.match(h.posted[0]!.text, /Showing 10 of 12; the rest come in the next report\./);
 });
 
 test("a thread's sections go up in that thread", async () => {
@@ -1142,10 +1142,28 @@ test("sections alone that a stop left unfinished are finished as they posted, ne
 
 test("a section that cannot be afforded defers the morning before anything posts", async () => {
   const h = quietMorning();
-  const report = handedOff({ ...weekly(UNIVERSAL, 1), cost: { subrequests: 5, d1Queries: 0 } });
+  const report = handedOff({ ...weekly(UNIVERSAL, 1), cost: () => ({ subrequests: 5, d1Queries: 0 }) });
   h.deps.sections = [report.port];
   h.headroom.subrequests = 6;
   await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
   assert.equal(h.posted.length, 0);
   assert.deepEqual(report.calls, []);
+});
+
+test("a section is costed by the cards that show this morning, never by its whole queue", async () => {
+  const h = quietMorning();
+  const counted: number[] = [];
+  const report = handedOff({
+    ...weekly(UNIVERSAL, 40),
+    cost: (shown) => {
+      counted.push(shown.length);
+      return { subrequests: shown.length, d1Queries: 0 };
+    },
+  });
+  h.deps.sections = [report.port];
+  // The post, a held-back edit and the ten that show fit; forty would not.
+  h.headroom.subrequests = 12;
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 1);
+  assert.deepEqual(counted, [10]);
 });

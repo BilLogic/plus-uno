@@ -751,13 +751,13 @@ export function driftSection(deps: DriftSectionDeps, handOff: SectionHandOff<Dri
         whole: true,
         ttlMs: DRIFT_CARD_TTL_MS,
         lines: value.cards.length ? lines : [driftParent(value.kinds), ...lines],
-        // An edit when a card did not stage; the stagings, marks and records
-        // are internal.
-        cost: { subrequests: 1, d1Queries: value.cards.length * 3 + 2 },
+        // An edit when a card did not stage; each card that shows, a staging;
+        // the marks and records are internal.
+        cost: (shown) => ({ subrequests: 1, d1Queries: shown.length * 3 + 2 }),
         says: (ids) => driftParent(value.cards.filter((c) => ids.includes(c.id)).map((c) => c.here.target.kind)),
       };
     },
-    async posted(value, place, shown, report) {
+    async posted(value, place, shown, report, progress) {
       const ts = report.ts;
       const root = place.threadTs ?? ts;
       const now = deps.now();
@@ -768,13 +768,20 @@ export function driftSection(deps: DriftSectionDeps, handOff: SectionHandOff<Dri
           await deps.store.clearIntakeMark(c.group);
           continue;
         }
+        const before = progress.done.get(c.id);
+        if (before !== undefined) {
+          (before ? staged : failed).push(c);
+          continue;
+        }
         try {
           await deps.stage(cardProposal(place.channel, root, ts, c), value.channelKind);
           staged.push(c);
+          await progress.mark(c.id, true);
         } catch (err) {
           rethrowIfBudget(err);
           console.error(`[figma-drift] ${place.channel}:${root} card ${c.id} posted but not staged: ${err instanceof Error ? err.message : String(err)}`);
           failed.push(c);
+          await progress.mark(c.id, false);
         }
       }
       for (const c of failed) await deps.store.clearIntakeMark(c.group);

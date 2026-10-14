@@ -5,7 +5,7 @@
 
 import type { Env } from "../types";
 import { charge } from "../net";
-import type { TidyListing, TidyMemory, TidyRefs, TidySkips } from "./run";
+import type { TidyHanded, TidyListing, TidyMemory, TidyRefs, TidySkips } from "./run";
 
 const DAY_S = 24 * 60 * 60;
 /** What outlives a quiet stretch — what a file's pages named, what was left
@@ -18,6 +18,7 @@ export interface TidyStored {
   memory: TidyMemory;
   refs: TidyRefs;
   skips: TidySkips;
+  waiting: TidyHanded;
 }
 
 const STORES: Record<keyof TidyStored, { key: string; ttlS: number }> = {
@@ -27,6 +28,9 @@ const STORES: Record<keyof TidyStored, { key: string; ttlS: number }> = {
   memory: { key: "figma-tidy:memory", ttlS: 6 * 7 * DAY_S },
   refs: { key: "figma-tidy:refs", ttlS: KEPT_TTL_S },
   skips: { key: "figma-tidy:skips", ttlS: KEPT_TTL_S },
+  /** The week's cards that did not show, for the next morning's message:
+   *  gone by the next Monday's, which hands over a week of its own. */
+  waiting: { key: "figma-tidy:waiting", ttlS: 7 * DAY_S },
 };
 
 /**

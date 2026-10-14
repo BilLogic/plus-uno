@@ -21,7 +21,8 @@
 //     Review's Needs changes (`./revise.ts`) instead of letting it stage a
 //     near-copy beside the card.
 // A PRD decision with no PRD to write to has a line in the opener and a plain
-// reply in the message's thread saying so, with no card. The message's thread
+// reply in the message's thread saying so, with no card — at most
+// `MAX_NO_PRD_REPLIES` a morning; the rest stay queued for the next. The message's thread
 // record — each number's proposal, and its file — is kept so a revision can
 // find it.
 //
@@ -53,6 +54,9 @@ export const DECISION_CARD_TTL_MS = 72 * 60 * 60 * 1000;
 export const NOT_STAGED = "Didn't go through, so it's queued again for tomorrow morning.";
 /** The section's name on the sweep's morning post. */
 export const FIGMA_DECISIONS_SECTION = "figma-decisions";
+/** How many no-PRD replies one morning's message makes in its thread: each
+ *  is a Slack post, so the rest wait in their file's queue entry. */
+export const MAX_NO_PRD_REPLIES = 5;
 
 /** One file's decisions, as the hand-over leaves them for the morning's message. */
 export interface HandedFile extends DecisionFile {
@@ -106,6 +110,7 @@ export async function postFigmaDecisions(job: ScheduledJob, deps: SweepDeps): Pr
   if (!queued.length) return finish("handled", null);
 
   let members: string[] | null | undefined;
+  let replies = MAX_NO_PRD_REPLIES;
   const files: HandedFile[] = [];
   for (const file of queued) {
     const waiting: QueuedDecision[] = [];
@@ -124,7 +129,10 @@ export async function postFigmaDecisions(job: ScheduledJob, deps: SweepDeps): Pr
       confirmers = members;
     }
     const cardable = waiting.filter((d) => operationsOf(d).length);
-    const told = waiting.filter((d) => !operationsOf(d).length);
+    // Past the morning's replies, a no-PRD decision waits in the queue.
+    const told = waiting.filter((d) => !operationsOf(d).length).slice(0, replies);
+    replies -= told.length;
+    if (!cardable.length && !told.length) continue;
     files.push({ fileKey: file.fileKey, title: file.title, url: file.url, owner: file.owner, confirmers, cardable, told });
     handed.push({ ...file, decisions: waiting });
     cards += cardable.length;
@@ -171,8 +179,9 @@ export function figmaDecisionsSection(fc: SweepFigmaComments, date: string, now:
         cards: all.map(({ n, file, d }) => ({ person: null, item: decisionItem(n, d, commentUrl(file.fileKey, d.nodeId, d.commentId), file.owner) })),
         ttlMs: DECISION_CARD_TTL_MS,
         ...(told.length ? { lines: told } : {}),
-        // Each told decision's reply, and an edit when a card did not stage.
-        cost: { subrequests: value.files.reduce((sum, f) => sum + f.told.length, 0) + 1, d1Queries: all.length * 3 },
+        // Each told decision's reply, an edit when a card did not stage, and
+        // each card that shows, a staging.
+        cost: (shown) => ({ subrequests: value.files.reduce((sum, f) => sum + f.told.length, 0) + 1, d1Queries: shown.length * 3 }),
         says(ids, person) {
           return value.files
             .flatMap((file) => {
@@ -185,7 +194,7 @@ export function figmaDecisionsSection(fc: SweepFigmaComments, date: string, now:
         },
       };
     },
-    async posted(value, place, shown, report) {
+    async posted(value, place, shown, report, progress) {
       const ts = report.ts;
       const all = numbered(value);
       const showing = all.filter((e) => shown.includes(e.d.commentId));
@@ -206,14 +215,21 @@ export function figmaDecisionsSection(fc: SweepFigmaComments, date: string, now:
       for (const { n, file, d } of showing) {
         const at = { channel: place.channel, ts };
         const asFile: DecisionFile = { fileKey: file.fileKey, title: file.title, confirmers: file.confirmers };
-        try {
-          await slack.stage(stagedDecision(at, asFile, { messageTs: ts, id: d.commentId }, n, d, DECISION_CARD_TTL_MS));
-        } catch (err) {
-          rethrowIfBudget(err);
-          console.error(`[figma-comments] decision ${d.commentId} posted but not staged: ${err instanceof Error ? err.message : String(err)}`);
-          failed.push(d.commentId);
-          continue;
+        const before = progress.done.get(d.commentId);
+        if (before === false) failed.push(d.commentId);
+        if (before === undefined) {
+          try {
+            await slack.stage(stagedDecision(at, asFile, { messageTs: ts, id: d.commentId }, n, d, DECISION_CARD_TTL_MS));
+          } catch (err) {
+            rethrowIfBudget(err);
+            console.error(`[figma-comments] decision ${d.commentId} posted but not staged: ${err instanceof Error ? err.message : String(err)}`);
+            failed.push(d.commentId);
+            await progress.mark(d.commentId, false);
+            continue;
+          }
+          await progress.mark(d.commentId, true);
         }
+        if (before === false) continue;
         thread.decisions.push({ n, commentId: d.commentId, proposalKey: itemProposal(ts, d.commentId).proposalTs, decision: d, file: asFile });
         done.add(d.commentId);
         // At once, so a stop after this never cards it again, and a reply
@@ -227,8 +243,12 @@ export function figmaDecisionsSection(fc: SweepFigmaComments, date: string, now:
       }
       for (const file of value.files) {
         for (const d of file.told) {
-          const sent = await slack.post({ text: noPrdNote(d, commentUrl(file.fileKey, d.nodeId, d.commentId)), thread_ts: ts });
-          if (!sent.ok) continue;
+          const before = progress.done.get(d.commentId);
+          if (before === undefined) {
+            const sent = await slack.post({ text: noPrdNote(d, commentUrl(file.fileKey, d.nodeId, d.commentId)), thread_ts: ts });
+            await progress.mark(d.commentId, sent.ok);
+            if (!sent.ok) continue;
+          } else if (!before) continue;
           done.add(d.commentId);
           await fc.carded.add([d.commentId]);
         }

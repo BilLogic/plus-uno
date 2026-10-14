@@ -122,6 +122,7 @@ export async function runTidyPostOnEnv(env: Env, ctx: JobContext): Promise<TidyP
       memory: tidyStore(env, "memory"),
       refs: tidyStore(env, "refs"),
       skips: tidyStore(env, "skips"),
+      waiting: tidyStore(env, "waiting"),
       roadmap: {
         async cards(numbers) {
           const rows = await queryRoadmapByNumbers(env, numbers);
@@ -182,6 +183,7 @@ export function tidySectionFor(env: Env, ctx: JobContext): SweepSection | undefi
   return tidySection(
     {
       memory: tidyStore(env, "memory"),
+      waiting: tidyStore(env, "waiting"),
       async edit(ts, message) {
         // The message's own tag, kept: it is the sweep's.
         await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks, ...(message.metadata ? { metadata: message.metadata } : {}) });

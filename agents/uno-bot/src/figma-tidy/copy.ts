@@ -37,6 +37,17 @@ export function tidyParent(runDate: string, fresh: number, stillOpen: number): s
 }
 
 /**
+ * The parent line on a later morning, for the week's cards that did not fit
+ * on an earlier message.
+ *
+ * @param week - The Monday the week's tidy-up ran
+ * @param waiting - The cards still to show
+ */
+export function tidyCarriedParent(week: string, waiting: number): string {
+  return `More from the Figma tidy-up for the week of ${shortDate(week)}: ${plural(waiting, "item", "items")} that did not fit before.`;
+}
+
+/**
  * One owner's bullet in the week's reply: how many of their files need a
  * tidy, and how many wait past the cards shown. The shared card opens it on
  * the owner, mentioned once (`decisionReport`'s `ownerLines`).
@@ -47,8 +58,8 @@ export function tidyParent(runDate: string, fresh: number, stillOpen: number): s
  */
 export function ownerLine(owner: string | null, total: number, shown: number): string {
   let more = "";
-  if (shown === 0) more = ": they come next week";
-  else if (shown < total) more = `: here ${shown === 1 ? "is" : "are"} ${shown}, and ${total - shown} more next week`;
+  if (shown === 0) more = ": they come in the next report";
+  else if (shown < total) more = `: here ${shown === 1 ? "is" : "are"} ${shown}, and ${total - shown} more in the next report`;
   if (!owner) {
     const files = plural(total, "file has", "files have");
     return `${files} no owner I could find${more}.`;
@@ -158,4 +169,4 @@ export function allClearText(fixed: number): string {
 }
 
 /** A card that showed and did not stage says this in its place. */
-export const TIDY_NOT_STAGED = "Didn't go through, so it comes back next week.";
+export const TIDY_NOT_STAGED = "Didn't go through, so it comes back in tomorrow's report.";

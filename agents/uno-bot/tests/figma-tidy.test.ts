@@ -124,6 +124,7 @@ function postWorld(opts: {
   memory?: TidyMemory | null;
   refs?: TidyRefs | null;
   skips?: TidySkips | null;
+  waiting?: TidyHanded | null;
   store?: ThreadState;
   runDate?: string;
   now?: number;
@@ -135,6 +136,7 @@ function postWorld(opts: {
   const list = box<TidyListing | null>(listing(opts.files));
   const refs = box<TidyRefs | null>(opts.refs ?? null);
   const skips = box<TidySkips | null>(opts.skips ?? null);
+  const waiting = box<TidyHanded | null>(opts.waiting ?? null);
   const runDate = opts.runDate ?? RUN_DATE;
   const handOff = sectionHandOffIn<TidyHanded>(memoryRunStorage(), TIDY_SECTION);
   const deps: TidyPostDeps = {
@@ -142,6 +144,7 @@ function postWorld(opts: {
     memory: memory.store,
     refs: refs.store,
     skips: skips.store,
+    waiting: waiting.store,
     roadmap: {
       cards: async (numbers) => (opts.cards ?? []).filter((c) => numbers.includes(c.number)),
       likely: async (project) => opts.likely?.[project] ?? null,
@@ -161,6 +164,7 @@ function postWorld(opts: {
   const section = tidySection(
     {
       memory: memory.store,
+      waiting: waiting.store,
       edit: async () => {},
       reports: store,
       stage: (p) => hooks.stage(p),
@@ -178,7 +182,7 @@ function postWorld(opts: {
     if (!o.dryRun) await runSweepJob({ key: "sweep-post", kind: "sweep-post" }, h.deps);
     return result;
   };
-  return { deps, run, hooks, posts, staged, memory, list, store, marked, skips };
+  return { deps, run, hooks, posts, staged, memory, list, store, marked, skips, waiting };
 }
 
 type Card = {
@@ -477,11 +481,29 @@ describe("the post", () => {
       [...sarah.slice(0, 4).map((s) => s.f.name), ...meryem.slice(0, 4).map((s) => s.f.name), "Loose file", "Other loose"],
     );
     assert.equal(Object.keys(w.memory.b.value!.shown).length, 10, "an item that did not show is not remembered");
+    assert.equal(w.waiting.b.value!.shown.length, 5, "what did not show waits for the next morning");
+
+    // Tuesday: no listing of its own, so the week's five that had no room go up.
+    const tuesday = postWorld({ files: [], memory: w.memory.b.value, waiting: w.waiting.b.value, runDate: "2026-10-13" });
+    await tuesday.run();
+    assert.equal(
+      opener(tuesday.posts[0]!),
+      [
+        "• <@U0SARAH>, 4 files need a tidy.",
+        "• <@U0MERYEM>, 1 file needs a tidy.",
+        "• More from the Figma tidy-up for the week of Oct 12: 5 items that did not fit before.",
+      ].join("\n"),
+    );
+    assert.equal(cardsIn(tuesday.posts[0]!.blocks).length, 5);
+    assert.equal(Object.keys(tuesday.memory.b.value!.shown).length, 15);
+    assert.equal(tuesday.waiting.b.value, null, "nothing left waiting");
 
     const next = postWorld({ files: w.list.b.value!.files, cards: [...sarah, ...meryem].map((s) => s.c), memory: w.memory.b.value, runDate: "2026-10-19" });
     next.list.b.value!.runDate = "2026-10-19";
+    next.waiting.b.value = w.waiting.b.value;
     await next.run();
     assert.equal(opener(next.posts[0]!), "• <@U0SARAH>, 4 files need a tidy.\n• <@U0MERYEM>, 1 file needs a tidy.\n• Figma tidy-up for the week of Oct 19: 5 new items, and 10 still open from earlier weeks.");
+    assert.equal(next.waiting.b.value, null, "a new week replaces what an earlier one left waiting");
   });
 
   it("every owner gets a card before anyone gets a second", async () => {
@@ -602,11 +624,12 @@ describe("the post", () => {
     assert.equal(dry.memory.b.writes, 0);
   });
 
-  it("a card that does not stage is not remembered, so it comes back next week", async () => {
+  it("a card that does not stage is not remembered, and waits for the next morning", async () => {
     const w = postWorld({ files: [file("u-wip", "F1", "AI Indicator / Card 733 / Sarah")], cards: [card(733, "Shipped", "U0SARAH")] });
     w.hooks.stage = async () => Promise.reject(new Error("DO down"));
     await w.run();
     assert.deepEqual(w.memory.b.value!.shown, {});
+    assert.deepEqual(w.waiting.b.value!.shown.map((x) => x.finding.file.key), ["F1"]);
   });
 });
 
@@ -836,14 +859,14 @@ describe("the read", () => {
     }
   });
 
-  it("is planned in Monday's morning run only, the post after every read", () => {
+  it("reads on Monday's morning run only, and hands over every morning, after every read", () => {
     const reads = Array.from({ length: TIDY_JOBS }, (_, i) => `figma-tidy-read-${i + 1}`);
     const monday = planRun("morning", Date.parse("2026-10-12T13:00:00Z"));
     const tidy = monday.jobs.filter((j) => j.kind === "figma-tidy-read" || j.kind === "figma-tidy-post");
     assert.deepEqual(tidy.map((j) => j.key), [...reads, "figma-tidy-post"]);
     assert.deepEqual(tidy.at(-1)!.after, reads);
     const tuesday = planRun("morning", Date.parse("2026-10-13T13:00:00Z"));
-    assert.equal(tuesday.jobs.some((j) => j.kind.startsWith("figma-tidy")), false);
+    assert.deepEqual(tuesday.jobs.filter((j) => j.kind.startsWith("figma-tidy")).map((j) => j.key), ["figma-tidy-post"]);
     assert.equal(planRun("end-of-day", Date.parse("2026-10-13T04:00:00Z")).jobs.some((j) => j.kind.startsWith("figma-tidy")), false);
   });
 });

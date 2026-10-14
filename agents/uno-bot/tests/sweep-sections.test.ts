@@ -1,5 +1,6 @@
 // A job's hand-off to the sweep's morning post: kept by place in the run's
-// storage, claimed by a report, cleared before its job stages anything.
+// storage, claimed by a report, and kept, marked card by card, until its job
+// has staged what showed.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -71,9 +72,45 @@ test("a message of sections alone that never finished is stranded until posted",
 
   await s.port.posted(place!, ["a"], { ts: "1.0", text: "" });
   assert.deepEqual(s.calls, ["posted a of a"]);
-  assert.equal(s.storage.map.size, 0, "cleared before it staged");
+  assert.equal(s.storage.map.size, 0, "cleared once it staged");
   // Twice is once.
   await s.port.posted(place!, ["a"], { ts: "1.0", text: "" });
   await s.port.notPosted(place!, "late");
   assert.deepEqual(s.calls, ["posted a of a"]);
+});
+
+test("a stop part-way through staging keeps the place, and the retry carries on from the marks", async () => {
+  const storage = memoryStorage();
+  const handOff = sectionHandOffIn<{ ids: string[] }>(storage, "weekly");
+  const staged: string[] = [];
+  let stopAfter = 1;
+  const port = handedSection({
+    source: "weekly",
+    date: DATE,
+    handOff,
+    cardsOf: (value) => ({
+      cards: value.ids.map((id) => ({ person: null, item: { id, title: id, body: "", open: { label: "Open", url: "https://example.com" } } })),
+      says: (ids) => `${ids.length} found.`,
+    }),
+    posted: async (_value, _place, shown, _report, progress) => {
+      for (const id of shown) {
+        if (progress.done.has(id)) continue;
+        if (stopAfter-- <= 0) throw new Error("subrequest budget");
+        staged.push(id);
+        await progress.mark(id, true);
+      }
+    },
+    notPosted: async () => {},
+  });
+  await handOff.put(DATE, TOP, { ids: ["a", "b", "c"] });
+  const [place] = await port.waiting();
+  await port.claim(place!, aloneKeyOf(DATE, TOP));
+  await assert.rejects(port.posted(place!, ["a", "b"], { ts: "1.0", text: "" }));
+  assert.deepEqual(staged, ["a"]);
+  assert.equal((await port.stranded(DATE)).length, 1, "still claimed, for the retry");
+
+  stopAfter = 9;
+  await port.posted(place!, ["a", "b"], { ts: "1.0", text: "" });
+  assert.deepEqual(staged, ["a", "b"], "a is not staged twice");
+  assert.equal(storage.map.size, 0);
 });

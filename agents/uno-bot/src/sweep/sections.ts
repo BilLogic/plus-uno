@@ -15,7 +15,10 @@
 // with its own confirmers, window and words, and keeps whatever did not show
 // for the next morning. `notPosted` gives a place's cards back to their job.
 // A report claims a place's cards before it posts, so a retried morning finds
-// them by its key and never shows them twice.
+// them by its key and never shows them twice. A place stays in the hand-off,
+// claimed, until its job has staged every card it showed, each card marked as
+// it goes (`SectionProgress`): a budget stop part-way is retried from the
+// mark, and nothing it showed is lost or staged twice.
 //
 // THE HAND-OFF lives in the morning run's own runner storage (`JobContext.
 // runStorage`): one key a job a morning, read and written whole by that exact
@@ -51,9 +54,11 @@ export interface SectionCards extends SectionPlace {
   /** Lines with no card of their own, said under the opener (a pointer to a
    *  card in another thread). */
   lines?: string[];
-  /** What its `posted` spends once the report is up: each card's staging,
-   *  and any line it posts in the thread. */
-  cost?: { subrequests: number; d1Queries: number };
+  /** What its `posted` spends once the report is up, for the cards that
+   *  showed (by item id): each one's staging, and any line it posts in the
+   *  thread. Never the whole queue: only what goes up this morning. Absent,
+   *  each card shown costs a staging's D1 queries. */
+  cost?(shown: readonly string[]): { subrequests: number; d1Queries: number };
   /** What the opener says of a person's cards, or — `person: null` — of the
    *  section's cards nobody owns, by their item ids. */
   says(ids: readonly string[], person: string | null): string;
@@ -65,9 +70,12 @@ export interface SweepSection {
   readonly source: string;
   /** Each place's cards waiting this morning, unclaimed. */
   waiting(): Promise<SectionCards[]>;
-  /** A report takes a place's cards, by its card key, before it posts. */
-  claim(place: SectionCards, cardKey: string): Promise<void>;
-  /** The cards a report claimed, still to stage; null when none. */
+  /** A report takes a place's cards, by its card key, before it posts —
+   *  with the cards it shows, by item id, so a retry rebuilds it as it went
+   *  up. */
+  claim(place: SectionCards, cardKey: string, shown?: readonly string[]): Promise<void>;
+  /** The cards a report claimed — those it showed, when it said — still to
+   *  stage; null when none. */
   claimed(cardKey: string): Promise<SectionCards | null>;
   /** A report that never went up gives its cards back. */
   unclaim(cardKey: string): Promise<void>;
@@ -101,10 +109,24 @@ export function isAloneKey(cardKey: string): boolean {
   return cardKey.slice(10, 20) === ":sections:";
 }
 
-/** One place's handed-off value, and the report that claimed it. */
+/** One place's handed-off value, the report that claimed it, and each card
+ *  its job has already handled once that report went up — `true` staged,
+ *  `false` failed — by item id. */
 export interface StoredPlace<P> extends SectionPlace {
   value: P;
   claimedBy?: string;
+  /** The cards the claiming report shows, by item id. */
+  shown?: string[];
+  done?: Record<string, boolean>;
+}
+
+/** What a section's `posted` has already done for a report, from an earlier
+ *  try a stop cut short, and how it records each card as it goes. */
+export interface SectionProgress {
+  /** Each card handled, by item id: `true` staged, `false` failed. */
+  readonly done: ReadonlyMap<string, boolean>;
+  /** Record a card handled, before the next one starts. */
+  mark(id: string, staged: boolean): Promise<void>;
 }
 
 /** A job's hand-off in the run's storage. */
@@ -113,8 +135,10 @@ export interface SectionHandOff<P> {
   put(date: string, place: SectionPlace, value: P): Promise<void>;
   /** Every place kept for a morning. */
   places(date: string): Promise<Array<StoredPlace<P>>>;
-  claim(date: string, place: SectionPlace, cardKey: string): Promise<void>;
+  claim(date: string, place: SectionPlace, cardKey: string, shown?: readonly string[]): Promise<void>;
   unclaim(date: string, cardKey: string): Promise<void>;
+  /** Record one card of a place handled once its report is up. */
+  mark(date: string, place: SectionPlace, id: string, staged: boolean): Promise<void>;
   /** A place is posted, or given up: it is not kept. */
   clear(date: string, place: SectionPlace): Promise<void>;
 }
@@ -141,18 +165,23 @@ export function sectionHandOffIn<P>(storage: Pick<RunnerStorage, "get" | "put" |
         places.set(placeKeyOf(place), { channel: place.channel, threadTs: place.threadTs, value });
       }),
     places: async (date) => [...(await read(date)).values()],
-    claim: (date, place, cardKey) =>
+    claim: (date, place, cardKey, shown) =>
       change(date, (places) => {
         const kept = places.get(placeKeyOf(place));
-        if (kept) places.set(placeKeyOf(place), { ...kept, claimedBy: cardKey });
+        if (kept) places.set(placeKeyOf(place), { ...kept, claimedBy: cardKey, ...(shown ? { shown: [...shown] } : {}) });
       }),
     unclaim: (date, cardKey) =>
       change(date, (places) => {
         for (const [key, kept] of places) {
           if (kept.claimedBy !== cardKey) continue;
-          const { claimedBy: _claimed, ...rest } = kept;
+          const { claimedBy: _claimed, shown: _shown, done: _done, ...rest } = kept;
           places.set(key, rest);
         }
+      }),
+    mark: (date, place, id, staged) =>
+      change(date, (places) => {
+        const kept = places.get(placeKeyOf(place));
+        if (kept) places.set(placeKeyOf(place), { ...kept, done: { ...kept.done, [id]: staged } });
       }),
     clear: (date, place) =>
       change(date, (places) => {
@@ -169,16 +198,19 @@ export interface HandedSectionSpec<P> {
   handOff: SectionHandOff<P>;
   /** The place's cards and what the opener says of them. */
   cardsOf(value: P): Pick<SectionCards, "cards" | "says"> & Partial<Pick<SectionCards, "whole" | "ttlMs" | "lines" | "cost">>;
-  /** The cards it showed, by item id, staged, and the rest kept. */
-  posted(value: P, place: SectionPlace, shown: readonly string[], report: { ts: string; text: string }): Promise<void>;
+  /** The cards it showed, by item id, staged, and the rest kept. Each card
+   *  `progress` holds was handled by an earlier try: it is not staged again,
+   *  and counts as it came out. Each card handled now is marked at once. */
+  posted(value: P, place: SectionPlace, shown: readonly string[], report: { ts: string; text: string }, progress: SectionProgress): Promise<void>;
   /** Every card kept for the next morning. */
   notPosted(value: P, place: SectionPlace, why: string): Promise<void>;
 }
 
 /**
- * A job's hand-off as the port `sweep-post` reads (`SweepSection`). A place is
- * cleared from the hand-off before its job stages anything, so a stop past
- * that point never stages it twice.
+ * A job's hand-off as the port `sweep-post` reads (`SweepSection`). A place
+ * posted stays in the hand-off, claimed, while its job stages, with each card
+ * marked as it is handled, and is cleared once its job is done: a stop part-way
+ * leaves it for the retry, which carries on from the marks.
  *
  * @param spec - The hand-off and what the job does with a place
  */
@@ -191,9 +223,16 @@ export function handedSection<P>(spec: HandedSectionSpec<P>): SweepSection {
     threadTs: kept.threadTs,
     ...spec.cardsOf(kept.value),
   });
+  /** A claimed place as its report showed it: the cards it went up with. */
+  const asClaimed = (date: string, kept: StoredPlace<P>): SectionCards => {
+    const place = cardsOf(date, kept);
+    return kept.shown ? { ...place, cards: place.cards.filter((c) => kept.shown!.includes(c.item.id)) } : place;
+  };
+  const keptAt = async (place: SectionCards): Promise<StoredPlace<P> | undefined> =>
+    (await spec.handOff.places(place.date)).find((p) => placeKeyOf(p) === placeKeyOf(place));
   /** The place's value, out of the hand-off; null when already taken. */
   const take = async (place: SectionCards): Promise<P | null> => {
-    const kept = (await spec.handOff.places(place.date)).find((p) => placeKeyOf(p) === placeKeyOf(place));
+    const kept = await keptAt(place);
     if (!kept) return null;
     await spec.handOff.clear(place.date, place);
     return kept.value;
@@ -203,19 +242,29 @@ export function handedSection<P>(spec: HandedSectionSpec<P>): SweepSection {
     async waiting() {
       return (await spec.handOff.places(spec.date)).filter((p) => !p.claimedBy).map((p) => cardsOf(spec.date, p));
     },
-    claim: (place, cardKey) => spec.handOff.claim(place.date, place, cardKey),
+    claim: (place, cardKey, shown) => spec.handOff.claim(place.date, place, cardKey, shown),
     async claimed(cardKey) {
       const date = dateOf(cardKey);
       const kept = (await spec.handOff.places(date)).find((p) => p.claimedBy === cardKey);
-      return kept ? cardsOf(date, kept) : null;
+      return kept ? asClaimed(date, kept) : null;
     },
     unclaim: (cardKey) => spec.handOff.unclaim(dateOf(cardKey), cardKey),
     async stranded(date) {
-      return (await spec.handOff.places(date)).flatMap((p) => (p.claimedBy && isAloneKey(p.claimedBy) ? [{ cardKey: p.claimedBy, place: cardsOf(date, p) }] : []));
+      return (await spec.handOff.places(date)).flatMap((p) => (p.claimedBy && isAloneKey(p.claimedBy) ? [{ cardKey: p.claimedBy, place: asClaimed(date, p) }] : []));
     },
     async posted(place, shown, report) {
-      const value = await take(place);
-      if (value !== null) await spec.posted(value, place, shown, report);
+      const kept = await keptAt(place);
+      if (!kept) return;
+      const done = new Map(Object.entries(kept.done ?? {}));
+      const progress: SectionProgress = {
+        done,
+        async mark(id, staged) {
+          done.set(id, staged);
+          await spec.handOff.mark(place.date, place, id, staged);
+        },
+      };
+      await spec.posted(kept.value, place, shown, report, progress);
+      await spec.handOff.clear(place.date, place);
     },
     async notPosted(place, why) {
       const value = await take(place);

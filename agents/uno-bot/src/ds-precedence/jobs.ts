@@ -42,6 +42,7 @@
 // `Env` enters in `ds-precedence/env.ts`.
 
 import type { PendingProposal } from "../thread-state/index";
+import { rethrowIfBudget } from "../net";
 import { renderProposalCard } from "../slack/proposal-render";
 import { itemProposal, markNotStaged, type ReportMessage, type ReportStore } from "../slack/decision-cards";
 import { handedSection, type SectionHandOff, type SweepSection } from "../sweep/sections";
@@ -58,6 +59,7 @@ import {
 } from "./compare";
 import {
   byComponent,
+  componentId,
   precedenceCard,
   precedenceCardWords,
   precedenceItem,
@@ -89,7 +91,7 @@ export const PRECEDENCE_CARD_TTL_MS = 6 * 24 * 60 * 60 * 1000;
  *  believe it (`indexedInLibrary`). */
 const MIN_LIBRARY_RATIO = 0.5;
 /** A card that showed and did not stage says this in its place. */
-export const NOT_STAGED = "Didn't go through, so it comes back with next week's check.";
+export const NOT_STAGED = "Didn't go through, so it comes back in tomorrow's report.";
 
 /** What the check keeps for the morning. */
 export interface PrecedenceReport {
@@ -249,12 +251,12 @@ export interface SectionDeps {
 /**
  * The weekly report as a section of the sweep's morning message in
  * #plus-universal: one line, with the rule linked, then a card per component,
- * each its own proposal (`stagedComponent`). It shows whole, never split over
- * two messages: past the carousel's ten its line says how many show, and the
- * rest come back with the next week's check, which finds them again. Once the
- * message is up the report is cleared before any card stages, so a stop
- * there never shows a card twice; a card that did not stage says so on the
- * message.
+ * each its own proposal (`stagedComponent`). It goes first on the message:
+ * past the carousel's ten its line says how many show. Once the message is
+ * up, each card it showed stages; what did not show, or did not stage, stays
+ * in the report for the next morning's message, which hands it over again
+ * until a newer week's check replaces it. A card that did not stage says so
+ * on the message.
  *
  * @param deps - The report, the thread record, the edit and the staging
  * @param handOff - The morning run's hand-off
@@ -271,30 +273,48 @@ export function precedenceSection(deps: SectionDeps, handOff: SectionHandOff<Pre
         cards: findings.map((f) => ({ person: null, item: precedenceItem(f) })),
         whole: true,
         ttlMs: PRECEDENCE_CARD_TTL_MS,
-        // The edit, when a card did not stage.
-        cost: { subrequests: 1, d1Queries: findings.length * 3 },
+        // The cards that show, each a staging, and the edit when one did not stage.
+        cost: (shown) => ({ subrequests: 1, d1Queries: shown.length * 3 }),
         says: () => precedenceParent(findings.length, deps.ruleUrl),
       };
     },
-    async posted(value, place, shown, report) {
-      // Shown: not handed over again, whatever stages.
-      const waiting = await deps.report.read();
-      if (waiting && (waiting.weekOf ?? waiting.checkedAt.slice(0, 10)) === value.weekOf) await deps.report.write(null);
+    async posted(value, place, shown, report, progress) {
       await deps.recordThread({ channel: place.channel, ts: report.ts, weekOf: value.weekOf });
+      const staged = new Set<string>();
       const failed: string[] = [];
       for (const finding of byComponent(value.items)) {
         const id = precedenceItem(finding).id;
         if (!shown.includes(id)) continue;
+        const before = progress.done.get(id);
+        if (before !== undefined) {
+          if (before) staged.add(id);
+          else failed.push(id);
+          continue;
+        }
         try {
           await deps.stage(stagedComponent(place.channel, report.ts, finding, value.weekOf, value.confirmers));
+          staged.add(id);
+          await progress.mark(id, true);
         } catch (err) {
+          rethrowIfBudget(err);
           console.error(`[ds-precedence] ${finding.component} posted but not staged: ${err instanceof Error ? err.message : String(err)}`);
           failed.push(id);
+          await progress.mark(id, false);
         }
       }
+      // What staged is not handed over again; the rest wait in the report for
+      // the next morning, unless a newer week's check has replaced it.
+      const waiting = await deps.report.read();
+      if (waiting && (waiting.weekOf ?? waiting.checkedAt.slice(0, 10)) === value.weekOf) {
+        const rest = waiting.items.filter((item) => !staged.has(componentId(item.component)));
+        if (rest.length !== waiting.items.length) await deps.report.write(rest.length ? { ...waiting, items: rest } : null);
+      }
       if (!failed.length) return;
-      const marked = await markNotStaged(deps.reports, report.ts, failed, NOT_STAGED).catch(() => null);
-      if (marked) await deps.edit(report.ts, marked).catch(() => {});
+      const marked = await markNotStaged(deps.reports, report.ts, failed, NOT_STAGED).catch((err: unknown) => {
+        rethrowIfBudget(err);
+        return null;
+      });
+      if (marked) await deps.edit(report.ts, marked).catch(rethrowIfBudget);
     },
     async notPosted(_value, _place, why) {
       // The report stays waiting: the next morning hands it over again.

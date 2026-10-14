@@ -93,9 +93,10 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * the end-of-day `dm-capture-read` reads their DMs for drift and undocumented
  * answers, and the morning `dm-capture-post` offers each fix on a decision card in
  * their DM with uno-bot that only they can decide (src/dm-watch/capture.ts).
- * The weekly Figma tidy-up's two, Monday morning: `figma-tidy-read` lists the
+ * The weekly Figma tidy-up's two: Monday morning's `figma-tidy-read` lists the
  * teams' stage folders, and `figma-tidy-post` checks each file against its
- * cards and hands the week's Review cards to the sweep's post (src/figma-tidy/).
+ * cards and hands the week's Review cards to the sweep's post — and on the
+ * other mornings, the week's cards that had no room yet (src/figma-tidy/).
  * Every morning job that finds cards for a team channel hands them to
  * `sweep-post`, which runs after them all, so a place gets one message.
  */
@@ -227,12 +228,13 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     // overnight is withdrawn first.
     { key: "figma-drift-recheck", kind: "figma-drift-recheck" },
     { key: "figma-drift-post", kind: "figma-drift-post" },
-    // Monday: the week's Figma tidy-up, its listing cut into jobs, then the hand-over.
+    // Monday: the week's Figma tidy-up, its listing cut into jobs, then the
+    // hand-over; every other morning, the hand-over of the week's cards an
+    // earlier message had no room for.
     ...Array.from({ length: TIDY_JOBS }, (_, i) => ({ key: `figma-tidy-read-${i + 1}`, kind: "figma-tidy-read" as const, weekday: MONDAY })),
     {
       key: "figma-tidy-post",
       kind: "figma-tidy-post",
-      weekday: MONDAY,
       after: Array.from({ length: TIDY_JOBS }, (_, i) => `figma-tidy-read-${i + 1}`),
     },
     // After every hand-over: a job not planned today counts as done.
