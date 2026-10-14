@@ -608,13 +608,13 @@ export const CHECKS = [
   },
   {
     name: 'test:bundle',
-    script: 'node --test scripts/*.test.mjs',
+    script: 'node --test scripts/*.test.mjs measurement/*/*.test.mjs',
     pkg: 'bot',
     trigger: ['pull_request', 'deploy'],
     kind: 'spawn',
     spawnReason: '`node --test`, for the same reason as test:scripts.',
     guards:
-      "the bot's own script tests \u2014 apply-cutover, secrets, deploy, the harness bundler \u2014 which check-harness.yml has run since #266 but check:harness did not, so the local gate was a strict SUBSET of the remote one. That gap cost a red CI on #388: a message reworded in apply-cutover.mjs broke an assertion in apply-cutover.test.mjs, `npm run check:harness` went green locally on all 38 sub-checks, and the failure appeared only after the push. The completeness assertion could not have caught it either, because it scans `check:*` names and this is not one. 0.3s, measured 2026-08-30.",
+      "the bot's own script tests \u2014 apply-cutover, secrets, deploy, the harness bundler, and the measurement tools under measurement/ \u2014 which check-harness.yml has run since #266 but check:harness did not, so the local gate was a strict SUBSET of the remote one. That gap cost a red CI on #388: a message reworded in apply-cutover.mjs broke an assertion in apply-cutover.test.mjs, `npm run check:harness` went green locally on all 38 sub-checks, and the failure appeared only after the push. The completeness assertion could not have caught it either, because it scans `check:*` names and this is not one. 0.3s, measured 2026-08-30.",
   },
   {
     name: 'test',
