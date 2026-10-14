@@ -21,6 +21,20 @@ summary: Pillar → channel map (group announcements; all private — uno-bot mu
 Pillar → channel map (group announcements; **all private — uno-bot must be invited before posting/@here**):
 `Universal` → #plus-universal `C072E8SFLKV` · `Admin` → #plus-admin `C089A3E9CCW` · `Toolkit` → #plus-toolkit `C08925VDFF1` · `Training` → #plus-training `C07L5RZV6DR` · `Marketing` → #plus-marketing `C052BG9NE86`. Tutoring + Help Center: unmapped — flag at retro.
 
+## Surfaces
+
+Every way into uno-bot from Slack. Skills run from a DM or an @mention; the other surfaces each do one thing.
+
+| Surface | What it does |
+|---|---|
+| DM · @mention · a thread uno-bot is in | any ask; every skill runs here |
+| Five message shortcuts (a message → *More actions*) | *Catch me up from here* · *Where was this decided?* · *Help me reply* · *Think harder about this* · *Is this still true?* |
+| Home tab | how to reach uno-bot, what it can do, and the button that stops your running turn |
+| `/grind` · `/chill` | run a question on the deep model, or cheap and short |
+| `/stop` | stop the turn uno-bot is running for you |
+
+Slack delivers slash commands only from a channel or DM composer, so inside a thread *Think harder about this* stands in for `/grind` and the Home tab's button for `/stop`. The app manifest is edited by hand in app settings (ADR-024); `agents/uno-bot/slack-app-manifest.yaml` is the record to diff against.
+
 <!-- ide-only -->
 ## The end-of-day sweep — read path and audience rule
 
@@ -234,7 +248,7 @@ Until then this file mandated Slack **mrkdwn** (`*single*` bold, literal `•`, 
 
 - **Reply in-thread by default** (`thread_ts` = the *parent* message's ts). Keeps the channel clean.
 - A fresh top-level post is only for cross-channel announcements (e.g. a review fan-out to #plus-design) — a real new message, not a reply.
-- **A `/uno-*` slash command runs as a public thread.** The Worker posts a framing message in the channel and threads the run under it, so history, the emoji gate, and proposals behave exactly as they do for an @mention.
+- **A `/grind` or `/chill` run is a public thread.** The Worker posts a framing message in the channel and threads the run under it, so history, the emoji gate, and proposals behave exactly as they do for an @mention.
 - **Mention only who must act** (`<@U…>`). Never spray `<!here>` / `<!channel>` / `<!everyone>` — they need installer permission and read as noise. Batch related updates into one message, not five.
 <!-- ide-only -->
 
