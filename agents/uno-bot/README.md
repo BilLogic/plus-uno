@@ -204,6 +204,24 @@ Four files read something that is not in the database, and render it in as a tab
 
 A file that reads an input fails with `no such table` if you run it without rendering, so an ungraded run cannot pass for a graded one.
 
+**The measurement window** (2026-09-01 to 2027-01-01, each file's default; the usage record starts 2026-09-29) tracks five numbers:
+
+- `load-on-lead`: asks reaching the lead, and beside them every ask to the bot (`asks_to_bot`, per workday), split into housekeeping (pain_category 1–5 and 7), judgment (6) and unlabelled.
+- `adoption`: distinct askers, the ones who asked in 3 or more weeks, and askers per Monday week. The lead is excluded.
+- `responsiveness`: the waits as before, with `unanswered`, the real asks the bot never answered.
+- `proposal-outcomes`: approved, approved with edits, rejected, refused, expired and still live, for cards, upkeep fixes and reminders.
+- `appreciation-weekly`: thanks per week, as reactions (`appreciation`) and as replies (`turns.thanks`, counted whatever `test_traffic` says).
+
+**Sampling answers to grade.** `sample-answers` lists the eligible answers: real asks answered with disposition `answered`. Run it with `--json` and draw the sample from that output:
+
+```bash
+npm run metric -- sample-answers --from 2026-09-01 --to 2027-01-01 --out /tmp/sample-answers.sql
+npx wrangler d1 execute uno-bot-usage --remote --file /tmp/sample-answers.sql --json > /tmp/eligible.json
+node scripts/sample-answers.mjs --rows /tmp/eligible.json --seed fall-2026 --n 50 --second 10
+```
+
+The same rows and seed always give the same picks. The output is CSV: `turn_id,slack_link,surface,needs_permission,second_grade`. `needs_permission` is 1 for a DM or a group DM: ask the asker before you open it. `second_grade` marks the answers a second grader also grades.
+
 **Cite a result** with:
 
 - the query file and the commit it was run from (`git rev-parse --short HEAD`);

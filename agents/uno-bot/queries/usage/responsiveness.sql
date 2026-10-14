@@ -13,12 +13,19 @@
 -- human reply to the thread's opening ask. Compare the two as "how long people
 -- waited", not as one measure before and after.
 --
+-- Unanswered: real asks in the window the bot never answered (no
+-- first_answer_at) — a failed turn, a stop before anything was shown. They
+-- have no wait, so the cohorts leave them out; the `unanswered` column counts
+-- them on every row, so they show instead of dropping out.
+--
 -- Percentiles are nearest-rank: the value at rank ceil(p * n) in ascending
 -- order, computed as (p * n + 99) / 100 in integers. The baseline query
 -- (responsiveness-baseline.sql) uses the same, so before and after compare.
 --
 -- Window: ask time (turns.asked_at), UTC, the @from date inclusive to the @to
--- date exclusive. Set both with scripts/metric-query.mjs --from/--to.
+-- date exclusive. Set both with scripts/metric-query.mjs --from/--to. The
+-- default runs 2026-09-01 to 2027-01-01, the measurement window; the usage
+-- record begins on 2026-09-29, so nothing before that date is in it.
 -- Reads: the graded answers (queries/usage/graded-answers.csv), rendered in by
 -- scripts/metric-query.mjs; run unrendered, it fails on the missing table.
 -- Excludes: test traffic (test_traffic = 0 only).
@@ -40,6 +47,12 @@ WITH
       AND t.first_answer_at IS NOT NULL
       AND t.asked_at >= win.from_ms AND t.asked_at < win.to_ms
   ),
+  unanswered(n) AS (
+    SELECT COUNT(*) FROM turns t, win
+    WHERE t.test_traffic = 0
+      AND t.first_answer_at IS NULL
+      AND t.asked_at >= win.from_ms AND t.asked_at < win.to_ms
+  ),
   cohorts(cohort) AS (VALUES ('correct'), ('ungraded')),
   waits AS (
     SELECT 'correct' AS cohort, wait_ms FROM answered WHERE grade = 'correct'
@@ -57,7 +70,8 @@ SELECT
   COUNT(r.wait_ms)                                               AS answers,
   MAX(CASE WHEN r.rn = (50 * r.n + 99) / 100 THEN r.wait_ms END) AS median_ms,
   MAX(CASE WHEN r.rn = (90 * r.n + 99) / 100 THEN r.wait_ms END) AS p90_ms,
-  ROUND(AVG(r.wait_ms >= 86400000), 4)                           AS next_day_share
+  ROUND(AVG(r.wait_ms >= 86400000), 4)                           AS next_day_share,
+  (SELECT n FROM unanswered)                                     AS unanswered
 FROM cohorts c
 LEFT JOIN ranked r ON r.cohort = c.cohort
 GROUP BY c.cohort
