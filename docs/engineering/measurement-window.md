@@ -17,6 +17,7 @@ Notion each week.
 - **Runs** from 1 September 2026 until about 100 real asks are on the usage record. It has no fixed end date.
 - **The usage record begins 2026-09-29.** A query over September reads nothing before that date; say so wherever a September number is cited.
 - **The minimums were locked on 2026-10-13.** Report 2026-10-13 onward as its own line beside the whole window, and tick *After lock only* on that row.
+- **Later cuts get their own line too.** When a change to what uno-bot does with an ask ships inside the window, record its deploy date in the Weekly snapshot's Notes and report the numbers from that date as an *after cut* line. The bot-skills restructure (#1199, #1204, #1206, #1208) is held until the window closes. Note the go-live dates of Figma triage cards (#1211), team-channel routing (#1210) and Review pop-up edit tracking (#1214) the same way, since each may shift number 5.
 
 ## The five numbers
 
@@ -27,6 +28,8 @@ Notion each week.
 | 3 | Share of asks left to the next day, and median wait | 18%, 29 min | under 5%, minutes |
 | 4 | Askers, and askers with asks in 3+ window weeks | — | at least 10; half of them |
 | 5 | Proposals approved / approved with edits / rejected — cards, upkeep fixes, reminders | — | tracked, not published |
+
+*Approved with edits* in number 5 counts a "Needs changes" revision and, from the #1214 deploy on, a Review pop-up approve with edits. Cards confirmed before that deploy read as plain approvals, so the edited share starts at that date.
 
 ### How number 1 is counted
 
@@ -48,6 +51,7 @@ to them through the notion-plus connector, per `docs/connectors/notion.md`.
 
 ## Weekly, each Monday for the week just closed
 
+0. **Confirm the record is writing.** After any deploy, and at the start of each week, query remote D1 read-only (`npx wrangler d1 execute uno-bot-usage --remote --command "…"`) and check that the newest turns carry the current build, and that thanks (`turns.thanks`), reactions (`appreciation`) and card events (`proposal_events`) are arriving. Run live tests in #uno-bot-sandbox (`C0B4QBWAUJU`, test traffic) or the lead's le goat DM. A test that lands in a counted table, such as a thanks reply or reaction from the lead's account, goes in the Weekly snapshot's *Test log (exclude from counts)* with exactly what to subtract. The first check ran 2026-10-14 on r607, with all four paths recording.
 1. **Run the saved queries.** From `agents/uno-bot/`, for each of `agents/uno-bot/queries/usage/load-on-lead.sql`, `agents/uno-bot/queries/usage/self-serve-rate.sql`, `agents/uno-bot/queries/usage/responsiveness.sql`, `agents/uno-bot/queries/usage/adoption.sql`, `agents/uno-bot/queries/usage/proposal-outcomes.sql` and `agents/uno-bot/queries/usage/appreciation-weekly.sql` (the metric name is the file name without `.sql`):
 
    ```bash
