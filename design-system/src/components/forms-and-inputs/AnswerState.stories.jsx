@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 
 import ChoiceGrid from './ChoiceGrid';
-import Scale from './RadioButtonGroup';
+import ChoiceGroup from './ChoiceGroup';
 
 /**
  * What "not answered yet" looks like, and what an answer does to the state you
@@ -25,6 +25,9 @@ import Scale from './RadioButtonGroup';
  *
  * Neither is visible on screen. The grid renders the same either way, and a
  * pre-selected scale looks like a scale. Both need the state read back.
+ *
+ * `Scale` has since been replaced by `ChoiceGroup`, which inherits the rule: a
+ * radio group starts unanswered. The stories below hold it to that.
  */
 
 const stack = { display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '560px' };
@@ -54,7 +57,14 @@ const SCALE_OPTIONS = [
  */
 export const ScaleStartsUnanswered = () => (
     <div style={stack}>
-        <Scale name="confidence" label="Confidence" options={SCALE_OPTIONS} />
+        <ChoiceGroup
+            name="confidence"
+            legend="Confidence"
+            orientation="inline"
+            leadingText="Low"
+            trailingText="High"
+            options={SCALE_OPTIONS}
+        />
     </div>
 );
 
@@ -84,9 +94,10 @@ export const ScaleAcceptsAFalsyDefault = () => (
           * than merely a premature one. Putting 0 first would have hidden that:
           * both the old expression and the new one land on 0.
           */}
-        <Scale
+        <ChoiceGroup
             name="score"
-            label="Score"
+            legend="Score"
+            orientation="inline"
             defaultValue={0}
             options={[{ value: 1, label: '1' }, { value: 0, label: '0' }]}
         />

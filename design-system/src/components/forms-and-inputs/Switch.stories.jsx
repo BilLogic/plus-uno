@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Switch from './Switch';
 
@@ -144,4 +145,19 @@ Interactive.args = {
     label: 'Toggle Switch',
     size: 'medium',
     disabled: false,
+};
+
+/**
+ * Read-only: the setting is shown at full contrast and stays in the tab order,
+ * and clicking does not change it.
+ */
+export const ReadOnly = () => (
+    <Switch id="switch-readonly" label="Auto-assign substitutes" defaultChecked readOnly />
+);
+ReadOnly.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const control = canvas.getByRole('switch', { name: 'Auto-assign substitutes' });
+    await expect(control.getAttribute('aria-readonly')).toBe('true');
+    await userEvent.click(control);
+    await expect(control.checked).toBe(true);
 };

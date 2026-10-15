@@ -74,6 +74,14 @@ Use checkbox when a user needs to select more than one option from a list.
     <DsCanvasQuiet of={CheckboxStories.InteractionStates} />
 </DocsCanvasShell>
 
+<DocsCanvasShell description={<>Read-only: focusable, full contrast, and the answer does not change.</>}>
+    <DsCanvasQuiet of={CheckboxStories.ReadOnly} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A description under the label, and the card appearance.</>}>
+    <DsCanvasQuiet of={CheckboxStories.DescriptionAndCard} />
+</DocsCanvasShell>
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -116,6 +124,19 @@ it is what a "select all" control needs when only some rows are ticked.
 <div className="sb-ds-doc-section">
 
 ## Usage notes
+
+### Read-only is not disabled.
+
+`readOnly` shows an answer the person may read but not change: the box stays in
+the tab order at full contrast, says `aria-readonly`, and ignores clicks and
+Space. `disabled` takes it out of the tab order and greys it, for a box that does
+not apply right now.
+
+### A description describes; the label names.
+
+`description` renders under the label and is wired with `aria-describedby`, so
+it is read after the name instead of becoming part of it. `appearance="card"`
+draws the box, label and description as one bordered tile.
 
 ### Pick controlled or uncontrolled and stay there.
 
@@ -187,7 +208,7 @@ box resolves it like any other, so it cannot be used as a third stored value.
 <Checkbox id="mon" label="Monday" />
 <Checkbox id="tue" label="Tuesday" />
 
-// Correct — either name the group, or let MultipleChoice own the whole set.
+// Correct — either name the group, or let ChoiceGroup own the whole set.
 <fieldset>
   <legend>Available days</legend>
   <Checkbox id="mon" label="Monday" />
@@ -202,8 +223,8 @@ box resolves it like any other, so it cannot be used as a third stored value.
 ## Related
 
 - For a setting that takes effect immediately, use `Switch`.
-- For one answer from several options, use `Radio` or `MultipleChoice` with `type="radio"`.
-- For a group of checkboxes, use `MultipleChoice` with `type="checkbox"`. A group is the group component's job: it owns the value and the group label, where Checkboxes mapped by hand in each screen own neither.
+- For one answer from several options, use `ChoiceGroup`.
+- For a group of checkboxes, use `ChoiceGroup` with `type="checkbox"`. A group is the group component's job: it owns the value and the group label, where Checkboxes mapped by hand in each screen own neither.
 - For a rows-by-columns matrix of choices, use `ChoiceGrid`.
 - For choices in a popup, use `Select`.
 

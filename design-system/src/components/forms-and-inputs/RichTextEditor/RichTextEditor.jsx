@@ -256,7 +256,7 @@ const RichTextEditor = ({
             {/*
               * #329. A `span`, not a `label`. `contentEditable` is not a form
               * control, so `htmlFor` has nothing to bind to — the same reason
-              * `Rating` and `Scale` name their groups with `aria-labelledby`
+              * `Rating` names its group with `aria-labelledby`
               * (#206). The editor points back at this id.
               */}
             {label && (

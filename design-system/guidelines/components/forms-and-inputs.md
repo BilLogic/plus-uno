@@ -20,19 +20,18 @@ importable from `@/components` today.
 |---|---|
 | free text, one line | `Input` |
 | free text, several lines | `Textarea`, sized with `rows` |
-| one pick, 2–5 options worth showing | `MultipleChoice type="radio"` |
+| one pick, 2–5 options worth showing | `ChoiceGroup` (`type="radio"`, the default) |
 | one pick from a longer list | `Select`, with `searchable` past about 8 options |
-| several picks, few options | `MultipleChoice type="checkbox"` |
+| several picks, few options | `ChoiceGroup type="checkbox"` |
 | several picks from a longer, fixed list | `Select mode="multi"` |
 | several picks, or values the user adds | `Select mode="multi" creatable` |
 | a pick through a hierarchy | `Cascader` for one path · `TreeSelect multiple` for many |
-| a rating on a scale | `Scale` for a numbered scale with end labels · `Rating` for stars |
+| a rating on a scale | `ChoiceGroup orientation="inline"` with `leadingText` and `trailingText` for a numbered scale · `Rating` for stars |
 | the same choice for several questions | `ChoiceGrid` |
 | an action run from a button | `Dropdown` — a button, not a field |
 
-Where the group is heading: one `ChoiceGroup` (with `type` and `orientation`)
-replaces `MultipleChoice` and `Scale`, and `TagInput` takes the "values the user
-adds" row once it accepts typing. Until each lands, use the names in the table.
+Where the group is heading: `TagInput` takes the "values the user adds" row
+once it accepts typing. Until then, use `Select mode="multi" creatable`.
 
 The rest of the group answers narrower shapes: `NumberInput` for a number with
 steppers, `RichTextEditor` for formatted prose, `InputGroup` for a field with
@@ -51,15 +50,15 @@ trigger, and supports multi-select and search. If the trigger should still read
 ### A group is the group component's job
 
 Reach for the group component before mapping `Checkbox` or `Radio` over an
-array. `MultipleChoice` takes an `options` array, owns the value and renders a
-`fieldset` with a `legend` when given one; `ChoiceGrid` builds the
-rows-by-columns matrix and labels every cell with `aria-labelledby` pointing at
-both its row and its column; `Scale` renders the low and high end labels
-alongside the options.
+array. `ChoiceGroup` takes an `options` array, owns the value and renders a
+`fieldset` named by its `legend`, stacked or inline, with scale ends, an
+"Other" answer, per-option descriptions, the `card` appearance and one group
+`error`; `ChoiceGrid` builds the rows-by-columns matrix from the same Checkbox
+and Radio and labels every cell with `aria-labelledby` pointing at both its row
+and its column.
 
 ### Names that look importable and are not the answer
 
-- `RadioButtonGroup` is the file; the export is `Scale`.
 - `SelectMultiple` is legacy — `Select mode="multi"` covers it.
 - `OptionList` renders an inline list that its caller positions by hand; it is
   a part, not a field.
@@ -91,10 +90,12 @@ not in an `Alert` at the top of the form — see
 `design-system/guidelines/components/messaging.md`.
 
 **`required` means three different things.** On `Input`, `NumberInput`,
-`FileUpload`, `DateAndTimePicker`, `Rating`, `TagInput` and `Scale` it draws an
+`FileUpload`, `DateAndTimePicker`, `Rating` and `TagInput` it draws an
 asterisk marked `aria-label="required"` and stops there, so enforce it yourself.
-`Checkbox` forwards it to the native input. `Select` announces it through a
-visually hidden "Required" description on the trigger.
+`Checkbox` forwards it to the native input. `ChoiceGroup` marks its legend and,
+for radios, sets `aria-required` on the group and `required` on every radio; a
+checkbox group cannot be enforced natively, so check it yourself. `Select`
+announces it through a visually hidden "Required" description on the trigger.
 
 ## Where the group is weakest
 
@@ -109,7 +110,7 @@ value — read from `onChange`, which hands you the value rather than an event.
 The menu-backed fields that do carry a full ARIA pattern are `Cascader`
 (`combobox` → `listbox` → `option`), `TreeSelect` (`combobox` → `tree` →
 `treeitem`) and `DatePicker`'s trigger (`combobox` → `dialog`). Where the list
-is short enough, `MultipleChoice` beats all of them: every option is a native
+is short enough, `ChoiceGroup` beats all of them: every option is a native
 radio or checkbox.
 
 ## Related

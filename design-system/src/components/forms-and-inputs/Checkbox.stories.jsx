@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Checkbox from './Checkbox';
 
@@ -217,4 +218,42 @@ Interactive.args = {
     size: 'medium',
     disabled: false,
     required: false,
+};
+
+/**
+ * Read-only: the answer is shown at full contrast and stays in the tab order,
+ * and clicking or pressing Space does not change it.
+ */
+export const ReadOnly = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+        <Checkbox id="checkbox-readonly-on" label="Background check complete" defaultChecked readOnly />
+        <Checkbox id="checkbox-readonly-off" label="Training complete" readOnly />
+    </div>
+);
+ReadOnly.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const on = canvas.getByRole('checkbox', { name: 'Background check complete' });
+    await expect(on.getAttribute('aria-readonly')).toBe('true');
+    await expect(on.disabled).toBe(false);
+    await userEvent.click(on);
+    await expect(on.checked).toBe(true);
+
+    const off = canvas.getByRole('checkbox', { name: 'Training complete' });
+    off.focus();
+    await userEvent.keyboard(' ');
+    await expect(off.checked).toBe(false);
+};
+
+/** A description under the label, and the card appearance. */
+export const DescriptionAndCard = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)', maxWidth: '360px' }}>
+        <Checkbox id="checkbox-desc" label="Email reminders" description="Sent the evening before." />
+        <Checkbox id="checkbox-card" label="Text reminders" description="Sent an hour before." appearance="card" defaultChecked />
+    </div>
+);
+DescriptionAndCard.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const box = canvas.getByRole('checkbox', { name: 'Email reminders' });
+    const desc = canvasElement.ownerDocument.getElementById(box.getAttribute('aria-describedby'));
+    await expect(desc.textContent).toBe('Sent the evening before.');
 };

@@ -1,0 +1,49 @@
+/**
+ * Shared choice states for Checkbox and Radio: description, card, read-only.
+ * The control is 18px (checkbox) or 12px (radio) plus the label gap, so the
+ * description is indented by the wrapper's own custom property.
+ */
+
+.plus-choice-has-description {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--size-element-gap-xs);
+}
+
+.plus-choice-description {
+    padding-left: var(--plus-choice-indent);
+    color: var(--color-on-surface-variant);
+}
+
+.plus-form-checkbox-wrapper {
+    --plus-choice-indent: calc(18px + var(--size-element-gap-sm));
+}
+
+.plus-form-radio-wrapper {
+    --plus-choice-indent: calc(12px + var(--size-element-gap-sm));
+}
+
+.plus-choice-card {
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    border: var(--size-element-stroke-sm) solid var(--color-outline-variant);
+    border-radius: var(--size-element-radius-md);
+    background-color: var(--color-surface-container-lowest);
+
+    &:has(input:checked) {
+        border-color: var(--color-primary-border);
+        background-color: var(--color-primary-state-08);
+    }
+
+    &:has(input:focus-visible) {
+        border-color: var(--color-primary-border);
+    }
+}
+
+// Read-only keeps full contrast (it is an answer to read, not a control that
+// is off) and drops the pointer affordance.
+.plus-choice-readonly {
+    .form-check-input,
+    .form-check-label {
+        cursor: default;
+    }
+}

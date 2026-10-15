@@ -42,7 +42,7 @@ From `design-system/src/components/forms-and-inputs/OptionList.scss`. Override t
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `MultipleChoice` · `NumberInput` · `Radio` · `RadioButtonGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 
