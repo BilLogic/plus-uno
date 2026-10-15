@@ -93,16 +93,19 @@ export function isDmKind(kind: CommitmentKind): boolean {
 export const RAISED_KINDS: readonly CommitmentKind[] = [...CARD_KINDS, ...DM_KINDS];
 
 /**
- * The two morning budgets a promiser's reminders count against: `asked`, what
- * a person asked for or promised (thread promises, "remind me"), and `cards`,
- * what uno-bot raises on its own — the card follow-ups and the DM asks. That
- * backlog spends only its own budget and goes after a person's own asks, so it
+ * The three morning budgets a promiser's reminders count against: `asked`,
+ * what a person asked for or promised (thread promises, "remind me"); `cards`,
+ * what uno-bot raises on its own — the card follow-ups and the DM asks; and
+ * `weekly`, the stuck Roadmap cards, whose Monday section shows every one a
+ * person has, so that budget is spent apart from the daily asks. What uno-bot
+ * raises spends only its own budget and goes after a person's own asks, so it
  * never pushes a person's own reminder back a morning.
  */
-export type ReminderBudget = "asked" | "cards";
+export type ReminderBudget = "asked" | "cards" | "weekly";
 
 /** The budget a kind's reminders count against. */
 export function budgetOf(kind: CommitmentKind): ReminderBudget {
+  if (kind === "card_stale") return "weekly";
   return isCardKind(kind) || isDmKind(kind) ? "cards" : "asked";
 }
 

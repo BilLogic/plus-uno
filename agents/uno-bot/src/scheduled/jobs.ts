@@ -21,7 +21,7 @@ import { dsPrecedenceSectionFor, runDsPrecedenceCheck, runDsPrecedencePost } fro
 import { figmaDecisionsSectionFor, figmaQuestionsSectionFor } from "../figma-comments/env";
 import { runSweepJobOnEnv } from "../sweep/env";
 import { commitmentThreadHookFor, runCommitmentNudgesOnEnv } from "../commitments/env";
-import { cardTodoNoteHookFor, cardTodoThreadHookFor, morningFollowUpsFor, runCardFollowThroughOnEnv } from "../follow-through/env";
+import { cardTodoNoteHookFor, cardTodoThreadHookFor, morningFollowUpsFor, runCardFollowThroughOnEnv, weeklyStaleCardsFor } from "../follow-through/env";
 import type { SweepThread } from "../sweep/finding";
 import type { SweepDeps } from "../sweep/run";
 import type { SweepSection } from "../sweep/sections";
@@ -74,15 +74,16 @@ const sweepBody: JobBody = async (env, job, ctx) => {
 
 /**
  * What the morning's other jobs handed the sweep's post, one port a job: the
- * card follow-ups, the weekly DS precedence report, the Figma comment
- * decisions, the weekly Figma tidy-up, the Figma drift questions, the Dev
- * Mode links card and the blueprint revisions
+ * card follow-ups, Monday's stuck cards, the weekly DS precedence report,
+ * the Figma comment decisions, the weekly Figma tidy-up, the Figma drift
+ * questions, the Dev Mode links card and the blueprint revisions
  * (src/sweep/sections.ts). Each is absent without its bindings or
  * the run's storage.
  */
 export function morningSectionsFor(env: Env, ctx: JobContext): SweepSection[] {
   return [
     morningFollowUpsFor(env, ctx),
+    weeklyStaleCardsFor(env, ctx),
     dsPrecedenceSectionFor(env, ctx),
     figmaDecisionsSectionFor(env, ctx),
     figmaQuestionsSectionFor(env, ctx),

@@ -59,6 +59,7 @@ import {
   followUpsForSweep,
   handOffIn,
 } from "../src/follow-through/index";
+import { STALE_CARDS_SECTION } from "../src/sweep/sections";
 import { at, BOT, DESIGN, drift, msg, NOTES_DB, notionPage, reply, sweepHarness, ts, UNIVERSAL, UNO_BOT, utcDay } from "./helpers/sweep-harness";
 import { createInMemoryRunnerStorage } from "../src/runner/storage";
 import { recordingViews } from "./helpers/recording-slack";
@@ -154,7 +155,7 @@ function morning(
   store: InMemoryCommitmentStore,
   rm: ReturnType<typeof roadmap>,
   now: number,
-  opts: { threadState?: ThreadState; failStage?: (p: PendingProposal) => boolean; meter?: NudgeDeps["meter"]; gaps?: GapNotes; handOff?: FollowUpHandOff } = {},
+  opts: { threadState?: ThreadState; failStage?: (p: PendingProposal) => boolean; meter?: NudgeDeps["meter"]; gaps?: GapNotes; handOff?: FollowUpHandOff; weeklyHandOff?: FollowUpHandOff } = {},
 ) {
   const posts: Array<{ channel: string; threadTs: string | null; text: string; blocks: unknown[]; cards: Card[]; ts: string }> = [];
   const edits: Array<{ ts: string; text: string; cards: Card[] }> = [];
@@ -188,6 +189,7 @@ function morning(
     config: CONFIG,
     ...(opts.gaps ? { gaps: opts.gaps } : {}),
     ...(opts.handOff ? { handOff: opts.handOff } : {}),
+    ...(opts.weeklyHandOff ? { weeklyHandOff: opts.weeklyHandOff } : {}),
   };
   const deps: NudgeDeps = {
     slack: {
@@ -759,7 +761,7 @@ describe("F5: a stuck card", () => {
     const row = only(store);
     assert.equal(row.kind, "card_stale");
     assert.equal(row.channel, UNIVERSAL);
-    const m = morning(store, rm, at(30, 13));
+    const m = morning(store, rm, at(35, 13));
     await m.run();
     assert.equal(m.posts[0]!.channel, UNIVERSAL);
     assert.match(m.posts[0]!.text, /^<@U0MAYA>, checking in on a Roadmap card that has gone quiet\./);
@@ -778,7 +780,7 @@ describe("F5: a stuck card", () => {
     const store = createInMemoryCommitmentStore();
     const rm = roadmap({ cards: [stuck()] });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
-    const clock = { now: at(30, 13) };
+    const clock = { now: at(35, 13) };
     const threadState = createInMemoryThreadState({ now: () => clock.now });
     const m = morning(store, rm, clock.now, { threadState });
     await m.run();
@@ -821,29 +823,29 @@ describe("F5: a stuck card", () => {
     const { ran, redrawn } = await review(threadState, m.posts[0]!, only(store).id, "cancel", { userId: BEA, choice: "still" });
     assert.ok(!ran.some((v) => v.execute), "nothing runs");
     assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Still on it · <@U0BEA>");
-    assert.equal(redrawn.at(-1)![0]!.body.text, "Nothing written. Checked again Oct 21.");
-    const weekOn = await on(at(39, 13));
+    assert.equal(redrawn.at(-1)![0]!.body.text, "Nothing written. Checked again Oct 26.");
+    const weekOn = await on(at(44, 13));
     assert.equal(weekOn.posts.length, 0);
     assert.equal(only(store).state, "snoozed");
-    assert.equal(only(store).dueAt, at(30, 13) + 21 * DAY);
+    assert.equal(only(store).dueAt, at(35, 13) + 21 * DAY);
   });
 
   it("Still on it twice snoozes twice, then the row lapses", async () => {
     const { store, m, threadState, on } = await stuckOnCard();
     await review(threadState, m.posts[0]!, only(store).id, "cancel", { userId: MAYA, choice: "still" });
-    await on(at(39, 13));
+    await on(at(44, 13));
     assert.equal(only(store).snoozes, 1);
     // Three weeks from the first card, unmoved: the follow-up asks, in its thread.
-    const second = await on(at(51, 13));
+    const second = await on(at(56, 13));
     assert.equal(second.posts.length, 1);
     assert.equal(second.posts[0]!.threadTs, m.posts[0]!.ts);
     await review(threadState, second.posts[0]!, only(store).id, "cancel", { userId: MAYA, choice: "still" });
     // A week on, its follow-up's answer is read, not lapsed over.
-    await on(at(59, 13));
+    await on(at(64, 14));
     assert.equal(only(store).state, "snoozed");
     assert.equal(only(store).snoozes, 2);
-    assert.equal(only(store).dueAt, at(51, 13) + 21 * DAY);
-    const last = await on(at(72, 14)); // 9 am ET, after the clocks change
+    assert.equal(only(store).dueAt, at(56, 13) + 21 * DAY);
+    const last = await on(at(77, 14)); // 9 am ET, after the clocks change
     assert.equal(last.posts.length, 0);
     assert.equal(only(store).state, "lapsed");
   });
@@ -959,8 +961,8 @@ describe("F5: a stuck card", () => {
     const comments: Record<string, number | null> = {};
     const rm = roadmap({ cards: [stuck()], comments });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
-    comments.p1 = at(30, 12);
-    const m = morning(store, rm, at(30, 13));
+    comments.p1 = at(35, 12);
+    const m = morning(store, rm, at(35, 13));
     await m.run();
     assert.equal(m.posts.length, 0);
     assert.equal(only(store).state, "auto_done");
@@ -970,12 +972,121 @@ describe("F5: a stuck card", () => {
     const store = createInMemoryCommitmentStore();
     const rm = roadmap({ cards: [stuck()] });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
-    await morning(store, rm, at(30, 13)).run();
+    await morning(store, rm, at(35, 13)).run();
     const row = only(store);
-    await store.update(row.id, { state: "done", resolvedAt: at(30, 15) });
+    await store.update(row.id, { state: "done", resolvedAt: at(35, 15) });
     // Edited since, and stuck again by its own clock — but asked two days ago.
-    rm.cards.set("p1", stuck({ lastEditedAt: at(30, 16) - 22 * DAY + DAY }));
-    assert.equal((await runCardFollowThroughScan(SCAN, scanDeps(store, rm, at(32, 22)))).rows.length, 0);
+    rm.cards.set("p1", stuck({ lastEditedAt: at(35, 16) - 22 * DAY + DAY }));
+    assert.equal((await runCardFollowThroughScan(SCAN, scanDeps(store, rm, at(37, 22)))).rows.length, 0);
+  });
+});
+
+describe("stuck cards are weekly: asked on Monday's morning", () => {
+  const MONDAY = at(35, 13); // Mon 2026-10-05, 09:00 ET
+  const stuck = (over: Partial<ActiveCard> = {}) =>
+    card({ designStatus: "Under Review", contributors: [{ id: "n-maya", name: "Maya Chen" }], lastEditedAt: EOD - 22 * DAY, ...over });
+
+  it("a stuck card found on a Tuesday night waits through Friday, and is asked on Monday's morning", async () => {
+    const store = createInMemoryCommitmentStore();
+    const rm = roadmap({ cards: [stuck()] });
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    for (const day of [30, 31, 32]) {
+      const m = morning(store, rm, at(day, 13));
+      await m.run();
+      assert.equal(m.posts.length, 0, `nothing on ${utcDay(at(day, 13))}`);
+      assert.equal(only(store).state, "open", "carried, not dropped");
+      assert.equal(only(store).nudges, 0);
+    }
+    const monday = morning(store, rm, MONDAY);
+    await monday.run();
+    assert.equal(monday.posts.length, 1);
+    assert.equal(only(store).state, "nudged");
+    assert.equal(only(store).nudgeTs, monday.posts[0]!.ts);
+  });
+
+  it("an unowned card is asked on any weekday morning, while a stuck one beside it waits for Monday", async () => {
+    const store = createInMemoryCommitmentStore();
+    const rm = roadmap({ cards: [card({ pageId: "a" }), stuck({ pageId: "b" })] });
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    const m = morning(store, rm, at(30, 13));
+    await m.run();
+    assert.equal(m.posts.length, 1);
+    assert.equal(m.posts[0]!.cards.length, 1);
+    const rows = [...store.rows.values()];
+    assert.equal(rows.find((r) => r.kind === "card_unowned")!.state, "nudged");
+    assert.equal(rows.find((r) => r.kind === "card_stale")!.state, "open");
+  });
+
+  it("its one follow-up keeps its rhythm: in its thread, five working days on, whatever the weekday", async () => {
+    const store = createInMemoryCommitmentStore();
+    const rm = roadmap({ cards: [stuck()] });
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    const monday = morning(store, rm, MONDAY);
+    await monday.run();
+    const nextMonday = morning(store, rm, at(42, 13));
+    await nextMonday.run();
+    assert.equal(nextMonday.posts.length, 0, "not yet: five working days run to the end of next Monday");
+    const tuesday = morning(store, rm, at(43, 13));
+    await tuesday.run();
+    assert.equal(tuesday.posts.length, 1);
+    assert.equal(tuesday.posts[0]!.threadTs, monday.posts[0]!.ts);
+    assert.equal(only(store).nudges, 2);
+  });
+
+  it("on Monday, all of one person's stuck cards are in the section, past the two-a-person cap; their unowned cards keep it", async () => {
+    const store = createInMemoryCommitmentStore();
+    const rm = roadmap({
+      cards: [
+        ...[0, 1, 2, 3].map((i) => stuck({ pageId: `s${i}`, title: `Stuck ${i}`, lastEditedAt: EOD - (22 + i) * DAY })),
+        // Three Maya created with nobody on them: daily asks, two a morning.
+        ...[0, 1, 2].map((i) => card({ pageId: `u${i}`, creatorId: "n-maya", lastEditedAt: EOD - (8 + i) * DAY })),
+      ],
+    });
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    const storage = createInMemoryRunnerStorage();
+    const mon = morning(store, rm, MONDAY, { handOff: handOffIn(storage), weeklyHandOff: handOffIn(storage, STALE_CARDS_SECTION) });
+    await mon.run();
+    const day = utcDay(MONDAY);
+    const [weekly] = await followUpsForSweep(mon.due, MONDAY, day, { weekly: true }).waiting();
+    assert.deepEqual(weekly!.cards.map((c) => c.item.title).sort(), ["Stuck 0", "Stuck 1", "Stuck 2", "Stuck 3"]);
+    assert.ok(weekly!.cards.every((c) => c.person === MAYA));
+    const [daily] = await followUpsForSweep(mon.due, MONDAY, day).waiting();
+    assert.equal(daily!.cards.length, MAX_CARD_REMINDERS_PER_PERSON, "the daily asks keep the cap");
+  });
+
+  it("on Monday, a channel's stuck cards are handed off as one whole section, past the two-a-channel cap", async () => {
+    const store = createInMemoryCommitmentStore();
+    const people = [
+      { id: "n-maya", name: "Maya Chen" },
+      { id: "n-bea", name: "Bea Ruiz" },
+      { id: "n-ade", name: "Ade Obi" },
+    ];
+    const rm = roadmap({
+      cards: [card({ pageId: "a" }), ...people.map((p, i) => stuck({ pageId: `s${i}`, title: `Stuck ${i}`, contributors: [p], lastEditedAt: EOD - (22 + i) * DAY }))],
+    });
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    const storage = createInMemoryRunnerStorage();
+    const handOff = handOffIn(storage);
+    const weeklyHandOff = handOffIn(storage, STALE_CARDS_SECTION);
+
+    // Wednesday: the unowned card is handed to the daily section; nothing weekly.
+    const wed = morning(store, rm, at(30, 13), { handOff, weeklyHandOff });
+    await wed.run();
+    const wedDay = utcDay(at(30, 13));
+    assert.equal(await followUpsForSweep(wed.due, at(30, 13), wedDay, { weekly: true }).waiting().then((w) => w.length), 0);
+    const [daily] = await followUpsForSweep(wed.due, at(30, 13), wedDay).waiting();
+    assert.equal(daily!.cards.length, 1);
+    assert.ok(!daily!.whole);
+
+    const mon = morning(store, rm, MONDAY, { handOff, weeklyHandOff });
+    await mon.run();
+    const day = utcDay(MONDAY);
+    const weekly = await followUpsForSweep(mon.due, MONDAY, day, { weekly: true }).waiting();
+    assert.equal(weekly.length, 1, "one section a place");
+    assert.equal(weekly[0]!.source, STALE_CARDS_SECTION);
+    assert.equal(weekly[0]!.channel, DESIGN);
+    assert.equal(weekly[0]!.whole, true);
+    assert.deepEqual(weekly[0]!.cards.map((c) => c.item.title).sort(), ["Stuck 0", "Stuck 1", "Stuck 2"]);
   });
 });
 
@@ -1084,7 +1195,7 @@ describe("shared rules", () => {
       ],
     });
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
-    const m = morning(store, rm, at(30, 13));
+    const m = morning(store, rm, at(35, 13));
     await m.run();
     assert.equal(m.posts.length, 2);
     const bea = m.posts.find((p) => mentions(p.text).includes(BEA))!;
@@ -1971,7 +2082,7 @@ describe("tagging through the Team Members directory", () => {
     );
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
     assert.equal(only(store).promiserId, ZOE);
-    const m = morning(store, rm, at(30, 13));
+    const m = morning(store, rm, at(35, 13));
     await m.run();
     assert.deepEqual(mentions(m.posts[0]!.text), [ZOE, BEA]);
   });
@@ -1994,7 +2105,7 @@ describe("tagging through the Team Members directory", () => {
     );
     const report = await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
     assert.ok(report.notes.some((n) => n.includes("Kai Lo")), report.summary);
-    const m = morning(store, rm, at(30, 13));
+    const m = morning(store, rm, at(35, 13));
     await m.run();
     assert.deepEqual(mentions(m.posts[0]!.text), [MAYA]);
     assert.equal(m.posts[0]!.cards[0]!.subtitle!.text, "<@U0MAYA> · Under Review · no comments for 3 weeks · not found in Slack: Kai Lo");
@@ -2044,7 +2155,7 @@ describe("tagging through the Team Members directory", () => {
   it("a follow-up that could not tag someone notes it to the lead once: their name and the column to fill", async () => {
     const { store, rm } = await kaiUnmatched();
     const lead = leadNotes();
-    const m = morning(store, rm, at(30, 13), { gaps: lead.gaps });
+    const m = morning(store, rm, at(35, 13), { gaps: lead.gaps });
     await m.run();
     assert.equal(m.posts.length, 1);
     assert.equal(lead.notes.length, 1);
@@ -2053,7 +2164,7 @@ describe("tagging through the Team Members directory", () => {
     assert.match(lead.notes[0]!.text, /Notion Person/);
     assert.doesNotMatch(lead.notes[0]!.text, /n-kai|Maya|U0MAYA|Under Review/, "no ids, and nothing of the card");
     // The follow-up a week on, still unable to tag Kai: no second note within 30 days.
-    const later = morning(store, rm, at(38, 13), { gaps: lead.gaps });
+    const later = morning(store, rm, at(43, 13), { gaps: lead.gaps });
     await later.run();
     assert.equal(later.posts.length, 1, "the follow-up a week on posted");
     assert.equal(lead.notes.length, 1);
@@ -2062,7 +2173,7 @@ describe("tagging through the Team Members directory", () => {
   it("someone whose row matched no one in Slack is noted for the row's Slack ID", async () => {
     const { store, rm } = await kaiUnmatched();
     const lead = leadNotes({ stored: { at: EOD, roles: {}, gaps: ["kai lo"] } });
-    await morning(store, rm, at(30, 13), { gaps: lead.gaps }).run();
+    await morning(store, rm, at(35, 13), { gaps: lead.gaps }).run();
     assert.equal(lead.notes.length, 1);
     assert.match(lead.notes[0]!.text, /Slack ID/);
   });
@@ -2071,7 +2182,7 @@ describe("tagging through the Team Members directory", () => {
     // A guest or a Past Collaborator is on neither list; nor is a row with its Slack ID and Notion Person.
     const { store, rm } = await kaiUnmatched();
     const lead = leadNotes({ stored: { at: EOD, roles: {}, gaps: ["Gus Hale"], noNotionPerson: ["Ana Pérez"] } });
-    const m = morning(store, rm, at(30, 13), { gaps: lead.gaps });
+    const m = morning(store, rm, at(35, 13), { gaps: lead.gaps });
     await m.run();
     assert.equal(m.posts.length, 1);
     assert.deepEqual(lead.notes, []);
@@ -2080,10 +2191,10 @@ describe("tagging through the Team Members directory", () => {
   it("a budget stop during the note never posts the follow-up twice", async () => {
     const { store, rm } = await kaiUnmatched();
     const stopping = leadNotes({ stop: true });
-    const stopped = morning(store, rm, at(30, 13), { gaps: stopping.gaps });
+    const stopped = morning(store, rm, at(35, 13), { gaps: stopping.gaps });
     await assert.rejects(stopped.run(), SubrequestBudgetError);
     assert.equal(stopped.posts.length, 1);
-    const retry = morning(store, rm, at(30, 13, 5), { gaps: leadNotes().gaps });
+    const retry = morning(store, rm, at(35, 13, 5), { gaps: leadNotes().gaps });
     await retry.run();
     assert.equal(retry.posts.length, 0, "the retry posts nothing again");
     assert.equal(only(store).state, "nudged");
@@ -2094,7 +2205,7 @@ describe("tagging through the Team Members directory", () => {
     const rm = withDirectory(roadmap({ cards: [card({ creatorId: "n-unknown" })] }));
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
     const lead = leadNotes();
-    const m = morning(store, rm, at(30, 13), { gaps: lead.gaps });
+    const m = morning(store, rm, at(35, 13), { gaps: lead.gaps });
     await m.run();
     assert.equal(m.posts.length, 0);
     assert.deepEqual(lead.notes, []);
@@ -2103,7 +2214,7 @@ describe("tagging through the Team Members directory", () => {
   it("with LEAD_USER_ID unset, a follow-up that could not tag someone notes nobody", async () => {
     const { store, rm } = await kaiUnmatched();
     const lead = leadNotes({ lead: null });
-    const m = morning(store, rm, at(30, 13), { gaps: lead.gaps });
+    const m = morning(store, rm, at(35, 13), { gaps: lead.gaps });
     await m.run();
     assert.equal(m.posts.length, 1);
     assert.deepEqual(lead.notes, []);
@@ -2114,7 +2225,7 @@ describe("tagging through the Team Members directory", () => {
     const rm = withDirectory(roadmap({ cards: [card({ designStatus: "Under Review", lastEditedAt: EOD - 22 * DAY, contributors: [{ id: "n-maya", name: "Maya Chen" }] })] }));
     await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
     const lead = leadNotes();
-    await morning(store, rm, at(30, 13), { gaps: lead.gaps }).run();
+    await morning(store, rm, at(35, 13), { gaps: lead.gaps }).run();
     assert.deepEqual(lead.notes, []);
   });
 
@@ -2136,7 +2247,7 @@ describe("tagging through the Team Members directory", () => {
     );
     const report = await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
     assert.ok(report.notes.some((n) => n.includes("n-nameless")), report.summary);
-    const m = morning(store, rm, at(30, 13));
+    const m = morning(store, rm, at(35, 13));
     await m.run();
     assert.equal(m.posts[0]!.cards[0]!.subtitle!.text, "<@U0MAYA> · Under Review · no comments for 3 weeks");
     assert.doesNotMatch(JSON.stringify(m.posts[0]!.blocks), /n-nameless/);
@@ -2276,7 +2387,7 @@ describe("the morning's one message a channel", () => {
   });
 
   it("past ten cards: ten show, filled round-robin, and each bullet says how many wait", async () => {
-    const now = at(30, 13);
+    const now = at(35, 13);
     const { store, rm } = await beasCards(true);
     const h = await fixesAtTop(12, now);
     const { m } = await morningOf(store, rm, h, now);
@@ -2323,8 +2434,33 @@ describe("the morning's one message a channel", () => {
     assert.equal((await stage.places(utcDay(now))).size, 0);
   });
 
+  it("Monday's stuck cards go up whole, beside a fix and an unowned card, on the channel's one message", async () => {
+    const now = at(35, 13); // Mon 2026-10-05, 09:00 ET
+    const store = createInMemoryCommitmentStore();
+    const stuck = (i: number, who: { id: string; name: string }) =>
+      card({ pageId: `s${i}`, title: `Stuck ${i}`, designStatus: "Under Review", contributors: [who], lastEditedAt: EOD - (22 + i) * DAY });
+    const rm = roadmap({ cards: [card({ pageId: "a" }), stuck(0, { id: "n-maya", name: "Maya Chen" }), stuck(1, { id: "n-ade", name: "Ade Obi" }), stuck(2, { id: "n-maya", name: "Maya Chen" })] });
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    const h = await fixesAtTop(1, now);
+    const storage = createInMemoryRunnerStorage();
+    const m = morning(store, rm, now, { handOff: handOffIn(storage), weeklyHandOff: handOffIn(storage, STALE_CARDS_SECTION), threadState: h.threadState });
+    await m.run();
+    assert.equal(m.posts.length, 0);
+    const day = utcDay(now);
+    h.deps.sections = [followUpsForSweep(m.due, now, day), followUpsForSweep(m.due, now, day, { weekly: true })];
+    await runSweepJob(SWEEP_POST, h.deps);
+
+    assert.equal(h.posted.length, 1, "one top-level message");
+    const titles = cardsOf(h.posted[0]!.blocks).map((c) => c.title.text);
+    assert.equal(titles.length, 5);
+    assert.deepEqual(titles.filter((t) => t.startsWith("Stuck")).sort(), ["Stuck 0", "Stuck 1", "Stuck 2"], "the weekly section shows whole");
+    assert.equal(m.staged.length, 4);
+    assert.ok([...store.rows.values()].every((r) => r.state === "nudged" && r.nudgeTs === h.posted[0]!.ts));
+    assert.equal(await storage.get(`${STALE_CARDS_SECTION}:${day}`), undefined, "the weekly hand-off is spent");
+  });
+
   it("the hand-off keeps a morning's places under one key: merged by row, claimed, given back, cleared", async () => {
-    const now = at(30, 13);
+    const now = at(35, 13);
     const { store, rm } = await beasCards(true);
     const storage = createInMemoryRunnerStorage();
     const kept: FollowUpHandOff = handOffIn(storage);
