@@ -116,4 +116,5 @@ radio or checkbox.
 
 - `design-system/src/components/forms-and-inputs/index.md` — generated facts and coverage
 - `design-system/guidelines/composition/forms.md` — how fields compose on a surface
+- `design-system/guidelines/composition/form-behaviour.md` — when to validate, errors on submit, required, read-only, unsaved changes
 - `design-system/guidelines/foundations/accessibility.md` — the WCAG bar
