@@ -102,7 +102,7 @@ function readsFor(env: Env): CardReads {
 
 /** People lookups, each answer kept for the life of the object — one job or
  *  one reaction: the Team Members directory first, then by name. */
-function peopleFor(env: Env): CardPeople {
+export function peopleFor(env: Env): CardPeople {
   return throughDirectory(byNameFor(env), () => notionPeopleFor(env));
 }
 

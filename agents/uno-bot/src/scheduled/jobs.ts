@@ -30,6 +30,7 @@ import { runBackstopOnEnv } from "../figma-notify/env";
 import { runTidyPostOnEnv, runTidyReadOnEnv, tidySectionFor } from "../figma-tidy/env";
 import { devLinksSectionFor, runDevLinksMorningOnEnv } from "../figma-links/env";
 import { dmThreadHookFor } from "../dm-sweep/env";
+import { revisionSectionFor, runRevisionPostOnEnv, runShippedRevisionsOnEnv } from "../blueprint-upkeep/env";
 import { runProposalExpiry } from "../usage/index";
 import { runDmPromiseNudgesOnEnv, runDmPromiseReadOnEnv } from "../dm-watch/env";
 import { runDmCapturePostOnEnv, runDmCaptureReadOnEnv } from "../dm-watch/capture-env";
@@ -74,8 +75,8 @@ const sweepBody: JobBody = async (env, job, ctx) => {
 /**
  * What the morning's other jobs handed the sweep's post, one port a job: the
  * card follow-ups, the weekly DS precedence report, the Figma comment
- * decisions, the weekly Figma tidy-up, the Figma drift questions and the Dev
- * Mode links card
+ * decisions, the weekly Figma tidy-up, the Figma drift questions, the Dev
+ * Mode links card and the blueprint revisions
  * (src/sweep/sections.ts). Each is absent without its bindings or
  * the run's storage.
  */
@@ -88,6 +89,7 @@ export function morningSectionsFor(env: Env, ctx: JobContext): SweepSection[] {
     tidySectionFor(env, ctx),
     driftSectionFor(env, ctx),
     devLinksSectionFor(env, ctx),
+    revisionSectionFor(env, ctx),
   ].filter(
     (s): s is SweepSection => !!s,
   );
@@ -292,6 +294,21 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "figma-dev-links-post": async (env, job, ctx) => {
     const report = await runDevLinksMorningOnEnv(env, ctx);
     console.log(`[figma-links] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // End of day: the Roadmap cards deployed since the last run, each weighed by
+  // the service-change gate; a blueprint revision drafted for each that
+  // changes the service, kept for the morning (src/blueprint-upkeep/).
+  "blueprint-shipped": async (env, job, ctx) => {
+    const report = await runShippedRevisionsOnEnv(env, ctx);
+    console.log(`[blueprint-upkeep] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // Morning: each waiting revision handed to the sweep's message at its
+  // card's place.
+  "blueprint-revision-post": async (env, job, ctx) => {
+    const report = await runRevisionPostOnEnv(env, ctx);
+    console.log(`[blueprint-upkeep] ${job.key}: ${report.summary}`);
     return report;
   },
 };

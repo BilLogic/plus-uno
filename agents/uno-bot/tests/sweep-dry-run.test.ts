@@ -140,7 +140,7 @@ test("the probe dry-runs the named run's jobs", async () => {
   const body = report.body as { ok: boolean; run: string; planned: unknown[]; jobs: { key: string; outcome: string; subrequests: number }[] };
   assert.equal(body.ok, true);
   assert.equal(body.run, "morning");
-  assert.equal(body.planned.length, 10);
+  assert.equal(body.planned.length, 11);
   assert.deepEqual(body.jobs.map((j) => [j.key, j.outcome, j.subrequests]), [
     ["commitment-nudge", "handled", 0],
     ["ds-precedence-post", "handled", 0],
@@ -151,6 +151,8 @@ test("the probe dry-runs the named run's jobs", async () => {
     // Every morning: the week's tidy-up cards that had no room yet.
     ["figma-tidy-post", "handled", 0],
     ["figma-dev-links-post", "handled", 0],
+    // No HARNESS_KV bound: no revisions kept, nothing handed over.
+    ["blueprint-revision-post", "handled", 0],
     ["sweep-post", "handled", 0],
     // No Notion key: the roster read refuses before spending anything.
     ["team-roles-sync", "handled", 0],

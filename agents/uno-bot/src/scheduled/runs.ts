@@ -103,6 +103,11 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * Dev Mode links card for the PRs merged into main since the last one that
  * changed a design-system component (src/figma-links/feed.ts), while
  * `FIGMA_DEV_LINKS` is on (src/figma-links/morning.ts).
+ * Blueprint upkeep's two: the end-of-day `blueprint-shipped` weighs the
+ * Roadmap cards deployed since its last run and drafts a blueprint revision
+ * for each that changes the service, and the morning
+ * `blueprint-revision-post` hands each to the sweep's message at its card's
+ * place (src/blueprint-upkeep/).
  * Every morning job that finds cards for a team channel hands them to
  * `sweep-post`, which runs after them all, so a place gets one message.
  */
@@ -136,7 +141,9 @@ export type ScheduledJobKind =
   | "dm-capture-post"
   | "figma-tidy-read"
   | "figma-tidy-post"
-  | "figma-dev-links-post";
+  | "figma-dev-links-post"
+  | "blueprint-shipped"
+  | "blueprint-revision-post";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -217,7 +224,7 @@ export const TIDY_JOBS = 5;
 
 /** The morning jobs that hand their cards to the sweep's post, which runs
  *  after them all (src/sweep/sections.ts). */
-const MORNING_SECTIONS = ["commitment-nudge", "ds-precedence-post", FIGMA_DECISIONS_POST_KEY, "figma-drift-post", "figma-tidy-post", "figma-dev-links-post"] as const;
+const MORNING_SECTIONS = ["commitment-nudge", "ds-precedence-post", FIGMA_DECISIONS_POST_KEY, "figma-drift-post", "figma-tidy-post", "figma-dev-links-post", "blueprint-revision-post"] as const;
 
 /** Monday, as `Date.getUTCDay` numbers an ET day. */
 const MONDAY = 1;
@@ -255,6 +262,7 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
       after: Array.from({ length: TIDY_JOBS }, (_, i) => `figma-tidy-read-${i + 1}`),
     },
     { key: "figma-dev-links-post", kind: "figma-dev-links-post" },
+    { key: "blueprint-revision-post", kind: "blueprint-revision-post" },
     // After every hand-over: a job not planned today counts as done.
     { key: "sweep-post", kind: "sweep-post", after: [...MORNING_SECTIONS] },
     { key: "team-roles-sync", kind: "team-roles-sync" },
@@ -268,6 +276,9 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "ds-precedence-check", kind: "ds-precedence-check", weekday: MONDAY },
     // Early too, for the same reason: one Roadmap read, a few lookups a card.
     { key: "card-follow-through", kind: "card-follow-through" },
+    // Before the batches too: a Roadmap read, then a judgement, a search, a
+    // path read and a draft for each of at most two cards.
+    { key: "blueprint-shipped", kind: "blueprint-shipped" },
     // A live drift question is looked at again in both runs, so a file that
     // caught up during the day withdraws it by morning.
     { key: "figma-drift-recheck", kind: "figma-drift-recheck" },
