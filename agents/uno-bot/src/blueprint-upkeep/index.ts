@@ -18,7 +18,8 @@ export {
 export { draftRevision, readDraft, type Draft, type DraftedChange, type DraftInput, type PathToday } from "./draft";
 export { revisionItem, revisionText, type RevisionSource } from "./card";
 export { cardEvidence, MAX_PRDS, prdIdsOf, type EvidencePage } from "./evidence";
-export { promotionDraft, stageOf, STAGES, type PlannedRows, type ShipStage } from "./stages";
+export { promotionDraft, retirementDraft, stageOf, STAGES, variantPromotionDraft, type PlannedRows, type ShipStage } from "./stages";
+export { cardKey, keepProposalLinks, prdCardOf, type LinkDeps, type ThreadCards } from "./link";
 export {
   COMPARISON_SUBREQUESTS,
   comparisonText,

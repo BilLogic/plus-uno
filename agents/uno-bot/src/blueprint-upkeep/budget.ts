@@ -9,7 +9,8 @@
 export const MATCH_JOBS = 6;
 /** External subrequests one card's weighing may spend at its worst: a
  *  deploy's promotion try, then the card and its PRD, the judgement, the
- *  search and the owner. Two such cards fill a job. */
+ *  search and the owner. Two such cards fill a job. A card linked to a drawn
+ *  proposal reads at most three paths and the owner instead, inside it. */
 export const MATCH_COST = 20;
 /** End-of-day jobs that draft paths. */
 export const DRAFT_JOBS = 6;

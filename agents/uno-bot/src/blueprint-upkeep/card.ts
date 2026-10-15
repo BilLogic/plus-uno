@@ -41,18 +41,27 @@ export function revisionTitle(today: Pick<PathToday, "scenario" | "path">): stri
   return `${today.scenario} › ${today.path}`;
 }
 
-function statusChange(draft: Draft): string {
-  if (draft.promoted) return `${code("planned")} → ${code("live")}`;
+/** The status change a card is titled by, as plain words: `from → to`, or
+ *  `rows → to` for rows with no single status before. */
+function change(draft: Draft): { from: string | null; to: string } {
+  const row = draft.revision.rows.find((r) => r.to !== "deprecated");
+  // A promotion is titled by its rows: they are what moves on.
+  if (draft.promoted && row?.from) return { from: row.from, to: row.to };
   const path = draft.revision.path;
-  if (path) return `${code(path.from)} → ${code(path.to)}`;
-  const to = draft.revision.rows.find((r) => r.to !== "deprecated")?.to ?? "deprecated";
-  return `rows → ${code(to)}`;
+  if (path) return { from: path.from, to: path.to };
+  return { from: null, to: row?.to ?? "deprecated" };
+}
+
+function statusChange(draft: Draft): string {
+  const c = change(draft);
+  return `${c.from ? code(c.from) : "rows"} → ${code(c.to)}`;
 }
 
 /** Part 2, Roadmap words only. */
 function whyNow(source: RevisionSource): string {
   const id = source.number !== null ? `RM-${source.number}` : esc(source.title);
-  return `*Why now:* ${id} reached ${code(`${source.status.property}: ${source.status.value}`)} — “${esc(source.quote)}” <${source.url}|${esc(source.title)}>`;
+  const quote = source.quote.trim() ? ` — “${esc(source.quote)}”` : "";
+  return `*Why now:* ${id} reached ${code(`${source.status.property}: ${source.status.value}`)}${quote} <${source.url}|${esc(source.title)}>`;
 }
 
 function today(path: PathToday): string[] {
@@ -66,8 +75,11 @@ function today(path: PathToday): string[] {
 const KIND_WORD = { added: "Added", changed: "Changed", deprecated: "Deprecated", promoted: "Promoted" } as const;
 
 function proposed(draft: Draft): string[] {
+  const path = draft.revision.path;
   return [
     "*Proposed*",
+    ...(draft.note ? [draft.note] : []),
+    ...(draft.retires && path ? [`• The path: ${code(path.from)} → ${code(path.to)}`] : []),
     ...draft.changes.map((c) =>
       c.kind === "changed"
         ? `• ${KIND_WORD[c.kind]} ${where(c)}: ${esc(c.before ?? "")} → ${esc(c.content)}`
@@ -84,6 +96,10 @@ function confidence(draft: Draft): string[] {
 }
 
 function ask(draft: Draft): string {
+  const path = draft.revision.path;
+  if (!draft.revision.rows.length && path) {
+    return `*The ask:* Approve sets this path to ${code(path.to)} on the blueprint, as uno-bot; no cell is written. Only the card's owner or Bill can approve; Reject writes nothing.`;
+  }
   const to = draft.revision.rows.some((r) => r.to !== "deprecated") ? statusOf(draft) : null;
   const what = to ? `writes these rows to the blueprint as ${code(to)}` : "writes these rows to the blueprint";
   return `*The ask:* Approve ${what}, as uno-bot, all or nothing. Only the card's owner or Bill can approve; Reject writes nothing.`;
@@ -132,15 +148,21 @@ export function revisionItem(source: RevisionSource, path: PathToday, draft: Dra
     .map(([k, n]) => `${n} ${k}`);
   return {
     id: revisionItemId(source, path),
-    title: `${n !== undefined ? `${n}. ` : ""}${revisionTitle(path)} · ${draft.promoted ? "planned → live" : draft.revision.path ? `${draft.revision.path.from} → ${draft.revision.path.to}` : "rows"}`,
+    title: `${n !== undefined ? `${n}. ` : ""}${revisionTitle(path)} · ${titleChange(draft)}`,
     subtitle: `${source.number !== null ? `RM-${source.number}` : esc(source.title)} · ${code(`${source.status.property}: ${source.status.value}`)}`,
     ...(owner ? { owners: [{ slack: owner }] } : {}),
-    body: `${counts.join(" · ")} · confidence ${draft.confidence.toFixed(1)}${draft.gaps.length ? ` · ${draft.gaps.length} to verify` : ""}`,
+    body: `${[...counts, ...(draft.retires ? ["path retired"] : [])].join(" · ")} · confidence ${draft.confidence.toFixed(1)}${draft.gaps.length ? ` · ${draft.gaps.length} to verify` : ""}`,
     open: { label: "Blueprint", url: path.link ?? source.url },
     also: { label: "Roadmap card", url: source.url },
     done: `written to the blueprint as uno-bot.`,
     detail: revisionText(source, path, draft),
   };
+}
+
+/** The item title's status change: `from → to`, or `rows`. */
+function titleChange(draft: Draft): string {
+  const c = change(draft);
+  return c.from ? `${c.from} → ${c.to}` : "rows";
 }
 
 /** The card the Gate stages: stated, the whole text as its lead. */

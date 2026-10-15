@@ -28,6 +28,8 @@ const UNLINKED =
   `SELECT ${COLUMNS} FROM blueprint_proposals WHERE card_id IS NULL AND written_at <= ?1 ` +
   `ORDER BY written_at, proposal_ts LIMIT ?2`;
 
+const BY_CARD = `SELECT ${COLUMNS} FROM blueprint_proposals WHERE card_id = ?1 ORDER BY written_at, proposal_ts LIMIT ?2`;
+
 type Row = Record<
   "proposal_ts" | "channel_id" | "thread_ts" | "reply_ts" | "requester_id" | "path_id" | "today_path_id" | "cell_ids" | "written_at" | "card_id",
   unknown
@@ -82,6 +84,11 @@ export function createD1ProposalRecords(deps: { db: ProposalDatabase; now?: () =
     async unlinkedBefore(before, limit) {
       chargeD1Query();
       const { results } = await db.prepare(UNLINKED).bind(before, limit).all<Row>();
+      return results.map(fromRow);
+    },
+    async byCard(cardId, limit) {
+      chargeD1Query();
+      const { results } = await db.prepare(BY_CARD).bind(cardId, limit).all<Row>();
       return results.map(fromRow);
     },
   };

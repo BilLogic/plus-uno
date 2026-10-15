@@ -44,13 +44,17 @@ describe("[d1] the blueprint proposals migration", () => {
     for (const { name } of results) expect(name).not.toMatch(/text|content|title|summary|label|scenario/);
   });
 
-  it("serves a thread's lookup and the unlinked check from their indexes", async () => {
+  it("serves a thread's lookup, the unlinked check and a card's lookup from their indexes", async () => {
     const plan = async (sql: string) =>
       (await bindings.USAGE_DB.prepare(`EXPLAIN QUERY PLAN ${sql}`).all<{ detail: string }>()).results.map((r) => r.detail).join(" | ");
     expect(await plan("SELECT proposal_ts FROM blueprint_proposals WHERE channel_id = 'C' AND thread_ts = 't'")).toMatch(
       /blueprint_proposals_by_thread/,
     );
     expect(await plan("SELECT proposal_ts FROM blueprint_proposals WHERE card_id IS NULL AND written_at <= 5 ORDER BY written_at")).toMatch(
+      /blueprint_proposals_unlinked/,
+    );
+    // A card's lookup rides the same index: card_id leads it.
+    expect(await plan("SELECT proposal_ts FROM blueprint_proposals WHERE card_id = 'page-a' ORDER BY written_at")).toMatch(
       /blueprint_proposals_unlinked/,
     );
   });

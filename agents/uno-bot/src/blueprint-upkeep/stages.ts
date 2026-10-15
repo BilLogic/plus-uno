@@ -10,6 +10,14 @@
 //     again; only when none of them is `planned` on the blueprint today — the
 //     `planned` card was never approved — is a fresh `live` revision drafted.
 //
+// A card whose thread drew a PROPOSAL, linked to it (`./link.ts`), moves that
+// proposal on instead: its `proposed` variant path and the cells on it are
+// promoted as drawn — to `planned` at the design hand-off, to `live` at the
+// deploy (`variantPromotionDraft`). The variant sits BESIDE today's path, so
+// going live does not by itself say today's path is retired; whether it
+// replaces it is the reviewer's call, offered on a card of its own at the
+// deploy (`retirementDraft`), approved or rejected apart from the promotion.
+//
 // A card is weighed once per moment: the seen set holds `pageId@stage`, and a
 // card weighed at a later moment counts as weighed at every earlier one, so a
 // deployed card whose `Design Status` still reads `Shipped` is not drafted
@@ -137,5 +145,67 @@ export function promotionDraft(planned: PlannedRows, today: PathToday): Draft | 
     confidence: 1,
     gaps: moved ? [`${moved} row(s) drafted at planned are no longer planned on the blueprint and were left out`] : [],
     promoted: true,
+  };
+}
+
+/** The statuses a target moves on from: what is behind it. */
+const BEHIND: Partial<Record<EntityStatus, readonly EntityStatus[]>> = {
+  planned: ["proposed"],
+  live: ["proposed", "planned", "built"],
+};
+
+const code = (word: string) => `\`${word}\``;
+
+/**
+ * A linked proposal's variant path moved on as drawn: each cell behind the
+ * target, and the path itself. Null when nothing on it is behind.
+ *
+ * @param variant - The proposal's path as the blueprint holds it now
+ * @param target - `planned` at a design hand-off, `live` at a deploy
+ * @param beside - Today's path it was drawn beside, as the card names it
+ */
+export function variantPromotionDraft(variant: PathToday, target: EntityStatus, beside?: Pick<PathToday, "scenario" | "path">): Draft | null {
+  const behind = BEHIND[target] ?? [];
+  const rows: RevisionRow[] = [];
+  const changes: DraftedChange[] = [];
+  for (const cell of variant.cells) {
+    if (!behind.includes(cell.status)) continue;
+    rows.push({ stepId: cell.stepId, laneId: cell.laneId, content: cell.content, from: cell.status, to: target });
+    changes.push({ kind: "promoted", step: nameOf(variant.steps, cell.stepId), lane: nameOf(variant.lanes, cell.laneId), content: cell.content });
+  }
+  const pathBehind = behind.includes(variant.status);
+  if (!rows.length && !pathBehind) return null;
+  const from = beside ? ` beside ${code(`${beside.scenario} › ${beside.path}`)}` : "";
+  return {
+    revision: {
+      pathId: variant.pathId,
+      label: `${variant.scenario} › ${variant.path}`,
+      rows,
+      ...(pathBehind ? { path: { from: variant.status, to: target } } : {}),
+    },
+    changes,
+    confidence: 1,
+    gaps: [],
+    promoted: true,
+    note: `The proposal drawn${from} when this work's PRD was written, moving on as drawn.`,
+  };
+}
+
+/**
+ * Today's path set to `deprecated` because a promoted proposal replaces it:
+ * the path's status alone, no cell written. Null when it is retired already.
+ *
+ * @param today - Today's path, as the blueprint holds it now
+ * @param replacement - The proposal's path going live beside it
+ */
+export function retirementDraft(today: PathToday, replacement: Pick<PathToday, "scenario" | "path">): Draft | null {
+  if (today.status === "deprecated") return null;
+  return {
+    revision: { pathId: today.pathId, label: `${today.scenario} › ${today.path}`, rows: [], path: { from: today.status, to: "deprecated" } },
+    changes: [],
+    confidence: 1,
+    gaps: [],
+    retires: true,
+    note: `If ${code(`${replacement.scenario} › ${replacement.path}`)} replaces this path once it is ${code("live")}, this path goes to ${code("deprecated")}; its cells are left as they are. Reject if both paths stay.`,
   };
 }
