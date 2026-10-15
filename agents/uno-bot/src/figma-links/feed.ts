@@ -1,34 +1,35 @@
-// What feeds the merged-PR queue (`./queue.ts`): PRs merged into main that
-// change a design-system component.
+// What the morning's Dev Mode links card covers (`./morning.ts`): PRs merged
+// into main that change a design-system component.
 //
-// THE FEED — `feedMergedPrs`, the first step of the morning
-// `figma-dev-links-pr` job: read one page of the pulls most recently closed
-// into main, keep those merged after the last one this feed has seen, and,
-// oldest first, read each one's changed files. A file under
-// `design-system/src/components/` names its component folder — `<group>/<Name>/`
-// or a flat `<group>/<Name>.*` — and that folder is the component whose
-// registry `code.source` sits in it (`component-registry.json`, the same map
-// the cards match a component to its Figma node by). Each PR that names one
-// is queued with its components; the queue, the cards and the
-// `FIGMA_DEV_LINKS` setting do the rest.
+// THE READ — `readMergedPrs`, the first step of the morning
+// `figma-dev-links-post` job: read one page of the pulls most recently closed
+// into main, keep those merged after the mark, and, oldest first, read each
+// one's changed files. A file under `design-system/src/components/` names its
+// component folder — `<group>/<Name>/` or a flat `<group>/<Name>.*` — and that
+// folder is the component whose registry `code.source` sits in it
+// (`component-registry.json`, the same map the card matches a component to
+// its Figma node by). The components those PRs name are the card's.
 //
-// THE MARK — the last merged PR seen (its merge time and number). It moves
-// past each PR whose files were read, so a PR is never queued twice; a first
-// run sets it at the newest merge and queues nothing, so the feed starts from
-// the day it is deployed rather than from the repo's history. A PR merged
-// after the mark was updated after it, so the page covers every one unless it
-// came back full with its oldest update still past the mark; then the run
-// note names that gap for a person to check, and the page is read as usual.
+// THE MARK — the last merged PR the card has covered (its merge time and
+// number). The read says where it would move (`through`): past each PR whose
+// files were read. It moves only once the card covering them stages, or at
+// once when they named nothing to link, so a PR is never carded twice and
+// never lost to a card that did not stage. A first run sets it at the newest
+// merge and names nothing, so the feed starts from the day it is deployed
+// rather than from the repo's history. A PR merged after the mark was updated
+// after it, so the page covers every one unless it came back full with its
+// oldest update still past the mark; then the run note names that gap for a
+// person to check, and the page is read as usual.
 //
 // THE BUDGET — one pull-list read, then one files read per PR, at most
 // `FILES_PER_RUN`; PRs past that wait for the next morning behind the mark.
-// With the registry read that is at most seven GitHub subrequests.
+// With the registry read the card's plan shares, that is at most seven GitHub
+// subrequests.
 //
 // PURE.
 
 import { rethrowIfBudget } from "../net";
 import type { DevLinkRegistry } from "./links";
-import { queuePrLinks, type QueuedPrLinks } from "./queue";
 
 /** A merged pull, as the feed reads it. */
 export interface MergedPull {
@@ -48,7 +49,7 @@ export interface MergedPullPage {
   oldestUpdatedAt: string | null;
 }
 
-/** The last merged PR the feed has seen. */
+/** The last merged PR the card has covered. */
 export interface SeenMark {
   mergedAt: string;
   number: number;
@@ -65,11 +66,21 @@ export interface FeedDeps {
   /** A pull's changed file paths. */
   pullFiles(number: number): Promise<string[]>;
   registry(): Promise<DevLinkRegistry>;
-  queue: Store<QueuedPrLinks[]>;
   mark: Store<SeenMark | null>;
 }
 
-/** Files reads one run makes; the PRs past them wait for the next run. */
+/** What a morning's read found. */
+export interface MergedPrs {
+  /** The registry components the PRs read changed, in the order met. */
+  components: string[];
+  /** The PRs whose files were read, oldest first. */
+  prs: number[];
+  /** Where the mark moves once they are dealt with; null when no PR was read. */
+  through: SeenMark | null;
+  summary: string;
+}
+
+/** Files reads one run makes; the PRs past them wait for the next morning. */
 export const FILES_PER_RUN = 5;
 
 const COMPONENTS_DIR = "design-system/src/components/";
@@ -109,20 +120,22 @@ const after = (p: SeenMark, mark: SeenMark) => p.mergedAt > mark.mergedAt || (p.
 const order = (a: MergedPull, b: MergedPull) => (a.mergedAt === b.mergedAt ? a.number - b.number : a.mergedAt < b.mergedAt ? -1 : 1);
 
 /**
- * Queue the component changes of PRs merged since the last run.
+ * The component changes of the PRs merged since the mark. Writes the mark
+ * only on a first run; otherwise says where it would move.
  *
- * @param deps - GitHub's reads, the registry, the queue and the mark
- * @param opts - `dryRun` reads and says what it would queue, and writes nothing
+ * @param deps - GitHub's reads, the registry and the mark
+ * @param opts - `dryRun` reads and writes nothing
  */
-export async function feedMergedPrs(deps: FeedDeps, opts: { dryRun?: boolean } = {}): Promise<{ summary: string }> {
+export async function readMergedPrs(deps: FeedDeps, opts: { dryRun?: boolean } = {}): Promise<MergedPrs> {
+  const none = (summary: string): MergedPrs => ({ components: [], prs: [], through: null, summary });
   const page = await deps.mergedPulls();
   const pulls = [...page.pulls].sort(order);
   const mark = await deps.mark.read();
   if (!mark) {
     const newest = pulls.at(-1);
-    if (!newest) return { summary: "no merged PR yet; nothing marked" };
+    if (!newest) return none("no merged PR yet; nothing marked");
     if (!opts.dryRun) await deps.mark.write({ mergedAt: newest.mergedAt, number: newest.number });
-    return { summary: `starting after #${newest.number}` };
+    return none(`starting after #${newest.number}`);
   }
   const fresh = pulls.filter((p) => after(p, mark));
   // A PR merged after the mark was updated after it too, so a page whose
@@ -130,11 +143,13 @@ export async function feedMergedPrs(deps: FeedDeps, opts: { dryRun?: boolean } =
   // stops short of it may have left some behind; what it holds is still read.
   const gap = page.full && page.oldestUpdatedAt && page.oldestUpdatedAt > mark.mergedAt ? page.oldestUpdatedAt : null;
   const gapNote = gap ? `PRs merged between ${mark.mergedAt} and ${gap} may be missing from the page read, so check them by hand` : null;
-  if (!fresh.length) return { summary: gapNote ?? "no PR merged since the last run" };
+  if (!fresh.length) return none(gapNote ?? "no PR merged since the last run");
 
   const byFolder = componentsByFolder(await deps.registry());
   const lines: string[] = [];
-  let seen = mark;
+  const components: string[] = [];
+  const prs: number[] = [];
+  let seen: SeenMark | null = null;
   let tried = 0;
   for (const p of fresh.slice(0, FILES_PER_RUN)) {
     tried += 1;
@@ -143,23 +158,26 @@ export async function feedMergedPrs(deps: FeedDeps, opts: { dryRun?: boolean } =
       files = await deps.pullFiles(p.number);
     } catch (err) {
       rethrowIfBudget(err);
-      lines.push(`#${p.number}: files not read, kept for the next run — ${err instanceof Error ? err.message : String(err)}`);
+      lines.push(`#${p.number}: files not read, kept for the next morning — ${err instanceof Error ? err.message : String(err)}`);
       break;
     }
     const folders = [...new Set(files.map(componentFolderOf).filter((f): f is string => f !== null))];
-    const components = folders.flatMap((f) => (byFolder.has(f) ? [byFolder.get(f)!] : []));
+    const named = folders.flatMap((f) => (byFolder.has(f) ? [byFolder.get(f)!] : []));
     const unknown = folders.filter((f) => !byFolder.has(f));
-    if (components.length) {
-      if (!opts.dryRun) await queuePrLinks(deps.queue, { pr: { number: p.number, url: p.url }, components });
-      lines.push(`#${p.number}: queued ${components.join(", ")}`);
-    }
+    for (const c of named) if (!components.includes(c)) components.push(c);
+    if (named.length) lines.push(`#${p.number}: ${named.join(", ")}`);
     if (unknown.length) lines.push(`#${p.number}: no registry component for ${unknown.join(", ")}, skipped`);
+    prs.push(p.number);
     seen = { mergedAt: p.mergedAt, number: p.number };
   }
   // The PRs no file read reached: after a failed one, or past the cap.
   const waiting = fresh.length - tried;
-  if (waiting > 0) lines.push(`${waiting} more merged PR(s) wait for the next run`);
+  if (waiting > 0) lines.push(`${waiting} more merged PR(s) wait for the next morning`);
   if (gapNote) lines.push(gapNote);
-  if (!opts.dryRun && seen !== mark) await deps.mark.write(seen);
-  return { summary: lines.join("; ") || `${fresh.length} merged PR(s), none touching a component` };
+  return {
+    components,
+    prs,
+    through: seen,
+    summary: lines.join("; ") || `${prs.length} merged PR(s), none touching a component`,
+  };
 }

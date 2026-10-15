@@ -35,7 +35,6 @@ import { TOOL_BODIES } from "../src/agent/tool-bodies";
 import { retrievalRanIn } from "../src/agent/confidence";
 import { proposalWasAddressed } from "../src/agent/pending-notice";
 import { operationKinds, renderProposalCard } from "../src/slack/proposal-render";
-import { warrantsReviewRequest } from "../src/slack/api";
 
 function schemasFromDisk(): ToolSchema[] {
   return JSON.parse(
@@ -264,22 +263,5 @@ describe("the readers answer from the row", () => {
     // Gate vocabulary works whatever is staged, including a name with no row —
     // the pending notice is telemetry, and a renamed tool must not zero it.
     assert.equal(proposalWasAddressed("it is still pending", "moon_landing"), true);
-  });
-
-  it("announces exactly the rows that name a reviewable artifact", () => {
-    for (const name of TOOL_NAMES) {
-      const artifact = TOOL_TABLE[name].reviewRequest;
-      assert.equal(
-        warrantsReviewRequest(name),
-        artifact !== null,
-        `the review-request fan-out disagrees with ${name}`,
-      );
-      if (artifact === null) continue;
-      assert.ok(artifact.length > 0, `${name} names an empty artifact`);
-      // An artifact is something a CONFIRMED run left, so it can only be a
-      // tool that went past the Gate.
-      assert.equal(TOOL_TABLE[name].access, "gated", `${name} reviews an ungated run`);
-    }
-    assert.equal(warrantsReviewRequest("moon_landing"), false);
   });
 });

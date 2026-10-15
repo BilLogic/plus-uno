@@ -39,16 +39,10 @@
 // internal parts, documentation sets or archived, and the registry has no
 // marker telling those from a real gap, so every week would repeat them.
 //
-// A component a library publish is still carrying — a card the library
-// tracker follows, or a change set waiting for its morning post — is left out:
-// after a deliberate publish code follows the library, so the precedence rule
-// is not the one that applies (`inFlightComponents`).
-//
 // Pure: no `Env`, no fetch. tests/ds-precedence.test.ts drives it over
 // fixtures drawn from #339.
 
 import type { FigmaComponentsResponse } from "../figma/client";
-import { figmaNodeUrl, type LibraryChangeSet } from "../figma-library/draft";
 import { namesInWords } from "../slack/copy-words";
 import { figmaFileUrl } from "../figma/links";
 
@@ -280,8 +274,6 @@ export interface CompareInput {
   library: LiveLibrary;
   fileKey: string;
   repo: string;
-  /** Components a library publish is still carrying; left out. */
-  inFlight: ReadonlySet<string>;
 }
 
 /**
@@ -290,12 +282,11 @@ export interface CompareInput {
  * @param input - The index, the registry, the library and the context
  */
 export function findDisagreements(input: CompareInput): Disagreement[] {
-  const { index, registry, library, fileKey, repo, inFlight } = input;
+  const { index, registry, library, fileKey, repo } = input;
   const found: Disagreement[] = [];
   const winner: DsSource = "code";
   const loser = losingSide("code", "library");
   for (const entry of index) {
-    if (inFlight.has(entry.name)) continue;
     const reg = registry.components?.[entry.name];
     const resolved = resolveSets(reg?.figma?.sets ?? [], library);
     const codeUrl = `https://github.com/${repo}/blob/main/${entry.docPath}`;
@@ -399,34 +390,7 @@ export function findDisagreements(input: CompareInput): Disagreement[] {
   return found;
 }
 
-/**
- * The components a library publish is still carrying: those a tracked card
- * names, and those a change set waiting for its morning post touches,
- * mapped through the registry by set node id or name.
- *
- * @param tracked - The library tracker's cards (`implement` is a name list)
- * @param findings - Change sets waiting for the morning post
- * @param registry - component-registry.json
- */
-export function inFlightComponents(
-  tracked: ReadonlyArray<{ implement: string | null }>,
-  findings: ReadonlyArray<Pick<LibraryChangeSet, "created" | "modified" | "deleted">>,
-  registry: PrecedenceRegistry,
-): Set<string> {
-  const names = new Set<string>();
-  for (const t of tracked) {
-    for (const name of (t.implement ?? "").split(",")) if (name.trim()) names.add(name.trim());
-  }
-  const entries = Object.entries(registry.components ?? {});
-  for (const changeSet of findings) {
-    for (const c of [...changeSet.created, ...changeSet.modified, ...changeSet.deleted]) {
-      const hit = entries.find(([, e]) =>
-        (e.figma?.sets ?? []).some(
-          (s) => (c.setNodeId && s.componentSetNodeId === c.setNodeId) || norm(s.name ?? "") === norm(c.containingFrame),
-        ),
-      );
-      if (hit) names.add(hit[0]);
-    }
-  }
-  return names;
+/** A node in a Figma file, opened on it. */
+function figmaNodeUrl(fileKey: string, nodeId: string): string {
+  return `https://www.figma.com/design/${fileKey}?node-id=${nodeId.replace(/:/g, "-")}`;
 }

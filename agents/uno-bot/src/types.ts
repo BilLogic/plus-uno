@@ -66,11 +66,11 @@ export interface Env {
    *  `integrations/repo-list.mjs`. Unset → `GITHUB_REPO` alone. */
   GITHUB_REPOS?: string;
   FIGMA_ACCESS_TOKEN: string;
-  // Figma library jobs (figma-poll.ts at end of day, figma-library/ in the
-  // morning). Both optional — unset → the job logs a skip and does nothing.
-  // FIGMA_FILE_KEY is the DS file (non-secret: it's in every shared Figma URL);
-  // PLUS_UNIVERSAL_CHANNEL_ID is #plus-universal, where a publish's card lands
-  // and whose members may confirm it.
+  // FIGMA_FILE_KEY is the DS file (non-secret: it's in every shared Figma
+  // URL): the library poll (figma-poll.ts) and the weekly DS precedence check
+  // read it. PLUS_UNIVERSAL_CHANNEL_ID is #plus-universal, where the sweep's
+  // design-system report goes, the weekly DS precedence section among it.
+  // Both optional — unset → the job logs a skip and does nothing.
   FIGMA_FILE_KEY?: string;
   PLUS_UNIVERSAL_CHANNEL_ID?: string;
   /** The other team channels of the posting ladder's pillar → channel map
@@ -121,17 +121,19 @@ export interface Env {
   NOTION_RESEARCH_PAPERS_DB_ID?: string;
   /** Banners — notion_search scope "banners". */
   NOTION_BANNERS_DB_ID?: string;
-  // #plus-design — reviewable artifacts (PRs, new PRDs) are announced here for
-  // team REVIEW (D5). Optional — unset → no review fan-out.
+  // #plus-design — the design team's channel. Read by the Figma Review cards
+  // when FIGMA_ASK_CHANNEL_ID is unset, figma-comments, the sweeps,
+  // follow-through, and the sweep_share_post allowlist.
   PLUS_DESIGN_CHANNEL_ID?: string;
   /** Where Figma Review cards post (`figma-ask/env.ts` `figmaReviewChannel`):
    *  a change asked for in a Figma comment (`figma-ask/`) and the weekly
    *  tidy-up (`figma-tidy/`). Blank or unset → #plus-design. */
   FIGMA_ASK_CHANNEL_ID?: string;
-  /** `on` lets Dev Mode links run for every registry component and post a
-   *  card for each merged PR that changed a design-system component
-   *  (`figma-links/gate.ts`, `figma-links/feed.ts`). Unset → one component
-   *  per manual run, and merged PRs wait in their queue. */
+  /** `on` lets Dev Mode links run for every registry component, and lets the
+   *  morning hand a card to the sweep's #plus-design message for the merged
+   *  PRs that changed a design-system component (`figma-links/gate.ts`,
+   *  `figma-links/feed.ts`). Unset → one component per manual run, and merged
+   *  PRs wait behind the feed's mark. */
   FIGMA_DEV_LINKS?: string;
   /** The channels the end-of-day sweep reads, comma-separated ids
    *  (`scheduled/runs.ts` `sweepChannelsFrom`). Unset → nothing is swept. */
@@ -199,7 +201,9 @@ export interface Env {
    *  Optional — unbound, turns are answered as before and recorded nowhere. */
   USAGE_DB?: D1Database;
   /** Comma-separated channel ids whose turns are test traffic on the usage
-   *  record — #uno-bot-sandbox. */
+   *  record — #uno-bot-sandbox. A post one of them, or a debug route, sets off
+   *  stays in that test channel and never reaches a team channel
+   *  (`usage/record.ts` `teamPostChannel`). */
   TEST_CHANNEL_IDS?: string;
   /** Slack user id of the lead: whose thread replies, and DMs from an asker,
    *  count as an ask escalated (src/usage/resolution.ts). Their own connected

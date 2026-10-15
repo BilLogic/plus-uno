@@ -14,14 +14,16 @@
 //
 // PURE: types and one merge.
 
-import type { Addressee } from "../destination/index";
+import type { Addressee, ChannelIds } from "../destination/index";
 import type { FigmaClient } from "../figma/client";
 import type { PendingProposal, ProposalOperation, ThreadState } from "../thread-state/index";
-import type { ReportStore } from "../slack/decision-cards";
+import type { ReportMessage, ReportStore } from "../slack/decision-cards";
+import type { SectionHandOff } from "../sweep/sections";
+import type { FigmaDecisionsHanded } from "./post";
 import type { DecisionDetector, DecisionRoute } from "./detector";
 import type { DecisionUpdate } from "./draft";
 import type { Section } from "./sections";
-import type { TriagePorts } from "./triage";
+import type { QuestionsHanded, TriagePorts } from "./triage";
 import type { FigmaPeople, NotionPeople, TeamRoles } from "../usage/roles";
 import type { DecisionRow, RowUpdate } from "../decisions-db/row";
 
@@ -64,16 +66,25 @@ export interface QueuedFile {
   title: string;
   url: string;
   owner: FileOwner | null;
+  /** The Product Pillar values of the cards its title names: which team's
+   *  channel the posting ladder sends its decisions to. Absent on a file
+   *  queued before it was kept: then its Figma team, or #plus-design. */
+  pillars?: string[];
   /** Who may decide: the cards' Contributors as Slack ids. Empty for a file
-   *  with no card, or none whose Contributors are Slack people: then
-   *  #plus-design's members decide its cards. */
+   *  with no card, or none whose Contributors are Slack people: then its
+   *  place's members decide its cards. */
   confirmers: string[];
   decisions: QueuedDecision[];
   runDate: string;
   foundAt: number;
-  /** The #plus-design thread a morning opened for it and could not finish:
-   *  the next morning posts in it rather than opening a second. */
-  threadTs?: string;
+}
+
+/** A file as its cards are staged: who may decide them. */
+export interface DecisionFile {
+  fileKey: string;
+  /** The file's name, as Figma has it. */
+  title: string;
+  confirmers: string[];
 }
 
 /** The KV records both jobs keep. */
@@ -95,20 +106,19 @@ export interface FigmaCommentStores {
   };
 }
 
-/** A decision thread posted in #plus-design, as the reply handler finds it. */
-export interface DecisionThread {
+/** The thread of a morning message in #plus-design that carried decision
+ *  cards, as the reply handler finds it. */
+export interface DecisionThread extends DecisionFile {
   channel: string;
-  /** The parent message's ts: the thread. */
+  /** The message's ts: the thread. */
   ts: string;
-  fileKey: string;
-  title: string;
-  /** Who may decide, as the cards were staged. */
-  confirmers: string[];
   /** When its cards lapse, epoch ms. */
   expiresAt: number;
-  /** Each staged decision: its number, and `proposalKey`, the key its proposal is
-   *  staged under — its message and its comment id (`itemProposalKey`). */
-  decisions: Array<{ n: number; commentId: string; proposalKey: string; decision: QueuedDecision }>;
+  /** Each staged decision: its number, `proposalKey`, the key its proposal is
+   *  staged under — its message and its comment id (`itemProposalKey`) — and
+   *  its file. A thread from before a message carried several files names
+   *  none: its one file is the thread's own. */
+  decisions: Array<{ n: number; commentId: string; proposalKey: string; decision: QueuedDecision; file?: DecisionFile }>;
   /** Cards shown in the thread so far, staged or not: the next card's number
    *  follows it, so a card that showed and failed is never renumbered onto. */
   numbered?: number;
@@ -134,12 +144,23 @@ export interface SweepFigmaComments extends FigmaCommentStores {
   detector: DecisionDetector;
   /** MISC's team id, from `FIGMA_TEAM_IDS`; absent, nothing is skipped as MISC. */
   miscTeamId?: string;
+  /** The morning run's hand-off to the sweep's post (`./post.ts`); absent on
+   *  a rehearsal, which hands nothing over. */
+  handOff?: SectionHandOff<FigmaDecisionsHanded>;
+  /** The unanswered questions' hand-off to the sweep's post (`./triage.ts`);
+   *  absent on a rehearsal. */
+  questionsHandOff?: SectionHandOff<QuestionsHanded>;
   /** The morning's Slack side. Absent, the post skips. */
   slack?: {
-    post(message: { text: string; blocks?: unknown[]; thread_ts?: string }): Promise<{ ok: boolean; ts?: string }>;
-    edit(ts: string, message: { text: string; blocks?: unknown[] }): Promise<void>;
-    /** #plus-design's members, or null when they cannot be read. */
-    members(): Promise<string[] | null>;
+    /** Post in `channel`, or #plus-design. */
+    post(message: { channel?: string; text: string; blocks?: unknown[]; thread_ts?: string }): Promise<{ ok: boolean; ts?: string }>;
+    /** Edit a message in `channel`, or #plus-design. */
+    edit(ts: string, message: { text: string; blocks?: unknown[]; metadata?: ReportMessage["metadata"] }, channel?: string): Promise<void>;
+    /** A channel's members — #plus-design's when none is named — or null
+     *  when they cannot be read. */
+    members(channel?: string): Promise<string[] | null>;
+    /** The posting ladder's channel ids; absent, #plus-design alone. */
+    channels?: ChannelIds;
     /** Stage a card the Worker posted, and put it on the usage record. */
     stage(proposal: PendingProposal): Promise<void>;
     /** Where each morning's report and its items' states are kept
@@ -160,6 +181,12 @@ export function operationsOf(d: Pick<QueuedDecision, "operation" | "row">): Prop
   return [...(d.operation ? [d.operation] : []), ...(d.row?.operations ?? [])];
 }
 
+/** A staged decision's file: its own, or — on a thread from before a message
+ *  carried several files — the thread's. */
+export function fileOf(thread: DecisionThread, entry: DecisionThread["decisions"][number]): DecisionFile {
+  return entry.file ?? { fileKey: thread.fileKey, title: thread.title, confirmers: thread.confirmers };
+}
+
 /**
  * A file queued again before its morning: the newer read's decisions replace
  * the older's thread by thread, and the rest stay.
@@ -170,5 +197,5 @@ export function operationsOf(d: Pick<QueuedDecision, "operation" | "row">): Prop
 export function mergeQueuedFile(older: QueuedFile | null, newer: QueuedFile): QueuedFile {
   if (!older) return newer;
   const fresh = new Set(newer.decisions.map((d) => d.commentId));
-  return { ...newer, ...(older.threadTs ? { threadTs: older.threadTs } : {}), decisions: [...older.decisions.filter((d) => !fresh.has(d.commentId)), ...newer.decisions] };
+  return { ...newer, decisions: [...older.decisions.filter((d) => !fresh.has(d.commentId)), ...newer.decisions] };
 }

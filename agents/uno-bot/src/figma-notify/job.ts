@@ -9,7 +9,7 @@
 //     the same job for a change whose notification never came.
 //   • FILE_COMMENT — a new comment the route marked as asking uno-bot
 //     something gets its answer, as a reply in Figma (#903, `../figma-ask/`).
-//     Any other comment is only noted: the midnight comment read (#900) reads
+//     Any other comment is only noted: the end-of-day comment read (#900) reads
 //     the KV notes instead, a day at a time.
 //
 // A READER'S FAILURE IS LOGGED, NEVER THROWN. The scheduled re-check looks at

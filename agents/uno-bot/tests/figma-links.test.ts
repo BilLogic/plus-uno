@@ -1,8 +1,8 @@
 // Dev Mode links on the registry's components, end to end on fakes: a run
 // posts one Review card per component that still needs its Code and
 // Storybook links, Approve writes exactly those links through the one Figma
-// client and leaves one labelled comment the first time, and a merged
-// library PR's link is offered the same way.
+// client and leaves one labelled comment the first time, and the morning
+// hands one card for the components that PRs merged into main changed.
 //
 // What an outsider sees: which cards post where, what each would write,
 // what lands in Figma after Approve, and that a second run adds nothing.
@@ -27,6 +27,13 @@ import {
   type CardedMark,
 } from "../src/figma-links/run";
 import { devLinksRequestOf } from "../src/figma-links/gate";
+import { devLinksDebugChannel } from "../src/figma-links/env";
+import { DEV_LINKS_SECTION, devLinksSection, handOverDevLinks, type DevLinksHanded, type DevLinksMorningDeps } from "../src/figma-links/morning";
+import type { MergedPull, SeenMark } from "../src/figma-links/feed";
+import { planDevLinksCard } from "../src/figma-links/run";
+import { sectionHandOffIn } from "../src/sweep/sections";
+import { runSweepJob } from "../src/sweep/run";
+import { memoryRunStorage, sweepHarness } from "./helpers/sweep-harness";
 import { figmaDevLinksProbe } from "../src/diagnostics/probes/figma";
 import type { Env } from "../src/types";
 import { isOwnComment } from "../src/figma-ask/trigger";
@@ -37,7 +44,6 @@ import { recordingDelivery } from "../src/turn/index";
 import { recordingViews } from "./helpers/recording-slack";
 import { notified } from "./helpers/notified";
 import { createInMemoryThreadState, type PendingProposal, type ReportItemState } from "../src/thread-state/index";
-import { runQueuedPrLinks, type QueuedPrLinks } from "../src/figma-links/queue";
 
 const CHANNEL = "D0APTB20SK0";
 const BILL = "U03FYQJRQHX";
@@ -346,6 +352,12 @@ describe("when a run may go", () => {
     assert.equal(await probe("component=Button&post=1"), false);
   });
 
+  it("a debug route's card posts in a test channel, never the Figma Review-card channel", () => {
+    const env = { PLUS_DESIGN_CHANNEL_ID: "C_DESIGN", FIGMA_ASK_CHANNEL_ID: "C_ASK", TEST_CHANNEL_IDS: "C_SANDBOX, C_OTHER" } as Env;
+    assert.equal(devLinksDebugChannel(env), "C_SANDBOX");
+    assert.deepEqual(devLinksDebugChannel({ ...env, TEST_CHANNEL_IDS: "" }), { refused: "no TEST_CHANNEL_IDS — a debug route's card posts only in a test channel" });
+  });
+
   it("once it is on: all of them, or several named", () => {
     assert.deepEqual(devLinksRequestOf({ all: true }, "on"), { request: { all: true } });
     assert.deepEqual(devLinksRequestOf({ component: "Button, Badge" }, " ON "), { request: { components: ["Button", "Badge"] } });
@@ -493,16 +505,6 @@ describe("a decided card stops counting as open", () => {
     const batch = await runDevLinksPost(w.deps, { all: true });
     assert.doesNotMatch(batch.summary, /already open/);
     assert.ok(linksOf(w.staged[1]!).some((l) => l.name.endsWith(": Button")));
-  });
-
-  it("a merged PR's card decided lets the PR's links be offered again", async () => {
-    const pr = { number: 77, url: "https://github.com/BilLogic/plus-uno/pull/77" };
-    const w = world();
-    await runDevLinksPost(w.deps, { pr, components: ["Button"] });
-    assert.match((await runDevLinksPost(w.deps, { pr, components: ["Button"] })).summary, /card already open: PR #77/);
-    await settle(w, FIRST_TS, "pr-77", { kind: "rejected", by: BILL });
-    const again = await runDevLinksPost(w.deps, { pr, components: ["Button"] });
-    assert.equal(again.cards, 1, again.summary);
   });
 
   it("a card past its time stops counting as open", async () => {
@@ -662,38 +664,90 @@ describe("Approve on the batch card", () => {
   });
 });
 
-describe("a merged library PR", () => {
-  const PR = { number: 1200, url: "https://github.com/BilLogic/plus-uno/pull/1200" };
+describe("the morning's card, on the sweep's #plus-design message", () => {
+  const DESIGN = "C0DESIGN";
+  const DATE = "2026-10-14";
+  const BUTTON_FILE = "design-system/src/components/actions/Button/Button.jsx";
+  const merged = (number: number, mergedAt: string): MergedPull => ({ number, url: `https://github.com/${REPO}/pull/${number}`, mergedAt });
+  const START: SeenMark = { mergedAt: "2026-10-10T00:00:00Z", number: 1 };
 
-  it("one card adds the PR's link to each mapped component it names, plainly named", async () => {
+  function morningWorld(opts: { pulls?: MergedPull[]; files?: Record<number, string[]>; mark?: SeenMark | null; on?: boolean } = {}) {
     const w = world();
-    const result = await runDevLinksPost(w.deps, { pr: PR, components: ["Button", "Banner"] });
-    assert.equal(result.cards, 1);
-    assert.match(result.summary, /not in the registry, so no links: Banner/);
-    assert.equal(w.posts[0]!.text.split("\n")[0], "PR #1200 merged, so its link is ready for Review on Button in Dev Mode.");
-    assert.deepEqual(linksOf(w.staged[0]!), [
-      { file_key: LIB, node_id: "33:2470", name: "PR #1200: Button", url: PR.url },
-      { file_key: LIB, node_id: "979:20977", name: "PR #1200: Button", url: PR.url },
-    ]);
+    const through = { value: opts.mark === undefined ? START : opts.mark };
+    const mark = { read: async () => through.value, write: async (v: SeenMark | null) => void (through.value = v) };
+    const handOff = sectionHandOffIn<DevLinksHanded>(memoryRunStorage(), DEV_LINKS_SECTION);
+    const pulls = opts.pulls ?? [merged(7, "2026-10-13T15:00:00Z")];
+    const filesAsked: number[] = [];
+    const deps: DevLinksMorningDeps = {
+      on: opts.on ?? true,
+      feed: {
+        mergedPulls: async () => ({ pulls, full: false, oldestUpdatedAt: pulls.map((p) => p.mergedAt).sort()[0] ?? null }),
+        pullFiles: async (n) => {
+          filesAsked.push(n);
+          return opts.files?.[n] ?? [BUTTON_FILE];
+        },
+        registry: w.deps.registry,
+        mark,
+      },
+      plan: (request) => planDevLinksCard(w.deps, request),
+      members: async () => [BILL],
+      handOff,
+      channel: DESIGN,
+      date: DATE,
+      now: () => NOW,
+    };
+    const section = devLinksSection({ reports: w.store, stage: (p) => w.deps.stage(p), edit: async () => {}, carded: w.deps.carded, mark, now: () => NOW }, handOff, DATE);
+    const h = sweepHarness({ channels: {}, now: NOW, runDate: DATE, threadState: w.store });
+    h.deps.sections = [section];
+    const run = async () => {
+      const handed = await handOverDevLinks(deps);
+      await runSweepJob({ key: "sweep-post", kind: "sweep-post" }, h.deps);
+      return handed;
+    };
+    return { w, h, deps, through, run, filesAsked };
+  }
+
+  it("a PR merged into main that changed a component goes up as one card on the morning's one message, and the mark moves past it", async () => {
+    const m = morningWorld();
+    const handed = await m.run();
+    assert.match(handed.summary, /handed a card for 4 link\(s\) from 1 merged PR/);
+    assert.equal(m.h.posted.length, 1);
+    assert.equal(m.h.posted[0]!.channel, DESIGN);
+    assert.match(m.h.posted[0]!.text, /Dev Mode links for Button are ready for Review\./);
+    assert.equal(m.w.staged.length, 1);
+    assert.deepEqual(m.w.staged[0]!.confirmers, [BILL]);
+    assert.deepEqual(m.through.value, { mergedAt: "2026-10-13T15:00:00Z", number: 7 });
+    assert.ok(m.w.carded.value?.["links-Button"]);
+
+    // The next morning: nothing new merged, nothing goes up.
+    const again = await handOverDevLinks(m.deps);
+    assert.match(again.summary, /no PR merged since the last run/);
   });
 
-  it("the queue waits while FIGMA_DEV_LINKS is off, and posts and empties once it is on", async () => {
-    let queue: QueuedPrLinks[] = [{ pr: PR, components: ["Button"] }];
-    const asked: unknown[] = [];
-    const deps = {
-      queue: { read: async () => queue, write: async (q: QueuedPrLinks[]) => void (queue = q) },
-      post: async (request: unknown) => {
-        asked.push(request);
-        return { posted: true, cards: 1, summary: "posted 1 card(s)" };
-      },
-    };
-    const held = await runQueuedPrLinks({ ...deps, on: false });
-    assert.match(held.summary, /1 merged PR waiting/);
-    assert.deepEqual(asked, []);
-    assert.equal(queue.length, 1);
+  it("a merged PR that changed no component moves the mark at once and hands nothing over", async () => {
+    const m = morningWorld({ files: { 7: ["agents/uno-bot/src/index.ts"] } });
+    await m.run();
+    assert.equal(m.h.posted.length, 0);
+    assert.deepEqual(m.through.value, { mergedAt: "2026-10-13T15:00:00Z", number: 7 });
+  });
 
-    await runQueuedPrLinks({ ...deps, on: true });
-    assert.deepEqual(asked, [{ pr: PR, components: ["Button"] }]);
-    assert.deepEqual(queue, []);
+  it("waits while FIGMA_DEV_LINKS is off, reading nothing, and the first morning only marks the newest merge", async () => {
+    const off = morningWorld({ on: false });
+    assert.match((await off.run()).summary, /wait until FIGMA_DEV_LINKS is on/);
+    assert.equal(off.h.posted.length, 0);
+    assert.deepEqual(off.filesAsked, []);
+
+    const first = morningWorld({ mark: null });
+    assert.match((await first.run()).summary, /starting after #7/);
+    assert.equal(first.h.posted.length, 0);
+    assert.deepEqual(first.through.value, { mergedAt: "2026-10-13T15:00:00Z", number: 7 });
+  });
+
+  it("a card that does not stage leaves the mark, so the next morning plans it again", async () => {
+    const m = morningWorld();
+    m.w.deps.stage = async () => Promise.reject(new Error("DO down"));
+    await m.run();
+    assert.equal(m.h.posted.length, 1);
+    assert.deepEqual(m.through.value, START);
   });
 });

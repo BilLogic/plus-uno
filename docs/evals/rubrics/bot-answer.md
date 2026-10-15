@@ -14,7 +14,7 @@ dimensions:
   - id: D4
     definition: "proposal-gate discipline — side-effect actions stage a confirmation card; nothing irreversible without the requester's ✅ (INFERRED 2026-07-08: gate.ts pre-dated d892346f, so this dimension was already covered)"
   - id: D5
-    definition: "communication routing — reviewable artifacts fan out to the right channel; people get @-mentioned via Team-DB Slack ids"
+    definition: "communication routing — people get @-mentioned via Team-DB Slack ids"
   - id: D6
     definition: "connector use — writes to an external estate (notion_create, github_issue_create, dm_relay) fire only behind the proposal gate"
   - id: D7

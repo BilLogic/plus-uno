@@ -1,11 +1,10 @@
-// The merged-PR feed for Dev Mode links: which merged PRs reach the queue,
-// and with which components.
+// The merged-PR feed for Dev Mode links: which merged PRs the morning's card
+// covers, with which components, and where the mark moves once it stages.
 
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-import { feedMergedPrs, type FeedDeps, type MergedPull, type SeenMark } from "../src/figma-links/feed";
-import type { QueuedPrLinks } from "../src/figma-links/queue";
+import { readMergedPrs, type FeedDeps, type MergedPull, type SeenMark } from "../src/figma-links/feed";
 import type { DevLinkRegistry } from "../src/figma-links/links";
 
 const REGISTRY: DevLinkRegistry = {
@@ -15,6 +14,8 @@ const REGISTRY: DevLinkRegistry = {
     Footer: { code: { source: "design-system/src/specs/Universal/Sections/Footer/Footer.jsx" } },
   },
 };
+
+const START: SeenMark = { mergedAt: "2026-10-13T00:00:00Z", number: 0 };
 
 const pull = (number: number, mergedAt: string): MergedPull => ({
   number,
@@ -30,8 +31,7 @@ function world(opts: {
   full?: string;
   failing?: number[];
 }) {
-  let queue: QueuedPrLinks[] = [];
-  let mark: SeenMark | null = opts.mark === undefined ? { mergedAt: "2026-10-13T00:00:00Z", number: 0 } : opts.mark;
+  let mark: SeenMark | null = opts.mark === undefined ? START : opts.mark;
   const filesAsked: number[] = [];
   const deps: FeedDeps = {
     mergedPulls: async () => ({
@@ -45,14 +45,13 @@ function world(opts: {
       return opts.files[n] ?? [];
     },
     registry: async () => REGISTRY,
-    queue: { read: async () => queue, write: async (q) => void (queue = q) },
     mark: { read: async () => mark, write: async (m) => void (mark = m) },
   };
-  return { deps, queue: () => queue, mark: () => mark, filesAsked };
+  return { deps, mark: () => mark, filesAsked };
 }
 
 describe("the merged-PR feed", () => {
-  it("a merged PR touching two component folders queues a link for each component", async () => {
+  it("a merged PR touching two component folders names each component, and leaves the mark for the card to move", async () => {
     const w = world({
       pulls: [pull(1300, "2026-10-14T10:00:00Z")],
       files: {
@@ -63,30 +62,31 @@ describe("the merged-PR feed", () => {
         ],
       },
     });
-    await feedMergedPrs(w.deps);
-    assert.deepEqual(w.queue(), [
-      { pr: { number: 1300, url: "https://github.com/BilLogic/plus-uno/pull/1300" }, components: ["Button", "Checkbox"] },
-    ]);
+    const fed = await readMergedPrs(w.deps);
+    assert.deepEqual(fed.components, ["Button", "Checkbox"]);
+    assert.deepEqual(fed.prs, [1300]);
+    assert.deepEqual(fed.through, { mergedAt: "2026-10-14T10:00:00Z", number: 1300 });
+    assert.deepEqual(w.mark(), START, "the feed never moves the mark past the PRs it read");
   });
 
-  it("a merged PR touching nothing under components queues nothing, and is not read again", async () => {
+  it("a merged PR touching nothing under components names nothing, and the mark may move past it", async () => {
     const w = world({
       pulls: [pull(1301, "2026-10-14T10:00:00Z")],
       files: { 1301: ["agents/uno-bot/src/index.ts", "design-system/src/specs/Universal/Sections/Footer/Footer.jsx"] },
     });
-    await feedMergedPrs(w.deps);
-    assert.deepEqual(w.queue(), []);
-    assert.deepEqual(w.mark(), { mergedAt: "2026-10-14T10:00:00Z", number: 1301 });
+    const fed = await readMergedPrs(w.deps);
+    assert.deepEqual(fed.components, []);
+    assert.deepEqual(fed.through, { mergedAt: "2026-10-14T10:00:00Z", number: 1301 });
   });
 
-  it("a PR already seen queues nothing and its files are not read", async () => {
+  it("a PR already seen names nothing and its files are not read", async () => {
     const w = world({
       pulls: [pull(1302, "2026-10-14T10:00:00Z")],
       files: { 1302: ["design-system/src/components/actions/Button/Button.jsx"] },
       mark: { mergedAt: "2026-10-14T10:00:00Z", number: 1302 },
     });
-    const { summary } = await feedMergedPrs(w.deps);
-    assert.deepEqual(w.queue(), []);
+    const { summary, through } = await readMergedPrs(w.deps);
+    assert.equal(through, null);
     assert.deepEqual(w.filesAsked, []);
     assert.match(summary, /no PR merged since the last run/);
   });
@@ -96,19 +96,19 @@ describe("the merged-PR feed", () => {
       pulls: [pull(1303, "2026-10-14T10:00:00Z")],
       files: { 1303: ["design-system/src/components/_internal/Footer/Footer.jsx"] },
     });
-    const { summary } = await feedMergedPrs(w.deps);
-    assert.deepEqual(w.queue(), []);
+    const { summary, components } = await readMergedPrs(w.deps);
+    assert.deepEqual(components, []);
     assert.match(summary, /#1303: no registry component for _internal\/Footer, skipped/);
   });
 
-  it("a first run marks the newest merge and queues nothing", async () => {
+  it("a first run marks the newest merge and names nothing", async () => {
     const w = world({
       pulls: [pull(1305, "2026-10-14T11:00:00Z"), pull(1304, "2026-10-14T10:00:00Z")],
       files: { 1305: ["design-system/src/components/actions/Button/Button.jsx"] },
       mark: null,
     });
-    await feedMergedPrs(w.deps);
-    assert.deepEqual(w.queue(), []);
+    const fed = await readMergedPrs(w.deps);
+    assert.equal(fed.through, null);
     assert.deepEqual(w.filesAsked, []);
     assert.deepEqual(w.mark(), { mergedAt: "2026-10-14T11:00:00Z", number: 1305 });
   });
@@ -116,20 +116,20 @@ describe("the merged-PR feed", () => {
   it("reads at most FILES_PER_RUN PRs, oldest first, and leaves the rest behind the mark", async () => {
     const pulls = [1, 2, 3, 4, 5, 6, 7].map((i) => pull(1310 + i, `2026-10-14T1${i}:00:00Z`)).reverse();
     const w = world({ pulls, files: {} });
-    const { summary } = await feedMergedPrs(w.deps);
+    const { summary, through } = await readMergedPrs(w.deps);
     assert.deepEqual(w.filesAsked, [1311, 1312, 1313, 1314, 1315]);
-    assert.deepEqual(w.mark(), { mergedAt: "2026-10-14T15:00:00Z", number: 1315 });
-    assert.match(summary, /2 more merged PR\(s\) wait for the next run/);
+    assert.deepEqual(through, { mergedAt: "2026-10-14T15:00:00Z", number: 1315 });
+    assert.match(summary, /2 more merged PR\(s\) wait for the next morning/);
   });
 
   it("counts as waiting only the PRs after the one whose files failed", async () => {
     const pulls = [1, 2, 3, 4].map((i) => pull(1320 + i, `2026-10-14T1${i}:00:00Z`));
     const w = world({ pulls, files: {}, failing: [1322] });
-    const { summary } = await feedMergedPrs(w.deps);
+    const { summary, through } = await readMergedPrs(w.deps);
     assert.deepEqual(w.filesAsked, [1321, 1322]);
-    assert.deepEqual(w.mark(), { mergedAt: "2026-10-14T11:00:00Z", number: 1321 }, "the mark stops before the failed PR");
-    assert.match(summary, /#1322: files not read, kept for the next run/);
-    assert.match(summary, /2 more merged PR\(s\) wait for the next run/);
+    assert.deepEqual(through, { mergedAt: "2026-10-14T11:00:00Z", number: 1321 }, "the mark stops before the failed PR");
+    assert.match(summary, /#1322: files not read, kept for the next morning/);
+    assert.match(summary, /2 more merged PR\(s\) wait for the next morning/);
   });
 
   it("a full page that does not reach back to the mark says PRs merged in the gap may be missed", async () => {
@@ -138,14 +138,14 @@ describe("the merged-PR feed", () => {
       files: { 1331: ["design-system/src/components/actions/Button/Button.jsx"] },
       full: "2026-10-14T09:00:00Z",
     });
-    const { summary } = await feedMergedPrs(w.deps);
-    assert.deepEqual(w.queue().map((q) => q.pr.number), [1331], "what the page holds is still read");
+    const { summary, prs } = await readMergedPrs(w.deps);
+    assert.deepEqual(prs, [1331], "what the page holds is still read");
     assert.match(summary, /PRs merged between 2026-10-13T00:00:00Z and 2026-10-14T09:00:00Z may be missing/);
   });
 
   it("a full page that reaches back past the mark covers every merge since, and says nothing of a gap", async () => {
     const w = world({ pulls: [pull(1332, "2026-10-14T12:00:00Z")], files: {}, full: "2026-10-12T09:00:00Z" });
-    const { summary } = await feedMergedPrs(w.deps);
+    const { summary } = await readMergedPrs(w.deps);
     assert.doesNotMatch(summary, /may be missing/);
   });
 });

@@ -424,7 +424,7 @@ async function readFile(
     });
   }
   if (!decisions.length) return none;
-  return { ok: true, file: { fileKey, title, url: fileUrl, owner, confirmers, decisions, runDate: deps.runDate, foundAt: deps.now() } };
+  return { ok: true, file: { fileKey, title, url: fileUrl, owner, pillars, confirmers, decisions, runDate: deps.runDate, foundAt: deps.now() } };
 }
 
 /**

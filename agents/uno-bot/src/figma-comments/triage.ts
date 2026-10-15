@@ -15,6 +15,8 @@ import { escapeSlackText } from "../slack/mrkdwn";
 import { resolveDestination, routeFinding, teamNamed, type Addressee, type ChannelIds } from "../destination/index";
 import { escapeRegExp } from "../tools/slack-people";
 import { commentUrl } from "./draft";
+import { itemProposalKey } from "../slack/decision-cards";
+import { handedSection, type SectionHandOff, type SweepSection } from "../sweep/sections";
 import type { FileOwner } from "./queue";
 import type { CommentThread } from "./threads";
 import type { Section } from "./sections";
@@ -78,8 +80,6 @@ export interface TriagePorts {
   handles: Record<string, string>;
   /** The ladder's channel ids. */
   channels: ChannelIds;
-  /** Post a top-level message: its ts, or Slack's refusal (`not_in_channel`). */
-  post(channel: string, text: string): Promise<Posted>;
   /** DM a person; whether it posted. */
   dm(slackId: string, text: string): Promise<boolean>;
   /** Put a channel card on the usage record (`workerCardEvent`). Best-effort:
@@ -174,25 +174,50 @@ export async function keepOpenQuestions(ports: TriagePorts, file: WatchedFile): 
 
 /** What a morning's triage did. */
 export interface TriageResult {
+  /** Questions raised this morning, or — their channel line handed to the
+   *  sweep's post — on their way to it. */
   raised: number;
   notes: string[];
 }
 
+/** One question's line on its place's morning message. */
+export interface HandedQuestion {
+  fileKey: string;
+  commentId: string;
+  /** The line, whole: whom it is for, the question and its link. */
+  line: string;
+  /** Whether every DM it owes has gone: then the line going up raises it. */
+  dmedAll: boolean;
+}
+
+/** What the triage leaves for a place's morning message. */
+export interface QuestionsHanded {
+  questions: HandedQuestion[];
+}
+
+/** The section's name on the sweep's morning post. */
+export const QUESTIONS_SECTION = "figma-questions";
+
 /**
- * The morning's triage: each watched question that is due, re-read, and
- * raised once through the ladder.
+ * The morning's triage: each watched question that is due, re-read, its DMs
+ * sent, and its channel line handed to the sweep's message for the place the
+ * ladder names (`questionsSection`), so the channel gets one message a
+ * morning. A question is raised once every DM it owes has gone and its line,
+ * if it owes one, is up.
  *
  * @param figma - Figma's comment read
  * @param ports - The triage's records and Slack
- * @param opts - The clock, the meter, and a dry run that sends and keeps nothing
+ * @param opts - The clock, the meter, the morning's hand-off and date, and a
+ *   dry run that sends and keeps nothing
  */
-export async function raiseUnanswered(
+export async function handOverUnanswered(
   figma: Pick<FigmaClient, "comments">,
   ports: TriagePorts,
-  opts: { now: number; dryRun?: boolean; meter?: { headroom(): { subrequests: number } } },
+  opts: { now: number; date: string; handOff?: SectionHandOff<QuestionsHanded>; dryRun?: boolean; meter?: { headroom(): { subrequests: number } } },
 ): Promise<TriageResult> {
   const result: TriageResult = { raised: 0, notes: [] };
   const left = () => opts.meter?.headroom().subrequests ?? Number.POSITIVE_INFINITY;
+  const byPlace = new Map<string, HandedQuestion[]>();
   for (const file of await ports.watch.list()) {
     const due = file.questions.filter((q) => dueAt(Date.parse(q.createdAt)) <= opts.now);
     if (!due.length) continue;
@@ -219,7 +244,7 @@ export async function raiseUnanswered(
         continue;
       }
       const named = namedIn(root.message, root.user.handle, ports.handles, comments);
-      if (left() < 1 + named.mapped.length * DM_COST) {
+      if (left() < named.mapped.length * DM_COST) {
         result.notes.push("the budget left could not raise every question, so some wait for tomorrow");
         stopped = true;
         break;
@@ -228,16 +253,21 @@ export async function raiseUnanswered(
         result.raised += 1;
         continue;
       }
-      const sent = await raise(file, q, root, named, ports, opts.now);
-      if (sent.ok) {
+      const sent = await send(file, q, root, named, ports);
+      if (sent.raised) {
         await ports.raised.add(q.commentId);
         done.add(q.commentId);
         result.raised += 1;
         continue;
       }
       progressed.set(q.commentId, sent.question);
-      if (sent.notIn) {
-        result.notes.push(`uno-bot is not in ${sent.notIn}, so the question ${q.commentId} on ${file.fileKey} waits for the invite`);
+      if (sent.line && opts.handOff) {
+        byPlace.set(sent.line.channel, [...(byPlace.get(sent.line.channel) ?? []), sent.line.question]);
+        result.raised += 1;
+      } else if (sent.line) {
+        result.notes.push(`the question ${q.commentId} on ${file.fileKey} has no morning message to go on, so it waits`);
+      } else if (sent.unplaced) {
+        result.notes.push(`the channel the posting ladder names for ${file.fileKey} is not configured, so the question ${q.commentId} waits`);
       } else {
         result.notes.push(`the question ${q.commentId} on ${file.fileKey} did not reach everyone it is for, so the rest wait for tomorrow`);
       }
@@ -249,7 +279,64 @@ export async function raiseUnanswered(
     }
     if (stopped) break;
   }
+  if (opts.handOff) for (const [channel, questions] of byPlace) await opts.handOff.put(opts.date, { channel, threadTs: null }, { questions });
   return result;
+}
+
+/**
+ * The unanswered questions as a section of the sweep's morning message: a
+ * line each, with no card. Once the message is up, each line goes on the
+ * usage record as a Worker-staged card, and its question is marked carded —
+ * and raised, when every DM it owed has gone. A message that does not go up
+ * leaves each question watched, so the next morning hands it over again.
+ *
+ * @param ports - The triage's records and the usage record
+ * @param handOff - The morning run's hand-off
+ * @param date - The morning's date
+ * @param now - The clock
+ */
+export function questionsSection(ports: TriagePorts, handOff: SectionHandOff<QuestionsHanded>, date: string, now: () => number): SweepSection {
+  return handedSection<QuestionsHanded>({
+    source: QUESTIONS_SECTION,
+    date,
+    handOff,
+    cardsOf(value) {
+      return {
+        cards: [],
+        lines: value.questions.map((q) => q.line),
+        // Each line's usage row, and its question's record.
+        cost: () => ({ subrequests: 0, d1Queries: value.questions.length }),
+        says: () => "",
+      };
+    },
+    async posted(value, place, _shown, report, progress) {
+      for (const q of value.questions) {
+        if (progress.done.has(q.commentId)) continue;
+        await ports
+          .recordCard(workerCardEvent({ proposalId: itemProposalKey(report.ts, `question-${q.commentId}`), channelId: place.channel, at: now(), ttlMs: TRIAGE_CARD_TTL_MS }))
+          .catch((err: unknown) => {
+            rethrowIfBudget(err);
+            console.error(`[figma-triage] ${q.commentId} went up but is not on the usage record: ${err instanceof Error ? err.message : String(err)}`);
+          });
+        const file = await ports.watch.read(q.fileKey);
+        if (q.dmedAll) {
+          await ports.raised.add(q.commentId);
+          if (file) {
+            const rest = file.questions.filter((w) => w.commentId !== q.commentId);
+            if (rest.length) await ports.watch.write({ ...file, questions: rest });
+            else await ports.watch.remove(file.fileKey);
+          }
+        } else if (file) {
+          await ports.watch.write({ ...file, questions: file.questions.map((w) => (w.commentId === q.commentId ? { ...w, carded: true } : w)) });
+        }
+        await progress.mark(q.commentId, true);
+      }
+    },
+    async notPosted(_value, _place, why) {
+      // Every question is still watched, its line not marked: the next morning hands it over again.
+      console.error(`[figma-triage] the morning message did not carry the questions (${why}) — kept for tomorrow`);
+    },
+  });
 }
 
 /** The people a question @-names: those the map has, by Slack id, and those it does not, by handle. */
@@ -295,19 +382,18 @@ export function namedIn(message: string, asker: string, handles: Record<string, 
   return out;
 }
 
-/** Send one question: a DM to each mapped person no earlier morning reached,
- *  and the channel card — unless everyone named is mapped, or it posted before.
- *  Raised (`ok`) once every one of those is reached; otherwise the question
- *  with whom it reached, to keep watching, and the channel that refused the
- *  card because uno-bot is not in it. */
-async function raise(
+/** Send what one question owes this morning: a DM to each mapped person no
+ *  earlier morning reached, and — unless everyone named is mapped, or its line
+ *  went up before — its channel line, for the place the ladder names. Raised
+ *  at once when it owes no line and every DM has gone; otherwise the question
+ *  with whom it reached, to keep watching, and its line to hand over. */
+async function send(
   file: WatchedFile,
   q: WatchedQuestion,
   root: FigmaComment,
   named: Named,
   ports: TriagePorts,
-  now: number,
-): Promise<{ ok: true } | { ok: false; question: WatchedQuestion; notIn?: string }> {
+): Promise<{ raised: true } | { raised: false; question: WatchedQuestion; line?: { channel: string; question: HandedQuestion }; unplaced?: true }> {
   const link = commentUrl(file.fileKey, q.nodeId, q.commentId);
   const dmed = new Set(q.dmed ?? []);
   for (const person of named.mapped) {
@@ -316,9 +402,9 @@ async function raise(
   }
   // A person whose DM failed stays owed it: the next morning tries them alone.
   const allDmed = named.mapped.every((p) => dmed.has(p.slack));
-  const reached = (carded: boolean): WatchedQuestion => ({ ...q, ...(dmed.size ? { dmed: [...dmed] } : {}), ...(carded ? { carded: true } : {}) });
+  const question: WatchedQuestion = { ...q, ...(dmed.size ? { dmed: [...dmed] } : {}) };
   const cardDue = !(named.mapped.length && !named.unmapped.length) && !q.carded;
-  if (!cardDue) return allDmed ? { ok: true } : { ok: false, question: reached(!!q.carded) };
+  if (!cardDue) return allDmed ? { raised: true } : { raised: false, question };
 
   // The file's team is read only when no card pillar has a channel: then it decides.
   const team = file.pillars.some((p) => teamNamed(p)) ? null : await ports.fileTeam(file.fileKey);
@@ -328,18 +414,15 @@ async function raise(
     figmaFile: { team, creatorHandle: file.owner && "figma" in file.owner ? file.owner.figma : null },
   });
   const where = resolveDestination(destination, ports.channels);
-  if (!where) return { ok: false, question: reached(false) };
-  const card = await ports.post(where.channel, questionCard(file, q, root.message, link, addressee, named.unmapped));
-  if (card.ok) {
-    await ports
-      .recordCard(workerCardEvent({ proposalId: card.ts, channelId: where.channel, at: now, ttlMs: TRIAGE_CARD_TTL_MS }))
-      .catch((err: unknown) => {
-        rethrowIfBudget(err);
-        console.error(`[figma-triage] ${card.ts} posted but is not on the usage record: ${err instanceof Error ? err.message : String(err)}`);
-      });
-    return allDmed ? { ok: true } : { ok: false, question: reached(true) };
-  }
-  return { ok: false, question: reached(false), ...(card.error === "not_in_channel" ? { notIn: where.channel } : {}) };
+  if (!where) return { raised: false, question, unplaced: true };
+  return {
+    raised: false,
+    question,
+    line: {
+      channel: where.channel,
+      question: { fileKey: file.fileKey, commentId: q.commentId, line: questionCard(file, q, root.message, link, addressee, named.unmapped), dmedAll: allDmed },
+    },
+  };
 }
 
 /** The channel card: whom it is for, the file, the question, its asker and place, anyone unmapped, and the link. */

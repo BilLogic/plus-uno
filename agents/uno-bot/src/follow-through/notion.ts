@@ -4,8 +4,9 @@
 // and turns a Roadmap row into an `ActiveCard`.
 //
 //   • the active cards: `queryRowsWithStatus` over the three active Design
-//     Status values, pages of 100 up to `ACTIVE_MAX_PAGES`;
-//   • one card: `readPageRow`;
+//     Status values, Design in `Current Team` in the same query, pages of 100
+//     up to `ACTIVE_MAX_PAGES`;
+//   • one card: `readPageRow`, read as gone once it is not a Design card;
 //   • a card's newest comment: `listPageComments` — one page, oldest first, so
 //     a card with a full page of comments reads as commented just now, which
 //     never flags it;
@@ -56,23 +57,39 @@ function roadmapId(env: Env): string {
   return env.NOTION_ROADMAP_DB_ID;
 }
 
-/** Every Roadmap card in an active Design Status, and whether the read stopped short. */
+/** The team whose cards get follow-ups, as `Current Team` names it. */
+const DESIGN_TEAM = "Design";
+
+/** The one clause that keeps another team's cards out of the query. */
+const DESIGN_TEAM_FILTER = { property: "Current Team", multi_select: { contains: DESIGN_TEAM } };
+
+/** Whether a row is a Design card: Design is in its `Current Team`. */
+function isDesignCard(row: EditedRow): boolean {
+  return (row.values["Current Team"] ?? []).includes(DESIGN_TEAM);
+}
+
+/**
+ * Every Design card in an active Design Status, and whether the read stopped
+ * short. A card another team owns is never followed up: the team is in the
+ * query, and a row back without it is dropped all the same.
+ */
 export async function queryActiveCards(env: Env): Promise<{ cards: ActiveCard[]; truncated: boolean }> {
   const cards: ActiveCard[] = [];
   let after: string | undefined;
   for (let page = 0; page < ACTIVE_MAX_PAGES; page++) {
-    const { rows, more, next } = await queryRowsWithStatus(env, roadmapId(env), "Design Status", ACTIVE_DESIGN_STATUSES, 100, after);
-    cards.push(...rows.map(toActiveCard));
+    const { rows, more, next } = await queryRowsWithStatus(env, roadmapId(env), "Design Status", ACTIVE_DESIGN_STATUSES, 100, after, DESIGN_TEAM_FILTER);
+    cards.push(...rows.filter(isDesignCard).map(toActiveCard));
     if (!more || !next) return { cards, truncated: false };
     after = next;
   }
   return { cards, truncated: true };
 }
 
-/** One card as it is now; null when it is gone, archived or no longer shared. */
+/** One card as it is now; null when it is gone, archived, no longer shared,
+ *  or no longer a Design card — so a follow-up kept for it settles quietly. */
 export async function readCard(env: Env, pageId: string): Promise<ActiveCard | null> {
   const row = await readPageRow(env, pageId);
-  return row ? toActiveCard(row) : null;
+  return row && isDesignCard(row) ? toActiveCard(row) : null;
 }
 
 /** A page's newest comment, epoch ms, or null for none. */

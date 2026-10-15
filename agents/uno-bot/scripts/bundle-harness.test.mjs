@@ -1008,7 +1008,7 @@ test("budget, sort and reference naming read only the section row — no path-su
 
 // ── Scheduled actions: one doc per family whose posts people reply to ─────────
 
-const FAMILIES = ["sweep", "follow-through", "dm-watch", "figma-comments", "figma-library", "ds-precedence"];
+const FAMILIES = ["sweep", "follow-through", "dm-watch", "figma-comments", "ds-precedence"];
 
 test("each scheduled-action family is disclosed under its folder name, with a generated pointer", () => {
   const prompt = assembled();

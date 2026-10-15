@@ -27,8 +27,8 @@ import { runBackstopOnEnv } from "../src/figma-notify/env";
 import type { Env } from "../src/types";
 
 const HOUR = 60 * 60 * 1000;
-/** The end-of-day run: 00:00 ET on Oct 8, 2026. */
-const MIDNIGHT = Date.parse("2026-10-08T04:00:00Z");
+/** The end-of-day run: 06:00 ET on Oct 8, 2026. */
+const END_OF_DAY = Date.parse("2026-10-08T10:00:00Z");
 const iso = (ms: number) => new Date(ms).toISOString();
 
 const UNIVERSAL: FigmaTeam = { name: "Universal", id: "1279226364199713409" };
@@ -70,7 +70,7 @@ function world(figma: InMemoryFigma, teams: readonly FigmaTeam[], opts: { notes?
   const notes = new Map(Object.entries(opts.notes ?? {}).map(([key, at]) => [`${CHANGED_PREFIX}${key}`, { at: iso(at), ttlS: CHANGED_TTL_S }]));
   let saved: BackstopState | null = null;
   const budget = { left: opts.budget ?? Infinity };
-  const clock = { now: MIDNIGHT };
+  const clock = { now: END_OF_DAY };
   const spend = <T>(p: Promise<T>) => {
     budget.left -= 1;
     return p;
@@ -110,7 +110,7 @@ function world(figma: InMemoryFigma, teams: readonly FigmaTeam[], opts: { notes?
 
 const JOB = { key: "figma-backstop-1" };
 /** A change inside the first sweep's window: Oct 7, early afternoon ET. */
-const AFTERNOON = MIDNIGHT - 10 * HOUR;
+const AFTERNOON = END_OF_DAY - 16 * HOUR;
 
 describe("the backstop catches what no notification reported", () => {
   it("queues a change with no note once, with its claim key and the backstop's mark, and writes its note (AC 2)", async () => {
@@ -125,7 +125,7 @@ describe("the backstop catches what no notification reported", () => {
     assert.deepEqual(report.missed, [{ fileKey: "FILEA", at: iso(AFTERNOON) }]);
     assert.equal(report.finished, true);
     assert.equal(w.state()!.sweep, null);
-    assert.equal(w.state()!.lastUntil, MIDNIGHT - GRACE_MS);
+    assert.equal(w.state()!.lastUntil, END_OF_DAY - GRACE_MS);
     assert.match(report.summary, /listed 2 .*: 1 file\(s\) changed, 1 with no notification, queued; sweep finished$/);
   });
 
@@ -159,27 +159,27 @@ describe("the backstop catches what no notification reported", () => {
   });
 
   it("leaves a change from the run's last half hour for the next sweep, which queues it", async () => {
-    const late = MIDNIGHT - 20 * 60 * 1000;
+    const late = END_OF_DAY - 20 * 60 * 1000;
     const figma = teamsWith([UNIVERSAL], { Universal: { F1: [{ key: "FILEA", at: late }] } });
     const w = world(figma, [UNIVERSAL]);
     await runBackstop(JOB, w.deps);
     assert.equal(w.queued.length, 0, "it may still be notified");
 
-    w.clock.now = MIDNIGHT + 24 * HOUR;
+    w.clock.now = END_OF_DAY + 24 * HOUR;
     await runBackstop(JOB, w.deps);
     assert.deepEqual(w.queued.map((j) => j.fileKey), ["FILEA"], "the next night's window holds it");
   });
 
   it("looks back only a day the first time, and from the last sweep's end after that", async () => {
     const figma = teamsWith([UNIVERSAL], {
-      Universal: { F1: [{ key: "OLD", at: MIDNIGHT - GRACE_MS - FIRST_LOOK_BACK_MS - HOUR }, { key: "NEW", at: AFTERNOON }] },
+      Universal: { F1: [{ key: "OLD", at: END_OF_DAY - GRACE_MS - FIRST_LOOK_BACK_MS - HOUR }, { key: "NEW", at: AFTERNOON }] },
     });
     const w = world(figma, [UNIVERSAL]);
     await runBackstop(JOB, w.deps);
     assert.deepEqual(w.queued.map((j) => j.fileKey), ["NEW"], "a change older than a day is not dredged up");
 
     // The next night: nothing new changed, so nothing is queued, the old one included.
-    w.clock.now = MIDNIGHT + 24 * HOUR;
+    w.clock.now = END_OF_DAY + 24 * HOUR;
     const second = await runBackstop(JOB, w.deps);
     assert.equal(second.inWindow, 0);
     assert.equal(w.queued.length, 1);
@@ -229,7 +229,7 @@ describe("the backstop's budget (AC 3)", () => {
     assert.equal(figma.calls().length - listedFirst, second.listed);
     assert.equal(new Set(w.queued.map((j) => j.eventId)).size, 30);
     assert.equal(w.queued.length, 30, "every folder's change, once");
-    assert.equal(w.state()!.lastUntil, MIDNIGHT - GRACE_MS);
+    assert.equal(w.state()!.lastUntil, END_OF_DAY - GRACE_MS);
   });
 
   it("fits the six teams in the end-of-day run's jobs at the Worker's ceiling", async () => {
@@ -250,20 +250,20 @@ describe("the backstop's budget (AC 3)", () => {
     const w = world(figma, teams, { budget: 5 });
     await runBackstop(JOB, w.deps);
     const unfinished = w.state()!.sweep!;
-    assert.deepEqual([unfinished.from, unfinished.until], [MIDNIGHT - GRACE_MS - FIRST_LOOK_BACK_MS, MIDNIGHT - GRACE_MS]);
+    assert.deepEqual([unfinished.from, unfinished.until], [END_OF_DAY - GRACE_MS - FIRST_LOOK_BACK_MS, END_OF_DAY - GRACE_MS]);
 
     // The next night, a day later: the old sweep first, with its own window.
-    w.clock.now = MIDNIGHT + 24 * HOUR;
+    w.clock.now = END_OF_DAY + 24 * HOUR;
     w.budget.left = Infinity;
     const resumed = await runBackstop(JOB, w.deps);
     assert.equal(resumed.finished, true);
     assert.equal(w.queued.length, 30, "nothing in the old window was lost");
-    assert.equal(w.state()!.lastUntil, MIDNIGHT - GRACE_MS, "it ended where its own window did");
+    assert.equal(w.state()!.lastUntil, END_OF_DAY - GRACE_MS, "it ended where its own window did");
 
     // Then a fresh sweep, from there to the new night less its hour: no gap, no overlap.
     const fresh = await runBackstop(JOB, w.deps);
     assert.equal(fresh.inWindow, 0);
-    assert.equal(w.state()!.lastUntil, MIDNIGHT + 24 * HOUR - GRACE_MS);
+    assert.equal(w.state()!.lastUntil, END_OF_DAY + 24 * HOUR - GRACE_MS);
   });
 
   it("never lists a folder's change twice into the queue, even listed again after a stop", async () => {

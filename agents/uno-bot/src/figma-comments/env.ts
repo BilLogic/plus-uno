@@ -13,15 +13,20 @@
 //   • The detector: the Worker's one ModelProvider.
 //   • The queue, the carded marks, MISC's list and each thread's record:
 //     HARNESS_KV, with an expiry. The queue holds words, so never D1 (ADR-030).
-//   • Slack: `chat.postMessage` and `chat.update` in #plus-design
-//     (`PLUS_DESIGN_CHANNEL_ID`), its members, and a card staged in ThreadState
-//     and put on the usage record as staged by the Worker.
+//   • Slack: `chat.postMessage` and `chat.update` in the place the posting
+//     ladder names (`../destination/`; #plus-design is `PLUS_DESIGN_CHANNEL_ID`)
+//     — a reply in the thread of the sweep's morning message, and an edit of
+//     it — that place's members, and a card staged in ThreadState and put on
+//     the usage record as staged by the Worker.
+//   • The hand-off: the morning run's own storage (`JobContext.runStorage`),
+//     read by the sweep's post (`figmaDecisionsSectionFor`).
 //   • The unanswered-question triage (`./triage.ts`): its watch list and
 //     raised marks in HARNESS_KV with an expiry; each file's Figma team from
 //     the nightly backstop's state, one KV read a morning; the hand-kept
-//     handle map, `FIGMA_HANDLE_SLACK_IDS`; the ladder's channel ids; and
-//     `chat.postMessage`, to a channel or, after `conversations.open`, a DM;
-//     a channel card goes on the usage record as staged by the Worker.
+//     handle map, `FIGMA_HANDLE_SLACK_IDS`; the ladder's channel ids; a DM,
+//     after `conversations.open`; and a line on the sweep's morning message,
+//     through the hand-off, which goes on the usage record as staged by the
+//     Worker once it is up.
 //   • New wording for a decision (`./revise.ts`) — Review's Needs changes, or
 //     a reply on an explicit cue: the thread's record, the card in
 //     ThreadState and its Needs changes lock, the page read fresh as the
@@ -41,15 +46,19 @@ import { decisionRowsOf, queryRoadmapCards } from "../integrations/notion";
 import { openConversation, postMessage, updateMessage } from "../slack/api";
 import { channelIdsFor } from "../destination/env";
 import { BACKSTOP_STATE_KEY, type BackstopState } from "../figma-notify/backstop";
-import { figmaHandlesFrom, type Posted, type TriagePorts, type WatchedFile } from "./triage";
+import { figmaHandlesFrom, questionsSection, QUESTIONS_SECTION, type Posted, type QuestionsHanded, type TriagePorts, type WatchedFile } from "./triage";
+import { ladderChannelsFor } from "../destination/env";
 import { channelMembers } from "../slack/channel-members";
 import { threadStateFor } from "../thread-state/production";
 import type { PendingProposal } from "../thread-state/index";
 import { figmaPeopleFor, notionPeopleFor, proposalEventLogFor, teamRolesFor } from "../usage/production";
 import { getBotIdentity } from "../slack/api";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
+import type { JobContext } from "../scheduled/runs";
+import { sectionHandOffIn, type SweepSection } from "../sweep/sections";
 import { modelDecisionDetector } from "./detector";
 import { reviseDecision } from "./revise";
+import { figmaDecisionsSection, FIGMA_DECISIONS_SECTION, type FigmaDecisionsHanded } from "./post";
 import type { DecisionThread, QueuedFile, SweepFigmaComments } from "./queue";
 
 const DAY_S = 24 * 60 * 60;
@@ -168,17 +177,25 @@ export function figmaCommentsFor(env: Env, kv: KVNamespace, provider: ModelProvi
             channel,
             async post(message) {
               const res = await postMessage(env, {
-                channel,
+                channel: message.channel ?? channel,
                 text: message.text,
                 ...(message.blocks ? { blocks: message.blocks } : {}),
                 ...(message.thread_ts ? { thread_ts: message.thread_ts } : {}),
               });
               return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
             },
-            async edit(ts, message) {
-              await updateMessage(env, { channel, ts, text: message.text, ...(message.blocks ? { blocks: message.blocks } : {}) });
+            async edit(ts, message, place) {
+              // A message's own tag, kept: the morning's is the sweep's.
+              await updateMessage(env, {
+                channel: place ?? channel,
+                ts,
+                text: message.text,
+                ...(message.blocks ? { blocks: message.blocks } : {}),
+                ...(message.metadata ? { metadata: message.metadata } : {}),
+              });
             },
-            members: () => channelMembers(env, channel),
+            members: (place) => channelMembers(env, place ?? channel),
+            channels: channelIdsFor(env),
             stage: (proposal) => stageDecisionCard(env, proposal),
             reports: threadStateFor(env),
           },
@@ -261,13 +278,41 @@ export function triageOn(env: Env, kv: KVNamespace): TriagePorts {
     },
     handles,
     channels: channelIdsFor(env),
-    post,
     async dm(slackId, text) {
       const open = await openConversation(env, slackId);
       return open.ok ? (await post(open.channel, text)).ok : false;
     },
     recordCard: (event) => recordProposalEvents(proposalEventLogFor(env), [event]),
   };
+}
+
+/**
+ * The morning's comment decisions as a section of the sweep's message in each
+ * place they were handed to, or undefined without the bindings or the run's
+ * storage.
+ *
+ * @param env - Worker bindings
+ * @param ctx - The morning run
+ */
+export function figmaDecisionsSectionFor(env: Env, ctx: JobContext): SweepSection | undefined {
+  if (!env.HARNESS_KV || !ctx.runStorage) return undefined;
+  const fc = figmaCommentsFor(env, env.HARNESS_KV, selectProvider(env));
+  if (!fc) return undefined;
+  const handOff = sectionHandOffIn<FigmaDecisionsHanded>(ctx.runStorage, FIGMA_DECISIONS_SECTION);
+  return figmaDecisionsSection({ ...fc, handOff }, ctx.runDate, () => Date.now());
+}
+
+/**
+ * The morning's unanswered Figma questions as a section of the sweep's
+ * message in each place they were handed to, or undefined without HARNESS_KV
+ * or the run's storage.
+ *
+ * @param env - Worker bindings
+ * @param ctx - The morning run
+ */
+export function figmaQuestionsSectionFor(env: Env, ctx: JobContext): SweepSection | undefined {
+  if (!env.HARNESS_KV || !ctx.runStorage) return undefined;
+  return questionsSection(triageOn(env, env.HARNESS_KV), sectionHandOffIn<QuestionsHanded>(ctx.runStorage, QUESTIONS_SECTION), ctx.runDate, () => Date.now());
 }
 
 /** Each decision thread's record in HARNESS_KV. */
@@ -302,29 +347,29 @@ export async function stageDecisionCard(env: Env, proposal: PendingProposal): Pr
 
 /**
  * Whether a message may be a reply rewording a decision: a person's reply in a
- * #plus-design thread, with text. Shape only — whether the thread is a
+ * thread of a channel the posting ladder posts in, with text. Shape only — whether the thread is a
  * decision thread is one KV read, in `isFigmaDecisionThread`.
  *
  * @param env - Worker bindings
  * @param event - The message
  */
 export function isFigmaDecisionCandidate(env: Env, event: SlackMessageEvent): boolean {
-  const channel = env.PLUS_DESIGN_CHANNEL_ID?.trim();
-  if (!channel || event.channel !== channel || !event.thread_ts || event.thread_ts === event.ts || !env.HARNESS_KV) return false;
+  // A decision thread is the morning message of whichever place the ladder sent it to.
+  if (!ladderChannelsFor(env).includes(event.channel) || !event.thread_ts || event.thread_ts === event.ts || !env.HARNESS_KV) return false;
   if (event.bot_id || !event.user || (event.subtype && event.subtype !== "thread_broadcast")) return false;
   return !!event.text?.trim();
 }
 
 /**
- * Whether a #plus-design thread is a comment-decision thread, for as long as
- * its record lasts. One KV read, and only for a reply in that channel.
+ * Whether a thread in a ladder channel is a comment-decision thread, for as
+ * long as its record lasts. One KV read, and only for a reply in one.
  *
  * @param env - Worker bindings
  * @param channel - The reply's channel
  * @param threadTs - The reply's thread
  */
 export async function isFigmaDecisionThread(env: Env, channel: string, threadTs: string): Promise<boolean> {
-  if (!env.HARNESS_KV || channel !== env.PLUS_DESIGN_CHANNEL_ID?.trim()) return false;
+  if (!env.HARNESS_KV || !ladderChannelsFor(env).includes(channel)) return false;
   const thread = await decisionThreadsOn(env.HARNESS_KV).read(threadTs);
   return !!thread && thread.channel === channel && thread.ts === threadTs;
 }

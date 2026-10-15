@@ -89,6 +89,9 @@ import { threadStateFor } from "../thread-state/production";
 import { notionPeopleFor, proposalEventLogFor, teamRolesFor } from "../usage/production";
 import { executeReadSource } from "../tools/read-source";
 import { figmaCommentsFor } from "../figma-comments/env";
+import { FIGMA_DECISIONS_SECTION, type FigmaDecisionsHanded } from "../figma-comments/post";
+import { QUESTIONS_SECTION, type QuestionsHanded } from "../figma-comments/triage";
+import { sectionHandOffIn } from "./sections";
 import { findSlackUsers, slackDirectoryFor } from "../tools/slack-people";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import type { OperationOutcome } from "../gate/index";
@@ -141,7 +144,7 @@ export async function runSweepJobOnEnv(
   env: Env,
   job: ScheduledJob,
   opts: JobContext,
-  extra: Pick<SweepDeps, "onThread" | "onNote" | "onDmThread" | "fileDrift" | "followUps"> = {},
+  extra: Pick<SweepDeps, "onThread" | "onNote" | "onDmThread" | "fileDrift" | "sections"> = {},
 ): Promise<SweepJobReport | { summary: string }> {
   if (!env.USAGE_DB || !env.HARNESS_KV) {
     // No cursor store means every run would re-read the day; nothing is safer.
@@ -228,6 +231,13 @@ async function sweepDepsFor(
   const fc = figmaCommentsFor(env, kv, provider);
   const figmaComments = fc && {
     ...fc,
+    // The morning's hand-over leaves its decisions for the sweep's post.
+    ...(opts.runStorage
+      ? {
+          handOff: sectionHandOffIn<FigmaDecisionsHanded>(opts.runStorage, FIGMA_DECISIONS_SECTION),
+          questionsHandOff: sectionHandOffIn<QuestionsHanded>(opts.runStorage, QUESTIONS_SECTION),
+        }
+      : {}),
     card: (n: number) => measured(() => fc.card(n)),
     ...(fc.decisionRows ? { decisionRows: (url: string) => measured(() => fc.decisionRows!(url)) } : {}),
     detector: { detect: (input: Parameters<typeof fc.detector.detect>[0]) => measured(() => fc.detector.detect(input)) },
@@ -358,6 +368,7 @@ async function sweepDepsFor(
     now: () => Date.now(),
     dryRun: opts.dryRun,
     runDate: opts.runDate,
+    ...(opts.spawn ? { spawn: opts.spawn } : {}),
   };
 }
 

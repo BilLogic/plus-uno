@@ -1,26 +1,14 @@
-// The Figma library's jobs, bound to `Env` — the only file in the folder that
-// names it. The snapshot refresh (`./snapshot-refresh.ts`) reads what the poll
-// left owed in HARNESS_KV, reads the repo's snapshot from GitHub, and sends
-// `repository_dispatch` with GITHUB_TOKEN. The post reads the registry from GitHub and the
-// channel's members from Slack, posts the card, and keeps its report and
-// stages it in ThreadState; the tracker reads GitHub's intakes, and files and
-// closes a card nobody decided. Findings and the tracked cards are JSON in HARNESS_KV
-// beside the poll's snapshot.
+// The library snapshot refresh bound to `Env` — the only file in the folder
+// that names it. The refresh (`./snapshot-refresh.ts`) reads what the poll
+// (`../figma-poll.ts`) left owed in HARNESS_KV, reads the repo's snapshot from
+// GitHub, and sends `repository_dispatch` with GITHUB_TOKEN.
 //
-// The repo is `GITHUB_REPO`, the harness repo: the registry lives there, the
-// intake is filed there (`github_issue_create` with no `repo`).
+// The repo is `GITHUB_REPO`, the harness repo: the snapshot lives there, and a
+// refresh that keeps not landing files its `automation-blocked` issue there.
 
 import type { Env } from "../types";
-import { getPermalink, postMessage, updateMessage } from "../slack/api";
-import { channelMembers } from "../slack/channel-members";
-import { REGISTRY_PATH } from "../figma/registry";
-import { threadStateFor } from "../thread-state/production";
-import { figmaClientFor } from "../figma/production";
-import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
-import { proposalEventLogFor } from "../usage/production";
-import { GithubRequestError, githubIssueClient, githubIssueUpdateClient, githubLibraryReads, resolveRepoFor } from "../integrations/github";
-import { INTAKE_LABELS, renderIssueBody } from "../tools/github-issue-render";
-import { FINDINGS_KV_KEY, kvJson } from "../figma-poll";
+import { GithubRequestError, githubIssueClient, githubLibraryReads, resolveRepoFor } from "../integrations/github";
+import { kvJson } from "../figma-poll";
 import { repositoryDispatch } from "../tools/github-dispatch";
 import {
   BLOCKED_LABEL,
@@ -31,124 +19,7 @@ import {
   type RefreshOwed,
   type SnapshotRefreshReport,
 } from "./snapshot-refresh";
-import type { ComponentRegistry, LibraryChangeSet } from "./draft";
-import { LIBRARY_CARD_TTL_MS, postLibraryFindings, type PostResult } from "./post";
-import { windowInWords } from "../slack/copy-words";
-import { charge, rethrowIfBudget } from "../net";
-import { trackLibraryIntakes, type TrackedPublish, type TrackResult } from "./track";
-
-export const TRACKED_KV_KEY = "figma-poll:tracked";
-/** Edits announced as "edited, not published", waiting for the next publish. */
-const UNPUBLISHED_KV_KEY = "figma-poll:unpublished";
-/** Who an expired card's intake was filed for, as its footer says it. */
-const EXPIRED_REQUESTER = `the #plus-universal library card, after ${windowInWords(LIBRARY_CARD_TTL_MS / 3_600_000)} with no decision`;
-function trackedStore(env: Env) {
-  return kvJson<TrackedPublish[]>(env, TRACKED_KV_KEY, []);
-}
-
-/**
- * The post job on `Env`.
- * @param env - Worker bindings
- * @param opts - `dryRun` posts, stages and writes nothing
- */
-export async function runLibraryPost(env: Env, opts: { dryRun: boolean }): Promise<PostResult> {
-  const channel = env.PLUS_UNIVERSAL_CHANNEL_ID?.trim();
-  if (!channel) return { posted: 0, pending: 0, summary: "PLUS_UNIVERSAL_CHANNEL_ID not set — nothing posted" };
-  const target = resolveRepoFor(env, undefined);
-  return postLibraryFindings(
-    {
-      findings: kvJson<LibraryChangeSet[]>(env, FINDINGS_KV_KEY, []),
-      tracked: trackedStore(env),
-      unpublished: kvJson<LibraryChangeSet | null>(env, UNPUBLISHED_KV_KEY, null),
-      async registry() {
-        if (!target.ok) return null;
-        try {
-          const parsed = JSON.parse(await githubLibraryReads(env, target.entry).rawFile(REGISTRY_PATH)) as ComponentRegistry;
-          return parsed && typeof parsed.components === "object" ? parsed : null;
-        } catch (err) {
-          console.warn(`[figma-library] registry unread: ${err instanceof Error ? err.message : String(err)}`);
-          return null;
-        }
-      },
-      members: () => channelMembers(env, channel),
-      async fileName(fileKey) {
-        const figma = figmaClientFor(env);
-        return figma ? (await figma.fileMeta(fileKey)).file.name || null : null;
-      },
-      async post(message) {
-        const res = await postMessage(env, { channel, text: message.text, blocks: message.blocks });
-        return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
-      },
-      async edit(ts, message) {
-        const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
-        if (!res.ok) throw new Error(res.error ?? "chat.update failed");
-      },
-      reports: threadStateFor(env),
-      async reply(ts, text) {
-        const res = await postMessage(env, { channel, thread_ts: ts, text });
-        if (!res.ok) throw new Error(res.error ?? "chat.postMessage failed");
-      },
-      async stage(proposal) {
-        const { retired } = await threadStateFor(env).putProposal(proposal);
-        // On the usage record like any card, staged by the Worker itself.
-        await recordProposalEvents(proposalEventLogFor(env), [
-          ...supersededEvents(retired, Date.now(), "worker"),
-          // Always a channel card (#plus-universal).
-          stagedEvent({ proposal, at: Date.now(), via: "worker", channelStored: true }),
-        ]);
-      },
-      channel,
-      now: () => Date.now(),
-    },
-    opts,
-  );
-}
-
-/**
- * The tracker job on `Env`.
- * @param env - Worker bindings
- * @param opts - `dryRun` files, edits, posts and writes nothing
- */
-export async function runLibraryTrack(env: Env, opts: { dryRun: boolean }): Promise<TrackResult> {
-  const target = resolveRepoFor(env, undefined);
-  if (!target.ok) {
-    return { dropped: 0, expired: 0, remaining: 0, summary: `no repo: ${target.error}` };
-  }
-  const reads = githubLibraryReads(env, target.entry);
-  const issues = githubIssueClient(env, target.entry);
-  return trackLibraryIntakes(
-    {
-      tracked: trackedStore(env),
-      github: {
-        recentIntakes: (since) => reads.recentIntakes(since),
-        intakesSince: (since) => reads.intakesSince(since),
-        // Approve's filing, with no Approve: the same labels, and the same
-        // footer naming where it came from.
-        async fileIntake(draft, card) {
-          const permalink = await getPermalink(env, card.channel, card.ts).catch((err: unknown) => {
-            rethrowIfBudget(err);
-            return null;
-          });
-          return issues.createIssue({
-            title: draft.title,
-            body: renderIssueBody(draft, { requester: EXPIRED_REQUESTER, permalink }),
-            labels: INTAKE_LABELS,
-          });
-        },
-      },
-      async postToThread(channel, ts, text) {
-        await postMessage(env, { channel, thread_ts: ts, text });
-      },
-      reports: threadStateFor(env),
-      async closeCard(channel, ts, message) {
-        const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
-        if (!res.ok) throw new Error(res.error ?? "chat.update failed");
-      },
-      now: () => Date.now(),
-    },
-    opts,
-  );
-}
+import { charge } from "../net";
 
 /**
  * The `figma-snapshot-refresh` job on `Env` (#898): settle what the repo's

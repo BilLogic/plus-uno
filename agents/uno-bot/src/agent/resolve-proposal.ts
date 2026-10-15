@@ -27,7 +27,7 @@
 // put the proposal in front of a person in the first place.
 
 import type { Env, SlackContext } from "../types";
-import { postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
+import { postMessage } from "../slack/api";
 import { batchOutcomeNote, batchTelemetryLine, runOperations, settleInto } from "../gate/index";
 import { batchResultPost } from "../slack/batch-result";
 import type { GateVerdict, OperationOutcome } from "../gate/index";
@@ -287,38 +287,7 @@ async function runWonVerdict(
       );
     }
   }
-
-  // D5: announce a successful reviewable artifact to #plus-design (right place
-  // + person + time). Best-effort — never let a fan-out failure break the flow.
-  // A card the Worker staged itself has no requester to name, and its own
-  // channel thread is where the result is followed (the Figma library card),
-  // so it asks nobody for a review here.
-  for (const outcome of run.requesterUserId ? outcomes : []) {
-    if (!warrantsReviewRequest(outcome.toolName) || !outcome.ok) continue;
-    try {
-      await postReviewRequest(env, {
-        toolName: outcome.toolName,
-        requesterUserId: run.requesterUserId,
-        originChannel: run.channel,
-        artifactUrl: resultUrl(outcome.result),
-      });
-    } catch (err) {
-      console.warn(
-        `[gate] review-request fan-out failed: ${err instanceof Error ? err.message : String(err)}`,
-      );
-    }
-  }
   return outcomes;
-}
-
-/** Pull an artifact URL (PR/Notion link) out of a tool result, if present. */
-function resultUrl(resultJson: string): string | undefined {
-  try {
-    const r = JSON.parse(resultJson) as { url?: string; pr_url?: string };
-    return r.url ?? r.pr_url ?? undefined;
-  } catch {
-    return undefined;
-  }
 }
 
 /**

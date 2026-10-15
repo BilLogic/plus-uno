@@ -1170,8 +1170,8 @@ describe("Gate imports no Slack module", () => {
   }
 });
 
-// A card the Worker states itself — the library card, the weekly DS
-// precedence card — answers the gate in its own words (`PendingProposal.stated`).
+// A card the Worker states itself — the weekly DS precedence card, a Figma
+// tidy-up card — answers the gate in its own words (`PendingProposal.stated`).
 // The generic lines assume a card someone asked for: "tell me what to change",
 // "ask me again", "the newest card". None of that is true here.
 describe("a stated card answers in its own words", () => {
@@ -1233,17 +1233,6 @@ describe("a stated card answers in its own words", () => {
       assert.deepEqual(verdict.post?.note, { kind: "resolved", decision: "cancel", cancelled: "Rejected, nothing filed" }, door.name);
       assert.equal(renderGateNote(verdict.post!.note), "Rejected, nothing filed.", door.name);
     }
-  });
-
-  it("a library card staged while a ⛔ filed its intake: the ⛔ runs nothing and says the intake comes at the window's close", async () => {
-    // As such a card is still stored: its old cancel batch, and its old words.
-    const legacy = { ...STATED, onCancel: [INTAKE], stated: { ...WORDS, cancelled: "Intake only" } } as PendingProposal;
-    const verdict = await resolveSignal(button("cancel"), { threadState: await stagedStated(legacy) });
-    assert.equal(verdict.outcome, "won");
-    assert.equal(verdict.execute, undefined);
-    assert.equal(renderGateNote(verdict.post!.note), "No code drafted. Its intake is filed when the card's window closes.");
-    const { notes } = await press(await stagedStated(legacy), "cancel");
-    assert.deepEqual(notes, [`:no_entry: No code drafted. Its intake is filed when the card's window closes, decided by <@${PRESSER}>.`]);
   });
 
   it("closes the card with what the ⛔ did and who decided", async () => {

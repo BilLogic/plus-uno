@@ -208,8 +208,8 @@ export function etDateOf(at: number): string {
  * with comments.
  *
  * A comment is dated by when it was created, else when Figma sent it, else
- * now — on the ET day, the team's day, so the midnight run reads the day that
- * just ended.
+ * now — on the ET day, the team's day, so the end-of-day run reads the day it
+ * sweeps.
  *
  * @param event - A new file event
  * @param now - Epoch ms, for a comment that carries no time of its own

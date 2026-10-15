@@ -29,8 +29,21 @@ import type { DecisionRow } from "../../src/integrations/notion";
 import type { TeamRoles } from "../../src/usage/roles";
 import { modelDecisionDetector } from "../../src/figma-comments/detector";
 import type { DecisionThread, QueuedFile, SweepFigmaComments } from "../../src/figma-comments/queue";
-import { figmaHandlesFrom, type TriagePorts, type WatchedFile } from "../../src/figma-comments/triage";
+import { figmaHandlesFrom, QUESTIONS_SECTION, type QuestionsHanded, type TriagePorts, type WatchedFile } from "../../src/figma-comments/triage";
 import type { ChannelIds } from "../../src/destination/index";
+import { FIGMA_DECISIONS_SECTION, type FigmaDecisionsHanded } from "../../src/figma-comments/post";
+import { sectionHandOffIn } from "../../src/sweep/sections";
+
+/** A morning run's own storage, in memory. */
+export function memoryRunStorage() {
+  const map = new Map<string, unknown>();
+  return {
+    map,
+    get: async <T>(key: string) => structuredClone(map.get(key)) as T | undefined,
+    put: async (key: string, value: unknown) => void map.set(key, structuredClone(value)),
+    delete: async (key: string) => map.delete(key),
+  };
+}
 
 export const DESIGN = "C0DESIGN";
 export const UNIVERSAL = "C0UNIVERSAL";
@@ -184,7 +197,6 @@ export interface FigmaRecords {
   triage: {
     watch: Map<string, WatchedFile>;
     raised: Set<string>;
-    posts: Array<{ channel: string; text: string }>;
     dms: Array<{ to: string; text: string }>;
     /** The usage record's rows for each channel card, as the Worker stages them. */
     events: ProposalEvent[];
@@ -196,8 +208,6 @@ export interface FigmaRecords {
  *  and `C0TOOLKIT` unless set). */
 export interface TriageOptions {
   handles?: string;
-  /** Channels uno-bot is not in: a post there answers `not_in_channel`. */
-  notIn?: string[];
   /** Slack ids whose DM does not send. */
   dmFails?: string[];
   fileTeams?: Record<string, string>;
@@ -329,8 +339,10 @@ export function sweepHarness(opts: {
     threads: new Map(),
     messages: [],
     listed: [],
-    triage: { watch: new Map(), raised: new Set(), posts: [], dms: [], events: [] },
+    triage: { watch: new Map(), raised: new Set(), dms: [], events: [] },
   };
+  const runStorage = memoryRunStorage();
+  const ladder: ChannelIds = opts.figma?.triage?.channels ?? { plusDesign: DESIGN, plusUniversal: UNIVERSAL, plusToolkit: "C0TOOLKIT" };
   const triageOpts = opts.figma?.triage;
   const triage: TriagePorts | undefined = triageOpts
     ? {
@@ -346,12 +358,7 @@ export function sweepHarness(opts: {
         },
         fileTeam: async (fileKey) => triageOpts.fileTeams?.[fileKey] ?? null,
         handles: figmaHandlesFrom(triageOpts.handles),
-        channels: triageOpts.channels ?? { plusDesign: DESIGN, plusUniversal: UNIVERSAL, plusToolkit: "C0TOOLKIT" },
-        post: async (channel, text) => {
-          if (triageOpts.notIn?.includes(channel)) return { ok: false, error: "not_in_channel" };
-          figmaRecords.triage.posts.push({ channel, text });
-          return { ok: true, ts: `${Math.floor(clock.now / 1000)}.${String(800000 + figmaRecords.triage.posts.length)}` };
-        },
+        channels: ladder,
         dm: async (to, text) => {
           if (triageOpts.dmFails?.includes(to)) return false;
           figmaRecords.triage.dms.push({ to, text });
@@ -407,11 +414,12 @@ export function sweepHarness(opts: {
             return { ok: true, ts };
           },
           async edit(ts, message) {
-            const m = figmaRecords.messages.find((x) => x.ts === ts);
+            const m = figmaRecords.messages.find((x) => x.ts === ts) ?? posted.find((x) => x.channel === DESIGN && x.ts === ts);
             if (m) m.edited = message.text;
             if (m && message.blocks) m.editedBlocks = message.blocks;
           },
           members: async () => (opts.figma!.members === undefined ? [] : opts.figma!.members),
+          channels: ladder,
           reports: threadState,
           async stage(proposal) {
             once("stage");
@@ -428,6 +436,9 @@ export function sweepHarness(opts: {
           write: async (thread) => void figmaRecords.threads.set(thread.ts, structuredClone(thread)),
         },
         ...(triage ? { triage } : {}),
+        // The morning run's storage, which the hand-over and the sweep's post share.
+        handOff: sectionHandOffIn<FigmaDecisionsHanded>(runStorage, FIGMA_DECISIONS_SECTION),
+        questionsHandOff: sectionHandOffIn<QuestionsHanded>(runStorage, QUESTIONS_SECTION),
       }
     : undefined;
 

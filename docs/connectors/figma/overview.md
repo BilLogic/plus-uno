@@ -21,7 +21,7 @@ uno-bot reaches Figma over REST alone, through one client (`src/figma/`); the Fi
 | Comments | read, post, reply and delete; the one ungated write is the @uno reply (the figma-comments scheduled action) |
 | Reactions | send `":goat:"`, the shortcode — Figma answers the emoji character with a 400 — and read a 🐐 back as `:goat:` |
 | Webhooks, library components, folders, versions | read, by the scheduled actions |
-| Dev Mode links | written, live: `figma_dev_links` adds a component's Code, Storybook and PR links on Approve of its Review card — one component, or a batch card (`src/figma-links/`) |
+| Dev Mode links | written, live: `figma_dev_links` adds a component's Code and Storybook links on Approve of its Review card — one component, or a batch card (`src/figma-links/`) |
 | Variables (token names) | Enterprise only: a binding's id is readable, the name it points at is not; a token value comes from `design-system/src/tokens/` through `github_read` |
 | Canvas writes, file renames and moves, Figma Make | out of the API's reach: the bot writes out the exact change for a person, or files the build through `file-a-ticket` |
 

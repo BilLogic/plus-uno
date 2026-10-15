@@ -120,7 +120,7 @@ function renderPendingBlock(p: PendingContext, sender: SenderContext | null): st
           ),
         ]
       : [`- tool: ${p.toolName}`, `- parameters: ${JSON.stringify(p.input, null, 2)}`]),
-    // A card the Worker staged itself (the Figma library card) has no requester.
+    // A card the Worker staged itself (a weekly DS precedence card) has no requester.
     p.requesterUserId ? `- requester: <@${p.requesterUserId}>` : "- requester: none — uno-bot staged this card itself",
     sender ? `- current message sender: <@${sender.userId}>` : "",
     "",

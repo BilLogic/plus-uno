@@ -39,7 +39,7 @@ import { threadStateFor } from "../thread-state/production";
 import { gapNotesFor, notionPeopleFor, proposalEventLogFor } from "../usage/production";
 import { throughDirectory } from "./people";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
-import type { SweepFollowUps } from "../sweep/run";
+import type { SweepSection } from "../sweep/sections";
 import type { CommitmentRecord } from "../commitments/store";
 import { TAP_REFUSED, type TapAnswer } from "../commitments/copy";
 import type { ReminderReaction } from "../commitments/run";
@@ -208,7 +208,7 @@ export function cardFollowUpsFor(env: Env, opts: Pick<JobContext, "dryRun" | "ru
  * @param env - Worker bindings
  * @param opts - The sweep job's run
  */
-export function morningFollowUpsFor(env: Env, opts: JobContext): SweepFollowUps | undefined {
+export function morningFollowUpsFor(env: Env, opts: JobContext): SweepSection | undefined {
   const deps = dueDepsFor(env, opts);
   return deps ? followUpsForSweep(deps, Date.now(), opts.runDate) : undefined;
 }

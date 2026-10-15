@@ -12,51 +12,45 @@
 //   • SKIP — "Leave as is" keeps a file and check quiet until the file's
 //     title cards change (`leaveAsIs`), so an item stays left as is however
 //     long the file stays as it is.
-//   • the POST — `figma-tidy-post`, after the reads: the cards the titles name,
-//     read from the Roadmap in one query; the checks (`./checks.ts`); then the
-//     week's report on the shared decision card (`slack/decision-cards.ts`):
-//     a parent line in the channel, and in its thread one combined reply: a
-//     bullet per owner, mentioning them once, with their count and how many
-//     wait for next week, the files with no owner the Roadmap names last;
-//     then one carousel of at most ten cards (Slack's limit), grouped by
-//     owner in bullet order. Past ten, the cards are filled round-robin, so
-//     every owner has one before anyone has a second. Each card is its own
+//   • the HAND-OVER — `figma-tidy-post`, after the reads and before the
+//     sweep's post: the cards the titles name, read from the Roadmap in one
+//     query; the checks (`./checks.ts`); then what is new handed to the
+//     sweep's morning message in the Figma Review channel, as a section of it
+//     (`tidySection`, `../sweep/sections.ts`). It posts nothing of its own.
+//     The section is a line for the week, a bullet per owner, mentioning them
+//     once, with their count, the files with no owner the Roadmap names last;
+//     then its cards in the message's one carousel of at most ten (Slack's
+//     limit), shared with the other sections, filled round-robin, so every
+//     owner has one before anyone has a second. Each card is its own
 //     proposal, answered in its Review pop-up with "Moved it" or "Leave as
 //     is"; neither writes to Figma (`./copy.ts`).
 //
 // WHAT THE WEEKS REMEMBER. Every card shown is remembered by its fingerprint
 // (file, check and card) for five weeks. A later week shows only what is new,
-// and counts what is still open; an item held back past the ten is not
-// remembered, so it is new the next week. A week with nothing new posts
-// nothing; the first week with nothing open at all, after a week that had
-// some, posts one all-clear and then goes quiet.
+// and counts what is still open; an item that did not show is not
+// remembered, so it is new the next week. A week with nothing new hands
+// nothing over; the first week with nothing open at all, after a week that
+// had some, hands over one all-clear line and then goes quiet.
 //
 // Subrequest math (each job an alarm with a fresh 50; lookups stop at 38):
 //   read: one call a listing, three with retries; ~30 for five teams. Then
 //         one or two page reads a file (`PAGES_COST` with retries) until
 //         the job's budget is nearly spent.
-//   post: the Roadmap (one query per 100 cards) + a likely card for each
-//         unknown one shown (at most `LIKELY_LOOKUPS`) + members (at most 3
-//         pages) + the parent and its one reply. The report record and
-//         stagings are Durable Object hops; the listing and memory are KV.
+//   hand-over: the Roadmap (one query per 100 cards) + a likely card for the
+//         first unknown ones (at most `LIKELY_LOOKUPS`) + members (at most 3
+//         pages). The listing, the memory and the hand-off are internal.
+//   section: an edit when a card did not stage (1), on the sweep's post's
+//         budget; the stagings are Durable Object hops.
 //
 // PURE: `Env` enters in `./env.ts`.
 
 import { rethrowIfBudget } from "../net";
 import { FigmaRequestError, type FigmaClient } from "../figma/client";
 import type { FigmaTeam } from "../figma-notify/teams";
-import type { PendingProposal, ThreadState } from "../thread-state/index";
+import type { PendingProposal } from "../thread-state/index";
 import { renderProposalCard } from "../slack/proposal-render";
-import {
-  decisionReport,
-  itemProposal,
-  markNotStaged,
-  MAX_REPORT_ITEMS,
-  reportRecord,
-  roundRobin,
-  type ReportMessage,
-  type ReportStore,
-} from "../slack/decision-cards";
+import { itemProposal, markNotStaged, roundRobin, type ReportMessage, type ReportStore } from "../slack/decision-cards";
+import { handedSection, type SectionHandOff, type SweepSection } from "../sweep/sections";
 import { pagesOf } from "../figma-comments/sections";
 import { collectTextLayers } from "../integrations/figma-reading";
 import {
@@ -81,6 +75,7 @@ import {
   tidyCardWords,
   tidyChoices,
   tidyItem,
+  tidyCarriedParent,
   tidyParent,
   TIDY_NOT_STAGED,
   TIDY_REVISION_REFUSAL,
@@ -292,16 +287,12 @@ export interface TidyPostDeps {
   };
   /** The channel's member ids — who may answer a card — or null when Slack would not say. */
   members(): Promise<string[] | null>;
-  /** Post top level, or in a thread. */
-  post(message: ReportMessage, threadTs?: string): Promise<{ ok: boolean; ts?: string }>;
-  /** Edit a posted message in place. */
-  edit(ts: string, message: ReportMessage): Promise<void>;
-  reports: ReportStore & Pick<ThreadState, "putReport">;
-  stage(proposal: PendingProposal): Promise<void>;
-  /** Mark the parent's thread, so the team's replies there are not all turns. */
-  markThread(ts: string): Promise<void>;
+  /** The week's cards that did not show on an earlier morning's message. */
+  waiting: Store<TidyHanded | null>;
+  /** The morning run's hand-off; absent on a rehearsal. */
+  handOff?: SectionHandOff<TidyHanded>;
   channel: string;
-  /** The Monday, `YYYY-MM-DD`. */
+  /** The morning's date: the Monday, on the week's own run. */
   runDate: string;
   now(): number;
 }
@@ -311,22 +302,50 @@ export interface TidyPostResult {
   summary: string;
 }
 
-/** A finding as the week's reply carries it. */
+/** A finding as the week's section carries it. */
 interface Shown {
   finding: TidyFinding;
   likely: TidyCard | null;
+  /** Its owner's name, where a DM tags nobody. */
+  ownerName?: string;
 }
 
+/** What the week's hand-over leaves for the morning's message. */
+export interface TidyHanded {
+  /** Every new finding, round-robin by owner, each with the likely card it names. */
+  shown: Shown[];
+  /** New this week, and still open from earlier weeks. */
+  fresh: number;
+  stillOpen: number;
+  /** Every open item, new or not: what an all-clear says were fixed. */
+  open: number;
+  /** Who may answer a card. */
+  confirmers: string[];
+  /** Items fixed since last week, when this week is the all-clear. */
+  allClear?: number;
+  /** The Monday whose week these are, on a later morning carrying the cards
+   *  an earlier message had no room for. */
+  carriedFrom?: string;
+}
+
+/** The section's name on the sweep's morning post. */
+export const TIDY_SECTION = "figma-tidy";
+
 /**
- * The week's post.
+ * The week's hand-over: the checks, then what is new handed to the sweep's
+ * morning message in the Figma Review channel, as a section of it. It posts
+ * nothing of its own. On a morning with no listing of its own, the week's
+ * cards an earlier message had no room for are handed over instead.
  *
- * @param deps - The listing, the memory, the Roadmap, the channel and the store
- * @param opts - `dryRun` reads and drafts, and posts, stages and writes nothing
+ * @param deps - The listing, the memory, the Roadmap, the members and the hand-off
+ * @param opts - `dryRun` reads and drafts, and hands over and keeps nothing
  */
 export async function runTidyPost(deps: TidyPostDeps, opts: { dryRun?: boolean } = {}): Promise<TidyPostResult> {
   const listing = await deps.listing.read();
-  if (!listing || listing.runDate !== deps.runDate) return { posted: false, summary: "no listing for this week" };
+  if (!listing || listing.runDate !== deps.runDate) return handOverWaiting(deps, opts);
   if (listing.tasks.length) return { posted: false, summary: `the listing stopped short (${listing.tasks.length} left) — no report this week` };
+  // A new week: what an earlier week left waiting is replaced by its own.
+  if (!opts.dryRun) await deps.waiting.write(null);
 
   const refs = Object.fromEntries(Object.entries((await deps.refs.read()) ?? {}).map(([key, r]) => [key, r.cards]));
   const numbers = cardsNamed(listing.files, listing.folders, refs);
@@ -337,20 +356,17 @@ export async function runTidyPost(deps: TidyPostDeps, opts: { dryRun?: boolean }
   const memory = remembered(await deps.memory.read(), deps.runDate);
   const fresh = findings.filter((f) => !memory.shown[f.fingerprint]);
   const stillOpen = findings.length - fresh.length;
-  const keep = async (m: TidyMemory) => {
-    if (!opts.dryRun) await deps.memory.write(m);
+  const handOver = async (value: TidyHanded) => {
+    if (!opts.dryRun && deps.handOff) await deps.handOff.put(deps.runDate, { channel: deps.channel, threadTs: null }, value);
   };
 
   if (!fresh.length) {
     if (!findings.length && memory.open > 0) {
-      if (opts.dryRun) return { posted: false, summary: "would post the all-clear" };
-      const text = allClearText(memory.open);
-      const sent = await deps.post({ text, blocks: [{ type: "section", text: { type: "mrkdwn", text } }] });
-      if (!sent.ok) return { posted: false, summary: "the all-clear did not post" };
-      await keep({ ...memory, open: 0 });
-      return { posted: true, summary: "all clear" };
+      if (opts.dryRun || !deps.handOff) return { posted: false, summary: "would hand the all-clear to the morning post" };
+      await handOver({ shown: [], fresh: 0, stillOpen: 0, open: 0, confirmers: [], allClear: memory.open });
+      return { posted: false, summary: "handed the all-clear to the morning post" };
     }
-    await keep({ ...memory, open: findings.length });
+    if (!opts.dryRun) await deps.memory.write({ ...memory, open: findings.length });
     return { posted: false, summary: findings.length ? `nothing new; ${findings.length} still open` : "nothing to tidy" };
   }
 
@@ -358,10 +374,13 @@ export async function runTidyPost(deps: TidyPostDeps, opts: { dryRun?: boolean }
   if (!members) return { posted: false, summary: "the channel's members unread — no report this week" };
 
   const groups = byOwner(fresh);
-  const picked = roundRobin(groups, MAX_REPORT_ITEMS);
+  // Every owner's first before anyone's second, as the carousel fills.
+  const ordered = [...roundRobin(groups, fresh.length).values()].flat();
+  // Each owner's name, from the Roadmap cards read above: what a DM says in place of a tag.
+  const names = new Map(cards.flatMap((c) => (c.owner && c.ownerName ? [[c.owner, c.ownerName] as const] : [])));
   let lookups = 0;
   const shown: Shown[] = [];
-  for (const finding of [...picked.values()].flat()) {
+  for (const finding of ordered) {
     let likely: TidyCard | null = null;
     if (finding.check === "unknown-card" && lookups < LIKELY_LOOKUPS) {
       lookups += 1;
@@ -370,71 +389,127 @@ export async function runTidyPost(deps: TidyPostDeps, opts: { dryRun?: boolean }
         return null;
       });
     }
-    shown.push({ finding, likely });
+    const ownerName = finding.owner ? names.get(finding.owner) : undefined;
+    shown.push({ finding, likely, ...(ownerName ? { ownerName } : {}) });
   }
-  if (opts.dryRun) return { posted: false, summary: `would post ${shown.length} card(s) for ${groups.size} owner(s), ${fresh.length} new, ${stillOpen} still open` };
+  const counted = `${shown.length} card(s) for ${groups.size} owner(s), ${fresh.length} new, ${stillOpen} still open`;
+  if (opts.dryRun || !deps.handOff) return { posted: false, summary: `would hand ${counted} to the morning post` };
+  await handOver({ shown, fresh: fresh.length, stillOpen, open: findings.length, confirmers: members });
+  return { posted: false, summary: `handed ${counted} to the morning post` };
+}
 
-  const parentText = tidyParent(deps.runDate, fresh.length, stillOpen);
-  const parent = await deps.post({ text: parentText, blocks: [{ type: "section", text: { type: "mrkdwn", text: parentText } }] });
-  if (!parent.ok || !parent.ts) return { posted: false, summary: "the parent line did not post" };
-  const parentTs = parent.ts;
-  await deps.markThread(parentTs).catch((err: unknown) => rethrowIfBudget(err));
+/** A later morning's hand-over: the week's cards that did not show yet. */
+async function handOverWaiting(deps: TidyPostDeps, opts: { dryRun?: boolean }): Promise<TidyPostResult> {
+  const waiting = await deps.waiting.read();
+  if (!waiting?.shown.length) return { posted: false, summary: "no listing for this week" };
+  const counted = `${waiting.shown.length} card(s) still waiting from the week`;
+  if (opts.dryRun || !deps.handOff) return { posted: false, summary: `would hand ${counted} to the morning post` };
+  await deps.handOff.put(deps.runDate, { channel: deps.channel, threadTs: null }, waiting);
+  return { posted: false, summary: `handed ${counted} to the morning post` };
+}
 
-  const next: TidyMemory = { shown: { ...memory.shown }, open: findings.length };
-  // Each owner's name, from the Roadmap cards read above: what a DM says in place of a tag.
-  const names = new Map(cards.flatMap((c) => (c.owner && c.ownerName ? [[c.owner, c.ownerName] as const] : [])));
-  const report = decisionReport(
-    shown.map((s) => tidyItem(s.finding, s.likely, s.finding.owner ? names.get(s.finding.owner) : undefined)),
-    "",
-    {
-      channel: deps.channel,
-      ownerLines: [...groups].map(([owner, items]) => ({
-        owner: owner ? { slack: owner, ...(names.has(owner) ? { name: names.get(owner)! } : {}) } : null,
-        says: ownerLine(owner, items.length, picked.get(owner)!.length),
-      })),
-    },
-  );
-  const sent = await deps.post({ text: report.text, blocks: report.blocks }, parentTs);
-  if (!sent.ok || !sent.ts) {
-    await keep(next);
-    return { posted: true, summary: `the parent posted and its reply did not; ${fresh.length} new come back next week` };
-  }
-  const ts = sent.ts;
-  const recorded = await deps.reports.putReport(reportRecord(deps.channel, ts, report, TIDY_CARD_TTL_MS)).then(
-    () => true,
-    () => false,
-  );
-  let staged = 0;
-  const failed: string[] = [];
-  for (const s of shown) {
-    try {
-      if (!recorded) throw new Error("no report record");
-      await deps.stage(stagedFinding(deps.channel, parentTs, ts, s, members));
-      next.shown[s.finding.fingerprint] = deps.runDate;
-      staged += 1;
-    } catch (err) {
-      rethrowIfBudget(err);
-      failed.push(tidyItem(s.finding, s.likely).id);
-    }
-  }
-  if (failed.length) {
-    const marked = recorded ? await markNotStaged(deps.reports, ts, failed, TIDY_NOT_STAGED).catch(() => null) : null;
-    if (marked) await deps.edit(ts, marked).catch(() => {});
-  }
-  await keep(next);
-  return { posted: true, summary: `posted ${staged} card(s) for ${groups.size} owner(s); ${fresh.length} new, ${stillOpen} still open` };
+export interface TidySectionDeps {
+  memory: Store<TidyMemory | null>;
+  /** Where the week's cards that did not show wait for the next morning. */
+  waiting: Store<TidyHanded | null>;
+  /** Edit the morning's message in place. */
+  edit(ts: string, message: ReportMessage): Promise<void>;
+  reports: ReportStore;
+  stage(proposal: PendingProposal): Promise<void>;
+  /** Mark the message's thread, so the team's replies there are not all turns. */
+  markThread(ts: string): Promise<void>;
 }
 
 /**
- * One finding's card as ThreadState stages it: one item of the week's reply.
+ * The week's tidy-up as a section of the sweep's morning message: a line for
+ * the week, a bullet per owner (the files with no owner the Roadmap names
+ * last), then a card per finding, sharing the carousel's ten. Each card shown
+ * is its own proposal, answered in its Review pop-up with "Moved it" or
+ * "Leave as is", and remembered; one that did not show, or did not stage,
+ * waits for the next morning's message, until the next Monday's week
+ * replaces it. The all-clear is a section of one line and no card.
  *
- * @param channel - Where the report posted
- * @param parentTs - The parent line: the thread
- * @param replyTs - The week's reply
+ * @param deps - The memory, the edit and the staging
+ * @param handOff - The morning run's hand-off
+ * @param date - The Monday
+ */
+export function tidySection(deps: TidySectionDeps, handOff: SectionHandOff<TidyHanded>, date: string): SweepSection {
+  return handedSection<TidyHanded>({
+    source: TIDY_SECTION,
+    date,
+    handOff,
+    cardsOf(value) {
+      if (value.allClear !== undefined) return { cards: [], lines: [allClearText(value.allClear)], cost: () => ({ subrequests: 2, d1Queries: 0 }), says: () => "" };
+      return {
+        cards: value.shown.map((s) => ({ person: s.finding.owner, item: tidyItem(s.finding, s.likely, s.ownerName) })),
+        ttlMs: TIDY_CARD_TTL_MS,
+        lines: [value.carriedFrom ? tidyCarriedParent(value.carriedFrom, value.shown.length) : tidyParent(date, value.fresh, value.stillOpen)],
+        // The memory and the waiting cards, an edit when a card did not
+        // stage, and each card that shows, a staging.
+        cost: (shown) => ({ subrequests: 5, d1Queries: shown.length * 3 + 1 }),
+        says: (ids, person) => ownerLine(person, ids.length, ids.length),
+      };
+    },
+    async posted(value, place, shown, report, progress) {
+      const memory = remembered(await deps.memory.read(), date);
+      if (value.allClear !== undefined) {
+        await deps.memory.write({ ...memory, open: 0 });
+        return;
+      }
+      await deps.markThread(report.ts).catch((err: unknown) => rethrowIfBudget(err));
+      const next: TidyMemory = { shown: { ...memory.shown }, open: value.carriedFrom ? memory.open : value.open };
+      const failed: string[] = [];
+      const rest: Shown[] = [];
+      for (const s of value.shown) {
+        const id = tidyItem(s.finding, s.likely).id;
+        if (!shown.includes(id)) {
+          rest.push(s);
+          continue;
+        }
+        let staged = progress.done.get(id);
+        if (staged === undefined) {
+          try {
+            await deps.stage(stagedFinding(place.channel, report.ts, s, value.confirmers));
+            staged = true;
+          } catch (err) {
+            rethrowIfBudget(err);
+            staged = false;
+          }
+          await progress.mark(id, staged);
+        }
+        if (staged) next.shown[s.finding.fingerprint] = date;
+        else {
+          failed.push(id);
+          rest.push(s);
+        }
+      }
+      await deps.memory.write(next);
+      // What did not show, or did not stage, comes on the next morning's message.
+      await deps.waiting.write(rest.length ? { ...value, shown: rest, carriedFrom: value.carriedFrom ?? date } : null);
+      if (!failed.length) return;
+      const marked = await markNotStaged(deps.reports, report.ts, failed, TIDY_NOT_STAGED).catch((err: unknown) => {
+        rethrowIfBudget(err);
+        return null;
+      });
+      if (marked) await deps.edit(report.ts, marked).catch(rethrowIfBudget);
+    },
+    async notPosted(_value, _place, why) {
+      // Nothing shown is remembered: next week's finds it new again.
+      console.error(`[figma-tidy] the morning message did not carry the week (${why}) — it comes back next week`);
+    },
+  });
+}
+
+/**
+ * One finding's card as ThreadState stages it: one item of the morning's
+ * message.
+ *
+ * @param channel - Where the message posted
+ * @param messageTs - The message: the thread
  * @param shown - The finding, and the likely card it names
  * @param confirmers - Who may answer it
  */
-export function stagedFinding(channel: string, parentTs: string, replyTs: string, shown: Shown, confirmers: readonly string[]): PendingProposal {
+export function stagedFinding(channel: string, messageTs: string, shown: Shown, confirmers: readonly string[]): PendingProposal {
   const card = tidyCard(shown.finding, shown.likely);
   const operations = card.operations;
   return {
@@ -442,9 +517,9 @@ export function stagedFinding(channel: string, parentTs: string, replyTs: string
     toolName: operations[0]!.toolName,
     input: operations[0]!.input,
     channel,
-    threadTs: parentTs,
-    replyTs: parentTs,
-    ...itemProposal(replyTs, tidyItem(shown.finding, shown.likely).id),
+    threadTs: messageTs,
+    replyTs: messageTs,
+    ...itemProposal(messageTs, tidyItem(shown.finding, shown.likely).id),
     proposalText: renderProposalCard(card).text,
     requesterUserId: "",
     ttlMs: TIDY_CARD_TTL_MS,

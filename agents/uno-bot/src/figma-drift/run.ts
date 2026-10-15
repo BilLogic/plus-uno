@@ -12,41 +12,45 @@
 //   • ONE INTAKE PER FILE. A file's intake is drafted in the first thread that
 //     discussed it (`askGroupOf` keeps audiences apart). While that card is
 //     live, the file gets no second intake.
-//   • ONE REPORT PER THREAD PER MORNING, on the shared decision card
-//     (`slack/decision-cards.ts`): a parent line counting every file the
-//     thread discussed, then one card per file whose intake it drafts, each
-//     its own proposal (`itemProposal`), decided in its own Review pop-up —
-//     File an intake writes; its other choices write nothing. A file whose intake is
-//     drafted in another thread is no card here: the parent gains a one-line
-//     pointer to it, and a thread with only such files gets the pointers
-//     alone. The pointers are a notification, not a write, so they are not
-//     gated; filing an intake is. Nothing typed in the thread decides a card.
+//   • ONE SECTION PER THREAD PER MORNING, on the sweep's one message for its
+//     place (`driftSection`, `../sweep/sections.ts`): the job hands each
+//     thread's cards over and posts nothing of its own. A line for the files,
+//     then one card per file whose intake the thread drafts — shown whole,
+//     never split — each its own proposal (`itemProposal`), decided in its
+//     own Review pop-up — File an intake writes; its other choices write
+//     nothing. A file whose intake is drafted in another thread is no card
+//     here: a one-line pointer to it, linked to that card's thread, and a
+//     thread with only such files gets the pointers alone. The pointers are
+//     a notification, not a write, so they are not gated; filing an intake
+//     is. Nothing typed in the thread decides a card.
 //   • A thread whose drift card is still live is not asked again until it is
 //     decided or lapses: its findings wait, so no card ever retires another.
 //   • Each card lives 72 h, with no re-ping; its confirmers are its file's
 //     owner plus everyone who posted in the threads that discussed it that
 //     morning. A revision is refused (`DRIFT_NO_REVISION`): the intake is
 //     drafted from the thread as it stands.
-// Each report is posted where `pickDestination` puts it — its own thread, or
-// the private place its evidence is in — and never in #uno-bot.
+// Each section goes where `pickDestination` puts it — its own thread, or the
+// private place its evidence is in — and never in #uno-bot.
 //
-// WHILE IT IS LIVE. Each report posted is kept as a live record for its 72 h.
-// Both scheduled runs look at each record's Figma files again. A card whose
-// file now shows its decision is retired, so no Approve can file it, and
-// redrawn in place to say "Updated Sep 30. Nothing to do."; a pointer-only
-// message is edited the same way once every file it names shows its
-// decision. Nothing is ever posted. Past 72 h a report is left as it is: no
-// re-ping, no edit.
+// WHILE IT IS LIVE. Each message's cards are kept as a live record for their
+// 72 h. Both scheduled runs look at each record's Figma files again. A card
+// whose file now shows its decision is retired, so no Approve can file it,
+// and redrawn in place on the message to say "Updated Sep 30. Nothing to
+// do." Pointers on the morning's message are not edited: other sections share
+// it. A pointer-only message from before the sweep carried them is still
+// edited once every file it names shows its decision. Nothing is ever
+// posted. Past 72 h a card is left as it is: no re-ping, no edit.
 //
-// A POSTED CARD IS STAGED OR SAYS SO. A file's intake mark is written before
-// the post, so a retried morning never posts a second card for it; a post that
-// fails clears the marks and keeps the findings, and a card that fails to
-// stage says so on itself, clears its mark and keeps its finding.
+// A SHOWN CARD IS STAGED OR SAYS SO. A file's intake mark is written at the
+// hand-over, so a retried morning never drafts a second card for it; a
+// message that does not go up clears the marks and keeps the findings, and a
+// card that fails to stage says so on itself, clears its mark and keeps its
+// finding.
 //
 // Named dependencies; `Env` enters in `./env.ts`.
 
 import { D1QueryBudgetError, rethrowIfBudget, SubrequestBudgetError, isSubrequestBudgetError } from "../net";
-import type { PendingProposal, ProposalOperation, ThreadState } from "../thread-state/index";
+import type { PendingProposal, ProposalOperation, ReportItem } from "../thread-state/index";
 import type { ChannelKind, TargetKind } from "../sweep/finding";
 import { pickDestination, resolveDestination, type ChannelIds } from "../sweep/finding";
 import { postableAt } from "../sweep/schedule";
@@ -59,11 +63,11 @@ import {
   itemProposal,
   itemProposalKey,
   markNotStaged,
-  reportRecord,
   settleItem,
   type ReportMessage,
   type ReportStore,
 } from "../slack/decision-cards";
+import { handedSection, type SectionHandOff, type SweepSection } from "../sweep/sections";
 import {
   caughtUpNote,
   caughtUpText,
@@ -226,20 +230,11 @@ export interface AskPlace {
 export interface DriftPostDeps {
   store: DriftStore;
   slack: {
-    /** Post a report or the pointers alone, tagged as the sweep's so a reply
-     *  under it is read by the sweep thread's rule. */
-    post(to: AskPlace, message: { text: string; blocks?: unknown[]; card: boolean }): Promise<{ ok: boolean; ts?: string }>;
     permalink(channel: string, ts: string): Promise<string | null>;
-    /** Edit a posted report in place (`chat.update`). */
-    edit(channel: string, ts: string, message: ReportMessage): Promise<void>;
-    /** Mark the thread as entered through a proactive post, when the bot had
-     *  no history there (`sweep/thread-mark.ts`). */
-    markThread(channel: string, threadTs: string): Promise<void>;
   };
-  /** Where each report's record is kept, and its cards' states land. */
-  reports: ReportStore & Pick<ThreadState, "putReport">;
-  /** Stage one card and record it on the usage record (`stageSweepCard`). */
-  stage(proposal: PendingProposal, channelKind: ChannelKind): Promise<void>;
+  /** The morning run's hand-off to the sweep's post, and the morning's date;
+   *  absent on a rehearsal, which hands nothing over. */
+  handOff?: { date: string; to: SectionHandOff<DriftHanded> };
   /** Whether a card's proposal is still live in ThreadState. */
   cardLive(proposalTs: string): Promise<boolean>;
   /** The Figma client: a file's last change and publisher (`versions`), and
@@ -260,7 +255,7 @@ export interface DriftPostDeps {
   dryRun?: boolean;
 }
 
-/** One report posted — or, on a dry run, planned. */
+/** One thread handed over — or, on a dry run, planned. */
 export interface DriftAskReport {
   channel: string;
   threadTs: string | null;
@@ -295,12 +290,10 @@ interface ThreadPlan {
   drafts: string[];
 }
 
-/** Where a file's card went up: its report's thread and ts, and its id. */
+/** Where a file's card is, or goes up this morning: its place and thread. */
 interface CardPlace {
   channel: string;
   thread: string | null;
-  ts: string;
-  itemId?: string;
 }
 
 /** Where a file's intake is drafted this morning. */
@@ -452,21 +445,16 @@ export async function runDriftAsks(job: { key: string }, deps: DriftPostDeps): P
   if (waiting.size) notes.push(`${waiting.size} file(s) wait for tomorrow's asks`);
   for (const t of threads.values()) t.findings = t.findings.filter((f) => !waiting.has(askGroupOf(f)));
 
-  const cardLinks = new Map<string, string | null>();
+  // Where each drafted file's card goes, fixed before any thread is handed
+  // over, so a pointer in an earlier thread can name a later one's.
   const cardPlaces = new Map<string, CardPlace>();
-  const asked: string[] = [];
   const cardThreads = [...threads.values()].filter((t) => t.drafts.length).sort((a, b) => earliest(a.findings) - earliest(b.findings));
-  const carded: ThreadPlan[] = [];
   for (const t of cardThreads) {
-    if (await askWithCards(deps, t, byGroup, homes, look, cardLinks, cardPlaces, asks, notes)) carded.push(t);
+    const to = placeOf(t.findings[0]!, deps.config);
+    if (to) for (const g of t.drafts) cardPlaces.set(g, { channel: to.channel, thread: to.threadTs });
   }
-  // Recorded once every report is up, so a file drafted in a later report is
-  // on this thread's record too. A file whose card did not go up stays queued.
-  for (const t of carded) {
-    const placed = t.findings.filter((f) => deps.dryRun || placeFor(askGroupOf(f), homes, cardPlaces));
-    if (!deps.dryRun) await recordAsked(deps, placed, (f) => placeFor(askGroupOf(f), homes, cardPlaces));
-    asked.push(...placed.map((f) => f.id));
-  }
+  const ctx: HandCtx = { deps, byGroup, homes, look, links: new Map(), cardPlaces, asks, notes };
+  for (const t of cardThreads) await handCards(ctx, t);
   let questions = 0;
   const questionThreads = [...threads.values()]
     .filter((t) => !t.drafts.length && t.findings.length)
@@ -477,15 +465,14 @@ export async function runDriftAsks(job: { key: string }, deps: DriftPostDeps): P
       break;
     }
     questions += 1;
-    asked.push(...(await askWithPointers(deps, t, homes, look, cardLinks, cardPlaces, asks)));
+    await handPointers(ctx, t);
   }
-  if (asked.length && !deps.dryRun) await deps.store.remove(asked);
 
   const note = notes.length ? notes.join("; ") : null;
   const cards = asks.filter((a) => a.role === "card").length;
-  const verb = deps.dryRun ? "would ask" : "asked";
+  const verb = deps.dryRun || !deps.handOff ? "would ask" : "handed";
   const summary = asks.length
-    ? `${verb} ${asks.length} thread(s), ${cards} with drafted intakes${note ? ` — ${note}` : ""}`
+    ? `${verb} ${asks.length} thread(s), ${cards} with drafted intakes, to the morning post${note ? ` — ${note}` : ""}`
     : `no file drift due this morning${note ? ` — ${note}` : ""}`;
   return { kind: "figma-drift-post", key: job.key, outcome: "handled", note, asks, settled, summary };
 }
@@ -506,61 +493,89 @@ async function threadBusy(deps: Pick<DriftPostDeps, "store" | "cardLive">, chann
   return false;
 }
 
-/** One file drafted in a thread's report. */
-interface Drafted {
+/** A file's card, as the hand-over drafted it for its thread's section. */
+export interface DriftCard {
   group: string;
+  /** Its id in the morning's message. */
+  id: string;
   /** This thread's finding about it. */
   here: FileDriftFinding;
-  /** Every thread's finding about it this morning, oldest first. */
-  all: FileDriftFinding[];
-  /** Its card's id in the report. */
-  id: string;
+  /** Its file's owner, the people in every thread that discussed it this
+   *  morning, and its last publisher the directory maps. */
+  confirmers: string[];
   operation: ProposalOperation;
   lane: FileDriftFinding["lane"];
   /** Why its Product Pillar was left off, or null. */
   note: string | null;
   /** Its file's last publisher's Slack id and Figma handle, when the directory maps them. */
   publisher: { slackId: string; handle: string } | null;
+  /** What the card and Review say of it, with what the morning saw of its file. */
+  words: DriftFileWords;
+  /** The newest change already judged not to show the decision. */
+  checkedThrough: number;
+}
+
+/** A file whose intake is drafted elsewhere: a line pointing at it. */
+export interface DriftPointer {
+  finding: FileDriftFinding;
+  line: string;
+  /** Where its card is: what the thread's ask record keeps. */
+  card: { channel: string; thread: string | null };
+}
+
+/** What the hand-over leaves for one thread's place on the morning's message. */
+export interface DriftHanded {
+  channelKind: ChannelKind;
+  cards: DriftCard[];
+  pointers: DriftPointer[];
+  /** The kind of each file the thread discussed, cards and pointers alike. */
+  kinds: TargetKind[];
+}
+
+/** The section's name on the sweep's morning post. */
+export const DRIFT_SECTION = "figma-drift";
+
+/** One morning's hand-over, as each thread is handed. */
+interface HandCtx {
+  deps: DriftPostDeps;
+  byGroup: Map<string, FileDriftFinding[]>;
+  homes: Map<string, Home>;
+  look: FileLook;
+  /** Each file's card link, once read this morning. */
+  links: Map<string, string | null>;
+  cardPlaces: Map<string, CardPlace>;
+  asks: DriftAskReport[];
+  notes: string[];
 }
 
 /**
- * One thread's report: a card per file it drafts, each its own proposal, and
- * a pointer for each file it discussed whose intake is drafted elsewhere.
- *
- * @returns Whether the report went up with at least one card staged
+ * One thread's cards, a card per file it drafts, and a pointer for each file
+ * it discussed whose intake is drafted elsewhere — handed to the morning's
+ * message for its place. Each file's intake mark is written first, so a
+ * retried morning never drafts it twice.
  */
-async function askWithCards(
-  deps: DriftPostDeps,
-  t: ThreadPlan,
-  byGroup: Map<string, FileDriftFinding[]>,
-  homes: Map<string, Home>,
-  look: FileLook,
-  cardLinks: Map<string, string | null>,
-  cardPlaces: Map<string, CardPlace>,
-  asks: DriftAskReport[],
-  notes: string[],
-): Promise<boolean> {
+async function handCards(ctx: HandCtx, t: ThreadPlan): Promise<void> {
+  const { deps, look, notes } = ctx;
   const first = t.findings[0]!;
   const to = placeOf(first, deps.config);
   if (!to) {
     notes.push(`${t.key}: its place is not configured`);
-    return false;
+    return;
   }
   const groups = t.drafts.map((g) => ({
     group: g,
     here: t.findings.find((f) => askGroupOf(f) === g)!,
-    all: (byGroup.get(g) ?? []).sort((a, b) => a.driftAt - b.driftAt),
+    all: (ctx.byGroup.get(g) ?? []).sort((a, b) => a.driftAt - b.driftAt),
   }));
   const publicEvidence = groups.flatMap((d) => d.all).filter((f) => f.evidence.channelKind === "public");
+  const elsewhere = t.findings.filter((f) => !t.drafts.includes(askGroupOf(f)));
   if (!deps.dryRun) {
-    // Everything the report will send, counted before any of it is: the
-    // permalinks, a publisher and the pillar options per file, the post, its
-    // record, each card's staging and usage row, the report's own permalink,
-    // its live record and an edit held back.
-    ensureHeadroom(deps, { subrequests: publicEvidence.length + 4 * groups.length + 5, d1Queries: 2 });
+    // Everything it reads, counted before any of it is: the permalinks, a
+    // publisher and the pillar options per file, and a link per pointer.
+    ensureHeadroom(deps, { subrequests: publicEvidence.length + 2 * groups.length + elsewhere.length + 1, d1Queries: 0 });
   }
   const now = deps.now();
-  if (!deps.dryRun) {
+  if (!deps.dryRun && deps.handOff) {
     for (const d of groups) await deps.store.setIntakeMark(d.group, { channel: to.channel, threadTs: to.threadTs, cardTs: null, markedAt: now });
   }
 
@@ -576,7 +591,7 @@ async function askWithCards(
   }
   let options: Promise<string[] | null> | undefined;
   let people: Promise<FigmaPeople> | undefined;
-  const drafted: Drafted[] = [];
+  const cards: DriftCard[] = [];
   for (const [i, d] of groups.entries()) {
     const f = d.here;
     const figmaKey = f.fileKey.startsWith("figma:") ? f.fileKey.slice("figma:".length) : null;
@@ -608,190 +623,226 @@ async function askWithCards(
             }),
           )
         : null;
-    drafted.push({
-      ...d,
-      id: String(i + 1),
+    const named = publisherSlack && publisher ? { slackId: publisherSlack, handle: publisher.handle } : null;
+    cards.push({
+      group: d.group,
+      id: `drift-${i + 1}`,
+      here: f,
+      confirmers: [...new Set([...d.all.flatMap((x) => [x.owner, ...x.participants]), named?.slackId].filter((id): id is string => !!id))],
       operation: intake.operation,
       lane: intake.lane,
       note: choice.note ? pillarNote(choice.note) : null,
-      publisher: publisherSlack && publisher ? { slackId: publisherSlack, handle: publisher.handle } : null,
+      publisher: named,
+      words: wordsOf(f, look),
+      checkedThrough: look.judgedThrough.get(f.id) ?? f.driftAt,
     });
   }
-  // Files this thread discussed whose intake is drafted elsewhere: a pointer each.
-  const elsewhere = t.findings.filter((f) => !t.drafts.includes(askGroupOf(f)));
-  const parent = [
-    driftParent([...drafted.map((d) => d.here), ...elsewhere].map((f) => f.target.kind)),
-    ...elsewhere.map((f) => elsewhereLine(f.target, linkFor(askGroupOf(f), cardLinks))),
-  ].join("\n");
-  const report = decisionReport(
-    drafted.map((d) => driftItem({ id: d.id, ...wordsOf(d.here, look), owner: d.here.owner || null, publisher: d.publisher, lane: d.lane })),
-    parent,
-  );
-  const ask: DriftAskReport = {
+  const pointers = await pointersFor(ctx, elsewhere);
+  const value: DriftHanded = {
+    channelKind: first.evidence.channelKind,
+    cards,
+    pointers,
+    kinds: [...cards.map((c) => c.here), ...pointers.map((p) => p.finding)].map((f) => f.target.kind),
+  };
+  const preview = decisionReport(cards.map(itemOf), [driftParent(value.kinds), ...pointers.map((p) => p.line)].join("\n"));
+  ctx.asks.push({
     channel: to.channel,
     threadTs: to.threadTs,
     role: "card",
     files: t.findings.map((f) => f.fileKey),
-    text: deps.dryRun && first.evidence.channelKind !== "public" ? WITHHELD_ASK_TEXT : report.text,
-  };
-  if (deps.dryRun) {
-    asks.push(ask);
-    for (const d of drafted) cardLinks.set(d.group, null);
-    return true;
-  }
-
-  const clearMarks = async (list: readonly Drafted[]) => {
-    for (const d of list) await deps.store.clearIntakeMark(d.group);
-  };
-  const sent = await deps.slack.post(to, { text: report.text, blocks: report.blocks, card: true });
-  if (!sent.ok || !sent.ts) {
-    await clearMarks(drafted);
-    notes.push(`${t.key}: the report's post failed — kept for tomorrow`);
-    return false;
-  }
-  const root = to.threadTs ?? sent.ts;
-  const notPosted = async (why: string) => {
-    await deps.slack.edit(to.channel, sent.ts!, { text: DRIFT_NOT_POSTED_TEXT, blocks: textSections(DRIFT_NOT_POSTED_TEXT) }).catch(rethrowIfBudget);
-    await clearMarks(drafted);
-    notes.push(`${t.key}: posted but ${why} — edited to say so, kept for tomorrow`);
-    return false;
-  };
-  try {
-    await deps.reports.putReport(reportRecord(to.channel, sent.ts, report, DRIFT_CARD_TTL_MS));
-  } catch (err) {
-    rethrowIfBudget(err);
-    return notPosted(`its record was not kept (${err instanceof Error ? err.message : String(err)})`);
-  }
-
-  // Each card its own proposal: Review opens it, and only it.
-  const staged: Drafted[] = [];
-  const failed: Drafted[] = [];
-  for (const d of drafted) {
-    const operation = d.operation;
-    const proposal: PendingProposal = {
-      operations: [operation],
-      toolName: operation.toolName,
-      input: operation.input,
-      channel: to.channel,
-      threadTs: root,
-      replyTs: root,
-      ...itemProposal(sent.ts, d.id),
-      // What Review shows: the file, what was settled, and the intake.
-      proposalText: renderProposalCard(driftReview({ ...wordsOf(d.here, look), lane: d.lane, note: d.note }, operation)).text,
-      // Nobody asked: the Worker staged it.
-      requesterUserId: "",
-      ttlMs: DRIFT_CARD_TTL_MS,
-      confirmers: [...new Set([...d.all.flatMap((f) => [f.owner, ...f.participants]), d.publisher?.slackId].filter((id): id is string => !!id))],
-      // Nobody asked, so the gate's "ask me again" lines would be wrong.
-      stated: driftCardWords(DRIFT_CARD_TTL_MS / 3_600_000),
-      choices: driftChoices(),
-      refuseRevision: DRIFT_NO_REVISION,
-    };
-    try {
-      await deps.stage(proposal, first.evidence.channelKind);
-      staged.push(d);
-    } catch (err) {
-      rethrowIfBudget(err);
-      console.error(`[figma-drift] ${t.key} card ${d.id} posted but not staged: ${err instanceof Error ? err.message : String(err)}`);
-      failed.push(d);
-    }
-  }
-  if (!staged.length) return notPosted("no card staged");
-  if (failed.length) {
-    await clearMarks(failed);
-    const marked = await markNotStaged(
-      deps.reports,
-      sent.ts,
-      failed.map((d) => d.id),
-      DRIFT_NOT_STAGED,
-    ).catch((err: unknown) => {
-      rethrowIfBudget(err);
-      return null;
-    });
-    if (marked) await deps.slack.edit(to.channel, sent.ts, marked).catch(rethrowIfBudget);
-    notes.push(`${t.key}: ${failed.length} card(s) did not stage — kept for tomorrow`);
-  }
-  for (const d of staged) {
-    await deps.store.setIntakeMark(d.group, { channel: to.channel, threadTs: root, cardTs: sent.ts, itemId: d.id, markedAt: now });
-  }
-  asks.push({ ...ask, ts: sent.ts });
-  const idOf = new Map(staged.map((d) => [d.here.id, d.id] as const));
-  await keepLive(
-    deps,
-    { channel: to.channel, ts: sent.ts, threadTs: root, role: "card" },
-    staged.map((d) => d.here),
-    look,
-    now,
-    (f) => ({ itemId: idOf.get(f.id)! }),
-  );
-  const link = await deps.slack.permalink(to.channel, sent.ts).catch((err: unknown) => {
-    rethrowIfBudget(err);
-    return null;
+    text: deps.dryRun && first.evidence.channelKind !== "public" ? WITHHELD_ASK_TEXT : preview.text,
   });
-  for (const d of staged) {
-    cardLinks.set(d.group, link);
-    cardPlaces.set(d.group, { channel: to.channel, thread: root, ts: sent.ts, itemId: d.id });
-  }
-  return true;
+  if (!deps.dryRun && deps.handOff) await deps.handOff.to.put(deps.handOff.date, to, value);
 }
 
-/**
- * The pointers alone, in a thread whose files' intakes are drafted elsewhere.
- *
- * @returns The ids of the findings asked
- */
-async function askWithPointers(
-  deps: DriftPostDeps,
-  t: ThreadPlan,
-  homes: Map<string, Home>,
-  look: FileLook,
-  cardLinks: Map<string, string | null>,
-  cardPlaces: Map<string, CardPlace>,
-  asks: DriftAskReport[],
-): Promise<string[]> {
-  // A file whose card did not go up this morning is not pointed at.
-  const findings = t.findings.filter((f) => placeFor(askGroupOf(f), homes, cardPlaces) || deps.dryRun);
-  if (!findings.length) return [];
-  const first = findings[0]!;
+/** The pointers alone, for a thread whose files' intakes are drafted elsewhere. */
+async function handPointers(ctx: HandCtx, t: ThreadPlan): Promise<void> {
+  const { deps } = ctx;
+  const first = t.findings[0]!;
   const to = placeOf(first, deps.config);
-  if (!to) return [];
-  if (!deps.dryRun) ensureHeadroom(deps, { subrequests: 2 + findings.length, d1Queries: 0 });
-  const lines: string[] = [];
-  for (const f of findings) {
-    const group = askGroupOf(f);
-    let link = linkFor(group, cardLinks);
-    const home = homes.get(group);
-    if (link === null && home?.kind === "live" && home.mark.cardTs && !deps.dryRun) {
-      link = await deps.slack.permalink(home.mark.channel, home.mark.cardTs).catch((err: unknown) => {
-        rethrowIfBudget(err);
-        return null;
-      });
-      cardLinks.set(group, link);
-    }
-    lines.push(elsewhereLine(f.target, link));
-  }
-  const text = [driftParent(findings.map((f) => f.target.kind)), ...lines].join("\n");
-  const ask: DriftAskReport = {
+  if (!to) return;
+  if (!deps.dryRun) ensureHeadroom(deps, { subrequests: 1 + t.findings.length, d1Queries: 0 });
+  const pointers = await pointersFor(ctx, t.findings);
+  if (!pointers.length) return;
+  const value: DriftHanded = { channelKind: first.evidence.channelKind, cards: [], pointers, kinds: pointers.map((p) => p.finding.target.kind) };
+  const text = [driftParent(value.kinds), ...pointers.map((p) => p.line)].join("\n");
+  ctx.asks.push({
     channel: to.channel,
     threadTs: to.threadTs,
     role: "question",
-    files: findings.map((f) => f.fileKey),
+    files: pointers.map((p) => p.finding.fileKey),
     text: deps.dryRun && first.evidence.channelKind !== "public" ? WITHHELD_ASK_TEXT : text,
-  };
-  if (deps.dryRun) {
-    asks.push(ask);
-    return findings.map((f) => f.id);
-  }
-  const sent = await deps.slack.post(to, { text, card: false });
-  if (!sent.ok || !sent.ts) return [];
-  if (to.threadTs) await deps.slack.markThread(to.channel, to.threadTs).catch(rethrowIfBudget);
-  asks.push({ ...ask, ts: sent.ts });
-  await keepLive(deps, { channel: to.channel, ts: sent.ts, threadTs: to.threadTs ?? sent.ts, role: "question" }, findings, look, deps.now(), (f) => {
-    const place = placeFor(askGroupOf(f), homes, cardPlaces);
-    return place?.ts ? { intakeKey: place.itemId ? itemProposalKey(place.ts, place.itemId) : place.ts } : {};
   });
-  await recordAsked(deps, findings, (f) => placeFor(askGroupOf(f), homes, cardPlaces));
-  return findings.map((f) => f.id);
+  if (!deps.dryRun && deps.handOff) await deps.handOff.to.put(deps.handOff.date, to, value);
+}
+
+/** A pointer for each finding whose file's card has a place — live, or
+ *  going up this morning — linked to it where Slack gives a link. */
+async function pointersFor(ctx: HandCtx, findings: readonly FileDriftFinding[]): Promise<DriftPointer[]> {
+  const out: DriftPointer[] = [];
+  for (const f of findings) {
+    const group = askGroupOf(f);
+    const place = placeFor(group, ctx.homes, ctx.cardPlaces);
+    if (!place) continue;
+    out.push({ finding: f, line: elsewhereLine(f.target, await linkOf(ctx, group, place)), card: { channel: place.channel, thread: place.thread } });
+  }
+  return out;
+}
+
+/** A file's card link: its live card, or the thread its card goes up in
+ *  this morning; null when there is none to read. */
+async function linkOf(ctx: HandCtx, group: string, place: CardPlace): Promise<string | null> {
+  if (ctx.links.has(group)) return ctx.links.get(group)!;
+  const home = ctx.homes.get(group);
+  const at = home?.kind === "live" && home.mark.cardTs ? home.mark.cardTs : place.thread;
+  const link =
+    at && !ctx.deps.dryRun
+      ? await ctx.deps.slack.permalink(place.channel, at).catch((err: unknown) => {
+          rethrowIfBudget(err);
+          return null;
+        })
+      : null;
+  ctx.links.set(group, link);
+  return link;
+}
+
+/** A card as the morning's message shows it. */
+function itemOf(c: DriftCard): ReportItem {
+  return driftItem({ id: c.id, ...c.words, owner: c.here.owner || null, publisher: c.publisher, lane: c.lane });
+}
+
+export interface DriftSectionDeps {
+  store: DriftStore;
+  /** Stage one card and record it on the usage record (`stageSweepCard`). */
+  stage(proposal: PendingProposal, channelKind: ChannelKind): Promise<void>;
+  /** Where the morning message's record is kept, and its cards' states land. */
+  reports: ReportStore;
+  /** Edit the morning's message in place (`chat.update`). */
+  edit(channel: string, ts: string, message: ReportMessage): Promise<void>;
+  /** Mark the thread as entered through a proactive post, when the bot had
+   *  no history there (`sweep/thread-mark.ts`). */
+  markThread(channel: string, threadTs: string): Promise<void>;
+  now(): number;
+}
+
+/**
+ * A thread's drift as a section of the sweep's morning message for its place:
+ * a line for the files its owner or nobody has, its cards — whole, never
+ * split — and its pointers, or the pointers alone with the thread's line.
+ * Once the message is up, each card it showed is its own proposal, decided in
+ * its own Review pop-up — File an intake writes; its other choices write
+ * nothing — and kept live, so the re-check can withdraw it once its file
+ * catches up. What went up leaves the queue, on the thread's ask record; a
+ * card that did not stage says so, and waits with its finding.
+ *
+ * @param deps - The store, the staging, the record, the edit and the mark
+ * @param handOff - The morning run's hand-off
+ * @param date - The morning's date
+ */
+export function driftSection(deps: DriftSectionDeps, handOff: SectionHandOff<DriftHanded>, date: string): SweepSection {
+  return handedSection<DriftHanded>({
+    source: DRIFT_SECTION,
+    date,
+    handOff,
+    cardsOf(value) {
+      const lines = value.pointers.map((p) => p.line);
+      return {
+        cards: value.cards.map((c) => ({ person: c.here.owner || null, item: itemOf(c) })),
+        whole: true,
+        ttlMs: DRIFT_CARD_TTL_MS,
+        lines: value.cards.length ? lines : [driftParent(value.kinds), ...lines],
+        // An edit when a card did not stage; each card that shows, a staging;
+        // the marks and records are internal.
+        cost: (shown) => ({ subrequests: 1, d1Queries: shown.length * 3 + 2 }),
+        says: (ids) => driftParent(value.cards.filter((c) => ids.includes(c.id)).map((c) => c.here.target.kind)),
+      };
+    },
+    async posted(value, place, shown, report, progress) {
+      const ts = report.ts;
+      const root = place.threadTs ?? ts;
+      const now = deps.now();
+      const staged: DriftCard[] = [];
+      const failed: DriftCard[] = [];
+      for (const c of value.cards) {
+        if (!shown.includes(c.id)) {
+          await deps.store.clearIntakeMark(c.group);
+          continue;
+        }
+        const before = progress.done.get(c.id);
+        if (before !== undefined) {
+          (before ? staged : failed).push(c);
+          continue;
+        }
+        try {
+          await deps.stage(cardProposal(place.channel, root, ts, c), value.channelKind);
+          staged.push(c);
+          await progress.mark(c.id, true);
+        } catch (err) {
+          rethrowIfBudget(err);
+          console.error(`[figma-drift] ${place.channel}:${root} card ${c.id} posted but not staged: ${err instanceof Error ? err.message : String(err)}`);
+          failed.push(c);
+          await progress.mark(c.id, false);
+        }
+      }
+      for (const c of failed) await deps.store.clearIntakeMark(c.group);
+      if (failed.length) {
+        const marked = await markNotStaged(deps.reports, ts, failed.map((c) => c.id), DRIFT_NOT_STAGED).catch((err: unknown) => {
+          rethrowIfBudget(err);
+          return null;
+        });
+        if (marked) await deps.edit(place.channel, ts, marked).catch(rethrowIfBudget);
+      }
+      for (const c of staged) {
+        await deps.store.setIntakeMark(c.group, { channel: place.channel, threadTs: root, cardTs: ts, itemId: c.id, markedAt: now });
+      }
+      if (staged.length) {
+        await keepLive(
+          deps.store,
+          { channel: place.channel, ts, threadTs: root, role: "card" },
+          staged.map((c) => ({ ...liveFileOf(c.here, c.checkedThrough), itemId: c.id })),
+          now,
+        );
+      } else if (place.threadTs) {
+        await deps.markThread(place.channel, place.threadTs).catch(rethrowIfBudget);
+      }
+      // What went up leaves the queue, on the thread's record: its cards that
+      // staged, and its pointers.
+      const placed = [
+        ...staged.map((c) => ({ f: c.here, card: { channel: place.channel, thread: root } })),
+        ...value.pointers.map((p) => ({ f: p.finding, card: p.card })),
+      ];
+      await recordAsked(deps.store, placed, now);
+      if (placed.length) await deps.store.remove(placed.map((p) => p.f.id));
+    },
+    async notPosted(value, _place, why) {
+      // Every finding stays queued, and its file may be drafted afresh.
+      for (const c of value.cards) await deps.store.clearIntakeMark(c.group);
+      console.error(`[figma-drift] the morning message did not carry the drift (${why}) — kept for tomorrow`);
+    },
+  });
+}
+
+/** A card as ThreadState stages it: one item of the morning's message. */
+function cardProposal(channel: string, root: string, ts: string, c: DriftCard): PendingProposal {
+  return {
+    operations: [c.operation],
+    toolName: c.operation.toolName,
+    input: c.operation.input,
+    channel,
+    threadTs: root,
+    replyTs: root,
+    ...itemProposal(ts, c.id),
+    // What Review shows: the file, what was settled, and the intake.
+    proposalText: renderProposalCard(driftReview({ ...c.words, lane: c.lane, note: c.note }, c.operation)).text,
+    // Nobody asked: the Worker staged it.
+    requesterUserId: "",
+    ttlMs: DRIFT_CARD_TTL_MS,
+    confirmers: [...c.confirmers],
+    // Nobody asked, so the gate's "ask me again" lines would be wrong.
+    stated: driftCardWords(DRIFT_CARD_TTL_MS / 3_600_000),
+    choices: driftChoices(),
+    refuseRevision: DRIFT_NO_REVISION,
+  };
 }
 
 /** A finding as its card and Review name it, with what the morning saw of
@@ -800,39 +851,37 @@ function wordsOf(f: FileDriftFinding, look: FileLook): DriftFileWords {
   return { file: f.target, threadSays: f.threadSays, decidedAt: f.driftAt, change: look.changes.get(f.id) ?? { kind: "unknown" } };
 }
 
+/** A finding as a live record names its file. */
+function liveFileOf(f: FileDriftFinding, checkedThrough: number): LiveAskFile {
+  return {
+    fileKey: f.fileKey,
+    kind: f.target.kind,
+    url: f.target.url,
+    decidedAt: f.driftAt,
+    threadSays: f.threadSays,
+    sourceSays: f.sourceSays,
+    checkedThrough,
+  };
+}
+
 /**
  * Keep a posted report as live, so the re-check can withdraw it. Best-effort:
  * the report is up whether or not its record lands, and without one it simply
  * lives out its 72 h.
  */
 async function keepLive(
-  deps: Pick<DriftPostDeps, "store">,
+  store: Pick<DriftStore, "saveLiveAsk" | "markLiveFile">,
   message: Pick<LiveAsk, "channel" | "ts" | "threadTs" | "role">,
-  findings: readonly FileDriftFinding[],
-  look: FileLook,
+  files: LiveAskFile[],
   now: number,
-  extra: (f: FileDriftFinding) => Pick<LiveAskFile, "itemId" | "intakeKey">,
 ): Promise<void> {
-  const ask: LiveAsk = {
-    ...message,
-    askedAt: now,
-    files: findings.map((f) => ({
-      fileKey: f.fileKey,
-      kind: f.target.kind,
-      url: f.target.url,
-      decidedAt: f.driftAt,
-      threadSays: f.threadSays,
-      sourceSays: f.sourceSays,
-      checkedThrough: look.judgedThrough.get(f.id) ?? f.driftAt,
-      ...extra(f),
-    })),
-  };
+  const ask: LiveAsk = { ...message, askedAt: now, files };
   try {
-    await deps.store.saveLiveAsk(ask);
+    await store.saveLiveAsk(ask);
     // A file-change notification reads this, and looks no further for a file
     // no live report names (`recheckOnUpdate`).
     for (const key of new Set(ask.files.filter((f) => isFigmaKind(f.kind)).map((f) => f.fileKey))) {
-      await deps.store.markLiveFile(key, now + DRIFT_CARD_TTL_MS);
+      await store.markLiveFile(key, now + DRIFT_CARD_TTL_MS);
     }
   } catch (err) {
     rethrowIfBudget(err);
@@ -840,41 +889,29 @@ async function keepLive(
   }
 }
 
-/** A file's report link, once fetched this morning; null until then. */
-function linkFor(group: string, cardLinks: Map<string, string | null>): string | null {
-  return cardLinks.get(group) ?? null;
-}
-
-function placeFor(group: string, homes: Map<string, Home>, cardPlaces: Map<string, CardPlace>): CardPlace | { channel: string; thread: string | null; ts?: string; itemId?: string } | null {
+function placeFor(group: string, homes: Map<string, Home>, cardPlaces: Map<string, CardPlace>): CardPlace | null {
   const home = homes.get(group);
   if (home?.kind === "live") {
     const { mark } = home;
-    return {
-      channel: mark.channel,
-      thread: mark.threadTs ?? mark.cardTs,
-      ...(mark.cardTs ? { ts: mark.cardTs } : {}),
-      ...(mark.itemId ? { itemId: mark.itemId } : {}),
-    };
+    return { channel: mark.channel, thread: mark.threadTs ?? mark.cardTs };
   }
   return cardPlaces.get(group) ?? null;
 }
 
-/** The thread's ask record gains these files. */
+/** The thread's ask record gains these files: one evidence thread's. */
 async function recordAsked(
-  deps: DriftPostDeps,
-  findings: readonly FileDriftFinding[],
-  cardOf: (f: FileDriftFinding) => { channel: string; thread: string | null } | null,
+  store: Pick<DriftStore, "asked" | "saveAsked">,
+  placed: ReadonlyArray<{ f: FileDriftFinding; card: { channel: string; thread: string | null } }>,
+  now: number,
 ): Promise<void> {
-  const first = findings[0];
+  const first = placed[0]?.f;
   if (!first) return;
   const threadTs = first.evidence.threadTs ?? "";
-  const record = await deps.store.asked(first.evidence.channel, threadTs);
-  for (const f of findings) {
-    const card = cardOf(f);
-    if (!card) continue;
-    record[f.fileKey] = { cardChannel: card.channel, cardThread: card.thread, kind: f.target.kind, askedAt: deps.now() };
+  const record = await store.asked(first.evidence.channel, threadTs);
+  for (const { f, card } of placed) {
+    record[f.fileKey] = { cardChannel: card.channel, cardThread: card.thread, kind: f.target.kind, askedAt: now };
   }
-  await deps.store.saveAsked(first.evidence.channel, threadTs, record);
+  await store.saveAsked(first.evidence.channel, threadTs, record);
 }
 
 /** Where a finding's report goes (`pickDestination`), never #uno-bot. */

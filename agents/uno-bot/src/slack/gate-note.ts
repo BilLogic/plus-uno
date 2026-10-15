@@ -26,7 +26,7 @@
 //     person did not wait too long, they acted on the card above the one being
 //     held — and unlike an aged-out card there is a live one in the thread to
 //     send them to.
-//   • A STATED CARD (the library card, the weekly DS precedence card) is one
+//   • A STATED CARD (the Dev Mode links card, the weekly DS precedence card) is one
 //     nobody asked for, with no ⚠️ and a ⛔ that means what its footer says.
 //     "Tell me what to change", "ask me again" and "the newest card" are all
 //     wrong on it, so it carries its own words for a ⛔ and a late

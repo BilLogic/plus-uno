@@ -222,7 +222,7 @@ export interface PendingProposal {
   proposalText: string;
   /**
    * The card's own blocks as posted, when it had blocks of its own rather than
-   * its text in sections: a sweep card's carousel, a Figma library card's
+   * its text in sections: a sweep card's carousel, a Figma Review card's
    * release card and table, a Figma preview's screenshot. A note or a decision
    * is edited onto these (`slack/proposal-render.ts` `notedCardBlocks`), so the
    * card keeps its layout. Absent — a text-only card, or one that stepped down
@@ -266,7 +266,7 @@ export interface PendingProposal {
   revising?: { userId: string; at?: number };
   /**
    * The card's own words for the gate's answers, on a card the Worker states
-   * itself (`ProposalCard.kind: "stated"` — the library card, the weekly DS
+   * itself (`ProposalCard.kind: "stated"` — the Dev Mode links card, the weekly DS
    * precedence card). Absent — every turn's card — the generic lines in
    * `slack/gate-note.ts`, which assume a card someone asked for: "tell me what
    * to change", "ask me again", "the newest :warning: card". A stated card has
@@ -597,21 +597,14 @@ export interface StatedCardWords {
   expired: string;
 }
 
-/** What a ⛔ did on a library card staged while a ⛔ still filed its intake. */
-export const LEGACY_LIBRARY_CANCELLED = "No code drafted. Its intake is filed when the card's window closes";
-
 /**
  * What a ⛔ did on a stated card, in its own words — or nothing, on any other
- * card. A library card staged before a ⛔ stopped filing its intake still
- * carries the batch that did (`onCancel`) and the words "Intake only"; its ⛔
- * now runs nothing, and the tracker files its intake when its window closes
- * (`figma-library/track.ts`), so it says that instead.
+ * card.
  *
  * @param proposal - The card, as stored
  */
 export function statedCancelOf(proposal: PendingProposal): string | undefined {
-  if (!proposal.stated) return undefined;
-  return "onCancel" in proposal ? LEGACY_LIBRARY_CANCELLED : proposal.stated.cancelled;
+  return proposal.stated?.cancelled;
 }
 
 /** The card the ask behind this proposal staged: its origin, or itself. */

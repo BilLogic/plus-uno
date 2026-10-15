@@ -608,18 +608,13 @@ export function githubWorkflowClient(env: Env, target: RepoEntry): GithubWorkflo
   };
 }
 
-/** The reads the Figma library jobs make, bound to one repo. Each throws
+/** The repo reads the Figma and DS jobs make, bound to one repo. Each throws
  *  `GithubRequestError` on any non-2xx. */
 export interface GithubLibraryReads {
   readonly repo: string;
   /** A file's whole text from the default branch, or from `ref` — no cap,
    *  unlike `githubReadPath`, whose 12k cap would cut the component registry. */
   rawFile(path: string, ref?: string): Promise<string>;
-  /** `harness-intake` issues updated since `since` (ISO), pulls left out. */
-  recentIntakes(since: string): Promise<Array<{ number: number; url: string; body: string }>>;
-  /** Open `harness-intake` issues, most recently updated first, pulls left
-   *  out — the first 100, where a weekly-updated intake stays near the top. */
-  openIntakes(): Promise<Array<{ number: number; url: string; body: string }>>;
   /** Every `harness-intake` issue updated since `since` (ISO), up to 100, and
    *  whether that was all of them — so a caller about to file can tell "none
    *  carries the marker" from "the page ran out". */
@@ -638,8 +633,8 @@ export interface GithubLibraryReads {
 const LIBRARY_PAGE = 50;
 
 /**
- * The library jobs' reads on one listed repo (GET …/contents with the raw
- * media type, GET …/issues, GET …/pulls). One subrequest per call.
+ * The Figma and DS jobs' reads on one listed repo (GET …/contents with the
+ * raw media type, GET …/issues). One subrequest per call.
  */
 export function githubLibraryReads(env: Env, target: RepoEntry): GithubLibraryReads {
   const repo = target.repo;
@@ -659,19 +654,6 @@ export function githubLibraryReads(env: Env, target: RepoEntry): GithubLibraryRe
     }
     return res;
   };
-  const intakesAt = async (url: string) => {
-    const data = (await (await get("issue list", url)).json().catch(() => [])) as Array<{
-      number?: unknown;
-      html_url?: unknown;
-      body?: unknown;
-      pull_request?: unknown;
-    }>;
-    return (Array.isArray(data) ? data : []).flatMap((i) =>
-      typeof i.number === "number" && typeof i.html_url === "string" && !i.pull_request
-        ? [{ number: i.number, url: i.html_url, body: typeof i.body === "string" ? i.body : "" }]
-        : [],
-    );
-  };
   return {
     repo,
     async rawFile(path, ref) {
@@ -679,17 +661,6 @@ export function githubLibraryReads(env: Env, target: RepoEntry): GithubLibraryRe
       const at = ref ? `?ref=${encodeURIComponent(ref)}` : "";
       const res = await get("contents read", `https://api.github.com/repos/${repo}/contents/${clean}${at}`, "application/vnd.github.raw+json");
       return res.text();
-    },
-    async recentIntakes(since) {
-      return intakesAt(
-        `https://api.github.com/repos/${repo}/issues?labels=harness-intake&state=all` +
-          `&since=${encodeURIComponent(since)}&per_page=${LIBRARY_PAGE}`,
-      );
-    },
-    async openIntakes() {
-      return intakesAt(
-        `https://api.github.com/repos/${repo}/issues?labels=harness-intake&state=open&sort=updated&direction=desc&per_page=100`,
-      );
     },
     async intakesSince(since) {
       // Counted before pulls are left out: a full page is a page that may

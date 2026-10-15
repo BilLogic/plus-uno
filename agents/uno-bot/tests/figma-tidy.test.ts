@@ -1,8 +1,8 @@
 // The weekly Figma tidy-up, end to end on fakes: Monday's read jobs list the
 // teams' stage folders, and the post job checks each file against its
-// Roadmap cards, then posts one parent line in the channel and one combined
-// reply in its thread, a shared decision report of Review cards whose pop-up
-// answers are "Moved it" and "Leave as is".
+// Roadmap cards, then hands the week to the sweep's morning message, where it
+// is a section of Review cards whose pop-up answers are "Moved it" and
+// "Leave as is".
 //
 // What an outsider sees: which files are flagged and what each card tells the
 // owner to do, who is mentioned where, what is remembered from week to week,
@@ -16,14 +16,20 @@ import type { FigmaTeam } from "../src/figma-notify/teams";
 import {
   runTidyPost,
   runTidyRead,
+  tidySection,
   TIDY_CARD_TTL_MS,
+  TIDY_SECTION,
   type TidyCard,
+  type TidyHanded,
   type TidyListing,
   type TidyMemory,
   type TidyPostDeps,
   type TidyRefs,
   type TidySkips,
 } from "../src/figma-tidy/run";
+import { runSweepJob } from "../src/sweep/index";
+import { sectionHandOffIn } from "../src/sweep/sections";
+import { memoryRunStorage, sweepHarness } from "./helpers/sweep-harness";
 import { likelyCard, projectWords } from "../src/figma-tidy/checks";
 import { leaveAsIs } from "../src/figma-tidy/run";
 import { figmaReviewChannel } from "../src/figma-ask/env";
@@ -40,10 +46,9 @@ import { createInMemoryThreadState, type PendingProposal, type ThreadState } fro
 
 const CHANNEL = "C03FC8AS69K";
 const MEMBERS = ["U0SARAH", "U0MERYEM", "U0BILL"];
-const PARENT = "1760360400.000001";
-/** The week's reply, posted second. */
-const REPLY = "1760360400.000002";
-const NOW = Number(PARENT) * 1000 + 10 * 60_000;
+const NOW = 1760360400000 + 10 * 60_000;
+/** The sweep's morning message, as the harness posts it. */
+const MSG = `${Math.floor(NOW / 1000)}.900001`;
 const RUN_DATE = "2026-10-12";
 
 const UNIVERSAL: FigmaTeam = { name: "Universal", id: "100" };
@@ -103,10 +108,15 @@ function box<T>(initial: T) {
 
 interface Posted {
   text: string;
-  blocks?: unknown[];
-  threadTs?: string;
+  blocks: unknown[];
+  threadTs: string | null;
 }
 
+/**
+ * A Monday: the hand-over (`runTidyPost`), then — unless a rehearsal — the
+ * sweep's post with the week as its section, on one ThreadState. `posts`
+ * are the sweep's messages.
+ */
 function postWorld(opts: {
   files: ReturnType<typeof file>[];
   cards?: TidyCard[];
@@ -114,46 +124,65 @@ function postWorld(opts: {
   memory?: TidyMemory | null;
   refs?: TidyRefs | null;
   skips?: TidySkips | null;
+  waiting?: TidyHanded | null;
   store?: ThreadState;
   runDate?: string;
   now?: number;
 }) {
   const store = opts.store ?? createInMemoryThreadState({ now: () => opts.now ?? NOW });
-  const posts: Posted[] = [];
   const staged: PendingProposal[] = [];
   const marked: string[] = [];
   const memory = box<TidyMemory | null>(opts.memory ?? null);
   const list = box<TidyListing | null>(listing(opts.files));
   const refs = box<TidyRefs | null>(opts.refs ?? null);
   const skips = box<TidySkips | null>(opts.skips ?? null);
-  let n = 0;
+  const waiting = box<TidyHanded | null>(opts.waiting ?? null);
+  const runDate = opts.runDate ?? RUN_DATE;
+  const handOff = sectionHandOffIn<TidyHanded>(memoryRunStorage(), TIDY_SECTION);
   const deps: TidyPostDeps = {
     listing: list.store,
     memory: memory.store,
     refs: refs.store,
     skips: skips.store,
+    waiting: waiting.store,
     roadmap: {
       cards: async (numbers) => (opts.cards ?? []).filter((c) => numbers.includes(c.number)),
       likely: async (project) => opts.likely?.[project] ?? null,
     },
     members: async () => [...MEMBERS],
-    post: async (message, threadTs) => {
-      posts.push({ ...message, ...(threadTs ? { threadTs } : {}) });
-      n += 1;
-      return { ok: true, ts: n === 1 ? PARENT : `1760360400.00000${n}` };
-    },
-    edit: async () => {},
-    reports: store,
-    stage: async (proposal) => {
+    handOff,
+    channel: CHANNEL,
+    runDate,
+    now: () => opts.now ?? NOW,
+  };
+  const hooks = {
+    stage: async (proposal: PendingProposal) => {
       staged.push(proposal);
       await store.putProposal(proposal);
     },
-    markThread: async (ts) => void marked.push(ts),
-    channel: CHANNEL,
-    runDate: opts.runDate ?? RUN_DATE,
-    now: () => opts.now ?? NOW,
   };
-  return { deps, posts, staged, memory, list, store, marked, skips };
+  const section = tidySection(
+    {
+      memory: memory.store,
+      waiting: waiting.store,
+      edit: async () => {},
+      reports: store,
+      stage: (p) => hooks.stage(p),
+      markThread: async (ts) => void marked.push(ts),
+    },
+    handOff,
+    runDate,
+  );
+  const h = sweepHarness({ channels: {}, now: opts.now ?? NOW, runDate, threadState: store });
+  h.deps.sections = [section];
+  const posts = h.posted as Posted[];
+  /** The hand-over, then the sweep's post unless a rehearsal. */
+  const run = async (o: { dryRun?: boolean } = {}) => {
+    const result = await runTidyPost(deps, o);
+    if (!o.dryRun) await runSweepJob({ key: "sweep-post", kind: "sweep-post" }, h.deps);
+    return result;
+  };
+  return { deps, run, hooks, posts, staged, memory, list, store, marked, skips, waiting };
 }
 
 type Card = {
@@ -173,17 +202,15 @@ describe("the checks", () => {
       files: [file("u-wip", "F1", "AI Indicator / Card 733 / Sarah")],
       cards: [card(733, "Shipped", "U0SARAH")],
     });
-    const result = await runTidyPost(w.deps);
-    assert.equal(result.posted, true);
-    assert.equal(w.posts.length, 2, "the parent line, then one reply for the owner");
-    assert.match(w.posts[0]!.text, /^Figma tidy-up for the week of Oct 12: 1 new item\.$/);
-    const reply = w.posts[1]!;
-    assert.equal(reply.threadTs, PARENT);
-    assert.equal(messageBlocksRefusal(reply.blocks!), null);
-    assert.match(JSON.stringify(reply.blocks![0]), /<@U0SARAH>, 1 file needs a tidy\./);
+    await w.run();
+    assert.equal(w.posts.length, 1, "one message: the morning's");
+    const reply = w.posts[0]!;
+    assert.equal(reply.threadTs, null);
+    assert.equal(messageBlocksRefusal(reply.blocks), null);
+    assert.match(JSON.stringify(reply.blocks[0]), /<@U0SARAH>, 1 file needs a tidy\./);
+    assert.match(JSON.stringify(reply.blocks[0]), /Figma tidy-up for the week of Oct 12: 1 new item\./);
     assert.deepEqual(notified(reply), ["U0SARAH"], "the owner is pinged from the main text");
-    assert.deepEqual(notified(w.posts[0]!), [], "the parent line pings nobody");
-    const [c] = cardsIn(reply.blocks!);
+    const [c] = cardsIn(reply.blocks);
     assert.equal(c!.title.text, "AI Indicator / Card 733 / Sarah");
     assert.equal(c!.subtitle!.text, "<@U0SARAH> · Wrong folder · Card 733");
     assert.equal(c!.body.text, "In ⏳ WIP, but Card 733 is Shipped. Move it to Universal › 📐 Specs.");
@@ -197,9 +224,9 @@ describe("the checks, each case", () => {
   /** Every card posted, by title. */
   async function bodies(files: ReturnType<typeof file>[], cards: TidyCard[] = [], likely: Record<string, TidyCard> = {}) {
     const w = postWorld({ files, cards, likely });
-    await runTidyPost(w.deps);
+    await w.run();
     const out: Record<string, { subtitle: string; body: string; buttons: string[] }> = {};
-    for (const p of w.posts.slice(1)) {
+    for (const p of w.posts) {
       for (const c of cardsIn(p.blocks!)) out[c.title.text] = { subtitle: c.subtitle!.text, body: c.body.text, buttons: c.actions.map((a) => a.text.text) };
     }
     return { out, w };
@@ -276,7 +303,7 @@ describe("the checks, each case", () => {
     ]);
     l.folders.push({ team: "MISC", id: "m-wip", name: "WIP" }, { team: "Universal", id: "u-odd", name: "Sandbox" });
     w.list.b.value = l;
-    await runTidyPost(w.deps);
+    await w.run();
     assert.deepEqual(w.posts, []);
   });
 
@@ -306,10 +333,10 @@ describe("the title check", () => {
       cards: [card(733, "WIP", "U0SARAH"), card(812, "WIP", "U0MERYEM"), card(1002, "WIP", null)],
       refs: refs([1002, 733, 812]),
     });
-    await runTidyPost(w.deps);
-    assert.equal(w.posts.length, 2);
-    assert.match(JSON.stringify(w.posts[1]!.blocks![0]), /<@U0SARAH>, 1 file needs a tidy\./);
-    const [c] = cardsIn(w.posts[1]!.blocks!);
+    await w.run();
+    assert.equal(w.posts.length, 1);
+    assert.match(JSON.stringify(w.posts[0]!.blocks![0]), /<@U0SARAH>, 1 file needs a tidy\./);
+    const [c] = cardsIn(w.posts[0]!.blocks!);
     assert.equal(c!.subtitle!.text, "<@U0SARAH> · Title misses a card · Card 812");
     assert.equal(
       c!.body.text,
@@ -324,8 +351,8 @@ describe("the title check", () => {
       cards: [card(733, "WIP", "U0SARAH", null, "AI", ["Sarah"]), card(812, "WIP", "U0MERYEM", null, "AI", ["Meryem", "Sarah"])],
       refs: refs([812]),
     });
-    await runTidyPost(w.deps);
-    const [c] = cardsIn(w.posts[1]!.blocks!);
+    await w.run();
+    const [c] = cardsIn(w.posts[0]!.blocks!);
     assert.match(c!.body.text, /Rename it to "AI Indicator \/ Card 733 & 812 \/ Sarah & Meryem"\.$/);
   });
 
@@ -335,7 +362,7 @@ describe("the title check", () => {
       cards: [card(733, "WIP", "U0SARAH")],
       refs: refs([733, 4444]),
     });
-    await runTidyPost(w.deps);
+    await w.run();
     assert.deepEqual(w.posts, []);
   });
 
@@ -345,11 +372,11 @@ describe("the title check", () => {
       cards: [card(812, "WIP", "U0MERYEM")],
       refs: refs([812]),
     });
-    await runTidyPost(w.deps);
-    const all = w.posts.slice(1).flatMap((p) => cardsIn(p.blocks!));
+    await w.run();
+    const all = w.posts.flatMap((p) => cardsIn(p.blocks!));
     assert.equal(all.length, 1);
     assert.match(all[0]!.body.text, /Rename it to "Onboarding \/ Card 812 \/ Sarah"\.$/);
-    assert.match(JSON.stringify(w.posts[1]!.blocks![0]), /<@U0MERYEM>/);
+    assert.match(JSON.stringify(w.posts[0]!.blocks![0]), /<@U0MERYEM>/);
   });
 });
 
@@ -359,7 +386,7 @@ describe("an item left as is", () => {
 
   it("is silenced on later runs, and not counted open", async () => {
     const w = postWorld({ files, cards, skips: { "F1|wrong-folder": "733" } });
-    const result = await runTidyPost(w.deps);
+    const result = await w.run();
     assert.deepEqual(w.posts, []);
     assert.equal(result.summary, "nothing to tidy");
   });
@@ -370,8 +397,8 @@ describe("an item left as is", () => {
       cards,
       skips: { "F1|wrong-folder": "733", "F9|title": "1" },
     });
-    await runTidyPost(w.deps);
-    assert.equal(cardsIn(w.posts[1]!.blocks!)[0]!.subtitle!.text, "<@U0SARAH> · Wrong folder · Card 734");
+    await w.run();
+    assert.equal(cardsIn(w.posts[0]!.blocks)[0]!.subtitle!.text, "<@U0SARAH> · Wrong folder · Card 734");
     assert.deepEqual(w.skips.b.value, { "F9|title": "1" });
   });
 });
@@ -380,43 +407,54 @@ describe("the post", () => {
   const many = (n: number, owner: string, base: number) =>
     Array.from({ length: n }, (_, i) => ({ f: file("u-wip", `${owner}${i}`, `P${base + i} / Card ${base + i} / x`), c: card(base + i, "Shipped", owner) }));
 
-  /** The opener's words: the reply's first block. */
-  const opener = (reply: Posted) => (reply.blocks![0] as { text: { text: string } }).text.text;
+  /** The opener's words: the message's first block. */
+  const opener = (message: Posted) => (message.blocks[0] as { text: { text: string } }).text.text;
 
-  it("one combined reply: a bullet per owner, each mentioned once, the unassigned last, and every card in one carousel", async () => {
+  it("hands the week over and posts nothing of its own", async () => {
+    const w = postWorld({ files: [file("u-wip", "F1", "AI Indicator / Card 733 / Sarah")], cards: [card(733, "Shipped", "U0SARAH")] });
+    const result = await runTidyPost(w.deps);
+    assert.equal(result.posted, false);
+    assert.equal(result.summary, "handed 1 card(s) for 1 owner(s), 1 new, 0 still open to the morning post");
+    assert.deepEqual(w.posts, []);
+    assert.equal(w.memory.b.writes, 0, "nothing remembered until it shows");
+  });
+
+  it("one section of the morning's message: a bullet per owner, each mentioned once, the unassigned last, the week's line, and every card in the carousel", async () => {
     const sarah = many(4, "U0SARAH", 100);
     const meryem = many(2, "U0MERYEM", 200);
     const w = postWorld({
       files: [sarah[0]!.f, file("u-wip", "Z", "Loose file"), ...meryem.map((s) => s.f), ...sarah.slice(1).map((s) => s.f)],
       cards: [...sarah, ...meryem].map((s) => s.c),
     });
-    await runTidyPost(w.deps);
-    assert.equal(w.posts[0]!.text, "Figma tidy-up for the week of Oct 12: 7 new items.");
-    assert.equal(w.posts.length, 2, "the parent, and one reply in its thread");
-    const reply = w.posts[1]!;
-    assert.equal(reply.threadTs, PARENT);
-    assert.equal(opener(reply), "• <@U0SARAH>, 4 files need a tidy.\n• <@U0MERYEM>, 2 files need a tidy.\n• 1 file has no owner I could find.");
-    assert.deepEqual(notified(reply), ["U0SARAH", "U0MERYEM"]);
+    await w.run();
+    assert.equal(w.posts.length, 1, "one message, at the channel's top");
+    const message = w.posts[0]!;
+    assert.equal(message.threadTs, null);
+    assert.equal(
+      opener(message),
+      "• <@U0SARAH>, 4 files need a tidy.\n• <@U0MERYEM>, 2 files need a tidy.\n• 1 file has no owner I could find.\n• Figma tidy-up for the week of Oct 12: 7 new items.",
+    );
+    assert.deepEqual(notified(message), ["U0SARAH", "U0MERYEM"]);
     assert.deepEqual(
-      cardsIn(reply.blocks!).map((c) => c.title.text),
+      cardsIn(message.blocks).map((c) => c.title.text),
       [...sarah.map((s) => s.f.name), ...meryem.map((s) => s.f.name), "Loose file"],
       "grouped by owner, in bullet order",
     );
-    assert.match(cardsIn(reply.blocks!)[4]!.subtitle!.text, /^<@U0MERYEM> · /, "each card's subtitle tags its owner");
-    assert.deepEqual(w.marked, [PARENT], "the thread is marked, so replies there are not all turns");
+    assert.match(cardsIn(message.blocks)[4]!.subtitle!.text, /^<@U0MERYEM> · /, "each card's subtitle tags its owner");
+    assert.deepEqual(w.marked, [MSG], "the thread is marked, so replies there are not all turns");
     assert.equal(w.staged.length, 7);
-    for (const p of w.staged) assert.equal(p.item!.messageTs, REPLY);
+    for (const p of w.staged) assert.equal(p.item!.messageTs, MSG);
   });
 
-  it("a single-owner week reads as one opener line", async () => {
+  it("a single-owner week reads as its owner's line and the week's", async () => {
     const sarah = many(7, "U0SARAH", 100);
     const w = postWorld({ files: sarah.map((s) => s.f), cards: sarah.map((s) => s.c) });
-    await runTidyPost(w.deps);
-    assert.equal(opener(w.posts[1]!), "<@U0SARAH>, 7 files need a tidy.");
+    await w.run();
+    assert.match(opener(w.posts[0]!), /<@U0SARAH>, 7 files need a tidy\./);
     const loose = postWorld({ files: [file("u-wip", "Z", "Loose file"), file("u-wip", "Y", "Other loose")] });
-    await runTidyPost(loose.deps);
-    assert.equal(opener(loose.posts[1]!), "2 files have no owner I could find.");
-    assert.deepEqual(notified(loose.posts[1]!), [], "no owner, nobody pinged");
+    await loose.run();
+    assert.match(opener(loose.posts[0]!), /2 files have no owner I could find\./);
+    assert.deepEqual(notified(loose.posts[0]!), [], "no owner, nobody pinged");
   });
 
   it("more than ten: ten cards, filled round-robin across owners with the unassigned last, and each bullet counts what waits", async () => {
@@ -426,40 +464,58 @@ describe("the post", () => {
       files: [...sarah.map((s) => s.f), file("u-wip", "Z", "Loose file"), file("u-wip", "Y", "Other loose"), ...meryem.map((s) => s.f)],
       cards: [...sarah, ...meryem].map((s) => s.c),
     });
-    await runTidyPost(w.deps);
-    assert.equal(w.posts.length, 2);
-    const reply = w.posts[1]!;
+    await w.run();
+    assert.equal(w.posts.length, 1);
+    const message = w.posts[0]!;
     assert.equal(
-      opener(reply),
+      opener(message),
       [
-        "• <@U0SARAH>, 8 files need a tidy: here are 4, and 4 more next week.",
-        "• <@U0MERYEM>, 5 files need a tidy: here are 4, and 1 more next week.",
+        "• <@U0SARAH>, 8 files need a tidy. Here are 4; 4 more come in the next report.",
+        "• <@U0MERYEM>, 5 files need a tidy. Here are 4; 1 more come in the next report.",
         "• 2 files have no owner I could find.",
+        "• Figma tidy-up for the week of Oct 12: 15 new items.",
       ].join("\n"),
     );
     assert.deepEqual(
-      cardsIn(reply.blocks!).map((c) => c.title.text),
+      cardsIn(message.blocks).map((c) => c.title.text),
       [...sarah.slice(0, 4).map((s) => s.f.name), ...meryem.slice(0, 4).map((s) => s.f.name), "Loose file", "Other loose"],
     );
-    assert.equal(Object.keys(w.memory.b.value!.shown).length, 10, "a held item is not remembered");
+    assert.equal(Object.keys(w.memory.b.value!.shown).length, 10, "an item that did not show is not remembered");
+    assert.equal(w.waiting.b.value!.shown.length, 5, "what did not show waits for the next morning");
+
+    // Tuesday: no listing of its own, so the week's five that had no room go up.
+    const tuesday = postWorld({ files: [], memory: w.memory.b.value, waiting: w.waiting.b.value, runDate: "2026-10-13" });
+    await tuesday.run();
+    assert.equal(
+      opener(tuesday.posts[0]!),
+      [
+        "• <@U0SARAH>, 4 files need a tidy.",
+        "• <@U0MERYEM>, 1 file needs a tidy.",
+        "• More from the Figma tidy-up for the week of Oct 12: 5 items that did not fit before.",
+      ].join("\n"),
+    );
+    assert.equal(cardsIn(tuesday.posts[0]!.blocks).length, 5);
+    assert.equal(Object.keys(tuesday.memory.b.value!.shown).length, 15);
+    assert.equal(tuesday.waiting.b.value, null, "nothing left waiting");
 
     const next = postWorld({ files: w.list.b.value!.files, cards: [...sarah, ...meryem].map((s) => s.c), memory: w.memory.b.value, runDate: "2026-10-19" });
     next.list.b.value!.runDate = "2026-10-19";
-    await runTidyPost(next.deps);
-    assert.equal(next.posts[0]!.text, "Figma tidy-up for the week of Oct 19: 5 new items, and 10 still open from earlier weeks.");
-    assert.equal(opener(next.posts[1]!), "• <@U0SARAH>, 4 files need a tidy.\n• <@U0MERYEM>, 1 file needs a tidy.");
+    next.waiting.b.value = w.waiting.b.value;
+    await next.run();
+    assert.equal(opener(next.posts[0]!), "• <@U0SARAH>, 4 files need a tidy.\n• <@U0MERYEM>, 1 file needs a tidy.\n• Figma tidy-up for the week of Oct 19: 5 new items, and 10 still open from earlier weeks.");
+    assert.equal(next.waiting.b.value, null, "a new week replaces what an earlier one left waiting");
   });
 
-  it("every owner gets a card before anyone gets a second, and one shown of several reads \"here is 1\"", async () => {
+  it("every owner gets a card before anyone gets a second", async () => {
     const owners = Array.from({ length: 11 }, (_, i) => `U0OWNER${String.fromCharCode(65 + i)}`);
     const all = owners.flatMap((o, i) => many(2, o, 100 + i * 10));
     const w = postWorld({ files: all.map((s) => s.f), cards: all.map((s) => s.c) });
-    await runTidyPost(w.deps);
-    const lines = opener(w.posts[1]!).split("\n");
-    assert.equal(lines.length, 11);
-    assert.equal(lines[0], "• <@U0OWNERA>, 2 files need a tidy: here is 1, and 1 more next week.");
-    assert.equal(lines[10], "• <@U0OWNERK>, 2 files need a tidy: they come next week.");
-    assert.equal(cardsIn(w.posts[1]!.blocks!).length, 10);
+    await w.run();
+    const lines = opener(w.posts[0]!).split("\n");
+    assert.equal(lines.length, 12);
+    assert.equal(lines[0], "• <@U0OWNERA>, 2 files need a tidy. Here is 1; 1 more come in the next report.");
+    assert.equal(lines[10], "• <@U0OWNERK>, 2 files need a tidy. They come in the next report.");
+    assert.equal(cardsIn(w.posts[0]!.blocks).length, 10);
   });
 
   it("a DM run tags nobody, and names each owner in plain text", async () => {
@@ -470,20 +526,20 @@ describe("the post", () => {
       cards: [...sarah.map((s) => ({ ...s.c, ownerName: "Sarah Lee" })), ...meryem.map((s) => ({ ...s.c, ownerName: "Meryem Ali" }))],
     });
     w.deps.channel = "D0APTB20SK0";
-    await runTidyPost(w.deps);
-    assert.equal(w.posts.length, 2);
-    assert.doesNotMatch(JSON.stringify(w.posts[1]), /<@/);
-    assert.equal(opener(w.posts[1]!), "• Sarah Lee, 2 files need a tidy.\n• Meryem Ali, 1 file needs a tidy.\n• 1 file has no owner I could find.");
-    assert.match(cardsIn(w.posts[1]!.blocks!)[0]!.subtitle!.text, /^Sarah Lee · /, "the subtitle names the owner too");
+    await w.run();
+    assert.equal(w.posts.length, 1);
+    assert.doesNotMatch(JSON.stringify(w.posts[0]), /<@/);
+    assert.match(opener(w.posts[0]!), /^• Sarah Lee, 2 files need a tidy\.\n• Meryem Ali, 1 file needs a tidy\.\n• 1 file has no owner I could find\./);
+    assert.match(cardsIn(w.posts[0]!.blocks)[0]!.subtitle!.text, /^Sarah Lee · /, "the subtitle names the owner too");
   });
 
   it("stages each card as its own proposal, answered Moved it or Leave as is, by the channel's members, for six days", async () => {
     const w = postWorld({ files: [file("u-wip", "F1", "AI Indicator / Card 733 / Sarah")], cards: [card(733, "Shipped", "U0SARAH")] });
-    await runTidyPost(w.deps);
+    await w.run();
     assert.equal(w.staged.length, 1);
     const [p] = w.staged;
-    assert.equal(p!.proposalTs, itemProposal(REPLY, "wrong-folder-F1-733").proposalTs);
-    assert.equal(p!.threadTs, PARENT);
+    assert.equal(p!.proposalTs, itemProposal(MSG, "wrong-folder-F1-733").proposalTs);
+    assert.equal(p!.threadTs, MSG);
     assert.deepEqual(p!.confirmers, MEMBERS);
     assert.equal(p!.ttlMs, TIDY_CARD_TTL_MS);
     assert.deepEqual(
@@ -501,7 +557,7 @@ describe("the post", () => {
     const files = [file("u-wip", "F1", "AI Indicator / Card 733 / Sarah")];
     const cards = [card(733, "Shipped", "U0SARAH")];
     const first = postWorld({ files, cards });
-    await runTidyPost(first.deps);
+    await first.run();
     const memory = first.memory.b.value;
     assert.deepEqual(memory, { shown: { "F1|wrong-folder|733": RUN_DATE }, open: 1 });
 
@@ -512,9 +568,9 @@ describe("the post", () => {
       runDate: "2026-10-19",
     });
     next.list.b.value!.runDate = "2026-10-19";
-    await runTidyPost(next.deps);
-    assert.equal(next.posts[0]!.text, "Figma tidy-up for the week of Oct 19: 1 new item, and 1 still open from earlier weeks.");
-    assert.deepEqual(cardsIn(next.posts[1]!.blocks!).map((c) => c.title.text), ["New / Card 734 / Sarah"]);
+    await next.run();
+    assert.match(opener(next.posts[0]!), /Figma tidy-up for the week of Oct 19: 1 new item, and 1 still open from earlier weeks\./);
+    assert.deepEqual(cardsIn(next.posts[0]!.blocks).map((c) => c.title.text), ["New / Card 734 / Sarah"]);
   });
 
   it("a fingerprint is forgotten after five weeks", async () => {
@@ -523,8 +579,8 @@ describe("the post", () => {
       cards: [card(733, "Shipped", "U0SARAH")],
       memory: { shown: { "F1|wrong-folder|733": "2026-09-07" }, open: 1 },
     });
-    await runTidyPost(old.deps);
-    assert.equal(old.posts[0]!.text, "Figma tidy-up for the week of Oct 12: 1 new item.");
+    await old.run();
+    assert.match(opener(old.posts[0]!), /Figma tidy-up for the week of Oct 12: 1 new item\./);
   });
 
   it("a week with nothing new posts nothing, even with items still open", async () => {
@@ -533,53 +589,54 @@ describe("the post", () => {
       cards: [card(733, "Shipped", "U0SARAH")],
       memory: { shown: { "F1|wrong-folder|733": "2026-10-05" }, open: 1 },
     });
-    const result = await runTidyPost(w.deps);
+    const result = await w.run();
     assert.equal(result.posted, false);
     assert.deepEqual(w.posts, []);
     assert.equal(w.memory.b.value!.open, 1);
   });
 
-  it("the week everything is fixed posts one all-clear, then goes quiet", async () => {
+  it("the week everything is fixed says one all-clear on the morning's message, then goes quiet", async () => {
     const w = postWorld({ files: [], memory: { shown: { "F1|wrong-folder|733": "2026-10-05" }, open: 12 } });
-    await runTidyPost(w.deps);
+    await w.run();
     assert.equal(w.posts.length, 1);
-    assert.equal(w.posts[0]!.text, "*Figma tidy-up: all clear* 🎉 Last week's 12 items are fixed. Nice work.");
+    assert.match(w.posts[0]!.text, /\*Figma tidy-up: all clear\* 🎉 Last week's 12 items are fixed\. Nice work\./);
     assert.equal(w.memory.b.value!.open, 0);
 
     const after = postWorld({ files: [], memory: w.memory.b.value, runDate: "2026-10-19" });
     after.list.b.value!.runDate = "2026-10-19";
-    await runTidyPost(after.deps);
+    await after.run();
     assert.deepEqual(after.posts, []);
   });
 
-  it("posts nothing when the listing is not this week's or stopped short, and a dry run posts, stages and remembers nothing", async () => {
+  it("hands nothing over when the listing is not this week's or stopped short, and a dry run hands over and remembers nothing", async () => {
     const stale = postWorld({ files: [file("u-wip", "Z", "Loose")], runDate: "2026-10-19" });
-    assert.equal((await runTidyPost(stale.deps)).posted, false);
+    assert.match((await stale.run()).summary, /no listing for this week/);
     const short = postWorld({ files: [file("u-wip", "Z", "Loose")] });
     short.list.b.value!.tasks.push({ kind: "folder", team: "Universal", folderId: "u-specs" });
-    assert.equal((await runTidyPost(short.deps)).posted, false);
+    assert.match((await short.run()).summary, /stopped short/);
     for (const w of [stale, short]) assert.deepEqual(w.posts, []);
 
     const dry = postWorld({ files: [file("u-wip", "Z", "Loose")] });
-    const r = await runTidyPost(dry.deps, { dryRun: true });
-    assert.match(r.summary, /would post 1 card/);
+    const r = await dry.run({ dryRun: true });
+    assert.match(r.summary, /would hand 1 card/);
     assert.deepEqual(dry.posts, []);
     assert.deepEqual(dry.staged, []);
     assert.equal(dry.memory.b.writes, 0);
   });
 
-  it("a card that does not stage is not remembered, so it comes back next week", async () => {
+  it("a card that does not stage is not remembered, and waits for the next morning", async () => {
     const w = postWorld({ files: [file("u-wip", "F1", "AI Indicator / Card 733 / Sarah")], cards: [card(733, "Shipped", "U0SARAH")] });
-    w.deps.stage = async () => Promise.reject(new Error("DO down"));
-    await runTidyPost(w.deps);
+    w.hooks.stage = async () => Promise.reject(new Error("DO down"));
+    await w.run();
     assert.deepEqual(w.memory.b.value!.shown, {});
+    assert.deepEqual(w.waiting.b.value!.shown.map((x) => x.finding.file.key), ["F1"]);
   });
 });
 
 describe("answering a card in its Review", () => {
   async function answered() {
     const w = postWorld({ files: [file("u-wip", "F1", "AI Indicator / Card 733 / Sarah")], cards: [card(733, "Shipped", "U0SARAH")] });
-    await runTidyPost(w.deps);
+    await w.run();
     const updates: Array<{ ts: string; message: CardMessage }> = [];
     const ran: unknown[] = [];
     const views = recordingViews({ alreadyOpen: ["V1"] });
@@ -598,7 +655,7 @@ describe("answering a card in its Review", () => {
     };
     const answer = (choice: string, userId = "U0SARAH") =>
       runReviewDecision(
-        { viewId: "V1", channel: CHANNEL, messageTs: itemProposal(REPLY, "wrong-folder-F1-733").proposalTs, userId, decision: "cancel", choice },
+        { viewId: "V1", channel: CHANNEL, messageTs: itemProposal(MSG, "wrong-folder-F1-733").proposalTs, userId, decision: "cancel", choice },
         deps,
       );
     return { answer, updates, ran };
@@ -802,14 +859,14 @@ describe("the read", () => {
     }
   });
 
-  it("is planned in Monday's morning run only, the post after every read", () => {
+  it("reads on Monday's morning run only, and hands over every morning, after every read", () => {
     const reads = Array.from({ length: TIDY_JOBS }, (_, i) => `figma-tidy-read-${i + 1}`);
     const monday = planRun("morning", Date.parse("2026-10-12T13:00:00Z"));
     const tidy = monday.jobs.filter((j) => j.kind === "figma-tidy-read" || j.kind === "figma-tidy-post");
     assert.deepEqual(tidy.map((j) => j.key), [...reads, "figma-tidy-post"]);
     assert.deepEqual(tidy.at(-1)!.after, reads);
     const tuesday = planRun("morning", Date.parse("2026-10-13T13:00:00Z"));
-    assert.equal(tuesday.jobs.some((j) => j.kind.startsWith("figma-tidy")), false);
-    assert.equal(planRun("end-of-day", Date.parse("2026-10-13T04:00:00Z")).jobs.some((j) => j.kind.startsWith("figma-tidy")), false);
+    assert.deepEqual(tuesday.jobs.filter((j) => j.kind.startsWith("figma-tidy")).map((j) => j.key), ["figma-tidy-post"]);
+    assert.equal(planRun("end-of-day", Date.parse("2026-10-13T10:00:00Z")).jobs.some((j) => j.kind.startsWith("figma-tidy")), false);
   });
 });

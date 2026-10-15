@@ -5,9 +5,8 @@
 //   • THE POST — `runDevLinksPost`: read the registry and the links the
 //     components' library components already carry (one Tier 2 read per file:
 //     two files hold all 68), then post ONE Review card: a named component's,
-//     a batch card listing every component a run of several still has to
-//     link, or a merged component PR's. Cards post where the Figma Review-card
-//     setting says. Posting writes nothing to Figma.
+//     or a batch card listing every component a run of several still has to
+//     link. Posting writes nothing to Figma.
 //   • THE WRITE — `writeDevLinks`, the card's one operation past Approve:
 //     read the nodes' links again, rename a Code link still under its old
 //     name, add only what is still missing (a re-run or a second card never
@@ -82,8 +81,7 @@ export const DEV_LINKS_CARD_TTL_MS = 3 * 24 * 60 * 60 * 1000;
 /** What a run is asked for. */
 export type DevLinksRequest =
   | { components: readonly string[] }
-  | { all: true }
-  | { pr: { number: number; url: string }; components: readonly string[] };
+  | { all: true };
 
 export interface DevLinksDeps {
   /** component-registry.json, as the repo has it. */
@@ -163,9 +161,18 @@ export interface DevLinksResult {
 }
 
 /** The card's write, and what it is for. */
-interface Planned {
+export interface PlannedDevLinks {
   subject: DevLinksSubject;
   write: DevLinksWrite;
+}
+
+/** What a request comes to before anything posts: its one card, or none and why. */
+export interface DevLinksPlan {
+  planned: PlannedDevLinks | null;
+  /** What the run passed over, for its summary: ` — …`, or empty. */
+  tail: string;
+  /** Why nothing was planned, when it was not for want of links to add. */
+  stopped?: string;
 }
 
 /** The Dev Mode links already on these nodes, read once per file. */
@@ -191,20 +198,24 @@ const changesOf = (plan: DevLinkPlan): DevLink[] => [
 ];
 
 /**
- * Post the Review card a request needs.
+ * The one Review card a request needs, read and planned, posting nothing:
+ * what the debug route posts on a message of its own, and what the morning
+ * hands the sweep's #plus-design message (`./morning.ts`).
  *
- * @param deps - The registry, the Figma client, the channel and the store
- * @param request - One component, several or all of them (one batch card), or a merged PR's
- * @param opts - `dryRun` reads and plans, and posts and stages nothing
+ * @param deps - The registry, the Figma client and the cards still open
+ * @param request - One component, or several or all of them (one batch card)
  */
-export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksRequest, opts: { dryRun?: boolean } = {}): Promise<DevLinksResult> {
+export async function planDevLinksCard(
+  deps: Pick<DevLinksDeps, "registry" | "figma" | "repo" | "reports" | "carded" | "now">,
+  request: DevLinksRequest,
+): Promise<DevLinksPlan> {
   const targets = devLinkTargets(await deps.registry(), deps.repo);
   const names = "all" in request ? [...targets.keys()] : [...new Set(request.components)];
   const unknown = names.filter((n) => !targets.has(n));
   const chosen = names.flatMap((n) => targets.get(n) ?? []);
   const notes: string[] = [];
   if (unknown.length) notes.push(`not in the registry, so no links: ${unknown.join(", ")}`);
-  if (!chosen.length) return { posted: false, cards: 0, summary: notes.join("; ") || "no components asked for" };
+  if (!chosen.length) return { planned: null, tail: "", stopped: notes.join("; ") || "no components asked for" };
 
   let existing: FigmaDevResource[];
   try {
@@ -214,66 +225,62 @@ export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksReque
     );
   } catch (err) {
     rethrowIfBudget(err);
-    return { posted: false, cards: 0, retry: true, summary: `Figma's links unread, so nothing posted: ${err instanceof Error ? err.message : String(err)}` };
+    return { planned: null, tail: "", stopped: `Figma's links unread, so nothing posted: ${err instanceof Error ? err.message : String(err)}` };
   }
 
   const now = deps.now();
   const carded = await openCards(deps.reports, (await deps.carded.read()) ?? {}, now);
-  let planned: Planned | null = null;
+  let planned: PlannedDevLinks | null = null;
   const already: string[] = [];
   const atCap: string[] = [];
   const open: string[] = [];
-  if ("pr" in request) {
-    const links: DevLink[] = [];
-    const named: string[] = [];
-    for (const t of chosen) {
-      const plan = planDevLinks(wantedLinks(t, [{ kind: "pr", ...request.pr }]), existing);
-      if (plan.atCap.length) atCap.push(t.component);
-      if (plan.add.length) {
-        links.push(...plan.add);
-        named.push(t.component);
-      } else if (!plan.atCap.length) already.push(t.component);
+  // A run naming one component gets that component's card; any more, one batch card.
+  const single = "components" in request && chosen.length === 1;
+  const batch: Required<DevLinksWrite> = { links: [], introduce: [], renames: 0 };
+  const entries: DevLinksBatchEntry[] = [];
+  let figmaUrl = "";
+  for (const t of chosen) {
+    const plan = planDevLinks(wantedLinks(t, [{ kind: "code" }, { kind: "storybook" }]), existing);
+    if (plan.atCap.length) atCap.push(t.component);
+    const changes = changesOf(plan);
+    if (!changes.length) {
+      if (!plan.atCap.length) already.push(t.component);
+      continue;
     }
-    const subject: DevLinksSubject = { kind: "pr", ...request.pr, components: named };
-    if (links.length && carded[devLinksItemId(subject)]) open.push(`PR #${request.pr.number}`);
-    else if (links.length) planned = { subject, write: { links, introduce: [] } };
-  } else {
-    // A run naming one component gets that component's card; any more, one batch card.
-    const single = "components" in request && chosen.length === 1;
-    const write: Required<DevLinksWrite> = { links: [], introduce: [], renames: 0 };
-    const entries: DevLinksBatchEntry[] = [];
-    let figmaUrl = "";
-    for (const t of chosen) {
-      const plan = planDevLinks(wantedLinks(t, [{ kind: "code" }, { kind: "storybook" }]), existing);
-      if (plan.atCap.length) atCap.push(t.component);
-      const changes = changesOf(plan);
-      if (!changes.length) {
-        if (!plan.atCap.length) already.push(t.component);
-        continue;
-      }
-      const own: DevLinksSubject = { kind: "component", component: t.component, figmaUrl: t.figmaUrl, storybook: t.storybook };
-      if (carded[devLinksItemId(own)]) {
-        open.push(t.component);
-        continue;
-      }
-      figmaUrl ||= t.figmaUrl;
-      write.links.push(...changes);
-      write.renames += plan.rename.length;
-      if (!linkedBefore(t.component, existing, t.nodeIds)) write.introduce.push({ file_key: t.fileKey, node_id: changes[0]!.node_id, component: t.component });
-      entries.push({ component: t.component, adds: [...new Map(plan.add.map((l) => [l.name, { name: l.name, url: l.url }])).values()], renamed: plan.rename.length > 0 });
-      if (single) planned = { subject: own, write };
+    const own: DevLinksSubject = { kind: "component", component: t.component, figmaUrl: t.figmaUrl, storybook: t.storybook };
+    if (carded[devLinksItemId(own)]) {
+      open.push(t.component);
+      continue;
     }
-    if (!single && entries.length) {
-      const subject: DevLinksSubject = { kind: "batch", figmaUrl, components: entries };
-      if (carded[devLinksItemId(subject)]) open.push("the batch");
-      else planned = { subject, write };
-    }
+    figmaUrl ||= t.figmaUrl;
+    batch.links.push(...changes);
+    batch.renames += plan.rename.length;
+    if (!linkedBefore(t.component, existing, t.nodeIds)) batch.introduce.push({ file_key: t.fileKey, node_id: changes[0]!.node_id, component: t.component });
+    entries.push({ component: t.component, adds: [...new Map(plan.add.map((l) => [l.name, { name: l.name, url: l.url }])).values()], renamed: plan.rename.length > 0 });
+    if (single) planned = { subject: own, write: batch };
+  }
+  if (!single && entries.length) {
+    const subject: DevLinksSubject = { kind: "batch", figmaUrl, components: entries };
+    if (carded[devLinksItemId(subject)]) open.push("the batch");
+    else planned = { subject, write: batch };
   }
   if (already.length) notes.push(`already linked: ${already.join(", ")}`);
   if (atCap.length) notes.push(`at Figma's 10 links, so some held back: ${atCap.join(", ")}`);
   if (open.length) notes.push(`card already open: ${open.join(", ")}`);
-  const tail = notes.length ? ` — ${notes.join("; ")}` : "";
+  return { planned, tail: notes.length ? ` — ${notes.join("; ")}` : "" };
+}
 
+/**
+ * Post the Review card a request needs, on a message of its own.
+ *
+ * @param deps - The registry, the Figma client, the channel and the store
+ * @param request - One component, or several or all of them (one batch card)
+ * @param opts - `dryRun` reads and plans, and posts and stages nothing
+ */
+export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksRequest, opts: { dryRun?: boolean } = {}): Promise<DevLinksResult> {
+  const { planned, tail, stopped } = await planDevLinksCard(deps, request);
+  if (stopped) return { posted: false, cards: 0, summary: stopped, ...(stopped.startsWith("Figma's links unread") ? { retry: true as const } : {}) };
+  const now = deps.now();
   if (!planned) return { posted: false, cards: 0, summary: `nothing to add${tail}` };
   if (opts.dryRun) return { posted: false, cards: 0, summary: `would post 1 card for ${planned.write.links.length} link(s)${tail}` };
 
@@ -305,9 +312,23 @@ export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksReque
     if (marked) await deps.edit(ts, marked).catch(() => {});
     return { posted: true, cards: 0, retry: true, summary: `the card posted but did not stage${tail}` };
   }
-  carded[devLinksItemId(subject)] = { closes: now + DEV_LINKS_CARD_TTL_MS, ts };
-  await deps.carded.write(carded);
+  await markCarded(deps, devLinksItemId(subject), ts, now);
   return { posted: true, cards: 1, summary: `posted 1 card for ${write.links.length} link(s)${tail}` };
+}
+
+/**
+ * Keep a card posted, by its id, so no run offers it again while it is open.
+ *
+ * @param deps - The cards posted
+ * @param id - The card's id (`devLinksItemId`)
+ * @param ts - The message it is in
+ * @param now - The clock
+ */
+export async function markCarded(deps: Pick<DevLinksDeps, "carded">, id: string, ts: string, now: number): Promise<void> {
+  // Marks past their time go as a new one is kept.
+  const carded = Object.fromEntries(Object.entries((await deps.carded.read()) ?? {}).filter(([, mark]) => closesOf(mark) > now));
+  carded[id] = { closes: now + DEV_LINKS_CARD_TTL_MS, ts };
+  await deps.carded.write(carded);
 }
 
 /**

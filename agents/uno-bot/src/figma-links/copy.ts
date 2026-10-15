@@ -36,15 +36,13 @@ export interface DevLinksBatchEntry {
   renamed: boolean;
 }
 
-/** What a card is for: one component's links, several on one card, or a merged PR's. */
+/** What a card is for: one component's links, or several on one card. */
 export type DevLinksSubject =
   | { kind: "component"; component: string; figmaUrl: string; storybook: string | null }
-  | { kind: "batch"; figmaUrl: string; components: DevLinksBatchEntry[] }
-  | { kind: "pr"; number: number; url: string; components: string[] };
+  | { kind: "batch"; figmaUrl: string; components: DevLinksBatchEntry[] };
 
 /** A card's id: Slack-safe, unique in its report. */
 export function devLinksItemId(subject: DevLinksSubject): string {
-  if (subject.kind === "pr") return `pr-${subject.number}`;
   if (subject.kind === "batch") return "links-batch";
   return `links-${subject.component.replace(/[^A-Za-z0-9_-]+/g, "-")}`;
 }
@@ -66,9 +64,6 @@ const capital = (s: string) => `${s[0]!.toUpperCase()}${s.slice(1)}`;
 
 /** What a card says it does, plain. */
 export function devLinksBody(subject: DevLinksSubject, write: DevLinksWrite): string {
-  if (subject.kind === "pr") {
-    return `Adds the PR's link to ${namesInWords(subject.components)} in Dev Mode, on ${plural(touched(write), "library component", "library components")}.`;
-  }
   const comment = !write.introduce.length
     ? ""
     : subject.kind === "batch"
@@ -79,16 +74,6 @@ export function devLinksBody(subject: DevLinksSubject, write: DevLinksWrite): st
 
 /** One write as its card. */
 export function devLinksItem(subject: DevLinksSubject, write: DevLinksWrite): ReportItem {
-  if (subject.kind === "pr") {
-    return {
-      id: devLinksItemId(subject),
-      title: `PR #${subject.number} merged`,
-      subtitle: `Dev Mode links · ${namesInWords(subject.components)}`,
-      body: devLinksBody(subject, write),
-      open: { label: "Open PR", url: subject.url },
-      done: "PR link added in Dev Mode.",
-    };
-  }
   if (subject.kind === "batch") {
     return {
       id: devLinksItemId(subject),
@@ -137,7 +122,7 @@ export function devLinksCard(subject: DevLinksSubject, write: DevLinksWrite): Pr
   } else {
     const distinct = [...new Map(write.links.map((l) => [l.name, l.url])).entries()];
     lines = [
-      subject.kind === "pr" ? `*PR #${subject.number}* · <${subject.url}|open PR>` : `*${escapeSlackText(subject.component)}* · <${subject.figmaUrl}|open in Figma>`,
+      `*${escapeSlackText(subject.component)}* · <${subject.figmaUrl}|open in Figma>`,
       ...distinct.map(([name, url]) => `• <${url}|${escapeSlackText(name)}>`),
       `Approving ${changeWords(write)}${comment}. A link already there is not added twice. Reject adds nothing.`,
     ];
@@ -169,9 +154,6 @@ export const DEV_LINKS_NOT_STAGED = "Didn't go through. Run it again to post a f
 
 /** The parent line, above the run's one card. */
 export function devLinksParent(subject: DevLinksSubject): string {
-  if (subject.kind === "pr") {
-    return `PR #${subject.number} merged, so its link is ready for Review on ${namesInWords(subject.components)} in Dev Mode.`;
-  }
   if (subject.kind === "batch") return `Dev Mode links for ${plural(subject.components.length, "component", "components")} are ready for Review, on one card.`;
   return `Dev Mode links for ${subject.component} are ready for Review.`;
 }

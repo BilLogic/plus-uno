@@ -1,5 +1,5 @@
 // Who may decide a card a job posts: the channel's members, read in pages.
-// Shared by every Worker-posted report — the library publish card, the DS
+// Shared by every Worker-posted report — the Dev Mode links card, the DS
 // precedence report, the Figma comment decisions, the tidy-up and the Dev
 // Mode links.
 

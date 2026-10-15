@@ -4,11 +4,12 @@
 // before the rest (#904): whether a link on a component's library component
 // reaches its variants is Figma behaviour no fixture can show. Bill named the
 // component: Button. So until the `FIGMA_DEV_LINKS` setting reads `on`, a run
-// names Button alone, the 68 do not run, and a merged component PR's link waits
-// in its queue. Bill confirmed the check on 2026-10-12, and the setting is on:
-// `all=1` posts the rest on one batch card. Only a manual run asks for it —
-// no scheduled job does. Every run still posts a Review card and writes
-// nothing until it is approved.
+// names Button alone, and the 68 do not run. Bill confirmed the check on
+// 2026-10-12, and the setting is on: `all=1` posts the rest on one batch card.
+// Only a manual run asks for it; the one scheduled job, the morning's
+// (`./morning.ts`), asks only for the components the PRs merged into main
+// changed (`./feed.ts`), and only while the setting is on.
+// Every run still posts a Review card and writes nothing until it is approved.
 //
 // PURE.
 
@@ -17,7 +18,7 @@ import type { DevLinksRequest } from "./run";
 /** The one component the live check runs on. */
 export const LIVE_CHECK_COMPONENT = "Button";
 
-/** Whether the setting lets the whole registry, and merged PRs, through. */
+/** Whether the setting lets the whole registry through. */
 export function devLinksOn(setting: string | undefined): boolean {
   return setting?.trim().toLowerCase() === "on";
 }

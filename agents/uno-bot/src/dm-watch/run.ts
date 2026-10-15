@@ -49,7 +49,7 @@
 // DM starts only when what is left covers it. A stop saves the positions of
 // the DMs finished so far and rethrows; the runner runs the job again on a
 // fresh budget, which keeps the night's stopping point (keyed by the run's
-// date, so a retry past midnight UTC resumes rather than restarts) and skips
+// date, so a retry on a later calendar day resumes rather than restarts) and skips
 // the DMs already read.
 //
 // Every dependency is injected, so the Node suite runs whole days against

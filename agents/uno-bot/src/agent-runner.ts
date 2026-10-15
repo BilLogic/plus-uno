@@ -40,7 +40,7 @@ export class AgentRunner {
     this.deps = {
       now: () => Date.now(),
       runThreadJob: (job) => onRunnerJob(env, job),
-      runScheduledJob: (job, runDate) => runScheduledJob(env, job, { dryRun: false, runDate, runStorage: state.storage }),
+      runScheduledJob: (job, runDate, spawn) => runScheduledJob(env, job, { dryRun: false, runDate, runStorage: state.storage, spawn }),
     };
   }
 

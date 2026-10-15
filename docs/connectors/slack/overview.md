@@ -15,10 +15,14 @@ This folder is Slack's connector: this overview ships in uno-bot's prompt, and [
 
 | Channel | ID | Use |
 |---|---|---|
-| #plus-design | `C03FC8AS69K` | review requests, design-team coordination |
+| #plus-design | `C03FC8AS69K` | the sweep's morning message (fixes, card follow-ups, Figma comment decisions, Figma Review cards), design-team coordination |
 | #plus-design-feedback | `C074QG2V7DJ` | share-out bundles + feedback threads |
 | #uno-bot | `C0ARJ2A3A69` | team intake about uno-bot |
-| #plus-universal | `C072E8SFLKV` | Figma library publish cards |
+| #plus-universal | `C072E8SFLKV` | the sweep's morning message for design-system fixes, with the weekly DS precedence report |
+
+**One message a place each morning.** Every unprompted post is a section of its place's one sweep message: the card follow-ups, the weekly DS precedence report, the Figma comment decisions and unanswered questions, the Dev Mode links card, the Figma drift questions and the week's tidy-up all hand their cards to the sweep's post, which puts everything a place has on that place's one message (`agents/uno-bot/scheduled-actions/sweep/ACTION.md` § One message a place).
+
+**Test traffic stays in the test channel.** A run asked for in a `TEST_CHANNEL_IDS` channel, or through the debug route, posts only in a test channel, by the usage record's test-traffic rule (`teamPostChannel` in `agents/uno-bot/src/usage/record.ts`): a share-out stays in its thread, and the debug route's Dev Mode links card goes to the first test channel. A follow-up or a sweep fix found in a test channel's thread is asked in that thread.
 
 #uno-bot is where the team reports problems with uno-bot and asks for changes. A top-level post engages with no @mention. A report or change request becomes a drafted GitHub intake (`harness-intake`), or a comment on the open intake it matches, staged in the post's thread; a ✅ from the poster or anyone who has replied there files it. A plain question is just answered. #uno-bot-sandbox posts stay test traffic.
 
@@ -57,7 +61,7 @@ Slack delivers slash commands only from a channel or DM composer, so inside a th
 
 The Worker's one proactive read of channels, whose rules are the `sweep` scheduled action (`agents/uno-bot/scheduled-actions/sweep/ACTION.md`):
 
-- **Read path.** At the 00:00 ET end-of-day run, dated to the workday that just ended, one job per channel on `SWEEP_CHANNELS` (`agents/uno-bot/wrangler.toml`) reads with the **bot token**:
+- **Read path.** At the 06:00 ET end-of-day run, dated to the workday before it, one job per channel on `SWEEP_CHANNELS` (`agents/uno-bot/wrangler.toml`) reads with the **bot token**:
   - `conversations.info` first: a private channel is read only when it is also on `SLACK_SEARCH_PRIVATE_ALLOWLIST`, and a DM stays unread;
   - one more job reads every group DM uno-bot is in (`users.conversations`, `types=mpim`); a retry passes over those already handled today, and one that fails is counted while the rest are read;
   - then `conversations.history` since the channel's cursor, in pages of 200, plus `conversations.replies` for every thread active since then, also in pages of 200.
@@ -128,7 +132,7 @@ One dialect, three destinations — you write Markdown, the Worker renders it pe
 ## Threading & mentions
 
 - **Reply in-thread by default** (`thread_ts` = the *parent* message's ts). Keeps the channel clean.
-- A fresh top-level post is only for cross-channel announcements (e.g. a review fan-out to #plus-design) — a real new message, not a reply.
+- A fresh top-level post is only for cross-channel announcements (e.g. a Figma Review card in #plus-design) — a real new message, not a reply.
 - **A `/grind` or `/chill` run is a public thread.** The Worker posts a framing message in the channel and threads the run under it, so history, the emoji gate, and proposals behave exactly as they do for an @mention.
 - **Mention only who must act** (`<@U…>`). A broadcast (`<!here>` / `<!channel>` / `<!everyone>`) needs installer permission and reads as noise. Batch related updates into one message, not five.
 <!-- ide-only -->
@@ -138,7 +142,7 @@ One dialect, three destinations — you write Markdown, the Worker renders it pe
 Slack notifies from a message's main text, not from a card's subtitle. A card kind passes whom each item is for as `ReportItem.owners`, and the shared decision card (`decisionReport` in `agents/uno-bot/src/slack/decision-cards.ts`) builds the opener from them, so the ping lives in one place:
 
 - **Who:** the owner whose answer the card needs: the page owner on a sweep fix, the file owner on Figma drift and comment decisions, the tidy-up owner, the person a follow-up asks. A Figma drift card's other publisher is named in its subtitle in plain text.
-- **Anyone-can-settle cards** (library publish, DS precedence, Dev Mode links) carry no owners, so they tag nobody.
+- **Anyone-can-settle cards** (DS precedence, Dev Mode links) carry no owners, so they tag nobody: the section's line stands in the opener untagged.
 - **Shape:** one card for one owner reads `<@owner>, <parent line>`. Otherwise the parent line, then one bullet per owner listing that owner's cards (`• <@Max> — Tutor profile cleanup + Tutor Admin tutor detail`), each owner tagged once, in one message. A report that counts per owner passes `ownerLines` and the bullets carry its words (`• <@Coco>, 4 files need a tidy.`); one such bullet alone reads `<@Coco>, 4 files need a tidy.` A bulleted list, since mrkdwn has no tables.
 - **The subtitle shows whose card it is.** An open card's subtitle leads with its owners' tags (`<@owner> · from this thread`), drawn by the shared card from the same `owners`. Slack notifies nobody from a subtitle, so the opener does the notifying and the tag is for the reader. The exception is the plain rung (sections, where cards are refused): sections notify, so it drops the opener's tags. Once decided, the subtitle says who decided instead.
 - **A DM** (channel `D…`) tags nobody, in the opener or the subtitle; a named owner still shows in plain text. **An owner Team Members does not map** is `{ name }`, written in plain text in both places; the Monday unmatched-people DM covers them.

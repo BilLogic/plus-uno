@@ -109,23 +109,23 @@ test("owner routing falls through its three rungs, never to a default", () => {
 });
 
 test("a finding posts at the first weekday 09:00 ET (13:00 UTC in EDT) after it was found", () => {
-  // Swept at Wednesday 00:00 ET (04:00 UTC) → Wednesday 09:00 ET, 13:00 UTC.
-  assert.equal(postableAt(Date.UTC(2026, 8, 30, 4)), Date.UTC(2026, 8, 30, 13));
-  // Friday's work, swept at Saturday 00:00 ET → Monday 09:00 ET, not the weekend.
-  assert.equal(postableAt(Date.UTC(2026, 9, 3, 4)), Date.UTC(2026, 9, 5, 13));
-  // A swept job deferred into the small hours still makes that morning.
+  // Swept at Wednesday 06:00 ET (10:00 UTC) → Wednesday 09:00 ET, 13:00 UTC.
+  assert.equal(postableAt(Date.UTC(2026, 8, 30, 10)), Date.UTC(2026, 8, 30, 13));
+  // Friday's work, swept at Saturday 06:00 ET → Monday 09:00 ET, not the weekend.
+  assert.equal(postableAt(Date.UTC(2026, 9, 3, 10)), Date.UTC(2026, 9, 5, 13));
+  // A swept job deferred past its firing still makes that morning.
   assert.equal(postableAt(Date.UTC(2026, 8, 30, 12, 59)), Date.UTC(2026, 8, 30, 13));
   // Exactly at 09:00 ET is not "after".
   assert.equal(postableAt(Date.UTC(2026, 8, 29, 13)), Date.UTC(2026, 8, 30, 13));
 });
 
 test("a finding posts at 09:00 ET on both sides of the 1 Nov 2026 change", () => {
-  // Fri 30 Oct swept at Sat 31 Oct 00:00 EDT → Mon 2 Nov 09:00 EST, 14:00 UTC.
-  assert.equal(postableAt(Date.UTC(2026, 9, 31, 4)), Date.UTC(2026, 10, 2, 14));
+  // Fri 30 Oct swept at Sat 31 Oct 06:00 EDT → Mon 2 Nov 09:00 EST, 14:00 UTC.
+  assert.equal(postableAt(Date.UTC(2026, 9, 31, 10)), Date.UTC(2026, 10, 2, 14));
   // Found before Friday's run → that morning, 09:00 EDT.
   assert.equal(postableAt(Date.UTC(2026, 9, 30, 9)), Date.UTC(2026, 9, 30, 13));
-  // Mon 2 Nov swept at Tue 3 Nov 00:00 EST, 05:00 UTC → that morning's 14:00 UTC run.
-  assert.equal(postableAt(Date.UTC(2026, 10, 3, 5)), Date.UTC(2026, 10, 3, 14));
+  // Mon 2 Nov swept at Tue 3 Nov 06:00 EST, 11:00 UTC → that morning's 14:00 UTC run.
+  assert.equal(postableAt(Date.UTC(2026, 10, 3, 11)), Date.UTC(2026, 10, 3, 14));
   // 13:00 UTC on Mon 2 Nov is 08:00 EST → that morning's 14:00 UTC run.
   assert.equal(postableAt(Date.UTC(2026, 10, 2, 13)), Date.UTC(2026, 10, 2, 14));
 });

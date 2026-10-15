@@ -15,6 +15,7 @@ import {
   renderReviewer,
   renderShareout,
 } from "../src/tools/share-out-render";
+import { shareoutPlace } from "../src/tools/share-for-feedback";
 
 const FULL = {
   project: "Session Sign Up",
@@ -153,5 +154,22 @@ describe("input normalization", () => {
     const f = fieldsFromInput({ summary: "x", project: "   ", deadline: "" });
     assert.equal(f.project, undefined);
     assert.equal(f.deadline, undefined);
+  });
+});
+
+describe("where a share-out posts", () => {
+  const env = { PLUS_DESIGN_FEEDBACK_CHANNEL_ID: "C_FEEDBACK", TEST_CHANNEL_IDS: "C_SANDBOX" };
+  const from = (channel: string) => ({ channel, threadTs: "1.1", userMsgTs: "1.1" });
+
+  it("goes to #plus-design-feedback, top level, from a real conversation", () => {
+    assert.deepEqual(shareoutPlace(env, from("C_DESIGN")), { channel: "C_FEEDBACK", where: "#plus-design-feedback" });
+  });
+
+  it("stays in a test channel's own thread: test traffic never posts to a team channel", () => {
+    assert.deepEqual(shareoutPlace(env, from("C_SANDBOX")), { channel: "C_SANDBOX", threadTs: "1.1", where: "this thread" });
+  });
+
+  it("falls back to the asking thread when no feedback channel is set", () => {
+    assert.deepEqual(shareoutPlace({}, from("C_DESIGN")), { channel: "C_DESIGN", threadTs: "1.1", where: "this thread" });
   });
 });
