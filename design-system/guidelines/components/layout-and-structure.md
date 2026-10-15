@@ -50,13 +50,10 @@ element (`h6`) for its `heading`.
 
 ## What the containers do and do not give you
 
-**`ListGroup` earns its ARIA.** When every child is option-shaped — a
-`ListGroup.Item` with `selectable="single"` or `"multi"`, or a `ListGroup.Option`
-— the container adds `role="listbox"` and `aria-multiselectable`, and the items
-carry `role="option"`, `aria-selected` and a tab stop. Mix in a plain navigation
-item and it correctly drops back to no role, because a listbox whose children are
-not all options is invalid. This is the one component in the group that gets
-selection semantics right, and it is why `Select`'s multi mode composes it.
+**`ListGroup` is not a picker.** It lists links, actions and content, and each
+actionable row is its own tab stop. A list of options to pick from is the option
+list under a field — `Select`, or `ChoiceGroup` for fewer than five options —
+which carries the listbox role and its arrow keys.
 
 **A clickable `Card` is not keyboard reachable.** `onClick` sets a pointer cursor
 and attaches a handler; it adds no role, no tab stop and no key handling. Put

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ListGroup from './ListGroup';
 import Badge from '@/components/status-and-loading/Badge/Badge';
 
@@ -9,13 +9,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: `A flexible list item for navigation, display, or selection.
-
-| Mode | Prop | Use Case |
-|------|------|----------|
-| Default | \`selectable="none"\` | Navigation, menus, clickable items |
-| Single Select | \`selectable="single"\` | Radio-style selection |
-| Multi Select | \`selectable="multi"\` | Checkbox-style selection |
+                component: `A list item for navigation, actions or content. Picking a value is the option list's job, not this item's.
 
 ### Size Options
 - \`b1\`: Body 1 - largest
@@ -72,55 +66,6 @@ function ListGroupItemContentDemo() {
     );
 }
 
-function ListGroupItemVariantsDemos() {
-    const [singleValue, setSingleValue] = useState('opt1');
-    const [multiValues, setMultiValues] = useState(['opt1', 'opt3']);
-
-    const handleMultiToggle = (value) => {
-        setMultiValues(prev =>
-            prev.includes(value)
-                ? prev.filter(v => v !== value)
-                : [...prev, value]
-        );
-    };
-
-    return (
-        <>
-            <section>
-                <span id="single-select-demo-label" className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SINGLE SELECT</span>
-                <ListGroup aria-labelledby="single-select-demo-label">
-                    {['opt1', 'opt2', 'opt3'].map((value, i) => (
-                        <ListGroup.Item
-                            key={value}
-                            value={value}
-                            label={`Option ${i + 1}`}
-                            selectable="single"
-                            name="single-demo-docs"
-                            selected={singleValue === value}
-                            onClick={() => setSingleValue(value)}
-                        />
-                    ))}
-                </ListGroup>
-            </section>
-            <section>
-                <span id="multi-select-demo-label" className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MULTI SELECT</span>
-                <ListGroup aria-labelledby="multi-select-demo-label">
-                    {['opt1', 'opt2', 'opt3'].map((value, i) => (
-                        <ListGroup.Item
-                            key={value}
-                            value={value}
-                            label={`Option ${i + 1}`}
-                            selectable="multi"
-                            selected={multiValues.includes(value)}
-                            onClick={() => handleMultiToggle(value)}
-                        />
-                    ))}
-                </ListGroup>
-            </section>
-        </>
-    );
-}
-
 function ListGroupItemSizesDemo() {
     return (
         <section>
@@ -140,12 +85,6 @@ export const ListItemContent = () => (
     </div>
 );
 
-export const ListItemSelectionModes = () => (
-    <div style={col}>
-        <ListGroupItemVariantsDemos />
-    </div>
-);
-
 export const ListItemSizes = () => (
     <div style={col}>
         <ListGroupItemSizesDemo />
@@ -155,7 +94,6 @@ export const ListItemSizes = () => (
 export const ListItemOverview = () => (
     <div style={col}>
         <ListGroupItemContentDemo />
-        <ListGroupItemVariantsDemos />
         <ListGroupItemSizesDemo />
     </div>
 );
@@ -167,31 +105,16 @@ ListItemOverview.parameters = {
 
 export const ListItemInteractive = {
     render: (args) => {
-        const [selected, setSelected] = useState(args.selected);
-
-        const handleClick = () => {
-            if (args.selectable !== 'none') {
-                setSelected(!selected);
-            }
-        };
-
+        const { text, showLeadingIcon, leadingIcon, showCounter, counterValue, counterStyle, ...itemArgs } = args;
         return (
             <ListGroup style={{ maxWidth: '400px' }}>
-                <ListGroup.Item
-                    {...args}
-                    selected={selected}
-                    onClick={handleClick}
-                >
-                    {args.selectable === 'none' && (
-                        <>
-                            {args.showLeadingIcon && (
-                                <i className={`fas fa-${args.leadingIcon} me-3`} style={{ color: 'var(--color-primary)' }} />
-                            )}
-                            <span className="flex-grow-1">{args.text}</span>
-                            {args.showCounter && (
-                                <Badge style={args.counterStyle} size={args.size}>{args.counterValue}</Badge>
-                            )}
-                        </>
+                <ListGroup.Item {...itemArgs}>
+                    {showLeadingIcon && (
+                        <i className={`fas fa-${leadingIcon} me-3`} style={{ color: 'var(--color-primary)' }} />
+                    )}
+                    <span className="flex-grow-1">{text}</span>
+                    {showCounter && (
+                        <Badge style={counterStyle} size={args.size}>{counterValue}</Badge>
                     )}
                 </ListGroup.Item>
             </ListGroup>
@@ -199,12 +122,8 @@ export const ListItemInteractive = {
     },
     args: {
         text: 'List Item',
-        label: 'Option Label',
-        value: 'option-1',
         size: 'b2',
-        selectable: 'none',
         active: false,
-        selected: false,
         disabled: false,
         action: true,
         showLeadingIcon: true,
@@ -219,35 +138,12 @@ export const ListItemInteractive = {
             options: ['b1', 'b2', 'b3'],
             table: { category: 'Design' }
         },
-        selectable: {
-            control: { type: 'select' },
-            options: ['none', 'single', 'multi'],
-            description: 'Selection mode',
-            table: { category: 'Design' }
-        },
         text: {
             control: 'text',
-            if: { arg: 'selectable', eq: 'none' },
-            table: { category: 'Content' }
-        },
-        label: {
-            control: 'text',
-            if: { arg: 'selectable', neq: 'none' },
-            table: { category: 'Content' }
-        },
-        value: {
-            control: 'text',
-            if: { arg: 'selectable', neq: 'none' },
             table: { category: 'Content' }
         },
         active: {
             control: 'boolean',
-            if: { arg: 'selectable', eq: 'none' },
-            table: { category: 'State' }
-        },
-        selected: {
-            control: 'boolean',
-            if: { arg: 'selectable', neq: 'none' },
             table: { category: 'State' }
         },
         disabled: {
@@ -256,12 +152,10 @@ export const ListItemInteractive = {
         },
         action: {
             control: 'boolean',
-            if: { arg: 'selectable', eq: 'none' },
             table: { category: 'Behavior' }
         },
         showLeadingIcon: {
             control: 'boolean',
-            if: { arg: 'selectable', eq: 'none' },
             table: { category: 'Visuals' }
         },
         leadingIcon: {
@@ -272,7 +166,6 @@ export const ListItemInteractive = {
         },
         showCounter: {
             control: 'boolean',
-            if: { arg: 'selectable', eq: 'none' },
             table: { category: 'Visuals' }
         },
         counterValue: {

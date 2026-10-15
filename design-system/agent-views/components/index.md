@@ -8,7 +8,7 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
-## UI components (63)
+## UI components (61)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [Alert](../../src/components/messaging/Alert/index.md)
@@ -43,7 +43,6 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [NavTabs](../../src/components/navigation/NavTabs/index.md)
 - [Navbar](../../src/components/_internal/Navbar/index.md)
 - [NumberInput](../../src/components/forms-and-inputs/NumberInput.md)
-- [OptionList](../../src/components/forms-and-inputs/OptionList.md)
 - [Pagination](../../src/components/navigation/Pagination/index.md)
 - [Popover](../../src/components/overlays/Popover/index.md)
 - [Progress](../../src/components/status-and-loading/Progress/index.md)
@@ -54,7 +53,6 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [ScrollBar](../../src/components/layout-and-structure/ScrollBar/index.md)
 - [Scrollspy](../../src/components/navigation/Scrollspy/index.md)
 - [Select](../../src/components/forms-and-inputs/Select.md)
-- [SelectMultiple](../../src/components/forms-and-inputs/SelectMultiple.md)
 - [Sidebar](../../src/components/_internal/Sidebar/index.md)
 - [SidebarTab](../../src/components/navigation/SidebarTab/index.md)
 - [Skeleton](../../src/components/status-and-loading/Skeleton/index.md)

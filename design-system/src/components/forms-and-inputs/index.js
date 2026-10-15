@@ -1,6 +1,5 @@
 export { default as Textarea } from './Textarea';
 export { default as Select } from './Select';
-export { default as SelectMultiple } from './SelectMultiple';
 export { default as Range } from './Range';
 export { default as TagInput } from './TagInput';
 export { default as Input } from './Input';
@@ -11,7 +10,6 @@ export { default as DatePicker } from './DatePicker';
 export { default as DateAndTimePicker } from './DateAndTimePicker';
 export { default as InputGroup } from './InputGroup';
 export { default as NumberInput } from './NumberInput';
-export { default as OptionList } from './OptionList';
 export { default as Cascader } from './Cascader';
 export { default as TreeSelect } from './TreeSelect';
 export { default as ChoiceGrid } from './ChoiceGrid';

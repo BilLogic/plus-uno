@@ -87,9 +87,10 @@ and its column.
 
 ### Names that look importable and are not the answer
 
-- `SelectMultiple` is legacy — `Select mode="multi"` covers it.
-- `OptionList` renders an inline list that its caller positions by hand; it is
-  a part, not a field.
+- The option list under a field (`Listbox`) and its row (`OptionRow`) are
+  internal parts in `forms-and-inputs/_internal/`, not fields. Select and
+  TagInput build on them; for several values from a known list, use
+  `Select mode="multi"`.
 - `TagInput` shows and removes tags. It has no text entry, so it cannot take a
   new value from the user.
 - `DatePicker` is a bare date control with no `label`, no `required`, no

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import Input from '@/components/forms-and-inputs/Input';
-import OptionList from '@/components/forms-and-inputs/OptionList';
+import Listbox from '@/components/forms-and-inputs/_internal/Listbox';
 
 const INSTITUTION_OPTIONS = [
     'Aspen Heights Middle School',
@@ -65,24 +65,12 @@ export default function InstitutionSelection() {
                         size="medium"
                         style={{ backgroundColor: 'var(--color-surface)' }}
                     />
-                    <div
-                        style={{
-                            marginTop: 'var(--size-element-gap-xs)',
-                            backgroundColor: 'var(--color-surface-container)',
-                            borderRadius: 'var(--size-modal-radius-sm)',
-                            border: '1px solid var(--color-outline-variant)',
-                            boxShadow: 'var(--elevation-light-2)',
-                            maxHeight: '200px',
-                            overflowY: 'auto',
-                        }}
-                    >
-                        <OptionList
-                            id="institution-open-options"
-                            flush
-                            options={INSTITUTION_OPTIONS}
-                            defaultValue={null}
-                        />
-                    </div>
+                    <Listbox
+                        id="institution-open-options"
+                        aria-label="Institutions"
+                        options={INSTITUTION_OPTIONS}
+                        style={{ marginTop: 'var(--size-element-gap-xs)' }}
+                    />
                 </div>
 
                 <div style={{ pointerEvents: 'none' }}>
@@ -98,27 +86,13 @@ export default function InstitutionSelection() {
                         style={{ backgroundColor: 'var(--color-surface)' }}
                         readOnly
                     />
-                    <div
-                        style={{
-                            marginTop: 'var(--size-element-gap-xs)',
-                            backgroundColor: 'var(--color-surface-container)',
-                            borderRadius: 'var(--size-modal-radius-sm)',
-                            border: '1px solid var(--color-outline-variant)',
-                            boxShadow: 'var(--elevation-light-2)',
-                            maxHeight: '120px',
-                            overflowY: 'auto',
-                        }}
-                    >
-                        <OptionList
-                            id="institution-typing-options"
-                            flush
-                            options={[
-                                'Aspen Heights Middle School',
-                                'Aspen Heights High School',
-                            ]}
-                            defaultValue={null}
-                        />
-                    </div>
+                    <Listbox
+                        id="institution-typing-options"
+                        aria-label="Institutions matching Aspen"
+                        options={INSTITUTION_OPTIONS}
+                        filter="Aspen"
+                        style={{ marginTop: 'var(--size-element-gap-xs)' }}
+                    />
                 </div>
 
                 <div style={{ pointerEvents: 'none' }}>

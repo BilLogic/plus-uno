@@ -5,9 +5,9 @@ import DatePicker from './DatePicker/DatePicker';
 import Input from './Input';
 import InputGroup from './InputGroup/InputGroup';
 import NumberInput from './NumberInput';
-import OptionList from './OptionList';
 import Select from './Select';
 import Textarea from './Textarea';
+import Listbox from './_internal/Listbox';
 
 /**
  * Seeing where focus is, and what is selected, in every colour mode.
@@ -133,8 +133,8 @@ export const ForcedColorsKeepFocusAndSelection = () => (
         <InputGroup id="fv-amount" label="Amount" leadingVisual="£" />
         <DatePicker id="fv-date" aria-label="Date" />
         <Select aria-label="Subject" options={[{ value: 'maths', label: 'Maths' }]} />
-        <OptionList aria-label="Day" options={['Monday', 'Tuesday']} defaultValue="Tuesday" />
-        <OptionList aria-label="Days" mode="multi" options={['Monday', 'Tuesday']} defaultValue={['Tuesday']} />
+        <Listbox aria-label="Day" options={['Monday', 'Tuesday']} defaultValue="Tuesday" />
+        <Listbox aria-label="Days" mode="multi" options={['Monday', 'Tuesday']} defaultValue={['Tuesday']} />
     </div>
 );
 
@@ -151,7 +151,7 @@ ForcedColorsKeepFocusAndSelection.play = async ({ canvasElement }) => {
         canvas.getByRole('textbox', { name: 'Amount' }),
         canvas.getByRole('combobox', { name: 'Date' }),
         canvas.getByRole('button', { name: 'Subject' }),
-        within(canvas.getByRole('listbox', { name: 'Day' })).getAllByRole('option')[0],
+        canvas.getByRole('listbox', { name: 'Day' }),
     ];
     for (const field of fields) {
         field.focus();
@@ -163,13 +163,15 @@ ForcedColorsKeepFocusAndSelection.play = async ({ canvasElement }) => {
     }
     document.activeElement.blur();
 
-    // Selection, single and multi: the chosen option's mark takes a forced
-    // fill, and the mark beside it does not.
-    for (const name of ['Day', 'Days']) {
-        const [unselected, selected] = within(canvas.getByRole('listbox', { name }))
-            .getAllByRole('option')
-            .map((option) => option.querySelector('.plus-list-option-indicator'));
-        await expect(forcedValue(selected, 'background-color'), `${name}: selected mark`).not.toBe('');
-        await expect(forcedValue(unselected, 'background-color'), `${name}: unselected mark`).toBe('');
-    }
+    // Selection. A multi-select row's checkbox mark takes a forced fill and the
+    // mark beside it does not; a single-select row is the only one with a check.
+    const [unchecked, checked] = within(canvas.getByRole('listbox', { name: 'Days' }))
+        .getAllByRole('option')
+        .map((option) => option.querySelector('.plus-option-row-check'));
+    await expect(forcedValue(checked, 'background-color'), 'Days: selected mark').not.toBe('');
+    await expect(forcedValue(unchecked, 'background-color'), 'Days: unselected mark').toBe('');
+    const marks = within(canvas.getByRole('listbox', { name: 'Day' }))
+        .getAllByRole('option')
+        .map((option) => Boolean(option.querySelector('.plus-option-row-selected-mark')));
+    await expect(marks, 'Day: only the selected row is marked').toEqual([false, true]);
 };
