@@ -182,10 +182,10 @@ describe("the draft reads as a draft", () => {
 
   it("reads a GitHub issue and a DM by what a person checks", async () => {
     const issue = lines(await draftOf({ toolName: "github_issue_create", input: { title: "Badge drift", body: "The badge differs." }, proposalText: "x" })).join("\n");
-    assert.match(issue, /New GitHub issue on BilLogic\/plus-uno/);
-    // What a confirmer may change is typed in place.
-    assert.match(issue, /input: Title = Badge drift\nsection: \*Repository:\* BilLogic\/plus-uno/);
-    assert.match(issue, /input: Body = The badge differs\./);
+    // In the shared anatomy (`tests/review-github-archive.test.ts`): the repo
+    // is the where line's link, and what a confirmer may change is typed in place.
+    assert.match(issue, /^header: File a GitHub issue\nrich_text: /);
+    assert.match(issue, /input: Title = Badge drift\ninput: Body = The badge differs\./);
 
     const dm = lines(await draftOf({ toolName: "dm_relay", input: { recipient: "U07ABC", text: "Card is ready." }, proposalText: "x" })).join("\n");
     assert.match(dm, /\*To:\* <@U07ABC>/);
@@ -209,7 +209,7 @@ describe("the draft reads as a draft", () => {
   });
 
   it("shows the card's text for a tool it has no reading for", async () => {
-    const words = lines(await draftOf({ toolName: "github_workflow_run", input: { workflow: "deploy.yml" }, proposalText: "• *Workflow:* deploy.yml" })).join("\n");
+    const words = lines(await draftOf({ toolName: "unread_tool", input: { workflow: "deploy.yml" }, proposalText: "• *Workflow:* deploy.yml" })).join("\n");
     assert.match(words, /Workflow:\* deploy\.yml/);
   });
 });
