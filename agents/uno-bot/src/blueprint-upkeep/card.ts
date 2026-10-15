@@ -110,9 +110,9 @@ export function revisionText(source: RevisionSource, path: PathToday, draft: Dra
   ].join("\n");
 }
 
-/** The item id a revision card takes in its report. */
-export function revisionItemId(source: Pick<RevisionSource, "pageId">): string {
-  return `rev-${source.pageId}`;
+/** The item id a revision card takes in its report: one per card and path. */
+export function revisionItemId(source: Pick<RevisionSource, "pageId">, path: Pick<PathToday, "pathId">): string {
+  return `rev-${source.pageId}-${path.pathId}`;
 }
 
 /**
@@ -122,15 +122,16 @@ export function revisionItemId(source: Pick<RevisionSource, "pageId">): string {
  * @param path - Today's path
  * @param draft - The drafted revision
  * @param owner - The card owner's Slack id, when known
+ * @param n - Its number in the thread, which a reply names it by
  */
-export function revisionItem(source: RevisionSource, path: PathToday, draft: Draft, owner: string | null): ReportItem {
+export function revisionItem(source: RevisionSource, path: PathToday, draft: Draft, owner: string | null, n?: number): ReportItem {
   const counts = (["added", "changed", "deprecated"] as const)
     .map((k) => [k, draft.changes.filter((c) => c.kind === k).length] as const)
     .filter(([, n]) => n > 0)
     .map(([k, n]) => `${n} ${k}`);
   return {
-    id: revisionItemId(source),
-    title: `${revisionTitle(path)} · ${draft.revision.path ? `${draft.revision.path.from} → ${draft.revision.path.to}` : "rows"}`,
+    id: revisionItemId(source, path),
+    title: `${n !== undefined ? `${n}. ` : ""}${revisionTitle(path)} · ${draft.revision.path ? `${draft.revision.path.from} → ${draft.revision.path.to}` : "rows"}`,
     subtitle: `${source.number !== null ? `RM-${source.number}` : esc(source.title)} · ${code(`${source.status.property}: ${source.status.value}`)}`,
     ...(owner ? { owners: [{ slack: owner }] } : {}),
     body: `${counts.join(" · ")} · confidence ${draft.confidence.toFixed(1)}${draft.gaps.length ? ` · ${draft.gaps.length} to verify` : ""}`,
@@ -159,4 +160,36 @@ export function revisionParent(count: number): string {
   return count === 1
     ? "Shipped work changed the service: one blueprint revision to approve."
     : `Shipped work changed the service: ${count} blueprint revisions to approve.`;
+}
+
+/** One card's gaps, as the thread's ask names them. */
+export interface GapAsk {
+  n: number;
+  label: string;
+  gaps: string[];
+  /** Who is asked: the card's owner, else Bill. */
+  who: string | null;
+}
+
+/**
+ * The thread's ask about what the drafts could not verify: one line per card
+ * with gaps, tagging the person who can answer it. Null when no card has any.
+ *
+ * @param asks - Each card's gaps
+ */
+export function gapAskText(asks: readonly GapAsk[]): string | null {
+  const lines = asks
+    .filter((a) => a.gaps.length)
+    .map(
+      (a) =>
+        `${a.who ? `<@${a.who}> ` : ""}On ${a.n}. *${esc(a.label)}*, I couldn't verify: ${a.gaps.map(esc).join("; ")}. Reply here with what's right and I'll redraft that card.`,
+    );
+  return lines.length ? lines.join("\n") : null;
+}
+
+/** The thread message that carries the cards the morning's carousel had no room for. */
+export function overflowParent(count: number): string {
+  return count === 1
+    ? "One more blueprint revision from shipped work, which the report above had no room for."
+    : `${count} more blueprint revisions from shipped work, which the report above had no room for.`;
 }
