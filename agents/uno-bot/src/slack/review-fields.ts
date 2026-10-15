@@ -21,6 +21,7 @@
 // PURE: no `Env`, no fetch. The options arrive through the door's
 // `fieldOptions`, so `tests/proposal-edit.test.ts` drives all of it.
 import { placeholderIn } from "../agent/placeholder";
+import { MAX_FEEDBACK_QUESTIONS } from "../tools/share-out-render";
 import { proposalOperations, type PendingProposal, type ProposalOperation } from "../thread-state/index";
 
 /** Where a select's options live: a database the Worker writes to, and the
@@ -142,11 +143,6 @@ function notionUpdateFields(input: Input): FieldSpec[] {
 /** Said under a share-out's optional question: what clearing it does. */
 const DROP_QUESTION = "Clear it to drop the question.";
 
-/** The share-out's question cap (`share-out-render.ts`'s
- *  `MAX_FEEDBACK_QUESTIONS`): a question past it never posts, so it is not
- *  offered. */
-const MAX_QUESTIONS = 3;
-
 /**
  * A `shareout_post`'s words: what it is, one input per staged question (the
  * first required, the rest optional, so clearing one drops it), what is out
@@ -155,7 +151,7 @@ const MAX_QUESTIONS = 3;
  * pinged is a new proposal.
  */
 function shareoutFields(input: Input): FieldSpec[] {
-  const questions = Array.isArray(input.feedback_wanted) ? input.feedback_wanted.slice(0, MAX_QUESTIONS) : [];
+  const questions = Array.isArray(input.feedback_wanted) ? input.feedback_wanted.slice(0, MAX_FEEDBACK_QUESTIONS) : [];
   return [
     { path: "summary", label: "What this is", kind: "multiline", required: true, hint: "One or two sentences. The questions go below." },
     ...questions.map(

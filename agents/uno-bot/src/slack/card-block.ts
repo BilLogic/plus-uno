@@ -15,6 +15,7 @@
 // built it: any view, however it was assembled, can be stepped down.
 //
 // PURE: blocks in, blocks out; the send is a parameter.
+import { escapeSlackText } from "./mrkdwn";
 
 /** The thing a draft shares or touches, as its card shows it. */
 export interface ObjectCard {
@@ -39,7 +40,8 @@ const SECTION_CHARS = 3000;
 
 const plain = (text: string) => ({ type: "plain_text", text });
 
-function clip(text: string, max: number): string {
+/** Text cut to one of Slack's caps, an ellipsis where it was cut. */
+export function clip(text: string, max: number): string {
   return text.length > max ? `${text.slice(0, max - 1)}…` : text;
 }
 
@@ -80,7 +82,7 @@ const textOf = (t: Text | undefined): string => (typeof t?.text === "string" ? t
  *  and the body as a section beneath. */
 export function cardFallbackBlocks(block: unknown): unknown[] {
   const card = block as CardShape;
-  const escape = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const escape = escapeSlackText;
   const title = textOf(card.title);
   const subtitle = textOf(card.subtitle);
   const lines = [title ? `*${escape(title)}*` : "", subtitle ? escape(subtitle) : ""].filter(Boolean);

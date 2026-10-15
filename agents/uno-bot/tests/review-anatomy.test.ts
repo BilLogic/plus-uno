@@ -214,6 +214,10 @@ describe("a draft outside the share-out keeps its body and gains its title and d
     assert.ok(json.includes("*Summary:*"));
   });
 
+  it("a raw user id listed alone becomes a mention, so the name shows", () => {
+    assert.equal(withoutInternalFields("• *Reviewers:*\n    ◦ U0BRYAN001"), "• *Reviewers:*\n    ◦ <@U0BRYAN001>");
+  });
+
   it("withoutInternalFields leaves every other line as it was", () => {
     const text = "• *Title:* T\n• *Place:* here\n• *Body:* line one\nline two\n• *Channel:* C0X";
     assert.equal(withoutInternalFields(text), "• *Title:* T\n• *Body:* line one\nline two");
@@ -239,6 +243,10 @@ describe("the posted card's summary line", () => {
       "• *Project:* Live App",
     ]);
     assert.equal(summary, ":warning: Ready to *share this for feedback in #plus-design-feedback*: Live App");
+  });
+
+  it("keeps an all-caps word that only looks like an id", () => {
+    assert.match(summaryOf(["• *Project:* DASHBOARD"]), /: DASHBOARD$/);
   });
 });
 

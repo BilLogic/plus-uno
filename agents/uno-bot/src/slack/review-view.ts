@@ -36,6 +36,7 @@
 // identity, and the decision is resolved against it and nothing else.
 import { textSections } from "./render";
 import { CONFIRM_FOOTER, withoutInternalFields } from "./proposal-render";
+import { clip } from "./card-block";
 import { anatomyBlocks, decisionWords, DESCRIPTION_CHARS, reviewTitle, type DecisionWords } from "./review-anatomy";
 import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
 import {
@@ -231,7 +232,7 @@ export function draftView(
     ? [
         { type: "divider" },
         choiceInput(proposal.choices, anatomy?.approve ? { ...words, confirm: anatomy.approve } : words),
-        noteInput(Boolean(proposal.choices?.length)),
+        noteInput(Boolean(proposal.choices?.length), Boolean(anatomy)),
         ...(access.closesAt !== undefined ? [context(openLine(access.closesAt, access.confirmers))] : []),
       ]
     : [context(readOnlyLine(access.confirmers))];
@@ -297,8 +298,7 @@ const OWN_CHOICE = "choice:";
 
 /** An option's description: what choosing it does, plain, at most 75. */
 function description(text: string): { description: { type: "plain_text"; text: string } } {
-  const clipped = text.length > DESCRIPTION_CHARS ? `${text.slice(0, DESCRIPTION_CHARS - 1)}…` : text;
-  return { description: { type: "plain_text", text: clipped } };
+  return { description: { type: "plain_text", text: clip(text, DESCRIPTION_CHARS) } };
 }
 
 /** The decision: Approve, Needs changes and Reject, each saying what it does
@@ -319,13 +319,20 @@ function choiceInput(own: readonly ReviewChoice[] | undefined, words: DecisionWo
   };
 }
 
-function noteInput(own = false): unknown {
+/** The note's hint. A draft in the shared anatomy leaves out "I revise the
+ *  draft from it", which Needs changes' own description already says. */
+function noteInput(own = false, anatomy = false): unknown {
+  const hint = own
+    ? "Optional context for your answer."
+    : anatomy
+      ? "Needs changes: what should change. Reject: an optional reason."
+      : "Needs changes: what should change. I revise the draft from it. Reject: an optional reason.";
   return {
     type: "input",
     block_id: NOTE_BLOCK_ID,
     optional: true,
     label: { type: "plain_text", text: "Note" },
-    hint: { type: "plain_text", text: own ? "Optional context for your answer." : "Needs changes: what should change. I revise the draft from it. Reject: an optional reason." },
+    hint: { type: "plain_text", text: hint },
     element: { type: "plain_text_input", action_id: NOTE_ACTION_ID, multiline: true, max_length: NOTE_MAX_CHARS },
   };
 }

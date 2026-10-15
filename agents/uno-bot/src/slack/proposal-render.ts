@@ -178,15 +178,16 @@ const SHAPE_LABELS = new Set([...INTERNAL_LABELS, "heading", "source link", "pag
 
 /** A value no reader can use on the summary line: a raw Slack id, a hex or
  *  uuid id, or a bare flag. */
-const RAW_VALUE = /^(?:[UWCGDT][A-Z0-9]{8,}|[0-9a-f-]{20,}|true|false)$/i;
+const RAW_VALUE = /^(?:[UWCGDT](?=[A-Z0-9]*\d)[A-Z0-9]{8,}|[0-9a-fA-F-]{20,}|[Tt]rue|[Ff]alse)$/;
 
 /** A key field whose value is a bare number reads with its label: "Round 1". */
 const NUMERIC = /^\d+(?:\.\d+)?$/;
 
 /**
  * A card's text without its internal inputs' bullets (`INTERNAL_LABELS`),
- * each with the lines nested under it: what a draft drawn from the card's
- * text shows. Every other line stays as it was.
+ * each with the lines nested under it, and a raw user id listed alone as a
+ * mention: what a draft drawn from the card's text shows. Every other line
+ * stays as it was.
  *
  * @param text - The card's text
  */
@@ -202,7 +203,9 @@ export function withoutInternalFields(text: string): string {
       hiding = field[1]!.length;
       continue;
     }
-    out.push(line);
+    // A raw user id as a list item (a share-out's reviewers) is a mention, so
+    // Slack shows the person's name rather than the id.
+    out.push(line.replace(/^(\s*◦ )([UW][A-Z0-9]{6,})$/, "$1<@$2>"));
   }
   return out.join("\n");
 }

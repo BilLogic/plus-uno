@@ -19,7 +19,7 @@
 // Only blocks a modal takes: no `table`, `markdown` or `container`.
 //
 // PURE: blocks out, nothing posted, nothing read.
-import { objectCardBlocks, type ObjectCard } from "./card-block";
+import { clip, objectCardBlocks, type ObjectCard } from "./card-block";
 import { escapeSlackText } from "./mrkdwn";
 import type { ProposalOperation } from "../thread-state/index";
 
@@ -65,8 +65,9 @@ export const DESCRIPTION_CHARS = 75;
 /** Alerts to a draft, by the anatomy's rule; a further caveat is a context line. */
 const MAX_ALERTS = 2;
 
-function clip(text: string, max: number): string {
-  return text.length > max ? `${text.slice(0, max - 1)}…` : text;
+/** A `notion_create`'s surface, as its title and its words both read it. */
+function surfaceOf(input: Record<string, unknown>): string {
+  return typeof input.surface === "string" ? input.surface.trim().toLowerCase() : "";
 }
 
 /** Zone 1's headline. */
@@ -195,7 +196,7 @@ const TITLES: Readonly<Record<string, string | ((input: Record<string, unknown>)
   github_issue_create: "Review new issue",
   github_issue_update: "Review issue update",
   notion_create: (input) => {
-    const surface = typeof input.surface === "string" ? input.surface.trim().toLowerCase() : "";
+    const surface = surfaceOf(input);
     if (surface === "prd" || surface === "intake") return "Review Roadmap card";
     if (surface === "decision") return "Review decision";
     if (surface === "marketplace") return "Review Marketplace row";
@@ -240,7 +241,7 @@ const REVISE = "I redraft it from your note and post a new card.";
 const WORDS: Readonly<Record<string, readonly [string, string] | ((input: Record<string, unknown>) => readonly [string, string])>> = {
   shareout_post: (input) => [shareoutApprove(input), "Nothing posts."],
   notion_create: (input) => {
-    const surface = typeof input.surface === "string" ? input.surface.trim().toLowerCase() : "";
+    const surface = surfaceOf(input);
     if (surface === "prd" || surface === "intake") return ["Creates the card now and links it in the thread.", "Nothing happens."];
     if (surface === "decision") return ["Logs the decision now and links it in the thread.", "Nothing happens."];
     return ["Creates the page now and links it in the thread.", "Nothing happens."];

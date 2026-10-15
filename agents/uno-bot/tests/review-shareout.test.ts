@@ -253,6 +253,8 @@ describe("the share-out draft is drawn in the shared anatomy", () => {
       ["revise", "I redraft it from your note and post a new card."],
       ["cancel", "Nothing posts."],
     ]);
+    const note = blocksOf(draft).find((b) => b.block_id === "uno_review_note")!;
+    assert.equal(note.hint!.text, "Needs changes: what should change. Reject: an optional reason.");
   });
 
   it("fits Slack's limits: 100 blocks, a 24-character title, 3,000 characters of text", async () => {

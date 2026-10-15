@@ -22,7 +22,7 @@ import { reviewSections, textSections } from "./render";
 import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
 import { fieldInputBlocks, MAX_INPUT_CHARS, type EditableField } from "./review-fields";
 import { relayRecipientId } from "../tools/relayed-dm-render";
-import { shareoutChannelRef } from "../tools/share-out-render";
+import { MAX_FEEDBACK_QUESTIONS, shareoutChannelRef } from "../tools/share-out-render";
 import { createdDesignStatus } from "../integrations/notion";
 import {
   alertsFromCaveats,
@@ -545,7 +545,7 @@ function shareoutAnatomy(input: Input, detail: AnatomyContext): DraftAnatomy {
   part("summary", "What this is", str(input.summary));
   const changed = str(input.what_changed);
   if (changed) content.push(quoteBlock("What changed since last round", changed));
-  const questions = (Array.isArray(input.feedback_wanted) ? input.feedback_wanted : []).map(str).slice(0, 3);
+  const questions = (Array.isArray(input.feedback_wanted) ? input.feedback_wanted : []).map(str).slice(0, MAX_FEEDBACK_QUESTIONS);
   const shown: string[] = [];
   questions.forEach((q, i) => {
     const inline = field(`feedback_wanted.${i}`);
