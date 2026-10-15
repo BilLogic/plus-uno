@@ -50,6 +50,8 @@
 export interface HistoryTurn {
   role: "user" | "assistant";
   content: string;
+  /** When the turn was recorded, in epoch ms, where its writer stamps it. */
+  at?: number;
 }
 
 export interface ConversationState {
@@ -136,6 +138,30 @@ export function renderState(state: ConversationState): string {
       "a settled decision as open again unless they reopen it.)",
     ...lines,
   ].join("\n");
+}
+
+// ── Aged cancels ─────────────────────────────────────────────────────────────
+//
+// A ⛔ note tells the model an action was just cancelled, and the model reads
+// "just" into it: it declines to re-propose on its own. In a DM every top-level
+// message is one conversation, so the note can be hours old by the next ask,
+// and the model still bounced that ask as "a moment ago". A note older than
+// the window is left out of what the model sees, here and in the state block.
+// The store keeps it, so the conversation's record of the cancel survives and
+// the code guard (`turn/turn.ts`, `agent/cancel-note.ts`) still reads it. A
+// note with no `at` predates the stamp, so it is hours old and left out too.
+
+/** The whole of a ⛔ note, as `agent/cancel-note.ts` writes it. */
+const CANCEL_NOTE_RE = /^\(Cancelled the proposed [a-z_]+\b[^\n]*\)$/;
+
+/** `history` without the ⛔ notes recorded more than `windowMs` before `now`. */
+export function withoutAgedCancels<T extends HistoryTurn>(history: T[], now: number, windowMs: number): T[] {
+  return history.filter(
+    (t) =>
+      t.role !== "assistant" ||
+      !CANCEL_NOTE_RE.test(t.content.trim()) ||
+      (t.at !== undefined && now - t.at <= windowMs),
+  );
 }
 
 // ── Progressive summarisation ────────────────────────────────────────────────

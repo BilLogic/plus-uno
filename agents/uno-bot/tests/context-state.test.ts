@@ -6,6 +6,7 @@ import {
   deriveState,
   detectDrift,
   renderState,
+  withoutAgedCancels,
   type HistoryTurn,
 } from "../src/agent/context-state";
 
@@ -82,4 +83,20 @@ test("a short conversation is passed through untouched", () => {
   const { turns, dropped } = compactHistory(CONVERSATION, { keepRecent: 12, maxChars: 12_000 });
   assert.equal(dropped, 0);
   assert.deepEqual(turns, CONVERSATION);
+});
+
+// A ⛔ note past the window is history, not "just now", so the model is not
+// shown it; the store keeps it. A note with no time predates the stamp.
+test("an aged or unstamped cancel note is left out, and a recent one and everything else stay", () => {
+  const now = Date.parse("2026-10-15T14:00:00Z");
+  const note = "(Cancelled the proposed shareout_post for place feedback_channel — nothing was done.)";
+  const history: HistoryTurn[] = [
+    { role: "user", content: "share it for feedback" },
+    { role: "assistant", content: note, at: now - 11 * 60 * 60_000 },
+    { role: "assistant", content: note },
+    { role: "assistant", content: `${note} Then I filed the card.`, at: now - 11 * 60 * 60_000 },
+    { role: "user", content: note },
+    { role: "assistant", content: note, at: now - 60_000 },
+  ];
+  assert.deepEqual(withoutAgedCancels(history, now, 30 * 60_000), [history[0], history[3], history[4], history[5]]);
 });

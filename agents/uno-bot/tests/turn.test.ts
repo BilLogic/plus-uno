@@ -2850,3 +2850,81 @@ test("a cancel note with no time on it, from before cancels were stamped, holds 
   const outcome = await afterCancel(cancelNote("shareout_post", {}), [shareout()], null);
   assert.equal(outcome.disposition, "staged");
 });
+
+// The code guard is half of it. In a DM the store IS the history the model
+// reads, so the ⛔ note itself sits in its context, and a model that sees it
+// declines on its own ("you cancelled that a moment ago") whatever the clock
+// says. The fake below does exactly that: it refuses whenever a cancel note
+// reaches it, so a card staged past it means the note never did.
+const IMITATED_REFUSAL = "From what I recall, you cancelled that a moment ago, so I'm not re-proposing it.";
+
+async function inADm(
+  note: string,
+  toolCalls: Array<{ name: string; args: Record<string, unknown> }>,
+  /** How long before this turn the cancel was recorded; `null` for an unstamped note. */
+  agoMs: number | null,
+  opts: { contextState?: boolean } = {},
+) {
+  const threadState = createInMemoryThreadState();
+  await threadState.appendHistory(REF, { role: "user", content: "share the live app prototype for feedback" });
+  await threadState.appendHistory(REF, { role: "assistant", content: note, ...(agoMs === null ? {} : { at: NOW - agoMs }) });
+  const h = harness({ threadState, now: () => NOW, replies: [{ text: "Staging it.", toolCalls }] });
+  if (opts.contextState) h.deps.contextState = true;
+  let sawNote = false;
+  const start = h.provider.start.bind(h.provider);
+  h.provider.start = async (turn) => {
+    sawNote = turn.conversation.some((t) => t.text.includes("Cancelled the proposed") || /cancelled: [a-z_]+/.test(t.text));
+    return start(turn);
+  };
+  const send = h.provider.send.bind(h.provider);
+  h.provider.send = async (args) =>
+    sawNote ? { ok: true, text: IMITATED_REFUSAL, toolCalls: [], stop: "end" } : send(args);
+  // The DM path hands the turn the store's history as its conversation.
+  const outcome = await runTurn(
+    request({ text: "share it here in this DM", history: await threadState.readHistory(REF) }),
+    h.deps,
+  );
+  return { outcome, sawNote, stored: await threadState.readHistory(REF) };
+}
+
+test("a fresh ask hours after a ⛔ in the same DM stages a card, because the old note never reaches the model", async () => {
+  const { outcome, sawNote } = await inADm(cancelNote("shareout_post", {}), [shareout({ place: "here" })], 11 * 60 * 60_000);
+  assert.equal(sawNote, false);
+  assert.equal(outcome.disposition, "staged");
+  assert.doesNotMatch(outcome.posted ?? "", /cancelled that/i);
+});
+
+test("an aged ⛔ note is left out of the model's context but kept in the conversation's record", async () => {
+  const note = cancelNote("shareout_post", {});
+  const { stored } = await inADm(note, [shareout()], 11 * 60 * 60_000);
+  assert.ok(stored.some((t) => t.content === note));
+});
+
+test("an aged ⛔ is not in the state block either, when the state block is on", async () => {
+  const { outcome, sawNote } = await inADm(cancelNote("shareout_post", {}), [shareout()], 11 * 60 * 60_000, {
+    contextState: true,
+  });
+  assert.equal(sawNote, false);
+  assert.equal(outcome.disposition, "staged");
+});
+
+test("a ⛔ note with no time on it counts as aged, and is left out of the model's context", async () => {
+  const { outcome, sawNote } = await inADm(cancelNote("shareout_post", {}), [shareout()], null);
+  assert.equal(sawNote, false);
+  assert.equal(outcome.disposition, "staged");
+});
+
+test("a ⛔ inside the window still reaches the model, and the same card is still held back", async () => {
+  const { outcome, sawNote } = await inADm(cancelNote("shareout_post", {}), [shareout()], 2 * 60_000);
+  assert.equal(sawNote, true);
+  assert.notEqual(outcome.disposition, "staged");
+});
+
+test("a redirect after a ⛔ is never held back, recent or aged", async () => {
+  // Recent: a model that stages the redirect, and the guard compares targets.
+  const recent = await afterCancel(cancelNote("shareout_post", {}), [shareout({ place: "here" })], 2 * 60_000);
+  assert.equal(recent.disposition, "staged");
+  // Aged, under the imitating model: the incident itself.
+  const aged = await inADm(cancelNote("shareout_post", {}), [shareout({ place: "here" })], 11 * 60 * 60_000);
+  assert.equal(aged.outcome.disposition, "staged");
+});

@@ -155,7 +155,9 @@ export interface HistoryTurn {
    *  invisible. */
   ts?: string;
   /** When the turn was recorded, in epoch ms, where its writer stamps it. A
-   *  ⛔ note does, so "just cancelled" can mean recent (`agent/cancel-note.ts`). */
+   *  ⛔ note does, so "just cancelled" can mean recent: the code guard holds a
+   *  card back only inside the window (`agent/cancel-note.ts`), and an older
+   *  note is left out of what the model reads (`agent/context-state.ts`). */
   at?: number;
   /** Names of the references `read_reference` served on this turn. The TEXT is
    *  deliberately not persisted (#423): a later turn sees a one-line stub per
