@@ -265,6 +265,14 @@ const ListGroup = ({
                 event.preventDefault();
                 moveTo(nodes.length - 1);
                 return;
+            case 'Enter':
+            case ' ':
+                // Choosing is the option's click, so the keyboard and the
+                // pointer run one handler and cannot drift apart.
+                if (current < 0) return;
+                event.preventDefault();
+                if (nodes[current].getAttribute('aria-disabled') !== 'true') nodes[current].click();
+                return;
             default:
         }
     };

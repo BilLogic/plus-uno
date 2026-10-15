@@ -258,11 +258,17 @@ const Select = ({
                 )}
 
                 {/* Trigger / Input Field */}
+                {/*
+                  * The rest props land on the trigger, because a `div role="button"`
+                  * cannot be named by `<label for>`: a caller's `aria-label` or
+                  * `aria-labelledby` is the only way it gets a name.
+                  */}
                 <Dropdown.Toggle
                     as={CustomSelectToggle}
+                    {...props}
                     id={id}
                     disabled={disabled || readonly}
-                    aria-describedby={requiredHintId}
+                    aria-describedby={[props['aria-describedby'], requiredHintId].filter(Boolean).join(' ') || undefined}
                 >
                 <div className="plus-select-value">
                     {showBadgesInTrigger && (

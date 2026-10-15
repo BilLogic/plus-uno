@@ -3,7 +3,7 @@
 
 # DatePicker
 
-Date picker (Figma Forms · Date & Time Picker · Month Date Picker). Trigger is a form control with calendar-day trailing icon — distinct from Select's caret.
+Date picker (Figma Forms · Date & Time Picker · Month Date Picker). Trigger is a form control with calendar-day trailing icon — distinct from Select's caret. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: DatePicker has no `label` prop, so that is how a caller names it.
 
 **Import:** `import { DatePicker } from '@/components';`
 
@@ -43,7 +43,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-disabled-opacity` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-text` · `--color-surface` · `--color-surface-container-high` · `--font-family-body` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body2` · `--font-size-body3` · `--font-size-fa-body2-solid` · `--font-weight-normal` · `--font-weight-semibold-1` · `--size-border-radius-radius-50` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-sm` · `--size-element-stroke-sm` · `--size-modal-radius-sm`
+`--color-disabled-opacity` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-text` · `--color-surface` · `--color-surface-container-high` · `--font-family-body` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body2` · `--font-size-body3` · `--font-size-fa-body2-solid` · `--font-weight-normal` · `--font-weight-semibold-1` · `--size-border-radius-radius-50` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-sm` · `--size-element-stroke-lg` · `--size-element-stroke-sm` · `--size-modal-radius-sm`
 
 From `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.scss`. Override these through the token layer, never with a literal.
 

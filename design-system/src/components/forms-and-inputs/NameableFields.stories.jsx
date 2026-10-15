@@ -1,9 +1,11 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
+import DatePicker from './DatePicker/DatePicker';
 import InputGroup from './InputGroup/InputGroup';
 import MultipleChoice from './MultipleChoice';
 import RichTextEditor from './RichTextEditor/RichTextEditor';
+import Select from './Select';
 
 /**
  * Three fields that could not be named.
@@ -111,4 +113,75 @@ HidingTheLabelKeepsTheName.play = async ({ canvasElement }) => {
     // that says nothing, which is worse than the div it replaced.
     await expect(canvas.queryAllByRole('group')).toHaveLength(0);
     await expect(canvas.getAllByRole('radio')).toHaveLength(2);
+};
+
+/**
+ * A field with no label of its own takes its name from the caller.
+ *
+ * `Select`'s trigger is a `div role="button"`, which a `<label for>` cannot
+ * name, and `DatePicker` has no `label` prop. For both, `aria-label` or
+ * `aria-labelledby` passed by the caller is the only route to a name, so the
+ * component has to hand those on to the control rather than drop them.
+ */
+export const CallerPropsNameTheControl = () => (
+    <div style={stack}>
+        <span id="nf-term-label">Term</span>
+        <Select
+            id="nf-subject"
+            aria-label="Subject"
+            options={[{ value: 'maths', label: 'Maths' }, { value: 'english', label: 'English' }]}
+        />
+        <Select
+            id="nf-term"
+            aria-labelledby="nf-term-label"
+            required
+            options={[{ value: 'fall', label: 'Fall' }]}
+        />
+        <DatePicker id="nf-session-date" aria-label="Session date" />
+    </div>
+);
+
+CallerPropsNameTheControl.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const subject = canvas.getByRole('button', { name: 'Subject' });
+    await expect(subject.classList.contains('plus-select-trigger')).toBe(true);
+
+    // A caller's own label and the component's required hint both survive.
+    const term = canvas.getByRole('button', { name: 'Term' });
+    await expect(term.getAttribute('aria-describedby')).toBe('nf-term-required');
+
+    const date = canvas.getByRole('combobox', { name: 'Session date' });
+    await expect(date.tagName).toBe('INPUT');
+};
+
+/**
+ * A dropdown addon's props reach the dropdown, and only the dropdown.
+ *
+ * Spreading them on the addon wrapper as well put the same `id` on two
+ * elements, and wrote props such as `ariaLabel` to a `span` as unknown DOM
+ * attributes, where they name nothing.
+ */
+export const DropdownAddonTakesItsPropsOnce = () => (
+    <div style={stack}>
+        <InputGroup
+            id="nf-price"
+            label="Price"
+            leadingVisual={{
+                type: 'dropdown',
+                id: 'nf-currency',
+                text: 'GBP',
+                ariaLabel: 'Currency',
+                items: [{ label: 'GBP' }, { label: 'USD' }],
+            }}
+        />
+    </div>
+);
+
+DropdownAddonTakesItsPropsOnce.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvasElement.querySelectorAll('#nf-currency')).toHaveLength(1);
+    await expect(canvasElement.querySelector('[arialabel]')).toBeNull();
+    await expect(canvas.getByRole('button', { name: 'Currency' })).toBeTruthy();
 };

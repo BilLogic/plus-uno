@@ -197,6 +197,12 @@ export default defineConfig({
             commands: {
               emulateReducedMotion: async ({ page }, value) => {
                 await page.emulateMedia({ reducedMotion: value });
+              },
+              // The same for forced-colours mode (Windows High Contrast), which
+              // Chromium both matches and paints. `null` restores the default.
+              // The Focus visibility stories use it.
+              emulateForcedColors: async ({ page }, value) => {
+                await page.emulateMedia({ forcedColors: value });
               }
             }
           },

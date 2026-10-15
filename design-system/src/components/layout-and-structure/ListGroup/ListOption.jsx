@@ -18,6 +18,12 @@ export const ListOption = ({
     name,
     onClick,
     className = '',
+    /**
+     * Whether this option holds the list's single tab stop. Defaults to true so
+     * an option used on its own stays reachable; `ListGroup` passes false to
+     * all but one when it manages a listbox.
+     */
+    tabbable = true,
     ...props
 }) => {
     const displayLabel = label || children;
@@ -46,7 +52,7 @@ export const ListOption = ({
             role="option"
             aria-selected={selected}
             aria-disabled={disabled}
-            tabIndex={disabled ? -1 : 0}
+            tabIndex={disabled || !tabbable ? -1 : 0}
             {...props}
         >
             <SelectionIndicator mode={mode} selected={selected} disabled={disabled} />
@@ -64,7 +70,8 @@ ListOption.propTypes = {
     mode: PropTypes.oneOf(['single', 'multi']),
     name: PropTypes.string,
     onClick: PropTypes.func,
-    className: PropTypes.string
+    className: PropTypes.string,
+    tabbable: PropTypes.bool
 };
 
 export default ListOption;

@@ -80,11 +80,18 @@
     }
 
     &:focus,
-    &:focus-visible,
     &:active {
         outline: none !important;
         box-shadow: none !important;
         border-color: var(--color-outline-variant) !important;
+    }
+
+    // Keyboard focus is shown the way Input shows it: the border takes the
+    // focus-ring colour. A pointer press stays quiet through the rule above.
+    &:focus-visible {
+        outline: none !important;
+        box-shadow: none !important;
+        border-color: var(--color-focus-ring) !important;
     }
 }
 
@@ -489,5 +496,14 @@
         &::after {
             display: none; // Remove default caret
         }
+    }
+}
+
+// Forced colours (Windows High Contrast) repaint this field's focus border to
+// the same system colour as its resting border, so focus is drawn as an
+// outline, which forced colours keep.
+@media (forced-colors: active) {
+    .plus-select-trigger:focus-visible {
+        outline: var(--size-element-stroke-lg, 2px) solid Highlight !important;
     }
 }

@@ -223,3 +223,28 @@
 .plus-list-option-label {
     flex: 1;
 }
+
+// Forced colours (Windows High Contrast) repaint every fill from the system
+// palette, so a focused row and a selected mark looked like their resting
+// selves. Focus becomes an outline; the selected mark is painted in the
+// system Highlight colour, with its check or dot in HighlightText.
+@media (forced-colors: active) {
+    .plus-list-option:focus-visible {
+        outline: var(--size-element-stroke-lg, 2px) solid Highlight;
+        outline-offset: calc(-1 * var(--size-element-stroke-lg, 2px));
+    }
+
+    .plus-list-option-indicator.is-selected {
+        forced-color-adjust: none;
+        border-color: Highlight;
+        background-color: Highlight;
+
+        .fa-check {
+            color: HighlightText;
+        }
+
+        &::before {
+            background-color: HighlightText;
+        }
+    }
+}

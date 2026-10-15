@@ -78,7 +78,7 @@ const formatMonthYear = (date) => {
  * DatePicker trigger — form field + calendar-day icon (not Dropdown caret).
  * Figma: Month (Date Picker) / Month (no label) on Date & Time Picker page.
  */
-const DatePickerToggle = forwardRef(({ displayValue, placeholder, disabled, readOnly, isOpen, calendarId, id, name, onClick, onFocus, onBlur, sizeClass }, ref) => {
+const DatePickerToggle = forwardRef(({ displayValue, placeholder, disabled, readOnly, isOpen, calendarId, id, name, onClick, onFocus, onBlur, sizeClass, inputProps }, ref) => {
     /**
      * Opens/closes the calendar via react-bootstrap Dropdown.Toggle.
      *
@@ -104,6 +104,7 @@ const DatePickerToggle = forwardRef(({ displayValue, placeholder, disabled, read
             onClick={handleActivate}
         >
             <input
+                {...inputProps}
                 type="text"
                 className="plus-date-picker-input"
                 readOnly
@@ -146,11 +147,16 @@ DatePickerToggle.propTypes = {
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
     sizeClass: PropTypes.string,
+    inputProps: PropTypes.object,
 };
 
 /**
  * Date picker (Figma Forms · Date & Time Picker · Month Date Picker).
  * Trigger is a form control with calendar-day trailing icon — distinct from Select's caret.
+ *
+ * Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`,
+ * `data-*`) go to the input, which is the control a screen reader lands on:
+ * DatePicker has no `label` prop, so that is how a caller names it.
  *
  * @param {object} props
  */
@@ -170,6 +176,7 @@ const DatePicker = ({
     onBlur,
     className = '',
     style,
+    ...props
 }) => {
     const autoId = useId();
     const [selectedDate, setSelectedDate] = useState(parseDate(value));
@@ -341,6 +348,7 @@ const DatePicker = ({
                 onFocus={onFocus}
                 onBlur={onBlur}
                 sizeClass={sizeClass}
+                inputProps={props}
             />
 
             <Dropdown.Menu

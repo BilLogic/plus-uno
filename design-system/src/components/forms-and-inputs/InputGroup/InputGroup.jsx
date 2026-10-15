@@ -338,8 +338,11 @@ const InputGroupDropdown = ({
         disabled ? 'plus-input-group-dropdown-disabled' : ''
     ].filter(Boolean).join(' ');
 
+    // The rest props are the Dropdown's (`id`, `ariaLabel`, `onToggle`…), so
+    // they go to it alone: on the wrapper too, `id` landed twice and the
+    // Dropdown's own props became unknown attributes on a span.
     return (
-        <BootstrapInputGroup.Text className={`plus-input-group-addon plus-input-group-dropdown ${sizeClass} ${disabled ? 'plus-input-group-addon-disabled' : ''} ${className}`} {...props}>
+        <BootstrapInputGroup.Text className={`plus-input-group-addon plus-input-group-dropdown ${sizeClass} ${disabled ? 'plus-input-group-addon-disabled' : ''} ${className}`}>
             <Dropdown
                 buttonText={buttonText || text || children || 'Dropdown'}
                 size={dropdownSize}

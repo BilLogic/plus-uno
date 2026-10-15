@@ -30,6 +30,7 @@ const LoginForm = () => {
                         <Input
                             id="login-email"
                             type="email"
+                            autoComplete="email"
                             placeholder="name@company.com"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -44,6 +45,7 @@ const LoginForm = () => {
                         <Input
                             id="login-password"
                             type="password"
+                            autoComplete="current-password"
                             placeholder="••••••••"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -55,7 +57,7 @@ const LoginForm = () => {
                             id="remember-me"
                             label="Remember me for 30 days"
                             checked={rememberMe}
-                            onChange={(checked) => setRememberMe(checked)}
+                            onChange={(e) => setRememberMe(e.target.checked)}
                         />
                     </div>
 
