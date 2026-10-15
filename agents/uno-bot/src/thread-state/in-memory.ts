@@ -33,6 +33,7 @@ import {
   reportItemLook,
   type ReportExpiryRecord,
   claimedFiling,
+  comparisonKey,
   proposalReplyThread,
   proposalSlot,
   proposalTtlMs,
@@ -105,6 +106,8 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
   const activeRuns = new Map<string, ActiveRunRecord>();
   const events = new Map<string, EventRecord>();
   const filings = new Map<string, FilingRecord>();
+  /** When each thread's comparison for a scenario was shown, by `comparisonKey`. */
+  const compared = new Map<string, number>();
   const executions = new Map<string, Execution>();
 
   /** Take an execution if it has been cut off; drop it if it has aged out;
@@ -462,6 +465,14 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     async settleFiling(key, issue) {
       if (issue) filings.set(key, { at: now(), issue });
       else filings.delete(key);
+    },
+
+    async claimComparison(ref, scenario) {
+      const key = comparisonKey(ref, scenario);
+      const at = compared.get(key);
+      if (at !== undefined && now() - at < HISTORY_TTL_MS) return false;
+      compared.set(key, now());
+      return true;
     },
   };
 }

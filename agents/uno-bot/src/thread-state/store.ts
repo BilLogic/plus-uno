@@ -1409,6 +1409,21 @@ export interface ThreadState {
   /** Settle a claimed filing: the issue it filed, or null to release the
    *  claim with nothing filed. */
   settleFiling(key: string, issue: FiledIssue | null): Promise<void>;
+
+  // ----- one comparison per scenario per thread -----
+
+  /**
+   * Claim the one blueprint comparison a thread gets for a scenario
+   * (`blueprint-upkeep/milestone.ts`): true the first time, and recorded in
+   * the same step, so of two racing turns one shows it. Kept as long as the
+   * thread's memory (`HISTORY_TTL_MS`).
+   */
+  claimComparison(ref: ThreadRef, scenario: string): Promise<boolean>;
+}
+
+/** The record a thread's one comparison for a scenario is kept under. */
+export function comparisonKey(ref: ThreadRef, scenario: string): string {
+  return `cmp:${ref.channel}:${ref.thread}:${scenario.trim().toLowerCase()}`;
 }
 
 // ── One filing per key ───────────────────────────────────────────────────────

@@ -149,6 +149,13 @@ import {
   type TurnSettlement,
 } from "./delivery";
 import { cancelledRecently, RECENT_CANCEL_MS } from "../agent/cancel-note";
+import {
+  handOffMilestone,
+  prdMilestone,
+  type Comparison,
+  type Milestone,
+  type MilestoneComparison,
+} from "../blueprint-upkeep/milestone";
 
 // ── Policy ───────────────────────────────────────────────────────────────────
 
@@ -355,6 +362,10 @@ export interface TurnOutcome {
   /** What a ✅ taken during this turn ran, operation by operation, when the
    *  executor reported it. */
   executed?: OperationOutcome[];
+  /** The idea set beside today's blueprint at a milestone, when the reply
+   *  carried one: the match and today's path, for whatever offers to draft
+   *  the idea on the blueprint next. */
+  comparison?: Comparison;
 }
 
 // ── The dependencies ─────────────────────────────────────────────────────────
@@ -638,6 +649,14 @@ export interface TurnDeps {
   /** Structured state + progressive summarisation (`CONTEXT_STATE`). Flagged
    *  off in production; see the header of `agent/context-state.ts`. */
   contextState?: boolean;
+
+  /**
+   * The idea set beside today's blueprint, at a milestone — a PRD staged, a
+   * build handed to the IDE (`blueprint-upkeep/milestone.ts`). Null when the
+   * idea changes no path today, or the thread has seen this scenario's. Absent,
+   * no reply carries one.
+   */
+  milestoneComparison?: MilestoneComparison;
 
   now?(): number;
 }
@@ -1615,12 +1634,19 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
         return null;
       })
     : null;
+  // A staged PRD is a milestone: its comparison posts BEFORE the card, so the
+  // card stays the last message in the thread.
+  const comparison = inPlace
+    ? null
+    : await compareAt(prdMilestone(result.operations) ?? handOffMilestone(result.previewText ?? "", request.text, run.references), ref, deps);
+  if (comparison) await delivery.postNote(comparison.text);
   const posted = inPlace ? { ok: true, text: inPlace.text, ts: inPlace.staged.proposalTs } : await delivery.card(card);
   // An answer-only surface declined the card on purpose: the person is told
   // what it would have done instead, so the turn answered, and nothing stages.
+  const remembered = comparison ? `${comparison.text}\n\n${posted.text}` : posted.text;
   if (!inPlace && posted.declined) {
-    await memory.remember(posted.text);
-    return { disposition: "answered", posted: posted.text, wrote: memory.wrote(), telemetry };
+    await memory.remember(remembered);
+    return { disposition: "answered", posted: posted.text, wrote: memory.wrote(), telemetry, ...(comparison ? { comparison } : {}) };
   }
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] proposal card was not staged (${result.toolName})`);
@@ -1726,7 +1752,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // A proposal is still a completed conversational turn. An agent_view DM has
   // no Slack thread to rebuild, so preserving this exchange in the store is the
   // only way its image pointer reaches the immediate follow-up.
-  await memory.remember(posted.text);
+  await memory.remember(remembered);
 
   return {
     disposition: "staged",
@@ -1734,7 +1760,17 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     staged: { proposal, card },
     wrote: memory.wrote(),
     telemetry,
+    ...(comparison ? { comparison } : {}),
   };
+}
+
+/**
+ * The comparison a milestone earns, or null: no milestone, no port, or the
+ * port found nothing to compare. Fails quiet — the reply never waits on it.
+ */
+async function compareAt(milestone: Milestone | null, ref: ThreadRef, deps: Pick<TurnDeps, "milestoneComparison">): Promise<Comparison | null> {
+  if (!milestone || !deps.milestoneComparison) return null;
+  return deps.milestoneComparison(ref, milestone).catch(() => null);
 }
 
 /** Fresh page reads a batch may spend on Before beyond the card's own read.
@@ -2272,7 +2308,11 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   if (stripped.trimmed) console.log(`[result-table] trimmed ${stripped.trimmed} list item(s) past the first 3; prose over budget`);
   // A blueprint place carried from an earlier answer keeps that answer's
   // form; the reader gets the breadcrumb either way.
-  const prose = breadcrumbsInProse(figmaAnswerCopy(stripped.text, presentation?.sources));
+  const answered = breadcrumbsInProse(figmaAnswerCopy(stripped.text, presentation?.sources));
+  // A build handed to the IDE is a milestone: the comparison rides the reply,
+  // after the judge, in code's words.
+  const comparison = await compareAt(handOffMilestone(answered, request.text, run.references), ref, deps);
+  const prose = comparison ? `${answered}\n\n${comparison.text}` : answered;
 
   // The table rides with the answer; what comes back as `posted.text` is then
   // the prose and its plain list, which is what the thread remembers below.
@@ -2323,6 +2363,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     posted: posted.text,
     wrote: ctx.memory.wrote(),
     telemetry,
+    ...(comparison ? { comparison } : {}),
   };
 }
 

@@ -40,5 +40,5 @@ The build hand-off:
 ## Exit
 
 - **file** — the GitHub issue or the Roadmap intake on one card; ✅ files it.
-- **hand off** — a build with its PRD: the ticket filed, plus the ready-to-paste IDE prompt naming uno-prototype in the shape above. A direct fix the reporter wants made now: an IDE prompt naming uno-maintain with the quoted fix.
+- **hand off** — a build with its PRD: the ticket filed, plus the ready-to-paste IDE prompt naming uno-prototype in the shape above, its `Run in the IDE` line as written: the Worker reads it to set a build that changes the service beside today's blueprint. A direct fix the reporter wants made now: an IDE prompt naming uno-maintain with the quoted fix.
 - **answer** — an open intake already covers it: its link, and whether to add this to it.
