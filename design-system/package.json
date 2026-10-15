@@ -7,7 +7,6 @@
     "*.scss"
   ],
   "scripts": {
-    "build": "vite build",
     "test": "vitest run"
   },
   "peerDependencies": {

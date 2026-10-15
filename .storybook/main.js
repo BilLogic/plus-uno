@@ -46,16 +46,11 @@ const config = {
   staticDirs: (() => {
     const staticDirs = [];
     const rootDistPath = path.resolve(__dirname, '../dist');
-    const distPath = path.resolve(__dirname, '../design-system/dist');
     const assetsPath = path.resolve(__dirname, '../design-system/src/assets');
 
     // Include root dist directory for CSS files
     if (fs.existsSync(rootDistPath)) {
       staticDirs.push({ from: rootDistPath, to: '/dist' });
-    }
-    // Only include directories that exist
-    if (fs.existsSync(distPath) && fs.readdirSync(distPath).length > 0) {
-      staticDirs.push({ from: distPath, to: '/packages-dist' });
     }
     if (fs.existsSync(assetsPath)) {
       staticDirs.push({ from: assetsPath, to: '/assets' });
