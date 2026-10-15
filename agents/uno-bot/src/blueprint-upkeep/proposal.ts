@@ -2,21 +2,22 @@
 // can draw on it.
 //
 // Under a milestone's comparison (`./milestone.ts`) the turn drafts the idea's
-// rows on the matched path and posts a ✅ card: "Draft this on the blueprint
-// as a proposal?". The card's one operation is a blueprint revision at
-// `proposed` (`revisionCard`), and its only confirmer is the person who asked
-// — the deployment's standing confirmers are not added. ✅ writes the rows
-// through the gated writer; ⛔ or no answer writes nothing. Once the write is
-// back, the thread → rows record is kept (`drawnProposalOf`,
+// rows against the matched path and posts a ✅ card: "Draft this on the
+// blueprint as a proposal?". The card's one operation is a blueprint revision
+// with a `variant` (`revisionCard`), and its only confirmer is the person who
+// asked — the deployment's standing confirmers are not added. ✅ draws the
+// idea through the gated writer; ⛔ or no answer writes nothing. Once the write
+// is back, the thread → rows record is kept (`drawnProposalOf`,
 // `./proposal-records.ts`) for linking the rows to the Roadmap card the PRD
 // becomes and for offering their removal later.
 //
-// BESIDE, NEVER OVER. A blueprint slot (step × lane on a path) holds one cell,
-// and today's cells are product truth (ADR-021). A proposal therefore only
-// ADDS cells on empty slots: a drafted change to a cell that exists, or a
-// deprecation, would rewrite today's journey for an idea nobody has shipped,
-// so it is left out and named on the card. A draft with nothing to add is no
-// offer.
+// A NEW PATH BESIDE TODAY'S, NEVER OVER IT. Today's cells are product truth
+// (ADR-021), so a proposal is drawn as a new `proposed` `variant` path in the
+// same scenario, with today's lanes and step order, and the idea's cells are
+// written there at `proposed`: a cell it adds and a cell it changes alike. A
+// moment the idea removes is named on the card and left empty on the new path;
+// nothing of today's path is written. An idea that only removes is no offer —
+// a path with no cells shows nothing.
 //
 // THE DEFAULT TIER. The draft is an idea's few rows on a path already read and
 // matched, offered to the person who is waiting on the reply, and it lands as
@@ -29,11 +30,11 @@
 
 import type { ModelProvider } from "../agent/model-provider";
 import type { OperationOutcome } from "../gate/index";
-import { readRevision, revisionCard, type BlueprintRevision } from "../blueprint-write/index";
+import { readRevision, revisionCard, VARIANT_KIND, type BlueprintRevision } from "../blueprint-write/index";
 import { escapeSlackText } from "../slack/mrkdwn";
 import type { PendingProposal, StatedCardWords } from "../thread-state/index";
 import type { ProposalCard } from "../turn/delivery";
-import { draftPrompt, readDraft, type DraftedChange } from "./draft";
+import { draftPrompt, readDraft, type DraftedChange, type PathToday } from "./draft";
 import type { ServiceChangeInput } from "./gate";
 import type { Comparison } from "./milestone";
 import type { DrawnProposal } from "./proposal-records";
@@ -58,8 +59,10 @@ export const PROPOSAL_CARD_WORDS: StatedCardWords = {
 export interface ProposalDraft {
   comparison: Comparison;
   revision: BlueprintRevision;
-  /** The rows as the card shows them, in the revision's order: all `added`. */
+  /** The rows as the card shows them, in the revision's order: added or changed. */
   changes: DraftedChange[];
+  /** Today's cells the idea removes: named, and left empty on the new path. */
+  removed: DraftedChange[];
   confidence: number;
   /** What the draft could not verify, and what it left out. */
   gaps: string[];
@@ -76,43 +79,64 @@ export type ProposalDrafter = (comparison: Comparison, idea: ServiceChangeInput)
 
 export const PROPOSAL_SYSTEM = [
   "You keep a service blueprint. Someone is exploring an idea that changes how one path works today. You are shown the idea, and the path as it is today: its steps, its lanes, and each cell (the square where a step meets a lane) with its text.",
-  "Draft the cells this idea would ADD to this path, as a proposal shown beside today's cells.",
+  "Draft the row changes this idea makes to THIS path. They are drawn as a proposal on a new path beside today's, so today's cells stay as they are.",
   "- Use only the step ids and lane ids you are shown. If the idea needs a step or a lane the path does not have, do not invent an id: name it in new_steps_or_lanes.",
-  "- Add only where a step and a lane have no cell yet. Where the idea changes or removes a cell that exists, do not draft it: say so in gaps.",
+  "- added: a cell where a step and a lane have none today. changed: a cell whose text the idea changes. deprecated: a cell for a moment that no longer happens under the idea.",
   "- Write each cell's text the way the path's cells are written: one short sentence about what that actor does at that step.",
+  "- Change only what the idea changes. Say in gaps what you could not verify from its text.",
   "Reply with JSON only, no prose, in exactly this shape:",
-  '{"rows":[{"change":"added","step_id":"","lane_id":"","content":""}],"new_steps_or_lanes":[],"confidence":0.0,"gaps":[]}',
+  '{"rows":[{"change":"added|changed|deprecated","step_id":"","lane_id":"","content":""}],"new_steps_or_lanes":[],"confidence":0.0,"gaps":[]}',
 ].join("\n");
 
-const slotName = (c: Pick<DraftedChange, "step" | "lane">) => `${c.step} (${c.lane})`;
+/** The longest name a drawn path takes. */
+const MAX_PATH_NAME = 80;
+
+/** The new path's name, from the idea: its title, else today's path's. */
+export function proposalPathName(idea: ServiceChangeInput, today: Pick<PathToday, "path">): string {
+  const title = idea.title.replace(/\s+/g, " ").trim();
+  const name = title || `${today.path} (proposed)`;
+  return name.length > MAX_PATH_NAME ? `${name.slice(0, MAX_PATH_NAME - 1).trimEnd()}…` : name;
+}
 
 /**
- * Read a proposal draft against the path: the additions are kept, every change
- * to a cell that exists becomes a gap.
+ * Read a proposal draft against the path: each added or changed cell becomes a
+ * row of the new path, and each removal is named.
  *
  * @param reply - The model's text
  * @param comparison - The comparison it was drafted from
  * @param idea - The idea's title and text
- * @returns The draft, or null when it adds nothing
+ * @returns The draft, or null when it draws no cell
  */
 export function readProposalDraft(reply: string, comparison: Comparison, idea: ServiceChangeInput): ProposalDraft | null {
-  const read = readDraft(reply, { title: idea.title, text: idea.text, today: comparison.today, target: PROPOSED });
+  const { today } = comparison;
+  if (!today.scenarioId) return null;
+  const read = readDraft(reply, { title: idea.title, text: idea.text, today, target: PROPOSED });
   if (!read) return null;
   const rows: BlueprintRevision["rows"] = [];
   const changes: DraftedChange[] = [];
-  const gaps = [...read.gaps];
+  const removed: DraftedChange[] = [];
   read.revision.rows.forEach((row, i) => {
     const change = read.changes[i]!;
-    if (row.from === null) {
-      rows.push(row);
+    if (row.to === "deprecated") removed.push(change);
+    // The new path starts empty: every cell is new there.
+    else {
+      rows.push({ ...row, from: null, to: PROPOSED });
       changes.push(change);
-    } else {
-      gaps.push(`left out the ${change.kind === "deprecated" ? "removal" : "change"} at ${slotName(change)}: a proposal sits beside today's cells and never writes over one`);
     }
   });
   if (!rows.length) return null;
-  const { path: _pathStatus, ...revision } = read.revision;
-  return { comparison, revision: { ...revision, rows }, changes, confidence: read.confidence, gaps };
+  const revision: BlueprintRevision = {
+    pathId: today.pathId,
+    label: `${today.scenario} › ${today.path}`,
+    rows,
+    variant: {
+      scenarioId: today.scenarioId,
+      name: proposalPathName(idea, today),
+      status: PROPOSED,
+      lanes: Object.fromEntries(today.lanes.map((l) => [l.id, l.name])),
+    },
+  };
+  return { comparison, revision, changes, removed, confidence: read.confidence, gaps: read.gaps };
 }
 
 /**
@@ -132,7 +156,7 @@ export function draftProposal(deps: ProposalDraftDeps): ProposalDrafter {
       });
       if (!reply.ok) return null;
       const draft = readProposalDraft(reply.text, comparison, idea);
-      if (!draft) console.log(`[proposal] ${comparison.scenario}: the draft adds nothing beside today's cells`);
+      if (!draft) console.log(`[proposal] ${comparison.scenario}: the draft draws no cell`);
       return draft;
     } catch (err) {
       console.warn(`[proposal] draft skipped: ${err instanceof Error ? err.message : String(err)}`);
@@ -153,14 +177,19 @@ const esc = escapeSlackText;
 export function proposalOfferCard(draft: ProposalDraft): ProposalCard {
   const { today } = draft.comparison;
   const place = `${today.scenario} › ${today.path}`;
+  const name = draft.revision.variant!.name;
+  const at = (c: DraftedChange) => `${esc(c.step)} (${esc(c.lane)})`;
   const lead = [
     "*Draft this on the blueprint as a proposal?*",
-    `*${esc(place)}* · rows → ${code(PROPOSED)}${today.link ? ` · <${today.link}|open the path>` : ""}`,
+    `*${esc(place)}* · a new ${code(PROPOSED)} ${code(VARIANT_KIND)} path beside it, “${esc(name)}”${today.link ? ` · <${today.link}|open today's path>` : ""}`,
     "*Proposed*",
-    ...draft.changes.map((c) => `• Added ${esc(c.step)} (${esc(c.lane)}): ${esc(c.content)}`),
+    ...draft.changes.map((c) =>
+      c.kind === "changed" ? `• Changes ${at(c)}: ${esc(c.before ?? "")} → ${esc(c.content)}` : `• Adds ${at(c)}: ${esc(c.content)}`,
+    ),
+    ...draft.removed.map((c) => `• No longer happens at ${at(c)}: ${esc(c.content)} (left empty on the new path)`),
     `*Confidence:* ${draft.confidence.toFixed(1)}`,
-    ...(draft.gaps.length ? [`*Could not draft:* ${draft.gaps.map(esc).join("; ")}`] : []),
-    `*The ask:* Approve writes these rows to the blueprint as ${code(PROPOSED)}, beside today's cells, as uno-bot, all or nothing. Only the person who asked can approve; Reject, or no answer in ${PROPOSAL_CARD_TTL_MS / 3_600_000} h, writes nothing.`,
+    ...(draft.gaps.length ? [`*Could not verify:* ${draft.gaps.map(esc).join("; ")}`] : []),
+    `*The ask:* Approve creates the path at ${code(PROPOSED)} and writes these cells on it, as uno-bot, all or nothing; today's path is not touched. Only the person who asked can approve; Reject, or no answer in ${PROPOSAL_CARD_TTL_MS / 3_600_000} h, writes nothing.`,
   ].join("\n");
   const operation = revisionCard(draft.revision, []).operations![0]!;
   return { kind: "stated", verb: "draft this on the blueprint as a proposal", lead, footer: "", fields: [], caveats: [], operations: [operation] };
@@ -224,14 +253,23 @@ export function drawnProposalOf(
   if (!written) return null;
   const revision = readRevision(written.input ?? proposal.input);
   if ("error" in revision) return null;
+  // What the writer reported: the path it created and the cells on it.
+  let result: { created_path?: unknown; cells?: unknown };
+  try {
+    result = JSON.parse(written.result) as typeof result;
+  } catch {
+    return null;
+  }
+  if (typeof result.created_path !== "string" || !Array.isArray(result.cells)) return null;
   return {
     proposalTs: proposal.proposalTs,
     channel: proposal.channel,
     threadTs: proposal.threadTs,
     replyTs: proposal.replyTs ?? proposal.userMsgTs,
     requesterId: proposal.requesterUserId,
-    pathId: revision.pathId,
-    rows: revision.rows.map((r) => ({ laneId: r.laneId, stepId: r.stepId })),
+    pathId: result.created_path,
+    todayPathId: revision.pathId,
+    cellIds: result.cells.map(String),
     writtenAt: at,
     cardId: null,
   };

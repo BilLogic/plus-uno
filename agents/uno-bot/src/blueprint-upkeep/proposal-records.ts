@@ -1,27 +1,18 @@
 // What a drawn proposal wrote on the blueprint, kept by its thread.
 //
 // One record per approved offer (`./proposal.ts`): the thread it was offered
-// in, who asked, the path, and the slots its `proposed` rows were written to.
-// It is how a later turn finds a thread's rows — to link them to the Roadmap
-// card the PRD becomes, so shipping that card promotes them rather than
-// drafting duplicates — and how a daily check finds rows that never got a card,
-// to offer their removal to the person who drew them.
-//
-// A slot (path, step, lane) is how the rows are named: it is the key every
-// authoring write takes, so a promotion or a removal goes through the same
-// RPCs by it, and it never goes stale the way a cell's text would. Ids and
-// times only — no text, no titles (ADR-030): the rows' words are on the
-// blueprint, and the thread is in Slack.
+// in, who asked, the `proposed` path it created beside today's, and the cells
+// written on it. It is how a later turn finds a thread's proposal — to link it
+// to the Roadmap card the PRD becomes, so shipping that card promotes it rather
+// than drafting a duplicate — and how a daily check finds proposals that never
+// got a card, to offer their removal to the person who drew them. The new path
+// is the whole proposal, so it is what a removal deletes and a promotion
+// moves on. Ids and times only — no text, no titles (ADR-030): the cells'
+// words are on the blueprint, and the thread is in Slack.
 //
 // Two adapters keep the same contract: `createInMemoryProposalRecords` below,
 // and the D1 one beside it (`./proposal-records-d1.ts`,
 // migrations/usage/0016_blueprint_proposals.sql).
-
-/** A slot a proposal's row was written to. */
-export interface ProposalRow {
-  laneId: string;
-  stepId: string;
-}
 
 export interface DrawnProposal {
   /** The approved card's ts: the record's identity. */
@@ -32,8 +23,12 @@ export interface DrawnProposal {
   /** A real message ts to reply under. */
   replyTs: string;
   requesterId: string;
+  /** The `proposed` path the approval created. */
   pathId: string;
-  rows: ProposalRow[];
+  /** Today's path it was drawn beside. */
+  todayPathId: string;
+  /** The cells written on the new path. */
+  cellIds: string[];
   /** When the rows were written, epoch ms. */
   writtenAt: number;
   /** The Roadmap card's Notion page id, once the PRD became one. */
@@ -54,7 +49,7 @@ export interface ProposalRecords {
 /** The in-memory adapter: the Node suite's, and the contract's reference. */
 export function createInMemoryProposalRecords(): ProposalRecords {
   const kept = new Map<string, DrawnProposal>();
-  const copy = (p: DrawnProposal): DrawnProposal => ({ ...p, rows: p.rows.map((r) => ({ ...r })) });
+  const copy = (p: DrawnProposal): DrawnProposal => ({ ...p, cellIds: [...p.cellIds] });
   const oldestFirst = (a: DrawnProposal, b: DrawnProposal) => a.writtenAt - b.writtenAt || a.proposalTs.localeCompare(b.proposalTs);
   return {
     async record(proposal) {

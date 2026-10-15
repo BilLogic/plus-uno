@@ -53,10 +53,11 @@ export {
   PROPOSAL_DRAFT_TIER,
   PROPOSAL_OFFER_SUBREQUESTS,
   proposalOfferCard,
+  proposalPathName,
   proposalSlotKey,
   readProposalDraft,
   stagedProposalOffer,
   type ProposalDraft,
   type ProposalDrafter,
 } from "./proposal";
-export { createInMemoryProposalRecords, type DrawnProposal, type ProposalRecords, type ProposalRow } from "./proposal-records";
+export { createInMemoryProposalRecords, type DrawnProposal, type ProposalRecords } from "./proposal-records";

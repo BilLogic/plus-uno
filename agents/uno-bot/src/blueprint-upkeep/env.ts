@@ -124,7 +124,11 @@ export async function readPathOf(env: Env, cellId: string): Promise<PathToday | 
   if (!held) return null;
   const pathId = encodeURIComponent(held.path_id);
   const [[path], cells, lanes, steps] = await Promise.all([
-    rest<{ id: string; name: string; status: string; scenarios: { name: string } | null }>(env, "paths", `select=id,name,status,scenarios(name)&id=eq.${pathId}`),
+    rest<{ id: string; name: string; status: string; scenario_id: string | null; scenarios: { name: string } | null }>(
+      env,
+      "paths",
+      `select=id,name,status,scenario_id,scenarios(name)&id=eq.${pathId}`,
+    ),
     rest<{ id: string; lane_id: string; step_id: string; content: string | null; status: string }>(
       env,
       "cells",
@@ -142,6 +146,7 @@ export async function readPathOf(env: Env, cellId: string): Promise<PathToday | 
   const link = cellUrl(env.BLUEPRINT_APP_URL, first);
   return {
     pathId: path.id,
+    ...(path.scenario_id ? { scenarioId: path.scenario_id } : {}),
     scenario: path.scenarios?.name ?? "",
     path: path.name,
     status: asStatus(path.status),

@@ -1,5 +1,5 @@
-// A proposal offer, ✅'d by the person who asked, drawn on the blueprint as
-// `proposed` rows — or nothing drawn at all.
+// A proposal offer, ✅'d by the person who asked, drawn on the blueprint as a
+// `proposed` variant path beside today's — or nothing drawn at all.
 //
 // THE SEAM. The offer is staged as the turn stages it (`stagedProposalOffer`
 // over a drafted proposal) in the in-memory ThreadState, a signal is resolved
@@ -24,17 +24,19 @@ import type { Comparison } from "../src/blueprint-upkeep/milestone";
 
 interface Call {
   url: string;
+  method: string;
   body: Record<string, unknown> | null;
 }
 
 const SUPABASE = "https://blueprint.test";
+const NEW_PATH = "path-new";
 let calls: Call[] = [];
 let failing = new Set<string>();
 
 globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
   const url = String(input);
   const body = typeof init?.body === "string" ? (JSON.parse(init.body) as Record<string, unknown>) : null;
-  calls.push({ url, body });
+  calls.push({ url, method: init?.method ?? "GET", body });
   const reply = (payload: unknown, status = 200) =>
     new Response(JSON.stringify(payload), { status, headers: { "content-type": "application/json" } });
   if (url === `${SUPABASE}/auth/v1/token?grant_type=password`) {
@@ -45,6 +47,18 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
     if (failing.has(slot)) return reply({ message: "the database fell over" }, 500);
     return reply({ id: `cell-${slot}`, inserted: true, change_id: `change-${calls.length}`, previous: null });
   }
+  if (url === `${SUPABASE}/rest/v1/rpc/create_path_at_status`) {
+    if (failing.has("create")) return reply({ message: "no such function" }, 404);
+    return reply(NEW_PATH);
+  }
+  // The new path's lanes, copied by name from the scenario's.
+  if (url === `${SUPABASE}/rest/v1/lanes?select=id,name&path_id=eq.${NEW_PATH}`) {
+    return reply([
+      { id: "nl-tutor", name: "Tutor" },
+      { id: "nl-sup", name: "Supervisor" },
+    ]);
+  }
+  if (url === `${SUPABASE}/rest/v1/rpc/delete_cell` || url === `${SUPABASE}/rest/v1/rpc/delete_path`) return reply("archive-1");
   if (url.startsWith(SUPABASE)) return reply({ message: `no such route: ${url}` }, 404);
   if (url.includes("slack.com/api/")) return reply({ ok: true, ts: "1700000000.999999" });
   throw new Error(`no stub route for ${url}`);
@@ -114,6 +128,7 @@ const COMPARISON: Comparison = {
   text: "(the comparison)",
   today: {
     pathId: "path-1",
+    scenarioId: "scenario-1",
     scenario: "Call-off",
     path: "Standard",
     status: "live",
@@ -132,7 +147,7 @@ const COMPARISON: Comparison = {
 const DRAFT = JSON.stringify({
   rows: [
     { change: "added", step_id: "s-2", lane_id: "l-tutor", content: "Free tutor claims the posted call-off" },
-    { change: "added", step_id: "s-1", lane_id: "l-sup", content: "Supervisor sees the call-off on the board" },
+    { change: "changed", step_id: "s-2", lane_id: "l-sup", content: "Supervisor sees who claimed it" },
   ],
   new_steps_or_lanes: [],
   confidence: 0.7,
@@ -190,36 +205,64 @@ beforeEach(async () => {
 });
 
 describe("✅ by the person who asked", () => {
-  it("writes each drafted row as `proposed` on an empty slot, through the gated writer", async () => {
+  it("creates a `proposed` variant path named from the idea, then writes its cells there at `proposed`", async () => {
     const verdict = await decide(REQUESTER);
     assert.equal(verdict.outcome, "won");
     await execute(verdict);
+    const rpcs = rpcCalls();
+    assert.equal(rpcs[0]!.fn, "create_path_at_status");
+    assert.deepEqual(rpcs[0]!.args, {
+      scenario_id: "scenario-1",
+      name: "Self-serve call-offs",
+      status: "proposed",
+      kind: "variant",
+      // Today's path lends its lanes and step order to the variant.
+      lane_source_path_id: "path-1",
+      agent_session_id: rpcs[1]!.args?.agent_session_id,
+    });
+    assert.ok(!calls.some((c) => c.url.includes("record_authoring_change")), "every call records itself");
+    // On the new path's own lanes, matched by name: today's cells are never touched.
     assert.deepEqual(
-      rpcCalls().map((r) => [r.fn, r.args?.path_id, r.args?.step_id, r.args?.lane_id, r.args?.status]),
+      rpcs.slice(1).map((r) => [r.fn, r.args?.path_id, r.args?.step_id, r.args?.lane_id, r.args?.content, r.args?.status]),
       [
-        ["upsert_cell_at_status", "path-1", "s-2", "l-tutor", "proposed"],
-        ["upsert_cell_at_status", "path-1", "s-1", "l-sup", "proposed"],
+        ["upsert_cell_at_status", NEW_PATH, "s-2", "nl-tutor", "Free tutor claims the posted call-off", "proposed"],
+        ["upsert_cell_at_status", NEW_PATH, "s-2", "nl-sup", "Supervisor sees who claimed it", "proposed"],
       ],
     );
+    assert.ok(!rpcs.some((r) => r.args?.path_id === "path-1"), "today's path is never written");
   });
 
   it("tells the thread, with a link into the blueprint app", async () => {
     await execute(await decide(REQUESTER));
-    assert.match(appended.join("\n"), /wrote 2 rows/i);
+    assert.match(appended.join("\n"), /Drew 2 rows on a new proposed path, "Self-serve call-offs", beside Call-off › Standard/);
     assert.match(appended.join("\n"), /plus-uno\.netlify\.app\/blueprint\/\?cell=/);
   });
 
-  it("keeps the thread → rows record: the card, its thread, who asked, the path and the slots", async () => {
+  it("keeps the thread → rows record: the card, its thread, who asked, the new path, today's path and the cells", async () => {
     await execute(await decide(REQUESTER));
     const [insert] = recorded();
     assert.ok(insert, "one record");
-    const [proposalTs, channel, threadTs, replyTs, requester, pathId, rows, writtenAt, cardId] = insert.values;
-    assert.deepEqual([proposalTs, channel, threadTs, replyTs, requester, pathId, cardId], [CARD_TS, CHANNEL, THREAD, THREAD, REQUESTER, "path-1", null]);
-    assert.deepEqual(JSON.parse(String(rows)), [
-      { laneId: "l-tutor", stepId: "s-2" },
-      { laneId: "l-sup", stepId: "s-1" },
-    ]);
+    const [proposalTs, channel, threadTs, replyTs, requester, pathId, todayPathId, cellIds, writtenAt, cardId] = insert.values;
+    assert.deepEqual(
+      [proposalTs, channel, threadTs, replyTs, requester, pathId, todayPathId, cardId],
+      [CARD_TS, CHANNEL, THREAD, THREAD, REQUESTER, NEW_PATH, "path-1", null],
+    );
+    assert.deepEqual(JSON.parse(String(cellIds)), ["cell-nl-tutor:s-2", "cell-nl-sup:s-2"]);
     assert.equal(typeof writtenAt, "number");
+  });
+});
+
+describe("the press's budget", () => {
+  it("counts the path's creation, its lane read and its deletion beside every cell and its take-back", async () => {
+    const { revisionWriteCalls } = await import("../src/blueprint-write/index.js");
+    const proposal = await offer();
+    const { readRevision } = await import("../src/blueprint-write/index.js");
+    const revision = readRevision(proposal.input);
+    assert.ok(!("error" in revision));
+    // create (1) + lane read (1) + 2 cells × (write 1 + delete 1) + delete_path (1)
+    assert.equal(revisionWriteCalls(revision), 7);
+    const { variant: _variant, ...inPlace } = revision;
+    assert.equal(revisionWriteCalls(inPlace), 4, "a revision in place pays for none of it");
   });
 });
 
@@ -255,10 +298,27 @@ describe("nothing is written or recorded", () => {
     assert.deepEqual(recorded(), []);
   });
 
-  it("when the write fails part-way: it is taken back, and no record is kept", async () => {
-    failing.add("l-sup:s-1");
+  it("when a cell fails: the cells written and the new path are deleted, newest first, and no record is kept", async () => {
+    failing.add("nl-sup:s-2");
     await execute(await decide(REQUESTER));
-    assert.match(appended.join("\n"), /did NOT complete|not written/i);
+    assert.deepEqual(
+      rpcCalls().map((r) => [r.fn, r.args?.cell_id ?? r.args?.path_id ?? r.args?.scenario_id]),
+      [
+        ["create_path_at_status", "scenario-1"],
+        ["upsert_cell_at_status", NEW_PATH],
+        ["upsert_cell_at_status", NEW_PATH],
+        ["delete_cell", "cell-nl-tutor:s-2"],
+        ["delete_path", NEW_PATH],
+      ],
+    );
+    assert.match(appended.join("\n"), /not written/i);
+    assert.deepEqual(recorded(), []);
+  });
+
+  it("when the variant path cannot be created: nothing else is written", async () => {
+    failing.add("create");
+    await execute(await decide(REQUESTER));
+    assert.deepEqual(rpcCalls().map((r) => r.fn), ["create_path_at_status"]);
     assert.deepEqual(recorded(), []);
   });
 });

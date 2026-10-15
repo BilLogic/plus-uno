@@ -20,11 +20,9 @@ export function drawn(over: Partial<DrawnProposal> = {}): DrawnProposal {
     threadTs: "1700000000.000100",
     replyTs: "1700000000.000100",
     requesterId: "U0MAYA",
-    pathId: "path-1",
-    rows: [
-      { laneId: "l-tutor", stepId: "s-2" },
-      { laneId: "l-tutor", stepId: "s-3" },
-    ],
+    pathId: "path-new",
+    todayPathId: "path-1",
+    cellIds: ["cell-a", "cell-b"],
     writtenAt: 1_790_000_000_000,
     cardId: null,
     ...over,
@@ -45,15 +43,15 @@ export function runProposalRecordsConformance(label: string, make: () => Proposa
   it("recording the same card twice keeps the first", async () => {
     const r = make();
     await r.record(drawn());
-    await r.record(drawn({ pathId: "path-2", writtenAt: 5 }));
+    await r.record(drawn({ pathId: "path-other", writtenAt: 5 }));
     assert.deepEqual(await r.inThread("C0TEAM", "1700000000.000100"), [drawn()]);
   });
 
   it("a thread's proposals come back oldest first", async () => {
     const r = make();
-    await r.record(drawn({ proposalTs: "1700000000.000900", pathId: "path-2", writtenAt: 2_000 }));
+    await r.record(drawn({ proposalTs: "1700000000.000900", pathId: "path-later", writtenAt: 2_000 }));
     await r.record(drawn({ proposalTs: "1700000000.000500", writtenAt: 1_000 }));
-    assert.deepEqual((await r.inThread("C0TEAM", "1700000000.000100")).map((p) => p.pathId), ["path-1", "path-2"]);
+    assert.deepEqual((await r.inThread("C0TEAM", "1700000000.000100")).map((p) => p.pathId), ["path-new", "path-later"]);
   });
 
   it("linking a card links the thread's unlinked proposals and leaves a linked one as it was", async () => {

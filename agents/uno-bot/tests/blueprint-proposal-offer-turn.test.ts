@@ -23,6 +23,7 @@ const MATCH: BlueprintRow[] = [
 
 const TODAY: PathToday = {
   pathId: "path-1",
+  scenarioId: "scenario-1",
   scenario: "Call-off",
   path: "Standard",
   status: "live",
@@ -65,6 +66,13 @@ const DRAFT = JSON.stringify({
 });
 const ONLY_CHANGES = JSON.stringify({
   rows: [{ change: "changed", step_id: "s-2", lane_id: "l-sup", content: "Supervisor sees who claimed it" }],
+  new_steps_or_lanes: [],
+  confidence: 0.7,
+  gaps: [],
+});
+
+const ONLY_REMOVES = JSON.stringify({
+  rows: [{ change: "deprecated", step_id: "s-3", lane_id: "l-sup", content: "" }],
   new_steps_or_lanes: [],
   confidence: 0.7,
   gaps: [],
@@ -130,12 +138,13 @@ test("a PRD that changes a path today gets the offer under its comparison, befor
 
   const [card] = offerCards(w.h);
   assert.match(card!.lead!, /Call-off › Standard/);
-  assert.match(card!.lead!, /Added Find a fill-in \(Tutor\): Free tutor claims the posted call-off/);
-  assert.match(card!.lead!, /Added Confirm the fill-in \(Tutor\): Claiming tutor confirms on the board/);
-  assert.match(card!.lead!, /`proposed`/);
+  assert.match(card!.lead!, /a new `proposed` `variant` path beside it, “Self-serve call-offs”/);
+  assert.match(card!.lead!, /Adds Find a fill-in \(Tutor\): Free tutor claims the posted call-off/);
+  assert.match(card!.lead!, /Adds Confirm the fill-in \(Tutor\): Claiming tutor confirms on the board/);
+  assert.match(card!.lead!, /today's path is not touched/);
 });
 
-test("the offer writes only additions at `proposed`, and only the requester may approve it", async () => {
+test("the offer draws a new `proposed` variant path with the added and changed cells, and only the requester may approve it", async () => {
   const w = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE] });
   await runTurn(request({ text: "turn this thread into a PRD" }), w.h.deps);
 
@@ -151,21 +160,27 @@ test("the offer writes only additions at `proposed`, and only the requester may 
     rows: [
       { stepId: "s-2", laneId: "l-tutor", content: "Free tutor claims the posted call-off", from: null, to: "proposed" },
       { stepId: "s-3", laneId: "l-tutor", content: "Claiming tutor confirms on the board", from: null, to: "proposed" },
+      { stepId: "s-2", laneId: "l-sup", content: "Supervisor sees who claimed it", from: null, to: "proposed" },
     ],
+    variant: {
+      scenarioId: "scenario-1",
+      name: "Self-serve call-offs",
+      status: "proposed",
+      lanes: { "l-tutor": "Tutor", "l-sup": "Supervisor" },
+    },
   });
   // The PRD's card is still live beside it, in the thread's own slot.
   const prd = await liveCard(w.threadState, w.h.delivery.stagedAt[1]!);
   assert.equal(prd.toolName, "notion_create");
 });
 
-test("a change or removal of today's cell is left out of the proposal and named on the card", async () => {
+test("the card shows which of today's cells the idea changes, and which moments it removes", async () => {
   const w = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE] });
   await runTurn(request({ text: "turn this thread into a PRD" }), w.h.deps);
 
   const lead = offerCards(w.h)[0]!.lead!;
-  assert.match(lead, /left out the change at Find a fill-in \(Supervisor\)/);
-  assert.match(lead, /left out the removal at Confirm the fill-in \(Supervisor\)/);
-  assert.doesNotMatch(lead, /Supervisor sees who claimed it/);
+  assert.match(lead, /Changes Find a fill-in \(Supervisor\): Supervisor asks around in Slack → Supervisor sees who claimed it/);
+  assert.match(lead, /No longer happens at Confirm the fill-in \(Supervisor\): Supervisor confirms by DM/);
 });
 
 test("an uno-prototype hand-off gets the offer after the reply that carries its comparison", async () => {
@@ -199,12 +214,25 @@ test("a second milestone on the same scenario in the thread offers nothing again
   assert.equal(second.draftModel.generated.length, 0);
 });
 
-test("a draft that only changes today's cells is no offer", async () => {
+test("an idea that only changes today's steps gets the offer, drawn as its own path", async () => {
   const w = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE], drafts: [ONLY_CHANGES] });
   const outcome = await runTurn(request({ text: "turn this thread into a PRD" }), w.h.deps);
   assert.equal(outcome.disposition, "staged");
+  const [card] = offerCards(w.h);
+  assert.ok(card, "an offer");
+  assert.match(card.lead!, /Changes Find a fill-in \(Supervisor\): Supervisor asks around in Slack → Supervisor sees who claimed it/);
+  const offer = await liveCard(w.threadState, w.h.delivery.stagedAt[0]!);
+  const [op] = proposalOperations(offer);
+  assert.deepEqual((op!.input as { rows: unknown[] }).rows, [
+    { stepId: "s-2", laneId: "l-sup", content: "Supervisor sees who claimed it", from: null, to: "proposed" },
+  ]);
+  assert.equal((op!.input as { variant?: { status: string } }).variant?.status, "proposed");
+});
+
+test("an idea that only removes a moment draws no path, and gets no offer", async () => {
+  const w = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE], drafts: [ONLY_REMOVES] });
+  await runTurn(request({ text: "turn this thread into a PRD" }), w.h.deps);
   assert.deepEqual(offerCards(w.h), []);
-  assert.equal(outcome.comparison?.scenario, "Call-off", "the comparison still stands");
 });
 
 test("the draft runs on the default tier, and not at all without the budget for it", async () => {
