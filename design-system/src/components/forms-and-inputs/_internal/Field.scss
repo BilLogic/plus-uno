@@ -1,0 +1,370 @@
+/**
+ * _Field — one look for every text-like field.
+ *
+ * One 1px border (`--size-element-border`) in outline-variant on one fill
+ * (`--color-surface`). Hover turns the border inverse-primary. Focus draws a
+ * 2px ring (`--size-element-stroke-lg`) inside the box in the focus-ring
+ * colour; hover and focus are both blue, so the width is what tells them
+ * apart. Figma draws its stroke inside the box, so the border is taken out of
+ * the padding here and the heights match the library: 28 · 34 · 40.
+ */
+
+.plus-field-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+    width: 100%;
+}
+
+// The box fades itself; the stack fades only what sits around it, so a
+// disabled field fades once.
+.plus-field-stack--disabled > :not(.plus-field) {
+    opacity: var(--color-disabled-opacity);
+}
+
+.plus-field-label-row {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs);
+}
+
+.plus-field-label {
+    margin-bottom: 0;
+    color: var(--color-on-surface);
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-normal);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+}
+
+.plus-field-required {
+    color: var(--color-danger-text);
+    margin-left: var(--size-element-gap-xs);
+}
+
+// Hidden, not removed: the label still names the control.
+.plus-field-label--hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.plus-field-info {
+    display: inline-flex;
+    align-items: center;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+    cursor: help;
+
+    &:focus-visible {
+        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+        outline-offset: var(--size-element-border);
+        border-radius: var(--size-element-radius-sm);
+    }
+}
+
+.plus-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-md);
+    width: 100%;
+    box-sizing: border-box;
+    border: var(--size-element-border) solid var(--color-outline-variant);
+    border-radius: var(--size-element-radius-sm);
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-normal);
+    cursor: text;
+    transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+
+    // Medium is the default.
+    padding:
+        calc(var(--size-element-pad-y-md) - var(--size-element-border))
+        calc(var(--size-element-pad-x-md) - var(--size-element-border));
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
+
+    &--small {
+        padding:
+            calc(var(--size-element-pad-y-sm) - var(--size-element-border))
+            calc(var(--size-element-pad-x-sm) - var(--size-element-border));
+        gap: var(--size-element-gap-sm);
+        font-size: var(--font-size-body3);
+        line-height: var(--font-line-height-body3);
+    }
+
+    &--large {
+        padding:
+            calc(var(--size-element-pad-y-lg) - var(--size-element-border))
+            calc(var(--size-element-pad-x-lg) - var(--size-element-border));
+        font-size: var(--font-size-body1);
+        line-height: var(--font-line-height-body1);
+    }
+
+    &--multiline {
+        align-items: flex-start;
+    }
+}
+
+.plus-field__content {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    align-items: center;
+}
+
+// The slots are one text line high, whatever sits in them, so a stepper or an
+// addon button never makes the field taller than its text.
+.plus-field .plus-field__leading,
+.plus-field .plus-field__trailing {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: var(--size-element-gap-xs);
+    height: 1lh;
+    color: var(--color-on-surface-variant);
+    white-space: nowrap;
+
+    // A small button in a slot is cut to the line: 22 high in a medium field,
+    // so the field stays 34. Figma does the same with a height override.
+    .plus-btn.btn {
+        height: 100%;
+        min-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    // Steppers and icon-only buttons are square.
+    .plus-btn.btn.plus-field-stepper,
+    .plus-btn.btn.plus-btn--icon-only {
+        width: auto;
+        aspect-ratio: 1 / 1;
+        padding: 0;
+    }
+}
+
+// The control fills the content slot and draws nothing of its own: the box is
+// the field.
+.plus-field__control {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    outline: none;
+    box-shadow: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+
+    &::placeholder {
+        color: var(--color-on-surface-variant);
+        opacity: 1;
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        background: transparent;
+    }
+}
+
+textarea.plus-field__control {
+    display: block;
+    resize: vertical;
+}
+
+// ── States ──────────────────────────────────────────────────────────────────
+
+.plus-field:hover:not(.plus-field--disabled):not(.plus-field--readonly):not(.plus-field--invalid):not(.plus-field--valid),
+.plus-field--hover {
+    border-color: var(--color-inverse-primary);
+}
+
+.plus-field:focus-within,
+.plus-field--focus {
+    outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+    outline-offset: calc(var(--size-element-stroke-lg) * -1);
+}
+
+.plus-field--invalid {
+    border-color: var(--color-danger-border);
+
+    &:focus-within {
+        outline-color: var(--color-danger-border);
+    }
+}
+
+.plus-field--valid {
+    border-color: var(--color-success-border);
+
+    &:focus-within {
+        outline-color: var(--color-success-border);
+    }
+}
+
+.plus-field--readonly {
+    background-color: var(--color-surface-variant);
+    cursor: default;
+}
+
+.plus-field--disabled {
+    opacity: var(--color-disabled-opacity);
+    color: var(--color-on-surface-variant);
+    cursor: not-allowed;
+}
+
+// ── Subtle: reads as plain text until hovered or edited ─────────────────────
+
+.plus-field--subtle {
+    border-color: transparent;
+    background-color: transparent;
+
+    .plus-field__trailing {
+        visibility: hidden;
+    }
+
+    &:hover:not(.plus-field--disabled):not(.plus-field--readonly),
+    &.plus-field--hover {
+        border-color: transparent;
+        background-color: var(--color-surface-container);
+
+        .plus-field__trailing {
+            visibility: visible;
+        }
+    }
+
+    // Editing, a failed save and a confirmation look like the standard field.
+    &:focus-within,
+    &.plus-field--focus,
+    &.plus-field--invalid,
+    &.plus-field--valid {
+        background-color: var(--color-surface);
+
+        .plus-field__trailing {
+            visibility: visible;
+        }
+    }
+
+    // The border comes back under the same 2px ring as the standard field.
+    &:focus-within,
+    &.plus-field--focus {
+        border-color: var(--color-outline-variant);
+        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+        outline-offset: calc(var(--size-element-stroke-lg) * -1);
+    }
+
+    &.plus-field--invalid {
+        border-color: var(--color-danger-border);
+
+        &:focus-within {
+            outline-color: var(--color-danger-border);
+        }
+    }
+
+    &.plus-field--valid {
+        border-color: var(--color-success-border);
+
+        &:focus-within {
+            outline-color: var(--color-success-border);
+        }
+    }
+
+    &.plus-field--busy .plus-field__trailing {
+        visibility: visible;
+    }
+
+    // Disabled and read-only subtle fields are just text.
+    &.plus-field--readonly,
+    &.plus-field--disabled {
+        border-color: transparent;
+        background-color: transparent;
+    }
+}
+
+// ── Caption ─────────────────────────────────────────────────────────────────
+
+.plus-field-caption {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--size-element-gap-sm);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+}
+
+.plus-field-caption__message {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs);
+    min-width: 0;
+
+    i {
+        flex-shrink: 0;
+        font-size: var(--font-size-body3);
+    }
+
+    &--help {
+        color: var(--color-on-surface-variant);
+    }
+
+    &--invalid {
+        color: var(--color-danger-text);
+    }
+
+    &--success {
+        color: var(--color-success-text);
+    }
+}
+
+.plus-field-caption__count {
+    flex-shrink: 0;
+    margin-left: auto;
+    color: var(--color-on-surface-variant);
+    font-variant-numeric: tabular-nums;
+
+    &--over {
+        color: var(--color-danger-text);
+    }
+}
+
+// "saving…" in Trailing while a subtle field's save runs.
+.plus-field-saving {
+    color: var(--color-on-surface-variant);
+    font-style: italic;
+}
+
+// ── Subtle editing: Save / Cancel under a multi-line field ──────────────────
+
+.plus-field-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--size-element-gap-xs);
+}
+
+// Forced colours (Windows High Contrast) repaint the ring's colour to match
+// the border at rest, so the ring is named in the system Highlight colour.
+@media (forced-colors: active) {
+    .plus-field:focus-within {
+        outline: var(--size-element-stroke-lg) solid Highlight;
+    }
+}

@@ -245,7 +245,6 @@ export const webAppSourceSnippets = {
         '  id="textarea-overview"',
         '  label="Label"',
         '  placeholder="Enter text..."',
-        '  variant="long"',
         '  rows={3}',
         '/>'
     ]),
@@ -288,6 +287,7 @@ export const webAppSourceSnippets = {
     formNumber: snippet([
         '<NumberInput',
         '  id="number-input-overview"',
+        '  label="Number of sessions"',
         '  placeholder="Number"',
         '/>'
     ]),

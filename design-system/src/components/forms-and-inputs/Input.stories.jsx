@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Input from './Input';
 
@@ -185,13 +186,17 @@ export const Styles = () => (
     </div>
 );
 
-/** Sizes — Available in medium (default) size. */
+/** Sizes — small, medium (default) and large, from `_Field`. */
 export const Sizes = () => (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, justifyContent: 'center', alignItems: 'flex-start' }}>
-        <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MEDIUM (DEFAULT)</span>
-            <Input id="doc-size-medium" placeholder="Placeholder" value="" size="medium" trailingVisual="fa-solid fa-icons" />
-        </div>
+        {['small', 'medium', 'large'].map((size) => (
+            <div key={size}>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">
+                    {size === 'medium' ? 'MEDIUM (DEFAULT)' : size.toUpperCase()}
+                </span>
+                <Input id={`doc-size-${size}`} label={`${size} input`} showLabel={false} placeholder="Placeholder" size={size} trailingVisual="fa-solid fa-icons" />
+            </div>
+        ))}
     </div>
 );
 
@@ -264,4 +269,194 @@ Interactive.args = {
     value: '',
     leadingVisual: 'none',
     trailingVisual: 'icon',
+};
+
+/**
+ * Anatomy — label, `_Field` (Leading · Content · Trailing) and caption.
+ * The caption carries a message on the left and a count on the right.
+ */
+export const Anatomy = () => (
+    <div style={{ maxWidth: '360px' }}>
+        <Input
+            id="input-anatomy"
+            label="Full name"
+            required
+            info="As it appears on your school ID."
+            caption="Your first and last name."
+            placeholder="Your name"
+            leadingVisual="fa-solid fa-user"
+            trailingVisual="fa-solid fa-circle-check"
+            maxLength={40}
+            defaultValue="Bill"
+        />
+    </div>
+);
+
+Anatomy.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('textbox', { name: 'Full name' });
+    const box = input.closest('.plus-field');
+
+    // The three slots, in order, with the control in Content.
+    await expect([...box.children].map((child) => child.className))
+        .toEqual(['plus-field__leading', 'plus-field__content', 'plus-field__trailing']);
+    await expect(box.querySelector('.plus-field__content').contains(input)).toBe(true);
+
+    // Required: an asterisk for the eye, `aria-required` for everyone else.
+    await expect(input.getAttribute('aria-required')).toBe('true');
+    const star = canvasElement.querySelector('.plus-field-required');
+    await expect(star.getAttribute('aria-hidden')).toBe('true');
+
+    // The info button sits outside the label, so its name is not the field's,
+    // and it opens a tooltip on hover.
+    const info = canvas.getByRole('button', { name: 'About Full name' });
+    await userEvent.hover(info);
+    await waitFor(() => expect(within(document.body).getByRole('tooltip')).toHaveTextContent('As it appears on your school ID.'));
+    await userEvent.unhover(info);
+
+    // Standing help and the count, side by side.
+    await expect(canvasElement.querySelector('.plus-field-caption__message')).toHaveTextContent('Your first and last name.');
+    await expect(canvasElement.querySelector('.plus-field-caption__count')).toHaveTextContent('4 / 40');
+};
+
+/** CaptionErrorAndCount — the error on the left, the count on the right, together. */
+export const CaptionErrorAndCount = () => {
+    const [value, setValue] = useState('A summary that runs long');
+    return (
+        <div style={{ maxWidth: '360px' }}>
+            <Input
+                id="input-caption"
+                label="Headline"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                maxLength={30}
+                validation="invalid"
+                validationMessage="Keep it to one line."
+            />
+        </div>
+    );
+};
+
+CaptionErrorAndCount.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('textbox', { name: 'Headline' });
+
+    const alert = canvas.getByRole('alert');
+    await expect(alert).toHaveTextContent('Keep it to one line.');
+    const count = canvasElement.querySelector('.plus-field-caption__count');
+    await expect(count).toHaveTextContent('24 / 30');
+
+    // Both sit on one line: the message left, the count right.
+    await expect(alert.getBoundingClientRect().left).toBeLessThan(count.getBoundingClientRect().left);
+    await expect(Math.round(alert.getBoundingClientRect().top)).toBe(Math.round(count.getBoundingClientRect().top));
+
+    // The control points at both, and the count follows typing.
+    const ids = input.getAttribute('aria-describedby').split(' ');
+    await expect(ids).toContain(alert.id);
+    await expect(ids).toContain(count.id);
+    await userEvent.type(input, '!');
+    await expect(count).toHaveTextContent('25 / 30');
+};
+
+/** Autofill — `autoComplete` reaches the input, for the browser and password managers. */
+export const Autofill = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: '360px' }}>
+        <Input id="input-autofill-email" label="Email address" type="email" autoComplete="email" />
+        <Input id="input-autofill-password" label="Password" type="password" autoComplete="current-password" />
+        <Input id="input-autofill-code" label="Access code" autoComplete="one-time-code" />
+    </div>
+);
+
+Autofill.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('textbox', { name: 'Email address' }).getAttribute('autocomplete')).toBe('email');
+    await expect(canvasElement.querySelector('#input-autofill-password').getAttribute('autocomplete')).toBe('current-password');
+    await expect(canvas.getByRole('textbox', { name: 'Access code' }).getAttribute('autocomplete')).toBe('one-time-code');
+};
+
+/**
+ * Search — Input with the magnifier in Leading and a visually hidden label.
+ * An example, not a component: the Figma Search example is two Inputs like these.
+ */
+export const Search = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: '360px' }}>
+        <Input id="input-search-small" label="Search tutors" showLabel={false} type="search" size="small" placeholder="Search tutors" leadingVisual="fa-solid fa-magnifying-glass" />
+        <Input id="input-search-medium" label="Search tutors" showLabel={false} type="search" placeholder="Search tutors" leadingVisual="fa-solid fa-magnifying-glass" />
+    </div>
+);
+
+Search.play = async ({ canvasElement }) => {
+    const [small, medium] = within(canvasElement).getAllByRole('searchbox', { name: 'Search tutors' });
+    await expect(small.closest('.plus-field').querySelector('.plus-field__leading .fa-magnifying-glass')).not.toBeNull();
+    await expect(medium.closest('.plus-field').querySelector('.plus-field__trailing')).toBeNull();
+};
+
+/** A save that takes a moment, and fails when asked to save "fail". */
+const slowSave = (value) => new Promise((resolve, reject) => {
+    setTimeout(() => (value === 'fail' ? reject(new Error('That grade could not be saved.')) : resolve()), 150);
+});
+
+/**
+ * Subtle — reads as plain text until hovered or edited, for record pages.
+ * Saves on blur or Enter, Esc cancels, "saving…" shows in Trailing, and a
+ * failed save keeps the field open in `invalid` with what was typed.
+ */
+export const Subtle = (args) => {
+    const [saved, setSaved] = useState('8th grade');
+    return (
+        <div style={{ maxWidth: '360px' }}>
+            <Input
+                id="input-subtle"
+                label="Grade level"
+                subtle
+                value={saved}
+                trailingVisual="dropdown"
+                onSave={async (next) => {
+                    if (args.onSave) args.onSave(next);
+                    await slowSave(next);
+                    setSaved(next);
+                }}
+            />
+        </div>
+    );
+};
+Subtle.args = { onSave: fn() };
+
+Subtle.play = async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('textbox', { name: 'Grade level' });
+    const box = input.closest('.plus-field');
+    await expect(getComputedStyle(box).borderTopColor).toBe('rgba(0, 0, 0, 0)');
+
+    // Esc cancels: back to the saved value, nothing saved.
+    await userEvent.click(input);
+    await userEvent.clear(input);
+    await userEvent.type(input, '7th grade{Escape}');
+    await expect(input).toHaveValue('8th grade');
+    await expect(args.onSave).not.toHaveBeenCalled();
+
+    // Enter saves, with "saving…" in Trailing while it runs.
+    await userEvent.click(input);
+    await userEvent.clear(input);
+    await userEvent.type(input, '9th grade{Enter}');
+    await expect(args.onSave).toHaveBeenCalledWith('9th grade');
+    await expect(canvas.getByRole('status')).toHaveTextContent('saving…');
+    await waitFor(() => expect(canvas.queryByRole('status')).toBeNull());
+    await expect(input).toHaveValue('9th grade');
+
+    // Leaving the field saves too.
+    await userEvent.click(input);
+    await userEvent.type(input, '!');
+    await userEvent.tab();
+    await expect(args.onSave).toHaveBeenLastCalledWith('9th grade!');
+    await waitFor(() => expect(canvas.queryByRole('status')).toBeNull());
+
+    // A failed save stays open in invalid, says why, and keeps the text.
+    await userEvent.click(input);
+    await userEvent.clear(input);
+    await userEvent.type(input, 'fail{Enter}');
+    await waitFor(() => expect(canvas.getByRole('alert')).toHaveTextContent('That grade could not be saved.'));
+    await expect(input).toHaveValue('fail');
+    await expect(input.getAttribute('aria-invalid')).toBe('true');
+    await expect(box.classList.contains('plus-field--invalid')).toBe(true);
 };

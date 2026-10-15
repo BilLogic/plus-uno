@@ -1062,6 +1062,16 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=39-4802",
             "source": "node-chart",
             "status": "verified"
+          },
+          {
+            "id": "field",
+            "name": "_Field",
+            "componentSetNodeId": "14841:25919",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-6957"
@@ -1086,6 +1096,16 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13671-3218",
             "source": "node-chart",
             "status": "verified"
+          },
+          {
+            "id": "field",
+            "name": "_Field",
+            "componentSetNodeId": "14841:25919",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19496"
@@ -1446,6 +1466,16 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13644-11268",
             "source": "node-chart",
             "status": "verified"
+          },
+          {
+            "id": "field",
+            "name": "_Field",
+            "componentSetNodeId": "14841:25919",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812"
@@ -2409,13 +2439,6 @@
         "source": "design-system/src/components/forms-and-inputs/Textarea.jsx",
         "storybookId": "components-forms-and-inputs-textarea--docs",
         "props": {
-          "variant": {
-            "type": "enum",
-            "values": [
-              "long",
-              "short"
-            ]
-          },
           "size": {
             "type": "enum",
             "values": [
@@ -2441,13 +2464,10 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "form-textarea",
-            "name": "Form Textarea",
+            "id": "textarea",
+            "name": "Textarea",
             "componentSetNodeId": "13541:10731",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731",
-            "codeDefaults": {
-              "variant": "long"
-            },
             "variantValueMap": {
               "validation": {
                 "invalid": "error",
@@ -2455,31 +2475,21 @@
               }
             },
             "status": "verified",
-            "verifiedAt": "2026-06-13",
-            "notes": "variantProps TBD — add from Figma variant inspection."
+            "verifiedAt": "2026-10-15",
+            "notes": "One set. Form Short Textarea was merged into it and deleted from the library; a short textarea is `rows={1}` in code and an instance resized to 34 high in Figma. `rows` is code-only: Figma sets the height by resizing the instance."
           },
           {
-            "id": "form-short-textarea",
-            "name": "Form Short Textarea",
-            "componentSetNodeId": "13543:5904",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904",
-            "codeDefaults": {
-              "variant": "short"
-            },
-            "variantValueMap": {
-              "validation": {
-                "invalid": "error",
-                "valid": "success"
-              }
-            },
-            "status": "verified",
-            "verifiedAt": "2026-06-13"
+            "id": "field",
+            "name": "_Field",
+            "componentSetNodeId": "14841:25919",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731",
-        "deliberate": {
-          "variant": "Code carries long and short as one `variant` prop; the library draws them as two sets, Form Textarea and Form Short Textarea."
-        }
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731"
       }
     },
     "Tile": {

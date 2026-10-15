@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 86,
-    "uses": 264,
+    "names": 85,
+    "uses": 261,
     "bare": 5
   },
   "tokens": {
@@ -116,10 +116,6 @@
       "uses": 5,
       "bare": 0
     },
-    "--font-size-body-small": {
-      "uses": 1,
-      "bare": 0
-    },
     "--font-size-caption": {
       "uses": 1,
       "bare": 0
@@ -153,11 +149,11 @@
       "bare": 0
     },
     "--font-weight-light": {
-      "uses": 3,
+      "uses": 2,
       "bare": 0
     },
     "--font-weight-medium": {
-      "uses": 4,
+      "uses": 3,
       "bare": 0
     },
     "--font-weight-regular": {

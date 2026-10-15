@@ -276,30 +276,18 @@
     gap: 0;
 }
 
+// The search field is an Input; inside the list it is a row, not a box: one
+// rule under it, and the field's own focus ring.
 .plus-select-search {
-    .plus-input {
-        border-radius: 0;
+    .plus-field {
         border: none;
-        border-bottom: 0.8px solid var(--color-outline-variant);
-        margin-bottom: 0;
-        width: 100%;
+        border-bottom: var(--size-element-border) solid var(--color-outline-variant);
+        border-radius: 0;
         background-color: var(--color-surface);
-        transition: none !important;
-        color: var(--color-on-surface-variant);
-        font-weight: var(--font-weight-normal);
-
-        &::placeholder {
-            color: var(--color-on-surface-variant);
-        }
+        transition: none;
 
         &:hover {
-            background-color: var(--color-on-surface-state-08) !important;
-            border-color: var(--color-outline-variant) !important;
-        }
-
-        &:focus,
-        &:focus-visible {
-            border-color: var(--color-focus-ring) !important;
+            background-color: var(--color-on-surface-state-08);
         }
     }
 }
