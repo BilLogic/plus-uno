@@ -327,6 +327,19 @@ describe("a share-out in a channel the asker names", () => {
     assert.match(await refusal({ place: "channel", channel: "#design-crit" }, asked("C_DESIGN"), reads), /couldn't look up #design-crit/);
   });
 
+  it("tells a channel that does not exist apart from one it could not look up", async () => {
+    const missing = await refusal({ place: "channel", channel: "#no-such-channel-xyz" });
+    assert.match(missing, /^I can't find #no-such-channel-xyz\. If it's private, add me to it first\./);
+    assert.doesNotMatch(missing, /couldn't look up/);
+  });
+
+  it("asks for the link when the channel lists ran on past what one turn reads", async () => {
+    const { reads } = fakeReads({ channelByName: async () => "unfinished" });
+    const said = await refusal({ place: "channel", channel: "#design-crit" }, asked("C_DESIGN"), reads);
+    assert.match(said, /couldn't find #design-crit in the channels I read — paste its link/);
+    assert.match(said, /#plus-design-feedback or here/);
+  });
+
   it("keeps an ask from a test channel in its own thread, and reads nothing", async () => {
     const { reads, calls } = fakeReads();
     assert.deepEqual(await decide({ place: "channel", channel: "#design-crit" }, asked("C_SANDBOX"), reads), {
