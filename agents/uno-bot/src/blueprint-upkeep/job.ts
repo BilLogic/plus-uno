@@ -8,7 +8,10 @@
 //     words and its PRD's (`./evidence.ts`). A card that passes queues one
 //     path to draft for EVERY `scenario › path` the gate matched
 //     confidently. A deploy whose design hand-off drafted rows promotes them
-//     instead (`./stages.ts`), with no judgement or draft.
+//     instead (`./stages.ts`), with no judgement or draft — and so does a
+//     card linked to a drawn proposal (`./link.ts`), at either moment: the
+//     proposal's own variant path moves on, today's path is offered for
+//     retirement on its own card at the deploy, and nothing new is drafted.
 //   • the DRAFT — the end-of-day `blueprint-draft-N` jobs: each reads the
 //     next queued paths as they are today and drafts that path's revision on
 //     the grind tier (`./draft.ts`) — `planned` rows for a design hand-off,
@@ -57,7 +60,18 @@ import {
   revisionTitle,
   type RevisionSource,
 } from "./card";
-import { holdDeprecations, promotionDraft, STAGES, weighedAt, type PlannedRows, type ShipStage } from "./stages";
+import {
+  holdDeprecations,
+  promotionDraft,
+  retirementDraft,
+  STAGES,
+  variantPromotionDraft,
+  weighedAt,
+  type PlannedRows,
+  type ShipStage,
+} from "./stages";
+import { cardKey } from "./link";
+import type { DrawnProposal, ProposalRecords } from "./proposal-records";
 import { DRAFT_COST, DRAFT_JOBS, MATCH_COST, MATCH_JOBS } from "./budget";
 
 export { DRAFT_COST, DRAFT_JOBS, MATCH_COST, MATCH_JOBS };
@@ -69,6 +83,10 @@ export const FIRST_LOOKBACK_MS = 3 * 24 * 60 * 60 * 1000;
 export const REVISION_CARD_TTL_MS = 72 * 60 * 60 * 1000;
 /** Design hand-offs remembered until their deploy. */
 const PLANNED_KEPT = 200;
+/** Path reads a linked card's proposals may spend: a variant each at a design
+ *  hand-off, a variant and today's path each at a deploy. Proposals past it
+ *  are named on the first card as not read. */
+const LINKED_READS = 3;
 /** Characters of a card's words kept for its draft: what the draft is shown. */
 const MAX_KEPT_TEXT = 6_000;
 /** The progress mark a place's gap ask is recorded under. */
@@ -169,6 +187,12 @@ export interface ShippedDeps {
   gate: ServiceChangeGate;
   /** Today's path holding this cell; null when it cannot be read. */
   readPath(cellId: string): Promise<PathToday | null>;
+  /** A path by its own id; null when it cannot be read. Without it, a deploy
+   *  offers no retirement of the path a proposal was drawn beside. */
+  readPathById?(pathId: string): Promise<PathToday | null>;
+  /** The drawn proposals linked to a Roadmap card (`./proposal-records.ts`);
+   *  without them, every card drafts. */
+  proposals?: Pick<ProposalRecords, "byCard">;
   provider: ModelProvider;
   /** The card owner's Slack id: its first Contributor, when one is found. */
   ownerOf(card: ShippedCard): Promise<string | null>;
@@ -344,6 +368,18 @@ async function weigh(deps: ShippedDeps, card: ShippedCard, state: Settled): Prom
       return { source: { pageId: card.pageId, url: card.url, title: card.title, number: card.number, status, quote }, channel, owner, confirmers };
     };
 
+    // A card linked to a drawn proposal moves the proposal on, and drafts nothing.
+    const linked = await linkedPromotions(deps, card);
+    if (linked) {
+      const promoted: WaitingRevision[] = [];
+      for (const l of linked) {
+        const routed = await route("");
+        if (typeof routed === "string") return routed;
+        promoted.push({ ...routed, today: l.today, draft: l.draft, key: `${weighedKey(card.pageId, card.stage)}|${l.key}`, cellId: l.cellId, target });
+      }
+      return promoted.length ? { paths: [], promoted } : "its linked proposal is already there";
+    }
+
     const promoted: WaitingRevision[] = [];
     for (const p of handedOff) {
       const today = await deps.readPath(p.cellId);
@@ -372,6 +408,69 @@ async function weigh(deps: ShippedDeps, card: ShippedCard, state: Settled): Prom
     console.error(`[blueprint-upkeep] ${card.title} not weighed: ${err instanceof Error ? err.message : String(err)}`);
     return "read failed";
   }
+}
+
+/** One card a linked proposal yields: its path read now and the draft on it. */
+interface LinkedCard {
+  today: PathToday;
+  draft: Draft;
+  /** A cell on the path: where a redraft's read starts. */
+  cellId: string;
+  /** Its key's tail, unique on the card. */
+  key: string;
+}
+
+/**
+ * The cards a card's linked proposals yield: each variant path promoted to
+ * the card's target, and at a deploy each path it was drawn beside offered
+ * for retirement. Null when the card has no linked proposal whose path can be
+ * read — it is then weighed as any other card.
+ */
+async function linkedPromotions(deps: ShippedDeps, card: ShippedCard): Promise<LinkedCard[] | null> {
+  if (!deps.proposals) return null;
+  const { target } = STAGES[card.stage];
+  const deploy = card.stage === "deployed";
+  const proposals = await deps.proposals.byCard(cardKey(card.pageId), LINKED_READS);
+  if (!proposals.length) return null;
+  const cards: LinkedCard[] = [];
+  let reads = 0;
+  let read = 0;
+  let unread = 0;
+  const retiring = new Set<string>();
+  for (const p of proposals) {
+    const cost = deploy && deps.readPathById ? 2 : 1;
+    if (reads + cost > LINKED_READS || !p.cellIds[0]) {
+      unread += 1;
+      continue;
+    }
+    reads += 1;
+    const variant = await variantOf(deps, p);
+    if (!variant) continue;
+    read += 1;
+    let beside: PathToday | null = null;
+    if (deploy && deps.readPathById && !retiring.has(p.todayPathId)) {
+      reads += 1;
+      beside = await deps.readPathById(p.todayPathId);
+    }
+    const promoted = variantPromotionDraft(variant, target, beside ?? undefined);
+    if (promoted) cards.push({ today: variant, draft: promoted, cellId: variant.cells[0]?.id ?? p.cellIds[0], key: revisionTitle(variant) });
+    const retire = beside && beside.pathId !== variant.pathId ? retirementDraft(beside, variant) : null;
+    if (beside && retire) {
+      retiring.add(p.todayPathId);
+      cards.push({ today: beside, draft: retire, cellId: beside.cells[0]?.id ?? p.cellIds[0], key: `retire|${revisionTitle(beside)}` });
+    }
+  }
+  if (!read) return null;
+  if (unread && cards[0]) {
+    cards[0] = { ...cards[0], draft: { ...cards[0].draft, gaps: [...cards[0].draft.gaps, `${unread} more proposal(s) linked to this card were not read this run`] } };
+  }
+  return cards;
+}
+
+/** A drawn proposal's path as the blueprint holds it now; null once it is gone. */
+async function variantOf(deps: ShippedDeps, p: DrawnProposal): Promise<PathToday | null> {
+  const path = await deps.readPath(p.cellIds[0]!);
+  return path && path.pathId === p.pathId ? path : null;
 }
 
 /**

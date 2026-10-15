@@ -40,10 +40,12 @@ export interface ProposalRecords {
   record(proposal: DrawnProposal): Promise<void>;
   /** Every proposal drawn in a thread, oldest first. */
   inThread(channel: string, threadTs: string): Promise<DrawnProposal[]>;
-  /** Link a thread's unlinked proposals to a Roadmap card; how many were. */
+  /** Link a thread's unlinked, standing proposals to a Roadmap card; how many were. */
   linkCard(channel: string, threadTs: string, cardId: string): Promise<number>;
   /** Proposals still without a card, written at or before `before`, oldest first. */
   unlinkedBefore(before: number, limit: number): Promise<DrawnProposal[]>;
+  /** A Roadmap card's linked proposals not withdrawn, oldest first: what its shipping promotes. */
+  byCard(cardId: string, limit: number): Promise<DrawnProposal[]>;
 
   // Withdrawal and the 30-day offer (`./proposal-cleanup.ts`). A withdrawn
   // record stays, marked, so the thread and the check never see it again.
@@ -89,7 +91,7 @@ export function createInMemoryProposalRecords(): ProposalRecords {
     async linkCard(channel, threadTs, cardId) {
       let linked = 0;
       for (const p of kept.values()) {
-        if (p.channel === channel && p.threadTs === threadTs && p.cardId === null) {
+        if (p.channel === channel && p.threadTs === threadTs && p.cardId === null && isStanding(p)) {
           p.cardId = cardId;
           linked += 1;
         }
@@ -129,6 +131,9 @@ export function createInMemoryProposalRecords(): ProposalRecords {
     },
     async releaseOffer(proposalTs) {
       if (marks.has(proposalTs)) marks.set(proposalTs, { ...markOf(proposalTs), offeredAt: null });
+    },
+    async byCard(cardId, limit) {
+      return [...kept.values()].filter((p) => p.cardId === cardId && isStanding(p)).sort(oldestFirst).slice(0, limit).map(copy);
     },
   };
 }

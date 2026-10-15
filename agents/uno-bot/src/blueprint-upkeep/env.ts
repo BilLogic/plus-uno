@@ -20,11 +20,17 @@
 //     the thread's store for its once-per-scenario claim; the offer under it
 //     drafts on the same provider;
 //   • a drawn proposal's thread → rows record: `blueprint_proposals` in the
-//     usage database (`proposalRecordsFor`);
-//   • its removal: a ✅ card posted under the proposal's thread and staged as
-//     a revision card is (`proposalOfferDepsFor`), on a removal ask there or
-//     from the morning's `blueprint-proposal-offer` check — one post and a
-//     few D1 queries an offer (`./proposal-cleanup.ts`).
+//     usage database (`proposalRecordsFor`); the Roadmap card a thread's PRD
+//     created, a HARNESS_KV key a thread for 45 days, so a proposal drawn
+//     after its PRD is linked as it is kept (`./link.ts`);
+//   • a linked card's proposals: one D1 query, then each variant path read
+//     (5) and, at a deploy, the path it was drawn beside by its id (4) —
+//     three path reads at most, inside `MATCH_COST`;
+//   • a drawn proposal's removal: a ✅ card posted under the proposal's
+//     thread and staged as a revision card is (`proposalOfferDepsFor`), on a
+//     removal ask there or from the morning's `blueprint-proposal-offer`
+//     check — one post, one staging and a few D1 queries an offer
+//     (`./proposal-cleanup.ts`).
 //
 // Budget (ADR-022), against the 38-subrequest lookup ceiling of one alarm,
 // each job sized by cost, not by a count (`./budget.ts`).
@@ -70,6 +76,7 @@ import type { ThreadState } from "../thread-state/index";
 import type { PathToday } from "./draft";
 import { draftProposal, drawnProposalOf, PROPOSAL_OFFER_SUBREQUESTS, type ProposalDrafter } from "./proposal";
 import { createD1ProposalRecords } from "./proposal-records-d1";
+import { keepProposalLinks, prdCardOf, type ThreadCards } from "./link";
 import type { ProposalRecords } from "./proposal-records";
 import { isRemoveRequest, offerAgedRemovals, offerRequestedRemoval, type OfferDeps } from "./proposal-cleanup";
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
@@ -97,6 +104,9 @@ import {
 const STATE_KV_KEY = "blueprint-upkeep:state";
 const WEIGHED_PREFIX = "blueprint-upkeep:weighed:";
 const THREAD_PREFIX = "blueprint-upkeep:thread:";
+const THREAD_CARD_PREFIX = "blueprint-upkeep:thread-card:";
+/** How long a thread's PRD card is remembered for a proposal drawn after it. */
+const THREAD_CARD_TTL_S = 45 * 24 * 60 * 60;
 const EMPTY: UpkeepState = { cursor: null, read: null, matched: [], waiting: [] };
 
 const stateFor = (env: Env) => kvJson<UpkeepState>(env, STATE_KV_KEY, EMPTY);
@@ -185,7 +195,19 @@ export async function readPathOf(env: Env, cellId: string): Promise<PathToday | 
   const id = encodeURIComponent(cellId);
   const [held] = await rest<{ path_id: string }>(env, "cells", `select=path_id&id=eq.${id}`);
   if (!held) return null;
-  const pathId = encodeURIComponent(held.path_id);
+  return readPathById(env, held.path_id, cellId);
+}
+
+/**
+ * A path by its own id, as `readPathOf` reads it: four reads.
+ *
+ * @param env - Worker bindings
+ * @param id - The path's id
+ * @param fallbackCell - The cell its link opens on when the path has none
+ */
+export async function readPathById(env: Env, id: string, fallbackCell?: string): Promise<PathToday | null> {
+  if (!isBlueprintConfigured(env)) return null;
+  const pathId = encodeURIComponent(id);
   const [[path], cells, lanes, steps] = await Promise.all([
     rest<{ id: string; name: string; status: string; scenario_id: string | null; scenarios: { name: string } | null }>(
       env,
@@ -205,8 +227,8 @@ export async function readPathOf(env: Env, cellId: string): Promise<PathToday | 
   const at = (stepId: string) => stepOrder.findIndex((s) => s.id === stepId);
   const laneAt = (laneId: string) => lanes.findIndex((l) => l.id === laneId);
   const ordered = [...cells].sort((a, b) => at(a.step_id) - at(b.step_id) || laneAt(a.lane_id) - laneAt(b.lane_id));
-  const first = ordered[0]?.id ?? cellId;
-  const link = cellUrl(env.BLUEPRINT_APP_URL, first);
+  const first = ordered[0]?.id ?? fallbackCell;
+  const link = first ? cellUrl(env.BLUEPRINT_APP_URL, first) : undefined;
   return {
     pathId: path.id,
     ...(path.scenario_id ? { scenarioId: path.scenario_id } : {}),
@@ -250,12 +272,15 @@ function shippedDepsFor(env: Env): ShippedDeps | string {
   const provider = selectProvider(env);
   const people = peopleFor(env);
   const config = channelIdsFor(env);
+  const proposals = proposalRecordsFor(env);
   return (
     {
       roadmap: { shippedSince: (since) => measured(() => shippedSince(env, since)) },
       evidence: (card) => cardEvidence((pageId) => measured(() => readNotionPage(env, pageId)), card.pageId),
       gate: serviceChangeGate({ provider, search: async (q) => (await measured(() => searchBlueprint(env, q))).rows }),
       readPath: (cellId) => measured(() => readPathOf(env, cellId)),
+      readPathById: (pathId) => measured(() => readPathById(env, pathId)),
+      ...(proposals ? { proposals } : {}),
       provider,
       async ownerOf(card) {
         const first = card.contributors[0];
@@ -462,13 +487,29 @@ export function proposalRecordsFor(env: Pick<Env, "USAGE_DB">): ProposalRecords 
   return env.USAGE_DB ? createD1ProposalRecords({ db: env.USAGE_DB }) : null;
 }
 
+/** The Roadmap card a thread's PRD created, one KV key a thread. */
+function threadCardsOn(kv: KVNamespace): ThreadCards {
+  const key = (channel: string, ts: string) => `${THREAD_CARD_PREFIX}${channel}:${ts}`;
+  return {
+    async cardOf(channel, ts) {
+      charge(1, "kv");
+      return kv.get(key(channel, ts));
+    },
+    async remember(channel, ts, cardId) {
+      charge(1, "kv");
+      await kv.put(key(channel, ts), cardId, { expirationTtl: THREAD_CARD_TTL_S });
+    },
+  };
+}
+
 /**
- * Keep what a decided proposal offer drew on the blueprint (`drawnProposalOf`):
- * its thread and the rows written. Nothing for any other card, a ⛔ or a write
- * that did not land. Best-effort: a failed record is logged, and the rows and
- * the thread's reply stand.
+ * Keep what a decided card means for its thread's proposals (`./link.ts`):
+ * what a proposal offer drew on the blueprint, and the link to the Roadmap
+ * card the thread's PRD created. Nothing for any other card, a ⛔ or a write
+ * that did not land. Best-effort: a failure is logged, and the rows, the PRD
+ * and the thread's reply stand.
  *
- * @param env - Carries USAGE_DB
+ * @param env - Carries USAGE_DB and HARNESS_KV
  * @param proposal - The decided card
  * @param outcomes - What its batch ran; undefined for a ⛔
  */
@@ -477,14 +518,10 @@ export async function recordDrawnProposalFor(
   proposal: PendingProposal,
   outcomes: readonly OperationOutcome[] | undefined,
 ): Promise<void> {
-  const drawn = drawnProposalOf(proposal, outcomes, Date.now());
-  const records = drawn ? proposalRecordsFor(env) : null;
-  if (!drawn || !records) return;
-  try {
-    await records.record(drawn);
-  } catch (err) {
-    console.error(`[proposal] rows of ${proposal.proposalTs} not recorded: ${err instanceof Error ? err.message : String(err)}`);
-  }
+  if (!drawnProposalOf(proposal, outcomes, Date.now()) && !prdCardOf(outcomes)) return;
+  const records = proposalRecordsFor(env);
+  if (!records) return;
+  await keepProposalLinks({ records, threadCards: env.HARNESS_KV ? threadCardsOn(env.HARNESS_KV) : null, now: () => Date.now() }, proposal, outcomes);
 }
 
 // ── A drawn proposal's removal ───────────────────────────────────────────────

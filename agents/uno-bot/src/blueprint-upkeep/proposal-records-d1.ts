@@ -24,7 +24,7 @@ const RECORD =
   `INSERT INTO blueprint_proposals (${COLUMNS}) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10) ` +
   `ON CONFLICT (proposal_ts) DO NOTHING`;
 const IN_THREAD = `SELECT ${COLUMNS} FROM blueprint_proposals WHERE channel_id = ?1 AND thread_ts = ?2 ORDER BY written_at, proposal_ts`;
-const LINK = `UPDATE blueprint_proposals SET card_id = ?3, linked_at = ?4 WHERE channel_id = ?1 AND thread_ts = ?2 AND card_id IS NULL`;
+const LINK = `UPDATE blueprint_proposals SET card_id = ?3, linked_at = ?4 WHERE channel_id = ?1 AND thread_ts = ?2 AND card_id IS NULL AND withdrawn_at IS NULL`;
 const UNLINKED =
   `SELECT ${COLUMNS} FROM blueprint_proposals WHERE card_id IS NULL AND written_at <= ?1 ` +
   `ORDER BY written_at, proposal_ts LIMIT ?2`;
@@ -43,6 +43,7 @@ const RELEASE_OFFER = `UPDATE blueprint_proposals SET offered_at = NULL WHERE pr
 
 const changed = (res: unknown) => Number((res as { meta?: { changes?: number } } | null)?.meta?.changes ?? 0);
 const timeOrNull = (v: unknown) => (v == null ? null : Number(v));
+const BY_CARD = `SELECT ${COLUMNS} FROM blueprint_proposals WHERE card_id = ?1 AND withdrawn_at IS NULL ORDER BY written_at, proposal_ts LIMIT ?2`;
 
 type Row = Record<
   "proposal_ts" | "channel_id" | "thread_ts" | "reply_ts" | "requester_id" | "path_id" | "today_path_id" | "cell_ids" | "written_at" | "card_id",
@@ -127,6 +128,11 @@ export function createD1ProposalRecords(deps: { db: ProposalDatabase; now?: () =
     async releaseOffer(proposalTs) {
       chargeD1Query();
       await db.prepare(RELEASE_OFFER).bind(proposalTs).run();
+    },
+    async byCard(cardId, limit) {
+      chargeD1Query();
+      const { results } = await db.prepare(BY_CARD).bind(cardId, limit).all<Row>();
+      return results.map(fromRow);
     },
   };
 }

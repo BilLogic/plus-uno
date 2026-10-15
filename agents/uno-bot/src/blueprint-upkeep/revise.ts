@@ -144,6 +144,12 @@ async function redraft(
     if (fromReview) await deps.clearRevising(old.proposalTs).catch(() => {});
   };
 
+  // A path's retirement is its status alone: approved or rejected, never redrafted.
+  if (r.draft.retires) {
+    await unlock();
+    return say(`${card.n}. *${label}* only sets the path's status, so there is nothing to redraft: approve it, or reject it to keep the path as it is.`);
+  }
+
   let next: typeof r | null = null;
   let deprecate: PlannedRows["deprecate"] = [];
   try {
