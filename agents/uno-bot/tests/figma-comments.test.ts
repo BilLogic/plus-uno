@@ -24,7 +24,7 @@ import { DECISION_CARD_TTL_MS, figmaDecisionsSection, MAX_NO_PRD_REPLIES } from 
 import { candidateThreads, readable } from "../src/figma-comments/threads";
 import { dividerSection, pageOf, pagesOf } from "../src/figma-comments/sections";
 import { cardNumbersOf } from "../src/figma-comments/title";
-import { dueAt, figmaHandlesFrom, questionsSection } from "../src/figma-comments/triage";
+import { dueAt, questionsSection } from "../src/figma-comments/triage";
 import { modelDecisionDetector, type DecisionInput } from "../src/figma-comments/detector";
 import { numberedReply, reviseDecision, rewordCue, type ReviseDeps } from "../src/figma-comments/revise";
 import { NEEDS_CHANGES_LEAD, cardSentBack } from "../src/slack/review-door";
@@ -858,12 +858,16 @@ describe("an unanswered question, raised after two workdays", () => {
     assert.equal(posts(h).length, 1);
   });
 
-  it("DMs a mapped @-name instead of posting, and names an unmapped one on the channel card", async () => {
+  /** The night's comments with c10 asking `message`, and one by Sarah K, so her Figma id is on the file. */
+  const asking = (message: string) => [
+    ...COMMENTS.map((c) => (c.id === "c10" ? { ...c, message } : c)),
+    comment("c12", { handle: "Sarah K", created_at: "2026-09-29T14:00:00Z", message: "Card states are in", client_meta: pin("8:1") }),
+  ];
+
+  it("DMs a person the Team Members Figma map knows through their commenter id, and names an unmapped one on the channel card", async () => {
     const client = seededFigma();
-    client.seedFile(FILE, {
-      comments: COMMENTS.map((c) => (c.id === "c10" ? { ...c, message: "@Sarah K should the bar animate? cc @bea" } : c)),
-    });
-    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { handles: "Sarah K=U0SARAH" } });
+    client.seedFile(FILE, { comments: asking("@Sarah K should the bar animate? cc @bea") });
+    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { people: { "u-Sarah K": "U0SARAH" } } });
     await runSweepJob(NIGHT, h.deps);
     await morning(h, FRIDAY);
     assert.deepEqual(h.figma.triage.dms.map((d) => d.to), ["U0SARAH"]);
@@ -873,16 +877,25 @@ describe("an unanswered question, raised after two workdays", () => {
     );
     assert.equal(posts(h).length, 1);
     assert.equal(posts(h)[0]!.channel, TOOLKIT);
-    assert.match(posts(h)[0]!.text, / It names bea, who isn't matched to a Slack account yet\. /);
+    assert.match(posts(h)[0]!.text, / It names bea, who isn't matched to a Slack account yet\. /, "bea commented, but the map has no entry for her id");
     assert.doesNotMatch(posts(h)[0]!.text, /names Sarah K/, "the mapped person is DMed, not named");
+  });
+
+  it("names on the channel card a handle with no commenter id on the file, whatever the map holds", async () => {
+    const client = seededFigma();
+    client.seedFile(FILE, { comments: COMMENTS.map((c) => (c.id === "c10" ? { ...c, message: "@dana should the bar animate?" } : c)) });
+    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { people: { "u-dana": "U0DANA" } } });
+    await runSweepJob(NIGHT, h.deps);
+    await morning(h, FRIDAY);
+    assert.deepEqual(h.figma.triage.dms, [], "no commenter id for @dana on the file, so nobody is DMed");
+    assert.equal(posts(h).length, 1);
+    assert.match(posts(h)[0]!.text, / It names dana, who isn't matched to a Slack account yet\. /);
   });
 
   it("sends only the DM when everyone it names is mapped", async () => {
     const client = seededFigma();
-    client.seedFile(FILE, {
-      comments: COMMENTS.map((c) => (c.id === "c10" ? { ...c, message: "@Sarah K should the bar animate?" } : c)),
-    });
-    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { handles: "sarah k=U0SARAH" } });
+    client.seedFile(FILE, { comments: asking("@sarah k should the bar animate?") });
+    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { people: { "u-Sarah K": "U0SARAH" } } });
     await runSweepJob(NIGHT, h.deps);
     await morning(h, FRIDAY);
     assert.deepEqual(h.figma.triage.dms.map((d) => d.to), ["U0SARAH"]);
@@ -893,10 +906,8 @@ describe("an unanswered question, raised after two workdays", () => {
 
   it("waits for the invite when the card is refused, and never DMs again the people it already reached", async () => {
     const client = seededFigma();
-    client.seedFile(FILE, {
-      comments: COMMENTS.map((c) => (c.id === "c10" ? { ...c, message: "@Sarah K should the bar animate? cc @bea" } : c)),
-    });
-    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { handles: "Sarah K=U0SARAH" } });
+    client.seedFile(FILE, { comments: asking("@Sarah K should the bar animate? cc @bea") });
+    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { people: { "u-Sarah K": "U0SARAH" } } });
     h.notInChannel.add(TOOLKIT);
     await runSweepJob(NIGHT, h.deps);
     await morning(h, FRIDAY);
@@ -919,11 +930,9 @@ describe("an unanswered question, raised after two workdays", () => {
 
   it("retries next morning only the mapped person whose DM failed", async () => {
     const client = seededFigma();
-    client.seedFile(FILE, {
-      comments: COMMENTS.map((c) => (c.id === "c10" ? { ...c, message: "@Sarah K @bea should the bar animate?" } : c)),
-    });
+    client.seedFile(FILE, { comments: asking("@Sarah K @bea should the bar animate?") });
     const dmFails = ["U0BEA"];
-    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { handles: "Sarah K=U0SARAH,bea=U0BEA", dmFails } });
+    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { people: { "u-Sarah K": "U0SARAH", "u-bea": "U0BEA" }, dmFails } });
     await runSweepJob(NIGHT, h.deps);
     const friday = await morning(h, FRIDAY);
     assert.deepEqual(h.figma.triage.dms.map((d) => d.to), ["U0SARAH"]);
@@ -978,11 +987,10 @@ describe("an unanswered question, raised after two workdays", () => {
     assert.ok(dueAt(friday) <= Date.parse("2026-10-07T13:00:00Z"), "by Wednesday's morning run");
   });
 
-  it("reads the handle map as handle=Slack id pairs, and refuses anything else", () => {
-    assert.deepEqual(figmaHandlesFrom("Sarah K=U0SARAH, @bea=U0BEA"), { "sarah k": "U0SARAH", bea: "U0BEA" });
-    assert.deepEqual(figmaHandlesFrom(""), {});
-    assert.throws(() => figmaHandlesFrom("sarah=someone"), /not handle=<Slack id>/);
-    assert.throws(() => figmaHandlesFrom("bea=U0A,Bea=U0B"), /appears twice/);
+  it("keeps no hand-kept handle map: the Team Members Figma map is the one people map", () => {
+    for (const file of ["wrangler.toml", "src/types.ts"]) {
+      assert.doesNotMatch(readFileSync(resolve(process.cwd(), file), "utf8"), /FIGMA_HANDLE_SLACK_IDS/, file);
+    }
   });
 
   it("keeps nothing on a dry run", async () => {

@@ -9,6 +9,7 @@
 import { rethrowIfBudget } from "../net";
 import { workerCardEvent, type ProposalEvent } from "../usage/proposal-events";
 import type { FigmaClient, FigmaComment } from "../figma/client";
+import { slackPersonOfFigma, type FigmaPeople } from "../usage/roles";
 import { asksUno, isOwnComment } from "../figma-ask/trigger";
 import { etDayOf, etHourOn } from "../sweep/schedule";
 import { escapeSlackText } from "../slack/mrkdwn";
@@ -76,8 +77,8 @@ export interface TriagePorts {
   };
   /** The Figma file's team, as `FIGMA_TEAM_IDS` names it; null when unknown. */
   fileTeam(fileKey: string): Promise<string | null>;
-  /** The hand-kept Figma handle → Slack id map, its handles lower-cased. */
-  handles: Record<string, string>;
+  /** The Team Members Figma map: Figma user id → Slack id. */
+  people(): Promise<FigmaPeople>;
   /** The ladder's channel ids. */
   channels: ChannelIds;
   /** DM a person; whether it posted. */
@@ -85,26 +86,6 @@ export interface TriagePorts {
   /** Put a channel card on the usage record (`workerCardEvent`). Best-effort:
    *  a failed write never unsends the card. */
   recordCard(event: ProposalEvent): Promise<void>;
-}
-
-/**
- * The hand-kept Figma handle → Slack id map, from `handle=U…` pairs,
- * comma-separated. Handles are matched in any case.
- *
- * @param raw - The setting: `Sarah K=U0123ABCD,bea=U0456EFGH`
- * @throws When an entry is not `handle=<Slack id>`, or a handle appears twice
- */
-export function figmaHandlesFrom(raw: string | undefined): Record<string, string> {
-  const map: Record<string, string> = {};
-  if (!raw?.trim()) return map;
-  for (const entry of raw.split(",")) {
-    const m = /^\s*([^=]*\S)\s*=\s*([UW][A-Z0-9]+)\s*$/.exec(entry);
-    if (!m) throw new Error(`FIGMA_HANDLE_SLACK_IDS: "${entry.trim()}" is not handle=<Slack id>`);
-    const handle = m[1]!.replace(/^@/, "").toLowerCase();
-    if (map[handle]) throw new Error(`FIGMA_HANDLE_SLACK_IDS: ${m[1]} appears twice`);
-    map[handle] = m[2]!;
-  }
-  return map;
 }
 
 /**
@@ -218,6 +199,7 @@ export async function handOverUnanswered(
   const result: TriageResult = { raised: 0, notes: [] };
   const left = () => opts.meter?.headroom().subrequests ?? Number.POSITIVE_INFINITY;
   const byPlace = new Map<string, HandedQuestion[]>();
+  let people: FigmaPeople | null = null;
   for (const file of await ports.watch.list()) {
     const due = file.questions.filter((q) => dueAt(Date.parse(q.createdAt)) <= opts.now);
     if (!due.length) continue;
@@ -243,7 +225,8 @@ export async function handOverUnanswered(
         done.add(q.commentId);
         continue;
       }
-      const named = namedIn(root.message, root.user.handle, ports.handles, comments);
+      people ??= await ports.people();
+      const named = namedIn(root.message, root.user.handle, people, comments);
       if (left() < named.mapped.length * DM_COST) {
         result.notes.push("the budget left could not raise every question, so some wait for tomorrow");
         stopped = true;
@@ -339,31 +322,39 @@ export function questionsSection(ports: TriagePorts, handOff: SectionHandOff<Que
   });
 }
 
-/** The people a question @-names: those the map has, by Slack id, and those it does not, by handle. */
+/** The people a question @-names: those the Team Members map has, by Slack id, and those it does not, by handle. */
 interface Named {
   mapped: Array<{ handle: string; slack: string }>;
   unmapped: string[];
 }
 
 /**
- * The people a comment @-names. A handle the map has, or a commenter's on the
- * file, is matched whole, longest first, so `@Sarah K` is one person; any
- * other `@word` is a person by that word. Never uno-bot, never the asker.
+ * The people a comment @-names. A commenter's handle on the file is matched
+ * whole, longest first, so `@Sarah K` is one person, and reaches Slack through
+ * that commenter's Figma user id in the Team Members map; any other `@word`
+ * is a person by that word, unmapped. A handle two commenters' ids share maps
+ * to nobody. Never uno-bot, never the asker.
  *
  * @param message - The question
  * @param asker - Its asker's handle
- * @param handles - The Figma handle → Slack id map, lower-cased
- * @param comments - The file's comments, whose authors are known handles
+ * @param people - The Team Members Figma map: Figma user id → Slack id
+ * @param comments - The file's comments, each carrying its author's id and handle
  */
-export function namedIn(message: string, asker: string, handles: Record<string, string>, comments: readonly FigmaComment[]): Named {
-  const known = [...new Set([...Object.keys(handles), ...comments.map((c) => c.user.handle.toLowerCase())])].sort((a, b) => b.length - a.length);
+export function namedIn(message: string, asker: string, people: FigmaPeople, comments: readonly FigmaComment[]): Named {
+  const ids = new Map<string, string | null>();
+  for (const { user } of comments) {
+    const key = user.handle.toLowerCase();
+    const id = ids.get(key);
+    ids.set(key, id === undefined || id === user.id ? user.id : null);
+  }
+  const known = [...ids.keys()].sort((a, b) => b.length - a.length);
   const out: Named = { mapped: [], unmapped: [] };
   const seen = new Set<string>([asker.toLowerCase()]);
   const add = (handle: string) => {
     const key = handle.toLowerCase();
     if (seen.has(key)) return;
     seen.add(key);
-    const slack = handles[key];
+    const slack = slackPersonOfFigma(ids.get(key), people);
     if (slack) out.mapped.push({ handle, slack });
     else out.unmapped.push(handle);
   };

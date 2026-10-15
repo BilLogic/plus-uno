@@ -22,8 +22,9 @@
 //     read by the sweep's post (`figmaDecisionsSectionFor`).
 //   • The unanswered-question triage (`./triage.ts`): its watch list and
 //     raised marks in HARNESS_KV with an expiry; each file's Figma team from
-//     the nightly backstop's state, one KV read a morning; the hand-kept
-//     handle map, `FIGMA_HANDLE_SLACK_IDS`; the ladder's channel ids; a DM,
+//     the nightly backstop's state, one KV read a morning; the Team Members
+//     Figma map the daily sync keeps (`figmaPeopleFor`), one KV read a
+//     morning, and only once a question is due; the ladder's channel ids; a DM,
 //     after `conversations.open`; and a line on the sweep's morning message,
 //     through the hand-off, which goes on the usage record as staged by the
 //     Worker once it is up.
@@ -46,7 +47,7 @@ import { decisionRowsOf, queryRoadmapCards } from "../integrations/notion";
 import { openConversation, postMessage, updateMessage } from "../slack/api";
 import { channelIdsFor } from "../destination/env";
 import { BACKSTOP_STATE_KEY, type BackstopState } from "../figma-notify/backstop";
-import { figmaHandlesFrom, questionsSection, QUESTIONS_SECTION, type Posted, type QuestionsHanded, type TriagePorts, type WatchedFile } from "./triage";
+import { questionsSection, QUESTIONS_SECTION, type Posted, type QuestionsHanded, type TriagePorts, type WatchedFile } from "./triage";
 import { ladderChannelsFor } from "../destination/env";
 import { channelMembers } from "../slack/channel-members";
 import { threadStateFor } from "../thread-state/production";
@@ -216,12 +217,6 @@ export const RAISED_TTL_S = 90 * DAY_S;
 
 /** The triage's ports on HARNESS_KV and Slack. */
 export function triageOn(env: Env, kv: KVNamespace): TriagePorts {
-  let handles: Record<string, string> = {};
-  try {
-    handles = figmaHandlesFrom(env.FIGMA_HANDLE_SLACK_IDS);
-  } catch (err) {
-    console.warn(`[figma-comments] FIGMA_HANDLE_SLACK_IDS unread, so nobody is DMed: ${err instanceof Error ? err.message : String(err)}`);
-  }
   let teams: Promise<Record<string, string>> | null = null;
   const post = async (channel: string, text: string): Promise<Posted> => {
     const res = await postMessage(env, { channel, text });
@@ -276,7 +271,7 @@ export function triageOn(env: Env, kv: KVNamespace): TriagePorts {
       })();
       return (await teams)[fileKey] ?? null;
     },
-    handles,
+    people: () => figmaPeopleFor(env),
     channels: channelIdsFor(env),
     async dm(slackId, text) {
       const open = await openConversation(env, slackId);
