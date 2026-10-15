@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **96,529 chars from 9 files**, against an assembled budget of 175,500 (78,971 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 76,145 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **96,668 chars from 9 files**, against an assembled budget of 175,500 (78,832 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 76,284 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,145 (−7,897 ide-only) | 10,145 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 13,331 | 23,505 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 20,901 | 44,447 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 46,093 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,015 | 47,168 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 52,861 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 64,647 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 16,358 (−5,976 ide-only) | 81,056 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 84,524 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 91,040 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 95,673 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 96,529 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 13,470 | 23,644 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 20,901 | 44,586 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 46,232 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,015 | 47,307 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 53,000 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 64,786 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 16,358 (−5,976 ide-only) | 81,195 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 84,663 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 91,179 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 95,812 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 96,668 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -303,7 +303,7 @@ A proposal card retired by a revision staged later in the same thread, or the mo
 _Avoid_: "expired card"
 
 **sweep**:
-The end-of-day read of every source uno-bot watches, DMs with it included, for **drift** and each **commitment** (a task someone took on); the next weekday morning posts one **decision card** a place.
+The end-of-day read of every source uno-bot watches, DMs with it included, for **drift** and each **commitment** (a task someone took on); the next weekday morning posts one message a place, each job's **decision cards** on it.
 _Avoid_: "digest", "scan"
 
 **relayed DM**:
@@ -342,11 +342,10 @@ A **source** is a link a lookup of the same turn returned, which an answer stand
 _Avoid_: "citation", "reference", "Sources:" line in the answer text
 
 **Capture** / **Reconcile** / **Follow through**:
-The three families of unprompted work: was it written down, do the sources agree, did it get done. DM Capture is the opt-in switch that adds a person's own DMs to Capture.
-_Avoid_: "capture" for logging a lesson
+The three families of unprompted work: was it written down, do the sources agree, did it get done. DM Capture is the opt-in switch that adds a person's own DMs; uno-maintain's knowledge capture is a different thing.
 
 **DS precedence**:
-uno-storybook > BS4 Foundation library > Figma spec pages: the rule Reconcile settles a design-system disagreement by, and its weekly check; the loser gets an intake.
+The order Reconcile settles a design-system disagreement by (`AGENTS.md` § Conventions), and its weekly check of code against the Figma library.
 
 **le goat**:
 uno-bot's name in Slack and Figma (🐐), the one people @-mention.
@@ -358,32 +357,32 @@ _Avoid_: "GOAT" for the **lead**
 uno-bot's D1 database `uno-bot-usage`; each published number is a saved query in `agents/uno-bot/queries/usage/` (cited below as `usage/`).
 
 **ask** / **turn**:
-A turn is "every message the bot answered, follow-ups included"; an ask is "a turn whose own message opened a thread" (`usage/load-on-lead.sql:10`).
+A turn is "every message the bot answered, follow-ups included"; an ask is "a turn whose own message opened a thread" (`usage/load-on-lead.sql:10-12`).
 
 **escalated to the lead**:
-"escalated_to_lead = 1", read from the lead's replies and DMs "by topic" (`usage/load-on-lead.sql:4,20`). Not an **Escalation**.
+"escalated_to_lead = 1" (`usage/load-on-lead.sql:4`): the lead answered in the thread or in a DM on its topic, so the count "leans HIGH" (`:20-21`). Not an **Escalation**.
 
 **settled**:
 "escalated_to_lead known" after the end-of-day pass (`usage/self-serve-rate.sql:15`); the rest are `pending`.
 
 **self-served**:
-"escalated_to_lead = 0 and a resolution of `reaction`", `task_completed` or `no_escalation` (`usage/self-serve-rate.sql:5`).
+A settled ask with escalated_to_lead = 0 and a resolution of `reaction`, `task_completed` or `no_escalation` (`usage/self-serve-rate.sql:5-7`).
 _Avoid_: "deflected"
 
 **approved with edits**:
-"✅ on a card whose staged row names the card it revised", or whose Review pop-up edits changed it (`usage/proposal-outcomes.sql:10`).
+"✅ on a card whose staged row names the card it revised", or whose Review pop-up edits changed it (`usage/proposal-outcomes.sql:10-13`).
 
 **test traffic**:
-`test_traffic = 1`: a turn in #uno-bot-sandbox, or a greeting; every query "Excludes: test traffic" (`usage/self-serve-rate.sql:35`).
+`test_traffic = 1`, set by `isTestTraffic` (`agents/uno-bot/src/usage/record.ts:96`): a sandbox or debug turn, or a greeting; every query "Excludes: test traffic" (`usage/self-serve-rate.sql:35`).
 
 **measurement window**:
 "2026-09-01 to 2027-01-01, the measurement window" (`usage/load-on-lead.sql:34`), closing at about 100 real asks: `docs/engineering/measurement-window.md`.
 
 **housekeeping**:
-For asks to uno-bot, "housekeeping (1–5 and 7" by pain_category (`usage/load-on-lead.sql:27`); for the lead's inbox, any `what_it_took` but "Needs the lead's judgment" (`agents/uno-bot/measurement/housekeeping-sort/prompt.md`).
+For asks to uno-bot, pain_category 1–5 and 7 (`usage/load-on-lead.sql:27`); for the lead's inbox, any `what_it_took` but "Needs the lead's judgment" (`agents/uno-bot/measurement/housekeeping-sort/prompt.md`).
 
 **Asks corpus**:
-The Notion database of 2,413 asks to the lead that the housekeeping baseline was counted from (`housekeeping-sort/lib.mjs:13,19`).
+The Notion database of 2,413 asks to the lead that the housekeeping baseline was counted from (`agents/uno-bot/measurement/housekeeping-sort/lib.mjs:13,19`).
 _Avoid_: bare "corpus"
 
 ### Harness
@@ -427,8 +426,8 @@ The two maintenance severities: a trivial fix committed straight to main, vs a P
 _Avoid_: "Tier 1", "Tier 2"
 
 **Tier 1 / Tier 2 / Tier 3**:
-The loading tiers: always-loaded · on demand · retrieved live. A model's tier is "model tier", always.
-_Avoid_: "Tier" for a maintenance severity or a model
+The loading tiers: always-loaded · on demand · retrieved live.
+_Avoid_: "Tier" for a maintenance severity, or for a model's tier (say "model tier")
 
 **disclosed**:
 Reference pushed out of the always-loaded tier behind a pointer, loaded only when it fires. For uno-bot, a doc declares `disclosure: reference` and is read through `read_reference`.

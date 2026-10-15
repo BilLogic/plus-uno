@@ -114,8 +114,7 @@ export const RETIRED = [
  * precisely so this sweep has something to point at, and so cannot be swept.
  * One entry per retirement, keyed by the file that holds it — the maintenance
  * severities in the glossary, and the ModelProvider seam that retired the
- * provider sense of "lane" in the Worker README's § Worker seams, where the
- * code-seam words moved when the glossary became a glossary only. Matched on
+ * provider sense of "lane" in the Worker README's § Worker seams. Matched on
  * the entry's `**Term**:` line; the exemption is that entry's `_Avoid_:` line
  * and no other.
  */

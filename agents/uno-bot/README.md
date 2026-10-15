@@ -24,7 +24,7 @@ Because the brain is bundled, **guidance changes reach the bot on `deploy`, not 
 
 ### Worker seams
 
-The words the Worker's code is organised by; `GLOSSARY.md` keeps the words people use about the bot.
+The words the Worker's code is organised by; `GLOSSARY.md` keeps the words people use about the bot. A **Turn** runs the one agent loop through **ModelProvider**; each tool call is dispatched by its **tool table** row, a staged one waits on **Gate**, and **ThreadState** carries the thread from one turn to the next.
 
 **Turn**:
 One uno-bot turn (`agents/uno-bot/src/turn/`): one request in (who, where, the text, the images, the pending proposal), one outcome out (what was posted, what is staged, what the conversation remembers). What a person sees while it runs goes through its **Delivery** port.
