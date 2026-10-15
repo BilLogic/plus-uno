@@ -55,6 +55,17 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
     "figma-library-poll",
     "card-follow-through",
     "blueprint-shipped",
+    "blueprint-shipped",
+    "blueprint-shipped",
+    "blueprint-shipped",
+    "blueprint-shipped",
+    "blueprint-shipped",
+    "blueprint-draft",
+    "blueprint-draft",
+    "blueprint-draft",
+    "blueprint-draft",
+    "blueprint-draft",
+    "blueprint-draft",
     "figma-drift-recheck",
     "figma-backstop",
     "figma-backstop",
@@ -197,6 +208,8 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
     // Each revision drafted from shipped work, to its card's place.
     ["blueprint-revision-post", "blueprint-revision-post"],
     ["sweep-post", "sweep-post"],
+    // After it: the revisions its carousel had no room for, in its thread.
+    ["blueprint-revision-thread", "blueprint-revision-thread"],
     ["team-roles-sync", "team-roles-sync"],
     // Both runs purge, so text never outlives its 14 days over a weekend.
     ["usage-text-purge", "usage-text-purge"],
@@ -206,7 +219,19 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
   assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind, j.after]), [
     ["figma-library-poll", "figma-library-poll", undefined],
     ["card-follow-through", "card-follow-through", undefined],
-    ["blueprint-shipped", "blueprint-shipped", undefined],
+    // Blueprint upkeep's matching, then its drafting, cut into jobs by cost.
+    ["blueprint-shipped-1", "blueprint-shipped", undefined],
+    ["blueprint-shipped-2", "blueprint-shipped", undefined],
+    ["blueprint-shipped-3", "blueprint-shipped", undefined],
+    ["blueprint-shipped-4", "blueprint-shipped", undefined],
+    ["blueprint-shipped-5", "blueprint-shipped", undefined],
+    ["blueprint-shipped-6", "blueprint-shipped", undefined],
+    ["blueprint-draft-1", "blueprint-draft", undefined],
+    ["blueprint-draft-2", "blueprint-draft", undefined],
+    ["blueprint-draft-3", "blueprint-draft", undefined],
+    ["blueprint-draft-4", "blueprint-draft", undefined],
+    ["blueprint-draft-5", "blueprint-draft", undefined],
+    ["blueprint-draft-6", "blueprint-draft", undefined],
     ["figma-drift-recheck", "figma-drift-recheck", undefined],
     // The Figma backstop's sweep, in as many jobs as it may need (#896).
     ["figma-backstop-1", "figma-backstop", undefined],

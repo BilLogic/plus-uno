@@ -45,6 +45,7 @@ import { isIntakeChannel } from "../turn/intake-channel";
 import { handlePrecedenceGateReply, isPrecedenceGateCandidate, isWeeklyPrecedenceThread } from "../ds-precedence/env";
 import { handleFigmaDecisionReply, isFigmaDecisionCandidate, isFigmaDecisionThread } from "../figma-comments/env";
 import { handleCardReplyOnEnv, isCardReplyCandidate, mayBeCardReply } from "../follow-through/env";
+import { handleRevisionReplyOnEnv, isRevisionReplyCandidate, isRevisionThread } from "../blueprint-upkeep/env";
 import { recheckOnUpdateOnEnv } from "../figma-drift/env";
 import { typedEmojiDecision } from "../gate/reactions";
 import { runFigmaEventJob } from "../figma-notify/job";
@@ -494,7 +495,8 @@ async function onMessage(env: Env, event: SlackMessageEvent, reply?: string | nu
 /**
  * The ahead-of-the-turn handler a message is for, decided once when it is
  * queued: a typed ✅/⛔ in a weekly DS precedence thread, which gets the
- * review-only line, a reply in a Figma comment-decision thread, which may reword one of its decisions, or
+ * review-only line, a reply in a Figma comment-decision thread, which may reword one of its decisions,
+ * a reply in a thread holding blueprint revision cards, which may redraft one, or
  * an answer in a thread holding a card follow-up (each one KV read, and only
  * for a message of the right shape). Null for none.
  *
@@ -504,6 +506,7 @@ async function onMessage(env: Env, event: SlackMessageEvent, reply?: string | nu
 export async function replyHandlerAt(env: Env, msg: SlackMessageEvent): Promise<string | null> {
   if (isPrecedenceGateCandidate(env, msg) && (await isWeeklyPrecedenceThread(env, msg.channel, msg.thread_ts!))) return "ds-precedence";
   if (isFigmaDecisionCandidate(env, msg) && (await isFigmaDecisionThread(env, msg.channel, msg.thread_ts!))) return "figma-decisions";
+  if (isRevisionReplyCandidate(env, msg) && (await isRevisionThread(env, msg.channel, msg.thread_ts!).catch(() => false))) return "blueprint-revisions";
   if (await mayBeCardReply(env, msg)) return "follow-through";
   return null;
 }
@@ -515,6 +518,13 @@ export function replyHandlersFor(env: Env): ReplyHandler[] {
   return [
     { name: "ds-precedence", candidate: (e) => isPrecedenceGateCandidate(env, e), handle: (e) => handlePrecedenceGateReply(env, e) },
     { name: "figma-decisions", candidate: (e) => isFigmaDecisionCandidate(env, e), handle: (e) => handleFigmaDecisionReply(env, e) },
+    // A revision thread is the morning message's, which may hold card
+    // follow-ups too: an answer to one of those is theirs first.
+    {
+      name: "blueprint-revisions",
+      candidate: (e) => isRevisionReplyCandidate(env, e),
+      handle: async (e) => (isCardReplyCandidate(env, e) && (await handleCardReplyOnEnv(env, e))) || handleRevisionReplyOnEnv(env, e),
+    },
     { name: "follow-through", candidate: (e) => isCardReplyCandidate(env, e), handle: (e) => handleCardReplyOnEnv(env, e) },
   ];
 }

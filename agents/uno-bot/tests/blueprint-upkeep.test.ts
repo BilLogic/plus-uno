@@ -142,6 +142,10 @@ function world(opts: {
     placeOf: (card) => (card.pillars.includes("Tutoring") ? TEAM : DESIGN),
     billId: BILL,
     state: state.store,
+    weighed: (() => {
+      const marks = new Set<string>();
+      return { has: async (k: string) => marks.has(k), add: async (k: string) => void marks.add(k) };
+    })(),
     now: () => NOW,
   };
   return { deps, state, searched };
@@ -155,6 +159,9 @@ function morning(state: ReturnType<typeof box<UpkeepState>>) {
   const section = revisionSection(
     {
       state: state.store,
+      threads: { read: async () => null, write: async () => {} },
+      post: async () => {},
+      now: () => NOW,
       stage: async (proposal) => {
         staged.push(proposal);
         await threadState.putProposal(proposal);

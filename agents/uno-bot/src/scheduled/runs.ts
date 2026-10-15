@@ -23,6 +23,7 @@ import type { RunnerStorage } from "../runner/storage";
 import { END_OF_DAY_RUN_HOUR_ET, etDayOf, etParts, isWorkday, MORNING_RUN_HOUR_ET, sweptDayOf } from "../sweep/schedule";
 import { CLASSIFY_BATCHES } from "../usage/classify-run";
 import { ASK_RESOLUTION_JOBS } from "../usage/resolution-pass";
+import { DRAFT_JOBS as UPKEEP_DRAFT_JOBS, MATCH_JOBS as UPKEEP_MATCH_JOBS } from "../blueprint-upkeep/budget";
 
 /** The end-of-day run's first `ask-resolution` job: the one that announces a
  *  missing token, and the one a dry run rehearses. */
@@ -104,11 +105,12 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * Dev Mode links card for the PRs merged into main since the last one that
  * changed a design-system component (src/figma-links/feed.ts), while
  * `FIGMA_DEV_LINKS` is on (src/figma-links/morning.ts).
- * Blueprint upkeep's two: the end-of-day `blueprint-shipped` weighs the
- * Roadmap cards deployed since its last run and drafts a blueprint revision
- * for each that changes the service, and the morning
- * `blueprint-revision-post` hands each to the sweep's message at its card's
- * place (src/blueprint-upkeep/).
+ * Blueprint upkeep's four: the end-of-day `blueprint-shipped` jobs weigh the
+ * Roadmap cards deployed since the last run and queue each path a card
+ * changes, and the `blueprint-draft` jobs draft each path's blueprint
+ * revision; the morning `blueprint-revision-post` hands each to the sweep's
+ * message at its card's place, and `blueprint-revision-thread` puts the ones
+ * its carousel had no room for in its thread (src/blueprint-upkeep/).
  * Every morning job that finds cards for a team channel hands them to
  * `sweep-post`, which runs after them all, so a place gets one message.
  */
@@ -144,7 +146,9 @@ export type ScheduledJobKind =
   | "figma-tidy-post"
   | "figma-dev-links-post"
   | "blueprint-shipped"
-  | "blueprint-revision-post";
+  | "blueprint-draft"
+  | "blueprint-revision-post"
+  | "blueprint-revision-thread";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -266,6 +270,9 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "blueprint-revision-post", kind: "blueprint-revision-post" },
     // After every hand-over: a job not planned today counts as done.
     { key: "sweep-post", kind: "sweep-post", after: [...MORNING_SECTIONS] },
+    // After the sweep's post and the place jobs it spawns, which run right
+    // behind it: the revisions a carousel had no room for, in its thread.
+    { key: "blueprint-revision-thread", kind: "blueprint-revision-thread", after: ["sweep-post"] },
     { key: "team-roles-sync", kind: "team-roles-sync" },
     // Both runs purge, so no text outlives 14 days across a weekend and one
     // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).
@@ -277,9 +284,12 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "ds-precedence-check", kind: "ds-precedence-check", weekday: MONDAY },
     // Early too, for the same reason: one Roadmap read, a few lookups a card.
     { key: "card-follow-through", kind: "card-follow-through" },
-    // Before the batches too: a Roadmap read, then a judgement, a search, a
-    // path read and a draft for each of at most two cards.
-    { key: "blueprint-shipped", kind: "blueprint-shipped" },
+    // Before the batches too: blueprint upkeep's matching, then its drafting,
+    // cut into jobs sized by cost (src/blueprint-upkeep/env.ts states the
+    // math). Each takes what the last left, so a quiet night's later jobs find
+    // nothing.
+    ...Array.from({ length: UPKEEP_MATCH_JOBS }, (_, i) => ({ key: `blueprint-shipped-${i + 1}`, kind: "blueprint-shipped" as const })),
+    ...Array.from({ length: UPKEEP_DRAFT_JOBS }, (_, i) => ({ key: `blueprint-draft-${i + 1}`, kind: "blueprint-draft" as const })),
     // A live drift question is looked at again in both runs, so a file that
     // caught up during the day withdraws it by morning.
     { key: "figma-drift-recheck", kind: "figma-drift-recheck" },

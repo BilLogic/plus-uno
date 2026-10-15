@@ -30,7 +30,7 @@ import { runBackstopOnEnv } from "../figma-notify/env";
 import { runTidyPostOnEnv, runTidyReadOnEnv, tidySectionFor } from "../figma-tidy/env";
 import { devLinksSectionFor, runDevLinksMorningOnEnv } from "../figma-links/env";
 import { dmThreadHookFor } from "../dm-sweep/env";
-import { revisionSectionFor, runRevisionPostOnEnv, runShippedRevisionsOnEnv } from "../blueprint-upkeep/env";
+import { revisionSectionFor, runRevisionPostOnEnv, runRevisionThreadOnEnv, runShippedDraftOnEnv, runShippedMatchOnEnv } from "../blueprint-upkeep/env";
 import { runProposalExpiry } from "../usage/index";
 import { runDmPromiseNudgesOnEnv, runDmPromiseReadOnEnv } from "../dm-watch/env";
 import { runDmCapturePostOnEnv, runDmCaptureReadOnEnv } from "../dm-watch/capture-env";
@@ -297,11 +297,18 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
     console.log(`[figma-links] ${job.key}: ${report.summary}`);
     return report;
   },
-  // End of day: the Roadmap cards deployed since the last run, each weighed by
-  // the service-change gate; a blueprint revision drafted for each that
-  // changes the service, kept for the morning (src/blueprint-upkeep/).
+  // End of day, one of several: the next Roadmap cards deployed since the
+  // last run, each weighed by the service-change gate, a path queued to draft
+  // for each path a card changes (src/blueprint-upkeep/).
   "blueprint-shipped": async (env, job, ctx) => {
-    const report = await runShippedRevisionsOnEnv(env, ctx);
+    const report = await runShippedMatchOnEnv(env, ctx);
+    console.log(`[blueprint-upkeep] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // End of day, one of several: the next queued paths, each drafted as a
+  // blueprint revision kept for the morning.
+  "blueprint-draft": async (env, job, ctx) => {
+    const report = await runShippedDraftOnEnv(env, ctx);
     console.log(`[blueprint-upkeep] ${job.key}: ${report.summary}`);
     return report;
   },
@@ -309,6 +316,13 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // card's place.
   "blueprint-revision-post": async (env, job, ctx) => {
     const report = await runRevisionPostOnEnv(env, ctx);
+    console.log(`[blueprint-upkeep] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // Morning, after the sweep's post: the revisions a carousel had no room
+  // for, up in its message's thread.
+  "blueprint-revision-thread": async (env, job, ctx) => {
+    const report = await runRevisionThreadOnEnv(env, ctx);
     console.log(`[blueprint-upkeep] ${job.key}: ${report.summary}`);
     return report;
   },

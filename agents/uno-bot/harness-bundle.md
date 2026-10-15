@@ -42,18 +42,18 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 133,322 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 133,893 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `blueprint-upkeep` | [`agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md`](../../agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md) | 1,797 |
+| `blueprint-upkeep` | [`agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md`](../../agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md) | 2,320 |
 | `critique-a-design` | [`agents/uno-bot/skills/critique-a-design/SKILL.md`](../../agents/uno-bot/skills/critique-a-design/SKILL.md) | 3,637 |
 | `dm-watch` | [`agents/uno-bot/scheduled-actions/dm-watch/ACTION.md`](../../agents/uno-bot/scheduled-actions/dm-watch/ACTION.md) | 2,820 |
 | `docs/connectors/figma/annotations` | [`docs/connectors/figma/annotations.md`](../../docs/connectors/figma/annotations.md) | 1,488 |
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,697 |
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,555 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
-| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,091 |
+| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,139 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,697 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 1,800 |
 | `figma-comments` | [`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) | 8,890 |
@@ -1132,11 +1132,11 @@ Drafting follows the same routing, not just answering: `skills/uno-synthesize` q
 
 <!-- canonical per ADR-017 (docs/adr/) · a scheduled action, read through read_reference as `blueprint-upkeep` · the code is agents/uno-bot/src/blueprint-upkeep/; the writer it stages is ADR-034's. -->
 
-Each end of day `blueprint-shipped` reads the Roadmap cards that reached `Dev Status: Deployed` since its last run and weighs each through the service-change gate: a judgement that the card changes who does what, or when, AND a confident `search_blueprint` match on one `scenario › path`. A card failing either gets nothing. A card passing both gets one **blueprint revision** for that path, drafted on the grind tier, and is weighed once.
+Each end of day the `blueprint-shipped-N` jobs read the Roadmap cards that reached `Design Status: Shipped` or `Dev Status: Deployed` since the last run and weigh each through the service-change gate: a judgement that the card or its PRD changes who does what, or when, AND a confident `search_blueprint` match. A card failing either gets nothing. A card passing both gets one **blueprint revision** for every `scenario › path` matched, each drafted on the grind tier by the `blueprint-draft-N` jobs, and is weighed once per status. A deploy whose design hand-off was drafted promotes those rows instead. Work left over at the end of a night waits for the next.
 
-The next morning, `blueprint-revision-post` hands each revision to the sweep's message at the card's place (`agents/uno-bot/scheduled-actions/sweep/ACTION.md` § One message a place): the pillar's team channel, else #plus-design. The card has six parts — `scenario › path` and the status change; why now (the RM-ID, its Roadmap status, one quoted sentence, a link); today's `step (lane)` rows with a link into the blueprint app; the proposed rows, added, changed or deprecated; confidence and what could not be verified; the ask. The why-now line speaks the Roadmap's words and every other part the blueprint's.
+The next morning, `blueprint-revision-post` hands each revision to the sweep's message at the card's place (`agents/uno-bot/scheduled-actions/sweep/ACTION.md` § One message a place): the pillar's team channel, else #plus-design. Each card is numbered; past the carousel's ten the message says "+N more in the thread" and `blueprint-revision-thread` posts those there. The card has six parts — `scenario › path` and the status change; why now (the RM-ID, its Roadmap status, one quoted sentence, a link); today's `step (lane)` rows with a link into the blueprint app; the proposed rows, added, changed, deprecated or promoted; confidence and what could not be verified; the ask. The why-now line speaks the Roadmap's words and every other part the blueprint's. In the thread uno-bot tags the card's owner with each thing a draft could not verify.
 
-Only the card's owner or Bill can approve it — the card names exactly those two, standing confirmers left out. Approve writes the rows `live` as uno-bot through the authoring RPCs, all or none (ADR-034). Reject, or 72 hours undecided, writes nothing. A change that needs a new step or lane is named under what could not be verified and left for a person, who adds the step or lane through `writers/blueprint`. A correction typed in the thread is not yet a redraft — point the person to Reject and to `writers/blueprint`.
+Only the card's owner or Bill can approve it — the card names exactly those two, standing confirmers left out. Approve writes the rows as uno-bot through the authoring RPCs, all or none (ADR-034). Reject, or 72 hours undecided, writes nothing. A reply in the thread from the owner or Bill redrafts that card in place — start it with the card's number (`2: …`) when they may approve several — and so does Review's Needs changes. A change that needs a new step or lane is named under what could not be verified and left for a person, who adds the step or lane through `writers/blueprint`.
 
 
 
@@ -1939,7 +1939,7 @@ THE standing-automation registry. An automation absent from the table below is u
 | End-of-day sweep | end-of-day run: `sweep-channel` (one per `SWEEP_CHANNELS` entry), `sweep-group-dms`, `sweep-dms`, `sweep-notes`, `sweep-cards`; morning run: `sweep-post`, after every job that hands it a section, spawns one `sweep-post:<place>` job a place — one message a place; `figma-drift-post`; both runs: `figma-drift-recheck` | Bill | [`sweep`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) |
 | Figma comments | end-of-day run: `sweep-figma-comments`; morning run: `sweep-figma-post`; an @uno ask, at `POST /figma/events` | Bill | [`figma-comments`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) |
 | Follow-through | end-of-day run: `card-follow-through`; morning run: `commitment-nudge` | Bill | [`follow-through`](../../agents/uno-bot/scheduled-actions/follow-through/ACTION.md) |
-| Blueprint upkeep | end-of-day run: `blueprint-shipped`; morning run: `blueprint-revision-post` | Bill | [`blueprint-upkeep`](../../agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md) |
+| Blueprint upkeep | end-of-day run: `blueprint-shipped`, `blueprint-draft`; morning run: `blueprint-revision-post`, `blueprint-revision-thread` | Bill | [`blueprint-upkeep`](../../agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md) |
 | DS precedence check | Monday's end-of-day run: `ds-precedence-check`; morning run: `ds-precedence-post` | Bill | [`ds-precedence`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) |
 | DM watch | per person who switched it on — end-of-day run: `dm-promise-read`; morning run: `dm-promise-nudge` | Bill | [`dm-watch`](../../agents/uno-bot/scheduled-actions/dm-watch/ACTION.md) |
 | DM Capture | per person who switched it on — end-of-day run: `dm-capture-read`; morning run: `dm-capture-post` | Bill | [`sweep`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) § Capture |

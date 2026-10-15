@@ -5,6 +5,7 @@
 
 export {
   confidentMatch,
+  confidentMatches,
   isConfidentRow,
   MATCH_SCORE_FLOOR,
   serviceChangeGate,
@@ -30,21 +31,35 @@ export {
   type MilestoneComparison,
 } from "./milestone";
 export {
+  DRAFT_COST,
+  DRAFT_JOBS,
+  draftMatched,
   handOverRevisions,
-  MAX_CARDS_PER_RUN,
+  MATCH_COST,
+  MATCH_JOBS,
+  matchShipped,
+  postOverflow,
+  replanRows,
   REVISION_CARD_TTL_MS,
   revisionSection,
   runShippedRevisions,
   stagedRevision,
   UPKEEP_SECTION,
+  weighedKey,
   type HandOverDeps,
+  type MatchedPath,
+  type OverflowDeps,
   type RevisionHanded,
+  type RevisionThread,
+  type RevisionThreadCard,
+  type RevisionThreads,
   type SectionDeps,
   type ShippedCard,
   type ShippedDeps,
   type ShippedReport,
   type UpkeepState,
   type WaitingRevision,
+  type WeighedMarks,
 } from "./job";
 export {
   draftProposal,
@@ -61,3 +76,4 @@ export {
   type ProposalDrafter,
 } from "./proposal";
 export { createInMemoryProposalRecords, type DrawnProposal, type ProposalRecords } from "./proposal-records";
+export { redraftRevision, type RedraftDeps, type RevisionReply } from "./revise";

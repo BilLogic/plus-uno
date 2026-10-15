@@ -129,6 +129,10 @@ function world(model: ReturnType<typeof scripted>, cards: ShippedCard[]) {
     placeOf: () => TEAM,
     billId: BILL,
     state: state.store,
+    weighed: (() => {
+      const marks = new Set<string>();
+      return { has: async (k: string) => marks.has(k), add: async (k: string) => void marks.add(k) };
+    })(),
     now: () => NOW,
   };
   return { deps, state, blueprint, roadmap };
@@ -142,6 +146,9 @@ async function morning(state: ReturnType<typeof box<UpkeepState>>): Promise<Pend
   const section = revisionSection(
     {
       state: state.store,
+      threads: { read: async () => null, write: async () => {} },
+      post: async () => {},
+      now: () => NOW,
       stage: async (proposal) => {
         staged.push(proposal);
         await threadState.putProposal(proposal);

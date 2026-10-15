@@ -12,7 +12,8 @@
 // WHAT "CONFIDENT" MEANS. Cosine similarity alone cannot tell a question with
 // an answer from one without (`BlueprintRow.matchedBy`, measured 2026-08-19),
 // so a cell counts when two retrievers agree on it, or when its similarity
-// clears `MATCH_SCORE_FLOOR`. The path with the most such cells wins.
+// clears `MATCH_SCORE_FLOOR`. Every path holding such a cell is a match —
+// one change can touch several paths — strongest (most cells) first.
 //
 // PURE: the model and the search arrive as ports.
 
@@ -55,7 +56,15 @@ export interface ScenarioMatch {
 }
 
 export type GateResult =
-  | { pass: true; match: ScenarioMatch; quote: string; query: string }
+  | {
+      pass: true;
+      /** The strongest match: `matches[0]`. */
+      match: ScenarioMatch;
+      /** Every path confidently matched, strongest first. */
+      matches: ScenarioMatch[];
+      quote: string;
+      query: string;
+    }
   | { pass: false; reason: "not-a-service-change" | "no-confident-match" | "judgement-failed" };
 
 export interface GateDeps {
@@ -73,21 +82,30 @@ export function isConfidentRow(row: BlueprintRow): boolean {
 }
 
 /**
- * The confident match the rows hold, or null: the `scenario › path` with the
- * most confident cells, the first found on a tie.
+ * Every confident match the rows hold: one per `scenario › path`, the path
+ * with the most confident cells first, the first found on a tie.
  *
  * @param rows - `search_blueprint`'s rows
  */
-export function confidentMatch(rows: readonly BlueprintRow[]): ScenarioMatch | null {
+export function confidentMatches(rows: readonly BlueprintRow[]): ScenarioMatch[] {
   const byPath = new Map<string, BlueprintRow[]>();
   for (const row of rows.filter(isConfidentRow)) {
     const key = `${row.scenario} › ${row.path}`;
     byPath.set(key, [...(byPath.get(key) ?? []), row]);
   }
-  let best: BlueprintRow[] | null = null;
-  for (const group of byPath.values()) if (!best || group.length > best.length) best = group;
-  if (!best) return null;
-  return { scenario: best[0]!.scenario!, path: best[0]!.path!, cellId: best[0]!.id, rows: best };
+  return [...byPath.values()]
+    .map((group, at) => ({ group, at }))
+    .sort((a, b) => b.group.length - a.group.length || a.at - b.at)
+    .map(({ group }) => ({ scenario: group[0]!.scenario!, path: group[0]!.path!, cellId: group[0]!.id, rows: group }));
+}
+
+/**
+ * The strongest confident match the rows hold, or null.
+ *
+ * @param rows - `search_blueprint`'s rows
+ */
+export function confidentMatch(rows: readonly BlueprintRow[]): ScenarioMatch | null {
+  return confidentMatches(rows)[0] ?? null;
 }
 
 /** The quote, only when it is the text's own words; else the text's first sentence. */
@@ -117,8 +135,8 @@ export function serviceChangeGate(deps: GateDeps): ServiceChangeGate {
     if (judged?.changes_service !== true || !(confidence >= CONFIDENCE_FLOOR) || confidence > 1 || !query) {
       return { pass: false, reason: "not-a-service-change" };
     }
-    const match = confidentMatch(await deps.search(query));
-    if (!match) return { pass: false, reason: "no-confident-match" };
-    return { pass: true, match, query, quote: quoteFrom(judged.quote, input.text) };
+    const matches = confidentMatches(await deps.search(query));
+    if (!matches.length) return { pass: false, reason: "no-confident-match" };
+    return { pass: true, match: matches[0]!, matches, query, quote: quoteFrom(judged.quote, input.text) };
   };
 }
