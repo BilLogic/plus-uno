@@ -96,3 +96,19 @@ test("a one-shot whose backup fails too reports the backup's failure", async () 
   assert.equal(res.model, "gemini-backup");
   assert.match(!res.ok ? res.message : "", /429/);
 });
+
+// Not a fallback: the one-shot's other way to come back short. Thinking spends
+// the same ceiling as the answer, so a MAX_TOKENS stop is `ok` with a fragment,
+// and the seam says so rather than leaving the caller to find a broken parse.
+test("a one-shot that stops at MAX_TOKENS reports cutOff; one that ends does not", async () => {
+  for (const [finishReason, cutOff] of [["MAX_TOKENS", true], ["STOP", undefined]] as const) {
+    route = (async () =>
+      new Response(
+        JSON.stringify({ ...OK, candidates: [{ content: { parts: [{ text: '{"verdict":"fa' }] }, finishReason }] }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      )) as typeof fetch;
+    const res = await (await geminiProvider(ENV)).generate({ tier: "default", prompt: "hi" });
+    assert.equal(res.ok, true);
+    assert.equal(res.ok ? res.cutOff : "failed", cutOff, finishReason);
+  }
+});

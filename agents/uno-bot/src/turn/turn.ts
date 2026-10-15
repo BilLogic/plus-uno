@@ -148,6 +148,7 @@ import {
   type ProposalCard,
   type TurnSettlement,
 } from "./delivery";
+import { cancelledRecently } from "../agent/cancel-note";
 
 // ── Policy ───────────────────────────────────────────────────────────────────
 
@@ -1433,20 +1434,18 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     });
   }
 
-  // Gate idempotency (b): the person JUST cancelled this same action, and the
-  // store's outcome note is authoritative — the live thread only shows the
+  // Gate idempotency (b): the person JUST cancelled this same action (the same
+  // tool on the same target; a redirect is a new card, `agent/cancel-note.ts`),
+  // and the store's outcome note is authoritative — the live thread only shows the
   // narrative text. Don't re-card a cancelled action; require an explicit
-  // revival. The window is the last few turns, so one clarifying exchange
-  // clears it. Best-effort: a store hiccup must not block a legitimate proposal.
+  // revival. The window is the last few turns AND the last half hour
+  // (`RECENT_CANCEL_MS`), so one clarifying exchange clears it, and so does a
+  // night: in a DM the last few turns can be hours old. Best-effort: a store hiccup must not block a legitimate proposal.
   try {
     const stored = await threadState.readHistory(ref);
     const justCancelled = stored
       .slice(-3)
-      .some(
-        (t) =>
-          t.role === "assistant" &&
-          t.content.includes(`(Cancelled the proposed ${result.toolName}`),
-      );
+      .some((t) => cancelledRecently(t, result.toolName, result.input, deps.now?.() ?? Date.now()));
     if (justCancelled) {
       const bounce =
         `You cancelled that ${verbFor(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
@@ -2412,6 +2411,18 @@ async function buildCard(
   return card.ask || card.lead ? { ...card, leadBy: modelLed ? "model" : "worker" } : card;
 }
 
+/** Where each share-out in a batch posts, from the executor's own rule, so the
+ *  plan groups it there (`ProposalCard.places`). Nothing for a single
+ *  operation, which has no plan, or a batch with no share-out. */
+function shareoutPlacesOf(
+  operations: ProposalOperation[],
+  deps: Pick<TurnDeps, "cards">,
+  channel: string,
+): { places?: Array<string | null> } {
+  if (operations.length <= 1 || !operations.some((op) => op.toolName === "shareout_post")) return {};
+  return { places: operations.map((op) => (op.toolName === "shareout_post" ? deps.cards.shareoutWhere(op.input, channel) : null)) };
+}
+
 /** The card itself, before who-wrote-the-lead is marked. */
 async function cardOf(
   result: Extract<AgentResult, { kind: "proposal" }>,
@@ -2427,6 +2438,7 @@ async function cardOf(
     fields: cardFieldsOf(input),
     caveats: caveatsFor(toolName, input, result.previewText),
     operations: result.operations,
+    ...shareoutPlacesOf(operations, deps, channel),
   };
 
   // THE ASK, when the model staged an intake and wrote no line of its own
@@ -2446,8 +2458,11 @@ async function cardOf(
     // THE PLACE, named the way the issue card names its repo: a share-out
     // posts to #plus-design-feedback or stays in the asking conversation, and
     // the heading says which — read from the executor's own decision, so the
-    // card never names one place while the ✅ posts to another.
-    return { ...card, verb: `${card.verb} in ${deps.cards.shareoutWhere(input, channel)}` };
+    // card never names one place while the ✅ posts to another. A batch that
+    // posts to two places names neither on the verb; its plan's group
+    // headings name each.
+    const where = new Set(card.places?.filter((p): p is string => p !== null) ?? [deps.cards.shareoutWhere(input, channel)]);
+    return where.size === 1 ? { ...card, verb: `${card.verb} in ${[...where][0]}` } : card;
   }
   if (toolName === "github_issue_create") {
     // THE REPO AND WHO CAN READ IT: an intake on a public repo is readable by
