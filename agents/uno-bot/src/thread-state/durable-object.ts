@@ -36,6 +36,7 @@ import type { ThreadState as ThreadStateDurableObject } from "../thread-state";
 import type { OutageStore } from "../turn/capacity-outage";
 import type {
   CutOffNoteReport,
+  DecidedMark,
   DecisionReportRecord,
   Execution,
   FiledIssue,
@@ -140,9 +141,10 @@ export function createDurableObjectThreadState(
     },
 
     // The delete IS the claim, in one transaction with the read before it: of
-    // racing resolvers exactly one hop returns true.
-    claimProposal(proposalTs: string): Promise<boolean> {
-      return hop().claimProposal(proposalTs, now());
+    // racing resolvers exactly one hop returns true. What was decided rides
+    // the same hop, so keeping the decided card for View costs nothing extra.
+    claimProposal(proposalTs: string, decided?: DecidedMark): Promise<boolean> {
+      return hop().claimProposal(proposalTs, now(), decided);
     },
 
     // ----- decision reports -----

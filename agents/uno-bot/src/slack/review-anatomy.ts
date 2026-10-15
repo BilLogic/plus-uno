@@ -52,6 +52,9 @@ export interface DraftAnatomy {
   /** What Approve does on this card, when the tool's words need the draft
    *  (`decisionWords` otherwise). */
   approve?: string;
+  /** Where Approve sends it, as mrkdwn after "to" ("post in <#C…>"): what the
+   *  decided card's alert says it was approved for. */
+  destination?: string;
   /** What Needs changes does on this card, when it does something other than
    *  redraft (`decisionWords` otherwise). */
   revise?: string;
@@ -82,6 +85,21 @@ export function headerBlock(text: string): unknown {
 /** Zone 1's where line: one rich text section of native elements. */
 export function whereLine(elements: readonly WhereElement[]): unknown {
   return { type: "rich_text", elements: [{ type: "rich_text_section", elements: elements.map((e) => ({ ...e })) }] };
+}
+
+/** A where-line element as mrkdwn, for an alert that names it: a channel or
+ *  a person as their pill, a link as a link, words escaped. */
+export function whereMrkdwn(element: WhereElement): string {
+  switch (element.type) {
+    case "channel":
+      return `<#${element.channel_id}>`;
+    case "user":
+      return `<@${element.user_id}>`;
+    case "link":
+      return element.text ? `<${element.url}|${escapeSlackText(element.text)}>` : `<${element.url}>`;
+    case "text":
+      return escapeSlackText(element.text);
+  }
 }
 
 /** Zone 2: an alert per caveat, two at most, each plain text under 200

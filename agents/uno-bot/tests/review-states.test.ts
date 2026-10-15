@@ -1,0 +1,389 @@
+// The Review pop-up around the draft: a batch, the read-only view, a decided
+// card opened from View, and the states after a decision or once a card has
+// closed (`docs/plans/2026-10-15-review-modal-redesign.md` § 2, § 9, § 14 and
+// Decision 5).
+//
+// Driven at the review door on the in-memory ThreadState and a views client
+// that refuses what Slack refuses (`tests/helpers/recording-slack.ts`). Each
+// case asserts what Slack was handed.
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
+
+import type { GateVerdict } from "../src/gate/index";
+import { createInMemoryThreadState, PROPOSAL_TTL_MS, type PendingProposal, type ProposalOperation, type ThreadState } from "../src/thread-state/index";
+import { recordingDelivery } from "../src/turn/index";
+import { runReviewDecision, runReviewOpen, type ReviewDoorDeps } from "../src/slack/review-door";
+import { batchHeader } from "../src/slack/review-batch";
+import { CONFIRM_FOOTER } from "../src/slack/proposal-render";
+import { recordingViews } from "./helpers/recording-slack";
+
+const CHANNEL = "D0ASKER01";
+const THREAD = "1760540000.000050";
+const CARD_TS = "1760540000.000100";
+const BILL = "U0BILL0001";
+const BRYAN = "U0BRYAN001";
+const COCO = "U0COCO0001";
+
+const SHAREOUT = {
+  project: "Session Sign Up",
+  artifact: "hi-fi prototype",
+  fidelity: "high",
+  round: 1,
+  summary: "Hi-fi prototype of the new session sign-up flow, with the waitlist state.",
+  feedback_wanted: ["Is the waitlist state clear before a tutor commits?", "Does the confirmation step need the calendar add?"],
+  not_looking_for: "Visual polish; colours are placeholders.",
+  link: "https://plus-uno.netlify.app/prototypes/session-sign-up",
+  reviewers: [BRYAN],
+  deadline: "EOD Friday",
+  place: "channel",
+  channel: "C0SANDBOX1",
+};
+
+const SHAREOUT_TEXT = [
+  ":warning: About to *share this for feedback in <#C0SANDBOX1|uno-bot-sandbox>*:",
+  `• *Summary:* ${SHAREOUT.summary}`,
+  ":warning: *Bundle incomplete — missing: Loom walkthrough · Decisions DB link.*",
+  "Approving posts it *without* them — or drop the links in this thread first and I'll fold them in.",
+  CONFIRM_FOOTER,
+].join("\n");
+
+const dm = (recipient: string, text = "Crit moved to 3pm Friday."): ProposalOperation => ({ toolName: "dm_relay", input: { recipient, text } });
+
+const CARD: PendingProposal = {
+  toolName: "shareout_post",
+  input: SHAREOUT,
+  channel: CHANNEL,
+  threadTs: THREAD,
+  replyTs: THREAD,
+  userMsgTs: "1760540000.000040",
+  proposalTs: CARD_TS,
+  proposalText: SHAREOUT_TEXT,
+  requesterUserId: "U0ASKER001",
+  confirmers: [BILL],
+};
+
+/** Two DMs behind one card. */
+const TWO_DMS: Partial<PendingProposal> = {
+  operations: [dm(BRYAN), dm(COCO)],
+  toolName: "dm_relay",
+  input: dm(BRYAN).input,
+  proposalText: `:warning: About to *send 2 DMs*\n${CONFIRM_FOOTER}`,
+};
+
+type Block = {
+  type: string;
+  block_id?: string;
+  level?: string;
+  label?: { text: string };
+  element?: { initial_value?: string; options?: Array<{ value: string; description?: { text: string } }> };
+  text?: { type?: string; text: string };
+  title?: { text: string };
+  body?: { text: string };
+  elements?: unknown[];
+};
+type View = { title: { text: string }; submit?: unknown; blocks: Block[] };
+
+function harness(threadState: ThreadState, now?: () => number) {
+  const views = recordingViews({ alreadyOpen: ["V1"] });
+  const ran: GateVerdict[] = [];
+  const deps: ReviewDoorDeps = {
+    threadState,
+    views: views.client,
+    delivery: () => recordingDelivery(),
+    applyVerdict: async (verdict) => void ran.push(verdict),
+    updateCard: async () => {},
+    restage: async () => {},
+    revise: async () => {},
+    ...(now ? { now } : {}),
+  };
+  return { deps, views, ran };
+}
+
+async function store(over: Partial<PendingProposal> = {}, now?: () => number): Promise<ThreadState> {
+  const threadState = createInMemoryThreadState(now ? { now } : {});
+  await threadState.putProposal({ ...CARD, ...over });
+  return threadState;
+}
+
+const open = (userId: string, extra: Record<string, unknown> = {}) => ({ triggerId: "T.trigger", channel: CHANNEL, messageTs: CARD_TS, userId, ...extra });
+const decide = (decision: "confirm" | "cancel" | "revise", note?: string) => ({
+  viewId: "V1",
+  channel: CHANNEL,
+  messageTs: CARD_TS,
+  userId: BILL,
+  decision,
+  ...(note ? { note } : {}),
+});
+
+/** The view Slack was last handed. */
+function lastView(h: ReturnType<typeof harness>): View {
+  assert.deepEqual(h.views.refused, []);
+  return h.views.calls.at(-1)!.view as View;
+}
+
+/** A rich text block's words, its pills as mentions. */
+function richText(e: unknown): string {
+  const el = e as { text?: unknown; user_id?: string; channel_id?: string; elements?: unknown[] };
+  if (typeof el.text === "string") return el.text;
+  if (el.user_id) return `<@${el.user_id}>`;
+  if (el.channel_id) return `<#${el.channel_id}>`;
+  return (el.elements ?? []).map(richText).join("");
+}
+
+const inputs = (view: View) => view.blocks.filter((b) => b.type === "input");
+
+/** Every text a view carries, for the limits. */
+function texts(view: unknown): string[] {
+  const out: string[] = [];
+  JSON.stringify(view, (key, value) => {
+    if ((key === "text" || key === "initial_value") && typeof value === "string") out.push(value);
+    return value;
+  });
+  return out;
+}
+
+describe("a batch of DMs", () => {
+  async function draft() {
+    const h = harness(await store(TWO_DMS));
+    await runReviewOpen(open(BILL), h.deps);
+    return { h, view: lastView(h) };
+  }
+
+  it("opens on what it does, both recipients as pills, in run order", async () => {
+    const { view } = await draft();
+    assert.equal(view.title.text, "Review 2 DMs");
+    assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.text!.text], ["header", "Send 2 DMs"]);
+    assert.equal(view.blocks[1]!.type, "rich_text");
+    assert.equal(richText(view.blocks[1]), `Sends as uno, naming who asked, to <@${BRYAN}> and <@${COCO}>, in this order.`);
+  });
+
+  it("gives each recipient a numbered label over its own Message input", async () => {
+    const { view } = await draft();
+    const shape = view.blocks.map((b) => (b.type === "rich_text" ? `rich_text: ${richText(b)}` : b.type === "input" ? `input: ${b.block_id}` : b.type));
+    assert.deepEqual(shape, [
+      "header",
+      `rich_text: Sends as uno, naming who asked, to <@${BRYAN}> and <@${COCO}>, in this order.`,
+      `rich_text: 1 · To <@${BRYAN}>`,
+      "input: uno_field:0.text",
+      `rich_text: 2 · To <@${COCO}>`,
+      "input: uno_field:1.text",
+      "divider",
+      "input: uno_review_choice",
+      "input: uno_review_note",
+    ]);
+    for (const key of ["0.text", "1.text"]) {
+      const input = view.blocks.find((b) => b.block_id === `uno_field:${key}`)!;
+      assert.equal(input.label!.text, "Message");
+      assert.equal(input.element!.initial_value, "Crit moved to 3pm Friday.");
+    }
+    assert.doesNotMatch(JSON.stringify(view), /\*To:\*|Direct message|operations, run in order/);
+  });
+
+  it("says what each decision does for the whole batch", async () => {
+    const { view } = await draft();
+    const choice = view.blocks.find((b) => b.block_id === "uno_review_choice")!;
+    assert.deepEqual(
+      choice.element!.options!.map((o) => o.description?.text),
+      ["Sends both DMs now.", "I redraft it from your note and post a new card.", "Nothing is sent."],
+    );
+  });
+
+  it("fits Slack's limits with ten long DMs", async () => {
+    const ten = Array.from({ length: 10 }, (_, i) => dm(`U0PERSON${String(i).padStart(2, "0")}`, "x".repeat(2999)));
+    const h = harness(await store({ ...TWO_DMS, operations: ten }));
+    await runReviewOpen(open(BILL), h.deps);
+    const view = lastView(h);
+    assert.equal(view.title.text, "Review 10 DMs");
+    assert.equal(view.blocks[0]!.text!.text, "Send 10 DMs");
+    assert.ok(view.blocks.length <= 100);
+    assert.ok(view.title.text.length <= 24);
+    assert.ok(texts(view).every((t) => t.length <= 3000));
+    assert.equal(inputs(view).filter((b) => b.block_id?.startsWith("uno_field:")).length, 10);
+  });
+
+  it("falls back to the card's text whole when one of its tools has no reading", async () => {
+    const h = harness(await store({ ...TWO_DMS, operations: [dm(BRYAN), { toolName: "github_workflow_run", input: { workflow: "deploy.yml" } }], proposalText: "• *Workflow:* deploy.yml" }));
+    await runReviewOpen(open(BILL), h.deps);
+    assert.match(JSON.stringify(lastView(h).blocks), /Workflow:\* deploy\.yml/);
+  });
+});
+
+describe("a batch's header", () => {
+  const issue = { toolName: "github_issue_create", input: { title: "Badge drift" } };
+  const prd = { toolName: "notion_create", input: { surface: "prd", title: "Goal cycle" } };
+
+  it("counts a batch of one tool in a person's words", () => {
+    assert.equal(batchHeader([dm(BRYAN), dm(COCO)]), "Send 2 DMs");
+    assert.equal(batchHeader([issue, issue]), "File 2 issues");
+    assert.equal(batchHeader([prd, prd, prd]), "Add 3 Roadmap cards");
+  });
+
+  it("names each kind of a mixed batch, counted, in the order it first runs", () => {
+    assert.equal(batchHeader([dm(BRYAN), issue, dm(COCO)]), "Send 2 DMs and file an issue");
+    assert.equal(batchHeader([prd, issue, dm(BRYAN)]), "Add a Roadmap card, file an issue and send a DM");
+  });
+
+  it("says its size, in order, when a tool has no words of its own", () => {
+    assert.equal(batchHeader([dm(BRYAN), { toolName: "github_workflow_run", input: {} }]), "Run 2 operations, in order");
+  });
+});
+
+describe("the read-only view, for someone who can't decide", () => {
+  it("opens on an info alert naming who can, then the draft with no input and no Submit", async () => {
+    const h = harness(await store());
+    await runReviewOpen(open("U0OTHER001"), h.deps);
+    const view = lastView(h);
+    assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level], ["alert", "info"]);
+    assert.equal(view.blocks[0]!.text!.text, `Read-only. Only <@${BILL}> can decide this proposal.`);
+    assert.equal(view.blocks[1]!.type, "header");
+    assert.equal(inputs(view).length, 0, "no inputs at all, the decision's included");
+    assert.equal(view.submit, undefined);
+    assert.equal(view.blocks.filter((b) => b.type === "context" && /Read-only/.test(JSON.stringify(b))).length, 0, "no footnote at the bottom");
+  });
+
+  it("puts the summary in the card's body, and the questions in a list", async () => {
+    const h = harness(await store());
+    await runReviewOpen(open("U0OTHER001"), h.deps);
+    const view = lastView(h);
+    const card = view.blocks.find((b) => b.type === "card")!;
+    assert.equal(card.body!.text, SHAREOUT.summary);
+    assert.doesNotMatch(JSON.stringify(view), /What this is/);
+    for (const q of SHAREOUT.feedback_wanted) assert.ok(JSON.stringify(view).includes(q), q);
+  });
+
+  it("shows a batch's messages as text, not inputs", async () => {
+    const h = harness(await store(TWO_DMS));
+    await runReviewOpen(open("U0OTHER001"), h.deps);
+    const view = lastView(h);
+    assert.equal(inputs(view).length, 0);
+    assert.equal(view.blocks[0]!.level, "info");
+    assert.match(JSON.stringify(view), /Crit moved to 3pm Friday\./);
+  });
+});
+
+describe("a decided card, opened from View", () => {
+  async function decided(decision: "confirm" | "cancel", over: Partial<PendingProposal> = {}, note?: string) {
+    const h = harness(await store(over));
+    await runReviewDecision(decide(decision, note), h.deps);
+    await runReviewOpen(open("U0OTHER001", { cardText: "(the decided card)" }), h.deps);
+    return { h, view: lastView(h) };
+  }
+
+  it("draws the same content read-only, under a success alert saying who approved and where it posts", async () => {
+    const { view } = await decided("confirm");
+    assert.equal(view.title.text, "Review share-out");
+    assert.deepEqual(view.blocks.map((b) => b.type).slice(0, 3), ["alert", "header", "card"]);
+    assert.equal(view.blocks[0]!.level, "success");
+    assert.equal(view.blocks[0]!.text!.type, "mrkdwn");
+    assert.equal(view.blocks[0]!.text!.text, `Approved by <@${BILL}> to post in <#C0SANDBOX1>.`);
+    assert.equal(view.blocks.find((b) => b.type === "card")!.body!.text, SHAREOUT.summary);
+    assert.equal(inputs(view).length, 0);
+    assert.equal(view.submit, undefined);
+  });
+
+  it("leaves out the where line and the caveats, which were about the decision", async () => {
+    const { view } = await decided("confirm");
+    assert.equal(view.blocks.filter((b) => b.type === "alert").length, 1, "only the decided alert");
+    assert.doesNotMatch(JSON.stringify(view), /Posts in|Bundle incomplete/);
+  });
+
+  it("says a Reject the same way, under a plain alert with the reason", async () => {
+    const { view } = await decided("cancel", {}, "Wrong channel");
+    assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level], ["alert", "default"]);
+    assert.equal(view.blocks[0]!.text!.text, `Rejected by <@${BILL}>: Wrong channel.`);
+    assert.equal(view.blocks[1]!.type, "header");
+  });
+
+  it("cuts a long reason inside the alert's 200, never through an escaped character", async () => {
+    const { view } = await decided("cancel", {}, "R&D ".repeat(100));
+    const text = view.blocks[0]!.text!.text;
+    assert.ok(text.length <= 200, String(text.length));
+    assert.match(text, /^Rejected by <@U0BILL0001>: R&amp;D/);
+    assert.doesNotMatch(text, /&(a|am|amp)?…/, "no entity cut in half");
+  });
+
+  it("says who a batch of DMs went to", async () => {
+    const { view } = await decided("confirm", TWO_DMS);
+    assert.equal(view.blocks[0]!.text!.text, `Approved by <@${BILL}> to send to <@${BRYAN}> and <@${COCO}>.`);
+    assert.equal(view.blocks[1]!.text!.text, "Send 2 DMs");
+    assert.equal(inputs(view).length, 0);
+  });
+
+  it("falls back to the outcome alone once the card's lifetime is over", async () => {
+    let t = 1_760_540_000_000;
+    const now = () => t;
+    const threadState = await store({}, now);
+    const h = harness(threadState, now);
+    await runReviewDecision(decide("confirm"), h.deps);
+    t += PROPOSAL_TTL_MS + 1;
+    await runReviewOpen(open(BILL, { cardText: `${SHAREOUT_TEXT}\n:white_check_mark: Approved by <@${BILL}>` }), h.deps);
+    const view = lastView(h);
+    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "success"], ["section", undefined]]);
+    assert.match(view.blocks[1]!.text!.text, /no longer kept/);
+    assert.deepEqual(await threadState.getProposalByTs(CARD_TS), { state: "none" }, "and the record is gone");
+  });
+});
+
+describe("after a decision, and closed", () => {
+  it("answers Approve with a success alert, then what happens next", async () => {
+    const h = harness(await store());
+    await runReviewDecision(decide("confirm"), h.deps);
+    const view = lastView(h);
+    assert.equal(view.title.text, "Review share-out");
+    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "success"], ["section", undefined]]);
+    assert.equal(view.blocks[0]!.text!.text, "Approved.");
+    assert.equal(view.blocks[1]!.text!.text, "I'm running it now. The outcome posts in the thread.");
+  });
+
+  it("answers Reject with a plain alert, then that nothing runs", async () => {
+    const h = harness(await store());
+    await runReviewDecision(decide("cancel"), h.deps);
+    const view = lastView(h);
+    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "default"], ["section", undefined]]);
+    assert.deepEqual(view.blocks.map((b) => b.text!.text), ["Rejected.", "Nothing will run."]);
+  });
+
+  it("answers Needs changes with an info alert, then where the revision goes", async () => {
+    const h = harness(await store());
+    await runReviewDecision(decide("revise", "Ask about the calendar first"), h.deps);
+    const view = lastView(h);
+    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "info"], ["section", undefined]]);
+    assert.equal(view.blocks[0]!.text!.text, "Sent back with your note.");
+    assert.match(view.blocks[1]!.text!.text, /new card posts in the thread/);
+  });
+
+  it("says a card being revised is, then where to decide", async () => {
+    const threadState = await store();
+    assert.equal(await threadState.markRevising(CARD_TS, BILL), "marked");
+    const h = harness(threadState);
+    await runReviewOpen(open(BILL), h.deps);
+    const view = lastView(h);
+    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "info"], ["section", undefined]]);
+    assert.equal(view.blocks[0]!.text!.text, "This proposal is being revised.");
+    assert.equal(view.title.text, "Review share-out");
+  });
+
+  it("answers an expired card with a warning, then what to do", async () => {
+    let t = 1_760_540_000_000;
+    const now = () => t;
+    const h = harness(await store({}, now), now);
+    t += PROPOSAL_TTL_MS + 1;
+    await runReviewOpen(open(BILL), h.deps);
+    const view = lastView(h);
+    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "warning"], ["section", undefined]]);
+    assert.equal(view.blocks[0]!.text!.text, "This proposal expired, so it can't be approved now.");
+    assert.equal(view.blocks[1]!.text!.text, "Ask me again and I'll set it up fresh.");
+    assert.equal(view.submit, undefined);
+  });
+
+  it("answers a replaced card with a warning, then where the newer one is", async () => {
+    const threadState = await store();
+    await threadState.putProposal({ ...CARD, proposalTs: "1760540000.000200" });
+    const h = harness(threadState);
+    await runReviewOpen(open(BILL), h.deps);
+    const view = lastView(h);
+    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "warning"], ["section", undefined]]);
+    assert.equal(view.blocks[0]!.text!.text, "This proposal was replaced by a newer one.");
+    assert.match(view.blocks[1]!.text!.text, /newest card in the thread/);
+  });
+});

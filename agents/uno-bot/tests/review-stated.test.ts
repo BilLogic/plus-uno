@@ -406,7 +406,10 @@ describe("a sweep's shared note in Review", () => {
     const view = decide(await shareCard(), false);
     assertFits(view);
     assert.ok(!types(view).includes("input"));
-    assert.equal(types(view)[0], "header");
+    // Who can decide opens the view as an info alert (§ The shared anatomy,
+    // Read-only); the draft's zones follow from the header.
+    assert.deepEqual(types(view).slice(0, 2), ["alert", "header"]);
+    assert.equal((view.blocks[0] as { level?: string }).level, "info");
   });
 
   it("staged before its facts, shows the card's text", async () => {
