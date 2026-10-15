@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import useFieldId from './useFieldId';
 import PropTypes from 'prop-types';
-import { Form } from 'react-bootstrap';
+import Field from './_internal/Field';
+import OptionRow from './_internal/OptionRow';
+import './_internal/Listbox.scss';
 import './Cascader.scss';
 
 /**
@@ -330,14 +332,21 @@ const Cascader = ({
     }, [isOpen, rebuildColumnsFromPath]);
 
     /*
-     * #323. `id` used to be applied to the wrapper, so a `label` pointing at it
-     * named a `div`. It now names the input, which is the element focus lands on.
+     * `id` names the input, which is the element focus lands on, so a `label`
+     * pointing at it names the combobox.
      */
     return (
         <div className={`plus-cascader-wrapper ${className}`} style={style} ref={wrapperRef}>
-            {/* Input Field */}
-            <div className="plus-cascader-input-container">
-                <Form.Control
+            <Field
+                disabled={disabled}
+                state={isOpen ? 'focus' : undefined}
+                className="plus-cascader-field"
+                onClick={handleInputClick}
+                trailing={(
+                    <i className={`fa-solid fa-caret-down plus-cascader-arrow ${isOpen ? 'plus-cascader-arrow-open' : ''}`} aria-hidden="true" />
+                )}
+            >
+                <input
                     ref={inputRef}
                     id={fieldId}
                     type="text"
@@ -345,8 +354,7 @@ const Cascader = ({
                     value={displayText}
                     placeholder={placeholder}
                     disabled={disabled}
-                    className={`plus-cascader-input ${isOpen ? 'plus-cascader-input-open' : ''}`}
-                    onClick={handleInputClick}
+                    className="plus-field__control plus-cascader-input"
                     onKeyDown={handleTriggerKeyDown}
                     role="combobox"
                     aria-haspopup="listbox"
@@ -354,62 +362,53 @@ const Cascader = ({
                     aria-controls={isOpen ? menuId : undefined}
                     {...props}
                 />
-                <i className={`fa-solid fa-caret-down plus-cascader-arrow ${isOpen ? 'plus-cascader-arrow-open' : ''}`} aria-hidden="true" />
-            </div>
+            </Field>
 
-            {/* Dropdown Menu with Columns */}
+            {/* The listbox surface; its body holds one column per level. */}
             {isOpen && (
-                <div className="plus-cascader-menu" id={menuId} onKeyDown={handleMenuKeyDown}>
-                    <div className="plus-cascader-columns">
+                <div className="plus-listbox plus-cascader-menu" id={menuId}>
+                    <div className="plus-listbox-body plus-cascader-columns">
                         {activeColumns.map((columnOptions, columnIndex) => (
                             <div
                                 key={columnIndex}
-                                className="plus-cascader-column"
+                                className="plus-listbox-options plus-cascader-column"
                                 role="listbox"
                                 aria-label={columnIndex === 0
                                     ? 'Options'
                                     : `Options under ${selectedPath[columnIndex - 1]}`}
                             >
                                 {columnOptions.map((option, optionIndex) => {
-                                    const optionText = typeof option === 'string' ? option : (option.text || option.label || 'Option');
-                                    const optionValue = typeof option === 'string' ? option : (option.value || optionText);
-                                    const hasChildren = typeof option === 'object' && option.children && option.children.length > 0;
-                                    const isDisabled = disabled || (typeof option === 'object' && option.disabled);
-                                    
-                                    // Check if this option is selected (part of selectedPath)
-                                    const isSelected = columnIndex < selectedPath.length && 
-                                        (typeof option === 'string' ? option === selectedPath[columnIndex] : 
-                                         (option.value || option.text || option.label) === selectedPath[columnIndex]);
+                                    const optionValue = optionValueOf(option);
+                                    const hasChildren = optionChildrenOf(option).length > 0;
+                                    // Part of the path so far, in this column.
+                                    const isSelected = columnIndex < selectedPath.length
+                                        && optionValue === selectedPath[columnIndex];
+                                    const key = `${columnIndex}:${optionIndex}`;
 
                                     return (
-                                        <div
-                                            key={optionIndex}
-                                            className={`plus-cascader-option ${isSelected ? 'plus-cascader-option-selected' : ''} ${isDisabled ? 'plus-cascader-option-disabled' : ''}`}
-                                            role="option"
-                                            aria-selected={isSelected}
-                                            aria-disabled={isDisabled || undefined}
-                                            /*
-                                             * #323. One tab stop per open menu,
-                                             * on the cursor. Every option used
-                                             * to have none at all.
-                                             */
-                                            tabIndex={activeCell
+                                        <OptionRow
+                                            key={key}
+                                            value={optionValue}
+                                            label={optionLabelOf(option)}
+                                            selected={isSelected}
+                                            disabled={disabled || optionIsDisabled(option)}
+                                            // The path is the value, so a row shows no check of its own.
+                                            check={false}
+                                            trailing={hasChildren ? <OptionRow.Chevron /> : undefined}
+                                            /* One tab stop per open menu, on the cursor. */
+                                            tabbable={Boolean(activeCell
                                                 && activeCell.column === columnIndex
-                                                && activeCell.index === optionIndex ? 0 : -1}
+                                                && activeCell.index === optionIndex)}
                                             ref={(element) => {
-                                                const key = `${columnIndex}:${optionIndex}`;
                                                 if (element) optionRefs.current.set(key, element);
                                                 else optionRefs.current.delete(key);
                                             }}
                                             onFocus={() => setActiveCell({ column: columnIndex, index: optionIndex })}
-                                            onClick={() => !isDisabled && handleOptionClick(option, columnIndex)}
+                                            // The menu's keys, handled before the row's own Enter and Space.
+                                            onKeyDown={handleMenuKeyDown}
+                                            onSelect={() => handleOptionClick(option, columnIndex)}
                                             onMouseEnter={() => handleOptionHover(option, columnIndex)}
-                                        >
-                                            <span className="plus-cascader-option-text">{optionText}</span>
-                                            {hasChildren && (
-                                                <i className="fas fa-caret-right plus-cascader-option-chevron" aria-hidden="true" />
-                                            )}
-                                        </div>
+                                        />
                                     );
                                 })}
                             </div>
