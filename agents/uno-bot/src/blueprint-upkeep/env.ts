@@ -14,20 +14,32 @@
 //     directory then by name (card follow-ups' `peopleFor`);
 //   • the place: card follow-ups' ladder (`cardPlace`);
 //   • Bill: `LEAD_USER_ID`, the deployment's lead;
-//   • the state: one JSON record in HARNESS_KV;
+//   • the state: one JSON record in HARNESS_KV; each card's weighed mark a
+//     key of its own there, kept for good; each revision thread a key too;
 //   • a turn's milestone comparison: the same gate, search and path read, and
 //     the thread's store for its once-per-scenario claim.
 //
-// Budget (ADR-022), per card weighed: the page and up to three block pages
-// (4), its one PRD the same (4), the judgement (1), the search (≤3), the path
-// read (4), the draft (1-2), a Slack lookup or two for the owner — about 15
-// on a typical card, 20 at the worst, so `MAX_CARDS_PER_RUN` (2) and the
-// Roadmap query fit one alarm's ceiling unless both cards are at their worst;
-// `measured` stops the run there. A promotion reads only the path (4) and
-// the owner.
+// Budget (ADR-022), against the 38-subrequest lookup ceiling of one alarm,
+// each job sized by cost, not by a count (`./budget.ts`).
+// A match job: the Roadmap query (1, the first job only) and the model's
+// token (1), then per card a deploy's promotion try — the path read (5) —
+// and, failing that, the page and up to three block pages (4), its one PRD
+// the same (4), the judgement (1), the search (≤3) and a Slack lookup or two
+// for the owner: `MATCH_COST` (20) at the worst. A draft job: the token,
+// then per path the path read (5) and the draft, grind then default (2):
+// `DRAFT_COST` (7). A job starts a card or a path only while the alarm's
+// headroom covers that worst case, so two PRD-heavy cards fill a match job
+// and a light night fits several; a card that still overruns stops on the
+// ceiling and its job is deferred, the cards before it kept. What a night's
+// jobs do not reach waits on the cursor and the queue for the next.
 
 import type { Env } from "../types";
-import { budgetHeadroom, countedFetch } from "../net";
+import { budgetHeadroom, charge, countedFetch } from "../net";
+import { getBotIdentity, postMessage, updateMessage } from "../slack/api";
+import type { SlackMessageEvent } from "../slack/types";
+import { ladderChannelsFor } from "../destination/env";
+import { reportRecord } from "../slack/decision-cards";
+import { redraftRevision } from "./revise";
 import { selectProvider } from "../agent/run-agent";
 import { channelIdsFor } from "../destination/env";
 import { queryRowsWithAnyStatus, readNotionPage } from "../integrations/notion";
@@ -52,20 +64,65 @@ import type { PathToday } from "./draft";
 import { cardEvidence } from "./evidence";
 import { stageOf, STAGES } from "./stages";
 import {
+  draftMatched,
   handOverRevisions,
+  matchShipped,
+  postOverflow,
+  replanRows,
   revisionSection,
-  runShippedRevisions,
   UPKEEP_SECTION,
   type RevisionHanded,
+  type RevisionThread,
+  type RevisionThreads,
   type ShippedCard,
+  type ShippedDeps,
   type ShippedReport,
   type UpkeepState,
+  type WeighedMarks,
 } from "./job";
 
 const STATE_KV_KEY = "blueprint-upkeep:state";
-const EMPTY: UpkeepState = { cursor: null, seen: [], waiting: [] };
+const WEIGHED_PREFIX = "blueprint-upkeep:weighed:";
+const THREAD_PREFIX = "blueprint-upkeep:thread:";
+const EMPTY: UpkeepState = { cursor: null, read: null, matched: [], waiting: [] };
 
 const stateFor = (env: Env) => kvJson<UpkeepState>(env, STATE_KV_KEY, EMPTY);
+
+/** Each card weighed, one key a card and status, never expiring. */
+function weighedOn(kv: KVNamespace): WeighedMarks {
+  return {
+    async has(key) {
+      charge(1, "kv");
+      return (await kv.get(`${WEIGHED_PREFIX}${key}`)) !== null;
+    },
+    async add(key) {
+      charge(1, "kv");
+      await kv.put(`${WEIGHED_PREFIX}${key}`, String(Date.now()));
+    },
+  };
+}
+
+/** Each revision thread, kept a day past its cards' window. */
+export function revisionThreadsOn(kv: KVNamespace): RevisionThreads {
+  const key = (channel: string, ts: string) => `${THREAD_PREFIX}${channel}:${ts}`;
+  return {
+    async read(channel, ts) {
+      charge(1, "kv");
+      return kv.get<RevisionThread>(key(channel, ts), "json");
+    },
+    async write(thread) {
+      charge(1, "kv");
+      const ttl = Math.max(60, Math.ceil((thread.expiresAt - Date.now()) / 1000) + 24 * 60 * 60);
+      await kv.put(key(thread.channel, thread.ts), JSON.stringify(thread), { expirationTtl: ttl });
+    },
+  };
+}
+
+/** One line in a thread. */
+async function postLine(env: Env, channel: string, threadTs: string, text: string): Promise<void> {
+  const res = await postMessage(env, { channel, thread_ts: threadTs, text });
+  if (!res.ok) throw new Error(`thread line not posted (${String(res.error ?? "unknown")})`);
+}
 
 async function shippedSince(env: Env, since: string): Promise<ShippedCard[]> {
   if (!env.NOTION_ROADMAP_DB_ID) throw new Error("NOTION_ROADMAP_DB_ID not configured");
@@ -146,19 +203,36 @@ export async function readPathOf(env: Env, cellId: string): Promise<PathToday | 
 }
 
 /**
- * The end-of-day read on `Env`.
+ * One end-of-day match job (`blueprint-shipped-N`) on `Env`.
  *
  * @param env - Worker bindings
  * @param opts - `dryRun` keeps nothing
  */
-export async function runShippedRevisionsOnEnv(env: Env, opts: JobContext): Promise<ShippedReport> {
-  if (!env.NOTION_ROADMAP_DB_ID || !env.NOTION_API_KEY) return { drafted: 0, summary: "Notion not configured — read skipped" };
-  if (!isBlueprintConfigured(env)) return { drafted: 0, summary: "uno-blueprint not configured — read skipped" };
-  if (!env.HARNESS_KV) return { drafted: 0, summary: "HARNESS_KV not bound — nowhere to keep revisions; read skipped" };
+export async function runShippedMatchOnEnv(env: Env, opts: JobContext): Promise<ShippedReport> {
+  const deps = shippedDepsFor(env);
+  return typeof deps === "string" ? { drafted: 0, summary: deps } : matchShipped(deps, opts);
+}
+
+/**
+ * One end-of-day draft job (`blueprint-draft-N`) on `Env`.
+ *
+ * @param env - Worker bindings
+ * @param opts - `dryRun` keeps nothing
+ */
+export async function runShippedDraftOnEnv(env: Env, opts: JobContext): Promise<ShippedReport> {
+  const deps = shippedDepsFor(env);
+  return typeof deps === "string" ? { drafted: 0, summary: deps } : draftMatched(deps, opts);
+}
+
+/** The end-of-day jobs' dependencies on `Env`, or why there are none. */
+function shippedDepsFor(env: Env): ShippedDeps | string {
+  if (!env.NOTION_ROADMAP_DB_ID || !env.NOTION_API_KEY) return "Notion not configured — read skipped";
+  if (!isBlueprintConfigured(env)) return "uno-blueprint not configured — read skipped";
+  if (!env.HARNESS_KV) return "HARNESS_KV not bound — nowhere to keep revisions; read skipped";
   const provider = selectProvider(env);
   const people = peopleFor(env);
   const config = channelIdsFor(env);
-  return runShippedRevisions(
+  return (
     {
       roadmap: { shippedSince: (since) => measured(() => shippedSince(env, since)) },
       evidence: (card) => cardEvidence((pageId) => measured(() => readNotionPage(env, pageId)), card.pageId),
@@ -172,9 +246,10 @@ export async function runShippedRevisionsOnEnv(env: Env, opts: JobContext): Prom
       placeOf: (card) => cardPlace(card, config),
       billId: env.LEAD_USER_ID?.trim() || null,
       state: stateFor(env),
+      weighed: weighedOn(env.HARNESS_KV),
+      meter: { headroom: budgetHeadroom },
       now: () => Date.now(),
-    },
-    opts,
+    }
   );
 }
 
@@ -206,7 +281,13 @@ export async function runRevisionPostOnEnv(env: Env, opts: JobContext): Promise<
 export function revisionSectionFor(env: Env, opts: JobContext): SweepSection | undefined {
   if (!env.HARNESS_KV || !opts.runStorage) return undefined;
   return revisionSection(
-    { state: stateFor(env), stage: (proposal) => stageRevisionCard(env, proposal) },
+    {
+      state: stateFor(env),
+      stage: (proposal) => stageRevisionCard(env, proposal),
+      threads: revisionThreadsOn(env.HARNESS_KV),
+      post: (channel, threadTs, text) => postLine(env, channel, threadTs, text),
+      now: () => Date.now(),
+    },
     sectionHandOffIn<RevisionHanded>(opts.runStorage, UPKEEP_SECTION),
     opts.runDate,
   );
@@ -220,6 +301,115 @@ async function stageRevisionCard(env: Env, proposal: PendingProposal): Promise<v
     ...supersededEvents(retired, now, "worker"),
     stagedEvent({ proposal, at: now, via: "worker", channelStored: true }),
   ]);
+}
+
+/**
+ * The morning's thread job (`blueprint-revision-thread`) on `Env`: the cards
+ * a carousel had no room for, up in its thread.
+ *
+ * @param env - Worker bindings
+ * @param opts - The morning run
+ */
+export async function runRevisionThreadOnEnv(env: Env, opts: JobContext): Promise<{ summary: string }> {
+  if (!env.HARNESS_KV) return { summary: "HARNESS_KV not bound — nothing to put in a thread" };
+  const store = threadStateFor(env);
+  return postOverflow(
+    {
+      state: stateFor(env),
+      async postReport(channel, threadTs, report, ttlMs) {
+        const res = await postMessage(env, { channel, thread_ts: threadTs, text: report.text, blocks: report.blocks });
+        if (!res.ok || !res.ts) throw new Error(`thread report not posted (${String(res.error ?? "unknown")})`);
+        await store.putReport(reportRecord(channel, res.ts, report, ttlMs));
+        return res.ts;
+      },
+      stage: (proposal) => stageRevisionCard(env, proposal),
+      threads: revisionThreadsOn(env.HARNESS_KV),
+      post: (channel, threadTs, text) => postLine(env, channel, threadTs, text),
+      meter: { headroom: budgetHeadroom },
+      date: opts.runDate,
+      now: () => Date.now(),
+    },
+    opts,
+  );
+}
+
+// ── A reply in a revision thread ─────────────────────────────────────────────
+
+/**
+ * Whether a message may correct a revision card, by its shape alone: a
+ * person's reply, with text, in a thread of a channel the posting ladder
+ * posts in. Reads nothing.
+ *
+ * @param env - Worker bindings
+ * @param event - The message
+ */
+export function isRevisionReplyCandidate(env: Env, event: SlackMessageEvent): boolean {
+  if (!env.HARNESS_KV || !event.thread_ts || event.thread_ts === event.ts || !ladderChannelsFor(env).includes(event.channel)) return false;
+  if (event.bot_id || !event.user || (event.subtype && event.subtype !== "thread_broadcast")) return false;
+  return !!event.text?.trim();
+}
+
+/**
+ * Whether a thread holds revision cards still decidable. One KV read.
+ *
+ * @param env - Worker bindings
+ * @param channel - The reply's channel
+ * @param threadTs - The reply's thread
+ */
+export async function isRevisionThread(env: Env, channel: string, threadTs: string): Promise<boolean> {
+  if (!env.HARNESS_KV) return false;
+  const thread = await revisionThreadsOn(env.HARNESS_KV).read(channel, threadTs);
+  return !!thread && thread.expiresAt > Date.now();
+}
+
+/**
+ * A queued reply in a revision thread: redraft the card it corrects. Runs at
+ * the head of the thread's job (`slack/message-job.ts`).
+ *
+ * @param env - Worker bindings
+ * @param event - The message
+ * @returns Whether it was a correction, handled — the turn is then skipped
+ */
+export async function handleRevisionReplyOnEnv(env: Env, event: SlackMessageEvent): Promise<boolean> {
+  if (!isRevisionReplyCandidate(env, event)) return false;
+  const store = threadStateFor(env);
+  const events = proposalEventLogFor(env);
+  const bot = (await getBotIdentity(env))?.userId;
+  return redraftRevision(
+    {
+      threads: revisionThreadsOn(env.HARNESS_KV!),
+      async card(key) {
+        const found = await store.getProposalByTs(key);
+        return found.state === "found" ? found.proposal : null;
+      },
+      readPath: (cellId) => measured(() => readPathOf(env, cellId)),
+      provider: selectProvider(env),
+      reports: store,
+      async edit(channel, ts, message) {
+        await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks, ...(message.metadata ? { metadata: message.metadata } : {}) });
+      },
+      post: (channel, threadTs, text) => postLine(env, channel, threadTs, text),
+      stage: (proposal) => stageRevisionCard(env, proposal),
+      async restore(proposal) {
+        const { retired } = await store.putProposal(proposal);
+        await recordProposalEvents(events, supersededEvents(retired, Date.now(), "worker"));
+      },
+      async retire(ts) {
+        await store.retireProposal(ts);
+      },
+      clearRevising: (ts) => store.clearRevising(ts),
+      superseded: (tss) => recordProposalEvents(events, supersededEvents(tss, Date.now(), "worker")),
+      replan: (record) => replanRows(stateFor(env), record),
+      now: () => Date.now(),
+    },
+    {
+      channel: event.channel,
+      threadTs: event.thread_ts!,
+      user: event.user!,
+      text: event.text ?? "",
+      mentionsBot: !!bot && (event.text ?? "").includes(`<@${bot}>`),
+    },
+  );
 }
 
 /**

@@ -1700,7 +1700,7 @@ function composeReport(
         const ids = entries.flatMap((e) => (!isFix(e) && e.at === at ? [e.card.item.id] : []));
         return ids.length ? [h.place.says(ids, owner)] : [];
       }),
-      ...(here < entries.length ? [waitWords(here, entries.length)] : []),
+      ...(here < entries.length ? [waitWords(here, entries.length, entries.every((e) => !isFix(e) && !!handed[e.at]!.place.overflowInThread))] : []),
     ];
     // A name a card carries for its owner, which a DM says in place of a tag.
     const name = entries
@@ -1714,7 +1714,8 @@ function composeReport(
     if (theirs.length) {
       const here = theirs.filter((e) => shown.has(e)).length;
       const line = h.place.says(theirs.map((e) => e.card.item.id), null);
-      ownerLines.push({ owner: null, says: here < theirs.length ? `${line} Showing ${here} of ${theirs.length}; the rest come in the next report.` : line });
+      const rest = h.place.overflowInThread ? `+${theirs.length - here} more in the thread.` : `Showing ${here} of ${theirs.length}; the rest come in the next report.`;
+      ownerLines.push({ owner: null, says: here < theirs.length ? `${line} ${rest}` : line });
     }
     for (const line of h.place.lines ?? []) ownerLines.push({ owner: null, says: line });
   });
@@ -1730,8 +1731,11 @@ function composeReport(
   };
 }
 
-/** What a person's bullet says when some of theirs wait. */
-function waitWords(shown: number, total: number): string {
+/** What a person's bullet says when some of theirs wait: in the next
+ *  report, or — every one of them from a section that puts its overflow
+ *  there — in the thread. */
+function waitWords(shown: number, total: number, inThread = false): string {
+  if (inThread) return `+${total - shown} more in the thread.`;
   if (shown === 0) return total === 1 ? "It comes in the next report." : "They come in the next report.";
   const here = shown === 1 ? "Here is 1" : `Here are ${shown}`;
   return `${here}; ${total - shown} more come in the next report.`;

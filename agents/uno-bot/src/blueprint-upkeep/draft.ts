@@ -70,6 +70,9 @@ export interface DraftInput {
   today: PathToday;
   /** The status the shipped work puts rows at: `live` once deployed. */
   target: EntityStatus;
+  /** A redraft: what a reviewer said in the card's thread, and the rows they
+   *  pushed back on. Their words outrank the card's where the two disagree. */
+  correction?: { text: string; previous: DraftedChange[] };
 }
 
 export const DRAFT_TIER = "grind" as const;
@@ -98,6 +101,15 @@ export function draftPrompt(input: DraftInput): string {
     `LANES: ${today.lanes.map((l) => `${l.id} = ${l.name}`).join("; ")}`,
     "CELLS:",
     ...today.cells.map((c) => `- step ${c.stepId} (${name(today.steps, c.stepId)}) × lane ${c.laneId} (${name(today.lanes, c.laneId)}): ${c.content}`),
+    ...(input.correction
+      ? [
+          "",
+          "EARLIER DRAFT, which a reviewer pushed back on:",
+          ...input.correction.previous.map((c) => `- ${c.kind} ${c.step} × ${c.lane}: ${c.content}`),
+          `REVIEWER'S CORRECTION (it outranks the work's text where they disagree): ${input.correction.text.slice(0, 2_000)}`,
+          "Draft the rows again with the correction applied.",
+        ]
+      : []),
   ].join("\n");
 }
 
