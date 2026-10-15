@@ -87,6 +87,8 @@ interface World {
   notes: Array<{ to: string; text: string }>;
   /** The clock the gap notes' marks read, epoch ms. */
   clock: { now: number };
+  /** The usage rows the turns left. */
+  usage: () => Array<{ disposition: string; proposalId: string | null }>;
 }
 
 function world(
@@ -149,6 +151,7 @@ function world(
     clock,
     marks,
     askers,
+    usage: () => h.usage.records(),
     async run(c, fragments) {
       const result = await runFigmaEventJob(queuedFor(c, fragments), { onAsk: (job) => answerFigmaAsk(job, deps) });
       return { outcome: result.outcome, line: result.line };
@@ -311,6 +314,31 @@ describe("a change request", () => {
     assert.deepEqual(w.replies(), [{ root: "100", message: [ANSWER_ONLY, `To make it, I'd create this card in Notion. ${TO_SLACK}`].join("\n") }]);
     assert.deepEqual(w.figma.writes().map((c) => c.method), ["replyToComment"], "Figma gets only the reply");
     assert.equal(await w.deps.threadState.getProposalByThread({ channel: DESIGN, thread: `figma:${FILE}:100` }), null, "no proposal staged");
+  });
+
+  it("is recorded as answered, not failed, and the thread remembers the reply's lines", async () => {
+    const errors: string[] = [];
+    const error = console.error;
+    console.error = (...args: unknown[]) => void errors.push(args.join(" "));
+    try {
+      const w = world({ replies: STAGES });
+      await ask(w, comment("100", "@uno please add to the PRD: hide the bar until the first goal"));
+      assert.deepEqual(
+        w.usage().map((r) => ({ disposition: r.disposition, proposalId: r.proposalId })),
+        [{ disposition: "answered", proposalId: null }],
+      );
+      const remembered = (await w.deps.threadState.readHistory({ channel: DESIGN, thread: `figma:${FILE}:100` }))
+        .filter((t) => t.role === "assistant")
+        .map((t) => t.content);
+      assert.deepEqual(remembered, [w.replies()[0]!.message.replace(/^🐐: /, "")]);
+
+      const stranger = world({ replies: STAGES });
+      await ask(stranger, comment("100", "@uno add it to the PRD", { user: STRANGER }));
+      assert.deepEqual(stranger.usage().map((r) => r.disposition), ["answered"]);
+    } finally {
+      console.error = error;
+    }
+    assert.deepEqual(errors.filter((e) => /proposal card was not staged/.test(e)), [], "a deliberate refusal is no error");
   });
 
   it("remembers a clarifying question as the lines Figma posted, not the whole note", async () => {

@@ -1613,6 +1613,12 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       })
     : null;
   const posted = inPlace ? { ok: true, text: inPlace.text, ts: inPlace.staged.proposalTs } : await delivery.card(card);
+  // An answer-only surface declined the card on purpose: the person is told
+  // what it would have done instead, so the turn answered, and nothing stages.
+  if (!inPlace && posted.declined) {
+    await memory.remember(posted.text);
+    return { disposition: "answered", posted: posted.text, wrote: memory.wrote(), telemetry };
+  }
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] proposal card was not staged (${result.toolName})`);
     return {

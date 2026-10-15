@@ -60,7 +60,7 @@ import type { ThreadRef, ThreadState } from "../thread-state/index";
 import { buildTurnRequest, type Delivery, type TurnOutcome, type TurnRequest } from "../turn/index";
 import { slackPersonOfFigma, type FigmaPeople } from "../usage/roles";
 import type { GapNotes } from "../usage/gap-notes";
-import { figmaReplyText, plainAnswer, type FigmaReply, type FigmaSource } from "./copy";
+import { answerOnlyReply, figmaReplyText, plainAnswer, type FigmaReply, type FigmaSource } from "./copy";
 import { figmaAskDelivery, type FigmaAskDelivery } from "./delivery";
 import { askText, asksUno, asPosted, isOwnComment } from "./trigger";
 import { figmaFileUrl } from "../figma/links";
@@ -233,7 +233,7 @@ async function draft(
   // An asker the map does not know gets a public-only answer: a missing
   // Figma User ID on their row is worth the lead knowing now.
   if (!slackId) await deps.gaps?.figmaAsker(comment.user.handle);
-  const delivery = figmaAskDelivery();
+  const delivery = figmaAskDelivery({ teammate: slackId !== null });
 
   const request = buildTurnRequest({
     userId: slackId ?? `figma:${comment.user.id}`,
@@ -486,7 +486,7 @@ function replyOf(
 ): FigmaReply | null {
   // A write the turn proposed was refused: answer-only, saying what it would have done.
   const refused = delivery.refusedCard();
-  if (refused) return teammate ? { kind: "answer-only", would: refused.verb || null } : { kind: "not-teammate" };
+  if (refused) return answerOnlyReply(teammate, refused.verb);
   const answer = delivery.answer();
   if (outcome?.disposition === "answered" && answer !== null) {
     const { lines, cited } = plainAnswer(answer);

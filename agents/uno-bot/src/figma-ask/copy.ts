@@ -45,6 +45,18 @@ export type FigmaReply =
 /** What a reply to a change asked for in Figma opens with. */
 const NO_CHANGE = "I can't make changes from a Figma comment, so nothing was changed.";
 
+/**
+ * The reply to a change the turn proposed and the ask refused: what it would
+ * do, for a teammate, who is sent to le goat in Slack; for anyone else, only
+ * that nothing was changed.
+ *
+ * @param teammate - Whether Team Members maps the asker
+ * @param verb - The write's fixed gate words; empty when it has none
+ */
+export function answerOnlyReply(teammate: boolean, verb: string): FigmaReply {
+  return teammate ? { kind: "answer-only", would: verb || null } : { kind: "not-teammate" };
+}
+
 /** Where a teammate's change is drafted instead. */
 const TO_SLACK = "Ask le goat in Slack, and I'll draft it there for a teammate to approve.";
 
