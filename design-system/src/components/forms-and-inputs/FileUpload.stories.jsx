@@ -17,7 +17,11 @@ export default {
         },
     },
     argTypes: {
-        children: { table: { disable: true } },
+        children: {
+            control: false,
+            description: 'The uploaded-file list, shown below the button and outside the frame',
+            table: { category: 'Content' },
+        },
         onClick: { table: { disable: true } },
         style: { table: { disable: true } },
         label: {
@@ -169,6 +173,38 @@ export const InteractionStates = () => (
                 disabled
             />
         </div>
+    </div>
+);
+
+export const WithFiles = () => (
+    <div style={{ maxWidth: '640px' }}>
+        <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+            Pass the chosen files as children. They sit below the button, outside the frame, as on the post-session recording upload.
+        </p>
+        <FileUpload
+            id="file-upload-with-files"
+            label="Upload session recording"
+            required
+            description="Upload this session’s Zoom recording. Single files and .zip work too."
+            buttonText="Choose a file"
+        >
+            {['zoom_0.mp4', 'audio_only.m4a', 'chat.txt'].map((file) => (
+                <div
+                    key={file}
+                    className="body2-txt"
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--size-element-gap-sm)',
+                        padding: 'var(--size-element-pad-y-sm) 0',
+                        color: 'var(--color-on-surface)',
+                    }}
+                >
+                    <i className="fa-solid fa-file" aria-hidden="true" style={{ color: 'var(--color-on-surface-variant)' }} />
+                    {file}
+                </div>
+            ))}
+        </FileUpload>
     </div>
 );
 
