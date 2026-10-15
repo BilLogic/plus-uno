@@ -111,7 +111,7 @@ export function runCommitmentRecordsConformance(
   it("a person's own asks come before card follow-ups, and each budget skips only its own", async () => {
     const records = make();
     const card = (id: string, dueAt: number) =>
-      commitmentRow({ id, kind: "card_stale", dueAt, threadTs: "", messageTs: "", requesterId: null, deadlineAt: null, cardId: id });
+      commitmentRow({ id, kind: "card_unowned", dueAt, threadTs: "", messageTs: "", requesterId: null, deadlineAt: null, cardId: id });
     await records.addCommitments([
       card("card:a", 10),
       card("card:b", 20),
@@ -122,6 +122,18 @@ export function runCommitmentRecordsConformance(
     assert.equal((await records.nextDue(500, "2026-10-01", { asked: ["U0MAYA"] }))?.id, "card:a");
     assert.equal((await records.nextDue(500, "2026-10-01", { cards: ["U0MAYA"] }))?.id, "C:promise");
     assert.equal(await records.nextDue(500, "2026-10-01", { asked: ["U0MAYA"], cards: ["U0MAYA"] }), null);
+  });
+
+  it("keeps stuck cards on a weekly budget of their own, apart from the daily card asks", async () => {
+    const records = make();
+    await records.addCommitments([
+      commitmentRow({ id: "card:s", kind: "card_stale", dueAt: 10, remindedOn: "2026-10-01", checkedOn: "2026-10-01", threadTs: "", messageTs: "", cardId: "s" }),
+      commitmentRow({ id: "card:t", kind: "card_stale", dueAt: 20, threadTs: "", messageTs: "", cardId: "t" }),
+      commitmentRow({ id: "card:u", kind: "card_unowned", dueAt: 30, threadTs: "", messageTs: "", cardId: "u" }),
+    ]);
+    assert.deepEqual(await records.remindedOn("2026-10-01"), { asked: {}, cards: {}, weekly: { U0MAYA: 1 } });
+    assert.equal((await records.nextDue(500, "2026-10-01", { cards: ["U0MAYA"] }))?.id, "card:t");
+    assert.equal((await records.nextDue(500, "2026-10-01", { weekly: ["U0MAYA"] }))?.id, "card:u");
   });
 
   it("counts each promiser's reminders on a morning", async () => {
@@ -135,8 +147,8 @@ export function runCommitmentRecordsConformance(
     await records.addCommitments([
       commitmentRow({ id: "card:x", kind: "card_unowned", remindedOn: "2026-10-01", threadTs: "", messageTs: "", cardId: "x" }),
     ]);
-    assert.deepEqual(await records.remindedOn("2026-10-01"), { asked: { U0MAYA: 2, U0ADE: 1 }, cards: { U0MAYA: 1 } });
-    assert.deepEqual(await records.remindedOn("2026-10-02"), { asked: {}, cards: {} });
+    assert.deepEqual(await records.remindedOn("2026-10-01"), { asked: { U0MAYA: 2, U0ADE: 1 }, cards: { U0MAYA: 1 }, weekly: {} });
+    assert.deepEqual(await records.remindedOn("2026-10-02"), { asked: {}, cards: {}, weekly: {} });
   });
 
   it("finds a promiser's live commitment in a thread, and only a live one", async () => {
@@ -271,7 +283,7 @@ export function runCommitmentRecordsConformance(
     assert.equal((await records.nextDue(Number.MAX_SAFE_INTEGER, "2026-10-01", { asked: ["U0MAYA"] }))?.id, miss.id);
     assert.equal((await records.nextDue(Number.MAX_SAFE_INTEGER, "2026-10-01", { asked: ["U0MAYA"], cards: ["U0MAYA"] })), null);
     await records.update(miss.id, { state: "nudged", remindedOn: "2026-10-01" });
-    assert.deepEqual(await records.remindedOn("2026-10-01"), { asked: {}, cards: { U0MAYA: 1 } });
+    assert.deepEqual(await records.remindedOn("2026-10-01"), { asked: {}, cards: { U0MAYA: 1 }, weekly: {} });
     await records.update(miss.id, { state: "done", resolvedAt: 5 });
     assert.deepEqual(await records.latestAnswers(miss.channel, 3), []);
   });

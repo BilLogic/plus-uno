@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **17 reference(s), 130,949 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **17 reference(s), 131,058 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -58,7 +58,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `figma-comments` | [`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) | 8,890 |
 | `file-a-ticket` | [`agents/uno-bot/skills/file-a-ticket/SKILL.md`](../../agents/uno-bot/skills/file-a-ticket/SKILL.md) | 3,182 |
 | `find-the-right-person` | [`agents/uno-bot/skills/find-the-right-person/SKILL.md`](../../agents/uno-bot/skills/find-the-right-person/SKILL.md) | 2,558 |
-| `follow-through` | [`agents/uno-bot/scheduled-actions/follow-through/ACTION.md`](../../agents/uno-bot/scheduled-actions/follow-through/ACTION.md) | 11,060 |
+| `follow-through` | [`agents/uno-bot/scheduled-actions/follow-through/ACTION.md`](../../agents/uno-bot/scheduled-actions/follow-through/ACTION.md) | 11,169 |
 | `prepare-the-call` | [`agents/uno-bot/skills/prepare-the-call/SKILL.md`](../../agents/uno-bot/skills/prepare-the-call/SKILL.md) | 2,202 |
 | `relay-a-message` | [`agents/uno-bot/skills/relay-a-message/SKILL.md`](../../agents/uno-bot/skills/relay-a-message/SKILL.md) | 1,462 |
 | `share-out` | [`agents/uno-bot/skills/share-out/SKILL.md`](../../agents/uno-bot/skills/share-out/SKILL.md) | 2,627 |
@@ -2124,7 +2124,7 @@ The same end-of-day read also looks for **commitments**: someone in a swept thre
 
 ## Card follow-ups
 
-Three more follow-ups ride the commitments' schedule and limits: the same end-of-day detection, the 9 am ET weekday morning post, and one follow-up at most and then lapsed. They have a morning budget of their own, two a person: a person's own reminders (promises, "remind me") go first and keep their own two, so a card backlog leaves them on time. The code is `agents/uno-bot/src/follow-through/`.
+Three more follow-ups ride the commitments' schedule and limits: the same end-of-day detection, the 9 am ET weekday morning post, and one follow-up at most and then lapsed. They have a morning budget of their own, two a person: a person's own reminders (promises, "remind me") go first and keep their own two, so a card backlog leaves them on time. Monday's stuck cards keep a budget apart from it, open that morning, so every stuck card a person has shows. The code is `agents/uno-bot/src/follow-through/`.
 
 - **The card:** each follow-up goes up on the shared decision card: a parent line mentioning the people asked, then one card per follow-up with Review and Open. All follow-ups in one place on one morning share a message, as a carousel, filled round-robin across the people asked once there are more than 10. At a channel's top they go on the sweep's report for that channel (`sweep` § The report, one message a channel). Review is the only answer, decided in the pop-up, nothing to tap or type. A decided card names the answer and who gave it ("Done · @Bea").
 - **F3, a card to-do with no card.** A thread or a running note says to create a Roadmap card ("Bill to create a card for the facelift last stage", "can someone make a card for this"). Two working days on, uno-bot searches the Roadmap by the to-do's words; a matching card closes it silently. Otherwise its card names the to-do, mentioning the assignee, or the note's takers when nobody was named, with Review and Open source. Review holds the drafted card (the PRD template), editable under Edit fields; Approve files it, and Reject drops the to-do. A message kept as a card to-do is passed over as a promise, so it gets one reminder, not two. Running notes reach it through the notes job, team notes only.

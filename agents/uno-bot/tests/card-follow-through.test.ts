@@ -1033,6 +1033,27 @@ describe("stuck cards are weekly: asked on Monday's morning", () => {
     assert.equal(only(store).nudges, 2);
   });
 
+  it("on Monday, all of one person's stuck cards are in the section, past the two-a-person cap; their unowned cards keep it", async () => {
+    const store = createInMemoryCommitmentStore();
+    const rm = roadmap({
+      cards: [
+        ...[0, 1, 2, 3].map((i) => stuck({ pageId: `s${i}`, title: `Stuck ${i}`, lastEditedAt: EOD - (22 + i) * DAY })),
+        // Three Maya created with nobody on them: daily asks, two a morning.
+        ...[0, 1, 2].map((i) => card({ pageId: `u${i}`, creatorId: "n-maya", lastEditedAt: EOD - (8 + i) * DAY })),
+      ],
+    });
+    await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+    const storage = createInMemoryRunnerStorage();
+    const mon = morning(store, rm, MONDAY, { handOff: handOffIn(storage), weeklyHandOff: handOffIn(storage, STALE_CARDS_SECTION) });
+    await mon.run();
+    const day = utcDay(MONDAY);
+    const [weekly] = await followUpsForSweep(mon.due, MONDAY, day, { weekly: true }).waiting();
+    assert.deepEqual(weekly!.cards.map((c) => c.item.title).sort(), ["Stuck 0", "Stuck 1", "Stuck 2", "Stuck 3"]);
+    assert.ok(weekly!.cards.every((c) => c.person === MAYA));
+    const [daily] = await followUpsForSweep(mon.due, MONDAY, day).waiting();
+    assert.equal(daily!.cards.length, MAX_CARD_REMINDERS_PER_PERSON, "the daily asks keep the cap");
+  });
+
   it("on Monday, a channel's stuck cards are handed off as one whole section, past the two-a-channel cap", async () => {
     const store = createInMemoryCommitmentStore();
     const people = [
