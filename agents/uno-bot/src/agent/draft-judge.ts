@@ -564,7 +564,7 @@ export async function reviewDraft(
         // to fix; the length and both ends tell the next reader which.
         reason = answer.cutOff ? "judge output cut off at the token ceiling" : "unparseable judge output";
         console.warn(
-          `[draft-judge] ${reason} (chars=${raw.length} mode=${mode} head=${JSON.stringify(raw.slice(0, 120))} ` +
+          `[draft-judge] ${reason} (model=${answer.model} chars=${raw.length} mode=${mode} head=${JSON.stringify(raw.slice(0, 120))} ` +
             `tail=${JSON.stringify(raw.slice(-80))}) — sending the original draft`,
         );
       }
