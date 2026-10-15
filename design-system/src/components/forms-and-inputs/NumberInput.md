@@ -3,11 +3,13 @@
 
 # NumberInput
 
+Empty is not 0: an empty field stays empty, and stepping from it starts at 0 (or the nearest bound). A typed value outside `min`/`max` is clamped when the field loses focus, not while it is typed. The steppers are named "Decrease {label}" and "Increase {label}", minus before plus as in Figma. The field is a text input, so the scroll wheel never changes the value.
+
 **Import:** `import { NumberInput } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/NumberInput.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/NumberInput.stories.jsx` — Overview, Content, Styles, InteractionStates, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/NumberInput.stories.jsx` — Overview, Content, Styles, InteractionStates, Interactive, Steppers, EmptyIsNotZero, ClampOnBlur, WheelLeavesTheValue
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/NumberInput.mdx`
 
@@ -20,15 +22,21 @@
 | `label` | node | — | Optional field label |
 | `required` | bool | `false` | Show required indicator |
 | `showLabel` | bool | `true` | — |
+| `info` | node | — | Text for an info tooltip beside the label. |
+| `caption` | node | — | Standing help under the field. A validation message takes its place. |
 | `placeholder` | string | `'Number'` | Placeholder text for the input |
-| `value` | string or number | — | — |
+| `value` | string or number | — | Empty (`''` or `null`) stays empty; it is never read as 0. |
+| `defaultValue` | string or number | — | — |
+| `size` | enum | `'medium'` | — |
 | `disabled` | bool | `false` | Disable the number input |
-| `readonly` | bool | `false` | Make the input read-only |
+| `readOnly` | bool | — | Make the input read-only. Hides the steppers. |
+| `readonly` | bool | — | @deprecated Prefer `readOnly` |
 | `validation` | enum | `'none'` | Validation state of the input |
-| `validationMessage` | string | — | Validation message to display |
+| `validationMessage` | node | — | Validation message to display |
 | `min` | number | — | Minimum value |
 | `max` | number | — | Maximum value |
 | `step` | number | `1` | Step increment/decrement value |
+| `subtle` | bool | `false` | Borderless until hovered or edited. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 | `onChange` | func | — | — |
@@ -39,18 +47,16 @@
 
 ## Variants
 
+**`size`** — `small` · `medium` · `large`
+
 **`validation`** — `none` · `invalid` · `success`
 
 Anything not listed is not a valid value.
-
-## Tokens touched
-
-`--bg-color` · `--border-color` · `--color-danger` · `--color-danger-border` · `--color-danger-state-08` · `--color-danger-state-12` · `--color-focus-ring` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-success` · `--color-success-border` · `--color-success-state-08` · `--color-success-state-12` · `--color-surface-container` · `--color-surface-container-low` · `--color-surface-container-lowest` · `--font-family-body` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body2` · `--font-size-body3` · `--font-weight-normal` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-sm` · `--size-element-pad-y-sm` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--text-color`
-
-From `design-system/src/components/forms-and-inputs/NumberInput.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
 Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `OptionList` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
+
+> Authored guidance is partial — missing: correct/incorrect (#166).

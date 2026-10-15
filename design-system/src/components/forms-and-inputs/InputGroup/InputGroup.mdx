@@ -14,6 +14,16 @@ export const figmaMeta = {
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13671-3218",
       "source": "node-chart",
       "status": "verified"
+    },
+    {
+      "id": "field",
+      "name": "_Field",
+      "componentSetNodeId": "14841:25919",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
+      "source": "manual",
+      "status": "unpublished",
+      "isComponentSet": true,
+      "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
     }
   ]
 };
@@ -52,6 +62,16 @@ Easily extend form controls by adding text, check box, radio, or button on eithe
 
 <DocsCanvasShell description={<>Baseline input field with addons on both sides.</>}>
     <DsCanvasQuiet of={InputGroupStories.Content} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Slots
+
+<DocsCanvasShell description={<>Addons sit in the field's Leading and Trailing slots and draw no box of their own. Buttons are small and cut to the line, so the field stays 34 high.</>}>
+    <DsCanvasQuiet of={InputGroupStories.AddonsInSlots} />
 </DocsCanvasShell>
 
 </div>
@@ -114,14 +134,15 @@ Easily extend form controls by adding text, check box, radio, or button on eithe
 
 ## When to use
 
-Use `InputGroup` for a text field joined edge-to-edge with something else — a
-unit after the box, a currency symbol before it, a button that acts on what was
-typed. The joining is the whole point: the addons share the field's border, so
-they read as one control.
+Use `InputGroup` for a text field with something inside its box — a unit
+after the value, a currency symbol before it, a button that acts on what was
+typed. The addons sit in the field's Leading and Trailing slots and share its
+one border, so they read as one control.
 
-Up to two addons sit on each side. `leadingVisual`, `leadingVisual2`,
-`trailingVisual` and `trailingVisual2` each take an element, a string shorthand,
-or an object like `{ type: 'button', text: 'Go', onClick }`. The subcomponents —
+`leadingVisual` and `trailingVisual` each take one addon or an array of them
+(Trailing holds two at most): an element, a string shorthand, or an object like
+`{ type: 'button', text: 'Go', onClick }`. Button and dropdown addons are always
+the small size, cut to the field's line, so the field keeps its height. The subcomponents —
 `InputGroup.Text`, `.Icon`, `.Button`, `.Dropdown`, `.Checkbox`, `.Radio` — are
 what those shorthands build, and can be passed directly.
 
@@ -180,6 +201,8 @@ generic names "Toggle option" and "Select option". `"button"` is labelled
   `InputGroup.Dropdown` are real ones. `InputGroup.Text` and `InputGroup.Icon`
   are decoration — the icon is `aria-hidden`, so an icon that means something
   needs text beside it.
+- **`required` shows an asterisk and sets `aria-required`**, and a
+  `validationMessage` is announced with `role="alert"`, as on `Input`.
 - **Two addons a side is the limit, and it is a limit for a reason.** Four things
   bolted to a field are four things a screen-reader user meets before the field
   itself.

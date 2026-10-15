@@ -15,7 +15,6 @@ export default {
  * Shows all visual states of the Additional Details text input
  * 
  * Uses design system Textarea component with:
- * - variant="long" for boxed style
  * - placeholder for unfilled state
  * - rows=2 for appropriate height
  */
@@ -34,7 +33,6 @@ export const Overview = () => (
                     label={<>Additional details <span style={{ color: 'var(--color-danger)' }}>*</span></>}
                     placeholder="Provide additional context..."
                     rows={2}
-                    variant="long"
                 />
             </div>
         </section>
@@ -46,7 +44,6 @@ export const Overview = () => (
                     label={<>Additional details <span style={{ color: 'var(--color-danger)' }}>*</span></>}
                     defaultValue="Bla bla bla bla"
                     rows={2}
-                    variant="long"
                 />
             </div>
         </section>
@@ -73,7 +70,6 @@ export const Interactive = () => {
                     value={details}
                     onChange={(e) => setDetails(e.target.value)}
                     rows={2}
-                    variant="long"
                 />
             </div>
             {details && (

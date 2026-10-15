@@ -15,9 +15,9 @@ authored half (#166), counted rather than assumed.
 | [DatePicker](DatePicker/index.md) | 15 | ✅ | ✅ | ✅ |
 | [Dropdown](Dropdown/index.md) | 13 | ✅ | ✅ | ✅ |
 | [FileUpload](FileUpload.md) | 16 | ✅ | ✅ | ✅ |
-| [Input](Input.md) | 22 | ✅ | ✅ | ✅ |
-| [InputGroup](InputGroup/index.md) | 20 | ✅ | ✅ | ✅ |
-| [NumberInput](NumberInput.md) | 21 | ✅ | ✅ | ✅ |
+| [Input](Input.md) | 30 | ✅ | ✅ | ✅ |
+| [InputGroup](InputGroup/index.md) | 24 | ✅ | ✅ | ✅ |
+| [NumberInput](NumberInput.md) | 27 | ✅ | ✕ | ✅ |
 | [OptionList](OptionList.md) | 12 | ✕ | ✕ | ✕ |
 | [Radio](Radio.md) | 17 | ✅ | ✕ | ✅ |
 | [Range](Range.md) | 14 | ✅ | ✕ | ✅ |
@@ -27,10 +27,10 @@ authored half (#166), counted rather than assumed.
 | [SelectMultiple](SelectMultiple.md) | 10 | ✕ | ✕ | ✕ |
 | [Switch](Switch.md) | 15 | ✅ | ✅ | ✅ |
 | [TagInput](TagInput.md) | 13 | ✅ | ✅ | ✅ |
-| [Textarea](Textarea.md) | 17 | ✅ | ✅ | ✅ |
+| [Textarea](Textarea.md) | 26 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect.md) | 9 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 20/22 (91%) · Correct/incorrect 13/22 (59%) · Accessibility 20/22 (91%)
+**Authored coverage:** When to use 20/22 (91%) · Correct/incorrect 12/22 (55%) · Accessibility 20/22 (91%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

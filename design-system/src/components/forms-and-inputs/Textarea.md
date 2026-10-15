@@ -3,11 +3,13 @@
 
 # Textarea
 
+`rows` sets the height; a one-line textarea is `rows={1}`. With `maxLength`, the caption counts characters on the right. With `subtle`, it reads as plain text until hovered or edited, shows Save and Cancel while editing, and stays open when it loses focus.
+
 **Import:** `import { Textarea } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/Textarea.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Textarea.stories.jsx` — Overview, Styles, Sizes, InteractionStatesLong, InteractionStatesShort, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Textarea.stories.jsx` — Overview, Rows, Sizes, InteractionStates, Count, Subtle, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Textarea.mdx`
 
@@ -18,18 +20,27 @@
 | `id` | string | — | — |
 | `name` | string | — | — |
 | `label` | node | — | Field label |
+| `required` | bool | `false` | Shows an asterisk and sets `aria-required`. |
+| `showLabel` | bool | `true` | Hides the label without removing it. |
+| `info` | node | — | Text for an info tooltip beside the label. |
+| `caption` | node | — | Standing help under the field. A validation message takes its place. |
 | `value` | string | — | — |
 | `defaultValue` | string | — | — |
 | `placeholder` | string | — | Placeholder text |
-| `rows` | number | `3` | Visible text rows |
+| `rows` | number | `3` | Visible text rows. One row is the short textarea. |
 | `size` | enum | `'medium'` | Size variant |
-| `variant` | enum | `'long'` | The visual style of the textarea |
-| `state` | enum | `'default'` | The visual state of the component |
+| `validation` | enum | `'none'` | Validation result |
+| `validationMessage` | node | — | Message under the field when validation is not none |
+| `state` | enum | `'default'` | `focus` draws focus still, for documentation. The other values are older names for `validation`, `readOnly` and `disabled`. |
 | `disabled` | bool | `false` | — |
 | `readOnly` | bool | `false` | — |
+| `maxLength` | number | — | Limits the length and shows a count in the caption |
+| `subtle` | bool | `false` | Borderless until hovered or edited, with Save and Cancel while editing. |
+| `onSave` | func | — | Subtle only: called by Save (or Ctrl/⌘+Enter). Throw or reject to keep the field open in `invalid`. |
 | `onChange` | func | — | — |
 | `onFocus` | func | — | — |
 | `onBlur` | func | — | — |
+| `onKeyDown` | func | — | — |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
@@ -37,17 +48,11 @@
 
 **`size`** — `small` · `medium` · `large`
 
-**`variant`** — `long` · `short`
+**`validation`** — `none` · `invalid` · `success`
 
-**`state`** — `default` · `focus` · `error` · `success` · `readonly` · `disabled` · `valid` · `read-only`
+**`state`** — `default` · `focus` · `error` · `success` · `readonly` · `disabled` · `valid` · `read-only` · `invalid`
 
 Anything not listed is not a valid value.
-
-## Tokens touched
-
-`--color-danger-border` · `--color-focus-ring` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline` · `--color-outline-variant` · `--color-success-border` · `--color-surface` · `--color-surface-variant` · `--font-family-body` · `--font-line-height-body1` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body-small` · `--font-size-body1` · `--font-size-body2` · `--font-size-body3` · `--font-weight-light` · `--font-weight-medium` · `--size-element-gap-xs` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-stroke-lg`
-
-From `design-system/src/components/forms-and-inputs/Textarea.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 

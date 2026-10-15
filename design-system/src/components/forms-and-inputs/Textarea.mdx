@@ -7,13 +7,6 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
   "props": {
-    "variant": {
-      "type": "enum",
-      "values": [
-        "long",
-        "short"
-      ]
-    },
     "size": {
       "type": "enum",
       "values": [
@@ -36,40 +29,37 @@ export const figmaMeta = {
   },
   "sets": [
     {
-      "id": "form-textarea",
-      "name": "Form Textarea",
+      "id": "textarea",
+      "name": "Textarea",
       "componentSetNodeId": "13541:10731",
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731",
-      "codeDefaults": {
-        "variant": "long"
+      "variantValueMap": {
+        "validation": {
+          "invalid": "error",
+          "valid": "success"
+        }
       },
-      "variantValueMap": { "validation": { "invalid": "error", "valid": "success" } },
       "status": "verified",
-      "verifiedAt": "2026-06-13",
-      "notes": "variantProps TBD — add from Figma variant inspection."
+      "verifiedAt": "2026-10-15",
+      "notes": "One set. Form Short Textarea was merged into it and deleted from the library; a short textarea is `rows={1}` in code and an instance resized to 34 high in Figma. `rows` is code-only: Figma sets the height by resizing the instance."
     },
     {
-      "id": "form-short-textarea",
-      "name": "Form Short Textarea",
-      "componentSetNodeId": "13543:5904",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904",
-      "codeDefaults": {
-        "variant": "short"
-      },
-      "variantValueMap": { "validation": { "invalid": "error", "valid": "success" } },
-      "status": "verified",
-      "verifiedAt": "2026-06-13"
+      "id": "field",
+      "name": "_Field",
+      "componentSetNodeId": "14841:25919",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
+      "source": "manual",
+      "status": "unpublished",
+      "isComponentSet": true,
+      "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
     }
-  ],
-  "deliberate": {
-    "variant": "Code carries long and short as one `variant` prop; the library draws them as two sets, Form Textarea and Form Short Textarea."
-  }
+  ]
 };
 
 <Meta of={TextareaStories} />
 
 <Title />
-Use text area for multi-line text input form fields.
+Use a textarea for free text over several lines.
 
 <DocsTabs of={TextareaStories}>
 
@@ -88,7 +78,7 @@ Use text area for multi-line text input form fields.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Long form (boxed) textarea with label and placeholder.</>}>
+<DocsCanvasShell attachSourceBelow description={<>A labelled textarea with a placeholder, on the same field as Input.</>}>
     <Canvas of={TextareaStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -96,13 +86,19 @@ Use text area for multi-line text input form fields.
 
 <div className="sb-ds-doc-section">
 
-## Appearance
+## Rows
 
-<DocsCanvasShell description={<>Long (boxed) and short (underlined) styles.</>}>
-    <DsCanvasQuiet of={TextareaStories.Styles} />
+<DocsCanvasShell description={<>`rows` sets the height. One row is the short textarea, as tall as an Input.</>}>
+    <DsCanvasQuiet of={TextareaStories.Rows} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Size variants: small, medium, and large.</>}>
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sizes
+
+<DocsCanvasShell description={<>Small, medium and large type and padding.</>}>
     <DsCanvasQuiet of={TextareaStories.Sizes} />
 </DocsCanvasShell>
 
@@ -112,12 +108,28 @@ Use text area for multi-line text input form fields.
 
 ## States
 
-<DocsCanvasShell description={<>Long form: default, focus, filled, valid, error, disabled, read-only (plus placeholder examples).</>}>
-    <DsCanvasQuiet of={TextareaStories.InteractionStatesLong} />
+<DocsCanvasShell description={<>Default, focus, filled, valid, invalid, disabled and read-only: the same states as Input.</>}>
+    <DsCanvasQuiet of={TextareaStories.InteractionStates} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Short form: same state matrix.</>}>
-    <DsCanvasQuiet of={TextareaStories.InteractionStatesShort} />
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Count
+
+<DocsCanvasShell description={<>With `maxLength`, a count on the right of the caption, beside any error.</>}>
+    <DsCanvasQuiet of={TextareaStories.Count} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Subtle
+
+<DocsCanvasShell description={<>Plain text until hovered or edited. Save and Cancel show while editing, and the field stays open when focus leaves it.</>}>
+    <DsCanvasQuiet of={TextareaStories.Subtle} />
 </DocsCanvasShell>
 
 </div>
@@ -152,8 +164,8 @@ Use text area for multi-line text input form fields.
 
 Use `Textarea` when the answer is prose the user writes in their own words —
 session notes, a reflection, a reason for cancelling. `rows` (default 3) sets
-the visible height, and `variant="short"` gives the one-line treatment used in
-the Figma spec for compact note fields.
+the visible height; a one-line note field is `rows={1}`, which is as tall as an
+`Input` of the same size.
 
 </div>
 
@@ -161,14 +173,25 @@ the Figma spec for compact note fields.
 
 ## Usage notes
 
-### `rows` is ignored in the short variant.
+- **`validation` and `validationMessage` work as they do on Input.** The
+  message sits in the caption, on the left; with `maxLength`, a count sits on
+  the right ("55 / 120"), and neither replaces the other.
+- **`subtle` keeps the editor open.** A click elsewhere mid-paragraph should not
+  publish half a thought, so a subtle textarea saves only through its Save
+  button (or Ctrl/⌘+Enter) and stays open when it loses focus. Cancel or Esc
+  puts the saved text back. A failed save keeps the field open in `invalid`.
+- **`state` is for older call sites and still pictures.** `state="focus"` draws
+  focus for documentation; `error`, `success`, `readonly` and `disabled` are
+  older names for `validation`, `readOnly` and `disabled`.
+
+### One row, not a short variant.
 
 ```jsx
-// Incorrect — `variant="short"` forces one row regardless of what rows says.
-<Textarea id="summary" variant="short" rows={6} />
+// Incorrect — `variant` is gone; there is one textarea.
+<Textarea id="other" label="Other" variant="short" />
 
-// Correct — the long variant is the one that honours rows.
-<Textarea id="summary" rows={6} />
+// Correct.
+<Textarea id="other" label="Other" rows={1} />
 ```
 
 </div>
@@ -181,44 +204,12 @@ the Figma spec for compact note fields.
   once and used for both the label's `htmlFor` and the control; when no `id` is
   given, React's `useId` supplies one. Pass `id` only when something outside the
   component needs to point at the control, and you will get exactly that id back.
-  `name` is a form key, not an id, and no longer stands in for one (#206).
-- **The label is only rendered when `label` is given.** There is no
-  `showLabel`-style escape hatch here, so a field with no visible label needs an
-  `aria-label`, which is spread onto the control.
-- **`state` is presentation.** `error`, `success`, `readonly` and `disabled` all
-  resolve to a class; only `disabled` and `readOnly` change the control's actual
-  behaviour, and they override `state` when set.
-- **The aliases are real.** `read-only`, `readOnly` and `valid` are normalised to
-  `readonly` and `success` respectively — they exist for older call sites, and
-  new code should use `readonly` and `success`.
-- **Everything passes through.** `maxLength`, `required`, `aria-invalid`,
-  `aria-describedby` and the rest all reach the control, which is how the
-  missing message slot is worked around.
-
-### Pass `id`, not just `name`.
-
-```jsx
-// Incorrect — the label points at `name`, but the textarea only receives `id`.
-// Same trap as Input.
-<Textarea name="notes" label="Session notes" value={notes} onChange={onNotes} />
-
-// Correct.
-<Textarea id="notes" name="notes" label="Session notes" value={notes} onChange={onNotes} />
-```
-
-### `state="error"` carries no message.
-
-```jsx
-// Incorrect — the field turns red and says nothing. Unlike Input, there is no
-// validationMessage prop here, so the reason never reaches the user.
-<Textarea id="notes" label="Session notes" state="error" value={notes} onChange={onNotes} />
-
-// Correct — render the message and point the field at it.
-<Textarea id="notes" label="Session notes" state="error"
-          aria-invalid={true} aria-describedby="notes-error"
-          value={notes} onChange={onNotes} />
-<p id="notes-error">Notes must be at least 20 characters.</p>
-```
+- **`showLabel={false}` hides the label without removing it**, as on Input.
+- **An error is announced.** With `validation="invalid"`, the control carries
+  `aria-invalid`, points at the message with `aria-describedby`, and the message
+  renders with `role="alert"`. The count is described too.
+- **`required` shows an asterisk and sets `aria-required`.** Explain the
+  asterisk once, in the form's legend.
 
 </div>
 
@@ -226,9 +217,8 @@ the Figma spec for compact note fields.
 
 ## Related
 
-- For a one-line answer, use `Input`.
+- For a one-line answer that is not prose, use `Input`.
 - For formatted text, use `RichTextEditor`.
-- For an error message under the field, render it yourself and link it with `aria-describedby` — `state` colours the control but there is no message slot. See *Label & caption*.
 
 </div>
 

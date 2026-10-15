@@ -1,11 +1,25 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Form } from 'react-bootstrap';
 import useFieldId from './useFieldId';
-import './Input.scss';
+import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription } from './_internal/Field';
+import useInlineEdit from './_internal/useInlineEdit';
+
+/** A string visual is a Font Awesome class; `'dropdown'` is the caret. */
+const renderVisual = (visual) => {
+    if (!visual) return null;
+    if (typeof visual !== 'string') return visual;
+    const className = visual === 'dropdown' ? 'fa-solid fa-caret-down' : visual;
+    return <i className={className} aria-hidden="true" />;
+};
 
 /**
- * Input — text field with optional leading/trailing visuals and validation.
+ * Input — a labelled single-line text field on `_Field`.
+ *
+ * Label, field and caption: the caption shows a validation message (or
+ * standing help) on the left and, when `maxLength` is set, a count on the
+ * right. With `subtle`, the field reads as plain text until it is hovered or
+ * edited, and saves on blur or Enter through `onSave`.
+ *
  * Prefer `readOnly` (camelCase); legacy `readonly` is still accepted.
  */
 const Input = ({
@@ -15,12 +29,14 @@ const Input = ({
     required = false,
     /**
      * Hide the label visually. It is still rendered and still names the input —
-     * see the `showLabel` section in `Input.mdx` (#213) for why it cannot remove
-     * it.
+     * see the `showLabel` section in `Input.mdx` for why it cannot remove it.
      */
     showLabel = true,
+    info,
+    caption,
     placeholder,
     value,
+    defaultValue,
     inputRef,
     size = 'medium',
     disabled = false,
@@ -32,134 +48,131 @@ const Input = ({
     leadingVisual,
     trailingVisual,
     type = 'text',
+    maxLength,
+    subtle = false,
+    onSave,
     className = '',
     style,
     onChange,
     onFocus,
     onBlur,
+    onKeyDown,
     ...props
 }) => {
-    const [isFocused, setIsFocused] = useState(false);
-    /** One id for the label and the input — see `useFieldId` (#206). */
+    /** One id for the label and the input — see `useFieldId`. */
     const fieldId = useFieldId(id);
-
-    /*
-     * #327. The validation message is now something the field POINTS AT.
-     *
-     * It used to render as text after the input with no id, so nothing could
-     * refer to it: a screen-reader user heard the field's name and none of the
-     * reason it was rejected. Giving it an id and pointing `aria-describedby` at
-     * it is the whole fix, and `aria-invalid` is the other half — the state, as
-     * opposed to the explanation.
-     *
-     * A caller's own `aria-describedby` is kept and ours is appended, so
-     * pointing at your own help text does not silently lose the error, and the
-     * error does not silently lose your help text.
-     */
-    const validationId = validation !== 'none' && validationMessage
-        ? `${fieldId}-validation`
-        : undefined;
-    const describedBy = [props['aria-describedby'], validationId]
-        .filter(Boolean).join(' ') || undefined;
     /** Prefer `readOnly`; honor legacy `readonly` when explicitly passed */
     const isReadOnly = readOnly !== undefined ? readOnly : Boolean(readonly);
 
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
-    
-    const handleFocus = (e) => {
-        setIsFocused(true);
-        if (onFocus) onFocus(e);
+    const edit = useInlineEdit({ enabled: subtle && !disabled && !isReadOnly, value, defaultValue, onSave });
+
+    // The count follows what is in the field, held or not.
+    const [typedLength, setTypedLength] = useState(String(defaultValue ?? '').length);
+    const currentValue = edit.enabled ? edit.draft : value;
+    const length = currentValue !== undefined && currentValue !== null
+        ? String(currentValue).length
+        : typedLength;
+
+    const failed = edit.enabled && edit.error;
+    const tone = failed || validation === 'invalid' ? 'invalid' : (validation === 'success' ? 'success' : 'help');
+    const message = failed
+        ? edit.error
+        : (validation !== 'none' && validationMessage) || caption;
+    const counted = maxLength !== undefined;
+    const { messageId, countId, describedBy } = fieldDescription({
+        fieldId,
+        message,
+        counted,
+        describedBy: props['aria-describedby'],
+    });
+
+    const handleChange = (event) => {
+        if (edit.enabled) edit.setDraft(event.target.value);
+        else if (value === undefined) setTypedLength(event.target.value.length);
+        if (onChange) onChange(event);
+    };
+    const handleFocus = (event) => {
+        if (edit.enabled) edit.handlers.onFocus(event);
+        if (onFocus) onFocus(event);
+    };
+    const handleBlur = (event) => {
+        if (edit.enabled) edit.handlers.onBlur(event);
+        if (onBlur) onBlur(event);
+    };
+    const handleKeyDown = (event) => {
+        if (onKeyDown) onKeyDown(event);
+        if (edit.enabled && !event.defaultPrevented) edit.handlers.onKeyDown(event);
     };
 
-    const handleBlur = (e) => {
-        setIsFocused(false);
-        if (onBlur) onBlur(e);
+    const setRefs = (node) => {
+        if (edit.enabled) edit.controlRef.current = node;
+        if (typeof inputRef === 'function') inputRef(node);
+        else if (inputRef) inputRef.current = node;
     };
+
+    const trailing = edit.enabled && edit.saving
+        ? <span className="plus-field-saving" role="status">saving…</span>
+        : renderVisual(trailingVisual);
+
+    const valueProps = edit.enabled
+        ? { value: edit.draft }
+        : { value, defaultValue };
 
     const inputClasses = [
+        'plus-field__control',
         'plus-input',
-        `plus-input-${size}`,
-        sizeClass,
-        disabled ? 'plus-input-disabled' : '',
-        isReadOnly ? 'plus-input-readonly' : '',
-        isFocused ? 'plus-input-focused' : '',
-        validation !== 'none' ? `plus-input-${validation}` : '',
-        className
+        className,
     ].filter(Boolean).join(' ');
 
-    const validationIcon = validation === 'invalid' ? (
-        <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" />
-    ) : validation === 'success' ? (
-        <i className="fa-solid fa-circle-check" aria-hidden="true" />
-    ) : null;
-
     return (
-        <div className={`plus-input-wrapper ${disabled ? 'plus-input-wrapper-disabled' : ''}`}>
-            {label && (
-                <Form.Label
-                    htmlFor={fieldId}
-                    className={`plus-input-label${showLabel ? '' : ' plus-input-label-hidden'}`}
-                >
-                    {label}
-                    {required && (
-                        <span className="plus-input-required" aria-label="required">*</span>
-                    )}
-                </Form.Label>
-            )}
-            <div className="plus-input-container">
-                {leadingVisual && (
-                    <div className="plus-input-leading-visual">
-                        {typeof leadingVisual === 'string' ? (
-                            <i className={leadingVisual} aria-hidden="true" />
-                        ) : (
-                            leadingVisual
-                        )}
-                    </div>
-                )}
-                <Form.Control
+        <FieldStack disabled={disabled} className="plus-input-wrapper">
+            <FieldLabel htmlFor={fieldId} required={required} info={info} hidden={!showLabel}>
+                {label}
+            </FieldLabel>
+            <Field
+                size={size}
+                subtle={subtle}
+                disabled={disabled}
+                readOnly={isReadOnly}
+                invalid={tone === 'invalid'}
+                valid={tone === 'success'}
+                busy={edit.enabled && edit.saving}
+                leading={renderVisual(leadingVisual)}
+                trailing={trailing}
+            >
+                <input
                     id={fieldId}
                     name={name}
                     type={type}
                     placeholder={placeholder}
-                    value={value}
-                    ref={inputRef}
+                    {...valueProps}
+                    ref={setRefs}
                     disabled={disabled}
                     readOnly={isReadOnly}
+                    maxLength={maxLength}
                     className={inputClasses}
                     style={style}
-                    onChange={onChange}
+                    onChange={handleChange}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
+                    onKeyDown={handleKeyDown}
+                    aria-required={required || undefined}
                     {...props}
                     /* After the spread: this value already contains the
                      * caller's, so letting the spread win would drop ours. */
                     aria-describedby={describedBy}
-                    aria-invalid={validation === 'invalid' || undefined}
+                    aria-invalid={tone === 'invalid' || undefined}
                 />
-                {trailingVisual && (
-                    <div className="plus-input-trailing-visual">
-                        {typeof trailingVisual === 'string' ? (
-                            trailingVisual === 'dropdown' ? (
-                                <i className="fa-solid fa-caret-down" aria-hidden="true" />
-                            ) : (
-                                <i className={trailingVisual} aria-hidden="true" />
-                            )
-                        ) : (
-                            trailingVisual
-                        )}
-                    </div>
-                )}
-            </div>
-            {validation !== 'none' && validationMessage && (
-                <div
-                    id={validationId}
-                    className={`plus-input-validation plus-input-validation-${validation}`}
-                >
-                    {validationIcon}
-                    <span className="plus-input-validation-message">{validationMessage}</span>
-                </div>
-            )}
-        </div>
+            </Field>
+            <FieldCaption
+                messageId={messageId}
+                message={message}
+                tone={tone}
+                countId={countId}
+                count={length}
+                maxLength={maxLength}
+            />
+        </FieldStack>
     );
 };
 
@@ -167,10 +180,16 @@ Input.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
     label: PropTypes.node,
+    /** Shows an asterisk and sets `aria-required`. Explain the asterisk once, in the form's legend. */
     required: PropTypes.bool,
     showLabel: PropTypes.bool,
+    /** Text for an info tooltip beside the label. */
+    info: PropTypes.node,
+    /** Standing help under the field. A validation message takes its place. */
+    caption: PropTypes.node,
     placeholder: PropTypes.string,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     inputRef: PropTypes.oneOfType([
         PropTypes.func,
         PropTypes.shape({ current: PropTypes.any })
@@ -181,7 +200,7 @@ Input.propTypes = {
     /** @deprecated Prefer `readOnly` */
     readonly: PropTypes.bool,
     validation: PropTypes.oneOf(['none', 'invalid', 'success']),
-    validationMessage: PropTypes.string,
+    validationMessage: PropTypes.node,
     leadingVisual: PropTypes.oneOfType([
         PropTypes.string, // Icon class name
         PropTypes.node // React element
@@ -191,13 +210,20 @@ Input.propTypes = {
         PropTypes.node // React element
     ]),
     type: PropTypes.string,
+    /** Limits the length and shows a count on the right of the caption. */
+    maxLength: PropTypes.number,
+    /** Borderless until hovered or edited, for editing in place. */
+    subtle: PropTypes.bool,
+    /** Subtle only: called on blur or Enter with the new value. Throw or reject to keep the field open in `invalid`. */
+    onSave: PropTypes.func,
+    /** Browser autofill token, e.g. `email`, `current-password`, `one-time-code`. */
+    autoComplete: PropTypes.string,
     className: PropTypes.string,
     style: PropTypes.object,
     onChange: PropTypes.func,
     onFocus: PropTypes.func,
-    onBlur: PropTypes.func
+    onBlur: PropTypes.func,
+    onKeyDown: PropTypes.func
 };
 
 export default Input;
-
-

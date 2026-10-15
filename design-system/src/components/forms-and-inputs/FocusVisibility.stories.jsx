@@ -157,7 +157,9 @@ ForcedColorsKeepFocusAndSelection.play = async ({ canvasElement }) => {
         field.focus();
         await expect(document.activeElement).toBe(field);
         await expect(
-            outlined(field) || outlined(field.closest('.plus-date-picker-trigger')),
+            outlined(field)
+                || outlined(field.closest('.plus-field'))
+                || outlined(field.closest('.plus-date-picker-trigger')),
             `${field.getAttribute('aria-label') || field.id || field.textContent} shows focus`,
         ).toBe(true);
     }

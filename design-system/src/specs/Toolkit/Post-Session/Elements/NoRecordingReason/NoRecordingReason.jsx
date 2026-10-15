@@ -88,7 +88,6 @@ const NoRecordingReason = ({
                         onChange={onOtherDetailChange}
                         placeholder="Briefly describe why there’s no recording"
                         rows={1}
-                        variant="short"
                         size="medium"
                     />
                 </div>
