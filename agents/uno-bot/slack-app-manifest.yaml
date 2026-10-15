@@ -18,10 +18,6 @@
 # agent_session_stopped (#576, 2026-09-17): this file subscribes to it; the
 # live app does not yet.
 #
-# Slash commands: /grind, /chill and /stop, here and on the live app (checked
-# on the Slash Commands page, 2026-10-15). The `commands` bot scope stays for
-# them.
-#
 # ── IN SYNC WITH LIVE (verified `npm run slack:diff`, 2026-08-06) ────────────
 # `messages_tab_enabled: true` and the `app_context_changed` subscription are
 # both applied on the app now, and the handlers for the agent surface shipped
@@ -38,6 +34,10 @@
 # migration to agent_view is complete and irreversible by Slack's own design, so
 # there is no configuration these would serve. An arrival now would be a
 # Slack-side surprise, and shows up in the unhandled-event log.
+#
+# Slash commands: /grind, /chill and /stop, here and on the live app (checked
+# on the Slash Commands page, 2026-10-15). The `commands` bot scope stays for
+# them.
 #
 # ⚠️ The API cannot apply this file; the WEB EDITOR can. pkce_enabled makes
 # apps.manifest.update / .validate reject every payload — including Slack's own
