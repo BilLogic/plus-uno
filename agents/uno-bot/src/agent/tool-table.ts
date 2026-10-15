@@ -399,6 +399,19 @@ export const TOOL_TABLE = {
       nouns: ["revision", "blueprint", "rows"],
     },
   },
+  // A proposal removal card's one operation (src/blueprint-upkeep/
+  // proposal-cleanup.ts): a drawn proposal's cells, then its path, deleted
+  // through the delete RPCs as uno-bot. The Worker stages it; the model is
+  // never offered it.
+  blueprint_withdraw: {
+    access: "worker",
+    retrieval: false,
+    gate: {
+      verb: "remove this proposal from the blueprint",
+      kind: "remove a blueprint proposal",
+      nouns: ["proposal", "blueprint", "path"],
+    },
+  },
   proposal_resolve: { access: "control", retrieval: false },
 } as const satisfies Record<string, ToolRow>;
 

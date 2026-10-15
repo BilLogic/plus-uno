@@ -25,7 +25,12 @@
 //     after its PRD is linked as it is kept (`./link.ts`);
 //   • a linked card's proposals: one D1 query, then each variant path read
 //     (5) and, at a deploy, the path it was drawn beside by its id (4) —
-//     three path reads at most, inside `MATCH_COST`.
+//     three path reads at most, inside `MATCH_COST`;
+//   • a drawn proposal's removal: a ✅ card posted under the proposal's
+//     thread and staged as a revision card is (`proposalOfferDepsFor`), on a
+//     removal ask there or from the morning's `blueprint-proposal-offer`
+//     check — one post, one staging and a few D1 queries an offer
+//     (`./proposal-cleanup.ts`).
 //
 // Budget (ADR-022), against the 38-subrequest lookup ceiling of one alarm,
 // each job sized by cost, not by a count (`./budget.ts`).
@@ -73,6 +78,8 @@ import { draftProposal, drawnProposalOf, PROPOSAL_OFFER_SUBREQUESTS, type Propos
 import { createD1ProposalRecords } from "./proposal-records-d1";
 import { keepProposalLinks, prdCardOf, type ThreadCards } from "./link";
 import type { ProposalRecords } from "./proposal-records";
+import { isRemoveRequest, offerAgedRemovals, offerRequestedRemoval, type OfferDeps } from "./proposal-cleanup";
+import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
 import type { OperationOutcome } from "../gate/index";
 import { cardEvidence } from "./evidence";
 import { stageOf, STAGES } from "./stages";
@@ -515,4 +522,74 @@ export async function recordDrawnProposalFor(
   const records = proposalRecordsFor(env);
   if (!records) return;
   await keepProposalLinks({ records, threadCards: env.HARNESS_KV ? threadCardsOn(env.HARNESS_KV) : null, now: () => Date.now() }, proposal, outcomes);
+}
+
+// ── A drawn proposal's removal ───────────────────────────────────────────────
+
+/** A message's text without its @-mentions, as the removal ask is read. */
+const unmentioned = (text: string | undefined) => (text ?? "").replace(/<@[A-Z0-9]+(?:\|[^>]*)?>/g, " ").trim();
+
+/** The removal doors' ports on `Env`, or null without the usage database. */
+function proposalOfferDepsFor(env: Env): OfferDeps | null {
+  const records = proposalRecordsFor(env);
+  if (!records) return null;
+  return {
+    records,
+    async postCard(p, card) {
+      const rendered = renderProposalCard(card);
+      const sent = await postMessage(env, {
+        channel: p.channel,
+        thread_ts: p.replyTs,
+        text: rendered.text,
+        blocks: rendered.blocks ?? proposalCardBlocks(rendered.text),
+      });
+      return sent.ok && sent.ts ? { ts: sent.ts, text: rendered.text } : null;
+    },
+    stage: (proposal) => stageRevisionCard(env, proposal),
+    linkOf: (p) => (p.cellIds[0] ? cellUrl(env.BLUEPRINT_APP_URL, p.cellIds[0]) : undefined),
+  };
+}
+
+/**
+ * Whether a message may ask to remove a proposal, by its shape alone: a
+ * person's message, in a thread or a DM, that reads as a short removal ask
+ * (`isRemoveRequest`). Reads nothing.
+ *
+ * @param env - Worker bindings
+ * @param event - The message
+ * @param isDm - Whether the message is in a DM, where the whole DM is one conversation
+ */
+export function isWithdrawRequestCandidate(env: Env, event: SlackMessageEvent, isDm: boolean): boolean {
+  if (!env.USAGE_DB || !isBlueprintConfigured(env)) return false;
+  if (event.bot_id || !event.user || (event.subtype && event.subtype !== "thread_broadcast")) return false;
+  if (!isDm && (!event.thread_ts || event.thread_ts === event.ts)) return false;
+  return isRemoveRequest(unmentioned(event.text));
+}
+
+/**
+ * A removal ask in a proposal's conversation: a ✅ card for each proposal the
+ * sender drew there. Runs at the head of the thread's job.
+ *
+ * @param env - Worker bindings
+ * @param event - The message
+ * @param conversation - The conversation key the proposal was recorded under
+ * @returns Whether it was a removal ask, handled — the turn is then skipped
+ */
+export async function handleWithdrawRequestOnEnv(env: Env, event: SlackMessageEvent, conversation: string): Promise<boolean> {
+  const deps = proposalOfferDepsFor(env);
+  if (!deps || !event.user) return false;
+  return offerRequestedRemoval(deps, { channel: event.channel, threadTs: conversation, user: event.user, text: unmentioned(event.text) });
+}
+
+/**
+ * The morning's removal offers (`blueprint-proposal-offer`) on `Env`.
+ *
+ * @param env - Worker bindings
+ * @param opts - `dryRun` posts and marks nothing
+ */
+export async function runProposalOffersOnEnv(env: Env, opts: JobContext): Promise<{ summary: string }> {
+  if (!isBlueprintConfigured(env)) return { summary: "uno-blueprint not configured — no removal offered" };
+  const deps = proposalOfferDepsFor(env);
+  if (!deps) return { summary: "USAGE_DB not bound — no drawn proposals to look at" };
+  return offerAgedRemovals({ ...deps, now: () => Date.now(), meter: { headroom: budgetHeadroom } }, { dryRun: opts.dryRun });
 }

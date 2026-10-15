@@ -45,7 +45,13 @@ import { isIntakeChannel } from "../turn/intake-channel";
 import { handlePrecedenceGateReply, isPrecedenceGateCandidate, isWeeklyPrecedenceThread } from "../ds-precedence/env";
 import { handleFigmaDecisionReply, isFigmaDecisionCandidate, isFigmaDecisionThread } from "../figma-comments/env";
 import { handleCardReplyOnEnv, isCardReplyCandidate, mayBeCardReply } from "../follow-through/env";
-import { handleRevisionReplyOnEnv, isRevisionReplyCandidate, isRevisionThread } from "../blueprint-upkeep/env";
+import {
+  handleRevisionReplyOnEnv,
+  handleWithdrawRequestOnEnv,
+  isRevisionReplyCandidate,
+  isRevisionThread,
+  isWithdrawRequestCandidate,
+} from "../blueprint-upkeep/env";
 import { recheckOnUpdateOnEnv } from "../figma-drift/env";
 import { typedEmojiDecision } from "../gate/reactions";
 import { runFigmaEventJob } from "../figma-notify/job";
@@ -498,7 +504,9 @@ async function onMessage(env: Env, event: SlackMessageEvent, reply?: string | nu
  * review-only line, a reply in a Figma comment-decision thread, which may reword one of its decisions,
  * a reply in a thread holding blueprint revision cards, which may redraft one, or
  * an answer in a thread holding a card follow-up (each one KV read, and only
- * for a message of the right shape). Null for none.
+ * for a message of the right shape), or a short removal ask that may be about
+ * a blueprint proposal drawn there (its shape alone; the handler reads the
+ * record). Null for none.
  *
  * @param env - Worker bindings
  * @param msg - The message
@@ -508,6 +516,7 @@ export async function replyHandlerAt(env: Env, msg: SlackMessageEvent): Promise<
   if (isFigmaDecisionCandidate(env, msg) && (await isFigmaDecisionThread(env, msg.channel, msg.thread_ts!))) return "figma-decisions";
   if (isRevisionReplyCandidate(env, msg) && (await isRevisionThread(env, msg.channel, msg.thread_ts!).catch(() => false))) return "blueprint-revisions";
   if (await mayBeCardReply(env, msg)) return "follow-through";
+  if (isWithdrawRequestCandidate(env, msg, isDm(msg.channel))) return "blueprint-withdraw";
   return null;
 }
 
@@ -526,6 +535,14 @@ export function replyHandlersFor(env: Env): ReplyHandler[] {
       handle: async (e) => (isCardReplyCandidate(env, e) && (await handleCardReplyOnEnv(env, e))) || handleRevisionReplyOnEnv(env, e),
     },
     { name: "follow-through", candidate: (e) => isCardReplyCandidate(env, e), handle: (e) => handleCardReplyOnEnv(env, e) },
+    // "remove it" from the person who drew a blueprint proposal in this
+    // conversation: a ✅ card to delete it. Anyone else, or a conversation with
+    // no proposal of theirs standing, falls through to the turn.
+    {
+      name: "blueprint-withdraw",
+      candidate: (e) => isWithdrawRequestCandidate(env, e, isDm(e.channel)),
+      handle: (e) => handleWithdrawRequestOnEnv(env, e, conversationTs(e)),
+    },
   ];
 }
 

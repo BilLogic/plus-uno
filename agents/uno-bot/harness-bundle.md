@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **97,197 chars from 9 files**, against an assembled budget of 175,500 (78,303 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 76,813 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **97,234 chars from 9 files**, against an assembled budget of 175,500 (78,266 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 76,850 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -23,14 +23,14 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 13,728 | 23,871 | 20,000 (constitution) |
 | 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 20,901 | 44,813 | 22,048 (persona) |
 | 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 46,459 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,156 | 47,675 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 53,368 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 65,154 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 16,358 (−5,976 ide-only) | 81,563 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 85,031 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 91,547 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,740 (−1,734 ide-only) | 96,341 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 97,197 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,193 | 47,712 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 53,405 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 65,191 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 16,358 (−5,976 ide-only) | 81,600 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 85,068 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 91,584 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,740 (−1,734 ide-only) | 96,378 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 97,234 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -42,18 +42,18 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 133,893 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 134,622 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `blueprint-upkeep` | [`agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md`](../../agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md) | 2,320 |
+| `blueprint-upkeep` | [`agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md`](../../agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md) | 3,021 |
 | `critique-a-design` | [`agents/uno-bot/skills/critique-a-design/SKILL.md`](../../agents/uno-bot/skills/critique-a-design/SKILL.md) | 3,637 |
 | `dm-watch` | [`agents/uno-bot/scheduled-actions/dm-watch/ACTION.md`](../../agents/uno-bot/scheduled-actions/dm-watch/ACTION.md) | 2,820 |
 | `docs/connectors/figma/annotations` | [`docs/connectors/figma/annotations.md`](../../docs/connectors/figma/annotations.md) | 1,488 |
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,697 |
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,555 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
-| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,139 |
+| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,167 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,697 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 1,800 |
 | `figma-comments` | [`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) | 8,890 |
@@ -602,7 +602,7 @@ At most ONE plain sentence before a tool call, written for the requester and abo
 
 <!-- scheduled-actions — read_reference by name -->
 
-**blueprint-upkeep** — blueprint revision cards from shipped work — read before answering a reply on one, or what its Approve or Reject did.
+**blueprint-upkeep** — blueprint revision cards from shipped work, and a drawn proposal's removal card — read before answering a reply on one, or what its Approve or Reject did.
 **dm-watch** — DM watch — read before answering a reminder about a promise in someone's own DMs, a question about the Home tab's DM switches, or "why can uno-bot see my DMs?".
 **ds-precedence** — the weekly DS precedence report — read before answering a reply on one of its #plus-universal cards, or what its Approve, Needs changes or Reject did.
 **figma-comments** — Figma comments — read before answering a reply on a comment-decision card, a raised Figma question or its DM, or an @uno ask made in Figma, or explaining why uno-bot replied or reacted in a file.
@@ -1137,6 +1137,8 @@ Each end of day the `blueprint-shipped-N` jobs read the Roadmap cards that reach
 The next morning, `blueprint-revision-post` hands each revision to the sweep's message at the card's place (`agents/uno-bot/scheduled-actions/sweep/ACTION.md` § One message a place): the pillar's team channel, else #plus-design. Each card is numbered; past the carousel's ten the message says "+N more in the thread" and `blueprint-revision-thread` posts those there. The card has six parts — `scenario › path` and the status change; why now (the RM-ID, its Roadmap status, one quoted sentence, a link); today's `step (lane)` rows with a link into the blueprint app; the proposed rows, added, changed, deprecated or promoted; confidence and what could not be verified; the ask. The why-now line speaks the Roadmap's words and every other part the blueprint's. In the thread uno-bot tags the card's owner with each thing a draft could not verify.
 
 Only the card's owner or Bill can approve it — the card names exactly those two, standing confirmers left out. Approve writes the rows as uno-bot through the authoring RPCs, all or none (ADR-034). Reject, or 72 hours undecided, writes nothing. A reply in the thread from the owner or Bill redrafts that card in place — start it with the card's number (`2: …`) when they may approve several — and so does Review's Needs changes. A change that needs a new step or lane is named under what could not be verified and left for a person, who adds the step or lane through `writers/blueprint`.
+
+A **proposal** drawn on the blueprint from a conversation (a `proposed` variant path beside today's) comes off only on a removal card that its requester alone approves. The card goes up in the proposal's own thread when the requester replies there with a short ask such as "remove it", and once from the morning's `blueprint-proposal-offer` check when no Roadmap card has been linked to the proposal in 30 days; only an unlinked proposal is offered. Approve deletes its cells, then its path, as uno-bot (ADR-034). Reject, or no answer in its window (24 hours for an ask, 4 days for the check's offer), keeps it, and the check offers each proposal once. Anyone else's "remove it" is an ordinary turn.
 
 
 
@@ -1939,7 +1941,7 @@ THE standing-automation registry. An automation absent from the table below is u
 | End-of-day sweep | end-of-day run: `sweep-channel` (one per `SWEEP_CHANNELS` entry), `sweep-group-dms`, `sweep-dms`, `sweep-notes`, `sweep-cards`; morning run: `sweep-post`, after every job that hands it a section, spawns one `sweep-post:<place>` job a place — one message a place; `figma-drift-post`; both runs: `figma-drift-recheck` | Bill | [`sweep`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) |
 | Figma comments | end-of-day run: `sweep-figma-comments`; morning run: `sweep-figma-post`; an @uno ask, at `POST /figma/events` | Bill | [`figma-comments`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) |
 | Follow-through | end-of-day run: `card-follow-through`; morning run: `commitment-nudge` | Bill | [`follow-through`](../../agents/uno-bot/scheduled-actions/follow-through/ACTION.md) |
-| Blueprint upkeep | end-of-day run: `blueprint-shipped`, `blueprint-draft`; morning run: `blueprint-revision-post`, `blueprint-revision-thread` | Bill | [`blueprint-upkeep`](../../agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md) |
+| Blueprint upkeep | end-of-day run: `blueprint-shipped`, `blueprint-draft`; morning run: `blueprint-revision-post`, `blueprint-revision-thread`, `blueprint-proposal-offer` | Bill | [`blueprint-upkeep`](../../agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md) |
 | DS precedence check | Monday's end-of-day run: `ds-precedence-check`; morning run: `ds-precedence-post` | Bill | [`ds-precedence`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) |
 | DM watch | per person who switched it on — end-of-day run: `dm-promise-read`; morning run: `dm-promise-nudge` | Bill | [`dm-watch`](../../agents/uno-bot/scheduled-actions/dm-watch/ACTION.md) |
 | DM Capture | per person who switched it on — end-of-day run: `dm-capture-read`; morning run: `dm-capture-post` | Bill | [`sweep`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) § Capture |

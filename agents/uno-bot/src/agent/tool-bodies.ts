@@ -48,6 +48,7 @@ import { executeDsPrecedenceIntake } from "../tools/ds-precedence-intake";
 import { executeTidyLeaveAsIs } from "../tools/figma-tidy-up";
 import { executeDevLinks } from "../tools/figma-dev-links";
 import { executeBlueprintRevise } from "../tools/blueprint-revise";
+import { executeBlueprintWithdraw } from "../tools/blueprint-withdraw";
 import type { ToolName } from "./tool-table";
 
 /**
@@ -93,6 +94,7 @@ export const TOOL_BODIES: Record<ToolName, ToolBody> = {
   figma_tidy_up: (env, input) => executeTidyLeaveAsIs(env, input),
   figma_dev_links: (env, input, slack) => executeDevLinks(env, input, slack),
   blueprint_revise: (env, input, slack) => executeBlueprintRevise(env, input, slack),
+  blueprint_withdraw: (env, input, slack) => executeBlueprintWithdraw(env, input, slack),
   // Answered by Turn's presentation step from the turn's own lookups, which
   // replaces this result before the model reads it (`turn/presentation.ts`).
   // A run with no presentation step — none today — gets the plain refusal.

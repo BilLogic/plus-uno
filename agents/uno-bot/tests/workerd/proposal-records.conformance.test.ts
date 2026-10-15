@@ -53,9 +53,29 @@ describe("[d1] the blueprint proposals migration", () => {
     expect(await plan("SELECT proposal_ts FROM blueprint_proposals WHERE card_id IS NULL AND written_at <= 5 ORDER BY written_at")).toMatch(
       /blueprint_proposals_unlinked/,
     );
+    expect(
+      await plan(
+        "SELECT proposal_ts FROM blueprint_proposals WHERE card_id IS NULL AND offered_at IS NULL AND withdrawn_at IS NULL AND written_at <= 5 ORDER BY written_at",
+      ),
+    ).toMatch(/blueprint_proposals_unlinked/);
     // A card's lookup rides the same index: card_id leads it.
     expect(await plan("SELECT proposal_ts FROM blueprint_proposals WHERE card_id = 'page-a' ORDER BY written_at")).toMatch(
       /blueprint_proposals_unlinked/,
     );
+  });
+
+  it("charges one D1 query per clean-up statement", async () => {
+    const records = createD1ProposalRecords({ db: bindings.USAGE_DB });
+    await records.record(drawn());
+    const spent = await runMetered(async () => {
+      await records.standing(drawn().proposalTs);
+      await records.standingInThread("C0TEAM", "1700000000.000100");
+      await records.dueForOffer(Number.MAX_SAFE_INTEGER, 10);
+      await records.claimOffer(drawn().proposalTs, 1);
+      await records.releaseOffer(drawn().proposalTs);
+      await records.withdraw(drawn().proposalTs, 2);
+      return d1QueriesUsed();
+    });
+    expect(spent).toBe(6);
   });
 });

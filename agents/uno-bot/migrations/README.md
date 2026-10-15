@@ -17,7 +17,8 @@ that ticket allows, and no summary and no id of the other person. A blueprint
 proposal drawn from a conversation keeps its thread, the `proposed` path it
 created beside today's and that path's cells in `blueprint_proposals` (`0016_blueprint_proposals.sql`,
 `agents/uno-bot/src/blueprint-upkeep/proposal-records.ts`): ids and times, no
-cell text. The bot's
+cell text. When its removal was offered and when it was withdrawn are two
+times on the same row (`0017_blueprint_proposal_cleanup.sql`). The bot's
 semantic-retrieval schema does **not** — see the second half.
 
 ## The usage database (`usage/`)
