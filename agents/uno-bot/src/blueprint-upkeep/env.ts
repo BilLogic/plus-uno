@@ -37,8 +37,9 @@
 // Budget (ADR-022), against the 38-subrequest lookup ceiling of one alarm,
 // each job sized by cost, not by a count (`./budget.ts`).
 // A match job: the Roadmap query (1, the first job only) and the model's
-// token (1), then per card a deploy's promotion try — the path read (5) —
-// and, failing that, the page and up to three block pages (4), its one PRD
+// token (1), then per card a deploy's promotion try — the path read (5), and
+// when it promotes, the card's words (8) and one redraft (2) before the owner
+// (2): 17 — and, failing that, the page and up to three block pages (4), its one PRD
 // the same (4), the judgement (1), the search (≤3) and a Slack lookup or two
 // for the owner: `MATCH_COST` (20) at the worst. A draft job: the token,
 // then per path the path read (5) and the draft, grind then default (2):

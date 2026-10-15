@@ -187,8 +187,9 @@ describe("a design hand-off", () => {
 });
 
 describe("the same card's deploy", () => {
-  it("promotes the same rows `planned → live` on a promotion card, drafting nothing", async () => {
-    const model = scripted({ default: [SERVICE], grind: [DRAFT] });
+  it("promotes the same rows `planned → live` on a promotion card, with no judgement", async () => {
+    // The redraft at the deploy finds the card's words unchanged since the hand-off.
+    const model = scripted({ default: [SERVICE], grind: [DRAFT, DRAFT] });
     const w = world(model, [DESIGNED]);
     await runShippedRevisions(w.deps);
     await morning(w.state);
@@ -198,7 +199,11 @@ describe("the same card's deploy", () => {
     const asked = model.asked.length;
 
     assert.equal((await runShippedRevisions(w.deps)).drafted, 1);
-    assert.equal(model.asked.length, asked, "no judgement, no draft: the rows are known");
+    assert.deepEqual(
+      model.asked.slice(asked).map((p) => p.tier),
+      ["grind"],
+      "no judgement — the path is known — and one redraft against the card's words now",
+    );
     const [card] = await morning(w.state);
     assert.ok(card);
     assert.deepEqual(rowsOf(card), [
@@ -209,6 +214,65 @@ describe("the same card's deploy", () => {
     assert.match(card.proposalText, /`planned` → `live`/);
     assert.match(card.proposalText, /`Dev Status: Deployed`/);
     assert.match(card.proposalText, /“Tutors now confirm their own swaps in the app, and the supervisor is only told\.”/);
+  });
+
+  it("adds what changed between the hand-off and the deploy to the same promotion card", async () => {
+    const LATER = JSON.stringify({
+      rows: [
+        { change: "changed", step_id: "step-approve", lane_id: "lane-tutor", content: "Tutor confirms the swap in the app; the supervisor gets a notice" },
+        { change: "added", step_id: "step-request", lane_id: "lane-sup", content: "Supervisor sees the swap request" },
+        { change: "deprecated", step_id: "step-approve", lane_id: "lane-sup" },
+      ],
+      confidence: 0.7,
+      gaps: ["whether the notice is email or in-app"],
+    });
+    const model = scripted({ default: [SERVICE], grind: [DRAFT, LATER] });
+    const w = world(model, [DESIGNED]);
+    await runShippedRevisions(w.deps);
+    await morning(w.state);
+    w.blueprint.path = PATH_PLANNED;
+    w.roadmap.cards = [DEPLOYED];
+
+    assert.equal((await runShippedRevisions(w.deps)).drafted, 1, "one promotion card, not a second one");
+    assert.ok(model.asked.at(-1)!.prompt.includes(CARD_TEXT), "redrafted on the card's words as they are now");
+    const cards = await morning(w.state);
+    assert.equal(cards.length, 1);
+    const rows = cards[0]!.input.rows as Row[];
+    assert.deepEqual(
+      rows.map((r) => [r.stepId, r.laneId, r.from, r.to, r.content]),
+      [
+        ["step-approve", "lane-tutor", "planned", "live", "Tutor confirms the swap in the app; the supervisor gets a notice"],
+        ["step-approve", "lane-sup", "live", "deprecated", "Supervisor approves the swap"],
+        ["step-request", "lane-sup", null, "live", "Supervisor sees the swap request"],
+      ],
+    );
+    assert.match(cards[0]!.proposalText, /whether the notice is email or in-app/);
+  });
+
+  it("promotes alone, and says so, when the job cannot afford the redraft", async () => {
+    const model = scripted({ default: [SERVICE], grind: [DRAFT, DRAFT] });
+    const w = world(model, [DESIGNED]);
+    await runShippedRevisions(w.deps);
+    await morning(w.state);
+    w.blueprint.path = PATH_PLANNED;
+    w.roadmap.cards = [DEPLOYED];
+    const asked = model.asked.length;
+    // Room for the card and its promotion, not for the card's words and a draft.
+    let left = 20;
+    w.deps.readPath = async (cellId) => {
+      left -= 9; // the read, and what else the alarm spent beside it
+      return cellId === "cell-2" ? w.blueprint.path : null;
+    };
+    w.deps.meter = { headroom: () => ({ subrequests: left }) };
+
+    assert.equal((await runShippedRevisions(w.deps)).drafted, 1);
+    assert.equal(model.asked.length, asked, "no redraft");
+    const [card] = await morning(w.state);
+    assert.deepEqual(rowsOf(card!), [
+      ["lane-tutor", "planned", "live"],
+      ["lane-sup", "live", "deprecated"],
+    ]);
+    assert.match(card!.proposalText, /not checked against the card's words at the deploy/);
   });
 
   it("drafts `live` rows afresh when the `planned` card was never approved", async () => {

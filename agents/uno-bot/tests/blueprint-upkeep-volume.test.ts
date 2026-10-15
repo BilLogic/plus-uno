@@ -430,7 +430,7 @@ describe("a design hand-off redrafted in its thread", () => {
     await endOfDay(w, DATE);
     const m = await morning(w.state);
     const redrafted = "Supervisor is emailed about the request";
-    const kit = redraftKit(w, m, () =>
+    const settled = () =>
       JSON.stringify({
         rows: [
           { change: "added", step_id: "step-request", lane_id: "lane-sup", content: redrafted },
@@ -438,8 +438,8 @@ describe("a design hand-off redrafted in its thread", () => {
         ],
         confidence: 0.8,
         gaps: [],
-      }),
-    );
+      });
+    const kit = redraftKit(w, m, settled);
     assert.equal(await redraftRevision(kit.deps, kit.reply(OWNER, "It's the supervisor who's emailed, at the request.")), true);
 
     // ✅ on the redrafted card writes its rows, as the writer would.
@@ -457,9 +457,14 @@ describe("a design hand-off redrafted in its thread", () => {
 
     // The card deploys: its promotion lists the redrafted rows, nothing of the first draft.
     stage = "deployed";
+    // The card's words now say what the thread settled, so the deploy's
+    // redraft of the path finds nothing to add.
+    const atDeploy = model({ grind: settled });
+    w.deps.provider = atDeploy.provider;
     const asked = w.ai.asked.length;
     await endOfDay(w, "2026-10-17");
-    assert.equal(w.ai.asked.length, asked, "a promotion: no judgement, no draft");
+    assert.equal(w.ai.asked.length, asked, "a promotion: no judgement");
+    assert.equal(atDeploy.asked.length, 1, "one redraft against the card's words now");
     const promoted = (await morning(w.state)).staged;
     assert.equal(promoted.length, 1);
     assert.deepEqual(

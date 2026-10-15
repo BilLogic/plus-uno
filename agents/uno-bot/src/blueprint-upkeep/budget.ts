@@ -13,6 +13,13 @@ export const PATH_READ_COST = 5;
 export const GATE_SUBREQUESTS = 4;
 /** One draft: grind, then default when grind is out of capacity. */
 export const DRAFT_CALLS = 2;
+/** A card's words: its page and up to three block pages (4), and its one PRD the same (4). */
+export const EVIDENCE_COST = 8;
+/** The card's owner: a Slack lookup or two. */
+export const OWNER_COST = 2;
+/** A deploy's redraft of its hand-off's path against the card's words now:
+ *  the words, the draft, and the owner looked up after it. */
+export const PROMOTION_REDRAFT_COST = EVIDENCE_COST + DRAFT_CALLS + OWNER_COST;
 /** End-of-day jobs that weigh cards. */
 export const MATCH_JOBS = 6;
 /** External subrequests one card's weighing may spend at its worst: a

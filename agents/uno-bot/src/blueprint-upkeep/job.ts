@@ -8,7 +8,8 @@
 //     words and its PRD's (`./evidence.ts`). A card that passes queues one
 //     path to draft for EVERY `scenario › path` the gate matched
 //     confidently. A deploy whose design hand-off drafted rows promotes them
-//     instead (`./stages.ts`), with no judgement or draft — and so does a
+//     instead (`./stages.ts`), with no judgement, adding what a redraft of
+//     the same path against the card's words now changes — and so does a
 //     card linked to a drawn proposal (`./link.ts`), at either moment: the
 //     proposal's own variant path moves on, today's path is offered for
 //     retirement on its own card at the deploy, and nothing new is drafted.
@@ -63,6 +64,7 @@ import {
 import {
   holdDeprecations,
   promotionDraft,
+  withRedraft,
   retirementDraft,
   STAGES,
   variantPromotionDraft,
@@ -72,7 +74,7 @@ import {
 } from "./stages";
 import { cardKey } from "./link";
 import type { DrawnProposal, ProposalRecords } from "./proposal-records";
-import { DRAFT_COST, DRAFT_JOBS, MATCH_COST, MATCH_JOBS } from "./budget";
+import { DRAFT_COST, DRAFT_JOBS, EVIDENCE_COST, MATCH_COST, MATCH_JOBS, PROMOTION_REDRAFT_COST } from "./budget";
 
 export { DRAFT_COST, DRAFT_JOBS, MATCH_COST, MATCH_JOBS };
 /** The section's name on the sweep's morning post. */
@@ -381,13 +383,40 @@ async function weigh(deps: ShippedDeps, card: ShippedCard, state: Settled): Prom
     }
 
     const promoted: WaitingRevision[] = [];
+    let words: string | null = null;
     for (const p of handedOff) {
       const today = await deps.readPath(p.cellId);
-      const draft = today ? promotionDraft(p, today) : null;
-      if (!today || !draft) continue;
+      const promotion = today ? promotionDraft(p, today) : null;
+      if (!today || !promotion) continue;
+      // What changed between the hand-off and the deploy, on the same card.
+      const unchecked = (why: string): Draft => ({
+        ...promotion,
+        gaps: [...promotion.gaps, `not checked against the card's words at the deploy: ${why}, so only the hand-off's cells are promoted`],
+      });
+      let draft: Draft;
+      if (headroom(deps) < PROMOTION_REDRAFT_COST - (words === null ? 0 : EVIDENCE_COST)) {
+        draft = unchecked("this run's budget was spent");
+      } else {
+        try {
+          words ??= await deps.evidence(card);
+          draft = withRedraft(promotion, await draftRevision(deps.provider, { title: card.title, text: words, today, target }), today);
+        } catch (err) {
+          rethrowIfBudget(err);
+          console.warn(`[blueprint-upkeep] ${card.title}: deploy redraft failed: ${err instanceof Error ? err.message : String(err)}`);
+          draft = unchecked("the redraft failed");
+        }
+      }
       const routed = await route(p.quote);
       if (typeof routed === "string") return routed;
-      promoted.push({ ...routed, today, draft, key: `${weighedKey(card.pageId, card.stage)}|${revisionTitle(today)}`, cellId: p.cellId, target });
+      promoted.push({
+        ...routed,
+        today,
+        draft,
+        key: `${weighedKey(card.pageId, card.stage)}|${revisionTitle(today)}`,
+        cellId: p.cellId,
+        target,
+        ...(words !== null ? { text: words.slice(0, MAX_KEPT_TEXT) } : {}),
+      });
     }
     if (promoted.length) return { paths: [], promoted };
 

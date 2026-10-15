@@ -6,8 +6,11 @@
 //     still happens until the work deploys, so it waits on the record below.
 //   • `Dev Status: Deployed` — the work is live: rows at `live`. When the
 //     card's design hand-off drafted rows, the deploy PROMOTES those rows
-//     (`planned → live`, and the held deprecations) instead of drafting them
-//     again; only when none of them is `planned` on the blueprint today — the
+//     (`planned → live`, and the held deprecations) first, then drafts the
+//     same path again against the card's words as they are now, and adds to
+//     the same promotion card any cell that differs (`withRedraft`), so a
+//     change between the hand-off and the deploy reaches the blueprint. Only
+//     when none of the rows is `planned` on the blueprint today — the
 //     `planned` card was never approved — is a fresh `live` revision drafted.
 //
 // A card whose thread drew a PROPOSAL, linked to it (`./link.ts`), moves that
@@ -145,6 +148,52 @@ export function promotionDraft(planned: PlannedRows, today: PathToday): Draft | 
     confidence: 1,
     gaps: moved ? [`${moved} cell(s) drafted at planned are no longer planned on the blueprint and were left out`] : [],
     promoted: true,
+  };
+}
+
+const slotKey = (r: Slot) => `${r.stepId}:${r.laneId}`;
+
+/**
+ * A deploy's promotion with what a redraft against the card's words now
+ * changes on top: a promoted or held cell the redraft words differently takes
+ * the redraft's words, and a cell the promotion does not touch is added — each
+ * only where it differs from the blueprint today. The promotion as it was when
+ * nothing differs.
+ *
+ * @param promotion - The hand-off's cells promoted (`promotionDraft`)
+ * @param redraft - The same path drafted again at the deploy; null for nothing
+ * @param today - The path as the blueprint holds it now
+ */
+export function withRedraft(promotion: Draft, redraft: Draft | null, today: PathToday): Draft {
+  if (!redraft) return promotion;
+  const rows = [...promotion.revision.rows];
+  const changes = [...promotion.changes];
+  let changed = 0;
+  redraft.revision.rows.forEach((row, i) => {
+    const change = redraft.changes[i]!;
+    const at = rows.findIndex((r) => slotKey(r) === slotKey(row));
+    if (at >= 0) {
+      const had = rows[at]!;
+      if (had.to === row.to && (had.content === row.content || row.to === "deprecated")) return;
+      rows[at] = { ...row, from: had.from };
+      changes[at] = row.to === "deprecated" ? change : { kind: "changed", step: change.step, lane: change.lane, content: row.content, before: had.content };
+    } else {
+      const cell = at === -1 ? today.cells.find((c) => slotKey(c) === slotKey(row)) : undefined;
+      if (cell && cell.status === row.to && cell.content === row.content) return;
+      rows.push(row);
+      changes.push(change);
+    }
+    changed += 1;
+  });
+  if (!changed) return promotion;
+  return {
+    ...promotion,
+    revision: { ...promotion.revision, rows },
+    changes,
+    confidence: Math.min(promotion.confidence, redraft.confidence),
+    gaps: [...promotion.gaps, ...redraft.gaps],
+    note: `${changed} cell(s) redrafted from the card's words at the deploy, beside the cells promoted from its design hand-off.`,
+    ...(redraft.tierNote ? { tierNote: redraft.tierNote } : {}),
   };
 }
 
