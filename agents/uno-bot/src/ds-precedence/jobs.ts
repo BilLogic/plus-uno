@@ -63,6 +63,7 @@ import {
   componentId,
   precedenceCard,
   precedenceCardWords,
+  precedenceFacts,
   precedenceItem,
   precedenceParent,
   PRECEDENCE_NOTE_TAKEN,
@@ -388,5 +389,6 @@ export function stagedComponent(
     refuseRevision: PRECEDENCE_REVISION_REFUSAL,
     // Needs changes writes the note on the intake (`./dispute.ts`): no redraft.
     afterNeedsChanges: PRECEDENCE_NOTE_TAKEN,
+    facts: precedenceFacts(finding, weekOf),
   };
 }

@@ -14,6 +14,7 @@ import { countedFetch, rethrowIfBudget } from "../net";
 import type { SlackEventFile } from "./types";
 import { cardLinks } from "./plan-block";
 import type { SlackIcon } from "./estate-glyphs";
+import { sendWithCardFallback } from "./card-block";
 
 interface SlackOk {
   ok: true;
@@ -120,7 +121,7 @@ export async function postToResponseUrl(
  * take the same markup pass as a message's.
  */
 export async function viewsOpen(env: Env, triggerId: string, view: Record<string, unknown>): Promise<string | null> {
-  const res = await slackCall<SlackResponse>(env, "views.open", { trigger_id: triggerId, view: withSafeBlocks(view) });
+  const res = await sendWithCardFallback(view, (v) => slackCall<SlackResponse>(env, "views.open", { trigger_id: triggerId, view: withSafeBlocks(v) }));
   if (!res.ok) return null;
   const id = (res.view as { id?: unknown } | undefined)?.id;
   return typeof id === "string" ? id : null;
@@ -132,15 +133,17 @@ export async function viewsOpen(env: Env, triggerId: string, view: Record<string
  * Slack keeps at most three views in a stack.
  */
 export async function viewsPush(env: Env, triggerId: string, view: Record<string, unknown>): Promise<string | null> {
-  const res = await slackCall<SlackResponse>(env, "views.push", { trigger_id: triggerId, view: withSafeBlocks(view) });
+  const res = await sendWithCardFallback(view, (v) => slackCall<SlackResponse>(env, "views.push", { trigger_id: triggerId, view: withSafeBlocks(v) }));
   if (!res.ok) return null;
   const id = (res.view as { id?: unknown } | undefined)?.id;
   return typeof id === "string" ? id : null;
 }
 
-/** Replace an open modal's contents. Whether Slack took it. */
+/** Replace an open modal's contents. Whether Slack took it. A view whose
+ *  `card` Slack refuses goes once more with the card stepped down
+ *  (`card-block.ts`), as `views.open` and `views.push` do. */
 export async function viewsUpdate(env: Env, viewId: string, view: Record<string, unknown>): Promise<boolean> {
-  const res = await slackCall<SlackResponse>(env, "views.update", { view_id: viewId, view: withSafeBlocks(view) });
+  const res = await sendWithCardFallback(view, (v) => slackCall<SlackResponse>(env, "views.update", { view_id: viewId, view: withSafeBlocks(v) }));
   return res.ok;
 }
 
@@ -233,13 +236,14 @@ export async function conversationsMembers(env: Env, channel: string, limit = 10
   );
 }
 
-/** users.conversations via the bot token — one page of the conversations of
- *  `types` uno-bot is a member of, the first unless `cursor` names the next. */
-export async function botConversations(env: Env, types: string, cursor?: string) {
-  return slackGet<SlackResponse & { channels?: { id?: string }[]; response_metadata?: { next_cursor?: string } }>(
+/** users.conversations via the bot token — one page of up to `limit` of the
+ *  unarchived conversations of `types` uno-bot is a member of, the first
+ *  unless `cursor` names the next. */
+export async function botConversations(env: Env, types: string, cursor?: string, limit = 200) {
+  return slackGet<SlackChannelPage>(
     env,
     "users.conversations",
-    { types, exclude_archived: "true", limit: "200", ...(cursor ? { cursor } : {}) },
+    { types, exclude_archived: "true", limit: String(limit), ...(cursor ? { cursor } : {}) },
   );
 }
 
@@ -255,19 +259,23 @@ export interface SlackConversation {
   is_member?: boolean;
 }
 
+/** One page of a channel list, as users.conversations and conversations.list
+ *  both return it. */
+export type SlackChannelPage = SlackResponse & { channels?: SlackConversation[]; response_metadata?: { next_cursor?: string } };
+
 /** conversations.info via the bot token — what kind of conversation this is. */
 export async function conversationsInfo(env: Env, channel: string) {
   return slackGet<SlackResponse & { channel?: SlackConversation }>(env, "conversations.info", { channel });
 }
 
-/** conversations.list via the bot token — one page of up to 1000 unarchived
- *  public and private channels, the first unless `cursor` names the next. A
- *  private channel is listed only when the bot is in it. */
-export async function conversationsList(env: Env, cursor?: string) {
-  return slackGet<SlackResponse & { channels?: SlackConversation[]; response_metadata?: { next_cursor?: string } }>(
+/** conversations.list via the bot token — one page of up to `limit`
+ *  unarchived channels of `types`, the first unless `cursor` names the next.
+ *  A private channel is listed only when the bot is in it. */
+export async function conversationsList(env: Env, types: string, cursor?: string, limit = 200) {
+  return slackGet<SlackChannelPage>(
     env,
     "conversations.list",
-    { types: "public_channel,private_channel", exclude_archived: "true", limit: "1000", ...(cursor ? { cursor } : {}) },
+    { types, exclude_archived: "true", limit: String(limit), ...(cursor ? { cursor } : {}) },
   );
 }
 
