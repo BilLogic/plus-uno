@@ -25,14 +25,11 @@ importable from `@/components` today.
 | one pick, more than 15 options | `Select searchable` |
 | several picks, fewer than 5 options | `ChoiceGroup type="checkbox"` |
 | several picks from a longer, fixed list | `Select mode="multi"` |
-| several picks, or values the user adds | `Select mode="multi" creatable` |
+| several picks, or values the user adds | `TagInput` |
 | a pick through a hierarchy | `Cascader` for one leaf along one path · `TreeSelect` to see the tree, pick a parent, or pick several — see below |
 | a rating on a scale | `ChoiceGroup orientation="inline"` with `leadingText` and `trailingText` for a numbered scale · `Rating` for stars |
 | the same choice for several questions | `ChoiceGrid` |
 | an action run from a button | `Dropdown` — a button, not a field |
-
-Where the group is heading: `TagInput` takes the "values the user adds" row
-once it accepts typing. Until then, use `Select mode="multi" creatable`.
 
 The rest of the group answers narrower shapes: `NumberInput` for a number with
 steppers, `RichTextEditor` for formatted prose, `InputGroup` for a field with
@@ -91,8 +88,10 @@ and its column.
   internal parts in `forms-and-inputs/_internal/`, not fields. Select and
   TagInput build on them; for several values from a known list, use
   `Select mode="multi"`.
-- `TagInput` shows and removes tags. It has no text entry, so it cannot take a
-  new value from the user.
+- `TagInput` is the field for a set of tags the user picks or adds, as in
+  Notion's multi-select: typing filters its options, and a Create row adds a
+  new value with a random Tag colour, reported through `onCreate`. Its
+  `options` are required and owned by the caller.
 - `DatePicker` is a bare date control with no `label`, no `required`, no
   `validation`, and no rest props, so nothing can name it. Reach for
   `DateAndTimePicker`, which has `label`, `required`, `validation` with
@@ -108,9 +107,9 @@ something else on the page must reference the control; leave it off and the
 label still names the field. `Select` and `DatePicker` render no label, so this
 rule does not reach them.
 
-**Validation is wired on four fields.** `validation="invalid"` with
-`validationMessage` — on `Input`, `NumberInput`, `FileUpload` and
-`DateAndTimePicker` — sets `aria-invalid` and points `aria-describedby` at the
+**Validation is wired on five fields.** `validation="invalid"` with
+`validationMessage` — on `Input`, `NumberInput`, `FileUpload`,
+`DateAndTimePicker` and `TagInput` — sets `aria-invalid` and points `aria-describedby` at the
 message, appending to any `aria-describedby` the caller passed. `Textarea` has
 no message slot: its `state="error"` is styling, so the caller renders the
 message and passes `aria-invalid` and `aria-describedby`, which reach the

@@ -3,11 +3,13 @@
 
 # TagInput
 
+Notion's multi-select. Focusing the field opens a list of the options. Typing filters it and highlights the first match; Enter or a click adds the highlighted option. A "Create *text*" row is offered when no option matches the text exactly, ignoring case, and creating gives the new tag a random Tag colour, reported once through `onCreate`. Backspace in an empty entry removes the last tag, and Esc closes the list and clears only the typed text. Built on the shared parts: `_Field` is the box, `Listbox` the list and its rows, and the chips are Tags in a TagGroup. Without focus the tags collapse into "+n"; with focus they wrap, up to three rows, then scroll.
+
 **Import:** `import { TagInput } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/TagInput.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TagInput.stories.jsx` — Overview, Sizes, Colors, Disabled, Controlled, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/TagInput.stories.jsx` — TypingFilters, CreateWhenNothingMatches, MatchIgnoresCase, ClickPicks, BackspaceRemovesTheLastTag, EscClearsOnlyTheText, PasteSplitsOnCommas, MaxLength, PickLimit, CollapsesWithoutFocus, TemporaryIdUntilConfirmed, ReadOnly, Invalid, Disabled, Controlled, Overview, Sizes, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TagInput.mdx`
 
@@ -17,15 +19,25 @@
 |------|------|---------|-------------|
 | `id` | string | — | — |
 | `name` | string | — | — |
-| `label` | node | — | Field label. Names the group the tags sit in. |
-| `required` | bool | `false` | Draws the required asterisk after the label |
-| `tags` | arrayOf or string or shape or oneOf | — | — |
-| `defaultTags` | arrayOf or string or shape or oneOf | `[]` | — |
+| `label` | node | — | Names the field. |
+| `required` | bool | `false` | Shows an asterisk and sets aria-required. |
+| `info` | node | — | Text for an info tooltip beside the label. |
+| `caption` | node | — | Standing help under the field. |
+| `placeholder` | string | `'Select or create a tag'` | Shown in the entry while there are no tags. |
+| `options` | arrayOf or string or shape or oneOf | `[]` | The options the list offers: strings, or objects with `value`, `label` (or `text`) and a Tag `color`. Required; the caller owns the list and adds what `onCreate` reports to it. |
+| `tags` | arrayOf | — | The picked tags, controlled. Pass `onChange` with it. |
+| `defaultTags` | arrayOf | `[]` | The picked tags at first, uncontrolled. |
 | `size` | enum | `'medium'` | Size variant |
-| `disabled` | bool | `false` | Disables every tag and removes every × |
-| `onAdd` | func | — | — |
-| `onRemove` | func | — | — |
-| `onChange` | func | — | — |
+| `disabled` | bool | `false` | Disables every tag and the entry. |
+| `readOnly` | bool | `false` | Shows the tags with no × and no entry, on the read-only fill. |
+| `validation` | enum | `'none'` | — |
+| `validationMessage` | node | — | Shown under the field, and announced, while `validation` is `invalid`. |
+| `maxLength` | number | — | The longest a new value can be. |
+| `maxTags` | number | — | The most tags the field holds. At the limit, Create hides and the list says so. |
+| `onAdd` | func | — | `(tag)`: a tag was added, picked or created. |
+| `onCreate` | func | — | `({ value, color })`: a new value was created, with the colour it was given. Store both on the option. Return a promise of the stored id to hold the tag on a temporary id, saving, until it resolves; a rejection removes the tag and puts the text back. |
+| `onRemove` | func | — | `(index, tag)`: a tag was removed. |
+| `onChange` | func | — | `(tags)`: the new list, after any add or remove. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
@@ -33,11 +45,13 @@
 
 **`size`** — `small` · `medium` · `large`
 
+**`validation`** — `none` · `invalid`
+
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-danger` · `--color-on-surface` · `--color-outline-variant` · `--color-primary-border` · `--color-surface-container-low` · `--font-weight-normal` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-md`
+`--color-on-surface-variant` · `--font-line-height-body3` · `--font-size-body3` · `--plus-tag-input-max-height` · `--size-element-gap-sm` · `--size-element-pad-x-md` · `--size-element-pad-y-sm`
 
 From `design-system/src/components/forms-and-inputs/TagInput.scss`. Override these through the token layer, never with a literal.
 
