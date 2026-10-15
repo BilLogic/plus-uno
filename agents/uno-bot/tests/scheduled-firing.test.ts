@@ -54,6 +54,7 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
   assert.deepEqual(planRun("end-of-day", END_OF_DAY).jobs.map((j) => j.kind), [
     "figma-library-poll",
     "card-follow-through",
+    "blueprint-shipped",
     "figma-drift-recheck",
     "figma-backstop",
     "figma-backstop",
@@ -193,6 +194,8 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
     ["figma-tidy-post", "figma-tidy-post"],
     // A Dev Mode links card for the component PRs merged since the last.
     ["figma-dev-links-post", "figma-dev-links-post"],
+    // Each revision drafted from shipped work, to its card's place.
+    ["blueprint-revision-post", "blueprint-revision-post"],
     ["sweep-post", "sweep-post"],
     ["team-roles-sync", "team-roles-sync"],
     // Both runs purge, so text never outlives its 14 days over a weekend.
@@ -203,6 +206,7 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
   assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind, j.after]), [
     ["figma-library-poll", "figma-library-poll", undefined],
     ["card-follow-through", "card-follow-through", undefined],
+    ["blueprint-shipped", "blueprint-shipped", undefined],
     ["figma-drift-recheck", "figma-drift-recheck", undefined],
     // The Figma backstop's sweep, in as many jobs as it may need (#896).
     ["figma-backstop-1", "figma-backstop", undefined],
@@ -413,7 +417,7 @@ test("the sweep's post runs after every morning job that hands it cards, Monday'
   const monday = planRun("morning", Date.parse("2026-10-12T13:00:00Z"));
   const keys = monday.jobs.map((j) => j.key);
   const post = monday.jobs.find((j) => j.kind === "sweep-post")!;
-  const handOvers = ["commitment-nudge", "ds-precedence-post", "sweep:figma-post", "figma-drift-post", "figma-tidy-post", "figma-dev-links-post"];
+  const handOvers = ["commitment-nudge", "ds-precedence-post", "sweep:figma-post", "figma-drift-post", "figma-tidy-post", "figma-dev-links-post", "blueprint-revision-post"];
   assert.deepEqual(post.after, handOvers);
   for (const key of handOvers) assert.ok(keys.indexOf(key) < keys.indexOf("sweep-post"), `${key} is planned before the post`);
 });

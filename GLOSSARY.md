@@ -129,6 +129,10 @@ A Roadmap card id (`RM-<n>`; `Card <n>` in Figma titles), the join key.
 A source of truth a later decision overruled: a Notion page or a Figma file.
 _Avoid_: "out of sync"
 
+**blueprint revision**:
+The drafted row changes to one path of the **uno-blueprint** — cells added, changed or deprecated, each with its status — from one piece of shipped work or one idea, reviewed and approved whole.
+_Avoid_: "blueprint update", "card" (a card is the Roadmap's)
+
 ### uno-bot
 
 **uno-bot**:

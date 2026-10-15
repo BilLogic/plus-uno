@@ -389,7 +389,7 @@ async function scanCard(
 
 /** The channel a card's follow-up goes to: `pickDestination` with no thread,
  *  so by its pillar. */
-function cardPlace(card: Pick<ActiveCard, "url" | "title" | "pillars">, config: FollowThroughConfig): string | null {
+export function cardPlace(card: Pick<ActiveCard, "url" | "title" | "pillars">, config: FollowThroughConfig): string | null {
   const destination = pickDestination({
     evidence: { channel: "", channelKind: "public", threadTs: null, messageTs: [], permalinks: [] },
     target: { url: card.url, kind: "notion", writable: true, title: card.title, pillars: card.pillars },
