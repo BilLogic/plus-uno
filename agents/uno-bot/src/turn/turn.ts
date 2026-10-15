@@ -1717,7 +1717,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // A proposal is still a completed conversational turn. An agent_view DM has
   // no Slack thread to rebuild, so preserving this exchange in the store is the
   // only way its image pointer reaches the immediate follow-up.
-  await memory.remember(posted.shown ?? posted.text);
+  await memory.remember(posted.text);
 
   return {
     disposition: "staged",
@@ -1893,7 +1893,7 @@ async function dropFromSweepCard(
     ],
     deps.usage.writeTimeoutMs,
   );
-  await memory.remember(posted.shown ?? posted.text);
+  await memory.remember(posted.text);
   return { disposition: "staged", posted: posted.text, staged: { proposal, card }, wrote: memory.wrote(), telemetry };
 }
 

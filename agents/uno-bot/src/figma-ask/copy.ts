@@ -1,5 +1,4 @@
-// What uno-bot says when asked in a Figma comment (#903), and the #plus-design
-// post a change request opens.
+// What uno-bot says when asked in a Figma comment (#903).
 //
 // THE REPLY is plain text: Figma shows a comment as typed, so Slack's markup
 // would arrive as asterisks and angle brackets. It leads with the label, says
@@ -9,14 +8,13 @@
 // could not find this, and points at #plus-design, so uno-bot never guesses in
 // a file.
 //
-// THE LEAD in #plus-design is a Figma message like the rest
-// (docs/connectors/slack.md § Figma messages): one line asking one named
-// person — the file's design owner, else the asker — to review the draft,
-// with the ask quoted. The card under it carries the gate.
+// A CHANGE is never made from Figma. The reply says so, names what uno-bot
+// would do, and sends a teammate to le goat in Slack, where a change is
+// drafted for a teammate to approve.
 //
 // PURE.
 
-import { escapeSlackText, toPlainText } from "../slack/mrkdwn";
+import { toPlainText } from "../slack/mrkdwn";
 import { labelled } from "./trigger";
 
 /** Lines of answer a reply carries, at most. */
@@ -37,12 +35,18 @@ export interface FigmaSource {
 export type FigmaReply =
   | { kind: "answer"; lines: string[]; source: FigmaSource | null }
   | { kind: "question"; lines: string[] }
-  /** `where`: the channel the card is in, by name; absent, the reply names none (a DM). */
-  | { kind: "drafted"; link: string | null; where?: string }
+  /** A teammate's change, not made: `would` is what one approval would do, in
+   *  the write's fixed gate words (`agent/tool-table.ts`); null when unknown. */
+  | { kind: "answer-only"; would: string | null }
+  /** A change asked for by someone Team Members does not map. */
   | { kind: "not-teammate" }
-  /** A teammate's change that could not be drafted: no #plus-design to draft it in, or Slack refused the card. */
-  | { kind: "not-drafted" }
   | { kind: "failed" };
+
+/** What a reply to a change asked for in Figma opens with. */
+const NO_CHANGE = "I can't make changes from a Figma comment, so nothing was changed.";
+
+/** Where a teammate's change is drafted instead. */
+const TO_SLACK = "Ask le goat in Slack, and I'll draft it there for a teammate to approve.";
 
 /**
  * A reply as Figma shows it: the label, then what it says, its first line beside the label.
@@ -73,18 +77,10 @@ export function figmaReplyLines(reply: FigmaReply): string[] {
         return reply.source && reply.lines.length ? [...reply.lines, sourceLine(reply.source)] : [CANT_FIND_LINE];
       case "question":
         return [...reply.lines, "Reply here with @uno and the answer, and I'll pick it up."];
-      case "drafted":
-        return [
-          `I drafted this change for approval${reply.where ? ` in ${reply.where}` : ""}${reply.link ? `: ${reply.link}` : "."}`,
-          "Nothing changes in the file or anywhere else until a teammate approves it there.",
-        ];
+      case "answer-only":
+        return [NO_CHANGE, reply.would ? `To make it, I'd ${reply.would}. ${TO_SLACK}` : TO_SLACK];
       case "not-teammate":
-        return [
-          "I draft changes only for teammates whose Figma account is on Team Members, so I haven't drafted this one.",
-          "Ask in #plus-design.",
-        ];
-      case "not-drafted":
-        return ["I couldn't draft this change, so nothing was drafted or written. Ask in #plus-design."];
+        return [`${NO_CHANGE} Ask in #plus-design.`];
       case "failed":
         return ["I couldn't answer this just now. Ask in #plus-design."];
     }
@@ -142,33 +138,4 @@ function capLine(line: string): string {
   const cut = line.slice(0, MAX_LINE_CHARS);
   const end = cut.lastIndexOf(". ");
   return end > MAX_LINE_CHARS / 2 ? cut.slice(0, end + 1) : `${cut.slice(0, MAX_LINE_CHARS - 1).trimEnd()}…`;
-}
-
-/** What the #plus-design lead names. */
-export interface AskLead {
-  /** The asker's Slack id. */
-  asker: string;
-  /** Who is asked to review: the file's design owner, else the asker. */
-  owner: string;
-  file: { title: string; url: string };
-  /** The ask, one line and short. */
-  quote: string;
-  /** A Figma link to the comment. */
-  commentUrl: string;
-}
-
-/**
- * The #plus-design post a change asked for in Figma opens, in one line: the
- * one person asked, what happened, the ask, and one action. The card goes in
- * its thread. The file's title and the ask are people's words, escaped so
- * they read as typed.
- *
- * @param lead - Who asked, who reviews, in which file, and what
- */
-export function askLeadText(lead: AskLead): string {
-  const file = `<${lead.file.url}|${escapeSlackText(lead.file.title)}>`;
-  const quote = `“${escapeSlackText(lead.quote)}” (<${lead.commentUrl}|comment>)`;
-  return lead.owner === lead.asker
-    ? `<@${lead.asker}>, you asked in a Figma comment on ${file}: ${quote}. Can you review the draft below?`
-    : `<@${lead.owner}>, <@${lead.asker}> asked in a Figma comment on ${file}: ${quote}. Can you review the draft below?`;
 }
