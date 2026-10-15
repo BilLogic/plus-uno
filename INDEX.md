@@ -187,6 +187,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/031-a-run-with-no-requester-is-bounded-by-its-evidence.md`](docs/adr/031-a-run-with-no-requester-is-bounded-by-its-evidence.md) | A scheduled run has no requester whose visibility bounds it, so each finding's own evidence does — a private channel's finding stays in it, a group DM's goes back to it and leaves only as a reworded note on a separate share card someone there ✅s, and mixed evidence is private (2026-09-29); a file in one of the six PLUS Figma teams counts like a public design channel (amended 2026-09-30, #891); a finding with no thread goes to its team's channel, by the card's pillar else the Figma file's team, before #plus-design (amended 2026-10-14) |
 | [`docs/adr/032-a-cron-may-read-with-a-persons-own-token-only-for-them.md`](docs/adr/032-a-cron-may-read-with-a-persons-own-token-only-for-them.md) | A scheduled job with no requester may read with a person's own Slack token only after that person opted in, only after the live token's granted scopes check out, and only to tell that person — in their DM with uno-bot, never anyone else — keeping a permalink, a due time and a state and nothing of the message (2026-09-30) |
 | [`docs/adr/033-bot-skills-live-with-the-worker.md`](docs/adr/033-bot-skills-live-with-the-worker.md) | uno-bot's instructions are its own bot skills, kept with the Worker and named for what the bot does, each ending in answer, file or hand off; the six uno skills become IDE-only, and the bot never builds code or draws in Figma (2026-10-14) |
+| [`docs/adr/034-the-worker-writes-the-blueprint-behind-the-gate.md`](docs/adr/034-the-worker-writes-the-blueprint-behind-the-gate.md) | uno-bot writes approved blueprint revisions itself, through the authoring RPCs under its own rpc_writer identity, all or none, on a ✅ from a confirmer the card names; writers/blueprint becomes the IDE writer plus the Worker's gated writer (2026-10-15) |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -215,6 +216,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-144 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+145 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.
