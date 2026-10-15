@@ -411,7 +411,10 @@ describe("a pick under Edit fields keeps itself", () => {
     const redrawn = views.calls.at(-1)!;
     assert.equal(redrawn.kind === "update" && redrawn.viewId, "V1");
     const words = JSON.stringify(blocksOf(redrawn.view));
-    assert.match(words, /\*Product Pillar:\* Universal/);
+    // The pick reads in the facts, beside the Edit fields button that made it.
+    const facts = blocksOf(redrawn.view).find((b) => (b as { fields?: unknown }).fields) as { accessory?: { action_id?: string } } | undefined;
+    assert.match(JSON.stringify(facts), /\*Product Pillar\*\\nUniversal/);
+    assert.equal(facts?.accessory?.action_id, "uno_review_edit");
     assert.match(words, /Edited here: Product Pillar/);
     // The draft keeps its fields in place, by the same block ids, so what was
     // typed there survives the redraw.
@@ -438,7 +441,7 @@ describe("a pick under Edit fields keeps itself", () => {
       for (const which of order) await keepReviewPick(picks[which], h.deps);
       assert.deepEqual(await keptOn(h.deps.threadState), { [KEY]: "Universal", [STATUS]: "Shipped" });
       const last = JSON.stringify(blocksOf(h.views.calls.at(-1)!.view));
-      assert.match(last, /\*Product Pillar:\* Universal/);
+      assert.match(last, /\*Product Pillar\*\\nUniversal/);
 
       await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", decision: "confirm" }, h.deps);
       assert.deepEqual(h.ran[0]?.execute?.input.properties, { product_pillar: "Universal", "Design Status": "Shipped" });
