@@ -19,10 +19,20 @@
 //
 // PURE: blocks out, nothing posted, nothing read.
 import { reviewSections, textSections } from "./render";
-import { escapeSlackText } from "./mrkdwn";
+import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
 import { fieldInputBlocks, MAX_INPUT_CHARS, type EditableField } from "./review-fields";
 import { relayRecipientId } from "../tools/relayed-dm-render";
+import { MAX_FEEDBACK_QUESTIONS, shareoutChannelRef } from "../tools/share-out-render";
 import { createdDesignStatus } from "../integrations/notion";
+import {
+  alertsFromCaveats,
+  labelledText,
+  listBlock,
+  quoteBlock,
+  shareoutApprove,
+  type DraftAnatomy,
+  type WhereElement,
+} from "./review-anatomy";
 import type { ProposalOperation } from "../thread-state/index";
 
 type Input = Record<string, unknown>;
@@ -424,4 +434,139 @@ export function caveatsOf(cardText: string): string[] {
     }
   });
   return out;
+}
+
+// ── Drafts in the shared anatomy (`review-anatomy.ts`) ──────────────────────
+
+/** What a reading in the shared anatomy is drawn with: the card's text, for
+ *  the place it names and its caveats, and the draft's detail. */
+type AnatomyContext = DraftDetail & { cardText: string };
+
+/** Readings in the shared anatomy, by tool. A tool with none is drawn by its
+ *  `READERS` reading, or from the card's text. */
+const ANATOMY_READERS: Record<string, (input: Input, context: AnatomyContext) => DraftAnatomy> = {
+  shareout_post: shareoutAnatomy,
+};
+
+/**
+ * The draft read into the shared anatomy's zones, or null when the batch is
+ * not one operation of a tool that has a reading in it.
+ *
+ * @param operations - The batch as it would run, saved edits applied
+ * @param cardText - The card's text, without its footer
+ * @param detail - The fields drawn as inputs in place, and whether the reader
+ *   may decide
+ */
+export function anatomyOf(operations: readonly ProposalOperation[], cardText: string, detail: DraftDetail = {}): DraftAnatomy | null {
+  const op = operations.length === 1 ? operations[0] : undefined;
+  const reader = op ? ANATOMY_READERS[op.toolName] : undefined;
+  return reader ? reader(op!.input, { ...detail, cardText }) : null;
+}
+
+/** Where a share-out's card says it posts: its heading's place, which the
+ *  executor's own decision named when the card was staged. */
+const SHAREOUT_HEADING = /^:warning: About to \*share this for feedback in (.+)\*:$/m;
+
+/** The place a share-out posts, as one where-line element: a channel by id
+ *  where the card names one, its words otherwise ("this thread"). */
+function shareoutPlaceElement(input: Input, cardText: string): WhereElement {
+  const where = SHAREOUT_HEADING.exec(cardText)?.[1]?.trim();
+  const linked = where ? /^<#([CG][A-Z0-9]+)(?:\|[^>]*)?>$/.exec(where) : null;
+  if (linked) return { type: "channel", channel_id: linked[1]! };
+  if (where) return { type: "text", text: where };
+  // A card staged without the heading: what its input asked for.
+  const ref = str(input.place) === "channel" ? shareoutChannelRef(input.channel) : null;
+  if (ref && "id" in ref) return { type: "channel", channel_id: ref.id };
+  return { type: "text", text: str(input.place) === "here" ? "this conversation" : "#plus-design-feedback" };
+}
+
+/** "Posts in #channel and pings @A, @B and @C." — each person a user element
+ *  where the input holds their id, their name as written where it does not. */
+function shareoutWhere(input: Input, cardText: string): WhereElement[] {
+  const reviewers = (Array.isArray(input.reviewers) ? input.reviewers : []).map(str).filter(Boolean);
+  const out: WhereElement[] = [{ type: "text", text: "Posts in " }, shareoutPlaceElement(input, cardText)];
+  reviewers.forEach((r, i) => {
+    const join = i === 0 ? " and pings " : i === reviewers.length - 1 ? " and " : ", ";
+    out.push({ type: "text", text: join }, SLACK_USER_ID.test(r) ? { type: "user", user_id: r } : { type: "text", text: r });
+  });
+  out.push({ type: "text", text: "." });
+  return out;
+}
+
+const capital = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+
+/** The card's subtitle: the artifact (when the project is the title), the
+ *  round as "Round 1", and the fidelity in words. */
+function shareoutSubtitle(input: Input, titled: boolean): string {
+  const round = typeof input.round === "number" ? input.round : Number(str(input.round)) || undefined;
+  const fidelity = str(input.fidelity);
+  return [titled ? capital(str(input.artifact)) : "", round ? `Round ${round}` : "", fidelity ? `${capital(fidelity)} fidelity` : ""]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+/** The Open button's words: the artifact's last word ("Open prototype"), or
+ *  "Open link". */
+function openWords(artifact: string): string {
+  const noun = artifact.split(/\s+/).at(-1) ?? "";
+  return noun && noun.length <= 20 ? `Open ${noun}` : "Open link";
+}
+
+/** Said under a share-out's inputs: what is locked, and how to change it. */
+export const SHAREOUT_LOCKED =
+  "Where it posts, who it pings, the fidelity and the round are fixed on this card. To change them, choose Needs changes.";
+
+/**
+ * A share-out in the anatomy: "Share for feedback", where it posts and who it
+ * pings, the bundle caveat as an alert, the project as a card, then its words.
+ * For a confirmer the words are the prefilled inputs `review-fields.ts`
+ * offers (what this is, each question, not looking for, the deadline), with a
+ * line saying the rest is locked; for anyone else they are shown, read-only.
+ */
+function shareoutAnatomy(input: Input, detail: AnatomyContext): DraftAnatomy {
+  const project = str(input.project);
+  const artifact = str(input.artifact);
+  const link = str(input.link);
+  const subtitle = shareoutSubtitle(input, Boolean(project));
+  const field = (path: string) => detail.inline?.get(`0.${path}`);
+  const editing = detail.editing === true;
+
+  const content: unknown[] = [];
+  /** One of the share-out's words: its input in place, or the text shown. */
+  const part = (path: string, label: string, value: string) => {
+    const inline = field(path);
+    if (inline) content.push(...fieldInputBlocks([inline]));
+    else if (value) {
+      content.push(labelledText(label, value));
+      if (editing && value.length > MAX_INPUT_CHARS) content.push(context(TOO_LONG_TO_EDIT));
+    }
+  };
+
+  part("summary", "What this is", str(input.summary));
+  const changed = str(input.what_changed);
+  if (changed) content.push(quoteBlock("What changed since last round", changed));
+  const questions = (Array.isArray(input.feedback_wanted) ? input.feedback_wanted : []).map(str).slice(0, MAX_FEEDBACK_QUESTIONS);
+  const shown: string[] = [];
+  questions.forEach((q, i) => {
+    const inline = field(`feedback_wanted.${i}`);
+    if (inline) content.push(...fieldInputBlocks([inline]));
+    else if (q) shown.push(q);
+  });
+  if (shown.length) content.push(listBlock("Feedback wanted", shown));
+  part("not_looking_for", "Not looking for", str(input.not_looking_for));
+  part("deadline", "Deadline", str(input.deadline));
+  if (editing) content.push(context(SHAREOUT_LOCKED));
+
+  return {
+    header: "Share for feedback",
+    where: shareoutWhere(input, detail.cardText),
+    alerts: alertsFromCaveats(caveatsOf(detail.cardText)),
+    object: {
+      title: project || capital(artifact) || "Share-out",
+      ...(subtitle ? { subtitle } : {}),
+      ...(/^https?:\/\//.test(link) ? { open: { url: link, text: openWords(artifact) } } : {}),
+    },
+    content,
+    approve: shareoutApprove(input),
+  };
 }
