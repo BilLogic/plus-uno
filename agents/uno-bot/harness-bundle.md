@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **96,613 chars from 9 files**, against an assembled budget of 175,500 (78,887 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 76,229 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **96,774 chars from 9 files**, against an assembled budget of 175,500 (78,726 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 76,390 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -29,8 +29,8 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 16,358 (−5,976 ide-only) | 81,140 | — |
 | 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 84,608 | — |
 | 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 91,124 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 95,757 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 96,613 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,740 (−1,570 ide-only) | 95,918 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 96,774 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -1083,7 +1083,7 @@ Every table and column in the catalog's own comments, and the tables only a serv
 - **uno-blueprint (Supabase) is the source of truth for the CURRENT service journey.** Ground every current-state product claim in a blueprint read (`search_blueprint` / PostgREST) with lane/actor attribution; cite what you found. Notion is a mixed estate — stale docs *and* legitimate future state — so authority is routed by claim type (§ Two sources, one time axis), not by a single "blueprint always wins" rule.
 - **Query at task time, never cache.** `docs/product-and-service/` holds foundation only (identity, pillars, archetypes); live truth — features, requirements, screens — is retrieved fresh per task.
 - **Paired writes, never one alone:** any requirement change updates the PRD (Notion) and the blueprint (Supabase) together — Flow 4's requirement/story path. A PRD edit without a blueprint write (or vice versa) is a defect. **Detection is human today** — no automation reads Supabase, so nothing verifies the pair. The weekly shipped watchdog files a *verify-blueprint* intake per shipped journey card (`skills/uno-maintain/references/method.md` §6) but cannot confirm drift itself; any human spot files a `uno-maintain` intake.
-- Write access: `writers/blueprint` only, via `skills/uno-synthesize` (new requirements) and `skills/uno-maintain` (changes). All other consumers are read-only.
+- Write access, two writers (ADR-034): `writers/blueprint` in the IDE, via `skills/uno-synthesize` (new requirements) and `skills/uno-maintain` (changes); and uno-bot's gated writer, which writes a blueprint revision through the authoring RPCs once a confirmer its card names presses ✅. All other consumers are read-only.
 - Supabase is also the candidate dummy backend for prototypes needing persistence — separate schema, never mixed with blueprint tables.
 
 **Navigating it:** the blueprint's own account — shape, status vocabulary, retrieval modes — is `docs/connectors/supabase/blueprint.md`, vendored from plus-uno-blueprint, its schema disclosed beside it in `docs/connectors/supabase/blueprint-schema.md`; the answering rules (citation shape, confidence, absence) are `docs/connectors/supabase/blueprint-navigation.md`; SQL and PostgREST recipes are `docs/connectors/supabase/blueprint-direct-access.md`. Load the first two before any blueprint read; this file owns access and source routing only.

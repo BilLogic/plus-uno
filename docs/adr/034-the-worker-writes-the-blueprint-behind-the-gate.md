@@ -1,0 +1,18 @@
+---
+embodiment: ide
+summary: uno-bot writes approved blueprint revisions itself, through the authoring RPCs under its own rpc_writer identity, all or none, on a ✅ from a confirmer the card names; writers/blueprint becomes the IDE writer plus the Worker's gated writer (2026-10-15)
+status: active
+verified: 2026-10-15 (#1285)
+---
+
+# ADR-034: The Worker writes the blueprint behind the gate (2026-10-15)
+
+**Decision.** The Worker becomes a gated blueprint writer, reversing "write access: `writers/blueprint` only". A **blueprint revision** — the drafted cell changes to one path, each with its status before and after, plus an optional path status — is staged as one card whose single operation is the `worker` tool `blueprint_revise` (`agents/uno-bot/src/blueprint-write/`). Its confirmers are exactly the people the card names, the standing confirmers left out (`exclusiveConfirmers`, a new card term every other card leaves unset). On a ✅ from one of them, the Worker signs in as its own Auth user, `app_metadata.role = rpc_writer` (`SUPABASE_WRITE_EMAIL` in `[vars]`, the secret `SUPABASE_WRITE_PASSWORD`), and writes every row through `upsert_cell_at_status` and the path through `set_path_status`. Both RPCs record themselves in `authoring_changes` with author `agent`, `author_id` uno-bot's account, one agent session per approval and the captured inverse. ⛔, expiry and a lost race reach no RPC. `writers/blueprint` stays the IDE writer through the Supabase MCP; the Worker's writer is the second, narrower one.
+
+**All or none.** A revision is reviewed whole, so it is written whole. A failed write, or a cell that moved since the draft (a slot filled, a status changed — a stale race), takes back every write already made, that one included, newest first, through the same RPCs. A changed cell is put back as it stood. A new cell cannot be: the `rpc_writer` tier may not delete (a trigger refuses it), so it is set to `deprecated` and named in the thread for a person to delete. For the same reason, removing a drawn proposal is a status write to `deprecated`, never a delete.
+
+**Budget (ADR-022).** A write is one subrequest because the RPC records itself; sign-in is one more, at most once an hour per isolate. Before its first call the tool takes the revision's worst case — every write and every take-back, plus sign-in — and refuses the press, writing nothing, when that and a four-call reserve for the thread's reply exceed the headroom. A job that drafts revisions keeps each one within that ceiling.
+
+**Why.** Shipped work changes the service, and a revision someone has to carry to the IDE afterwards is the drift the blueprint already suffers. The Worker has the draft and the approval in hand, so it writes. The narrowness is the point: the RPC guards admit `rpc_writer` only inside a SECURITY DEFINER body, so the identity reaches the blueprint through recorded operations and no table, deletes stay human, and the service-role key stays off the Worker (plus-uno-blueprint `20261015120000`). Owner-or-Bill confirmers, not the standing list: product truth changes only with the person who shipped it or the person who makes product calls (#1279).
+
+**Consequences.** Every Worker write is traceable to an approval by its agent session in `authoring_changes`. A revision that needs a new step or lane is out of this writer's reach: `add_step` and `add_lane` leave their record to the caller, which would be a second subrequest per write and a write that can land unrecorded. The connector doc's access table names the Worker's writer. Rollback: drop the tool row and redeploy; the identity's password can be rotated or the Auth user disabled in the dashboard without a deploy. — uno (agent), Oct 2026, applying #1285

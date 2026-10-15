@@ -84,3 +84,6 @@ embed-model-ab.json
 
 .cutover.env
 
+
+# uno-bot blueprint-writer wizard (public values only)
+.blueprint-writer.env

@@ -387,6 +387,18 @@ export const TOOL_TABLE = {
       nouns: ["dev mode", "link", "figma"],
     },
   },
+  // A blueprint revision card's one operation (src/blueprint-write/): the
+  // drafted rows written through the authoring RPCs under uno-bot's own
+  // identity, all or none. The Worker stages it; the model is never offered it.
+  blueprint_revise: {
+    access: "worker",
+    retrieval: false,
+    gate: {
+      verb: "write this revision to the blueprint",
+      kind: "write a blueprint revision",
+      nouns: ["revision", "blueprint", "rows"],
+    },
+  },
   proposal_resolve: { access: "control", retrieval: false },
 } as const satisfies Record<string, ToolRow>;
 
