@@ -1,13 +1,14 @@
 /**
  * Profile - Elements - Language Preferences
  *
- * Multi-select dropdown for selecting languages the user can tutor in.
+ * The languages a tutor can tutor in, as a TagInput: type to filter, pick a
+ * language, or create one the list does not have yet.
  *
  * Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4899-13061&m=dev
  */
-import React from 'react';
-import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
-import Select from '@/components/forms-and-inputs/Select';
+import React, { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
+import TagInput from '@/components/forms-and-inputs/TagInput';
 
 export default {
     title: 'Specs/Profile/Elements/Language Preferences',
@@ -18,47 +19,62 @@ export default {
         docs: {
             description: {
                 component:
-                    'Language preferences multi-select with badges for tutor profile. Token notes are in the file header comment.',
+                    'The languages a tutor can tutor in, on TagInput: type to filter, pick one, or create a language the list lacks.',
             },
         },
     },
 };
 
 const languageOptions = [
-    { value: 'arabic', label: 'Arabic' },
-    { value: 'english', label: 'English' },
-    { value: 'french', label: 'French' },
-    { value: 'korean', label: 'Korean' },
+    { value: 'arabic', label: 'Arabic', color: 'green' },
+    { value: 'english', label: 'English', color: 'blue' },
+    { value: 'french', label: 'French', color: 'purple' },
+    { value: 'korean', label: 'Korean', color: 'teal' },
 ];
 
-/** Reusable Language Preferences component for use in sections and pages */
-export const LanguagePreferences = ({ id = 'language-preferences', value, onChange, defaultValue, required = false, ...props }) => {
+/**
+ * Reusable Language Preferences element for sections and pages.
+ *
+ * `value` and `defaultValue` are arrays of language values, such as
+ * `['english', 'french']`; `onChange` receives the same shape. A created
+ * language joins the options with the colour TagInput gave it.
+ */
+export const LanguagePreferences = ({
+    id = 'language-preferences',
+    value,
+    onChange,
+    defaultValue,
+    required = false,
+    ...props
+}) => {
+    const [options, setOptions] = useState(languageOptions);
+    const [internal, setInternal] = useState(defaultValue ?? []);
+    const values = value ?? internal;
+
+    const tagOf = (languageValue) => {
+        const option = options.find((o) => o.value === languageValue);
+        return option ? { value: option.value, text: option.label, color: option.color } : languageValue;
+    };
+
     return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-small-gap-xs, 4px)',
-                width: '100%',
+        <TagInput
+            id={id}
+            label="Language Preferences"
+            required={required}
+            placeholder="Select or create a language"
+            options={options}
+            tags={values.map(tagOf)}
+            onCreate={({ value: text, color }) => {
+                setOptions((list) => [...list, { value: text.toLowerCase(), label: text, color }]);
+                return text.toLowerCase();
             }}
-        >
-            <Label text="Language Preferences" required={required} />
-            <Select
-                id={id}
-                mode="multi"
-                options={languageOptions}
-                value={value}
-                onChange={onChange}
-                defaultValue={defaultValue}
-                placeholder="Select Languages"
-                displayMode="badges"
-                creatable={true}
-                searchable={true}
-                size="medium"
-                style={{ width: '100%' }}
-                {...props}
-            />
-        </div>
+            onChange={(next) => {
+                const nextValues = next.map((tag) => (typeof tag === 'string' ? tag : tag.value));
+                if (value === undefined) setInternal(nextValues);
+                if (onChange) onChange(nextValues);
+            }}
+            {...props}
+        />
     );
 };
 
@@ -70,9 +86,22 @@ const languagePresetDefaults = {
 
 export const Overview = () => (
     <div style={{ maxWidth: '400px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
-        <LanguagePreferences id="language-preferences-overview" required={false} />
+        <LanguagePreferences id="language-preferences-overview" defaultValue={languagePresetDefaults.bilingual} />
     </div>
 );
+
+/** It is a TagInput: typing a language the list lacks creates it. */
+Overview.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('combobox', { name: 'Language Preferences' });
+    const tags = within(canvas.getByRole('list', { name: 'Selected: Language Preferences' }));
+    await expect(tags.getByText('English')).toBeInTheDocument();
+
+    await userEvent.click(input);
+    await userEvent.type(input, 'Spanish{Enter}');
+    await expect(tags.getByText('Spanish')).toBeInTheDocument();
+    await userEvent.keyboard('{Escape}');
+};
 
 export const Variants = () => (
     <div
@@ -84,14 +113,10 @@ export const Variants = () => (
         }}
     >
         <div style={{ maxWidth: '400px', flex: '1 1 320px' }}>
-            <LanguagePreferences id="language-var-empty" required={false} />
+            <LanguagePreferences id="language-var-empty" />
         </div>
         <div style={{ maxWidth: '400px', flex: '1 1 320px' }}>
-            <LanguagePreferences
-                id="language-var-bilingual"
-                defaultValue={languagePresetDefaults.bilingual}
-                required={false}
-            />
+            <LanguagePreferences id="language-var-bilingual" defaultValue={languagePresetDefaults.bilingual} />
         </div>
     </div>
 );
@@ -104,7 +129,7 @@ export const Interactive = {
         preset: {
             control: 'radio',
             options: ['empty', 'bilingual', 'trilingual'],
-            description: 'Initial language badges',
+            description: 'Initial languages',
             table: { category: 'State' },
         },
     },
@@ -114,7 +139,6 @@ export const Interactive = {
                 id="language-preferences-interactive"
                 key={args.preset}
                 defaultValue={languagePresetDefaults[args.preset]}
-                required={false}
             />
         </div>
     ),

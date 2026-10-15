@@ -96,7 +96,7 @@ export const NameWithoutId = () => (
         <DateAndTimePicker name="starts" label="Session start" />
         <ChoiceGroup name="confidence" legend="Confidence" orientation="inline" options={scaleOptions} />
         <Rating name="overall" label="Overall rating" value={3} />
-        <TagInput name="topics" label="Topics" tags={['Algebra', 'Geometry']} />
+        <TagInput name="topics" label="Topics" options={['Algebra', 'Geometry']} tags={['Algebra', 'Geometry']} />
     </div>
 );
 
@@ -119,7 +119,8 @@ NameWithoutId.play = async ({ canvasElement }) => {
     // is what this file is about and it did not change; the role did, and this
     // line is where that is recorded.
     canvas.getByRole('radiogroup', { name: /Overall rating/ });
-    canvas.getByRole('group', { name: /Topics/ });
+    // TagInput has a text entry, so its label names that, as any input's does.
+    canvas.getByRole('combobox', { name: /Topics/ });
 };
 
 /**
@@ -305,7 +306,7 @@ export const ExplicitIds = () => (
         <DateAndTimePicker id="la-starts" name="starts" label="Session start" />
         <ChoiceGroup id="la-confidence" name="confidence" legend="Confidence" orientation="inline" options={scaleOptions} />
         <Rating id="la-overall" name="overall" label="Overall rating" value={3} />
-        <TagInput id="la-topics" name="topics" label="Topics" tags={['Algebra']} />
+        <TagInput id="la-topics" name="topics" label="Topics" options={['Algebra']} tags={['Algebra']} />
         <Radio id="la-cadence" name="cadence" label="Every session" value="every" />
         <ChoiceGroup id="la-reminder" name="reminder" legend="Reminder" options={reminderOptions} />
     </div>
