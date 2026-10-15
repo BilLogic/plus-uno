@@ -36,6 +36,7 @@
       "Scale",
       "Select",
       "Switch",
+      "Tag input",
       "Textarea",
       "Tree select"
     ],
@@ -146,6 +147,7 @@
         "Scale",
         "Select",
         "Switch",
+        "Tag input",
         "Textarea",
         "Tree select"
       ],

@@ -2390,6 +2390,33 @@
         ]
       }
     },
+    "TagInput": {
+      "code": {
+        "import": "@/components/forms-and-inputs",
+        "export": "default",
+        "mdxPath": "design-system/src/components/forms-and-inputs/TagInput.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/TagInput.jsx",
+        "storybookId": "components-forms-and-inputs-tag-input--docs",
+        "props": {
+          "size": {
+            "type": "enum",
+            "values": [
+              "small",
+              "medium",
+              "large"
+            ]
+          },
+          "disabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": []
+      }
+    },
     "Textarea": {
       "code": {
         "import": "@/components/forms-and-inputs",
@@ -2431,25 +2458,6 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Form Short Textarea (MDX link)",
-            "componentSetNodeId": "13543:5904",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904",
-            "source": "storybook-mdx",
-            "codeDefaults": {
-              "variant": "short"
-            },
-            "variantValueMap": {
-              "validation": {
-                "invalid": "error",
-                "valid": "success"
-              }
-            },
-            "status": "verified",
-            "verifiedAt": "2026-06-13",
-            "notes": "Verified 2026-06-13: MDX figmaLink points directly to Form Short Textarea component set (not a docs page)."
-          },
-          {
             "id": "form-textarea",
             "name": "Form Textarea",
             "componentSetNodeId": "13541:10731",
@@ -2483,10 +2491,13 @@
             },
             "status": "verified",
             "verifiedAt": "2026-06-13",
-            "notes": "Same node as storybook-resources MDX link."
+            "notes": "Also the node the Resources card's Figma link opens."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904",
+        "deliberate": {
+          "variant": "Code carries long and short as one `variant` prop; the library draws them as two sets, Form Textarea and Form Short Textarea."
+        }
       }
     },
     "Tile": {

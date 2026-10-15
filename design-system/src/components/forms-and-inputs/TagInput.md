@@ -7,18 +7,22 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/TagInput.jsx`
 
+**Stories:** `design-system/src/components/forms-and-inputs/TagInput.stories.jsx` — Overview, Sizes, Colors, Disabled, Controlled, Interactive
+
+**Storybook page:** `design-system/src/components/forms-and-inputs/TagInput.mdx`
+
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | — |
 | `name` | string | — | — |
-| `label` | node | — | — |
-| `required` | bool | `false` | — |
+| `label` | node | — | Field label. Names the group the tags sit in. |
+| `required` | bool | `false` | Draws the required asterisk after the label |
 | `tags` | arrayOf or string or shape or oneOf | — | — |
 | `defaultTags` | arrayOf or string or shape or oneOf | `[]` | — |
-| `size` | enum | `'medium'` | — |
-| `disabled` | bool | `false` | — |
+| `size` | enum | `'medium'` | Size variant |
+| `disabled` | bool | `false` | Disables every tag and removes every × |
 | `onAdd` | func | — | — |
 | `onRemove` | func | — | — |
 | `onChange` | func | — | — |
@@ -41,8 +45,6 @@ From `design-system/src/components/forms-and-inputs/TagInput.scss`. Override the
 
 Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `MultipleChoice` · `NumberInput` · `OptionList` · `Radio` · `RadioButtonGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `Textarea` · `TreeSelect`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `TagInput` is the right call, only what it accepts.
+> Authored guidance is partial — missing: correct/incorrect (#166).

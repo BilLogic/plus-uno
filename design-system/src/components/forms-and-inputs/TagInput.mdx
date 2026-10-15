@@ -1,0 +1,167 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TagInputStories from './TagInput.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "size": {
+      "type": "enum",
+      "values": [
+        "small",
+        "medium",
+        "large"
+      ]
+    },
+    "disabled": { "type": "boolean" }
+  },
+  "sets": []
+};
+
+<Meta of={TagInputStories} />
+
+<Title />
+Use tag input for a field that holds a set of short values, such as the topics
+a session covers.
+
+<DocsTabs of={TagInputStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A labelled field of removable tags. Uncontrolled, so the field keeps its own list.</>}>
+    <Canvas of={TagInputStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<DocsCanvasShell description={<>Size variants: small, medium, and large.</>}>
+    <DsCanvasQuiet of={TagInputStories.Sizes} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A tag given as an object takes a Tag color; a plain string is grey.</>}>
+    <DsCanvasQuiet of={TagInputStories.Colors} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Disabled: every tag is disabled and none has a ×.</>}>
+    <DsCanvasQuiet of={TagInputStories.Disabled} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Controlled: with `onChange` the × removes the tag; with no handler there is no ×.</>}>
+    <DsCanvasQuiet of={TagInputStories.Controlled} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={TagInputStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `TagInput` when a field's value is a set of short labels: the topics a
+session covered, or the subjects a tutor teaches. The tags are `Tag`s in a
+`TagGroup`, so a picked value looks like every other category in the product.
+The field shows and removes tags; it has no text entry of its own.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### A controlled field needs a handler to offer a ×.
+
+```jsx
+// Incorrect — controlled with no handler, so no tag can be removed and none shows a ×.
+<TagInput label="Topics" tags={topics} />
+
+// Correct — onChange receives the new list.
+<TagInput label="Topics" tags={topics} onChange={setTopics} />
+```
+
+### A tag's color is a Tag color.
+
+```jsx
+// Incorrect — the status names are deprecated aliases and warn in development.
+<TagInput label="Subjects" defaultTags={[{ value: 'math', text: 'Math', color: 'success' }]} />
+
+// Correct — a tag is a category, so it takes a Tag color.
+<TagInput label="Subjects" defaultTags={[{ value: 'math', text: 'Math', color: 'green' }]} />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The label names a group.** TagInput renders tags, not an input, so its
+  label is a `span` that names the tag container through `aria-labelledby`,
+  and the container takes `role="group"`. With no `label` the container has
+  no role and no name, so give every TagInput a label.
+- **Each × names its tag.** The remove button is named `Remove <tag>`, so a
+  row of them is not a row of identical controls.
+- **Disabled leaves nothing to press.** `TagGroup` disables every tag and
+  takes the × away.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For one value rather than a set, use `Tag`.
+- For the set without a field around it, use `TagGroup`.
+- For picking several values from a known list, use `SelectMultiple`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>
