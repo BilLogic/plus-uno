@@ -29,7 +29,7 @@ import type { DecisionRow } from "../../src/integrations/notion";
 import type { TeamRoles } from "../../src/usage/roles";
 import { modelDecisionDetector } from "../../src/figma-comments/detector";
 import type { DecisionThread, QueuedFile, SweepFigmaComments } from "../../src/figma-comments/queue";
-import { figmaHandlesFrom, QUESTIONS_SECTION, type QuestionsHanded, type TriagePorts, type WatchedFile } from "../../src/figma-comments/triage";
+import { QUESTIONS_SECTION, type QuestionsHanded, type TriagePorts, type WatchedFile } from "../../src/figma-comments/triage";
 import type { ChannelIds } from "../../src/destination/index";
 import { FIGMA_DECISIONS_SECTION, type FigmaDecisionsHanded } from "../../src/figma-comments/post";
 import { sectionHandOffIn } from "../../src/sweep/sections";
@@ -203,11 +203,11 @@ export interface FigmaRecords {
   };
 }
 
-/** The triage's wiring: the handle map as the Worker's config spells it, each
- *  file's Figma team, and the ladder's channel ids (#plus-design, #plus-universal
- *  and `C0TOOLKIT` unless set). */
+/** The triage's wiring: the Team Members Figma map (Figma user id → Slack id),
+ *  each file's Figma team, and the ladder's channel ids (#plus-design,
+ *  #plus-universal and `C0TOOLKIT` unless set). */
 export interface TriageOptions {
-  handles?: string;
+  people?: Record<string, string>;
   /** Slack ids whose DM does not send. */
   dmFails?: string[];
   fileTeams?: Record<string, string>;
@@ -357,7 +357,7 @@ export function sweepHarness(opts: {
           add: async (id) => void figmaRecords.triage.raised.add(id),
         },
         fileTeam: async (fileKey) => triageOpts.fileTeams?.[fileKey] ?? null,
-        handles: figmaHandlesFrom(triageOpts.handles),
+        people: async () => triageOpts.people ?? {},
         channels: ladder,
         dm: async (to, text) => {
           if (triageOpts.dmFails?.includes(to)) return false;
