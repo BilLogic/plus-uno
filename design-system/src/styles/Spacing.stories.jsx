@@ -148,7 +148,7 @@ export const ElementSpacings = () => (
         ]} />
         <h4 className="h4" style={{ margin: '28px 0 12px' }}>Radius</h4>
         <DocTable cols={VALUE_COLS} rows={[
-            ['--size-element-radius-sm', '2px', 'Small radius (radius-50)'],
+            ['--size-element-radius-sm', '4px', 'Small radius (radius-100)'],
             ['--size-element-radius-md', '4px', 'Medium radius (radius-100)'],
             ['--size-element-radius-lg', '8px', 'Large radius (radius-200)'],
             ['--size-element-radius-full', '999px', 'Pill shape (radius-1000)'],
@@ -241,7 +241,7 @@ export const CornerRadiusApplication = () => (
         </p>
         <h4 className="h4" style={{ marginBottom: '12px' }}>Elements layer</h4>
         <DocTable cols={VALUE_COLS_4} rows={[
-            ['--size-element-radius-sm', '2px', 'element-pad-sm', 'Small buttons'],
+            ['--size-element-radius-sm', '4px', 'element-pad-sm', 'Small buttons'],
             ['--size-element-radius-md', '4px', 'element-pad-md', 'Standard buttons'],
             ['--size-element-radius-lg', '8px', 'element-pad-lg', 'Large buttons'],
             ['--size-element-radius-full', '999px', 'Pill shape', 'Badges, chips'],

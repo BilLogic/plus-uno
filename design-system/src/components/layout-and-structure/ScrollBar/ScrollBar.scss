@@ -22,7 +22,7 @@
 
     &::-webkit-scrollbar-thumb {
         background-color: var(--color-outline-variant);
-        border-radius: var(--size-element-radius-sm, 2px);
+        border-radius: var(--size-element-radius-sm, 4px);
 
         &:hover {
             background-color: var(--color-outline);

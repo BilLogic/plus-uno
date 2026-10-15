@@ -122,7 +122,7 @@
         align-items: center;
         justify-content: center;
         padding: var(--size-element-pad-y-lg, 16px);
-        border-radius: var(--size-element-radius-sm, 2px);
+        border-radius: var(--size-element-radius-sm, 4px);
         opacity: 0.38;
         flex-shrink: 0;
         position: relative;
@@ -133,7 +133,7 @@
         position: absolute;
         inset: 0;
         background-color: var(--color-tertiary-state-08, rgba(14, 129, 117, 0.08));
-        border-radius: var(--size-element-radius-sm, 2px);
+        border-radius: var(--size-element-radius-sm, 4px);
     }
 
     &__thumbnail-img {
@@ -142,7 +142,7 @@
         height: 100%;
         object-fit: contain;
         object-position: 50% 50%;
-        border-radius: var(--size-element-radius-sm, 2px);
+        border-radius: var(--size-element-radius-sm, 4px);
     }
 
     &__title {

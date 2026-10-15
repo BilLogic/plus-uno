@@ -82,7 +82,7 @@
     // Figma _tree_select (13526:17500) panel ground is Neutral Colors/surface.
     background-color: var(--color-surface);
     border: var(--size-element-stroke-md) solid var(--color-outline-variant);
-    border-radius: var(--size-element-radius-sm, 2px);
+    border-radius: var(--size-element-radius-sm, 4px);
     box-shadow: var(--elevation-light-2);
     padding: var(--size-element-pad-y-sm, 4px) 0;
 }

@@ -347,10 +347,15 @@ ${lines(groups.stroke)}}
 
 /**
  * Semantic tokens whose value differs from Figma's alias: token -> the
- * primitive it points at instead. `surface-container-gap-md` is space-300
- * (16px) where Figma's `Surface Container/gap-md` is space-600 (32px).
+ * primitive it points at instead. `element-radius-sm` is radius-100 (4px)
+ * where the Figma export in `source/` still says radius-50 (2px). Storybook
+ * won that conflict, and Figma's `Element/radius-sm` now points at radius-100,
+ * so the next `sync:tokens` makes this override stale and the check below
+ * asks for it to be deleted. `surface-container-gap-md` is space-300 (16px)
+ * where Figma's `Surface Container/gap-md` is space-600 (32px).
  */
 const SEMANTIC_OVERRIDES = {
+    'element-radius-sm': 'border-radius-radius-100',
     'surface-container-gap-md': 'spacing-medium-space-300',
 };
 

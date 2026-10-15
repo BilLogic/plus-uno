@@ -54,7 +54,7 @@ export const SKELETON_PRESETS = Object.keys(PRESETS);
 /** Radius token names, each the full token with its fallback. */
 export const SKELETON_RADII = {
     none: '0',
-    'element-radius-sm': 'var(--size-element-radius-sm, 2px)',
+    'element-radius-sm': 'var(--size-element-radius-sm, 4px)',
     'element-radius-md': 'var(--size-element-radius-md, 4px)',
     'element-radius-lg': 'var(--size-element-radius-lg, 8px)',
     'element-radius-full': 'var(--size-element-radius-full, 999px)',

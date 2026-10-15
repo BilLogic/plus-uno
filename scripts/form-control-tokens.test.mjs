@@ -10,10 +10,10 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 const REGISTRY = path.join(REPO_ROOT, 'design-system/figma/token-registry.json');
 const corpus = tokenCorpus();
 
-test('the small element radius is 2px, as Figma and the Input fallback say', () => {
+test('the small element radius stays 4px: Storybook won the conflict with Figma', () => {
   const token = corpus.get('--size-element-radius-sm');
-  assert.equal(token?.raw, 'var(--size-border-radius-radius-50)');
-  assert.equal(token?.value, '2px');
+  assert.equal(token?.raw, 'var(--size-border-radius-radius-100)');
+  assert.equal(token?.value, '4px');
 });
 
 test('the four Figma surface roles resolve under their colour names', () => {
