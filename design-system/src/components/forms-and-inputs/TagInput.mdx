@@ -68,7 +68,7 @@ a session covers.
     <DsCanvasQuiet of={TagInputStories.Disabled} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Controlled: with `onChange` the × removes the tag; with no handler there is no ×.</>}>
+<DocsCanvasShell description={<>Controlled: with `onChange` or `onRemove` the × removes the tag; with neither there is no ×.</>}>
     <DsCanvasQuiet of={TagInputStories.Controlled} />
 </DocsCanvasShell>
 
@@ -119,7 +119,8 @@ The field shows and removes tags; it has no text entry of its own.
 // Incorrect — controlled with no handler, so no tag can be removed and none shows a ×.
 <TagInput label="Topics" tags={topics} />
 
-// Correct — onChange receives the new list.
+// Correct — onChange receives the new list. onRemove, which receives the index
+// and the tag, offers the × as well.
 <TagInput label="Topics" tags={topics} onChange={setTopics} />
 ```
 
@@ -145,8 +146,8 @@ The field shows and removes tags; it has no text entry of its own.
   no role and no name, so give every TagInput a label.
 - **Each × names its tag.** The remove button is named `Remove <tag>`, so a
   row of them is not a row of identical controls.
-- **Disabled leaves nothing to press.** `TagGroup` disables every tag and
-  takes the × away.
+- **Disabled leaves nothing to press.** TagInput draws no ×, and `TagGroup`
+  disables every tag.
 
 </div>
 
