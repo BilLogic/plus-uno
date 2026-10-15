@@ -22,44 +22,70 @@ import Textarea from './Textarea';
  * draw focus as a border-colour change, and a selected row's mark is a
  * primary-filled box or dot: all of it repainted to the same system colour as
  * its resting state, so neither focus nor selection showed. The fix draws
- * focus as an `outline`, which forced colours keeps, and paints the selected
+ * focus as an `outline`, which forced colours keep, and paints the selected
  * mark in the system `Highlight` colour.
  *
- * The assertions compare a state with its neighbour (focused against resting,
- * selected against unselected) rather than naming colours, because the system
- * palette is the user's to choose.
+ * HOW FORCED COLOURS ARE TESTED. Not by turning the mode on. The runner can
+ * emulate it only for the whole browser page, which the other story files
+ * share, and a story that did so left later files rendering forced and failing
+ * axe colour-contrast. So the forced-colours story reads the stylesheet
+ * instead: of the rules under `@media (forced-colors: active)`, which apply to
+ * the focused field, and to the selected mark and not its unselected neighbour.
  */
 
 const stack = { display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '420px' };
 
 /**
- * Whether this is the Storybook test runner (Vitest Browser Mode), where the
- * page's media features can be emulated. Plain Storybook has no runner to ask,
- * so the forced-colours story only asserts inside it.
+ * Every style rule the page's stylesheets hold under
+ * `@media (forced-colors: active)`, nested rules included.
  *
- * @returns {boolean}
+ * @returns {CSSStyleRule[]}
  */
-const inTestRunner = () => import.meta.env.MODE === 'test' && window.__vitest_browser__ === true;
+const forcedColorRules = () => {
+    const found = [];
+    const walk = (rules, forced) => {
+        for (const rule of rules) {
+            const isForced = forced
+                || (rule instanceof CSSMediaRule && /forced-colors:\s*active/.test(rule.media.mediaText));
+            if (rule instanceof CSSStyleRule && isForced) found.push(rule);
+            if (rule.cssRules) walk(rule.cssRules, isForced);
+        }
+    };
+    for (const sheet of document.styleSheets) {
+        let rules;
+        try {
+            rules = sheet.cssRules;
+        } catch {
+            continue; // a cross-origin sheet; none of ours are
+        }
+        walk(rules, false);
+    }
+    return found;
+};
 
 /**
- * Sets forced-colours mode through the runner's `emulateForcedColors` command
- * (vite.config.js). `null` restores the default.
+ * The value a forced-colours rule gives `property` on `element` in its current
+ * state, or '' when none does. `matches` is read now, so a `:focus-visible` or
+ * `:focus-within` rule counts only while the element is focused.
  *
- * THIS USES A PRIVATE API, as the Skeleton stories do for reduced motion:
- * `window.__vitest_browser_runner__.commands` is Vitest's internal handle.
- *
- * @param {'active'|'none'|null} value
+ * @param {Element|null} element
+ * @param {string} property
+ * @returns {string}
  */
-const emulateForcedColors = async (value) => {
-    if (!inTestRunner()) return;
-    const commands = window.__vitest_browser_runner__?.commands;
-    if (!commands) {
-        throw new Error(
-            'emulateForcedColors: the Vitest runner handle (window.__vitest_browser_runner__.commands) '
-            + 'is missing. Check it against the installed Vitest version.',
-        );
+const forcedValue = (element, property) => {
+    if (!element) return '';
+    let value = '';
+    for (const rule of forcedColorRules()) {
+        let applies = false;
+        try {
+            applies = element.matches(rule.selectorText);
+        } catch {
+            applies = false; // a selector `matches` cannot parse
+        }
+        const declared = rule.style.getPropertyValue(property);
+        if (applies && declared) value = declared;
     }
-    await commands.triggerCommand('emulateForcedColors', [value]);
+    return value;
 };
 
 export default {
@@ -73,14 +99,6 @@ export default {
                     + 'including in forced-colours mode.',
             },
         },
-    },
-    // Every story starts and ends in the default colour mode, so a failure
-    // part-way cannot leave the page forced for the stories after it.
-    beforeEach: async () => {
-        await emulateForcedColors(null);
-        return async () => {
-            await emulateForcedColors(null);
-        };
     },
 };
 
@@ -104,8 +122,8 @@ SelectTriggerShowsFocus.play = async ({ canvasElement }) => {
 };
 
 /**
- * In forced-colours mode a focused field draws an outline, and a selected
- * option's mark differs from an unselected one's.
+ * In forced-colours mode a focused field draws a solid outline, and a selected
+ * option's mark is painted where an unselected one's is not.
  */
 export const ForcedColorsKeepFocusAndSelection = () => (
     <div style={stack}>
@@ -121,14 +139,8 @@ export const ForcedColorsKeepFocusAndSelection = () => (
 );
 
 ForcedColorsKeepFocusAndSelection.play = async ({ canvasElement }) => {
-    if (!inTestRunner()) return;
-    await emulateForcedColors('active');
-    await expect(window.matchMedia('(forced-colors: active)').matches).toBe(true);
-
     const canvas = within(canvasElement);
-    const outlined = (element) => Boolean(element)
-        && getComputedStyle(element).outlineStyle !== 'none'
-        && parseFloat(getComputedStyle(element).outlineWidth) >= 2;
+    const outlined = (element) => /\bsolid\b/.test(forcedValue(element, 'outline'));
 
     // Focus, field by field. The ring is on the control itself, or on the box
     // drawn around it where the field is a box with a control inside.
@@ -149,14 +161,15 @@ ForcedColorsKeepFocusAndSelection.play = async ({ canvasElement }) => {
             `${field.getAttribute('aria-label') || field.id || field.textContent} shows focus`,
         ).toBe(true);
     }
+    document.activeElement.blur();
 
-    // Selection, single and multi: the mark of the chosen option is painted
-    // differently from the mark of the one beside it.
+    // Selection, single and multi: the chosen option's mark takes a forced
+    // fill, and the mark beside it does not.
     for (const name of ['Day', 'Days']) {
         const [unselected, selected] = within(canvas.getByRole('listbox', { name }))
             .getAllByRole('option')
             .map((option) => option.querySelector('.plus-list-option-indicator'));
-        await expect(getComputedStyle(selected).backgroundColor)
-            .not.toBe(getComputedStyle(unselected).backgroundColor);
+        await expect(forcedValue(selected, 'background-color'), `${name}: selected mark`).not.toBe('');
+        await expect(forcedValue(unselected, 'background-color'), `${name}: unselected mark`).toBe('');
     }
 };
