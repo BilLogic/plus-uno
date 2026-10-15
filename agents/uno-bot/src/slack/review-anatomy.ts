@@ -19,8 +19,9 @@
 // Only blocks a modal takes: no `table`, `markdown` or `container`.
 //
 // PURE: blocks out, nothing posted, nothing read.
-import { clip, objectCardBlocks, type ObjectCard } from "./card-block";
+import { clip, isLink, objectCardBlocks, type ObjectCard } from "./card-block";
 import { escapeSlackText } from "./mrkdwn";
+import { issueUpdateFromInput, type IssueUpdate } from "../tools/github-issue-update-render";
 import type { ProposalOperation } from "../thread-state/index";
 
 /** One element of the where line, as Slack's rich text takes it. */
@@ -54,6 +55,9 @@ export interface DraftAnatomy {
   /** Where Approve sends it, as mrkdwn after "to" ("post in <#C…>"): what the
    *  decided card's alert says it was approved for. */
   destination?: string;
+  /** What Needs changes does on this card, when it does something other than
+   *  redraft (`decisionWords` otherwise). */
+  revise?: string;
 }
 
 /** Slack's caps: a header's text 150, an alert's 200, a section field 2,000
@@ -148,14 +152,21 @@ export function alertsFromCaveats(lines: readonly string[]): DraftAlert[] {
   return alerts;
 }
 
+/** One short fact: its label, its value, and where the value opens, when it
+ *  is a link (a source thread, a Roadmap card). */
+export type Fact = readonly [label: string, value: string, url?: string];
+
 /** Zone 4: short facts in two columns, ten at most, the accessory beside them
- *  (Edit fields, where its selects can be edited). */
-export function factsSection(facts: ReadonlyArray<readonly [string, string]>, accessory?: unknown): unknown {
+ *  (Edit fields, where its selects can be edited). A fact with an http(s)
+ *  address reads as its value, linked. */
+export function factsSection(facts: ReadonlyArray<Fact>, accessory?: unknown): unknown {
+  const valueOf = (value: string, url?: string) =>
+    url && isLink(url) ? `<${url}|${escapeSlackText(value)}>` : escapeSlackText(value);
   return {
     type: "section",
     fields: facts
       .slice(0, MAX_FIELDS)
-      .map(([label, value]) => ({ type: "mrkdwn", text: clip(`*${escapeSlackText(label)}*\n${escapeSlackText(value)}`, FIELD_CHARS) })),
+      .map(([label, value, url]) => ({ type: "mrkdwn", text: clip(`*${escapeSlackText(label)}*\n${valueOf(value, url)}`, FIELD_CHARS) })),
     ...(accessory ? { accessory } : {}),
   };
 }
@@ -179,6 +190,10 @@ export function quoteBlock(label: string, text: string): unknown {
     elements: [boldLine(label), { type: "rich_text_quote", elements: [{ type: "text", text: clip(text, TEXT_CHARS) }] }],
   };
 }
+
+/** Said where a value is too long to be an input. */
+export const TOO_LONG_TO_EDIT =
+  "This text is over the 3,000 characters a pop-up field holds, so it can't be edited here. Choose Needs changes to ask for a different wording.";
 
 /** Zone 4: a text shown, not edited, under a bold label. */
 export function labelledText(label: string, text: string): unknown {
@@ -268,11 +283,11 @@ const WORDS: Readonly<Record<string, readonly [string, string] | ((input: Record
   notion_archive: ["Archives it now.", "Nothing is archived."],
   dm_relay: ["Sends the DM now.", "Nothing is sent."],
   github_issue_create: ["Files the issue now and links it in the thread.", "Nothing happens."],
-  github_issue_update: ["Updates the issue now.", "Nothing happens."],
+  github_issue_update: (input) => [issueUpdateApprove(input), "Nothing happens."],
   github_workflow_run: ["Starts the run; its runs page posts in the thread.", "Nothing runs."],
   sweep_share_post: ["Posts exactly this note.", "Nothing posts."],
   figma_dev_links: ["Adds the links and the comment in Figma.", "Adds nothing."],
-  ds_precedence_intake: ["Adds it to this week's intake.", "Nothing is filed."],
+  ds_precedence_intake: ["Adds it to this week's intake.", "Left as deliberate. Nothing is filed."],
   figma_tidy_up: ["Leaves the file as it is.", "Nothing is recorded."],
 };
 
@@ -280,6 +295,34 @@ const WORDS: Readonly<Record<string, readonly [string, string] | ((input: Record
 export function shareoutApprove(input: Record<string, unknown>): string {
   const n = Array.isArray(input.reviewers) ? input.reviewers.filter((r) => typeof r === "string" && r.trim()).length : 0;
   return n ? `Posts it now and pings ${n} reviewer${n === 1 ? "" : "s"}.` : "Posts it now.";
+}
+
+/** What one follow-up does to its issue, each step in the third person, in
+ *  the order the pop-up's heading names them: the comment, the state, then
+ *  the labels ("comments", "closes", "labels"). */
+function issueUpdateVerbs(update: IssueUpdate): string[] {
+  const verbs: string[] = [];
+  if (update.comment) verbs.push("comments");
+  if (update.state) verbs.push(update.state === "open" ? "reopens" : "closes");
+  if (update.addLabels.length || update.removeLabels.length) verbs.push(update.removeLabels.length ? "relabels" : "labels");
+  return verbs;
+}
+
+/** "a, b and c". */
+function andList(items: readonly string[]): string {
+  return items.length <= 1 ? (items[0] ?? "") : `${items.slice(0, -1).join(", ")} and ${items.at(-1)!}`;
+}
+
+/** An issue follow-up's Approve: what it does to the issue, by number
+ *  ("Comments, closes and labels #688 now."), read as the executor reads the
+ *  input. */
+export function issueUpdateApprove(input: Record<string, unknown>): string {
+  const read = issueUpdateFromInput(input);
+  if (!read.ok) return "Updates the issue now.";
+  const verbs = issueUpdateVerbs(read.update);
+  // A comment alone is a comment on the issue, never "comments #688".
+  const words = verbs.length === 1 && verbs[0] === "comments" ? "comments on" : andList(verbs);
+  return `${words.charAt(0).toUpperCase()}${words.slice(1)} #${read.update.issue} now.`;
 }
 
 /**

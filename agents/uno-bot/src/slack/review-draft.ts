@@ -32,15 +32,16 @@ import {
   quoteBlock,
   shareoutApprove,
   whereMrkdwn,
+  TOO_LONG_TO_EDIT,
   type DraftAnatomy,
   type WhereElement,
 } from "./review-anatomy";
-import type { ProposalOperation } from "../thread-state/index";
+import { devLinksAnatomy, precedenceAnatomy, shareNoteAnatomy, tidyAnatomy } from "./review-stated";
+import { createFacts, notionCreateAnatomy, type NotionDatabaseLinks } from "./review-notion-create";
+import { archiveAnatomy, issueCreateAnatomy, issueUpdateAnatomy, workflowRunAnatomy } from "./review-draft-writes";
+import type { ProposalOperation, StatedFacts } from "../thread-state/index";
 
 type Input = Record<string, unknown>;
-
-/** Said where a Roadmap card's write sets no Design Status. */
-export const DESIGN_STATUS_NOT_SET = "not set";
 
 /** Slack's cap on a `header` block's text. */
 const HEADER_CHARS = 150;
@@ -69,7 +70,6 @@ type Part = { heading?: string; text: string; key?: string; replaces?: boolean; 
 
 const str = (v: unknown): string => (typeof v === "string" ? v.trim() : "");
 const obj = (v: unknown): Input => (v && typeof v === "object" && !Array.isArray(v) ? (v as Input) : {});
-const squash = (name: string) => name.toLowerCase().replace(/[\s_]+/g, "");
 
 /** A property key as a person reads it: `evidence_link` → `Evidence link`. A
  *  key the model wrote in the database's own spelling is kept as written. */
@@ -90,38 +90,15 @@ function sectionsOf(value: unknown): Array<{ heading?: string; text: string }> {
 
 function notionCreate(input: Input): ReadOperation {
   const surface = str(input.surface).toLowerCase();
-  const props = obj(input.properties);
-  const prop = (...names: string[]) => {
-    const want = new Set(names.map(squash));
-    const key = Object.keys(props).find((k) => want.has(squash(k)));
-    return key ? str(props[key]) : "";
-  };
-  const shown = new Set<string>();
-  const properties: ReadOperation["properties"] = [["Title", str(input.title), "title"]];
-  if (surface === "prd" || surface === "intake") {
-    const pillar = prop("product_pillar") || str(input.product_pillar);
-    if (pillar) properties.push(["Product Pillar", pillar]);
-    // What the write sets, not what the model drafted: a drafted Design
-    // Status is not a property the create writes.
-    properties.push(["Design Status", createdDesignStatus(surface) ?? DESIGN_STATUS_NOT_SET]);
-    ["productpillar", "designstatus"].forEach((k) => shown.add(k));
-  }
-  if (surface === "decision") {
-    const status = prop("status") || str(input.status);
-    if (status) properties.push(["Status", status]);
-    const card = prop("roadmap_card") || str(input.roadmap_card);
-    if (card) properties.push(["Roadmap Card", card]);
-    ["status", "roadmapcard"].forEach((k) => shown.add(k));
-  }
-  for (const [key, value] of Object.entries(props)) {
-    // A list (a Marketplace row's contributors) reads as one line.
-    const shownValue = Array.isArray(value) ? value.map(str).filter(Boolean).join(", ") : str(value);
-    if (shown.has(squash(key)) || !shownValue) continue;
-    properties.push([labelOf(key), shownValue]);
-  }
+  // The facts the anatomy draws as fields (`review-notion-create.ts`), here as
+  // label lines: a linked value by its address. Summary goes before Source.
+  const { facts, source } = createFacts(surface, input);
+  const properties: ReadOperation["properties"] = [
+    ["Title", str(input.title), "title"],
+    ...facts.map(([label, value, url]): [string, string] => [label, url ?? value]),
+  ];
   const summary = str(input.summary);
   if (summary) properties.push(["Summary", summary, "summary"]);
-  const source = str(input.source_url);
   if (source) properties.push(["Source", source]);
 
   const body = sectionsOf(input.sections);
@@ -217,6 +194,13 @@ export interface DraftDetail {
   editing?: boolean;
   /** Why the change is proposed, mrkdwn; shown once, at the first change. */
   issue?: string;
+  /** A stated card's facts (`PendingProposal.facts`). */
+  facts?: StatedFacts;
+  /** Edit fields, for a reading that sets it beside the facts its selects
+   *  edit; the view puts it at the head of the content otherwise. */
+  editButton?: unknown;
+  /** Where the Notion databases a create lands in open. */
+  databases?: NotionDatabaseLinks;
 }
 
 /** What one change is drawn with: the draft's detail, and whether the Issue
@@ -237,9 +221,9 @@ const NEW = "New content";
 /** Slack's cap on a section's text. */
 const SECTION_CHARS = 3000;
 
-/** Said where a value is too long to be an input. */
-export const TOO_LONG_TO_EDIT =
-  "This text is over the 3,000 characters a pop-up field holds, so it can't be edited here. Choose Needs changes to ask for a different wording.";
+// Kept here too: it lives in `review-anatomy.ts` now, so the readers in
+// `review-draft-writes.ts` can say it without importing this file back.
+export { TOO_LONG_TO_EDIT };
 
 /**
  * The draft as a person reads it, or null when any operation is a tool this
@@ -465,12 +449,22 @@ export function caveatsOf(cardText: string): string[] {
 
 /** What a reading in the shared anatomy is drawn with: the card's text, for
  *  the place it names and its caveats, and the draft's detail. */
-type AnatomyContext = DraftDetail & { cardText: string };
+export type AnatomyContext = DraftDetail & { cardText: string };
 
-/** Readings in the shared anatomy, by tool. A tool with none is drawn by its
- *  `READERS` reading, or from the card's text. */
-const ANATOMY_READERS: Record<string, (input: Input, context: AnatomyContext) => DraftAnatomy> = {
+/** Readings in the shared anatomy, by tool. A tool with none — or a reading
+ *  that returns null, as a stated card staged before its facts does — is
+ *  drawn by its `READERS` reading, or from the card's text. */
+const ANATOMY_READERS: Record<string, (input: Input, context: AnatomyContext) => DraftAnatomy | null> = {
   shareout_post: shareoutAnatomy,
+  figma_tidy_up: tidyAnatomy,
+  figma_dev_links: devLinksAnatomy,
+  ds_precedence_intake: precedenceAnatomy,
+  sweep_share_post: shareNoteAnatomy,
+  notion_create: (input, context) => notionCreateAnatomy(input, { ...context, caveats: caveatsOf(context.cardText) }),
+  notion_archive: archiveAnatomy,
+  github_issue_update: issueUpdateAnatomy,
+  github_workflow_run: workflowRunAnatomy,
+  github_issue_create: issueCreateAnatomy,
 };
 
 /**

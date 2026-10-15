@@ -56,6 +56,7 @@ import {
   DEV_LINKS_REVISION_REFUSAL,
   devLinksCard,
   devLinksCardWords,
+  devLinksFacts,
   devLinksCarryOn,
   devLinksComment,
   devLinksDoubled,
@@ -366,6 +367,7 @@ export function stagedDevLinks(
     confirmers: [...confirmers],
     stated: devLinksCardWords(DEV_LINKS_CARD_TTL_MS / 3_600_000),
     refuseRevision: DEV_LINKS_REVISION_REFUSAL,
+    facts: devLinksFacts(subject, write),
   };
 }
 

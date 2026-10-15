@@ -73,6 +73,7 @@ import {
   type ReviewViewState,
 } from "./review-fields";
 import type { ProposalOperation } from "../thread-state/index";
+import type { NotionDatabaseLinks } from "./review-notion-create";
 
 export type { ReviewViewState } from "./review-fields";
 export type { ReviewPick } from "./review-view";
@@ -117,6 +118,14 @@ export interface ReviewDoorDeps {
   /** A select's live options, read from the target database when Edit fields
    *  opens and again on Approve. Absent, no select is offered. */
   fieldOptions?: ReadOptions;
+  /** Where the Notion databases a create lands in open, for the draft's where
+   *  line. Absent, each is named and not linked. */
+  notionDatabases?: NotionDatabaseLinks;
+}
+
+/** The draft's database links, as `draftView` takes them. */
+function databasesOf(deps: Pick<ReviewDoorDeps, "notionDatabases">): { databases?: NotionDatabaseLinks } {
+  return deps.notionDatabases ? { databases: deps.notionDatabases } : {};
 }
 
 /** Review, pressed on a card — or View, on a card already decided. */
@@ -197,7 +206,7 @@ export async function runReviewOpen(request: ReviewOpenRequest, deps: ReviewDoor
           card,
           look.proposal,
           { mayDecide: look.mayDecide, confirmers: look.confirmers, ...(await itemClosesAt(look.proposal, deps)) },
-          { editable: draftValuesOf(look.proposal).size > 0, edits: look.kept },
+          { editable: draftValuesOf(look.proposal).size > 0, edits: look.kept, ...databasesOf(deps) },
         )
       : look.state === "gone" && request.cardText
         ? outcomeView(card, request.cardText)
@@ -312,7 +321,7 @@ export async function keepReviewPick(request: ReviewPick, deps: ReviewDoorDeps):
   }
   await deps.views.update(
     request.rootViewId,
-    draftView(card, look.proposal, { mayDecide: true, confirmers: look.confirmers }, { edits: kept, editable: true }),
+    draftView(card, look.proposal, { mayDecide: true, confirmers: look.confirmers }, { edits: kept, editable: true, ...databasesOf(deps) }),
   );
   // An alert from a refused pick goes once a pick passes.
   if (request.blocks.some((b: unknown) => (b as { type?: string }).type === "alert")) {
@@ -597,7 +606,7 @@ export async function reviewEdits(
     kept?: Readonly<Record<string, string>>;
     staged?: PendingProposal;
   },
-  deps: Pick<ReviewDoorDeps, "threadState" | "standingConfirmers" | "fieldOptions">,
+  deps: Pick<ReviewDoorDeps, "threadState" | "standingConfirmers" | "fieldOptions" | "notionDatabases">,
 ): Promise<
   | { ok: true; operations?: ProposalOperation[]; edited: string[]; changes: FieldChange[] }
   | { ok: false; view: Record<string, unknown> }
@@ -631,6 +640,7 @@ export async function reviewEdits(
           ...(request.fields && request.state ? { typed: stateValues(request.fields, request.state) } : {}),
           editable: true,
           alert: { level: "error", text: checked.alert },
+          ...databasesOf(deps),
         },
       ),
     };

@@ -54,6 +54,7 @@ import {
   type ReviewViewState,
 } from "./review-fields";
 import { anatomyOf, caveatsOf, draftHeadline, readableDraft } from "./review-draft";
+import type { NotionDatabaseLinks } from "./review-notion-create";
 import type { DecidedProposal, PendingProposal, ReviewChoice, StatedCardWords } from "../thread-state/index";
 import type { ReviewDecision } from "../gate/index";
 
@@ -194,6 +195,8 @@ export function draftView(
     typed?: ReadonlyMap<string, string>;
     editable?: boolean;
     alert?: { level: "error" | "success"; text: string };
+    /** Where the Notion databases a create lands in open, for its where line. */
+    databases?: NotionDatabaseLinks;
   } = {},
 ): View {
   const mayDecide = access.mayDecide && !access.decided;
@@ -206,27 +209,32 @@ export function draftView(
       .filter((f) => inline.has(f.key))
       .map((f) => [f.key, { ...f, value: opts.typed?.get(f.key) ?? edits[f.key] ?? f.value }] as const),
   );
-  const detail = {
-    ...(proposal.before ? { before: proposal.before } : {}),
-    ...(proposal.issue ? { issue: proposal.issue } : {}),
-    inline: inPlace,
-    editing: mayDecide,
-  };
   // Edit fields only for what the draft does not already hold in place.
   const editable =
     mayDecide && opts.editable !== false && [...draftValuesOf(proposal).keys()].some((key) => !inline.has(key));
   const editButton = editable ? button(REVIEW_EDIT_ACTION_ID, "Edit fields", "edit") : undefined;
+  const detail = {
+    ...(proposal.before ? { before: proposal.before } : {}),
+    ...(proposal.issue ? { issue: proposal.issue } : {}),
+    ...(proposal.facts ? { facts: proposal.facts } : {}),
+    inline: inPlace,
+    editing: mayDecide,
+    ...(editButton ? { editButton } : {}),
+    ...(opts.databases ? { databases: opts.databases } : {}),
+  };
   const editedLabels = labelsOf(proposal, Object.keys(edits));
   const edited = editedLabels.length ? [context(`:pencil2: Edited here: ${editedLabels.join(", ")}. Approve writes these values.`)] : [];
 
   // A tool read in the shared anatomy (`review-anatomy.ts`), or a batch
   // (`review-batch.ts`), opens on what it does; any other draft opens on its
   // headline, as before. Once decided, its where line and caveats go: the
-  // alert at the top says what happened instead.
+  // alert at the top says what happened instead. A reading that sets Edit
+  // fields beside its facts needs no line of its own for it.
   const reading = operations.length > 1 ? batchAnatomy(operations, text, detail) : anatomyOf(operations, text, detail);
   const anatomy = reading && access.decided ? settled(reading) : reading;
+  const holdsEdit = !!editButton && !!anatomy?.content.some((b) => (b as { accessory?: unknown }).accessory === editButton);
   const read = anatomy
-    ? anatomyBlocks(anatomy, [...(editButton ? [{ type: "section", text: { type: "mrkdwn", text: "*Fields*" }, accessory: editButton }] : []), ...edited])
+    ? anatomyBlocks(anatomy, [...(editButton && !holdsEdit ? [{ type: "section", text: { type: "mrkdwn", text: "*Fields*" }, accessory: editButton }] : []), ...edited])
     : (readableDraft(operations, access.decided ? [] : caveatsOf(text), detail) ?? textSections(withoutInternalFields(text)));
   // A field the reading did not draw — the batch has a tool it cannot read —
   // still goes in place, after the draft, so it is never left uneditable.
@@ -254,7 +262,11 @@ export function draftView(
   const tail: unknown[] = mayDecide
     ? [
         { type: "divider" },
-        choiceInput(proposal.choices, anatomy?.approve ? { ...words, confirm: anatomy.approve } : words),
+        choiceInput(proposal.choices, {
+          ...words,
+          ...(anatomy?.approve ? { confirm: anatomy.approve } : {}),
+          ...(anatomy?.revise ? { revise: anatomy.revise } : {}),
+        }),
         noteInput(Boolean(proposal.choices?.length), Boolean(anatomy)),
         ...(access.closesAt !== undefined ? [context(openLine(access.closesAt, access.confirmers))] : []),
       ]

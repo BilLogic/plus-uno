@@ -2046,8 +2046,10 @@ export async function restageExecution(
   // what never ran, so they no longer line up with its operations. Nor are
   // the old card's blocks: the fresh card went up with its own.
   // Nor is its Before: it was keyed on the old batch's operations, so the
-  // fresh one is read for the batch that will run.
-  const { sweepShare: _sweepShare, stated: _stated, fixes: _fixes, proposalBlocks: _blocks, before: _before, ...kept } = original;
+  // fresh one is read for the batch that will run. Nor are a stated card's
+  // facts, for the same reason as its words: Review shows the fresh card's
+  // text, cut-off warning and all.
+  const { sweepShare: _sweepShare, stated: _stated, fixes: _fixes, proposalBlocks: _blocks, before: _before, facts: _facts, ...kept } = original;
   const proposal: PendingProposal = {
     ...kept,
     operations: restage.operations,

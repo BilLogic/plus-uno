@@ -249,9 +249,11 @@ describe("Review opens the draft", () => {
     assert.equal(inputs[1]!.optional, true);
     assert.equal(draft.blocks.at(-1)!.block_id, "uno_review_note", "the note is last, just above the footer");
     assert.deepEqual(actionIds(draft), [], "no decision buttons in the body");
-    // Edit fields sits at the top, beside the draft.
-    assert.equal(draft.blocks[0]?.accessory?.action_id, "uno_review_edit");
-    assert.equal(draft.blocks[0]?.accessory?.text.text, "Edit fields");
+    // Edit fields sits beside the facts its selects edit, under the title.
+    const facts = draft.blocks.find((b) => b.accessory?.action_id === "uno_review_edit");
+    assert.equal(facts?.type, "section");
+    assert.equal(facts?.accessory?.text.text, "Edit fields");
+    assert.ok(draft.blocks.indexOf(facts!) > draft.blocks.findIndex((b) => b.block_id === "uno_field:0.title"));
   });
 
   it("reads the decision and note from Submit, and asks for a note before Needs changes", () => {

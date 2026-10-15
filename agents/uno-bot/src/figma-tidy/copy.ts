@@ -11,7 +11,7 @@
 //
 // PURE.
 
-import type { ReportItem, ReviewChoice, StatedCardWords } from "../thread-state/index";
+import type { ReportItem, ReviewChoice, StatedCardWords, TidyFacts } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { shortDate, windowInWords } from "../slack/copy-words";
@@ -141,6 +141,19 @@ export function tidyCard(finding: TidyFinding, likely: { number: number; title: 
     fields: [],
     caveats: [],
     operations: [{ toolName: TIDY_TOOL, input: { file_key: finding.file.key, check: finding.check, card: finding.card, cards: cardKey(finding.file.name) } }],
+  };
+}
+
+/** The finding as Review draws it (`PendingProposal.facts`): the file, the
+ *  check and what it found, and the file's link for Open file. */
+export function tidyFacts(finding: TidyFinding, likely: { number: number; title: string } | null): TidyFacts {
+  return {
+    kind: "figma_tidy_up",
+    file: finding.file.name,
+    check: SUBTITLE[finding.check],
+    finding: findingBody(finding, likely),
+    fileUrl: figmaFileUrl(finding.file.key),
+    note: "Files are moved and renamed in Figma by a person. Your answer records what you did.",
   };
 }
 
