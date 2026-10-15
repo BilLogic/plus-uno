@@ -811,6 +811,9 @@ function operationGroupKey(op: PlannedOperation, place?: string): GroupKey {
     // a result's `posted_to`), never a team channel it will not post to. An
     // older record without one falls back to what its input asked for.
     const where = place ?? (str("place") === "here" ? "this conversation" : "#plus-design-feedback");
+    // A named channel is its link on the heading and its #name in plain words.
+    const link = /^<#([A-Z0-9]+)(?:\|([^>]*))?>$/.exec(where);
+    if (link) return { key: `channel:${link[1]}`, heading: `*${where}*`, name: link[2] ? `#${link[2]}` : "a channel" };
     return bolded(`channel:${where.toLowerCase()}`, where);
   }
   const pageUrl = str("page_url") || str("url");

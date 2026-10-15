@@ -243,11 +243,32 @@ export async function botConversations(env: Env, types: string, cursor?: string)
   );
 }
 
+/** A conversation as conversations.info and conversations.list describe it
+ *  to the bot: `is_member` is the bot's own membership. */
+export interface SlackConversation {
+  id?: string;
+  name?: string;
+  is_private?: boolean;
+  is_im?: boolean;
+  is_mpim?: boolean;
+  is_archived?: boolean;
+  is_member?: boolean;
+}
+
 /** conversations.info via the bot token — what kind of conversation this is. */
 export async function conversationsInfo(env: Env, channel: string) {
-  return slackGet<
-    SlackResponse & { channel?: { id?: string; is_private?: boolean; is_im?: boolean; is_mpim?: boolean } }
-  >(env, "conversations.info", { channel });
+  return slackGet<SlackResponse & { channel?: SlackConversation }>(env, "conversations.info", { channel });
+}
+
+/** conversations.list via the bot token — one page of up to 1000 unarchived
+ *  public and private channels, the first unless `cursor` names the next. A
+ *  private channel is listed only when the bot is in it. */
+export async function conversationsList(env: Env, cursor?: string) {
+  return slackGet<SlackResponse & { channels?: SlackConversation[]; response_metadata?: { next_cursor?: string } }>(
+    env,
+    "conversations.list",
+    { types: "public_channel,private_channel", exclude_archived: "true", limit: "1000", ...(cursor ? { cursor } : {}) },
+  );
 }
 
 /** One message as conversations.history returns it, threads summarised. */

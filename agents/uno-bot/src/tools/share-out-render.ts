@@ -90,6 +90,32 @@ export function renderShareout(f: ShareoutFields, requester: string): string {
   return lines.join("\n");
 }
 
+/** A channel a share-out's `channel` input names: by id, or by name. */
+export type ShareoutChannelRef = { id: string } | { name: string };
+
+/**
+ * The channel in a share-out's `channel` input. An id comes bare (`C0…`), as a
+ * `<#C0…|name>` mention or in a Slack archive link; anything else is a name,
+ * read without its `#` and in lower case, as Slack spells channel names. Null
+ * when the input names nothing a channel could be called.
+ */
+export function shareoutChannelRef(value: unknown): ShareoutChannelRef | null {
+  if (typeof value !== "string") return null;
+  const text = value.trim();
+  const id =
+    /^<#([CGD][A-Z0-9]+)(?:\|[^>]*)?>$/.exec(text)?.[1] ??
+    /\/archives\/([CGD][A-Z0-9]+)/.exec(text)?.[1] ??
+    (/^[CGD][A-Z0-9]{8,}$/.test(text) ? text : undefined);
+  if (id) return { id };
+  const name = text.replace(/^#/, "").toLowerCase();
+  return /^[\p{Ll}\p{N}_-]{1,80}$/u.test(name) ? { name } : null;
+}
+
+/** A channel ref as a person reads it before it is looked up. */
+export function channelRefText(ref: ShareoutChannelRef): string {
+  return "id" in ref ? `<#${ref.id}>` : `#${ref.name}`;
+}
+
 /** Normalize a tool input value to a string list (accepts an array or a
  *  comma-separated string, which is what the model reaches for under load). */
 export function asList(v: unknown): string[] {

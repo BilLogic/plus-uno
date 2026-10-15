@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **17 reference(s), 130,618 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **17 reference(s), 131,098 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -50,7 +50,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `dm-watch` | [`agents/uno-bot/scheduled-actions/dm-watch/ACTION.md`](../../agents/uno-bot/scheduled-actions/dm-watch/ACTION.md) | 2,820 |
 | `docs/connectors/figma/annotations` | [`docs/connectors/figma/annotations.md`](../../docs/connectors/figma/annotations.md) | 1,488 |
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,697 |
-| `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,121 |
+| `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,555 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,591 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,550 |
@@ -61,7 +61,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `follow-through` | [`agents/uno-bot/scheduled-actions/follow-through/ACTION.md`](../../agents/uno-bot/scheduled-actions/follow-through/ACTION.md) | 10,647 |
 | `prepare-the-call` | [`agents/uno-bot/skills/prepare-the-call/SKILL.md`](../../agents/uno-bot/skills/prepare-the-call/SKILL.md) | 2,202 |
 | `relay-a-message` | [`agents/uno-bot/skills/relay-a-message/SKILL.md`](../../agents/uno-bot/skills/relay-a-message/SKILL.md) | 1,462 |
-| `share-out` | [`agents/uno-bot/skills/share-out/SKILL.md`](../../agents/uno-bot/skills/share-out/SKILL.md) | 2,581 |
+| `share-out` | [`agents/uno-bot/skills/share-out/SKILL.md`](../../agents/uno-bot/skills/share-out/SKILL.md) | 2,627 |
 | `sweep` | [`agents/uno-bot/scheduled-actions/sweep/ACTION.md`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) | 23,310 |
 
 ## The assembled prompt
@@ -1333,7 +1333,7 @@ Until 2026-08-22 the tool had no fields for fidelity, round, what-changed, the q
 
 Bundle links (Loom · live preview · Figma replica · Decisions DB) go in `link` and the surrounding thread; the confirmation card audits them and names anything missing before ✅.
 
-**Where it posts** is `place`: #plus-design-feedback, top level, by default; `here` keeps it in the conversation it was asked in, the DM or the thread. A test channel always keeps it in its own thread, and so does a Worker with no feedback channel set. The card names the place the ✅ posts to ("in #plus-design-feedback", "in this DM", "in this thread"). Those are the only two places: asked for any other, the bot says so and offers them rather than staging a card for somewhere else.
+**Where it posts** is `place`: #plus-design-feedback, top level, by default, and the place the bot suggests first; `here` keeps it in the conversation it was asked in, the DM or the thread; `channel` posts top level in any channel the asker names in `channel` (an id, a mention, a link or a `#name`). A named channel is checked in code before the card is staged and again at ✅: the asker must be in it, and the bot must be able to post there — any public channel (`chat:write.public`), or a private one the bot has been added to. A check that fails is said plainly ("you're not in #x", "I can't post in #x — add me to it first") with #plus-design-feedback and here offered instead. A test channel always keeps it in its own thread; a Worker with no feedback channel set keeps the default there too. The card names the place the ✅ posts to ("in #plus-design-feedback", "in this DM", "in this thread", "in #design-crit").
 
 ## Answer shapes
 
@@ -2226,7 +2226,7 @@ Finished-enough work goes in front of people. Three rails, each ending in one �
 ## Steps
 
 1. **Pick the rail once.** Share / post for feedback / get eyes on → the feedback round (step 2). Close the round / record what we decided → the close (step 3). Publish / register / update in the marketplace → the entry (step 4). Find a prototype → the search (step 5). "Post this in Slack" could be any of them or a plain message → ask which. Done when the rail is named or the question asked.
-2. **Feedback round.** Stage `shareout_post` at once with the links in hand; its card audits the bundle and names what is missing. Where it posts is its `place`, by the tool's own rule. Up to three questions fit the artifact's stage, plus what is out of scope this round. Reviewers are Slack ids from `notion_search` with scope team, or the PRD's Owner; a person with no id is named in the lead line and left off. Done when the card is staged with the questions, the link and the reviewers filled from the thread.
+2. **Feedback round.** Stage `shareout_post` at once with the links in hand; its card audits the bundle and names what is missing. Suggest #plus-design-feedback first; the other places it can post, and their checks, are the tool's. Up to three questions fit the artifact's stage, plus what is out of scope this round. Reviewers are Slack ids from `notion_search` with scope team, or the PRD's Owner; a person with no id is named in the lead line and left off. Done when the card is staged with the questions, the link and the reviewers filled from the thread.
 3. **Close the round.** When the feedback is in, offer to record the decisions: `notion_create` with surface decision, the Roadmap card and the thread permalink as evidence. Acting on the feedback is a new build ask through file-a-ticket. Done when the decision card is staged or declined.
 4. **Marketplace entry.** `notion_create` with surface marketplace creates the row or updates the one already there; its description names the fields. Ask once, in one message, for only the fields the thread lacks. A value the tool reports as unmatched goes back to the designer as a question. Done when the card is staged with every field the designer supplied.
 5. **Search.** `notion_search` with scope marketplace; `source_read` a hit for more. Done when the results are posted.

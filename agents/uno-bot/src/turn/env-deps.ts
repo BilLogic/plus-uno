@@ -32,7 +32,7 @@ import { reportItems } from "../slack/decision-cards";
 import { formatAssistantContext } from "../slack/assistant";
 import { buildNotionBefore, buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
 import { renderDeliveredBody } from "../slack/render";
-import { shareoutPlace } from "../tools/share-for-feedback";
+import { shareoutReadsFor, shareoutWhereFor, type ShareoutReads } from "../tools/share-for-feedback";
 import { standingConfirmersOf } from "../slack/standing-confirmers";
 import { recordSweepRestageFor } from "../sweep/env";
 import { figmaClientFor } from "../figma/production";
@@ -146,6 +146,9 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
 
   const slack = toolSlackContextFor(request, wiring);
   const preflightAsked = new Map<string, Promise<{ ask: string } | null>>();
+  // A named channel's Slack reads, made once for the turn: the preflight that
+  // checks it and the card that names it read the same answers.
+  const shareoutReads = shareoutReadsFor(env);
 
   // Watched for capacity (#1228), Slack turns and Figma asks alike: a turn
   // that fails on it with the backup tried is counted, and the lead hears
@@ -214,7 +217,7 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
       // check between them (`agent/preflight.ts`).
       const key = `${toolName}:${JSON.stringify(input)}`;
       let pending = preflightAsked.get(key);
-      if (!pending) preflightAsked.set(key, (pending = preflight(toolName, input, { env })));
+      if (!pending) preflightAsked.set(key, (pending = preflight(toolName, input, { env, shareout: { slack, reads: shareoutReads } })));
       const ask = await pending;
       reporters.onGateAsk?.(ask?.ask ?? null);
       return ask;
@@ -241,7 +244,7 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
 
     // The reads a card needs and Turn may not make itself — shared with the
     // doors that re-stage a cut-off run (`restageFor`, below).
-    cards: cardReadsFor(env),
+    cards: cardReadsFor(env, shareoutReads),
     onRestaged: (from, to) => followRestageFor(env, from, to),
     // An item of a decision report, revised or reopened in its own card in
     // the report's message: in this channel, on the turn's own store.
@@ -288,8 +291,12 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
  * Its own function because Turn is not the only thing that builds a card: the
  * reaction and button doors re-stage what a cut-off run never finished
  * (`restageFor`), and that card is read the way a turn's is.
+ *
+ * @param env - Worker bindings
+ * @param shareoutReads - The Slack reads a share-out to a named channel is
+ *                        decided on; a turn hands in the ones its preflight read
  */
-export function cardReadsFor(env: Env): TurnDeps["cards"] {
+export function cardReadsFor(env: Env, shareoutReads: ShareoutReads = shareoutReadsFor(env)): TurnDeps["cards"] {
   return {
     notionRevision: (input) => buildNotionRevision(env, input),
     notionBefore: (input, opts) => buildNotionBefore(env, input, opts),
@@ -316,8 +323,8 @@ export function cardReadsFor(env: Env): TurnDeps["cards"] {
         .catch(() => null);
       return { repo: target.entry.repo, branch };
     },
-    // Where a share-out would post, by the executor's own rule.
-    shareoutWhere: (input, channel) => shareoutPlace(env, { channel }, input.place).where,
+    // Where a share-out would post, by the executor's own decision.
+    shareoutWhere: (input, at) => shareoutWhereFor(env, at, input, shareoutReads),
   };
 }
 
