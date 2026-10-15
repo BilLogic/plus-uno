@@ -439,33 +439,6 @@ async function designOwnerOf(fc: SweepFigmaComments, contributors: readonly stri
 }
 
 
-/** What finding a file's design owner reads, outside the night's read. */
-export interface DesignOwnerReads {
-  /** A Roadmap card's page, by its number; null when the Roadmap has none. */
-  card(number: number): Promise<{ url: string } | null>;
-  /** A card page's Contributors, as Slack ids. */
-  contributors(cardUrl: string): Promise<string[]>;
-  roles(): Promise<TeamRoles>;
-}
-
-/**
- * A file's design owner, by the night's rule: the cards its title names
- * (`Card <n>`, at most `MAX_CARDS_PER_FILE`), their Contributors, and the
- * first the roles name a designer. Null when no card or no designer does —
- * the caller falls back as the night does, to the file's creator.
- *
- * @param reads - The card, its Contributors and the roles
- * @param title - The file's title
- */
-export async function designOwnerOfFile(reads: DesignOwnerReads, title: string): Promise<string | null> {
-  const contributors: string[] = [];
-  for (const number of cardNumbersOf(title).slice(0, MAX_CARDS_PER_FILE)) {
-    const card = await reads.card(number);
-    if (card) contributors.push(...(await reads.contributors(card.url)));
-  }
-  return contributors.length ? designerAmong([...new Set(contributors)], await reads.roles()) : null;
-}
-
 /** The file's creator by Figma handle, or null when the file's meta has none or cannot be read. */
 async function creatorOf(fc: SweepFigmaComments, fileKey: string): Promise<FileOwner | null> {
   try {

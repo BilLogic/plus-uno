@@ -6,7 +6,7 @@
 //     title search for a likely card. A card's owner is its design owner: the
 //     first Contributor, through the Team Members map's Notion people, whom
 //     the team's roles name a designer (the rule `figma-comments/read.ts` uses).
-//   • Slack: where the Figma Review cards go up (`figmaReviewChannel`) —
+//   • Slack: where the tidy-up's Review cards go up (`figmaReviewChannel`) —
 //     #plus-design unless `FIGMA_ASK_CHANNEL_ID` names another — as a section
 //     of the sweep's morning message there; its members answer. The message's
 //     thread is marked as a sweep card's is, so the team's replies there are
@@ -23,7 +23,6 @@ import { sectionHandOffIn, type SweepSection } from "../sweep/sections";
 import { figmaClientFor } from "../figma/production";
 import { figmaTeamsFrom } from "../figma-notify/teams";
 import { channelMembers } from "../slack/channel-members";
-import { figmaReviewChannel } from "../figma-ask/env";
 import { queryRoadmapByNumbers, queryRoadmapCards } from "../integrations/notion";
 import { storedTeamRoles } from "../usage/production";
 import { roleOf, slackPersonOfNotion, type NotionPeople, type TeamRoles } from "../usage/roles";
@@ -46,6 +45,15 @@ import {
 } from "./run";
 import { tidyStore } from "./store";
 
+/**
+ * Where the tidy-up's Figma Review cards post: the channel or DM
+ * `FIGMA_ASK_CHANNEL_ID` names, else #plus-design; null when neither is set.
+ *
+ * @param env - Worker bindings
+ */
+export function figmaReviewChannel(env: Env): string | null {
+  return env.FIGMA_ASK_CHANNEL_ID?.trim() || env.PLUS_DESIGN_CHANNEL_ID?.trim() || null;
+}
 
 /** A Roadmap card's fields, whichever query read it. */
 type RoadmapFields = Pick<TidyCard, "number" | "title" | "url" | "designStatus" | "devStatus">;

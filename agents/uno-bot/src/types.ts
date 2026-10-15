@@ -121,13 +121,13 @@ export interface Env {
   NOTION_RESEARCH_PAPERS_DB_ID?: string;
   /** Banners — notion_search scope "banners". */
   NOTION_BANNERS_DB_ID?: string;
-  // #plus-design — the design team's channel. Read by the Figma Review cards
-  // when FIGMA_ASK_CHANNEL_ID is unset, figma-comments, the sweeps,
-  // follow-through, and the sweep_share_post allowlist.
+  // #plus-design — the design team's channel. Read by the Figma tidy-up's
+  // Review cards when FIGMA_ASK_CHANNEL_ID is unset, figma-comments, the
+  // sweeps, follow-through, the sweep_share_post allowlist, and a Figma @uno
+  // ask's turn, which runs as #plus-design and posts nothing there.
   PLUS_DESIGN_CHANNEL_ID?: string;
-  /** Where Figma Review cards post (`figma-ask/env.ts` `figmaReviewChannel`):
-   *  a change asked for in a Figma comment (`figma-ask/`) and the weekly
-   *  tidy-up (`figma-tidy/`). Blank or unset → #plus-design. */
+  /** Where the weekly Figma tidy-up's Review cards post
+   *  (`figma-tidy/env.ts` `figmaReviewChannel`). Blank or unset → #plus-design. */
   FIGMA_ASK_CHANNEL_ID?: string;
   /** `on` lets Dev Mode links run for every registry component, and lets the
    *  morning hand a card to the sweep's #plus-design message for the merged

@@ -242,12 +242,14 @@ UNO_BOT_CHANNEL_ID = "C0ARJ2A3A69"
 # channel. Leave blank → DMs and the alert channel only.
 UNO_BOT_SANDBOX_CHANNEL = "C0B4QBWAUJU"
 # #plus-design channel id — the design team's channel, the posting ladder's
-# last rung. Read by the Figma Review cards when FIGMA_ASK_CHANNEL_ID is unset,
-# figma-comments, the sweeps, follow-through, and the sweep_share_post allowlist.
+# last rung. Read by the Figma
+# tidy-up's Review cards when FIGMA_ASK_CHANNEL_ID is unset, figma-comments,
+# the sweeps, follow-through, the sweep_share_post allowlist, and a Figma @uno
+# ask's turn, which runs as #plus-design and posts nothing there.
 PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
-# Where a change asked for in a Figma comment posts its lead and Review card
-# (src/figma-ask/env.ts), and where the weekly Figma tidy-up posts its Review
-# cards (src/figma-tidy/env.ts). Unset, as now: the card posts in #plus-design
+# Where the weekly Figma tidy-up posts its Review cards
+# (src/figma-tidy/env.ts). A Figma @uno ask posts nothing to Slack, so it
+# does not read this. Unset, as now: the card posts in #plus-design
 # (PLUS_DESIGN_CHANNEL_ID). Set it to a DM id to keep test cards out of
 # #plus-design while a Figma flow is in testing.
 # Dev Mode links (src/figma-links/): blank, `/debug/figma-dev-links` takes
