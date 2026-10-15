@@ -7,6 +7,18 @@
 // ("post it here instead") has to get one. So the note records that target,
 // and only the same tool on the same target is held back. A note written
 // before targets were recorded holds back the tool, as it always did.
+//
+// And "just" has to be true. In a DM every top-level message is one
+// conversation, so the last few turns can be hours old: live on r631 a cancel
+// from 22:53 bounced the first ask of the next morning as "a moment ago". The
+// note carries when it was recorded (`HistoryTurn.at`), and only a cancel
+// inside `RECENT_CANCEL_MS` holds anything back. A note with no time predates
+// the stamp, so it is hours old by now and holds nothing back.
+
+/** How long a ⛔ holds the same card back. A cancel and the model's own
+ *  re-proposal land within one exchange, minutes apart; half an hour covers a
+ *  slow reply, and stops well short of a card's own hour-long life. */
+export const RECENT_CANCEL_MS = 30 * 60_000;
 
 const NOTE_RE = /\(Cancelled the proposed ([a-z_]+)(?: for ([^—)]+?))? — /;
 
@@ -33,4 +45,16 @@ export function cancelledSame(content: string, toolName: string, input: Record<s
   const note = NOTE_RE.exec(content);
   if (!note || note[1] !== toolName) return false;
   return note[2] === undefined || note[2] === targetOf(toolName, input);
+}
+
+/** Whether `turn` is a ⛔ note for this tool on this target, recorded within
+ *  `RECENT_CANCEL_MS` of `now`. */
+export function cancelledRecently(
+  turn: { role: string; content: string; at?: number },
+  toolName: string,
+  input: Record<string, unknown>,
+  now: number,
+): boolean {
+  if (turn.role !== "assistant" || turn.at === undefined || now - turn.at > RECENT_CANCEL_MS) return false;
+  return cancelledSame(turn.content, toolName, input);
 }

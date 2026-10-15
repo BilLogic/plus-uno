@@ -148,7 +148,7 @@ import {
   type ProposalCard,
   type TurnSettlement,
 } from "./delivery";
-import { cancelledSame } from "../agent/cancel-note";
+import { cancelledRecently } from "../agent/cancel-note";
 
 // ── Policy ───────────────────────────────────────────────────────────────────
 
@@ -1438,13 +1438,14 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // tool on the same target; a redirect is a new card, `agent/cancel-note.ts`),
   // and the store's outcome note is authoritative — the live thread only shows the
   // narrative text. Don't re-card a cancelled action; require an explicit
-  // revival. The window is the last few turns, so one clarifying exchange
-  // clears it. Best-effort: a store hiccup must not block a legitimate proposal.
+  // revival. The window is the last few turns AND the last half hour
+  // (`RECENT_CANCEL_MS`), so one clarifying exchange clears it, and so does a
+  // night: in a DM the last few turns can be hours old. Best-effort: a store hiccup must not block a legitimate proposal.
   try {
     const stored = await threadState.readHistory(ref);
     const justCancelled = stored
       .slice(-3)
-      .some((t) => t.role === "assistant" && cancelledSame(t.content, result.toolName, result.input));
+      .some((t) => cancelledRecently(t, result.toolName, result.input, deps.now?.() ?? Date.now()));
     if (justCancelled) {
       const bounce =
         `You cancelled that ${verbFor(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
