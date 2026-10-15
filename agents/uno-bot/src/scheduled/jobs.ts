@@ -31,6 +31,7 @@ import { runTidyPostOnEnv, runTidyReadOnEnv, tidySectionFor } from "../figma-tid
 import { devLinksSectionFor, runDevLinksMorningOnEnv } from "../figma-links/env";
 import { dmThreadHookFor } from "../dm-sweep/env";
 import {
+  removalOfferSectionFor,
   revisionSectionFor,
   runProposalOffersOnEnv,
   runRevisionPostOnEnv,
@@ -83,8 +84,8 @@ const sweepBody: JobBody = async (env, job, ctx) => {
  * What the morning's other jobs handed the sweep's post, one port a job: the
  * card follow-ups, Monday's stuck cards, the weekly DS precedence report,
  * the Figma comment decisions, the weekly Figma tidy-up, the Figma drift
- * questions, the Dev Mode links card and the blueprint revisions
- * (src/sweep/sections.ts). Each is absent without its bindings or
+ * questions, the Dev Mode links card, the blueprint revisions and the
+ * blueprint proposals' removal offers (src/sweep/sections.ts). Each is absent without its bindings or
  * the run's storage.
  */
 export function morningSectionsFor(env: Env, ctx: JobContext): SweepSection[] {
@@ -98,6 +99,7 @@ export function morningSectionsFor(env: Env, ctx: JobContext): SweepSection[] {
     driftSectionFor(env, ctx),
     devLinksSectionFor(env, ctx),
     revisionSectionFor(env, ctx),
+    removalOfferSectionFor(env, ctx),
   ].filter(
     (s): s is SweepSection => !!s,
   );
@@ -334,7 +336,8 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
     return report;
   },
   // Morning: each drawn proposal no Roadmap card took up in 30 days, its
-  // removal offered once in its own thread to the person who drew it.
+  // removal handed to the sweep's message in its own thread, offered once to
+  // the person who drew it.
   "blueprint-proposal-offer": async (env, job, ctx) => {
     const report = await runProposalOffersOnEnv(env, ctx);
     console.log(`[blueprint-upkeep] ${job.key}: ${report.summary}`);

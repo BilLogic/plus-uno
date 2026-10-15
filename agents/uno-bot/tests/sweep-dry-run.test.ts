@@ -153,11 +153,11 @@ test("the probe dry-runs the named run's jobs", async () => {
     ["figma-dev-links-post", "handled", 0],
     // No HARNESS_KV bound: no revisions kept, nothing handed over.
     ["blueprint-revision-post", "handled", 0],
+    ["blueprint-proposal-offer", "handled", 0],
     ["sweep-post", "handled", 0],
     // No HARNESS_KV bound: nothing to put in a thread.
     ["blueprint-revision-thread", "handled", 0],
     // No blueprint configured: no removal offered, nothing spent.
-    ["blueprint-proposal-offer", "handled", 0],
     // No Notion key: the roster read refuses before spending anything.
     ["team-roles-sync", "handled", 0],
     // No usage database bound: nothing to purge, nothing spent.

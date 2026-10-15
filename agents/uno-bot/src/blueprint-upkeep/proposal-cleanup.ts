@@ -7,8 +7,11 @@
 //   • "remove it" from the requester, in the proposal's own thread
 //     (`isRemoveRequest`, `offerRequestedRemoval`);
 //   • the morning check, once, for a proposal no Roadmap card was linked to
-//     within 30 days (`offerAgedRemovals`). A linked proposal is never
-//     offered: its card's shipping promotes it.
+//     within 30 days. A post nobody asked for rides the morning sweep's
+//     message (`../sweep/sections.ts`): the check hands each offer to it as a
+//     section whose place is the proposal's own thread
+//     (`handOverAgedRemovals`, `removalOfferSection`). A linked proposal is
+//     never offered: its card's shipping promotes it.
 //
 // THE OFFER IS A ✅ CARD, NOT AN INLINE YES. Deleting rows is a blueprint
 // write, and every blueprint write the Worker makes goes through the Gate
@@ -18,6 +21,11 @@
 // second door onto the blueprint with none of that. So the reply that asks is
 // answered with a card, and only its ✅ deletes; ⛔, silence past the card's
 // window, or anyone else's ✅ keeps the proposal.
+//
+// ONCE, NEVER SILENT. The offer is claimed in the record only once its card
+// is up and staged: a morning message that never went up, or a card shown
+// but not staged, uses nothing, and the next morning offers it again. A
+// staged card claims it, so no later morning offers it twice.
 //
 // THE DELETE. Bill's ruling (2026-10-15): uno-bot may delete, so withdrawing
 // removes the rows rather than marking them `deprecated`. The card's one
@@ -30,7 +38,9 @@
 // PURE: the records, Slack and the staging arrive as ports.
 
 import type { ProposalCard } from "../turn/delivery";
-import type { PendingProposal, StatedCardWords } from "../thread-state/index";
+import type { PendingProposal, ReportItem, StatedCardWords } from "../thread-state/index";
+import { itemProposal } from "../slack/decision-cards";
+import { handedSection, type SectionHandOff, type SweepSection } from "../sweep/sections";
 import { authoringCall, authoringCallCost, type WriterDeps } from "../blueprint-write/index";
 import { rethrowIfBudget } from "../net";
 import type { DrawnProposal, ProposalRecords } from "./proposal-records";
@@ -41,10 +51,11 @@ export const WITHDRAW_TOOL = "blueprint_withdraw" as const;
 export const OFFER_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
 /** Offers one morning makes at most; the rest wait for the next. */
 export const OFFERS_PER_RUN = 8;
-/** What one offer spends at most: the card's post and its staging in thread
- *  state (2 subrequests); its claim, a release, and its proposal events (D1). */
-export const OFFER_SUBREQUESTS = 2;
+/** D1 queries one shown offer spends once the message is up: its staging's
+ *  proposal events and its claim. */
 export const OFFER_D1_QUERIES = 4;
+/** The removal offers' section on the sweep's morning post. */
+export const REMOVAL_OFFER_SECTION = "blueprint-proposal-offers";
 /** The card's slot in its thread is `blueprint-withdraw:<proposal ts>`. */
 export const WITHDRAW_SLOT_PREFIX = "blueprint-withdraw:";
 
@@ -280,50 +291,127 @@ export async function offerRequestedRemoval(
   return true;
 }
 
-export interface AgedDeps extends OfferDeps {
-  now(): number;
-  /** The alarm's headroom; unbounded when absent. */
-  meter?: { headroom(): { subrequests: number; d1Queries: number } };
+/** What a morning hands the sweep's post for one proposal's thread. */
+export interface RemovalHanded {
+  proposals: DrawnProposal[];
+}
+
+/** The place an offer goes: the proposal's own thread. */
+const placeOf = (p: DrawnProposal) => ({ channel: p.channel, threadTs: p.replyTs });
+
+/**
+ * The morning check's hand-over: each unlinked proposal past 30 days, not yet
+ * offered, to the sweep's message in its own thread. Claims nothing: the
+ * section claims each offer once its card is staged.
+ *
+ * @param deps - The records, the clock, the morning's hand-off (absent on a rehearsal) and its date
+ * @param opts - `dryRun` hands nothing over
+ */
+export async function handOverAgedRemovals(
+  deps: { records: Pick<ProposalRecords, "dueForOffer">; now(): number; handOff?: SectionHandOff<RemovalHanded>; date: string },
+  opts: { dryRun?: boolean } = {},
+): Promise<{ handed: number; summary: string }> {
+  const due = await deps.records.dueForOffer(deps.now() - OFFER_AFTER_MS, OFFERS_PER_RUN);
+  if (!due.length) return { handed: 0, summary: "no proposal is due a removal offer" };
+  if (opts.dryRun || !deps.handOff) return { handed: 0, summary: `would offer the removal of ${due.length} proposal(s)` };
+  const byThread = new Map<string, DrawnProposal[]>();
+  for (const p of due) byThread.set(`${p.channel}:${p.replyTs}`, [...(byThread.get(`${p.channel}:${p.replyTs}`) ?? []), p]);
+  for (const proposals of byThread.values()) await deps.handOff.put(deps.date, placeOf(proposals[0]!), { proposals });
+  return { handed: due.length, summary: `handed the removal offer of ${due.length} proposal(s) to the morning post` };
+}
+
+/** The report item an offer takes: one per proposal. */
+export function withdrawalItemId(p: Pick<DrawnProposal, "proposalTs">): string {
+  return `withdraw-${p.proposalTs}`;
 }
 
 /**
- * The morning check: each unlinked proposal past 30 days, offered for
- * removal once, in its own thread, to the person who drew it. The claim is
- * taken before the post and given back if the post fails, so an offer is
- * never made twice and never lost.
+ * The check's offer as one card of the morning message.
  *
- * @param deps - The records, the post, the staging, the clock and the meter
- * @param opts - `dryRun` posts and marks nothing
+ * @param p - The drawn proposal
+ * @param link - Where the proposal opens in the blueprint app
  */
-export async function offerAgedRemovals(deps: AgedDeps, opts: { dryRun?: boolean } = {}): Promise<{ offered: number; summary: string }> {
-  const due = await deps.records.dueForOffer(deps.now() - OFFER_AFTER_MS, OFFERS_PER_RUN);
-  if (!due.length) return { offered: 0, summary: "no proposal is due a removal offer" };
-  if (opts.dryRun) return { offered: 0, summary: `would offer the removal of ${due.length} proposal(s)` };
-  let offered = 0;
-  let held = 0;
-  for (const p of due) {
-    const room = deps.meter?.headroom();
-    if (room && (room.subrequests < OFFER_SUBREQUESTS || room.d1Queries < OFFER_D1_QUERIES)) {
-      held = due.length - offered;
-      break;
-    }
-    if (!(await deps.records.claimOffer(p.proposalTs, deps.now()))) continue;
-    let posted: { ts: string; text: string } | null = null;
-    try {
-      posted = await deps.postCard(p, withdrawalCard(p, "aged", deps.linkOf?.(p)));
-    } catch (err) {
-      rethrowIfBudget(err);
-      console.error(`[proposal-cleanup] offer for ${p.proposalTs} not posted: ${message(err)}`);
-    }
-    if (!posted) {
-      await deps.records.releaseOffer(p.proposalTs);
-      continue;
-    }
-    await deps.stage(stagedWithdrawal(p, "aged", posted));
-    offered += 1;
-  }
+export function withdrawalItem(p: DrawnProposal, link: string): ReportItem {
   return {
-    offered,
-    summary: `offered the removal of ${offered} proposal(s)${held ? `; ${held} wait for the next morning` : ""}`,
+    id: withdrawalItemId(p),
+    title: "Remove this proposal from the blueprint?",
+    subtitle: `drawn ${day(p.writtenAt)} · no Roadmap card linked in 30 days`,
+    owners: [{ slack: p.requesterId }],
+    body: `Deletes the proposed path and its ${cells(p.cellIds.length)}; today's path is not touched`,
+    open: { label: "Blueprint", url: link },
+    done: "removed from the blueprint as uno-bot.",
+    detail: withdrawalCard(p, "aged", link).lead ?? "",
   };
+}
+
+/**
+ * The check's offer as staged once the morning message is up: the removal
+ * card's one operation and confirmer, keyed by its item on that message.
+ *
+ * @param p - The drawn proposal
+ * @param messageTs - The morning message
+ * @param text - What the card says
+ */
+export function stagedAgedOffer(p: DrawnProposal, messageTs: string, text: string): PendingProposal {
+  const staged = stagedWithdrawal(p, "aged", { ts: messageTs, text });
+  return { ...staged, ...itemProposal(messageTs, withdrawalItemId(p)), supersedeKey: staged.supersedeKey };
+}
+
+export interface RemovalSectionDeps {
+  records: Pick<ProposalRecords, "claimOffer">;
+  /** Stage a shown card at the Gate. */
+  stage(proposal: PendingProposal): Promise<void>;
+  /** Where a proposal opens in the blueprint app. */
+  linkOf(p: DrawnProposal): string;
+  now(): number;
+}
+
+/**
+ * The removal offers as a section of the morning message in each proposal's
+ * own thread: each card staged once the message is up, then its offer
+ * claimed. A card not staged, or a message that never went up, claims
+ * nothing, so the next morning offers it again.
+ *
+ * @param deps - The records' claim, the staging, the link and the clock
+ * @param handOff - The morning run's hand-off
+ * @param date - The morning's date
+ */
+export function removalOfferSection(deps: RemovalSectionDeps, handOff: SectionHandOff<RemovalHanded>, date: string): SweepSection {
+  return handedSection<RemovalHanded>({
+    source: REMOVAL_OFFER_SECTION,
+    date,
+    handOff,
+    cardsOf(value) {
+      return {
+        cards: value.proposals.map((p) => ({ person: p.requesterId, item: withdrawalItem(p, deps.linkOf(p)) })),
+        ttlMs: WITHDRAWAL_CARD_TTL_MS.aged,
+        says: (ids) =>
+          ids.length === 1
+            ? "the proposal drawn here has had no Roadmap card linked in 30 days: remove it from the blueprint?"
+            : `${ids.length} proposals drawn here have had no Roadmap card linked in 30 days: remove them from the blueprint?`,
+        cost: (shown) => ({ subrequests: 0, d1Queries: shown.length * OFFER_D1_QUERIES }),
+      };
+    },
+    async posted(value, _place, shown, report, progress) {
+      for (const p of value.proposals) {
+        const id = withdrawalItemId(p);
+        if (!shown.includes(id) || progress.done.has(id)) continue;
+        const item = withdrawalItem(p, deps.linkOf(p));
+        try {
+          await deps.stage(stagedAgedOffer(p, report.ts, item.detail ?? item.body));
+        } catch (err) {
+          rethrowIfBudget(err);
+          console.error(`[proposal-cleanup] offer for ${p.proposalTs} shown but not staged — offered again next morning: ${message(err)}`);
+          await progress.mark(id, false);
+          continue;
+        }
+        // Claimed once staged: the card is live, and no later morning offers it.
+        await deps.records.claimOffer(p.proposalTs, deps.now());
+        await progress.mark(id, true);
+      }
+    },
+    async notPosted(value, _place, why) {
+      console.error(`[proposal-cleanup] the morning message did not carry ${value.proposals.length} removal offer(s) (${why}) — offered again next morning`);
+    },
+  });
 }
