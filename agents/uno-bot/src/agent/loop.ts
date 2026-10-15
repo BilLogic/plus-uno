@@ -38,6 +38,7 @@ import type { PendingProposal, ProposalOperation, ThreadRef } from "../thread-st
 import type { ProviderConversationTurn } from "./provider-conversation";
 import { toolResultDigest, type ToolCall, type ToolResultNote } from "./tool-transcript";
 import { finishedProgress, type ToolProgressEvent } from "./tool-progress";
+import { ModelCallError } from "./model-provider";
 import type {
   ModelProvider,
   ModelStop,
@@ -380,8 +381,8 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
    *
    * The decision to retry is the LOOP's; whether a backup exists is the
    * adapter's fact. One switch per turn: a backup that also fails is a real
-   * outage, and the capacity alerting in `slack/delivery.ts` is what should
-   * hear about it.
+   * outage, and `turn/capacity-outage.ts` is what keeps count of it and tells
+   * the lead when it lasts.
    */
   const send = async (
     toolsEnabled: boolean,
@@ -399,7 +400,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
         );
         continue;
       }
-      throw new Error(`${provider.name} ${reply.status}: ${reply.message}`.slice(0, 400));
+      throw new ModelCallError(provider.name, reply.status, reply.message, reply.code);
     }
   };
 

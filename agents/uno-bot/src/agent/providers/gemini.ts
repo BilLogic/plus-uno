@@ -64,13 +64,22 @@ interface GeminiResponseData {
     /** Prefix served from Gemini implicit caching, when it applies. */
     cachedContentTokenCount?: number;
   };
-  error?: { code?: number; message?: string };
+  error?: { code?: number; message?: string; status?: string };
 }
 
 // Capacity/availability statuses a backup model is worth trying on. The
 // 2026-07-16 quota incident was every turn 429ing with the bot down in Slack
-// for an afternoon; degraded (pricier/slower) beats down.
+// for an afternoon; degraded (pricier/slower) beats down. Vertex answers a
+// quota failure as 429 with status RESOURCE_EXHAUSTED, and an overloaded
+// model as 503 UNAVAILABLE, so both arrive here as their HTTP status
+// (`tests/gemini-fallback.test.ts`).
 const FALLBACK_STATUSES = new Set([404, 429, 500, 503]);
+
+/** The backup model, or null when there is none to try for `model`. */
+function backupFor(env: Env, model: string): string | null {
+  const backup = env.GEMINI_FALLBACK_MODEL ?? "gemini-2.5-pro";
+  return backup && backup !== model ? backup : null;
+}
 
 // Gemini's function-declaration schema is an OpenAPI subset — it rejects JSON
 // Schema keys like additionalProperties/$schema. Strip them recursively.
@@ -158,14 +167,25 @@ export function geminiProvider(env: Env): ModelProvider {
           message: "no Gemini credential configured",
         };
       }
-      const { thinkingLevel: level } = geminiDials(prompt.tier, oneShotModel);
-      const res = await geminiGenerate(env, {
-        model: oneShotModel,
-        prompt: prompt.prompt,
-        ...(prompt.system ? { system: prompt.system } : {}),
-        ...(prompt.maxTokens ? { maxTokens: prompt.maxTokens } : {}),
-        ...(level ? { thinkingLevel: level } : {}),
-      });
+      const ask = (model: string) => {
+        const { thinkingLevel: level } = geminiDials(prompt.tier, model);
+        return geminiGenerate(env, {
+          model,
+          prompt: prompt.prompt,
+          ...(prompt.system ? { system: prompt.system } : {}),
+          ...(prompt.maxTokens ? { maxTokens: prompt.maxTokens } : {}),
+          ...(level ? { thinkingLevel: level } : {}),
+        });
+      };
+      let res = await ask(oneShotModel);
+      // The same one failover a turn gets, for every scheduled job and judge
+      // that asks through here: a quota outage on the main model is answered
+      // by the backup, not by a skipped run.
+      const backup = backupFor(env, oneShotModel);
+      if (!res.ok && res.status !== undefined && FALLBACK_STATUSES.has(res.status) && backup) {
+        console.warn(`[gemini] ${oneShotModel} failed (${res.status}) — asking ${backup} instead`);
+        res = await ask(backup);
+      }
       if (!res.ok) {
         return { ok: false, model: res.model, message: res.error ?? "generateContent failed" };
       }
@@ -253,6 +273,7 @@ export function geminiProvider(env: Env): ModelProvider {
           ok: false,
           status,
           message: parsed.error?.message ?? "generateContent failed",
+          ...(parsed.error?.status ? { code: parsed.error.status } : {}),
         };
       }
 
@@ -301,8 +322,8 @@ export function geminiProvider(env: Env): ModelProvider {
     },
 
     fallback(status: number): boolean {
-      const backup = env.GEMINI_FALLBACK_MODEL ?? "gemini-2.5-pro";
-      if (fellBack || !FALLBACK_STATUSES.has(status) || !backup || backup === model) return false;
+      const backup = backupFor(env, model);
+      if (fellBack || !FALLBACK_STATUSES.has(status) || !backup) return false;
       fellBack = true;
       console.warn(`[gemini] ${model} failed (${status}) — falling back to ${backup} for the rest of this turn`);
       model = backup;

@@ -25,8 +25,9 @@
 // a clock and nothing else. `Env` stops here, at the boundary.
 
 import type { Env } from "../types";
-import { createDurableObjectThreadState } from "./durable-object";
+import { createDurableObjectOutageStore, createDurableObjectThreadState } from "./durable-object";
 import type { ThreadState } from "./store";
+import type { OutageStore } from "../turn/capacity-outage";
 
 /**
  * Production's store: the Durable Object adapter over the `THREAD_STATE`
@@ -39,4 +40,12 @@ import type { ThreadState } from "./store";
  */
 export function threadStateFor(env: Env): ThreadState {
   return createDurableObjectThreadState({ namespace: env.THREAD_STATE });
+}
+
+/**
+ * The capacity outage's record, on the same single instance
+ * (`turn/capacity-outage.ts`).
+ */
+export function capacityOutageStoreFor(env: Env): OutageStore {
+  return createDurableObjectOutageStore({ namespace: env.THREAD_STATE });
 }

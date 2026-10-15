@@ -91,7 +91,46 @@ export type ModelStop = "end" | "tool" | "paused";
  */
 export type ModelReply =
   | { ok: true; text: string; toolCalls: ModelToolCall[]; stop: ModelStop }
-  | { ok: false; status: number; message: string };
+  /** `code` is the provider's own status word when it sends one (Vertex's
+   *  `RESOURCE_EXHAUSTED`, `UNAVAILABLE`). */
+  | { ok: false; status: number; message: string; code?: string };
+
+/** HTTP statuses that mean the model is out of capacity: a quota (429), an
+ *  overloaded or unavailable model (503), Anthropic's overloaded (529). */
+const CAPACITY_STATUSES = new Set([429, 503, 529]);
+
+/** Provider status words that mean the same, whatever the HTTP status. */
+const CAPACITY_CODES = new Set(["RESOURCE_EXHAUSTED", "UNAVAILABLE"]);
+
+/**
+ * A model call that failed, as the loop throws it: which provider, the HTTP
+ * status and the provider's status word. Typed so a capacity failure is
+ * decided by what the model call answered, never by the words of an error
+ * message, which a tool's "Service Unavailable" would match too.
+ */
+export class ModelCallError extends Error {
+  constructor(
+    readonly provider: string,
+    readonly status: number,
+    message: string,
+    readonly code?: string,
+  ) {
+    super(`${provider} ${status}: ${message}`.slice(0, 400));
+    this.name = "ModelCallError";
+  }
+}
+
+/**
+ * Whether a failure is the model being out of capacity, with the backup
+ * already tried: a `ModelCallError` with a capacity status or status word.
+ * Anything else, a tool's error included, is not.
+ *
+ * @param err - What a turn's model run threw
+ */
+export function isCapacityFailure(err: unknown): boolean {
+  if (!(err instanceof ModelCallError)) return false;
+  return CAPACITY_STATUSES.has(err.status) || (err.code !== undefined && CAPACITY_CODES.has(err.code));
+}
 
 /** What the last send actually ran on. `model` is named because every provider
  *  has one; everything else is `detail`, so no provider's dial — a Gemini

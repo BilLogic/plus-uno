@@ -523,5 +523,7 @@ function replyOf(
   if (outcome?.disposition === "asked" && note) return { kind: "question", lines: plainAnswer(note).lines };
   // A "thanks" the turn only acknowledged has nothing to reply.
   if (outcome?.disposition === "reacted") return null;
+  // Both models out of capacity: the plain overloaded line, as Slack says it.
+  if (delivery.overloaded()) return { kind: "overloaded" };
   return { kind: "failed" };
 }

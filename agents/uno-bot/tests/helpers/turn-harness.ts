@@ -205,6 +205,9 @@ export function harness(opts: {
   /** The model the fake provider reports, and the tokens it reports spending. */
   providerModel?: string;
   providerUsage?: Partial<ModelUsage>;
+  /** The model call fails this many times with this status before the
+   *  script plays, with a backup model or none: a capacity outage. */
+  providerFailure?: { times: number; status: number; backupModel: string | null };
   /** The turn's clock. Absent, the real one. */
   now?: () => number;
   /** The values a lookup's filter can take, as the board offers them. Absent,
@@ -227,6 +230,9 @@ export function harness(opts: {
     replies: opts.replies ?? [{ text: "Here is the answer." }],
     ...(opts.providerModel ? { model: opts.providerModel } : {}),
     ...(opts.providerUsage ? { usage: opts.providerUsage } : {}),
+    ...(opts.providerFailure
+      ? { failTimes: opts.providerFailure.times, failStatus: opts.providerFailure.status, backupModel: opts.providerFailure.backupModel }
+      : {}),
   });
   const usage = createInMemoryUsageLog();
   const proposalEvents = createInMemoryProposalEventLog({ turns: usage });

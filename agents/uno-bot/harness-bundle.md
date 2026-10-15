@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **97,298 chars from 9 files**, against an assembled budget of 175,500 (78,202 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 76,914 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **97,696 chars from 9 files**, against an assembled budget of 175,500 (77,804 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 77,312 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -26,11 +26,11 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,015 | 48,335 | — |
 | 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 54,028 | — |
 | 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 65,814 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 15,960 (−5,976 ide-only) | 81,825 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 85,293 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 91,809 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 96,442 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 97,298 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 16,358 (−5,976 ide-only) | 82,223 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 85,691 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 92,207 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 96,840 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 97,696 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **17 reference(s), 129,860 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **17 reference(s), 129,989 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -55,7 +55,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,591 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,550 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 1,767 |
-| `figma-comments` | [`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) | 8,674 |
+| `figma-comments` | [`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) | 8,803 |
 | `file-a-ticket` | [`agents/uno-bot/skills/file-a-ticket/SKILL.md`](../../agents/uno-bot/skills/file-a-ticket/SKILL.md) | 3,182 |
 | `find-the-right-person` | [`agents/uno-bot/skills/find-the-right-person/SKILL.md`](../../agents/uno-bot/skills/find-the-right-person/SKILL.md) | 2,558 |
 | `follow-through` | [`agents/uno-bot/scheduled-actions/follow-through/ACTION.md`](../../agents/uno-bot/scheduled-actions/follow-through/ACTION.md) | 10,647 |
@@ -910,7 +910,7 @@ Uses the model's default voice for chat; the bot's specific register lives in `a
 - **Glanceable, not paragraphs.** `**Bold label**` lines in place of `#` headings, `-` bullets two levels deep at most, and a table for any grid of three or more rows.
 - **Summarize, link the artifact** — the link sits on the name of the thing (`[the Roadmap card](url)`); steps are summarized, not transcribed.
 - **Human, contraction-y, low ceremony.** Brief and clear over formal; no jokes that don't serve the task.
-- **A failure says what did not change and names one next step** (retry, adjust or escalate) — a bare "something went wrong" helps nobody. The Worker's own failure post is that shape in blocks: a bold progress line with the next step, a ⚠️ line, and a Try again button that asks the question again as the person.
+- **A failure says what did not change and names one next step** (retry, adjust or escalate) — a bare "something went wrong" helps nobody. The Worker's own failure post is that shape in blocks: a bold progress line with the next step, a ⚠️ line, and a Try again button that asks the question again as the person. A model out of capacity falls over to the backup model quietly; when both fail, the asker reads only "I'm overloaded right now and couldn't answer. Try again in a few minutes.", nothing is posted to #uno-bot, and the lead gets one DM once failures have run for 30 minutes, then one line when the outage is over. Test traffic counts toward none of it (`agents/uno-bot/src/turn/capacity-outage.ts`).
 - **Confirm before real-world side-effects** (the proposal gate) — but gate only genuinely risky ops; no confirmation fatigue.
 - **On behalf of** — acting for a person, say so, and surface what was done + a link.
 - **A post in a channel** — top level rather than a thread reply — is a summary plus a link; the detail goes in its thread or on the linked page.
@@ -2015,7 +2015,7 @@ An @uno in a Figma comment is answered in the file, through the notification rou
 
 - **The trigger:** the `@` is required — @uno, @unobot, @uno-bot, @uno bot, @goat, @le goat, @le-goat, @legoat, @the goat, any case, typed or picked from Figma's list. A comment that opens with uno-bot's label is uno-bot's own and gets no answer; Figma reads 🐐 back as `:goat:`, so every own-comment check accepts both.
 - **The acknowledgement:** the ask gets a `:goat:` reaction before anything else, so the asker sees it was picked up. It is sent as the shortcode, since Figma refuses the emoji character, and sent once.
-- **The reply:** on the root comment, leading `🐐: ` beside its first line, then 1–3 plain lines and the source the answer cites (a link that turn's lookups returned, other than the frame asked on), or "I couldn't find this" pointing at #plus-design. It posts the moment the answer is ready: Bill approved this one write without a ✅ on 2026-10-11, because the label marks it as uno-bot's.
+- **The reply:** on the root comment, leading `🐐: ` beside its first line, then 1–3 plain lines and the source the answer cites (a link that turn's lookups returned, other than the frame asked on), or "I couldn't find this" pointing at #plus-design; when both models are out of capacity, the plain overloaded line Slack gives, and the failure counts toward the lead's outage DM. It posts the moment the answer is ready: Bill approved this one write without a ✅ on 2026-10-11, because the label marks it as uno-bot's.
 - **A change request:** the ask is answer-only and posts nothing to Slack (Bill, 2026-10-14). The turn refuses its card before it stages, so the reply names the write it would have run, in that write's fixed words, and points a teammate at le goat in Slack to draft it.
 - **Who asked:** a teammate, by the Team Members Figma user id, gets the team's answer. Anyone the map does not know gets public facts, is offered no write, and is pointed at #plus-design; when their handle names a row with no Figma User ID, the lead gets one DM a month saying so.
 - **Public scope:** people outside the team can open a file, so the turn reads at public scope (`agent/public-scope.ts`), an allowlist of tools; the table is in `docs/connectors/figma/uno-bot-access.md`.

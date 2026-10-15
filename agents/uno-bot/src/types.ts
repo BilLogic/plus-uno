@@ -142,8 +142,11 @@ export interface Env {
   // from the reviews channel above). Optional — unset → shareout_post falls back
   // to the origin thread.
   PLUS_DESIGN_FEEDBACK_CHANNEL_ID?: string;
-  // Channel for operational alerts (capacity/quota outages). Unset → defaults to
-  // #uno-bot. See slack/delivery.ts alertCapacity.
+  // #uno-bot by default. Two uses: where a failure that is NOT capacity tells
+  // people to report a repeat (slack/failure-message.ts), and a channel the
+  // Slack diagnostics probe may post to (diagnostics/probes/slack.ts). A
+  // capacity outage is never posted here: it goes to LEAD_USER_ID's DM once it
+  // lasts (turn/capacity-outage.ts).
   UNO_BOT_ALERT_CHANNEL?: string;
   // Channel the Slack probes may post raw test messages to besides a DM and the
   // alert channel. Unset → DMs and the alert channel only. See diagnostics/probes/slack.ts.
@@ -183,7 +186,7 @@ export interface Env {
   // silence, 2026-07-09). See agent-runner.ts.
   AGENT_RUNNER: DurableObjectNamespace;
   // Harness resilience: stores the last fully-successful system-prompt assembly
-  // + the alert-throttle timestamp. (The harness itself is now baked into the
+  // + the hint that a capacity outage may be open (turn/capacity-outage.ts). (The harness itself is now baked into the
   // Worker bundle at build time — src/generated/harness.ts — so serving it costs
   // zero subrequests; this KV is the fallback/alert path. See agent/skills.ts.)
   /** Tier models on the Gemini adapter. A tier is model PLUS thinking level

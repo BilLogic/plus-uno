@@ -15,6 +15,7 @@
 // PURE.
 
 import { toPlainText } from "../slack/mrkdwn";
+import { OVERLOADED_LEAD, OVERLOADED_NEXT } from "../slack/failure-message";
 import { labelled } from "./trigger";
 
 /** Lines of answer a reply carries, at most. */
@@ -40,6 +41,8 @@ export type FigmaReply =
   | { kind: "answer-only"; would: string | null }
   /** A change asked for by someone Team Members does not map. */
   | { kind: "not-teammate" }
+  /** Both models out of capacity: the plain overloaded line, as Slack says it. */
+  | { kind: "overloaded" }
   | { kind: "failed" };
 
 /** What a reply to a change asked for in Figma opens with. */
@@ -93,6 +96,8 @@ export function figmaReplyLines(reply: FigmaReply): string[] {
         return [NO_CHANGE, reply.would ? `To make it, I'd ${reply.would}. ${TO_SLACK}` : TO_SLACK];
       case "not-teammate":
         return [`${NO_CHANGE} Ask in #plus-design.`];
+      case "overloaded":
+        return [`${OVERLOADED_LEAD} ${OVERLOADED_NEXT}`];
       case "failed":
         return ["I couldn't answer this just now. Ask in #plus-design."];
     }
