@@ -29,10 +29,12 @@ import {
   listBlock,
   quoteBlock,
   shareoutApprove,
+  TOO_LONG_TO_EDIT,
   type DraftAnatomy,
   type WhereElement,
 } from "./review-anatomy";
 import { createFacts, notionCreateAnatomy, type NotionDatabaseLinks } from "./review-notion-create";
+import { archiveAnatomy, issueCreateAnatomy, issueUpdateAnatomy, workflowRunAnatomy } from "./review-draft-writes";
 import type { ProposalOperation } from "../thread-state/index";
 
 type Input = Record<string, unknown>;
@@ -213,9 +215,9 @@ const NEW = "New content";
 /** Slack's cap on a section's text. */
 const SECTION_CHARS = 3000;
 
-/** Said where a value is too long to be an input. */
-export const TOO_LONG_TO_EDIT =
-  "This text is over the 3,000 characters a pop-up field holds, so it can't be edited here. Choose Needs changes to ask for a different wording.";
+// Kept here too: it lives in `review-anatomy.ts` now, so the readers in
+// `review-draft-writes.ts` can say it without importing this file back.
+export { TOO_LONG_TO_EDIT };
 
 /**
  * The draft as a person reads it, or null when any operation is a tool this
@@ -418,13 +420,17 @@ export function caveatsOf(cardText: string): string[] {
 
 /** What a reading in the shared anatomy is drawn with: the card's text, for
  *  the place it names and its caveats, and the draft's detail. */
-type AnatomyContext = DraftDetail & { cardText: string };
+export type AnatomyContext = DraftDetail & { cardText: string };
 
 /** Readings in the shared anatomy, by tool. A tool with none is drawn by its
  *  `READERS` reading, or from the card's text. */
 const ANATOMY_READERS: Record<string, (input: Input, context: AnatomyContext) => DraftAnatomy> = {
   shareout_post: shareoutAnatomy,
   notion_create: (input, context) => notionCreateAnatomy(input, { ...context, caveats: caveatsOf(context.cardText) }),
+  notion_archive: archiveAnatomy,
+  github_issue_update: issueUpdateAnatomy,
+  github_workflow_run: workflowRunAnatomy,
+  github_issue_create: issueCreateAnatomy,
 };
 
 /**
