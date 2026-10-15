@@ -6,11 +6,11 @@ summary: Legacy routing-registry schema — the two production surfaces only. Ne
 # Marketplace Schema — legacy routing registry
 
 > **This is not where a new prototype is registered.** The catalog is the Notion
-> Prototype Marketplace — see `notion-marketplace-db.md`. `prototypes-data.js`
+> Prototype Marketplace — see `docs/connectors/notion/marketplace-db.md`. `prototypes-data.js`
 > is a routing registry for the **two production surfaces hosted on `main`**
 > (the live app and the Full Demo Walkthrough), and `marketplace.md` says not to
 > add new experiment IDs to it. Read this file only when editing one of those
-> two entries; for anything else you want `notion-marketplace-db.md`.
+> two entries; for anything else you want `docs/connectors/notion/marketplace-db.md`.
 
 Schema for entries in `src/pages/PrototypeMarket/prototypes-data.js`.
 

@@ -200,6 +200,20 @@ export function proposalEvent(
   return { ...EMPTY, proposalId, event, at, via };
 }
 
+/**
+ * The staged row of a card the Worker posted with nothing to confirm — a
+ * Figma question raised in a team channel: in the channel it went to, running
+ * no tools, for `ttlMs`, after which the expiry pass ages it out. It counts
+ * among the Worker-staged cards like any other.
+ */
+export function workerCardEvent(input: { proposalId: string; channelId: string; at: number; ttlMs: number }): ProposalEvent {
+  return {
+    ...proposalEvent(input.proposalId, "staged", askedAtOf(input.proposalId, input.at), "worker"),
+    channelId: input.channelId,
+    ttlMs: input.ttlMs,
+  };
+}
+
 /** `superseded` for each card a staging retired — the ts the store reported,
  *  `via` whoever staged its successor: a turn's revision, a re-stage, the
  *  Worker. */

@@ -1,20 +1,21 @@
 // notion_create executor — creates a page/card in a convention Notion surface
-// (prd / intake / decision), then posts the link. Side effect → routed through
-// the ✅ gate. Marketplace is NOT a surface here — its relation + rollup +
-// dual-write shape is an in-IDE writers/notion operation. Component PRDs and
-// research notes are not bot surfaces: component PRDs are regular feature PRDs
-// on the Roadmap, and deep research is an IDE-only skill that writes to the
-// project hub's Research page. The page opens with the attribution line naming
-// the requester (`integrations/notion-attribution.ts`).
+// (prd / intake / decision), or creates or updates the Prototype Marketplace
+// row for one prototype (marketplace), then posts the link. Side effect → routed
+// through the ✅ gate. Component PRDs and research notes are not bot surfaces:
+// component PRDs are regular feature PRDs on the Roadmap, and deep research is
+// an IDE-only skill that writes to the project hub's Research page. A created
+// page opens with the attribution line naming the requester
+// (`integrations/notion-attribution.ts`).
 
 import type { Env } from "../types";
 import type { SlackContext } from "../types";
 import { postMessage } from "../slack/api";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { notionCreate, type NotionCreateSurface, type PrdSection } from "../integrations/notion";
+import { MarketplaceQuestion, marketplaceInputOf, publishMarketplaceRow } from "../integrations/notion-marketplace";
 import { requesterName } from "./requester-name";
 
-const SURFACES = new Set<NotionCreateSurface>(["prd", "intake", "decision"]);
+const SURFACES = new Set<NotionCreateSurface>(["prd", "intake", "decision", "marketplace"]);
 
 function asString(v: unknown): string {
   return typeof v === "string" ? v.trim() : "";
@@ -50,6 +51,7 @@ export async function executeNotionCreate(
     return JSON.stringify({ ok: false, error: `unknown or unsupported surface '${surface}'` });
   }
   if (!title) return JSON.stringify({ ok: false, error: "missing 'title'" });
+  if (surface === "marketplace") return publishToMarketplace(env, input, title, slack);
 
   // Split the model's freeform `properties` into known keys and body extras.
   const props =
@@ -122,6 +124,52 @@ export async function executeNotionCreate(
       channel: slack.channel,
       thread_ts: slack.threadTs,
       text: `:x: Couldn't create in Notion — ${detail}`,
+    });
+    return JSON.stringify({ ok: false, status: "notion_failed", detail });
+  }
+}
+
+/** Create or update the Marketplace row, and post where it landed. A value the
+ *  database cannot take goes back to the requester as a question. */
+async function publishToMarketplace(
+  env: Env,
+  input: Record<string, unknown>,
+  title: string,
+  slack: SlackContext,
+): Promise<string> {
+  try {
+    const row = await publishMarketplaceRow(env, {
+      ...marketplaceInputOf(input),
+      name: title,
+      onBehalfOf: await requesterName(env, slack),
+    });
+    const verb = row.status === "updated" ? "Updated" : "Created";
+    await postMessage(env, {
+      channel: slack.channel,
+      thread_ts: slack.threadTs,
+      text: `${verb} <${row.url}|${escapeSlackText(title)}> in ${row.label}.`,
+    });
+    return JSON.stringify({
+      ok: true,
+      status: row.status,
+      surface: "marketplace",
+      url: row.url,
+      message: `${verb} '${title}' on ${row.label}.`,
+    });
+  } catch (err) {
+    if (err instanceof MarketplaceQuestion) {
+      return JSON.stringify({
+        ok: false,
+        status: "needs_input",
+        question: err.message,
+        message: "Nothing was written. Put the question to the requester, then stage the publish again with their answer.",
+      });
+    }
+    const detail = err instanceof Error ? err.message : String(err);
+    await postMessage(env, {
+      channel: slack.channel,
+      thread_ts: slack.threadTs,
+      text: `:x: Couldn't publish to the Marketplace — ${detail}`,
     });
     return JSON.stringify({ ok: false, status: "notion_failed", detail });
   }

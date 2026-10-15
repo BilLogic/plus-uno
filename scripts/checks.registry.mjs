@@ -73,7 +73,7 @@
  *             still holds the number as a private constant.
  *   module    a path to an ES module exporting `run(ctx) => Finding[]` (see
  *             `scripts/lib/findings.mjs`). The runner calls it in-process and
- *             renders one banner for it. 42 of the 59 rows carry one.
+ *             renders one banner for it. 43 of the 59 rows carry one.
  *   kind      'spawn' — and nothing else. The row cannot answer the findings
  *             interface, so the runner runs `npm run <name>` and reads its exit
  *             code. A spawn row carries `spawnReason`.
@@ -187,7 +187,7 @@ export const CHECKS = [
     trigger: ['pull_request', 'sweep'],
     module: 'scripts/generate-uno-skill-surfaces.mjs',
     guards:
-      'the generated skill surfaces — .claude/skills/ stubs, the Worker command map, the Slack app-manifest block — against each SKILL.md.',
+      'the generated .claude/skills/ stubs against each SKILL.md.',
   },
   {
     name: 'check:check-registry',
@@ -220,7 +220,7 @@ export const CHECKS = [
     trigger: ['pull_request', 'sweep'],
     module: 'scripts/check-skill-overlap.mjs',
     guards:
-      'one rule, one home — no substantive line living in two faces of the same skill, and none living in two bundled docs. Reads the bundled set from the bundler, so a stale bundle stops it — and since #234 a SHORT set stops it too, rather than comparing the survivors and printing the narrowed number as the corpus.',
+      'one rule, one home — no substantive line living in both an uno skill’s method and its SKILL.md, and none living in two docs the Worker reads (the prompt plus every disclosed reference, the bot skills among them). Reads the bundled set from the bundler, so a stale bundle stops it — and since #234 a SHORT set stops it too, rather than comparing the survivors and printing the narrowed number as the corpus.',
   },
   {
     name: 'check:knowledge-disposition',
@@ -238,7 +238,7 @@ export const CHECKS = [
     module: 'scripts/check-negation-ratchet.mjs',
     baseline: 'scripts/baselines/negation-baseline.json',
     guards:
-      "the negation ratchet — the density of five imperative-ban tokens (never / don't / do not / cannot / must not) not climbing, over THREE scopes ratcheted separately from one baseline file: the bundled harness docs; since #174, the hand-authored IDE-side docs (the `embodiment: ide` complement of the bundled set within the bundler's own section roots, so docs/adr/ and the generated .claude/skills/ surfaces are out by structure); and since #425 the headless GitHub Actions prompts under scripts/prompts/, the third embodiment, which declare no embodiment: and are never bundled, so they are listed by where they live rather than found through the bundler. It counts PROHIBITION TOKENS, not negation as written: the two differ by roughly 3x and #234 chose the narrow, unarguable one on the evidence. Each scope also refuses to run against fewer docs than its baseline was recorded over — a ratchet only fails on a RISE, so a corpus that vanished otherwise passes with a smaller number. Since #601 the record is read and written through `scripts/lib/ratchet.mjs`: six sets, a counts map and a corpus FLOOR per scope, and a scope's total is the sum of its counts rather than a second number stored beside them. The script header carries the measurement.",
+      "the negation ratchet — the density of five imperative-ban tokens (never / don't / do not / cannot / must not) not climbing, over THREE scopes ratcheted separately from one baseline file: the bundled harness docs; since #174, the hand-authored IDE-side docs (the `embodiment: ide` complement of the bundled set within the bundler's own section roots, plus its IDE-only skills/ root, so docs/adr/ and the generated .claude/skills/ surfaces are out by structure); and since #425 the headless GitHub Actions prompts under scripts/prompts/, the third embodiment, which declare no embodiment: and are never bundled, so they are listed by where they live rather than found through the bundler. It counts PROHIBITION TOKENS, not negation as written: the two differ by roughly 3x and #234 chose the narrow, unarguable one on the evidence. Each scope also refuses to run against fewer docs than its baseline was recorded over — a ratchet only fails on a RISE, so a corpus that vanished otherwise passes with a smaller number. Since #601 the record is read and written through `scripts/lib/ratchet.mjs`: six sets, a counts map and a corpus FLOOR per scope, and a scope's total is the sum of its counts rather than a second number stored beside them. The script header carries the measurement.",
   },
   {
     name: 'check:pointers',
@@ -397,7 +397,16 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-harness-budgets.mjs',
     guards:
-      "the char budgets WRITTEN DOWN in prose still being the ones the bundler asserts. The budgets are decided once, in `BUDGETS` in agents/uno-bot/scripts/bundle-harness.mjs, and a doc that blows one fails the build (the constitution's is soft and warns instead) — but two harness documents also state a budget as a number a reader will act on: AGENTS.md § The loading contract (\"Soft budget ≤20k chars: an overrun warns rather than fails\") and skills/README.md (\"`bot.md` is on a 7,000-char budget the bundler asserts\"). Both are copies, and until #510 nothing compared them: raise `botFace` to 8,000 and the README goes on saying 7,000 with the build green, so the sentence a skill author reads before cutting a face is simply wrong. Prose is what an agent obeys, which makes this the direction the silence costs most. The bundler now writes a JSON manifest of what it computed — members, per-section totals, the census, `BUDGETS` verbatim — and this check reads the number out of each sentence and compares it to the constant it copies, naming the file, the line, the prose value and the constant. A sentence reworded past the pattern is a finding too, rather than a check that quietly matches nothing and passes (#234). On the findings interface (#508), so the runner calls it in-process. Mutation-tested three ways over a fixture root: a prose number raised, a prose number lowered, and a sentence rewritten out of reach.",
+      "budget numbers having one home. The budgets are decided once, in `BUDGETS` in agents/uno-bot/scripts/bundle-harness.mjs, and a doc that blows one fails the build (the constitution's is soft and warns). Two harness documents used to write a budget down as a number a reader acts on — AGENTS.md § The loading contract and skills/README.md — and a copy goes on saying 7,000 the day the constant moves to 8,000, with the build green, in the sentence a skill author reads before cutting a doc. Since the bot-harness spec a doc cites the constant by key (`BUDGETS.botSkill`) instead, and this check reads every doc under the bundler's section roots, off the manifest `assemble()` returns in-process, for two things: a line about a budget that states a char count, and a `BUDGETS.<key>` citation the bundler does not state — so a renamed budget role cannot leave its citations pointing at nothing. On the findings interface (#508), so the runner calls it in-process. Mutation-tested over a fixture root: a number written down in chars and in k, a stale number no constant holds, and a citation of a missing key.",
+  },
+  {
+    name: 'check:bot-skills',
+    script: 'node scripts/check-bot-skills.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-bot-skills.mjs',
+    guards:
+      "every bot skill keeping the authoring rules a check can see. A bot skill is a doc under the bundler's `bot-skills` section — its description ships in the prompt as the skill's pointer line, its body is read by name through `read_reference` — and which docs those are comes from the manifest `assemble()` returns in-process, so the check keeps no folder list. Each one names only tools that exist in agents/uno-bot/tool-definitions.json (every backticked snake_case name), ends in a `## Exit` section whose items each open with answer, file or hand off, and carries a one-line description within `BUDGETS.botSkillDescription`. A skill that tells the bot to call a tool it does not have, or to exit in a way it cannot (open a PR, post a review), is the defect the uno skills' per-skill Slack docs shipped before the bot skills replaced them. A grep guard fails any live file that still names those retired docs (plans, ADRs, todos, the archive and generated files are left as written); `--retired-faces` prints its hits alone. Mutation-tested over a fixture root: a missing tool, a missing or empty Exit, a fourth exit, a long or missing description, a live retired-face line.",
   },
   {
     name: 'check:figma-colour-drift',

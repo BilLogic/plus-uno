@@ -256,10 +256,6 @@ export interface ProposalCard {
    * posted — which put Slack's message-size limits inside the turn.
    */
   operations: ProposalOperation[];
-  /** A Figma render of the design a `prototype_scaffold` implements, when one
-   *  could be fetched. A URL, not a block: what Slack does with an image is
-   *  the adapter's. */
-  previewImageUrl?: string;
   /** The Worker's own tag on the card's message, read back later to tell
    *  what kind of card it is — a revised end-of-day sweep card carries the
    *  sweep's (`sweep/cards.ts` `asSweepRevision`). */

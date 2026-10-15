@@ -33,7 +33,7 @@ test('every retired shape is caught, with its line and why', () => {
     'run weekly-tier1-digest.yml',
     'emit NO_TIER1_THIS_WEEK',
   ];
-  const found = findingsIn(lines.join('\n'), 'skills/x/bot.md');
+  const found = findingsIn(lines.join('\n'), 'skills/x/SKILL.md');
   assert.equal(found.length, lines.length, JSON.stringify(found, null, 1));
   assert.equal(found[0].line, 1);
   assert.equal(found[6].text, 'suggested tier');

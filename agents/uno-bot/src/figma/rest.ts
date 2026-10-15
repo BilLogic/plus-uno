@@ -75,6 +75,7 @@ import {
   type FigmaFolderFilesResponse,
   type FigmaImagesResponse,
   type FigmaNodesResponse,
+  type FigmaReactionsResponse,
   type FigmaTeamFoldersResponse,
   type FigmaTier,
   type FigmaVersionsResponse,
@@ -242,7 +243,7 @@ export function createFigmaRestClient(deps: FigmaRestDeps): FigmaClient {
           what: "nodes",
           tier: 1,
           method: "GET",
-          path: `${file(key)}/nodes${query({ ids, depth: opts.depth, geometry: opts.geometry })}`,
+          path: `${file(key)}/nodes${query({ ids, depth: opts.depth, geometry: opts.geometry, version: opts.version })}`,
         },
         opts,
       ),
@@ -258,8 +259,16 @@ export function createFigmaRestClient(deps: FigmaRestDeps): FigmaClient {
       ),
     components: (key, opts) =>
       call<FigmaComponentsResponse>({ what: "components", tier: 3, method: "GET", path: `${file(key)}/components` }, opts),
-    versions: (key, opts) =>
-      call<FigmaVersionsResponse>({ what: "versions", tier: 2, method: "GET", path: `${file(key)}/versions` }, opts),
+    versions: (key, opts = {}) =>
+      call<FigmaVersionsResponse>(
+        {
+          what: "versions",
+          tier: 2,
+          method: "GET",
+          path: `${file(key)}/versions${query({ page_size: opts.pageSize, before: opts.before })}`,
+        },
+        opts,
+      ),
     comments: (key, opts) =>
       call<FigmaCommentsResponse>({ what: "comments", tier: 2, method: "GET", path: `${file(key)}/comments` }, opts),
     postComment: (key, message, at, opts) =>
@@ -284,6 +293,23 @@ export function createFigmaRestClient(deps: FigmaRestDeps): FigmaClient {
         },
         opts,
       ),
+    reactions: (key, commentId, opts) =>
+      call<FigmaReactionsResponse>(
+        { what: "comment reactions", tier: 2, method: "GET", path: `${file(key)}/comments/${encodeURIComponent(commentId)}/reactions` },
+        opts,
+      ),
+    postReaction: async (key, commentId, emoji, opts) => {
+      await call<unknown>(
+        {
+          what: "comment reaction",
+          tier: 2,
+          method: "POST",
+          path: `${file(key)}/comments/${encodeURIComponent(commentId)}/reactions`,
+          body: { emoji },
+        },
+        opts,
+      );
+    },
     teamFolders: (teamId, opts) =>
       call<FigmaTeamFoldersResponse>(
         { what: "team folders", tier: 2, method: "GET", path: `/v2/teams/${encodeURIComponent(teamId)}/folders` },

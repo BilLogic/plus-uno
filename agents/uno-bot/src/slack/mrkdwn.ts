@@ -1,7 +1,7 @@
 // Markdown → Slack mrkdwn coercion, for the paths that need mrkdwn.
 //
 // Since 2026-08-22 the model writes STANDARD MARKDOWN (`AGENT.md`,
-// `docs/connectors/slack.md`) — the dialect it writes best, and the dialect
+// `docs/connectors/slack/overview.md`) — the dialect it writes best, and the dialect
 // Slack's own `markdown_text` field takes, which is how a streamed reply
 // ships. Two paths still need mrkdwn, and both run through here:
 //
@@ -119,7 +119,7 @@ function keepOrEscapeToken(token: string, inner: string): string {
  *     `&amp;lt;` reads `&lt;` rather than `<`.
  *
  * WHY THIS IS SAFE where the escaper was needed: markup Slack cannot parse
- * blanks a whole message (docs/connectors/slack.md § Streamed text, and
+ * blanks a whole message (docs/connectors/slack/shapes.md § Streamed text, and
  * `sanitizeSlackMarkup` above), and this pass removes every `<…>` before
  * anything is sent — the angle markup becomes words, and the only `<` or `>`
  * left is one an entity decoded to, into a field Slack does not parse.
@@ -301,12 +301,12 @@ function transformSegment(seg: string): string {
     // Citation-marker noise the harness bans but models still emit (live
     // 2026-07-10, gemini stress round): numeric grounding indices like
     // " [11]" / " [1, 22]" (Gemini's internal chunk ids — meaningless to
-    // readers) and repo-path brackets like " [docs/connectors/notion.md]".
+    // readers) and repo-path brackets like " [docs/connectors/notion/overview.md]".
     // Note: markdown [label](url) links were already converted above, so
     // these patterns can't touch real links.
     .replace(/ ?\[\d+(?:,\s*\d+)*\]/g, "")
     .replace(/ ?\[(?:docs|skills|agents|design-system)\/[^\]\n]*\]/g, "")
-    // Bare harness-file citations ("[method.md]", "[bot.md]") and bracketed
+    // Bare harness-file citations ("[method.md]", "[SKILL.md]") and bracketed
     // row-UUID citations ("[a0000000-…]", "[id1, id2]") — both reached
     // designers in the 2026-07-11 test round despite the prompt ban.
     .replace(/ ?\[[a-z0-9_-]+\.md\]/gi, "")

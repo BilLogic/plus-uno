@@ -1,7 +1,7 @@
 [
   {
     "name": "roadmap_query",
-    "description": "Read-only, ungated. Query the live Notion Roadmap board: per card its title, link, card number, Design Status, Dev Status, pillars and people. Use it for any ask in Roadmap frame words — card, RM-ID, Design Status, Dev Status, pillar, owner, 'what's WIP / under review', 'where are we on X' — and for finding a card from a vague or partial title. Cards live on this board only; notion_search covers the doc surfaces. Title and card-number lookups are matched by the server across the whole board, so a card is found wherever it sits; a title lookup returns every card whose title contains the phrase — all of them, counted in `contains_count`, so 'how many cards are titled X' has an exact answer — then ranked fuzzy candidates, so a vague description becomes a 'did you mean…' list with links rather than a request for a URL. Believe the result's `note` over any assumption of completeness: a large unfiltered read may report a PARTIAL set, and a miss on a partial read means 'I couldn't find it'. A named thing that is not a card may be a doc — check notion_search before concluding it is absent. Filters combine freely (e.g. design_status + person). For a card's body beyond these properties, source_read its url.",
+    "description": "Read-only. Query the live Notion Roadmap board: per card its title, link, card number, Design Status, Dev Status, pillars and people. Use it for any ask in Roadmap frame words — card, RM-ID, Design Status, Dev Status, pillar, owner, 'what's WIP / under review', 'where are we on X' — and for finding a card from a vague or partial title. Cards live on this board only; notion_search covers the doc surfaces. Title and card-number lookups are matched by the server across the whole board, so a card is found wherever it sits; a title lookup returns every card whose title contains the phrase — all of them, counted in `contains_count`, so 'how many cards are titled X' has an exact answer — then ranked fuzzy candidates, so a vague description becomes a 'did you mean…' list with links rather than a request for a URL. Believe the result's `note` over any assumption of completeness: a large unfiltered read may report a PARTIAL set, and a miss on a partial read means 'I couldn't find it'. A named thing that is not a card may be a doc — check notion_search before concluding it is absent. Filters combine freely (e.g. design_status + person). For a card's body beyond these properties, source_read its url. Every card lookup ends in a match or in named candidates (name + status + link); asking for the Notion link is the last resort. Still nothing after notion_search → list candidates AS candidates, naming the estates checked; a neighbour presented as the asked-for thing is a wrong answer.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -31,7 +31,7 @@
   },
   {
     "name": "notion_search",
-    "description": "Read-only, ungated. Keyword search of Notion pages and database entries when you have no URL yet. Pick the `scope` the ask names — 'team' for 'who should I talk to about X' / find an SME; 'apps' for 'can I get access to X' / 'who owns or admins tool Y' (the Application Admin grants; you route); 'marketplace' for the prototype catalog; 'help_tutors' / 'help_teachers' for Help Center articles; 'decisions' for 'what did we decide about X'; 'running_notes' for design running notes; 'news' / 'success_stories' / 'research_papers' / 'banners' for Content HQ; 'any' for an unknown surface, last resort. A scoped query reads the live database directly (full read + fuzzy title match) and beats workspace search. Roadmap cards are roadmap_query's. Returns titles, URLs and key properties; follow up with source_read for full content. Believe the result's `note` over any assumption of completeness: a large catalog can exceed one read, and a miss on such a read means 'I couldn't find it'. Only pages the uno-bot integration is connected to are searchable, so an empty result is reported as an empty search. Docs may be stale or aspirational (roadmap PRDs, future specs): check the linked card's Design/Dev Status and decision state before stating a doc's content as current fact.",
+    "description": "Read-only. Keyword search of Notion pages and database entries when you have no URL yet. Pick the `scope` the ask names — 'team' for 'who should I talk to about X' / find an SME; 'apps' for 'can I get access to X' / 'who owns or admins tool Y' (the Application Admin grants; you route); 'marketplace' for the prototype catalog; 'help_tutors' / 'help_teachers' for Help Center articles; 'decisions' for 'what did we decide about X'; 'running_notes' for design running notes; 'news' / 'success_stories' / 'research_papers' / 'banners' for Content HQ; 'any' for an unknown surface, last resort. A scoped query reads the live database directly (full read + fuzzy title match) and beats workspace search. Roadmap cards are roadmap_query's. Returns titles, URLs and key properties; follow up with source_read for full content. Believe the result's `note` over any assumption of completeness: a large catalog can exceed one read, and a miss on such a read means 'I couldn't find it'. Only pages the uno-bot integration is connected to are searchable, so an empty result is reported as an empty search. Docs may be stale or aspirational (roadmap PRDs, future specs): check the linked card's Design/Dev Status and decision state before stating a doc's content as current fact. Access asks ('can I get access to X', 'who owns Y') → scope 'apps': name the *Application Admin* as the person who grants (@-mention via the roster's Slack id when resolvable), *Power Users* for usage questions, end with a short copy-paste request to the admin (what, why, how long) and link the app's directory page — that routing is the whole deliverable. App not listed → say so and offer the closest listed names.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -66,7 +66,7 @@
   },
   {
     "name": "source_read",
-    "description": "Read-only, ungated. Fetch the content of a URL: a Notion page (title + properties including Owner/people + block text), a Figma frame (node name/type, text layers and the comment threads pinned to it or a layer inside it), a Slack Canvas shared into this conversation, a GitHub or raw file, or any web page (text). Use it whenever the request contains or refers to a URL, a linked PRD/doc/guide, or a Figma frame — read it, ground the answer in the returned content, and cite it. A Canvas attachment appears in the user turn as a source URL; read that URL when the request refers to the attachment. Canvas access is conversation-scoped, so the Worker serves only Canvases shared here. 'Who owns / should review this' reads the page's Owner/people property. A failed fetch is reported with its cause. For a repo file you know by path, or a directory listing, github_read is the direct route.",
+    "description": "Read-only. Fetch the content of a URL: a Notion page (title + properties including Owner/people + block text), a Figma frame (node name/type, text layers, Dev Mode annotations, fills, and the comment threads pinned to it or a layer inside it; with `since`, what changed in it since that date), a Slack Canvas shared into this conversation, a GitHub or raw file, or any web page (text). Use it whenever the request contains or refers to a URL, a linked PRD/doc/guide, or a Figma frame — read it, ground the answer in the returned content, and cite it. A Canvas attachment appears in the user turn as a source URL; read that URL when the request refers to the attachment. Canvas access is conversation-scoped, so the Worker serves only Canvases shared here. 'Who owns / should review this' reads the page's Owner/people property. A failed fetch is reported with its cause. For a repo file you know by path, or a directory listing, github_read is the direct route. An unreachable Notion link: try it as a public web page, then notion_search the same title, and only then give grant steps — only pages IN the PLUS team workspace can be shared with the bot.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -77,13 +77,17 @@
         "url": {
           "type": "string",
           "description": "The full http(s) URL to read (Notion, Figma, GitHub, or any web page)."
+        },
+        "since": {
+          "type": "string",
+          "description": "Figma links only: a date (2026-10-01) or ISO time. The read then also says what changed in the frame between the version saved at or before it and now. Set it for 'what changed since…' / 'what's new in this frame since…' asks."
         }
       }
     }
   },
   {
     "name": "search_blueprint",
-    "description": "Read-only, ungated. Hybrid search over the uno-blueprint (Supabase), the source of truth for the current service journey. Use it first for any ask in blueprint frame words — how a flow works, who does what, scenario, step, 'what happens when' — and cite the rows. Choose the scope yourself: a question inside one phase, scenario, path kind or lane role gets the matching `filter_*`; a shape question ('what does onboarding look like') gets a `granularity` coarser than `cell`; a completeness question ('how many cells mention Zoom') answers from `matched`, the corpus-wide count behind the rows shown. Filters with no `query` list the whole scope. Word each row by its `status` (the blueprint account says what each one licenses). No rows is a fact about the QUERY: check `index` or re-search under the scenario's own name before saying the blueprint has nothing; a current doc (Help Center, shipped PRD) may then answer, cited and dated. Rows carry `url` (a deep link opening THAT cell — link the cells you rely on, verbatim), may carry `links` (URLs the authors attached, safe to surface) and `updatedAt` (judge staleness from it). `matchedBy` names the retrievers that found a row: `vector` (semantic similarity), `keyword` (the cell's prose), `structural` (its breadcrumb name), or a `+`-joined set. Use it for confidence: a row several retrievers agree on matched the blueprint's own words; a `vector`-only row is a semantic guess and gets a hedge; when EVERY row is `vector`-only, nothing in the blueprint mentions your terms — treat the topic as probably absent and present such rows as near-misses at most. `score` cannot tell you this. The result also reports `retrieval`, `truncated` + `capped_by` (say the list is partial), `cached` + `age_ms` (true = rows read on an earlier turn, so claim no freshness) and `thin`. When `orientation` is `live`, `index` is the complete list of phases → scenarios → paths read this turn: name the phase from it, quote counts only from its `scale`, and read future state from its status markers; `unavailable` means you could not check, so claim no absence. Ask for it any time with `include: [\"index\"]`. Follow the `notes` array — each entry is one obligation for THIS result.",
+    "description": "Read-only. Hybrid search over the uno-blueprint (Supabase), the source of truth for the current service journey. Use it first for any ask in blueprint frame words — how a flow works, who does what, scenario, step, 'what happens when' — and cite the rows. Choose the scope yourself: a question inside one phase, scenario, path kind or lane role gets the matching `filter_*`; a shape question ('what does onboarding look like') gets a `granularity` coarser than `cell`; a completeness question ('how many cells mention Zoom') answers from `matched`, the corpus-wide count behind the rows shown. Filters with no `query` list the whole scope. Word each row by its `status` (the blueprint account says what each one licenses). No rows is a fact about the QUERY: check `index` or re-search under the scenario's own name before saying the blueprint has nothing; a current doc (Help Center, shipped PRD) may then answer, cited and dated. Rows carry `url` (a deep link opening THAT cell — link the cells you rely on, verbatim), may carry `links` (URLs the authors attached, safe to surface) and `updatedAt` (judge staleness from it). `matchedBy` names the retrievers that found a row: `vector` (semantic similarity), `keyword` (the cell's prose), `structural` (its breadcrumb name), or a `+`-joined set. Use it for confidence: a row several retrievers agree on matched the blueprint's own words; a `vector`-only row is a semantic guess and gets a hedge; when EVERY row is `vector`-only, nothing in the blueprint mentions your terms — treat the topic as probably absent and present such rows as near-misses at most. `score` cannot tell you this. The result also reports `retrieval`, `truncated` + `capped_by` (say the list is partial), `cached` + `age_ms` (true = rows read on an earlier turn, so claim no freshness) and `thin`. When `orientation` is `live`, `index` is the complete list of phases → scenarios → paths read this turn: name the phase from it, quote counts only from its `scale`, and read future state from its status markers; `unavailable` means you could not check, so claim no absence. Ask for it any time with `include: [\"index\"]`. Follow the `notes` array — each entry is one obligation for THIS result. It has no cards and no Design Status.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -154,7 +158,7 @@
   },
   {
     "name": "github_read",
-    "description": "Read-only, ungated. Read a GitHub repo on the bot's repo list by repo-relative path: a file's contents (DS agent-views, rule docs, AGENTS.md, a component's source, token values under design-system/src/tokens/) or a directory listing (a directory path returns its entries). Use it for any DS component / token / prop / rule-doc fact, to confirm a component exists under design-system/src/components before proposing component_implement, and to ground a review in the actual rule docs. `search` finds where something lives when the path is unknown. `repo` picks the repo; omitted, it is plus-uno. For a GitHub URL a designer pasted, source_read reads it directly.",
+    "description": "Read-only. Read a GitHub repo on the bot's repo list by repo-relative path: a file's contents (DS agent-views, rule docs, AGENTS.md, a component's source, token values under design-system/src/tokens/) or a directory listing (a directory path returns its entries). Use it for any DS component / token / prop / rule-doc fact, to confirm a component exists under design-system/src/components, and to ground a review in the actual rule docs. `search` finds where something lives when the path is unknown. `repo` picks the repo; omitted, it is plus-uno. For a GitHub URL a designer pasted, source_read reads it directly. 'What's the token for X?' is a token value under design-system/src/tokens/, read here — tokens belong to no component, so no component lookup. Confirm a component exists under design-system/src/components before asserting it; Storybook renders client-side and returns nothing, so link Storybook and read GitHub. A repo off the list is refused — say which ones you can reach. plus-uno-blueprint is read for its code, schema and issues; blueprint content is search_blueprint's. Link github.com under the repo you read; a file not fetched this turn → link its folder. A component's name links to its live Storybook docs page (https://plus-uno.netlify.app/storybook/?path=/docs/components-<name-kebab>--docs; `forms-` prefix for form components; unsure of the id → the Storybook root).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -188,7 +192,7 @@
   },
   {
     "name": "github_intake_search",
-    "description": "Read-only, ungated. Search the open GitHub intakes (issues labelled harness-intake, awaiting triage) by keyword, on a listed repo — plus-uno unless `repo` names another. Run it before staging github_issue_create, every time: if an open intake already covers the request, name it by title and link and ask whether to add this to it (a github_issue_update comment) or file a new one anyway — stage the card only on 'file anyway'. No match is not a route: which repo it belongs on unclear → ask, naming the listed ones. The Worker fixes the open state and the label and refuses a repo off its list; you send keywords, and a repo when it is not plus-uno.",
+    "description": "Read-only. Search the open GitHub intakes (issues labelled harness-intake, awaiting triage) by keyword, on a listed repo — plus-uno unless `repo` names another. Run it before staging github_issue_create, every time: if an open intake already covers the request, name it by title and link and ask whether to add this to it (a github_issue_update comment) or file a new one anyway — stage the card only on 'file anyway'. No match is not a route: which repo it belongs on unclear → ask, naming the listed ones. The Worker fixes the open state and the label and refuses a repo off its list; you send keywords, and a repo when it is not plus-uno.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -214,7 +218,7 @@
   },
   {
     "name": "slack_user_profile",
-    "description": "Read-only, ungated. Look up a Slack user — by id for their profile (display name, title/role, email, timezone, status), or by `name` to find who someone is ('Coco', 'Meryem') among active teammates. Use it when you need to know WHO someone is: a member id from slack_channel_members, an @-mention in the thread, a card contributor's Slack identity, a person named for a relayed DM. A name lookup returns every match: one → name them as <@id>; several → ask which one before staging anything; none → say so, never guess. Mention people as <@id> in replies.",
+    "description": "Read-only. Look up a Slack user — by id for their profile (display name, title/role, email, timezone, status), or by `name` to find who someone is ('Coco', 'Meryem') among active teammates. Use it when you need to know WHO someone is: a member id from slack_channel_members, an @-mention in the thread, a card contributor's Slack identity, a person named for a relayed DM. A name lookup returns every match: one → name them as <@id>; several → ask which one before staging anything; none → say so, never guess. Mention people as <@id> in replies.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -232,7 +236,7 @@
   },
   {
     "name": "slack_channel_members",
-    "description": "Read-only, ungated. List a Slack channel's member ids (first 100) — for 'who's in #plus-design', review routing, or checking whether someone is in a channel before referring them there. The bot must be in the channel. Returns ids only; mention them as <@id> (Slack renders names) and use slack_user_profile for the one person whose role you need.",
+    "description": "Read-only. List a Slack channel's member ids (first 100) — for 'who's in #plus-design', review routing, or checking whether someone is in a channel before referring them there. The bot must be in the channel. Returns ids only; mention them as <@id> (Slack renders names) and use slack_user_profile for the one person whose role you need.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -249,7 +253,7 @@
   },
   {
     "name": "slack_thread_read",
-    "description": "Read-only, ungated. Read the messages of a Slack thread you were given a link to, outside this conversation's own memory — to tally handoff sign-offs (dev/PM/stakeholder ✅), read reviewer verdicts, or pull a source discussion to synthesize into findings. Pass the message/thread permalink. The bot must be a member of the channel; a linked thread reads about 50 messages.",
+    "description": "Read-only. Read the messages of a Slack thread you were given a link to, outside this conversation's own memory — to read reviewer verdicts in its messages, or pull a source discussion to synthesize into findings. It returns message text only, never reactions. Pass the message/thread permalink. The bot must be a member of the channel; a linked thread reads about 50 messages.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -266,7 +270,7 @@
   },
   {
     "name": "slack_react",
-    "description": "Direct, ungated. Add an emoji reaction AS UNO-BOT to a message in the current thread — to acknowledge, celebrate, or signal state. Any workspace emoji name without colons ('tada', 'eyes', 'raised_hands', a custom workspace emoji). Reactions are reversible. For a PURE acknowledgement from the user ('thanks', 'got it', 'nice') react and end the turn with no text — the reaction is the whole reply. The gate emoji (white_check_mark, heavy_check_mark, +1, thumbsup, no_entry, x, negative_squared_cross_mark, no_entry_sign) resolve proposal cards, so the tool refuses them. One reaction per message per turn: a second on the same message is refused. With message_ts omitted it reacts to the user's current message.",
+    "description": "Direct. Add an emoji reaction AS UNO-BOT to a message in the current thread — to acknowledge, celebrate, or signal state. Any workspace emoji name without colons ('tada', 'eyes', 'raised_hands', a custom workspace emoji). Reactions are reversible. For a PURE acknowledgement from the user ('thanks', 'got it', 'nice') react and end the turn with no text — the reaction is the whole reply. The gate emoji (white_check_mark, heavy_check_mark, +1, thumbsup, no_entry, x, negative_squared_cross_mark, no_entry_sign) resolve proposal cards, so the tool refuses them. One reaction per message per turn: a second on the same message is refused. With message_ts omitted it reacts to the user's current message.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -287,7 +291,7 @@
   },
   {
     "name": "present",
-    "description": "Ungated, fetches nothing. Show rows a lookup already returned THIS turn beneath your answer, as a sortable table, as cards or as a chart, or flag a conflict between two sources. TABLE: blueprint cells or findings, GitHub issues, Notion results, Slack matches — any list of 3 or more records the reader should scan or compare. Code fills every cell, the caption (count, filters, partial) and the links from that lookup's own rows; you choose the lookup, up to 4 of the fields its rows carry, and the takeaway; a result whose rows can be one says so in `table_ready`, naming those fields. Columns are short fields: long text, lists and bare links are refused, and the first column links to each row's url by itself. At most 30 rows and one table per answer. For Roadmap cards, roadmap_query's as_table does the same. CARDS: linkable items the reader will open — Figma frames, Roadmap cards, Help Center articles, components. One item posts as one card, 2 to 10 as a carousel; more are cut to the first 10. Each card shows the logo of where it leads, a title, a subtitle and link buttons built from the row's own links; rows with no link are left out. Name the title field first in `columns`, then optionally the subtitle field. The result says `table_attached` or `cards_attached`: when true, lead with the takeaway and what stands out, name at most 3 items, and leave the rest to what is attached; when false, its `error` says why, and you list the items in your answer yourself. CHARTS: when the rows hold numbers that compare (cards per Design Status, issues per owner) or trend (sessions per week), ask for shape 'chart' instead, with group_by and, to sum a numeric field rather than count rows, measure. A count that took one lookup per group (roadmap_query once per Design Status) is a chart too: ask with `across` naming the argument the calls differ by, and each call becomes one bar valued at the total that lookup itself reported, rows past its first 30 included. Code counts every value; you never type one. At least 3 groups, at most 2 charts per answer. The result says `chart_attached` and hands back `values` and `total`: lead with the takeaway, and any number you give is one of those. A group_by chart that cannot be grounded (a partial list, too few groups, a field the rows lack) comes back `chart_attached: false` with the rows attached as a table and a line beneath it saying why; an across chart that cannot be (filters that differ between calls) comes back with only the line. A lookup that read only part of its status is still a bar, at the count read; the result names it in `at_least`, and you say 'at least' for it and for any total. CONFLICT: when two sources you read this turn disagree — the blueprint (today) says one thing, a Roadmap card or PRD (the plan) another — give the disagreement as ONE sentence in `line`, naming both sides; code posts it as a ⚠️ line under your answer. One per answer; never type ⚠️ yourself. The result says `warning_attached`; when false, say the conflict in one plain sentence of your prose instead.",
+    "description": "Fetches nothing. Show rows a lookup already returned THIS turn beneath your answer, as a sortable table, as cards or as a chart, or flag a conflict between two sources. TABLE: blueprint cells or findings, GitHub issues, Notion results, Slack matches — any list of 3 or more records the reader should scan or compare. Code fills every cell, the caption (count, filters, partial) and the links from that lookup's own rows; you choose the lookup, up to 4 of the fields its rows carry, and the takeaway; a result whose rows can be one says so in `table_ready`, naming those fields. Columns are short fields: long text, lists and bare links are refused, and the first column links to each row's url by itself. At most 30 rows and one table per answer. For Roadmap cards, roadmap_query's as_table does the same. CARDS: linkable items the reader will open — Figma frames, Roadmap cards, Help Center articles, components. One item posts as one card, 2 to 10 as a carousel; more are cut to the first 10. Each card shows the logo of where it leads, a title, a subtitle and link buttons built from the row's own links; rows with no link are left out. Name the title field first in `columns`, then optionally the subtitle field. The result says `table_attached` or `cards_attached`: when true, lead with the takeaway and what stands out, name at most 3 items, and leave the rest to what is attached; when false, its `error` says why, and you list the items in your answer yourself. CHARTS: when the rows hold numbers that compare (cards per Design Status, issues per owner) or trend (sessions per week), ask for shape 'chart' instead, with group_by and, to sum a numeric field rather than count rows, measure. A count that took one lookup per group (roadmap_query once per Design Status) is a chart too: ask with `across` naming the argument the calls differ by, and each call becomes one bar valued at the total that lookup itself reported, rows past its first 30 included. Code counts every value; you never type one. At least 3 groups, at most 2 charts per answer. The result says `chart_attached` and hands back `values` and `total`: lead with the takeaway, and any number you give is one of those. A group_by chart that cannot be grounded (a partial list, too few groups, a field the rows lack) comes back `chart_attached: false` with the rows attached as a table and a line beneath it saying why; an across chart that cannot be (filters that differ between calls) comes back with only the line. A lookup that read only part of its status is still a bar, at the count read; the result names it in `at_least`, and you say 'at least' for it and for any total. CONFLICT: when two sources you read this turn disagree — the blueprint (today) says one thing, a Roadmap card or PRD (the plan) another — give the disagreement as ONE sentence in `line`, naming both sides; code posts it as a ⚠️ line under your answer. One per answer; never type ⚠️ yourself. The result says `warning_attached`; when false, say the conflict in one plain sentence of your prose instead.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -355,7 +359,7 @@
   },
   {
     "name": "reminder_set",
-    "description": "Direct, ungated. When the person asks you to remind THEM of something ('remind me Thursday to review the PRD', 'remind me in 2 days about this thread'), set it here. Pass `when` as they said it and `what` as a short verb phrase in your own words, no quote ('review the PRD', 'come back to this thread'). It is delivered at the first weekday 9 am ET run on or after that day, in this DM or thread, mentioning only them; they answer 🙌 done or ⏳ snooze. On ok, reply with exactly `confirm` (\"Got it, Thu 9 am ET.\") and nothing else. On `ask`, nothing was set: ask that one question, then call again with their answer. Only for the asker: never set one for someone else. No proposal card.",
+    "description": "Direct. When the person asks you to remind THEM of something ('remind me Thursday to review the PRD', 'remind me in 2 days about this thread'), set it here. Pass `when` as they said it and `what` as a short verb phrase in your own words, no quote ('review the PRD', 'come back to this thread'). It is delivered at the first weekday 9 am ET run on or after that day, in this DM or thread, mentioning only them; they answer 🙌 done or ⏳ snooze. On ok, reply with exactly `confirm` (\"Got it, Thu 9 am ET.\") and nothing else. On `ask`, nothing was set: ask that one question, then call again with their answer. Only for the asker: never set one for someone else. No proposal card.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -377,7 +381,7 @@
   },
   {
     "name": "slack_search",
-    "description": "Read-only, ungated. Search Slack messages to find prior discussion. Results arrive PRE-CLEARED by a Worker-side visibility firewall and are safe to quote as returned. Three modes, reported in result.visibility: 'public-only' (no user credential stored — public channels are the entire search), 'workspace-filtered' (public + team-allowlisted private channels; DMs excluded), and 'requester-own' (active only when the requester has connected their Slack history AND is asking in their own DM with you — results then include their DMs, group DMs and private channels, exactly what they can already see). Requester-own results answer that requester in that DM and stay there. `searched_surfaces` says what was actually looked at. An empty result means nothing matched THERE — scope the absence in the same sentence as the finding ('nothing in the public channels I can see'), and when the result carries `absence_scope`, follow it exactly. `withheld_private_matches` appears ONLY in the requester's own DM, where saying 'there were matches I can't surface' is safe; elsewhere it is absent BY DESIGN, because the count alone tells a room that private material exists — so a missing field is reported as nothing. A `note` with a connect link is offered when the requester wanted wider coverage.",
+    "description": "Read-only. Search Slack messages to find prior discussion. Results arrive PRE-CLEARED by a Worker-side visibility firewall and are safe to quote as returned. Three modes, reported in result.visibility: 'public-only' (no user credential stored — public channels are the entire search), 'workspace-filtered' (public + team-allowlisted private channels; DMs excluded), and 'requester-own' (active only when the requester has connected their Slack history AND is asking in their own DM with you — results then include their DMs, group DMs and private channels, exactly what they can already see). Requester-own results answer that requester in that DM and stay there. `searched_surfaces` says what was actually looked at. An empty result means nothing matched THERE — scope the absence in the same sentence as the finding ('nothing in the public channels I can see'), and when the result carries `absence_scope`, follow it exactly. `withheld_private_matches` appears ONLY in the requester's own DM, where saying 'there were matches I can't surface' is safe; elsewhere it is absent BY DESIGN, because the count alone tells a room that private material exists — so a missing field is reported as nothing. A `note` with a connect link is offered when the requester wanted wider coverage.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -394,7 +398,7 @@
   },
   {
     "name": "read_reference",
-    "description": "Read-only, ungated, zero network cost. Returns one harness document by name from a map baked into the Worker at build time — the skill methods and references that are disclosed behind this tool instead of loaded into every turn. Reach for it when a skill's Worker face names its method (for example `uno-maintain/method`) at the point the turn needs the full procedure, or when a question the loaded documents leave open names a reference. The answer is already in context when the loaded skill face, the persona or the connector docs settle it; a document read this turn stays available for the rest of the turn and is dropped when the turn ends, so a later turn reads it again with one call. A miss returns the map's names, so a second call with one of them is one lookup.",
+    "description": "Read-only, zero network cost. Returns one harness document by name from a map baked into the Worker at build time — the bot skills, scheduled actions and references disclosed behind this tool instead of loaded into every turn. Reach for it when an ask matches a bot skill's or a scheduled action's pointer line (read it by the bold name that opens the line, for example `draft-a-prd`), or when a question the loaded documents leave open names a reference. A document read this turn stays available for the rest of the turn and is dropped when the turn ends, so a later turn reads it again with one call. A miss returns the map's names, so a second call with one of them is one lookup.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -404,14 +408,14 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "The reference's name: the skill and document, e.g. `uno-maintain/method`. A name the map lacks returns the known names."
+          "description": "The reference's name, as its pointer line gives it: a bot skill or scheduled action by its folder (`draft-a-prd`, `sweep`), any other doc by its path (`docs/engineering/operations`). A name the map lacks returns the known names."
         }
       }
     }
   },
   {
     "name": "notion_create",
-    "description": "SIDE EFFECT, routed through the confirmation gate. Create a page or card. Use it for 'file a PRD / intake / card' and for recording a decision. `surface` selects where and what: 'prd' (design or DS-component PRD on the Roadmap board), 'intake' (maintenance intake on the Roadmap board — Product Pillar: Universal + Product Tag: Maintenance), or 'decision' (Decisions DB row under Design HQ, which requires properties.roadmap_card). Put the full drafted document INTO the call — the staged card renders every parameter and is the draft review. Beside the call, write one line naming the surface and asking whether to file. Required properties and body shape follow docs/connectors/notion.md; option names (pillars, OKRs, selects) are exact matches of existing values — the tool reports a mismatch rather than creating one. Keep content grounded in the conversation, with genuine unknowns under an 'Open Questions' section.",
+    "description": "Create a page or card. Use it for 'file a PRD / intake / card' and for recording a decision. `surface` selects where and what: 'prd' (design or DS-component PRD on the Roadmap board), 'intake' (maintenance intake on the Roadmap board — Product Pillar: Universal + Product Tag: Maintenance), 'decision' (Decisions DB row under Design HQ, which requires properties.roadmap_card), or 'marketplace' (the Prototype Marketplace row for one prototype: an existing row with the same name or deployment link is updated, never duplicated). Put the full drafted document INTO the call — the staged card renders every parameter and is the draft review. Beside the call, write one line naming the surface and asking whether to file. Required properties follow the Notion connector overview, and the body is written per read_reference name docs/connectors/notion/page-writing; option names (pillars, OKRs, selects) are exact matches of existing values — the tool reports a mismatch rather than creating one. Keep content grounded in the conversation, with genuine unknowns under an 'Open Questions' section. 'Publish to the marketplace' is surface 'marketplace', one card; shareout_post is the feedback round.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -425,9 +429,10 @@
           "enum": [
             "prd",
             "intake",
-            "decision"
+            "decision",
+            "marketplace"
           ],
-          "description": "Where to file it: 'prd' (feature or DS-component PRD card on the Roadmap board), 'intake' (maintenance/request intake card, Product Pillar: Universal + Product Tag: Maintenance), or 'decision' (Decisions DB row — requires properties.roadmap_card; optional Status/Evidence). Research docs and marketplace entries are created in-IDE, not by the bot."
+          "description": "Where to file it: 'prd' (feature or DS-component PRD card on the Roadmap board), 'intake' (maintenance/request intake card, Product Pillar: Universal + Product Tag: Maintenance), 'decision' (Decisions DB row — requires properties.roadmap_card; optional Status/Evidence), or 'marketplace' (Prototype Marketplace row — title is the prototype's name). Research docs are created in-IDE, not by the bot."
         },
         "title": {
           "type": "string",
@@ -460,14 +465,14 @@
         },
         "acceptance_criteria": {
           "type": "array",
-          "description": "For 'prd'/'prd' (component PRDs included): checklist rendered as Notion to-do checkboxes (read downstream by component_implement / prototype_scaffold). Inline Markdown renders: **bold**, `code`, [label](url).",
+          "description": "For 'prd'/'prd' (component PRDs included): checklist rendered as Notion to-do checkboxes. Inline Markdown renders: **bold**, `code`, [label](url).",
           "items": {
             "type": "string"
           }
         },
         "properties": {
           "type": "object",
-          "description": "Surface-specific card properties as key→value, exact-matched against the live schema by the tool (PRD: product_pillar; intake: evidence_link, suggested_tier; decision: roadmap_card [required], status, evidence). Only include what the conversation supports; never invent option names.",
+          "description": "Surface-specific card properties as key→value, exact-matched against the live schema by the tool (PRD: product_pillar; intake: evidence_link, suggested_tier; decision: roadmap_card [required], status, evidence; marketplace: description, stage [Low-fi · Mid-fi · High-fi], deployment_url, project_card [Roadmap card link, number or exact title], contributors [names or Notion user ids], loom, repo_path, local_path, figma_replica [optional]). For marketplace, ask once for whichever of these the conversation lacks before staging; the Roadmap rollups (pillar, design status, Roadmap ID) fill themselves from project_card. Only include what the conversation supports; never invent option names.",
           "additionalProperties": true
         },
         "source_url": {
@@ -479,7 +484,7 @@
   },
   {
     "name": "notion_update",
-    "description": "SIDE EFFECT, routed through the confirmation gate. Update an existing Notion page or card. Use it for 'update / append to this card', for 'fix / correct / rewrite that section', and for property changes ('set Dev Status to…', 'assign Max'). Works on ANY page or database the bot is shared on — Roadmap cards, Decisions DB rows, per-person running-notes pages, any DB. Three uses, combinable: (1) change PROPERTIES via `properties` — the tool reads the page's live database schema, matches your property name case/space/underscore-insensitively and writes by the real type, so 'Dev Status', a Date, a Person, a URL, a number and a checkbox all work; a select/status value that is not an existing option is reported back rather than created. (2) append narrative blocks via `append` — added at the end of the body. (3) rewrite a block WHERE IT STANDS via `replace` — cite the block id and the exact `edited` stamp from this page's `blocks` index in a source_read, and the tool refuses the write, unchanged, if the block moved since you read it. Prefer `replace` when the ask is to correct something the page already says: appending a contradicting section leaves both readings on the page. Nothing is ever deleted, and everything outside the named blocks is untouched. Pass the page URL. For notion_update the Worker renders the linked card and a current → new diff itself, so the preview is just the warm lead.",
+    "description": "Update an existing Notion page or card. Use it for 'update / append to this card', for 'fix / correct / rewrite that section', and for property changes ('set Dev Status to…', 'assign Max'). Works on ANY page or database the bot is shared on — Roadmap cards, Decisions DB rows, per-person running-notes pages, any DB. Three uses, combinable: (1) change PROPERTIES via `properties` — the tool reads the page's live database schema, matches your property name case/space/underscore-insensitively and writes by the real type, so 'Dev Status', a Date, a Person, a URL, a number and a checkbox all work; a select/status value that is not an existing option is reported back rather than created. (2) append narrative blocks via `append` — added at the end of the body. (3) rewrite a block WHERE IT STANDS via `replace` — cite the block id and the exact `edited` stamp from this page's `blocks` index in a source_read, and the tool refuses the write, unchanged, if the block moved since you read it. Prefer `replace` when the ask is to correct something the page already says: appending a contradicting section leaves both readings on the page. Nothing is ever deleted, and everything outside the named blocks is untouched. Pass the page URL. For notion_update the Worker renders the linked card and a current → new diff itself, so the preview is just the warm lead. A question about a property ('assigned to Max?', 'is Dev Status still Triage?') is answered in words with nothing staged; call this when someone asks for the change ('set it to…', 'assign Max').",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -559,7 +564,7 @@
   },
   {
     "name": "notion_archive",
-    "description": "SIDE EFFECT, routed through the confirmation gate. Archive (soft-delete) a Notion page or card. Use it for 'archive this card', 'delete that', 'remove that card', 'undo' on a page the designer names or one the bot created. Works on any page the bot can reach. Archiving moves the page to Notion's trash, which is recoverable; the ✅ gate plus requester identity are the safety. Pass the page URL — typically the link the bot posted when it created the card.",
+    "description": "Archive (soft-delete) a Notion page or card. Use it for 'archive this card', 'delete that', 'remove that card', 'undo' on a page the designer names or one the bot created. Works on any page the bot can reach. Archiving moves the page to Notion's trash, which is recoverable; the confirmation plus requester identity are the safety. Pass the page URL — typically the link the bot posted when it created the card.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -575,62 +580,8 @@
     }
   },
   {
-    "name": "component_implement",
-    "description": "SIDE EFFECT, routed through the confirmation gate. Open a draft PR that implements a named design-system component change, by triggering the figma-implement GitHub Action. Use it when the designer names a specific DS-library component with clear build/update intent ('implement Badge', 'go ahead with the Badge change') — the ask names a component, so the call carries a component name, a PRD and optional notes. Two prerequisites, checked before staging: the component exists under design-system/src/components (github_read confirms it), and a Notion PRD is in hand — if the thread's root links one the Worker reads it from there, otherwise ask for the PRD link and pass it as notion_prd_url. A Figma library publish is not this tool's ask: uno-bot posts its own card for that in #plus-universal. With either missing, say which and stage nothing. 'Check / look at / compare' a component is a question, answered in words.",
-    "input_schema": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "component"
-      ],
-      "properties": {
-        "component": {
-          "type": "string",
-          "description": "The component name as it appears in the Figma library, exact casing (e.g. 'Badge', 'Button', 'CardSurface')."
-        },
-        "notion_prd_url": {
-          "type": "string",
-          "description": "The Notion PRD link for this change. Read automatically when the thread's root links a PRD — only set this when the designer pastes a PRD link themselves."
-        },
-        "notes": {
-          "type": "string",
-          "description": "Optional free-form implementation notes from the designer. Pass through verbatim if present; omit otherwise."
-        }
-      }
-    }
-  },
-  {
-    "name": "prototype_scaffold",
-    "description": "SIDE EFFECT, routed through the confirmation gate. Scaffold a NEW prototype under prototypes/{slug}/ from a Figma design (page, screen or flow), by triggering the figma-implement-design GitHub Action to open a draft PR. Use it when the designer pastes a Figma URL and asks to build or prototype it ('build this <figma.com/…>', 'scaffold a prototype for this frame'); the URL must carry a node-id. A PRD is required at every fidelity (method §0): a Notion PRD URL goes in notion_prd_url; an inline PRD pasted this turn satisfies the gate with the parameter omitted. With no PRD, say one is required and route to uno-synthesize. Confirm fidelity first ('hi-fi via the DS library, or a quick mid-fi draft?'), and name what the brief leaves open (an unspecified state, a filter whose semantics could go two ways) either as a question or in the preview bullets so the ✅ is informed.",
-    "input_schema": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "figma_url"
-      ],
-      "properties": {
-        "figma_url": {
-          "type": "string",
-          "description": "Full Figma URL the designer pasted, e.g. 'https://www.figma.com/design/NUcRDZUzUiuVmx1ydNXpl3/APPLICATION-PROTOTYPES?node-id=158-21725'. Must contain a node-id query param."
-        },
-        "notion_prd_url": {
-          "type": "string",
-          "description": "Optional. Full notion.so URL of a PRD for this prototype, if the designer has one. Never invent it; omit if they choose to skip."
-        },
-        "slug": {
-          "type": "string",
-          "description": "Optional kebab-case folder name for prototypes/{slug}/. Must match ^[a-z0-9][a-z0-9-]{1,40}$. If omitted, derived from the Figma node name."
-        },
-        "notes": {
-          "type": "string",
-          "description": "Optional free-form implementation notes from the designer. Pass through verbatim."
-        }
-      }
-    }
-  },
-  {
     "name": "shareout_post",
-    "description": "SIDE EFFECT (it pings people), routed through the confirmation gate. Share a prototype, design or PRD with the team FOR FEEDBACK — the 'publish' / 'share out' / 'post for feedback' / 'surface this for review' action. Posts the share-out to #plus-design-feedback in the team's documented shape (docs/connectors/slack.md § Share-out post): project + artifact + fidelity + round, what it is, what changed, up to three specific questions, what is out of scope, the link, and @-mentioned reviewers. Stage IMMEDIATELY with whatever links are in hand: the confirmation card itself flags anything missing from the bundle (Loom / live preview / Decisions link) and the user's ✅ is informed consent to post without them (policy 2026-07-16).",
+    "description": "It pings people. Share a prototype, design or PRD with the team FOR FEEDBACK — the 'share out' / 'post for feedback' / 'surface this for review' action ('surface' is Slack's verb here, not the Surface component). Publishing to the Prototype Marketplace is notion_create's surface 'marketplace'. Posts the share-out to #plus-design-feedback in the team's documented shape (read_reference name docs/connectors/slack/shapes, § Share-out post): project + artifact + fidelity + round, what it is, what changed, up to three specific questions, what is out of scope, the link, and @-mentioned reviewers. Stage IMMEDIATELY with whatever links are in hand: the confirmation card itself flags anything missing from the bundle (Loom / live preview / Decisions link) and the user's ✅ is informed consent to post without them (policy 2026-07-16).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -698,46 +649,8 @@
     }
   },
   {
-    "name": "email_send",
-    "description": "SIDE EFFECT (sends a real email), routed through the confirmation gate. Send an email via Gmail on the design team's behalf. Use it to reach someone outside Slack: an external SME or collaborator, a stakeholder who wants a PRD or prototype summary by mail, or a follow-up the designer explicitly asks to send by email. Anything that can stay in Slack stays in Slack. Draft the email conversationally first (recipient, subject, body) and let the designer refine it; invoke once they approve. Recipient addresses come from the designer — ask when unknown.",
-    "input_schema": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "to",
-        "subject",
-        "body"
-      ],
-      "properties": {
-        "to": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "minItems": 1,
-          "description": "Recipient email address(es). Never invent — use addresses the designer provided."
-        },
-        "cc": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Optional CC email address(es)."
-        },
-        "subject": {
-          "type": "string",
-          "description": "Email subject line."
-        },
-        "body": {
-          "type": "string",
-          "description": "Email body, written in standard Markdown — the same dialect as everywhere else. The Worker sends it as both plain text and HTML, so **bold**, _italic_, `code`, - bullets, 1. numbered, [label](url) links, > quotes, ```fenced code``` and --- dividers all render. Write it out fully — no placeholders. This is outward mail to someone outside the team: greeting, the point up front, and a sign-off."
-        }
-      }
-    }
-  },
-  {
     "name": "dm_relay",
-    "description": "SIDE EFFECT (sends a real Slack DM), routed through the confirmation gate. A relayed DM: pass something to a named person as a DM, on the requester's behalf — 'send this to Coco', 'pass this along to <@U…>'. One call per recipient; several recipients are several calls in the same reply, which stage as one card. `recipient` is a Slack user id: take it from an @-mention in the thread, or resolve a name first with slack_user_profile's `name` lookup, and when a name matches more than one person ask which one instead of staging. The Worker opens the DM with who asked and closes it with a link back to this conversation — write neither yourself. Carry only what is visible in this conversation; private material from any other space never travels in a relay.",
+    "description": "It sends a real Slack DM. A relayed DM: pass something to a named person as a DM, on the requester's behalf — 'send this to Coco', 'pass this along to <@U…>'. One call per recipient; several recipients are several calls in the same reply, which stage as one card. `recipient` is a Slack user id: take it from an @-mention in the thread, or resolve a name first with slack_user_profile's `name` lookup, and when a name matches more than one person ask which one instead of staging. The Worker opens the DM with who asked and closes it with a link back to this conversation — write neither yourself. Carry only what is visible in this conversation; private material from any other space never travels in a relay.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -759,7 +672,7 @@
   },
   {
     "name": "github_issue_create",
-    "description": "SIDE EFFECT (creates a real issue on a listed GitHub repo), routed through the confirmation gate. File an intake as a GitHub issue on the listed repo whose purpose matches what would change — uno-bot or the harness (skills, persona, harness docs, rubrics) on plus-uno, the marketing site on plus-marketing-website, the service-blueprint app's code or schema on plus-uno-blueprint; unclear which, ask before staging. Use it when someone asks to track, file or report such a problem — 'track this on GitHub', 'file an issue for someone to fix'. Run github_intake_search on the same repo first, and stage this only when no open intake covers the request or the requester chose to file anyway. Product and design maintenance (a DS component, a product flow, a design doc) is a Roadmap intake card (notion_create, surface 'intake') instead; say which surface and repo you chose so the requester can redirect it. Beside the call, write one line naming the repo and asking whether to file. You write the title, the body and the repo — the Worker refuses a repo off its list, sets the triage labels and appends a footer naming the requester and linking this thread. The card says whether the repo is public; write every intake as if anyone can read it: content from a DM or private channel other than this conversation never goes in it.",
+    "description": "It creates a real issue on a listed GitHub repo. File an intake as a GitHub issue on the listed repo whose purpose matches what would change — uno-bot or the harness (skills, persona, harness docs, rubrics) on plus-uno, the marketing site on plus-marketing-website, the service-blueprint app's code or schema on plus-uno-blueprint; unclear which, ask before staging. Use it when someone asks to track, file or report such a problem — 'track this on GitHub', 'file an issue for someone to fix'. Run github_intake_search on the same repo first, and stage this only when no open intake covers the request or the requester chose to file anyway. Product and design maintenance (a DS component, a product flow, a design doc) is a Roadmap intake card (notion_create, surface 'intake') instead; say which surface and repo you chose so the requester can redirect it. Beside the call, write one line naming the repo and asking whether to file. You write the title, the body and the repo — the Worker refuses a repo off its list, sets the triage labels and appends a footer naming the requester and linking this thread. The card says whether the repo is public; write every intake as if anyone can read it: content from a DM or private channel other than this conversation never goes in it.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -790,7 +703,7 @@
   },
   {
     "name": "github_issue_update",
-    "description": "SIDE EFFECT (writes to a real issue on a listed GitHub repo), routed through the confirmation gate. Follow up on an existing GitHub issue in a listed repo: comment on it ('add this repro to #688'), close it as completed or not planned, or reopen it ('close #688 as done'), and add or remove labels that already exist on the repo ('label #688 bug'). Beside the call, write one line naming the issue and asking whether to go ahead. One call per issue, carrying every change asked for on it; several issues are several calls in the same reply, which stage as one card. Never the triage outcomes ready-for-agent, ready-for-human or wontfix, either way — those are a maintainer's decision, so say so instead of staging. The Worker refuses a repo off its list and a label the repo lacks, and appends a footer naming the requester to every comment — write the comment only. The card says whether the repo is public; write every comment as if anyone can read it: content from a DM or private channel other than this conversation never goes in one.",
+    "description": "It writes to a real issue on a listed GitHub repo. Follow up on an existing GitHub issue in a listed repo: comment on it ('add this repro to #688'), close it as completed or not planned, or reopen it ('close #688 as done'), and add or remove labels that already exist on the repo ('label #688 bug'). Beside the call, write one line naming the issue and asking whether to go ahead. One call per issue, carrying every change asked for on it; several issues are several calls in the same reply, which stage as one card. Never the triage outcomes ready-for-agent, ready-for-human or wontfix, either way — those are a maintainer's decision, so say so instead of staging. The Worker refuses a repo off its list and a label the repo lacks, and appends a footer naming the requester to every comment — write the comment only. The card says whether the repo is public; write every comment as if anyone can read it: content from a DM or private channel other than this conversation never goes in one.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -843,7 +756,7 @@
   },
   {
     "name": "github_workflow_run",
-    "description": "SIDE EFFECT (starts a real GitHub Actions run), routed through the confirmation gate. Run a workflow the bot's repo list allows on a listed repo — 're-sync Notion on the marketing site' (sync-notion.yml on plus-marketing-website), 'run the render walk on the blueprint' (render-walk.yml on plus-uno-blueprint). Only a workflow named for that repo on the list can run; anything else is refused before a card, and the refusal names the allowed ones. Never a stand-in for component_implement or prototype_scaffold. It always runs on the repo's default branch and takes no inputs. The card shows the repo, the workflow and that branch; past the ✅ the thread gets the workflow's runs page.",
+    "description": "It starts a real GitHub Actions run. Run a workflow the bot's repo list allows on a listed repo — 're-sync Notion on the marketing site' (sync-notion.yml on plus-marketing-website), 'run the render walk on the blueprint' (render-walk.yml on plus-uno-blueprint). Only a workflow named for that repo on the list can run; anything else is refused before a card, and the refusal names the allowed ones. It always runs on the repo's default branch and takes no inputs. The card shows the repo, the workflow and that branch; past the ✅ the thread gets the workflow's runs page.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

@@ -28,8 +28,8 @@
 //   <X>. Did you get it?", once, in the thread; unanswered by its next due
 //   date, it lapses. C6: a proposal card in the thread offering to post a note,
 //   decided from Review — Approve runs `sweep_share_post` with a reworded note
-//   (`./copy.ts`) in #plus-universal for the design system, #plus-design
-//   otherwise (`shareDestination`), and Reject drops it. That Approve, by the
+//   (`./copy.ts`) in #plus-universal for the design system, the Universal team's work,
+//   and #plus-design otherwise (`shareDestination`), and Reject drops it. That Approve, by the
 //   person the DM is with, is the only way anything found in a DM reaches a
 //   channel. Each raise
 //   card holds a slot of its own (`raiseSlot`). A thread gets one raise, and a
@@ -51,6 +51,7 @@
 // PURE: every dependency is injected (tests/dm-sweep.test.ts); `Env` enters in
 // `./env.ts`.
 
+import { channelIdOf, type ChannelIds } from "../destination/index";
 import { rethrowIfBudget } from "../net";
 import { reminderAnswer, reminderBlocks, TAP_REFUSED, type TapAnswer } from "../commitments/copy";
 import { dayLabel, etDayOf, rearmedDueAt, TEXT_KEEP_MS } from "../commitments/due";
@@ -323,7 +324,7 @@ export interface DmMorningDeps {
   threadState: Pick<ThreadState, "putProposal">;
   proposalEvents: ProposalEventLog;
   /** The team channels a raise note may go to, and #uno-bot, which it never does. */
-  channels: { plusDesign?: string; plusUniversal?: string; unoBot?: string };
+  channels: ChannelIds;
   dryRun?: boolean;
 }
 
@@ -379,8 +380,8 @@ async function dueOne(deps: DmMorningDeps, c: CommitmentRecord, now: number, run
 
   if (c.kind !== "dm_disagreement" || !text.raise) return lapse("refused", `not a DM ask this Worker knows (${c.kind})`);
   const to = text.raise.to;
-  const channel = (to === "plus-universal" ? deps.channels.plusUniversal : deps.channels.plusDesign)?.trim();
-  if (!channel || channel === deps.channels.unoBot?.trim()) return lapse("refused", `no ${to} channel to raise it in`);
+  const channel = channelIdOf(to, deps.channels);
+  if (!channel) return lapse("refused", `no ${to} channel to raise it in`);
   const { card, operations } = raiseCard({ when, topic: text.what, sources: text.raise.sources, channel, to });
   if (deps.dryRun) return { id: c.id, action: "nudged", text: DM_WITHHELD };
   const sent = await deps.slack.postCard(place, card, { event_type: DM_RAISE_EVENT, event_payload: { id: c.id } });

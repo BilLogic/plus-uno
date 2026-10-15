@@ -15,6 +15,7 @@
 //
 // A Worker with either binding missing reads no DM and posts nothing.
 
+import { channelIdsFor } from "../destination/env";
 import type { Env } from "../types";
 import { selectProvider } from "../agent/run-agent";
 import { rethrowIfBudget } from "../net";
@@ -109,11 +110,7 @@ export function dmAsksFor(
     },
     threadState: threadStateFor(env),
     proposalEvents: proposalEventLogFor(env),
-    channels: {
-      plusDesign: env.PLUS_DESIGN_CHANNEL_ID,
-      plusUniversal: env.PLUS_UNIVERSAL_CHANNEL_ID,
-      unoBot: env.UNO_BOT_CHANNEL_ID,
-    },
+    channels: channelIdsFor(env),
     dryRun: opts.dryRun,
   });
 }

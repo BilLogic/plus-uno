@@ -19,6 +19,7 @@
 //
 // PURE: no `Env`, no Workers global.
 
+import type { ChannelRole } from "../destination/index";
 import type { ChannelKind } from "../sweep/finding";
 
 /**
@@ -242,7 +243,7 @@ export interface CommitmentText {
   onCard?: boolean;
   /** A `dm_disagreement`'s two sources, in the detector's short names, and
    *  the team channel its note would go to. `what` holds the topic. */
-  raise?: { sources: [string, string]; to: "plus-design" | "plus-universal" };
+  raise?: { sources: [string, string]; to: ChannelRole };
 }
 
 /** The KV half. */

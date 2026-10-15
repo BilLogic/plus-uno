@@ -7,10 +7,14 @@
 //   • Figma: the one client (`figmaClientFor`), paced and backing off on 429;
 //   • Slack: a debug route's card posts in a test channel (`TEST_CHANNEL_IDS`,
 //     `devLinksDebugChannel`), never a team channel; the morning's card, for
-//     the library PRs merged since the last, goes on the sweep's #plus-design
-//     message (`./morning.ts`), and #plus-design's members decide it;
+//     the PRs merged into main since the last that changed a component, goes
+//     on the sweep's #plus-design message (`./morning.ts`), and #plus-design's
+//     members decide it;
+//   • GitHub: the PRs merged into main and their changed files, read through
+//     the metered client (`githubLibraryReads`) by the feed (`./feed.ts`);
 //   • KV: the cards posted and the message each is in, so a later run never
-//     offers one twice while it is undecided (`./run.ts` reads its report);
+//     offers one twice while it is undecided (`./run.ts` reads its report),
+//     and the last merged PR the card covered (`SEEN_KV_KEY`);
 //   • the meter: a run stages its one card only when its D1 and subrequest
 //     budget allow (`budgetHeadroom`), and Approve writes only the Figma calls
 //     this invocation has room for;
@@ -18,7 +22,7 @@
 //     (`runDevLinksWriteJobOnEnv`), so it never queues behind a person's turn.
 
 import type { Env } from "../types";
-import { budgetHeadroom } from "../net";
+import { budgetHeadroom, rethrowIfBudget } from "../net";
 import { devLinksStopped } from "./copy";
 import { postMessage, updateMessage } from "../slack/api";
 import { figmaClientFor } from "../figma/production";
@@ -33,7 +37,8 @@ import { teamPostChannel } from "../usage/record";
 import type { JobContext } from "../scheduled/runs";
 import { sectionHandOffIn, type SweepSection } from "../sweep/sections";
 import { devLinksOn } from "./gate";
-import { DEV_LINKS_SECTION, devLinksSection, handOverDevLinks, MERGED_THROUGH_KV_KEY, type DevLinksHanded } from "./morning";
+import { DEV_LINKS_SECTION, devLinksSection, handOverDevLinks, SEEN_KV_KEY, type DevLinksHanded } from "./morning";
+import type { SeenMark } from "./feed";
 import {
   planDevLinksCard,
   runDevLinksPost,
@@ -123,8 +128,8 @@ export async function runDevLinksOnEnv(env: Env, request: DevLinksRequest, opts:
 }
 
 /**
- * The morning's hand-over of a Dev Mode links card for the library PRs merged
- * since the last, on `Env`.
+ * The morning's hand-over of a Dev Mode links card for the PRs merged into
+ * main since the last that changed a component, on `Env`.
  *
  * @param env - Worker bindings
  * @param ctx - The morning run
@@ -136,11 +141,17 @@ export async function runDevLinksMorningOnEnv(env: Env, ctx: JobContext): Promis
   if ("refused" in deps) return { summary: deps.refused };
   const target = resolveRepoFor(env, undefined);
   if (!target.ok) return { summary: `no repo: ${target.error}` };
+  const reads = githubLibraryReads(env, target.entry);
   return handOverDevLinks(
     {
       on: devLinksOn(env.FIGMA_DEV_LINKS),
-      closedPulls: (since) => githubLibraryReads(env, target.entry).closedPulls(since),
-      mergedThrough: kvJson<string | null>(env, MERGED_THROUGH_KV_KEY, null),
+      feed: {
+        mergedPulls: () => reads.mergedPulls("main"),
+        pullFiles: (n) => reads.pullFiles(n),
+        // The plan's own registry read, shared: one subrequest for both.
+        registry: deps.registry,
+        mark: kvJson<SeenMark | null>(env, SEEN_KV_KEY, null),
+      },
       plan: (request) => planDevLinksCard(deps, request),
       members: deps.members,
       ...(ctx.runStorage ? { handOff: sectionHandOffIn<DevLinksHanded>(ctx.runStorage, DEV_LINKS_SECTION) } : {}),
@@ -179,7 +190,7 @@ export function devLinksSectionFor(env: Env, ctx: JobContext): SweepSection | un
         await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks, ...(message.metadata ? { metadata: message.metadata } : {}) });
       },
       carded: kvJson<Record<string, CardedMark> | null>(env, CARDED_KV_KEY, null),
-      mergedThrough: kvJson<string | null>(env, MERGED_THROUGH_KV_KEY, null),
+      mark: kvJson<SeenMark | null>(env, SEEN_KV_KEY, null),
       now: () => Date.now(),
     },
     sectionHandOffIn<DevLinksHanded>(ctx.runStorage, DEV_LINKS_SECTION),

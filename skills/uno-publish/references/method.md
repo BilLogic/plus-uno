@@ -1,11 +1,10 @@
 ---
-embodiment: all
-disclosure: reference
-summary: uno-publish — the shared procedure both faces load.
+embodiment: ide
+summary: uno-publish — the procedure SKILL.md loads on invocation.
 ---
 
-<!-- Runtime-neutral core — loaded by both faces (SKILL.md in the IDE, bot.md on the Worker).
-     WHAT must happen and which gates hold; WHO executes each step lives in the faces. -->
+<!-- Runtime-neutral core — loaded by SKILL.md on invocation.
+     WHAT must happen and which gates hold; WHO executes each step lives in SKILL.md. -->
 
 # uno-publish — method
 
@@ -46,7 +45,7 @@ Publish never writes its own study guide and never analyzes the session.
 
 ### Share-out
 
-Draft a directed feedback prompt — specific, stage-appropriate questions, never "thoughts?". Post shape, question cap (≤3 plus a NOT-looking-for line), and channel: `docs/connectors/slack.md`. Distribution is uno-bot's job.
+Draft a directed feedback prompt — specific, stage-appropriate questions, never "thoughts?". Post shape, question cap (≤3 plus a NOT-looking-for line), and channel: `docs/connectors/slack/shapes.md`. Distribution is uno-bot's job.
 
 ### Close the round
 
@@ -63,8 +62,8 @@ Linear and gated; the order is load-bearing.
    - The **blueprint half always routes through `skills/uno-maintain`** (this skill holds no blueprint write access), citing the confirmed handoff as pre-authorization — maintain's handoff-pre-authorized path applies (its method §6). Paired-write rules: `docs/connectors/supabase/overview.md`.
    - Rails writes with **no** live handoff are ordinary maintain intakes — full human gate, no pre-authorization.
 4. **Review gate — DS / UNO / a11y.** Run through `skills/uno-review`: design-system compliance, harness consistency (the spec agrees with what step 3 just wrote), accessibility. Review diagnoses; fixes go back through prototyping — they don't happen here.
-5. **Sign-off — the human gate.** The developer, the PM, and the stakeholder each ✅ in the handoff thread (reviewer-verdict convention: `docs/connectors/slack.md`). **No sign-off, no publish.** Two of three is not enough, and nobody proxies a missing one.
-6. **Marketplace entry.** First verify step 3 **landed** — storybook committed, blueprint update applied (or its maintain intake's thread shows it applied); propagation in flight blocks registration. Then register the finished package in the notion-marketplace DB (live; schema + publish procedure: `skills/uno-publish/references/notion-marketplace-db.md`, conventions: `docs/connectors/notion.md`). The entry is schema-validated before it lands — all required fields present, enums exact-match. Registration runs in-IDE via `writers/notion`; the Worker only searches the catalog.
+5. **Sign-off — the human gate.** The developer, the PM, and the stakeholder each ✅ in the handoff thread (reviewer-verdict convention: `docs/connectors/slack/overview.md`). **No sign-off, no publish.** Two of three is not enough, and nobody proxies a missing one.
+6. **Marketplace entry.** First verify step 3 **landed** — storybook committed, blueprint update applied (or its maintain intake's thread shows it applied); propagation in flight blocks registration. Then register the finished package in the notion-marketplace DB (live; schema + publish procedure: `docs/connectors/notion/marketplace-db.md`, conventions: `docs/connectors/notion/overview.md`). The entry is schema-validated before it lands — all required fields present, enums exact-match. In-IDE, registration runs via `writers/notion`; in Slack, the bot publishes it with `notion_create(surface: "marketplace")` on one ✅ card.
 
 ## Boundaries
 

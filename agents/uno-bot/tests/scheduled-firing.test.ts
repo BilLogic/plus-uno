@@ -167,7 +167,7 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
     ["figma-drift-post", "figma-drift-post"],
     // The week's tidy-up cards an earlier message had no room for.
     ["figma-tidy-post", "figma-tidy-post"],
-    // A Dev Mode links card for the library PRs merged since the last.
+    // A Dev Mode links card for the component PRs merged since the last.
     ["figma-dev-links-post", "figma-dev-links-post"],
     ["sweep-post", "sweep-post"],
     ["team-roles-sync", "team-roles-sync"],

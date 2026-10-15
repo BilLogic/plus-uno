@@ -50,12 +50,12 @@ test("a required secret that is not set is reported missing", () => {
 });
 
 test("an optional secret that is not set is NOT missing — it degrades by design", () => {
-  // GMAIL_* unset means send_email reports "not configured". That is the
-  // intended state, not an incident, and reporting it as missing would train
-  // whoever runs this to ignore the output.
+  // SUPABASE_ANON_KEY unset means search_blueprint reports "not configured".
+  // That is the intended state, not an incident, and reporting it as missing
+  // would train whoever runs this to ignore the output.
   const { missing, optionalUnset } = classify([]);
-  assert.ok(!missing.includes("GMAIL_SENDER"));
-  assert.ok(optionalUnset.includes("GMAIL_SENDER"));
+  assert.ok(!missing.includes("SUPABASE_ANON_KEY"));
+  assert.ok(optionalUnset.includes("SUPABASE_ANON_KEY"));
 });
 
 test("a live secret nobody declared is reported — the #288 case", () => {

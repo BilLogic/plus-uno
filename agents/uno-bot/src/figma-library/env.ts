@@ -1,8 +1,7 @@
 // The library snapshot refresh bound to `Env` — the only file in the folder
 // that names it. The refresh (`./snapshot-refresh.ts`) reads what the poll
 // (`../figma-poll.ts`) left owed in HARNESS_KV, reads the repo's snapshot from
-// GitHub, and sends `repository_dispatch` with GITHUB_TOKEN, the way
-// `component_implement` starts `figma-implement.yml`.
+// GitHub, and sends `repository_dispatch` with GITHUB_TOKEN.
 //
 // The repo is `GITHUB_REPO`, the harness repo: the snapshot lives there, and a
 // refresh that keeps not landing files its `automation-blocked` issue there.

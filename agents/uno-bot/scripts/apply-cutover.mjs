@@ -110,9 +110,7 @@ export function edits(values) {
     { file: ".github/workflows/uno-bot-deploy.yml", from: `"${OLD.account}"`, to: `"${values.account}"`, count: 1,
       why: "CLOUDFLARE_ACCOUNT_ID on the deploy job" },
     { file: "agents/uno-bot/slack-app-manifest.yaml", from: OLD.host, to: host, count: null,
-      why: "the OAuth redirect plus the events and interactivity request URLs — pasted by hand into Slack afterwards (ADR-024)" },
-    { file: "agents/uno-bot/slack-app-manifest-commands.yaml", from: OLD.host, to: host, count: null,
-      why: "the nine command URLs, same paste" },
+      why: "the OAuth redirect, the events and interactivity request URLs and the three command URLs — pasted by hand into Slack afterwards (ADR-024)" },
   ];
 }
 

@@ -35,12 +35,9 @@ import { executeSlackUserProfile, executeSlackChannelMembers } from "../tools/sl
 import { executeSlackReact } from "../tools/slack-react";
 import { executeReminderSet } from "../tools/reminder-set";
 import { readReference } from "../tools/read-reference";
-import { executeImplement } from "../tools/implement";
-import { executeImplementDesign } from "../tools/implement-design";
 import { executeNotionCreate } from "../tools/notion-create";
 import { executeNotionUpdate } from "../tools/notion-update";
 import { executeNotionArchive } from "../tools/notion-archive";
-import { executeSendEmail } from "../tools/send-email";
 import { executeShareForFeedback } from "../tools/share-for-feedback";
 import { executeRelayDm, relayMemoryFor, relaySlackFor } from "../tools/relay-dm";
 import { executeGithubIssueCreate } from "../tools/github-issue";
@@ -85,10 +82,7 @@ export const TOOL_BODIES: Record<ToolName, ToolBody> = {
   notion_create: (env, input, slack) => executeNotionCreate(env, input, slack),
   notion_update: (env, input, slack) => executeNotionUpdate(env, input, slack),
   notion_archive: (env, input, slack) => executeNotionArchive(env, input, slack),
-  component_implement: (env, input, slack) => executeImplement(env, input, slack),
-  prototype_scaffold: (env, input, slack) => executeImplementDesign(env, input, slack),
   shareout_post: (env, input, slack) => executeShareForFeedback(env, input, slack),
-  email_send: (env, input, slack) => executeSendEmail(env, input, slack),
   dm_relay: (env, input, slack) => executeRelayDm({ slack: relaySlackFor(env), memory: relayMemoryFor(env) }, input, slack),
   github_issue_create: (env, input, slack) => executeGithubIssueCreate(env, input, slack),
   github_issue_update: (env, input, slack) => executeGithubIssueUpdate(env, input, slack),

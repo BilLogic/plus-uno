@@ -1,5 +1,5 @@
 // The weekly Figma tidy-up's checks: each listed file against the Roadmap
-// cards its title names (`docs/connectors/figma.md` § Agent duties in the
+// cards its title names (`docs/connectors/figma/overview.md` § Agent duties in the
 // workspace, the hygiene checklist).
 //
 //   • WRONG FOLDER — the file's stage folder doesn't match its card's stage,

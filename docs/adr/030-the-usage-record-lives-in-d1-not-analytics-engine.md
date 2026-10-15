@@ -60,6 +60,8 @@ Three jobs, from the spec (#742):
   (ADR-020, the 2026-09-29 amendment).
 - Channel request text past its classification, and in any case past 14 days.
 - Secrets and tokens.
+- The text of a disclosed reference. `turns.references_read` (0015) stores the
+  names `read_reference` served, never what they say.
 
 The first migration stores no message text at all: the row carries ids, times,
 counts, names of tools, and the *kinds* of source an answer linked to (Notion,

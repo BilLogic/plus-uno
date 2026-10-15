@@ -1,17 +1,16 @@
 /**
  * The overlap guard — one rule, one home.
  *
- * A skill is two faces over one method (`AGENTS.md` § Skills; the placement rule
- * is `skills/README.md` § Where content goes). The contract has a measurable
+ * A skill is `SKILL.md` over one method (`AGENTS.md` § Skills; the placement
+ * rule is `skills/README.md` § Where content goes). The contract has a measurable
  * invariant — a rule states itself once — and until now nothing measured it. Two
  * places a rule can live is two places it can drift, and the only thing holding
  * the six skills apart was whoever wrote them remembering the split (#162).
  *
- * WHAT IT COMPARES, SCOPE ONE — WITHIN A SKILL. All three pairings, per skill:
- * `references/method.md` against each face, and the two faces against each
- * other. A rule that reached a face from the method is the failure this exists
- * for; a rule that reached one face from the other is the same failure with the
- * method skipped.
+ * WHAT IT COMPARES, SCOPE ONE — WITHIN A SKILL. One pairing per skill:
+ * `references/method.md` against `SKILL.md`. A rule that reached `SKILL.md`
+ * from the method is the failure this exists for. (Until the bot skills
+ * replaced them, each skill had a second, Slack-side file and three pairings.)
  *
  * WHAT IT COMPARES, SCOPE TWO — ACROSS THE BUNDLE (#174). Every bundled doc
  * against every other: 21 docs, 210 pairs. One rule, one home is not a fact
@@ -23,28 +22,24 @@
  * `GLOSSARY.md`, and it took a human reading all three to notice.
  *
  * THE BUNDLED SET IS ASKED OF THE BUNDLER, never re-globbed here — see
- * `scripts/lib/bundled-set.mjs`. A second list of members is a list that can
- * disagree with the first, which is the failure `#159` deleted. The cost is
- * that a stale bundle stops this check before it counts anything; the shared
- * module says so in those words rather than reporting it as an overlap.
+ * `scripts/lib/bundled-set.mjs`, which reads the manifest `assemble()` returns
+ * in-process. A second list of members is a list that can disagree with the
+ * first, which is the failure `#159` deleted. A tree the bundler refuses stops
+ * this check before it counts anything, and the shared module says so in those
+ * words rather than reporting it as an overlap.
  *
- * AND A SHORT SET STOPS IT TOO (#234). Asking the bundler still leaves the
- * answer to be READ BACK, by matching `<!-- path -->` markers in the artifact,
- * and this used to end in `.filter(fs.existsSync)` — every unresolved doc
- * dropped with no error, no warning and no count assertion. Break the marker
- * format and the parse yields one member; 210 pairings become 0; `0 substantive
- * shared line(s)` prints and the check exits 0 having compared nothing. Both
- * halves are now loud: the shared module cross-checks the parse against the
- * bundler's own member count, and the shortfall from disk comes back as
- * `missing` for the report below. The summary says `N of M docs the bundler
- * declares` for the same reason — one number cannot show a narrowing, two can.
+ * A SHORT SET STOPS IT TOO (#234). This used to end in `.filter(fs.existsSync)`
+ * — every unresolved doc dropped with no error, no warning and no count
+ * assertion. The shortfall from disk now comes back as `missing` for the report
+ * below. The summary says `N of M docs the bundler declares` for the same
+ * reason — one number cannot show a narrowing, two can.
  *
  * NOTE THE SCOPES OVERLAP BUT DO NOT NEST. `SKILL.md` is IDE-side and never
  * bundled, so scope one is the only thing that reads it; `AGENTS.md`,
  * `GLOSSARY.md`, `AGENT.md` and the connector docs are bundled and belong to no
- * skill, so scope two is the only thing that reads them. Six `bot.md` files and
- * six `method.md` files sit in both, compared to their own skill by scope one
- * and to the other nineteen docs by scope two.
+ * skill, so scope two is the only thing that reads them. The methods are
+ * IDE-only too, so the scopes now share no doc: scope one reads the six skills,
+ * scope two reads the Worker's corpus, the bot skills among it.
  *
  * THE THRESHOLD, AND WHY IT IS WHERE IT IS. Measured 2026-08-26 across all six
  * skills and all three pairings: 25 lines coincide, and every one is structure — `---`,
@@ -271,15 +266,10 @@ export function auditBundle(files = workerFiles({ tag: 'skill-overlap', notThis:
 const FACES = {
   method: 'references/method.md',
   skill: 'SKILL.md',
-  bot: 'bot.md',
 };
 
-/** The three pairings, named as the contract names them. */
-const PAIRINGS = [
-  ['method', 'bot'],
-  ['method', 'skill'],
-  ['skill', 'bot'],
-];
+/** The one pairing, named as the contract names it. */
+const PAIRINGS = [['method', 'skill']];
 
 const rel = (abs) => path.relative(REPO_ROOT, abs).replace(/\\/g, '/');
 
@@ -341,15 +331,15 @@ const DISCOUNT_NOTE =
  * the reasoning rather than whichever one a migration happened to keep.
  */
 export const REMEDY =
-  '  -> A rule states itself once. Move it to the skill\'s references/method.md and let both' +
-  '\n     faces load it, or cut it from the face that only echoes it. What belongs where:' +
+  '  -> A rule states itself once. Keep it in the skill\'s references/method.md, which' +
+  '\n     SKILL.md loads, and cut it from SKILL.md. What belongs where:' +
   '\n     skills/README.md § Where content goes.' +
   '\n  -> Every bundled doc is in the prompt on every turn, so a rule written twice is' +
   '\n     paid for twice and drifts in two places. Keep it in the doc that OWNS it — the' +
   '\n     constitution for a repo-wide rule, the persona for a voice rule, the method for a' +
   '\n     procedure — and cite it from the other. A citation names the rule; it does not' +
   '\n     restate it, which is why the other 200-odd pairs of these docs pass.' +
-  '\n  -> a skill is one method and two faces. skills/README.md § Where content goes.' +
+  '\n  -> a skill is SKILL.md over one method. skills/README.md § Where content goes.' +
   DISCOUNT_NOTE;
 
 /**

@@ -87,7 +87,7 @@ crons = ["0 10,11 * * TUE-SAT", "0 13,14 * * MON-FRI"]
 # blank. On a pass, set SLACK_STREAM_MARKUP_PROBE HERE in [vars] — a dashboard
 # value is wiped by the next deploy — as "pass:YYYY-MM-DD" plus any note. Until
 # then "on" is refused at runtime, logged once per isolate —
-# docs/connectors/slack.md § Streamed text.
+# docs/connectors/slack/shapes.md § Streamed text.
 SLACK_STREAM_MARKUP_PROBE = "pass:2026-09-22 r393 DM: raw bare <@teammate> + fenced <@teammate> <@U…> streamed via markdown_text, not blank; both shown literally, fenced one as code, real id in code did not ping"
 SLACK_STREAMING = "off"
 #
@@ -214,11 +214,25 @@ FIGMA_FILE_KEY = "zAecJNRdvJzAUOcjV32tRX"
 # (#896) lists these teams' folders. It replaces the FIGMA_TEAM_ID secret, which
 # held one id, and the wrong one.
 FIGMA_TEAM_IDS = "Universal=1279226364199713409,Training=1279227480162592555,Toolkit=1279227565411025715,Admin=1279229084983452695,Others=1279227354789670676,MISC=1279241534978917312"
+# Who a Figma question DMs: handle=SlackUserId pairs, comma-separated, kept by
+# hand (src/figma-comments/triage.ts). A question nobody answered in two
+# workdays DMs each person it @-names who is listed here, and names anyone
+# else on its channel card. Empty → everyone named is named on the card.
+FIGMA_HANDLE_SLACK_IDS = ""
 # #plus-universal channel id (private; uno-bot is a member) — the design-ops
 # team's channel. The sweep's morning post for the design system goes here,
 # the weekly DS precedence section among it, and its members are who may
 # decide a precedence card. Leave blank → that report waits and nothing posts.
 PLUS_UNIVERSAL_CHANNEL_ID = "C072E8SFLKV"
+# The other team channels of the posting ladder (src/destination/): a finding
+# with no thread goes to the channel of its card's Product Pillar, else its
+# Figma file's team (docs/connectors/slack/overview.md). Each is private, so uno-bot
+# needs an invite before it can post there. Leave one blank → that team's
+# findings are not posted.
+PLUS_ADMIN_CHANNEL_ID = "C089A3E9CCW"
+PLUS_TOOLKIT_CHANNEL_ID = "C08925VDFF1"
+PLUS_TRAINING_CHANNEL_ID = "C07L5RZV6DR"
+PLUS_MARKETING_CHANNEL_ID = "C052BG9NE86"
 # #uno-bot channel id — the intake channel (src/turn/intake-channel.ts): a
 # top-level post there engages with no @mention and becomes a drafted intake.
 # Leave blank → there is no intake channel.
@@ -227,7 +241,8 @@ UNO_BOT_CHANNEL_ID = "C0ARJ2A3A69"
 # /debug/slack-stream) may post raw test messages besides a DM and the alert
 # channel. Leave blank → DMs and the alert channel only.
 UNO_BOT_SANDBOX_CHANNEL = "C0B4QBWAUJU"
-# #plus-design channel id — the design team's channel. Read by the Figma
+# #plus-design channel id — the design team's channel, the posting ladder's
+# last rung. Read by the Figma
 # tidy-up's Review cards when FIGMA_ASK_CHANNEL_ID is unset, figma-comments,
 # the sweeps, follow-through, the sweep_share_post allowlist, and a Figma @uno
 # ask's turn, which runs as #plus-design and posts nothing there.
@@ -368,12 +383,12 @@ STANDING_CONFIRMER_IDS = "U03FYQJRQHX,U09E652SJ02"
 #   GITHUB_TOKEN
 #       PAT with repo:dispatch + Contents:Read + Issues:Write, on every
 #       repo in GITHUB_REPOS, plus Actions: Read and write on each repo
-#       that lists workflows. Powers component_implement /
-#       prototype_scaffold, which dispatch workflows in BilLogic/plus-uno,
-#       github_issue_create, which files intakes on each listed repo,
-#       github_issue_update, which follows up on issues there,
-#       github_workflow_run, which starts a listed workflow, and
-#       github_read / github_intake_search on each listed repo.
+#       that lists workflows. Powers the Figma snapshot refresh, which
+#       dispatches a workflow in BilLogic/plus-uno, github_issue_create,
+#       which files intakes on each listed repo, github_issue_update,
+#       which follows up on issues there, github_workflow_run, which
+#       starts a listed workflow, and github_read / github_intake_search
+#       on each listed repo.
 #   FIGMA_ACCESS_TOKEN
 #       Figma personal access token, used only through the Figma client
 #       (src/figma/): frame reads and renders, the library poll, the DS
@@ -409,16 +424,6 @@ STANDING_CONFIRMER_IDS = "U03FYQJRQHX,U09E652SJ02"
 #       read-only anon key for the uno-blueprint project. Unset,
 #       search_blueprint reports "not configured" and the bot falls back
 #       to cited docs rather than fabricating.
-#   GMAIL_SENDER [optional]
-#       authorized From mailbox for email_send. The whole Gmail lane is
-#       off unless all four GMAIL_* are set; send_email then fails
-#       gracefully.
-#   GMAIL_CLIENT_ID [optional]
-#       Gmail OAuth client id. See GMAIL_SENDER — all four or none.
-#   GMAIL_CLIENT_SECRET [optional]
-#       Gmail OAuth client secret. See GMAIL_SENDER — all four or none.
-#   GMAIL_REFRESH_TOKEN [optional]
-#       Gmail OAuth refresh token. See GMAIL_SENDER — all four or none.
 #   GEMINI_API_KEY [DO NOT SET]
 #       AI Studio key — must NOT be set on the Worker (ADR-018,
 #       2026-07-16). The Vertex SA above is canonical and takes precedence

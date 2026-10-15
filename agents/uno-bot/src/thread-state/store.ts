@@ -30,6 +30,7 @@
 // invisible from out here, and #493/#494 can settle them inside the module
 // without touching a caller's signature.
 
+import type { ChannelRole } from "../destination/index";
 import type { AssistantContext } from "../slack/types";
 import type { VisionReference } from "../slack/vision-reference";
 import type { CardFixes } from "../turn/delivery";
@@ -621,7 +622,7 @@ export interface StagingReport {
  *  optional, and a card with neither is held to the defaults. */
 /** A group-DM sweep card's share (`PendingProposal.sweepShare`). */
 export interface SweepShare {
-  pages: Array<{ url: string; title: string; to: "plus-universal" | "plus-design" }>;
+  pages: Array<{ url: string; title: string; to: ChannelRole }>;
 }
 
 export type ProposalTerms = Pick<PendingProposal, "ttlMs" | "confirmers">;

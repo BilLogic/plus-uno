@@ -90,8 +90,8 @@ describe("a Figma ask on its production wiring", () => {
     );
 
     assert.deepEqual(sent.filter((url) => url.includes("slack.com")), [], "no Slack call");
-    assert.deepEqual(figma.writes().map((w) => w.method), ["replyToComment"]);
-    assert.match(String(figma.writes()[0]!.args[2]), /^🐐: I can't make changes from a Figma comment/);
+    assert.deepEqual(figma.writes().map((w) => w.method), ["postReaction", "replyToComment"]);
+    assert.match(String(figma.writes()[1]!.args[2]), /^🐐: I can't make changes from a Figma comment/);
     assert.deepEqual(outcomes, ["answered"]);
     assert.equal(await h.threadState.getProposalByThread({ channel: "C03FC8AS69K", thread: `figma:${FILE}:100` }), null);
   });

@@ -3,13 +3,11 @@
 //
 // The Gate records who asked (`requesterUserId`) and the real ts the card was
 // posted under (`post.replyTs`). Both have to reach the tool body: a relayed DM
-// names the requester to its recipient and confirms in their thread, and
-// `email_send`'s EMAIL_AUTHORIZED_USERS check asks who asked. Until the relayed
-// DM, the executor dropped both, so the allowlist compared against `undefined`
-// and refused everyone the moment it was set.
+// names the requester to its recipient and confirms in their thread, and a
+// GitHub intake names who asked in its footer.
 //
 // HOW THE WORLD IS FAKED. `executeVerdict` names `Env` and reaches Slack and
-// Gmail through `net.ts`, which binds `fetch` when it is first evaluated — so,
+// GitHub through `net.ts`, which binds `fetch` when it is first evaluated — so,
 // as in `notion-write.test.ts`, one routing stub goes onto `globalThis` before
 // anything imports it and the module under test is loaded lazily. Thread
 // history goes to a fake Durable Object namespace whose stub records nothing
@@ -110,8 +108,6 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
   if (url.startsWith("https://api.notion.com/v1/databases/")) {
     return reply({ properties: { Name: { type: "title" }, Priority: { type: "rich_text" } } });
   }
-  if (url.includes("oauth2.googleapis.com/token")) return reply({ access_token: "ya29.test" });
-  if (url.includes("gmail.googleapis.com")) return reply({ id: "msg-1" });
   throw new Error(`no stub route for ${url}`);
 }) as typeof fetch;
 
@@ -324,33 +320,6 @@ test("a group DM's fix ✅ posts nothing outside the group DM", async () => {
   };
   await run(env(SHARE_ENV), { ...verdict, proposal });
   assert.equal(posts().filter((p) => p.channel === "C0DESIGN" || p.channel === "C0UNIVERSAL").length, 0);
-});
-
-const EMAIL = {
-  toolName: "email_send",
-  input: { to: ["sme@example.edu"], subject: "Calendar Sync", body: "A real message body, long enough to send." },
-};
-const GMAIL = {
-  GMAIL_SENDER: "design@example.edu",
-  GMAIL_CLIENT_ID: "id",
-  GMAIL_CLIENT_SECRET: "secret",
-  GMAIL_REFRESH_TOKEN: "refresh",
-};
-const gmailSends = () => calls.filter((c) => c.url.includes("gmail.googleapis.com")).length;
-
-test("email_send's user allowlist sees who asked: an allowlisted requester sends", async () => {
-  calls = [];
-  const run = await executeVerdict();
-  await run(env({ ...GMAIL, EMAIL_AUTHORIZED_USERS: "U0REQUESTR1" }), won([EMAIL]));
-  assert.equal(gmailSends(), 1);
-});
-
-test("email_send's user allowlist sees who asked: anyone else is refused", async () => {
-  calls = [];
-  const run = await executeVerdict();
-  await run(env({ ...GMAIL, EMAIL_AUTHORIZED_USERS: "U0SOMEONEELSE" }), won([EMAIL]));
-  assert.equal(gmailSends(), 0);
-  assert.ok(posts().some((p) => /isn't enabled for you/.test(String(p.text))));
 });
 
 test("an approved GitHub intake names who asked in its footer, and links the issue under the reply ts", async () => {
@@ -744,6 +713,7 @@ function stagingTurn() {
     tokensCached: 0,
     costUsd: 0,
     toolsCalled: [],
+    referencesRead: [],
     sourcesCited: [],
     disposition: "staged",
     proposalId: "1700000000.000300",

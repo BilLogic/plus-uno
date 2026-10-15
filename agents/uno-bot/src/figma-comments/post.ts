@@ -1,11 +1,14 @@
 // `sweep-figma-post` — the morning's comment decisions, handed to the sweep's
-// one message in #plus-design as a section of it (`../sweep/sections.ts`), on
-// the shared decision card (`slack/decision-cards.ts`).
+// one message in the place the posting ladder names (`../destination/`) as a
+// section of it (`../sweep/sections.ts`), on the shared decision card
+// (`slack/decision-cards.ts`).
 //
 // THE HAND-OVER, before the sweep's post: every queued file's decisions not
 // yet carded, with who may decide each file's, go into the morning run's
-// storage for #plus-design's top. It posts nothing: the channel gets one
-// message a morning.
+// storage for the top of the file's place — its cards' team channel, else
+// its Figma team's, else #plus-design. It posts nothing: a channel gets one
+// message a morning. Then the questions nobody answered (`./triage.ts`) are
+// handed over the same way.
 //
 // THE SECTION, on that message: a line per file for its owner — the card's
 // design owner tagged once in the opener, or the file's creator by Figma
@@ -15,8 +18,8 @@
 // own proposal, staged as one item of the message (`itemProposal`):
 //   • its own slot, so every decision is live at once and decided on its own;
 //   • 72 h, with no re-ping when it lapses;
-//   • confirmers: its file's cards' Contributors; a file with no card,
-//     #plus-design's members, read at the hand-over;
+//   • confirmers: its file's cards' Contributors; a file with no card, its
+//     place's members, read at the hand-over;
 //   • its own words at the gate, and `refuseRevision`, which points a turn at
 //     Review's Needs changes (`./revise.ts`) instead of letting it stage a
 //     near-copy beside the card.
@@ -29,6 +32,10 @@
 // WHAT DOES NOT SHOW waits in the file's queue entry in HARNESS_KV
 // (`./queue.ts`) for the next morning's message, and so does a card that
 // showed and did not stage, which says so on the message.
+//
+// THEN THE QUESTIONS. Once the threads are posted, any Figma question nobody
+// answered in two workdays is raised once through the posting ladder
+// (`./triage.ts`), on the budget the threads left.
 //
 // NOTHING IS WRITTEN HERE. A card's Approve runs its one operation through the
 // gate, like any card; this job hands over, and its section stages.
@@ -46,6 +53,8 @@ import { readMeter, recordRun, type SweepDeps, type SweepJobReport } from "../sw
 import { handedSection, type SweepSection } from "../sweep/sections";
 import { decisionCard, decisionCardWords, decisionItem, decisionParent, noPrdLine, noPrdNote, rewordInstead } from "./copy";
 import { commentUrl } from "./draft";
+import { handOverUnanswered } from "./triage";
+import { resolveDestination, routeFinding, teamNamed } from "../destination/index";
 import { operationsOf, type DecisionFile, type FileOwner, type QueuedDecision, type QueuedFile, type SweepFigmaComments } from "./queue";
 
 /** How long a decision card stays confirmable. */
@@ -68,7 +77,7 @@ export interface HandedFile extends DecisionFile {
   told: QueuedDecision[];
 }
 
-/** What the hand-over leaves for #plus-design's top. */
+/** What the hand-over leaves for a place's top. */
 export interface FigmaDecisionsHanded {
   files: HandedFile[];
 }
@@ -84,12 +93,27 @@ export async function postFigmaDecisions(job: ScheduledJob, deps: SweepDeps): Pr
   const meterStart = readMeter(deps);
   const handed: QueuedFile[] = [];
   const notes: string[] = [];
+  /** The channels the morning's decisions were handed to. */
+  const places = new Set<string>();
   let cards = 0;
-  const finish = async (outcome: SweepRunOutcome, note: string | null): Promise<SweepJobReport> => {
+  const finish = async (outcome: SweepRunOutcome, decided: string | null): Promise<SweepJobReport> => {
+    // Then the questions nobody answered, on what budget the decisions left.
+    const fcNow = deps.figmaComments;
+    const triage = fcNow?.triage
+      ? await handOverUnanswered(fcNow.figma, fcNow.triage, {
+          now: deps.now(),
+          date: deps.runDate,
+          ...(fcNow.questionsHandOff ? { handOff: fcNow.questionsHandOff } : {}),
+          ...(deps.dryRun ? { dryRun: true } : {}),
+          ...(deps.meter ? { meter: deps.meter } : {}),
+        })
+      : null;
+    const said = [decided, ...(triage?.notes ?? [])].filter((n): n is string => !!n);
+    const note = said.length ? said.join("; ") : null;
     await recordRun(deps, {
       runName: "morning",
       jobKey: job.key,
-      channels: deps.figmaComments?.slack ? [deps.figmaComments.slack.channel] : [],
+      channels: places.size ? [...places] : deps.figmaComments?.slack ? [deps.figmaComments.slack.channel] : [],
       threads: handed.length,
       items: cards,
       outcome,
@@ -98,7 +122,8 @@ export async function postFigmaDecisions(job: ScheduledJob, deps: SweepDeps): Pr
       meterStart,
     });
     const verb = deps.dryRun || !deps.figmaComments?.handOff ? "would hand" : "handed";
-    const counted = `${verb} ${cards} Figma decision card(s) on ${handed.length} file(s) to the morning post`;
+    const raised = triage ? `, ${verb} ${triage.raised} unanswered Figma question(s)` : "";
+    const counted = `${verb} ${cards} Figma decision card(s) on ${handed.length} file(s) to the morning post${raised}`;
     const summary = note ? `${counted} — ${note}` : counted;
     return { kind: "sweep-figma-post", key: job.key, outcome, note, threads: handed.length, findings: [], cards: [], figmaFiles: handed, summary };
   };
@@ -109,9 +134,9 @@ export async function postFigmaDecisions(job: ScheduledJob, deps: SweepDeps): Pr
   const queued = (await fc.queue.list()).sort((a, b) => a.foundAt - b.foundAt);
   if (!queued.length) return finish("handled", null);
 
-  let members: string[] | null | undefined;
+  const members = new Map<string, Promise<string[] | null>>();
   let replies = MAX_NO_PRD_REPLIES;
-  const files: HandedFile[] = [];
+  const byPlace = new Map<string, HandedFile[]>();
   for (const file of queued) {
     const waiting: QueuedDecision[] = [];
     for (const d of file.decisions) if (!(await fc.carded.has(d.commentId))) waiting.push(d);
@@ -119,28 +144,55 @@ export async function postFigmaDecisions(job: ScheduledJob, deps: SweepDeps): Pr
       if (!deps.dryRun) await fc.queue.remove(file.fileKey);
       continue;
     }
+    const channel = await placeOfFile(fc, file);
+    if (!channel) {
+      notes.push(`the channel the posting ladder names for ${file.fileKey} is not configured, so it waits`);
+      continue;
+    }
     let confirmers = file.confirmers;
     if (!confirmers.length) {
-      members ??= await slack.members();
-      if (!members?.length) {
-        notes.push(`#plus-design's members could not be read, so ${file.fileKey} waits for tomorrow`);
+      if (!members.has(channel)) members.set(channel, slack.members(channel));
+      const read = await members.get(channel)!;
+      if (!read?.length) {
+        notes.push(`${channel}'s members could not be read, so ${file.fileKey} waits for tomorrow`);
         continue;
       }
-      confirmers = members;
+      confirmers = read;
     }
     const cardable = waiting.filter((d) => operationsOf(d).length);
     // Past the morning's replies, a no-PRD decision waits in the queue.
     const told = waiting.filter((d) => !operationsOf(d).length).slice(0, replies);
     replies -= told.length;
     if (!cardable.length && !told.length) continue;
-    files.push({ fileKey: file.fileKey, title: file.title, url: file.url, owner: file.owner, confirmers, cardable, told });
+    byPlace.set(channel, [...(byPlace.get(channel) ?? []), { fileKey: file.fileKey, title: file.title, url: file.url, owner: file.owner, confirmers, cardable, told }]);
     handed.push({ ...file, decisions: waiting });
     cards += cardable.length;
   }
-  if (files.length && !deps.dryRun && fc.handOff) {
-    await fc.handOff.put(deps.runDate, { channel: slack.channel, threadTs: null }, { files });
+  for (const [channel, files] of byPlace) {
+    places.add(channel);
+    if (!deps.dryRun && fc.handOff) await fc.handOff.put(deps.runDate, { channel, threadTs: null }, { files });
   }
   return finish("handled", notes.length ? notes.join("; ") : null);
+}
+
+/**
+ * The channel a file's decisions go to: the posting ladder's, read with its
+ * cards' Product Pillar and, when none of them has a channel, the file's Figma
+ * team. Null when that channel is not configured.
+ *
+ * @param fc - The comment jobs' ports
+ * @param file - A queued file
+ */
+async function placeOfFile(fc: SweepFigmaComments, file: QueuedFile): Promise<string | null> {
+  const pillars = file.pillars ?? [];
+  // The file's team is read only when no card pillar has a channel: then it decides.
+  const team = pillars.some((p) => teamNamed(p)) ? null : ((await fc.triage?.fileTeam(file.fileKey)) ?? null);
+  const { destination } = routeFinding({
+    evidence: null,
+    card: pillars.length ? { pillars, designOwner: file.owner && "slack" in file.owner ? file.owner.slack : null } : null,
+    figmaFile: { team, creatorHandle: file.owner && "figma" in file.owner ? file.owner.figma : null },
+  });
+  return resolveDestination(destination, fc.slack?.channels ?? { plusDesign: fc.slack?.channel })?.channel ?? null;
 }
 
 /** Every card of a hand-over, numbered across the message in file order. */
@@ -157,7 +209,7 @@ function handleOf(owner: FileOwner | null): string | null {
 
 /**
  * The comment decisions as a section of the sweep's morning message in
- * #plus-design, or undefined when the hand-off, the Slack side or the
+ * each place it was handed to, or undefined when the hand-off, the Slack side or the
  * thread records are not wired.
  *
  * @param fc - The comment jobs' ports
@@ -239,13 +291,13 @@ export function figmaDecisionsSection(fc: SweepFigmaComments, date: string, now:
       }
       if (failed.length) {
         const marked = await markNotStaged(slack.reports, ts, failed, NOT_STAGED).catch(() => null);
-        if (marked) await slack.edit(ts, marked).catch(() => {});
+        if (marked) await slack.edit(ts, marked, place.channel).catch(() => {});
       }
       for (const file of value.files) {
         for (const d of file.told) {
           const before = progress.done.get(d.commentId);
           if (before === undefined) {
-            const sent = await slack.post({ text: noPrdNote(d, commentUrl(file.fileKey, d.nodeId, d.commentId)), thread_ts: ts });
+            const sent = await slack.post({ channel: place.channel, text: noPrdNote(d, commentUrl(file.fileKey, d.nodeId, d.commentId)), thread_ts: ts });
             await progress.mark(d.commentId, sent.ok);
             if (!sent.ok) continue;
           } else if (!before) continue;

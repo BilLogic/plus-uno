@@ -29,6 +29,7 @@
 // PURE: no `Env`, no Slack call. A report is data (`ReportItem`); the shared
 // builder draws it.
 
+import { CHANNEL_ROLES, type ChannelRole } from "../destination/index";
 import { typedEmojiDecision } from "../gate/reactions";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { clip } from "../slack/decision-cards";
@@ -181,11 +182,8 @@ function stable(v: unknown): string {
   return JSON.stringify(v);
 }
 
-/** Slack's names for the two team channels a group DM's share goes to. */
-export const SHARE_CHANNEL_NAMES: Record<SweepShare["pages"][number]["to"], string> = {
-  "plus-universal": "#plus-universal",
-  "plus-design": "#plus-design",
-};
+/** Slack's names for the channels a group DM's share goes to. */
+export const SHARE_CHANNEL_NAMES = Object.fromEntries(CHANNEL_ROLES.map((role) => [role, `#${role}`])) as Record<ChannelRole, string>;
 
 /** What a share card — a group DM's share, or the DM sweep's raise note —
  *  says at the gate (`PendingProposal.stated`). */
@@ -551,6 +549,6 @@ export function sweepCardInstruction(): string {
   return [
     "(system: SWEEP CARD — the pending card is an end-of-day sweep card: one `notion_update` per fix, each an in-place replace, or an `insert` that adds an answer after a block. A card holding an `insert` is revised only by `drop N`: do not restage it, tell them to reply `drop N`.",
     "A reply that drops an item in words (\"not the second one\"; a bare \"drop 2\" is applied before you see it) → stage the SAME batch without that operation, every other operation byte for byte. Nothing left → cancel with `proposal_resolve`.",
-    "Change only what the reply asked for: the revision holds the card's own fixes, minus the dropped ones. For anything more, `read_reference` `docs/connectors/slack-sweep`.)",
+    "Change only what the reply asked for: the revision holds the card's own fixes, minus the dropped ones. For anything more, `read_reference` `sweep`.)",
   ].join("\n");
 }

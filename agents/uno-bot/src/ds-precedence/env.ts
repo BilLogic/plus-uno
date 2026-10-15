@@ -6,6 +6,7 @@
 // in HARNESS_KV beside the library poll's keys; each report's cards and their
 // decisions are on ThreadState, as every decision report's are.
 
+import { channelIdsFor } from "../destination/env";
 import type { Env } from "../types";
 import { charge } from "../net";
 import { postMessage, updateMessage } from "../slack/api";
@@ -82,10 +83,7 @@ export async function runDsPrecedenceCheck(env: Env, opts: JobContext): Promise<
 
 /** #plus-universal, where the report goes up; null when not configured. */
 function channelOf(env: Env): string | null {
-  return precedenceChannel({
-    plusUniversal: env.PLUS_UNIVERSAL_CHANNEL_ID?.trim() || undefined,
-    plusDesign: env.PLUS_DESIGN_CHANNEL_ID?.trim() || undefined,
-  });
+  return precedenceChannel(channelIdsFor(env));
 }
 
 /**

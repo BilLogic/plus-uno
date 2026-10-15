@@ -99,7 +99,10 @@ export interface FigmaComponentsResponse {
   };
 }
 
-/** GET /v1/files/:key/versions, newest first. Autosaves have a null label and description. */
+/**
+ * GET /v1/files/:key/versions, newest first. Autosaves have a null label and
+ * description. One page; `before` the last id listed reads the next older one.
+ */
 export interface FigmaVersionsResponse {
   versions?: {
     id: string;
@@ -108,6 +111,7 @@ export interface FigmaVersionsResponse {
     created_at: string;
     user?: { handle?: string; id?: string };
   }[];
+  pagination?: { prev_page?: string; next_page?: string };
 }
 
 /** A Figma user. No email: only `/v1/me` carries one. */
@@ -140,6 +144,18 @@ export interface FigmaComment {
 /** GET /v1/files/:key/comments */
 export interface FigmaCommentsResponse {
   comments: FigmaComment[];
+}
+
+/** One reaction on a comment: its shortcode and who left it. */
+export interface FigmaReaction {
+  emoji: string;
+  user: FigmaUser;
+  created_at?: string;
+}
+
+/** GET /v1/files/:key/comments/:comment_id/reactions */
+export interface FigmaReactionsResponse {
+  reactions: FigmaReaction[];
 }
 
 export interface FigmaFolder {
@@ -269,11 +285,11 @@ export interface FigmaClient {
   file(fileKey: string, opts?: FigmaCallOptions & { depth?: number; ids?: readonly string[] }): Promise<FigmaFileResponse>;
   /** The file's name and creator, without its tree. Tier 3. */
   fileMeta(fileKey: string, opts?: FigmaCallOptions): Promise<FigmaFileMetaResponse>;
-  /** Some nodes of a file, by id. Tier 1. */
+  /** Some nodes of a file, by id — as they stand, or as they were at `version` (an id from `versions`). Tier 1. */
   nodes(
     fileKey: string,
     ids: readonly string[],
-    opts?: FigmaCallOptions & { depth?: number; geometry?: "paths" },
+    opts?: FigmaCallOptions & { depth?: number; geometry?: "paths"; version?: string },
   ): Promise<FigmaNodesResponse>;
   /** Nodes rendered to images, by id. Tier 1. */
   images(
@@ -283,14 +299,26 @@ export interface FigmaClient {
   ): Promise<FigmaImagesResponse>;
   /** The file's published components. Tier 3. */
   components(fileKey: string, opts?: FigmaCallOptions): Promise<FigmaComponentsResponse>;
-  /** The file's version history, newest first. Tier 2. */
-  versions(fileKey: string, opts?: FigmaCallOptions): Promise<FigmaVersionsResponse>;
+  /**
+   * One page of the file's version history, newest first: `pageSize` of them
+   * (Figma's default 30, its most 50), older than the version id `before`
+   * when given. Tier 2.
+   */
+  versions(fileKey: string, opts?: FigmaCallOptions & { pageSize?: number; before?: string }): Promise<FigmaVersionsResponse>;
   /** Every comment on the file, roots and replies. Tier 2. */
   comments(fileKey: string, opts?: FigmaCallOptions): Promise<FigmaCommentsResponse>;
   /** A new root comment, pinned to a node when `at` is given. Posts as the token's owner. Tier 2. */
   postComment(fileKey: string, message: string, at?: FigmaCommentPin, opts?: FigmaCallOptions): Promise<FigmaComment>;
   /** A reply. `rootCommentId` must be a root: Figma refuses a reply to a reply. Tier 2. */
   replyToComment(fileKey: string, rootCommentId: string, message: string, opts?: FigmaCallOptions): Promise<FigmaComment>;
+  /** A comment's reactions. Tier 2. */
+  reactions(fileKey: string, commentId: string, opts?: FigmaCallOptions): Promise<FigmaReactionsResponse>;
+  /**
+   * React to a comment as the token's owner. `emoji` is a shortcode
+   * (`":goat:"`): Figma refuses the emoji character with a 400, and reads a
+   * reaction back as its shortcode (probed live, 2026-10-14). Tier 2.
+   */
+  postReaction(fileKey: string, commentId: string, emoji: string, opts?: FigmaCallOptions): Promise<void>;
   /** A team's top-level folders. Tier 2. */
   teamFolders(teamId: string, opts?: FigmaCallOptions): Promise<FigmaTeamFoldersResponse>;
   /** The files in one folder. Tier 2. */

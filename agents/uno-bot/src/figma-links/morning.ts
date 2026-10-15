@@ -1,13 +1,11 @@
 // `figma-dev-links-post` — the morning's Dev Mode links card, handed to the
 // sweep's one message in #plus-design as a section of it (`../sweep/sections.ts`).
 //
-// THE SOURCE is the one the old morning job read: a library PR that
-// `figma-implement.yml` opened ("feat: Figma DS update — <components>") and
-// that has since merged. Its components may need their Code and Storybook
-// links in Dev Mode. A read of the repo's recently closed pulls a morning
-// (paged until it reaches back past the mark) finds those merged since the
-// last one carded (`MERGED_THROUGH_KV_KEY`); the first morning only sets that
-// mark, so nothing from before it is offered.
+// THE SOURCE is the PRs merged into main that changed a design-system
+// component (`./feed.ts`): their components may need their Code and
+// Storybook links in Dev Mode. The feed reads those merged since the last
+// one carded (`SEEN_KV_KEY`); the first morning only sets that mark, so
+// nothing from before it is offered.
 //
 // THE HAND-OVER, before the sweep's post, while `FIGMA_DEV_LINKS` is on: the
 // components those PRs named, planned as one card (`planDevLinksCard` — a
@@ -27,25 +25,14 @@ import type { PendingProposal } from "../thread-state/index";
 import { markNotStaged, type ReportMessage, type ReportStore } from "../slack/decision-cards";
 import { handedSection, type SectionHandOff, type SweepSection } from "../sweep/sections";
 import { DEV_LINKS_NOT_STAGED, devLinksItem, devLinksItemId, devLinksParent } from "./copy";
+import { readMergedPrs, type FeedDeps, type SeenMark } from "./feed";
 import { DEV_LINKS_CARD_TTL_MS, markCarded, stagedDevLinks, type DevLinksDeps, type DevLinksPlan, type DevLinksRequest, type PlannedDevLinks } from "./run";
 
 /** The section's name on the sweep's morning post. */
 export const DEV_LINKS_SECTION = "figma-dev-links";
 
-/** When the last library PR whose links were carded merged (ISO), in HARNESS_KV. */
-export const MERGED_THROUGH_KV_KEY = "figma-links:merged-through";
-
-/** The title `figma-implement.yml` gives its PR, before the component list. */
-const IMPLEMENT_TITLE = "feat: Figma DS update — ";
-
-/** A closed pull as the morning reads it. */
-export interface ClosedPull {
-  number: number;
-  title: string;
-  url: string;
-  /** When it merged (ISO); null when it closed unmerged. */
-  mergedAt: string | null;
-}
+/** The last merged PR whose links were carded (`./feed.ts` `SeenMark`), in HARNESS_KV. */
+export const SEEN_KV_KEY = "figma-links:prs-seen";
 
 interface Store<T> {
   read(): Promise<T>;
@@ -56,15 +43,14 @@ interface Store<T> {
 export interface DevLinksHanded extends PlannedDevLinks {
   confirmers: string[];
   /** The latest merge the card covers: where the mark moves once it stages. */
-  through: string;
+  through: SeenMark;
 }
 
 export interface DevLinksMorningDeps {
   /** Whether `FIGMA_DEV_LINKS` is on: until it is, the PRs wait. */
   on: boolean;
-  /** The repo's pulls closed and updated since an ISO time, newest first. */
-  closedPulls(since: string): Promise<ClosedPull[]>;
-  mergedThrough: Store<string | null>;
+  /** The merged PRs' reads and the mark (`./feed.ts`). */
+  feed: FeedDeps;
   plan(request: DevLinksRequest): Promise<DevLinksPlan>;
   /** #plus-design's member ids, or null when Slack would not say. */
   members(): Promise<string[] | null>;
@@ -76,36 +62,29 @@ export interface DevLinksMorningDeps {
   now(): number;
 }
 
-/** The components a `figma-implement.yml` PR's title names; none for any other PR. */
-export function implementComponents(title: string): string[] {
-  if (!title.startsWith(IMPLEMENT_TITLE)) return [];
-  return [...new Set(title.slice(IMPLEMENT_TITLE.length).split(",").map((n) => n.trim()).filter(Boolean))];
-}
-
 /**
- * The morning's hand-over of a Dev Mode links card for the library PRs
- * merged since the last one carded.
+ * The morning's hand-over of a Dev Mode links card for the PRs merged into
+ * main since the last one carded that changed a component.
  *
- * @param deps - The setting, the pulls, the mark, the plan, the members and the hand-off
+ * @param deps - The setting, the feed and its mark, the plan, the members and the hand-off
  * @param opts - `dryRun` reads and plans, and hands over and keeps nothing
  */
 export async function handOverDevLinks(deps: DevLinksMorningDeps, opts: { dryRun?: boolean } = {}): Promise<{ summary: string }> {
-  if (!deps.on) return { summary: "merged library PRs wait until FIGMA_DEV_LINKS is on" };
-  const through = await deps.mergedThrough.read();
-  if (!through) {
-    // The first morning: what merged before it is not offered.
-    if (!opts.dryRun) await deps.mergedThrough.write(new Date(deps.now()).toISOString());
-    return { summary: "started watching merged library PRs" };
+  if (!deps.on) return { summary: "merged PRs wait until FIGMA_DEV_LINKS is on" };
+  const fed = await readMergedPrs(deps.feed, opts);
+  const latest = fed.through;
+  if (!latest) return { summary: fed.summary };
+  const merged = fed.prs;
+  if (!fed.components.length) {
+    // Nothing among them to link: those PRs are done with.
+    if (!opts.dryRun) await deps.feed.mark.write(latest);
+    return { summary: fed.summary };
   }
-  const merged = (await deps.closedPulls(through)).filter((p) => p.mergedAt && p.mergedAt > through && implementComponents(p.title).length);
-  if (!merged.length) return { summary: "no library PR merged since the last card" };
-  const latest = merged.map((p) => p.mergedAt!).sort().at(-1)!;
-  const components = [...new Set(merged.flatMap((p) => implementComponents(p.title)))];
-  const { planned, tail, stopped } = await deps.plan({ components });
+  const { planned, tail, stopped } = await deps.plan({ components: fed.components });
   if (stopped) return { summary: `${stopped} — kept for tomorrow` };
   if (!planned) {
     // Nothing left to link: those PRs are done with.
-    if (!opts.dryRun) await deps.mergedThrough.write(latest);
+    if (!opts.dryRun) await deps.feed.mark.write(latest);
     return { summary: `nothing to add for ${merged.length} merged PR(s)${tail}` };
   }
   const members = await deps.members();
@@ -121,7 +100,8 @@ export interface DevLinksSectionDeps extends Pick<DevLinksDeps, "carded"> {
   stage(proposal: PendingProposal): Promise<void>;
   /** Edit the morning's message in place. */
   edit(ts: string, message: ReportMessage): Promise<void>;
-  mergedThrough: Store<string | null>;
+  /** The feed's mark (`./feed.ts`). */
+  mark: Store<SeenMark | null>;
   now(): number;
 }
 
@@ -168,7 +148,7 @@ export function devLinksSection(deps: DevLinksSectionDeps, handOff: SectionHandO
       }
       if (staged) {
         await markCarded(deps, id, report.ts, deps.now());
-        await deps.mergedThrough.write(value.through);
+        await deps.mark.write(value.through);
         return;
       }
       const marked = await markNotStaged(deps.reports, report.ts, [id], DEV_LINKS_NOT_STAGED).catch((err: unknown) => {

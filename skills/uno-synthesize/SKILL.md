@@ -71,7 +71,7 @@ enforces convention surfaces and exact-match selects.
 | When | Load |
 |---|---|
 | always | `references/method.md` |
-| any Notion write | `docs/connectors/notion.md` |
+| any Notion write | `docs/connectors/notion/overview.md` |
 | any blueprint read or write | `docs/connectors/supabase/overview.md` + `docs/connectors/supabase/blueprint.md` + `docs/connectors/supabase/blueprint-navigation.md` |
 | a findings page | `docs/conventions/writing.md` § Findings pages |
 
@@ -87,7 +87,7 @@ scenarios: `docs/evals/scenarios/uno-synthesize.md`.
   implements code.
 - Stays scoped to the provided context — expanding into adjacent evidence-gathering
   is uno-research's job.
-- All external writes go through the writers; follow `docs/connectors/notion.md` (never invent select options).
+- All external writes go through the writers; follow `docs/connectors/notion/overview.md` (never invent select options).
 
 ## Hand-offs
 

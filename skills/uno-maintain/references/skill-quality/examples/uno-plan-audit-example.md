@@ -4,7 +4,7 @@ embodiment: ide
 
 # Example Audit: uno-plan
 
-A worked example of the audit format, kept for its shape. `uno-plan` is a retired skill: the `references/consulting.md` it cites lives on only in `docs/knowledge/archive/mode-era/`.
+A worked example of the audit format, kept for its shape. `uno-plan` is a retired skill: the `references/consulting.md` it cites was retired with it and lives on only in git history.
 
 ## Executive Summary
 - Overall result: `Needs Revision`

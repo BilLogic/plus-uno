@@ -400,9 +400,9 @@ function kv<T>(initial: T) {
   };
 }
 
-function checkDeps(library: FigmaComponentsResponse, report = kv<PrecedenceReport | null>(null)) {
+function checkDeps(library: FigmaComponentsResponse, report = kv<PrecedenceReport | null>(null), creator?: string) {
   const figma = createInMemoryFigma();
-  figma.seedFile(FILE_KEY, { components: library });
+  figma.seedFile(FILE_KEY, { components: library, ...(creator ? { creator: { id: "f1", handle: creator } } : {}) });
   const deps: CheckDeps = {
     github: { indexMarkdown: async () => INDEX_MD, registry: async () => REGISTRY },
     figma,
@@ -631,6 +631,17 @@ describe("the morning post", () => {
 
     assert.equal(reportBox.box.value, null, "shown, so not handed over again");
     assert.deepEqual(recorded, [{ channel: CHANNEL, ts: MSG, weekOf: "2026-10-02" }]);
+  });
+
+  it("names the library file's creator by Figma handle, untagged: the library has no card", async () => {
+    const { deps: check, report } = checkDeps(LIBRARY, undefined, "Bryan <L>");
+    await runPrecedenceCheck(check);
+    assert.equal(report.box.value!.creatorHandle, "Bryan <L>");
+    const { morning, posts } = postDeps(report.box.value);
+    await morning();
+    const parent = JSON.stringify(posts[0]!.blocks![0]);
+    assert.match(parent, /Bryan &lt;L&gt;, code and the library disagree on 2 components\./, "named, escaped, and first");
+    assert.deepEqual(notified(posts[0]!), [], "a handle, never a tag");
   });
 
   it("stages each component as its own proposal: the week's intake, decided by the channel's members, for six days", async () => {

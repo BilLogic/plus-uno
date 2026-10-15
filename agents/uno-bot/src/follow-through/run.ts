@@ -67,13 +67,14 @@
 //
 // WHERE IT POSTS: `pickDestination`, as every proactive job. A thread's to-do
 // is answered in that thread (a private channel's stays there); a card has no
-// thread, so its follow-up goes to #plus-universal when its Product Pillar is
-// Universal and #plus-design otherwise. Never #uno-bot, never a Notion
+// thread, so its follow-up goes to the team channel of its Product Pillar, and
+// to #plus-design when the pillar has none. Never #uno-bot, never a Notion
 // comment, never the lead by default.
 //
 // Every dependency is injected (tests/card-follow-through.test.ts). `Env`
 // enters in `./env.ts`.
 
+import { teamOfChannel, type ChannelIds } from "../destination/index";
 import { D1QueryBudgetError, rethrowIfBudget, SubrequestBudgetError } from "../net";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { pickDestination, resolveDestination, routeOwner, type ChannelKind, type SweepMessage, type SweepThread } from "../sweep/finding";
@@ -178,9 +179,7 @@ export interface CardPeople {
   notionUserForSlack(slackUserId: string): Promise<string | null>;
 }
 
-export interface FollowThroughConfig {
-  plusDesign?: string;
-  plusUniversal?: string;
+export interface FollowThroughConfig extends ChannelIds {
   /** #uno-bot: never a destination. */
   unoBot?: string;
   botUserId?: string | null;
@@ -1346,19 +1345,18 @@ async function acknowledge(deps: Pick<AnswerDeps, "update">, c: CommitmentRecord
 
 /**
  * The drafted card for a to-do: one `notion_create` of a Roadmap card on the
- * PRD template, titled for the to-do and linking where it was said. The
- * `Universal` pillar is set only for a to-do from #plus-universal, and only
- * when the Roadmap offers exactly that option.
+ * PRD template, titled for the to-do and linking where it was said. A to-do
+ * from a team channel sets that team's pillar, and only when the Roadmap
+ * offers exactly that option.
  */
 export async function draftOperation(
   c: Pick<CommitmentRecord, "channel">,
   text: Pick<CommitmentText, "what" | "sourceUrl">,
-  deps: { reads: Pick<CardReads, "pillarOptions">; config: Pick<FollowThroughConfig, "plusUniversal"> },
+  deps: { reads: Pick<CardReads, "pillarOptions">; config: FollowThroughConfig },
 ): Promise<ProposalOperation> {
   let pillar: string | undefined;
-  if (c.channel === deps.config.plusUniversal) {
-    pillar = (await deps.reads.pillarOptions()).find((o) => o === "Universal");
-  }
+  const team = teamOfChannel(c.channel, deps.config);
+  if (team) pillar = (await deps.reads.pillarOptions()).find((o) => o === team);
   const where = text.sourceUrl ? `the running note (${text.sourceUrl})` : "a Slack thread";
   return {
     toolName: "notion_create",

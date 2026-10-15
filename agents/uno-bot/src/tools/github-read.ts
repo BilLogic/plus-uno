@@ -1,6 +1,5 @@
 // github_read executor — READ-ONLY. Read a file's contents or list a directory
-// (to check what exists, e.g. a DS component folder before proposing
-// component_implement), or search the code, in any repo on the Worker's repo
+// (to check what exists, e.g. a DS component folder), or search the code, in any repo on the Worker's repo
 // list. Runs inline in the agent loop (no gate).
 //
 // The model may name a `repo`; it reaches GitHub only as the entry the resolver

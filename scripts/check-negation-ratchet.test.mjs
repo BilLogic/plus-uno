@@ -1,11 +1,10 @@
 /**
  * Tests for what `check:negation` says when it CANNOT run.
  *
- * The check reads its file list from `bundle-harness.mjs --check`. When the
- * committed bundle is stale that child exits non-zero, and until #204 the
- * failure escaped as a raw `execFileSync` throw: a Node stack trace, the
- * bundler's own diagnostic discarded by `stdio: ignore`, and the composite gate
- * reporting `✗ check:negation` — a prohibition-count problem that does not
+ * The check reads its file list from the bundler's manifest, in-process. When
+ * the bundler refuses the tree, until #204 the failure escaped as a raw throw:
+ * a Node stack trace, the bundler's own diagnostic discarded, and the composite
+ * gate reporting `✗ check:negation` — a prohibition-count problem that does not
  * exist. Same shape `generate-agent.js` fixed in #191.
  *
  * What is asserted here is the message a contributor actually reads. #191's
@@ -36,17 +35,7 @@ import {
   roseReport,
 } from './check-negation-ratchet.mjs';
 import { ACTIONS_PROMPTS_DIR, actionsPromptFiles, walkPromptDocs } from './lib/actions-prompts.mjs';
-import {
-  REPO_ROOT,
-  SECTION_ROOTS,
-  censusMismatchReport,
-  disclosedFiles,
-  embodimentOf,
-  harnessManifest,
-  ideAuthoredFiles,
-  manifestUnreadableReport,
-  unresolvedReport,
-} from './lib/bundled-set.mjs';
+import { REPO_ROOT, harnessManifest, harnessSets, unresolvedReport } from './lib/bundled-set.mjs';
 import { frontmatter } from './lib/corpus.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 
@@ -83,18 +72,18 @@ function withRecord(record, fn) {
   }
 }
 
-/** The bundler's real `--check` failure, verbatim in shape (2026-08-26). */
-const realStderr =
-  '[bundle-harness] 2 generated artifact(s) STALE — a bundled harness doc changed but the generated file was not regenerated:\n' +
-  '  /repo/agents/uno-bot/src/generated/harness.ts\n' +
-  '    committed: 170,000 chars · regenerated: 170,037 chars\n' +
-  '  -> npm run bundle:harness';
+/** The bundler's real refusal, verbatim in shape. */
+const refusal = {
+  messages: [
+    '1 doc(s) under a bundle section declare no `embodiment`:\n' +
+      '  docs/connectors/zz-undeclared.md\n' +
+      '  -> add `embodiment: all | ide | uno-bot` to the frontmatter.',
+  ],
+};
 
-test('a stale bundle is reported as a stale bundle, not as a prohibition rise', () => {
-  const msg = bundlerFailureReport({ status: 1, stderr: realStderr });
-
-  assert.match(msg, /stale/i, 'must name staleness as the cause');
-  // The whole defect: the reader was pointed at the ratchet, which is fine.
+test("a refused tree is reported as the bundler's finding, not as a prohibition rise", () => {
+  const msg = bundlerFailureReport(refusal);
+  assert.match(msg, /bundler refused the tree/);
   assert.match(
     msg,
     /nothing is wrong with the prohibition-token count/i,
@@ -103,36 +92,20 @@ test('a stale bundle is reported as a stale bundle, not as a prohibition rise', 
 });
 
 test('the message points at the command that fixes it', () => {
-  const msg = bundlerFailureReport({ status: 1, stderr: realStderr });
-  assert.match(msg, /bundle:harness/, 'must name the regeneration script');
+  assert.match(bundlerFailureReport(refusal), /bundle:harness/, 'must name the regeneration script');
 });
 
 test("the bundler's own diagnostic reaches the reader", () => {
-  const msg = bundlerFailureReport({ status: 1, stderr: realStderr });
-  // Relayed whole — the naming of WHICH artifact is behind, and by how much,
-  // is the fact the stack trace used to bury.
-  for (const line of realStderr.split('\n')) {
-    assert.ok(msg.includes(line), `child stderr line missing from the report: ${line}`);
+  const msg = bundlerFailureReport(refusal);
+  for (const line of refusal.messages[0].split('\n')) {
+    assert.ok(msg.includes(line.trim()), `bundler line missing from the report: ${line}`);
   }
 });
 
-test('no Node stack trace is quoted back at the reader', () => {
-  const msg = bundlerFailureReport({ status: 1, stderr: realStderr });
-  assert.doesNotMatch(msg, /node:internal/, 'the Node internals frame must not appear');
-  assert.doesNotMatch(msg, /Command failed:/, "execFileSync's own wrapper message must not appear");
-});
-
-test('a child that says nothing still produces an actionable report', () => {
-  // A guard that goes quiet when the child does is the same defect one level
-  // down, so the silent case gets its own line rather than an empty gap.
-  const msg = bundlerFailureReport({ status: 2, stderr: '' });
-  assert.match(msg, /exited 2/, 'must state the exit code when there is nothing else to show');
+test('a refusal with no stated reason still produces an actionable report', () => {
+  const msg = bundlerFailureReport({ messages: [] });
+  assert.match(msg, /gave no reason/);
   assert.match(msg, /bundle:harness/);
-});
-
-test('a signalled child reports the signal rather than a bare exit code', () => {
-  const msg = bundlerFailureReport({ status: null, signal: 'SIGKILL', stderr: '' });
-  assert.match(msg, /SIGKILL/);
 });
 
 // ── What the number is called, and what it covers (#234) ─────────────────────
@@ -273,88 +246,21 @@ test('a rise names the scope it happened in, and the docs that caused it', () =>
   assert.match(msg, /state the target behaviour/);
 });
 
-// ── The IDE walk, and the witness that makes it falsifiable ──────────────────
+// ── The IDE corpus is the bundler's own rows ─────────────────────────────────
 
-// THE FIXTURE IS A MANIFEST, NOT A LOG LINE (#510). The census and the
-// disclosed set used to be regexed out of the bundler's stdout and out of the
-// companion's markdown table, so the fixtures here were strings of prose and
-// the tests had to cover "the sentence was reworded" as a case of its own. The
-// bundler writes a JSON manifest now; a field is present or it is not.
-const MANIFEST_FIXTURE = {
-  census: { underRoots: 67, bundled: 21, disclosed: 1, ideOnly: 45 },
-  budgets: { assembled: 170_000, persona: 28_000, botFace: 7_000, constitution: 20_000 },
-  members: [
-    { path: 'AGENTS.md', embodiment: 'all', section: 'constitution', delivery: 'bundled', chars: 1 },
-    {
-      path: 'skills/uno-maintain/references/method.md',
-      embodiment: 'all',
-      section: 'skills',
-      delivery: 'disclosed',
-      name: 'uno-maintain/method',
-      chars: 10_198,
-    },
-    { path: 'skills/README.md', embodiment: 'ide', section: 'skills', delivery: 'ide-only', chars: 5_765 },
-  ],
-};
+/** The bundler's section roots, read off its manifest. */
+const sectionRoots = () => harnessManifest({ tag: 'negation' }).sections.flatMap((s) => s.roots);
 
-test('the disclosed set is the manifest rows whose delivery is `disclosed`', () => {
-  assert.deepEqual(disclosedFiles(MANIFEST_FIXTURE), ['skills/uno-maintain/references/method.md']);
-  assert.deepEqual(disclosedFiles({ members: [] }), []);
-  // Neither a bundled nor an ide-only row is disclosed — the three deliveries
-  // partition the corpus, and reading one as another is how a Worker-side guard
-  // would quietly measure the wrong set.
-  assert.deepEqual(
-    disclosedFiles({ members: MANIFEST_FIXTURE.members.filter((m) => m.delivery !== 'disclosed') }),
-    [],
-  );
-});
-
-test('the real bundler states a census, budgets and a row per declared doc', () => {
+test('each set is the manifest rows of one delivery, and the census counts them', () => {
   const manifest = harnessManifest({ tag: 'negation' });
-  const { census } = manifest;
-  assert.equal(census.underRoots, census.bundled + census.disclosed + census.ideOnly);
-  assert.equal(manifest.members.length, census.underRoots);
-  assert.equal(typeof manifest.budgets.botFace, 'number');
-  // The two counts this check depends on, against the walk it does itself.
-  assert.equal(census.ideOnly, ideAuthoredFiles().length);
-  assert.equal(census.disclosed, disclosedFiles(manifest).length);
-});
-
-test('a walk that disagrees with the bundler points at the roots, not at the corpus', () => {
-  const msg = censusMismatchReport({
-    walkedIde: 45,
-    bundled: 21,
-    census: { underRoots: 67, bundled: 21, disclosed: 0, ideOnly: 46 },
-    tag: 'negation',
-  });
-  assert.match(msg, /walked 45 ide-only doc\(s\), 0 disclosed and 21 bundled \(66 in all\)/);
-  assert.match(msg, /it says 46 ide-only and 0 disclosed out of 67/);
-  assert.match(msg, /SECTION_ROOTS/, 'must name the list that fell behind');
-  assert.match(msg, /bundle-harness\.mjs/, 'and the list it must match');
-});
-
-test('a manifest the guard cannot read is reported as a changed bundler, not as a count of zero', () => {
-  // What the `census: null` case became. A census that came back null had to be
-  // told apart from a real zero at every call site; a manifest that states no
-  // census never reaches the comparison at all, and this is the message.
-  const msg = manifestUnreadableReport({ why: 'it states no `census`, `budgets` and `members`', tag: 'negation' });
-  assert.match(msg, /exited 0 but its manifest could not be read/);
-  assert.match(msg, /cannot vouch for/);
-  assert.match(msg, /--manifest/, 'must name the flag that writes it');
-});
-
-test('embodiment is read off frontmatter, and its absence is null', () => {
-  assert.equal(embodimentOf('---\nsummary: x\nembodiment: ide\n---\n\n# Doc\n'), 'ide');
-  assert.equal(embodimentOf('---\nembodiment: all\n---\n'), 'all');
-  assert.equal(embodimentOf('# No frontmatter at all\n'), null);
-  assert.equal(embodimentOf('---\nsummary: x\n---\n\nbody\n'), null);
-  // A mention in the BODY is not a declaration — the frontmatter block ends at
-  // the first closing fence.
-  assert.equal(embodimentOf('---\nsummary: x\n---\n\nembodiment: uno-bot\n'), null);
+  const sets = harnessSets({ tag: 'negation' });
+  assert.equal(sets.ide.length, manifest.census.ideOnly);
+  assert.equal(sets.disclosed.length, manifest.census.disclosed);
+  assert.equal(sets.bundled.length, manifest.census.bundled);
 });
 
 test('the IDE corpus excludes ADRs and generated surfaces by where they live', () => {
-  const ide = ideAuthoredFiles();
+  const { ide } = harnessSets({ tag: 'negation' });
   assert.ok(ide.length > 0, 'an empty IDE corpus is a broken walk, not a clean repo');
 
   // Both exclusions are structural: neither directory is a section root, so
@@ -367,17 +273,23 @@ test('the IDE corpus excludes ADRs and generated surfaces by where they live', (
     assert.doesNotMatch(rel, /^\.claude\//, `a generated surface reached the corpus: ${rel}`);
   }
   assert.ok(
-    SECTION_ROOTS.every((r) => !r.startsWith('docs/adr') && !r.startsWith('.claude')),
+    sectionRoots().every((r) => !r.startsWith('docs/adr') && !r.startsWith('.claude')),
     'neither excluded directory may become a section root without this decision being revisited',
   );
+});
+
+test('the IDE corpus counts the uno skills under skills/', () => {
+  const { ide } = harnessSets({ tag: 'negation' });
+  assert.ok(ide.includes('skills/uno-maintain/SKILL.md'), 'an uno skill is IDE-side text the ratchet must see');
+  assert.ok(ide.includes('skills/uno-review/references/method.md'));
 });
 
 test('every doc in the IDE corpus declares itself IDE-side', () => {
   // The scopes must partition, never overlap: a doc counted in both would be
   // double-counted, and one counted in neither would be unguarded.
-  for (const rel of ideAuthoredFiles()) {
+  for (const rel of harnessSets({ tag: 'negation' }).ide) {
     const text = fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
-    assert.equal(embodimentOf(text), 'ide', `not an ide doc: ${rel}`);
+    assert.equal(frontmatter(text).meta.embodiment, 'ide', `not an ide doc: ${rel}`);
   }
 });
 
@@ -629,7 +541,7 @@ test('the three corpora partition — no doc is counted twice', () => {
   // And by rule, not just by record: the bundler's roots never reach the
   // loader's, so the Actions walk cannot overlap the other two.
   assert.ok(
-    SECTION_ROOTS.every((r) => !r.startsWith(ACTIONS_PROMPTS_DIR)),
+    sectionRoots().every((r) => !r.startsWith(ACTIONS_PROMPTS_DIR)),
     'scripts/prompts must not become a bundler section root without this decision being revisited',
   );
 });

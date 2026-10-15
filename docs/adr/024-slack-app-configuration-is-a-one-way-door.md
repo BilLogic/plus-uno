@@ -10,7 +10,7 @@ verified: 2026-08-26 (#172)
 **Decision.** Treat uno-bot's Slack app configuration as append-only. Ask for the
 narrowest scope set that works at first install, because the only way to take one
 back is to uninstall the app from the workspace and install it fresh. Manage the
-manifest by hand in app settings and keep `agents/uno-bot/slack-app-manifest-commands.yaml`
+manifest by hand in app settings and keep `agents/uno-bot/slack-app-manifest.yaml`
 as documented intent to diff against, because `oauth_config.pkce_enabled` is on and
 that permanently disables the manifest write API. Verify what an app can do against
 the **live token** — a grant is a third state no manifest tool can see.

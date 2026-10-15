@@ -6,7 +6,7 @@
 //
 // Only body content the bot adds gets the line. A property change writes no
 // body, and an in-place replace or insert edits a human's text where it
-// stands, so neither carries it (`docs/connectors/notion.md` § Attribution).
+// stands, so neither carries it (`docs/connectors/notion/page-writing.md` § Attribution).
 
 /**
  * The attribution sentence, as a Notion reader sees it.

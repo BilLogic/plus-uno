@@ -8,7 +8,6 @@ import {
   linksIn,
   pickDestination,
   postableAt,
-  resolveDestination,
   routeOwner,
   type DriftFinding,
   type FindingTarget,
@@ -54,45 +53,42 @@ test("pickDestination: each kind of finding lands on its rung", () => {
       { rung: "thread", channel: "C0DESIGN", threadTs: "1790000000.000100" },
     ],
     [
-      "no thread, Universal card → #plus-universal",
+      "no thread, a card → its pillar's team channel",
       { evidence: evidence({ threadTs: null }), target: notion(["Toolkit", "Universal"]) },
-      { rung: "design-system", channel: "plus-universal" },
+      { rung: "team", team: "Toolkit", channel: "plus-toolkit" },
     ],
     [
-      "no thread, the Figma library → #plus-universal",
+      "no thread, the Figma library → its team, Universal",
       { evidence: evidence({ threadTs: null }), target: { ...notion(), kind: "figma-library", writable: false } },
-      { rung: "design-system", channel: "plus-universal" },
+      { rung: "team", team: "Universal", channel: "plus-universal" },
     ],
     [
-      "no thread, design-system code → #plus-universal",
+      "no thread, design-system code → the library's team",
       { evidence: evidence({ threadTs: null }), target: { ...notion(), kind: "design-system-code", writable: false } },
-      { rung: "design-system", channel: "plus-universal" },
+      { rung: "team", team: "Universal", channel: "plus-universal" },
     ],
     [
-      "no thread, Storybook → #plus-universal",
+      "no thread, Storybook → the library's team",
       { evidence: evidence({ threadTs: null }), target: { ...notion(), kind: "storybook", writable: false } },
-      { rung: "design-system", channel: "plus-universal" },
+      { rung: "team", team: "Universal", channel: "plus-universal" },
     ],
     [
-      "no thread, anything else → #plus-design",
-      { evidence: evidence({ threadTs: null }), target: notion(["Toolkit"]) },
+      "no thread, an unmapped pillar → #plus-design",
+      { evidence: evidence({ threadTs: null }), target: notion(["Tutoring"]) },
+      { rung: "design", channel: "plus-design" },
+    ],
+    [
+      "no thread, a page with no card → #plus-design",
+      { evidence: evidence({ threadTs: null }), target: notion() },
+      { rung: "design", channel: "plus-design" },
+    ],
+    [
+      "no thread, a plain Figma file names no team → #plus-design",
+      { evidence: evidence({ threadTs: null }), target: { ...notion(), kind: "figma", writable: false } },
       { rung: "design", channel: "plus-design" },
     ],
   ];
   for (const [name, finding, expected] of table) assert.deepEqual(pickDestination(finding), expected, name);
-});
-
-test("a role's channel resolves from config, and is null when unset — never #uno-bot", () => {
-  const channels = { plusUniversal: "C0UNIVERSAL", plusDesign: "C0DESIGN" };
-  assert.deepEqual(resolveDestination({ rung: "design-system", channel: "plus-universal" }, channels), {
-    channel: "C0UNIVERSAL",
-    threadTs: null,
-  });
-  assert.deepEqual(resolveDestination({ rung: "design", channel: "plus-design" }, channels), {
-    channel: "C0DESIGN",
-    threadTs: null,
-  });
-  assert.equal(resolveDestination({ rung: "design", channel: "plus-design" }, {}), null);
 });
 
 test("owner routing falls through its three rungs, never to a default", () => {

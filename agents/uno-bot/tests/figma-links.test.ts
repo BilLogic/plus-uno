@@ -1,8 +1,8 @@
 // Dev Mode links on the registry's components, end to end on fakes: a run
 // posts one Review card per component that still needs its Code and
 // Storybook links, Approve writes exactly those links through the one Figma
-// client and leaves one labelled comment the first time, and a merged
-// library PR's link is offered the same way.
+// client and leaves one labelled comment the first time, and the morning
+// hands one card for the components that PRs merged into main changed.
 //
 // What an outsider sees: which cards post where, what each would write,
 // what lands in Figma after Approve, and that a second run adds nothing.
@@ -28,7 +28,8 @@ import {
 } from "../src/figma-links/run";
 import { devLinksRequestOf } from "../src/figma-links/gate";
 import { devLinksDebugChannel } from "../src/figma-links/env";
-import { DEV_LINKS_SECTION, devLinksSection, handOverDevLinks, implementComponents, type ClosedPull, type DevLinksHanded, type DevLinksMorningDeps } from "../src/figma-links/morning";
+import { DEV_LINKS_SECTION, devLinksSection, handOverDevLinks, type DevLinksHanded, type DevLinksMorningDeps } from "../src/figma-links/morning";
+import type { MergedPull, SeenMark } from "../src/figma-links/feed";
 import { planDevLinksCard } from "../src/figma-links/run";
 import { sectionHandOffIn } from "../src/sweep/sections";
 import { runSweepJob } from "../src/sweep/run";
@@ -666,17 +667,28 @@ describe("Approve on the batch card", () => {
 describe("the morning's card, on the sweep's #plus-design message", () => {
   const DESIGN = "C0DESIGN";
   const DATE = "2026-10-14";
-  const merged = (number: number, title: string, mergedAt: string | null): ClosedPull => ({ number, title, url: `https://github.com/${REPO}/pull/${number}`, mergedAt });
+  const BUTTON_FILE = "design-system/src/components/actions/Button/Button.jsx";
+  const merged = (number: number, mergedAt: string): MergedPull => ({ number, url: `https://github.com/${REPO}/pull/${number}`, mergedAt });
+  const START: SeenMark = { mergedAt: "2026-10-10T00:00:00Z", number: 1 };
 
-  function morningWorld(opts: { pulls?: ClosedPull[]; through?: string | null; on?: boolean } = {}) {
+  function morningWorld(opts: { pulls?: MergedPull[]; files?: Record<number, string[]>; mark?: SeenMark | null; on?: boolean } = {}) {
     const w = world();
-    const through = { value: opts.through === undefined ? "2026-10-10T00:00:00Z" : opts.through };
-    const mark = { read: async () => through.value, write: async (v: string | null) => void (through.value = v) };
+    const through = { value: opts.mark === undefined ? START : opts.mark };
+    const mark = { read: async () => through.value, write: async (v: SeenMark | null) => void (through.value = v) };
     const handOff = sectionHandOffIn<DevLinksHanded>(memoryRunStorage(), DEV_LINKS_SECTION);
+    const pulls = opts.pulls ?? [merged(7, "2026-10-13T15:00:00Z")];
+    const filesAsked: number[] = [];
     const deps: DevLinksMorningDeps = {
       on: opts.on ?? true,
-      closedPulls: async () => opts.pulls ?? [merged(7, "feat: Figma DS update — Button", "2026-10-13T15:00:00Z")],
-      mergedThrough: mark,
+      feed: {
+        mergedPulls: async () => ({ pulls, full: false, oldestUpdatedAt: pulls.map((p) => p.mergedAt).sort()[0] ?? null }),
+        pullFiles: async (n) => {
+          filesAsked.push(n);
+          return opts.files?.[n] ?? [BUTTON_FILE];
+        },
+        registry: w.deps.registry,
+        mark,
+      },
       plan: (request) => planDevLinksCard(w.deps, request),
       members: async () => [BILL],
       handOff,
@@ -684,7 +696,7 @@ describe("the morning's card, on the sweep's #plus-design message", () => {
       date: DATE,
       now: () => NOW,
     };
-    const section = devLinksSection({ reports: w.store, stage: (p) => w.deps.stage(p), edit: async () => {}, carded: w.deps.carded, mergedThrough: mark, now: () => NOW }, handOff, DATE);
+    const section = devLinksSection({ reports: w.store, stage: (p) => w.deps.stage(p), edit: async () => {}, carded: w.deps.carded, mark, now: () => NOW }, handOff, DATE);
     const h = sweepHarness({ channels: {}, now: NOW, runDate: DATE, threadState: w.store });
     h.deps.sections = [section];
     const run = async () => {
@@ -692,15 +704,10 @@ describe("the morning's card, on the sweep's #plus-design message", () => {
       await runSweepJob({ key: "sweep-post", kind: "sweep-post" }, h.deps);
       return handed;
     };
-    return { w, h, deps, through, run };
+    return { w, h, deps, through, run, filesAsked };
   }
 
-  it("names the components a figma-implement PR's title lists, and no other PR's", () => {
-    assert.deepEqual(implementComponents("feat: Figma DS update — Badge, Button"), ["Badge", "Button"]);
-    assert.deepEqual(implementComponents("fix: something else"), []);
-  });
-
-  it("a library PR merged since the last card goes up as one card on the morning's one message, and the mark moves past it", async () => {
+  it("a PR merged into main that changed a component goes up as one card on the morning's one message, and the mark moves past it", async () => {
     const m = morningWorld();
     const handed = await m.run();
     assert.match(handed.summary, /handed a card for 4 link\(s\) from 1 merged PR/);
@@ -709,23 +716,31 @@ describe("the morning's card, on the sweep's #plus-design message", () => {
     assert.match(m.h.posted[0]!.text, /Dev Mode links for Button are ready for Review\./);
     assert.equal(m.w.staged.length, 1);
     assert.deepEqual(m.w.staged[0]!.confirmers, [BILL]);
-    assert.equal(m.through.value, "2026-10-13T15:00:00Z");
+    assert.deepEqual(m.through.value, { mergedAt: "2026-10-13T15:00:00Z", number: 7 });
     assert.ok(m.w.carded.value?.["links-Button"]);
 
     // The next morning: nothing new merged, nothing goes up.
     const again = await handOverDevLinks(m.deps);
-    assert.match(again.summary, /no library PR merged since the last card/);
+    assert.match(again.summary, /no PR merged since the last run/);
   });
 
-  it("waits while FIGMA_DEV_LINKS is off, and the first morning only starts watching", async () => {
+  it("a merged PR that changed no component moves the mark at once and hands nothing over", async () => {
+    const m = morningWorld({ files: { 7: ["agents/uno-bot/src/index.ts"] } });
+    await m.run();
+    assert.equal(m.h.posted.length, 0);
+    assert.deepEqual(m.through.value, { mergedAt: "2026-10-13T15:00:00Z", number: 7 });
+  });
+
+  it("waits while FIGMA_DEV_LINKS is off, reading nothing, and the first morning only marks the newest merge", async () => {
     const off = morningWorld({ on: false });
     assert.match((await off.run()).summary, /wait until FIGMA_DEV_LINKS is on/);
     assert.equal(off.h.posted.length, 0);
+    assert.deepEqual(off.filesAsked, []);
 
-    const first = morningWorld({ through: null });
-    assert.match((await first.run()).summary, /started watching/);
+    const first = morningWorld({ mark: null });
+    assert.match((await first.run()).summary, /starting after #7/);
     assert.equal(first.h.posted.length, 0);
-    assert.equal(first.through.value, new Date(NOW).toISOString());
+    assert.deepEqual(first.through.value, { mergedAt: "2026-10-13T15:00:00Z", number: 7 });
   });
 
   it("a card that does not stage leaves the mark, so the next morning plans it again", async () => {
@@ -733,6 +748,6 @@ describe("the morning's card, on the sweep's #plus-design message", () => {
     m.w.deps.stage = async () => Promise.reject(new Error("DO down"));
     await m.run();
     assert.equal(m.h.posted.length, 1);
-    assert.equal(m.through.value, "2026-10-10T00:00:00Z");
+    assert.deepEqual(m.through.value, START);
   });
 });

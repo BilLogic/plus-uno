@@ -118,6 +118,7 @@
 // suite runs whole days against fakes (tests/sweep-run.test.ts). `Env` enters
 // in `./env.ts`.
 
+import { CHANNEL_ROLES, PILLAR_CHANNELS, channelIdOf, teamOfChannel, type ChannelIds } from "../destination/index";
 import { D1QueryBudgetError, isSubrequestBudgetError, rethrowIfBudget, SubrequestBudgetError } from "../net";
 import type { HistoryMessage } from "../slack/api";
 import { proposalReplyThread, type OwnerLine, type PendingProposal, type ProposalOperation, type ReportItem, type ThreadState } from "../thread-state/index";
@@ -317,8 +318,9 @@ export type PostedCard =
 /** Posting and staging, and the reads the morning needs. */
 export interface SweepDelivery {
   /** Post the report, tagged with its key and digest. `refusedBlocks` when
-   *  Slack refused its blocks, so it may step down to plain sections. */
-  post(to: CardPlace, message: SweepReportMessage, tag: CardTag): Promise<{ ok: boolean; ts?: string; refusedBlocks?: boolean }>;
+   *  Slack refused its blocks, so it may step down to plain sections; `error`
+   *  is Slack's own code for a refusal (`not_in_channel`). */
+  post(to: CardPlace, message: SweepReportMessage, tag: CardTag): Promise<{ ok: boolean; ts?: string; refusedBlocks?: boolean; error?: string }>;
   /** Edit a posted report in place (`chat.update`): a fix that did not stage
    *  says so on its card. */
   edit(channel: string, ts: string, message: SweepReportMessage): Promise<void>;
@@ -356,9 +358,7 @@ const SECTION_CARD_D1_QUERIES = 3;
  *  held back for a card that does not stage. */
 const ALONE_SUBREQUESTS = 2;
 
-export interface SweepConfig {
-  plusDesign?: string;
-  plusUniversal?: string;
+export interface SweepConfig extends ChannelIds {
   /** #uno-bot: never swept, never posted in. */
   unoBot?: string;
   /** The DS library file key, so a link to it counts as the design system. */
@@ -1251,14 +1251,17 @@ async function postPlaces(job: ScheduledJob, deps: SweepDeps, scope: SectionPlac
     // jobs', and none hands any over on a dry run.
     const handed = deps.dryRun ? [] : await waitingSections(ctx, postDate, here);
     let onCards = 0;
+    let refused = 0;
     for (const plan of plans) {
       const to = resolveDestination(plan.destination, deps.config);
       const here = to ? takeHanded(handed, to) : [];
       const posted = await postCard(ctx, plan, postDate, here);
       onCards += posted.items;
+      refused += posted.refused ?? 0;
       if (!posted.tookSections) handed.push(...here);
     }
-    const waiting = fresh.length - onCards;
+    // A fix whose channel refused it waits for the invite, its own note said.
+    const waiting = fresh.length - onCards - refused;
     if (waiting > 0) notes.push(`${waiting} fix(es) wait in the queue for a live card to resolve or for room on a card`);
     // A place the sweep has no report for gets its sections alone, on one message.
     for (const group of groupBy(handed, (h) => placeKeyOf(h.place)).values()) await postSectionsAlone(ctx, group, postDate);
@@ -1341,7 +1344,7 @@ async function postCard(
   planned: SweepCardPlan,
   postDate: string,
   handed: readonly Handed[] = [],
-): Promise<{ items: number; tookSections: boolean }> {
+): Promise<{ items: number; refused?: number; tookSections: boolean }> {
   const { deps, now, notes } = ctx;
   const to = resolveDestination(planned.destination, deps.config);
   if (!to) {
@@ -1406,6 +1409,23 @@ async function postCard(
   // the report's record keeps every redraw plain from then on.
   const plain = !sent.ok && sent.refusedBlocks === true;
   if (plain) sent = await deps.delivery.post(to, { text: report.text, blocks: plainReportBlocks(report.blocks) }, tag);
+  if (!sent.ok && sent.error === "not_in_channel") {
+    // On the record as failed, never dropped: the outcomes count sees a team
+    // channel nobody invited uno-bot to. The finding stays queued and cards
+    // again once it is in. Failed ONCE per finding: a finding an earlier
+    // morning's refusal already recorded keeps that row, and this card's are
+    // released. Neither carded nor waiting on a live card.
+    const before = await deps.store.itemsForFindings(plan.items.map((f) => f.id));
+    const refusedBefore = new Set(before.filter((i) => i.status === "failed" && i.proposalTs === null && i.cardKey !== plan.key).map((i) => i.findingId));
+    await deps.store.releaseCard(plan.key);
+    await deps.store.addItems(
+      plan.items.filter((f) => !refusedBefore.has(f.id)).map((f) => ({ ...itemRecord(f, plan, now), status: "failed" as const, postedAt: now, resolvedAt: now })),
+    );
+    await deps.store.dropCard(plan.key);
+    notes.push(`${plan.key}: uno-bot is not in ${to.channel} — recorded as failed, kept for tomorrow`);
+    for (const h of handed) await h.section.notPosted(h.place, "uno-bot is not in the channel");
+    return { items: 0, refused: plan.items.length, tookSections: done.tookSections };
+  }
   if (!sent.ok || !sent.ts) {
     await release(deps, plan.key);
     notes.push(`${plan.key}: the post failed — kept for tomorrow`);
@@ -1526,7 +1546,8 @@ async function finishAlone(
 /** A place as the destination the sweep would name it by. */
 function destinationOfPlace(to: SectionPlace, config: SweepConfig): Destination {
   if (to.threadTs) return { rung: "thread", channel: to.channel, threadTs: to.threadTs };
-  if (to.channel === config.plusUniversal) return { rung: "design-system", channel: "plus-universal" };
+  const team = teamOfChannel(to.channel, config);
+  if (team) return { rung: "team", team, channel: PILLAR_CHANNELS[team] };
   if (to.channel === config.plusDesign) return { rung: "design", channel: "plus-design" };
   return { rung: "private", channel: to.channel, threadTs: null };
 }
@@ -2071,8 +2092,11 @@ async function placesLiveInThreadState(
 
 /** A place's channel and thread, back from its key (`destinationKey`). */
 function placeOf(key: string, config: SweepConfig): { channel: string; threadTs: string | null } | null {
-  if (key === "plus-design") return config.plusDesign ? { channel: config.plusDesign, threadTs: null } : null;
-  if (key === "plus-universal") return config.plusUniversal ? { channel: config.plusUniversal, threadTs: null } : null;
+  const role = CHANNEL_ROLES.find((r) => r === key);
+  if (role) {
+    const channel = channelIdOf(role, config);
+    return channel ? { channel, threadTs: null } : null;
+  }
   const [channel, threadTs] = key.split(":");
   return channel ? { channel, threadTs: threadTs || null } : null;
 }

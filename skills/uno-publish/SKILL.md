@@ -46,11 +46,12 @@ the designer's explicit go-ahead first; show what will be written and wait.
 | rail decision = handoff | `references/rails/handoff.md` |
 | registering a prototype (handoff step 6, or standalone "register this prototype") | `references/marketplace.md` |
 | helping deploy a preview | `references/deployment-guide.md` |
-| building the marketplace entry | `references/notion-marketplace-db.md` (+ `references/marketplace-schema.md` / examples if dual-writing a routing registry) |
-| composing the share-out or checking sign-offs | `docs/connectors/slack.md` |
+| building the marketplace entry | `docs/connectors/notion/marketplace-db.md` (+ `references/marketplace-schema.md` / examples if dual-writing a routing registry) |
+| composing the share-out | `docs/connectors/slack/shapes.md` |
+| checking sign-offs | `docs/connectors/slack/overview.md` |
 
-Summoned writers load their own conventions (`notion.md`,
-`docs/connectors/figma.md`) — don't restate those here.
+Summoned writers load their own conventions (`docs/connectors/notion/`,
+`docs/connectors/figma/`); this skill cites them rather than restating them.
 
 ## Quality bar
 

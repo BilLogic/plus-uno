@@ -9,8 +9,8 @@ summary: The constitution — identity, routing, the loading contract, and hard 
 
 The one identity, roster, and routing document for every agent working in this repo — the in-IDE agent, the uno-bot Slack Worker (which bakes this file into its bundle at build time), and headless GitHub Actions runs.
 
-**The interaction contract: humans speak in skills · skills summon agents · agents obey conventions.**
-Users remember six skills (or describe intent and get routed). Skills invoke agents; users never do. Agents point at the conventions they enforce and never restate them.
+**The interaction contract (IDE): humans speak in skills · skills summon agents · agents obey conventions.**
+Users remember six skills; agents point at the conventions they enforce and never restate them. In Slack, bot skills call the Worker's tools instead.
 
 ## Identity
 
@@ -42,13 +42,13 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 | `skills/uno-review` | DS / UNO / a11y lens review · Design QA at Ready-for-QA | reviewers/* (except auditor — uno-maintain's) |
 | `skills/uno-maintain` | intake · direct fixes · gated changes · cross-estate sync · knowledge capture | reviewers/auditor · researchers/source-miner · reviewers/rubric-applier · writers/* |
 
-Routing: match intent to the Use-when column; if ambiguous, ask which capability is meant. Each skill's `SKILL.md` is the IDE face, `bot.md` the Worker face; the IDE loads `references/method.md` on invocation, and the Worker reads it by name through `read_reference` when the face's pointer fires. Which content belongs in which of the three — and the guard that holds the split — is `skills/README.md`.
+Routing: match intent to the Use-when column; if ambiguous, ask which capability is meant. These six are **uno skills**, IDE workflows: `SKILL.md` loads `references/method.md` on invocation. uno-bot runs its own **bot skills** under `agents/uno-bot/skills/`, named for what the bot does, each ending in an **exit** — answer, file or hand off (a ready-to-paste IDE prompt naming an uno skill); a bot skill's description is its always-loaded pointer and its body is read by name through `read_reference`. What goes in which file, for both, is `skills/README.md`.
 
-**A skill's discovery surfaces are generated.** Claude Code, Cursor and Slack each read their own path, and `npm run generate:skill-surfaces` publishes all three from the canonical frontmatter — so edit `skills/<name>/SKILL.md` and regenerate; `npm run check:skill-surfaces` fails the harness gate on drift. What is generated where: `docs/engineering/setup.md` § Generated skill surfaces.
+**A skill's IDE discovery surface is generated.** Claude Code and Cursor read `.claude/skills/`, and `npm run generate:skill-surfaces` publishes a stub there from the canonical frontmatter — so edit `skills/<name>/SKILL.md` and regenerate; `npm run check:skill-surfaces` fails the harness gate on drift. What is generated where: `docs/engineering/setup.md` § Generated skill surfaces.
 
 ## Agents — what skills summon
 
-`agents/` holds three plain kinds plus the embodiment: **researchers/** (gather), **reviewers/** (judge), **writers/** (notion · figma · blueprint — the *only* agents that write to external estates, save the Worker's labelled reply to an @uno Figma comment: `docs/connectors/figma.md`). Roster, anatomy, and the creation rule: `agents/README.md`.
+`agents/` holds three plain kinds plus the embodiment: **researchers/** (gather), **reviewers/** (judge), **writers/** (notion · figma · blueprint — the IDE's only estate writers; uno-bot writes through ✅-gated tools and one ungated @uno Figma reply: `docs/connectors/figma/overview.md`). Roster, anatomy, and the creation rule: `agents/README.md`.
 
 ## Conventions — what agents obey
 
@@ -58,16 +58,16 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 
 ## The loading contract
 
-**Tier 1 — always loaded.** This file, and nothing else. Soft budget ≤20k chars: an overrun warns rather than fails, and a tier that bloats still defeats the tier.
+**Tier 1 — always loaded.** This file, and nothing else. Soft char budget (`BUDGETS.constitution`): an overrun warns rather than fails, and a tier that bloats still defeats the tier.
 
 **Tier 3 — retrieved live, never cached.** Product truth from `uno-blueprint` (`writers/blueprint` / `search_blueprint`); design-system truth from `uno-storybook` (read the source and stories). Team conventions are *not* Tier 3 — they are canonical in-repo (ADR-017) and load as plain files.
 
-**uno-bot's Tier 2 is `read_reference`.** A doc that declares `disclosure: reference` leaves the always-loaded bundle for a map baked beside it, and the Worker reads it by name — `uno-maintain/method` — on the turns whose pointer fires; the text lasts the turn and a later turn re-reads it in one call. Everything else in the bundle is always in context.
+**uno-bot's Tier 2 is `read_reference`.** A doc that declares `disclosure: reference` leaves the always-loaded bundle for a map baked beside it, and the Worker reads it by name — `draft-a-prd` — on the turns whose pointer fires; the text lasts the turn and a later turn re-reads it in one call. Everything else in the bundle is always in context.
 
 <!-- ide-only -->
 **Tier 2 — loaded on demand.** Two or three documents per task. § Progressive loading is the trigger table; beyond it: a skill loads its own `SKILL.md` + `references/method.md` on invocation and its `references/*.md` as linked; an agent loads its `agents/<kind>/<name>.md` plus the conventions it names.
 
-**Bundle mechanics (uno-bot).** Sections, order, `ide-only` stripping and the five char budgets — this file, the persona, each `bot.md`, the assembled ceiling and its floor — are decided in one place, the header of `agents/uno-bot/scripts/bundle-harness.mjs`. `npm run check:harness` names the file and the distance for each: this file's overrun warns, and a stale bundle, any other overrun or a shortfall fails the build. The same run writes a JSON manifest (`--manifest`, gitignored) of what it computed, which is what the root guards read instead of parsing its log lines, and what holds the budget numbers written above to the constants that assert them (`check:harness-budgets`).
+**Bundle mechanics (uno-bot).** Sections, order, `ide-only` stripping and the char budgets — this file, the persona, each bot skill, the assembled ceiling and its floor — are decided in one place, the header of `agents/uno-bot/scripts/bundle-harness.mjs`. `npm run check:harness` names the file and the distance for each: this file's overrun warns, and a stale bundle, any other overrun or a shortfall fails the build. Its `assemble()` returns a manifest of what it computed, and the root checks read that in-process through `scripts/lib/bundled-set.mjs`. A doc cites a budget by its `BUDGETS` key and leaves the number to the bundler; `check:harness-budgets` holds every doc under a section root to that.
 
 **GitHub Actions.** `scripts/lib/skill-loader.js` loads `scripts/prompts/*` with meta-stripping; offline, which is fine because conventions are repo-canonical.
 <!-- /ide-only -->
@@ -82,7 +82,7 @@ The name in parentheses is how the rest of the harness cites each rule, so renum
 1. **The design system's generated index is the existence law** (`DS-knowledge-is-law`, `no-duplicate-components`). Start at `design-system/guidelines/overview.md`, then load only what the task needs (e.g. `design-system/agent-views/components/index.md`, `design-system/agent-views/tokens/tokens.md`). A component absent from the index does not exist — propose creating it rather than asserting it, and check the index before creating one so you do not duplicate what is there.
 2. **Read the source for every name you use** (`read-source-first`, `no-hallucinated-props`). Props, variants and types come from the component `.jsx` / `.stories.jsx` — or from `get-documentation` on the Storybook MCP endpoint (`docs/connectors/storybook-mcp.md`) — before you write them.
 3. **Icons are Font Awesome Free** (`FA-Free-only`): `fa-solid`, `fa-regular`, `fa-brands` — including the brand glyphs (`fa-brands fa-notion`, `fa-brands fa-figma`). Pro families and Pro-only names (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, `fa-grid-2`) are not licensed here and render as blanks.
-4. **Notion writes follow `docs/connectors/notion.md`** — the convention surfaces and the ✅-gated tools. Select options, pillars, features and OKRs are exact-matched against what the database already offers; a value that does not exist is a question for the requester. Safety is the gate + schema match, not a hardcoded database fence.
+4. **Notion writes follow `docs/connectors/notion/`** — the convention surfaces and the ✅-gated tools. Select options, pillars, features and OKRs are exact-matched against what the database already offers; a value that does not exist is a question for the requester. Safety is the gate + schema match, not a hardcoded database fence.
 5. **PLUS components first** (`PLUS-components-first`), then generic React-Bootstrap where no PLUS equivalent exists (ADR-009). Bootstrap is the UI framework for product UI; Tailwind is present but scoped to the Storybook documentation chrome in `design-system/src/storybook-docs/`, so it is not a precedent for product code.
 
 <!-- ide-only -->
@@ -104,7 +104,7 @@ Each rule is one line here and its body lives in the document it names; the lead
 
 ## Knowledge
 
-Finished work leaves behind a **rule** in the doc that already owns the subject, an **ADR** under `docs/adr/` when the call is hard to reverse, an **archive** entry in `docs/knowledge/archive/` when a superseded era's own trail matters, or — most often — **nothing**: git keeps the trail, and a finding worth less than the context it costs is worth deleting. `docs/knowledge/INDEX.md` is the contract, `npm run check:knowledge-disposition` enforces it, and `docs/knowledge/changelog.md` is the ledger of what was promoted. Capture runs through `skills/uno-maintain`; land the note and its disposition in the same change. What is already in the archive stays as it is (#172).
+Finished work leaves behind a **rule** in the doc that already owns the subject, an **ADR** under `docs/adr/` when the call is hard to reverse, an **archive** entry in `docs/knowledge/archive/` while a live doc, ADR or code comment cites it as its decision trail, or — most often — **nothing**: git keeps the trail, and a finding worth less than the context it costs is worth deleting. `docs/knowledge/INDEX.md` is the contract, `npm run check:knowledge-disposition` enforces it, and `docs/knowledge/changelog.md` is the ledger of what was promoted. Capture runs through `skills/uno-maintain`; land the note and its disposition in the same change. The same test clears `docs/plans/`, `todos/` and the archive itself: a plan, todo or archived doc whose work has landed or been abandoned is deleted once nothing live cites it.
 
 <!-- ide-only -->
 ## Progressive loading
@@ -121,9 +121,10 @@ Finished work leaves behind a **rule** in the doc that already owns the subject,
 | Implementation setup (aliases, prototypes, Vite) | `docs/engineering/setup.md` |
 | Figma link, implement-design, design-to-code mapping, or **code write-back to Figma** | `design-system/figma/component-registry.json` + `token-registry.json` (MANDATORY — load first); then `design-system/guidelines/figma/component-alignment.md`. When the gate is active, write-back also loads `.cursor/hooks/briefings/active-writeback-gate.json`. |
 | Figma node id or link for a specific component | `design-system/figma/component-figma-links.md` (generated from component MDX; run `npm run generate:figma-links`) |
-| Writing to Notion / Figma / Slack / blueprint | the matching `docs/connectors/*.md` |
+| Writing to Notion / Figma / Slack / blueprint | the matching connector folder's `docs/connectors/<tool>/overview.md`, then the sibling its pointer names |
 | Reading or reasoning over the blueprint | `docs/connectors/supabase/blueprint.md` first — the blueprint's own account (shape, status vocabulary, retrieval modes; the schema is `blueprint-schema.md` beside it), vendored from plus-uno-blueprint, so a schema fix belongs there — then `docs/connectors/supabase/blueprint-navigation.md` for citation shape, confidence and absence; `docs/connectors/supabase/blueprint-direct-access.md` for SQL and PostgREST recipes. Load BEFORE querying; un-guided blueprint reads fail on navigation and lane attribution (the Worker carries the first two) |
 | Long-form — a README, a recap, a findings page | `docs/conventions/writing.md`. Ordinary replies, commits and PRDs need no doc: the model's default is the house voice. |
+| Writing or editing a bot skill | `skills/README.md` § Bot skills, then `npm run check:bot-skills` |
 | Editing anything an agent reads — this file, a skill, a convention, an agent doc | load the `writing-for-agents` skill first. It is the standard harness prose is reviewed against, and it lives upstream so there is no second copy here to drift. |
 | Product / in-app UI copy (labels, errors, empty states) | `design-system/guidelines/foundations/content/` — what a tutor reads inside the app |
 | Component architecture questions | `design-system/guidelines/components/overview.md` |

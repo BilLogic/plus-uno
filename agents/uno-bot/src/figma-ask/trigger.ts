@@ -21,7 +21,7 @@
 /** The emoji the label is, and the whole of the label comments carried before it took the colon. */
 const GOAT = "🐐";
 
-/** What everything uno-bot writes into Figma opens with, its first line beside it (docs/connectors/slack.md § Figma messages, rule 7). */
+/** What everything uno-bot writes into Figma opens with, its first line beside it (docs/connectors/slack/shapes.md § Figma messages, rule 7). */
 export const FIGMA_LABEL = `${GOAT}:`;
 
 /** The label replies carried before it was the emoji alone, still on comments already posted. */
@@ -48,6 +48,13 @@ const TRIGGERS = new RegExp(TRIGGER.source, "gi");
 
 /** The label as Figma reads a comment back: the emoji's shortcode (seen live, 2026-10-12). */
 const LABEL_READ_BACK = ":goat:";
+
+/**
+ * The reaction on an ask uno-bot picked up, as Figma's reactions call takes
+ * it: the shortcode. The emoji character is refused with a 400, and the
+ * reaction reads back as `:goat:` (probed live, 2026-10-14).
+ */
+export const GOAT_REACTION = LABEL_READ_BACK;
 
 /**
  * A comment as uno-bot posted it: the label Figma hands back as its shortcode

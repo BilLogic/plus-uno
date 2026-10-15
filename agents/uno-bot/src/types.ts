@@ -73,10 +73,22 @@ export interface Env {
   // Both optional — unset → the job logs a skip and does nothing.
   FIGMA_FILE_KEY?: string;
   PLUS_UNIVERSAL_CHANNEL_ID?: string;
+  /** The other team channels of the posting ladder's pillar → channel map
+   *  (`destination/`), each private: unset or uninvited, that team's findings
+   *  are not posted. */
+  PLUS_ADMIN_CHANNEL_ID?: string;
+  PLUS_TOOLKIT_CHANNEL_ID?: string;
+  PLUS_TRAINING_CHANNEL_ID?: string;
+  PLUS_MARKETING_CHANNEL_ID?: string;
   /** The six PLUS Figma teams, `name=id` pairs (`figma-notify/teams.ts`). The
    *  subscription setup reads them from wrangler.toml; the nightly backstop
    *  (#896) lists their folders. */
   FIGMA_TEAM_IDS?: string;
+  /** The hand-kept Figma handle → Slack id map, `handle=U…` pairs: who a
+   *  question @-naming them in Figma DMs once nobody answered it
+   *  (`figma-comments/triage.ts`). Unset, everyone named is named on the
+   *  channel card instead. */
+  FIGMA_HANDLE_SLACK_IDS?: string;
   /** The passcode Figma echoes in every notification (`POST /figma/events`).
    *  Unset → the route answers 401 to every delivery. */
   FIGMA_WEBHOOK_PASSCODE?: string;
@@ -117,8 +129,11 @@ export interface Env {
   /** Where the weekly Figma tidy-up's Review cards post
    *  (`figma-tidy/env.ts` `figmaReviewChannel`). Blank or unset → #plus-design. */
   FIGMA_ASK_CHANNEL_ID?: string;
-  /** `on` lets Dev Mode links run for every registry component
-   *  (`figma-links/gate.ts`). Unset → one component per manual run. */
+  /** `on` lets Dev Mode links run for every registry component, and lets the
+   *  morning hand a card to the sweep's #plus-design message for the merged
+   *  PRs that changed a design-system component (`figma-links/gate.ts`,
+   *  `figma-links/feed.ts`). Unset → one component per manual run, and merged
+   *  PRs wait behind the feed's mark. */
   FIGMA_DEV_LINKS?: string;
   /** The channels the end-of-day sweep reads, comma-separated ids
    *  (`scheduled/runs.ts` `sweepChannelsFrom`). Unset → nothing is swept. */
@@ -136,12 +151,6 @@ export interface Env {
   // Channel the Slack probes may post raw test messages to besides a DM and the
   // alert channel. Unset → DMs and the alert channel only. See diagnostics/probes/slack.ts.
   UNO_BOT_SANDBOX_CHANNEL?: string;
-  // Gmail send (D6 connector). All optional — when unset, send_email fails
-  // gracefully with a "not configured" error instead of sending.
-  GMAIL_SENDER?: string;
-  GMAIL_CLIENT_ID?: string;
-  GMAIL_CLIENT_SECRET?: string;
-  GMAIL_REFRESH_TOKEN?: string;
   // uno-blueprint Supabase (D8 grounding). Read-only. When unset, search_blueprint
   // reports "not configured" so the bot falls back to cited docs instead of
   // fabricating.
@@ -223,7 +232,7 @@ export interface Env {
   /** The markup probe's pass, recorded by whoever ran it: `pass:YYYY-MM-DD`
    *  and an optional note. Either streaming flag stays off without one —
    *  `streamFlagOn` in slack/slack-delivery.ts, the probe in
-   *  docs/connectors/slack.md. */
+   *  docs/connectors/slack/overview.md. */
   SLACK_STREAM_MARKUP_PROBE?: string;
   /** "on" swaps the hand-rolled 👍/👎 `actions` row for Slack's native
    *  `context_actions` block (`feedback_buttons` + an `icon_button` delete).
@@ -287,13 +296,6 @@ export interface Env {
   // debug routes return 404. Set via `wrangler secret put DEBUG_TOKEN` and pass
   // it as the `x-debug-token` header. See src/index.ts.
   DEBUG_TOKEN?: string;
-  // email_send authorization (defense beyond the requester-identity gate):
-  // EMAIL_AUTHORIZED_USERS = comma-separated Slack user IDs allowed to trigger
-  // outward email; EMAIL_ALLOWED_DOMAINS = comma-separated recipient domains
-  // (e.g. "andrew.cmu.edu,tutor.plus"). Unset → email_send stays available to
-  // any requester / any recipient (legacy behavior). See tools/send-email.ts.
-  EMAIL_AUTHORIZED_USERS?: string;
-  EMAIL_ALLOWED_DOMAINS?: string;
   /** Comma-separated Slack user ids who may confirm or cancel any card that
    *  names its confirmers, beside the people it names — except a card in
    *  someone's 1:1 DM. Unset, a card's own set is the whole of it

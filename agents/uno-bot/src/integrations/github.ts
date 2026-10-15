@@ -1,9 +1,7 @@
 // Read from the GitHub repos on the Worker's repo list via the contents API
 // (for github_read): fetch a file's decoded text, or list a directory's
 // entries. GITHUB_TOKEN is already on the Worker for repository_dispatch; this
-// reuses it read-only. Fail-loud (throws) so the tool can report honestly —
-// unlike ds-components.ts, which fails-open because it's a preflight guard,
-// not a user-facing read.
+// reuses it read-only. Fail-loud (throws) so the tool can report honestly.
 //
 // EVERY CALL HERE TAKES A RESOLVED REPO — a `RepoEntry` off the list, never a
 // string the model wrote. `resolveRepoFor` is the one way to get one: it reads
@@ -610,10 +608,6 @@ export function githubWorkflowClient(env: Env, target: RepoEntry): GithubWorkflo
   };
 }
 
-/** Pulls a page of `closedPulls`, and the pages it reads at most. */
-const PULL_PAGE = 30;
-export const MAX_PULL_PAGES = 5;
-
 /** The repo reads the Figma and DS jobs make, bound to one repo. Each throws
  *  `GithubRequestError` on any non-2xx. */
 export interface GithubLibraryReads {
@@ -625,11 +619,18 @@ export interface GithubLibraryReads {
    *  whether that was all of them — so a caller about to file can tell "none
    *  carries the marker" from "the page ran out". */
   intakesSince(since: string): Promise<{ intakes: Array<{ number: number; url: string; body: string }>; complete: boolean }>;
-  /** The closed pulls updated since `since` (ISO), newest first, each with
-   *  when it merged — null for one closed unmerged: page after page of 30,
-   *  up to `MAX_PULL_PAGES`, each page a subrequest. */
-  closedPulls(since: string): Promise<Array<{ number: number; title: string; url: string; mergedAt: string | null }>>;
+  /** The merged pulls among the 50 most recently updated closed into `base`,
+   *  whether the page came back full, and its oldest `updated_at`. */
+  mergedPulls(base: string): Promise<{
+    pulls: Array<{ number: number; url: string; mergedAt: string }>;
+    full: boolean;
+    oldestUpdatedAt: string | null;
+  }>;
+  /** A pull's changed file paths — its first 100, where a component change sits. */
+  pullFiles(number: number): Promise<string[]>;
 }
+
+const LIBRARY_PAGE = 50;
 
 /**
  * The Figma and DS jobs' reads on one listed repo (GET …/contents with the
@@ -683,29 +684,32 @@ export function githubLibraryReads(env: Env, target: RepoEntry): GithubLibraryRe
         complete: page.length < 100,
       };
     },
-    async closedPulls(since) {
-      const out: Array<{ number: number; title: string; url: string; mergedAt: string | null }> = [];
-      for (let page = 1; page <= MAX_PULL_PAGES; page++) {
-        const url = `https://api.github.com/repos/${repo}/pulls?state=closed&sort=updated&direction=desc&per_page=${PULL_PAGE}&page=${page}`;
-        const data = (await (await get("pull list", url)).json().catch(() => [])) as Array<{
-          number?: unknown;
-          title?: unknown;
-          html_url?: unknown;
-          merged_at?: unknown;
-          updated_at?: unknown;
-        }>;
-        const rows = Array.isArray(data) ? data : [];
-        for (const p of rows) {
-          if (typeof p.number === "number" && typeof p.title === "string" && typeof p.html_url === "string") {
-            out.push({ number: p.number, title: p.title, url: p.html_url, mergedAt: typeof p.merged_at === "string" ? p.merged_at : null });
-          }
-        }
-        // Newest first by update, so a page reaching back past `since` is the
-        // last one that can hold anything merged after it.
-        const oldest = rows.at(-1)?.updated_at;
-        if (rows.length < PULL_PAGE || (typeof oldest === "string" && oldest < since)) break;
-      }
-      return out;
+    async mergedPulls(base) {
+      const url =
+        `https://api.github.com/repos/${repo}/pulls?state=closed&base=${encodeURIComponent(base)}` +
+        `&sort=updated&direction=desc&per_page=${LIBRARY_PAGE}`;
+      const data = (await (await get("pull list", url)).json().catch(() => [])) as Array<{
+        number?: unknown;
+        html_url?: unknown;
+        merged_at?: unknown;
+        updated_at?: unknown;
+      }>;
+      const page = Array.isArray(data) ? data : [];
+      const updated = page.flatMap((p) => (typeof p.updated_at === "string" ? [p.updated_at] : [])).sort();
+      return {
+        pulls: page.flatMap((p) =>
+          typeof p.number === "number" && typeof p.html_url === "string" && typeof p.merged_at === "string" && p.merged_at
+            ? [{ number: p.number, url: p.html_url, mergedAt: p.merged_at }]
+            : [],
+        ),
+        full: page.length >= LIBRARY_PAGE,
+        oldestUpdatedAt: updated[0] ?? null,
+      };
+    },
+    async pullFiles(number) {
+      const url = `https://api.github.com/repos/${repo}/pulls/${number}/files?per_page=100`;
+      const data = (await (await get("pull files", url)).json().catch(() => [])) as Array<{ filename?: unknown }>;
+      return (Array.isArray(data) ? data : []).flatMap((f) => (typeof f.filename === "string" ? [f.filename] : []));
     },
   };
 }

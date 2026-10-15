@@ -40,15 +40,9 @@ GITHUB_TOKEN=
 NOTION_API_KEY=
 
 # --- Figma ---
-# Read-scoped PAT — powers the proposal-card screenshot on prototype_scaffold
+# Read-scoped PAT — frame reads and renders, the library poll and the drift checks
 FIGMA_ACCESS_TOKEN=
 
 # --- Supabase (uno-blueprint) ---
 # Publishable/anon read key for blueprint_search (SUPABASE_URL is a [vars] entry)
 SUPABASE_ANON_KEY=
-
-# --- Gmail (email_send) ---
-GMAIL_SENDER=
-GMAIL_CLIENT_ID=
-GMAIL_CLIENT_SECRET=
-GMAIL_REFRESH_TOKEN=

@@ -388,28 +388,7 @@ export function renderProposalCard(card: ProposalCard): RenderedCard {
     const blocks = [...fixes, ...proposalActionBlocks()];
     return followUp.length ? { text: plan.text, blocks, followUp } : { text: plan.text, blocks };
   }
-  if (!card.previewImageUrl) {
-    return followUp.length ? { text: plan.text, followUp } : { text: plan.text };
-  }
-  // The Figma preview card. Its BLOCKS carry the screenshot, the preamble and
-  // the footer; the planned text rides along as Slack's notification and
-  // fallback copy, and as what the button handler re-renders from. A
-  // `prototype_scaffold` is a single operation, so there is no plan to lose.
-  const blocks: unknown[] = [];
-  const lead = cardLead(card);
-  if (lead) blocks.push({ type: "section", text: { type: "mrkdwn", text: lead } });
-  blocks.push({
-    type: "image",
-    image_url: card.previewImageUrl,
-    alt_text: "Figma preview of the design to implement",
-  });
-  blocks.push({
-    type: "section",
-    text: { type: "mrkdwn", text: `${aboutTo(card)}\n${renderFields(card.fields)}` },
-  });
-  blocks.push({ type: "section", text: { type: "mrkdwn", text: CONFIRM_FOOTER } });
-  blocks.push(...proposalActionBlocks());
-  return followUp.length ? { text: plan.text, blocks, followUp } : { text: plan.text, blocks };
+  return followUp.length ? { text: plan.text, followUp } : { text: plan.text };
 }
 
 function aboutTo(card: ProposalCard): string {
@@ -817,10 +796,6 @@ function operationGroupKey(op: PlannedOperation): GroupKey {
       ? { key: `source:${source.toLowerCase()}`, heading: `*${source}* (Notion data source)`, name: `${source} (Notion data source)` }
       : bolded("source:notion", "Notion");
   }
-  if (op.toolName === "email_send") {
-    const to = str("to") || str("recipient");
-    return to ? bolded(`email:${to.toLowerCase()}`, to) : bolded("email:", "Gmail");
-  }
   if (op.toolName === "dm_relay") {
     // A table cell renders no mention, so the plain name is the kind of
     // target; the text copy beside the table names the person.
@@ -830,10 +805,6 @@ function operationGroupKey(op: PlannedOperation): GroupKey {
   if (op.toolName === "shareout_post") {
     const channel = str("channel") || "#plus-design-feedback";
     return bolded(`channel:${channel.toLowerCase()}`, channel);
-  }
-  if (op.toolName === "component_implement" || op.toolName === "prototype_scaffold") {
-    const repo = str("repo") || str("repository");
-    if (repo) return bolded(`repo:${repo.toLowerCase()}`, repo);
   }
   const pageUrl = str("page_url") || str("url");
   const title = str("title") || str("page_title") || str("page");

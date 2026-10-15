@@ -24,6 +24,7 @@ import { DECISION_CARD_TTL_MS, figmaDecisionsSection, MAX_NO_PRD_REPLIES } from 
 import { candidateThreads, readable } from "../src/figma-comments/threads";
 import { dividerSection, pageOf, pagesOf } from "../src/figma-comments/sections";
 import { cardNumbersOf } from "../src/figma-comments/title";
+import { dueAt, figmaHandlesFrom, questionsSection } from "../src/figma-comments/triage";
 import { modelDecisionDetector, type DecisionInput } from "../src/figma-comments/detector";
 import { numberedReply, reviseDecision, rewordCue, type ReviseDeps } from "../src/figma-comments/revise";
 import { NEEDS_CHANGES_LEAD, cardSentBack } from "../src/slack/review-door";
@@ -35,7 +36,7 @@ import { replyHandlerAt } from "../src/slack/events";
 import type { SlackMessageEvent } from "../src/slack/types";
 import type { Env } from "../src/types";
 import type { DecisionRow } from "../src/integrations/notion";
-import { at, DESIGN, notionPage, ROADMAP_DB, sweepHarness, type SweepHarness } from "./helpers/sweep-harness";
+import { at, DESIGN, notionPage, ROADMAP_DB, sweepHarness, type SweepHarness, type TriageOptions } from "./helpers/sweep-harness";
 import { mentionCount, notified } from "./helpers/notified";
 
 /** One card of a decision report, as Slack is handed it. */
@@ -209,6 +210,8 @@ async function nightHarness(
     sources?: SweepSource[];
     decisionRows?: Record<string, DecisionRow[]>;
     people?: { figma: Record<string, string>; notion: Record<string, string> };
+    cards?: Record<number, { url: string; title: string; pillars?: string[] }>;
+    triage?: TriageOptions;
   } = {},
 ) {
   const client = over.figma ?? seededFigma();
@@ -221,7 +224,8 @@ async function nightHarness(
     figma: {
       client,
       notes: over.notes ?? NOTES,
-      cards: { 2482: { url: CARD_URL, title: "Goal Setting" } },
+      cards: over.cards ?? { 2482: { url: CARD_URL, title: "Goal Setting" } },
+      ...(over.triage ? { triage: over.triage } : {}),
       // Meryem is the card's PM, Sarah its designer: the design owner.
       roles: { U0MERYEM: "pm", U0SARAH: "design" },
       ...(over.members !== undefined ? { members: over.members } : {}),
@@ -462,6 +466,24 @@ describe("the morning's decisions on the sweep's message in #plus-design (#900)"
     assert.deepEqual(h.figma.messages, []);
     assert.deepEqual(h.posted, []);
     assert.equal(h.figma.queue.size, 1, "queued until the message is up");
+  });
+
+  it("goes to the message of the place the posting ladder names: a Toolkit card's file to #plus-toolkit, a Tutoring card's to its Figma team's", async () => {
+    const toolkit = await nightHarness({ cards: { 2482: { url: CARD_URL, title: "Goal Setting", pillars: ["Toolkit"] } } });
+    await runSweepJob(NIGHT, toolkit.h.deps);
+    toolkit.h.clock.now = at(30, 13);
+    await morning(toolkit.h);
+    assert.deepEqual(toolkit.h.posted.map((p) => [p.channel, p.threadTs]), [["C0TOOLKIT", null]], "one message, in the team's channel");
+    assert.equal(toolkit.h.staged.length, 4);
+    assert.ok(toolkit.h.staged.every((p) => p.channel === "C0TOOLKIT"));
+    const [thread] = [...toolkit.h.figma.threads.values()];
+    assert.equal(thread!.channel, "C0TOOLKIT", "a rewording reply finds its thread there");
+
+    const tutoring = await nightHarness({ cards: { 2482: { url: CARD_URL, title: "Goal Setting", pillars: ["Tutoring"] } }, triage: { fileTeams: { [FILE]: "Toolkit" } } });
+    await runSweepJob(NIGHT, tutoring.h.deps);
+    tutoring.h.clock.now = at(30, 13);
+    await morning(tutoring.h);
+    assert.deepEqual(tutoring.h.posted.map((p) => p.channel), ["C0TOOLKIT"], "no pillar channel: the file's Figma team decides");
   });
 
   it("is a section of the one message: its owner's bullet, and a card per decision in the carousel", async () => {
@@ -724,6 +746,250 @@ describe("the morning's decisions on the sweep's message in #plus-design (#900)"
     assert.equal(h.figma.messages[0]!.threadTs, h.posted[0]!.ts);
     assert.deepEqual([...h.figma.carded], ["c1"]);
     assert.equal(h.figma.queue.size, 0);
+  });
+});
+
+describe("an unanswered question, raised after two workdays", () => {
+  const TOOLKIT = "C0TOOLKIT";
+  const TOOLKIT_CARD = { 2482: { url: CARD_URL, title: "Goal Setting", pillars: ["Toolkit"] } };
+  /** Tuesday's question (c10, Specs) waits Wednesday and Thursday: Friday's morning raises it. */
+  const THURSDAY = at(31, 13);
+  const FRIDAY = at(32, 13);
+  const MONDAY = at(35, 13);
+
+  /** A morning: the hand-over, then the sweep's post with the decisions and
+   *  the questions as its sections. The summary is both jobs'. */
+  async function morning(h: SweepHarness, now: number) {
+    h.clock.now = now;
+    const report = await runSweepJob(MORNING, h.deps);
+    const fc = h.deps.figmaComments!;
+    h.deps.sections = [
+      figmaDecisionsSection(fc, h.deps.runDate, h.deps.now)!,
+      questionsSection(fc.triage!, fc.questionsHandOff!, h.deps.runDate, h.deps.now),
+    ];
+    const post = await runSweepJob(SWEEP_POST, h.deps);
+    return { summary: `${report.summary} | ${post.summary}` };
+  }
+
+  /** Each question line on a morning message, with its channel. */
+  function posts(h: SweepHarness): Array<{ channel: string; text: string }> {
+    return h.posted.flatMap((p) =>
+      p.text.split("\n").flatMap((line) => {
+        const m = /((?:<@\w+>|[\w.-]+), a question in .*\|Open comment>|A question in .*\|Open comment>)/.exec(line);
+        return m ? [{ channel: p.channel, text: m[1]! }] : [];
+      }),
+    );
+  }
+
+  it("is raised once, at two workdays, on the morning message of the card's team channel, tagging its design owner", async () => {
+    const { h } = await nightHarness({ cards: TOOLKIT_CARD, triage: {} });
+    await runSweepJob(NIGHT, h.deps);
+    await morning(h, at(30, 13));
+    await morning(h, THURSDAY);
+    assert.equal(posts(h).length, 0, "one workday is not two");
+    const report = await morning(h, FRIDAY);
+    assert.match(report.summary, /handed \d+ Figma decision card\(s\) on \d+ file\(s\) to the morning post, handed 1 unanswered Figma question\(s\)/);
+    assert.equal(posts(h).length, 1);
+    const [post] = posts(h);
+    assert.equal(post!.channel, TOOLKIT);
+    assert.equal(
+      post!.text,
+      "<@U0SARAH>, a question in <https://www.figma.com/design/GoalFile1|Goal Setting / Card 2482 / Sarah> has waited two workdays with no answer: “Should the bar animate?” — meryem, Specs › Goal states. <https://www.figma.com/design/GoalFile1?node-id=4-1#c10|Open comment>",
+    );
+    await morning(h, MONDAY);
+    assert.equal(posts(h).length, 1, "never raised again");
+    assert.deepEqual(h.figma.triage.dms, []);
+    const [event] = h.figma.triage.events;
+    assert.equal(h.figma.triage.events.length, 1, "the card is on the usage record once, as a Worker-staged card");
+    assert.equal(event!.event, "staged");
+    assert.equal(event!.via, "worker");
+    assert.equal(event!.channelId, TOOLKIT);
+    assert.deepEqual(event!.tools, [], "a question card runs nothing");
+    assert.equal(h.posted.filter((p) => p.channel === TOOLKIT && p.threadTs === null).length, 2, "Friday's one message there, and Monday's for the card's decisions");
+  });
+
+  it("keeps a question whose team channel uno-bot is not in", async () => {
+    const { h } = await nightHarness({ cards: TOOLKIT_CARD, triage: {} });
+    h.notInChannel.add(TOOLKIT);
+    await runSweepJob(NIGHT, h.deps);
+    await morning(h, FRIDAY);
+    assert.deepEqual(posts(h), []);
+    assert.deepEqual(h.figma.triage.events, [], "nothing on the usage record until it is up");
+    assert.equal(h.figma.triage.watch.get(FILE)?.questions.length, 1, "never dropped: it waits for the invite");
+  });
+
+  it("leaves a question on any other page alone", async () => {
+    const client = seededFigma();
+    client.seedFile(FILE, {
+      comments: [...COMMENTS, comment("c11", { created_at: "2026-09-29T20:10:00Z", message: "Is option B final?", client_meta: pin("6:1") })],
+    });
+    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: {} });
+    await runSweepJob(NIGHT, h.deps);
+    await morning(h, FRIDAY);
+    assert.deepEqual(posts(h).map((p) => p.text.match(/“(.*)”/)?.[1]), ["Should the bar animate?"], "the WIP question is not raised");
+  });
+
+  it("raises nothing once someone else answered or the thread was resolved", async () => {
+    const { h, client } = await nightHarness({ cards: TOOLKIT_CARD, triage: {} });
+    await runSweepJob(NIGHT, h.deps);
+    client.seedFile(FILE, {
+      comments: [...COMMENTS, comment("c10r", { handle: "sarah", parent_id: "c10", created_at: "2026-09-30T14:00:00Z", message: "No, it stays still." })],
+    });
+    await morning(h, FRIDAY);
+    assert.deepEqual(posts(h), []);
+    assert.equal(h.figma.triage.watch.size, 0, "an answered question is no longer watched");
+
+    const second = await nightHarness({ cards: TOOLKIT_CARD, triage: {} });
+    await runSweepJob(NIGHT, second.h.deps);
+    second.client.seedFile(FILE, {
+      comments: COMMENTS.map((c) => (c.id === "c10" ? { ...c, resolved_at: "2026-09-30T14:00:00Z" } : c)),
+    });
+    await morning(second.h, FRIDAY);
+    assert.deepEqual(posts(second.h), []);
+  });
+
+  it("is still raised when only its asker replied", async () => {
+    const { h, client } = await nightHarness({ cards: TOOLKIT_CARD, triage: {} });
+    await runSweepJob(NIGHT, h.deps);
+    client.seedFile(FILE, {
+      comments: [...COMMENTS, comment("c10b", { handle: "meryem", parent_id: "c10", created_at: "2026-09-30T14:00:00Z", message: "Anyone?" })],
+    });
+    await morning(h, FRIDAY);
+    assert.equal(posts(h).length, 1);
+  });
+
+  it("DMs a mapped @-name instead of posting, and names an unmapped one on the channel card", async () => {
+    const client = seededFigma();
+    client.seedFile(FILE, {
+      comments: COMMENTS.map((c) => (c.id === "c10" ? { ...c, message: "@Sarah K should the bar animate? cc @bea" } : c)),
+    });
+    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { handles: "Sarah K=U0SARAH" } });
+    await runSweepJob(NIGHT, h.deps);
+    await morning(h, FRIDAY);
+    assert.deepEqual(h.figma.triage.dms.map((d) => d.to), ["U0SARAH"]);
+    assert.equal(
+      h.figma.triage.dms[0]!.text,
+      "meryem asked you a question in <https://www.figma.com/design/GoalFile1|Goal Setting / Card 2482 / Sarah> two workdays ago, and nobody has answered: “@Sarah K should the bar animate? cc @bea” — Specs › Goal states. <https://www.figma.com/design/GoalFile1?node-id=4-1#c10|Open comment>",
+    );
+    assert.equal(posts(h).length, 1);
+    assert.equal(posts(h)[0]!.channel, TOOLKIT);
+    assert.match(posts(h)[0]!.text, / It names bea, who isn't matched to a Slack account yet\. /);
+    assert.doesNotMatch(posts(h)[0]!.text, /names Sarah K/, "the mapped person is DMed, not named");
+  });
+
+  it("sends only the DM when everyone it names is mapped", async () => {
+    const client = seededFigma();
+    client.seedFile(FILE, {
+      comments: COMMENTS.map((c) => (c.id === "c10" ? { ...c, message: "@Sarah K should the bar animate?" } : c)),
+    });
+    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { handles: "sarah k=U0SARAH" } });
+    await runSweepJob(NIGHT, h.deps);
+    await morning(h, FRIDAY);
+    assert.deepEqual(h.figma.triage.dms.map((d) => d.to), ["U0SARAH"]);
+    assert.deepEqual(posts(h), []);
+    await morning(h, MONDAY);
+    assert.equal(h.figma.triage.dms.length, 1, "never DMed twice");
+  });
+
+  it("waits for the invite when the card is refused, and never DMs again the people it already reached", async () => {
+    const client = seededFigma();
+    client.seedFile(FILE, {
+      comments: COMMENTS.map((c) => (c.id === "c10" ? { ...c, message: "@Sarah K should the bar animate? cc @bea" } : c)),
+    });
+    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { handles: "Sarah K=U0SARAH" } });
+    h.notInChannel.add(TOOLKIT);
+    await runSweepJob(NIGHT, h.deps);
+    await morning(h, FRIDAY);
+    assert.deepEqual(h.figma.triage.dms.map((d) => d.to), ["U0SARAH"]);
+    assert.deepEqual(posts(h), []);
+    assert.equal(h.figma.triage.raised.size, 0, "a refused line is not raised");
+    assert.equal(h.figma.triage.watch.get(FILE)?.questions.length, 1, "still watched");
+
+    await morning(h, MONDAY);
+    assert.equal(h.figma.triage.dms.length, 1, "Sarah is not DMed again while the card waits");
+    assert.deepEqual(posts(h), []);
+
+    h.notInChannel.delete(TOOLKIT);
+    const invited = await morning(h, at(36, 13));
+    assert.equal(posts(h).length, 1, "the line goes once uno-bot is invited");
+    assert.equal(h.figma.triage.dms.length, 1, "and Sarah still has one DM");
+    assert.match(invited.summary, /handed 1 unanswered Figma question\(s\)/);
+    assert.equal(h.figma.triage.watch.size, 0);
+  });
+
+  it("retries next morning only the mapped person whose DM failed", async () => {
+    const client = seededFigma();
+    client.seedFile(FILE, {
+      comments: COMMENTS.map((c) => (c.id === "c10" ? { ...c, message: "@Sarah K @bea should the bar animate?" } : c)),
+    });
+    const dmFails = ["U0BEA"];
+    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { handles: "Sarah K=U0SARAH,bea=U0BEA", dmFails } });
+    await runSweepJob(NIGHT, h.deps);
+    const friday = await morning(h, FRIDAY);
+    assert.deepEqual(h.figma.triage.dms.map((d) => d.to), ["U0SARAH"]);
+    assert.doesNotMatch(friday.summary, /handed 1 unanswered/);
+    assert.equal(h.figma.triage.watch.get(FILE)?.questions.length, 1, "bea is still owed her DM");
+
+    dmFails.length = 0;
+    await morning(h, MONDAY);
+    assert.deepEqual(h.figma.triage.dms.map((d) => d.to), ["U0SARAH", "U0BEA"], "only bea is DMed on the retry");
+    assert.deepEqual(posts(h), []);
+    assert.equal(h.figma.triage.watch.size, 0);
+    await morning(h, at(36, 13));
+    assert.equal(h.figma.triage.dms.length, 2);
+  });
+
+  it("with a card whose pillars have no channel, goes to the Figma file's team channel, tagging its design owner", async () => {
+    const tutoring = { 2482: { url: CARD_URL, title: "Goal Setting", pillars: ["Tutoring"] } };
+    const { h } = await nightHarness({ cards: tutoring, triage: { fileTeams: { [FILE]: "Toolkit" } } });
+    await runSweepJob(NIGHT, h.deps);
+    await morning(h, FRIDAY);
+    assert.equal(posts(h).length, 1);
+    assert.equal(posts(h)[0]!.channel, TOOLKIT);
+    assert.match(posts(h)[0]!.text, /^<@U0SARAH>, a question/);
+  });
+
+  it("with no card, goes to the Figma file's team channel and names its creator by handle, untagged", async () => {
+    const client = createInMemoryFigma();
+    client.seedFile("ToolFile1", {
+      name: "Session notes",
+      document: DOCUMENT,
+      creator: { id: "u-bea", handle: "bea" },
+      comments: [comment("q1", { handle: "meryem", created_at: "2026-09-29T20:00:00Z", message: "Who signs off on this?", client_meta: pin("8:1") }, "ToolFile1")],
+    });
+    const notes = [{ key: "figma-notify:commented:2026-09-29:ToolFile1", at: "2026-09-29T20:00:00Z" }];
+    const none = JSON.stringify({ decisions: [] });
+    const { h } = await nightHarness({ figma: client, notes, replies: [none], triage: { fileTeams: { ToolFile1: "Toolkit" } } });
+    await runSweepJob(NIGHT, h.deps);
+    await morning(h, FRIDAY);
+    assert.equal(posts(h).length, 1);
+    assert.equal(posts(h)[0]!.channel, TOOLKIT);
+    assert.match(posts(h)[0]!.text, /^bea, a question in <https:\/\/www\.figma\.com\/design\/ToolFile1\|Session notes> has waited/);
+
+    const elsewhere = await nightHarness({ figma: client, notes, replies: [none], triage: { fileTeams: { ToolFile1: "MISC" } } });
+    await runSweepJob(NIGHT, elsewhere.h.deps);
+    await morning(elsewhere.h, FRIDAY);
+    assert.equal(posts(elsewhere.h)[0]!.channel, DESIGN, "a team with no channel → #plus-design");
+  });
+
+  it("counts workdays only: a Friday question waits Monday and Tuesday, and Wednesday's morning raises it", () => {
+    const friday = Date.parse("2026-10-02T18:00:00Z");
+    assert.ok(dueAt(friday) > Date.parse("2026-10-07T03:59:00Z"), "not before Wednesday");
+    assert.ok(dueAt(friday) <= Date.parse("2026-10-07T13:00:00Z"), "by Wednesday's morning run");
+  });
+
+  it("reads the handle map as handle=Slack id pairs, and refuses anything else", () => {
+    assert.deepEqual(figmaHandlesFrom("Sarah K=U0SARAH, @bea=U0BEA"), { "sarah k": "U0SARAH", bea: "U0BEA" });
+    assert.deepEqual(figmaHandlesFrom(""), {});
+    assert.throws(() => figmaHandlesFrom("sarah=someone"), /not handle=<Slack id>/);
+    assert.throws(() => figmaHandlesFrom("bea=U0A,Bea=U0B"), /appears twice/);
+  });
+
+  it("keeps nothing on a dry run", async () => {
+    const { h } = await nightHarness({ cards: TOOLKIT_CARD, triage: {} });
+    h.deps.dryRun = true;
+    await runSweepJob(NIGHT, h.deps);
+    assert.equal(h.figma.triage.watch.size, 0);
   });
 });
 

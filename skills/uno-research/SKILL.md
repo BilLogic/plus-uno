@@ -61,7 +61,7 @@ writers/notion.
       Task `researchers/people-scout` directly for ranked candidates.
    2. Before any intro draft is sent or conversation planned: draft the study
       guide per method.md; `writers/notion` writes it to the Research & notes
-      DB. Read `docs/connectors/notion.md` before the write — convention
+      DB. Read `docs/connectors/notion/overview.md` before the write — convention
       surfaces only, never create select options. **Notion unreachable?** Draft
       the guide locally, flag it `⏳ pending Notion write`, and say so — the
       gate is satisfied by the guide existing and being shown, never by
@@ -83,8 +83,8 @@ writers/notion.
 | scoping an explorer dispatch — repo layout, key paths, commands | `references/foundations-index.json` |
 | DS usage-pattern questions | `references/patterns-index.json` |
 | prior-knowledge check | root `INDEX.md` + `docs/adr/overview.md`; ledger: `docs/knowledge/changelog.md` |
-| writing the study guide (via writers/notion) | `docs/connectors/notion.md` |
-| pointing source-miner at Slack | `docs/connectors/slack.md` (channel map) |
+| writing the study guide (via writers/notion) | `docs/connectors/notion/page-writing.md` |
+| pointing source-miner at Slack | `docs/connectors/slack/overview.md` (channel map) |
 
 ## Quality bar
 

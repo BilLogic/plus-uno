@@ -71,7 +71,7 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
     return handleSlackEventsRequest(request, env, ctx);
   }
 
-  // Slash commands (/uno-prototype, /uno-research, …). Separate route because
+  // Slash commands (/grind, /chill, /stop). Separate route because
   // Slack posts them form-encoded, not as an events JSON envelope.
   if (request.method === "POST" && url.pathname === "/slack/commands") {
     return handleSlackCommandRequest(request, env, ctx);

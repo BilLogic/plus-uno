@@ -10,10 +10,11 @@
 //
 // THE CARDED MARKS are ids only: a thread whose decision was carded is never
 // carded again, whatever later replies say (a known limit, stated in
-// `docs/connectors/figma.md`).
+// `docs/connectors/figma/overview.md`).
 //
 // PURE: types and one merge.
 
+import type { Addressee, ChannelIds } from "../destination/index";
 import type { FigmaClient } from "../figma/client";
 import type { PendingProposal, ProposalOperation, ThreadState } from "../thread-state/index";
 import type { ReportMessage, ReportStore } from "../slack/decision-cards";
@@ -22,6 +23,7 @@ import type { FigmaDecisionsHanded } from "./post";
 import type { DecisionDetector, DecisionRoute } from "./detector";
 import type { DecisionUpdate } from "./draft";
 import type { Section } from "./sections";
+import type { QuestionsHanded, TriagePorts } from "./triage";
 import type { FigmaPeople, NotionPeople, TeamRoles } from "../usage/roles";
 import type { DecisionRow, RowUpdate } from "../decisions-db/row";
 
@@ -53,13 +55,9 @@ export interface QueuedDecision {
   row?: { operations: ProposalOperation[]; update: RowUpdate };
 }
 
-/** Who a file's thread asks. */
-export type FileOwner =
-  /** The card's design owner, as a Slack id. */
-  | { slack: string }
-  /** No design owner in Slack: the file's creator, by Figma handle, since
-   *  nothing maps a Figma person to a Slack one. */
-  | { figma: string };
+/** Who a file's thread asks: the posting ladder's addressee — the card's
+ *  design owner as a Slack id, else the file's creator by Figma handle. */
+export type FileOwner = Addressee;
 
 /** One file's decisions, waiting for the morning. */
 export interface QueuedFile {
@@ -68,9 +66,13 @@ export interface QueuedFile {
   title: string;
   url: string;
   owner: FileOwner | null;
+  /** The Product Pillar values of the cards its title names: which team's
+   *  channel the posting ladder sends its decisions to. Absent on a file
+   *  queued before it was kept: then its Figma team, or #plus-design. */
+  pillars?: string[];
   /** Who may decide: the cards' Contributors as Slack ids. Empty for a file
-   *  with no card, or none whose Contributors are Slack people: then
-   *  #plus-design's members decide its cards. */
+   *  with no card, or none whose Contributors are Slack people: then its
+   *  place's members decide its cards. */
   confirmers: string[];
   decisions: QueuedDecision[];
   runDate: string;
@@ -128,8 +130,9 @@ export interface SweepFigmaComments extends FigmaCommentStores {
   /** Keys under a prefix of the notification route's KV notes, each with the
    *  time it records (null when it cannot be read). */
   notes: { list(prefix: string): Promise<Array<{ key: string; at: string | null }>> };
-  /** A Roadmap card by its number, or null when the Roadmap has none. */
-  card(number: number): Promise<{ url: string; title: string } | null>;
+  /** A Roadmap card by its number, with its Product Pillar values, or null
+   *  when the Roadmap has none. */
+  card(number: number): Promise<{ url: string; title: string; pillars?: string[] } | null>;
   /** The team's roles by Slack id (`usage/roles.ts`): how a card's design
    *  owner is told from its other Contributors. Empty when unread. */
   roles(): Promise<TeamRoles>;
@@ -144,12 +147,20 @@ export interface SweepFigmaComments extends FigmaCommentStores {
   /** The morning run's hand-off to the sweep's post (`./post.ts`); absent on
    *  a rehearsal, which hands nothing over. */
   handOff?: SectionHandOff<FigmaDecisionsHanded>;
+  /** The unanswered questions' hand-off to the sweep's post (`./triage.ts`);
+   *  absent on a rehearsal. */
+  questionsHandOff?: SectionHandOff<QuestionsHanded>;
   /** The morning's Slack side. Absent, the post skips. */
   slack?: {
-    post(message: { text: string; blocks?: unknown[]; thread_ts?: string }): Promise<{ ok: boolean; ts?: string }>;
-    edit(ts: string, message: { text: string; blocks?: unknown[]; metadata?: ReportMessage["metadata"] }): Promise<void>;
-    /** #plus-design's members, or null when they cannot be read. */
-    members(): Promise<string[] | null>;
+    /** Post in `channel`, or #plus-design. */
+    post(message: { channel?: string; text: string; blocks?: unknown[]; thread_ts?: string }): Promise<{ ok: boolean; ts?: string }>;
+    /** Edit a message in `channel`, or #plus-design. */
+    edit(ts: string, message: { text: string; blocks?: unknown[]; metadata?: ReportMessage["metadata"] }, channel?: string): Promise<void>;
+    /** A channel's members — #plus-design's when none is named — or null
+     *  when they cannot be read. */
+    members(channel?: string): Promise<string[] | null>;
+    /** The posting ladder's channel ids; absent, #plus-design alone. */
+    channels?: ChannelIds;
     /** Stage a card the Worker posted, and put it on the usage record. */
     stage(proposal: PendingProposal): Promise<void>;
     /** Where each morning's report and its items' states are kept
@@ -161,6 +172,8 @@ export interface SweepFigmaComments extends FigmaCommentStores {
     read(ts: string): Promise<DecisionThread | null>;
     write(thread: DecisionThread): Promise<void>;
   };
+  /** The unanswered-question triage (`./triage.ts`). Absent, no question is kept or raised. */
+  triage?: TriagePorts;
 }
 
 /** Everything a decision's ✅ runs: its update, then its row. Empty for a decision said only in the thread. */

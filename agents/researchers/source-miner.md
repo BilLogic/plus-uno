@@ -23,5 +23,5 @@ Gathers evidence from outside the repo: Slack history, analytics pulls, Notion r
 
 ## Conventions it obeys
 
-- `docs/connectors/slack.md` — channel map for where evidence lives
-- `docs/connectors/notion.md` — read surfaces; this agent never writes
+- `docs/connectors/slack/overview.md` — channel map for where evidence lives
+- `docs/connectors/notion/overview.md` — read surfaces; this agent never writes

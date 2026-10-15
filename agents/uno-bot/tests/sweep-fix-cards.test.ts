@@ -236,3 +236,55 @@ test("Review decides one fix: Approve runs only it, and its card redraws as appr
   assert.deepEqual(cards[0]!.actions.map((a: Block) => a.text.text), ["Review", "Open page"], "the others wait on their own decisions");
   assert.equal(messageBlocksRefusal(door.updates.at(-1)!.blocks as Block[]), null);
 });
+
+test("a report to a channel uno-bot is not in is recorded as failed, never dropped, and cards again once it is invited", async () => {
+  const history = [msg("U0SAM", ROOT, `PRD: <${PAGE.url}>`, { reply_count: 1, latest_reply: ts(29, 16, 0) })];
+  const h = sweepHarness({
+    channels: { [DESIGN]: { kind: "public", history, threads: { [ROOT]: [history[0]!, msg("U0ADE", ts(29, 16, 0), "Launch slips to November.")] } } },
+    sources: [PAGE],
+    detectorReplies: [reply(drift({ source: PAGE, block: "blk-0", evidence: [ts(29, 16, 0)], claimedBy: "U0ADE", replacement: FIXES[0]! }))],
+    now: at(29, 22),
+  });
+  await runSweepJob(END_OF_DAY, h.deps);
+  h.notInChannel.add(DESIGN);
+  h.clock.now = at(30, 14);
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 0, "nothing went up");
+  const [finding] = await h.store.pendingFindings();
+  assert.ok(finding, "the finding is still queued");
+  const items = await h.store.itemsForFindings([finding.id]);
+  assert.deepEqual(items.map((i) => i.status), ["failed"], "the refused post is on the record as failed");
+  assert.ok(items[0]!.postedAt, "with the time it was tried, so the outcomes query counts it");
+
+  h.notInChannel.delete(DESIGN);
+  h.clock.now = at(31, 14);
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 1, "invited, the same finding cards again");
+});
+
+test("a finding waiting for the invite is on the record as failed once, however many mornings the channel refuses it", async () => {
+  const history = [msg("U0SAM", ROOT, `PRD: <${PAGE.url}>`, { reply_count: 1, latest_reply: ts(29, 16, 0) })];
+  const h = sweepHarness({
+    channels: { [DESIGN]: { kind: "public", history, threads: { [ROOT]: [history[0]!, msg("U0ADE", ts(29, 16, 0), "Launch slips to November.")] } } },
+    sources: [PAGE],
+    detectorReplies: [reply(drift({ source: PAGE, block: "blk-0", evidence: [ts(29, 16, 0)], claimedBy: "U0ADE", replacement: FIXES[0]! }))],
+    now: at(29, 22),
+  });
+  await runSweepJob(END_OF_DAY, h.deps);
+  h.notInChannel.add(DESIGN);
+  for (const day of [30, 31, 32]) {
+    h.clock.now = at(day, 14);
+    const report = await runSweepJob(MORNING, h.deps);
+    assert.match(report.summary, /posted 0 card\(s\) holding 0 fix\(es\)/, "a refused card carded nothing");
+    assert.doesNotMatch(report.summary, /wait in the queue for a live card/, "nor is it waiting on one: it waits for the invite");
+  }
+  const [finding] = await h.store.pendingFindings();
+  assert.ok(finding);
+  const items = await h.store.itemsForFindings([finding.id]);
+  assert.deepEqual(items.map((i) => i.status), ["failed"], "one failed row for the one finding");
+
+  h.notInChannel.delete(DESIGN);
+  h.clock.now = at(33, 14);
+  await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 1, "invited, it cards");
+});

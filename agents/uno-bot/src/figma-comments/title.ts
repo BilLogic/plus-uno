@@ -1,7 +1,7 @@
 // The Roadmap cards a Figma file belongs to, read off its title (#900).
 //
 // How We Fig titles a card's file `<Project> / Card <n> & <m> / <designers>`
-// (`docs/connectors/figma.md` § File titles): `Card <n>` is the card's number,
+// (`docs/connectors/figma/overview.md` § File titles): `Card <n>` is the card's number,
 // a file for several cards joins them with `&`, and a number matches only
 // whole. Files from before the convention carry the variants it corrects — a
 // bare `2204 & 2251` segment, or `Card #733` — and still name their cards, so

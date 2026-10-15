@@ -34,7 +34,7 @@ plus-vibe-coding-starting-kit/
 │   └── src/                   Components, forms, DataViz, specs, tokens, styles
 ├── prototypes/                home-redesign (live app) + branch experiment folders
 ├── src/                       Vite SPA entry (Storybook redirect + live app routes)
-├── skills/                    Six dual-face skills (SKILL.md + bot.md + references/method.md)
+├── skills/                    Six IDE skills (SKILL.md + references/method.md)
 ├── agents/                    researchers/ · reviewers/ · writers/ · uno-bot/ (Worker)
 ├── docs/
 │   ├── context/               Descriptive — product, design-system foundation, onboarding

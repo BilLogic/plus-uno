@@ -18,7 +18,7 @@ import { runClassifyBatch, runTextPurge } from "../usage/classify-run";
 import { askCategoriesFor, proposalEventLogFor, runTeamRolesSync } from "../usage/production";
 import { runSnapshotRefreshOnEnv } from "../figma-library/env";
 import { dsPrecedenceSectionFor, runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
-import { figmaDecisionsSectionFor } from "../figma-comments/env";
+import { figmaDecisionsSectionFor, figmaQuestionsSectionFor } from "../figma-comments/env";
 import { runSweepJobOnEnv } from "../sweep/env";
 import { commitmentThreadHookFor, runCommitmentNudgesOnEnv } from "../commitments/env";
 import { cardTodoNoteHookFor, cardTodoThreadHookFor, morningFollowUpsFor, runCardFollowThroughOnEnv } from "../follow-through/env";
@@ -84,6 +84,7 @@ export function morningSectionsFor(env: Env, ctx: JobContext): SweepSection[] {
     morningFollowUpsFor(env, ctx),
     dsPrecedenceSectionFor(env, ctx),
     figmaDecisionsSectionFor(env, ctx),
+    figmaQuestionsSectionFor(env, ctx),
     tidySectionFor(env, ctx),
     driftSectionFor(env, ctx),
     devLinksSectionFor(env, ctx),
@@ -286,7 +287,7 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
     console.log(`[figma-tidy] ${job.key}: ${report.summary}`);
     return report;
   },
-  // Morning: a Dev Mode links card for the library PRs merged since the last,
+  // Morning: a Dev Mode links card for the component PRs merged since the last,
   // handed to the sweep's #plus-design message (src/figma-links/morning.ts).
   "figma-dev-links-post": async (env, job, ctx) => {
     const report = await runDevLinksMorningOnEnv(env, ctx);

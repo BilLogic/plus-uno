@@ -1,7 +1,7 @@
 // The Dev Mode links' words: the parent line, the one Review card a run posts,
 // what the gate says, the replies a batch write leaves in its thread, and the
 // one comment Approve leaves in Figma the first time a component gets its
-// links. Figma messages (docs/connectors/slack.md § Figma messages):
+// links. Figma messages (docs/connectors/slack/shapes.md § Figma messages):
 // "component", never "component set" or "node".
 //
 // PURE.

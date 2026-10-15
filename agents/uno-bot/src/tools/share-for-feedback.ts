@@ -55,7 +55,7 @@ export async function executeShareForFeedback(
   const place = shareoutPlace(env, slack);
   const requester = slack.requestedBy ? `<@${slack.requestedBy}>` : "A designer";
 
-  // The Flow 3 template, per docs/connectors/slack.md § Share-out post. The
+  // The Flow 3 template, per docs/connectors/slack/shapes.md § Share-out post. The
   // shape lives in share-out-render.ts so it can be asserted — it drifted from
   // the doc for months precisely because nothing compared the two.
   const body = renderShareout(fields, requester);

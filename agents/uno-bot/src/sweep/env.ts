@@ -46,6 +46,7 @@
 // here is measured by the meter's own trip counter, and one that tripped is
 // thrown as the budget stop the job saves and defers on.
 
+import { channelIdsFor } from "../destination/env";
 import { teamSurfacesFor } from "./team-surfaces";
 import type { Env } from "../types";
 import { LOOKUP_CEILING } from "../agent/loop-policy";
@@ -85,10 +86,11 @@ import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render
 import { refusedForBlocks } from "../slack/delivery";
 import { parseSlackCanvasId } from "../slack/canvas-reference";
 import { threadStateFor } from "../thread-state/production";
-import { notionPeopleFor, proposalEventLogFor } from "../usage/production";
+import { notionPeopleFor, proposalEventLogFor, teamRolesFor } from "../usage/production";
 import { executeReadSource } from "../tools/read-source";
 import { figmaCommentsFor } from "../figma-comments/env";
 import { FIGMA_DECISIONS_SECTION, type FigmaDecisionsHanded } from "../figma-comments/post";
+import { QUESTIONS_SECTION, type QuestionsHanded } from "../figma-comments/triage";
 import { sectionHandOffIn } from "./sections";
 import { findSlackUsers, slackDirectoryFor } from "../tools/slack-people";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
@@ -230,7 +232,12 @@ async function sweepDepsFor(
   const figmaComments = fc && {
     ...fc,
     // The morning's hand-over leaves its decisions for the sweep's post.
-    ...(opts.runStorage ? { handOff: sectionHandOffIn<FigmaDecisionsHanded>(opts.runStorage, FIGMA_DECISIONS_SECTION) } : {}),
+    ...(opts.runStorage
+      ? {
+          handOff: sectionHandOffIn<FigmaDecisionsHanded>(opts.runStorage, FIGMA_DECISIONS_SECTION),
+          questionsHandOff: sectionHandOffIn<QuestionsHanded>(opts.runStorage, QUESTIONS_SECTION),
+        }
+      : {}),
     card: (n: number) => measured(() => fc.card(n)),
     ...(fc.decisionRows ? { decisionRows: (url: string) => measured(() => fc.decisionRows!(url)) } : {}),
     detector: { detect: (input: Parameters<typeof fc.detector.detect>[0]) => measured(() => fc.detector.detect(input)) },
@@ -278,7 +285,7 @@ async function sweepDepsFor(
           });
         const res = await send(message.blocks);
         if (res.ok && res.ts) return { ok: true, ts: res.ts };
-        return { ok: false, ...(refusedForBlocks(res) ? { refusedBlocks: true } : {}) };
+        return { ok: false, ...(refusedForBlocks(res) ? { refusedBlocks: true } : {}), ...(typeof res.error === "string" ? { error: res.error } : {}) };
       },
       async edit(channel, ts, message) {
         // Its tag rides every edit, so a later search by its key still finds it.
@@ -345,9 +352,7 @@ async function sweepDepsFor(
       permalink: (channel, ts) => getPermalink(env, channel, ts),
     },
     config: {
-      plusDesign: env.PLUS_DESIGN_CHANNEL_ID?.trim() || undefined,
-      plusUniversal: env.PLUS_UNIVERSAL_CHANNEL_ID?.trim() || undefined,
-      unoBot: env.UNO_BOT_CHANNEL_ID?.trim() || undefined,
+      ...channelIdsFor(env),
       figmaLibraryKey: env.FIGMA_FILE_KEY?.trim() || undefined,
       botUserId: bot?.userId ?? null,
       roadmapDb: env.NOTION_ROADMAP_DB_ID?.trim() || undefined,
@@ -396,6 +401,7 @@ function sweepNotionFor(env: Env): SweepNotion {
     edited: (databaseId, since, after) =>
       measured(() => queryEditedSince(env, databaseId, since, RECORDS_PER_JOB, after)),
     comments: (pageId) => measured(() => listPageComments(env, pageId)),
+    roles: () => teamRolesFor(env),
   };
 }
 
@@ -437,11 +443,7 @@ export async function offerSweepShareFor(
 ): Promise<void> {
   if (!proposal.sweepShare) return;
   await stageSweepShare(proposal, outcomes, {
-    channels: {
-      plusDesign: env.PLUS_DESIGN_CHANNEL_ID,
-      plusUniversal: env.PLUS_UNIVERSAL_CHANNEL_ID,
-      unoBot: env.UNO_BOT_CHANNEL_ID,
-    },
+    channels: channelIdsFor(env),
     async post(to, card) {
       const rendered = renderProposalCard(card);
       const res = await postMessage(env, {

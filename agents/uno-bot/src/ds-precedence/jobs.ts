@@ -31,8 +31,8 @@
 //
 // Subrequest math (each job an alarm with a fresh 50; lookups stop at 38):
 //   check:     the index + the registry from GitHub + the library's
-//              /components from Figma = 3 external; the report is KV, the
-//              internal bucket.
+//              /components and its meta (the creator the report names) from
+//              Figma = 4 external; the report is KV, the internal bucket.
 //   hand-over: members (at most 3 pages); the report and the hand-off are
 //              internal.
 //   section:   an edit when a card did not stage (1), on the sweep's post's
@@ -46,7 +46,8 @@ import { rethrowIfBudget } from "../net";
 import { renderProposalCard } from "../slack/proposal-render";
 import { itemProposal, markNotStaged, type ReportMessage, type ReportStore } from "../slack/decision-cards";
 import { handedSection, type SectionHandOff, type SweepSection } from "../sweep/sections";
-import { pickDestination, resolveDestination, type TeamChannels } from "../sweep/finding";
+import { pickRoute, resolveDestination, type ChannelIds } from "../sweep/finding";
+import type { Addressee } from "../destination/index";
 import type { FigmaClient } from "../figma/client";
 import type { JobContext } from "../scheduled/runs";
 import {
@@ -72,17 +73,36 @@ import {
 /**
  * The channel the weekly report posts in, by the rule every proactive job
  * shares (`pickDestination`): the check reads no conversation, so there is no
- * private place or thread to answer in, and its target is the Figma library —
- * a design-system target. Null when that role's channel is not configured.
+ * private place or thread to answer in, and its target is the Figma library,
+ * the Universal team's file. Null when that channel is not configured.
  *
  * @param channels - The Worker's team channel ids
  */
-export function precedenceChannel(channels: TeamChannels): string | null {
-  const destination = pickDestination({
+export function precedenceChannel(channels: ChannelIds): string | null {
+  return resolveDestination(precedenceRoute(null).destination, channels)?.channel ?? null;
+}
+
+/** Whom the weekly report names: the ladder's addressee for the library file. */
+export function precedenceAddressee(report: Pick<PrecedenceReport, "creatorHandle">): Addressee | null {
+  return precedenceRoute(report.creatorHandle ?? null).addressee;
+}
+
+function precedenceRoute(creatorHandle: string | null): ReturnType<typeof pickRoute> {
+  return pickRoute({
     evidence: { channel: "", channelKind: "public", threadTs: null, messageTs: [], permalinks: [] },
-    target: { url: "", kind: "figma-library", writable: false, title: "", pillars: [] },
+    target: { url: "", kind: "figma-library", writable: false, title: "", pillars: [], creatorHandle },
   });
-  return resolveDestination(destination, channels)?.channel ?? null;
+}
+
+/** The library file's creator by handle; null when its meta cannot be read, which never stops the check. */
+async function creatorOf(deps: Pick<CheckDeps, "figma" | "fileKey">): Promise<string | null> {
+  try {
+    return (await deps.figma.fileMeta(deps.fileKey)).file.creator?.handle ?? null;
+  } catch (err) {
+    rethrowIfBudget(err);
+    console.warn(`[ds-precedence] the library's creator was not read: ${err instanceof Error ? err.message : String(err)}`);
+    return null;
+  }
 }
 
 /** How long a weekly card stays confirmable: gone before next week's. */
@@ -100,6 +120,9 @@ export interface PrecedenceReport {
    *  with. Absent from a report kept before it was recorded; `checkedAt`'s
    *  date stands in. */
   weekOf?: string;
+  /** The library file's creator by Figma handle: whom the report names, as
+   *  the ladder names a file with no card. Absent when the meta was unread. */
+  creatorHandle?: string | null;
   items: Disagreement[];
 }
 
@@ -123,8 +146,8 @@ export interface CheckDeps extends Pick<JobContext, "runDate"> {
     /** design-system/figma/component-registry.json */
     registry(): Promise<PrecedenceRegistry>;
   };
-  /** The Figma client: the library file's components. */
-  figma: Pick<FigmaClient, "components">;
+  /** The Figma client: the library file's components, and its creator. */
+  figma: Pick<FigmaClient, "components" | "fileMeta">;
   report: Store<PrecedenceReport | null>;
   fileKey: string;
   repo: string;
@@ -143,10 +166,11 @@ export interface CheckResult {
  * @param opts - `dryRun` compares and writes nothing
  */
 export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boolean } = {}): Promise<CheckResult> {
-  const [markdown, registry, components] = await Promise.all([
+  const [markdown, registry, components, creatorHandle] = await Promise.all([
     deps.github.indexMarkdown(),
     deps.github.registry(),
     deps.figma.components(deps.fileKey),
+    creatorOf(deps),
   ]);
   const index = parseComponentIndex(markdown);
   if (!index.length) throw new Error("the component index listed no components — refusing to report every one missing");
@@ -170,7 +194,9 @@ export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boole
     repo: deps.repo,
   });
   if (!opts.dryRun) {
-    await deps.report.write(items.length ? { checkedAt: new Date(deps.now()).toISOString(), weekOf: deps.runDate, items } : null);
+    await deps.report.write(
+      items.length ? { checkedAt: new Date(deps.now()).toISOString(), weekOf: deps.runDate, creatorHandle, items } : null,
+    );
   }
   return {
     found: items.length,
@@ -187,6 +213,8 @@ export interface PrecedenceHanded {
   weekOf: string;
   items: Disagreement[];
   confirmers: string[];
+  /** The library file's creator by Figma handle, whom the line names. */
+  creatorHandle?: string | null;
 }
 
 export interface HandOverDeps {
@@ -229,6 +257,7 @@ export async function handOverPrecedenceReport(deps: HandOverDeps, opts: { dryRu
     weekOf: report.weekOf ?? report.checkedAt.slice(0, 10),
     items: report.items,
     confirmers: members,
+    creatorHandle: report.creatorHandle ?? null,
   });
   return { posted: false, summary: `handed ${components} component card(s) to the morning post` };
 }
@@ -275,7 +304,7 @@ export function precedenceSection(deps: SectionDeps, handOff: SectionHandOff<Pre
         ttlMs: PRECEDENCE_CARD_TTL_MS,
         // The cards that show, each a staging, and the edit when one did not stage.
         cost: (shown) => ({ subrequests: 1, d1Queries: shown.length * 3 }),
-        says: () => precedenceParent(findings.length, deps.ruleUrl),
+        says: () => precedenceParent(findings.length, deps.ruleUrl, precedenceAddressee(value)),
       };
     },
     async posted(value, place, shown, report, progress) {

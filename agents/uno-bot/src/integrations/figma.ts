@@ -2,14 +2,16 @@
 //
 // `parseFigmaUrl` validates/splits a pasted Figma link (used by the executor
 // and the proposal preview). `fetchFigmaFrame` reads a pasted frame for
-// `source_read` — its text and the comments pinned in it (#899);
+// `source_read` — its text, annotations and fills, the comments pinned in it
+// (#899) and, given a date, what changed in it since;
 // `fetchFigmaNode` reads a frame's text alone, for the drift check;
 // `fetchFigmaImagePngUrl` renders a node to a PNG for vision and the Slack
 // proposal preview. Each takes the client rather than `Env`, so tests drive
 // them over the shared fake.
 
 import type { FigmaCallOptions, FigmaClient } from "../figma/client";
-import { collectTextLayers, pinnedThreads, type FigmaFrameRead, type FigmaNode } from "./figma-reading";
+import { collectAnnotations, collectFills, frameChanges } from "./figma-frame-detail";
+import { collectTextLayers, pinnedThreads, type FigmaFrameChanges, type FigmaFrameRead, type FigmaNode } from "./figma-reading";
 
 const IMAGE_FETCH_TIMEOUT_MS = 8000;
 const NODE_FETCH_TIMEOUT_MS = 8000;
@@ -52,64 +54,154 @@ export async function fetchFigmaNode(
   nodeId: string,
 ): Promise<FigmaNodeContent> {
   if (!figma) throw new Error("FIGMA_ACCESS_TOKEN not configured on the Worker");
-  return contentOf(await readFrameDoc(figma, fileKey, nodeId));
+  const { doc, shown } = await readFrameDoc(figma, fileKey, nodeId);
+  return contentOf(doc, shown);
 }
 
 /**
- * Read a pasted frame for `source_read`: its name, type and text layers, and
- * the comment threads pinned to it or to a layer inside it (#899).
+ * Read a pasted frame for `source_read`: its name, type, text layers,
+ * annotations and fills, the comment threads pinned to it or to a layer
+ * inside it (#899), and — given `since` — what changed in it since then.
  *
- * The comments come from one more call, made after the node read has
- * landed. Made beside it, the comments call could be metered first and spend
- * a turn's last lookup, leaving the frame — the part that read fine before —
- * to the budget stop. The node read decides the outcome as `fetchFigmaNode`
- * does: it throws on a missing client or a refusal. A comments read that
- * fails — a refusal, a rate limit it may not wait out (`COMMENTS_MAX_WAIT_MS`),
- * a timeout, the turn's budget stop — never costs the frame: its text comes
- * back with `commentsUnread`, which says unknown rather than none, and the
- * loop's trip counter still marks a budget stop partial.
+ * Every call after the node read is made after it has landed. Made beside
+ * it, one could be metered first and spend a turn's last lookup, leaving the
+ * frame — the part that read fine before — to the budget stop. The node read
+ * decides the outcome as `fetchFigmaNode` does: it throws on a missing client
+ * or a refusal. A comments or diff read that fails — a refusal, a rate limit
+ * it may not wait out, a timeout, the turn's budget stop — never costs the
+ * frame: it comes back with `commentsUnread` or `changesUnread`, which say
+ * unknown rather than none, and the loop's trip counter still marks a budget
+ * stop partial.
+ *
+ * SUBREQUESTS, first attempts: 1 for the frame, +1 for its comments, and with
+ * `since` +1 for each page of the history read (at most MAX_VERSION_PAGES)
+ * and +1 for the frame at that version — 4 for a date inside the newest
+ * VERSIONS_PAGE_SIZE versions, 6 at most. A retried attempt is one more each.
  *
  * @param figma - The Figma client; undefined when the Worker has no token
- * @param opts - `comments: false` reads the node alone, as the sweep does
+ * @param opts - `comments: false` reads the node alone, as the sweep does;
+ *   `since` (epoch ms) asks what changed since that moment
  */
 export async function fetchFigmaFrame(
-  figma: Pick<FigmaClient, "nodes" | "comments"> | undefined,
+  figma: Pick<FigmaClient, "nodes" | "comments" | "versions"> | undefined,
   fileKey: string,
   nodeId: string,
-  opts: { comments?: boolean } = {},
+  opts: { comments?: boolean; since?: number } = {},
 ): Promise<FigmaFrameRead> {
   if (!figma) throw new Error("FIGMA_ACCESS_TOKEN not configured on the Worker");
 
-  const doc = await readFrameDoc(figma, fileKey, nodeId);
-  const content = contentOf(doc);
-  if (opts.comments === false) return content;
+  const { doc, shown } = await readFrameDoc(figma, fileKey, nodeId);
+  // The name shown labels what the read lists; the diff below takes `doc` as Figma holds it.
+  const named = { ...doc, name: shown };
+  let frame: FigmaFrameRead = { ...contentOf(doc, shown), annotations: collectAnnotations(named), fills: collectFills(named) };
 
-  const read = await figma
-    .comments(fileKey, { timeoutMs: COMMENTS_FETCH_TIMEOUT_MS, attempts: 2, maxWaitMs: COMMENTS_MAX_WAIT_MS })
-    .then(
-      (r) => ({ list: r.comments ?? [] }),
-      (err: unknown) => ({ error: err instanceof Error ? err.message : String(err) }),
-    );
-  if ("error" in read) {
-    console.warn(`[figma] comments ${fileKey} failed: ${read.error}`);
-    return { ...content, commentsUnread: read.error };
+  if (opts.comments !== false) {
+    const read = await figma
+      .comments(fileKey, { timeoutMs: COMMENTS_FETCH_TIMEOUT_MS, attempts: 2, maxWaitMs: COMMENTS_MAX_WAIT_MS })
+      .then(
+        (r) => ({ list: r.comments ?? [] }),
+        (err: unknown) => ({ error: messageOf(err) }),
+      );
+    if ("error" in read) {
+      console.warn(`[figma] comments ${fileKey} failed: ${read.error}`);
+      frame = { ...frame, commentsUnread: read.error };
+    } else {
+      // The id the link named is the frame's, whether or not the node echoes it.
+      frame = { ...frame, comments: pinnedThreads({ ...named, id: doc.id ?? nodeId }, read.list) };
+    }
   }
-  // The id the link named is the frame's, whether or not the node echoes it.
-  return { ...content, comments: pinnedThreads({ ...doc, id: doc.id ?? nodeId }, read.list) };
+
+  if (opts.since !== undefined) {
+    try {
+      frame = { ...frame, ...(await changesSince(figma, fileKey, nodeId, doc, opts.since)) };
+    } catch (err) {
+      console.warn(`[figma] changes ${fileKey} ${nodeId} failed: ${messageOf(err)}`);
+      frame = { ...frame, changesUnread: messageOf(err) };
+    }
+  }
+  return frame;
 }
 
-/** The frame's node, or a throw the caller reports as "couldn't read it". */
-async function readFrameDoc(figma: Pick<FigmaClient, "nodes">, fileKey: string, nodeId: string): Promise<FigmaNode> {
+/** How many versions one history page asks for: Figma's most. */
+export const VERSIONS_PAGE_SIZE = 50;
+/** The most history pages one diff reads, so a date far back costs a bounded number of calls. */
+export const MAX_VERSION_PAGES = 3;
+/**
+ * The most a diff's reads may wait on pacing and 429 backoff, each. The
+ * older frame is a Tier 1 read, where uno-bot's share frees one slot every
+ * 12 s, so this covers one slot and no more.
+ */
+export const CHANGES_MAX_WAIT_MS = 12_000;
+
+/**
+ * What changed in the frame between the newest version saved at or before
+ * `since` and now, or why that is unread when the history does not reach
+ * back to `since`. A refusal throws, for the caller to report as unread.
+ */
+async function changesSince(
+  figma: Pick<FigmaClient, "nodes" | "versions">,
+  fileKey: string,
+  nodeId: string,
+  now: FigmaNode,
+  since: number,
+): Promise<{ changes: FigmaFrameChanges } | { changesUnread: string }> {
+  const call = { timeoutMs: NODE_FETCH_TIMEOUT_MS, attempts: 2, maxWaitMs: CHANGES_MAX_WAIT_MS };
+  let before: string | undefined;
+  let oldest: string | undefined;
+  for (let page = 0; page < MAX_VERSION_PAGES; page++) {
+    const listed = (await figma.versions(fileKey, { ...call, pageSize: VERSIONS_PAGE_SIZE, ...(before ? { before } : {}) })).versions ?? [];
+    const version = listed.find((v) => Date.parse(v.created_at) <= since);
+    if (version) {
+      const data = await figma.nodes(fileKey, [nodeId], { ...call, version: version.id });
+      const then = data.nodes?.[nodeId]?.document ?? null;
+      const { changes, total } = frameChanges(then, now);
+      return {
+        changes: {
+          since: new Date(since).toISOString(),
+          version: {
+            id: version.id,
+            ...(version.label ? { label: version.label } : {}),
+            at: version.created_at,
+            ...(version.user?.handle ? { by: version.user.handle } : {}),
+          },
+          changes,
+          total,
+        },
+      };
+    }
+    oldest = listed.at(-1)?.created_at ?? oldest;
+    if (listed.length < VERSIONS_PAGE_SIZE) {
+      return {
+        changesUnread: oldest
+          ? `the file's saved history starts at ${oldest}, after ${new Date(since).toISOString()}`
+          : "the file lists no saved versions",
+      };
+    }
+    before = listed.at(-1)!.id;
+  }
+  return {
+    changesUnread: `the newest ${MAX_VERSION_PAGES * VERSIONS_PAGE_SIZE} versions reach back only to ${oldest}, after ${new Date(since).toISOString()}`,
+  };
+}
+
+function messageOf(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
+
+/** The frame's node as Figma holds it, and the name to show for it — a blank
+ *  name falls back to the file's — or a throw the caller reports as "couldn't
+ *  read it". A diff compares the node, never the name shown. */
+async function readFrameDoc(figma: Pick<FigmaClient, "nodes">, fileKey: string, nodeId: string): Promise<{ doc: FigmaNode; shown: string }> {
   const data = await figma.nodes(fileKey, [nodeId], { timeoutMs: NODE_FETCH_TIMEOUT_MS });
   const doc = data.nodes?.[nodeId]?.document;
   if (!doc) throw new Error(`Figma node ${nodeId} not found in file ${fileKey}`);
-  return { ...doc, name: doc.name?.trim() || data.name?.trim() || "Figma frame" };
+  return { doc, shown: doc.name?.trim() || data.name?.trim() || "Figma frame" };
 }
 
 /** A node's name, type and text layers. */
-function contentOf(doc: FigmaNode): FigmaNodeContent {
+function contentOf(doc: FigmaNode, name: string): FigmaNodeContent {
   const { texts, truncated } = collectTextLayers(doc);
-  return { name: doc.name ?? "(unnamed)", type: doc.type ?? "NODE", texts, truncated };
+  return { name, type: doc.type ?? "NODE", texts, truncated };
 }
 
 export { parseFigmaUrl, type FigmaUrlParts } from "./figma-reading";

@@ -33,7 +33,7 @@ Open [localhost:4200](http://localhost:4200) for Storybook, [localhost:4100/home
 
 All three read the same brain: [`AGENTS.md`](AGENTS.md) — the constitution: identity, skill roster, the loading contract, and the hard rules. The in-IDE agent and headless runs read those files from the checkout, so a push to `main` reaches them immediately. The Worker does NOT: its harness is baked into the bundle at build time, so a guidance edit reaches uno-bot only on `npm run deploy` (`agents/uno-bot/scripts/bundle-harness.mjs`).
 
-**The interaction contract: humans speak in skills · skills summon agents · agents obey conventions.**
+**The interaction contract (IDE): humans speak in skills · skills summon agents · agents obey conventions.** uno-bot runs its own bot skills over the Worker's tools.
 
 ### The six skills (what you invoke)
 
@@ -48,11 +48,11 @@ You either name a skill or just describe what you want — uno routes. In plain 
 | `uno-review` | design-system / product-intent / accessibility review, or Design QA vs the Figma spec |
 | `uno-maintain` | something's off — file it; small fixes auto-apply, big ones become PR + PRD |
 
-The canonical routing table (Use-when triggers + which agents each skill summons) lives in `AGENTS.md` § Skills — single source, deliberately not restated here. Each skill folder has two faces: `SKILL.md` (IDE) and `bot.md` (Slack Worker), both built on the same `references/method.md`.
+The canonical routing table (Use-when triggers + which agents each skill summons) lives in `AGENTS.md` § Skills — single source, deliberately not restated here. Each skill is an IDE workflow: `SKILL.md` over its `references/method.md`. uno-bot runs its own bot skills, under `agents/uno-bot/skills/`.
 
 ### The agents (what skills summon — internal, never invoked by users)
 
-`agents/` holds three plain kinds plus one embodiment: **researchers/** gather (explorer · source-miner · people-scout), **reviewers/** judge (ds-lens · uno-lens · a11y-lens · design-qa · rubric-applier · auditor), **writers/** are the only roles allowed to write to external estates (notion · figma · blueprint), and **uno-bot/** is the Slack embodiment (persona + Cloudflare Worker). Roster and rules: [`agents/README.md`](agents/README.md).
+`agents/` holds three plain kinds plus one embodiment: **researchers/** gather (explorer · source-miner · people-scout), **reviewers/** judge (ds-lens · uno-lens · a11y-lens · design-qa · rubric-applier · auditor), **writers/** are the IDE's only external-estate writers (notion · figma · blueprint; uno-bot writes through its ✅-gated tools), and **uno-bot/** is the Slack embodiment (persona + Cloudflare Worker). Roster and rules: [`agents/README.md`](agents/README.md).
 
 ### Knowledge compounding
 
@@ -80,7 +80,7 @@ plus-uno/
 │   ├── knowledge/                 # Append-only — lessons, ADRs, research, archive
 │   └── plans/                     # Dated implementation plans
 │
-├── skills/                        # HOW — six capabilities, each with SKILL.md (IDE) + bot.md (Worker)
+├── skills/                        # HOW — six IDE workflows, each SKILL.md + references/method.md
 └── agents/                        # WHO — researchers/ · reviewers/ · writers/ + uno-bot/ (Slack Worker)
 ```
 

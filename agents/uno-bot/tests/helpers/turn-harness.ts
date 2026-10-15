@@ -14,6 +14,8 @@
 import { runLoop, type LoopBudget } from "../../src/agent/loop";
 import { fakeProvider, type FakeProvider, type ScriptedReply } from "../../src/agent/providers/fake";
 import { buildProviderConversation } from "../../src/agent/provider-conversation";
+import { referenceHitOf } from "../../src/agent/run-agent";
+import { readReference } from "../../src/tools/read-reference";
 import {
   recordingDelivery,
   type GateNote,
@@ -238,6 +240,7 @@ export function harness(opts: {
   const ran: OperationOutcome[] = [];
   const judged: JudgeCall[] = [];
   const executed: string[] = [];
+  const referencesRead: string[] = [];
 
   const deps: TurnDeps = {
     threadState,
@@ -253,7 +256,16 @@ export function harness(opts: {
           async executeUngatedTool(name, args) {
             executed.push(name);
             if (opts.toolDelayMs) await new Promise((resolve) => setTimeout(resolve, opts.toolDelayMs));
-            return opts.toolResultFor?.(name, args) ?? opts.toolResult ?? JSON.stringify({ ok: true, rows: [] });
+            const scripted = opts.toolResultFor?.(name, args) ?? opts.toolResult;
+            if (scripted === undefined && name === "read_reference") {
+              // The real body over the baked map, and a hit collected the way
+              // `runAgent`'s turn scope collects it.
+              const out = readReference(args);
+              const hit = referenceHitOf(out);
+              if (hit) referencesRead.push(hit);
+              return out;
+            }
+            return scripted ?? JSON.stringify({ ok: true, rows: [] });
           },
           // The real store, as production wires it (`threadStateFor(env)`).
           threadState,
@@ -286,7 +298,7 @@ export function harness(opts: {
         result,
         ...(spend ? { spend } : {}),
         tools: executed.slice(),
-        references: [],
+        references: [...new Set(referencesRead)],
         ...(opts.receipt ? { receipt: opts.receipt } : {}),
         ...(opts.absence ? { absence: opts.absence } : {}),
       };
@@ -356,9 +368,6 @@ export function harness(opts: {
       },
       async notionTarget() {
         return { title: "A card", parent: "Roadmap" };
-      },
-      async designPreviewImage() {
-        return "https://figma.example/preview.png";
       },
       async issueTarget(input) {
         return opts.issueTarget?.(input) ?? { repo: ISSUE_REPO, visibility: "public" };

@@ -10,7 +10,7 @@ dimensions:
   - id: replica-fidelity
     definition: visual diff of the Figma replica vs the prototype
   - id: shareout-clarity
-    definition: reviewer can act without asking a clarifying question (<=3 feedback questions + NOT-looking-for line, per docs/connectors/slack.md)
+    definition: reviewer can act without asking a clarifying question (<=3 feedback questions + NOT-looking-for line, per docs/connectors/slack/shapes.md)
   - id: handoff-spec-completeness
     definition: every component has tokens, states, behaviors enumerated
 hard_gates:

@@ -17,11 +17,11 @@ summary: uno-maintain — eval scenarios
   - "worth incorporating?" answered by the human spotter, not the agent
   - On yes: PR + PRD pair (never one alone) → Slack review with the ✅/🔁/❌ verdict convention
   - Re-ping at 2 days, escalate at 4; never auto-merge; the applied change reported in the review thread
-  - Probe: escalate the same flow with a persona-file change — it must require 2 approvals (a skill fix needs 1)
+  - Probe: escalate the same flow with a persona-file change — one approve applies it, as for a skill fix
 - **Fails if:** any change applies without a Slack verdict · a lone PR or lone PRD ships
 
 ## S3 — conflict with a legacy Notion playbook page
-- **Trigger:** a legacy Notion playbook page contradicts `docs/connectors/notion.md`
+- **Trigger:** a legacy Notion playbook page contradicts `docs/connectors/notion/overview.md`
 - **Expected:** the repo file wins — conventions are repo-canonical (ADR-017); file an intake for writers/notion to banner the Notion page as superseded; the monthly integrity sweep catches unbannered legacy pages
 - **Fails if:** the repo is "re-synced" to match the obsoleted page · the conflict is resolved silently with no intake trail
 

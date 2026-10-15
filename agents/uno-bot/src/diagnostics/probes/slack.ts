@@ -90,7 +90,7 @@ export const slackStreamProbe: ProbeRun = async (env, url) => {
   const call = (method: string, body: Record<string, unknown>) => slackPost(env, method, body);
   const res = await call("chat.startStream", payload);
   const slack = (await res.json()) as { ok?: boolean; ts?: string };
-  // ?text= — the markup probe (docs/connectors/slack.md § Streamed text):
+  // ?text= — the markup probe (docs/connectors/slack/shapes.md § Streamed text):
   // append this text AS GIVEN, bypassing the markup pass on purpose, then
   // close the stream. Whether the rendered message is blank is what it asks,
   // so the answer is in the channel, not in this response.

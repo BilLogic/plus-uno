@@ -100,9 +100,9 @@ A design value: color, spacing, typography, elevation, radius.
 **Foundation**:
 A fundamental design primitive (color palette, type scale, grid).
 
-**replica**:
-The Figma frame mirroring a coded prototype, required in prototype share-outs.
-_Avoid_: "screenshot"
+**Figma replica**:
+A Figma frame a person makes to mirror a coded prototype: an optional link on its Marketplace row and in its share-out.
+_Avoid_: bare "replica", "screenshot"
 
 ### Estates
 
@@ -180,8 +180,15 @@ A gated DM uno-bot sends someone on a requester's behalf, attributed.
 _Avoid_: "proactive DM", "outreach"
 
 **intake**:
-A change request: implementation in a listed plus-uno repo (blueprint, Storybook docs, harness, prototypes) → that repo's GitHub issue; product or design, including a live PLUS app bug → a Roadmap card, the frame's own when named, else a new one.
+A change request, routed by the `file-a-ticket` bot skill: implementation in a listed repo → that repo's GitHub issue; product or design, a live PLUS app bug included → a Roadmap card.
 _Avoid_: "ticket"
+
+**decision card**:
+The Slack shape a **scheduled action** reports on: a parent line, then one card per item with Review and Open, each item its own **proposal card**.
+
+**lead**:
+The design team's lead (Bill today): makes product-direction calls and is the deployment's standing confirmer. Distinct from **Lead Tutor**.
+_Avoid_: "GOAT", "admin"
 
 **agent session**:
 The Slack object a uno-bot conversation runs inside, moving through `active` · `processing` · `suspended` · `closed`; it replaces Slack's deprecated assistant threads.
@@ -213,8 +220,30 @@ _Avoid_: "the AI"
 A runtime uno runs in (the IDE, the uno-bot Worker, headless GitHub Actions), each with its own powers and its own slice of the harness.
 _Avoid_: "mode", "environment"
 
+**uno skill**:
+An IDE workflow under `skills/` (`uno-research` … `uno-maintain`): `SKILL.md` over its method, invoked by a person.
+_Avoid_: bare "skill" where a **bot skill** could be meant
+
+**bot skill**:
+What uno-bot does for one kind of ask, under `agents/uno-bot/skills/`, named for the action (`draft-a-prd`): its description is always loaded as a **pointer**, its body is read by name, and it ends in one **exit**.
+_Avoid_: "Worker face", "bot face", "bot.md"
+
+**exit**:
+How a bot skill ends: **answer** (the reply is the deliverable), **file** (a ✅ card writes or sends), or **hand off**.
+
+**hand off**:
+The exit that passes the rest of the work on: a ready-to-paste IDE prompt naming the uno skill, or the **lead** for a call only they make. Distinct from the **Handoff Spec**, the document a dev handoff carries.
+_Avoid_: "handoff" for the exit
+
+**scheduled action**:
+Work uno-bot does on its own clock whose posts people reply to; one doc per family under `agents/uno-bot/scheduled-actions/`, read by name.
+_Avoid_: "scheduled job", "cron", "skill"
+
+**connector overview**:
+The always-loaded doc for one tool under `docs/connectors/`: what uno reaches in it and the rules for each reach. Anything else about the tool is **disclosed** beside it.
+
 **share-out**:
-A feedback-rail publish: Loom + preview + Decisions DB link (+ replica for prototypes).
+A feedback-rail publish: Loom + preview + Decisions DB link (+ a **Figma replica** when one exists).
 _Avoid_: "post", "update"
 
 **direct fix / gated change**:
@@ -234,7 +263,7 @@ A line held in context that names material outside it and when to reach it: a sk
 _Avoid_: "link", "reference" (a reference is what a pointer points AT)
 
 **ladder** / **disclosed**:
-Where writing sits by how immediately the agent needs it: in-file step · in-file reference · **disclosed** reference, pushed out of the always-loaded tier behind a pointer and loaded only when it fires.
+Where writing sits by how immediately the agent needs it: in-file step · in-file reference · **disclosed** reference, pushed out of the always-loaded tier behind a pointer and loaded only when it fires. For uno-bot, a doc declares `disclosure: reference` and is read through `read_reference`.
 _Avoid_: "hidden" or "optional" for disclosed
 
 **leading word**:
@@ -275,4 +304,4 @@ Two estates describe the product in **different languages**, and the words are N
 
 **Attribution rule:** when reporting findings, name the estate you actually read, in its own words — "on the Roadmap board" ONLY for Notion Roadmap cards; "in the service blueprint" ONLY for blueprint rows.
 
-How frame words render in chat (as `code`) is a Slack and Notion writing convention: `docs/connectors/slack.md` § Frame words render as code.
+How frame words render in chat (as `code`) is a Slack and Notion writing convention: `docs/connectors/slack/overview.md` § Frame words render as code.

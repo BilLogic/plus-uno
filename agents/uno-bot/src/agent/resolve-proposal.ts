@@ -181,8 +181,8 @@ async function runWonVerdict(
         // The real ts to reply under, and who asked: a relayed DM names the
         // requester to its recipient and confirms in their thread.
         // Who ASKED — the requester of record — not whoever pressed ✅: anyone
-        // in the thread may approve, and `email_send`'s allowlist and a relayed
-        // DM's attribution are both about the person the action is for.
+        // in the thread may approve, and a relayed DM's attribution and an
+        // intake's footer are both about the person the action is for.
         ...(verdict.post?.replyTs ? { replyTs: verdict.post.replyTs } : {}),
         requestedBy: run.requesterUserId,
         ...(verdict.by?.userId ? { approvedBy: verdict.by.userId } : {}),

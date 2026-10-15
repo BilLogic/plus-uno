@@ -8,7 +8,7 @@
 // A tool with no row offers nothing to edit and approves as staged.
 //
 // SELECTS OFFER ONLY WHAT THE DATABASE OFFERS. Notion silently creates any
-// option it is handed (`docs/connectors/notion.md`), so a select reads the
+// option it is handed (`docs/connectors/notion/overview.md`), so a select reads the
 // target database's live options when the pop-up opens and again when Approve
 // is pressed: an option removed in between is refused, not created. A select
 // whose options cannot be read is left out rather than offered as free text.
@@ -163,10 +163,6 @@ const FIELDS: Record<string, FieldSpec[] | ((input: Input) => FieldSpec[])> = {
   ],
   github_issue_create: [
     { path: "title", label: "Title", kind: "text", required: true },
-    { path: "body", label: "Body", kind: "multiline", required: true },
-  ],
-  email_send: [
-    { path: "subject", label: "Subject", kind: "text" },
     { path: "body", label: "Body", kind: "multiline", required: true },
   ],
   dm_relay: [{ path: "text", label: "Message", kind: "multiline", required: true }],

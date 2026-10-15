@@ -46,6 +46,8 @@ const COPIED = [
   "agents/uno-bot/src/generated",
   "agents/uno-bot/scripts/bundle-harness.mjs",
 ];
+/** Copied when present: a section root may hold nothing yet, and an empty section is legal. */
+const COPIED_IF_PRESENT = ["agents/uno-bot/skills", "agents/uno-bot/scheduled-actions"];
 
 let repoRoot, bundler, harnessTs, companionMd, referencesTs;
 
@@ -56,6 +58,9 @@ before(() => {
   // having done nothing — which every test below would read as a pass.
   repoRoot = realpathSync(mkdtempSync(path.join(tmpdir(), "harness-tree-")));
   for (const rel of COPIED) cpSync(path.join(checkout, rel), path.join(repoRoot, rel), { recursive: true });
+  for (const rel of COPIED_IF_PRESENT) {
+    if (existsSync(path.join(checkout, rel))) cpSync(path.join(checkout, rel), path.join(repoRoot, rel), { recursive: true });
+  }
   bundler = path.join(repoRoot, "agents/uno-bot/scripts/bundle-harness.mjs");
   harnessTs = path.join(repoRoot, "agents/uno-bot/src/generated/harness.ts");
   companionMd = path.join(repoRoot, "agents/uno-bot/harness-bundle.md");
@@ -147,44 +152,48 @@ test("a doc marked `ide` is absent from the Worker bundle", () => {
   }
 });
 
-test("every skill's bot.md is bundled and every SKILL.md is not", () => {
-  const members = memberOrder(assembled());
-  for (const skill of ["research", "synthesize", "prototype", "publish", "review", "maintain"]) {
-    assert.ok(members.includes(`skills/uno-${skill}/bot.md`), `uno-${skill}/bot.md missing from the bundle`);
-    assert.ok(!members.includes(`skills/uno-${skill}/SKILL.md`), `uno-${skill}/SKILL.md leaked into the bundle`);
-  }
-});
+/** The seven bot skills, each a folder under agents/uno-bot/skills. */
+const BOT_SKILLS = [
+  "critique-a-design",
+  "draft-a-prd",
+  "file-a-ticket",
+  "find-the-right-person",
+  "prepare-the-call",
+  "relay-a-message",
+  "share-out",
+];
 
-test("a skill's method.md precedes its bot.md, or is disclosed behind read_reference", () => {
-  // Two deliveries, one rule per skill (#423): a method that ships in the prompt
-  // loads before its face, because it is meaningless read second; a method
-  // that declares `disclosure: reference` leaves the prompt entirely and is
-  // reachable only through the baked map, under the skill's own name.
+test("the uno skills are IDE workflows: nothing under skills/ reaches the prompt or the map", () => {
   const members = memberOrder(assembled());
   const map = references();
+  assert.deepEqual(members.filter((m) => m.startsWith("skills/")), [], "an uno skill file reached the prompt");
+  assert.deepEqual(Object.keys(map).filter((n) => n.startsWith("uno-")), [], "an uno skill file reached the map");
   for (const skill of ["research", "synthesize", "prototype", "publish", "review", "maintain"]) {
-    const method = members.indexOf(`skills/uno-${skill}/references/method.md`);
-    const bot = members.indexOf(`skills/uno-${skill}/bot.md`);
-    assert.ok(bot !== -1, `uno-${skill} is missing its Worker face`);
-    if (`uno-${skill}/method` in map) {
-      assert.equal(method, -1, `uno-${skill}: a disclosed method must be absent from the prompt`);
-    } else {
-      assert.ok(method !== -1, `uno-${skill} is missing a method — neither bundled nor disclosed`);
-      assert.ok(method < bot, `uno-${skill}: method.md must load before bot.md`);
-    }
+    assert.equal(embodimentOf(`skills/uno-${skill}/references/method.md`), "ide", `uno-${skill}'s method is IDE-only`);
   }
 });
 
-test("sections stay in declared order: constitution, persona, skills, then docs", () => {
+test("every bot skill's body is in the map under its folder name, and its pointer is in the prompt", () => {
+  const prompt = assembled();
+  const map = references();
+  for (const name of BOT_SKILLS) {
+    assert.ok(name in map, `${name} is missing from the reference map`);
+    assert.ok(prompt.includes(`**${name}** — `), `${name} has no pointer line in the prompt`);
+    assert.ok(!prompt.includes(map[name]), `${name}'s body reached the prompt`);
+  }
+});
+
+test("sections stay in declared order: constitution, persona, bot skills, then docs", () => {
   const members = memberOrder(assembled());
   // AGENTS.md is member 0 and carries no path comment, so GLOSSARY.md — the
   // constitution section's second member — is the first commented one.
   assert.equal(members[0], "GLOSSARY.md", "the constitution section must come first");
   assert.equal(members[1], "agents/uno-bot/AGENT.md", "the persona must follow the constitution");
 
-  const lastSkill = members.map((m, i) => (m.startsWith("skills/") ? i : -1)).filter((i) => i >= 0).pop();
-  const firstDoc = members.findIndex((m) => m.startsWith("docs/"));
-  assert.ok(lastSkill < firstDoc, "a docs/ section member was bundled before the last skill");
+  const prompt = assembled();
+  const pointers = prompt.indexOf("<!-- bot-skills — read_reference by name -->");
+  assert.ok(pointers > prompt.indexOf("<!-- agents/uno-bot/AGENT.md -->"), "the bot skills must follow the persona");
+  assert.ok(pointers < prompt.indexOf("<!-- docs/"), "a docs/ section member was bundled before the bot skills");
 
   const firstConnector = members.findIndex((m) => m.startsWith("docs/connectors/"));
   const firstEngineering = members.findIndex((m) => m.startsWith("docs/engineering/"));
@@ -205,6 +214,22 @@ test("a doc under a section root with no embodiment fails the build", () => {
   assert.equal(result.code, 1, "an undeclared doc must fail the build, not default to unbundled");
   assert.match(result.out, /declare no `embodiment`/);
   assert.match(result.out, /zz-test-undeclared\.md/);
+});
+
+test("a doc under skills/ with no embodiment fails the build", () => {
+  const rel = "skills/uno-review/references/zz-test-undeclared.md";
+  const result = withFile(rel, (abs) => writeFileSync(abs, "# probe\n\nno frontmatter here\n"), () => runBundler());
+  assert.equal(result.code, 1, "skills/ is walked for the declaration rule, though it ships nothing");
+  assert.match(result.out, /declare no `embodiment`/);
+  assert.match(result.out, /zz-test-undeclared\.md/);
+});
+
+test("a doc under skills/ that asks to ship fails the build: those docs are IDE-only", () => {
+  const rel = "skills/uno-review/references/zz-test-ships.md";
+  const result = withFile(rel, (abs) => writeFileSync(abs, "---\nembodiment: all\n---\n# probe\n"), () => runBundler());
+  assert.equal(result.code, 1);
+  assert.match(result.out, /zz-test-ships\.md/);
+  assert.match(result.out, /embodiment: ide/);
 });
 
 test("--check fails on a stale artifact and writes nothing", () => {
@@ -253,19 +278,19 @@ test("a persona over its char budget fails the build", () => {
   assert.equal(result.code, 1, "a persona over budget must fail the build");
   assert.match(result.out, /over its char budget/i);
   assert.match(result.out, /AGENT\.md/);
-  assert.match(result.out, /28,000/, "the failure must name the budget");
+  assert.match(result.out, /22,048/, "the failure must name the budget");
   assert.match(result.out, /over by [\d,]+/, "the failure must name the overrun");
   assert.equal(readFileSync(harnessTs, "utf8"), before, "a failing budget must not write the artifact");
 });
 
-test("a Worker face over its char budget fails the build", () => {
-  const rel = "skills/uno-research/bot.md";
-  const result = withFile(rel, (abs, original) => writeFileSync(abs, original + padding(7_000)), () =>
+test("a bot skill over its char budget fails the build", () => {
+  const rel = "agents/uno-bot/skills/draft-a-prd/SKILL.md";
+  const result = withFile(rel, (abs, original) => writeFileSync(abs, original + padding(5_000)), () =>
     runBundler(["--check"]),
   );
-  assert.equal(result.code, 1, "a Worker face over budget must fail the build");
-  assert.match(result.out, /uno-research\/bot\.md/);
-  assert.match(result.out, /7,000/, "the failure must name the budget");
+  assert.equal(result.code, 1, "a bot skill over budget must fail the build");
+  assert.match(result.out, /draft-a-prd\/SKILL\.md/);
+  assert.match(result.out, /5,000/, "the failure must name the budget");
   assert.match(result.out, /over by [\d,]+/, "the failure must name the overrun");
 });
 
@@ -275,7 +300,7 @@ test("an assembled bundle over its char budget fails the build", () => {
   // because it is always in the prompt: a method padded here would land in the
   // reference map instead once it is disclosed (#424), and the ceiling would
   // never see it.
-  const rel = "docs/connectors/figma.md";
+  const rel = "docs/connectors/figma/overview.md";
   const result = withFile(rel, (abs, original) => writeFileSync(abs, original + padding(200_000)), () =>
     runBundler(["--check"]),
   );
@@ -291,7 +316,7 @@ test("an assembled bundle over its char budget fails the build", () => {
 // constitution that swells the whole bundle past 175,500 still fails.
 
 /** An always-loaded doc with a long bundled middle, to take padding back out of. */
-const OFFSET_DOC = "docs/connectors/slack.md";
+const OFFSET_DOC = "docs/connectors/slack/overview.md";
 
 /** `text` with `n` chars cut from the line break nearest its middle — inside the
  *  bundled body, clear of the frontmatter and of the ide-only blocks at either end. */
@@ -425,7 +450,7 @@ test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
   // to do with the floor logic it guards: in #576 two rows added to the glossary
   // put the emptied bundle back over the floor, and the deep-module batch
   // #592-#625 did it again by adding a glossary row per module landed.
-  // `figma.md` is the fifth member for the reason `supabase/overview.md` was the
+  // `figma/overview.md` is the fifth member for the reason `supabase/overview.md` was the
   // fourth: about 6.8k of real headroom rather than the next hairline. If this
   // trips again, add another member rather than trimming prose to fit a
   // fixture — the bundle growing is the healthy direction, and the thing under
@@ -438,11 +463,11 @@ test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
   const result = withFile(wranglerToml, withRegion("us-central1"), () =>
     withFiles(
       [
-        "docs/connectors/notion.md",
-        "docs/connectors/slack.md",
+        "docs/connectors/notion/overview.md",
+        "docs/connectors/slack/overview.md",
         "docs/connectors/supabase/blueprint-navigation.md",
         "docs/connectors/supabase/overview.md",
-        "docs/connectors/figma.md",
+        "docs/connectors/figma/overview.md",
       ],
       frontmatterOnly,
       () => runBundler(["--check"]),
@@ -508,16 +533,20 @@ test("the manifest lists every member in load order, ending at the assembled len
 
   const order = ["AGENTS.md", ...memberOrder(assembled())];
   assert.equal(rows.length, order.length, "the manifest must carry one row per bundled file");
+  // A section's pointer block is a numbered row too, with no file to name, so
+  // the file rows' numbers rise in load order with a gap where one sits.
   rows.forEach((row, i) => {
-    assert.equal(Number(row[1]), i + 1, "manifest rows must be numbered in load order");
+    assert.ok(i === 0 ? Number(row[1]) === 1 : Number(row[1]) > Number(rows[i - 1][1]), "manifest rows must be numbered in load order");
     assert.equal(row[2], order[i], `manifest row ${i + 1} must name the file loaded in that position`);
   });
 
   // The running total is the assembled prompt's length through that row, so the
   // last one is the whole prompt. That is what ties the manifest to the text
   // below it: a manifest whose arithmetic did not land on the real total would
-  // be a table of plausible numbers.
-  const cells = rows[rows.length - 1][3].split("|").map((c) => c.trim());
+  // be a table of plausible numbers. The last row may be a section's pointer
+  // block rather than a file, so it is read from every numbered row.
+  const numbered = [...manifest.matchAll(/^\| \d+ \| \S+ \| [^|]+ \|(.*)\|$/gm)];
+  const cells = numbered[numbered.length - 1][1].split("|").map((c) => c.trim());
   assert.equal(
     Number(cells[1].replace(/,/g, "")),
     assembled().length,
@@ -544,7 +573,7 @@ test("--check fails on a stale companion, names it, and writes nothing", () => {
 
 test("a bundled doc changed without regenerating fails and names the companion", () => {
   const result = withFile(
-    "docs/connectors/figma.md",
+    "docs/connectors/figma/overview.md",
     (abs, original) => writeFileSync(abs, `${original}\nA probe line.\n`),
     () => runBundler(["--check"]),
   );
@@ -561,22 +590,22 @@ test("a bundled doc changed without regenerating fails and names the companion",
 // bundler gains one more place to put it. These hold the map to the same bar
 // as the prompt: same assembly, same staleness guard, listed in the manifest.
 
-test("uno-maintain's method is disclosed: absent from the prompt, present in the map by the skill's name", () => {
-  const src = readFileSync(path.join(repoRoot, "skills/uno-maintain/references/method.md"), "utf8");
-  assert.match(src, /^disclosure:\s*reference$/m, "method.md must declare its delivery");
-  assert.equal(embodimentOf("skills/uno-maintain/references/method.md"), "all", "the IDE still loads it from disk");
-  assert.ok(!memberOrder(assembled()).includes("skills/uno-maintain/references/method.md"));
+test("file-a-ticket is disclosed: absent from the prompt, present in the map by its folder's name", () => {
+  const rel = "agents/uno-bot/skills/file-a-ticket/SKILL.md";
+  const src = readFileSync(path.join(repoRoot, rel), "utf8");
+  assert.match(src, /^disclosure:\s*reference$/m, "a bot skill must declare its delivery");
+  assert.ok(!memberOrder(assembled()).includes(rel));
   const map = references();
-  assert.ok("uno-maintain/method" in map, `map holds ${Object.keys(map).join(", ")}`);
-  assert.ok(map["uno-maintain/method"].startsWith("<!-- Shared core"), "the map carries the body, frontmatter stripped");
-  assert.ok(map["uno-maintain/method"].includes("## 4 · Severity classification"), "the map carries the whole method");
+  assert.ok("file-a-ticket" in map, `map holds ${Object.keys(map).join(", ")}`);
+  assert.ok(map["file-a-ticket"].startsWith("# File a ticket"), "the map carries the body, frontmatter stripped");
+  assert.ok(map["file-a-ticket"].includes("## Exit"), "the map carries the whole skill");
 });
 
 test("the manifest lists disclosed references in their own table with chars", () => {
   const md = readFileSync(companionMd, "utf8");
   const section = md.slice(md.indexOf("## Disclosed references"), md.indexOf("## The assembled prompt"));
   assert.ok(section.length > 0, "the manifest must carry a disclosed-references section");
-  assert.match(section, /^\| `uno-maintain\/method` \| \[`skills\/uno-maintain\/references\/method\.md`\]\([^)]+\) \| [\d,]+ \|$/m);
+  assert.match(section, /^\| `file-a-ticket` \| \[`agents\/uno-bot\/skills\/file-a-ticket\/SKILL\.md`\]\([^)]+\) \| [\d,]+ \|$/m);
 });
 
 test("the companion carries each disclosed reference verbatim, after the prompt", () => {
@@ -592,20 +621,21 @@ test("the companion carries each disclosed reference verbatim, after the prompt"
 });
 
 test("the census names the disclosed count beside the bundled and ide-only ones", () => {
-  // The expected count is read off the docs themselves, so a method moving in
-  // or out of the map (#423 moved one, #424 four more) changes this test's
-  // expectation and the bundler's answer together. A connector doc can be
-  // disclosed too (the sweep's rules are), so the docs roots are read as well.
+  // The expected count is read off the docs themselves, so a doc moving in or
+  // out of the map changes this test's expectation and the bundler's answer
+  // together. Every bot skill and scheduled action is disclosed, and a
+  // connector doc can be too, so each root the Worker reads is counted.
   const disclosed = (abs) => existsSync(abs) && /^disclosure:\s*reference$/m.test(readFileSync(abs, "utf8"));
-  const methods = readdirSync(path.join(repoRoot, "skills"), { withFileTypes: true })
-    .filter((d) => d.isDirectory() && d.name.startsWith("uno-"))
-    .map((d) => path.join(repoRoot, "skills", d.name, "references", "method.md"))
-    .filter(disclosed).length;
-  const docs = ["docs/connectors", "docs/engineering", "docs/conventions"]
+  const disclosedOnDisk = [
+    "agents/uno-bot/skills",
+    "agents/uno-bot/scheduled-actions",
+    "docs/connectors",
+    "docs/engineering",
+    "docs/conventions",
+  ]
     .flatMap((root) => Object.keys(treeSnapshot(repoRoot, root)))
     .filter((rel) => rel.endsWith(".md") && disclosed(path.join(repoRoot, rel))).length;
-  const disclosedOnDisk = methods + docs;
-  assert.ok(disclosedOnDisk >= 1, "expected at least one disclosed method on disk");
+  assert.ok(disclosedOnDisk >= BOT_SKILLS.length, "expected every bot skill disclosed on disk");
   const result = runBundler(["--check"]);
   assert.equal(result.code, 0, result.out);
   assert.match(
@@ -634,7 +664,7 @@ test("--check fails on a stale reference map, names it, and writes nothing", () 
 
 test("a disclosed doc edited without regenerating fails --check and names the map", () => {
   const result = withFile(
-    "skills/uno-maintain/references/method.md",
+    "agents/uno-bot/skills/file-a-ticket/SKILL.md",
     (abs, original) => writeFileSync(abs, `${original}\nA probe line.\n`),
     () => runBundler(["--check"]),
   );
@@ -673,34 +703,24 @@ test("a disclosed doc does not count toward the assembled prompt, and the prompt
   const len = assembled().length;
   const disclosedChars = Object.values(map).reduce((n, t) => n + t.length, 0);
   assert.ok(disclosedChars > 0);
-  assert.ok(!assembled().includes(map["uno-maintain/method"]));
+  assert.ok(!assembled().includes(map["file-a-ticket"]));
   const floor = activeFloor();
   assert.ok(len >= floor.value + floor.margin, `the prompt (${len}) must stay above the floor after the cut`);
 });
 
 // ── The manifest (#510) ──────────────────────────────────────────────────────
 //
-// The datum the root guards read instead of parsing this script's log lines.
-// What is asserted here is its SHAPE and its agreement with the artifacts of
-// the same run: the manifest is only worth reading if a guard can trust the
-// census, the budgets and the delivery of every row.
+// The datum the root guards read in-process instead of parsing this script's
+// log lines. What is asserted here is its SHAPE and its agreement with the
+// artifacts of the same assembly: the manifest is only worth reading if a guard
+// can trust the census, the budgets and the delivery of every row.
 
-/** Run the bundler with `--manifest` into a throwaway path, and parse what it wrote. */
-const runWithManifest = (args = ["--check"]) => {
-  const dir = mkdtempSync(path.join(tmpdir(), "harness-manifest-"));
-  const file = path.join(dir, "manifest.json");
-  try {
-    const r = runBundler([...args, "--manifest", file]);
-    return { ...r, manifest: existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : null };
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
-};
+/** The manifest `assemble()` returns for the copied tree. */
+const manifestOf = () => assemble({ repoRoot }).manifest;
 
-test("--manifest writes a manifest whose census, budgets and members agree with the bundle", () => {
-  const { code, manifest } = runWithManifest();
-  assert.equal(code, 0);
-  assert.ok(manifest, "--check must still write the manifest: the guards that read it ask for --check");
+test("the manifest's census, budgets and members agree with the bundle", () => {
+  const manifest = manifestOf();
+  assert.ok(manifest, "a tree that assembles has a manifest");
 
   // The census, as four numbers rather than as a sentence.
   const { census } = manifest;
@@ -738,7 +758,7 @@ test("--manifest writes a manifest whose census, budgets and members agree with 
 
   // The budgets, verbatim, so `check:harness-budgets` can hold the prose to
   // them; and the assembled numbers this run measured.
-  for (const key of ["assembled", "persona", "botFace", "constitution"]) {
+  for (const key of ["assembled", "persona", "botSkill", "constitution"]) {
     assert.equal(typeof manifest.budgets[key], "number", `budgets.${key} must be a number`);
   }
   assert.equal(manifest.assembled.chars, assembled().length);
@@ -749,10 +769,11 @@ test("--manifest writes a manifest whose census, budgets and members agree with 
   // Per-section totals, in the bundle's own order.
   assert.deepEqual(
     manifest.sections.map((s) => s.name),
-    ["constitution", "persona", "skills", "connectors", "engineering", "conventions"],
+    ["constitution", "persona", "bot-skills", "scheduled-actions", "connectors", "engineering", "conventions"],
   );
+  assert.deepEqual(manifest.ideRoots.map((r) => r.root), ["skills"], "walked for the census, never a section");
   assert.equal(
-    manifest.sections.reduce((t, s) => t + s.docs, 0),
+    manifest.sections.reduce((t, s) => t + s.docs, 0) + manifest.ideRoots.reduce((t, r) => t + r.docs, 0),
     census.underRoots,
   );
 });
@@ -761,8 +782,8 @@ test("the stdout census sentence is unchanged, and the manifest agrees with it",
   // The sentence stays for humans (#510). No guard parses it any more, so this
   // is the one place left that reads it — precisely to prove that the datum and
   // the prose still say the same thing.
-  const { out, manifest } = runWithManifest();
-  const { census } = manifest;
+  const { out } = runBundler(["--check"]);
+  const { census } = manifestOf();
   assert.match(
     out,
     new RegExp(
@@ -772,12 +793,11 @@ test("the stdout census sentence is unchanged, and the manifest agrees with it",
   );
 });
 
-test("--manifest disturbs neither committed artifact", () => {
-  const before = { ts: readFileSync(harnessTs, "utf8"), md: readFileSync(companionMd, "utf8") };
-  assert.equal(runBundler(["--check"]).code, 0, "the plain --check must still pass");
-  assert.equal(runWithManifest().code, 0);
-  assert.equal(readFileSync(harnessTs, "utf8"), before.ts, "--check --manifest must not write harness.ts");
-  assert.equal(readFileSync(companionMd, "utf8"), before.md, "--check --manifest must not write the companion");
+test("each section row names the roots it scans", () => {
+  const roots = Object.fromEntries(manifestOf().sections.map((x) => [x.name, x.roots]));
+  assert.deepEqual(roots.constitution, ["AGENTS.md", "GLOSSARY.md"]);
+  assert.deepEqual(roots.persona, ["agents/uno-bot/AGENT.md"]);
+  for (const [name, list] of Object.entries(roots)) assert.ok(list.length, `${name} must scan a root`);
 });
 
 // ── The assemble function, and the check module over it (#537) ────────────────
@@ -802,7 +822,6 @@ function fixtureRoot() {
   write("GLOSSARY.md", doc("# Glossary\n\nOne word.\n"));
   write("agents/uno-bot/AGENT.md", doc("# Persona\n\nOne voice.\n"));
   write("agents/uno-bot/wrangler.toml", 'GEMINI_REGION = "global"\n');
-  mkdirSync(path.join(root, "skills"), { recursive: true });
   // Unbudgeted, and long enough that the assembled prompt clears the implicit
   // floor — a fixture under it would fail on the floor rather than on the thing
   // each test is about.
@@ -874,5 +893,180 @@ test("run({ repoRoot }) returns the assembly's own findings, not a staleness ver
     assert.match(findings[0].message, /zz-undeclared\.md/);
   } finally {
     rmSync(root, { recursive: true, force: true });
+  }
+});
+
+// ── Section rows carry their own delivery rules ───────────────────────────────
+//
+// Budget, sort and reference naming each read the section row a doc sits under
+// and nothing else. So a new shape of section is one row: these tests add a row,
+// or a doc under an existing one, and change nothing else.
+
+/** A doc's source: frontmatter fields, then a body. */
+const docSource = (fields, body) =>
+  `---\n${Object.entries(fields).map(([k, v]) => `${k}: ${v}`).join("\n")}\n---\n\n${body}`;
+
+/** The two baked strings out of an in-process assembly. */
+const bakedOf = (assembly, rel) => {
+  const ts = assembly.artifacts[rel];
+  return JSON.parse(ts.slice(ts.indexOf("= ") + 2, ts.lastIndexOf(";")));
+};
+const promptOf = (assembly) => bakedOf(assembly, "agents/uno-bot/src/generated/harness.ts");
+const mapOf = (assembly) => bakedOf(assembly, "agents/uno-bot/src/generated/references.ts");
+
+/** Write a file in the copy, creating its folder; withFile removes the file afterwards. */
+const writeIn = (abs, text) => {
+  mkdirSync(path.dirname(abs), { recursive: true });
+  writeFileSync(abs, text);
+};
+
+test("a new section row with a budget role fails an over-budget doc under it, with no other edit", () => {
+  const rowRel = "agents/uno-bot/scripts/bundle-harness.mjs";
+  const docRel = "docs/zz-probe-section/over.md";
+  const result = withFile(
+    rowRel,
+    (abs, original) => {
+      const persona = original.match(/^\s*\{ name: "persona".*$/m);
+      assert.ok(persona, "the persona row must be one line the probe can sit after");
+      writeFileSync(
+        abs,
+        original.replace(
+          persona[0],
+          `${persona[0]}\n  { name: "zz-probe", roots: ["docs/zz-probe-section"], budget: { role: "probe", limit: 1_000, soft: false }, nameBy: "path" },`,
+        ),
+      );
+    },
+    () =>
+      withFile(docRel, (abs) => writeIn(abs, docSource({ embodiment: "all" }, padding(2_000))), () =>
+        runBundler(["--check"]),
+      ),
+  );
+  assert.equal(result.code, 1, "a doc over its row's budget must fail the build");
+  assert.match(result.out, /zz-probe-section\/over\.md \(probe\)/);
+  assert.match(result.out, /1,000/, "the failure must name the row's limit");
+  assert.match(result.out, /over by [\d,]+/);
+});
+
+const PROBE_SKILL = "agents/uno-bot/skills/zz-probe-skill/SKILL.md";
+const probeSkill = (body) =>
+  docSource(
+    {
+      embodiment: "uno-bot",
+      disclosure: "reference",
+      description: "Probe trigger words — use when testing the bundler.",
+    },
+    body,
+  );
+
+test("a disclosed bot skill emits its pointer after the persona, and its body lands in the map under its folder", () => {
+  const assembly = withFile(PROBE_SKILL, (abs) => writeIn(abs, probeSkill("# Probe\n\nThe body.\n")), () =>
+    assemble({ repoRoot }),
+  );
+  assert.deepEqual(assembly.findings.filter((f) => (f.severity ?? "error") === "error"), []);
+  const prompt = promptOf(assembly);
+  const pointer = "**zz-probe-skill** — Probe trigger words — use when testing the bundler.";
+  const at = prompt.indexOf(pointer);
+  assert.ok(at !== -1, "the pointer line must be in the prompt");
+  assert.ok(at > prompt.indexOf("<!-- agents/uno-bot/AGENT.md -->"), "bot skills sort after the persona");
+  assert.ok(!prompt.includes("The body."), "the body stays out of the prompt");
+  assert.equal(mapOf(assembly)["zz-probe-skill"], "# Probe\n\nThe body.\n", "the body is in the map by folder name");
+  const row = assembly.manifest.members.find((m) => m.path === PROBE_SKILL);
+  assert.equal(row.section, "bot-skills");
+  assert.equal(row.name, "zz-probe-skill");
+  assert.equal(row.pointer, pointer);
+});
+
+test("a disclosed doc with no description emits no pointer", () => {
+  // The disclosed connector and engineering docs carry a `summary` and no
+  // `description`; their pointers are written in the docs that fire them, so
+  // the prompt is the committed one, byte for byte.
+  const assembly = assemble({ repoRoot });
+  assert.equal(promptOf(assembly), assembled());
+  assert.deepEqual(mapOf(assembly), references());
+});
+
+test("a bot skill body over its budget fails the build, naming the role and the limit", () => {
+  const assembly = withFile(PROBE_SKILL, (abs) => writeIn(abs, probeSkill(`# Probe\n${padding(5_000)}`)), () =>
+    assemble({ repoRoot }),
+  );
+  const errors = assembly.findings.filter((f) => (f.severity ?? "error") === "error");
+  assert.equal(errors.length, 1);
+  assert.match(errors[0].message, /zz-probe-skill\/SKILL\.md \(botSkill\)/);
+  assert.match(errors[0].message, /5,000/);
+});
+
+test("budget, sort and reference naming read only the section row — no path-suffix rule remains", () => {
+  const code = readFileSync(bundler, "utf8")
+    .split("\n")
+    .filter((l) => !l.trim().startsWith("//") && !l.trim().startsWith("*"))
+    .join("\n");
+  assert.ok(!/endsWith\(["'`]\//.test(code), "a path-suffix test decides something");
+  assert.ok(!/method\.md|bot\.md/.test(code), "the bundler names a skill file shape");
+  assert.ok(!/\\\/references\\\//.test(code), "the bundler matches a references/ path");
+  assert.ok(!/section === ["']/.test(code), "the bundler branches on a section's name");
+});
+
+// ── Scheduled actions: one doc per family whose posts people reply to ─────────
+
+const FAMILIES = ["sweep", "follow-through", "dm-watch", "figma-comments", "ds-precedence"];
+
+test("each scheduled-action family is disclosed under its folder name, with a generated pointer", () => {
+  const prompt = assembled();
+  const map = references();
+  for (const family of FAMILIES) {
+    assert.ok(typeof map[family] === "string" && map[family].length > 0, `\`${family}\` must be in the reference map`);
+    const pointer = prompt.split("\n").find((l) => l.startsWith(`**${family}** — `));
+    assert.ok(pointer, `\`${family}\` must leave a pointer line in the prompt`);
+  }
+  const block = prompt.indexOf("<!-- scheduled-actions — read_reference by name -->");
+  assert.ok(block !== -1, "the pointer lines are the scheduled-actions section's generated block");
+  assert.ok(block > prompt.indexOf("<!-- agents/uno-bot/AGENT.md -->"), "scheduled actions sort after the persona");
+});
+
+test("the sweep doc is read by its new name only", () => {
+  assert.ok(!("docs/connectors/slack-sweep" in references()), "the old name must leave the map");
+  assert.ok(!assembled().includes("slack-sweep"), "the prompt must not name the old doc");
+});
+
+// ── Connector folders: the overview always loaded, the rest on demand ─────────
+
+const CONNECTOR_FOLDERS = {
+  slack: ["docs/connectors/slack/shapes"],
+  notion: ["docs/connectors/notion/page-writing"],
+  figma: ["docs/connectors/figma/annotations"],
+};
+
+test("each connector folder bundles its overview and discloses its siblings", () => {
+  const { members } = manifestOf();
+  const prompt = assembled();
+  for (const [folder, disclosed] of Object.entries(CONNECTOR_FOLDERS)) {
+    const root = `docs/connectors/${folder}/`;
+    const rows = members.filter((m) => m.path.startsWith(root));
+    const overview = rows.find((m) => m.path === `${root}overview.md`);
+    assert.equal(overview?.delivery, "bundled", `${root}overview.md must be always loaded`);
+    for (const row of rows.filter((m) => m !== overview)) {
+      assert.notEqual(row.delivery, "bundled", `${row.path} must be disclosed or IDE-only, not always loaded`);
+    }
+    assert.deepEqual(
+      rows.filter((m) => m.delivery === "disclosed").map((m) => m.name).sort(),
+      disclosed,
+      `${root} discloses exactly its named siblings`,
+    );
+    for (const name of disclosed) {
+      assert.ok(prompt.split("\n").some((l) => l.startsWith(`**${name}** — `)), `\`${name}\` must leave a pointer line`);
+    }
+    assert.ok(!existsSync(path.join(repoRoot, `docs/connectors/${folder}.md`)), `docs/connectors/${folder}.md must be gone`);
+  }
+});
+
+test("the Figma overview carries the REST reach table", () => {
+  const prompt = assembled();
+  const start = prompt.indexOf("<!-- docs/connectors/figma/overview.md -->");
+  assert.ok(start !== -1, "the Figma overview is in the prompt");
+  const end = prompt.indexOf("<!-- docs/connectors/", start + 10);
+  const body = prompt.slice(start, end === -1 ? undefined : end);
+  assert.match(body, /## What uno-bot can reach in Figma/);
+  for (const row of ["Render a frame", "Comments", "Reactions", "Variables", "Canvas writes"]) {
+    assert.match(body, new RegExp(`\\| ${row}`), `the reach table has a ${row} row`);
   }
 });

@@ -1,10 +1,9 @@
 ---
-embodiment: all
-disclosure: reference
-summary: uno-maintain — the shared procedure both faces load.
+embodiment: ide
+summary: uno-maintain — the procedure SKILL.md loads on invocation.
 ---
 
-<!-- Shared core, loaded by both faces (SKILL.md + bot.md). Runtime-neutral: no IDE tool names, no Slack mechanics; where a role is named (writers/*, auditor) the faces own HOW it's dispatched. -->
+<!-- The procedure, loaded by SKILL.md on invocation. Runtime-neutral: no IDE tool names, no Slack mechanics; where a role is named (writers/*, auditor) SKILL.md owns HOW it's dispatched. -->
 <!-- Source flows: Flow 4 (intake & proposal) + Flow 5 (review & approval), PLUS UNO Workflow board. -->
 
 # uno-maintain — method
@@ -19,10 +18,10 @@ Every intake is one of four **trigger types** — improvement (could be better) 
 |---|---|---|
 | Codebase | product context / stories | fix `docs/product-and-service/*` + `GLOSSARY.md` |
 | Codebase | harness doc stale / wrong | fix `docs/product-and-service/*` (non-product) + `docs/conventions/*` — repo-canonical, ADR-017 |
-| Codebase | a skill isn't useful | refine the skill (`skills/*` — both faces if shared) |
+| Codebase | a skill isn't useful | refine the skill (`skills/*`) |
 | Codebase | UNO off-role / personality | tune persona / instructions (AGENTS.md, embodiment deltas) |
 | Codebase | Storybook inconsistent / bug | fix the design system (`design-system/src/**`) |
-| Codebase | uno-bot misbehaving | fix uno-bot (`agents/uno-bot/**`, bot faces) |
+| Codebase | uno-bot misbehaving | fix uno-bot (`agents/uno-bot/**`, its bot skills) |
 | Figma | spec out of date | update the Figma spec pages |
 | Figma | components out of date | update the Figma component library |
 | Notion | requirement / story changed | update PRD **+ blueprint together** — paired, never one alone |
@@ -32,7 +31,7 @@ Every intake is one of four **trigger types** — improvement (could be better) 
 
 The taxonomy is the harness map — when a new component joins the harness, this table must grow.
 
-**Record:** an intake lives as a **Roadmap DB card** — `Product Pillar: Universal`, lifecycle in the `Intake Status` property (card mechanics: `docs/connectors/notion.md`). Every intake names its **evidence** (file / frame / message link) in the card body and a **suggested severity**. Separate from Decisions DB **Evidence** (URL property on durable design/product decisions).
+**Record:** an intake lives as a **Roadmap DB card** — `Product Pillar: Universal`, lifecycle in the `Intake Status` property (card mechanics: `docs/connectors/notion/overview.md`). Every intake names its **evidence** (file / frame / message link) in the card body and a **suggested severity**. Separate from Decisions DB **Evidence** (URL property on durable design/product decisions).
 
 **Headless surrogate:** scheduled sweeps run without Notion access and file
 their intakes as GitHub issues labeled `harness-intake` (transport contract:
@@ -75,8 +74,8 @@ Answered by the **spotter** (fallback: the designated maintainer) — never by t
 ## 5 · Gated change — PR + PRD → verdict
 
 1. **Pair, never one alone.** Open the PR *and* pair it with a PRD carrying the rationale — reviewers see *why*, not just *what*. A lone PR or lone PRD never ships.
-2. **Review post** to the design review channel (`docs/connectors/slack.md`): self-sufficient — one-line summary, PR + PRD links, suggested reviewers. Assume the reviewer never opens the PR.
-3. **Verdict** from a routed reviewer, machine-parseable per `docs/connectors/slack.md` gate 2 (approve / request-changes / reject — the emoji vocabulary lives there, not here). **Persona and DS-component changes need two approvals.** No verdict in 2 working days → re-ping the suggested reviewers once; 4 working days → escalate to the design lead. **Never auto-merge on silence.**
+2. **Review post** to the design review channel (`docs/connectors/slack/overview.md`): self-sufficient — one-line summary, PR + PRD links, suggested reviewers. Assume the reviewer never opens the PR.
+3. **Verdict** from a routed reviewer, machine-parseable per `docs/connectors/slack/overview.md` gate 2 (approve / request-changes / reject — the emoji vocabulary lives there, not here). One approve applies any change, persona and DS components included. No verdict in 2 working days → re-ping the suggested reviewers once; 4 working days → escalate to the design lead. **Never auto-merge on silence.**
 4. **Execute on approve only.** Merge the PR or apply the update, then reply in the review thread with what was applied — a non-code apply has no merge commit, so that reply is its record.
 5. **🔁** → revise and re-enter at drafting (§2); each round gets a fresh, complete post. **❌** → record why in the thread so the idea isn't silently re-raised.
 

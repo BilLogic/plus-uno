@@ -1,6 +1,6 @@
 // The share-out post's shape, and its agreement with the convention doc.
 //
-// `docs/connectors/slack.md` § Share-out post specified the Flow 3 template
+// `docs/connectors/slack/shapes.md` § Share-out post specified the Flow 3 template
 // from 2026-07-16; the tool posted four fixed lines and had no fields for most
 // of it, so the documented post was literally unreachable. Nothing compared
 // them, which is why it went unnoticed for months. These assertions are that
@@ -115,14 +115,14 @@ describe("the doc and the tool cannot drift again", () => {
   // The actual fix. The template and the schema disagreed for months because
   // nothing read both — so this reads both.
   const root = join(process.cwd(), "..", "..");
-  const doc = readFileSync(join(root, "docs", "connectors", "slack.md"), "utf8");
+  const doc = readFileSync(join(root, "docs", "connectors", "slack", "shapes.md"), "utf8");
   const tools = JSON.parse(
     readFileSync(join(process.cwd(), "tool-definitions.json"), "utf8"),
   ) as Array<{ name: string; input_schema: { properties: Record<string, unknown> } }>;
   const shareout = tools.find((t) => t.name === "shareout_post")!;
 
   it("names every schema field in the convention", () => {
-    const documented = doc.slice(doc.indexOf("## Share-out post"), doc.indexOf("## Two gates"));
+    const documented = doc.slice(doc.indexOf("## Share-out post"), doc.indexOf("## Answer shapes"));
     for (const field of Object.keys(shareout.input_schema.properties)) {
       assert.ok(
         documented.includes(`\`${field}\``),

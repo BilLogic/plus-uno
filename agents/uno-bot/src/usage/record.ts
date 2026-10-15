@@ -67,6 +67,8 @@ export interface TurnRecordFacts {
   routeReason: string;
   spend?: RecordedSpend;
   toolsCalled: readonly string[];
+  /** The names `read_reference` served this turn. */
+  referencesRead: readonly string[];
   /** What the person was finally shown, for the sources it links. */
   posted?: string;
   disposition: TurnDisposition;
@@ -273,6 +275,7 @@ export function buildTurnRecord(facts: TurnRecordFacts): TurnRecord {
       ? estimateCostUsd(facts.spend.provider, facts.spend.model, facts.spend.usage, askedAt)
       : 0,
     toolsCalled: [...facts.toolsCalled],
+    referencesRead: [...facts.referencesRead],
     sourcesCited: sourcesCitedIn(facts.posted),
     disposition: facts.disposition,
     proposalId: facts.proposalId ?? null,

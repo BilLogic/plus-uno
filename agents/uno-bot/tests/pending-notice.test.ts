@@ -23,8 +23,8 @@ describe("a reply that addresses the pending proposal", () => {
 
   it("counts the tool's own noun, which is how people actually write", () => {
     assert.equal(proposalWasAddressed("The card covers the reconfirm step.", "notion_create"), true);
-    assert.equal(proposalWasAddressed("That email is ready to go.", "email_send"), true);
-    assert.equal(proposalWasAddressed("The prototype would need the PRD first.", "prototype_scaffold"), true);
+    assert.equal(proposalWasAddressed("That message is ready to go.", "dm_relay"), true);
+    assert.equal(proposalWasAddressed("The issue would need its repo first.", "github_issue_create"), true);
     assert.equal(proposalWasAddressed("I'd share that for feedback once it's ready.", "shareout_post"), true);
   });
 });
@@ -36,7 +36,7 @@ describe("a reply that walks away from it", () => {
     const reply =
       "The reconfirmation step sits under Standard Scheduling — I checked the " +
       "blueprint just now. It's owned by the Ops lane at the day-of column.";
-    assert.equal(proposalWasAddressed(reply, "email_send"), false);
+    assert.equal(proposalWasAddressed(reply, "dm_relay"), false);
   });
 
   it("treats an empty reply as unaddressed", () => {
@@ -54,12 +54,12 @@ describe("a reply that walks away from it", () => {
     // is the most-discussed subject here, so a substring match would mark
     // almost every blueprint answer as addressed and zero out the rate.
     const reply = "The reconfirmation step sits under Standard Scheduling.";
-    assert.equal(proposalWasAddressed(reply, "email_send"), false, reply);
-    assert.equal(proposalWasAddressed("please confirm that", "email_send"), true);
+    assert.equal(proposalWasAddressed(reply, "dm_relay"), false, reply);
+    assert.equal(proposalWasAddressed("please confirm that", "dm_relay"), true);
   });
 
   it("is case-insensitive", () => {
-    assert.equal(proposalWasAddressed("STAGED and waiting", "email_send"), true);
+    assert.equal(proposalWasAddressed("STAGED and waiting", "dm_relay"), true);
   });
 
   it("falls back to gate words for a tool it has no nouns for", () => {
@@ -77,12 +77,12 @@ describe("the log line", () => {
   });
 
   it("collapses newlines so one bounce is one grep-able line", () => {
-    const line = bounceLogLine("email_send", "yes\n\ndo it", "a\nb\nc");
+    const line = bounceLogLine("dm_relay", "yes\n\ndo it", "a\nb\nc");
     assert.equal(line.includes("\n"), false, line);
   });
 
   it("clips a long reply rather than flooding the log", () => {
-    const line = bounceLogLine("email_send", "x".repeat(400), "y".repeat(400));
+    const line = bounceLogLine("dm_relay", "x".repeat(400), "y".repeat(400));
     // 800 chars of input in, a bounded line out.
     assert.ok(line.length < 400, `line was ${line.length} chars`);
   });

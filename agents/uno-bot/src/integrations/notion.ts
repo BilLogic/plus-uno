@@ -1,5 +1,6 @@
 // Worker-safe Notion client: notionCreate (PRD/intake on Roadmap; decision rows
-// on Decisions DB), notionUpdate (any shared page), archive, search helpers.
+// on Decisions DB), notionUpdate (any shared page), archive, search helpers. The
+// Prototype Marketplace write is notion-marketplace.ts.
 // database, placed in "Need PRD / Under Playground"), notionUpdate,
 // archiveCard, notionSearch, readNotionPage, findTeamMembers, queryRoadmapCards.
 //
@@ -24,7 +25,7 @@ import {
   type NotionBlock,
 } from "./notion-blocks";
 
-const NOTION_API = "https://api.notion.com/v1";
+export const NOTION_API = "https://api.notion.com/v1";
 const NOTION_VERSION = "2022-06-28";
 const TEAM_QUERY_PAGE_SIZE = 100;
 const TEAM_MAX = 200;
@@ -43,13 +44,13 @@ const DESIGN_STATUS_NEED_PRD = "Need PRD / Under Playground";
 export function createdDesignStatus(surface: string): string | null {
   return surface.trim().toLowerCase() === "prd" ? DESIGN_STATUS_NEED_PRD : null;
 }
-const REQUEST_TIMEOUT_MS = 10000;
+export const REQUEST_TIMEOUT_MS = 10000;
 const MAX_RICH_TEXT = 1900; // Notion caps a single rich_text content at 2000
 
 // Shared auth headers for every Notion REST call — one definition so the token
 // header and API version can't drift between endpoints. `write:true` adds the
 // JSON content-type needed by POST/PATCH.
-function notionHeaders(env: Env, opts?: { write?: boolean }): Record<string, string> {
+export function notionHeaders(env: Env, opts?: { write?: boolean }): Record<string, string> {
   const h: Record<string, string> = {
     Authorization: `Bearer ${env.NOTION_API_KEY}`,
     "Notion-Version": NOTION_VERSION,
@@ -60,7 +61,7 @@ function notionHeaders(env: Env, opts?: { write?: boolean }): Record<string, str
 
 // One error-string format for every Notion endpoint (was hand-built ~7×, and
 // drifted). `fallback` names the operation for the message tail.
-function notionError(status: number, data: { code?: string; message?: string }, fallback: string): Error {
+export function notionError(status: number, data: { code?: string; message?: string }, fallback: string): Error {
   return new Error(`Notion ${status}${data.code ? ` ${data.code}` : ""}: ${data.message ?? fallback}`);
 }
 
@@ -83,7 +84,7 @@ export interface CreatedPrd {
   url: string;
 }
 
-function richText(content: string) {
+export function richText(content: string) {
   return [{ type: "text", text: { content: content.slice(0, MAX_RICH_TEXT) } }];
 }
 
@@ -102,11 +103,11 @@ function todo(content: string) {
  *
  * Was `bodyToParagraphs`: split on blank lines, one `paragraph` block each, no
  * markup parsing at all. The model writes standard Markdown (`AGENT.md`, and
- * `notion.md` § Decisions shows a body as `**Decision:** one sentence`), so
+ * `docs/connectors/notion/overview.md` § Decisions DB shows a body as `**Decision:** one sentence`), so
  * bullets arrived as literal hyphens, bold as literal asterisks, and links as
  * literal `[label](url)`. See `notion-blocks.ts` for the mapping.
  */
-function bodyToBlocks(body: string): unknown[] {
+export function bodyToBlocks(body: string): unknown[] {
   return markdownToNotionBlocks(body);
 }
 
@@ -322,7 +323,7 @@ interface DbQueryRow {
 // fixed-page loop, POST databases/{id}/query, error + has_more handling that
 // every catalog reader (apps / catalog scopes / roadmap) had copied verbatim.
 // Each caller supplies only its per-row `mapRow` (return null to drop a row).
-async function queryDatabaseRows<T>(
+export async function queryDatabaseRows<T>(
   env: Env,
   databaseId: string,
   opts: { maxPages: number; pageSize?: number; filter?: unknown; errorLabel: string },
@@ -1123,28 +1124,45 @@ export async function notionUserName(env: Env, userId: string): Promise<string |
 }
 
 /** Notion users pages read looking for a name. */
-const USER_LIST_PAGES = 3;
+export const USER_LIST_PAGES = 3;
 
 /**
  * The one Notion person whose name, compared by `normalise`, is this one; null
  * for none or several. Up to `USER_LIST_PAGES` subrequests.
  */
 export async function notionUserIdForName(env: Env, name: string, normalise: (s: string) => string): Promise<string | null> {
+  return (await notionUserIdsForNames(env, [name], normalise)).get(name) ?? null;
+}
+
+/**
+ * Each name's one Notion person, compared by `normalise`; null for none or
+ * several. One listing serves every name: up to `USER_LIST_PAGES` subrequests.
+ */
+export async function notionUserIdsForNames(
+  env: Env,
+  names: readonly string[],
+  normalise: (s: string) => string,
+): Promise<Map<string, string | null>> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
-  const wanted = normalise(name);
-  if (!wanted) return null;
-  const hits = new Set<string>();
-  let cursor: string | undefined;
-  for (let page = 0; page < USER_LIST_PAGES; page++) {
-    const q = new URLSearchParams({ page_size: "100", ...(cursor ? { start_cursor: cursor } : {}) });
-    const res = await countedFetch(`${NOTION_API}/users?${q.toString()}`, { headers: notionHeaders(env) });
-    const data = (await res.json()) as { results?: { id?: string; name?: string; type?: string }[]; has_more?: boolean; next_cursor?: string | null; message?: string; code?: string };
-    if (!res.ok) throw notionError(res.status, data, "user list failed");
-    for (const u of data.results ?? []) if (u.id && u.type === "person" && u.name && normalise(u.name) === wanted) hits.add(u.id);
-    if (!data.has_more || !data.next_cursor) break;
-    cursor = data.next_cursor;
+  const wanted = names.map((n) => [n, normalise(n)] as const).filter(([, w]) => w);
+  const hits = new Map(names.map((n) => [n, new Set<string>()] as const));
+  if (wanted.length) {
+    let cursor: string | undefined;
+    for (let page = 0; page < USER_LIST_PAGES; page++) {
+      const q = new URLSearchParams({ page_size: "100", ...(cursor ? { start_cursor: cursor } : {}) });
+      const res = await countedFetch(`${NOTION_API}/users?${q.toString()}`, { headers: notionHeaders(env) });
+      const data = (await res.json()) as { results?: { id?: string; name?: string; type?: string }[]; has_more?: boolean; next_cursor?: string | null; message?: string; code?: string };
+      if (!res.ok) throw notionError(res.status, data, "user list failed");
+      for (const u of data.results ?? []) {
+        if (!u.id || u.type !== "person" || !u.name) continue;
+        const key = normalise(u.name);
+        for (const [n, w] of wanted) if (w === key) hits.get(n)!.add(u.id);
+      }
+      if (!data.has_more || !data.next_cursor) break;
+      cursor = data.next_cursor;
+    }
   }
-  return hits.size === 1 ? [...hits][0]! : null;
+  return new Map(names.map((n) => [n, hits.get(n)!.size === 1 ? [...hits.get(n)!][0]! : null] as const));
 }
 
 /**
@@ -1231,11 +1249,14 @@ export async function listPageComments(env: Env, pageId: string): Promise<PageCo
 // ─── Generic create across convention surfaces (for notion_create) ───────────
 // The mechanical half of a Notion create: resolve the destination DB + the
 // surface's base properties, build the body, POST. The editorial half (what a
-// good PRD says, which pillar) lives in the conventions the bot loads. Marketplace
-// is intentionally NOT here — its relation + rollup + dual-write shape is an
-// in-IDE writers/notion operation, not a one-shot Worker write.
+// good PRD says, which pillar) lives in the conventions the bot loads. The
+// Marketplace surface is its own write (`./notion-marketplace.ts`): it creates
+// or updates one row, so it shares none of this body-building path.
 
-export type NotionCreateSurface = "prd" | "intake" | "decision";
+/** The surfaces this file builds a page on. */
+export type NotionPageSurface = "prd" | "intake" | "decision";
+/** Every `notion_create` surface: the page surfaces, and the Marketplace row. */
+export type NotionCreateSurface = NotionPageSurface | "marketplace";
 
 export interface NotionCreateInput {
   title: string;
@@ -1264,7 +1285,7 @@ interface SurfacePlan {
   label: string;
 }
 
-function planSurface(env: Env, surface: NotionCreateSurface, input: NotionCreateInput): SurfacePlan {
+function planSurface(env: Env, surface: NotionPageSurface, input: NotionCreateInput): SurfacePlan {
   switch (surface) {
     case "prd": {
       const properties: Record<string, unknown> = {
@@ -1318,7 +1339,7 @@ function planSurface(env: Env, surface: NotionCreateSurface, input: NotionCreate
 
 export async function notionCreate(
   env: Env,
-  surface: NotionCreateSurface,
+  surface: NotionPageSurface,
   input: NotionCreateInput,
 ): Promise<CreatedPrd & { label: string }> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
@@ -1420,7 +1441,7 @@ export async function notionCreate(
 /**
  * The options a database's select, status or multi-select property offers, in
  * their stored spelling — what a write exact-matches against, since Notion
- * silently creates any option it is handed (`docs/connectors/notion.md`).
+ * silently creates any option it is handed (`docs/connectors/notion/overview.md`).
  * Null when the property is not one of those types or is not on the schema.
  *
  * @param env - Worker bindings
@@ -1452,7 +1473,7 @@ export async function databaseOptions(env: Env, databaseId: string, property: st
   }
 }
 
-type OptionList = { options?: { name?: string }[] };
+export type OptionList = { options?: { name?: string }[] };
 
 // ─── Update an existing page: schema-aware property writes + narrative append ──
 // (notion_update). Property writes introspect the page's PARENT DATABASE schema,
@@ -1489,7 +1510,7 @@ export function normalizeName(s: string): string {
 // the query string FIRST: a "copy link to view" URL carries the VIEW id in
 // ?v=<id>, which would otherwise be captured alongside the page id and rejected
 // as an unknown relation target (live review 2026-07-13). De-duped.
-function extractNotionIds(v: string): string[] {
+export function extractNotionIds(v: string): string[] {
   const base = v.split("?")[0] ?? v;
   const out: string[] = [];
   const seen = new Set<string>();

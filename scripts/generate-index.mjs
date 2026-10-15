@@ -53,7 +53,7 @@ const ROLE_PATHS = [
   ['Designer building UI', ['design-system/guidelines/overview.md', 'design-system/agent-views/components/index.md', 'design-system/guidelines/composition/layout.md']],
   ['Agent, any task', ['AGENTS.md', 'INDEX.md']],
   ['Working on the harness', ['AGENTS.md', 'docs/adr/overview.md', 'skills/uno-maintain/SKILL.md']],
-  ['Working on uno-bot', ['agents/uno-bot/AGENT.md', 'docs/connectors/slack.md', 'docs/engineering/operations.md']],
+  ['Working on uno-bot', ['agents/uno-bot/AGENT.md', 'docs/connectors/slack/overview.md', 'docs/engineering/operations.md']],
   ['Writing something long', ['docs/conventions/writing.md', 'docs/connectors/overview.md']],
 ];
 

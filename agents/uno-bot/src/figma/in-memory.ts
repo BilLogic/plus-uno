@@ -15,6 +15,12 @@
 //   • a comment is posted as the token's owner (`me`), whoever asked;
 //   • a comment's emoji read back as Figma stores them, as shortcodes: a
 //     posted `🐐` comes back `:goat:` (seen live, 2026-10-12);
+//   • a reaction is sent as a shortcode: the emoji character is a 400, and
+//     `:goat:` is taken and reads back as `:goat:` (probed live, 2026-10-14);
+//   • a node read at a `version` answers from what was seeded for that
+//     version, and a version the file never listed is a 400;
+//   • a version-history read is one page, newest first: `pageSize` of them
+//     (30 when not given), older than `before` when given;
 //   • a file read to a `depth` stops that many levels below the document (1
 //     is the pages alone), and one read for `ids` holds only the paths down to
 //     those nodes, with their subtrees.
@@ -32,6 +38,7 @@ import {
   type FigmaFolder,
   type FigmaFolderFile,
   type FigmaMethod,
+  type FigmaReaction,
   type FigmaUser,
   type FigmaVersionsResponse,
   type FigmaWebhook,
@@ -56,6 +63,8 @@ export interface SeedFile {
   document?: FigmaNode;
   /** The nodes `/nodes` and `/images` answer for, by id. */
   nodes?: Record<string, FigmaNode>;
+  /** The nodes `/nodes?version=` answers for, by version id, then node id. */
+  nodesAt?: Record<string, Record<string, FigmaNode>>;
   /** The `/components` body. */
   components?: FigmaComponentsResponse;
   /** The `/versions` body. */
@@ -92,6 +101,7 @@ export interface InMemoryFigma extends FigmaClient {
 const WRITES: ReadonlySet<FigmaMethod> = new Set<FigmaMethod>([
   "postComment",
   "replyToComment",
+  "postReaction",
   "addDevResources",
   "updateDevResources",
   "removeDevResource",
@@ -103,11 +113,14 @@ interface StoredFile {
   lastModified: string;
   document: FigmaNode;
   nodes: Record<string, FigmaNode>;
+  nodesAt: Record<string, Record<string, FigmaNode>>;
   components: FigmaComponentsResponse;
   versions: FigmaVersionsResponse;
   comments: FigmaComment[];
   devResources: FigmaDevResource[];
   creator: FigmaUser | null;
+  /** Each comment's reactions, by comment id. */
+  reactions: Map<string, FigmaReaction[]>;
 }
 
 /** The tree cut `depth` levels below `node`, as Figma's `depth` cuts it. */
@@ -175,22 +188,26 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
         lastModified: new Date(now()).toISOString(),
         document: { name: "Document", type: "DOCUMENT", children: [] },
         nodes: {},
+        nodesAt: {},
         components: { meta: { components: [] } },
         versions: { versions: [] },
         comments: [],
         devResources: [],
         creator: null,
+        reactions: new Map(),
       };
       files.set(fileKey, {
         name: seed.name ?? current.name,
         lastModified: seed.lastModified ?? current.lastModified,
         document: clone(seed.document ?? current.document),
         nodes: clone(seed.nodes ?? current.nodes),
+        nodesAt: clone(seed.nodesAt ?? current.nodesAt),
         components: clone(seed.components ?? current.components),
         versions: clone(seed.versions ?? current.versions),
         comments: clone(seed.comments ?? current.comments),
         devResources: clone(seed.devResources ?? current.devResources),
         creator: clone(seed.creator ?? current.creator),
+        reactions: current.reactions,
       });
     },
     seedTeam(teamId, list) {
@@ -224,8 +241,14 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
     async nodes(key, ids, o) {
       const entry = enter("nodes", [key, ids, o]);
       const f = fileOf("nodes", key);
+      let held = f.nodes;
+      if (o?.version !== undefined) {
+        const listed = o.version in f.nodesAt || (f.versions.versions ?? []).some((v) => v.id === o.version);
+        if (!listed) throw new FigmaRequestError(400, "Figma nodes 400: Invalid version");
+        held = f.nodesAt[o.version] ?? {};
+      }
       // An id the file does not hold comes back null, as Figma's does.
-      const nodes = Object.fromEntries(ids.map((id) => [id, f.nodes[id] ? { document: f.nodes[id] } : null]));
+      const nodes = Object.fromEntries(ids.map((id) => [id, held[id] ? { document: held[id] } : null]));
       return landed(entry, { name: f.name, lastModified: f.lastModified, err: null, nodes });
     },
     async images(key, ids, o) {
@@ -243,7 +266,11 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
     },
     async versions(key, o) {
       const entry = enter("versions", [key, o]);
-      return landed(entry, fileOf("versions", key).versions);
+      const all = fileOf("versions", key).versions.versions ?? [];
+      const from = o?.before === undefined ? 0 : all.findIndex((v) => v.id === o.before) + 1;
+      if (from === 0 && o?.before !== undefined) throw new FigmaRequestError(400, "Figma versions 400: Invalid before");
+      const page = all.slice(from, from + (o?.pageSize ?? 30));
+      return landed(entry, { versions: page });
     },
     async comments(key, o) {
       const entry = enter("comments", [key, o]);
@@ -287,6 +314,22 @@ export function createInMemoryFigma(opts: { me?: FigmaUser; now?: () => number }
       };
       f.comments.push(reply);
       return landed(entry, reply);
+    },
+    async reactions(key, commentId, o) {
+      const entry = enter("reactions", [key, commentId, o]);
+      const f = fileOf("comment reactions", key);
+      if (!f.comments.some((c) => c.id === commentId)) throw new FigmaRequestError(404, "Figma comment reactions 404: Comment not found");
+      return landed(entry, { reactions: f.reactions.get(commentId) ?? [] });
+    },
+    async postReaction(key, commentId, emoji, o) {
+      const entry = enter("postReaction", [key, commentId, emoji, o]);
+      const f = fileOf("comment reaction", key);
+      if (!f.comments.some((c) => c.id === commentId)) throw new FigmaRequestError(404, "Figma comment reaction 404: Comment not found");
+      if (!/^:[\w+-]+:$/.test(emoji)) throw new FigmaRequestError(400, "Figma comment reaction 400: Invalid emoji");
+      const list = f.reactions.get(commentId) ?? [];
+      if (!list.some((r) => r.emoji === emoji && r.user.id === me.id)) list.push({ emoji, user: me });
+      f.reactions.set(commentId, list);
+      landed(entry, undefined);
     },
     async teamFolders(teamId, o) {
       const entry = enter("teamFolders", [teamId, o]);

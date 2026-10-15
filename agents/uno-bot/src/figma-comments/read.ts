@@ -34,7 +34,10 @@
 //      designer — else the file's creator (`/meta`), by Figma handle; and
 //      each card's Decisions DB rows, which a key decision's row is weighed
 //      against (`../decisions-db/row.ts`);
-//   4. one model call (`./detector.ts`), and each decision drafted
+//   4. its open questions — asked, unresolved, answered by nobody but the
+//      asker — kept for the morning that raises them (`./triage.ts`), with the
+//      cards' Product Pillar and the owner;
+//   5. one model call (`./detector.ts`), and each decision drafted
 //      (`./draft.ts`) and queued for the morning (`./queue.ts`).
 // A file with no thread in its window costs one call.
 //
@@ -55,11 +58,12 @@ import type { SweepSource } from "../sweep/finding";
 import type { SweepRunOutcome } from "../sweep/store";
 import { contributorsOf, MAX_FAILED_NIGHTS, readMeter, recordRun, type SweepDeps, type SweepJobReport } from "../sweep/run";
 import { candidateThreads, readComments, type CommentThread, type ReadWindow } from "./threads";
-import { roleOf, type TeamRoles } from "../usage/roles";
+import { designerAmong, type TeamRoles } from "../usage/roles";
 import { DECISION_SECTIONS, pageOf, pagesOf, type FilePage, type NodePlace } from "./sections";
 import { cardNumbersOf } from "./title";
 import { isDecisionField, type ShownCard, type ShownThread } from "./detector";
 import { commentUrl, draftDecision } from "./draft";
+import { isOpenQuestion, keepOpenQuestions } from "./triage";
 import { mergeQueuedFile, type FileOwner, type QueuedDecision, type QueuedFile, type SweepFigmaComments } from "./queue";
 import { figmaFileUrl } from "../figma/links";
 
@@ -311,11 +315,13 @@ async function readFile(
   let owner: FileOwner | null = null;
   let confirmers: string[] = [];
   let rows: Record<number, DecisionRow[]> | undefined;
+  const pillars: string[] = [];
   try {
     for (const number of cardNumbersOf(title).slice(0, MAX_CARDS_PER_FILE)) {
       const found = await fc.card(number);
       const page = found ? await readUsable(deps.sources, deps.config, found.url, "notion") : null;
       if (!found || !page) continue;
+      for (const p of found.pillars ?? []) if (!pillars.includes(p)) pillars.push(p);
       cards.push({ number, title: found.title || page.title, url: page.url, fields: fieldsOf(page) });
       cardPages.push(page);
     }
@@ -337,6 +343,26 @@ async function readFile(
     return failure("its card could not be read", err);
   }
 
+  const fileUrl = figmaFileUrl(fileKey);
+  const questions = counted.filter(({ thread }) => isOpenQuestion(thread));
+  if (fc.triage && questions.length && !deps.dryRun) {
+    await keepOpenQuestions(fc.triage, {
+      fileKey,
+      title,
+      url: fileUrl,
+      pillars,
+      owner,
+      questions: questions.map(({ thread, page }) => ({
+        commentId: thread.root.id,
+        nodeId: thread.nodeId,
+        by: thread.root.user.handle,
+        createdAt: thread.root.created_at,
+        section: page.section!,
+        page: page.name,
+      })),
+    });
+  }
+
   const shown: ShownThread[] = counted.map(({ thread, page, layer }) => ({
     id: thread.root.id,
     section: page.section!,
@@ -345,7 +371,6 @@ async function readFile(
     resolved: !!thread.root.resolved_at,
     comments: readComments(thread).map((c) => ({ by: c.user.handle, at: c.created_at, text: c.message })),
   }));
-  const fileUrl = figmaFileUrl(fileKey);
   const detected = await fc.detector.detect({ file: { title, url: fileUrl }, threads: shown, cards, prd, ...(rows ? { rows } : {}) });
   if (!detected.ok) return { ok: false, error: `the detector did not answer (${detected.error})`, counts: !QUOTA.test(detected.error) };
   const people = detected.decisions.some((d) => d.row) && fc.people ? await fc.people() : { figma: {}, notion: {} };
@@ -399,7 +424,7 @@ async function readFile(
     });
   }
   if (!decisions.length) return none;
-  return { ok: true, file: { fileKey, title, url: fileUrl, owner, confirmers, decisions, runDate: deps.runDate, foundAt: deps.now() } };
+  return { ok: true, file: { fileKey, title, url: fileUrl, owner, pillars, confirmers, decisions, runDate: deps.runDate, foundAt: deps.now() } };
 }
 
 /**
@@ -413,10 +438,6 @@ async function designOwnerOf(fc: SweepFigmaComments, contributors: readonly stri
   return designerAmong(contributors, await fc.roles());
 }
 
-/** The first of a card's Contributors, as Slack ids, the roles name a designer. */
-export function designerAmong(contributors: readonly string[], roles: TeamRoles): string | null {
-  return contributors.find((id) => roleOf(id, roles) === "design") ?? null;
-}
 
 /** The file's creator by Figma handle, or null when the file's meta has none or cannot be read. */
 async function creatorOf(fc: SweepFigmaComments, fileKey: string): Promise<FileOwner | null> {

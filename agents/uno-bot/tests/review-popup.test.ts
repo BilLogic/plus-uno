@@ -180,16 +180,12 @@ describe("the draft reads as a draft", () => {
     assert.doesNotMatch(words, /block_id|last_edited_time|page_url|append|replace/);
   });
 
-  it("reads a GitHub issue, an email and a DM by what a person checks", async () => {
+  it("reads a GitHub issue and a DM by what a person checks", async () => {
     const issue = lines(await draftOf({ toolName: "github_issue_create", input: { title: "Badge drift", body: "The badge differs." }, proposalText: "x" })).join("\n");
     assert.match(issue, /New GitHub issue on BilLogic\/plus-uno/);
     // What a confirmer may change is typed in place.
     assert.match(issue, /input: Title = Badge drift\nsection: \*Repository:\* BilLogic\/plus-uno/);
     assert.match(issue, /input: Body = The badge differs\./);
-
-    const mail = lines(await draftOf({ toolName: "email_send", input: { to: ["a@b.org"], subject: "Hello", body: "Hi there." }, proposalText: "x" })).join("\n");
-    assert.match(mail, /\*To:\* a@b\.org\ninput: Subject = Hello/);
-    assert.match(mail, /input: Body = Hi there\./);
 
     const dm = lines(await draftOf({ toolName: "dm_relay", input: { recipient: "U07ABC", text: "Card is ready." }, proposalText: "x" })).join("\n");
     assert.match(dm, /\*To:\* <@U07ABC>/);

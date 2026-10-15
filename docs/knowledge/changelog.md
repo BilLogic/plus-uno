@@ -47,3 +47,14 @@ shipped in v2; it produced no standing rule and no decision needing an ADR, so i
 kept as a record rather than promoted.
 
 **Enforced by** `npm run check:knowledge-disposition` (`scripts/check-knowledge-disposition.mjs`).
+
+## 2026-10-14 — the history cleanup
+
+The archive rule changed: `archive/` holds a superseded doc only while something
+live cites it as its decision trail. Nothing did, so all 32 archived files were
+deleted — `bot-v1`, `mode-era`, `uno-compound`, `uno-review`,
+`figma-vendor-notes`, the agent persona, the v2 Figma sync workflow, and both
+audits above. The harness audit's request to be kept is overruled by that rule;
+its P2 finding survives as the quote that opens this ledger. Git keeps every
+file. `archive/eval-runs/`, archived the same week, stays: `docs/evals/` and
+the blueprint integration cite it.

@@ -88,6 +88,7 @@ test("an answered turn records who, where, when, what ran and what it cost", asy
     // The fake is not Gemini, so its prompt count is read as excluding the cache.
     costUsd: (1_200 * 0.75 + 1_000 * 0.075 + 120 * 3.75) / 1_000_000,
     toolsCalled: ["search_blueprint"],
+    referencesRead: [],
     sourcesCited: ["blueprint"],
     disposition: "answered",
     proposalId: null,
@@ -421,6 +422,40 @@ test("a re-staged revision still names the card the revision replaced", async ()
     [row?.via, row?.originProposalId, row?.revisesProposalId],
     ["restage", revised.staged!.proposal.proposalTs, PENDING.proposalTs],
   );
+});
+
+// ── references read ──────────────────────────────────────────────────────────
+
+test("a turn that read two references records both names, in the order read", async () => {
+  const h = harness({
+    replies: [
+      {
+        text: "",
+        toolCalls: [
+          { name: "read_reference", args: { name: "draft-a-prd" } },
+          { name: "read_reference", args: { name: "critique-a-design" } },
+        ],
+      },
+      { text: "File it as an intake." },
+    ],
+  });
+  await runTurn(request(), h.deps);
+  assert.deepEqual(only(h.usage.records()).referencesRead, ["draft-a-prd", "critique-a-design"]);
+});
+
+test("a turn that read no reference, or asked for one that does not exist, records none", async () => {
+  const none = harness();
+  await runTurn(request(), none.deps);
+  assert.deepEqual(only(none.usage.records()).referencesRead, []);
+
+  const miss = harness({
+    replies: [
+      { text: "", toolCalls: [{ name: "read_reference", args: { name: "draft-a-prds" } }] },
+      { text: "No such document." },
+    ],
+  });
+  await runTurn(request(), miss.deps);
+  assert.deepEqual(only(miss.usage.records()).referencesRead, []);
 });
 
 // ── unprompted thanks ────────────────────────────────────────────────────────

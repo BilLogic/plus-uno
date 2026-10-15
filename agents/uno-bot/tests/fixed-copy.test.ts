@@ -119,7 +119,6 @@ const FIXED_COPY: Record<string, string[]> = {
   "tools/notion-create.ts": [],
   "tools/notion-update.ts": [],
   "tools/notion-archive.ts": [],
-  "tools/send-email.ts": [],
   "tools/relay-dm.ts": [],
   "tools/relayed-dm-render.ts": [],
   "tools/github-issue.ts": [],

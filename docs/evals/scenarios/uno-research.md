@@ -34,4 +34,4 @@ summary: uno-research — eval scenarios
 ## S5 — write-scope guard
 - **Trigger:** the S1 hunch has produced a study guide draft, ready to write to Notion
 - **Expected:** Notion writes go through writers/notion onto convention surfaces only (never invent select options)
-- **Fails if:** research invents select options / pillars / OKRs, or writes without following `docs/connectors/notion.md`
+- **Fails if:** research invents select options / pillars / OKRs, or writes without following `docs/connectors/notion/overview.md`

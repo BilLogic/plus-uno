@@ -15,7 +15,7 @@
  * authenticated Figma session, which no CI job and no plain `node` process here
  * has: the REST route to variables is `GET /v1/files/:key/variables/local`, and
  * that endpoint answers `403 — This endpoint requires the file_variables:read
- * scope`, a scope this account is not offered at all (docs/connectors/figma.md).
+ * scope`, a scope this account is not offered at all (docs/connectors/figma/overview.md).
  * The Plugin API can read them, so the capture is a script somebody runs in
  * Figma. The same reasoning as `audit:figma-registry`: a task that cannot do the
  * thing should hand you the thing to run, not pretend to have run it.

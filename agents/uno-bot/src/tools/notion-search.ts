@@ -36,7 +36,7 @@ type CatalogScopeConfig = {
 
 /**
  * Catalog scopes wired to wrangler DATABASE ids. Keep in sync with
- * docs/connectors/notion.md § Read radar and tool-definitions.json.
+ * docs/connectors/notion/overview.md § Read radar and tool-definitions.json.
  */
 const CATALOG_SCOPES: Record<string, CatalogScopeConfig> = {
   help_tutors: {
@@ -53,7 +53,7 @@ const CATALOG_SCOPES: Record<string, CatalogScopeConfig> = {
   marketplace: {
     envKey: "NOTION_MARKETPLACE_DB_ID",
     label: "Prototype Marketplace",
-    note: "Prototype catalog rows. Prefer this scope over 'any' for marketplace lookups. Publishing entries is in-IDE (writers/notion), not a bot write.",
+    note: "Prototype catalog rows. Prefer this scope over 'any' for marketplace lookups. Publishing or updating a row is notion_create with surface 'marketplace'.",
   },
   running_notes: {
     envKey: "NOTION_RUNNING_NOTES_DB_ID",

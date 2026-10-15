@@ -80,7 +80,8 @@ const LEAD = "U0LEAD";
 const MAYA = "U0MAYA";
 const BEA = "U0BEA";
 const ADE = "U0ADE";
-const CONFIG: FollowThroughConfig = { plusDesign: DESIGN, plusUniversal: UNIVERSAL, unoBot: UNO_BOT, botUserId: BOT };
+const TOOLKIT = "C0TOOLKIT";
+const CONFIG: FollowThroughConfig = { plusDesign: DESIGN, plusUniversal: UNIVERSAL, plusToolkit: TOOLKIT, unoBot: UNO_BOT, botUserId: BOT };
 
 const ROOT = ts(29, 13); // Tue 2026-09-29, 09:00 ET
 const TODO = ts(29, 15);
@@ -513,6 +514,8 @@ describe("F3: a to-do to make a card", () => {
     assert.deepEqual(withIt.operations[0]!.input.properties, { product_pillar: "Universal" });
     const without = await draftCard(row, text, { reads: roadmap({ pillars: ["universal (DS)"] }).reads, config: CONFIG });
     assert.equal(without.operations[0]!.input.properties, undefined);
+    const toolkit = await draftCard({ ...row, channel: TOOLKIT }, text, { reads: roadmap({ pillars: ["Toolkit", "Universal"] }).reads, config: CONFIG });
+    assert.deepEqual(toolkit.operations[0]!.input.properties, { product_pillar: "Toolkit" }, "a team channel's to-do takes its team's pillar");
     const elsewhere = await draftCard({ ...row, channel: DESIGN }, text, { reads: roadmap().reads, config: CONFIG });
     assert.equal(elsewhere.operations[0]!.input.properties, undefined);
   });
@@ -737,6 +740,17 @@ describe("F4: an active card with no owner", () => {
 describe("F5: a stuck card", () => {
   const stuck = (over: Partial<ActiveCard> = {}) =>
     card({ designStatus: "Under Review", contributors: [{ id: "n-maya", name: "Maya Chen" }], lastEditedAt: EOD - 22 * DAY, ...over });
+
+  it("a card lands in its pillar's team channel, and in #plus-design when the pillar has none", async () => {
+    for (const [pillars, channel] of [
+      [["Toolkit"], TOOLKIT],
+      [["Tutoring"], DESIGN],
+    ] as const) {
+      const store = createInMemoryCommitmentStore();
+      await runCardFollowThroughScan(SCAN, scanDeps(store, roadmap({ cards: [stuck({ pillars: [...pillars] })] })));
+      assert.equal(only(store).channel, channel, pillars[0]);
+    }
+  });
 
   it("mentions its Contributor; a Universal card lands in #plus-universal", async () => {
     const store = createInMemoryCommitmentStore();

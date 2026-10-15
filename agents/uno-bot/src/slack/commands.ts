@@ -1,6 +1,7 @@
-// Slash-command entry point: /uno-prototype, /uno-research, … (one per skill).
+// Slash-command entry point: /grind, /chill and /stop — system controls, not
+// skills. Skills are reached by DM, @mention and the message shortcuts.
 //
-// SHAPE — why a slash command becomes an ordinary thread
+// SHAPE — why an effort command becomes an ordinary thread
 // -----------------------------------------------------
 // uno-bot is thread-native: history, the emoji proposal gate, and the resolution
 // path all key off a channel + thread_ts. A slash command has neither until we
@@ -30,7 +31,6 @@ import {
   type SlashStopDoorDeps,
 } from "./stop-doors";
 import { slackDelivery } from "./slack-delivery";
-import { SLASH_COMMANDS } from "../generated/slack-commands";
 import type { SlackMessageEvent } from "./types";
 
 interface SlashCommandPayload {
@@ -88,8 +88,7 @@ export function handleSlashCommand(
     return ephemeral(":warning: Slack sent a command I couldn't read. Try again?");
   }
 
-  // /stop is not a skill, so it does not go through SLASH_COMMANDS. It is a
-  // system control: it must be fast, take no arguments, and never start work.
+  // /stop must be fast, take no arguments, and never start work.
   //
   // It sets a flag the running agent loop reads at every iteration and once
   // more before it delivers an answer — the Worker cannot interrupt a DO alarm,
@@ -110,8 +109,8 @@ export function handleSlashCommand(
   }
 
   // /grind and /chill are effort modes, not skills: they take the question you
-  // were going to ask anyway and run it harder or cheaper. Same synthetic-event
-  // path as a /uno-* run, with an explicit tier attached.
+  // were going to ask anyway and run it harder or cheaper, as a synthetic
+  // message event with an explicit tier attached.
   const effort = EFFORT_COMMANDS[payload.command];
   if (effort) {
     if (!payload.text) {
@@ -128,29 +127,16 @@ export function handleSlashCommand(
     );
   }
 
-  const target = SLASH_COMMANDS[payload.command];
-  if (!target) {
-    // Reachable whenever the app manifest declares a command the deployed Worker
-    // doesn't know — i.e. the manifest was updated ahead of a deploy.
-    console.error(`[slash] unknown command: ${payload.command}`);
-    return ephemeral(
-      `:warning: \`${payload.command}\` isn't wired up on my side yet. ` +
-        `Known: ${Object.keys(SLASH_COMMANDS).map((c) => `\`${c}\``).join(" · ")}`,
-    );
-  }
-
-  // No arguments is a question, not a run. Answering it costs nothing and
-  // starting a thread to ask would litter the channel.
-  if (!payload.text) {
-    const hint = target.usageHint ? ` ${target.usageHint}` : " <what you want>";
-    return ephemeral(`Usage: \`${payload.command}${hint}\``);
-  }
-
-  ctx.waitUntil(startRun(env, payload, target.skill));
-
-  // The framing message lands a beat later; this is what the caller sees now.
-  return ephemeral(`On it — starting *${target.skill}* in <#${payload.channelId}>. Watch the thread.`);
+  // Reachable whenever the app manifest declares a command the deployed Worker
+  // doesn't know, or Slack still routes one the manifest has dropped.
+  console.error(`[slash] unknown command: ${payload.command}`);
+  return ephemeral(
+    `:warning: \`${payload.command}\` isn't a command I know. ` +
+      `Known: ${KNOWN_COMMANDS.map((c) => `\`${c}\``).join(" · ")}`,
+  );
 }
+
+const KNOWN_COMMANDS = [...Object.keys(EFFORT_COMMANDS), "/stop"];
 
 async function startEffortRun(
   env: Env,
@@ -185,51 +171,6 @@ async function startEffortRun(
       payload.responseUrl,
       ":warning: I couldn't start that one — try again, and flag it in #uno-bot if it repeats.",
     ).catch(() => {});
-  }
-}
-
-async function startRun(
-  env: Env,
-  payload: SlashCommandPayload,
-  skill: string,
-): Promise<void> {
-  try {
-    // The framing message is the thread root, and it is deliberately public:
-    // the command was invoked in a channel, so the team can see what was asked
-    // and follow the answer. It also quotes the request, so the thread reads
-    // correctly for anyone arriving later without the ephemeral context.
-    const posted = await postMessage(env, {
-      channel: payload.channelId,
-      text: `<@${payload.userId}> ran \`${payload.command}\`\n>>> ${payload.text}`,
-    });
-
-    const rootTs = posted?.ts;
-    if (!rootTs) {
-      throw new Error("chat.postMessage returned no ts — cannot thread the run");
-    }
-
-    // Synthetic message event. `user` is the human who typed the command (the
-    // agent addresses them, and gate.ts's self-confirm guard compares against
-    // the BOT id, so a human id is correct here). ts === thread_ts puts the run
-    // in its own thread rooted at the framing message.
-    const event: SlackMessageEvent = {
-      type: "message",
-      channel: payload.channelId,
-      user: payload.userId,
-      text: `Use the ${skill} skill.\n\n${payload.text}`,
-      ts: rootTs,
-      thread_ts: rootTs,
-    };
-
-    await enqueueAgentJob(env, { kind: "message", event }, `${payload.channelId}:${rootTs}`);
-  } catch (err) {
-    const detail = err instanceof Error ? err.message : String(err);
-    console.error(`[slash] ${payload.command} failed to start: ${detail}`);
-    await replyPrivately(
-      payload.responseUrl,
-      `:warning: I couldn't start \`${payload.command}\` — nothing is running. ` +
-        `Try again, and if it repeats flag it in #uno-bot.`,
-    );
   }
 }
 

@@ -98,7 +98,8 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * cards and hands the week's Review cards to the sweep's post — and on the
  * other mornings, the week's cards that had no room yet (src/figma-tidy/).
  * The morning `figma-dev-links-post` hands the sweep's #plus-design message a
- * Dev Mode links card for the library PRs merged since the last one, while
+ * Dev Mode links card for the PRs merged into main since the last one that
+ * changed a design-system component (src/figma-links/feed.ts), while
  * `FIGMA_DEV_LINKS` is on (src/figma-links/morning.ts).
  * Every morning job that finds cards for a team channel hands them to
  * `sweep-post`, which runs after them all, so a place gets one message.

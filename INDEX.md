@@ -15,7 +15,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 **Working on the harness** → [`AGENTS.md`](AGENTS.md) → [`docs/adr/overview.md`](docs/adr/overview.md) → [`skills/uno-maintain/SKILL.md`](skills/uno-maintain/SKILL.md)
 
-**Working on uno-bot** → [`agents/uno-bot/AGENT.md`](agents/uno-bot/AGENT.md) → [`docs/connectors/slack.md`](docs/connectors/slack.md) → [`docs/engineering/operations.md`](docs/engineering/operations.md)
+**Working on uno-bot** → [`agents/uno-bot/AGENT.md`](agents/uno-bot/AGENT.md) → [`docs/connectors/slack/overview.md`](docs/connectors/slack/overview.md) → [`docs/engineering/operations.md`](docs/engineering/operations.md)
 
 **Writing something long** → [`docs/conventions/writing.md`](docs/conventions/writing.md) → [`docs/connectors/overview.md`](docs/connectors/overview.md)
 
@@ -32,18 +32,12 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
-| [`skills/README.md`](skills/README.md) | Skill anatomy — which content belongs in method.md, which in a face, and the guard that holds the split |
-| [`skills/uno-maintain/bot.md`](skills/uno-maintain/bot.md) | uno-maintain — the Worker's maintain turn, complete in-file; the method is disclosed behind read_reference. |
+| [`skills/README.md`](skills/README.md) | Skill anatomy — what goes in an uno skill's method and its SKILL.md, what goes in a bot skill, and the guards that hold each |
 | [`skills/uno-maintain/SKILL.md`](skills/uno-maintain/SKILL.md) | Fix the harness, not project design work |
-| [`skills/uno-prototype/bot.md`](skills/uno-prototype/bot.md) | uno-prototype — the Worker's prototype turn, complete in-file; the method is disclosed behind read_reference. |
 | [`skills/uno-prototype/SKILL.md`](skills/uno-prototype/SKILL.md) | PRD → design artifact |
-| [`skills/uno-publish/bot.md`](skills/uno-publish/bot.md) | uno-publish — the Worker's publish turn, complete in-file; the method is disclosed behind read_reference. |
 | [`skills/uno-publish/SKILL.md`](skills/uno-publish/SKILL.md) | The method — rails, gates, contracts — is references/method.md |
-| [`skills/uno-research/bot.md`](skills/uno-research/bot.md) | uno-research — the Worker's research turn, complete in-file; the method is disclosed behind read_reference. |
 | [`skills/uno-research/SKILL.md`](skills/uno-research/SKILL.md) | Gather context that doesn't exist yet |
-| [`skills/uno-review/bot.md`](skills/uno-review/bot.md) | uno-review — the Worker's review turn, complete in-file; the method is disclosed behind read_reference. |
 | [`skills/uno-review/SKILL.md`](skills/uno-review/SKILL.md) | reviewers/ds-lens · reviewers/uno-lens · reviewers/a11y-lens · reviewers/design-qa · reviewers/rubric-applier — defined in agents/ (see agents/README.md) |
-| [`skills/uno-synthesize/bot.md`](skills/uno-synthesize/bot.md) | uno-synthesize — the Worker's synthesize turn, complete in-file; the method is disclosed behind read_reference. |
 | [`skills/uno-synthesize/SKILL.md`](skills/uno-synthesize/SKILL.md) | The procedure lives in references/method.md (always load): ingest → findings toll gate → STOP at the designer's two gates → PRD → paired |
 
 ## Agents — what skills summon
@@ -64,7 +58,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`agents/uno-bot/harness-bundle.md`](agents/uno-bot/harness-bundle.md) | Generated readable companion to the baked Worker prompt — the load-order manifest plus the assembled harness as markdown. |
 | [`agents/uno-bot/migrations/README.md`](agents/uno-bot/migrations/README.md) | The Worker's own database migrations — the uno-bot-usage D1 schema under usage/ and how to apply it — and why the blueprint's retrieval schema is not here. |
 | [`agents/uno-bot/README.md`](agents/uno-bot/README.md) | A Cloudflare Worker that puts uno (the PLUS design agent) in Slack as @uno-bot: it receives Slack events, runs an agentic tool-use loop, answers grounded questions across Notion / |
-| [`agents/writers/blueprint.md`](agents/writers/blueprint.md) | The only agent that touches uno-blueprint (Supabase, the product source of truth) |
+| [`agents/writers/blueprint.md`](agents/writers/blueprint.md) | The only agent that writes uno-blueprint (Supabase, the product source of truth), and the grounding reader for the skills that summon it |
 | [`agents/writers/figma.md`](agents/writers/figma.md) | The only agent that writes to the Figma workspace |
 | [`agents/writers/notion.md`](agents/writers/notion.md) | The only agent that writes to Notion |
 
@@ -72,11 +66,15 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
-| [`docs/connectors/figma.md`](docs/connectors/figma.md) | PLUS Figma files follow How We Fig — five stage folders per team, `<Project> / Card <n> & <m> / <designers>` titles, six divider page sections; an agent suggests a rename or a move and a person makes it |
-| [`docs/connectors/notion.md`](docs/connectors/notion.md) | How agents write to Notion — the MCP-write principle, convention surfaces, the gated tools, and body shape. |
+| [`docs/connectors/figma/annotations.md`](docs/connectors/figma/annotations.md) | Figma's six annotation category labels, disclosed — what each holds, the Logic / data vs Development test, where status, construction notes and analytics go instead, and why a file's list drifts |
+| [`docs/connectors/figma/overview.md`](docs/connectors/figma/overview.md) | Figma's connector overview, always loaded — what uno-bot can reach over REST, canvas vs comments, How We Fig's stage folders, file titles and page sections, and an agent's duties; the six annotation labels are annotations.md beside it, and the bot's long-form access doc is uno-bot-access.md |
+| [`docs/connectors/figma/uno-bot-access.md`](docs/connectors/figma/uno-bot-access.md) | What uno-bot can read and write in Figma over REST, and where it stops — frame renders, comment reads and @uno replies, the library and comment pipelines, a Figma ask's public scope, and each limit with its cause and next route |
+| [`docs/connectors/notion/marketplace-db.md`](docs/connectors/notion/marketplace-db.md) | The Prototype Marketplace database (LIVE under Design HQ) — its schema, deploy URLs and publish procedure, read by the IDE publish skill and the Worker's marketplace write |
+| [`docs/connectors/notion/overview.md`](docs/connectors/notion/overview.md) | Notion's connector overview, always loaded — the one credential and the MCP-write principle, the write surfaces, the Decisions DB, the read radar and the Roadmap card rules; page-writing.md beside it is how a body is written |
+| [`docs/connectors/notion/page-writing.md`](docs/connectors/notion/page-writing.md) | How a Notion page body is written, disclosed — the Markdown the Worker turns into blocks, attribution, the project-hub golden sections, the comments protocol and the API's markdown quirks |
 | [`docs/connectors/overview.md`](docs/connectors/overview.md) | One row per connected tool: where its conventions live, what touches it |
-| [`docs/connectors/slack-sweep.md`](docs/connectors/slack-sweep.md) | The end-of-day sweep — what it reads, where its drift reports go, who may decide a fix, how it asks about a read-only file, how its commitment reminders nudge a promiser, its card follow-ups, and what it asks in a person's DM with uno-bot. |
-| [`docs/connectors/slack.md`](docs/connectors/slack.md) | Pillar → channel map (group announcements; all private — uno-bot must be invited before posting/@here): Universal → #plus-universal C072E8SFLKV · Admin → #plus-admin C089A3E9CCW · |
+| [`docs/connectors/slack/overview.md`](docs/connectors/slack/overview.md) | Slack's connector overview, always loaded — channels, the pillar → channel map, surfaces, the two gates, message formatting, threading, writing style and frame words; the output shapes are shapes.md beside it |
+| [`docs/connectors/slack/shapes.md`](docs/connectors/slack/shapes.md) | Slack's output shapes, disclosed — the share-out post, the answer shapes `present` builds (result table, chart, answer cards, ⚠️ line, Sources box), the render path each part takes, and the copy rules for the Worker's own Figma messages |
 | [`docs/connectors/storybook-mcp.md`](docs/connectors/storybook-mcp.md) | The Storybook MCP endpoint — the primary interface to the design system while Storybook runs, plus the story-authoring conventions that keep it useful. |
 | [`docs/connectors/supabase/blueprint-direct-access.md`](docs/connectors/supabase/blueprint-direct-access.md) | Query recipes and service-key notes for agents that read the blueprint's database directly rather than through the portal — the supplement to blueprint.md, which it adds to |
 | [`docs/connectors/supabase/blueprint-navigation.md`](docs/connectors/supabase/blueprint-navigation.md) | uno-bot's voice over the blueprint — citation shape, confidence language, absence behaviour and source routing; the blueprint's own account of its shape is blueprint.md beside this file, its schema blueprint-schema.md |
@@ -137,7 +135,7 @@ Adding a doc changes this file; editing this file changes nothing.
 |-----|---------|
 | [`docs/engineering/coding.md`](docs/engineering/coding.md) | How to write code in this repo — barrel imports, tokens over literals, styling conventions, and what not to reach for. |
 | [`docs/engineering/measurement-window.md`](docs/engineering/measurement-window.md) | How to run uno-bot's measurement window each week and close it — the five numbers, where each comes from, where it is recorded, and what stays private. |
-| [`docs/engineering/operations.md`](docs/engineering/operations.md) | THE standing-automation registry — every cron, scheduled Worker job, webhook and PR gate, with its trigger, agent, implementation and who pays. |
+| [`docs/engineering/operations.md`](docs/engineering/operations.md) | THE standing-automation registry — every cron, scheduled Worker job, webhook and PR gate, with its trigger, owner and a link to its home. |
 | [`docs/engineering/setup.md`](docs/engineering/setup.md) | Aliases, package structure, prototype conventions, token workflow, local preview. |
 
 ## Product and service
@@ -186,8 +184,9 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/028-a-tier-is-model-plus-thinking-level-moving-together.md`](docs/adr/028-a-tier-is-model-plus-thinking-level-moving-together.md) | On the Gemini lane a tier is one named configuration of model PLUS thinking level — chill low, default medium, grind high — reversing the 2026-08-07 call to pin one dial; attribution comes from changing one tier at a time (2026-09-04) |
 | [`docs/adr/029-in-place-block-replacement-behind-the-gate.md`](docs/adr/029-in-place-block-replacement-behind-the-gate.md) | uno-bot may rewrite a named Notion block in place — keyed by a block id plus the last-edited stamp seen at read, behind the ✅ gate — relaxing the append-only rule that made every correction a contradicting section at the bottom of the page (2026-09-15) |
 | [`docs/adr/030-the-usage-record-lives-in-d1-not-analytics-engine.md`](docs/adr/030-the-usage-record-lives-in-d1-not-analytics-engine.md) | uno-bot's per-turn usage record is a D1 (SQLite) database, uno-bot-usage, rather than Workers Analytics Engine — rows are updated after the turn, every metric is re-runnable SQL, and nothing may be sampled or expire mid-window; with what the database is for and what it never stores (2026-09-29) |
-| [`docs/adr/031-a-run-with-no-requester-is-bounded-by-its-evidence.md`](docs/adr/031-a-run-with-no-requester-is-bounded-by-its-evidence.md) | A scheduled run has no requester whose visibility bounds it, so each finding's own evidence does — a private channel's finding stays in it, a group DM's goes back to it and leaves only as a reworded note on a separate share card someone there ✅s, and mixed evidence is private (2026-09-29); a file in one of the six PLUS Figma teams counts like a public design channel (amended 2026-09-30, #891) |
+| [`docs/adr/031-a-run-with-no-requester-is-bounded-by-its-evidence.md`](docs/adr/031-a-run-with-no-requester-is-bounded-by-its-evidence.md) | A scheduled run has no requester whose visibility bounds it, so each finding's own evidence does — a private channel's finding stays in it, a group DM's goes back to it and leaves only as a reworded note on a separate share card someone there ✅s, and mixed evidence is private (2026-09-29); a file in one of the six PLUS Figma teams counts like a public design channel (amended 2026-09-30, #891); a finding with no thread goes to its team's channel, by the card's pillar else the Figma file's team, before #plus-design (amended 2026-10-14) |
 | [`docs/adr/032-a-cron-may-read-with-a-persons-own-token-only-for-them.md`](docs/adr/032-a-cron-may-read-with-a-persons-own-token-only-for-them.md) | A scheduled job with no requester may read with a person's own Slack token only after that person opted in, only after the live token's granted scopes check out, and only to tell that person — in their DM with uno-bot, never anyone else — keeping a permalink, a due time and a state and nothing of the message (2026-09-30) |
+| [`docs/adr/033-bot-skills-live-with-the-worker.md`](docs/adr/033-bot-skills-live-with-the-worker.md) | uno-bot's instructions are its own bot skills, kept with the Worker and named for what the bot does, each ending in answer, file or hand off; the six uno skills become IDE-only, and the bot never builds code or draws in Figma (2026-10-14) |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -216,6 +215,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-145 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+144 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

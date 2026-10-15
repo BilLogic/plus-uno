@@ -1,7 +1,7 @@
 ---
 embodiment: ide
 summary: Harness IA — one constitution, dual-face skills, derived agent roster (2026-07-07)
-status: active
+status: active-with-correction
 verified: 2026-08-24 (#171)
 ---
 
@@ -14,3 +14,5 @@ verified: 2026-08-24 (#171)
 **Supersedes.** ADR-001 (AGENTS.md entry point — strengthened: now the *only* one), ADR-007 (skills agent-agnostic under .agent/ — now top-level skills/ with per-runtime faces), ADR-008 (compound loop via uno-compound — now uno-maintain), the .agent/SKILL.md mode/pipeline router.
 
 **Pending, closed.** The Pipedream→Cloudflare cutover outcome is recorded in ADR-014 (Status CONFIRMED live, 2026-07-08). Skill-body rewrites (plan Phase 1) landed with evals-first scenarios.
+
+**Superseded in part (2026-10-14).** Point 2, the dual-face skill, is superseded by ADR-033: the six skills are IDE-only, and uno-bot runs its own bot skills under `agents/uno-bot/skills/`. Points 1 and 3–6 stand.
