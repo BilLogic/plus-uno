@@ -1,6 +1,7 @@
 // The checked-in price table the usage record estimates a turn's cost from.
 //
-// USD per million tokens, list prices, read 2026-09-29:
+// USD per million tokens, list prices, read 2026-09-29 (gemini-4-argon
+// 2026-10-15):
 //   - Gemini: ai.google.dev/gemini-api/docs/pricing (paid tier, prompts
 //     ≤200k tokens). uno-bot is billed through Vertex AI, whose rates are not
 //     reproduced here; these are the published list rates, and the column is
@@ -28,6 +29,7 @@ interface PriceWindow {
 }
 
 const JAN_1_2027 = Date.UTC(2027, 0, 1);
+const DEC_1_2026 = Date.UTC(2026, 11, 1);
 
 /** Oldest window first; the first window whose `until` is after the turn wins. */
 export const PRICE_TABLE: Readonly<Record<string, readonly PriceWindow[]>> = {
@@ -38,6 +40,12 @@ export const PRICE_TABLE: Readonly<Record<string, readonly PriceWindow[]>> = {
   "gemini-3.7-flash": [
     { until: JAN_1_2027, rates: { input: 0.75, output: 3.75, cachedInput: 0.075 } },
     { rates: { input: 1.5, output: 7.5, cachedInput: 0.15 } },
+  ],
+  // Implicit caching only — Argon serves no explicit cachedContents, which the
+  // `global` region already does without (gemini/cache.ts).
+  "gemini-4-argon": [
+    { until: DEC_1_2026, rates: { input: 2, output: 10, cachedInput: 0.1 } },
+    { rates: { input: 4, output: 20, cachedInput: 0.2 } },
   ],
   "gemini-3.5-flash-lite": [{ rates: { input: 0.3, output: 2.5, cachedInput: 0.03 } }],
   "gemini-3.1-pro-preview": [{ rates: { input: 2, output: 12, cachedInput: 0.2 } }],

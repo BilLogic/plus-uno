@@ -186,7 +186,7 @@ const MIN_SHORTENED_FROM_DRAFT = 0.5;
  * `default`, and no longer `grind`. #605 moved the judge to grind on the theory
  * that a judge should be at least as strong as what it grades, and accepted
  * "more latency" for it. It was not more latency, it was no judgement: on the
- * Gemini lane grind is `gemini-3.1-pro-preview` at `high`, and on 2026-10-07
+ * Gemini lane grind was `gemini-3.1-pro-preview` at `high`, and on 2026-10-07
  * every judged draft in `wrangler tail` — six of six across five builds, from
  * 2,729 to 17,614 characters — hit JUDGE_TIMEOUT_MS and shipped unread. The
  * 2.7k timeout is what names the cause: a pass verdict is a dozen output
