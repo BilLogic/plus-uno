@@ -66,6 +66,17 @@ function textTransport(text: string): {
   };
 }
 
+test("generate reports a max_tokens stop as cutOff", async () => {
+  const provider = claudeProvider({
+    transport: async () => ({
+      status: 200,
+      data: { content: [{ type: "text", text: '{"verdict":"fa' }], stop_reason: "max_tokens" },
+    }),
+  });
+  const result = await provider.generate({ tier: "chill", prompt: "score this draft" });
+  assert.deepEqual(result, { ok: true, model: CLAUDE_MODELS.chill, text: '{"verdict":"fa', cutOff: true });
+});
+
 test("generate sends one prompt on the tier's model and returns the text", async () => {
   const t = textTransport("the reply");
   const provider = claudeProvider({ transport: t.transport });

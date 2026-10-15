@@ -48,6 +48,7 @@ import { proposalEventLogFor } from "../usage/production";
 import { recordTaskCompletion } from "../usage/resolution-env";
 import { isToolName, runsPastGate } from "./tool-table";
 import { TOOLS_BY_NAME } from "./tools";
+import { cancelNote } from "./cancel-note";
 
 /**
  * Act on a verdict that won its claim: react on the person's ORIGINAL request
@@ -152,7 +153,8 @@ async function runWonVerdict(
       { channel: pending.channel, thread: pending.threadTs },
       {
         role: "assistant",
-        content: `(Cancelled the proposed ${pending.toolName} — nothing was done.)`,
+        content: cancelNote(pending.toolName, pending.input),
+        at: Date.now(),
       },
     );
     // A sweep card's ⛔ drops its items (`sweep/outcomes.ts`).

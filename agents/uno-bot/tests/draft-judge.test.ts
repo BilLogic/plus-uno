@@ -96,6 +96,17 @@ test("prose around the JSON is tolerated; prose instead of it is an error", asyn
   assert.equal(out.reason, "unparseable judge output");
 });
 
+test("a judge reply cut off at the output ceiling is named as cut off, not unparseable", async () => {
+  // The verdict JSON stops mid-string: the token ceiling, thinking included,
+  // ran out before the closing brace. Still fails open to the draft.
+  const truncated = verdictJson({ verdict: "fail", failed: ["D1"], revised: LONG_DRAFT }).slice(0, 80);
+  const cut = fakeProvider({ generateReplies: [truncated], generateCutOff: true });
+  const out = await reviewDraft(cut, { userText: "q", draft: LONG_DRAFT });
+  assert.equal(out.verdict, "error");
+  assert.equal(out.text, LONG_DRAFT);
+  assert.equal(out.reason, "judge output cut off at the token ceiling");
+});
+
 // ── the correction gate ──────────────────────────────────────────────────────
 
 test("a correction turn carries the extra gate, the previous reply and the tools that ran", async () => {

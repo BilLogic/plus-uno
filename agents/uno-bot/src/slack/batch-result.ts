@@ -34,6 +34,18 @@ function headOf(outcomes: OperationOutcome[]): string {
 
 const planOf = (outcomes: OperationOutcome[]) => outcomes.map((o) => ({ toolName: o.toolName, input: o.input ?? {} }));
 
+/** Where each operation landed, in the executor's own words: a share-out's
+ *  `posted_to`, so the result is grouped by where it posted, not by its input. */
+const placesOf = (outcomes: OperationOutcome[]) =>
+  outcomes.map((o) => {
+    try {
+      const posted = (JSON.parse(o.result) as Record<string, unknown>).posted_to;
+      return typeof posted === "string" && posted.trim() ? posted : null;
+    } catch {
+      return null;
+    }
+  });
+
 /**
  * What the thread is told once the batch has run — every operation named, done
  * or failed, so a partial result is visible rather than hidden behind the one
@@ -51,7 +63,7 @@ export function batchResultMessage(outcomes: OperationOutcome[]): string | null 
   if (outcomes.length <= 1) return null;
   const planned = planOf(outcomes);
   const lines: string[] = [];
-  for (const group of groupOperations(planned)) {
+  for (const group of groupOperations(planned, placesOf(outcomes))) {
     lines.push(group.heading);
     for (const i of group.members) {
       const o = outcomes[i]!;
@@ -94,7 +106,7 @@ export function batchResultTable(outcomes: OperationOutcome[]): ResultTable | nu
   if (outcomes.length <= 1 || outcomes.length > MAX_ROWS) return null;
   const planned = planOf(outcomes);
   const rows: ResultRow[] = [];
-  for (const group of groupOperations(planned)) {
+  for (const group of groupOperations(planned, placesOf(outcomes))) {
     for (const i of group.members) {
       const o = outcomes[i]!;
       const what = operationKindSummary(planned[i]!);

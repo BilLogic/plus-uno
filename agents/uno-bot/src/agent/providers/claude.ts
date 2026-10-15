@@ -19,7 +19,9 @@
 //   • `stop_reason`: end_turn/stop_sequence → `end`, tool_use → `tool`, and
 //     `pause_turn` → resumed RIGHT HERE by echoing the paused content and
 //     calling again, so the loop never learns the word (it would otherwise have
-//     to grow a provider stop reason it has no policy for);
+//     to grow a provider stop reason it has no policy for); on a one-shot,
+//     `max_tokens` → `cutOff`, so a caller parsing the text can tell a
+//     truncation from a malformed reply;
 //   • the tier → Vertex model id, the extended-thinking budget, `web_search`
 //     (server-side on Vertex, zero Worker subrequests), the `cache_control`
 //     shape that turns the loop's `stable` system block into a cached prefix;
@@ -240,7 +242,12 @@ export function claudeProvider(opts: ClaudeProviderOptions): ModelProvider {
           message: `HTTP ${status}: ${parsed.error?.message ?? "rawPredict failed"}`,
         };
       }
-      return { ok: true, model: oneShotModel, text: textOf(parsed.content ?? []) };
+      return {
+        ok: true,
+        model: oneShotModel,
+        text: textOf(parsed.content ?? []),
+        ...(parsed.stop_reason === "max_tokens" ? { cutOff: true } : {}),
+      };
     },
 
     async start(turn: ModelTurn): Promise<void> {
