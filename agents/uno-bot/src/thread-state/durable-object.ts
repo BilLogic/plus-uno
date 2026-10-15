@@ -253,6 +253,12 @@ export function createDurableObjectThreadState(
     settleFiling(key: string, issue: FiledIssue | null): Promise<void> {
       return hop().settleFiling(key, issue, now());
     },
+
+    // ----- one comparison per scenario per thread -----
+
+    claimComparison(ref: ThreadRef, scenario: string): Promise<boolean> {
+      return hop().claimComparison(ref, scenario, now());
+    },
   };
 }
 
