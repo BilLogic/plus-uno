@@ -29,11 +29,6 @@ export const PRESS_RESERVE = 4;
 function failureText(label: string, result: Extract<RevisionResult, { ok: false }>): string {
   const parts = [`The revision to ${label} was not written: ${result.reason}.`];
   if (result.tookBack) parts.push(`Took back ${result.tookBack} ${result.tookBack === 1 ? "write" : "writes"}.`);
-  if (result.leftDeprecated.length) {
-    parts.push(
-      `${result.leftDeprecated.length} new cell(s) are left as deprecated, because uno-bot may not delete — a person deletes them: ${result.leftDeprecated.join(", ")}.`,
-    );
-  }
   if (result.notTakenBack.length) parts.push(`Could NOT take back: ${result.notTakenBack.join("; ")} — the blueprint still shows these.`);
   return parts.join(" ");
 }
@@ -82,6 +77,6 @@ export async function executeBlueprintRevise(env: Env, input: Record<string, unk
   return JSON.stringify(
     result.ok
       ? { ok: true, message: text, session: sessionId, written: result.written }
-      : { ok: false, error: text, session: sessionId, took_back: result.tookBack, left_deprecated: result.leftDeprecated },
+      : { ok: false, error: text, session: sessionId, took_back: result.tookBack },
   );
 }

@@ -13,7 +13,10 @@
 // Supabase half of the stub plays the uno-blueprint project: the password
 // grant mints a token, `upsert_cell_at_status` and `set_path_status` answer as
 // plus-uno-blueprint `20261015120000` defines them, and a row can be told to
-// fail or to have moved since the draft.
+// fail or to have moved since the draft. `log` plays `authoring_changes` with
+// that migration's trigger: a row appended under an `rpc_writer` JWT reads
+// `author = uno-bot` with the token's `sub`, whoever appended it, and anyone
+// else claiming `uno-bot` is refused.
 import { beforeEach, describe, it } from "node:test";
 import assert from "node:assert/strict";
 
@@ -30,7 +33,43 @@ interface Call {
 }
 
 const SUPABASE = "https://blueprint.test";
-const TOKEN = "jwt-for-uno-bot";
+const BOT_UID = "0b0b0b0b-0000-4000-8000-00000000b0b0";
+const b64url = (o: unknown) => Buffer.from(JSON.stringify(o)).toString("base64url");
+/** uno-bot's JWT as the password grant mints it: `app_metadata` set by the server. */
+const TOKEN = `${b64url({ alg: "HS256" })}.${b64url({ sub: BOT_UID, role: "authenticated", app_metadata: { role: "rpc_writer" } })}.sig`;
+
+interface LogRow {
+  fn: string;
+  author: string;
+  author_id: string | null;
+  agent_session_id: unknown;
+}
+let log: LogRow[] = [];
+
+/** The claims of the bearer token a request carries, or null. */
+function claims(headers: Record<string, string>): { sub?: string; app_metadata?: { role?: string } } | null {
+  const jwt = headers.authorization?.replace(/^Bearer /, "");
+  const payload = jwt?.split(".")[1];
+  if (!payload) return null;
+  try {
+    return JSON.parse(Buffer.from(payload, "base64url").toString()) as { sub?: string; app_metadata?: { role?: string } };
+  } catch {
+    return null;
+  }
+}
+
+/** One append to `authoring_changes`, through the trigger `authoring_changes_name_uno_bot`. */
+function append(headers: Record<string, string>, fn: string, author: string, sessionId: unknown = null): string | null {
+  const who = claims(headers);
+  if (who?.app_metadata?.role === "rpc_writer") {
+    log.push({ fn, author: "uno-bot", author_id: who.sub ?? null, agent_session_id: sessionId });
+  } else if (author === "uno-bot") {
+    return "Only the uno-bot account writes as uno-bot";
+  } else {
+    log.push({ fn, author, author_id: who?.sub ?? null, agent_session_id: sessionId });
+  }
+  return null;
+}
 
 let calls: Call[] = [];
 /** Slots (`lane:step`) whose write fails with a 500. */
@@ -66,6 +105,7 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
     const before = occupied.get(slot);
     const id = before?.id ?? `cell-${slot}`;
     occupied.set(slot, { id, content: String(body?.content), status: String(body?.status) });
+    append(headers, "upsert_cell_at_status", body?.agent_session_id ? "agent" : "human", body?.agent_session_id ?? null);
     return reply({
       id,
       inserted: !before,
@@ -76,7 +116,24 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
   if (url === `${SUPABASE}/rest/v1/rpc/set_path_status`) {
     const previous = pathStatus;
     pathStatus = String(body?.status);
+    append(headers, "set_path_status", body?.agent_session_id ? "agent" : "human", body?.agent_session_id ?? null);
     return reply({ id: body?.path_id, change_id: `change-${calls.length}`, previous: { status: previous } });
+  }
+  if (url === `${SUPABASE}/rest/v1/rpc/delete_cell`) {
+    // One of the delete functions: archives into the log itself, as `human`.
+    const slot = [...occupied.entries()].find(([, c]) => c.id === body?.cell_id)?.[0];
+    if (!slot) return reply({ code: "P0001", message: "Unknown cell" }, 400);
+    occupied.delete(slot);
+    append(headers, "delete_cell", "human");
+    return reply(`change-${calls.length}`);
+  }
+  if (url === `${SUPABASE}/rest/v1/rpc/add_step`) {
+    // An older RPC: writes, and leaves its record to the caller.
+    return reply(`step-${calls.length}`);
+  }
+  if (url === `${SUPABASE}/rest/v1/rpc/record_authoring_change`) {
+    const refused = append(headers, String(body?.fn), String(body?.author ?? "human"), body?.agent_session_id ?? null);
+    return refused ? reply({ code: "42501", message: refused }, 403) : reply(`change-${calls.length}`);
   }
   if (url.startsWith(SUPABASE)) return reply({ message: `no such route: ${url}` }, 404);
   if (url.startsWith("https://counted.test/")) return reply({});
@@ -196,6 +253,7 @@ beforeEach(async () => {
   occupied = new Map([["lane-system:step-4", { id: "cell-existing", content: "Reflection saved", status: "planned" }]]);
   pathStatus = "planned";
   minted = 0;
+  log = [];
   const { forgetBlueprintSession } = await import("../src/blueprint-write/index.js");
   forgetBlueprintSession();
 });
@@ -319,23 +377,24 @@ describe("nothing is written", () => {
 });
 
 describe("a failure part-way", () => {
-  it("takes back what was written, and says so", async () => {
-    // Row one is new and lands; row two fails. Row one cannot be deleted by
-    // uno-bot, so it is taken back as `deprecated` and named for a person.
+  it("takes back what was written, deleting the cell it made, and says so", async () => {
+    // Row one is new and lands; row two fails. Row one is taken back through
+    // the delete RPC, which records itself — no record call follows it.
     failing.add("lane-system:step-4");
     await execute(await decide(OWNER));
     assert.deepEqual(
-      rpcCalls().map((r) => [r.fn, r.args?.lane_id, r.args?.status]),
+      rpcCalls().map((r) => [r.fn, r.args?.lane_id ?? r.args?.cell_id, r.args?.status]),
       [
         ["upsert_cell_at_status", "lane-tutor", "planned"],
         ["upsert_cell_at_status", "lane-system", "live"],
-        ["upsert_cell_at_status", "lane-tutor", "deprecated"],
+        ["delete_cell", "cell-lane-tutor:step-3", undefined],
       ],
     );
+    assert.equal(occupied.has("lane-tutor:step-3"), false, "the new cell is gone");
     const told = appended.join("\n");
     assert.match(told, /did NOT complete/);
     assert.match(told, /took back 1/i);
-    assert.match(told, /cell-lane-tutor:step-3/, "the new cell a person has to delete is named");
+    assert.doesNotMatch(told, /deprecated/);
   });
 
   it("puts a changed cell back as it stood", async () => {
@@ -357,7 +416,43 @@ describe("a failure part-way", () => {
     occupied.set("lane-system:step-4", { id: "cell-existing", content: "Reflection saved", status: "built" });
     await execute(await decide(OWNER));
     assert.equal(occupied.get("lane-system:step-4")?.status, "built");
-    assert.equal(occupied.get("lane-tutor:step-3")?.status, "deprecated");
+    assert.equal(occupied.has("lane-tutor:step-3"), false, "the cell it made is deleted");
     assert.match(appended.join("\n"), /changed since the draft/);
+  });
+});
+
+describe("attribution", () => {
+  it("lands every row it causes in authoring_changes as uno-bot, under the bot's own user id", async () => {
+    // A write, a failure and a delete: the three ways a revision touches the log.
+    failing.add("lane-system:step-4");
+    await execute(await decide(OWNER));
+    assert.deepEqual(log.map((r) => r.fn), ["upsert_cell_at_status", "delete_cell"]);
+    for (const row of log) {
+      assert.equal(row.author, "uno-bot", `${row.fn} is attributed to uno-bot`);
+      assert.equal(row.author_id, BOT_UID);
+    }
+  });
+
+  it("follows an older RPC with record_authoring_change, as uno-bot under the approval's session", async () => {
+    const { authoringCall, authoringCallCost, blueprintRpcFor } = await import("../src/blueprint-write/index.js");
+    const deps = { rpc: blueprintRpcFor(env()), sessionId: "11111111-2222-4333-8444-555555555555" };
+    await authoringCall(deps, "add_step", { scenario_id: "scn-1", label: "Reflect" }, { fn: "delete_step", args: {} });
+    assert.deepEqual(rpcCalls().map((r) => r.fn), ["add_step", "record_authoring_change"]);
+    assert.deepEqual(rpcCalls()[1]!.args, {
+      fn: "add_step",
+      args: { scenario_id: "scn-1", label: "Reflect" },
+      revert: { fn: "delete_step", args: {} },
+      author: "uno-bot",
+      agent_session_id: "11111111-2222-4333-8444-555555555555",
+    });
+    assert.deepEqual(log, [
+      { fn: "add_step", author: "uno-bot", author_id: BOT_UID, agent_session_id: "11111111-2222-4333-8444-555555555555" },
+    ]);
+    assert.equal(authoringCallCost("add_step"), 2, "the record is a second subrequest");
+  });
+
+  it("does not follow an RPC that records itself", async () => {
+    const { authoringCallCost } = await import("../src/blueprint-write/index.js");
+    for (const fn of ["upsert_cell_at_status", "set_path_status", "delete_cell"]) assert.equal(authoringCallCost(fn), 1, fn);
   });
 });
