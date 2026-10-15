@@ -115,7 +115,7 @@ The design-system source of truth (stories + MDX → /storybook).
 _Avoid_: "the docs site"
 
 **Decisions DB**:
-The centralized decision log under Design HQ, one row per decision.
+The decision log under Design HQ, one row per decision.
 _Avoid_: "Decision Log" (obsolete per-project subpage)
 
 **pillar**:
@@ -144,7 +144,7 @@ The ⚠️ card holding a side-effect tool call until someone approves it: short
 _Avoid_: "confirmation dialog", "prompt", bare "card" where a Roadmap card could be meant
 
 **superseded card**:
-A proposal card retired by a later revision in the same thread: it executes nothing and answers that it was replaced. Expired is different: the card's TTL ran out.
+A proposal card retired by a later revision in its thread, or once a turn commits to writing one: it executes nothing and answers that it was replaced. Expired is different: the card's TTL ran out.
 _Avoid_: "expired card"
 
 **sweep**:
@@ -160,7 +160,7 @@ A change request, routed by the `file-a-ticket` bot skill: implementation in a l
 _Avoid_: "ticket"
 
 **standing confirmers**:
-Who may decide any card that names its confirmers, except in someone's own DM (`STANDING_CONFIRMER_IDS`).
+Who may decide any card that names its confirmers, beside the people it names, except in someone's own DM (`STANDING_CONFIRMER_IDS`).
 
 **decision card**:
 The Slack shape a **scheduled action** reports on: a parent line, then one card per item with Review and Open, each item its own **proposal card**.
@@ -175,10 +175,10 @@ _Avoid_: "assistant thread", "the panel thread", bare "session" (a **Session** i
 
 **working signal**:
 What tells a person a turn is in flight: the **agent session** shown as processing until the turn settles, on every exit, not when the answer posts.
-_Avoid_: "the thinking indicator", "the status line"
+_Avoid_: "the thinking indicator", "the status line" (the status is told to Slack; the signal is seen)
 
 **checklist**:
-The Slack plan a person watches while a turn's lookups run: a **task card** per run of like lookups or routing choice, the answer beneath. A task card approves nothing.
+The Slack plan a person watches while a turn's lookups run: a **task card** per run of like lookups or routing choice, the answer beneath. A task card approves nothing: not a Roadmap card or a **proposal card**.
 _Avoid_: "plan stream", "progress surface", "steps"
 
 **result table**:
@@ -208,7 +208,7 @@ uno-bot's D1 database `uno-bot-usage`; each published number is a saved query in
 A turn is "every message the bot answered, follow-ups included"; an ask is "a turn whose own message opened a thread" (`usage/load-on-lead.sql:10-12`).
 
 **escalated to the lead**:
-"escalated_to_lead = 1" (`usage/load-on-lead.sql:4`): the lead answered in thread or by DM on its topic, so the count "leans HIGH" (`:20-21`). Not an **Escalation**.
+"escalated_to_lead = 1" (`usage/load-on-lead.sql:4`): the lead answered in thread or by DM on its topic. Not an **Escalation**.
 
 **settled**:
 "escalated_to_lead known" after the end-of-day pass (`usage/self-serve-rate.sql:15`); the rest are `pending`.
@@ -227,10 +227,7 @@ _Avoid_: "deflected"
 "2026-09-01 to 2027-01-01, the measurement window" (`usage/load-on-lead.sql:34`), closing at about 100 real asks: `docs/engineering/measurement-window.md`.
 
 **housekeeping**:
-For asks to uno-bot, pain_category 1–5 and 7 (`usage/load-on-lead.sql:27`); for the lead's inbox, any **What it took** but "Needs the lead's judgment" (`agents/uno-bot/measurement/housekeeping-sort/prompt.md`).
-
-**What it took**:
-The inbox sort's call on a request: "Could be looked up", "Needs prep, then a person" or "Needs the lead's judgment".
+For asks to uno-bot, pain_category 1–5 and 7 (`usage/load-on-lead.sql:27`); for the lead's inbox, a request whose **What it took** is "Could be looked up" or "Needs prep, then a person", not "Needs the lead's judgment" (`agents/uno-bot/measurement/housekeeping-sort/prompt.md`).
 
 **Asks corpus**:
 The Notion database of 2,413 asks to the lead that the housekeeping baseline was counted from (`agents/uno-bot/measurement/housekeeping-sort/lib.mjs:13,19`).
@@ -247,7 +244,7 @@ A runtime uno runs in (the IDE, the uno-bot Worker, headless GitHub Actions), ea
 _Avoid_: "mode", "environment"
 
 **uno skill**:
-An IDE workflow under `skills/` (`uno-research` … `uno-maintain`): `SKILL.md` over its method, invoked by a person.
+An IDE workflow under `skills/`: `SKILL.md` over its method, invoked by a person.
 _Avoid_: bare "skill" where a **bot skill** could be meant
 
 **bot skill**:
@@ -258,7 +255,7 @@ _Avoid_: "Worker face", "bot face", "bot.md"
 How a bot skill ends: **answer** (the reply is the deliverable), **file** (a ✅ card writes or sends), or **hand off**.
 
 **hand off**:
-The exit that passes the rest of the work on: a ready-to-paste IDE prompt naming the uno skill, or the **lead** for a call only they make. Distinct from the **Handoff Spec**, the document a dev handoff carries.
+The exit that passes the rest of the work on: a ready-to-paste IDE prompt naming the uno skill, or the **lead** for a call only they make. Not the **Handoff Spec** a dev handoff carries.
 _Avoid_: "handoff" for the exit
 
 **scheduled action**:
