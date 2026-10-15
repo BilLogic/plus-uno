@@ -498,6 +498,16 @@ const CODE_ONLY_LAYOUT = {
 };
 
 /**
+ * Stacking layers. Figma has no z-index, so these are code's alone and are
+ * written unitless. The overlay layer sits above a modal (Bootstrap's 1055)
+ * and level with its popovers, so a list opened from a field inside a modal
+ * is not covered by it.
+ */
+const CODE_ONLY_LAYERS = {
+    'layout-z-index-overlay': { value: 1070, note: 'floating listboxes and menus; above a modal' },
+};
+
+/**
  * The semantic token the grid gutter is documented as equal to. The note is
  * checked, not trusted: Figma's `Grid/content-gutter` and this token's
  * resolved value have to match.
@@ -507,9 +517,14 @@ const GRID_GAP_EQUALS = 'element-gap-sm';
 /**
  * Generate layout tokens SCSS
  *
- * Reads `Breakpoints/*`, `Columns/*` and `Grid/content-gutter`. Not written
- * yet: `Display/*`, `Grid/columns`, `Grid/viewport-gutter`,
- * `Grid/viewport-margin` and `Min Heights/*`.
+ * Reads `Breakpoints/*`, `Columns/*`, `Grid/content-gutter`, `Min Heights/*`
+ * and `Max Heights/*`. Not written yet: `Display/*`, `Grid/columns`,
+ * `Grid/viewport-gutter` and `Grid/viewport-margin`.
+ *
+ * `Min Heights/listbox` is `--layout-min-height-listbox`. A height the modes
+ * agree on is written once; one that differs by breakpoint is written at its
+ * first mode and overridden in each wider breakpoint's block, as the column
+ * spans are.
  */
 function generateLayoutSCSS() {
     const { json } = readSource('size _ layout.json');
@@ -558,6 +573,19 @@ function generateLayoutSCSS() {
     const columns = (mode, indent) =>
         Array.from({ length: 12 }, (_, i) => `${indent}--col-${i + 1}: ${px(variable(`Columns/col-${i + 1}`)(mode))};\n`).join('');
 
+    const heights = json.variables
+        .map((v) => ({ v, match: /^(Min|Max) Heights\/(.+)$/.exec(v.name) }))
+        .filter(({ match }) => match)
+        .map(({ v, match }) => ({
+            token: `layout-${match[1].toLowerCase()}-height-${slug(match[2])}`,
+            figma: v.name,
+            at: (mode) => v.resolvedValuesByMode[mode.id],
+        }))
+        .sort((a, b) => a.token.localeCompare(b.token));
+    const varies = (h) => new Set(modes.map(h.at)).size > 1;
+    const heightLines = (mode, indent, only) =>
+        heights.filter(only).map((h) => `${indent}--${h.token}: ${px(h.at(mode))}; /* Figma ${h.figma} */\n`).join('');
+
     let scss = `/**
  * Layout Tokens
  * Breakpoints, containers, and column widths
@@ -570,11 +598,15 @@ ${Object.entries(breakpoints).map(([k, v]) => `    --breakpoint-${k}: ${px(v)};\
 ${Object.entries(CODE_ONLY_LAYOUT).map(([token, { value, note }]) => `    --${token}: ${px(value)}; /* ${note}; not a Figma variable (CODE_ONLY_LAYOUT) */\n`).join('')}\
     --layout-grid-gap: ${px(gridGap)}; /* Figma Grid/content-gutter (= --size-${GRID_GAP_EQUALS}); col-* spans assume this */
 
+    /* Stacking layers; not Figma variables (CODE_ONLY_LAYERS) */
+${Object.entries(CODE_ONLY_LAYERS).map(([token, { value, note }]) => `    --${token}: ${value}; /* ${note} */\n`).join('')}
+    /* Min and max heights — ${modes[0].key.toUpperCase()} values where they differ by breakpoint */
+${heightLines(modes[0], '    ', () => true)}
     /* Content-grid column spans — ${modes[0].key.toUpperCase()} values; wider breakpoints override below */
 ${columns(modes[0], '    ')}}
 `;
     for (const mode of modes.slice(1)) {
-        scss += `\n@media (min-width: ${px(breakpoints[`${mode.key}-min`])}) {\n    :root {\n${columns(mode, '        ')}    }\n}\n`;
+        scss += `\n@media (min-width: ${px(breakpoints[`${mode.key}-min`])}) {\n    :root {\n${heightLines(mode, '        ', varies)}${columns(mode, '        ')}    }\n}\n`;
     }
     return scss;
 }

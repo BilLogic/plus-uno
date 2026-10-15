@@ -6,17 +6,14 @@
 
 .plus-listbox {
     /*
-     * Figma Min Heights/listbox and Max Heights/listbox. Code has no height
-     * tokens yet, so the part owns them. 300px is about eight rows: the
-     * steering law keeps a scrolling list short and wide.
+     * Figma Min Heights/listbox and Max Heights/listbox. 300px is about eight
+     * rows: the steering law keeps a scrolling list short and wide. The
+     * overlay layer sits above a modal, so a list opened from a field inside
+     * one is not covered by it.
      */
-    --plus-listbox-min-height: 140px;
-    --plus-listbox-max-height: 300px;
-    /*
-     * Above a modal (Bootstrap's 1055) and level with popovers, so a list
-     * opened from a field inside a modal is not covered by it.
-     */
-    --plus-listbox-z-index: 1070;
+    --plus-listbox-min-height: var(--layout-min-height-listbox);
+    --plus-listbox-max-height: var(--layout-max-height-listbox);
+    --plus-listbox-z-index: var(--layout-z-index-overlay);
 
     display: flex;
     flex-direction: column;

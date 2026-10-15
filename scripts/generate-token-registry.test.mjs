@@ -20,3 +20,9 @@ test('a Border Subtle variable never falls back to the 3:1 -border role', () => 
 test('the 3:1 Border role still maps to -border', () => {
   assert.equal(deriveCandidates(COLLECTION, 'Success/Success Border')[0], '--color-success-border');
 });
+
+test('a layout min or max height maps to its --layout-*-height-* token', () => {
+  assert.equal(deriveCandidates('size / layout', 'Min Heights/listbox')[0], '--layout-min-height-listbox');
+  assert.equal(deriveCandidates('size / layout', 'Max Heights/listbox')[0], '--layout-max-height-listbox');
+  assert.equal(deriveCandidates('size / layout', 'Min Heights/card-body')[0], '--layout-min-height-card-body');
+});
