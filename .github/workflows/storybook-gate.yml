@@ -1,6 +1,7 @@
 name: check:storybook
 
-# The Storybook browser suite, on every PR. What it asserts and why the a11y half
+# The Storybook browser suite, on every PR, and the design system's unit suite
+# beside it. What it asserts and why the a11y half
 # is a ratchet rather than a threshold is written once, in
 # `scripts/check-storybook.mjs` — never restate it here.
 #
@@ -31,6 +32,11 @@ name: check:storybook
 # THE PLAYWRIGHT BROWSER IS CACHED BY VERSION. `playwright install --with-deps`
 # on a cold cache is ~40s of download; keyed on the resolved playwright version so
 # a dependency bump busts it rather than silently running the old browser.
+#
+# A SECOND JOB, `design-system`, runs the design system's unit suite; why it
+# lives in this workflow is its row's `reason` in `scripts/checks.registry.mjs`.
+# It is a job rather than a step of the browser job so each red reads apart in
+# the check list and each suite runs whatever the other does.
 #
 # Spot-run: `gh workflow run storybook-gate.yml`.
 
@@ -97,3 +103,29 @@ jobs:
       - name: npm run check:docs-chrome
         run: npm run check:docs-chrome
       # <<< END GENERATED (storybook-checks)
+
+  design-system:
+    runs-on: ubuntu-latest
+    # A few seconds of suite after `npm ci`; 10 lets a cold npm cache through.
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: ".nvmrc"
+          cache: npm
+
+      - name: npm ci
+        run: npm ci
+
+      # >>> GENERATED (design-system-checks) by scripts/generate-check-scripts.mjs from scripts/checks.registry.mjs — do not edit between the markers; run `npm run generate:check-registry`.
+      # The design system's unit and contract tests: vitest on jsdom, over
+      # design-system/src/**/*.test.* and design-system/tests/. No browser.
+      - name: npm run test:design-system
+        run: npm run test:design-system
+      # <<< END GENERATED (design-system-checks)

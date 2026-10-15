@@ -33,7 +33,8 @@
  *             step of `check:agent`, or standing as its own named job in
  *             `.github/workflows/uno-bot-checks.yml`, which is where an
  *             EXCLUDED row can still carry this trigger), 'sweep' (a step of
- *             the monthly integrity sweep), 'storybook-gate' (the browser job),
+ *             the monthly integrity sweep), 'storybook-gate' (a job of
+ *             storybook-gate.yml),
  *             'deploy' (a gate of the `deploy` chain in agents/uno-bot —
  *             `DEPLOY_CHAIN`, below). A string, or an array when a check
  *             genuinely runs in more than one place. ALL FOUR ARE ASSERTED, in
@@ -73,7 +74,7 @@
  *             still holds the number as a private constant.
  *   module    a path to an ES module exporting `run(ctx) => Finding[]` (see
  *             `scripts/lib/findings.mjs`). The runner calls it in-process and
- *             renders one banner for it. 43 of the 59 rows carry one.
+ *             renders one banner for it. 43 of the 60 rows carry one.
  *   kind      'spawn' — and nothing else. The row cannot answer the findings
  *             interface, so the runner runs `npm run <name>` and reads its exit
  *             code. A spawn row carries `spawnReason`.
@@ -764,6 +765,21 @@ export const EXCLUDED = [
     'step in `.github/workflows/storybook-gate.yml`, which already pays for the browser.',
   },
   {
+    name: 'test:design-system',
+    script: 'npm --prefix design-system test',
+    pkg: 'root',
+    trigger: 'storybook-gate',
+    kind: 'spawn',
+    spawnReason: '`vitest run` in design-system/, for the same reason as test:scripts.',
+    reason:
+'it needs the root `npm ci` — vitest, jsdom, React and every package the components ' +
+    'import — and this gate installs nothing at the root, deliberately. It is a guard without ' +
+    'the `check:` prefix, so the completeness assertion could not see it, and it ran in no ' +
+    'workflow: the suite could not even start in a clean checkout and nobody was told (#910). ' +
+    'It is its own job, `design-system`, in `.github/workflows/storybook-gate.yml`, which ' +
+    'already pays for that install; no browser.',
+  },
+  {
     name: 'check:fetch',
     script: 'node scripts/check-fetch.mjs',
     pkg: 'bot',
@@ -928,6 +944,16 @@ export const WORKFLOW_STEPS = [
       "for by this point, and a failure here should not hide a story failure.",
     ],
     runs: ["check:docs-chrome"],
+  },
+  {
+    workflow: ".github/workflows/storybook-gate.yml",
+    region: "design-system-checks",
+    name: "npm run test:design-system",
+    note: [
+      "The design system's unit and contract tests: vitest on jsdom, over",
+      "design-system/src/**/*.test.* and design-system/tests/. No browser.",
+    ],
+    runs: ["test:design-system"],
   },
 ];
 
