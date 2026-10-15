@@ -1,18 +1,25 @@
 // Blueprint upkeep from shipped work, end to end on named dependencies:
 //
 //   • the MATCH — the end-of-day `blueprint-shipped-N` jobs: the first reads
-//     the Roadmap cards that reached `Dev Status: Deployed` since the last
-//     run (one query from a cursor), leaving out every card already weighed
-//     for that status; each job then weighs the next few through the
-//     service-change gate (`./gate.ts`). A card that passes queues one path
-//     to draft for EVERY `scenario › path` the gate matched confidently.
+//     the Roadmap cards that reached `Design Status: Shipped` or `Dev Status:
+//     Deployed` since the last run (one query from a cursor), leaving out
+//     every card already weighed at that moment; each job then weighs the
+//     next cards through the service-change gate (`./gate.ts`) on the card's
+//     words and its PRD's (`./evidence.ts`). A card that passes queues one
+//     path to draft for EVERY `scenario › path` the gate matched
+//     confidently. A deploy whose design hand-off drafted rows promotes them
+//     instead (`./stages.ts`), with no judgement or draft.
 //   • the DRAFT — the end-of-day `blueprint-draft-N` jobs: each reads the
-//     next few queued paths as they are today and drafts that path's
-//     revision on the grind tier (`./draft.ts`), kept in KV for the morning
-//     with its place and its confirmers. Matching and drafting are cut into
-//     numbered jobs, each its own alarm, so a busy ship week spreads over
-//     them — and over the next night, the cursor holding — and no alarm
-//     passes the lookup ceiling (ADR-022). The budget math is in `./env.ts`.
+//     next queued paths as they are today and drafts that path's revision on
+//     the grind tier (`./draft.ts`) — `planned` rows for a design hand-off,
+//     its deprecations held for the deploy; `live` for a deploy — kept in KV
+//     for the morning with its place and its confirmers.
+//   • BUDGET. Matching and drafting are cut into numbered jobs, each its own
+//     alarm, and each job starts a card or a path only while the alarm's
+//     headroom covers its worst cost (`./budget.ts`), so a busy ship week
+//     spreads over them — and over the next night, the cursor and the queue
+//     holding — and no alarm passes the lookup ceiling (ADR-022). The math is
+//     in `./env.ts`.
 //   • the HAND-OVER — every morning (`blueprint-revision-post`), before the
 //     sweep's post: each waiting revision is handed to the sweep's message at
 //     its card's place, the posting ladder card follow-ups take.
@@ -23,10 +30,11 @@
 //     morning's `blueprint-revision-thread`, after the sweep's post. The
 //     thread is told, tagging the person, what each draft could not verify.
 //
-// WEIGHED ONCE. A card is weighed once per Roadmap status: its weighed mark
-// is durable (one key a card and status), so a card edited again after it
-// shipped comes back from the query and is passed over. A redraft is only
-// ever asked for in the card's thread (`./revise.ts`).
+// WEIGHED ONCE. A card is weighed once per moment, and a card weighed at a
+// later moment counts as weighed at every earlier one. The marks are durable
+// (one key a card and moment), so a card edited again after it shipped comes
+// back from the query and is passed over. A redraft is only ever asked for in
+// the card's thread (`./revise.ts`).
 //
 // `Env` enters in `./env.ts`.
 
@@ -49,22 +57,24 @@ import {
   revisionTitle,
   type RevisionSource,
 } from "./card";
+import { holdDeprecations, promotionDraft, STAGES, weighedAt, type PlannedRows, type ShipStage } from "./stages";
+import { DRAFT_COST, DRAFT_JOBS, MATCH_COST, MATCH_JOBS } from "./budget";
 
+export { DRAFT_COST, DRAFT_JOBS, MATCH_COST, MATCH_JOBS };
 /** The section's name on the sweep's morning post. */
 export const UPKEEP_SECTION = "blueprint-revisions";
-import { CARDS_PER_MATCH_JOB, DRAFT_COST, DRAFT_JOBS, MATCH_COST, MATCH_JOBS, PATHS_PER_DRAFT_JOB } from "./budget";
-export { CARDS_PER_MATCH_JOB, DRAFT_COST, DRAFT_JOBS, MATCH_COST, MATCH_JOBS, PATHS_PER_DRAFT_JOB };
-/** A read this recent means tonight's is done: a later match job reads none. */
-const READ_GAP_MS = 6 * 60 * 60 * 1000;
 /** How far back a first run looks: a weekend and a day. */
 export const FIRST_LOOKBACK_MS = 3 * 24 * 60 * 60 * 1000;
 /** How long a revision card stays confirmable. */
 export const REVISION_CARD_TTL_MS = 72 * 60 * 60 * 1000;
-/** The Roadmap status this job watches, and the blueprint status it writes. */
-export const DEPLOYED = { property: "Dev Status", value: "Deployed" } as const;
-const DEPLOYED_TARGET: EntityStatus = "live";
+/** Design hand-offs remembered until their deploy. */
+const PLANNED_KEPT = 200;
+/** Characters of a card's words kept for its draft: what the draft is shown. */
+const MAX_KEPT_TEXT = 6_000;
 /** The progress mark a place's gap ask is recorded under. */
 const GAP_ASK_MARK = "gap-ask";
+/** The moments, earliest first. */
+const ORDER = Object.keys(STAGES) as ShipStage[];
 
 /** A Roadmap card that shipped, as the job reads it. */
 export interface ShippedCard {
@@ -72,6 +82,8 @@ export interface ShippedCard {
   url: string;
   title: string;
   number: number | null;
+  /** The latest shipping moment its status holds (`./stages.ts`). */
+  stage: ShipStage;
   pillars: string[];
   contributors: Array<{ id: string; name: string }>;
   /** `last_edited_time`, epoch ms. */
@@ -81,7 +93,7 @@ export interface ShippedCard {
 /** Who a revision is for and where it goes, settled when its card is weighed. */
 interface Routed {
   source: RevisionSource;
-  /** The card's own words, for the draft and any redraft. */
+  /** The card's words and its PRD's, for the draft and any redraft. */
   text: string;
   channel: string;
   owner: string | null;
@@ -92,8 +104,9 @@ interface Routed {
 
 /** A path a card's gate matched, waiting for its draft. */
 export interface MatchedPath extends Routed {
-  /** `<card and status>|<scenario › path>`: never queued twice. */
+  /** `<card>@<moment>|<scenario › path>`: never queued twice. */
   key: string;
+  stage: ShipStage;
   /** A matched cell on the path, where its read starts. */
   cellId: string;
   label: string;
@@ -120,11 +133,17 @@ export interface WaitingRevision extends Partial<Pick<Routed, "text" | "target">
 export interface UpkeepState {
   /** ISO time the next read starts from; null before the first run. */
   cursor: string | null;
-  /** Tonight's read, while its cards are being weighed. */
-  read?: { startedAt: string; cards: ShippedCard[] } | null;
+  /** The run whose read was last finished: its later match jobs read none. */
+  readFor?: string | null;
+  /** The run's read, while its cards are being weighed. */
+  read?: { runId: string; startedAt: string; cards: ShippedCard[] } | null;
   /** Paths matched and not yet drafted, oldest first. */
   matched?: MatchedPath[];
   waiting: WaitingRevision[];
+  /** What each design hand-off drafted, for its deploy to promote. */
+  planned?: PlannedRows[];
+  /** Cards weighed before the marks were durable, as `pageId@stage`. */
+  seen?: string[];
 }
 
 interface Store<T> {
@@ -132,7 +151,7 @@ interface Store<T> {
   write(value: T): Promise<void>;
 }
 
-/** The durable record of which cards were weighed, one key a card and status. */
+/** The durable record of which cards were weighed, one key a card and moment. */
 export interface WeighedMarks {
   has(key: string): Promise<boolean>;
   add(key: string): Promise<void>;
@@ -140,11 +159,12 @@ export interface WeighedMarks {
 
 export interface ShippedDeps {
   roadmap: {
-    /** Cards in `Dev Status: Deployed` edited at or after `since` (ISO). */
-    deployedSince(since: string): Promise<ShippedCard[]>;
+    /** Cards in `Design Status: Shipped` or `Dev Status: Deployed` edited at
+     *  or after `since` (ISO). */
+    shippedSince(since: string): Promise<ShippedCard[]>;
   };
-  /** The card's own words: its page text. The one input boundary, so a PRD
-   *  or a code reader can be added behind it. */
+  /** The card's words: its page text and its PRD's (`./evidence.ts`). The
+   *  one input boundary, so a code reader can be added behind it. */
   evidence(card: ShippedCard): Promise<string>;
   gate: ServiceChangeGate;
   /** Today's path holding this cell; null when it cannot be read. */
@@ -164,82 +184,120 @@ export interface ShippedDeps {
 }
 
 export interface ShippedReport {
-  /** Paths queued to draft (a match job) or revisions drafted (a draft job). */
+  /** Paths queued or promoted (a match job), or revisions drafted (a draft job). */
   drafted: number;
+  /** Of a match job's, the promotions: revisions kept with no draft. */
+  promoted?: number;
   summary: string;
 }
+
+/** Which run a job belongs to: its date, or one call's own id. */
+export interface RunOpts {
+  dryRun?: boolean;
+  runDate?: string;
+}
+
+type Settled = Required<Omit<UpkeepState, "seen">> & Pick<UpkeepState, "seen">;
 
 const EMPTY: UpkeepState = { cursor: null, read: null, matched: [], waiting: [] };
 
 /** A state as kept, with the fields an older record lacks. */
-function settled(state: UpkeepState | null): Required<UpkeepState> {
+function settled(state: UpkeepState | null): Settled {
   const s = state ?? EMPTY;
-  return { cursor: s.cursor ?? null, read: s.read ?? null, matched: [...(s.matched ?? [])], waiting: [...(s.waiting ?? [])] };
+  return {
+    cursor: s.cursor ?? null,
+    readFor: s.readFor ?? null,
+    read: s.read ?? null,
+    matched: [...(s.matched ?? [])],
+    waiting: [...(s.waiting ?? [])],
+    planned: [...(s.planned ?? [])],
+    ...(s.seen?.length ? { seen: s.seen } : {}),
+  };
 }
 
-/** The durable mark of a card weighed for one Roadmap status. */
-export function weighedKey(card: Pick<ShippedCard, "pageId">, status: { property: string; value: string }): string {
-  return `${card.pageId}|${status.property}: ${status.value}`;
+/** The durable mark of a card weighed at one moment: `pageId@stage`. */
+export function weighedKey(pageId: string, stage: ShipStage): string {
+  return `${pageId}@${stage}`;
 }
+
+/** Whether a card was weighed at its moment or a later one. */
+async function isWeighed(deps: Pick<ShippedDeps, "weighed">, legacy: ReadonlySet<string>, card: ShippedCard): Promise<boolean> {
+  if (weighedAt(legacy, card.pageId, card.stage)) return true;
+  for (const stage of ORDER.slice(ORDER.indexOf(card.stage))) {
+    if (await deps.weighed.has(weighedKey(card.pageId, stage))) return true;
+  }
+  return false;
+}
+
+/** The marks a card weighed at a moment takes: that one and every earlier. */
+const marksFor = (card: ShippedCard) => ORDER.slice(0, ORDER.indexOf(card.stage) + 1).map((s) => weighedKey(card.pageId, s));
 
 const headroom = (deps: Pick<ShippedDeps, "meter">) => deps.meter?.headroom().subrequests ?? Infinity;
 
 /**
- * One match job: the Roadmap read when tonight's has not happened, then the
- * next cards of it through the gate, each matched path queued for a draft.
+ * One match job: the run's Roadmap read when it has not happened, then the
+ * next cards of it through the gate while the alarm's headroom covers one
+ * more at its worst; each matched path queued for a draft, each deploy's
+ * promotion kept for the morning.
  *
  * @param deps - The Roadmap, the gate, the store and the marks
- * @param opts - `dryRun` weighs and keeps nothing
+ * @param opts - `dryRun` weighs and keeps nothing; `runDate` names the run
  */
-export async function matchShipped(deps: ShippedDeps, opts: { dryRun?: boolean } = {}): Promise<ShippedReport> {
+export async function matchShipped(deps: ShippedDeps, opts: RunOpts = {}): Promise<ShippedReport> {
   const state = settled(await deps.state.read());
+  const runId = opts.runDate ?? new Date(deps.now()).toISOString();
   const notes: string[] = [];
   if (!state.read) {
-    if (state.cursor && deps.now() - Date.parse(state.cursor) < READ_GAP_MS) {
-      return { drafted: 0, summary: "tonight's read is done" };
-    }
+    if (state.readFor === runId) return { drafted: 0, summary: "this run's read is done" };
     const since = state.cursor ?? new Date(deps.now() - FIRST_LOOKBACK_MS).toISOString();
     const startedAt = new Date(deps.now()).toISOString();
+    const legacy = new Set(state.seen ?? []);
     const fresh: ShippedCard[] = [];
-    for (const card of await deps.roadmap.deployedSince(since)) {
-      if (!(await deps.weighed.has(weighedKey(card, DEPLOYED)))) fresh.push(card);
-    }
-    state.read = { startedAt, cards: fresh };
-    notes.push(`${fresh.length} deployed card(s) not yet weighed since ${since}`);
+    for (const card of await deps.roadmap.shippedSince(since)) if (!(await isWeighed(deps, legacy, card))) fresh.push(card);
+    state.read = { runId, startedAt, cards: fresh };
+    notes.push(`${fresh.length} shipped card(s) not yet weighed since ${since}`);
   }
+  const read = state.read;
 
   const marks: string[] = [];
+  let weighed = 0;
   let queued = 0;
+  let promoted = 0;
   const silent: string[] = [];
   try {
-    while (state.read.cards.length && marks.length < CARDS_PER_MATCH_JOB) {
+    while (read.cards.length) {
       if (headroom(deps) < MATCH_COST) {
         notes.push("this job's budget is nearly spent — the next job carries on");
         break;
       }
-      const card = state.read.cards[0]!;
-      const outcome = await weigh(deps, card);
-      state.read.cards.shift();
-      marks.push(weighedKey(card, DEPLOYED));
+      const card = read.cards[0]!;
+      const outcome = await weigh(deps, card, state);
+      read.cards.shift();
+      weighed += 1;
+      marks.push(...marksFor(card));
       if (typeof outcome === "string") {
         silent.push(`${card.title}: ${outcome}`);
         continue;
       }
-      for (const path of outcome) {
+      for (const path of outcome.paths) {
         if (state.matched.some((m) => m.key === path.key) || state.waiting.some((w) => w.key === path.key)) continue;
         state.matched.push(path);
         queued += 1;
       }
+      state.waiting.push(...outcome.promoted);
+      queued += outcome.promoted.length;
+      promoted += outcome.promoted.length;
     }
-    if (!state.read.cards.length) {
+    if (!read.cards.length) {
       // Past every card only once every card was weighed.
-      state.cursor = state.read.startedAt;
+      state.cursor = read.startedAt;
+      state.readFor = read.runId;
       state.read = null;
     }
   } finally {
     if (!opts.dryRun) {
       await deps.state.write(state);
-      // After the state: a card is marked only once its paths are kept.
+      // After the state: a card is marked only once what it yielded is kept.
       for (const key of marks) await deps.weighed.add(key);
     }
   }
@@ -247,39 +305,68 @@ export async function matchShipped(deps: ShippedDeps, opts: { dryRun?: boolean }
   const left = state.read?.cards.length ?? 0;
   return {
     drafted: queued,
+    promoted,
     summary:
-      [...notes, `weighed ${marks.length} card(s), ${verb} ${queued} path(s) to draft`].join("; ") +
+      [...notes, `weighed ${weighed} card(s), ${verb} ${queued} revision(s) or path(s)`].join("; ") +
       (silent.length ? `; silent on ${silent.join(", ")}` : "") +
       (left ? `; ${left} card(s) wait for the next job` : ""),
   };
 }
 
-/** One card through the gate: a path to draft for each match, or why not. */
-async function weigh(deps: ShippedDeps, card: ShippedCard): Promise<MatchedPath[] | string> {
+/** What weighing one card yields: paths to draft, or promotions ready now. */
+interface Weighed {
+  paths: MatchedPath[];
+  promoted: WaitingRevision[];
+}
+
+/**
+ * One card: a deploy's promotion of what its hand-off drafted, else the gate,
+ * a path to draft for each match — or why nothing. A deploy retires its
+ * hand-off's record and anything of it still queued or waiting, whatever it
+ * yields.
+ */
+async function weigh(deps: ShippedDeps, card: ShippedCard, state: Settled): Promise<Weighed | string> {
   try {
+    const { property, value, target } = STAGES[card.stage];
+    const status = { property, value };
+    const handedOff = card.stage === "deployed" ? state.planned.filter((p) => p.pageId === card.pageId) : [];
+    if (card.stage === "deployed") {
+      state.planned = state.planned.filter((p) => p.pageId !== card.pageId);
+      state.matched = state.matched.filter((m) => m.source.pageId !== card.pageId);
+      state.waiting = state.waiting.filter((w) => w.source.pageId !== card.pageId);
+    }
+    const route = async (quote: string): Promise<Omit<Routed, "text" | "target"> | string> => {
+      const channel = deps.placeOf(card);
+      if (!channel) return "no place to post";
+      const owner = await deps.ownerOf(card);
+      const confirmers = [...new Set([owner, deps.billId].filter((id): id is string => !!id))];
+      if (!confirmers.length) return "nobody to confirm";
+      return { source: { pageId: card.pageId, url: card.url, title: card.title, number: card.number, status, quote }, channel, owner, confirmers };
+    };
+
+    const promoted: WaitingRevision[] = [];
+    for (const p of handedOff) {
+      const today = await deps.readPath(p.cellId);
+      const draft = today ? promotionDraft(p, today) : null;
+      if (!today || !draft) continue;
+      const routed = await route(p.quote);
+      if (typeof routed === "string") return routed;
+      promoted.push({ ...routed, today, draft, key: `${weighedKey(card.pageId, card.stage)}|${revisionTitle(today)}`, cellId: p.cellId, target });
+    }
+    if (promoted.length) return { paths: [], promoted };
+
     const text = await deps.evidence(card);
     const gate = await deps.gate({ title: card.title, text });
     if (!gate.pass) return gate.reason;
-    const channel = deps.placeOf(card);
-    if (!channel) return "no place to post";
-    const owner = await deps.ownerOf(card);
-    const confirmers = [...new Set([owner, deps.billId].filter((id): id is string => !!id))];
-    if (!confirmers.length) return "nobody to confirm";
-    const source: RevisionSource = { pageId: card.pageId, url: card.url, title: card.title, number: card.number, status: { ...DEPLOYED }, quote: gate.quote };
-    return gate.matches.map((m) => {
-      const label = `${m.scenario} › ${m.path}`;
-      return {
-        key: `${weighedKey(card, DEPLOYED)}|${label}`,
-        cellId: m.cellId,
-        label,
-        source,
-        text: text.slice(0, MAX_KEPT_TEXT),
-        channel,
-        owner,
-        confirmers,
-        target: DEPLOYED_TARGET,
-      };
-    });
+    const routed = await route(gate.quote);
+    if (typeof routed === "string") return routed;
+    return {
+      promoted: [],
+      paths: gate.matches.map((m) => {
+        const label = `${m.scenario} › ${m.path}`;
+        return { ...routed, key: `${weighedKey(card.pageId, card.stage)}|${label}`, stage: card.stage, cellId: m.cellId, label, text: text.slice(0, MAX_KEPT_TEXT), target };
+      }),
+    };
   } catch (err) {
     rethrowIfBudget(err);
     console.error(`[blueprint-upkeep] ${card.title} not weighed: ${err instanceof Error ? err.message : String(err)}`);
@@ -287,24 +374,21 @@ async function weigh(deps: ShippedDeps, card: ShippedCard): Promise<MatchedPath[
   }
 }
 
-/** Characters of a card's text kept for its draft: what the draft is shown. */
-const MAX_KEPT_TEXT = 6_000;
-
 /**
- * One draft job: the next queued paths read as they are today, each drafted.
+ * One draft job: the next queued paths read as they are today, each drafted,
+ * while the alarm's headroom covers one more.
  *
  * @param deps - The path read, the model and the store
  * @param opts - `dryRun` drafts and keeps nothing
  */
-export async function draftMatched(deps: ShippedDeps, opts: { dryRun?: boolean } = {}): Promise<ShippedReport> {
+export async function draftMatched(deps: ShippedDeps, opts: RunOpts = {}): Promise<ShippedReport> {
   const state = settled(await deps.state.read());
   if (!state.matched.length) return { drafted: 0, summary: "no paths waiting for a draft" };
   const notes: string[] = [];
   const silent: string[] = [];
-  let tried = 0;
   let drafted = 0;
   try {
-    while (state.matched.length && tried < PATHS_PER_DRAFT_JOB) {
+    while (state.matched.length) {
       if (headroom(deps) < DRAFT_COST) {
         notes.push("this job's budget is nearly spent — the next job carries on");
         break;
@@ -312,12 +396,14 @@ export async function draftMatched(deps: ShippedDeps, opts: { dryRun?: boolean }
       const path = state.matched[0]!;
       const outcome = await draftPath(deps, path);
       state.matched.shift();
-      tried += 1;
-      if (typeof outcome === "string") silent.push(`${path.label}: ${outcome}`);
-      else if (!state.waiting.some((w) => w.key === outcome.key)) {
-        state.waiting.push(outcome);
-        drafted += 1;
+      if (typeof outcome === "string") {
+        silent.push(`${path.label}: ${outcome}`);
+        continue;
       }
+      if (state.waiting.some((w) => w.key === outcome.revision.key)) continue;
+      state.waiting.push(outcome.revision);
+      if (outcome.planned) state.planned = [...state.planned, outcome.planned].slice(-PLANNED_KEPT);
+      drafted += 1;
     }
   } finally {
     if (!opts.dryRun) await deps.state.write(state);
@@ -332,24 +418,19 @@ export async function draftMatched(deps: ShippedDeps, opts: { dryRun?: boolean }
   };
 }
 
-async function draftPath(deps: ShippedDeps, m: MatchedPath): Promise<WaitingRevision | string> {
+/** One queued path drafted: its revision, and a hand-off's record for its deploy. */
+async function draftPath(deps: ShippedDeps, m: MatchedPath): Promise<{ revision: WaitingRevision; planned?: PlannedRows } | string> {
   try {
     const today = await deps.readPath(m.cellId);
     if (!today) return "the matched path could not be read";
-    const draft = await draftRevision(deps.provider, { title: m.source.title, text: m.text, today, target: m.target });
-    if (!draft) return "no writable draft";
-    return {
-      source: m.source,
-      today,
-      draft,
-      channel: m.channel,
-      owner: m.owner,
-      confirmers: m.confirmers,
-      key: m.key,
-      cellId: m.cellId,
-      text: m.text,
-      target: m.target,
-    };
+    const drafted = await draftRevision(deps.provider, { title: m.source.title, text: m.text, today, target: m.target });
+    const held = drafted && m.stage === "designed" ? holdDeprecations(drafted) : { draft: drafted, deprecate: [] };
+    if (!held.draft) return "no writable draft";
+    const { stage: _stage, label: _label, ...routed } = m;
+    const revision: WaitingRevision = { ...routed, today, draft: held.draft };
+    if (m.stage !== "designed") return { revision };
+    const rows = held.draft.revision.rows.map(({ stepId, laneId }) => ({ stepId, laneId }));
+    return { revision, planned: { pageId: m.source.pageId, cellId: m.cellId, quote: m.source.quote, rows, deprecate: held.deprecate } };
   } catch (err) {
     rethrowIfBudget(err);
     console.error(`[blueprint-upkeep] ${m.label} not drafted: ${err instanceof Error ? err.message : String(err)}`);
@@ -375,11 +456,17 @@ export async function runShippedRevisions(deps: ShippedDeps, opts: { dryRun?: bo
       weighed: { has: async (k) => marked.has(k) || (await deps.weighed.has(k)), add: async (k) => void marked.add(k) },
     };
   }
+  // One id for the night, so its later match jobs read nothing again.
+  const runDate = `call:${crypto.randomUUID()}`;
   const summaries: string[] = [];
-  for (let i = 0; i < MATCH_JOBS; i++) summaries.push((await matchShipped(run)).summary);
   let drafted = 0;
+  for (let i = 0; i < MATCH_JOBS; i++) {
+    const r = await matchShipped(run, { runDate });
+    drafted += r.promoted ?? 0;
+    summaries.push(r.summary);
+  }
   for (let i = 0; i < DRAFT_JOBS; i++) {
-    const r = await draftMatched(run);
+    const r = await draftMatched(run, { runDate });
     drafted += r.drafted;
     summaries.push(r.summary);
   }

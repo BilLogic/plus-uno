@@ -30,6 +30,7 @@ import { replaceItem, type ReportMessage, type ReportStore } from "../slack/deci
 import type { ModelProvider } from "../agent/model-provider";
 import { draftRevision, type PathToday } from "./draft";
 import { gapAskText, revisionItem, revisionTitle } from "./card";
+import { holdDeprecations } from "./stages";
 import { stagedRevision, type RevisionThread, type RevisionThreadCard, type RevisionThreads } from "./job";
 
 export interface RedraftDeps {
@@ -150,7 +151,9 @@ async function redraft(
       target: r.target ?? "live",
       correction: { text: wording, previous: r.draft.changes },
     });
-    if (draft) next = { ...r, today, draft };
+    // A design hand-off's deprecations wait for its deploy, as on the first draft.
+    const held = draft && r.target === "planned" ? holdDeprecations(draft).draft : draft;
+    if (held) next = { ...r, today, draft: held };
   } catch (err) {
     rethrowIfBudget(err);
     console.warn(`[blueprint-upkeep] ${label} not redrafted: ${err instanceof Error ? err.message : String(err)}`);

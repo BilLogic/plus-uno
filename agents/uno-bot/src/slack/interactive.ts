@@ -386,7 +386,10 @@ async function reviseFromReview(
       // A Figma comment decision revises its own way: its handler takes the
       // note at the head of the job (`figma-comments/revise.ts`). Every other
       // card goes to the turn, as before.
-      const own = (await replyHandlerAt(env, event)) === "figma-decisions" ? "figma-decisions" : null;
+      // A blueprint revision card is redrafted by its thread's handler too
+      // (`blueprint-upkeep/revise.ts`).
+      const at = await replyHandlerAt(env, event);
+      const own = at === "figma-decisions" || at === "blueprint-revisions" ? at : null;
       await enqueueAgentJob(env, { kind: "message", event, reply: own }, conversationKey(event));
     },
     updateCard: async (message) => {

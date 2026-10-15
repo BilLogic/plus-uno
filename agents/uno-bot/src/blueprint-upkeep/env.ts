@@ -1,9 +1,11 @@
 // Blueprint upkeep bound to `Env` — the only file in the folder that names it.
 //
 // What each port becomes:
-//   • the Roadmap: one status query on `Dev Status: Deployed`, narrowed to
-//     cards edited since the cursor (`queryRowsWithStatus`), one page of 100;
-//   • the evidence: the card's own page text (`readNotionPage`);
+//   • the Roadmap: one status query on `Design Status: Shipped` or `Dev
+//     Status: Deployed`, narrowed to cards edited since the cursor
+//     (`queryRowsWithAnyStatus`), one page of 100;
+//   • the evidence: the card's page text and its PRD's (`readNotionPage`,
+//     through `cardEvidence`);
 //   • the gate's search: `search_blueprint`'s read (`searchBlueprint`);
 //   • the path read: four anon-key PostgREST reads of uno-blueprint — the
 //     matched cell's path, then that path's cells, lanes and ordered steps;
@@ -15,18 +17,19 @@
 //   • the state: one JSON record in HARNESS_KV; each card's weighed mark a
 //     key of its own there, kept for good; each revision thread a key too.
 //
-// Budget (ADR-022), against the 38-subrequest lookup ceiling of one alarm.
+// Budget (ADR-022), against the 38-subrequest lookup ceiling of one alarm,
+// each job sized by cost, not by a count (`./budget.ts`).
 // A match job: the Roadmap query (1, the first job only) and the model's
-// token (1), then per card the page and up to three block pages (4), the
-// judgement (1), the search (≤3) and a Slack lookup or two for the owner —
-// `MATCH_COST` (10) a card. A draft job: the token, then per path the path
-// read (5) and the draft, grind then default (2) — `DRAFT_COST` (7). Each
-// job starts a card or a path only while the alarm's headroom covers that
-// cost, so a costly card ends its job early and the next job carries on; a
-// card that overruns stops on the ceiling, its job deferred with the cards
-// before it kept. `MATCH_JOBS` × `CARDS_PER_MATCH_JOB` cards and `DRAFT_JOBS`
-// × `PATHS_PER_DRAFT_JOB` paths a night at most; the rest wait on the cursor
-// and the queue for the next night.
+// token (1), then per card a deploy's promotion try — the path read (5) —
+// and, failing that, the page and up to three block pages (4), its one PRD
+// the same (4), the judgement (1), the search (≤3) and a Slack lookup or two
+// for the owner: `MATCH_COST` (20) at the worst. A draft job: the token,
+// then per path the path read (5) and the draft, grind then default (2):
+// `DRAFT_COST` (7). A job starts a card or a path only while the alarm's
+// headroom covers that worst case, so two PRD-heavy cards fill a match job
+// and a light night fits several; a card that still overruns stops on the
+// ceiling and its job is deferred, the cards before it kept. What a night's
+// jobs do not reach waits on the cursor and the queue for the next.
 
 import type { Env } from "../types";
 import { budgetHeadroom, charge, countedFetch } from "../net";
@@ -37,7 +40,7 @@ import { reportRecord } from "../slack/decision-cards";
 import { redraftRevision } from "./revise";
 import { selectProvider } from "../agent/run-agent";
 import { channelIdsFor } from "../destination/env";
-import { queryRowsWithStatus, readNotionPage } from "../integrations/notion";
+import { queryRowsWithAnyStatus, readNotionPage } from "../integrations/notion";
 import { searchBlueprint, isBlueprintConfigured } from "../integrations/blueprint";
 import { cellUrl } from "../integrations/blueprint-link";
 import { ENTITY_STATUSES, type EntityStatus } from "../blueprint-write/index";
@@ -53,8 +56,9 @@ import type { JobContext } from "../scheduled/runs";
 import type { PendingProposal } from "../thread-state/index";
 import { serviceChangeGate } from "./gate";
 import type { PathToday } from "./draft";
+import { cardEvidence } from "./evidence";
+import { stageOf, STAGES } from "./stages";
 import {
-  DEPLOYED,
   draftMatched,
   handOverRevisions,
   matchShipped,
@@ -114,21 +118,28 @@ async function postLine(env: Env, channel: string, threadTs: string, text: strin
   if (!res.ok) throw new Error(`thread line not posted (${String(res.error ?? "unknown")})`);
 }
 
-async function deployedSince(env: Env, since: string): Promise<ShippedCard[]> {
+async function shippedSince(env: Env, since: string): Promise<ShippedCard[]> {
   if (!env.NOTION_ROADMAP_DB_ID) throw new Error("NOTION_ROADMAP_DB_ID not configured");
-  const { rows } = await queryRowsWithStatus(env, env.NOTION_ROADMAP_DB_ID, DEPLOYED.property, [DEPLOYED.value], 100, undefined, {
+  const { rows } = await queryRowsWithAnyStatus(env, env.NOTION_ROADMAP_DB_ID, [STAGES.designed, STAGES.deployed], 100, {
     timestamp: "last_edited_time",
     last_edited_time: { on_or_after: since },
   });
-  return rows.map((row) => ({
-    pageId: row.id,
-    url: row.url,
-    title: row.title,
-    number: row.number ?? null,
-    pillars: row.values["Product Pillar"] ?? [],
-    contributors: row.persons.Contributor ?? [],
-    lastEditedAt: Date.parse(row.lastEditedTime) || 0,
-  }));
+  return rows.flatMap((row) => {
+    const stage = stageOf(row.values);
+    if (!stage) return [];
+    return [
+      {
+        pageId: row.id,
+        url: row.url,
+        title: row.title,
+        number: row.number ?? null,
+        stage,
+        pillars: row.values["Product Pillar"] ?? [],
+        contributors: row.persons.Contributor ?? [],
+        lastEditedAt: Date.parse(row.lastEditedTime) || 0,
+      },
+    ];
+  });
 }
 
 /** One anon-key PostgREST read of uno-blueprint. */
@@ -217,8 +228,8 @@ function shippedDepsFor(env: Env): ShippedDeps | string {
   const config = channelIdsFor(env);
   return (
     {
-      roadmap: { deployedSince: (since) => measured(() => deployedSince(env, since)) },
-      evidence: async (card) => (await measured(() => readNotionPage(env, card.pageId))).text,
+      roadmap: { shippedSince: (since) => measured(() => shippedSince(env, since)) },
+      evidence: (card) => cardEvidence((pageId) => measured(() => readNotionPage(env, pageId)), card.pageId),
       gate: serviceChangeGate({ provider, search: async (q) => (await measured(() => searchBlueprint(env, q))).rows }),
       readPath: (cellId) => measured(() => readPathOf(env, cellId)),
       provider,

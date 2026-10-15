@@ -15,9 +15,9 @@ export {
 } from "./gate";
 export { draftRevision, readDraft, type Draft, type DraftedChange, type DraftInput, type PathToday } from "./draft";
 export { revisionItem, revisionText, type RevisionSource } from "./card";
+export { cardEvidence, MAX_PRDS, prdIdsOf, type EvidencePage } from "./evidence";
+export { promotionDraft, stageOf, STAGES, type PlannedRows, type ShipStage } from "./stages";
 export {
-  CARDS_PER_MATCH_JOB,
-  DEPLOYED,
   DRAFT_COST,
   DRAFT_JOBS,
   draftMatched,
@@ -25,7 +25,6 @@ export {
   MATCH_COST,
   MATCH_JOBS,
   matchShipped,
-  PATHS_PER_DRAFT_JOB,
   postOverflow,
   REVISION_CARD_TTL_MS,
   revisionSection,

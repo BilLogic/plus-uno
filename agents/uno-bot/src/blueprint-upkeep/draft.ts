@@ -38,7 +38,8 @@ export interface PathToday {
   link?: string;
 }
 
-export type ChangeKind = "added" | "changed" | "deprecated";
+/** `promoted` is a row moving on as written: `planned → live` at a deploy. */
+export type ChangeKind = "added" | "changed" | "deprecated" | "promoted";
 
 /** One drafted row as the card shows it: blueprint words only. */
 export interface DraftedChange {
@@ -58,6 +59,8 @@ export interface Draft {
   gaps: string[];
   /** Set when the grind tier was out of capacity and the default tier drafted. */
   tierNote?: string;
+  /** A deploy's promotion of rows a design hand-off drafted (`./stages.ts`). */
+  promoted?: true;
 }
 
 export interface DraftInput {

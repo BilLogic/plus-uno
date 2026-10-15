@@ -45,6 +45,7 @@ const CARD: ShippedCard = {
   url: "https://www.notion.so/card1",
   title: "Tutors confirm their own session swaps",
   number: 2292,
+  stage: "deployed",
   pillars: ["Tutoring"],
   contributors: [{ id: "n-owner", name: "Owner Person" }],
   lastEditedAt: Date.UTC(2026, 9, 15, 18),
@@ -126,7 +127,7 @@ function world(opts: {
   const state = box<UpkeepState>(opts.state ?? { cursor: "2026-10-15T10:00:00.000Z", seen: [], waiting: [] });
   const searched: string[] = [];
   const deps: ShippedDeps = {
-    roadmap: { deployedSince: async () => opts.cards ?? [CARD] },
+    roadmap: { shippedSince: async () => opts.cards ?? [CARD] },
     evidence: async (card) => opts.text?.[card.pageId] ?? CARD_TEXT,
     gate: serviceChangeGate({
       provider: opts.model.provider,
@@ -141,6 +142,10 @@ function world(opts: {
     placeOf: (card) => (card.pillars.includes("Tutoring") ? TEAM : DESIGN),
     billId: BILL,
     state: state.store,
+    weighed: (() => {
+      const marks = new Set<string>();
+      return { has: async (k: string) => marks.has(k), add: async (k: string) => void marks.add(k) };
+    })(),
     now: () => NOW,
   };
   return { deps, state, searched };
@@ -154,6 +159,9 @@ function morning(state: ReturnType<typeof box<UpkeepState>>) {
   const section = revisionSection(
     {
       state: state.store,
+      threads: { read: async () => null, write: async () => {} },
+      post: async () => {},
+      now: () => NOW,
       stage: async (proposal) => {
         staged.push(proposal);
         await threadState.putProposal(proposal);
