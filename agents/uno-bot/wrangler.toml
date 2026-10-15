@@ -18,10 +18,10 @@ head_sampling_rate = 1
 # trigger fires at both UTC hours its run can fall on, and the handler reads
 # each firing's scheduled time in ET, so only the firing at the run's ET hour
 # does anything:
-#   • 00:00 ET, Tue–Sat → the end-of-day run (04:00 UTC in EDT, 05:00 in EST),
-#     dated to the workday it sweeps: Saturday 00:00 sweeps Friday
+#   • 06:00 ET, Tue–Sat → the end-of-day run (10:00 UTC in EDT, 11:00 in EST),
+#     dated to the workday it sweeps: Saturday 06:00 sweeps Friday
 #   • 09:00 ET, Mon–Fri → the morning run    (13:00 UTC in EDT, 14:00 in EST)
-# The firing an hour off (05:00 or 13:00 UTC in EDT, 04:00 or 14:00 in EST) is
+# The firing an hour off (11:00 or 13:00 UTC in EDT, 10:00 or 14:00 in EST) is
 # a no-op, so each run is once a day all year. Two of the free plan's five
 # cron triggers. Weekdays are named, not numbered: Cloudflare counts 1 as
 # SUNDAY, not Monday. The handler also refuses a firing whose ET day is not a
@@ -35,7 +35,7 @@ head_sampling_rate = 1
 # ceiling (ADR-022, LOOKUP_CEILING = 38); a job the ceiling cuts short keeps its
 # place and retries. Dry run: GET /debug/sweep?dry_run=1&run=morning|end-of-day.
 [triggers]
-crons = ["0 4,5 * * TUE-SAT", "0 13,14 * * MON-FRI"]
+crons = ["0 10,11 * * TUE-SAT", "0 13,14 * * MON-FRI"]
 
 # ── FREE-TIER CONSTRAINTS (deliberate — the team keeps the Worker on the free
 # plan; design within these, don't fight them) ────────────────────────────────

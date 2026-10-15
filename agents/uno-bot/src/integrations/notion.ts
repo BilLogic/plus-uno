@@ -1028,9 +1028,10 @@ async function queryRowPage(
 }
 
 /**
- * The rows of one database whose status property holds one of `statuses`:
- * one query page of at most `limit`, whether more wait past it, and where the
- * next page starts. One subrequest. Throws on failure.
+ * The rows of one database whose status property holds one of `statuses`,
+ * and that also match `also` when given: one query page of at most `limit`,
+ * whether more wait past it, and where the next page starts. One subrequest.
+ * Throws on failure.
  *
  * @param env - Carries NOTION_API_KEY
  * @param databaseId - The database to read
@@ -1038,6 +1039,7 @@ async function queryRowPage(
  * @param statuses - Its option names, exact
  * @param limit - Rows per read, 1–100
  * @param after - The `next` of the page before
+ * @param also - One more Notion filter clause, ANDed with the statuses
  */
 export async function queryRowsWithStatus(
   env: Env,
@@ -1046,13 +1048,15 @@ export async function queryRowsWithStatus(
   statuses: readonly string[],
   limit = 100,
   after?: string,
+  also?: Record<string, unknown>,
 ): Promise<{ rows: EditedRow[]; more: boolean; next: string | null }> {
+  const byStatus = { or: statuses.map((s) => ({ property, status: { equals: s } })) };
   return queryRowPage(
     env,
     databaseId,
     {
       page_size: Math.min(Math.max(limit, 1), 100),
-      filter: { or: statuses.map((s) => ({ property, status: { equals: s } })) },
+      filter: also ? { and: [also, byStatus] } : byStatus,
       ...(after ? { start_cursor: after } : {}),
     },
     "status query failed",

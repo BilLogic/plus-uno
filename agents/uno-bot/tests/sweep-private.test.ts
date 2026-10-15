@@ -438,18 +438,18 @@ test("25 group DMs over two budgets: the retry passes over those already swept t
   assert.deepEqual(handled().sort(), ids.map((id) => `sweep:group-dms:${id}`).sort());
 });
 
-test("under EST, a group-DM sweep that runs after midnight records and skips under the day it sweeps", async () => {
-  // Wed 2026-12-02 (day 63) is swept at Thu 00:00 EST, 05:00 UTC on the 3rd,
+test("under EST, a group-DM sweep that runs the next morning records and skips under the day it sweeps", async () => {
+  // Wed 2026-12-02 (day 63) is swept at Thu 06:00 EST, 11:00 UTC on the 3rd,
   // by a run dated 2026-12-02; the budget stops the job, and its retry runs
   // ten minutes later.
   const { ids, channels } = manyGroupDms(25, 63);
-  const h = sweepHarness({ channels, groupDms: ids, now: at(64, 5), runDate: "2026-12-02" });
+  const h = sweepHarness({ channels, groupDms: ids, now: at(64, 11), runDate: "2026-12-02" });
   h.budget.replies = 12;
   await assert.rejects(runSweepJob(GROUP_DMS, h.deps), (err) => isSubrequestBudgetError(err));
 
   h.budget.replies = Infinity;
   h.reads.length = 0;
-  h.clock.now = at(64, 5, 10);
+  h.clock.now = at(64, 11, 10);
   const retried = await runSweepJob(GROUP_DMS, h.deps);
   assert.match(retried.summary, /12 already swept this run/);
   for (const id of ids.slice(0, 12)) assert.ok(!h.reads.includes(`info ${id}`), `${id} is not read again`);

@@ -517,6 +517,57 @@ test("the Roadmap reads: rows by status, one row again, a property's options, th
   assert.equal(await notionBotUserId(ENV), "u-unobot");
 });
 
+test("card follow-ups read only Design cards: one query asks for the active statuses and Design in Current Team", async () => {
+  const DB = "2fc01241aaaa4bbbbccccddddeeeefff";
+  const DESIGN = "dddddddd-dddd-dddd-dddd-dddddddddddd";
+  const OPS = "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee";
+  const row = (id: string, teams: string[]) => ({
+    id,
+    url: `https://www.notion.so/Card-${id.replace(/-/g, "")}`,
+    last_edited_time: "2026-10-13T12:00:00.000Z",
+    created_by: { id: "u-bea" },
+    parent: { type: "database_id", database_id: DB },
+    properties: {
+      Name: { type: "title", title: [{ plain_text: "A card" }] },
+      "Design Status": { type: "status", status: { name: "WIP" } },
+      "Current Team": { type: "multi_select", multi_select: teams.map((name) => ({ name })) },
+    },
+  });
+  serve({
+    [`POST /databases/${DB}/query`]: {
+      body: { has_more: false, next_cursor: null, results: [row(DESIGN, ["Ops", "Design"]), row(OPS, ["Ops"])] },
+    },
+    [`GET /pages/${DESIGN}`]: { body: row(DESIGN, ["Design"]) },
+    [`GET /pages/${OPS}`]: { body: row(OPS, ["Ops"]) },
+  });
+  const { queryActiveCards, readCard } = await import("../src/follow-through/notion.js");
+  const { ACTIVE_DESIGN_STATUSES } = await import("../src/follow-through/rules.js");
+
+  const { cards, truncated } = await queryActiveCards({ ...ENV, NOTION_ROADMAP_DB_ID: DB } as typeof ENV);
+
+  assert.equal(calls.length, 1, "one query, with the team filter in it");
+  assert.deepEqual(calls[0]!.body, {
+    page_size: 100,
+    filter: {
+      and: [
+        { property: "Current Team", multi_select: { contains: "Design" } },
+        { or: ACTIVE_DESIGN_STATUSES.map((s) => ({ property: "Design Status", status: { equals: s } })) },
+      ],
+    },
+  });
+  // A card another team owns is never followed up, even should a read return it.
+  assert.deepEqual(
+    cards.map((c) => c.pageId),
+    [DESIGN.replace(/-/g, "")],
+  );
+  assert.equal(truncated, false);
+  // A follow-up kept before a card left Design reads it again as gone, which
+  // settles it without a post.
+  const env = { ...ENV, NOTION_ROADMAP_DB_ID: DB } as typeof ENV;
+  assert.equal((await readCard(env, DESIGN))?.pageId, DESIGN.replace(/-/g, ""));
+  assert.equal(await readCard(env, OPS), null);
+});
+
 test("a page's comments come back with their text, time and the pages they mention", async () => {
   serve({
     [`GET /comments?block_id=${PAGE}`]: {

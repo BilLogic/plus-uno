@@ -1,12 +1,12 @@
 // Scheduled runs: which firing starts one, what it holds, and where it queues.
 //
 // Two cron triggers of the free plan's five fire at each run's two UTC
-// hours — 00:00 ET (the end-of-day run) is 04:00 or 05:00 UTC, Tuesday to
+// hours — 06:00 ET (the end-of-day run) is 10:00 or 11:00 UTC, Tuesday to
 // Saturday, and 09:00 ET (the morning run) 13:00 or 14:00 UTC, Monday to
 // Friday — so each run is there whether ET is UTC-4 or UTC-5. A firing reads
 // its own scheduled time in ET and enqueues the matching run; the firing an
 // hour off does nothing. The end-of-day run is dated to the ET day it sweeps,
-// the one that ended at its midnight (`sweptDayOf`). The Figma library poll
+// the one before it (`sweptDayOf`). The Figma library poll
 // that once ran on every firing is the end-of-day run's `figma-library-poll`
 // job. The wrangler.toml cron comment gives the ET times.
 //
@@ -161,8 +161,8 @@ export interface ScheduledJob {
  * What every job body is handed beside its job.
  *
  * `runDate` is the date the job's records, skips and labels carry, however
- * late it runs. The end-of-day run fires at 00:00 ET, after the day it sweeps
- * has ended, so a date read off the clock would name the wrong day — and a
+ * late it runs. The end-of-day run fires at 06:00 ET, the morning after the
+ * day it sweeps, so a date read off the clock would name the wrong day — and a
  * job deferred on a budget stop, or the retry of a half-done one, must keep
  * the date its run was planned under.
  */
@@ -224,7 +224,7 @@ const FRIDAY = 5;
  * morning, like every proactive job.
  *
  * The DS precedence check is weekly, on FRIDAY's end-of-day run — the one
- * that fires at Saturday 00:00 ET and is dated Friday: the week's merges and
+ * that fires at Saturday 06:00 ET and is dated Friday: the week's merges and
  * any library publish have landed, so it reads where the week ended, and its
  * report opens Monday's morning run — the start of the week the team has to
  * act on it, with the cards live until the next check. Its hand-over is on
@@ -310,9 +310,10 @@ export const RUN_NAMES = Object.keys(RUN_HOURS) as ScheduledRunName[];
  * The runs a firing starts: the one anchored to its ET hour, when the firing
  * is that hour's :00 slot, and none otherwise. Each run is once a day all
  * year: 13:00 UTC is the morning run under EDT and nothing under EST (08:00
- * ET), and 05:00 UTC the end-of-day run under EST and nothing under EDT.
- * Only on a run day, whatever the cron says: a morning Monday to Friday, and
- * an end-of-day run that sweeps Monday to Friday — Tuesday to Saturday 00:00.
+ * ET), and 11:00 UTC the end-of-day run under EST and nothing under EDT
+ * (07:00 ET). Only on a run day, whatever the cron says: a morning Monday to
+ * Friday, and an end-of-day run that sweeps Monday to Friday — Tuesday to
+ * Saturday 06:00.
  *
  * Compared by hour and minute, not to the millisecond, so a `scheduledTime` a
  * few seconds past the slot still lands in it. ET is a whole-hour offset, so
@@ -342,7 +343,7 @@ export const WEEKDAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as con
 
 /**
  * A run, planned for its ET day — the morning's own, and for the end-of-day
- * run the day it sweeps (`sweptDayOf`: at Saturday 00:00 ET, Friday): its
+ * run the day it sweeps (`sweptDayOf`: at Saturday 06:00 ET, Friday): its
  * jobs for that day's weekday — or for `weekday` when given, which is how the
  * sweep probe rehearses Friday's jobs on a Tuesday; the date stays the run's.
  * The weekday filter covers every

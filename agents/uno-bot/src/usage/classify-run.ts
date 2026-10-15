@@ -46,13 +46,13 @@ export const TEXT_RETENTION_MS = 14 * 24 * 60 * 60 * 1000;
  * of day.
  *
  * WHY 11 DAYS AND NOT 14. Every run purges: the morning run at 09:00 ET
- * Monday to Friday, and the end-of-day run at 00:00 ET Tuesday to Saturday.
- * On a weekday the gaps are 9 h (00:00 to 09:00) and 15 h (09:00 to the next
- * 00:00); the longest is the weekend, Saturday 00:00 to Monday 09:00:
+ * Monday to Friday, and the end-of-day run at 06:00 ET Tuesday to Saturday.
+ * On a weekday the gaps are 3 h (06:00 to 09:00) and 21 h (09:00 to the next
+ * 06:00); the longest is the weekend, Saturday 06:00 to Monday 09:00:
  *
- *     Sat 00:00 → Mon 09:00                                  57 h
- *     one run missed: Mon 09:00, so Sat 00:00 → Tue 00:00     72 h
- *                     or Sat 00:00, so Fri 09:00 → Mon 09:00  72 h
+ *     Sat 06:00 → Mon 09:00                                  51 h
+ *     one run missed: Mon 09:00, so Sat 06:00 → Tue 06:00     72 h
+ *                     or Sat 06:00, so Fri 09:00 → Mon 09:00  72 h
  *     the weekend the clocks go back is an hour longer        73 h
  *     the purge, last job of its run, starts up to 1 h late   74 h
  *

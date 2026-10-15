@@ -1,20 +1,21 @@
 // When the day's runs happen, in the team's time, and when a sweep finding may
 // be posted: at the first weekday morning run after it was detected.
 //
-// Both runs are ET times all year: the end-of-day run at 00:00 ET, just after
-// the workday it sweeps ends (students work late), and the morning run at
-// 09:00 ET, when people start. In UTC that is 04:00 and 13:00 under EDT and
-// 05:00 and 14:00 under EST. The crons fire at both UTC hours of each
-// (wrangler.toml), so a firing reads its ET hour rather than a fixed UTC one.
+// Both runs are ET times all year: the end-of-day run at 06:00 ET, after
+// the workday it sweeps and the late night that follows it (students work
+// late), and the morning run at 09:00 ET, when people start, three hours
+// behind it. In UTC that is 10:00 and 13:00 under EDT and 11:00 and 14:00
+// under EST. The crons fire at both UTC hours of each (wrangler.toml), so a
+// firing reads its ET hour rather than a fixed UTC one.
 //
-// The end-of-day run fires after midnight, so it is DATED to the ET day it
-// sweeps — the one that just ended (`sweptDayOf`). Monday to Friday are swept
-// Tuesday to Saturday at 00:00 ET, and a record, skip or label a job keeps
-// still names the workday it read.
+// The end-of-day run fires the next morning, so it is DATED to the ET day it
+// sweeps — the one before (`sweptDayOf`). Monday to Friday are swept Tuesday
+// to Saturday at 06:00 ET, and a record, skip or label a job keeps still names
+// the workday it read.
 //
 // Detection runs in the end-of-day jobs and posting at the morning run, so
 // people see a card at the start of their day and its 72 h clock starts when
-// they can act on it. A finding swept at Saturday 00:00 therefore waits for
+// they can act on it. A finding swept at Saturday 06:00 therefore waits for
 // Monday morning. Stated as a function of the detection time, not of which
 // run is asking, so a morning job that runs late, twice, or on a rehearsal
 // cannot post a finding before its morning.
@@ -26,8 +27,9 @@
 
 /** The ET hour of the morning run (`scheduled/runs.ts` anchors it). */
 export const MORNING_RUN_HOUR_ET = 9;
-/** The ET hour of the end-of-day run: midnight, closing the day it sweeps. */
-export const END_OF_DAY_RUN_HOUR_ET = 0;
+/** The ET hour of the end-of-day run: 06:00 the next morning, three hours
+ *  before the morning run that posts what it found. */
+export const END_OF_DAY_RUN_HOUR_ET = 6;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const HOUR_MS = 60 * 60 * 1000;
@@ -67,9 +69,9 @@ export function morningRunOn(day: number): number {
 
 /**
  * The ET day an end-of-day run at `at` sweeps, and is dated to: the day before
- * when `at` is before the morning run's hour — the 00:00 ET firing, and any
- * job of it deferred into the small hours — and `at`'s own day from the
- * morning on, which is the day a rehearsal in working hours would sweep.
+ * when `at` is before the morning run's hour — the 06:00 ET firing, and any
+ * job of it deferred past it — and `at`'s own day from the morning on, which
+ * is the day a rehearsal in working hours would sweep.
  *
  * @param at - When the run fires, or is rehearsed, epoch ms
  */

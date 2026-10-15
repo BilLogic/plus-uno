@@ -288,11 +288,11 @@ describe("the switches", () => {
       onScheduledFiring(time, { enqueueRun: async (run) => void runs.push(run), dmWatchers: () => ((reads += 1), watchers()) });
     await fire(at(29, 15, 15), async () => [MAYA]);
     assert.equal(reads, 0);
-    // Wed 00:00 ET: the end-of-day run that sweeps Tuesday.
-    const midnight = at(30, 4);
-    await fire(midnight, async () => [MAYA]);
+    // Wed 06:00 ET: the end-of-day run that sweeps Tuesday.
+    const endOfDay = at(30, 10);
+    await fire(endOfDay, async () => [MAYA]);
     assert.deepEqual(runs.pop()?.jobs.filter((j) => j.user).map((j) => j.key), [`dm-promise-read:${MAYA}`]);
-    await fire(midnight, async () => {
+    await fire(endOfDay, async () => {
       throw new Error("D1 down");
     });
     const run = runs.pop();
