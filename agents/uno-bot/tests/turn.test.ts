@@ -38,7 +38,7 @@ import { sweepShareOffer, SWEEP_SHARE_KEY } from "../src/sweep/share";
 import { FIX_REVIEW_INSTEAD, FIX_SCOPE_REFUSAL, sweepTag } from "../src/sweep/cards";
 import { decisionReport, itemProposal, reportItems, reportRecord } from "../src/slack/decision-cards";
 import { renderProposalCard } from "../src/slack/proposal-render";
-import { cancelNote } from "../src/agent/cancel-note";
+import { cancelNote, RECENT_CANCEL_MS } from "../src/agent/cancel-note";
 import { parseRepoList, resolveRepo } from "../src/integrations/repo-list.mjs";
 import { executeRelayDm, type RelaySlack } from "../src/tools/relay-dm";
 import {
@@ -2787,11 +2787,19 @@ test("a share-out batch's result groups each post under the place it was posted 
 // that names a DIFFERENT target is a new card: live on r621 a share-out card
 // named #plus-design-feedback, and the way out — cancel it, then "post it
 // here" — was bounced as the same action.
-async function afterCancel(note: string, toolCalls: Array<{ name: string; args: Record<string, unknown> }>) {
+const NOW = Date.parse("2026-10-15T14:00:00Z");
+
+async function afterCancel(
+  note: string,
+  toolCalls: Array<{ name: string; args: Record<string, unknown> }>,
+  /** How long before this turn the cancel was recorded; `null` for a note
+   *  written before cancels were stamped. */
+  agoMs: number | null = 2 * 60_000,
+) {
   const threadState = createInMemoryThreadState();
   await threadState.appendHistory(REF, { role: "user", content: "share the live app prototype for feedback" });
-  await threadState.appendHistory(REF, { role: "assistant", content: note });
-  const h = harness({ threadState, replies: [{ text: "Staging it again.", toolCalls }] });
+  await threadState.appendHistory(REF, { role: "assistant", content: note, ...(agoMs === null ? {} : { at: NOW - agoMs }) });
+  const h = harness({ threadState, now: () => NOW, replies: [{ text: "Staging it again.", toolCalls }] });
   return runTurn(request({ text: "post it here in this thread instead" }), h.deps);
 }
 
@@ -2823,4 +2831,22 @@ test("a cancelled intake re-staged on another repo is a new card, and on the sam
 test("a cancel note from before targets were recorded still holds the tool back", async () => {
   const outcome = await afterCancel("(Cancelled the proposed shareout_post — nothing was done.)", [shareout({ place: "here" })]);
   assert.equal(outcome.disposition, "asked");
+});
+
+// "A moment ago" has to be true. Live on r631 a share-out cancelled at 22:53
+// bounced the first ask of the next morning: in a DM every top-level message
+// is one conversation, so the last few turns can be hours old.
+test("a cancel from hours ago does not hold the same share-out back", async () => {
+  const outcome = await afterCancel(cancelNote("shareout_post", {}), [shareout()], 11 * 60 * 60_000);
+  assert.equal(outcome.disposition, "staged");
+});
+
+test("a cancel from just inside the window still holds the same share-out back", async () => {
+  const outcome = await afterCancel(cancelNote("shareout_post", {}), [shareout()], RECENT_CANCEL_MS);
+  assert.equal(outcome.disposition, "asked");
+});
+
+test("a cancel note with no time on it, from before cancels were stamped, holds nothing back", async () => {
+  const outcome = await afterCancel(cancelNote("shareout_post", {}), [shareout()], null);
+  assert.equal(outcome.disposition, "staged");
 });

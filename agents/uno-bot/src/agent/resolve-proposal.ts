@@ -154,6 +154,7 @@ async function runWonVerdict(
       {
         role: "assistant",
         content: cancelNote(pending.toolName, pending.input),
+        at: Date.now(),
       },
     );
     // A sweep card's ⛔ drops its items (`sweep/outcomes.ts`).
