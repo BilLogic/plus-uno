@@ -156,6 +156,8 @@ import {
   type Milestone,
   type MilestoneComparison,
 } from "../blueprint-upkeep/milestone";
+import { proposalOfferCard, stagedProposalOffer, type ProposalDrafter } from "../blueprint-upkeep/proposal";
+import { rethrowIfBudget } from "../net";
 
 // ── Policy ───────────────────────────────────────────────────────────────────
 
@@ -657,6 +659,14 @@ export interface TurnDeps {
    * no reply carries one.
    */
   milestoneComparison?: MilestoneComparison;
+
+  /**
+   * The idea's rows on the compared path, drafted for the ✅ card that offers
+   * to draw them on the blueprint as a proposal (`blueprint-upkeep/proposal.ts`).
+   * Null when the draft adds nothing beside today's cells. Absent, a
+   * comparison carries no offer.
+   */
+  proposalDraft?: ProposalDrafter;
 
   now?(): number;
 }
@@ -1364,6 +1374,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       telemetry,
       memory,
       presenting,
+      staging,
     });
   }
 
@@ -1636,14 +1647,19 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     : null;
   // A staged PRD is a milestone: its comparison posts BEFORE the card, so the
   // card stays the last message in the thread.
-  const comparison = inPlace
+  const milestone = inPlace
     ? null
-    : await compareAt(prdMilestone(result.operations) ?? handOffMilestone(result.previewText ?? "", request.text, run.references), ref, deps);
+    : (prdMilestone(result.operations) ?? handOffMilestone(result.previewText ?? "", request.text, run.references));
+  const comparison = await compareAt(milestone, ref, deps);
   if (comparison) await delivery.postNote(comparison.text);
+  // The offer to draw the idea goes under its comparison and before this
+  // turn's own card, which stays the last message: a typed ✅ answers the
+  // thread's newest card, and that must stay the one the person asked for.
+  const offered = comparison && milestone ? await offerProposal(comparison, milestone, request, { ...deps, delivery }, staging) : null;
   const posted = inPlace ? { ok: true, text: inPlace.text, ts: inPlace.staged.proposalTs } : await delivery.card(card);
   // An answer-only surface declined the card on purpose: the person is told
   // what it would have done instead, so the turn answered, and nothing stages.
-  const remembered = comparison ? `${comparison.text}\n\n${posted.text}` : posted.text;
+  const remembered = [comparison?.text, offered?.proposalText, posted.text].filter(Boolean).join("\n\n");
   if (!inPlace && posted.declined) {
     await memory.remember(remembered);
     return { disposition: "answered", posted: posted.text, wrote: memory.wrote(), telemetry, ...(comparison ? { comparison } : {}) };
@@ -1771,6 +1787,62 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
 async function compareAt(milestone: Milestone | null, ref: ThreadRef, deps: Pick<TurnDeps, "milestoneComparison">): Promise<Comparison | null> {
   if (!milestone || !deps.milestoneComparison) return null;
   return deps.milestoneComparison(ref, milestone).catch(() => null);
+}
+
+/**
+ * Offer to draw a compared idea on the blueprint: draft its rows, post the ✅
+ * card in the thread, and stage it for the requester alone, in its own slot,
+ * so it never replaces the turn's own card. Null when there is no drafter, the
+ * draft adds nothing, or the card did not stage. Fails quiet, past a budget
+ * stop: the reply already stands without it.
+ */
+async function offerProposal(
+  comparison: Comparison,
+  milestone: Milestone,
+  request: TurnRequest,
+  deps: Pick<TurnDeps, "proposalDraft" | "delivery" | "threadState" | "usage">,
+  staging: StagingFacts,
+): Promise<PendingProposal | null> {
+  if (!deps.proposalDraft) return null;
+  try {
+    const draft = await deps.proposalDraft(comparison, milestone.idea);
+    if (!draft) return null;
+    const posted = await deps.delivery.card(proposalOfferCard(draft));
+    if (!posted.ok || !posted.ts || posted.declined) return null;
+    const proposal: PendingProposal = {
+      ...stagedProposalOffer(draft, {
+        channel: request.channel,
+        threadTs: request.conversationTs,
+        ...(request.replyTs ? { replyTs: request.replyTs } : {}),
+        userMsgTs: request.userMsgTs,
+        requesterUserId: request.userId,
+        proposalTs: posted.ts,
+        proposalText: posted.text,
+      }),
+      ...ownBlocks(posted),
+    };
+    const { retired } = await deps.threadState.putProposal(proposal);
+    await recordProposalEvents(
+      deps.usage.proposalEvents,
+      [
+        ...supersededEvents(retired, staging.now(), "revision"),
+        stagedEvent({
+          proposal,
+          at: staging.now(),
+          via: "turn",
+          channelStored: staging.channelStored,
+          turnId: staging.turnId,
+          testTraffic: staging.testTraffic,
+        }),
+      ],
+      deps.usage.writeTimeoutMs,
+    );
+    return proposal;
+  } catch (err) {
+    rethrowIfBudget(err);
+    console.warn(`[proposal] offer not staged: ${err instanceof Error ? err.message : String(err)}`);
+    return null;
+  }
 }
 
 /** Fresh page reads a batch may spend on Before beyond the card's own read.
@@ -2130,6 +2202,8 @@ interface TextTurnCtx {
   /** The turn's presentation step: what its lookups left to post beneath the
    *  answer, read once the pre-checks below have added their ⚠️ lines. */
   presenting: Presenter;
+  /** What a card the reply carries an offer for is recorded with. */
+  staging: StagingFacts;
 }
 
 /**
@@ -2311,7 +2385,8 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   const answered = breadcrumbsInProse(figmaAnswerCopy(stripped.text, presentation?.sources));
   // A build handed to the IDE is a milestone: the comparison rides the reply,
   // after the judge, in code's words.
-  const comparison = await compareAt(handOffMilestone(answered, request.text, run.references), ref, deps);
+  const handOff = handOffMilestone(answered, request.text, run.references);
+  const comparison = await compareAt(handOff, ref, deps);
   const prose = comparison ? `${answered}\n\n${comparison.text}` : answered;
 
   // The table rides with the answer; what comes back as `posted.text` is then
@@ -2342,9 +2417,12 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     };
   }
 
+  // The offer to draw the idea follows the reply that carries its comparison.
+  const offered = comparison && handOff ? await offerProposal(comparison, handOff, request, deps, ctx.staging) : null;
+
   // Record what was actually POSTED (capped, placeholder and all), not the raw
   // text.
-  await ctx.memory.rememberAssistant(posted.text);
+  await ctx.memory.rememberAssistant(offered ? `${posted.text}\n\n${offered.proposalText}` : posted.text);
 
   // A card was staged at turn start and this turn neither resolved it (that
   // would be kind:"resolved") nor said anything about it. The approval has

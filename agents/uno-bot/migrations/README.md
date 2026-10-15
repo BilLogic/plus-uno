@@ -13,7 +13,11 @@ since 0008 a self-reminder asked for in a DM or group DM is kept, and posted
 back only there. DM watch keeps its Home-tab switches and the promises read
 in a person's own DMs, and how far each DM was read, in three tables of its own (`0011_dm_watch.sql`,
 `agents/uno-bot/src/dm-watch/store.ts`): a row there holds a permalink, which
-that ticket allows, and no summary and no id of the other person. The bot's
+that ticket allows, and no summary and no id of the other person. A blueprint
+proposal drawn from a conversation keeps its thread, its path and the slots of
+its `proposed` rows in `blueprint_proposals` (`0016_blueprint_proposals.sql`,
+`agents/uno-bot/src/blueprint-upkeep/proposal-records.ts`): ids and times, no
+cell text. The bot's
 semantic-retrieval schema does **not** — see the second half.
 
 ## The usage database (`usage/`)

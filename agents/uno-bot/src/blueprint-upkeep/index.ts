@@ -1,6 +1,7 @@
 // Blueprint upkeep: the service-change gate, a revision drafted from shipped
 // work, its card on the morning sweep, and an idea set beside today's path at
-// a conversation's milestones. `Env` enters in `./env.ts`.
+// a conversation's milestones, with the offer to draft it on the blueprint as
+// a proposal. `Env` enters in `./env.ts`.
 
 export {
   confidentMatch,
@@ -45,3 +46,17 @@ export {
   type UpkeepState,
   type WaitingRevision,
 } from "./job";
+export {
+  draftProposal,
+  drawnProposalOf,
+  PROPOSAL_CARD_TTL_MS,
+  PROPOSAL_DRAFT_TIER,
+  PROPOSAL_OFFER_SUBREQUESTS,
+  proposalOfferCard,
+  proposalSlotKey,
+  readProposalDraft,
+  stagedProposalOffer,
+  type ProposalDraft,
+  type ProposalDrafter,
+} from "./proposal";
+export { createInMemoryProposalRecords, type DrawnProposal, type ProposalRecords, type ProposalRow } from "./proposal-records";
