@@ -1,12 +1,15 @@
 // Blueprint upkeep from shipped work, end to end on named dependencies:
 //
 //   • the READ — the end-of-day `blueprint-shipped` job: the Roadmap cards
-//     that reached `Dev Status: Deployed` since the last run (one query from a
-//     cursor), each through the service-change gate (`./gate.ts`); a card
-//     that passes has today's matched path read and ONE path's revision
-//     drafted on the grind tier (`./draft.ts`), kept in KV for the morning
-//     with its place and its confirmers. A card is weighed once: its page id
-//     is remembered whichever way the gate went. It posts nothing.
+//     that reached `Design Status: Shipped` or `Dev Status: Deployed` since
+//     the last run (one query from a cursor), each through the service-change
+//     gate (`./gate.ts`) on its own words and its PRD's (`./evidence.ts`); a
+//     card that passes has today's matched path read and ONE path's revision
+//     drafted on the grind tier (`./draft.ts`) — `planned` rows for a design
+//     hand-off, `live` for a deploy, which promotes the hand-off's rows when
+//     it drafted any (`./stages.ts`) — kept in KV for the morning with its
+//     place and its confirmers. A card is weighed once per status: it is
+//     remembered whichever way the gate went. It posts nothing.
 //   • the HAND-OVER — every morning (`blueprint-revision-post`), before the
 //     sweep's post: each waiting revision is handed to the sweep's message at
 //     its card's place, the posting ladder card follow-ups take (the pillar's
@@ -29,11 +32,12 @@ import type { PendingProposal } from "../thread-state/index";
 import { itemProposal } from "../slack/decision-cards";
 import { renderProposalCard } from "../slack/proposal-render";
 import { handedSection, type SectionHandOff, type SweepSection } from "../sweep/sections";
-import { revisionCard, type EntityStatus } from "../blueprint-write/index";
+import { revisionCard } from "../blueprint-write/index";
 import type { ModelProvider } from "../agent/model-provider";
 import type { ServiceChangeGate } from "./gate";
 import { draftRevision, type Draft, type PathToday } from "./draft";
 import { revisionItem, revisionItemId, revisionParent, revisionProposalCard, type RevisionSource } from "./card";
+import { holdDeprecations, markWeighed, promotionDraft, STAGES, weighedAt, type PlannedRows, type ShipStage } from "./stages";
 
 /** The section's name on the sweep's morning post. */
 export const UPKEEP_SECTION = "blueprint-revisions";
@@ -45,9 +49,8 @@ export const FIRST_LOOKBACK_MS = 3 * 24 * 60 * 60 * 1000;
 export const REVISION_CARD_TTL_MS = 72 * 60 * 60 * 1000;
 /** Page ids remembered as weighed. */
 const SEEN_KEPT = 500;
-/** The Roadmap status this job watches, and the blueprint status it writes. */
-export const DEPLOYED = { property: "Dev Status", value: "Deployed" } as const;
-const DEPLOYED_TARGET: EntityStatus = "live";
+/** Design hand-offs remembered until their deploy. */
+const PLANNED_KEPT = 200;
 
 /** A Roadmap card that shipped, as the job reads it. */
 export interface ShippedCard {
@@ -55,6 +58,8 @@ export interface ShippedCard {
   url: string;
   title: string;
   number: number | null;
+  /** The latest shipping moment its status holds (`./stages.ts`). */
+  stage: ShipStage;
   pillars: string[];
   contributors: Array<{ id: string; name: string }>;
   /** `last_edited_time`, epoch ms. */
@@ -75,9 +80,11 @@ export interface WaitingRevision {
 export interface UpkeepState {
   /** ISO time the next read starts from; null before the first run. */
   cursor: string | null;
-  /** Page ids already weighed, newest last. */
+  /** Cards already weighed, as `pageId@stage`, newest last. */
   seen: string[];
   waiting: WaitingRevision[];
+  /** What each design hand-off drafted, for its deploy to promote. */
+  planned?: PlannedRows[];
 }
 
 interface Store<T> {
@@ -87,11 +94,12 @@ interface Store<T> {
 
 export interface ShippedDeps {
   roadmap: {
-    /** Cards in `Dev Status: Deployed` edited at or after `since` (ISO). */
-    deployedSince(since: string): Promise<ShippedCard[]>;
+    /** Cards in `Design Status: Shipped` or `Dev Status: Deployed` edited at
+     *  or after `since` (ISO). */
+    shippedSince(since: string): Promise<ShippedCard[]>;
   };
-  /** The card's own words: its page text. The one input boundary, so a PRD
-   *  or a code reader can be added behind it. */
+  /** The card's words: its page text and its PRD's (`./evidence.ts`). The
+   *  one input boundary, so a code reader can be added behind it. */
   evidence(card: ShippedCard): Promise<string>;
   gate: ServiceChangeGate;
   /** Today's path holding this cell; null when it cannot be read. */
@@ -125,16 +133,26 @@ export async function runShippedRevisions(deps: ShippedDeps, opts: { dryRun?: bo
   const startedAt = new Date(deps.now()).toISOString();
   const since = state.cursor ?? new Date(deps.now() - FIRST_LOOKBACK_MS).toISOString();
   const seen = new Set(state.seen);
-  const fresh = (await deps.roadmap.deployedSince(since)).filter((c) => !seen.has(c.pageId));
+  const fresh = (await deps.roadmap.shippedSince(since)).filter((c) => !weighedAt(seen, c.pageId, c.stage));
   const batch = fresh.slice(0, MAX_CARDS_PER_RUN);
 
   const drafted: WaitingRevision[] = [];
   const skipped: string[] = [];
+  let planned = state.planned ?? [];
+  let waiting = state.waiting;
   for (const card of batch) {
-    const outcome = await weigh(deps, card);
-    seen.add(card.pageId);
+    const outcome = await weigh(deps, card, planned.find((p) => p.pageId === card.pageId) ?? null);
+    markWeighed(seen, card.pageId, card.stage);
+    if (card.stage === "deployed") {
+      // The hand-off's rows are promoted or drafted afresh now, either way.
+      planned = planned.filter((p) => p.pageId !== card.pageId);
+      waiting = waiting.filter((w) => w.source.pageId !== card.pageId);
+    }
     if (typeof outcome === "string") skipped.push(`${card.title}: ${outcome}`);
-    else drafted.push(outcome);
+    else {
+      drafted.push(outcome.revision);
+      if (outcome.planned) planned = [...planned, outcome.planned];
+    }
   }
 
   if (!opts.dryRun) {
@@ -142,47 +160,79 @@ export async function runShippedRevisions(deps: ShippedDeps, opts: { dryRun?: bo
       // Past every card only once every card was weighed.
       cursor: fresh.length > batch.length ? state.cursor ?? since : startedAt,
       seen: [...seen].slice(-SEEN_KEPT),
-      waiting: [...state.waiting, ...drafted],
+      waiting: [...waiting, ...drafted],
+      planned: planned.slice(-PLANNED_KEPT),
     });
   }
   const verb = opts.dryRun ? "would keep" : "kept";
   return {
     drafted: drafted.length,
     summary:
-      `${fresh.length} deployed card(s) since ${since}; ${verb} ${drafted.length} revision(s)` +
+      `${fresh.length} shipped card(s) since ${since}; ${verb} ${drafted.length} revision(s)` +
       (skipped.length ? `; silent on ${skipped.join(", ")}` : "") +
       (fresh.length > batch.length ? `; ${fresh.length - batch.length} wait for the next run` : ""),
   };
 }
 
-/** One card through the gate and the draft: its revision, or why not. */
-async function weigh(deps: ShippedDeps, card: ShippedCard): Promise<WaitingRevision | string> {
+/** A weighed card's revision, and what a design hand-off keeps for its deploy. */
+interface Weighed {
+  revision: WaitingRevision;
+  planned?: PlannedRows;
+}
+
+/**
+ * One card through the gate and the draft: its revision, or why not. A deploy
+ * whose design hand-off drafted rows promotes them instead (`./stages.ts`).
+ */
+async function weigh(deps: ShippedDeps, card: ShippedCard, handedOff: PlannedRows | null): Promise<Weighed | string> {
   try {
+    const { property, value, target } = STAGES[card.stage];
+    const status = { property, value };
+    if (card.stage === "deployed" && handedOff) {
+      const today = await deps.readPath(handedOff.cellId);
+      const draft = today ? promotionDraft(handedOff, today) : null;
+      if (today && draft) return await revisionFor(deps, card, { status, quote: handedOff.quote, today, draft });
+    }
     const text = await deps.evidence(card);
     const gate = await deps.gate({ title: card.title, text });
     if (!gate.pass) return gate.reason;
     const today = await deps.readPath(gate.match.cellId);
     if (!today) return "the matched path could not be read";
-    const draft = await draftRevision(deps.provider, { title: card.title, text, today, target: DEPLOYED_TARGET });
-    if (!draft) return "no writable draft";
-    const channel = deps.placeOf(card);
-    if (!channel) return "no place to post";
-    const owner = await deps.ownerOf(card);
-    const confirmers = [owner, deps.billId].filter((id): id is string => !!id);
-    if (!confirmers.length) return "nobody to confirm";
-    return {
-      source: { pageId: card.pageId, url: card.url, title: card.title, number: card.number, status: { ...DEPLOYED }, quote: gate.quote },
-      today,
-      draft,
-      channel,
-      owner,
-      confirmers: [...new Set(confirmers)],
-    };
+    const drafted = await draftRevision(deps.provider, { title: card.title, text, today, target });
+    const held = drafted && card.stage === "designed" ? holdDeprecations(drafted) : { draft: drafted, deprecate: [] };
+    if (!held.draft) return "no writable draft";
+    const weighed = await revisionFor(deps, card, { status, quote: gate.quote, today, draft: held.draft });
+    if (typeof weighed === "string" || card.stage !== "designed") return weighed;
+    const rows = held.draft.revision.rows.map(({ stepId, laneId }) => ({ stepId, laneId }));
+    return { ...weighed, planned: { pageId: card.pageId, cellId: gate.match.cellId, quote: gate.quote, rows, deprecate: held.deprecate } };
   } catch (err) {
     rethrowIfBudget(err);
     console.error(`[blueprint-upkeep] ${card.title} not weighed: ${err instanceof Error ? err.message : String(err)}`);
     return "read failed";
   }
+}
+
+/** A drafted revision at its card's place, with who may confirm it. */
+async function revisionFor(
+  deps: ShippedDeps,
+  card: ShippedCard,
+  d: { status: RevisionSource["status"]; quote: string; today: PathToday; draft: Draft },
+): Promise<Weighed | string> {
+  const channel = deps.placeOf(card);
+  if (!channel) return "no place to post";
+  const owner = await deps.ownerOf(card);
+  const confirmers = [owner, deps.billId].filter((id): id is string => !!id);
+  if (!confirmers.length) return "nobody to confirm";
+  return {
+    revision: {
+      source: { pageId: card.pageId, url: card.url, title: card.title, number: card.number, status: d.status, quote: d.quote },
+      today: d.today,
+      draft: d.draft,
+      channel,
+      owner,
+      confirmers: [...new Set(confirmers)],
+    },
+  };
 }
 
 /** What a morning hands the sweep's post for one place. */

@@ -14,8 +14,9 @@ export {
 } from "./gate";
 export { draftRevision, readDraft, type Draft, type DraftedChange, type DraftInput, type PathToday } from "./draft";
 export { revisionItem, revisionText, type RevisionSource } from "./card";
+export { cardEvidence, MAX_PRDS, prdIdsOf, type EvidencePage } from "./evidence";
+export { promotionDraft, stageOf, STAGES, type PlannedRows, type ShipStage } from "./stages";
 export {
-  DEPLOYED,
   handOverRevisions,
   MAX_CARDS_PER_RUN,
   REVISION_CARD_TTL_MS,

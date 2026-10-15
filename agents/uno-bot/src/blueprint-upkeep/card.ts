@@ -4,7 +4,7 @@
 //   2. why now     — the card's RM-ID, its status, one quoted sentence, a link
 //   3. today       — the path's cells as `step (lane)` rows, with a link into
 //                    the blueprint app
-//   4. proposed    — each row added, changed or deprecated
+//   4. proposed    — each row added, changed, deprecated or promoted
 //   5. confidence  — the draft's confidence, and what it could not verify
 //   6. the ask     — who may approve, and what approving writes
 //
@@ -42,6 +42,7 @@ export function revisionTitle(today: Pick<PathToday, "scenario" | "path">): stri
 }
 
 function statusChange(draft: Draft): string {
+  if (draft.promoted) return `${code("planned")} → ${code("live")}`;
   const path = draft.revision.path;
   if (path) return `${code(path.from)} → ${code(path.to)}`;
   const to = draft.revision.rows.find((r) => r.to !== "deprecated")?.to ?? "deprecated";
@@ -62,7 +63,7 @@ function today(path: PathToday): string[] {
   return [`*Today*${path.link ? ` · <${path.link}|open the path>` : ""}`, ...(rows.length ? rows : ["• (no cells on this path yet)"])];
 }
 
-const KIND_WORD = { added: "Added", changed: "Changed", deprecated: "Deprecated" } as const;
+const KIND_WORD = { added: "Added", changed: "Changed", deprecated: "Deprecated", promoted: "Promoted" } as const;
 
 function proposed(draft: Draft): string[] {
   return [
@@ -124,13 +125,13 @@ export function revisionItemId(source: Pick<RevisionSource, "pageId">): string {
  * @param owner - The card owner's Slack id, when known
  */
 export function revisionItem(source: RevisionSource, path: PathToday, draft: Draft, owner: string | null): ReportItem {
-  const counts = (["added", "changed", "deprecated"] as const)
+  const counts = (["added", "changed", "deprecated", "promoted"] as const)
     .map((k) => [k, draft.changes.filter((c) => c.kind === k).length] as const)
     .filter(([, n]) => n > 0)
     .map(([k, n]) => `${n} ${k}`);
   return {
     id: revisionItemId(source),
-    title: `${revisionTitle(path)} · ${draft.revision.path ? `${draft.revision.path.from} → ${draft.revision.path.to}` : "rows"}`,
+    title: `${revisionTitle(path)} · ${draft.promoted ? "planned → live" : draft.revision.path ? `${draft.revision.path.from} → ${draft.revision.path.to}` : "rows"}`,
     subtitle: `${source.number !== null ? `RM-${source.number}` : esc(source.title)} · ${code(`${source.status.property}: ${source.status.value}`)}`,
     ...(owner ? { owners: [{ slack: owner }] } : {}),
     body: `${counts.join(" · ")} · confidence ${draft.confidence.toFixed(1)}${draft.gaps.length ? ` · ${draft.gaps.length} to verify` : ""}`,

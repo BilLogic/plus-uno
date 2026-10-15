@@ -1065,6 +1065,33 @@ export async function queryRowsWithStatus(
 }
 
 /**
+ * The rows of one database where any one of several status properties holds
+ * its value, and that also match `also`: one query page of at most `limit`.
+ * One subrequest. Throws on failure.
+ *
+ * @param env - Carries NOTION_API_KEY
+ * @param databaseId - The database to read
+ * @param either - Status properties and an option of each, by exact name
+ * @param limit - Rows per read, 1–100
+ * @param also - One more Notion filter clause, ANDed with the statuses
+ */
+export async function queryRowsWithAnyStatus(
+  env: Env,
+  databaseId: string,
+  either: ReadonlyArray<{ property: string; value: string }>,
+  limit = 100,
+  also?: Record<string, unknown>,
+): Promise<{ rows: EditedRow[]; more: boolean; next: string | null }> {
+  const byStatus = { or: either.map(({ property, value }) => ({ property, status: { equals: value } })) };
+  return queryRowPage(
+    env,
+    databaseId,
+    { page_size: Math.min(Math.max(limit, 1), 100), filter: also ? { and: [also, byStatus] } : byStatus },
+    "status query failed",
+  );
+}
+
+/**
  * The Roadmap cards with these numbers, as rows: one query per 100 numbers,
  * the most Notion's compound filter takes. A number the Roadmap lacks is
  * simply absent. Throws on failure.
