@@ -46,6 +46,4 @@ From `design-system/src/components/status-and-loading/Count/Count.scss`. Overrid
 
 Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Progress` · `Skeleton` · `Spinner` · `Status` · `Suggestion` · `Tag` · `TagGroup` · `Tile`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

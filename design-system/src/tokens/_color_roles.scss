@@ -159,4 +159,19 @@
      * with `npm run snapshot:figma-variables`.
      */
     --color-focus-ring-inverse: var(--color-surface);
+
+    /*
+     * SURFACE ROLES UNDER THEIR FIGMA NAMES — `Surface roles/surface-*`.
+     *
+     * Figma files these four in colors / neutral, so a binding read back from
+     * Figma names `--color-surface-default`, not the `--surface-default` that
+     * `_elevation.scss` defines. Each aliases the same neutral colour that
+     * Figma's variable aliases, and that its elevation role aliases, so
+     * `check:figma-colour-drift` can follow the chain to a value. The raised and
+     * overlay roles still need their `--surface-*-shadow` beside them.
+     */
+    --color-surface-default: var(--color-surface-container-lowest);
+    --color-surface-overlay: var(--color-surface-container-lowest);
+    --color-surface-raised: var(--color-surface-container-lowest);
+    --color-surface-sunken: var(--color-surface);
 }

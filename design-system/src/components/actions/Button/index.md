@@ -73,6 +73,4 @@ Implemented as `ButtonContent`.
 
 Same group: `ButtonGroup` · `CloseButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
