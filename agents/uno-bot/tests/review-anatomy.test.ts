@@ -197,9 +197,10 @@ describe("a draft outside the share-out keeps its body and gains its title and d
       "• *Block id:* 0f1e2d3c",
       CONFIRM_FOOTER,
     ].join("\n");
-    const view = draftView(card, { ...BASE, toolName: "notion_archive", input: { page_url: "https://www.notion.so/abc" }, proposalText: text }, access);
+    // A tool with no reading of its own, so the card's text is what is drawn.
+    const view = draftView(card, { ...BASE, toolName: "unread_tool", input: { page_url: "https://www.notion.so/abc" }, proposalText: text }, access);
     const json = JSON.stringify(view);
-    assert.equal((view as { title: { text: string } }).title.text, "Review archive");
+    assert.equal((view as { title: { text: string } }).title.text, "Review proposal");
     for (const label of ["Place", "Channel", "Surface", "File key", "Check", "Introduce", "Cards", "Block id"]) {
       assert.ok(!json.includes(`*${label}:*`), `${label} is hidden`);
     }
