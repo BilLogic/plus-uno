@@ -8,7 +8,8 @@
 //     words and its PRD's (`./evidence.ts`). A card that passes queues one
 //     path to draft for EVERY `scenario › path` the gate matched
 //     confidently. A deploy whose design hand-off drafted rows promotes them
-//     instead (`./stages.ts`), with no judgement or draft — and so does a
+//     instead (`./stages.ts`), with no judgement, adding what a redraft of
+//     the same path against the card's words now changes — and so does a
 //     card linked to a drawn proposal (`./link.ts`), at either moment: the
 //     proposal's own variant path moves on, today's path is offered for
 //     retirement on its own card at the deploy, and nothing new is drafted.
@@ -28,7 +29,7 @@
 //     its card's place, the posting ladder card follow-ups take.
 //   • the SECTION — on that place's one message, one card per revision, each
 //     its own proposal: the `blueprint_revise` operation, confirmed by the
-//     card's owner or Bill and nobody else. Cards the carousel has no room
+//     card's owner or the lead and nobody else. Cards the carousel has no room
 //     for are said as "+N more in the thread" and go up there, in the
 //     morning's `blueprint-revision-thread`, after the sweep's post. The
 //     thread is told, tagging the person, what each draft could not verify.
@@ -63,6 +64,7 @@ import {
 import {
   holdDeprecations,
   promotionDraft,
+  withRedraft,
   retirementDraft,
   STAGES,
   variantPromotionDraft,
@@ -72,7 +74,7 @@ import {
 } from "./stages";
 import { cardKey } from "./link";
 import type { DrawnProposal, ProposalRecords } from "./proposal-records";
-import { DRAFT_COST, DRAFT_JOBS, MATCH_COST, MATCH_JOBS } from "./budget";
+import { DRAFT_COST, DRAFT_JOBS, EVIDENCE_COST, MATCH_COST, MATCH_JOBS, PROMOTION_REDRAFT_COST } from "./budget";
 
 export { DRAFT_COST, DRAFT_JOBS, MATCH_COST, MATCH_JOBS };
 /** The section's name on the sweep's morning post. */
@@ -198,8 +200,8 @@ export interface ShippedDeps {
   ownerOf(card: ShippedCard): Promise<string | null>;
   /** The card's place by the posting ladder; null when none is configured. */
   placeOf(card: ShippedCard): string | null;
-  /** Bill's Slack id (`LEAD_USER_ID`), the other confirmer. */
-  billId: string | null;
+  /** The lead's Slack id (`LEAD_USER_ID`), the other confirmer. */
+  leadId: string | null;
   state: Store<UpkeepState>;
   weighed: WeighedMarks;
   /** What the alarm has left; unbounded when absent. */
@@ -363,7 +365,7 @@ async function weigh(deps: ShippedDeps, card: ShippedCard, state: Settled): Prom
       const channel = deps.placeOf(card);
       if (!channel) return "no place to post";
       const owner = await deps.ownerOf(card);
-      const confirmers = [...new Set([owner, deps.billId].filter((id): id is string => !!id))];
+      const confirmers = [...new Set([owner, deps.leadId].filter((id): id is string => !!id))];
       if (!confirmers.length) return "nobody to confirm";
       return { source: { pageId: card.pageId, url: card.url, title: card.title, number: card.number, status, quote }, channel, owner, confirmers };
     };
@@ -381,13 +383,40 @@ async function weigh(deps: ShippedDeps, card: ShippedCard, state: Settled): Prom
     }
 
     const promoted: WaitingRevision[] = [];
+    let words: string | null = null;
     for (const p of handedOff) {
       const today = await deps.readPath(p.cellId);
-      const draft = today ? promotionDraft(p, today) : null;
-      if (!today || !draft) continue;
+      const promotion = today ? promotionDraft(p, today) : null;
+      if (!today || !promotion) continue;
+      // What changed between the hand-off and the deploy, on the same card.
+      const unchecked = (why: string): Draft => ({
+        ...promotion,
+        gaps: [...promotion.gaps, `not checked against the card's words at the deploy: ${why}, so only the hand-off's cells are promoted`],
+      });
+      let draft: Draft;
+      if (headroom(deps) < PROMOTION_REDRAFT_COST - (words === null ? 0 : EVIDENCE_COST)) {
+        draft = unchecked("this run's budget was spent");
+      } else {
+        try {
+          words ??= await deps.evidence(card);
+          draft = withRedraft(promotion, await draftRevision(deps.provider, { title: card.title, text: words, today, target }), today);
+        } catch (err) {
+          rethrowIfBudget(err);
+          console.warn(`[blueprint-upkeep] ${card.title}: deploy redraft failed: ${err instanceof Error ? err.message : String(err)}`);
+          draft = unchecked("the redraft failed");
+        }
+      }
       const routed = await route(p.quote);
       if (typeof routed === "string") return routed;
-      promoted.push({ ...routed, today, draft, key: `${weighedKey(card.pageId, card.stage)}|${revisionTitle(today)}`, cellId: p.cellId, target });
+      promoted.push({
+        ...routed,
+        today,
+        draft,
+        key: `${weighedKey(card.pageId, card.stage)}|${revisionTitle(today)}`,
+        cellId: p.cellId,
+        target,
+        ...(words !== null ? { text: words.slice(0, MAX_KEPT_TEXT) } : {}),
+      });
     }
     if (promoted.length) return { paths: [], promoted };
 
@@ -669,7 +698,7 @@ export function revisionSection(deps: SectionDeps, handOff: SectionHandOff<Revis
     handOff,
     cardsOf(value) {
       return {
-        cards: value.revisions.map((r, i) => ({ person: r.owner, item: revisionItem(r.source, r.today, r.draft, r.owner, i + 1) })),
+        cards: value.revisions.map((r, i) => ({ person: r.owner, item: revisionItem(r.source, r.today, r.draft, r, i + 1) })),
         ttlMs: REVISION_CARD_TTL_MS,
         overflowInThread: true,
         says: (ids) => revisionParent(ids.length),
@@ -771,7 +800,7 @@ export async function postOverflow(deps: OverflowDeps, opts: { dryRun?: boolean 
       const { channel, ts } = group[0]!.overflow!;
       const shown = group.slice(0, MAX_REPORT_ITEMS);
       if ((deps.meter?.headroom().d1Queries ?? Infinity) < shown.length * STAGING_D1_QUERIES + 2) break;
-      const items = group.map((r) => revisionItem(r.source, r.today, r.draft, r.owner, r.overflow!.n));
+      const items = group.map((r) => revisionItem(r.source, r.today, r.draft, r, r.overflow!.n));
       const report = decisionReport(items, overflowParent(group.length), { channel });
       const messageTs = await deps.postReport(channel, ts, report, REVISION_CARD_TTL_MS);
       threads += 1;
@@ -819,7 +848,7 @@ export async function replanRows(state: Store<UpkeepState>, record: PlannedRows)
 
 /** A revision card's line for a turn that would revise it: its thread revises it. */
 export const REVISION_REDRAFT_POINTER =
-  "To change this blueprint revision, its owner or Bill replies in this thread with what's wrong, starting with the card's number when there are several — uno-bot redrafts it on the same card.";
+  "To change this blueprint revision, someone who can approve it replies in this thread with what's wrong, starting with the revision's number when there are several — uno-bot redrafts it in its place.";
 
 /**
  * One revision's card as ThreadState stages it: one item of its report, whose
@@ -838,7 +867,7 @@ export function stagedRevision(
   opts: { threadTs?: string; itemId?: string; ttlMs?: number } = {},
 ): PendingProposal {
   const gate = revisionCard(r.draft.revision, r.confirmers);
-  const card = revisionProposalCard(r.source, r.today, r.draft, gate.operations![0]!);
+  const card = revisionProposalCard(r.source, r.today, r.draft, r.confirmers, gate.operations![0]!);
   const thread = opts.threadTs ?? messageTs;
   return {
     ...gate,

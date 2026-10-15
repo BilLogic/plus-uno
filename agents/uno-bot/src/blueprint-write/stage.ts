@@ -9,7 +9,7 @@ import type { BlueprintRevision } from "./revision";
  * stages beside its own text, blocks, thread and lifetime.
  *
  * The confirmers are exactly the people named — for a shipped card its owner
- * and Bill, for a drawn proposal its requester — and the deployment's standing
+ * and the lead, for a drawn proposal its requester — and the deployment's standing
  * confirmers are NOT added (`exclusiveConfirmers`): product truth changes only
  * with the person who shipped it or the person who makes product calls.
  *

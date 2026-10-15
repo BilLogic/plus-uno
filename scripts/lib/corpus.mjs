@@ -427,7 +427,7 @@ function parseFields(lines, { structured = false } = {}) {
       while (i + 1 < lines.length && (lines[i + 1].startsWith('  ') || lines[i + 1].trim() === '')) {
         const sub = lines[++i];
         // A comment-only line is a continuation of the line above's comment —
-        // `trigger_types` in the Actions prompts wraps one over two lines.
+        // a list item whose comment wraps over two lines.
         if (!sub.trim() || sub.trim().startsWith('#')) continue;
         const seq = /^\s+-\s+(.+?)\s*(?:#.*)?$/.exec(sub);
         if (seq) {

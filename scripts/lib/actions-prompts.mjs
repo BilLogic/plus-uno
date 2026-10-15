@@ -1,48 +1,36 @@
 /**
- * Who is in the Actions embodiment, asked of the loader's own root.
+ * The headless prompts' corpus, by where it lives: every `.md` under
+ * `scripts/prompts/`.
  *
- * uno has three embodiments — the IDE, the uno-bot Worker, and headless GitHub
- * Actions (`AGENTS.md` § The loading contract names all three). The first two are swept by
- * `check:negation` and by the harness name sweep because the bundler can name
- * their members: a doc under a section root declares `embodiment:` and the
- * bundler walks for it (`bundled-set.mjs`). The Actions prompts declare
- * nothing, on purpose (#417 § Embodiment stays a document property): they are
- * loaded by `scripts/lib/skill-loader.js` and by the sweep workflows'
- * `prompt-file:`, never bundled, so a frontmatter value would be a claim
- * nothing reads. What they need is to be swept — and until #425 they were not,
- * because every sweep took its corpus from the bundler and the bundler has
- * never heard of them.
+ * What is left there is the shared headless-intake contract
+ * (`references/headless-intake.md`) that an automation filing GitHub issues
+ * follows — the Worker's Figma snapshot refresh among them. The GitHub Actions
+ * adapters that once lived beside it (the shipped watchdog, the integrity
+ * sweep, the implement builds) are deleted, and with them the loader that
+ * handed them to a model. The directory stays swept because the contract is
+ * agent-facing text: `check:negation`'s `actions` scope and the harness name
+ * sweep (`agents/uno-bot/tests/harness-blueprint-names.test.ts`) both read
+ * this list. It carries no `embodiment:` and is never bundled, so the
+ * bundler's walk cannot name it (#425).
  *
- * THIS IS THE THIRD SUBJECT SET, LISTED BY WHERE IT LIVES. Membership is the
- * loader's own root, `scripts/prompts/`, walked for every `.md`: the five
- * adapters' `SKILL.md`, their `references/`, and the shared headless-intake
- * contract every sweep adapter points at. Faking `embodiment:` onto them to
- * ride the bundler's walk was the option not taken — it would have put the
- * Actions prompts under a bundler that must then be taught to skip them, which
- * is a second membership rule dressed as the first.
- *
- * ONE WALK, TWO CALLERS. `check:negation`'s `actions` scope and
- * `agents/uno-bot/tests/harness-blueprint-names.test.ts` both read this list.
- * A second glob in the test would be the one-rule-two-homes defect one level
- * down (#159, #216); the test imports this by file URL instead, since its
- * compiled output lives under `.test-build/` where a relative import cannot
- * reach it.
- *
- * The root itself is IMPORTED from the loader, not restated: the corpus is
- * "whatever the loader can reach", and a loader moved to a new directory moves
- * this walk with it.
+ * ONE WALK, TWO CALLERS. A second glob in the test would be the
+ * one-rule-two-homes defect one level down (#159, #216); the test imports this
+ * by file URL instead, since its compiled output lives under `.test-build/`
+ * where a relative import cannot reach it.
  */
 
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { documents } from './corpus.mjs';
-import { PROMPTS_ROOT } from './skill-loader.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
 
-/** The Actions prompts' root, repo-relative — `scripts/prompts`. */
+/** The headless prompts' root, absolute. */
+export const PROMPTS_ROOT = path.join(REPO_ROOT, 'scripts', 'prompts');
+
+/** The headless prompts' root, repo-relative — `scripts/prompts`. */
 export const ACTIONS_PROMPTS_DIR = path.relative(REPO_ROOT, PROMPTS_ROOT).split(path.sep).join('/');
 
 /**
@@ -60,10 +48,10 @@ export function walkPromptDocs(root) {
 }
 
 /**
- * The Actions prompts, as repo-relative paths in the shape `resolveBundled`
+ * The headless prompts, as repo-relative paths in the shape `resolveBundled`
  * reads — the same shape the other two scopes hand it.
  *
- * @returns {string[]} sorted, e.g. `scripts/prompts/uno-integrity-sweep/SKILL.md`.
+ * @returns {string[]} sorted, e.g. `scripts/prompts/references/headless-intake.md`.
  */
 export function actionsPromptFiles() {
   return walkPromptDocs(PROMPTS_ROOT).map((rel) => `${ACTIONS_PROMPTS_DIR}/${rel}`);

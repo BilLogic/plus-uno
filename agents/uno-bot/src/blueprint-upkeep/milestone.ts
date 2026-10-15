@@ -8,9 +8,11 @@
 // comparison: that path's steps today as `step (lane)`, the idea's own words
 // beside them, and a link into the blueprint app.
 //
-// AT MOST ONCE PER THREAD PER SCENARIO, claimed in the thread's store before
-// the path is read, so a repeat costs a judgement and a search and nothing
-// more. Nothing is written anywhere: the comparison is words in a reply.
+// AT MOST ONCE PER THREAD PER SCENARIO, claimed in the thread's store once the
+// path is read and the comparison is ready to show, so a read that fails
+// leaves the offer for the next milestone. A repeat costs the judgement, the
+// search and the read, and shows nothing. Nothing is written anywhere: the
+// comparison is words in a reply.
 //
 // WHAT IS NOT A MILESTONE. An answer, a critique (a turn that read
 // `critique-a-design`), and a reply that names `uno-prototype` without the
@@ -27,13 +29,15 @@
 //
 // PURE: the gate, the path read, the claim and the budget arrive as ports.
 
+import { rethrowIfBudget } from "../net";
 import type { ThreadRef } from "../thread-state/index";
+import { GATE_SUBREQUESTS, PATH_READ_COST } from "./budget";
 import type { PathToday } from "./draft";
 import type { ServiceChangeGate, ServiceChangeInput } from "./gate";
 
-/** External subrequests one comparison may spend: the judgement (1), the
- *  search (up to 3) and the path read (4). */
-export const COMPARISON_SUBREQUESTS = 8;
+/** External subrequests one comparison may spend: the gate's judgement and
+ *  search, then the path read. */
+export const COMPARISON_SUBREQUESTS = GATE_SUBREQUESTS + PATH_READ_COST;
 /** Steps shown before the rest are counted. */
 const MAX_STEPS = 8;
 /** The bot skill whose turns are critique, never a milestone. */
@@ -145,8 +149,8 @@ export function comparisonText(today: PathToday, quote: string): string {
 }
 
 /**
- * The comparison at a milestone, over its ports. Fails quiet: any error is no
- * comparison, and the reply goes out as it was.
+ * The comparison at a milestone, over its ports. Fails quiet past a budget
+ * stop: any other error is no comparison, and the reply goes out as it was.
  *
  * @param deps - The gate, the path read, the thread's claim and the budget
  */
@@ -160,12 +164,13 @@ export function milestoneComparison(deps: ComparisonDeps): MilestoneComparison {
         return null;
       }
       const { scenario, path, cellId } = gated.match;
+      const today = await deps.readPath(cellId);
+      if (!today) return null;
+      // Claimed only now: a failed read leaves the offer for the next milestone.
       if (!(await deps.firstInThread(ref, scenario))) {
         console.log(`[milestone] ${milestone.kind}: ${scenario} already compared in this thread`);
         return null;
       }
-      const today = await deps.readPath(cellId);
-      if (!today) return null;
       return {
         milestone: milestone.kind,
         scenario,
@@ -176,6 +181,7 @@ export function milestoneComparison(deps: ComparisonDeps): MilestoneComparison {
         text: comparisonText(today, gated.quote),
       };
     } catch (err) {
+      rethrowIfBudget(err);
       console.warn(`[milestone] comparison skipped: ${err instanceof Error ? err.message : String(err)}`);
       return null;
     }

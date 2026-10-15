@@ -14,7 +14,7 @@ import { runSweepJob, type SweepThread } from "../src/sweep/index";
 import { chainReplyHandlers, runMessageJob } from "../src/slack/message-job";
 import type { SlackMessageEvent } from "../src/slack/types";
 import { sweepHooks, threadHooks } from "../src/scheduled/jobs";
-import { replyHandlerAt, replyHandlersFor } from "../src/slack/events";
+import { replyHandlerAt, replyHandlersFor, reviewNoteHandler } from "../src/slack/events";
 import { toActiveCard } from "../src/follow-through/notion";
 import type { Env } from "../src/types";
 import {
@@ -1795,6 +1795,13 @@ describe("wiring", () => {
     const reply = { type: "message", channel: DESIGN, thread_ts: "1790700000.000100", ts: "1790700100.000100", user: MAYA, text: "Shipped" } as SlackMessageEvent;
     assert.equal(card.candidate(reply), true, "a short reply in a design thread is the card handler's to check");
     assert.equal(card.candidate({ ...reply, thread_ts: undefined }), false, "a top-level message is never a follow-up reply");
+  });
+
+  it("a Review note goes to a Figma decision's or a blueprint revision's own handler, and every other card's to the turn", () => {
+    assert.equal(reviewNoteHandler("figma-decisions"), "figma-decisions");
+    assert.equal(reviewNoteHandler("blueprint-revisions"), "blueprint-revisions");
+    assert.equal(reviewNoteHandler("follow-through"), null);
+    assert.equal(reviewNoteHandler(null), null);
   });
 });
 

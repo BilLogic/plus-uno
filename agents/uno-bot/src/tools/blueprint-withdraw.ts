@@ -2,16 +2,15 @@
 // a ✅ from the person who drew the proposal: its cells and then its path
 // deleted through the delete RPCs under uno-bot's own identity, and its record
 // marked withdrawn. What it decides is `blueprint-upkeep/proposal-cleanup.ts`;
-// this file binds `Env`, holds the press to its subrequest budget (ADR-022)
-// and tells the thread.
+// this file binds `Env`, and the press's shared steps — its refusals before
+// any call, the thread told — are `./blueprint-press.ts`.
 
 import type { Env, SlackContext } from "../types";
-import { budgetHeadroom, rethrowIfBudget } from "../net";
-import { postMessage } from "../slack/api";
-import { blueprintRpcFor, signInCalls, writeIdentityGap } from "../blueprint-write/index";
+import { rethrowIfBudget } from "../net";
+import { blueprintRpcFor } from "../blueprint-write/index";
 import { readWithdrawal, withdrawalRefusal, withdrawalWriteCalls, withdrawProposal } from "../blueprint-upkeep/proposal-cleanup";
 import { createD1ProposalRecords } from "../blueprint-upkeep/proposal-records-d1";
-import { PRESS_RESERVE } from "./blueprint-revise";
+import { pressRefusalOn, threadTeller } from "./blueprint-press";
 
 const cells = (n: number) => `${n} ${n === 1 ? "cell" : "cells"}`;
 
@@ -20,16 +19,7 @@ export async function executeBlueprintWithdraw(env: Env, input: Record<string, u
   const w = readWithdrawal(input);
   if ("error" in w) return JSON.stringify({ ok: false, error: w.error });
 
-  const tell = async (text: string) => {
-    if (slack.batched) return;
-    const thread = slack.replyTs ?? slack.threadTs;
-    try {
-      await postMessage(env, { channel: slack.channel, ...(thread ? { thread_ts: thread } : {}), text });
-    } catch (err) {
-      rethrowIfBudget(err);
-      console.warn(`[blueprint] removal result not posted: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  };
+  const tell = threadTeller(env, slack, "removal result");
 
   // The record as it stands now, not as it stood when the card went up.
   const records = env.USAGE_DB ? createD1ProposalRecords({ db: env.USAGE_DB }) : null;
@@ -40,15 +30,13 @@ export async function executeBlueprintWithdraw(env: Env, input: Record<string, u
     return JSON.stringify({ ok: false, error: text });
   }
 
-  const gap = writeIdentityGap(env);
-  if (gap) return JSON.stringify({ ok: false, error: gap });
-  const cost = signInCalls(env) + withdrawalWriteCalls(w);
-  const headroom = budgetHeadroom().subrequests - PRESS_RESERVE;
-  if (cost > headroom) {
-    return JSON.stringify({
-      ok: false,
-      error: `removing this proposal needs up to ${cost} blueprint calls and the press has ${Math.max(0, headroom)} left; nothing was removed`,
-    });
+  const pressRefusal = pressRefusalOn(env, () => withdrawalWriteCalls(w), {
+    needs: "removing this proposal needs",
+    nothing: "nothing was removed",
+  });
+  if (pressRefusal) {
+    await tell(`The proposal was not removed: ${pressRefusal}.`);
+    return JSON.stringify({ ok: false, error: pressRefusal });
   }
 
   const result = await (async () => {

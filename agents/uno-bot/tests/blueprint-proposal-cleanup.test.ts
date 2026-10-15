@@ -1,6 +1,8 @@
-// Offering a drawn proposal's removal: the morning check's job seam
-// (`offerAgedRemovals`) and the in-thread ask (`offerRequestedRemoval`), over
-// the in-memory records with Slack and the Gate's staging as recording fakes.
+// Offering a drawn proposal's removal: the morning check, handed to the
+// sweep's post as a section in the proposal's own thread
+// (`handOverAgedRemovals`, `removalOfferSection`, run through the real sweep
+// on its harness), and the in-thread ask (`offerRequestedRemoval`), over the
+// in-memory records with Slack and the Gate's staging as recording fakes.
 // What happens on the card's ✅ is `blueprint-proposal-withdraw.test.ts`.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
@@ -11,18 +13,25 @@ import {
   type ProposalRecords,
 } from "../src/blueprint-upkeep/index";
 import {
+  handOverAgedRemovals,
   isRemoveRequest,
   OFFER_AFTER_MS,
-  offerAgedRemovals,
   offerRequestedRemoval,
+  REMOVAL_OFFER_SECTION,
+  removalOfferSection,
   WITHDRAW_TOOL,
   type OfferDeps,
+  type RemovalHanded,
 } from "../src/blueprint-upkeep/proposal-cleanup";
-import type { PendingProposal } from "../src/thread-state/index";
+import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
+import { sectionHandOffIn } from "../src/sweep/sections";
+import { runSweepJob } from "../src/sweep/index";
+import { memoryRunStorage, sweepHarness } from "./helpers/sweep-harness";
 import type { ProposalCard } from "../src/turn/delivery";
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1_800_000_000_000;
+const DATE = new Date(NOW).toISOString().slice(0, 10);
 
 function drawn(over: Partial<DrawnProposal> = {}): DrawnProposal {
   return {
@@ -64,17 +73,53 @@ async function recordAll(records: ProposalRecords, ...ps: DrawnProposal[]) {
   for (const p of ps) await records.record(p);
 }
 
+/** The morning: the check hands its offers over, then the sweep's post puts
+ *  each on the proposal's own thread as a section of one message. */
+function morning(records: ProposalRecords, opts: { stageFails?: Set<string>; notInChannel?: string[] } = {}) {
+  const threadState = createInMemoryThreadState({ now: () => NOW });
+  const handOff = sectionHandOffIn<RemovalHanded>(memoryRunStorage(), REMOVAL_OFFER_SECTION);
+  const staged: PendingProposal[] = [];
+  const section = removalOfferSection(
+    {
+      records,
+      async stage(proposal) {
+        const input = proposal.input as { proposalTs: string };
+        if (opts.stageFails?.has(input.proposalTs)) throw new Error("thread state unavailable");
+        staged.push(proposal);
+        await threadState.putProposal(proposal);
+      },
+      linkOf: (p) => `https://blueprint.example/?cell=${p.cellIds[0] ?? ""}`,
+      now: () => NOW,
+    },
+    handOff,
+    DATE,
+  );
+  const h = sweepHarness({ channels: {}, now: NOW, runDate: DATE, threadState });
+  for (const c of opts.notInChannel ?? []) h.notInChannel.add(c);
+  h.deps.sections = [section];
+  return {
+    posts: h.posted,
+    staged,
+    async run(run: { dryRun?: boolean } = {}) {
+      const handed = await handOverAgedRemovals({ records, now: () => NOW, handOff, date: DATE }, run);
+      if (!run.dryRun) await runSweepJob({ key: "sweep-post", kind: "sweep-post" }, h.deps);
+      return handed;
+    },
+  };
+}
+
 describe("the morning check", () => {
-  it("offers an unlinked proposal past 30 days to the person who drew it, in its own thread, on a card only they decide", async () => {
+  it("offers an unlinked proposal past 30 days on the morning message, in the proposal's own thread, on a card only its requester decides", async () => {
     const records = createInMemoryProposalRecords();
     await recordAll(records, drawn());
-    const { deps, posts, staged } = world(records);
-    const report = await offerAgedRemovals(deps);
-    assert.equal(report.offered, 1);
-    assert.equal(posts.length, 1);
-    assert.equal(posts[0]!.p.replyTs, "t1");
-    assert.match(posts[0]!.card.lead ?? "", /no Roadmap card has been linked to it in 30 days/);
-    const [card] = staged;
+    const m = morning(records);
+    const report = await m.run();
+    assert.equal(report.handed, 1);
+    assert.equal(m.posts.length, 1, "one message: the sweep's, not a post of its own");
+    assert.equal(m.posts[0]!.channel, "C0TEAM");
+    assert.equal(m.posts[0]!.threadTs, "t1", "in the proposal's own thread");
+    assert.match(m.posts[0]!.text, /U0MAYA/, "the opener tags the person who drew it");
+    const [card] = m.staged;
     assert.ok(card);
     assert.equal(card.toolName, WITHDRAW_TOOL);
     assert.deepEqual(card.input, { proposalTs: "1.1", pathId: "path-new", cellIds: ["cell-a"], reason: "aged" });
@@ -82,16 +127,16 @@ describe("the morning check", () => {
     assert.equal(card.exclusiveConfirmers, true);
     assert.equal(card.channel, "C0TEAM");
     assert.equal(card.threadTs, "t1");
+    assert.match(card.proposalText, /no Roadmap card has been linked to it in 30 days/);
   });
 
   it("offers it once: the next morning finds nothing to offer", async () => {
     const records = createInMemoryProposalRecords();
     await recordAll(records, drawn());
-    const first = world(records);
-    await offerAgedRemovals(first.deps);
-    const second = world(records);
-    const report = await offerAgedRemovals(second.deps);
-    assert.equal(report.offered, 0);
+    await morning(records).run();
+    const second = morning(records);
+    const report = await second.run();
+    assert.equal(report.handed, 0);
     assert.deepEqual(second.posts, []);
   });
 
@@ -99,9 +144,9 @@ describe("the morning check", () => {
     const records = createInMemoryProposalRecords();
     await recordAll(records, drawn({ writtenAt: NOW - 200 * DAY }));
     await records.linkCard("C0TEAM", "t1", "page-a");
-    const { deps, posts } = world(records);
-    await offerAgedRemovals(deps);
-    assert.deepEqual(posts, []);
+    const m = morning(records);
+    await m.run();
+    assert.deepEqual(m.posts, []);
   });
 
   it("waits for a proposal under 30 days, and never offers one already withdrawn", async () => {
@@ -109,51 +154,54 @@ describe("the morning check", () => {
     await recordAll(
       records,
       drawn({ proposalTs: "1.1", writtenAt: NOW - OFFER_AFTER_MS + DAY }),
-      drawn({ proposalTs: "1.2", threadTs: "t2", writtenAt: NOW - 60 * DAY }),
+      drawn({ proposalTs: "1.2", threadTs: "t2", replyTs: "t2", writtenAt: NOW - 60 * DAY }),
     );
     await records.withdraw("1.2", NOW - DAY);
-    const { deps, posts } = world(records);
-    await offerAgedRemovals(deps);
-    assert.deepEqual(posts, []);
+    const m = morning(records);
+    await m.run();
+    assert.deepEqual(m.posts, []);
   });
 
-  it("an offer Slack refused is not counted as made, so the next morning offers it", async () => {
+  it("a morning message that did not go up uses nothing: the next morning offers it", async () => {
     const records = createInMemoryProposalRecords();
     await recordAll(records, drawn());
-    const refused = world(records, { refuse: new Set(["1.1"]) });
-    await offerAgedRemovals(refused.deps);
+    const refused = morning(records, { notInChannel: ["C0TEAM"] });
+    await refused.run();
     assert.deepEqual(refused.staged, []);
-    const next = world(records);
-    assert.equal((await offerAgedRemovals(next.deps)).offered, 1);
+    const next = morning(records);
+    await next.run();
+    assert.equal(next.staged.length, 1);
+  });
+
+  it("an offer shown but not staged is not counted as made, so the next morning offers it again", async () => {
+    const records = createInMemoryProposalRecords();
+    await recordAll(records, drawn());
+    const failed = morning(records, { stageFails: new Set(["1.1"]) });
+    await failed.run();
+    assert.deepEqual(failed.staged, []);
+    assert.equal((await records.dueForOffer(NOW, 10)).length, 1, "the claim is not taken");
+    const next = morning(records);
+    await next.run();
+    assert.equal(next.staged.length, 1);
   });
 
   it("a rehearsal posts, stages and marks nothing", async () => {
     const records = createInMemoryProposalRecords();
     await recordAll(records, drawn());
-    const dry = world(records);
-    const report = await offerAgedRemovals(dry.deps, { dryRun: true });
+    const dry = morning(records);
+    const report = await dry.run({ dryRun: true });
     assert.match(report.summary, /would offer the removal of 1/);
     assert.deepEqual(dry.posts, []);
     assert.equal((await records.dueForOffer(NOW, 10)).length, 1);
   });
 
-  it("stops before the alarm's budget runs out, and the rest wait for the next morning", async () => {
+  it("each proposal's offer goes in its own thread", async () => {
     const records = createInMemoryProposalRecords();
-    await recordAll(records, drawn({ proposalTs: "1.1" }), drawn({ proposalTs: "1.2", threadTs: "t2" }));
-    const { deps, posts } = world(records);
-    // Room for one offer: its post and its staging.
-    let left = 2;
-    const report = await offerAgedRemovals({
-      ...deps,
-      postCard: async (p, card) => {
-        left -= 2;
-        return deps.postCard(p, card);
-      },
-      meter: { headroom: () => ({ subrequests: left, d1Queries: 100 }) },
-    });
-    assert.equal(posts.length, 1);
-    assert.match(report.summary, /1 wait for the next morning/);
-    assert.equal((await records.dueForOffer(NOW, 10)).length, 1);
+    await recordAll(records, drawn({ proposalTs: "1.1" }), drawn({ proposalTs: "1.2", threadTs: "t2", replyTs: "t2" }));
+    const m = morning(records);
+    await m.run();
+    assert.deepEqual(m.posts.map((p) => p.threadTs).sort(), ["t1", "t2"]);
+    assert.equal(m.staged.length, 2);
   });
 });
 

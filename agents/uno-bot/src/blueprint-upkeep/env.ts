@@ -7,13 +7,14 @@
 //   • the evidence: the card's page text and its PRD's (`readNotionPage`,
 //     through `cardEvidence`);
 //   • the gate's search: `search_blueprint`'s read (`searchBlueprint`);
-//   • the path read: four anon-key PostgREST reads of uno-blueprint — the
-//     matched cell's path, then that path's cells, lanes and ordered steps;
+//   • the path read: five anon-key PostgREST reads of uno-blueprint — the
+//     matched cell's path, then that path, its cells, lanes and ordered steps
+//     (`PATH_READ_COST`);
 //   • the model: the Worker's provider (`selectProvider`), one tier a call;
 //   • the owner: the card's first Contributor, through the Team Members
 //     directory then by name (card follow-ups' `peopleFor`);
 //   • the place: card follow-ups' ladder (`cardPlace`);
-//   • Bill: `LEAD_USER_ID`, the deployment's lead;
+//   • the lead: `LEAD_USER_ID`, the deployment's lead, the other confirmer;
 //   • the state: one JSON record in HARNESS_KV; each card's weighed mark a
 //     key of its own there, kept for good; each revision thread a key too;
 //   • a turn's milestone comparison: the same gate, search and path read, and
@@ -26,25 +27,29 @@
 //   • a linked card's proposals: one D1 query, then each variant path read
 //     (5) and, at a deploy, the path it was drawn beside by its id (4) —
 //     three path reads at most, inside `MATCH_COST`;
-//   • a drawn proposal's removal: a ✅ card posted under the proposal's
-//     thread and staged as a revision card is (`proposalOfferDepsFor`), on a
-//     removal ask there or from the morning's `blueprint-proposal-offer`
-//     check — one post, one staging and a few D1 queries an offer
-//     (`./proposal-cleanup.ts`).
+//   • a drawn proposal's removal: a ✅ card under the proposal's thread,
+//     staged as a revision card is — posted there on a removal ask
+//     (`proposalOfferDepsFor`), or, from the morning's
+//     `blueprint-proposal-offer` check, handed to the sweep's message as a
+//     section in that thread (`removalOfferSectionFor`): one staging and a few
+//     D1 queries an offer (`./proposal-cleanup.ts`).
 //
 // Budget (ADR-022), against the 38-subrequest lookup ceiling of one alarm,
 // each job sized by cost, not by a count (`./budget.ts`).
 // A match job: the Roadmap query (1, the first job only) and the model's
-// token (1), then per card a deploy's promotion try — the path read (5) —
-// and, failing that, the page and up to three block pages (4), its one PRD
+// token (1), then per card a deploy's promotion try — the path read (5), and
+// when it promotes, the card's words (8) and one redraft (2) before the owner
+// (2): 17 — and, failing that, the page and up to three block pages (4), its one PRD
 // the same (4), the judgement (1), the search (≤3) and a Slack lookup or two
 // for the owner: `MATCH_COST` (20) at the worst. A draft job: the token,
 // then per path the path read (5) and the draft, grind then default (2):
 // `DRAFT_COST` (7). A job starts a card or a path only while the alarm's
-// headroom covers that worst case, so two PRD-heavy cards fill a match job
-// and a light night fits several; a card that still overruns stops on the
-// ceiling and its job is deferred, the cards before it kept. What a night's
-// jobs do not reach waits on the cursor and the queue for the next.
+// headroom covers that worst case: after the first job's 2, 36 is left, so
+// one PRD-heavy card (20) leaves 16 and fills its job, while a light card
+// leaves room for another; across `MATCH_JOBS` that is six PRD-heavy cards a
+// night at the least. A card that still overruns stops on the ceiling and its
+// job is deferred, the cards before it kept. What a night's jobs do not reach
+// waits on the cursor and the queue for the next.
 
 import type { Env } from "../types";
 import { budgetHeadroom, charge, countedFetch } from "../net";
@@ -57,7 +62,7 @@ import { selectProvider } from "../agent/run-agent";
 import { channelIdsFor } from "../destination/env";
 import { queryRowsWithAnyStatus, readNotionPage } from "../integrations/notion";
 import { searchBlueprint, isBlueprintConfigured } from "../integrations/blueprint";
-import { cellUrl } from "../integrations/blueprint-link";
+import { appRootUrl, cellUrl } from "../integrations/blueprint-link";
 import { ENTITY_STATUSES, type EntityStatus } from "../blueprint-write/index";
 import { kvJson } from "../figma-poll";
 import { measured } from "../sweep/env";
@@ -78,7 +83,15 @@ import { draftProposal, drawnProposalOf, PROPOSAL_OFFER_SUBREQUESTS, type Propos
 import { createD1ProposalRecords } from "./proposal-records-d1";
 import { keepProposalLinks, prdCardOf, type ThreadCards } from "./link";
 import type { ProposalRecords } from "./proposal-records";
-import { isRemoveRequest, offerAgedRemovals, offerRequestedRemoval, type OfferDeps } from "./proposal-cleanup";
+import {
+  handOverAgedRemovals,
+  isRemoveRequest,
+  offerRequestedRemoval,
+  REMOVAL_OFFER_SECTION,
+  removalOfferSection,
+  type OfferDeps,
+  type RemovalHanded,
+} from "./proposal-cleanup";
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
 import type { OperationOutcome } from "../gate/index";
 import { cardEvidence } from "./evidence";
@@ -287,7 +300,7 @@ function shippedDepsFor(env: Env): ShippedDeps | string {
         return first ? people.slackIdForNotionUser(first.id, first.name) : null;
       },
       placeOf: (card) => cardPlace(card, config),
-      billId: env.LEAD_USER_ID?.trim() || null,
+      leadId: env.LEAD_USER_ID?.trim() || null,
       state: stateFor(env),
       weighed: weighedOn(env.HARNESS_KV),
       meter: { headroom: budgetHeadroom },
@@ -581,15 +594,57 @@ export async function handleWithdrawRequestOnEnv(env: Env, event: SlackMessageEv
   return offerRequestedRemoval(deps, { channel: event.channel, threadTs: conversation, user: event.user, text: unmentioned(event.text) });
 }
 
+/** Where a proposal opens in the blueprint app — its first cell, else the
+ *  app — or null without `BLUEPRINT_APP_URL`, when an offer has no link. */
+function proposalLinkOn(env: Env): ((p: { cellIds: string[] }) => string) | null {
+  const root = appRootUrl(env.BLUEPRINT_APP_URL);
+  if (!root) return null;
+  return (p) => (p.cellIds[0] ? cellUrl(env.BLUEPRINT_APP_URL, p.cellIds[0]) : undefined) ?? root;
+}
+
 /**
- * The morning's removal offers (`blueprint-proposal-offer`) on `Env`.
+ * The morning's removal offers (`blueprint-proposal-offer`) on `Env`: each
+ * due proposal handed to the sweep's message, in its own thread.
  *
  * @param env - Worker bindings
- * @param opts - `dryRun` posts and marks nothing
+ * @param opts - The morning run; `dryRun` hands nothing over
  */
 export async function runProposalOffersOnEnv(env: Env, opts: JobContext): Promise<{ summary: string }> {
   if (!isBlueprintConfigured(env)) return { summary: "uno-blueprint not configured — no removal offered" };
-  const deps = proposalOfferDepsFor(env);
-  if (!deps) return { summary: "USAGE_DB not bound — no drawn proposals to look at" };
-  return offerAgedRemovals({ ...deps, now: () => Date.now(), meter: { headroom: budgetHeadroom } }, { dryRun: opts.dryRun });
+  const records = proposalRecordsFor(env);
+  if (!records) return { summary: "USAGE_DB not bound — no drawn proposals to look at" };
+  if (!proposalLinkOn(env)) return { summary: "BLUEPRINT_APP_URL not set — no removal offered" };
+  return handOverAgedRemovals(
+    {
+      records,
+      now: () => Date.now(),
+      ...(opts.runStorage ? { handOff: sectionHandOffIn<RemovalHanded>(opts.runStorage, REMOVAL_OFFER_SECTION) } : {}),
+      date: opts.runDate,
+    },
+    { dryRun: opts.dryRun },
+  );
+}
+
+/**
+ * The removal offers' section of the sweep's morning message, or undefined
+ * without the usage database, the blueprint, its app's URL or the run's
+ * storage.
+ *
+ * @param env - Worker bindings
+ * @param opts - The morning run
+ */
+export function removalOfferSectionFor(env: Env, opts: JobContext): SweepSection | undefined {
+  const records = proposalRecordsFor(env);
+  const linkOf = proposalLinkOn(env);
+  if (!records || !linkOf || !isBlueprintConfigured(env) || !opts.runStorage) return undefined;
+  return removalOfferSection(
+    {
+      records,
+      stage: (proposal) => stageRevisionCard(env, proposal),
+      linkOf,
+      now: () => Date.now(),
+    },
+    sectionHandOffIn<RemovalHanded>(opts.runStorage, REMOVAL_OFFER_SECTION),
+    opts.runDate,
+  );
 }

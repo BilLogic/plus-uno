@@ -180,7 +180,7 @@ function world(opts: { cards: () => ShippedCard[]; rows: (card: string) => Bluep
     provider: { name: "metered", generate: async (p: ModelPrompt) => (meterOf.spend(1), ai.provider.generate(p)) } as unknown as ModelProvider,
     ownerOf: async () => (meterOf.spend(2), OWNER),
     placeOf: () => TEAM,
-    billId: BILL,
+    leadId: BILL,
     state: state.store,
     weighed: { has: async (k) => marks.has(k), add: async (k) => void marks.add(k) },
     meter: { headroom: meterOf.headroom },
@@ -365,7 +365,7 @@ describe("a reply in the card's thread", () => {
   it("names the card by number when its writer may approve several", async () => {
     const { m, deps, reply } = await upAndRunning(2);
     assert.equal(await redraftRevision(deps, reply(BILL, "The supervisor is emailed.")), true);
-    assert.match(m.lines.at(-1)!.text, /Which card/, "asked which");
+    assert.match(m.lines.at(-1)!.text, /Which revision/, "asked which");
     const before = m.staged.length;
     assert.equal(await redraftRevision(deps, reply(BILL, "2: The supervisor is emailed.")), true);
     assert.equal(m.staged.length, before + 1);
@@ -430,7 +430,7 @@ describe("a design hand-off redrafted in its thread", () => {
     await endOfDay(w, DATE);
     const m = await morning(w.state);
     const redrafted = "Supervisor is emailed about the request";
-    const kit = redraftKit(w, m, () =>
+    const settled = () =>
       JSON.stringify({
         rows: [
           { change: "added", step_id: "step-request", lane_id: "lane-sup", content: redrafted },
@@ -438,8 +438,8 @@ describe("a design hand-off redrafted in its thread", () => {
         ],
         confidence: 0.8,
         gaps: [],
-      }),
-    );
+      });
+    const kit = redraftKit(w, m, settled);
     assert.equal(await redraftRevision(kit.deps, kit.reply(OWNER, "It's the supervisor who's emailed, at the request.")), true);
 
     // ✅ on the redrafted card writes its rows, as the writer would.
@@ -457,9 +457,14 @@ describe("a design hand-off redrafted in its thread", () => {
 
     // The card deploys: its promotion lists the redrafted rows, nothing of the first draft.
     stage = "deployed";
+    // The card's words now say what the thread settled, so the deploy's
+    // redraft of the path finds nothing to add.
+    const atDeploy = model({ grind: settled });
+    w.deps.provider = atDeploy.provider;
     const asked = w.ai.asked.length;
     await endOfDay(w, "2026-10-17");
-    assert.equal(w.ai.asked.length, asked, "a promotion: no judgement, no draft");
+    assert.equal(w.ai.asked.length, asked, "a promotion: no judgement");
+    assert.equal(atDeploy.asked.length, 1, "one redraft against the card's words now");
     const promoted = (await morning(w.state)).staged;
     assert.equal(promoted.length, 1);
     assert.deepEqual(

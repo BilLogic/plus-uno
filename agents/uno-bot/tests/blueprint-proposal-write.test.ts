@@ -234,7 +234,7 @@ describe("✅ by the person who asked", () => {
 
   it("tells the thread, with a link into the blueprint app", async () => {
     await execute(await decide(REQUESTER));
-    assert.match(appended.join("\n"), /Drew 2 rows on a new proposed path, "Self-serve call-offs", beside Call-off › Standard/);
+    assert.match(appended.join("\n"), /Drew 2 cells on a new proposed path, "Self-serve call-offs", beside Call-off › Standard/);
     assert.match(appended.join("\n"), /plus-uno\.netlify\.app\/blueprint\/\?cell=/);
   });
 

@@ -58,7 +58,7 @@ const NOT_A_SERVICE_CHANGE = JSON.stringify({ changes_service: false, confidence
 
 const IDEA_SUMMARY = "Tutors post their own call-off and the first free tutor claims it. The supervisor only sees the result.";
 
-function world(opts: { replies: ScriptedReply[]; judgements: string[]; threadState?: ThreadState; affordable?: boolean }) {
+function world(opts: { replies: ScriptedReply[]; judgements: string[]; threadState?: ThreadState; affordable?: boolean; unreadable?: boolean }) {
   const threadState = opts.threadState ?? createInMemoryThreadState();
   const gateModel: FakeProvider = fakeProvider({ generateReplies: opts.judgements });
   const searched: string[] = [];
@@ -74,7 +74,7 @@ function world(opts: { replies: ScriptedReply[]; judgements: string[]; threadSta
     }),
     readPath: async (cellId) => {
       pathReads.push(cellId);
-      return TODAY;
+      return opts.unreadable ? null : TODAY;
     },
     firstInThread: (ref, scenario) => threadState.claimComparison(ref, scenario),
     affordable: () => opts.affordable ?? true,
@@ -168,7 +168,19 @@ test("a second milestone on the same scenario in the thread shows nothing; the f
 
   assert.equal(outcome.comparison, undefined);
   assert.doesNotMatch(second.h.delivery.posted.join("\n"), /Call off a session \(Tutor\)/);
-  assert.deepEqual(second.pathReads, [], "a repeat spends no path read");
+  assert.equal(second.gateModel.generated.length, 1, "a repeat still asks the gate which scenario it is");
+});
+
+test("a milestone whose path could not be read leaves the scenario's one comparison for the next", async () => {
+  const threadState = createInMemoryThreadState();
+  const failed = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE], threadState, unreadable: true });
+  const first = await runTurn(request({ text: "turn this thread into a PRD" }), failed.h.deps);
+  assert.equal(first.comparison, undefined);
+
+  const next = world({ replies: [{ text: HAND_OFF }], judgements: [SERVICE_CHANGE], threadState });
+  const outcome = await runTurn(request({ text: "now hand it to the IDE", userMsgTs: "1700000000.000300" }), next.h.deps);
+  assert.equal(outcome.comparison?.scenario, "Call-off", "the failed read did not use up the offer");
+  assert.match(next.h.delivery.posted.join("\n"), /Call off a session \(Tutor\)/);
 });
 
 test("the same scenario in another thread is compared again", async () => {

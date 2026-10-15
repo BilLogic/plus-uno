@@ -111,10 +111,11 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * revision; the morning `blueprint-revision-post` hands each to the sweep's
  * message at its card's place, and `blueprint-revision-thread` puts the ones
  * its carousel had no room for in its thread (src/blueprint-upkeep/). The
- * morning `blueprint-proposal-offer` offers, once, the removal of each
- * proposal drawn on the blueprint that no Roadmap card was linked to within
- * 30 days, on a card in the proposal's own thread that only the person who
- * drew it decides (src/blueprint-upkeep/proposal-cleanup.ts).
+ * morning `blueprint-proposal-offer` hands the sweep's message, once, the
+ * removal offer of each proposal drawn on the blueprint that no Roadmap card
+ * was linked to within 30 days, as a section in the proposal's own thread,
+ * on a card only the person who drew it decides
+ * (src/blueprint-upkeep/proposal-cleanup.ts).
  * Every morning job that finds cards for a team channel hands them to
  * `sweep-post`, which runs after them all, so a place gets one message.
  */
@@ -234,7 +235,7 @@ export const TIDY_JOBS = 5;
 
 /** The morning jobs that hand their cards to the sweep's post, which runs
  *  after them all (src/sweep/sections.ts). */
-const MORNING_SECTIONS = ["commitment-nudge", "ds-precedence-post", FIGMA_DECISIONS_POST_KEY, "figma-drift-post", "figma-tidy-post", "figma-dev-links-post", "blueprint-revision-post"] as const;
+const MORNING_SECTIONS = ["commitment-nudge", "ds-precedence-post", FIGMA_DECISIONS_POST_KEY, "figma-drift-post", "figma-tidy-post", "figma-dev-links-post", "blueprint-revision-post", "blueprint-proposal-offer"] as const;
 
 /** Monday, as `Date.getUTCDay` numbers an ET day. */
 const MONDAY = 1;
@@ -273,15 +274,15 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     },
     { key: "figma-dev-links-post", kind: "figma-dev-links-post" },
     { key: "blueprint-revision-post", kind: "blueprint-revision-post" },
+    // A drawn proposal's removal offer is a post nobody asked for, so it rides
+    // the morning message too (src/sweep/sections.ts), as a section in the
+    // proposal's thread, where the person who drew it sees it.
+    { key: "blueprint-proposal-offer", kind: "blueprint-proposal-offer" },
     // After every hand-over: a job not planned today counts as done.
     { key: "sweep-post", kind: "sweep-post", after: [...MORNING_SECTIONS] },
     // After the sweep's post and the place jobs it spawns, which run right
     // behind it: the revisions a carousel had no room for, in its thread.
     { key: "blueprint-revision-thread", kind: "blueprint-revision-thread", after: ["sweep-post"] },
-    // Not a sweep section: each offer goes in its proposal's own thread, where
-    // the person who drew it sees it (ADR-031). After the morning message, in
-    // working hours, never in the night run.
-    { key: "blueprint-proposal-offer", kind: "blueprint-proposal-offer" },
     { key: "team-roles-sync", kind: "team-roles-sync" },
     // Both runs purge, so no text outlives 14 days across a weekend and one
     // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).

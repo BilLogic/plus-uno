@@ -61,6 +61,7 @@ import type { ModelTier } from "../agent/routing";
 import {
   cutOffVerdict,
   resolveSignal,
+  revisionRefusal,
   type GateRestage,
   type GateVerdict,
   type OperationOutcome,
@@ -1786,7 +1787,10 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
  */
 async function compareAt(milestone: Milestone | null, ref: ThreadRef, deps: Pick<TurnDeps, "milestoneComparison">): Promise<Comparison | null> {
   if (!milestone || !deps.milestoneComparison) return null;
-  return deps.milestoneComparison(ref, milestone).catch(() => null);
+  return deps.milestoneComparison(ref, milestone).catch((err: unknown) => {
+    rethrowIfBudget(err);
+    return null;
+  });
 }
 
 /**
@@ -2017,21 +2021,6 @@ async function dropFromSweepCard(
   );
   await memory.remember(posted.text);
   return { disposition: "staged", posted: posted.text, staged: { proposal, card }, wrote: memory.wrote(), telemetry };
-}
-
-/**
- * What a person outside a card's confirmer set is told when their message
- * would have revised it. Names who can, since that is who to ask; only a Slack
- * user id is mentioned.
- */
-export function revisionRefusal(confirmers: readonly string[], userId: string): string {
-  const id = /^[UW][A-Z0-9]{2,20}$/;
-  const to = id.test(userId) ? `<@${userId}> ` : "";
-  const who = confirmers.filter((c) => id.test(c)).map((c) => `<@${c}>`);
-  const names = who.length <= 1 ? who.join("") : `${who.slice(0, -1).join(", ")} or ${who[who.length - 1]}`;
-  return who.length
-    ? `:warning: ${to}Only ${names} can change this proposal, so it stays as it is — ask one of them if it needs a change.`
-    : `:warning: ${to}Nobody here can change this proposal, so it stays as it is.`;
 }
 
 // ── The gate path ────────────────────────────────────────────────────────────

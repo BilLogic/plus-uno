@@ -207,11 +207,11 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
     ["figma-dev-links-post", "figma-dev-links-post"],
     // Each revision drafted from shipped work, to its card's place.
     ["blueprint-revision-post", "blueprint-revision-post"],
+    ["blueprint-proposal-offer", "blueprint-proposal-offer"],
     ["sweep-post", "sweep-post"],
     // After it: the revisions its carousel had no room for, in its thread.
     ["blueprint-revision-thread", "blueprint-revision-thread"],
     // A drawn proposal no Roadmap card took up in 30 days, offered for removal in its thread.
-    ["blueprint-proposal-offer", "blueprint-proposal-offer"],
     ["team-roles-sync", "team-roles-sync"],
     // Both runs purge, so text never outlives its 14 days over a weekend.
     ["usage-text-purge", "usage-text-purge"],
@@ -444,7 +444,7 @@ test("the sweep's post runs after every morning job that hands it cards, Monday'
   const monday = planRun("morning", Date.parse("2026-10-12T13:00:00Z"));
   const keys = monday.jobs.map((j) => j.key);
   const post = monday.jobs.find((j) => j.kind === "sweep-post")!;
-  const handOvers = ["commitment-nudge", "ds-precedence-post", "sweep:figma-post", "figma-drift-post", "figma-tidy-post", "figma-dev-links-post", "blueprint-revision-post"];
+  const handOvers = ["commitment-nudge", "ds-precedence-post", "sweep:figma-post", "figma-drift-post", "figma-tidy-post", "figma-dev-links-post", "blueprint-revision-post", "blueprint-proposal-offer"];
   assert.deepEqual(post.after, handOvers);
   for (const key of handOvers) assert.ok(keys.indexOf(key) < keys.indexOf("sweep-post"), `${key} is planned before the post`);
 });
