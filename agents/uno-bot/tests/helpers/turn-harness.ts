@@ -25,7 +25,16 @@ import {
   type TurnRequest,
 } from "../../src/turn/index";
 import { runOperations, type OperationOutcome } from "../../src/gate/index";
-import { shareoutPlace } from "../../src/tools/share-for-feedback";
+import { shareoutWhereFor, type ShareoutReads } from "../../src/tools/share-for-feedback";
+import { preflight } from "../../src/agent/preflight";
+import type { Env } from "../../src/types";
+
+/** Slack with no channel the bot can see: a case that names none needs none. */
+const NO_CHANNELS: ShareoutReads = {
+  channelById: async () => "missing",
+  channelByName: async () => "missing",
+  members: async () => null,
+};
 import {
   createInMemoryProposalEventLog,
   createInMemoryUsageLog,
@@ -160,7 +169,7 @@ export function harness(opts: {
   absence?: AbsenceContext;
   preflightAsk?: string;
   /** A refusal that depends on the call — what a real guard does. */
-  preflightFor?: (toolName: string, input: Record<string, unknown>) => string | null;
+  preflightFor?: (toolName: string, input: Record<string, unknown>) => string | null | Promise<string | null>;
   delivery?: RecordingDelivery;
   threadState?: ThreadState;
   toolResult?: string;
@@ -203,6 +212,13 @@ export function harness(opts: {
   origin?: TurnOrigin;
   /** `TEST_CHANNEL_IDS`, parsed. Absent, none. */
   testChannelIds?: string[];
+  /** Slack as the bot sees it, for a share-out to a channel the asker names:
+   *  the preflight check and the card read both run the executor's own
+   *  decision on it, asked by `shareoutAt`. Absent, every channel is missing. */
+  shareoutReads?: ShareoutReads;
+  /** Where and by whom the share-out was asked; absent, `CHANNEL` and `U1`,
+   *  as `request()` asks it. */
+  shareoutAt?: { channel: string; requestedBy?: string };
   /** The model the fake provider reports, and the tokens it reports spending. */
   providerModel?: string;
   providerUsage?: Partial<ModelUsage>;
@@ -242,6 +258,8 @@ export function harness(opts: {
   const judged: JudgeCall[] = [];
   const executed: string[] = [];
   const referencesRead: string[] = [];
+  // A configured feedback channel, and this harness's test channels.
+  const shareoutEnv = { PLUS_DESIGN_FEEDBACK_CHANNEL_ID: "C_FEEDBACK", TEST_CHANNEL_IDS: (opts.testChannelIds ?? []).join(",") };
 
   const deps: TurnDeps = {
     threadState,
@@ -311,7 +329,13 @@ export function harness(opts: {
     },
 
     async preflight(toolName, input) {
-      const ask = opts.preflightFor?.(toolName, input) ?? opts.preflightAsk;
+      // A share-out's channel checks are the real ones, on this case's Slack.
+      if (toolName === "shareout_post" && opts.shareoutReads) {
+        const shareout = { slack: opts.shareoutAt ?? { channel: CHANNEL, requestedBy: "U1" }, reads: opts.shareoutReads };
+        const real = await preflight(toolName, input, { env: shareoutEnv as unknown as Env, shareout });
+        if (real) return real;
+      }
+      const ask = (await opts.preflightFor?.(toolName, input)) ?? opts.preflightAsk;
       return ask ? { ask } : null;
     },
 
@@ -377,11 +401,10 @@ export function harness(opts: {
         const repo = typeof input.repo === "string" && input.repo ? input.repo : ISSUE_REPO;
         return { repo, branch: opts.workflowBranch === undefined ? WORKFLOW_DEFAULT_REF : opts.workflowBranch };
       },
-      // The executor's own rule, on a configured feedback channel and this
-      // harness's test channels.
-      shareoutWhere(input, channel) {
-        const env = { PLUS_DESIGN_FEEDBACK_CHANNEL_ID: "C_FEEDBACK", TEST_CHANNEL_IDS: (opts.testChannelIds ?? []).join(",") };
-        return shareoutPlace(env, { channel }, input.place).where;
+      // The executor's own rule, on a configured feedback channel, this
+      // harness's test channels and this case's Slack.
+      async shareoutWhere(input, at) {
+        return shareoutWhereFor(shareoutEnv, at, input, opts.shareoutReads ?? NO_CHANNELS);
       },
     },
 

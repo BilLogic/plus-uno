@@ -2,21 +2,36 @@
 // Wire name: the tool is registered and proposed as `shareout_post`.
 // Posts a "sharing this for feedback" message to #plus-design-feedback, or in
 // the asking conversation when the asker keeps it there (`place: "here"`) or
-// that channel isn't configured: what's being shared, a link
+// that channel isn't configured, or in a channel the asker names
+// (`place: "channel"`): what's being shared, a link
 // back, a feedback prompt, and @-mentioned reviewers. This is the uno-publish
 // shareout ritual — NOT marketplace registration (manual today; see #173).
 // Side effect: it pings people, so it routes through the confirmation gate.
 //
 // A share-out asked for in a test channel (`TEST_CHANNEL_IDS`) is test traffic,
 // by the usage record's rule: it posts in that channel's thread, never in the
-// team channel (`teamPostChannel`).
+// team channel (`teamPostChannel`) or a channel the asker named.
+//
+// A NAMED CHANNEL IS CHECKED, in code, before a card is staged (preflight) and
+// again at ✅ (this executor), by one decision, `decideShareoutPlace`:
+//   • the asker is in the channel, so nobody pings a channel they are not in;
+//   • the bot can post there. The bot holds `chat:write.public`, so a public
+//     channel needs no invite; a private one needs the bot in it, and Slack
+//     shows the bot no private channel it is not in, so that one reads as
+//     "add me to it".
+// What it reads, and the cost: a channel by id is one `conversations.info`; a
+// `#name` is one page of `conversations.list` (two at most); the asker's
+// membership is one page of `conversations.members` (three at most, via
+// `slack/channel-members.ts`). So 2 subrequests usually and 5 at worst, read
+// once per turn — the preflight and the card share them — and again at ✅.
 
 import type { Env } from "../types";
 import type { SlackContext } from "../types";
-import { postMessage } from "../slack/api";
+import { conversationsInfo, conversationsList, postMessage, type SlackConversation } from "../slack/api";
+import { channelMembers } from "../slack/channel-members";
 import { DM_CONVERSATION } from "../thread-state/index";
-import { teamPostChannel, testChannelIdsOf } from "../usage/record";
-import { fieldsFromInput, renderShareout } from "./share-out-render";
+import { isTestOrigin, teamPostChannel, testChannelIdsOf } from "../usage/record";
+import { channelRefText, fieldsFromInput, renderShareout, shareoutChannelRef } from "./share-out-render";
 
 /** Where a share-out posts: the channel, the thread when it stays in the asking
  *  one, and how the result and the card name the place. */
@@ -30,7 +45,8 @@ export interface ShareoutPlace {
  * Where a share-out posts: #plus-design-feedback, top level — unless the asker
  * kept it in the conversation (`place: "here"`), it was asked for in a test
  * channel, or that channel is not set, when it stays where it was asked: the
- * asking thread, or the DM.
+ * asking thread, or the DM. A channel the asker named is
+ * `decideShareoutPlace`'s, which reads Slack.
  *
  * The card names the place from this same decision (`turn/env-deps.ts`
  * `cardReadsFor` § `shareoutWhere`), so a ✅ posts where the card said.
@@ -58,17 +74,191 @@ export function shareoutPlace(
   };
 }
 
+/** A channel as the bot sees it. `kind: "dm"` is a DM or group DM, which is
+ *  not a place to share out to. */
+export interface ShareoutChannel {
+  id: string;
+  name: string;
+  kind: "channel" | "dm";
+  isPrivate: boolean;
+  isArchived: boolean;
+  botIsMember: boolean;
+}
+
+/** A lookup's answer: the channel, `"missing"` when Slack shows the bot none
+ *  by that id or name, `"failed"` when Slack could not be read. */
+export type ChannelLookup = ShareoutChannel | "missing" | "failed";
+
+/** What a share-out to a named channel reads of Slack. */
+export interface ShareoutReads {
+  channelById(id: string): Promise<ChannelLookup>;
+  channelByName(name: string): Promise<ChannelLookup>;
+  /** The channel's member ids, or null when Slack would not say. */
+  members(channel: string): Promise<readonly string[] | null>;
+}
+
+/** Pages of 1000 channels a `#name` is looked up in. */
+const CHANNEL_LIST_PAGES = 2;
+
+/** The most subrequests one named-channel decision spends: two pages of
+ *  channels and three of members. */
+export const SHAREOUT_CHANNEL_CHECK_COST = CHANNEL_LIST_PAGES + 3;
+
+function channelOf(c: SlackConversation): ShareoutChannel | null {
+  if (!c.id) return null;
+  return {
+    id: c.id,
+    name: c.name ?? "",
+    kind: c.is_im || c.is_mpim ? "dm" : "channel",
+    isPrivate: c.is_private === true,
+    isArchived: c.is_archived === true,
+    botIsMember: c.is_member === true,
+  };
+}
+
+/**
+ * The Slack reads, on the bot token, each made once for the life of this
+ * object: a turn builds one and its preflight and card read share it; the
+ * executor builds its own at ✅. A channel found by name answers for its id
+ * too. Any error reads as `"failed"`, which refuses — a check that could not
+ * run never lets a post through.
+ *
+ * @param env - Worker bindings
+ */
+export function shareoutReadsFor(env: Env): ShareoutReads {
+  const byId = new Map<string, Promise<ChannelLookup>>();
+  const byName = new Map<string, Promise<ChannelLookup>>();
+  const members = new Map<string, Promise<readonly string[] | null>>();
+  const once = <T>(memo: Map<string, Promise<T>>, key: string, read: () => Promise<T>): Promise<T> => {
+    let pending = memo.get(key);
+    if (!pending) memo.set(key, (pending = read()));
+    return pending;
+  };
+
+  return {
+    channelById: (id) =>
+      once(byId, id, async () => {
+        const res = await conversationsInfo(env, id).catch(() => null);
+        if (!res) return "failed";
+        if (!res.ok) return (res as { error?: string }).error === "channel_not_found" ? "missing" : "failed";
+        return (res.channel && channelOf(res.channel)) ?? "missing";
+      }),
+    channelByName: (name) =>
+      once(byName, name, async () => {
+        let cursor: string | undefined;
+        for (let page = 0; page < CHANNEL_LIST_PAGES; page++) {
+          const res = await conversationsList(env, cursor).catch(() => null);
+          if (!res?.ok) return "failed";
+          const hit = (res.channels ?? []).find((c) => c.name === name);
+          const found = hit ? channelOf(hit) : null;
+          if (found) {
+            byId.set(found.id, Promise.resolve(found));
+            return found;
+          }
+          cursor = res.response_metadata?.next_cursor || undefined;
+          if (!cursor) return "missing";
+        }
+        // More channels than the pages read: it may be on a later one.
+        return "failed";
+      }),
+    members: (channel) => once(members, channel, () => channelMembers(env, channel).catch(() => null)),
+  };
+}
+
+/** What a share-out is decided to do: post in `place`, or refuse in words the
+ *  asker reads. */
+export type ShareoutDecision = { ok: true; place: ShareoutPlace } | { ok: false; refusal: string };
+
+const OFFER = "I can share it in #plus-design-feedback or here instead — which would you like?";
+const refuse = (why: string): ShareoutDecision => ({ ok: false, refusal: `${why} ${OFFER}` });
+
+/**
+ * Where a share-out posts, with a named channel checked: the one decision the
+ * preflight, the card and the executor all read.
+ *
+ * `place: "channel"` posts top level in the channel named by `channel` — an
+ * id, a mention, a link or a `#name` — once the asker is in it and the bot can
+ * post there. An ask from a test channel still stays in its own thread, and a
+ * named #plus-design-feedback is the feedback channel. Every other place is
+ * `shareoutPlace`'s and reads nothing.
+ *
+ * @param env - `PLUS_DESIGN_FEEDBACK_CHANNEL_ID` and `TEST_CHANNEL_IDS`
+ * @param slack - Where it was asked, and who asked
+ * @param input - The tool's input: `place`, and `channel` for a named one
+ * @param reads - Slack, as the bot sees it
+ */
+export async function decideShareoutPlace(
+  env: Pick<Env, "PLUS_DESIGN_FEEDBACK_CHANNEL_ID" | "TEST_CHANNEL_IDS">,
+  slack: Pick<SlackContext, "channel" | "threadTs" | "replyTs" | "requestedBy">,
+  input: Record<string, unknown>,
+  reads: ShareoutReads,
+): Promise<ShareoutDecision> {
+  if (input.place !== "channel") return { ok: true, place: shareoutPlace(env, slack, input.place) };
+  if (isTestOrigin({ origin: "slack", channel: slack.channel, testChannelIds: testChannelIdsOf(env) })) {
+    return { ok: true, place: shareoutPlace(env, slack, "here") };
+  }
+
+  const ref = shareoutChannelRef(input.channel);
+  if (!ref) return refuse("Which channel should it go in?");
+  const feedback = env.PLUS_DESIGN_FEEDBACK_CHANNEL_ID?.trim();
+  if ("id" in ref ? ref.id === feedback : ref.name === "plus-design-feedback") {
+    return { ok: true, place: shareoutPlace(env, slack, "feedback_channel") };
+  }
+
+  const asked = channelRefText(ref);
+  const found = "id" in ref ? await reads.channelById(ref.id) : await reads.channelByName(ref.name);
+  if (found === "failed") return refuse(`I couldn't look up ${asked} just now.`);
+  if (found === "missing") {
+    return refuse("id" in ref ? `I can't post in ${asked} — add me to it first.` : `I can't find ${asked}. If it's private, add me to it first.`);
+  }
+  const named = found.name ? `#${found.name}` : asked;
+  if (found.kind === "dm") return refuse(`${asked} is a DM, not a channel.`);
+  if (found.isArchived) return refuse(`${named} is archived.`);
+  // `chat:write.public` covers a public channel; a private one needs the bot in it.
+  if (found.isPrivate && !found.botIsMember) return refuse(`I can't post in ${named} — add me to it first.`);
+
+  if (!slack.requestedBy) return refuse(`I couldn't tell who's asking, so I can't check you're in ${named}.`);
+  const members = await reads.members(found.id);
+  if (!members) return refuse(`I couldn't check you're in ${named}.`);
+  if (!members.includes(slack.requestedBy)) return refuse(`You're not in ${named}, so I won't post there for you.`);
+
+  return { ok: true, place: { channel: found.id, where: found.name ? `<#${found.id}|${found.name}>` : `<#${found.id}>` } };
+}
+
+/**
+ * Where a share-out's card says it posts, from the same decision. A refused
+ * named channel is named as asked: the preflight has already refused it before
+ * any card, and the executor refuses it again at ✅, so the card never names
+ * one place while the ✅ posts to another.
+ */
+export async function shareoutWhereFor(
+  env: Pick<Env, "PLUS_DESIGN_FEEDBACK_CHANNEL_ID" | "TEST_CHANNEL_IDS">,
+  at: { channel: string; requestedBy?: string },
+  input: Record<string, unknown>,
+  reads: ShareoutReads,
+): Promise<string> {
+  const decided = await decideShareoutPlace(env, at, input, reads);
+  if (decided.ok) return decided.place.where;
+  const ref = shareoutChannelRef(input.channel);
+  return ref ? channelRefText(ref) : "a channel";
+}
+
 export async function executeShareForFeedback(
   env: Env,
   input: Record<string, unknown>,
   slack: SlackContext,
+  reads: ShareoutReads = shareoutReadsFor(env),
 ): Promise<string> {
   const fields = fieldsFromInput(input);
   if (!fields.summary) {
     return JSON.stringify({ ok: false, error: "missing 'summary' of what's being shared" });
   }
 
-  const place = shareoutPlace(env, slack, input.place);
+  // Checked again at ✅: membership or the bot's access may have changed
+  // since the card was staged.
+  const decided = await decideShareoutPlace(env, slack, input, reads);
+  if (!decided.ok) return JSON.stringify({ ok: false, status: "refused", message: decided.refusal });
+  const place = decided.place;
   const requester = slack.requestedBy ? `<@${slack.requestedBy}>` : "A designer";
 
   // The Flow 3 template, per docs/connectors/slack/shapes.md § Share-out post. The
@@ -79,8 +269,8 @@ export async function executeShareForFeedback(
   try {
     const posted = await postMessage(env, {
       channel: place.channel,
-      // In #plus-design-feedback this is a top-level post; anywhere else it
-      // stays in the asking conversation.
+      // In #plus-design-feedback or a named channel this is a top-level post;
+      // anywhere else it stays in the asking conversation.
       thread_ts: place.threadTs,
       text: body,
     });

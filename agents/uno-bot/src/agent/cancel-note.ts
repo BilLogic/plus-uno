@@ -15,6 +15,8 @@
 // inside `RECENT_CANCEL_MS` holds anything back. A note with no time predates
 // the stamp, so it is hours old by now and holds nothing back.
 
+import { shareoutChannelRef } from "../tools/share-out-render";
+
 /** How long a ⛔ holds the same card back. A cancel and the model's own
  *  re-proposal land within one exchange, minutes apart; half an hour covers a
  *  slow reply, and stops well short of a card's own hour-long life. */
@@ -23,9 +25,16 @@ export const RECENT_CANCEL_MS = 30 * 60_000;
 const NOTE_RE = /\(Cancelled the proposed ([a-z_]+)(?: for ([^—)]+?))? — /;
 
 /** The target a tool's card names on its verb, as it compares: a share-out's
- *  place, an intake's repo by name. `null` for a tool whose card names none. */
+ *  place (a named channel by its id or lower-case name), an intake's repo by
+ *  name. `null` for a tool whose card names none. */
 function targetOf(toolName: string, input: Record<string, unknown>): string | null {
-  if (toolName === "shareout_post") return `place ${input.place === "here" ? "here" : "feedback_channel"}`;
+  if (toolName === "shareout_post") {
+    if (input.place === "channel") {
+      const ref = shareoutChannelRef(input.channel);
+      return `place channel ${ref ? ("id" in ref ? ref.id : `#${ref.name}`) : "unnamed"}`;
+    }
+    return `place ${input.place === "here" ? "here" : "feedback_channel"}`;
+  }
   if (toolName === "github_issue_create") {
     const repo = typeof input.repo === "string" ? input.repo.trim().toLowerCase().split("/").pop() : "";
     return `repo ${repo || "default"}`;

@@ -462,6 +462,14 @@ async function teamRolesOf(usage: TurnUsage): Promise<TeamRoles> {
   }
 }
 
+/** Where a card's action was asked, and who asked it — what a card read needs
+ *  when the answer depends on the asker, as a share-out to a named channel's
+ *  does. */
+export interface CardAsked {
+  channel: string;
+  requestedBy?: string;
+}
+
 export interface TurnDeps {
   /** Per-thread memory. Turn reads the panel context and the outcome notes, and
    *  owns the history append and its compaction. */
@@ -550,11 +558,12 @@ export interface TurnDeps {
      *  to — or null when the repo is off the list. `branch` is null when the
      *  default branch could not be read, and the card says so. */
     workflowTarget(input: Record<string, unknown>): Promise<{ repo: string; branch: string | null } | null>;
-    /** Where a `shareout_post` asked in `channel` would post, named as the
-     *  card says it — "#plus-design-feedback", "this DM", "this thread" —
-     *  from the executor's own decision (`tools/share-for-feedback.ts`
-     *  `shareoutPlace`), so the card names the place a ✅ posts to. */
-    shareoutWhere(input: Record<string, unknown>, channel: string): string;
+    /** Where a `shareout_post` asked in `at.channel` by `at.requestedBy`
+     *  would post, named as the card says it — "#plus-design-feedback",
+     *  "this DM", "this thread", or a named channel's `<#C…|name>` — from the
+     *  executor's own decision (`tools/share-for-feedback.ts`
+     *  `decideShareoutPlace`), so the card names the place a ✅ posts to. */
+    shareoutWhere(input: Record<string, unknown>, at: CardAsked): Promise<string>;
   };
 
   /**
@@ -1580,7 +1589,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     );
   await recordSuperseded(retiredAhead);
 
-  const built = await buildCard(result, deps, request.surface === "assistant", request.channel);
+  const built = await buildCard(result, deps, request.surface === "assistant", { channel: request.channel, requestedBy: request.userId });
   // A revision of a sweep card is still one, so replies under it are read by
   // the sweep's rule.
   // A report's fix is redrawn in its report instead.
@@ -1839,7 +1848,7 @@ async function dropFromSweepCard(
       { kind: "proposal", operations, toolName: first.toolName, input: first.input },
       deps,
       request.surface === "assistant",
-      request.channel,
+      { channel: request.channel, requestedBy: pending.requesterUserId },
     ),
   );
   const card: ProposalCard = fixes ? { ...built, fixes } : built;
@@ -2012,7 +2021,7 @@ export async function restageExecution(
           // The card's DM caveats follow the surface, and a DM channel is the one
           // the proposal record can still name.
           original.channel.startsWith("D"),
-          original.channel,
+          { channel: original.channel, requestedBy: original.requesterUserId },
         );
   // The warning rides the card, not only the note before it: a note that
   // failed to post must not leave a card that reads like any other.
@@ -2401,9 +2410,9 @@ async function buildCard(
   result: Extract<AgentResult, { kind: "proposal" }>,
   deps: Pick<TurnDeps, "cards">,
   fromDm: boolean,
-  channel: string,
+  at: CardAsked,
 ): Promise<ProposalCard> {
-  const card = await cardOf(result, deps, fromDm, channel);
+  const card = await cardOf(result, deps, fromDm, at);
   // Who wrote the opening line (no reader since the eval envelope went): the model when its own
   // reply leads, the Worker for everything else — its ask, its PRD line, or a
   // lead that is only its "I could not stage …" note.
@@ -2414,13 +2423,15 @@ async function buildCard(
 /** Where each share-out in a batch posts, from the executor's own rule, so the
  *  plan groups it there (`ProposalCard.places`). Nothing for a single
  *  operation, which has no plan, or a batch with no share-out. */
-function shareoutPlacesOf(
+async function shareoutPlacesOf(
   operations: ProposalOperation[],
   deps: Pick<TurnDeps, "cards">,
-  channel: string,
-): { places?: Array<string | null> } {
+  at: CardAsked,
+): Promise<{ places?: Array<string | null> }> {
   if (operations.length <= 1 || !operations.some((op) => op.toolName === "shareout_post")) return {};
-  return { places: operations.map((op) => (op.toolName === "shareout_post" ? deps.cards.shareoutWhere(op.input, channel) : null)) };
+  const places: Array<string | null> = [];
+  for (const op of operations) places.push(op.toolName === "shareout_post" ? await deps.cards.shareoutWhere(op.input, at) : null);
+  return { places };
 }
 
 /** The card itself, before who-wrote-the-lead is marked. */
@@ -2428,7 +2439,7 @@ async function cardOf(
   result: Extract<AgentResult, { kind: "proposal" }>,
   deps: Pick<TurnDeps, "cards">,
   fromDm: boolean,
-  channel: string,
+  at: CardAsked,
 ): Promise<ProposalCard> {
   const { toolName, input, operations } = result;
   const card: ProposalCard = {
@@ -2438,7 +2449,7 @@ async function cardOf(
     fields: cardFieldsOf(input),
     caveats: caveatsFor(toolName, input, result.previewText),
     operations: result.operations,
-    ...shareoutPlacesOf(operations, deps, channel),
+    ...(await shareoutPlacesOf(operations, deps, at)),
   };
 
   // THE ASK, when the model staged an intake and wrote no line of its own
@@ -2456,12 +2467,12 @@ async function cardOf(
 
   if (toolName === "shareout_post") {
     // THE PLACE, named the way the issue card names its repo: a share-out
-    // posts to #plus-design-feedback or stays in the asking conversation, and
-    // the heading says which — read from the executor's own decision, so the
-    // card never names one place while the ✅ posts to another. A batch that
-    // posts to two places names neither on the verb; its plan's group
-    // headings name each.
-    const where = new Set(card.places?.filter((p): p is string => p !== null) ?? [deps.cards.shareoutWhere(input, channel)]);
+    // posts to #plus-design-feedback, stays in the asking conversation, or
+    // posts in a channel the asker named, and the heading says which — read
+    // from the executor's own decision, so the card never names one place
+    // while the ✅ posts to another. A batch that posts to two places names
+    // neither on the verb; its plan's group headings name each.
+    const where = new Set(card.places?.filter((p): p is string => p !== null) ?? [await deps.cards.shareoutWhere(input, at)]);
     return where.size === 1 ? { ...card, verb: `${card.verb} in ${[...where][0]}` } : card;
   }
   if (toolName === "github_issue_create") {
