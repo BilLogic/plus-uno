@@ -1,5 +1,6 @@
 // Blueprint upkeep: the service-change gate, a revision drafted from shipped
-// work, and its card on the morning sweep. `Env` enters in `./env.ts`.
+// work, its card on the morning sweep, and an idea set beside today's path at
+// a conversation's milestones. `Env` enters in `./env.ts`.
 
 export {
   confidentMatch,
@@ -14,6 +15,17 @@ export {
 } from "./gate";
 export { draftRevision, readDraft, type Draft, type DraftedChange, type DraftInput, type PathToday } from "./draft";
 export { revisionItem, revisionText, type RevisionSource } from "./card";
+export {
+  COMPARISON_SUBREQUESTS,
+  comparisonText,
+  handOffMilestone,
+  milestoneComparison,
+  prdMilestone,
+  type Comparison,
+  type ComparisonDeps,
+  type Milestone,
+  type MilestoneComparison,
+} from "./milestone";
 export {
   DEPLOYED,
   handOverRevisions,

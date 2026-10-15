@@ -12,7 +12,9 @@
 //     directory then by name (card follow-ups' `peopleFor`);
 //   • the place: card follow-ups' ladder (`cardPlace`);
 //   • Bill: `LEAD_USER_ID`, the deployment's lead;
-//   • the state: one JSON record in HARNESS_KV.
+//   • the state: one JSON record in HARNESS_KV;
+//   • a turn's milestone comparison: the same gate, search and path read, and
+//     the thread's store for its once-per-scenario claim.
 //
 // Budget (ADR-022), per card weighed: the page and up to three block pages
 // (4), the judgement (1), the search (≤3), the path read (4), the draft (1-2),
@@ -20,7 +22,7 @@
 // and the Roadmap query fit one alarm's ceiling.
 
 import type { Env } from "../types";
-import { countedFetch } from "../net";
+import { budgetHeadroom, countedFetch } from "../net";
 import { selectProvider } from "../agent/run-agent";
 import { channelIdsFor } from "../destination/env";
 import { queryRowsWithStatus, readNotionPage } from "../integrations/notion";
@@ -38,6 +40,9 @@ import { threadStateFor } from "../thread-state/production";
 import type { JobContext } from "../scheduled/runs";
 import type { PendingProposal } from "../thread-state/index";
 import { serviceChangeGate } from "./gate";
+import { COMPARISON_SUBREQUESTS, milestoneComparison, type MilestoneComparison } from "./milestone";
+import { DELIVERY_RESERVE } from "../agent/loop-policy";
+import type { ThreadState } from "../thread-state/index";
 import type { PathToday } from "./draft";
 import {
   DEPLOYED,
@@ -202,4 +207,24 @@ async function stageRevisionCard(env: Env, proposal: PendingProposal): Promise<v
     ...supersededEvents(retired, now, "worker"),
     stagedEvent({ proposal, at: now, via: "worker", channelStored: true }),
   ]);
+}
+
+/**
+ * The milestone comparison on `Env`, as a turn dependency; none where the
+ * blueprint is not configured. Spends the judgement, the search and the path
+ * read only when the turn still has them beside its delivery reserve.
+ *
+ * @param env - Worker bindings
+ * @param threadState - The turn's store, which keeps the once-per-thread claim
+ */
+export function milestoneComparisonOn(env: Env, threadState: ThreadState): { milestoneComparison?: MilestoneComparison } {
+  if (!isBlueprintConfigured(env)) return {};
+  return {
+    milestoneComparison: milestoneComparison({
+      gate: serviceChangeGate({ provider: selectProvider(env), search: async (q) => (await searchBlueprint(env, q)).rows }),
+      readPath: (cellId) => readPathOf(env, cellId),
+      firstInThread: (ref, scenario) => threadState.claimComparison(ref, scenario),
+      affordable: () => budgetHeadroom().subrequests >= COMPARISON_SUBREQUESTS + DELIVERY_RESERVE,
+    }),
+  };
 }
