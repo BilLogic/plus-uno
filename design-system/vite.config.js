@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import dts from 'vite-plugin-dts';
 import { resolve } from 'path';
 
 export default defineConfig({
@@ -8,12 +7,9 @@ export default defineConfig({
         react({
             // Use automatic JSX runtime (React 17+/18+)
             jsxRuntime: 'automatic'
-        }),
-        dts({
-            insertTypesEntry: true,
-            include: ['src'],
-            exclude: ['**/*.stories.jsx', '**/*.test.jsx', '**/demo/**/*']
         })
+        // No type emit: the package is unpublished (ADR-006), so nothing reads its
+        // types, and TypeScript 7 ships no JS compiler API for a .d.ts plugin to drive.
     ],
     css: {
         preprocessorOptions: {
