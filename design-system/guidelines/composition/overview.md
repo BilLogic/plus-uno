@@ -15,6 +15,7 @@ answers "what goes where, and inside what".
 | [hierarchy.md](hierarchy.md) | The four context levels (element → card → section → page) and the token layer each draws from |
 | [surfaces.md](surfaces.md) | Cards, tables, modals, empty and loading states |
 | [forms.md](forms.md) | Field composition, spacing, validation, the modal form variant |
+| [form-behaviour.md](form-behaviour.md) | When a form validates, errors on submit, required fields, disabled vs read-only, unsaved changes, dependent and subtle fields |
 
 ## The rule these share
 
