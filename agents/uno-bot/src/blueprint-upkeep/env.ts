@@ -17,7 +17,10 @@
 //   • the state: one JSON record in HARNESS_KV; each card's weighed mark a
 //     key of its own there, kept for good; each revision thread a key too;
 //   • a turn's milestone comparison: the same gate, search and path read, and
-//     the thread's store for its once-per-scenario claim.
+//     the thread's store for its once-per-scenario claim; the offer under it
+//     drafts on the same provider;
+//   • a drawn proposal's thread → rows record: `blueprint_proposals` in the
+//     usage database (`proposalRecordsFor`).
 //
 // Budget (ADR-022), against the 38-subrequest lookup ceiling of one alarm,
 // each job sized by cost, not by a count (`./budget.ts`).
@@ -61,6 +64,10 @@ import { COMPARISON_SUBREQUESTS, milestoneComparison, type MilestoneComparison }
 import { DELIVERY_RESERVE } from "../agent/loop-policy";
 import type { ThreadState } from "../thread-state/index";
 import type { PathToday } from "./draft";
+import { draftProposal, drawnProposalOf, PROPOSAL_OFFER_SUBREQUESTS, type ProposalDrafter } from "./proposal";
+import { createD1ProposalRecords } from "./proposal-records-d1";
+import type { ProposalRecords } from "./proposal-records";
+import type { OperationOutcome } from "../gate/index";
 import { cardEvidence } from "./evidence";
 import { stageOf, STAGES } from "./stages";
 import {
@@ -174,7 +181,11 @@ export async function readPathOf(env: Env, cellId: string): Promise<PathToday | 
   if (!held) return null;
   const pathId = encodeURIComponent(held.path_id);
   const [[path], cells, lanes, steps] = await Promise.all([
-    rest<{ id: string; name: string; status: string; scenarios: { name: string } | null }>(env, "paths", `select=id,name,status,scenarios(name)&id=eq.${pathId}`),
+    rest<{ id: string; name: string; status: string; scenario_id: string | null; scenarios: { name: string } | null }>(
+      env,
+      "paths",
+      `select=id,name,status,scenario_id,scenarios(name)&id=eq.${pathId}`,
+    ),
     rest<{ id: string; lane_id: string; step_id: string; content: string | null; status: string }>(
       env,
       "cells",
@@ -192,6 +203,7 @@ export async function readPathOf(env: Env, cellId: string): Promise<PathToday | 
   const link = cellUrl(env.BLUEPRINT_APP_URL, first);
   return {
     pathId: path.id,
+    ...(path.scenario_id ? { scenarioId: path.scenario_id } : {}),
     scenario: path.scenarios?.name ?? "",
     path: path.name,
     status: asStatus(path.status),
@@ -413,16 +425,23 @@ export async function handleRevisionReplyOnEnv(env: Env, event: SlackMessageEven
 }
 
 /**
- * The milestone comparison on `Env`, as a turn dependency; none where the
- * blueprint is not configured. Spends the judgement, the search and the path
- * read only when the turn still has them beside its delivery reserve.
+ * The milestone comparison and the offer under it on `Env`, as turn
+ * dependencies; none where the blueprint is not configured. Each spends its
+ * calls only when the turn still has them beside its delivery reserve.
  *
  * @param env - Worker bindings
  * @param threadState - The turn's store, which keeps the once-per-thread claim
  */
-export function milestoneComparisonOn(env: Env, threadState: ThreadState): { milestoneComparison?: MilestoneComparison } {
+export function milestoneComparisonOn(
+  env: Env,
+  threadState: ThreadState,
+): { milestoneComparison?: MilestoneComparison; proposalDraft?: ProposalDrafter } {
   if (!isBlueprintConfigured(env)) return {};
   return {
+    proposalDraft: draftProposal({
+      provider: selectProvider(env),
+      affordable: () => budgetHeadroom().subrequests >= PROPOSAL_OFFER_SUBREQUESTS + DELIVERY_RESERVE,
+    }),
     milestoneComparison: milestoneComparison({
       gate: serviceChangeGate({ provider: selectProvider(env), search: async (q) => (await searchBlueprint(env, q)).rows }),
       readPath: (cellId) => readPathOf(env, cellId),
@@ -430,4 +449,34 @@ export function milestoneComparisonOn(env: Env, threadState: ThreadState): { mil
       affordable: () => budgetHeadroom().subrequests >= COMPARISON_SUBREQUESTS + DELIVERY_RESERVE,
     }),
   };
+}
+
+/** The thread → rows records, or null without the usage database. */
+export function proposalRecordsFor(env: Pick<Env, "USAGE_DB">): ProposalRecords | null {
+  return env.USAGE_DB ? createD1ProposalRecords({ db: env.USAGE_DB }) : null;
+}
+
+/**
+ * Keep what a decided proposal offer drew on the blueprint (`drawnProposalOf`):
+ * its thread and the rows written. Nothing for any other card, a ⛔ or a write
+ * that did not land. Best-effort: a failed record is logged, and the rows and
+ * the thread's reply stand.
+ *
+ * @param env - Carries USAGE_DB
+ * @param proposal - The decided card
+ * @param outcomes - What its batch ran; undefined for a ⛔
+ */
+export async function recordDrawnProposalFor(
+  env: Env,
+  proposal: PendingProposal,
+  outcomes: readonly OperationOutcome[] | undefined,
+): Promise<void> {
+  const drawn = drawnProposalOf(proposal, outcomes, Date.now());
+  const records = drawn ? proposalRecordsFor(env) : null;
+  if (!drawn || !records) return;
+  try {
+    await records.record(drawn);
+  } catch (err) {
+    console.error(`[proposal] rows of ${proposal.proposalTs} not recorded: ${err instanceof Error ? err.message : String(err)}`);
+  }
 }

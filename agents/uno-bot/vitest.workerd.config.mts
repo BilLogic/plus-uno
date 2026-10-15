@@ -18,7 +18,8 @@
 // about. The third is the sweep records suite, for the same reason and on the
 // same database (migrations/usage/0002_sweep.sql), and the fourth the commitment
 // records suite (0006_commitments.sql), and the DM watch records suite
-// (0011_dm_watch.sql). Their `USAGE_DB` binding
+// (0011_dm_watch.sql), and the drawn blueprint proposals suite
+// (0016_blueprint_proposals.sql). Their `USAGE_DB` binding
 // comes from wrangler.toml like the rest;
 // miniflare backs it with a local, per-run D1 and never contacts the account.
 // The migrations are read here, in Node, and handed to the test as the
@@ -75,6 +76,7 @@ export default defineConfig({
       "tests/workerd/sweep-records.conformance.test.ts",
       "tests/workerd/commitment-records.conformance.test.ts",
       "tests/workerd/dm-watch-records.conformance.test.ts",
+      "tests/workerd/proposal-records.conformance.test.ts",
       "tests/workerd/metric-queries.test.ts",
       "tests/workerd/figma-events.route.test.ts",
     ],

@@ -28,6 +28,8 @@ import { jsonObjectIn } from "../sweep/detector";
 /** The path a revision is drafted against, as the blueprint has it today. */
 export interface PathToday {
   pathId: string;
+  /** The scenario's id, where the read had it: what a proposal's new path is created in. */
+  scenarioId?: string;
   scenario: string;
   path: string;
   status: EntityStatus;

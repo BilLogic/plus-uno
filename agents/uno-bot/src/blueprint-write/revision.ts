@@ -35,6 +35,25 @@ export interface BlueprintRevision {
   rows: RevisionRow[];
   /** The path's own status change, written after its rows, when it has one. */
   path?: { from: EntityStatus; to: EntityStatus };
+  /**
+   * Draw the rows on a NEW path beside `pathId` instead of on it: a proposal.
+   * The writer creates the path at `status` (`create_path_at_status`, lanes
+   * and step order copied from `pathId`), then writes each row on the new
+   * path's lane of the same name. `pathId`'s own cells are never written.
+   */
+  variant?: BlueprintVariant;
+}
+
+/** The kind a drawn proposal's path takes in the blueprint's route vocabulary. */
+export const VARIANT_KIND = "variant" as const;
+
+export interface BlueprintVariant {
+  scenarioId: string;
+  /** The new path's name. */
+  name: string;
+  status: EntityStatus;
+  /** `pathId`'s lanes by id, so each row finds its lane on the new path by name. */
+  lanes: Record<string, string>;
 }
 
 const isStatus = (v: unknown): v is EntityStatus => ENTITY_STATUSES.includes(v as EntityStatus);
@@ -49,7 +68,7 @@ const isText = (v: unknown): v is string => typeof v === "string" && v.trim() !=
  * @param input - The operation's input as stored on the card
  */
 export function readRevision(input: Record<string, unknown>): BlueprintRevision | { error: string } {
-  const { pathId, label, rows, path } = input;
+  const { pathId, label, rows, path, variant } = input;
   if (!isText(pathId)) return { error: "the revision names no path" };
   if (!Array.isArray(rows) || rows.length === 0) return { error: "the revision has no rows" };
   const read: RevisionRow[] = [];
@@ -69,10 +88,19 @@ export function readRevision(input: Record<string, unknown>): BlueprintRevision 
     if (!isStatus(p.from) || !isStatus(p.to)) return { error: "the path's status change is outside the vocabulary" };
     pathChange = { from: p.from, to: p.to };
   }
+  let drawn: BlueprintVariant | undefined;
+  if (variant !== undefined) {
+    const v = (variant ?? {}) as Record<string, unknown>;
+    const lanes = (v.lanes ?? {}) as Record<string, unknown>;
+    if (!isText(v.scenarioId) || !isText(v.name) || !isStatus(v.status)) return { error: "the new path needs a scenario, a name and a status" };
+    if (typeof lanes !== "object" || !read.every((r) => isText(lanes[r.laneId]))) return { error: "a row's lane has no name to find it by on the new path" };
+    drawn = { scenarioId: v.scenarioId, name: v.name, status: v.status, lanes: Object.fromEntries(read.map((r) => [r.laneId, lanes[r.laneId] as string])) };
+  }
   return {
     pathId,
     label: isText(label) ? label : "the path",
     rows: read,
     ...(pathChange ? { path: pathChange } : {}),
+    ...(drawn ? { variant: drawn } : {}),
   };
 }

@@ -281,8 +281,8 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     // `agent/context-state.ts` for why this one does not get to ship on.
     contextState: env.CONTEXT_STATE === "on",
 
-    // A milestone's idea beside today's blueprint; absent where the blueprint
-    // is not configured.
+    // A milestone's idea beside today's blueprint, and the offer to draw it
+    // there as a proposal; absent where the blueprint is not configured.
     ...milestoneComparisonOn(env, wiring.threadState),
     },
   );

@@ -5,7 +5,15 @@
 // A job stages a revision with `revisionCard`; the Gate resolves it; the
 // `blueprint_revise` tool (`tools/blueprint-revise.ts`) writes it.
 
-export { ENTITY_STATUSES, readRevision, type BlueprintRevision, type EntityStatus, type RevisionRow } from "./revision";
+export {
+  ENTITY_STATUSES,
+  readRevision,
+  VARIANT_KIND,
+  type BlueprintRevision,
+  type BlueprintVariant,
+  type EntityStatus,
+  type RevisionRow,
+} from "./revision";
 export { authoringCall, authoringCallCost, revisionWriteCalls, writeRevision, type RevisionResult, type WriterDeps } from "./write";
 export { blueprintRpcFor, forgetBlueprintSession, signInCalls, writeIdentityGap, type WriteIdentityEnv } from "./session";
 export { revisionCard } from "./stage";
