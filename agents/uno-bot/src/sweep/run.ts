@@ -1161,9 +1161,11 @@ async function postFindings(job: ScheduledJob, deps: SweepDeps): Promise<SweepJo
  * place with a fix due (whether or not its report is still live — its own job
  * reads that), with a report an earlier try recorded and never finished, or
  * with a section handed over or stranded. Reads the queue and the hand-offs;
- * posts nothing.
+ * posts nothing, and records its own run row even when no place is due.
  */
 async function spreadMorning(job: ScheduledJob, deps: SweepDeps): Promise<SweepJobReport> {
+  const startedAt = deps.now();
+  const meterStart = readMeter(deps);
   const now = deps.now();
   const places = new Map<string, SectionPlace>();
   const add = (place: SectionPlace | null) => {
@@ -1179,6 +1181,17 @@ async function spreadMorning(job: ScheduledJob, deps: SweepDeps): Promise<SweepJ
   const jobs = [...places.values()].map((place): ScheduledJob => ({ key: `${job.key}:${placeKeyOf(place)}`, kind: "sweep-post", place }));
   await deps.spawn!(jobs);
   const summary = jobs.length ? `spread over ${jobs.length} place job(s)` : "nothing due this morning";
+  await recordRun(deps, {
+    runName: "morning",
+    jobKey: job.key,
+    channels: [...new Set([...places.values()].map((p) => p.channel))],
+    threads: 0,
+    items: 0,
+    outcome: "handled",
+    note: summary,
+    startedAt,
+    meterStart,
+  });
   return { kind: "sweep-post", key: job.key, outcome: "handled", note: null, threads: 0, findings: [], cards: [], summary };
 }
 

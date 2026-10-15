@@ -1209,6 +1209,39 @@ test("the run's post spreads over one job a place, and posts nothing itself", as
   assert.equal(report.calls.length, 2, "claimed, then posted");
 });
 
+test("a quiet morning that spreads still records its post step, over no places", async () => {
+  const h = quietMorning();
+  const spawned: ScheduledJob[] = [];
+  Object.assign(h.deps, { spawn: async (jobs: readonly ScheduledJob[]) => void spawned.push(...jobs) });
+  await runSweepJob(MORNING, h.deps);
+  assert.deepEqual(spawned, []);
+  assert.deepEqual(
+    h.store.runs().map((r) => [r.runName, r.jobKey, r.channels, r.threads, r.items, r.outcome, r.note]),
+    [["morning", MORNING.key, [], 0, 0, "handled", "nothing due this morning"]],
+  );
+});
+
+test("the spread morning records its own row naming the places, and each place job its own", async () => {
+  const h = await fixAt({ channel: DESIGN, channelKind: "public" });
+  const report = handedOff(weekly(UNIVERSAL, 2));
+  h.deps.sections = [report.port];
+  const spawned: ScheduledJob[] = [];
+  Object.assign(h.deps, { spawn: async (jobs: readonly ScheduledJob[]) => void spawned.push(...jobs) });
+  await runSweepJob(MORNING, h.deps);
+  const parent = h.store.runs().filter((r) => r.jobKey === MORNING.key);
+  assert.equal(parent.length, 1);
+  assert.deepEqual(
+    [parent[0]!.runName, new Set(parent[0]!.channels), parent[0]!.outcome, parent[0]!.note],
+    ["morning", new Set(spawned.map((j) => j.place!.channel)), "handled", "spread over 2 place job(s)"],
+  );
+  assert.equal(parent[0]!.channels.length, 2);
+
+  for (const job of spawned) await runSweepJob(job, h.deps);
+  for (const job of spawned) {
+    assert.equal(h.store.runs().filter((r) => r.jobKey === job.key && r.runName === "morning").length, 1, job.key);
+  }
+});
+
 test("a place's job that runs out of budget holds up no other place", async () => {
   const h = await fixAt({ channel: DESIGN, channelKind: "public" });
   const report = handedOff({ ...weekly(UNIVERSAL, 2), cost: () => ({ subrequests: 30, d1Queries: 0 }) });
