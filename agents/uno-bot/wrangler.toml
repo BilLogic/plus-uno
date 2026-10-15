@@ -164,7 +164,7 @@ NOTION_BANNERS_DB_ID = "36eb7cca-4982-81f4-ad99-e53e62d9506a"
 # read-only anon key is set separately via `wrangler secret put SUPABASE_ANON_KEY`.
 SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"
 # The uno-bot Auth user on that project — the blueprint WRITE identity, an
-# rpc_writer (authoring RPCs only, no table writes, deletes refused). Public on
+# rpc_writer (authoring RPCs only, deletes included; no table writes). Public on
 # purpose: its password is the secret SUPABASE_WRITE_PASSWORD, set with
 # scripts/blueprint-writer-wizard.sh.
 SUPABASE_WRITE_EMAIL = "uno-bot@uno-blueprint.local"
