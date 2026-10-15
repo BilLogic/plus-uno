@@ -441,11 +441,14 @@ describe('the colour key is finer than the normaliser it replaces', () => {
    * bases already in the corpus; 405 the same day, when ten state-layer bases
    * were re-mixed from their Figma solids and their washes joined those
    * channels; 411 when `--color-focus-ring-inverse` arrived as another solid
-   * #f9f9fc and paired with the six surface overlays. The number is asserted
+   * #f9f9fc and paired with the six surface overlays; 426 when the four
+   * `--color-surface-default|overlay|raised|sunken` roles arrived as aliases
+   * of solid neutrals already in the corpus and brought 15 pairs with their
+   * overlays, every one of the new pairs touching one of the four. The number is asserted
    * rather than logged because a migrating caller's exposure is this number,
    * and a drift in it is news either way.
    */
-  it('differs from the normaliser on 411 live token pairs', () => {
+  it('differs from the normaliser on 426 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
       .map((entry) => entry.value)
       .filter((value) => normaliseColour(value) !== null);
@@ -458,7 +461,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
         pairs += 1;
       }
     }
-    expect(pairs).toBe(411);
+    expect(pairs).toBe(426);
   });
 
   /*
