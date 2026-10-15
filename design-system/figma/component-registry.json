@@ -1713,9 +1713,8 @@
           {
             "id": "rich-text-editor",
             "name": "Rich Text Editor",
-            "componentSetNodeId": "10010:37927",
-            "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10010-37927",
+            "componentSetNodeId": "18729:36579",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18729-36579",
             "source": "node-chart",
             "status": "verified"
           }

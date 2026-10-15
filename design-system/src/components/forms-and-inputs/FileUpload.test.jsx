@@ -46,4 +46,34 @@ describe('FileUpload', () => {
         const { container } = render(<FileUpload label="Recording" />);
         expect(container.querySelector('.plus-file-upload-description')).toBeNull();
     });
+
+    it('marks a valid field and its message as valid', () => {
+        const { container } = render(
+            <FileUpload label="Recording" validation="valid" validationMessage="Looks good" />
+        );
+        expect(container.querySelector('.plus-file-upload-container')).toHaveClass('plus-file-upload-valid');
+        expect(screen.getByText('Looks good').parentElement).toHaveClass('plus-file-upload-validation-valid');
+        expect(screen.getByRole('button', { name: 'Choose a file' })).toBeEnabled();
+    });
+
+    it('still accepts the deprecated success value as valid', () => {
+        const { container } = render(
+            <FileUpload label="Recording" validation="success" validationMessage="Looks good" />
+        );
+        expect(container.querySelector('.plus-file-upload-container')).toHaveClass('plus-file-upload-valid');
+        expect(screen.getByText('Looks good').parentElement).toHaveClass('plus-file-upload-validation-valid');
+    });
+
+    it('shows the files but offers no way to choose one when read-only', () => {
+        const onChange = vi.fn();
+        const { container } = render(
+            <FileUpload label="Recording" readOnly onChange={onChange}>
+                <span>zoom_0.mp4</span>
+            </FileUpload>
+        );
+        expect(screen.queryByRole('button', { name: 'Choose a file' })).toBeNull();
+        expect(container.querySelector('.plus-file-upload-container')).toHaveClass('plus-file-upload-readonly');
+        expect(container.querySelector('input[type="file"]')).toHaveAttribute('aria-readonly', 'true');
+        expect(screen.getByText('zoom_0.mp4')).toBeInTheDocument();
+    });
 });

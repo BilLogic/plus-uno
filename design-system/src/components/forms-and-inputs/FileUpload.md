@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/FileUpload.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/FileUpload.stories.jsx` — Overview, Content, Styles, InteractionStates, WithFiles, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/FileUpload.stories.jsx` — Overview, Content, Styles, InteractionStates, ReadOnly, WithFiles, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FileUpload.mdx`
 
@@ -22,6 +22,7 @@
 | `description` | string | — | Description text shown below the label |
 | `acceptedFormats` | arrayOf | — | — |
 | `disabled` | bool | `false` | Disable the file upload component |
+| `readOnly` | bool | `false` | Show the field and its files without a way to choose a file |
 | `validation` | enum | `'none'` | Validation state of the component |
 | `validationMessage` | string | — | Message displayed for validation states |
 | `buttonText` | string | `'Choose a file'` | Text displayed on the file selection button |
@@ -34,13 +35,13 @@
 
 ## Variants
 
-**`validation`** — `none` · `invalid` · `success`
+**`validation`** — `none` · `invalid` · `valid` · `success`
 
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-danger` · `--color-danger-state-08` · `--color-focus-ring` · `--color-on-surface` · `--color-on-surface-variant` · `--color-success` · `--color-success-state-08` · `--font-family-body` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body2` · `--font-size-body3` · `--font-weight-normal` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-radius-md`
+`--color-danger` · `--color-danger-state-08` · `--color-focus-ring` · `--color-on-surface` · `--color-on-surface-variant` · `--color-success` · `--color-success-state-08` · `--color-surface-variant` · `--font-family-body` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body2` · `--font-size-body3` · `--font-weight-normal` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-radius-md`
 
 From `design-system/src/components/forms-and-inputs/FileUpload.scss`. Override these through the token layer, never with a literal.
 

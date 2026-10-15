@@ -29,7 +29,7 @@
         box-shadow: 0 0 0 0.2rem var(--color-danger-state-08);
     }
     
-    &.plus-file-upload-success {
+    &.plus-file-upload-valid {
         box-shadow: 0 0 0 0.2rem var(--color-success-state-08);
     }
     
@@ -38,6 +38,12 @@
     // keep sufficient color contrast (WCAG AA). The button handles its own disabled style.
     &.plus-file-upload-disabled {
         cursor: not-allowed;
+    }
+
+    // Read-only: the field box reads as a fixed value, like the Input read-only state.
+    &.plus-file-upload-readonly {
+        background-color: var(--color-surface-variant);
+        cursor: default;
     }
 }
 
@@ -115,7 +121,7 @@
     }
 }
 
-.plus-file-upload-validation-success {
+.plus-file-upload-validation-valid {
     color: var(--color-success);
     
     i {
