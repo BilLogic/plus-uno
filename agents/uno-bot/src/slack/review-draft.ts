@@ -237,6 +237,8 @@ const NEW = "New content";
 /** Slack's cap on a section's text. */
 const SECTION_CHARS = 3000;
 
+// Kept here too: it lives in `review-anatomy.ts` now, so the readers in
+// `review-draft-writes.ts` can say it without importing this file back.
 export { TOO_LONG_TO_EDIT };
 
 /**

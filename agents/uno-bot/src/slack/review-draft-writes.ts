@@ -49,12 +49,31 @@ interface RepoNotice {
   fromDm: boolean;
 }
 
-const VISIBILITY_LINE = /^(?::warning: )?\*([^*]+)\* (is public|is private|may be public) — .*$/m;
+const VISIBILITY_LINE = /^(?::warning: )?\*([^*]+)\* (is public|is private|may be public) — .*$/;
+
+/**
+ * The card's caveat lines: the run of them at its foot, where the renderer
+ * writes every caveat after the fields. Read from the foot, not searched for,
+ * and with the input's own words taken out first — the card writes a body or
+ * a comment verbatim, the last field above the caveats — so a body or comment
+ * that quotes a caveat-shaped line is never taken for one.
+ */
+function caveatLines(cardText: string, input: Input = {}): string[] {
+  const words = [str(input.comment), str(input.body)].filter((w) => w.includes("\n") || w.startsWith(":warning:") || VISIBILITY_LINE.test(w));
+  const text = words.reduce((t, w) => t.split(w).join(""), cardText);
+  const lines = text.trimEnd().split("\n");
+  let start = lines.length;
+  while (start > 0 && (lines[start - 1]!.startsWith(":warning:") || VISIBILITY_LINE.test(lines[start - 1]!))) start--;
+  return lines.slice(start).filter((line) => !/^:warning: About to /.test(line));
+}
 
 /** The card's repo-visibility line, read back; null when it has none (an
  *  update with no comment carries none: nothing is written that anyone reads). */
-function repoNotice(cardText: string): RepoNotice | null {
-  const m = VISIBILITY_LINE.exec(cardText);
+function repoNotice(cardText: string, input: Input): RepoNotice | null {
+  const m = caveatLines(cardText, input)
+    .map((line) => VISIBILITY_LINE.exec(line))
+    .filter((match) => match !== null)
+    .at(-1);
   if (!m) return null;
   const visibility = m[2] === "is public" ? "public" : m[2] === "is private" ? "private" : "unknown";
   return { repo: m[1]!, visibility, fromDm: !m[0].includes("linking this thread") };
@@ -62,11 +81,8 @@ function repoNotice(cardText: string): RepoNotice | null {
 
 /** The card's caveats other than the repo's visibility (a cut-off rerun, say),
  *  as alerts. */
-function otherAlerts(cardText: string): DraftAlert[] {
-  const lines = cardText
-    .split("\n")
-    .filter((line) => line.startsWith(":warning:") && !/^:warning: About to /.test(line) && !VISIBILITY_LINE.test(line));
-  return alertsFromCaveats(lines);
+function otherAlerts(cardText: string, input: Input = {}): DraftAlert[] {
+  return alertsFromCaveats(caveatLines(cardText, input).filter((line) => !VISIBILITY_LINE.test(line)));
 }
 
 /**
@@ -74,14 +90,17 @@ function otherAlerts(cardText: string): DraftAlert[] {
  * visibility could not be read, a warning to check the words before they go
  * out; on a private one, an info line saying who can read them.
  *
- * @param what - "the issue" or "the comment"
+ * Each says it in under an alert's 200 characters, whatever the repo's name:
+ * the where line names the repo, so the alert does not.
+ *
+ * @param write - What goes out: the new issue, or a comment on one
  */
-function repoAlert(notice: RepoNotice, what: "issue" | "comment"): DraftAlert {
-  const [readable, check] = what === "comment" ? ["the comment once it's posted", "Check it"] : ["the issue once it's filed", "Check the body"];
+function repoAlert(notice: RepoNotice, write: "issue" | "comment"): DraftAlert {
+  const [readable, check] = write === "comment" ? ["the comment once it's posted", "Check it"] : ["the issue once it's filed", "Check the body"];
   const footer = notice.fromDm ? "I add a footer naming you." : "I add a footer naming you and linking this thread.";
   const tail = `${check} for anything from a DM or private channel. ${footer}`;
-  if (notice.visibility === "private") return { level: "info", text: `Only people with access to ${notice.repo} can read the ${what}. ${footer}` };
-  if (notice.visibility === "unknown") return { level: "warning", text: `I couldn't check whether ${notice.repo} is public, so treat the ${what} as readable by anyone. ${tail}` };
+  if (notice.visibility === "private") return { level: "info", text: `Only people with access to the repo can read the ${write}. ${footer}` };
+  if (notice.visibility === "unknown") return { level: "warning", text: `I couldn't check if the repo is public, so treat the ${write} as public. ${tail}` };
   return { level: "warning", text: `Anyone can read ${readable}. ${tail}` };
 }
 
@@ -178,7 +197,7 @@ function issueUpdateFacts(update: IssueUpdate): Array<[string, string]> {
  */
 export function issueUpdateAnatomy(input: Input, detail: AnatomyContext): DraftAnatomy {
   const read = issueUpdateFromInput(input);
-  const notice = repoNotice(detail.cardText);
+  const notice = repoNotice(detail.cardText, input);
   // The card's `Issue` line is the resolver's `repo#number`.
   const ref = /^(\S+?)#(\d+)$/.exec(cardField(detail.cardText, "Issue"));
   const repo = ref?.[1] ?? notice?.repo ?? (str(input.repo).includes("/") ? str(input.repo) : DEFAULT_REPO);
@@ -197,7 +216,7 @@ export function issueUpdateAnatomy(input: Input, detail: AnatomyContext): DraftA
       { type: "link", url: `${repoUrl(repo)}/issues/${update.issue}`, text: `${repo}#${update.issue}` },
       repoTail(notice),
     ],
-    alerts: [...otherAlerts(detail.cardText), ...(notice ? [repoAlert(notice, "comment")] : [])],
+    alerts: [...otherAlerts(detail.cardText, input), ...(notice ? [repoAlert(notice, "comment")] : [])],
     content,
   };
 }
@@ -248,7 +267,7 @@ const ISSUE_HEADING = /^:warning: About to \*file a GitHub issue on (\S+)\*:$/m;
  * anyone else, the title and the body as GitHub will render it.
  */
 export function issueCreateAnatomy(input: Input, detail: AnatomyContext): DraftAnatomy {
-  const notice = repoNotice(detail.cardText);
+  const notice = repoNotice(detail.cardText, input);
   const repo = ISSUE_HEADING.exec(detail.cardText)?.[1] ?? notice?.repo ?? (str(input.repo).includes("/") ? str(input.repo) : DEFAULT_REPO);
   const content: unknown[] = [];
   textOrInput(content, detail, "title", "Title", str(input.title));
@@ -260,7 +279,7 @@ export function issueCreateAnatomy(input: Input, detail: AnatomyContext): DraftA
   return {
     header: "File a GitHub issue",
     where: [{ type: "text", text: "Files on " }, { type: "link", url: repoUrl(repo), text: repo }, repoTail(notice)],
-    alerts: [...otherAlerts(detail.cardText), ...(notice ? [repoAlert(notice, "issue")] : [])],
+    alerts: [...otherAlerts(detail.cardText, input), ...(notice ? [repoAlert(notice, "issue")] : [])],
     content,
   };
 }

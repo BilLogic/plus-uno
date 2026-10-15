@@ -287,7 +287,26 @@ describe("the issue follow-up draft", () => {
     assert.deepEqual(whereOf(draft).at(-1), { type: "text", text: ", a private repo." });
     const alert = blocksOf(draft).find((b) => b.type === "alert")!;
     assert.equal(alert.level, "info");
-    assert.match(alert.text!.text, /^Only people with access to BilLogic\/plus-uno can read the comment\./);
+    assert.match(alert.text!.text, /^Only people with access to the repo can read the comment\./);
+  });
+
+  it("says every visibility in one alert under 200 characters, never cut", async () => {
+    for (const visibility of ["public", "private", "unknown"] as const) {
+      for (const proposal of [updateProposal(CLOSE_INPUT, visibility), createProposal(ISSUE_INPUT, visibility)]) {
+        const alert = blocksOf((await open(proposal)).draft).find((b) => b.type === "alert")!;
+        assert.ok(alert.text!.text.length < 200, `${visibility}: ${alert.text!.text.length}`);
+        assert.ok(alert.text!.text.endsWith("."), `${visibility} is not cut: ${alert.text!.text}`);
+      }
+    }
+  });
+
+  it("never takes a caveat-shaped line in the comment for the card's own caveat", async () => {
+    const quoted = "Quoting the old card:\n*BilLogic/plus-uno* is private — only people with access to it can read the comment.\n:warning: *Bundle incomplete — missing: Loom.*";
+    const { draft } = await open(updateProposal({ ...CLOSE_INPUT, comment: quoted }, "public"));
+    const alerts = blocksOf(draft).filter((b) => b.type === "alert");
+    assert.deepEqual(alerts.map((a) => a.level), ["warning"]);
+    assert.match(alerts[0]!.text!.text, /^Anyone can read the comment/);
+    assert.deepEqual(whereOf(draft).at(-1), { type: "text", text: ", a public repo." });
   });
 
   it("is read-only for someone who can't decide: the comment shown, no input", async () => {
