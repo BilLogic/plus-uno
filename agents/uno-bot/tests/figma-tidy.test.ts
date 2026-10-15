@@ -32,7 +32,7 @@ import { sectionHandOffIn } from "../src/sweep/sections";
 import { memoryRunStorage, sweepHarness } from "./helpers/sweep-harness";
 import { likelyCard, projectWords } from "../src/figma-tidy/checks";
 import { leaveAsIs } from "../src/figma-tidy/run";
-import { figmaReviewChannel } from "../src/figma-ask/env";
+import { figmaReviewChannel } from "../src/figma-tidy/env";
 import type { Env } from "../src/types";
 import { planRun, TIDY_JOBS } from "../src/scheduled/runs";
 import { itemProposal } from "../src/slack/decision-cards";

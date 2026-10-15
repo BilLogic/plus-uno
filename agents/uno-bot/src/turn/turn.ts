@@ -1613,6 +1613,12 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       })
     : null;
   const posted = inPlace ? { ok: true, text: inPlace.text, ts: inPlace.staged.proposalTs } : await delivery.card(card);
+  // An answer-only surface declined the card on purpose: the person is told
+  // what it would have done instead, so the turn answered, and nothing stages.
+  if (!inPlace && posted.declined) {
+    await memory.remember(posted.text);
+    return { disposition: "answered", posted: posted.text, wrote: memory.wrote(), telemetry };
+  }
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] proposal card was not staged (${result.toolName})`);
     return {
@@ -1717,7 +1723,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // A proposal is still a completed conversational turn. An agent_view DM has
   // no Slack thread to rebuild, so preserving this exchange in the store is the
   // only way its image pointer reaches the immediate follow-up.
-  await memory.remember(posted.shown ?? posted.text);
+  await memory.remember(posted.text);
 
   return {
     disposition: "staged",
@@ -1848,6 +1854,11 @@ async function dropFromSweepCard(
   );
   const card: ProposalCard = fixes ? { ...built, fixes } : built;
   const posted = await delivery.card(card);
+  // Declined on an answer-only surface, as a fresh card is (`PostResult.declined`).
+  if (posted.declined) {
+    await memory.remember(posted.text);
+    return { disposition: "answered", posted: posted.text, wrote: memory.wrote(), telemetry };
+  }
   if (!posted.ok || !posted.ts) {
     console.error("[turn] sweep card revision was not staged");
     return { disposition: "failed", failure: { stage: "delivery" }, wrote: memory.wrote(), telemetry };
@@ -1893,7 +1904,7 @@ async function dropFromSweepCard(
     ],
     deps.usage.writeTimeoutMs,
   );
-  await memory.remember(posted.shown ?? posted.text);
+  await memory.remember(posted.text);
   return { disposition: "staged", posted: posted.text, staged: { proposal, card }, wrote: memory.wrote(), telemetry };
 }
 
@@ -2021,6 +2032,8 @@ export async function restageExecution(
   const card: ProposalCard = { ...built, caveats: [{ kind: "cut-off-rerun" }, ...built.caveats] };
   const before = await batchBefore(restage.operations, built.revision, deps.cards);
   const posted = await deps.delivery.card(card);
+  // Declined on an answer-only surface: nothing re-staged, and nothing failed.
+  if (posted.declined) return null;
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] re-staged card was not posted (${first.toolName})`);
     await deps.delivery.postFailure("delivery");

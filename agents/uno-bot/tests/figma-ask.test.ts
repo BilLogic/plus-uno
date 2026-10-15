@@ -2,10 +2,10 @@
 //
 // Each case queues what the notification route queues for a FILE_COMMENT and
 // runs the job on the shared in-memory Figma, the in-memory ThreadState, and
-// the REAL turn behind a fake model (`tests/helpers/turn-harness.ts`). A card
-// reaches #plus-design through a recording Delivery. What is asserted is what a
-// person sees: the reply on the comment, the card in #plus-design, and what
-// Figma was asked to write — never which helper ran.
+// the REAL turn behind a fake model (`tests/helpers/turn-harness.ts`). The ask
+// has no way to post to Slack, so what is asserted is what a person sees in
+// Figma: the reply on the comment, and what Figma was asked to write — never
+// which helper ran.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
@@ -18,17 +18,14 @@ import type { FigmaAskDelivery } from "../src/figma-ask/delivery";
 import { isOwnComment } from "../src/figma-ask/trigger";
 import { CANT_FIND_LINE } from "../src/figma-ask/copy";
 import { candidateThreads } from "../src/figma-comments/threads";
-import { recordingDelivery, runTurn, type RecordingDelivery } from "../src/turn/index";
+import { runTurn } from "../src/turn/index";
 import { SubrequestBudgetError } from "../src/net";
 import type { ScriptedReply } from "../src/agent/providers/fake";
 import { harness } from "./helpers/turn-harness";
 import { readGithub } from "../src/tools/github-read";
 import { gapNotes, type StoredTeamRoles } from "../src/usage/index";
 import { figmaAskDepsFor } from "../src/figma-ask/env";
-import { runReviewDecision } from "../src/slack/review-door";
-import type { GateVerdict } from "../src/gate/gate";
 import type { Env } from "../src/types";
-import { recordingViews } from "./helpers/recording-slack";
 
 const FILE = "FILEKEY1";
 const DESIGN = "CDESIGN1";
@@ -80,14 +77,8 @@ interface World {
   figma: InMemoryFigma;
   deps: FigmaAskDeps;
   marks: Map<string, AskMark>;
-  /** Where #plus-design's lead posts landed. */
-  leads: string[];
-  /** The card Delivery, per lead. */
-  cards: RecordingDelivery[];
   /** Run the job the route queues for `c`, from the payload's fragments (its text, by default). */
   run(c: FigmaComment, fragments?: unknown[]): Promise<{ outcome: string; line: string }>;
-  /** The design owner #plus-design's lead resolves; null for none. */
-  owner: { slack: string | null };
   /** What each turn was told of its asker. */
   askers: Array<{ unmappedAsker: boolean; fileKey: string }>;
   /** Replies uno-bot posted on the file, in order. */
@@ -96,6 +87,8 @@ interface World {
   notes: Array<{ to: string; text: string }>;
   /** The clock the gap notes' marks read, epoch ms. */
   clock: { now: number };
+  /** The usage rows the turns left. */
+  usage: () => Array<{ disposition: string; proposalId: string | null }>;
 }
 
 function world(
@@ -103,9 +96,6 @@ function world(
     replies?: ScriptedReply[];
     people?: Record<string, string>;
     comments?: FigmaComment[];
-    design?: boolean;
-    /** Where the lead and its card post; #plus-design by default. */
-    channel?: string;
     toolResultFor?: (name: string, args: Record<string, unknown>) => string;
     preflightAsk?: string;
     /** The stored Team Members map; by default Sarah is mapped, and the rows
@@ -118,12 +108,7 @@ function world(
   figma.seedFile(FILE, { name: "Goal Setting / Card 2482 / Meryem", comments: opts.comments ?? [], creator: SARAH });
   const h = harness({ replies: opts.replies ?? reads(`The bar stays hidden until the first goal is set. [Goal Setting PRD](${PRD})`), toolResult: PRD_FOUND, ...(opts.toolResultFor ? { toolResultFor: opts.toolResultFor } : {}), ...(opts.preflightAsk ? { preflightAsk: opts.preflightAsk } : {}) });
   const askers: Array<{ unmappedAsker: boolean; fileKey: string }> = [];
-  /** The card Delivery of each lead, by the lead's ts. */
-  const byLead = new Map<string, RecordingDelivery>();
   const marks = new Map<string, AskMark>();
-  const leads: string[] = [];
-  const cards: RecordingDelivery[] = [];
-  const owner: { slack: string | null } = { slack: "UOWNER" };
   const notes: Array<{ to: string; text: string }> = [];
   const clock = { now: NOW };
   /** The 30-day marks, as KV keeps them: each with its expiry. */
@@ -142,7 +127,6 @@ function world(
       return { ok: true };
     },
   });
-  const channel = opts.channel ?? DESIGN;
   const deps: FigmaAskDeps = {
     figma,
     people: async () => opts.people ?? { [SARAH.id]: "USARAH" },
@@ -156,27 +140,7 @@ function world(
       askers.push(asker);
       return runTurn(request, { ...h.deps, delivery });
     },
-    ...(opts.design === false
-      ? {}
-      : {
-          design: {
-            channel,
-            ...(channel === DESIGN || channel === "C03FC8AS69K" ? { name: "#plus-design" } : {}),
-            post: async (text) => {
-              leads.push(text);
-              return { ts: `1760000000.00000${leads.length}` };
-            },
-            permalink: async (ts) => `https://plus.slack.com/archives/${channel}/p${ts.replace(".", "")}`,
-            cardDelivery: (leadTs) => {
-              const d = recordingDelivery();
-              cards.push(d);
-              byLead.set(leadTs, d);
-              return d;
-            },
-            cardIn: async (leadTs) => byLead.get(leadTs)?.stagedAt[0] ?? null,
-            designOwner: async () => owner.slack,
-          },
-        }),
+    channel: DESIGN,
     gaps,
     now: () => NOW,
   };
@@ -186,10 +150,8 @@ function world(
     notes,
     clock,
     marks,
-    leads,
-    cards,
-    owner,
     askers,
+    usage: () => h.usage.records(),
     async run(c, fragments) {
       const result = await runFigmaEventJob(queuedFor(c, fragments), { onAsk: (job) => answerFigmaAsk(job, deps) });
       return { outcome: result.outcome, line: result.line };
@@ -343,37 +305,40 @@ describe("a change request", () => {
   const STAGES: ScriptedReply[] = [
     { text: "Drafting it.", toolCalls: [{ name: "notion_create", args: { title: "Hide the progress bar until the first goal" } }] },
   ];
+  const ANSWER_ONLY = "🐐: I can't make changes from a Figma comment, so nothing was changed.";
+  const TO_SLACK = "Ask le goat in Slack, and I'll draft it there for a teammate to approve.";
 
-  it("is drafted as a card in #plus-design under a lead asking the design owner, and the reply links it", async () => {
+  it("gets one Figma reply saying what uno-bot would do and pointing at le goat in Slack, and nothing is staged", async () => {
     const w = world({ replies: STAGES });
     await ask(w, comment("100", "@uno please add to the PRD: hide the bar until the first goal"));
-
-    assert.equal(w.leads.length, 1);
-    assert.match(
-      w.leads[0]!,
-      /^<@UOWNER>, <@USARAH> asked in a Figma comment on <https:\/\/www\.figma\.com\/design\/FILEKEY1\|Goal Setting \/ Card 2482 \/ Meryem>: “please add to the PRD: hide the bar until the first goal” \(<[^>]+\|comment>\)\. Can you review the draft below\?$/,
-    );
-    assert.equal(w.cards.length, 1);
-    assert.equal(w.cards[0]!.stagedCards.length, 1, "one card, staged in the lead's thread");
-
-    const link = `https://plus.slack.com/archives/${DESIGN}/p1760000000000001`;
-    assert.deepEqual(w.replies().map((r) => r.message), [
-      [`🐐: I drafted this change for approval in #plus-design: ${link}`, "Nothing changes in the file or anywhere else until a teammate approves it there."].join("\n"),
-    ]);
+    assert.deepEqual(w.replies(), [{ root: "100", message: [ANSWER_ONLY, `To make it, I'd create this card in Notion. ${TO_SLACK}`].join("\n") }]);
+    assert.deepEqual(w.figma.writes().map((c) => c.method), ["replyToComment"], "Figma gets only the reply");
+    assert.equal(await w.deps.threadState.getProposalByThread({ channel: DESIGN, thread: `figma:${FILE}:100` }), null, "no proposal staged");
   });
 
-  it("leaves the Figma thread only what Figma showed; the card's words go to the lead's thread", async () => {
-    const w = world({ replies: STAGES });
-    await ask(w, comment("100", "@uno please add to the PRD: hide the bar until the first goal"));
-    const link = `https://plus.slack.com/archives/${DESIGN}/p1760000000000001`;
-    const figmaThread = await w.deps.threadState.readHistory({ channel: DESIGN, thread: `figma:${FILE}:100` });
-    assert.deepEqual(
-      figmaThread.filter((t) => t.role === "assistant").map((t) => t.content),
-      [[`I drafted this change for approval in #plus-design: ${link}`, "Nothing changes in the file or anywhere else until a teammate approves it there."].join("\n")],
-    );
-    const lead = await w.deps.threadState.readHistory({ channel: DESIGN, thread: "1760000000.000001" });
-    const staged = await w.deps.threadState.getProposalByThread({ channel: DESIGN, thread: "1760000000.000001" });
-    assert.deepEqual(lead.filter((t) => t.role === "assistant").map((t) => t.content), [staged!.proposalText]);
+  it("is recorded as answered, not failed, and the thread remembers the reply's lines", async () => {
+    const errors: string[] = [];
+    const error = console.error;
+    console.error = (...args: unknown[]) => void errors.push(args.join(" "));
+    try {
+      const w = world({ replies: STAGES });
+      await ask(w, comment("100", "@uno please add to the PRD: hide the bar until the first goal"));
+      assert.deepEqual(
+        w.usage().map((r) => ({ disposition: r.disposition, proposalId: r.proposalId })),
+        [{ disposition: "answered", proposalId: null }],
+      );
+      const remembered = (await w.deps.threadState.readHistory({ channel: DESIGN, thread: `figma:${FILE}:100` }))
+        .filter((t) => t.role === "assistant")
+        .map((t) => t.content);
+      assert.deepEqual(remembered, [w.replies()[0]!.message.replace(/^🐐: /, "")]);
+
+      const stranger = world({ replies: STAGES });
+      await ask(stranger, comment("100", "@uno add it to the PRD", { user: STRANGER }));
+      assert.deepEqual(stranger.usage().map((r) => r.disposition), ["answered"]);
+    } finally {
+      console.error = error;
+    }
+    assert.deepEqual(errors.filter((e) => /proposal card was not staged/.test(e)), [], "a deliberate refusal is no error");
   });
 
   it("remembers a clarifying question as the lines Figma posted, not the whole note", async () => {
@@ -386,74 +351,39 @@ describe("a change request", () => {
     assert.deepEqual(remembered, [["Which PRD should this go in?", "The goal-setting one or the onboarding one?", "Or both?"].join("\n")]);
   });
 
-  it("writes nothing from Figma: the card waits in #plus-design's thread, and Figma gets only the reply", async () => {
-    const w = world({ replies: STAGES });
-    await ask(w, comment("100", "@uno add it to the PRD"));
-    assert.deepEqual(w.figma.writes().map((c) => c.method), ["replyToComment"]);
-    const staged = await w.deps.threadState.getProposalByThread({ channel: DESIGN, thread: "1760000000.000001" });
-    assert.ok(staged, "the card is found from its thread in #plus-design");
-    assert.equal(staged!.toolName, "notion_create");
-    assert.equal(staged!.replyTs, "1760000000.000001");
-  });
+  for (const [write, args, ask_, would] of [
+    ["notion_update", { page_url: "https://www.notion.so/card-2482", append: "Sessions list newest first" }, "the live app shows sessions oldest first, newest should be first", "update this Notion page"],
+    ["notion_create", { title: "Heading reads Your schedule" }, 'change the heading on this screen to "Your schedule"', "create this card in Notion"],
+    ["github_issue_create", { title: "Blueprint app: phase filter drops a scenario", body: "Seen in Figma.", repo: "plus-uno-blueprint" }, "the blueprint app's phase filter drops a scenario", "file a GitHub issue"],
+  ] as const) {
+    it(`a change routed to ${write} is answered only: the reply names it, and nothing is staged`, async () => {
+      const w = world({ replies: [{ text: "Drafting it.", toolCalls: [{ name: write, args: { ...args } }] }] });
+      await ask(w, comment("100", `@uno ${ask_}`));
+      assert.deepEqual(w.replies().map((r) => r.message), [[ANSWER_ONLY, `To make it, I'd ${would}. ${TO_SLACK}`].join("\n")]);
+      assert.equal(await w.deps.threadState.getProposalByThread({ channel: DESIGN, thread: `figma:${FILE}:100` }), null);
+    });
+  }
 
-  it("from someone not on Team Members is not drafted, and the reply says so", async () => {
+  it("from someone not on Team Members is answered only, and pointed at #plus-design", async () => {
     const w = world({ replies: STAGES });
     await ask(w, comment("100", "@uno add it to the PRD", { user: STRANGER }));
-    assert.deepEqual(w.leads, []);
-    assert.deepEqual(w.cards, []);
-    assert.match(w.replies()[0]!.message, /^🐐: I draft changes only for teammates/);
+    assert.deepEqual(w.replies().map((r) => r.message), [`${ANSWER_ONLY} Ask in #plus-design.`]);
   });
 
-  it("asks the file's creator when no design owner resolves, and the asker when nobody does", async () => {
-    const creator = world({ replies: STAGES, people: { [SARAH.id]: "USARAH", "1500002": "UCREATOR" } });
-    creator.owner.slack = null;
-    creator.figma.seedFile(FILE, { creator: { id: "1500002", handle: "meryem" } });
-    await ask(creator, comment("100", "@uno add it to the PRD"));
-    assert.match(creator.leads[0]!, /^<@UCREATOR>, <@USARAH> asked in a Figma comment on /);
-
-    const nobody = world({ replies: STAGES, people: { [SARAH.id]: "USARAH" } });
-    nobody.owner.slack = null;
-    nobody.figma.seedFile(FILE, { creator: { id: "1500002", handle: "meryem" } });
-    await ask(nobody, comment("100", "@uno add it to the PRD"));
-    assert.match(nobody.leads[0]!, /^<@USARAH>, you asked in a Figma comment on .*Can you review the draft below\?$/);
-  });
-
-  it("escapes the file's title and the ask, so Slack shows them as typed", async () => {
+  it("is answered once: a redelivery runs no second turn and posts no second reply", async () => {
     const w = world({ replies: STAGES });
-    w.figma.seedFile(FILE, { name: "Q&A <draft>" });
-    await ask(w, comment("100", "@uno add <b>this</b> & that to the PRD"));
-    assert.match(w.leads[0]!, /\|Q&amp;A &lt;draft&gt;>/);
-    assert.match(w.leads[0]!, /“add &lt;b&gt;this&lt;\/b&gt; &amp; that to the PRD”/);
-  });
-
-  it("says it couldn't be drafted when #plus-design is not configured, rather than claim a draft", async () => {
-    const w = world({ replies: STAGES, design: false });
-    await ask(w, comment("100", "@uno add it to the PRD"));
-    assert.deepEqual(w.replies().map((r) => r.message), [
-      ["🐐: I couldn't draft this change, so nothing was drafted or written. Ask in #plus-design."].join("\n"),
-    ]);
-  });
-
-  it("never posts a second card: a stop after the card posted defers, and the retry only replies", async () => {
-    const w = world({ replies: STAGES });
-    const answer = w.deps.answer;
     let turns = 0;
-    w.deps.answer = async (request, delivery, asker) => {
+    const answer = w.deps.answer;
+    w.deps.answer = (request, delivery, asker) => {
       turns += 1;
-      const outcome = await answer(request, delivery, asker);
-      if (turns === 1) throw new SubrequestBudgetError(38);
-      return outcome;
+      return answer(request, delivery, asker);
     };
     const c = comment("100", "@uno add it to the PRD");
-    assert.equal((await ask(w, c)).outcome, "deferred");
-    assert.deepEqual(w.replies(), [], "a stop inside the turn defers rather than reply");
-    assert.equal((await w.run(c)).outcome, "handled");
-    assert.equal(turns, 1, "no second turn");
-    assert.equal(w.leads.length, 1);
-    assert.equal(w.cards.length, 1, "one card");
-    assert.match(w.replies()[0]!.message, /I drafted this change for approval in #plus-design: https:\/\/plus\.slack\.com/);
-    const staged = await w.deps.threadState.getProposalByThread({ channel: DESIGN, thread: "1760000000.000001" });
-    assert.ok(staged, "the card's record still moved to its thread");
+    await ask(w, c);
+    await w.run(c);
+    await answerFigmaAsk({ fileKey: FILE, commentId: "100" }, w.deps);
+    assert.equal(turns, 1);
+    assert.equal(w.replies().length, 1);
   });
 
   it("a stranger is answered from public facts only, and told the turn so", async () => {
@@ -488,38 +418,7 @@ describe("a change request", () => {
     assert.deepEqual(histories[1], [], "the unmapped asker's turn reads no teammate turn");
   });
 
-  it("a teammate's change to the screen stages one proposal from the write the turn calls, and the reply links its card", async () => {
-    const w = world({
-      replies: [
-        { text: "Drafting it.", toolCalls: [{ name: "notion_update", args: { page_url: "https://www.notion.so/card-2482", append: "Heading: Your schedule" } }] },
-      ],
-    });
-    await ask(w, comment("100", '@uno change the heading on this screen to "Your schedule"'));
-    assert.equal(w.leads.length, 1);
-    assert.equal(w.cards.length, 1);
-    assert.equal(w.cards[0]!.stagedCards.length, 1);
-    const staged = await w.deps.threadState.getProposalByThread({ channel: DESIGN, thread: "1760000000.000001" });
-    assert.equal(staged!.toolName, "notion_update");
-    assert.match(w.replies()[0]!.message, /^🐐: I drafted this change for approval in #plus-design: https:\/\/plus\.slack\.com/);
-  });
-
-  for (const [write, args, ask_] of [
-    ["notion_update", { page_url: "https://www.notion.so/card-2482", append: "Sessions list newest first" }, "the live app shows sessions oldest first, newest should be first"],
-    ["notion_create", { title: "Heading reads Your schedule" }, 'change the heading on this screen to "Your schedule"'],
-    ["github_issue_create", { title: "Blueprint app: phase filter drops a scenario", body: "Seen in Figma.", repo: "plus-uno-blueprint" }, "the blueprint app's phase filter drops a scenario"],
-  ] as const) {
-    it(`a change routed to ${write} stages one card and the reply links it`, async () => {
-      const w = world({ replies: [{ text: "Drafting it.", toolCalls: [{ name: write, args: { ...args } }] }] });
-      await ask(w, comment("100", `@uno ${ask_}`));
-      assert.equal(w.cards.length, 1);
-      assert.equal(w.cards[0]!.stagedCards.length, 1);
-      const staged = await w.deps.threadState.getProposalByThread({ channel: DESIGN, thread: "1760000000.000001" });
-      assert.equal(staged!.toolName, write);
-      assert.match(w.replies()[0]!.message, /I drafted this change for approval in #plus-design: https:\/\/plus\.slack\.com/);
-    });
-  }
-
-  it("tells a teammate's turn to propose a change with the write that fits, and a stranger's to propose none", async () => {
+  it("tells a teammate's turn no change is made from Figma, the write that fits naming it, and a stranger's to propose none", async () => {
     const scopes: string[] = [];
     const w = world();
     const answer = w.deps.answer;
@@ -530,12 +429,12 @@ describe("a change request", () => {
     await ask(w, comment("100", "@uno the built screen lists sessions oldest first"));
     await ask(w, comment("200", "@uno the built screen lists sessions oldest first", { user: STRANGER }));
     const [teammate, stranger] = scopes;
-    assert.match(teammate!, /change they ask for[^.]*is a proposal[^.]*intake/i);
+    assert.match(teammate!, /no change is made from a Figma comment/i);
+    assert.match(teammate!, /le goat in Slack/);
+    assert.doesNotMatch(teammate!, /#plus-design/);
     assert.match(teammate!, /live PLUS app[^;]*frame's Roadmap card[^;]*`notion_update`[^;]*new Roadmap card \(`notion_create`\)/);
     assert.match(teammate!, /plus-uno repo[^;]*blueprint[^;]*Storybook[^;]*harness[^;]*prototypes[^;]*`github_issue_create`/);
     assert.match(teammate!, /component[^.]*`component_implement`/);
-    assert.doesNotMatch(teammate!, /built product/);
-    assert.doesNotMatch(teammate!, /nothing is written/i);
     assert.match(stranger!, /propose no change/);
     assert.doesNotMatch(stranger!, /notion_update|github_issue_create/);
   });
@@ -882,53 +781,6 @@ describe("a GitHub file the turn read directly", () => {
   });
 });
 
-describe("a try stopped while the card was posting", () => {
-  const STAGES: ScriptedReply[] = [
-    { text: "Drafting it.", toolCalls: [{ name: "notion_create", args: { title: "Hide the progress bar until the first goal" } }] },
-  ];
-
-  /** A world whose marks refuse, once, the first write that `when` matches. */
-  function stoppedAt(when: (mark: AskMark) => boolean): World {
-    const w = world({ replies: STAGES });
-    const put = w.deps.marks.put;
-    let stopped = false;
-    w.deps.marks.put = async (id, mark) => {
-      if (!stopped && when(mark)) {
-        stopped = true;
-        throw new SubrequestBudgetError(38);
-      }
-      return put(id, mark);
-    };
-    return w;
-  }
-
-  it("links the card when it did post, and posts no second one", async () => {
-    const w = stoppedAt((m) => m.state !== "replied" && !!m.card);
-    const c = comment("100", "@uno add it to the PRD");
-    assert.equal((await ask(w, c)).outcome, "deferred");
-    assert.equal((await w.run(c)).outcome, "handled");
-    assert.equal(w.leads.length, 1);
-    assert.equal(w.cards.length, 1, "one card");
-    assert.deepEqual(w.replies().map((r) => r.message), [
-      [
-        `🐐: I drafted this change for approval in #plus-design: https://plus.slack.com/archives/${DESIGN}/p1760000000000001`,
-        "Nothing changes in the file or anywhere else until a teammate approves it there.",
-      ].join("\n"),
-    ]);
-  });
-
-  it("says it couldn't draft the change when the card never posted, and posts none", async () => {
-    const w = stoppedAt((m) => m.state !== "replied" && !!m.lead);
-    const c = comment("100", "@uno add it to the PRD");
-    assert.equal((await ask(w, c)).outcome, "deferred");
-    assert.equal((await w.run(c)).outcome, "handled");
-    assert.equal(w.cards.length, 0);
-    assert.deepEqual(w.replies().map((r) => r.message), [
-      ["🐐: I couldn't draft this change, so nothing was drafted or written. Ask in #plus-design."].join("\n"),
-    ]);
-  });
-});
-
 describe("a reply on its way", () => {
   it("is marked replying before it posts, so a Worker killed after it posted never posts it twice", async () => {
     const w = world();
@@ -995,7 +847,7 @@ describe("the decision read and the asks", () => {
     const threads = candidateThreads(
       [
         comment("100", "@uno we decided: hide the bar until the first goal. Add it to the PRD.", { resolved_at: "2026-10-09T16:00:00Z" }),
-        comment("101", ":goat:: I drafted this change for approval in #plus-design.", { parent_id: "100", user: BILL, client_meta: null }),
+        comment("101", ":goat:: I can't make changes from a Figma comment, so nothing was changed.", { parent_id: "100", user: BILL, client_meta: null }),
         comment("102", "@goat agreed, hidden it is.", { parent_id: "100", client_meta: null }),
       ],
       window,
@@ -1055,68 +907,19 @@ describe("a Team Members gap the ask ran into", () => {
   });
 });
 
-describe("where a change request's card posts", () => {
+describe("the ask on Env", () => {
   const PLUS_DESIGN = "C03FC8AS69K";
-  const LE_GOAT_DM = "D0APTB20SK0";
-  const BILL_SLACK = "U03FYQJRQHX";
-  const STAGES: ScriptedReply[] = [
-    { text: "Drafting it.", toolCalls: [{ name: "notion_create", args: { title: "Hide the progress bar until the first goal" } }] },
-  ];
   const env = (vars: Partial<Env>) =>
     ({ FIGMA_ACCESS_TOKEN: "figd_test", HARNESS_KV: {}, THREAD_STATE: {}, PLUS_DESIGN_CHANNEL_ID: PLUS_DESIGN, ...vars }) as unknown as Env;
 
-  it("is the setting's channel when it names one, and #plus-design when it is blank or unset", () => {
-    const dm = figmaAskDepsFor(env({ FIGMA_ASK_CHANNEL_ID: LE_GOAT_DM }))?.design;
-    assert.deepEqual([dm?.channel, dm?.name], [LE_GOAT_DM, undefined], "a DM is not named in the reply");
-    for (const vars of [{ FIGMA_ASK_CHANNEL_ID: "  " }, {}]) {
-      const design = figmaAskDepsFor(env(vars))?.design;
-      assert.deepEqual([design?.channel, design?.name], [PLUS_DESIGN, "#plus-design"]);
-    }
+  it("holds nothing that posts to Slack: Figma, the people map, the marks, the turn and the gap notes", () => {
+    const deps = figmaAskDepsFor(env({ FIGMA_ASK_CHANNEL_ID: "D0APTB20SK0" }));
+    assert.ok(deps);
+    assert.deepEqual(Object.keys(deps).sort(), ["answer", "channel", "figma", "gaps", "marks", "now", "people", "threadState"]);
   });
 
-  for (const [where, channel, drafted] of [
-    ["#plus-design", PLUS_DESIGN, "I drafted this change for approval in #plus-design"],
-    ["the le goat DM", LE_GOAT_DM, "I drafted this change for approval"],
-  ] as const) {
-    it(`posts the lead and card in ${where}, the reply links it there, and Approve there runs the write`, async () => {
-      const w = world({ replies: STAGES, channel });
-      await ask(w, comment("100", "@uno please add to the PRD: hide the bar until the first goal"));
-
-      assert.equal(w.leads.length, 1);
-      assert.match(w.leads[0]!, /^<@UOWNER>, <@USARAH> asked in a Figma comment on /);
-      assert.equal(w.cards[0]!.stagedCards.length, 1);
-      const link = `https://plus.slack.com/archives/${channel}/p1760000000000001`;
-      assert.deepEqual(
-        w.replies().map((r) => r.message),
-        [[`🐐: ${drafted}: ${link}`, "Nothing changes in the file or anywhere else until a teammate approves it there."].join("\n")],
-        "the reply names only the channel the card is in, and links it there",
-      );
-
-      const staged = await w.deps.threadState.getProposalByThread({ channel, thread: "1760000000.000001" });
-      assert.ok(staged, "the card is found from its thread where it posted");
-      assert.equal(staged!.channel, channel);
-
-      const ran: GateVerdict[] = [];
-      const redrawn: string[] = [];
-      await runReviewDecision(
-        { viewId: "V1", channel, messageTs: staged!.proposalTs, userId: BILL_SLACK, decision: "confirm" },
-        {
-          threadState: w.deps.threadState,
-          standingConfirmers: [BILL_SLACK],
-          views: recordingViews({ alreadyOpen: ["V1"] }).client,
-          delivery: () => recordingDelivery(),
-          applyVerdict: async (v) => {
-            ran.push(v);
-            return [{ toolName: v.execute?.toolName ?? "", ok: true, result: "{}", message: "Created." }];
-          },
-          updateCard: async (at) => void redrawn.push(at),
-          restage: async () => {},
-          revise: async () => {},
-        },
-      );
-      assert.equal(ran.length, 1);
-      assert.equal(ran[0]!.execute?.toolName, "notion_create", "Approve runs the drafted write");
-      assert.deepEqual(redrawn, [channel], "the card is redrawn where it posted");
-    });
-  }
+  it("runs the turn as #plus-design, whatever FIGMA_ASK_CHANNEL_ID names", () => {
+    assert.equal(figmaAskDepsFor(env({ FIGMA_ASK_CHANNEL_ID: "D0APTB20SK0" }))?.channel, PLUS_DESIGN);
+    assert.equal(figmaAskDepsFor(env({ PLUS_DESIGN_CHANNEL_ID: " " }))?.channel, undefined);
+  });
 });
