@@ -158,10 +158,14 @@ async function decide(reason: "asked" | "aged", userId: string, glyph?: string, 
   return (await gate()).resolveSignal(signal(userId, glyph), { threadState, standingConfirmers: STANDING });
 }
 
-async function execute(verdict: GateVerdict) {
+async function execute(verdict: GateVerdict, over: Partial<Env> = {}) {
   const { executeVerdict } = await import("../src/agent/resolve-proposal.js");
-  return executeVerdict(env(), verdict);
+  return executeVerdict({ ...env(), ...over } as Env, verdict);
 }
+
+/** What the thread was told in Slack, by `chat.postMessage`. */
+const told = () =>
+  calls.filter((c) => c.url.includes("slack.com/api/chat.postMessage")).map((c) => String(c.body?.text ?? ""));
 
 const rpcCalls = () =>
   calls.filter((c) => c.url.includes("/rest/v1/rpc/")).map((c) => [c.url.split("/rpc/")[1], c.body?.cell_id ?? c.body?.path_id]);
@@ -259,6 +263,24 @@ describe("nothing is deleted", () => {
     await execute(await decide("aged", REQUESTER));
     assert.deepEqual(rpcCalls(), []);
     assert.deepEqual(withdrawals(), []);
+  });
+});
+
+describe("the press's refusals tell the thread", () => {
+  it("when the write identity is not set up", async () => {
+    await execute(await decide("asked", REQUESTER), { SUPABASE_WRITE_PASSWORD: "" } as Partial<Env>);
+    assert.deepEqual(rpcCalls(), []);
+    assert.ok(told().some((t) => /SUPABASE_WRITE_PASSWORD/.test(t)), told().join(" | "));
+  });
+
+  it("when the press cannot afford the removal", async () => {
+    const { runMetered, countedFetch } = await import("../src/net.js");
+    await runMetered(async () => {
+      for (let i = 0; i < 44; i++) await countedFetch(`https://slack.com/api/counted.test?${i}`);
+      await execute(await decide("asked", REQUESTER));
+    });
+    assert.deepEqual(rpcCalls(), []);
+    assert.ok(told().some((t) => /blueprint calls/.test(t)), told().join(" | "));
   });
 });
 

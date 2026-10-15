@@ -314,7 +314,7 @@ describe("✅ by a confirmer the card names", () => {
   it("tells the thread what it wrote, with a link to the blueprint", async () => {
     await execute(await decide(OWNER));
     assert.match(posted(), /Session › Happy path/);
-    assert.match(appended.join("\n"), /wrote 2 rows/i);
+    assert.match(appended.join("\n"), /wrote 2 cells/i);
     assert.match(appended.join("\n"), /plus-uno\.netlify\.app\/blueprint\/\?cell=/);
   });
 });

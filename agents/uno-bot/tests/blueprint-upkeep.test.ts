@@ -140,7 +140,7 @@ function world(opts: {
     provider: opts.model.provider,
     ownerOf: async () => OWNER,
     placeOf: (card) => (card.pillars.includes("Tutoring") ? TEAM : DESIGN),
-    billId: BILL,
+    leadId: BILL,
     state: state.store,
     weighed: (() => {
       const marks = new Set<string>();
@@ -228,8 +228,11 @@ describe("a deployed card that changes the service", () => {
     // confidence and gaps
     assert.match(text, /0\.8/);
     assert.match(text, /supervisor is told by email or in the app/);
-    // the ask
-    assert.match(text, /Approve/);
+    // the ask: who approves, by mention — the owner and the lead, never a name
+    const ask = text.split("\n").find((l) => l.startsWith("*The ask:*"))!;
+    assert.match(ask, new RegExp(`Only <@${OWNER}> or <@${BILL}> can approve`));
+    assert.match(ask, /writes these cells/);
+    assert.doesNotMatch(ask, /\bBill\b|card's owner/);
     // never mixed: no Roadmap status word in the rows, no blueprint status in the why-now
     const whyNow = text.split("\n").find((l) => l.includes("RM-2292"))!;
     assert.doesNotMatch(whyNow, /`live`|`built`/);

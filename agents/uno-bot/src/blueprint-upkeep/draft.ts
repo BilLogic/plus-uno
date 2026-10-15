@@ -155,7 +155,7 @@ export function readDraft(reply: string, input: DraftInput): Draft | null {
     const s = step(text(r.step_id));
     const l = lane(text(r.lane_id));
     if (!s || !l) {
-      gaps.push(`a row on a step or lane this path does not have (${text(r.step_id) || "?"} × ${text(r.lane_id) || "?"}) was left out`);
+      gaps.push(`a cell on a step or lane this path does not have (${text(r.step_id) || "?"} × ${text(r.lane_id) || "?"}) was left out`);
       continue;
     }
     const slot = `${s.id}:${l.id}`;

@@ -170,7 +170,7 @@ async function world(model: ReturnType<typeof scripted>, cards: ShippedCard[], o
     provider: model.provider,
     ownerOf: async () => OWNER,
     placeOf: () => TEAM,
-    billId: BILL,
+    leadId: BILL,
     state: state.store,
     weighed: (() => {
       const marks = new Set<string>();

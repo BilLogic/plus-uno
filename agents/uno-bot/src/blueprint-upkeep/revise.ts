@@ -24,7 +24,7 @@
 import { rethrowIfBudget } from "../net";
 import { typedEmojiDecision } from "../gate/reactions";
 import type { PendingProposal } from "../thread-state/index";
-import { revisionRefusal } from "../turn/turn";
+import { revisionRefusal } from "../gate/refusal";
 import { NEEDS_CHANGES_LEAD } from "../slack/review-door";
 import { replaceItem, type ReportMessage, type ReportStore } from "../slack/decision-cards";
 import type { ModelProvider } from "../agent/model-provider";
@@ -109,7 +109,7 @@ export async function redraftRevision(deps: RedraftDeps, reply: RevisionReply): 
       const card = thread.cards.find((c) => c.n === n);
       if (!card) return say(`There's no blueprint revision ${n} in this thread.`);
       chosen = live.find((l) => l.card.n === n);
-      if (!chosen) return say(`Card ${n} has already been decided or has closed, so there's nothing to redraft.`);
+      if (!chosen) return say(`Revision ${n} has already been decided or has closed, so there's nothing to redraft.`);
       if (!chosen.card.revision.confirmers.includes(reply.user)) return say(revisionRefusal(chosen.card.revision.confirmers, reply.user));
       wording = m[2]!.trim();
     } else {
@@ -117,7 +117,7 @@ export async function redraftRevision(deps: RedraftDeps, reply: RevisionReply): 
       if (!theirs.length) return false;
       if (theirs.length > 1) {
         const ns = theirs.map((l) => l.card.n);
-        return say(`Which card is that about? Start the reply with its number, like \`${ns[0]}: …\` — open: ${ns.join(", ")}.`);
+        return say(`Which revision is that about? Start the reply with its number, like \`${ns[0]}: …\` — open: ${ns.join(", ")}.`);
       }
       chosen = theirs[0]!;
       wording = bare;
@@ -171,7 +171,7 @@ async function redraft(
   }
   if (!next) {
     await unlock();
-    return say(`I couldn't redraft ${card.n}. *${label}* with that, so its card stays as it is.`);
+    return say(`I couldn't redraft ${card.n}. *${label}* with that, so it stays as it is.`);
   }
 
   const ttlMs = Math.max(thread.expiresAt - deps.now(), 0);
@@ -180,7 +180,7 @@ async function redraft(
   const before = (await deps.reports.getReport(card.messageTs))?.entries.find((e) => e.id === card.itemId)?.item;
   const replaced = before
     ? await replaceItem(deps.reports, card.messageTs, card.itemId, {
-        ...revisionItem(next.source, next.today, next.draft, next.owner, card.n),
+        ...revisionItem(next.source, next.today, next.draft, next, card.n),
         ...(before.owners ? { owners: before.owners } : {}),
       })
     : null;
@@ -203,8 +203,8 @@ async function redraft(
     if (replaced && before) await deps.reports.updateReport(card.messageTs, { id: replaced.id, replace: { id: card.itemId, item: before } }).catch(() => null);
     return say(
       restored
-        ? `That redraft of ${card.n}. *${label}* didn't go through, so the card before it still stands.`
-        : `That redraft of ${card.n}. *${label}* didn't go through, and the card before it couldn't be put back, so it has no live card.`,
+        ? `That redraft of ${card.n}. *${label}* didn't go through, so the revision before it still stands.`
+        : `That redraft of ${card.n}. *${label}* didn't go through, and the revision before it couldn't be put back, so there is none left to approve.`,
     );
   }
   // A design hand-off's rows, as its deploy will promote them: the redraft's,
@@ -223,5 +223,5 @@ async function redraft(
   });
   await deps.superseded([old.proposalTs]);
   const ask = gapAskText([{ n: card.n, label, gaps: next.draft.gaps, who: next.owner ?? next.confirmers[0] ?? null }]);
-  return say([`Redrafted ${card.n}. *${label}* with that correction, on the same card.`, ...(ask ? [ask] : [])].join("\n"));
+  return say([`Redrafted ${card.n}. *${label}* with that correction, in its place.`, ...(ask ? [ask] : [])].join("\n"));
 }

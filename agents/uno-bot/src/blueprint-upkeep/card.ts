@@ -6,7 +6,7 @@
 //                    the blueprint app
 //   4. proposed    — each row added, changed, deprecated or promoted
 //   5. confidence  — the draft's confidence, and what it could not verify
-//   6. the ask     — who may approve, and what approving writes
+//   6. the ask     — who may approve, by Slack mention, and what approving writes
 //
 // ADR-023: the why-now line speaks the Roadmap's words (`Dev Status:
 // Deployed`, an RM-ID) and every other part the blueprint's (step, lane, path,
@@ -41,8 +41,8 @@ export function revisionTitle(today: Pick<PathToday, "scenario" | "path">): stri
   return `${today.scenario} › ${today.path}`;
 }
 
-/** The status change a card is titled by, as plain words: `from → to`, or
- *  `rows → to` for rows with no single status before. */
+/** The status change a revision is titled by, as plain words: `from → to`,
+ *  or `cells → to` for cells with no single status before. */
 function change(draft: Draft): { from: string | null; to: string } {
   const row = draft.revision.rows.find((r) => r.to !== "deprecated");
   // A promotion is titled by its rows: they are what moves on.
@@ -54,7 +54,7 @@ function change(draft: Draft): { from: string | null; to: string } {
 
 function statusChange(draft: Draft): string {
   const c = change(draft);
-  return `${c.from ? code(c.from) : "rows"} → ${code(c.to)}`;
+  return `${c.from ? code(c.from) : "cells"} → ${code(c.to)}`;
 }
 
 /** Part 2, Roadmap words only. */
@@ -95,14 +95,21 @@ function confidence(draft: Draft): string[] {
   ];
 }
 
-function ask(draft: Draft): string {
+/** The people who may approve, as Slack mentions: `<@A> or <@B>`. */
+function approvers(confirmers: readonly string[]): string {
+  const who = confirmers.map((c) => `<@${c}>`);
+  return who.length <= 1 ? (who[0] ?? "nobody") : `${who.slice(0, -1).join(", ")} or ${who[who.length - 1]}`;
+}
+
+function ask(draft: Draft, confirmers: readonly string[]): string {
   const path = draft.revision.path;
+  const who = `Only ${approvers(confirmers)} can approve; Reject writes nothing.`;
   if (!draft.revision.rows.length && path) {
-    return `*The ask:* Approve sets this path to ${code(path.to)} on the blueprint, as uno-bot; no cell is written. Only the card's owner or Bill can approve; Reject writes nothing.`;
+    return `*The ask:* Approve sets this path to ${code(path.to)} on the blueprint, as uno-bot; no cell is written. ${who}`;
   }
   const to = draft.revision.rows.some((r) => r.to !== "deprecated") ? statusOf(draft) : null;
-  const what = to ? `writes these rows to the blueprint as ${code(to)}` : "writes these rows to the blueprint";
-  return `*The ask:* Approve ${what}, as uno-bot, all or nothing. Only the card's owner or Bill can approve; Reject writes nothing.`;
+  const what = to ? `writes these cells to the blueprint as ${code(to)}` : "writes these cells to the blueprint";
+  return `*The ask:* Approve ${what}, as uno-bot, all or nothing. ${who}`;
 }
 
 function statusOf(draft: Draft): string {
@@ -110,20 +117,21 @@ function statusOf(draft: Draft): string {
 }
 
 /**
- * The whole card, mrkdwn: the six parts in order.
+ * The whole revision, mrkdwn: the six parts in order.
  *
  * @param source - The shipped card
  * @param path - Today's path
  * @param draft - The drafted revision
+ * @param confirmers - Who may approve it: the card's owner and the lead
  */
-export function revisionText(source: RevisionSource, path: PathToday, draft: Draft): string {
+export function revisionText(source: RevisionSource, path: PathToday, draft: Draft, confirmers: readonly string[]): string {
   return [
     `*${esc(revisionTitle(path))}* · ${statusChange(draft)}`,
     whyNow(source),
     ...today(path),
     ...proposed(draft),
     ...confidence(draft),
-    ask(draft),
+    ask(draft, confirmers),
   ].join("\n");
 }
 
@@ -138,10 +146,17 @@ export function revisionItemId(source: Pick<RevisionSource, "pageId">, path: Pic
  * @param source - The shipped card
  * @param path - Today's path
  * @param draft - The drafted revision
- * @param owner - The card owner's Slack id, when known
+ * @param people - The card owner's Slack id, when known, and who may approve
  * @param n - Its number in the thread, which a reply names it by
  */
-export function revisionItem(source: RevisionSource, path: PathToday, draft: Draft, owner: string | null, n?: number): ReportItem {
+export function revisionItem(
+  source: RevisionSource,
+  path: PathToday,
+  draft: Draft,
+  people: { owner: string | null; confirmers: readonly string[] },
+  n?: number,
+): ReportItem {
+  const { owner } = people;
   const counts = (["added", "changed", "deprecated", "promoted"] as const)
     .map((k) => [k, draft.changes.filter((c) => c.kind === k).length] as const)
     .filter(([, n]) => n > 0)
@@ -155,22 +170,28 @@ export function revisionItem(source: RevisionSource, path: PathToday, draft: Dra
     open: { label: "Blueprint", url: path.link ?? source.url },
     also: { label: "Roadmap card", url: source.url },
     done: `written to the blueprint as uno-bot.`,
-    detail: revisionText(source, path, draft),
+    detail: revisionText(source, path, draft, people.confirmers),
   };
 }
 
-/** The item title's status change: `from → to`, or `rows`. */
+/** The item title's status change: `from → to`, or `cells`. */
 function titleChange(draft: Draft): string {
   const c = change(draft);
-  return c.from ? `${c.from} → ${c.to}` : "rows";
+  return c.from ? `${c.from} → ${c.to}` : "cells";
 }
 
 /** The card the Gate stages: stated, the whole text as its lead. */
-export function revisionProposalCard(source: RevisionSource, path: PathToday, draft: Draft, operation: ProposalOperation): ProposalCard {
+export function revisionProposalCard(
+  source: RevisionSource,
+  path: PathToday,
+  draft: Draft,
+  confirmers: readonly string[],
+  operation: ProposalOperation,
+): ProposalCard {
   return {
     kind: "stated",
     verb: "write this revision to the blueprint",
-    lead: revisionText(source, path, draft),
+    lead: revisionText(source, path, draft, confirmers),
     footer: "",
     fields: [],
     caveats: [],
@@ -190,7 +211,7 @@ export interface GapAsk {
   n: number;
   label: string;
   gaps: string[];
-  /** Who is asked: the card's owner, else Bill. */
+  /** Who is asked: the Roadmap card's owner, else the lead. */
   who: string | null;
 }
 
@@ -205,7 +226,7 @@ export function gapAskText(asks: readonly GapAsk[]): string | null {
     .filter((a) => a.gaps.length)
     .map(
       (a) =>
-        `${a.who ? `<@${a.who}> ` : ""}On ${a.n}. *${esc(a.label)}*, I couldn't verify: ${a.gaps.map(esc).join("; ")}. Reply here with what's right and I'll redraft that card.`,
+        `${a.who ? `<@${a.who}> ` : ""}On ${a.n}. *${esc(a.label)}*, I couldn't verify: ${a.gaps.map(esc).join("; ")}. Reply here with what's right and I'll redraft that revision.`,
     );
   return lines.length ? lines.join("\n") : null;
 }

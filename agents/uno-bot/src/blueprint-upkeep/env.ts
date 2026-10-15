@@ -7,13 +7,14 @@
 //   • the evidence: the card's page text and its PRD's (`readNotionPage`,
 //     through `cardEvidence`);
 //   • the gate's search: `search_blueprint`'s read (`searchBlueprint`);
-//   • the path read: four anon-key PostgREST reads of uno-blueprint — the
-//     matched cell's path, then that path's cells, lanes and ordered steps;
+//   • the path read: five anon-key PostgREST reads of uno-blueprint — the
+//     matched cell's path, then that path, its cells, lanes and ordered steps
+//     (`PATH_READ_COST`);
 //   • the model: the Worker's provider (`selectProvider`), one tier a call;
 //   • the owner: the card's first Contributor, through the Team Members
 //     directory then by name (card follow-ups' `peopleFor`);
 //   • the place: card follow-ups' ladder (`cardPlace`);
-//   • Bill: `LEAD_USER_ID`, the deployment's lead;
+//   • the lead: `LEAD_USER_ID`, the deployment's lead, the other confirmer;
 //   • the state: one JSON record in HARNESS_KV; each card's weighed mark a
 //     key of its own there, kept for good; each revision thread a key too;
 //   • a turn's milestone comparison: the same gate, search and path read, and
@@ -41,10 +42,12 @@
 // for the owner: `MATCH_COST` (20) at the worst. A draft job: the token,
 // then per path the path read (5) and the draft, grind then default (2):
 // `DRAFT_COST` (7). A job starts a card or a path only while the alarm's
-// headroom covers that worst case, so two PRD-heavy cards fill a match job
-// and a light night fits several; a card that still overruns stops on the
-// ceiling and its job is deferred, the cards before it kept. What a night's
-// jobs do not reach waits on the cursor and the queue for the next.
+// headroom covers that worst case: after the first job's 2, 36 is left, so
+// one PRD-heavy card (20) leaves 16 and fills its job, while a light card
+// leaves room for another; across `MATCH_JOBS` that is six PRD-heavy cards a
+// night at the least. A card that still overruns stops on the ceiling and its
+// job is deferred, the cards before it kept. What a night's jobs do not reach
+// waits on the cursor and the queue for the next.
 
 import type { Env } from "../types";
 import { budgetHeadroom, charge, countedFetch } from "../net";
@@ -287,7 +290,7 @@ function shippedDepsFor(env: Env): ShippedDeps | string {
         return first ? people.slackIdForNotionUser(first.id, first.name) : null;
       },
       placeOf: (card) => cardPlace(card, config),
-      billId: env.LEAD_USER_ID?.trim() || null,
+      leadId: env.LEAD_USER_ID?.trim() || null,
       state: stateFor(env),
       weighed: weighedOn(env.HARNESS_KV),
       meter: { headroom: budgetHeadroom },

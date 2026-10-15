@@ -143,7 +143,7 @@ export function promotionDraft(planned: PlannedRows, today: PathToday): Draft | 
     },
     changes,
     confidence: 1,
-    gaps: moved ? [`${moved} row(s) drafted at planned are no longer planned on the blueprint and were left out`] : [],
+    gaps: moved ? [`${moved} cell(s) drafted at planned are no longer planned on the blueprint and were left out`] : [],
     promoted: true,
   };
 }

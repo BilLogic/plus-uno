@@ -34,7 +34,7 @@
 import { rethrowIfBudget } from "../net";
 import { typedEmojiDecision } from "../gate/reactions";
 import type { PendingProposal } from "../thread-state/index";
-import { revisionRefusal } from "../turn/turn";
+import { revisionRefusal } from "../gate/refusal";
 import { NEEDS_CHANGES_LEAD } from "../slack/review-door";
 import type { SweepSource } from "../sweep/finding";
 import type { DecisionDetector, ShownCard } from "./detector";

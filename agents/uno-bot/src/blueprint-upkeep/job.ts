@@ -28,7 +28,7 @@
 //     its card's place, the posting ladder card follow-ups take.
 //   • the SECTION — on that place's one message, one card per revision, each
 //     its own proposal: the `blueprint_revise` operation, confirmed by the
-//     card's owner or Bill and nobody else. Cards the carousel has no room
+//     card's owner or the lead and nobody else. Cards the carousel has no room
 //     for are said as "+N more in the thread" and go up there, in the
 //     morning's `blueprint-revision-thread`, after the sweep's post. The
 //     thread is told, tagging the person, what each draft could not verify.
@@ -198,8 +198,8 @@ export interface ShippedDeps {
   ownerOf(card: ShippedCard): Promise<string | null>;
   /** The card's place by the posting ladder; null when none is configured. */
   placeOf(card: ShippedCard): string | null;
-  /** Bill's Slack id (`LEAD_USER_ID`), the other confirmer. */
-  billId: string | null;
+  /** The lead's Slack id (`LEAD_USER_ID`), the other confirmer. */
+  leadId: string | null;
   state: Store<UpkeepState>;
   weighed: WeighedMarks;
   /** What the alarm has left; unbounded when absent. */
@@ -363,7 +363,7 @@ async function weigh(deps: ShippedDeps, card: ShippedCard, state: Settled): Prom
       const channel = deps.placeOf(card);
       if (!channel) return "no place to post";
       const owner = await deps.ownerOf(card);
-      const confirmers = [...new Set([owner, deps.billId].filter((id): id is string => !!id))];
+      const confirmers = [...new Set([owner, deps.leadId].filter((id): id is string => !!id))];
       if (!confirmers.length) return "nobody to confirm";
       return { source: { pageId: card.pageId, url: card.url, title: card.title, number: card.number, status, quote }, channel, owner, confirmers };
     };
@@ -669,7 +669,7 @@ export function revisionSection(deps: SectionDeps, handOff: SectionHandOff<Revis
     handOff,
     cardsOf(value) {
       return {
-        cards: value.revisions.map((r, i) => ({ person: r.owner, item: revisionItem(r.source, r.today, r.draft, r.owner, i + 1) })),
+        cards: value.revisions.map((r, i) => ({ person: r.owner, item: revisionItem(r.source, r.today, r.draft, r, i + 1) })),
         ttlMs: REVISION_CARD_TTL_MS,
         overflowInThread: true,
         says: (ids) => revisionParent(ids.length),
@@ -771,7 +771,7 @@ export async function postOverflow(deps: OverflowDeps, opts: { dryRun?: boolean 
       const { channel, ts } = group[0]!.overflow!;
       const shown = group.slice(0, MAX_REPORT_ITEMS);
       if ((deps.meter?.headroom().d1Queries ?? Infinity) < shown.length * STAGING_D1_QUERIES + 2) break;
-      const items = group.map((r) => revisionItem(r.source, r.today, r.draft, r.owner, r.overflow!.n));
+      const items = group.map((r) => revisionItem(r.source, r.today, r.draft, r, r.overflow!.n));
       const report = decisionReport(items, overflowParent(group.length), { channel });
       const messageTs = await deps.postReport(channel, ts, report, REVISION_CARD_TTL_MS);
       threads += 1;
@@ -819,7 +819,7 @@ export async function replanRows(state: Store<UpkeepState>, record: PlannedRows)
 
 /** A revision card's line for a turn that would revise it: its thread revises it. */
 export const REVISION_REDRAFT_POINTER =
-  "To change this blueprint revision, its owner or Bill replies in this thread with what's wrong, starting with the card's number when there are several — uno-bot redrafts it on the same card.";
+  "To change this blueprint revision, someone who can approve it replies in this thread with what's wrong, starting with the revision's number when there are several — uno-bot redrafts it in its place.";
 
 /**
  * One revision's card as ThreadState stages it: one item of its report, whose
@@ -838,7 +838,7 @@ export function stagedRevision(
   opts: { threadTs?: string; itemId?: string; ttlMs?: number } = {},
 ): PendingProposal {
   const gate = revisionCard(r.draft.revision, r.confirmers);
-  const card = revisionProposalCard(r.source, r.today, r.draft, gate.operations![0]!);
+  const card = revisionProposalCard(r.source, r.today, r.draft, r.confirmers, gate.operations![0]!);
   const thread = opts.threadTs ?? messageTs;
   return {
     ...gate,
