@@ -97,14 +97,26 @@ async function draftOf(over: Partial<PendingProposal> = {}) {
   return views.calls[1]!.view as { blocks: Array<Record<string, unknown>> };
 }
 
-/** Each block's words, in order: a header's text, a section's, a context's,
- *  and an input's label and the value it opens with. */
+/** A rich text element's words: a section's run together, a list's items
+ *  each after a dash. */
+function richWords(e: { type?: string; text?: string; elements?: unknown[] }): string {
+  if (e.type === "rich_text_list") return (e.elements ?? []).map((i) => `- ${richWords(i as typeof e)}`).join(" ");
+  if (e.elements) return e.elements.map((i) => richWords(i as typeof e)).join("");
+  return e.text ?? "";
+}
+
+/** Each block's words, in order: a header's text, a section's or its fields',
+ *  a context's, a rich text block's parts split by ` | `, and an input's label
+ *  and the value it opens with. */
 function lines(view: { blocks: Array<Record<string, unknown>> }): string[] {
   return view.blocks.map((b) => {
     if (b.type === "input") {
       const element = b.element as { initial_value?: string } | undefined;
       return `input: ${(b.label as { text?: string } | undefined)?.text ?? ""}${element?.initial_value ? ` = ${element.initial_value}` : ""}`;
     }
+    if (b.type === "rich_text") return `rich_text: ${(b.elements as Array<Parameters<typeof richWords>[0]>).map(richWords).join(" | ")}`;
+    const fields = b.fields as Array<{ text: string }> | undefined;
+    if (fields) return `fields: ${fields.map((f) => f.text).join(" | ")}`;
     const text = (b.text as { text?: string } | undefined)?.text;
     if (text) return `${b.type}: ${text}`;
     const elements = (b.elements as Array<{ text?: string | { text: string } }> | undefined) ?? [];
@@ -115,15 +127,16 @@ function lines(view: { blocks: Array<Record<string, unknown>> }): string[] {
 const indexOf = (all: string[], pattern: RegExp) => all.findIndex((l) => pattern.test(l));
 
 describe("the draft reads as a draft", () => {
-  it("leads with the key properties, by the database's names, and the Design Status the create writes", async () => {
+  it("leads with what it makes and where, then Title, the facts beside Edit fields, and Summary", async () => {
     const all = lines(await draftOf());
     const words = all.join("\n");
-    assert.match(all[0]!, /New PRD card on the Roadmap/);
-    // Title and Summary are typed in place, each where the draft reads it.
-    const order = [/input: Title = Goal cycle resets per session/, /\*Product Pillar:\* Toolkit/, /\*Design Status:\* Need PRD \/ Under Playground/, /input: Summary = Tutors read/];
+    assert.equal(all[0], "header: New PRD card");
+    assert.equal(all[1], "rich_text: Creates a card on the Roadmap board.");
+    // Title and Summary are typed in place; the facts sit between them.
+    const order = [/input: Title = Goal cycle resets per session/, /fields: \*Product Pillar\*\nToolkit \| \*Design Status\*\nNeed PRD \/ Under Playground/, /input: Summary = Tutors read/];
     const at = order.map((p) => words.search(p));
-    assert.ok(at.every((i) => i >= 0), JSON.stringify(at));
-    assert.deepEqual([...at].sort((a, b) => a - b), at, "Title, Product Pillar, Design Status, Summary");
+    assert.ok(at.every((i) => i >= 0), words);
+    assert.deepEqual([...at].sort((a, b) => a - b), at, "Title, the facts, Summary");
     // No parameter name leaks.
     assert.doesNotMatch(words, /Surface|Properties:|Sections:|\bprd\b|Product pillar|Heading:|Body:/);
   });
@@ -132,29 +145,29 @@ describe("the draft reads as a draft", () => {
     // The create writes this value; a drafted one is not the property.
     assert.equal(createdDesignStatus("prd"), "Need PRD / Under Playground");
     const words = lines(await draftOf({ input: { ...PRD_INPUT, properties: { product_pillar: "Toolkit", design_status: "Shipped" } } })).join("\n");
-    assert.ok(words.includes(`*Design Status:* ${createdDesignStatus("prd")}`), words);
+    assert.ok(words.includes(`*Design Status*\n${createdDesignStatus("prd")}`), words);
     assert.doesNotMatch(words, /not set|Shipped|Design status/);
   });
 
   it("says not set only where the write sets none: an intake card", async () => {
     assert.equal(createdDesignStatus("intake"), null);
     const words = lines(await draftOf({ input: { surface: "intake", title: "Fix the badge" } })).join("\n");
-    assert.match(words, /\*Design Status:\* not set/);
+    assert.match(words, /\*Design Status\*\nnot set/);
   });
 
-  it("writes the body as headings and paragraphs, in the draft's section order, whatever order the keys came in", async () => {
+  it("writes the body as bold lines and their text, in the draft's section order, whatever order the keys came in", async () => {
     const all = lines(await draftOf());
-    const context = indexOf(all, /^header: Context$/);
-    const contextBody = indexOf(all, /^section: Tutors lose track/);
-    const goals = indexOf(all, /^header: Goals$/);
-    const goalsBody = indexOf(all, /^section: One reset per session/);
-    assert.ok(context >= 0 && context < contextBody && contextBody < goals && goals < goalsBody, JSON.stringify(all));
+    const context = indexOf(all, /^rich_text: Context \| Tutors lose track/);
+    const goals = indexOf(all, /^rich_text: Goals \| One reset per session/);
+    assert.ok(context >= 0 && context < goals, JSON.stringify(all));
+    // A heading opens no header block of its own: zone 1's is the only one.
+    assert.deepEqual(all.filter((l) => l.startsWith("header:")), ["header: New PRD card"]);
   });
 
-  it("keeps the card's caveats at the end of the draft, above the decisions", async () => {
+  it("puts the card's caveat in an alert at the top, under where it goes", async () => {
     const all = lines(await draftOf());
-    const caveat = indexOf(all, /No open questions were named/);
-    assert.equal(caveat, all.length - 4, JSON.stringify(all.slice(-4)));
+    assert.match(all[2]!, /^alert: No open questions were named for this brief\..*choose Needs changes\. Approving builds it as-is\.$/);
+    assert.equal(all.filter((l) => /No open questions/.test(l)).length, 1, "said once");
     assert.deepEqual(all.slice(-3).map((l) => l.split(":")[0]), ["divider", "input", "input"]);
   });
 
@@ -182,10 +195,10 @@ describe("the draft reads as a draft", () => {
 
   it("reads a GitHub issue and a DM by what a person checks", async () => {
     const issue = lines(await draftOf({ toolName: "github_issue_create", input: { title: "Badge drift", body: "The badge differs." }, proposalText: "x" })).join("\n");
-    assert.match(issue, /New GitHub issue on BilLogic\/plus-uno/);
-    // What a confirmer may change is typed in place.
-    assert.match(issue, /input: Title = Badge drift\nsection: \*Repository:\* BilLogic\/plus-uno/);
-    assert.match(issue, /input: Body = The badge differs\./);
+    // In the shared anatomy (`tests/review-github-archive.test.ts`): the repo
+    // is the where line's link, and what a confirmer may change is typed in place.
+    assert.match(issue, /^header: File a GitHub issue\nrich_text: /);
+    assert.match(issue, /input: Title = Badge drift\ninput: Body = The badge differs\./);
 
     const dm = lines(await draftOf({ toolName: "dm_relay", input: { recipient: "U07ABC", text: "Card is ready." }, proposalText: "x" })).join("\n");
     assert.match(dm, /\*To:\* <@U07ABC>/);
@@ -209,7 +222,7 @@ describe("the draft reads as a draft", () => {
   });
 
   it("shows the card's text for a tool it has no reading for", async () => {
-    const words = lines(await draftOf({ toolName: "github_workflow_run", input: { workflow: "deploy.yml" }, proposalText: "• *Workflow:* deploy.yml" })).join("\n");
+    const words = lines(await draftOf({ toolName: "unread_tool", input: { workflow: "deploy.yml" }, proposalText: "• *Workflow:* deploy.yml" })).join("\n");
     assert.match(words, /Workflow:\* deploy\.yml/);
   });
 });
