@@ -164,7 +164,7 @@ export interface LoopBudget {
 
 export interface LoopDeps {
   /** Execute one UNGATED tool — the dispatch distinction, not a read/write one:
-   *  `slack_react` is ungated and writes (see GLOSSARY.md (**tool table**)). Returns
+   *  `slack_react` is ungated and writes (see `agents/uno-bot/README.md` § Worker seams, **tool table**). Returns
    *  its result text. Bound to the environment and the Slack context by the
    *  caller. */
   executeUngatedTool(name: string, args: Record<string, unknown>): Promise<string>;

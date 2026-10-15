@@ -154,6 +154,9 @@ export interface HistoryTurn {
    *  thread and a receipt recorded only in the store would otherwise be
    *  invisible. */
   ts?: string;
+  /** When the turn was recorded, in epoch ms, where its writer stamps it. A
+   *  ⛔ note does, so "just cancelled" can mean recent (`agent/cancel-note.ts`). */
+  at?: number;
   /** Names of the references `read_reference` served on this turn. The TEXT is
    *  deliberately not persisted (#423): a later turn sees a one-line stub per
    *  name and a re-read is one baked-map lookup. */

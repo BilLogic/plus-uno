@@ -29,6 +29,8 @@ export interface GeminiResult {
   error?: string;
   /** The HTTP status of a refused call; absent when the call never went out. */
   status?: number;
+  /** The candidate's finishReason, e.g. `STOP` or `MAX_TOKENS`. */
+  finishReason?: string;
   ms: number;
 }
 
@@ -195,10 +197,12 @@ export async function geminiGenerate(
     }
     const parts = data.candidates?.[0]?.content?.parts ?? [];
     const text = parts.filter((p) => p.text && !p.thought).map((p) => p.text).join("");
+    const finishReason = data.candidates?.[0]?.finishReason;
     return {
       ok: true,
       model,
       text,
+      ...(finishReason ? { finishReason } : {}),
       usage: {
         input: data.usageMetadata?.promptTokenCount ?? 0,
         output: data.usageMetadata?.candidatesTokenCount ?? 0,

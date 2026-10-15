@@ -218,6 +218,22 @@ npm run generate:index
 npm --prefix agents/uno-bot run bundle:harness
 ```
 
+### Harness seams
+
+The words the harness checks are organised by.
+
+**check registry**:
+`scripts/checks.registry.mjs`, the one list of the repo's checks: each row says what a check runs and where it runs, and every place that runs checks is held to agree with it.
+_Avoid_: "the check list", "COMPOSED"
+
+**corpus**:
+`scripts/lib/corpus.mjs`, the harness's one reader of repo files: what documents exist and what each one says. Checks ask it rather than the filesystem. Not the **Asks corpus** of the measurement window.
+_Avoid_: "the walker", "the parser" (there is one of each)
+
+**ratchet**:
+`scripts/lib/ratchet.mjs`, a check's recorded baseline: a count may fall and a rise is a finding, an entry the run stops finding is a finding too, and a missing record fails loudly.
+_Avoid_: "the whitelist", "the exceptions file", "the allow-list"
+
 ## The Worker's own checks
 
 `.github/workflows/uno-bot-checks.yml` runs three jobs on every pull request —

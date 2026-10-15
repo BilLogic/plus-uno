@@ -189,7 +189,14 @@ export function geminiProvider(env: Env): ModelProvider {
       if (!res.ok) {
         return { ok: false, model: res.model, message: res.error ?? "generateContent failed" };
       }
-      return { ok: true, model: res.model, text: res.text ?? "" };
+      // Thinking spends the same ceiling as the answer, so a one-shot can stop
+      // mid-sentence with `ok` still true.
+      return {
+        ok: true,
+        model: res.model,
+        text: res.text ?? "",
+        ...(res.finishReason === "MAX_TOKENS" ? { cutOff: true } : {}),
+      };
     },
 
     async start(turn: ModelTurn): Promise<void> {
