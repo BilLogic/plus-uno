@@ -12,16 +12,15 @@
 #
 # ── PENDING DIFFERENCES ──────────────────────────────────────────────────────
 # Until the YAML is pasted into the App Manifest page by hand, `npm run
-# slack:diff` reports these two, and they are the expected reading. Everything
+# slack:diff` reports this one, and it is the expected reading. Everything
 # else below was in sync when it was written.
 #
 # agent_session_stopped (#576, 2026-09-17): this file subscribes to it; the
 # live app does not yet.
 #
-# The six skill commands: `features.slash_commands` here holds /grind, /chill
-# and /stop only; the live app still declares the six skill commands, and the
-# Worker answers each with its unknown-command reply. The `commands` bot scope
-# stays: the three remaining commands need it.
+# Slash commands: /grind, /chill and /stop, here and on the live app (checked
+# on the Slash Commands page, 2026-10-15). The `commands` bot scope stays for
+# them.
 #
 # ── IN SYNC WITH LIVE (verified `npm run slack:diff`, 2026-08-06) ────────────
 # `messages_tab_enabled: true` and the `app_context_changed` subscription are
