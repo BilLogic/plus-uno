@@ -63,7 +63,7 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | Suggestion | `17885:57` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-57) |
 | Components | Switch | `14876:12006` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12006) |
 | Components | Tag | `17884:2099` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17884-2099) |
-| Components | Textarea | `13543:5904` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904) |
+| Components | Textarea | `13541:10731` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731) |
 | Components | Tile | `17906:48560` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17906-48560) |
 | Components | Toast | `3548:245993` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245993) |
 | Components | Tooltip | `3497:19486` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19486) |

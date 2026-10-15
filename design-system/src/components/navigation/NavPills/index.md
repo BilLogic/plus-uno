@@ -72,6 +72,4 @@ Implemented as `NavPillsDropdown`.
 
 Same group: `Breadcrumb` · `NavTabs` · `Pagination` · `Scrollspy` · `SidebarTab`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

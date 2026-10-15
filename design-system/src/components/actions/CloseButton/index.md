@@ -38,6 +38,4 @@ From `design-system/src/components/actions/CloseButton/CloseButton.scss`. Overri
 
 Same group: `Button` · `ButtonGroup`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

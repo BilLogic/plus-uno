@@ -7,20 +7,20 @@ authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [AiLabel](AiLabel/index.md) | 9 | ✅ | ✕ | ✅ |
-| [Badge](Badge/index.md) | 11 | ✅ | ✕ | ✅ |
-| [BadgeVariants](BadgeVariants.md) | 15 | ✅ | ✕ | ✅ |
-| [Count](Count/index.md) | 10 | ✅ | ✕ | ✅ |
-| [Progress](Progress/index.md) | 11 | ✅ | ✕ | ✅ |
-| [Skeleton](Skeleton/index.md) | 9 | ✅ | ✕ | ✅ |
-| [Spinner](Spinner/index.md) | 4 | ✅ | ✕ | ✅ |
-| [Status](Status/index.md) | 9 | ✅ | ✕ | ✅ |
-| [Suggestion](Suggestion/index.md) | 8 | ✅ | ✕ | ✅ |
-| [Tag](Tag/index.md) | 22 | ✅ | ✕ | ✅ |
-| [TagGroup](TagGroup/index.md) | 10 | ✅ | ✕ | ✅ |
-| [Tile](Tile/index.md) | 10 | ✅ | ✕ | ✅ |
+| [AiLabel](AiLabel/index.md) | 9 | ✅ | ✅ | ✅ |
+| [Badge](Badge/index.md) | 11 | ✅ | ✅ | ✅ |
+| [BadgeVariants](BadgeVariants.md) | 15 | ✅ | ✅ | ✅ |
+| [Count](Count/index.md) | 10 | ✅ | ✅ | ✅ |
+| [Progress](Progress/index.md) | 11 | ✅ | ✅ | ✅ |
+| [Skeleton](Skeleton/index.md) | 9 | ✅ | ✅ | ✅ |
+| [Spinner](Spinner/index.md) | 4 | ✅ | ✅ | ✅ |
+| [Status](Status/index.md) | 9 | ✅ | ✅ | ✅ |
+| [Suggestion](Suggestion/index.md) | 8 | ✅ | ✅ | ✅ |
+| [Tag](Tag/index.md) | 22 | ✅ | ✅ | ✅ |
+| [TagGroup](TagGroup/index.md) | 10 | ✅ | ✅ | ✅ |
+| [Tile](Tile/index.md) | 10 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 12/12 (100%) · Correct/incorrect 0/12 (0%) · Accessibility 12/12 (100%)
+**Authored coverage:** When to use 12/12 (100%) · Correct/incorrect 12/12 (100%) · Accessibility 12/12 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says
