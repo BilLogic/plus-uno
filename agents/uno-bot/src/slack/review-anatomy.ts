@@ -19,7 +19,7 @@
 // Only blocks a modal takes: no `table`, `markdown` or `container`.
 //
 // PURE: blocks out, nothing posted, nothing read.
-import { clip, objectCardBlocks, type ObjectCard } from "./card-block";
+import { clip, isLink, objectCardBlocks, type ObjectCard } from "./card-block";
 import { escapeSlackText } from "./mrkdwn";
 import type { ProposalOperation } from "../thread-state/index";
 
@@ -139,7 +139,7 @@ export type Fact = readonly [label: string, value: string, url?: string];
  *  address reads as its value, linked. */
 export function factsSection(facts: ReadonlyArray<Fact>, accessory?: unknown): unknown {
   const valueOf = (value: string, url?: string) =>
-    url && /^https?:\/\/[^\s<>|]+$/.test(url) ? `<${url}|${escapeSlackText(value)}>` : escapeSlackText(value);
+    url && isLink(url) ? `<${url}|${escapeSlackText(value)}>` : escapeSlackText(value);
   return {
     type: "section",
     fields: facts

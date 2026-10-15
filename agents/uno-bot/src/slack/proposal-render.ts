@@ -24,7 +24,7 @@ import type { CardAsk, CardCaveat, CardField, CardRevision, ProposalCard } from 
 import type { ProposalOperation } from "../thread-state/index";
 import { gateWordsFor } from "../agent/tool-table";
 import { relayRecipientId } from "../tools/relayed-dm-render";
-import { DESIGN_STATUS_NOT_SET } from "./review-draft";
+import { DESIGN_STATUS_NOT_SET } from "./review-notion-create";
 import { createdDesignStatus } from "../integrations/notion";
 
 // One shared confirmation footer on every card. It names no approver, since

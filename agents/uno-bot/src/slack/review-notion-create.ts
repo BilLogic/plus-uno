@@ -20,8 +20,8 @@
 // shown rather than offered.
 //
 // PURE: blocks out, nothing posted, nothing read.
-import { clip } from "./card-block";
-import { createdDesignStatus, extractNotionIds } from "../integrations/notion";
+import { clip, isLink } from "./card-block";
+import { canonicalNotionUrl, createdDesignStatus, extractNotionIds } from "../integrations/notion";
 import {
   alertsFromCaveats,
   factsSection,
@@ -66,7 +66,6 @@ const TEXT_CHARS = 3000;
 const str = (v: unknown): string => (typeof v === "string" ? v.trim() : "");
 const obj = (v: unknown): Input => (v && typeof v === "object" && !Array.isArray(v) ? (v as Input) : {});
 const squash = (name: string) => name.toLowerCase().replace(/[\s_]+/g, "");
-const isUrl = (v: string) => /^https?:\/\/[^\s<>|]+$/.test(v);
 
 /** A property key as a person reads it: `evidence_link` → `Evidence link`. A
  *  key the model wrote in the database's own spelling is kept as written. */
@@ -87,14 +86,14 @@ function headerOf(surface: string): string {
 
 /** A database by name, linked where its address is known. */
 function database(name: string, url: string | undefined): WhereElement {
-  return url && isUrl(url) ? { type: "link", url, text: name } : { type: "text", text: name, style: { bold: true } };
+  return url && isLink(url) ? { type: "link", url, text: name } : { type: "text", text: name, style: { bold: true } };
 }
 
 /** A Roadmap card's address, from the URL or id the decision carries. */
 function cardUrl(card: string): string | undefined {
-  if (isUrl(card)) return card;
+  if (isLink(card)) return card;
   const id = extractNotionIds(card)[0];
-  return id ? `https://www.notion.so/${id}` : undefined;
+  return id ? canonicalNotionUrl(null, id) : undefined;
 }
 
 /** Zone 1's line: the database the create lands in, and a decision's card. */
@@ -144,28 +143,38 @@ function linkFact(label: string, url: string, words = linkWords(url)): Fact {
   return [label, words, url];
 }
 
-/** The short facts, in the order a person checks them: what the write sets,
- *  never an input's own key. */
-function factsOf(surface: string, input: Input): Fact[] {
+/** A create's property, by any spelling of its name (case, spaces and
+ *  underscores ignored), or its bare input key. */
+function propOf(input: Input, ...names: string[]): string {
   const props = obj(input.properties);
-  const prop = (...names: string[]) => {
-    const want = new Set(names.map(squash));
-    const key = Object.keys(props).find((k) => want.has(squash(k)));
-    return key ? str(props[key]) : "";
-  };
+  const want = new Set(names.map(squash));
+  const key = Object.keys(props).find((k) => want.has(squash(k)));
+  return (key ? str(props[key]) : "") || str(input[names[0]!]);
+}
+
+/**
+ * A create's short facts, in the order a person checks them: what the write
+ * sets, never an input's own key, a link as its place. The source comes
+ * apart, so a reading can put the summary before it.
+ *
+ * @param surface - The create's surface, lower case
+ * @param input - The create call
+ */
+export function createFacts(surface: string, input: Input): { facts: Fact[]; source?: string } {
+  const props = obj(input.properties);
   const shown = new Set<string>();
   const facts: Fact[] = [];
   if (surface === "prd" || surface === "intake") {
-    const pillar = prop("product_pillar") || str(input.product_pillar);
+    const pillar = propOf(input, "product_pillar");
     if (pillar) facts.push(["Product Pillar", pillar]);
     // What the write sets, not what the model drafted.
     facts.push(["Design Status", createdDesignStatus(surface) ?? DESIGN_STATUS_NOT_SET]);
     ["productpillar", "designstatus"].forEach((k) => shown.add(k));
   }
   if (surface === "decision") {
-    const status = prop("status") || str(input.status);
+    const status = propOf(input, "status");
     if (status) facts.push(["Status", status]);
-    const card = prop("roadmap_card") || str(input.roadmap_card);
+    const card = propOf(input, "roadmap_card");
     const linked = card ? cardUrl(card) : undefined;
     if (card) facts.push(linked ? linkFact("Roadmap Card", linked, "Open card") : ["Roadmap Card", card]);
     ["status", "roadmapcard"].forEach((k) => shown.add(k));
@@ -174,11 +183,16 @@ function factsOf(surface: string, input: Input): Fact[] {
     // A list (a Marketplace row's contributors) reads as one line.
     const v = Array.isArray(value) ? value.map(str).filter(Boolean).join(", ") : str(value);
     if (shown.has(squash(key)) || !v) continue;
-    facts.push(isUrl(v) ? linkFact(labelOf(key), v) : [labelOf(key), v]);
+    facts.push(isLink(v) ? linkFact(labelOf(key), v) : [labelOf(key), v]);
   }
   const source = str(input.source_url);
-  if (source) facts.push(isUrl(source) ? linkFact("Source", source) : ["Source", source]);
-  return facts;
+  return source ? { facts, source } : { facts };
+}
+
+/** The facts the anatomy draws: the source last, linked as its place. */
+function factsOf(surface: string, input: Input): Fact[] {
+  const { facts, source } = createFacts(surface, input);
+  return source ? [...facts, isLink(source) ? linkFact("Source", source) : ["Source", source]] : facts;
 }
 
 // ── The body: Markdown as rich text ─────────────────────────────────────────
@@ -287,8 +301,7 @@ const MARKETPLACE_APPROVE = "Creates or updates the row now and links it in the 
  */
 export function notionCreateAnatomy(input: Input, context: NotionCreateContext): DraftAnatomy {
   const surface = str(input.surface).toLowerCase();
-  const props = obj(input.properties);
-  const card = str(props.roadmap_card) || str(props["Roadmap Card"]) || str(input.roadmap_card);
+  const card = propOf(input, "roadmap_card");
   const content: unknown[] = [];
   /** A text the confirmer edits in place, or the text shown. */
   const part = (path: string, label: string) => {

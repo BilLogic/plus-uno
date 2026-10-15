@@ -45,8 +45,9 @@ export function clip(text: string, max: number): string {
   return text.length > max ? `${text.slice(0, max - 1)}…` : text;
 }
 
-/** Whether a link can be an Open button: an https or http URL, nothing else. */
-function isLink(url: string): boolean {
+/** Whether a link can be an Open button, or a linked value: an https or
+ *  http URL, nothing else. */
+export function isLink(url: string): boolean {
   return /^https?:\/\/[^\s<>|]+$/.test(url);
 }
 

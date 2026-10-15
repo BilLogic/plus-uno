@@ -338,6 +338,10 @@ describe("a decision's draft is drawn in the shared anatomy", () => {
   it("links a card given by its id alone, and names one given by words", async () => {
     const id = await decision({ input: { ...DECISION, properties: { ...DECISION.properties, roadmap_card: "0123456789abcdef0123456789abcdef" } } });
     assert.deepEqual(whereOf(id.draft)[4], { type: "link", url: "https://www.notion.so/0123456789abcdef0123456789abcdef", text: "its Roadmap card" });
+    // By any spelling of the property, the same in the where line as in the facts.
+    const spelled = await decision({ input: { ...DECISION, properties: { status: "Accepted", "Roadmap card": CARD_URL } } });
+    assert.deepEqual(whereOf(spelled.draft)[4], { type: "link", url: CARD_URL, text: "its Roadmap card" });
+    assert.ok(factsOf(spelled.draft)!.fields!.some((f) => f.text === `*Roadmap Card*\n<${CARD_URL}|Open card>`));
     const named = await decision({ input: { ...DECISION, properties: { ...DECISION.properties, roadmap_card: "Session sign-up waitlist" } } });
     assert.deepEqual(whereOf(named.draft)[4], { type: "text", text: "Session sign-up waitlist", style: { bold: true } });
   });
