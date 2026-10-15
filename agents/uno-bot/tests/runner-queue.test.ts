@@ -19,6 +19,9 @@
 //
 //   a once-key queues once — a sender that redelivers (Figma, #895) gets one
 //   job per key for as long as the key is remembered
+//
+//   a job may spread its work — the jobs it spawns run next, before the run's
+//   later jobs, each with its own alarm, budget and retries
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createInMemoryRunnerStorage, type InMemoryRunnerStorage } from "../src/runner/storage";
@@ -43,7 +46,7 @@ const noop = (key: string, after?: string[]): ScheduledJob =>
   after ? { key, kind: "noop", after } : { key, kind: "noop" };
 
 /** A runner the test drives: storage, a clock, and a log of what each job did. */
-function harness(execute?: (job: ScheduledJob, runDate: string) => Promise<void>) {
+function harness(execute?: (job: ScheduledJob, runDate: string, spawn?: (jobs: readonly ScheduledJob[]) => Promise<void>) => Promise<void>) {
   const storage = createInMemoryRunnerStorage();
   const clock = { t: 1_000_000 };
   const ran: string[] = [];
@@ -54,9 +57,9 @@ function harness(execute?: (job: ScheduledJob, runDate: string) => Promise<void>
       threadRan.push(job.kind);
       return "handled";
     },
-    runScheduledJob: async (job, runDate) => {
+    runScheduledJob: async (job, runDate, spawn) => {
       ran.push(job.key);
-      await execute?.(job, runDate);
+      await execute?.(job, runDate, spawn);
     },
   };
   return { storage, clock, ran, threadRan, deps };
@@ -275,4 +278,68 @@ test("a once-key job waits its turn among the thread's jobs, and sets the alarm"
   assert.notEqual(await h.storage.getAlarm(), null);
   await drain(h);
   assert.deepEqual(h.threadRan, ["cut-off", "figma-event"]);
+});
+
+test("a job's spawned jobs run next, each on its own alarm, before the run's later jobs", async () => {
+  const h = harness(async (job, _date, spawn) => {
+    if (job.key === "post") await spawn!([noop("post:b"), noop("post:a")]);
+  });
+  await enqueueRun(h.storage, run([noop("first"), noop("post"), noop("last")]), h.clock.t);
+  assert.equal(await drain(h), 5);
+  assert.deepEqual(h.ran, ["first", "post", "post:a", "post:b", "last"], "keyed by their own keys");
+});
+
+test("a spawned job keeps its own budget: one given up loses only itself", async () => {
+  const h = harness(async (job, _date, spawn) => {
+    if (job.key === "post") await spawn!([noop("post:heavy"), noop("post:light")]);
+    if (job.key === "post:heavy") throw new SubrequestBudgetError(38);
+  });
+  await enqueueRun(h.storage, run([noop("post")]), h.clock.t);
+  await drain(h);
+  assert.deepEqual(h.ran, ["post", "post:heavy", "post:heavy", "post:heavy", "post:light"]);
+});
+
+test("a retried job spawns nothing twice, and nothing already done", async () => {
+  let tries = 0;
+  const h = harness(async (job, _date, spawn) => {
+    if (job.key !== "post") return;
+    await spawn!([noop("post:a")]);
+    tries += 1;
+    if (tries === 1) throw new SubrequestBudgetError(38);
+  });
+  await enqueueRun(h.storage, run([noop("post")]), h.clock.t);
+  await drain(h);
+  assert.deepEqual(h.ran, ["post", "post", "post:a"]);
+});
+
+test("a parent retried after spawning keeps every sibling: a child is keyed by its own key, not its place in the list", async () => {
+  let tries = 0;
+  const h = harness(async (job, _date, spawn) => {
+    if (job.key !== "post") return;
+    tries += 1;
+    // The first try spawns a and b; the retry's list has shifted.
+    await spawn!(tries === 1 ? [noop("post:a"), noop("post:b")] : [noop("post:b"), noop("post:c")]);
+    if (tries === 1) throw new SubrequestBudgetError(38);
+  });
+  await enqueueRun(h.storage, run([noop("post")]), h.clock.t);
+  await drain(h);
+  assert.deepEqual(h.ran.filter((k) => k !== "post").sort(), ["post:a", "post:b", "post:c"]);
+});
+
+test("a child that failed runs again when the run is queued again; one done does not", async () => {
+  let failOnce = true;
+  const h = harness(async (job, _date, spawn) => {
+    if (job.key === "post") await spawn!([noop("post:a"), noop("post:b")]);
+    if (job.key === "post:b" && failOnce) {
+      failOnce = false;
+      throw new Error("Slack down");
+    }
+  });
+  const plan = run([noop("post")]);
+  await enqueueRun(h.storage, plan, h.clock.t);
+  await drain(h);
+  assert.deepEqual(h.ran, ["post", "post:a", "post:b"]);
+  await enqueueRun(h.storage, plan, h.clock.t);
+  await drain(h);
+  assert.deepEqual(h.ran, ["post", "post:a", "post:b", "post", "post:b"]);
 });

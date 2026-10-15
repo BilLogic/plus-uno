@@ -110,12 +110,7 @@ const FIXED_COPY: Record<string, string[]> = {
   "follow-through/run.ts": [],
   "commitments/copy.ts": [],
   "commitments/remind.ts": [],
-  // Figma library, drift and the weekly precedence thread. 🎉 marks a merged
-  // PR, the one ship tests/figma-copy.test.ts allows.
-  "figma-library/draft.ts": [],
-  "figma-library/post.ts": [],
-  "figma-library/release.ts": [],
-  "figma-library/track.ts": ["🎉"],
+  // Figma drift and the weekly precedence report.
   "figma-drift/copy.ts": [],
   "ds-precedence/report.ts": [],
   // What a write tool says once it has run, and what it asks before staging

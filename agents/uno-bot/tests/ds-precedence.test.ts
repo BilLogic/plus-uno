@@ -1,8 +1,9 @@
 // The weekly DS precedence check, end to end on fakes: the end-of-day check
 // compares the component index and the registry's props with the Figma
-// library, the next morning run posts one report of shared decision cards in
-// #plus-universal — one card per component — and each card's Approve adds its
-// component to the week's one intake, filing it on the first.
+// library, the next morning run hands the report to the sweep's one message in
+// #plus-universal, where it is a section of shared decision cards — one card
+// per component — and each card's Approve adds its component to the week's
+// one intake, filing it on the first.
 //
 // The fixtures are drawn from the manual first pass of this check (#339): the
 // five button sets that split what code keeps as one `fill` prop, a code
@@ -14,7 +15,6 @@ import type { FigmaComponentsResponse } from "../src/figma/client";
 import { createInMemoryFigma } from "../src/figma/in-memory";
 import {
   findDisagreements,
-  inFlightComponents,
   liveLibraryFrom,
   losingSide,
   parseComponentIndex,
@@ -24,16 +24,24 @@ import { PRECEDENCE_INTAKE_TOOL, precedenceMarker, precedenceRuleUrl } from "../
 import { addToWeeklyIntake, type IntakeDeps } from "../src/ds-precedence/intake";
 import { disputePrecedenceItem } from "../src/ds-precedence/dispute";
 import {
+  handOverPrecedenceReport,
   NOT_STAGED,
-  postPrecedenceReport,
   precedenceChannel,
+  precedenceSection,
   runPrecedenceCheck,
   PRECEDENCE_CARD_TTL_MS,
+  PRECEDENCE_SECTION,
   type CheckDeps,
+  type HandOverDeps,
   type PostedThread,
-  type PostDeps,
+  type PrecedenceHanded,
   type PrecedenceReport,
+  type SectionDeps,
 } from "../src/ds-precedence/jobs";
+import { runSweepJob } from "../src/sweep/index";
+import { isSubrequestBudgetError, SubrequestBudgetError } from "../src/net";
+import { sectionHandOffIn } from "../src/sweep/sections";
+import { sweepHarness } from "./helpers/sweep-harness";
 import { isWeeklyPrecedenceThread } from "../src/ds-precedence/env";
 import { TOOL_TABLE } from "../src/agent/tool-table";
 import type { Env } from "../src/types";
@@ -139,14 +147,13 @@ const REGISTRY: PrecedenceRegistry = {
   },
 };
 
-function check(inFlight: ReadonlySet<string> = new Set()) {
+function check() {
   return findDisagreements({
     index: parseComponentIndex(INDEX_MD),
     registry: REGISTRY,
     library: liveLibraryFrom(LIBRARY),
     fileKey: FILE_KEY,
     repo: REPO,
-    inFlight,
   });
 }
 
@@ -224,7 +231,6 @@ function textareaCheck(registry: PrecedenceRegistry = textareaRegistry()) {
     library: liveLibraryFrom(TEXTAREA_LIBRARY),
     fileKey: FILE_KEY,
     repo: REPO,
-    inFlight: new Set(),
   });
 }
 
@@ -285,7 +291,6 @@ describe("the comparison", () => {
       library: liveLibraryFrom(LIBRARY),
       fileKey: FILE_KEY,
       repo: REPO,
-      inFlight: new Set(),
     }).filter((d) => d.component === "Tooltip");
     assert.equal(found.length, 1);
     assert.equal(found[0]!.kind, "axis-values");
@@ -359,7 +364,6 @@ describe("the comparison", () => {
         library: liveLibraryFrom(library),
         fileKey: FILE_KEY,
         repo: REPO,
-        inFlight: new Set(),
       }).filter((d) => d.component === "Tooltip");
       assert.deepEqual(found, [], spelling);
     }
@@ -377,22 +381,6 @@ describe("the comparison", () => {
       textareaCheck(registry).map((d) => d.key),
       ["Textarea:size:missing-axis"],
     );
-  });
-
-  it("leaves out a component a library publish is still carrying, where code follows", () => {
-    const inFlight = inFlightComponents(
-      [{ implement: "Button, Tooltip" }],
-      [
-        {
-          created: [],
-          modified: [{ key: "k", name: "placement=top", description: "", nodeId: "500:1", containingFrame: "Tooltip", setNodeId: "300:1" }],
-          deleted: [],
-        },
-      ],
-      REGISTRY,
-    );
-    assert.deepEqual([...inFlight].sort(), ["Button", "Tooltip"]);
-    assert.deepEqual(check(inFlight).map((d) => d.component), ["TreeSelect"]);
   });
 });
 
@@ -419,7 +407,6 @@ function checkDeps(library: FigmaComponentsResponse, report = kv<PrecedenceRepor
     github: { indexMarkdown: async () => INDEX_MD, registry: async () => REGISTRY },
     figma,
     report: report.store,
-    inFlight: async () => new Set<string>(),
     fileKey: FILE_KEY,
     repo: REPO,
     now: () => Date.UTC(2026, 9, 2, 22, 0),
@@ -445,31 +432,35 @@ const AGREEING: FigmaComponentsResponse = {
   },
 };
 
-interface Post {
-  text: string;
-  blocks?: unknown[];
+/** The morning's clock, and the ts the sweep's one message posts with. */
+const NOW = 1759500000000 + 10 * 60_000;
+const MSG = `${Math.floor(NOW / 1000)}.900001`;
+const DATE = "2025-10-03";
+
+/** A run's storage, in memory. */
+function runStorage() {
+  const map = new Map<string, unknown>();
+  return {
+    get: async <T>(key: string) => structuredClone(map.get(key)) as T | undefined,
+    put: async (key: string, value: unknown) => void map.set(key, structuredClone(value)),
+    delete: async (key: string) => map.delete(key),
+  };
 }
 
-/** The report's message ts, and a clock ten minutes after it. */
-const MSG = "1759500000.000001";
-const NOW = Number(MSG) * 1000 + 10 * 60_000;
-
+/**
+ * A morning: the hand-over, then the sweep's post with the report as its
+ * section, on one ThreadState. `posts` are the sweep's messages.
+ */
 function postDeps(report: PrecedenceReport | null, store: ThreadState = createInMemoryThreadState({ now: () => NOW })) {
-  const posts: Post[] = [];
-  const edits: Array<{ ts: string; message: Post }> = [];
+  const edits: Array<{ ts: string; message: { text: string; blocks?: unknown[] } }> = [];
   const staged: PendingProposal[] = [];
   const reportBox = kv<PrecedenceReport | null>(report);
   const recorded: PostedThread[] = [];
-  let n = 0;
-  const deps: PostDeps = {
+  const handOff = sectionHandOffIn<PrecedenceHanded>(runStorage(), PRECEDENCE_SECTION);
+  const hand: HandOverDeps = { report: reportBox.store, members: async () => [...MEMBERS], handOff, channel: CHANNEL, date: DATE };
+  const deps: SectionDeps = {
     report: reportBox.store,
     recordThread: async (thread) => void recorded.push(thread),
-    members: async () => [...MEMBERS],
-    post: async (message) => {
-      posts.push(message);
-      n += 1;
-      return { ok: true, ts: `1759500000.00000${n}` };
-    },
     edit: async (ts, message) => void edits.push({ ts, message }),
     reports: store,
     stage: async (proposal) => {
@@ -478,9 +469,17 @@ function postDeps(report: PrecedenceReport | null, store: ThreadState = createIn
     },
     channel: CHANNEL,
     ruleUrl: precedenceRuleUrl(REPO),
-    now: () => NOW,
   };
-  return { deps, posts, edits, staged, reportBox, recorded, store };
+  const section = precedenceSection(deps, handOff, DATE);
+  const h = sweepHarness({ channels: {}, now: NOW, runDate: DATE, threadState: store });
+  h.deps.sections = [section];
+  /** The hand-over, then — unless a rehearsal — the sweep's post. */
+  const morning = async (opts: { dryRun?: boolean } = {}) => {
+    const result = await handOverPrecedenceReport(hand, opts);
+    if (!opts.dryRun) await runSweepJob({ key: "sweep-post", kind: "sweep-post" }, h.deps);
+    return result;
+  };
+  return { hand, deps, section, morning, handOff, posts: h.posted, edits, staged, reportBox, recorded, store };
 }
 
 describe("the end-of-day check", () => {
@@ -527,7 +526,7 @@ describe("the end-of-day check", () => {
     const { deps, report } = checkDeps(LIBRARY);
     await runPrecedenceCheck({ ...deps, now: () => Date.UTC(2026, 11, 5, 5, 10), runDate: "2026-12-04" });
     const morning = postDeps(report.box.value);
-    await postPrecedenceReport(morning.deps);
+    await morning.morning();
     assert.equal(morning.recorded[0]!.weekOf, "2026-12-04");
     assert.equal(morning.staged[0]!.operations![0]!.input.week_of, "2026-12-04");
     assert.match(morning.staged[0]!.proposalText, /week of Dec 4/);
@@ -536,7 +535,7 @@ describe("the end-of-day check", () => {
   it("a report kept before the run's date was recorded is labelled with its check's date", async () => {
     const kept = { checkedAt: "2026-09-25T22:00:00.000Z", items: (await weekReport()).items };
     const morning = postDeps(kept);
-    await postPrecedenceReport(morning.deps);
+    await morning.morning();
     assert.equal(morning.staged[0]!.operations![0]!.input.week_of, "2026-09-25");
   });
 });
@@ -584,29 +583,42 @@ describe("the morning post", () => {
     assert.equal(precedenceChannel({ plusDesign: "C0DESIGN" }), null, "no fallback to another channel");
   });
 
-  it("a clean week posts nothing", async () => {
-    const { deps, posts, staged } = postDeps(null);
-    const result = await postPrecedenceReport(deps);
+  it("a clean week hands nothing over, and the morning posts nothing", async () => {
+    const { morning, posts, staged } = postDeps(null);
+    const result = await morning();
     assert.equal(result.posted, false);
+    assert.match(result.summary, /no disagreements waiting/);
     assert.deepEqual(posts, []);
     assert.deepEqual(staged, []);
   });
 
-  it("posts one message: a plain parent line, then one card per component with Review, Code and Figma", async () => {
-    const { deps, posts, reportBox, recorded } = postDeps(await weekReport());
-    const result = await postPrecedenceReport(deps);
-    assert.equal(result.posted, true);
+  it("hands the report over and posts nothing of its own: the sweep's one message carries it", async () => {
+    const { hand, handOff, reportBox } = postDeps(await weekReport());
+    const result = await handOverPrecedenceReport(hand);
+    assert.equal(result.posted, false);
+    assert.match(result.summary, /handed 2 component card\(s\) to the morning post/);
+    const [place] = await handOff.places(DATE);
+    assert.equal(place!.channel, CHANNEL);
+    assert.equal(place!.threadTs, null);
+    assert.deepEqual(place!.value.confirmers, MEMBERS);
+    assert.notEqual(reportBox.box.value, null, "kept until the message is up");
+  });
+
+  it("goes up as one section of the morning's message: a plain line, then one card per component with Review, Code and Figma", async () => {
+    const { morning, posts, reportBox, recorded } = postDeps(await weekReport());
+    await morning();
     assert.equal(posts.length, 1, "one message, nothing in a thread");
     const [message] = posts;
-    assert.equal(messageBlocksRefusal(message!.blocks!), null);
+    assert.equal(message!.channel, CHANNEL);
+    assert.equal(messageBlocksRefusal(message!.blocks), null);
     assert.deepEqual(notified(message!), [], "anyone can settle precedence: nobody is tagged");
     assert.match(
-      JSON.stringify(message!.blocks![0]),
+      JSON.stringify(message!.blocks[0]),
       new RegExp(
         `Code and the library disagree on 2 components\\. <https://github\\.com/${REPO}/blob/main/AGENTS\\.md#conventions--what-agents-obey\\|Code wins> unless a difference is deliberate\\.`,
       ),
     );
-    const [button, tree] = cardsIn(message!.blocks!);
+    const [button, tree] = cardsIn(message!.blocks);
     assert.equal(button!.title.text, "Button");
     assert.equal(button!.subtitle!.text, "Library side");
     assert.match(button!.body.text, /^Code has one fill prop \(/, "plain words, no backticks");
@@ -615,19 +627,19 @@ describe("the morning post", () => {
     assert.match(button!.actions[2]!.url!, /^https:\/\/www\.figma\.com\//);
     assert.equal(tree!.title.text, "TreeSelect");
     assert.equal(tree!.body.text, "Code has it, the library has no published component for it.");
-    assert.doesNotMatch(JSON.stringify(message), GATE_WORDS);
+    assert.doesNotMatch(JSON.stringify({ text: message!.text, blocks: message!.blocks }), GATE_WORDS);
 
-    assert.equal(reportBox.box.value, null, "the report is handed off");
+    assert.equal(reportBox.box.value, null, "shown, so not handed over again");
     assert.deepEqual(recorded, [{ channel: CHANNEL, ts: MSG, weekOf: "2026-10-02" }]);
   });
 
   it("stages each component as its own proposal: the week's intake, decided by the channel's members, for six days", async () => {
-    const { deps, staged } = postDeps(await weekReport());
-    await postPrecedenceReport(deps);
+    const { morning, staged } = postDeps(await weekReport());
+    await morning();
     assert.equal(staged.length, 2, "one proposal per card");
     const [button, tree] = staged;
-    assert.equal(button!.proposalTs, itemProposal(MSG, "Button").proposalTs);
-    assert.deepEqual(button!.item, { messageTs: MSG, id: "Button" });
+    assert.equal(button!.proposalTs, itemProposal(MSG, "ds-Button").proposalTs);
+    assert.deepEqual(button!.item, { messageTs: MSG, id: "ds-Button" });
     assert.notEqual(button!.supersedeKey, tree!.supersedeKey, "each card its own slot");
     assert.deepEqual(button!.confirmers, MEMBERS);
     assert.equal(button!.ttlMs, PRECEDENCE_CARD_TTL_MS);
@@ -647,67 +659,75 @@ describe("the morning post", () => {
   it("several disagreements on one component are one card", async () => {
     const two = reportOf(1);
     two.items.push({ ...two.items[0]!, key: "Component1:size:axis-values", kind: "axis-values", summary: "code has `size=\"xs\"`, the library doesn't" });
-    const { deps, posts, staged } = postDeps(two);
-    await postPrecedenceReport(deps);
-    const cards = cardsIn(posts[0]!.blocks!);
+    const { morning, posts, staged } = postDeps(two);
+    await morning();
+    const cards = cardsIn(posts[0]!.blocks);
     assert.equal(cards.length, 1);
     assert.equal(cards[0]!.body.text, 'Code has it, the library has no published component for it; code has size="xs", the library doesn\'t.');
     assert.equal(staged.length, 1);
     assert.match(String(staged[0]!.operations![0]!.input.section), /xs/);
   });
 
-  it("shows ten cards and keeps the rest for tomorrow's report, under the same week", async () => {
-    const { deps, posts, staged, reportBox } = postDeps(reportOf(12));
-    await postPrecedenceReport(deps);
-    assert.equal(cardsIn(posts[0]!.blocks!).length, 10);
-    assert.match(JSON.stringify(posts[0]!.blocks![0]), /disagree on 12 components\..*Showing 10 of 12; the rest come in the next report\./);
+  it("past ten it shows ten, says so, and the rest wait in the report for the next morning", async () => {
+    const { morning, posts, staged, reportBox } = postDeps(reportOf(12));
+    await morning();
+    assert.equal(posts.length, 1);
+    assert.equal(cardsIn(posts[0]!.blocks).length, 10);
+    assert.match(JSON.stringify(posts[0]!.blocks[0]), /disagree on 12 components\..*Showing 10 of 12; the rest come in the next report\./);
     assert.equal(staged.length, 10);
-    assert.deepEqual(reportBox.box.value?.items.map((i) => i.component), ["Component11", "Component12"]);
-    assert.equal(reportBox.box.value?.weekOf, "2026-10-02");
-
-    const tomorrow = postDeps(reportBox.box.value);
-    await postPrecedenceReport(tomorrow.deps);
-    assert.equal(cardsIn(tomorrow.posts[0]!.blocks!).length, 2);
-    assert.equal(tomorrow.staged[0]!.operations![0]!.input.week_of, "2026-10-02");
-    assert.equal(tomorrow.reportBox.box.value, null);
+    assert.deepEqual(
+      reportBox.box.value!.items.map((i) => i.component),
+      ["Component11", "Component12"],
+      "the two that did not show wait for the next morning",
+    );
   });
 
-  it("a card that does not stage says so with nothing to review, and posts again tomorrow", async () => {
-    const { deps, edits, reportBox } = postDeps(await weekReport());
+  it("a budget stop while a card stages is thrown, not taken for a card that failed, and the report stays", async () => {
+    const { morning, deps, edits, reportBox } = postDeps(await weekReport());
+    deps.stage = async () => Promise.reject(new SubrequestBudgetError(48));
+    await assert.rejects(morning(), isSubrequestBudgetError);
+    assert.deepEqual(edits, [], "no card marked as failed");
+    assert.notEqual(reportBox.box.value, null);
+  });
+
+  it("a card that does not stage says so with nothing to review", async () => {
+    const { morning, deps, edits, reportBox } = postDeps(await weekReport());
     const stage = deps.stage;
-    deps.stage = async (p) => (p.item?.id === "TreeSelect" ? Promise.reject(new Error("DO down")) : stage(p));
-    const result = await postPrecedenceReport(deps);
-    assert.equal(result.posted, true);
+    deps.stage = async (p) => (p.item?.id === "ds-TreeSelect" ? Promise.reject(new Error("DO down")) : stage(p));
+    await morning();
     assert.equal(edits.length, 1);
     assert.equal(edits[0]!.ts, MSG);
+    assert.deepEqual(reportBox.box.value!.items.map((i) => i.component), ["TreeSelect"], "it waits for the next morning");
     const [, tree] = cardsIn(edits[0]!.message.blocks!);
     assert.equal(tree!.subtitle!.text, NOT_STAGED);
     assert.deepEqual(tree!.actions.map((a) => a.text.text), ["Code", "Figma"], "no Review");
-    assert.deepEqual(reportBox.box.value?.items.map((i) => i.component), ["TreeSelect"]);
   });
 
-  it("keeps the report for tomorrow when the members cannot be read, or the message does not post", async () => {
+  it("keeps the report for tomorrow when the members cannot be read, or the message does not carry it", async () => {
     const unread = postDeps(await weekReport());
-    unread.deps.members = async () => null;
-    assert.equal((await postPrecedenceReport(unread.deps)).posted, false);
+    unread.hand.members = async () => null;
+    assert.match((await unread.morning()).summary, /members unread/);
     assert.deepEqual(unread.posts, []);
     assert.notEqual(unread.reportBox.box.value, null);
 
     const refused = postDeps(await weekReport());
-    refused.deps.post = async () => ({ ok: false });
-    assert.equal((await postPrecedenceReport(refused.deps)).posted, false);
+    await handOverPrecedenceReport(refused.hand);
+    const [place] = await refused.section.waiting();
+    await refused.section.notPosted(place!, "Slack refused the post");
     assert.deepEqual(refused.staged, []);
     assert.notEqual(refused.reportBox.box.value, null);
+    assert.deepEqual(await refused.handOff.places(DATE), [], "the next morning hands it over afresh");
   });
 
-  it("a dry run drafts and posts, stages and writes nothing", async () => {
-    const { deps, posts, staged, reportBox } = postDeps(await weekReport());
-    const result = await postPrecedenceReport(deps, { dryRun: true });
+  it("a dry run hands nothing over and writes nothing", async () => {
+    const { morning, posts, staged, reportBox, handOff } = postDeps(await weekReport());
+    const result = await morning({ dryRun: true });
     assert.equal(result.posted, false);
-    assert.match(result.summary, /would post 2 component card/);
+    assert.match(result.summary, /would hand 2 component card/);
     assert.deepEqual(posts, []);
     assert.deepEqual(staged, []);
     assert.equal(reportBox.box.writes, 0);
+    assert.deepEqual(await handOff.places(DATE), []);
   });
 });
 
@@ -816,7 +836,7 @@ describe("deciding a weekly card in its Review", () => {
    *  fake repo. */
   async function decided(issues: Issue[] = []) {
     const posted = postDeps(await weekReport());
-    await postPrecedenceReport(posted.deps);
+    await posted.morning();
     const gh = github(issues, posted.store);
     const updates: Array<{ ts: string; message: CardMessage }> = [];
     const said: string[] = [];
@@ -859,8 +879,8 @@ describe("deciding a weekly card in its Review", () => {
 
   it("Approve on one card files the week's intake, Approve on the next comments on it, and each card says who decided", async () => {
     const { decide, gh, updates } = await decided();
-    await decide("TreeSelect", "confirm", MEMBERS[0]!);
-    await decide("Button", "confirm", MEMBERS[1]!);
+    await decide("ds-TreeSelect", "confirm", MEMBERS[0]!);
+    await decide("ds-Button", "confirm", MEMBERS[1]!);
     assert.equal(gh.created.length, 1, "one intake for the week");
     assert.match(gh.created[0]!.body, /### TreeSelect/);
     assert.equal(gh.comments.length, 1);
@@ -875,7 +895,7 @@ describe("deciding a weekly card in its Review", () => {
 
   it("names the existing intake found at write time, rather than the draft's destination", async () => {
     const { decide, gh, updates } = await decided([{ number: 1090, url: `https://github.com/${REPO}/issues/1090`, body: precedenceMarker("2026-10-02") }]);
-    await decide("Button", "confirm", MEMBERS[0]!);
+    await decide("ds-Button", "confirm", MEMBERS[0]!);
     assert.equal(gh.created.length, 0);
     assert.equal(gh.comments[0]!.issue_number, 1090);
     assert.equal(cardsIn(updates.at(-1)!.message.blocks)[0]!.body.text, "Written: added to DS precedence intake #1090.");
@@ -884,7 +904,7 @@ describe("deciding a weekly card in its Review", () => {
   it("keeps a failed write as not written even if its result carries a receipt", async () => {
     const { decide, gh, updates } = await decided([{ number: 1090, url: `https://github.com/${REPO}/issues/1090`, body: precedenceMarker("2026-10-02") }]);
     gh.deps.comment = async () => JSON.stringify({ ok: false, error: "GitHub unavailable", report_done: "added to intake #1090." });
-    await decide("Button", "confirm", MEMBERS[0]!);
+    await decide("ds-Button", "confirm", MEMBERS[0]!);
     const button = cardsIn(updates.at(-1)!.message.blocks)[0]!;
     assert.match(button.subtitle!.text, /not written/);
     assert.equal(button.body.text, "Nothing written.");
@@ -892,7 +912,7 @@ describe("deciding a weekly card in its Review", () => {
 
   it("Needs changes disputes the card: its note goes on the week's intake, filing it first, and the card reads Noted by", async () => {
     const { decide, gh, updates, store, views } = await decided();
-    await decide("Button", "revise", MEMBERS[0]!, "ghost is library-only on purpose");
+    await decide("ds-Button", "revise", MEMBERS[0]!, "ghost is library-only on purpose");
     const popUp = JSON.stringify(views.calls.map((c) => c.view));
     assert.match(popUp, /Your note goes on this week's intake\./, "the pop-up says where the note goes");
     assert.doesNotMatch(popUp, /revising the draft/);
@@ -902,9 +922,9 @@ describe("deciding a weekly card in its Review", () => {
     assert.equal(button!.subtitle!.text, "Noted by <@U0MEMBER1>");
     assert.equal(button!.body.text, "Note: ghost is library-only on purpose");
     assert.deepEqual(button!.actions.map((a) => a.text.text), ["View", "Code", "Figma"]);
-    assert.notEqual((await store.getProposalByTs(itemProposal(MSG, "Button").proposalTs)).state, "found", "nothing else decides it");
+    assert.notEqual((await store.getProposalByTs(itemProposal(MSG, "ds-Button").proposalTs)).state, "found", "nothing else decides it");
 
-    await decide("TreeSelect", "revise", MEMBERS[1]!, "the library is right, code is behind");
+    await decide("ds-TreeSelect", "revise", MEMBERS[1]!, "the library is right, code is behind");
     assert.equal(gh.created.length, 1);
     assert.deepEqual(gh.comments.map((c) => c.comment), ["**TreeSelect**: disputed by Bill — the library is right, code is behind"]);
   });
@@ -912,19 +932,19 @@ describe("deciding a weekly card in its Review", () => {
   it("a dispute that does not reach the intake puts the card back to open and says so", async () => {
     const { decide, gh, updates, said, store } = await decided();
     gh.deps.intakesSince = async () => Promise.reject(new Error("GitHub 502"));
-    await decide("Button", "revise", MEMBERS[0]!, "deliberate");
+    await decide("ds-Button", "revise", MEMBERS[0]!, "deliberate");
     const [button] = cardsIn(updates.at(-1)!.message.blocks);
     assert.equal(button!.subtitle!.text, "Library side");
     assert.deepEqual(button!.actions.map((a) => a.text.text), ["Review", "Code", "Figma"]);
     assert.match(said[0]!, /didn't reach this week's intake/);
-    const live = await store.getProposalByTs(itemProposal(MSG, "Button").proposalTs);
+    const live = await store.getProposalByTs(itemProposal(MSG, "ds-Button").proposalTs);
     assert.equal(live.state, "found");
     assert.equal(live.state === "found" && live.proposal.revising, undefined, "the lock is lifted");
   });
 
   it("Reject leaves the difference as deliberate and writes nothing", async () => {
     const { decide, gh, updates } = await decided();
-    await decide("Button", "cancel", MEMBERS[0]!, "ghost is library-only on purpose");
+    await decide("ds-Button", "cancel", MEMBERS[0]!, "ghost is library-only on purpose");
     assert.deepEqual(gh.created, []);
     assert.deepEqual(gh.comments, []);
     const [button] = cardsIn(updates.at(-1)!.message.blocks);
@@ -933,7 +953,7 @@ describe("deciding a weekly card in its Review", () => {
 
   it("only a #plus-universal member can decide a card", async () => {
     const { decide, gh } = await decided();
-    await decide("Button", "confirm", "U0OUTSIDE");
+    await decide("ds-Button", "confirm", "U0OUTSIDE");
     assert.deepEqual(gh.created, []);
   });
 });

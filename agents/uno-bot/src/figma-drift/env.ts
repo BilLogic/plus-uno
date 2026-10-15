@@ -10,10 +10,13 @@
 //     72 h, and beside it `figma-drift:live-file:<file>`, the one read a
 //     file-change notification makes before it looks further. KV, not D1: the queue and the live records hold the thread's words
 //     (ADR-030), and expire.
-//   • Slack: `chat.postMessage` in the thread, tagged with the sweep's message
-//     metadata so a reply under it is read by the sweep thread's rule
-//     (`isSweepCardPost`); `chat.getPermalink`; `chat.update` to redraw a
-//     report or edit the pointers.
+//   • Slack: nothing posted — each thread's cards go up on the sweep's
+//     morning message for its place, tagged as the sweep's, so a reply under
+//     it is read by the sweep thread's rule (`isSweepCardPost`);
+//     `chat.getPermalink`; `chat.update` to redraw a card, keeping the
+//     message's own tag, or edit an older pointer-only message.
+//   • The hand-off: the morning run's own storage (`JobContext.runStorage`),
+//     read by the sweep's post (`driftSectionFor`).
 //   • Staging: the sweep's own (`stageSweepCard`) — ThreadState, the staged
 //     row on the usage record, and the thread mark — one card at a time; each
 //     report's record in ThreadState beside them (`putReport`).
@@ -31,7 +34,7 @@
 
 import type { Env } from "../types";
 import { budgetHeadroom, charge } from "../net";
-import { getPermalink, postMessage, updateMessage, type SlackMessageMetadata } from "../slack/api";
+import { getPermalink, updateMessage, type SlackMessageMetadata } from "../slack/api";
 import { threadStateFor } from "../thread-state/production";
 import { proposalEvent, recordProposalEvents } from "../usage/index";
 import { figmaPeopleFor, proposalEventLogFor } from "../usage/production";
@@ -43,15 +46,19 @@ import { measured } from "../sweep/env";
 import { stageSweepCard } from "../sweep/run";
 import { SWEEP_CARD_EVENT } from "../sweep/cards";
 import { markSweepThread } from "../sweep/thread-mark";
-import type { ScheduledJob } from "../scheduled/runs";
+import type { JobContext, ScheduledJob } from "../scheduled/runs";
+import { sectionHandOffIn, type SweepSection } from "../sweep/sections";
 import { DRIFT_CARD_TTL_MS } from "./copy";
 import { LEGACY_DRIFT_KEY, type FileDriftFinding, type FileDriftSink } from "./finding";
 import { proposalReplyThread } from "../thread-state/index";
 import { modelFrameJudge } from "./judge";
 import {
+  driftSection,
+  DRIFT_SECTION,
   recheckLiveAsks,
   recheckOnUpdate,
   runDriftAsks,
+  type DriftHanded,
   type AskRecord,
   type DriftPostReport,
   type DriftRecheckReport,
@@ -87,17 +94,14 @@ export function fileDriftSinkFor(env: Env): FileDriftSink | undefined {
 }
 
 /**
- * The morning's `figma-drift-post` job on `Env`.
+ * The morning's `figma-drift-post` job on `Env`: the hand-over.
  *
  * @param env - Worker bindings
  * @param job - The job
- * @param opts - `dryRun` reads, judges and drafts, and posts, stages and writes nothing
+ * @param ctx - The morning run: `dryRun` reads, judges and drafts, and hands
+ *   over and writes nothing; a run with no storage has nowhere to hand over
  */
-export async function runDriftAsksOnEnv(
-  env: Env,
-  job: ScheduledJob,
-  opts: { dryRun: boolean },
-): Promise<DriftPostReport | { summary: string }> {
+export async function runDriftAsksOnEnv(env: Env, job: ScheduledJob, ctx: JobContext): Promise<DriftPostReport | { summary: string }> {
   if (!env.HARNESS_KV) return { summary: "HARNESS_KV not bound — no file drift to ask about" };
   const kv = env.HARNESS_KV;
   const threadState = threadStateFor(env);
@@ -105,38 +109,8 @@ export async function runDriftAsksOnEnv(
   const figma = figmaFor(env);
   return runDriftAsks(job, {
     store: kvDriftStore(kv),
-    slack: {
-      async post(to, message) {
-        const res = await postMessage(env, {
-          channel: to.channel,
-          text: message.text,
-          ...(message.blocks ? { blocks: message.blocks } : {}),
-          metadata: driftTag(message.card ? "drift-card" : "drift-question"),
-          ...(to.threadTs ? { thread_ts: to.threadTs } : {}),
-        });
-        return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
-      },
-      permalink: (channel, ts) => measured(() => getPermalink(env, channel, ts)),
-      async edit(channel, ts, message) {
-        await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks, metadata: driftTag("drift-card") });
-      },
-      async markThread(channel, threadTs) {
-        if (!(await threadState.readHistory({ channel, thread: threadTs })).length) await markSweepThread(kv, channel, threadTs);
-      },
-    },
-    reports: threadState,
-    async stage(proposal, channelKind) {
-      await stageSweepCard(
-        proposal,
-        {
-          threadState,
-          proposalEvents: proposalEventLogFor(env),
-          markThread: (channel, thread) => markSweepThread(kv, channel, thread),
-        },
-        Date.now(),
-        channelKind,
-      );
-    },
+    slack: { permalink: (channel, ts) => measured(() => getPermalink(env, channel, ts)) },
+    ...(ctx.runStorage ? { handOff: { date: ctx.runDate, to: sectionHandOffIn<DriftHanded>(ctx.runStorage, DRIFT_SECTION) } } : {}),
     async cardLive(ts) {
       return (await threadState.getProposalByTs(ts)).state === "found";
     },
@@ -153,8 +127,49 @@ export async function runDriftAsksOnEnv(
     },
     meter: { headroom: budgetHeadroom },
     now: () => Date.now(),
-    dryRun: opts.dryRun,
+    dryRun: ctx.dryRun,
   });
+}
+
+/**
+ * The morning's drift as sections of the sweep's messages, one a thread, or
+ * undefined without HARNESS_KV or the run's storage.
+ *
+ * @param env - Worker bindings
+ * @param ctx - The morning run
+ */
+export function driftSectionFor(env: Env, ctx: JobContext): SweepSection | undefined {
+  if (!env.HARNESS_KV || !ctx.runStorage) return undefined;
+  const kv = env.HARNESS_KV;
+  const threadState = threadStateFor(env);
+  return driftSection(
+    {
+      store: kvDriftStore(kv),
+      async stage(proposal, channelKind) {
+        await stageSweepCard(
+          proposal,
+          {
+            threadState,
+            proposalEvents: proposalEventLogFor(env),
+            markThread: (channel, thread) => markSweepThread(kv, channel, thread),
+          },
+          Date.now(),
+          channelKind,
+        );
+      },
+      reports: threadState,
+      async edit(channel, ts, message) {
+        // The message's own tag, kept: it is the sweep's.
+        await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks, ...(message.metadata ? { metadata: message.metadata } : {}) });
+      },
+      async markThread(channel, threadTs) {
+        if (!(await threadState.readHistory({ channel, thread: threadTs })).length) await markSweepThread(kv, channel, threadTs);
+      },
+      now: () => Date.now(),
+    },
+    sectionHandOffIn<DriftHanded>(ctx.runStorage, DRIFT_SECTION),
+    ctx.runDate,
+  );
 }
 
 /**
@@ -202,7 +217,8 @@ function recheckDepsFor(env: Env, kv: KVNamespace, dryRun: boolean): Parameters<
       return (await threadState.retireProposal(ts)).retired;
     },
     async edit(channel, ts, message) {
-      await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks, metadata: driftTag("drift-withdrawn") });
+      // A card on the sweep's morning message keeps that message's tag.
+      await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks, metadata: message.metadata ?? driftTag("drift-withdrawn") });
     },
     reports: threadState,
     async recordWithdrawn(proposalTs) {

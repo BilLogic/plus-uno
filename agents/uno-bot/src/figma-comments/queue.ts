@@ -16,7 +16,9 @@
 
 import type { FigmaClient } from "../figma/client";
 import type { PendingProposal, ProposalOperation, ThreadState } from "../thread-state/index";
-import type { ReportStore } from "../slack/decision-cards";
+import type { ReportMessage, ReportStore } from "../slack/decision-cards";
+import type { SectionHandOff } from "../sweep/sections";
+import type { FigmaDecisionsHanded } from "./post";
 import type { DecisionDetector, DecisionRoute } from "./detector";
 import type { DecisionUpdate } from "./draft";
 import type { Section } from "./sections";
@@ -73,9 +75,14 @@ export interface QueuedFile {
   decisions: QueuedDecision[];
   runDate: string;
   foundAt: number;
-  /** The #plus-design thread a morning opened for it and could not finish:
-   *  the next morning posts in it rather than opening a second. */
-  threadTs?: string;
+}
+
+/** A file as its cards are staged: who may decide them. */
+export interface DecisionFile {
+  fileKey: string;
+  /** The file's name, as Figma has it. */
+  title: string;
+  confirmers: string[];
 }
 
 /** The KV records both jobs keep. */
@@ -97,20 +104,19 @@ export interface FigmaCommentStores {
   };
 }
 
-/** A decision thread posted in #plus-design, as the reply handler finds it. */
-export interface DecisionThread {
+/** The thread of a morning message in #plus-design that carried decision
+ *  cards, as the reply handler finds it. */
+export interface DecisionThread extends DecisionFile {
   channel: string;
-  /** The parent message's ts: the thread. */
+  /** The message's ts: the thread. */
   ts: string;
-  fileKey: string;
-  title: string;
-  /** Who may decide, as the cards were staged. */
-  confirmers: string[];
   /** When its cards lapse, epoch ms. */
   expiresAt: number;
-  /** Each staged decision: its number, and `proposalKey`, the key its proposal is
-   *  staged under — its message and its comment id (`itemProposalKey`). */
-  decisions: Array<{ n: number; commentId: string; proposalKey: string; decision: QueuedDecision }>;
+  /** Each staged decision: its number, `proposalKey`, the key its proposal is
+   *  staged under — its message and its comment id (`itemProposalKey`) — and
+   *  its file. A thread from before a message carried several files names
+   *  none: its one file is the thread's own. */
+  decisions: Array<{ n: number; commentId: string; proposalKey: string; decision: QueuedDecision; file?: DecisionFile }>;
   /** Cards shown in the thread so far, staged or not: the next card's number
    *  follows it, so a card that showed and failed is never renumbered onto. */
   numbered?: number;
@@ -135,10 +141,13 @@ export interface SweepFigmaComments extends FigmaCommentStores {
   detector: DecisionDetector;
   /** MISC's team id, from `FIGMA_TEAM_IDS`; absent, nothing is skipped as MISC. */
   miscTeamId?: string;
+  /** The morning run's hand-off to the sweep's post (`./post.ts`); absent on
+   *  a rehearsal, which hands nothing over. */
+  handOff?: SectionHandOff<FigmaDecisionsHanded>;
   /** The morning's Slack side. Absent, the post skips. */
   slack?: {
     post(message: { text: string; blocks?: unknown[]; thread_ts?: string }): Promise<{ ok: boolean; ts?: string }>;
-    edit(ts: string, message: { text: string; blocks?: unknown[] }): Promise<void>;
+    edit(ts: string, message: { text: string; blocks?: unknown[]; metadata?: ReportMessage["metadata"] }): Promise<void>;
     /** #plus-design's members, or null when they cannot be read. */
     members(): Promise<string[] | null>;
     /** Stage a card the Worker posted, and put it on the usage record. */
@@ -159,6 +168,12 @@ export function operationsOf(d: Pick<QueuedDecision, "operation" | "row">): Prop
   return [...(d.operation ? [d.operation] : []), ...(d.row?.operations ?? [])];
 }
 
+/** A staged decision's file: its own, or — on a thread from before a message
+ *  carried several files — the thread's. */
+export function fileOf(thread: DecisionThread, entry: DecisionThread["decisions"][number]): DecisionFile {
+  return entry.file ?? { fileKey: thread.fileKey, title: thread.title, confirmers: thread.confirmers };
+}
+
 /**
  * A file queued again before its morning: the newer read's decisions replace
  * the older's thread by thread, and the rest stay.
@@ -169,5 +184,5 @@ export function operationsOf(d: Pick<QueuedDecision, "operation" | "row">): Prop
 export function mergeQueuedFile(older: QueuedFile | null, newer: QueuedFile): QueuedFile {
   if (!older) return newer;
   const fresh = new Set(newer.decisions.map((d) => d.commentId));
-  return { ...newer, ...(older.threadTs ? { threadTs: older.threadTs } : {}), decisions: [...older.decisions.filter((d) => !fresh.has(d.commentId)), ...newer.decisions] };
+  return { ...newer, decisions: [...older.decisions.filter((d) => !fresh.has(d.commentId)), ...newer.decisions] };
 }

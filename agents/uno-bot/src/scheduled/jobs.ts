@@ -16,17 +16,19 @@ import { runFigmaPoll } from "../figma-poll";
 import { selectProvider } from "../agent/run-agent";
 import { runClassifyBatch, runTextPurge } from "../usage/classify-run";
 import { askCategoriesFor, proposalEventLogFor, runTeamRolesSync } from "../usage/production";
-import { runLibraryPost, runLibraryTrack, runSnapshotRefreshOnEnv } from "../figma-library/env";
-import { runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
+import { runSnapshotRefreshOnEnv } from "../figma-library/env";
+import { dsPrecedenceSectionFor, runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
+import { figmaDecisionsSectionFor } from "../figma-comments/env";
 import { runSweepJobOnEnv } from "../sweep/env";
 import { commitmentThreadHookFor, runCommitmentNudgesOnEnv } from "../commitments/env";
 import { cardTodoNoteHookFor, cardTodoThreadHookFor, morningFollowUpsFor, runCardFollowThroughOnEnv } from "../follow-through/env";
 import type { SweepThread } from "../sweep/finding";
 import type { SweepDeps } from "../sweep/run";
-import { fileDriftSinkFor, runDriftAsksOnEnv, runDriftRecheckOnEnv } from "../figma-drift/env";
+import type { SweepSection } from "../sweep/sections";
+import { driftSectionFor, fileDriftSinkFor, runDriftAsksOnEnv, runDriftRecheckOnEnv } from "../figma-drift/env";
 import { runBackstopOnEnv } from "../figma-notify/env";
-import { runTidyPostOnEnv, runTidyReadOnEnv } from "../figma-tidy/env";
-import { runQueuedPrLinksOnEnv } from "../figma-links/env";
+import { runTidyPostOnEnv, runTidyReadOnEnv, tidySectionFor } from "../figma-tidy/env";
+import { devLinksSectionFor, runDevLinksMorningOnEnv } from "../figma-links/env";
 import { dmThreadHookFor } from "../dm-sweep/env";
 import { runProposalExpiry } from "../usage/index";
 import { runDmPromiseNudgesOnEnv, runDmPromiseReadOnEnv } from "../dm-watch/env";
@@ -57,17 +59,38 @@ const sweepBody: JobBody = async (env, job, ctx) => {
     job.kind === "sweep-post" || job.kind === "sweep-dms" || job.kind === "sweep-figma-comments" || job.kind === "sweep-figma-post"
       ? undefined
       : fileDriftSinkFor(env);
-  // The morning's post takes the card follow-ups handed off for a channel's
-  // top, so the channel gets one message (src/follow-through/).
-  const followUps = job.kind === "sweep-post" ? morningFollowUpsFor(env, ctx) : undefined;
+  // The morning's post takes what the other morning jobs handed off for a
+  // place, so each place gets one message (src/sweep/sections.ts).
+  const sections = job.kind === "sweep-post" ? morningSectionsFor(env, ctx) : undefined;
   const report = await runSweepJobOnEnv(env, job, ctx, {
     ...sweepHooks(env, job, ctx),
     ...(fileDrift ? { fileDrift } : {}),
-    ...(followUps ? { followUps } : {}),
+    ...(sections?.length ? { sections } : {}),
   });
   console.log(`[sweep] ${job.key}: ${report.summary}`);
   return report;
 };
+
+/**
+ * What the morning's other jobs handed the sweep's post, one port a job: the
+ * card follow-ups, the weekly DS precedence report, the Figma comment
+ * decisions, the weekly Figma tidy-up, the Figma drift questions and the Dev
+ * Mode links card
+ * (src/sweep/sections.ts). Each is absent without its bindings or
+ * the run's storage.
+ */
+export function morningSectionsFor(env: Env, ctx: JobContext): SweepSection[] {
+  return [
+    morningFollowUpsFor(env, ctx),
+    dsPrecedenceSectionFor(env, ctx),
+    figmaDecisionsSectionFor(env, ctx),
+    tidySectionFor(env, ctx),
+    driftSectionFor(env, ctx),
+    devLinksSectionFor(env, ctx),
+  ].filter(
+    (s): s is SweepSection => !!s,
+  );
+}
 
 /** The hooks a sweep job feeds: per thread for a channel read, per note for
  *  the notes job, per DM thread for the DM job, none otherwise. */
@@ -104,23 +127,10 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // Proves the path end to end — the enqueue, one alarm, the done marker —
   // and spends nothing.
   noop: async () => {},
-  // End of day: diff the DS file against the snapshot and keep what changed
-  // for the morning (src/figma-poll.ts).
+  // End of day: what the DS file published since the last look, owed to the
+  // repo's snapshot as a refresh (src/figma-poll.ts).
   "figma-library-poll": async (env, _job, { dryRun }) => {
     console.log(`[figma-poll] ${(await runFigmaPoll(env, { dryRun })).summary}`);
-  },
-  // Morning: each change set becomes one card in #plus-universal.
-  "figma-library-post": async (env, _job, { dryRun }) => {
-    console.log(`[figma-library] post: ${(await runLibraryPost(env, { dryRun })).summary}`);
-  },
-  // Morning: link each posted card's PR, and close its intake on merge.
-  "figma-library-track": async (env, _job, { dryRun }) => {
-    console.log(`[figma-library] track: ${(await runLibraryTrack(env, { dryRun })).summary}`);
-  },
-  // Morning, after the tracker: a Dev Mode links card for each merged
-  // library PR it queued, once FIGMA_DEV_LINKS is on (src/figma-links/).
-  "figma-dev-links-pr": async (env, _job, { dryRun }) => {
-    console.log(`[figma-links] PR links: ${(await runQueuedPrLinksOnEnv(env, { dryRun })).summary}`);
   },
   // End of day, last of the Figma jobs: a publish the poll found starts the
   // refresh of the repo's library snapshot, and again each night until it
@@ -146,7 +156,8 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // each channel's one report beside its handed-off card follow-ups.
   "sweep-post": sweepBody,
   // End of day: decisions in the day's Figma comments, kept for the morning;
-  // morning: one #plus-design thread per file (src/figma-comments/).
+  // morning: each file's decisions handed to the sweep's #plus-design message
+  // (src/figma-comments/).
   "sweep-figma-comments": sweepBody,
   "sweep-figma-post": sweepBody,
   // End of day: label one batch of the channel asks still holding text, and
@@ -193,10 +204,10 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
     console.log(`[commitments] ${job.key}: ${report.summary}`);
     return report;
   },
-  // Morning: each file drift the sweep kept is asked about in its thread, with
-  // one drafted intake per file (src/figma-drift/).
-  "figma-drift-post": async (env, job, { dryRun }) => {
-    const report = await runDriftAsksOnEnv(env, job, { dryRun });
+  // Morning: each file drift the sweep kept is handed to the sweep's message
+  // for its thread, with one drafted intake per file (src/figma-drift/).
+  "figma-drift-post": async (env, job, ctx) => {
+    const report = await runDriftAsksOnEnv(env, job, ctx);
     console.log(`[figma-drift] ${job.key}: ${report.summary}`);
     return report;
   },
@@ -257,12 +268,14 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
     console.log(`[dm-capture] ${job.key}: ${report.summary}`);
     return report;
   },
-  // Morning: a waiting report becomes one thread and one card in #plus-universal.
-  "ds-precedence-post": async (env, _job, { dryRun }) => {
-    console.log(`[ds-precedence] post: ${(await runDsPrecedencePost(env, { dryRun })).summary}`);
+  // Morning: a waiting report is handed to the sweep's #plus-universal message,
+  // one card a component (src/ds-precedence/).
+  "ds-precedence-post": async (env, _job, ctx) => {
+    console.log(`[ds-precedence] hand-over: ${(await runDsPrecedencePost(env, ctx)).summary}`);
   },
-  // Monday morning: the next stretch of the teams' folder listing, then the
-  // week's tidy-up cards in #plus-design (src/figma-tidy/).
+  // Monday morning: the next stretch of the teams' folder listing; then, every
+  // morning, the week's tidy-up cards handed to the sweep's message in the
+  // Figma Review channel (src/figma-tidy/).
   "figma-tidy-read": async (env, job, ctx) => {
     const report = await runTidyReadOnEnv(env, ctx);
     console.log(`[figma-tidy] ${job.key}: ${report.summary}`);
@@ -271,6 +284,13 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "figma-tidy-post": async (env, job, ctx) => {
     const report = await runTidyPostOnEnv(env, ctx);
     console.log(`[figma-tidy] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // Morning: a Dev Mode links card for the library PRs merged since the last,
+  // handed to the sweep's #plus-design message (src/figma-links/morning.ts).
+  "figma-dev-links-post": async (env, job, ctx) => {
+    const report = await runDevLinksMorningOnEnv(env, ctx);
+    console.log(`[figma-links] ${job.key}: ${report.summary}`);
     return report;
   },
 };

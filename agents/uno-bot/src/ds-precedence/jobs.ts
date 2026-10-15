@@ -8,37 +8,44 @@
 //     components is a Figma or token fault, not a library that emptied
 //     overnight, and reporting every component missing would file a wrong
 //     intake — that week is skipped, logged once, and changes nothing kept.
-//   • the POST — every morning run (`ds-precedence-post`): when a report is
-//     waiting, post it in #plus-universal (`precedenceChannel`) on the shared
-//     decision card (`slack/decision-cards.ts`): the parent line, then one
-//     card per component, each its own proposal (`itemProposal`), decided by
-//     the channel's members — read now — for six days. A card's Approve runs
+//   • the HAND-OVER — every morning run (`ds-precedence-post`), before the
+//     sweep's post: when a report is waiting, read #plus-universal's members
+//     (`precedenceChannel`) and hand the report to the sweep's morning
+//     message there, as one section of it (`precedenceSection`,
+//     `../sweep/sections.ts`). It posts nothing of its own: the channel gets
+//     one message a morning. The section is a line with the rule linked, then
+//     one card per component, each its own proposal (`itemProposal`), decided
+//     by the channel's members for six days. A card's Approve runs
 //     `ds_precedence_intake` (`./intake.ts`), which files the week's intake or
 //     comments on it; its Needs changes writes a dispute there
-//     (`./dispute.ts`); its Reject leaves the difference as deliberate. Nothing
-//     is typed, and a turn that would change a card is told to use its Review
-//     (`refuseRevision`).
-//     At most ten cards a morning, the carousel's limit: the rest, and any
-//     card that did not stage, stay in the report for the next morning, under
-//     the same week. Every morning rather than only Monday's: a morning whose
-//     reads fail keeps the report, and the next one posts it.
-//     Every posted message is recorded under its own ts (`env.ts`), so the
-//     engagement gate knows its thread whichever week it is.
+//     (`./dispute.ts`); its Reject leaves the difference as deliberate.
+//     Nothing is typed, and a turn that would change a card is told to use
+//     its Review (`refuseRevision`).
+//     The section shows whole, never over two messages: past the carousel's
+//     ten its line says how many show, and the rest come back with the next
+//     week's check. A morning whose message does not go up keeps the report,
+//     and the next one hands it over again — in practice once a week, the
+//     Monday after Friday's check.
+//     Every message that carried it is recorded under its own ts (`env.ts`),
+//     so the engagement gate knows its thread whichever week it is.
 //
 // Subrequest math (each job an alarm with a fresh 50; lookups stop at 38):
-//   check: the index + the registry from GitHub + the library's /components
-//          from Figma = 3 external; the in-flight read and the report are KV,
-//          the internal bucket.
-//   post:  members (at most 3 pages) + the message (1) + an edit when a card
-//          did not stage (1) = 5; the report's record and each card's staging
-//          are Durable Object hops.
+//   check:     the index + the registry from GitHub + the library's
+//              /components from Figma = 3 external; the report is KV, the
+//              internal bucket.
+//   hand-over: members (at most 3 pages); the report and the hand-off are
+//              internal.
+//   section:   an edit when a card did not stage (1), on the sweep's post's
+//              budget; the thread record, each card's staging and its usage
+//              rows are internal.
 //
 // `Env` enters in `ds-precedence/env.ts`.
 
-import type { PendingProposal, ThreadState } from "../thread-state/index";
+import type { PendingProposal } from "../thread-state/index";
+import { rethrowIfBudget } from "../net";
 import { renderProposalCard } from "../slack/proposal-render";
-import { decisionReport, itemProposal, markNotStaged, reportRecord, type ReportMessage, type ReportStore } from "../slack/decision-cards";
-import { textSections } from "../slack/render";
+import { itemProposal, markNotStaged, type ReportMessage, type ReportStore } from "../slack/decision-cards";
+import { handedSection, type SectionHandOff, type SweepSection } from "../sweep/sections";
 import { pickDestination, resolveDestination, type TeamChannels } from "../sweep/finding";
 import type { FigmaClient } from "../figma/client";
 import type { JobContext } from "../scheduled/runs";
@@ -52,6 +59,7 @@ import {
 } from "./compare";
 import {
   byComponent,
+  componentId,
   precedenceCard,
   precedenceCardWords,
   precedenceItem,
@@ -83,7 +91,7 @@ export const PRECEDENCE_CARD_TTL_MS = 6 * 24 * 60 * 60 * 1000;
  *  believe it (`indexedInLibrary`). */
 const MIN_LIBRARY_RATIO = 0.5;
 /** A card that showed and did not stage says this in its place. */
-export const NOT_STAGED = "Didn't go through, so it posts again tomorrow morning.";
+export const NOT_STAGED = "Didn't go through, so it comes back in tomorrow's report.";
 
 /** What the check keeps for the morning. */
 export interface PrecedenceReport {
@@ -118,8 +126,6 @@ export interface CheckDeps extends Pick<JobContext, "runDate"> {
   /** The Figma client: the library file's components. */
   figma: Pick<FigmaClient, "components">;
   report: Store<PrecedenceReport | null>;
-  /** Components a library publish is still carrying. */
-  inFlight(registry: PrecedenceRegistry): Promise<Set<string>>;
   fileKey: string;
   repo: string;
   now(): number;
@@ -162,7 +168,6 @@ export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boole
     library,
     fileKey: deps.fileKey,
     repo: deps.repo,
-    inFlight: await deps.inFlight(registry),
   });
   if (!opts.dryRun) {
     await deps.report.write(items.length ? { checkedAt: new Date(deps.now()).toISOString(), weekOf: deps.runDate, items } : null);
@@ -173,29 +178,149 @@ export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boole
   };
 }
 
-export interface PostDeps {
+/** The section's name on the sweep's morning post (`../sweep/sections.ts`). */
+export const PRECEDENCE_SECTION = "ds-precedence";
+
+/** What the morning hands the sweep's post: the week's report and who may
+ *  decide its cards, read this morning. */
+export interface PrecedenceHanded {
+  weekOf: string;
+  items: Disagreement[];
+  confirmers: string[];
+}
+
+export interface HandOverDeps {
   report: Store<PrecedenceReport | null>;
-  /** Record a posted report's thread under its own ts, for as long as its
-   *  replies matter (`env.ts`). */
-  recordThread(thread: PostedThread): Promise<void>;
   /** The channel's member ids, or null when Slack would not say. */
   members(): Promise<string[] | null>;
-  /** Post in the channel, top level. */
-  post(message: ReportMessage): Promise<{ ok: boolean; ts?: string }>;
-  /** Edit a posted message in place (`chat.update`). */
-  edit(ts: string, message: ReportMessage): Promise<void>;
-  /** Where each report's record is kept, and its cards' decisions land. */
-  reports: ReportStore & Pick<ThreadState, "putReport">;
-  stage(proposal: PendingProposal): Promise<void>;
+  /** The morning run's hand-off; absent on a rehearsal. */
+  handOff?: SectionHandOff<PrecedenceHanded>;
   channel: string;
-  /** Where the precedence rule is written, as the parent line links it. */
-  ruleUrl: string;
-  now(): number;
+  /** The morning's date. */
+  date: string;
 }
 
 export interface PostResult {
   posted: boolean;
   summary: string;
+}
+
+/**
+ * The morning's move: the waiting report, if any, handed to the sweep's post
+ * for #plus-universal's one message. It posts nothing itself, and keeps the
+ * report until that message is up.
+ *
+ * @param deps - The report, the channel's members and the hand-off
+ * @param opts - `dryRun` reads and hands nothing over
+ */
+export async function handOverPrecedenceReport(deps: HandOverDeps, opts: { dryRun?: boolean } = {}): Promise<PostResult> {
+  const report = await deps.report.read();
+  if (!report?.items.length) return { posted: false, summary: "no disagreements waiting" };
+
+  const members = await deps.members();
+  if (!members) {
+    // A card nobody could confirm is worse than a day's wait.
+    console.error("[ds-precedence] could not read the channel's members — report kept for tomorrow");
+    return { posted: false, summary: "kept: the channel's members unread" };
+  }
+  const components = byComponent(report.items).length;
+  if (opts.dryRun || !deps.handOff) return { posted: false, summary: `would hand ${components} component card(s) to the morning post` };
+  await deps.handOff.put(deps.date, { channel: deps.channel, threadTs: null }, {
+    weekOf: report.weekOf ?? report.checkedAt.slice(0, 10),
+    items: report.items,
+    confirmers: members,
+  });
+  return { posted: false, summary: `handed ${components} component card(s) to the morning post` };
+}
+
+export interface SectionDeps {
+  report: Store<PrecedenceReport | null>;
+  /** Record a posted report's thread under its own ts, for as long as its
+   *  replies matter (`env.ts`). */
+  recordThread(thread: PostedThread): Promise<void>;
+  /** Edit the morning's message in place (`chat.update`). */
+  edit(ts: string, message: ReportMessage): Promise<void>;
+  /** Where the morning message's record is kept, and its cards' decisions land. */
+  reports: ReportStore;
+  stage(proposal: PendingProposal): Promise<void>;
+  channel: string;
+  /** Where the precedence rule is written, as the section's line links it. */
+  ruleUrl: string;
+}
+
+/**
+ * The weekly report as a section of the sweep's morning message in
+ * #plus-universal: one line, with the rule linked, then a card per component,
+ * each its own proposal (`stagedComponent`). It goes first on the message:
+ * past the carousel's ten its line says how many show. Once the message is
+ * up, each card it showed stages; what did not show, or did not stage, stays
+ * in the report for the next morning's message, which hands it over again
+ * until a newer week's check replaces it. A card that did not stage says so
+ * on the message.
+ *
+ * @param deps - The report, the thread record, the edit and the staging
+ * @param handOff - The morning run's hand-off
+ * @param date - The morning's date
+ */
+export function precedenceSection(deps: SectionDeps, handOff: SectionHandOff<PrecedenceHanded>, date: string): SweepSection {
+  return handedSection<PrecedenceHanded>({
+    source: PRECEDENCE_SECTION,
+    date,
+    handOff,
+    cardsOf(value) {
+      const findings = byComponent(value.items);
+      return {
+        cards: findings.map((f) => ({ person: null, item: precedenceItem(f) })),
+        whole: true,
+        ttlMs: PRECEDENCE_CARD_TTL_MS,
+        // The cards that show, each a staging, and the edit when one did not stage.
+        cost: (shown) => ({ subrequests: 1, d1Queries: shown.length * 3 }),
+        says: () => precedenceParent(findings.length, deps.ruleUrl),
+      };
+    },
+    async posted(value, place, shown, report, progress) {
+      await deps.recordThread({ channel: place.channel, ts: report.ts, weekOf: value.weekOf });
+      const staged = new Set<string>();
+      const failed: string[] = [];
+      for (const finding of byComponent(value.items)) {
+        const id = precedenceItem(finding).id;
+        if (!shown.includes(id)) continue;
+        const before = progress.done.get(id);
+        if (before !== undefined) {
+          if (before) staged.add(id);
+          else failed.push(id);
+          continue;
+        }
+        try {
+          await deps.stage(stagedComponent(place.channel, report.ts, finding, value.weekOf, value.confirmers));
+          staged.add(id);
+          await progress.mark(id, true);
+        } catch (err) {
+          rethrowIfBudget(err);
+          console.error(`[ds-precedence] ${finding.component} posted but not staged: ${err instanceof Error ? err.message : String(err)}`);
+          failed.push(id);
+          await progress.mark(id, false);
+        }
+      }
+      // What staged is not handed over again; the rest wait in the report for
+      // the next morning, unless a newer week's check has replaced it.
+      const waiting = await deps.report.read();
+      if (waiting && (waiting.weekOf ?? waiting.checkedAt.slice(0, 10)) === value.weekOf) {
+        const rest = waiting.items.filter((item) => !staged.has(componentId(item.component)));
+        if (rest.length !== waiting.items.length) await deps.report.write(rest.length ? { ...waiting, items: rest } : null);
+      }
+      if (!failed.length) return;
+      const marked = await markNotStaged(deps.reports, report.ts, failed, NOT_STAGED).catch((err: unknown) => {
+        rethrowIfBudget(err);
+        return null;
+      });
+      if (marked) await deps.edit(report.ts, marked).catch(rethrowIfBudget);
+    },
+    async notPosted(_value, _place, why) {
+      // The report stays waiting: the next morning hands it over again.
+      console.error(`[ds-precedence] the morning message did not carry the report (${why}) — kept for tomorrow`);
+    },
+  });
 }
 
 /**
@@ -235,71 +360,4 @@ export function stagedComponent(
     // Needs changes writes the note on the intake (`./dispute.ts`): no redraft.
     afterNeedsChanges: PRECEDENCE_NOTE_TAKEN,
   };
-}
-
-/**
- * The morning post: the waiting report, if any, as one message of cards.
- *
- * @param deps - Reads, the post, the report's record and the staging
- * @param opts - `dryRun` reads and drafts, and posts, stages and writes nothing
- */
-export async function postPrecedenceReport(deps: PostDeps, opts: { dryRun?: boolean } = {}): Promise<PostResult> {
-  const report = await deps.report.read();
-  if (!report?.items.length) return { posted: false, summary: "no disagreements waiting" };
-
-  const members = await deps.members();
-  if (!members) {
-    // A card nobody could confirm is worse than a day's wait.
-    console.error("[ds-precedence] could not read the channel's members — report kept for tomorrow");
-    return { posted: false, summary: "kept: the channel's members unread" };
-  }
-
-  const weekOf = report.weekOf ?? report.checkedAt.slice(0, 10);
-  const findings = byComponent(report.items);
-  const built = decisionReport(findings.map(precedenceItem), precedenceParent(findings.length, deps.ruleUrl));
-  const shown = findings.slice(0, built.shown.length);
-  const held = findings.slice(built.shown.length);
-  if (opts.dryRun) return { posted: false, summary: `would post ${shown.length} component card(s)` };
-
-  const sent = await deps.post({ text: built.text, blocks: built.blocks });
-  if (!sent.ok || !sent.ts) {
-    console.error("[ds-precedence] the report did not post — kept for tomorrow");
-    return { posted: false, summary: "post failed; kept" };
-  }
-  const ts = sent.ts;
-  // The report is up: posting it again tomorrow would show its cards twice,
-  // so only what it held back is kept.
-  const keep = (rest: readonly ComponentFinding[]) =>
-    deps.report.write(rest.length ? { ...report, weekOf, items: rest.flatMap((f) => f.items) } : null);
-  await keep(held);
-  await deps.recordThread({ channel: deps.channel, ts, weekOf });
-
-  const kept = await deps.reports.putReport(reportRecord(deps.channel, ts, built, PRECEDENCE_CARD_TTL_MS)).then(
-    () => true,
-    (err: unknown) => {
-      console.error(`[ds-precedence] the report posted but its record was not kept: ${err instanceof Error ? err.message : String(err)}`);
-      return false;
-    },
-  );
-  const failed: ComponentFinding[] = [];
-  for (const finding of shown) {
-    try {
-      if (!kept) throw new Error("no report record");
-      await deps.stage(stagedComponent(deps.channel, ts, finding, weekOf, members));
-    } catch (err) {
-      console.error(`[ds-precedence] ${finding.component} posted but not staged: ${err instanceof Error ? err.message : String(err)}`);
-      failed.push(finding);
-    }
-  }
-  if (!failed.length) return { posted: true, summary: `posted ${shown.length} component card(s)` };
-
-  // Cards with nothing to review say so, and post again tomorrow.
-  await keep([...failed, ...held]);
-  const ids = failed.map((f) => precedenceItem(f).id);
-  const marked = kept ? await markNotStaged(deps.reports, ts, ids, NOT_STAGED).catch(() => null) : null;
-  // No record to mark them on: the message is cut back to a line saying so,
-  // since its Review buttons would open nothing.
-  const waiting = "The DS precedence cards didn't go through this morning, so they post again tomorrow.";
-  await deps.edit(ts, marked ?? { text: waiting, blocks: textSections(waiting) }).catch(() => {});
-  return { posted: true, summary: `posted ${shown.length} component card(s); ${failed.length} did not stage and wait for tomorrow` };
 }

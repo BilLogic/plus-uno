@@ -43,7 +43,7 @@ import { itemProposal, replaceItem, type ReportMessage, type ReportStore } from 
 import { commentUrl, draftDecision } from "./draft";
 import { stagedDecision } from "./post";
 import { fieldsOf } from "./read";
-import type { DecisionThread, QueuedDecision } from "./queue";
+import { fileOf, type DecisionFile, type DecisionThread, type QueuedDecision } from "./queue";
 import { figmaFileUrl } from "../figma/links";
 
 export interface ReviseDeps {
@@ -187,14 +187,15 @@ export async function reviseDecision(deps: ReviseDeps, reply: DecisionReply): Pr
   };
   // A Needs changes already passed the gate's confirmer check, standing
   // confirmers included; a typed reply is checked here.
-  if (note === null && !thread.confirmers.includes(reply.user)) {
+  const file = fileOf(thread, entry);
+  if (note === null && !file.confirmers.includes(reply.user)) {
     await unlock();
-    return say(revisionRefusal(thread.confirmers, reply.user));
+    return say(revisionRefusal(file.confirmers, reply.user));
   }
 
   let revised: QueuedDecision | null;
   try {
-    revised = await redraft(deps, thread, entry.decision, wording);
+    revised = await redraft(deps, file, entry.decision, wording);
   } catch (err) {
     rethrowIfBudget(err);
     console.warn(`[figma-comments] decision ${entry.decision.commentId} not redrafted: ${err instanceof Error ? err.message : String(err)}`);
@@ -216,7 +217,7 @@ export async function reviseDecision(deps: ReviseDeps, reply: DecisionReply): Pr
     return say(`Decision ${n}'s card can't be revised in place, so it stays as it is.`);
   }
   await deps.retire(old.proposalTs);
-  const link = commentUrl(thread.fileKey, revised.nodeId, revised.commentId);
+  const link = commentUrl(file.fileKey, revised.nodeId, revised.commentId);
   const before = (await deps.reports.getReport(item.messageTs))?.entries.find((e) => e.id === item.id)?.item;
   // In place: the same card in the report, under the same number, open again
   // as a new proposal.
@@ -224,7 +225,7 @@ export async function reviseDecision(deps: ReviseDeps, reply: DecisionReply): Pr
   let staged = false;
   if (replaced) {
     try {
-      await deps.stage(stagedDecision(thread, { messageTs: item.messageTs, id: replaced.id }, n, revised, ttlMs));
+      await deps.stage(stagedDecision(thread, file, { messageTs: item.messageTs, id: replaced.id }, n, revised, ttlMs));
       staged = true;
       await deps.thread.write({
         ...thread,
@@ -262,7 +263,7 @@ export async function reviseDecision(deps: ReviseDeps, reply: DecisionReply): Pr
 }
 
 /** The decision drafted again with the teammate's words, against a fresh read of its page; null when it cannot be. */
-async function redraft(deps: ReviseDeps, thread: DecisionThread, d: QueuedDecision, wording: string): Promise<QueuedDecision | null> {
+async function redraft(deps: ReviseDeps, file: DecisionFile, d: QueuedDecision, wording: string): Promise<QueuedDecision | null> {
   let prd: SweepSource | null = null;
   const cards: ShownCard[] = [];
   if (d.update.kind === "prd") prd = await deps.page(d.update.page.url);
@@ -272,7 +273,7 @@ async function redraft(deps: ReviseDeps, thread: DecisionThread, d: QueuedDecisi
   }
   if ((d.route === "prd" && !prd) || (d.route === "card" && !cards.length)) return null;
   const result = await deps.detector.detect({
-    file: { title: thread.title, url: figmaFileUrl(thread.fileKey) },
+    file: { title: file.title, url: figmaFileUrl(file.fileKey) },
     threads: [
       { id: d.commentId, section: d.section, page: d.page, resolved: !!d.resolvedAt, comments: [{ by: d.by, at: d.createdAt, text: d.quote }] },
     ],
@@ -285,8 +286,8 @@ async function redraft(deps: ReviseDeps, thread: DecisionThread, d: QueuedDecisi
   const { operation, update, before } = draftDecision(found, {
     prd,
     card: d.update.kind === "card" ? d.update.card : null,
-    file: { title: thread.title },
-    commentUrl: commentUrl(thread.fileKey, d.nodeId, d.commentId),
+    file: { title: file.title },
+    commentUrl: commentUrl(file.fileKey, d.nodeId, d.commentId),
     quote: d.quote,
     by: d.by,
     where: `${d.section} › ${d.page}`,

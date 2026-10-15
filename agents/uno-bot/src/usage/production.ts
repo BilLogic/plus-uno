@@ -85,13 +85,9 @@ export function classifyAskFor(env: Env): ((text: string) => Promise<SubType | n
   return async (text) => (await classifyAsks(selectProvider(env), [text]))[0] ?? null;
 }
 
-/** `TEST_CHANNEL_IDS`, parsed: comma-separated channel ids, blanks dropped. */
-export function testChannelIdsOf(env: Pick<Env, "TEST_CHANNEL_IDS">): string[] {
-  return (env.TEST_CHANNEL_IDS ?? "")
-    .split(",")
-    .map((id) => id.trim())
-    .filter(Boolean);
-}
+/** `TEST_CHANNEL_IDS`, parsed — kept beside the rule that reads it
+ *  (`./record.ts`), so a module with no bindings can read it too. */
+export { testChannelIdsOf } from "./record";
 
 /**
  * The stored role map (`./team-roles-sync.ts`), or an empty one — every role

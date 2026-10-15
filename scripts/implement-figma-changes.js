@@ -33,9 +33,9 @@ const FIGMA_FILE_KEY = process.env.FIGMA_FILE_KEY;
 const PR_TITLE = process.env.PR_TITLE || '';
 const PR_BODY_FILE = process.env.PR_BODY_FILE;
 const NOTION_PRD_ID = process.env.NOTION_PRD_ID || '';
-// Set when uno-bot's Figma library card dispatched the run: the publish's
-// Figma version id. Its spec is the `harness-intake` issue the same card filed,
-// found by the marker its body opens with — never a Notion PRD.
+// Set when a dispatch names a library publish: its Figma version id. Its spec
+// is that publish's `harness-intake` issue, found by the marker its body opens
+// with — never a Notion PRD. uno-bot no longer sends one; a manual run may.
 const FIGMA_VERSION_ID = /^\d{1,24}$/.test(process.env.FIGMA_VERSION_ID || '') ? process.env.FIGMA_VERSION_ID : '';
 // CLAUDE_MODEL is loaded from scripts/prompts/uno-implement/SKILL.md frontmatter at runtime — see main()
 const COMPONENTS_DIR = resolve('design-system/src/components');
@@ -44,10 +44,10 @@ const TOKENS_DIR = resolve(TOKEN_DIR);
 // ─── Helpers ───────────────────────────────────────────────
 
 /**
- * The `harness-intake` issue uno-bot filed for a Figma library publish, found
- * by the marker its body opens with (agents/uno-bot/src/figma-library/draft.ts
- * `publishMarker`). Null when there is no token, no repo or no match — the run
- * then goes ahead from the component list alone.
+ * The `harness-intake` issue filed for a Figma library publish, found by the
+ * marker its body opens with (`<!-- uno-bot:figma-publish:<version>`). Null
+ * when there is no token, no repo or no match — the run then goes ahead from
+ * the component list alone.
  */
 async function findLibraryIntake(versionId) {
   const token = process.env.GITHUB_TOKEN;

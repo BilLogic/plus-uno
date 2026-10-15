@@ -26,8 +26,8 @@ head_sampling_rate = 1
 # cron triggers. Weekdays are named, not numbered: Cloudflare counts 1 as
 # SUNDAY, not Monday. The handler also refuses a firing whose ET day is not a
 # run day, so a wrong weekday field would start nothing extra. The Figma library poll is the end-of-day run's
-# `figma-library-poll` job, and its
-# findings post in #plus-universal at the next morning run
+# `figma-library-poll` job: a publish it finds owes the repo's library snapshot
+# a refresh, started later in the same run, and posts nothing
 # (src/figma-poll.ts, src/figma-library/). Manual poll: GET /debug/figma-poll.
 # Budget: the handler only ENQUEUES the run on its own AgentRunner instance (one
 # DO hop, inside the ~10ms scheduled CPU limit). The runner then runs ONE job
@@ -203,8 +203,9 @@ BLUEPRINT_INDEX = "off"
 # ── Figma library jobs (the scheduled runs on the [triggers] cron above) ────
 # DS design-system Figma file key — non-secret (it's the path segment of every
 # shared Figma URL; see design-system/figma/component-figma-links.md). The
-# end-of-day poll diffs this file's components/versions against a KV snapshot
-# (HARNESS_KV, key "figma-poll:snapshot"). Leave blank to disable the poll.
+# end-of-day poll compares this file's versions with the ones it saw last
+# (HARNESS_KV, key "figma-poll:snapshot"), and the weekly DS precedence check
+# reads its components. Leave blank to disable both.
 FIGMA_FILE_KEY = "zAecJNRdvJzAUOcjV32tRX"
 # The six PLUS Figma teams, as name=id pairs. Non-secret, and no API call lists
 # them: each id is read off the team's URL (the #881 probe used these). The
@@ -214,14 +215,13 @@ FIGMA_FILE_KEY = "zAecJNRdvJzAUOcjV32tRX"
 # held one id, and the wrong one.
 FIGMA_TEAM_IDS = "Universal=1279226364199713409,Training=1279227480162592555,Toolkit=1279227565411025715,Admin=1279229084983452695,Others=1279227354789670676,MISC=1279241534978917312"
 # #plus-universal channel id (private; uno-bot is a member) — the design-ops
-# team's channel. The morning run posts each library publish here as one card
-# (drafted intake + implementation), and its members are who may confirm it.
-# Leave blank → the findings wait in KV and nothing is posted.
+# team's channel. The sweep's morning post for the design system goes here,
+# the weekly DS precedence section among it, and its members are who may
+# decide a precedence card. Leave blank → that report waits and nothing posts.
 PLUS_UNIVERSAL_CHANNEL_ID = "C072E8SFLKV"
 # #uno-bot channel id — the intake channel (src/turn/intake-channel.ts): a
 # top-level post there engages with no @mention and becomes a drafted intake.
-# Nothing about the Figma library posts here any more. Leave blank → there is
-# no intake channel.
+# Leave blank → there is no intake channel.
 UNO_BOT_CHANNEL_ID = "C0ARJ2A3A69"
 # #uno-bot-sandbox channel id — where the Slack probes (/debug/slack-post,
 # /debug/slack-stream) may post raw test messages besides a DM and the alert
@@ -237,11 +237,10 @@ PLUS_DESIGN_CHANNEL_ID = "C03FC8AS69K"
 # (PLUS_DESIGN_CHANNEL_ID). Set it to a DM id to keep test cards out of
 # #plus-design while a Figma flow is in testing.
 # Dev Mode links (src/figma-links/): blank, `/debug/figma-dev-links` takes
-# Button alone (the live check with Bill; `post=1` posts its Review card),
-# every other component waits, and a merged library PR's link stays queued.
-# "on" since Bill passed that check (2026-10-12): `?all=1&post=1` posts the
-# rest on one batch card — only that manual run does — and the morning run
-# posts each merged PR's card. A card writes only on Approve.
+# Button alone (the live check with Bill; `post=1` posts its Review card), and
+# every other component waits. "on" since Bill passed that check
+# (2026-10-12): `?all=1&post=1` posts the rest on one batch card — only that
+# manual run does. A card writes only on Approve.
 FIGMA_DEV_LINKS = "on"
 # ── End-of-day sweep (src/sweep/) ────────────────────────────────────────────
 # The channels the end-of-day run reads for Notion drift, one job per channel:
@@ -338,7 +337,9 @@ CLAUDE_MODEL = "claude-sonnet-5"
 # Channels whose turns are flagged test traffic on the usage record, so they
 # never count toward adoption: #uno-bot-sandbox. Comma-separated channel ids.
 # Every /debug/* and /health/* route and a
-# greeting with no ask are test traffic without being listed here.
+# greeting with no ask are test traffic without being listed here. A post test
+# traffic sets off stays in the test channel — a debug route's goes to the first
+# one listed — and never reaches a team channel (src/usage/record.ts).
 #   uno-bot-sandbox C0B4QBWAUJU
 TEST_CHANNEL_IDS = "C0B4QBWAUJU"
 # The lead: a reply of theirs in an ask's thread, or a DM to them from the asker
@@ -453,9 +454,9 @@ binding = "SLACK_OAUTH_KV"
 id = "aa0ba01735c545d1abe887bd81fc98aa"
 
 # KV — delivery-alert throttle, the Gemini explicit-cache memo, and the Figma
-# library's state under "figma-poll:*": the component snapshot, the findings
-# waiting for the morning post, and the posted cards being tracked
-# (src/figma-poll.ts, src/figma-library/env.ts) — and the sweep's findings
+# library's state under "figma-poll:*": the version ids last seen and the
+# refresh a publish owes the repo's snapshot (src/figma-poll.ts,
+# src/figma-library/env.ts) — and the sweep's findings
 # waiting for the morning under "sweep:findings:*" (src/sweep/env.ts). NOT a
 # harness fallback: the harness is baked into the bundle and skills.ts serves
 # the compiled constant with zero KV access.

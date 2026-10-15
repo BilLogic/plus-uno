@@ -1712,7 +1712,7 @@ test("a revised or re-staged group-DM sweep card carries no share", async () => 
   assert.equal(sweepShareOffer(restaged.proposal.sweepShare, applied, channels), null);
 });
 
-// A stated card (the library card, the weekly precedence card) answers the
+// A stated card (the weekly precedence card, a tidy-up card) answers the
 // gate in its own words. The fresh card a cut-off run comes back on is an
 // ordinary one, so its words do not come with it.
 test("a re-staged stated card leaves its own words behind", async () => {

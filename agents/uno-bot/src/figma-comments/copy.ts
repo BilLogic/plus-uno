@@ -52,9 +52,17 @@ export function decisionParent(file: Pick<QueuedFile, "title" | "url">, count: n
   return `${what} <${file.url}|${fileName(file)}> ${reads}.`;
 }
 
-/** The parent, edited, when none of its cards went up this morning. */
-export function decisionParentWaiting(file: Pick<QueuedFile, "title" | "url">): string {
-  return `Comments in <${file.url}|${fileName(file)}> read like decisions. Their cards didn't go through this morning, so they'll post here tomorrow morning.`;
+/**
+ * The opener's line for a file's PRD decisions with no PRD to write to: no
+ * card, and a reply in the thread for each.
+ *
+ * @param file - The file
+ * @param count - How many
+ */
+export function noPrdLine(file: Pick<QueuedFile, "title" | "url">, count: number): string {
+  const what = count === 1 ? "1 comment in" : `${count} comments in`;
+  const reads = count === 1 ? "reads like a PRD change" : "read like PRD changes";
+  return `${what} <${file.url}|${fileName(file)}> ${reads} with no PRD page to draft on; the details are in this thread.`;
 }
 
 /** Whom a card is for: the owner as a Slack person, else by Figma handle. */

@@ -9,6 +9,7 @@ import {
   askedAtOf,
   buildTurnRecord,
   estimateCostUsd,
+  isTestOrigin,
   isTestTraffic,
   isThanks,
   MAX_REQUEST_TEXT_CHARS,
@@ -16,6 +17,7 @@ import {
   ratesFor,
   selfFiledTicketOf,
   sourcesCitedIn,
+  teamPostChannel,
   type TurnRecordFacts,
   withAskLabel,
 } from "../src/usage/index";
@@ -191,6 +193,30 @@ test("test traffic: a debug route, a sandbox channel, a bare greeting — and no
   assert.equal(isTestTraffic({ ...base, disposition: "reacted", question: "thanks!" }), true);
   // A reaction to a real question is still a real ask.
   assert.equal(isTestTraffic({ ...base, disposition: "reacted", question: "is this right?" }), false);
+});
+
+test("a test origin: the rule's debug route and sandbox channel, with no turn to read", () => {
+  const base = { origin: "slack" as const, channel: "C1", testChannelIds: ["C_SANDBOX"] };
+  assert.equal(isTestOrigin(base), false);
+  assert.equal(isTestOrigin({ ...base, origin: "debug" }), true);
+  assert.equal(isTestOrigin({ ...base, channel: "C_SANDBOX" }), true);
+  // The greeting clause is a turn's, not a place's: the same rule, its first two clauses.
+  for (const over of [{}, { origin: "debug" as const }, { channel: "C_SANDBOX" }]) {
+    const at = { ...base, ...over };
+    assert.equal(isTestOrigin(at), isTestTraffic({ ...at, disposition: "answered", question: "where is it?" }));
+  }
+});
+
+test("a team-channel post test traffic set off stays in the test channel", () => {
+  const sandbox = ["C_SANDBOX", "C_SANDBOX_2"];
+  // Real traffic posts where it was aimed.
+  assert.equal(teamPostChannel({ origin: "slack", channel: "C1", testChannelIds: sandbox }, "C_TEAM"), "C_TEAM");
+  // A test channel's post stays in that test channel, whichever it is.
+  assert.equal(teamPostChannel({ origin: "slack", channel: "C_SANDBOX_2", testChannelIds: sandbox }, "C_TEAM"), "C_SANDBOX_2");
+  // A debug route has no channel: the first test channel takes it.
+  assert.equal(teamPostChannel({ origin: "debug", channel: "", testChannelIds: sandbox }, "C_TEAM"), "C_SANDBOX");
+  // With no test channel set, a debug route's post goes nowhere.
+  assert.equal(teamPostChannel({ origin: "debug", channel: "", testChannelIds: [] }, "C_TEAM"), null);
 });
 
 // ── unprompted thanks ────────────────────────────────────────────────────────
