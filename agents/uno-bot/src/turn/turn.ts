@@ -2410,6 +2410,18 @@ async function buildCard(
   return card.ask || card.lead ? { ...card, leadBy: modelLed ? "model" : "worker" } : card;
 }
 
+/** Where each share-out in a batch posts, from the executor's own rule, so the
+ *  plan groups it there (`ProposalCard.places`). Nothing for a single
+ *  operation, which has no plan, or a batch with no share-out. */
+function shareoutPlacesOf(
+  operations: ProposalOperation[],
+  deps: Pick<TurnDeps, "cards">,
+  channel: string,
+): { places?: Array<string | null> } {
+  if (operations.length <= 1 || !operations.some((op) => op.toolName === "shareout_post")) return {};
+  return { places: operations.map((op) => (op.toolName === "shareout_post" ? deps.cards.shareoutWhere(op.input, channel) : null)) };
+}
+
 /** The card itself, before who-wrote-the-lead is marked. */
 async function cardOf(
   result: Extract<AgentResult, { kind: "proposal" }>,
@@ -2425,6 +2437,7 @@ async function cardOf(
     fields: cardFieldsOf(input),
     caveats: caveatsFor(toolName, input, result.previewText),
     operations: result.operations,
+    ...shareoutPlacesOf(operations, deps, channel),
   };
 
   // THE ASK, when the model staged an intake and wrote no line of its own
@@ -2444,8 +2457,11 @@ async function cardOf(
     // THE PLACE, named the way the issue card names its repo: a share-out
     // posts to #plus-design-feedback or stays in the asking conversation, and
     // the heading says which — read from the executor's own decision, so the
-    // card never names one place while the ✅ posts to another.
-    return { ...card, verb: `${card.verb} in ${deps.cards.shareoutWhere(input, channel)}` };
+    // card never names one place while the ✅ posts to another. A batch that
+    // posts to two places names neither on the verb; its plan's group
+    // headings name each.
+    const where = new Set(card.places?.filter((p): p is string => p !== null) ?? [deps.cards.shareoutWhere(input, channel)]);
+    return where.size === 1 ? { ...card, verb: `${card.verb} in ${[...where][0]}` } : card;
   }
   if (toolName === "github_issue_create") {
     // THE REPO AND WHO CAN READ IT: an intake on a public repo is readable by

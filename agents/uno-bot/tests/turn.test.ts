@@ -2740,6 +2740,49 @@ test("a share-out asked in a test channel says this thread on its card, whatever
   assert.equal(outcome.staged!.card.verb, "share this for feedback in this thread");
 });
 
+/** Two share-outs staged behind one ✅, with these `place` inputs. */
+function twoShareoutsTurn(places: [unknown, unknown], testChannelIds: string[] = []) {
+  const call = (n: number, place: unknown) => ({
+    name: "shareout_post",
+    args: { summary: `Prototype ${n}, ready for a first round.`, ...(place === undefined ? {} : { place }) },
+  });
+  return harness({
+    testChannelIds,
+    replies: [{ text: "I'll share both prototypes for feedback.", toolCalls: [call(1, places[0]), call(2, places[1])] }],
+  });
+}
+
+test("a share-out batch asked in a test channel is grouped under this thread, never the team channel", async () => {
+  const h = twoShareoutsTurn([undefined, "feedback_channel"], [CHANNEL]);
+  const outcome = await runTurn(request({ text: "share both prototypes for feedback" }), h.deps);
+  const card = outcome.staged!.card;
+  assert.equal(card.verb, "share this for feedback in this thread");
+  const { text } = renderProposalCard(card);
+  assert.match(text, /^\*this thread\*$/m);
+  assert.doesNotMatch(text, /#plus-design-feedback/);
+});
+
+test("a share-out batch split between two places names both groups, and no one place on its verb", async () => {
+  const h = twoShareoutsTurn([undefined, "here"]);
+  const outcome = await runTurn(request({ text: "share one in the team channel and keep the other here" }), h.deps);
+  const card = outcome.staged!.card;
+  assert.equal(card.verb, "share this for feedback");
+  const { text } = renderProposalCard(card);
+  assert.match(text, /^\*#plus-design-feedback\*$/m);
+  assert.match(text, /^\*this thread\*$/m);
+});
+
+test("a share-out batch's result groups each post under the place it was posted to", () => {
+  const shared = (where: string) => JSON.stringify({ ok: true, status: "shared", posted_to: where, message: `Shared for feedback in ${where}.` });
+  const message =
+    batchResultMessage([
+      { toolName: "shareout_post", input: { summary: "One" }, ok: true, result: shared("this thread"), message: "Shared for feedback in this thread." },
+      { toolName: "shareout_post", input: { summary: "Two", place: "here" }, ok: true, result: shared("this thread"), message: "Shared for feedback in this thread." },
+    ]) ?? "";
+  assert.match(message, /^\*this thread\*$/m);
+  assert.doesNotMatch(message, /#plus-design-feedback|this conversation/);
+});
+
 // A cancelled card is not re-proposed on the model's own say-so, but a card
 // that names a DIFFERENT target is a new card: live on r621 a share-out card
 // named #plus-design-feedback, and the way out — cancel it, then "post it
