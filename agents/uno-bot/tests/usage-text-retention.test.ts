@@ -1,8 +1,8 @@
 // No channel ask's text outlives 14 days — across a weekend, and across one
 // missed run.
 //
-// The runs are 09:00 ET Monday to Friday and 06:00 ET Tuesday to Saturday,
-// so the purge cannot run every day. These cases walk the real schedule hour by hour — which firings
+// The runs are 06:00 and 09:00 ET Monday to Friday, so the purge cannot run
+// every day. These cases walk the real schedule hour by hour — which firings
 // start a run, and which runs hold the purge job, read from `runs.ts` itself —
 // and the real purge job, over a store holding one ask, and check that the
 // text is gone before it is 14 days old. The purge is the last job of its run
@@ -65,8 +65,8 @@ async function ageWhenCleared(askedAt: number, skip?: number, late = PURGE_LATE_
   throw new Error("never cleared");
 }
 
-// Saturday 3 October 2026, 10:30 UTC — just after the run that swept Friday.
-const SATURDAY_EARLY = Date.UTC(2026, 9, 3, 10, 30);
+// Friday 9 October 2026, 13:30 UTC — just after the week's last run, Friday's morning.
+const FRIDAY_MORNING = Date.UTC(2026, 9, 9, 13, 30);
 
 test("both runs purge: Tuesday's 06:00 and 09:00 ET", () => {
   const tuesday = Date.UTC(2026, 9, 6);
@@ -74,24 +74,24 @@ test("both runs purge: Tuesday's 06:00 and 09:00 ET", () => {
     purgeFirings(tuesday, 1).map((t) => new Date(t).getUTCHours()),
     [10, 13],
   );
-  // The longest gap between two purges is the weekend: Sat 06:00 to Mon 09:00 ET, 51 h.
+  // The longest gap between two purges is the weekend: Fri 09:00 to Mon 06:00 ET, 69 h.
   const week = purgeFirings(Date.UTC(2026, 9, 5), 8);
   const gaps = week.slice(1).map((t, i) => (t - week[i]!) / HOUR);
-  assert.deepEqual(gaps, [21, 3, 21, 3, 21, 3, 21, 3, 21, 51]);
+  assert.deepEqual(gaps, [3, 21, 3, 21, 3, 21, 3, 21, 3, 69, 3]);
 });
 
-test("an ask just after Saturday's 06:00 run is gone before it is 14 days old", async () => {
-  const age = await ageWhenCleared(SATURDAY_EARLY, undefined, 0);
+test("an ask just after Friday's 09:00 run is gone before it is 14 days old", async () => {
+  const age = await ageWhenCleared(FRIDAY_MORNING, undefined, 0);
   assert.ok(age >= PURGE_AFTER_MS, "not before the cutoff");
   assert.ok(age <= TEXT_RETENTION_MS, `cleared at ${age / DAY} days`);
 });
 
 test("one skipped run does not let text outlive 14 days", async () => {
-  // The worst case: the text passes the cutoff just after Saturday's 06:00
-  // run, and the Monday morning run is missed — 72 h to Tuesday 06:00.
-  const askedAt = Date.UTC(2026, 9, 3, 10, 1) - PURGE_AFTER_MS;
-  const mondayMorning = Date.UTC(2026, 9, 5, 13);
-  const age = await ageWhenCleared(askedAt, mondayMorning);
+  // The worst case: the text passes the cutoff just after Friday's 09:00
+  // run, and Monday's 06:00 run is missed — 72 h to Monday 09:00.
+  const askedAt = Date.UTC(2026, 9, 9, 13, 1) - PURGE_AFTER_MS;
+  const mondayEarly = Date.UTC(2026, 9, 12, 10);
+  const age = await ageWhenCleared(askedAt, mondayEarly);
   assert.ok(age <= TEXT_RETENTION_MS, `cleared at ${age / DAY} days`);
 });
 
@@ -107,12 +107,11 @@ test("any ask hour in a week, with any one run missed, is cleared within 14 days
 });
 
 test("the weekend the clocks go back, with one run missed and the purge late, still clears within 14 days", async () => {
-  // Friday 30 Oct is swept at Sat 31 Oct 10:00 UTC (EDT) and Mon 2 Nov's
-  // runs are 14:00 UTC and Tue 3 Nov 11:00 UTC (EST): the weekend gap is an
-  // hour longer than usual.
-  const fridaySwept = Date.UTC(2026, 9, 31, 10);
-  const askedAt = fridaySwept + 60 * 1000 - PURGE_AFTER_MS;
-  const age = await ageWhenCleared(askedAt, Date.UTC(2026, 10, 2, 14));
+  // Friday 30 Oct's last run is 13:00 UTC (EDT) and Mon 2 Nov's runs are
+  // 11:00 and 14:00 UTC (EST): the weekend gap is an hour longer than usual.
+  const fridayMorning = Date.UTC(2026, 9, 30, 13);
+  const askedAt = fridayMorning + 60 * 1000 - PURGE_AFTER_MS;
+  const age = await ageWhenCleared(askedAt, Date.UTC(2026, 10, 2, 11));
   assert.ok(age <= TEXT_RETENTION_MS, `cleared at ${age / DAY} days`);
   const weekStart = Date.UTC(2026, 9, 26);
   for (let at = weekStart; at < weekStart + 14 * DAY; at += HOUR + 7 * 60 * 1000) {
