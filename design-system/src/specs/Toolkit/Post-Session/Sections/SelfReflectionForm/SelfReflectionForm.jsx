@@ -121,17 +121,13 @@ const SelfReflectionForm = ({
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                    <p className="body1-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
-                        How did this session go for you?
-                        <span style={{ color: 'var(--color-danger)' }}> *</span>
-                    </p>
-                    <LinearScale
-                        name="self-reflection-rating"
-                        value={rating}
-                        onChange={setRating}
-                    />
-                </div>
+                <LinearScale
+                    name="self-reflection-rating"
+                    legend={<span className="body1-txt font-weight-semibold">How did this session go for you?</span>}
+                    required
+                    value={rating}
+                    onChange={setRating}
+                />
 
                 <MultiSelectQuestion
                     question="Which area of teaching felt most effective?"

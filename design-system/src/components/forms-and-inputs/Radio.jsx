@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import useFieldId from './useFieldId';
+import { choiceInputProps, choiceClasses, ChoiceDescription } from './choiceItem';
 import './Radio.scss';
 
 /**
@@ -17,9 +18,20 @@ const Radio = ({
     defaultChecked,
     size = 'medium',
     disabled = false,
+    /**
+     * Shown, focusable, not changeable. ARIA allows `aria-readonly` on a
+     * radiogroup and not on a radio, so a lone Radio carries the behaviour and
+     * the group (ChoiceGroup) carries the announcement.
+     */
+    readOnly = false,
+    /** Secondary text under the label. It describes the option; it does not name it. */
+    description,
+    /** `card` draws the option as a bordered tile. */
+    appearance = 'plain',
     onChange,
     onFocus,
     onBlur,
+    onClick,
     className = '',
     style,
     ...props
@@ -40,18 +52,24 @@ const Radio = ({
      * `useFieldId` — `useId` runs per instance and each option in the group
      * gets its own value. Components that render the whole group derive one
      * base and suffix it per option instead; see `optionIdBase` in
-     * `RadioButtonGroup` and `MultipleChoice`.
+     * `ChoiceGroup`.
      *
      * A caller who passes `id` gets exactly that id back.
      */
     const fieldId = useFieldId(id);
     const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
 
+    const { 'aria-describedby': describedBy, ...inputRest } = props;
+    const { descriptionId, inputProps } = choiceInputProps({
+        fieldId, description, readOnly, onChange, onClick, describedBy,
+    });
+
     const wrapperClasses = [
         'plus-form-radio-wrapper',
         `plus-form-radio-${size}`,
         sizeClass,
         disabled ? 'plus-form-radio-disabled' : '',
+        choiceClasses({ appearance, readOnly, description }),
         className
     ].filter(Boolean).join(' ');
 
@@ -65,13 +83,14 @@ const Radio = ({
                 checked={isControlled ? checked : undefined}
                 defaultChecked={!isControlled ? defaultChecked : undefined}
                 disabled={disabled}
-                onChange={onChange}
                 onFocus={onFocus}
                 onBlur={onBlur}
                 label={label}
                 className="plus-form-radio"
-                {...props}
+                {...inputRest}
+                {...inputProps}
             />
+            <ChoiceDescription id={descriptionId}>{description}</ChoiceDescription>
         </div>
     );
 };
@@ -85,9 +104,13 @@ Radio.propTypes = {
     defaultChecked: PropTypes.bool,
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
+    readOnly: PropTypes.bool,
+    description: PropTypes.node,
+    appearance: PropTypes.oneOf(['plain', 'card']),
     onChange: PropTypes.func,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
+    onClick: PropTypes.func,
     className: PropTypes.string,
     style: PropTypes.object
 };

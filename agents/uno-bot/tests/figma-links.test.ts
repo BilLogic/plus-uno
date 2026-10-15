@@ -323,7 +323,7 @@ describe("only registry components", () => {
     const root = join(process.cwd(), "..", "..");
     const registry = JSON.parse(readFileSync(join(root, "design-system", "figma", "component-registry.json"), "utf8")) as DevLinkRegistry;
     const names = Object.keys(registry.components);
-    assert.equal(names.length, 69);
+    assert.equal(names.length, 68);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);

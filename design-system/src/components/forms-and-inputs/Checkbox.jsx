@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import useFieldId from './useFieldId';
+import { choiceInputProps, choiceClasses, ChoiceDescription } from './choiceItem';
 import './Checkbox.scss';
 
 /**
@@ -18,10 +19,20 @@ const Checkbox = ({
     indeterminate = false,
     size = 'medium',
     disabled = false,
+    /**
+     * Shown and announced, not changeable. Unlike `disabled` the box stays in
+     * the tab order and keeps full contrast, so the answer can still be read.
+     */
+    readOnly = false,
     required = false,
+    /** Secondary text under the label. It describes the box; it does not name it. */
+    description,
+    /** `card` draws the choice as a bordered tile. */
+    appearance = 'plain',
     onChange,
     onFocus,
     onBlur,
+    onClick,
     className = '',
     style,
     ...props
@@ -57,6 +68,11 @@ const Checkbox = ({
 
     const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
 
+    const { 'aria-describedby': describedBy, ...inputRest } = props;
+    const { descriptionId, inputProps } = choiceInputProps({
+        fieldId, description, readOnly, onChange, onClick, describedBy,
+    });
+
     const wrapperClasses = [
         'plus-form-checkbox-wrapper',
         `plus-form-checkbox-${size}`,
@@ -64,6 +80,7 @@ const Checkbox = ({
         indeterminate ? 'plus-form-checkbox-indeterminate' : '',
         disabled ? 'plus-form-checkbox-disabled' : '',
         required ? 'plus-form-checkbox-required' : '',
+        choiceClasses({ appearance, readOnly, description }),
         className
     ].filter(Boolean).join(' ');
 
@@ -86,14 +103,16 @@ const Checkbox = ({
                     defaultChecked={!isControlled ? defaultChecked : undefined}
                     disabled={disabled}
                     required={required}
-                    onChange={onChange}
                     onFocus={onFocus}
                     onBlur={onBlur}
                     label={labelContent}
                     className="plus-form-checkbox"
-                    {...props}
+                    {...inputRest}
+                    {...inputProps}
+                    aria-readonly={readOnly || undefined}
                 />
             </div>
+            <ChoiceDescription id={descriptionId}>{description}</ChoiceDescription>
         </div>
     );
 };
@@ -108,10 +127,14 @@ Checkbox.propTypes = {
     indeterminate: PropTypes.bool,
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
+    readOnly: PropTypes.bool,
     required: PropTypes.bool,
+    description: PropTypes.node,
+    appearance: PropTypes.oneOf(['plain', 'card']),
     onChange: PropTypes.func,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
+    onClick: PropTypes.func,
     className: PropTypes.string,
     style: PropTypes.object
 };

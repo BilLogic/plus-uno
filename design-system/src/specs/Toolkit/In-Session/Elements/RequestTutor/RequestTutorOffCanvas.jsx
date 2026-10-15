@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/actions/Button/Button';
-import Checkbox from '@/components/forms-and-inputs/Checkbox';
+import ChoiceGroup from '@/components/forms-and-inputs/ChoiceGroup';
 import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
 
 /**
@@ -26,7 +26,6 @@ const REASONS = [
     { id: 'fewer-tutors', label: 'Fewer tutors than expected' },
     { id: 'more-students', label: 'More students than expected' },
     { id: 'need-support', label: 'Students need additional support' },
-    { id: 'other', label: 'Other' },
 ];
 
 /** −  [n]  +  stepper (Figma `Request / Number of Tutors`, 1–5). */
@@ -139,14 +138,14 @@ export const RequestTutorOffCanvas = ({
     const [step, setStep] = useState(isLead ? 'form' : 'preview');
     const [tutorCount, setTutorCount] = useState(1);
     const [closesAt, setClosesAt] = useState('12:45');
-    const [reasons, setReasons] = useState({});
+    const [reasons, setReasons] = useState([]);
     const [otherReason, setOtherReason] = useState('');
 
     if (!open) return null;
 
     const selectedReasonLabel = (() => {
-        const picked = REASONS.filter((r) => reasons[r.id] && r.id !== 'other').map((r) => r.label);
-        if (reasons.other && otherReason) picked.push(otherReason);
+        const picked = REASONS.filter((r) => reasons.includes(r.id)).map((r) => r.label);
+        if (reasons.includes('other') && otherReason) picked.push(otherReason);
         return picked.join(', ') || 'Tutor did not show up';
     })();
 
@@ -198,35 +197,21 @@ export const RequestTutorOffCanvas = ({
                         />
                     </div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
-                    <FieldLabel>Reason for request</FieldLabel>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                        {REASONS.map((r) => (
-                            <Checkbox
-                                key={r.id}
-                                label={r.label}
-                                checked={!!reasons[r.id]}
-                                onChange={(e) => setReasons((prev) => ({ ...prev, [r.id]: e?.target ? e.target.checked : !prev[r.id] }))}
-                            />
-                        ))}
-                        {reasons.other && (
-                            <input
-                                type="text"
-                                value={otherReason}
-                                onChange={(e) => setOtherReason(e.target.value)}
-                                placeholder="Tell us more…"
-                                className="body2-txt"
-                                style={{
-                                    padding: 'var(--size-element-pad-y-sm) var(--size-element-pad-x-md)',
-                                    borderRadius: 'var(--size-element-radius-md)',
-                                    border: `var(--size-element-stroke-sm) solid var(--color-outline-variant)`,
-                                    background: 'var(--color-surface-container-lowest)',
-                                    color: 'var(--color-on-surface)',
-                                }}
-                            />
-                        )}
-                    </div>
-                </div>
+                <ChoiceGroup
+                    id="request-reason"
+                    name="request-reason"
+                    type="checkbox"
+                    legend={<span className="font-weight-semibold">Reason for request</span>}
+                    options={REASONS.map((r) => ({ value: r.id, label: r.label }))}
+                    value={reasons}
+                    onChange={setReasons}
+                    other={{
+                        label: 'Other',
+                        placeholder: 'Tell us more…',
+                        text: otherReason,
+                        onTextChange: setOtherReason,
+                    }}
+                />
             </>
         );
         footer = <Footer primary={<Button text="Next" style="primary" fill="filled" size="medium" trailingVisual="arrow-right" onClick={() => setStep('preview')} />} />;

@@ -9,7 +9,7 @@ Form Switch — Foundations Form Switch Button (Figma `82:16570`). Controlled vi
 
 **Source:** `design-system/src/components/forms-and-inputs/Switch.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Switch.stories.jsx` — Overview, Content, Sizes, InteractionStates, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Switch.stories.jsx` — Overview, Content, Sizes, InteractionStates, Interactive, ReadOnly
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Switch.mdx`
 
@@ -25,6 +25,7 @@ Form Switch — Foundations Form Switch Button (Figma `82:16570`). Controlled vi
 | `defaultChecked` | bool | — | — |
 | `size` | enum | `'medium'` | Size variant |
 | `disabled` | bool | `false` | Disable the switch |
+| `readOnly` | bool | `false` | — |
 | `onChange` | func | — | — |
 | `onFocus` | func | — | — |
 | `onBlur` | func | — | — |
@@ -46,6 +47,6 @@ From `design-system/src/components/forms-and-inputs/Switch.scss`. Override these
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `MultipleChoice` · `NumberInput` · `OptionList` · `Radio` · `RadioButtonGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `OptionList` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
