@@ -9,33 +9,33 @@ export const figmaMeta = {
   "sets": [
     {
       "id": "tree-select",
-      "name": "_tree_select",
-      "componentSetNodeId": "13526:17500",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13526-17500",
+      "name": "Tree Select",
+      "componentSetNodeId": "18550:42560",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18550-42560",
       "source": "manual",
       "status": "unpublished",
-      "isComponentSet": false,
-      "notes": "The assembled tree select panel — a single COMPONENT, `_`-prefixed per the library's private convention. Owner named it canonical on 2026-09-15, with the two building-block sets below CONTAINED as instances; it still mixes tree_dropdown ver 1 and ver 3 parts internally. ⚠ The Figma design is NOT finalized — confirm with the owner before treating this mapping or the panel's visuals as final. PROVENANCE: resolved by the MCP get_metadata tool on 2026-09-15, which is where its COMPONENT type comes from. It is NOT in scripts/figma-component-snapshot.json — private components are never published, so `unpublished` is its settled state rather than a step on the way to `verified`, and the link opens for someone with access to the file rather than from the library. tree_select_ver2 (13529:2016), mapped here until 2026-09-15, IS published, and was dropped all the same: the owner does not count it part of the canonical trio."
+      "isComponentSet": true,
+      "notes": "A `_Field` trigger over `_Listbox`, whose Body holds a flat run of `Dropdown list Item` rows: state default · filled · open · disabled × multiple? false · true. In code the field is `_internal/Field.jsx` and each row is `_internal/OptionRow.jsx` in the `treeitem` role. Built in the library and signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
     },
     {
-      "id": "tree-dropdown-layers",
-      "name": "tree_dropdown layers",
-      "componentSetNodeId": "13529:1075",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13529-1075",
+      "id": "tree-indent",
+      "name": "_Tree Indent",
+      "componentSetNodeId": "13520:72548",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13520-72548",
       "source": "manual",
-      "status": "verified",
+      "status": "unpublished",
       "isComponentSet": true,
-      "notes": "Building block: the indent layers a tree select row is drawn from — 8 variants over open? and # of indents (0-3). Instantiated inside _tree_select. PROVENANCE: all 8 variants are in the 2026-09-15 components snapshot, so this one is published, not merely resolvable."
+      "notes": "Part: the row's depth, level 1 · 2 · 3, in steps bound to `Tree/indent` (20px, aliasing space-400). In code it is `OptionRow.Indent`, depth × 20px. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state. Every row is `Dropdown list Item` (37:6472), the row OptionRow draws; its Leading slot holds this part."
     },
     {
-      "id": "indented-tree-select-item-list",
-      "name": "Indented Tree Select Item List",
-      "componentSetNodeId": "13520:70443",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13520-70443",
+      "id": "tree-toggle",
+      "name": "_Tree Toggle",
+      "componentSetNodeId": "18607:41718",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18607-41718",
       "source": "manual",
-      "status": "verified",
+      "status": "unpublished",
       "isComponentSet": true,
-      "notes": "Building block: the indented item list — 9 variants over '# of items' (1-9). Instantiated inside _tree_select. PROVENANCE: typed by get_metadata on 2026-09-15, and all 9 variants (13520:70444 through 13520:70488) are in the components snapshot of that date, so it is published. The earlier note calling this set Legacy-and-deliberately-unmapped was wrong; the owner names it part of the canonical trio."
+      "notes": "Part: the caret, state collapsed · expanded · leaf (an empty cell of the same size, `Tree/toggle` 16px), with gap? before a checkbox. In code it is `OptionRow.Toggle`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state. Every row is `Dropdown list Item` (37:6472), the row OptionRow draws; its Leading slot holds this part."
     }
   ]
 };
@@ -55,13 +55,10 @@ export const figmaMeta = {
     figmaFileKey={figmaMeta.fileKey}
 />
 
-**The Figma design is not finalized.** `_tree_select` (`13526:17500`) is the
-panel the owner named canonical on 2026-09-15, and it still mixes
-`tree_dropdown` ver 1 and ver 3 parts internally. It is private in the library
-— `_`-prefixed, and absent from the published-components snapshot — so the link
-above opens for someone with access to the file rather than from the published
-library. The two building-block sets beneath it are published. Confirm with the
-owner before treating the mapping, or the panel's visuals, as final.
+The trigger is the shared field, and the panel is the shared listbox surface
+holding a flat run of option rows in the `treeitem` role. Each row's Leading
+slot holds the indent (depth × 20px), the toggle and, with `multiple`, a
+checkbox that is partly checked on a parent with some of its nodes picked.
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
