@@ -606,7 +606,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Cascader.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Cascader.jsx",
         "storybookId": "components-forms-and-inputs-cascader--docs"
       },
@@ -630,7 +630,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Checkbox.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Checkbox.jsx",
         "storybookId": "components-forms-and-inputs-checkbox--docs"
       },
@@ -654,7 +654,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/ChoiceGrid.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/ChoiceGrid.jsx",
         "storybookId": "components-forms-and-inputs-choice-grid--docs"
       },
@@ -792,7 +792,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/DateAndTimePicker.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/DateAndTimePicker.jsx",
         "storybookId": "components-forms-and-inputs-date-time-picker--docs"
       },
@@ -897,7 +897,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Dropdown/Dropdown.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs/Dropdown",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Dropdown",
         "source": "design-system/src/components/forms-and-inputs/Dropdown/Dropdown.jsx",
         "storybookId": "components-forms-and-inputs-dropdown--docs"
       },
@@ -938,7 +938,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/FileUpload.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/FileUpload.jsx",
         "storybookId": "components-forms-and-inputs-file-upload--docs"
       },
@@ -988,7 +988,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Input.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Input.jsx",
         "storybookId": "components-forms-and-inputs-input--docs"
       },
@@ -1012,7 +1012,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/InputGroup/InputGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs/InputGroup",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/InputGroup",
         "source": "design-system/src/components/forms-and-inputs/InputGroup/InputGroup.jsx",
         "storybookId": "components-forms-and-inputs-input-group--docs"
       },
@@ -1060,7 +1060,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/LabelAndCaption.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/LabelAndCaption.stories.jsx",
         "storybookId": "components-forms-and-inputs-label-caption--docs"
       },
@@ -1264,7 +1264,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/MultipleChoice.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/MultipleChoice.jsx",
         "storybookId": "components-forms-and-inputs-multiple-choice--docs"
       },
@@ -1404,7 +1404,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/NumberInput.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/NumberInput.jsx",
         "storybookId": "components-forms-and-inputs-number-input--docs"
       },
@@ -1593,7 +1593,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Radio.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Radio.jsx",
         "storybookId": "components-forms-and-inputs-radio--docs"
       },
@@ -1617,7 +1617,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/RadioButtonGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/RadioButtonGroup.jsx",
         "storybookId": "components-forms-and-inputs-scale--docs"
       },
@@ -1661,7 +1661,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Range.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Range.jsx",
         "storybookId": "components-forms-and-inputs-range--docs"
       },
@@ -1685,7 +1685,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Rating.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Rating.jsx",
         "storybookId": "components-forms-and-inputs-rating--docs"
       },
@@ -1719,7 +1719,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs/RichTextEditor",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/RichTextEditor",
         "source": "design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.jsx",
         "storybookId": "components-forms-and-inputs-rich-text-editor--docs"
       },
@@ -1794,7 +1794,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Select.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Select.jsx",
         "storybookId": "components-forms-and-inputs-select--docs"
       },
@@ -2116,7 +2116,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Switch.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Switch.jsx",
         "storybookId": "components-forms-and-inputs-switch--docs"
       },
@@ -2395,7 +2395,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/TagInput.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/TagInput.jsx",
         "storybookId": "components-forms-and-inputs-tag-input--docs",
         "props": {
@@ -2422,7 +2422,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Textarea.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Textarea.jsx",
         "storybookId": "components-forms-and-inputs-textarea--docs",
         "props": {
@@ -2490,11 +2490,10 @@
               }
             },
             "status": "verified",
-            "verifiedAt": "2026-06-13",
-            "notes": "Also the node the Resources card's Figma link opens."
+            "verifiedAt": "2026-06-13"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904",
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731",
         "deliberate": {
           "variant": "Code carries long and short as one `variant` prop; the library draws them as two sets, Form Textarea and Form Short Textarea."
         }
@@ -2666,7 +2665,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/TreeSelect.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/TreeSelect.jsx",
         "storybookId": "components-forms-and-inputs-tree-select--docs"
       },

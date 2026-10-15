@@ -53,6 +53,4 @@ From `design-system/src/components/forms-and-inputs/NumberInput.scss`. Override 
 
 Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `MultipleChoice` · `OptionList` · `Radio` · `RadioButtonGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
