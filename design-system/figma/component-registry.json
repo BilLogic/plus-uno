@@ -592,8 +592,9 @@
           {
             "id": "carousel",
             "name": "Carousel",
-            "componentSetNodeId": "34:8261",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=34-8261",
+            "componentSetNodeId": "34:7879",
+            "isComponentSet": false,
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=34-7879",
             "source": "node-chart",
             "status": "verified"
           }
@@ -1404,7 +1405,7 @@
           },
           {
             "id": "pill-dropdown",
-            "name": "Pill Dropdown",
+            "name": "_Pill Dropdown",
             "componentSetNodeId": "4209:29770",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-29770",
             "source": "node-chart",
@@ -1436,7 +1437,7 @@
           },
           {
             "id": "tab-dropdown",
-            "name": "Tab Dropdown",
+            "name": "_Tab Dropdown",
             "componentSetNodeId": "4209:29375",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-29375",
             "source": "node-chart",
@@ -1610,8 +1611,8 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "popovers",
-            "name": "Popovers",
+            "id": "popover",
+            "name": "Popover",
             "componentSetNodeId": "49:19534",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-19534",
             "source": "node-chart",
@@ -1996,7 +1997,7 @@
         "sets": [
           {
             "id": "spinner-animation",
-            "name": "Spinner Animation",
+            "name": "Spinner",
             "componentSetNodeId": "44:4872",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4872",
             "source": "node-chart",
@@ -2004,7 +2005,7 @@
           },
           {
             "id": "loading-animations-1-growing",
-            "name": "Loading Animations 1 - Growing",
+            "name": "Spinner Growing",
             "componentSetNodeId": "9296:3061",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9296-3061",
             "source": "node-chart",
@@ -2012,7 +2013,7 @@
           },
           {
             "id": "loading-animations-2-rotating",
-            "name": "Loading Animations 2 - rotating",
+            "name": "Spinner Rotating",
             "componentSetNodeId": "9297:3104",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3104",
             "source": "node-chart",
@@ -2020,7 +2021,7 @@
           },
           {
             "id": "loading-animations-3-stacking",
-            "name": "Loading Animations 3 - stacking",
+            "name": "Spinner Stacking",
             "componentSetNodeId": "9297:3156",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3156",
             "source": "node-chart",
