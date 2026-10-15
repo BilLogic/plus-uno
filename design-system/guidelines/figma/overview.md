@@ -28,6 +28,7 @@ governs are generated and stay beside the source they describe in
 | `component-alignment.md` | this folder | Workflow for agents and contributors (implement + write-back) |
 | `mcp-guide.md` | this folder | Figma MCP tool reference + implement-design workflows |
 | `token-mapping.md` | this folder | Figma ↔ CSS token mapping (authoritative) |
+| `page-documentation.md` | this folder | The page standard: layout, the Docs frame, naming, and the done test |
 | `parity-2026-07.md` | this folder | Dated Figma ↔ Storybook parity snapshot |
 | `component-registry.json` | `design-system/figma/` | **Generated** — import ↔ Figma component set ↔ props |
 | `token-registry.json` | `design-system/figma/` | **Generated** — Figma variable ↔ CSS custom property, validated against SCSS |

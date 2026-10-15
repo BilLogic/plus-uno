@@ -105,6 +105,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/figma/component-alignment.md`](design-system/guidelines/figma/component-alignment.md) | How to keep Figma component instances and PLUS code imports (@/components/) consistent when implementing designs in Cursor or writing prototypes back to Figma |
 | [`design-system/guidelines/figma/mcp-guide.md`](design-system/guidelines/figma/mcp-guide.md) | The registry load gate is design-system/guidelines/figma/registry-load-gate.md — MANDATORY, registries first, not restated here |
 | [`design-system/guidelines/figma/overview.md`](design-system/guidelines/figma/overview.md) | Machine-readable contracts and human runbooks so Cursor prototypes, Storybook, and the Figma design system stay aligned on tokens and components |
+| [`design-system/guidelines/figma/page-documentation.md`](design-system/guidelines/figma/page-documentation.md) | The page standard for the BS4 Foundation Figma library — layout, the Docs frame and its seven sections, naming, what a page must not hold, tokens, and the done test. |
 | [`design-system/guidelines/figma/parity-2026-07.md`](design-system/guidelines/figma/parity-2026-07.md) | Full-inventory sweep across both Figma files and the Storybook docs after the IA overhaul and BS4 library publish |
 | [`design-system/guidelines/figma/registry-load-gate.md`](design-system/guidelines/figma/registry-load-gate.md) | Agents MUST read both files below before |
 | [`design-system/guidelines/figma/token-mapping.md`](design-system/guidelines/figma/token-mapping.md) | For quick machine lookups, agents may read token-registry.json (read-only); use this doc for the authoritative tables, extended cases, and notes |
@@ -216,6 +217,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-145 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+146 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.
