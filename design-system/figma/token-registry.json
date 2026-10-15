@@ -25,6 +25,11 @@
       "Outline Variant": "var(--color-outline-variant)",
       "Focus / Focus Ring": "var(--color-focus-ring)",
       "Focus / Focus Ring Inverse": "var(--color-focus-ring-inverse)",
+      "Element/opacity-disabled": "var(--color-disabled-opacity)",
+      "Surface roles/surface-default": "var(--color-surface-default)",
+      "Surface roles/surface-sunken": "var(--color-surface-sunken)",
+      "Surface roles/surface-raised": "var(--color-surface-raised)",
+      "Surface roles/surface-overlay": "var(--color-surface-overlay)",
       "Mastering Content": "var(--color-mastering-content)",
       "Relationship": "var(--color-relationship)",
       "Social Emotional": "var(--color-social-emotional)",
@@ -309,7 +314,11 @@
       "State-layers/surface/opacity-0_08": "var(--color-surface-state-08)",
       "State-layers/surface/opacity-0_12": "var(--color-surface-state-12)",
       "State-layers/surface/opacity-0_16": "var(--color-surface-state-16)",
-      "Surface roles/surface-container": "var(--color-surface-container)"
+      "Surface roles/surface-container": "var(--color-surface-container)",
+      "Surface roles/surface-default": "var(--color-surface-default)",
+      "Surface roles/surface-overlay": "var(--color-surface-overlay)",
+      "Surface roles/surface-raised": "var(--color-surface-raised)",
+      "Surface roles/surface-sunken": "var(--color-surface-sunken)"
     },
     "size / layout": {
       "Columns/col-1": "var(--col-1)",
@@ -439,12 +448,12 @@
     }
   },
   "validation": {
-    "scssTokenCount": 506,
+    "scssTokenCount": 510,
     "unknownTokens": [],
     "figmaVariableCoverage": {
       "total": 361,
-      "resolved": 332,
-      "percent": 92,
+      "resolved": 336,
+      "percent": 93,
       "unresolved": [
         {
           "collection": "colors / accent",
@@ -493,38 +502,6 @@
           "tried": [
             "--color-warning-bold-candidate-b",
             "--color-proposal-warning-bold-candidate-b"
-          ]
-        },
-        {
-          "collection": "colors / neutral",
-          "figmaVariable": "Surface roles/surface-default",
-          "tried": [
-            "--color-surface-default",
-            "--color-surface-roles-surface-default"
-          ]
-        },
-        {
-          "collection": "colors / neutral",
-          "figmaVariable": "Surface roles/surface-overlay",
-          "tried": [
-            "--color-surface-overlay",
-            "--color-surface-roles-surface-overlay"
-          ]
-        },
-        {
-          "collection": "colors / neutral",
-          "figmaVariable": "Surface roles/surface-raised",
-          "tried": [
-            "--color-surface-raised",
-            "--color-surface-roles-surface-raised"
-          ]
-        },
-        {
-          "collection": "colors / neutral",
-          "figmaVariable": "Surface roles/surface-sunken",
-          "tried": [
-            "--color-surface-sunken",
-            "--color-surface-roles-surface-sunken"
           ]
         },
         {
