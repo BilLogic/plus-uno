@@ -1,7 +1,7 @@
 ---
 title: "Review pop-up redesign: audit and proposal"
 type: design
-status: proposal
+status: decided (Bill, 2026-10-15); not yet built
 date: 2026-10-15
 repos: plus-uno (agents/uno-bot)
 ---
@@ -17,7 +17,8 @@ one block anatomy for all of them, built only from blocks Slack takes in a
 modal. Each variant that needs work has its before → after as exact Block Kit
 JSON, with a Block Kit Builder link.
 
-No code changes yet. Each "before" payload was rendered by the repo's own
+Bill approved all five of its decisions on 2026-10-15 (§ Decisions), and the
+afters below already include them. No code changes yet. Each "before" payload was rendered by the repo's own
 `draftView` / `renderProposalCard` at `origin/main` (f199e5ad) from sample
 inputs. It is what Slack is handed today, not a reconstruction.
 
@@ -176,7 +177,12 @@ supplies the content of each zone. The zones decide the blocks.
      label;
    - text that goes out verbatim (a comment, a shared note) as a
      `rich_text_quote`;
-   - every value editable today as a prefilled input, exactly as now;
+   - every text a confirmer would fix as a prefilled input with a label and,
+     where the field is not self-explanatory, a hint: every value editable
+     today, plus the share-out's summary, questions and "not looking for";
+     required inputs follow `review-fields.ts`'s `required`, optional ones say
+     what clearing them does;
+   - a round always reads "Round 1", never a bare "1" or "round 1";
    - before/after as `notion_update` already draws it (Current content ·
      Issue · New content input).
    Body headings become bold `rich_text` lines. `header` is kept for zone 1,
@@ -220,16 +226,25 @@ What changes:
   with the reviewer as a `user` pill and the deadline in the same line.
 - The bundle caveat is a `warning` alert, third block, above the fold.
 - The project is a `card`: title Session Sign Up, subtitle "Hi-fi prototype ·
-  round 1", the summary as its body, and an Open prototype button. The link no
-  longer shows as a bare URL.
-- Feedback wanted is an ordered `rich_text` list. Not looking for is its own
-  labelled block.
+  Round 1 · High fidelity", and an Open prototype button. The link no longer
+  shows as a bare URL.
+- **The words are inputs, prefilled** (Decision 1): What this is (required,
+  as `summary` is in the tool's schema), Feedback question 1 (required when
+  the draft has one), Feedback questions 2 and 3 and Not looking for
+  (optional; the hint says clearing one drops it). Each has a label and a
+  hint, as Edit fields and the feedback modal do. Today a reworded question
+  costs a Needs changes round trip and a new card.
+- **Where it posts and who it pings stay locked.** They are the rich-text line
+  at the top, and a `context` under the inputs says Needs changes is how to
+  change them, by the rule in `review-fields.ts` that changing where is a new
+  proposal. The deadline, fidelity and round stay read-only too.
 - `place`, `channel`, `Round: 1` as a label, `Fidelity: high` as a label, and
-  raw reviewer ids are gone. Fidelity and round sit in the card's subtitle.
+  raw reviewer ids are gone.
 - Approve says what it does: "Posts it now and pings 1 reviewer."
-- One 855-character mrkdwn section becomes 6 native blocks; 9 blocks in all.
+- One 855-character mrkdwn section becomes native blocks: 13 in all, 5 of them
+  inputs.
 
-**Before: Share-out, option A (read-only content)** · 5 blocks · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%20proposal%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22submit%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Submit%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0SANDBOX1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760540000.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*The%20draft*%22%7D%7D%2C%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3Awarning%3A%20About%20to%20*share%20this%20for%20feedback%20in%20%23uno-bot-sandbox*%3A%5Cn%E2%80%A2%20*Summary%3A*%20Hi-fi%20prototype%20of%20the%20new%20session%20sign-up%20flow%2C%20with%20the%20waitlist%20state.%5Cn%E2%80%A2%20*Place%3A*%20channel%5Cn%E2%80%A2%20*Deadline%3A*%20EOD%20Friday%5Cn%E2%80%A2%20*Round%3A*%201%5Cn%E2%80%A2%20*Project%3A*%20Session%20Sign%20Up%5Cn%E2%80%A2%20*Artifact%3A*%20hi-fi%20prototype%5Cn%E2%80%A2%20*Channel%3A*%20%23uno-bot-sandbox%5Cn%E2%80%A2%20*Feedback%20wanted%3A*%5Cn%20%20%20%20%E2%97%A6%20Is%20the%20waitlist%20state%20clear%20before%20a%20tutor%20commits%3F%5Cn%20%20%20%20%E2%97%A6%20Does%20the%20confirmation%20step%20need%20the%20calendar%20add%3F%5Cn%20%20%20%20%E2%97%A6%20Anything%20in%20the%20copy%20that%20reads%20as%20a%20promise%20we%20can't%20keep%3F%5Cn%E2%80%A2%20*Fidelity%3A*%20high%5Cn%E2%80%A2%20*Not%20looking%20for%3A*%20Visual%20polish%3B%20colours%20are%20placeholders.%5Cn%E2%80%A2%20*Link%3A*%20https%3A%2F%2Fplus-uno.netlify.app%2Fprototypes%2Fsession-sign-up%5Cn%E2%80%A2%20*Reviewers%3A*%5Cn%20%20%20%20%E2%97%A6%20U0BRYAN001%5Cn%3Awarning%3A%20*Bundle%20incomplete%20%E2%80%94%20missing%3A%20Loom%20walkthrough%20%C2%B7%20Decisions%20DB%20link.*%5CnApproving%20posts%20it%20*without*%20them%20%E2%80%94%20or%20drop%20the%20links%20in%20this%20thread%20first%20and%20I'll%20fold%20them%20in.%22%7D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_choice%22%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Decision%22%7D%2C%22element%22%3A%7B%22type%22%3A%22radio_buttons%22%2C%22action_id%22%3A%22uno_review_choice_input%22%2C%22options%22%3A%5B%7B%22value%22%3A%22confirm%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Approve%22%7D%7D%2C%7B%22value%22%3A%22revise%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%22%7D%7D%2C%7B%22value%22%3A%22cancel%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Reject%22%7D%7D%5D%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_note%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Note%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%3A%20what%20should%20change.%20I%20revise%20the%20draft%20from%20it.%20Reject%3A%20an%20optional%20reason.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22uno_review_note_input%22%2C%22multiline%22%3Atrue%2C%22max_length%22%3A3000%7D%7D%5D%7D)
+**Before: Share-out** · 5 blocks · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%20proposal%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22submit%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Submit%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0SANDBOX1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760540000.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*The%20draft*%22%7D%7D%2C%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3Awarning%3A%20About%20to%20*share%20this%20for%20feedback%20in%20%23uno-bot-sandbox*%3A%5Cn%E2%80%A2%20*Summary%3A*%20Hi-fi%20prototype%20of%20the%20new%20session%20sign-up%20flow%2C%20with%20the%20waitlist%20state.%5Cn%E2%80%A2%20*Place%3A*%20channel%5Cn%E2%80%A2%20*Deadline%3A*%20EOD%20Friday%5Cn%E2%80%A2%20*Round%3A*%201%5Cn%E2%80%A2%20*Project%3A*%20Session%20Sign%20Up%5Cn%E2%80%A2%20*Artifact%3A*%20hi-fi%20prototype%5Cn%E2%80%A2%20*Channel%3A*%20%23uno-bot-sandbox%5Cn%E2%80%A2%20*Feedback%20wanted%3A*%5Cn%20%20%20%20%E2%97%A6%20Is%20the%20waitlist%20state%20clear%20before%20a%20tutor%20commits%3F%5Cn%20%20%20%20%E2%97%A6%20Does%20the%20confirmation%20step%20need%20the%20calendar%20add%3F%5Cn%20%20%20%20%E2%97%A6%20Anything%20in%20the%20copy%20that%20reads%20as%20a%20promise%20we%20can't%20keep%3F%5Cn%E2%80%A2%20*Fidelity%3A*%20high%5Cn%E2%80%A2%20*Not%20looking%20for%3A*%20Visual%20polish%3B%20colours%20are%20placeholders.%5Cn%E2%80%A2%20*Link%3A*%20https%3A%2F%2Fplus-uno.netlify.app%2Fprototypes%2Fsession-sign-up%5Cn%E2%80%A2%20*Reviewers%3A*%5Cn%20%20%20%20%E2%97%A6%20U0BRYAN001%5Cn%3Awarning%3A%20*Bundle%20incomplete%20%E2%80%94%20missing%3A%20Loom%20walkthrough%20%C2%B7%20Decisions%20DB%20link.*%5CnApproving%20posts%20it%20*without*%20them%20%E2%80%94%20or%20drop%20the%20links%20in%20this%20thread%20first%20and%20I'll%20fold%20them%20in.%22%7D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_choice%22%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Decision%22%7D%2C%22element%22%3A%7B%22type%22%3A%22radio_buttons%22%2C%22action_id%22%3A%22uno_review_choice_input%22%2C%22options%22%3A%5B%7B%22value%22%3A%22confirm%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Approve%22%7D%7D%2C%7B%22value%22%3A%22revise%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%22%7D%7D%2C%7B%22value%22%3A%22cancel%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Reject%22%7D%7D%5D%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_note%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Note%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%3A%20what%20should%20change.%20I%20revise%20the%20draft%20from%20it.%20Reject%3A%20an%20optional%20reason.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22uno_review_note_input%22%2C%22multiline%22%3Atrue%2C%22max_length%22%3A3000%7D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -328,7 +343,7 @@ What changes:
 
 </details>
 
-**After: Share-out, option A (read-only content)** · 9 blocks · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%20share-out%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22submit%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Submit%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0SANDBOX1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760540000.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Share%20for%20feedback%22%7D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Posts%20in%20%22%7D%2C%7B%22type%22%3A%22channel%22%2C%22channel_id%22%3A%22C0SANDBOX1%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20and%20pings%20%22%7D%2C%7B%22type%22%3A%22user%22%2C%22user_id%22%3A%22U0BRYAN001%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22.%20Comments%20in%20its%20thread%20by%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22EOD%20Friday%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22.%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22warning%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Bundle%20incomplete%3A%20no%20Loom%20walkthrough%20or%20Decisions%20DB%20link.%20Approving%20posts%20it%20without%20them%2C%20or%20drop%20the%20links%20in%20the%20thread%20first.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Hi-fi%20prototype%20%C2%B7%20round%201%22%7D%2C%22body%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Hi-fi%20prototype%20of%20the%20new%20session%20sign-up%20flow%2C%20with%20the%20waitlist%20state.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Open%20prototype%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fprototypes%2Fsession-sign-up%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Feedback%20wanted%20on%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22ordered%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Is%20the%20waitlist%20state%20clear%20before%20a%20tutor%20commits%3F%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Does%20the%20confirmation%20step%20need%20the%20calendar%20add%3F%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Anything%20in%20the%20copy%20that%20reads%20as%20a%20promise%20we%20can't%20keep%3F%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Not%20looking%20for%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Visual%20polish%3B%20colours%20are%20placeholders.%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_choice%22%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Decision%22%7D%2C%22element%22%3A%7B%22type%22%3A%22radio_buttons%22%2C%22action_id%22%3A%22uno_review_choice_input%22%2C%22options%22%3A%5B%7B%22value%22%3A%22confirm%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Approve%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Posts%20it%20now%20and%20pings%201%20reviewer.%22%7D%7D%2C%7B%22value%22%3A%22revise%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22I%20redraft%20it%20from%20your%20note%20and%20post%20a%20new%20card.%22%7D%7D%2C%7B%22value%22%3A%22cancel%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Reject%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Nothing%20posts.%22%7D%7D%5D%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_note%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Note%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%3A%20what%20should%20change.%20Reject%3A%20an%20optional%20reason.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22uno_review_note_input%22%2C%22multiline%22%3Atrue%2C%22max_length%22%3A3000%7D%7D%5D%7D)
+**After: Share-out** · 13 blocks · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%20share-out%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22submit%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Submit%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0SANDBOX1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760540000.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Share%20for%20feedback%22%7D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Posts%20in%20%22%7D%2C%7B%22type%22%3A%22channel%22%2C%22channel_id%22%3A%22C0SANDBOX1%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20and%20pings%20%22%7D%2C%7B%22type%22%3A%22user%22%2C%22user_id%22%3A%22U0BRYAN001%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22.%20Comments%20in%20its%20thread%20by%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22EOD%20Friday%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22.%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22warning%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Bundle%20incomplete%3A%20no%20Loom%20walkthrough%20or%20Decisions%20DB%20link.%20Approving%20posts%20it%20without%20them%2C%20or%20drop%20the%20links%20in%20the%20thread%20first.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Hi-fi%20prototype%20%C2%B7%20Round%201%20%C2%B7%20High%20fidelity%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Open%20prototype%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fprototypes%2Fsession-sign-up%22%7D%5D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_field%3A0.summary%22%2C%22optional%22%3Afalse%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22What%20this%20is%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22One%20or%20two%20sentences.%20The%20questions%20go%20below.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22value%22%2C%22multiline%22%3Atrue%2C%22max_length%22%3A3000%2C%22initial_value%22%3A%22Hi-fi%20prototype%20of%20the%20new%20session%20sign-up%20flow%2C%20with%20the%20waitlist%20state.%22%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_field%3A0.feedback_wanted.0%22%2C%22optional%22%3Afalse%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Feedback%20question%201%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Specific%20to%20this%20stage%2C%20so%20nobody%20has%20to%20answer%20%5C%22thoughts%3F%5C%22.%20Up%20to%20three.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22value%22%2C%22multiline%22%3Afalse%2C%22max_length%22%3A3000%2C%22initial_value%22%3A%22Is%20the%20waitlist%20state%20clear%20before%20a%20tutor%20commits%3F%22%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_field%3A0.feedback_wanted.1%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Feedback%20question%202%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Clear%20it%20to%20drop%20the%20question.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22value%22%2C%22multiline%22%3Afalse%2C%22max_length%22%3A3000%2C%22initial_value%22%3A%22Does%20the%20confirmation%20step%20need%20the%20calendar%20add%3F%22%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_field%3A0.feedback_wanted.2%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Feedback%20question%203%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Clear%20it%20to%20drop%20the%20question.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22value%22%2C%22multiline%22%3Afalse%2C%22max_length%22%3A3000%2C%22initial_value%22%3A%22Anything%20in%20the%20copy%20that%20reads%20as%20a%20promise%20we%20can't%20keep%3F%22%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_field%3A0.not_looking_for%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Not%20looking%20for%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22What%20reviewers%20should%20leave%20alone%20this%20round.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22value%22%2C%22multiline%22%3Atrue%2C%22max_length%22%3A3000%2C%22initial_value%22%3A%22Visual%20polish%3B%20colours%20are%20placeholders.%22%7D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Where%20it%20posts%20and%20who%20it%20pings%20are%20fixed%20on%20this%20card.%20To%20change%20them%2C%20choose%20Needs%20changes.%22%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_choice%22%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Decision%22%7D%2C%22element%22%3A%7B%22type%22%3A%22radio_buttons%22%2C%22action_id%22%3A%22uno_review_choice_input%22%2C%22options%22%3A%5B%7B%22value%22%3A%22confirm%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Approve%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Posts%20it%20now%20and%20pings%201%20reviewer.%22%7D%7D%2C%7B%22value%22%3A%22revise%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22I%20redraft%20it%20from%20your%20note%20and%20post%20a%20new%20card.%22%7D%7D%2C%7B%22value%22%3A%22cancel%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Reject%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Nothing%20posts.%22%7D%7D%5D%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_note%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Note%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%3A%20what%20should%20change.%20Reject%3A%20an%20optional%20reason.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22uno_review_note_input%22%2C%22multiline%22%3Atrue%2C%22max_length%22%3A3000%7D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -414,269 +429,7 @@ What changes:
       },
       "subtitle": {
         "type": "plain_text",
-        "text": "Hi-fi prototype · round 1"
-      },
-      "body": {
-        "type": "mrkdwn",
-        "text": "Hi-fi prototype of the new session sign-up flow, with the waitlist state."
-      },
-      "actions": [
-        {
-          "type": "button",
-          "action_id": "uno_review_open",
-          "text": {
-            "type": "plain_text",
-            "text": "Open prototype"
-          },
-          "url": "https://plus-uno.netlify.app/prototypes/session-sign-up"
-        }
-      ]
-    },
-    {
-      "type": "rich_text",
-      "elements": [
-        {
-          "type": "rich_text_section",
-          "elements": [
-            {
-              "type": "text",
-              "text": "Feedback wanted on",
-              "style": {
-                "bold": true
-              }
-            }
-          ]
-        },
-        {
-          "type": "rich_text_list",
-          "style": "ordered",
-          "elements": [
-            {
-              "type": "rich_text_section",
-              "elements": [
-                {
-                  "type": "text",
-                  "text": "Is the waitlist state clear before a tutor commits?"
-                }
-              ]
-            },
-            {
-              "type": "rich_text_section",
-              "elements": [
-                {
-                  "type": "text",
-                  "text": "Does the confirmation step need the calendar add?"
-                }
-              ]
-            },
-            {
-              "type": "rich_text_section",
-              "elements": [
-                {
-                  "type": "text",
-                  "text": "Anything in the copy that reads as a promise we can't keep?"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "rich_text",
-      "elements": [
-        {
-          "type": "rich_text_section",
-          "elements": [
-            {
-              "type": "text",
-              "text": "Not looking for",
-              "style": {
-                "bold": true
-              }
-            }
-          ]
-        },
-        {
-          "type": "rich_text_section",
-          "elements": [
-            {
-              "type": "text",
-              "text": "Visual polish; colours are placeholders."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "divider"
-    },
-    {
-      "type": "input",
-      "block_id": "uno_review_choice",
-      "label": {
-        "type": "plain_text",
-        "text": "Decision"
-      },
-      "element": {
-        "type": "radio_buttons",
-        "action_id": "uno_review_choice_input",
-        "options": [
-          {
-            "value": "confirm",
-            "text": {
-              "type": "plain_text",
-              "text": "Approve"
-            },
-            "description": {
-              "type": "plain_text",
-              "text": "Posts it now and pings 1 reviewer."
-            }
-          },
-          {
-            "value": "revise",
-            "text": {
-              "type": "plain_text",
-              "text": "Needs changes"
-            },
-            "description": {
-              "type": "plain_text",
-              "text": "I redraft it from your note and post a new card."
-            }
-          },
-          {
-            "value": "cancel",
-            "text": {
-              "type": "plain_text",
-              "text": "Reject"
-            },
-            "description": {
-              "type": "plain_text",
-              "text": "Nothing posts."
-            }
-          }
-        ]
-      }
-    },
-    {
-      "type": "input",
-      "block_id": "uno_review_note",
-      "optional": true,
-      "label": {
-        "type": "plain_text",
-        "text": "Note"
-      },
-      "hint": {
-        "type": "plain_text",
-        "text": "Needs changes: what should change. Reject: an optional reason."
-      },
-      "element": {
-        "type": "plain_text_input",
-        "action_id": "uno_review_note_input",
-        "multiline": true,
-        "max_length": 3000
-      }
-    }
-  ]
-}
-```
-
-</details>
-
-**Option B: the text a confirmer would fix, editable in place.** The share-out
-has no editable fields today, so a reworded question costs a Needs changes
-round trip. Option B adds `shareout_post` rows to `review-fields.ts`'s
-`FIELDS` (summary, each question, not looking for), drawn as prefilled inputs
-exactly as `dm_relay`'s message is. Approve already runs edits through
-`checkEdits`.
-
-**After: Share-out, option B (editable)** · 12 blocks · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%20share-out%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22submit%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Submit%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0SANDBOX1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760540000.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Share%20for%20feedback%22%7D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Posts%20in%20%22%7D%2C%7B%22type%22%3A%22channel%22%2C%22channel_id%22%3A%22C0SANDBOX1%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20and%20pings%20%22%7D%2C%7B%22type%22%3A%22user%22%2C%22user_id%22%3A%22U0BRYAN001%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22.%20Comments%20in%20its%20thread%20by%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22EOD%20Friday%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22.%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22warning%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Bundle%20incomplete%3A%20no%20Loom%20walkthrough%20or%20Decisions%20DB%20link.%20Approving%20posts%20it%20without%20them%2C%20or%20drop%20the%20links%20in%20the%20thread%20first.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Hi-fi%20prototype%20%C2%B7%20round%201%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Open%20prototype%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fprototypes%2Fsession-sign-up%22%7D%5D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_field%3A0.summary%22%2C%22optional%22%3Afalse%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22What%20this%20is%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22value%22%2C%22multiline%22%3Atrue%2C%22max_length%22%3A3000%2C%22initial_value%22%3A%22Hi-fi%20prototype%20of%20the%20new%20session%20sign-up%20flow%2C%20with%20the%20waitlist%20state.%22%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_field%3A0.feedback_wanted.0%22%2C%22optional%22%3Afalse%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Question%201%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22value%22%2C%22multiline%22%3Afalse%2C%22max_length%22%3A3000%2C%22initial_value%22%3A%22Is%20the%20waitlist%20state%20clear%20before%20a%20tutor%20commits%3F%22%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_field%3A0.feedback_wanted.1%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Question%202%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22value%22%2C%22multiline%22%3Afalse%2C%22max_length%22%3A3000%2C%22initial_value%22%3A%22Does%20the%20confirmation%20step%20need%20the%20calendar%20add%3F%22%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_field%3A0.feedback_wanted.2%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Question%203%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22value%22%2C%22multiline%22%3Afalse%2C%22max_length%22%3A3000%2C%22initial_value%22%3A%22Anything%20in%20the%20copy%20that%20reads%20as%20a%20promise%20we%20can't%20keep%3F%22%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_field%3A0.not_looking_for%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Not%20looking%20for%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22value%22%2C%22multiline%22%3Afalse%2C%22max_length%22%3A3000%2C%22initial_value%22%3A%22Visual%20polish%3B%20colours%20are%20placeholders.%22%7D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_choice%22%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Decision%22%7D%2C%22element%22%3A%7B%22type%22%3A%22radio_buttons%22%2C%22action_id%22%3A%22uno_review_choice_input%22%2C%22options%22%3A%5B%7B%22value%22%3A%22confirm%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Approve%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Posts%20it%20now%20and%20pings%201%20reviewer.%22%7D%7D%2C%7B%22value%22%3A%22revise%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22I%20redraft%20it%20from%20your%20note%20and%20post%20a%20new%20card.%22%7D%7D%2C%7B%22value%22%3A%22cancel%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Reject%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Nothing%20posts.%22%7D%7D%5D%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_note%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Note%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%3A%20what%20should%20change.%20Reject%3A%20an%20optional%20reason.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22uno_review_note_input%22%2C%22multiline%22%3Atrue%2C%22max_length%22%3A3000%7D%7D%5D%7D)
-
-<details><summary>Block Kit JSON</summary>
-
-```json
-{
-  "type": "modal",
-  "callback_id": "uno_review_draft",
-  "title": {
-    "type": "plain_text",
-    "text": "Review share-out"
-  },
-  "close": {
-    "type": "plain_text",
-    "text": "Close"
-  },
-  "submit": {
-    "type": "plain_text",
-    "text": "Submit"
-  },
-  "private_metadata": "{\"channel\":\"C0SANDBOX1\",\"ts\":\"1760540000.000100\"}",
-  "blocks": [
-    {
-      "type": "header",
-      "text": {
-        "type": "plain_text",
-        "text": "Share for feedback"
-      }
-    },
-    {
-      "type": "rich_text",
-      "elements": [
-        {
-          "type": "rich_text_section",
-          "elements": [
-            {
-              "type": "text",
-              "text": "Posts in "
-            },
-            {
-              "type": "channel",
-              "channel_id": "C0SANDBOX1"
-            },
-            {
-              "type": "text",
-              "text": " and pings "
-            },
-            {
-              "type": "user",
-              "user_id": "U0BRYAN001"
-            },
-            {
-              "type": "text",
-              "text": ". Comments in its thread by "
-            },
-            {
-              "type": "text",
-              "text": "EOD Friday",
-              "style": {
-                "bold": true
-              }
-            },
-            {
-              "type": "text",
-              "text": "."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "alert",
-      "level": "warning",
-      "text": {
-        "type": "plain_text",
-        "text": "Bundle incomplete: no Loom walkthrough or Decisions DB link. Approving posts it without them, or drop the links in the thread first."
-      }
-    },
-    {
-      "type": "card",
-      "title": {
-        "type": "plain_text",
-        "text": "Session Sign Up"
-      },
-      "subtitle": {
-        "type": "plain_text",
-        "text": "Hi-fi prototype · round 1"
+        "text": "Hi-fi prototype · Round 1 · High fidelity"
       },
       "actions": [
         {
@@ -698,6 +451,10 @@ exactly as `dm_relay`'s message is. Approve already runs edits through
         "type": "plain_text",
         "text": "What this is"
       },
+      "hint": {
+        "type": "plain_text",
+        "text": "One or two sentences. The questions go below."
+      },
       "element": {
         "type": "plain_text_input",
         "action_id": "value",
@@ -712,7 +469,11 @@ exactly as `dm_relay`'s message is. Approve already runs edits through
       "optional": false,
       "label": {
         "type": "plain_text",
-        "text": "Question 1"
+        "text": "Feedback question 1"
+      },
+      "hint": {
+        "type": "plain_text",
+        "text": "Specific to this stage, so nobody has to answer \"thoughts?\". Up to three."
       },
       "element": {
         "type": "plain_text_input",
@@ -728,7 +489,11 @@ exactly as `dm_relay`'s message is. Approve already runs edits through
       "optional": true,
       "label": {
         "type": "plain_text",
-        "text": "Question 2"
+        "text": "Feedback question 2"
+      },
+      "hint": {
+        "type": "plain_text",
+        "text": "Clear it to drop the question."
       },
       "element": {
         "type": "plain_text_input",
@@ -744,7 +509,11 @@ exactly as `dm_relay`'s message is. Approve already runs edits through
       "optional": true,
       "label": {
         "type": "plain_text",
-        "text": "Question 3"
+        "text": "Feedback question 3"
+      },
+      "hint": {
+        "type": "plain_text",
+        "text": "Clear it to drop the question."
       },
       "element": {
         "type": "plain_text_input",
@@ -762,13 +531,26 @@ exactly as `dm_relay`'s message is. Approve already runs edits through
         "type": "plain_text",
         "text": "Not looking for"
       },
+      "hint": {
+        "type": "plain_text",
+        "text": "What reviewers should leave alone this round."
+      },
       "element": {
         "type": "plain_text_input",
         "action_id": "value",
-        "multiline": false,
+        "multiline": true,
         "max_length": 3000,
         "initial_value": "Visual polish; colours are placeholders."
       }
+    },
+    {
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": "Where it posts and who it pings are fixed on this card. To change them, choose Needs changes."
+        }
+      ]
     },
     {
       "type": "divider"
@@ -847,12 +629,15 @@ exactly as `dm_relay`'s message is. Approve already runs edits through
 
 ### 2. Share-out, read-only and decided (rows 18 and 22)
 
-Read-only puts who can decide in an `info` alert at the top instead of a
-`context` line at the bottom. A decided card opened from View shows a
-`success` alert with who approved and where it posted, over the same zones 1–4.
-The decided view needs the operations after the card is decided. Today
-`decidedView` gets only the card's text, because the record is gone; see
-Decision 5.
+Someone who can't decide sees the same content without inputs: the summary as
+the card's body, the questions as an ordered `rich_text` list and "not looking
+for" as its own labelled block. Who can decide is an `info` alert at the top
+instead of a `context` line at the bottom.
+
+A decided card opened from View shows a `success` alert with who approved and
+where it posted, over the same content (Decision 5). This needs the decided
+batch kept on the thread's record; today `decidedView` gets only the card's
+text, because the record is gone.
 
 **Before: Read-only (not a confirmer)** · 3 blocks · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%20proposal%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0SANDBOX1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760540000.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*The%20draft*%22%7D%7D%2C%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3Awarning%3A%20About%20to%20*share%20this%20for%20feedback%20in%20%23uno-bot-sandbox*%3A%5Cn%E2%80%A2%20*Summary%3A*%20Hi-fi%20prototype%20of%20the%20new%20session%20sign-up%20flow%2C%20with%20the%20waitlist%20state.%5Cn%E2%80%A2%20*Place%3A*%20channel%5Cn%E2%80%A2%20*Deadline%3A*%20EOD%20Friday%5Cn%E2%80%A2%20*Round%3A*%201%5Cn%E2%80%A2%20*Project%3A*%20Session%20Sign%20Up%5Cn%E2%80%A2%20*Artifact%3A*%20hi-fi%20prototype%5Cn%E2%80%A2%20*Channel%3A*%20%23uno-bot-sandbox%5Cn%E2%80%A2%20*Feedback%20wanted%3A*%5Cn%20%20%20%20%E2%97%A6%20Is%20the%20waitlist%20state%20clear%20before%20a%20tutor%20commits%3F%5Cn%20%20%20%20%E2%97%A6%20Does%20the%20confirmation%20step%20need%20the%20calendar%20add%3F%5Cn%20%20%20%20%E2%97%A6%20Anything%20in%20the%20copy%20that%20reads%20as%20a%20promise%20we%20can't%20keep%3F%5Cn%E2%80%A2%20*Fidelity%3A*%20high%5Cn%E2%80%A2%20*Not%20looking%20for%3A*%20Visual%20polish%3B%20colours%20are%20placeholders.%5Cn%E2%80%A2%20*Link%3A*%20https%3A%2F%2Fplus-uno.netlify.app%2Fprototypes%2Fsession-sign-up%5Cn%E2%80%A2%20*Reviewers%3A*%5Cn%20%20%20%20%E2%97%A6%20U0BRYAN001%5Cn%3Awarning%3A%20*Bundle%20incomplete%20%E2%80%94%20missing%3A%20Loom%20walkthrough%20%C2%B7%20Decisions%20DB%20link.*%5CnApproving%20posts%20it%20*without*%20them%20%E2%80%94%20or%20drop%20the%20links%20in%20this%20thread%20first%20and%20I'll%20fold%20them%20in.%22%7D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Read-only.%20Only%20%3C%40U0BILL0001%3E%20can%20decide%20this%20proposal.%22%7D%5D%7D%5D%7D)
 
@@ -901,7 +686,7 @@ Decision 5.
 
 </details>
 
-**After: Read-only (not a confirmer)** · 7 blocks · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%20share-out%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0SANDBOX1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760540000.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22info%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Read-only.%20Only%20%3C%40U0BILL0001%3E%20can%20decide%20this%20proposal.%22%7D%7D%2C%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Share%20for%20feedback%22%7D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Posts%20in%20%22%7D%2C%7B%22type%22%3A%22channel%22%2C%22channel_id%22%3A%22C0SANDBOX1%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20and%20pings%20%22%7D%2C%7B%22type%22%3A%22user%22%2C%22user_id%22%3A%22U0BRYAN001%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22.%20Comments%20in%20its%20thread%20by%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22EOD%20Friday%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22.%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22warning%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Bundle%20incomplete%3A%20no%20Loom%20walkthrough%20or%20Decisions%20DB%20link.%20Approving%20posts%20it%20without%20them%2C%20or%20drop%20the%20links%20in%20the%20thread%20first.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Hi-fi%20prototype%20%C2%B7%20round%201%22%7D%2C%22body%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Hi-fi%20prototype%20of%20the%20new%20session%20sign-up%20flow%2C%20with%20the%20waitlist%20state.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Open%20prototype%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fprototypes%2Fsession-sign-up%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Feedback%20wanted%20on%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22ordered%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Is%20the%20waitlist%20state%20clear%20before%20a%20tutor%20commits%3F%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Does%20the%20confirmation%20step%20need%20the%20calendar%20add%3F%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Anything%20in%20the%20copy%20that%20reads%20as%20a%20promise%20we%20can't%20keep%3F%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Not%20looking%20for%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Visual%20polish%3B%20colours%20are%20placeholders.%22%7D%5D%7D%5D%7D%5D%7D)
+**After: Read-only (not a confirmer)** · 7 blocks · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%20share-out%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0SANDBOX1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760540000.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22info%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Read-only.%20Only%20%3C%40U0BILL0001%3E%20can%20decide%20this%20proposal.%22%7D%7D%2C%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Share%20for%20feedback%22%7D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Posts%20in%20%22%7D%2C%7B%22type%22%3A%22channel%22%2C%22channel_id%22%3A%22C0SANDBOX1%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20and%20pings%20%22%7D%2C%7B%22type%22%3A%22user%22%2C%22user_id%22%3A%22U0BRYAN001%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22.%20Comments%20in%20its%20thread%20by%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22EOD%20Friday%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22.%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22warning%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Bundle%20incomplete%3A%20no%20Loom%20walkthrough%20or%20Decisions%20DB%20link.%20Approving%20posts%20it%20without%20them%2C%20or%20drop%20the%20links%20in%20the%20thread%20first.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Hi-fi%20prototype%20%C2%B7%20Round%201%20%C2%B7%20High%20fidelity%22%7D%2C%22body%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Hi-fi%20prototype%20of%20the%20new%20session%20sign-up%20flow%2C%20with%20the%20waitlist%20state.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Open%20prototype%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fprototypes%2Fsession-sign-up%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Feedback%20wanted%20on%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22ordered%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Is%20the%20waitlist%20state%20clear%20before%20a%20tutor%20commits%3F%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Does%20the%20confirmation%20step%20need%20the%20calendar%20add%3F%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Anything%20in%20the%20copy%20that%20reads%20as%20a%20promise%20we%20can't%20keep%3F%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Not%20looking%20for%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Visual%20polish%3B%20colours%20are%20placeholders.%22%7D%5D%7D%5D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -991,7 +776,7 @@ Decision 5.
       },
       "subtitle": {
         "type": "plain_text",
-        "text": "Hi-fi prototype · round 1"
+        "text": "Hi-fi prototype · Round 1 · High fidelity"
       },
       "body": {
         "type": "mrkdwn",
@@ -1130,7 +915,7 @@ Decision 5.
 
 </details>
 
-**After: Decided, opened from View** · 5 blocks · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%20share-out%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0SANDBOX1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760540000.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22success%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Approved%20by%20%3C%40U0BILL0001%3E.%20Posted%20in%20%3C%23C0SANDBOX1%3E.%22%7D%7D%2C%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Share%20for%20feedback%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Hi-fi%20prototype%20%C2%B7%20round%201%22%7D%2C%22body%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Hi-fi%20prototype%20of%20the%20new%20session%20sign-up%20flow%2C%20with%20the%20waitlist%20state.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Open%20prototype%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fprototypes%2Fsession-sign-up%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Feedback%20wanted%20on%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22ordered%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Is%20the%20waitlist%20state%20clear%20before%20a%20tutor%20commits%3F%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Does%20the%20confirmation%20step%20need%20the%20calendar%20add%3F%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Anything%20in%20the%20copy%20that%20reads%20as%20a%20promise%20we%20can't%20keep%3F%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Not%20looking%20for%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Visual%20polish%3B%20colours%20are%20placeholders.%22%7D%5D%7D%5D%7D%5D%7D)
+**After: Decided, opened from View** · 5 blocks · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%20share-out%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0SANDBOX1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760540000.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22success%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Approved%20by%20%3C%40U0BILL0001%3E.%20Posted%20in%20%3C%23C0SANDBOX1%3E.%22%7D%7D%2C%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Share%20for%20feedback%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Hi-fi%20prototype%20%C2%B7%20Round%201%20%C2%B7%20High%20fidelity%22%7D%2C%22body%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Hi-fi%20prototype%20of%20the%20new%20session%20sign-up%20flow%2C%20with%20the%20waitlist%20state.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Open%20prototype%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fprototypes%2Fsession-sign-up%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Feedback%20wanted%20on%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22ordered%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Is%20the%20waitlist%20state%20clear%20before%20a%20tutor%20commits%3F%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Does%20the%20confirmation%20step%20need%20the%20calendar%20add%3F%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Anything%20in%20the%20copy%20that%20reads%20as%20a%20promise%20we%20can't%20keep%3F%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Not%20looking%20for%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Visual%20polish%3B%20colours%20are%20placeholders.%22%7D%5D%7D%5D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -1171,7 +956,7 @@ Decision 5.
       },
       "subtitle": {
         "type": "plain_text",
-        "text": "Hi-fi prototype · round 1"
+        "text": "Hi-fi prototype · Round 1 · High fidelity"
       },
       "body": {
         "type": "mrkdwn",
@@ -4827,34 +4612,30 @@ alert, `dm_relay` with one recipient, `notion_update`, and both feedback views
 stay as they are, apart from the title and the decision's option descriptions,
 which every draft gets.
 
-## Decisions for Bill
+## Decisions (Bill, 2026-10-15)
 
-1. **Make the share-out's text editable in place (option B)?** Recommend
-   **yes** for the summary, the three questions and "not looking for". The
-   questions are what a confirmer most often rewords. Today that costs a Needs
-   changes round trip and a new card. Fidelity, round, deadline and reviewers
-   stay read-only, since changing who is pinged is a new proposal by the rule
-   in `review-fields.ts`. The same reasoning applies to an issue follow-up's
-   comment; recommend that too.
-2. **Per-tool modal titles?** Recommend **yes** ("Review share-out", "Review
-   new issue"…). The title is the first thing read, and "Review proposal" is
-   the same on every card.
-3. **Use Slack's `card` block for the shared or touched object?** Recommend
-   **yes, with a fallback**: a card when the summary is 200 characters or fewer,
-   otherwise a card with no body and the summary in a `section`. This is the
-   one block uno-bot has never put in a modal, so it ships behind a live check
-   in the sandbox DM (§ Not verified).
-4. **One alert per caveat, at most two, under the destination line?** Recommend
-   **yes**. The other option, alerts first above the header, makes a warning
-   the first thing read but hides what the card does. Bill's order (what and
-   where first, then warnings) keeps both above the fold, since zone 1 is two
-   blocks.
-5. **What View shows on a decided card.** Today the record is gone once a card
-   is decided, so View can only re-render the card text: the bullet dump.
-   Recommend **keeping the decided batch on the thread's record
-   (`ThreadState`) for the card's lifetime**, so View draws the same anatomy read-only under a
-   `success` alert. The cheaper alternative is to render the card's short
-   summary line (`shortCardOf`) and its outcome, with no detail.
+Bill reviewed the draft on 2026-10-15 and said yes to all five. Each is folded
+into the afters above, so the doc proposes one view per variant.
+
+1. **The share-out's words are editable in place.** Yes. In Bill's words,
+   "we'd need the text input box". The summary, the three questions and "not
+   looking for" are prefilled inputs (§ 1). Where it posts, who it pings, the
+   deadline, fidelity and round stay locked, since changing who is pinged is a
+   new proposal by the rule in `review-fields.ts`. The issue follow-up's
+   comment was in the same recommendation but is still a quote in § 3; making
+   it an input is the same change and is left for the ticket to confirm.
+2. **Per-tool modal titles.** Yes: "Review share-out", "Review new issue" and
+   the rest (§ The shared anatomy). "Review proposal" goes.
+3. **Slack's `card` block for the shared or touched object.** Yes, live-checked
+   first. A card carries a body only when the text is 200 characters or fewer;
+   otherwise the card has no body and the text sits under it. Because uno-bot
+   has never put a `card` in a modal, the first ticket opens one in the le goat
+   DM before any reader is built on it (§ Not verified).
+4. **Alerts near the top.** Yes: one `alert` per caveat, at most two, right
+   under the what-and-where line. A refused edit's `error` alert stays first.
+5. **View on a decided card keeps the record.** Yes. The decided batch stays on
+   the thread's record (`ThreadState`) for the card's lifetime, so View draws
+   the same content read-only under a `success` alert (§ 2).
 
 ## Not verified
 
@@ -4863,7 +4644,8 @@ which every draft gets.
   afters were checked in code against the documented limits (title ≤24, ≤100
   blocks, text ≤3,000, alert ≤200, card body ≤200, option description ≤75, a
   modal-only block set). Bill or a live check opens the links before any of it
-  is built.
+  is built. `docs/plans/2026-10-15-review-modal-redesign.html` lists every
+  variant's Before and After links in the order to check them.
 - **`card` in a modal**, and the `icon` on it, are documented but untried
   here. The afters use no icon, because the docs show two different icon
   shapes (`slack_icon`/`icon_name` in the card example, `icon`/`name` on the
@@ -4873,7 +4655,7 @@ which every draft gets.
   fallback is the plain-text alert plus a `rich_text` line with the `user`
   element.
 
-## Implementation notes (for the tickets, not decided here)
+## Implementation notes (for the tickets)
 
 - **One reader per gated tool.** `review-draft.ts`'s `READERS` gains
   `shareout_post`, `notion_archive`, `github_issue_update`,
@@ -4883,6 +4665,17 @@ which every draft gets.
   body parts) instead of `headline` + `properties` + `body`. With a reader for
   every row, the card-text fallback is unreachable for anything the Gate
   stages.
+- **Share-out fields.** `review-fields.ts`'s `FIELDS` gains a
+  `shareout_post` row: `summary` (required), one input per staged
+  `feedback_wanted` item (the first required, the rest optional, so clearing
+  one drops it), and `not_looking_for` (optional). `writePath` already
+  addresses `feedback_wanted.0`; Approve has to drop emptied questions before
+  the write, and `checkEdits` holds each to the placeholder guard as it does
+  every text field.
+- **"Round 1" on the posted card too.** The thread card's summary line
+  (`shortCardOf` in `proposal-render.ts`) joins key fields by bare value, so a
+  share-out's line reads "EOD Friday · 1 · Live App". The round is shown as
+  "Round 1" there as well, by labelling a numeric key field with its label.
 - **Caveats as data, not scraped text.** `caveatsOf` reads `:warning:` lines
   back out of the card text with a regex. The `CardCaveat` values the turn
   decided should ride the staged proposal (`PendingProposal`) instead, so the
