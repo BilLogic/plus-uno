@@ -17,7 +17,8 @@ export type EntityStatus = (typeof ENTITY_STATUSES)[number];
  * The writer holds the write to it: a cell that has moved since the draft (a
  * slot filled, a status changed) is a stale race, and the whole revision is
  * taken back rather than written over somebody else's edit. A deprecation is
- * a row like any other, with `to: "deprecated"` — nothing is ever deleted.
+ * a row like any other, with `to: "deprecated"`; a revision deletes only a
+ * cell it created itself, when it takes that cell back.
  */
 export interface RevisionRow {
   laneId: string;

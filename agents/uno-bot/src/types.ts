@@ -153,7 +153,7 @@ export interface Env {
   SUPABASE_ANON_KEY?: string;
   // uno-blueprint WRITE identity: an Auth user whose app_metadata.role is
   // rpc_writer, so its JWT opens the authoring RPCs and no table, and every
-  // write it makes lands in authoring_changes under its own author_id. Signs in
+  // write it makes lands in authoring_changes as author uno-bot. Signs in
   // with the password grant; never a service-role key. Set up by
   // scripts/blueprint-writer-wizard.sh.
   SUPABASE_WRITE_EMAIL?: string;
