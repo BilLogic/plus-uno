@@ -74,6 +74,10 @@ Use switch when a user needs to toggle between two states: on and off, true and 
     <DsCanvasQuiet of={SwitchStories.InteractionStates} />
 </DocsCanvasShell>
 
+<DocsCanvasShell description={<>Read-only: focusable, full contrast, announced read-only, and the setting does not change.</>}>
+    <DsCanvasQuiet of={SwitchStories.ReadOnly} />
+</DocsCanvasShell>
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -118,6 +122,12 @@ component does not name.
 <div className="sb-ds-doc-section">
 
 ## Usage notes
+
+### Read-only shows a setting the person cannot change.
+
+`readOnly` keeps the switch focusable and at full contrast, sets
+`aria-readonly`, and ignores clicks and Space. Use `disabled` for a setting that
+does not apply right now.
 
 ### A switch acts now; a checkbox saves later.
 
@@ -233,7 +243,7 @@ name is empty, and a screen reader announces only "switch, on".
 
 - For a value saved with the rest of a form, use `Checkbox`.
 - For accepting terms, use `Checkbox` — the decision is submitted, not applied on the spot.
-- For one of two named options, use `RadioButtonGroup`.
+- For one of two named options, use `ChoiceGroup`.
 
 </div>
 

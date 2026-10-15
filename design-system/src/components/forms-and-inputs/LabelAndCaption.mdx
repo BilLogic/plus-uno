@@ -166,8 +166,8 @@ users and your own validation is what enforces it.
   that sits above an input and points at nothing names nothing.
 - **A label for a set of controls is not a `label`.** For radios or a scale, a
   `label` element would point at one control and clicking it would select that
-  one. `Scale` and `Rating` use a `span` with an id and name the group with
-  `aria-labelledby` instead — that is the pattern to copy.
+  one. `ChoiceGroup` uses a `fieldset` named by its `legend`, and `Rating` a
+  `span` with an id and `aria-labelledby` — those are the patterns to copy.
 - **Validation messages are attached to their fields.** `Input`, `NumberInput`,
   `FileUpload` and `DateAndTimePicker` give the message an id and point the
   control at it, and mark an invalid field `aria-invalid` (#327). Your own
@@ -189,7 +189,7 @@ users and your own validation is what enforces it.
 
 - For the fullest treatment of naming a field, including why the label cannot be
   taken away, see `Input`.
-- For a group of controls under one question, see `Scale` or `MultipleChoice`.
+- For a group of controls under one question, see `ChoiceGroup`.
 - For a message about the whole form rather than one field, use `Alert`.
 
 </div>

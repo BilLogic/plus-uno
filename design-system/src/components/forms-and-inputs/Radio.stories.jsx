@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Radio from './Radio';
 
@@ -273,4 +274,38 @@ Interactive.args = {
     thirdLabel: 'Option 3',
     size: 'medium',
     disabled: false,
+};
+
+/**
+ * Read-only: the answer is shown at full contrast and stays in the tab order,
+ * and clicking does not change it. ARIA has no `aria-readonly` for a lone
+ * radio, so a read-only question goes in a ChoiceGroup, which announces it.
+ */
+export const ReadOnly = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+        <Radio id="radio-readonly-1" name="radio-readonly" label="In person" value="in-person" defaultChecked readOnly />
+        <Radio id="radio-readonly-2" name="radio-readonly" label="Online" value="online" readOnly />
+    </div>
+);
+ReadOnly.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const online = canvas.getByRole('radio', { name: 'Online' });
+    await expect(online.disabled).toBe(false);
+    await userEvent.click(online);
+    await expect(online.checked).toBe(false);
+    await expect(canvas.getByRole('radio', { name: 'In person' }).checked).toBe(true);
+};
+
+/** A description under the label, and the card appearance. */
+export const DescriptionAndCard = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)', maxWidth: '360px' }}>
+        <Radio id="radio-desc" name="radio-desc" label="Weekly" value="weekly" description="Every week at the same time." />
+        <Radio id="radio-card" name="radio-card" label="Just once" value="once" description="A single session." appearance="card" defaultChecked />
+    </div>
+);
+DescriptionAndCard.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const weekly = canvas.getByRole('radio', { name: 'Weekly' });
+    const desc = canvasElement.ownerDocument.getElementById(weekly.getAttribute('aria-describedby'));
+    await expect(desc.textContent).toBe('Every week at the same time.');
 };

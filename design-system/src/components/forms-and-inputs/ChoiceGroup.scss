@@ -1,0 +1,86 @@
+/**
+ * ChoiceGroup — Figma `ChoiceGroup` (18265:52386): Legend, a row holding the
+ * leading text, the Options slot and the trailing text, then Other and Error.
+ */
+
+// A `fieldset` brings a border, margin, padding and a min-content width that a
+// div does not; the group should be laid out by its contents only.
+.plus-choice-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm);
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.plus-choice-group-legend {
+    float: none;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    font-size: inherit;
+    line-height: inherit;
+    color: var(--color-on-surface);
+}
+
+.plus-choice-group-required {
+    color: var(--color-danger);
+}
+
+.plus-choice-group-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm);
+}
+
+.plus-choice-group-inline .plus-choice-group-options {
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: var(--size-element-gap-md);
+}
+
+.plus-choice-group-scale {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-md);
+}
+
+.plus-choice-group-scale-end {
+    color: var(--color-on-surface);
+}
+
+.plus-choice-group-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm);
+}
+
+// Inline choices size to their content rather than filling the row.
+.plus-choice-group-inline .plus-choice-group-item > [class*='-wrapper'] {
+    width: auto;
+}
+
+// Under the option's label, past its control and the label gap.
+.plus-choice-group-reveal {
+    padding-left: calc(12px + var(--size-element-gap-sm));
+}
+
+.plus-choice-group-checkbox .plus-choice-group-reveal {
+    padding-left: calc(18px + var(--size-element-gap-sm));
+}
+
+.plus-choice-group-other {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-sm);
+
+    > .plus-choice-group-item {
+        flex: 0 0 auto;
+    }
+}
+
+.plus-choice-group-error {
+    color: var(--color-danger);
+}

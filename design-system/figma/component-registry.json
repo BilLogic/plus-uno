@@ -656,29 +656,88 @@
         "mdxPath": "design-system/src/components/forms-and-inputs/ChoiceGrid.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/ChoiceGrid.jsx",
-        "storybookId": "components-forms-and-inputs-choice-grid--docs"
+        "storybookId": "components-forms-and-inputs-choice-grid--docs",
+        "props": {
+          "type": {
+            "type": "enum",
+            "values": [
+              "radio",
+              "checkbox"
+            ]
+          }
+        }
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "multiple-choice-grid",
-            "name": "Multiple Choice Grid",
+            "id": "choice-grid",
+            "name": "Choice Grid",
             "componentSetNodeId": "13541:9229",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-9229",
             "source": "node-chart",
-            "status": "verified"
-          },
-          {
-            "id": "checkbox-grid",
-            "name": "CheckBox Grid",
-            "componentSetNodeId": "13541:9240",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-9240",
-            "source": "node-chart",
-            "status": "verified"
+            "status": "verified",
+            "verifiedAt": "2026-10-15",
+            "notes": "Rebuilt on Form Checkbox and Form Radio Button with a `type` axis and a `_Choice Grid Row` part. The separate CheckBox Grid set (13541:9240) was deleted."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13317-2958"
+      }
+    },
+    "ChoiceGroup": {
+      "code": {
+        "import": "@/components/forms-and-inputs",
+        "export": "default",
+        "mdxPath": "design-system/src/components/forms-and-inputs/ChoiceGroup.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/ChoiceGroup.jsx",
+        "storybookId": "components-forms-and-inputs-choice-group--docs",
+        "props": {
+          "type": {
+            "type": "enum",
+            "values": [
+              "radio",
+              "checkbox"
+            ]
+          },
+          "orientation": {
+            "type": "enum",
+            "values": [
+              "stacked",
+              "inline"
+            ]
+          },
+          "appearance": {
+            "type": "enum",
+            "values": [
+              "plain",
+              "card"
+            ]
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "choice-group",
+            "name": "ChoiceGroup",
+            "componentSetNodeId": "18265:52386",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-52386",
+            "source": "node-chart",
+            "status": "verified",
+            "verifiedAt": "2026-10-15",
+            "notes": "Four variants, type × orientation. Legend, then a row of Leading text, the Options slot (Form Radio Button or Form Checkbox, at least two) and Trailing text, then Other and Error. Replaces the deleted Multiple Choice (Radio) 13540:9207, Multiple Choice (Checkbox) 13540:9717 and Scale Radio Button 13536:6785. Linear Scale stays in the library, deprecated, until the Specs file swaps its six instances."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-52386",
+        "deliberate": {
+          "appearance": "Figma sets appearance on each Form Checkbox and Form Radio Button in the Options slot, since a group cannot reach into its slot; code sets it once on ChoiceGroup and passes it to every choice.",
+          "description": "Figma sets description on each choice in the Options slot; code takes it per option in `options` and passes it to that choice."
+        }
       }
     },
     "CloseButton": {
@@ -1259,38 +1318,6 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502"
       }
     },
-    "MultipleChoice": {
-      "code": {
-        "import": "@/components/forms-and-inputs",
-        "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/MultipleChoice.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/MultipleChoice.jsx",
-        "storybookId": "components-forms-and-inputs-multiple-choice--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "multiple-choice-radio",
-            "name": "Multiple Choice (Radio)",
-            "componentSetNodeId": "13540:9207",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13540-9207",
-            "source": "node-chart",
-            "status": "verified"
-          },
-          {
-            "id": "multiple-choice-checkbox",
-            "name": "Multiple Choice (Checkbox)",
-            "componentSetNodeId": "13540:9717",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13540-9717",
-            "source": "node-chart",
-            "status": "verified"
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13332-2508"
-      }
-    },
     "Navbar": {
       "code": {
         "import": "@/components",
@@ -1607,50 +1634,6 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5858",
             "source": "node-chart",
             "status": "verified"
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005"
-      }
-    },
-    "RadioButtonGroup": {
-      "code": {
-        "import": "@/components/forms-and-inputs",
-        "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/RadioButtonGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/RadioButtonGroup.jsx",
-        "storybookId": "components-forms-and-inputs-scale--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "scale-radio-button",
-            "name": "Scale Radio Button",
-            "componentSetNodeId": "13536:6785",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-6785",
-            "source": "node-chart",
-            "status": "verified"
-          },
-          {
-            "id": "scale-options",
-            "name": "Scale Options",
-            "componentSetNodeId": "13536:9083",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-9083",
-            "source": "node-chart",
-            "status": "verified",
-            "isComponentSet": false,
-            "notes": "Was 13536:9084, which resolves to nothing in the file. A plain COMPONENT, not a set. Re-read from the Scale page 2026-08-29."
-          },
-          {
-            "id": "linear-scale",
-            "name": "Linear Scale",
-            "componentSetNodeId": "13536:9208",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-9208",
-            "source": "node-chart",
-            "status": "verified",
-            "isComponentSet": false,
-            "notes": "Was 13611:16853, which resolves to nothing in the file — not an off-by-one, a different node entirely. A plain COMPONENT, not a set. Re-read from the Scale page 2026-08-29."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005"

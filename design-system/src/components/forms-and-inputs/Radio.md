@@ -9,7 +9,7 @@ Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
 
 **Source:** `design-system/src/components/forms-and-inputs/Radio.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Radio.stories.jsx` — Overview, Content, Layout, Sizes, InteractionStates, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Radio.stories.jsx` — Overview, Content, Layout, Sizes, InteractionStates, Interactive, ReadOnly, DescriptionAndCard
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Radio.mdx`
 
@@ -25,15 +25,21 @@ Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
 | `defaultChecked` | bool | — | — |
 | `size` | enum | `'medium'` | Size variant |
 | `disabled` | bool | `false` | Disable the radio |
+| `readOnly` | bool | `false` | — |
+| `description` | node | — | — |
+| `appearance` | enum | `'plain'` | — |
 | `onChange` | func | — | — |
 | `onFocus` | func | — | — |
 | `onBlur` | func | — | — |
+| `onClick` | func | — | — |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
 ## Variants
 
 **`size`** — `small` · `medium` · `large`
+
+**`appearance`** — `plain` · `card`
 
 Anything not listed is not a valid value.
 
@@ -45,7 +51,7 @@ From `design-system/src/components/forms-and-inputs/Radio.scss`. Override these 
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `MultipleChoice` · `NumberInput` · `OptionList` · `RadioButtonGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `OptionList` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

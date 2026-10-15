@@ -3,12 +3,11 @@ import { expect, within } from 'storybook/test';
 
 import DateAndTimePicker from './DateAndTimePicker';
 import FileUpload from './FileUpload';
+import ChoiceGroup from './ChoiceGroup';
 import Input from './Input';
-import MultipleChoice from './MultipleChoice';
 import NumberInput from './NumberInput';
 import Radio from './Radio';
 import Rating from './Rating';
-import Scale from './RadioButtonGroup';
 import TagInput from './TagInput';
 import Textarea from './Textarea';
 
@@ -95,7 +94,7 @@ export const NameWithoutId = () => (
         <NumberInput name="quantity" label="Quantity" />
         <FileUpload name="transcript" label="Transcript" />
         <DateAndTimePicker name="starts" label="Session start" />
-        <Scale name="confidence" label="Confidence" options={scaleOptions} />
+        <ChoiceGroup name="confidence" legend="Confidence" orientation="inline" options={scaleOptions} />
         <Rating name="overall" label="Overall rating" value={3} />
         <TagInput name="topics" label="Topics" tags={['Algebra', 'Geometry']} />
     </div>
@@ -133,7 +132,7 @@ export const RadioGroupWithoutIds = () => (
         <Radio name="cadence" label="Every session" value="every" defaultChecked />
         <Radio name="cadence" label="Every other session" value="alternate" />
         <Radio name="cadence" label="Once a month" value="monthly" />
-        <MultipleChoice name="reminder" options={reminderOptions} />
+        <ChoiceGroup name="reminder" legend="Reminder" options={reminderOptions} />
     </div>
 );
 
@@ -304,11 +303,11 @@ export const ExplicitIds = () => (
         <NumberInput id="la-quantity" name="quantity" label="Quantity" />
         <FileUpload id="la-transcript" name="transcript" label="Transcript" />
         <DateAndTimePicker id="la-starts" name="starts" label="Session start" />
-        <Scale id="la-confidence" name="confidence" label="Confidence" options={scaleOptions} />
+        <ChoiceGroup id="la-confidence" name="confidence" legend="Confidence" orientation="inline" options={scaleOptions} />
         <Rating id="la-overall" name="overall" label="Overall rating" value={3} />
         <TagInput id="la-topics" name="topics" label="Topics" tags={['Algebra']} />
         <Radio id="la-cadence" name="cadence" label="Every session" value="every" />
-        <MultipleChoice id="la-reminder" name="reminder" options={reminderOptions} />
+        <ChoiceGroup id="la-reminder" name="reminder" legend="Reminder" options={reminderOptions} />
     </div>
 );
 

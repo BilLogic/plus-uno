@@ -38,7 +38,6 @@ That pattern is implemented with colocated `*.mdx` files, shared docs layout pri
 5. **Sidebar alias**
    A few sidebar labels are more user-facing than the implementation name. Current examples:
    - `Components/Loading` for `Spinner`
-   - `Components/Forms and inputs/Scale` for `RadioButtonGroup`
    - `Components/Forms and inputs/Date & time picker` for `DateAndTimePicker`
 
 These aliases are acceptable when intentional, but they should be rare and kept in sync with [`storySort`](../../../.storybook/preview.jsx).
@@ -211,14 +210,13 @@ The tables below summarize how current entries are organized today. The goal is 
 | `Radio` | MDX-first | `Content`, `Layout`, `Sizes`, `Interaction States`, `Interactive` | No | Strong standard pattern. |
 | `Switch` | MDX-first | `Content`, `Sizes`, `Interaction States`, `Interactive` | No | Strong standard pattern. |
 | `Range` | MDX-first | `Sizes`, `Interactive` | No | Minimal but likely correct for this control. |
-| `Multiple Choice` | MDX-first | `Styles`, `Content`, `Sizes`, `Interaction States`, `Interactive` | No | Mostly standard, but section order should probably normalize. |
+| `Choice Group` | MDX-first | `Types`, `Orientation`, `Scale Ends`, `Descriptions`, `Other`, `Reveal`, `States`, `Validation`, `Interactive` | No | Replaced Multiple Choice and Scale; every story carries a play test. |
 | `Choice Grid` | MDX-first | `Styles`, `Layout`, `Interaction States`, `Interactive` | No | More structural than content-led. |
 | `File Upload` | MDX-first | `Content`, `Styles`, `Interaction States`, `Interactive` | No | No strong need for sizes. |
 | `Date Picker` | MDX-first | `Sizes`, `Interaction States`, `Interactive` | No | Starts from usage/state instead of content. |
 | `Time Picker` | MDX-first | `Content`, `Sizes`, `Styles`, `Interaction States`, `Interactive` | No | Sidebar alias for `DateAndTimePicker`. |
 | `Rating` | Stories-only | `Overview` | No | Migration outlier. |
 | `Input Group` | Stories-only | `Overview` | No | Migration outlier. |
-| `Scale` | Stories-only | `Overview` | No | Migration outlier and sidebar alias. |
 
 ## What is already working well
 
