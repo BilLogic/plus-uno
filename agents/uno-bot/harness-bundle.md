@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **17 reference(s), 130,734 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **17 reference(s), 130,618 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -61,7 +61,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `follow-through` | [`agents/uno-bot/scheduled-actions/follow-through/ACTION.md`](../../agents/uno-bot/scheduled-actions/follow-through/ACTION.md) | 10,647 |
 | `prepare-the-call` | [`agents/uno-bot/skills/prepare-the-call/SKILL.md`](../../agents/uno-bot/skills/prepare-the-call/SKILL.md) | 2,202 |
 | `relay-a-message` | [`agents/uno-bot/skills/relay-a-message/SKILL.md`](../../agents/uno-bot/skills/relay-a-message/SKILL.md) | 1,462 |
-| `share-out` | [`agents/uno-bot/skills/share-out/SKILL.md`](../../agents/uno-bot/skills/share-out/SKILL.md) | 2,697 |
+| `share-out` | [`agents/uno-bot/skills/share-out/SKILL.md`](../../agents/uno-bot/skills/share-out/SKILL.md) | 2,581 |
 | `sweep` | [`agents/uno-bot/scheduled-actions/sweep/ACTION.md`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) | 23,310 |
 
 ## The assembled prompt
@@ -2223,7 +2223,7 @@ Finished-enough work goes in front of people. Three rails, each ending in one �
 ## Steps
 
 1. **Pick the rail once.** Share / post for feedback / get eyes on → the feedback round (step 2). Close the round / record what we decided → the close (step 3). Publish / register / update in the marketplace → the entry (step 4). Find a prototype → the search (step 5). "Post this in Slack" could be any of them or a plain message → ask which. Done when the rail is named or the question asked.
-2. **Feedback round.** Stage `shareout_post` at once with the links in hand; its card audits the bundle and names what is missing. It posts to #plus-design-feedback, or with `place` here in this DM or thread when the asker keeps it here; asked for any other place, say those are the two and ask which. Up to three questions fit the artifact's stage, plus what is out of scope this round. Reviewers are Slack ids from `notion_search` with scope team, or the PRD's Owner; a person with no id is named in the lead line and left off. Done when the card is staged with the questions, the link and the reviewers filled from the thread.
+2. **Feedback round.** Stage `shareout_post` at once with the links in hand; its card audits the bundle and names what is missing. Where it posts is its `place`, by the tool's own rule. Up to three questions fit the artifact's stage, plus what is out of scope this round. Reviewers are Slack ids from `notion_search` with scope team, or the PRD's Owner; a person with no id is named in the lead line and left off. Done when the card is staged with the questions, the link and the reviewers filled from the thread.
 3. **Close the round.** When the feedback is in, offer to record the decisions: `notion_create` with surface decision, the Roadmap card and the thread permalink as evidence. Acting on the feedback is a new build ask through file-a-ticket. Done when the decision card is staged or declined.
 4. **Marketplace entry.** `notion_create` with surface marketplace creates the row or updates the one already there; its description names the fields. Ask once, in one message, for only the fields the thread lacks. A value the tool reports as unmatched goes back to the designer as a question. Done when the card is staged with every field the designer supplied.
 5. **Search.** `notion_search` with scope marketplace; `source_read` a hit for more. Done when the results are posted.
