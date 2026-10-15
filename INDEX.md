@@ -88,7 +88,7 @@ Adding a doc changes this file; editing this file changes nothing.
 |-----|---------|
 | [`design-system/guidelines/components/actions.md`](design-system/guidelines/components/actions.md) | Which action component to reach for — Button and ButtonGroup, and what neither of them is |
 | [`design-system/guidelines/components/changelog.md`](design-system/guidelines/components/changelog.md) | How a component records what changed about it — starting empty on 2026-08-26, never backfilled |
-| [`design-system/guidelines/components/forms-and-inputs.md`](design-system/guidelines/components/forms-and-inputs.md) | Twenty-three input components sorted by the shape of the answer, plus the id and validation rules that apply across all of them |
+| [`design-system/guidelines/components/forms-and-inputs.md`](design-system/guidelines/components/forms-and-inputs.md) | Which input to use, sorted by the shape of the answer, plus the id, validation and required rules that apply across the group |
 | [`design-system/guidelines/components/layout-and-structure.md`](design-system/guidelines/components/layout-and-structure.md) | Nine container components sorted by what is being contained, plus the three pairs that get confused |
 | [`design-system/guidelines/components/messaging.md`](design-system/guidelines/components/messaging.md) | Alert, Toast or Modal — choosing by how long the message lives and whether it blocks |
 | [`design-system/guidelines/components/navigation.md`](design-system/guidelines/components/navigation.md) | Six navigation components sorted by what the user is moving between |

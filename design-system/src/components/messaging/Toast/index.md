@@ -45,6 +45,4 @@ From `design-system/src/components/messaging/Toast/Toast.scss`. Override these t
 
 Same group: `Alert` · `Modal`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
