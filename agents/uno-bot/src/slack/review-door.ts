@@ -43,6 +43,7 @@ import { applyPressVerdict, decidedCard, liveCard, type ButtonDoorTarget, type C
 import { renderGateNote } from "./gate-note";
 import { escapeSlackText } from "./mrkdwn";
 import { withEditedFields } from "./proposal-render";
+import { reviewTitle } from "./review-anatomy";
 import {
   closedView,
   decidedView,
@@ -52,6 +53,8 @@ import {
   inlineKeysOf,
   loadingView,
   noticeView,
+  outcomeView,
+  stateView,
   type ReviewedCard,
   type ReviewPick,
 } from "./review-view";
@@ -124,8 +127,8 @@ export interface ReviewOpenRequest {
    *  item's key (`itemProposal`) for an item of a decision report. */
   messageTs: string;
   userId: string;
-  /** The card's own text, as the click carries it: what View shows once the
-   *  record is gone. */
+  /** The card's own text, as the click carries it: the outcome View shows
+   *  once the record no longer keeps the decided draft. */
   cardText?: string;
   /** An item of a decision report: its message and its id. View reads its
    *  words off the report's record. */
@@ -158,7 +161,9 @@ export interface ReviewDecisionRequest {
 }
 
 /** Open the pop-up on a card: loading first, then the draft or why there is
- *  none to decide. */
+ *  none to decide. A decided card whose record still keeps it (View) is drawn
+ *  as its draft, read-only, under who decided it; one whose record does not
+ *  shows its outcome alone. */
 export async function runReviewOpen(request: ReviewOpenRequest, deps: ReviewDoorDeps): Promise<void> {
   const card: ReviewedCard = { channel: request.channel, ts: request.messageTs };
   const viewId = await deps.views.open(request.triggerId, loadingView(card));
@@ -174,12 +179,19 @@ export async function runReviewOpen(request: ReviewOpenRequest, deps: ReviewDoor
   // An item no longer live: its words come off the report's record, and one
   // whose time ran out is shown closed on its card from now on.
   const item = request.item && look.state !== "live" ? await reportItem(request.channel, request.item, deps) : null;
-  const view = item
+  const view = look.state === "gone" && look.decided
+    ? draftView(card, look.decided.proposal, { mayDecide: false, confirmers: [], decided: look.decided })
+    : item
     ? decidedView(card, item)
     :
     look.state === "live" && look.proposal.revising
       ? // Sent back with Needs changes: the revised card is the one to decide.
-        noticeView(card, request.item ? "This proposal is being revised. Its card shows the revised draft once it is ready." : "This proposal is being revised. Decide on the revised card when it posts in the thread.")
+        stateView(
+          card,
+          "info",
+          request.item ? "This proposal is being revised. Its card shows the revised draft once it is ready." : "This proposal is being revised. Decide on the revised card when it posts in the thread.",
+          titleOf(look.proposal),
+        )
       : look.state === "live"
       ? draftView(
           card,
@@ -188,7 +200,7 @@ export async function runReviewOpen(request: ReviewOpenRequest, deps: ReviewDoor
           { editable: draftValuesOf(look.proposal).size > 0, edits: look.kept },
         )
       : look.state === "gone" && request.cardText
-        ? decidedView(card, request.cardText)
+        ? outcomeView(card, request.cardText)
         : closedView(card, look);
   await deps.views.update(viewId, view);
 }
@@ -382,7 +394,7 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
   // Said in the pop-up before the run starts, so the person sees it register
   // at once rather than after a write that can take a while.
   if (verdict.outcome === "won") {
-    await show(noticeView(card, own ? ownLine(own) : decidedLine(decision)));
+    await show(stateView(card, decision === "confirm" ? "success" : "default", own ? ownLine(own) : decidedLine(decision), titleOf(live ?? verdict.proposal)));
   } else if (verdict.post && verdict.post.note.kind !== "cut-off") {
     // A non-win is answered where the person is looking, which is the pop-up
     // — even a note the button door would edit onto the card.
@@ -443,7 +455,12 @@ async function applyRevise(
     return;
   }
   await showIn(request, deps)(
-    noticeView(card, verdict.proposal.afterNeedsChanges ?? (verdict.proposal.item ? "Sent back with your note. I'm revising the draft, and its card shows the revision once it is ready." : "Sent back with your note. I'm revising the draft, and the new card posts in the thread.")),
+    stateView(
+      card,
+      "info",
+      verdict.proposal.afterNeedsChanges ?? (verdict.proposal.item ? "Sent back with your note. I'm revising the draft, and its card shows the revision once it is ready." : "Sent back with your note. I'm revising the draft, and the new card posts in the thread."),
+      titleOf(verdict.proposal),
+    ),
   );
   // Live, not decided: nothing is decided until the revision replaces it, and
   // a revision that never comes hands the card back (`startRevision`, Turn's
@@ -533,16 +550,22 @@ export async function startRevision(
     .catch(() => null);
 }
 
-/** What the pop-up says once one of the card's own answers wins. */
+/** A state's title: the card's own, where the view has the card. */
+function titleOf(proposal: PendingProposal | undefined): string | undefined {
+  return proposal ? reviewTitle(proposalOperations(proposal)) : undefined;
+}
+
+/** What the pop-up says once one of the card's own answers wins: the answer,
+ *  then what happens next. */
 function ownLine(own: ReviewChoice): string {
   return own.verdict === "confirm"
-    ? `${own.label}. I'm running it now, and the outcome posts in the thread.`
+    ? `${own.label}. I'm running it now. The outcome posts in the thread.`
     : `${own.label}. Nothing will run.`;
 }
 
 function decidedLine(decision: "confirm" | "cancel"): string {
   return decision === "confirm"
-    ? "Approved. I'm running it now, and the outcome posts in the thread."
+    ? "Approved. I'm running it now. The outcome posts in the thread."
     : "Rejected. Nothing will run.";
 }
 

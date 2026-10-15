@@ -724,13 +724,68 @@ describe("Reject in the pop-up", () => {
 });
 
 describe("a decided card", () => {
-  it("opens read-only from View, from the card's own words", async () => {
-    const { deps, views } = harness(createInMemoryThreadState());
-    await runReviewOpen({ ...open(), cardText: `${PROPOSAL.proposalText}\n:white_check_mark: Approved by <@U1>` }, deps);
-    const view = views.calls[1]!.view;
-    assert.match(viewText(view), /Reflection redesign/);
-    assert.match(viewText(view), /already been decided/);
+  it("falls back to its outcome alone when its record keeps no draft, as on a card decided before it did", async () => {
+    // The claim before the decided record: no mark, so the record is deleted.
+    const threadState = await staged();
+    assert.equal(await threadState.claimProposal(CARD_TS), true);
+    const { deps, views } = harness(threadState);
+    await runReviewOpen({ ...open(), cardText: `${PROPOSAL.proposalText}\n:white_check_mark: Approved by <@U0BILL0001>` }, deps);
+    const view = views.calls[1]!.view as { blocks: Array<{ type: string; level?: string; text?: { type: string; text: string } }>; submit?: unknown };
+    assert.deepEqual(view.blocks.map((b) => b.type), ["alert", "section"]);
+    assert.equal(view.blocks[0]!.level, "success");
+    assert.equal(view.blocks[0]!.text!.text, "Approved by <@U0BILL0001>");
+    assert.match(view.blocks[1]!.text!.text, /no longer kept, so only its outcome shows here/);
+    assert.equal(view.submit, undefined);
     assert.deepEqual(actionIds(view), []);
+  });
+
+  it("falls back to a plain decided line when the card's text carries no outcome", async () => {
+    const { deps, views } = harness(createInMemoryThreadState());
+    await runReviewOpen({ ...open(), cardText: PROPOSAL.proposalText }, deps);
+    const view = views.calls[1]!.view as { blocks: Array<{ type: string; level?: string; text?: { text: string } }> };
+    assert.equal(views.refused.length, 0);
+    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "info"], ["section", undefined]]);
+    assert.match(view.blocks[0]!.text!.text, /already been decided/);
+  });
+
+  it("opens from View as its draft, read-only, under who approved it", async () => {
+    const threadState = await staged();
+    const { deps, views } = harness(threadState);
+    await runReviewDecision({ ...approve("U0BILL0001") }, deps);
+    await runReviewOpen({ ...open("U0OTHER001"), cardText: "(the decided card)" }, deps);
+    const view = views.calls.at(-1)!.view as { blocks: Array<{ type: string; level?: string; text?: { text: string } }>; submit?: unknown };
+    assert.equal(views.refused.length, 0);
+    assert.equal(view.blocks[0]!.type, "alert");
+    assert.equal(view.blocks[0]!.level, "success");
+    assert.equal(view.blocks[0]!.text!.text, "Approved by <@U0BILL0001>.");
+    assert.match(viewText(view), /Reflection redesign/, "the draft, not the card's text");
+    assert.doesNotMatch(viewText(view), /the decided card/);
+    assert.equal(view.submit, undefined);
+    assert.equal(view.blocks.filter((b) => b.type === "input").length, 0);
+    assert.deepEqual(actionIds(view), []);
+  });
+
+  it("opens a rejected card the same way, under a plain alert with the reason", async () => {
+    const threadState = await staged();
+    const { deps, views } = harness(threadState);
+    await runReviewDecision({ ...approve("U0BILL0001"), decision: "cancel", note: "Not this week" }, deps);
+    await runReviewOpen(open("U0BILL0001"), deps);
+    const view = views.calls.at(-1)!.view as { blocks: Array<{ type: string; level?: string; text?: { text: string } }> };
+    assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level], ["alert", "default"]);
+    assert.equal(view.blocks[0]!.text!.text, "Rejected by <@U0BILL0001>: Not this week.");
+    assert.match(viewText(view), /Reflection redesign/);
+  });
+
+  it("draws what was approved, edits included, not the staged draft", async () => {
+    const threadState = await staged();
+    const { deps, views } = harness(threadState);
+    const state = { "uno_field:0.title": { value: { type: "plain_text_input", value: "Reflection, round two" } } };
+    const fields = [{ key: "0.title", label: "Title", kind: "text" as const, value: "Reflection redesign", required: true }];
+    await runReviewDecision({ ...approve("U0BILL0001"), state, fields }, deps);
+    await runReviewOpen(open(), deps);
+    const json = viewText(views.calls.at(-1)!.view);
+    assert.match(json, /Reflection, round two/);
+    assert.doesNotMatch(json, /Reflection redesign/);
   });
 
   it("still resolves from a ✅ or ⛔ reaction, which the card no longer advertises", async () => {

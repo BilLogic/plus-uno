@@ -51,6 +51,9 @@ export interface DraftAnatomy {
   /** What Approve does on this card, when the tool's words need the draft
    *  (`decisionWords` otherwise). */
   approve?: string;
+  /** Where Approve sends it, as mrkdwn after "to" ("post in <#C…>"): what the
+   *  decided card's alert says it was approved for. */
+  destination?: string;
 }
 
 /** Slack's caps: a header's text 150, an alert's 200, a section field 2,000

@@ -23,8 +23,9 @@
 // in-memory ThreadState (`tests/confirmation-paths.test.ts`) — as MEANINGS
 // now, not as strings.
 //
-// THE CLAIM IS THE LOCK. `ThreadState.claimProposal` deletes the record, one
-// caller at a time, and fails closed. Of two racing resolvers exactly one gets
+// THE CLAIM IS THE LOCK. `ThreadState.claimProposal` consumes the record, one
+// caller at a time, and fails closed — keeping the decided card behind for
+// Review's View until the card's own TTL. Of two racing resolvers exactly one gets
 // `true`; the loser's verdict is `stale` and its post says so. Nothing past
 // the claim runs twice, which matters because `notion_create` is not
 // idempotent.
@@ -44,6 +45,7 @@ import {
   unfinishedOperations,
 } from "../thread-state/index";
 import type {
+  DecidedProposal,
   Execution,
   PendingProposal,
   ProposalOperation,
@@ -457,7 +459,10 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
       return claim(proposal, decision, signal.userId, deps, { byCard: true, rejected: reason ? { reason } : {} });
     }
     const changed = editedOnConfirm(proposal, signal.operations);
-    const verdict = await claim(edited(proposal, signal.operations), decision, signal.userId, deps, { byCard: true });
+    const verdict = await claim(edited(proposal, signal.operations), decision, signal.userId, deps, {
+      byCard: true,
+      ...(signal.operations?.length ? { edits: signal.operations } : {}),
+    });
     return changed && verdict.outcome === "won" ? { ...verdict, edited: true } : verdict;
   }
   return claim(proposal, decision, signal.userId, deps, { byCard: signal.kind !== "typed" });
@@ -568,8 +573,9 @@ export type ProposalLook =
   | { state: "live"; proposal: PendingProposal; mayDecide: boolean; confirmers: string[]; kept: Readonly<Record<string, string>> }
   | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
   | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
-  /** Decided, cut off, or never a card: nothing here is waiting on anyone. */
-  | { state: "gone" };
+  /** Decided, cut off, or never a card: nothing here is waiting on anyone.
+   *  `decided` is the card as it was decided, while its record keeps it. */
+  | { state: "gone"; decided?: DecidedProposal };
 
 export async function lookAtProposal(messageTs: string, userId: string, deps: GateDeps): Promise<ProposalLook> {
   const byTs = await deps.threadState.getProposalByTs(messageTs).catch(() => ({ state: "none" }) as const);
@@ -584,7 +590,7 @@ export async function lookAtProposal(messageTs: string, userId: string, deps: Ga
     };
   }
   if (byTs.state === "superseded" || byTs.state === "expired") return byTs;
-  return { state: "gone" };
+  return byTs.state === "none" && "decided" in byTs && byTs.decided ? { state: "gone", decided: byTs.decided } : { state: "gone" };
 }
 
 /** The claim, and the verdict that follows from it. */
@@ -600,6 +606,8 @@ async function claim(
     rejected?: { reason?: string };
     /** The signal was a gesture on the card itself (`notAConfirmer`). */
     byCard?: boolean;
+    /** The batch as the pop-up approved it, kept on the decided record. */
+    edits?: ProposalOperation[];
   } = {},
 ): Promise<GateVerdict> {
   const { narrative, rejected } = opts;
@@ -615,7 +623,19 @@ async function claim(
   // A person who reacts ✅ and then, unsure it registered, also types "go
   // ahead" runs two handlers that each loaded this same record. Whoever loses
   // here must not post the winner's narrative and above all must not execute.
-  if (!(await deps.threadState.claimProposal(proposal.proposalTs))) {
+  // The claim keeps what was decided on the card's record, for View
+  // (`claimProposal`): who, which way, and the batch as approved. Not for an
+  // item of a decision report, whose View reads its words and its outcome off
+  // the report's own record, which outlives the item's.
+  const decided = proposal.item
+    ? undefined
+    : {
+        decision,
+        ...(userId ? { by: userId } : {}),
+        ...(rejected?.reason ? { reason: rejected.reason } : {}),
+        ...(opts.edits?.length ? { operations: opts.edits } : {}),
+      };
+  if (!(await deps.threadState.claimProposal(proposal.proposalTs, decided))) {
     console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs} was not claimable`);
     // WHY the claim was refused decides what to say, and the store is the only
     // one who knows (#583). Two doors reach this function with a proposal they

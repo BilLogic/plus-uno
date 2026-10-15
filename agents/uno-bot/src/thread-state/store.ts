@@ -968,7 +968,68 @@ export type ProposalLookup =
    *  `proposalText` and `proposalBlocks` (both answers) are the card as
    *  posted, so the note about it can be edited onto it. */
   | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
-  | { state: "none" };
+  /** Claimed, aged out or never staged: nothing to decide. `decided` is the
+   *  card as it was decided, kept for the rest of its lifetime so Review's
+   *  View can draw it (`DecidedProposal`); absent once that lifetime ends, and
+   *  on every card decided before the record was kept. */
+  | { state: "none"; decided?: DecidedProposal };
+
+/**
+ * What a claim keeps of the card it won: the decision, who made it, and the
+ * batch as it was decided, for Review's View to draw read-only. Written by the
+ * claim itself, in the same transaction and the same hop, so keeping it costs
+ * no extra subrequest. Bound to the card's own lifetime: it reads as gone, and
+ * the daily sweep deletes it, once the card's `ttlMs` (an hour by default)
+ * from staging has passed, exactly as the pending record would have.
+ */
+export interface DecidedMark {
+  decision: "confirm" | "cancel";
+  /** Who decided it, when a person did. */
+  by?: string;
+  /** A Reject's reason, as the pop-up took it. */
+  reason?: string;
+  /** The batch as approved, when the decision edited it (Review's fields, or a
+   *  card's own answer's args). Absent, the staged batch is what was decided. */
+  operations?: ProposalOperation[];
+}
+
+/** A decided card, as its record hands it back (`ProposalLookup` "none"). */
+export interface DecidedProposal {
+  /** The card as decided: its edited batch in place, its posted blocks not
+   *  kept. */
+  proposal: PendingProposal;
+  decision: "confirm" | "cancel";
+  by?: string;
+  reason?: string;
+}
+
+/** How a decided record stores its decision: the mark, less the batch, which
+ *  is written into the payload (`decidedPayload`). */
+export type DecidedNote = Omit<DecidedMark, "operations">;
+
+/**
+ * The card a claim keeps: the decided batch in place of the staged one, and
+ * nothing View does not read — not the posted blocks, not the Needs changes
+ * mark. (Kept picks live beside the payload, and the claim drops them.)
+ *
+ * @param proposal - The card's record as staged
+ * @param mark - What the claim decided
+ */
+export function decidedPayload(proposal: PendingProposal, mark: DecidedMark): PendingProposal {
+  const { proposalBlocks: _blocks, revising: _revising, ...kept } = proposal;
+  const [first] = mark.operations ?? [];
+  return first ? { ...kept, operations: mark.operations, toolName: first.toolName, input: first.input } : kept;
+}
+
+/** The mark as a decided record stores it beside its payload. */
+export function decidedNoteOf(mark: DecidedMark): DecidedNote {
+  return { decision: mark.decision, ...(mark.by ? { by: mark.by } : {}), ...(mark.reason ? { reason: mark.reason } : {}) };
+}
+
+/** A decided record read back: its payload and the note beside it. */
+export function decidedOf(proposal: PendingProposal, note: DecidedNote): DecidedProposal {
+  return { proposal, ...note };
+}
 
 /**
  * The answer to "may I run this turn?".
@@ -1196,12 +1257,21 @@ export interface ThreadState {
    *
    * Callers that only want the record gone ignore the boolean.
    *
+   * **A WON CLAIM KEEPS THE DECIDED CARD** when it is told what was decided
+   * (`decided`): instead of the delete, the record is rewritten in the same
+   * transaction as the decided batch (`decidedPayload`), so Review's View can
+   * draw it read-only for the rest of the card's lifetime — no longer, by the
+   * same TTL and the same daily sweep as a pending card. It is out of reach of
+   * everything else: every lookup answers "none" (`getProposalByTs` with
+   * `decided` on it), and a second claim, a retirement, a Needs changes mark
+   * and a kept pick all refuse it. Without `decided` the record is deleted.
+   *
    * **Fails CLOSED**, unlike the event methods below: the actions behind this
    * gate are the irreversible ones. A missed execution is visible — the person
    * sees nothing happened and asks again — while a double execution is silent
    * and has to be undone by hand.
    */
-  claimProposal(proposalTs: string): Promise<boolean>;
+  claimProposal(proposalTs: string, decided?: DecidedMark): Promise<boolean>;
 
   // ----- decision reports -----
 

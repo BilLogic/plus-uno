@@ -100,7 +100,15 @@ async function draftOf(over: Partial<PendingProposal> = {}) {
 /** Each block's words, in order: a header's text, a section's, a context's,
  *  and an input's label and the value it opens with. */
 function lines(view: { blocks: Array<Record<string, unknown>> }): string[] {
+  /** A rich text block's words, its user pills as mentions. */
+  const rich = (e: unknown): string => {
+    const el = e as { text?: unknown; user_id?: string; elements?: unknown[] };
+    if (typeof el.text === "string") return el.text;
+    if (el.user_id) return `<@${el.user_id}>`;
+    return (el.elements ?? []).map(rich).join("");
+  };
   return view.blocks.map((b) => {
+    if (b.type === "rich_text") return `rich_text: ${rich(b)}`;
     if (b.type === "input") {
       const element = b.element as { initial_value?: string } | undefined;
       return `input: ${(b.label as { text?: string } | undefined)?.text ?? ""}${element?.initial_value ? ` = ${element.initial_value}` : ""}`;
@@ -202,9 +210,10 @@ describe("the draft reads as a draft", () => {
         ],
       }),
     );
-    assert.match(all[0]!, /2 operations, run in order/);
-    const first = indexOf(all, /1\. New PRD card on the Roadmap/);
-    const second = indexOf(all, /2\. Direct message/);
+    // A mixed batch's header names what each kind does, in run order.
+    assert.equal(all[0]!, "header: Add a Roadmap card and send a DM");
+    const first = indexOf(all, /^rich_text: 1 · New PRD card on the Roadmap$/);
+    const second = indexOf(all, /^rich_text: 2 · To <@U07ABC>$/);
     assert.ok(first > 0 && first < indexOf(all, /Goal cycle resets/) && indexOf(all, /One reset per session/) < second, JSON.stringify(all));
   });
 

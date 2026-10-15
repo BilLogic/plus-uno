@@ -24,6 +24,7 @@ import { fieldInputBlocks, MAX_INPUT_CHARS, type EditableField } from "./review-
 import { relayRecipientId } from "../tools/relayed-dm-render";
 import { MAX_FEEDBACK_QUESTIONS, shareoutChannelRef } from "../tools/share-out-render";
 import { createdDesignStatus } from "../integrations/notion";
+import { CARD_BODY_CHARS } from "./card-block";
 import {
   alertsFromCaveats,
   labelledText,
@@ -252,24 +253,47 @@ export function readableDraft(
   caveats: readonly string[] = [],
   detail: DraftDetail = {},
 ): unknown[] | null {
+  const parts = operationParts(operations, detail);
+  if (!parts) return null;
+  const blocks: unknown[] = [];
+  const many = parts.length > 1;
+  parts.forEach((op, i) => {
+    if (many) {
+      if (i) blocks.push({ type: "divider" });
+      blocks.push({ type: "section", text: { type: "mrkdwn", text: `*${i + 1}. ${escapeSlackText(op.headline)}*` } });
+    }
+    blocks.push(...op.blocks);
+  });
+  if (caveats.length) blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: caveats.join("\n") }] });
+  return blocks;
+}
+
+/**
+ * Each operation of the batch read on its own: its headline, and its
+ * properties and body as blocks, keyed by its place in the batch so a field in
+ * place finds its input. Null when any operation is a tool this file has no
+ * reading for. What `readableDraft` numbers, and what a batch in the shared
+ * anatomy (`review-batch.ts`) labels.
+ *
+ * @param operations - The batch as it would run, saved edits applied
+ * @param detail - Before values, and the fields drawn as inputs in place
+ */
+export function operationParts(
+  operations: readonly ProposalOperation[],
+  detail: DraftDetail = {},
+): Array<{ headline: string; blocks: unknown[] }> | null {
   const read = operations.map((op) => READERS[op.toolName]?.(op.input) ?? null);
   if (!read.length || read.some((r) => !r)) return null;
   const issueAt = detail.issue ? firstChange(read as ReadOperation[]) : undefined;
-  const blocks: unknown[] = [];
-  const many = read.length > 1;
-  read.forEach((op, i) => {
-    if (many) {
-      if (i) blocks.push({ type: "divider" });
-      blocks.push({ type: "section", text: { type: "mrkdwn", text: `*${i + 1}. ${escapeSlackText(op!.headline)}*` } });
-    }
+  return read.map((op, i) => {
+    const blocks: unknown[] = [];
     const keyOf = (path?: string) => (path ? `${i}.${path}` : undefined);
     const at = (key?: string) => ({ ...detail, issueHere: key !== undefined && key === issueAt });
     const properties = op!.properties.map(([label, value, path]): [string, string, string?] => [label, value, keyOf(path)]);
     blocks.push(...(op!.changes ? propertyBlocks(properties, detail, issueAt) : newPropertyBlocks(properties, detail)));
     for (const part of op!.body) blocks.push(...partBlocks({ ...part, key: keyOf(part.key) }, at(keyOf(part.key))));
+    return { headline: op!.headline, blocks };
   });
-  if (caveats.length) blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: caveats.join("\n") }] });
-  return blocks;
 }
 
 /** The headline the pop-up opens with: the one operation's, or the batch's size. */
@@ -493,6 +517,11 @@ function shareoutWhere(input: Input, cardText: string): WhereElement[] {
   return out;
 }
 
+/** A where-line place as mrkdwn: a channel as its link, words escaped. */
+function placeMrkdwn(place: WhereElement): string {
+  return place.type === "channel" ? `<#${place.channel_id}>` : place.type === "text" ? escapeSlackText(place.text) : "";
+}
+
 const capital = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
 /** The card's subtitle: the artifact (when the project is the title), the
@@ -530,6 +559,10 @@ function shareoutAnatomy(input: Input, detail: AnatomyContext): DraftAnatomy {
   const subtitle = shareoutSubtitle(input, Boolean(project));
   const field = (path: string) => detail.inline?.get(`0.${path}`);
   const editing = detail.editing === true;
+  // Read-only, a summary short enough is the card's body (§ 2); otherwise it
+  // is its own block, or its input.
+  const summary = str(input.summary);
+  const summaryInCard = !field("summary") && summary.length > 0 && summary.length <= CARD_BODY_CHARS;
 
   const content: unknown[] = [];
   /** One of the share-out's words: its input in place, or the text shown. */
@@ -542,7 +575,7 @@ function shareoutAnatomy(input: Input, detail: AnatomyContext): DraftAnatomy {
     }
   };
 
-  part("summary", "What this is", str(input.summary));
+  if (!summaryInCard) part("summary", "What this is", summary);
   const changed = str(input.what_changed);
   if (changed) content.push(quoteBlock("What changed since last round", changed));
   const questions = (Array.isArray(input.feedback_wanted) ? input.feedback_wanted : []).map(str).slice(0, MAX_FEEDBACK_QUESTIONS);
@@ -564,9 +597,11 @@ function shareoutAnatomy(input: Input, detail: AnatomyContext): DraftAnatomy {
     object: {
       title: project || capital(artifact) || "Share-out",
       ...(subtitle ? { subtitle } : {}),
+      ...(summaryInCard ? { body: summary } : {}),
       ...(/^https?:\/\//.test(link) ? { open: { url: link, text: openWords(artifact) } } : {}),
     },
     content,
     approve: shareoutApprove(input),
+    destination: `post in ${placeMrkdwn(shareoutPlaceElement(input, detail.cardText))}`,
   };
 }
