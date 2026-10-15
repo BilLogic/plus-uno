@@ -62,6 +62,9 @@ export interface FakeProviderOptions {
    *  `generateFailMessage`, and the caller is meant to treat it differently —
    *  the draft judge skips on this and errors on that (#605). */
   generateUnavailableMessage?: string;
+  /** When true, every `generate` reply reports it stopped at the output
+   *  ceiling (`cutOff`), as an adapter does on a truncated one-shot. */
+  generateCutOff?: boolean;
   model?: string;
   usage?: Partial<ModelUsage>;
 }
@@ -128,7 +131,12 @@ export function fakeProvider(opts: FakeProviderOptions = {}): FakeProvider {
       if (opts.generateFailMessage !== undefined) {
         return { ok: false, model, message: opts.generateFailMessage };
       }
-      return { ok: true, model, text: generateReplies[generateCursor++] ?? "" };
+      return {
+        ok: true,
+        model,
+        text: generateReplies[generateCursor++] ?? "",
+        ...(opts.generateCutOff ? { cutOff: true } : {}),
+      };
     },
 
     async send({ toolsEnabled }): Promise<ModelReply> {

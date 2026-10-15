@@ -560,8 +560,13 @@ export async function reviewDraft(
         }
       } else {
         verdict = "error";
-        reason = "unparseable judge output";
-        console.warn(`[draft-judge] unparseable judge output (${raw.slice(0, 120)}) — sending the original draft`);
+        // A cut-off reply is a ceiling to tune, an unparseable one a prompt
+        // to fix; the length and both ends tell the next reader which.
+        reason = answer.cutOff ? "judge output cut off at the token ceiling" : "unparseable judge output";
+        console.warn(
+          `[draft-judge] ${reason} (chars=${raw.length} mode=${mode} head=${JSON.stringify(raw.slice(0, 120))} ` +
+            `tail=${JSON.stringify(raw.slice(-80))}) — sending the original draft`,
+        );
       }
     }
     // A breach is a fail on the count alone. The judge reading a draft with

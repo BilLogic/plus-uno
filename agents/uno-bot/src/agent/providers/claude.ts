@@ -240,7 +240,12 @@ export function claudeProvider(opts: ClaudeProviderOptions): ModelProvider {
           message: `HTTP ${status}: ${parsed.error?.message ?? "rawPredict failed"}`,
         };
       }
-      return { ok: true, model: oneShotModel, text: textOf(parsed.content ?? []) };
+      return {
+        ok: true,
+        model: oneShotModel,
+        text: textOf(parsed.content ?? []),
+        ...(parsed.stop_reason === "max_tokens" ? { cutOff: true } : {}),
+      };
     },
 
     async start(turn: ModelTurn): Promise<void> {
