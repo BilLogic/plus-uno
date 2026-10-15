@@ -8,15 +8,16 @@
 // under EST. The crons fire at both UTC hours of each (wrangler.toml), so a
 // firing reads its ET hour rather than a fixed UTC one.
 //
-// The end-of-day run fires the next morning, so it is DATED to the ET day it
-// sweeps — the one before (`sweptDayOf`). Monday to Friday are swept Tuesday
-// to Saturday at 06:00 ET, and a record, skip or label a job keeps still names
-// the workday it read.
+// The end-of-day run fires Monday to Friday at 06:00 ET, the morning after,
+// so it is DATED to the workday it sweeps — the one before (`sweptDayOf`).
+// Monday's run is dated Friday: nothing fires at the weekend, and its jobs
+// read from where Friday's run left them, so it covers Friday, Saturday and
+// Sunday. A record, skip or label a job keeps still names the workday it read,
+// and no workday is swept twice.
 //
 // Detection runs in the end-of-day jobs and posting at the morning run, so
 // people see a card at the start of their day and its 72 h clock starts when
-// they can act on it. A finding swept at Saturday 06:00 therefore waits for
-// Monday morning. Stated as a function of the detection time, not of which
+// they can act on it. Stated as a function of the detection time, not of which
 // run is asking, so a morning job that runs late, twice, or on a rehearsal
 // cannot post a finding before its morning.
 //
@@ -68,16 +69,25 @@ export function morningRunOn(day: number): number {
 }
 
 /**
- * The ET day an end-of-day run at `at` sweeps, and is dated to: the day before
- * when `at` is before the morning run's hour — the 06:00 ET firing, and any
- * job of it deferred past it — and `at`'s own day from the morning on, which
- * is the day a rehearsal in working hours would sweep.
+ * The ET day an end-of-day run at `at` sweeps, and is dated to: the workday
+ * before when `at` is before the morning run's hour — the 06:00 ET firing,
+ * and any job of it deferred past it; Monday's is Friday, whose weekend it
+ * reads too — and `at`'s own day from the morning on, which is the day a
+ * rehearsal in working hours would sweep.
  *
  * @param at - When the run fires, or is rehearsed, epoch ms
  */
 export function sweptDayOf(at: number): number {
   const day = etDayOf(at);
-  return etParts(at).h < MORNING_RUN_HOUR_ET ? day - DAY_MS : day;
+  if (etParts(at).h >= MORNING_RUN_HOUR_ET) return day;
+  let swept = day - DAY_MS;
+  while (isWeekend(swept)) swept -= DAY_MS;
+  return swept;
+}
+
+/** Whether an ET day is Monday to Friday. */
+export function isWorkday(day: number): boolean {
+  return !isWeekend(day);
 }
 
 /**

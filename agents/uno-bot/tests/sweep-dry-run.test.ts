@@ -169,11 +169,11 @@ test("Monday's morning plans the role-map sync and no weekly gaps DM", async () 
   assert.deepEqual(keys.filter((k) => /gap/.test(k)), []);
 });
 
-test("the probe rehearses another weekday's jobs: Friday's DS precedence check on any day", async () => {
+test("the probe rehearses another weekday's jobs: Monday's DS precedence check on any day", async () => {
   // Unconfigured, so the check says so and spends nothing — what matters is
   // that it is planned second, before the batches spend the ceiling, and
   // rehearsed, not skipped.
-  const url = new URL("https://w/debug/sweep?dry_run=1&run=end-of-day&weekday=fri");
+  const url = new URL("https://w/debug/sweep?dry_run=1&run=end-of-day&weekday=mon");
   const report = await runMetered(() => sweepProbe({} as Env, url, new Request(url)));
   assert.ok("body" in report);
   const body = report.body as {

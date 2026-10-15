@@ -4,7 +4,7 @@
 const HOUR = 60 * 60 * 1000;
 
 /**
- * Every firing of `0 10,11 * * TUE-SAT` and `0 13,14 * * MON-FRI`, from `from`
+ * Every firing of `0 10,11 * * MON-FRI` and `0 13,14 * * MON-FRI`, from `from`
  * for `days` days: the end-of-day run's two UTC hours and the morning run's.
  */
 export function cronFirings(from: number, days: number): number[] {
@@ -14,7 +14,7 @@ export function cronFirings(from: number, days: number): number[] {
     const d = new Date(t);
     const h = d.getUTCHours();
     const wd = d.getUTCDay();
-    if (([10, 11].includes(h) && wd >= 2 && wd <= 6) || ([13, 14].includes(h) && wd >= 1 && wd <= 5)) times.push(t);
+    if (([10, 11].includes(h) && wd >= 1 && wd <= 5) || ([13, 14].includes(h) && wd >= 1 && wd <= 5)) times.push(t);
   }
   return times;
 }

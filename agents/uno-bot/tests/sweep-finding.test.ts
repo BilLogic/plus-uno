@@ -111,7 +111,9 @@ test("owner routing falls through its three rungs, never to a default", () => {
 test("a finding posts at the first weekday 09:00 ET (13:00 UTC in EDT) after it was found", () => {
   // Swept at Wednesday 06:00 ET (10:00 UTC) → Wednesday 09:00 ET, 13:00 UTC.
   assert.equal(postableAt(Date.UTC(2026, 8, 30, 10)), Date.UTC(2026, 8, 30, 13));
-  // Friday's work, swept at Saturday 06:00 ET → Monday 09:00 ET, not the weekend.
+  // Friday's work and the weekend, swept at Monday 06:00 ET → that morning.
+  assert.equal(postableAt(Date.UTC(2026, 9, 5, 10)), Date.UTC(2026, 9, 5, 13));
+  // Anything found at the weekend waits for Monday 09:00 ET.
   assert.equal(postableAt(Date.UTC(2026, 9, 3, 10)), Date.UTC(2026, 9, 5, 13));
   // A swept job deferred past its firing still makes that morning.
   assert.equal(postableAt(Date.UTC(2026, 8, 30, 12, 59)), Date.UTC(2026, 8, 30, 13));
@@ -120,7 +122,9 @@ test("a finding posts at the first weekday 09:00 ET (13:00 UTC in EDT) after it 
 });
 
 test("a finding posts at 09:00 ET on both sides of the 1 Nov 2026 change", () => {
-  // Fri 30 Oct swept at Sat 31 Oct 06:00 EDT → Mon 2 Nov 09:00 EST, 14:00 UTC.
+  // Fri 30 Oct swept at Mon 2 Nov 06:00 EST, 11:00 UTC → that morning's 14:00 UTC run.
+  assert.equal(postableAt(Date.UTC(2026, 10, 2, 11)), Date.UTC(2026, 10, 2, 14));
+  // Found on Sat 31 Oct, still EDT → Mon 2 Nov 09:00 EST, 14:00 UTC.
   assert.equal(postableAt(Date.UTC(2026, 9, 31, 10)), Date.UTC(2026, 10, 2, 14));
   // Found before Friday's run → that morning, 09:00 EDT.
   assert.equal(postableAt(Date.UTC(2026, 9, 30, 9)), Date.UTC(2026, 9, 30, 13));
