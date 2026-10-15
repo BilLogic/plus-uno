@@ -244,7 +244,7 @@ The design agent, in every embodiment.
 _Avoid_: "the AI"
 
 **embodiment**:
-A runtime uno runs in (the IDE, the uno-bot Worker, headless GitHub Actions), each with its own powers and slice of the harness.
+A runtime uno runs in (the IDE, the uno-bot Worker), each with its own powers and slice of the harness.
 _Avoid_: "mode", "environment"
 
 **uno skill**:

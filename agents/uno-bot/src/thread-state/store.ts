@@ -263,7 +263,7 @@ export interface PendingProposal {
   /**
    * Set when `confirmers` is the whole set: the deployment's standing
    * confirmers are NOT added (`cardConfirmers`). For a card only particular
-   * people may decide — a blueprint revision is its card owner's and Bill's,
+   * people may decide — a blueprint revision is its card owner's and the lead's,
    * a drawn proposal its requester's. Absent, the card keeps the rule every
    * other card has. Meaningless without `confirmers`.
    */

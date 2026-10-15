@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **97,234 chars from 9 files**, against an assembled budget of 175,500 (78,266 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 76,850 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **97,353 chars from 9 files**, against an assembled budget of 175,500 (78,147 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 76,969 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,114 (−7,717 ide-only) | 10,114 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 13,728 | 23,871 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 20,901 | 44,813 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 46,459 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,193 | 47,712 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 53,405 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 65,191 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 16,358 (−5,976 ide-only) | 81,600 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 85,068 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 91,584 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,740 (−1,734 ide-only) | 96,378 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 97,234 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 13,703 | 23,846 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 20,901 | 44,788 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 46,434 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 47,682 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 53,375 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 65,161 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 16,358 (−5,976 ide-only) | 81,570 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 85,038 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 91,554 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,889 (−1,734 ide-only) | 96,497 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 97,353 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -42,11 +42,11 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 134,622 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 134,989 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `blueprint-upkeep` | [`agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md`](../../agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md) | 3,021 |
+| `blueprint-upkeep` | [`agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md`](../../agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md) | 3,388 |
 | `critique-a-design` | [`agents/uno-bot/skills/critique-a-design/SKILL.md`](../../agents/uno-bot/skills/critique-a-design/SKILL.md) | 3,637 |
 | `dm-watch` | [`agents/uno-bot/scheduled-actions/dm-watch/ACTION.md`](../../agents/uno-bot/scheduled-actions/dm-watch/ACTION.md) | 2,820 |
 | `docs/connectors/figma/annotations` | [`docs/connectors/figma/annotations.md`](../../docs/connectors/figma/annotations.md) | 1,488 |
@@ -400,7 +400,7 @@ The design agent, in every embodiment.
 _Avoid_: "the AI"
 
 **embodiment**:
-A runtime uno runs in (the IDE, the uno-bot Worker, headless GitHub Actions), each with its own powers and slice of the harness.
+A runtime uno runs in (the IDE, the uno-bot Worker), each with its own powers and slice of the harness.
 _Avoid_: "mode", "environment"
 
 **uno skill**:
@@ -602,7 +602,7 @@ At most ONE plain sentence before a tool call, written for the requester and abo
 
 <!-- scheduled-actions — read_reference by name -->
 
-**blueprint-upkeep** — blueprint revision cards from shipped work, and a drawn proposal's removal card — read before answering a reply on one, or what its Approve or Reject did.
+**blueprint-upkeep** — blueprint revisions from shipped work, and a drawn proposal's removal card — read before answering a reply on one, or what its Approve or Reject did.
 **dm-watch** — DM watch — read before answering a reminder about a promise in someone's own DMs, a question about the Home tab's DM switches, or "why can uno-bot see my DMs?".
 **ds-precedence** — the weekly DS precedence report — read before answering a reply on one of its #plus-universal cards, or what its Approve, Needs changes or Reject did.
 **figma-comments** — Figma comments — read before answering a reply on a comment-decision card, a raised Figma question or its DM, or an @uno ask made in Figma, or explaining why uno-bot replied or reacted in a file.
@@ -1088,7 +1088,7 @@ Every table and column in the catalog's own comments, and the tables only a serv
 
 - **uno-blueprint (Supabase) is the source of truth for the CURRENT service journey.** Ground every current-state product claim in a blueprint read (`search_blueprint` / PostgREST) with lane/actor attribution; cite what you found. Notion is a mixed estate — stale docs *and* legitimate future state — so authority is routed by claim type (§ Two sources, one time axis), not by a single "blueprint always wins" rule.
 - **Query at task time, never cache.** `docs/product-and-service/` holds foundation only (identity, pillars, archetypes); live truth — features, requirements, screens — is retrieved fresh per task.
-- **Paired writes, never one alone:** any requirement change updates the PRD (Notion) and the blueprint (Supabase) together — Flow 4's requirement/story path. A PRD edit without a blueprint write (or vice versa) is a defect. **Detection is human today** — no automation reads Supabase, so nothing verifies the pair. The weekly shipped watchdog files a *verify-blueprint* intake per shipped journey card (`skills/uno-maintain/references/method.md` §6) but cannot confirm drift itself; any human spot files a `uno-maintain` intake.
+- **Paired writes, never one alone:** any requirement change updates the PRD (Notion) and the blueprint (Supabase) together — Flow 4's requirement/story path. A PRD edit without a blueprint write (or vice versa) is a defect. **Shipped work is caught by the Worker:** its end-of-day `blueprint-shipped` jobs read the Roadmap cards handed off or deployed, read the blueprint path each one changes, and stage a blueprint revision for the card's owner or the lead to approve (`agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md`). A drift it cannot see — a PRD edited after its card shipped, a cell nobody's card touched — is a human spot, filed as a `uno-maintain` intake.
 - Write access, two writers (ADR-034): `writers/blueprint` in the IDE, via `skills/uno-synthesize` (new requirements) and `skills/uno-maintain` (changes); and uno-bot's gated writer, which writes a blueprint revision through the authoring RPCs once a confirmer its card names presses ✅. All other consumers are read-only.
 - Supabase is also the candidate dummy backend for prototypes needing persistence — separate schema, never mixed with blueprint tables.
 
@@ -1132,13 +1132,13 @@ Drafting follows the same routing, not just answering: `skills/uno-synthesize` q
 
 <!-- canonical per ADR-017 (docs/adr/) · a scheduled action, read through read_reference as `blueprint-upkeep` · the code is agents/uno-bot/src/blueprint-upkeep/; the writer it stages is ADR-034's. -->
 
-Each end of day the `blueprint-shipped-N` jobs read the Roadmap cards that reached `Design Status: Shipped` or `Dev Status: Deployed` since the last run and weigh each through the service-change gate: a judgement that the card or its PRD changes who does what, or when, AND a confident `search_blueprint` match. A card failing either gets nothing. A card passing both gets one **blueprint revision** for every `scenario › path` matched, each drafted on the grind tier by the `blueprint-draft-N` jobs, and is weighed once per status. A deploy whose design hand-off was drafted promotes those rows instead. Work left over at the end of a night waits for the next.
+Each end of day the `blueprint-shipped-N` jobs read the Roadmap cards that reached `Design Status: Shipped` or `Dev Status: Deployed` since the last run and weigh each through the service-change gate: a judgement that the card or its PRD changes who does what, or when, AND a confident `search_blueprint` match. A card failing either gets nothing. A card passing both gets one **blueprint revision** for every `scenario › path` matched, each drafted on the grind tier by the `blueprint-draft-N` jobs, and is weighed once per status. A deploy whose design hand-off was drafted promotes those cells instead, then drafts the same path again against the card's words as they are now and adds any cell that differs to the same promotion. Work left over at the end of a night waits for the next.
 
-The next morning, `blueprint-revision-post` hands each revision to the sweep's message at the card's place (`agents/uno-bot/scheduled-actions/sweep/ACTION.md` § One message a place): the pillar's team channel, else #plus-design. Each card is numbered; past the carousel's ten the message says "+N more in the thread" and `blueprint-revision-thread` posts those there. The card has six parts — `scenario › path` and the status change; why now (the RM-ID, its Roadmap status, one quoted sentence, a link); today's `step (lane)` rows with a link into the blueprint app; the proposed rows, added, changed, deprecated or promoted; confidence and what could not be verified; the ask. The why-now line speaks the Roadmap's words and every other part the blueprint's. In the thread uno-bot tags the card's owner with each thing a draft could not verify.
+The next morning, `blueprint-revision-post` hands each revision to the sweep's message at the card's place (`agents/uno-bot/scheduled-actions/sweep/ACTION.md` § One message a place): the pillar's team channel, else #plus-design. Each revision is numbered; past the carousel's ten the message says "+N more in the thread" and `blueprint-revision-thread` posts those there. A revision has six parts — `scenario › path` and the status change; why now (the RM-ID, its Roadmap status, one quoted sentence, a link); today's cells as `step (lane)` with a link into the blueprint app; the proposed cells, added, changed, deprecated or promoted; confidence and what could not be verified; the ask, which names who may approve by mention. The why-now line speaks the Roadmap's words and every other part the blueprint's. In the thread uno-bot tags the Roadmap card's owner with each thing a draft could not verify.
 
-Only the card's owner or Bill can approve it — the card names exactly those two, standing confirmers left out. Approve writes the rows as uno-bot through the authoring RPCs, all or none (ADR-034). Reject, or 72 hours undecided, writes nothing. A reply in the thread from the owner or Bill redrafts that card in place — start it with the card's number (`2: …`) when they may approve several — and so does Review's Needs changes. A change that needs a new step or lane is named under what could not be verified and left for a person, who adds the step or lane through `writers/blueprint`.
+Only the Roadmap card's owner or the deployment's lead (`LEAD_USER_ID`) can approve a revision — it names exactly those two, standing confirmers left out. Approve writes the cells as uno-bot through the authoring RPCs, all or none (ADR-034). Reject, or 72 hours undecided, writes nothing. A reply in the thread from either of them redrafts that revision in place — start it with the revision's number (`2: …`) when they may approve several — and so does Review's Needs changes. A change that needs a new step or lane is named under what could not be verified and left for a person, who adds the step or lane through `writers/blueprint`.
 
-A **proposal** drawn on the blueprint from a conversation (a `proposed` variant path beside today's) comes off only on a removal card that its requester alone approves. The card goes up in the proposal's own thread when the requester replies there with a short ask such as "remove it", and once from the morning's `blueprint-proposal-offer` check when no Roadmap card has been linked to the proposal in 30 days; only an unlinked proposal is offered. Approve deletes its cells, then its path, as uno-bot (ADR-034). Reject, or no answer in its window (24 hours for an ask, 4 days for the check's offer), keeps it, and the check offers each proposal once. Anyone else's "remove it" is an ordinary turn.
+A **proposal** drawn on the blueprint from a conversation (a `proposed` variant path beside today's) comes off only on a removal card that its requester alone approves. The card goes up in the proposal's own thread when the requester replies there with a short ask such as "remove it", and once, when no Roadmap card has been linked to the proposal in 30 days, on the morning sweep's message in that thread (the `blueprint-proposal-offer` check hands it over); only an unlinked proposal is offered, and an offer whose message or card did not go up is made again the next morning. Approve deletes its cells, then its path, as uno-bot (ADR-034). Reject, or no answer in its window (24 hours for an ask, 4 days for the check's offer), keeps it, and the check offers each proposal once. Anyone else's "remove it" is an ordinary turn.
 
 
 

@@ -142,26 +142,18 @@
  * against fewer — a doc genuinely deleted or re-declared shrinks the corpus
  * without the bundler being wrong.
  *
- * ── THE THIRD SCOPE: THE ACTIONS PROMPTS (#425, built 2026-09-05) ────────────
+ * ── THE THIRD SCOPE: THE HEADLESS PROMPTS (#425, built 2026-09-05) ─────────
  *
- * uno has three embodiments, and the two scopes above cover two of them. The
- * third — headless GitHub Actions — runs on `scripts/prompts/**\/*.md`: five
- * adapter `SKILL.md`s, their `references/`, and the shared headless-intake
- * contract. They were outside every sweep for a structural reason, not an
- * oversight: both scopes above take their corpus from the bundler's walk, and
- * the Actions prompts are never bundled. They also carry no `embodiment:`
- * frontmatter, on purpose (#417 § Embodiment stays a document property): the
- * constitution already names the runtime, and the prompts reach a model by
- * their own loader. Faking the key onto them to ride the bundler's walk would
- * have been a second membership rule dressed as the first, so instead the
- * corpus is listed by where it lives — `scripts/lib/actions-prompts.mjs` walks
- * the loader's own root, and the harness name sweep reads the same list.
+ * The two scopes above take their corpus from the bundler's walk; the
+ * headless prompts under `scripts/prompts/**\/*.md` are never bundled and
+ * carry no `embodiment:`, so the corpus is listed by where it lives —
+ * `scripts/lib/actions-prompts.mjs` walks it, and the harness name sweep
+ * reads the same list. What is left there is the shared headless-intake
+ * contract an automation filing GitHub issues follows; the GitHub Actions
+ * adapters and their loader are deleted.
  *
- * IT READS WHOLE FILES, like the IDE scope, and for the same kind of reason:
- * the adapters reach the model as a `prompt-file:` handed over whole by the
- * sweep workflows, frontmatter included, so a ban in a `description:` there is
- * text the model is told. (The two implement adapters, which went through
- * `skill-loader.js`'s narrower route, were deleted with their build Actions.)
+ * IT READS WHOLE FILES, like the IDE scope: the contract is agent-facing text
+ * from its first line.
  * Measured at #425: 7 docs carrying 68 prohibition tokens —
  * 42 of them in the two implement adapters, which predate the operations rule
  * that adapters carry loop mechanics only and are due a rewrite when next
@@ -303,18 +295,15 @@ export const SCOPES = [
   },
   {
     key: 'actions',
-    noun: 'Actions prompts',
+    noun: 'headless prompts',
     corpus:
-      'the headless GitHub Actions prompts under scripts/prompts/ — every .md the skill-loader ' +
-      'root holds: the adapter SKILL.mds, their references/, and the shared headless-intake contract. ' +
-      'Listed by where they live, since they carry no embodiment: and are never bundled (#425)',
-    // Not from the bundler's sets at all — the third embodiment has its own
-    // loader, and this is its own walk (scripts/lib/actions-prompts.mjs).
+      'the headless prompts under scripts/prompts/ — every .md there: the shared headless-intake ' +
+      'contract. Listed by where they live, since they carry no embodiment: and are never bundled (#425)',
+    // Not from the bundler's sets at all: its own walk (scripts/lib/actions-prompts.mjs).
     files: () => actionsPromptFiles(),
     read: (text) => text,
     measuredOn:
-      'whole files, frontmatter included — the sweep workflows hand a SKILL.md to the model as a ' +
-      'prompt-file: with nothing stripped',
+      'whole files, frontmatter included — the contract is agent-facing from its first line',
   },
 ];
 

@@ -202,11 +202,11 @@ seven-generator composite `check:agent` — declare `kind: 'spawn'` and the reas
 in the same row, and a row declaring neither fails the gate rather than being
 run on a guess (#509).
 
-All three embodiments are swept, not two: the headless Actions prompts under
-`scripts/prompts/` are a subject of the negation ratchet (`check:negation`, its
-`actions` scope) and of the harness name sweep (the Worker's
+The headless prompts under `scripts/prompts/` — the shared headless-intake
+contract — are swept too: a subject of the negation ratchet (`check:negation`,
+its `actions` scope) and of the harness name sweep (the Worker's
 `harness-blueprint-names` test), listed by where they live because they carry
-no `embodiment:` and reach a model by their own loader rather than the bundle (#425).
+no `embodiment:` and sit outside the bundle (#425).
 
 When it reports a generated artifact as stale, the fix is always to regenerate
 and commit:

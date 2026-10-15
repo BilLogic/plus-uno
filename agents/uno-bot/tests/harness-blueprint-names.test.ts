@@ -25,15 +25,15 @@
 // the assembly rather than a list of paths means a doc added to the prompt is
 // swept the day it is added, with nothing to remember.
 //
-// THE THIRD SUBJECT IS THE ACTIONS PROMPTS (#425). uno has three embodiments
-// and the two subjects above are the Worker's. The headless GitHub Actions
-// prompts under `scripts/prompts/` reach a model by their own loader, never
-// the bundler, and carry no `embodiment:` on purpose — so until #425 no sweep
-// could name them and none did. They are listed by where they live: the walk
-// is `scripts/lib/actions-prompts.mjs`, shared with `check:negation`'s third
-// scope, and imported here by file URL because this test's compiled twin runs
-// from `.test-build/` where a relative import cannot reach the repo root. The
-// same two sweeps run over them, sentence-scoped with the same exemption.
+// THE THIRD SUBJECT IS THE HEADLESS PROMPTS (#425). The two subjects above
+// are the Worker's. What is left under `scripts/prompts/` — the shared
+// headless-intake contract an automation filing GitHub issues follows — is
+// never bundled and carries no `embodiment:`, so it is listed by where it
+// lives: the walk is `scripts/lib/actions-prompts.mjs`, shared with
+// `check:negation`'s third scope, and imported here by file URL because this
+// test's compiled twin runs from `.test-build/` where a relative import cannot
+// reach the repo root. The same two sweeps run over it, sentence-scoped with
+// the same exemption.
 //
 // THE FOURTH SUBJECT IS THE RUNTIME NOTES (#443). A tool RESULT carries prose
 // too — the conflict note and index note `search_blueprint` attaches, the
@@ -294,7 +294,7 @@ test("no removed convention survives as an instruction", () => {
   assert.deepEqual(found, []);
 });
 
-test("the Actions prompts name no retired identifier and keep no removed convention", async () => {
+test("the headless prompts name no retired identifier and keep no removed convention", async () => {
   const { ACTIONS_PROMPTS_DIR, actionsPromptFiles } = await actionsPrompts();
   const files = actionsPromptFiles();
   assert.ok(files.length > 0, "an empty Actions corpus is a broken walk, not a clean repo");

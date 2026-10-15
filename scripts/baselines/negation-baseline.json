@@ -72,8 +72,8 @@
       }
     },
     "actions": {
-      "corpus": "the headless GitHub Actions prompts under scripts/prompts/ — every .md the skill-loader root holds: the adapter SKILL.mds, their references/, and the shared headless-intake contract. Listed by where they live, since they carry no embodiment: and are never bundled (#425)",
-      "measuredOn": "whole files, frontmatter included — the sweep workflows hand a SKILL.md to the model as a prompt-file: with nothing stripped",
+      "corpus": "the headless prompts under scripts/prompts/ — every .md there: the shared headless-intake contract. Listed by where they live, since they carry no embodiment: and are never bundled (#425)",
+      "measuredOn": "whole files, frontmatter included — the contract is agent-facing from its first line",
       "docs": 1,
       "counts": {
         "scripts/prompts/references/headless-intake.md": 3
