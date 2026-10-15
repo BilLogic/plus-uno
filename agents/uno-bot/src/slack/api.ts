@@ -237,7 +237,7 @@ export async function conversationsMembers(env: Env, channel: string, limit = 10
  *  unarchived conversations of `types` uno-bot is a member of, the first
  *  unless `cursor` names the next. */
 export async function botConversations(env: Env, types: string, cursor?: string, limit = 200) {
-  return slackGet<SlackResponse & { channels?: SlackConversation[]; response_metadata?: { next_cursor?: string } }>(
+  return slackGet<SlackChannelPage>(
     env,
     "users.conversations",
     { types, exclude_archived: "true", limit: String(limit), ...(cursor ? { cursor } : {}) },
@@ -256,19 +256,23 @@ export interface SlackConversation {
   is_member?: boolean;
 }
 
+/** One page of a channel list, as users.conversations and conversations.list
+ *  both return it. */
+export type SlackChannelPage = SlackResponse & { channels?: SlackConversation[]; response_metadata?: { next_cursor?: string } };
+
 /** conversations.info via the bot token — what kind of conversation this is. */
 export async function conversationsInfo(env: Env, channel: string) {
   return slackGet<SlackResponse & { channel?: SlackConversation }>(env, "conversations.info", { channel });
 }
 
-/** conversations.list via the bot token — one page of up to 1000 unarchived
- *  channels of `types`, the first unless `cursor` names the next. A private
- *  channel is listed only when the bot is in it. */
-export async function conversationsList(env: Env, types: string, cursor?: string) {
-  return slackGet<SlackResponse & { channels?: SlackConversation[]; response_metadata?: { next_cursor?: string } }>(
+/** conversations.list via the bot token — one page of up to `limit`
+ *  unarchived channels of `types`, the first unless `cursor` names the next.
+ *  A private channel is listed only when the bot is in it. */
+export async function conversationsList(env: Env, types: string, cursor?: string, limit = 200) {
+  return slackGet<SlackChannelPage>(
     env,
     "conversations.list",
-    { types, exclude_archived: "true", limit: "1000", ...(cursor ? { cursor } : {}) },
+    { types, exclude_archived: "true", limit: String(limit), ...(cursor ? { cursor } : {}) },
   );
 }
 

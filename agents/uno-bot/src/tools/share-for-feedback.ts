@@ -30,12 +30,12 @@
 
 import type { Env } from "../types";
 import type { SlackContext } from "../types";
-import { botConversations, conversationsInfo, conversationsList, postMessage, type SlackConversation } from "../slack/api";
+import { botConversations, conversationsInfo, conversationsList, postMessage, type SlackChannelPage, type SlackConversation } from "../slack/api";
 import { channelMembers, MEMBER_PAGES } from "../slack/channel-members";
 import { budgetHeadroom } from "../net";
 import { DM_CONVERSATION } from "../thread-state/index";
 import { isTestOrigin, teamPostChannel, testChannelIdsOf } from "../usage/record";
-import { channelRefText, fieldsFromInput, renderShareout, shareoutChannelRef } from "./share-out-render";
+import { channelRefText, fieldsFromInput, renderShareout, shareoutChannelRef, type ShareoutChannelRef } from "./share-out-render";
 
 /** Where a share-out posts: the channel, the thread when it stays in the asking
  *  one, and how the result and the card name the place. */
@@ -97,8 +97,9 @@ export type ChannelLookup = ShareoutChannel | "missing" | "unfinished" | "failed
 
 /** What a share-out to a named channel reads of Slack. */
 export interface ShareoutReads {
-  /** Whether the turn's subrequest budget still covers a whole check. */
-  affordable(): boolean;
+  /** Whether the turn's subrequest budget still covers checking `ref`: free
+   *  when it was read already, a whole check otherwise. */
+  affordable(ref: ShareoutChannelRef): boolean;
   channelById(id: string): Promise<ChannelLookup>;
   channelByName(name: string): Promise<ChannelLookup>;
   /** The channel's member ids, or null when Slack would not say. */
@@ -109,8 +110,8 @@ export interface ShareoutReads {
 const BOT_CHANNEL_PAGES = 2;
 /** Pages of public channels a `#name` is looked for in after them. */
 const PUBLIC_CHANNEL_PAGES = 4;
-/** Channels asked for per page: Slack's most. */
-const CHANNEL_PAGE_LIMIT = 1000;
+/** Channels asked for per page: Slack documents the limit as under 1000. */
+const CHANNEL_PAGE_LIMIT = 999;
 
 /** The most subrequests one named-channel decision spends: the pages of both
  *  channel lists and the pages of members. */
@@ -148,8 +149,10 @@ export function shareoutReadsFor(env: Env): ShareoutReads {
   };
 
   return {
-    // A check already read this turn costs nothing more to read again.
-    affordable: () => byId.size + byName.size > 0 || budgetHeadroom().subrequests >= SHAREOUT_CHANNEL_CHECK_COST,
+    // A channel already read this turn costs nothing more to read again; any
+    // other one is a whole check.
+    affordable: (ref) =>
+      ("id" in ref ? byId.has(ref.id) : byName.has(ref.name)) || budgetHeadroom().subrequests >= SHAREOUT_CHANNEL_CHECK_COST,
     channelById: (id) =>
       once(byId, id, async () => {
         const res = await conversationsInfo(env, id).catch(() => null);
@@ -185,34 +188,35 @@ export function shareoutReadsFor(env: Env): ShareoutReads {
         const found =
           typeof own === "object"
             ? { ...own, botIsMember: true }
-            : await channelInList(name, PUBLIC_CHANNEL_PAGES, (cursor) => conversationsList(env, "public_channel", cursor));
+            : await channelInList(name, PUBLIC_CHANNEL_PAGES, (cursor) => conversationsList(env, "public_channel", cursor, CHANNEL_PAGE_LIMIT));
         if (typeof found === "object") {
           byId.set(found.id, Promise.resolve(found));
           return found;
         }
-        return found === "missing" && own === "missing" ? "missing" : found === "failed" ? "failed" : "unfinished";
+        if (found === "failed") return found;
+        // Missing only when both lists were read to their end.
+        return found === "missing" && own === "missing" ? "missing" : "unfinished";
       }),
     members: (channel) => once(members, channel, () => channelMembers(env, channel).catch(() => null)),
   };
 }
 
-/** One page of a channel list, as both Slack list methods return it. */
-type ChannelPage = { ok: boolean; error?: unknown; channels?: SlackConversation[]; response_metadata?: { next_cursor?: string } };
-
 /**
- * The channel called `name` in a list read page by page, `pages` at most. A
- * failed read names its reason in the log once, here: a refusal that says
- * only "couldn't look up" otherwise leaves nothing to tell a rate limit from
- * a missing scope.
+ * The channel called `name` in a list read page by page, `pages` at most.
+ *
+ * A Slack refusal is already in the log: `slackGet` warns with Slack's error
+ * (`ratelimited` on a 429, `missing_scope`, a non-JSON status). The one thing
+ * it does not report is a throw — the turn's subrequest budget stopping the
+ * call — so that is warned here, once, rather than read as a silent "failed".
  */
-async function channelInList(name: string, pages: number, read: (cursor?: string) => Promise<ChannelPage>): Promise<ChannelLookup> {
+async function channelInList(name: string, pages: number, read: (cursor?: string) => Promise<SlackChannelPage>): Promise<ChannelLookup> {
   let cursor: string | undefined;
   for (let page = 0; page < pages; page++) {
-    const res: ChannelPage = await read(cursor).catch((err: unknown) => ({ ok: false, error: err instanceof Error ? err.message : String(err) }));
-    if (!res.ok) {
-      console.warn(`[shareout] looking up #${name} failed: ${String(res.error ?? "unknown")}`);
-      return "failed";
-    }
+    const res = await read(cursor).catch((err: unknown) => {
+      console.warn(`[shareout] looking up #${name} stopped: ${err instanceof Error ? err.message : String(err)}`);
+      return null;
+    });
+    if (!res?.ok) return "failed";
     const hit = (res.channels ?? []).find((c) => c.name === name);
     const found = hit ? channelOf(hit) : null;
     if (found) return found;
@@ -265,7 +269,7 @@ export async function decideShareoutPlace(
   const asked = channelRefText(ref);
   // A DM id is refused unread: the bot holds no `im:read` to look one up.
   if ("id" in ref && ref.id.startsWith("D")) return refuse(`${asked} is a DM, not a channel.`);
-  if (!reads.affordable()) return refuse(`I've used this turn's Slack lookups before I could check ${asked} — ask me again.`);
+  if (!reads.affordable(ref)) return refuse(`I've used this turn's Slack lookups before I could check ${asked} — ask me again.`);
   const found = "id" in ref ? await reads.channelById(ref.id) : await reads.channelByName(ref.name);
   if (found === "failed") return refuse(`I couldn't look up ${asked} — paste its link and I'll try again.`);
   if (found === "unfinished") return refuse(`I couldn't find ${asked} in the channels I read — paste its link and I'll check it.`);

@@ -86,12 +86,14 @@ describe("the Slack reads behind a share-out to a named channel", () => {
       botIsMember: false,
     });
     assert.deepEqual(calls, ["conversations.info"]);
+    await withinBudget();
   });
 
   it("reads a channel Slack does not show the bot as missing, and a failed read as failed", async () => {
     const reads = await readsFor();
     assert.equal(await reads.channelById("G0HIDDEN01"), "missing");
     assert.equal(await reads.channelById("C0FLAKY001"), "failed");
+    await withinBudget();
   });
 
   it("finds a channel the bot is in among its own channels, in one read", async () => {
@@ -170,7 +172,7 @@ describe("the Slack reads behind a share-out to a named channel", () => {
     const reads = await readsFor();
     assert.equal(await reads.channelByName("design-crit"), "failed");
     assert.deepEqual(calls, ["users.conversations"]);
-    assert.ok(warnings.some((w) => /#design-crit/.test(w) && /ratelimited/.test(w)), warnings.join("\n"));
+    assert.ok(warnings.some((w) => /users.conversations/.test(w) && /ratelimited/.test(w)), warnings.join("\n"));
     await withinBudget();
   });
 
@@ -179,7 +181,7 @@ describe("the Slack reads behind a share-out to a named channel", () => {
     listPages = [empty("1"), { status: 200, body: { ok: false, error: "missing_scope" } }];
     const reads = await readsFor();
     assert.equal(await reads.channelByName("design-crit"), "failed");
-    assert.ok(warnings.some((w) => /#design-crit/.test(w) && /missing_scope/.test(w)), warnings.join("\n"));
+    assert.ok(warnings.some((w) => /conversations.list/.test(w) && /missing_scope/.test(w)), warnings.join("\n"));
     await withinBudget();
   });
 
@@ -194,5 +196,35 @@ describe("the Slack reads behind a share-out to a named channel", () => {
     await reads.members("C0CRIT0001");
     // The name's lookup answers for its id too.
     assert.deepEqual(calls, ["users.conversations", "conversations.members"]);
+    await withinBudget();
+  });
+
+  it("counts a channel already read as free, and any other one as a whole check", async () => {
+    const { runMetered, withSubrequestLimit } = await import("../src/net.js");
+    const { SHAREOUT_CHANNEL_CHECK_COST } = await load();
+    botPages = [{ channels: [{ id: "C0CRIT0001", name: "design-crit" }] }];
+    await runMetered(() =>
+      withSubrequestLimit(SHAREOUT_CHANNEL_CHECK_COST, async () => {
+        const reads = await readsFor();
+        assert.equal(reads.affordable({ name: "design-crit" }), true);
+        await reads.channelByName("design-crit");
+        // One read spent: a second, different name no longer fits.
+        assert.equal(reads.affordable({ name: "design-crit" }), true);
+        assert.equal(reads.affordable({ id: "C0CRIT0001" }), true);
+        assert.equal(reads.affordable({ name: "big-room" }), false);
+      }),
+    );
+  });
+
+  it("reads a lookup the turn's budget stops as failed, and says so in the log", async () => {
+    const { runMetered, withSubrequestLimit } = await import("../src/net.js");
+    await runMetered(() =>
+      withSubrequestLimit(0, async () => {
+        const reads = await readsFor();
+        assert.equal(await reads.channelByName("design-crit"), "failed");
+      }),
+    );
+    assert.deepEqual(calls, []);
+    assert.ok(warnings.some((w) => /#design-crit stopped/.test(w)), warnings.join("\n"));
   });
 });

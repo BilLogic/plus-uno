@@ -165,9 +165,10 @@ const KEY_FIELDS = 3;
 const SUMMARY_TITLE_CHARS = 80;
 
 /** Labels that name how a call is shaped, not what it writes: a surface, a
- *  section's heading, a link back, where a share-out posts (its verb already
- *  names the place, from the executor's own decision, and the raw `place`
- *  word means nothing to a reader). Never a key in the summary. */
+ *  section's heading, a link back, where a share-out posts. Only
+ *  `shareout_post` takes a `place` or a `channel`, and its verb already names
+ *  the place from the executor's own decision; the raw `place` word means
+ *  nothing to a reader. Never a key in the summary. */
 const SHAPE_LABELS = new Set(["surface", "heading", "source link", "page link", "link", "place", "channel"]);
 
 /** One `• *Label:* value` line of a card's text, with what continues it and
