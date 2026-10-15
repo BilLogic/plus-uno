@@ -20,6 +20,7 @@
 import type { Env } from "../types";
 import { getGoogleAccessToken } from "./auth";
 import { countedFetch } from "../net";
+import { takesThinkingLevel } from "../agent/gemini-tiers";
 
 export interface GeminiResult {
   ok: boolean;
@@ -161,9 +162,9 @@ export async function geminiGenerate(
       maxOutputTokens: opts.maxTokens ?? 2048,
       // thinking_level nests under thinkingConfig on the REST generateContent
       // surface (live 400 confirmed it's not a direct generationConfig field).
-      // Gemini 3.x only — 2.5-gen models reject it ("not supported by this
-      // model", probed 2026-07-16), so it's gated on the model generation.
-      ...(opts.thinkingLevel && /^gemini-3/.test(model)
+      // Gemini 3 and later only — 2.5-gen models reject it ("not supported by
+      // this model", probed 2026-07-16), so it's gated on the model generation.
+      ...(opts.thinkingLevel && takesThinkingLevel(model)
         ? { thinkingConfig: { thinkingLevel: opts.thinkingLevel } }
         : {}),
     },
