@@ -38,6 +38,7 @@ import { sweepShareOffer, SWEEP_SHARE_KEY } from "../src/sweep/share";
 import { FIX_REVIEW_INSTEAD, FIX_SCOPE_REFUSAL, sweepTag } from "../src/sweep/cards";
 import { decisionReport, itemProposal, reportItems, reportRecord } from "../src/slack/decision-cards";
 import { renderProposalCard } from "../src/slack/proposal-render";
+import { cancelNote } from "../src/agent/cancel-note";
 import { parseRepoList, resolveRepo } from "../src/integrations/repo-list.mjs";
 import { executeRelayDm, type RelaySlack } from "../src/tools/relay-dm";
 import {
@@ -2737,4 +2738,46 @@ test("a share-out asked in a test channel says this thread on its card, whatever
   const h = shareoutTurn({ place: "feedback_channel" }, [CHANNEL]);
   const outcome = await runTurn(request({ text: "share the live app prototype for feedback" }), h.deps);
   assert.equal(outcome.staged!.card.verb, "share this for feedback in this thread");
+});
+
+// A cancelled card is not re-proposed on the model's own say-so, but a card
+// that names a DIFFERENT target is a new card: live on r621 a share-out card
+// named #plus-design-feedback, and the way out — cancel it, then "post it
+// here" — was bounced as the same action.
+async function afterCancel(note: string, toolCalls: Array<{ name: string; args: Record<string, unknown> }>) {
+  const threadState = createInMemoryThreadState();
+  await threadState.appendHistory(REF, { role: "user", content: "share the live app prototype for feedback" });
+  await threadState.appendHistory(REF, { role: "assistant", content: note });
+  const h = harness({ threadState, replies: [{ text: "Staging it again.", toolCalls }] });
+  return runTurn(request({ text: "post it here in this thread instead" }), h.deps);
+}
+
+const shareout = (args: Record<string, unknown> = {}) => ({
+  name: "shareout_post",
+  args: { summary: "The live app prototype, ready for a first round.", ...args },
+});
+
+test("a cancelled share-out re-staged for another place is a new card", async () => {
+  const outcome = await afterCancel(cancelNote("shareout_post", {}), [shareout({ place: "here" })]);
+  assert.equal(outcome.disposition, "staged");
+  assert.equal(outcome.staged!.card.verb, "share this for feedback in this thread");
+});
+
+test("a cancelled share-out re-staged for the same place is still not re-proposed", async () => {
+  const outcome = await afterCancel(cancelNote("shareout_post", { place: "feedback_channel" }), [shareout()]);
+  assert.equal(outcome.disposition, "asked");
+  assert.match(outcome.posted ?? "", /You cancelled that share this for feedback a moment ago/);
+});
+
+test("a cancelled intake re-staged on another repo is a new card, and on the same repo is not", async () => {
+  const issue = (repo: string) => ({ name: "github_issue_create", args: { title: "Button drift", body: "b", repo } });
+  const moved = await afterCancel(cancelNote("github_issue_create", { repo: "BilLogic/plus-uno" }), [issue("example-org/harness")]);
+  assert.equal(moved.disposition, "staged");
+  const same = await afterCancel(cancelNote("github_issue_create", { repo: "plus-uno" }), [issue("BilLogic/Plus-Uno")]);
+  assert.equal(same.disposition, "asked");
+});
+
+test("a cancel note from before targets were recorded still holds the tool back", async () => {
+  const outcome = await afterCancel("(Cancelled the proposed shareout_post — nothing was done.)", [shareout({ place: "here" })]);
+  assert.equal(outcome.disposition, "asked");
 });
