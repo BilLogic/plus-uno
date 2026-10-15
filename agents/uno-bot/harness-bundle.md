@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **97,696 chars from 9 files**, against an assembled budget of 175,500 (77,804 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 77,312 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **96,529 chars from 9 files**, against an assembled budget of 175,500 (78,971 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 76,145 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,145 (−7,897 ide-only) | 10,145 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 14,498 | 24,672 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 20,901 | 45,614 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 47,260 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,015 | 48,335 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 54,028 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 65,814 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 16,358 (−5,976 ide-only) | 82,223 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 85,691 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 92,207 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 96,840 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 97,696 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 13,331 | 23,505 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 20,901 | 44,447 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 46,093 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,015 | 47,168 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 52,861 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 64,647 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 16,358 (−5,976 ide-only) | 81,056 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 84,524 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 91,040 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,579 (−1,219 ide-only) | 95,673 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 96,529 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -294,32 +294,8 @@ _Avoid_: "Slackbot"
 uno-bot's own always-loaded document: voice, audience, gate and etiquette, beside what every embodiment obeys.
 _Avoid_: "system prompt", "soul"
 
-**Diagnostics**:
-uno-bot's probes: the public blueprint health probe and the token-gated debug probes, sharing one report shape. Separate from the plain uptime check.
-_Avoid_: "the debug routes"
-
-**ThreadState**:
-uno-bot's memory of one thread, behind one typed interface: its history, the pending proposal, the assistant context, the cancel flag, the events already handled and the run lease.
-_Avoid_: "the DO", "thread-state client"
-
-**ModelProvider**:
-The seam between uno-bot's one agent loop and a model: one adapter per model, each answering a turn or a one-shot prompt on a named tier.
-_Avoid_: "the provider loop", "provider lane", "Gemini lane", "Claude lane", "model lane", "both lanes" (there is one loop, adapters behind one seam — and **lane** is the blueprint's actor row)
-
-**tool table**:
-The one typed row per uno-bot tool: its **access**, which says whether a call runs at once, waits for approval on a proposal card, or settles a card already standing (a dispatch distinction, not read/write), plus what the rest of the bot reads off it: the words on its task or proposal card, whether an answer can cite it, and what review a run asks for.
-_Avoid_: "the tool registry", "the tool list"
-
-**Turn**:
-One uno-bot turn: one request in (who, where, the text, the images, the pending proposal), one outcome out (what was posted, what is staged, what the conversation remembers). What a person sees while it runs goes through its **Delivery** port.
-_Avoid_: "the handler", "the message pipeline"
-
-**Gate**:
-The one place a staged proposal is resolved: any of five approval signals in, one verdict out (won, stale or none), and only a won verdict runs the tool.
-_Avoid_: "the confirmation gate", "the ✅ handler"
-
 **proposal card**:
-The ⚠️ card holding a side-effect tool call until someone approves it: what **Gate**'s signals resolve. Short in the thread, decided in its Review pop-up.
+The ⚠️ card holding a side-effect tool call until someone approves it: short in the thread, decided in its Review pop-up.
 _Avoid_: "confirmation dialog", "prompt"
 
 **superseded card**:
@@ -327,7 +303,7 @@ A proposal card retired by a revision staged later in the same thread, or the mo
 _Avoid_: "expired card"
 
 **sweep**:
-The end-of-day read of every source uno-bot watches for **drift** and each **commitment**, a task someone took on; fixes post next morning as **proposal cards**.
+The end-of-day read of every source uno-bot watches, DMs with it included, for **drift** and each **commitment** (a task someone took on); the next weekday morning posts one **decision card** a place.
 _Avoid_: "digest", "scan"
 
 **relayed DM**:
@@ -358,12 +334,57 @@ The Slack plan a person watches while a turn's lookups run: a **task card** per 
 _Avoid_: "plan stream", "progress surface", "steps"
 
 **result table**:
-The sortable table beneath an answer, filled by code from one lookup's rows on fields the model picked. One per answer; not a Markdown table or the **tool table**.
+The sortable table beneath an answer, filled by code from one lookup's rows on fields the model picked. One per answer; not a Markdown table.
 _Avoid_: "card table", "data table"
 
 **source** / **Sources box**:
 A **source** is a link a lookup of the same turn returned, which an answer stands on; the **Sources box** lists them beneath the answer in Slack, and is a single `Source:` line in Figma.
 _Avoid_: "citation", "reference", "Sources:" line in the answer text
+
+**Capture** / **Reconcile** / **Follow through**:
+The three families of unprompted work: was it written down, do the sources agree, did it get done. DM Capture is the opt-in switch that adds a person's own DMs to Capture.
+_Avoid_: "capture" for logging a lesson
+
+**DS precedence**:
+uno-storybook > BS4 Foundation library > Figma spec pages: the rule Reconcile settles a design-system disagreement by, and its weekly check; the loser gets an intake.
+
+**le goat**:
+uno-bot's name in Slack and Figma (🐐), the one people @-mention.
+_Avoid_: "GOAT" for the **lead**
+
+### Measurement
+
+**usage record**:
+uno-bot's D1 database `uno-bot-usage`; each published number is a saved query in `agents/uno-bot/queries/usage/` (cited below as `usage/`).
+
+**ask** / **turn**:
+A turn is "every message the bot answered, follow-ups included"; an ask is "a turn whose own message opened a thread" (`usage/load-on-lead.sql:10`).
+
+**escalated to the lead**:
+"escalated_to_lead = 1", read from the lead's replies and DMs "by topic" (`usage/load-on-lead.sql:4,20`). Not an **Escalation**.
+
+**settled**:
+"escalated_to_lead known" after the end-of-day pass (`usage/self-serve-rate.sql:15`); the rest are `pending`.
+
+**self-served**:
+"escalated_to_lead = 0 and a resolution of `reaction`", `task_completed` or `no_escalation` (`usage/self-serve-rate.sql:5`).
+_Avoid_: "deflected"
+
+**approved with edits**:
+"✅ on a card whose staged row names the card it revised", or whose Review pop-up edits changed it (`usage/proposal-outcomes.sql:10`).
+
+**test traffic**:
+`test_traffic = 1`: a turn in #uno-bot-sandbox, or a greeting; every query "Excludes: test traffic" (`usage/self-serve-rate.sql:35`).
+
+**measurement window**:
+"2026-09-01 to 2027-01-01, the measurement window" (`usage/load-on-lead.sql:34`), closing at about 100 real asks: `docs/engineering/measurement-window.md`.
+
+**housekeeping**:
+For asks to uno-bot, "housekeeping (1–5 and 7" by pain_category (`usage/load-on-lead.sql:27`); for the lead's inbox, any `what_it_took` but "Needs the lead's judgment" (`agents/uno-bot/measurement/housekeeping-sort/prompt.md`).
+
+**Asks corpus**:
+The Notion database of 2,413 asks to the lead that the housekeeping baseline was counted from (`housekeeping-sort/lib.mjs:13,19`).
+_Avoid_: bare "corpus"
 
 ### Harness
 
@@ -380,7 +401,7 @@ An IDE workflow under `skills/` (`uno-research` … `uno-maintain`): `SKILL.md` 
 _Avoid_: bare "skill" where a **bot skill** could be meant
 
 **bot skill**:
-What uno-bot does for one kind of ask, under `agents/uno-bot/skills/`, named for the action (`draft-a-prd`): its description is always loaded as a **pointer**, its body is read by name, and it ends in one **exit**.
+What uno-bot does for one kind of ask, under `agents/uno-bot/skills/`, named for the action (`draft-a-prd`): its description is always loaded, its body is read by name, and it ends in one **exit**.
 _Avoid_: "Worker face", "bot face", "bot.md"
 
 **exit**:
@@ -406,39 +427,12 @@ The two maintenance severities: a trivial fix committed straight to main, vs a P
 _Avoid_: "Tier 1", "Tier 2"
 
 **Tier 1 / Tier 2 / Tier 3**:
-The loading tiers: always-loaded · on demand · retrieved live. *Tier* means loading and nothing else.
-_Avoid_: "Tier" for a maintenance severity
+The loading tiers: always-loaded · on demand · retrieved live. A model's tier is "model tier", always.
+_Avoid_: "Tier" for a maintenance severity or a model
 
-**check registry**:
-The one list of the repo's checks: each row says what a check runs and where it runs, and every place that runs checks is held to agree with it.
-_Avoid_: "the check list", "COMPOSED"
-
-**pointer**:
-A line held in context that names material outside it and when to reach it: a skill description, a progressive-loading row. Its wording, not its target, decides whether the agent gets there.
-_Avoid_: "link", "reference" (a reference is what a pointer points AT)
-
-**ladder** / **disclosed**:
-Where writing sits by how immediately the agent needs it: in-file step · in-file reference · **disclosed** reference, pushed out of the always-loaded tier behind a pointer and loaded only when it fires. For uno-bot, a doc declares `disclosure: reference` and is read through `read_reference`.
-_Avoid_: "hidden" or "optional" for disclosed
-
-**leading word**:
-A compact pretrained concept an agent thinks with (*tracer bullet*, *red*, *ratchet*): repeated as a token, kept out of sentence form; front-loaded in a pointer so it triggers.
-
-**sprawl**:
-A document too long even when every line is live: attention thins across it. The cure is the ladder, not a shorter sentence.
-_Avoid_: "bloat" (bloat is dead weight; sprawl is live weight)
-
-**corpus**:
-The harness's one reader of repo files: what documents exist and what each one says. Checks ask it rather than the filesystem.
-_Avoid_: "the walker", "the parser" (there is one of each)
-
-**ratchet**:
-A check's recorded baseline: a count may fall and a rise is a finding, an entry the run stops finding is a finding too, and a missing record fails loudly.
-_Avoid_: "the whitelist", "the exceptions file", "the allow-list"
-
-**judge**:
-The Worker's pre-send check that grades a draft against the bot-answer rubric: `pass`, `fail`, `skip` or `error`. A skip fails open, so it carries its reason.
-_Avoid_: "the rubric" (that is the document a judge grades against)
+**disclosed**:
+Reference pushed out of the always-loaded tier behind a pointer, loaded only when it fires. For uno-bot, a doc declares `disclosure: reference` and is read through `read_reference`.
+_Avoid_: "hidden", "optional"
 
 ## Two vocabularies — the blueprint speaks service-blueprint, the Roadmap speaks project-management
 

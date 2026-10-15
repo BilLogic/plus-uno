@@ -17,9 +17,9 @@
  * rule: docs/plans/ and todos/ (a plan keeps the words it was written in),
  * docs/adr/ (a decision record keeps the spelling it decided in),
  * docs/knowledge/archive/ (the graveyard), generated artifacts (the bundle is
- * regenerated from the swept sources), and the glossary's own `_Avoid_:`
- * lines, which name the old spelling precisely so this sweep has something
- * to point at.
+ * regenerated from the swept sources), and the `_Avoid_:` lines of the
+ * entries that own a retirement (`OWNERS`), which name the old spelling
+ * precisely so this sweep has something to point at.
  *
  * Each pattern is a MAINTENANCE-only shape: the word beside "Tier" is one only
  * the severity meaning ever took (fix, digest, whitelist, pipeline, apply,
@@ -51,7 +51,8 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(here, '..');
 
 export const REMEDY =
-  '  -> GLOSSARY.md (**direct fix / gated change**, **ModelProvider**) names the current words. The old\n' +
+  '  -> GLOSSARY.md (**direct fix / gated change**) and agents/uno-bot/README.md\n' +
+  '     (**ModelProvider**) name the current words. The old\n' +
   '     spelling may fall out of live docs and may not come back: a maintenance\n' +
   '     "Tier 1" now reads as a LOADING tier to every agent that opens the glossary.';
 
@@ -109,16 +110,19 @@ export const RETIRED = [
 ];
 
 /**
- * The glossary entries that OWN a retired spelling: their `_Avoid_:` line names
- * it precisely so this sweep has something to point at, and so cannot be swept.
- * One entry per retirement — the maintenance severities, and the ModelProvider
- * seam that retired the provider sense of "lane". Matched on the entry's
- * `**Term**:` line; the exemption is that entry's `_Avoid_:` line and no other.
+ * The entries that OWN a retired spelling: their `_Avoid_:` line names it
+ * precisely so this sweep has something to point at, and so cannot be swept.
+ * One entry per retirement, keyed by the file that holds it — the maintenance
+ * severities in the glossary, and the ModelProvider seam that retired the
+ * provider sense of "lane" in the Worker README's § Worker seams, where the
+ * code-seam words moved when the glossary became a glossary only. Matched on
+ * the entry's `**Term**:` line; the exemption is that entry's `_Avoid_:` line
+ * and no other.
  */
-const GLOSSARY_OWNERS = [
-  /^\*\*direct fix \/ gated change\*\*:$/,
-  /^\*\*ModelProvider\*\*:$/,
-];
+export const OWNERS = {
+  'GLOSSARY.md': [/^\*\*direct fix \/ gated change\*\*:$/],
+  'agents/uno-bot/README.md': [/^\*\*ModelProvider\*\*:$/],
+};
 
 /** The file types an agent reads. Tested against the name, as the walk hands it. */
 const SWEPT = ['.md', '.mdx', '.yml', '.yaml', '.json'];
@@ -143,10 +147,11 @@ const skipEntry = (name) => name === 'node_modules' || name.startsWith('.') || n
 export function findingsIn(text, rel = '') {
   const out = [];
   const lines = text.split('\n');
-  let owner = false; // inside a glossary entry that owns a retired spelling
+  const owners = OWNERS[rel];
+  let owner = false; // inside an entry that owns a retired spelling
   lines.forEach((line, i) => {
-    if (rel === 'GLOSSARY.md') {
-      if (TERM.test(line)) owner = GLOSSARY_OWNERS.some((re) => re.test(line));
+    if (owners) {
+      if (TERM.test(line)) owner = owners.some((re) => re.test(line));
       else if (line.trim() === '') owner = false;
       else if (owner && line.startsWith('_Avoid_:')) return;
     }

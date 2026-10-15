@@ -7,7 +7,7 @@
 // It sat in `slack/` until #623, which is what made `gate/gate.ts` — a module
 // declared Slack-free — import a Slack module. The path was the only thing
 // Slack about it: a reaction event sends an emoji NAME, and what that name
-// MEANS on a card is the gate's policy, exactly as GLOSSARY.md's **Gate** entry says.
+// MEANS on a card is the gate's policy, exactly as the **Gate** entry in `agents/uno-bot/README.md` § Worker seams says.
 // The one genuinely Slack-shaped fact, that a typed emoji arrives as either the
 // glyph or the `:shortcode:` depending on the client, is a fact about the input
 // and is handled below rather than delegated.

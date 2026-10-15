@@ -22,6 +22,38 @@ and did.
 
 Because the brain is bundled, **guidance changes reach the bot on `deploy`, not on a push to `main`** (`deploy` runs `bundle:harness` first — see `agents/uno-bot/package.json`). Editing the persona/skills and pushing to `main` alone does **not** reprogram the running bot; you must `wrangler deploy`.
 
+### Worker seams
+
+The words the Worker's code is organised by; `GLOSSARY.md` keeps the words people use about the bot.
+
+**Turn**:
+One uno-bot turn (`agents/uno-bot/src/turn/`): one request in (who, where, the text, the images, the pending proposal), one outcome out (what was posted, what is staged, what the conversation remembers). What a person sees while it runs goes through its **Delivery** port.
+_Avoid_: "the handler", "the message pipeline"
+
+**ModelProvider**:
+The seam between uno-bot's one agent loop and a model (`agents/uno-bot/src/agent/model-provider.ts`): one adapter per model, each answering a turn or a one-shot prompt on a named model tier.
+_Avoid_: "the provider loop", "provider lane", "Gemini lane", "Claude lane", "model lane", "both lanes" (there is one loop, adapters behind one seam — and **lane** is the blueprint's actor row)
+
+**tool table**:
+The one typed row per uno-bot tool (`agents/uno-bot/src/agent/tool-table.ts`): its **access**, which says whether a call runs at once, waits for approval on a proposal card, or settles a card already standing (a dispatch distinction, not read/write), plus what the rest of the bot reads off it: the words on its task or proposal card, whether an answer can cite it, and what review a run asks for.
+_Avoid_: "the tool registry", "the tool list"
+
+**Gate**:
+The one place a staged proposal is resolved (`agents/uno-bot/src/gate/`): any of five approval signals in, one verdict out (won, stale or none), and only a won verdict runs the tool.
+_Avoid_: "the confirmation gate", "the ✅ handler"
+
+**ThreadState**:
+uno-bot's memory of one thread, behind one typed interface (`agents/uno-bot/src/thread-state.ts`): its history, the pending proposal, the assistant context, the cancel flag, the events already handled and the run lease.
+_Avoid_: "the DO", "thread-state client"
+
+**judge**:
+The pre-send check that grades a draft against the bot-answer rubric (`agents/uno-bot/src/agent/draft-judge.ts`): `pass`, `fail`, `skip` or `error`. A skip fails open, so it carries its reason.
+_Avoid_: "the rubric" (that is the document a judge grades against)
+
+**Diagnostics**:
+uno-bot's probes (`agents/uno-bot/src/diagnostics/`): the public blueprint health probe and the token-gated debug probes, sharing one report shape. Separate from the plain uptime check.
+_Avoid_: "the debug routes"
+
 ## Model providers — two adapters, one switch
 
 `MODEL_PROVIDER` in `agents/uno-bot/wrangler.toml` selects which adapter answers every turn (`agents/uno-bot/src/agent/run-agent.ts` § `selectProvider` reads it — the one place it is read, asserted by `agents/uno-bot/scripts/provider-read.test.mjs`; every other caller that wants a model, the pre-send draft judge included, takes the provider that function returns):
