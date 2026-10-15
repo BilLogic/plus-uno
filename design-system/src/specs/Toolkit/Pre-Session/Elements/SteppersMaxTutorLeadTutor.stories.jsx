@@ -52,14 +52,16 @@ const ErrorStepper = ({ label = 'Max # of lead tutors', value = '4' }) => (
                 value={value}
                 size="medium"
                 readonly
+                validation="invalid"
                 className="error-stepper-input-group"
             />
         </div>
         <style>{`
-            .error-stepper-input-group .plus-input-group-input {
-                text-align: center;
+            .plus-field.error-stepper-input-group {
                 background-color: var(--color-surface-container-lowest);
-                border-color: var(--color-danger) !important;
+            }
+            .error-stepper-input-group .plus-field__control {
+                text-align: center;
             }
         `}</style>
     </div>

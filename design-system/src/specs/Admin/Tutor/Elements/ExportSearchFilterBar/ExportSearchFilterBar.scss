@@ -27,48 +27,8 @@
         flex: 1;
         min-width: 120px;
         max-width: 400px;
-        height: 100%;
-
-        // Override InputGroup small size to match Figma specs (28px height)
-        .export-search-filter-bar__search-input-group {
-            height: 28px;
-            min-height: 28px;
-
-            // Override input padding to match Figma small size
-            .plus-input-group-input {
-                height: 28px !important;
-                min-height: 28px !important;
-                max-height: 28px !important;
-                padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-sm, 8px);
-                font-size: var(--font-size-body3, 12px);
-                line-height: var(--font-line-height-body3, 1.5);
-                border-top-left-radius: 0 !important;
-                border-bottom-left-radius: 0 !important;
-                margin-left: 0 !important;
-                box-sizing: border-box !important;
-            }
-
-            // Override addon padding to match and ensure connection
-            .plus-input-group-addon {
-                height: 28px !important;
-                min-height: 28px !important;
-                max-height: 28px !important;
-                padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-sm, 8px);
-                border-top-right-radius: 0 !important;
-                border-bottom-right-radius: 0 !important;
-                margin-right: 0 !important;
-                box-sizing: border-box !important;
-            }
-
-            // Ensure no gap between addon and input
-            >*:not(:last-child) {
-                margin-right: 0 !important;
-            }
-
-            >*:not(:first-child) {
-                margin-left: 0 !important;
-            }
-        }
+        // The search is a small InputGroup, whose field box is already the
+        // 28px Figma draws; the icon sits in its Leading slot.
     }
 
     &__filters {
