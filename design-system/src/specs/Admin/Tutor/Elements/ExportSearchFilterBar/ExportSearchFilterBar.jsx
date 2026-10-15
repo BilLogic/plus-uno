@@ -48,11 +48,7 @@ const ExportSearchFilterBar = ({
                 <InputGroup
                     placeholder={searchPlaceholder}
                     onChange={(e) => onSearch && onSearch(e.target.value)}
-                    leadingVisual={
-                        <InputGroup.Text style={{ backgroundColor: 'var(--color-surface, #f9f9fc)' }}>
-                            <i className="fas fa-search" style={{ fontSize: '10px', color: 'var(--color-on-surface-variant, #3f484a)' }} />
-                        </InputGroup.Text>
-                    }
+                    leadingVisual={{ type: 'icon', icon: 'fa-solid fa-magnifying-glass' }}
                     size="small"
                     className="export-search-filter-bar__search-input-group"
                 />

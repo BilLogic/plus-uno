@@ -17,6 +17,15 @@
     --layout-sidebar-width: 164px; /* SideNav fixed width; not a Figma variable (CODE_ONLY_LAYOUT) */
     --layout-grid-gap: 8px; /* Figma Grid/content-gutter (= --size-element-gap-sm); col-* spans assume this */
 
+    /* Stacking layers; not Figma variables (CODE_ONLY_LAYERS) */
+    --layout-z-index-overlay: 1070; /* floating listboxes and menus; above a modal */
+
+    /* Min and max heights — MD values where they differ by breakpoint */
+    --layout-max-height-listbox: 300px; /* Figma Max Heights/listbox */
+    --layout-min-height-card-body: 20px; /* Figma Min Heights/card-body */
+    --layout-min-height-listbox: 140px; /* Figma Min Heights/listbox */
+    --layout-min-height-modal-body: 40px; /* Figma Min Heights/modal-body */
+
     /* Content-grid column spans — MD values; wider breakpoints override below */
     --col-1: 48.67px;
     --col-2: 105.33px;
@@ -34,6 +43,8 @@
 
 @media (min-width: 1024px) {
     :root {
+        --layout-min-height-card-body: 30px; /* Figma Min Heights/card-body */
+        --layout-min-height-modal-body: 50px; /* Figma Min Heights/modal-body */
         --col-1: 55px;
         --col-2: 118px;
         --col-3: 181px;
@@ -51,6 +62,8 @@
 
 @media (min-width: 1440px) {
     :root {
+        --layout-min-height-card-body: 40px; /* Figma Min Heights/card-body */
+        --layout-min-height-modal-body: 60px; /* Figma Min Heights/modal-body */
         --col-1: 89.67px;
         --col-2: 187.33px;
         --col-3: 285px;

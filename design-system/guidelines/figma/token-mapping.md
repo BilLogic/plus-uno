@@ -93,6 +93,16 @@ Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity 
 | Elevation Light/4 (modals) | `var(--elevation-light-4)` |
 | Elevation Light/5 (dialogs) | `var(--elevation-light-5)` |
 
+## Layout Tokens
+
+| Figma Variable | PLUS CSS Token | Notes |
+|----------------|----------------|-------|
+| Min Heights/listbox | `var(--layout-min-height-listbox)` | 140 at every breakpoint; the shortest an option list draws |
+| Max Heights/listbox | `var(--layout-max-height-listbox)` | 300 at every breakpoint, about eight rows; the body scrolls past it |
+| Min Heights/card-body | `var(--layout-min-height-card-body)` | 20 / 30 / 40 at MD / LG / XL |
+| Min Heights/modal-body | `var(--layout-min-height-modal-body)` | 40 / 50 / 60 at MD / LG / XL |
+| — (code only) | `var(--layout-z-index-overlay)` | 1070, the layer floating listboxes and menus draw on: above a modal, level with popovers. Figma has no z-index |
+
 ## Rules for create_design_system_rules
 
 When encoding rules via `create_design_system_rules`, include these conventions:

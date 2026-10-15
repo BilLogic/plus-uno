@@ -189,6 +189,9 @@ export function deriveCandidates(collection, name) {
   }
 
   if (collection.includes('layout')) {
+    // "Min Heights/listbox" -> --layout-min-height-listbox.
+    const height = head.match(/^(Min|Max) Heights$/i);
+    if (height) out.push(`--layout-${height[1].toLowerCase()}-height-${slug(leaf)}`);
     // Grid columns are bare in code (`--col-1`).
     out.push(`--${slug(leaf)}`);
     out.push(`--size-${slug(head)}-${slug(leaf)}`);
