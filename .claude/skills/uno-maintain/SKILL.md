@@ -7,7 +7,7 @@ description: >
   severity pipeline: direct fixes (typos, links, dates only) land straight
   on main, their commit the record; gated changes ship as a PR + PRD pair
   through Slack review to a verdict. Also runs the standing sweeps (staleness,
-  hygiene, shipped watchdog) and settles what finished work leaves behind — a
+  hygiene) and post-ship reconciliation, and settles what finished work leaves behind — a
   rule, an ADR, or nothing. Use when the user says "file an intake", "this doc
   is stale", "the spec and Storybook disagree", "the skill/persona is off",
   "fix this typo", "run the staleness sweep", "document this", "capture this

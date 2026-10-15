@@ -11,7 +11,7 @@
  *
  * Usage:
  *   import { loadSkill } from './lib/skill-loader.js';
- *   const systemPrompt = await loadSkill('uno-integrity-sweep');
+ *   const systemPrompt = await loadSkill('<skill>');
  *
  * This loader does three things:
  *   1. Read the SKILL.md YAML frontmatter through the corpus reader

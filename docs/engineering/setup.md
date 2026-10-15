@@ -173,9 +173,8 @@ throwaway directory instead of the repo. `scripts/check-doc-links.test.mjs` and
 `scripts/check-knowledge-disposition.test.mjs` are the shape to copy, and
 `npm run test:scripts` runs them.
 
-That registry is also the author of the three places that used to state the same
-set by hand: the `check:*` block of `package.json`, the check steps of
-`.github/workflows/harness-integrity-sweep.yml` and those of
+That registry is also the author of the places that used to state the same
+set by hand: the `check:*` block of `package.json` and the check steps of
 `.github/workflows/storybook-gate.yml`. Each carries a generated region between
 markers; run `npm run generate:check-registry` after editing a row, and
 `npm run check:check-registry` fails on drift.
