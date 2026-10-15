@@ -22,7 +22,7 @@ import * as diagnostics from "./diagnostics";
 import { handleFigmaEventsOnEnv } from "./figma-notify/env";
 
 export default {
-  // Cron (wrangler.toml [triggers]). The 09:00 and 00:00 ET firings enqueue
+  // Cron (wrangler.toml [triggers]). The 09:00 and 06:00 ET firings enqueue
   // the morning and end-of-day runs on their own AgentRunner, one job per
   // alarm (src/scheduled/runs.ts); the firing an hour off does nothing. The Figma
   // library poll is one of those jobs now, not work done on every firing.

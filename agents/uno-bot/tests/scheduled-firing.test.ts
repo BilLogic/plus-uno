@@ -1,7 +1,7 @@
 // The cron firing: a scheduled run on two slots, and nothing on the rest.
 //
-// Two triggers fire at each run's two UTC hours: 00:00 ET, the end-of-day
-// run, is 04:00 UTC in EDT and 05:00 in EST, Tuesday to Saturday; 09:00 ET,
+// Two triggers fire at each run's two UTC hours: 06:00 ET, the end-of-day
+// run, is 10:00 UTC in EDT and 11:00 in EST, Tuesday to Saturday; 09:00 ET,
 // the morning run, is 13:00 UTC in EDT and 14:00 in EST, Monday to Friday. The
 // handler reads the scheduled time and enqueues the matching run, dated to the
 // ET day it is for: the end-of-day run to the day it sweeps, the one before.
@@ -29,8 +29,8 @@ import { cronFirings } from "./helpers/cron";
 const at = (hh: number, mm: number): number => Date.UTC(2026, 8, 29, hh, mm);
 /** Tuesday's morning run: 09:00 EDT. */
 const MORNING = at(13, 0);
-/** Tuesday's end-of-day run: Wednesday 00:00 EDT. */
-const MIDNIGHT = Date.UTC(2026, 8, 30, 4, 0);
+/** Tuesday's end-of-day run: Wednesday 06:00 EDT. */
+const END_OF_DAY = Date.UTC(2026, 8, 30, 10, 0);
 
 async function fire(scheduledTime: number) {
   const runs: ScheduledRun[] = [];
@@ -46,7 +46,7 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
   // The dependency set is the whole of what a firing can do.
   const deps: Parameters<typeof onScheduledFiring>[1] = { enqueueRun: async () => {} };
   assert.deepEqual(Object.keys(deps), ["enqueueRun"]);
-  assert.deepEqual(planRun("end-of-day", MIDNIGHT).jobs.map((j) => j.kind), [
+  assert.deepEqual(planRun("end-of-day", END_OF_DAY).jobs.map((j) => j.kind), [
     "figma-library-poll",
     "card-follow-through",
     "figma-drift-recheck",
@@ -70,36 +70,39 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
   ]);
 });
 
-test("in EDT, 13:00 UTC enqueues the morning run and 04:00 UTC the end-of-day run, dated to the day it sweeps", async () => {
+test("in EDT, 13:00 UTC enqueues the morning run and 10:00 UTC the end-of-day run, dated to the day it sweeps", async () => {
   const morning = await fire(MORNING);
   assert.deepEqual(morning.runs.map((r) => [r.name, r.date]), [["morning", "2026-09-29"]]);
 
-  const endOfDay = await fire(MIDNIGHT);
+  const endOfDay = await fire(END_OF_DAY);
   assert.deepEqual(endOfDay.runs.map((r) => [r.name, r.date]), [["end-of-day", "2026-09-29"]]);
 });
 
 test("the runs keep their ET hours on both sides of the 1 Nov 2026 change", async () => {
   // Fri 30 Oct is EDT (UTC-4); Mon 2 Nov is EST (UTC-5). The morning run is
-  // 09:00 ET and the end-of-day run 00:00 ET all year.
+  // 09:00 ET and the end-of-day run 06:00 ET all year.
   const oct30 = (hh: number) => Date.UTC(2026, 9, 30, hh);
   const oct31 = (hh: number) => Date.UTC(2026, 9, 31, hh);
   const nov2 = (hh: number) => Date.UTC(2026, 10, 2, hh);
   const nov3 = (hh: number) => Date.UTC(2026, 10, 3, hh);
   assert.deepEqual(runsForFiring(oct30(13)), ["morning"]);
   assert.deepEqual(runsForFiring(oct30(14)), []);
-  // Friday's work is swept at Saturday 00:00 EDT, 04:00 UTC.
-  assert.deepEqual(runsForFiring(oct31(4)), ["end-of-day"]);
-  assert.deepEqual(runsForFiring(oct31(5)), []);
+  // Friday's work is swept at Saturday 06:00 EDT, 10:00 UTC.
+  assert.deepEqual(runsForFiring(oct31(10)), ["end-of-day"]);
+  assert.deepEqual(runsForFiring(oct31(11)), []);
+  // 00:00 ET starts nothing.
+  assert.deepEqual(runsForFiring(oct31(4)), []);
   assert.deepEqual(runsForFiring(nov2(13)), []);
   assert.deepEqual(runsForFiring(nov2(14)), ["morning"]);
-  // Monday's work is swept at Tuesday 00:00 EST, 05:00 UTC.
-  assert.deepEqual(runsForFiring(nov3(4)), []);
-  assert.deepEqual(runsForFiring(nov3(5)), ["end-of-day"]);
-  const saturday = await fire(oct31(4));
+  // Monday's work is swept at Tuesday 06:00 EST, 11:00 UTC.
+  assert.deepEqual(runsForFiring(nov3(10)), []);
+  assert.deepEqual(runsForFiring(nov3(11)), ["end-of-day"]);
+  assert.deepEqual(runsForFiring(nov3(5)), []);
+  const saturday = await fire(oct31(10));
   assert.deepEqual(saturday.runs.map((r) => [r.name, r.date]), [["end-of-day", "2026-10-30"]]);
   const morning = await fire(nov2(14));
   assert.deepEqual(morning.runs.map((r) => [r.name, r.date]), [["morning", "2026-11-02"]]);
-  const endOfDay = await fire(nov3(5));
+  const endOfDay = await fire(nov3(11));
   assert.deepEqual(endOfDay.runs.map((r) => [r.name, r.date]), [["end-of-day", "2026-11-02"]]);
 });
 
@@ -134,14 +137,14 @@ test("no other firing enqueues a run", async () => {
   assert.deepEqual(runsForFiring(MORNING + 20_000), ["morning"]);
   assert.deepEqual(runsForFiring(at(13, 15)), []);
   // Nor does a firing on a day with no run, whatever a trigger says: Monday
-  // 00:00 ET would sweep a Sunday, and Saturday 09:00 is no morning.
-  assert.deepEqual(runsForFiring(Date.UTC(2026, 9, 5, 4)), []);
+  // 06:00 ET would sweep a Sunday, and Saturday 09:00 is no morning.
+  assert.deepEqual(runsForFiring(Date.UTC(2026, 9, 5, 10)), []);
   assert.deepEqual(runsForFiring(Date.UTC(2026, 9, 3, 13)), []);
 });
 
 test("a failed enqueue is logged and swallowed, not thrown out of the handler", async () => {
   const runs: string[] = [];
-  await onScheduledFiring(MIDNIGHT, {
+  await onScheduledFiring(END_OF_DAY, {
     enqueueRun: async (run) => {
       runs.push(run.name);
       throw new Error("runner down");
@@ -171,7 +174,7 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
     // Both runs purge, so text never outlives its 14 days over a weekend.
     ["usage-text-purge", "usage-text-purge"],
   ]);
-  const endOfDay = planRun("end-of-day", MIDNIGHT);
+  const endOfDay = planRun("end-of-day", END_OF_DAY);
   assert.equal(endOfDay.date, "2026-09-29");
   assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind, j.after]), [
     ["figma-library-poll", "figma-library-poll", undefined],
@@ -209,7 +212,7 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
 });
 
 test("the end-of-day run sweeps each listed channel as its own job, then the group DMs, the DMs, the notes and the cards, before the purge; the morning posts", () => {
-  const endOfDay = planRun("end-of-day", MIDNIGHT, ["C0DESIGN", "C0OTHER"]);
+  const endOfDay = planRun("end-of-day", END_OF_DAY, ["C0DESIGN", "C0OTHER"]);
   const jobs = endOfDay.jobs.map((j) => [j.key, j.kind, j.channel]);
   // The sweep jobs go straight before the purge; what the plan holds after it
   // stays after it.
@@ -231,7 +234,7 @@ test("the end-of-day run sweeps each listed channel as its own job, then the gro
   const morning = planRun("morning", MORNING, ["C0DESIGN"]).jobs;
   assert.equal(morning.some((j) => j.kind === "sweep-channel" || j.kind === "sweep-group-dms" || j.kind === "sweep-dms"), false);
   // A blank list sweeps nothing, the group DMs included.
-  assert.equal(planRun("end-of-day", MIDNIGHT, []).jobs.some((j) => j.key.startsWith("sweep:")), false);
+  assert.equal(planRun("end-of-day", END_OF_DAY, []).jobs.some((j) => j.key.startsWith("sweep:")), false);
 });
 
 test("SWEEP_CHANNELS never includes #uno-bot or a DM, whatever it says", () => {
@@ -241,7 +244,7 @@ test("SWEEP_CHANNELS never includes #uno-bot or a DM, whatever it says", () => {
 
 test("a firing plans the end-of-day sweep over the channels it was handed", async () => {
   const runs: ScheduledRun[] = [];
-  await onScheduledFiring(MIDNIGHT, {
+  await onScheduledFiring(END_OF_DAY, {
     enqueueRun: async (run) => {
       runs.push(run);
     },
@@ -288,7 +291,7 @@ test("the enqueue reaches the run's own runner, and costs one charged hop", asyn
     }),
   };
   const env = { AGENT_RUNNER } as unknown as Env;
-  const run = planRun("end-of-day", MIDNIGHT);
+  const run = planRun("end-of-day", END_OF_DAY);
   const hops = await runMetered(async () => {
     await enqueueScheduledRun(env, run);
     return internalSubrequestsFor("agent-runner");
@@ -298,9 +301,9 @@ test("the enqueue reaches the run's own runner, and costs one charged hop", asyn
   assert.equal(hops, 1);
 });
 
-test("the DS precedence check runs on Friday's end-of-day run only — Saturday 00:00 ET — second, before the batches spend the ceiling", () => {
-  // 2026-10-03 04:00 UTC is Saturday 00:00 EDT, the run that sweeps Friday 2 Oct.
-  const friday = planRun("end-of-day", Date.UTC(2026, 9, 3, 4, 0));
+test("the DS precedence check runs on Friday's end-of-day run only — Saturday 06:00 ET — second, before the batches spend the ceiling", () => {
+  // 2026-10-03 10:00 UTC is Saturday 06:00 EDT, the run that sweeps Friday 2 Oct.
+  const friday = planRun("end-of-day", Date.UTC(2026, 9, 3, 10, 0));
   assert.equal(friday.date, "2026-10-02");
   assert.deepEqual(friday.jobs.slice(0, 2).map((j) => [j.key, j.after ?? []]), [
     ["figma-library-poll", []],
@@ -308,11 +311,11 @@ test("the DS precedence check runs on Friday's end-of-day run only — Saturday 
   ]);
   const without = (at: number) => planRun("end-of-day", at).jobs.map((j) => j.key);
   for (let day = 29; day <= 30; day++) {
-    // Tuesday and Wednesday 00:00 of the same week, which sweep Monday and
-    // Tuesday, and Friday 00:00 below, which sweeps Thursday: no check.
-    assert.equal(without(Date.UTC(2026, 8, day, 4, 0)).includes("ds-precedence-check"), false);
+    // Tuesday and Wednesday 06:00 of the same week, which sweep Monday and
+    // Tuesday, and Friday 06:00 below, which sweeps Thursday: no check.
+    assert.equal(without(Date.UTC(2026, 8, day, 10, 0)).includes("ds-precedence-check"), false);
   }
-  const thursday = Date.UTC(2026, 9, 2, 4, 0);
+  const thursday = Date.UTC(2026, 9, 2, 10, 0);
   assert.equal(without(thursday).includes("ds-precedence-check"), false);
   // The filter spares every other job, the spread-in batches included.
   assert.deepEqual(
@@ -320,12 +323,12 @@ test("the DS precedence check runs on Friday's end-of-day run only — Saturday 
     without(thursday),
   );
   assert.ok(friday.jobs.some((j) => j.kind === "usage-classify"));
-  // In EST too: Saturday 7 Nov 00:00 is 05:00 UTC, and sweeps Friday 6 Nov.
-  const est = planRun("end-of-day", Date.UTC(2026, 10, 7, 5, 0));
+  // In EST too: Saturday 7 Nov 06:00 is 11:00 UTC, and sweeps Friday 6 Nov.
+  const est = planRun("end-of-day", Date.UTC(2026, 10, 7, 11, 0));
   assert.equal(est.date, "2026-11-06");
   assert.equal(est.jobs[1]?.key, "ds-precedence-check");
   // Another weekday's plan, on request, is that weekday's.
-  assert.equal(planRun("end-of-day", MIDNIGHT, [], 5).jobs[1]?.key, "ds-precedence-check");
+  assert.equal(planRun("end-of-day", END_OF_DAY, [], 5).jobs[1]?.key, "ds-precedence-check");
   // A rehearsal in working hours plans the coming night's run: today's.
   assert.equal(planRun("end-of-day", Date.UTC(2026, 9, 2, 19, 0)).jobs[1]?.key, "ds-precedence-check");
   // The post is on every morning, so a morning whose reads fail is retried.
@@ -337,7 +340,7 @@ test("a dry run rehearses one ask-resolution job, not all of them", async () => 
   const original = console.log;
   console.log = (...args: unknown[]) => lines.push(args.join(" "));
   try {
-    for (const job of planRun("end-of-day", MIDNIGHT).jobs.filter((j) => j.kind === "ask-resolution")) {
+    for (const job of planRun("end-of-day", END_OF_DAY).jobs.filter((j) => j.kind === "ask-resolution")) {
       await runScheduledJob({} as Env, job, { dryRun: true, runDate: "2026-09-22" });
     }
   } finally {
@@ -351,7 +354,7 @@ test("wrangler.toml holds the two triggers these tests walk, with named weekdays
   // Cloudflare counts weekday 1 as Sunday, so the days are named, and the
   // helper the schedule tests walk (helpers/cron.ts) models exactly these.
   const toml = readFileSync(resolve(process.cwd(), "wrangler.toml"), "utf8");
-  assert.match(toml, /^crons = \["0 4,5 \* \* TUE-SAT", "0 13,14 \* \* MON-FRI"\]$/m);
+  assert.match(toml, /^crons = \["0 10,11 \* \* TUE-SAT", "0 13,14 \* \* MON-FRI"\]$/m);
 });
 
 test("the sweep's post runs after every morning job that hands it cards, Monday's tidy-up included", () => {

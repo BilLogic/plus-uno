@@ -125,9 +125,9 @@ test("a job cut short by the budget keeps its key and runs before later jobs", a
 });
 
 test("a job is handed its run's date, also when its retry runs on a later calendar day", async () => {
-  // The end-of-day run fires at 00:00 ET and is dated to the ET day it
+  // The end-of-day run fires at 06:00 ET and is dated to the ET day it
   // sweeps, the one before: a job the budget stops, and its retry, run on
-  // the next calendar day, still under the run's date.
+  // a later calendar day, still under the run's date.
   const dates: string[] = [];
   let tripped = false;
   const h = harness(async (job, runDate) => {

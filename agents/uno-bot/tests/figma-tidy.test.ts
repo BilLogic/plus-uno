@@ -867,6 +867,6 @@ describe("the read", () => {
     assert.deepEqual(tidy.at(-1)!.after, reads);
     const tuesday = planRun("morning", Date.parse("2026-10-13T13:00:00Z"));
     assert.deepEqual(tuesday.jobs.filter((j) => j.kind.startsWith("figma-tidy")).map((j) => j.key), ["figma-tidy-post"]);
-    assert.equal(planRun("end-of-day", Date.parse("2026-10-13T04:00:00Z")).jobs.some((j) => j.kind.startsWith("figma-tidy")), false);
+    assert.equal(planRun("end-of-day", Date.parse("2026-10-13T10:00:00Z")).jobs.some((j) => j.kind.startsWith("figma-tidy")), false);
   });
 });
