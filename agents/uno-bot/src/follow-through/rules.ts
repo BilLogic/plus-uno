@@ -8,7 +8,10 @@
 //     Contributor for `UNOWNED_AFTER_MS`. Ready for Design and Need PRD are
 //     queue states, where no owner yet is expected.
 //   • F5 — an active card with a Contributor that has sat in one Design Status
-//     for `STALE_AFTER_MS` with no comment in that time.
+//     for `STALE_AFTER_MS` with no comment in that time. Found any night, it
+//     is first asked on a Monday morning only (`isStaleCheckInMorning`): a
+//     week's stuck cards are one weekly section a place, where F3 and F4 are
+//     asked the next morning, since a missing card or owner needs routing now.
 //
 // Notion does not say when a status or a Contributor last changed, so both are
 // read off the card's `last_edited_time`: a card nobody has edited for a week
@@ -22,6 +25,8 @@
 // are the Roadmap's own options, spelled as the board spells them.
 //
 // PURE: no `Env`, no Slack, no Workers global.
+
+import { etDayOf } from "../sweep/schedule";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -41,6 +46,20 @@ export const CARD_REARM_WORKING_DAYS = 5;
 /** New top-level card questions one channel gets in one morning; the rest
  *  wait a morning. */
 export const MAX_CARD_POSTS_PER_CHANNEL = 2;
+/** The ET weekday F5's first ask goes up on: Monday, as `Date.getUTCDay`
+ *  numbers an ET day. */
+export const STALE_CHECK_IN_WEEKDAY = 1;
+
+/**
+ * Whether a morning run at `now` is the one F5's first asks go up on: the
+ * Monday one. A stuck card found any other night waits for it.
+ *
+ * @param now - The morning run's time, epoch ms
+ */
+export function isStaleCheckInMorning(now: number): boolean {
+  return new Date(etDayOf(now)).getUTCDay() === STALE_CHECK_IN_WEEKDAY;
+}
+
 /** How long an F5 owner's choice of Design Status stays open: a proposal
  *  card's life. */
 export const CHOICE_TTL_MS = 72 * 60 * 60 * 1000;

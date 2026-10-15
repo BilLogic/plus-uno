@@ -26,7 +26,7 @@ export function createInMemoryCommitmentStore(): InMemoryCommitmentStore {
       return copy(rows.get(id));
     },
     async nextDue(now, runDate, skip = {}) {
-      const rank = (r: CommitmentRecord) => (budgetOf(r.kind) === "cards" ? 1 : 0);
+      const rank = (r: CommitmentRecord) => (budgetOf(r.kind) === "asked" ? 0 : 1);
       const due = [...rows.values()]
         .filter(
           (r) =>
@@ -36,7 +36,7 @@ export function createInMemoryCommitmentStore(): InMemoryCommitmentStore {
       return copy(due[0]);
     },
     async remindedOn(runDate) {
-      const counts: Record<ReminderBudget, Record<string, number>> = { asked: {}, cards: {} };
+      const counts: Record<ReminderBudget, Record<string, number>> = { asked: {}, cards: {}, weekly: {} };
       for (const r of rows.values()) {
         if (r.remindedOn !== runDate) continue;
         const b = counts[budgetOf(r.kind)];

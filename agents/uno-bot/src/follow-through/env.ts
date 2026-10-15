@@ -17,7 +17,9 @@
 //   • The hand-off: the cards for a channel's top wait in the morning run's
 //     own runner storage (`JobContext.runStorage`, `handOffIn`), read by exact
 //     key, for the sweep's morning post to put on that channel's report
-//     (`morningFollowUpsFor`). A rehearsal has none, and posts as before.
+//     (`morningFollowUpsFor`); Monday's stuck cards wait under a key of their
+//     own, the weekly section (`weeklyStaleCardsFor`). A rehearsal has none,
+//     and posts as before.
 //   • The thread marks: the sweep card's (`markSweepThread`), so the team's
 //     replies under a follow-up don't start turns; and the follow-up reply
 //     mark (`./reply-mark.ts`), so only a reply in a thread holding an older
@@ -39,7 +41,7 @@ import { threadStateFor } from "../thread-state/production";
 import { gapNotesFor, notionPeopleFor, proposalEventLogFor } from "../usage/production";
 import { throughDirectory } from "./people";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
-import type { SweepSection } from "../sweep/sections";
+import { STALE_CARDS_SECTION, type SweepSection } from "../sweep/sections";
 import type { CommitmentRecord } from "../commitments/store";
 import { TAP_REFUSED, type TapAnswer } from "../commitments/copy";
 import type { ReminderReaction } from "../commitments/run";
@@ -213,6 +215,19 @@ export function morningFollowUpsFor(env: Env, opts: JobContext): SweepSection | 
   return deps ? followUpsForSweep(deps, Date.now(), opts.runDate) : undefined;
 }
 
+/**
+ * Monday's stuck cards the commitment job handed off, for the sweep's morning
+ * post as a weekly section shown whole, or undefined without the bindings.
+ * Every other morning it has nothing waiting.
+ *
+ * @param env - Worker bindings
+ * @param opts - The sweep job's run
+ */
+export function weeklyStaleCardsFor(env: Env, opts: JobContext): SweepSection | undefined {
+  const deps = dueDepsFor(env, opts);
+  return deps ? followUpsForSweep(deps, Date.now(), opts.runDate, { weekly: true }) : undefined;
+}
+
 function dueDepsFor(env: Env, opts: Pick<JobContext, "dryRun" | "runStorage">, botUserId?: string | null): DueDeps | undefined {
   const store = storeFor(env);
   if (!store || !env.HARNESS_KV) return undefined;
@@ -248,7 +263,7 @@ function dueDepsFor(env: Env, opts: Pick<JobContext, "dryRun" | "runStorage">, b
     markThread: (channel, thread) => markSweepThread(kv, channel, thread),
     config: configFor(env, botUserId),
     gaps: gapNotesFor(env),
-    ...(opts.runStorage ? { handOff: handOffIn(opts.runStorage) } : {}),
+    ...(opts.runStorage ? { handOff: handOffIn(opts.runStorage), weeklyHandOff: handOffIn(opts.runStorage, STALE_CARDS_SECTION) } : {}),
     dryRun: opts.dryRun,
   };
 }
