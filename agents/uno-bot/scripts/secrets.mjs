@@ -84,6 +84,11 @@ export const SECRETS = [
     why: "read-only anon key for the uno-blueprint project. Unset, search_blueprint reports \"not configured\" and the bot falls back to cited docs rather than fabricating.",
   },
   {
+    name: "SUPABASE_WRITE_PASSWORD",
+    required: false,
+    why: "password of the uno-bot Auth user (SUPABASE_WRITE_EMAIL in [vars]) on the uno-blueprint project, an rpc_writer: it signs in for a one-hour JWT that opens the authoring RPCs and no table. Set it with scripts/blueprint-writer-wizard.sh. Unset, the bot cannot write the blueprint and reads are unaffected.",
+  },
+  {
     name: "GEMINI_API_KEY",
     required: false,
     forbidden: true,
