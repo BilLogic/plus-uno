@@ -64,7 +64,7 @@ interface GeminiResponseData {
     /** Prefix served from Gemini implicit caching, when it applies. */
     cachedContentTokenCount?: number;
   };
-  error?: { code?: number; message?: string };
+  error?: { code?: number; message?: string; status?: string };
 }
 
 // Capacity/availability statuses a backup model is worth trying on. The
@@ -273,6 +273,7 @@ export function geminiProvider(env: Env): ModelProvider {
           ok: false,
           status,
           message: parsed.error?.message ?? "generateContent failed",
+          ...(parsed.error?.status ? { code: parsed.error.status } : {}),
         };
       }
 

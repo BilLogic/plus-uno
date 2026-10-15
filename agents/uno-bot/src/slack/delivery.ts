@@ -6,8 +6,9 @@
 // #593) and the Delivery adapter does (`slack/delivery-adapter.ts`, #594): the
 // Slack posting client, the streaming switch, the alert channel. `Env` never
 // enters — it is turned into that record once, in `slack/slack-delivery.ts`
-// (and `events.ts` for the one failure path that does not go through Delivery). That is what lets the Node suite DRIVE the
-// answer path rather than read it (`tests/stream-recipient.test.ts`, #654).
+// (and `events.ts` for the one failure path that does not go through
+// Delivery). That is what lets the Node suite DRIVE the answer path rather
+// than read it (`tests/stream-recipient.test.ts`, #654).
 
 import { decideStream, type StreamRecipient } from "./stream-recipient";
 import { answerMessages, deliverAnswer } from "./answer-posts";
@@ -23,23 +24,21 @@ import { answerCardsBlock } from "./answer-cards-block";
 import { textCopy, type Presentation } from "../turn/presentation";
 import { signed } from "../turn/warning-line";
 import { feedbackBlock, type AnswerFeedback } from "./feedback";
+import { isCapacityFailure } from "../agent/model-provider";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
 // exactly how a model-quota outage read as a mystery for an afternoon
-// (2026-07-16). Detect them so the asker gets the plain overloaded line rather
-// than a generic one. Nobody else is pinged from here: the backup model takes
-// over quietly, and an outage that lasts reaches the lead in their own DM
-// (`turn/capacity-outage.ts`).
-const CAPACITY_ERR_RE =
-  /\b429\b|resource[ _]has[ _]been[ _]exhausted|resource_exhausted|\bquota\b|rate[ -]?limit|too many requests|\b503\b|overloaded|unavailable/i;
+// (2026-07-16). The asker gets the plain overloaded line instead, decided by
+// what the model call answered (`isCapacityFailure`: its status, never the
+// words of a message), so the line and the lead's outage count
+// (`turn/capacity-outage.ts`) can never disagree. Nobody else is pinged from
+// here: the backup model takes over quietly, and an outage that lasts reaches
+// the lead in their own DM.
+export const isCapacityError = isCapacityFailure;
 
-export function isCapacityError(err: unknown): boolean {
-  const m = err instanceof Error ? err.message : String(err ?? "");
-  return CAPACITY_ERR_RE.test(m);
-}
-
-/** Default channel a failure tells people to report to (#uno-bot) — the
- *  envelope may override via `UNO_BOT_ALERT_CHANNEL`. */
+/** #uno-bot: where a failure that is NOT capacity tells people to report a
+ *  repeat, and the channel the Slack diagnostics probe may post to. The
+ *  envelope may override it with `UNO_BOT_ALERT_CHANNEL`. */
 export const DEFAULT_ALERT_CHANNEL = "C0ARJ2A3A69";
 
 /**

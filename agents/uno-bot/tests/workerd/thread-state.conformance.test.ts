@@ -22,7 +22,7 @@ import { describe, expect, it, vi } from "vitest";
 import { internalSubrequestsUsed, runMetered } from "../../src/net";
 import { ThreadState as ThreadStateObject } from "../../src/thread-state";
 import type { Env } from "../../src/types";
-import { createDurableObjectThreadState } from "../../src/thread-state/durable-object";
+import { createDurableObjectOutageStore, createDurableObjectThreadState } from "../../src/thread-state/durable-object";
 import {
   CUT_OFF_SWEEP_RETRY_MS,
   CUT_OFF_SWEEP_SLACK_MS,
@@ -298,5 +298,52 @@ describe("[durable-object] the cut-off alarm", () => {
       await fire();
       expect(await keys(stub)).toEqual([kept, kept]);
     }
+  });
+});
+
+// The capacity outage's record (`turn/capacity-outage.ts`) on the real object:
+// the point of keeping it here is that the object serialises every
+// transition, so failures arriving together hand the lead's DM to one caller.
+describe("[durable-object] the capacity outage record", () => {
+  const MIN = 60_000;
+  const outageStore = () => createDurableObjectOutageStore({ namespace, instance: `outage-${instanceCounter++}` });
+
+  it("failures arriving together are handed the DM once", async () => {
+    const store = outageStore();
+    const t0 = Date.now();
+    for (const m of [0, 8, 16, 24]) await store.failed(t0 + m * MIN);
+    const steps = await Promise.all(Array.from({ length: 8 }, () => store.failed(t0 + 31 * MIN)));
+    expect(steps.filter((s) => s.tell)).toHaveLength(1);
+    expect(steps.find((s) => s.tell)?.tell?.asks).toBeGreaterThanOrEqual(5);
+  });
+
+  it("successes arriving together are handed the recovery line once, and a refused DM's claim comes back", async () => {
+    const store = outageStore();
+    const t0 = Date.now();
+    for (const m of [0, 8, 16, 24]) await store.failed(t0 + m * MIN);
+    const told = (await store.failed(t0 + 31 * MIN)).tell!.told!;
+    await store.release(told);
+    expect((await store.failed(t0 + 32 * MIN)).tell, "released, so the next failure tells").toBeDefined();
+    const steps = await Promise.all(Array.from({ length: 6 }, () => store.succeeded(t0 + 40 * MIN)));
+    expect(steps.filter((s) => s.recovered)).toHaveLength(1);
+    expect(steps.find((s) => s.recovered)?.recovered).toEqual({ first: t0, end: t0 + 40 * MIN });
+  });
+
+  it("a told outage quiet past the period closes at the next failure, which starts afresh", async () => {
+    const store = outageStore();
+    const t0 = Date.now();
+    for (const m of [0, 8, 16, 24, 31]) await store.failed(t0 + m * MIN);
+    const step = await store.failed(t0 + 480 * MIN);
+    expect(step.recovered).toEqual({ first: t0, end: t0 + 31 * MIN });
+    expect(step.tell).toBeUndefined();
+  });
+
+  it("each call is one charged hop", async () => {
+    const store = outageStore();
+    const used = await runMetered(async () => {
+      await store.failed(Date.now());
+      return internalSubrequestsUsed();
+    });
+    expect(used).toBe(1);
   });
 });

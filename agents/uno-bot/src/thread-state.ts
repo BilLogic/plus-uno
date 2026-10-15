@@ -87,6 +87,13 @@ import {
   type ThreadRef,
 } from "./thread-state/store";
 import type { AssistantContext } from "./slack/types";
+import {
+  outageOnFailure,
+  outageOnRelease,
+  outageOnSuccess,
+  type OutageRecord,
+  type OutageStep,
+} from "./turn/capacity-outage";
 
 interface HistoryRecord {
   turns: HistoryTurn[];
@@ -840,7 +847,44 @@ export class ThreadState extends DurableObject<Env> {
     if (issue) await this.storage.put<FilingRecord>(filingKey(key), { at, issue });
     else await this.storage.delete(filingKey(key));
   }
+
+  // ----- the capacity outage (turn/capacity-outage.ts) -----
+  //
+  // One record for the workspace, kept here because this is the one
+  // serialised store it has: each transition is a read-modify-write in one
+  // transaction, which is what lets only one caller be handed the lead's DM.
+  // Outside the GC sweep's prefixes, on purpose: a told outage stays until it
+  // is over, however long that takes.
+
+  async capacityFailed(at: number): Promise<OutageStep> {
+    return this.storage.transaction(async (txn) => {
+      const { record, step } = outageOnFailure((await txn.get<OutageRecord>(OUTAGE_KEY)) ?? null, at);
+      await txn.put<OutageRecord>(OUTAGE_KEY, record);
+      return step;
+    });
+  }
+
+  async capacitySucceeded(at: number): Promise<OutageStep> {
+    return this.storage.transaction(async (txn) => {
+      const held = (await txn.get<OutageRecord>(OUTAGE_KEY)) ?? null;
+      if (!held) return {};
+      const { step } = outageOnSuccess(held, at);
+      await txn.delete(OUTAGE_KEY);
+      return step;
+    });
+  }
+
+  async capacityRelease(told: number): Promise<void> {
+    await this.storage.transaction(async (txn) => {
+      const held = (await txn.get<OutageRecord>(OUTAGE_KEY)) ?? null;
+      const next = outageOnRelease(held, told);
+      if (next && next !== held) await txn.put<OutageRecord>(OUTAGE_KEY, next);
+    });
+  }
 }
+
+/** The capacity outage's one record. */
+const OUTAGE_KEY = "capacity-outage";
 
 /** What a read-modify-write runs against: the object's storage, or the
  *  transaction it runs inside — alarm included, so a wake is armed in the

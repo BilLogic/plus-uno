@@ -28,7 +28,6 @@ import { runAgent, selectProvider, type AgentResult, type TurnDials } from "../a
 import type { ToolCall, ToolResultNote } from "../agent/tool-transcript";
 import type { GateRestage, GateVerdict, OperationOutcome } from "../gate/index";
 import { conversationsHistoryBefore, openConversation, postMessage, updateMessage } from "../slack/api";
-import { isCapacityError } from "../slack/delivery";
 import { reportItems } from "../slack/decision-cards";
 import { formatAssistantContext } from "../slack/assistant";
 import { buildNotionBefore, buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
@@ -52,7 +51,8 @@ import {
 } from "../usage/production";
 import { charge } from "../net";
 import { resolveGeminiModel } from "../agent/gemini-tiers";
-import { capacityOutage, OUTAGE_KV_KEY, watchCapacity, type CapacityOutage, type OutageRecord } from "./capacity-outage";
+import { capacityOutage, NOT_WATCHED, outageForPlace, watchCapacity, type CapacityOutage } from "./capacity-outage";
+import { capacityOutageStoreFor } from "../thread-state/production";
 import type { Delivery } from "./delivery";
 import { restageExecution, type TurnDeps, type TurnRequest } from "./turn";
 
@@ -161,8 +161,13 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
       // own scope, and what it collected is part of what it answers with.
       // Watched for capacity (#1228): a turn that fails on it with the backup
       // tried is counted, and the lead hears about an outage that lasts; the
-      // next turn that answers closes it.
-      const run = await watchCapacity(capacityOutageFor(env), isCapacityError, () => runAgent({
+      // next turn that answers closes it. Test traffic (a debug route, a
+      // channel on TEST_CHANNEL_IDS) neither counts nor closes one.
+      const watched = outageForPlace(
+        { origin: wiring.origin, channel: request.channel, testChannelIds: testChannelIdsOf(env) },
+        () => capacityOutageFor(env),
+      );
+      const run = await watchCapacity(watched, () => runAgent({
         env,
         // Routing already happened, in Turn: the tier travels as an opaque
         // name, and the agent run has no way left to route a second time on
@@ -372,36 +377,48 @@ async function followRestageFor(env: Env, from: PendingProposal, to: PendingProp
   await recordSweepRestageFor(env, from, to);
 }
 
-/** How long the outage record outlives its last write, so a record nobody
- *  closes cannot linger past a week. */
-const OUTAGE_TTL_S = 7 * 24 * 60 * 60;
+/** The KV hint that an outage may be open, so a succeeding turn calls the
+ *  Durable Object only then. */
+const OUTAGE_HINT_KEY = "capacity-outage:open";
+
+/** How long the hint outlives its last raise: past any outage the lead was
+ *  told about, which closes by itself at its next failure if the hint is gone. */
+const OUTAGE_HINT_TTL_S = 7 * 24 * 60 * 60;
 
 /**
- * The capacity outage on `Env`: one HARNESS_KV key, and a DM to
- * `LEAD_USER_ID` alone in their DM with uno-bot. No HARNESS_KV keeps nothing
- * and tells nobody; no lead keeps the record and tells nobody.
+ * The capacity outage on `Env`: its record on the ThreadState Durable Object,
+ * a HARNESS_KV hint that one may be open, and a DM to `LEAD_USER_ID` alone in
+ * their DM with uno-bot. No lead, or no HARNESS_KV, keeps nothing: an outage
+ * nobody can be told about is not worth a call per turn.
  *
  * @param env - Worker bindings
  */
 export function capacityOutageFor(env: Env): CapacityOutage {
   const kv = env.HARNESS_KV;
-  if (!kv) return { failed: async () => {}, succeeded: async () => {} };
+  const lead = env.LEAD_USER_ID?.trim();
+  if (!kv || !lead) return NOT_WATCHED;
   // Which adapter answers is `selectProvider`'s to decide (#605); only its
   // name is read here, to say what is failing.
   const claude = selectProvider(env).name === "vertex-claude";
   return capacityOutage({
-    lead: env.LEAD_USER_ID?.trim() || null,
+    lead,
     models: claude
       ? `the Claude model (${env.CLAUDE_MODEL ?? "the default"}), which has no backup`
       : `${resolveGeminiModel("default", env)} and its backup, ${env.GEMINI_FALLBACK_MODEL ?? "gemini-2.5-pro"}`,
-    async read() {
-      charge(1, "kv");
-      return await kv.get<OutageRecord>(OUTAGE_KV_KEY, "json");
-    },
-    async write(record) {
-      charge(1, "kv");
-      if (record) await kv.put(OUTAGE_KV_KEY, JSON.stringify(record), { expirationTtl: OUTAGE_TTL_S });
-      else await kv.delete(OUTAGE_KV_KEY);
+    store: capacityOutageStoreFor(env),
+    hint: {
+      async isUp() {
+        charge(1, "kv");
+        return (await kv.get(OUTAGE_HINT_KEY)) !== null;
+      },
+      async raise() {
+        charge(1, "kv");
+        await kv.put(OUTAGE_HINT_KEY, "1", { expirationTtl: OUTAGE_HINT_TTL_S });
+      },
+      async lower() {
+        charge(1, "kv");
+        await kv.delete(OUTAGE_HINT_KEY);
+      },
     },
     async dm(userId, text) {
       const open = await openConversation(env, userId);

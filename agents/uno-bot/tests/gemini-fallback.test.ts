@@ -63,6 +63,8 @@ for (const status of [429, 503, 500, 404]) {
     const first = await provider.send({ toolsEnabled: false });
     assert.equal(first.ok, false);
     assert.equal(!first.ok && first.status, status);
+    // Vertex's own status word rides along, for the capacity test to read.
+    assert.equal(!first.ok && first.code, FAILURES[status]!.status);
     assert.equal(provider.fallback(status), true);
     const second = await provider.send({ toolsEnabled: false });
     assert.equal(second.ok, true);

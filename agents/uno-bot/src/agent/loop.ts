@@ -38,6 +38,7 @@ import type { PendingProposal, ProposalOperation, ThreadRef } from "../thread-st
 import type { ProviderConversationTurn } from "./provider-conversation";
 import { toolResultDigest, type ToolCall, type ToolResultNote } from "./tool-transcript";
 import { finishedProgress, type ToolProgressEvent } from "./tool-progress";
+import { ModelCallError } from "./model-provider";
 import type {
   ModelProvider,
   ModelStop,
@@ -399,7 +400,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
         );
         continue;
       }
-      throw new Error(`${provider.name} ${reply.status}: ${reply.message}`.slice(0, 400));
+      throw new ModelCallError(provider.name, reply.status, reply.message, reply.code);
     }
   };
 
