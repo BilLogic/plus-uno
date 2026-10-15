@@ -208,3 +208,12 @@
         }
     }
 }
+
+// Forced colours (Windows High Contrast) repaint this field's focus border to
+// the same system colour as its resting border, so focus is drawn as an
+// outline, which forced colours keep.
+@media (forced-colors: active) {
+    .plus-textarea-v2__control:focus-visible {
+        outline: var(--size-element-stroke-lg, 2px) solid Highlight;
+    }
+}

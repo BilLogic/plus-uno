@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import Cascader from './Cascader';
+import OptionList from './OptionList';
 import TreeSelect from './TreeSelect';
 
 /**
@@ -313,4 +314,51 @@ CascaderGoesBackAndCloses.play = async ({ canvasElement }) => {
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(canvas.queryByRole('listbox')).toBeNull());
     await expect(document.activeElement).toBe(trigger);
+};
+
+/**
+ * A listbox option is chosen with Enter or Space, and the list is one tab stop.
+ *
+ * `ListGroup` walked its options with the arrow keys and then offered no key
+ * to choose one, so Select's multi mode and OptionList could be browsed and
+ * not used. `ListGroup.Option` also ignored the tab stop `ListGroup` handed it,
+ * which left every option in the Tab order.
+ */
+export const ListboxChoosesFromTheKeyboard = () => {
+    const [days, setDays] = useState([]);
+    return (
+        <div style={stack}>
+            <OptionList
+                aria-label="Days"
+                mode="multi"
+                options={['Monday', 'Tuesday', 'Wednesday']}
+                value={days}
+                onSelect={setDays}
+            />
+            <p data-testid="mkn-days-value">{days.join(',') || 'none'}</p>
+        </div>
+    );
+};
+
+ListboxChoosesFromTheKeyboard.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const listbox = canvas.getByRole('listbox', { name: 'Days' });
+    const options = within(listbox).getAllByRole('option');
+    const readout = () => canvas.getByTestId('mkn-days-value').textContent;
+
+    // One tab stop: only the option at the cursor is in the Tab order.
+    await expect(options.map((option) => option.tabIndex)).toEqual([0, -1, -1]);
+
+    options[0].focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(readout()).toBe('Monday');
+
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(document.activeElement).toBe(options[1]);
+    await userEvent.keyboard(' ');
+    await expect(readout()).toBe('Monday,Tuesday');
+
+    // Space toggles, as a click does.
+    await userEvent.keyboard(' ');
+    await expect(readout()).toBe('Monday');
 };

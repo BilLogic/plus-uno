@@ -56,7 +56,9 @@ const TagInput = ({
     defaultTags = [],
     size = 'medium',
     disabled = false,
-    onAdd,
+    // Accepted and never called: TagInput has no text entry, so nothing is
+    // added through it. Named here so it is not spread onto the DOM.
+    onAdd, // eslint-disable-line no-unused-vars
     onRemove,
     onChange,
     className = '',
@@ -86,23 +88,6 @@ const TagInput = ({
     // TagInput keeps itself, or a controlled one with a handler. A disabled
     // field has none; TagGroup takes the × away from its tags.
     const canRemove = !disabled && (!isControlled || Boolean(onRemove || onChange));
-
-    const handleAdd = (tagValue) => {
-        if (disabled) return;
-
-        if (!isControlled) {
-            setInternalTags([...internalTags, tagValue]);
-        }
-
-        if (onAdd) {
-            onAdd(tagValue);
-        }
-
-        if (onChange) {
-            const newTags = [...currentTags, tagValue];
-            onChange(newTags);
-        }
-    };
 
     const handleRemove = (tagIndex) => {
         if (disabled) return;
