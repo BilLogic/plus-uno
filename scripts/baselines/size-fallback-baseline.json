@@ -37,7 +37,6 @@
     "--size-element-radius-full 50%",
     "--size-element-radius-md 6px",
     "--size-element-radius-md 8px",
-    "--size-element-radius-sm 2px",
     "--size-element-stroke-md 2px",
     "--size-modal-gap-lg 24px",
     "--size-modal-gap-md 16px",

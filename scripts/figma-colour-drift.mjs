@@ -24,7 +24,7 @@
  *
  * WHY THE MAPPING RUNS FIGMA -> CSS. Figma is the source, and the CSS is
  * generated from it. A variable with no CSS counterpart is normal (candidates
- * under `Proposal/`, the `Surface roles/` set) and is reported as UNMAPPED
+ * under `Proposal/`) and is reported as UNMAPPED
  * rather than failed; a CSS token with no Figma variable is a different
  * question, and `check:token-registry` already asks it.
  */

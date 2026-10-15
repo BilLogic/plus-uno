@@ -37,7 +37,7 @@ For buttons, badges, inputs, and other small components:
 | `--size-element-gap-sm` | 8px | Small gap |
 | `--size-element-gap-md` | 10px | Medium gap |
 | `--size-element-gap-lg` | 12px | Large gap |
-| `--size-element-radius-sm` | 4px | Small border radius |
+| `--size-element-radius-sm` | 2px | Small border radius |
 | `--size-element-radius-md` | 4px | Medium border radius |
 | `--size-element-radius-lg` | 8px | Large border radius |
 | `--size-element-radius-full` | 999px | Pill shape |

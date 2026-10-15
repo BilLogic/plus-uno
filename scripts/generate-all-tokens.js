@@ -347,13 +347,10 @@ ${lines(groups.stroke)}}
 
 /**
  * Semantic tokens whose value differs from Figma's alias: token -> the
- * primitive it points at instead. `element-radius-sm` is radius-100 (4px)
- * where Figma's `Element/radius-sm` is radius-50 (2px); `surface-container-
- * gap-md` is space-300 (16px) where Figma's `Surface Container/gap-md` is
- * space-600 (32px).
+ * primitive it points at instead. `surface-container-gap-md` is space-300
+ * (16px) where Figma's `Surface Container/gap-md` is space-600 (32px).
  */
 const SEMANTIC_OVERRIDES = {
-    'element-radius-sm': 'border-radius-radius-100',
     'surface-container-gap-md': 'spacing-medium-space-300',
 };
 
