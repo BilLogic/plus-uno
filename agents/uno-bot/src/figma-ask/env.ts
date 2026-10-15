@@ -19,11 +19,12 @@
 // Every KV call is charged to the invocation's internal bucket.
 
 import type { Env } from "../types";
+import type { ThreadState } from "../thread-state/index";
 import { charge } from "../net";
 import { figmaClientFor } from "../figma/production";
 import { threadStateFor } from "../thread-state/production";
-import { buildTurnDeps } from "../turn/env-deps";
-import { runTurn } from "../turn/index";
+import { buildTurnDeps, type TurnWiring } from "../turn/env-deps";
+import { runTurn, type Delivery } from "../turn/index";
 import { figmaPeopleFor, gapNotesFor } from "../usage/production";
 import { answerFigmaAsk, ASK_MARK_TTL_S, type AskMark, type FigmaAskDeps, type FigmaAskResult } from "./job";
 
@@ -57,27 +58,39 @@ export function figmaAskDepsFor(env: Env): FigmaAskDeps | undefined {
       },
     },
     threadState,
-    answer: (request, delivery, asker) =>
-      runTurn(
-        request,
-        buildTurnDeps(env, request, {
-          threadState,
-          delivery,
-          // Answer-only: the request carries no pending card, and a verdict
-          // that reaches a Figma turn anyway runs nothing.
-          applyVerdict: async (verdict) => {
-            if (verdict.outcome === "won") console.warn("[figma-ask] a verdict reached a Figma turn; nothing ran");
-          },
-          // No `toolThreadTs`: the ask is in Figma, so a tool has no Slack
-          // message to thread its own post off.
-          // Public scope, and recorded as a Figma ask.
-          origin: "figma",
-          unmappedAsker: asker.unmappedAsker,
-          figmaFileKey: asker.fileKey,
-        }),
-      ),
+    answer: (request, delivery, asker) => runTurn(request, buildTurnDeps(env, request, figmaTurnWiring(threadState, delivery, asker))),
     ...(channel ? { channel } : {}),
     now: () => Date.now(),
+  };
+}
+
+/**
+ * How a Figma ask's turn is wired: answer-only, at public scope, and
+ * recorded as a Figma ask.
+ *
+ * @param threadState - The store the turn remembers in
+ * @param delivery - The ask's Delivery (`./delivery.ts`)
+ * @param asker - Whether Team Members maps the asker, and the file asked on
+ */
+export function figmaTurnWiring(
+  threadState: ThreadState,
+  delivery: Delivery,
+  asker: { unmappedAsker: boolean; fileKey: string },
+): TurnWiring {
+  return {
+    threadState,
+    delivery,
+    // Answer-only: the request carries no pending card, and a verdict that
+    // reaches a Figma turn anyway runs nothing.
+    applyVerdict: async (verdict) => {
+      if (verdict.outcome === "won") console.warn("[figma-ask] a verdict reached a Figma turn; nothing ran");
+    },
+    // No `toolThreadTs`: the ask is in Figma, so a tool has no Slack message
+    // to thread its own post off.
+    // Public scope, and recorded as a Figma ask.
+    origin: "figma",
+    unmappedAsker: asker.unmappedAsker,
+    figmaFileKey: asker.fileKey,
   };
 }
 

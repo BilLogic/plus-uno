@@ -1854,6 +1854,11 @@ async function dropFromSweepCard(
   );
   const card: ProposalCard = fixes ? { ...built, fixes } : built;
   const posted = await delivery.card(card);
+  // Declined on an answer-only surface, as a fresh card is (`PostResult.declined`).
+  if (posted.declined) {
+    await memory.remember(posted.text);
+    return { disposition: "answered", posted: posted.text, wrote: memory.wrote(), telemetry };
+  }
   if (!posted.ok || !posted.ts) {
     console.error("[turn] sweep card revision was not staged");
     return { disposition: "failed", failure: { stage: "delivery" }, wrote: memory.wrote(), telemetry };
@@ -2027,6 +2032,8 @@ export async function restageExecution(
   const card: ProposalCard = { ...built, caveats: [{ kind: "cut-off-rerun" }, ...built.caveats] };
   const before = await batchBefore(restage.operations, built.revision, deps.cards);
   const posted = await deps.delivery.card(card);
+  // Declined on an answer-only surface: nothing re-staged, and nothing failed.
+  if (posted.declined) return null;
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] re-staged card was not posted (${first.toolName})`);
     await deps.delivery.postFailure("delivery");

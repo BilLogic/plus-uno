@@ -15,10 +15,10 @@
 // `declined` (`PostResult.declined`), so the turn stages nothing and ends
 // ANSWERED — on the usage record too, since the person gets a reply — and
 // remembers the lines that reply carries. The reply says what the card would
-// have done (its write's fixed gate verb, never the card's own
-// words, which can name a private repo or page) and where to ask for it
-// instead. So nothing an ask in Figma proposes is ever written, and nothing
-// is posted to Slack.
+// have done (its write's fixed gate verb, never the card's own words, which
+// can name a private repo or page) and where to ask for it instead. So
+// nothing an ask in Figma proposes is ever written, and nothing is posted to
+// Slack.
 //
 // PURE.
 
