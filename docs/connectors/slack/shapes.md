@@ -42,6 +42,8 @@ Until 2026-08-22 the tool had no fields for fidelity, round, what-changed, the q
 
 Bundle links (Loom · live preview · Figma replica · Decisions DB) go in `link` and the surrounding thread; the confirmation card audits them and names anything missing before ✅.
 
+**Where it posts** is `place`: #plus-design-feedback, top level, by default; `here` keeps it in the conversation it was asked in, the DM or the thread. A test channel always keeps it in its own thread, and so does a Worker with no feedback channel set. The card names the place the ✅ posts to ("in #plus-design-feedback", "in this DM", "in this thread"). Those are the only two places: asked for any other, the bot says so and offers them rather than staging a card for somewhere else.
+
 ## Answer shapes
 
 Code builds each of these from the rows a lookup returned this turn; the model chooses the shape and writes the prose around it.

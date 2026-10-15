@@ -803,6 +803,9 @@ function operationGroupKey(op: PlannedOperation): GroupKey {
     return id ? { key: `dm:${id}`, heading: `*<@${id}>*`, name: "a DM" } : bolded("dm:", "a DM");
   }
   if (op.toolName === "shareout_post") {
+    // A share-out kept in the asking conversation is grouped as that, never
+    // under the team channel it will not post to.
+    if (str("place") === "here") return bolded("channel:here", "this conversation");
     const channel = str("channel") || "#plus-design-feedback";
     return bolded(`channel:${channel.toLowerCase()}`, channel);
   }

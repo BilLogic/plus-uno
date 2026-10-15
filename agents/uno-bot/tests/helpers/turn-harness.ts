@@ -25,6 +25,7 @@ import {
   type TurnRequest,
 } from "../../src/turn/index";
 import { runOperations, type OperationOutcome } from "../../src/gate/index";
+import { shareoutPlace } from "../../src/tools/share-for-feedback";
 import {
   createInMemoryProposalEventLog,
   createInMemoryUsageLog,
@@ -375,6 +376,12 @@ export function harness(opts: {
       async workflowTarget(input) {
         const repo = typeof input.repo === "string" && input.repo ? input.repo : ISSUE_REPO;
         return { repo, branch: opts.workflowBranch === undefined ? WORKFLOW_DEFAULT_REF : opts.workflowBranch };
+      },
+      // The executor's own rule, on a configured feedback channel and this
+      // harness's test channels.
+      shareoutWhere(input, channel) {
+        const env = { PLUS_DESIGN_FEEDBACK_CHANNEL_ID: "C_FEEDBACK", TEST_CHANNEL_IDS: (opts.testChannelIds ?? []).join(",") };
+        return shareoutPlace(env, { channel }, input.place).where;
       },
     },
 

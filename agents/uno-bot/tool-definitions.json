@@ -581,7 +581,7 @@
   },
   {
     "name": "shareout_post",
-    "description": "It pings people. Share a prototype, design or PRD with the team FOR FEEDBACK — the 'share out' / 'post for feedback' / 'surface this for review' action ('surface' is Slack's verb here, not the Surface component). Publishing to the Prototype Marketplace is notion_create's surface 'marketplace'. Posts the share-out to #plus-design-feedback in the team's documented shape (read_reference name docs/connectors/slack/shapes, § Share-out post): project + artifact + fidelity + round, what it is, what changed, up to three specific questions, what is out of scope, the link, and @-mentioned reviewers. Stage IMMEDIATELY with whatever links are in hand: the confirmation card itself flags anything missing from the bundle (Loom / live preview / Decisions link) and the user's ✅ is informed consent to post without them (policy 2026-07-16).",
+    "description": "It pings people. Share a prototype, design or PRD with the team FOR FEEDBACK — the 'share out' / 'post for feedback' / 'surface this for review' action ('surface' is Slack's verb here, not the Surface component). Publishing to the Prototype Marketplace is notion_create's surface 'marketplace'. It posts in one of two places: #plus-design-feedback (the default), or `place: 'here'` — this conversation, the DM or thread it was asked in — when the asker wants it kept here. When the asker names any other destination, say you can post only in those two and ask which, instead of staging a card. The post follows the team's documented shape (read_reference name docs/connectors/slack/shapes, § Share-out post): project + artifact + fidelity + round, what it is, what changed, up to three specific questions, what is out of scope, the link, and @-mentioned reviewers. Stage IMMEDIATELY with whatever links are in hand: the confirmation card itself flags anything missing from the bundle (Loom / live preview / Decisions link) and the user's ✅ is informed consent to post without them (policy 2026-07-16).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -644,6 +644,14 @@
         "deadline": {
           "type": "string",
           "description": "Optional human-readable feedback deadline, e.g. 'EOD Friday'."
+        },
+        "place": {
+          "type": "string",
+          "enum": [
+            "feedback_channel",
+            "here"
+          ],
+          "description": "Where it posts: 'feedback_channel' (#plus-design-feedback, the default) or 'here' (this DM or thread — 'post it here', 'keep it in this DM'). A test channel always keeps it in its own thread."
         }
       }
     }

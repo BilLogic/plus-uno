@@ -549,6 +549,11 @@ export interface TurnDeps {
      *  to — or null when the repo is off the list. `branch` is null when the
      *  default branch could not be read, and the card says so. */
     workflowTarget(input: Record<string, unknown>): Promise<{ repo: string; branch: string | null } | null>;
+    /** Where a `shareout_post` asked in `channel` would post, named as the
+     *  card says it — "#plus-design-feedback", "this DM", "this thread" —
+     *  from the executor's own decision (`tools/share-for-feedback.ts`
+     *  `shareoutPlace`), so the card names the place a ✅ posts to. */
+    shareoutWhere(input: Record<string, unknown>, channel: string): string;
   };
 
   /**
@@ -1576,7 +1581,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     );
   await recordSuperseded(retiredAhead);
 
-  const built = await buildCard(result, deps, request.surface === "assistant");
+  const built = await buildCard(result, deps, request.surface === "assistant", request.channel);
   // A revision of a sweep card is still one, so replies under it are read by
   // the sweep's rule.
   // A report's fix is redrawn in its report instead.
@@ -1835,6 +1840,7 @@ async function dropFromSweepCard(
       { kind: "proposal", operations, toolName: first.toolName, input: first.input },
       deps,
       request.surface === "assistant",
+      request.channel,
     ),
   );
   const card: ProposalCard = fixes ? { ...built, fixes } : built;
@@ -2007,6 +2013,7 @@ export async function restageExecution(
           // The card's DM caveats follow the surface, and a DM channel is the one
           // the proposal record can still name.
           original.channel.startsWith("D"),
+          original.channel,
         );
   // The warning rides the card, not only the note before it: a note that
   // failed to post must not leave a card that reads like any other.
@@ -2395,8 +2402,9 @@ async function buildCard(
   result: Extract<AgentResult, { kind: "proposal" }>,
   deps: Pick<TurnDeps, "cards">,
   fromDm: boolean,
+  channel: string,
 ): Promise<ProposalCard> {
-  const card = await cardOf(result, deps, fromDm);
+  const card = await cardOf(result, deps, fromDm, channel);
   // Who wrote the opening line (no reader since the eval envelope went): the model when its own
   // reply leads, the Worker for everything else — its ask, its PRD line, or a
   // lead that is only its "I could not stage …" note.
@@ -2409,6 +2417,7 @@ async function cardOf(
   result: Extract<AgentResult, { kind: "proposal" }>,
   deps: Pick<TurnDeps, "cards">,
   fromDm: boolean,
+  channel: string,
 ): Promise<ProposalCard> {
   const { toolName, input, operations } = result;
   const card: ProposalCard = {
@@ -2433,6 +2442,13 @@ async function cardOf(
   const sameTool = operations.every((op) => op.toolName === toolName);
   const ask = (made: CardAsk | null): { ask?: CardAsk } => (silent && sameTool && made ? { ask: made } : {});
 
+  if (toolName === "shareout_post") {
+    // THE PLACE, named the way the issue card names its repo: a share-out
+    // posts to #plus-design-feedback or stays in the asking conversation, and
+    // the heading says which — read from the executor's own decision, so the
+    // card never names one place while the ✅ posts to another.
+    return { ...card, verb: `${card.verb} in ${deps.cards.shareoutWhere(input, channel)}` };
+  }
   if (toolName === "github_issue_create") {
     // THE REPO AND WHO CAN READ IT: an intake on a public repo is readable by
     // anyone the moment it is filed, and the card is the one place a person

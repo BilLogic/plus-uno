@@ -16,6 +16,8 @@ import {
   renderShareout,
 } from "../src/tools/share-out-render";
 import { shareoutPlace } from "../src/tools/share-for-feedback";
+import { cardReadsFor } from "../src/turn/env-deps";
+import type { Env } from "../src/types";
 
 const FULL = {
   project: "Session Sign Up",
@@ -171,5 +173,51 @@ describe("where a share-out posts", () => {
 
   it("falls back to the asking thread when no feedback channel is set", () => {
     assert.deepEqual(shareoutPlace({}, from("C_DESIGN")), { channel: "C_DESIGN", threadTs: "1.1", where: "this thread" });
+  });
+
+  it("goes to #plus-design-feedback when asked for the feedback channel by name", () => {
+    assert.deepEqual(shareoutPlace(env, from("C_DESIGN"), "feedback_channel"), { channel: "C_FEEDBACK", where: "#plus-design-feedback" });
+  });
+
+  it("stays in the asking thread when asked to post here", () => {
+    assert.deepEqual(shareoutPlace(env, from("C_DESIGN"), "here"), { channel: "C_DESIGN", threadTs: "1.1", where: "this thread" });
+  });
+
+  it("stays in the DM when asked to post here from a DM", () => {
+    // A threadless DM's conversation key is "dm", never a ts to post under:
+    // the reply target is the asking message's own ts.
+    const dm = { channel: "D_BILL", threadTs: "dm", replyTs: "2.2", userMsgTs: "2.2" };
+    assert.deepEqual(shareoutPlace(env, dm, "here"), { channel: "D_BILL", threadTs: "2.2", where: "this DM" });
+  });
+
+  it("posts top level in a DM it has no reply ts for, never under the conversation key", () => {
+    const dm = { channel: "D_BILL", threadTs: "dm", userMsgTs: "2.2" };
+    assert.deepEqual(shareoutPlace(env, dm, "here"), { channel: "D_BILL", where: "this DM" });
+  });
+
+  it("stays in a test channel's thread whichever place was asked for", () => {
+    assert.deepEqual(shareoutPlace(env, from("C_SANDBOX"), "feedback_channel"), { channel: "C_SANDBOX", threadTs: "1.1", where: "this thread" });
+    assert.deepEqual(shareoutPlace(env, from("C_SANDBOX"), "here"), { channel: "C_SANDBOX", threadTs: "1.1", where: "this thread" });
+  });
+});
+
+describe("the card names where a share-out will post", () => {
+  const env = { PLUS_DESIGN_FEEDBACK_CHANNEL_ID: "C_FEEDBACK", TEST_CHANNEL_IDS: "C_SANDBOX" } as unknown as Env;
+  const where = (input: Record<string, unknown>, channel: string) => cardReadsFor(env).shareoutWhere(input, channel);
+
+  it("names #plus-design-feedback by default", () => {
+    assert.equal(where({ summary: "x" }, "C_DESIGN"), "#plus-design-feedback");
+  });
+
+  it("names this DM when the share-out stays in a DM", () => {
+    assert.equal(where({ summary: "x", place: "here" }, "D_BILL"), "this DM");
+  });
+
+  it("names this thread when the share-out stays in the asking thread", () => {
+    assert.equal(where({ summary: "x", place: "here" }, "C_DESIGN"), "this thread");
+  });
+
+  it("names this thread for a test channel, whatever was asked", () => {
+    assert.equal(where({ summary: "x" }, "C_SANDBOX"), "this thread");
   });
 });
