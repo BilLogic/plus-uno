@@ -8,7 +8,7 @@ import { conversationsMembers } from "./api";
 import { standingConfirmersOf } from "./standing-confirmers";
 
 /** Pages of 200 members — a channel of up to 600 people. */
-const MEMBER_PAGES = 3;
+export const MEMBER_PAGES = 3;
 
 /**
  * A channel's member ids, or null when Slack would not say — or when there are

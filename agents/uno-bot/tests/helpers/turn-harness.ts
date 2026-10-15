@@ -31,6 +31,7 @@ import type { Env } from "../../src/types";
 
 /** Slack with no channel the bot can see: a case that names none needs none. */
 const NO_CHANNELS: ShareoutReads = {
+  affordable: () => true,
   channelById: async () => "missing",
   channelByName: async () => "missing",
   members: async () => null,

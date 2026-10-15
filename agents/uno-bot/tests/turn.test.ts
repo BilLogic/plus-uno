@@ -2859,6 +2859,7 @@ test("a cancel note with no time on it, from before cancels were stamped, holds 
 const CRIT_CHANNEL = { id: "C0CRIT0001", name: "design-crit", kind: "channel", isPrivate: false, isArchived: false, botIsMember: false } as const;
 const BIG_CHANNEL = { id: "C0BIG00001", name: "big-room", kind: "channel", isPrivate: false, isArchived: false, botIsMember: true } as const;
 const NAMED: ShareoutReads = {
+  affordable: () => true,
   async channelById(id) {
     return [CRIT_CHANNEL, BIG_CHANNEL].find((c) => c.id === id) ?? "missing";
   },

@@ -15,7 +15,7 @@
 // inside `RECENT_CANCEL_MS` holds anything back. A note with no time predates
 // the stamp, so it is hours old by now and holds nothing back.
 
-import { shareoutChannelRef } from "../tools/share-out-render";
+import { channelRefText, shareoutChannelRef } from "../tools/share-out-render";
 
 /** How long a ⛔ holds the same card back. A cancel and the model's own
  *  re-proposal land within one exchange, minutes apart; half an hour covers a
@@ -31,7 +31,7 @@ function targetOf(toolName: string, input: Record<string, unknown>): string | nu
   if (toolName === "shareout_post") {
     if (input.place === "channel") {
       const ref = shareoutChannelRef(input.channel);
-      return `place channel ${ref ? ("id" in ref ? ref.id : `#${ref.name}`) : "unnamed"}`;
+      return `place channel ${ref ? channelRefText(ref) : "unnamed"}`;
     }
     return `place ${input.place === "here" ? "here" : "feedback_channel"}`;
   }

@@ -23,12 +23,15 @@
 // `#name` is one page of `conversations.list` (two at most); the asker's
 // membership is one page of `conversations.members` (three at most, via
 // `slack/channel-members.ts`). So 2 subrequests usually and 5 at worst, read
-// once per turn — the preflight and the card share them — and again at ✅.
+// once per turn — the preflight and the card share them — and again at ✅. A
+// turn whose budget no longer covers the worst case refuses instead of
+// reading (`ShareoutReads.affordable`).
 
 import type { Env } from "../types";
 import type { SlackContext } from "../types";
 import { conversationsInfo, conversationsList, postMessage, type SlackConversation } from "../slack/api";
-import { channelMembers } from "../slack/channel-members";
+import { channelMembers, MEMBER_PAGES } from "../slack/channel-members";
+import { budgetHeadroom } from "../net";
 import { DM_CONVERSATION } from "../thread-state/index";
 import { isTestOrigin, teamPostChannel, testChannelIdsOf } from "../usage/record";
 import { channelRefText, fieldsFromInput, renderShareout, shareoutChannelRef } from "./share-out-render";
@@ -91,6 +94,8 @@ export type ChannelLookup = ShareoutChannel | "missing" | "failed";
 
 /** What a share-out to a named channel reads of Slack. */
 export interface ShareoutReads {
+  /** Whether the turn's subrequest budget still covers a whole check. */
+  affordable(): boolean;
   channelById(id: string): Promise<ChannelLookup>;
   channelByName(name: string): Promise<ChannelLookup>;
   /** The channel's member ids, or null when Slack would not say. */
@@ -100,9 +105,9 @@ export interface ShareoutReads {
 /** Pages of 1000 channels a `#name` is looked up in. */
 const CHANNEL_LIST_PAGES = 2;
 
-/** The most subrequests one named-channel decision spends: two pages of
- *  channels and three of members. */
-export const SHAREOUT_CHANNEL_CHECK_COST = CHANNEL_LIST_PAGES + 3;
+/** The most subrequests one named-channel decision spends: the pages of
+ *  channels and the pages of members. */
+export const SHAREOUT_CHANNEL_CHECK_COST = CHANNEL_LIST_PAGES + MEMBER_PAGES;
 
 function channelOf(c: SlackConversation): ShareoutChannel | null {
   if (!c.id) return null;
@@ -136,6 +141,8 @@ export function shareoutReadsFor(env: Env): ShareoutReads {
   };
 
   return {
+    // A check already read this turn costs nothing more to read again.
+    affordable: () => byId.size + byName.size > 0 || budgetHeadroom().subrequests >= SHAREOUT_CHANNEL_CHECK_COST,
     channelById: (id) =>
       once(byId, id, async () => {
         const res = await conversationsInfo(env, id).catch(() => null);
@@ -206,8 +213,11 @@ export async function decideShareoutPlace(
   }
 
   const asked = channelRefText(ref);
+  // A DM id is refused unread: the bot holds no `im:read` to look one up.
+  if ("id" in ref && ref.id.startsWith("D")) return refuse(`${asked} is a DM, not a channel.`);
+  if (!reads.affordable()) return refuse(`I've used this turn's Slack lookups before I could check ${asked} — ask me again.`);
   const found = "id" in ref ? await reads.channelById(ref.id) : await reads.channelByName(ref.name);
-  if (found === "failed") return refuse(`I couldn't look up ${asked} just now.`);
+  if (found === "failed") return refuse(`I couldn't look up ${asked} — paste its link and I'll try again.`);
   if (found === "missing") {
     return refuse("id" in ref ? `I can't post in ${asked} — add me to it first.` : `I can't find ${asked}. If it's private, add me to it first.`);
   }
@@ -257,7 +267,7 @@ export async function executeShareForFeedback(
   // Checked again at ✅: membership or the bot's access may have changed
   // since the card was staged.
   const decided = await decideShareoutPlace(env, slack, input, reads);
-  if (!decided.ok) return JSON.stringify({ ok: false, status: "refused", message: decided.refusal });
+  if (!decided.ok) return JSON.stringify({ ok: false, status: "refused", error: decided.refusal });
   const place = decided.place;
   const requester = slack.requestedBy ? `<@${slack.requestedBy}>` : "A designer";
 

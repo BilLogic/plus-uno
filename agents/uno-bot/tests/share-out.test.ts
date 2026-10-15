@@ -223,6 +223,7 @@ const MEMBERS: Record<string, string[]> = { C0CRIT0001: ["U_ASKER", "U2"], C0BIG
 function fakeReads(over: Partial<ShareoutReads> = {}) {
   const calls: string[] = [];
   const reads: ShareoutReads = {
+    affordable: () => true,
     async channelById(id) {
       calls.push(`info ${id}`);
       return KNOWN.find((c) => c.id === id) ?? "missing";
@@ -302,9 +303,16 @@ describe("a share-out in a channel the asker names", () => {
 
   it("refuses an archived channel, a DM and a missing channel", async () => {
     assert.match(await refusal({ place: "channel", channel: "C0OLD00001" }), /#old-crit is archived/);
-    const { reads } = fakeReads({ channelById: async (id) => ({ id, name: "", kind: "dm", isPrivate: true, isArchived: false, botIsMember: true }) });
+    const { reads, calls } = fakeReads();
     assert.match(await refusal({ place: "channel", channel: "D0BILL0001" }, asked("C_DESIGN"), reads), /not a channel/);
+    assert.deepEqual(calls, []);
     assert.match(await refusal({ place: "channel" }), /Which channel/);
+  });
+
+  it("refuses rather than check a channel the turn's budget cannot cover", async () => {
+    const { reads, calls } = fakeReads({ affordable: () => false });
+    assert.match(await refusal({ place: "channel", channel: "#design-crit" }, asked("C_DESIGN"), reads), /used this turn's Slack lookups/);
+    assert.deepEqual(calls, []);
   });
 
   it("refuses when it cannot check the asker is in the channel", async () => {
@@ -379,7 +387,7 @@ describe("the refusal comes before a card is staged", () => {
     const out = JSON.parse(await executeShareForFeedback(env, { summary, place: "channel", channel: "#big-room" }, slack, fakeReads().reads));
     assert.equal(out.ok, false);
     assert.equal(out.status, "refused");
-    assert.match(out.message, /You're not in #big-room/);
+    assert.match(out.error, /You're not in #big-room/);
   });
 });
 

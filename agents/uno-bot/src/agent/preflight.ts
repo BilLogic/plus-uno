@@ -14,7 +14,7 @@
 // which `default` already says, so a new row needs no edit in this file.
 
 import type { Env, SlackContext } from "../types";
-import { decideShareoutPlace, SHAREOUT_CHANNEL_CHECK_COST, type ShareoutReads } from "../tools/share-for-feedback";
+import { decideShareoutPlace, type ShareoutReads } from "../tools/share-for-feedback";
 // Placeholder detection lives next door, import-free, so the loop and a plain
 // Node test can both reach it without dragging `Env` behind them.
 import { placeholderRefusal } from "./placeholder";
@@ -220,12 +220,8 @@ export async function preflight(
       // shareoutBundleNote) so ✅ is informed consent to post partial.
 
       // A channel the asker names is checked before any card: they are in
-      // it, and the bot can post there (`tools/share-for-feedback.ts`). A turn
-      // too short of lookups to check says so rather than stage unchecked.
+      // it, and the bot can post there (`tools/share-for-feedback.ts`).
       if (input.place === "channel" && ctx.shareout) {
-        if (budgetHeadroom().subrequests < SHAREOUT_CHANNEL_CHECK_COST) {
-          return { ask: "I've used this turn's Slack lookups before I could check that channel — ask me again and I'll check it." };
-        }
         const decided = await decideShareoutPlace(ctx.env, ctx.shareout.slack, input, ctx.shareout.reads);
         if (!decided.ok) return { ask: decided.refusal };
       }
