@@ -283,12 +283,25 @@ if [[ ! -f "$BLUEPRINT_DIR/$MIGRATION_FILE" ]]; then
   exit 1
 fi
 write_env BLUEPRINT_DIR "$BLUEPRINT_DIR"
-say "apply:pending reads SUPABASE_DB_URL from that checkout's .env.local, lists"
+# apply:pending reads SUPABASE_DB_URL from the environment and does not load
+# .env.local itself, so each run sources it in a subshell: the URL never
+# reaches this shell, and nothing here prints it.
+apply_pending() { # [--apply]
+  (cd "$BLUEPRINT_DIR" \
+    && { [[ -f .env.local ]] || { warn "No .env.local in $BLUEPRINT_DIR, so no SUPABASE_DB_URL."; exit 1; }; } \
+    && set -a && . ./.env.local && set +a \
+    && npm run --silent apply:pending -- --from="$MIGRATION" "$@")
+}
+if [[ ! -d "$BLUEPRINT_DIR/node_modules" ]]; then
+  warn "That checkout has no node_modules: run 'npm ci' in $BLUEPRINT_DIR, then re-run."
+  exit 1
+fi
+say "apply:pending takes SUPABASE_DB_URL from that checkout's .env.local, lists"
 say "what it would apply from $MIGRATION on, and applies only with --apply."
-(cd "$BLUEPRINT_DIR" && npm run --silent apply:pending -- --from="$MIGRATION") \
+apply_pending \
   || { warn "The dry run failed; fix what it says (usually SUPABASE_DB_URL), then re-run."; exit 1; }
 if confirm "Apply exactly the list above to production?"; then
-  (cd "$BLUEPRINT_DIR" && npm run --silent apply:pending -- --from="$MIGRATION" --apply) \
+  apply_pending --apply \
     || { warn "The apply failed and rolled back. Nothing is half-done; read the error, then re-run."; exit 1; }
   pass "migration applied"
 else
