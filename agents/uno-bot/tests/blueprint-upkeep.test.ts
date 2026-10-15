@@ -45,6 +45,7 @@ const CARD: ShippedCard = {
   url: "https://www.notion.so/card1",
   title: "Tutors confirm their own session swaps",
   number: 2292,
+  stage: "deployed",
   pillars: ["Tutoring"],
   contributors: [{ id: "n-owner", name: "Owner Person" }],
   lastEditedAt: Date.UTC(2026, 9, 15, 18),
@@ -126,7 +127,7 @@ function world(opts: {
   const state = box<UpkeepState>(opts.state ?? { cursor: "2026-10-15T10:00:00.000Z", seen: [], waiting: [] });
   const searched: string[] = [];
   const deps: ShippedDeps = {
-    roadmap: { deployedSince: async () => opts.cards ?? [CARD] },
+    roadmap: { shippedSince: async () => opts.cards ?? [CARD] },
     evidence: async (card) => opts.text?.[card.pageId] ?? CARD_TEXT,
     gate: serviceChangeGate({
       provider: opts.model.provider,

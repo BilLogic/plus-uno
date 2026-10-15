@@ -1,9 +1,11 @@
 // Blueprint upkeep bound to `Env` — the only file in the folder that names it.
 //
 // What each port becomes:
-//   • the Roadmap: one status query on `Dev Status: Deployed`, narrowed to
-//     cards edited since the cursor (`queryRowsWithStatus`), one page of 100;
-//   • the evidence: the card's own page text (`readNotionPage`);
+//   • the Roadmap: one status query on `Design Status: Shipped` or `Dev
+//     Status: Deployed`, narrowed to cards edited since the cursor
+//     (`queryRowsWithAnyStatus`), one page of 100;
+//   • the evidence: the card's page text and its PRD's (`readNotionPage`,
+//     through `cardEvidence`);
 //   • the gate's search: `search_blueprint`'s read (`searchBlueprint`);
 //   • the path read: four anon-key PostgREST reads of uno-blueprint — the
 //     matched cell's path, then that path's cells, lanes and ordered steps;
@@ -15,15 +17,18 @@
 //   • the state: one JSON record in HARNESS_KV.
 //
 // Budget (ADR-022), per card weighed: the page and up to three block pages
-// (4), the judgement (1), the search (≤3), the path read (4), the draft (1-2),
-// a Slack lookup or two for the owner — about 15, so `MAX_CARDS_PER_RUN` (2)
-// and the Roadmap query fit one alarm's ceiling.
+// (4), its one PRD the same (4), the judgement (1), the search (≤3), the path
+// read (4), the draft (1-2), a Slack lookup or two for the owner — about 15
+// on a typical card, 20 at the worst, so `MAX_CARDS_PER_RUN` (2) and the
+// Roadmap query fit one alarm's ceiling unless both cards are at their worst;
+// `measured` stops the run there. A promotion reads only the path (4) and
+// the owner.
 
 import type { Env } from "../types";
 import { countedFetch } from "../net";
 import { selectProvider } from "../agent/run-agent";
 import { channelIdsFor } from "../destination/env";
-import { queryRowsWithStatus, readNotionPage } from "../integrations/notion";
+import { queryRowsWithAnyStatus, readNotionPage } from "../integrations/notion";
 import { searchBlueprint, isBlueprintConfigured } from "../integrations/blueprint";
 import { cellUrl } from "../integrations/blueprint-link";
 import { ENTITY_STATUSES, type EntityStatus } from "../blueprint-write/index";
@@ -39,8 +44,9 @@ import type { JobContext } from "../scheduled/runs";
 import type { PendingProposal } from "../thread-state/index";
 import { serviceChangeGate } from "./gate";
 import type { PathToday } from "./draft";
+import { cardEvidence } from "./evidence";
+import { stageOf, STAGES } from "./stages";
 import {
-  DEPLOYED,
   handOverRevisions,
   revisionSection,
   runShippedRevisions,
@@ -56,21 +62,28 @@ const EMPTY: UpkeepState = { cursor: null, seen: [], waiting: [] };
 
 const stateFor = (env: Env) => kvJson<UpkeepState>(env, STATE_KV_KEY, EMPTY);
 
-async function deployedSince(env: Env, since: string): Promise<ShippedCard[]> {
+async function shippedSince(env: Env, since: string): Promise<ShippedCard[]> {
   if (!env.NOTION_ROADMAP_DB_ID) throw new Error("NOTION_ROADMAP_DB_ID not configured");
-  const { rows } = await queryRowsWithStatus(env, env.NOTION_ROADMAP_DB_ID, DEPLOYED.property, [DEPLOYED.value], 100, undefined, {
+  const { rows } = await queryRowsWithAnyStatus(env, env.NOTION_ROADMAP_DB_ID, [STAGES.designed, STAGES.deployed], 100, {
     timestamp: "last_edited_time",
     last_edited_time: { on_or_after: since },
   });
-  return rows.map((row) => ({
-    pageId: row.id,
-    url: row.url,
-    title: row.title,
-    number: row.number ?? null,
-    pillars: row.values["Product Pillar"] ?? [],
-    contributors: row.persons.Contributor ?? [],
-    lastEditedAt: Date.parse(row.lastEditedTime) || 0,
-  }));
+  return rows.flatMap((row) => {
+    const stage = stageOf(row.values);
+    if (!stage) return [];
+    return [
+      {
+        pageId: row.id,
+        url: row.url,
+        title: row.title,
+        number: row.number ?? null,
+        stage,
+        pillars: row.values["Product Pillar"] ?? [],
+        contributors: row.persons.Contributor ?? [],
+        lastEditedAt: Date.parse(row.lastEditedTime) || 0,
+      },
+    ];
+  });
 }
 
 /** One anon-key PostgREST read of uno-blueprint. */
@@ -142,8 +155,8 @@ export async function runShippedRevisionsOnEnv(env: Env, opts: JobContext): Prom
   const config = channelIdsFor(env);
   return runShippedRevisions(
     {
-      roadmap: { deployedSince: (since) => measured(() => deployedSince(env, since)) },
-      evidence: async (card) => (await measured(() => readNotionPage(env, card.pageId))).text,
+      roadmap: { shippedSince: (since) => measured(() => shippedSince(env, since)) },
+      evidence: (card) => cardEvidence((pageId) => measured(() => readNotionPage(env, pageId)), card.pageId),
       gate: serviceChangeGate({ provider, search: async (q) => (await measured(() => searchBlueprint(env, q))).rows }),
       readPath: (cellId) => measured(() => readPathOf(env, cellId)),
       provider,
