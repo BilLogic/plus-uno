@@ -19,7 +19,7 @@
 //
 // Pure: no `Env`, no fetch.
 
-import type { ProposalOperation, ReportItem, StatedCardWords } from "../thread-state/index";
+import type { PrecedenceFacts, ProposalOperation, ReportItem, StatedCardWords } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
 import type { Addressee } from "../destination/index";
@@ -210,6 +210,28 @@ export function precedenceCard(finding: ComponentFinding, weekOf: string): Propo
     fields: [],
     caveats: [],
     operations: [precedenceOperation(finding, weekOf)],
+  };
+}
+
+/** The side that needs the fix, as the finding says it. */
+const FIXES: Record<DsSource, string> = { code: "code needs the fix", library: "the library needs the fix", "spec-pages": "the spec pages need the fix" };
+
+/**
+ * One component as Review draws it (`PendingProposal.facts`): the finding,
+ * what differs with each prop in backticks, both sources, and the week.
+ *
+ * @param finding - The component
+ * @param weekOf - The check's date
+ */
+export function precedenceFacts(finding: ComponentFinding, weekOf: string): PrecedenceFacts {
+  const first = finding.items[0]!;
+  return {
+    kind: "ds_precedence_intake",
+    finding: `${finding.component}: ${FIXES[first.loser]}`,
+    week: shortDate(weekOf),
+    differences: finding.items.map((i) => `${i.summary.charAt(0).toUpperCase()}${i.summary.slice(1)}`),
+    codeUrl: first.codeUrl,
+    figmaUrl: first.figmaUrl,
   };
 }
 

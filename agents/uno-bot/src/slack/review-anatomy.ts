@@ -52,6 +52,9 @@ export interface DraftAnatomy {
   /** What Approve does on this card, when the tool's words need the draft
    *  (`decisionWords` otherwise). */
   approve?: string;
+  /** What Needs changes does on this card, when it does something other than
+   *  redraft (`decisionWords` otherwise). */
+  revise?: string;
 }
 
 /** Slack's caps: a header's text 150, an alert's 200, a section field 2,000
@@ -266,7 +269,7 @@ const WORDS: Readonly<Record<string, readonly [string, string] | ((input: Record
   github_workflow_run: ["Starts the run; its runs page posts in the thread.", "Nothing runs."],
   sweep_share_post: ["Posts exactly this note.", "Nothing posts."],
   figma_dev_links: ["Adds the links and the comment in Figma.", "Adds nothing."],
-  ds_precedence_intake: ["Adds it to this week's intake.", "Nothing is filed."],
+  ds_precedence_intake: ["Adds it to this week's intake.", "Left as deliberate. Nothing is filed."],
   figma_tidy_up: ["Leaves the file as it is.", "Nothing is recorded."],
 };
 

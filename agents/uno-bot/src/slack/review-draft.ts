@@ -33,9 +33,10 @@ import {
   type DraftAnatomy,
   type WhereElement,
 } from "./review-anatomy";
+import { devLinksAnatomy, precedenceAnatomy, shareNoteAnatomy, tidyAnatomy } from "./review-stated";
 import { createFacts, notionCreateAnatomy, type NotionDatabaseLinks } from "./review-notion-create";
 import { archiveAnatomy, issueCreateAnatomy, issueUpdateAnatomy, workflowRunAnatomy } from "./review-draft-writes";
-import type { ProposalOperation } from "../thread-state/index";
+import type { ProposalOperation, StatedFacts } from "../thread-state/index";
 
 type Input = Record<string, unknown>;
 
@@ -190,6 +191,8 @@ export interface DraftDetail {
   editing?: boolean;
   /** Why the change is proposed, mrkdwn; shown once, at the first change. */
   issue?: string;
+  /** A stated card's facts (`PendingProposal.facts`). */
+  facts?: StatedFacts;
   /** Edit fields, for a reading that sets it beside the facts its selects
    *  edit; the view puts it at the head of the content otherwise. */
   editButton?: unknown;
@@ -422,10 +425,15 @@ export function caveatsOf(cardText: string): string[] {
  *  the place it names and its caveats, and the draft's detail. */
 export type AnatomyContext = DraftDetail & { cardText: string };
 
-/** Readings in the shared anatomy, by tool. A tool with none is drawn by its
- *  `READERS` reading, or from the card's text. */
-const ANATOMY_READERS: Record<string, (input: Input, context: AnatomyContext) => DraftAnatomy> = {
+/** Readings in the shared anatomy, by tool. A tool with none — or a reading
+ *  that returns null, as a stated card staged before its facts does — is
+ *  drawn by its `READERS` reading, or from the card's text. */
+const ANATOMY_READERS: Record<string, (input: Input, context: AnatomyContext) => DraftAnatomy | null> = {
   shareout_post: shareoutAnatomy,
+  figma_tidy_up: tidyAnatomy,
+  figma_dev_links: devLinksAnatomy,
+  ds_precedence_intake: precedenceAnatomy,
+  sweep_share_post: shareNoteAnatomy,
   notion_create: (input, context) => notionCreateAnatomy(input, { ...context, caveats: caveatsOf(context.cardText) }),
   notion_archive: archiveAnatomy,
   github_issue_update: issueUpdateAnatomy,
