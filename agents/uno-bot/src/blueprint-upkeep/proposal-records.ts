@@ -44,11 +44,39 @@ export interface ProposalRecords {
   linkCard(channel: string, threadTs: string, cardId: string): Promise<number>;
   /** Proposals still without a card, written at or before `before`, oldest first. */
   unlinkedBefore(before: number, limit: number): Promise<DrawnProposal[]>;
+
+  // Withdrawal and the 30-day offer (`./proposal-cleanup.ts`). A withdrawn
+  // record stays, marked, so the thread and the check never see it again.
+
+  /** A proposal and where its clean-up stands; null for no such record. */
+  standing(proposalTs: string): Promise<ProposalStanding | null>;
+  /** A thread's proposals not withdrawn, oldest first. */
+  standingInThread(channel: string, threadTs: string): Promise<DrawnProposal[]>;
+  /** Mark a proposal withdrawn; false when it already was, or is no record. */
+  withdraw(proposalTs: string, at: number): Promise<boolean>;
+  /** Unlinked, standing proposals never offered for removal, written at or
+   *  before `before`, oldest first. */
+  dueForOffer(before: number, limit: number): Promise<DrawnProposal[]>;
+  /** Take the one removal offer a proposal gets; false when it was taken. */
+  claimOffer(proposalTs: string, at: number): Promise<boolean>;
+  /** Give back a claim whose offer never went up, for the next check. */
+  releaseOffer(proposalTs: string): Promise<void>;
+}
+
+/** A proposal with its clean-up marks: when it was offered for removal, and
+ *  when it was withdrawn. */
+export interface ProposalStanding {
+  proposal: DrawnProposal;
+  offeredAt: number | null;
+  withdrawnAt: number | null;
 }
 
 /** The in-memory adapter: the Node suite's, and the contract's reference. */
 export function createInMemoryProposalRecords(): ProposalRecords {
   const kept = new Map<string, DrawnProposal>();
+  const marks = new Map<string, { offeredAt: number | null; withdrawnAt: number | null }>();
+  const markOf = (ts: string) => marks.get(ts) ?? { offeredAt: null, withdrawnAt: null };
+  const isStanding = (p: DrawnProposal) => markOf(p.proposalTs).withdrawnAt === null;
   const copy = (p: DrawnProposal): DrawnProposal => ({ ...p, cellIds: [...p.cellIds] });
   const oldestFirst = (a: DrawnProposal, b: DrawnProposal) => a.writtenAt - b.writtenAt || a.proposalTs.localeCompare(b.proposalTs);
   return {
@@ -74,6 +102,33 @@ export function createInMemoryProposalRecords(): ProposalRecords {
         .sort(oldestFirst)
         .slice(0, limit)
         .map(copy);
+    },
+    async standing(proposalTs) {
+      const p = kept.get(proposalTs);
+      return p ? { proposal: copy(p), ...markOf(proposalTs) } : null;
+    },
+    async standingInThread(channel, threadTs) {
+      return [...kept.values()].filter((p) => p.channel === channel && p.threadTs === threadTs && isStanding(p)).sort(oldestFirst).map(copy);
+    },
+    async withdraw(proposalTs, at) {
+      if (!kept.has(proposalTs) || markOf(proposalTs).withdrawnAt !== null) return false;
+      marks.set(proposalTs, { ...markOf(proposalTs), withdrawnAt: at });
+      return true;
+    },
+    async dueForOffer(before, limit) {
+      return [...kept.values()]
+        .filter((p) => p.cardId === null && p.writtenAt <= before && isStanding(p) && markOf(p.proposalTs).offeredAt === null)
+        .sort(oldestFirst)
+        .slice(0, limit)
+        .map(copy);
+    },
+    async claimOffer(proposalTs, at) {
+      if (!kept.has(proposalTs) || markOf(proposalTs).offeredAt !== null) return false;
+      marks.set(proposalTs, { ...markOf(proposalTs), offeredAt: at });
+      return true;
+    },
+    async releaseOffer(proposalTs) {
+      if (marks.has(proposalTs)) marks.set(proposalTs, { ...markOf(proposalTs), offeredAt: null });
     },
   };
 }

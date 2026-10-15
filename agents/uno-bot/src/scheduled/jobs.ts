@@ -30,7 +30,14 @@ import { runBackstopOnEnv } from "../figma-notify/env";
 import { runTidyPostOnEnv, runTidyReadOnEnv, tidySectionFor } from "../figma-tidy/env";
 import { devLinksSectionFor, runDevLinksMorningOnEnv } from "../figma-links/env";
 import { dmThreadHookFor } from "../dm-sweep/env";
-import { revisionSectionFor, runRevisionPostOnEnv, runRevisionThreadOnEnv, runShippedDraftOnEnv, runShippedMatchOnEnv } from "../blueprint-upkeep/env";
+import {
+  revisionSectionFor,
+  runProposalOffersOnEnv,
+  runRevisionPostOnEnv,
+  runRevisionThreadOnEnv,
+  runShippedDraftOnEnv,
+  runShippedMatchOnEnv,
+} from "../blueprint-upkeep/env";
 import { runProposalExpiry } from "../usage/index";
 import { runDmPromiseNudgesOnEnv, runDmPromiseReadOnEnv } from "../dm-watch/env";
 import { runDmCapturePostOnEnv, runDmCaptureReadOnEnv } from "../dm-watch/capture-env";
@@ -323,6 +330,13 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // for, up in its message's thread.
   "blueprint-revision-thread": async (env, job, ctx) => {
     const report = await runRevisionThreadOnEnv(env, ctx);
+    console.log(`[blueprint-upkeep] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // Morning: each drawn proposal no Roadmap card took up in 30 days, its
+  // removal offered once in its own thread to the person who drew it.
+  "blueprint-proposal-offer": async (env, job, ctx) => {
+    const report = await runProposalOffersOnEnv(env, ctx);
     console.log(`[blueprint-upkeep] ${job.key}: ${report.summary}`);
     return report;
   },

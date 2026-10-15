@@ -110,7 +110,11 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * changes, and the `blueprint-draft` jobs draft each path's blueprint
  * revision; the morning `blueprint-revision-post` hands each to the sweep's
  * message at its card's place, and `blueprint-revision-thread` puts the ones
- * its carousel had no room for in its thread (src/blueprint-upkeep/).
+ * its carousel had no room for in its thread (src/blueprint-upkeep/). The
+ * morning `blueprint-proposal-offer` offers, once, the removal of each
+ * proposal drawn on the blueprint that no Roadmap card was linked to within
+ * 30 days, on a card in the proposal's own thread that only the person who
+ * drew it decides (src/blueprint-upkeep/proposal-cleanup.ts).
  * Every morning job that finds cards for a team channel hands them to
  * `sweep-post`, which runs after them all, so a place gets one message.
  */
@@ -148,7 +152,8 @@ export type ScheduledJobKind =
   | "blueprint-shipped"
   | "blueprint-draft"
   | "blueprint-revision-post"
-  | "blueprint-revision-thread";
+  | "blueprint-revision-thread"
+  | "blueprint-proposal-offer";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -273,6 +278,10 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     // After the sweep's post and the place jobs it spawns, which run right
     // behind it: the revisions a carousel had no room for, in its thread.
     { key: "blueprint-revision-thread", kind: "blueprint-revision-thread", after: ["sweep-post"] },
+    // Not a sweep section: each offer goes in its proposal's own thread, where
+    // the person who drew it sees it (ADR-031). After the morning message, in
+    // working hours, never in the night run.
+    { key: "blueprint-proposal-offer", kind: "blueprint-proposal-offer" },
     { key: "team-roles-sync", kind: "team-roles-sync" },
     // Both runs purge, so no text outlives 14 days across a weekend and one
     // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).

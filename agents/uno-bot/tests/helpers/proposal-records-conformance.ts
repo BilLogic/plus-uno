@@ -76,4 +76,35 @@ export function runProposalRecordsConformance(label: string, make: () => Proposa
     assert.deepEqual((await r.unlinkedBefore(200, 1)).map((p) => p.proposalTs), ["1.2"]);
     assert.deepEqual(await r.unlinkedBefore(5, 10), []);
   });
+
+  // ── Withdrawal and the 30-day offer ───────────────────────────────────────
+
+  it("a withdrawn proposal leaves its thread's standing ones and is withdrawn once", async () => {
+    const r = make();
+    await r.record(drawn({ proposalTs: "1.1", writtenAt: 1 }));
+    await r.record(drawn({ proposalTs: "1.2", writtenAt: 2 }));
+    assert.equal(await r.withdraw("1.1", 500), true);
+    assert.equal(await r.withdraw("1.1", 600), false, "already withdrawn");
+    assert.deepEqual((await r.standingInThread("C0TEAM", "1700000000.000100")).map((p) => p.proposalTs), ["1.2"]);
+    assert.deepEqual(await r.standing("1.1"), { proposal: drawn({ proposalTs: "1.1", writtenAt: 1 }), offeredAt: null, withdrawnAt: 500 });
+    assert.equal(await r.standing("9.9"), null);
+  });
+
+  it("only unlinked, standing, never-offered proposals are due an offer, and a claim is taken once", async () => {
+    const r = make();
+    await r.record(drawn({ proposalTs: "1.1", threadTs: "t1", writtenAt: 100 }));
+    await r.record(drawn({ proposalTs: "1.2", threadTs: "t2", writtenAt: 50 }));
+    await r.record(drawn({ proposalTs: "1.3", threadTs: "t3", writtenAt: 60 }));
+    await r.record(drawn({ proposalTs: "1.4", threadTs: "t4", writtenAt: 10 }));
+    await r.record(drawn({ proposalTs: "1.5", threadTs: "t5", writtenAt: 400 }));
+    await r.linkCard("C0TEAM", "t4", "page-a");
+    await r.withdraw("1.3", 70);
+    assert.deepEqual((await r.dueForOffer(200, 10)).map((p) => p.proposalTs), ["1.2", "1.1"]);
+    assert.equal(await r.claimOffer("1.2", 300), true);
+    assert.equal(await r.claimOffer("1.2", 301), false, "claimed once");
+    assert.deepEqual((await r.dueForOffer(200, 10)).map((p) => p.proposalTs), ["1.1"]);
+    assert.equal((await r.standing("1.2"))?.offeredAt, 300);
+    await r.releaseOffer("1.2");
+    assert.deepEqual((await r.dueForOffer(200, 1)).map((p) => p.proposalTs), ["1.2"]);
+  });
 }

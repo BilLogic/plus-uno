@@ -210,6 +210,8 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
     ["sweep-post", "sweep-post"],
     // After it: the revisions its carousel had no room for, in its thread.
     ["blueprint-revision-thread", "blueprint-revision-thread"],
+    // A drawn proposal no Roadmap card took up in 30 days, offered for removal in its thread.
+    ["blueprint-proposal-offer", "blueprint-proposal-offer"],
     ["team-roles-sync", "team-roles-sync"],
     // Both runs purge, so text never outlives its 14 days over a weekend.
     ["usage-text-purge", "usage-text-purge"],

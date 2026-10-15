@@ -1788,9 +1788,9 @@ describe("wiring", () => {
     assert.equal(threadHooks(bare, { dryRun: false, runDate: utcDay(EOD) }), undefined);
   });
 
-  it("the message job tries a typed gate emoji in a DS precedence thread first, then a Figma decision's rewording, then a blueprint revision's correction, then the card follow-up reply — no typed answer to a drift card", () => {
+  it("the message job tries a typed gate emoji in a DS precedence thread first, then a Figma decision's rewording, then a blueprint revision's correction, then the card follow-up reply, then a blueprint proposal's removal ask — no typed answer to a drift card", () => {
     const handlers = replyHandlersFor({ PLUS_DESIGN_CHANNEL_ID: DESIGN, USAGE_DB: {}, HARNESS_KV: {} } as unknown as Env);
-    assert.deepEqual(handlers.map((h) => h.name), ["ds-precedence", "figma-decisions", "blueprint-revisions", "follow-through"]);
+    assert.deepEqual(handlers.map((h) => h.name), ["ds-precedence", "figma-decisions", "blueprint-revisions", "follow-through", "blueprint-withdraw"]);
     const card = handlers[3]!;
     const reply = { type: "message", channel: DESIGN, thread_ts: "1790700000.000100", ts: "1790700100.000100", user: MAYA, text: "Shipped" } as SlackMessageEvent;
     assert.equal(card.candidate(reply), true, "a short reply in a design thread is the card handler's to check");
