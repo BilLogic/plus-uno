@@ -141,7 +141,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Range | Form Range Input | `42:5756` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5756) | verified |
 | Components | Rating | Rating System (disclosure) | `13526:17774` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13526-17774) | verified |
 | Components | Rating | Rating System (with text) | `13536:195` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-195) | verified |
-| Components | RichTextEditor | Rich Text Editor | `10010:37927` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10010-37927) | verified |
+| Components | RichTextEditor | Rich Text Editor | `18729:36579` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18729-36579) | verified |
 | Components | ScrollBar | Scrollbar | `39:5070` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=39-5070) | verified |
 | Components | Scrollspy | Scrollspy | `72:16776` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16776) | verified |
 | Components | Select | Select | `8583:12093` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=8583-12093) | verified |
