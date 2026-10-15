@@ -1,31 +1,28 @@
 #!/usr/bin/env node
 //
-// generate-check-scripts.mjs — the registry writes the three places that used
-// to re-list the checks by hand.
+// generate-check-scripts.mjs — the registry writes the places that used to
+// re-list the checks by hand.
 //
 // WHY THIS EXISTS
 // ---------------
-// `scripts/checks.registry.mjs` holds one row per check. Three other files
+// `scripts/checks.registry.mjs` holds one row per check. Other files
 // stated the same set in their own words:
 //
 //   1. the `check:*` block of the root package.json — 46 lines binding a name
 //      to a command, and the only place that binding exists;
-//   2. `.github/workflows/harness-integrity-sweep.yml` — the monthly backstop,
-//      which runs eight of them as spelled-out steps because `main` is
-//      unprotected and a direct push never meets the PR gate;
-//   3. `.github/workflows/storybook-gate.yml` — the browser job, which runs the
+//   2. `.github/workflows/storybook-gate.yml` — the browser job, which runs the
 //      two checks the fast gate deliberately excludes.
 //
-// Nothing compared the four. A check could be registered and missing from a
+// Nothing compared them. A check could be registered and missing from a
 // manifest, or run in a workflow while the registry said it ran nowhere, and
 // both read as correct from inside each file. So the registry is now the author
-// of the generated regions of all three, and `--check` fails on drift — the
+// of the generated regions of both, and `--check` fails on drift — the
 // same shape as `scripts/generate-uno-skill-surfaces.mjs` and
 // `check:skill-surfaces`.
 //
 // WHAT IT DOES NOT OWN. Everything outside the markers: every `generate:*`,
 // `dev:*` and `build:*` script, and every workflow step that is not a check
-// (the checkouts, the Node setup, the sibling clones, the Claude action). The
+// (the checkouts, the Node setup, the installs). The
 // markers are narrow on purpose — a generator that owns a whole file is a
 // generator that eats the hand-written reasoning around it.
 //
@@ -34,8 +31,8 @@
 // catches the same drift without taking authorship of a file this registry
 // only half describes.
 //
-// AND EVERY TRIGGER IS ASSERTED, NOT JUST THE TWO THIS SCRIPT WRITES. The
-// `trigger` column names four places a check runs, and generation reaches two
+// AND EVERY TRIGGER IS ASSERTED, NOT JUST THE ONE THIS SCRIPT WRITES. The
+// `trigger` column names three places a check runs, and generation reaches one
 // of them. The other two — the pull-request workflows and the Worker's `deploy`
 // chain — were honoured by hand: a row could claim `pull_request` and be run by
 // nothing, or the chain could gain a step no row knew about, and each file read
@@ -533,7 +530,6 @@ export function consistencyFindings() {
 
   const registered = new Map(ALL.map((row) => [row.name, row]));
   const WORKFLOW_TRIGGER = {
-    '.github/workflows/harness-integrity-sweep.yml': 'sweep',
     '.github/workflows/storybook-gate.yml': 'storybook-gate',
   };
 
@@ -572,7 +568,7 @@ export function consistencyFindings() {
     }
   }
 
-  // The other two triggers. All four are asserted now, which is the whole of
+  // The other two triggers. All three are asserted now, which is the whole of
   // the registry's `trigger` column no longer has a column nobody reads.
   found.push(...pullRequestFindings(pullRequestRuns()));
   found.push(...deployChainFindings());
@@ -583,8 +579,8 @@ export function consistencyFindings() {
 // ---------------------------------------------------------------------------
 // the two triggers that are honoured by hand-written files
 //
-// `sweep` and `storybook-gate` are asserted above, against WORKFLOW_STEPS,
-// because the registry writes those steps. The other two are not written from
+// `storybook-gate` is asserted above, against WORKFLOW_STEPS, because the
+// registry writes those steps. The other two are not written from
 // here — the pull-request workflows are jobs with installs and forty lines of
 // measured argument around each `run:`, and the deploy chain ends in the
 // command that reaches a real Cloudflare account. Both are therefore READ and
@@ -835,7 +831,7 @@ export const summary = () =>
   `${CHECKS.length} registered + ${EXCLUDED.length} excluded checks, ` +
   `${rootCheckRows().length} in package.json, ${WORKFLOW_STEPS.length} workflow steps, ` +
   `${PULL_REQUEST_WORKFLOWS.length} pull-request workflows, ` +
-  `${DEPLOY_CHAIN.length}-step deploy chain — all four triggers asserted, no drift`;
+  `${DEPLOY_CHAIN.length}-step deploy chain — all three triggers asserted, no drift`;
 
 // `main()` is not the shape here: its default branch is the gate, and this
 // file's default is the WRITE — `--check` is the side door. So the entry

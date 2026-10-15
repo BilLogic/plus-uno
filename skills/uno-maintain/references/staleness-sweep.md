@@ -3,7 +3,7 @@ embodiment: ide
 summary: One intake per finding (evidence + suggested severity), through the normal pipeline in method.md
 ---
 
-<!-- Load for: the conventions-integrity sweep (monthly, at retro). Registry row: docs/engineering/operations.md. Run by reviewers/auditor — inspect and file intakes only, never fix in-sweep. -->
+<!-- Load for: the conventions-integrity sweep (monthly, at retro). Run by reviewers/auditor — inspect and file intakes only, never fix in-sweep. -->
 
 # Integrity sweep checklist
 

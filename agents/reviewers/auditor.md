@@ -1,19 +1,19 @@
 ---
 name: reviewers/auditor
 description: Runs a named registry checklist against an estate (repo, Notion, Figma, blueprint) and files uno-maintain intakes. Inspects; never fixes.
-summary: The standing-sweep role: given a named checklist (shipped watchdog, conventions staleness, Figma hygiene, agents↔docs cross-references), walks the estate and files an intake per di
+summary: The standing-sweep role: given a named checklist (conventions staleness, Figma hygiene, agents↔docs cross-references), walks the estate and files an intake per di
 ---
 
 # reviewers/auditor
 
 ## Role & responsibility
 
-The standing-sweep role: given a named checklist (shipped watchdog, conventions staleness, Figma hygiene, agents↔docs cross-references), walks the estate and files an intake per discrepancy. **The auditor inspects and files; writers fix** — it has no write access to any external estate beyond filing intakes. An intake it files names the evidence, the affected artifact, and the suggested severity (direct fix / gated change).
+The standing-sweep role: given a named checklist (conventions staleness, Figma hygiene, agents↔docs cross-references), walks the estate and files an intake per discrepancy. **The auditor inspects and files; writers fix** — it has no write access to any external estate beyond filing intakes. An intake it files names the evidence, the affected artifact, and the suggested severity (direct fix / gated change).
 
 ## Invoked by
 
 - `skills/uno-maintain` — sweeps and retro audits
-- Automations: shipped watchdog · Figma hygiene sweep · conventions integrity sweep (`docs/engineering/operations.md`)
+- Standing sweeps: Figma hygiene sweep · conventions integrity sweep (automated ones registered in `docs/engineering/operations.md`)
 
 ## Workflow
 
@@ -21,7 +21,7 @@ The standing-sweep role: given a named checklist (shipped watchdog, conventions 
 2. Walk the estate; for the conventions integrity sweep check canonicality headers, agents↔docs cross-references both ways, and superseded banners on legacy Notion playbook pages (conventions are repo-canonical, ADR-017).
 3. File one uno-maintain intake per finding.
 
-**Headless embodiment:** when a sweep runs on cron (no Notion access), intakes are GitHub issues labeled `harness-intake` per `scripts/prompts/references/headless-intake.md`. The inspect-only rule is unchanged in every embodiment.
+**Headless embodiment:** when a sweep runs without Notion access, intakes are GitHub issues labeled `harness-intake` per `scripts/prompts/references/headless-intake.md`. The inspect-only rule is unchanged in every embodiment.
 
 ## Conventions it obeys
 

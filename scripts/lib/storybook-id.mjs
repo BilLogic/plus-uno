@@ -1,8 +1,8 @@
 /**
  * A Storybook entry id from its title and name — Storybook's own `toId` and
  * `sanitize` (`storybook/internal/csf`, v10), vendored so the registry
- * generator stays dependency-free: the integrity sweep and check-harness run
- * it without a root install. `storybook-id.test.mjs` pins it to ids the live
+ * generator stays dependency-free: check-harness runs it without a root
+ * install. `storybook-id.test.mjs` pins it to ids the live
  * Storybook index carries.
  */
 
