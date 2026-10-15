@@ -1173,7 +1173,11 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // a reply cite a fetch or concede an error it never made — unsatisfiable by
   // construction. The text patterns lean broad on purpose; this is the guard
   // that keeps that safe.
-  const priorAssistantTurn = [...request.history].reverse().find((t) => t.role === "assistant");
+  // A ⛔ note past `RECENT_CANCEL_MS` is history, not "just now": the model is
+  // not shown it, and only the store keeps it (`agent/context-state.ts`). Not
+  // behind the state flag: it is about what any turn's model reads.
+  const shownHistory = withoutAgedCancels(request.history, startedAt, RECENT_CANCEL_MS);
+  const priorAssistantTurn = [...shownHistory].reverse().find((t) => t.role === "assistant");
   // Receipts are attached to the USER turn of the exchange they describe, so
   // the search is by receipt, not by role.
   const priorReceipt = [...request.history].reverse().find((t) => t.retrieval)?.retrieval;
@@ -1186,11 +1190,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     );
   }
 
-  // A ⛔ note past `RECENT_CANCEL_MS` is history, not "just now": the model is
-  // not shown it, and only the store keeps it (`agent/context-state.ts`).
-  const conversation = withoutAgedCancels(request.history, startedAt, RECENT_CANCEL_MS);
   if (deps.contextState) {
-    const block = buildContextBlock(conversation, request.text);
+    const block = buildContextBlock(shownHistory, request.text);
     if (block) modelBlocks.push(block);
   }
   const modelText = modelBlocks.join("\n\n");
@@ -1199,8 +1200,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // conversation with a COUNT rather than deleting it silently — a model told
   // the record is partial can say so; a model handed a gap reasons across it.
   const historyForModel = deps.contextState
-    ? compactHistory(conversation, { keepRecent: 12, maxChars: 12_000 }).turns
-    : conversation;
+    ? compactHistory(shownHistory, { keepRecent: 12, maxChars: 12_000 }).turns
+    : shownHistory;
 
   // ── The working signals ────────────────────────────────────────────────────
   //

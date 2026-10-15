@@ -2873,6 +2873,7 @@ async function inADm(
   let sawNote = false;
   const start = h.provider.start.bind(h.provider);
   h.provider.start = async (turn) => {
+    // The note itself, or the state block's line for it (`deriveState`).
     sawNote = turn.conversation.some((t) => t.text.includes("Cancelled the proposed") || /cancelled: [a-z_]+/.test(t.text));
     return start(turn);
   };
@@ -2914,7 +2915,9 @@ test("a ⛔ note with no time on it counts as aged, and is left out of the model
   assert.equal(outcome.disposition, "staged");
 });
 
-test("a ⛔ inside the window still reaches the model, and the same card is still held back", async () => {
+// The code guard's half of a recent ⛔ is the `afterCancel` cases above; this
+// is the model's half, which still sees the note inside the window.
+test("a ⛔ inside the window still reaches the model, and no card is staged", async () => {
   const { outcome, sawNote } = await inADm(cancelNote("shareout_post", {}), [shareout()], 2 * 60_000);
   assert.equal(sawNote, true);
   assert.notEqual(outcome.disposition, "staged");
@@ -2924,7 +2927,7 @@ test("a redirect after a ⛔ is never held back, recent or aged", async () => {
   // Recent: a model that stages the redirect, and the guard compares targets.
   const recent = await afterCancel(cancelNote("shareout_post", {}), [shareout({ place: "here" })], 2 * 60_000);
   assert.equal(recent.disposition, "staged");
-  // Aged, under the imitating model: the incident itself.
+  // Aged, under the imitating model: the DM ask that was bounced the next morning.
   const aged = await inADm(cancelNote("shareout_post", {}), [shareout({ place: "here" })], 11 * 60 * 60_000);
   assert.equal(aged.outcome.disposition, "staged");
 });

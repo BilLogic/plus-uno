@@ -145,11 +145,13 @@ export function renderState(state: ConversationState): string {
 // A ⛔ note tells the model an action was just cancelled, and the model reads
 // "just" into it: it declines to re-propose on its own. In a DM every top-level
 // message is one conversation, so the note can be hours old by the next ask,
-// and the model still bounced that ask as "a moment ago". A note older than
-// the window is left out of what the model sees, here and in the state block.
-// The store keeps it, so the conversation's record of the cancel survives and
-// the code guard (`turn/turn.ts`, `agent/cancel-note.ts`) still reads it. A
-// note with no `at` predates the stamp, so it is hours old and left out too.
+// and the model still bounced that ask as "a moment ago". A turn that is only
+// a note older than the window is left out of what the model sees, and so of
+// the state block too. The store keeps it, so the conversation's record of the
+// cancel survives and the code guard (`turn/turn.ts`, `agent/cancel-note.ts`)
+// still reads it. A note with no `at` predates the stamp, so it is hours old
+// and left out too. Unlike the rest of this file it is not behind the flag:
+// the note reaches the model on every turn, state block or none.
 
 /** The whole of a ⛔ note, as `agent/cancel-note.ts` writes it. */
 const CANCEL_NOTE_RE = /^\(Cancelled the proposed [a-z_]+\b[^\n]*\)$/;
