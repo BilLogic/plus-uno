@@ -27,7 +27,7 @@ import { reviewDraft } from "../agent/draft-judge";
 import { runAgent, selectProvider, type AgentResult, type TurnDials } from "../agent/run-agent";
 import type { ToolCall, ToolResultNote } from "../agent/tool-transcript";
 import type { GateRestage, GateVerdict, OperationOutcome } from "../gate/index";
-import { conversationsHistoryBefore, updateMessage } from "../slack/api";
+import { conversationsHistoryBefore, openConversation, postMessage, updateMessage } from "../slack/api";
 import { reportItems } from "../slack/decision-cards";
 import { formatAssistantContext } from "../slack/assistant";
 import { buildNotionBefore, buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
@@ -49,6 +49,10 @@ import {
   testChannelIdsOf,
   usageLogFor,
 } from "../usage/production";
+import { charge } from "../net";
+import { resolveGeminiModel } from "../agent/gemini-tiers";
+import { capacityOutage, NOT_WATCHED, watchedTurnDeps, type CapacityOutage } from "./capacity-outage";
+import { capacityOutageStoreFor } from "../thread-state/production";
 import type { Delivery } from "./delivery";
 import { restageExecution, type TurnDeps, type TurnRequest } from "./turn";
 
@@ -142,7 +146,15 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
 
   const slack = toolSlackContextFor(request, wiring);
 
-  return {
+  // Watched for capacity (#1228), Slack turns and Figma asks alike: a turn
+  // that fails on it with the backup tried is counted, and the lead hears
+  // about an outage that lasts; the next turn that answers closes it. Test
+  // traffic (a debug route, a channel on TEST_CHANNEL_IDS) neither counts nor
+  // closes one.
+  return watchedTurnDeps(
+    { origin: wiring.origin, channel: request.channel, testChannelIds: testChannelIdsOf(env) },
+    () => capacityOutageFor(env),
+    {
     threadState: wiring.threadState,
     standingConfirmers: standingConfirmersOf(env),
     delivery: wiring.delivery,
@@ -262,7 +274,8 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     // summarisation. FLAGGED OFF by default; see the header of
     // `agent/context-state.ts` for why this one does not get to ship on.
     contextState: env.CONTEXT_STATE === "on",
-  };
+    },
+  );
 }
 
 /**
@@ -363,4 +376,57 @@ export function restageFor(
  */
 async function followRestageFor(env: Env, from: PendingProposal, to: PendingProposal): Promise<void> {
   await recordSweepRestageFor(env, from, to);
+}
+
+/** The KV hint that an outage may be open, so a succeeding turn calls the
+ *  Durable Object only then. */
+const OUTAGE_HINT_KEY = "capacity-outage:open";
+
+/** How long the hint outlives its last raise: past any outage the lead was
+ *  told about, which closes by itself at its next failure if the hint is gone. */
+const OUTAGE_HINT_TTL_S = 7 * 24 * 60 * 60;
+
+/**
+ * The capacity outage on `Env`: its record on the ThreadState Durable Object,
+ * a HARNESS_KV hint that one may be open, and a DM to `LEAD_USER_ID` alone in
+ * their DM with uno-bot. No lead, or no HARNESS_KV, keeps nothing: an outage
+ * nobody can be told about is not worth a call per turn.
+ *
+ * @param env - Worker bindings
+ */
+export function capacityOutageFor(env: Env): CapacityOutage {
+  const kv = env.HARNESS_KV;
+  const lead = env.LEAD_USER_ID?.trim();
+  if (!kv || !lead) return NOT_WATCHED;
+  // Which adapter answers is `selectProvider`'s to decide (#605); only its
+  // name is read here, to say what is failing.
+  const claude = selectProvider(env).name === "vertex-claude";
+  return capacityOutage({
+    lead,
+    models: claude
+      ? `the Claude model (${env.CLAUDE_MODEL ?? "the default"}), which has no backup`
+      : `${resolveGeminiModel("default", env)} and its backup, ${env.GEMINI_FALLBACK_MODEL ?? "gemini-2.5-pro"}`,
+    store: capacityOutageStoreFor(env),
+    hint: {
+      async isUp() {
+        charge(1, "kv");
+        return (await kv.get(OUTAGE_HINT_KEY)) !== null;
+      },
+      async raise() {
+        charge(1, "kv");
+        await kv.put(OUTAGE_HINT_KEY, "1", { expirationTtl: OUTAGE_HINT_TTL_S });
+      },
+      async lower() {
+        charge(1, "kv");
+        await kv.delete(OUTAGE_HINT_KEY);
+      },
+    },
+    async dm(userId, text) {
+      const open = await openConversation(env, userId);
+      if (!open.ok) return { ok: false, error: open.error };
+      const res = await postMessage(env, { channel: open.channel, text });
+      return res.ok ? { ok: true } : { ok: false, error: res.error ?? "post failed" };
+    },
+    now: () => Date.now(),
+  });
 }

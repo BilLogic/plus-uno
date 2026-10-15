@@ -104,7 +104,6 @@ export function postingDeps(env: Env): PostingDeps {
     slack: postingClientFor(env),
     streamingOn: streamFlagOn(env, "SLACK_STREAMING"),
     alertChannel: env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL,
-    throttle: env.HARNESS_KV ?? null,
   };
 }
 

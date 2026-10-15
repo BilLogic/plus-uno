@@ -33,6 +33,7 @@
 import { charge } from "../net";
 import type { AssistantContext } from "../slack/types";
 import type { ThreadState as ThreadStateDurableObject } from "../thread-state";
+import type { OutageStore } from "../turn/capacity-outage";
 import type {
   CutOffNoteReport,
   DecisionReportRecord,
@@ -252,5 +253,29 @@ export function createDurableObjectThreadState(
     settleFiling(key: string, issue: FiledIssue | null): Promise<void> {
       return hop().settleFiling(key, issue, now());
     },
+  };
+}
+
+/**
+ * The capacity outage's record on the same single instance: one hop per call,
+ * charged like every other. Its own adapter rather than three more methods on
+ * `ThreadState`, because it is not thread memory; it lives in this object
+ * only because this is the workspace's one serialised store.
+ *
+ * @param deps - The binding, and an instance for the conformance suite
+ */
+export function createDurableObjectOutageStore(deps: {
+  namespace: DurableObjectNamespace<ThreadStateDurableObject>;
+  instance?: string;
+}): OutageStore {
+  const instance = deps.instance ?? DO_INSTANCE_NAME;
+  function hop(): DurableObjectStub<ThreadStateDurableObject> {
+    charge(1, "thread-state");
+    return deps.namespace.get(deps.namespace.idFromName(instance));
+  }
+  return {
+    failed: (at) => hop().capacityFailed(at),
+    succeeded: (at) => hop().capacitySucceeded(at),
+    release: (told) => hop().capacityRelease(told),
   };
 }

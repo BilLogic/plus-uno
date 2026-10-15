@@ -19,6 +19,7 @@ import { isOwnComment } from "../src/figma-ask/trigger";
 import { CANT_FIND_LINE } from "../src/figma-ask/copy";
 import { candidateThreads } from "../src/figma-comments/threads";
 import { runTurn } from "../src/turn/index";
+import { watchedTurnDeps, type CapacityOutage } from "../src/turn/capacity-outage";
 import { SubrequestBudgetError } from "../src/net";
 import type { ScriptedReply } from "../src/agent/providers/fake";
 import { harness } from "./helpers/turn-harness";
@@ -102,11 +103,16 @@ function world(
      *  "Guest" and "Rae Ng" have no Figma User ID. */
     roster?: StoredTeamRoles | null;
     lead?: string | null;
+    /** The model fails: both models, or the main one with a backup. */
+    providerFailure?: { times: number; status: number; backupModel: string | null };
+    /** Where a Figma ask's model runs report a capacity outage, watched as
+     *  production watches them (`watchedTurnDeps`); with `testChannelIds`. */
+    outage?: { outage: CapacityOutage; testChannelIds?: string[] };
   } = {},
 ): World {
   const figma = createInMemoryFigma({ me: BILL, now: () => NOW });
   figma.seedFile(FILE, { name: "Goal Setting / Card 2482 / Meryem", comments: opts.comments ?? [], creator: SARAH });
-  const h = harness({ replies: opts.replies ?? reads(`The bar stays hidden until the first goal is set. [Goal Setting PRD](${PRD})`), toolResult: PRD_FOUND, ...(opts.toolResultFor ? { toolResultFor: opts.toolResultFor } : {}), ...(opts.preflightAsk ? { preflightAsk: opts.preflightAsk } : {}) });
+  const h = harness({ replies: opts.replies ?? reads(`The bar stays hidden until the first goal is set. [Goal Setting PRD](${PRD})`), toolResult: PRD_FOUND, ...(opts.toolResultFor ? { toolResultFor: opts.toolResultFor } : {}), ...(opts.preflightAsk ? { preflightAsk: opts.preflightAsk } : {}), ...(opts.providerFailure ? { providerFailure: opts.providerFailure } : {}) });
   const askers: Array<{ unmappedAsker: boolean; fileKey: string }> = [];
   const marks = new Map<string, AskMark>();
   const notes: Array<{ to: string; text: string }> = [];
@@ -138,7 +144,14 @@ function world(
     threadState: h.threadState,
     answer: (request, delivery, asker) => {
       askers.push(asker);
-      return runTurn(request, { ...h.deps, delivery });
+      const turnDeps = opts.outage
+        ? watchedTurnDeps(
+            { origin: "figma", channel: request.channel, testChannelIds: opts.outage.testChannelIds ?? [] },
+            () => opts.outage!.outage,
+            h.deps,
+          )
+        : h.deps;
+      return runTurn(request, { ...turnDeps, delivery });
     },
     channel: DESIGN,
     gaps,
@@ -921,5 +934,63 @@ describe("the ask on Env", () => {
   it("runs the turn as #plus-design, whatever FIGMA_ASK_CHANNEL_ID names", () => {
     assert.equal(figmaAskDepsFor(env({ FIGMA_ASK_CHANNEL_ID: "D0APTB20SK0" }))?.channel, PLUS_DESIGN);
     assert.equal(figmaAskDepsFor(env({ PLUS_DESIGN_CHANNEL_ID: " " }))?.channel, undefined);
+  });
+});
+
+describe("both models out of capacity", () => {
+  const OVERLOADED = "I'm overloaded right now and couldn't answer. Try again in a few minutes.";
+  const BOTH_FAIL = { times: 2, status: 429, backupModel: "fake-backup" };
+
+  function recording() {
+    const calls: string[] = [];
+    return {
+      calls,
+      outage: {
+        failed: async () => void calls.push("failed"),
+        succeeded: async () => void calls.push("succeeded"),
+      } satisfies CapacityOutage,
+    };
+  }
+
+  it("the asker gets one reply in Figma with the plain overloaded line, once per comment", async () => {
+    const w = world({ providerFailure: BOTH_FAIL });
+    const c = comment("100", "@uno when does the progress bar show?");
+    await ask(w, c);
+    assert.equal(w.replies().length, 1);
+    assert.ok(w.replies()[0]!.message.includes(OVERLOADED), w.replies()[0]!.message);
+    assert.ok(w.replies()[0]!.message.includes("🐐"), "labelled as uno-bot's");
+    // Figma redelivers, the runner retries: the mark keeps it to one reply.
+    await w.run(c);
+    assert.equal(w.replies().length, 1);
+  });
+
+  it("counts toward the outage like a Slack turn", async () => {
+    const r = recording();
+    const w = world({ providerFailure: BOTH_FAIL, outage: { outage: r.outage } });
+    await ask(w, comment("100", "@uno when does the progress bar show?"));
+    assert.deepEqual(r.calls, ["failed"]);
+  });
+
+  it("a main model out of capacity with a backup that answers is a plain answer, and a success", async () => {
+    const r = recording();
+    const w = world({ providerFailure: { times: 1, status: 429, backupModel: "fake-backup" }, outage: { outage: r.outage } });
+    await ask(w, comment("100", "@uno when does the progress bar show?"));
+    assert.equal(w.replies().length, 1);
+    assert.ok(!w.replies()[0]!.message.includes("overloaded"), w.replies()[0]!.message);
+    assert.deepEqual(r.calls, ["succeeded"]);
+  });
+
+  it("a failure that is not capacity keeps the ordinary failed reply", async () => {
+    const w = world({ providerFailure: { times: 2, status: 400, backupModel: "fake-backup" } });
+    await ask(w, comment("100", "@uno when does the progress bar show?"));
+    assert.equal(w.replies().length, 1);
+    assert.ok(!w.replies()[0]!.message.includes("overloaded"), w.replies()[0]!.message);
+  });
+
+  it("test traffic neither counts nor closes an outage", async () => {
+    const r = recording();
+    const w = world({ providerFailure: BOTH_FAIL, outage: { outage: r.outage, testChannelIds: [DESIGN] } });
+    await ask(w, comment("100", "@uno when does the progress bar show?"));
+    assert.deepEqual(r.calls, []);
   });
 });

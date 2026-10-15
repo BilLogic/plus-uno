@@ -454,7 +454,7 @@ new_sqlite_classes = ["AgentRunner"]
 binding = "SLACK_OAUTH_KV"
 id = "aa0ba01735c545d1abe887bd81fc98aa"
 
-# KV — delivery-alert throttle, the Gemini explicit-cache memo, and the Figma
+# KV — the hint that a capacity outage may be open (src/turn/capacity-outage.ts), the Gemini explicit-cache memo, and the Figma
 # library's state under "figma-poll:*": the version ids last seen and the
 # refresh a publish owes the repo's snapshot (src/figma-poll.ts,
 # src/figma-library/env.ts) — and the sweep's findings
