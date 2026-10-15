@@ -1167,6 +1167,17 @@ export function runThreadStateConformance(
     assert.deepEqual(await store.claimFiling("week"), { state: "claimed" }, "a lease past its time was a caller killed mid-filing");
   });
 
+  it("a thread's comparison for a scenario is claimed once; another thread or scenario is its own", async () => {
+    const { store, clock } = setup();
+    const ref = { channel: "C1", thread: "1.0" };
+    assert.equal(await store.claimComparison(ref, "Call-off"), true);
+    assert.equal(await store.claimComparison(ref, "call-off"), false, "the same scenario, however it is cased");
+    assert.equal(await store.claimComparison(ref, "Reschedule"), true);
+    assert.equal(await store.claimComparison({ channel: "C1", thread: "2.0" }, "Call-off"), true);
+    clock.advance(HISTORY_TTL_MS + 1);
+    assert.equal(await store.claimComparison(ref, "Call-off"), true, "kept as long as the thread's memory");
+  });
+
   it("the one-shot dedup and the lease share one record", async () => {
     const { store } = setup();
     assert.equal(await store.claimRun("Ev1"), "claimed");

@@ -15,7 +15,9 @@
 //   • the place: card follow-ups' ladder (`cardPlace`);
 //   • Bill: `LEAD_USER_ID`, the deployment's lead;
 //   • the state: one JSON record in HARNESS_KV; each card's weighed mark a
-//     key of its own there, kept for good; each revision thread a key too.
+//     key of its own there, kept for good; each revision thread a key too;
+//   • a turn's milestone comparison: the same gate, search and path read, and
+//     the thread's store for its once-per-scenario claim.
 //
 // Budget (ADR-022), against the 38-subrequest lookup ceiling of one alarm,
 // each job sized by cost, not by a count (`./budget.ts`).
@@ -55,6 +57,9 @@ import { threadStateFor } from "../thread-state/production";
 import type { JobContext } from "../scheduled/runs";
 import type { PendingProposal } from "../thread-state/index";
 import { serviceChangeGate } from "./gate";
+import { COMPARISON_SUBREQUESTS, milestoneComparison, type MilestoneComparison } from "./milestone";
+import { DELIVERY_RESERVE } from "../agent/loop-policy";
+import type { ThreadState } from "../thread-state/index";
 import type { PathToday } from "./draft";
 import { cardEvidence } from "./evidence";
 import { stageOf, STAGES } from "./stages";
@@ -403,4 +408,24 @@ export async function handleRevisionReplyOnEnv(env: Env, event: SlackMessageEven
       mentionsBot: !!bot && (event.text ?? "").includes(`<@${bot}>`),
     },
   );
+}
+
+/**
+ * The milestone comparison on `Env`, as a turn dependency; none where the
+ * blueprint is not configured. Spends the judgement, the search and the path
+ * read only when the turn still has them beside its delivery reserve.
+ *
+ * @param env - Worker bindings
+ * @param threadState - The turn's store, which keeps the once-per-thread claim
+ */
+export function milestoneComparisonOn(env: Env, threadState: ThreadState): { milestoneComparison?: MilestoneComparison } {
+  if (!isBlueprintConfigured(env)) return {};
+  return {
+    milestoneComparison: milestoneComparison({
+      gate: serviceChangeGate({ provider: selectProvider(env), search: async (q) => (await searchBlueprint(env, q)).rows }),
+      readPath: (cellId) => readPathOf(env, cellId),
+      firstInThread: (ref, scenario) => threadState.claimComparison(ref, scenario),
+      affordable: () => budgetHeadroom().subrequests >= COMPARISON_SUBREQUESTS + DELIVERY_RESERVE,
+    }),
+  };
 }

@@ -53,6 +53,7 @@ import { charge } from "../net";
 import { resolveGeminiModel } from "../agent/gemini-tiers";
 import { capacityOutage, NOT_WATCHED, watchedTurnDeps, type CapacityOutage } from "./capacity-outage";
 import { capacityOutageStoreFor } from "../thread-state/production";
+import { milestoneComparisonOn } from "../blueprint-upkeep/env";
 import type { Delivery } from "./delivery";
 import { restageExecution, type TurnDeps, type TurnRequest } from "./turn";
 
@@ -279,6 +280,10 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     // summarisation. FLAGGED OFF by default; see the header of
     // `agent/context-state.ts` for why this one does not get to ship on.
     contextState: env.CONTEXT_STATE === "on",
+
+    // A milestone's idea beside today's blueprint; absent where the blueprint
+    // is not configured.
+    ...milestoneComparisonOn(env, wiring.threadState),
     },
   );
 }
