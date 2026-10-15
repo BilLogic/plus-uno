@@ -76,4 +76,18 @@ export function runProposalRecordsConformance(label: string, make: () => Proposa
     assert.deepEqual((await r.unlinkedBefore(200, 1)).map((p) => p.proposalTs), ["1.2"]);
     assert.deepEqual(await r.unlinkedBefore(5, 10), []);
   });
+
+  it("a card's linked proposals come back oldest first, up to the limit, and no other card's", async () => {
+    const r = make();
+    await r.record(drawn({ proposalTs: "1.1", threadTs: "t1", writtenAt: 200 }));
+    await r.record(drawn({ proposalTs: "1.2", threadTs: "t1", writtenAt: 100 }));
+    await r.record(drawn({ proposalTs: "1.3", threadTs: "t2", writtenAt: 50 }));
+    await r.record(drawn({ proposalTs: "1.4", threadTs: "t3", writtenAt: 10 }));
+    await r.linkCard("C0TEAM", "t1", "page-a");
+    await r.linkCard("C0TEAM", "t2", "page-b");
+    assert.deepEqual((await r.byCard("page-a", 10)).map((p) => p.proposalTs), ["1.2", "1.1"]);
+    assert.deepEqual((await r.byCard("page-a", 1)).map((p) => p.proposalTs), ["1.2"]);
+    assert.deepEqual((await r.byCard("page-b", 10)).map((p) => [p.proposalTs, p.cardId]), [["1.3", "page-b"]]);
+    assert.deepEqual(await r.byCard("page-none", 10), []);
+  });
 }

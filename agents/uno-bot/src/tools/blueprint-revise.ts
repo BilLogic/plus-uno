@@ -74,6 +74,8 @@ export async function executeBlueprintRevise(env: Env, input: Record<string, unk
   const link = result.ok && result.cellIds[0] ? cellUrl(env.BLUEPRINT_APP_URL, result.cellIds[0]) : undefined;
   const text = result.ok && revision.variant
     ? `Drew ${result.cellIds.length} ${result.cellIds.length === 1 ? "row" : "rows"} on a new ${revision.variant.status} path, "${revision.variant.name}", beside ${revision.label} on the blueprint as uno-bot (agent session ${sessionId}).${link ? ` ${link}` : ""}`
+    : result.ok && !revision.rows.length && revision.path
+    ? `Set ${revision.label} to ${revision.path.to} on the blueprint as uno-bot (agent session ${sessionId}).`
     : result.ok
     ? `Wrote ${result.cellIds.length} ${result.cellIds.length === 1 ? "row" : "rows"}${revision.path ? ` and the path's status (${revision.path.to})` : ""} to ${revision.label} on the blueprint as uno-bot (agent session ${sessionId}).${link ? ` ${link}` : ""}`
     : failureText(revision.label, result);

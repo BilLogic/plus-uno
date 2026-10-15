@@ -44,6 +44,8 @@ export interface ProposalRecords {
   linkCard(channel: string, threadTs: string, cardId: string): Promise<number>;
   /** Proposals still without a card, written at or before `before`, oldest first. */
   unlinkedBefore(before: number, limit: number): Promise<DrawnProposal[]>;
+  /** A Roadmap card's linked proposals, oldest first: what its shipping promotes. */
+  byCard(cardId: string, limit: number): Promise<DrawnProposal[]>;
 }
 
 /** The in-memory adapter: the Node suite's, and the contract's reference. */
@@ -74,6 +76,9 @@ export function createInMemoryProposalRecords(): ProposalRecords {
         .sort(oldestFirst)
         .slice(0, limit)
         .map(copy);
+    },
+    async byCard(cardId, limit) {
+      return [...kept.values()].filter((p) => p.cardId === cardId).sort(oldestFirst).slice(0, limit).map(copy);
     },
   };
 }

@@ -32,6 +32,7 @@ export interface BlueprintRevision {
   pathId: string;
   /** `scenario › path`, for the thread's account of the write. */
   label: string;
+  /** Empty only when the revision is its path's status change alone. */
   rows: RevisionRow[];
   /** The path's own status change, written after its rows, when it has one. */
   path?: { from: EntityStatus; to: EntityStatus };
@@ -70,7 +71,8 @@ const isText = (v: unknown): v is string => typeof v === "string" && v.trim() !=
 export function readRevision(input: Record<string, unknown>): BlueprintRevision | { error: string } {
   const { pathId, label, rows, path, variant } = input;
   if (!isText(pathId)) return { error: "the revision names no path" };
-  if (!Array.isArray(rows) || rows.length === 0) return { error: "the revision has no rows" };
+  // A revision with no rows only moves its path's status: retiring a path.
+  if (!Array.isArray(rows) || (rows.length === 0 && (path === undefined || variant !== undefined))) return { error: "the revision has no rows" };
   const read: RevisionRow[] = [];
   for (const [i, raw] of rows.entries()) {
     const r = (raw ?? {}) as Record<string, unknown>;

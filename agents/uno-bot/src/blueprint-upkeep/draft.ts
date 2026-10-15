@@ -61,8 +61,14 @@ export interface Draft {
   gaps: string[];
   /** Set when the grind tier was out of capacity and the default tier drafted. */
   tierNote?: string;
-  /** A deploy's promotion of rows a design hand-off drafted (`./stages.ts`). */
+  /** A deploy's promotion of rows a design hand-off drafted, or a linked
+   *  proposal's rows moving on as drawn (`./stages.ts`). */
   promoted?: true;
+  /** A line the card shows above its rows: where promoted rows came from, or
+   *  what a path's retirement makes way for. Blueprint words. */
+  note?: string;
+  /** Set on a card that only retires today's path: no rows, no redraft. */
+  retires?: true;
 }
 
 export interface DraftInput {
