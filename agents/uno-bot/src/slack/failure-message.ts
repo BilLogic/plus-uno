@@ -77,6 +77,11 @@ const NEXT_STEP: Record<FailureStage, string> = {
   internal: "Try again.",
 };
 
+/** The plain overloaded line, in two parts: what happened, and what to do.
+ *  A Figma ask's reply says the same (`figma-ask/copy.ts`). */
+export const OVERLOADED_LEAD = "I'm overloaded right now and couldn't answer.";
+export const OVERLOADED_NEXT = "Try again in a few minutes.";
+
 /** What a failure says it left alone. Every failure has the same answer:
  *  reads change nothing, and a write never runs before its card is approved. */
 export const NOTHING_CHANGED = "Nothing was created or changed.";
@@ -116,9 +121,9 @@ export function failureMessage(input: FailureInput & { ask?: string }): FailureM
   // reaches only here, after the backup model failed too, and it says no
   // more than that: the lead hears about an outage that lasts in their own DM
   // (`turn/capacity-outage.ts`), so nobody else is named.
-  const lead = capacity ? "I'm overloaded right now and couldn't answer." : PROGRESS[stage];
+  const lead = capacity ? OVERLOADED_LEAD : PROGRESS[stage];
   const next = capacity
-    ? "Try again in a few minutes."
+    ? OVERLOADED_NEXT
     : `${NEXT_STEP[stage]} If it happens twice, say so${where} and someone will look at the logs.`;
   const warning = signed(NOTHING_CHANGED);
 

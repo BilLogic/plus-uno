@@ -41,6 +41,7 @@
 
 import { isCapacityFailure } from "../agent/model-provider";
 import { isTestOrigin, type PostOrigin } from "../usage/record";
+import type { TurnDeps } from "./turn";
 
 /** How long failures must have run before the lead hears about them. */
 export const LASTING_MS = 30 * 60_000;
@@ -295,4 +296,18 @@ export async function watchCapacity<T>(outage: CapacityOutage, run: () => Promis
   }
   await outage.succeeded();
   return result;
+}
+
+/**
+ * A turn's dependencies with its model runs watched, for the turn's place:
+ * how `./env-deps.ts` builds every turn, a Slack turn and a Figma ask alike.
+ *
+ * @param place - Where the turn came from; test traffic is not watched
+ * @param outage - The outage a real turn reports to; built only when used
+ * @param deps - The turn's dependencies
+ */
+export function watchedTurnDeps(place: PostOrigin, outage: () => CapacityOutage, deps: TurnDeps): TurnDeps {
+  const watched = outageForPlace(place, outage);
+  if (watched === NOT_WATCHED) return deps;
+  return { ...deps, runAgent: (request) => watchCapacity(watched, () => deps.runAgent(request)) };
 }

@@ -51,7 +51,7 @@ import {
 } from "../usage/production";
 import { charge } from "../net";
 import { resolveGeminiModel } from "../agent/gemini-tiers";
-import { capacityOutage, NOT_WATCHED, outageForPlace, watchCapacity, type CapacityOutage } from "./capacity-outage";
+import { capacityOutage, NOT_WATCHED, watchedTurnDeps, type CapacityOutage } from "./capacity-outage";
 import { capacityOutageStoreFor } from "../thread-state/production";
 import type { Delivery } from "./delivery";
 import { restageExecution, type TurnDeps, type TurnRequest } from "./turn";
@@ -146,7 +146,15 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
 
   const slack = toolSlackContextFor(request, wiring);
 
-  return {
+  // Watched for capacity (#1228), Slack turns and Figma asks alike: a turn
+  // that fails on it with the backup tried is counted, and the lead hears
+  // about an outage that lasts; the next turn that answers closes it. Test
+  // traffic (a debug route, a channel on TEST_CHANNEL_IDS) neither counts nor
+  // closes one.
+  return watchedTurnDeps(
+    { origin: wiring.origin, channel: request.channel, testChannelIds: testChannelIdsOf(env) },
+    () => capacityOutageFor(env),
+    {
     threadState: wiring.threadState,
     standingConfirmers: standingConfirmersOf(env),
     delivery: wiring.delivery,
@@ -159,15 +167,7 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
       // false "nothing was fetched" and a different confidence verdict with
       // nothing failing. There is nothing to remember now: the entry opens its
       // own scope, and what it collected is part of what it answers with.
-      // Watched for capacity (#1228): a turn that fails on it with the backup
-      // tried is counted, and the lead hears about an outage that lasts; the
-      // next turn that answers closes it. Test traffic (a debug route, a
-      // channel on TEST_CHANNEL_IDS) neither counts nor closes one.
-      const watched = outageForPlace(
-        { origin: wiring.origin, channel: request.channel, testChannelIds: testChannelIdsOf(env) },
-        () => capacityOutageFor(env),
-      );
-      const run = await watchCapacity(watched, () => runAgent({
+      const run = await runAgent({
         env,
         // Routing already happened, in Turn: the tier travels as an opaque
         // name, and the agent run has no way left to route a second time on
@@ -199,7 +199,7 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
         ...(reporters.onDials ? { onDials: reporters.onDials } : {}),
         ...(reporters.onToolCall ? { onToolCall: reporters.onToolCall } : {}),
         ...(reporters.onToolResult ? { onToolResult: reporters.onToolResult } : {}),
-      }));
+      });
       reporters.onAgentResult?.(run.result);
       return run;
     },
@@ -274,7 +274,8 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     // summarisation. FLAGGED OFF by default; see the header of
     // `agent/context-state.ts` for why this one does not get to ship on.
     contextState: env.CONTEXT_STATE === "on",
-  };
+    },
+  );
 }
 
 /**

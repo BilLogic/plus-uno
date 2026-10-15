@@ -23,6 +23,7 @@
 // PURE.
 
 import type { TaskCardSource } from "../agent/task-card-readout";
+import { isCapacityFailure } from "../agent/model-provider";
 import { gateWordsFor } from "../agent/tool-table";
 import { describeGateNote, type Delivery } from "../turn/index";
 import { answerOnlyReply, figmaReplyLines, plainAnswer } from "./copy";
@@ -43,6 +44,9 @@ export interface FigmaAskDelivery extends Delivery {
    *  the card's own, which can name a repo or a page; null when the turn
    *  tried none. `verb` is empty for a write with no gate words. */
   readonly refusedCard: () => { verb: string } | null;
+  /** Whether the turn failed because both models were out of capacity
+   *  (`isCapacityFailure`, the test the Slack failure line uses). */
+  readonly overloaded: () => boolean;
 }
 
 /**
@@ -56,6 +60,7 @@ export function figmaAskDelivery(opts: { teammate: boolean }): FigmaAskDelivery 
   const notes: string[] = [];
   const sources: TaskCardSource[] = [];
   let refused: { verb: string } | null = null;
+  let overloaded = false;
   const quiet = async (): Promise<void> => {};
 
   return {
@@ -63,6 +68,7 @@ export function figmaAskDelivery(opts: { teammate: boolean }): FigmaAskDelivery 
     notes: () => [...notes],
     sources: () => [...sources],
     refusedCard: () => refused,
+    overloaded: () => overloaded,
 
     react: quiet,
     removeReaction: quiet,
@@ -72,8 +78,11 @@ export function figmaAskDelivery(opts: { teammate: boolean }): FigmaAskDelivery 
     endProgress: quiet,
     reopenCard: quiet,
     postInterim() {},
-    // A failure is told in the reply the job posts, from the turn's outcome.
-    postFailure: quiet,
+    // A failure is told in the reply the job posts, from the turn's outcome:
+    // only whether it was capacity is kept, so the reply can say so plainly.
+    async postFailure(_stage, err) {
+      if (isCapacityFailure(err)) overloaded = true;
+    },
 
     toolProgress(event) {
       if (event.phase !== "finished") return;
