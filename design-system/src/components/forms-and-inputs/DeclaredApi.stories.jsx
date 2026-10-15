@@ -56,13 +56,8 @@ export default {
 /* ------------------------------------------------------------------ Select */
 
 /**
- * `required` reaches assistive technology.
- *
- * It cannot do it through `aria-required`: the trigger is a `div` with
- * `role="button"`, and that role does not allow the attribute. So `required`
- * points the trigger at a visually hidden description instead, which is the
- * half the 26 call sites passing `required` were actually missing — they all
- * draw their own visible asterisk beside their own label already.
+ * `required` reaches assistive technology as `aria-required` on the combobox,
+ * and stays off the fields that did not ask for it.
  */
 export const SelectRequired = () => (
     <div style={stack}>
@@ -81,32 +76,16 @@ export const SelectRequired = () => (
 );
 
 SelectRequired.play = async ({ canvasElement }) => {
-    const doc = canvasElement.ownerDocument;
     const canvas = within(canvasElement);
-
-    const trigger = canvas.getByRole('button', { name: /Select a school/ });
-    const describedBy = trigger.getAttribute('aria-describedby');
-
-    // Declared and ignored means: no attribute at all. That is the assertion.
-    await expect(describedBy).not.toBeNull();
-
-    const description = doc.getElementById(describedBy);
-    await expect(description).not.toBeNull();
-    await expect(description.textContent.trim()).toBe('Required');
-
-    // ...and it stays off the fields that did not ask for it.
-    const optional = canvas.getByRole('button', { name: /Select a subject/ });
-    await expect(optional.getAttribute('aria-describedby')).toBeNull();
+    const field = canvas.getByRole('combobox', { name: /Select a school/ });
+    await expect(field).toHaveAttribute('aria-required', 'true');
+    const optional = canvas.getByRole('combobox', { name: /Select a subject/ });
+    await expect(optional).not.toHaveAttribute('aria-required');
 };
 
 /**
- * `onFocus` and `onBlur` fire on the field, not on whatever is inside it.
- *
- * The two things that have to hold at once: focus crossing the widget
- * boundary reports, and focus moving *within* the widget does not. The second
- * is why they are bound in the capture phase — the search `Input` stops
- * propagation on focus and blur to keep the menu from toggling, which would
- * otherwise swallow a blur that leaves the widget from the search box.
+ * `onFocus` and `onBlur` fire on the field, not on whatever is inside it:
+ * focus crossing the widget boundary reports, and moving within it does not.
  */
 export const SelectFocusAndBlur = () => {
     const [log, setLog] = useState([]);
@@ -131,21 +110,20 @@ export const SelectFocusAndBlur = () => {
 SelectFocusAndBlur.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const logEl = canvas.getByTestId('focus-log');
-    const trigger = canvas.getByRole('button', { name: /Select a school/ });
+    const field = canvas.getByRole('combobox', { name: /Select a school/ });
 
     canvas.getByRole('button', { name: 'Before' }).focus();
     await userEvent.tab();
-    await expect(trigger).toHaveFocus();
+    await expect(field).toHaveFocus();
     await expect(logEl).toHaveTextContent('focus');
 
-    // Into the search box, which is inside the widget: still one focus, no blur.
-    await userEvent.click(trigger);
-    const search = await canvas.findByPlaceholderText('Search');
-    await userEvent.click(search);
+    // Opening the list and pressing a row keeps focus in the field: no blur.
+    await userEvent.click(field);
+    await userEvent.click(await within(document.body).findByRole('option', { name: 'School B' }));
+    await expect(field).toHaveFocus();
     await expect(logEl).toHaveTextContent(/^focus$/);
 
-    // Out of the widget entirely: one blur, and the menu closed behind us.
-    await userEvent.click(trigger);
+    // Out of the widget entirely: one blur.
     await userEvent.click(canvas.getByRole('button', { name: 'After' }));
     await expect(logEl).toHaveTextContent(/^focus,blur$/);
 };

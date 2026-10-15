@@ -82,57 +82,6 @@ const FieldWrapper = ({ children }) => (
     </div>
 );
 
-/**
- * Error message component
- *
- * Tokens:
- * - Icon: fa-triangle-exclamation, --color-danger, 10px
- * - Text: body3-txt, --color-danger
- * - Gap: --size-element-gap-sm (8px)
- */
-const ErrorMessage = ({ message }) => (
-    <div
-        style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--size-element-gap-sm, 8px)',
-            marginTop: 'var(--size-ele-gap-xs, 4px)',
-        }}
-    >
-        <i
-            className="fa-solid fa-triangle-exclamation"
-            style={{ color: 'var(--color-danger)', fontSize: '10px' }}
-        />
-        <span className="body3-txt" style={{ color: 'var(--color-danger)' }}>
-            {message}
-        </span>
-    </div>
-);
-
-/**
- * Error wrapper that applies a danger border around the Select
- * Since the Select component doesn't have a built-in error state,
- * we wrap it and use CSS to override the trigger border.
- *
- * Tokens:
- * - Border color: --color-danger
- */
-const ErrorSelectWrapper = ({ children }) => (
-    <div
-        className="plus-select-error-wrapper"
-        style={{
-            // Override the select trigger border to danger color
-        }}
-    >
-        <style>{`
-            .plus-select-error-wrapper .plus-select-trigger {
-                border-color: var(--color-danger) !important;
-            }
-        `}</style>
-        {children}
-    </div>
-);
-
 // ─── Stories ─────────────────────────────────────────────────────
 
 /**
@@ -212,16 +161,15 @@ export const Overview = () => (
             <h6 className="h6 mb-3">Error State (Validation Error)</h6>
             <FieldWrapper>
                 <SchoolLabel />
-                <ErrorSelectWrapper>
-                    <Select
-                        options={schoolOptions}
-                        placeholder="Select a school"
-                        mode="single"
-                        searchable
-                        required
-                    />
-                </ErrorSelectWrapper>
-                <ErrorMessage message="School is required" />
+                <Select
+                    options={schoolOptions}
+                    placeholder="Select a school"
+                    mode="single"
+                    searchable
+                    required
+                    invalid
+                    caption="School is required"
+                />
             </FieldWrapper>
         </section>
     </div>
@@ -256,38 +204,21 @@ export const Interactive = () => {
 
             <FieldWrapper>
                 <SchoolLabel />
-                {hasError ? (
-                    <ErrorSelectWrapper>
-                        <Select
-                            options={schoolOptions}
-                            placeholder="Select a school"
-                            mode="single"
-                            searchable
-                            required
-                            value={selectedSchool}
-                            onChange={(val) => {
-                                setSelectedSchool(val);
-                                setTouched(true);
-                            }}
-                            onBlur={() => setTouched(true)}
-                        />
-                    </ErrorSelectWrapper>
-                ) : (
-                    <Select
-                        options={schoolOptions}
-                        placeholder="Select a school"
-                        mode="single"
-                        searchable
-                        required
-                        value={selectedSchool}
-                        onChange={(val) => {
-                            setSelectedSchool(val);
-                            setTouched(true);
-                        }}
-                        onBlur={() => setTouched(true)}
-                    />
-                )}
-                {hasError && <ErrorMessage message="School is required" />}
+                <Select
+                    options={schoolOptions}
+                    placeholder="Select a school"
+                    mode="single"
+                    searchable
+                    required
+                    value={selectedSchool}
+                    onChange={(val) => {
+                        setSelectedSchool(val);
+                        setTouched(true);
+                    }}
+                    onBlur={() => setTouched(true)}
+                    invalid={hasError}
+                    caption={hasError ? 'School is required' : undefined}
+                />
             </FieldWrapper>
 
             {selectedSchool && (

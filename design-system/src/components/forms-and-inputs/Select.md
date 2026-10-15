@@ -3,11 +3,13 @@
 
 # Select
 
+internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. A searchable field is a text input: typing in it filters the list. A plain one is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array in multi mode), controlled or not. - **Multi mode** shows Tags in a TagGroup (`displayMode="tags"`), which collapse into "+n" without focus. `displayMode="badges"` keeps the Badge chips for screens that still draw them. - **Trailing** holds the clear × (not a tab stop; Delete does the same) and the caret.
+
 **Import:** `import { Select } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/Select.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Select.stories.jsx` — Content, Modes, Sizes, InteractionStates, Overview, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Select.stories.jsx` — Content, Modes, Sizes, InteractionStates, DependentFields, LongList, Overview, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select.mdx`
 
@@ -16,27 +18,40 @@
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | — |
-| `name` | string | — | — |
+| `name` | string | — | Submitted with a form through hidden inputs, one per value. |
+| `label` | node | — | The visible label above the field. Without one, pass `aria-label` or `aria-labelledby`. |
+| `caption` | node | — | Help under the field. With `invalid`, it is the error and is announced. |
 | `mode` | enum | `'single'` | — |
-| `options` | arrayOf (required) | `[]` | — |
-| `value` | string or arrayOf | — | — |
-| `defaultValue` | string or arrayOf | — | — |
+| `options` | arrayOf (required) | `[]` | Objects: `value` is the id, `label` (or `text`) what is shown. `group` puts consecutive options under a heading. |
+| `value` | arrayOf | — | The picked id, or ids in multi mode. Pass it to control the field. |
+| `defaultValue` | arrayOf | — | — |
 | `placeholder` | string | `'Select...'` | — |
-| `searchable` | bool | `false` | — |
-| `creatable` | bool | `false` | — |
-| `open` | bool | — | — |
+| `searchable` | bool | `false` | Typing in the field filters the list. |
+| `creatable` | bool | `false` | Offers "Create text " when nothing matches exactly, ignoring case. Implies typing. |
+| `onCreate` | func | — | Called with the text of a created option, which is then picked. |
+| `open` | bool | — | Holds the list open or shut, for documentation. |
 | `defaultOpen` | bool | `false` | — |
 | `defaultSearchTerm` | string | `''` | — |
-| `displayMode` | enum | `'badges'` | — |
-| `lineWrap` | bool | `true` | — |
-| `truncate` | bool | `false` | — |
+| `displayMode` | enum | `'tags'` | Multi mode: `tags` (Tag chips), `badges` (the older Badge chips) or `text` (comma-separated). |
+| `lineWrap` | bool | `true` | Badges only: wrap onto more lines. |
+| `truncate` | bool | `false` | Badges only: clip the row with a fade. |
 | `size` | enum | `'medium'` | — |
 | `disabled` | bool | `false` | — |
-| `readonly` | bool | `false` | — |
-| `required` | bool | `false` | — |
-| `onChange` | func | — | — |
-| `onFocus` | func | — | — |
-| `onBlur` | func | — | — |
+| `readonly` | bool | `false` | Shows the value, stays focusable, and cannot be changed. |
+| `readOnly` | bool | — | Alias of `readonly`. |
+| `required` | bool | `false` | Shows an asterisk on the label and sets `aria-required`. |
+| `invalid` | bool | `false` | Draws the error border; `caption` becomes the announced error. |
+| `commitOnClose` | bool | `false` | Multi mode: `onChange` fires once when the list closes, as a filter bar wants, not on each pick. |
+| `selectAll` | bool | `false` | Multi mode: a "Select all" button over the list, hidden past 50 matches. |
+| `maxSelections` | number | — | Multi mode: the most values; past it the other rows are disabled and the list says why. |
+| `dependsOn` | shape or arrayOf or string | — | The field this one depends on: `{ value, label }`. Until `value` is set the field is disabled with "Choose {label} first"; when it changes, this field clears. |
+| `loading` | bool | `false` | The options are on their way: the list shows a loading row. |
+| `loadOptions` | func | — | `(text, { offset, limit })` → `Promise<{ options, total }>`. Options load as the list opens, as you type and as you scroll, 50 at a time. |
+| `recent` | arrayOf | — | Ids shown under "Recent" before typing, in a list of more than 50. |
+| `suggested` | arrayOf | — | Ids shown under "Suggested" before typing, in a list of more than 50. |
+| `onChange` | func | — | `(next)`: an id, or an array of ids in multi mode. |
+| `onFocus` | func | — | Focus entering the field from outside it. |
+| `onBlur` | func | — | Focus leaving the field and its list. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
@@ -44,7 +59,7 @@
 
 **`mode`** — `single` · `multi`
 
-**`displayMode`** — `badges` · `text`
+**`displayMode`** — `tags` · `badges` · `text`
 
 **`size`** — `small` · `medium` · `large`
 
@@ -52,7 +67,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-focus-ring` · `--color-inverse-primary` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-on-surface-state-12` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary-container` · `--color-primary-state-08` · `--color-surface` · `--color-surface-container-lowest` · `--color-surface-variant` · `--font-family-body` · `--font-line-height-body1` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body1` · `--font-size-body2` · `--font-size-body3` · `--font-size-fa-body2-solid` · `--font-weight-normal` · `--font-weight-semibold-1` · `--primary-primary-text` · `--secondary-secondary-text` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-sm` · `--size-element-stroke-lg` · `--size-modal-radius-sm`
+`--color-focus-ring` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-on-surface-variant` · `--color-outline` · `--color-primary` · `--color-primary-border` · `--color-secondary-text` · `--font-family-body` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body2` · `--font-size-body3` · `--font-size-fa-body2-solid` · `--font-weight-normal` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-sm` · `--size-element-stroke-lg`
 
 From `design-system/src/components/forms-and-inputs/Select.scss`. Override these through the token layer, never with a literal.
 

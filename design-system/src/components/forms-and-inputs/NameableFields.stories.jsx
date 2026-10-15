@@ -119,7 +119,7 @@ HidingTheLabelKeepsTheName.play = async ({ canvasElement }) => {
 /**
  * A field with no label of its own takes its name from the caller.
  *
- * `Select`'s trigger is a `div role="button"`, which a `<label for>` cannot
+ * A plain `Select` is a `div role="combobox"`, which a `<label for>` cannot
  * name, and `DatePicker` has no `label` prop. For both, `aria-label` or
  * `aria-labelledby` passed by the caller is the only route to a name, so the
  * component has to hand those on to the control rather than drop them.
@@ -145,12 +145,12 @@ export const CallerPropsNameTheControl = () => (
 CallerPropsNameTheControl.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    const subject = canvas.getByRole('button', { name: 'Subject' });
-    await expect(subject.classList.contains('plus-select-trigger')).toBe(true);
+    const subject = canvas.getByRole('combobox', { name: 'Subject' });
+    await expect(subject.classList.contains('plus-select-combobox')).toBe(true);
 
-    // A caller's own label and the component's required hint both survive.
-    const term = canvas.getByRole('button', { name: 'Term' });
-    await expect(term.getAttribute('aria-describedby')).toBe('nf-term-required');
+    // A caller's own label and `required` both survive.
+    const term = canvas.getByRole('combobox', { name: 'Term' });
+    await expect(term).toHaveAttribute('aria-required', 'true');
 
     const date = canvas.getByRole('combobox', { name: 'Session date' });
     await expect(date.tagName).toBe('INPUT');

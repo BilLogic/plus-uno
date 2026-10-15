@@ -1820,10 +1820,15 @@
             "componentSetNodeId": "8583:12093",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=8583-12093",
             "source": "node-chart",
-            "status": "verified"
+            "status": "verified",
+            "verifiedAt": "2026-10-15",
+            "notes": "28 variants, mode (single · multi · multi (badges)) × state (closed · open · invalid · read-only · disabled) × filled?. Built on Form (`_Field`): Content holds `_Field Text`, or a TagGroup of removable Tags in multi; Trailing holds `_Field Clear` (18756:36409) and the `_Dropdown icon` caret; open variants float a `_Listbox` of Dropdown list Item rows. Searchable and creatable are list content (a `_Listbox Hint` header, a create row footer), not properties. Docs frame: Docs / Select 18729:33744."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10266"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10342",
+        "deliberate": {
+          "displayMode": "Code has a third value, `text`, a comma-separated list with no Figma column; `badges` is kept on both sides until the screens that draw Badge chips move to Tags."
+        }
       }
     },
     "Sidebar": {
