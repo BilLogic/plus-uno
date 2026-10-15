@@ -195,7 +195,8 @@ finish() {
 # authoring RPC (deletes included) and fails every write policy (so no raw
 # table write); a trigger stamps `author = 'uno-bot'` and the bot's author_id
 # on every authoring_changes row it causes; and it writes a status through
-# `upsert_cell_at_status` / `set_path_status`, which record themselves. The Worker signs in with the password grant for a
+# `upsert_cell_at_status` / `set_path_status` / `create_path_at_status`, which
+# record themselves. The Worker signs in with the password grant for a
 # one-hour JWT. Never a service-role key.
 #
 # WHAT THIS WIZARD REFUSES TO DO FOR YOU. It never creates the account, never
