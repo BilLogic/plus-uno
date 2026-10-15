@@ -129,10 +129,10 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | MediaObject | Media Object Level | `53:20312` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-20312) | verified |
 | Components | Modal | Modal | `53:20229` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-20229) | verified |
 | Components | Navbar | Navbar | `72:16462` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16462) | verified |
+| Components | NavPills | _Pill Dropdown | `4209:29770` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-29770) | verified |
 | Components | NavPills | Nav Pills | `69:16745` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=69-16745) | verified |
-| Components | NavPills | Pill Dropdown | `4209:29770` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-29770) | verified |
+| Components | NavTabs | _Tab Dropdown | `4209:29375` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-29375) | verified |
 | Components | NavTabs | Nav Tabs | `69:16779` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=69-16779) | verified |
-| Components | NavTabs | Tab Dropdown | `4209:29375` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-29375) | verified |
 | Components | NumberInput | Number Input Group Button | `13644:11268` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13644-11268) | verified |
 | Components | Pagination | Pagination | `53:19822` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-19822) | verified |
 | Components | Popover | Popovers | `49:19534` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-19534) | verified |
@@ -147,10 +147,10 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Select | Select | `8583:12093` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=8583-12093) | verified |
 | Components | SidebarTab | Side Bar Tab | `17118:127` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17118-127) | verified |
 | Components | Skeleton | Skeleton | `17878:1851` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1851) | verified |
-| Components | Spinner | Loading Animations 1 - Growing | `9296:3061` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9296-3061) | verified |
-| Components | Spinner | Loading Animations 2 - rotating | `9297:3104` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3104) | verified |
-| Components | Spinner | Loading Animations 3 - stacking | `9297:3156` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3156) | verified |
-| Components | Spinner | Spinner Animation | `44:4872` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4872) | verified |
+| Components | Spinner | Spinner | `44:4872` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4872) | verified |
+| Components | Spinner | Spinner Growing | `9296:3061` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9296-3061) | verified |
+| Components | Spinner | Spinner Rotating | `9297:3104` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3104) | verified |
+| Components | Spinner | Spinner Stacking | `9297:3156` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3156) | verified |
 | Components | Status | Status | `17876:1653` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-1653) | verified |
 | Components | Suggestion | Suggestion | `17878:1769` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1769) | verified |
 | Components | Switch | Form Switch Button | `82:16570` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=82-16570) | verified |
