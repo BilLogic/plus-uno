@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/FileUpload.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/FileUpload.stories.jsx` — Overview, Content, Styles, InteractionStates, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/FileUpload.stories.jsx` — Overview, Content, Styles, InteractionStates, WithFiles, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FileUpload.mdx`
 
@@ -30,6 +30,7 @@
 | `onChange` | func | — | — |
 | `onFocus` | func | — | — |
 | `onBlur` | func | — | — |
+| `children` | node | — | The uploaded-file list, shown below the button and outside the frame |
 
 ## Variants
 

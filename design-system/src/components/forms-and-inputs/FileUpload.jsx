@@ -21,6 +21,7 @@ const FileUpload = ({
     onChange,
     onFocus,
     onBlur,
+    children,
     ...props
 }) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -93,6 +94,21 @@ const FileUpload = ({
             className={`plus-file-upload-wrapper ${className}`}
             style={style}
         >
+            {label && (
+                <Form.Label htmlFor={fieldId} className={`plus-file-upload-label ${disabled ? 'plus-file-upload-label-disabled' : ''}`}>
+                    {label}
+                    {required && (
+                        <span className="plus-file-upload-required" aria-label="required">*</span>
+                    )}
+                </Form.Label>
+            )}
+
+            {/*
+             * The frame holds the description and the button, like the shared
+             * field box: focus and validation outline this whole field, never
+             * the button alone. The label sits above it; the file list and the
+             * validation message sit below it.
+             */}
             <div
                 className={`plus-file-upload-container ${disabled ? 'plus-file-upload-disabled' : ''} ${validation !== 'none' ? `plus-file-upload-${validation}` : ''} ${isFocused ? 'plus-file-upload-focused' : ''}`}
                 style={{
@@ -101,14 +117,6 @@ const FileUpload = ({
                     borderStyle: 'solid'
                 }}
             >
-                {label && (
-                    <Form.Label htmlFor={fieldId} className="plus-file-upload-label">
-                        {label}
-                        {required && (
-                            <span className="plus-file-upload-required" aria-label="required">*</span>
-                        )}
-                    </Form.Label>
-                )}
 
                 {descriptionText && (
                     <p id={descriptionId} className="plus-file-upload-description">
@@ -148,17 +156,23 @@ const FileUpload = ({
                         onBlur={handleBlur}
                     />
                 </div>
-
-                {validation !== 'none' && validationMessage && (
-                    <div
-                        id={validationId}
-                        className={`plus-file-upload-validation plus-file-upload-validation-${validation}`}
-                    >
-                        {validationIcon}
-                        <span className="plus-file-upload-validation-message">{validationMessage}</span>
-                    </div>
-                )}
             </div>
+
+            {children && (
+                <div className="plus-file-upload-files">
+                    {children}
+                </div>
+            )}
+
+            {validation !== 'none' && validationMessage && (
+                <div
+                    id={validationId}
+                    className={`plus-file-upload-validation plus-file-upload-validation-${validation}`}
+                >
+                    {validationIcon}
+                    <span className="plus-file-upload-validation-message">{validationMessage}</span>
+                </div>
+            )}
         </div>
     );
 };
@@ -178,7 +192,9 @@ FileUpload.propTypes = {
     style: PropTypes.object,
     onChange: PropTypes.func,
     onFocus: PropTypes.func,
-    onBlur: PropTypes.func
+    onBlur: PropTypes.func,
+    /** The uploaded-file list, shown below the button and outside the frame. */
+    children: PropTypes.node
 };
 
 export default FileUpload;

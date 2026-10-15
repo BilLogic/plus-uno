@@ -7,6 +7,7 @@
 .plus-file-upload-wrapper {
     display: flex;
     flex-direction: column;
+    gap: var(--size-element-gap-xs, 4px);
     width: 100%;
 }
 
@@ -53,7 +54,7 @@
     }
 }
 
-.plus-file-upload-disabled .plus-file-upload-label {
+.plus-file-upload-label-disabled {
     color: var(--color-on-surface-variant);
 }
 
@@ -85,6 +86,13 @@
     pointer-events: none;
 }
 
+// Uploaded-file list, below the framed field
+.plus-file-upload-files {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
 // Validation message
 .plus-file-upload-validation {
     display: flex;
@@ -92,7 +100,6 @@
     gap: var(--size-element-gap-xs, 4px);
     font-size: var(--font-size-body3);
     line-height: var(--font-line-height-body3);
-    margin-top: var(--size-element-gap-xs, 4px);
     
     i {
         font-size: var(--font-size-body3);
