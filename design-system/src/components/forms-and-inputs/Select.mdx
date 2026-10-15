@@ -29,7 +29,7 @@ Use a select input when a user needs to select one or multiple options from a lo
 
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10266"
-    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -116,13 +116,8 @@ Use a select input when a user needs to select one or multiple options from a lo
 
 Use `Select` when the user picks from a known list of values and the choice is
 part of a form's data. It covers the cases a plain list of radios cannot:
-`mode="multi"` for several values shown as dismissible badges in the trigger,
-`searchable` for lists long enough to need filtering, `creatable` for lists the
-user may extend.
-
-`Select` composes the rest of the system — `Badge` for the selected values,
-`ListGroup` for multi-select options, `Input` for the search field — so it stays
-visually consistent with the fields around it.
+`mode="multi"` for several values shown in the trigger, `searchable` for lists
+long enough to need filtering, `creatable` for lists the user may extend.
 
 </div>
 
@@ -182,11 +177,11 @@ visually consistent with the fields around it.
 <Select options={grades} onChange={(value) => setGrade(value)} />
 ```
 
-### Multi-select badges are dismissible only when the field is live.
+### Selected values are removable only when the field is live.
 
 ```jsx
-// Incorrect — expecting the badges to still be removable while read-only.
-// `readonly` (and `disabled`) turn the badge X off, by design.
+// Incorrect — expecting the values to still be removable while read-only.
+// `readonly` (and `disabled`) take the remove button away, by design.
 <Select mode="multi" readonly value={selected} options={topics} onChange={setTopics} />
 
 // Correct — read-only shows the values; the editable field lets them go.
@@ -199,17 +194,23 @@ visually consistent with the fields around it.
 
 ## Accessibility
 
-- **This is not a native `select` and not an ARIA combobox.** The trigger is a
-  `div` with `role="button"` and `tabIndex={0}`; the options are `button`
-  elements in single mode and `ListGroup` options in multi mode. There is no
-  `aria-expanded` on the trigger and no `aria-activedescendant`, so the open
-  list is not announced as a list of options.
-- **Keyboard.** The trigger is reachable and can be activated, but there is no
-  arrow-key navigation between options — the options are reached by tabbing.
-  Keep the option list short, or use `MultipleChoice` where every option is a
-  native radio or checkbox.
-- **Name the trigger.** `id` is forwarded to the trigger element, so an external
-  `label htmlFor` is the reliable way to give it a name.
+- **This is not a native `select`.** The trigger is a `div` with
+  `role="button"` and `tabIndex={0}`, and it does carry `aria-expanded`; Down
+  opens the menu. Below it the two modes differ. Multi mode lists its options
+  as a `ListGroup` listbox, `role="option"` on each. Single mode lists plain
+  `button` elements with no listbox or option role, so the open list is not
+  announced as a list of options.
+- **Choosing by keyboard.** In both modes the arrow keys move between options.
+  Single-mode options are buttons, so Enter and Space choose one. Multi-mode
+  options have no key handler: the arrow keys reach an option and nothing
+  selects it. Where every option must be keyboard-operable today, use
+  `MultipleChoice`, whose options are native radios or checkboxes.
+- **The trigger has no accessible name, and the call site cannot give it one.**
+  A `div` is not a labelable element, so an external `label htmlFor` does not
+  name it, and `aria-label` / `aria-labelledby` passed to `Select` are not
+  forwarded to the trigger. A screen reader announces "button" and the current
+  value. Keep a visible label beside the field for sighted users; the gap
+  itself is the component's to close.
 - **`required` is announced as a description, not as `aria-required`.** ARIA
   does not allow `aria-required` on `role="button"`, so the trigger gets an
   `aria-describedby` pointing at a visually hidden "Required" instead — the
@@ -219,21 +220,9 @@ visually consistent with the fields around it.
   rendered internally with `showLabel={false}` and the placeholder `Search`, and
   the component exposes no prop to label it. That is a known gap, not something
   the call site can fix.
-- **Selected values are `Badge`s.** Each carries the same hard-coded `Dismiss`
-  label, so a multi-select with several values exposes several identically named
-  buttons.
-
-### Label it, because the component will not.
-
-```jsx
-// Incorrect — the trigger is a div with role="button" and no name. A screen
-// reader announces "button", and nothing more.
-<Select id="subject" options={subjects} value={subject} onChange={setSubject} />
-
-// Correct — a visible label wired to the trigger by id.
-<label htmlFor="subject">Subject</label>
-<Select id="subject" options={subjects} value={subject} onChange={setSubject} />
-```
+- **Every remove button has the same name.** In multi mode each selected value
+  carries a remove button labelled "Dismiss", so several values expose several
+  identically named buttons.
 
 </div>
 
@@ -242,7 +231,7 @@ visually consistent with the fields around it.
 ## Related
 
 - For actions rather than a value, use `Dropdown`.
-- For five or fewer options that all fit on screen, use `Radio` or `RadioButtonGroup`.
+- For five or fewer options that all fit on screen, use `MultipleChoice` with `type="radio"`.
 - For hierarchical values, use `TreeSelect` or `Cascader`.
 - For a native form you intend to submit without JavaScript, use a plain `<select>`; this component does not participate in form submission.
 

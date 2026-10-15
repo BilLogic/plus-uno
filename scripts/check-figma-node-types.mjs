@@ -32,7 +32,7 @@ const RECORDING = 'design-system/figma/node-types.json';
 /**
  * The floor. 100 distinct ids across 102 mappings — two ids carry two mappings
  * each: `13574:1150` is shared by `DatePicker` and `DateAndTimePicker`, and
- * `13543:5904` is listed twice by `Textarea`, once as its MDX link. A
+ * `13541:10731` is listed twice by `Textarea`, once as its MDX link. A
  * comparison over an empty recording agrees with everything, so the size is
  * asserted rather than assumed. Lower it only when a mapping is genuinely
  * deleted, and say which one in the commit.

@@ -31,6 +31,11 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 | Outline Variant | `var(--color-outline-variant)` | Subtle borders |
 | Focus / Focus Ring | `var(--color-focus-ring)` | Every focus indicator on a neutral ground |
 | Focus / Focus Ring Inverse | `var(--color-focus-ring-inverse)` | Focus indicator on a colored or dark ground; aliases surface |
+| Element/opacity-disabled | `var(--color-disabled-opacity)` | 0.38 on the whole disabled control. Figma files it in size / semantics as 38, because it reads an opacity variable as a percentage |
+| Surface roles/surface-default | `var(--color-surface-default)` | The page; aliases `--surface-default` |
+| Surface roles/surface-sunken | `var(--color-surface-sunken)` | The ground behind grouped things; aliases `--surface-sunken` |
+| Surface roles/surface-raised | `var(--color-surface-raised)` | A card that lifts; pair with `--surface-raised-shadow` |
+| Surface roles/surface-overlay | `var(--color-surface-overlay)` | Popovers and toasts; pair with `--surface-overlay-shadow` |
 
 ### SMART Competency Colors
 | Figma | PLUS CSS Token |

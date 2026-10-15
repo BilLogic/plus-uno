@@ -117,6 +117,7 @@ Footer actions: either extra `Button` row in `children`, or `primaryButton` / `s
 - `design-system/agent-views/components/index.md` — confirm `Input`, `Button`, `Modal`, `Card` exist
 - their Storybook MDX and `*.stories.jsx` — props, variants, usage
 - `surfaces.md` — the modal this form sits in when it is an overlay
+- `form-behaviour.md` — when the form validates, what submit does with errors, read-only and unsaved changes
 
 ## Rules
 
