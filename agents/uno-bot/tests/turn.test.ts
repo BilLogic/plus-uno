@@ -37,7 +37,7 @@ import { LEGACY_DRIFT_REPLY } from "../src/figma-drift/copy";
 import { sweepShareOffer, SWEEP_SHARE_KEY } from "../src/sweep/share";
 import { FIX_REVIEW_INSTEAD, FIX_SCOPE_REFUSAL, sweepTag } from "../src/sweep/cards";
 import { decisionReport, itemProposal, reportItems, reportRecord } from "../src/slack/decision-cards";
-import { renderProposalCard } from "../src/slack/proposal-render";
+import { renderProposalCard, shortCardOf } from "../src/slack/proposal-render";
 import { cancelNote, RECENT_CANCEL_MS } from "../src/agent/cancel-note";
 import { parseRepoList, resolveRepo } from "../src/integrations/repo-list.mjs";
 import { executeRelayDm, type RelaySlack } from "../src/tools/relay-dm";
@@ -2895,6 +2895,17 @@ test("a share-out to a channel named by #name names that channel on its card", a
   const h = namedChannelTurn("#design-crit");
   const outcome = await runTurn(request({ text: "share the live app prototype in #design-crit" }), h.deps);
   assert.equal(outcome.staged!.card.verb, "share this for feedback in <#C0CRIT0001|design-crit>");
+});
+
+test("a share-out card's summary names the work, not the raw place or channel the verb already says", async () => {
+  const call = {
+    name: "shareout_post",
+    args: { summary: "The live app prototype, ready for a first round.", fidelity: "high", project: "Live app prototype", place: "channel", channel: "#design-crit" },
+  };
+  const h = harness({ shareoutReads: NAMED, replies: [{ text: "I'll share it.", toolCalls: [call] }] });
+  const outcome = await runTurn(request({ text: "share the live app prototype in #design-crit" }), h.deps);
+  const short = shortCardOf(renderProposalCard(outcome.staged!.card).text);
+  assert.equal(short?.summary, ":warning: Ready to *share this for feedback in <#C0CRIT0001|design-crit>*: high · Live app prototype");
 });
 
 test("a share-out to a channel the asker is not in is refused plainly, and no card is staged", async () => {

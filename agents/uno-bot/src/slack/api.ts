@@ -233,13 +233,14 @@ export async function conversationsMembers(env: Env, channel: string, limit = 10
   );
 }
 
-/** users.conversations via the bot token — one page of the conversations of
- *  `types` uno-bot is a member of, the first unless `cursor` names the next. */
-export async function botConversations(env: Env, types: string, cursor?: string) {
-  return slackGet<SlackResponse & { channels?: { id?: string }[]; response_metadata?: { next_cursor?: string } }>(
+/** users.conversations via the bot token — one page of up to `limit` of the
+ *  unarchived conversations of `types` uno-bot is a member of, the first
+ *  unless `cursor` names the next. */
+export async function botConversations(env: Env, types: string, cursor?: string, limit = 200) {
+  return slackGet<SlackResponse & { channels?: SlackConversation[]; response_metadata?: { next_cursor?: string } }>(
     env,
     "users.conversations",
-    { types, exclude_archived: "true", limit: "200", ...(cursor ? { cursor } : {}) },
+    { types, exclude_archived: "true", limit: String(limit), ...(cursor ? { cursor } : {}) },
   );
 }
 
@@ -261,13 +262,13 @@ export async function conversationsInfo(env: Env, channel: string) {
 }
 
 /** conversations.list via the bot token — one page of up to 1000 unarchived
- *  public and private channels, the first unless `cursor` names the next. A
- *  private channel is listed only when the bot is in it. */
-export async function conversationsList(env: Env, cursor?: string) {
+ *  channels of `types`, the first unless `cursor` names the next. A private
+ *  channel is listed only when the bot is in it. */
+export async function conversationsList(env: Env, types: string, cursor?: string) {
   return slackGet<SlackResponse & { channels?: SlackConversation[]; response_metadata?: { next_cursor?: string } }>(
     env,
     "conversations.list",
-    { types: "public_channel,private_channel", exclude_archived: "true", limit: "1000", ...(cursor ? { cursor } : {}) },
+    { types, exclude_archived: "true", limit: "1000", ...(cursor ? { cursor } : {}) },
   );
 }
 
