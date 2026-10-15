@@ -202,6 +202,7 @@ const preview = {
               "Scale",
               "Select",
               "Switch",
+              "Tag input",
               "Textarea",
               "Tree select"
             ],

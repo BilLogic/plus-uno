@@ -27,11 +27,11 @@ authored half (#166), counted rather than assumed.
 | [Select](Select.md) | 24 | ✅ | ✕ | ✅ |
 | [SelectMultiple](SelectMultiple.md) | 10 | ✕ | ✕ | ✕ |
 | [Switch](Switch.md) | 14 | ✅ | ✕ | ✅ |
-| [TagInput](TagInput.md) | 13 | ✕ | ✕ | ✕ |
+| [TagInput](TagInput.md) | 13 | ✅ | ✕ | ✅ |
 | [Textarea](Textarea.md) | 17 | ✅ | ✕ | ✅ |
 | [TreeSelect](TreeSelect.md) | 9 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 20/23 (87%) · Correct/incorrect 0/23 (0%) · Accessibility 20/23 (87%)
+**Authored coverage:** When to use 21/23 (91%) · Correct/incorrect 0/23 (0%) · Accessibility 21/23 (91%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says
