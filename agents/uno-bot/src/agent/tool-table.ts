@@ -286,7 +286,9 @@ export const TOOL_TABLE = {
     access: "gated",
     retrieval: false,
     gate: {
-      verb: "share this for feedback in #plus-design-feedback",
+      // The card adds where it posts to this verb — #plus-design-feedback, or
+      // the asking DM or thread (`turn/turn.ts` § cardOf).
+      verb: "share this for feedback",
       kind: "post a share-out",
       nouns: ["share", "share-out", "shareout", "feedback", "post"],
     },

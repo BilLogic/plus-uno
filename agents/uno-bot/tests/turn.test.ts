@@ -2695,3 +2695,46 @@ test("Turn does not import a Slack module", () => {
     );
   }
 });
+
+// A share-out's card names the place the ✅ posts to, read the way the
+// executor reads it: #plus-design-feedback by default, or the conversation it
+// was asked in when the asker keeps it there. Live on r621 a DM ask to "post
+// it here" staged a card for the team channel.
+function shareoutTurn(args: Record<string, unknown>, testChannelIds: string[] = []) {
+  return harness({
+    testChannelIds,
+    replies: [
+      {
+        text: "I'll share the live app prototype for feedback.",
+        toolCalls: [{ name: "shareout_post", args: { summary: "The live app prototype, ready for a first round.", ...args } }],
+      },
+    ],
+  });
+}
+
+test("a share-out card names #plus-design-feedback by default", async () => {
+  const h = shareoutTurn({});
+  const outcome = await runTurn(request({ text: "share the live app prototype for feedback" }), h.deps);
+  assert.equal(outcome.staged!.card.verb, "share this for feedback in #plus-design-feedback");
+});
+
+test("a share-out kept in a DM says this DM on its card", async () => {
+  const h = shareoutTurn({ place: "here" });
+  const outcome = await runTurn(
+    request({ channel: "D1", surface: "assistant", text: "share the live app prototype for feedback — post it here in this DM" }),
+    h.deps,
+  );
+  assert.equal(outcome.staged!.card.verb, "share this for feedback in this DM");
+});
+
+test("a share-out kept in the asking thread says this thread on its card", async () => {
+  const h = shareoutTurn({ place: "here" });
+  const outcome = await runTurn(request({ text: "share the live app prototype for feedback, in this thread" }), h.deps);
+  assert.equal(outcome.staged!.card.verb, "share this for feedback in this thread");
+});
+
+test("a share-out asked in a test channel says this thread on its card, whatever was asked", async () => {
+  const h = shareoutTurn({ place: "feedback_channel" }, [CHANNEL]);
+  const outcome = await runTurn(request({ text: "share the live app prototype for feedback" }), h.deps);
+  assert.equal(outcome.staged!.card.verb, "share this for feedback in this thread");
+});

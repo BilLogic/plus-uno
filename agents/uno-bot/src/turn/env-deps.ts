@@ -32,6 +32,7 @@ import { reportItems } from "../slack/decision-cards";
 import { formatAssistantContext } from "../slack/assistant";
 import { buildNotionBefore, buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
 import { renderDeliveredBody } from "../slack/render";
+import { shareoutPlace } from "../tools/share-for-feedback";
 import { standingConfirmersOf } from "../slack/standing-confirmers";
 import { recordSweepRestageFor } from "../sweep/env";
 import { figmaClientFor } from "../figma/production";
@@ -315,6 +316,8 @@ export function cardReadsFor(env: Env): TurnDeps["cards"] {
         .catch(() => null);
       return { repo: target.entry.repo, branch };
     },
+    // Where a share-out would post, by the executor's own rule.
+    shareoutWhere: (input, channel) => shareoutPlace(env, { channel }, input.place).where,
   };
 }
 
