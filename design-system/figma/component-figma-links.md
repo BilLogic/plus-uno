@@ -99,7 +99,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | ButtonGroup | Button Group | `34:5212` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=34-5212) | verified |
 | Components | Card | Card | `4241:27817` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4241-27817) | verified |
 | Components | Card | Overview Card | `12785:189314` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=12785-189314) | verified |
-| Components | Carousel | Carousel | `34:8261` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=34-8261) | verified |
+| Components | Carousel | Carousel | `34:7879` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=34-7879) | verified |
 | Components | Cascader | Cascade list | `13584:55731` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13584-55731) | verified |
 | Components | Checkbox | Form Checkbox | `42:5857` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5857) | verified |
 | Components | ChoiceGrid | Choice Grid | `13541:9229` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-9229) | verified |
@@ -135,7 +135,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | NavTabs | Tab Dropdown | `4209:29375` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-29375) | verified |
 | Components | NumberInput | Number Input Group Button | `13644:11268` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13644-11268) | verified |
 | Components | Pagination | Pagination | `53:19822` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-19822) | verified |
-| Components | Popover | Popovers | `49:19534` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-19534) | verified |
+| Components | Popover | Popover | `49:19534` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-19534) | verified |
 | Components | Progress | Progress Bar | `49:6872` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-6872) | verified |
 | Components | Radio | Form Radio Button | `42:5858` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5858) | verified |
 | Components | Range | Form Range Input | `42:5756` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5756) | verified |
