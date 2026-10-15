@@ -28,6 +28,7 @@ import { restageFor } from "../turn/env-deps";
 import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsPush, viewsUpdate } from "./api";
 import { executeVerdict, runVerdict } from "../agent/resolve-proposal";
 import { REVIEW_ACTION_ID } from "./proposal-render";
+import { OPEN_ACTION_ID } from "./card-block";
 import { DECISION_REVIEW_ACTION_PREFIX, reviewPressOf } from "./decision-cards";
 import {
   NEEDS_CHANGES_LEAD,
@@ -189,6 +190,9 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
   if (actionId.startsWith(DECISION_REVIEW_ACTION_PREFIX)) return openReview(env, payload, actionId);
   if (actionId === REVIEW_EDIT_ACTION_ID) return editInReview(env, payload);
+  // The Review pop-up's Open button (`card-block.ts`): a link, which the
+  // browser already followed. Nothing to do.
+  if (actionId === OPEN_ACTION_ID) return;
   // A pick under the Review pop-up's Edit fields: kept on the card at once,
   // so there is nothing to save and going back loses nothing.
   const pick = actionId === FIELD_ACTION_ID ? reviewPickOf(payload) : null;

@@ -35,7 +35,8 @@
 // card's own buttons carry it in the message they sit on: that ts is the
 // identity, and the decision is resolved against it and nothing else.
 import { textSections } from "./render";
-import { CONFIRM_FOOTER } from "./proposal-render";
+import { CONFIRM_FOOTER, withoutInternalFields } from "./proposal-render";
+import { anatomyBlocks, decisionWords, DESCRIPTION_CHARS, reviewTitle, type DecisionWords } from "./review-anatomy";
 import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
 import {
   draftValuesOf,
@@ -50,7 +51,7 @@ import {
   type EditableField,
   type ReviewViewState,
 } from "./review-fields";
-import { caveatsOf, draftHeadline, readableDraft } from "./review-draft";
+import { anatomyOf, caveatsOf, draftHeadline, readableDraft } from "./review-draft";
 import type { PendingProposal, ReviewChoice, StatedCardWords } from "../thread-state/index";
 import type { ReviewDecision } from "../gate/index";
 
@@ -79,7 +80,9 @@ export interface ReviewedCard {
   ts: string;
 }
 
-/** Slack's modal title cap is 24 characters. */
+/** The title of a view that is not a draft: loading, a closed card, a notice.
+ *  A draft is titled for its tool (`review-anatomy.ts` § `reviewTitle`), at
+ *  most Slack's 24 characters. */
 const TITLE = "Review proposal";
 
 /** Slack's cap on a view's blocks. A long draft can pass it, so `fitBody`
@@ -148,9 +151,12 @@ export interface DraftAccess {
 }
 
 /**
- * The draft, written for a person: the key properties, then the body as
- * headings and paragraphs, then the card's caveats (`review-draft.ts`). A
- * proposal that file cannot read shows the card's text instead.
+ * The draft, written for a person, under its tool's title. A tool read in the
+ * shared anatomy (`review-draft.ts` § `anatomyOf`) is drawn in its zones —
+ * what it does and where, its caveats as alerts, the object as a card, then
+ * its content. Any other: the key properties, then the body as headings and
+ * paragraphs, then the card's caveats; and a proposal that file cannot read
+ * shows the card's text, its internal inputs left out.
  *
  * A confirmer's view has Edit fields at the top when the draft has fields to
  * edit, ends with the decision and a note, and has Submit as its footer. `mayDecide` false is the same draft read-only: Close alone, and a
@@ -188,35 +194,52 @@ export function draftView(
     inline: inPlace,
     editing: access.mayDecide,
   };
-  const read = readableDraft(operations, caveatsOf(text), detail) ?? textSections(text);
+  // Edit fields only for what the draft does not already hold in place.
+  const editable =
+    access.mayDecide && opts.editable !== false && [...draftValuesOf(proposal).keys()].some((key) => !inline.has(key));
+  const editButton = editable ? button(REVIEW_EDIT_ACTION_ID, "Edit fields", "edit") : undefined;
+  const editedLabels = labelsOf(proposal, Object.keys(edits));
+  const edited = editedLabels.length ? [context(`:pencil2: Edited here: ${editedLabels.join(", ")}. Approve writes these values.`)] : [];
+
+  // A tool read in the shared anatomy (`review-anatomy.ts`) opens on what it
+  // does; any other draft opens on its headline, as before.
+  const anatomy = anatomyOf(operations, text, detail);
+  const read = anatomy
+    ? anatomyBlocks(anatomy, [...(editButton ? [{ type: "section", text: { type: "mrkdwn", text: "*Fields*" }, accessory: editButton }] : []), ...edited])
+    : (readableDraft(operations, caveatsOf(text), detail) ?? textSections(withoutInternalFields(text)));
   // A field the reading did not draw — the batch has a tool it cannot read —
   // still goes in place, after the draft, so it is never left uneditable.
   const drawn = new Set(read.map((b) => (b as { block_id?: string }).block_id));
   const rest = [...inPlace.values()].filter((f) => !drawn.has(`${FIELD_BLOCK_PREFIX}${f.key}`));
   const body = rest.length ? [...read, { type: "divider" }, ...fieldInputBlocks(rest)] : read;
 
-  const headline = draftHeadline(operations);
   const head: unknown[] = [];
+  // A refused edit's alert stays first, above every zone.
   if (opts.alert) head.push(alertBlock(opts.alert.level, opts.alert.text));
-  // Edit fields only for what the draft does not already hold in place.
-  const editable =
-    access.mayDecide && opts.editable !== false && [...draftValuesOf(proposal).keys()].some((key) => !inline.has(key));
-  head.push({
-    type: "section",
-    text: { type: "mrkdwn", text: headline ? `*${escapeSlackText(headline)}*` : "*The draft*" },
-    ...(editable ? { accessory: button(REVIEW_EDIT_ACTION_ID, "Edit fields", "edit") } : {}),
-  });
-  const edited = labelsOf(proposal, Object.keys(edits));
-  if (edited.length) head.push(context(`:pencil2: Edited here: ${edited.join(", ")}. Approve writes these values.`));
+  if (!anatomy) {
+    const headline = draftHeadline(operations);
+    head.push({
+      type: "section",
+      text: { type: "mrkdwn", text: headline ? `*${escapeSlackText(headline)}*` : "*The draft*" },
+      ...(editButton ? { accessory: editButton } : {}),
+    });
+    head.push(...edited);
+  }
 
+  const words = decisionWords(operations);
   const tail: unknown[] = access.mayDecide
-    ? [{ type: "divider" }, choiceInput(proposal.choices), noteInput(Boolean(proposal.choices?.length)), ...(access.closesAt !== undefined ? [context(openLine(access.closesAt, access.confirmers))] : [])]
+    ? [
+        { type: "divider" },
+        choiceInput(proposal.choices, anatomy?.approve ? { ...words, confirm: anatomy.approve } : words),
+        noteInput(Boolean(proposal.choices?.length)),
+        ...(access.closesAt !== undefined ? [context(openLine(access.closesAt, access.confirmers))] : []),
+      ]
     : [context(readOnlyLine(access.confirmers))];
   const fitted = fitBody(body, MAX_VIEW_BLOCKS - head.length - tail.length);
   return modal(
     { channel: card.channel, ts: card.ts },
     [...head, ...fitted, ...tail],
-    access.mayDecide ? { submit: SUBMIT } : {},
+    { title: reviewTitle(operations), ...(access.mayDecide ? { submit: SUBMIT } : {}) },
   );
 }
 
@@ -272,14 +295,26 @@ const CHOICES: ReadonlyArray<[ReviewDecision, string]> = [
  *  to the card's own list before anything runs. */
 const OWN_CHOICE = "choice:";
 
-function choiceInput(own?: readonly ReviewChoice[]): unknown {
+/** An option's description: what choosing it does, plain, at most 75. */
+function description(text: string): { description: { type: "plain_text"; text: string } } {
+  const clipped = text.length > DESCRIPTION_CHARS ? `${text.slice(0, DESCRIPTION_CHARS - 1)}…` : text;
+  return { description: { type: "plain_text", text: clipped } };
+}
+
+/** The decision: Approve, Needs changes and Reject, each saying what it does
+ *  on this card — or the card's own answers, each with its decided words. */
+function choiceInput(own: readonly ReviewChoice[] | undefined, words: DecisionWords): unknown {
   const options = own?.length
-    ? own.map((c) => ({ value: `${OWN_CHOICE}${c.verdict}:${c.value}`, text: { type: "mrkdwn", text: c.label } }))
-    : CHOICES.map(([value, text]) => ({ value, text: { type: "plain_text", text } }));
+    ? own.map((c) => ({
+        value: `${OWN_CHOICE}${c.verdict}:${c.value}`,
+        text: { type: "mrkdwn", text: c.label },
+        ...(c.decided?.trim() ? description(c.decided.trim()) : {}),
+      }))
+    : CHOICES.map(([value, text]) => ({ value, text: { type: "plain_text", text }, ...description(words[value]) }));
   return {
     type: "input",
     block_id: CHOICE_BLOCK_ID,
-    label: { type: "plain_text", text: "Decision" },
+    label: { type: "plain_text", text: own?.length ? "Your answer" : "Decision" },
     element: { type: "radio_buttons", action_id: CHOICE_ACTION_ID, options },
   };
 }
@@ -396,7 +431,7 @@ function reviewNoteOf(state: unknown): string {
  */
 export function decidedView(card: ReviewedCard, cardText: string): View {
   return modal(card, [
-    ...textSections(draftBody(cardText)),
+    ...textSections(withoutInternalFields(draftBody(cardText))),
     context("Read-only. This proposal has already been decided."),
   ]);
 }

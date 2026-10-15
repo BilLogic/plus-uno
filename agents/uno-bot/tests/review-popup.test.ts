@@ -209,8 +209,8 @@ describe("the draft reads as a draft", () => {
   });
 
   it("shows the card's text for a tool it has no reading for", async () => {
-    const words = lines(await draftOf({ toolName: "shareout_post", input: { channel: "#x" }, proposalText: "• *Channel:* #x" })).join("\n");
-    assert.match(words, /Channel:\* #x/);
+    const words = lines(await draftOf({ toolName: "github_workflow_run", input: { workflow: "deploy.yml" }, proposalText: "• *Workflow:* deploy.yml" })).join("\n");
+    assert.match(words, /Workflow:\* deploy\.yml/);
   });
 });
 
