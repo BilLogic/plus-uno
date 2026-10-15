@@ -45,11 +45,11 @@ artifact once a persona or Worker-face budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **9 reference(s), 116,669 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **9 reference(s), 116,815 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 36,181 |
+| `docs/connectors/slack-sweep` | [`docs/connectors/slack-sweep.md`](../../docs/connectors/slack-sweep.md) | 36,327 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 12,846 |
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 9,864 |
@@ -1549,7 +1549,7 @@ The **sweep** is uno-bot's end-of-day read of the design channels for **drift**:
 - **Group DMs:** every group DM uno-bot is in, read by one more end-of-day job.
 - **DMs with uno-bot:** each 1:1 DM uno-bot answered in lately, read by one more end-of-day job with no opt-in, since uno-bot is a party to it (§ DMs with uno-bot).
 - **DMs between people:** unread, except a person's own DMs once they tick "Catch decisions from my DMs" on the Home tab. Those are read with their own token, and each fix goes on its own decision card in their DM with uno-bot, decided only by them, in Review. The card links the DM (Open DM), and its words stay in the DM; its subtitle reads "Your DM" and the day, naming nobody in it (ADR-032).
-- **When:** the end-of-day run at 06:00 ET, the morning after each workday, reads each channel since its cursor, which lives in the usage database, three hours before the 09:00 ET morning post. It is dated to the day it sweeps, so Friday is swept at Saturday 06:00 and its cards post Monday.
+- **When:** the end-of-day run at 06:00 ET, the morning after each workday, reads each channel since its cursor, which lives in the usage database, three hours before the 09:00 ET morning post. It is dated to the day it sweeps, so Friday is swept at Saturday 06:00 and its cards post Monday. In production (2026-09-30 to 10-14) its sweep jobs finished within about 10 minutes of the run starting, so what it finds reaches the 09:00 post.
 - **Links:** a thread's Notion, GitHub, Figma and canvas links, read the way `source_read` reads them. Only Notion is written in place. A thread with no Notion, Figma or `design-system/` code link, no named page and no answered question is passed over.
 - **Named, not linked:** a message that names a page in two or more words ("the booking flow PRD", "the tutor help center") has it searched for in Notion, then in GitHub. Only the top hit is kept, only when it shares two words with the name, and only from a team surface: a Roadmap card, a Help Center article, a Decisions or Marketplace row, or a top-level workspace page titled as a PRD or spec. A page nested under another page, and any page titled as a 1:1, is no hit. The card marks that page *found by search*, so a confirmer can Reject a wrong target. A search that fails finds nothing and holds nothing up.
 - **Figma comments:** one more end-of-day job reads the comment threads under a file's 📐 Specs or 🔍 For Review pages, in the six Figma teams (MISC aside), created or resolved since it switched on. A thread that reads like a decision becomes its own card on the sweep's #plus-design morning message (§ Figma comment decisions).

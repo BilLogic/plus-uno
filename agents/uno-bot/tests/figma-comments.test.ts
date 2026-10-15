@@ -71,8 +71,8 @@ const CARD_ID = "24820000000000000000000000000001";
 const PRD_ID = "24820000000000000000000000000002";
 const CARD_URL = `https://www.notion.so/${CARD_ID}`;
 const PRD_URL = `https://www.notion.so/${PRD_ID}`;
-/** 2026-09-29 00:00 ET, the switch-on. */
-const SWITCH_ON = at(29, 4);
+/** 2026-09-29 06:00 ET, the switch-on, at an end-of-day run. */
+const SWITCH_ON = at(29, 10);
 const SWITCHED = `${new Date(SWITCH_ON).toISOString()}|${new Date(SWITCH_ON).toISOString()}||`;
 
 /** A file under How We Fig's dividers: a Cover, Specs with a nested frame, WIP, For Review. */
@@ -198,7 +198,7 @@ function seededFigma(): InMemoryFigma {
   return figma;
 }
 
-/** A harness switched on at the watermark, its clock at the next midnight. */
+/** A harness switched on at the watermark, its clock at the next end-of-day run, 06:00 ET. */
 async function nightHarness(
   over: {
     figma?: InMemoryFigma;
@@ -217,7 +217,7 @@ async function nightHarness(
     sources: over.sources ?? [CARD, PRD],
     people: { Meryem: "U0MERYEM", "Sarah K": "U0SARAH" },
     detectorReplies: over.replies ?? [REPLY],
-    now: at(30, 4),
+    now: at(30, 10),
     figma: {
       client,
       notes: over.notes ?? NOTES,
@@ -241,7 +241,7 @@ describe("the night's read of Figma comments (#900)", () => {
     const report = await runSweepJob(NIGHT, h.deps);
     assert.equal(
       report.summary,
-      "0 Figma file(s) read, 0 decision(s) kept for the morning — switched on: comments created or resolved after 2026-09-29T04:00:00.000Z are read, none before",
+      "0 Figma file(s) read, 0 decision(s) kept for the morning — switched on: comments created or resolved after 2026-09-29T10:00:00.000Z are read, none before",
     );
     assert.deepEqual(client.calls(), [], "no comment is read on the night it switches on");
     assert.equal(await h.store.cursor(COMMENTS_CURSOR), SWITCHED);
@@ -328,7 +328,7 @@ describe("the night's read of Figma comments (#900)", () => {
         ],
       ],
     );
-    assert.equal(await h.store.cursor(COMMENTS_CURSOR), `2026-09-29T04:00:00.000Z|2026-09-30T04:00:00.000Z||`, "the next night starts where this one ended");
+    assert.equal(await h.store.cursor(COMMENTS_CURSOR), `2026-09-29T10:00:00.000Z|2026-09-30T10:00:00.000Z||`, "the next night starts where this one ended");
   });
 
   it("asks the card's design owner; with none in Slack, the file's creator; with neither, the card", async () => {
@@ -345,7 +345,7 @@ describe("the night's read of Figma comments (#900)", () => {
         sources: [{ ...CARD, contributors: ["Nobody Mapped", "Meryem", "Sarah K"] }, PRD],
         people: { Meryem: "U0MERYEM", "Sarah K": "U0SARAH" },
         detectorReplies: [REPLY],
-        now: at(30, 4),
+        now: at(30, 10),
         figma: { client, notes: NOTES, cards: { 2482: { url: CARD_URL, title: "Goal Setting" } }, roles },
       });
       await h.store.saveCursor(COMMENTS_CURSOR, SWITCHED, SWITCH_ON);
@@ -362,13 +362,13 @@ describe("the night's read of Figma comments (#900)", () => {
   it("reads nothing on a night whose notes name no file, and nothing twice for one day's activity", async () => {
     const { h, client } = await nightHarness();
     await runSweepJob(NIGHT, h.deps);
-    h.clock.now = at(31, 4);
+    h.clock.now = at(31, 10);
     const quiet = await runSweepJob(NIGHT, h.deps);
     assert.equal(quiet.summary, "0 Figma file(s) read, 0 decision(s) kept for the morning");
     assert.equal(h.provider.generated.length, 1);
     assert.equal(client.calls().filter((c) => c.method === "comments").length, 1, "no file was a candidate the second night");
     // A note that still names the file, with nothing new in the window, reads its comments and finds nothing to ask.
-    h.clock.now = at(32, 4);
+    h.clock.now = at(32, 10);
     (h.deps.figmaComments!.notes as { list(p: string): Promise<unknown[]> }).list = async () => [
       { key: `figma-notify:changed:${FILE}`, at: "2026-10-01T15:00:00Z" },
     ];
@@ -419,8 +419,8 @@ describe("the night's read of Figma comments (#900)", () => {
 
   it("cuts a window longer than the notes last to the last seven days, and says so", async () => {
     const { h } = await nightHarness();
-    const old = new Date(at(19, 4)).toISOString();
-    await h.store.saveCursor(COMMENTS_CURSOR, `${old}|${old}||`, at(19, 4));
+    const old = new Date(at(19, 10)).toISOString();
+    await h.store.saveCursor(COMMENTS_CURSOR, `${old}|${old}||`, at(19, 10));
     const report = await runSweepJob(NIGHT, h.deps);
     assert.match(report.summary, /the window ran past the seven days the notes keep, so the last seven were read$/);
   });
@@ -432,7 +432,7 @@ describe("the night's read of Figma comments (#900)", () => {
       sources: [CARD, PRD],
       people: { Meryem: "U0MERYEM", "Sarah K": "U0SARAH" },
       detectorReplies: [REPLY],
-      now: at(30, 4),
+      now: at(30, 10),
       dryRun: true,
       figma: { client, notes: NOTES, cards: { 2482: { url: CARD_URL, title: "Goal Setting" } } },
     });
@@ -567,7 +567,7 @@ describe("the morning's decisions on the sweep's message in #plus-design (#900)"
     client.seedFile(FILE, {
       comments: [...COMMENTS, comment("c1s", { handle: "meryem", parent_id: "c1", created_at: "2026-09-30T15:00:00Z", message: "Done in v3" })],
     });
-    h.clock.now = at(31, 4);
+    h.clock.now = at(31, 10);
     (h.deps.figmaComments!.notes as { list(p: string): Promise<unknown[]> }).list = async (prefix: string) =>
       prefix.startsWith("figma-notify:commented:2026-09-30") ? [{ key: `figma-notify:commented:2026-09-30:${FILE}`, at: "2026-09-30T15:00:00Z" }] : [];
     await runSweepJob(NIGHT, h.deps);
@@ -730,11 +730,11 @@ describe("the morning's decisions on the sweep's message in #plus-design (#900)"
 describe("what decides what the read sees", () => {
   it("reads a comment created after the watermark, or a root resolved after it, and nothing else", () => {
     const w = SWITCH_ON;
-    assert.equal(readable({ created_at: "2026-09-29T05:00:00Z", resolved_at: null, parent_id: "", message: "" }, w), true);
-    assert.equal(readable({ created_at: "2026-09-28T05:00:00Z", resolved_at: "2026-09-29T05:00:00Z", parent_id: "", message: "" }, w), true);
-    assert.equal(readable({ created_at: "2026-09-28T05:00:00Z", resolved_at: "2026-09-29T05:00:00Z", parent_id: "c1", message: "" }, w), false);
-    assert.equal(readable({ created_at: "2026-09-28T05:00:00Z", resolved_at: null, parent_id: "", message: "" }, w), false);
-    const threads = candidateThreads(COMMENTS, { watermark: w, from: w, until: at(30, 4) });
+    assert.equal(readable({ created_at: "2026-09-29T11:00:00Z", resolved_at: null, parent_id: "", message: "" }, w), true);
+    assert.equal(readable({ created_at: "2026-09-28T11:00:00Z", resolved_at: "2026-09-29T11:00:00Z", parent_id: "", message: "" }, w), true);
+    assert.equal(readable({ created_at: "2026-09-28T11:00:00Z", resolved_at: "2026-09-29T11:00:00Z", parent_id: "c1", message: "" }, w), false);
+    assert.equal(readable({ created_at: "2026-09-28T11:00:00Z", resolved_at: null, parent_id: "", message: "" }, w), false);
+    const threads = candidateThreads(COMMENTS, { watermark: w, from: w, until: at(30, 10) });
     assert.deepEqual(
       threads.map((t) => [t.root.id, t.replies.map((r) => r.id)]),
       [
@@ -752,7 +752,7 @@ describe("what decides what the read sees", () => {
   it("reads a reply after the watermark on an older open thread, by that reply alone", async () => {
     const old = comment("o1", { handle: "bea", created_at: "2026-09-20T12:00:00Z", message: "An old open question about the bar", client_meta: pin("4:1") });
     const answer = comment("o1r", { handle: "meryem", parent_id: "o1", created_at: "2026-09-29T16:30:00Z", message: "Settled: the bar waits for a goal" });
-    const window = { watermark: SWITCH_ON, from: SWITCH_ON, until: at(30, 4) };
+    const window = { watermark: SWITCH_ON, from: SWITCH_ON, until: at(30, 10) };
     const [thread] = candidateThreads([old, answer], window);
     assert.equal(thread?.root.id, "o1");
     assert.equal(thread?.rootRead, false);
@@ -845,10 +845,10 @@ describe("what decides what the read sees", () => {
   });
 
   it("keeps its place as one string, and quotes a comment on one short line", () => {
-    const c = { watermark: SWITCH_ON, from: SWITCH_ON, until: at(30, 4), done: ["A", "B"] };
+    const c = { watermark: SWITCH_ON, from: SWITCH_ON, until: at(30, 10), done: ["A", "B"] };
     assert.deepEqual(readCommentsCursor(writeCommentsCursor(c)), c);
     assert.equal(readCommentsCursor(null), null);
-    assert.deepEqual(etDatesOf(SWITCH_ON, at(30, 4)), ["2026-09-29", "2026-09-30"]);
+    assert.deepEqual(etDatesOf(SWITCH_ON, at(30, 10)), ["2026-09-29", "2026-09-30"]);
     assert.equal(quoteOf("Keep it\n  hidden"), "Keep it hidden");
     assert.equal(quoteOf("x".repeat(300)).length, 200);
   });

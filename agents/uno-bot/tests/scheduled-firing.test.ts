@@ -90,7 +90,7 @@ test("the runs keep their ET hours on both sides of the 1 Nov 2026 change", asyn
   // Friday's work is swept at Saturday 06:00 EDT, 10:00 UTC.
   assert.deepEqual(runsForFiring(oct31(10)), ["end-of-day"]);
   assert.deepEqual(runsForFiring(oct31(11)), []);
-  // Midnight, where the run used to be, starts nothing.
+  // 00:00 ET starts nothing.
   assert.deepEqual(runsForFiring(oct31(4)), []);
   assert.deepEqual(runsForFiring(nov2(13)), []);
   assert.deepEqual(runsForFiring(nov2(14)), ["morning"]);

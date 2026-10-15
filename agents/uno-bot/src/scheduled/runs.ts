@@ -6,9 +6,9 @@
 // Friday — so each run is there whether ET is UTC-4 or UTC-5. A firing reads
 // its own scheduled time in ET and enqueues the matching run; the firing an
 // hour off does nothing. The end-of-day run is dated to the ET day it sweeps,
-// the one before it (`sweptDayOf`). The Figma library poll
-// that once ran on every firing is the end-of-day run's `figma-library-poll`
-// job. The wrangler.toml cron comment gives the ET times.
+// the one before it (`sweptDayOf`). The Figma library poll that once ran on
+// every firing is the end-of-day run's `figma-library-poll` job. The
+// wrangler.toml cron comment gives the ET times.
 //
 // The handler only ENQUEUES. A scheduled invocation gets about 10 ms of CPU,
 // and a run's work belongs on its runner, where each alarm runs one job with a
