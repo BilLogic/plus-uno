@@ -138,6 +138,10 @@ export function devLinksCard(subject: DevLinksSubject, write: DevLinksWrite): Pr
   };
 }
 
+/** A link's label in Review: its name without the component, or the whole
+ *  name where it names none. */
+const linkLabel = (name: string) => (name.includes(": ") ? labelOf(name) : name);
+
 /**
  * The card as Review draws it (`PendingProposal.facts`): the component, what
  * Approve changes and where, and every link by its label. A batch lists each
@@ -160,7 +164,7 @@ export function devLinksFacts(subject: DevLinksSubject, write: DevLinksWrite): D
       figmaUrl: subject.figmaUrl,
       components: subject.components.map((e) => ({
         component: e.component,
-        links: e.adds.map((l) => ({ label: labelOf(l.name), url: l.url })),
+        links: e.adds.map((l) => ({ label: linkLabel(l.name), url: l.url })),
         ...(e.renamed ? { also: "renames its Code link to Code (plus-uno)" } : {}),
       })),
       batch: true,
@@ -174,7 +178,7 @@ export function devLinksFacts(subject: DevLinksSubject, write: DevLinksWrite): D
     change: capital(changeWords(write)),
     ...(comment ? { comment } : {}),
     figmaUrl: subject.figmaUrl,
-    components: [{ component: subject.component, links: distinct.map(([name, url]) => ({ label: labelOf(name) || name, url })) }],
+    components: [{ component: subject.component, links: distinct.map(([name, url]) => ({ label: linkLabel(name), url })) }],
     batch: false,
     notes,
   };

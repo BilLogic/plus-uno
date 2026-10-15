@@ -275,6 +275,8 @@ describe("a DS precedence card in Review", () => {
     assert.equal(week!.text, "Oct 12");
     const code = elementsOf(blocksOf(view)[2]!).filter((e) => e.style?.code).map((e) => e.text);
     assert.deepEqual(code, ['size="xs"', "pill"]);
+    const lines = (blocksOf(view)[2]!.elements![1]!.elements ?? []).map((l) => (l.elements ?? []).map((e) => e.text).join(""));
+    assert.deepEqual(lines, ['Code has size="xs", the library doesn\'t', "The library has a pill variant code doesn't"]);
     assert.doesNotMatch(JSON.stringify(blocksOf(view)[2]), /`/, "no backticks left in the list");
   });
 

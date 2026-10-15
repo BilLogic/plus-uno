@@ -46,7 +46,7 @@ export function clip(text: string, max: number): string {
 }
 
 /** Whether a link can be an Open button: an https or http URL, nothing else. */
-function isLink(url: string): boolean {
+export function isLink(url: string): boolean {
   return /^https?:\/\/[^\s<>|]+$/.test(url);
 }
 

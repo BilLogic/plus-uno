@@ -229,7 +229,7 @@ export function precedenceFacts(finding: ComponentFinding, weekOf: string): Prec
     kind: "ds_precedence_intake",
     finding: `${finding.component}: ${FIXES[first.loser]}`,
     week: shortDate(weekOf),
-    differences: finding.items.map((i) => i.summary),
+    differences: finding.items.map((i) => `${i.summary.charAt(0).toUpperCase()}${i.summary.slice(1)}`),
     codeUrl: first.codeUrl,
     figmaUrl: first.figmaUrl,
   };

@@ -10,7 +10,8 @@
 // its reading is null, so the pop-up shows the card's text as it always has.
 //
 // PURE: blocks out, nothing posted, nothing read.
-import { clip, OPEN_ACTION_ID } from "./card-block";
+import { clip, isLink, OPEN_ACTION_ID } from "./card-block";
+import { escapeSlackText } from "./mrkdwn";
 import type { DraftAnatomy, WhereElement } from "./review-anatomy";
 import type { DevLinksFacts, PrecedenceFacts, ShareNoteFacts, StatedFacts, TidyFacts } from "../thread-state/index";
 
@@ -35,11 +36,11 @@ const MAX_ITEMS = 40;
 /** A channel's id, as Slack writes one. */
 const CHANNEL_ID = /^[CG][A-Z0-9]{6,}$/;
 
-/** A mrkdwn text's entities back to the characters it shows: rich text is
- *  read as written, so the quote shows what the post will. */
+/** A mrkdwn text's entities back to the characters they stand for: rich
+ *  text is read as written. The sweep's notes are escaped plain text, so the
+ *  quote reads as the post does. */
 const unescaped = (t: string) => t.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
 
-const isLink = (url: string) => /^https?:\/\/[^\s<>|]+$/.test(url);
 const text = (t: string, style?: { bold?: boolean; code?: boolean }): RichElement => ({ type: "text", text: clip(t, TEXT_CHARS), ...(style ? { style } : {}) });
 const link = (url: string, label: string): RichElement => (isLink(url) ? { type: "link", url, text: clip(label, TEXT_CHARS) } : text(label));
 const section = (elements: readonly RichElement[]) => ({ type: "rich_text_section", elements: [...elements] });
@@ -59,7 +60,7 @@ function richList(label: string, items: ReadonlyArray<readonly RichElement[]>): 
 /** Plain lines under the content, as one context block. */
 function notes(lines: readonly string[]): unknown[] {
   const kept = lines.map((l) => l.trim()).filter(Boolean);
-  return kept.length ? [{ type: "context", elements: [{ type: "plain_text", text: clip(kept.join(" "), TEXT_CHARS) }] }] : [];
+  return kept.length ? [{ type: "context", elements: [{ type: "mrkdwn", text: clip(escapeSlackText(kept.join(" ")), TEXT_CHARS) }] }] : [];
 }
 
 /** A line with each backticked stretch in code style: "Code has `size`" →
