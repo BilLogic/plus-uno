@@ -24,7 +24,7 @@ Group labeled inputs, selection controls, and actions into a coherent data-entry
 | Text | `Input` | `@/components` |
 | Multi-line | `Textarea` | `@/components` |
 | Pick one | `Select`, `Radio` | `@/components` |
-| Pick many | `Checkbox`, `SelectMultiple` | `@/components` |
+| Pick many | `Checkbox`, `Select mode="multi"` | `@/components` |
 | Toggle | `Switch` | `@/components` |
 | Date/time | `DatePicker`, `DateAndTimePicker` | `@/components` |
 | Grouped field | `InputGroup` | `@/components` |

@@ -3,15 +3,15 @@ import PropTypes from 'prop-types';
 import { Dropdown } from 'react-bootstrap';
 import Badge from '@/components/status-and-loading/Badge';
 import Button from '@/components/actions/Button';
-import ListGroup, { ListGroupItem } from '@/components/layout-and-structure/ListGroup/ListGroup';
 import Input from './Input';
+import Listbox from './_internal/Listbox';
 import './Select.scss';
 
 /**
  * Enhanced Select Component
  * 
  * Uses existing design system components:
- * - **ListGroup.Item** with selectable prop for options
+ * - **Listbox** (internal) for multi-select options
  * - **Badge** (dismissible) for selected values
  * - **Button** (ghost) for creatable option
  * - **InputGroup** for search field
@@ -134,9 +134,6 @@ const Select = ({
     const selectedValues = mode === 'multi'
         ? (Array.isArray(currentValue) ? currentValue : [])
         : currentValue;
-
-    // Map Select size to ListGroup.Item size
-    const listItemSize = size === 'small' ? 'b3' : size === 'large' ? 'b1' : 'b2';
 
     // Filter options based on search
     const filteredOptions = allOptions.filter(opt => {
@@ -352,29 +349,18 @@ const Select = ({
 
                     {/* Options list */}
                     {mode === 'multi' ? (
-                        <ListGroup flush className="plus-select-options">
-                            {filteredOptions.map((opt, idx) => {
-                                const optValue = opt.value;
-                                const optLabel = opt.label || opt.text || opt.value;
-                                const isSelected = selectedValues.includes(optValue);
-                                const isDisabled = Boolean(opt.disabled);
-
-                                return (
-                                    <ListGroupItem
-                                        key={idx}
-                                        value={optValue}
-                                        label={optLabel}
-                                        selectable="multi"
-                                        name={`${name || id}-option`}
-                                        selected={isSelected}
-                                        disabled={isDisabled}
-                                        size={listItemSize}
-                                        className="plus-select-option-item"
-                                        onClick={() => handleSelect(optValue)}
-                                    />
-                                );
-                            })}
-                        </ListGroup>
+                        filteredOptions.length > 0 && (
+                            <Listbox
+                                embedded
+                                className="plus-select-options"
+                                aria-label={props['aria-label'] || (props['aria-labelledby'] ? undefined : 'Options')}
+                                aria-labelledby={props['aria-label'] ? undefined : props['aria-labelledby']}
+                                mode="multi"
+                                options={filteredOptions}
+                                value={selectedValues}
+                                onChange={(next, opt) => handleSelect(opt.value)}
+                            />
+                        )
                     ) : (
                         <div className="plus-select-options">
                             {filteredOptions.map((opt, idx) => {

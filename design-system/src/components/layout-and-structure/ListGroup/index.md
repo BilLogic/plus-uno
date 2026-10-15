@@ -23,7 +23,7 @@
 
 ## Tokens touched
 
-`--color-danger-container` · `--color-info-container` · `--color-on-danger-container` · `--color-on-info-container` · `--color-on-primary` · `--color-on-primary-container` · `--color-on-secondary-container` · `--color-on-success-container` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-on-warning-container` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-container` · `--color-primary-state-08` · `--color-primary-text` · `--color-secondary-container` · `--color-success-container` · `--color-surface` · `--color-surface-container-low` · `--color-surface-container-lowest` · `--color-warning-container` · `--font-family-body` · `--font-line-height-body1` · `--font-size-body1` · `--font-weight-normal` · `--font-weight-semibold-1` · `--size-card-radius-sm` · `--size-element-gap-lg` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-full` · `--size-element-radius-sm` · `--size-element-stroke-lg` · `--size-element-stroke-md` · `--size-spacing-medium-space-200`
+`--color-danger-container` · `--color-info-container` · `--color-on-danger-container` · `--color-on-info-container` · `--color-on-primary-container` · `--color-on-secondary-container` · `--color-on-success-container` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-on-warning-container` · `--color-outline-variant` · `--color-primary-container` · `--color-primary-state-08` · `--color-primary-text` · `--color-secondary-container` · `--color-success-container` · `--color-surface` · `--color-surface-container-low` · `--color-warning-container` · `--font-family-body` · `--font-line-height-body1` · `--font-size-body1` · `--font-weight-normal` · `--font-weight-semibold-1` · `--size-card-radius-sm` · `--size-element-gap-lg` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-full` · `--size-spacing-medium-space-200`
 
 From `design-system/src/components/layout-and-structure/ListGroup/ListGroup.scss`. Override these through the token layer, never with a literal.
 
@@ -36,28 +36,20 @@ Implemented as `ListGroupItem`.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | node | — | — |
-| `label` | node | — | — |
-| `value` | string or number | — | — |
 | `active` | bool | — | — |
-| `selected` | bool | — | — |
 | `disabled` | bool | — | — |
 | `href` | string | — | — |
 | `action` | bool | — | — |
 | `style` | enum | — | — |
 | `size` | enum | — | — |
-| `selectable` | enum | — | — |
-| `name` | string | — | — |
 | `onClick` | func | — | — |
 | `className` | string | — | — |
 | `as` | elementType | — | — |
-| `tabbable` | bool | — | Holds the listbox's single tab stop. Managed by `ListGroup`. |
-
-### `ListGroup.Option`
-
-Implemented as `ListOptionComponent`.
 
 ## Related
 
 Same group: `Accordion` · `Card` · `Carousel` · `Collapse` · `Divider` · `Jumbotron` · `MediaObject` · `ScrollBar`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
+
+> Authored guidance is partial — missing: correct/incorrect (#166).

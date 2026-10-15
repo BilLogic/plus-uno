@@ -1,0 +1,111 @@
+/*
+ * Listbox — the internal option list (Figma _Listbox).
+ * Surface roles/surface-overlay, an outline-variant border, Modal/radius-sm and
+ * Elevation Light/2, as Figma binds them.
+ */
+
+.plus-listbox {
+    /*
+     * Figma Min Heights/listbox and Max Heights/listbox. Code has no height
+     * tokens yet, so the part owns them. 300px is about eight rows: the
+     * steering law keeps a scrolling list short and wide.
+     */
+    --plus-listbox-min-height: 140px;
+    --plus-listbox-max-height: 300px;
+    /*
+     * Above a modal (Bootstrap's 1055) and level with popovers, so a list
+     * opened from a field inside a modal is not covered by it.
+     */
+    --plus-listbox-z-index: 1070;
+
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: var(--plus-listbox-min-height);
+    max-height: var(--plus-listbox-max-height);
+    overflow: hidden;
+    background-color: var(--color-surface-overlay);
+    border: var(--size-element-border) solid var(--color-outline-variant);
+    border-radius: var(--size-modal-radius-sm);
+    box-shadow: var(--elevation-light-2);
+}
+
+/* In a portal: placed against its field, at least the field's width, and
+   free to grow with its content up to the viewport. */
+.plus-listbox--floating {
+    position: fixed;
+    z-index: var(--plus-listbox-z-index);
+    width: max-content;
+    max-width: calc(100vw - 2 * var(--size-section-pad-x-md));
+}
+
+/* Inside another menu, which already draws the surface. */
+.plus-listbox--embedded {
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.plus-listbox-header,
+.plus-listbox-footer {
+    flex-shrink: 0;
+}
+
+.plus-listbox-header {
+    border-bottom: var(--size-element-border) solid var(--color-outline-variant);
+}
+
+.plus-listbox-footer {
+    border-top: var(--size-element-border) solid var(--color-outline-variant);
+}
+
+.plus-listbox-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.plus-listbox-options {
+    display: flex;
+    flex-direction: column;
+    outline: none;
+
+    &:focus-visible {
+        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+        outline-offset: calc(-1 * var(--size-element-stroke-lg));
+    }
+}
+
+.plus-listbox-message {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-sm);
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    color: var(--color-on-surface-variant);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
+
+    &--error {
+        color: var(--color-danger-text);
+    }
+
+    &--count,
+    &--limit {
+        font-size: var(--font-size-body3);
+        line-height: var(--font-line-height-body3);
+    }
+}
+
+@media (forced-colors: active) {
+    .plus-listbox-options:focus-visible {
+        outline: var(--size-element-stroke-lg) solid Highlight;
+        outline-offset: calc(-1 * var(--size-element-stroke-lg));
+    }
+}

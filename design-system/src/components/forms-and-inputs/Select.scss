@@ -350,15 +350,6 @@
 .plus-select-options {
     background-color: transparent;
 
-    // Multi-select dropdown should not render row separators/borders.
-    // ListGroup default styles add border-bottom on each item; override here.
-    &.list-group-flush {
-        .plus-list-option.plus-select-option-item {
-            border: none !important;
-            border-bottom: none !important;
-        }
-    }
-
     .dropdown-item {
         display: flex;
         align-items: center;
@@ -425,66 +416,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-    }
-
-    .plus-list-option.plus-select-option-item {
-        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px) !important;
-        margin: 0 !important;
-        box-sizing: border-box;
-        background-color: var(--color-surface);
-        font-family: var(--font-family-body);
-        font-size: var(--font-size-body2);
-        font-weight: var(--font-weight-normal);
-        line-height: var(--font-line-height-body2);
-        gap: var(--size-element-gap-md, 10px);
-        align-items: center;
-        border: none !important;
-        box-shadow: none !important;
-
-        .form-check-label {
-            color: var(--color-on-surface);
-        }
-
-        &:hover:not(.disabled) {
-            background-color: var(--color-on-surface-state-08);
-            border: none !important;
-            box-shadow: none !important;
-        }
-
-        &.active {
-            position: relative;
-            /* Override OptionList active background to match single-select selected */
-            background-color: var(--color-primary-state-08, rgba(4, 114, 168, 0.08)) !important;
-            font-weight: var(--font-weight-normal) !important;
-            padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px) !important;
-            margin: 0 !important;
-            gap: var(--size-element-gap-md, 10px) !important;
-            border: none !important;
-            box-shadow: none !important;
-
-            &::before {
-                content: '';
-                position: absolute;
-                left: 0;
-                top: 0;
-                bottom: 0;
-                width: 4px;
-                background-color: var(--color-primary-container);
-            }
-        }
-
-        &.disabled {
-            opacity: 0.38;
-            pointer-events: none;
-            cursor: not-allowed;
-            border: none !important;
-            box-shadow: none !important;
-        }
-    }
-
-    // Prevent Bootstrap active adjacency rule from shifting selected rows.
-    .plus-list-option.plus-select-option-item + .plus-list-option.plus-select-option-item.active {
-        margin-top: 0 !important;
     }
 }
 

@@ -2,7 +2,7 @@
 
 # Forms and inputs
 
-22 components. Each row links to the generated facts; the three columns after it are the
+20 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
@@ -18,19 +18,17 @@ authored half (#166), counted rather than assumed.
 | [Input](Input.md) | 22 | ✅ | ✅ | ✅ |
 | [InputGroup](InputGroup/index.md) | 20 | ✅ | ✅ | ✅ |
 | [NumberInput](NumberInput.md) | 21 | ✅ | ✅ | ✅ |
-| [OptionList](OptionList.md) | 12 | ✕ | ✕ | ✕ |
 | [Radio](Radio.md) | 17 | ✅ | ✕ | ✅ |
 | [Range](Range.md) | 14 | ✅ | ✕ | ✅ |
 | [Rating](Rating.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
 | [Select](Select.md) | 24 | ✅ | ✅ | ✅ |
-| [SelectMultiple](SelectMultiple.md) | 10 | ✕ | ✕ | ✕ |
 | [Switch](Switch.md) | 15 | ✅ | ✅ | ✅ |
 | [TagInput](TagInput.md) | 13 | ✅ | ✅ | ✅ |
 | [Textarea](Textarea.md) | 17 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect.md) | 9 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 20/22 (91%) · Correct/incorrect 13/22 (59%) · Accessibility 20/22 (91%)
+**Authored coverage:** When to use 20/20 (100%) · Correct/incorrect 13/20 (65%) · Accessibility 20/20 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

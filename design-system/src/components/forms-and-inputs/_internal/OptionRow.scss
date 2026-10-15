@@ -1,0 +1,223 @@
+/*
+ * OptionRow — the one row of every option list (Figma: Dropdown list Item).
+ * The row fills its list's width, and every state's fill spans the whole row.
+ */
+
+.plus-option-row {
+    /* Figma Tree/indent and Tree/toggle, which alias these spacing steps. */
+    --plus-option-row-indent-step: var(--size-spacing-medium-space-400);
+    --plus-option-row-toggle-size: var(--size-spacing-medium-space-300);
+
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-md);
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    margin: 0;
+    border: none;
+    background-color: transparent;
+    color: var(--color-on-surface);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body2);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--font-line-height-body2);
+    text-align: left;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s ease;
+
+    /* Hover is the keyboard-highlighted row; Figma draws them as one state. */
+    &:hover:not(.is-disabled),
+    &.is-highlighted:not(.is-disabled) {
+        background-color: var(--color-on-surface-state-08);
+    }
+
+    &:active:not(.is-disabled) {
+        background-color: var(--color-on-surface-state-12);
+    }
+
+    &.is-selected {
+        background-color: var(--color-primary-state-08);
+
+        &:hover:not(.is-disabled),
+        &.is-highlighted:not(.is-disabled) {
+            background-color: var(--color-primary-state-12);
+        }
+    }
+
+    &:focus-visible {
+        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+        outline-offset: calc(-1 * var(--size-element-stroke-lg));
+    }
+
+    &.is-disabled {
+        opacity: var(--color-disabled-opacity);
+        cursor: not-allowed;
+    }
+}
+
+.plus-option-row--group {
+    padding-top: var(--size-element-pad-y-lg);
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-body3);
+    font-weight: var(--font-weight-semibold-1);
+    line-height: var(--font-line-height-body3);
+    cursor: default;
+
+    &:hover,
+    &:active {
+        background-color: transparent;
+    }
+}
+
+.plus-option-row--create .plus-option-row-leading {
+    color: var(--color-primary-text);
+}
+
+.plus-option-row-leading,
+.plus-option-row-trailing {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+}
+
+/* The tree's indent and caret sit flush, so depth is exactly level x step. */
+.plus-option-row-leading {
+    gap: 0;
+
+    > * + * {
+        margin-left: var(--size-element-gap-md);
+    }
+
+    > .plus-option-row-indent + *,
+    > .plus-option-row-indent {
+        margin-left: 0;
+    }
+}
+
+.plus-option-row-trailing {
+    gap: var(--size-element-gap-sm);
+    color: var(--color-on-surface-variant);
+}
+
+.plus-option-row-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.plus-option-row-label,
+.plus-option-row-description {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.plus-option-row-description {
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+}
+
+.plus-option-row-selected-mark {
+    color: var(--color-primary);
+}
+
+.plus-option-row-indent {
+    display: inline-block;
+    flex-shrink: 0;
+    width: calc(var(--plus-option-row-level) * var(--plus-option-row-indent-step));
+}
+
+.plus-option-row-toggle {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: var(--plus-option-row-toggle-size);
+    height: var(--plus-option-row-toggle-size);
+    color: var(--color-on-surface-variant);
+}
+
+.plus-option-row-chevron {
+    color: var(--color-on-surface-variant);
+}
+
+/* A drawn mark, not a form control; sized to match Checkbox and Radio. */
+.plus-option-row-check {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: var(--size-spacing-medium-space-300);
+    height: var(--size-spacing-medium-space-300);
+    box-sizing: border-box;
+    border: var(--size-element-stroke-md) solid var(--color-outline-variant);
+    background-color: var(--color-surface-container-lowest);
+    transition: background-color 0.2s, border-color 0.2s;
+
+    &--checkbox {
+        border-radius: var(--size-element-radius-sm);
+
+        // The check and the dash only render on a checked or partly-checked
+        // mark, which is filled with primary.
+        i {
+            // @grounds: --color-primary
+            color: var(--color-on-primary);
+            font-size: var(--font-size-body3);
+        }
+    }
+
+    &--radio {
+        border-radius: var(--size-element-radius-full);
+
+        &.is-checked::before {
+            content: '';
+            width: var(--size-spacing-small-space-100);
+            height: var(--size-spacing-small-space-100);
+            border-radius: var(--size-element-radius-full);
+            background-color: var(--color-on-primary);
+        }
+    }
+
+    &.is-checked,
+    &.is-indeterminate {
+        border-color: var(--color-primary-border);
+        background-color: var(--color-primary);
+    }
+}
+
+/*
+ * Forced colours repaint every fill from the system palette, so a highlighted
+ * or selected row would look like a resting one. The cursor becomes an outline
+ * and the selected mark is painted in Highlight.
+ */
+@media (forced-colors: active) {
+    .plus-option-row.is-highlighted,
+    .plus-option-row:focus-visible {
+        outline: var(--size-element-stroke-lg) solid Highlight;
+        outline-offset: calc(-1 * var(--size-element-stroke-lg));
+    }
+
+    .plus-option-row.is-selected .plus-option-row-label {
+        text-decoration: underline;
+    }
+
+    .plus-option-row-check.is-checked,
+    .plus-option-row-check.is-indeterminate {
+        forced-color-adjust: none;
+        border-color: Highlight;
+        background-color: Highlight;
+
+        i {
+            color: HighlightText;
+        }
+
+        &::before {
+            background-color: HighlightText;
+        }
+    }
+}
