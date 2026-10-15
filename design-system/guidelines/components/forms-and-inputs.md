@@ -20,12 +20,13 @@ importable from `@/components` today.
 |---|---|
 | free text, one line | `Input` |
 | free text, several lines | `Textarea`, sized with `rows` |
-| one pick, 2–5 options worth showing | `ChoiceGroup` (`type="radio"`, the default) |
-| one pick from a longer list | `Select`, with `searchable` past about 8 options |
-| several picks, few options | `ChoiceGroup type="checkbox"` |
+| one pick, fewer than 5 options | `ChoiceGroup` (`type="radio"`, the default) |
+| one pick, 5–15 options | `Select` |
+| one pick, more than 15 options | `Select searchable` |
+| several picks, fewer than 5 options | `ChoiceGroup type="checkbox"` |
 | several picks from a longer, fixed list | `Select mode="multi"` |
 | several picks, or values the user adds | `Select mode="multi" creatable` |
-| a pick through a hierarchy | `Cascader` for one path · `TreeSelect multiple` for many |
+| a pick through a hierarchy | `Cascader` for one leaf along one path · `TreeSelect` to see the tree, pick a parent, or pick several — see below |
 | a rating on a scale | `ChoiceGroup orientation="inline"` with `leadingText` and `trailingText` for a numbered scale · `Rating` for stars |
 | the same choice for several questions | `ChoiceGrid` |
 | an action run from a button | `Dropdown` — a button, not a field |
@@ -39,6 +40,33 @@ text, an icon or a button welded to it, `Range` for a number in a continuous
 range, `Switch` for a setting that applies immediately, `Checkbox` for one
 independent yes/no saved with the form, `DateAndTimePicker` for a date or time,
 `FileUpload` for a file.
+
+### A default, or every option in view
+
+The counts above are a starting point; two things move them. When there is a
+good default, a `Select` suits even a short list: it shows the default and
+keeps the alternatives quiet. When people must compare every option to answer,
+or no default stands out, keep the options in view with `ChoiceGroup`, even
+past 5. Several picks go through checkboxes in view (`ChoiceGroup
+type="checkbox"`) or `Select mode="multi"`, which keeps the picks visible as
+tags in the field; never through a single-pick `Select`.
+
+### Cascader or TreeSelect
+
+Both take the same `options` tree, nested through `children`. They differ in
+what the user sees and what they can pick.
+
+- **`Cascader`** when the answer is one leaf, reached along a single path where
+  each level narrows the next — school, then grade, then class. Its `value` is
+  the path, an array from root to leaf; one column opens per level, and picking
+  a leaf commits and closes. It cannot pick a parent or more than one node.
+- **`TreeSelect`** when people need to see the hierarchy as a whole, pick a
+  parent node itself, or pick several items. Single mode commits any node,
+  parent or leaf; `multiple` adds checkboxes, and a fully checked parent stands
+  in for its children in the field.
+
+If the user should never stop part-way down, it is a `Cascader`. If stopping at
+a parent is a valid answer, or the answer is a set, it is a `TreeSelect`.
 
 ### Dropdown is an action menu
 
