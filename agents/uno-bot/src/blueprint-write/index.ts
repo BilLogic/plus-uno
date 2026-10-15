@@ -6,6 +6,6 @@
 // `blueprint_revise` tool (`tools/blueprint-revise.ts`) writes it.
 
 export { ENTITY_STATUSES, readRevision, type BlueprintRevision, type EntityStatus, type RevisionRow } from "./revision";
-export { revisionWriteCalls, writeRevision, type RevisionResult, type WriterDeps } from "./write";
+export { authoringCall, authoringCallCost, revisionWriteCalls, writeRevision, type RevisionResult, type WriterDeps } from "./write";
 export { blueprintRpcFor, forgetBlueprintSession, signInCalls, writeIdentityGap, type WriteIdentityEnv } from "./session";
 export { revisionCard } from "./stage";

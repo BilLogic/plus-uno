@@ -1,21 +1,22 @@
 // Writing one approved blueprint revision through the authoring RPCs — all of
 // it, or none of it.
 //
-// TWO RPCS, BOTH RECORDING THEMSELVES. `upsert_cell_at_status` writes a cell's
-// text and status in one statement; `set_path_status` a path's status. Each
-// appends its own `authoring_changes` row in the same transaction — author
-// `agent`, `author_id` uno-bot's account, the agent session this approval
-// minted, and the captured inverse (plus-uno-blueprint `20261015120000`). So a
-// write is one subrequest and can never land unrecorded; nothing here calls
-// `record_authoring_change`.
+// EVERY WRITE IS RECORDED, AS UNO-BOT. Each authoring call lands one row in
+// `authoring_changes`, and the database's trigger stamps that row `author =
+// uno-bot` with uno-bot's `author_id`, because the call carried the bot's JWT
+// (plus-uno-blueprint `20261015120000`). Who appends the row depends on the
+// RPC. `upsert_cell_at_status` and `set_path_status` append their own in the
+// same transaction, and so do the delete functions. Every older RPC
+// (`add_step`, `create_path`, …) leaves the record to its caller, so
+// `authoringCall` follows one with `record_authoring_change`: a second
+// subrequest, which `authoringCallCost` counts.
 //
 // ALL OR NONE. A revision is reviewed whole, so it is written whole. When a
 // write fails, or a cell turns out to have moved since the draft (a stale
 // race: a slot filled, a status changed), every write already made — that one
-// included — is taken back, newest first, through the same RPCs. A changed
-// cell is put back as it stood. A NEW cell cannot be: uno-bot's identity may
-// not delete (a trigger refuses it), so it is set to `deprecated` and named,
-// for a person to delete. What could not be taken back is named too.
+// included — is taken back, newest first. A changed cell is put back as it
+// stood. A cell the revision created is deleted through `delete_cell`. What
+// could not be taken back is named.
 //
 // Env-free: the RPC arrives as a function, so the Node suite drives this
 // through the Gate with a fake Supabase fetch.
@@ -24,7 +25,7 @@ import type { BlueprintRevision, EntityStatus, RevisionRow } from "./revision";
 
 export interface WriterDeps {
   /** One authoring RPC: its result, or a throw with the database's reason. */
-  rpc(fn: "upsert_cell_at_status" | "set_path_status", args: Record<string, unknown>): Promise<unknown>;
+  rpc(fn: string, args: Record<string, unknown>): Promise<unknown>;
   /** The agent session every write of this approval is recorded under. */
   sessionId: string;
 }
@@ -37,11 +38,50 @@ export type RevisionResult =
       reason: string;
       /** Writes taken back. */
       tookBack: number;
-      /** New cells left `deprecated` because uno-bot may not delete them. */
-      leftDeprecated: string[];
       /** Writes whose take-back failed — the blueprint still shows them. */
       notTakenBack: string[];
     };
+
+/**
+ * The RPCs that append their own `authoring_changes` row. Every other
+ * authoring RPC is recorded by its caller.
+ */
+const SELF_RECORDING = new Set(["upsert_cell_at_status", "set_path_status"]);
+const recordsItself = (fn: string) => SELF_RECORDING.has(fn) || fn.startsWith("delete_");
+
+/**
+ * Subrequests one authoring call costs: 1, or 2 for an RPC that leaves its
+ * record to the caller.
+ *
+ * @param fn - The authoring RPC's name
+ */
+export function authoringCallCost(fn: string): number {
+  return recordsItself(fn) ? 1 : 2;
+}
+
+/**
+ * One authoring RPC, recorded. An RPC that does not record itself is followed
+ * by `record_authoring_change` under the approval's agent session, as
+ * `uno-bot` — the trigger stamps that author on a row under the bot's JWT
+ * whatever is passed, and refuses it from anyone else.
+ *
+ * @param deps - The RPC and the approval's agent session
+ * @param fn - The authoring RPC
+ * @param args - Its arguments
+ * @param revert - The call that undoes it, for the record
+ */
+export async function authoringCall(
+  deps: WriterDeps,
+  fn: string,
+  args: Record<string, unknown>,
+  revert: { fn: string; args: Record<string, unknown> } | null = null,
+): Promise<unknown> {
+  const result = await deps.rpc(fn, args);
+  if (!recordsItself(fn)) {
+    await deps.rpc("record_authoring_change", { fn, args, revert, author: "uno-bot", agent_session_id: deps.sessionId });
+  }
+  return result;
+}
 
 /**
  * Blueprint calls a revision can cost at worst: every write, then every one of
@@ -50,8 +90,11 @@ export type RevisionResult =
  * @param revision - The revision to write
  */
 export function revisionWriteCalls(revision: Pick<BlueprintRevision, "rows" | "path">): number {
-  const writes = revision.rows.length + (revision.path ? 1 : 0);
-  return writes * 2;
+  const cell = authoringCallCost("upsert_cell_at_status");
+  // A cell's take-back is the same upsert or a delete; budget the dearer.
+  const cellBack = Math.max(authoringCallCost("upsert_cell_at_status"), authoringCallCost("delete_cell"));
+  const path = authoringCallCost("set_path_status");
+  return revision.rows.length * (cell + cellBack) + (revision.path ? path * 2 : 0);
 }
 
 type Written =
@@ -88,7 +131,7 @@ export async function writeRevision(revision: BlueprintRevision, deps: WriterDep
   for (const row of revision.rows) {
     let report: CellReport;
     try {
-      report = (await deps.rpc("upsert_cell_at_status", cellArgs(row, row.content, row.to))) as CellReport;
+      report = (await authoringCall(deps, "upsert_cell_at_status", cellArgs(row, row.content, row.to))) as CellReport;
     } catch (err) {
       reason = `writing ${slotOf(row)} failed: ${message(err)}`;
       break;
@@ -104,7 +147,7 @@ export async function writeRevision(revision: BlueprintRevision, deps: WriterDep
 
   if (reason === null && revision.path) {
     try {
-      const report = (await deps.rpc("set_path_status", {
+      const report = (await authoringCall(deps, "set_path_status", {
         path_id: revision.pathId,
         status: revision.path.to,
         agent_session_id: deps.sessionId,
@@ -125,22 +168,20 @@ export async function writeRevision(revision: BlueprintRevision, deps: WriterDep
 
   // Newest first, so each take-back meets the state its write left.
   let tookBack = 0;
-  const leftDeprecated: string[] = [];
   const notTakenBack: string[] = [];
   for (const w of [...written].reverse()) {
     try {
       if (w.kind === "path") {
-        await deps.rpc("set_path_status", { path_id: revision.pathId, status: w.previous, agent_session_id: deps.sessionId });
+        await authoringCall(deps, "set_path_status", { path_id: revision.pathId, status: w.previous, agent_session_id: deps.sessionId });
       } else if (w.previous) {
-        await deps.rpc("upsert_cell_at_status", cellArgs(w.row, w.previous.content, w.previous.status));
+        await authoringCall(deps, "upsert_cell_at_status", cellArgs(w.row, w.previous.content, w.previous.status));
       } else {
-        await deps.rpc("upsert_cell_at_status", cellArgs(w.row, w.row.content, "deprecated"));
-        leftDeprecated.push(w.id);
+        await authoringCall(deps, "delete_cell", { cell_id: w.id });
       }
       tookBack += 1;
     } catch (err) {
       notTakenBack.push(`${w.kind === "path" ? "the path's status" : slotOf(w.row)} (${message(err)})`);
     }
   }
-  return { ok: false, reason, tookBack, leftDeprecated, notTakenBack };
+  return { ok: false, reason, tookBack, notTakenBack };
 }

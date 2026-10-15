@@ -2,9 +2,10 @@
 //
 // An ordinary Auth user (`SUPABASE_WRITE_EMAIL`, password in the secret
 // `SUPABASE_WRITE_PASSWORD`) whose `app_metadata.role` is `rpc_writer`: its
-// JWT passes the guard inside every SECURITY DEFINER authoring RPC and no
-// table's write policy, and deletes under it are refused by a trigger
-// (plus-uno-blueprint `20261015120000`). Never the service-role key.
+// JWT passes the guard inside every SECURITY DEFINER authoring RPC, the
+// delete RPCs included, and no table's write policy; every `authoring_changes`
+// row appended under it reads `author = uno-bot` (plus-uno-blueprint
+// `20261015120000`). Never the service-role key.
 //
 // The password grant mints a one-hour JWT. It is held per isolate and reused
 // until a minute before it lapses, so sign-in costs one subrequest an hour at

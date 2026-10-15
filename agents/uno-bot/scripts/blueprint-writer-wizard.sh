@@ -192,10 +192,10 @@ finish() {
 # whose app_metadata.role is `rpc_writer`. plus-uno-blueprint's migration
 # 20261015120000_uno_bot_writes_through_the_rpcs_alone.sql is what gives that
 # role its meaning: it passes the guard inside every SECURITY DEFINER
-# authoring RPC, fails every write policy (so no raw table write), cannot
-# delete, and writes a status through `upsert_cell_at_status` /
-# `set_path_status`, which record themselves in authoring_changes with the
-# bot's own author_id. The Worker signs in with the password grant for a
+# authoring RPC (deletes included) and fails every write policy (so no raw
+# table write); a trigger stamps `author = 'uno-bot'` and the bot's author_id
+# on every authoring_changes row it causes; and it writes a status through
+# `upsert_cell_at_status` / `set_path_status`, which record themselves. The Worker signs in with the password grant for a
 # one-hour JWT. Never a service-role key.
 #
 # WHAT THIS WIZARD REFUSES TO DO FOR YOU. It never creates the account, never
@@ -273,7 +273,7 @@ stage "Apply the migration in plus-uno-blueprint"
 say "The SQL lives in plus-uno-blueprint, reviewed as its own pull request:"
 note "  $MIGRATION_FILE"
 say "It redefines is_service_account() for the rpc_writer tier, adds the two"
-say "self-recording status RPCs and the delete guard, and grants the claim to"
+say "self-recording status RPCs and the uno-bot author tier, and grants the claim to"
 say "$BOT_EMAIL. Apply it once that pull request is merged and pulled."
 ask BLUEPRINT_DIR "Path to your plus-uno-blueprint checkout:"
 BLUEPRINT_DIR="${BLUEPRINT_DIR/#\~/$HOME}"
@@ -327,7 +327,7 @@ note "  1. a direct table PATCH (must change nothing)"
 note "  2. upsert_cell_at_status, status proposed, content + ' [uno-bot write check]'"
 note "  3. the same RPC with the previous content and status (the revert)"
 note "  4. the cell reads back exactly as it was; authoring_changes holds both"
-note "     writes under the bot's own author_id"
+note "     writes as author uno-bot under the bot's own author_id"
 say "The cell stays 'proposed' throughout, so the live board never changes"
 say "meaning; the two audit rows are permanent, as every write's are."
 open_url "$DASHBOARD/settings/api-keys"
@@ -414,8 +414,8 @@ if (( ${#FAILED[@]} == 0 )); then
         note "  $ORIGINAL"
       fi
       LOG="$(api GET "/rest/v1/authoring_changes?agent_session_id=eq.$SESSION_ID&select=fn,author,author_id&order=at" || true)"
-      if [[ "$(jq '[.[] | select(.fn == "upsert_cell_at_status" and .author == "agent" and .author_id == "'"$BOT_USER_ID"'")] | length' <<<"$LOG")" == "2" ]]; then
-        pass "authoring_changes holds both writes under the bot's author_id (session $SESSION_ID)"
+      if [[ "$(jq '[.[] | select(.fn == "upsert_cell_at_status" and .author == "uno-bot" and .author_id == "'"$BOT_USER_ID"'")] | length' <<<"$LOG")" == "2" ]]; then
+        pass "authoring_changes holds both writes as uno-bot under its author_id (session $SESSION_ID)"
       else
         fail "authoring_changes for session $SESSION_ID reads $LOG"
       fi
@@ -432,8 +432,8 @@ fi
 pause "Continue to the summary?"
 
 finish
-note "Deletes stay human-only: the delete guard was proven against a local database,"
-note "not here, because proving it here means calling delete_cell on a real cell."
+note "The bot may delete through the delete RPCs; that path was proven against a local"
+note "database, not here, because proving it here means deleting a real row."
 note "Next: plus-uno-blueprint regenerates deployment/types/database.ts for the two"
 note "new RPCs (docs/engineering/access-and-security.md § Regenerating)."
 (( ${#FAILED[@]} )) && exit 1 || exit 0

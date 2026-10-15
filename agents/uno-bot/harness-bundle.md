@@ -29,7 +29,7 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 16,358 (−5,976 ide-only) | 81,563 | — |
 | 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 85,031 | — |
 | 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 91,547 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,740 (−1,570 ide-only) | 96,341 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,740 (−1,734 ide-only) | 96,341 | — |
 | 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 97,197 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
