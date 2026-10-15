@@ -379,7 +379,7 @@ export function renderProposalCard(card: ProposalCard): RenderedCard {
   // plan of its own (`ProposalCard.footer`).
   if (card.kind === "stated") return { text: statedText(card) };
   const body = card.kind === "revision" ? revisionText(card) : confirmText(card);
-  const plan = withOperationPlan(body, card.operations);
+  const plan = withOperationPlan(body, card.operations, card.places);
   const followUp = plan.followUp ?? [];
   // A sweep card: one card per fix (`sweep-card-blocks.ts`). The planned text
   // is its notification and fallback copy, and what it is staged with.
@@ -631,9 +631,10 @@ export interface OperationPlan {
 export function withOperationPlan(
   cardText: string,
   operations: ReadonlyArray<PlannedOperation>,
+  places?: ReadonlyArray<string | null>,
 ): OperationPlan {
   if (operations.length <= 1) return { text: cardText };
-  const groups = groupOperations(operations);
+  const groups = groupOperations(operations, places);
   const full = planBody(operations, groups, false);
   const head = planHead(operations.length, groups.length);
 
@@ -755,11 +756,14 @@ export interface OperationGroup {
  * the order their first operation does, and the numbering is the batch's own,
  * so the headings still read top to bottom as the run order.
  */
-export function groupOperations(operations: ReadonlyArray<PlannedOperation>): OperationGroup[] {
+export function groupOperations(
+  operations: ReadonlyArray<PlannedOperation>,
+  places?: ReadonlyArray<string | null>,
+): OperationGroup[] {
   const groups: OperationGroup[] = [];
   const byKey = new Map<string, OperationGroup>();
   operations.forEach((op, i) => {
-    const { key, ...target } = operationGroupKey(op);
+    const { key, ...target } = operationGroupKey(op, places?.[i] ?? undefined);
     let group = byKey.get(key);
     if (!group) {
       group = { ...target, members: [] };
@@ -786,7 +790,7 @@ const bolded = (key: string, name: string): GroupKey => ({ key, heading: `*${nam
  *  a data source, a repo, a channel, a recipient. Never invented: an input that
  *  names no target gets the tool's own generic heading, because a wrong target
  *  on a card is worse than a vague one. */
-function operationGroupKey(op: PlannedOperation): GroupKey {
+function operationGroupKey(op: PlannedOperation, place?: string): GroupKey {
   const str = (k: string): string =>
     typeof op.input[k] === "string" ? (op.input[k] as string).trim() : "";
 
@@ -803,11 +807,11 @@ function operationGroupKey(op: PlannedOperation): GroupKey {
     return id ? { key: `dm:${id}`, heading: `*<@${id}>*`, name: "a DM" } : bolded("dm:", "a DM");
   }
   if (op.toolName === "shareout_post") {
-    // A share-out kept in the asking conversation is grouped as that, never
-    // under the team channel it will not post to.
-    if (str("place") === "here") return bolded("channel:here", "this conversation");
-    const channel = str("channel") || "#plus-design-feedback";
-    return bolded(`channel:${channel.toLowerCase()}`, channel);
+    // Grouped under the place the executor resolved for it (`ProposalCard.places`,
+    // a result's `posted_to`), never a team channel it will not post to. An
+    // older record without one falls back to what its input asked for.
+    const where = place ?? (str("place") === "here" ? "this conversation" : "#plus-design-feedback");
+    return bolded(`channel:${where.toLowerCase()}`, where);
   }
   const pageUrl = str("page_url") || str("url");
   const title = str("title") || str("page_title") || str("page");

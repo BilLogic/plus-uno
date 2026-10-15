@@ -256,6 +256,12 @@ export interface ProposalCard {
    * posted — which put Slack's message-size limits inside the turn.
    */
   operations: ProposalOperation[];
+  /** Where each operation in `operations` lands, when the Worker resolves it
+   *  rather than the input naming it — a share-out's place, from the executor's
+   *  own rule (`tools/share-for-feedback.ts` `shareoutPlace`) — so the plan's
+   *  group headings say what the ✅ does. In batch order; `null` for an
+   *  operation whose input names its own target. */
+  places?: Array<string | null>;
   /** The Worker's own tag on the card's message, read back later to tell
    *  what kind of card it is — a revised end-of-day sweep card carries the
    *  sweep's (`sweep/cards.ts` `asSweepRevision`). */

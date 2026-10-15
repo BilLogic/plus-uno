@@ -892,6 +892,21 @@ describe("an unanswered question, raised after two workdays", () => {
     assert.match(posts(h)[0]!.text, / It names dana, who isn't matched to a Slack account yet\. /);
   });
 
+  it("names on the channel card a handle two commenters on the file share, even when the map knows one of them", async () => {
+    const client = seededFigma();
+    const comments = [
+      ...asking("@sarah k should the bar animate?"),
+      comment("c13", { handle: "sarah k", created_at: "2026-09-29T15:00:00Z", message: "Spacing too", client_meta: pin("8:2") }),
+    ];
+    client.seedFile(FILE, { comments });
+    const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { people: { "u-Sarah K": "U0SARAH" } } });
+    await runSweepJob(NIGHT, h.deps);
+    await morning(h, FRIDAY);
+    assert.deepEqual(h.figma.triage.dms, [], "two Figma ids answer to @sarah k, so the bot cannot tell whom to DM");
+    assert.equal(posts(h).length, 1);
+    assert.match(posts(h)[0]!.text, / It names sarah k, who isn't matched to a Slack account yet\. /);
+  });
+
   it("sends only the DM when everyone it names is mapped", async () => {
     const client = seededFigma();
     client.seedFile(FILE, { comments: asking("@sarah k should the bar animate?") });
