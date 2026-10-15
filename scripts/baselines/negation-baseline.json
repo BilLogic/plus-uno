@@ -26,7 +26,7 @@
         "docs/connectors/supabase/overview.md": 9,
         "docs/connectors/slack/shapes.md": 3,
         "docs/connectors/supabase/blueprint-schema.md": 12,
-        "docs/engineering/operations.md": 2
+        "docs/engineering/operations.md": 1
       }
     },
     "ide": {
@@ -41,10 +41,9 @@
         "skills/README.md": 2,
         "skills/uno-maintain/SKILL.md": 10,
         "skills/uno-maintain/references/ds-fix.md": 5,
-        "skills/uno-maintain/references/method.md": 13,
+        "skills/uno-maintain/references/method.md": 11,
         "skills/uno-maintain/references/skill-quality/audit-examples.md": 1,
         "skills/uno-maintain/references/staleness-sweep.md": 1,
-        "skills/uno-maintain/references/sweeps.md": 1,
         "skills/uno-prototype/SKILL.md": 10,
         "skills/uno-prototype/examples/flow-map-spec.md": 2,
         "skills/uno-prototype/examples/interactive-spec.md": 2,
@@ -75,11 +74,9 @@
     "actions": {
       "corpus": "the headless GitHub Actions prompts under scripts/prompts/ — every .md the skill-loader root holds: the adapter SKILL.mds, their references/, and the shared headless-intake contract. Listed by where they live, since they carry no embodiment: and are never bundled (#425)",
       "measuredOn": "whole files, frontmatter included — the sweep workflows hand a SKILL.md to the model as a prompt-file: with nothing stripped",
-      "docs": 3,
+      "docs": 1,
       "counts": {
-        "scripts/prompts/references/headless-intake.md": 4,
-        "scripts/prompts/uno-integrity-sweep/SKILL.md": 7,
-        "scripts/prompts/uno-shipped-watchdog/SKILL.md": 5
+        "scripts/prompts/references/headless-intake.md": 3
       }
     }
   }

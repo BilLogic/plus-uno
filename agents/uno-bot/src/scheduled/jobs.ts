@@ -192,7 +192,7 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
     const { summary } = await runProposalExpiry(proposalEventLogFor(env), Date.now(), { dryRun });
     console.log(`[usage] proposal expiry: ${summary}`);
   },
-  // Friday's end of day: compare code with the library and keep the
+  // Monday's end of day: compare code with the library and keep the
   // disagreements for the morning (src/ds-precedence/).
   "ds-precedence-check": async (env, _job, ctx) => {
     console.log(`[ds-precedence] check: ${(await runDsPrecedenceCheck(env, ctx)).summary}`);

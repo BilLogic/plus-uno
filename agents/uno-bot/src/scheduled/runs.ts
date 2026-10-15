@@ -1,14 +1,16 @@
 // Scheduled runs: which firing starts one, what it holds, and where it queues.
 //
 // Two cron triggers of the free plan's five fire at each run's two UTC
-// hours — 06:00 ET (the end-of-day run) is 10:00 or 11:00 UTC, Tuesday to
-// Saturday, and 09:00 ET (the morning run) 13:00 or 14:00 UTC, Monday to
-// Friday — so each run is there whether ET is UTC-4 or UTC-5. A firing reads
-// its own scheduled time in ET and enqueues the matching run; the firing an
-// hour off does nothing. The end-of-day run is dated to the ET day it sweeps,
-// the one before it (`sweptDayOf`). The Figma library poll that once ran on
-// every firing is the end-of-day run's `figma-library-poll` job. The
-// wrangler.toml cron comment gives the ET times.
+// hours, Monday to Friday — 06:00 ET (the end-of-day run) is 10:00 or 11:00
+// UTC, and 09:00 ET (the morning run) 13:00 or 14:00 UTC — so each run is
+// there whether ET is UTC-4 or UTC-5. A firing reads its own scheduled time in
+// ET and enqueues the matching run; the firing an hour off does nothing. The
+// end-of-day run is dated to the workday it sweeps, the one before it —
+// Monday's to Friday, whose weekend it reads too (`sweptDayOf`): each of its
+// jobs reads from where Friday's run left its cursor. A job planned on a
+// weekday is planned on the run that FIRES that ET weekday. The Figma library
+// poll that once ran on every firing is the end-of-day run's
+// `figma-library-poll` job. The wrangler.toml cron comment gives the ET times.
 //
 // The handler only ENQUEUES. A scheduled invocation gets about 10 ms of CPU,
 // and a run's work belongs on its runner, where each alarm runs one job with a
@@ -18,7 +20,7 @@
 // through its two named dependencies (tests/scheduled-firing.test.ts).
 
 import type { RunnerStorage } from "../runner/storage";
-import { END_OF_DAY_RUN_HOUR_ET, etDayOf, etParts, MORNING_RUN_HOUR_ET, sweptDayOf } from "../sweep/schedule";
+import { END_OF_DAY_RUN_HOUR_ET, etDayOf, etParts, isWorkday, MORNING_RUN_HOUR_ET, sweptDayOf } from "../sweep/schedule";
 import { CLASSIFY_BATCHES } from "../usage/classify-run";
 import { ASK_RESOLUTION_JOBS } from "../usage/resolution-pass";
 
@@ -69,7 +71,7 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * decisions under Specs and For Review, and the morning `sweep-figma-post`
  * hands a card per decision to the sweep's message in #plus-design
  * (src/figma-comments/).
- * The weekly DS precedence check's two: Friday's end-of-day check, and the
+ * The weekly DS precedence check's two: Monday's end-of-day check, and the
  * morning hand-over that puts its report on the sweep's message in
  * #plus-universal (src/ds-precedence/).
  * The morning `commitment-nudge` reminds each promiser whose commitment is due,
@@ -150,7 +152,8 @@ export interface ScheduledJob {
   readonly channel?: string;
   /** The person a DM watch job reads and reminds for. */
   readonly user?: string;
-  /** The UTC weekday (0 Sunday … 6 Saturday) the job is planned on; absent,
+  /** The ET weekday (0 Sunday … 6 Saturday) of the firing the job is planned
+   *  on — Monday's end-of-day run is dated Friday but is Monday's; absent,
    *  every day its run fires. */
   readonly weekday?: number;
   /** The one place a `sweep-post` job spawned for a place posts to: a
@@ -216,21 +219,20 @@ export const TIDY_JOBS = 5;
  *  after them all (src/sweep/sections.ts). */
 const MORNING_SECTIONS = ["commitment-nudge", "ds-precedence-post", FIGMA_DECISIONS_POST_KEY, "figma-drift-post", "figma-tidy-post", "figma-dev-links-post"] as const;
 
-/** Monday and Friday, as `Date.getUTCDay` numbers them. */
+/** Monday, as `Date.getUTCDay` numbers an ET day. */
 const MONDAY = 1;
-const FRIDAY = 5;
 
 /**
  * Every run's jobs. What the end of the day finds is posted the next
  * morning, like every proactive job.
  *
- * The DS precedence check is weekly, on FRIDAY's end-of-day run — the one
- * that fires at Saturday 06:00 ET and is dated Friday: the week's merges and
+ * The DS precedence check is weekly, on MONDAY's end-of-day run — the one
+ * that fires at Monday 06:00 ET and is dated Friday: the week's merges and
  * any library publish have landed, so it reads where the week ended, and its
- * report opens Monday's morning run — the start of the week the team has to
- * act on it, with the cards live until the next check. Its hand-over is on
- * every morning, not only Monday's: a report waits in KV until a morning's
- * message carries it.
+ * report opens Monday's morning run three hours later — the start of the week
+ * the team has to act on it, with the cards live until the next check. Its
+ * hand-over is on every morning, not only Monday's: a report waits in KV until
+ * a morning's message carries it.
  */
 const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
   morning: [
@@ -263,7 +265,7 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
   "end-of-day": [
     { key: "figma-library-poll", kind: "figma-library-poll" },
     // Second, so a rehearsal reaches it before the batches spend the ceiling.
-    { key: "ds-precedence-check", kind: "ds-precedence-check", weekday: FRIDAY },
+    { key: "ds-precedence-check", kind: "ds-precedence-check", weekday: MONDAY },
     // Early too, for the same reason: one Roadmap read, a few lookups a card.
     { key: "card-follow-through", kind: "card-follow-through" },
     // A live drift question is looked at again in both runs, so a file that
@@ -312,9 +314,8 @@ export const RUN_NAMES = Object.keys(RUN_HOURS) as ScheduledRunName[];
  * is that hour's :00 slot, and none otherwise. Each run is once a day all
  * year: 13:00 UTC is the morning run under EDT and nothing under EST (08:00
  * ET), and 11:00 UTC the end-of-day run under EST and nothing under EDT
- * (07:00 ET). Only on a run day, whatever the cron says: a morning Monday to
- * Friday, and an end-of-day run that sweeps Monday to Friday — Tuesday to
- * Saturday 06:00.
+ * (07:00 ET). Only on a run day, whatever the cron says: both runs fire Monday
+ * to Friday, in ET.
  *
  * Compared by hour and minute, not to the millisecond, so a `scheduledTime` a
  * few seconds past the slot still lands in it. ET is a whole-hour offset, so
@@ -325,7 +326,7 @@ export const RUN_NAMES = Object.keys(RUN_HOURS) as ScheduledRunName[];
 export function runsForFiring(scheduledTime: number): ScheduledRunName[] {
   if (new Date(scheduledTime).getUTCMinutes() !== 0) return [];
   const hour = etParts(scheduledTime).h;
-  return RUN_NAMES.filter((name) => RUN_HOURS[name] === hour && isWorkday(runDayOf(name, scheduledTime)));
+  return isWorkday(etDayOf(scheduledTime)) ? RUN_NAMES.filter((name) => RUN_HOURS[name] === hour) : [];
 }
 
 /** The ET day a run at `at` is for: the morning's own, or the day the
@@ -334,19 +335,15 @@ function runDayOf(name: ScheduledRunName, at: number): number {
   return name === "end-of-day" ? sweptDayOf(at) : etDayOf(at);
 }
 
-function isWorkday(day: number): boolean {
-  const wd = new Date(day).getUTCDay();
-  return wd >= 1 && wd <= 5;
-}
-
 /** Weekday names as a caller spells them, in `Date.getUTCDay` order. */
 export const WEEKDAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
 
 /**
- * A run, planned for its ET day — the morning's own, and for the end-of-day
- * run the day it sweeps (`sweptDayOf`: at Saturday 06:00 ET, Friday): its
- * jobs for that day's weekday — or for `weekday` when given, which is how the
- * sweep probe rehearses Friday's jobs on a Tuesday; the date stays the run's.
+ * A run, dated to its ET day — the morning's own, and for the end-of-day run
+ * the workday it sweeps (`sweptDayOf`: at Monday 06:00 ET, Friday) — with
+ * the jobs of the ET weekday it fires on, or of `weekday` when given, which
+ * is how the sweep probe rehearses Monday's jobs on a Tuesday; the date stays
+ * the run's.
  * The weekday filter covers every
  * job, the spread-in batches and the sweep jobs included. The end-of-day run
  * adds one `sweep-channel` job per swept channel after its fixed jobs, keyed
@@ -398,7 +395,7 @@ export function planRun(
   const purge = plan.findIndex((j) => j.kind === "usage-text-purge");
   const all = purge < 0 ? [...plan, ...sweeps, ...dms] : [...plan.slice(0, purge), ...sweeps, ...dms, ...plan.slice(purge)];
   const d = new Date(runDayOf(name, at));
-  const day = weekday ?? d.getUTCDay();
+  const day = weekday ?? new Date(etDayOf(at)).getUTCDay();
   const jobs = all.filter((job) => job.weekday === undefined || job.weekday === day);
   return { name, date: d.toISOString().slice(0, 10), jobs };
 }

@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **96,805 chars from 9 files**, against an assembled budget of 175,500 (78,695 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 76,421 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **96,774 chars from 9 files**, against an assembled budget of 175,500 (78,726 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 76,390 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,145 (−7,897 ide-only) | 10,145 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 13,446 | 23,620 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 20,901 | 44,562 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 46,208 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,015 | 47,283 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 52,976 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 64,762 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 16,358 (−5,976 ide-only) | 81,171 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 84,639 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 91,155 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,740 (−1,570 ide-only) | 95,949 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 96,805 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,114 (−7,717 ide-only) | 10,114 | 20,000 (constitution) |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 13,446 | 23,589 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 20,901 | 44,531 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 46,177 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,015 | 47,252 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 52,945 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 64,731 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 16,358 (−5,976 ide-only) | 81,140 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 84,608 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 91,124 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,740 (−1,570 ide-only) | 95,918 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 96,774 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **17 reference(s), 131,098 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **17 reference(s), 130,460 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -52,9 +52,9 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,697 |
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,555 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,115 |
-| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,591 |
+| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 6,895 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,550 |
-| `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 1,767 |
+| `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 1,800 |
 | `figma-comments` | [`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) | 8,890 |
 | `file-a-ticket` | [`agents/uno-bot/skills/file-a-ticket/SKILL.md`](../../agents/uno-bot/skills/file-a-ticket/SKILL.md) | 3,182 |
 | `find-the-right-person` | [`agents/uno-bot/skills/find-the-right-person/SKILL.md`](../../agents/uno-bot/skills/find-the-right-person/SKILL.md) | 2,558 |
@@ -62,7 +62,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `prepare-the-call` | [`agents/uno-bot/skills/prepare-the-call/SKILL.md`](../../agents/uno-bot/skills/prepare-the-call/SKILL.md) | 2,202 |
 | `relay-a-message` | [`agents/uno-bot/skills/relay-a-message/SKILL.md`](../../agents/uno-bot/skills/relay-a-message/SKILL.md) | 1,462 |
 | `share-out` | [`agents/uno-bot/skills/share-out/SKILL.md`](../../agents/uno-bot/skills/share-out/SKILL.md) | 2,627 |
-| `sweep` | [`agents/uno-bot/scheduled-actions/sweep/ACTION.md`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) | 23,310 |
+| `sweep` | [`agents/uno-bot/scheduled-actions/sweep/ACTION.md`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) | 23,335 |
 
 ## The assembled prompt
 
@@ -78,7 +78,7 @@ everything the bot can be told.
 
 <!-- Tier: 1 — the only always-loaded doc. Everything else loads on demand or is retrieved live; the contract is § The loading contract below. -->
 
-The one identity, roster, and routing document for every agent working in this repo — the in-IDE agent, the uno-bot Slack Worker (which bakes this file into its bundle at build time), and headless GitHub Actions runs.
+The one identity, roster, and routing document for every agent working in this repo — the in-IDE agent and the uno-bot Slack Worker (which bakes this file into its bundle at build time).
 
 **The interaction contract (IDE): humans speak in skills · skills summon agents · agents obey conventions.**
 Users remember six skills; agents point at the conventions they enforce and never restate them. In Slack, bot skills call the Worker's tools instead.
@@ -1898,12 +1898,12 @@ THE standing-automation registry. An automation absent from the table below is u
 - **A row is name · trigger · owner · link.** The link is the automation's home: its scheduled-action doc (read through `read_reference` by that name), its workflow, or its code. The home holds everything else — what it does, its agent, where it runs and who pays.
 - **Every automation that judges names its agent in its home.** One that asks a model to judge with no agent named is unowned by definition. A deterministic automation — scripts, REST, diffs, an embedding call — names none, and its Owner answers for it.
 - **An automation invokes a skill's method; it never embeds its own copy of the logic.** Migrate opportunistically as each is next touched.
-- **Every automation is a loop, and declares its loop mechanics.** Stop condition and issue caps go in its prompt adapter (`scripts/prompts/<name>/SKILL.md`); trigger cadence and the hard turn cap go in its workflow file. The procedure itself stays in the skill's method. Portable by construction: any model can execute the written loop, and harness loop primitives are optional accelerators. Pre-rule adapters (uno-implement, uno-implement-design) migrate as each is next touched. *(rule added 2026-07-16)*
-- **Every automation names where it runs and who pays.** A Worker job runs on the CF Worker, and its model calls are Gemini on Vertex, billed to GCP `hcii-plus`. Scheduled sweeps run as GitHub Actions cron → the claude-vertex composite action (`.github/actions/claude-vertex`) → Claude-on-Vertex, billed to the `hcii-plus` GCP project via the uno-bot service account (ADR-018 — the `GEMINI_SA_*` secret names are that same account, so rotating "the Gemini secrets" rotates every Claude cron too). Never a personal Anthropic seat. Model routed by difficulty per the bot's tier table: sonnet default · opus for reconciliation-grade judgment · haiku candidate for trivia. *(rule added 2026-07-16)*
+- **Every automation is a loop, and declares its loop mechanics.** Stop condition, caps and trigger cadence go in its home (its job code or its workflow file); the procedure itself stays in the skill's method. Portable by construction: any model can execute the written loop. *(rule added 2026-07-16)*
+- **Every automation names where it runs and who pays.** A Worker job runs on the CF Worker, and its model calls are Gemini on Vertex, billed to GCP `hcii-plus` through the uno-bot service account (ADR-018). A GitHub Actions workflow runs scripts and calls no model. Every model in scheduled automation is Gemini, routed by the Worker's tier table (ADR-028). *(rule added 2026-07-16)*
 
-**The Worker's scheduled runs.** Two wrangler crons (`agents/uno-bot/wrangler.toml` `[triggers]`) start two runs each weekday: the **end-of-day run** at 06:00 ET, Tuesday to Saturday, dated to the workday before it, and the **morning run** at 09:00 ET, Monday to Friday. The handler only enqueues; the AgentRunner runs one job per alarm. `agents/uno-bot/src/scheduled/runs.ts` plans which job kinds each run holds, and `src/scheduled/jobs.ts` pairs each kind with its body. Every kind but `noop` (which proves the path and is planned in no run) is named in a row below. A family whose posts people reply to has its own doc in `agents/uno-bot/scheduled-actions/`; the rest have a row alone. Rehearse a run with `GET /debug/sweep?dry_run=1`; it writes nothing.
+**The Worker's scheduled runs.** Two wrangler crons (`agents/uno-bot/wrangler.toml` `[triggers]`) start two runs each weekday: the **end-of-day run** at 06:00 ET and the **morning run** at 09:00 ET, both Monday to Friday. The end-of-day run is dated to the workday before it; Monday's is dated Friday and reads from where Friday's run left off, so it covers Friday and the weekend. The handler only enqueues; the AgentRunner runs one job per alarm. `agents/uno-bot/src/scheduled/runs.ts` plans which job kinds each run holds, and `src/scheduled/jobs.ts` pairs each kind with its body. Every kind but `noop` (which proves the path and is planned in no run) is named in a row below. A family whose posts people reply to has its own doc in `agents/uno-bot/scheduled-actions/`; the rest have a row alone. Rehearse a run with `GET /debug/sweep?dry_run=1`; it writes nothing.
 
-**Sweep intake transport** (labels, dedupe, caps, injection rule): `scripts/prompts/references/headless-intake.md` — one copy; every adapter points at it.
+**GitHub intake transport** (labels, dedupe, caps, injection rule) for an automation that files issues: `scripts/prompts/references/headless-intake.md`.
 
 
 | Automation | Trigger | Owner | Link |
@@ -1917,13 +1917,11 @@ THE standing-automation registry. An automation absent from the table below is u
 | End-of-day sweep | end-of-day run: `sweep-channel` (one per `SWEEP_CHANNELS` entry), `sweep-group-dms`, `sweep-dms`, `sweep-notes`, `sweep-cards`; morning run: `sweep-post`, after every job that hands it a section, spawns one `sweep-post:<place>` job a place — one message a place; `figma-drift-post`; both runs: `figma-drift-recheck` | Bill | [`sweep`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) |
 | Figma comments | end-of-day run: `sweep-figma-comments`; morning run: `sweep-figma-post`; an @uno ask, at `POST /figma/events` | Bill | [`figma-comments`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) |
 | Follow-through | end-of-day run: `card-follow-through`; morning run: `commitment-nudge` | Bill | [`follow-through`](../../agents/uno-bot/scheduled-actions/follow-through/ACTION.md) |
-| DS precedence check | Friday's end-of-day run: `ds-precedence-check`; morning run: `ds-precedence-post` | Bill | [`ds-precedence`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) |
+| DS precedence check | Monday's end-of-day run: `ds-precedence-check`; morning run: `ds-precedence-post` | Bill | [`ds-precedence`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) |
 | DM watch | per person who switched it on — end-of-day run: `dm-promise-read`; morning run: `dm-promise-nudge` | Bill | [`dm-watch`](../../agents/uno-bot/scheduled-actions/dm-watch/ACTION.md) |
 | DM Capture | per person who switched it on — end-of-day run: `dm-capture-read`; morning run: `dm-capture-post` | Bill | [`sweep`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) § Capture |
 | Usage record upkeep | end-of-day run: `usage-classify`, `ask-resolution`, `proposal-expiry`; morning run: `team-roles-sync`; both runs: `usage-text-purge` | Bill | [`agents/uno-bot/README.md`](../../agents/uno-bot/README.md) (usage record) |
 | Figma tidy-up | Monday's morning run: `figma-tidy-read` jobs, then `figma-tidy-post` | Bill | [`src/figma-tidy/`](../../agents/uno-bot/src/figma-tidy/) |
-| Shipped watchdog | weekly cron (Wed 09:00 UTC) | Bill | [`shipped-watchdog.yml`](../../.github/workflows/shipped-watchdog.yml) |
-| Conventions integrity sweep | monthly cron (1st, 09:00 UTC) | Bill | [`harness-integrity-sweep.yml`](../../.github/workflows/harness-integrity-sweep.yml) |
 | Blueprint embeddings refresh | nightly cron (07:00 UTC) | Bill | [`uno-bot-embed-blueprint.yml`](../../.github/workflows/uno-bot-embed-blueprint.yml) |
 | Harness gate | every `pull_request` + on demand | Bill | [`check-harness.yml`](../../.github/workflows/check-harness.yml) → [`scripts/check-harness.mjs`](../../scripts/check-harness.mjs) |
 | uno-bot Worker checks | every `pull_request` + on demand | Bill | [`uno-bot-checks.yml`](../../.github/workflows/uno-bot-checks.yml) |
@@ -1979,7 +1977,7 @@ Every line traces to the PRD, the conversation or a design-system read.
 
 <!-- canonical per ADR-017 (docs/adr/) · a scheduled action, read through read_reference as `ds-precedence` · moved 2026-10-14 out of docs/connectors/figma/uno-bot-access.md · the code is agents/uno-bot/src/ds-precedence/; its copy follows docs/connectors/slack/shapes.md § Figma messages. -->
 
-Friday's end-of-day `ds-precedence-check` (the run at Saturday 06:00 ET) compares the component index and registry props with the library; DS precedence says the library side takes each fix. Its report goes up as a section of the next weekday morning's sweep message in #plus-universal (`agents/uno-bot/scheduled-actions/sweep/ACTION.md` § One message a place), on the shared decision card: a line saying how many components disagree, then one card per component (Review · Code · Figma). It stays on one message: past ten, the line says how many show, and the rest come back with the next week's check. Approve adds that component to the week's one `harness-intake`: the week's first Approve files it, each later one comments on it, one at a time through ThreadState, which remembers the week's intake (closed or not). Needs changes puts the person's note on that intake as a dispute. Reject leaves the difference as deliberate. A clean week posts nothing. Every one of these messages follows the copy in `docs/connectors/slack/shapes.md` § Figma messages.
+Monday's end-of-day `ds-precedence-check` (the run at Monday 06:00 ET, dated the Friday before) compares the component index and registry props with the library; DS precedence says the library side takes each fix. Its report goes up as a section of Monday morning's sweep message, three hours later, in #plus-universal (`agents/uno-bot/scheduled-actions/sweep/ACTION.md` § One message a place), on the shared decision card: a line saying how many components disagree, then one card per component (Review · Code · Figma). It stays on one message: past ten, the line says how many show, and the rest come back with the next week's check. Approve adds that component to the week's one `harness-intake`: the week's first Approve files it, each later one comments on it, one at a time through ThreadState, which remembers the week's intake (closed or not). Needs changes puts the person's note on that intake as a dispute. Reject leaves the difference as deliberate. A clean week posts nothing. Every one of these messages follows the copy in `docs/connectors/slack/shapes.md` § Figma messages.
 
 Each card is decided in its own Review, with nothing to type: a typed ✅ or ⛔ in the thread of the message carrying it gets the one review-only line and runs nothing. "Written:" names the intake number the Approve's write returned; a card Needs changes noted reads "Noted by" who sent it, a rejected one "Rejected by" who decided, and one whose six days pass undecided "Closed, no decision".
 
@@ -2266,7 +2264,7 @@ The **sweep** is uno-bot's end-of-day read of the design channels for **drift**:
 - **Group DMs:** every group DM uno-bot is in, read by one more end-of-day job.
 - **DMs with uno-bot:** each 1:1 DM uno-bot answered in lately, read by one more end-of-day job with no opt-in, since uno-bot is a party to it (§ DMs with uno-bot).
 - **DMs between people:** unread, except a person's own DMs once they tick "Catch decisions from my DMs" on the Home tab. Those are read with their own token (§ Capture).
-- **When:** the end-of-day run at 06:00 ET, the morning after each workday, reads each channel since its cursor, which lives in the usage database, three hours before the 09:00 ET morning post. It is dated to the day it sweeps, so Friday is swept at Saturday 06:00 and its cards post Monday. In production (2026-09-30 to 10-14) its sweep jobs finished within about 10 minutes of the run starting, so what it finds reaches the 09:00 post.
+- **When:** the end-of-day run at 06:00 ET, Monday to Friday, reads each channel since its cursor, which lives in the usage database, three hours before the 09:00 ET morning post. It is dated to the workday it sweeps; Monday's run is dated Friday and reads Friday and the weekend, and its cards post Monday at 09:00. In production (2026-09-30 to 10-14) its sweep jobs finished within about 10 minutes of the run starting, so what it finds reaches the 09:00 post.
 - **Links:** a thread's Notion, GitHub, Figma and canvas links, read the way `source_read` reads them. Only Notion is written in place. A thread with no Notion, Figma or `design-system/` code link, no named page and no answered question is passed over.
 - **Named, not linked:** a message that names a page in two or more words ("the booking flow PRD", "the tutor help center") has it searched for in Notion, then in GitHub. Only the top hit is kept, only when it shares two words with the name, and only from a team surface: a Roadmap card, a Help Center article, a Decisions or Marketplace row, or a top-level workspace page titled as a PRD or spec. A page nested under another page, and any page titled as a 1:1, is no hit. The card marks that page *found by search*, so a confirmer can Reject a wrong target. A search that fails finds nothing and holds nothing up.
 - **Figma comments:** one more end-of-day job reads the comment threads under a file's 📐 Specs or 🔍 For Review pages, in the six Figma teams (MISC aside), created or resolved since it switched on. A thread that reads like a decision becomes its own card on the morning message of the place the posting ladder names for the file (`figma-comments`).

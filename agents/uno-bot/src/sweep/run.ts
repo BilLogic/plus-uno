@@ -595,8 +595,8 @@ async function sweepGroupDms(job: ScheduledJob, deps: SweepDeps): Promise<SweepJ
 }
 
 /** How far back `sweep-dms` looks for DMs uno-bot answered in: a weekend and
- *  a missed run. Two end-of-day runs are at most 96 h apart (Sat 06:00 to
- *  Wed 06:00 with Tuesday's missed), and 97 h on the weekend the clocks go
+ *  a missed run. Two end-of-day runs are at most 96 h apart (Fri 06:00 to
+ *  Tue 06:00 with Monday's missed), and 97 h on the weekend the clocks go
  *  back, so four days and two hours covers both with an hour to spare. Each
  *  DM's own cursor says what in it is new. */
 export const DM_LOOKBACK_MS = (4 * 24 + 2) * 60 * 60 * 1000;
