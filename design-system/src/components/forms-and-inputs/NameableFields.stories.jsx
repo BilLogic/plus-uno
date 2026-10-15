@@ -1,9 +1,9 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
+import ChoiceGroup from './ChoiceGroup';
 import DatePicker from './DatePicker/DatePicker';
 import InputGroup from './InputGroup/InputGroup';
-import MultipleChoice from './MultipleChoice';
 import RichTextEditor from './RichTextEditor/RichTextEditor';
 import Select from './Select';
 
@@ -26,7 +26,8 @@ import Select from './Select';
  *
  * `MultipleChoice` rendered the options and nothing around them. The question
  * lived on the page and was attached to nothing, so the answers were four
- * controls with no subject.
+ * controls with no subject. `ChoiceGroup` replaced it and is always a
+ * `fieldset`, named by its `legend`.
  *
  * axe catches the first of those three and not the other two: an `input` with no
  * accessible name is a rule, a `contentEditable` div with no role is not, and
@@ -54,7 +55,7 @@ export const EveryFieldCanBeNamed = () => (
     <div style={stack}>
         <InputGroup id="nf-amount" label="Amount" leadingVisual="£" />
         <RichTextEditor id="nf-notes" label="Session notes" />
-        <MultipleChoice
+        <ChoiceGroup
             name="level"
             legend="What level are you teaching?"
             options={['Beginner', 'Advanced']}
@@ -80,22 +81,22 @@ EveryFieldCanBeNamed.play = async ({ canvasElement }) => {
     await expect(editor.isContentEditable).toBe(true);
 
     // 3. The options are inside a named group, which is what ties them to the
-    //    question. `fieldset`/`legend` reports as a group to the role query.
-    const group = canvas.getByRole('group', { name: 'What level are you teaching?' });
+    //    question. A radio `fieldset` reports as a radiogroup to the role query.
+    const group = canvas.getByRole('radiogroup', { name: 'What level are you teaching?' });
     await expect(within(group).getAllByRole('radio')).toHaveLength(2);
 };
 
 /**
  * Naming a field must not change what it looks like.
  *
- * `showLabel={false}` on `InputGroup`, and `MultipleChoice` without a legend,
- * are the two ways a caller keeps the old appearance — so both have to keep
- * working, and the first has to keep the name it is hiding.
+ * `showLabel={false}` on `InputGroup`, and `ChoiceGroup` with `aria-label`
+ * instead of a legend, are the two ways a caller keeps a question off screen —
+ * so both have to keep the name they are hiding.
  */
 export const HidingTheLabelKeepsTheName = () => (
     <div style={stack}>
         <InputGroup id="nf-hidden" label="Search" showLabel={false} trailingVisual="icon" />
-        <MultipleChoice name="unlabelled" options={['One', 'Two']} />
+        <ChoiceGroup name="unlabelled" aria-label="Pick one" options={['One', 'Two']} />
     </div>
 );
 
@@ -109,10 +110,10 @@ HidingTheLabelKeepsTheName.play = async ({ canvasElement }) => {
     const label = canvasElement.querySelector('label');
     await expect(label.getBoundingClientRect().width).toBeLessThanOrEqual(1);
 
-    // With no legend there is no group — an unnamed `fieldset` would be a group
-    // that says nothing, which is worse than the div it replaced.
-    await expect(canvas.queryAllByRole('group')).toHaveLength(0);
-    await expect(canvas.getAllByRole('radio')).toHaveLength(2);
+    // No legend on screen, and the group still says what it asks.
+    const group = canvas.getByRole('radiogroup', { name: 'Pick one' });
+    await expect(group.querySelector('legend')).toBeNull();
+    await expect(within(group).getAllByRole('radio')).toHaveLength(2);
 };
 
 /**

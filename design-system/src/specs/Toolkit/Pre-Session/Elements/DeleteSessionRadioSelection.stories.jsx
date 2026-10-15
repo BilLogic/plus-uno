@@ -1,10 +1,11 @@
 import React from 'react';
-import Radio from '@/components/forms-and-inputs/Radio';
+import ChoiceGroup from '@/components/forms-and-inputs/ChoiceGroup';
 import DatePicker from '@/components/forms-and-inputs/DatePicker';
 
 export default {
     tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Elements/Delete Session Radio Selection',
+    excludeStories: ['dateRangeOption'],
     parameters: {
         layout: 'padded',
     },
@@ -22,80 +23,69 @@ const RadioLabel = () => (
     </span>
 );
 
-// ─── Reusable Component ──────────────────────────────────────
+// ─── Reusable option ─────────────────────────────────────────
 
 /**
- * DeleteSessionRadioItem
- * A radio option that, when selected, reveals a date range picker.
- *
- * Props:
- * - selected: Whether the radio is checked
- * - startDate: Value for the start DatePicker (YYYY-MM-DD or '')
- * - endDate: Value for the end DatePicker (YYYY-MM-DD or '')
- * - startPlaceholder: Placeholder for start date
- * - endPlaceholder: Placeholder for end date
+ * The "during a specific date period" answer, as a ChoiceGroup option: while it
+ * is chosen, the date range opens under it. The Delete Session modals put it in
+ * their own ChoiceGroup beside the other answers.
  *
  * Tokens:
- * - Gap between radio and content: --size-element-gap-sm
  * - Gap between date pickers and "to": --size-element-gap-sm
  * - Typography: body2-txt
  * - Color: --color-on-surface
  */
-export const DeleteSessionRadioItem = ({
-    selected = false,
+export const dateRangeOption = ({
     startDate = '',
     endDate = '',
     startPlaceholder = 'Select Date',
     endPlaceholder = 'Select Date',
-}) => (
-    <div
-        style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--size-section-gap-md)',
-            alignItems: 'flex-start',
-        }}
-    >
-        <Radio
-            name="delete-session-radio"
-            label={<RadioLabel />}
-            checked={selected}
-            onChange={() => {}}
-        />
-
-        {selected && (
-            <div
+} = {}) => ({
+    id: 'delete-date-period',
+    value: 'date-period',
+    label: <RadioLabel />,
+    reveal: (
+        <div
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--size-element-gap-sm)',
+            }}
+        >
+            <DatePicker
+                size="small"
+                placeholder={startPlaceholder}
+                value={startDate}
+                onChange={() => {}}
+            />
+            <span
+                className="body2-txt"
                 style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 'var(--size-element-gap-sm)',
-                    paddingLeft: 'calc(18px + var(--size-element-gap-sm))',
+                    color: 'var(--color-on-surface)',
+                    fontWeight: 300,
                 }}
             >
-                <DatePicker
-                    size="small"
-                    placeholder={startPlaceholder}
-                    value={startDate}
-                    onChange={() => {}}
-                />
-                <span
-                    className="body2-txt"
-                    style={{
-                        color: 'var(--color-on-surface)',
-                        fontWeight: 300,
-                    }}
-                >
-                    to
-                </span>
-                <DatePicker
-                    size="small"
-                    placeholder={endPlaceholder}
-                    value={endDate}
-                    onChange={() => {}}
-                />
-            </div>
-        )}
-    </div>
+                to
+            </span>
+            <DatePicker
+                size="small"
+                placeholder={endPlaceholder}
+                value={endDate}
+                onChange={() => {}}
+            />
+        </div>
+    ),
+});
+
+/** The option on its own, chosen or not, for the state gallery below. */
+const DeleteSessionRadioItem = ({ selected = false, ...dates }) => (
+    <ChoiceGroup
+        name="delete-session-radio"
+        aria-label="Sessions to cancel"
+        options={[dateRangeOption(dates)]}
+        value={selected ? 'date-period' : null}
+        onChange={() => {}}
+    />
 );
 
 // ─── Stories ─────────────────────────────────────────────────

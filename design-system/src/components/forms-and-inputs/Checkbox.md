@@ -9,7 +9,7 @@ Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
 
 **Source:** `design-system/src/components/forms-and-inputs/Checkbox.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Checkbox.stories.jsx` — Overview, Content, Sizes, InteractionStates, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Checkbox.stories.jsx` — Overview, Content, Sizes, InteractionStates, Interactive, ReadOnly, DescriptionAndCard
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Checkbox.mdx`
 
@@ -26,16 +26,22 @@ Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
 | `indeterminate` | bool | `false` | Indeterminate visual state |
 | `size` | enum | `'medium'` | Size variant |
 | `disabled` | bool | `false` | Disable the checkbox |
+| `readOnly` | bool | `false` | — |
 | `required` | bool | `false` | Show required indicator |
+| `description` | node | — | — |
+| `appearance` | enum | `'plain'` | — |
 | `onChange` | func | — | — |
 | `onFocus` | func | — | — |
 | `onBlur` | func | — | — |
+| `onClick` | func | — | — |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
 ## Variants
 
 **`size`** — `small` · `medium` · `large`
+
+**`appearance`** — `plain` · `card`
 
 Anything not listed is not a valid value.
 
@@ -47,6 +53,6 @@ From `design-system/src/components/forms-and-inputs/Checkbox.scss`. Override the
 
 ## Related
 
-Same group: `Cascader` · `ChoiceGrid` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `MultipleChoice` · `NumberInput` · `OptionList` · `Radio` · `RadioButtonGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Cascader` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `OptionList` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

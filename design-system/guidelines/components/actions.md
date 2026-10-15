@@ -34,7 +34,7 @@ an action:
 
 | You want | Reach for | Not |
 |---|---|---|
-| A value the user picks | `Select`, `RadioButtonGroup` | Buttons with `active` |
+| A value the user picks | `Select`, `ChoiceGroup` | Buttons with `active` |
 | A menu of things to do | `Dropdown` | A Button that opens a div |
 | Switching between views | `NavTabs`, `NavPills` | A ButtonGroup of two |
 | A setting that applies now | `Switch` | A toggle Button |

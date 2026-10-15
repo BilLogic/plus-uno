@@ -74,6 +74,14 @@ Use radio when a user needs to select one option from a list.
     <DsCanvasQuiet of={RadioStories.InteractionStates} />
 </DocsCanvasShell>
 
+<DocsCanvasShell description={<>Read-only: focusable, full contrast, and the choice does not change.</>}>
+    <DsCanvasQuiet of={RadioStories.ReadOnly} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A description under the label, and the card appearance.</>}>
+    <DsCanvasQuiet of={RadioStories.DescriptionAndCard} />
+</DocsCanvasShell>
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -120,9 +128,16 @@ Use radio when a user needs to select one option from a list.
 
 ## Usage notes
 
+- **`readOnly` keeps the choice readable and fixed.** The radio stays in the tab
+  order at full contrast and ignores clicks and arrow keys. ARIA lets a radio
+  group say `aria-readonly` and not a single radio, so put read-only radios in a
+  `ChoiceGroup`, which announces it.
+- **`description` describes; the label names.** It renders under the label and
+  is wired with `aria-describedby`. `appearance="card"` draws the option as one
+  bordered tile.
 - **`Radio` is one option, not the group.** The group is whatever shares a
   `name`. Nothing here renders the set, names it or manages which member is
-  chosen — `MultipleChoice`, `RadioButtonGroup` and `ChoiceGrid` do that.
+  chosen — `ChoiceGroup` and `ChoiceGrid` do that.
 - **`checked` makes it controlled and `defaultChecked` is then ignored.** Pass
   `checked` with an `onChange` that sets it, or pass `defaultChecked` and let
   the browser hold the state. Passing both is the mistake that renders a radio
@@ -158,7 +173,7 @@ Use radio when a user needs to select one option from a list.
   onto the input.
 - **Nothing here names the set.** `name` groups the radios for the form, not for
   a screen reader. Wrap related radios in a `fieldset` with a `legend`, or hand
-  the whole set to `MultipleChoice` or `Scale` — see
+  the whole set to `ChoiceGroup` — see
   `design-system/guidelines/foundations/accessibility.md`.
 
 </div>
@@ -167,8 +182,8 @@ Use radio when a user needs to select one option from a list.
 
 ## Related
 
-- For a group of radios, use `MultipleChoice` with `type="radio"`. A group is the group component's job: it owns the value and the group label, where Radios mapped by hand in each screen own neither.
-- For a point on a labelled scale, use `Scale`.
+- For a group of radios, use `ChoiceGroup`. A group is the group component's job: it owns the value and the group label, where Radios mapped by hand in each screen own neither.
+- For a point on a labelled scale, use `ChoiceGroup` with `orientation="inline"`, `leadingText` and `trailingText`.
 - For any number of answers rather than exactly one, use `Checkbox`.
 - For choices in a popup rather than on the page, use `Select`.
 - For a rows-by-columns matrix of choices, use `ChoiceGrid`.

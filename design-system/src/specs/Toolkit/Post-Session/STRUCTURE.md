@@ -99,7 +99,7 @@ Use **page docs** for single-step visual QA against Figma masters. Use **Reflect
 - Session Info lives under `Pages/SessionInfo/` (title matches folder).
 - Free Response Question = `Sections/FreeResponseQuestion/` (legacy `FormReflection` archived).
 - `Tables/index.js` → `Reflections.stories.jsx`; Cards barrel is empty (Figma Cards strip empty).
-- Linear Scale uses Foundations `Scale.Button` radios inside a Post-Session shell (Figma `10819:11602`).
+- Linear Scale is a Foundations `ChoiceGroup` (inline radios, scale ends as leading and trailing text) inside a Post-Session shell (Figma `10819:11602`).
 
 ## Obsolete (removed from Storybook catalog)
 

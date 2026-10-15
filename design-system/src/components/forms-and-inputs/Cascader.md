@@ -32,7 +32,7 @@ From `design-system/src/components/forms-and-inputs/Cascader.scss`. Override the
 
 ## Related
 
-Same group: `Checkbox` · `ChoiceGrid` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `MultipleChoice` · `NumberInput` · `OptionList` · `Radio` · `RadioButtonGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `OptionList` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

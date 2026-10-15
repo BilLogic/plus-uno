@@ -6,22 +6,25 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "type": {
+      "type": "enum",
+      "values": [
+        "radio",
+        "checkbox"
+      ]
+    }
+  },
   "sets": [
     {
-      "id": "multiple-choice-grid",
-      "name": "Multiple Choice Grid",
+      "id": "choice-grid",
+      "name": "Choice Grid",
       "componentSetNodeId": "13541:9229",
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-9229",
       "source": "node-chart",
-      "status": "verified"
-    },
-    {
-      "id": "checkbox-grid",
-      "name": "CheckBox Grid",
-      "componentSetNodeId": "13541:9240",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-9240",
-      "source": "node-chart",
-      "status": "verified"
+      "status": "verified",
+      "verifiedAt": "2026-10-15",
+      "notes": "Rebuilt on Form Checkbox and Form Radio Button with a `type` axis and a `_Choice Grid Row` part. The separate CheckBox Grid set (13541:9240) was deleted."
     }
   ]
 };
@@ -81,6 +84,10 @@ export const figmaMeta = {
     <DsCanvasQuiet of={ChoiceGridStories.InteractionStates} />
 </DocsCanvasShell>
 
+<DocsCanvasShell description={<>Read-only grid: the answers show and stay in the tab order, and clicking a cell changes nothing.</>}>
+    <DsCanvasQuiet of={ChoiceGridStories.ReadOnly} />
+</DocsCanvasShell>
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -137,11 +144,10 @@ state of its own.
             onChange={(next) => setV(next)} />
 ```
 
-### In checkbox mode, treat the object you passed in as spent.
+### In checkbox mode, `onChange` hands you a fresh object.
 
-The merge copies the top level and writes into the row objects it finds, so the
-row you passed in is modified in place. Do not keep the previous `values` around
-to compare against — take the object `onChange` hands you as the new truth.
+The merge copies the top level and the row it changes, so the `values` you passed
+in is left as it was and can be compared against the next one.
 
 ### A radio row cannot be unanswered again.
 
@@ -152,7 +158,7 @@ option is better than a row the user cannot clear.
 ### Keep the grid small.
 
 Every cell is a control, so a six-by-five grid is thirty tab stops. Past that,
-ask the questions one at a time with `MultipleChoice`.
+ask the questions one at a time with `ChoiceGroup`.
 
 </div>
 
@@ -164,9 +170,12 @@ ask the questions one at a time with `MultipleChoice`.
   `aria-labelledby` pointing at both the row label and the column header, so it
   is announced as "Punctuality, Agree" rather than as an unnamed radio in a
   table.
+- **Every cell is the real control.** Cells render `Checkbox` and `Radio`, so
+  focus, states and read-only behave as they do anywhere else.
 - **Radio rows are grouped per row.** Each row's inputs share a `name` built from
-  the row's id, which is what makes one answer per row and arrow-key movement
-  along it.
+  the grid's id and the row's id, which is what makes one answer per row and
+  arrow-key movement along it. With no `id` or `name` the grid generates its own
+  base, so two grids on a page never share ids or radio groups.
 - **The grid itself has no name.** There is no caption and no `aria-label` on the
   table. Put the question above it as a heading, and describe the scale in the
   column headers.
@@ -182,8 +191,8 @@ ask the questions one at a time with `MultipleChoice`.
 
 ## Related
 
-- For one question with several answers, use `MultipleChoice`.
-- For a rated answer with end labels, use `Scale`.
+- For one question with several answers, use `ChoiceGroup`.
+- For a rated answer with end labels, use `ChoiceGroup` with `leadingText` and `trailingText`.
 - For data being displayed rather than answered, use `Table`.
 
 </div>

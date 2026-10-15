@@ -1,6 +1,6 @@
 import React from 'react';
 import Modal from '@/components/messaging/Modal';
-import Radio from '@/components/forms-and-inputs/Radio';
+import ChoiceGroup from '@/components/forms-and-inputs/ChoiceGroup';
 import { DeleteModalSessionCard } from '@/specs/Toolkit/Pre-Session/Cards/DeleteModalSessionCard.stories';
 import { CancelButton, ConfirmButton } from '@/specs/Toolkit/Pre-Session/Elements/SupervisorManagementButtons.stories';
 
@@ -47,33 +47,16 @@ const SessionTypeModalBody = () => (
         />
 
         {/* Radio Options */}
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-modal-gap-md)',
-            }}
-        >
-            <Radio
-                id="session-type-this-only"
-                name="session-type"
-                label="This session only"
-                value="this-only"
-                defaultChecked
-            />
-            <Radio
-                id="session-type-recurring-date"
-                name="session-type"
-                label="All recurring sessions  during a specific date period"
-                value="recurring-date"
-            />
-            <Radio
-                id="session-type-all-recurring"
-                name="session-type"
-                label="All recurring sessions"
-                value="all-recurring"
-            />
-        </div>
+        <ChoiceGroup
+            name="session-type"
+            aria-label="Sessions to edit"
+            defaultValue="this-only"
+            options={[
+                { id: 'session-type-this-only', value: 'this-only', label: 'This session only' },
+                { id: 'session-type-recurring-date', value: 'recurring-date', label: 'All recurring sessions during a specific date period' },
+                { id: 'session-type-all-recurring', value: 'all-recurring', label: 'All recurring sessions' },
+            ]}
+        />
 
         {/* Bottom Buttons */}
         <div

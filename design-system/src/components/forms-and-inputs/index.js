@@ -15,7 +15,6 @@ export { default as OptionList } from './OptionList';
 export { default as Cascader } from './Cascader';
 export { default as TreeSelect } from './TreeSelect';
 export { default as ChoiceGrid } from './ChoiceGrid';
-export { default as MultipleChoice } from './MultipleChoice';
+export { default as ChoiceGroup } from './ChoiceGroup';
 export { default as FileUpload } from './FileUpload';
 export { default as Rating } from './Rating';
-export { default as Scale } from './RadioButtonGroup';

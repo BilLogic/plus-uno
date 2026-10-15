@@ -204,7 +204,7 @@ long enough to need filtering, `creatable` for lists the user may extend.
   Single-mode options are buttons, so Enter and Space choose one. Multi-mode
   options have no key handler: the arrow keys reach an option and nothing
   selects it. Where every option must be keyboard-operable today, use
-  `MultipleChoice`, whose options are native radios or checkboxes.
+  `ChoiceGroup`, whose options are native radios or checkboxes.
 - **The trigger has no accessible name, and the call site cannot give it one.**
   A `div` is not a labelable element, so an external `label htmlFor` does not
   name it, and `aria-label` / `aria-labelledby` passed to `Select` are not
@@ -231,7 +231,7 @@ long enough to need filtering, `creatable` for lists the user may extend.
 ## Related
 
 - For actions rather than a value, use `Dropdown`.
-- For five or fewer options that all fit on screen, use `MultipleChoice` with `type="radio"`.
+- For five or fewer options that all fit on screen, use `ChoiceGroup`.
 - For hierarchical values, use `TreeSelect` or `Cascader`.
 - For a native form you intend to submit without JavaScript, use a plain `<select>`; this component does not participate in form submission.
 
