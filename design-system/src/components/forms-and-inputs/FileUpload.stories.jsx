@@ -12,7 +12,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'File upload component for selecting and uploading files. Supports various states including default, focus, disabled, error, and success validation states.',
+                    'File upload component for selecting and uploading files. Supports various states including default, focus, disabled, read-only, invalid, and valid states.',
             },
         },
     },
@@ -55,9 +55,14 @@ export default {
             description: 'Disable the file upload component',
             table: { category: 'Behavior' },
         },
+        readOnly: {
+            control: 'boolean',
+            description: 'Show the field and its files without a way to choose a file',
+            table: { category: 'Behavior' },
+        },
         validation: {
             control: 'select',
-            options: ['none', 'invalid', 'success'],
+            options: ['none', 'invalid', 'valid'],
             description: 'Validation state of the component',
             table: { category: 'Behavior' },
         },
@@ -126,14 +131,14 @@ export const Styles = () => (
             />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SUCCESS</span>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VALID</span>
             <FileUpload
-                id="file-upload-success"
+                id="file-upload-valid"
                 label="Upload files"
                 required
                 acceptedFormats={formats}
                 buttonText="Choose a file"
-                validation="success"
+                validation="valid"
                 validationMessage="Validation message"
             />
         </div>
@@ -173,6 +178,34 @@ export const InteractionStates = () => (
                 disabled
             />
         </div>
+    </div>
+);
+
+export const ReadOnly = () => (
+    <div style={{ maxWidth: '640px' }}>
+        <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+            Read-only shows the field and the files already chosen, with no button to choose another.
+        </p>
+        <FileUpload
+            id="file-upload-read-only"
+            label="Session recording"
+            description="Uploaded by the tutor after the session."
+            readOnly
+        >
+            <div
+                className="body2-txt"
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--size-element-gap-sm)',
+                    padding: 'var(--size-element-pad-y-sm) 0',
+                    color: 'var(--color-on-surface)',
+                }}
+            >
+                <i className="fa-solid fa-file" aria-hidden="true" style={{ color: 'var(--color-on-surface-variant)' }} />
+                zoom_0.mp4
+            </div>
+        </FileUpload>
     </div>
 );
 
@@ -227,6 +260,7 @@ Interactive.args = {
     formatPreset: 'mixed',
     buttonText: 'Choose a file',
     disabled: false,
+    readOnly: false,
     validation: 'none',
     validationMessage: '',
 };

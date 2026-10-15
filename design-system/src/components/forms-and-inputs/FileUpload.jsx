@@ -13,7 +13,8 @@ const FileUpload = ({
     description,
     acceptedFormats,
     disabled = false,
-    validation = 'none', // 'none', 'invalid', 'success'
+    readOnly = false,
+    validation = 'none',
     validationMessage,
     buttonText = 'Choose a file',
     className = '',
@@ -28,6 +29,8 @@ const FileUpload = ({
     const fileInputRef = useRef(null);
     /** One id for the label and the file input — see `useFieldId` (#206). */
     const fieldId = useFieldId(id);
+    /** `success` is the old name for `valid`, the field vocabulary Figma uses. */
+    const state = validation === 'success' ? 'valid' : validation;
 
     /*
      * #327 — see `Input.jsx`. This component has TWO things worth pointing at:
@@ -36,7 +39,7 @@ const FileUpload = ({
      * before "that file was too large" rather than instead of it.
      */
     const descriptionId = `${fieldId}-description`;
-    const validationId = validation !== 'none' && validationMessage
+    const validationId = state !== 'none' && validationMessage
         ? `${fieldId}-validation`
         : undefined;
 
@@ -52,13 +55,13 @@ const FileUpload = ({
 
     const handleButtonClick = (e) => {
         e.preventDefault();
-        if (!disabled && fileInputRef.current) {
+        if (!disabled && !readOnly && fileInputRef.current) {
             fileInputRef.current.click();
         }
     };
 
     const handleFileChange = (e) => {
-        if (disabled) return;
+        if (disabled || readOnly) return;
         if (onChange) {
             onChange(e);
         }
@@ -67,15 +70,15 @@ const FileUpload = ({
     // Determine border color based on state
     const getBorderColor = () => {
         if (disabled) return 'transparent';
-        if (validation === 'invalid') return 'var(--color-danger)';
-        if (validation === 'success') return 'var(--color-success)';
+        if (state === 'invalid') return 'var(--color-danger)';
+        if (state === 'valid') return 'var(--color-success)';
         if (isFocused) return 'var(--color-primary)';
         return 'transparent';
     };
 
-    const validationIcon = validation === 'invalid' ? (
+    const validationIcon = state === 'invalid' ? (
         <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" />
-    ) : validation === 'success' ? (
+    ) : state === 'valid' ? (
         <i className="fa-solid fa-circle-check" aria-hidden="true" />
     ) : null;
 
@@ -110,7 +113,7 @@ const FileUpload = ({
              * validation message sit below it.
              */}
             <div
-                className={`plus-file-upload-container ${disabled ? 'plus-file-upload-disabled' : ''} ${validation !== 'none' ? `plus-file-upload-${validation}` : ''} ${isFocused ? 'plus-file-upload-focused' : ''}`}
+                className={`plus-file-upload-container ${disabled ? 'plus-file-upload-disabled' : ''} ${readOnly ? 'plus-file-upload-readonly' : ''} ${state !== 'none' ? `plus-file-upload-${state}` : ''} ${isFocused ? 'plus-file-upload-focused' : ''}`}
                 style={{
                     borderColor: getBorderColor(),
                     borderWidth: getBorderColor() !== 'transparent' ? '1px' : '0',
@@ -125,6 +128,12 @@ const FileUpload = ({
                 )}
 
                 <div className="plus-file-upload-button-container">
+                    {/*
+                     * Read-only shows the field and its files with nothing to
+                     * choose: the input stays for the label and its description,
+                     * and the button goes, since a file input has no native
+                     * read-only state.
+                     */}
                     <input
                         ref={fileInputRef}
                         type="file"
@@ -143,9 +152,11 @@ const FileUpload = ({
                             descriptionText ? descriptionId : undefined,
                             validationId,
                         ].filter(Boolean).join(' ') || undefined}
-                        aria-invalid={validation === 'invalid' || undefined}
+                        aria-invalid={state === 'invalid' || undefined}
+                        aria-readonly={readOnly || undefined}
+                        tabIndex={readOnly ? -1 : props.tabIndex}
                     />
-                    <Button
+                    {!readOnly && (<Button
                         text={buttonText}
                         style="primary"
                         fill="filled"
@@ -154,7 +165,7 @@ const FileUpload = ({
                         onClick={handleButtonClick}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
-                    />
+                    />)}
                 </div>
             </div>
 
@@ -164,10 +175,10 @@ const FileUpload = ({
                 </div>
             )}
 
-            {validation !== 'none' && validationMessage && (
+            {state !== 'none' && validationMessage && (
                 <div
                     id={validationId}
-                    className={`plus-file-upload-validation plus-file-upload-validation-${validation}`}
+                    className={`plus-file-upload-validation plus-file-upload-validation-${state}`}
                 >
                     {validationIcon}
                     <span className="plus-file-upload-validation-message">{validationMessage}</span>
@@ -185,7 +196,10 @@ FileUpload.propTypes = {
     description: PropTypes.string,
     acceptedFormats: PropTypes.arrayOf(PropTypes.string),
     disabled: PropTypes.bool,
-    validation: PropTypes.oneOf(['none', 'invalid', 'success']),
+    /** Shows the field and its files without a way to choose a file. */
+    readOnly: PropTypes.bool,
+    /** `success` is deprecated: use `valid`. */
+    validation: PropTypes.oneOf(['none', 'invalid', 'valid', 'success']),
     validationMessage: PropTypes.string,
     buttonText: PropTypes.string,
     className: PropTypes.string,
