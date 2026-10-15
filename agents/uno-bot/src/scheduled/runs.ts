@@ -87,7 +87,8 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * Team Members database (src/usage/team-roles-sync.ts).
  * The end-of-day `card-follow-through` keeps a follow-up for each active
  * Roadmap card nobody owns or that has stopped moving; the morning
- * `commitment-nudge` asks about it (src/follow-through/).
+ * `commitment-nudge` asks about it — a card that stopped moving on Monday's
+ * morning only, as a weekly section (src/follow-through/).
  * DM watch's two, one job per person with a promise switch on: the
  * end-of-day `dm-promise-read` reads that person's DMs with their own token,
  * and the morning `dm-promise-nudge` reminds them in their DM with uno-bot
