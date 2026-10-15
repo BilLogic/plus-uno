@@ -294,6 +294,14 @@ describe("a decided card, opened from View", () => {
     assert.equal(view.blocks[1]!.type, "header");
   });
 
+  it("cuts a long reason inside the alert's 200, never through an escaped character", async () => {
+    const { view } = await decided("cancel", {}, "R&D ".repeat(100));
+    const text = view.blocks[0]!.text!.text;
+    assert.ok(text.length <= 200, String(text.length));
+    assert.match(text, /^Rejected by <@U0BILL0001>: R&amp;D/);
+    assert.doesNotMatch(text, /&(a|am|amp)?…/, "no entity cut in half");
+  });
+
   it("says who a batch of DMs went to", async () => {
     const { view } = await decided("confirm", TWO_DMS);
     assert.equal(view.blocks[0]!.text!.text, `Approved by <@${BILL}> to send to <@${BRYAN}> and <@${COCO}>.`);

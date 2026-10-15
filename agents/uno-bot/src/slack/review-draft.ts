@@ -31,6 +31,7 @@ import {
   listBlock,
   quoteBlock,
   shareoutApprove,
+  whereMrkdwn,
   type DraftAnatomy,
   type WhereElement,
 } from "./review-anatomy";
@@ -517,11 +518,6 @@ function shareoutWhere(input: Input, cardText: string): WhereElement[] {
   return out;
 }
 
-/** A where-line place as mrkdwn: a channel as its link, words escaped. */
-function placeMrkdwn(place: WhereElement): string {
-  return place.type === "channel" ? `<#${place.channel_id}>` : place.type === "text" ? escapeSlackText(place.text) : "";
-}
-
 const capital = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
 /** The card's subtitle: the artifact (when the project is the title), the
@@ -602,6 +598,6 @@ function shareoutAnatomy(input: Input, detail: AnatomyContext): DraftAnatomy {
     },
     content,
     approve: shareoutApprove(input),
-    destination: `post in ${placeMrkdwn(shareoutPlaceElement(input, detail.cardText))}`,
+    destination: `post in ${whereMrkdwn(shareoutPlaceElement(input, detail.cardText))}`,
   };
 }

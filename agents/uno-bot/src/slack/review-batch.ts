@@ -14,10 +14,9 @@
 // null, and the pop-up draws the card's text, as before.
 //
 // PURE: blocks out, nothing posted, nothing read.
-import { escapeSlackText } from "./mrkdwn";
 import { fieldInputBlocks } from "./review-fields";
 import { relayRecipientId } from "../tools/relayed-dm-render";
-import { alertsFromCaveats, labelledText, type DraftAnatomy, type WhereElement } from "./review-anatomy";
+import { alertsFromCaveats, labelledText, whereMrkdwn, type DraftAnatomy, type WhereElement } from "./review-anatomy";
 import { caveatsOf, operationParts, type DraftDetail } from "./review-draft";
 import type { ProposalOperation } from "../thread-state/index";
 
@@ -79,10 +78,6 @@ function recipientElement(input: Input): WhereElement {
   return id ? { type: "user", user_id: id } : { type: "text", text: str(input.recipient) || "someone" };
 }
 
-/** A where-line element as mrkdwn, for the decided card's alert. */
-function elementMrkdwn(element: WhereElement): string {
-  return element.type === "user" ? `<@${element.user_id}>` : element.type === "text" ? escapeSlackText(element.text) : "";
-}
 
 /** One operation's bold numbered label: "1 · To @Bryan", or "2 · New GitHub
  *  issue on …". */
@@ -136,6 +131,6 @@ export function batchAnatomy(operations: readonly ProposalOperation[], cardText:
     ...(where.length ? { where } : {}),
     alerts: alertsFromCaveats(caveatsOf(cardText)),
     content,
-    ...(recipients.length ? { destination: `send to ${andList(recipients.map(elementMrkdwn))}` } : {}),
+    ...(recipients.length ? { destination: `send to ${andList(recipients.map(whereMrkdwn))}` } : {}),
   };
 }

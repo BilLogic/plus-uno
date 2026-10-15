@@ -288,8 +288,13 @@ function decidedAlert(
   const level = decided.decision === "confirm" ? "success" : "default";
   if (proposal.choices?.length) return mentionAlert(level, `Answered${by}.`);
   if (decided.decision === "cancel") {
-    const reason = decided.reason?.trim();
-    return mentionAlert(level, `Rejected${by}${reason ? `: ${escapeSlackText(reason)}` : ""}.`);
+    // Cut before it is escaped, so the alert's own clip never splits an
+    // entity or the mention ahead of it.
+    const reason = decided.reason?.trim() ?? "";
+    const room = ALERT_CHARS - `Rejected${by}: .`.length;
+    let cut = Math.min(reason.length, room);
+    while (cut > 0 && escapeSlackText(clip(reason, cut)).length > room) cut--;
+    return mentionAlert(level, `Rejected${by}${cut ? `: ${escapeSlackText(clip(reason, cut))}` : ""}.`);
   }
   return mentionAlert(level, `Approved${by}${reading?.destination ? ` to ${reading.destination}` : ""}.`);
 }
