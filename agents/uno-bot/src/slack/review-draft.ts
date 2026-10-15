@@ -33,12 +33,12 @@ import {
   type DraftAnatomy,
   type WhereElement,
 } from "./review-anatomy";
+import { DESIGN_STATUS_NOT_SET, notionCreateAnatomy, type NotionDatabaseLinks } from "./review-notion-create";
 import type { ProposalOperation } from "../thread-state/index";
 
-type Input = Record<string, unknown>;
+export { DESIGN_STATUS_NOT_SET };
 
-/** Said where a Roadmap card's write sets no Design Status. */
-export const DESIGN_STATUS_NOT_SET = "not set";
+type Input = Record<string, unknown>;
 
 /** Slack's cap on a `header` block's text. */
 const HEADER_CHARS = 150;
@@ -215,6 +215,11 @@ export interface DraftDetail {
   editing?: boolean;
   /** Why the change is proposed, mrkdwn; shown once, at the first change. */
   issue?: string;
+  /** Edit fields, for a reading that sets it beside the facts its selects
+   *  edit; the view puts it at the head of the content otherwise. */
+  editButton?: unknown;
+  /** Where the Notion databases a create lands in open. */
+  databases?: NotionDatabaseLinks;
 }
 
 /** What one change is drawn with: the draft's detail, and whether the Issue
@@ -446,6 +451,7 @@ type AnatomyContext = DraftDetail & { cardText: string };
  *  `READERS` reading, or from the card's text. */
 const ANATOMY_READERS: Record<string, (input: Input, context: AnatomyContext) => DraftAnatomy> = {
   shareout_post: shareoutAnatomy,
+  notion_create: (input, context) => notionCreateAnatomy(input, { ...context, caveats: caveatsOf(context.cardText) }),
 };
 
 /**

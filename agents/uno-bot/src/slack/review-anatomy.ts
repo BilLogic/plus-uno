@@ -130,14 +130,21 @@ export function alertsFromCaveats(lines: readonly string[]): DraftAlert[] {
   return alerts;
 }
 
+/** One short fact: its label, its value, and where the value opens, when it
+ *  is a link (a source thread, a Roadmap card). */
+export type Fact = readonly [label: string, value: string, url?: string];
+
 /** Zone 4: short facts in two columns, ten at most, the accessory beside them
- *  (Edit fields, where its selects can be edited). */
-export function factsSection(facts: ReadonlyArray<readonly [string, string]>, accessory?: unknown): unknown {
+ *  (Edit fields, where its selects can be edited). A fact with an http(s)
+ *  address reads as its value, linked. */
+export function factsSection(facts: ReadonlyArray<Fact>, accessory?: unknown): unknown {
+  const valueOf = (value: string, url?: string) =>
+    url && /^https?:\/\/[^\s<>|]+$/.test(url) ? `<${url}|${escapeSlackText(value)}>` : escapeSlackText(value);
   return {
     type: "section",
     fields: facts
       .slice(0, MAX_FIELDS)
-      .map(([label, value]) => ({ type: "mrkdwn", text: clip(`*${escapeSlackText(label)}*\n${escapeSlackText(value)}`, FIELD_CHARS) })),
+      .map(([label, value, url]) => ({ type: "mrkdwn", text: clip(`*${escapeSlackText(label)}*\n${valueOf(value, url)}`, FIELD_CHARS) })),
     ...(accessory ? { accessory } : {}),
   };
 }

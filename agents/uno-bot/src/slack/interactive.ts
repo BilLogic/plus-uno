@@ -49,7 +49,8 @@ import {
   reviewedCardOf,
 } from "./review-view";
 import { FIELD_ACTION_ID, type OptionSource } from "./review-fields";
-import { databaseOptions } from "../integrations/notion";
+import { canonicalNotionUrl, databaseOptions } from "../integrations/notion";
+import type { NotionDatabaseLinks } from "./review-notion-create";
 import { proposalReplyThread, type PendingProposal } from "../thread-state/index";
 import { conversationKey, enqueueAgentJob, replyHandlerAt } from "./events";
 import type { SlackMessageEvent } from "./types";
@@ -432,7 +433,21 @@ function reviewDoorDeps(env: Env): ReviewDoorDeps {
       const database = optionDatabase(env, source);
       return database ? databaseOptions(env, database, source.property) : null;
     },
+    notionDatabases: notionDatabaseLinks(env),
   };
+}
+
+/** Where each Notion database a create lands in opens, by its id. */
+function notionDatabaseLinks(env: Env): NotionDatabaseLinks {
+  const at = (id: string | undefined) => (id?.trim() ? canonicalNotionUrl(null, id.trim()) : undefined);
+  const links: NotionDatabaseLinks = {};
+  const roadmap = at(env.NOTION_ROADMAP_DB_ID);
+  const decisions = at(env.NOTION_DECISIONS_DB_ID);
+  const marketplace = at(env.NOTION_MARKETPLACE_DB_ID);
+  if (roadmap) links.roadmap = roadmap;
+  if (decisions) links.decisions = decisions;
+  if (marketplace) links.marketplace = marketplace;
+  return links;
 }
 
 async function replyEphemeral(payload: InteractionPayload, text: string): Promise<void> {
