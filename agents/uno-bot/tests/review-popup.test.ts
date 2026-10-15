@@ -99,7 +99,8 @@ async function draftOf(over: Partial<PendingProposal> = {}) {
 
 /** A rich text element's words: a section's run together, a list's items
  *  each after a dash. */
-function richWords(e: { type?: string; text?: string; elements?: unknown[] }): string {
+function richWords(e: { type?: string; text?: string; user_id?: string; elements?: unknown[] }): string {
+  if (e.type === "user") return `<@${e.user_id}>`;
   if (e.type === "rich_text_list") return (e.elements ?? []).map((i) => `- ${richWords(i as typeof e)}`).join(" ");
   if (e.elements) return e.elements.map((i) => richWords(i as typeof e)).join("");
   return e.text ?? "";
@@ -215,9 +216,10 @@ describe("the draft reads as a draft", () => {
         ],
       }),
     );
-    assert.match(all[0]!, /2 operations, run in order/);
-    const first = indexOf(all, /1\. New PRD card on the Roadmap/);
-    const second = indexOf(all, /2\. Direct message/);
+    // A mixed batch's header names what each kind does, in run order.
+    assert.equal(all[0]!, "header: Add a Roadmap card and send a DM");
+    const first = indexOf(all, /^rich_text: 1 · New PRD card on the Roadmap$/);
+    const second = indexOf(all, /^rich_text: 2 · To <@U07ABC>$/);
     assert.ok(first > 0 && first < indexOf(all, /Goal cycle resets/) && indexOf(all, /One reset per session/) < second, JSON.stringify(all));
   });
 
