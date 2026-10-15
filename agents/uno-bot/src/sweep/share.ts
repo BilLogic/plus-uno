@@ -30,7 +30,7 @@ import { CHANNEL_ROLES, channelIdOf, type ChannelIds } from "../destination/inde
 import type { OperationOutcome } from "../gate/index";
 import { rethrowIfBudget } from "../net";
 import { escapeSlackText } from "../slack/mrkdwn";
-import type { PendingProposal, ProposalOperation, SweepShare, ThreadState } from "../thread-state/index";
+import type { PendingProposal, ProposalOperation, ShareNoteFacts, SweepShare, ThreadState } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { recordProposalEvents, stagedEvent, storesChannel, supersededEvents, type ProposalEventLog } from "../usage/index";
 import { SHARE_CARD_WORDS, SHARE_CHANNEL_NAMES, SWEEP_CARD_MARK, SWEEP_CARD_TTL_MS, shareCard } from "./cards";
@@ -83,7 +83,7 @@ export function sweepShareOffer(
   share: SweepShare | undefined,
   outcomes: readonly OperationOutcome[],
   channels: ShareChannels,
-): { card: ProposalCard; operations: ProposalOperation[] } | null {
+): { card: ProposalCard; operations: ProposalOperation[]; facts: ShareNoteFacts } | null {
   if (!share) return null;
   const idOf = (to: SweepShareNote["to"]): string | undefined => {
     return channelIdOf(to, channels) ?? undefined;
@@ -97,8 +97,17 @@ export function sweepShareOffer(
     toolName: SWEEP_SHARE_TOOL,
     input: { channel: n.channel, channel_name: SHARE_CHANNEL_NAMES[n.to], text: n.text },
   }));
-  return { card: sweepShareCard(operations), operations };
+  return { card: sweepShareCard(operations), operations, facts: SWEEP_SHARE_FACTS };
 }
+
+/** A group DM's share as Review draws it (`PendingProposal.facts`); the note
+ *  and its channel are each operation's input. */
+export const SWEEP_SHARE_FACTS: ShareNoteFacts = {
+  kind: "sweep_share_post",
+  header: "Share what was settled",
+  from: "this group DM",
+  notes: [`The people who could confirm the fix can confirm this. Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`],
+};
 
 /**
  * The share card for its operations: each note quoted exactly as approving
@@ -175,6 +184,7 @@ export async function stageSweepShare(
       confirmers: [...(fix.confirmers ?? [])],
       supersedeKey: SWEEP_SHARE_KEY,
       stated: SHARE_CARD_WORDS,
+      facts: offer.facts,
     };
     const { retired } = await deps.threadState.putProposal(proposal);
     const now = deps.now();

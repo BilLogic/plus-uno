@@ -74,6 +74,7 @@ import {
   tidyCard,
   tidyCardWords,
   tidyChoices,
+  tidyFacts,
   tidyItem,
   tidyCarriedParent,
   tidyParent,
@@ -527,6 +528,7 @@ export function stagedFinding(channel: string, messageTs: string, shown: Shown, 
     stated: tidyCardWords(TIDY_CARD_TTL_MS / 3_600_000),
     refuseRevision: TIDY_REVISION_REFUSAL,
     choices: tidyChoices(),
+    facts: tidyFacts(shown.finding, shown.likely),
   };
 }
 

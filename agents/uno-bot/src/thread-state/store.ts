@@ -376,6 +376,15 @@ export interface PendingProposal {
    * where the stager holds no reason; none is made up.
    */
   issue?: string;
+  /**
+   * A stated card's facts, as data (`StatedFacts`), so Review draws them in
+   * its zones (`slack/review-stated.ts`) instead of reading them back out of
+   * the card's text. Set by the Worker's own stagers, each worded by its
+   * stager's copy. Absent on every other card and on a card staged before it,
+   * which Review shows as its text. A re-staged card drops it, as it drops
+   * `before`: the fresh card is an ordinary one.
+   */
+  facts?: StatedFacts;
 }
 
 /**
@@ -405,6 +414,69 @@ export interface ProposalSelect {
   path: string;
   label: string;
   source: { database: "roadmap" | "decisions"; property: string };
+}
+
+/**
+ * What a stated card is about, as Review draws it (`PendingProposal.facts`):
+ * one shape per Worker tool, in the words its stager's copy chose.
+ */
+export type StatedFacts = TidyFacts | DevLinksFacts | PrecedenceFacts | ShareNoteFacts;
+
+/** A Figma tidy-up finding (`figma-tidy/copy.ts`). */
+export interface TidyFacts {
+  kind: "figma_tidy_up";
+  /** The file's name. */
+  file: string;
+  /** The check, as a person reads it: "Unknown card". */
+  check: string;
+  /** What the check found, plain. */
+  finding: string;
+  fileUrl: string;
+  /** What answering does, plain. */
+  note: string;
+}
+
+/** A Dev Mode links card (`figma-links/copy.ts`). */
+export interface DevLinksFacts {
+  kind: "figma_dev_links";
+  /** The action, naming the component: "Add Dev Mode links to Button". */
+  header: string;
+  /** What Approve changes: "Adds 2 links in Dev Mode to 1 library component". */
+  change: string;
+  /** The comment it also leaves, when it leaves one: "and one comment saying
+   *  what they are". */
+  comment?: string;
+  figmaUrl: string;
+  /** One for a component's card; one per component on a batch card. */
+  components: Array<{ component: string; links: Array<{ label: string; url: string }>; also?: string }>;
+  batch: boolean;
+  /** Plain lines under the links. */
+  notes: string[];
+}
+
+/** One component of the weekly DS precedence check (`ds-precedence/report.ts`). */
+export interface PrecedenceFacts {
+  kind: "ds_precedence_intake";
+  /** The finding: "Badge: the library needs the fix". */
+  finding: string;
+  /** The week, as a person reads it: "Oct 12". */
+  week: string;
+  /** What differs, one line each, a prop or value in backticks. */
+  differences: string[];
+  codeUrl: string;
+  figmaUrl: string;
+}
+
+/** A note the sweep posts verbatim in a team channel (`sweep/share.ts`,
+ *  `dm-sweep/copy.ts`). The note and its channel are the operation's input. */
+export interface ShareNoteFacts {
+  kind: "sweep_share_post";
+  /** The action: "Share what was settled". */
+  header: string;
+  /** Where nothing else leaves: "this group DM". */
+  from: string;
+  /** Plain lines under the note. */
+  notes: string[];
 }
 
 // ── Decision reports ─────────────────────────────────────────────────────────

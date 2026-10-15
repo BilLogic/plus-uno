@@ -190,9 +190,10 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
   if (actionId.startsWith(DECISION_REVIEW_ACTION_PREFIX)) return openReview(env, payload, actionId);
   if (actionId === REVIEW_EDIT_ACTION_ID) return editInReview(env, payload);
-  // The Review pop-up's Open button (`card-block.ts`): a link, which the
-  // browser already followed. Nothing to do.
-  if (actionId === OPEN_ACTION_ID) return;
+  // The Review pop-up's Open buttons (`card-block.ts`, and a row's own, as
+  // `uno_review_open_code`): a link, which the browser already followed.
+  // Nothing to do.
+  if (actionId === OPEN_ACTION_ID || actionId.startsWith(`${OPEN_ACTION_ID}_`)) return;
   // A pick under the Review pop-up's Edit fields: kept on the card at once,
   // so there is nothing to save and going back loses nothing.
   const pick = actionId === FIELD_ACTION_ID ? reviewPickOf(payload) : null;

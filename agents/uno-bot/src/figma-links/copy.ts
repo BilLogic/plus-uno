@@ -6,7 +6,7 @@
 //
 // PURE.
 
-import type { ReportItem, StatedCardWords } from "../thread-state/index";
+import type { DevLinksFacts, ReportItem, StatedCardWords } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { namesInWords, windowInWords } from "../slack/copy-words";
@@ -135,6 +135,48 @@ export function devLinksCard(subject: DevLinksSubject, write: DevLinksWrite): Pr
     fields: [],
     caveats: [],
     operations: [{ toolName: DEV_LINKS_TOOL, input: { links: write.links, introduce: write.introduce } }],
+  };
+}
+
+/**
+ * The card as Review draws it (`PendingProposal.facts`): the component, what
+ * Approve changes and where, and every link by its label. A batch lists each
+ * component with its links.
+ */
+export function devLinksFacts(subject: DevLinksSubject, write: DevLinksWrite): DevLinksFacts {
+  const comment = !write.introduce.length
+    ? undefined
+    : subject.kind === "batch"
+      ? "and one comment on each new component's first saying what they are"
+      : "and one comment saying what they are";
+  const notes = ["A link already there is not added twice."];
+  if (subject.kind === "batch") {
+    notes.push("A batch this size writes in steps; a reply in this thread says when the last link is in.");
+    return {
+      kind: "figma_dev_links",
+      header: `Add Dev Mode links to ${plural(subject.components.length, "component", "components")}`,
+      change: capital(changeWords(write)),
+      ...(comment ? { comment } : {}),
+      figmaUrl: subject.figmaUrl,
+      components: subject.components.map((e) => ({
+        component: e.component,
+        links: e.adds.map((l) => ({ label: labelOf(l.name), url: l.url })),
+        ...(e.renamed ? { also: "renames its Code link to Code (plus-uno)" } : {}),
+      })),
+      batch: true,
+      notes,
+    };
+  }
+  const distinct = [...new Map(write.links.map((l) => [l.name, l.url])).entries()];
+  return {
+    kind: "figma_dev_links",
+    header: `Add Dev Mode links to ${subject.component}`,
+    change: capital(changeWords(write)),
+    ...(comment ? { comment } : {}),
+    figmaUrl: subject.figmaUrl,
+    components: [{ component: subject.component, links: distinct.map(([name, url]) => ({ label: labelOf(name) || name, url })) }],
+    batch: false,
+    notes,
   };
 }
 

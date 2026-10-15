@@ -33,7 +33,8 @@ import {
   type DraftAnatomy,
   type WhereElement,
 } from "./review-anatomy";
-import type { ProposalOperation } from "../thread-state/index";
+import { devLinksAnatomy, precedenceAnatomy, shareNoteAnatomy, tidyAnatomy } from "./review-stated";
+import type { ProposalOperation, StatedFacts } from "../thread-state/index";
 
 type Input = Record<string, unknown>;
 
@@ -215,6 +216,8 @@ export interface DraftDetail {
   editing?: boolean;
   /** Why the change is proposed, mrkdwn; shown once, at the first change. */
   issue?: string;
+  /** A stated card's facts (`PendingProposal.facts`). */
+  facts?: StatedFacts;
 }
 
 /** What one change is drawn with: the draft's detail, and whether the Issue
@@ -442,10 +445,15 @@ export function caveatsOf(cardText: string): string[] {
  *  the place it names and its caveats, and the draft's detail. */
 type AnatomyContext = DraftDetail & { cardText: string };
 
-/** Readings in the shared anatomy, by tool. A tool with none is drawn by its
- *  `READERS` reading, or from the card's text. */
-const ANATOMY_READERS: Record<string, (input: Input, context: AnatomyContext) => DraftAnatomy> = {
+/** Readings in the shared anatomy, by tool. A tool with none — or a reading
+ *  that returns null, as a stated card staged before its facts does — is
+ *  drawn by its `READERS` reading, or from the card's text. */
+const ANATOMY_READERS: Record<string, (input: Input, context: AnatomyContext) => DraftAnatomy | null> = {
   shareout_post: shareoutAnatomy,
+  figma_tidy_up: tidyAnatomy,
+  figma_dev_links: devLinksAnatomy,
+  ds_precedence_intake: precedenceAnatomy,
+  sweep_share_post: shareNoteAnatomy,
 };
 
 /**

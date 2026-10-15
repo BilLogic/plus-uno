@@ -192,6 +192,7 @@ export function draftView(
   const detail = {
     ...(proposal.before ? { before: proposal.before } : {}),
     ...(proposal.issue ? { issue: proposal.issue } : {}),
+    ...(proposal.facts ? { facts: proposal.facts } : {}),
     inline: inPlace,
     editing: access.mayDecide,
   };
@@ -231,7 +232,11 @@ export function draftView(
   const tail: unknown[] = access.mayDecide
     ? [
         { type: "divider" },
-        choiceInput(proposal.choices, anatomy?.approve ? { ...words, confirm: anatomy.approve } : words),
+        choiceInput(proposal.choices, {
+          ...words,
+          ...(anatomy?.approve ? { confirm: anatomy.approve } : {}),
+          ...(anatomy?.revise ? { revise: anatomy.revise } : {}),
+        }),
         noteInput(Boolean(proposal.choices?.length), Boolean(anatomy)),
         ...(access.closesAt !== undefined ? [context(openLine(access.closesAt, access.confirmers))] : []),
       ]
