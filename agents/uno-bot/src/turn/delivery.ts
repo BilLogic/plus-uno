@@ -386,15 +386,15 @@ export interface PostResult {
   text: string;
   /** The ts it landed on, where the adapter knows one. */
   ts?: string;
-  /** What the conversation the turn answers shows of this post, when that is
-   *  not `text`: a Figma ask's card posts in #plus-design and the comment
-   *  shows only the line linking it. The thread remembers this; `text` stays
-   *  the card's own words. */
-  shown?: string;
   /** On a card: its own blocks, when it went up with them — a carousel, a
    *  preview — rather than its text. Opaque here; staged with the card
    *  (`PendingProposal.proposalBlocks`) so a note is edited onto them. */
   blocks?: unknown[];
+  /** On a card: the adapter declined it on purpose, on a surface that is
+   *  answer-only (a Figma ask, `figma-ask/delivery.ts`). Nothing posted and
+   *  nothing stages; the turn ends answered, remembering `text` — what the
+   *  person is told instead. */
+  declined?: true;
 }
 
 export interface Delivery {

@@ -9,48 +9,27 @@
 //     drafted mark holds the reply's words until it is posted, so never D1
 //     (ADR-030).
 //   • The turn: `runTurn` on the shared dependency builder, as Slack's turns
-//     are, with the ThreadState Durable Object and a verdict that
-//     executes. It runs in #plus-design with the `figma` origin, so every
-//     tool reads at public scope, and an unmapped asker's at public facts
-//     alone (`agent/public-scope.ts`).
-//   • #plus-design (`PLUS_DESIGN_CHANNEL_ID`), or the channel or DM
-//     `FIGMA_ASK_CHANNEL_ID` names when set: the lead is `chat.postMessage`,
-//     its link `chat.getPermalink`, and the card the Slack Delivery's own,
-//     posted in the lead's thread with Review. Whether a card landed under a
-//     lead is `conversations.replies` on its thread: a message the bot posted
-//     there after the lead. Who the lead asks is the
-//     night's design-owner rule (`figma-comments/read.ts`), on the night's
-//     reads: the Roadmap card, its Contributors, the Slack directory, the roles.
+//     are, with the ThreadState Durable Object. It runs as #plus-design
+//     (`PLUS_DESIGN_CHANNEL_ID`) with the `figma` origin, so every tool reads
+//     at public scope, and an unmapped asker's at public facts alone
+//     (`agent/public-scope.ts`). It is answer-only: its Delivery refuses every
+//     card (`./delivery.ts`), and a verdict that reaches it runs nothing.
 //
+// Nothing here posts to Slack: the answer goes up in the Figma thread alone.
 // Every KV call is charged to the invocation's internal bucket.
 
 import type { Env } from "../types";
-import { charge, rethrowIfBudget } from "../net";
-import { designOwnerOfFile, type DesignOwnerReads } from "../figma-comments/read";
-import { queryRoadmapCards } from "../integrations/notion";
-import { readSource } from "../sweep/env";
-import { findSlackUsers, slackDirectoryFor } from "../tools/slack-people";
-import { runVerdict } from "../agent/resolve-proposal";
+import type { ThreadState } from "../thread-state/index";
+import { charge } from "../net";
 import { figmaClientFor } from "../figma/production";
-import { conversationsReplies, getBotIdentity, getPermalink, postMessage } from "../slack/api";
-import { slackDelivery } from "../slack/slack-delivery";
 import { threadStateFor } from "../thread-state/production";
-import { buildTurnDeps } from "../turn/env-deps";
-import { runTurn } from "../turn/index";
-import { figmaPeopleFor, gapNotesFor, teamRolesFor } from "../usage/production";
+import { buildTurnDeps, type TurnWiring } from "../turn/env-deps";
+import { runTurn, type Delivery } from "../turn/index";
+import { figmaPeopleFor, gapNotesFor } from "../usage/production";
 import { answerFigmaAsk, ASK_MARK_TTL_S, type AskMark, type FigmaAskDeps, type FigmaAskResult } from "./job";
 
 /** One key per comment asked about. */
 export const ASK_MARK_PREFIX = "figma-ask:";
-
-/**
- * Where Figma Review cards post — a comment's ask and the weekly tidy-up: the
- * channel or DM `FIGMA_ASK_CHANNEL_ID` names, else #plus-design; null when
- * neither is set.
- */
-export function figmaReviewChannel(env: Env): string | null {
-  return env.FIGMA_ASK_CHANNEL_ID?.trim() || env.PLUS_DESIGN_CHANNEL_ID?.trim() || null;
-}
 
 /**
  * The ask's dependencies on `Env`, or undefined when the Worker has no Figma
@@ -63,7 +42,7 @@ export function figmaAskDepsFor(env: Env): FigmaAskDeps | undefined {
   const kv = env.HARNESS_KV;
   if (!figma || !kv) return undefined;
   const threadState = threadStateFor(env);
-  const channel = figmaReviewChannel(env);
+  const channel = env.PLUS_DESIGN_CHANNEL_ID?.trim();
   return {
     figma,
     people: () => figmaPeopleFor(env),
@@ -79,77 +58,39 @@ export function figmaAskDepsFor(env: Env): FigmaAskDeps | undefined {
       },
     },
     threadState,
-    answer: (request, delivery, asker) =>
-      runTurn(
-        request,
-        buildTurnDeps(env, request, {
-          threadState,
-          delivery,
-          applyVerdict: (verdict) => runVerdict(env, verdict),
-          // No `toolThreadTs`: the ask is in Figma, so a tool has no Slack
-          // message to thread its own post off. A card's lead is the thread
-          // its ✅ runs in, from the moved record (`./job.ts`).
-          // Public scope, and recorded as a Figma ask.
-          origin: "figma",
-          unmappedAsker: asker.unmappedAsker,
-          figmaFileKey: asker.fileKey,
-        }),
-      ),
-    ...(channel
-      ? {
-          design: {
-            channel,
-            // Named only where it is #plus-design: a DM is no channel to point at.
-            ...(channel === env.PLUS_DESIGN_CHANNEL_ID?.trim() ? { name: "#plus-design" } : {}),
-            async post(text) {
-              const res = await postMessage(env, { channel, text });
-              return res.ok && res.ts ? { ts: res.ts } : null;
-            },
-            permalink: (ts) => getPermalink(env, channel, ts).catch(() => null),
-            cardDelivery: (leadTs, slackId) => slackDelivery(env, { channel, replyTs: leadTs, userMsgTs: leadTs, userId: slackId }),
-            async cardIn(leadTs) {
-              const [bot, thread] = await Promise.all([getBotIdentity(env), conversationsReplies(env, channel, leadTs, 20)]);
-              if (!thread.ok || !bot) throw new Error(`the lead's thread was not read: ${thread.ok ? "no bot identity" : (thread.error ?? "unknown")}`);
-              const card = thread.messages.find((m) => m.ts !== leadTs && ((!!bot.botId && m.bot_id === bot.botId) || m.user === bot.userId));
-              return card?.ts ?? null;
-            },
-            designOwner: (title) => designOwnerOfFile(designOwnerReads(env), title),
-          },
-        }
-      : {}),
+    answer: (request, delivery, asker) => runTurn(request, buildTurnDeps(env, request, figmaTurnWiring(threadState, delivery, asker))),
+    ...(channel ? { channel } : {}),
     now: () => Date.now(),
   };
 }
 
 /**
- * What finding a file's design owner reads, on `Env` — the night's reads
- * (`figma-comments/env.ts`, `sweep/env.ts`): the card by number from the
- * Roadmap, its page's Contributors by name, each name looked up in the Slack
- * directory, and the team's roles.
+ * How a Figma ask's turn is wired: answer-only, at public scope, and
+ * recorded as a Figma ask.
+ *
+ * @param threadState - The store the turn remembers in
+ * @param delivery - The ask's Delivery (`./delivery.ts`)
+ * @param asker - Whether Team Members maps the asker, and the file asked on
  */
-function designOwnerReads(env: Env): DesignOwnerReads {
-  const directory = slackDirectoryFor(env);
+export function figmaTurnWiring(
+  threadState: ThreadState,
+  delivery: Delivery,
+  asker: { unmappedAsker: boolean; fileKey: string },
+): TurnWiring {
   return {
-    async card(number) {
-      const { rows } = await queryRoadmapCards(env, { cardNumber: number });
-      const card = rows.find((r) => r.card_number === number);
-      return card ? { url: card.url } : null;
+    threadState,
+    delivery,
+    // Answer-only: the request carries no pending card, and a verdict that
+    // reaches a Figma turn anyway runs nothing.
+    applyVerdict: async (verdict) => {
+      if (verdict.outcome === "won") console.warn("[figma-ask] a verdict reached a Figma turn; nothing ran");
     },
-    async contributors(url) {
-      const page = await readSource(env, url, "notion");
-      const ids: string[] = [];
-      for (const name of page?.contributors ?? []) {
-        try {
-          const r = JSON.parse(await findSlackUsers(directory, name)) as { ok?: boolean; matches?: { id?: string }[] };
-          const id = r.ok && r.matches?.length === 1 ? r.matches[0]!.id : undefined;
-          if (id) ids.push(id);
-        } catch (err) {
-          rethrowIfBudget(err);
-        }
-      }
-      return ids;
-    },
-    roles: () => teamRolesFor(env),
+    // No `toolThreadTs`: the ask is in Figma, so a tool has no Slack message
+    // to thread its own post off.
+    // Public scope, and recorded as a Figma ask.
+    origin: "figma",
+    unmappedAsker: asker.unmappedAsker,
+    figmaFileKey: asker.fileKey,
   };
 }
 

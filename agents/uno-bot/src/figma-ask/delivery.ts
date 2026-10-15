@@ -11,18 +11,21 @@
 // will carry (`plainAnswer`), so the thread remembers what Figma shows and not
 // the lines the reply cut: anyone on the file reads the thread's next answer.
 //
-// A CARD IS THE ONE THING POSTED MID-TURN, and it goes to Slack, never to
-// Figma: `stage` posts it in #plus-design, where Review decides it. With no
-// `stage` — an asker Team Members does not know, or no #plus-design configured
-// — the card is refused, the turn ends without staging anything, and the
-// reply says why. So nothing an ask in Figma proposes is ever written from
-// Figma.
+// A CARD IS DECLINED, always: a Figma ask is answer-only. The card comes back
+// `declined` (`PostResult.declined`), so the turn stages nothing and ends
+// ANSWERED — on the usage record too, since the person gets a reply — and
+// remembers the lines that reply carries. The reply says what the card would
+// have done (its write's fixed gate verb, never the card's own words, which
+// can name a private repo or page) and where to ask for it instead. So
+// nothing an ask in Figma proposes is ever written, and nothing is posted to
+// Slack.
 //
-// PURE: what posts the card arrives by name.
+// PURE.
 
 import type { TaskCardSource } from "../agent/task-card-readout";
-import { describeCard, describeGateNote, type Delivery, type PostResult, type ProposalCard } from "../turn/index";
-import { plainAnswer } from "./copy";
+import { gateWordsFor } from "../agent/tool-table";
+import { describeGateNote, type Delivery } from "../turn/index";
+import { answerOnlyReply, figmaReplyLines, plainAnswer } from "./copy";
 
 /** The lines of `text` the reply carries, as the thread remembers them. */
 const shown = (text: string): string => plainAnswer(text).lines.join("\n");
@@ -35,21 +38,24 @@ export interface FigmaAskDelivery extends Delivery {
   readonly notes: () => string[];
   /** Every link the turn's lookups read, with what each tool said of who may see it. */
   readonly sources: () => TaskCardSource[];
-  /** Why a card the turn tried to stage did not stage: no way to stage one
-   *  was given, or #plus-design refused the post; null when none was refused. */
-  readonly refusedCard: () => "not-allowed" | "not-posted" | null;
+  /** The card the turn tried to stage, refused: what its approval would do,
+   *  in its first write's fixed gate words (`agent/tool-table.ts`), never
+   *  the card's own, which can name a repo or a page; null when the turn
+   *  tried none. `verb` is empty for a write with no gate words. */
+  readonly refusedCard: () => { verb: string } | null;
 }
 
 /**
  * The Delivery for one ask.
  *
- * @param opts - `stage`, how a card reaches #plus-design; absent, cards are refused
+ * @param opts - `teammate`: whether Team Members maps the asker, for what a
+ *   declined card says
  */
-export function figmaAskDelivery(opts: { stage?: (card: ProposalCard) => Promise<PostResult> } = {}): FigmaAskDelivery {
+export function figmaAskDelivery(opts: { teammate: boolean }): FigmaAskDelivery {
   let answer: string | null = null;
   const notes: string[] = [];
   const sources: TaskCardSource[] = [];
-  let refused: "not-allowed" | "not-posted" | null = null;
+  let refused: { verb: string } | null = null;
   const quiet = async (): Promise<void> => {};
 
   return {
@@ -91,13 +97,11 @@ export function figmaAskDelivery(opts: { stage?: (card: ProposalCard) => Promise
     },
 
     async card(card) {
-      if (!opts.stage) {
-        refused = "not-allowed";
-        return { ok: false, text: describeCard(card) };
-      }
-      const posted = await opts.stage(card);
-      if (!posted.ok || !posted.ts) refused = "not-posted";
-      return posted;
+      const first = card.operations[0]?.toolName;
+      refused = { verb: (first && gateWordsFor(first)?.verb) || "" };
+      // Declined, not failed: the turn ends answered, and remembers the lines
+      // the reply will carry in place of the card.
+      return { ok: true, declined: true, text: figmaReplyLines(answerOnlyReply(opts.teammate, refused.verb)).join("\n") };
     },
   };
 }

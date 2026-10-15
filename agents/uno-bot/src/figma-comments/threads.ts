@@ -20,10 +20,10 @@
 // is never a candidate (#891).
 //
 // WHAT IS LEFT TO @uno. A comment that asks uno-bot something was answered as
-// it was made (#903, `../figma-ask/`), and a change it asked for went to
-// #plus-design as its own card; uno-bot's own replies carry its label. Its
-// replies are never read here, and an ask in a thread still open is not
-// either, so no open ask becomes a second card at night: such a thread is read
+// it was made (#903, `../figma-ask/`), in its own thread and nowhere else;
+// uno-bot's own replies carry its label. Its replies are never read here, and
+// an ask in a thread still open is not either, so no open ask becomes a card
+// at night: such a thread is read
 // by its other replies alone, as an old root is. Once the thread is resolved,
 // an ask in it is read like any other comment — resolving settles it, and a
 // decision worded as an ask to uno-bot is still the team's decision.
