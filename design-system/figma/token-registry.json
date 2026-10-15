@@ -342,7 +342,11 @@
       "Columns/col-6": "var(--col-6)",
       "Columns/col-7": "var(--col-7)",
       "Columns/col-8": "var(--col-8)",
-      "Columns/col-9": "var(--col-9)"
+      "Columns/col-9": "var(--col-9)",
+      "Max Heights/listbox": "var(--layout-max-height-listbox)",
+      "Min Heights/card-body": "var(--layout-min-height-card-body)",
+      "Min Heights/listbox": "var(--layout-min-height-listbox)",
+      "Min Heights/modal-body": "var(--layout-min-height-modal-body)"
     },
     "size / primitive": {
       "Border/Radius/radius-0": "var(--size-border-radius-radius-0)",
@@ -459,12 +463,12 @@
     }
   },
   "validation": {
-    "scssTokenCount": 510,
+    "scssTokenCount": 515,
     "unknownTokens": [],
     "figmaVariableCoverage": {
       "total": 375,
-      "resolved": 347,
-      "percent": 93,
+      "resolved": 351,
+      "percent": 94,
       "unresolved": [
         {
           "collection": "colors / accent",
@@ -639,42 +643,6 @@
             "--viewport-margin",
             "--size-grid-viewport-margin",
             "--size-viewport-margin"
-          ]
-        },
-        {
-          "collection": "size / layout",
-          "figmaVariable": "Max Heights/listbox",
-          "tried": [
-            "--listbox",
-            "--size-max-heights-listbox",
-            "--size-listbox"
-          ]
-        },
-        {
-          "collection": "size / layout",
-          "figmaVariable": "Min Heights/card-body",
-          "tried": [
-            "--card-body",
-            "--size-min-heights-card-body",
-            "--size-card-body"
-          ]
-        },
-        {
-          "collection": "size / layout",
-          "figmaVariable": "Min Heights/listbox",
-          "tried": [
-            "--listbox",
-            "--size-min-heights-listbox",
-            "--size-listbox"
-          ]
-        },
-        {
-          "collection": "size / layout",
-          "figmaVariable": "Min Heights/modal-body",
-          "tried": [
-            "--modal-body",
-            "--size-min-heights-modal-body",
-            "--size-modal-body"
           ]
         },
         {
