@@ -44,8 +44,9 @@ function door() {
 
 /** The one failure post, and its blocks. */
 function failurePost(posting: ReturnType<typeof recordingPosting>): { text: string; blocks: Block[] } {
-  const posts = posting.of("message").filter((m) => m.channel === "C1"); // a capacity alert goes elsewhere
+  const posts = posting.of("message");
   assert.equal(posts.length, 1, "one message, and only one");
+  assert.equal(posts[0]!.channel, "C1", "in the asker's own conversation");
   return { text: posts[0]!.text, blocks: (posts[0]!.blockList ?? []) as Block[] };
 }
 
@@ -107,11 +108,12 @@ describe("the failure post", () => {
     assert.match(text, /Nothing was created or changed/);
   });
 
-  it("over capacity says wait, and still offers Try again", async () => {
+  it("over capacity says so plainly to the asker alone, and still offers Try again", async () => {
     const posting = recordingPosting();
-    await postVisibleFailure(posting.deps(), "C1", "1.000100", "1.000100", new Error("429 quota"), "agent", QUESTION);
+    await postVisibleFailure(posting.deps(), "C1", "1.000100", "1.000100", new Error("gemini 429: quota"), "agent", QUESTION);
+    // failurePost holds it to one message, in C1: no alert goes anywhere else.
     const { blocks } = failurePost(posting);
-    assert.match(String(blocks[0]!.text.text), /^:x: \*.*over capacity.*\*\n.*couple of minutes/is);
+    assert.match(String(blocks[0]!.text.text), /^:x: \*I'm overloaded right now and couldn't answer\.\*\nTry again in a few minutes\.$/);
     assert.equal(blocks.at(-1)!.type, "actions");
   });
 

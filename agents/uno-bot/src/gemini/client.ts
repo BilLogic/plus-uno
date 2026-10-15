@@ -27,6 +27,8 @@ export interface GeminiResult {
   text?: string;
   usage?: { input: number; output: number; thinking: number };
   error?: string;
+  /** The HTTP status of a refused call; absent when the call never went out. */
+  status?: number;
   ms: number;
 }
 
@@ -187,6 +189,7 @@ export async function geminiGenerate(
         ok: false,
         model,
         error: `HTTP ${res.status}: ${data.error?.message ?? "unknown"}`.slice(0, 300),
+        status: res.status,
         ms: Date.now() - started,
       };
     }

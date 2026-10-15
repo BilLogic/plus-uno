@@ -49,11 +49,12 @@ export type FailureStage =
 
 export interface FailureInput {
   stage: FailureStage;
-  /** A 429 / quota / overloaded / 5xx class error. Changes the next step from
-   *  "tell us" to "wait", which is the one case where waiting is right. */
+  /** A 429 / quota / overloaded / 503 class error, with the backup model
+   *  tried. Changes the next step from "tell us" to "wait", which is the one
+   *  case where waiting is right. */
   capacity?: boolean;
-  /** Where to report it. Rendered as a channel mention when it looks like an
-   *  id, otherwise verbatim. */
+  /** Where to report a failure that is not capacity. Rendered as a channel
+   *  mention when it looks like an id, otherwise verbatim. */
   alertChannel?: string;
 }
 
@@ -111,10 +112,13 @@ export function failureMessage(input: FailureInput & { ask?: string }): FailureM
 
   // Capacity is a genuinely different failure and deserves its own words: the
   // blocker is temporary and external, the next step is to wait, and telling
-  // someone to "flag it" for a quota outage wastes their time and ours.
-  const lead = capacity ? "I'm over capacity right now, so I couldn't finish that one." : PROGRESS[stage];
+  // someone to "flag it" for a quota outage wastes their time and ours. It
+  // reaches only here, after the backup model failed too, and it says no
+  // more than that: the lead hears about an outage that lasts in their own DM
+  // (`turn/capacity-outage.ts`), so nobody else is named.
+  const lead = capacity ? "I'm overloaded right now and couldn't answer." : PROGRESS[stage];
   const next = capacity
-    ? "Give it a couple of minutes, then try again; the team already knows."
+    ? "Try again in a few minutes."
     : `${NEXT_STEP[stage]} If it happens twice, say so${where} and someone will look at the logs.`;
   const warning = signed(NOTHING_CHANGED);
 

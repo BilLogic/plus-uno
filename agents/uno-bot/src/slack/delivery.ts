@@ -4,10 +4,9 @@
 //
 // IT TAKES NAMED DEPENDENCIES, the way the stop doors do (`slack/stop-doors.ts`,
 // #593) and the Delivery adapter does (`slack/delivery-adapter.ts`, #594): the
-// Slack posting client, the streaming switch, the alert channel, the throttle
-// store. `Env` never enters — it is turned into that record once, in
-// `slack/slack-delivery.ts` (and `events.ts` for the one failure path that
-// does not go through Delivery). That is what lets the Node suite DRIVE the
+// Slack posting client, the streaming switch, the alert channel. `Env` never
+// enters — it is turned into that record once, in `slack/slack-delivery.ts`
+// (and `events.ts` for the one failure path that does not go through Delivery). That is what lets the Node suite DRIVE the
 // answer path rather than read it (`tests/stream-recipient.test.ts`, #654).
 
 import { decideStream, type StreamRecipient } from "./stream-recipient";
@@ -27,8 +26,10 @@ import { feedbackBlock, type AnswerFeedback } from "./feedback";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
 // exactly how a model-quota outage read as a mystery for an afternoon
-// (2026-07-16). Detect them so the USER gets an honest "over capacity" message
-// and the TEAM gets a throttled alert instead of the failure being invisible.
+// (2026-07-16). Detect them so the asker gets the plain overloaded line rather
+// than a generic one. Nobody else is pinged from here: the backup model takes
+// over quietly, and an outage that lasts reaches the lead in their own DM
+// (`turn/capacity-outage.ts`).
 const CAPACITY_ERR_RE =
   /\b429\b|resource[ _]has[ _]been[ _]exhausted|resource_exhausted|\bquota\b|rate[ -]?limit|too many requests|\b503\b|overloaded|unavailable/i;
 
@@ -37,10 +38,9 @@ export function isCapacityError(err: unknown): boolean {
   return CAPACITY_ERR_RE.test(m);
 }
 
-/** Default alert channel (#uno-bot) — the envelope may override via `UNO_BOT_ALERT_CHANNEL`. */
+/** Default channel a failure tells people to report to (#uno-bot) — the
+ *  envelope may override via `UNO_BOT_ALERT_CHANNEL`. */
 export const DEFAULT_ALERT_CHANNEL = "C0ARJ2A3A69";
-const ALERT_THROTTLE_KEY = "alert:capacity";
-const ALERT_THROTTLE_S = 600; // 10 min — one ping per outage, not per message
 
 /**
  * The Slack calls the posting functions actually make.
@@ -72,12 +72,6 @@ export interface PostingClient {
   ): Promise<boolean>;
 }
 
-/** The throttle store a capacity alert consults, if one is bound. */
-export interface PostingThrottle {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string, opts: { expirationTtl: number }): Promise<void>;
-}
-
 /**
  * What the posting functions need, by name.
  *
@@ -89,39 +83,8 @@ export interface PostingDeps {
   slack: PostingClient;
   /** `SLACK_STREAMING === "on"` — whether a new answer stream may open. */
   streamingOn: boolean;
-  /** Where a capacity outage pings the team. */
+  /** Where a failure that is not capacity tells people to report it. */
   alertChannel: string;
-  /** Best-effort throttle; absent means every capacity failure alerts. */
-  throttle?: PostingThrottle | null;
-}
-
-/**
- * Throttled team alert on a capacity/quota outage. Best-effort: a failure
- * inside here never propagates into the reply path.
- *
- * @param deps named posting dependencies
- * @param err the capacity error, snippeted into the ping
- */
-async function alertCapacity(deps: PostingDeps, err: unknown): Promise<void> {
-  try {
-    const kv = deps.throttle;
-    if (kv) {
-      if (await kv.get(ALERT_THROTTLE_KEY)) return;
-      await kv.put(ALERT_THROTTLE_KEY, String(Date.now()), { expirationTtl: ALERT_THROTTLE_S });
-    }
-    const snippet = (err instanceof Error ? err.message : String(err ?? "")).slice(0, 300);
-    await deps.slack
-      .postMessage({
-        channel: deps.alertChannel,
-        text:
-          ":warning: le goat's replies are failing on model *capacity/quota* — users are getting errors until this clears.\n" +
-          `> ${snippet}\n` +
-          "Check GCP Console → IAM & Admin → Quotas (filter *Vertex AI* + the active model), or point `GEMINI_MODEL` at a model with headroom.",
-      })
-      .catch(() => {});
-  } catch {
-    /* never let alerting break the failure path */
-  }
 }
 
 /**
@@ -134,7 +97,7 @@ async function alertCapacity(deps: PostingDeps, err: unknown): Promise<void> {
  * @param channel conversation the person is in
  * @param threadTs optional: in an agent_view DM there is no thread
  * @param userMsgTs the person's message — what the ❌ lands on
- * @param err so capacity/quota outages surface distinctly
+ * @param err so a capacity/quota outage reads as one
  * @param stage how far the turn got; drives what the message can honestly promise
  * @param ask the question, when it can be asked again: the post offers it
  *   back as Try again
@@ -158,7 +121,6 @@ export async function postVisibleFailure(
   if (!posted.ok && refusedForBlocks(posted)) {
     await deps.slack.postMessage({ channel, thread_ts: threadTs, text: message.text }).catch(() => {});
   }
-  if (capacity) await alertCapacity(deps, err);
 }
 
 // The render — what a reply looks like when it ships — moved to

@@ -28,10 +28,11 @@ test("stages differ — the message says how far it actually got", () => {
   assert.equal(seen.size, STAGES.length);
 });
 
-test("a capacity failure says wait, not report", () => {
-  const msg = buildFailureMessage({ stage: "agent", capacity: true });
-  assert.match(msg, /over capacity/i);
-  assert.match(msg, /couple of minutes/i);
+test("a capacity failure is the plain overloaded line: wait, no detail, nobody else named", () => {
+  const msg = buildFailureMessage({ stage: "agent", capacity: true, alertChannel: "C0ARJ2A3A69" });
+  assert.match(msg, /I'm overloaded right now and couldn't answer\./);
+  assert.match(msg, /Try again in a few minutes\./);
+  assert.doesNotMatch(msg, /<#|<@|team|quota|429/i);
 });
 
 test("an alert channel id renders as a channel mention", () => {

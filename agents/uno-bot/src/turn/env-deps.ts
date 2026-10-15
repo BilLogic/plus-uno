@@ -27,7 +27,8 @@ import { reviewDraft } from "../agent/draft-judge";
 import { runAgent, selectProvider, type AgentResult, type TurnDials } from "../agent/run-agent";
 import type { ToolCall, ToolResultNote } from "../agent/tool-transcript";
 import type { GateRestage, GateVerdict, OperationOutcome } from "../gate/index";
-import { conversationsHistoryBefore, updateMessage } from "../slack/api";
+import { conversationsHistoryBefore, openConversation, postMessage, updateMessage } from "../slack/api";
+import { isCapacityError } from "../slack/delivery";
 import { reportItems } from "../slack/decision-cards";
 import { formatAssistantContext } from "../slack/assistant";
 import { buildNotionBefore, buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
@@ -49,6 +50,9 @@ import {
   testChannelIdsOf,
   usageLogFor,
 } from "../usage/production";
+import { charge } from "../net";
+import { resolveGeminiModel } from "../agent/gemini-tiers";
+import { capacityOutage, OUTAGE_KV_KEY, watchCapacity, type CapacityOutage, type OutageRecord } from "./capacity-outage";
 import type { Delivery } from "./delivery";
 import { restageExecution, type TurnDeps, type TurnRequest } from "./turn";
 
@@ -155,7 +159,10 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
       // false "nothing was fetched" and a different confidence verdict with
       // nothing failing. There is nothing to remember now: the entry opens its
       // own scope, and what it collected is part of what it answers with.
-      const run = await runAgent({
+      // Watched for capacity (#1228): a turn that fails on it with the backup
+      // tried is counted, and the lead hears about an outage that lasts; the
+      // next turn that answers closes it.
+      const run = await watchCapacity(capacityOutageFor(env), isCapacityError, () => runAgent({
         env,
         // Routing already happened, in Turn: the tier travels as an opaque
         // name, and the agent run has no way left to route a second time on
@@ -187,7 +194,7 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
         ...(reporters.onDials ? { onDials: reporters.onDials } : {}),
         ...(reporters.onToolCall ? { onToolCall: reporters.onToolCall } : {}),
         ...(reporters.onToolResult ? { onToolResult: reporters.onToolResult } : {}),
-      });
+      }));
       reporters.onAgentResult?.(run.result);
       return run;
     },
@@ -363,4 +370,45 @@ export function restageFor(
  */
 async function followRestageFor(env: Env, from: PendingProposal, to: PendingProposal): Promise<void> {
   await recordSweepRestageFor(env, from, to);
+}
+
+/** How long the outage record outlives its last write, so a record nobody
+ *  closes cannot linger past a week. */
+const OUTAGE_TTL_S = 7 * 24 * 60 * 60;
+
+/**
+ * The capacity outage on `Env`: one HARNESS_KV key, and a DM to
+ * `LEAD_USER_ID` alone in their DM with uno-bot. No HARNESS_KV keeps nothing
+ * and tells nobody; no lead keeps the record and tells nobody.
+ *
+ * @param env - Worker bindings
+ */
+export function capacityOutageFor(env: Env): CapacityOutage {
+  const kv = env.HARNESS_KV;
+  if (!kv) return { failed: async () => {}, succeeded: async () => {} };
+  // Which adapter answers is `selectProvider`'s to decide (#605); only its
+  // name is read here, to say what is failing.
+  const claude = selectProvider(env).name === "vertex-claude";
+  return capacityOutage({
+    lead: env.LEAD_USER_ID?.trim() || null,
+    models: claude
+      ? `the Claude model (${env.CLAUDE_MODEL ?? "the default"}), which has no backup`
+      : `${resolveGeminiModel("default", env)} and its backup, ${env.GEMINI_FALLBACK_MODEL ?? "gemini-2.5-pro"}`,
+    async read() {
+      charge(1, "kv");
+      return await kv.get<OutageRecord>(OUTAGE_KV_KEY, "json");
+    },
+    async write(record) {
+      charge(1, "kv");
+      if (record) await kv.put(OUTAGE_KV_KEY, JSON.stringify(record), { expirationTtl: OUTAGE_TTL_S });
+      else await kv.delete(OUTAGE_KV_KEY);
+    },
+    async dm(userId, text) {
+      const open = await openConversation(env, userId);
+      if (!open.ok) return { ok: false, error: open.error };
+      const res = await postMessage(env, { channel: open.channel, text });
+      return res.ok ? { ok: true } : { ok: false, error: res.error ?? "post failed" };
+    },
+    now: () => Date.now(),
+  });
 }
