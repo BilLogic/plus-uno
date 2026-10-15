@@ -87,7 +87,7 @@ The atomic hierarchy: Element → Card → Section → Page.
 A full page composition.
 
 **Prompt-spec**:
-The engineered prompt handed to an external generative tool (Stitch, Figma Make, v0): the deliverable of the low/mid-fi lane, not the artifact the tool returns. Distinct from **Spec** and from the **PRD** it is written from.
+The engineered prompt handed to an external generative tool (Stitch, Figma Make, v0), the low/mid-fi lane's deliverable rather than what the tool returns. Not a **Spec** or the **PRD** it comes from.
 _Avoid_: bare "spec"
 
 **Component docs page**:
@@ -115,7 +115,7 @@ The design-system source of truth (stories + MDX → /storybook).
 _Avoid_: "the docs site"
 
 **Decisions DB**:
-The centralized decision log under Design HQ: Status / Owner / Sign-off / Date / Roadmap Card / Evidence.
+The centralized decision log under Design HQ, one row per decision.
 _Avoid_: "Decision Log" (obsolete per-project subpage)
 
 **pillar**:
@@ -139,12 +139,12 @@ _Avoid_: "Slackbot"
 uno-bot's own always-loaded document: voice, audience, gate and etiquette, beside what every embodiment obeys.
 _Avoid_: "system prompt", "soul"
 
-**proposal card**:
-The ⚠️ card holding a side-effect tool call until someone approves it: short in the thread, decided in its Review pop-up.
-_Avoid_: "confirmation dialog", "prompt"
+**proposal card** / **Review pop-up**:
+The ⚠️ card holding a side-effect tool call until someone approves it: short in the thread, decided in its Review pop-up (Approve · Needs changes · Reject).
+_Avoid_: "confirmation dialog", "prompt", bare "card" where a Roadmap card could be meant
 
 **superseded card**:
-A proposal card retired by a revision staged later in the same thread, or the moment a turn commits to writing one: it executes nothing and answers that it was replaced. Expired is different: the card's TTL ran out.
+A proposal card retired by a later revision in the same thread: it executes nothing and answers that it was replaced. Expired is different: the card's TTL ran out.
 _Avoid_: "expired card"
 
 **sweep**:
@@ -159,23 +159,26 @@ _Avoid_: "proactive DM", "outreach"
 A change request, routed by the `file-a-ticket` bot skill: implementation in a listed repo → that repo's GitHub issue; product or design, a live PLUS app bug included → a Roadmap card.
 _Avoid_: "ticket"
 
+**standing confirmers**:
+Who may decide any card that names its confirmers, except in someone's own DM (`STANDING_CONFIRMER_IDS`).
+
 **decision card**:
 The Slack shape a **scheduled action** reports on: a parent line, then one card per item with Review and Open, each item its own **proposal card**.
 
 **lead**:
-The design team's lead (Bill today): makes product-direction calls and is the deployment's standing confirmer. Distinct from **Lead Tutor**.
+The design team's lead (Bill today): makes product-direction calls. Distinct from **Lead Tutor**.
 _Avoid_: "GOAT", "admin"
 
 **agent session**:
 The Slack object a uno-bot conversation runs inside, moving through `active` · `processing` · `suspended` · `closed`; it replaces Slack's deprecated assistant threads.
-_Avoid_: "assistant thread", "the panel thread"
+_Avoid_: "assistant thread", "the panel thread", bare "session" (a **Session** is tutoring)
 
 **working signal**:
-What tells a person a turn is in flight: the **agent session** shown as processing from the start of the work until the turn settles, on every exit. Posting the answer does not take it down.
-_Avoid_: "the thinking indicator", "the status line" (the status is what Slack is told; the signal is what the person sees)
+What tells a person a turn is in flight: the **agent session** shown as processing until the turn settles, on every exit, not when the answer posts.
+_Avoid_: "the thinking indicator", "the status line"
 
 **checklist**:
-The Slack plan a person watches while a turn's lookups run: a **task card** per run of like lookups or per routing choice, the answer posted beneath. A task card is neither a Roadmap card nor a **proposal card**: it approves nothing.
+The Slack plan a person watches while a turn's lookups run: a **task card** per run of like lookups or routing choice, the answer beneath. A task card approves nothing.
 _Avoid_: "plan stream", "progress surface", "steps"
 
 **result table**:
@@ -183,11 +186,11 @@ The sortable table beneath an answer, filled by code from one lookup's rows on f
 _Avoid_: "card table", "data table"
 
 **source** / **Sources box**:
-A **source** is a link a lookup of the same turn returned, which an answer stands on; the **Sources box** lists them beneath the answer in Slack, and is a single `Source:` line in Figma.
+A **source** is a link a lookup of the same turn returned that an answer stands on; the **Sources box** lists them beneath it in Slack, a single `Source:` line in Figma.
 _Avoid_: "citation", "reference", "Sources:" line in the answer text
 
 **Capture** / **Reconcile** / **Follow through**:
-The three families of unprompted work: was it written down, do the sources agree, did it get done. DM Capture is the opt-in switch that adds a person's own DMs; uno-maintain's knowledge capture is a different thing.
+The three families of unprompted work: was it written down, do the sources agree, did it get done. DM Capture is the opt-in switch that adds a person's own DMs; not uno-maintain's knowledge capture.
 
 **DS precedence**:
 The order Reconcile settles a design-system disagreement by (`AGENTS.md` § Conventions), and its weekly check of code against the Figma library.
@@ -205,7 +208,7 @@ uno-bot's D1 database `uno-bot-usage`; each published number is a saved query in
 A turn is "every message the bot answered, follow-ups included"; an ask is "a turn whose own message opened a thread" (`usage/load-on-lead.sql:10-12`).
 
 **escalated to the lead**:
-"escalated_to_lead = 1" (`usage/load-on-lead.sql:4`): the lead answered in the thread or in a DM on its topic, so the count "leans HIGH" (`:20-21`). Not an **Escalation**.
+"escalated_to_lead = 1" (`usage/load-on-lead.sql:4`): the lead answered in thread or by DM on its topic, so the count "leans HIGH" (`:20-21`). Not an **Escalation**.
 
 **settled**:
 "escalated_to_lead known" after the end-of-day pass (`usage/self-serve-rate.sql:15`); the rest are `pending`.
@@ -218,13 +221,16 @@ _Avoid_: "deflected"
 "✅ on a card whose staged row names the card it revised", or whose Review pop-up edits changed it (`usage/proposal-outcomes.sql:10-13`).
 
 **test traffic**:
-`test_traffic = 1`, set by `isTestTraffic` (`agents/uno-bot/src/usage/record.ts:96`): a sandbox or debug turn, or a greeting; every query "Excludes: test traffic" (`usage/self-serve-rate.sql:35`).
+`test_traffic = 1` (`agents/uno-bot/src/usage/record.ts:96`): a sandbox or debug turn, or a greeting. Every query excludes it (`usage/self-serve-rate.sql:35`).
 
 **measurement window**:
 "2026-09-01 to 2027-01-01, the measurement window" (`usage/load-on-lead.sql:34`), closing at about 100 real asks: `docs/engineering/measurement-window.md`.
 
 **housekeeping**:
-For asks to uno-bot, pain_category 1–5 and 7 (`usage/load-on-lead.sql:27`); for the lead's inbox, any `what_it_took` but "Needs the lead's judgment" (`agents/uno-bot/measurement/housekeeping-sort/prompt.md`).
+For asks to uno-bot, pain_category 1–5 and 7 (`usage/load-on-lead.sql:27`); for the lead's inbox, any **What it took** but "Needs the lead's judgment" (`agents/uno-bot/measurement/housekeeping-sort/prompt.md`).
+
+**What it took**:
+The inbox sort's call on a request: "Could be looked up", "Needs prep, then a person" or "Needs the lead's judgment".
 
 **Asks corpus**:
 The Notion database of 2,413 asks to the lead that the housekeeping baseline was counted from (`agents/uno-bot/measurement/housekeeping-sort/lib.mjs:13,19`).
@@ -237,7 +243,7 @@ The design agent, in every embodiment.
 _Avoid_: "the AI"
 
 **embodiment**:
-A runtime uno runs in (the IDE, the uno-bot Worker, headless GitHub Actions), each with its own powers and its own slice of the harness.
+A runtime uno runs in (the IDE, the uno-bot Worker, headless GitHub Actions), each with its own powers and slice of the harness.
 _Avoid_: "mode", "environment"
 
 **uno skill**:
