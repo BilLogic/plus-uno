@@ -38,6 +38,7 @@ export {
   MATCH_JOBS,
   matchShipped,
   postOverflow,
+  replanRows,
   REVISION_CARD_TTL_MS,
   revisionSection,
   runShippedRevisions,

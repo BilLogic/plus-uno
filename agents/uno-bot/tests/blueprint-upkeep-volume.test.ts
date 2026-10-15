@@ -25,10 +25,12 @@ import {
   matchShipped,
   postOverflow,
   redraftRevision,
+  replanRows,
   revisionSection,
   serviceChangeGate,
   UPKEEP_SECTION,
   type PathToday,
+  type PlannedRows,
   type RevisionHanded,
   type RevisionThread,
   type RevisionThreads,
@@ -306,33 +308,40 @@ describe("what a draft could not verify", () => {
   });
 });
 
+/** What a redraft is wired to, over a morning's store: the reply's ports,
+ *  the message edits it made, and the model it drafts with. */
+function redraftKit(w: ReturnType<typeof world>, m: Awaited<ReturnType<typeof morning>>, grind: () => string) {
+  const edits: Array<{ channel: string; ts: string; text: string }> = [];
+  const redraftModel = model({ grind });
+  const deps = {
+    threads: m.threads,
+    card: async (key: string) => {
+      const found = await m.threadState.getProposalByTs(key);
+      return found.state === "found" ? found.proposal : null;
+    },
+    readPath: (cellId: string) => w.deps.readPath(cellId),
+    provider: redraftModel.provider,
+    reports: m.threadState,
+    edit: async (channel: string, ts: string, message: { text: string }) => void edits.push({ channel, ts, text: message.text }),
+    post: async (channel: string, threadTs: string, text: string) => void m.lines.push({ channel, threadTs, text }),
+    stage: m.stage,
+    restore: async (p: PendingProposal) => void (await m.threadState.putProposal(p)),
+    retire: async (ts: string) => void (await m.threadState.retireProposal(ts)),
+    clearRevising: (ts: string) => m.threadState.clearRevising(ts),
+    superseded: async () => {},
+    replan: (record: PlannedRows) => replanRows(w.state.store, record),
+    now: () => NOW,
+  };
+  const reply = (user: string, text: string) => ({ channel: TEAM, threadTs: m.posts[0]!.ts, user, text, mentionsBot: false });
+  return { deps, edits, reply, redraftModel };
+}
+
 describe("a reply in the card's thread", () => {
   async function upAndRunning(paths = 1) {
     const w = world({ cards: () => [card(1)], rows: () => rowsFor(paths) });
     await endOfDay(w, DATE);
     const m = await morning(w.state);
-    const edits: Array<{ channel: string; ts: string; text: string }> = [];
-    const redraftModel = model({ grind: () => draftReply("Tutor confirms the swap; the supervisor gets an email") });
-    const deps = {
-      threads: m.threads,
-      card: async (key: string) => {
-        const found = await m.threadState.getProposalByTs(key);
-        return found.state === "found" ? found.proposal : null;
-      },
-      readPath: async (cellId: string) => pathOfCell(cellId),
-      provider: redraftModel.provider,
-      reports: m.threadState,
-      edit: async (channel: string, ts: string, message: { text: string }) => void edits.push({ channel, ts, text: message.text }),
-      post: async (channel: string, threadTs: string, text: string) => void m.lines.push({ channel, threadTs, text }),
-      stage: m.stage,
-      restore: async (p: PendingProposal) => void (await m.threadState.putProposal(p)),
-      retire: async (ts: string) => void (await m.threadState.retireProposal(ts)),
-      clearRevising: (ts: string) => m.threadState.clearRevising(ts),
-      superseded: async () => {},
-      now: () => NOW,
-    };
-    const reply = (user: string, text: string) => ({ channel: TEAM, threadTs: m.posts[0]!.ts, user, text, mentionsBot: false });
-    return { m, deps, edits, reply, redraftModel };
+    return { m, ...redraftKit(w, m, () => draftReply("Tutor confirms the swap; the supervisor gets an email")) };
   }
 
   it("from the owner redrafts that card's revision on the same card", async () => {
@@ -407,5 +416,58 @@ describe("a card weighed once", () => {
     await endOfDay(w, "2026-10-17");
     assert.equal(w.state.b.value.waiting.length, 0, "nothing drafted");
     assert.equal(w.ai.asked.length, asked, "not judged or drafted again");
+  });
+});
+
+describe("a design hand-off redrafted in its thread", () => {
+  it("is promoted at its deploy as redrafted: the rows its Approve wrote", async () => {
+    let stage: ShippedCard["stage"] = "designed";
+    const w = world({ cards: () => [card(1, { stage })], rows: () => rowsFor(1) });
+    let blueprint = path(1);
+    w.deps.readPath = async () => structuredClone(blueprint);
+
+    // The hand-off drafts a tutor row at Approve swap; its owner corrects it.
+    await endOfDay(w, DATE);
+    const m = await morning(w.state);
+    const redrafted = "Supervisor is emailed about the request";
+    const kit = redraftKit(w, m, () =>
+      JSON.stringify({
+        rows: [
+          { change: "added", step_id: "step-request", lane_id: "lane-sup", content: redrafted },
+          { change: "deprecated", step_id: "step-approve", lane_id: "lane-sup" },
+        ],
+        confidence: 0.8,
+        gaps: [],
+      }),
+    );
+    assert.equal(await redraftRevision(kit.deps, kit.reply(OWNER, "It's the supervisor who's emailed, at the request.")), true);
+
+    // ✅ on the redrafted card writes its rows, as the writer would.
+    const approved = m.staged.at(-1)!;
+    type Row = { stepId: string; laneId: string; content: string; to: PathToday["status"] };
+    for (const row of approved.input.rows as Row[]) {
+      blueprint = {
+        ...blueprint,
+        cells: [
+          ...blueprint.cells.filter((c) => !(c.stepId === row.stepId && c.laneId === row.laneId)),
+          { id: `w-${row.stepId}-${row.laneId}`, stepId: row.stepId, laneId: row.laneId, content: row.content, status: row.to },
+        ],
+      };
+    }
+
+    // The card deploys: its promotion lists the redrafted rows, nothing of the first draft.
+    stage = "deployed";
+    const asked = w.ai.asked.length;
+    await endOfDay(w, "2026-10-17");
+    assert.equal(w.ai.asked.length, asked, "a promotion: no judgement, no draft");
+    const promoted = (await morning(w.state)).staged;
+    assert.equal(promoted.length, 1);
+    assert.deepEqual(
+      (promoted[0]!.input.rows as Array<Row & { from: string | null }>).map((r) => [r.stepId, r.laneId, r.from, r.to, r.content]),
+      [
+        ["step-request", "lane-sup", "planned", "live", redrafted],
+        ["step-approve", "lane-sup", "live", "deprecated", "Supervisor approves the swap"],
+      ],
+    );
   });
 });

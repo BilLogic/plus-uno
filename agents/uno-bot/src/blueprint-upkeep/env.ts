@@ -68,6 +68,7 @@ import {
   handOverRevisions,
   matchShipped,
   postOverflow,
+  replanRows,
   revisionSection,
   UPKEEP_SECTION,
   type RevisionHanded,
@@ -398,6 +399,7 @@ export async function handleRevisionReplyOnEnv(env: Env, event: SlackMessageEven
       },
       clearRevising: (ts) => store.clearRevising(ts),
       superseded: (tss) => recordProposalEvents(events, supersededEvents(tss, Date.now(), "worker")),
+      replan: (record) => replanRows(stateFor(env), record),
       now: () => Date.now(),
     },
     {

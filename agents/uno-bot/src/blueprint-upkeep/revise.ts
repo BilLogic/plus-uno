@@ -30,7 +30,7 @@ import { replaceItem, type ReportMessage, type ReportStore } from "../slack/deci
 import type { ModelProvider } from "../agent/model-provider";
 import { draftRevision, type PathToday } from "./draft";
 import { gapAskText, revisionItem, revisionTitle } from "./card";
-import { holdDeprecations } from "./stages";
+import { holdDeprecations, type PlannedRows } from "./stages";
 import { stagedRevision, type RevisionThread, type RevisionThreadCard, type RevisionThreads } from "./job";
 
 export interface RedraftDeps {
@@ -50,6 +50,9 @@ export interface RedraftDeps {
   retire(proposalTs: string): Promise<void>;
   clearRevising(proposalTs: string): Promise<void>;
   superseded(proposalTs: readonly string[]): Promise<void>;
+  /** Keep a design hand-off's redrafted rows for its deploy to promote, in
+   *  place of the card and path's earlier record (`replanRows`). */
+  replan(record: PlannedRows): Promise<void>;
   now(): number;
 }
 
@@ -142,6 +145,7 @@ async function redraft(
   };
 
   let next: typeof r | null = null;
+  let deprecate: PlannedRows["deprecate"] = [];
   try {
     const today = (r.cellId ? await deps.readPath(r.cellId) : null) ?? r.today;
     const draft = await draftRevision(deps.provider, {
@@ -152,8 +156,9 @@ async function redraft(
       correction: { text: wording, previous: r.draft.changes },
     });
     // A design hand-off's deprecations wait for its deploy, as on the first draft.
-    const held = draft && r.target === "planned" ? holdDeprecations(draft).draft : draft;
-    if (held) next = { ...r, today, draft: held };
+    const held = draft && r.target === "planned" ? holdDeprecations(draft) : { draft, deprecate: [] };
+    if (held.draft) next = { ...r, today, draft: held.draft };
+    deprecate = held.deprecate;
   } catch (err) {
     rethrowIfBudget(err);
     console.warn(`[blueprint-upkeep] ${label} not redrafted: ${err instanceof Error ? err.message : String(err)}`);
@@ -195,6 +200,12 @@ async function redraft(
         ? `That redraft of ${card.n}. *${label}* didn't go through, so the card before it still stands.`
         : `That redraft of ${card.n}. *${label}* didn't go through, and the card before it couldn't be put back, so it has no live card.`,
     );
+  }
+  // A design hand-off's rows, as its deploy will promote them: the redraft's,
+  // which are what an Approve on this card writes.
+  if (next.target === "planned" && next.cellId) {
+    const rows = next.draft.revision.rows.map(({ stepId, laneId }) => ({ stepId, laneId }));
+    await deps.replan({ pageId: next.source.pageId, cellId: next.cellId, quote: next.source.quote, rows, deprecate });
   }
   await deps.threads.write({
     ...thread,

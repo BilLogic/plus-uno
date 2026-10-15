@@ -704,6 +704,20 @@ export async function postOverflow(deps: OverflowDeps, opts: { dryRun?: boolean 
   return { summary: `put ${posted.size} revision card(s) in ${threads} morning thread(s)${held.size ? `; ${held.size} wait for the next morning` : ""}` };
 }
 
+/**
+ * A design hand-off's rows kept anew after a redraft: the card and path's
+ * earlier record (same page, same matched cell) gives way, so the deploy
+ * promotes what an Approve on the redrafted card wrote.
+ *
+ * @param state - The job's store
+ * @param record - The redraft's rows and held deprecations
+ */
+export async function replanRows(state: Store<UpkeepState>, record: PlannedRows): Promise<void> {
+  const s = settled(await state.read());
+  const others = s.planned.filter((p) => !(p.pageId === record.pageId && p.cellId === record.cellId));
+  await state.write({ ...s, planned: [...others, record].slice(-PLANNED_KEPT) });
+}
+
 /** A revision card's line for a turn that would revise it: its thread revises it. */
 export const REVISION_REDRAFT_POINTER =
   "To change this blueprint revision, its owner or Bill replies in this thread with what's wrong, starting with the card's number when there are several — uno-bot redrafts it on the same card.";
