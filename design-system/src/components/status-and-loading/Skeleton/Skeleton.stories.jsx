@@ -23,7 +23,7 @@ import Skeleton, { SKELETON_PRESETS, SKELETON_RADII, SKELETON_SHAPES } from './S
 /**
  * Whether this is the Storybook test runner (Vitest Browser Mode). Two signals
  * must agree: Vite's `test` mode, and Vitest's own browser marker
- * (`window.__vitest_browser__`, private, checked against Vitest 4.1.11). Plain
+ * (`window.__vitest_browser__`, private, checked against Vitest 5.0.4). Plain
  * Storybook has neither. If only one is present — `vitest --mode other`, or a
  * Vitest upgrade that drops the marker — this throws, so the ReducedMotion
  * story fails instead of skipping silently.
@@ -46,7 +46,7 @@ const inTestRunner = () => {
  * Playwright's `page.emulateMedia`. `null` restores no preference.
  *
  * THIS USES A PRIVATE API. `window.__vitest_browser_runner__.commands` is
- * Vitest's internal handle, checked against Vitest 4.1.11. The documented
+ * Vitest's internal handle, checked against Vitest 5.0.4. The documented
  * route, `import { commands } from 'vitest/browser'`, cannot be used here: that
  * module throws when loaded outside Browser Mode, and this file also loads in
  * plain Storybook. If a Vitest upgrade moves the handle, the ReducedMotion

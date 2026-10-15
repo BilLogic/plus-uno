@@ -200,12 +200,14 @@ export default defineConfig({
               }
             }
           },
-          // Vitest replaces config arrays rather than merging them, so naming a
-          // setup file here deletes the ones @storybook/addon-vitest injects from
-          // its own `config()` hook. The addon then re-adds a browser setup file
-          // later, from `configureVitest`, against a different config object — and
-          // the project ends up with a setup graph assembled across two phases.
-          // Name the addon's entry explicitly so the list is whole and ordered.
+          // Name the addon's entry explicitly so the list is whole and ordered
+          // whatever Vitest's array-merge rules are. Vitest 4 replaced config
+          // arrays, so naming only our file deleted the ones
+          // @storybook/addon-vitest injects from its own `config()` hook (the
+          // addon then re-added a browser setup file later, from
+          // `configureVitest`, against a different config object). Vitest 5
+          // appends inherited arrays instead; on 5.0.4 the resolved project list
+          // is exactly these two, in this order, once each.
           //
           // Storybook prints an info box offering to let you delete
           // .storybook/vitest.setup.ts, on the grounds that since 10.3 the addon

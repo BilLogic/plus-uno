@@ -1,14 +1,12 @@
 name: vitest 5 watch
 
-# vitest 5 is held back by two plugins whose peer range stops at 4 (the ignore
-# entries in .github/dependabot.yml say which and why). Each side of the repo
-# waits on one of them and can move on its own:
+# vitest 5 is held back on one side of the repo by a plugin whose peer range
+# stops at 4 (the ignore entry in .github/dependabot.yml says why):
 #
-#   /               @storybook/addon-vitest          (the Storybook gate)
 #   /agents/uno-bot @cloudflare/vitest-pool-workers  (test:workerd)
 #
-# Weekly, this reads each plugin's latest stable peer range from the registry
-# and, once one accepts vitest 5, files a needs-triage issue for that side —
+# Weekly, this reads the plugin's latest stable peer range from the registry
+# and, once it accepts vitest 5, files a needs-triage issue for that side —
 # once; an open issue with the same title stops a second. The upgrade itself
 # is that issue's work, including removing the matching ignore entry.
 # Spot-run: `gh workflow run vitest-5-watch.yml`.
@@ -53,5 +51,4 @@ jobs:
               "" \
               "Filed by .github/workflows/vitest-5-watch.yml.")"
           }
-          check "/" "@storybook/addon-vitest"
           check "/agents/uno-bot" "@cloudflare/vitest-pool-workers"

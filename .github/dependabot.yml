@@ -47,14 +47,6 @@ updates:
       # scripts/check-deps.mjs). Two Bootstraps have to become one first.
       - dependency-name: bootstrap
         update-types: [version-update:semver-major]
-      # vitest 5 waits on the Storybook vitest addon: 10.6 peers vitest ^3 || ^4,
-      # and only the 11 alpha takes 5. Forcing it past the peer range breaks
-      # the Storybook gate. vitest-5-watch.yml files an issue when a stable
-      # addon accepts 5; drop this entry in that PR.
-      - dependency-name: vitest
-        update-types: [version-update:semver-major]
-      - dependency-name: "@vitest/*"
-        update-types: [version-update:semver-major]
 
   # ── The Cloudflare Worker, which has its own manifest and its own runtime ──
   - package-ecosystem: npm

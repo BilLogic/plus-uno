@@ -9,9 +9,11 @@
  *   1. `optimizeDeps.include` pins the setup graph, so the first optimise pass is
  *      the only one. `axe-core` is the load-bearing entry — addon-a11y reaches it
  *      through a dynamic `import("axe-core")` that no static scan can see.
- *   2. `setupFiles` names the addon's internal setup file alongside ours. Vitest
- *      replaces config arrays rather than merging them, so listing only our file
- *      deletes the ones @storybook/addon-vitest injects.
+ *   2. `setupFiles` names the addon's internal setup file alongside ours, so the
+ *      list is whole and ordered whatever Vitest's array-merge rules are: Vitest
+ *      4 replaced config arrays, which made listing only our file delete the
+ *      addon's, and Vitest 5 appends inherited ones. On 5.0.4 the resolved
+ *      project list is exactly these two, in this order, once each.
  *
  * Our own setup file must stay, despite Storybook's info box offering to remove
  * it: without a local `setProjectAnnotations` the addon loads
