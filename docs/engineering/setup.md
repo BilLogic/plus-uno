@@ -260,6 +260,10 @@ headless chromium, any `play` block executed, axe run over the result
 needs `npm ci` and a Playwright browser and takes ~130s; `check:harness` needs
 neither and takes ~14s, and merging them would make the fast answer slow.
 
+The same workflow runs the design system's unit suite, `npm run
+test:design-system` (vitest on jsdom, no browser), as its own `design-system`
+job; its row's `reason` in `scripts/checks.registry.mjs` says why it lives there.
+
 Two kinds of failure, two mechanisms:
 
 - **`play` functions and render errors block outright.** There are none failing

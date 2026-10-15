@@ -1,12 +1,13 @@
-# @tutors.plus/design-system
+# PLUS Design System
 
-PLUS Design System package for Figma Make and React applications.
+The PLUS component library, consumed inside this repository by Storybook and
+the prototypes. It is private and unpublished (ADR-006).
 
 ## Installation
 
-```bash
-npm install @tutors.plus/design-system react-bootstrap
-```
+Run `npm ci` at the repository root. That one install carries everything the
+design system and its tests import; `design-system/package.json` holds only its
+scripts and peer ranges. Run the suite with `npm run test:design-system`.
 
 ## Setup (CDN Resources)
 
@@ -28,8 +29,8 @@ Add these to your `index.html` `<head>`:
 ## Usage
 
 ```jsx
-import '@tutors.plus/design-system/styles';
-import { Button, Alert, Badge, Accordion, Breadcrumb } from '@tutors.plus/design-system';
+import '@/styles/main.scss';
+import { Button, Alert, Badge, Accordion, Breadcrumb } from '@/components';
 
 function App() {
   return (
