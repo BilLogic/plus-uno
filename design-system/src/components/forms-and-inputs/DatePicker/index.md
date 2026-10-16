@@ -3,13 +3,13 @@
 
 # DatePicker
 
-Date picker (Figma Forms · Date & Time Picker · Month Date Picker). Trigger is a form control with calendar-day trailing icon — distinct from Select's caret. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: DatePicker has no `label` prop, so that is how a caller names it.
+Built from the shared parts: the field is `_Field` with the calendar icon in Trailing, and the calendar is the shared `Calendar` on the `_Listbox` surface, which DateAndTimePicker opens too. - **Typing:** the field takes MM/DD/YYYY (and, with `range`, two dates joined by a dash). It is checked when you press Enter or leave the field: a real day inside `minDate`…`maxDate` is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Range:** the first click sets the first day, the second the last; a click before the first day starts again. `onChange` receives `[start, end]`. - **Popup:** opens 4px (`--size-element-gap-xs`) below the field, left-aligned (or as `calendarAlign` asks), and flips above with the same gap when there is no room below. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: DatePicker has no `label` prop, so that is how a caller names it.
 
 **Import:** `import { DatePicker } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Sizes, InteractionStates, PickDate, PickRange, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Sizes, InteractionStates, PickDate, PickRange, Bounds, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx`
 
@@ -19,15 +19,18 @@ Date picker (Figma Forms · Date & Time Picker · Month Date Picker). Trigger is
 |------|------|---------|-------------|
 | `id` | string | — | — |
 | `name` | string | — | — |
-| `placeholder` | string | `'MM/DD/YYYY'` | Placeholder text |
-| `value` | string | — | — |
+| `placeholder` | string | — | Placeholder text |
+| `value` | string or arrayOf | — | ISO `YYYY-MM-DD`; with `range`, `[start, end]`, either end may be null. |
+| `range` | bool | `false` | Pick a first and a last day |
 | `size` | enum | `'medium'` | Size variant |
 | `disabled` | bool | `false` | Disable the picker |
 | `readOnly` | bool | `false` | Make read-only |
+| `invalid` | bool | `false` | Draw the field invalid |
+| `valid` | bool | `false` | Draw the field valid |
 | `minDate` | string or instanceOf | — | Optional minimum allowed date |
 | `maxDate` | string or instanceOf | — | Optional maximum allowed date |
 | `calendarAlign` | enum | `'left'` | Calendar dropdown alignment |
-| `onChange` | func | — | — |
+| `onChange` | func | — | `(iso)`, or `([start, end])` with `range`; '' or nulls when cleared. |
 | `onFocus` | func | — | — |
 | `onBlur` | func | — | — |
 | `className` | string | `''` | — |
@@ -43,7 +46,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-disabled-opacity` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-text` · `--color-surface` · `--color-surface-container-high` · `--font-family-body` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body2` · `--font-size-body3` · `--font-size-fa-body2-solid` · `--font-weight-normal` · `--font-weight-semibold-1` · `--size-border-radius-radius-50` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-sm` · `--size-element-stroke-lg` · `--size-element-stroke-sm` · `--size-modal-radius-sm`
+`--color-on-surface-variant`
 
 From `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.scss`. Override these through the token layer, never with a literal.
 

@@ -862,20 +862,24 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "month-date-picker",
-            "name": "Month (Date Picker)",
-            "componentSetNodeId": "13574:1150",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13574-1150",
-            "source": "node-chart",
-            "status": "verified"
+            "id": "date-and-time-picker",
+            "name": "DateAndTimePicker",
+            "componentSetNodeId": "18804:38420",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18804-38420",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "A date field and a `_Time Field` side by side with the time-zone caption beneath: state closed · date open · time open · read-only · disabled × validation none · invalid · success × filled? × size. The calendar is the shared `_Calendar` DatePicker opens, 4px (`gap-xs`) below the date field, left-aligned, flipping above. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
           },
           {
-            "id": "time-date-picker",
-            "name": "Time (Date Picker)",
+            "id": "time-field",
+            "name": "_Time Field",
             "componentSetNodeId": "16560:4508",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508",
-            "source": "node-chart",
-            "status": "verified"
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "The time half, state × filled? × size: hours, minutes and the AM/PM menu, which opens 4px (`gap-xs`) below. In code it lives inside `DateAndTimePicker.jsx`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
@@ -894,40 +898,37 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "date-time-picker",
-            "name": "Date & Time Picker",
-            "componentSetNodeId": "13549:6703",
-            "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703",
-            "source": "manual",
-            "status": "verified"
-          },
-          {
-            "id": "month-date-picker",
-            "name": "Month (Date Picker)",
+            "id": "date-picker",
+            "name": "DatePicker",
             "componentSetNodeId": "13574:1150",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13574-1150",
             "source": "manual",
-            "status": "verified"
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "state closed · open · invalid · valid · read-only · disabled × filled? × range? × size. A `_Field` trigger with the calendar-day icon in Trailing; the open variants show `_Calendar` in `_Listbox` Body, 4px (`gap-xs`) below the field, left-aligned, flipping above when there is no room. `range` and `size` are the code props of the same names. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
           },
           {
-            "id": "date-picker-single-date",
-            "name": "Date Picker (Single Date)",
-            "componentSetNodeId": "9413:1764",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9413-1764",
-            "source": "node-chart",
-            "status": "verified"
+            "id": "calendar",
+            "name": "_Calendar",
+            "componentSetNodeId": "18819:40157",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18819-40157",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "The month grid both pickers open, one variant per size. In code it is `_internal/Calendar.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
           },
           {
-            "id": "date-picker-range",
-            "name": "Date Picker (Range)",
-            "componentSetNodeId": "9538:17087",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9538-17087",
-            "source": "node-chart",
-            "status": "verified"
+            "id": "calendar-day",
+            "name": "_Calendar Day",
+            "componentSetNodeId": "9413:1755",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9413-1755",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "One day cell: default, hover, selected, disabled, today, in range and outside the month, at three sizes. In code it is the day button inside `_internal/Calendar.jsx`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9279-4480"
       }
     },
     "Divider": {

@@ -50,17 +50,19 @@ DaysAnnounceTheirDate.play = async ({ canvasElement }) => {
     // rather than living in a header nothing reads alongside it. The exact
     // wording is the locale's — `toLocaleDateString` — so the assertion matches
     // loosely rather than pinning a format this component does not choose.
-    const seventeenth = await waitFor(() => canvas.getByRole('button', { name: /August 17, 2026/ }));
+    // The calendar renders in a portal on the page, outside the canvas.
+    const page = within(document.body);
+    const seventeenth = await waitFor(() => page.getByRole('button', { name: /August 17, 2026/ }));
     await expect(seventeenth).toBeTruthy();
 
     // Which day is chosen is in the tree, not only in the fill colour.
     await expect(seventeenth.getAttribute('aria-pressed')).toBe('true');
 
-    const pressed = canvas.getAllByRole('button')
+    const pressed = page.getAllByRole('button')
         .filter((button) => button.getAttribute('aria-pressed') === 'true');
     await expect(pressed).toHaveLength(1);
 
     // A different day is a day, and is not the chosen one.
-    const eighteenth = canvas.getByRole('button', { name: /August 18, 2026/ });
+    const eighteenth = page.getByRole('button', { name: /August 18, 2026/ });
     await expect(eighteenth.getAttribute('aria-pressed')).toBe('false');
 };

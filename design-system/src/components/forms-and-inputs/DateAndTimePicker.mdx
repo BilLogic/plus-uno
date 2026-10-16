@@ -8,20 +8,24 @@ export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
   "sets": [
     {
-      "id": "month-date-picker",
-      "name": "Month (Date Picker)",
-      "componentSetNodeId": "13574:1150",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13574-1150",
-      "source": "node-chart",
-      "status": "verified"
+      "id": "date-and-time-picker",
+      "name": "DateAndTimePicker",
+      "componentSetNodeId": "18804:38420",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18804-38420",
+      "source": "manual",
+      "status": "unpublished",
+      "isComponentSet": true,
+      "notes": "A date field and a `_Time Field` side by side with the time-zone caption beneath: state closed · date open · time open · read-only · disabled × validation none · invalid · success × filled? × size. The calendar is the shared `_Calendar` DatePicker opens, 4px (`gap-xs`) below the date field, left-aligned, flipping above. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
     },
     {
-      "id": "time-date-picker",
-      "name": "Time (Date Picker)",
+      "id": "time-field",
+      "name": "_Time Field",
       "componentSetNodeId": "16560:4508",
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508",
-      "source": "node-chart",
-      "status": "verified"
+      "source": "manual",
+      "status": "unpublished",
+      "isComponentSet": true,
+      "notes": "The time half, state × filled? × size: hours, minutes and the AM/PM menu, which opens 4px (`gap-xs`) below. In code it lives inside `DateAndTimePicker.jsx`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
     }
   ]
 };
@@ -96,6 +100,16 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 <div className="sb-ds-doc-section">
 
+## Time zones
+
+<DocsCanvasShell description={<>The viewer’s zone, and the other person’s time when it differs.</>}>
+    <DsCanvasQuiet of={TimePickerStories.TimeZones} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -138,8 +152,9 @@ Date and time pickers let people select a date or range of dates and/or a time f
 ## Usage notes
 
 - **`onChange` does not hand you an event.** It is called with
-  `{ date, time }` — plain strings, or `null` for a half that is not yet
-  complete. Every other field in this group forwards a DOM event, so this is
+  `{ date, time, utc }` — plain strings, or `null` for a half that is not yet
+  complete. `utc` is the moment as ISO 8601 in UTC, worked out in `timeZone`;
+  store that, not `date` and `time`, which are only what the viewer saw. Every other field in this group forwards a DOM event, so this is
   the one place `event.target.value` will be undefined.
 - **`time` stays `null` until both hours and minutes are present.** A reader
   part-way through typing produces `{ date: '03/14/26', time: null }`, which is
@@ -154,6 +169,16 @@ Date and time pickers let people select a date or range of dates and/or a time f
 - **Changing AM/PM reports, with or without a date.** The event carries
   `date: null` when no date has been picked yet, rather than staying silent
   about a change the reader can see.
+- **Times are stored in UTC and shown in the viewer's zone.** `timeZone` is the
+  viewer's IANA zone and defaults to the browser's. The caption under the time
+  names it — "Eastern Time (ET)" — unless `showTimeZone={false}`. Pass
+  `otherTimeZone` and `otherPerson` when someone else will read the time, and
+  the caption adds theirs: "Pacific Time (PT) · 4:00 PM for the student (ET)".
+  Daylight saving is handled per date, so a 4:00 PM in November is an hour later
+  in UTC than one in October.
+- **The calendar opens 4px below the date field.** It is the same calendar as
+  `DatePicker`, `--size-element-gap-xs` below, left-aligned, flipping above when
+  there is no room. The AM/PM menu opens the same 4px below its button.
 - **Extra props go to the wrapper, not to the two inputs (#230).** The wrapper
   is the element that carries the group's role and name, so a caller's
   `aria-describedby` lands where it can help. They go on last, so a caller's
@@ -222,6 +247,9 @@ Date and time pickers let people select a date or range of dates and/or a time f
   on the control that is invalid, and a group is not a control. So wiring a
   validation message with `aria-describedby` works today; marking the two inputs
   invalid still needs the component changed.
+- **The time-zone caption is part of the description.** It is linked through
+  `aria-describedby` after any description you pass, so a reader hears the zone
+  along with the field.
 
 </div>
 
