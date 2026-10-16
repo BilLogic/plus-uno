@@ -23,6 +23,7 @@ import assert from "node:assert/strict";
 import {
   CANCEL_TTL_MS,
   CUT_OFF_NOTE_ATTEMPTS,
+  DECIDED_TTL_MS,
   DM_CONVERSATION,
   EVENT_DEDUP_TTL_MS,
   EXECUTION_CUTOFF_MS,
@@ -61,6 +62,9 @@ export function makeTestClock(start = 1_700_000_000_000): TestClock {
 
 const THREAD = { channel: "C1", thread: "1700.1" } as const;
 const OTHER = { channel: "C1", thread: "1700.9" } as const;
+
+/** The batch `proposal()` stages, as a replaced or expired lookup names it. */
+const STAGED = [{ toolName: "notion_create", input: { title: "Onboarding checklist" } }];
 
 function proposal(overrides: Partial<PendingProposal> = {}): PendingProposal {
   return {
@@ -598,6 +602,103 @@ export function runThreadStateConformance(
   it("claiming a proposal that was never staged is a loss, not an error", async () => {
     const { store } = setup();
     assert.equal(await store.claimProposal("1700.2"), false);
+  });
+
+  // Review's View on a decided card draws the batch it decided, so a claim
+  // told what was decided keeps the card instead of deleting it — for the
+  // card's own lifetime, and as nothing anything else can act on.
+  it("a claim told what was decided keeps the decided card, out of reach of everything else", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    assert.equal(await store.claimProposal("1700.2", { decision: "confirm", by: "U2" }), true);
+    const look = await store.getProposalByTs("1700.2");
+    assert.equal(look.state, "none");
+    assert.ok(look.state === "none" && look.decided, "the decided card is kept");
+    assert.equal(look.decided.decision, "confirm");
+    assert.equal(look.decided.by, "U2");
+    assert.equal(look.decided.proposal.proposalText, "Create the card?");
+    // Nothing can decide, revise, edit or retire it again.
+    assert.equal(await store.claimProposal("1700.2", { decision: "confirm", by: "U3" }), false);
+    assert.equal(await store.claimProposal("1700.2"), false);
+    assert.equal(await store.markRevising("1700.2", "U3"), "gone");
+    assert.equal(await store.keepPick("1700.2", "U3", "0.title", "x"), null);
+    assert.deepEqual(await store.retireProposal("1700.2"), { retired: false });
+    assert.equal(await store.getProposalByThread(THREAD), null);
+    assert.deepEqual(await store.getProposalsByChannel(THREAD.channel), []);
+  });
+
+  it("keeps the batch as decided, edits included, and not the card's posted blocks", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", proposalBlocks: [{ type: "section" }] }));
+    await store.keepPick("1700.2", "U2", "0.status", "Done");
+    const edited = [{ toolName: "notion_create", input: { title: "Onboarding checklist, v2" } }];
+    assert.equal(await store.claimProposal("1700.2", { decision: "confirm", by: "U2", operations: edited }), true);
+    const look = await store.getProposalByTs("1700.2");
+    assert.ok(look.state === "none" && look.decided);
+    assert.deepEqual(proposalOperations(look.decided.proposal), edited);
+    assert.deepEqual(look.decided.proposal.input, edited[0]!.input);
+    assert.equal(look.decided.proposal.proposalBlocks, undefined);
+  });
+
+  it("keeps a Reject's reason beside it", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    assert.equal(await store.claimProposal("1700.2", { decision: "cancel", by: "U2", reason: "Not this week" }), true);
+    const look = await store.getProposalByTs("1700.2");
+    assert.ok(look.state === "none" && look.decided);
+    assert.deepEqual([look.decided.decision, look.decided.reason], ["cancel", "Not this week"]);
+  });
+
+  it("keeps the decided card for its own lifetime, measured from the decision, not from staging", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: 2 * 60_000 }));
+    clock.advance(60_000);
+    assert.equal(await store.claimProposal("1700.2", { decision: "confirm", by: "U2" }), true);
+    // Long past the two minutes the card would have lived, View still has it.
+    clock.advance(DECIDED_TTL_MS);
+    const kept = await store.getProposalByTs("1700.2");
+    assert.ok(kept.state === "none" && kept.decided, "kept for its lifetime from the decision");
+    clock.advance(1);
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "none" });
+    // Gone, not expired: a decided card never reads as one nobody decided.
+    clock.advance(PROPOSAL_TTL_MS);
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "none" });
+  });
+
+  it("names the card's batch on a replaced or expired lookup, so its pop-up can be titled", async () => {
+    const { store, clock } = setup();
+    const update = { toolName: "github_issue_update", input: { issue_number: 7, comment: "Done." } };
+    await store.putProposal(proposal({ proposalTs: "1700.2", ...update }));
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    const replaced = await store.getProposalByTs("1700.2");
+    assert.ok(replaced.state === "superseded");
+    assert.deepEqual(replaced.operations, [update]);
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    const expired = await store.getProposalByTs("1700.3");
+    assert.ok(expired.state === "expired");
+    assert.deepEqual(expired.operations, [{ toolName: "notion_create", input: { title: "Onboarding checklist" } }]);
+  });
+
+  it("is neither replaced by a newer card in its thread nor in that card's way", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    assert.equal(await store.claimProposal("1700.2", { decision: "confirm", by: "U2" }), true);
+    const staging = await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    assert.deepEqual(staging.retired, []);
+    const old = await store.getProposalByTs("1700.2");
+    assert.ok(old.state === "none" && old.decided, "still the decided card, not a replaced one");
+    assert.equal((await store.getProposalByThread(THREAD))?.proposalTs, "1700.3");
+    assert.equal(await store.claimProposal("1700.3", { decision: "confirm", by: "U2" }), true);
+  });
+
+  it("of many concurrent claims told what was decided, exactly one wins", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal());
+    const results = await Promise.all(Array.from({ length: 24 }, (_, n) => store.claimProposal("1700.2", { decision: "confirm", by: `U${n}` })));
+    assert.equal(results.filter(Boolean).length, 1);
+    const look = await store.getProposalByTs("1700.2");
+    assert.ok(look.state === "none" && look.decided);
+    assert.equal(look.decided.by, `U${results.indexOf(true)}`);
   });
 
   // Needs changes locks a card while its revision is written: the first
@@ -1167,6 +1268,17 @@ export function runThreadStateConformance(
     assert.deepEqual(await store.claimFiling("week"), { state: "claimed" }, "a lease past its time was a caller killed mid-filing");
   });
 
+  it("a thread's comparison for a scenario is claimed once; another thread or scenario is its own", async () => {
+    const { store, clock } = setup();
+    const ref = { channel: "C1", thread: "1.0" };
+    assert.equal(await store.claimComparison(ref, "Call-off"), true);
+    assert.equal(await store.claimComparison(ref, "call-off"), false, "the same scenario, however it is cased");
+    assert.equal(await store.claimComparison(ref, "Reschedule"), true);
+    assert.equal(await store.claimComparison({ channel: "C1", thread: "2.0" }, "Call-off"), true);
+    clock.advance(HISTORY_TTL_MS + 1);
+    assert.equal(await store.claimComparison(ref, "Call-off"), true, "kept as long as the thread's memory");
+  });
+
   it("the one-shot dedup and the lease share one record", async () => {
     const { store } = setup();
     assert.equal(await store.claimRun("Ev1"), "claimed");
@@ -1236,9 +1348,9 @@ export function runThreadStateConformance(
     const stated = { cancelled: "Rejected, nothing filed", expired: "That card closed after 3 days with no decision." };
     await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: LONG_TTL_MS, stated }));
     await store.putProposal(proposal({ proposalTs: "1700.3", ttlMs: LONG_TTL_MS }));
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?" });
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?", operations: STAGED });
     clock.advance(LONG_TTL_MS + HOUR_MS);
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "expired", ttlMs: LONG_TTL_MS, stated, proposalText: "Create the card?" });
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "expired", ttlMs: LONG_TTL_MS, stated, proposalText: "Create the card?", operations: STAGED });
   });
 
   it("a retired stated card carries its words, and a turn's card answers as it always has", async () => {
@@ -1246,13 +1358,13 @@ export function runThreadStateConformance(
     const stated = { cancelled: "Nothing filed this week", expired: "That card closed after 6 days with no decision." };
     await store.putProposal(proposal({ proposalTs: "1700.2", stated }));
     await store.retireProposal("1700.2");
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?" });
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?", operations: STAGED });
     await store.putProposal(proposal({ proposalTs: "1700.4", threadTs: OTHER.thread }));
     await store.retireProposal("1700.4");
-    assert.deepEqual(await store.getProposalByTs("1700.4"), { state: "superseded", proposalText: "Create the card?" });
+    assert.deepEqual(await store.getProposalByTs("1700.4"), { state: "superseded", proposalText: "Create the card?", operations: STAGED });
     await store.putProposal(proposal({ proposalTs: "1700.6", threadTs: "1700.5" }));
     clock.advance(PROPOSAL_TTL_MS + 1);
-    assert.deepEqual(await store.getProposalByTs("1700.6"), { state: "expired", proposalText: "Create the card?" });
+    assert.deepEqual(await store.getProposalByTs("1700.6"), { state: "expired", proposalText: "Create the card?", operations: STAGED });
   });
 
   it("an execution of a proposal with its own TTL is takeable at 71 h and gone at 73 h", async () => {

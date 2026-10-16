@@ -24,7 +24,7 @@ import type { CardAsk, CardCaveat, CardField, CardRevision, ProposalCard } from 
 import type { ProposalOperation } from "../thread-state/index";
 import { gateWordsFor } from "../agent/tool-table";
 import { relayRecipientId } from "../tools/relayed-dm-render";
-import { DESIGN_STATUS_NOT_SET } from "./review-draft";
+import { DESIGN_STATUS_NOT_SET } from "./review-notion-create";
 import { createdDesignStatus } from "../integrations/notion";
 
 // One shared confirmation footer on every card. It names no approver, since
@@ -164,9 +164,51 @@ const KEY_FIELD_CHARS = 40;
 const KEY_FIELDS = 3;
 const SUMMARY_TITLE_CHARS = 80;
 
-/** Labels that name how a call is shaped, not what it writes: a surface, a
- *  section's heading, a link back. Never a key in the summary. */
-const SHAPE_LABELS = new Set(["surface", "heading", "source link", "page link", "link"]);
+/** Labels of a tool's internal inputs: how the executor routes or checks a
+ *  call, never what a person decides. A share-out's `place` and raw
+ *  `channel` (its verb already names where it posts, from the executor's own
+ *  decision), a create's `surface`, a Figma `file_key`, flags such as `check`
+ *  and `introduce`, a sweep's `cards`, and ids. Hidden from every draft
+ *  (`withoutInternalFields`) and from the summary line. */
+const INTERNAL_LABELS = new Set(["place", "channel", "surface", "file key", "check", "introduce", "cards", "block id", "page id", "file id"]);
+
+/** Labels that name how a call is shaped, not what it writes: the internal
+ *  inputs, a section's heading, a link back. Never a key in the summary. */
+const SHAPE_LABELS = new Set([...INTERNAL_LABELS, "heading", "source link", "page link", "link"]);
+
+/** A value no reader can use on the summary line: a raw Slack id, a hex or
+ *  uuid id, or a bare flag. */
+const RAW_VALUE = /^(?:[UWCGDT](?=[A-Z0-9]*\d)[A-Z0-9]{8,}|[0-9a-fA-F-]{20,}|[Tt]rue|[Ff]alse)$/;
+
+/** A key field whose value is a bare number reads with its label: "Round 1". */
+const NUMERIC = /^\d+(?:\.\d+)?$/;
+
+/**
+ * A card's text without its internal inputs' bullets (`INTERNAL_LABELS`),
+ * each with the lines nested under it, and a raw user id listed alone as a
+ * mention: what a draft drawn from the card's text shows. Every other line
+ * stays as it was.
+ *
+ * @param text - The card's text
+ */
+export function withoutInternalFields(text: string): string {
+  const out: string[] = [];
+  let hiding: number | null = null;
+  for (const line of text.split("\n")) {
+    const indent = /^\s*/.exec(line)![0].length;
+    if (hiding !== null && indent > hiding && /^\s*[•◦] /.test(line)) continue;
+    hiding = null;
+    const field = /^(\s*)• \*([^*]+):\*/.exec(line);
+    if (field && INTERNAL_LABELS.has(field[2]!.trim().toLowerCase())) {
+      hiding = field[1]!.length;
+      continue;
+    }
+    // A raw user id as a list item (a share-out's reviewers) is a mention, so
+    // Slack shows the person's name rather than the id.
+    out.push(line.replace(/^(\s*◦ )([UW][A-Z0-9]{6,})$/, "$1<@$2>"));
+  }
+  return out.join("\n");
+}
 
 /** One `• *Label:* value` line of a card's text, with what continues it and
  *  the field it sits under, if any. */
@@ -242,7 +284,7 @@ export function shortCardOf(text: string): { summary: string; size: string } | n
     .filter((f) => f.value.trim() && !f.value.includes("\n") && f.value.trim().length <= KEY_FIELD_CHARS)
     .filter((f) => !TITLE_LABELS.has(lower(f)) && !BODY_LABELS.has(lower(f)) && lower(f) !== "target")
     .filter((f) => !SHAPE_LABELS.has(lower(f)) && (!f.nested || f.parent?.toLowerCase() === "properties"))
-    .filter((f) => !/https?:\/\//.test(f.value));
+    .filter((f) => !/https?:\/\//.test(f.value) && !RAW_VALUE.test(f.value.trim()));
   // A create on a Roadmap surface names the Design Status its write sets
   // (`createdDesignStatus`), as the pop-up does (`review-draft.ts`) — never a
   // drafted one, which the create does not write as the property.
@@ -251,7 +293,7 @@ export function shortCardOf(text: string): { summary: string; size: string } | n
   const keys = keyFields
     .filter((f) => !(roadmap && lower(f) === "design status"))
     .slice(0, KEY_FIELDS - (roadmap ? 1 : 0))
-    .map((f) => f.value.trim());
+    .map((f) => (NUMERIC.test(f.value.trim()) ? `${f.label} ${f.value.trim()}` : f.value.trim()));
   if (roadmap) keys.push(createdDesignStatus(surface!) ?? `Design Status: ${DESIGN_STATUS_NOT_SET}`);
   if (titled && target) keys.unshift(target);
 
@@ -259,8 +301,8 @@ export function shortCardOf(text: string): { summary: string; size: string } | n
   const named = title ? `_${clip(title, SUMMARY_TITLE_CHARS)}_` : "";
   const after = [named, ...keys].filter(Boolean).join(" · ");
   const summary = verb
-    ? `:warning: Ready to *${verb}*${after ? `: ${after}` : ""}`
-    : `:warning: Ready for review: ${clip(lines.find((l) => l.trim())?.trim() ?? "a proposal", SUMMARY_TITLE_CHARS)}`;
+    ? `Ready to *${verb}*${after ? `: ${after}` : ""}`
+    : `Ready for review: ${clip(lines.find((l) => l.trim())?.trim() ?? "a proposal", SUMMARY_TITLE_CHARS)}`;
 
   // The size of the prose the pop-up holds: its body field, or the draft.
   const body = fields
@@ -297,13 +339,25 @@ export function withEditedFields(text: string, changes: ReadonlyArray<{ key: str
   let out = text;
   for (const change of changes) {
     if (!change.from) continue;
-    const label = humanizeParamKey(change.key.split(".").at(-1) ?? change.key);
-    const line = `• *${label}:* ${change.from}`;
+    const last = change.key.split(".").at(-1) ?? change.key;
+    // A list's item (`feedback_wanted.1`) is its `◦` line; a field cleared
+    // to nothing loses its line, as the write drops it.
+    const cleared = !change.to.trim();
+    const item = /^\d+$/.test(last);
+    const label = humanizeParamKey(last);
+    const line = item ? `◦ ${change.from}` : `• *${label}:* ${change.from}`;
     const at = wholeLineAt(out, line);
     if (at !== -1) {
-      out = `${out.slice(0, at)}• *${label}:* ${change.to}${out.slice(at + line.length)}`;
+      if (cleared) {
+        const start = out.lastIndexOf("\n", at - 1) + 1;
+        const end = at + line.length;
+        out = start > 0 ? `${out.slice(0, start - 1)}${out.slice(end)}` : out.slice(end + 1);
+        continue;
+      }
+      out = `${out.slice(0, at)}${item ? "◦ " : `• *${label}:* `}${change.to}${out.slice(at + line.length)}`;
       continue;
     }
+    if (cleared) continue;
     const alone = wrappedOnceAt(out, change.from);
     if (alone !== -1) out = `${out.slice(0, alone)}${change.to}${out.slice(alone + change.from.length)}`;
   }
@@ -377,7 +431,18 @@ export interface RenderedCard {
 export function renderProposalCard(card: ProposalCard): RenderedCard {
   // A stated card's footer names every operation it runs, so it carries no
   // plan of its own (`ProposalCard.footer`).
-  if (card.kind === "stated") return { text: statedText(card) };
+  if (card.kind === "stated") {
+    const text = statedText(card);
+    if (!card.short) return { text };
+    // Short in the thread, as a turn's card is: the pop-up holds the rest.
+    const blocks = [
+      { type: "section", text: { type: "mrkdwn", text: card.short.summary } },
+      context(card.short.size),
+      context(footerNoteFor("full")),
+      ...proposalActionBlocks(),
+    ];
+    return { text, blocks };
+  }
   const body = card.kind === "revision" ? revisionText(card) : confirmText(card);
   const plan = withOperationPlan(body, card.operations, card.places);
   const followUp = plan.followUp ?? [];
@@ -811,6 +876,9 @@ function operationGroupKey(op: PlannedOperation, place?: string): GroupKey {
     // a result's `posted_to`), never a team channel it will not post to. An
     // older record without one falls back to what its input asked for.
     const where = place ?? (str("place") === "here" ? "this conversation" : "#plus-design-feedback");
+    // A named channel is its link on the heading and its #name in plain words.
+    const link = /^<#([A-Z0-9]+)(?:\|([^>]*))?>$/.exec(where);
+    if (link) return { key: `channel:${link[1]}`, heading: `*${where}*`, name: link[2] ? `#${link[2]}` : "a channel" };
     return bolded(`channel:${where.toLowerCase()}`, where);
   }
   const pageUrl = str("page_url") || str("url");

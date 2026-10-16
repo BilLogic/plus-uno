@@ -33,7 +33,7 @@ The taxonomy is the harness map — when a new component joins the harness, this
 
 **Record:** an intake lives as a **Roadmap DB card** — `Product Pillar: Universal`, lifecycle in the `Intake Status` property (card mechanics: `docs/connectors/notion/overview.md`). Every intake names its **evidence** (file / frame / message link) in the card body and a **suggested severity**. Separate from Decisions DB **Evidence** (URL property on durable design/product decisions).
 
-**Headless surrogate:** scheduled sweeps run without Notion access and file
+**Headless surrogate:** automations that run without Notion access file
 their intakes as GitHub issues labeled `harness-intake` (transport contract:
 `scripts/prompts/references/headless-intake.md`). The queue covers every repo
 in uno-bot's `GITHUB_REPOS` list, whoever filed the intake. That multi-repo
@@ -84,13 +84,13 @@ Answered by the **spotter** (fallback: the designated maintainer) — never by t
 - **Handoff rails propagation (from uno-publish):** arrives **pre-authorized** — the designer-confirmed handoff plus its three sign-offs replace the worth-incorporating gate and the verdict. Execute the paired PRD + blueprint write per `docs/connectors/supabase/overview.md` and reply in the handoff thread with what was applied. This is the only intake that skips §3/§5.
 
 - **Conventions are repo-canonical** (decision 2026-07-07, ADR-017): `docs/conventions/` wins every conflict. A legacy Notion playbook page that contradicts a conventions file is the stale artifact — file an intake to banner it as superseded (the faces route the Notion write); never "re-sync" the repo to match it, never fix the drift silently.
-- **Standing sweeps:** named in `docs/engineering/operations.md` — shipped watchdog · Figma hygiene · conventions integrity (agents↔docs cross-references both ways, header canonicality, path rot) · Notion comment sweep. Each sweep files one intake per finding into this same pipeline.
-- **Post-ship reconciliation:** every shipped handoff triggers a reconcile of DS + harness + blueprint against built reality — routine, not exceptional. The check set, per shipped card:
+- **Standing sweeps:** Figma hygiene · conventions integrity (agents↔docs cross-references both ways, header canonicality, path rot; run by hand from `skills/uno-maintain/references/staleness-sweep.md`) · Notion comment sweep; `docs/engineering/operations.md` registers the automated ones. Each sweep files one intake per finding into this same pipeline.
+- **Post-ship reconciliation:** every shipped handoff triggers a reconcile of DS + harness + blueprint against built reality — routine, not exceptional. Three repo checks are maintain duties, run per shipped card in the session that handles the ship:
   - `design-system/` stories/MDX reflect the shipped surface where they reference it;
-  - harness docs (`docs/product-and-service/*`, conventions, skill references) don't describe pre-ship behavior as current;
-  - deployment/marketplace references (per uno-publish's references) still point at live URLs;
-  - the **blueprint** reflects the shipped change (`docs/connectors/supabase/overview.md` § Two sources — ship-time is when "blueprint wins vs shipped docs" becomes true). The headless watchdog can't read Supabase, so for any shipped card that touches the service journey it files a *verify-blueprint* intake naming the card and the likely scenario, rather than asserting drift itself; the intake's IDE session does the actual blueprint read.
-  The weekly shipped-watchdog automation runs exactly this set headlessly (`scripts/prompts/uno-shipped-watchdog/SKILL.md`); grow the set here, never in the adapter.
+  - harness docs (`docs/product-and-service/*`, conventions, skill references) describe post-ship behavior as current;
+  - deployment/marketplace references (per uno-publish's references) resolve to live URLs.
+
+  The **blueprint** reflecting the shipped change (`docs/connectors/supabase/overview.md` § Two sources — ship-time is when "blueprint wins vs shipped docs" becomes true) is uno-bot's job, `blueprint-shipped` (`agents/uno-bot/src/blueprint-upkeep/`): each end of day it weighs the cards that reached `Dev Status: Deployed`, and a card that changes the service gets a **blueprint revision** card in the next morning's sweep at the card's place, written `live` when a Contributor or Bill approves it in its Review pop-up. A shipped change the job stays silent on — no confident scenario match, or a step or lane only a person adds — goes through `writers/blueprint`. Grow the check set here.
 
 ## 7 · What the work leaves behind
 

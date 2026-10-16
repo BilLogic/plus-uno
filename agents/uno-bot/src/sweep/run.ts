@@ -595,8 +595,8 @@ async function sweepGroupDms(job: ScheduledJob, deps: SweepDeps): Promise<SweepJ
 }
 
 /** How far back `sweep-dms` looks for DMs uno-bot answered in: a weekend and
- *  a missed run. Two end-of-day runs are at most 96 h apart (Sat 06:00 to
- *  Wed 06:00 with Tuesday's missed), and 97 h on the weekend the clocks go
+ *  a missed run. Two end-of-day runs are at most 96 h apart (Fri 06:00 to
+ *  Tue 06:00 with Monday's missed), and 97 h on the weekend the clocks go
  *  back, so four days and two hours covers both with an hour to spare. Each
  *  DM's own cursor says what in it is new. */
 export const DM_LOOKBACK_MS = (4 * 24 + 2) * 60 * 60 * 1000;
@@ -1714,7 +1714,8 @@ function composeReport(
     if (theirs.length) {
       const here = theirs.filter((e) => shown.has(e)).length;
       const line = h.place.says(theirs.map((e) => e.card.item.id), null);
-      ownerLines.push({ owner: null, says: here < theirs.length ? `${line} Showing ${here} of ${theirs.length}; the rest come in the next report.` : line });
+      const rest = `Showing ${here} of ${theirs.length}; the rest come in the next report.`;
+      ownerLines.push({ owner: null, says: here < theirs.length ? `${line} ${rest}` : line });
     }
     for (const line of h.place.lines ?? []) ownerLines.push({ owner: null, says: line });
   });
@@ -1730,7 +1731,7 @@ function composeReport(
   };
 }
 
-/** What a person's bullet says when some of theirs wait. */
+/** What a person's bullet says when some of theirs wait: in the next report. */
 function waitWords(shown: number, total: number): string {
   if (shown === 0) return total === 1 ? "It comes in the next report." : "They come in the next report.";
   const here = shown === 1 ? "Here is 1" : `Here are ${shown}`;

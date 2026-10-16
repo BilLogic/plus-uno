@@ -28,6 +28,7 @@ import { restageFor } from "../turn/env-deps";
 import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsPush, viewsUpdate } from "./api";
 import { executeVerdict, runVerdict } from "../agent/resolve-proposal";
 import { REVIEW_ACTION_ID } from "./proposal-render";
+import { OPEN_ACTION_ID } from "./card-block";
 import { DECISION_REVIEW_ACTION_PREFIX, reviewPressOf } from "./decision-cards";
 import {
   NEEDS_CHANGES_LEAD,
@@ -48,9 +49,10 @@ import {
   reviewedCardOf,
 } from "./review-view";
 import { FIELD_ACTION_ID, type OptionSource } from "./review-fields";
-import { databaseOptions } from "../integrations/notion";
+import { canonicalNotionUrl, databaseOptions } from "../integrations/notion";
+import type { NotionDatabaseLinks } from "./review-notion-create";
 import { proposalReplyThread, type PendingProposal } from "../thread-state/index";
-import { conversationKey, enqueueAgentJob, replyHandlerAt } from "./events";
+import { conversationKey, enqueueAgentJob, replyHandlerAt, reviewNoteHandler } from "./events";
 import type { SlackMessageEvent } from "./types";
 import { isPrecedenceCard } from "../ds-precedence/dispute";
 import { disputeOnEnv } from "../tools/ds-precedence-intake";
@@ -189,6 +191,10 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
   if (actionId.startsWith(DECISION_REVIEW_ACTION_PREFIX)) return openReview(env, payload, actionId);
   if (actionId === REVIEW_EDIT_ACTION_ID) return editInReview(env, payload);
+  // The Review pop-up's Open buttons (`card-block.ts`, and a row's own, as
+  // `uno_review_open_code`): a link, which the browser already followed.
+  // Nothing to do.
+  if (actionId === OPEN_ACTION_ID || actionId.startsWith(`${OPEN_ACTION_ID}_`)) return;
   // A pick under the Review pop-up's Edit fields: kept on the card at once,
   // so there is nothing to save and going back loses nothing.
   const pick = actionId === FIELD_ACTION_ID ? reviewPickOf(payload) : null;
@@ -383,10 +389,10 @@ async function reviseFromReview(
         thread_ts: thread,
         revises: proposal.proposalTs,
       };
-      // A Figma comment decision revises its own way: its handler takes the
-      // note at the head of the job (`figma-comments/revise.ts`). Every other
-      // card goes to the turn, as before.
-      const own = (await replyHandlerAt(env, event)) === "figma-decisions" ? "figma-decisions" : null;
+      // A Figma comment decision and a blueprint revision revise their own
+      // way: their thread's handler takes the note at the head of the job.
+      // Every other card goes to the turn, as before.
+      const own = reviewNoteHandler(await replyHandlerAt(env, event));
       await enqueueAgentJob(env, { kind: "message", event, reply: own }, conversationKey(event));
     },
     updateCard: async (message) => {
@@ -428,7 +434,21 @@ function reviewDoorDeps(env: Env): ReviewDoorDeps {
       const database = optionDatabase(env, source);
       return database ? databaseOptions(env, database, source.property) : null;
     },
+    notionDatabases: notionDatabaseLinks(env),
   };
+}
+
+/** Where each Notion database a create lands in opens, by its id. */
+function notionDatabaseLinks(env: Env): NotionDatabaseLinks {
+  const at = (id: string | undefined) => (id?.trim() ? canonicalNotionUrl(null, id.trim()) : undefined);
+  const links: NotionDatabaseLinks = {};
+  const roadmap = at(env.NOTION_ROADMAP_DB_ID);
+  const decisions = at(env.NOTION_DECISIONS_DB_ID);
+  const marketplace = at(env.NOTION_MARKETPLACE_DB_ID);
+  if (roadmap) links.roadmap = roadmap;
+  if (decisions) links.decisions = decisions;
+  if (marketplace) links.marketplace = marketplace;
+  return links;
 }
 
 async function replyEphemeral(payload: InteractionPayload, text: string): Promise<void> {

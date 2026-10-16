@@ -13,7 +13,8 @@
 // `access` column. A tool with no arm here is a tool with nothing to check,
 // which `default` already says, so a new row needs no edit in this file.
 
-import type { Env } from "../types";
+import type { Env, SlackContext } from "../types";
+import { decideShareoutPlace, type ShareoutReads } from "../tools/share-for-feedback";
 // Placeholder detection lives next door, import-free, so the loop and a plain
 // Node test can both reach it without dragging `Env` behind them.
 import { placeholderRefusal } from "./placeholder";
@@ -26,6 +27,13 @@ import { MARKETPLACE_CHECK_COST, marketplaceInputOf, marketplaceQuestion } from 
 
 export interface PreflightCtx {
   env: Env;
+  /** Where a share-out was asked and by whom, and Slack as the bot sees it —
+   *  for the checks on a channel the asker names. Absent, those checks wait
+   *  for the executor, which runs them at ✅. */
+  shareout?: {
+    slack: Pick<SlackContext, "channel" | "threadTs" | "replyTs" | "requestedBy">;
+    reads: ShareoutReads;
+  };
 }
 
 export interface PreflightAsk {
@@ -210,6 +218,13 @@ export async function preflight(
       // approval. Staging proceeds with what's in hand, and the confirmation
       // card carries a deterministic bundle audit (proposal-render.ts:
       // shareoutBundleNote) so ✅ is informed consent to post partial.
+
+      // A channel the asker names is checked before any card: they are in
+      // it, and the bot can post there (`tools/share-for-feedback.ts`).
+      if (input.place === "channel" && ctx.shareout) {
+        const decided = await decideShareoutPlace(ctx.env, ctx.shareout.slack, input, ctx.shareout.reads);
+        if (!decided.ok) return { ask: decided.refusal };
+      }
       return null;
     }
 

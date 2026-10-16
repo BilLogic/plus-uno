@@ -180,6 +180,8 @@ describe("Review on one item of a report", () => {
     assert.equal(one!.subtitle!.text, "Closed, no decision");
     assert.deepEqual(one!.actions.map((a) => a.text.text), ["View", "Open"]);
     assert.match(JSON.stringify(views.calls.at(-1)!.view), /Closed, no decision/);
+    // Titled for its tool, which the lookup that found it closed named.
+    assert.equal((views.calls.at(-1)!.view as { title: { text: string } }).title.text, "Review page update");
   });
 
   it("marks Needs changes on the card, and a revision replaces it in place under a new proposal", async () => {

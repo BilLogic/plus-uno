@@ -1,7 +1,8 @@
 // What other morning jobs hand the sweep's post: their cards for a place, to
 // go up on that place's one message.
 //
-// ONE MESSAGE A PLACE. The card follow-ups, the weekly DS precedence report,
+// ONE MESSAGE A PLACE. The card follow-ups, Monday's stuck cards, the weekly
+// DS precedence report,
 // the Figma comment decisions, the Figma drift questions and the weekly Figma
 // tidy-up each used to post on their own. Now each job that finds them runs
 // before `sweep-post` and leaves its cards here, by place — a channel's top, or
@@ -92,6 +93,10 @@ export interface SweepSection {
 
 /** The card follow-ups' section (`../follow-through/`). */
 export const FOLLOW_UPS_SECTION = "follow-ups";
+
+/** The stuck Roadmap cards' weekly section, Monday's only, shown whole
+ *  (`../follow-through/`). */
+export const STALE_CARDS_SECTION = "stale-cards";
 
 /** A place as one key: `<channel>:<thread ts>`, empty for a channel's top. */
 export function placeKeyOf(place: SectionPlace): string {

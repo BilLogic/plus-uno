@@ -409,7 +409,7 @@ test('at least one harness doc still separates the two readings', () => {
   );
 });
 
-// ── The third scope: the Actions prompts (#425) ──────────────────────────────
+// ── The third scope: the headless prompts (#425) ──────────────────────────────
 //
 // The third embodiment is not the bundler's to name — its prompts declare no
 // `embodiment:` and are never bundled — so the corpus is listed by where it
@@ -445,13 +445,11 @@ test('the walk finds nested references and skips everything that is not markdown
   assert.deepEqual(walkPromptDocs(path.join(dir, 'missing')), [], 'a missing root is empty, not a throw');
 });
 
-test('the actions scope reads whole files, the way the sweep workflows hand them over', () => {
-  // Three adapters reach the model as a `prompt-file:` with nothing stripped,
-  // so a ban in `description:` is a ban the model reads.
+test('the actions scope reads whole files: a headless prompt is agent-facing from its first line', () => {
+  // A ban in `description:` is a ban the model reads.
   const doc = '---\nname: x\ndescription: never run this by hand\n---\n\n# x\n\nState the target.\n';
   assert.equal(countProhibitions(scopeBy('actions').read(doc)), 1);
   assert.match(scopeBy('actions').measuredOn, /frontmatter included/);
-  assert.match(scopeBy('actions').measuredOn, /prompt-file/);
 });
 
 test('MUTATION: a ban planted in a prompt fixture raises the actions scope and fails', () => {
@@ -472,7 +470,7 @@ test('MUTATION: a ban planted in a prompt fixture raises the actions scope and f
     return compare([measureDocs(scope, planted)], { actions: opened('actions') });
   });
   assert.equal(failures.length, 1, 'one scope rose, one report');
-  assert.match(failures[0], /Actions prompts rose 0 -> 1/, 'must name WHICH corpus rose');
+  assert.match(failures[0], /headless prompts rose 0 -> 1/, 'must name WHICH corpus rose');
   assert.match(failures[0], /scripts\/prompts\/x\/SKILL\.md: 0 -> 1/, 'and the doc that caused it');
 });
 
@@ -488,7 +486,7 @@ test('MUTATION: the actions scope shrinking refuses to run rather than passing s
     compare([measureDocs(scope, shrunk)], { actions: opened('actions') }),
   );
   assert.equal(failures.length, 1);
-  assert.match(failures[0], /the actions corpus shrank: 1 Actions prompts measured, against the 2/);
+  assert.match(failures[0], /the actions corpus shrank: 1 headless prompts measured, against the 2/);
 });
 
 test('a scope in the code with no baseline is a failure, not a pass', () => {

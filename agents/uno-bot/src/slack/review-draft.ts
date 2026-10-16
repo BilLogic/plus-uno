@@ -19,16 +19,30 @@
 //
 // PURE: blocks out, nothing posted, nothing read.
 import { reviewSections, textSections } from "./render";
-import { escapeSlackText } from "./mrkdwn";
+import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
 import { fieldInputBlocks, MAX_INPUT_CHARS, type EditableField } from "./review-fields";
 import { relayRecipientId } from "../tools/relayed-dm-render";
+import { MAX_FEEDBACK_QUESTIONS, shareoutChannelRef } from "../tools/share-out-render";
 import { createdDesignStatus } from "../integrations/notion";
-import type { ProposalOperation } from "../thread-state/index";
+import { CARD_BODY_CHARS } from "./card-block";
+import {
+  alertsFromCaveats,
+  labelledText,
+  listBlock,
+  quoteBlock,
+  shareoutApprove,
+  whereMrkdwn,
+  TOO_LONG_TO_EDIT,
+  type DraftAnatomy,
+  type WhereElement,
+} from "./review-anatomy";
+import { devLinksAnatomy, precedenceAnatomy, shareNoteAnatomy, tidyAnatomy } from "./review-stated";
+import { createFacts, notionCreateAnatomy, type NotionDatabaseLinks } from "./review-notion-create";
+import { archiveAnatomy, issueCreateAnatomy, issueUpdateAnatomy, workflowRunAnatomy } from "./review-draft-writes";
+import { blueprintReviseAnatomy } from "./review-blueprint";
+import type { ProposalOperation, StatedFacts } from "../thread-state/index";
 
 type Input = Record<string, unknown>;
-
-/** Said where a Roadmap card's write sets no Design Status. */
-export const DESIGN_STATUS_NOT_SET = "not set";
 
 /** Slack's cap on a `header` block's text. */
 const HEADER_CHARS = 150;
@@ -57,7 +71,6 @@ type Part = { heading?: string; text: string; key?: string; replaces?: boolean; 
 
 const str = (v: unknown): string => (typeof v === "string" ? v.trim() : "");
 const obj = (v: unknown): Input => (v && typeof v === "object" && !Array.isArray(v) ? (v as Input) : {});
-const squash = (name: string) => name.toLowerCase().replace(/[\s_]+/g, "");
 
 /** A property key as a person reads it: `evidence_link` → `Evidence link`. A
  *  key the model wrote in the database's own spelling is kept as written. */
@@ -78,38 +91,15 @@ function sectionsOf(value: unknown): Array<{ heading?: string; text: string }> {
 
 function notionCreate(input: Input): ReadOperation {
   const surface = str(input.surface).toLowerCase();
-  const props = obj(input.properties);
-  const prop = (...names: string[]) => {
-    const want = new Set(names.map(squash));
-    const key = Object.keys(props).find((k) => want.has(squash(k)));
-    return key ? str(props[key]) : "";
-  };
-  const shown = new Set<string>();
-  const properties: ReadOperation["properties"] = [["Title", str(input.title), "title"]];
-  if (surface === "prd" || surface === "intake") {
-    const pillar = prop("product_pillar") || str(input.product_pillar);
-    if (pillar) properties.push(["Product Pillar", pillar]);
-    // What the write sets, not what the model drafted: a drafted Design
-    // Status is not a property the create writes.
-    properties.push(["Design Status", createdDesignStatus(surface) ?? DESIGN_STATUS_NOT_SET]);
-    ["productpillar", "designstatus"].forEach((k) => shown.add(k));
-  }
-  if (surface === "decision") {
-    const status = prop("status") || str(input.status);
-    if (status) properties.push(["Status", status]);
-    const card = prop("roadmap_card") || str(input.roadmap_card);
-    if (card) properties.push(["Roadmap Card", card]);
-    ["status", "roadmapcard"].forEach((k) => shown.add(k));
-  }
-  for (const [key, value] of Object.entries(props)) {
-    // A list (a Marketplace row's contributors) reads as one line.
-    const shownValue = Array.isArray(value) ? value.map(str).filter(Boolean).join(", ") : str(value);
-    if (shown.has(squash(key)) || !shownValue) continue;
-    properties.push([labelOf(key), shownValue]);
-  }
+  // The facts the anatomy draws as fields (`review-notion-create.ts`), here as
+  // label lines: a linked value by its address. Summary goes before Source.
+  const { facts, source } = createFacts(surface, input);
+  const properties: ReadOperation["properties"] = [
+    ["Title", str(input.title), "title"],
+    ...facts.map(([label, value, url]): [string, string] => [label, url ?? value]),
+  ];
   const summary = str(input.summary);
   if (summary) properties.push(["Summary", summary, "summary"]);
-  const source = str(input.source_url);
   if (source) properties.push(["Source", source]);
 
   const body = sectionsOf(input.sections);
@@ -205,6 +195,13 @@ export interface DraftDetail {
   editing?: boolean;
   /** Why the change is proposed, mrkdwn; shown once, at the first change. */
   issue?: string;
+  /** A stated card's facts (`PendingProposal.facts`). */
+  facts?: StatedFacts;
+  /** Edit fields, for a reading that sets it beside the facts its selects
+   *  edit; the view puts it at the head of the content otherwise. */
+  editButton?: unknown;
+  /** Where the Notion databases a create lands in open. */
+  databases?: NotionDatabaseLinks;
 }
 
 /** What one change is drawn with: the draft's detail, and whether the Issue
@@ -225,9 +222,9 @@ const NEW = "New content";
 /** Slack's cap on a section's text. */
 const SECTION_CHARS = 3000;
 
-/** Said where a value is too long to be an input. */
-export const TOO_LONG_TO_EDIT =
-  "This text is over the 3,000 characters a pop-up field holds, so it can't be edited here. Choose Needs changes to ask for a different wording.";
+// Kept here too: it lives in `review-anatomy.ts` now, so the readers in
+// `review-draft-writes.ts` can say it without importing this file back.
+export { TOO_LONG_TO_EDIT };
 
 /**
  * The draft as a person reads it, or null when any operation is a tool this
@@ -242,24 +239,47 @@ export function readableDraft(
   caveats: readonly string[] = [],
   detail: DraftDetail = {},
 ): unknown[] | null {
+  const parts = operationParts(operations, detail);
+  if (!parts) return null;
+  const blocks: unknown[] = [];
+  const many = parts.length > 1;
+  parts.forEach((op, i) => {
+    if (many) {
+      if (i) blocks.push({ type: "divider" });
+      blocks.push({ type: "section", text: { type: "mrkdwn", text: `*${i + 1}. ${escapeSlackText(op.headline)}*` } });
+    }
+    blocks.push(...op.blocks);
+  });
+  if (caveats.length) blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: caveats.join("\n") }] });
+  return blocks;
+}
+
+/**
+ * Each operation of the batch read on its own: its headline, and its
+ * properties and body as blocks, keyed by its place in the batch so a field in
+ * place finds its input. Null when any operation is a tool this file has no
+ * reading for. What `readableDraft` numbers, and what a batch in the shared
+ * anatomy (`review-batch.ts`) labels.
+ *
+ * @param operations - The batch as it would run, saved edits applied
+ * @param detail - Before values, and the fields drawn as inputs in place
+ */
+export function operationParts(
+  operations: readonly ProposalOperation[],
+  detail: DraftDetail = {},
+): Array<{ headline: string; blocks: unknown[] }> | null {
   const read = operations.map((op) => READERS[op.toolName]?.(op.input) ?? null);
   if (!read.length || read.some((r) => !r)) return null;
   const issueAt = detail.issue ? firstChange(read as ReadOperation[]) : undefined;
-  const blocks: unknown[] = [];
-  const many = read.length > 1;
-  read.forEach((op, i) => {
-    if (many) {
-      if (i) blocks.push({ type: "divider" });
-      blocks.push({ type: "section", text: { type: "mrkdwn", text: `*${i + 1}. ${escapeSlackText(op!.headline)}*` } });
-    }
+  return read.map((op, i) => {
+    const blocks: unknown[] = [];
     const keyOf = (path?: string) => (path ? `${i}.${path}` : undefined);
     const at = (key?: string) => ({ ...detail, issueHere: key !== undefined && key === issueAt });
     const properties = op!.properties.map(([label, value, path]): [string, string, string?] => [label, value, keyOf(path)]);
     blocks.push(...(op!.changes ? propertyBlocks(properties, detail, issueAt) : newPropertyBlocks(properties, detail)));
     for (const part of op!.body) blocks.push(...partBlocks({ ...part, key: keyOf(part.key) }, at(keyOf(part.key))));
+    return { headline: op!.headline, blocks };
   });
-  if (caveats.length) blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: caveats.join("\n") }] });
-  return blocks;
 }
 
 /** The headline the pop-up opens with: the one operation's, or the batch's size. */
@@ -424,4 +444,157 @@ export function caveatsOf(cardText: string): string[] {
     }
   });
   return out;
+}
+
+// ── Drafts in the shared anatomy (`review-anatomy.ts`) ──────────────────────
+
+/** What a reading in the shared anatomy is drawn with: the card's text, for
+ *  the place it names and its caveats, and the draft's detail. */
+export type AnatomyContext = DraftDetail & { cardText: string };
+
+/** Readings in the shared anatomy, by tool. A tool with none — or a reading
+ *  that returns null, as a stated card staged before its facts does — is
+ *  drawn by its `READERS` reading, or from the card's text. */
+const ANATOMY_READERS: Record<string, (input: Input, context: AnatomyContext) => DraftAnatomy | null> = {
+  shareout_post: shareoutAnatomy,
+  figma_tidy_up: tidyAnatomy,
+  figma_dev_links: devLinksAnatomy,
+  ds_precedence_intake: precedenceAnatomy,
+  sweep_share_post: shareNoteAnatomy,
+  notion_create: (input, context) => notionCreateAnatomy(input, { ...context, caveats: caveatsOf(context.cardText) }),
+  notion_archive: archiveAnatomy,
+  github_issue_update: issueUpdateAnatomy,
+  github_workflow_run: workflowRunAnatomy,
+  github_issue_create: issueCreateAnatomy,
+  // A blueprint revision or proposal, read off its facts (`review-blueprint.ts`).
+  blueprint_revise: blueprintReviseAnatomy,
+};
+
+/**
+ * The draft read into the shared anatomy's zones, or null when the batch is
+ * not one operation of a tool that has a reading in it.
+ *
+ * @param operations - The batch as it would run, saved edits applied
+ * @param cardText - The card's text, without its footer
+ * @param detail - The fields drawn as inputs in place, and whether the reader
+ *   may decide
+ */
+export function anatomyOf(operations: readonly ProposalOperation[], cardText: string, detail: DraftDetail = {}): DraftAnatomy | null {
+  const op = operations.length === 1 ? operations[0] : undefined;
+  const reader = op ? ANATOMY_READERS[op.toolName] : undefined;
+  return reader ? reader(op!.input, { ...detail, cardText }) : null;
+}
+
+/** Where a share-out's card says it posts: its heading's place, which the
+ *  executor's own decision named when the card was staged. */
+const SHAREOUT_HEADING = /^:warning: About to \*share this for feedback in (.+)\*:$/m;
+
+/** The place a share-out posts, as one where-line element: a channel by id
+ *  where the card names one, its words otherwise ("this thread"). */
+function shareoutPlaceElement(input: Input, cardText: string): WhereElement {
+  const where = SHAREOUT_HEADING.exec(cardText)?.[1]?.trim();
+  const linked = where ? /^<#([CG][A-Z0-9]+)(?:\|[^>]*)?>$/.exec(where) : null;
+  if (linked) return { type: "channel", channel_id: linked[1]! };
+  if (where) return { type: "text", text: where };
+  // A card staged without the heading: what its input asked for.
+  const ref = str(input.place) === "channel" ? shareoutChannelRef(input.channel) : null;
+  if (ref && "id" in ref) return { type: "channel", channel_id: ref.id };
+  return { type: "text", text: str(input.place) === "here" ? "this conversation" : "#plus-design-feedback" };
+}
+
+/** "Posts in #channel and pings @A, @B and @C." — each person a user element
+ *  where the input holds their id, their name as written where it does not. */
+function shareoutWhere(input: Input, cardText: string): WhereElement[] {
+  const reviewers = (Array.isArray(input.reviewers) ? input.reviewers : []).map(str).filter(Boolean);
+  const out: WhereElement[] = [{ type: "text", text: "Posts in " }, shareoutPlaceElement(input, cardText)];
+  reviewers.forEach((r, i) => {
+    const join = i === 0 ? " and pings " : i === reviewers.length - 1 ? " and " : ", ";
+    out.push({ type: "text", text: join }, SLACK_USER_ID.test(r) ? { type: "user", user_id: r } : { type: "text", text: r });
+  });
+  out.push({ type: "text", text: "." });
+  return out;
+}
+
+const capital = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+
+/** The card's subtitle: the artifact (when the project is the title), the
+ *  round as "Round 1", and the fidelity in words. */
+function shareoutSubtitle(input: Input, titled: boolean): string {
+  const round = typeof input.round === "number" ? input.round : Number(str(input.round)) || undefined;
+  const fidelity = str(input.fidelity);
+  return [titled ? capital(str(input.artifact)) : "", round ? `Round ${round}` : "", fidelity ? `${capital(fidelity)} fidelity` : ""]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+/** The Open button's words: the artifact's last word ("Open prototype"), or
+ *  "Open link". */
+function openWords(artifact: string): string {
+  const noun = artifact.split(/\s+/).at(-1) ?? "";
+  return noun && noun.length <= 20 ? `Open ${noun}` : "Open link";
+}
+
+/** Said under a share-out's inputs: what is locked, and how to change it. */
+export const SHAREOUT_LOCKED =
+  "Where it posts, who it pings, the fidelity and the round are fixed on this card. To change them, choose Needs changes.";
+
+/**
+ * A share-out in the anatomy: "Share for feedback", where it posts and who it
+ * pings, the bundle caveat as an alert, the project as a card, then its words.
+ * For a confirmer the words are the prefilled inputs `review-fields.ts`
+ * offers (what this is, each question, not looking for, the deadline), with a
+ * line saying the rest is locked; for anyone else they are shown, read-only.
+ */
+function shareoutAnatomy(input: Input, detail: AnatomyContext): DraftAnatomy {
+  const project = str(input.project);
+  const artifact = str(input.artifact);
+  const link = str(input.link);
+  const subtitle = shareoutSubtitle(input, Boolean(project));
+  const field = (path: string) => detail.inline?.get(`0.${path}`);
+  const editing = detail.editing === true;
+  // Read-only, a summary short enough is the card's body (§ 2); otherwise it
+  // is its own block, or its input.
+  const summary = str(input.summary);
+  const summaryInCard = !field("summary") && summary.length > 0 && summary.length <= CARD_BODY_CHARS;
+
+  const content: unknown[] = [];
+  /** One of the share-out's words: its input in place, or the text shown. */
+  const part = (path: string, label: string, value: string) => {
+    const inline = field(path);
+    if (inline) content.push(...fieldInputBlocks([inline]));
+    else if (value) {
+      content.push(labelledText(label, value));
+      if (editing && value.length > MAX_INPUT_CHARS) content.push(context(TOO_LONG_TO_EDIT));
+    }
+  };
+
+  if (!summaryInCard) part("summary", "What this is", summary);
+  const changed = str(input.what_changed);
+  if (changed) content.push(quoteBlock("What changed since last round", changed));
+  const questions = (Array.isArray(input.feedback_wanted) ? input.feedback_wanted : []).map(str).slice(0, MAX_FEEDBACK_QUESTIONS);
+  const shown: string[] = [];
+  questions.forEach((q, i) => {
+    const inline = field(`feedback_wanted.${i}`);
+    if (inline) content.push(...fieldInputBlocks([inline]));
+    else if (q) shown.push(q);
+  });
+  if (shown.length) content.push(listBlock("Feedback wanted", shown));
+  part("not_looking_for", "Not looking for", str(input.not_looking_for));
+  part("deadline", "Deadline", str(input.deadline));
+  if (editing) content.push(context(SHAREOUT_LOCKED));
+
+  return {
+    header: "Share for feedback",
+    where: shareoutWhere(input, detail.cardText),
+    alerts: alertsFromCaveats(caveatsOf(detail.cardText)),
+    object: {
+      title: project || capital(artifact) || "Share-out",
+      ...(subtitle ? { subtitle } : {}),
+      ...(summaryInCard ? { body: summary } : {}),
+      ...(/^https?:\/\//.test(link) ? { open: { url: link, text: openWords(artifact) } } : {}),
+    },
+    content,
+    approve: shareoutApprove(input),
+    destination: `post in ${whereMrkdwn(shareoutPlaceElement(input, detail.cardText))}`,
+  };
 }

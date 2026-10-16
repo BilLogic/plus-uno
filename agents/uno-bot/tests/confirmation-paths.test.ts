@@ -1042,7 +1042,7 @@ describe("the button door", () => {
     assert.deepEqual(replacements, [
       {
         text: PROPOSAL.proposalText,
-        note: ":white_check_mark: Approved by <@U2>",
+        note: "Approved by <@U2>",
       },
     ]);
   });
@@ -1237,14 +1237,14 @@ describe("a stated card answers in its own words", () => {
 
   it("closes the card with what the ⛔ did and who decided", async () => {
     const { notes, delivery } = await press(await stagedStated(), "cancel");
-    assert.deepEqual(notes, [`:no_entry: Rejected, nothing filed, decided by <@${PRESSER}>.`]);
+    assert.deepEqual(notes, [`Rejected, nothing filed, decided by <@${PRESSER}>.`]);
     assert.equal(delivery.gateNotes.length, 1);
   });
 
   it("keeps the ✅ lines every card has", async () => {
     const { notes, delivery } = await press(await stagedStated(), "confirm");
     assert.deepEqual(delivery.gateNotes, [{ kind: "resolved", decision: "confirm" }]);
-    assert.deepEqual(notes, [`:white_check_mark: Approved by <@${PRESSER}>`]);
+    assert.deepEqual(notes, [`Approved by <@${PRESSER}>`]);
   });
 
   it("answers a decision after the window with the card's own line", async () => {
@@ -1299,7 +1299,7 @@ describe("a stated card answers in its own words", () => {
 
   it("leaves a turn's card on the generic lines", async () => {
     const { notes } = await press(await staged(), "cancel");
-    assert.deepEqual(notes, [`:no_entry: Cancelled by <@${PRESSER}> — tell me what to change and I'll stage it again.`]);
+    assert.deepEqual(notes, [`Cancelled by <@${PRESSER}> — tell me what to change and I'll stage it again.`]);
     assert.match(renderGateNote({ kind: "superseded" }), /newest card in this thread/);
     assert.match(renderGateNote({ kind: "expired" }), /Ask me again/);
   });

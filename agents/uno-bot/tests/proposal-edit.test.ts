@@ -227,7 +227,7 @@ describe("Approve with a field edited in place", () => {
     await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", ...request }, deps);
     assert.deepEqual(ran[0]?.execute?.input, PROPOSAL.input);
     assert.equal(ran[0]?.edited, undefined);
-    assert.deepEqual(cardUpdates.map((u) => u.note), [":white_check_mark: Approved by <@U2>"]);
+    assert.deepEqual(cardUpdates.map((u) => u.note), ["Approved by <@U2>"]);
   });
 
   it("holds a field typed in place to the guards, and keeps the typing on the redrawn draft", async () => {
@@ -270,7 +270,7 @@ describe("Approve with edits", () => {
     assert.equal(ran[0]?.execute?.operations[0]?.input.title, "Reflection, shorter form");
     assert.equal(ran[0]?.execute?.input.summary, PROPOSAL.input.summary);
     assert.deepEqual(cardUpdates.map((u) => u.note), [
-      "<@U2> edited Title\n:white_check_mark: Approved by <@U2>",
+      "<@U2> edited Title\nApproved by <@U2>",
     ]);
   });
 
@@ -292,7 +292,7 @@ describe("Approve with edits", () => {
         "0.properties.product_pillar": ("Universal"),
       });
     const [update] = cardUpdates;
-    assert.match(update!.note, /^<@U2> edited Title, Summary, Product Pillar\n:white_check_mark: Approved by <@U2>$/);
+    assert.match(update!.note, /^<@U2> edited Title, Summary, Product Pillar\nApproved by <@U2>$/);
     for (const edited of ["Reflection, shorter form", "One question after each session.", "Universal"]) {
       assert.ok(update!.text.includes(edited), edited);
     }
@@ -320,7 +320,7 @@ describe("Approve with edits", () => {
     const { deps, ran, cardUpdates } = harness(await staged());
     await approveWith(deps, { "0.title": ("Reflection redesign") });
     assert.deepEqual(ran[0]?.execute?.input, PROPOSAL.input);
-    assert.deepEqual(cardUpdates.map((u) => u.note), [":white_check_mark: Approved by <@U2>"]);
+    assert.deepEqual(cardUpdates.map((u) => u.note), ["Approved by <@U2>"]);
   });
 
   it("lets a standing confirmer's edit run with nobody else asked", async () => {
@@ -411,7 +411,10 @@ describe("a pick under Edit fields keeps itself", () => {
     const redrawn = views.calls.at(-1)!;
     assert.equal(redrawn.kind === "update" && redrawn.viewId, "V1");
     const words = JSON.stringify(blocksOf(redrawn.view));
-    assert.match(words, /\*Product Pillar:\* Universal/);
+    // The pick reads in the facts, beside the Edit fields button that made it.
+    const facts = blocksOf(redrawn.view).find((b) => (b as { fields?: unknown }).fields) as { accessory?: { action_id?: string } } | undefined;
+    assert.match(JSON.stringify(facts), /\*Product Pillar\*\\nUniversal/);
+    assert.equal(facts?.accessory?.action_id, "uno_review_edit");
     assert.match(words, /Edited here: Product Pillar/);
     // The draft keeps its fields in place, by the same block ids, so what was
     // typed there survives the redraw.
@@ -438,7 +441,7 @@ describe("a pick under Edit fields keeps itself", () => {
       for (const which of order) await keepReviewPick(picks[which], h.deps);
       assert.deepEqual(await keptOn(h.deps.threadState), { [KEY]: "Universal", [STATUS]: "Shipped" });
       const last = JSON.stringify(blocksOf(h.views.calls.at(-1)!.view));
-      assert.match(last, /\*Product Pillar:\* Universal/);
+      assert.match(last, /\*Product Pillar\*\\nUniversal/);
 
       await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", decision: "confirm" }, h.deps);
       assert.deepEqual(h.ran[0]?.execute?.input.properties, { product_pillar: "Universal", "Design Status": "Shipped" });

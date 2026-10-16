@@ -15,7 +15,14 @@ import {
   renderReviewer,
   renderShareout,
 } from "../src/tools/share-out-render";
-import { shareoutPlace } from "../src/tools/share-for-feedback";
+import {
+  decideShareoutPlace,
+  executeShareForFeedback,
+  shareoutPlace,
+  type ShareoutChannel,
+  type ShareoutReads,
+} from "../src/tools/share-for-feedback";
+import { preflight } from "../src/agent/preflight";
 import { cardReadsFor } from "../src/turn/env-deps";
 import type { Env } from "../src/types";
 
@@ -201,23 +208,230 @@ describe("where a share-out posts", () => {
   });
 });
 
+// A channel the asker names, as Slack would show it to the bot: #design-crit
+// is public with the asker in it, #big-room is public without them, #secret-room
+// is private with the bot in it, and #hidden is private without the bot, so
+// Slack does not show it at all.
+const CRIT = { id: "C0CRIT0001", name: "design-crit", kind: "channel", isPrivate: false, isArchived: false, botIsMember: false } as const;
+const BIG = { id: "C0BIG00001", name: "big-room", kind: "channel", isPrivate: false, isArchived: false, botIsMember: true } as const;
+const SECRET = { id: "G0SECRET01", name: "secret-room", kind: "channel", isPrivate: true, isArchived: false, botIsMember: true } as const;
+const OLD = { id: "C0OLD00001", name: "old-crit", kind: "channel", isPrivate: false, isArchived: true, botIsMember: false } as const;
+const KNOWN: ShareoutChannel[] = [CRIT, BIG, SECRET, OLD];
+const MEMBERS: Record<string, string[]> = { C0CRIT0001: ["U_ASKER", "U2"], C0BIG00001: ["U2"], G0SECRET01: ["U_ASKER"], C0OLD00001: ["U_ASKER"] };
+
+/** Slack as the bot sees it, recording every read. */
+function fakeReads(over: Partial<ShareoutReads> = {}) {
+  const calls: string[] = [];
+  const reads: ShareoutReads = {
+    affordable: () => true,
+    async channelById(id) {
+      calls.push(`info ${id}`);
+      return KNOWN.find((c) => c.id === id) ?? "missing";
+    },
+    async channelByName(name) {
+      calls.push(`list ${name}`);
+      return KNOWN.find((c) => c.name === name) ?? "missing";
+    },
+    async members(channel) {
+      calls.push(`members ${channel}`);
+      return MEMBERS[channel] ?? null;
+    },
+    ...over,
+  };
+  return { reads, calls };
+}
+
+describe("a share-out in a channel the asker names", () => {
+  const env = { PLUS_DESIGN_FEEDBACK_CHANNEL_ID: "C_FEEDBACK", TEST_CHANNEL_IDS: "C_SANDBOX" };
+  const asked = (channel: string) => ({ channel, threadTs: "1.1", userMsgTs: "1.1", requestedBy: "U_ASKER" });
+  type Asked = Parameters<typeof decideShareoutPlace>[1];
+  const decide = (input: Record<string, unknown>, at: Asked = asked("C_DESIGN"), reads = fakeReads().reads) =>
+    decideShareoutPlace(env, at, input, reads);
+  const refusal = async (input: Record<string, unknown>, at: Asked = asked("C_DESIGN"), reads = fakeReads().reads) => {
+    const decided = await decide(input, at, reads);
+    assert.equal(decided.ok, false, JSON.stringify(decided));
+    return decided.ok ? "" : decided.refusal;
+  };
+
+  it("posts top level in a channel named by id, and names it as a channel link", async () => {
+    assert.deepEqual(await decide({ place: "channel", channel: "C0CRIT0001" }), {
+      ok: true,
+      place: { channel: "C0CRIT0001", where: "<#C0CRIT0001|design-crit>" },
+    });
+  });
+
+  it("posts in a channel named by #name, looked up once", async () => {
+    const { reads, calls } = fakeReads();
+    assert.deepEqual(await decide({ place: "channel", channel: "#Design-Crit" }, asked("C_DESIGN"), reads), {
+      ok: true,
+      place: { channel: "C0CRIT0001", where: "<#C0CRIT0001|design-crit>" },
+    });
+    assert.deepEqual(calls, ["list design-crit", "members C0CRIT0001"]);
+  });
+
+  it("reads a channel mention or link as its id", async () => {
+    for (const channel of ["<#C0CRIT0001|design-crit>", "<#C0CRIT0001>", "https://plus.slack.com/archives/C0CRIT0001"]) {
+      const decided = await decide({ place: "channel", channel });
+      assert.equal(decided.ok && decided.place.channel, "C0CRIT0001", channel);
+    }
+  });
+
+  it("posts in a private channel the bot and the asker are both in", async () => {
+    const decided = await decide({ place: "channel", channel: "#secret-room" });
+    assert.equal(decided.ok && decided.place.where, "<#G0SECRET01|secret-room>");
+  });
+
+  it("refuses a channel the asker is not in, says so, and offers the two places", async () => {
+    const said = await refusal({ place: "channel", channel: "#big-room" });
+    assert.match(said, /You're not in #big-room/);
+    assert.match(said, /#plus-design-feedback or here/);
+  });
+
+  it("refuses a private channel the bot is not in, and asks to be added", async () => {
+    const byName = await refusal({ place: "channel", channel: "#hidden" });
+    assert.match(byName, /can't find #hidden/);
+    assert.match(byName, /add me to it/);
+    const byId = await refusal({ place: "channel", channel: "G0HIDDEN01" });
+    assert.match(byId, /can't post in <#G0HIDDEN01> — add me to it/);
+    assert.match(byId, /#plus-design-feedback or here/);
+  });
+
+  it("refuses a private channel Slack lists without the bot in it", async () => {
+    const { reads } = fakeReads({ channelById: async () => ({ ...SECRET, botIsMember: false }) });
+    assert.match(await refusal({ place: "channel", channel: "G0SECRET01" }, asked("C_DESIGN"), reads), /can't post in #secret-room — add me to it/);
+  });
+
+  it("refuses an archived channel, a DM and a missing channel", async () => {
+    assert.match(await refusal({ place: "channel", channel: "C0OLD00001" }), /#old-crit is archived/);
+    const { reads, calls } = fakeReads();
+    assert.match(await refusal({ place: "channel", channel: "D0BILL0001" }, asked("C_DESIGN"), reads), /not a channel/);
+    assert.deepEqual(calls, []);
+    assert.match(await refusal({ place: "channel" }), /Which channel/);
+  });
+
+  it("refuses rather than check a channel the turn's budget cannot cover", async () => {
+    const { reads, calls } = fakeReads({ affordable: () => false });
+    assert.match(await refusal({ place: "channel", channel: "#design-crit" }, asked("C_DESIGN"), reads), /used this turn's Slack lookups/);
+    assert.deepEqual(calls, []);
+  });
+
+  it("refuses when it cannot check the asker is in the channel", async () => {
+    const { reads } = fakeReads({ members: async () => null });
+    assert.match(await refusal({ place: "channel", channel: "#design-crit" }, asked("C_DESIGN"), reads), /couldn't check you're in #design-crit/);
+    const nobody = { channel: "C_DESIGN", threadTs: "1.1", userMsgTs: "1.1" };
+    assert.match(await refusal({ place: "channel", channel: "#design-crit" }, nobody), /couldn't tell who's asking/);
+  });
+
+  it("refuses when Slack cannot be read", async () => {
+    const { reads } = fakeReads({ channelByName: async () => "failed" });
+    assert.match(await refusal({ place: "channel", channel: "#design-crit" }, asked("C_DESIGN"), reads), /couldn't look up #design-crit/);
+  });
+
+  it("tells a channel that does not exist apart from one it could not look up", async () => {
+    const missing = await refusal({ place: "channel", channel: "#no-such-channel-xyz" });
+    assert.match(missing, /^I can't find #no-such-channel-xyz\. If it's private, add me to it first\./);
+    assert.doesNotMatch(missing, /couldn't look up/);
+  });
+
+  it("asks for the link when the channel lists ran on past what one turn reads", async () => {
+    const { reads } = fakeReads({ channelByName: async () => "unfinished" });
+    const said = await refusal({ place: "channel", channel: "#design-crit" }, asked("C_DESIGN"), reads);
+    assert.match(said, /couldn't find #design-crit in the channels I read — paste its link/);
+    assert.match(said, /#plus-design-feedback or here/);
+  });
+
+  it("keeps an ask from a test channel in its own thread, and reads nothing", async () => {
+    const { reads, calls } = fakeReads();
+    assert.deepEqual(await decide({ place: "channel", channel: "#design-crit" }, asked("C_SANDBOX"), reads), {
+      ok: true,
+      place: { channel: "C_SANDBOX", threadTs: "1.1", where: "this thread" },
+    });
+    assert.deepEqual(calls, []);
+  });
+
+  it("posts an ask from a DM in the channel named, since a DM is not a test channel", async () => {
+    const dm = { channel: "D_BILL", threadTs: "dm", replyTs: "2.2", userMsgTs: "2.2", requestedBy: "U_ASKER" };
+    const decided = await decide({ place: "channel", channel: "#design-crit" }, dm);
+    assert.equal(decided.ok && decided.place.channel, "C0CRIT0001");
+  });
+
+  it("reads #plus-design-feedback named as a channel as the feedback channel", async () => {
+    const { reads, calls } = fakeReads();
+    const feedbackEnv = { ...env, PLUS_DESIGN_FEEDBACK_CHANNEL_ID: "C0FEEDBACK1" };
+    for (const channel of ["#plus-design-feedback", "C0FEEDBACK1", "<#C0FEEDBACK1|plus-design-feedback>"]) {
+      assert.deepEqual(await decideShareoutPlace(feedbackEnv, asked("C_DESIGN"), { place: "channel", channel }, reads), {
+        ok: true,
+        place: { channel: "C0FEEDBACK1", where: "#plus-design-feedback" },
+      });
+    }
+    assert.deepEqual(calls, []);
+  });
+
+  it("leaves the default and here as they were, with nothing read", async () => {
+    const { reads, calls } = fakeReads();
+    assert.deepEqual(await decide({}, asked("C_DESIGN"), reads), { ok: true, place: { channel: "C_FEEDBACK", where: "#plus-design-feedback" } });
+    assert.deepEqual(await decide({ place: "here" }, asked("C_DESIGN"), reads), {
+      ok: true,
+      place: { channel: "C_DESIGN", threadTs: "1.1", where: "this thread" },
+    });
+    assert.deepEqual(calls, []);
+  });
+});
+
+describe("the refusal comes before a card is staged", () => {
+  const env = { PLUS_DESIGN_FEEDBACK_CHANNEL_ID: "C_FEEDBACK", TEST_CHANNEL_IDS: "C_SANDBOX" } as unknown as Env;
+  const summary = "The live app prototype, ready for a first round.";
+  const ctx = (reads = fakeReads().reads) => ({
+    env,
+    shareout: { slack: { channel: "C_DESIGN", threadTs: "1.1", requestedBy: "U_ASKER" }, reads },
+  });
+
+  it("asks instead of staging when the asker is not in the channel", async () => {
+    const ask = await preflight("shareout_post", { summary, place: "channel", channel: "#big-room" }, ctx());
+    assert.match(ask?.ask ?? "", /You're not in #big-room/);
+  });
+
+  it("stages a share-out to a channel that passes every check", async () => {
+    assert.equal(await preflight("shareout_post", { summary, place: "channel", channel: "#design-crit" }, ctx()), null);
+  });
+
+  it("the executor refuses at ✅ too, and posts nothing", async () => {
+    const slack = { channel: "C_DESIGN", threadTs: "1.1", userMsgTs: "1.1", requestedBy: "U_ASKER" };
+    const out = JSON.parse(await executeShareForFeedback(env, { summary, place: "channel", channel: "#big-room" }, slack, fakeReads().reads));
+    assert.equal(out.ok, false);
+    assert.equal(out.status, "refused");
+    assert.match(out.error, /You're not in #big-room/);
+  });
+});
+
 describe("the card names where a share-out will post", () => {
   const env = { PLUS_DESIGN_FEEDBACK_CHANNEL_ID: "C_FEEDBACK", TEST_CHANNEL_IDS: "C_SANDBOX" } as unknown as Env;
-  const where = (input: Record<string, unknown>, channel: string) => cardReadsFor(env).shareoutWhere(input, channel);
+  const where = (input: Record<string, unknown>, channel: string) =>
+    cardReadsFor(env, fakeReads().reads).shareoutWhere(input, { channel, requestedBy: "U_ASKER" });
 
-  it("names #plus-design-feedback by default", () => {
-    assert.equal(where({ summary: "x" }, "C_DESIGN"), "#plus-design-feedback");
+  it("names #plus-design-feedback by default", async () => {
+    assert.equal(await where({ summary: "x" }, "C_DESIGN"), "#plus-design-feedback");
   });
 
-  it("names this DM when the share-out stays in a DM", () => {
-    assert.equal(where({ summary: "x", place: "here" }, "D_BILL"), "this DM");
+  it("names this DM when the share-out stays in a DM", async () => {
+    assert.equal(await where({ summary: "x", place: "here" }, "D_BILL"), "this DM");
   });
 
-  it("names this thread when the share-out stays in the asking thread", () => {
-    assert.equal(where({ summary: "x", place: "here" }, "C_DESIGN"), "this thread");
+  it("names this thread when the share-out stays in the asking thread", async () => {
+    assert.equal(await where({ summary: "x", place: "here" }, "C_DESIGN"), "this thread");
   });
 
-  it("names this thread for a test channel, whatever was asked", () => {
-    assert.equal(where({ summary: "x" }, "C_SANDBOX"), "this thread");
+  it("names this thread for a test channel, whatever was asked", async () => {
+    assert.equal(await where({ summary: "x" }, "C_SANDBOX"), "this thread");
+    assert.equal(await where({ summary: "x", place: "channel", channel: "#design-crit" }, "C_SANDBOX"), "this thread");
+  });
+
+  it("names the channel the asker named, by id or by name", async () => {
+    assert.equal(await where({ summary: "x", place: "channel", channel: "C0CRIT0001" }, "C_DESIGN"), "<#C0CRIT0001|design-crit>");
+    assert.equal(await where({ summary: "x", place: "channel", channel: "#design-crit" }, "C_DESIGN"), "<#C0CRIT0001|design-crit>");
+  });
+
+  it("names the channel as asked when a check fails, so the card never names another place", async () => {
+    assert.equal(await where({ summary: "x", place: "channel", channel: "#big-room" }, "C_DESIGN"), "#big-room");
   });
 });

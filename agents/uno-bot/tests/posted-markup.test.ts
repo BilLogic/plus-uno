@@ -178,7 +178,7 @@ test("a card replaced over response_url is sanitised, text and blocks", async ()
   await postToResponseUrl("https://hooks.slack.test/actions/1", {
     replace_original: true,
     text,
-    blocks: proposalCardBlocks(text, ":white_check_mark: Approved by <@U03FYQJRQHX>"),
+    blocks: proposalCardBlocks(text, "Approved by <@U03FYQJRQHX>"),
   });
   const wire = JSON.stringify(sent[0]);
   assert.doesNotMatch(wire, /<@teammate>/, wire);

@@ -10,7 +10,8 @@
 //
 // Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `exec:{ts}`, `report:{ts}`,
 // `event:{event_id}`, `actx:{channel}:{thread}`, `cancel:{channel}:{thread}`,
-// `run:{user}`, `filing:{key}`, and the alarm's own `gc:next`.
+// `run:{user}`, `filing:{key}`, `cmp:{channel}:{thread}:{scenario}`, and the
+// alarm's own `gc:next`.
 //
 // ── THE CONTRACT IS THIS CLASS'S OWN SIGNATURE (#493, #494) ─────────────────
 //
@@ -22,7 +23,7 @@
 // `takeCutOffExecutionInThread`, `findCutOffExecutions`,
 // `reportCutOffNote`, `get/putAssistantContext`, `requestCancel`,
 // `consumeCancel`, `cancelForUser`, `setActiveRun`, `checkAndRecordEvent`,
-// `claimRun`, `markRunDone`, `claimFiling`, `settleFiling`. A rename is a type error rather than a runtime
+// `claimRun`, `markRunDone`, `claimFiling`, `settleFiling`, `claimComparison`. A rename is a type error rather than a runtime
 // 404, which is the whole point.
 //
 // There is NO `fetch()` and no route table. Until #494 this class carried a
@@ -59,6 +60,8 @@ import {
   ownTtl,
   ownWords,
   ownText,
+  ownOperations,
+  decidedLive,
   REPORT_GRACE_MS,
   changedReport,
   expiredReport,
@@ -68,6 +71,12 @@ import {
   type ReportExpiryRecord,
   type ReportExpiryEdit,
   claimedFiling,
+  comparisonKey,
+  decidedNoteOf,
+  decidedOf,
+  decidedPayload,
+  type DecidedMark,
+  type DecidedNote,
   FILING_TTL_MS,
   proposalReplyThread,
   proposalSlot,
@@ -113,6 +122,15 @@ interface ProposalRecord {
   retired?: boolean;
   /** Picks kept on the card's Review pop-up, by user id (`keepPick`). */
   kept?: Record<string, Record<string, string>>;
+  /** Claimed with what was decided (`claimProposal`): the payload is the
+   *  decided card, kept for View and out of reach of every other lookup.
+   *  Absent on a card still pending; a claim before this was kept deleted the
+   *  record instead. */
+  decided?: DecidedNote;
+  /** When the claim decided it: the decided card is kept for
+   *  `DECIDED_TTL_MS` from here, and swept after (`decidedLive`). Absent on a
+   *  card decided before it was stamped, which keeps its staged lifetime. */
+  decidedAt?: number;
 }
 
 // Latest assistant-panel context (what surface the user has open) per thread.
@@ -231,7 +249,8 @@ export class ThreadState extends DurableObject<Env> {
 
   // Delete expired records by their own TTL. Keys: event:{id}
   // (EVENT_DEDUP_TTL_MS), hist:{…} (HISTORY_TTL_MS), prop:{ts} and exec:{ts}
-  // (each card's own, `proposalTtlMs`). Answers when the next sweep is due: a
+  // (each card's own, `proposalTtlMs`; a decided card's from its decision,
+  // `decidedLive`). Answers when the next sweep is due: a
   // day away if anything remains, never if the store is empty.
   private async collectGarbage(now: number): Promise<number> {
     return this.storage.transaction(async (txn): Promise<number> => {
@@ -248,7 +267,8 @@ export class ThreadState extends DurableObject<Env> {
       }
       const props = await txn.list<ProposalRecord>({ prefix: "prop:" });
       for (const [key, rec] of props) {
-        if (now - rec.createdAt > recordTtlMs(rec)) await txn.delete(key);
+        const live = rec.decided ? decidedLive(rec, (rec.payload as PendingProposal | null) ?? {}, now) : now - rec.createdAt <= recordTtlMs(rec);
+        if (!live) await txn.delete(key);
         else remaining++;
       }
       const reports = await txn.list<ReportRecord>({ prefix: "report:" });
@@ -273,6 +293,11 @@ export class ThreadState extends DurableObject<Env> {
       const actx = await txn.list<AssistantContextRecord>({ prefix: "actx:" });
       for (const [key, rec] of actx) {
         if (now - rec.updatedAt > HISTORY_TTL_MS) await txn.delete(key);
+        else remaining++;
+      }
+      const compared = await txn.list<{ at: number }>({ prefix: "cmp:" });
+      for (const [key, rec] of compared) {
+        if (now - rec.at > HISTORY_TTL_MS) await txn.delete(key);
         else remaining++;
       }
       const filings = await txn.list<FilingRecord>({ prefix: "filing:" });
@@ -376,7 +401,7 @@ export class ThreadState extends DurableObject<Env> {
         // A record already stamped with a successor is settled. One only RETIRED
         // still wants this ts — that is the caller who retired it ahead of
         // staging this very card (#583).
-        if (rec.supersededBy) continue;
+        if (rec.supersededBy || rec.decided) continue;
         if (at - rec.createdAt > recordTtlMs(rec)) continue; // already "expired"
         const pending = rec.payload as PendingProposal | null;
         if (!pending || pending.channel !== proposal.channel) continue;
@@ -405,9 +430,9 @@ export class ThreadState extends DurableObject<Env> {
     const key = proposalKey(proposalTs);
     return this.storage.transaction(async (txn) => {
       const rec = await txn.get<ProposalRecord>(key);
-      // Claimed (gone), already retired or replaced, or aged out: this call
-      // retired nothing, and says so.
-      if (!rec || rec.retired || rec.supersededBy) return { retired: false };
+      // Claimed (gone, or kept decided), already retired or replaced, or aged
+      // out: this call retired nothing, and says so.
+      if (!rec || rec.decided || rec.retired || rec.supersededBy) return { retired: false };
       if (at - rec.createdAt > recordTtlMs(rec)) return { retired: false };
       const { kept: _, ...settled } = rec;
       await txn.put<ProposalRecord>(key, { ...settled, retired: true });
@@ -423,7 +448,7 @@ export class ThreadState extends DurableObject<Env> {
     const key = proposalKey(proposalTs);
     return this.storage.transaction(async (txn) => {
       const rec = await txn.get<ProposalRecord>(key);
-      if (!rec || rec.retired || rec.supersededBy) return "gone";
+      if (!rec || rec.decided || rec.retired || rec.supersededBy) return "gone";
       if (at - rec.createdAt > recordTtlMs(rec)) return "gone";
       const pending = rec.payload as PendingProposal | null;
       if (!pending) return "gone";
@@ -450,7 +475,7 @@ export class ThreadState extends DurableObject<Env> {
     const recKey = proposalKey(proposalTs);
     return this.storage.transaction(async (txn) => {
       const rec = await txn.get<ProposalRecord>(recKey);
-      if (!rec || rec.retired || rec.supersededBy) return null;
+      if (!rec || rec.decided || rec.retired || rec.supersededBy) return null;
       if (at - rec.createdAt > recordTtlMs(rec)) return null;
       const mine = { ...(rec.kept?.[userId] ?? {}) };
       if (value === null) delete mine[key];
@@ -464,7 +489,7 @@ export class ThreadState extends DurableObject<Env> {
   // retirement does not matter: a chain still ends in a live newest card.
   private async successorIsLive(ts: string, at: number, store: Txn): Promise<boolean> {
     const rec = await store.get<ProposalRecord>(proposalKey(ts));
-    return !!rec && at - rec.createdAt <= recordTtlMs(rec);
+    return !!rec && !rec.decided && at - rec.createdAt <= recordTtlMs(rec);
   }
 
   // "expired", "superseded" and "none" are different answers on purpose: the
@@ -476,15 +501,24 @@ export class ThreadState extends DurableObject<Env> {
     return this.storage.transaction(async (txn): Promise<ProposalLookup> => {
       const rec = await txn.get<ProposalRecord>(proposalKey(proposalTs));
       if (!rec) return { state: "none" };
+      // Decided: kept for View for its own lifetime from the decision, then
+      // gone as a claimed card is.
+      if (rec.decided) {
+        if (!decidedLive(rec, (rec.payload as PendingProposal | null) ?? {}, at)) {
+          await txn.delete(proposalKey(proposalTs));
+          return { state: "none" };
+        }
+        return { state: "none", decided: decidedOf(rec.payload as PendingProposal, rec.decided) };
+      }
       const proposal = (rec.payload as PendingProposal | null) ?? {};
       if (rec.supersededBy && (await this.successorIsLive(rec.supersededBy, at, txn))) {
-        return { state: "superseded", ...ownWords(proposal), ...ownText(proposal) };
+        return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal) };
       }
       if (at - rec.createdAt > recordTtlMs(rec)) {
         await txn.delete(proposalKey(proposalTs));
-        return { state: "expired", ...ownTtl(proposal), ...ownWords(proposal), ...ownText(proposal) };
+        return { state: "expired", ...ownTtl(proposal), ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal) };
       }
-      if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(proposal), ...ownText(proposal) };
+      if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal) };
       return {
         state: "found",
         proposal: withLiveMark(rec.payload as PendingProposal, at),
@@ -501,7 +535,7 @@ export class ThreadState extends DurableObject<Env> {
     let best: ProposalRecord | null = null;
     for (const rec of all.values()) {
       if (at - rec.createdAt > recordTtlMs(rec)) continue;
-      if (rec.supersededBy || rec.retired) continue; // retired, so never the thread's live card
+      if (rec.supersededBy || rec.retired || rec.decided) continue; // retired or decided, so never the thread's live card
       const proposal = rec.payload as PendingProposal | null;
       if (!proposal || proposal.channel !== ref.channel) continue;
       if (proposalReplyThread(proposal) !== ref.thread) continue; // keyed on the card's thread
@@ -517,7 +551,7 @@ export class ThreadState extends DurableObject<Env> {
     const live: ProposalRecord[] = [];
     for (const rec of all.values()) {
       if (at - rec.createdAt > recordTtlMs(rec)) continue;
-      if (rec.supersededBy || rec.retired) continue;
+      if (rec.supersededBy || rec.retired || rec.decided) continue;
       const proposal = rec.payload as PendingProposal | null;
       if (!proposal || proposal.channel !== channel) continue;
       live.push(rec);
@@ -536,15 +570,27 @@ export class ThreadState extends DurableObject<Env> {
   // one they just looked up, and the lookups alone therefore left a replaced
   // card executable. The reason this is the store's job, and the per-message
   // run lease that makes the race reachable, are on the interface.
-  async claimProposal(proposalTs: string, at: number): Promise<boolean> {
+  //
+  // Won with what was decided, the record is rewritten instead of deleted: one
+  // put in place of one delete, in the same transaction, so View's record
+  // costs no extra hop. It is stamped with when it was decided, and ages out,
+  // and is swept, `DECIDED_TTL_MS` after that (`decidedLive`).
+  async claimProposal(proposalTs: string, at: number, decided?: DecidedMark): Promise<boolean> {
     const key = proposalKey(proposalTs);
     return this.storage.transaction(async (txn) => {
       const rec = await txn.get<ProposalRecord>(key);
-      if (!rec || rec.retired || rec.supersededBy) return false;
+      if (!rec || rec.decided || rec.retired || rec.supersededBy) return false;
       // A card being revised is refused too: its revision is on the way.
       const pending = rec.payload as PendingProposal | null;
       if (pending && withLiveMark(pending, at).revising) return false;
-      return txn.delete(key);
+      if (!decided || !pending) return txn.delete(key);
+      await txn.put<ProposalRecord>(key, {
+        payload: decidedPayload(pending, decided),
+        createdAt: rec.createdAt,
+        decided: decidedNoteOf(decided),
+        decidedAt: at,
+      });
+      return true;
     });
   }
 
@@ -848,6 +894,19 @@ export class ThreadState extends DurableObject<Env> {
     else await this.storage.delete(filingKey(key));
   }
 
+  // ----- one comparison per scenario per thread -----
+
+  async claimComparison(ref: ThreadRef, scenario: string, at: number): Promise<boolean> {
+    const key = comparisonKey(ref, scenario);
+    return this.storage.transaction(async (txn) => {
+      const held = await txn.get<{ at: number }>(key);
+      if (held && at - held.at < HISTORY_TTL_MS) return false;
+      await txn.put<{ at: number }>(key, { at });
+      await this.ensureGcAlarm(txn);
+      return true;
+    });
+  }
+
   // ----- the capacity outage (turn/capacity-outage.ts) -----
   //
   // One record for the workspace, kept here because this is the one
@@ -912,7 +971,7 @@ function recordTtlMs(rec: ProposalRecord): number {
 function reportLook(proposals: Map<string, ProposalRecord>, executions: Map<string, Execution>) {
   return reportItemLook((key) => {
     const proposal = proposals.get(proposalKey(key));
-    return proposal && { createdAt: proposal.createdAt, ttlMs: recordTtlMs(proposal) };
+    return proposal && !proposal.decided ? { createdAt: proposal.createdAt, ttlMs: recordTtlMs(proposal) } : undefined;
   }, (key) => executions.has(executionKey(key)));
 }
 

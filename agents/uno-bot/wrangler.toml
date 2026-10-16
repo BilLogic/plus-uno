@@ -18,8 +18,9 @@ head_sampling_rate = 1
 # trigger fires at both UTC hours its run can fall on, and the handler reads
 # each firing's scheduled time in ET, so only the firing at the run's ET hour
 # does anything:
-#   • 06:00 ET, Tue–Sat → the end-of-day run (10:00 UTC in EDT, 11:00 in EST),
-#     dated to the workday it sweeps: Saturday 06:00 sweeps Friday
+#   • 06:00 ET, Mon–Fri → the end-of-day run (10:00 UTC in EDT, 11:00 in EST),
+#     dated to the workday it sweeps: Monday 06:00 sweeps Friday and the
+#     weekend, reading from where Friday's run left off
 #   • 09:00 ET, Mon–Fri → the morning run    (13:00 UTC in EDT, 14:00 in EST)
 # The firing an hour off (11:00 or 13:00 UTC in EDT, 10:00 or 14:00 in EST) is
 # a no-op, so each run is once a day all year. Two of the free plan's five
@@ -35,7 +36,7 @@ head_sampling_rate = 1
 # ceiling (ADR-022, LOOKUP_CEILING = 38); a job the ceiling cuts short keeps its
 # place and retries. Dry run: GET /debug/sweep?dry_run=1&run=morning|end-of-day.
 [triggers]
-crons = ["0 10,11 * * TUE-SAT", "0 13,14 * * MON-FRI"]
+crons = ["0 10,11 * * MON-FRI", "0 13,14 * * MON-FRI"]
 
 # ── FREE-TIER CONSTRAINTS (deliberate — the team keeps the Worker on the free
 # plan; design within these, don't fight them) ────────────────────────────────
@@ -163,6 +164,11 @@ NOTION_BANNERS_DB_ID = "36eb7cca-4982-81f4-ad99-e53e62d9506a"
 # uno-blueprint Supabase project URL (source of truth, D8). Non-secret — the
 # read-only anon key is set separately via `wrangler secret put SUPABASE_ANON_KEY`.
 SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"
+# The uno-bot Auth user on that project — the blueprint WRITE identity, an
+# rpc_writer (authoring RPCs only, deletes included; no table writes). Public on
+# purpose: its password is the secret SUPABASE_WRITE_PASSWORD, set with
+# scripts/blueprint-writer-wizard.sh.
+SUPABASE_WRITE_EMAIL = "uno-bot@uno-blueprint.local"
 # blueprint_search engine: "on" (default) = semantic (vector) search over the
 # semantic_search.corpus_chunks index, with keyword search as the fallback;
 # "off" = keyword only. Vector needs an embedding credential (the Vertex SA, same
@@ -419,6 +425,12 @@ STANDING_CONFIRMER_IDS = "U03FYQJRQHX,U09E652SJ02"
 #       read-only anon key for the uno-blueprint project. Unset,
 #       search_blueprint reports "not configured" and the bot falls back
 #       to cited docs rather than fabricating.
+#   SUPABASE_WRITE_PASSWORD [optional]
+#       password of the uno-bot Auth user (SUPABASE_WRITE_EMAIL in [vars])
+#       on the uno-blueprint project, an rpc_writer: it signs in for a
+#       one-hour JWT that opens the authoring RPCs and no table. Set it
+#       with scripts/blueprint-writer-wizard.sh. Unset, the bot cannot
+#       write the blueprint and reads are unaffected.
 #   GEMINI_API_KEY [DO NOT SET]
 #       AI Studio key — must NOT be set on the Worker (ADR-018,
 #       2026-07-16). The Vertex SA above is canonical and takes precedence

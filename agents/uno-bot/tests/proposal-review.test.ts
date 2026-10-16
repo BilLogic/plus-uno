@@ -26,7 +26,8 @@ import {
 } from "../src/slack/review-door";
 import type { CardMessage } from "../src/slack/button-door";
 import { proposalCardBlocks, renderProposalCard } from "../src/slack/proposal-render";
-import { draftSubmitOf } from "../src/slack/review-view";
+import { draftSubmitOf, outcomeView } from "../src/slack/review-view";
+import { statedCancelledNote } from "../src/slack/gate-note";
 import { runTurn, type ProposalCard, type TurnDeps } from "../src/turn/index";
 import { harness as turnHarness, request as turnRequest, PENDING } from "./helpers/turn-harness";
 import { verdictEvents } from "../src/usage/index";
@@ -97,6 +98,15 @@ function viewText(view: unknown): string {
   return JSON.stringify((view as { blocks: unknown[] }).blocks);
 }
 
+/** A rich text block's words, its pills written back as mentions. */
+function richWords(e: unknown): string {
+  const el = e as { text?: unknown; user_id?: string; channel_id?: string; url?: string; elements?: unknown[] };
+  if (typeof el.text === "string") return el.text;
+  if (el.user_id) return `<@${el.user_id}>`;
+  if (el.channel_id) return `<#${el.channel_id}>`;
+  return (el.elements ?? []).map(richWords).join("");
+}
+
 type CardBlock = { type: string; elements?: Array<{ action_id?: string; text?: { text: string } | string }> };
 
 /** The buttons a card's blocks offer, by label. */
@@ -143,7 +153,7 @@ describe("the card offers Review", () => {
     const words = blocks.map((b) => JSON.stringify(b));
 
     assert.equal(blocks[0]!.type, "section");
-    assert.match(words[0]!, /:warning: Ready to \*create a Notion page\*: _Goal cycle resets per session_ · Roadmap · Toolkit · Need PRD/);
+    assert.match(words[0]!, /"text":"Ready to \*create a Notion page\*: _Goal cycle resets per session_ · Roadmap · Toolkit · Need PRD/);
     assert.match(words[1]!, new RegExp(`Body ${body.length} characters · review before approving`));
     assert.match(words[2]!, /LLM-written · check before acting/);
     assert.deepEqual(cardButtons(blocks), ["Review"]);
@@ -171,7 +181,7 @@ describe("the card offers Review", () => {
       caveats: [],
       operations: [],
     });
-    const blocks = proposalCardBlocks(card.text, ":white_check_mark: Approved by <@U2>") as CardBlock[];
+    const blocks = proposalCardBlocks(card.text, "Approved by <@U2>") as CardBlock[];
     const words = JSON.stringify(blocks);
     assert.match(words, /Ready to \*file a GitHub issue\*: _Badge colour drift_/);
     assert.match(words, /Approved by <@U2>/);
@@ -180,7 +190,7 @@ describe("the card offers Review", () => {
   });
 
   it("keeps a decided card's draft one press away, as View", () => {
-    const blocks = proposalCardBlocks("(card)", ":white_check_mark: Approved by <@U2>") as CardBlock[];
+    const blocks = proposalCardBlocks("(card)", "Approved by <@U2>") as CardBlock[];
     assert.deepEqual(cardButtons(blocks), ["View"]);
     const row = blocks.find((b) => b.type === "actions");
     assert.deepEqual(row?.elements?.map((e) => e.action_id), ["uno_proposal_review"]);
@@ -249,9 +259,11 @@ describe("Review opens the draft", () => {
     assert.equal(inputs[1]!.optional, true);
     assert.equal(draft.blocks.at(-1)!.block_id, "uno_review_note", "the note is last, just above the footer");
     assert.deepEqual(actionIds(draft), [], "no decision buttons in the body");
-    // Edit fields sits at the top, beside the draft.
-    assert.equal(draft.blocks[0]?.accessory?.action_id, "uno_review_edit");
-    assert.equal(draft.blocks[0]?.accessory?.text.text, "Edit fields");
+    // Edit fields sits beside the facts its selects edit, under the title.
+    const facts = draft.blocks.find((b) => b.accessory?.action_id === "uno_review_edit");
+    assert.equal(facts?.type, "section");
+    assert.equal(facts?.accessory?.text.text, "Edit fields");
+    assert.ok(draft.blocks.indexOf(facts!) > draft.blocks.findIndex((b) => b.block_id === "uno_field:0.title"));
   });
 
   it("reads the decision and note from Submit, and asks for a note before Needs changes", () => {
@@ -288,7 +300,7 @@ describe("Review opens the draft", () => {
     assert.doesNotMatch(viewText(draft), /uno_review_edit/);
     assert.equal(draft.submit, undefined, "only Close");
     assert.equal(draft.close?.text, "Close");
-    assert.match(viewText(draft), /<@U07CONFIRM>/);
+    assert.match(viewText(draft), /"user_id":"U07CONFIRM"/);
   });
 
   it("lets a standing confirmer decide a card whose own set leaves them out", async () => {
@@ -364,7 +376,7 @@ describe("Approve in the pop-up", () => {
     assert.deepEqual(delivery.gateNotes, [{ kind: "resolved", decision: "confirm" }]);
     // The card is edited in place, as the button leaves it.
     assert.deepEqual(cardUpdates, [
-      { channel: CHANNEL, ts: CARD_TS, text: PROPOSAL.proposalText, note: ":white_check_mark: Approved by <@U2>" },
+      { channel: CHANNEL, ts: CARD_TS, text: PROPOSAL.proposalText, note: "Approved by <@U2>" },
     ]);
     // And the pop-up confirms the decision in one line, with nothing left to press.
     assert.deepEqual(views.calls.map((c) => c.kind), ["update"]);
@@ -704,7 +716,7 @@ describe("Reject in the pop-up", () => {
     ]);
     assert.deepEqual(
       cardUpdates.map((u) => u.note),
-      [":no_entry: Rejected by <@U2>: Wrong database"],
+      ["Rejected by <@U2>: Wrong database"],
     );
     assert.match(viewText(views.calls[0]!.view), /Rejected/);
     assert.deepEqual(actionIds(views.calls[0]!.view), []);
@@ -718,19 +730,102 @@ describe("Reject in the pop-up", () => {
   it("takes no reason at all", async () => {
     const { deps, cardUpdates, delivery } = harness(await staged());
     await runReviewDecision(decide("cancel", ""), deps);
-    assert.deepEqual(cardUpdates.map((u) => u.note), [":no_entry: Rejected by <@U2>"]);
+    assert.deepEqual(cardUpdates.map((u) => u.note), ["Rejected by <@U2>"]);
     assert.deepEqual(delivery.gateNotes, [{ kind: "resolved", decision: "cancel", rejected: {} }]);
   });
 });
 
 describe("a decided card", () => {
-  it("opens read-only from View, from the card's own words", async () => {
-    const { deps, views } = harness(createInMemoryThreadState());
-    await runReviewOpen({ ...open(), cardText: `${PROPOSAL.proposalText}\n:white_check_mark: Approved by <@U1>` }, deps);
-    const view = views.calls[1]!.view;
-    assert.match(viewText(view), /Reflection redesign/);
-    assert.match(viewText(view), /already been decided/);
+  it("falls back to its outcome alone when its record keeps no draft, as on a card decided before it did", async () => {
+    // The claim before the decided record: no mark, so the record is deleted.
+    const threadState = await staged();
+    assert.equal(await threadState.claimProposal(CARD_TS), true);
+    const { deps, views } = harness(threadState);
+    await runReviewOpen({ ...open(), cardText: `${PROPOSAL.proposalText}\n:white_check_mark: Approved by <@U0BILL0001>` }, deps);
+    const view = views.calls[1]!.view as { blocks: Array<{ type: string; level?: string; text?: { type: string; text: string } }>; submit?: unknown };
+    assert.deepEqual(view.blocks.map((b) => b.type), ["alert", "rich_text", "section"]);
+    assert.equal(view.blocks[0]!.level, "success");
+    assert.deepEqual(view.blocks[0]!.text, { type: "plain_text", text: "This proposal has already been decided." });
+    assert.equal(richWords(view.blocks[1]), "Approved by <@U0BILL0001>");
+    assert.match(view.blocks[2]!.text!.text, /no longer kept, so only its outcome shows here/);
+    assert.equal(view.submit, undefined);
     assert.deepEqual(actionIds(view), []);
+  });
+
+  it("reads its outcome's level off the words, and off the emoji a card decided before them still leads with", () => {
+    const cases: Array<[string, string, string]> = [
+      ["Approved by <@U0BILL0001>", "success", "Approved by <@U0BILL0001>"],
+      [":white_check_mark: Approved by <@U0BILL0001>", "success", "Approved by <@U0BILL0001>"],
+      ["Answered by <@U0BILL0001>.", "success", "Answered by <@U0BILL0001>."],
+      ["Rejected by <@U0BILL0001>: Wrong database", "default", "Rejected by <@U0BILL0001>: Wrong database"],
+      [":no_entry: Rejected by <@U0BILL0001>: Wrong database", "default", "Rejected by <@U0BILL0001>: Wrong database"],
+      ["Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again.", "default", "Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again."],
+      [":no_entry: Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again.", "default", "Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again."],
+      ["Left as deliberate, nothing filed, decided by <@U0BILL0001>.", "default", "Left as deliberate, nothing filed, decided by <@U0BILL0001>."],
+      [":no_entry: Left as deliberate, nothing filed, decided by <@U0BILL0001>.", "default", "Left as deliberate, nothing filed, decided by <@U0BILL0001>."],
+      [":warning: This run was cut off before it reported back — see the thread for what finished.", "warning", "This run was cut off before it reported back — see the thread for what finished."],
+    ];
+    // The stated card's note as its writer words it, so a change to that
+    // wording reads here too.
+    const stated = statedCancelledNote({ cancelled: "No intake filed" }, "U0BILL0001");
+    cases.push([stated, "default", stated]);
+    for (const [last, level, text] of cases) {
+      const view = outcomeView({ channel: CHANNEL, ts: CARD_TS }, `${PROPOSAL.proposalText}\n${last}`) as { blocks: Array<{ type: string; level?: string; text?: { type: string; text: string } }> };
+      // The level on a plain alert, and the outcome, pills and all, on the line under it.
+      assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level, view.blocks[0]!.text!.type], ["alert", level, "plain_text"], last);
+      assert.equal(richWords(view.blocks[1]), text, last);
+    }
+  });
+
+  it("falls back to a plain decided line when the card's text carries no outcome", async () => {
+    const { deps, views } = harness(createInMemoryThreadState());
+    await runReviewOpen({ ...open(), cardText: PROPOSAL.proposalText }, deps);
+    const view = views.calls[1]!.view as { blocks: Array<{ type: string; level?: string; text?: { text: string } }> };
+    assert.equal(views.refused.length, 0);
+    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "info"], ["section", undefined]]);
+    assert.match(view.blocks[0]!.text!.text, /already been decided/);
+  });
+
+  it("opens from View as its draft, read-only, under who approved it", async () => {
+    const threadState = await staged();
+    const { deps, views } = harness(threadState);
+    await runReviewDecision({ ...approve("U0BILL0001") }, deps);
+    await runReviewOpen({ ...open("U0OTHER001"), cardText: "(the decided card)" }, deps);
+    const view = views.calls.at(-1)!.view as { blocks: Array<{ type: string; level?: string; text?: { text: string } }>; submit?: unknown };
+    assert.equal(views.refused.length, 0);
+    assert.equal(view.blocks[0]!.type, "alert");
+    assert.equal(view.blocks[0]!.level, "success");
+    assert.equal(view.blocks[0]!.text!.text, "Approved.");
+    assert.equal(richWords(view.blocks[1]), "Approved by <@U0BILL0001>.");
+    assert.match(viewText(view), /Reflection redesign/, "the draft, not the card's text");
+    assert.doesNotMatch(viewText(view), /the decided card/);
+    assert.equal(view.submit, undefined);
+    assert.equal(view.blocks.filter((b) => b.type === "input").length, 0);
+    assert.deepEqual(actionIds(view), []);
+  });
+
+  it("opens a rejected card the same way, under a plain alert with the reason", async () => {
+    const threadState = await staged();
+    const { deps, views } = harness(threadState);
+    await runReviewDecision({ ...approve("U0BILL0001"), decision: "cancel", note: "Not this week" }, deps);
+    await runReviewOpen(open("U0BILL0001"), deps);
+    const view = views.calls.at(-1)!.view as { blocks: Array<{ type: string; level?: string; text?: { text: string } }> };
+    assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level], ["alert", "default"]);
+    assert.equal(view.blocks[0]!.text!.text, "Rejected.");
+    assert.equal(richWords(view.blocks[1]), "Rejected by <@U0BILL0001>: Not this week.");
+    assert.match(viewText(view), /Reflection redesign/);
+  });
+
+  it("draws what was approved, edits included, not the staged draft", async () => {
+    const threadState = await staged();
+    const { deps, views } = harness(threadState);
+    const state = { "uno_field:0.title": { value: { type: "plain_text_input", value: "Reflection, round two" } } };
+    const fields = [{ key: "0.title", label: "Title", kind: "text" as const, value: "Reflection redesign", required: true }];
+    await runReviewDecision({ ...approve("U0BILL0001"), state, fields }, deps);
+    await runReviewOpen(open(), deps);
+    const json = viewText(views.calls.at(-1)!.view);
+    assert.match(json, /Reflection, round two/);
+    assert.doesNotMatch(json, /Reflection redesign/);
   });
 
   it("still resolves from a ✅ or ⛔ reaction, which the card no longer advertises", async () => {

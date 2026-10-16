@@ -1,23 +1,16 @@
 ---
 embodiment: ide
-summary: docs/engineering/operations.md owns the sweep names (shipped watchdog · Figma hygiene · conventions integrity · comment sweep)
+summary: the standing sweeps (Figma hygiene · conventions integrity · comment sweep), run by summoning reviewers/auditor
 ---
 
 <!-- ~350 tokens | Load when: running or triaging a standing sweep or a scored audit — not needed for ordinary intakes -->
 
 # Sweeps & audits — IDE execution
 
-- Summon `reviewers/auditor` with a named checklist from the registry —
-  `docs/engineering/operations.md` owns the sweep names (shipped watchdog ·
-  Figma hygiene · conventions integrity · comment sweep). The auditor inspects
-  and files intakes; writers fix.
-- The integrity sweep and shipped watchdog also run
-  **headlessly on cron** — adapters in `scripts/prompts/uno-*/`, registry rows
-  in `docs/engineering/operations.md`. Spot-run one with
-  `gh workflow run <workflow-file>`; outcomes land in the Actions job summary
-  (`gh run view`). Their findings arrive via the intake queue
-  (SKILL.md § Intake sources), so don't re-run a sweep whose issues are still
-  undrained.
+- Summon `reviewers/auditor` with a named sweep's checklist — Figma hygiene ·
+  conventions integrity · comment sweep; `docs/engineering/operations.md`
+  registers the automated ones. The auditor inspects and files intakes;
+  writers fix.
 - Integrity sweep checklist:
   [`references/staleness-sweep.md`](staleness-sweep.md) (canonicality headers +
   agents↔docs cross-references + path integrity).

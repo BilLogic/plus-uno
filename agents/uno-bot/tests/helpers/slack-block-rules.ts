@@ -32,6 +32,9 @@ const WORKER_BLOCK_TYPES: ReadonlySet<string> = new Set([
   "header",
   "container",
   "context_actions",
+  // The Review pop-up's where line, lists and quotes (`review-anatomy.ts`):
+  // a message and a modal both take it, per the block reference.
+  "rich_text",
 ]);
 
 /** What a `container` holds, per its block reference (read 2026-10-08): 1 to
@@ -334,6 +337,7 @@ function blockRefusal(block: unknown): string | null {
     if (typeof text === "string" && text.length > SECTION_TEXT_CHARS) return `a section of ${text.length} chars`;
   }
   if (type === "markdown" && typeof block.text !== "string") return "a markdown block without text";
+  if (type === "rich_text" && (!Array.isArray(block.elements) || !block.elements.length)) return "a rich_text without elements";
   if (type === "context") {
     const n = Array.isArray(block.elements) ? block.elements.length : 0;
     if (n < CONTEXT_ELEMENTS.min || n > CONTEXT_ELEMENTS.max) return `a context of ${n} elements`;

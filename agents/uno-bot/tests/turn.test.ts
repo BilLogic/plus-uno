@@ -37,10 +37,11 @@ import { LEGACY_DRIFT_REPLY } from "../src/figma-drift/copy";
 import { sweepShareOffer, SWEEP_SHARE_KEY } from "../src/sweep/share";
 import { FIX_REVIEW_INSTEAD, FIX_SCOPE_REFUSAL, sweepTag } from "../src/sweep/cards";
 import { decisionReport, itemProposal, reportItems, reportRecord } from "../src/slack/decision-cards";
-import { renderProposalCard } from "../src/slack/proposal-render";
+import { renderProposalCard, shortCardOf } from "../src/slack/proposal-render";
 import { cancelNote, RECENT_CANCEL_MS } from "../src/agent/cancel-note";
 import { parseRepoList, resolveRepo } from "../src/integrations/repo-list.mjs";
 import { executeRelayDm, type RelaySlack } from "../src/tools/relay-dm";
+import type { ShareoutReads } from "../src/tools/share-for-feedback";
 import {
   createInMemoryThreadState,
   type HistoryTurn,
@@ -2849,6 +2850,114 @@ test("a cancel from just inside the window still holds the same share-out back",
 test("a cancel note with no time on it, from before cancels were stamped, holds nothing back", async () => {
   const outcome = await afterCancel(cancelNote("shareout_post", {}), [shareout()], null);
   assert.equal(outcome.disposition, "staged");
+});
+
+// A share-out to a channel the asker names (Bill, 2026-10-15): it posts there,
+// and the card names that channel. The checks run before any card is staged —
+// the asker must be in the channel, and the bot must be able to post in it —
+// and a check that fails is said plainly, with the two default places offered.
+const CRIT_CHANNEL = { id: "C0CRIT0001", name: "design-crit", kind: "channel", isPrivate: false, isArchived: false, botIsMember: false } as const;
+const BIG_CHANNEL = { id: "C0BIG00001", name: "big-room", kind: "channel", isPrivate: false, isArchived: false, botIsMember: true } as const;
+const NAMED: ShareoutReads = {
+  affordable: () => true,
+  async channelById(id) {
+    return [CRIT_CHANNEL, BIG_CHANNEL].find((c) => c.id === id) ?? "missing";
+  },
+  async channelByName(name) {
+    return [CRIT_CHANNEL, BIG_CHANNEL].find((c) => c.name === name) ?? "missing";
+  },
+  async members(channel) {
+    return channel === CRIT_CHANNEL.id ? ["U1"] : ["U2"];
+  },
+};
+
+/** A share-out staged for `channel`, twice — the model's one go at fixing a
+ *  refused call is the same call again, so a refusal reaches the person. */
+function namedChannelTurn(channel: string, testChannelIds: string[] = []) {
+  const call = { name: "shareout_post", args: { summary: "The live app prototype, ready for a first round.", place: "channel", channel } };
+  return harness({
+    testChannelIds,
+    shareoutReads: NAMED,
+    replies: [
+      { text: "I'll share the live app prototype for feedback.", toolCalls: [call] },
+      { text: "I'll share the live app prototype for feedback.", toolCalls: [call] },
+    ],
+  });
+}
+
+test("a share-out to a channel named by id names that channel on its card", async () => {
+  const h = namedChannelTurn("C0CRIT0001");
+  const outcome = await runTurn(request({ text: "share the live app prototype in C0CRIT0001" }), h.deps);
+  assert.equal(outcome.staged!.card.verb, "share this for feedback in <#C0CRIT0001|design-crit>");
+});
+
+test("a share-out to a channel named by #name names that channel on its card", async () => {
+  const h = namedChannelTurn("#design-crit");
+  const outcome = await runTurn(request({ text: "share the live app prototype in #design-crit" }), h.deps);
+  assert.equal(outcome.staged!.card.verb, "share this for feedback in <#C0CRIT0001|design-crit>");
+});
+
+test("a share-out card's summary names the work, not the raw place or channel the verb already says", async () => {
+  const call = {
+    name: "shareout_post",
+    args: { summary: "The live app prototype, ready for a first round.", fidelity: "high", project: "Live app prototype", place: "channel", channel: "#design-crit" },
+  };
+  const h = harness({ shareoutReads: NAMED, replies: [{ text: "I'll share it.", toolCalls: [call] }] });
+  const outcome = await runTurn(request({ text: "share the live app prototype in #design-crit" }), h.deps);
+  const short = shortCardOf(renderProposalCard(outcome.staged!.card).text);
+  assert.equal(short?.summary, "Ready to *share this for feedback in <#C0CRIT0001|design-crit>*: high · Live app prototype");
+});
+
+test("a share-out to a channel the asker is not in is refused plainly, and no card is staged", async () => {
+  const h = namedChannelTurn("#big-room");
+  const outcome = await runTurn(request({ text: "share the live app prototype in #big-room" }), h.deps);
+  assert.equal(outcome.disposition, "asked");
+  assert.match(outcome.posted ?? "", /You're not in #big-room/);
+  assert.match(outcome.posted ?? "", /#plus-design-feedback or here/);
+  assert.equal(h.delivery.calls.filter((c) => c.kind === "proposal").length, 0);
+  assert.equal(await h.threadState.getProposalByThread(REF), null);
+});
+
+test("a share-out to a channel the bot cannot post in is refused, and no card is staged", async () => {
+  const h = namedChannelTurn("#hidden");
+  const outcome = await runTurn(request({ text: "share the live app prototype in #hidden" }), h.deps);
+  assert.equal(outcome.disposition, "asked");
+  assert.match(outcome.posted ?? "", /can't find #hidden.*add me to it/);
+  assert.equal(h.delivery.calls.filter((c) => c.kind === "proposal").length, 0);
+});
+
+test("a share-out to a named channel asked in a test channel says this thread on its card", async () => {
+  const h = namedChannelTurn("#design-crit", [CHANNEL]);
+  const outcome = await runTurn(request({ text: "share the live app prototype in #design-crit" }), h.deps);
+  assert.equal(outcome.staged!.card.verb, "share this for feedback in this thread");
+});
+
+test("a share-out batch to a named channel is grouped under that channel", async () => {
+  const call = (n: number, args: Record<string, unknown>) => ({
+    name: "shareout_post",
+    args: { summary: `Prototype ${n}, ready for a first round.`, ...args },
+  });
+  const h = harness({
+    shareoutReads: NAMED,
+    replies: [{ text: "I'll share both.", toolCalls: [call(1, { place: "channel", channel: "#design-crit" }), call(2, {})] }],
+  });
+  const outcome = await runTurn(request({ text: "share one in #design-crit and one in the feedback channel" }), h.deps);
+  const card = outcome.staged!.card;
+  assert.equal(card.verb, "share this for feedback");
+  const { text } = renderProposalCard(card);
+  assert.match(text, /^\*<#C0CRIT0001\|design-crit>\*$/m);
+  assert.match(text, /^\*#plus-design-feedback\*$/m);
+});
+
+test("a cancelled share-out re-staged for another named channel is a new card, and for the same one is not", async () => {
+  const moved = await afterCancel(cancelNote("shareout_post", { place: "channel", channel: "#big-room" }), [
+    shareout({ place: "channel", channel: "#Design-Crit" }),
+  ]);
+  assert.equal(moved.disposition, "staged");
+  const same = await afterCancel(cancelNote("shareout_post", { place: "channel", channel: "#design-crit" }), [
+    shareout({ place: "channel", channel: "#Design-Crit" }),
+  ]);
+  assert.equal(same.disposition, "asked");
 });
 
 // The code guard is half of it. In a DM the store IS the history the model

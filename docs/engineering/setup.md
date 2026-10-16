@@ -173,9 +173,8 @@ throwaway directory instead of the repo. `scripts/check-doc-links.test.mjs` and
 `scripts/check-knowledge-disposition.test.mjs` are the shape to copy, and
 `npm run test:scripts` runs them.
 
-That registry is also the author of the three places that used to state the same
-set by hand: the `check:*` block of `package.json`, the check steps of
-`.github/workflows/harness-integrity-sweep.yml` and those of
+That registry is also the author of the places that used to state the same
+set by hand: the `check:*` block of `package.json` and the check steps of
 `.github/workflows/storybook-gate.yml`. Each carries a generated region between
 markers; run `npm run generate:check-registry` after editing a row, and
 `npm run check:check-registry` fails on drift.
@@ -203,11 +202,11 @@ seven-generator composite `check:agent` — declare `kind: 'spawn'` and the reas
 in the same row, and a row declaring neither fails the gate rather than being
 run on a guess (#509).
 
-All three embodiments are swept, not two: the headless Actions prompts under
-`scripts/prompts/` are a subject of the negation ratchet (`check:negation`, its
-`actions` scope) and of the harness name sweep (the Worker's
+The headless prompts under `scripts/prompts/` — the shared headless-intake
+contract — are swept too: a subject of the negation ratchet (`check:negation`,
+its `actions` scope) and of the harness name sweep (the Worker's
 `harness-blueprint-names` test), listed by where they live because they carry
-no `embodiment:` and reach a model by their own loader rather than the bundle (#425).
+no `embodiment:` and sit outside the bundle (#425).
 
 When it reports a generated artifact as stale, the fix is always to regenerate
 and commit:

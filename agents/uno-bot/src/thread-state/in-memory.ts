@@ -27,12 +27,19 @@ import {
   ownTtl,
   ownWords,
   ownText,
+  ownOperations,
+  decidedLive,
   REPORT_GRACE_MS,
   changedReport,
   expiredReport,
   reportItemLook,
   type ReportExpiryRecord,
   claimedFiling,
+  comparisonKey,
+  decidedNoteOf,
+  decidedOf,
+  decidedPayload,
+  type DecidedNote,
   proposalReplyThread,
   proposalSlot,
   proposalTtlMs,
@@ -67,6 +74,11 @@ interface ProposalRecord {
   retired?: boolean;
   /** Picks kept on the card's Review pop-up, by user id (`keepPick`). */
   kept?: Record<string, Record<string, string>>;
+  /** Claimed with what was decided: `proposal` is the decided card, kept for
+   *  View for `DECIDED_TTL_MS` from `decidedAt`, and out of reach of every
+   *  other lookup. */
+  decided?: DecidedNote;
+  decidedAt?: number;
 }
 
 interface AssistantContextRecord {
@@ -105,6 +117,8 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
   const activeRuns = new Map<string, ActiveRunRecord>();
   const events = new Map<string, EventRecord>();
   const filings = new Map<string, FilingRecord>();
+  /** When each thread's comparison for a scenario was shown, by `comparisonKey`. */
+  const compared = new Map<string, number>();
   const executions = new Map<string, Execution>();
 
   /** Take an execution if it has been cut off; drop it if it has aged out;
@@ -143,7 +157,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
    *  retirement does not matter: a chain still ends in a live newest card. */
   function successorIsLive(ts: string): boolean {
     const rec = proposals.get(ts);
-    return !!rec && now() - rec.createdAt <= proposalTtlMs(rec.proposal);
+    return !!rec && !rec.decided && now() - rec.createdAt <= proposalTtlMs(rec.proposal);
   }
 
   return {
@@ -185,7 +199,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         // A record already stamped with a successor is settled. One only
         // RETIRED still wants this ts — that is the caller who retired it
         // ahead of staging this very card.
-        if (rec.supersededBy) continue;
+        if (rec.supersededBy || rec.decided) continue;
         if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) continue;
         if (rec.proposal.channel !== proposal.channel) continue;
         if (proposalSlot(rec.proposal) !== slot) continue;
@@ -208,7 +222,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     // are different methods is on the interface (#583).
     async retireProposal(proposalTs) {
       const rec = proposals.get(proposalTs);
-      if (!rec || rec.retired || rec.supersededBy) return { retired: false };
+      if (!rec || rec.decided || rec.retired || rec.supersededBy) return { retired: false };
       if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) return { retired: false };
       rec.retired = true;
       delete rec.kept;
@@ -217,7 +231,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
 
     async markRevising(proposalTs, userId) {
       const rec = proposals.get(proposalTs);
-      if (!rec || rec.retired || rec.supersededBy) return "gone";
+      if (!rec || rec.decided || rec.retired || rec.supersededBy) return "gone";
       if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) return "gone";
       if (withLiveMark(rec.proposal, now()).revising) return "already";
       rec.proposal = { ...rec.proposal, revising: { userId, at: now() } };
@@ -233,7 +247,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
 
     async keepPick(proposalTs, userId, key, value) {
       const rec = proposals.get(proposalTs);
-      if (!rec || rec.retired || rec.supersededBy) return null;
+      if (!rec || rec.decided || rec.retired || rec.supersededBy) return null;
       if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) return null;
       const mine = { ...(rec.kept?.[userId] ?? {}) };
       if (value === null) delete mine[key];
@@ -245,14 +259,23 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     async getProposalByTs(proposalTs): Promise<ProposalLookup> {
       const rec = proposals.get(proposalTs);
       if (!rec) return { state: "none" };
+      // Decided: kept for View for its own lifetime from the decision, then
+      // gone as a claimed card is.
+      if (rec.decided) {
+        if (!decidedLive(rec, rec.proposal, now())) {
+          proposals.delete(proposalTs);
+          return { state: "none" };
+        }
+        return { state: "none", decided: structuredClone(decidedOf(rec.proposal, rec.decided)) };
+      }
       // A live successor beats the TTL — the ordering, and the third card it
       // stops the person from asking for, are in `ProposalLookup`.
-      if (rec.supersededBy && successorIsLive(rec.supersededBy)) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal) };
+      if (rec.supersededBy && successorIsLive(rec.supersededBy)) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal) };
       if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) {
         proposals.delete(proposalTs);
-        return { state: "expired", ...ownTtl(rec.proposal), ...ownWords(rec.proposal), ...ownText(rec.proposal) };
+        return { state: "expired", ...ownTtl(rec.proposal), ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal) };
       }
-      if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal) };
+      if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal) };
       return { state: "found", proposal: withLiveMark(rec.proposal, now()), createdAt: rec.createdAt, ...(rec.kept ? { kept: structuredClone(rec.kept) } : {}) };
     },
 
@@ -262,7 +285,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       let best: ProposalRecord | null = null;
       for (const rec of proposals.values()) {
         if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) continue;
-        if (rec.supersededBy || rec.retired) continue; // retired, so never the thread's live card
+        if (rec.supersededBy || rec.retired || rec.decided) continue; // retired or decided, so never the thread's live card
         if (rec.proposal.channel !== ref.channel) continue;
         if (proposalReplyThread(rec.proposal) !== ref.thread) continue; // keyed on the card's thread
         if (!best || rec.createdAt > best.createdAt) best = rec;
@@ -273,7 +296,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     async getProposalsByChannel(channel) {
       return [...proposals.values()]
         .filter((rec) => now() - rec.createdAt <= proposalTtlMs(rec.proposal))
-        .filter((rec) => !rec.supersededBy && !rec.retired)
+        .filter((rec) => !rec.supersededBy && !rec.retired && !rec.decided)
         .filter((rec) => rec.proposal.channel === channel)
         .sort((a, b) => b.createdAt - a.createdAt)
         .map((rec) => withLiveMark(rec.proposal, now()));
@@ -288,11 +311,21 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     // replaced card executable. The reason this is the store's job, and the
     // per-message run lease that makes the race reachable, are on the
     // interface.
-    async claimProposal(proposalTs) {
+    //
+    // Won with what was decided, the record stays as the decided card, for
+    // View, for its own lifetime from now (`claimProposal` on the interface).
+    async claimProposal(proposalTs, decided) {
       const rec = proposals.get(proposalTs);
       // A card being revised is refused too: its revision is on the way.
-      if (!rec || rec.retired || rec.supersededBy || withLiveMark(rec.proposal, now()).revising) return false;
-      return proposals.delete(proposalTs);
+      if (!rec || rec.decided || rec.retired || rec.supersededBy || withLiveMark(rec.proposal, now()).revising) return false;
+      if (!decided) return proposals.delete(proposalTs);
+      proposals.set(proposalTs, {
+        proposal: decidedPayload(rec.proposal, structuredClone(decided)),
+        createdAt: rec.createdAt,
+        decided: decidedNoteOf(decided),
+        decidedAt: now(),
+      });
+      return true;
     },
 
     // ----- decision reports -----
@@ -318,7 +351,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       if (!rec) return null;
       const next = expiredReport(rec, reportItemLook((key) => {
         const proposal = proposals.get(key);
-        return proposal && { createdAt: proposal.createdAt, ttlMs: proposalTtlMs(proposal.proposal) };
+        return proposal && !proposal.decided ? { createdAt: proposal.createdAt, ttlMs: proposalTtlMs(proposal.proposal) } : undefined;
       }, (key) => executions.has(key)), now());
       reports.set(messageTs, next);
       return next.expiryPending ? structuredClone({ report: next.report, revision: next.revision ?? 0 }) : null;
@@ -462,6 +495,14 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     async settleFiling(key, issue) {
       if (issue) filings.set(key, { at: now(), issue });
       else filings.delete(key);
+    },
+
+    async claimComparison(ref, scenario) {
+      const key = comparisonKey(ref, scenario);
+      const at = compared.get(key);
+      if (at !== undefined && now() - at < HISTORY_TTL_MS) return false;
+      compared.set(key, now());
+      return true;
     },
   };
 }

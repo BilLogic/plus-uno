@@ -21,7 +21,10 @@
 // PURE: no `Env`, no fetch. The options arrive through the door's
 // `fieldOptions`, so `tests/proposal-edit.test.ts` drives all of it.
 import { placeholderIn } from "../agent/placeholder";
+import { MAX_FEEDBACK_QUESTIONS } from "../tools/share-out-render";
+import { issueUpdateFromInput } from "../tools/github-issue-update-render";
 import { proposalOperations, type PendingProposal, type ProposalOperation } from "../thread-state/index";
+import { blueprintReviseFields } from "./review-blueprint-fields";
 
 /** Where a select's options live: a database the Worker writes to, and the
  *  property, by its exact name. */
@@ -44,6 +47,8 @@ export interface EditableField {
   value: string;
   /** For a select: the options offered, in the database's spelling. */
   options?: string[];
+  /** What the input's hint says, where the field is not self-explanatory. */
+  hint?: string;
 }
 
 /**
@@ -82,7 +87,7 @@ const MAX_OPTION_CHARS = 75;
 
 type Input = Record<string, unknown>;
 
-interface FieldSpec {
+export interface FieldSpec {
   path: string;
   label: string;
   kind: EditableField["kind"];
@@ -92,6 +97,7 @@ interface FieldSpec {
   applies?: (input: Input) => boolean;
   /** The draft's value, where the executor would read it. Default: `path`. */
   read?: (input: Input) => unknown;
+  hint?: string;
 }
 
 const surfaceIs = (surface: string) => (input: Input) =>
@@ -136,10 +142,66 @@ function notionUpdateFields(input: Input): FieldSpec[] {
   return specs;
 }
 
+/** Said under a share-out's optional question: what clearing it does. */
+const DROP_QUESTION = "Clear it to drop the question.";
+
+/**
+ * A `shareout_post`'s words: what it is, one input per staged question (the
+ * first required, the rest optional, so clearing one drops it), what is out
+ * of scope, and the deadline, free text as the tool takes it. Where it posts,
+ * who it pings, the fidelity and the round stay locked: changing who is
+ * pinged is a new proposal.
+ */
+function shareoutFields(input: Input): FieldSpec[] {
+  const questions = Array.isArray(input.feedback_wanted) ? input.feedback_wanted.slice(0, MAX_FEEDBACK_QUESTIONS) : [];
+  return [
+    { path: "summary", label: "What this is", kind: "multiline", required: true, hint: "One or two sentences. The questions go below." },
+    ...questions.map(
+      (_, i): FieldSpec => ({
+        path: `feedback_wanted.${i}`,
+        label: `Feedback question ${i + 1}`,
+        kind: "text",
+        required: i === 0,
+        hint: i === 0 ? 'Specific to this stage, so nobody has to answer "thoughts?". Up to three.' : DROP_QUESTION,
+      }),
+    ),
+    { path: "not_looking_for", label: "Not looking for", kind: "multiline", hint: "What reviewers should leave alone this round. Clear it to leave it out." },
+    { path: "deadline", label: "Deadline", kind: "text", hint: "When comments are due, in words, e.g. EOD Friday. Clear it to post without one." },
+  ];
+}
+
+/** Said under an issue follow-up's comment, whichever way it is required. */
+const COMMENT_HINT = "Posts as written, in GitHub Markdown, with my footer under it.";
+
+/**
+ * A `github_issue_update`'s comment: required when it is all the update does,
+ * optional when the update also closes, reopens or relabels, so clearing it
+ * runs the rest without one. The issue, the repo, the state and the labels
+ * stay locked: a different issue or a different change is a new proposal.
+ */
+function issueUpdateFields(input: Input): FieldSpec[] {
+  const read = issueUpdateFromInput(input);
+  const update = read.ok ? read.update : null;
+  const relabels = !!update && update.addLabels.length + update.removeLabels.length > 0;
+  const required = !update?.state && !relabels;
+  const rest = update?.state === "open" ? "reopen" : update?.state ? "close" : "update the labels";
+  return [
+    {
+      path: "comment",
+      label: "Comment",
+      kind: "multiline",
+      required,
+      hint: required ? COMMENT_HINT : `${COMMENT_HINT} Clear it to ${rest} without a comment.`,
+    },
+  ];
+}
+
 /** What each tool lets a confirmer change: a fixed list, or one read off the
- *  call when the call's shape decides which fields exist. */
-const FIELDS: Record<string, FieldSpec[] | ((input: Input) => FieldSpec[])> = {
+ *  call — and, for a Worker-staged card, its facts — when those decide which
+ *  fields exist. */
+const FIELDS: Record<string, FieldSpec[] | ((input: Input, proposal: PendingProposal) => FieldSpec[])> = {
   notion_update: notionUpdateFields,
+  shareout_post: shareoutFields,
   notion_create: [
     { path: "title", label: "Title", kind: "text", required: true },
     { path: "summary", label: "Summary", kind: "multiline" },
@@ -163,9 +225,12 @@ const FIELDS: Record<string, FieldSpec[] | ((input: Input) => FieldSpec[])> = {
   ],
   github_issue_create: [
     { path: "title", label: "Title", kind: "text", required: true },
-    { path: "body", label: "Body", kind: "multiline", required: true },
+    { path: "body", label: "Body", kind: "multiline", required: true, hint: "GitHub Markdown, as it will read on the issue." },
   ],
+  github_issue_update: issueUpdateFields,
   dm_relay: [{ path: "text", label: "Message", kind: "multiline", required: true }],
+  // The text of a revision's added and changed rows, read off its facts.
+  blueprint_revise: blueprintReviseFields,
 };
 
 function readPath(input: Input, path: string): unknown {
@@ -229,14 +294,21 @@ function draftFields(proposal: PendingProposal): Array<{ field: EditableField; s
     const own: FieldSpec[] = (proposal.selects ?? [])
       .filter((s) => (s.op ?? 0) === index)
       .map((s) => ({ path: s.path, label: s.label, kind: "select", required: true, options: s.source }));
-    for (const spec of [...(typeof table === "function" ? table(op.input) : table), ...own]) {
+    for (const spec of [...(typeof table === "function" ? table(op.input, proposal) : table), ...own]) {
       if (spec.applies && !spec.applies(op.input)) continue;
       const raw = spec.read ? spec.read(op.input) : readPath(op.input, spec.path);
       if (raw !== undefined && typeof raw !== "string") continue;
       const value = typeof raw === "string" ? raw : "";
       if (!value && !spec.required && spec.kind !== "select") continue;
       if (value.length > MAX_INPUT_CHARS) continue;
-      const field: EditableField = { key: `${index}.${spec.path}`, label: spec.label, kind: spec.kind, required: !!spec.required, value };
+      const field: EditableField = {
+        key: `${index}.${spec.path}`,
+        label: spec.label,
+        kind: spec.kind,
+        required: !!spec.required,
+        value,
+        ...(spec.hint ? { hint: spec.hint } : {}),
+      };
       out.push(spec.options ? { field, source: spec.options } : { field });
     }
   }
@@ -272,13 +344,43 @@ export function draftValuesOf(proposal: PendingProposal): Map<string, string> {
 export function withValues(proposal: PendingProposal, values: ReadonlyMap<string, string>): ProposalOperation[] {
   return proposalOperations(proposal).map((op, index) => {
     let input = op.input;
+    let wrote = false;
     for (const [key, value] of values) {
       const [at, ...path] = key.split(".");
-      if (Number(at) === index && path.length) input = writePath(input, path.join("."), value);
+      if (Number(at) === index && path.length) {
+        input = writePath(input, path.join("."), value);
+        wrote = true;
+      }
     }
-    return { toolName: op.toolName, input };
+    const tidy = wrote ? CLEARED[op.toolName] : undefined;
+    return { toolName: op.toolName, input: tidy ? tidy(input) : input };
   });
 }
+
+/**
+ * What a cleared optional field means, per tool, applied once every value is
+ * written: a share-out's emptied question is dropped from the list, so the
+ * rest renumber, and an emptied "not looking for" or deadline leaves the
+ * input, so the post goes without it. An issue follow-up's emptied comment
+ * leaves the input too, so the update runs its other steps without one.
+ */
+const CLEARED: Record<string, (input: Input) => Input> = {
+  shareout_post: (input) => {
+    const out: Input = { ...input };
+    if (Array.isArray(out.feedback_wanted)) {
+      out.feedback_wanted = out.feedback_wanted.filter((q) => typeof q !== "string" || q.trim() !== "");
+    }
+    for (const key of ["not_looking_for", "deadline"]) {
+      if (typeof out[key] === "string" && !(out[key] as string).trim()) delete out[key];
+    }
+    return out;
+  },
+  github_issue_update: (input) => {
+    if (typeof input.comment !== "string" || input.comment.trim()) return input;
+    const { comment: _cleared, ...out } = input;
+    return out;
+  },
+};
 
 /** A state as Slack would send it holding these values, each under its
  *  field's input: how saved edits re-enter the checks on Approve. */
@@ -317,6 +419,7 @@ export function fieldInputBlocks(fields: readonly EditableField[], values: Reado
       block_id: `${FIELD_BLOCK_PREFIX}${field.key}`,
       optional: !field.required,
       label: { type: "plain_text", text: field.label },
+      ...(field.hint ? { hint: { type: "plain_text", text: field.hint } } : {}),
       element,
     };
   });

@@ -15,7 +15,7 @@ import type { ChannelRole } from "../destination/index";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { SHARE_CHANNEL_NAMES, SWEEP_CARD_TTL_MS, shareCard } from "../sweep/cards";
 import type { ProposalCard } from "../turn/index";
-import type { ProposalOperation } from "../thread-state/index";
+import type { ProposalOperation, ShareNoteFacts } from "../thread-state/index";
 
 /** The tag on the raise card, as on every post uno-bot makes in a DM, so the
  *  next night reads it as uno-bot's own post and never as an answer. */
@@ -81,7 +81,7 @@ export function raiseCard(o: {
   sources: readonly [string, string];
   channel: string;
   to: RaiseTo;
-}): { card: ProposalCard; operations: ProposalOperation[] } {
+}): { card: ProposalCard; operations: ProposalOperation[]; facts: ShareNoteFacts } {
   const where = SHARE_CHANNEL_NAMES[o.to];
   const text = raiseNote(o);
   const operations: ProposalOperation[] = [{ toolName: RAISE_TOOL, input: { channel: o.channel, channel_name: where, text } }];
@@ -99,6 +99,12 @@ export function raiseCard(o: {
   return {
     card: shareCard({ where, lead: lines.join("\n"), operations }),
     operations,
+    facts: {
+      kind: "sweep_share_post",
+      header: "Raise a disagreement",
+      from: "this DM",
+      notes: [`No quote and no names go with it. Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`],
+    },
   };
 }
 

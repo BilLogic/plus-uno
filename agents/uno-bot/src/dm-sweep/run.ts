@@ -382,7 +382,7 @@ async function dueOne(deps: DmMorningDeps, c: CommitmentRecord, now: number, run
   const to = text.raise.to;
   const channel = channelIdOf(to, deps.channels);
   if (!channel) return lapse("refused", `no ${to} channel to raise it in`);
-  const { card, operations } = raiseCard({ when, topic: text.what, sources: text.raise.sources, channel, to });
+  const { card, operations, facts } = raiseCard({ when, topic: text.what, sources: text.raise.sources, channel, to });
   if (deps.dryRun) return { id: c.id, action: "nudged", text: DM_WITHHELD };
   const sent = await deps.slack.postCard(place, card, { event_type: DM_RAISE_EVENT, event_payload: { id: c.id } });
   if (!sent.ok || !sent.ts) return hold("Slack refused the post");
@@ -403,6 +403,7 @@ async function dueOne(deps: DmMorningDeps, c: CommitmentRecord, now: number, run
     confirmers: [c.promiserId],
     supersedeKey: raiseSlot(c.id),
     stated: SHARE_CARD_WORDS,
+    facts,
   };
   const { retired } = await deps.threadState.putProposal(proposal);
   // A DM is never named on the record (`storesChannel`).

@@ -82,7 +82,15 @@ async function draftFor(h: Awaited<ReturnType<typeof harness>>, userId = "U2"): 
 
 /** Each block's words, in order. An input reads as its label and its value. */
 function lines(view: View): string[] {
+  /** A rich text block's words, its user pills as mentions. */
+  const rich = (e: unknown): string => {
+    const el = e as { text?: unknown; user_id?: string; elements?: unknown[] };
+    if (typeof el.text === "string") return el.text;
+    if (el.user_id) return `<@${el.user_id}>`;
+    return (el.elements ?? []).map(rich).join("");
+  };
   return view.blocks.map((b) => {
+    if (b.type === "rich_text") return `rich_text: ${rich(b)}`;
     if (b.type === "input") return `input: ${b.label?.text} = ${b.element?.initial_value ?? ""}`;
     if (b.text?.text) return `${b.type}: ${b.text.text}`;
     return `${b.type}: ${(b.elements ?? []).map((e) => e.text ?? "").join(" ")}`;
@@ -260,10 +268,10 @@ describe("a card of several changes shows Current content for each", () => {
     op(PAGE_TWO, "Shipped", "b3", "Due: Nov 1."),
   ];
 
-  /** The draft's lines from operation `n`'s headline to the next one's. */
+  /** The draft's lines from operation `n`'s label to the next one's. */
   function operation(all: string[], n: number): string {
-    const start = all.findIndex((l) => l.includes(`*${n}. `));
-    const end = all.findIndex((l, i) => i > start && /\*\d+\. /.test(l));
+    const start = all.findIndex((l) => l.startsWith(`rich_text: ${n} · `));
+    const end = all.findIndex((l, i) => i > start && /^rich_text: \d+ · /.test(l));
     return all.slice(start, end < 0 ? undefined : end).join("\n");
   }
 

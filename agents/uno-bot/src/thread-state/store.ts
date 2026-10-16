@@ -61,6 +61,12 @@ export const HISTORY_TTL_MS = 7 * 24 * 60 * 60 * 1000;
  *  clock — is still the safety. */
 export const PROPOSAL_TTL_MS = 60 * 60 * 1000;
 
+/** How long a decided card is kept for Review's View, counted from the
+ *  decision: as long as the thread it was decided in is remembered
+ *  (`HISTORY_TTL_MS`), so View on a card still in a live conversation draws
+ *  its draft rather than its outcome alone. Read through `decidedLive`. */
+export const DECIDED_TTL_MS = HISTORY_TTL_MS;
+
 /** How long a processed event id is remembered. 24h, not 10 min: agent runs can
  *  legally exceed ten minutes (streaming + MCP; live run 2026-07-10: 11 min),
  *  after which Slack's duplicate delivery passed dedup and re-ran the ENTIRE
@@ -261,6 +267,14 @@ export interface PendingProposal {
    */
   confirmers?: string[];
   /**
+   * Set when `confirmers` is the whole set: the deployment's standing
+   * confirmers are NOT added (`cardConfirmers`). For a card only particular
+   * people may decide — a blueprint revision is its card owner's and the lead's,
+   * a drawn proposal its requester's. Absent, the card keeps the rule every
+   * other card has. Meaningless without `confirmers`.
+   */
+  exclusiveConfirmers?: true;
+  /**
    * Set by the store, never by a stager: a confirmer pressed Needs changes and
    * the revision is being written (`ThreadState.markRevising`). The card stays
    * findable, for the revision turn that replaces it, and is decided by no one
@@ -376,6 +390,15 @@ export interface PendingProposal {
    * where the stager holds no reason; none is made up.
    */
   issue?: string;
+  /**
+   * A stated card's facts, as data (`StatedFacts`), so Review draws them in
+   * its zones (`slack/review-stated.ts`) instead of reading them back out of
+   * the card's text. Set by the Worker's own stagers, each worded by its
+   * stager's copy. Absent on every other card and on a card staged before it,
+   * which Review shows as its text. A re-staged card drops it, as it drops
+   * `before`: the fresh card is an ordinary one.
+   */
+  facts?: StatedFacts;
 }
 
 /**
@@ -405,6 +428,154 @@ export interface ProposalSelect {
   path: string;
   label: string;
   source: { database: "roadmap" | "decisions"; property: string };
+}
+
+/**
+ * What a stated card is about, as Review draws it (`PendingProposal.facts`):
+ * one shape per Worker tool, in the words its stager's copy chose.
+ */
+export type StatedFacts = TidyFacts | DevLinksFacts | PrecedenceFacts | ShareNoteFacts | BlueprintRevisionFacts | BlueprintProposalFacts;
+
+/** A Figma tidy-up finding (`figma-tidy/copy.ts`). */
+export interface TidyFacts {
+  kind: "figma_tidy_up";
+  /** The file's name. */
+  file: string;
+  /** The check, as a person reads it: "Unknown card". */
+  check: string;
+  /** What the check found, plain. */
+  finding: string;
+  fileUrl: string;
+  /** What answering does, plain. */
+  note: string;
+}
+
+/** A Dev Mode links card (`figma-links/copy.ts`). */
+export interface DevLinksFacts {
+  kind: "figma_dev_links";
+  /** The action, naming the component: "Add Dev Mode links to Button". */
+  header: string;
+  /** What Approve changes: "Adds 2 links in Dev Mode to 1 library component". */
+  change: string;
+  /** The comment it also leaves, when it leaves one: "and one comment saying
+   *  what they are". */
+  comment?: string;
+  figmaUrl: string;
+  /** One for a component's card; one per component on a batch card. */
+  components: Array<{ component: string; links: Array<{ label: string; url: string }>; also?: string }>;
+  batch: boolean;
+  /** Plain lines under the links. */
+  notes: string[];
+}
+
+/** One component of the weekly DS precedence check (`ds-precedence/report.ts`). */
+export interface PrecedenceFacts {
+  kind: "ds_precedence_intake";
+  /** The finding: "Badge: the library needs the fix". */
+  finding: string;
+  /** The week, as a person reads it: "Oct 12". */
+  week: string;
+  /** What differs, one line each, a prop or value in backticks. */
+  differences: string[];
+  codeUrl: string;
+  figmaUrl: string;
+}
+
+/** A note the sweep posts verbatim in a team channel (`sweep/share.ts`,
+ *  `dm-sweep/copy.ts`). The note and its channel are the operation's input. */
+export interface ShareNoteFacts {
+  kind: "sweep_share_post";
+  /** The action: "Share what was settled". */
+  header: string;
+  /** Where nothing else leaves: "this group DM". */
+  from: string;
+  /** Plain lines under the note. */
+  notes: string[];
+}
+
+/** One row of a blueprint path as Review draws it: its lane and its text. */
+export interface BlueprintRowFact {
+  lane: string;
+  content: string;
+}
+
+/**
+ * One step of a blueprint comparison (`slack/review-blueprint.ts`): its rows
+ * today, then what changes in that step only. `row` is a change's index in the
+ * operation's `rows`, which its text's field is keyed by.
+ */
+export interface BlueprintStepFact {
+  step: string;
+  /** The step's rows today, in lane order; empty where the path has none. */
+  today: BlueprintRowFact[];
+  added?: Array<BlueprintRowFact & { row: number }>;
+  changed?: Array<BlueprintRowFact & { row: number; before: string }>;
+  /** `inferred`: deprecated because it contradicts the path's own rows, not
+   *  because of the shipped card; the owner is asked about it. */
+  deprecated?: Array<BlueprintRowFact & { inferred?: boolean }>;
+  promoted?: BlueprintRowFact[];
+  /** A proposal's rows in this step, on the new path. */
+  proposed?: BlueprintRowFact[];
+}
+
+/** Today's path as Review's card shows it. */
+export interface BlueprintPathFact {
+  name: string;
+  /** "17 rows, all live" or "6 rows: 4 live, 2 planned". */
+  rows: string;
+  /** View slice: a saved slice citing the path, else the first changed row. */
+  view?: string;
+}
+
+/** A blueprint revision from shipped work (`blueprint-upkeep/facts.ts`). The
+ *  rows the Approve writes are the operation's input. */
+export interface BlueprintRevisionFacts {
+  kind: "blueprint_revision";
+  scenario: string;
+  /** Where the scenario opens in the blueprint app. */
+  scenarioUrl?: string;
+  /** The status the rows are written at, and what they move from when the
+   *  revision promotes rows or retires the path. */
+  status: { from?: string; to: string };
+  counts: { added: number; changed: number; deprecated: number; promoted: number };
+  /** Why now, in the Roadmap's words: `RM-2567`, `Dev Status: Deployed`. */
+  card: { id: string; url: string; status: string; quote: string };
+  /** The Roadmap card's Contributors: a Slack person, or a name Team Members
+   *  maps to nobody. */
+  owners: CardOwner[];
+  today: BlueprintPathFact;
+  /** The steps drawn in full: today's rows, the changes, the inputs. */
+  steps: BlueprintStepFact[];
+  /** Steps that change past the ones drawn in full, listed as text so the
+   *  confirmer sees every row the Approve writes. */
+  later?: BlueprintStepFact[];
+  /** What the owner is asked before it is written: the draft's gaps. */
+  questions: string[];
+  inferred: number;
+  /** Set when the grind tier was out of capacity and the default tier drafted. */
+  tierNote?: string;
+  /** Where promoted rows came from, or what a retirement makes way for. */
+  note?: string;
+  /** A card that retires today's path: one Deprecated group, never redrafted. */
+  retires?: boolean;
+}
+
+/** An idea offered as a blueprint proposal (`blueprint-upkeep/proposal.ts`):
+ *  a new `proposed` path beside today's. */
+export interface BlueprintProposalFacts {
+  kind: "blueprint_proposal";
+  scenario: string;
+  scenarioUrl?: string;
+  /** The new path's name. */
+  name: string;
+  today: BlueprintPathFact;
+  /** Each step either side has: today's rows, then the proposal's. */
+  steps: BlueprintStepFact[];
+  moreSteps: number;
+  /** Rows the Approve writes. */
+  rows: number;
+  /** What the draft could not verify: a lane it had to guess, a step it needs. */
+  gaps: string[];
 }
 
 // ── Decision reports ─────────────────────────────────────────────────────────
@@ -595,7 +766,7 @@ export function changedReport(report: DecisionReportRecord, change: ReportChange
  */
 export interface StatedCardWords {
   /** What a ⛔ did, as a phrase with no person in it: "Rejected, nothing
-   *  filed". The card ends `:no_entry: <phrase>, decided by <@U>.` and the
+   *  filed". The card ends `<phrase>, decided by <@U>.` and the
    *  ⛔'s note in the thread is `<phrase>.` */
   cancelled: string;
   /** The answer to a ✅ or ⛔ that came after the card's window closed. */
@@ -630,7 +801,7 @@ export interface SweepShare {
   pages: Array<{ url: string; title: string; to: ChannelRole }>;
 }
 
-export type ProposalTerms = Pick<PendingProposal, "ttlMs" | "confirmers">;
+export type ProposalTerms = Pick<PendingProposal, "ttlMs" | "confirmers" | "exclusiveConfirmers">;
 
 /** How long a proposal stays confirmable: its own `ttlMs`, or the hour. */
 export function proposalTtlMs(proposal: Pick<PendingProposal, "ttlMs">): number {
@@ -656,6 +827,29 @@ export function withLiveMark(proposal: PendingProposal, at: number): PendingProp
   if (since === undefined || at - since <= REVISING_MARK_MS) return proposal;
   const { revising: _, ...rest } = proposal;
   return rest;
+}
+
+/**
+ * Whether a decided card's record is still kept: for `DECIDED_TTL_MS` from
+ * its decision. A record decided before the decision was stamped
+ * (`decidedAt` absent) keeps the card's own lifetime from staging, as it was
+ * written to.
+ *
+ * @param rec - When the card was staged and, once stamped, decided
+ * @param proposal - The card, for its own `ttlMs`
+ * @param at - The store's now
+ */
+export function decidedLive(rec: { createdAt: number; decidedAt?: number }, proposal: Pick<PendingProposal, "ttlMs">, at: number): boolean {
+  return rec.decidedAt !== undefined ? at - rec.decidedAt <= DECIDED_TTL_MS : at - rec.createdAt <= proposalTtlMs(proposal);
+}
+
+/** The card's batch, spread onto an "expired" or "superseded" lookup: what
+ *  its pop-up is titled by, read in the same hop as the answer. */
+export function ownOperations(
+  proposal: Partial<Pick<PendingProposal, "operations" | "toolName" | "input">>,
+): { operations?: ProposalOperation[] } {
+  if (proposal.operations?.length) return { operations: proposal.operations };
+  return proposal.toolName ? { operations: [{ toolName: proposal.toolName, input: proposal.input ?? {} }] } : {};
 }
 
 /** The card's own `ttlMs`, spread onto an "expired" lookup — absent for a
@@ -692,7 +886,7 @@ export function ownBlocks(posted: { blocks?: unknown[] }): { proposalBlocks?: un
  * person behind it is refused, since the set cannot be checked against it.
  */
 export function mayConfirm(
-  proposal: Pick<PendingProposal, "confirmers" | "channel">,
+  proposal: Pick<PendingProposal, "confirmers" | "exclusiveConfirmers" | "channel">,
   userId: string | undefined,
   standing: readonly string[] = [],
 ): boolean {
@@ -704,17 +898,18 @@ export function mayConfirm(
 /**
  * Everyone who may resolve a card with a confirmer set: its own confirmers,
  * then the deployment's standing confirmers (`STANDING_CONFIRMER_IDS`), each
- * once. Null for a card with no set, which anyone may resolve. The standing
+ * once — unless the card's set is exclusive, when its own people are the
+ * whole answer. Null for a card with no set, which anyone may resolve. The standing
  * set is read at resolution, never stored on the card, so a change to it
  * reaches cards already open — and it never reaches a card in a 1:1 DM, which
  * is the person's own and nobody else's.
  */
 export function cardConfirmers(
-  proposal: Pick<PendingProposal, "confirmers" | "channel">,
+  proposal: Pick<PendingProposal, "confirmers" | "exclusiveConfirmers" | "channel">,
   standing: readonly string[] = [],
 ): string[] | null {
   if (!proposal.confirmers) return null;
-  if (isImChannel(proposal.channel)) return [...proposal.confirmers];
+  if (proposal.exclusiveConfirmers || isImChannel(proposal.channel)) return [...proposal.confirmers];
   return [...new Set([...proposal.confirmers, ...standing])];
 }
 
@@ -736,6 +931,7 @@ export function inheritedTerms(replaced: ProposalTerms | null | undefined): Prop
   return {
     ...(replaced?.ttlMs !== undefined ? { ttlMs: replaced.ttlMs } : {}),
     ...(replaced?.confirmers ? { confirmers: [...replaced.confirmers] } : {}),
+    ...(replaced?.confirmers && replaced.exclusiveConfirmers ? { exclusiveConfirmers: true as const } : {}),
   };
 }
 
@@ -961,14 +1157,77 @@ export type ProposalLookup =
    *  of one by `retireProposal` — in which case it reads this way from the
    *  moment of retirement, and for the rest of its TTL if the revision it made
    *  way for never lands. `stated` is a stated card's own words. */
-  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
+  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[]; operations?: ProposalOperation[] }
   /** `ttlMs` is the card's own lifetime when it set one, so the person can be
    *  told how long it was live; absent, it lived the default hour. `stated` is
    *  a stated card's own words, whose `expired` line says it instead.
    *  `proposalText` and `proposalBlocks` (both answers) are the card as
-   *  posted, so the note about it can be edited onto it. */
-  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
-  | { state: "none" };
+   *  posted, so the note about it can be edited onto it, and `operations`
+   *  (both answers) its batch, so its pop-up is titled for its tool. */
+  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[]; operations?: ProposalOperation[] }
+  /** Claimed, aged out or never staged: nothing to decide. `decided` is the
+   *  card as it was decided, kept for `DECIDED_TTL_MS` from the decision so
+   *  Review's View can draw it (`DecidedProposal`); absent once that lifetime
+   *  ends, and on every card decided before the record was kept. */
+  | { state: "none"; decided?: DecidedProposal };
+
+/**
+ * What a claim keeps of the card it won: the decision, who made it, and the
+ * batch as it was decided, for Review's View to draw read-only. Written by the
+ * claim itself, in the same transaction and the same hop, so keeping it costs
+ * no extra subrequest. Bound to a lifetime of its own, `DECIDED_TTL_MS` from
+ * the decision (`decidedLive`): it reads as gone, and the daily sweep deletes
+ * it, once that has passed. It stays in the same Durable Object record the
+ * pending card was, so keeping it longer costs storage, not a hop.
+ */
+export interface DecidedMark {
+  decision: "confirm" | "cancel";
+  /** Who decided it, when a person did. */
+  by?: string;
+  /** A Reject's reason, as the pop-up took it. */
+  reason?: string;
+  /** The batch as approved, when the decision edited it (Review's fields, or a
+   *  card's own answer's args). Absent, the staged batch is what was decided. */
+  operations?: ProposalOperation[];
+}
+
+/** A decided card, as its record hands it back (`ProposalLookup` "none"). */
+export interface DecidedProposal {
+  /** The card as decided: its edited batch in place, its posted blocks not
+   *  kept. */
+  proposal: PendingProposal;
+  decision: "confirm" | "cancel";
+  by?: string;
+  reason?: string;
+}
+
+/** How a decided record stores its decision: the mark, less the batch, which
+ *  is written into the payload (`decidedPayload`). */
+export type DecidedNote = Omit<DecidedMark, "operations">;
+
+/**
+ * The card a claim keeps: the decided batch in place of the staged one, and
+ * nothing View does not read — not the posted blocks, not the Needs changes
+ * mark. (Kept picks live beside the payload, and the claim drops them.)
+ *
+ * @param proposal - The card's record as staged
+ * @param mark - What the claim decided
+ */
+export function decidedPayload(proposal: PendingProposal, mark: DecidedMark): PendingProposal {
+  const { proposalBlocks: _blocks, revising: _revising, ...kept } = proposal;
+  const [first] = mark.operations ?? [];
+  return first ? { ...kept, operations: mark.operations, toolName: first.toolName, input: first.input } : kept;
+}
+
+/** The mark as a decided record stores it beside its payload. */
+export function decidedNoteOf(mark: DecidedMark): DecidedNote {
+  return { decision: mark.decision, ...(mark.by ? { by: mark.by } : {}), ...(mark.reason ? { reason: mark.reason } : {}) };
+}
+
+/** A decided record read back: its payload and the note beside it. */
+export function decidedOf(proposal: PendingProposal, note: DecidedNote): DecidedProposal {
+  return { proposal, ...note };
+}
 
 /**
  * The answer to "may I run this turn?".
@@ -1196,12 +1455,21 @@ export interface ThreadState {
    *
    * Callers that only want the record gone ignore the boolean.
    *
+   * **A WON CLAIM KEEPS THE DECIDED CARD** when it is told what was decided
+   * (`decided`): instead of the delete, the record is rewritten in the same
+   * transaction as the decided batch (`decidedPayload`), so Review's View can
+   * draw it read-only for `DECIDED_TTL_MS` from the decision, stamped by the
+   * claim, and the daily sweep deletes it after that. It is out of reach of
+   * everything else: every lookup answers "none" (`getProposalByTs` with
+   * `decided` on it), and a second claim, a retirement, a Needs changes mark
+   * and a kept pick all refuse it. Without `decided` the record is deleted.
+   *
    * **Fails CLOSED**, unlike the event methods below: the actions behind this
    * gate are the irreversible ones. A missed execution is visible — the person
    * sees nothing happened and asks again — while a double execution is silent
    * and has to be undone by hand.
    */
-  claimProposal(proposalTs: string): Promise<boolean>;
+  claimProposal(proposalTs: string, decided?: DecidedMark): Promise<boolean>;
 
   // ----- decision reports -----
 
@@ -1399,6 +1667,21 @@ export interface ThreadState {
   /** Settle a claimed filing: the issue it filed, or null to release the
    *  claim with nothing filed. */
   settleFiling(key: string, issue: FiledIssue | null): Promise<void>;
+
+  // ----- one comparison per scenario per thread -----
+
+  /**
+   * Claim the one blueprint comparison a thread gets for a scenario
+   * (`blueprint-upkeep/milestone.ts`): true the first time, and recorded in
+   * the same step, so of two racing turns one shows it. Kept as long as the
+   * thread's memory (`HISTORY_TTL_MS`).
+   */
+  claimComparison(ref: ThreadRef, scenario: string): Promise<boolean>;
+}
+
+/** The record a thread's one comparison for a scenario is kept under. */
+export function comparisonKey(ref: ThreadRef, scenario: string): string {
+  return `cmp:${ref.channel}:${ref.thread}:${scenario.trim().toLowerCase()}`;
 }
 
 // ── One filing per key ───────────────────────────────────────────────────────

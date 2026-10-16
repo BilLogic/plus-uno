@@ -129,6 +129,10 @@ A Roadmap card id (`RM-<n>`; `Card <n>` in Figma titles), the join key.
 A source of truth a later decision overruled: a Notion page or a Figma file.
 _Avoid_: "out of sync"
 
+**blueprint revision**:
+The drafted row changes to one path of the **uno-blueprint** — cells added, changed or deprecated, each with its status — from one piece of shipped work or one idea, reviewed and approved whole.
+_Avoid_: "blueprint update", "card" (a card is the Roadmap's)
+
 ### uno-bot
 
 **uno-bot**:
@@ -240,7 +244,7 @@ The design agent, in every embodiment.
 _Avoid_: "the AI"
 
 **embodiment**:
-A runtime uno runs in (the IDE, the uno-bot Worker, headless GitHub Actions), each with its own powers and slice of the harness.
+A runtime uno runs in (the IDE, the uno-bot Worker), each with its own powers and slice of the harness.
 _Avoid_: "mode", "environment"
 
 **uno skill**:

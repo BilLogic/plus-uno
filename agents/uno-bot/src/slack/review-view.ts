@@ -35,8 +35,11 @@
 // card's own buttons carry it in the message they sit on: that ts is the
 // identity, and the decision is resolved against it and nothing else.
 import { textSections } from "./render";
-import { CONFIRM_FOOTER } from "./proposal-render";
-import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
+import { CONFIRM_FOOTER, withoutInternalFields } from "./proposal-render";
+import { clip } from "./card-block";
+import { anatomyBlocks, decisionWords, DESCRIPTION_CHARS, reviewTitle, type DecisionWords, type DraftAlert, type DraftAnatomy } from "./review-anatomy";
+import { batchAnatomy } from "./review-batch";
+import { SLACK_USER_ID, escapeSlackText, unescapeSlackText } from "./mrkdwn";
 import {
   draftValuesOf,
   FIELD_ACTION_ID,
@@ -50,8 +53,9 @@ import {
   type EditableField,
   type ReviewViewState,
 } from "./review-fields";
-import { caveatsOf, draftHeadline, readableDraft } from "./review-draft";
-import type { PendingProposal, ReviewChoice, StatedCardWords } from "../thread-state/index";
+import { anatomyOf, caveatsOf, draftHeadline, readableDraft } from "./review-draft";
+import type { NotionDatabaseLinks } from "./review-notion-create";
+import { proposalOperations, type DecidedProposal, type PendingProposal, type ProposalOperation, type ReviewChoice, type StatedCardWords } from "../thread-state/index";
 import type { ReviewDecision } from "../gate/index";
 
 /** The draft's one button; `slack/interactive.ts` routes it. */
@@ -79,7 +83,9 @@ export interface ReviewedCard {
   ts: string;
 }
 
-/** Slack's modal title cap is 24 characters. */
+/** The title of a view that is not a draft: loading, a closed card, a notice.
+ *  A draft is titled for its tool (`review-anatomy.ts` § `reviewTitle`), at
+ *  most Slack's 24 characters. */
 const TITLE = "Review proposal";
 
 /** Slack's cap on a view's blocks. A long draft can pass it, so `fitBody`
@@ -120,6 +126,49 @@ export function alertBlock(level: "error" | "success", text: string): unknown {
   return { type: "alert", block_id: REVIEW_ALERT_BLOCK_ID, level, text: { type: "plain_text", text } };
 }
 
+/** Slack's cap on an alert's text. */
+const ALERT_CHARS = 200;
+
+// AN ALERT NAMES NOBODY. Slack's alert takes mrkdwn, but its docs say nothing
+// of a mention inside one, and none has been seen to render; a pill that came
+// out as `<@U…>` would be the one line a person reads first. So an alert that
+// would name someone says its outcome in plain text, and the people and the
+// channel go on a `rich_text` line under it, as `user` and `channel`
+// elements, which render as pills everywhere a modal does.
+
+/** Slack's cap on a text element of a rich text line. */
+const RICH_TEXT_CHARS = 3000;
+
+/** A mention, a channel or a link in mrkdwn, as this file and the card write them. */
+const MRKDWN_TOKEN = /<@([UW][A-Z0-9]{6,})>|<#([CG][A-Z0-9]{6,})(?:\|[^>]*)?>|<(https?:\/\/[^|>\s]+)(?:\|([^>]*))?>/g;
+
+/** mrkdwn's entities back to the characters: rich text is read as written. */
+const unescaped = unescapeSlackText;
+
+/** A line of mrkdwn as rich text elements: each `<@U…>` a user pill, each
+ *  `<#C…>` a channel pill, each `<url|text>` a link, the rest its words. */
+export function richElements(mrkdwn: string): unknown[] {
+  const out: unknown[] = [];
+  let at = 0;
+  const words = (t: string) => {
+    if (t) out.push({ type: "text", text: clip(unescaped(t), RICH_TEXT_CHARS) });
+  };
+  for (const m of mrkdwn.matchAll(MRKDWN_TOKEN)) {
+    words(mrkdwn.slice(at, m.index));
+    if (m[1]) out.push({ type: "user", user_id: m[1] });
+    else if (m[2]) out.push({ type: "channel", channel_id: m[2] });
+    else out.push({ type: "link", url: m[3]!, ...(m[4] ? { text: unescaped(m[4]) } : {}) });
+    at = m.index + m[0].length;
+  }
+  words(mrkdwn.slice(at));
+  return out;
+}
+
+/** One rich text line: what an alert would have said with a pill in it. */
+function richLine(elements: readonly unknown[]): unknown {
+  return { type: "rich_text", elements: [{ type: "rich_text_section", elements }] };
+}
+
 function line(text: string): unknown {
   return { type: "section", text: { type: "mrkdwn", text } };
 }
@@ -145,16 +194,26 @@ export interface DraftAccess {
   /** When an item of a decision report closes undecided: its card shows
    *  neither who decides nor when, so the decision's own pop-up says both. */
   closesAt?: number;
+  /** A decided card, opened from View: which way it went and who decided.
+   *  Drawn read-only under an alert saying so, without its where line and
+   *  caveats, which were about a decision now made. */
+  decided?: Pick<DecidedProposal, "decision" | "by" | "reason">;
 }
 
 /**
- * The draft, written for a person: the key properties, then the body as
- * headings and paragraphs, then the card's caveats (`review-draft.ts`). A
- * proposal that file cannot read shows the card's text instead.
+ * The draft, written for a person, under its tool's title. A tool read in the
+ * shared anatomy (`review-draft.ts` § `anatomyOf`) is drawn in its zones —
+ * what it does and where, its caveats as alerts, the object as a card, then
+ * its content. Any other: the key properties, then the body as headings and
+ * paragraphs, then the card's caveats; and a proposal that file cannot read
+ * shows the card's text, its internal inputs left out.
  *
  * A confirmer's view has Edit fields at the top when the draft has fields to
- * edit, ends with the decision and a note, and has Submit as its footer. `mayDecide` false is the same draft read-only: Close alone, and a
- * line naming who can decide.
+ * edit, ends with the decision and a note, and has Submit as its footer.
+ * `mayDecide` false is the same draft read-only: no input, Close alone, and
+ * an `info` alert at the top naming who can decide. A `decided` card is
+ * read-only too, under a `success` alert (or a plain one for a Reject) saying
+ * who decided it and, where the reading knows, where it went.
  *
  * `opts.edits` are the values kept under Edit fields: the draft shows them in
  * place and says which fields they are. Approve reads them from the card's
@@ -171,53 +230,122 @@ export function draftView(
     typed?: ReadonlyMap<string, string>;
     editable?: boolean;
     alert?: { level: "error" | "success"; text: string };
+    /** Where the Notion databases a create lands in open, for its where line. */
+    databases?: NotionDatabaseLinks;
   } = {},
 ): View {
-  const edits = access.mayDecide ? (opts.edits ?? {}) : {};
+  const mayDecide = access.mayDecide && !access.decided;
+  const edits = mayDecide ? (opts.edits ?? {}) : {};
   const operations = withValues(proposal, new Map(Object.entries(edits)));
   const text = draftBody(proposal.proposalText);
-  const inline = access.mayDecide ? inlineKeysOf(proposal) : new Set<string>();
+  const inline = mayDecide ? inlineKeysOf(proposal) : new Set<string>();
   const inPlace = new Map(
     inlineFields(proposal)
       .filter((f) => inline.has(f.key))
       .map((f) => [f.key, { ...f, value: opts.typed?.get(f.key) ?? edits[f.key] ?? f.value }] as const),
   );
+  // Edit fields only for what the draft does not already hold in place.
+  const editable =
+    mayDecide && opts.editable !== false && [...draftValuesOf(proposal).keys()].some((key) => !inline.has(key));
+  const editButton = editable ? button(REVIEW_EDIT_ACTION_ID, "Edit fields", "edit") : undefined;
   const detail = {
     ...(proposal.before ? { before: proposal.before } : {}),
     ...(proposal.issue ? { issue: proposal.issue } : {}),
+    ...(proposal.facts ? { facts: proposal.facts } : {}),
     inline: inPlace,
-    editing: access.mayDecide,
+    editing: mayDecide,
+    ...(editButton ? { editButton } : {}),
+    ...(opts.databases ? { databases: opts.databases } : {}),
   };
-  const read = readableDraft(operations, caveatsOf(text), detail) ?? textSections(text);
+  const editedLabels = labelsOf(proposal, Object.keys(edits));
+  const edited = editedLabels.length ? [context(`Edited here: ${editedLabels.join(", ")}. Approve writes these values.`)] : [];
+
+  // A tool read in the shared anatomy (`review-anatomy.ts`), or a batch
+  // (`review-batch.ts`), opens on what it does; any other draft opens on its
+  // headline, as before. Once decided, its where line and caveats go: the
+  // alert at the top says what happened instead. A reading that sets Edit
+  // fields beside its facts needs no line of its own for it.
+  const reading = operations.length > 1 ? batchAnatomy(operations, text, detail) : anatomyOf(operations, text, detail);
+  const anatomy = reading && access.decided ? settled(reading) : reading;
+  const holdsEdit = !!editButton && !!anatomy?.content.some((b) => (b as { accessory?: unknown }).accessory === editButton);
+  const read = anatomy
+    ? anatomyBlocks(anatomy, [...(editButton && !holdsEdit ? [{ type: "section", text: { type: "mrkdwn", text: "*Fields*" }, accessory: editButton }] : []), ...edited])
+    : (readableDraft(operations, access.decided ? [] : caveatsOf(text), detail) ?? textSections(withoutInternalFields(text)));
   // A field the reading did not draw — the batch has a tool it cannot read —
   // still goes in place, after the draft, so it is never left uneditable.
   const drawn = new Set(read.map((b) => (b as { block_id?: string }).block_id));
   const rest = [...inPlace.values()].filter((f) => !drawn.has(`${FIELD_BLOCK_PREFIX}${f.key}`));
   const body = rest.length ? [...read, { type: "divider" }, ...fieldInputBlocks(rest)] : read;
 
-  const headline = draftHeadline(operations);
   const head: unknown[] = [];
+  // A refused edit's alert stays first, above every zone; then, for a view
+  // that cannot decide, why not.
   if (opts.alert) head.push(alertBlock(opts.alert.level, opts.alert.text));
-  // Edit fields only for what the draft does not already hold in place.
-  const editable =
-    access.mayDecide && opts.editable !== false && [...draftValuesOf(proposal).keys()].some((key) => !inline.has(key));
-  head.push({
-    type: "section",
-    text: { type: "mrkdwn", text: headline ? `*${escapeSlackText(headline)}*` : "*The draft*" },
-    ...(editable ? { accessory: button(REVIEW_EDIT_ACTION_ID, "Edit fields", "edit") } : {}),
-  });
-  const edited = labelsOf(proposal, Object.keys(edits));
-  if (edited.length) head.push(context(`:pencil2: Edited here: ${edited.join(", ")}. Approve writes these values.`));
+  if (access.decided) head.push(...decidedAlert(access.decided, proposal, reading));
+  else if (!mayDecide) head.push(stateAlert("info", "Read-only."), richLine(readOnlyLine(access.confirmers)));
+  if (!anatomy) {
+    const headline = draftHeadline(operations);
+    head.push({
+      type: "section",
+      text: { type: "mrkdwn", text: headline ? `*${escapeSlackText(headline)}*` : "*The draft*" },
+      ...(editButton ? { accessory: editButton } : {}),
+    });
+    head.push(...edited);
+  }
 
-  const tail: unknown[] = access.mayDecide
-    ? [{ type: "divider" }, choiceInput(proposal.choices), noteInput(Boolean(proposal.choices?.length)), ...(access.closesAt !== undefined ? [context(openLine(access.closesAt, access.confirmers))] : [])]
-    : [context(readOnlyLine(access.confirmers))];
+  const words = decisionWords(operations);
+  const tail: unknown[] = mayDecide
+    ? [
+        { type: "divider" },
+        choiceInput(proposal.choices, {
+          ...words,
+          ...(anatomy?.approve ? { confirm: anatomy.approve } : {}),
+          ...(anatomy?.revise ? { revise: anatomy.revise } : {}),
+        }),
+        noteInput(Boolean(proposal.choices?.length), Boolean(anatomy)),
+        ...(access.closesAt !== undefined ? [context(openLine(access.closesAt, access.confirmers))] : []),
+      ]
+    : [];
   const fitted = fitBody(body, MAX_VIEW_BLOCKS - head.length - tail.length);
   return modal(
     { channel: card.channel, ts: card.ts },
     [...head, ...fitted, ...tail],
-    access.mayDecide ? { submit: SUBMIT } : {},
+    { title: reviewTitle(operations), ...(mayDecide ? { submit: SUBMIT } : {}) },
   );
+}
+
+/** A decided card's reading: its content, without the where line and the
+ *  caveats, which were about the decision — or its own settled reading, where
+ *  it has one. */
+function settled(anatomy: DraftAnatomy): DraftAnatomy {
+  const { where: _where, alerts: _alerts, settled: own, ...rest } = anatomy;
+  return own ?? rest;
+}
+
+/**
+ * What a decided card says at the top: the outcome as a plain alert —
+ * "Approved.", "Rejected." or, on a card with its own answers, "Answered." —
+ * `success` for an Approve and a plain alert otherwise; then, where there is
+ * someone or somewhere to name, a rich text line with the pills: "Approved by
+ * @Bill to post in #channel.", "Rejected by @Bill: not this week.".
+ */
+function decidedAlert(
+  decided: NonNullable<DraftAccess["decided"]>,
+  proposal: PendingProposal,
+  reading: DraftAnatomy | null,
+): unknown[] {
+  const who = decided.by && SLACK_USER_ID.test(decided.by) ? decided.by : undefined;
+  const by = who ? [{ type: "text", text: " by " }, { type: "user", user_id: who }] : [];
+  const level = decided.decision === "confirm" ? "success" : "default";
+  const outcome = proposal.choices?.length ? "Answered" : decided.decision === "cancel" ? "Rejected" : "Approved";
+  const reason = decided.decision === "cancel" && !proposal.choices?.length ? (decided.reason?.trim() ?? "") : "";
+  const where = outcome === "Approved" && reading?.destination ? [{ type: "text", text: " to " }, ...richElements(reading.destination)] : [];
+  const tail = reason ? [{ type: "text", text: `: ${clip(reason, RICH_TEXT_CHARS - 2)}` }] : [];
+  const alert = stateAlert(level, `${outcome}.`);
+  // Nobody and nowhere to name: the alert says it all.
+  if (!by.length && !where.length && !tail.length) return [alert];
+  const stop = /[.!?]$/.test(reason) ? [] : [{ type: "text", text: "." }];
+  return [alert, richLine([{ type: "text", text: outcome }, ...by, ...where, ...tail, ...stop])];
 }
 
 /** The keys of the fields the draft holds as inputs in place: every text
@@ -272,25 +400,43 @@ const CHOICES: ReadonlyArray<[ReviewDecision, string]> = [
  *  to the card's own list before anything runs. */
 const OWN_CHOICE = "choice:";
 
-function choiceInput(own?: readonly ReviewChoice[]): unknown {
+/** An option's description: what choosing it does, plain, at most 75. */
+function description(text: string): { description: { type: "plain_text"; text: string } } {
+  return { description: { type: "plain_text", text: clip(text, DESCRIPTION_CHARS) } };
+}
+
+/** The decision: Approve, Needs changes and Reject, each saying what it does
+ *  on this card — or the card's own answers, each with its decided words. */
+function choiceInput(own: readonly ReviewChoice[] | undefined, words: DecisionWords): unknown {
   const options = own?.length
-    ? own.map((c) => ({ value: `${OWN_CHOICE}${c.verdict}:${c.value}`, text: { type: "mrkdwn", text: c.label } }))
-    : CHOICES.map(([value, text]) => ({ value, text: { type: "plain_text", text } }));
+    ? own.map((c) => ({
+        value: `${OWN_CHOICE}${c.verdict}:${c.value}`,
+        text: { type: "mrkdwn", text: c.label },
+        ...(c.decided?.trim() ? description(c.decided.trim()) : {}),
+      }))
+    : CHOICES.map(([value, text]) => ({ value, text: { type: "plain_text", text }, ...description(words[value]) }));
   return {
     type: "input",
     block_id: CHOICE_BLOCK_ID,
-    label: { type: "plain_text", text: "Decision" },
+    label: { type: "plain_text", text: own?.length ? "Your answer" : "Decision" },
     element: { type: "radio_buttons", action_id: CHOICE_ACTION_ID, options },
   };
 }
 
-function noteInput(own = false): unknown {
+/** The note's hint. A draft in the shared anatomy leaves out "I revise the
+ *  draft from it", which Needs changes' own description already says. */
+function noteInput(own = false, anatomy = false): unknown {
+  const hint = own
+    ? "Optional context for your answer."
+    : anatomy
+      ? "Needs changes: what should change. Reject: an optional reason."
+      : "Needs changes: what should change. I revise the draft from it. Reject: an optional reason.";
   return {
     type: "input",
     block_id: NOTE_BLOCK_ID,
     optional: true,
     label: { type: "plain_text", text: "Note" },
-    hint: { type: "plain_text", text: own ? "Optional context for your answer." : "Needs changes: what should change. I revise the draft from it. Reject: an optional reason." },
+    hint: { type: "plain_text", text: hint },
     element: { type: "plain_text_input", action_id: NOTE_ACTION_ID, multiline: true, max_length: NOTE_MAX_CHARS },
   };
 }
@@ -390,14 +536,65 @@ function reviewNoteOf(state: unknown): string {
 }
 
 /**
- * A decided card, opened from View: its own words, read-only. The record is
- * gone once a card is decided, so the words are the card's message as Slack
- * hands it with the click, outcome line included.
+ * An item of a decision report, decided and opened from View, when its card's
+ * record no longer keeps the decided draft: its words off the report's
+ * record, read-only, outcome included.
  */
-export function decidedView(card: ReviewedCard, cardText: string): View {
+export function decidedView(card: ReviewedCard, cardText: string, title?: string): View {
+  return modal(
+    card,
+    [...textSections(withoutInternalFields(draftBody(cardText))), context("Read-only. This proposal has already been decided.")],
+    title ? { title } : {},
+  );
+}
+
+/** Said under the outcome when the decided draft is no longer kept: a card
+ *  decided before its record kept it, or past its lifetime. */
+export const DRAFT_NOT_KEPT = "The draft behind this card is no longer kept, so only its outcome shows here. The card in the thread has the rest.";
+
+/** An outcome line led by an emoji: a run cut off before it reported back,
+ *  which still leads with `:warning:`, or a card decided before an Approve or
+ *  a Reject said so in words alone, which still ends with ✅ or ⛔. */
+const EMOJI_OUTCOME = /^:(white_check_mark|no_entry|warning):\s*/;
+
+/** An outcome line's level, from its words: "Approved by", "Answered by",
+ *  "Rejected by", "Cancelled by", or a stated card's ⛔ phrase ending
+ *  ", decided by <@U>." (`statedCancelledNote`). */
+function outcomeLevelOf(words: string): DraftAlert["level"] | null {
+  if (/^(Approved|Answered) by /.test(words)) return "success";
+  if (/^(Rejected|Cancelled)\b/.test(words)) return "default";
+  const stated = /, decided by <@([^>]+)>\.$/.exec(words);
+  return stated && SLACK_USER_ID.test(stated[1]!) ? "default" : null;
+}
+
+/** A decided card's outcome line, as the card's message ends with it: the
+ *  level its words mean — or, on a line led by an emoji, the level its emoji
+ *  means — and its words without the emoji. */
+function outcomeOf(cardText: string): { level: DraftAlert["level"]; text: string } | null {
+  const last = cardText.split("\n").map((l) => l.trim()).filter(Boolean).at(-1) ?? "";
+  const emoji = EMOJI_OUTCOME.exec(last);
+  if (emoji) {
+    const level = emoji[1] === "white_check_mark" ? "success" : emoji[1] === "warning" ? "warning" : "default";
+    return { level, text: last.slice(emoji[0].length) };
+  }
+  const level = outcomeLevelOf(last);
+  return level ? { level, text: last } : null;
+}
+
+/**
+ * A decided card opened from View when its record keeps no draft — decided
+ * before the record was kept, or past the card's lifetime: the outcome the
+ * card's message ends with, under a plain alert at the level its words mean
+ * (the line names who decided, so it is rich text, not the alert), and a line
+ * saying the draft is gone. A message with no outcome line reads as decided,
+ * plainly.
+ */
+export function outcomeView(card: ReviewedCard, cardText: string): View {
+  const outcome = outcomeOf(cardText);
   return modal(card, [
-    ...textSections(draftBody(cardText)),
-    context("Read-only. This proposal has already been decided."),
+    stateAlert(outcome?.level ?? "info", "This proposal has already been decided."),
+    ...(outcome ? [richLine(richElements(outcome.text))] : []),
+    line(DRAFT_NOT_KEPT),
   ]);
 }
 
@@ -410,33 +607,73 @@ export function openLine(closesAt: number, confirmers: readonly string[]): strin
   return `Open until ${when} ET${names ? ` · ${names} can decide.` : "."}`;
 }
 
-function readOnlyLine(confirmers: readonly string[]): string {
-  const who = confirmers.filter((id) => SLACK_USER_ID.test(id)).map((id) => `<@${id}>`);
-  if (!who.length) return "Read-only. Nobody here can decide this proposal.";
-  const names = who.length === 1 ? who[0]! : `${who.slice(0, -1).join(", ")} or ${who.at(-1)!}`;
-  return `Read-only. Only ${names} can decide this proposal.`;
+/** Who can decide a read-only draft, as rich text elements: "Only @A or @B
+ *  can decide this proposal." */
+function readOnlyLine(confirmers: readonly string[]): unknown[] {
+  const who = confirmers.filter((id) => SLACK_USER_ID.test(id));
+  if (!who.length) return [{ type: "text", text: "Nobody here can decide this proposal." }];
+  const names = who.flatMap((id, i) => [
+    ...(i === 0 ? [] : [{ type: "text", text: i === who.length - 1 ? " or " : ", " }]),
+    { type: "user", user_id: id },
+  ]);
+  return [{ type: "text", text: "Only " }, ...names, { type: "text", text: " can decide this proposal." }];
 }
 
-/** A card that cannot be decided any more, and why. No decision. */
+/** A state's alert: plain text, the outcome only. */
+function stateAlert(level: DraftAlert["level"], text: string): unknown {
+  return { type: "alert", level, text: { type: "plain_text", text: clip(text, ALERT_CHARS) } };
+}
+
+/**
+ * A state in place of the draft (§ 14): an alert with the outcome, then one
+ * line saying what happens next. A sentence that says both is split at its
+ * first full stop: "Approved. I'm running it now…" is the alert "Approved."
+ * over the line "I'm running it now…".
+ *
+ * @param level - `success` for an Approve, `default` for a Reject, `info` for
+ *   sent back and being revised, `warning` for expired and replaced
+ * @param text - The outcome, and what happens next after its first sentence
+ * @param title - The draft's title, where the view knows the card's tool
+ */
+export function stateView(card: ReviewedCard, level: DraftAlert["level"], text: string, title?: string): View {
+  const split = /^(.+?[.!?])\s+(\S.*)$/s.exec(text.trim());
+  const [outcome, next] = split ? [split[1]!, split[2]!] : [text.trim(), ""];
+  return modal({ channel: card.channel, ts: card.ts }, [stateAlert(level, outcome), ...(next ? [line(next)] : [])], title ? { title } : {});
+}
+
+/** A card that cannot be decided any more, and why. No decision. Titled for
+ *  the card's tool where the lookup that found it named its batch. */
 export function closedView(
   card: ReviewedCard,
-  why: { state: "expired"; stated?: StatedCardWords } | { state: "superseded" } | { state: "gone" },
+  why:
+    | { state: "expired"; stated?: StatedCardWords; operations?: readonly ProposalOperation[] }
+    | { state: "superseded"; operations?: readonly ProposalOperation[] }
+    | { state: "gone"; decided?: Pick<DecidedProposal, "proposal"> },
 ): View {
-  const meta = { channel: card.channel, ts: card.ts };
+  const title = closedTitle(why);
   switch (why.state) {
     case "expired":
-      return modal(meta, [line(why.stated?.expired ?? "This proposal expired, so it can't be approved now. Ask me again and I'll set it up fresh.")]);
+      return stateView(card, "warning", why.stated?.expired ?? "This proposal expired, so it can't be approved now. Ask me again and I'll set it up fresh.", title);
     case "superseded":
-      return modal(meta, [line("This proposal was replaced by a newer one. Review the newest card in the thread instead.")]);
+      return stateView(card, "warning", "This proposal was replaced by a newer one. Review the newest card in the thread instead.", title);
     case "gone":
-      return modal(meta, [line("This proposal has already been decided.")]);
+      return stateView(card, "info", "This proposal has already been decided. Its outcome is on the card in the thread.", title);
   }
 }
 
+/** A closed card's title: its tool's, from the batch its lookup named, or
+ *  nothing (the generic title) when the lookup named none. */
+export function closedTitle(
+  why: { operations?: readonly ProposalOperation[]; decided?: Pick<DecidedProposal, "proposal"> },
+): string | undefined {
+  const operations = why.operations ?? (why.decided ? proposalOperations(why.decided.proposal) : undefined);
+  return operations?.length ? reviewTitle(operations) : undefined;
+}
+
 /** One line in place of the draft: the decision registered, or the Gate's
- *  answer when it did not. */
-export function noticeView(card: ReviewedCard, text: string): View {
-  return modal({ channel: card.channel, ts: card.ts }, [line(text)]);
+ *  answer when it did not — under the card's title where the door knows it. */
+export function noticeView(card: ReviewedCard, text: string, title?: string): View {
+  return modal({ channel: card.channel, ts: card.ts }, [line(text)], title ? { title } : {});
 }
 
 /** The card a view's `private_metadata` names, or null for one this Worker

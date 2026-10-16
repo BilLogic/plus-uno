@@ -93,6 +93,7 @@ import {
   TEXT_KEEP_MS,
 } from "./due";
 import { snoozedRunAt } from "./remind";
+import { isStaleCheckInMorning } from "../follow-through/rules";
 import { budgetOf, cardTodoId, isCardKind, isDmKind, LIVE_STATES, type CommitmentPatch, type CommitmentRecord, type CommitmentStore, type CommitmentText, type ReminderBudget } from "./store";
 
 /** What one commitment may spend before it starts: the evidence reads, the
@@ -409,7 +410,14 @@ export async function runCommitmentNudges(job: ScheduledJob, deps: NudgeDeps): P
   ensureHeadroom(deps, COMMITMENT_COST);
   // Read again by a retried job, so the cap holds across its alarms.
   const reminded = await deps.store.remindedOn(runDate);
-  const limit: Record<ReminderBudget, number> = { asked: MAX_REMINDERS_PER_PERSON, cards: MAX_CARD_REMINDERS_PER_PERSON };
+  // Monday's stuck cards are one whole section a place: every one a person
+  // has shows that morning. Any other morning, a stuck card's thread asks
+  // keep the card cap.
+  const limit: Record<ReminderBudget, number> = {
+    asked: MAX_REMINDERS_PER_PERSON,
+    cards: MAX_CARD_REMINDERS_PER_PERSON,
+    weekly: isStaleCheckInMorning(now) ? Number.POSITIVE_INFINITY : MAX_CARD_REMINDERS_PER_PERSON,
+  };
   const capped = (b: ReminderBudget) => Object.keys(reminded[b]).filter((p) => reminded[b][p]! >= limit[b]);
   // Card rows held for `flush` keep the D1 writes that hand them back
   // (`release`) in reserve, so a budget stop before they post can still
@@ -418,7 +426,7 @@ export async function runCommitmentNudges(job: ScheduledJob, deps: NudgeDeps): P
   try {
     for (;;) {
       ensureHeadroom(deps, reserved());
-      const c = await deps.store.nextDue(now, runDate, { asked: capped("asked"), cards: capped("cards") });
+      const c = await deps.store.nextDue(now, runDate, { asked: capped("asked"), cards: capped("cards"), weekly: capped("weekly") });
       if (!c) break;
       const action = await handleDue(deps, c, now, runDate);
       if (action.action === "nudged" || action.action === "followed-up") {
