@@ -1,7 +1,8 @@
 /**
  * TreeSelect — a `_Field` trigger over a `_Listbox` surface holding a flat run
  * of OptionRows in the `treeitem` role. The field, the surface and the rows
- * draw themselves; this file only places the panel and turns the caret.
+ * draw themselves, and `.plus-listbox--anchored` places the panel; this file
+ * turns the caret.
  */
 
 .plus-tree-select-wrapper {
@@ -26,15 +27,4 @@
     &.plus-tree-select-arrow-open {
         transform: rotate(180deg);
     }
-}
-
-// The listbox surface, placed under the field and at least as wide.
-.plus-listbox.plus-tree-select-menu {
-    position: absolute;
-    top: calc(100% + var(--size-element-gap-xs));
-    left: 0;
-    z-index: var(--plus-listbox-z-index);
-    width: max-content;
-    min-width: 100%;
-    max-width: calc(100vw - 2 * var(--size-section-pad-x-md));
 }

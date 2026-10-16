@@ -3,6 +3,7 @@ import useFieldId from './useFieldId';
 import PropTypes from 'prop-types';
 import Field from './_internal/Field';
 import OptionRow from './_internal/OptionRow';
+import usePopupPlacement from './_internal/usePopupPlacement';
 import './_internal/Listbox.scss';
 import './TreeSelect.scss';
 
@@ -136,6 +137,8 @@ const TreeSelect = ({
     const [expandedValues, setExpandedValues] = useState(() => new Set());
     const wrapperRef = useRef(null);
     const inputRef = useRef(null);
+    const menuRef = useRef(null);
+    const place = usePopupPlacement({ open: isOpen, anchorRef: wrapperRef, surfaceRef: menuRef });
     /**
      * #323. Focus moves between real elements rather than through
      * `aria-activedescendant`: every treeitem is in the DOM already, so a
@@ -486,7 +489,12 @@ const TreeSelect = ({
             </Field>
 
             {isOpen && (
-                <div className="plus-listbox plus-tree-select-menu">
+                <div
+                    ref={menuRef}
+                    className="plus-listbox plus-listbox--anchored plus-tree-select-menu"
+                    data-placement={place?.placement}
+                    data-align={place?.align}
+                >
                     <div className="plus-listbox-body">
                         <div
                             className="plus-listbox-options"

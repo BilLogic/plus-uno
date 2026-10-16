@@ -12,6 +12,7 @@ import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import Spinner from '@/components/status-and-loading/Spinner/Spinner';
 import OptionRow from './OptionRow';
+import usePopupPlacement from './usePopupPlacement';
 import './Listbox.scss';
 
 /** Past this many options, only the rows on screen are drawn. */
@@ -20,8 +21,6 @@ export const VIRTUALIZE_ABOVE = 100;
 const OVERSCAN = 6;
 /** A row's height before one has been measured. */
 const FALLBACK_ROW_HEIGHT = 36;
-/** The gap between the field and the list, in px; matches `--size-element-gap-xs`. */
-const ANCHOR_GAP = 4;
 
 /**
  * One shape for every option, whether the caller passed a string or an object.
@@ -60,9 +59,11 @@ const isTextEntry = (target) => target instanceof HTMLElement
  * - **Surface:** `--color-surface-overlay`, 140–300px tall, then the body scrolls.
  * - **Slots:** `header` (a hint or a search field), the body of rows, and `footer`.
  * - **Rows:** `OptionRow` for every option, group heading and the Create row.
- * - **Placement:** with `anchorRef` it renders in a portal on `document.body`,
- *   at least as wide as the anchor, and flips above it when there isn't room
- *   below. Without one it renders in place.
+ * - **Placement:** with `anchorRef` it renders in a portal on `document.body`
+ *   and follows the popup placement rule through `usePopupPlacement`: at least
+ *   as wide as the anchor, flipped above it when there isn't room below, and
+ *   right-aligned when it would run past the viewport. Without one it renders
+ *   in place.
  * - **Focus:** without `anchorRef` the list is one tab stop and walks its rows
  *   with `aria-activedescendant`. With one, focus stays in the field: the field
  *   calls `ref.current.handleKeyDown(event)` and sets `aria-activedescendant`
@@ -217,35 +218,7 @@ const Listbox = ({
     /* ---------- placement ---------- */
     const surfaceRef = useRef(null);
     const bodyRef = useRef(null);
-    const [place, setPlace] = useState(null);
-
-    const reposition = useCallback(() => {
-        const anchor = anchorRef?.current;
-        const surface = surfaceRef.current;
-        if (!anchor || !surface) return;
-        const box = anchor.getBoundingClientRect();
-        const height = surface.offsetHeight;
-        const below = window.innerHeight - box.bottom - ANCHOR_GAP;
-        const above = box.top - ANCHOR_GAP;
-        const top = below < height && above > below;
-        setPlace({
-            placement: top ? 'top' : 'bottom',
-            top: top ? Math.max(box.top - ANCHOR_GAP - height, 0) : box.bottom + ANCHOR_GAP,
-            left: box.left,
-            minWidth: box.width,
-        });
-    }, [anchorRef]);
-
-    useLayoutEffect(() => {
-        if (!open || !anchorRef) return undefined;
-        reposition();
-        window.addEventListener('resize', reposition);
-        window.addEventListener('scroll', reposition, true);
-        return () => {
-            window.removeEventListener('resize', reposition);
-            window.removeEventListener('scroll', reposition, true);
-        };
-    }, [open, anchorRef, reposition, shown.length, canCreate, loading, error]);
+    const place = usePopupPlacement({ open, anchorRef, surfaceRef });
 
     // A press outside the field and the list closes it.
     useEffect(() => {
@@ -379,7 +352,7 @@ const Listbox = ({
             style={anchorRef ? {
                 top: place?.top ?? 0,
                 left: place?.left ?? 0,
-                minWidth: place?.minWidth,
+                minWidth: place?.anchorWidth,
                 visibility: place ? undefined : 'hidden',
                 ...style,
             } : style}

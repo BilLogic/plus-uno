@@ -25,12 +25,6 @@
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
-## Tokens touched
-
-`--plus-listbox-z-index` · `--size-element-gap-xs` · `--size-section-pad-x-md`
-
-From `design-system/src/components/forms-and-inputs/TreeSelect.scss`. Override these through the token layer, never with a literal.
-
 ## Related
 
 Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea`

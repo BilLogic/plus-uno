@@ -3,6 +3,7 @@ import useFieldId from './useFieldId';
 import PropTypes from 'prop-types';
 import Field from './_internal/Field';
 import OptionRow from './_internal/OptionRow';
+import usePopupPlacement from './_internal/usePopupPlacement';
 import './_internal/Listbox.scss';
 import './Cascader.scss';
 
@@ -27,9 +28,15 @@ const optionChildrenOf = (option) => (
 
 const optionIsDisabled = (option) => typeof option === 'object' && Boolean(option.disabled);
 
+/**
+ * The default `value`, one array for every render. A fresh `[]` each render
+ * would re-run the value sync on every render, which never settles.
+ */
+const NO_PATH = [];
+
 const Cascader = ({
     id,
-    value = [],
+    value = NO_PATH,
     options = [],
     onChange,
     placeholder = 'Please select',
@@ -43,6 +50,8 @@ const Cascader = ({
     const [activeColumns, setActiveColumns] = useState([options]); // Array of option arrays for each column
     const wrapperRef = useRef(null);
     const inputRef = useRef(null);
+    const menuRef = useRef(null);
+    const place = usePopupPlacement({ open: isOpen, anchorRef: wrapperRef, surfaceRef: menuRef });
     /**
      * #323. Where the keyboard cursor is: which column, and which row of it.
      * The options are real elements, so focus moves between them with a roving
@@ -366,7 +375,13 @@ const Cascader = ({
 
             {/* The listbox surface; its body holds one column per level. */}
             {isOpen && (
-                <div className="plus-listbox plus-cascader-menu" id={menuId}>
+                <div
+                    ref={menuRef}
+                    className="plus-listbox plus-listbox--anchored plus-cascader-menu"
+                    id={menuId}
+                    data-placement={place?.placement}
+                    data-align={place?.align}
+                >
                     <div className="plus-listbox-body plus-cascader-columns">
                         {activeColumns.map((columnOptions, columnIndex) => (
                             <div

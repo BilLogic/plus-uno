@@ -86,7 +86,8 @@ $dropdown-themes: (
         left: 0;
         margin: 0;
         z-index: 1000;
-        min-width: 200px;
+        // At least the toggle (the wrapper is its width), and never under 200px.
+        min-width: max(200px, 100%);
         max-width: 320px;
         padding: var(--size-element-pad-y-sm) 0;
         // Canonical menu surface per Figma (BS4 Dropdown → surface-container #edeef0).

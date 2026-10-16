@@ -131,8 +131,9 @@ rule: `Select`, `TagInput`, `TreeSelect`, `Cascader`, `DatePicker`,
 
 - **Gap:** `--size-element-gap-xs` (4px) between the trigger's edge and the
   popup surface, as a token, with Bootstrap's spacer margin reset to zero.
-  The shared `Listbox` holds it as `ANCHOR_GAP`; anything placed in CSS uses
-  `calc(100% + var(--size-element-gap-xs))`.
+  `Listbox`, `TreeSelect` and `Cascader` share one placement,
+  `_internal/usePopupPlacement.js`, which decides the flip and alignment; a
+  popup placed in CSS uses `calc(100% + var(--size-element-gap-xs))`.
 - **Alignment:** the popup's left edge sits on the trigger's left edge. Near
   the viewport's right edge it right-aligns instead.
 - **Width:** at least the trigger's width and at most 320px. A popup with

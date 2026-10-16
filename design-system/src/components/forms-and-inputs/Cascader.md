@@ -16,7 +16,7 @@
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | — |
-| `value` | arrayOf or string or number | `[]` | — |
+| `value` | arrayOf or string or number | `NO_PATH` | — |
 | `options` | arrayOf or string or shape or number or array or bool | `[]` | — |
 | `onChange` | func | — | — |
 | `placeholder` | string | `'Please select'` | Placeholder text when no options are available |
@@ -26,7 +26,7 @@
 
 ## Tokens touched
 
-`--color-outline-variant` · `--plus-listbox-z-index` · `--size-element-border` · `--size-element-gap-xs` · `--size-section-pad-x-md`
+`--color-outline-variant` · `--plus-listbox-viewport-width` · `--size-element-border`
 
 From `design-system/src/components/forms-and-inputs/Cascader.scss`. Override these through the token layer, never with a literal.
 
