@@ -220,6 +220,7 @@ Bind every value inside the Docs frame to a semantic variable, as
 | Section frames | gap `Section/gap-md` |
 | Example and do and don't cards | gap `Card/gap-lg`; padding `Surface Container/pad-x-md`, `pad-y-md`; radius `Card/radius-md`; fill `surface-container-low`; stroke `outline-variant` |
 | Table rows | gap `Table/cell-gap`; vertical padding `Element/gap-sm`; stroke `outline-variant` |
+| Open-state examples | the field and its popup stacked in a vertical auto-layout frame, gap `Element/gap-xs`, placed by auto-layout alone |
 
 Text uses the library's text styles: Title/H4 for the page title, Title/H5 for
 section headings, Body/B2 for prose and table cells (Bold for table headers),

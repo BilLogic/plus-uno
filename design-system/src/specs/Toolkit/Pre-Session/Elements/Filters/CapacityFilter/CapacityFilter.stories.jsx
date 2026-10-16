@@ -1,170 +1,73 @@
 import React, { useState } from 'react';
-import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
+import { Select } from '@/components';
+import { FilterSelect } from '../FilterSelect';
+import { playPicksOne } from '../filterPlay';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Capacity Filter',
-    component: Dropdown,
+    component: Select,
     tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
     },
 };
 
-// Capacity options for the filter dropdown
-const capacityItems = [
-    { text: 'Not filled', selected: true },
-    { text: 'Filled' },
-    { text: 'Both' },
+const capacityOptions = [
+    { value: 'not-filled', label: 'Not filled' },
+    { value: 'filled', label: 'Filled' },
+    { value: 'both', label: 'Both' },
 ];
 
 /**
- * Reusable Capacity Filter Component
- * For use in pages and other compositions
+ * Capacity filter: one of three answers that exclude each other, so it picks
+ * one and applies at once.
  */
-export const CapacityFilter = ({ value = 'Not filled', onChange }) => {
-    const items = [
-        { text: 'Not filled', selected: value === 'Not filled', onClick: () => onChange?.('Not filled') },
-        { text: 'Filled', selected: value === 'Filled', onClick: () => onChange?.('Filled') },
-        { text: 'Both', selected: value === 'Both', onClick: () => onChange?.('Both') },
-    ];
-    return (
-        <Dropdown
-            buttonText={value}
-            items={items}
-            size="small"
-            fill="outline"
-            style="secondary"
-        />
-    );
-};
+export const CapacityFilter = ({ value, defaultValue = 'not-filled', onChange, open }) => (
+    <FilterSelect
+        aria-label="Capacity"
+        options={capacityOptions}
+        value={value}
+        defaultValue={defaultValue}
+        onChange={onChange}
+        open={open}
+    />
+);
 
-/**
- * Overview - All States
- * Shows all visual states of the Capacity Filter dropdown
- * 
- * Uses design system Dropdown component with:
- * - size="small" for compact filter button
- * - fill="outline" for outlined button style
- * - style="secondary" for secondary color
- */
+/** Every state: closed, open, and each answer picked. */
 export const Overview = () => (
-    <div
-        style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--size-section-gap-lg)'
-        }}
-    >
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg)' }}>
         <section>
-            <h6 className="h6 mb-3">Closed State (Not Filled)</h6>
-            <p className="body3-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-                The filter dropdown in its default closed state showing "Not filled".
-            </p>
-            <Dropdown
-                buttonText="Not filled"
-                items={capacityItems}
-                size="small"
-                fill="outline"
-                style="secondary"
-            />
+            <h6 className="h6 mb-3">Closed state (not filled)</h6>
+            <CapacityFilter />
         </section>
-
-        <section>
-            <h6 className="h6 mb-3">Open State</h6>
-            <p className="body3-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-                The filter dropdown in its open state showing the capacity options.
-            </p>
-            <Dropdown
-                buttonText="Not filled"
-                items={capacityItems}
-                size="small"
-                fill="outline"
-                style="secondary"
-                isOpen={true}
-            />
+        <section style={{ paddingBottom: 'var(--size-section-gap-lg)' }}>
+            <h6 className="h6 mb-3">Open state</h6>
+            <CapacityFilter open />
         </section>
-
         <section style={{ marginTop: 'var(--size-section-gap-lg)' }}>
-            <h6 className="h6 mb-3">Filled Selected</h6>
-            <p className="body3-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-                The filter dropdown with "Filled" selected.
-            </p>
-            <Dropdown
-                buttonText="Filled"
-                items={[
-                    { text: 'Not filled' },
-                    { text: 'Filled', selected: true },
-                    { text: 'Both' },
-                ]}
-                size="small"
-                fill="outline"
-                style="secondary"
-            />
+            <h6 className="h6 mb-3">Filled picked</h6>
+            <CapacityFilter defaultValue="filled" />
         </section>
-
         <section>
-            <h6 className="h6 mb-3">Both Selected</h6>
-            <p className="body3-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-                The filter dropdown with "Both" selected.
-            </p>
-            <Dropdown
-                buttonText="Both"
-                items={[
-                    { text: 'Not filled' },
-                    { text: 'Filled' },
-                    { text: 'Both', selected: true },
-                ]}
-                size="small"
-                fill="outline"
-                style="secondary"
-            />
+            <h6 className="h6 mb-3">Both picked</h6>
+            <CapacityFilter defaultValue="both" />
         </section>
     </div>
 );
 
-/**
- * Interactive Demo
- * Allows user to interact with the capacity filter
- */
+/** Pick a capacity; the filter applies at once. */
 export const Interactive = () => {
-    const [selectedCapacity, setSelectedCapacity] = useState('Not filled');
-
-    const handleSelect = (capacityName) => {
-        setSelectedCapacity(capacityName);
-    };
-
-    const interactiveItems = [
-        { text: 'Not filled', selected: selectedCapacity === 'Not filled', onClick: () => handleSelect('Not filled') },
-        { text: 'Filled', selected: selectedCapacity === 'Filled', onClick: () => handleSelect('Filled') },
-        { text: 'Both', selected: selectedCapacity === 'Both', onClick: () => handleSelect('Both') },
-    ];
-
+    const [capacity, setCapacity] = useState('not-filled');
     return (
-        <div>
-            <h6 className="h6 mb-3">Interactive Demo</h6>
-            <p className="body2-txt mb-4">
-                Use the dropdown to filter sessions by capacity status.
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+            <CapacityFilter value={capacity} onChange={setCapacity} />
+            <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--color-on-surface)' }}>
+                    {capacity}
+                </strong>
             </p>
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--size-element-gap-md)'
-                }}
-            >
-                <Dropdown
-                    buttonText={selectedCapacity}
-                    items={interactiveItems}
-                    size="small"
-                    fill="outline"
-                    style="secondary"
-                />
-                <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    Currently filtering by: <strong style={{ color: 'var(--color-on-surface)' }}>
-                        {selectedCapacity}
-                    </strong>
-                </p>
-            </div>
         </div>
     );
 };
+
+Interactive.play = playPicksOne({ name: 'Capacity', pick: 'Filled', after: /^filled$/ });

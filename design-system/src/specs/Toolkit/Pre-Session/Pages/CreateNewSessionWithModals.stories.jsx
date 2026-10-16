@@ -76,8 +76,8 @@ const BackgroundContent = ({ tabs, selectedTab }) => (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <SectionTitle title="My Sessions" />
                 <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
-                    <SiteFilter initialSelection="All schools" />
-                    <TimeframeFilter initialSelection="This week" />
+                    <SiteFilter />
+                    <TimeframeFilter />
                 </div>
             </div>
 

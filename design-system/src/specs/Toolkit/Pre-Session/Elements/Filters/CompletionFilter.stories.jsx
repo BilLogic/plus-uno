@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
+import { Select } from '@/components';
+import { FilterSelect } from './FilterSelect';
+import { playPicksOne } from './filterPlay';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Completion Filter',
-    component: Dropdown,
+    component: Select,
     tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
@@ -11,100 +13,67 @@ export default {
 };
 
 const completionOptions = [
-    { text: 'Incomplete', value: 'incomplete' },
-    { text: 'Completed', value: 'completed' },
-    { text: 'Both', value: 'both' },
+    { value: 'incomplete', label: 'Incomplete' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'both', label: 'Both' },
 ];
 
 /**
- * Completion Filter Component
- * Dropdown for filtering by completion status
- * Uses semantic tokens:
- * - Dropdown: style="secondary", fill="outline", size="small"
- * - Gap: --size-element-gap-sm (when combined with other filters)
+ * Completion filter: one of three answers that exclude each other, so it
+ * picks one and applies at once.
  */
 export const CompletionFilter = ({
-    initialSelection = 'Incomplete',
+    value,
+    defaultValue = 'incomplete',
+    onChange,
+    open,
     options = completionOptions,
-    interactive = true,
-    isOpen
-}) => {
-    const [selected, setSelected] = useState(initialSelection);
+}) => (
+    <FilterSelect
+        aria-label="Completion"
+        options={options}
+        value={value}
+        defaultValue={defaultValue}
+        onChange={onChange}
+        open={open}
+    />
+);
 
-    const dropdownItems = options.map(option => ({
-        text: option.text,
-        selected: selected === option.text,
-        onClick: interactive ? () => {
-            setSelected(option.text);
-        } : undefined
-    }));
+/** Every state: closed, open, and each answer picked. */
+export const Overview = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg)' }}>
+        <section>
+            <h6 className="h6 mb-3">Default state (closed)</h6>
+            <CompletionFilter />
+        </section>
+        <section style={{ paddingBottom: 'var(--size-section-gap-lg)' }}>
+            <h6 className="h6 mb-3">Open state</h6>
+            <CompletionFilter open />
+        </section>
+        <section style={{ marginTop: 'var(--size-section-gap-lg)' }}>
+            <h6 className="h6 mb-3">Different picks</h6>
+            <div style={{ display: 'flex', gap: 'var(--size-element-gap-lg)' }}>
+                <CompletionFilter defaultValue="incomplete" />
+                <CompletionFilter defaultValue="completed" />
+                <CompletionFilter defaultValue="both" />
+            </div>
+        </section>
+    </div>
+);
 
+/** Pick a completion status; the filter applies at once. */
+export const Interactive = () => {
+    const [completion, setCompletion] = useState('incomplete');
     return (
-        <Dropdown
-            buttonText={selected}
-            items={dropdownItems}
-            style="secondary"
-            fill="outline"
-            size="small"
-            isOpen={isOpen}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+            <CompletionFilter value={completion} onChange={setCompletion} />
+            <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--color-on-surface)' }}>
+                    {completion}
+                </strong>
+            </p>
+        </div>
     );
 };
 
-/**
- * Overview - All States
- * Shows visual states of the Completion Filter
- */
-export const Overview = () => (
-    <div
-        style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--size-section-gap-lg)'
-        }}
-    >
-        <section>
-            <h6 className="h6 mb-3">Default State (Closed)</h6>
-            <CompletionFilter initialSelection="Incomplete" interactive={false} />
-        </section>
-
-        <section>
-            <h6 className="h6 mb-3">Open State (Dropdown Menu)</h6>
-            <div style={{ height: '180px' }}>
-                <CompletionFilter initialSelection="Incomplete" interactive={false} isOpen={true} />
-            </div>
-        </section>
-
-        <section>
-            <h6 className="h6 mb-3">Different Selections</h6>
-            <div style={{ display: 'flex', gap: 'var(--size-element-gap-lg)' }}>
-                <div>
-                    <p className="body3-txt mb-2" style={{ color: 'var(--color-on-surface-variant)' }}>Incomplete</p>
-                    <CompletionFilter initialSelection="Incomplete" interactive={false} />
-                </div>
-                <div>
-                    <p className="body3-txt mb-2" style={{ color: 'var(--color-on-surface-variant)' }}>Completed</p>
-                    <CompletionFilter initialSelection="Completed" interactive={false} />
-                </div>
-                <div>
-                    <p className="body3-txt mb-2" style={{ color: 'var(--color-on-surface-variant)' }}>Both</p>
-                    <CompletionFilter initialSelection="Both" interactive={false} />
-                </div>
-            </div>
-        </section>
-    </div>
-);
-
-/**
- * Interactive Demo
- * Allows user to interact with the filter
- */
-export const Interactive = () => (
-    <div>
-        <h6 className="h6 mb-3">Interactive Demo</h6>
-        <p className="body2-txt mb-4">
-            Select a completion status from the dropdown.
-        </p>
-        <CompletionFilter />
-    </div>
-);
+Interactive.play = playPicksOne({ name: 'Completion', pick: 'Completed', after: /^completed$/ });

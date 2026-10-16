@@ -43,10 +43,10 @@ const defaultSessions = [
 ];
 
 const defaultFilters = {
-    tutor: 'All tutors',
-    school: 'All schools',
-    days: 'All days',
-    capacity: 'Not filled'
+    tutor: [],
+    school: [],
+    days: [],
+    capacity: 'not-filled'
 };
 
 /**
@@ -82,10 +82,10 @@ const BackgroundContent = ({ tabs, selectedTab }) => (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <SectionTitle title="Session Sign-ups" />
                 <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
-                    <TutorFilter value={defaultFilters.tutor} />
-                    <SiteFilter initialSelection={defaultFilters.school} />
-                    <DaysFilter value={defaultFilters.days} />
-                    <CapacityFilter value={defaultFilters.capacity} />
+                    <TutorFilter defaultValue={defaultFilters.tutor} />
+                    <SiteFilter defaultValue={defaultFilters.school} />
+                    <DaysFilter defaultValue={defaultFilters.days} />
+                    <CapacityFilter defaultValue={defaultFilters.capacity} />
                 </div>
             </div>
 

@@ -304,7 +304,7 @@ const Dropdown = ({
                 className={menuClasses}
                 ref={menuRef}
                 style={{
-                    ...(placement.vertical === 'up' ? { top: 'auto', bottom: '100%' } : null),
+                    ...(placement.vertical === 'up' ? { top: 'auto', bottom: 'calc(100% + var(--size-element-gap-xs))' } : null),
                     ...(placement.horizontal === 'end' ? { left: 'auto', right: 0 } : null),
                 }}
             >

@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import AdminDateRangeFilter from './AdminDateRangeFilter';
 import './AdminDateRangeFilter.scss';
 
@@ -19,9 +20,9 @@ export default {
                 component: `Shared date range filter component used across all Admin sections (Group Admin, Student Admin, Session Admin, Tutor Admin).
 
 ## Features
-- **School Dropdown**: Filter by school with selectable options
-- **Tutor Dropdown**: Filter by tutor with selectable options
-- **Date Range**: From/To date pickers with primary outlined buttons
+- **School**: a single Select scoping the view to one school, or all
+- **Tutor**: a single Select scoping the view to one tutor, or all
+- **Date range**: From and To Selects over the offered dates
 - **Consistent Spacing**: 12px gap between groups, 8px gap within groups
 
 Matches Figma: node-id=258-262321`
@@ -61,7 +62,7 @@ export const Overview = {
 };
 
 /**
- * Interactive - Full functionality demo with working dropdowns
+ * Interactive - Full functionality demo with working filters
  */
 export const Interactive = {
     render: () => {
@@ -70,34 +71,10 @@ export const Interactive = {
         const [dateFrom, setDateFrom] = React.useState('01/10/25');
         const [dateTo, setDateTo] = React.useState('02/10/25');
 
-        const schoolOptions = [
-            { text: 'All Schools', onClick: () => setSelectedSchool('All Schools') },
-            { text: 'Lincoln High School', onClick: () => setSelectedSchool('Lincoln High School') },
-            { text: 'Washington Middle School', onClick: () => setSelectedSchool('Washington Middle School') },
-            { text: 'Jefferson Elementary', onClick: () => setSelectedSchool('Jefferson Elementary') }
-        ];
-
-        const tutorOptions = [
-            { text: 'All Tutors', onClick: () => setSelectedTutor('All Tutors') },
-            { text: 'John Smith', onClick: () => setSelectedTutor('John Smith') },
-            { text: 'Jane Doe', onClick: () => setSelectedTutor('Jane Doe') },
-            { text: 'Mike Johnson', onClick: () => setSelectedTutor('Mike Johnson') },
-            { text: 'Sarah Williams', onClick: () => setSelectedTutor('Sarah Williams') }
-        ];
-
-        const dateFromOptions = [
-            { text: '01/10/25', onClick: () => setDateFrom('01/10/25') },
-            { text: '12/01/24', onClick: () => setDateFrom('12/01/24') },
-            { text: '11/01/24', onClick: () => setDateFrom('11/01/24') },
-            { text: '10/01/24', onClick: () => setDateFrom('10/01/24') }
-        ];
-
-        const dateToOptions = [
-            { text: '02/10/25', onClick: () => setDateTo('02/10/25') },
-            { text: '01/31/25', onClick: () => setDateTo('01/31/25') },
-            { text: '12/31/24', onClick: () => setDateTo('12/31/24') },
-            { text: '11/30/24', onClick: () => setDateTo('11/30/24') }
-        ];
+        const schoolOptions = ['All Schools', 'Lincoln High School', 'Washington Middle School', 'Jefferson Elementary'];
+        const tutorOptions = ['All Tutors', 'John Smith', 'Jane Doe', 'Mike Johnson', 'Sarah Williams'];
+        const dateFromOptions = ['01/10/25', '12/01/24', '11/01/24', '10/01/24'];
+        const dateToOptions = ['02/10/25', '01/31/25', '12/31/24', '11/30/24'];
 
         return (
             <div style={{ padding: '24px', backgroundColor: 'var(--color-surface, #f9f9fc)', minHeight: '400px' }}>
@@ -120,6 +97,10 @@ export const Interactive = {
                         tutorOptions={tutorOptions}
                         dateFromOptions={dateFromOptions}
                         dateToOptions={dateToOptions}
+                        onSchoolChange={setSelectedSchool}
+                        onTutorChange={setSelectedTutor}
+                        onDateFromChange={setDateFrom}
+                        onDateToChange={setDateTo}
                     />
 
                     <div style={{
@@ -133,21 +114,34 @@ export const Interactive = {
                         </h5>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             <p className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
-                                <strong>School:</strong> {selectedSchool}
+                                <strong>School:</strong> <span data-testid="applied-school">{selectedSchool}</span>
                             </p>
                             <p className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
-                                <strong>Tutor:</strong> {selectedTutor}
+                                <strong>Tutor:</strong> <span data-testid="applied-tutor">{selectedTutor}</span>
                             </p>
                             <p className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
                                 <strong>Date Range:</strong> {dateFrom} to {dateTo}
                             </p>
                         </div>
                         <p className="body3-txt" style={{ marginTop: '12px', color: 'var(--color-on-surface-variant)', fontStyle: 'italic' }}>
-                            Click the dropdowns to select different options
+                            Pick a school, a tutor or a date to change the filters
                         </p>
                     </div>
                 </div>
             </div>
         );
     }
+};
+
+Interactive.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(document.body);
+
+    await userEvent.click(canvas.getByRole('combobox', { name: 'School' }));
+    await userEvent.click(await page.findByRole('option', { name: 'Jefferson Elementary' }));
+    await expect(canvas.getByTestId('applied-school')).toHaveTextContent('Jefferson Elementary');
+
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Tutor' }));
+    await userEvent.click(await page.findByRole('option', { name: 'Jane Doe' }));
+    await expect(canvas.getByTestId('applied-tutor')).toHaveTextContent('Jane Doe');
 };

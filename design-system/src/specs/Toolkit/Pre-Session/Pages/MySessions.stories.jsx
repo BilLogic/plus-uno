@@ -134,8 +134,8 @@ const MainContent = ({
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3 className="h4 font-weight-semibold" style={{ color: 'var(--color-on-surface)', margin: 0 }}>My Sessions</h3>
                 <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
-                    <SiteFilter initialSelection="All schools" />
-                    <TimeframeFilter initialSelection="This week" />
+                    <SiteFilter />
+                    <TimeframeFilter />
                 </div>
             </div>
 

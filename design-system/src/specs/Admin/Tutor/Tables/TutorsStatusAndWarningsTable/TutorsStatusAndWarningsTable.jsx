@@ -9,7 +9,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Table from '@/components/_internal/Table/Table';
-import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
+import { Select } from '@/components';
 import Badge from '@/components/status-and-loading/Badge/Badge';
 import UserAvatar from '@/components/_internal/UserAvatar/UserAvatar';
 import './TutorsStatusAndWarningsTable.scss';
@@ -36,12 +36,12 @@ const TutorsStatusAndWarningsTable = ({
     const displayTutors = tutors.length > 0 ? tutors : defaultTutors;
 
     const statusOptions = [
-        { text: 'On Track', value: 'On Track' },
-        { text: 'Check-In Needed', value: 'Check-In Needed' },
-        { text: 'On Watch', value: 'On Watch' },
-        { text: 'On TIP', value: 'On TIP' },
-        { text: 'Recommended for Termination', value: 'Recommended for Termination' },
-        { text: 'Inactive', value: 'Inactive' }
+        { label: 'On Track', value: 'On Track' },
+        { label: 'Check-In Needed', value: 'Check-In Needed' },
+        { label: 'On Watch', value: 'On Watch' },
+        { label: 'On TIP', value: 'On TIP' },
+        { label: 'Recommended for Termination', value: 'Recommended for Termination' },
+        { label: 'Inactive', value: 'Inactive' }
     ];
 
     // Define Headers matching standard Table prop format
@@ -133,17 +133,14 @@ const TutorsStatusAndWarningsTable = ({
         },
         {
             content: (
-                <Dropdown
-                    buttonText={tutor.status}
-                    items={statusOptions.map(opt => ({
-                        text: opt.text,
-                        selected: opt.value === tutor.status,
-                        onClick: () => onStatusChange && onStatusChange(tutor.id, opt.value)
-                    }))}
+                <Select
+                    aria-label={`Status for ${tutor.tutorName}`}
                     size="small"
-                    style={tutor.status === 'Check-In Needed' ? 'info' : 'secondary'}
-                    fill="ghost"
-                    className="tutors-status-and-warnings-table__status-dropdown"
+                    options={statusOptions}
+                    value={onStatusChange ? tutor.status : undefined}
+                    defaultValue={tutor.status}
+                    onChange={onStatusChange ? (next) => onStatusChange(tutor.id, next) : undefined}
+                    className="tutors-status-and-warnings-table__status-select"
                 />
             ),
             className: 'tutors-status-and-warnings-table__cell--status'
