@@ -341,6 +341,21 @@ describe("Submit carries the comment into the update that runs", () => {
     assert.equal(read.update.state, "closed_completed");
   });
 
+  it("drops a cleared comment from the decided card's steps, and from its line", async () => {
+    const { cardUpdates } = await approve(CLOSE, { "0.comment": "" });
+    const text = cardUpdates.at(-1)!.text;
+    assert.match(text, /\*Operations:\* add label `bug` · close as completed/);
+    assert.doesNotMatch(text, /comment ·|\*Comment:\*|Fixed in #1294\./);
+  });
+
+  it("drops a cleared comment from the steps View draws once decided", async () => {
+    const h = await approve(CLOSE, { "0.comment": "" });
+    await runReviewOpen({ triggerId: "T.trigger", channel: CHANNEL, messageTs: CARD_TS, userId: CONFIRMER }, h.deps);
+    const view = h.views.calls.at(-1)!.view;
+    assert.equal(blocksOf(view)[2]!.type, "header");
+    assert.doesNotMatch(JSON.stringify(view), /Comments|comments|Fixed in #1294\./);
+  });
+
   it("refuses to clear a comment that is the whole update, and runs nothing", async () => {
     const h = await approve(COMMENT_ONLY, { "0.comment": "" });
     assert.equal(h.ran.length, 0);

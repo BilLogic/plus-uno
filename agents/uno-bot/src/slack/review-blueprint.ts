@@ -253,7 +253,7 @@ function revisionAnatomy(input: Input, facts: BlueprintRevisionFacts, ctx: Anato
   const steps = revisionSteps(facts, input, ctx);
   const rows = Array.isArray(input.rows) ? input.rows.length : 0;
   const destination = facts.retires
-    ? "set the path to `deprecated`"
+    ? "set the path to deprecated"
     : `write ${plural(rows, "change")} to the blueprint`;
   return {
     header,
@@ -331,7 +331,8 @@ function proposalAnatomy(input: Input, facts: BlueprintProposalFacts): DraftAnat
       context("Written by uno-bot's blueprint identity. Once your PRD is a Roadmap card, shipping it promotes these rows."),
     ],
     approve: blueprintApprove(input),
-    destination: `draw ${plural(facts.rows, "`proposed` row")} on the blueprint`,
+    // Plain: the decided line is rich text read as written.
+    destination: `draw ${plural(facts.rows, "proposed row")} on the blueprint`,
     settled: {
       header,
       object: {

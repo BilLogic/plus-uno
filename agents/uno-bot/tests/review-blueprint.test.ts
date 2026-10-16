@@ -385,7 +385,8 @@ describe("a revision opened by someone who cannot decide it", () => {
     const v = view(staged(), { mayDecide: false });
     assertFits(v);
     assert.equal(v.blocks[0]!.type, "alert");
-    assert.equal(v.blocks[0]!.text!.text, `Read-only. Only <@${SURAJ}> or <@${BILL}> can decide this proposal.`);
+    assert.equal(v.blocks[0]!.text!.text, "Read-only.");
+    assert.equal(textOf(v.blocks[1]!), `Only @${SURAJ} or @${BILL} can decide this proposal.`);
     assert.deepEqual(inputs(v), []);
     assert.equal(v.submit, undefined);
     assert.ok(!v.blocks.some((b) => b.block_id === "uno_review_choice"));
@@ -402,7 +403,8 @@ describe("a revision decided, opened from View", () => {
     assertFits(v);
     assert.equal(v.blocks[0]!.type, "alert");
     assert.equal(v.blocks[0]!.level, "success");
-    assert.equal(v.blocks[0]!.text!.text, `Approved by <@${BILL}> to write 4 changes to the blueprint.`);
+    assert.equal(v.blocks[0]!.text!.text, "Approved.");
+    assert.equal(textOf(v.blocks[1]!), `Approved by @${BILL} to write 4 changes to the blueprint.`);
     const all = json(v.blocks);
     assert.ok(!all.includes("written as"), "no where line");
     assert.ok(!v.blocks.some((b) => b.type === "alert" && b.level === "warning"), "no gaps alert");
@@ -601,7 +603,8 @@ describe("a blueprint proposal in Review (B3)", () => {
   it("decided, is the drawn path and what each step wrote, and how to withdraw it (B4)", () => {
     const v = view(offer(), { decided: { decision: "confirm", by: SURAJ } });
     assertFits(v);
-    assert.equal(v.blocks[0]!.text!.text, `Approved by <@${SURAJ}> to draw 3 \`proposed\` rows on the blueprint.`);
+    assert.equal(v.blocks[0]!.text!.text, "Approved.");
+    assert.equal(textOf(v.blocks[1]!), `Approved by @${SURAJ} to draw 3 proposed rows on the blueprint.`);
     const card = v.blocks.find((b) => b.type === "card")!;
     assert.equal(card.title!.text, "Proposed: Self-serve call-offs");
     assert.equal(card.subtitle!.text, "Call-off Request · new path · 3 rows, proposed");

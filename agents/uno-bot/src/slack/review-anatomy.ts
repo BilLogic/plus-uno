@@ -260,6 +260,7 @@ const TITLES: Readonly<Record<string, string | ((input: Record<string, unknown>)
  */
 export function reviewTitle(operations: readonly ProposalOperation[]): string {
   if (operations.length > 1) {
+    if (operations.every((op) => op.toolName === "sweep_share_post")) return "Review shared notes";
     return operations.every((op) => op.toolName === "dm_relay") ? `Review ${operations.length} DMs` : `Review ${operations.length} operations`;
   }
   const op = operations[0];

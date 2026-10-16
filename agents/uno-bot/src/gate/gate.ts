@@ -571,8 +571,9 @@ function notAConfirmer(
 export type ProposalLook =
   /** `kept` is the picks this person kept on the card's Review pop-up. */
   | { state: "live"; proposal: PendingProposal; mayDecide: boolean; confirmers: string[]; kept: Readonly<Record<string, string>> }
-  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
-  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
+  /** `operations` (both answers) is the card's batch, for its pop-up's title. */
+  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[]; operations?: ProposalOperation[] }
+  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[]; operations?: ProposalOperation[] }
   /** Decided, cut off, or never a card: nothing here is waiting on anyone.
    *  `decided` is the card as it was decided, while its record keeps it. */
   | { state: "gone"; decided?: DecidedProposal };

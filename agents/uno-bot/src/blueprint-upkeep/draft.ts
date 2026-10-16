@@ -92,6 +92,11 @@ export interface DraftInput {
 
 export const DRAFT_TIER = "grind" as const;
 const MAX_TEXT_CHARS = 6_000;
+/** The output ceiling a draft is asked with. Thinking spends the same ceiling
+ *  as the answer (`ModelText.cutOff`), so it is room for the model's thinking
+ *  and then the JSON: 2,000 left a medium-level model cut off mid-JSON, which
+ *  read as a draft with no rows. */
+export const DRAFT_MAX_TOKENS = 8_000;
 
 export const DRAFT_SYSTEM = [
   "You keep a service blueprint current. A piece of work has shipped. You are shown its title and text, and one path of the blueprint as it is today: its steps, its lanes, and each cell (the square where a step meets a lane) with its text.",
@@ -208,6 +213,26 @@ export function readDraft(reply: string, input: DraftInput): Draft | null {
 }
 
 /**
+ * Why a reply `readDraft` read as nothing drew no row, in a log line's words.
+ *
+ * @param reply - The model's text
+ * @param input - What it was shown
+ * @param cutOff - Whether the reply stopped at the output ceiling
+ */
+export function whyNoDraft(reply: string, input: DraftInput, cutOff?: boolean): string {
+  if (cutOff) return "the reply stopped at the output ceiling";
+  const parsed = jsonObjectIn(reply) as Record<string, unknown> | null;
+  if (!parsed || !Array.isArray(parsed.rows)) return "the reply held no rows to read";
+  const missing = strings(parsed.new_steps_or_lanes);
+  if (!parsed.rows.length) return missing.length ? `it needs only steps or lanes the path does not have: ${missing.join("; ")}` : "the reply drew no rows";
+  const onGrid = (parsed.rows as unknown[]).some((raw) => {
+    const r = (raw ?? {}) as Record<string, unknown>;
+    return input.today.steps.some((s) => s.id === text(r.step_id)) && input.today.lanes.some((l) => l.id === text(r.lane_id));
+  });
+  return onGrid ? "no row it drew could be written" : "every row it drew was on a step or lane the path does not have";
+}
+
+/**
  * Draft one path's revision: on the grind tier, or on the default tier when
  * the grind tier is out of capacity.
  *
@@ -217,7 +242,7 @@ export function readDraft(reply: string, input: DraftInput): Draft | null {
  */
 export async function draftRevision(provider: ModelProvider, input: DraftInput): Promise<Draft | null> {
   const ask = (tier: "grind" | "default") =>
-    provider.generate({ tier, system: DRAFT_SYSTEM, prompt: draftPrompt(input), maxTokens: 2_000 });
+    provider.generate({ tier, system: DRAFT_SYSTEM, prompt: draftPrompt(input), maxTokens: DRAFT_MAX_TOKENS });
   let reply = await ask(DRAFT_TIER);
   let tierNote: string | undefined;
   if (isCapacityReply(reply)) {
@@ -226,5 +251,6 @@ export async function draftRevision(provider: ModelProvider, input: DraftInput):
   }
   if (!reply.ok) return null;
   const draft = readDraft(reply.text, input);
+  if (!draft) console.log(`[upkeep] ${input.today.scenario} › ${input.today.path}: no draft — ${whyNoDraft(reply.text, input, reply.cutOff)}`);
   return draft && tierNote ? { ...draft, tierNote } : draft;
 }

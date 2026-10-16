@@ -26,6 +26,7 @@ import { createDurableObjectOutageStore, createDurableObjectThreadState } from "
 import {
   CUT_OFF_SWEEP_RETRY_MS,
   CUT_OFF_SWEEP_SLACK_MS,
+  DECIDED_TTL_MS,
   EXECUTION_CUTOFF_MS,
   REPORT_EXPIRY_RETRY_MS,
   type DecisionReportRecord,
@@ -297,6 +298,24 @@ describe("[durable-object] the cut-off alarm", () => {
       await runInDurableObject(stub, (_o, state) => state.storage.put("gc:next", Date.now() - 1));
       await fire();
       expect(await keys(stub)).toEqual([kept, kept]);
+    }
+  });
+
+  // A decided card is kept for View for its own lifetime from the decision,
+  // and the daily sweep still deletes it once that lifetime is over.
+  it("the daily sweep keeps a decided card inside its lifetime and deletes it past it", async () => {
+    const DAY_MS = 24 * 60 * 60 * 1000;
+    for (const [ageDays, kept] of [
+      [DECIDED_TTL_MS / DAY_MS - 1, true],
+      [DECIDED_TTL_MS / DAY_MS + 1, false],
+    ] as const) {
+      const { store, stub, fire } = fresh(() => Date.now() - ageDays * DAY_MS);
+      await store.putProposal(PROPOSAL);
+      expect(await store.claimProposal(PROPOSAL.proposalTs, { decision: "confirm", by: "U2" })).toBe(true);
+      await runInDurableObject(stub, (_o, state) => state.storage.put("gc:next", Date.now() - 1));
+      await fire();
+      const has = await runInDurableObject(stub, async (_o, state) => (await state.storage.get("prop:1700.2")) !== undefined);
+      expect(has, `${ageDays} days after the decision`).toBe(kept);
     }
   });
 });

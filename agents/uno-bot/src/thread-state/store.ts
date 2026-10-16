@@ -61,6 +61,12 @@ export const HISTORY_TTL_MS = 7 * 24 * 60 * 60 * 1000;
  *  clock — is still the safety. */
 export const PROPOSAL_TTL_MS = 60 * 60 * 1000;
 
+/** How long a decided card is kept for Review's View, counted from the
+ *  decision: as long as the thread it was decided in is remembered
+ *  (`HISTORY_TTL_MS`), so View on a card still in a live conversation draws
+ *  its draft rather than its outcome alone. Read through `decidedLive`. */
+export const DECIDED_TTL_MS = HISTORY_TTL_MS;
+
 /** How long a processed event id is remembered. 24h, not 10 min: agent runs can
  *  legally exceed ten minutes (streaming + MCP; live run 2026-07-10: 11 min),
  *  after which Slack's duplicate delivery passed dedup and re-ran the ENTIRE
@@ -823,6 +829,29 @@ export function withLiveMark(proposal: PendingProposal, at: number): PendingProp
   return rest;
 }
 
+/**
+ * Whether a decided card's record is still kept: for `DECIDED_TTL_MS` from
+ * its decision. A record decided before the decision was stamped
+ * (`decidedAt` absent) keeps the card's own lifetime from staging, as it was
+ * written to.
+ *
+ * @param rec - When the card was staged and, once stamped, decided
+ * @param proposal - The card, for its own `ttlMs`
+ * @param at - The store's now
+ */
+export function decidedLive(rec: { createdAt: number; decidedAt?: number }, proposal: Pick<PendingProposal, "ttlMs">, at: number): boolean {
+  return rec.decidedAt !== undefined ? at - rec.decidedAt <= DECIDED_TTL_MS : at - rec.createdAt <= proposalTtlMs(proposal);
+}
+
+/** The card's batch, spread onto an "expired" or "superseded" lookup: what
+ *  its pop-up is titled by, read in the same hop as the answer. */
+export function ownOperations(
+  proposal: Partial<Pick<PendingProposal, "operations" | "toolName" | "input">>,
+): { operations?: ProposalOperation[] } {
+  if (proposal.operations?.length) return { operations: proposal.operations };
+  return proposal.toolName ? { operations: [{ toolName: proposal.toolName, input: proposal.input ?? {} }] } : {};
+}
+
 /** The card's own `ttlMs`, spread onto an "expired" lookup — absent for a
  *  card on the default hour, so that answer reads exactly as it always has. */
 export function ownTtl(proposal: Pick<PendingProposal, "ttlMs">): { ttlMs?: number } {
@@ -1128,26 +1157,28 @@ export type ProposalLookup =
    *  of one by `retireProposal` — in which case it reads this way from the
    *  moment of retirement, and for the rest of its TTL if the revision it made
    *  way for never lands. `stated` is a stated card's own words. */
-  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
+  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[]; operations?: ProposalOperation[] }
   /** `ttlMs` is the card's own lifetime when it set one, so the person can be
    *  told how long it was live; absent, it lived the default hour. `stated` is
    *  a stated card's own words, whose `expired` line says it instead.
    *  `proposalText` and `proposalBlocks` (both answers) are the card as
-   *  posted, so the note about it can be edited onto it. */
-  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
+   *  posted, so the note about it can be edited onto it, and `operations`
+   *  (both answers) its batch, so its pop-up is titled for its tool. */
+  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[]; operations?: ProposalOperation[] }
   /** Claimed, aged out or never staged: nothing to decide. `decided` is the
-   *  card as it was decided, kept for the rest of its lifetime so Review's
-   *  View can draw it (`DecidedProposal`); absent once that lifetime ends, and
-   *  on every card decided before the record was kept. */
+   *  card as it was decided, kept for `DECIDED_TTL_MS` from the decision so
+   *  Review's View can draw it (`DecidedProposal`); absent once that lifetime
+   *  ends, and on every card decided before the record was kept. */
   | { state: "none"; decided?: DecidedProposal };
 
 /**
  * What a claim keeps of the card it won: the decision, who made it, and the
  * batch as it was decided, for Review's View to draw read-only. Written by the
  * claim itself, in the same transaction and the same hop, so keeping it costs
- * no extra subrequest. Bound to the card's own lifetime: it reads as gone, and
- * the daily sweep deletes it, once the card's `ttlMs` (an hour by default)
- * from staging has passed, exactly as the pending record would have.
+ * no extra subrequest. Bound to a lifetime of its own, `DECIDED_TTL_MS` from
+ * the decision (`decidedLive`): it reads as gone, and the daily sweep deletes
+ * it, once that has passed. It stays in the same Durable Object record the
+ * pending card was, so keeping it longer costs storage, not a hop.
  */
 export interface DecidedMark {
   decision: "confirm" | "cancel";
@@ -1427,8 +1458,8 @@ export interface ThreadState {
    * **A WON CLAIM KEEPS THE DECIDED CARD** when it is told what was decided
    * (`decided`): instead of the delete, the record is rewritten in the same
    * transaction as the decided batch (`decidedPayload`), so Review's View can
-   * draw it read-only for the rest of the card's lifetime — no longer, by the
-   * same TTL and the same daily sweep as a pending card. It is out of reach of
+   * draw it read-only for `DECIDED_TTL_MS` from the decision, stamped by the
+   * claim, and the daily sweep deletes it after that. It is out of reach of
    * everything else: every lookup answers "none" (`getProposalByTs` with
    * `decided` on it), and a second claim, a retirement, a Needs changes mark
    * and a kept pick all refuse it. Without `decided` the record is deleted.

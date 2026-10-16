@@ -11,7 +11,7 @@
 //
 // PURE: blocks out, nothing posted, nothing read.
 import { clip, isLink, OPEN_ACTION_ID } from "./card-block";
-import { escapeSlackText } from "./mrkdwn";
+import { escapeSlackText, unescapeSlackText } from "./mrkdwn";
 import type { DraftAnatomy, WhereElement } from "./review-anatomy";
 import type { DevLinksFacts, PrecedenceFacts, ShareNoteFacts, StatedFacts, TidyFacts } from "../thread-state/index";
 
@@ -39,7 +39,7 @@ const CHANNEL_ID = /^[CG][A-Z0-9]{6,}$/;
 /** A mrkdwn text's entities back to the characters they stand for: rich
  *  text is read as written. The sweep's notes are escaped plain text, so the
  *  quote reads as the post does. */
-const unescaped = (t: string) => t.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+const unescaped = unescapeSlackText;
 
 const text = (t: string, style?: { bold?: boolean; code?: boolean }): RichElement => ({ type: "text", text: clip(t, TEXT_CHARS), ...(style ? { style } : {}) });
 const link = (url: string, label: string): RichElement => (isLink(url) ? { type: "link", url, text: clip(label, TEXT_CHARS) } : text(label));
@@ -153,26 +153,50 @@ export function precedenceAnatomy(_input: Input, context: StatedContext): DraftA
   };
 }
 
-/**
- * A note the sweep posts verbatim: where it posts, with the channel as a
- * pill and what does not leave, then the note itself as a quote.
- */
-export function shareNoteAnatomy(input: Input, context: StatedContext): DraftAnatomy | null {
-  const facts: ShareNoteFacts | null = factsOf(context, "sweep_share_post");
-  const note = typeof input.text === "string" ? input.text.trim() : "";
-  if (!facts || !note) return null;
+/** A shared note's text, as the sweep staged it; "" when it has none. */
+export function shareNoteText(input: Input): string {
+  return typeof input.text === "string" ? input.text.trim() : "";
+}
+
+/** Where a shared note posts, as one where-line element: the channel as a
+ *  pill, or its name where the input holds no id. */
+export function shareNoteChannel(input: Input): WhereElement {
   const channel = typeof input.channel === "string" ? input.channel.trim() : "";
   const name = typeof input.channel_name === "string" && input.channel_name.trim() ? input.channel_name.trim() : "a team channel";
+  return CHANNEL_ID.test(channel) ? { type: "channel", channel_id: channel } : { type: "text", text: name };
+}
+
+/** A shared note quoted exactly as it posts. */
+export function shareNoteQuote(note: string): unknown {
+  return { type: "rich_text", elements: [{ type: "rich_text_quote", elements: [text(unescaped(note))] }] };
+}
+
+/** The facts' plain lines under the notes. */
+export function shareNoteLines(facts: ShareNoteFacts): unknown[] {
+  return notes(facts.notes);
+}
+
+/** A shared note's facts, when the proposal carries them. */
+export function shareNoteFacts(context: StatedContext): ShareNoteFacts | null {
+  return factsOf(context, "sweep_share_post");
+}
+
+/**
+ * A note the sweep posts verbatim: where it posts, with the channel as a
+ * pill and what does not leave, then the note itself as a quote. A card of
+ * several notes is a batch (`review-batch.ts` § `shareNotesAnatomy`).
+ */
+export function shareNoteAnatomy(input: Input, context: StatedContext): DraftAnatomy | null {
+  const facts = shareNoteFacts(context);
+  const note = shareNoteText(input);
+  if (!facts || !note) return null;
   return {
     header: facts.header,
     where: [
       { type: "text", text: "Posts this note in " },
-      CHANNEL_ID.test(channel) ? { type: "channel", channel_id: channel } : { type: "text", text: name },
+      shareNoteChannel(input),
       { type: "text", text: `. Nothing else leaves ${facts.from}.` },
     ],
-    content: [
-      { type: "rich_text", elements: [{ type: "rich_text_quote", elements: [text(unescaped(note))] }] },
-      ...notes(facts.notes),
-    ],
+    content: [shareNoteQuote(note), ...shareNoteLines(facts)],
   };
 }
