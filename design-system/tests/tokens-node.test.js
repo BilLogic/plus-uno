@@ -478,10 +478,10 @@ describe('the colour key is finer than the normaliser it replaces', () => {
    * not seen. That is how every state-layer wash was written, so a re-mixed
    * base left its washes stale and nothing said so.
    *
-   * Measured over the live tree: 89 `var(--color-*, rgba(…))` sites across 20
-   * files, every one captured. 86 name a defined token and are compared with
+   * Measured over the live tree: 85 `var(--color-*, rgba(…))` sites, every one
+   * captured. 82 name a defined token and are compared with
    * alpha on both sides; the other 3 name tokens that are defined nowhere,
-   * and are the check's undefined-token finding instead. All 86 agree,
+   * and are the check's undefined-token finding instead. All 82 agree,
    * because the disagreeing washes were fixed when the capture widened, and
    * the test asserts it: a stale wash here is a failure, not a recount.
    */
@@ -502,7 +502,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
       (n, s) => n + (s.text.match(/var\(\s*--color-[a-z0-9-]+\s*,\s*rgba\(/g) ?? []).length,
       0,
     );
-    expect(washes).toBe(89);
+    expect(washes).toBe(85);
 
     const tokens = new Map(
       [...tokenCorpus({ prefix: '--color-', precedence: 'last' })].map(([name, entry]) => [
@@ -531,12 +531,13 @@ describe('the colour key is finer than the normaliser it replaces', () => {
       withAlpha += 1;
       expect(literal, `${use.path}:${use.line} ${use.token}`).toBe(tokenValue);
     }
-    // 86: Select's multi rows moved to the shared option row, and their
-    // selected wash with them.
-    expect(withAlpha).toBe(86);
+    // 82: the old Dropdown option list and its rows' state washes were
+    // deleted when value pickers moved to Select and the shared option row.
+    expect(withAlpha).toBe(82);
     // 643: MultipleChoice.scss left with ChoiceGroup, and its three hex
-    // fallbacks with it. 642: Select's multi-row wash went with its rows.
-    expect(comparable).toBe(642);
+    // fallbacks with it. 620: the date pickers moved onto the shared field and
+    // calendar, and the old Dropdown option list went, each with its fallbacks.
+    expect(comparable).toBe(620);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.
