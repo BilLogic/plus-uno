@@ -1,7 +1,8 @@
 // The Gemini adapter's backup model, on the wire (#1228).
 //
 // A quota or capacity failure — Vertex's 429 RESOURCE_EXHAUSTED, a 503
-// UNAVAILABLE / overloaded, a 500, a 404 for a model not served — fails over
+// UNAVAILABLE / overloaded, a 500, a 404 for a model not served, a 504 or a
+// proxy's 524 timeout — fails over
 // to `GEMINI_FALLBACK_MODEL`, on a turn (`send`, which the loop retries) and on
 // a one-shot (`generate`, which every scheduled job's model call goes through).
 // The loop's side of the retry is `tests/agent-loop.test.ts`'s. Driven against a stubbed fetch on the AI Studio key path, which needs no
@@ -177,4 +178,5 @@ test("a failed turn call logs how long it waited and how big the request was", a
   assert.match(line!, /ms=\d+/);
   assert.match(line!, /body_chars=\d+/);
   assert.match(line!, /turns=1/);
+  assert.match(line!, /cached=(true|false)/);
 });

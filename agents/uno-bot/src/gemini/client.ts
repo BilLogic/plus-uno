@@ -127,17 +127,19 @@ async function geminiEndpoint(
 /**
  * Low-level generateContent: caller owns the full request body (contents,
  * systemInstruction, tools, generationConfig, …) and gets the raw parsed
- * response back. The Gemini adapter (agent/providers/gemini.ts) builds on this.
+ * response back, with the length of the body it sent. The Gemini adapter
+ * (agent/providers/gemini.ts) builds on this.
  */
 export async function geminiGenerateRaw(
   env: Env,
   model: string,
   body: Record<string, unknown>,
-): Promise<{ status: number; data: unknown }> {
+): Promise<{ status: number; data: unknown; bodyChars: number }> {
   const { url, headers } = await geminiEndpoint(env, model);
-  const res = await countedFetch(url, { method: "POST", headers, body: JSON.stringify(body) });
+  const sent = JSON.stringify(body);
+  const res = await countedFetch(url, { method: "POST", headers, body: sent });
   const data = (await res.json().catch(() => ({}))) as unknown;
-  return { status: res.status, data };
+  return { status: res.status, data, bodyChars: sent.length };
 }
 
 export async function geminiGenerate(

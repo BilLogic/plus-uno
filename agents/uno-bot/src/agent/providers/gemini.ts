@@ -77,8 +77,10 @@ interface GeminiResponseData {
 // 504 and 524 are timeouts, and 524 is not Google's at all: it is Cloudflare's
 // proxy giving up on a subrequest whose origin sent no response headers for
 // 125s, with Cloudflare's HTML page as the body. On r660 (2026-10-16) two DM
-// thread turns on the default tier each failed on a 524 with no retry. A different model is a different generation, so one try on
-// the backup is worth the wait; a second timeout is the turn's ❌.
+// thread turns on the default tier each failed on a 524 with no retry. A
+// different model is a different generation, so one try on the backup is worth
+// the wait, though a backup that times out too keeps the asker waiting about
+// four minutes before the turn's ❌.
 const FALLBACK_STATUSES = new Set([404, 429, 500, 503, 504, 524]);
 const TIMEOUT_STATUSES = new Set([504, 524]);
 
@@ -281,14 +283,14 @@ export function geminiProvider(env: Env): ModelProvider {
       };
 
       const started = Date.now();
-      const { status, data } = await geminiGenerateRaw(env, model, body);
+      const { status, data, bodyChars } = await geminiGenerateRaw(env, model, body);
       const parsed = data as GeminiResponseData;
       if (status !== 200) {
         // What the r660 524s could not tell us: how long the call waited and
         // how big the request it waited on was.
         console.warn(
           `[gemini] call failed status=${status} model=${model} ms=${Date.now() - started} ` +
-            `body_chars=${JSON.stringify(body).length} turns=${contents.length} cached=${cacheName !== null}`,
+            `body_chars=${bodyChars} turns=${contents.length} cached=${cacheName !== null}`,
         );
         return {
           ok: false,
