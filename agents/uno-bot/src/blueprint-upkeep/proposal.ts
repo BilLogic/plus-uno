@@ -17,7 +17,10 @@
 // written there at `proposed`: a cell it adds and a cell it changes alike. A
 // moment the idea removes is named on the card and left empty on the new path;
 // nothing of today's path is written. An idea that only removes is no offer —
-// a path with no cells shows nothing.
+// a path with no cells shows nothing. A moment the path has no step for is
+// drawn in the cell of the nearest step it belongs to, and the missing step is
+// named on the card as a gap: the Worker cannot add a step (ADR-034), and an
+// idea that only adds new moments would otherwise draw no cell at all.
 //
 // THE DEFAULT TIER. The draft is an idea's few rows on a path already read and
 // matched, offered to the person who is waiting on the reply, and it lands as
@@ -34,7 +37,7 @@ import { readRevision, revisionCard, VARIANT_KIND, type BlueprintRevision } from
 import { escapeSlackText } from "../slack/mrkdwn";
 import type { PendingProposal, StatedCardWords } from "../thread-state/index";
 import type { ProposalCard } from "../turn/delivery";
-import { draftPrompt, readDraft, type DraftedChange, type PathToday } from "./draft";
+import { DRAFT_MAX_TOKENS, draftPrompt, readDraft, whyNoDraft, type DraftedChange, type PathToday } from "./draft";
 import type { ServiceChangeInput } from "./gate";
 import type { Comparison } from "./milestone";
 import type { DrawnProposal } from "./proposal-records";
@@ -80,7 +83,7 @@ export type ProposalDrafter = (comparison: Comparison, idea: ServiceChangeInput)
 export const PROPOSAL_SYSTEM = [
   "You keep a service blueprint. Someone is exploring an idea that changes how one path works today. You are shown the idea, and the path as it is today: its steps, its lanes, and each cell (the square where a step meets a lane) with its text.",
   "Draft the row changes this idea makes to THIS path. They are drawn as a proposal on a new path beside today's, so today's cells stay as they are.",
-  "- Use only the step ids and lane ids you are shown. If the idea needs a step or a lane the path does not have, do not invent an id: name it in new_steps_or_lanes.",
+  "- Use only the step ids and lane ids you are shown; never invent an id. If the idea adds a moment the path has no step for, draw it in the cell of the nearest step it belongs to, and name the missing step in new_steps_or_lanes. Name a missing lane there too.",
   "- added: a cell where a step and a lane have none today. changed: a cell whose text the idea changes. deprecated: a cell for a moment that no longer happens under the idea.",
   "- Write each cell's text the way the path's cells are written: one short sentence about what that actor does at that step.",
   "- Change only what the idea changes. Say in gaps what you could not verify from its text.",
@@ -140,6 +143,23 @@ export function readProposalDraft(reply: string, comparison: Comparison, idea: S
 }
 
 /**
+ * Why a reply `readProposalDraft` read as nothing makes no offer, in a log
+ * line's words.
+ *
+ * @param reply - The model's text
+ * @param comparison - The comparison it was drafted from
+ * @param idea - The idea's title and text
+ * @param cutOff - Whether the reply stopped at the output ceiling
+ */
+export function whyNoProposal(reply: string, comparison: Comparison, idea: ServiceChangeInput, cutOff?: boolean): string {
+  const { today } = comparison;
+  if (!today.scenarioId) return "today's path was read without its scenario, which the new path is created in";
+  const input = { title: idea.title, text: idea.text, today, target: PROPOSED };
+  if (readDraft(reply, input)) return "it only removes moments, and a path with no cells shows nothing";
+  return whyNoDraft(reply, input, cutOff);
+}
+
+/**
  * The drafter, over its ports. Fails quiet: any error is no offer.
  *
  * @param deps - The model and the budget
@@ -152,11 +172,14 @@ export function draftProposal(deps: ProposalDraftDeps): ProposalDrafter {
         tier: PROPOSAL_DRAFT_TIER,
         system: PROPOSAL_SYSTEM,
         prompt: draftPrompt({ title: idea.title, text: idea.text, today: comparison.today, target: PROPOSED }),
-        maxTokens: 2_000,
+        maxTokens: DRAFT_MAX_TOKENS,
       });
-      if (!reply.ok) return null;
+      if (!reply.ok) {
+        console.warn(`[proposal] ${comparison.scenario}: no offer — the model failed: ${reply.message}`);
+        return null;
+      }
       const draft = readProposalDraft(reply.text, comparison, idea);
-      if (!draft) console.log(`[proposal] ${comparison.scenario}: the draft draws no cell`);
+      if (!draft) console.log(`[proposal] ${comparison.scenario}: no offer — ${whyNoProposal(reply.text, comparison, idea, reply.cutOff)}`);
       return draft;
     } catch (err) {
       console.warn(`[proposal] draft skipped: ${err instanceof Error ? err.message : String(err)}`);
