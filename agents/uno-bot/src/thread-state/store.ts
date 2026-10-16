@@ -873,6 +873,46 @@ export function ownOperations(
   return proposal.toolName ? { operations: [{ toolName: proposal.toolName, input: proposal.input ?? {} }] } : {};
 }
 
+/** The live card a superseded one was replaced by: its ts, and its batch,
+ *  which is what its headline is read from (`agent/card-identity.ts`). */
+export interface ReplacingCard {
+  proposalTs: string;
+  operations: ProposalOperation[];
+}
+
+/** How many revisions a "superseded" lookup follows to the live card. A
+ *  chain longer than this is not a conversation anyone is still in. */
+export const REPLACED_BY_HOPS = 10;
+
+/**
+ * The live card at the end of a superseded card's chain, spread onto its
+ * "superseded" lookup — absent when the chain ends in a card that is not live.
+ *
+ * @param first - The card's direct successor's ts
+ * @param read - The store's own record read, by ts
+ * @param live - Whether that record is still waiting on a decision
+ */
+export async function replacedByOf<R extends { supersededBy?: string }>(
+  first: string,
+  read: (ts: string) => R | undefined | Promise<R | undefined>,
+  live: (rec: R) => boolean,
+  proposalOf: (rec: R) => Partial<PendingProposal>,
+): Promise<{ replacedBy?: ReplacingCard }> {
+  let ts = first;
+  for (let hop = 0; hop < REPLACED_BY_HOPS; hop++) {
+    const rec = await read(ts);
+    if (!rec) return {};
+    if (rec.supersededBy) {
+      ts = rec.supersededBy;
+      continue;
+    }
+    const proposal = proposalOf(rec);
+    if (!live(rec) || !proposal.toolName) return {};
+    return { replacedBy: { proposalTs: ts, ...(ownOperations(proposal) as { operations: ProposalOperation[] }) } };
+  }
+  return {};
+}
+
 /** The card's own `ttlMs`, spread onto an "expired" lookup — absent for a
  *  card on the default hour, so that answer reads exactly as it always has. */
 export function ownTtl(proposal: Pick<PendingProposal, "ttlMs">): { ttlMs?: number } {
@@ -1178,10 +1218,12 @@ export function unfinishedOperations(execution: Execution): ProposalOperation[] 
  * the successor is gone too, there is nothing to look at and the TTL owns the
  * record again, delete included.
  *
- * The successor's ts is deliberately NOT on this answer. Nothing outside the
- * store has a use for it that the thread's own newest card does not answer
- * better, and a chain (A replaced by B, B replaced by C) would hand out a
- * pointer to a card that is itself retired.
+ * The card that replaced it rides the answer as `replacedBy` (#1319): a thread
+ * holds several live cards now, so "the newest card in this thread" can be
+ * another matter's, and the person has to be told which card to decide
+ * instead. It is the END of the chain (A replaced by B, B replaced by C names
+ * C), and only while that card is live — a pointer to a card that is itself
+ * retired would send the person somewhere that answers "replaced" again.
  *
  * A card RETIRED by `retireProposal` and not yet replaced reads as
  * "superseded" too, for its remaining hour (#583): the revision it is making
@@ -1198,7 +1240,16 @@ export type ProposalLookup =
    *  of one by `retireProposal` — in which case it reads this way from the
    *  moment of retirement, and for the rest of its TTL if the revision it made
    *  way for never lands. `stated` is a stated card's own words. */
-  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[]; operations?: ProposalOperation[] }
+  /** `replacedBy` is the live card at the end of its revision chain, when
+   *  there is one: its ts and batch, which name it. */
+  | {
+      state: "superseded";
+      stated?: StatedCardWords;
+      proposalText?: string;
+      proposalBlocks?: unknown[];
+      operations?: ProposalOperation[];
+      replacedBy?: ReplacingCard;
+    }
   /** `ttlMs` is the card's own lifetime when it set one, so the person can be
    *  told how long it was live; absent, it lived the default hour. `stated` is
    *  a stated card's own words, whose `expired` line says it instead.

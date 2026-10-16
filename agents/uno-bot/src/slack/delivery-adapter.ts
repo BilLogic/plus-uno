@@ -73,6 +73,7 @@ import type { SlackMessageMetadata } from "./api";
 import { notedCardBlocks, proposalCardBlocks, renderProposalCard } from "./proposal-render";
 import { toPlainText } from "./mrkdwn";
 import { cardStaysLive, renderCardNote, renderGateNote } from "./gate-note";
+import { whichCardMessage } from "./which-card";
 import { planBlock } from "./plan-block";
 import { retryValue } from "./try-again";
 import type { Presentation, Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
@@ -1099,6 +1100,15 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
     // still be decided or View once it cannot. An edit Slack refuses posts the
     // note in the thread as before, so the person is never left with silence.
     async postGateNote(note, card) {
+      // "Approve which one?" is the one note that carries buttons: one per
+      // card it could mean (`which-card.ts`).
+      if (note.kind === "which-card") {
+        const message = whichCardMessage(note);
+        const posted = await slack
+          .postMessage({ channel, thread_ts: replyTs, text: message.text, blocks: message.blocks })
+          .catch(() => ({ ok: false as const }));
+        return { ok: !!posted.ok, text: message.text, ...("ts" in posted && posted.ts ? { ts: posted.ts } : {}) };
+      }
       if (!card) return postNote(renderGateNote(note));
       const line = renderCardNote(note);
       const updated = await slack

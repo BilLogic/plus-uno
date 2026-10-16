@@ -341,14 +341,25 @@ export type GateNote =
   | { kind: "expired"; ttlMs?: number; words?: string }
   /** A ✅ on a card a revision replaced (#573). `stated` when that card was a
    *  stated one, which has no ⚠️ to point at. */
-  | { kind: "superseded"; stated?: true }
+  | {
+      kind: "superseded";
+      stated?: true;
+      /** The headline of the live card that replaced it, when the store knows
+       *  it: with several live cards, "the newest card" may be another
+       *  matter's (#1319). */
+      by?: string;
+    }
   /** A reaction that landed somewhere other than the card it claims: say where
    *  the live card is, and resolve nothing. `stated` when the live card is a
    *  stated one: no ⚠️, and no tool name a person would know it by. */
   | { kind: "not-on-the-card"; toolName: string; glyph: string; userId: string; stated?: true }
-  /** A gate emoji typed outside any card's thread, in a DM holding several
-   *  live cards: ask which one, and resolve none of them. */
-  | { kind: "which-card"; count: number }
+  /** A decision that names no card, with several waiting (#1319): a gate
+   *  emoji typed in a thread holding more than one live card, or outside any
+   *  card's thread in a DM holding several, or the model's
+   *  `proposal_resolve` that never said which. Resolve none of them, and ask
+   *  "Approve which one?" (or "Cancel which one?") with one button per card:
+   *  `cards` is each card's ts and headline, newest first. */
+  | { kind: "which-card"; decision: "confirm" | "cancel"; cards: WhichCard[] }
   /** A turn staged a REVISION: the card that follows replaces the waiting
    *  card `replaced` names (its headline, `turn/card-matter.ts`). Said just
    *  before the card, so a wrong call is caught at once (#1318). */
@@ -383,6 +394,13 @@ export type GateNote =
        *  alarm is the one telling a channel thread. */
       mention?: string;
     };
+
+/** One card a "which one?" question offers: its ts, which its button
+ *  carries, and its headline, which the button reads (`agent/card-identity.ts`). */
+export interface WhichCard {
+  ts: string;
+  headline: string;
+}
 
 /** The card a gate note is about: its ts, its posted text, and its own blocks
  *  when it had any — what the note is edited onto. Gate's `GateCard`,

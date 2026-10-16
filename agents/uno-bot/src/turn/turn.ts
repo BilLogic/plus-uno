@@ -59,9 +59,11 @@ import type { AgentImage, HistoricalImages } from "../agent/provider-conversatio
 import { routeRequest } from "../agent/routing";
 import type { ModelTier } from "../agent/routing";
 import {
+  awaitingDecision,
   cutOffVerdict,
   resolveSignal,
   revisionRefusal,
+  whichCardNote,
   type GateRestage,
   type GateVerdict,
   type OperationOutcome,
@@ -702,7 +704,8 @@ export interface TurnDeps {
  * `active`, which is the same claim case three of the ticket exists to stop.
  * The thread does not stop waiting because a later turn went wrong. `resolved`
  * is the one ending that consumed the card, so it is the one exempt from the
- * live-card rule.
+ * live-card rule — for that card only: a thread holding a second live card
+ * still waits on it (#1319).
  *
  * ONE KNOWN IMPRECISION, in the safe direction. `cardLive` is the card the
  * thread held when the turn BEGAN, and one exit retires a card without
@@ -721,6 +724,9 @@ export function settlementOf(settle: {
   disposition: TurnDisposition;
   /** Whether a proposal card in this thread is still awaiting a decision. */
   cardLive: boolean;
+  /** Whether a SECOND card was live in this thread as well (#1318): a
+   *  resolution consumes one card, never the thread's others. */
+  moreLive?: boolean;
 }): TurnSettlement {
   switch (settle.disposition) {
     // The turn asked for something itself, so the card need not be read: a
@@ -741,8 +747,10 @@ export function settlementOf(settle: {
     case "stopped":
       return settle.cardLive ? "waiting-on-person" : "idle";
     // The one ending that consumed the card — the claim IS the resolution.
+    // Of ONE card: with another live beside it, the thread still waits on
+    // the person for that one (#1319).
     case "resolved":
-      return "idle";
+      return settle.moreLive ? "waiting-on-person" : "idle";
   }
 }
 
@@ -777,6 +785,7 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
   const cardLive = request.pending
     ? proposalReplyThread(request.pending) === turnThread
     : false;
+  const moreLive = liveCardsOf(request).filter((card) => proposalReplyThread(card) === turnThread).length > 1;
 
   // The usage record's clock: when the turn began, and when the person was
   // first shown something — an answer, a card, a note — as Delivery accepted it.
@@ -815,7 +824,7 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
         await unlockRevision(request, cardLive, deps);
         throw err;
       }),
-    (outcome) => settlementOf({ disposition: outcome.disposition, cardLive }),
+    (outcome) => settlementOf({ disposition: outcome.disposition, cardLive, moreLive }),
   );
 
   if (outcome.disposition !== "staged") await unlockRevision(request, cardLive, deps);
@@ -1370,6 +1379,16 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // second message beside it. Every other exit below closes it itself, because
   // nothing that follows them would.
   if (result.kind === "text") {
+    // The model read a decision and could not say which card it was for: the
+    // person is asked, a button per card, in place of the model's own words —
+    // which could only have asked the same thing without the buttons (#1319).
+    const waiting = result.askWhich ? awaitingDecision(liveCardsOf(request)) : [];
+    if (result.askWhich && waiting.length > 1) {
+      await delivery.endProgress("complete");
+      const said = await delivery.postGateNote(whichCardNote(result.askWhich, waiting));
+      await memory.remember(said.text);
+      return { disposition: "asked", posted: said.text, wrote: memory.wrote(), telemetry };
+    }
     // An answer the loop synthesized once its round-trips ran out rests on
     // fewer lookups than it wanted: a ⚠️ line says so.
     if (result.cutShort) presenting.budgetSpent();
@@ -2127,8 +2146,11 @@ async function settleVerdict(
       })
     : null;
   if (staged) await ctx.memory.remember(staged.proposal.proposalText);
+  // "Approve which one?" resolved nothing: it asked, and every card it names
+  // is still waiting on the person (#1319).
+  const asked = verdict.post?.note.kind === "which-card";
   return {
-    disposition: staged ? "staged" : "resolved",
+    disposition: staged ? "staged" : asked ? "asked" : "resolved",
     ...(staged ? { posted: staged.proposal.proposalText, staged } : posted ? { posted } : {}),
     wrote: ctx.memory.wrote(),
     telemetry: ctx.telemetry,

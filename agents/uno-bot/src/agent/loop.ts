@@ -82,7 +82,18 @@ export interface TurnDials {
 export type AgentResult =
   /** `cutShort`: the answer came from the tools-disabled synthesis pass, once
    *  the loop's round-trips ran out — what Turn's ⚠️ line reads. */
-  | { kind: "text"; text: string; cutShort?: true }
+  | {
+      kind: "text";
+      text: string;
+      cutShort?: true;
+      /**
+       * The model tried to decide a card with `proposal_resolve` while several
+       * were waiting, never said which, and ended its turn: the decision it
+       * meant, so Turn asks the person "Approve which one?" (or "Cancel which
+       * one?") instead of posting `text` (#1319).
+       */
+      askWhich?: "confirm" | "cancel";
+    }
   /**
    * The turn was stopped, and the answer goes undelivered.
    *
@@ -212,6 +223,9 @@ export interface LoopInput {
   tools: ToolSpec[];
 
   pending: PendingProposal | null;
+  /** Every card live in the thread, newest first — what `proposal_resolve`
+   *  may name (`validateProposalResolve`). Absent, `pending` is the only one. */
+  liveCards?: PendingProposal[];
   currentSenderId: string;
 
   /**
@@ -279,6 +293,8 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
   let fellBack = false;
   /** The turn's one preflight correction, once it has been handed to the model. */
   let preflightSpent = false;
+  /** A `proposal_resolve` refused for naming no card while several wait. */
+  let askWhich: "confirm" | "cancel" | undefined;
   const toolNamesUsed: string[] = [];
   /** How many lookups this turn has announced — each one's card number. */
   let progressSeq = 0;
@@ -520,7 +536,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
         console.log(`[stop] stopped at iteration ${iter}, answer undelivered`);
         return finish({ kind: "stopped" });
       }
-      return finish({ kind: "text", text: reply.text || "(empty response)" });
+      return finish({ kind: "text", text: reply.text || "(empty response)", ...(askWhich ? { askWhich } : {}) });
     }
 
     for (const call of reply.toolCalls) {
@@ -542,11 +558,15 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
     const resolveCall = reply.toolCalls.find((c) => c.name === "proposal_resolve");
     if (resolveCall) {
       const verdict = validateProposalResolve(
-        resolveCall.args as { decision?: unknown; message_to_user?: unknown },
+        resolveCall.args as { decision?: unknown; message_to_user?: unknown; card?: unknown },
         pending,
+        input.liveCards ?? (pending ? [pending] : []),
         input.currentSenderId,
       );
       if (!verdict.ok) {
+        // A decision that named no card while several wait: if the turn ends
+        // without the model naming one, the person is asked which (#1319).
+        if (verdict.unnamed) askWhich = verdict.unnamed;
         // Reject, and answer EVERY call in this turn — an announced call left
         // without a result leaves a slot the next turn's call of the same name
         // fills by mistake (and, on some wire formats, 400s outright).
@@ -567,7 +587,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
       return finish({
         kind: "resolved",
         decision: verdict.decision,
-        pending: pending!,
+        pending: verdict.card,
         messageToUser: verdict.messageToUser,
       });
     }

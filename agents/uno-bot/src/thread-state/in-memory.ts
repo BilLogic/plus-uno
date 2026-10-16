@@ -28,6 +28,7 @@ import {
   ownWords,
   ownText,
   ownOperations,
+  replacedByOf,
   decidedLive,
   REPORT_GRACE_MS,
   changedReport,
@@ -272,7 +273,15 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       }
       // A live successor beats the TTL — the ordering, and the third card it
       // stops the person from asking for, are in `ProposalLookup`.
-      if (rec.supersededBy && successorIsLive(rec.supersededBy)) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal) };
+      if (rec.supersededBy && successorIsLive(rec.supersededBy)) {
+        const replacedBy = await replacedByOf(
+          rec.supersededBy,
+          (ts) => proposals.get(ts),
+          (next) => !next.decided && !next.retired && now() - next.createdAt <= proposalTtlMs(next.proposal),
+          (next) => next.proposal,
+        );
+        return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal), ...structuredClone(replacedBy) };
+      }
       if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) {
         proposals.delete(proposalTs);
         return { state: "expired", ...ownTtl(rec.proposal), ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal) };

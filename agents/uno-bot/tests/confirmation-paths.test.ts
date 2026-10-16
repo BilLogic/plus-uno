@@ -620,7 +620,7 @@ describe("a card a revision replaced", () => {
     const { threadState } = await twoCards();
     const verdict = await resolveSignal(reaction(), { threadState });
     assert.equal(verdict.outcome, "stale");
-    assert.deepEqual(verdict.post?.note, { kind: "superseded" });
+    assert.deepEqual(verdict.post?.note, { kind: "superseded", by: "Reflection redesign, tutors only" });
     assert.equal(verdict.execute, undefined);
   });
 
@@ -628,7 +628,7 @@ describe("a card a revision replaced", () => {
     const { threadState } = await twoCards();
     const verdict = await resolveSignal(button(), { threadState });
     assert.equal(verdict.outcome, "stale");
-    assert.deepEqual(verdict.post?.note, { kind: "superseded" });
+    assert.deepEqual(verdict.post?.note, { kind: "superseded", by: "Reflection redesign, tutors only" });
     assert.equal(verdict.execute, undefined);
   });
 

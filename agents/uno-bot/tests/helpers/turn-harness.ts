@@ -313,6 +313,7 @@ export function harness(opts: {
         ],
         tools: [],
         pending: req.pending,
+        liveCards: req.liveCards,
         currentSenderId: req.currentSender.userId,
         cancelKey: opts.cancelKey ?? null,
         ...(req.onInterim ? { onInterim: req.onInterim } : {}),

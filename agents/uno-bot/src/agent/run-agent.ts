@@ -151,10 +151,12 @@ export interface AgentInput {
    */
   conversationTs: string;
   currentSender: { userId: string };
-  /** The card `proposal_resolve` decides: the thread's newest. */
+  /** The card the turn was handed: the thread's newest, or the card a Needs
+   *  changes sent back. */
   pending: PendingProposal | null;
   /** Every card waiting in the thread, newest first — what the model's
-   *  pending-proposal context lists. */
+   *  pending-proposal context lists, and what `proposal_resolve` names one
+   *  of (`validateProposalResolve`). */
   liveCards: PendingProposal[];
   /** Pre-rendered one-line description of what the user has open in the
    *  assistant panel (e.g. "channel <#C123>"), when chatting from the panel.
@@ -280,6 +282,7 @@ export async function runAgent(input: AgentInput): Promise<AgentRun> {
       system,
       tools,
       pending,
+      liveCards: input.liveCards,
       currentSenderId: currentSender.userId,
       cancelKey,
       ...(input.cancelSince !== undefined ? { cancelSince: input.cancelSince } : {}),

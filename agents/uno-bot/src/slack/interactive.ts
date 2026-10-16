@@ -60,6 +60,7 @@ import { runHomeStopDoor, type HomeStopDoorDeps } from "./stop-doors";
 import { slackDelivery } from "./slack-delivery";
 import { standingConfirmersOf } from "./standing-confirmers";
 import { runButtonDoor, type ButtonDoorDeps, type CardMessage } from "./button-door";
+import { WHICH_ACTION_PREFIX, runWhichCardDoor, whichPressOf } from "./which-card";
 import { DM_WATCH_ACTION_ID, saveDmWatchAction } from "../dm-watch/index";
 import { setDmWatchOnEnv } from "../dm-watch/env";
 import { publishHomeView } from "./home";
@@ -79,7 +80,7 @@ interface InteractionPayload {
   response_url?: string;
   user?: { id?: string };
   channel?: { id?: string };
-  message?: { ts?: string; thread_ts?: string; text?: string };
+  message?: { ts?: string; thread_ts?: string; text?: string; blocks?: unknown[] };
   actions?: Array<{
     action_id?: string;
     block_id?: string;
@@ -188,6 +189,7 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_delete_answer") return deleteAnswer(env, payload);
   if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
+  if (actionId.startsWith(WHICH_ACTION_PREFIX)) return resolveFromWhichCard(env, payload, actionId);
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
   if (actionId.startsWith(DECISION_REVIEW_ACTION_PREFIX)) return openReview(env, payload, actionId);
   if (actionId === REVIEW_EDIT_ACTION_ID) return editInReview(env, payload);
@@ -250,6 +252,40 @@ async function resolveFromButton(
   const userId = payload.user?.id ?? "someone";
   if (!channel || !ts) return;
   await runButtonDoor({ channel, messageTs: ts, decision, userId }, buttonDoorDeps(env, payload));
+}
+
+// A button under "Approve which one?" (#1319): one card's own ✅ or ⛔,
+// pressed from the question rather than the card (`which-card.ts`). The value
+// names the card; the card is edited by its ts, and the question — the message
+// pressed — through `response_url`.
+//
+// `Env` enters here and stops here.
+async function resolveFromWhichCard(env: Env, payload: InteractionPayload, actionId: string): Promise<void> {
+  const channel = payload.channel?.id;
+  const questionTs = payload.message?.ts;
+  const userId = payload.user?.id ?? "someone";
+  const press = whichPressOf(actionId, payload.actions?.[0]?.value);
+  if (!channel || !questionTs || !press) return;
+  await runWhichCardDoor(
+    {
+      channel,
+      questionTs,
+      question: { text: payload.message?.text ?? "", blocks: payload.message?.blocks ?? [] },
+      cardTs: press.cardTs,
+      decision: press.decision,
+      userId,
+    },
+    {
+      ...buttonDoorDeps(env, payload),
+      editCard: async (ts, message) => {
+        const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
+        // Cosmetic, as every card re-render is: the decision is already
+        // announced in the thread.
+        if (!res.ok) console.warn(`[interactive] card re-render after a which-card press failed on ${channel}/${ts}`);
+      },
+      replaceQuestion: (message) => replaceCard(payload, message),
+    },
+  );
 }
 
 /**

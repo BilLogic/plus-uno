@@ -1415,9 +1415,32 @@ export function runThreadStateConformance(
     const stated = { cancelled: "Rejected, nothing filed", expired: "That card closed after 3 days with no decision." };
     await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: LONG_TTL_MS, stated }));
     await store.putProposal(proposal({ proposalTs: "1700.3", ttlMs: LONG_TTL_MS }));
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?", operations: STAGED });
+    assert.deepEqual(await store.getProposalByTs("1700.2"), {
+      state: "superseded",
+      stated,
+      proposalText: "Create the card?",
+      operations: STAGED,
+      replacedBy: { proposalTs: "1700.3", operations: STAGED },
+    });
     clock.advance(LONG_TTL_MS + HOUR_MS);
     assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "expired", ttlMs: LONG_TTL_MS, stated, proposalText: "Create the card?", operations: STAGED });
+  });
+
+  // With several live cards in a thread, "the newest card" may be another
+  // matter's (#1319): a replaced card names the live card at the end of its
+  // revision chain, and names none once that card is decided.
+  it("a superseded card names the live card that replaced it, at the end of the chain", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    const last = [{ toolName: "notion_create", input: { title: "Third" } }];
+    await store.putProposal(proposal({ proposalTs: "1700.4", operations: last, toolName: "notion_create", input: { title: "Third" } }));
+    const lookup = await store.getProposalByTs("1700.2");
+    assert.equal(lookup.state, "superseded");
+    assert.deepEqual(lookup.state === "superseded" && lookup.replacedBy, { proposalTs: "1700.4", operations: last });
+    assert.ok(await store.claimProposal("1700.4"));
+    const after = await store.getProposalByTs("1700.2");
+    assert.equal(after.state === "superseded" ? after.replacedBy : undefined, undefined, "a decided card is no card to send anyone to");
   });
 
   it("a retired stated card carries its words, and a card without words answers with its lifetime alone", async () => {

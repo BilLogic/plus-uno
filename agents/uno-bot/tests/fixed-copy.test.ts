@@ -384,7 +384,7 @@ describe("the gate notes", () => {
     { kind: "resolved", decision: "cancel" },
     { kind: "not-on-the-card", toolName: "notion_create", glyph: "white_check_mark", userId: "U0000002" },
     { kind: "not-on-the-card", toolName: "notion_create", glyph: "no_entry", userId: "U0000002", stated: true },
-    { kind: "which-card", count: 2 },
+    { kind: "which-card", decision: "confirm", cards: [{ ts: "1700000000.000200", headline: "Backup tutor matching" }, { ts: "1700000000.000100", headline: "Session reflections" }] },
     { kind: "not-a-confirmer", confirmers: ["U0000007"], userId: "U0000002" },
     { kind: "not-a-confirmer", confirmers: [] },
     { kind: "resolve-failed", glyph: "white_check_mark" },

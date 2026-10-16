@@ -61,6 +61,7 @@ import {
   ownWords,
   ownText,
   ownOperations,
+  replacedByOf,
   decidedLive,
   REPORT_GRACE_MS,
   changedReport,
@@ -514,7 +515,15 @@ export class ThreadState extends DurableObject<Env> {
       }
       const proposal = (rec.payload as PendingProposal | null) ?? {};
       if (rec.supersededBy && (await this.successorIsLive(rec.supersededBy, at, txn))) {
-        return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal) };
+        // The live card it was replaced by, read in this same transaction:
+        // storage reads inside the object cost no subrequest.
+        const replacedBy = await replacedByOf(
+          rec.supersededBy,
+          (ts) => txn.get<ProposalRecord>(proposalKey(ts)),
+          (next) => !next.decided && !next.retired && at - next.createdAt <= recordTtlMs(next),
+          (next) => (next.payload as PendingProposal | null) ?? {},
+        );
+        return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal), ...replacedBy };
       }
       if (at - rec.createdAt > recordTtlMs(rec)) {
         await txn.delete(proposalKey(proposalTs));

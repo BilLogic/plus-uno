@@ -820,6 +820,10 @@
           ],
           "description": "'confirm' to proceed with the proposed action as-is. 'cancel' to stop or change direction (for a parameter change, cancel then stage a fresh proposal)."
         },
+        "card": {
+          "type": "string",
+          "description": "The id of the card this decides, as <pending_proposal> lists it. Required when more than one card is waiting; with one, it may be left out. If the person did not say which card they mean, do not guess: leave it out and end your turn, and they are asked which with a button per card."
+        },
         "message_to_user": {
           "type": "string",
           "description": "Short Slack mrkdwn message to post alongside the resolution, e.g. 'Got it — firing the implement for Badge now.' Keep to one or two sentences."

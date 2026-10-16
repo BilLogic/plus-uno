@@ -35,6 +35,7 @@ import {
   EXPIRED_POST,
   STALE_POST,
   SUPERSEDED_POST,
+  supersededBy,
   defaultNarrative,
   renderGateNote,
 } from "../src/slack/gate-note";
@@ -138,7 +139,7 @@ test("a ✅ on the card a revision replaced is told it was replaced, through bot
     // is not on the proposal I am holding" — is a true thing to say about a
     // reaction that missed, and the wrong thing to say to someone whose card
     // was replaced out from under them.
-    assert.equal(said(verdict), SUPERSEDED_POST, door);
+    assert.equal(said(verdict), supersededBy("Reflection redesign, tutors only"), door);
     assert.equal(verdict.outcome, "stale", door);
     // And still the guarantee #573 bought: the input they pushed back on does
     // not run.
@@ -153,7 +154,7 @@ test("a ⛔ on the replaced card is told the same, and leaves the revision live"
     threadState: h.threadState,
   });
 
-  assert.equal(said(verdict), SUPERSEDED_POST);
+  assert.equal(said(verdict), supersededBy("Reflection redesign, tutors only"));
   assert.equal(verdict.execute, undefined);
   // A decision about a retired card is not a decision about the live one: the
   // person still has something to confirm.

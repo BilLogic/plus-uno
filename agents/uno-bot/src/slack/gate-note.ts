@@ -74,6 +74,13 @@ export const SUPERSEDED_POST =
   "That proposal was replaced by a newer one — nothing was executed. " +
   "Confirm on the newest card in this thread instead.";
 
+/** The ✅/⛔ on a proposal a revision replaced, naming the card that did:
+ *  with several live cards in a thread, the newest may be another matter's
+ *  (#1319). The headline is the model's input, so escaped. */
+export function supersededBy(headline: string): string {
+  return `That proposal was replaced by *${escapeSlackText(headline)}* — nothing was executed. Confirm on that card instead.`;
+}
+
 /** The ✅/⛔ on a stated card a revision replaced. */
 export const STATED_SUPERSEDED_POST =
   "That card was revised, so nothing ran. Decide on the newest card in this thread.";
@@ -120,6 +127,23 @@ export function stagingLine(note: Extract<GateNote, { kind: "revised" | "staged-
   return `Added a new card below. ${listed} still waiting.`;
 }
 
+/**
+ * "Approve which one?" (#1319): the question, and that nothing ran — what
+ * sits above the question's buttons (`which-card.ts`).
+ */
+export function whichCardQuestion(note: Extract<GateNote, { kind: "which-card" }>): string {
+  const asked = note.decision === "confirm" ? "Approve which one?" : "Cancel which one?";
+  return `${asked} ${note.cards.length} proposals are waiting here, so nothing ran yet.`;
+}
+
+/** The question's text copy: the question, and the cards by headline — what
+ *  a notification and a screen reader get. Headlines come from the model's
+ *  input, so escaped. */
+function whichCardText(note: Extract<GateNote, { kind: "which-card" }>): string {
+  const names = note.cards.map((card) => `*${escapeSlackText(card.headline)}*`);
+  return `${whichCardQuestion(note)} ${names.join(", ")}.`;
+}
+
 /** One verdict, as the line a person reads. */
 export function renderGateNote(note: GateNote): string {
   switch (note.kind) {
@@ -138,7 +162,8 @@ export function renderGateNote(note: GateNote): string {
     case "expired":
       return note.words ?? expiredPost(note.ttlMs);
     case "superseded":
-      return note.stated ? STATED_SUPERSEDED_POST : SUPERSEDED_POST;
+      if (note.stated) return STATED_SUPERSEDED_POST;
+      return note.by ? supersededBy(note.by) : SUPERSEDED_POST;
     case "not-on-the-card":
       // Say where the card is, and name who is being answered: this is the one
       // verdict aimed at a specific person's specific gesture, so it is the one
@@ -153,13 +178,10 @@ export function renderGateNote(note: GateNote): string {
         `nothing was executed. Press Review on the card for *${note.toolName}* just above.`
       );
     case "which-card":
-      // Only an unthreaded DM line reaches this: anywhere else a typed emoji
-      // sits in a card's own thread and answers that card. Two cards are two different writes, and a ✅ outside both threads says
-      // nothing about which one it meant. Guessing runs the wrong one.
-      return (
-        `:warning: ${note.count} proposals are waiting in this DM, so I can't tell which one that is for — ` +
-        `nothing was executed. Press Review on the card you mean.`
-      );
+      // Two cards are two different writes, and a decision that names neither
+      // says nothing about which one it meant. Guessing runs the wrong one.
+      // The buttons are the message's own (`which-card.ts`); this is its text.
+      return whichCardText(note);
     case "review-only":
       return REVIEW_ONLY_POST;
     case "not-a-confirmer":
