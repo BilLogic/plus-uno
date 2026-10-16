@@ -1417,6 +1417,19 @@ export interface ThreadState {
   getProposalByThread(ref: ThreadRef): Promise<PendingProposal | null>;
 
   /**
+   * Every live proposal in a REPLY THREAD, newest first — the list beside
+   * `getProposalByThread`, whose answer is always this list's first card.
+   *
+   * A thread can hold several live cards at once: each `supersedeKey` slot
+   * (a sweep card, a report item's card) stays live beside a turn's card, so
+   * the newest one alone does not say what is waiting there. Live means what
+   * `getProposalByThread` means — staged, in its TTL, and neither retired,
+   * superseded nor decided — and `ref.thread` is the card's reply thread, as
+   * there. A card marked as being revised is still live, and carries its mark.
+   */
+  getProposalsByThread(ref: ThreadRef): Promise<PendingProposal[]>;
+
+  /**
    * Every live proposal in a CHANNEL, whatever thread or conversation it was
    * staged from, newest first — retired, superseded and aged-out cards left out.
    *

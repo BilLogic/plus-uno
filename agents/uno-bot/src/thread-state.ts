@@ -18,7 +18,7 @@
 // Every public method below is Durable Object RPC and its signature IS the
 // `src/thread-state` interface: `readHistory`, `appendHistory`,
 // `compactHistory`, `putProposal`, `retireProposal`, `keepPick`, `getProposalByTs`,
-// `getProposalByThread`, `getProposalsByChannel`, `claimProposal`,
+// `getProposalByThread`, `getProposalsByThread`, `getProposalsByChannel`, `claimProposal`,
 // `putReport`, `getReport`, `updateReport`, `beginExecution`, `settleOperation`, `endExecution`, `takeCutOffExecution`,
 // `takeCutOffExecutionInThread`, `findCutOffExecutions`,
 // `reportCutOffNote`, `get/putAssistantContext`, `requestCancel`,
@@ -542,6 +542,24 @@ export class ThreadState extends DurableObject<Env> {
       if (!best || rec.createdAt > best.createdAt) best = rec;
     }
     return best ? withLiveMark(best.payload as PendingProposal, at) : null;
+  }
+
+  // Same scan, every live card in the reply thread, newest first: the list
+  // `getProposalByThread` answers the head of (#1317).
+  async getProposalsByThread(ref: ThreadRef, at: number): Promise<PendingProposal[]> {
+    const all = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
+    const live: ProposalRecord[] = [];
+    for (const rec of all.values()) {
+      if (at - rec.createdAt > recordTtlMs(rec)) continue;
+      if (rec.supersededBy || rec.retired || rec.decided) continue;
+      const proposal = rec.payload as PendingProposal | null;
+      if (!proposal || proposal.channel !== ref.channel) continue;
+      if (proposalReplyThread(proposal) !== ref.thread) continue;
+      live.push(rec);
+    }
+    return live
+      .sort((a, b) => b.createdAt - a.createdAt)
+      .map((rec) => withLiveMark(rec.payload as PendingProposal, at));
   }
 
   // Same scan at channel grain, newest first: which cards are live anywhere in
