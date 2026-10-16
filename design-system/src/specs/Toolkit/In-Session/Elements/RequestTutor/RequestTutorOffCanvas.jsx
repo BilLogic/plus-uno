@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/actions/Button/Button';
-import ChoiceGroup from '@/components/forms-and-inputs/ChoiceGroup';
-import { Select } from '@/components';
+import { ChoiceGroup, Select } from '@/components';
 
 /**
  * RequestTutorOffCanvas — the "Request tutor(s)" / "Request lead tutor" side sheet triggered

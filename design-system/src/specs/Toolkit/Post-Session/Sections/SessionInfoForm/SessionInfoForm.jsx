@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import ChoiceGroup from '@/components/forms-and-inputs/ChoiceGroup';
+import { ChoiceGroup } from '@/components';
 import NavigationButtons from '@/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons';
 import LastUpdated from '@/specs/Toolkit/Post-Session/Elements/LastUpdated/LastUpdated';
 import SessionDate from '@/specs/Toolkit/Post-Session/Elements/SessionDate/SessionDate';

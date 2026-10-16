@@ -8,7 +8,7 @@
  */
 import React, { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
-import TagInput from '@/components/forms-and-inputs/TagInput';
+import { TagInput } from '@/components';
 
 export default {
     title: 'Specs/Profile/Elements/Language Preferences',

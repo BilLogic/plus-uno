@@ -1,7 +1,6 @@
 import React from 'react';
 
-import Input from '@/components/forms-and-inputs/Input';
-import Listbox from '@/components/forms-and-inputs/_internal/Listbox';
+import { Select } from '@/components';
 
 const INSTITUTION_OPTIONS = [
     'Aspen Heights Middle School',
@@ -11,7 +10,22 @@ const INSTITUTION_OPTIONS = [
     'Cedar Valley Middle School',
     'Clearwater Middle School',
     'Eagle Ridge Intermediate School',
-];
+].map((name) => ({ value: name, label: name }));
+
+/** What every state shares: a searchable Select with no visible label. */
+const field = {
+    'aria-label': 'Select your institution',
+    options: INSTITUTION_OPTIONS,
+    placeholder: 'Type or select your institution',
+    searchable: true,
+    size: 'medium',
+};
+
+/**
+ * An open list floats under its field, so the row keeps the list's full
+ * height clear below the field and the next state starts under the list.
+ */
+const openRow = { paddingBottom: 'var(--layout-max-height-listbox)' };
 
 /**
  * Non-interactive spec strip for institution dropdown states: empty, open, typing, filled.
@@ -42,72 +56,19 @@ export default function InstitutionSelection() {
                 }}
             >
                 <div style={{ pointerEvents: 'none' }}>
-                    <Input
-                        id="institution-empty"
-                        name="institution-empty"
-                        label="Select your institution"
-                        showLabel={false}
-                        placeholder="Type or select your institution"
-                        trailingVisual="dropdown"
-                        size="medium"
-                        style={{ backgroundColor: 'var(--color-surface)' }}
-                    />
+                    <Select id="institution-empty" {...field} />
+                </div>
+
+                <div style={{ pointerEvents: 'none', ...openRow }}>
+                    <Select id="institution-open" {...field} open />
+                </div>
+
+                <div style={{ pointerEvents: 'none', ...openRow }}>
+                    <Select id="institution-typing" {...field} open defaultSearchTerm="Aspen" />
                 </div>
 
                 <div style={{ pointerEvents: 'none' }}>
-                    <Input
-                        id="institution-open"
-                        name="institution-open"
-                        label="Select your institution"
-                        showLabel={false}
-                        placeholder="Type or select your institution"
-                        trailingVisual={<i className="fa-solid fa-caret-up" aria-hidden="true" />}
-                        size="medium"
-                        style={{ backgroundColor: 'var(--color-surface)' }}
-                    />
-                    <Listbox
-                        id="institution-open-options"
-                        aria-label="Institutions"
-                        options={INSTITUTION_OPTIONS}
-                        style={{ marginTop: 'var(--size-element-gap-xs)' }}
-                    />
-                </div>
-
-                <div style={{ pointerEvents: 'none' }}>
-                    <Input
-                        id="institution-typing"
-                        name="institution-typing"
-                        label="Select your institution"
-                        showLabel={false}
-                        value="Aspen"
-                        placeholder="Type or select your institution"
-                        trailingVisual={<i className="fa-solid fa-caret-up" aria-hidden="true" />}
-                        size="medium"
-                        style={{ backgroundColor: 'var(--color-surface)' }}
-                        readOnly
-                    />
-                    <Listbox
-                        id="institution-typing-options"
-                        aria-label="Institutions matching Aspen"
-                        options={INSTITUTION_OPTIONS}
-                        filter="Aspen"
-                        style={{ marginTop: 'var(--size-element-gap-xs)' }}
-                    />
-                </div>
-
-                <div style={{ pointerEvents: 'none' }}>
-                    <Input
-                        id="institution-filled"
-                        name="institution-filled"
-                        label="Select your institution"
-                        showLabel={false}
-                        value="Aspen Heights Middle School"
-                        placeholder="Type or select your institution"
-                        trailingVisual="dropdown"
-                        size="medium"
-                        style={{ backgroundColor: 'var(--color-surface)' }}
-                        readOnly
-                    />
+                    <Select id="institution-filled" {...field} defaultValue="Aspen Heights Middle School" />
                 </div>
             </div>
         </div>

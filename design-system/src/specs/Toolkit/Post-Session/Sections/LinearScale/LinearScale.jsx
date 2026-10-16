@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ChoiceGroup } from '@/components/forms-and-inputs';
+import { ChoiceGroup } from '@/components';
 import './LinearScale.scss';
 
 const SCALE_OPTIONS = [1, 2, 3, 4, 5].map((n) => ({ value: n, label: String(n) }));
