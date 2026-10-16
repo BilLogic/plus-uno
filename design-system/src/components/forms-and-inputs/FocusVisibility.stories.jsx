@@ -103,7 +103,7 @@ export default {
 };
 
 /**
- * Tabbing onto the Select trigger changes how it looks.
+ * Tabbing onto the Select combobox changes how its box looks.
  */
 export const SelectTriggerShowsFocus = () => (
     <div style={stack}>
@@ -112,13 +112,14 @@ export const SelectTriggerShowsFocus = () => (
 );
 
 SelectTriggerShowsFocus.play = async ({ canvasElement }) => {
-    const trigger = within(canvasElement).getByRole('button', { name: 'Subject' });
-    const resting = getComputedStyle(trigger).borderColor;
+    const trigger = within(canvasElement).getByRole('combobox', { name: 'Subject' });
+    const box = trigger.closest('.plus-field');
+    const resting = getComputedStyle(box).outlineStyle;
 
     await userEvent.tab();
     await expect(document.activeElement).toBe(trigger);
-    // The border colour transitions, so the focused colour arrives a beat later.
-    await waitFor(() => expect(getComputedStyle(trigger).borderColor).not.toBe(resting));
+    // The box around the combobox draws the field's focus ring.
+    await waitFor(() => expect(getComputedStyle(box).outlineStyle).not.toBe(resting));
 };
 
 /**
@@ -150,7 +151,7 @@ ForcedColorsKeepFocusAndSelection.play = async ({ canvasElement }) => {
         canvas.getByLabelText(/Hours/),
         canvas.getByRole('textbox', { name: 'Amount' }),
         canvas.getByRole('combobox', { name: 'Date' }),
-        canvas.getByRole('button', { name: 'Subject' }),
+        canvas.getByRole('combobox', { name: 'Subject' }),
         canvas.getByRole('listbox', { name: 'Day' }),
     ];
     for (const field of fields) {
