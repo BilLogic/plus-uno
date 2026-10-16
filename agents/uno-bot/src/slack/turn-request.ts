@@ -34,6 +34,8 @@ export interface TurnEnvelope {
   history: HistoryTurn[];
   /** The proposal staged in this conversation, if one is awaiting a decision. */
   pending: PendingProposal | null;
+  /** Every card live in the reply thread, newest first. */
+  liveCards?: PendingProposal[];
   /** The Notion PRD carried on the thread root, if any. */
   prd: { id?: string; url?: string } | null;
   /** Set when the message is in #uno-bot (`turn/intake-channel.ts`), with who
@@ -114,6 +116,7 @@ export function slackTurnRequest(
     ...(vision.reference ? { visionReference: vision.reference } : {}),
     history: envelope.history,
     pending: envelope.pending,
+    ...(envelope.liveCards ? { liveCards: envelope.liveCards } : {}),
     currentCanvasIds: canvasIdsSharedByMessage(text, event.files),
     sharedCanvasIds: canvasIdsSharedIntoConversation(text, event.files, envelope.history),
     prd: envelope.prd,

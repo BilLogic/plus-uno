@@ -324,9 +324,11 @@ test("a typed ✅ that files an issue on the bot's own repo records the ticket",
 
 // ── proposal events ──────────────────────────────────────────────────────────
 
+/** The model revising `PENDING`, which it names; where `PENDING` is not live,
+ *  the name matches nothing and the card is a fresh one. */
 const REVISION = {
   text: "Revised — the title you asked for.",
-  toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign, v2" } }],
+  toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign, v2", revises_card: PENDING.proposalTs } }],
 };
 
 test("a staged card is recorded staged, joined to the turn, with when its thread began", async () => {
@@ -509,13 +511,13 @@ test("a card claimed while its revision was being written is never recorded supe
   );
 });
 
-test("a card the staging itself retired is recorded superseded, and the expiry pass leaves it alone", async () => {
-  // No pending card handed in, but one is live in the thread: the store's
-  // backstop retires it as the new card goes up.
+test("a card a revision retired is recorded superseded, and the expiry pass leaves it alone", async () => {
+  // A card staged before turn cards had slots of their own: its revision
+  // stays in the thread's slot, and the card is out of reach once it posts.
   const h = harness({ replies: [REVISION] });
   await h.proposalEvents.record(stagedEvent({ proposal: PENDING, at: 0, via: "turn", channelStored: true }));
   await h.threadState.putProposal(PENDING);
-  await runTurn(request({ text: "file the v2 card" }), h.deps);
+  await runTurn(request({ text: "file the v2 card", pending: PENDING }), h.deps);
   await runProposalExpiry(h.proposalEvents, 1_800_000_000_000, { dryRun: false });
   assert.deepEqual(
     (await h.proposalEvents.eventsOf(PENDING.proposalTs)).map((e) => e.event),

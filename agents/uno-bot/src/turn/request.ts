@@ -53,6 +53,8 @@ export interface TurnFacts {
   visionReference?: VisionReference;
   history?: HistoryTurn[];
   pending?: PendingProposal | null;
+  /** Every live card in the reply thread, newest first (`TurnRequest.liveCards`). */
+  liveCards?: PendingProposal[];
   currentCanvasIds?: string[];
   sharedCanvasIds?: string[];
   prd?: { id?: string; url?: string } | null;
@@ -132,6 +134,7 @@ export function buildTurnRequest(facts: TurnFacts): TurnRequest {
     ...(facts.visionReference ? { visionReference: facts.visionReference } : {}),
     history: facts.history ?? [],
     pending: facts.pending ?? null,
+    ...(facts.liveCards ? { liveCards: facts.liveCards } : {}),
     ...(facts.currentCanvasIds?.length ? { currentCanvasIds: facts.currentCanvasIds } : {}),
     ...(facts.sharedCanvasIds?.length ? { sharedCanvasIds: facts.sharedCanvasIds } : {}),
     prd: facts.prd ?? null,

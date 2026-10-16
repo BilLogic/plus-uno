@@ -107,9 +107,25 @@ export const BEING_REVISED_POST =
  *  only its own Review decides. */
 export const REVIEW_ONLY_POST = "Each card here is decided from its own Review button, so nothing ran.";
 
+/**
+ * What a turn's staging did, said just above its card (#1318): a revision
+ * replaced the card it names; a separate proposal posted beside the cards
+ * still waiting. Either way the person can catch a wrong call at once and
+ * correct it in words. The headlines are the model's input, so escaped.
+ */
+export function stagingLine(note: Extract<GateNote, { kind: "revised" | "staged-beside" }>): string {
+  if (note.kind === "revised") return `Revised *${escapeSlackText(note.replaced)}*: the card below replaces the one above.`;
+  const names = note.waiting.map((w) => `*${escapeSlackText(w)}*`);
+  const listed = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)} above are` : `${names[0]} above is`;
+  return `Added a new card below. ${listed} still waiting.`;
+}
+
 /** One verdict, as the line a person reads. */
 export function renderGateNote(note: GateNote): string {
   switch (note.kind) {
+    case "revised":
+    case "staged-beside":
+      return stagingLine(note);
     case "resolved":
       // A stated card's ⛔ says what its footer promised, in the card's words.
       if (note.decision === "cancel" && note.cancelled) return `${note.cancelled}.`;

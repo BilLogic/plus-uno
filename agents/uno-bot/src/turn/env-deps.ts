@@ -196,6 +196,7 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
         conversationTs: request.conversationTs,
         currentSender: req.currentSender,
         pending: req.pending,
+        liveCards: req.liveCards,
         ...(req.assistantContext ? { assistantContext: req.assistantContext } : {}),
         ...(req.preflight ? { preflight: req.preflight } : {}),
         onInterim: req.onInterim,

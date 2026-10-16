@@ -162,14 +162,17 @@ test("a reply in the intake thread names the thread's opener as the reporter, no
 
 test("a reply in the intake thread that refines the draft stages a revision, which supersedes the card", async () => {
   const revised = { ...DRAFT, body: `${DRAFT.body}\n\n**Also.** It happened twice today.` };
+  const call: Record<string, unknown> = { ...revised };
   const h = harness({
     replies: [
       { text: "Want me to file this?", toolCalls: [{ name: "github_issue_create", args: DRAFT }] },
-      { text: "Updated — want me to file this?", toolCalls: [{ name: "github_issue_create", args: revised }] },
+      { text: "Updated — want me to file this?", toolCalls: [{ name: "github_issue_create", args: call }] },
     ],
   });
   const first = await runTurn(intakePost(REPORT), h.deps);
   const originalTs = first.staged!.proposal.proposalTs;
+  // The model names the card it revises.
+  call.revises_card = originalTs;
   const pending = await h.threadState.getProposalByThread({ channel: CHANNEL, thread: POST_TS });
 
   const second = await runTurn(

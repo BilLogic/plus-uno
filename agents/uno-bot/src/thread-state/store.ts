@@ -316,15 +316,20 @@ export interface PendingProposal {
    */
   fixes?: CardFixes;
   /**
-   * The card's own slot within its reply thread (`proposalSlot`). Absent —
-   * every turn's card — the card holds the thread's slot, and cards there
-   * replace one another. A card the Worker stages into a thread people also
-   * talk in sets one — `"sweep"` for an end-of-day sweep card, a report
-   * item's own key for each card of a decision report — so it and a turn's card stay live side
-   * by side, and only a card with the same key replaces it. A turn's batch
-   * revises it only when it touches it (`turn/turn.ts`); while both are live,
-   * a typed ✅ resolves the thread's newer card, as `getProposalByThread`
-   * always answers, and a reaction or button resolves the card it is on.
+   * The card's own slot within its reply thread (`proposalSlot`), and so its
+   * MATTER: a card and every revision of it share one key, and only a card
+   * with the same key replaces it. A turn's card is keyed by the first card
+   * of its matter (`turnCardKey`), so each separate proposal is live beside
+   * the others and a revision is staged into the slot of the card it
+   * supersedes (`turn/card-matter.ts`). A card the Worker stages into a
+   * thread people also talk in sets its own — `"sweep"` for an end-of-day
+   * sweep card, a report item's own key for each card of a decision report;
+   * a turn's batch revises it only when it touches it (`turn/turn.ts`).
+   * Absent only on a turn's card staged before keys were (#1318): it holds
+   * the thread's slot, and a revision of it stays there. While several are
+   * live, a typed ✅ resolves the thread's newer card, as
+   * `getProposalByThread` always answers, and a reaction or button resolves
+   * the card it is on.
    */
   supersedeKey?: string;
   /**
@@ -951,10 +956,10 @@ export function proposalReplyThread(
 /**
  * The grain one card retires another at: its reply thread, and within it the
  * card's own slot when it has a key (`supersedeKey`). Both adapters'
- * `putProposal` compare with this, so a thread holds one turn card and one
- * card per key at most, and staging retires only the card in its own slot —
- * a revision of a keyed card retires that card, an unrelated ask stages beside
- * it. The one supersession mechanism in the module.
+ * `putProposal` compare with this, so a thread holds one card per key at
+ * most, and staging retires only the card in its own slot — a revision
+ * retires the card it revises, a separate proposal stages beside it. The one
+ * supersession mechanism in the module.
  *
  * A sweep card staged before the key existed carries `sweepRun` and no key,
  * and is read as keyed `"sweep"` so it keeps its slot until it expires.
@@ -967,6 +972,25 @@ export function proposalSlot(proposal: Pick<PendingProposal, "replyTs" | "thread
 
 /** The end-of-day sweep card's slot key. */
 export const SWEEP_KEY = "sweep";
+
+/** What every turn card's slot key starts with. */
+const TURN_CARD_KEY = "card:";
+
+/**
+ * A turn card's slot key: the ts of the first card of its matter, which every
+ * revision of it carries. So the key names the matter, stable across
+ * revisions, and the matter's current card is the live card with that key.
+ */
+export function turnCardKey(firstCardTs: string): string {
+  return `${TURN_CARD_KEY}${firstCardTs}`;
+}
+
+/** Whether a card is a turn's — keyed by `turnCardKey`, or staged before turn
+ *  cards had keys — rather than one the Worker staged under a key of its own. */
+export function isTurnCard(proposal: Pick<PendingProposal, "supersedeKey" | "sweepRun">): boolean {
+  const key = slotKeyOf(proposal);
+  return key === undefined || key.startsWith(TURN_CARD_KEY);
+}
 
 /** A card's slot key, or undefined for a card holding its thread's slot. */
 export function slotKeyOf(proposal: Pick<PendingProposal, "supersedeKey" | "sweepRun">): string | undefined {

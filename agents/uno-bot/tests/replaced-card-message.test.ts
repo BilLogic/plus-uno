@@ -78,7 +78,8 @@ interface Flow {
  * is that argument the staging path used to consume.
  */
 async function stagedThenRevised(): Promise<Flow> {
-  const h = harness({ replies: REPLIES });
+  const replies = structuredClone(REPLIES);
+  const h = harness({ replies });
 
   const first: TurnOutcome = await runTurn(
     request({ text: "file a card for the reflection redesign" }),
@@ -86,6 +87,8 @@ async function stagedThenRevised(): Promise<Flow> {
   );
   assert.equal(first.disposition, "staged", "the first turn staged a card");
   const originalTs = first.staged!.proposal.proposalTs;
+  // The model names the card its revision replaces.
+  (replies[1]!.toolCalls[0]!.args as Record<string, unknown>).revises_card = originalTs;
 
   // What the Slack door would read and pass in on the next message.
   const pending = await h.threadState.getProposalByThread(REF);

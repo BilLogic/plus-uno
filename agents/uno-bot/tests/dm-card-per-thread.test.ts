@@ -160,9 +160,12 @@ test("a ✅ reaction on a non-card message in a DM thread points at that thread'
 });
 
 test("a revision inside the same DM thread still supersedes that thread's card", async () => {
+  const revision: Record<string, unknown> = { title: "Card A, revised" };
   const { h, cardA, cardB } = await twoThreadsTwoCards([
-    { text: "Revised.", toolCalls: [{ name: "notion_create", args: { title: "Card A, revised" } }] },
+    { text: "Revised.", toolCalls: [{ name: "notion_create", args: revision }] },
   ]);
+  // The model names the card it revises.
+  revision.revises_card = cardA;
   const revised = await turn(h, inThread(ASK_A, "1700000000.000700", "make it close as not planned"));
 
   assert.equal(revised.disposition, "staged");

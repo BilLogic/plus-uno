@@ -349,6 +349,13 @@ export type GateNote =
   /** A gate emoji typed outside any card's thread, in a DM holding several
    *  live cards: ask which one, and resolve none of them. */
   | { kind: "which-card"; count: number }
+  /** A turn staged a REVISION: the card that follows replaces the waiting
+   *  card `replaced` names (its headline, `turn/card-matter.ts`). Said just
+   *  before the card, so a wrong call is caught at once (#1318). */
+  | { kind: "revised"; replaced: string }
+  /** A turn staged a SEPARATE PROPOSAL while other cards wait: the card that
+   *  follows posts beside them, and each `waiting` headline is still live. */
+  | { kind: "staged-beside"; waiting: string[] }
   /** A signal from someone outside the card's confirmer set: resolve
    *  nothing, and name who can. `userId` is who was refused, when the signal
    *  carried one. */

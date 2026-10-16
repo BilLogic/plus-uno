@@ -44,6 +44,7 @@ import { executeRelayDm, type RelaySlack } from "../src/tools/relay-dm";
 import type { ShareoutReads } from "../src/tools/share-for-feedback";
 import {
   createInMemoryThreadState,
+  turnCardKey,
   type HistoryTurn,
   type PendingProposal,
   type ThreadState,
@@ -531,10 +532,11 @@ test("redirecting an intake's repo supersedes its card with one naming the new r
   const SITE = "BilLogic/plus-marketing-website";
   const HARNESS = "BilLogic/plus-uno";
   const draft = { title: "Hero CTA links nowhere", body: "The hero button on the home page 404s." };
+  const redirect: Record<string, unknown> = { ...draft, repo: HARNESS };
   const h = harness({
     replies: [
       { text: "Filing it on the marketing site.", toolCalls: [{ name: "github_issue_create", args: { ...draft, repo: SITE } }] },
-      { text: "Moving it to plus-uno.", toolCalls: [{ name: "github_issue_create", args: { ...draft, repo: HARNESS } }] },
+      { text: "Moving it to plus-uno.", toolCalls: [{ name: "github_issue_create", args: redirect }] },
     ],
     issueTarget: (staged) => ({ repo: String(staged.repo), visibility: "public" }),
   });
@@ -542,6 +544,8 @@ test("redirecting an intake's repo supersedes its card with one naming the new r
   const first = await runTurn(request({ text: "the hero button 404s — track this on GitHub" }), h.deps);
   assert.equal(first.staged!.card.verb, `file a GitHub issue on ${SITE}`);
   const firstTs = first.staged!.proposal.proposalTs;
+  // The model names the card it redirects: a revision of it.
+  redirect.revises_card = firstTs;
 
   const second = await runTurn(
     request({ text: "put it on plus-uno instead", pending: first.staged!.proposal }),
@@ -560,18 +564,18 @@ test("redirecting an intake's repo supersedes its card with one naming the new r
 // the requester redirected by surface, so the card has to say which one.
 test("redirecting a GitHub intake to the Roadmap supersedes it with a card naming the Roadmap", async () => {
   const draft = { title: "Button disabled state has no Figma spec", body: "Designers keep guessing the opacity." };
+  const redirect: Record<string, unknown> = { surface: "intake", title: draft.title, summary: draft.body };
   const h = harness({
     replies: [
       { text: "Filing it on plus-uno.", toolCalls: [{ name: "github_issue_create", args: draft }] },
-      {
-        text: "Moving it to the Roadmap.",
-        toolCalls: [{ name: "notion_create", args: { surface: "intake", title: draft.title, summary: draft.body } }],
-      },
+      { text: "Moving it to the Roadmap.", toolCalls: [{ name: "notion_create", args: redirect }] },
     ],
   });
 
   const first = await runTurn(request({ text: "track this on GitHub: the disabled Button has no spec" }), h.deps);
   const firstTs = first.staged!.proposal.proposalTs;
+  // The model names the card it redirects: a revision of it, on another tool.
+  redirect.revises_card = firstTs;
   const second = await runTurn(
     request({ text: "actually, put it on the Roadmap instead", pending: first.staged!.proposal }),
     h.deps,
@@ -984,7 +988,7 @@ test("staging a revised card supersedes the one it replaces", async () => {
     replies: [
       {
         text: "Filing the revised card.",
-        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2" } }],
+        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2", revises_card: PENDING.proposalTs } }],
       },
     ],
   });
@@ -1010,7 +1014,7 @@ test("a revised card inherits the lifetime and confirmer set of the card it repl
     replies: [
       {
         text: "Filing the revised card.",
-        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2" } }],
+        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2", revises_card: PENDING.proposalTs } }],
       },
     ],
   });
@@ -1091,7 +1095,7 @@ test("a comment on another issue in a commenting week's thread stages beside the
 
   assert.equal(outcome.disposition, "staged");
   const staged = outcome.staged!.proposal;
-  assert.equal(staged.supersedeKey, undefined, "its own card, in the thread's slot");
+  assert.equal(staged.supersedeKey, turnCardKey(staged.proposalTs), "a separate proposal, in a slot of its own");
   assert.equal((await h.threadState.getProposalByTs(WEEKLY_UPDATE.proposalTs)).state, "found", "the weekly card stays live");
   assert.equal((await h.threadState.getProposalByTs(staged.proposalTs)).state, "found");
 });
@@ -1161,7 +1165,7 @@ test("a revision from outside the confirmer set is refused and leaves the card l
     replies: [
       {
         text: "Filing the revised card.",
-        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2" } }],
+        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2", revises_card: PENDING.proposalTs } }],
       },
     ],
   });
@@ -1185,7 +1189,7 @@ test("a standing confirmer's push-back stages a revision that keeps the card's o
     replies: [
       {
         text: "Filing the revised card.",
-        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2" } }],
+        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2", revises_card: PENDING.proposalTs } }],
       },
     ],
   });

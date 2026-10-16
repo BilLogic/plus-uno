@@ -483,6 +483,28 @@ function offeredDescription(name: ToolName, description: string): string {
   return lead ? `${lead} ${description}` : description;
 }
 
+/**
+ * The argument a gated call names the waiting card it revises with: that
+ * card's id as the pending-proposal context lists it (`agent/skills.ts`).
+ * Offered on every gated tool here, so the schema file never repeats it, and
+ * taken off the call by the loop before anything stages (`agent/loop.ts`):
+ * it says which card the new one replaces, and is no part of what runs.
+ */
+export const REVISES_CARD = "revises_card";
+
+const REVISES_CARD_SCHEMA = {
+  type: "string",
+  description:
+    "Only when this call changes a card already waiting in this thread (an edit, a reply about that card): that card's id from the pending proposals. " +
+    "The new card replaces it and carries what it held. Leave it out for a different matter: the card then posts beside the waiting ones, and each is decided on its own.",
+} as const;
+
+/** The input schema the model is offered: a gated row's gains `revises_card`. */
+function offeredInputSchema(name: ToolName, input: ToolSchema["input_schema"]): ToolSchema["input_schema"] {
+  if (TOOL_TABLE[name].access !== "gated") return input;
+  return { ...input, properties: { ...input.properties, [REVISES_CARD]: REVISES_CARD_SCHEMA } };
+}
+
 /** One row with the schema it is offered under — null for a `worker` row,
  *  which is offered to no one. */
 export type SchemaRow = ToolRow & {
@@ -492,7 +514,8 @@ export type SchemaRow = ToolRow & {
 
 /**
  * Join the rows to the schemas, refusing either one without the other. A
- * gated row's description gains its gate lead here (`gateLeadFor`).
+ * gated row's description gains its gate lead here (`gateLeadFor`), and its
+ * input schema the `revises_card` argument (`REVISES_CARD`).
  *
  * A schema with no row would be offered to the model and come back refused by
  * the dispatch it has no row for; a row with no schema is a column five
@@ -522,7 +545,11 @@ export function withSchemas(schemas: readonly ToolSchema[]): Record<ToolName, Sc
       schemaless.push(name);
       continue;
     }
-    rows[name] = { name, ...TOOL_TABLE[name], schema: { ...schema, description: offeredDescription(name, schema.description) } };
+    rows[name] = {
+      name,
+      ...TOOL_TABLE[name],
+      schema: { ...schema, description: offeredDescription(name, schema.description), input_schema: offeredInputSchema(name, schema.input_schema) },
+    };
   }
   if (offered.length) {
     throw new Error(`worker tools must have no schema, since no one is offered them: ${offered.sort().join(", ")}`);

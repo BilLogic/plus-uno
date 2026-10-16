@@ -81,10 +81,9 @@ import {
   proposalOperations,
   proposalReplyThread,
   proposalTtlMs,
-  slotKeyOf,
   stagingCardOf,
   SWEEP_KEY,
-  itemProposalKey,
+  turnCardKey,
   type AssistantContext,
   type HistoryTurn,
   type PendingProposal,
@@ -113,6 +112,7 @@ import {
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
+import { cardMatter, stagingNote } from "./card-matter";
 import { judgedList, presentedProse, presenter, proseBudgetRepair, type Presenter } from "./presentation";
 import { figmaAnswerCopy } from "./figma-answer-copy";
 import { breadcrumbsInProse } from "../integrations/blueprint-link";
@@ -126,7 +126,6 @@ import {
   keepsToFix,
   INSERT_CARD_REFUSAL,
   keptFixes,
-  replacedBlocks,
   sweepCardInstruction,
   sweepCardPick,
   sweepTag,
@@ -295,8 +294,13 @@ export interface TurnRequest {
   // ----- what the conversation already holds -----
   /** The conversation as the model should read it, oldest turn first. */
   history: HistoryTurn[];
-  /** The proposal staged in this conversation and still awaiting a decision. */
+  /** The proposal staged in this conversation and still awaiting a decision:
+   *  the reply thread's newest, or the card a Needs changes sent back. */
   pending: PendingProposal | null;
+  /** Every card live in the reply thread, newest first
+   *  (`ThreadState.getProposalsByThread`), filled by the caller beside
+   *  `pending`. Absent, `pending` is the only one (`liveCardsOf`). */
+  liveCards?: PendingProposal[];
   /** Canvas ids shared on THIS message — persisted on the user turn. */
   currentCanvasIds?: string[];
   /** Canvas ids shared anywhere in this conversation — the authorization fact
@@ -385,6 +389,9 @@ export interface TurnAgentRequest {
   images?: AgentImage[];
   historicalImages?: HistoricalImages;
   pending: PendingProposal | null;
+  /** Every card waiting in the reply thread, newest first: what the model's
+   *  pending-proposal context lists, each by the id a revision names it by. */
+  liveCards: PendingProposal[];
   currentSender: { userId: string };
   assistantContext?: string;
   /** True when this turn is a correction — forces a fresh blueprint read and
@@ -1323,6 +1330,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       ...(request.images.length > 0 ? { images: request.images } : {}),
       ...(request.historicalImages ? { historicalImages: request.historicalImages } : {}),
       pending: request.pending,
+      liveCards: liveCardsOf(request),
       currentSender: { userId: request.userId },
       ...(assistantContext ? { assistantContext } : {}),
       correction,
@@ -1452,19 +1460,21 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   //
   // The comparison is the WHOLE batch, not its first operation: a re-stage that
   // agrees on operation one and differs on operation three is a different plan,
-  // and reading it as a confirmation would run the plan nobody saw.
-  if (
-    request.pending &&
-    stableStringify(proposalOperations(request.pending)) ===
-      stableStringify(result.operations)
-  ) {
+  // and reading it as a confirmation would run the plan nobody saw. Any live
+  // card in the thread may be the one it repeats — byte for byte names exactly
+  // one card, so there is no guessing which.
+  const liveCards = liveCardsOf(request);
+  const repeated = liveCards.find(
+    (card) => stableStringify(proposalOperations(card)) === stableStringify(result.operations),
+  );
+  if (repeated) {
     console.log(
       `[gate] identical re-stage of ${result.toolName} while pending — treating as confirm`,
     );
     const verdict = await resolveSignal(
       {
         kind: "model",
-        pending: request.pending,
+        pending: repeated,
         decision: "confirm",
         ...(result.previewText ? { messageToUser: result.previewText } : {}),
         userId: request.userId,
@@ -1510,16 +1520,20 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     );
   }
 
-  // The card this one revises. Every pending card, except a keyed one
-  // (`supersedeKey`) the batch does not touch: that is some other ask made in
-  // the thread — filing an issue under a sweep card, say — and stages as its
-  // own card beside it (`proposalSlot`), inheriting none of its terms. A sweep
-  // card is touched by a batch replacing one of its blocks; any other keyed
-  // card by a batch aiming one of its tools at the same target — the weekly
-  // card's own intake, not a separate issue filed or commented on beside it.
-  // A sweep report's fixes are each live under their own key, and the thread's
-  // newest is only one of them: the batch is checked against every live fix.
-  const replaced = await cardRevised(request.pending, result.operations, threadState);
+  // Revision or separate proposal (`turn/card-matter.ts`): the waiting card
+  // this one supersedes, or none — a different matter, staged in a slot of its
+  // own beside the waiting cards and inheriting none of their terms.
+  const matter = await cardMatter(
+    {
+      live: liveCards,
+      pending: request.pending,
+      operations: result.operations,
+      ...(result.revises ? { named: result.revises } : {}),
+      userId: request.userId,
+    },
+    threadState,
+  );
+  const replaced = matter.kind === "revision" ? matter.of : null;
 
   // A keyed card that revises only its own way (a weekly DS precedence card,
   // decided as it stands in its Review) is not revised by a turn at all: the batch is
@@ -1662,10 +1676,17 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // turn's own card, which stays the last message: a typed ✅ answers the
   // thread's newest card, and that must stay the one the person asked for.
   const offered = drafted ? await offerProposal(drafted, request, { ...deps, delivery }, staging) : null;
+  // Say which it was, just above the card, so a wrong call is caught at once
+  // and corrected in one message: the card it replaced, or the cards still
+  // waiting beside it. Not for a report's item, which redraws in its report.
+  const announced = inPlace
+    ? null
+    : stagingNote(matter, liveCards.filter((card) => card.proposalTs !== replaced?.proposalTs));
+  const said = announced ? await delivery.postGateNote(announced) : null;
   const posted = inPlace ? { ok: true, text: inPlace.text, ts: inPlace.staged.proposalTs } : await delivery.card(card);
   // An answer-only surface declined the card on purpose: the person is told
   // what it would have done instead, so the turn answered, and nothing stages.
-  const remembered = [compared, offered?.proposalText, posted.text].filter(Boolean).join("\n\n");
+  const remembered = [compared, offered?.proposalText, said?.ok ? said.text : null, posted.text].filter(Boolean).join("\n\n");
   if (!inPlace && posted.declined) {
     await memory.remember(remembered);
     return { disposition: "answered", posted: posted.text, wrote: memory.wrote(), telemetry, ...(comparison ? { comparison } : {}) };
@@ -1710,8 +1731,16 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     ...inheritedTerms(replaced),
     // And names it, for the usage record's "approved with edits".
     ...(replaced ? { revisesProposalTs: replaced.proposalTs } : {}),
-    // A revision of a keyed card stays in the card's slot.
-    ...(replaced?.supersedeKey ? { supersedeKey: replaced.supersedeKey } : {}),
+    // Its slot is its matter (`turnCardKey`): a revision is staged into the
+    // slot of the card it supersedes, and a separate proposal opens one of
+    // its own, named by this card, so it posts beside the waiting cards and
+    // retires none. A revision of a card staged before slots were keyed
+    // stays in the thread's slot, which retires that card.
+    ...(replaced
+      ? replaced.supersedeKey
+        ? { supersedeKey: replaced.supersedeKey }
+        : {}
+      : { supersedeKey: turnCardKey(posted.ts) }),
     // A revision of a sweep card stays a sweep card, in the sweep's slot, so
     // its items are still recorded (`sweep/outcomes.ts`); it keeps the card's
     // deadline, and its outcome joins the row the Worker's staging wrote. A
@@ -1728,7 +1757,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     // In #uno-bot the poster and the thread's repliers confirm, and a revision
     // adds whoever staged it (`turn/intake-channel.ts`).
     ...(request.intakeChannel
-      ? { confirmers: intakeConfirmers(request.intakeChannel, request.pending, request.userId) }
+      ? { confirmers: intakeConfirmers(request.intakeChannel, replaced, request.userId) }
       : {}),
     // An item revised in place is keyed on its report's message and its new
     // entry, in the item's own slot, for the time the item had left.
@@ -2932,60 +2961,17 @@ function isSubsetOf(revised: readonly ProposalOperation[], original: readonly Pr
   return revised.length > 0 && revised.every((op) => kept.has(stableStringify(op)));
 }
 
-/** Whether a batch replaces any block the card replaces. */
-function touchesBlocksOf(operations: readonly ProposalOperation[], card: PendingProposal): boolean {
-  const theirs = replacedBlocks(proposalOperations(card));
-  return [...replacedBlocks(operations)].some((b) => theirs.has(b));
-}
-
 /**
- * The card a turn's batch revises: the pending card, unless it is keyed
- * apart and the batch leaves it alone (null). A fix of a sweep report is one
- * of several live fixes in its thread, so every live fix of that report is
- * checked, and the one whose block the batch touches is the card revised.
+ * Every card waiting in the turn's reply thread, newest first: the caller's
+ * list, with `pending` in it — a card a Needs changes sent back is the one
+ * the turn was queued for, wherever the list puts it. With no list, the one
+ * card the turn was handed.
  */
-async function cardRevised(
-  pending: PendingProposal | null,
-  operations: readonly ProposalOperation[],
-  threadState: Pick<ThreadState, "getReport" | "getProposalByTs">,
-): Promise<PendingProposal | null> {
-  if (!pending) return null;
-  if (pending.item && pending.sweepRun) {
-    const { messageTs } = pending.item;
-    const record = await threadState.getReport(messageTs).catch(() => null);
-    for (const entry of record?.entries ?? [pending.item]) {
-      if ("state" in entry && entry.state.kind !== "open" && entry.state.kind !== "changes-asked") continue;
-      const look = await threadState.getProposalByTs(itemProposalKey(messageTs, entry.id)).catch(() => null);
-      if (look?.state === "found" && touchesCard(operations, look.proposal)) return look.proposal;
-    }
-    return null;
-  }
-  return slotKeyOf(pending) && !touchesCard(operations, pending) ? null : pending;
-}
-
-/**
- * Whether a batch touches a keyed card: for a sweep card, replaces one of its
- * blocks; for any other, aims one of its tools at the same target.
- */
-function touchesCard(operations: readonly ProposalOperation[], card: PendingProposal): boolean {
-  if (card.sweepRun) return touchesBlocksOf(operations, card);
-  const theirs = proposalOperations(card);
-  return operations.some((op) => theirs.some((own) => sameTarget(op, own)));
-}
-
-/**
- * Whether two operations use the same tool on the same target: an issue update
- * on the same `issue_number`, an issue create under the same title. Any other
- * tool is matched by the tool alone.
- */
-function sameTarget(a: ProposalOperation, b: ProposalOperation): boolean {
-  if (a.toolName !== b.toolName) return false;
-  if (a.toolName === "github_issue_update") return String(a.input.issue_number) === String(b.input.issue_number);
-  if (a.toolName === "github_issue_create") {
-    const title = (op: ProposalOperation) => String(op.input.title ?? "").trim().toLowerCase();
-    return title(a) === title(b);
-  }
-  return true;
+function liveCardsOf(request: Pick<TurnRequest, "pending" | "liveCards">): PendingProposal[] {
+  const listed = request.liveCards ?? [];
+  const { pending } = request;
+  if (!pending || listed.some((card) => card.proposalTs === pending.proposalTs)) return [...listed];
+  return [pending, ...listed];
 }
 
 /** Key-order-independent JSON compare, so two generations of the same tool

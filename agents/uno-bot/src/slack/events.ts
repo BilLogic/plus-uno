@@ -634,19 +634,25 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   let history: HistoryTurn[];
   let participants: string[];
   let pending: PendingProposal | null;
+  let liveCards: PendingProposal[];
   let prd: Awaited<ReturnType<typeof extractPrdFromThreadRoot>>;
   try {
-    [{ turns: history, participants }, pending, prd] = await Promise.all([
+    const cardRef = { channel, thread: cardThreadOf({ conversationTs: convTs, ...(threadTs ? { replyTs: threadTs } : {}) }) };
+    [{ turns: history, participants }, { pending, liveCards }, prd] = await Promise.all([
       buildThreadHistory(env, channel, convTs, event.thread_ts, event.ts, textReadsAsCorrection),
-      // The card, by contrast, is the REPLY THREAD's: in a DM a card staged
-      // under one ask is no business of the next unthreaded ask. A Needs
-      // changes note names the card it sent back, and revises that one.
-      event.revises
-        ? cardSentBack(threadStateFor(env), event.revises)
-        : threadStateFor(env).getProposalByThread({
-            channel,
-            thread: cardThreadOf({ conversationTs: convTs, ...(threadTs ? { replyTs: threadTs } : {}) }),
-          }),
+      // The cards, by contrast, are the REPLY THREAD's: in a DM a card staged
+      // under one ask is no business of the next unthreaded ask. Every live
+      // one, newest first, so the turn can tell a revision of one from a
+      // separate proposal; the newest is the card the turn was handed. A
+      // Needs changes note names the card it sent back, and revises that one.
+      (async () => {
+        const store = threadStateFor(env);
+        const [live, sentBack] = await Promise.all([
+          store.getProposalsByThread(cardRef),
+          event.revises ? cardSentBack(store, event.revises) : Promise.resolve(null),
+        ]);
+        return { pending: event.revises ? sentBack : (live[0] ?? null), liveCards: live };
+      })(),
       isThreadReply
         ? extractPrdFromThreadRoot(env, channel, event.thread_ts!)
         : Promise.resolve(null),
@@ -666,6 +672,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     text,
     history,
     pending,
+    liveCards,
     prd,
     // Who may confirm the card: the poster and everyone in the thread so far,
     // read off the thread the history rebuild already fetched.
