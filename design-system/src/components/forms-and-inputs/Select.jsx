@@ -1,22 +1,17 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import Badge from '@/components/status-and-loading/Badge';
-import Tag from '@/components/status-and-loading/Tag';
-import TagGroup from '@/components/status-and-loading/TagGroup';
 import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
 import Listbox from './_internal/Listbox';
+import SelectChips from './_internal/SelectChips';
+import { SEARCH_FIRST_ABOVE, selectList } from './_internal/selectList';
+import useOpenState from './_internal/useOpenState';
+import useOptionSource from './_internal/useOptionSource';
+import useStagedValue from './_internal/useStagedValue';
 import useFieldId from './useFieldId';
 import './Select.scss';
 
-/** Past this many options the list is search-first, and "Select all" hides. */
-export const SEARCH_FIRST_ABOVE = 50;
-/** `loadOptions` asks for this many options at a time. */
-const PAGE_SIZE = 50;
-/** How close to the bottom of the list, in px, the next page is asked for. */
-const LOAD_MORE_WITHIN = 48;
+export { SEARCH_FIRST_ABOVE };
 
-/** The option's words as a string, for filtering and the input; a node label falls back to `text`. */
-const labelOf = (option) => (typeof option.label === 'string' ? option.label : option.text ?? String(option.value));
 const isEmpty = (value) => value === undefined || value === null || value === ''
     || (Array.isArray(value) && value.length === 0);
 
@@ -93,180 +88,80 @@ const Select = ({
     const isDisabled = disabled || waiting;
     const live = !isDisabled && !isReadOnly;
 
-    /* ---------- value ---------- */
-    const empty = multi ? [] : '';
-    const [internalValue, setInternalValue] = useState(defaultValue ?? empty);
-    const controlled = value !== undefined;
-    const committed = controlled ? value : internalValue;
-    const committedList = multi ? (Array.isArray(committed) ? committed : []) : committed;
-
-    /** Picks made while open, for `commitOnClose`. `null` when not staging. */
-    const [draft, setDraft] = useState(null);
-    const current = draft ?? committedList;
-
-    const commit = (next) => {
-        if (!controlled) setInternalValue(next);
-        if (onChange) onChange(next);
-    };
+    /* ---------- value, staged for `commitOnClose` ---------- */
+    const picked = useStagedValue({ multi, value, defaultValue, onChange, staged: multi && commitOnClose });
+    const { empty, committed, committedList, current, commit } = picked;
 
     /* ---------- open, filter ---------- */
-    // A controlled `open` is the parent's: Select asks through `onOpenChange`.
-    const openControlled = open !== undefined;
-    const [internalOpen, setInternalOpen] = useState(Boolean(defaultOpen));
-    const isOpen = openControlled ? Boolean(open) : internalOpen;
-    const shown = isOpen && live;
     const [query, setQuery] = useState(defaultSearchTerm || null);
     const filter = query ?? '';
     const [focused, setFocused] = useState(false);
 
     useEffect(() => { setQuery(defaultSearchTerm || null); }, [defaultSearchTerm]);
 
+    // Closing, whoever closed it: the typed text goes, and staged picks land.
+    const { isOpen, openList, closeList } = useOpenState({
+        open,
+        defaultOpen,
+        onOpenChange,
+        enabled: live,
+        onOpen: picked.beginStaging,
+        onClose: () => {
+            setQuery(null);
+            picked.endStaging();
+        },
+    });
+    const shown = isOpen && live;
+
     /* ---------- options: given, created, loaded ---------- */
-    const [created, setCreated] = useState([]);
-    const [loaded, setLoaded] = useState({ query: null, options: [], total: 0, busy: false });
-    const known = useRef(new Map());
-    const all = useMemo(
-        () => [...(loadOptions ? loaded.options : options), ...created],
-        [loadOptions, loaded.options, options, created]
-    );
-    all.forEach((option) => known.current.set(option.value, option));
-    const optionFor = (optionValue) => known.current.get(optionValue);
-    const textFor = (optionValue) => {
-        const option = optionFor(optionValue);
-        return option ? labelOf(option) : String(optionValue);
-    };
-
-    const searchFirst = !loadOptions && all.length > SEARCH_FIRST_ABOVE;
-    const typeable = searchable || creatable || searchFirst || Boolean(loadOptions);
-
-    /* ---------- loadOptions ---------- */
-    const request = useRef(0);
-    // Held in a ref, so an inline `loadOptions` does not refetch on every render.
-    const loadOptionsRef = useRef(loadOptions);
-    loadOptionsRef.current = loadOptions;
-    const hasLoader = Boolean(loadOptions);
-    const load = useCallback((text, offset) => {
-        const ticket = ++request.current;
-        setLoaded((prev) => ({ ...prev, busy: true, ...(offset === 0 ? { query: text } : {}) }));
-        Promise.resolve(loadOptionsRef.current(text, { offset, limit: PAGE_SIZE })).then((result) => {
-            if (ticket !== request.current) return;
-            setLoaded((prev) => ({
-                query: text,
-                options: offset === 0 ? result.options : [...prev.options, ...result.options],
-                total: result.total ?? result.options.length,
-                busy: false,
-            }));
-        }, () => {
-            if (ticket === request.current) setLoaded((prev) => ({ ...prev, busy: false }));
-        });
-    }, []);
-
-    useEffect(() => {
-        if (shown && hasLoader) load(filter, 0);
-    }, [shown, filter, hasLoader, load]);
-
-    const more = loadOptions && loaded.options.length < loaded.total;
-    const loadMore = () => {
-        if (more && !loaded.busy) load(filter, loaded.options.length);
-    };
+    const source = useOptionSource({ options, loadOptions, filter, shown, listId });
+    const { all, optionFor, textFor, paging } = source;
 
     /* ---------- what the list shows ---------- */
-    const atLimit = multi && maxSelections !== undefined && current.length >= maxSelections;
-    const limited = (option) => (atLimit && !current.includes(option.value) ? { ...option, disabled: true } : option);
+    const {
+        searchFirst, waitingForSearch, atLimit, listOptions, listFilter, selectable, offerSelectAll,
+    } = selectList({
+        all,
+        filter,
+        current,
+        multi,
+        maxSelections,
+        hasLoader: Boolean(loadOptions),
+        recent,
+        suggested,
+        optionFor,
+        selectAll,
+        live,
+    });
+    const typeable = searchable || creatable || searchFirst || Boolean(loadOptions);
 
-    let listOptions = all.map(limited);
-    let listFilter = filter;
-    if (searchFirst && !filter) {
-        const recentIds = recent || [];
-        const suggestedIds = (suggested || []).filter((v) => !recentIds.includes(v));
-        const pick = (ids, group) => ids.map(optionFor).filter(Boolean).map((option) => ({ ...limited(option), group }));
-        listOptions = [...pick(recentIds, 'Recent'), ...pick(suggestedIds, 'Suggested')];
-        listFilter = '';
-    }
-
-    const matches = useMemo(() => {
-        const q = filter.trim().toLowerCase();
-        return q ? all.filter((option) => labelOf(option).toLowerCase().includes(q)) : all;
-    }, [all, filter]);
-    const selectable = matches.filter((option) => !option.disabled);
-    const offerSelectAll = multi && selectAll && live && maxSelections === undefined
-        && selectable.length > 0 && selectable.length <= SEARCH_FIRST_ABOVE
-        && !(searchFirst && !filter);
-
-    /* ---------- open and close ---------- */
     const controlRef = useRef(null);
     const fieldRef = useRef(null);
     const listRef = useRef(null);
     const [activeId, setActiveId] = useState();
 
-    /** What opening does to the field, whoever opened it. */
-    const startOpen = () => {
-        if (multi && commitOnClose) setDraft(committedList);
-    };
-
-    /** What closing does: the typed text goes, and staged picks land. */
-    const finishClose = () => {
-        setQuery(null);
-        if (draft !== null) {
-            const changed = draft.length !== committedList.length || draft.some((v) => !committedList.includes(v));
-            setDraft(null);
-            if (changed) commit(draft);
-        }
-    };
-
-    const openList = () => {
-        if (!live || isOpen) return;
-        if (onOpenChange) onOpenChange(true);
-        if (openControlled) return;
-        startOpen();
-        setInternalOpen(true);
-    };
-
-    const closeList = () => {
-        if (!isOpen) return;
-        if (onOpenChange) onOpenChange(false);
-        if (openControlled) return;
-        setInternalOpen(false);
-        finishClose();
-    };
-
-    // A controlled `open` that changes runs the same opening and closing work.
-    const lastOpen = useRef(isOpen);
-    useEffect(() => {
-        const was = lastOpen.current;
-        lastOpen.current = isOpen;
-        if (!openControlled || was === isOpen) return;
-        if (isOpen) startOpen(); else finishClose();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isOpen]);
-
     /* ---------- choosing ---------- */
     const choose = (next) => {
-        if (multi && commitOnClose && isOpen) setDraft(next);
+        if (multi && commitOnClose && isOpen) picked.stage(next);
         else commit(next);
         if (!multi) closeList();
         else if (filter) setQuery(null);
     };
 
     const create = (text) => {
-        const option = { value: text, label: text };
-        setCreated((prev) => [...prev, option]);
-        known.current.set(text, option);
+        source.addCreated({ value: text, label: text });
         if (onCreate) onCreate(text);
         choose(multi ? [...current, text] : text);
     };
 
     const removeValue = (optionValue) => {
-        const next = current.filter((v) => v !== optionValue);
-        if (draft !== null) setDraft(next);
-        else commit(next);
+        picked.change(current.filter((v) => v !== optionValue));
     };
 
     const clear = () => {
         setQuery(null);
         // Staging for `commitOnClose`: the clear lands with the rest, on close.
-        if (draft !== null) setDraft([]);
-        else commit(empty);
+        picked.change(empty);
     };
 
     const toggleAll = () => {
@@ -275,7 +170,7 @@ const Select = ({
         const next = allPicked
             ? current.filter((v) => !ids.includes(v))
             : [...current, ...ids.filter((v) => !current.includes(v))];
-        if (multi && commitOnClose) setDraft(next);
+        if (multi && commitOnClose) picked.stage(next);
         else commit(next);
     };
 
@@ -289,25 +184,11 @@ const Select = ({
             ? prev.join('\u0000') === parentValue.join('\u0000')
             : prev === parentValue;
         if (!dependsOn || same) return;
-        setDraft(null);
+        picked.dropStaging();
         if (!isEmpty(committed)) commit(empty);
         // Only a change of parent clears; the child's own value is not a cause.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [parentValue]);
-
-    /* ---------- loadOptions: the next page on scroll ---------- */
-    const loadMoreRef = useRef(loadMore);
-    loadMoreRef.current = loadMore;
-    useEffect(() => {
-        if (!shown || !hasLoader) return undefined;
-        const body = document.getElementById(listId)?.closest('.plus-listbox-body');
-        if (!body) return undefined;
-        const onScroll = () => {
-            if (body.scrollHeight - body.scrollTop - body.clientHeight < LOAD_MORE_WITHIN) loadMoreRef.current();
-        };
-        body.addEventListener('scroll', onScroll);
-        return () => body.removeEventListener('scroll', onScroll);
-    }, [shown, hasLoader, listId]);
 
     /* ---------- events ---------- */
     const hasValue = !isEmpty(current);
@@ -456,47 +337,19 @@ const Select = ({
         );
     }
 
-    let chips = null;
-    if (multi && hasValue && displayMode === 'tags') {
-        chips = (
-            <TagGroup
-                className="plus-select-tags"
-                label={typeof label === 'string' ? label : props['aria-label']}
-                overflow={focused || shown ? 'wrap' : 'collapse'}
-                disabled={isDisabled}
-                onOverflowClick={live ? () => { openList(); controlRef.current?.focus(); } : undefined}
-            >
-                {current.map((v) => (
-                    <Tag
-                        key={v}
-                        color="grey"
-                        behavior={live ? 'removable' : 'read-only'}
-                        onRemove={live ? () => removeValue(v) : undefined}
-                    >
-                        {textFor(v)}
-                    </Tag>
-                ))}
-            </TagGroup>
-        );
-    } else if (multi && hasValue && displayMode === 'badges') {
-        chips = (
-            <div className="plus-select-badges">
-                {current.map((v) => (
-                    <Badge
-                        key={v}
-                        text={textFor(v)}
-                        dismissible={live}
-                        onDismiss={(event) => {
-                            if (event && event.stopPropagation) event.stopPropagation();
-                            removeValue(v);
-                        }}
-                        size="b2"
-                        style="secondary"
-                    />
-                ))}
-            </div>
-        );
-    }
+    const chips = multi && hasValue ? (
+        <SelectChips
+            displayMode={displayMode}
+            values={current}
+            textFor={textFor}
+            onRemove={removeValue}
+            live={live}
+            disabled={isDisabled}
+            label={typeof label === 'string' ? label : props['aria-label']}
+            collapsed={!(focused || shown)}
+            onOverflowClick={() => { openList(); controlRef.current?.focus(); }}
+        />
+    ) : null;
 
     const trailing = (
         <>
@@ -530,22 +383,22 @@ const Select = ({
                 Select all
             </button>
         );
-    } else if (searchFirst && !filter) {
+    } else if (waitingForSearch) {
         header = <span className="plus-select-hint">{`Type to search ${all.length} options`}</span>;
     }
 
     let footer = null;
     if (atLimit) {
         footer = <Listbox.Message kind="limit">{`You can pick up to ${maxSelections}`}</Listbox.Message>;
-    } else if (loadOptions && more) {
+    } else if (paging.more) {
         footer = (
-            <Listbox.Message kind={loaded.busy ? 'loading' : 'count'}>
-                {loaded.busy ? 'Loading more…' : `Showing ${loaded.options.length} of ${loaded.total}`}
+            <Listbox.Message kind={paging.busy ? 'loading' : 'count'}>
+                {paging.busy ? 'Loading more…' : `Showing ${paging.count} of ${paging.total}`}
             </Listbox.Message>
         );
     }
 
-    const listLoading = loading || (Boolean(loadOptions) && loaded.busy && loaded.options.length === 0);
+    const listLoading = loading || paging.firstPage;
 
     const wrapperClasses = [
         'plus-select-wrapper',
@@ -602,7 +455,7 @@ const Select = ({
                     header={header}
                     footer={footer}
                     loading={listLoading}
-                    emptyMessage={searchFirst && !filter ? 'Type to search' : 'No results'}
+                    emptyMessage={waitingForSearch ? 'Type to search' : 'No results'}
                 />
             </div>
             {name && (multi ? committedList : (isEmpty(committedList) ? [] : [committedList])).map((v) => (
@@ -612,6 +465,7 @@ const Select = ({
         </FieldStack>
     );
 };
+
 
 const valueType = PropTypes.oneOfType([PropTypes.string, PropTypes.number]);
 
