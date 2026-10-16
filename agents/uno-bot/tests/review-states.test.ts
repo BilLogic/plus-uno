@@ -316,7 +316,7 @@ describe("a decided card, opened from View", () => {
     const h = harness(threadState, now);
     await runReviewDecision(decide("confirm"), h.deps);
     t += PROPOSAL_TTL_MS + 1;
-    await runReviewOpen(open(BILL, { cardText: `${SHAREOUT_TEXT}\n:white_check_mark: Approved by <@${BILL}>` }), h.deps);
+    await runReviewOpen(open(BILL, { cardText: `${SHAREOUT_TEXT}\nApproved by <@${BILL}>` }), h.deps);
     const view = lastView(h);
     assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "success"], ["section", undefined]]);
     assert.match(view.blocks[1]!.text!.text, /no longer kept/);
@@ -350,6 +350,17 @@ describe("after a decision, and closed", () => {
     assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "info"], ["section", undefined]]);
     assert.equal(view.blocks[0]!.text!.text, "Sent back with your note.");
     assert.match(view.blocks[1]!.text!.text, /new card posts in the thread/);
+  });
+
+  it("answers Needs changes with no note with a warning alert, then how to send one", async () => {
+    const h = harness(await store());
+    await runReviewDecision(decide("revise", "   "), h.deps);
+    const view = lastView(h);
+    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "warning"], ["section", undefined]]);
+    assert.deepEqual(view.blocks.map((b) => b.text!.text), [
+      "Needs changes needs a note.",
+      "Press Review again, choose Needs changes and write what to change.",
+    ]);
   });
 
   it("says a card being revised is, then where to decide", async () => {

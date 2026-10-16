@@ -84,7 +84,7 @@ export const STATED_SUPERSEDED_POST =
  * what the markup sanitiser keeps (`SLACK_USER_ID`).
  */
 export function statedCancelledNote(words: Pick<StatedCardWords, "cancelled">, userId: string): string {
-  return `:no_entry: ${words.cancelled}${SLACK_USER_ID.test(userId) ? `, decided by <@${userId}>` : ""}.`;
+  return `${words.cancelled}${SLACK_USER_ID.test(userId) ? `, decided by <@${userId}>` : ""}.`;
 }
 
 /** The default narrative, when the winning signal brought no words of its own. */

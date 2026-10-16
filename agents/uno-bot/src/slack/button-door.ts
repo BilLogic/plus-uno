@@ -275,12 +275,12 @@ export async function applyPressVerdict(
   }
   const note =
     request.decision === "confirm"
-      ? `:white_check_mark: Approved by <@${request.userId}>`
+      ? `Approved by <@${request.userId}>`
       : pending.stated
         ? statedCancelledNote({ cancelled: statedCancelOf(pending)! }, request.userId)
         : rejected
-          ? `:no_entry: Rejected by <@${request.userId}>${rejected.reason ? `: ${escapeSlackText(rejected.reason)}` : ""}`
-          : `:no_entry: Cancelled by <@${request.userId}> — tell me what to change and I'll stage it again.`;
+          ? `Rejected by <@${request.userId}>${rejected.reason ? `: ${escapeSlackText(rejected.reason)}` : ""}`
+          : `Cancelled by <@${request.userId}> — tell me what to change and I'll stage it again.`;
   const words: { text: string; note: string; edited?: boolean } = deps.reword
     ? deps.reword(pending.proposalText, note)
     : { text: pending.proposalText, note };

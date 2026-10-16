@@ -2905,7 +2905,7 @@ test("a share-out card's summary names the work, not the raw place or channel th
   const h = harness({ shareoutReads: NAMED, replies: [{ text: "I'll share it.", toolCalls: [call] }] });
   const outcome = await runTurn(request({ text: "share the live app prototype in #design-crit" }), h.deps);
   const short = shortCardOf(renderProposalCard(outcome.staged!.card).text);
-  assert.equal(short?.summary, ":warning: Ready to *share this for feedback in <#C0CRIT0001|design-crit>*: high · Live app prototype");
+  assert.equal(short?.summary, "Ready to *share this for feedback in <#C0CRIT0001|design-crit>*: high · Live app prototype");
 });
 
 test("a share-out to a channel the asker is not in is refused plainly, and no card is staged", async () => {

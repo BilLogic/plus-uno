@@ -343,7 +343,7 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
   // Needs changes with nothing to change: Submit requires a note for it, so
   // only a blank one gets here. uno-bot never guesses at a revision.
   if (request.decision === "revise" && !note) {
-    await show(noticeView(card, ":warning: Needs changes needs a note. Press Review again, choose Needs changes and write what to change."));
+    await show(stateView(card, "warning", "Needs changes needs a note. Press Review again, choose Needs changes and write what to change."));
     return;
   }
 

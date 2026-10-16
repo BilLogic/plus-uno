@@ -172,6 +172,6 @@ describe("closing a share card", () => {
     await runReviewDecision(decide("cancel"), deps);
     assert.deepEqual(ran.map((v) => [v.outcome, v.decision]), [["won", "cancel"]]);
     assert.deepEqual(delivery.gateNotes, [{ kind: "resolved", decision: "cancel", rejected: {} }]);
-    assert.deepEqual(notes, [":no_entry: Rejected by <@U2>"]);
+    assert.deepEqual(notes, ["Rejected by <@U2>"]);
   });
 });

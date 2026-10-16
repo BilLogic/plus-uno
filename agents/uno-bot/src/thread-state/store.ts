@@ -667,7 +667,7 @@ export function changedReport(report: DecisionReportRecord, change: ReportChange
  */
 export interface StatedCardWords {
   /** What a ⛔ did, as a phrase with no person in it: "Rejected, nothing
-   *  filed". The card ends `:no_entry: <phrase>, decided by <@U>.` and the
+   *  filed". The card ends `<phrase>, decided by <@U>.` and the
    *  ⛔'s note in the thread is `<phrase>.` */
   cancelled: string;
   /** The answer to a ✅ or ⛔ that came after the card's window closed. */
