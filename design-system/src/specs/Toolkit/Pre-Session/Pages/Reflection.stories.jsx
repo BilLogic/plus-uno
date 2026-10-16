@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@/components/actions/Button/Button';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { StatCard } from '../Cards/OverviewCard.stories';
@@ -64,8 +64,8 @@ const MainContent = ({
                 <SectionTitle title="Session Reflections" titleAs="h2" />
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)' }}>
                     <CompletionFilter
-                        initialSelection={completionFilter}
-                        interactive={interactive}
+                        value={completionFilter}
+                        onChange={onCompletionFilterChange}
                     />
                 </div>
             </div>
@@ -137,7 +137,7 @@ export const Overview = () => (
                 selectedTab="reflections"
                 onTabChange={() => {}}
                 reflections={defaultReflections}
-                completionFilter="Incomplete"
+                completionFilter="incomplete"
                 onCompletionFilterChange={() => {}}
                 onAction={() => {}}
                 interactive={false}
@@ -156,7 +156,8 @@ export const Overview = () => (
  */
 const InteractiveRender = (args) => {
     const [selectedTab, setSelectedTab] = useState('reflections');
-    const completionFilter = args.completionFilter;
+    const [completionFilter, setCompletionFilter] = useState(args.completionFilter);
+    useEffect(() => setCompletionFilter(args.completionFilter), [args.completionFilter]);
     const [reflections, setReflections] = useState(defaultReflections);
 
     const tabs = [
@@ -169,9 +170,9 @@ const InteractiveRender = (args) => {
 
     // Filter reflections based on completion filter
     const filteredReflections = reflections.filter(r => {
-        if (completionFilter === 'Both') return true;
-        if (completionFilter === 'Incomplete') return r.status === 'incomplete';
-        if (completionFilter === 'Completed') return r.status === 'completed';
+        if (completionFilter === 'both') return true;
+        if (completionFilter === 'incomplete') return r.status === 'incomplete';
+        if (completionFilter === 'completed') return r.status === 'completed';
         return true;
     });
 
@@ -220,7 +221,7 @@ const InteractiveRender = (args) => {
                     onTabChange={setSelectedTab}
                     reflections={filteredReflections}
                     completionFilter={completionFilter}
-                    onCompletionFilterChange={() => {}}
+                    onCompletionFilterChange={setCompletionFilter}
                     onAction={handleAction}
                     interactive={true}
                 />
@@ -232,7 +233,7 @@ const InteractiveRender = (args) => {
 export const Interactive = {
     render: InteractiveRender,
     argTypes: {
-        completionFilter: { control: 'radio', options: ['Incomplete', 'Completed', 'Both'], name: 'Completion filter', table: { category: 'State' } },
+        completionFilter: { control: 'radio', options: ['incomplete', 'completed', 'both'], name: 'Completion filter', table: { category: 'State' } },
     },
-    args: { completionFilter: 'Incomplete' },
+    args: { completionFilter: 'incomplete' },
 };

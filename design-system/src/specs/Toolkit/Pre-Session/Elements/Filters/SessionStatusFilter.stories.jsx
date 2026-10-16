@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
+import { Select } from '@/components';
+import { FilterSelect } from './FilterSelect';
+import { playCommitsOnClose } from './filterPlay';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Session Status Filter',
-    component: Dropdown,
+    component: Select,
     tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
@@ -11,103 +13,83 @@ export default {
 };
 
 const defaultStatuses = [
-    { text: 'All status', value: 'all', counter: 20 },
-    { text: 'In progress', value: 'in-progress', counter: 20 },
-    { text: 'Starting soon', value: 'starting-soon', counter: 20 },
-    { text: 'Scheduled', value: 'scheduled', counter: 20 },
-    { text: 'Cancelled', value: 'cancelled', counter: 20 },
-    { text: 'Completed', value: 'completed', counter: 20 },
+    { value: 'in-progress', label: 'In progress', count: 20 },
+    { value: 'starting-soon', label: 'Starting soon', count: 20 },
+    { value: 'scheduled', label: 'Scheduled', count: 20 },
+    { value: 'cancelled', label: 'Cancelled', count: 20 },
+    { value: 'completed', label: 'Completed', count: 20 },
 ];
 
 /**
- * Session Status Filter Component
- * Dropdown for filtering by session status
- * Uses semantic tokens:
- * - Dropdown: style="secondary", fill="outline", size="small"
- * - Counter badges shown beside each option
- * - Gap: --size-element-gap-sm (when combined with other filters)
+ * Session status filter: pick any number of statuses, each row with its
+ * session count. No pick means every status, so the empty field reads
+ * "All status". The table refilters once, when the list closes.
  */
 export const SessionStatusFilter = ({
-    initialSelection = 'All status',
+    value,
+    defaultValue = [],
+    onChange,
+    open,
     statuses = defaultStatuses,
-    interactive = true,
-    isOpen,
-    showCounts = true
-}) => {
-    const [selected, setSelected] = useState(initialSelection);
+    showCounts = true,
+}) => (
+    <FilterSelect
+        aria-label="Session status"
+        mode="multi"
+        placeholder="All status"
+        options={statuses.map(({ count, ...status }) => ({
+            ...status,
+            trailing: showCounts && count !== undefined
+                ? <span className="filter-select-count">{count}</span>
+                : undefined,
+        }))}
+        value={value}
+        defaultValue={defaultValue}
+        onChange={onChange}
+        open={open}
+    />
+);
 
-    const dropdownItems = statuses.map(status => ({
-        text: status.text,
-        counter: showCounts ? status.counter : undefined,
-        selected: selected === status.text,
-        onClick: interactive ? () => {
-            setSelected(status.text);
-        } : undefined
-    }));
+/** Every state: all statuses, open with counts, and statuses picked. */
+export const Overview = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg)' }}>
+        <section>
+            <h6 className="h6 mb-3">Default state (closed)</h6>
+            <SessionStatusFilter />
+        </section>
+        <section style={{ paddingBottom: 'var(--size-section-gap-lg)' }}>
+            <h6 className="h6 mb-3">Open state (with counts)</h6>
+            <SessionStatusFilter open />
+        </section>
+        <section style={{ marginTop: 'var(--size-section-gap-lg)' }}>
+            <h6 className="h6 mb-3">In progress picked</h6>
+            <SessionStatusFilter defaultValue={['in-progress']} />
+        </section>
+        <section>
+            <h6 className="h6 mb-3">Completed and cancelled picked</h6>
+            <SessionStatusFilter defaultValue={['completed', 'cancelled']} />
+        </section>
+    </div>
+);
 
+/** Pick statuses; the filter applies when the list closes. */
+export const Interactive = () => {
+    const [statuses, setStatuses] = useState([]);
     return (
-        <Dropdown
-            buttonText={selected}
-            items={dropdownItems}
-            style="secondary"
-            fill="outline"
-            size="small"
-            isOpen={isOpen}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+            <SessionStatusFilter value={statuses} onChange={setStatuses} />
+            <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--color-on-surface)' }}>
+                    {statuses.length ? statuses.join(', ') : 'all status'}
+                </strong>
+            </p>
+        </div>
     );
 };
 
-/**
- * Overview - All States
- * Shows visual states of the Session Status Filter
- */
-export const Overview = () => (
-    <div
-        style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--size-section-gap-lg)'
-        }}
-    >
-        <section>
-            <h6 className="h6 mb-3">Default State (Closed)</h6>
-            <SessionStatusFilter initialSelection="All status" interactive={false} />
-        </section>
-
-        <section>
-            <h6 className="h6 mb-3">Open State (Dropdown Menu with Counts)</h6>
-            <div style={{ height: '280px' }}>
-                <SessionStatusFilter initialSelection="All status" interactive={false} isOpen={true} />
-            </div>
-        </section>
-
-        <section>
-            <h6 className="h6 mb-3">Selected Status - In Progress</h6>
-            <SessionStatusFilter initialSelection="In progress" interactive={false} />
-        </section>
-
-        <section>
-            <h6 className="h6 mb-3">Selected Status - Completed</h6>
-            <SessionStatusFilter initialSelection="Completed" interactive={false} />
-        </section>
-
-        <section>
-            <h6 className="h6 mb-3">Selected Status - Cancelled</h6>
-            <SessionStatusFilter initialSelection="Cancelled" interactive={false} />
-        </section>
-    </div>
-);
-
-/**
- * Interactive Demo
- * Allows user to interact with the filter
- */
-export const Interactive = () => (
-    <div>
-        <h6 className="h6 mb-3">Interactive Demo</h6>
-        <p className="body2-txt mb-4">
-            Select a session status from the dropdown to filter sessions.
-        </p>
-        <SessionStatusFilter />
-    </div>
-);
+Interactive.play = playCommitsOnClose({
+    name: 'Session status',
+    picks: [/^In progress/, /^Scheduled/],
+    before: 'all status',
+    after: 'in-progress, scheduled',
+});

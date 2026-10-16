@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/actions/Button/Button';
 import ChoiceGroup from '@/components/forms-and-inputs/ChoiceGroup';
-import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
+import { Select } from '@/components';
 
 /**
  * RequestTutorOffCanvas — the "Request tutor(s)" / "Request lead tutor" side sheet triggered
@@ -21,6 +21,8 @@ import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
  */
 
 const CLOSING_TIMES = ['12:05', '12:15', '12:30', '12:45'];
+/** Later closing times, offered under "Other". */
+const OTHER_CLOSING_TIMES = ['1:00', '1:15', '1:30'];
 
 const REASONS = [
     { id: 'fewer-tutors', label: 'Fewer tutors than expected' },
@@ -188,12 +190,14 @@ export const RequestTutorOffCanvas = ({
                         {CLOSING_TIMES.map((t) => (
                             <Chip key={t} selected={closesAt === t} onClick={() => setClosesAt(t)}>{t}pm</Chip>
                         ))}
-                        <Dropdown
-                            buttonText="Other"
+                        <Select
+                            aria-label="Other closing time"
+                            placeholder="Other"
                             size="small"
-                            style="secondary"
-                            fill="outline"
-                            items={['1:00', '1:15', '1:30'].map((t) => ({ label: `${t}pm`, selected: closesAt === t, onClick: () => setClosesAt(t) }))}
+                            options={OTHER_CLOSING_TIMES.map((t) => ({ value: t, label: `${t}pm` }))}
+                            value={OTHER_CLOSING_TIMES.includes(closesAt) ? closesAt : ''}
+                            onChange={setClosesAt}
+                            style={{ width: '8rem' }}
                         />
                     </div>
                 </div>

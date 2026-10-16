@@ -1,160 +1,77 @@
 import React, { useState } from 'react';
-import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
+import { Select } from '@/components';
+import { FilterSelect } from '../FilterSelect';
+import { playCommitsOnClose } from '../filterPlay';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Tutor Filter',
-    component: Dropdown,
+    component: Select,
     tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
     },
 };
 
-// Tutor options for the filter dropdown
-const tutorItems = [
-    { text: 'All tutors', selected: true },
-    { text: 'Elijah Booker' },
-    { text: 'Willow Klein' },
-    { text: 'Elias Thorne' },
-    { text: 'Brynn Barajas' },
+const tutorOptions = [
+    { value: 'elijah-booker', label: 'Elijah Booker' },
+    { value: 'willow-klein', label: 'Willow Klein' },
+    { value: 'elias-thorne', label: 'Elias Thorne' },
+    { value: 'brynn-barajas', label: 'Brynn Barajas' },
 ];
 
 /**
- * Reusable Tutor Filter Component
- * For use in pages and other compositions
+ * Tutor filter: pick any number of tutors. No pick means every tutor, so the
+ * empty field reads "All tutors". The table refilters once, when the list closes.
  */
-export const TutorFilter = ({ value = 'All tutors', onChange }) => {
-    const items = [
-        { text: 'All tutors', selected: value === 'All tutors', onClick: () => onChange?.('All tutors') },
-        { text: 'Elijah Booker', selected: value === 'Elijah Booker', onClick: () => onChange?.('Elijah Booker') },
-        { text: 'Willow Klein', selected: value === 'Willow Klein', onClick: () => onChange?.('Willow Klein') },
-        { text: 'Elias Thorne', selected: value === 'Elias Thorne', onClick: () => onChange?.('Elias Thorne') },
-        { text: 'Brynn Barajas', selected: value === 'Brynn Barajas', onClick: () => onChange?.('Brynn Barajas') },
-    ];
-    return (
-        <Dropdown
-            buttonText={value}
-            items={items}
-            size="small"
-            fill="outline"
-            style="secondary"
-        />
-    );
-};
+export const TutorFilter = ({ value, defaultValue = [], onChange, open, options = tutorOptions }) => (
+    <FilterSelect
+        aria-label="Tutors"
+        mode="multi"
+        placeholder="All tutors"
+        options={options}
+        value={value}
+        defaultValue={defaultValue}
+        onChange={onChange}
+        open={open}
+    />
+);
 
-/**
- * Overview - All States
- * Shows all visual states of the Tutor Filter dropdown
- * 
- * Uses design system Dropdown component with:
- * - size="small" for compact filter button
- * - fill="outline" for outlined button style
- * - style="secondary" for secondary color
- */
+/** Every state: all tutors, open, and one tutor picked. */
 export const Overview = () => (
-    <div
-        style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--size-section-gap-lg)'
-        }}
-    >
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg)' }}>
         <section>
-            <h6 className="h6 mb-3">Closed State (All Tutors)</h6>
-            <p className="body3-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-                The filter dropdown in its default closed state showing "All tutors".
-            </p>
-            <Dropdown
-                buttonText="All tutors"
-                items={tutorItems}
-                size="small"
-                fill="outline"
-                style="secondary"
-            />
+            <h6 className="h6 mb-3">Closed state (all tutors)</h6>
+            <TutorFilter />
         </section>
-
-        <section>
-            <h6 className="h6 mb-3">Open State</h6>
-            <p className="body3-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-                The filter dropdown in its open state showing the list of tutors.
-            </p>
-            <Dropdown
-                buttonText="All tutors"
-                items={tutorItems}
-                size="small"
-                fill="outline"
-                style="secondary"
-                isOpen={true}
-            />
+        <section style={{ paddingBottom: 'var(--size-section-gap-lg)' }}>
+            <h6 className="h6 mb-3">Open state</h6>
+            <TutorFilter open />
         </section>
-
         <section style={{ marginTop: 'var(--size-section-gap-lg)' }}>
-            <h6 className="h6 mb-3">Specific Tutor Selected</h6>
-            <p className="body3-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-                The filter dropdown with a specific tutor selected.
-            </p>
-            <Dropdown
-                buttonText="Elijah Booker"
-                items={[
-                    { text: 'All tutors' },
-                    { text: 'Elijah Booker', selected: true },
-                    { text: 'Willow Klein' },
-                    { text: 'Elias Thorne' },
-                    { text: 'Brynn Barajas' },
-                ]}
-                size="small"
-                fill="outline"
-                style="secondary"
-            />
+            <h6 className="h6 mb-3">Specific tutor picked</h6>
+            <TutorFilter defaultValue={['elijah-booker']} />
         </section>
     </div>
 );
 
-/**
- * Interactive Demo
- * Allows user to interact with the tutor filter
- */
+/** Pick tutors; the filter applies when the list closes. */
 export const Interactive = () => {
-    const [selectedTutor, setSelectedTutor] = useState('All tutors');
-
-    const handleSelect = (tutorName) => {
-        setSelectedTutor(tutorName);
-    };
-
-    const interactiveItems = [
-        { text: 'All tutors', selected: selectedTutor === 'All tutors', onClick: () => handleSelect('All tutors') },
-        { text: 'Elijah Booker', selected: selectedTutor === 'Elijah Booker', onClick: () => handleSelect('Elijah Booker') },
-        { text: 'Willow Klein', selected: selectedTutor === 'Willow Klein', onClick: () => handleSelect('Willow Klein') },
-        { text: 'Elias Thorne', selected: selectedTutor === 'Elias Thorne', onClick: () => handleSelect('Elias Thorne') },
-        { text: 'Brynn Barajas', selected: selectedTutor === 'Brynn Barajas', onClick: () => handleSelect('Brynn Barajas') },
-    ];
-
+    const [tutors, setTutors] = useState([]);
     return (
-        <div>
-            <h6 className="h6 mb-3">Interactive Demo</h6>
-            <p className="body2-txt mb-4">
-                Use the dropdown to filter tutors. Click on a tutor name to select it.
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+            <TutorFilter value={tutors} onChange={setTutors} />
+            <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--color-on-surface)' }}>
+                    {tutors.length ? tutors.join(', ') : 'all tutors'}
+                </strong>
             </p>
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--size-element-gap-md)'
-                }}
-            >
-                <Dropdown
-                    buttonText={selectedTutor}
-                    items={interactiveItems}
-                    size="small"
-                    fill="outline"
-                    style="secondary"
-                />
-                <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    Currently filtering by: <strong style={{ color: 'var(--color-on-surface)' }}>
-                        {selectedTutor}
-                    </strong>
-                </p>
-            </div>
         </div>
     );
 };
+
+Interactive.play = playCommitsOnClose({
+    name: 'Tutors',
+    picks: ['Willow Klein', 'Brynn Barajas'],
+    before: 'all tutors',
+    after: 'willow-klein, brynn-barajas',
+});

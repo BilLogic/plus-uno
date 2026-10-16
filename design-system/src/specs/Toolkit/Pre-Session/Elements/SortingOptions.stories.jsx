@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
+import { expect, userEvent, within } from 'storybook/test';
+import { Select } from '@/components';
 
 export default {
     tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Elements/Sorting Options',
-    component: Dropdown,
+    component: Select,
     parameters: {
         layout: 'padded',
         docs: {
             description: {
-                component: 'Sorting Options dropdown with dynamic ordering logic and 8 specific states.'
+                component: 'Sorting Options: two single Selects, what to sort by and in which order. The orders on offer follow the sort.'
             }
         }
     },
@@ -32,8 +33,7 @@ const SORT_CONFIG = {
         ]
     },
     bookmark: {
-        label: 'Bookmark',
-        listLabel: 'Bookmarked',
+        label: 'Bookmarked',
         orders: [
             { id: 'bookmarked_first', label: 'Bookmarked First' },
             { id: 'bookmarked_last', label: 'Bookmarked Last' }
@@ -48,128 +48,108 @@ const SORT_CONFIG = {
     }
 };
 
+const sortOptions = Object.entries(SORT_CONFIG).map(([value, { label }]) => ({ value, label }));
+
+/**
+ * Sorting Options — sort is one choice, so each half is a single Select.
+ * Changing what to sort by resets the order to that sort's first order.
+ */
 const SortingOptions = ({
-    initialOpen = false,
     initialSort = 'name',
-    initialOrder = 'az',
-    isInteractive = false
+    initialOrder,
+    openSort,
+    openOrder,
+    onChange,
 }) => {
-    const [activeSort, setActiveSort] = useState(initialSort);
-    const [activeOrder, setActiveOrder] = useState(initialOrder);
-    const [isOpen, setIsOpen] = useState(initialOpen);
+    const [sort, setSort] = useState(initialSort);
+    const [order, setOrder] = useState(initialOrder ?? SORT_CONFIG[initialSort].orders[0].id);
 
-    const handleSortChange = (sortKey) => {
-        if (!isInteractive) return;
-        setActiveSort(sortKey);
-        const defaultOrder = SORT_CONFIG[sortKey].orders[0].id;
-        setActiveOrder(defaultOrder);
+    const handleSortChange = (nextSort) => {
+        const nextOrder = SORT_CONFIG[nextSort].orders[0].id;
+        setSort(nextSort);
+        setOrder(nextOrder);
+        if (onChange) onChange({ sort: nextSort, order: nextOrder });
     };
 
-    const handleOrderChange = (orderId) => {
-        if (!isInteractive) return;
-        setActiveOrder(orderId);
-        setIsOpen(false);
+    const handleOrderChange = (nextOrder) => {
+        setOrder(nextOrder);
+        if (onChange) onChange({ sort, order: nextOrder });
     };
-
-    const currentLabel = SORT_CONFIG[activeSort].label;
-
-    // Construct items array for Dropdown
-    const sortKeys = Object.keys(SORT_CONFIG);
-    const lastSortKey = sortKeys[sortKeys.length - 1];
-
-    const items = [
-        // Sort By Section
-        { label: 'Sort by', header: true },
-        ...sortKeys.map(key => ({
-            label: SORT_CONFIG[key].listLabel || SORT_CONFIG[key].label,
-            selected: activeSort === key,
-            onClick: () => handleSortChange(key),
-            // Attach divider to the last item of this section to avoid creating an empty button for a standalone divider
-            divider: key === lastSortKey
-        })),
-
-        // Order Section
-        { label: 'Order', header: true },
-        ...SORT_CONFIG[activeSort].orders.map(order => ({
-            label: order.label,
-            selected: activeOrder === order.id,
-            onClick: () => handleOrderChange(order.id)
-        }))
-    ];
 
     return (
-        <Dropdown
-            buttonText={currentLabel}
-            items={items}
-            style="secondary"
-            fill={(isInteractive ? isOpen : initialOpen) ? "tonal" : "ghost"} // User Feedback: Open state = Pressed (Tonal), Closed = Text (Ghost)
-            isOpen={isInteractive ? isOpen : initialOpen}
-            onToggle={(val) => isInteractive && setIsOpen(val)}
-        />
+        <div className="d-flex align-items-center" style={{ gap: 'var(--size-element-gap-sm)' }}>
+            <Select
+                aria-label="Sort by"
+                size="small"
+                options={sortOptions}
+                value={sort}
+                onChange={handleSortChange}
+                open={openSort}
+                style={{ width: '10rem' }}
+            />
+            <Select
+                aria-label="Order"
+                size="small"
+                options={SORT_CONFIG[sort].orders.map(({ id, label }) => ({ value: id, label }))}
+                value={order}
+                onChange={handleOrderChange}
+                open={openOrder}
+                style={{ width: '14rem' }}
+            />
+        </div>
     );
 };
 
 export const Overview = () => (
-    <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-lg)', paddingBottom: '400px' }}>
-        {/* Closed States Row */}
+    <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-lg)', paddingBottom: '240px' }}>
         <section>
-            <h6 className="h6 mb-4 text-muted">Closed States</h6>
-            <div className="d-flex align-items-start flex-wrap" style={{ gap: 'var(--size-element-gap-md)' }}>
-                <div>
-                    <h6 className="text-muted mb-2" style={{ fontSize: '12px' }}>Name</h6>
-                    <SortingOptions initialOpen={false} initialSort="name" />
-                </div>
-                <div>
-                    <h6 className="text-muted mb-2" style={{ fontSize: '12px' }}>Status</h6>
-                    <SortingOptions initialOpen={false} initialSort="status" />
-                </div>
-                <div>
-                    <h6 className="text-muted mb-2" style={{ fontSize: '12px' }}>Bookmark</h6>
-                    <SortingOptions initialOpen={false} initialSort="bookmark" />
-                </div>
-                <div>
-                    <h6 className="text-muted mb-2" style={{ fontSize: '12px' }}>Progress</h6>
-                    <SortingOptions initialOpen={false} initialSort="progress" />
-                </div>
+            <h6 className="h6 mb-4 text-muted">Closed states</h6>
+            <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-md)' }}>
+                <SortingOptions initialSort="name" />
+                <SortingOptions initialSort="status" />
+                <SortingOptions initialSort="bookmark" />
+                <SortingOptions initialSort="progress" />
             </div>
         </section>
 
-        {/* Open States Row - Added large margin-bottom to individual items to reserve space for absolute menu */}
-        <section style={{ marginTop: 'var(--size-element-gap-lg)' }}>
-            <h6 className="h6 mb-4 text-muted">Open States</h6>
-            <div className="d-flex align-items-start flex-wrap" style={{ gap: 'var(--size-element-gap-md)' }}> {/* User Feedback: Use element gap tokens */}
-                <div style={{ paddingBottom: '320px', minWidth: '250px' }}> {/* Increased min-width */}
-                    <h6 className="text-muted mb-2" style={{ fontSize: '12px' }}>Name (Expanded)</h6>
-                    <SortingOptions initialOpen={true} initialSort="name" initialOrder="az" />
-                </div>
+        <section style={{ marginTop: 'var(--size-element-gap-lg)', paddingBottom: '200px' }}>
+            <h6 className="h6 mb-4 text-muted">Sort by, open</h6>
+            <SortingOptions initialSort="status" openSort />
+        </section>
 
-                <div style={{ paddingBottom: '320px', minWidth: '250px' }}>
-                    <h6 className="text-muted mb-2" style={{ fontSize: '12px' }}>Status (Expanded)</h6>
-                    <SortingOptions initialOpen={true} initialSort="status" initialOrder="doing_well" />
-                </div>
-
-                <div style={{ paddingBottom: '320px', minWidth: '250px' }}>
-                    <h6 className="text-muted mb-2" style={{ fontSize: '12px' }}>Bookmark (Expanded)</h6>
-                    <SortingOptions initialOpen={true} initialSort="bookmark" initialOrder="bookmarked_first" />
-                </div>
-
-                <div style={{ paddingBottom: '320px', minWidth: '250px' }}>
-                    <h6 className="text-muted mb-2" style={{ fontSize: '12px' }}>Progress (Expanded)</h6>
-                    <SortingOptions initialOpen={true} initialSort="progress" initialOrder="goal_not_met" />
-                </div>
-            </div>
+        <section style={{ paddingBottom: '160px' }}>
+            <h6 className="h6 mb-4 text-muted">Order, open</h6>
+            <SortingOptions initialSort="progress" initialOrder="goal_not_met" openOrder />
         </section>
     </div>
 );
 
-export const Interactive = () => (
-    <div className="border rounded" style={{ padding: 'var(--size-card-pad-y-lg)', minHeight: '500px' }}>
-        <h6 className="h6 mb-3">Interactive Demo</h6>
-        <p className="mb-3 text-muted" style={{ fontSize: '14px' }}>
-            Using Design System <code>Dropdown</code> component.
-        </p>
-        <div style={{ display: 'flex', gap: '20px' }}>
-            <SortingOptions isInteractive={true} initialSort="name" />
+export const Interactive = () => {
+    const [applied, setApplied] = useState({ sort: 'name', order: 'az' });
+    return (
+        <div className="border rounded" style={{ padding: 'var(--size-card-pad-y-lg)', minHeight: '400px' }}>
+            <h6 className="h6 mb-3">Interactive demo</h6>
+            <SortingOptions initialSort="name" onChange={setApplied} />
+            <p className="body3-txt mt-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+                Sorted by: <strong data-testid="applied" style={{ color: 'var(--color-on-surface)' }}>
+                    {`${applied.sort} ${applied.order}`}
+                </strong>
+            </p>
         </div>
-    </div>
-);
+    );
+};
+
+Interactive.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(document.body);
+    const applied = canvas.getByTestId('applied');
+
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Sort by' }));
+    await userEvent.click(await page.findByRole('option', { name: 'Progress' }));
+    await expect(applied).toHaveTextContent('progress goal_not_met');
+    await expect(canvas.getByRole('combobox', { name: 'Order' })).toHaveTextContent('Goal Not Met First');
+
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Order' }));
+    await userEvent.click(await page.findByRole('option', { name: 'Goal Met First' }));
+    await expect(applied).toHaveTextContent('progress goal_met');
+};

@@ -106,10 +106,7 @@ const MainContent = ({
                         onSelect={onCallOffStateChange}
                         interactive={interactive}
                     />
-                    <TimeframeFilter
-                        initialSelection={timeframe}
-                        interactive={interactive}
-                    />
+                    <TimeframeFilter defaultValue={timeframe} />
                 </div>
             </div>
 
@@ -193,7 +190,7 @@ export const Overview = () => (
                 callOffs={defaultPendingCallOffs}
                 callOffState="pending"
                 onCallOffStateChange={() => {}}
-                timeframe="This week"
+                timeframe="this_week"
                 onTimeframeChange={() => {}}
                 onAction={() => {}}
                 interactive={false}
@@ -214,7 +211,7 @@ export const Overview = () => (
 const InteractiveRender = (args) => {
     const [selectedTab, setSelectedTab] = useState('call-offs');
     const callOffState = args.callOffState;
-    const timeframe = 'This week';
+    const timeframe = 'this_week';
 
     const tabs = [
         { id: 'my-sessions', label: 'My sessions', count: 20 },
@@ -427,7 +424,7 @@ export const WithModals = (args) => {
                         callOffs={defaultPendingCallOffs}
                         callOffState={callOffState}
                         onCallOffStateChange={setCallOffState}
-                        timeframe="This week"
+                        timeframe="this_week"
                         onTimeframeChange={() => {}}
                         onAction={() => {}}
                         interactive={false}

@@ -84,9 +84,9 @@ const MainContent = ({
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <SectionTitle title="All Sessions" />
                 <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
-                    <SessionStatusFilter initialSelection={filters.status} />
+                    <SessionStatusFilter defaultValue={filters.status} />
                     <TutorFilter value={filters.tutor} onChange={(val) => onFilterChange?.('tutor', val)} />
-                    <SiteFilter initialSelection={filters.school} />
+                    <SiteFilter defaultValue={filters.school} />
                     <TimeframeFilter value={filters.timeframe} onChange={(val) => onFilterChange?.('timeframe', val)} />
                 </div>
             </div>
@@ -136,10 +136,10 @@ const defaultSessions = [
 ];
 
 const defaultFilters = {
-    status: 'All status',
-    tutor: 'All tutors',
-    school: 'All schools',
-    timeframe: 'This week'
+    status: [],
+    tutor: [],
+    school: [],
+    timeframe: 'this_week'
 };
 
 /**
