@@ -1,0 +1,131 @@
+/*
+ * Calendar — the month grid (Figma _Calendar and _Calendar Day).
+ *
+ * It sits in the _Listbox surface (`.plus-listbox`), which draws the panel.
+ * A calendar is a fixed six-week grid, so its popup lifts the listbox's
+ * height limits rather than scrolling.
+ */
+
+.plus-date-popup.plus-listbox {
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+}
+
+.plus-calendar {
+    --plus-calendar-day: 36px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--size-element-gap-sm);
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+}
+
+.plus-calendar--small {
+    --plus-calendar-day: 28px;
+}
+
+.plus-calendar--large {
+    --plus-calendar-day: 44px;
+}
+
+.plus-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+}
+
+.plus-calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: var(--size-element-radius-sm);
+    color: var(--color-on-surface-variant);
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--color-surface-container-high);
+    }
+}
+
+.plus-calendar-month {
+    margin: 0;
+    color: var(--color-on-surface);
+}
+
+.plus-calendar-weekdays,
+.plus-calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, var(--plus-calendar-day));
+    gap: var(--size-element-gap-xs);
+}
+
+.plus-calendar-weekday {
+    text-align: center;
+    color: var(--color-on-surface-variant);
+    font-weight: var(--font-weight-semibold-1);
+}
+
+.plus-calendar-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--plus-calendar-day);
+    height: var(--plus-calendar-day);
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--size-element-radius-sm);
+    color: var(--color-on-surface);
+    cursor: pointer;
+
+    &:hover:not(.plus-calendar-day--disabled):not(.plus-calendar-day--outside):not(.plus-calendar-day--selected) {
+        background-color: var(--color-surface-container-high);
+    }
+
+    // `--color-outline` measured 3.65:1 against the panel, under AA for 14px
+    // text. `--color-on-surface-variant` measures 7.66:1 and still reads
+    // lighter than the month's own days.
+    &--outside {
+        color: var(--color-on-surface-variant);
+        cursor: default;
+    }
+
+    &--today {
+        border: var(--size-element-stroke-sm) solid var(--color-primary-border);
+        color: var(--color-primary-text);
+    }
+
+    &--in-range {
+        background-color: var(--color-primary-state-12);
+    }
+
+    &--selected {
+        background-color: var(--color-primary);
+        color: var(--color-on-primary);
+    }
+
+    &--disabled {
+        opacity: var(--color-disabled-opacity);
+        cursor: not-allowed;
+    }
+}
+
+// Forced colours drop the fills; keep the picked day and the range readable.
+@media (forced-colors: active) {
+    .plus-calendar-day--selected {
+        forced-color-adjust: none;
+        background-color: Highlight;
+        color: HighlightText;
+    }
+
+    .plus-calendar-day--in-range {
+        outline: 1px dashed Highlight;
+    }
+}
