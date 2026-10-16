@@ -431,7 +431,18 @@ export interface RenderedCard {
 export function renderProposalCard(card: ProposalCard): RenderedCard {
   // A stated card's footer names every operation it runs, so it carries no
   // plan of its own (`ProposalCard.footer`).
-  if (card.kind === "stated") return { text: statedText(card) };
+  if (card.kind === "stated") {
+    const text = statedText(card);
+    if (!card.short) return { text };
+    // Short in the thread, as a turn's card is: the pop-up holds the rest.
+    const blocks = [
+      { type: "section", text: { type: "mrkdwn", text: card.short.summary } },
+      context(card.short.size),
+      context(footerNoteFor("full")),
+      ...proposalActionBlocks(),
+    ];
+    return { text, blocks };
+  }
   const body = card.kind === "revision" ? revisionText(card) : confirmText(card);
   const plan = withOperationPlan(body, card.operations, card.places);
   const followUp = plan.followUp ?? [];

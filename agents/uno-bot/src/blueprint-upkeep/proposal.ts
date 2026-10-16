@@ -35,7 +35,8 @@ import type { ModelProvider } from "../agent/model-provider";
 import type { OperationOutcome } from "../gate/index";
 import { readRevision, revisionCard, VARIANT_KIND, type BlueprintRevision } from "../blueprint-write/index";
 import { escapeSlackText } from "../slack/mrkdwn";
-import type { PendingProposal, StatedCardWords } from "../thread-state/index";
+import type { BlueprintProposalFacts, PendingProposal, StatedCardWords } from "../thread-state/index";
+import { proposalFacts } from "./facts";
 import type { ProposalCard } from "../turn/delivery";
 import { DRAFT_MAX_TOKENS, draftPrompt, readDraft, whyNoDraft, type DraftedChange, type PathToday } from "./draft";
 import type { ServiceChangeInput } from "./gate";
@@ -202,8 +203,14 @@ export function proposalOfferCard(draft: ProposalDraft): ProposalCard {
   const place = `${today.scenario} › ${today.path}`;
   const name = draft.revision.variant!.name;
   const at = (c: DraftedChange) => `${esc(c.step)} (${esc(c.lane)})`;
+  const n = draft.revision.rows.length;
+  // Short in the thread (§ B2); its Review draws the rest from its facts.
+  const short = {
+    summary: `*Draft as a blueprint proposal?* _${esc(today.scenario)} › ${esc(name)}_ · ${n} ${code(PROPOSED)} ${n === 1 ? "row" : "rows"}`,
+    size: `New ${code("path")} beside today's _${esc(today.path)}_ · only you can decide`,
+  };
   const lead = [
-    "*Draft this on the blueprint as a proposal?*",
+    "*Draft as a blueprint proposal?*",
     `*${esc(place)}* · a new ${code(PROPOSED)} ${code(VARIANT_KIND)} path beside it, “${esc(name)}”${today.link ? ` · <${today.link}|open today's path>` : ""}`,
     "*Proposed*",
     ...draft.changes.map((c) =>
@@ -215,7 +222,21 @@ export function proposalOfferCard(draft: ProposalDraft): ProposalCard {
     `*The ask:* Approve creates the path at ${code(PROPOSED)} and writes these cells on it, as uno-bot, all or nothing; today's path is not touched. Only the person who asked can approve; Reject, or no answer in ${PROPOSAL_CARD_TTL_MS / 3_600_000} h, writes nothing.`,
   ].join("\n");
   const operation = revisionCard(draft.revision, []).operations![0]!;
-  return { kind: "stated", verb: "draft this on the blueprint as a proposal", lead, footer: "", fields: [], caveats: [], operations: [operation] };
+  return { kind: "stated", verb: "draft this on the blueprint as a proposal", lead, footer: "", fields: [], caveats: [], operations: [operation], short };
+}
+
+/** The proposal as its Review pop-up draws it (`PendingProposal.facts`):
+ *  today's steps beside the idea's, and what the draft could not verify,
+ *  each moment it removes among them. */
+export function offerFacts(draft: ProposalDraft): BlueprintProposalFacts {
+  const removed = draft.removed.map((c) => `${c.step} (${c.lane}) no longer happens under the idea, so the new path leaves it empty.`);
+  return proposalFacts({
+    today: draft.comparison.today,
+    name: draft.revision.variant!.name,
+    changes: draft.changes,
+    rows: draft.revision.rows.length,
+    gaps: [...draft.gaps, ...removed],
+  });
 }
 
 /** The card's slot in its thread: one per scenario, as the comparison is. */
@@ -254,6 +275,7 @@ export function stagedProposalOffer(
     ttlMs: PROPOSAL_CARD_TTL_MS,
     supersedeKey: proposalSlotKey(draft.comparison.scenario),
     stated: PROPOSAL_CARD_WORDS,
+    facts: offerFacts(draft),
   };
 }
 

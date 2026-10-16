@@ -138,7 +138,7 @@ function world(opts: {
     }),
     readPath: async (cellId) => (cellId === "cell-2" ? PATH : null),
     provider: opts.model.provider,
-    ownerOf: async () => OWNER,
+    ownersOf: async () => [{ slack: OWNER }],
     placeOf: (card) => (card.pillars.includes("Tutoring") ? TEAM : DESIGN),
     leadId: BILL,
     state: state.store,

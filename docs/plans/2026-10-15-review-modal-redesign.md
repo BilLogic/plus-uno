@@ -4726,7 +4726,9 @@ everywhere, the posted card's summary line included.
   check is `tests/proposal-review.test.ts` extended per reader, plus a live
   open of each variant in the le goat DM, never in #plus-design.
 
-## Blueprint cards (specced in #1279, decided, not built)
+## Blueprint cards (specced in #1279, decided, built)
+
+**Built.** The cards below are built to this section: the facts in `agents/uno-bot/src/blueprint-upkeep/facts.ts`, the pop-up readings in `agents/uno-bot/src/slack/review-blueprint.ts` and the editable rows in `review-blueprint-fields.ts`, the sweep card in `blueprint-upkeep/card.ts` (`revisionItem`), the inline comparison in `blueprint-upkeep/milestone.ts` and the ✅ card in `blueprint-upkeep/proposal.ts`. Tests: `agents/uno-bot/tests/review-blueprint.test.ts` and `blueprint-upkeep-rulings.test.ts`. Where the build differs: a row's field is keyed by its place in the operation's rows (`0.rows.<i>.content`), so an edit is written where the writer reads it; the retirement card writes the path's status alone, so its Approve fits a press on a path of any size, and its note says each cell keeps its own status; steps past twelve are listed as text in one block under the drawn ones, not as inputs, since the whole diff is no longer posted in the thread; and a card's owners are its first three Contributors (`MAX_OWNERS`), since each one resolved costs subrequests on the night's budget.
 
 A separate session specced uno-bot keeping the service blueprint current
 (#1279). Its tickets add two kinds of card the anatomy above has not drawn

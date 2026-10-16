@@ -39,6 +39,7 @@ import {
 import { devLinksAnatomy, precedenceAnatomy, shareNoteAnatomy, tidyAnatomy } from "./review-stated";
 import { createFacts, notionCreateAnatomy, type NotionDatabaseLinks } from "./review-notion-create";
 import { archiveAnatomy, issueCreateAnatomy, issueUpdateAnatomy, workflowRunAnatomy } from "./review-draft-writes";
+import { blueprintReviseAnatomy } from "./review-blueprint";
 import type { ProposalOperation, StatedFacts } from "../thread-state/index";
 
 type Input = Record<string, unknown>;
@@ -465,6 +466,8 @@ const ANATOMY_READERS: Record<string, (input: Input, context: AnatomyContext) =>
   github_issue_update: issueUpdateAnatomy,
   github_workflow_run: workflowRunAnatomy,
   github_issue_create: issueCreateAnatomy,
+  // A blueprint revision or proposal, read off its facts (`review-blueprint.ts`).
+  blueprint_revise: blueprintReviseAnatomy,
 };
 
 /**

@@ -1,20 +1,24 @@
-// A reply in a revision card's thread redrafts that card's revision.
+// A correction to a revision card redrafts that card's revision.
 //
-// The morning's revision cards are numbered in their thread, and the thread
-// asks each card's owner what its draft could not verify. So a reply there
-// from someone who may approve a card is read as a correction to it:
-//   • Review's Needs changes on a card: its note, for that card;
-//   • a numbered reply — `2: …`, `2. …`, `#2 …` — for card 2;
-//   • any other reply, for the one open card its writer may approve; with
-//     several, they are asked which, by number.
+// The morning's revision cards share their thread with each other and with
+// the other sections' cards, and the thread asks each card's owner what its
+// draft could not verify. So what redrafts a card has to say which card:
+//   • Review's Needs changes on a card: its note, for that card — the
+//     unambiguous route;
+//   • a reply in the thread that names the card's path — `12+ hours ahead`,
+//     or `Call-off Request › 12+ hours ahead` where two scenarios share a
+//     path's name — from someone who may approve it, for that card; an older
+//     reply's number (`2: …`) still names the card at that place;
+//   • any other reply from someone who may approve an open card is asked
+//     which path it is about, however many cards are open.
 // A reply from anyone else, one that @mentions uno-bot, or a typed ✅/⛔ is
 // not a correction: it takes its ordinary path, and a thread shared with
-// other sections' cards stays the team's. A numbered reply from someone who
-// may not approve that card is told who can.
+// other sections' cards stays the team's. A reply naming a card its writer
+// may not approve is told who can.
 //
 // THE REDRAFT is the path read fresh and drafted again with the correction
 // (`./draft.ts`, grind then default with the note). It takes the old card's
-// place in its report under the same number (`replaceItem`), staged as a new
+// place in its report under the same entry (`replaceItem`), staged as a new
 // proposal with the same confirmers and the time the card had left. The old
 // card is retired first, so an Approve racing the reply never writes the
 // draft just pushed back on; a redraft that fails to stage puts it back.
@@ -31,7 +35,7 @@ import type { ModelProvider } from "../agent/model-provider";
 import { draftRevision, type PathToday } from "./draft";
 import { gapAskText, revisionItem, revisionTitle } from "./card";
 import { holdDeprecations, type PlannedRows } from "./stages";
-import { stagedRevision, type RevisionThread, type RevisionThreadCard, type RevisionThreads } from "./job";
+import { ownersOf, stagedRevision, type RevisionThread, type RevisionThreadCard, type RevisionThreads } from "./job";
 
 export interface RedraftDeps {
   threads: RevisionThreads;
@@ -104,26 +108,55 @@ export async function redraftRevision(deps: RedraftDeps, reply: RevisionReply): 
   } else {
     const bare = withoutMentions(reply.text);
     const m = NUMBERED.exec(bare) ?? HASHED.exec(bare);
+    const theirs = live.filter((l) => l.card.revision.confirmers.includes(reply.user));
+    let named: RevisionThreadCard | undefined;
     if (m && isWording(m[2]!)) {
       const n = Number(m[1]);
-      const card = thread.cards.find((c) => c.n === n);
-      if (!card) return say(`There's no blueprint revision ${n} in this thread.`);
-      chosen = live.find((l) => l.card.n === n);
-      if (!chosen) return say(`Revision ${n} has already been decided or has closed, so there's nothing to redraft.`);
-      if (!chosen.card.revision.confirmers.includes(reply.user)) return say(revisionRefusal(chosen.card.revision.confirmers, reply.user));
+      named = thread.cards.find((c) => c.n === n);
+      if (!named) return say(`There's no blueprint revision ${n} in this thread.`);
       wording = m[2]!.trim();
     } else {
-      const theirs = live.filter((l) => l.card.revision.confirmers.includes(reply.user));
-      if (!theirs.length) return false;
-      if (theirs.length > 1) {
-        const ns = theirs.map((l) => l.card.n);
-        return say(`Which revision is that about? Start the reply with its number, like \`${ns[0]}: …\` — open: ${ns.join(", ")}.`);
-      }
-      chosen = theirs[0]!;
+      const matches = namedCards(thread.cards, bare);
+      // Two paths of the same name, and the reply names neither scenario.
+      if (matches.length > 1) return theirs.length ? say(whichPath(theirs.map((l) => l.card))) : false;
+      named = matches[0];
       wording = bare;
     }
+    if (!named) return theirs.length ? say(whichPath(theirs.map((l) => l.card))) : false;
+    const card = named;
+    // A name in passing from someone who decides no card here is the team's talk.
+    if (!m && !theirs.length && !card.revision.confirmers.includes(reply.user)) return false;
+    const label = revisionTitle(card.revision.today);
+    chosen = live.find((l) => l.card.n === card.n);
+    if (!chosen) return say(`*${label}* has already been decided or has closed, so there's nothing to redraft.`);
+    if (!chosen.card.revision.confirmers.includes(reply.user)) return say(revisionRefusal(chosen.card.revision.confirmers, reply.user));
   }
   return redraft(deps, thread, chosen.card, chosen.pending, wording, note !== null);
+}
+
+/** Whether a text says a name as a whole: "Path 1" is not said by "Path 10". */
+function says(text: string, name: string): boolean {
+  const wanted = name.trim().toLowerCase().replace(/\s+/g, " ");
+  if (!wanted) return false;
+  const escaped = wanted.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(?<![\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`, "u").test(text.toLowerCase().replace(/\s+/g, " "));
+}
+
+/**
+ * The thread's cards a reply names by their path: `scenario › path` where it
+ * says that, else the path's own name. Several when it names a path's name two
+ * scenarios share.
+ */
+function namedCards(cards: readonly RevisionThreadCard[], text: string): RevisionThreadCard[] {
+  const full = cards.filter((c) => says(text, revisionTitle(c.revision.today)));
+  if (full.length) return full;
+  return cards.filter((c) => says(text, c.revision.today.path));
+}
+
+/** The thread's question back when a reply names no path. */
+function whichPath(open: readonly RevisionThreadCard[]): string {
+  const names = open.map((c) => `*${revisionTitle(c.revision.today)}*`);
+  return `Which blueprint path is that about? Name it in your reply, or use Needs changes on its card's Review. Open: ${names.join(", ")}.`;
 }
 
 async function redraft(
@@ -147,7 +180,7 @@ async function redraft(
   // A path's retirement is its status alone: approved or rejected, never redrafted.
   if (r.draft.retires) {
     await unlock();
-    return say(`${card.n}. *${label}* only sets the path's status, so there is nothing to redraft: approve it, or reject it to keep the path as it is.`);
+    return say(`*${label}* only sets the path's status, so there is nothing to redraft: approve it, or reject it to keep the path as it is.`);
   }
 
   let next: typeof r | null = null;
@@ -171,7 +204,7 @@ async function redraft(
   }
   if (!next) {
     await unlock();
-    return say(`I couldn't redraft ${card.n}. *${label}* with that, so it stays as it is.`);
+    return say(`I couldn't redraft *${label}* with that, so it stays as it is.`);
   }
 
   const ttlMs = Math.max(thread.expiresAt - deps.now(), 0);
@@ -180,7 +213,7 @@ async function redraft(
   const before = (await deps.reports.getReport(card.messageTs))?.entries.find((e) => e.id === card.itemId)?.item;
   const replaced = before
     ? await replaceItem(deps.reports, card.messageTs, card.itemId, {
-        ...revisionItem(next.source, next.today, next.draft, next, card.n),
+        ...revisionItem(next.source, next.today, next.draft, { owners: ownersOf(next), confirmers: next.confirmers }, next.view),
         ...(before.owners ? { owners: before.owners } : {}),
       })
     : null;
@@ -203,8 +236,8 @@ async function redraft(
     if (replaced && before) await deps.reports.updateReport(card.messageTs, { id: replaced.id, replace: { id: card.itemId, item: before } }).catch(() => null);
     return say(
       restored
-        ? `That redraft of ${card.n}. *${label}* didn't go through, so the revision before it still stands.`
-        : `That redraft of ${card.n}. *${label}* didn't go through, and the revision before it couldn't be put back, so there is none left to approve.`,
+        ? `That redraft of *${label}* didn't go through, so the revision before it still stands.`
+        : `That redraft of *${label}* didn't go through, and the revision before it couldn't be put back, so there is none left to approve.`,
     );
   }
   // A design hand-off's rows, as its deploy will promote them: the redraft's,
@@ -222,6 +255,6 @@ async function redraft(
     console.warn(`[blueprint-upkeep] ${label}'s card not redrawn: ${err instanceof Error ? err.message : String(err)}`);
   });
   await deps.superseded([old.proposalTs]);
-  const ask = gapAskText([{ n: card.n, label, gaps: next.draft.gaps, who: next.owner ?? next.confirmers[0] ?? null }]);
-  return say([`Redrafted ${card.n}. *${label}* with that correction, in its place.`, ...(ask ? [ask] : [])].join("\n"));
+  const ask = gapAskText([{ label, gaps: next.draft.gaps, who: next.owner ?? next.confirmers[0] ?? null }]);
+  return say([`Redrafted *${label}* with that correction, in its place.`, ...(ask ? [ask] : [])].join("\n"));
 }

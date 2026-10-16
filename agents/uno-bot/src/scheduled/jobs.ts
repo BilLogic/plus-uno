@@ -35,7 +35,6 @@ import {
   revisionSectionFor,
   runProposalOffersOnEnv,
   runRevisionPostOnEnv,
-  runRevisionThreadOnEnv,
   runShippedDraftOnEnv,
   runShippedMatchOnEnv,
 } from "../blueprint-upkeep/env";
@@ -325,13 +324,6 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // card's place.
   "blueprint-revision-post": async (env, job, ctx) => {
     const report = await runRevisionPostOnEnv(env, ctx);
-    console.log(`[blueprint-upkeep] ${job.key}: ${report.summary}`);
-    return report;
-  },
-  // Morning, after the sweep's post: the revisions a carousel had no room
-  // for, up in its message's thread.
-  "blueprint-revision-thread": async (env, job, ctx) => {
-    const report = await runRevisionThreadOnEnv(env, ctx);
     console.log(`[blueprint-upkeep] ${job.key}: ${report.summary}`);
     return report;
   },

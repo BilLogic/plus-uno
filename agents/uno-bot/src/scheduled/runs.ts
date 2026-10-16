@@ -105,12 +105,12 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * Dev Mode links card for the PRs merged into main since the last one that
  * changed a design-system component (src/figma-links/feed.ts), while
  * `FIGMA_DEV_LINKS` is on (src/figma-links/morning.ts).
- * Blueprint upkeep's four: the end-of-day `blueprint-shipped` jobs weigh the
+ * Blueprint upkeep's: the end-of-day `blueprint-shipped` jobs weigh the
  * Roadmap cards deployed since the last run and queue each path a card
  * changes, and the `blueprint-draft` jobs draft each path's blueprint
  * revision; the morning `blueprint-revision-post` hands each to the sweep's
- * message at its card's place, and `blueprint-revision-thread` puts the ones
- * its carousel had no room for in its thread (src/blueprint-upkeep/). The
+ * message at its card's place, where the ones its carousel has no room for
+ * wait for the next morning (src/blueprint-upkeep/). The
  * morning `blueprint-proposal-offer` hands the sweep's message, once, the
  * removal offer of each proposal drawn on the blueprint that no Roadmap card
  * was linked to within 30 days, as a section in the proposal's own thread,
@@ -153,7 +153,6 @@ export type ScheduledJobKind =
   | "blueprint-shipped"
   | "blueprint-draft"
   | "blueprint-revision-post"
-  | "blueprint-revision-thread"
   | "blueprint-proposal-offer";
 
 /** One unit of a run — one alarm's work. */
@@ -280,9 +279,6 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "blueprint-proposal-offer", kind: "blueprint-proposal-offer" },
     // After every hand-over: a job not planned today counts as done.
     { key: "sweep-post", kind: "sweep-post", after: [...MORNING_SECTIONS] },
-    // After the sweep's post and the place jobs it spawns, which run right
-    // behind it: the revisions a carousel had no room for, in its thread.
-    { key: "blueprint-revision-thread", kind: "blueprint-revision-thread", after: ["sweep-post"] },
     { key: "team-roles-sync", kind: "team-roles-sync" },
     // Both runs purge, so no text outlives 14 days across a weekend and one
     // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).

@@ -8,16 +8,24 @@
 //   5. confidence  — the draft's confidence, and what it could not verify
 //   6. the ask     — who may approve, by Slack mention, and what approving writes
 //
+// That text is the card's thread and notification copy, and what View shows
+// once the proposal is gone. The morning card itself (`revisionItem`) is
+// short, and the Review pop-up draws the revision from its facts
+// (`./facts.ts`, `slack/review-blueprint.ts`), never from this text.
+//
 // ADR-023: the why-now line speaks the Roadmap's words (`Dev Status:
 // Deployed`, an RM-ID) and every other part the blueprint's (step, lane, path,
-// its statuses). Frame words render as code, so neither vocabulary's word is
-// read as plain English.
+// its statuses). Frame words render as code wherever the block takes code —
+// mrkdwn and rich text — so neither vocabulary's word is read as plain
+// English; a card's title and body, a header, an alert and an option's
+// description are plain text, and say them plain.
 
 import { escapeSlackText } from "../slack/mrkdwn";
-import type { ReportItem } from "../thread-state/index";
+import type { CardOwner, ReportItem } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import type { ProposalOperation } from "../thread-state/index";
 import type { Draft, DraftedChange, PathToday } from "./draft";
+import { countsLine, countsOf, roadmapId } from "./facts";
 
 /** The shipped card a revision came from, as the card names it. */
 export interface RevisionSource {
@@ -140,44 +148,58 @@ export function revisionItemId(source: Pick<RevisionSource, "pageId">, path: Pic
   return `rev-${source.pageId}-${path.pathId}`;
 }
 
+/** Whether the shipping moment is the design hand-off rather than the deploy. */
+const handedOff = (source: Pick<RevisionSource, "status">) => source.status.property === "Design Status";
+
+/** The moment, as the card says it: "deployed", "handed off". */
+function moment(source: Pick<RevisionSource, "status">): string {
+  return handedOff(source) ? "handed off" : "deployed";
+}
+
+/** What changes and how much, plain, for a card's body: "2 added, 1
+ *  changed, 1 deprecated · 2 questions." A retirement says so. */
+export function revisionBody(draft: Draft): string {
+  const counts = countsOf(draft.changes);
+  const what = draft.retires
+    ? `Retires the path and its ${counts.deprecated} ${counts.deprecated === 1 ? "row" : "rows"}`
+    : countsLine(counts) || "The path's status only";
+  const asks = draft.gaps.length ? ` · ${draft.gaps.length} ${draft.gaps.length === 1 ? "question" : "questions"}` : "";
+  return `${what}${asks}.`;
+}
+
 /**
- * The revision as one card of the morning message.
+ * The revision as one card of the morning message (§ A1): `scenario › path`
+ * as its title; the RM-ID, the moment and the status written in its
+ * subtitle, after its owners' tags; what changes in its body; View slice
+ * and the RM-ID as its buttons.
  *
  * @param source - The shipped card
  * @param path - Today's path
  * @param draft - The drafted revision
- * @param people - The card owner's Slack id, when known, and who may approve
- * @param n - Its number in the thread, which a reply names it by
+ * @param people - The Roadmap card's Contributors and who may approve
+ * @param view - Where View slice opens; today's path when absent
  */
 export function revisionItem(
   source: RevisionSource,
   path: PathToday,
   draft: Draft,
-  people: { owner: string | null; confirmers: readonly string[] },
-  n?: number,
+  people: { owners: readonly CardOwner[]; confirmers: readonly string[] },
+  view?: string,
 ): ReportItem {
-  const { owner } = people;
-  const counts = (["added", "changed", "deprecated", "promoted"] as const)
-    .map((k) => [k, draft.changes.filter((c) => c.kind === k).length] as const)
-    .filter(([, n]) => n > 0)
-    .map(([k, n]) => `${n} ${k}`);
+  const c = change(draft);
+  const status = c.from ? `${code(c.from)} → ${code(c.to)}` : code(c.to);
+  const rm = roadmapId(source);
   return {
     id: revisionItemId(source, path),
-    title: `${n !== undefined ? `${n}. ` : ""}${revisionTitle(path)} · ${titleChange(draft)}`,
-    subtitle: `${source.number !== null ? `RM-${source.number}` : esc(source.title)} · ${code(`${source.status.property}: ${source.status.value}`)}`,
-    ...(owner ? { owners: [{ slack: owner }] } : {}),
-    body: `${[...counts, ...(draft.retires ? ["path retired"] : [])].join(" · ")} · confidence ${draft.confidence.toFixed(1)}${draft.gaps.length ? ` · ${draft.gaps.length} to verify` : ""}`,
-    open: { label: "Blueprint", url: path.link ?? source.url },
-    also: { label: "Roadmap card", url: source.url },
-    done: `written to the blueprint as uno-bot.`,
+    title: revisionTitle(path),
+    subtitle: `${source.number !== null ? code(rm) : esc(rm)} ${moment(source)} · ${status}`,
+    ...(people.owners.length ? { owners: [...people.owners] } : {}),
+    body: revisionBody(draft),
+    open: { label: "View slice", url: view ?? path.link ?? source.url },
+    also: { label: source.number !== null ? rm : "Roadmap card", url: source.url },
+    done: draft.retires ? `${path.path} set to deprecated.` : `${countsLine(countsOf(draft.changes)) || "the path's status"}.`,
     detail: revisionText(source, path, draft, people.confirmers),
   };
-}
-
-/** The item title's status change: `from → to`, or `cells`. */
-function titleChange(draft: Draft): string {
-  const c = change(draft);
-  return c.from ? `${c.from} → ${c.to}` : "cells";
 }
 
 /** The card the Gate stages: stated, the whole text as its lead. */
@@ -199,25 +221,35 @@ export function revisionProposalCard(
   };
 }
 
-/** The opener's words for a section's cards. */
-export function revisionParent(count: number): string {
-  return count === 1
-    ? "Shipped work changed the service: one blueprint revision to approve."
-    : `Shipped work changed the service: ${count} blueprint revisions to approve.`;
+/**
+ * What the opener says of a person's revision cards, where Slack notifies:
+ * "`RM-2567` is deployed: 1 blueprint `path` to revise." Several cards name
+ * each RM-ID once; a mix of moments reads "shipped".
+ *
+ * @param sources - Each card's shipped Roadmap card, one per path
+ */
+export function revisionSays(sources: ReadonlyArray<Pick<RevisionSource, "pageId" | "number" | "title" | "status">>): string {
+  const cards = [...new Map(sources.map((s) => [s.pageId, s])).values()];
+  const ids = cards.map((s) => (s.number !== null ? code(roadmapId(s)) : esc(s.title)));
+  const named = ids.length <= 1 ? (ids[0] ?? "Shipped work") : `${ids.slice(0, -1).join(", ")} and ${ids.at(-1)!}`;
+  const moments = new Set(cards.map(moment));
+  const verb = moments.size > 1 ? "shipped" : `${cards.length > 1 ? "are" : "is"} ${[...moments][0] ?? "deployed"}`;
+  const n = sources.length;
+  return `${named} ${verb}: ${n} blueprint ${code("path")}${n === 1 ? "" : "s"} to revise.`;
 }
 
 /** One card's gaps, as the thread's ask names them. */
 export interface GapAsk {
-  n: number;
   label: string;
   gaps: string[];
-  /** Who is asked: the Roadmap card's owner, else the lead. */
+  /** Who is asked: the Roadmap card's first Contributor in Slack, else the lead. */
   who: string | null;
 }
 
 /**
  * The thread's ask about what the drafts could not verify: one line per card
- * with gaps, tagging the person who can answer it. Null when no card has any.
+ * with gaps, naming its path and tagging the person who can answer it. Null
+ * when no card has any.
  *
  * @param asks - Each card's gaps
  */
@@ -226,14 +258,7 @@ export function gapAskText(asks: readonly GapAsk[]): string | null {
     .filter((a) => a.gaps.length)
     .map(
       (a) =>
-        `${a.who ? `<@${a.who}> ` : ""}On ${a.n}. *${esc(a.label)}*, I couldn't verify: ${a.gaps.map(esc).join("; ")}. Reply here with what's right and I'll redraft that revision.`,
+        `${a.who ? `<@${a.who}> ` : ""}On *${esc(a.label)}*, I couldn't verify: ${a.gaps.map(esc).join("; ")}. Answer in Needs changes on its Review, or reply here naming the path, and I'll redraft it.`,
     );
   return lines.length ? lines.join("\n") : null;
-}
-
-/** The thread message that carries the cards the morning's carousel had no room for. */
-export function overflowParent(count: number): string {
-  return count === 1
-    ? "One more blueprint revision from shipped work, which the report above had no room for."
-    : `${count} more blueprint revisions from shipped work, which the report above had no room for.`;
 }
