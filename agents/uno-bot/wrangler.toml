@@ -163,6 +163,11 @@ NOTION_BANNERS_DB_ID = "36eb7cca-4982-81f4-ad99-e53e62d9506a"
 # uno-blueprint Supabase project URL (source of truth, D8). Non-secret — the
 # read-only anon key is set separately via `wrangler secret put SUPABASE_ANON_KEY`.
 SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"
+# The uno-bot Auth user on that project — the blueprint WRITE identity, an
+# rpc_writer (authoring RPCs only, deletes included; no table writes). Public on
+# purpose: its password is the secret SUPABASE_WRITE_PASSWORD, set with
+# scripts/blueprint-writer-wizard.sh.
+SUPABASE_WRITE_EMAIL = "uno-bot@uno-blueprint.local"
 # blueprint_search engine: "on" (default) = semantic (vector) search over the
 # semantic_search.corpus_chunks index, with keyword search as the fallback;
 # "off" = keyword only. Vector needs an embedding credential (the Vertex SA, same
@@ -419,6 +424,12 @@ STANDING_CONFIRMER_IDS = "U03FYQJRQHX,U09E652SJ02"
 #       read-only anon key for the uno-blueprint project. Unset,
 #       search_blueprint reports "not configured" and the bot falls back
 #       to cited docs rather than fabricating.
+#   SUPABASE_WRITE_PASSWORD [optional]
+#       password of the uno-bot Auth user (SUPABASE_WRITE_EMAIL in [vars])
+#       on the uno-blueprint project, an rpc_writer: it signs in for a
+#       one-hour JWT that opens the authoring RPCs and no table. Set it
+#       with scripts/blueprint-writer-wizard.sh. Unset, the bot cannot
+#       write the blueprint and reads are unaffected.
 #   GEMINI_API_KEY [DO NOT SET]
 #       AI Studio key — must NOT be set on the Worker (ADR-018,
 #       2026-07-16). The Vertex SA above is canonical and takes precedence
