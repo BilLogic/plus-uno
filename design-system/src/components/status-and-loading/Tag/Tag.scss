@@ -12,7 +12,7 @@
  * selected border), the hue's 08, 12 and 16 state layers, and the avatar fill
  * (the hue's Container) for the avatar types. Each hue borrows
  * the curriculum token whose color it names; teal is Tertiary, never Info.
- * Grey is not a hue: its border is Outline Variant, its swatch and selected
+ * Gray is not a hue: its border is Outline Variant, its swatch and selected
  * border are Outline, its state layers are on-surface-variant, and its avatar
  * fill is Surface Container High.
  * The map holds whole `var()` references so the generated docs list them.
@@ -27,7 +27,7 @@
 @use '../label-heights' as label;
 
 $tag-colors: (
-    'grey': (
+    'gray': (
         var(--color-outline-variant, #bec8ca),
         var(--color-outline, #6f797a),
         var(--color-on-surface-variant-state-08, rgba(63, 72, 74, 0.08)),
@@ -150,21 +150,21 @@ $tag-colors: (
 .plus-tag--person,
 .plus-tag--agent,
 .plus-tag--team {
-    @include tag-color-vars(map-get($tag-colors, 'grey'), $with-avatar: false);
+    @include tag-color-vars(map-get($tag-colors, 'gray'), $with-avatar: false);
 }
 
 /*
- * Grey avatars, as the Figma set draws them: a grey agent sits on the
- * Mastering Content Container (the AI purple) and a grey team on Technology
+ * Gray avatars, as the Figma set draws them: a gray agent sits on the
+ * Mastering Content Container (the AI purple) and a gray team on Technology
  * Tools 08, so neither reads as a person's neutral disc.
  * The team's state layer at rest is a named exception in
  * guidelines/foundations/color.md.
  */
-.plus-tag--grey.plus-tag--agent {
+.plus-tag--gray.plus-tag--agent {
     --plus-tag-avatar: var(--color-mastering-content-container, #f2daff);
 }
 
-.plus-tag--grey.plus-tag--team {
+.plus-tag--gray.plus-tag--team {
     --plus-tag-avatar: var(--color-technology-tools-state-08, rgba(0, 92, 189, 0.08));
 }
 
@@ -465,7 +465,7 @@ $tag-colors: (
 
 /*
  * A disabled avatar's fill and initials follow the tag's own. Saving keeps its
- * clear ground, so the spinner never sits on a grey disc.
+ * clear ground, so the spinner never sits on a gray disc.
  */
 .plus-tag--disabled .plus-tag__avatar:not(.plus-tag__avatar--saving) {
     background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));

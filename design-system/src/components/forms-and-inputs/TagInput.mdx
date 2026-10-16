@@ -37,7 +37,7 @@ export const figmaMeta = {
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19150-44293",
       "source": "manual",
       "status": "unpublished",
-      "notes": "The menu a TagInput row's \"…\" opens: a `_Listbox` whose Header holds a small field for the name, the Figma Form (code: `Input size=\"small\"`, Enter renames, Esc cancels), and whose Body holds Dropdown list Item rows: Delete with a trash icon and a divider, then a Colour heading and one row per Tag colour showing the Tag, the current one `state=selected`. It opens 4px under the \"…\", right-aligned to it. Each part shows only when its handler is passed."
+      "notes": "The menu a TagInput row's \"…\" opens: a `_Listbox` whose Header holds a small field for the name, the Figma Form (code: `Input size=\"small\"`, Enter renames, Esc cancels), and whose Body holds Dropdown list Item rows: Delete with a trash icon and a divider, then a Color heading and one row per Tag color showing the Tag, the current one `state=selected`. It opens 4px under the \"…\", right-aligned to it. Each part shows only when its handler is passed."
     }
   ]
 };
@@ -73,13 +73,13 @@ from a list or adds, such as the topics a session covers.
 
 <div className="sb-ds-doc-section">
 
-## Behaviour
+## Behavior
 
 <DocsCanvasShell description={<>Typing filters the list and highlights the first match. Enter or a click adds it.</>}>
     <DsCanvasQuiet of={TagInputStories.TypingFilters} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>When nothing matches, Create is highlighted and Enter adds the text as a new tag in a random Tag colour.</>}>
+<DocsCanvasShell description={<>When nothing matches, Create is highlighted and Enter adds the text as a new tag in a random Tag color.</>}>
     <DsCanvasQuiet of={TagInputStories.CreateWhenNothingMatches} />
 </DocsCanvasShell>
 
@@ -95,7 +95,7 @@ from a list or adds, such as the topics a session covers.
     <DsCanvasQuiet of={TagInputStories.PickLimit} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Option menu: with `onRename`, `onDelete` or `onColorChange`, the row under the pointer or the highlight shows a "…". It opens a menu to rename the option, delete it, or pick one of Tag's seven colours.</>}>
+<DocsCanvasShell description={<>Option menu: with `onRename`, `onDelete` or `onColorChange`, the row under the pointer or the highlight shows a "…". It opens a menu to rename the option, delete it, or pick one of Tag's seven colors.</>}>
     <DsCanvasQuiet of={TagInputStories.OptionMenu} />
 </DocsCanvasShell>
 
@@ -184,14 +184,14 @@ focusing it opens the list of options under it.
 ### The caller owns the options, and stores what is created.
 
 `options` is required. When the person creates a value, `onCreate` reports it
-once, with the colour it was given. Store both on a new option, so the colour
+once, with the color it was given. Store both on a new option, so the color
 stays the same everywhere the tag appears.
 
 ```jsx
-// Incorrect — the created value is never stored, so its colour is lost on the next render.
+// Incorrect — the created value is never stored, so its color is lost on the next render.
 <TagInput label="Topics" options={topics} />
 
-// Correct — the new value joins the options with its colour.
+// Correct — the new value joins the options with its color.
 <TagInput
     label="Topics"
     options={topics}
@@ -246,15 +246,15 @@ A field with none of them works as before, with no "…" and no handle.
 ```
 
 - **Delete** also removes a picked tag made from that option, through
-  `onChange` and `onRemove`. Rename and a colour change update that tag too.
+  `onChange` and `onRemove`. Rename and a color change update that tag too.
 - **Reorder** works on the whole list, so the handles hide while text is
   typed. `onReorder(fromIndex, toIndex)` gives places in `options`.
 
-### A tag's colour is a Tag colour.
+### A tag's color is a Tag color.
 
 The status names the chips once took (`success`, `danger` and the rest) are
 deprecated aliases and warn in development. A tag is a category, so it takes a
-Tag colour.
+Tag color.
 
 ### The keys behave as in Notion.
 

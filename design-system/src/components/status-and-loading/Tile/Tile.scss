@@ -22,14 +22,14 @@ $tile-sizes: (
 /*
  * The color names follow the Tag color set in the label spec, where yellow
  * replaces orange. Each hue name borrows the curriculum hue whose color it
- * names; grey is not a hue, so it names its neutral pairs directly.
+ * names; gray is not a hue, so it names its neutral pairs directly.
  *
  * Per name: subtle icon ground, subtle icon glyph, bold icon ground, bold icon
  * glyph, logo ground. A logo keeps its own colors, so it takes a ground only.
  * The map holds whole `var()` references so the generated docs can list them.
  */
 $tile-colors: (
-    'grey': (var(--color-surface-container-high), var(--color-on-surface-variant), var(--color-inverse-surface), var(--color-inverse-on-surface), var(--color-surface-container)),
+    'gray': (var(--color-surface-container-high), var(--color-on-surface-variant), var(--color-inverse-surface), var(--color-inverse-on-surface), var(--color-surface-container)),
     'blue': (var(--color-technology-tools-container), var(--color-on-technology-tools-container), var(--color-technology-tools), var(--color-on-technology-tools), var(--color-technology-tools-container)),
     'green': (var(--color-advocacy-container), var(--color-on-advocacy-container), var(--color-advocacy), var(--color-on-advocacy), var(--color-advocacy-container)),
     'purple': (var(--color-mastering-content-container), var(--color-on-mastering-content-container), var(--color-mastering-content), var(--color-on-mastering-content), var(--color-mastering-content-container)),

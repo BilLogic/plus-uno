@@ -123,14 +123,14 @@ export const IconSubtle = () => (
 );
 
 /**
- * Subtle is the color's Container with its on-container glyph. Grey has no
+ * Subtle is the color's Container with its on-container glyph. Gray has no
  * container of its own, so it takes surface-container-high and on-surface-variant.
  */
 IconSubtle.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     for (const color of ICON_COLORS) {
         const tile = canvas.getByTestId(`tile-${color}`);
-        const [ground, ink] = color === 'grey'
+        const [ground, ink] = color === 'gray'
             ? ['--color-surface-container-high', '--color-on-surface-variant']
             : [`--color-${HUE[color]}-container`, `--color-on-${HUE[color]}-container`];
         await expect(getComputedStyle(tile).backgroundColor, `${color} ground`).toBe(tokenColor(canvasElement, ground));
@@ -147,14 +147,14 @@ export const IconBold = () => (
 );
 
 /**
- * Bold is the solid color with its on-color glyph. Grey bold is the inverse
- * surface, so a bold grey tile reads as dark rather than as a darker grey.
+ * Bold is the solid color with its on-color glyph. Gray bold is the inverse
+ * surface, so a bold gray tile reads as dark rather than as a darker gray.
  */
 IconBold.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     for (const color of ICON_COLORS) {
         const tile = canvas.getByTestId(`tile-${color}`);
-        const [ground, ink] = color === 'grey'
+        const [ground, ink] = color === 'gray'
             ? ['--color-inverse-surface', '--color-inverse-on-surface']
             : [`--color-${HUE[color]}`, `--color-on-${HUE[color]}`];
         await expect(getComputedStyle(tile).backgroundColor, `${color} ground`).toBe(tokenColor(canvasElement, ground));
@@ -187,6 +187,25 @@ OrangeIsYellow.play = async ({ canvasElement }) => {
         .toBe(tokenColor(canvasElement, '--color-social-emotional-container'));
 };
 
+/**
+ * `grey` is the old spelling of `gray`, kept as a deprecated alias: it paints
+ * exactly what `gray` paints, and says so in development.
+ */
+export const GreyIsGray = () => (
+    <div style={row}>
+        <Tile color="gray" icon="book-open" data-testid="gray" />
+        <Tile color="grey" icon="book-open" data-testid="grey" />
+    </div>
+);
+
+GreyIsGray.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const want = canvas.getByTestId('gray');
+    const got = canvas.getByTestId('grey');
+    await expect(got).toHaveClass('plus-tile--gray');
+    await expect(getComputedStyle(got).backgroundColor).toBe(getComputedStyle(want).backgroundColor);
+};
+
 /* ------------------------------------------------------------------ logos */
 
 const Logo = () => (
@@ -217,7 +236,7 @@ export const Logos = () => (
 
 /**
  * A logo sits inset at the inner size and keeps its own colors. Its ground is
- * white by default, grey or a color's Container when the logo needs contrast.
+ * white by default, gray or a color's Container when the logo needs contrast.
  */
 Logos.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -231,7 +250,7 @@ Logos.play = async ({ canvasElement }) => {
 
     const grounds = {
         white: '--color-surface-container-lowest',
-        grey: '--color-surface-container',
+        gray: '--color-surface-container',
         ...Object.fromEntries(Object.entries(HUE).map(([c, h]) => [c, `--color-${h}-container`])),
     };
     for (const color of TILE_COLORS) {

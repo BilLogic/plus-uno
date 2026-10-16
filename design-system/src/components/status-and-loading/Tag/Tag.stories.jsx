@@ -76,7 +76,7 @@ export const Colors = () => (
 
 /**
  * A color name paints the hue it names, on the border and the swatch, and on
- * nothing else. The border is the hue's Border Subtle token (grey's is Outline
+ * nothing else. The border is the hue's Border Subtle token (gray's is Outline
  * Variant), the swatch is the hue itself, and the text is the same neutral on
  * every color.
  */
@@ -93,12 +93,12 @@ Colors.play = async ({ canvasElement }) => {
         await expect(px(s.borderTopWidth), `${color} has a 1px border`).toBe(1);
         await expect(s.color, `${color} text is neutral`).toBe(ink);
 
-        const border = color === 'grey'
+        const border = color === 'gray'
             ? tokenColor(canvasElement, '--color-outline-variant')
             : tokenColor(canvasElement, `--color-${HUE_TOKEN[color]}-border-subtle`);
         await expect(s.borderTopColor, `${color} border`).toBe(border);
 
-        const hue = color === 'grey'
+        const hue = color === 'gray'
             ? tokenColor(canvasElement, '--color-outline')
             : tokenColor(canvasElement, `--color-${HUE_TOKEN[color]}`);
         await expect(getComputedStyle(swatch).backgroundColor, `${color} swatch`).toBe(hue);
@@ -106,10 +106,10 @@ Colors.play = async ({ canvasElement }) => {
         await expect(px(getComputedStyle(swatch).borderTopLeftRadius)).toBe(2);
     }
 
-    // Grey is the one name that is not a hue: a default that drifted into a
+    // Gray is the one name that is not a hue: a default that drifted into a
     // color would have every uncolored tag claiming a category nobody gave it.
-    const greySwatch = canvas.getByTestId('grey').querySelector('[aria-hidden="true"]');
-    const [r, g, b] = getComputedStyle(greySwatch).backgroundColor.match(/\d+/g).map(Number);
+    const graySwatch = canvas.getByTestId('gray').querySelector('[aria-hidden="true"]');
+    const [r, g, b] = getComputedStyle(graySwatch).backgroundColor.match(/\d+/g).map(Number);
     await expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThan(12);
 };
 
@@ -427,7 +427,7 @@ RemoveFocusRingOnTypes.play = async ({ canvasElement }) => {
  * upper-cases to two (ß is SS). A label that is not text has no initials, and
  * development says so unless an avatar is given. Leading content meant for a
  * plain tag is ignored on an avatar type, with a warning. A disabled tag that
- * is saving shows its spinner on a clear ground, not a grey disc, and a broken
+ * is saving shows its spinner on a clear ground, not a gray disc, and a broken
  * avatar is still on initials once a save ends.
  */
 export const AvatarEdgeCases = {
@@ -478,7 +478,7 @@ export const AvatarEdgeCases = {
             await expect(px(getComputedStyle(avatarOf(canvas.getByTestId('swatch'))).width)).toBe(16);
 
             const saving = avatarOf(canvas.getByTestId('disabled-saving'));
-            await expect(getComputedStyle(saving).backgroundColor, 'no grey disc behind the spinner').toBe(CLEAR);
+            await expect(getComputedStyle(saving).backgroundColor, 'no gray disc behind the spinner').toBe(CLEAR);
 
             // A broken avatar stays broken through a save: once the save ends,
             // the tag is back on initials and does not retry the image.
@@ -511,7 +511,7 @@ export const AvatarEdgeCases = {
 };
 
 /**
- * The avatar's fill. A hued person or team sits on its hue's Container, a grey
+ * The avatar's fill. A hued person or team sits on its hue's Container, a gray
  * team on the Technology Tools 08 wash, and a disabled tag's photo stays whole:
  * the image covers the box at full opacity and in full color.
  */
@@ -519,7 +519,7 @@ export const AvatarFills = () => (
     <div style={row}>
         <Tag type="team" color="blue" data-testid="team-blue">Math team</Tag>
         <Tag type="person" color="teal" data-testid="person-teal">Rosa Chen</Tag>
-        <Tag type="team" data-testid="team-grey">Science team</Tag>
+        <Tag type="team" data-testid="team-gray">Science team</Tag>
         <TagContext.Provider value={{ isDisabled: true }}>
             <Tag type="person" avatar={PHOTO} data-testid="disabled-photo">Kai Brooks</Tag>
         </TagContext.Provider>
@@ -534,10 +534,10 @@ AvatarFills.play = async ({ canvasElement }) => {
         .toBe(tokenColor(canvasElement, '--color-technology-tools-container'));
     await expect(fill('person-teal'), 'a teal person fills Tertiary Container')
         .toBe(tokenColor(canvasElement, '--color-tertiary-container'));
-    await expect(fill('team-grey'), 'a grey team fills the Technology Tools 08 wash')
+    await expect(fill('team-gray'), 'a gray team fills the Technology Tools 08 wash')
         .toBe(tokenColor(canvasElement, '--color-technology-tools-state-08'));
 
-    // Disabled greys the tag, never the person: the photo shows as it is.
+    // Disabled grays the tag, never the person: the photo shows as it is.
     const img = canvas.getByTestId('disabled-photo').querySelector('img');
     await expect(img, 'the photo is shown').not.toBeNull();
     await expect(px(getComputedStyle(img).width), 'covering the 16 box').toBe(16);
@@ -591,7 +591,7 @@ export const StateLayers = () => (
     <div style={row}>
         <Tag behavior="selectable" color="blue">Unselected</Tag>
         <Tag behavior="selectable" color="blue" isSelected>Selected</Tag>
-        <Tag behavior="selectable" color="grey" isSelected>Grey selected</Tag>
+        <Tag behavior="selectable" color="gray" isSelected>Gray selected</Tag>
         <Tag behavior="link" color="green" href="#tag">Link</Tag>
         <Tag behavior="link" color="green" href="#tag" onRemove={() => {}} data-testid="split">Split link</Tag>
         <Tag behavior="removable" color="purple" onRemove={() => {}} data-testid="removable">Removable</Tag>
@@ -621,9 +621,9 @@ StateLayers.play = async ({ canvasElement }) => {
     await expect(whileForced(selected, ':hover', bg)).toBe(t('--color-technology-tools-state-16'));
     await expect(whileForced(selected, ':active', bg)).toBe(t('--color-technology-tools-state-16'));
 
-    const grey = canvas.getByRole('button', { name: 'Grey selected' });
-    await expect(getComputedStyle(grey).borderTopColor).toBe(t('--color-outline'));
-    await expect(getComputedStyle(grey)[bg]).toBe(t('--color-on-surface-variant-state-12'));
+    const gray = canvas.getByRole('button', { name: 'Gray selected' });
+    await expect(getComputedStyle(gray).borderTopColor).toBe(t('--color-outline'));
+    await expect(getComputedStyle(gray)[bg]).toBe(t('--color-on-surface-variant-state-12'));
 
     // A plain link: the tag is the link.
     const link = canvas.getByRole('link', { name: 'Link' });
@@ -1105,7 +1105,7 @@ export const OnImages = () => (
         <div style={onPicture}>
             <Tag color="blue" isElevated data-testid="read-only">Algebra</Tag>
             <Tag color="green" isElevated>Advocacy</Tag>
-            <Tag behavior="link" color="grey" href="#video" isElevated>Video</Tag>
+            <Tag behavior="link" color="gray" href="#video" isElevated>Video</Tag>
             <Tag type="person" color="blue" isElevated data-testid="person">Rosa Chen</Tag>
             <Tag behavior="link" color="magenta" href="#lesson" isElevated>Open lesson</Tag>
             <Tag behavior="link" color="teal" href="#unit" isElevated onRemove={() => {}} data-testid="split">
@@ -1183,7 +1183,7 @@ OnImages.play = async ({ canvasElement }) => {
     const video = canvas.getByRole('link', { name: 'Video' });
     await userEvent.tab();
     await expect(video).toHaveFocus();
-    await expectFocusRing(canvasElement, video, 'an elevated grey link');
+    await expectFocusRing(canvasElement, video, 'an elevated gray link');
 
     await userEvent.tab();
     await expect(link).toHaveFocus();
@@ -1454,8 +1454,8 @@ export const ElevatedOnlyReadOnlyAndLink = {
 
 /**
  * The old names keep working. `orange` is `yellow` (the hue is a 44° yellow),
- * and `variant="dismissible"` is `behavior="removable"`; both say so in
- * development.
+ * `grey` is `gray`, and `variant="dismissible"` is `behavior="removable"`; each
+ * says so in development.
  */
 export const DeprecatedNames = {
     render: () => {
@@ -1466,6 +1466,7 @@ export const DeprecatedNames = {
                 {mounted && (
                     <>
                         <Tag color="orange" data-testid="orange">Orange</Tag>
+                        <Tag color="grey" data-testid="grey-alias">Grey</Tag>
                         <Tag variant="dismissible" color="yellow" onRemove={() => {}}>Dismissible</Tag>
                     </>
                 )}
@@ -1481,6 +1482,11 @@ export const DeprecatedNames = {
                 .toBe(tokenColor(canvasElement, '--color-social-emotional-border-subtle'));
             await expect(canvas.getByRole('button', { name: 'Remove Dismissible' })).toBeInTheDocument();
             await expect(warn).toHaveBeenCalledWith(expect.stringContaining('color="orange" is deprecated'));
+            const greyAlias = canvas.getByTestId('grey-alias');
+            await expect(greyAlias).toHaveClass('plus-tag--gray');
+            await expect(getComputedStyle(greyAlias).borderTopColor)
+                .toBe(tokenColor(canvasElement, '--color-outline-variant'));
+            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('color="grey" is deprecated; use "gray"'));
             await expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="dismissible" is deprecated'));
         } finally {
             warn.mockRestore();
