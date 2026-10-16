@@ -6,13 +6,44 @@
  * Matches Figma: node-id=258-262435
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Table from '@/components/_internal/Table/Table';
-import { Select } from '@/components';
+import { StatusSelect } from '@/specs/Toolkit/In-Session/Elements/StatusSelect';
 import Badge from '@/components/status-and-loading/Badge/Badge';
 import UserAvatar from '@/components/_internal/UserAvatar/UserAvatar';
 import './TutorsStatusAndWarningsTable.scss';
+
+/**
+ * A tutor's status, set from the table. "Check-In Needed" asks the admin to
+ * act, so its field carries the info colour role.
+ */
+const StatusCell = ({ tutor, options, onStatusChange }) => {
+    const [status, setStatus] = useState(tutor.status);
+    return (
+        <StatusSelect
+            aria-label={`Status for ${tutor.tutorName}`}
+            options={options}
+            value={status}
+            onChange={(next) => {
+                setStatus(next);
+                if (onStatusChange) onStatusChange(tutor.id, next);
+            }}
+            tone={status === 'Check-In Needed' ? 'info' : undefined}
+            className="tutors-status-and-warnings-table__status-select"
+        />
+    );
+};
+
+StatusCell.propTypes = {
+    tutor: PropTypes.shape({
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        tutorName: PropTypes.string,
+        status: PropTypes.string,
+    }).isRequired,
+    options: PropTypes.array.isRequired,
+    onStatusChange: PropTypes.func,
+};
 
 const TutorsStatusAndWarningsTable = ({
     tutors = [],
@@ -133,14 +164,10 @@ const TutorsStatusAndWarningsTable = ({
         },
         {
             content: (
-                <Select
-                    aria-label={`Status for ${tutor.tutorName}`}
-                    size="small"
+                <StatusCell
+                    tutor={tutor}
                     options={statusOptions}
-                    value={onStatusChange ? tutor.status : undefined}
-                    defaultValue={tutor.status}
-                    onChange={onStatusChange ? (next) => onStatusChange(tutor.id, next) : undefined}
-                    className="tutors-status-and-warnings-table__status-select"
+                    onStatusChange={onStatusChange}
                 />
             ),
             className: 'tutors-status-and-warnings-table__cell--status'

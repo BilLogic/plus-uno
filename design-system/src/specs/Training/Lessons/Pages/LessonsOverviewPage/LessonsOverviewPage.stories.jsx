@@ -70,21 +70,21 @@ export default {
             table: { category: 'Responsive' },
         },
         statusFilter: {
-            control: { type: 'select' },
-            options: ['All', 'Assigned', 'In Progress', 'Completed', 'Not Started'],
-            description: 'Status filter value',
+            control: { type: 'check' },
+            options: ['assigned', 'in-progress', 'completed', 'not-started'],
+            description: 'Picked lesson statuses; none means all',
             table: { category: 'Filters' },
         },
         sortBy: {
             control: { type: 'select' },
-            options: ['Name', 'Status', 'Competency Areas'],
-            description: 'Sort field',
+            options: ['name', 'smart-competency', 'status', 'competency-areas'],
+            description: 'Sort by id',
             table: { category: 'Filters' },
         },
         sortOrder: {
             control: { type: 'select' },
-            options: ['A-Z', 'Z-A'],
-            description: 'Sort order',
+            options: ['az', 'za', 'least-progress', 'most-progress', 'technology-first'],
+            description: 'Order id',
             table: { category: 'Filters' },
         },
         currentView: {
@@ -125,9 +125,9 @@ export const Overview = {
  */
 export const Interactive = {
     render: (args) => {
-        const [statusFilter, setStatusFilter] = useState(args.statusFilter || 'All');
-        const [sortBy, setSortBy] = useState(args.sortBy || 'Name');
-        const [sortOrder, setSortOrder] = useState(args.sortOrder || 'A-Z');
+        const [statusFilter, setStatusFilter] = useState(args.statusFilter || []);
+        const [sortBy, setSortBy] = useState(args.sortBy || 'name');
+        const [sortOrder, setSortOrder] = useState(args.sortOrder || 'az');
         const [currentView, setCurrentView] = useState(args.currentView || 'list');
 
         return (
@@ -172,7 +172,7 @@ export const Interactive = {
 
     args: {
         breakpoint: 'native',
-        statusFilter: 'All',
+        statusFilter: [],
         status: 'in-progress',
         statusCounts: {
             all: 20,
@@ -181,8 +181,8 @@ export const Interactive = {
             completed: 5,
             notStarted: 15
         },
-        sortBy: 'Name',
-        sortOrder: 'A-Z',
+        sortBy: 'name',
+        sortOrder: 'az',
         currentView: 'list',
     },
 };

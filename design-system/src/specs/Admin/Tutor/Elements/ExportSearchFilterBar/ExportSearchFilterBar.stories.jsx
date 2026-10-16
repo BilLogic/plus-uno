@@ -1,19 +1,14 @@
 /**
  * ExportSearchFilterBar - Tutor Admin Element
- * 
- * Action bar with Export CSV, search, and filter dropdowns.
+ *
+ * Action bar with Export CSV, search, filters and sort.
  * Matches Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=433-370346
  */
 
 import React, { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import ExportSearchFilterBar from './ExportSearchFilterBar';
 import './ExportSearchFilterBar.scss';
-
-const defaultFilters = [
-    { key: 'lessons', label: 'All Lessons' },
-    { key: 'startDate', label: 'All Start Date' },
-    { key: 'name', label: 'Name', sortable: true },
-];
 
 export default {
     title: 'Specs/Admin/Tutor/Elements/Export Search Filter Bar',
@@ -22,7 +17,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: `Action bar component with Export CSV button, search input, and filter dropdowns.
+                component: `Action bar component with Export CSV button, search input, filters and sort.
 
 ## Figma Reference
 Node ID: 433-370346
@@ -30,8 +25,8 @@ Node ID: 433-370346
 ## Features
 - Export CSV button with download icon
 - Search input with magnifying glass icon
-- Multiple filter dropdowns
-- Sortable filter support (double caret for Name)
+- Filters as Selects: pick-many filters apply when their list closes; with nothing picked they read "All …"
+- Sort as a single Select
 `,
             },
         },
@@ -56,14 +51,8 @@ Node ID: 433-370346
 export const Overview = {
     render: () => (
         <div style={{ padding: 'var(--size-section-pad-y-lg)' }}>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Export Search Filter Bar</h6>
-            <ExportSearchFilterBar
-                filters={defaultFilters}
-                onExport={() => console.log('Export clicked')}
-                onSearch={(value) => console.log('Search:', value)}
-                onFilterChange={(key) => console.log('Filter changed:', key)}
-                onSort={(key) => console.log('Sort:', key)}
-            />
+            <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm)' }}>Export Search Filter Bar</h6>
+            <ExportSearchFilterBar />
         </div>
     ),
 };
@@ -73,39 +62,26 @@ export const Overview = {
  */
 export const Interactive = {
     render: (args) => {
-        const [selectedFilters, setSelectedFilters] = useState({});
+        const [selectedFilters, setSelectedFilters] = useState({ lessons: [], startDate: '' });
+        const [sortBy, setSortBy] = useState('name-az');
 
         return (
-            <div style={{ padding: 'var(--size-section-pad-y-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>
+            <div style={{ padding: 'var(--size-section-pad-y-lg)', minHeight: '320px' }}>
+                <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm)' }}>
                     Export Search Filter Bar - Interactive
                 </h6>
                 <ExportSearchFilterBar
                     exportLabel={args.exportLabel}
                     searchPlaceholder={args.searchPlaceholder}
-                    filters={defaultFilters}
                     selectedFilters={selectedFilters}
-                    onExport={() => console.log('Export clicked')}
-                    onSearch={(value) => console.log('Search:', value)}
-                    onFilterChange={(key) => {
-                        console.log('Filter changed:', key);
-                        // Cycle through some example options for better demo
-                        const options = {
-                            lessons: ['Math 101', 'Science Lab', 'History 101', 'All Lessons'],
-                            startDate: ['Last 7 Days', 'Last 30 Days', 'This Month', 'All Start Date'],
-                            name: ['A-Z', 'Z-A', 'Name']
-                        };
-
-                        const currentVal = selectedFilters[key] || '';
-                        const nextIndex = (options[key].indexOf(currentVal) + 1) % options[key].length;
-                        const nextVal = options[key][nextIndex] !== defaultFilters.find(f => f.key === key).label
-                            ? options[key][nextIndex]
-                            : undefined; // Reset to default label if it matches
-
-                        setSelectedFilters({ ...selectedFilters, [key]: nextVal });
-                    }}
-                    onSort={(key) => console.log('Sort:', key)}
+                    onFilterChange={(key, value) => setSelectedFilters({ ...selectedFilters, [key]: value })}
+                    sortBy={sortBy}
+                    onSort={setSortBy}
                 />
+                <p className="body3-txt" style={{ marginTop: 'var(--size-element-gap-lg)' }}>
+                    Lessons: <strong data-testid="applied-lessons">{selectedFilters.lessons.join(', ') || 'all'}</strong>
+                    {' · '}Sort: <strong data-testid="applied-sort">{sortBy}</strong>
+                </p>
             </div>
         );
     },
@@ -113,4 +89,21 @@ export const Interactive = {
         exportLabel: 'Export CSV',
         searchPlaceholder: 'Search',
     },
+};
+
+Interactive.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(document.body);
+    const lessons = canvas.getByTestId('applied-lessons');
+
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Lessons' }));
+    await userEvent.click(await page.findByRole('option', { name: 'Math 101' }));
+    await userEvent.click(await page.findByRole('option', { name: 'History 101' }));
+    await expect(lessons).toHaveTextContent('all');
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(lessons).toHaveTextContent('math-101, history-101'));
+
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Sort' }));
+    await userEvent.click(await page.findByRole('option', { name: 'Name Z-A' }));
+    await expect(canvas.getByTestId('applied-sort')).toHaveTextContent('name-za');
 };

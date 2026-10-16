@@ -99,10 +99,7 @@ const SessionAttendeeListItem = ({
             {showAttendanceControl && tab === 'attendance' && (
                 !calledOff && mode !== 'static' ? ( // 'static' mode forces Badge only
                     // Tutors (active) and Students use interactive dropdown
-                    <AttendanceDropdown
-                        initialStatus={attendanceStatus}
-                        className="pdropdown"
-                    />
+                    <AttendanceDropdown initialStatus={attendanceStatus} />
                 ) : (
                     // Called-off tutors OR static mode uses static badge
                     <AttendanceBadge

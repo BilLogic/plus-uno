@@ -1,67 +1,40 @@
-import React, { useState, forwardRef } from 'react';
-import { Dropdown } from 'react-bootstrap';
-// Import the reusable Toolkit components from dedicated files
-import { AttendanceBadge } from './badges/AttendanceBadge.jsx';
-import { AttendanceListItems } from './AttendanceListItems.jsx';
-import '@/components/forms-and-inputs/Dropdown/Dropdown.scss'; // Ensure styles are loaded
+import React, { useState } from 'react';
+import { StatusSelect } from './StatusSelect.jsx';
 
-// Custom Toggle to use the exported AttendanceBadge component
-const CustomToggle = forwardRef(({ children, onClick, className }, ref) => (
-    <div
-        ref={ref}
-        onClick={(e) => {
-            e.preventDefault();
-            onClick(e);
-        }}
-        className={`${className} cursor-pointer custom-toggle-no-caret`}
-        style={{ display: 'inline-block' }}
-    >
-        <style>{`
-            .custom-toggle-no-caret::after {
-                display: none !important;
-                content: none !important;
-                border: none !important;
-            }
-        `}</style>
-        {children}
-    </div>
-));
+const attendanceOptions = [
+    { value: 'present', label: 'Joined' },
+    { value: 'absent', label: 'Did not join' },
+    // Shown when the status is set elsewhere; it is not a pick.
+    { value: 'na', label: 'N/A', disabled: true },
+];
 
+const toneFor = { present: 'success', absent: 'danger' };
+
+/**
+ * Attendance picker: Joined or Did not join, on a small single Select. Before
+ * a pick it reads "Select"; the field takes the colour of the status picked.
+ */
 export const AttendanceDropdown = ({
     initialStatus = 'unknown',
     onStatusChange,
-    className = 'pdropdown'
+    className = '',
 }) => {
-    // State to manage the selected value and interaction
-    const [status, setStatus] = useState(initialStatus);
-    const [show, setShow] = useState(false);
+    const [status, setStatus] = useState(initialStatus === 'unknown' ? '' : initialStatus);
 
-    const handleSelect = (val) => {
-        setStatus(val);
-        setShow(false); // Close the dropdown on selection
-        if (onStatusChange) {
-            onStatusChange(val);
-        }
+    const handleChange = (next) => {
+        setStatus(next);
+        if (onStatusChange) onStatusChange(next || 'unknown');
     };
 
     return (
-        <Dropdown
+        <StatusSelect
+            aria-label="Attendance"
+            placeholder="Select"
+            options={attendanceOptions}
+            value={status}
+            onChange={handleChange}
+            tone={toneFor[status]}
             className={className}
-            show={show}
-            onToggle={(isOpen) => setShow(isOpen)}
-        >
-            <Dropdown.Toggle as={CustomToggle} id="attendance-dropdown">
-                {/* Reuse the AttendanceBadge component from the Toolkit */}
-                <AttendanceBadge status={status} showDropdown={true} />
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu className="dropdown-menu">
-                {/* Reuse the AttendanceListItems component from the Toolkit */}
-                <AttendanceListItems
-                    status={status}
-                    onSelect={handleSelect}
-                />
-            </Dropdown.Menu>
-        </Dropdown>
+        />
     );
 };

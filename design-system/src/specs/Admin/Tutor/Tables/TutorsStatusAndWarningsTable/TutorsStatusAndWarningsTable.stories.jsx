@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import TutorsStatusAndWarningsTable from './TutorsStatusAndWarningsTable';
 
 export default {
@@ -98,6 +99,19 @@ export const Interactive = {
     args: {
         tutors: defaultTutors,
     },
+};
+
+/** "Check-In Needed" carries the info colour role on its field; other statuses are neutral. */
+Interactive.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const [first] = canvas.getAllByRole('combobox', { name: 'Status for Floyd Miles' });
+    const toned = () => first.closest('.status-select').classList.contains('status-select--info');
+
+    await expect(toned()).toBe(true);
+    await userEvent.click(first);
+    await userEvent.click(await within(document.body).findByRole('option', { name: 'On Track' }));
+    await expect(first).toHaveTextContent('On Track');
+    await expect(toned()).toBe(false);
 };
 
 /**

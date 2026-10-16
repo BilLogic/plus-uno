@@ -1,17 +1,18 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/actions/Button/Button';
-import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
+import { FilterSelect } from '@/specs/Toolkit/Pre-Session/Elements/Filters/FilterSelect';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { StatCard } from '@/specs/Toolkit/Pre-Session/Cards/OverviewCard.stories';
 import { ReflectionsTableRow, ReflectionsTableHeaderRow } from '@/specs/Toolkit/Pre-Session/Tables/ReflectionsTable.stories';
 import { NavHorizontal } from '@/specs/Toolkit/Pre-Session/Tables/NavHorizontal.stories';
 import { REFLECTIONS } from '../data/reflections';
 
-const FILTER_OPTIONS = [
-    { text: 'Incomplete', value: 'incomplete' },
-    { text: 'Completed', value: 'completed' },
-    { text: 'Both', value: 'both' },
+/** Completion answers exclude each other, so the filter picks one. */
+const COMPLETION_OPTIONS = [
+    { value: 'incomplete', label: 'Incomplete' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'both', label: 'Both' },
 ];
 
 /**
@@ -42,8 +43,6 @@ export default function ReflectionsListPage() {
         { id: 'call-offs', label: 'Call-offs', count: 3 },
         { id: 'reflections', label: 'Reflections', count: incompleteCount },
     ];
-
-    const filterLabel = FILTER_OPTIONS.find((option) => option.value === completionFilter)?.text || 'Incomplete';
 
     return (
         <PageLayout
@@ -110,16 +109,11 @@ export default function ReflectionsListPage() {
                         }}
                     >
                         <h5 className="h5 m-0" style={{ color: 'var(--color-on-surface)' }}>Your reflections</h5>
-                        <Dropdown
-                            buttonText={filterLabel}
-                            style="secondary"
-                            fill="outline"
-                            size="small"
-                            items={FILTER_OPTIONS.map((option) => ({
-                                text: option.text,
-                                selected: completionFilter === option.value,
-                                onClick: () => setCompletionFilter(option.value),
-                            }))}
+                        <FilterSelect
+                            aria-label="Completion"
+                            options={COMPLETION_OPTIONS}
+                            value={completionFilter}
+                            onChange={setCompletionFilter}
                         />
                     </div>
                     <div style={{ width: '100%' }}>

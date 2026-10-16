@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { EngagementDropdown } from './EngagementDropdown.jsx';
 import { EngagementBadge } from './EngagementBadge.jsx';
 
@@ -10,7 +11,7 @@ export default {
         layout: 'centered',
         docs: {
             description: {
-                component: 'Interactive Engagement Dropdown composed of the Toolkit "Engagement Badge" and "Engagement List Items". Used to select student engagement status during in-session activities.'
+                component: 'Engagement picker: a small single Select for the student\'s engagement during a session. Partially engaged adds a Reason Select, and applies once a reason is picked. The field takes the colour of the status picked.'
             }
         }
     },
@@ -159,7 +160,7 @@ export const Interactive = () => {
         >
             <div>
                 <h5 className="text-muted mb-2">Interactive Engagement Dropdown</h5>
-                <p className="text-muted small mb-0">Click on the badge to open the dropdown and select an engagement status.</p>
+                <p className="text-muted small mb-0">Pick an engagement status. Partially engaged asks for a reason before it applies.</p>
             </div>
 
             {/* Status Display */}
@@ -172,12 +173,12 @@ export const Interactive = () => {
             >
                 <div className="d-flex flex-column gap-1">
                     <span className="small text-muted fw-bold">Last Selected Status:</span>
-                    <span className="body2-txt">{lastSelection.status || 'None'}</span>
+                    <span className="body2-txt" data-testid="applied-status">{lastSelection.status || 'None'}</span>
                 </div>
                 {lastSelection.reason && (
                     <div className="d-flex flex-column gap-1">
                         <span className="small text-muted fw-bold">Reason:</span>
-                        <span className="body2-txt">{lastSelection.reason}</span>
+                        <span className="body2-txt" data-testid="applied-reason">{lastSelection.reason}</span>
                     </div>
                 )}
             </div>
@@ -192,4 +193,24 @@ export const Interactive = () => {
             </div>
         </div>
     );
+};
+
+Interactive.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(document.body);
+    const status = canvas.getByTestId('applied-status');
+
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Engagement' }));
+    await userEvent.click(await page.findByRole('option', { name: 'Partially engaged' }));
+    await expect(status).toHaveTextContent('None');
+
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Reason' }));
+    await userEvent.click(await page.findByRole('option', { name: 'Left zoom early' }));
+    await expect(status).toHaveTextContent('partially-engaged');
+    await expect(canvas.getByTestId('applied-reason')).toHaveTextContent('left-early');
+
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Engagement' }));
+    await userEvent.click(await page.findByRole('option', { name: 'Fully engaged on zoom' }));
+    await expect(status).toHaveTextContent('fully-engaged');
+    await expect(canvas.queryByRole('combobox', { name: 'Reason' })).toBeNull();
 };
