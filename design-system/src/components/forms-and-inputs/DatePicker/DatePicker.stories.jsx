@@ -10,7 +10,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'DatePicker component for selecting dates. Supports single date selection and date range selection through paired pickers.',
+                    'A date field that opens a month calendar: one date, or with `range` a first and a last day. Dates can be picked or typed as MM/DD/YYYY.',
             },
         },
     },
@@ -44,6 +44,21 @@ export default {
             control: 'boolean',
             description: 'Make read-only',
             table: { category: 'Behavior' },
+        },
+        range: {
+            control: 'boolean',
+            description: 'Pick a first and a last day',
+            table: { category: 'Behavior', defaultValue: { summary: 'false' } },
+        },
+        invalid: {
+            control: 'boolean',
+            description: 'Draw the field invalid',
+            table: { category: 'Validation' },
+        },
+        valid: {
+            control: 'boolean',
+            description: 'Draw the field valid',
+            table: { category: 'Validation' },
         },
         minDate: {
             control: 'text',
@@ -154,21 +169,17 @@ PickDate.parameters = {
 };
 
 export const PickRange = () => {
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
+    const [range, setRange] = useState(['', '']);
+    const [start, end] = range;
 
     return (
-        <div style={{ paddingBottom: '300px' }}>
+        <div style={{ paddingBottom: '300px', maxWidth: '320px' }}>
             <h6 style={{ marginBottom: '16px' }}>Select a Date Range</h6>
             <p style={{ fontSize: '14px', color: 'var(--color-on-surface-variant)', marginBottom: '16px' }}>
-                Use two date pickers to define a start and end date for a range.
+                Click a first day, then a last day. The days between are marked.
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                <DatePicker value={startDate} onChange={setStartDate} placeholder="Start Date" maxDate={endDate} />
-                <span style={{ color: 'var(--color-on-surface-variant)' }}>to</span>
-                <DatePicker value={endDate} onChange={setEndDate} placeholder="End Date" minDate={startDate} />
-            </div>
-            {(startDate || endDate) && (
+            <DatePicker range value={range} onChange={setRange} />
+            {(start || end) && (
                 <div
                     style={{
                         marginTop: '16px',
@@ -178,7 +189,7 @@ export const PickRange = () => {
                     }}
                 >
                     <p style={{ margin: 0, fontSize: '14px' }}>
-                        <strong>Range:</strong> {startDate || '(not set)'} → {endDate || '(not set)'}
+                        <strong>Range:</strong> {start || '(not set)'} → {end || '(not set)'}
                     </p>
                 </div>
             )}
@@ -189,7 +200,31 @@ PickRange.storyName = 'Pick Range';
 PickRange.parameters = {
     docs: {
         description: {
-            story: 'Date range selection scenario. Two paired pickers allow selecting a start and end date, with automatic range constraint.',
+            story: 'One picker with `range`: the first click sets the first day, the second the last. `onChange` receives `[start, end]`.',
+        },
+    },
+};
+
+export const Bounds = () => {
+    const [date, setDate] = useState('');
+
+    return (
+        <div style={{ paddingBottom: '300px', maxWidth: '300px' }}>
+            <DatePicker
+                value={date}
+                onChange={setDate}
+                minDate="2026-10-05"
+                maxDate="2026-10-23"
+                aria-label="Session date"
+            />
+        </div>
+    );
+};
+Bounds.storyName = 'Earliest and latest dates';
+Bounds.parameters = {
+    docs: {
+        description: {
+            story: 'Days before `minDate` or after `maxDate` are disabled. A typed date outside them is kept and marked invalid, and `onChange` is not called.',
         },
     },
 };

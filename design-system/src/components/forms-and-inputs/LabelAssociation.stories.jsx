@@ -263,7 +263,8 @@ ForwardedProps.play = async ({ canvasElement }) => {
 
     // The discriminator. `null` before #230, because the rest object was
     // collected and dropped.
-    await expect(group.getAttribute('aria-describedby')).toBe('fp-starts-error');
+    // The caller's id leads; the field's own time zone caption follows it.
+    await expect(group.getAttribute('aria-describedby').split(' ')[0]).toBe('fp-starts-error');
 
     // And it resolves — a `for`/`describedby` that points at nothing is #206's
     // defect wearing a different attribute.
