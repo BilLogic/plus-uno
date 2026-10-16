@@ -1,6 +1,6 @@
 // The weekly DS precedence check's two moves, on named dependencies:
 //
-//   • the CHECK — Friday's end-of-day run (`ds-precedence-check`,
+//   • the CHECK — Monday's end-of-day run (`ds-precedence-check`,
 //     src/scheduled/runs.ts): read, compare, and keep the report in KV for the
 //     morning. It posts nothing. A clean week keeps nothing, and clears a
 //     report no morning ever posted, so a stale list never goes out. A
@@ -24,8 +24,8 @@
 //     The section shows whole, never over two messages: past the carousel's
 //     ten its line says how many show, and the rest come back with the next
 //     week's check. A morning whose message does not go up keeps the report,
-//     and the next one hands it over again — in practice once a week, the
-//     Monday after Friday's check.
+//     and the next one hands it over again — in practice once a week, on
+//     Monday morning, three hours after Monday's 06:00 check.
 //     Every message that carried it is recorded under its own ts (`env.ts`),
 //     so the engagement gate knows its thread whichever week it is.
 //

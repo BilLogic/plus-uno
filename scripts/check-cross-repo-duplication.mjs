@@ -93,8 +93,8 @@
  * all reachable — an absent checkout makes every exemption look stale, and
  * reporting that is reporting the missing checkout twice under a worse name.
  * Per entry and not per run: one missing sibling used to suspend every entry,
- * so a plus-uno↔blueprint pair went unchecked because sb was absent, and the
- * monthly sweep clones with continue-on-error, which makes that a normal month.
+ * so a plus-uno↔blueprint pair went unchecked because sb was absent, and a
+ * checkout with one sibling missing is a normal state, not an exceptional one.
  *
  * ── WHEN A SIBLING IS NOT CHECKED OUT ───────────────────────────────────────
  *
@@ -517,9 +517,8 @@ export function sweep(overrides = {}) {
   // three were.
   //
   // This used to gate on `reached.length === REPOS.length`, which reads as the
-  // same rule and is not: harness-integrity-sweep.yml clones both siblings with
-  // continue-on-error, so one clone failing is a normal month rather than an
-  // exceptional one, and a single absent repo then suspended the staleness
+  // same rule and is not: a checkout with one sibling missing is a normal
+  // state rather than an exceptional one, and a single absent repo then suspended the staleness
   // assertion for EVERY entry — including a plus-uno↔blueprint pair whose own
   // two repos had both been read and whose shared-word count had just been
   // computed. A recorded pair that has since been deduplicated could therefore

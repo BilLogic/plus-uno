@@ -3,7 +3,7 @@
  *
  * WHY IT EXISTS. Until this landed, no workflow in this repo carried a
  * `pull_request` trigger; the deterministic guards ran monthly
- * (`harness-integrity-sweep.yml`), on push (`uno-bot-deploy.yml`), or nowhere at
+ * (a sweep workflow since retired), on push (`uno-bot-deploy.yml`), or nowhere at
  * all. Monthly and on-push share one defect: they observe a branch only after
  * it is `main`. Two branches that are each green alone and red together are
  * therefore undetectable until the damage is merged — observed 2026-08-26, when
@@ -48,11 +48,11 @@
  * the registry.
  *
  * THE LIST IS A DATUM, NOT A CONSTANT IN HERE (#508). Three other places state
- * the same set — the `check:*` block of the root package.json, the monthly
- * `harness-integrity-sweep.yml` and `storybook-gate.yml` — and while this file
- * owned the list, nothing compared the four. All four now read
+ * the same set — the `check:*` block of the root package.json, a monthly
+ * sweep workflow (since retired) and `storybook-gate.yml` — and while this file
+ * owned the list, nothing compared them. Each now reads
  * `scripts/checks.registry.mjs`: this runner runs it, and
- * `scripts/generate-check-scripts.mjs` writes the other three's generated
+ * `scripts/generate-check-scripts.mjs` writes the others' generated
  * blocks, with `npm run check:check-registry` failing on drift. The runner
  * itself is `scripts/harness-runner.mjs`, tested in
  * `scripts/check-harness.test.mjs` — the single gate was the last untested

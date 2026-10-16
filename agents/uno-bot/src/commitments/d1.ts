@@ -68,16 +68,18 @@ const INSERT =
   `ON CONFLICT (commitment_id) DO NOTHING`;
 const LIVE = LIVE_STATES.map((s) => `'${s}'`).join(", ");
 const IS_CARD = `kind IN (${RAISED_KINDS.map((k) => `'${k}'`).join(", ")})`;
+const IS_WEEKLY = `kind = 'card_stale'`;
 // A person's own asks first, then what uno-bot raises on its own (card
 // follow-ups, DM asks); each passes over the promisers its own budget has
 // spent (`ReminderBudget`).
 const NEXT_DUE =
   `${SELECT} WHERE state IN (${LIVE}) AND due_at <= ? AND (checked_on IS NULL OR checked_on <> ?) ` +
-  `AND CASE WHEN ${IS_CARD} THEN promiser_id NOT IN (SELECT value FROM json_each(?)) ` +
+  `AND CASE WHEN ${IS_WEEKLY} THEN promiser_id NOT IN (SELECT value FROM json_each(?)) ` +
+  `WHEN ${IS_CARD} THEN promiser_id NOT IN (SELECT value FROM json_each(?)) ` +
   `ELSE promiser_id NOT IN (SELECT value FROM json_each(?)) END ` +
   `ORDER BY CASE WHEN ${IS_CARD} THEN 1 ELSE 0 END, due_at, commitment_id LIMIT 1`;
 const REMINDED_ON =
-  `SELECT promiser_id, CASE WHEN ${IS_CARD} THEN 'cards' ELSE 'asked' END AS budget, COUNT(*) AS n ` +
+  `SELECT promiser_id, CASE WHEN ${IS_WEEKLY} THEN 'weekly' WHEN ${IS_CARD} THEN 'cards' ELSE 'asked' END AS budget, COUNT(*) AS n ` +
   `FROM commitments WHERE reminded_on = ? GROUP BY promiser_id, budget`;
 const LIVE_IN_THREAD =
   `${SELECT} WHERE channel_id = ? AND thread_ts = ? AND promiser_id = ? AND kind = 'thread_promise' AND state IN (${LIVE}) ` +
@@ -182,12 +184,13 @@ export function createD1CommitmentRecords(deps: { db: SweepDatabase }): Commitme
       await db.prepare(INSERT).bind(JSON.stringify(rows.map(toRow))).run();
     },
     get: (id) => first(`${SELECT} WHERE commitment_id = ?`, id),
-    nextDue: (now, runDate, skip = {}) => first(NEXT_DUE, now, runDate, JSON.stringify(skip.cards ?? []), JSON.stringify(skip.asked ?? [])),
+    nextDue: (now, runDate, skip = {}) =>
+      first(NEXT_DUE, now, runDate, JSON.stringify(skip.weekly ?? []), JSON.stringify(skip.cards ?? []), JSON.stringify(skip.asked ?? [])),
     async remindedOn(runDate) {
       chargeD1Query();
       const { results } = await db.prepare(REMINDED_ON).bind(runDate).all<{ promiser_id: unknown; budget: unknown; n: unknown }>();
-      const counts: Record<ReminderBudget, Record<string, number>> = { asked: {}, cards: {} };
-      for (const r of results) counts[r.budget === "cards" ? "cards" : "asked"][String(r.promiser_id)] = Number(r.n);
+      const counts: Record<ReminderBudget, Record<string, number>> = { asked: {}, cards: {}, weekly: {} };
+      for (const r of results) counts[r.budget === "cards" || r.budget === "weekly" ? r.budget : "asked"][String(r.promiser_id)] = Number(r.n);
       return counts;
     },
     liveInThread: (channel, threadTs, promiserId) => first(LIVE_IN_THREAD, channel, threadTs, promiserId),

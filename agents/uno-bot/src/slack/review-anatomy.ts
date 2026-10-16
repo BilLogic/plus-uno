@@ -243,6 +243,8 @@ const TITLES: Readonly<Record<string, string | ((input: Record<string, unknown>)
   ds_precedence_intake: "Review DS intake",
   sweep_share_post: "Review shared note",
   figma_dev_links: "Review Dev Mode links",
+  blueprint_revise: "Blueprint revision",
+  blueprint_withdraw: "Remove proposal",
 };
 
 /**

@@ -10,7 +10,8 @@
 //
 // Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `exec:{ts}`, `report:{ts}`,
 // `event:{event_id}`, `actx:{channel}:{thread}`, `cancel:{channel}:{thread}`,
-// `run:{user}`, `filing:{key}`, and the alarm's own `gc:next`.
+// `run:{user}`, `filing:{key}`, `cmp:{channel}:{thread}:{scenario}`, and the
+// alarm's own `gc:next`.
 //
 // ── THE CONTRACT IS THIS CLASS'S OWN SIGNATURE (#493, #494) ─────────────────
 //
@@ -22,7 +23,7 @@
 // `takeCutOffExecutionInThread`, `findCutOffExecutions`,
 // `reportCutOffNote`, `get/putAssistantContext`, `requestCancel`,
 // `consumeCancel`, `cancelForUser`, `setActiveRun`, `checkAndRecordEvent`,
-// `claimRun`, `markRunDone`, `claimFiling`, `settleFiling`. A rename is a type error rather than a runtime
+// `claimRun`, `markRunDone`, `claimFiling`, `settleFiling`, `claimComparison`. A rename is a type error rather than a runtime
 // 404, which is the whole point.
 //
 // There is NO `fetch()` and no route table. Until #494 this class carried a
@@ -68,6 +69,7 @@ import {
   type ReportExpiryRecord,
   type ReportExpiryEdit,
   claimedFiling,
+  comparisonKey,
   decidedNoteOf,
   decidedOf,
   decidedPayload,
@@ -283,6 +285,11 @@ export class ThreadState extends DurableObject<Env> {
       const actx = await txn.list<AssistantContextRecord>({ prefix: "actx:" });
       for (const [key, rec] of actx) {
         if (now - rec.updatedAt > HISTORY_TTL_MS) await txn.delete(key);
+        else remaining++;
+      }
+      const compared = await txn.list<{ at: number }>({ prefix: "cmp:" });
+      for (const [key, rec] of compared) {
+        if (now - rec.at > HISTORY_TTL_MS) await txn.delete(key);
         else remaining++;
       }
       const filings = await txn.list<FilingRecord>({ prefix: "filing:" });
@@ -875,6 +882,19 @@ export class ThreadState extends DurableObject<Env> {
   async settleFiling(key: string, issue: FiledIssue | null, at: number): Promise<void> {
     if (issue) await this.storage.put<FilingRecord>(filingKey(key), { at, issue });
     else await this.storage.delete(filingKey(key));
+  }
+
+  // ----- one comparison per scenario per thread -----
+
+  async claimComparison(ref: ThreadRef, scenario: string, at: number): Promise<boolean> {
+    const key = comparisonKey(ref, scenario);
+    return this.storage.transaction(async (txn) => {
+      const held = await txn.get<{ at: number }>(key);
+      if (held && at - held.at < HISTORY_TTL_MS) return false;
+      await txn.put<{ at: number }>(key, { at });
+      await this.ensureGcAlarm(txn);
+      return true;
+    });
   }
 
   // ----- the capacity outage (turn/capacity-outage.ts) -----

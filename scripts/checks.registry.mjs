@@ -4,7 +4,7 @@
  * WHY IT IS A MODULE AND NOT PART OF THE RUNNER. This list used to live inside
  * `scripts/check-harness.mjs`, where only the runner could see it. So the same
  * set was re-listed by hand in three more places — the `check:*` block of the
- * root package.json, `.github/workflows/harness-integrity-sweep.yml` and
+ * root package.json, a monthly sweep workflow (since retired) and
  * `.github/workflows/storybook-gate.yml` — and nothing compared the four. A
  * check listed in one and forgotten in another is the orphan this harness
  * exists to prevent, one level up: not a check that runs nowhere, but a check
@@ -17,7 +17,7 @@
  * WHO READS IT.
  *   - `scripts/harness-runner.mjs`      runs CHECKS; asserts completeness.
  *   - `scripts/generate-check-scripts.mjs` writes the generated blocks of the
- *     root package.json and of the two workflows above; `--check` fails on
+ *     root package.json and of storybook-gate.yml; `--check` fails on
  *     drift (`npm run check:check-registry`).
  *   - `scripts/check-harness.test.mjs`   tests both of the above.
  *
@@ -32,14 +32,13 @@
  *             request — composed into `check:harness`, reached through it as a
  *             step of `check:agent`, or standing as its own named job in
  *             `.github/workflows/uno-bot-checks.yml`, which is where an
- *             EXCLUDED row can still carry this trigger), 'sweep' (a step of
- *             the monthly integrity sweep), 'storybook-gate' (a job of
- *             storybook-gate.yml),
+ *             EXCLUDED row can still carry this trigger), 'storybook-gate' (a
+ *             job of storybook-gate.yml),
  *             'deploy' (a gate of the `deploy` chain in agents/uno-bot —
  *             `DEPLOY_CHAIN`, below). A string, or an array when a check
- *             genuinely runs in more than one place. ALL FOUR ARE ASSERTED, in
+ *             genuinely runs in more than one place. ALL THREE ARE ASSERTED, in
  *             both directions: a row with a trigger and no step fails, and a
- *             step with no row fails. 'sweep' and 'storybook-gate' against
+ *             step with no row fails. 'storybook-gate' against
  *             `WORKFLOW_STEPS`, 'pull_request' against the run lines of
  *             `PULL_REQUEST_WORKFLOWS`, 'deploy' against `DEPLOY_CHAIN`.
  *   stepOf    the composed row that runs this row as a sub-process, for a row
@@ -185,7 +184,7 @@ export const CHECKS = [
     name: 'check:skill-surfaces',
     script: 'node scripts/generate-uno-skill-surfaces.mjs --check',
     pkg: 'root',
-    trigger: ['pull_request', 'sweep'],
+    trigger: 'pull_request',
     module: 'scripts/generate-uno-skill-surfaces.mjs',
     guards:
       'the generated .claude/skills/ stubs against each SKILL.md.',
@@ -197,10 +196,9 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/generate-check-scripts.mjs',
     guards:
-      'this registry against the three places that state the same set — the `check:*` block of ' +
-      'the root package.json, the check steps of harness-integrity-sweep.yml and those of ' +
-      'storybook-gate.yml, each written between markers from these rows. Before #508 nothing ' +
-      'compared the four, so a check could be registered and missing from a manifest, or run in ' +
+      'this registry against the places that state the same set — the `check:*` block of ' +
+      'the root package.json and the check steps of storybook-gate.yml, each written between ' +
+      'markers from these rows. Before #508 nothing compared them, so a check could be registered and missing from a manifest, or run in ' +
       'a workflow while the registry said it ran nowhere, and every file read as correct from ' +
       'the inside. It also asserts what a generated block cannot state: that each row\'s command ' +
       'is the one its package.json holds (including agents/uno-bot/, which is compared rather ' +
@@ -218,7 +216,7 @@ export const CHECKS = [
     name: 'check:skill-overlap',
     script: 'node scripts/check-skill-overlap.mjs',
     pkg: 'root',
-    trigger: ['pull_request', 'sweep'],
+    trigger: 'pull_request',
     module: 'scripts/check-skill-overlap.mjs',
     guards:
       'one rule, one home — no substantive line living in both an uno skill’s method and its SKILL.md, and none living in two docs the Worker reads (the prompt plus every disclosed reference, the bot skills among them). Reads the bundled set from the bundler, so a stale bundle stops it — and since #234 a SHORT set stops it too, rather than comparing the survivors and printing the narrowed number as the corpus.',
@@ -227,7 +225,7 @@ export const CHECKS = [
     name: 'check:knowledge-disposition',
     script: 'node scripts/check-knowledge-disposition.mjs',
     pkg: 'root',
-    trigger: ['pull_request', 'sweep'],
+    trigger: 'pull_request',
     module: 'scripts/check-knowledge-disposition.mjs',
     guards: 'every file under docs/knowledge/ declaring what it became (a `disposition:`).',
   },
@@ -239,7 +237,7 @@ export const CHECKS = [
     module: 'scripts/check-negation-ratchet.mjs',
     baseline: 'scripts/baselines/negation-baseline.json',
     guards:
-      "the negation ratchet — the density of five imperative-ban tokens (never / don't / do not / cannot / must not) not climbing, over THREE scopes ratcheted separately from one baseline file: the bundled harness docs; since #174, the hand-authored IDE-side docs (the `embodiment: ide` complement of the bundled set within the bundler's own section roots, plus its IDE-only skills/ root, so docs/adr/ and the generated .claude/skills/ surfaces are out by structure); and since #425 the headless GitHub Actions prompts under scripts/prompts/, the third embodiment, which declare no embodiment: and are never bundled, so they are listed by where they live rather than found through the bundler. It counts PROHIBITION TOKENS, not negation as written: the two differ by roughly 3x and #234 chose the narrow, unarguable one on the evidence. Each scope also refuses to run against fewer docs than its baseline was recorded over — a ratchet only fails on a RISE, so a corpus that vanished otherwise passes with a smaller number. Since #601 the record is read and written through `scripts/lib/ratchet.mjs`: six sets, a counts map and a corpus FLOOR per scope, and a scope's total is the sum of its counts rather than a second number stored beside them. The script header carries the measurement.",
+      "the negation ratchet — the density of five imperative-ban tokens (never / don't / do not / cannot / must not) not climbing, over THREE scopes ratcheted separately from one baseline file: the bundled harness docs; since #174, the hand-authored IDE-side docs (the `embodiment: ide` complement of the bundled set within the bundler's own section roots, plus its IDE-only skills/ root, so docs/adr/ and the generated .claude/skills/ surfaces are out by structure); and since #425 the headless prompts under scripts/prompts/ (the shared headless-intake contract), which declare no embodiment: and are never bundled, so they are listed by where they live rather than found through the bundler. It counts PROHIBITION TOKENS, not negation as written: the two differ by roughly 3x and #234 chose the narrow, unarguable one on the evidence. Each scope also refuses to run against fewer docs than its baseline was recorded over — a ratchet only fails on a RISE, so a corpus that vanished otherwise passes with a smaller number. Since #601 the record is read and written through `scripts/lib/ratchet.mjs`: six sets, a counts map and a corpus FLOOR per scope, and a scope's total is the sum of its counts rather than a second number stored beside them. The script header carries the measurement.",
   },
   {
     name: 'check:pointers',
@@ -273,7 +271,7 @@ export const CHECKS = [
     name: 'check:cross-repo',
     script: 'node scripts/check-cross-repo-duplication.mjs',
     pkg: 'root',
-    trigger: ['pull_request', 'sweep'],
+    trigger: 'pull_request',
     module: 'scripts/check-cross-repo-duplication.mjs',
     guards:
       "one meaning stated in TWO REPOSITORIES. The same rename map, in the same shape, sat in plus-uno-blueprint's glossary and in agentic-service-blueprinting's; nothing compared them and they drifted until each was deleted by its own ticket. This sweep compares the three repos' harness documents by SHINGLE — 12 consecutive normalised words, findings merged into runs of 30+ — because paragraph equality is defeated by one edited table cell and would have found ONE shared block across both of those glossaries, which shared 771 words. It reaches the blueprint the way sync-blueprint-contract.mjs does ($BLUEPRINT_REPO or a sibling checkout) and sb through the pinned development dependency this repo now holds the way the blueprint holds it. A vendored document is exempt by the marker its sync writes; three docs/agents/ files a shared plugin installs are exempt by name; two document pairs already duplicated are RECORDED with a ceiling their shared words may fall below and never rise above, and every exemption fails when it goes stale. WITH A SIBLING MISSING IT SKIPS LOUDLY rather than silently — it names the pairings it did not compare, on stdout and, on CI, as a ::warning:: and a job-summary line, because check:contract spent months exiting 0 on a missing checkout while a header called it a gate (#258).",
@@ -538,7 +536,7 @@ export const CHECKS = [
     name: 'check:intake-fsm',
     script: 'node .cursor/hooks/uno-prototype/test-fsm.mjs',
     pkg: 'root',
-    trigger: ['pull_request', 'sweep'],
+    trigger: 'pull_request',
     kind: 'spawn',
     spawnReason:
       'an assert-based smoke suite over the intake FSM. It throws on the first broken ' +
@@ -550,7 +548,7 @@ export const CHECKS = [
     name: 'test:scripts',
     script: 'node --test scripts/*.test.mjs scripts/lib/*.test.mjs',
     pkg: 'root',
-    trigger: ['pull_request', 'sweep'],
+    trigger: 'pull_request',
     kind: 'spawn',
     spawnReason:
       '`node --test`. The runner\'s report IS the findings set, in TAP, and re-rendering it ' +
@@ -699,7 +697,7 @@ export const EXCLUDED = [
     name: 'check:component-registry',
     script: 'node scripts/generate-component-registry-from-storybook.js --check',
     pkg: 'root',
-    trigger: ['pull_request', 'sweep'],
+    trigger: 'pull_request',
     kind: 'spawn',
     spawnReason: 'a generator, spawned as a step of check:agent — see check:component-docs.',
     stepOf: 'check:agent',
@@ -710,7 +708,7 @@ export const EXCLUDED = [
     name: 'check:token-registry',
     script: 'node scripts/generate-token-registry.mjs --check',
     pkg: 'root',
-    trigger: ['pull_request', 'sweep'],
+    trigger: 'pull_request',
     kind: 'spawn',
     spawnReason: 'a generator, spawned as a step of check:agent — see check:component-docs.',
     stepOf: 'check:agent',
@@ -836,91 +834,18 @@ export const EXCLUDED = [
  * The workflow steps that run checks, as data.
  *
  * `scripts/generate-check-scripts.mjs` renders these into the marked regions of
- * the two workflows that used to re-list checks by hand. A step is a step
- * rather than one row per check because the workflows genuinely group them —
- * two registry generators share one step, and so do the skill-overlap check and
- * the script tests.
+ * the workflow that used to re-list checks by hand. A step is a step rather
+ * than one row per check because a workflow may genuinely group them.
  *
  *   workflow  the file the region lives in.
  *   region    the marker pair it is rendered between. A workflow has more than
- *             one where hand-written YAML sits in the middle: the cross-repo
- *             step has to follow the sibling checkouts that give it something
- *             to compare.
+ *             one where hand-written YAML sits in the middle.
  *   name      the step's `name:`.
  *   note      the comment lines above the step, verbatim, each without its `#`.
- *             This prose is the reason the sweep keeps its steps spelled out
- *             instead of calling the composite, so it moved here with the list
- *             rather than being dropped.
  *   runs      the npm script names the step runs, in order.
  *   env       environment the step needs, if any.
  */
 export const WORKFLOW_STEPS = [
-  {
-    workflow: ".github/workflows/harness-integrity-sweep.yml",
-    region: "sweep-checks",
-    name: "Run registry checks",
-    runs: ["check:component-registry", "check:token-registry"],
-  },
-  {
-    workflow: ".github/workflows/harness-integrity-sweep.yml",
-    region: "sweep-checks",
-    name: "Intake FSM smoke tests",
-    note: [
-      "The intake FSM (.cursor/hooks/uno-prototype/) gates every prototype run,",
-      "but its suite had no runner — it passed only when someone invoked node by",
-      "hand. A test nobody runs protects nothing, so it rides the same monthly",
-      "deterministic pass as the registries. Dependency-free; no npm install.",
-    ],
-    runs: ["check:intake-fsm"],
-  },
-  {
-    workflow: ".github/workflows/harness-integrity-sweep.yml",
-    region: "sweep-checks",
-    name: "Skill-surface drift check",
-    note: [
-      "The six skills reach the IDEs and Slack only through generated surfaces",
-      "(.claude/skills/ stubs, the Worker's command map, the app-manifest",
-      "block). Edit a SKILL.md description without regenerating and the slash",
-      "menu quietly describes the old skill — invisible until someone reads it.",
-      "Dependency-free; no npm install.",
-    ],
-    runs: ["check:skill-surfaces"],
-  },
-  {
-    workflow: ".github/workflows/harness-integrity-sweep.yml",
-    region: "sweep-checks",
-    name: "Knowledge disposition check",
-    note: [
-      "docs/knowledge/ became sediment because nothing forced a note to say",
-      "what it became (#172). This is the forcing function: a file there",
-      "without a `disposition:` fails the sweep. Dependency-free; no npm install.",
-    ],
-    runs: ["check:knowledge-disposition"],
-  },
-  {
-    workflow: ".github/workflows/harness-integrity-sweep.yml",
-    region: "sweep-checks",
-    name: "Skill overlap check",
-    note: [
-      "A skill states each rule once — in references/method.md — and each face",
-      "carries only its delta (skills/README.md § Where content goes). Two",
-      "copies of a rule is two rules the moment one is edited, and each file",
-      "still reads correctly alone, so nothing surfaces the drift. The tests",
-      "ride along because a guard nobody has watched fail is a guard nobody",
-      "knows works (#191). Dependency-free; no npm install.",
-    ],
-    runs: ["check:skill-overlap", "test:scripts"],
-  },
-  {
-    workflow: ".github/workflows/harness-integrity-sweep.yml",
-    region: "sweep-cross-repo",
-    name: "Cross-repo duplicate sweep (the comparison, for real)",
-    runs: ["check:cross-repo"],
-    env: {
-      BLUEPRINT_REPO: ".sibling-repos/plus-uno-blueprint",
-      SB_REPO: ".sibling-repos/uno-blueprint-kit",
-    },
-  },
   {
     workflow: ".github/workflows/storybook-gate.yml",
     region: "storybook-checks",

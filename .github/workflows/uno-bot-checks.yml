@@ -70,7 +70,7 @@ name: uno-bot — Worker checks
 #
 # NOT PATHS-FILTERED, on the same reasoning as `check-harness.yml` and
 # `uno-bot-deploy.yml`: `tests/harness-blueprint-names.test.ts` reads the
-# assembled prompt, the tool schemas and the Actions prompts under
+# assembled prompt, the tool schemas and the headless prompts under
 # `scripts/prompts/`, so a PR that touches nothing under `agents/` can turn this
 # suite red — and a filter narrow enough to save an install is a filter that
 # misses that.

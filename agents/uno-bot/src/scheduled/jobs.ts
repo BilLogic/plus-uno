@@ -21,7 +21,7 @@ import { dsPrecedenceSectionFor, runDsPrecedenceCheck, runDsPrecedencePost } fro
 import { figmaDecisionsSectionFor, figmaQuestionsSectionFor } from "../figma-comments/env";
 import { runSweepJobOnEnv } from "../sweep/env";
 import { commitmentThreadHookFor, runCommitmentNudgesOnEnv } from "../commitments/env";
-import { cardTodoNoteHookFor, cardTodoThreadHookFor, morningFollowUpsFor, runCardFollowThroughOnEnv } from "../follow-through/env";
+import { cardTodoNoteHookFor, cardTodoThreadHookFor, morningFollowUpsFor, runCardFollowThroughOnEnv, weeklyStaleCardsFor } from "../follow-through/env";
 import type { SweepThread } from "../sweep/finding";
 import type { SweepDeps } from "../sweep/run";
 import type { SweepSection } from "../sweep/sections";
@@ -30,6 +30,15 @@ import { runBackstopOnEnv } from "../figma-notify/env";
 import { runTidyPostOnEnv, runTidyReadOnEnv, tidySectionFor } from "../figma-tidy/env";
 import { devLinksSectionFor, runDevLinksMorningOnEnv } from "../figma-links/env";
 import { dmThreadHookFor } from "../dm-sweep/env";
+import {
+  removalOfferSectionFor,
+  revisionSectionFor,
+  runProposalOffersOnEnv,
+  runRevisionPostOnEnv,
+  runRevisionThreadOnEnv,
+  runShippedDraftOnEnv,
+  runShippedMatchOnEnv,
+} from "../blueprint-upkeep/env";
 import { runProposalExpiry } from "../usage/index";
 import { runDmPromiseNudgesOnEnv, runDmPromiseReadOnEnv } from "../dm-watch/env";
 import { runDmCapturePostOnEnv, runDmCaptureReadOnEnv } from "../dm-watch/capture-env";
@@ -73,21 +82,24 @@ const sweepBody: JobBody = async (env, job, ctx) => {
 
 /**
  * What the morning's other jobs handed the sweep's post, one port a job: the
- * card follow-ups, the weekly DS precedence report, the Figma comment
- * decisions, the weekly Figma tidy-up, the Figma drift questions and the Dev
- * Mode links card
- * (src/sweep/sections.ts). Each is absent without its bindings or
+ * card follow-ups, Monday's stuck cards, the weekly DS precedence report,
+ * the Figma comment decisions, the weekly Figma tidy-up, the Figma drift
+ * questions, the Dev Mode links card, the blueprint revisions and the
+ * blueprint proposals' removal offers (src/sweep/sections.ts). Each is absent without its bindings or
  * the run's storage.
  */
 export function morningSectionsFor(env: Env, ctx: JobContext): SweepSection[] {
   return [
     morningFollowUpsFor(env, ctx),
+    weeklyStaleCardsFor(env, ctx),
     dsPrecedenceSectionFor(env, ctx),
     figmaDecisionsSectionFor(env, ctx),
     figmaQuestionsSectionFor(env, ctx),
     tidySectionFor(env, ctx),
     driftSectionFor(env, ctx),
     devLinksSectionFor(env, ctx),
+    revisionSectionFor(env, ctx),
+    removalOfferSectionFor(env, ctx),
   ].filter(
     (s): s is SweepSection => !!s,
   );
@@ -192,7 +204,7 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
     const { summary } = await runProposalExpiry(proposalEventLogFor(env), Date.now(), { dryRun });
     console.log(`[usage] proposal expiry: ${summary}`);
   },
-  // Friday's end of day: compare code with the library and keep the
+  // Monday's end of day: compare code with the library and keep the
   // disagreements for the morning (src/ds-precedence/).
   "ds-precedence-check": async (env, _job, ctx) => {
     console.log(`[ds-precedence] check: ${(await runDsPrecedenceCheck(env, ctx)).summary}`);
@@ -292,6 +304,43 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "figma-dev-links-post": async (env, job, ctx) => {
     const report = await runDevLinksMorningOnEnv(env, ctx);
     console.log(`[figma-links] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // End of day, one of several: the next Roadmap cards deployed since the
+  // last run, each weighed by the service-change gate, a path queued to draft
+  // for each path a card changes (src/blueprint-upkeep/).
+  "blueprint-shipped": async (env, job, ctx) => {
+    const report = await runShippedMatchOnEnv(env, ctx);
+    console.log(`[blueprint-upkeep] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // End of day, one of several: the next queued paths, each drafted as a
+  // blueprint revision kept for the morning.
+  "blueprint-draft": async (env, job, ctx) => {
+    const report = await runShippedDraftOnEnv(env, ctx);
+    console.log(`[blueprint-upkeep] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // Morning: each waiting revision handed to the sweep's message at its
+  // card's place.
+  "blueprint-revision-post": async (env, job, ctx) => {
+    const report = await runRevisionPostOnEnv(env, ctx);
+    console.log(`[blueprint-upkeep] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // Morning, after the sweep's post: the revisions a carousel had no room
+  // for, up in its message's thread.
+  "blueprint-revision-thread": async (env, job, ctx) => {
+    const report = await runRevisionThreadOnEnv(env, ctx);
+    console.log(`[blueprint-upkeep] ${job.key}: ${report.summary}`);
+    return report;
+  },
+  // Morning: each drawn proposal no Roadmap card took up in 30 days, its
+  // removal handed to the sweep's message in its own thread, offered once to
+  // the person who drew it.
+  "blueprint-proposal-offer": async (env, job, ctx) => {
+    const report = await runProposalOffersOnEnv(env, ctx);
+    console.log(`[blueprint-upkeep] ${job.key}: ${report.summary}`);
     return report;
   },
 };

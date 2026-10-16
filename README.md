@@ -29,9 +29,8 @@ Open [localhost:4200](http://localhost:4200) for Storybook, [localhost:4100/home
 |---|---|---|
 | **In-IDE agent** | Claude Code, Cursor, Windsurf, Copilot — any tool that reads `AGENTS.md` | The full-capability face: research, synthesis, prototyping, review, repo edits |
 | **uno-bot** | `@uno-bot` in Slack | Grounded Q&A + gated actions (file PRDs, trigger builds) — see [`agents/uno-bot/README.md`](agents/uno-bot/README.md) |
-| **Headless runs** | GitHub Actions (`Implement Design`, `Implement Figma Changes`) | Figma-to-code builds that open draft PRs |
 
-All three read the same brain: [`AGENTS.md`](AGENTS.md) — the constitution: identity, skill roster, the loading contract, and the hard rules. The in-IDE agent and headless runs read those files from the checkout, so a push to `main` reaches them immediately. The Worker does NOT: its harness is baked into the bundle at build time, so a guidance edit reaches uno-bot only on `npm run deploy` (`agents/uno-bot/scripts/bundle-harness.mjs`).
+Both read the same brain: [`AGENTS.md`](AGENTS.md) — the constitution: identity, skill roster, the loading contract, and the hard rules. The in-IDE agent reads those files from the checkout, so a push to `main` reaches it immediately. The Worker does NOT: its harness is baked into the bundle at build time, so a guidance edit reaches uno-bot only on `npm run deploy` (`agents/uno-bot/scripts/bundle-harness.mjs`).
 
 **The interaction contract (IDE): humans speak in skills · skills summon agents · agents obey conventions.** uno-bot runs its own bot skills over the Worker's tools.
 

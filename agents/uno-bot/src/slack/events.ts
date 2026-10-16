@@ -1,6 +1,6 @@
 import type { Env } from "../types";
 import type { ThreadJobOutcome } from "../runner/queue";
-import { charge } from "../net";
+import { charge, rethrowIfBudget } from "../net";
 import { looksLikeCorrection } from "../agent/run-agent";
 import { DM_CONVERSATION, type DecisionReportRecord, type Execution, type HistoryTurn, type PendingProposal } from "../thread-state/index";
 import { engagesOnSweepCard, isSweepCardPost } from "../sweep/cards";
@@ -45,6 +45,13 @@ import { isIntakeChannel } from "../turn/intake-channel";
 import { handlePrecedenceGateReply, isPrecedenceGateCandidate, isWeeklyPrecedenceThread } from "../ds-precedence/env";
 import { handleFigmaDecisionReply, isFigmaDecisionCandidate, isFigmaDecisionThread } from "../figma-comments/env";
 import { handleCardReplyOnEnv, isCardReplyCandidate, mayBeCardReply } from "../follow-through/env";
+import {
+  handleRevisionReplyOnEnv,
+  handleWithdrawRequestOnEnv,
+  isRevisionReplyCandidate,
+  isRevisionThread,
+  isWithdrawRequestCandidate,
+} from "../blueprint-upkeep/env";
 import { recheckOnUpdateOnEnv } from "../figma-drift/env";
 import { typedEmojiDecision } from "../gate/reactions";
 import { runFigmaEventJob } from "../figma-notify/job";
@@ -491,32 +498,105 @@ async function onMessage(env: Env, event: SlackMessageEvent, reply?: string | nu
   });
 }
 
+/** One reply handled ahead of the turn: the one table both the queue's choice
+ *  (`replyHandlerAt`) and the job's chain (`replyHandlersFor`) read, so the
+ *  two never disagree on a name or an order. */
+interface ReplyRoute {
+  name: string;
+  /** The message's shape alone; reads nothing. */
+  candidate(env: Env, e: SlackMessageEvent): boolean;
+  /** At queue time, what confirms it past its shape (a KV read); absent, its
+   *  shape is enough. */
+  confirmed?(env: Env, e: SlackMessageEvent): Promise<boolean>;
+  handle(env: Env, e: SlackMessageEvent): Promise<boolean>;
+  /** It takes a Review "Needs changes" note on its own cards itself. */
+  takesReviewNote?: true;
+}
+
+/**
+ * The replies handled ahead of the turn, in the order tried: a typed ✅/⛔ in a
+ * weekly DS precedence thread, which gets the review-only line (a throw runs
+ * the turn); a reply in a Figma comment-decision thread, which may reword one
+ * of its decisions; a reply in a thread holding blueprint revisions, which
+ * may redraft one; an answer in a thread holding a card follow-up (it catches
+ * every failure); and a short removal ask that may be about a blueprint
+ * proposal drawn there (its shape alone; the handler reads the record).
+ */
+const REPLY_ROUTES: readonly ReplyRoute[] = [
+  {
+    name: "ds-precedence",
+    candidate: isPrecedenceGateCandidate,
+    confirmed: (env, e) => isWeeklyPrecedenceThread(env, e.channel, e.thread_ts!),
+    handle: handlePrecedenceGateReply,
+  },
+  {
+    name: "figma-decisions",
+    candidate: isFigmaDecisionCandidate,
+    confirmed: (env, e) => isFigmaDecisionThread(env, e.channel, e.thread_ts!),
+    handle: handleFigmaDecisionReply,
+    takesReviewNote: true,
+  },
+  // A revision thread is the morning message's, which may hold card
+  // follow-ups too: an answer to one of those is theirs first.
+  {
+    name: "blueprint-revisions",
+    candidate: isRevisionReplyCandidate,
+    confirmed: (env, e) =>
+      isRevisionThread(env, e.channel, e.thread_ts!).catch((err: unknown) => {
+        rethrowIfBudget(err);
+        return false;
+      }),
+    handle: async (env, e) => (isCardReplyCandidate(env, e) && (await handleCardReplyOnEnv(env, e))) || handleRevisionReplyOnEnv(env, e),
+    takesReviewNote: true,
+  },
+  {
+    name: "follow-through",
+    candidate: isCardReplyCandidate,
+    confirmed: mayBeCardReply,
+    handle: handleCardReplyOnEnv,
+  },
+  // "remove it" from the person who drew a blueprint proposal in this
+  // conversation: a ✅ card to delete it. Anyone else, or a conversation with
+  // no proposal of theirs standing, falls through to the turn.
+  {
+    name: "blueprint-withdraw",
+    candidate: (env, e) => isWithdrawRequestCandidate(env, e, isDm(e.channel)),
+    handle: (env, e) => handleWithdrawRequestOnEnv(env, e, conversationTs(e)),
+  },
+];
+
 /**
  * The ahead-of-the-turn handler a message is for, decided once when it is
- * queued: a typed ✅/⛔ in a weekly DS precedence thread, which gets the
- * review-only line, a reply in a Figma comment-decision thread, which may reword one of its decisions, or
- * an answer in a thread holding a card follow-up (each one KV read, and only
- * for a message of the right shape). Null for none.
+ * queued (`REPLY_ROUTES`): the first whose shape fits and whose thread
+ * confirms it. Null for none.
  *
  * @param env - Worker bindings
  * @param msg - The message
  */
 export async function replyHandlerAt(env: Env, msg: SlackMessageEvent): Promise<string | null> {
-  if (isPrecedenceGateCandidate(env, msg) && (await isWeeklyPrecedenceThread(env, msg.channel, msg.thread_ts!))) return "ds-precedence";
-  if (isFigmaDecisionCandidate(env, msg) && (await isFigmaDecisionThread(env, msg.channel, msg.thread_ts!))) return "figma-decisions";
-  if (await mayBeCardReply(env, msg)) return "follow-through";
+  for (const route of REPLY_ROUTES) {
+    if (route.candidate(env, msg) && (!route.confirmed || (await route.confirmed(env, msg)))) return route.name;
+  }
   return null;
 }
 
-/** The replies handled ahead of the turn, in the order tried: a typed gate
- *  emoji in a weekly DS precedence thread (a throw runs the turn), a reply in a Figma comment-decision thread, and an answer under a card
- *  follow-up (it catches every failure). */
+/** The replies handled ahead of the turn, in the order tried (`REPLY_ROUTES`). */
 export function replyHandlersFor(env: Env): ReplyHandler[] {
-  return [
-    { name: "ds-precedence", candidate: (e) => isPrecedenceGateCandidate(env, e), handle: (e) => handlePrecedenceGateReply(env, e) },
-    { name: "figma-decisions", candidate: (e) => isFigmaDecisionCandidate(env, e), handle: (e) => handleFigmaDecisionReply(env, e) },
-    { name: "follow-through", candidate: (e) => isCardReplyCandidate(env, e), handle: (e) => handleCardReplyOnEnv(env, e) },
-  ];
+  return REPLY_ROUTES.map((route) => ({
+    name: route.name,
+    candidate: (e: SlackMessageEvent) => route.candidate(env, e),
+    handle: (e: SlackMessageEvent) => route.handle(env, e),
+  }));
+}
+
+/**
+ * The handler a Review "Needs changes" note goes to when that handler takes
+ * notes on its own cards (`takesReviewNote`); null sends it to the turn.
+ *
+ * @param name - The handler `replyHandlerAt` chose for the note
+ */
+export function reviewNoteHandler(name: string | null): string | null {
+  return REPLY_ROUTES.some((r) => r.name === name && r.takesReviewNote) ? name : null;
 }
 
 async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<void> {

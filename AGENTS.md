@@ -7,7 +7,7 @@ summary: The constitution — identity, routing, the loading contract, and hard 
 
 <!-- Tier: 1 — the only always-loaded doc. Everything else loads on demand or is retrieved live; the contract is § The loading contract below. -->
 
-The one identity, roster, and routing document for every agent working in this repo — the in-IDE agent, the uno-bot Slack Worker (which bakes this file into its bundle at build time), and headless GitHub Actions runs.
+The one identity, roster, and routing document for every agent working in this repo — the in-IDE agent and the uno-bot Slack Worker (which bakes this file into its bundle at build time).
 
 **The interaction contract (IDE): humans speak in skills · skills summon agents · agents obey conventions.**
 Users remember six skills; agents point at the conventions they enforce and never restate them. In Slack, bot skills call the Worker's tools instead.
@@ -69,7 +69,6 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 
 **Bundle mechanics (uno-bot).** Sections, order, `ide-only` stripping and the char budgets — this file, the persona, each bot skill, the assembled ceiling and its floor — are decided in one place, the header of `agents/uno-bot/scripts/bundle-harness.mjs`. `npm run check:harness` names the file and the distance for each: this file's overrun warns, and a stale bundle, any other overrun or a shortfall fails the build. Its `assemble()` returns a manifest of what it computed, and the root checks read that in-process through `scripts/lib/bundled-set.mjs`. A doc cites a budget by its `BUDGETS` key and leaves the number to the bundler; `check:harness-budgets` holds every doc under a section root to that.
 
-**GitHub Actions.** `scripts/lib/skill-loader.js` loads `scripts/prompts/*` with meta-stripping; offline, which is fine because conventions are repo-canonical.
 <!-- /ide-only -->
 
 ## Hard rules
@@ -86,7 +85,7 @@ The name in parentheses is how the rest of the harness cites each rule, so renum
 5. **PLUS components first** (`PLUS-components-first`), then generic React-Bootstrap where no PLUS equivalent exists (ADR-009). Bootstrap is the UI framework for product UI; Tailwind is present but scoped to the Storybook documentation chrome in `design-system/src/storybook-docs/`, so it is not a precedent for product code.
 
 <!-- ide-only -->
-### Code authoring — IDE and Actions runners only
+### Code authoring — IDE only
 
 Each rule is one line here and its body lives in the document it names; the leading word is the trigger.
 
