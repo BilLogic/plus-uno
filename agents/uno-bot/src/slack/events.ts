@@ -182,7 +182,9 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
 // Keyed per thread so runs within a thread stay ordered.
 // Exported for the slash-command route (commands.ts), which builds a synthetic
 // `message` job so a /grind or /chill run is an ordinary thread from here down.
-export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey: string): Promise<void> {
+// Resolves to whether the runner took the job, for a caller that tells its
+// person itself (a Check it press, which has its own words and Try again).
+export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey: string): Promise<boolean> {
   const stub = env.AGENT_RUNNER.get(env.AGENT_RUNNER.idFromName(threadKey));
   charge(1, "agent-runner"); // DO stub call — a subrequest the meter can't see.
   const res = await stub.fetch("https://do/enqueue", {
@@ -200,7 +202,8 @@ export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey
     // A cut-off job has nobody waiting on it: the record stays untaken, and
     // the ThreadState alarm hands it over again. A Figma event has no thread
     // to speak in, and never comes this way: its route enqueues it once.
-    if (job.kind === "cut-off" || job.kind === "figma-event" || job.kind === "report-expiry" || job.kind === "card-expiry" || job.kind === "figma-dev-links-write" || job.kind === "blueprint-check") return;
+    // A blueprint check's press tells its presser itself.
+    if (job.kind === "cut-off" || job.kind === "figma-event" || job.kind === "report-expiry" || job.kind === "card-expiry" || job.kind === "figma-dev-links-write" || job.kind === "blueprint-check") return false;
     const target =
       job.kind === "message"
         ? { channel: job.event.channel, thread_ts: replyThreadTs(job.event) }
@@ -209,7 +212,9 @@ export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey
       ...target,
       text: ":warning: I couldn't start on that one — try again, and if it repeats flag it in #uno-bot.",
     }).catch(() => {});
+    return false;
   }
+  return true;
 }
 
 /**
@@ -288,7 +293,7 @@ export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<Thre
     return "handled";
   }
   if (job.kind === "blueprint-check") {
-    await runBlueprintCheckOnEnv(env, job.offerTs);
+    await runBlueprintCheckOnEnv(env, job);
     return "handled";
   }
   if (job.kind === "figma-event") {

@@ -319,7 +319,7 @@ export function selectProvider(env: Env): ModelProvider {
   const provider = (env.MODEL_PROVIDER ?? "gemini").toLowerCase();
   if (provider === "vertex-claude" && claudeVertexConfigured(env)) {
     return claudeProvider({
-      transport: (model, body) => claudeVertexRaw(env, model, body),
+      transport: (model, body, signal) => claudeVertexRaw(env, model, body, signal),
       defaultModel: env.CLAUDE_MODEL,
     });
   }

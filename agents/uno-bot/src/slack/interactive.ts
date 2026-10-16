@@ -22,6 +22,7 @@
 // uses) or a normal chat.postMessage, never by holding the response open.
 
 import type { Env } from "../types";
+import { charge } from "../net";
 import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
 import { restageFor, stageFromButtonFor } from "../turn/env-deps";
@@ -61,9 +62,9 @@ import { slackDelivery } from "./slack-delivery";
 import { standingConfirmersOf } from "./standing-confirmers";
 import { runButtonDoor, type ButtonDoorDeps, type CardMessage } from "./button-door";
 import { WHICH_ACTION_PREFIX, runWhichCardDoor, whichPressOf } from "./which-card";
-import { CHECK_IT_ACTION_ID, resultsActionOf, runCheckItDoor, runResultsDoor } from "./blueprint-check";
+import { CHECK_IT_ACTION_ID, resultsActionOf, runCheckItDoor, runResultsDoor, runStopCheckDoor, STOP_CHECK_ACTION_ID } from "./blueprint-check";
 import { createdPageOn } from "../blueprint-upkeep/env";
-import type { ResultsAction } from "../blueprint-upkeep/check";
+import { blueprintCheckRunnerKey, type ResultsAction } from "../blueprint-upkeep/check";
 import { DM_WATCH_ACTION_ID, saveDmWatchAction } from "../dm-watch/index";
 import { setDmWatchOnEnv } from "../dm-watch/env";
 import { publishHomeView } from "./home";
@@ -194,6 +195,7 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
   if (actionId.startsWith(WHICH_ACTION_PREFIX)) return resolveFromWhichCard(env, payload, actionId);
   if (actionId === CHECK_IT_ACTION_ID) return checkIt(env, payload);
+  if (actionId === STOP_CHECK_ACTION_ID) return stopCheck(env, payload);
   const resultsAction = resultsActionOf(actionId);
   if (resultsAction) return actOnResults(env, payload, resultsAction);
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
@@ -310,6 +312,37 @@ async function checkIt(env: Env, payload: InteractionPayload): Promise<void> {
     {
       store: threadStateFor(env),
       enqueue: (job, runnerKey) => enqueueAgentJob(env, job, runnerKey),
+      replaceOffer: (message) => replaceCard(payload, message),
+      replyEphemeral: (text) => replyEphemeral(payload, text),
+    },
+  );
+}
+
+// Stop, on the checking line (#1322): the presser of Check it or the card's
+// requester stops the check (`blueprint-check.ts`). The record is marked here;
+// the model call in flight is aborted by asking the check's own runner, where
+// its job runs (`/cancel`, agent-runner.ts) — one hop, in this `waitUntil`.
+//
+// `Env` enters here and stops here.
+async function stopCheck(env: Env, payload: InteractionPayload): Promise<void> {
+  const channel = payload.channel?.id;
+  const offerTs = payload.message?.ts;
+  const userId = payload.user?.id;
+  if (!channel || !offerTs || !userId) return;
+  await runStopCheckDoor(
+    { channel, offerTs, userId },
+    {
+      store: threadStateFor(env),
+      async cancel(offer, run) {
+        const key = blueprintCheckRunnerKey(offer.channel, offer.offerTs);
+        charge(1, "agent-runner"); // DO stub call — a subrequest the meter can't see.
+        const res = await env.AGENT_RUNNER.get(env.AGENT_RUNNER.idFromName(key)).fetch("https://do/cancel", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ run }),
+        });
+        if (!res.ok) console.warn(`[blueprint-check] cancel refused on ${key}: ${res.status}`);
+      },
       replaceOffer: (message) => replaceCard(payload, message),
       replyEphemeral: (text) => replyEphemeral(payload, text),
     },
@@ -600,7 +633,7 @@ async function tryAgain(env: Env, payload: InteractionPayload): Promise<void> {
     },
     {
       post: async (message) => (await postMessage(env, message))?.ts ?? null,
-      enqueue: (event) => enqueueAgentJob(env, { kind: "message", event, reply: null }, conversationKey(event)),
+      enqueue: async (event) => void (await enqueueAgentJob(env, { kind: "message", event, reply: null }, conversationKey(event))),
       replyEphemeral: (text) => replyEphemeral(payload, text),
     },
   );
@@ -614,7 +647,7 @@ async function tryAsking(env: Env, payload: InteractionPayload): Promise<void> {
     {
       dmChannelFor: (id) => conversationsOpen(env, id),
       post: async (message) => (await postMessage(env, message))?.ts ?? null,
-      enqueue: (event, key) => enqueueAgentJob(env, { kind: "message", event }, key),
+      enqueue: async (event, key) => void (await enqueueAgentJob(env, { kind: "message", event }, key)),
     },
   );
 }

@@ -10,7 +10,7 @@
 //
 // Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `exec:{ts}`, `report:{ts}`,
 // `event:{event_id}`, `actx:{channel}:{thread}`, `cancel:{channel}:{thread}`,
-// `run:{user}`, `filing:{key}`, `cmp:{channel}:{thread}:{scenario}`, `chk:{ts}`, and the
+// `run:{user}`, `filing:{key}`, `cmp:{channel}:{thread}:{scenario}` (a check's record), `chk:{ts}`, and the
 // alarm's own `gc:next`.
 //
 // ── THE CONTRACT IS THIS CLASS'S OWN SIGNATURE (#493, #494) ─────────────────
@@ -23,7 +23,7 @@
 // `takeCutOffExecutionInThread`, `findCutOffExecutions`,
 // `reportCutOffNote`, `get/putAssistantContext`, `requestCancel`,
 // `consumeCancel`, `cancelForUser`, `setActiveRun`, `checkAndRecordEvent`,
-// `claimRun`, `markRunDone`, `claimFiling`, `settleFiling`, `claimComparison`,
+// `claimRun`, `markRunDone`, `claimFiling`, `settleFiling`, `claimCheck`, `getCheck`, `stepCheck`,
 // `putCheckOffer`, `getCheckOffer`. A rename is a type error rather than a runtime
 // 404, which is the whole point.
 //
@@ -78,6 +78,14 @@ import {
   cardExpiryOwed,
   expiredCardEdit,
   claimedFiling,
+  claimedCheck,
+  liveCheck,
+  steppedCheck,
+  type CheckClaim,
+  type CheckRecord,
+  type CheckStart,
+  type CheckState,
+  type StoredCheck,
   comparisonKey,
   CHECK_OFFER_KEEP_MS,
   checkOfferKey,
@@ -993,16 +1001,33 @@ export class ThreadState extends DurableObject<Env> {
     else await this.storage.delete(filingKey(key));
   }
 
-  // ----- one comparison per scenario per thread -----
+  // ----- one blueprint check per scenario per thread (#1322) -----
+  //
+  // Each read and its write are one transaction, so of two racing presses one
+  // claims, and a Stop and the job's own finish cannot both win.
 
-  async claimComparison(ref: ThreadRef, scenario: string, at: number): Promise<boolean> {
+  async claimCheck(ref: ThreadRef, scenario: string, start: CheckStart, at: number): Promise<CheckClaim> {
     const key = comparisonKey(ref, scenario);
     return this.storage.transaction(async (txn) => {
-      const held = await txn.get<{ at: number }>(key);
-      if (held && at - held.at < HISTORY_TTL_MS) return false;
-      await txn.put<{ at: number }>(key, { at });
-      await this.ensureGcAlarm(txn);
-      return true;
+      const { claim, store } = claimedCheck(await txn.get<StoredCheck>(key), at, start, crypto.randomUUID());
+      if (store) {
+        await txn.put<CheckRecord>(key, store);
+        await this.ensureGcAlarm(txn);
+      }
+      return claim;
+    });
+  }
+
+  async getCheck(ref: ThreadRef, scenario: string, at: number): Promise<CheckRecord | null> {
+    return liveCheck(await this.storage.get<StoredCheck>(comparisonKey(ref, scenario)), at);
+  }
+
+  async stepCheck(ref: ThreadRef, scenario: string, run: string, to: Exclude<CheckState, "running">, at: number): Promise<boolean> {
+    const key = comparisonKey(ref, scenario);
+    return this.storage.transaction(async (txn) => {
+      const stepped = steppedCheck(await txn.get<StoredCheck>(key), at, run, to);
+      if (stepped) await txn.put<CheckRecord>(key, stepped);
+      return stepped !== null;
     });
   }
 

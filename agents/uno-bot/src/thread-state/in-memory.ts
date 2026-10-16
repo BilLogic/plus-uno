@@ -38,6 +38,10 @@ import {
   reportItemLook,
   type ReportExpiryRecord,
   claimedFiling,
+  claimedCheck,
+  liveCheck,
+  steppedCheck,
+  type CheckRecord,
   comparisonKey,
   CHECK_OFFER_KEEP_MS,
   type CheckOfferRecord,
@@ -129,8 +133,8 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
   const activeRuns = new Map<string, ActiveRunRecord>();
   const events = new Map<string, EventRecord>();
   const filings = new Map<string, FilingRecord>();
-  /** When each thread's comparison for a scenario was shown, by `comparisonKey`. */
-  const compared = new Map<string, number>();
+  /** Each thread's check of a scenario, by `comparisonKey` (#1322). */
+  const checks = new Map<string, CheckRecord>();
   /** Each Check it offer, by its message ts, with when it was put. */
   const checkOffers = new Map<string, CheckOfferRecord>();
   const executions = new Map<string, Execution>();
@@ -540,12 +544,23 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       else filings.delete(key);
     },
 
-    async claimComparison(ref, scenario) {
+    async claimCheck(ref, scenario, start) {
       const key = comparisonKey(ref, scenario);
-      const at = compared.get(key);
-      if (at !== undefined && now() - at < HISTORY_TTL_MS) return false;
-      compared.set(key, now());
-      return true;
+      const { claim, store } = claimedCheck(checks.get(key), now(), start, crypto.randomUUID());
+      if (store) checks.set(key, store);
+      return structuredClone(claim);
+    },
+
+    async getCheck(ref, scenario) {
+      const live = liveCheck(checks.get(comparisonKey(ref, scenario)), now());
+      return live ? structuredClone(live) : null;
+    },
+
+    async stepCheck(ref, scenario, run, to) {
+      const key = comparisonKey(ref, scenario);
+      const stepped = steppedCheck(checks.get(key), now(), run, to);
+      if (stepped) checks.set(key, stepped);
+      return stepped !== null;
     },
 
     async putCheckOffer(offer) {

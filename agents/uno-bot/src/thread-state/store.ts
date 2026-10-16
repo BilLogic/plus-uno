@@ -1892,15 +1892,32 @@ export interface ThreadState {
    *  claim with nothing filed. */
   settleFiling(key: string, issue: FiledIssue | null): Promise<void>;
 
-  // ----- one comparison per scenario per thread -----
+  // ----- one blueprint check per scenario per thread (#1322) -----
+  //
+  // One record a thread and scenario (`CheckRecord`, under `comparisonKey`),
+  // whichever offer it was pressed on — a PRD card's or an IDE hand-off's
+  // (#1324) — so the thread checks a scenario once, whichever asked first.
+  // Each step is one hop and one transaction.
 
   /**
-   * Claim the one blueprint comparison a thread gets for a scenario
-   * (`blueprint-upkeep/milestone.ts`): true the first time, and recorded in
-   * the same step, so of two racing turns one shows it. Kept as long as the
-   * thread's memory (`HISTORY_TTL_MS`).
+   * Claim the thread's check of a scenario for a Check it press: "claimed"
+   * with the new run's id when nothing holds it, when what held it ended
+   * stopped or failed, or when a running one outlived `CHECK_LEASE_MS` (a job
+   * killed mid-run); otherwise "running" or "done" with the record, and
+   * nothing changes. Of two racing presses one is told "claimed".
    */
-  claimComparison(ref: ThreadRef, scenario: string): Promise<boolean>;
+  claimCheck(ref: ThreadRef, scenario: string, start: CheckStart): Promise<CheckClaim>;
+
+  /** The thread's check of a scenario as it stands, or null when there is none. */
+  getCheck(ref: ThreadRef, scenario: string): Promise<CheckRecord | null>;
+
+  /**
+   * Move a run to `stopped`, `done` or `failed` (`steppedCheck`): true when
+   * it moved. Only the run named moves, and only from `running` — though a
+   * done run may still fail (its results did not post) — so a stopped run's
+   * late job is told false and posts nothing.
+   */
+  stepCheck(ref: ThreadRef, scenario: string, run: string, to: Exclude<CheckState, "running">): Promise<boolean>;
 
   // ----- the blueprint check's offers (#1321) -----
 
@@ -1978,6 +1995,93 @@ export function checkOfferKey(offerTs: string): string {
 export interface CheckOfferRecord {
   offer: BlueprintCheckOffer;
   at: number;
+}
+
+// ── One blueprint check per scenario per thread (#1322) ─────────────────────
+
+/** Where a thread's check of a scenario is: under way, finished with its
+ *  results posted, stopped by someone, or failed (an error or its deadline). */
+export type CheckState = "running" | "done" | "stopped" | "failed";
+
+/**
+ * A thread's check of a scenario. Stopped and failed are not the end: Check
+ * again and Try again claim it anew, as a new run. Done is — the thread's
+ * results are posted.
+ */
+export interface CheckRecord {
+  state: CheckState;
+  /** This run's id, new at each claim: what tells a stopped run's late job
+   *  from the run that replaced it. */
+  run: string;
+  /** Who pressed Check it: with the offer's requester, who may stop it. */
+  by: string;
+  /** The check's status message: the offer's ts it was pressed on. */
+  statusTs: string;
+  /** When it last changed state, epoch ms. */
+  at: number;
+}
+
+/** What a Check it press starts a run with. */
+export interface CheckStart {
+  by: string;
+  statusTs: string;
+}
+
+/** The answer to a Check it press (`ThreadState.claimCheck`). */
+export type CheckClaim = { state: "claimed"; run: string } | { state: "running" | "done"; record: CheckRecord };
+
+/** How long a running check holds its claim before it is taken as a job
+ *  killed mid-run, and may be claimed again: past the check's own deadline
+ *  (`CHECK_DEADLINE_MS`, blueprint-upkeep/check.ts), with room for its
+ *  queue. */
+export const CHECK_LEASE_MS = 10 * 60 * 1000;
+
+/** A check's key as stored: a record, or the set-once mark from before #1322. */
+export type StoredCheck = CheckRecord | { at: number };
+
+/**
+ * A stored check, read as of `at`: null past the thread's memory. A mark
+ * from before #1322 (`{at}`) reads as a done check nobody can be named for.
+ *
+ * @param stored - What the key holds
+ * @param at - Now
+ */
+export function liveCheck(stored: StoredCheck | undefined, at: number): CheckRecord | null {
+  if (!stored || at - stored.at >= HISTORY_TTL_MS) return null;
+  return "state" in stored ? stored : { state: "done", run: "", by: "", statusTs: "", at: stored.at };
+}
+
+/**
+ * A claim against a check's record: the answer, and the record to store when
+ * the claim is taken (null when nothing changes).
+ *
+ * @param stored - What the key holds
+ * @param at - Now
+ * @param start - Who pressed, and the status message
+ * @param run - The new run's id, should the claim be taken
+ */
+export function claimedCheck(stored: StoredCheck | undefined, at: number, start: CheckStart, run: string): { claim: CheckClaim; store: CheckRecord | null } {
+  const live = liveCheck(stored, at);
+  if (live?.state === "done") return { claim: { state: "done", record: live }, store: null };
+  if (live?.state === "running" && at - live.at < CHECK_LEASE_MS) return { claim: { state: "running", record: live }, store: null };
+  return { claim: { state: "claimed", run }, store: { state: "running", run, ...start, at } };
+}
+
+/**
+ * A run's step to `to`, or null when it may not take it: another run holds
+ * the record, or the record is not running — though a done run may still
+ * fail.
+ *
+ * @param stored - What the key holds
+ * @param at - Now
+ * @param run - The run stepping
+ * @param to - Where to
+ */
+export function steppedCheck(stored: StoredCheck | undefined, at: number, run: string, to: Exclude<CheckState, "running">): CheckRecord | null {
+  const live = liveCheck(stored, at);
+  if (!live || live.run !== run) return null;
+  const from: CheckState[] = to === "failed" ? ["running", "done"] : ["running"];
+  return from.includes(live.state) ? { ...live, state: to, at } : null;
 }
 
 /** The record a thread's one comparison for a scenario is kept under. */

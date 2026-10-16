@@ -184,6 +184,9 @@ export function geminiProvider(env: Env): ModelProvider {
           ...(prompt.system ? { system: prompt.system } : {}),
           ...(prompt.maxTokens ? { maxTokens: prompt.maxTokens } : {}),
           ...(level ? { thinkingLevel: level } : {}),
+          // An abort fails the call with no status, so it never reaches the
+          // backup below.
+          ...(prompt.signal ? { signal: prompt.signal } : {}),
         });
       };
       let res = await ask(oneShotModel);

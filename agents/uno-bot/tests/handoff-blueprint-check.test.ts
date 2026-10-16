@@ -20,12 +20,14 @@ import {
   runBlueprintCheck,
   serviceChangeGate,
   serviceChangeJudgement,
+  type BlueprintCheckJob,
   type CheckOutcome,
   type PathToday,
 } from "../src/blueprint-upkeep/index";
 import type { BlueprintRow } from "../src/integrations/blueprint";
 import { createInMemoryThreadState, proposalOperations, type PendingProposal, type ThreadState } from "../src/thread-state/index";
-import { runCheckItDoor } from "../src/slack/blueprint-check";
+import { checkedMessage, runCheckItDoor, runStopCheckDoor } from "../src/slack/blueprint-check";
+import type { CardMessage } from "../src/slack/button-door";
 import type { RunnerJobPayload } from "../src/slack/types";
 import { cardExpiresAt } from "../src/card-expiry";
 import { CHANNEL, harness, request } from "./helpers/turn-harness";
@@ -111,26 +113,27 @@ async function pressed() {
   assert.ok(at >= 0, "the hand-off offered the check");
   const offerTs = `offer-${at + 1}`;
   const queued: RunnerJobPayload[] = [];
+  const redrawn: CardMessage[] = [];
   await runCheckItDoor(
     { channel: CHANNEL, offerTs, userId: REQUESTER },
     {
       store: threadState,
-      enqueue: async (job) => void queued.push(job),
-      replaceOffer: async () => {},
+      enqueue: async (job) => (queued.push(job), true),
+      replaceOffer: async (message) => void redrawn.push(message),
       replyEphemeral: async () => {},
       now: () => NOW,
     },
   );
   assert.deepEqual(queued.map((j) => j.kind), ["blueprint-check"], "the press queued the check");
-  return { threadState, offerTs, h };
+  return { threadState, offerTs, h, job: queued[0] as BlueprintCheckJob, redrawn };
 }
 
 /** The check's world: every post, card and status edit in thread order. */
-async function check(threadState: ThreadState, offerTs: string, drafts = [DRAFT]) {
+async function check(threadState: ThreadState, job: BlueprintCheckJob, drafts = [DRAFT]) {
   const seen: Array<{ kind: "post"; text: string; action: string | null } | { kind: "card"; lead: string } | { kind: "settle"; outcome: CheckOutcome }> = [];
   const draftModel = fakeProvider({ generateReplies: drafts });
   let cards = 0;
-  await runBlueprintCheck(offerTs, {
+  await runBlueprintCheck(job, {
     store: threadState,
     readPath: async () => TODAY,
     draft: draftProposal({ provider: draftModel, affordable: () => true }),
@@ -153,15 +156,15 @@ async function liveCard(threadState: ThreadState, ts: string): Promise<PendingPr
 }
 
 test("the hand-off's check posts today's steps beside the idea's, then the Draw on blueprint card, and nothing to add to a card", async () => {
-  const { threadState, offerTs, h } = await pressed();
-  const { seen, draftModel } = await check(threadState, offerTs);
+  const { threadState, job, h } = await pressed();
+  const { seen, draftModel } = await check(threadState, job);
 
-  assert.deepEqual(seen.map((s) => s.kind), ["post", "card", "settle"], "results, Draw on blueprint, done — and no add-to-card action");
-  const results = (seen[0] as { text: string }).text;
-  assert.equal((seen[0] as { action: string | null }).action, null, "no card to add the notes to, and no page to update");
+  assert.deepEqual(seen.map((s) => s.kind), ["settle", "post", "card"], "done, results, Draw on blueprint — and no add-to-card action");
+  const results = (seen[1] as { text: string }).text;
+  assert.equal((seen[1] as { action: string | null }).action, null, "no card to add the notes to, and no page to update");
   assert.match(results, /\*\*Your idea changes how \[\*Call-off\*\]\(https:\/\/blueprint\.example\/\?cell=cell-1\) works today\.\*\*/);
   assert.match(results, /\*\*Find a fill-in\*\*\n- Today: Supervisor asks around in Slack \(`Supervisor`\)\n- Your idea: Free tutor claims the posted call-off \(`Tutor`\); Supervisor sees who claimed it \(`Supervisor`\)/);
-  assert.deepEqual(seen[2], { kind: "settle", outcome: { kind: "done" } });
+  assert.deepEqual(seen[0], { kind: "settle", outcome: { kind: "done" } });
   // The idea it drafted is the hand-off's, kept with the offer.
   assert.match(draftModel.generated[0]!.prompt, /self-serve call-off board/);
   // The turn staged no card of its own; the Draw on blueprint card is the
@@ -170,10 +173,10 @@ test("the hand-off's check posts today's steps beside the idea's, then the Draw 
 });
 
 test("the Draw on blueprint card shows which cells the idea changes and removes, and only the requester may approve it", async () => {
-  const { threadState, offerTs } = await pressed();
-  const { seen } = await check(threadState, offerTs);
+  const { threadState, job } = await pressed();
+  const { seen } = await check(threadState, job);
 
-  const lead = (seen[1] as { lead: string }).lead;
+  const lead = (seen[2] as { lead: string }).lead;
   assert.match(lead, /Changes Find a fill-in \(Supervisor\): Supervisor asks around in Slack → Supervisor sees who claimed it/);
   assert.match(lead, /No longer happens at Confirm the fill-in \(Supervisor\): Supervisor confirms by DM/);
   const draw = await liveCard(threadState, "draw-1");
@@ -199,8 +202,30 @@ test("the Draw on blueprint card shows which cells the idea changes and removes,
 });
 
 test("a hand-off whose draft only removes a moment still gets today's steps and its own words, and no card", async () => {
-  const { threadState, offerTs } = await pressed();
-  const { seen } = await check(threadState, offerTs, [ONLY_REMOVES]);
-  assert.deepEqual(seen.map((s) => s.kind), ["post", "settle"]);
-  assert.match((seen[0] as { text: string }).text, /This idea: "A self-serve call-off board: tutors post their own call-off and the first free tutor claims it\."/);
+  const { threadState, job } = await pressed();
+  const { seen } = await check(threadState, job, [ONLY_REMOVES]);
+  assert.deepEqual(seen.map((s) => s.kind), ["settle", "post"]);
+  assert.match((seen[1] as { text: string }).text, /This idea: "A self-serve call-off board: tutors post their own call-off and the first free tutor claims it\."/);
+});
+
+test("with no card under it, the check's words never mention one: checking, stopped, failed, not started and too late", async () => {
+  const { threadState, offerTs, redrawn } = await pressed();
+  assert.equal(redrawn[0]!.text, "Checking *Call-off* against today's blueprint… The results will follow in this thread.");
+
+  const told: string[] = [];
+  const tell = async (text: string) => void told.push(text);
+  const redraw = async (message: CardMessage) => void redrawn.push(message);
+  await runStopCheckDoor({ channel: CHANNEL, offerTs, userId: REQUESTER }, { store: threadState, cancel: async () => {}, replaceOffer: redraw, replyEphemeral: tell });
+  assert.equal(redrawn.at(-1)!.text, "Stopped the blueprint check.");
+
+  const offer = (await threadState.getCheckOffer(offerTs))!;
+  assert.equal(checkedMessage(offer, { kind: "failed", reason: "error" }).text, "The blueprint check didn't finish.");
+  assert.equal(checkedMessage(offer, { kind: "failed", reason: "timed-out" }).text, "The blueprint check didn't finish — it ran too long.");
+
+  const again = (enqueue: () => Promise<boolean>, now: number) =>
+    runCheckItDoor({ channel: CHANNEL, offerTs, userId: REQUESTER }, { store: threadState, enqueue, replaceOffer: redraw, replyEphemeral: tell, now: () => now });
+  await again(async () => false, NOW);
+  assert.equal(redrawn.at(-1)!.text, "The blueprint check didn't finish.");
+  await again(async () => true, cardExpiresAt(NOW) + 1);
+  assert.deepEqual(told, ["I couldn't start the blueprint check — try again in a moment.", "That offer expired, so nothing was checked."]);
 });

@@ -86,7 +86,7 @@ import { serviceChangeGate } from "./gate";
 import { DELIVERY_RESERVE } from "../agent/loop-policy";
 import type { PathToday } from "./draft";
 import { draftProposal, drawnProposalOf, PROPOSAL_OFFER_SUBREQUESTS } from "./proposal";
-import { JUDGEMENT_SUBREQUESTS, runBlueprintCheck, serviceChangeJudgement, type ServiceChangeJudgement } from "./check";
+import { JUDGEMENT_SUBREQUESTS, runBlueprintCheck, serviceChangeJudgement, type BlueprintCheckJob, type ServiceChangeJudgement } from "./check";
 import { checkedMessage, resultsMessage } from "../slack/blueprint-check";
 import { createD1ProposalRecords } from "./proposal-records-d1";
 import { keepProposalLinks, prdCardOf, rememberCreatedPage, type MatterPages, type ThreadCards } from "./link";
@@ -497,19 +497,21 @@ export function serviceChangeJudgementOn(env: Env): { serviceChangeJudgement?: S
 /**
  * One blueprint check on `Env` (#1321), as its runner job runs it: on an
  * AgentRunner of its own, so on a fresh 50-subrequest budget — the offer's
- * record (1), the path read (5), the draft (≤2), the card's state (≤2: the
- * thread's cards, the matter's page) and the results' post and keeping (2),
- * the Draw on blueprint card's post, staging and events (≤4) and the status
- * edit (1). The draft runs only while that much is left beside the delivery
- * reserve.
+ * record (1), the thread's check record and the run's step to done or
+ * failed (≤3, #1322), the path read (5), the draft (≤2), the card's state
+ * (≤2: the thread's cards, the matter's page) and the results' post and
+ * keeping (2), the Draw on blueprint card's post, staging and events (≤4)
+ * and the status edit (≤2). The draft runs only while that much is left
+ * beside the delivery reserve. Stop reaches the draft through this runner's
+ * `/cancel` (`stopRunningCheck`), which costs the job nothing.
  *
  * @param env - Worker bindings
- * @param offerTs - The offer's message ts, as the job carries it
+ * @param job - The offer's message ts and the run, as the job carries them
  */
-export async function runBlueprintCheckOnEnv(env: Env, offerTs: string): Promise<void> {
+export async function runBlueprintCheckOnEnv(env: Env, job: BlueprintCheckJob): Promise<void> {
   const store = threadStateFor(env);
   const replyThread = (offer: BlueprintCheckOffer) => offer.replyTs ?? offer.threadTs;
-  await runBlueprintCheck(offerTs, {
+  await runBlueprintCheck(job, {
     store,
     readPath: (cellId) => readPathOf(env, cellId),
     draft: draftProposal({
@@ -544,7 +546,7 @@ export async function runBlueprintCheckOnEnv(env: Env, offerTs: string): Promise
       ]);
     },
     async settle(offer, outcome) {
-      const message = checkedMessage(offer.scenario, outcome);
+      const message = checkedMessage(offer, outcome);
       const edited = await updateMessage(env, { channel: offer.channel, ts: offer.offerTs, text: message.text, blocks: message.blocks });
       if (!edited.ok) console.warn(`[blueprint-check] status message ${offer.channel}/${offer.offerTs} not edited: ${edited.error ?? "refused"}`);
     },

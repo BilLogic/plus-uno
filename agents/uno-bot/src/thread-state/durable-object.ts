@@ -36,6 +36,10 @@ import type { ThreadState as ThreadStateDurableObject } from "../thread-state";
 import type { OutageStore } from "../turn/capacity-outage";
 import type {
   BlueprintCheckOffer,
+  CheckClaim,
+  CheckRecord,
+  CheckStart,
+  CheckState,
   CutOffNoteReport,
   DecidedMark,
   DecisionReportRecord,
@@ -269,10 +273,19 @@ export function createDurableObjectThreadState(
       return hop().settleFiling(key, issue, now());
     },
 
-    // ----- one comparison per scenario per thread -----
+    // ----- one blueprint check per scenario per thread -----
 
-    claimComparison(ref: ThreadRef, scenario: string): Promise<boolean> {
-      return hop().claimComparison(ref, scenario, now());
+    // One hop, one transaction, so of two racing presses one claims.
+    claimCheck(ref: ThreadRef, scenario: string, start: CheckStart): Promise<CheckClaim> {
+      return hop().claimCheck(ref, scenario, start, now());
+    },
+
+    getCheck(ref: ThreadRef, scenario: string): Promise<CheckRecord | null> {
+      return hop().getCheck(ref, scenario, now());
+    },
+
+    stepCheck(ref: ThreadRef, scenario: string, run: string, to: Exclude<CheckState, "running">): Promise<boolean> {
+      return hop().stepCheck(ref, scenario, run, to, now());
     },
 
     // ----- the blueprint check's offers -----

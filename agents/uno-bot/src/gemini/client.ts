@@ -150,6 +150,8 @@ export async function geminiGenerate(
     prompt: string;
     maxTokens?: number;
     thinkingLevel?: "minimal" | "low" | "medium" | "high";
+    /** Abort the request in flight; an abort comes back as a failure. */
+    signal?: AbortSignal;
   },
 ): Promise<GeminiResult> {
   const started = Date.now();
@@ -187,7 +189,7 @@ export async function geminiGenerate(
   }
 
   try {
-    const res = await countedFetch(url, { method: "POST", headers, body: JSON.stringify(body) });
+    const res = await countedFetch(url, { method: "POST", headers, body: JSON.stringify(body), ...(opts.signal ? { signal: opts.signal } : {}) });
     // A proxy's own failure (Cloudflare's 524 page) is HTML: keep the status.
     const data = (await res.json().catch(() => ({}))) as GenerateContentResponse;
     if (!res.ok) {

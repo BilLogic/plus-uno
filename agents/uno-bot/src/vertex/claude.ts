@@ -47,12 +47,14 @@ export async function claudeVertexRaw(
   env: Env,
   model: string,
   body: Record<string, unknown>,
+  signal?: AbortSignal,
 ): Promise<{ status: number; data: unknown }> {
   const token = await getGoogleAccessToken(env);
   const res = await countedFetch(endpoint(env, model), {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
     body: JSON.stringify({ anthropic_version: ANTHROPIC_VERTEX_VERSION, ...body }),
+    ...(signal ? { signal } : {}),
   });
   const data = (await res.json().catch(() => ({}))) as unknown;
   return { status: res.status, data };

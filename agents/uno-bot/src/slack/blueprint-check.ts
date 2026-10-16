@@ -1,26 +1,37 @@
 // The blueprint check as Slack shows it: the offer under a milestone's card,
-// the Check it press, and the one message that says how the check is going
-// (#1321).
+// the Check it press, Stop, and the one message that says how the check is
+// going (#1321, #1322).
 //
 // THE OFFER'S MESSAGE IS THE CHECK'S STATUS MESSAGE. It goes up as the offer
 // ("this changes how *Call-off* works today — check it against the
 // blueprint?") with a Check it button and its deadline; a press edits it to
-// the checking line; the job edits it to what the check came to
-// (`checkedMessage`). One ts for the check's whole life — the offer's
-// (`BlueprintCheckOffer.offerTs`) — which is where a Stop button or a result's
-// action finds it.
+// the checking line, with Stop; the job edits it to what the check came to
+// (`checkedMessage`: done, or failed with Try again); Stop edits it to the
+// stopped line, with Check again. One ts for the check's whole life — the
+// offer's (`BlueprintCheckOffer.offerTs`) — which is where every button on it,
+// and a result's action, finds the check.
 //
-// ANYONE IN THE THREAD MAY PRESS: the check only reads, and what it posts is
-// follow-ups. The thread's one check of a scenario is claimed at the press
-// (`ThreadState.claimComparison`), so of two presses one runs it and the
-// other is told, to them alone. The press only claims, edits and queues: it
-// runs inside `waitUntil`, and the check is a runner job of its own
-// (`blueprintCheckRunnerKey`), never the thread's.
+// ONE OWNER PER EDIT. The thread's record of the check (`ThreadState`
+// `claimCheck` / `stepCheck`, one transaction each) decides who writes the
+// message next: the press that claimed writes the checking line; the job
+// writes done or failed only after its own step to that state took; Stop
+// writes the stopped line only after its step took. So a Stop and the job's
+// finish never both land, and a stopped run's late job writes nothing.
 //
-// THE DEADLINE IS THE CARD RULE. Check it stops answering at
-// `BlueprintCheckOffer.expiresAt` — `cardExpiresAt` from when the offer went
-// up — and says so (`deadlineBlock`); a press past it checks nothing, and the
-// offer loses its button.
+// ANYONE IN THE THREAD MAY PRESS Check it: the check only reads, and what it
+// posts is follow-ups. Of two presses one runs it and the other is told, to
+// them alone. Check again (after Stop) and Try again (after a failure) are
+// the same button under other words: they claim the check anew. The press
+// only claims, edits and queues: it runs inside `waitUntil`, and the check is
+// a runner job of its own (`blueprintCheckRunnerKey`), never the thread's.
+//
+// STOP is for the person who pressed Check it and the card's requester;
+// anyone else is told who can, privately, and the check carries on.
+//
+// THE DEADLINE IS THE CARD RULE. Check it (and so Check again and Try again)
+// stops answering at `BlueprintCheckOffer.expiresAt` — `cardExpiresAt` from
+// when the offer went up — and says so (`deadlineBlock`); a press past it
+// checks nothing, and the offer loses its button.
 //
 // THE RESULTS CARRY THEIR ACTION (#1323). The follow-up with today's steps
 // beside the idea's has one button, by the card's state when it posted: Add
@@ -37,6 +48,7 @@
 import {
   blueprintCheckRunnerKey,
   cardNow,
+  checkRefOf,
   pageUpdateWithNotes,
   prdWithNotes,
   type CheckOutcome,
@@ -51,8 +63,10 @@ import type { CardMessage } from "./button-door";
 import { deadlineBlock, withDeadline } from "./card-deadline";
 import { escapeSlackText, SLACK_USER_ID } from "./mrkdwn";
 
-/** The Check it button's action id. */
+/** The Check it button's action id: also Check again and Try again. */
 export const CHECK_IT_ACTION_ID = "uno_blueprint_check";
+/** The Stop button's action id, on the checking line. */
+export const STOP_CHECK_ACTION_ID = "uno_blueprint_check_stop";
 
 const scenarioOf = (scenario: string) => `*${escapeSlackText(scenario)}*`;
 
@@ -63,10 +77,14 @@ function offerWords(scenario: string, underCard: boolean): string {
   return `This changes how ${scenarioOf(scenario)} works today — check it against the blueprint? Takes a few minutes${meanwhile}`;
 }
 
+/** A button. Its value is nothing a door needs — the message's own ts names
+ *  the offer — so no idea text ever rides on it. */
+function button(actionId: string, label: string, value: string) {
+  return { type: "button", action_id: actionId, text: { type: "plain_text", text: label, emoji: true }, value };
+}
+
 /**
- * The offer as Slack gets it: its words, its deadline, and Check it. The
- * button's value is nothing the press needs — the message's own ts names the
- * offer — so no idea text ever rides on it.
+ * The offer as Slack gets it: its words, its deadline, and Check it.
  *
  * @param offer - The scenario, the deadline, and whether a card waits above it
  */
@@ -77,69 +95,130 @@ export function checkOfferMessage(offer: CheckOfferNote): CardMessage {
     blocks: [
       { type: "section", text: { type: "mrkdwn", text: words } },
       deadlineBlock(offer.expiresAt),
-      {
-        type: "actions",
-        elements: [
-          { type: "button", action_id: CHECK_IT_ACTION_ID, text: { type: "plain_text", text: "Check it", emoji: true }, value: "check" },
-        ],
-      },
+      { type: "actions", elements: [button(CHECK_IT_ACTION_ID, "Check it", "check")] },
     ],
   };
 }
 
-/** A message that is one line of mrkdwn and nothing to press. */
-function line(text: string): CardMessage {
-  return { text, blocks: [{ type: "section", text: { type: "mrkdwn", text } }] };
+/** A message that is one line of mrkdwn, and its one button when it has one. */
+function line(text: string, action?: ReturnType<typeof button>): CardMessage {
+  return {
+    text,
+    blocks: [{ type: "section", text: { type: "mrkdwn", text } }, ...(action ? [{ type: "actions", elements: [action] }] : [])],
+  };
+}
+
+/** What the check's words need of its offer: the scenario, and whether it
+ *  was offered under a card. A hand-off's offer (#1324) has none, so its
+ *  words never mention one. */
+export type CheckSubject = Pick<BlueprintCheckOffer, "scenario" | "cardTs">;
+
+/** " Your card isn't affected." under a card; nothing without one. */
+function cardStands(offer: CheckSubject): string {
+  return offer.cardTs ? " Your card isn't affected." : "";
 }
 
 /**
- * The offer once Check it was pressed: the check is running, who asked, and
- * that the card stands.
+ * The offer once Check it was pressed: the check is running, who asked, that
+ * the card stands, and Stop.
  *
- * @param scenario - The scenario being checked
+ * @param offer - The offer being checked
  * @param by - Who pressed Check it
  */
-export function checkingMessage(scenario: string, by: string): CardMessage {
+export function checkingMessage(offer: CheckSubject, by: string): CardMessage {
   const who = SLACK_USER_ID.test(by) ? ` <@${by}> asked.` : "";
-  return line(`Checking ${scenarioOf(scenario)} against today's blueprint…${who} The results will follow in this thread; your card isn't affected.`);
+  const follow = offer.cardTs ? "The results will follow in this thread; your card isn't affected." : "The results will follow in this thread.";
+  return line(`Checking ${scenarioOf(offer.scenario)} against today's blueprint…${who} ${follow}`, button(STOP_CHECK_ACTION_ID, "Stop", "stop"));
 }
 
 /**
- * The status message once the check is over.
+ * The status message once Stop took, with Check again.
  *
- * @param scenario - The scenario checked
- * @param outcome - What the check came to
+ * @param offer - The offer that was being checked
  */
-export function checkedMessage(scenario: string, outcome: CheckOutcome): CardMessage {
-  if (outcome.kind === "done") return line(`Checked ${scenarioOf(scenario)} against today's blueprint. The results are below.`);
-  const why = outcome.reason === "unreadable" ? ` Today's ${scenarioOf(scenario)} path couldn't be read.` : "";
-  return line(`The blueprint check didn't finish.${why} Your card isn't affected.`);
+export function stoppedMessage(offer: CheckSubject): CardMessage {
+  return line(`Stopped the blueprint check.${cardStands(offer)}`, button(CHECK_IT_ACTION_ID, "Check again", "check"));
 }
 
-/** Said to the presser alone when the offer's deadline has passed. */
-export const CHECK_EXPIRED_REPLY = "That offer expired, so nothing was checked. Your card isn't affected.";
+/**
+ * The status message once the check is over: done, which loses Stop as the
+ * results go up, or failed, with Try again.
+ *
+ * @param offer - The offer checked
+ * @param outcome - What the check came to
+ */
+export function checkedMessage(offer: CheckSubject, outcome: CheckOutcome): CardMessage {
+  if (outcome.kind === "done") return line(`Checked ${scenarioOf(offer.scenario)} against today's blueprint. The results are below.`);
+  const why =
+    outcome.reason === "unreadable"
+      ? `. Today's ${scenarioOf(offer.scenario)} path couldn't be read.`
+      : outcome.reason === "timed-out"
+        ? " — it ran too long."
+        : ".";
+  return line(`The blueprint check didn't finish${why}${cardStands(offer)}`, button(CHECK_IT_ACTION_ID, "Try again", "check"));
+}
+
+/**
+ * Said to the presser alone when the offer's deadline has passed.
+ *
+ * @param offer - The offer pressed
+ */
+export function checkExpiredReply(offer: CheckSubject): string {
+  return `That offer expired, so nothing was checked.${cardStands(offer)}`;
+}
 /** Said to the presser alone when the store holds no such offer. */
 export const CHECK_GONE_REPLY = "That offer is no longer available, so nothing was checked.";
+/**
+ * Said to the presser alone when the check's job could not be queued; the
+ * message offers Try again.
+ *
+ * @param offer - The offer pressed
+ */
+export function checkNotStartedReply(offer: CheckSubject): string {
+  return `I couldn't start the blueprint check — try again in a moment.${cardStands(offer)}`;
+}
 /** Said to the presser alone when the thread's check of the scenario is
- *  already claimed. */
+ *  already running. */
 export function alreadyCheckedReply(scenario: string): string {
   return `${scenarioOf(scenario)} is already being checked in this thread — the results post here.`;
+}
+/** Said to the presser alone when the thread's check of the scenario is done. */
+export function checkedAlreadyReply(scenario: string): string {
+  return `${scenarioOf(scenario)} was already checked in this thread — the results are above.`;
+}
+/** Said to whoever pressed Stop once the check finished. */
+export const CHECK_FINISHED_REPLY = "That check already finished — the results are in the thread.";
+/** Said to whoever pressed Stop on a check that is not running. */
+export const CHECK_NOT_RUNNING_REPLY = "That check isn't running, so there was nothing to stop.";
+
+/**
+ * Said to someone who may not stop the check: who may, each a Slack user id
+ * mentioned once (the markup sanitizer keeps nothing else).
+ *
+ * @param may - The presser and the card's requester
+ */
+export function notAStopperReply(may: ReadonlyArray<string | undefined>): string {
+  const who = [...new Set(may.filter((id): id is string => !!id && SLACK_USER_ID.test(id)))].map((id) => `<@${id}>`);
+  return who.length ? `Only ${who.join(" or ")} can stop this check.` : "Nobody here can stop this check.";
 }
 
 // ── The press ────────────────────────────────────────────────────────────────
 
-/** A press on Check it, in the facts the envelope has. */
-export interface CheckItPress {
+/** A press on the status message, in the facts the envelope has. */
+export interface CheckPress {
   channel: string;
   /** The offer's own message: the record's key, and what the press edits. */
   offerTs: string;
   userId: string;
 }
 
+/** A press on Check it, Check again or Try again. */
+export type CheckItPress = CheckPress;
+
 export interface CheckItDoorDeps {
-  store: Pick<ThreadState, "getCheckOffer" | "claimComparison">;
-  /** Queue a runner job under a runner name. */
-  enqueue(job: RunnerJobPayload, runnerKey: string): Promise<void>;
+  store: Pick<ThreadState, "getCheckOffer" | "claimCheck" | "stepCheck">;
+  /** Queue a runner job under a runner name: whether it was queued. */
+  enqueue(job: RunnerJobPayload, runnerKey: string): Promise<boolean>;
   /** Redraw the offer's message where it was pressed. */
   replaceOffer(message: CardMessage): Promise<void>;
   /** Answer the presser alone, where they pressed. */
@@ -148,10 +227,12 @@ export interface CheckItDoorDeps {
 }
 
 /**
- * One Check it press: the thread's check of the scenario claimed, the offer
- * edited to the checking line, and the check queued on a runner of its own.
- * Past the deadline, for an offer the store no longer holds, or for a check
- * already claimed in the thread, nothing is queued and the presser is told.
+ * One Check it press: the thread's check of the scenario claimed as a new run,
+ * the offer edited to the checking line, and the check queued on a runner of
+ * its own. Past the deadline, for an offer the store no longer holds, or for
+ * a check already running or done in the thread, nothing is queued and the
+ * presser is told. A job the runner refuses fails the run: the presser is
+ * told, and the message offers Try again.
  *
  * @param press - Who pressed, on which offer
  * @param deps - The store, the runner, and the two Slack replies
@@ -165,23 +246,83 @@ export async function runCheckItDoor(press: CheckItPress, deps: CheckItDoorDeps)
   }
   if ((deps.now ?? Date.now)() > offer.expiresAt) {
     console.log(`[blueprint-check] press on ${press.channel}/${press.offerTs} after its deadline`);
-    await deps.replyEphemeral(CHECK_EXPIRED_REPLY);
+    await deps.replyEphemeral(checkExpiredReply(offer));
     await deps.replaceOffer(line(`${offerWords(offer.scenario, !!offer.cardTs)}\nExpired.`));
     return;
   }
-  if (!(await deps.store.claimComparison(conversationOf(offer), offer.scenario))) {
-    await deps.replyEphemeral(alreadyCheckedReply(offer.scenario));
+  const ref = checkRefOf(offer);
+  const claim = await deps.store.claimCheck(ref, offer.scenario, { by: press.userId, statusTs: offer.offerTs });
+  if (claim.state !== "claimed") {
+    await deps.replyEphemeral(claim.state === "running" ? alreadyCheckedReply(offer.scenario) : checkedAlreadyReply(offer.scenario));
     return;
   }
   // The checking line goes up before the job is queued, so the job's own
   // edit when it is done can never be overwritten by this one.
-  await deps.replaceOffer(checkingMessage(offer.scenario, press.userId));
-  await deps.enqueue({ kind: "blueprint-check", offerTs: offer.offerTs, by: press.userId }, blueprintCheckRunnerKey(offer.channel, offer.offerTs));
+  await deps.replaceOffer(checkingMessage(offer, press.userId));
+  const job: RunnerJobPayload = { kind: "blueprint-check", offerTs: offer.offerTs, by: press.userId, run: claim.run };
+  const queued = await deps.enqueue(job, blueprintCheckRunnerKey(offer.channel, offer.offerTs)).catch((err: unknown) => {
+    console.error(`[blueprint-check] queueing ${offer.channel}/${offer.offerTs} threw: ${err instanceof Error ? err.message : String(err)}`);
+    return false;
+  });
+  if (queued) return;
+  if (await deps.store.stepCheck(ref, offer.scenario, claim.run, "failed")) {
+    await deps.replaceOffer(checkedMessage(offer, { kind: "failed", reason: "error" }));
+  }
+  await deps.replyEphemeral(checkNotStartedReply(offer));
 }
 
-/** The conversation an offer's claim is kept under. */
-function conversationOf(offer: BlueprintCheckOffer): { channel: string; thread: string } {
-  return { channel: offer.channel, thread: offer.threadTs };
+// ── Stop ─────────────────────────────────────────────────────────────────────
+
+export interface StopCheckDoorDeps {
+  store: Pick<ThreadState, "getCheckOffer" | "getCheck" | "stepCheck">;
+  /** Abort the run's model call in flight, on the check's own runner.
+   *  Best-effort: the record already says stopped, which is what the job
+   *  obeys. */
+  cancel(offer: BlueprintCheckOffer, run: string): Promise<void>;
+  /** Redraw the offer's message where it was pressed. */
+  replaceOffer(message: CardMessage): Promise<void>;
+  /** Answer the presser alone, where they pressed. */
+  replyEphemeral(text: string): Promise<void>;
+}
+
+/**
+ * One Stop press. From the presser of Check it or the card's requester, a
+ * running check is stopped: its run marked so, its model call aborted, and
+ * the message edited to the stopped line with Check again. Anyone else is
+ * told who can stop it, and the check carries on. A check that already
+ * finished, or is not running, is left as it is, and the presser told.
+ *
+ * @param press - Who pressed, on which offer
+ * @param deps - The store, the check's runner, and the two Slack replies
+ */
+export async function runStopCheckDoor(press: CheckPress, deps: StopCheckDoorDeps): Promise<void> {
+  const offer = await deps.store.getCheckOffer(press.offerTs);
+  if (!offer) {
+    await deps.replyEphemeral(CHECK_GONE_REPLY);
+    return;
+  }
+  const ref = checkRefOf(offer);
+  const check = await deps.store.getCheck(ref, offer.scenario);
+  // The record's status message is this one: a check of the same scenario
+  // under another offer is not this message's to stop.
+  if (!check || check.statusTs !== offer.offerTs || check.state !== "running") {
+    await deps.replyEphemeral(check?.state === "done" ? CHECK_FINISHED_REPLY : CHECK_NOT_RUNNING_REPLY);
+    return;
+  }
+  if (press.userId !== check.by && press.userId !== offer.requesterUserId) {
+    await deps.replyEphemeral(notAStopperReply([check.by, offer.requesterUserId]));
+    return;
+  }
+  if (!(await deps.store.stepCheck(ref, offer.scenario, check.run, "stopped"))) {
+    // It finished, or failed, between the read and the step: its own words
+    // are on the message.
+    await deps.replyEphemeral(CHECK_NOT_RUNNING_REPLY);
+    return;
+  }
+  await deps.replaceOffer(stoppedMessage(offer));
+  await deps.cancel(offer, check.run).catch((err: unknown) => {
+    console.warn(`[blueprint-check] cancel of ${offer.channel}/${offer.offerTs} not delivered: ${err instanceof Error ? err.message : String(err)}`);
+  });
 }
 
 // ── The results and their action (#1323) ─────────────────────────────────────

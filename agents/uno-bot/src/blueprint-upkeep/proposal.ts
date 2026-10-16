@@ -78,8 +78,10 @@ export interface ProposalDraftDeps {
   affordable(): boolean;
 }
 
-/** Drafts the idea a comparison carries; null when there is nothing to offer. */
-export type ProposalDrafter = (comparison: Comparison, idea: ServiceChangeInput) => Promise<ProposalDraft | null>;
+/** Drafts the idea a comparison carries; null when there is nothing to offer.
+ *  `signal` aborts the model call in flight (a stopped check), which is
+ *  nothing to offer too. */
+export type ProposalDrafter = (comparison: Comparison, idea: ServiceChangeInput, signal?: AbortSignal) => Promise<ProposalDraft | null>;
 
 export const PROPOSAL_SYSTEM = [
   "You keep a service blueprint. Someone is exploring an idea that changes how one path works today. You are shown the idea, and the path as it is today: its steps, its lanes, and each cell (the square where a step meets a lane) with its text.",
@@ -166,7 +168,7 @@ export function whyNoProposal(reply: string, comparison: Comparison, idea: Servi
  * @param deps - The model and the budget
  */
 export function draftProposal(deps: ProposalDraftDeps): ProposalDrafter {
-  return async (comparison, idea) => {
+  return async (comparison, idea, signal) => {
     try {
       if (!deps.affordable()) return null;
       const reply = await deps.provider.generate({
@@ -174,6 +176,7 @@ export function draftProposal(deps: ProposalDraftDeps): ProposalDrafter {
         system: PROPOSAL_SYSTEM,
         prompt: draftPrompt({ title: idea.title, text: idea.text, today: comparison.today, target: PROPOSED }),
         maxTokens: DRAFT_MAX_TOKENS,
+        ...(signal ? { signal } : {}),
       });
       if (!reply.ok) {
         console.warn(`[proposal] ${comparison.scenario}: no offer — the model failed: ${reply.message}`);

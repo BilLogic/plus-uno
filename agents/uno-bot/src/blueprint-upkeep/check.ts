@@ -17,17 +17,23 @@
 //     own — the path read (5), the draft (≤2), the posts and the Draw on
 //     blueprint card's staging, about fifteen at the worst.
 //
-// WHAT THE CHECK POSTS. Follow-ups in the offer's thread: today's steps beside
-// the idea's, step by step where the idea's rows could be drafted
+// WHAT THE CHECK POSTS. Once its results are ready, and only if its run still
+// holds the thread's record (`ThreadState.stepCheck` to done), the offer's
+// own message — the checking line since the press — says the check is done,
+// losing Stop; then follow-ups in the offer's thread: today's steps beside the
+// idea's, step by step where the idea's rows could be drafted
 // (`comparisonText`), and the existing Draw on blueprint ✅ card
-// (`./proposal.ts`, requester only) when the draft draws anything. Then the
-// offer's own message — the checking line since the press — says the check is
-// done. A path that cannot be read, or a check that throws, says the card is
-// unaffected and posts nothing else.
+// (`./proposal.ts`, requester only) when the draft draws anything. A path
+// that cannot be read, a check that throws or one past `CHECK_DEADLINE_MS`
+// says it didn't finish, with Try again, and posts nothing else.
 //
-// WHERE LATER STEPS HOOK IN. The offer's message is the check's status message
-// for its whole life (press → checking → done / failed), so a Stop button on
-// it keys off `BlueprintCheckOffer.offerTs`.
+// STOP (#1322). A stopped run posts nothing: Stop marks the record, which the
+// job reads before it starts and steps against before it posts, and aborts
+// the model call in flight through `stopRunningCheck`. Stop's own door edits
+// the message; the job never does for a stopped run. The offer's message is
+// the check's status message for its whole life (press → checking → done /
+// failed / stopped), so every button on it keys off
+// `BlueprintCheckOffer.offerTs`.
 //
 // WHAT THE RESULTS OFFER (#1323). The results post with the one action that
 // fits the card as it stands when they arrive (`cardNow`), found by the card's
@@ -56,6 +62,7 @@ import {
   type BlueprintCheckOffer,
   type PendingProposal,
   type ProposalOperation,
+  type ThreadRef,
   type ThreadState,
 } from "../thread-state/index";
 import type { ProposalCard } from "../turn/delivery";
@@ -220,8 +227,55 @@ export function pageUpdateWithNotes(pageUrl: string, notes: string): ProposalOpe
   return [{ toolName: "notion_update", input: { page_url: pageUrl, append: { sections: [notesSection(notes)] } } }];
 }
 
+/**
+ * The thread a check's record is kept under (`ThreadState.claimCheck`): the
+ * offer's conversation, so every offer of the same scenario in the thread —
+ * a PRD card's or a hand-off's — shares it.
+ *
+ * @param offer - The offer
+ */
+export function checkRefOf(offer: Pick<BlueprintCheckOffer, "channel" | "threadTs">): ThreadRef {
+  return { channel: offer.channel, thread: offer.threadTs };
+}
+
+/** How long a check may run before it is stopped and said to have failed.
+ *  Under the record's lease (`CHECK_LEASE_MS`), so a check still running is
+ *  never taken for a killed one. */
+export const CHECK_DEADLINE_MS = 5 * 60 * 1000;
+
+// ── Stopping a check in flight ──────────────────────────────────────────────
+//
+// Stop (`slack/blueprint-check.ts`) marks the run stopped in the thread's
+// record, and the record is what decides: a job that finds its run stopped
+// posts nothing, whenever it looks. To also abort the model call in flight,
+// the Stop door asks the check's own runner (`blueprintCheckRunnerKey`, the
+// AgentRunner's `/cancel`), and the runner calls `stopRunningCheck` — the
+// same Durable Object instance, so the same isolate as the job, which
+// registered its controller here when it started. No poll, and no subrequest
+// from the job.
+
+const inFlight = new Map<string, AbortController>();
+
+/**
+ * Abort a run's check if it is running here: true when it was.
+ *
+ * @param run - The run its press claimed (`CheckRecord.run`)
+ */
+export function stopRunningCheck(run: string): boolean {
+  const running = inFlight.get(run);
+  running?.abort();
+  return running !== undefined;
+}
+
+/** A queued check, as its job carries it: the offer, and the run its press
+ *  claimed. */
+export interface BlueprintCheckJob {
+  offerTs: string;
+  run: string;
+}
+
 export interface BlueprintCheckDeps {
-  store: Pick<ThreadState, "getCheckOffer" | "putCheckOffer" | "putProposal" | "getProposalsByThread">;
+  store: Pick<ThreadState, "getCheckOffer" | "putCheckOffer" | "putProposal" | "getProposalsByThread" | "getCheck" | "stepCheck">;
   /** Today's path holding a cell, or null when it cannot be read. */
   readPath(cellId: string): Promise<PathToday | null>;
   /** The idea's rows on today's path, for the step-by-step comparison and the
@@ -240,6 +294,8 @@ export interface BlueprintCheckDeps {
    *  the check came to. */
   settle(offer: BlueprintCheckOffer, outcome: CheckOutcome): Promise<void>;
   now?(): number;
+  /** The check's deadline; `CHECK_DEADLINE_MS` without it. */
+  deadlineMs?: number;
 }
 
 /** A card as posted: its ts and text, its own blocks, and the lifetime it is
@@ -251,36 +307,66 @@ export interface PostedCard {
   ttlMs: number;
 }
 
-/** What a check came to, as its status message says it. */
-export type CheckOutcome = { kind: "done" } | { kind: "failed"; reason: "unreadable" | "error" };
+/** What a check came to, as its status message says it. A stopped check is
+ *  not here: Stop says that itself. */
+export type CheckOutcome = { kind: "done" } | { kind: "failed"; reason: "unreadable" | "error" | "timed-out" };
 
 /**
  * Run one check: read today's path, draft the idea's rows on it, post today's
  * steps beside the idea's and, when the draft draws anything, the Draw on
- * blueprint card; then settle the status message. An offer the store no
- * longer holds is nothing to do.
+ * blueprint card. Nothing posts unless the run still holds the thread's
+ * record, running, when the results are ready; the run is then done, and the
+ * status message loses Stop before the results go up. A stopped run posts
+ * nothing and leaves the message to Stop; a failed one, or one past its
+ * deadline, says so on the message. An offer the store no longer holds, or a
+ * run that is not running when its job starts, is nothing to do.
  *
- * @param offerTs - The offer's message ts, as the job carries it
+ * @param job - The offer's message ts and the run, as the job carries them
  * @param deps - The store, the path read, the drafter and Slack
  */
-export async function runBlueprintCheck(offerTs: string, deps: BlueprintCheckDeps): Promise<void> {
-  const offer = await deps.store.getCheckOffer(offerTs);
+export async function runBlueprintCheck(job: BlueprintCheckJob, deps: BlueprintCheckDeps): Promise<void> {
+  const offer = await deps.store.getCheckOffer(job.offerTs);
   if (!offer) {
-    console.warn(`[blueprint-check] ${offerTs}: no offer to check`);
+    console.warn(`[blueprint-check] ${job.offerTs}: no offer to check`);
     return;
   }
-  let outcome: CheckOutcome;
-  try {
-    outcome = await check(offer, deps);
-  } catch (err) {
-    console.error(`[blueprint-check] ${offer.scenario} in ${offer.channel}/${offerTs} failed: ${err instanceof Error ? err.message : String(err)}`);
-    outcome = { kind: "failed", reason: "error" };
+  const ref = checkRefOf(offer);
+  const held = await deps.store.getCheck(ref, offer.scenario);
+  if (!held || held.run !== job.run || held.state !== "running") {
+    console.log(`[blueprint-check] ${offer.scenario} in ${offer.channel}/${job.offerTs}: run ${job.run} is ${held?.run === job.run ? held.state : "not the thread's"}; nothing to do`);
+    return;
   }
-  await deps.settle(offer, outcome);
+  const stop = new AbortController();
+  inFlight.set(job.run, stop);
+  // The deadline is a timer of the job's own, cleared when the check ends —
+  // not `AbortSignal.timeout`, whose timer nothing clears and which Node does
+  // not wait on: a check held only by its deadline let the process exit
+  // before the deadline fired.
+  const deadline = new AbortController();
+  const timer = setTimeout(() => deadline.abort(new Error("the blueprint check ran past its deadline")), deps.deadlineMs ?? CHECK_DEADLINE_MS);
+  const signal = AbortSignal.any([stop.signal, deadline.signal]);
+  let outcome: CheckOutcome | "stopped";
+  try {
+    outcome = await check(offer, job.run, signal, deps);
+  } catch (err) {
+    if (stop.signal.aborted) outcome = "stopped";
+    else if (signal.aborted) outcome = { kind: "failed", reason: "timed-out" };
+    else {
+      console.error(`[blueprint-check] ${offer.scenario} in ${offer.channel}/${job.offerTs} failed: ${err instanceof Error ? err.message : String(err)}`);
+      outcome = { kind: "failed", reason: "error" };
+    }
+  } finally {
+    clearTimeout(timer);
+    inFlight.delete(job.run);
+  }
+  if (outcome === "stopped" || outcome.kind === "done") return;
+  // Said on the message only while the run still holds the record, so a Stop
+  // that won the race keeps its own words there.
+  if (await deps.store.stepCheck(ref, offer.scenario, job.run, "failed")) await deps.settle(offer, outcome);
 }
 
-async function check(offer: BlueprintCheckOffer, deps: BlueprintCheckDeps): Promise<CheckOutcome> {
-  const today = await deps.readPath(offer.cellId);
+async function check(offer: BlueprintCheckOffer, run: string, signal: AbortSignal, deps: BlueprintCheckDeps): Promise<CheckOutcome | "stopped"> {
+  const today = await untilAborted(deps.readPath(offer.cellId), signal);
   if (!today) return { kind: "failed", reason: "unreadable" };
   const comparison: Comparison = {
     milestone: offer.milestone,
@@ -291,10 +377,27 @@ async function check(offer: BlueprintCheckOffer, deps: BlueprintCheckDeps): Prom
     today,
     text: comparisonText(today, offer.quote),
   };
-  const drafted = await deps.draft(comparison, offer.idea);
+  // The drafter fails quiet, an abort included, so the signal is read again.
+  const drafted = await untilAborted(deps.draft(comparison, offer.idea, signal), signal);
+  signal.throwIfAborted();
+  // Done before anything posts: a Stop that landed first wins, and one that
+  // lands after finds the check finished. Then Stop leaves the message.
+  if (!(await deps.store.stepCheck(checkRefOf(offer), offer.scenario, run, "done"))) return "stopped";
+  await deps.settle(offer, { kind: "done" });
   await postResults(offer, drafted ? comparisonText(today, offer.quote, drafted.changes) : comparison.text, deps);
   if (drafted) await offerDraw(offer, drafted, deps);
   return { kind: "done" };
+}
+
+/** `work`, or a rejection as soon as `signal` aborts: for a step whose own
+ *  calls take no signal (the path read). */
+function untilAborted<T>(work: Promise<T>, signal: AbortSignal): Promise<T> {
+  signal.throwIfAborted();
+  return new Promise<T>((resolve, reject) => {
+    const onAbort = () => reject(signal.reason);
+    signal.addEventListener("abort", onAbort, { once: true });
+    work.then(resolve, reject).finally(() => signal.removeEventListener("abort", onAbort));
+  });
 }
 
 /**

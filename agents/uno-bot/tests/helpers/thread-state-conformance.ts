@@ -35,6 +35,7 @@ import {
   REVISING_MARK_MS,
   REPORT_GRACE_MS,
   FILING_LEASE_MS,
+  CHECK_LEASE_MS,
   RUN_LEASE_MS,
   proposalOperations,
   unfinishedOperations,
@@ -1343,15 +1344,56 @@ export function runThreadStateConformance(
     assert.deepEqual(await store.claimFiling("week"), { state: "claimed" }, "a lease past its time was a caller killed mid-filing");
   });
 
-  it("a thread's comparison for a scenario is claimed once; another thread or scenario is its own", async () => {
+  it("a thread's check of a scenario is its own: another thread or scenario is claimed apart, and a done one is kept as long as the thread's memory", async () => {
     const { store, clock } = setup();
     const ref = { channel: "C1", thread: "1.0" };
-    assert.equal(await store.claimComparison(ref, "Call-off"), true);
-    assert.equal(await store.claimComparison(ref, "call-off"), false, "the same scenario, however it is cased");
-    assert.equal(await store.claimComparison(ref, "Reschedule"), true);
-    assert.equal(await store.claimComparison({ channel: "C1", thread: "2.0" }, "Call-off"), true);
+    const start = { by: "U1", statusTs: "5.0" };
+    const first = await store.claimCheck(ref, "Call-off", start);
+    assert.equal(await store.stepCheck(ref, "Call-off", (first as { run: string }).run, "done"), true);
+    assert.equal((await store.claimCheck(ref, "call-off", start)).state, "done", "the same scenario, however it is cased");
+    assert.equal((await store.claimCheck(ref, "Reschedule", start)).state, "claimed");
+    assert.equal((await store.claimCheck({ channel: "C1", thread: "2.0" }, "Call-off", start)).state, "claimed");
     clock.advance(HISTORY_TTL_MS + 1);
-    assert.equal(await store.claimComparison(ref, "Call-off"), true, "kept as long as the thread's memory");
+    assert.equal(await store.getCheck(ref, "Call-off"), null);
+    assert.equal((await store.claimCheck(ref, "Call-off", start)).state, "claimed");
+  });
+
+  it("a thread's check of a scenario runs once at a time: stopped or failed it is claimed anew, done it stays done", async () => {
+    const { store, clock } = setup();
+    const ref = { channel: "C1", thread: "1.0" };
+    const first = await store.claimCheck(ref, "Call-off", { by: "U1", statusTs: "5.0" });
+    assert.equal(first.state, "claimed");
+    const run = (first as { run: string }).run;
+    const second = await store.claimCheck(ref, "call-off", { by: "U2", statusTs: "5.0" });
+    assert.equal(second.state, "running", "the same scenario, however it is cased");
+    assert.deepEqual(await store.getCheck(ref, "Call-off"), { state: "running", run, by: "U1", statusTs: "5.0", at: clock.now() });
+
+    assert.equal(await store.stepCheck(ref, "Call-off", run, "stopped"), true);
+    assert.equal(await store.stepCheck(ref, "Call-off", run, "done"), false, "a stopped run's late job cannot finish it");
+    const again = await store.claimCheck(ref, "Call-off", { by: "U2", statusTs: "5.0" });
+    assert.equal(again.state, "claimed", "Check again");
+    const rerun = (again as { run: string }).run;
+    assert.notEqual(rerun, run);
+    assert.equal(await store.stepCheck(ref, "Call-off", run, "stopped"), false, "the old run no longer holds it");
+
+    assert.equal(await store.stepCheck(ref, "Call-off", rerun, "failed"), true);
+    const retry = await store.claimCheck(ref, "Call-off", { by: "U1", statusTs: "5.0" });
+    assert.equal(retry.state, "claimed", "Try again");
+    const last = (retry as { run: string }).run;
+    assert.equal(await store.stepCheck(ref, "Call-off", last, "done"), true);
+    assert.equal(await store.stepCheck(ref, "Call-off", last, "stopped"), false, "a finished check cannot be stopped");
+    assert.equal((await store.claimCheck(ref, "Call-off", { by: "U2", statusTs: "5.0" })).state, "done");
+    assert.equal(await store.stepCheck(ref, "Call-off", last, "failed"), true, "a done run whose results did not post fails");
+  });
+
+  it("a running check past its lease was a job killed mid-run, and is claimed again", async () => {
+    const { store, clock } = setup();
+    const ref = { channel: "C1", thread: "1.0" };
+    await store.claimCheck(ref, "Call-off", { by: "U1", statusTs: "5.0" });
+    clock.advance(CHECK_LEASE_MS - 1);
+    assert.equal((await store.claimCheck(ref, "Call-off", { by: "U1", statusTs: "5.0" })).state, "running");
+    clock.advance(1);
+    assert.equal((await store.claimCheck(ref, "Call-off", { by: "U1", statusTs: "5.0" })).state, "claimed");
   });
 
   it("a Check it offer is kept under its message ts, past its deadline, for as long as the thread's memory", async () => {

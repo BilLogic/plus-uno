@@ -26,7 +26,6 @@ import {
 import type { BlueprintRow } from "../src/integrations/blueprint";
 import { createInMemoryThreadState, proposalOperations, type BlueprintCheckOffer, type PendingProposal, type ThreadState } from "../src/thread-state/index";
 import {
-  CHECK_EXPIRED_REPLY,
   CHECK_IT_ACTION_ID,
   checkedMessage,
   checkOfferMessage,
@@ -141,7 +140,11 @@ function door(threadState: ThreadState, clock: { t: number }) {
       { channel: CHANNEL, offerTs, userId },
       {
         store: threadState,
-        enqueue: async (job, key) => void queued.push({ key, job }),
+        enqueue: async (job, key) => {
+          queued.push({ key, job });
+          if (job.kind === "blueprint-check") pressedRun.set(job.offerTs, job.run);
+          return true;
+        },
         replaceOffer: async (message) => void redrawn.push(message),
         replyEphemeral: async (text) => void told.push(text),
         now: () => clock.t,
@@ -149,6 +152,9 @@ function door(threadState: ThreadState, clock: { t: number }) {
     );
   return { press, queued, redrawn, told };
 }
+
+/** The run the latest press on each offer queued, as its job carries it. */
+const pressedRun = new Map<string, string>();
 
 /** The check's world: the store, a scripted path read and draft, and every
  *  post, card and status edit in the order the thread would see them. */
@@ -158,7 +164,7 @@ function job(threadState: ThreadState, opts: { drafts?: string[]; unreadable?: b
   const pathReads: string[] = [];
   let cards = 0;
   const run = (offerTs: string) =>
-    runBlueprintCheck(offerTs, {
+    runBlueprintCheck({ offerTs, run: pressedRun.get(offerTs) ?? "never-pressed" }, {
       store: threadState,
       readPath: async (cellId) => {
         pathReads.push(cellId);
@@ -208,13 +214,13 @@ test("anyone in the thread may press Check it: the check is queued on a runner o
   const d = door(threadState, clock);
   await d.press(BYSTANDER, offerTs);
 
-  assert.deepEqual(d.queued, [{ key: `${CHANNEL}:blueprint-check:${offerTs}`, job: { kind: "blueprint-check", offerTs, by: BYSTANDER } }]);
+  assert.deepEqual(d.queued, [{ key: `${CHANNEL}:blueprint-check:${offerTs}`, job: { kind: "blueprint-check", offerTs, by: BYSTANDER, run: pressedRun.get(offerTs)! } }]);
   assert.notEqual(d.queued[0]!.key, `${CHANNEL}:${CONVERSATION}`, "not the thread's runner");
   assert.deepEqual(d.told, []);
   assert.equal(d.redrawn.length, 1);
   assert.match(d.redrawn[0]!.text, /Checking \*Call-off\* against today's blueprint…/);
   assert.match(d.redrawn[0]!.text, new RegExp(`<@${BYSTANDER}> asked`));
-  assert.doesNotMatch(JSON.stringify(d.redrawn[0]!.blocks), /"type":"actions"/, "Check it is gone once pressed");
+  assert.doesNotMatch(JSON.stringify(d.redrawn[0]!.blocks), new RegExp(`"action_id":"${CHECK_IT_ACTION_ID}"`), "Check it is gone once pressed");
   assert.equal(messageBlocksRefusal(d.redrawn[0]!.blocks), null);
 });
 
@@ -271,7 +277,7 @@ test("a press past the offer's deadline checks nothing: the presser is told, and
   await d.press(REQUESTER, offerTs);
 
   assert.deepEqual(d.queued, []);
-  assert.deepEqual(d.told, [CHECK_EXPIRED_REPLY]);
+  assert.deepEqual(d.told, ["That offer expired, so nothing was checked. Your card isn't affected."]);
   assert.match(d.redrawn[0]!.text, /Expired\.$/);
   assert.doesNotMatch(JSON.stringify(d.redrawn[0]!.blocks), /"type":"actions"/);
 });
@@ -292,12 +298,12 @@ test("the check posts today's steps beside the idea's as a follow-up, then the D
   const j = job(threadState);
   await j.run(offerTs);
 
-  assert.deepEqual(j.seen.map((s) => s.kind), ["post", "card", "settle"]);
-  const results = (j.seen[0] as { text: string }).text;
+  assert.deepEqual(j.seen.map((s) => s.kind), ["settle", "post", "card"], "the message loses Stop as the results go up");
+  const results = (j.seen[1] as { text: string }).text;
   assert.match(results, /\*\*Your idea changes how \[\*Call-off\*\]\(https:\/\/blueprint\.example\/\?cell=cell-1\) works today\.\*\* Today's path is \*Standard\*:/);
   assert.match(results, /\*\*Find a fill-in\*\*\n- Today: Supervisor asks around in Slack \(`Supervisor`\)\n- Your idea: Free tutor claims the posted call-off \(`Tutor`\); Supervisor sees who claimed it \(`Supervisor`\)/);
   assert.match(results, /\*\*Call off a session\*\*\n- Today: Tutor messages the supervisor \(`Tutor`\)\n- Your idea: no such step/);
-  assert.deepEqual(j.seen[2], { kind: "settle", outcome: { kind: "done" }, ts: offerTs }, "the offer's own message says it is done");
+  assert.deepEqual(j.seen[0], { kind: "settle", outcome: { kind: "done" }, ts: offerTs }, "the offer's own message says it is done");
   // The idea it drafted is the PRD's, read back from the offer.
   assert.match(j.draftModel.generated[0]!.prompt, /Self-serve call-offs/);
   assert.equal(j.draftModel.generated[0]!.tier, "default");
@@ -324,8 +330,8 @@ test("an idea whose draft draws nothing still gets today's steps and its own wor
   const j = job(threadState, { drafts: [ONLY_REMOVES] });
   await j.run(offerTs);
 
-  assert.deepEqual(j.seen.map((s) => s.kind), ["post", "settle"]);
-  const results = (j.seen[0] as { text: string }).text;
+  assert.deepEqual(j.seen.map((s) => s.kind), ["settle", "post"]);
+  const results = (j.seen[1] as { text: string }).text;
   assert.match(results, /Call off a session \(Tutor\) → Find a fill-in \(Supervisor\) → Confirm the fill-in \(Supervisor\)/);
   assert.match(results, /This idea: "Tutors post their own call-off and the first free tutor claims it\."/);
 });
@@ -338,15 +344,18 @@ test("a path that cannot be read posts no results, and the status says the card 
 
   assert.deepEqual(j.seen, [{ kind: "settle", outcome: { kind: "failed", reason: "unreadable" }, ts: offerTs }]);
   assert.equal(j.draftModel.generated.length, 0, "nothing drafted without today's path");
-  assert.match(checkedMessage("Call-off", { kind: "failed", reason: "unreadable" }).text, /didn't finish\. Today's \*Call-off\* path couldn't be read\. Your card isn't affected\./);
+  assert.match(checkedMessage({ scenario: "Call-off", cardTs: "card-1" }, { kind: "failed", reason: "unreadable" }).text, /didn't finish\. Today's \*Call-off\* path couldn't be read\. Your card isn't affected\./);
 });
 
-test("a check that throws settles as failed rather than going silent", async () => {
+test("a check whose results cannot post settles as failed rather than going silent", async () => {
   const { threadState, clock, offerTs } = await offered();
   await door(threadState, clock).press(REQUESTER, offerTs);
   const j = job(threadState, { postFails: true });
   await j.run(offerTs);
-  assert.deepEqual(j.seen, [{ kind: "settle", outcome: { kind: "failed", reason: "error" }, ts: offerTs }]);
+  assert.deepEqual(j.seen, [
+    { kind: "settle", outcome: { kind: "done" }, ts: offerTs },
+    { kind: "settle", outcome: { kind: "failed", reason: "error" }, ts: offerTs },
+  ]);
 });
 
 test("a job for an offer the store no longer holds does nothing", async () => {
@@ -366,5 +375,5 @@ test("the offer the job reads is the one the turn kept, whatever became of the c
   assert.equal(kept.cardTs, cardTs);
   const j = job(threadState);
   await j.run(offerTs);
-  assert.deepEqual(j.seen.map((s) => s.kind), ["post", "card", "settle"]);
+  assert.deepEqual(j.seen.map((s) => s.kind), ["settle", "post", "card"]);
 });

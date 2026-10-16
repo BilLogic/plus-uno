@@ -160,6 +160,10 @@ export interface ModelPrompt {
   /** Output ceiling for this call. The adapter's own default applies without it;
    *  a caller expecting a long answer (a re-drafted reply) should say so. */
   maxTokens?: number;
+  /** Abort the call in flight (a stopped blueprint check, #1322). An aborted
+   *  call comes back failed, or throws, as the adapter's transport does on
+   *  any abort; without it the call runs to its end, as it always has. */
+  signal?: AbortSignal;
 }
 
 /**

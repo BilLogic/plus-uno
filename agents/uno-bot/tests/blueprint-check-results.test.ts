@@ -136,14 +136,28 @@ async function offered(more: ScriptedReply[] = []) {
 
 type World = Awaited<ReturnType<typeof offered>>;
 
-/** Check it pressed, and the job run: the results message as Slack gets it. */
-async function checked(w: World): Promise<CardMessage> {
+/** The run each world's Check it queued, as its job carries it. */
+const queuedRun = new WeakMap<World, string>();
+
+/** Check it pressed; a second press while that check runs queues nothing. */
+async function press(w: World): Promise<void> {
   await runCheckItDoor(
     { channel: CHANNEL, offerTs: w.offerTs, userId: REQUESTER },
-    { store: w.threadState, enqueue: async () => {}, replaceOffer: async () => {}, replyEphemeral: async () => {}, now: () => w.clock.t },
+    {
+      store: w.threadState,
+      enqueue: async (job) => (job.kind === "blueprint-check" && queuedRun.set(w, job.run), true),
+      replaceOffer: async () => {},
+      replyEphemeral: async () => {},
+      now: () => w.clock.t,
+    },
   );
+}
+
+/** Check it pressed, and the job run: the results message as Slack gets it. */
+async function checked(w: World): Promise<CardMessage> {
+  await press(w);
   const posted: CardMessage[] = [];
-  await runBlueprintCheck(w.offerTs, {
+  await runBlueprintCheck({ offerTs: w.offerTs, run: queuedRun.get(w)! }, {
     store: w.threadState,
     readPath: async () => TODAY,
     draft: draftProposal({ provider: fakeProvider({ generateReplies: [DRAFT] }), affordable: () => true }),
@@ -230,10 +244,7 @@ test("card waiting: the results carry Add these notes, which stages a revision o
 test("card edited while the check ran: the notes land on the edited version, keeping the edit", async () => {
   const edit = { ...PRD_INPUT, title: "Claim a call-off", revises_card: "" };
   const w = await offered([{ text: "Renamed it.", toolCalls: [{ name: "notion_create", args: edit }] }]);
-  await runCheckItDoor(
-    { channel: CHANNEL, offerTs: w.offerTs, userId: REQUESTER },
-    { store: w.threadState, enqueue: async () => {}, replaceOffer: async () => {}, replyEphemeral: async () => {}, now: () => w.clock.t },
-  );
+  await press(w);
   // The requester edits the card while the check waits on its runner.
   edit.revises_card = w.cardTs;
   const pending = await w.threadState.getProposalByThread({ channel: CHANNEL, thread: CONVERSATION });
@@ -353,6 +364,8 @@ test("card cancelled: the results post with no add action", async () => {
 
 test("card expired: the results post with no add action", async () => {
   const w = await offered();
+  // Pressed in time; the card expires while the check runs.
+  await press(w);
   w.clock.t = cardExpiresAt(NOW) + 1;
   const results = await checked(w);
   assert.deepEqual(actionsOf(results), []);
