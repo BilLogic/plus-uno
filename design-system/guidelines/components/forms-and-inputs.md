@@ -125,6 +125,22 @@ for radios, sets `aria-required` on the group and `required` on every radio; a
 checkbox group cannot be enforced natively, so check it yourself. `Select`
 announces it through a visually hidden "Required" description on the trigger.
 
+**Popup placement.** Every popup that opens from a field or button follows one
+rule: `Select`, `TagInput`, `TreeSelect`, `Cascader`, `DatePicker`,
+`DateAndTimePicker` and the `Dropdown` menu.
+
+- **Gap:** `--size-element-gap-xs` (4px) between the trigger's edge and the
+  popup surface, as a token, with Bootstrap's spacer margin reset to zero.
+  The shared `Listbox` holds it as `ANCHOR_GAP`; anything placed in CSS uses
+  `calc(100% + var(--size-element-gap-xs))`.
+- **Alignment:** the popup's left edge sits on the trigger's left edge. Near
+  the viewport's right edge it right-aligns instead.
+- **Width:** at least the trigger's width and at most 320px. A popup with
+  columns (`Cascader`, the calendar) grows past 320px.
+- **Flip:** with no room below, the popup opens above, keeping the same gap.
+- **Arrowed exception:** a `Popover` or `Tooltip` with an arrow keeps its 8px
+  gap, because the arrow fills it. They sit outside this family.
+
 ## Where the group is weakest
 
 `Select` is the most used component here, and it is not a native `select`. The
