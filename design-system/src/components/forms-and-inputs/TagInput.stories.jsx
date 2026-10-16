@@ -467,6 +467,274 @@ Controlled.play = async ({ canvasElement }) => {
     await expect(tagsIn(canvas, 'With onChange').queryByText('Algebra')).not.toBeInTheDocument();
 };
 
+/**
+ * A screen that owns its options and lets people tidy them where they pick
+ * them: rename, delete, recolour and reorder, each reported to the caller,
+ * which updates its list, as a real caller would.
+ */
+const Tidy = ({
+    onRenameSpy, onDeleteSpy, onColorChangeSpy, onReorderSpy,
+    menu = true, reorder = true, initialTags = [], ...props
+}) => {
+    const [options, setOptions] = useState(TOPICS);
+    const handlers = {};
+    if (menu) {
+        handlers.onRename = (value, name) => {
+            if (onRenameSpy) onRenameSpy(value, name);
+            setOptions((list) => list.map((option) => (option.value === value ? { ...option, label: name } : option)));
+        };
+        handlers.onDelete = (value) => {
+            if (onDeleteSpy) onDeleteSpy(value);
+            setOptions((list) => list.filter((option) => option.value !== value));
+        };
+        handlers.onColorChange = (value, color) => {
+            if (onColorChangeSpy) onColorChangeSpy(value, color);
+            setOptions((list) => list.map((option) => (option.value === value ? { ...option, color } : option)));
+        };
+    }
+    if (reorder) {
+        handlers.onReorder = (from, to) => {
+            if (onReorderSpy) onReorderSpy(from, to);
+            setOptions((list) => {
+                const next = [...list];
+                next.splice(to, 0, ...next.splice(from, 1));
+                return next;
+            });
+        };
+    }
+    return <TagInput label="Topics" options={options} defaultTags={initialTags} {...handlers} {...props} />;
+};
+
+const tidyArgs = () => ({
+    onRenameSpy: fn(), onDeleteSpy: fn(), onColorChangeSpy: fn(), onReorderSpy: fn(),
+});
+
+/** Opens the list and points at a row the way a mouse does, then returns its "…" button. */
+const openMenuButton = async (canvasElement, name) => {
+    const canvas = within(canvasElement);
+    const body = bodyOf(canvasElement);
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Topics' }));
+    const listbox = await body.findByRole('listbox', { name: 'Topics options' });
+    await userEvent.hover(within(listbox).getByRole('option', { name }));
+    return body.findByRole('button', { name: `Options for ${name}` });
+};
+
+const rowNames = (canvasElement) => within(bodyOf(canvasElement).getByRole('listbox', { name: 'Topics options' }))
+    .getAllByRole('option').map((option) => option.textContent);
+
+/**
+ * The "…" on a row opens its menu. Focus moves to the name, Enter renames, and
+ * focus comes back to the "…". Esc leaves the name as it was.
+ */
+export const OptionMenuRenames = {
+    args: tidyArgs(),
+    render: (args) => <div style={stack}><Tidy {...args} /></div>,
+    play: async ({ canvasElement, args }) => {
+        const body = bodyOf(canvasElement);
+        const more = await openMenuButton(canvasElement, 'Decision recall');
+        await userEvent.click(more);
+
+        const name = await body.findByRole('textbox', { name: 'Name' });
+        await waitFor(() => expect(name).toHaveFocus());
+        await expect(name).toHaveValue('Decision recall');
+
+        await userEvent.keyboard('{Escape}');
+        await expect(args.onRenameSpy).not.toHaveBeenCalled();
+        await expect(body.queryByRole('listbox', { name: 'Options for Decision recall' })).not.toBeInTheDocument();
+        await waitFor(() => expect(more).toHaveFocus());
+
+        await userEvent.keyboard('{Enter}');
+        const again = await body.findByRole('textbox', { name: 'Name' });
+        await waitFor(() => expect(again).toHaveFocus());
+        await userEvent.clear(again);
+        await userEvent.type(again, 'Recall{Enter}');
+        await expect(args.onRenameSpy).toHaveBeenCalledWith('decision-recall', 'Recall');
+        await expect(body.getByRole('option', { name: 'Recall' })).toBeInTheDocument();
+        await waitFor(() => expect(body.getByRole('button', { name: 'Options for Recall' })).toHaveFocus());
+        await waitFor(() => expect(announcer(canvasElement)).toHaveTextContent('Decision recall renamed to Recall'));
+    },
+};
+
+/** Delete removes the option, and a tag picked from it goes too. */
+export const OptionMenuDeletes = {
+    args: { ...tidyArgs(), initialTags: [TOPICS[1]] },
+    render: (args) => <div style={stack}><Tidy {...args} /></div>,
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const body = bodyOf(canvasElement);
+        await userEvent.click(await openMenuButton(canvasElement, 'Decision recall'));
+        const menu = await body.findByRole('listbox', { name: 'Options for Decision recall' });
+
+        await userEvent.click(within(menu).getByRole('option', { name: 'Delete' }));
+        await expect(args.onDeleteSpy).toHaveBeenCalledWith('decision-recall');
+        await expect(body.queryByRole('option', { name: 'Decision recall' })).not.toBeInTheDocument();
+        await expect(canvas.queryByRole('list', { name: 'Selected: Topics' })).not.toBeInTheDocument();
+        await waitFor(() => expect(announcer(canvasElement)).toHaveTextContent('Decision recall deleted'));
+    },
+};
+
+/**
+ * The menu lists Tag's seven colours with the current one checked. A click
+ * picks one; so do the arrow keys and Enter from the name field.
+ */
+export const OptionMenuChangesColour = {
+    args: tidyArgs(),
+    render: (args) => <div style={stack}><Tidy {...args} /></div>,
+    play: async ({ canvasElement, args }) => {
+        const body = bodyOf(canvasElement);
+        const more = await openMenuButton(canvasElement, 'Decision recall');
+        await userEvent.click(more);
+        const menu = await body.findByRole('listbox', { name: 'Options for Decision recall' });
+        const colours = within(within(menu).getByRole('group', { name: 'Colour' })).getAllByRole('option');
+        await expect(colours.map((row) => row.textContent)).toEqual(
+            ['Grey', 'Blue', 'Green', 'Purple', 'Magenta', 'Yellow', 'Teal']
+        );
+        await expect(within(menu).getByRole('option', { name: 'Purple' })).toHaveAttribute('aria-selected', 'true');
+
+        await userEvent.click(within(menu).getByRole('option', { name: 'Teal' }));
+        await expect(args.onColorChangeSpy).toHaveBeenCalledWith('decision-recall', 'teal');
+        await waitFor(() => expect(more).toHaveFocus());
+
+        // The keyboard: Enter on the "…", then the arrows walk the rows from the top.
+        await userEvent.keyboard('{Enter}');
+        const name = await body.findByRole('textbox', { name: 'Name' });
+        await waitFor(() => expect(name).toHaveFocus());
+        const reopened = body.getByRole('listbox', { name: 'Options for Decision recall' });
+        await expect(within(reopened).getByRole('option', { name: 'Teal' })).toHaveAttribute('aria-selected', 'true');
+        await userEvent.keyboard('{ArrowDown}');
+        await expect(name).toHaveAttribute(
+            'aria-activedescendant',
+            within(reopened).getByRole('option', { name: 'Delete' }).id
+        );
+        await userEvent.keyboard('{ArrowDown}{ArrowDown}{Enter}');
+        await expect(args.onColorChangeSpy).toHaveBeenLastCalledWith('decision-recall', 'blue');
+    },
+};
+
+/**
+ * The keyboard reorders: Tab from the entry reaches the highlighted row's
+ * handle, Space picks the row up, the arrows move it, Space drops it and Esc
+ * cancels. Each step is announced.
+ */
+export const KeyboardReorder = {
+    args: tidyArgs(),
+    render: (args) => <div style={stack}><Tidy {...args} /></div>,
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const body = bodyOf(canvasElement);
+        await userEvent.click(canvas.getByRole('combobox', { name: 'Topics' }));
+        await body.findByRole('listbox', { name: 'Topics options' });
+
+        await userEvent.tab();
+        const handle = body.getByRole('button', { name: 'Reorder Design judgment' });
+        await expect(handle).toHaveFocus();
+
+        await userEvent.keyboard(' ');
+        await waitFor(() => expect(announcer(canvasElement)).toHaveTextContent('Design judgment picked up, position 1 of 4'));
+        await expect(body.getByRole('option', { name: 'Design judgment' })).toHaveClass('is-dragging');
+        await userEvent.keyboard('{ArrowDown}{ArrowDown}');
+        await waitFor(() => expect(announcer(canvasElement)).toHaveTextContent('position 3 of 4'));
+        await expect(body.getByRole('option', { name: 'Dev coordination' })).toHaveClass('has-drop-indicator');
+        await userEvent.keyboard('{Escape}');
+        await expect(args.onReorderSpy).not.toHaveBeenCalled();
+        await waitFor(() => expect(announcer(canvasElement)).toHaveTextContent('Reorder cancelled'));
+        await expect(body.getByRole('option', { name: 'Design judgment' })).not.toHaveClass('is-dragging');
+
+        await userEvent.keyboard(' {ArrowDown}{ArrowDown}{Enter}');
+        await expect(args.onReorderSpy).toHaveBeenCalledWith(0, 2);
+        await waitFor(() => expect(announcer(canvasElement)).toHaveTextContent('Design judgment dropped, position 3 of 4'));
+        await expect(rowNames(canvasElement)).toEqual(
+            ['Decision recall', 'Design system taxonomy', 'Design judgment', 'Dev coordination']
+        );
+        await waitFor(() => expect(body.getByRole('button', { name: 'Reorder Design judgment' })).toHaveFocus());
+    },
+};
+
+/** A drag by the handle moves a row, and a line marks where it will land. */
+export const DragReorder = {
+    args: tidyArgs(),
+    render: (args) => <div style={stack}><Tidy {...args} /></div>,
+    play: async ({ canvasElement, args }) => {
+        const body = bodyOf(canvasElement);
+        const canvas = within(canvasElement);
+        await userEvent.click(canvas.getByRole('combobox', { name: 'Topics' }));
+        const listbox = await body.findByRole('listbox', { name: 'Topics options' });
+        await userEvent.hover(within(listbox).getByRole('option', { name: 'Design judgment' }));
+        const handle = body.getByRole('button', { name: 'Reorder Design judgment' });
+
+        const start = handle.getBoundingClientRect();
+        const pointer = (target, type, y) => target.dispatchEvent(new PointerEvent(type, {
+            bubbles: true, clientX: start.left + 2, clientY: y, pointerId: 1, isPrimary: true, button: 0,
+        }));
+        pointer(handle, 'pointerdown', start.top + 2);
+        const dev = within(listbox).getByRole('option', { name: 'Dev coordination' }).getBoundingClientRect();
+        pointer(window, 'pointermove', dev.top + dev.height * 0.75);
+        await waitFor(() => expect(within(listbox).getByRole('option', { name: 'Design judgment' })).toHaveClass('is-dragging'));
+        await expect(within(listbox).getByRole('option', { name: 'Dev coordination' })).toHaveClass('has-drop-indicator-after');
+
+        pointer(window, 'pointerup', dev.top + dev.height * 0.75);
+        await expect(args.onReorderSpy).toHaveBeenCalledWith(0, 3);
+        await expect(rowNames(canvasElement)).toEqual(
+            ['Decision recall', 'Design system taxonomy', 'Dev coordination', 'Design judgment']
+        );
+    },
+};
+
+/** With none of the handlers, rows have no "…" and no handle, and Tab leaves the field as before. */
+export const NoTidyingWithoutHandlers = {
+    args: tidyArgs(),
+    render: (args) => (
+        <div style={stack}>
+            <Tidy {...args} menu={false} reorder={false} />
+            <button type="button">After</button>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const body = bodyOf(canvasElement);
+        await userEvent.click(canvas.getByRole('combobox', { name: 'Topics' }));
+        const listbox = await body.findByRole('listbox', { name: 'Topics options' });
+        await userEvent.hover(within(listbox).getByRole('option', { name: 'Decision recall' }));
+        await expect(body.queryByRole('button', { name: /^Options for/ })).not.toBeInTheDocument();
+        await expect(body.queryByRole('button', { name: /^Reorder/ })).not.toBeInTheDocument();
+        await expect(listbox.querySelector('.fa-grip-vertical')).toBeNull();
+        await userEvent.tab();
+        await expect(canvas.getByRole('button', { name: 'After' })).toHaveFocus();
+    },
+};
+
+const tidyArgTypes = {
+    menu: { control: 'boolean', description: 'Pass onRename, onDelete and onColorChange.', table: { category: 'Behavior' } },
+    reorder: { control: 'boolean', description: 'Pass onReorder.', table: { category: 'Behavior' } },
+    size: { control: 'radio', options: ['small', 'medium', 'large'], description: 'Size variant', table: { category: 'Design' } },
+};
+
+/** The option menu, open on a row. Controls choose which handlers the field gets. */
+export const OptionMenu = {
+    args: { menu: true, reorder: true, size: 'medium' },
+    argTypes: tidyArgTypes,
+    render: (args) => <div style={{ ...stack, minHeight: '480px' }}><Tidy {...args} /></div>,
+    play: async ({ canvasElement, args }) => {
+        if (!args.menu) return;
+        await userEvent.click(await openMenuButton(canvasElement, 'Decision recall'));
+    },
+};
+
+/** Reordering: a row picked up by its handle, with the hint naming the keys. */
+export const Reordering = {
+    args: { menu: true, reorder: true, size: 'medium' },
+    argTypes: tidyArgTypes,
+    render: (args) => <div style={{ ...stack, minHeight: '320px' }}><Tidy {...args} /></div>,
+    play: async ({ canvasElement, args }) => {
+        if (!args.reorder) return;
+        const canvas = within(canvasElement);
+        await userEvent.click(canvas.getByRole('combobox', { name: 'Topics' }));
+        await userEvent.tab();
+        await userEvent.keyboard(' {ArrowDown}');
+        await expect(bodyOf(canvasElement).getByText('↑ ↓ move · Space drops · Esc cancels')).toBeInTheDocument();
+    },
+};
+
 /** Filled, at rest. Focus it to type, pick and create. */
 export const Overview = () => (
     <div style={stack}>

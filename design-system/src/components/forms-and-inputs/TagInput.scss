@@ -73,6 +73,45 @@
     padding-block: calc(var(--size-element-pad-y-sm) - var(--size-element-border) - (#{label.$tag-height} - 1lh) / 2);
 }
 
+/* The handle drawn on every option row while the list can be reordered. */
+.plus-tag-input__grip-mark {
+    color: var(--color-on-surface-variant);
+
+    /* Under the handle button, which draws the same mark. */
+    &.is-covered {
+        visibility: hidden;
+    }
+}
+
+/* The highlighted row's handle and "…", laid over the row by the Listbox. */
+.plus-tag-input__grip {
+    cursor: grab;
+    touch-action: none;
+}
+
+.plus-tag-input__more {
+    margin-left: auto;
+}
+
+/*
+ * The option menu (Figma _Option menu): 240 wide, and as tall as its rows —
+ * Delete and the seven colours fit without the list's scroll.
+ */
+.plus-listbox.plus-tag-input__menu {
+    --plus-listbox-max-height: none;
+
+    width: var(--layout-width-option-menu);
+}
+
+/* The name field in the header, and Delete set off from the colours. */
+.plus-tag-input__rename {
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+}
+
+.plus-tag-input__menu .plus-listbox-options > [role='option'] + [role='group'] {
+    border-top: var(--size-element-border) solid var(--color-outline-variant);
+}
+
 .plus-tag-input__hint {
     padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
     color: var(--color-on-surface-variant);

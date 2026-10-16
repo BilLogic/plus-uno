@@ -43,6 +43,8 @@ const normalise = (option, index) => {
         group: option.group,
         leading: option.leading,
         trailing: option.trailing,
+        dragging: Boolean(option.dragging),
+        dropIndicator: option.dropIndicator,
         index,
         source: option,
     };
@@ -59,6 +61,8 @@ const isTextEntry = (target) => target instanceof HTMLElement
  * - **Surface:** `--color-surface-overlay`, as tall as its rows up to 300px, then the body scrolls.
  * - **Slots:** `header` (a hint or a search field), the body of rows, and `footer`.
  * - **Rows:** `OptionRow` for every option, group heading and the Create row.
+ *   `rowActions` draws a row's own controls (a drag handle, a "…") over the
+ *   highlighted row.
  * - **Placement:** with `anchorRef` it renders in a portal on `document.body`
  *   and follows the popup placement rule through `useAnchoredPopup`: at least
  *   as wide as the anchor, flipped above it when there isn't room below, and
@@ -90,8 +94,11 @@ const Listbox = ({
     open = true,
     onClose,
     anchorRef,
+    align = 'left',
     header,
     footer,
+    rowActions,
+    rowActionsIndex,
     loading = false,
     error,
     emptyMessage = 'No results',
@@ -214,13 +221,46 @@ const Listbox = ({
         }
     };
 
-    useImperativeHandle(ref, () => ({ handleKeyDown }));
+    /**
+     * Puts the cursor on an option by its place in `options`, as a field does
+     * after it moves or reveals one.
+     *
+     * @param {number} index
+     */
+    const highlight = (index) => {
+        const stop = stops.find((s) => s.option && s.option.index === index);
+        if (!stop) return;
+        scrollOnMove.current = true;
+        setActiveId(stop.id);
+    };
+
+    useImperativeHandle(ref, () => ({ handleKeyDown, highlight }));
 
     /* ---------- placement ---------- */
     const surfaceRef = useRef(null);
     const bodyRef = useRef(null);
     // Placed against the field; a press outside the field and the list closes it.
-    const place = useAnchoredPopup({ open, anchorRef, popupRef: surfaceRef, onClose });
+    const place = useAnchoredPopup({ open, anchorRef, popupRef: surfaceRef, align, onClose });
+
+    /* ---------- the row's own controls ---------- */
+    // Drawn over one row, beside the listbox rather than inside it: an option's
+    // children are presentational, so a button in one would be lost to a
+    // screen reader (axe: nested-interactive).
+    const actionsOption = rowActions
+        ? (rowActionsIndex !== undefined
+            ? shown.find((option) => option.index === rowActionsIndex)
+            : shown.find((option) => optionId(option) === resolvedActive))
+        : undefined;
+    const actions = actionsOption ? rowActions(actionsOption.source, actionsOption.index) : null;
+    const actionsRowId = actions ? optionId(actionsOption) : null;
+    const [actionsBox, setActionsBox] = useState(null);
+    useLayoutEffect(() => {
+        const rowNode = actionsRowId ? bodyRef.current?.querySelector(`#${CSS.escape(actionsRowId)}`) : null;
+        const next = rowNode ? { top: rowNode.offsetTop, height: rowNode.offsetHeight } : null;
+        setActionsBox((prev) => (
+            prev && next && prev.top === next.top && prev.height === next.height ? prev : next
+        ));
+    });
 
     /* ---------- virtualisation ---------- */
     const virtual = shown.length > VIRTUALIZE_ABOVE;
@@ -277,6 +317,8 @@ const Listbox = ({
                 disabled={option.disabled}
                 highlighted={rowId === resolvedActive}
                 check={!multi}
+                dragging={option.dragging}
+                dropIndicator={option.dropIndicator}
                 leading={leading.length ? leading : undefined}
                 trailing={option.trailing}
                 onSelect={() => choose(option)}
@@ -388,6 +430,16 @@ const Listbox = ({
                         />
                     )}
                 </div>
+                {actions && (
+                    <div
+                        className="plus-listbox-row-actions"
+                        style={actionsBox ? { top: actionsBox.top, height: actionsBox.height } : { visibility: 'hidden' }}
+                        // The controls answer their own keys; the list's must not see them.
+                        onKeyDown={(event) => event.stopPropagation()}
+                    >
+                        {actions}
+                    </div>
+                )}
             </div>
             {footer && <div className="plus-listbox-footer">{footer}</div>}
         </div>
@@ -445,6 +497,8 @@ Listbox.propTypes = {
             group: PropTypes.string,
             leading: PropTypes.node,
             trailing: PropTypes.node,
+            dragging: PropTypes.bool,
+            dropIndicator: PropTypes.oneOf(['before', 'after']),
         }),
     ])),
     /** `multi` draws a checkbox on each row and keeps the list open on a pick. */
@@ -462,12 +516,22 @@ Listbox.propTypes = {
     /** `(text)`: what the Create row shows after "Create". Defaults to the text. */
     createLabel: PropTypes.func,
     open: PropTypes.bool,
-    /** `(reason)`: 'select', 'escape' or 'outside'. */
+    /** `(reason, event)`: 'select', 'escape' or 'outside'; an outside press passes its pointer event. */
     onClose: PropTypes.func,
     /** The field to place against. Renders in a portal when set. */
     anchorRef: PropTypes.shape({ current: PropTypes.any }),
+    /** Which edge meets the anchor's: `right` for a menu opened from a button at a row's end. */
+    align: PropTypes.oneOf(['left', 'center', 'right']),
     header: PropTypes.node,
     footer: PropTypes.node,
+    /**
+     * `(option, index)`: controls for one row, such as a drag handle and a "…"
+     * button. They are drawn over the highlighted row, beside the listbox
+     * rather than inside the option, so they stay real buttons.
+     */
+    rowActions: PropTypes.func,
+    /** Keeps `rowActions` on the option at this place in `options`, as while its menu is open. */
+    rowActionsIndex: PropTypes.number,
     loading: PropTypes.bool,
     error: PropTypes.node,
     emptyMessage: PropTypes.node,

@@ -3,13 +3,13 @@
 
 # TagInput
 
-Notion's multi-select. Focusing the field opens a list of the options. Typing filters it and highlights the first match; Enter or a click adds the highlighted option. A "Create *text*" row is offered when no option matches the text exactly, ignoring case. It previews the new tag as the Tag it will be, in the random Tag colour it will get, and creating reports that colour once through `onCreate`. Backspace in an empty entry removes the last tag, and Esc closes the list and clears only the typed text. Built on the shared parts: `_Field` is the box, `Listbox` the list and its rows, and the chips are Tags in a TagGroup. Without focus the tags collapse into "+n"; with focus they wrap, up to three rows, then scroll.
+Notion's multi-select. Focusing the field opens a list of the options. Typing filters it and highlights the first match; Enter or a click adds the highlighted option. A "Create *text*" row is offered when no option matches the text exactly, ignoring case. It previews the new tag as the Tag it will be, in the random Tag colour it will get, and creating reports that colour once through `onCreate`. Backspace in an empty entry removes the last tag, and Esc closes the list and clears only the typed text. People can tidy the options where they pick them, as in Notion. With `onRename`, `onDelete` or `onColorChange`, the highlighted row shows a "…" that opens the option's menu: its name, Delete, and Tag's seven colours. With `onReorder`, each row has a handle to drag, or to pick up with Space and move with the arrows. Without these handlers neither appears. Built on the shared parts: `_Field` is the box, `Listbox` the list and its rows, and the chips are Tags in a TagGroup. Without focus the tags collapse into "+n"; with focus they wrap, up to three rows, then scroll.
 
 **Import:** `import { TagInput } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/TagInput.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TagInput.stories.jsx` — TypingFilters, CreateWhenNothingMatches, MatchIgnoresCase, ClickPicks, BackspaceRemovesTheLastTag, EscClearsOnlyTheText, PasteSplitsOnCommas, PastedTagsGetTagColours, MaxLength, PickLimit, CollapsesWithoutFocus, SmallFitsItsTags, TemporaryIdUntilConfirmed, ReadOnly, Invalid, Disabled, Controlled, Overview, Sizes, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/TagInput.stories.jsx` — TypingFilters, CreateWhenNothingMatches, MatchIgnoresCase, ClickPicks, BackspaceRemovesTheLastTag, EscClearsOnlyTheText, PasteSplitsOnCommas, PastedTagsGetTagColours, MaxLength, PickLimit, CollapsesWithoutFocus, SmallFitsItsTags, TemporaryIdUntilConfirmed, ReadOnly, Invalid, Disabled, Controlled, OptionMenuRenames, OptionMenuDeletes, OptionMenuChangesColour, KeyboardReorder, DragReorder, NoTidyingWithoutHandlers, OptionMenu, Reordering, Overview, Sizes, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TagInput.mdx`
 
@@ -19,15 +19,15 @@ Notion's multi-select. Focusing the field opens a list of the options. Typing fi
 |------|------|---------|-------------|
 | `id` | string | — | — |
 | `name` | string | — | — |
-| `label` | node | — | Names the field. |
-| `required` | bool | `false` | Shows an asterisk and sets aria-required. |
+| `label` | node | — | Names the field. Give every TagInput one. |
+| `required` | bool | `false` | Shows an asterisk and sets `aria-required`. |
 | `info` | node | — | Text for an info tooltip beside the label. |
-| `caption` | node | — | Standing help under the field. |
+| `caption` | node | — | Standing help under the field. A validation message takes its place. |
 | `placeholder` | string | `'Select or create a tag'` | Shown in the entry while there are no tags. |
 | `options` | arrayOf or string or shape or oneOf | `[]` | The options the list offers: strings, or objects with `value`, `label` (or `text`) and a Tag `color`. Required; the caller owns the list and adds what `onCreate` reports to it. |
 | `tags` | arrayOf | — | The picked tags, controlled. Pass `onChange` with it. |
 | `defaultTags` | arrayOf | `[]` | The picked tags at first, uncontrolled. |
-| `size` | enum | `'medium'` | Size variant |
+| `size` | enum | `'medium'` | — |
 | `disabled` | bool | `false` | Disables every tag and the entry. |
 | `readOnly` | bool | `false` | Shows the tags with no × and no entry, on the read-only fill. |
 | `validation` | enum | `'none'` | — |
@@ -38,6 +38,10 @@ Notion's multi-select. Focusing the field opens a list of the options. Typing fi
 | `onCreate` | func | — | `({ value, color })`: a new value was created, with the colour it was given. Store both on the option. Return a promise of the stored id to hold the tag on a temporary id, saving, until it resolves; a rejection removes the tag and puts the text back. |
 | `onRemove` | func | — | `(index, tag)`: a tag was removed. |
 | `onChange` | func | — | `(tags)`: the new list, after any add or remove. |
+| `onRename` | func | — | `(value, name)`: an option was renamed from its "…" menu. Store the new name on the option. A picked tag made from it takes the name too. |
+| `onDelete` | func | — | `(value)`: an option was deleted from its "…" menu. Remove it from `options`; a picked tag made from it is removed with it. |
+| `onColorChange` | func | — | `(value, color)`: an option was given another of Tag's seven colours from its "…" menu. Store it on the option. |
+| `onReorder` | func | — | `(fromIndex, toIndex)`: an option was moved by its handle, by drag or by the keyboard. Both are places in `options`; move the option there. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
@@ -51,7 +55,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface-variant` · `--font-line-height-body3` · `--font-size-body3` · `--plus-tag-input-max-height` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-pad-x-md` · `--size-element-pad-y-sm`
+`--color-on-surface-variant` · `--color-outline-variant` · `--font-line-height-body3` · `--font-size-body3` · `--layout-width-option-menu` · `--plus-tag-input-max-height` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-sm`
 
 From `design-system/src/components/forms-and-inputs/TagInput.scss`. Override these through the token layer, never with a literal.
 

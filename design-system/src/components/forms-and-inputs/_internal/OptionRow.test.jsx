@@ -122,4 +122,15 @@ describe('OptionRow', () => {
         expect(onToggle).toHaveBeenCalledTimes(1);
         expect(onSelect).not.toHaveBeenCalled();
     });
+
+    it('draws the dragging state and a drop line on either edge', () => {
+        const { rerender } = render(<OptionRow label="Maths" dragging dropIndicator="before" />);
+        const row = screen.getByRole('option');
+        expect(row).toHaveClass('is-dragging', 'has-drop-indicator');
+        expect(row).not.toHaveClass('has-drop-indicator-after');
+
+        rerender(<OptionRow label="Maths" dropIndicator="after" />);
+        expect(row).toHaveClass('has-drop-indicator-after');
+        expect(row).not.toHaveClass('is-dragging', 'has-drop-indicator');
+    });
 });

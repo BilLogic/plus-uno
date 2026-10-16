@@ -2447,7 +2447,17 @@
             "source": "manual",
             "status": "unpublished",
             "isComponentSet": true,
-            "notes": "3 sizes × 8 states: empty, filled, focus, typing, create, invalid, read-only and disabled. `size` is the code prop of the same name. `state` draws code's live states still: empty and filled are the tags, focus and typing are focus and the typed text, create is a Create row in the list, and invalid, read-only and disabled are `validation=\"invalid\"`, `readOnly` and `disabled`. Signed off; the library publishes it once the Specs file's text migration is ready, and the status becomes `verified` then."
+            "notes": "3 sizes × 10 states: empty, filled, focus, typing, create, option menu, reordering, invalid, read-only and disabled. `size` is the code prop of the same name. `state` draws code's live states still: empty and filled are the tags, focus and typing are focus and the typed text (the hovered row shows its \"…\" when the field has a menu handler), create is a Create row in the list, option menu is the `_Option menu` open from a row's \"…\" (`onRename`, `onDelete`, `onColorChange`), reordering is a row lifted by its handle with the drop line and the keys in the hint (`onReorder`), and invalid, read-only and disabled are `validation=\"invalid\"`, `readOnly` and `disabled`. The rows are Dropdown list Item, whose `state=dragging` and `drop indicator?` are OptionRow's `dragging` and `dropIndicator=\"before\"`. Signed off; the library publishes it once the Specs file's text migration is ready, and the status becomes `verified` then."
+          },
+          {
+            "id": "option-menu",
+            "name": "_Option menu",
+            "componentSetNodeId": "19150:44293",
+            "isComponentSet": false,
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19150-44293",
+            "source": "manual",
+            "status": "unpublished",
+            "notes": "The menu a TagInput row's \"…\" opens: a `_Listbox` whose Header holds a small field for the name, the Figma Form (code: `Input size=\"small\"`, Enter renames, Esc cancels), and whose Body holds Dropdown list Item rows: Delete with a trash icon and a divider, then a Colour heading and one row per Tag colour showing the Tag, the current one `state=selected`. It opens 4px under the \"…\", right-aligned to it. Each part shows only when its handler is passed."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18233-48345"

@@ -77,7 +77,7 @@ const samePlace = (a, b) => Boolean(a && b)
  * @param {{current: HTMLElement|null}} [options.anchorRef] the field; without one nothing is placed
  * @param {{current: HTMLElement|null}} options.popupRef the popup surface
  * @param {'left'|'center'|'right'} [options.align]
- * @param {(reason: string) => void} [options.onClose]
+ * @param {(reason: string, event?: PointerEvent) => void} [options.onClose] an outside press passes its event
  * @returns {{placement: 'top'|'bottom', side: 'start'|'end', top: number, left: number, minWidth: number}|null}
  *   `side` is `end` when the popup's right edge sits on the field's, `start` otherwise.
  */
@@ -121,7 +121,7 @@ export function useAnchoredPopup({ open, anchorRef, popupRef, align = 'left', on
         if (!open || !onClose || !anchorRef) return undefined;
         const onPointerDown = (event) => {
             if (popupRef.current?.contains(event.target) || anchorRef.current?.contains(event.target)) return;
-            onClose('outside');
+            onClose('outside', event);
         };
         document.addEventListener('pointerdown', onPointerDown);
         return () => document.removeEventListener('pointerdown', onPointerDown);
