@@ -295,6 +295,15 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       return best ? withLiveMark(best.proposal, now()) : null;
     },
 
+    async getProposalsByThread(ref) {
+      return [...proposals.values()]
+        .filter((rec) => now() - rec.createdAt <= proposalTtlMs(rec.proposal))
+        .filter((rec) => !rec.supersededBy && !rec.retired && !rec.decided)
+        .filter((rec) => rec.proposal.channel === ref.channel && proposalReplyThread(rec.proposal) === ref.thread)
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .map((rec) => withLiveMark(rec.proposal, now()));
+    },
+
     async getProposalsByChannel(channel) {
       return [...proposals.values()]
         .filter((rec) => now() - rec.createdAt <= proposalTtlMs(rec.proposal))

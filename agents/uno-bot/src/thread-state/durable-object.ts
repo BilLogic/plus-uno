@@ -136,6 +136,10 @@ export function createDurableObjectThreadState(
       return hop().getProposalByThread(ref, now());
     },
 
+    getProposalsByThread(ref: ThreadRef): Promise<PendingProposal[]> {
+      return hop().getProposalsByThread(ref, now());
+    },
+
     getProposalsByChannel(channel: string): Promise<PendingProposal[]> {
       return hop().getProposalsByChannel(channel, now());
     },

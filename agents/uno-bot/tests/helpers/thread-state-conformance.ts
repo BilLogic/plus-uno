@@ -451,6 +451,57 @@ export function runThreadStateConformance(
     assert.equal(await store.getProposalByThread({ channel: "D1", thread: "dm" }), null);
   });
 
+  // Every waiting card in one reply thread, newest first (#1317): what a turn
+  // that weighs revision against separate proposal has to see, where
+  // get-by-thread shows it only the newest.
+  it("list-by-thread lists a thread's one live card", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread }));
+    assert.deepEqual((await store.getProposalsByThread(THREAD)).map((p) => p.proposalTs), ["1700.2"]);
+  });
+
+  it("list-by-thread lists a turn's card and a keyed card side by side, newest first", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread }));
+    clock.advance(1_000);
+    await store.putProposal(proposal({ proposalTs: "1700.3", replyTs: THREAD.thread, supersedeKey: "sweep", sweepRun: "2026-09-30" }));
+    // Another thread's card, in the same channel, is not this thread's.
+    await store.putProposal(proposal({ proposalTs: "1700.4", threadTs: OTHER.thread, replyTs: OTHER.thread }));
+    assert.deepEqual((await store.getProposalsByThread(THREAD)).map((p) => p.proposalTs), ["1700.3", "1700.2"]);
+    // The newest-card lookup stays, and answers the list's head.
+    assert.equal((await store.getProposalByThread(THREAD))?.proposalTs, "1700.3");
+  });
+
+  it("list-by-thread leaves out superseded, retired, decided and expired cards", async () => {
+    const { store, clock } = setup();
+    // Expired: staged first, aged out by the end.
+    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread, supersedeKey: "old" }));
+    clock.advance(10_000);
+    // Superseded by a revision in its own slot: out; the revision is in.
+    await store.putProposal(proposal({ proposalTs: "1700.3", replyTs: THREAD.thread }));
+    clock.advance(1_000);
+    await store.putProposal(proposal({ proposalTs: "1700.4", replyTs: THREAD.thread }));
+    clock.advance(1_000);
+    // Retired ahead of a revision: out.
+    await store.putProposal(proposal({ proposalTs: "1700.5", replyTs: THREAD.thread, supersedeKey: "sweep", sweepRun: "2026-09-30" }));
+    await store.retireProposal("1700.5");
+    // Decided: out.
+    await store.putProposal(proposal({ proposalTs: "1700.6", replyTs: THREAD.thread, supersedeKey: "report-item" }));
+    assert.equal(await store.claimProposal("1700.6", { decision: "confirm", by: "U2" }), true);
+    clock.advance(1_000);
+    // Marked as being revised: still live, mark and all.
+    await store.putProposal(proposal({ proposalTs: "1700.7", replyTs: THREAD.thread, supersedeKey: "ds-precedence" }));
+    assert.equal(await store.markRevising("1700.7", "U2"), "marked");
+    clock.advance(1_000);
+    assert.deepEqual(
+      (await store.getProposalsByThread(THREAD)).map((p) => [p.proposalTs, p.revising?.userId]),
+      [["1700.7", "U2"], ["1700.4", undefined], ["1700.2", undefined]],
+    );
+
+    clock.advance(PROPOSAL_TTL_MS - 6_000); // 1700.2 has aged out; the rest have not
+    assert.deepEqual((await store.getProposalsByThread(THREAD)).map((p) => p.proposalTs), ["1700.7", "1700.4"]);
+  });
+
   // What an unthreaded ✅ in a DM needs: every card still live anywhere in the
   // DM, newest first, so one card resolves and several ask which. ANYWHERE —
   // a card staged from a reply inside a DM thread is filed under that thread,
