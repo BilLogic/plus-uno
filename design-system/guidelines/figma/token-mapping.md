@@ -102,6 +102,10 @@ Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity 
 | Min Heights/card-body | `var(--layout-min-height-card-body)` | 20 / 30 / 40 at MD / LG / XL |
 | Min Heights/modal-body | `var(--layout-min-height-modal-body)` | 40 / 50 / 60 at MD / LG / XL |
 | — (code only) | `var(--layout-z-index-overlay)` | 1070, the layer floating listboxes and menus draw on: above a modal, level with popovers. Figma has no z-index |
+| — (code only) | `var(--layout-max-width-listbox)` | 320, the widest a popup from a field or button grows. A popup with columns (Cascader, the calendar) is exempt |
+| — (code only) | `var(--layout-control-checkbox)` · `var(--layout-control-radio)` | 18 and 12, the checkbox box and radio dot; a description or reveal under the label indents by one plus the label gap |
+| — (code only) | `var(--layout-calendar-day-sm/md/lg)` · `var(--layout-calendar-nav)` | 28 / 36 / 44 calendar days by picker size, and the 32 month buttons |
+| — (code only) | `var(--layout-width-join-row)` | 520, the Home Join button with the session Select beside it |
 
 ## Rules for create_design_system_rules
 

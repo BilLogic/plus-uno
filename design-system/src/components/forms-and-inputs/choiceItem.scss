@@ -16,11 +16,11 @@
 }
 
 .plus-form-checkbox-wrapper {
-    --plus-choice-indent: calc(18px + var(--size-element-gap-sm));
+    --plus-choice-indent: calc(var(--layout-control-checkbox) + var(--size-element-gap-sm));
 }
 
 .plus-form-radio-wrapper {
-    --plus-choice-indent: calc(12px + var(--size-element-gap-sm));
+    --plus-choice-indent: calc(var(--layout-control-radio) + var(--size-element-gap-sm));
 }
 
 .plus-choice-card {

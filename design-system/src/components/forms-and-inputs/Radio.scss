@@ -24,10 +24,10 @@
     // Target the Form.Check container
     .form-check-input {
         // Radio button size - Figma: 12px
-        width: 12px;
-        height: 12px;
-        min-width: 12px;
-        min-height: 12px;
+        width: var(--layout-control-radio);
+        height: var(--layout-control-radio);
+        min-width: var(--layout-control-radio);
+        min-height: var(--layout-control-radio);
         padding: 0;
         margin: 0;
         margin-right: var(--size-element-gap-sm, 8px); // Spacing between radio and label

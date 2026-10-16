@@ -19,7 +19,7 @@
      * 320px. `min-width` (the field's width) wins over this, so a field wider
      * than the cap keeps its own width. Not a Figma variable.
      */
-    --plus-listbox-max-width: 320px;
+    --plus-listbox-max-width: var(--layout-max-width-listbox);
     --plus-listbox-viewport-width: calc(100vw - 2 * var(--size-section-pad-x-md));
 
     display: flex;
