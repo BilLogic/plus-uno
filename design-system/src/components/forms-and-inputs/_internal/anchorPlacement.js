@@ -57,48 +57,68 @@ export function placePopup({ anchor, width, height, viewport, align = 'left', ga
     };
 }
 
+const samePlace = (a, b) => Boolean(a && b)
+    && a.placement === b.placement && a.side === b.side
+    && a.top === b.top && a.left === b.left && a.minWidth === b.minWidth;
+
 /**
- * Places an open popup against its field, and keeps it there on scroll and
- * resize. A press outside both calls `onClose('outside')`.
+ * Places an open popup against its field, and keeps it there on scroll,
+ * resize, and whenever the popup or the field changes size. A press outside
+ * both calls `onClose('outside')`. Every field-anchored popup in the group
+ * places itself through this: the date pickers, `_Listbox` (Select,
+ * TagInput), TreeSelect, Cascader and the Dropdown menu.
+ *
+ * A popup in a portal positions itself from `top` and `left`. A popup inside
+ * its field's wrapper reads `placement` and `side` and lets CSS place it
+ * (`.plus-listbox--anchored` in `Listbox.scss`).
  *
  * @param {object} options
  * @param {boolean} options.open
- * @param {{current: HTMLElement|null}} options.anchorRef the field
+ * @param {{current: HTMLElement|null}} [options.anchorRef] the field; without one nothing is placed
  * @param {{current: HTMLElement|null}} options.popupRef the popup surface
  * @param {'left'|'center'|'right'} [options.align]
  * @param {(reason: string) => void} [options.onClose]
- * @returns {{placement: 'top'|'bottom', top: number, left: number, minWidth: number}|null}
+ * @returns {{placement: 'top'|'bottom', side: 'start'|'end', top: number, left: number, minWidth: number}|null}
+ *   `side` is `end` when the popup's right edge sits on the field's, `start` otherwise.
  */
 export function useAnchoredPopup({ open, anchorRef, popupRef, align = 'left', onClose }) {
     const [place, setPlace] = useState(null);
 
     const reposition = useCallback(() => {
-        const anchor = anchorRef.current;
+        const anchor = anchorRef?.current;
         const popup = popupRef.current;
         if (!anchor || !popup) return;
-        setPlace(placePopup({
-            anchor: anchor.getBoundingClientRect(),
-            width: popup.offsetWidth,
+        const box = anchor.getBoundingClientRect();
+        const width = popup.offsetWidth;
+        const placed = placePopup({
+            anchor: box,
+            width,
             height: popup.offsetHeight,
-            viewport: { width: window.innerWidth, height: window.innerHeight },
+            viewport: { width: document.documentElement.clientWidth, height: window.innerHeight },
             align,
             gap: readAnchorGap(),
-        }));
+        });
+        const next = { ...placed, side: width > box.width && placed.left < box.left ? 'end' : 'start' };
+        setPlace((prev) => (samePlace(prev, next) ? prev : next));
     }, [anchorRef, popupRef, align]);
 
     useLayoutEffect(() => {
-        if (!open) { setPlace(null); return undefined; }
+        if (!open || !anchorRef) { setPlace(null); return undefined; }
         reposition();
         window.addEventListener('resize', reposition);
         window.addEventListener('scroll', reposition, true);
+        const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(reposition);
+        if (popupRef.current) observer?.observe(popupRef.current);
+        if (anchorRef.current) observer?.observe(anchorRef.current);
         return () => {
             window.removeEventListener('resize', reposition);
             window.removeEventListener('scroll', reposition, true);
+            observer?.disconnect();
         };
-    }, [open, reposition]);
+    }, [open, anchorRef, popupRef, reposition]);
 
     useEffect(() => {
-        if (!open || !onClose) return undefined;
+        if (!open || !onClose || !anchorRef) return undefined;
         const onPointerDown = (event) => {
             if (popupRef.current?.contains(event.target) || anchorRef.current?.contains(event.target)) return;
             onClose('outside');

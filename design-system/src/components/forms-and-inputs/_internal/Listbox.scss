@@ -35,7 +35,7 @@
     box-shadow: var(--elevation-light-2);
 }
 
-/* In a portal: placed against its field by `usePopupPlacement`, at least the
+/* In a portal: placed against its field by `useAnchoredPopup`, at least the
    field's width (set inline), and free to grow with its content to the cap. */
 .plus-listbox--floating {
     position: fixed;
@@ -45,8 +45,8 @@
 }
 
 /* In place, inside a `position: relative` wrapper that is the field: below it
-   with the gap, or above it and right-aligned as `usePopupPlacement` decides
-   (`data-placement`, `data-align`). At least the field's width. */
+   with the gap, or above it and right-aligned as `useAnchoredPopup` decides
+   (`data-placement`, `data-side`). At least the field's width. */
 .plus-listbox--anchored {
     position: absolute;
     top: calc(100% + var(--size-element-gap-xs));
@@ -61,7 +61,7 @@
         bottom: calc(100% + var(--size-element-gap-xs));
     }
 
-    &[data-align='end'] {
+    &[data-side='end'] {
         left: auto;
         right: 0;
     }

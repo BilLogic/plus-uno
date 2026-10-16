@@ -12,7 +12,7 @@ import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import Spinner from '@/components/status-and-loading/Spinner/Spinner';
 import OptionRow from './OptionRow';
-import usePopupPlacement from './usePopupPlacement';
+import { useAnchoredPopup } from './anchorPlacement';
 import './Listbox.scss';
 
 /** Past this many options, only the rows on screen are drawn. */
@@ -60,7 +60,7 @@ const isTextEntry = (target) => target instanceof HTMLElement
  * - **Slots:** `header` (a hint or a search field), the body of rows, and `footer`.
  * - **Rows:** `OptionRow` for every option, group heading and the Create row.
  * - **Placement:** with `anchorRef` it renders in a portal on `document.body`
- *   and follows the popup placement rule through `usePopupPlacement`: at least
+ *   and follows the popup placement rule through `useAnchoredPopup`: at least
  *   as wide as the anchor, flipped above it when there isn't room below, and
  *   right-aligned when it would run past the viewport. Without one it renders
  *   in place.
@@ -218,18 +218,8 @@ const Listbox = ({
     /* ---------- placement ---------- */
     const surfaceRef = useRef(null);
     const bodyRef = useRef(null);
-    const place = usePopupPlacement({ open, anchorRef, surfaceRef });
-
-    // A press outside the field and the list closes it.
-    useEffect(() => {
-        if (!open || !anchorRef || !onClose) return undefined;
-        const onPointerDown = (event) => {
-            if (surfaceRef.current?.contains(event.target) || anchorRef.current?.contains(event.target)) return;
-            onClose('outside');
-        };
-        document.addEventListener('pointerdown', onPointerDown);
-        return () => document.removeEventListener('pointerdown', onPointerDown);
-    }, [open, anchorRef, onClose]);
+    // Placed against the field; a press outside the field and the list closes it.
+    const place = useAnchoredPopup({ open, anchorRef, popupRef: surfaceRef, onClose });
 
     /* ---------- virtualisation ---------- */
     const virtual = shown.length > VIRTUALIZE_ABOVE;
@@ -352,7 +342,7 @@ const Listbox = ({
             style={anchorRef ? {
                 top: place?.top ?? 0,
                 left: place?.left ?? 0,
-                minWidth: place?.anchorWidth,
+                minWidth: place?.minWidth,
                 visibility: place ? undefined : 'hidden',
                 ...style,
             } : style}

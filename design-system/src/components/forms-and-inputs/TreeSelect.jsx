@@ -3,7 +3,7 @@ import useFieldId from './useFieldId';
 import PropTypes from 'prop-types';
 import Field from './_internal/Field';
 import OptionRow from './_internal/OptionRow';
-import usePopupPlacement from './_internal/usePopupPlacement';
+import { useAnchoredPopup } from './_internal/anchorPlacement';
 import './_internal/Listbox.scss';
 import './TreeSelect.scss';
 
@@ -138,7 +138,7 @@ const TreeSelect = ({
     const wrapperRef = useRef(null);
     const inputRef = useRef(null);
     const menuRef = useRef(null);
-    const place = usePopupPlacement({ open: isOpen, anchorRef: wrapperRef, surfaceRef: menuRef });
+    const place = useAnchoredPopup({ open: isOpen, anchorRef: wrapperRef, popupRef: menuRef });
     /**
      * #323. Focus moves between real elements rather than through
      * `aria-activedescendant`: every treeitem is in the DOM already, so a
@@ -493,7 +493,7 @@ const TreeSelect = ({
                     ref={menuRef}
                     className="plus-listbox plus-listbox--anchored plus-tree-select-menu"
                     data-placement={place?.placement}
-                    data-align={place?.align}
+                    data-side={place?.side}
                 >
                     <div className="plus-listbox-body">
                         <div

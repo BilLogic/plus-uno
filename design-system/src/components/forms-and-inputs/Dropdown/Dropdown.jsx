@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import { useAnchoredPopup } from '../_internal/anchorPlacement';
 import './Dropdown.scss';
 
 /** What in a custom toggle can take focus back after Escape. */
@@ -72,10 +73,6 @@ const Dropdown = ({
     const toggleRef = useRef(null);
     const customToggleRef = useRef(null);
     const openerRef = useRef(null);
-    // Viewport-aware placement: the menu flips up when there isn't room below, and right-aligns
-    // when a left-aligned menu would spill off the right edge. Only the default vertical dropdown
-    // is auto-placed; an explicit `direction` of dropup/dropleft/dropright is honored as authored.
-    const [placement, setPlacement] = useState({ vertical: 'down', horizontal: 'start' });
 
     // Determine if controlled or uncontrolled
     const isControlled = controlledIsOpen !== undefined;
@@ -170,50 +167,14 @@ const Dropdown = ({
         // started mattering once the listener had a callback to call.
     }, [show, onToggle]);
 
-    // Measure available space and choose a placement so the menu stays on-screen.
-    const measurePlacement = useCallback(() => {
-        const toggleEl = dropdownRef.current;
-        const menuEl = menuRef.current;
-        if (!toggleEl || !menuEl) return;
-        const t = toggleEl.getBoundingClientRect();
-        const m = menuEl.getBoundingClientRect();
-        const vh = window.innerHeight || document.documentElement.clientHeight;
-        const vw = window.innerWidth || document.documentElement.clientWidth;
-        const MARGIN = 8;
-
-        // Vertical: only the neutral 'dropdown' auto-flips; 'dropup' stays up, side directions stay put.
-        let vertical = direction === 'dropup' ? 'up' : 'down';
-        if (direction === 'dropdown') {
-            const below = vh - t.bottom;
-            const above = t.top;
-            if (below < m.height + MARGIN && above > below) vertical = 'up';
-        }
-
-        // Horizontal alignment for vertical menus: right-align if a left-aligned menu would overflow.
-        let horizontal = 'start';
-        if (direction === 'dropdown' || direction === 'dropup') {
-            if (t.left + m.width > vw - MARGIN && t.right - m.width > MARGIN) horizontal = 'end';
-        }
-
-        setPlacement((prev) =>
-            prev.vertical === vertical && prev.horizontal === horizontal ? prev : { vertical, horizontal }
-        );
-    }, [direction]);
-
-    useLayoutEffect(() => {
-        if (!show) {
-            setPlacement((prev) => (prev.vertical === 'down' && prev.horizontal === 'start' ? prev : { vertical: 'down', horizontal: 'start' }));
-            return;
-        }
-        measurePlacement();
-        const onReflow = () => measurePlacement();
-        window.addEventListener('resize', onReflow);
-        window.addEventListener('scroll', onReflow, true);
-        return () => {
-            window.removeEventListener('resize', onReflow);
-            window.removeEventListener('scroll', onReflow, true);
-        };
-    }, [show, measurePlacement]);
+    // The menu is placed by the rule every field popup shares. Only the vertical
+    // directions are placed; 'dropup' always opens up, side directions stay put.
+    const vertical = direction === 'dropdown' || direction === 'dropup';
+    const place = useAnchoredPopup({ open: show && vertical, anchorRef: dropdownRef, popupRef: menuRef });
+    const placement = {
+        vertical: direction === 'dropup' || place?.placement === 'top' ? 'up' : 'down',
+        horizontal: place?.side ?? 'start',
+    };
 
     const wrapperClasses = [
         'pdropdown',

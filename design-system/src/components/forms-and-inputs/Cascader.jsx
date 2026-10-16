@@ -3,7 +3,7 @@ import useFieldId from './useFieldId';
 import PropTypes from 'prop-types';
 import Field from './_internal/Field';
 import OptionRow from './_internal/OptionRow';
-import usePopupPlacement from './_internal/usePopupPlacement';
+import { useAnchoredPopup } from './_internal/anchorPlacement';
 import './_internal/Listbox.scss';
 import './Cascader.scss';
 
@@ -51,7 +51,7 @@ const Cascader = ({
     const wrapperRef = useRef(null);
     const inputRef = useRef(null);
     const menuRef = useRef(null);
-    const place = usePopupPlacement({ open: isOpen, anchorRef: wrapperRef, surfaceRef: menuRef });
+    const place = useAnchoredPopup({ open: isOpen, anchorRef: wrapperRef, popupRef: menuRef });
     /**
      * #323. Where the keyboard cursor is: which column, and which row of it.
      * The options are real elements, so focus moves between them with a roving
@@ -380,7 +380,7 @@ const Cascader = ({
                     className="plus-listbox plus-listbox--anchored plus-cascader-menu"
                     id={menuId}
                     data-placement={place?.placement}
-                    data-align={place?.align}
+                    data-side={place?.side}
                 >
                     <div className="plus-listbox-body plus-cascader-columns">
                         {activeColumns.map((columnOptions, columnIndex) => (
