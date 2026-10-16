@@ -159,7 +159,7 @@ export function resolveToken(token, values, seen = new Set()) {
  * @param {string} value
  * @returns {{r: number, g: number, b: number, a: number}|null}
  */
-export function parseColour(value) {
+export function parseColor(value) {
   if (typeof value !== 'string') return null;
   const text = value.trim().toLowerCase();
 

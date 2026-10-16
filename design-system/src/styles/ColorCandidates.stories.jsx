@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect } from 'storybook/test';
 
-import { contrast as contrastOf, parseColour } from '../lib/tokens.mjs';
+import { contrast as contrastOf, parseColor } from '../lib/tokens.mjs';
 
 /**
  * The two color defects #312 measured, and what each one could become (#268).
@@ -64,7 +64,7 @@ const channels = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)
  * The adapter is only about SHAPE: everything below speaks in `#rrggbb`, the
  * module in `{r, g, b, a}`.
  */
-const contrast = (a, b) => contrastOf(parseColour(a), parseColour(b));
+const contrast = (a, b) => contrastOf(parseColor(a), parseColor(b));
 
 /** Hue in degrees, for the arc diagram. Saturation and lightness as percents. */
 const hsl = (hex) => {

@@ -71,7 +71,7 @@ import { NON_TEXT, analyzeSheet, groundAt, isNonText } from './lib/declared-grou
 import {
   composite,
   contrast,
-  parseColour,
+  parseColor,
   resolveToken,
   varReferencePattern,
 } from '../design-system/src/lib/tokens.mjs';
@@ -170,15 +170,15 @@ export function textSibling(token, values) {
  * is composited over the page before anything is measured.
  */
 export function opaqueGround(ground, values, page = PAGE_TOKEN) {
-  const paint = parseColour(resolveToken(ground, values));
+  const paint = parseColor(resolveToken(ground, values));
   if (!paint) return null;
   if (paint.a >= 1) return paint;
-  const beneath = parseColour(resolveToken(page, values));
+  const beneath = parseColor(resolveToken(page, values));
   return beneath ? composite(paint, beneath) : null;
 }
 
 export function ratio(token, values, ground = PAGE_TOKEN) {
-  const foreground = parseColour(resolveToken(token, values));
+  const foreground = parseColor(resolveToken(token, values));
   const background = opaqueGround(ground, values);
   if (!foreground || !background) return null;
   // A translucent FOREGROUND is a different question — text at 8% alpha is a

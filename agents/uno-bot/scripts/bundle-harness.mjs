@@ -1083,7 +1083,7 @@ export function assemble({ repoRoot = REPO_ROOT } = {}) {
  * The artifacts whose committed bytes differ from what this assembly would
  * write, in the order a report names them.
  *
- * Compared on NORMALISED endings. The HARNESS string itself is JSON-escaped, so
+ * Compared on NORMALIZED endings. The HARNESS string itself is JSON-escaped, so
  * the only real newlines in that file are the two wrapper ones — and on a
  * Windows checkout those arrive as CRLF while the assembly builds with "\n".
  * That 2-char difference reported the harness as STALE on every Windows run,

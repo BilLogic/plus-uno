@@ -42,7 +42,7 @@ test('every declaration and var() pattern in the named checks comes from the gra
       `${file} restates the font-family prefix instead of composing the module's patterns`,
     );
     assert.equal(
-      /function (terminal|colourKey|dimensionKey|readTokenDefinitions)\(/.test(src),
+      /function (terminal|colorKey|dimensionKey|readTokenDefinitions)\(/.test(src),
       false,
       `${file} still holds a token parser of its own`,
     );

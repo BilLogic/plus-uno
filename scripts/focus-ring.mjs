@@ -57,7 +57,7 @@ import path from 'node:path';
 import {
   composite,
   contrast,
-  parseColour,
+  parseColor,
   resolveToken,
   varReferencePattern,
 } from '../design-system/src/lib/tokens.mjs';
@@ -178,9 +178,9 @@ export function selectorChain(source, offset) {
  * measured against it.
  */
 export function ratio(token, ground, values, page = PAGE_TOKEN) {
-  const color = parseColour(resolveToken(token, values));
-  const raw = parseColour(resolveToken(ground, values));
-  const surface = parseColour(resolveToken(page, values));
+  const color = parseColor(resolveToken(token, values));
+  const raw = parseColor(resolveToken(ground, values));
+  const surface = parseColor(resolveToken(page, values));
   if (!color || !raw || !surface) return null;
   const base = raw.a < 1 ? composite(raw, surface) : raw;
   return contrast(composite(color, base), base);

@@ -363,7 +363,7 @@ export async function searchBlueprint(
     };
   }
 
-  // Keyed on the NORMALISED QUERY, not on its term bag. `terms()` lowercases,
+  // Keyed on the NORMALIZED QUERY, not on its term bag. `terms()` lowercases,
   // drops words under 3 characters, dedupes and then keeps only the first six —
   // so two genuinely different questions that happen to share those six words
   // collided, and the second one was served the first one's rows while the

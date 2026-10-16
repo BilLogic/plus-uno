@@ -25,7 +25,7 @@ import {
   composite,
   contrast,
   luminance,
-  parseColour,
+  parseColor,
   readTokens,
   resolveToken,
   toHex,
@@ -135,19 +135,19 @@ describe('resolveToken', () => {
   });
 });
 
-describe('parseColour', () => {
+describe('parseColor', () => {
   it('reads the three shapes the token file uses', () => {
-    expect(parseColour('#fff')).toEqual({ r: 255, g: 255, b: 255, a: 1 });
-    expect(parseColour('#9f8205')).toEqual({ r: 159, g: 130, b: 5, a: 1 });
-    expect(parseColour('rgba(113, 92, 0, 0.08)')).toEqual({ r: 113, g: 92, b: 0, a: 0.08 });
+    expect(parseColor('#fff')).toEqual({ r: 255, g: 255, b: 255, a: 1 });
+    expect(parseColor('#9f8205')).toEqual({ r: 159, g: 130, b: 5, a: 1 });
+    expect(parseColor('rgba(113, 92, 0, 0.08)')).toEqual({ r: 113, g: 92, b: 0, a: 0.08 });
   });
 
   it('returns null rather than a guess', () => {
-    expect(parseColour('currentColor')).toBe(null);
-    expect(parseColour('var(--color-primary)')).toBe(null);
-    expect(parseColour('rgb(300, 0, 0)')).toBe(null);
-    expect(parseColour('rgba(0, 0, 0, 4)')).toBe(null);
-    expect(parseColour(undefined)).toBe(null);
+    expect(parseColor('currentColor')).toBe(null);
+    expect(parseColor('var(--color-primary)')).toBe(null);
+    expect(parseColor('rgb(300, 0, 0)')).toBe(null);
+    expect(parseColor('rgba(0, 0, 0, 4)')).toBe(null);
+    expect(parseColor(undefined)).toBe(null);
   });
 });
 
@@ -160,8 +160,8 @@ describe('the contrast maths', () => {
 
   it('is the arithmetic that stops an 8% state layer being read as solid', () => {
     const page = { r: 249, g: 249, b: 252, a: 1 };
-    const layer = parseColour('rgba(113, 92, 0, 0.08)');
-    const label = parseColour('#5b4a00');
+    const layer = parseColor('rgba(113, 92, 0, 0.08)');
+    const label = parseColor('#5b4a00');
 
     expect(contrast(label, composite(layer, page))).toBeGreaterThan(4.5);
     expect(contrast(label, { ...layer, a: 1 })).toBeLessThan(2);
@@ -178,6 +178,6 @@ describe('the contrast maths', () => {
   });
 
   it('round-trips a parsed color through toHex', () => {
-    expect(toHex(parseColour('#9f8205'))).toBe('#9f8205');
+    expect(toHex(parseColor('#9f8205'))).toBe('#9f8205');
   });
 });

@@ -85,12 +85,12 @@
  * second walk of the token sources — and `normalizeColor` and
  * `normalizeDimension`, one of the two color keys and two dimension
  * normalizers #620 exists to collapse. `tokenCorpus` is the walk;
- * `colourKey` and `dimensionKey` are the keys. What is left here is what is
+ * `colorKey` and `dimensionKey` are the keys. What is left here is what is
  * about FALLBACKS — capturing the literal beside a token, auditing a FAMILY's
  * uses against their tokens, and the wording of the two reports.
  *
- * THE KEY KEEPS ALPHA, AND THE CAPTURE NOW READS IT. `colourKey` keeps alpha
- * where the `normalizeColor` it replaced (`parseColour` then `toHex`) dropped
+ * THE KEY KEEPS ALPHA, AND THE CAPTURE NOW READS IT. `colorKey` keeps alpha
+ * where the `normalizeColor` it replaced (`parseColor` then `toHex`) dropped
  * it. For a long time that reached no comparison here, because the fallback
  * literal was captured with `[^),]+` alone: it admits neither a comma nor a
  * `)`, so a whole `var(--color-x, rgba(…))` was not matched at all — not
@@ -99,7 +99,7 @@
  * washes beside them went unreported.
  *
  * `fallbackUsages` below now tries a whole color function before the plain
- * literal, using the pattern source `colourKey` itself reads with. Measured
+ * literal, using the pattern source `colorKey` itself reads with. Measured
  * over the live tree, that is 85 `rgba()` fallback sites across 20 files, all
  * captured; 82 name a defined token and are compared with alpha on both
  * sides, and 3 name a token defined nowhere. Widening the capture found 12
@@ -108,7 +108,7 @@
  * so a capture that quietly stops reading washes is told what it has changed.
  */
 
-import { COLOR_FUNCTION_SOURCE, colourKey } from '../design-system/src/lib/tokens-node.mjs';
+import { COLOR_FUNCTION_SOURCE, colorKey } from '../design-system/src/lib/tokens-node.mjs';
 import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 
 /**
@@ -122,7 +122,7 @@ const NESTED_VAR = 'var\\((?:[^()]|\\([^()]*\\))*\\)';
 /**
  * The fallback, in the order its branches are tried: a nested `var()`, then a
  * whole color function (the shared source, so the capture reads exactly what
- * `colourKey` reads), then a plain literal. The color function comes before
+ * `colorKey` reads), then a plain literal. The color function comes before
  * the plain literal because the plain literal stops at the first comma, and
  * every state-layer wash is written with commas. The fallback is read from
  * the named group, so the shared source's own numbered groups, which come
@@ -173,7 +173,7 @@ export function fallbackUsages(files, { prefix = '--color-' } = {}) {
  *
  * @param {{tokens: Map<string,string>, usages: Usage[]}} o
  */
-export function fallbackAudit({ tokens, usages, normalize = colourKey, reportUndefined = true }) {
+export function fallbackAudit({ tokens, usages, normalize = colorKey, reportUndefined = true }) {
   const disagreements = [];
   const undefinedTokens = new Map();
   let comparable = 0;

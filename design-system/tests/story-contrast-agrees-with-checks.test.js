@@ -44,7 +44,7 @@ import { resolve } from 'node:path';
 import { describe, it, expect } from 'vitest';
 
 import { ratio } from '../../scripts/focus-ring.mjs';
-import { contrast, parseColour, readTokens, resolveToken, toHex } from '../src/lib/tokens.mjs';
+import { contrast, parseColor, readTokens, resolveToken, toHex } from '../src/lib/tokens.mjs';
 
 /** The two files `colors()` in the check reads, in the order it reads them. */
 const TOKEN_FILES = ['src/tokens/_colors.scss', 'src/tokens/_color_roles.scss'];
@@ -54,12 +54,12 @@ const PAGE = '--color-surface';
 
 /** `readToken` in `FocusRing.stories.jsx`, for an opaque token: hex, or null. */
 const storyReadToken = (value) => {
-  const color = parseColour(value);
+  const color = parseColor(value);
   return color ? toHex(color) : null;
 };
 
 /** The story's adapter: everything in the story speaks `#rrggbb`. */
-const storyContrast = (a, b) => contrast(parseColour(a), parseColour(b));
+const storyContrast = (a, b) => contrast(parseColor(a), parseColor(b));
 
 describe('a story and a check agree about one pair of colors', () => {
   const source = TOKEN_FILES.map((file) => readFileSync(resolve(file), 'utf8')).join('\n');

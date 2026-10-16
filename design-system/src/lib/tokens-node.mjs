@@ -10,7 +10,7 @@
  * answered the three questions below privately: seventeen hardcoded the token
  * directory, the family map was restated beside them, and `scripts/` carried
  * two color keys and two dimension normalizers that agreed neither with each
- * other nor with `parseColour`. #621 moved the checks and the generators on to
+ * other nor with `parseColor`. #621 moved the checks and the generators on to
  * this file; #622 retired the docs check's remaining color key, alias
  * resolver and declaration regex, and replaced the registry generator's
  * `var()` — the loosest in the tree.
@@ -21,7 +21,7 @@
  *                 the table they define, read once, aliases followed. Moving
  *                 `design-system/src/tokens` becomes one edit here.
  *   THE FAMILIES  `FAMILIES` / `familyOf` — which family a token NAME is in.
- *   EQUALITY      `colourKey` / `dimensionKey` / `valueKey` / `sameValue` —
+ *   EQUALITY      `colorKey` / `dimensionKey` / `valueKey` / `sameValue` —
  *                 whether two VALUES are the same value.
  *
  * ─── IT READS THROUGH THE CORPUS, AND THAT IS THE POINT ─────────────────────
@@ -60,7 +60,7 @@
  * that, but until 2026-09-29 thirty were washes of a different color than
  * their name pointed at, because the solids were re-picked in Figma and the
  * washes never followed. The one remaining exception, shadow, is pinned in
- * `tokens-node.test.js`, and `colourKey` keeps alpha partly so a comparison
+ * `tokens-node.test.js`, and `colorKey` keeps alpha partly so a comparison
  * across that pairing cannot report an agreement nobody wrote.
  *
  * So the kind of a value is read off the VALUE — which is also the lesson
@@ -68,9 +68,9 @@
  * what they resolve to rather than by a prefix list, "so a new family is
  * covered the day it is minted". `valueKey` is that rule, once.
  *
- * ─── THE COLOR KEY IS WIDER THAN `parseColour` AND FINER THAN THE NORMALISER
+ * ─── THE COLOR KEY IS WIDER THAN `parseColor` AND FINER THAN THE NORMALIZER
  *
- * WIDER. `parseColour` in the browser half reads `#rgb`, `#rrggbb`, `rgb()`
+ * WIDER. `parseColor` in the browser half reads `#rgb`, `#rrggbb`, `rgb()`
  * and `rgba()`, and null for anything else — right for it, since what it feeds
  * is WCAG maths that needs channels. But `check:docs-token-literals` scans
  * stylesheets that contain `#abcd`, `#aabbccdd` and `hsl()`, and a module that
@@ -83,7 +83,7 @@
  *
  * FINER, AND THE NUMBER IS MEASURED. Alpha is part of this key and was not
  * part of `normalizeColor`, the normalizer `scripts/token-fallbacks.mjs`
- * carried until #621 moved the fallback checks here: `parseColour` followed by
+ * carried until #621 moved the fallback checks here: `parseColor` followed by
  * `toHex`, and `toHex` drops alpha. Over the live token corpus that is not a
  * rounding difference: 315 pairs of color tokens are EQUAL under the old
  * normalizer and UNEQUAL under this key — every one of them a translucent
@@ -109,7 +109,7 @@
  * forgot alpha reports agreement with something nobody wrote.
  *
  * OUT OF RANGE IS NOT A COLOR. `rgb(300, 0, 0)` keys as null rather than
- * clamping to red, which is `parseColour`'s rule and for its reason: a typo
+ * clamping to red, which is `parseColor`'s rule and for its reason: a typo
  * that clamped would report agreement with something nobody wrote.
  *
  * NAMED COLORS ARE NOT READ. `white` and `transparent` key as null. Neither
@@ -238,7 +238,7 @@ export function tokenCorpus({ root = REPO_ROOT, prefix = '--', precedence = 'fir
  * corpus. Minting a family means adding a row.
  */
 export const FAMILIES = [
-  { family: 'colour', prefix: '--color-', what: 'every color value and role' },
+  { family: 'color', prefix: '--color-', what: 'every color value and role' },
   {
     family: 'surface',
     prefix: '--surface-',
@@ -341,14 +341,14 @@ const hex2 = (n) => n.toString(16).padStart(2, '0');
  * Reads `#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`, `rgb()`, `rgba()`, `hsl()`
  * and `hsla()`, in comma or space syntax, with an alpha after `/` or after the
  * third comma, and channels as numbers or percentages. See the header for why
- * this is wider than `parseColour`, finer than the normalizer the fallback
+ * this is wider than `parseColor`, finer than the normalizer the fallback
  * checks carried before #621, and what the finer half costs a migrating
  * caller.
  *
  * @param {string} value
  * @returns {string|null}
  */
-export function colourKey(value) {
+export function colorKey(value) {
   if (typeof value !== 'string') return null;
   const literal = value.trim().toLowerCase();
 
@@ -445,7 +445,7 @@ export function dimensionKey(value) {
  * @returns {string|null}
  */
 export function valueKey(value) {
-  return colourKey(value) ?? dimensionKey(value);
+  return colorKey(value) ?? dimensionKey(value);
 }
 
 /**

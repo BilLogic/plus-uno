@@ -1,7 +1,7 @@
 /**
  * Tests for the BUTTON half of `check:button-contrast`.
  *
- * The maths — `parseColour`, `composite`, `luminance`, `contrast`,
+ * The maths — `parseColor`, `composite`, `luminance`, `contrast`,
  * `resolveToken`, `toHex` — moved to `design-system/src/lib/tokens.mjs` in
  * #506, and its tests moved with it to `design-system/tests/tokens.test.js`
  * (run by `npm test`). The ratchet went the same way and then on to

@@ -170,7 +170,7 @@ InputGroupText.propTypes = {
     className: PropTypes.string
 };
 
-/** Checkbox addon — code's Checkbox box (18), centred. Name it: the default is generic. */
+/** Checkbox addon — code's Checkbox box (18), centered. Name it: the default is generic. */
 const InputGroupCheckbox = ({
     checked = false,
     disabled = false,
@@ -200,7 +200,7 @@ InputGroupCheckbox.propTypes = {
 };
 
 /**
- * Radio addon — code's Radio, drawn at the checkbox's box (18) and centred.
+ * Radio addon — code's Radio, drawn at the checkbox's box (18) and centered.
  * Name it: the default is generic. A lone addon is its own group unless the
  * caller passes a shared `name`.
  */

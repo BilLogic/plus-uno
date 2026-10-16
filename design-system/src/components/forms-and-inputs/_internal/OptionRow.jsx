@@ -8,7 +8,7 @@ const MAX_LEADING = 4;
 
 /**
  * Draws the row's selected mark, check or dot, without being a form control.
- * A real `<input>` inside an option would be a second focusable, unlabelled
+ * A real `<input>` inside an option would be a second focusable, unlabeled
  * control inside an interactive element, which ARIA forbids and axe flags.
  *
  * @param {object} props

@@ -349,7 +349,7 @@ AddonsInSlots.play = async ({ canvasElement }) => {
     await expect(Math.abs(checkX - addonX)).toBeLessThanOrEqual(0.5);
     await expect(Math.abs(checkY - addonY)).toBeLessThanOrEqual(0.5);
 
-    // A radio addon is the PLUS Radio, named, 18 square and centred the same way.
+    // A radio addon is the PLUS Radio, named, 18 square and centered the same way.
     const primary = box('Primary contact');
     const radio = within(primary).getByRole('radio', { name: 'Make primary' });
     await expect(radio).toBeChecked();
@@ -358,8 +358,8 @@ AddonsInSlots.play = async ({ canvasElement }) => {
     await expect(Math.round(radioBox.width)).toBe(18);
     await expect(Math.round(radioBox.height)).toBe(18);
     const radioAddon = radio.closest('.plus-input-group-radio').getBoundingClientRect();
-    const [radioX, radioY] = centre(radioBox);
-    const [radioAddonX, radioAddonY] = centre(radioAddon);
+    const [radioX, radioY] = center(radioBox);
+    const [radioAddonX, radioAddonY] = center(radioAddon);
     await expect(Math.abs(radioX - radioAddonX)).toBeLessThanOrEqual(0.5);
     await expect(Math.abs(radioY - radioAddonY)).toBeLessThanOrEqual(0.5);
 };

@@ -30,7 +30,7 @@
  *
  * The token table is `tokenCorpus` (#620): one read, aliases followed, family
  * from the name, color and dimension keys from the same module. This check
- * used to carry its own copies of all four; they disagreed with `parseColour`
+ * used to carry its own copies of all four; they disagreed with `parseColor`
  * on alpha and with each other on a bare `0`. Indexing still prefers the
  * semantic name over the primitive `_primitives.scss` bans.
  *
@@ -136,7 +136,7 @@ import { fileURLToPath } from 'node:url';
 import { resolveToken } from '../design-system/src/lib/tokens.mjs';
 import {
   TOKEN_DIR,
-  colourKey,
+  colorKey,
   dimensionKey,
   familyOf,
   tokenCorpus,
@@ -194,7 +194,7 @@ export function buildTokenIndex(defs = new Map()) {
     if (value === undefined) continue;
     const bucket = familyOf(name);
     if (!bucket || !(bucket in index)) continue;
-    const key = bucket === 'color' ? colourKey(value) : dimensionKey(value);
+    const key = bucket === 'color' ? colorKey(value) : dimensionKey(value);
     if (key) push(bucket, key, name, def.file);
   }
 
@@ -360,7 +360,7 @@ export function findings(source, index) {
       found.push({ ...decl, literal, tokens: tokens.map((t) => t.name) });
     };
 
-    for (const m of value.matchAll(COLOR)) add(m[0], 'color', colourKey(m[0]));
+    for (const m of value.matchAll(COLOR)) add(m[0], 'color', colorKey(m[0]));
     for (const m of value.matchAll(DIMENSION)) {
       if (alwaysAllowed(m[0])) continue;
       add(m[0], bucketFor(decl.prop), dimensionKey(m[0]));

@@ -35,7 +35,7 @@ export default function SelectChips({
                 {values.map((v) => (
                     <Tag
                         key={v}
-                        color="grey"
+                        color="gray"
                         behavior={live ? 'removable' : 'read-only'}
                         onRemove={live ? () => onRemove(v) : undefined}
                     >

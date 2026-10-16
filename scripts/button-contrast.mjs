@@ -56,7 +56,7 @@ import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import {
   composite,
   contrast,
-  parseColour,
+  parseColor,
   readTokens,
   resolveToken,
   toHex,
@@ -116,14 +116,14 @@ export function themeMap(source) {
  * @returns {{ground: object, label: object}|{unresolved: string[]}}
  */
 export function combination(theme, fill, values) {
-  const page = parseColour(resolveToken(PAGE_TOKEN, values));
+  const page = parseColor(resolveToken(PAGE_TOKEN, values));
   const need = fill === 'filled' ? [theme.main, theme.onMain] : [theme.state, theme.text];
-  const unresolved = [PAGE_TOKEN, ...need].filter((token) => !parseColour(resolveToken(token, values)));
+  const unresolved = [PAGE_TOKEN, ...need].filter((token) => !parseColor(resolveToken(token, values)));
   if (unresolved.length) return { unresolved };
 
-  const label = parseColour(resolveToken(fill === 'filled' ? theme.onMain : theme.text, values));
-  if (fill === 'filled') return { ground: parseColour(resolveToken(theme.main, values)), label };
-  if (fill === 'tonal') return { ground: composite(parseColour(resolveToken(theme.state, values)), page), label };
+  const label = parseColor(resolveToken(fill === 'filled' ? theme.onMain : theme.text, values));
+  if (fill === 'filled') return { ground: parseColor(resolveToken(theme.main, values)), label };
+  if (fill === 'tonal') return { ground: composite(parseColor(resolveToken(theme.state, values)), page), label };
   return { ground: page, label };
 }
 

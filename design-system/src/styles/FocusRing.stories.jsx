@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect } from 'storybook/test';
 
-import { composite, contrast as contrastOf, parseColour, toHex } from '../lib/tokens.mjs';
+import { composite, contrast as contrastOf, parseColor, toHex } from '../lib/tokens.mjs';
 
 /**
  * The focus ring — what 29 of this system's focus styles looked like before
@@ -71,7 +71,7 @@ export default {
  * The adapter is only about SHAPE: everything below speaks in `#rrggbb`, the
  * module in `{r, g, b, a}`.
  */
-const contrast = (a, b) => contrastOf(parseColour(a), parseColour(b));
+const contrast = (a, b) => contrastOf(parseColor(a), parseColor(b));
 
 /**
  * Read a token as it renders, compositing translucency over the page.
@@ -85,10 +85,10 @@ const PAGE = '--color-surface';
 
 const readToken = (name, over = null) => {
     const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-    const color = parseColour(raw);
+    const color = parseColor(raw);
     if (!color) return null;
     if (color.a === 1) return toHex(color);
-    const ground = parseColour(over ?? readToken(PAGE));
+    const ground = parseColor(over ?? readToken(PAGE));
     // No ground to lay it on is not a reason to invent one: the raw channels
     // are what the old reader returned, and they are at least honest about
     // which color this is.

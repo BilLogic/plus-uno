@@ -78,7 +78,7 @@ import postcss from 'postcss';
 import postcssScss from 'postcss-scss';
 import selectorParser from 'postcss-selector-parser';
 
-import { parseColour, resolveToken } from '../../design-system/src/lib/tokens.mjs';
+import { parseColor, resolveToken } from '../../design-system/src/lib/tokens.mjs';
 import { REPO_ROOT } from './corpus.mjs';
 
 /**
@@ -348,7 +348,7 @@ export function groundErrors(declared, values) {
   for (const token of declared.tokens) {
     if (!/^--color-[a-z0-9-]+$/.test(token)) {
       errors.push(`\`${token}\` is not a --color-* token`);
-    } else if (!parseColour(resolveToken(token, values) ?? '')) {
+    } else if (!parseColor(resolveToken(token, values) ?? '')) {
       errors.push(`\`${token}\` does not resolve to a color in the token files`);
     }
   }
