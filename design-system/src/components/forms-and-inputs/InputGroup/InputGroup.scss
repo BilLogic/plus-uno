@@ -27,6 +27,11 @@
         margin: 0;
         float: none;
     }
+
+    // The Checkbox fills a row by default; in an addon it is as wide as its box.
+    .plus-form-checkbox-wrapper {
+        width: auto;
+    }
 }
 
 // The small Dropdown button, cut to the field's line like the button addons.
