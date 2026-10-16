@@ -23,8 +23,9 @@ import type { PrecedenceFacts, ProposalOperation, ReportItem, StatedCardWords } 
 import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
 import type { Addressee } from "../destination/index";
-import { shortDate, windowInWords } from "../slack/copy-words";
+import { shortDate } from "../slack/copy-words";
 import { SOURCE_NAMES, type Disagreement, type DsSource } from "./compare";
+import { CARD_WINDOW_WORDS } from "../card-expiry";
 
 /** The Worker tool every card runs (`./intake.ts`). */
 export const PRECEDENCE_INTAKE_TOOL = "ds_precedence_intake";
@@ -239,13 +240,11 @@ export function precedenceFacts(finding: ComponentFinding, weekOf: string): Prec
  * What a weekly card says at the gate (`PendingProposal.stated`): a Reject
  * means the difference is deliberate, and a card that closes undecided files
  * nothing — a later week's check is what asks again.
- *
- * @param windowHours - The card's whole window
  */
-export function precedenceCardWords(windowHours: number): StatedCardWords {
+export function precedenceCardWords(): StatedCardWords {
   return {
     cancelled: "Left as deliberate, nothing filed",
-    expired: `That card closed after ${windowInWords(windowHours)} with no decision, so nothing was filed.`,
+    expired: `That card closed after ${CARD_WINDOW_WORDS} with no decision, so nothing was filed.`,
   };
 }
 

@@ -29,7 +29,6 @@ import {
   precedenceChannel,
   precedenceSection,
   runPrecedenceCheck,
-  PRECEDENCE_CARD_TTL_MS,
   PRECEDENCE_SECTION,
   type CheckDeps,
   type HandOverDeps,
@@ -644,8 +643,8 @@ describe("the morning post", () => {
     assert.deepEqual(notified(posts[0]!), [], "a handle, never a tag");
   });
 
-  it("stages each component as its own proposal: the week's intake, decided by the channel's members, for six days", async () => {
-    const { morning, staged } = postDeps(await weekReport());
+  it("stages each component as its own proposal: the week's intake, decided by the channel's members, for 24 weekday hours", async () => {
+    const { morning, staged, store } = postDeps(await weekReport());
     await morning();
     assert.equal(staged.length, 2, "one proposal per card");
     const [button, tree] = staged;
@@ -653,7 +652,10 @@ describe("the morning post", () => {
     assert.deepEqual(button!.item, { messageTs: MSG, id: "ds-Button" });
     assert.notEqual(button!.supersedeKey, tree!.supersedeKey, "each card its own slot");
     assert.deepEqual(button!.confirmers, MEMBERS);
-    assert.equal(button!.ttlMs, PRECEDENCE_CARD_TTL_MS);
+    // Staged Friday 10:10 ET: live until Monday 10:10 ET.
+    const stored = await store.getProposalByTs(button!.proposalTs);
+    assert.ok(stored.state === "found");
+    assert.equal(stored.createdAt + stored.proposal.ttlMs!, Date.parse("2025-10-06T14:10:00Z"));
     assert.deepEqual(button!.operations!.map((o) => o.toolName), [PRECEDENCE_INTAKE_TOOL]);
     assert.equal(button!.operations![0]!.input.week_of, "2026-10-02");
     assert.match(String(button!.operations![0]!.input.section), /^### Button\n/);
@@ -662,7 +664,7 @@ describe("the morning post", () => {
     assert.match(button!.proposalText, /intake for the week of Oct 2/);
     assert.deepEqual(button!.stated, {
       cancelled: "Left as deliberate, nothing filed",
-      expired: "That card closed after 6 days with no decision, so nothing was filed.",
+      expired: "That card closed after 24 weekday hours with no decision, so nothing was filed.",
     });
     for (const p of staged) assert.doesNotMatch(`${p.proposalText} ${p.refuseRevision}`, GATE_WORDS);
   });

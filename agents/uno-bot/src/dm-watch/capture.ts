@@ -80,7 +80,7 @@ import {
 } from "../slack/decision-cards";
 import { textSections } from "../slack/render";
 import { isMorningRunTime } from "../commitments/due";
-import { changedSpan, itemOperation, operationsDigest, SWEEP_CARD_EVENT, SWEEP_CARD_TTL_MS } from "../sweep/cards";
+import { changedSpan, itemOperation, operationsDigest, SWEEP_CARD_EVENT } from "../sweep/cards";
 import type { CaptureDetector } from "../sweep/capture-detector";
 import type { DriftDetector } from "../sweep/detector";
 import { classifyLink, linksIn, type FindingAddition, type FindingTarget, type SweepMessage, type SweepSource, type TargetKind } from "../sweep/finding";
@@ -101,6 +101,7 @@ import {
   type ReadProgress,
 } from "./run";
 import { CAPTURE_FEATURE, positionScope, type DmReadPosition, type DmWatchRecords } from "./store";
+import { CARD_WINDOW_WORDS, cardExpiresAt, cardTtlMs } from "../card-expiry";
 
 /** What one window may spend: two model calls, the pages it reads and
  *  searches for, and what a stop saves. */
@@ -600,7 +601,7 @@ export async function runDmCapturePost(job: ScheduledJob, deps: DmCapturePostDep
     ts = posted.ts;
     try {
       // Where each card's decision lands: without it, no card can be staged.
-      await deps.reports.putReport(reportRecord(dm, ts, built, SWEEP_CARD_TTL_MS));
+      await deps.reports.putReport(reportRecord(dm, ts, built, cardTtlMs(deps.now())));
     } catch (err) {
       await deps.bot.remove(dm, ts, []).catch(rethrowIfBudget);
       rethrowIfBudget(err);
@@ -729,7 +730,7 @@ function onMessage(card: PendingProposal, messages: ReadonlySet<string>): boolea
 async function liveCard(queue: readonly DmCaptureFinding[], now: number, deps: Pick<DmCapturePostDeps, "liveCards">): Promise<boolean> {
   const posted = new Map<string, Set<string>>();
   for (const f of queue) {
-    if (f.state !== "proposed" || !f.cardChannel || !f.proposalTs || (f.postedAt ?? 0) + SWEEP_CARD_TTL_MS <= now) continue;
+    if (f.state !== "proposed" || !f.cardChannel || !f.proposalTs || cardExpiresAt(f.postedAt ?? 0) <= now) continue;
     posted.set(f.cardChannel, (posted.get(f.cardChannel) ?? new Set()).add(f.proposalTs));
   }
   for (const [channel, messages] of posted) {
@@ -865,7 +866,7 @@ export function dmCaptureCard(f: DmCaptureFinding): ProposalCard {
 /** What a DM Capture card says at the gate (`PendingProposal.stated`). */
 export const DM_CAPTURE_WORDS: StatedCardWords = {
   cancelled: "Rejected, nothing written",
-  expired: `That card closed after ${SWEEP_CARD_TTL_MS / 3_600_000} h with no decision, so nothing was written.`,
+  expired: `That card closed after ${CARD_WINDOW_WORDS} with no decision, so nothing was written.`,
 };
 
 /** A fix's one write. */
@@ -896,7 +897,6 @@ export function dmCaptureProposal(f: DmCaptureFinding, posted: { owner: string; 
     proposalText: renderProposalCard(dmCaptureCard(f)).text,
     // Nobody asked: the Worker staged it.
     requesterUserId: "",
-    ttlMs: SWEEP_CARD_TTL_MS,
     confirmers: [posted.owner],
     stated: DM_CAPTURE_WORDS,
     sweepRun: posted.runDate,

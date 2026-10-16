@@ -11,6 +11,7 @@
 
 import type { Env } from "../types";
 import { HARNESS } from "../generated/harness";
+import { CARD_WINDOW_WORDS } from "../card-expiry";
 
 export interface PendingContext {
   /** The whole staged batch. The model has to see every operation it is being
@@ -124,7 +125,7 @@ function renderPendingBlock(p: PendingContext, sender: SenderContext | null): st
     p.requesterUserId ? `- requester: <@${p.requesterUserId}>` : "- requester: none — uno-bot staged this card itself",
     sender ? `- current message sender: <@${sender.userId}>` : "",
     "",
-    "Read the user's current message as a reply to this proposal. If it says yes in any words — \"go ahead\", \"sure\", \"ok\", \"sounds good\", \"yep do it\" — invoke `proposal_resolve` with decision \"confirm\". If it says no, cancel. If it asks for a change, or asks something unrelated, reply conversationally; the proposal sits until someone presses ✅ / ⛔ on the card, reacts, or it expires after 60 minutes.",
+    `Read the user's current message as a reply to this proposal. If it says yes in any words — "go ahead", "sure", "ok", "sounds good", "yep do it" — invoke \`proposal_resolve\` with decision "confirm". If it says no, cancel. If it asks for a change, or asks something unrelated, reply conversationally; the proposal sits until someone presses ✅ / ⛔ on the card, reacts, or it expires ${CARD_WINDOW_WORDS} after it was staged — Saturday and Sunday do not count.`,
     "",
     `While this proposal is pending, do NOT invoke \`${p.toolName}\` (or any side-effect tool) again for the same action — proposal_resolve is the clean path. (If you do re-invoke it with identical parameters, the Worker treats that as a confirm rather than posting a second card.)`,
     "",

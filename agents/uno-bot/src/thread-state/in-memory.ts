@@ -43,6 +43,7 @@ import {
   proposalReplyThread,
   proposalSlot,
   proposalTtlMs,
+  stampedTtl,
   withLiveMark,
   type DecisionReportRecord,
   type Execution,
@@ -187,7 +188,8 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
 
     // ----- proposals -----
 
-    async putProposal(proposal) {
+    async putProposal(staged) {
+      const proposal = stampedTtl(staged, now());
       // The revised card retires the one it replaces, per REPLY THREAD — the
       // grain, and why a DM needs it, are in `putProposal`'s contract. Only
       // LIVE records are touched: an aged-out card is already answered by

@@ -804,7 +804,7 @@
   },
   {
     "name": "proposal_resolve",
-    "description": "Resolve a side-effect proposal that is awaiting confirmation. Use it when the system prompt shows a pending proposal AND the user's current message is a decision about it, in whatever words — a yes ('go ahead', 'sure', 'ok', 'sounds good', 'yep do it') confirms; a no ('cancel', 'no', 'scrap it') cancels. Anyone in the thread may confirm or cancel, not just the original requester. A message that asks for a change, or asks something unrelated, gets a conversational reply instead, and the proposal sits until someone presses ✅ / ⛔ on the card, reacts, or it expires after 60 minutes.",
+    "description": "Resolve a side-effect proposal that is awaiting confirmation. Use it when the system prompt shows a pending proposal AND the user's current message is a decision about it, in whatever words — a yes ('go ahead', 'sure', 'ok', 'sounds good', 'yep do it') confirms; a no ('cancel', 'no', 'scrap it') cancels. Anyone in the thread may confirm or cancel, not just the original requester. A message that asks for a change, or asks something unrelated, gets a conversational reply instead, and the proposal sits until someone presses ✅ / ⛔ on the card, reacts, or it expires 24 weekday hours after it was staged.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

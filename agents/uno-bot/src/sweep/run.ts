@@ -138,7 +138,6 @@ import {
   sweepParent,
   sweepReportMetadata,
   sweepShareOf,
-  SWEEP_CARD_TTL_MS,
   type SweepCardPlan,
 } from "./cards";
 import {
@@ -195,6 +194,7 @@ import type {
   SweepStore,
 } from "./store";
 import { aloneKeyOf, FOLLOW_UPS_SECTION, placeKeyOf, type SectionCards, type SectionPlace, type SweepSection } from "./sections";
+import { MAX_CARD_TTL_MS, cardExpiresAt, cardTtlMs } from "../card-expiry";
 
 /** A first sweep of a channel reads its last day. */
 export const FIRST_SWEEP_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -1243,7 +1243,7 @@ async function postPlaces(job: ScheduledJob, deps: SweepDeps, scope: SectionPlac
       if (outcome === "held") for (const i of items) held.add(i.findingId);
     }
     for (const i of open) {
-      if (i.proposalTs !== null && (i.postedAt ?? 0) + SWEEP_CARD_TTL_MS > now) live.add(i.destination);
+      if (i.proposalTs !== null && cardExpiresAt(i.postedAt ?? 0) > now) live.add(i.destination);
     }
     for (const place of await placesLiveInThreadState(deps, open, live)) live.add(place);
 
@@ -1340,9 +1340,13 @@ function sectionsCost(handed: readonly Handed[], shown: Readonly<Record<string, 
   );
 }
 
-/** How long a report's record lasts: its longest-lived card's window. */
-function reportTtl(handed: readonly Handed[]): number {
-  return Math.max(SWEEP_CARD_TTL_MS, ...handed.map((h) => h.place.ttlMs ?? 0));
+/** How long a report's record lasts: the window its fixes share, for a report
+ *  posted at `at` — or, with sections on it, the longest window any card gets,
+ *  since a section's job reads its decisions back on a later morning (the
+ *  follow-through's Still on it). Each staged card still closes on its own
+ *  deadline. */
+function reportTtl(handed: readonly Handed[], at: number): number {
+  return handed.length ? MAX_CARD_TTL_MS : cardTtlMs(at);
 }
 
 /**
@@ -1450,7 +1454,7 @@ async function postCard(
     ctx,
     plan,
     report,
-    { channel: to.channel, root: to.threadTs ?? sentTs, ts: sentTs, postDate, ttlMs: reportTtl(handed), ...(plain ? { plain: true } : {}) },
+    { channel: to.channel, root: to.threadTs ?? sentTs, ts: sentTs, postDate, ttlMs: reportTtl(handed, now), ...(plain ? { plain: true } : {}) },
     now,
     new Set(),
     shared ? sectionsOnReport(handed, shared.shown, { ts: sentTs, text: report.text }) : undefined,
@@ -1532,7 +1536,7 @@ async function finishAlone(
   try {
     if (!(await deps.delivery.reports.getReport(posted.ts))) {
       await deps.delivery.reports.putReport({
-        ...reportRecord(to.channel, posted.ts, built.report, reportTtl(handed)),
+        ...reportRecord(to.channel, posted.ts, built.report, reportTtl(handed, deps.now())),
         ...(posted.plain ? { plain: true } : {}),
         metadata: sweepReportMetadata({ cardKey, digest: "" }),
       });
@@ -1799,7 +1803,7 @@ async function stageReport(
     // A retry keeps the record an earlier try made, and the decisions on it.
     if (!(await deps.delivery.reports.getReport(posted.ts))) {
       await deps.delivery.reports.putReport({
-        ...reportRecord(posted.channel, posted.ts, report, posted.ttlMs ?? SWEEP_CARD_TTL_MS),
+        ...reportRecord(posted.channel, posted.ts, report, posted.ttlMs ?? cardTtlMs(deps.now())),
         ...(posted.plain ? { plain: true } : {}),
         metadata: sweepReportMetadata({ cardKey: plan.key, digest: operationsDigest(plan.operations) }),
       });
@@ -1888,9 +1892,9 @@ async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" 
   const postDate = cardKey.slice(0, 10);
   const posted = await deps.delivery.findPosted(to, cardKey, tsOf(Date.parse(`${postDate}T00:00:00Z`)));
   if (posted.state === "unknown") {
-    if (now > Date.parse(`${postDate}T00:00:00Z`) + SWEEP_CARD_TTL_MS) {
+    if (now > Date.parse(`${postDate}T00:00:00Z`) + MAX_CARD_TTL_MS) {
       await release(deps, cardKey, true);
-      notes.push(`${cardKey}: still not found after its 72 h (${posted.why}) — released`);
+      notes.push(`${cardKey}: still not found after its card's window (${posted.why}) — released`);
       return "released";
     }
     notes.push(`${cardKey}: could not tell whether it went up (${posted.why}) — held for the next try`);
@@ -1930,7 +1934,7 @@ async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" 
     ctx,
     plan,
     handed.length ? sharedReport(plan, handed, to.channel).report : sweepReport(plan),
-    { channel: to.channel, root: to.threadTs ?? posted.ts, ts: posted.ts, postDate, ttlMs: reportTtl(handed), ...(posted.plain ? { plain: true } : {}) },
+    { channel: to.channel, root: to.threadTs ?? posted.ts, ts: posted.ts, postDate, ttlMs: reportTtl(handed, Number.isFinite(postedAt) ? postedAt : now), ...(posted.plain ? { plain: true } : {}) },
     Number.isFinite(postedAt) ? postedAt : now,
     already,
     handed.length ? sectionsOnReport(handed, shown, { ts: posted.ts, text: posted.text }) : undefined,
@@ -2215,7 +2219,6 @@ export function sweepProposal(
     proposalText: row.length && f.row ? `${sweepItemText(f)}\n${escapeSlackText(rowWords(rowUpdateOf(f.row.key)))}` : sweepItemText(f),
     // Nobody asked: the Worker staged it.
     requesterUserId: "",
-    ttlMs: SWEEP_CARD_TTL_MS,
     confirmers: [...plan.confirmers],
     sweepRun: posted.postDate,
     stated: sweepItemWords(),

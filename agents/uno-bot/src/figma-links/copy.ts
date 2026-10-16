@@ -9,10 +9,11 @@
 import type { DevLinksFacts, ReportItem, StatedCardWords } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
-import { namesInWords, windowInWords } from "../slack/copy-words";
+import { namesInWords } from "../slack/copy-words";
 import type { ToolName } from "../agent/tool-table";
 import { isOwnComment, labeled, withoutLabel } from "../figma-ask/trigger";
 import type { DevLink } from "./links";
+import { CARD_WINDOW_WORDS } from "../card-expiry";
 
 /** The tool a card names: Approve runs it. */
 export const DEV_LINKS_TOOL: ToolName = "figma_dev_links";
@@ -185,10 +186,10 @@ export function devLinksFacts(subject: DevLinksSubject, write: DevLinksWrite): D
 }
 
 /** What the gate says on a Dev Mode links card in place of its generic lines. */
-export function devLinksCardWords(windowHours: number): StatedCardWords {
+export function devLinksCardWords(): StatedCardWords {
   return {
     cancelled: "Nothing added",
-    expired: `That card closed after ${windowInWords(windowHours)} with no decision, so no links were added.`,
+    expired: `That card closed after ${CARD_WINDOW_WORDS} with no decision, so no links were added.`,
   };
 }
 

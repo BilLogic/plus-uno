@@ -32,7 +32,7 @@ import {
   type DriftSectionDeps,
 } from "../src/figma-drift/run";
 import { sectionHandOffIn } from "../src/sweep/sections";
-import { DRIFT_CARD_TTL_MS, DRIFT_NO_REVISION, driftCardWords, LEGACY_DRIFT_REPLY } from "../src/figma-drift/copy";
+import { DRIFT_NO_REVISION, driftCardWords, LEGACY_DRIFT_REPLY } from "../src/figma-drift/copy";
 import { FRAME_MATCH_SYSTEM, frameMatchPrompt, modelFrameJudge, parseFrameMatch } from "../src/figma-drift/judge";
 import { fakeProvider, type FakeProvider } from "../src/agent/providers/fake";
 import type { FigmaNode } from "../src/integrations/figma-reading";
@@ -360,11 +360,11 @@ describe("a Figma drift at the morning run", () => {
     const input = proposal.operations![0]!.input as Record<string, unknown>;
     assert.equal(input.surface, "prd");
     assert.match(String(input.title), /^Update Session Recap in Figma: /);
-    assert.equal(proposal.ttlMs, DRIFT_CARD_TTL_MS);
+    assert.equal(proposal.ttlMs, 24 * 3_600_000, "staged Wednesday 09:00 ET, live until Thursday 09:00 ET");
     assert.deepEqual(proposal.confirmers, ["U0BEA", "U0STARTER", "U0ADE"], "the owner plus everyone who posted");
     assert.equal(proposal.replyTs, t.root.ts);
     assert.equal(proposal.sweepRun, undefined, "not a sweep card: it holds no sweep items");
-    assert.deepEqual(proposal.stated, driftCardWords(72), "the gate answers in the card's own words");
+    assert.deepEqual(proposal.stated, driftCardWords(), "the gate answers in the card's own words");
     assert.equal(proposal.refuseRevision, DRIFT_NO_REVISION, "a turn does not redraft it beside the card");
     assert.deepEqual(proposal.choices?.map(({ label, verdict }) => ({ label, verdict })), [
       { label: "File an intake", verdict: "confirm" },
@@ -511,7 +511,8 @@ describe("a Figma drift at the morning run", () => {
     const one = thread({ user: "U0STARTER", when: ts(29, 15), urls: [FIGMA_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     const { h, drifts } = night({ threads: [one], sources: [FIGMA_A], replies: [reply(fileDrift(FIGMA_A, [ts(29, 16)]))] });
     await runSweepJob(EOD, h.deps);
-    h.clock.now = at(30, 13);
+    // Posted late in Wednesday's morning, so it is still live at Thursday's.
+    h.clock.now = at(30, 13, 45);
     const m = morning(h, drifts);
     await m.run();
     assert.equal(m.posted.length, 1);
@@ -744,7 +745,7 @@ describe("two files discussed in one thread", () => {
     const found = await pendingOf(h, drifts, again, other);
     assert.ok(found);
     await drifts.add([{ ...found, detectedAt: at(30, 22) }]);
-    h.clock.now = at(31, 13);
+    h.clock.now = at(31, 12);
     await m.run();
     assert.equal(m.posted.length, 1, "nothing new in a thread whose card is live");
     assert.equal((await h.threadState.getProposalsByChannel(DESIGN)).length, 2);
@@ -948,7 +949,7 @@ describe("the drift check, before the ask (#897)", () => {
     const other = figmaFile("9-9", { url: "https://www.figma.com/design/ZzOther9/Onboarding?node-id=9-9", title: "Onboarding" });
     const again = thread({ user: "U0STARTER", when: t.root.ts, urls: [other.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
     await drifts.add([{ ...(await pendingOf(h, drifts, again, other))!, detectedAt: at(30, 22) }]);
-    h.clock.now = at(31, 13);
+    h.clock.now = at(31, 12);
     const calls = m.figma.calls().length;
     await m.run();
     assert.equal(m.figma.calls().length, calls, "no read for a finding that waits");
@@ -1022,14 +1023,15 @@ describe("the drift check, while the report is live (#897)", () => {
     assert.deepEqual(first.edits, []);
     assert.equal(first.provider.generated.length, 1);
 
-    h.clock.now = at(31, 13);
+    h.clock.now = at(31, 8);
     const second = recheck(h, drifts, m.figma, { judge: [SHOWS] });
     await recheckLiveAsks(RECHECK, second.deps);
     assert.equal(second.provider.generated.length, 0, "the same version is not judged twice");
     assert.deepEqual(second.edits, []);
 
-    seedFigmaFile(m.figma, { changedAt: "2026-10-01T15:00:00Z", frameA: UPDATED });
-    h.clock.now = at(32, 4);
+    // Still inside the card's window, which closes Thursday 09:00 ET.
+    seedFigmaFile(m.figma, { changedAt: "2026-10-01T10:00:00Z", frameA: UPDATED });
+    h.clock.now = at(31, 12);
     const third = recheck(h, drifts, m.figma, { judge: [SHOWS] });
     await recheckLiveAsks(RECHECK, third.deps);
     assert.deepEqual(third.edits.map((e) => cardsOf(e.blocks)[0]!.subtitle!.text), ["Updated Oct 1. Nothing to do."]);
@@ -1062,9 +1064,10 @@ describe("the drift check, while the report is live (#897)", () => {
     assert.deepEqual(labels(after[1]!), ["Review", "Open in Figma"], "the other file's card stays to decide");
 
     m.figma.seedFile("ZzOther9", {
-      versions: { versions: [{ id: "2", label: null, description: null, created_at: "2026-10-01T15:00:00Z", user: { handle: "bea.designs" } }] },
+      versions: { versions: [{ id: "2", label: null, description: null, created_at: "2026-10-01T10:00:00Z", user: { handle: "bea.designs" } }] },
     });
-    h.clock.now = at(32, 4);
+    // Still inside the cards' window, which closes Thursday 09:00 ET.
+    h.clock.now = at(31, 12);
     const second = recheck(h, drifts, m.figma, { judge: async () => "shows" });
     await recheckLiveAsks(RECHECK, second.deps);
     assert.deepEqual(cardsOf(second.edits[0]!.blocks).map((c) => c.subtitle!.text), ["Updated Sep 30. Nothing to do.", "Updated Oct 1. Nothing to do."]);
@@ -1124,7 +1127,7 @@ describe("the drift check, while the report is live (#897)", () => {
   });
 });
 describe("no re-ping (#897)", () => {
-  it("after 72 h with no answer, later mornings ask nothing and the file catching up edits nothing", async () => {
+  it("after its window with no answer, later mornings ask nothing and the file catching up edits nothing", async () => {
     const { h, drifts, m, t } = await recapMorning();
     await m.run();
     assert.equal(m.posted.length, 1);
@@ -1142,7 +1145,7 @@ describe("no re-ping (#897)", () => {
       assert.deepEqual(await drifts.pending(), [], "the thread was asked: the finding leaves");
     }
 
-    // Past its 72 h, the frame finally changes.
+    // Long past its window, the frame finally changes.
     seedFigmaFile(m.figma, { changedAt: "2026-10-06T15:00:00Z", frameA: UPDATED });
     h.clock.now = at(37, 20);
     const r = recheck(h, drifts, m.figma, { judge: [SHOWS] });
@@ -1309,7 +1312,7 @@ describe("a file-change notification (#896)", () => {
   it("withdraws a caught-up question within its own job, the way the scheduled runs do", async () => {
     const { h, drifts, m } = await recapMorning();
     await m.run();
-    assert.equal(await drifts.liveFileUntil(`figma:${FILE_KEY}`), at(30, 13) + DRIFT_CARD_TTL_MS, "the ask marked its file");
+    assert.equal(await drifts.liveFileUntil(`figma:${FILE_KEY}`), at(31, 13), "the ask marked its file, until Thursday 09:00 ET");
     const [card] = await h.threadState.getProposalsByChannel(DESIGN);
 
     // The designer updates the frame that afternoon; Figma's FILE_UPDATE follows.
@@ -1338,11 +1341,11 @@ describe("a file-change notification (#896)", () => {
     assert.equal(r.provider.generated.length, 0);
   });
 
-  it("looks no further once the question's 72 h are up", async () => {
+  it("looks no further once the question's 24 weekday hours are up", async () => {
     const { h, drifts, m } = await recapMorning();
     await m.run();
     seedFigmaFile(m.figma, { changedAt: "2026-10-03T15:00:00Z", frameA: UPDATED });
-    h.clock.now = at(30, 13) + DRIFT_CARD_TTL_MS + 1;
+    h.clock.now = at(31, 13) + 1;
     const r = recheck(h, drifts, m.figma, { judge: [SHOWS] });
     assert.equal(await recheckOnUpdate(FILE_KEY, { ...r.deps, store: drifts }), null);
     assert.deepEqual(r.edits, []);
@@ -1418,8 +1421,8 @@ describe("a drift card decided in Review", () => {
 
 // ── Cards from before the shared card ─────────────────────────────────────────
 //
-// A card posted before the drift report moved to the shared card lives out its
-// 72 h: one message, one proposal under `LEGACY_DRIFT_KEY`, a ✅/⛔ footer, and
+// A card posted before the drift report moved to the shared card lives out the
+// 72 h it was stored with: one message, one proposal under `LEGACY_DRIFT_KEY`, a ✅/⛔ footer, and
 // a live record with no `itemId` (a question's record names it by `cardTs`).
 
 describe("a card from before the shared card", () => {
@@ -1441,10 +1444,10 @@ describe("a card from before the shared card", () => {
       proposalTs: OLD_CARD,
       proposalText: "*Is the Figma file still current?* …",
       requesterUserId: "",
-      ttlMs: DRIFT_CARD_TTL_MS,
+      ttlMs: 72 * 3_600_000,
       confirmers: ["U0BEA"],
       supersedeKey: LEGACY_DRIFT_KEY,
-      stated: driftCardWords(72),
+      stated: { cancelled: "No intake filed", expired: "That card closed after 72 h with no decision, so nothing was filed." },
     };
     await h.threadState.putProposal(card);
     const file = {

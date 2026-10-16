@@ -1,3 +1,4 @@
+import { cardTtlMs } from "../src/card-expiry";
 // The five ways to resolve a proposal agree with each other.
 //
 // This file used to assert a glyph table and call itself "the three
@@ -43,7 +44,6 @@ import {
 } from "../src/gate/reactions";
 import {
   EXECUTION_CUTOFF_MS,
-  PROPOSAL_TTL_MS,
   createInMemoryThreadState,
   type PendingProposal,
   type ProposalOperation,
@@ -146,7 +146,13 @@ describe("five signals, one verdict", () => {
   it("wins, posts the same verdict, and executes the same tool on every door", async () => {
     const verdicts: GateVerdict[] = [];
     for (const door of DOORS) {
-      verdicts.push(await resolveSignal(door.signal, { threadState: await staged() }));
+      const threadState = await staged();
+      // The model reads its card from the store, as the turn hands it over:
+      // stamped with its lifetime, like the card every other door finds.
+      const signal = door.signal.kind === "model"
+        ? { ...door.signal, pending: (await threadState.getProposalByThread({ channel: CHANNEL, thread: THREAD }))! }
+        : door.signal;
+      verdicts.push(await resolveSignal(signal, { threadState }));
     }
 
     for (const [i, verdict] of verdicts.entries()) {
@@ -161,8 +167,10 @@ describe("five signals, one verdict", () => {
         { note: { kind: "resolved", decision: "confirm" }, replyTs: THREAD },
         where,
       );
+      // The card's lifetime is the store's stamp, not part of what runs.
+      const { ttlMs: _ttl, ...execute } = verdict.execute as NonNullable<typeof verdict.execute> & { ttlMs?: number };
       assert.deepEqual(
-        verdict.execute,
+        execute,
         {
           operations: [
             { toolName: "notion_create", input: { title: "Reflection redesign" } },
@@ -180,10 +188,14 @@ describe("five signals, one verdict", () => {
 
     // Not "each looks right" but "all five are the same verdict" — past the
     // door it came through, which each one names for the record.
-    const { by: _first, ...first } = verdicts[0]!;
+    const unstamped = (v: GateVerdict) => {
+      const { by: _by, ...rest } = v;
+      const { ttlMs: _ttl, ...execute } = (rest.execute ?? {}) as { ttlMs?: number };
+      return { ...rest, execute };
+    };
+    const first = unstamped(verdicts[0]!);
     for (const verdict of verdicts.slice(1)) {
-      const { by: _by, ...rest } = verdict;
-      assert.deepEqual(rest, first);
+      assert.deepEqual(unstamped(verdict), first);
     }
     assert.deepEqual(
       verdicts.map((v) => v.by),
@@ -532,7 +544,7 @@ describe("standing confirmers", () => {
     let now = 1_000_000;
     const threadState = createInMemoryThreadState({ now: () => now });
     await threadState.putProposal({ ...PROPOSAL, confirmers: [OWNER] });
-    now += PROPOSAL_TTL_MS + 1;
+    now += cardTtlMs(now) + 1;
     const verdict = await resolveSignal(reaction({ userId: LEAD }), { threadState, standingConfirmers });
     assert.equal(verdict.outcome, "stale");
     assert.equal(verdict.post?.note.kind, "expired");
@@ -558,11 +570,11 @@ describe("a card that is no longer there", () => {
   it("reports an expired proposal as stale, in the expired wording", async () => {
     let clock = 1_000_000;
     const threadState = await staged({ at: () => clock });
-    clock += PROPOSAL_TTL_MS + 1;
+    clock += cardTtlMs(clock) + 1;
 
     const verdict = await resolveSignal(reaction(), { threadState });
     assert.equal(verdict.outcome, "stale");
-    assert.deepEqual(verdict.post?.note, { kind: "expired" });
+    assert.deepEqual(verdict.post?.note, { kind: "expired", ttlMs: cardTtlMs(1_000_000) });
     assert.equal(verdict.execute, undefined);
     // Expiry is the store's answer, not a second clock in the gate — and the
     // by-thread fallback must not resurrect an aged-out card either.

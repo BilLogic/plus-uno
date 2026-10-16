@@ -17,7 +17,6 @@ import {
   runTidyPost,
   runTidyRead,
   tidySection,
-  TIDY_CARD_TTL_MS,
   TIDY_SECTION,
   type TidyCard,
   type TidyHanded,
@@ -533,7 +532,7 @@ describe("the post", () => {
     assert.match(cardsIn(w.posts[0]!.blocks)[0]!.subtitle!.text, /^Sarah Lee · /, "the subtitle names the owner too");
   });
 
-  it("stages each card as its own proposal, answered Moved it or Leave as is, by the channel's members, for six days", async () => {
+  it("stages each card as its own proposal, answered Moved it or Leave as is, by the channel's members, for 24 weekday hours", async () => {
     const w = postWorld({ files: [file("u-wip", "F1", "AI Indicator / Card 733 / Sarah")], cards: [card(733, "Shipped", "U0SARAH")] });
     await w.run();
     assert.equal(w.staged.length, 1);
@@ -541,7 +540,10 @@ describe("the post", () => {
     assert.equal(p!.proposalTs, itemProposal(MSG, "wrong-folder-F1-733").proposalTs);
     assert.equal(p!.threadTs, MSG);
     assert.deepEqual(p!.confirmers, MEMBERS);
-    assert.equal(p!.ttlMs, TIDY_CARD_TTL_MS);
+    // Staged Monday 09:10 ET: live until Tuesday 09:10 ET.
+    const stored = await w.store.getProposalByTs(p!.proposalTs);
+    assert.ok(stored.state === "found");
+    assert.equal(stored.createdAt + stored.proposal.ttlMs!, Date.parse("2025-10-14T13:10:00Z"));
     assert.deepEqual(
       p!.choices!.map((c) => [c.label, c.verdict]),
       [

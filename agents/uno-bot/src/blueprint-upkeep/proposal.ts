@@ -42,6 +42,7 @@ import { DRAFT_MAX_TOKENS, draftPrompt, readDraft, whyNoDraft, type DraftedChang
 import type { ServiceChangeInput } from "./gate";
 import type { Comparison } from "./milestone";
 import type { DrawnProposal } from "./proposal-records";
+import { CARD_WINDOW_WORDS } from "../card-expiry";
 
 /** The status a proposal's rows are written at. */
 export const PROPOSED = "proposed" as const;
@@ -49,14 +50,12 @@ export const PROPOSED = "proposed" as const;
 export const PROPOSAL_DRAFT_TIER = "default" as const;
 /** External subrequests an offer spends: the draft (1) and the card (1). */
 export const PROPOSAL_OFFER_SUBREQUESTS = 2;
-/** How long the card can be decided: a working day, and the night after it. */
-export const PROPOSAL_CARD_TTL_MS = 24 * 60 * 60 * 1000;
 /** The card's slot in its thread is `blueprint-proposal:<scenario>`. */
 export const PROPOSAL_SLOT_PREFIX = "blueprint-proposal:";
 
 export const PROPOSAL_CARD_WORDS: StatedCardWords = {
   cancelled: "Rejected, nothing drafted on the blueprint",
-  expired: `That card closed after ${PROPOSAL_CARD_TTL_MS / 3_600_000} h with no decision, so nothing was drafted on the blueprint.`,
+  expired: `That card closed after ${CARD_WINDOW_WORDS} with no decision, so nothing was drafted on the blueprint.`,
 };
 
 /** An idea's rows on one path, ready to offer. */
@@ -219,7 +218,7 @@ export function proposalOfferCard(draft: ProposalDraft): ProposalCard {
     ...draft.removed.map((c) => `• No longer happens at ${at(c)}: ${esc(c.content)} (left empty on the new path)`),
     `*Confidence:* ${draft.confidence.toFixed(1)}`,
     ...(draft.gaps.length ? [`*Could not verify:* ${draft.gaps.map(esc).join("; ")}`] : []),
-    `*The ask:* Approve creates the path at ${code(PROPOSED)} and writes these cells on it, as uno-bot, all or nothing; today's path is not touched. Only the person who asked can approve; Reject, or no answer in ${PROPOSAL_CARD_TTL_MS / 3_600_000} h, writes nothing.`,
+    `*The ask:* Approve creates the path at ${code(PROPOSED)} and writes these cells on it, as uno-bot, all or nothing; today's path is not touched. Only the person who asked can approve; Reject, or no answer in ${CARD_WINDOW_WORDS}, writes nothing.`,
   ].join("\n");
   const operation = revisionCard(draft.revision, []).operations![0]!;
   return { kind: "stated", verb: "draft this on the blueprint as a proposal", lead, footer: "", fields: [], caveats: [], operations: [operation], short };
@@ -272,7 +271,6 @@ export function stagedProposalOffer(
     proposalTs: at.proposalTs,
     proposalText: at.proposalText,
     requesterUserId: at.requesterUserId,
-    ttlMs: PROPOSAL_CARD_TTL_MS,
     supersedeKey: proposalSlotKey(draft.comparison.scenario),
     stated: PROPOSAL_CARD_WORDS,
     facts: offerFacts(draft),

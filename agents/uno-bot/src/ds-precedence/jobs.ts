@@ -106,8 +106,6 @@ async function creatorOf(deps: Pick<CheckDeps, "figma" | "fileKey">): Promise<st
   }
 }
 
-/** How long a weekly card stays confirmable: gone before next week's. */
-export const PRECEDENCE_CARD_TTL_MS = 6 * 24 * 60 * 60 * 1000;
 /** The share of indexed components the library must have for the check to
  *  believe it (`indexedInLibrary`). */
 const MIN_LIBRARY_RATIO = 0.5;
@@ -302,7 +300,6 @@ export function precedenceSection(deps: SectionDeps, handOff: SectionHandOff<Pre
       return {
         cards: findings.map((f) => ({ person: null, item: precedenceItem(f) })),
         whole: true,
-        ttlMs: PRECEDENCE_CARD_TTL_MS,
         // The cards that show, each a staging, and the edit when one did not stage.
         cost: (shown) => ({ subrequests: 1, d1Queries: shown.length * 3 }),
         says: () => precedenceParent(findings.length, deps.ruleUrl, precedenceAddressee(value)),
@@ -383,9 +380,8 @@ export function stagedComponent(
     proposalText: renderProposalCard(card).text,
     // Nobody asked: the Worker staged it.
     requesterUserId: "",
-    ttlMs: PRECEDENCE_CARD_TTL_MS,
     confirmers: [...confirmers],
-    stated: precedenceCardWords(PRECEDENCE_CARD_TTL_MS / 3_600_000),
+    stated: precedenceCardWords(),
     refuseRevision: PRECEDENCE_REVISION_REFUSAL,
     // Needs changes writes the note on the intake (`./dispute.ts`): no redraft.
     afterNeedsChanges: PRECEDENCE_NOTE_TAKEN,

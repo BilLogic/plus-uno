@@ -12,6 +12,7 @@
 //
 // The harness itself lives in `tests/helpers/turn-harness.ts`, shared with the
 // flow tests that drive a turn and then ask Gate what a person was told (#583).
+import { MAX_CARD_TTL_MS } from "../src/card-expiry";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
@@ -1002,9 +1003,10 @@ test("staging a revised card supersedes the one it replaces", async () => {
   assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, revisedTs);
 });
 
-// A card with its own lifetime and confirmer set keeps both through a
-// revision: pushing back on the content is not a way round the gate.
-test("a revised card inherits the lifetime and confirmer set of the card it replaces", async () => {
+// A card's confirmer set survives a revision: pushing back on the content is
+// not a way round the gate. Its lifetime does not — the revision is a card
+// staged now, on the expiry rule's full window from now (#1315).
+test("a revised card inherits the confirmer set of the card it replaces, and a fresh window", async () => {
   const held: PendingProposal = { ...PENDING, ttlMs: 72 * 60 * 60 * 1000, confirmers: ["U7", "U8"] };
   const h = harness({
     replies: [
@@ -1022,10 +1024,10 @@ test("a revised card inherits the lifetime and confirmer set of the card it repl
   );
 
   assert.equal(outcome.disposition, "staged");
-  assert.equal(outcome.staged!.proposal.ttlMs, held.ttlMs);
+  assert.equal(outcome.staged!.proposal.ttlMs, undefined, "the store stamps the rule");
   assert.deepEqual(outcome.staged!.proposal.confirmers, ["U7", "U8"]);
   const stored = await h.threadState.getProposalByThread(REF);
-  assert.equal(stored?.ttlMs, held.ttlMs);
+  assert.ok(stored?.ttlMs !== undefined && stored.ttlMs >= 24 * 60 * 60 * 1000 - 60_000 && stored.ttlMs <= MAX_CARD_TTL_MS);
   assert.deepEqual(stored?.confirmers, ["U7", "U8"]);
 });
 
@@ -1557,6 +1559,27 @@ test("a \"drop 2\" revision is superseded-and-staged on the record, rooted at th
   assert.match(outcome.staged!.card.lead ?? "", /End-of-day sweep/);
   assert.equal(outcome.staged!.card.tag?.eventType, "uno_sweep_card");
   assert.equal(outcome.staged!.card.tag?.payload.role, "revision");
+});
+
+// A turn's card is staged on the one expiry rule (#1315): staged Friday 15:00
+// ET, it is confirmable until Monday 15:00 ET, the weekend not counted.
+test("a card a turn stages on Friday afternoon stays confirmable until Monday afternoon", async () => {
+  const friday = Date.parse("2026-10-16T19:00:00Z");
+  const clock = { now: friday };
+  const threadState = createInMemoryThreadState({ now: () => clock.now });
+  const h = harness({
+    threadState,
+    now: () => clock.now,
+    replies: [{ text: "Filing the card.", toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign" } }] }],
+  });
+  const outcome = await runTurn(request({ text: "file a card for the reflection redesign" }), h.deps);
+  assert.equal(outcome.disposition, "staged");
+  const ts = outcome.staged!.proposal.proposalTs;
+
+  clock.now = Date.parse("2026-10-19T18:59:00Z");
+  assert.equal((await threadState.getProposalByTs(ts)).state, "found", "Monday 14:59 ET: still live");
+  clock.now = Date.parse("2026-10-19T19:01:00Z");
+  assert.notEqual((await threadState.getProposalByTs(ts)).state, "found", "Monday 15:01 ET: expired");
 });
 
 // A revision lives only as long as the card it replaces had left: dropping

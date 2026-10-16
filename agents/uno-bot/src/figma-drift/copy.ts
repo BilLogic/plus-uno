@@ -30,15 +30,13 @@
 // PURE: no `Env`, no Slack module, no Workers global.
 
 import { escapeSlackText } from "../slack/mrkdwn";
-import { shortDate, windowInWords } from "../slack/copy-words";
+import { shortDate } from "../slack/copy-words";
 import { etDayOf } from "../sweep/schedule";
 import type { ProposalOperation, ReportItem, ReviewChoice, StatedCardWords } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import type { TargetKind } from "../sweep/finding";
 import type { IntakeLane } from "./finding";
-
-/** How long a drift card stays decidable. */
-export const DRIFT_CARD_TTL_MS = 72 * 60 * 60 * 1000;
+import { CARD_WINDOW_WORDS } from "../card-expiry";
 
 /** Characters of a paraphrase quoted on a card, so its 200-character body
  *  keeps what the file did. */
@@ -178,10 +176,10 @@ export function driftReview(input: DriftFileWords & { lane: IntakeLane; note: st
  *
  * @param ttlHours - The card's whole window, in hours
  */
-export function driftCardWords(ttlHours: number): StatedCardWords {
+export function driftCardWords(): StatedCardWords {
   return {
     cancelled: "No intake filed",
-    expired: `That card closed after ${windowInWords(ttlHours)} with no decision, so nothing was filed.`,
+    expired: `That card closed after ${CARD_WINDOW_WORDS} with no decision, so nothing was filed.`,
   };
 }
 
