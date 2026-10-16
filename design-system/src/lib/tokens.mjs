@@ -135,7 +135,7 @@ export function readTokens(source, { prefix = '--' } = {}) {
  * A `var()` FALLBACK is followed through to the token, not to the fallback: the
  * fallback is what a browser paints when the token is missing, and a token that
  * resolves is the case this answers. What the fallback says instead is
- * `check:colour-fallbacks`' question, and it stays its own check.
+ * `check:color-fallbacks`' question, and it stays its own check.
  *
  * @param {string} token
  * @param {Map<string, string>} values

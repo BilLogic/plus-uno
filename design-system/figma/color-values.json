@@ -1,5 +1,5 @@
 {
-  "note": "Every non-state-layer COLOUR variable in the PLUS Figma library, with its FULLY RESOLVED hex — aliases followed, so `Info/Info` records the teal it actually paints rather than the fact that it points somewhere. Read live with the Plugin API; see scripts/figma-colour-drift.mjs for what reads it and why the name snapshot beside it was not enough. State layers are excluded: they are the base colour at 8/12/16% and drift with it.",
+  "note": "Every non-state-layer COLOUR variable in the PLUS Figma library, with its FULLY RESOLVED hex — aliases followed, so `Info/Info` records the teal it actually paints rather than the fact that it points somewhere. Read live with the Plugin API; see scripts/figma-color-drift.mjs for what reads it and why the name snapshot beside it was not enough. State layers are excluded: they are the base colour at 8/12/16% and drift with it.",
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "measuredAt": "2026-09-15",
   "method": "figma.variables.getLocalVariableCollectionsAsync + getLocalVariablesAsync, first mode of each `colors *` collection, VARIABLE_ALIAS followed to a literal (depth-capped at 8, and a cross-collection alias falls back to the target's own first mode). Alpha is appended as `@0.32` when below 1.",

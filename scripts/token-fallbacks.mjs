@@ -36,7 +36,7 @@
  * the disagreements shrink as files are touched, and this list should be driven
  * to zero deliberately.
  *
- * ─── WHY THIS FILE IS NOT CALLED `colour-fallbacks` ─────────────────────────
+ * ─── WHY THIS FILE IS NOT CALLED `color-fallbacks` ─────────────────────────
  * Because the defect is not about colour. #268 asks for "a fallback that
  * disagrees with its token", unqualified, and the colour half turned out to be
  * the SMALLER half. The same measurement over dimension tokens finds 546

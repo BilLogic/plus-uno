@@ -167,7 +167,7 @@
      * Figma names `--color-surface-default`, not the `--surface-default` that
      * `_elevation.scss` defines. Each aliases the same neutral colour that
      * Figma's variable aliases, and that its elevation role aliases, so
-     * `check:figma-colour-drift` can follow the chain to a value. The raised and
+     * `check:figma-color-drift` can follow the chain to a value. The raised and
      * overlay roles still need their `--surface-*-shadow` beside them.
      */
     --color-surface-default: var(--color-surface-container-lowest);

@@ -4,7 +4,7 @@
  * (#507).
  *
  * THE DEFECT THIS PINS. Five stories — `FocusRing`, `IntentRoles`,
- * `AiIdentity`, `ColourCandidates` and `BadgeVariants` — each carried their own
+ * `AiIdentity`, `ColorCandidates` and `BadgeVariants` — each carried their own
  * copy of WCAG relative luminance, and `check:focus-ring`,
  * `check:text-contrast` and `check:button-contrast` carried a sixth in
  * `scripts/button-contrast.mjs`. Six copies of one formula agree until one of

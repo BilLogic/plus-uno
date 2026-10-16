@@ -14,7 +14,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import { tokenCorpus } from '../design-system/src/lib/tokens-node.mjs';
-import { cssColours, normalise } from './figma-colour-drift.mjs';
+import { cssColours, normalise } from './figma-color-drift.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

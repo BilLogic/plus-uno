@@ -18,7 +18,7 @@
  * ships. It sat as a KNOWN divergence until 2026-09-15, when the owner chose
  * #bdf292 and the live library turned out to already hold it: the variable
  * re-measured to #bdf292 into the recording that day. The state layers are NOT
- * evidence either way — `colour-values.json` excludes them by design, because
+ * evidence either way — `color-values.json` excludes them by design, because
  * they are the base colour at 8/12/16% and drift with it. The count of
  * divergences is a ratchet.
  *

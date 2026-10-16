@@ -7,7 +7,7 @@
  * because this repository keeps agent worktrees under `.claude/worktrees/`, the
  * read, the memoized parse, the empty-corpus floor, the `--report` dump, and
  * the one place both families reach their RECORD. Those were spelled out twice,
- * 110 lines each, in `check-colour-fallbacks.mjs` and
+ * 110 lines each, in `check-color-fallbacks.mjs` and
  * `check-size-fallbacks.mjs`, and the two copies had already drifted in wording
  * while agreeing in fact.
  *

@@ -5,7 +5,7 @@ import { expect } from 'storybook/test';
  * The type scale, measured — and three things it could become (#267).
  *
  * WHAT THIS PAGE IS. A decision aid in the same shape as
- * `ColourCandidates.stories.jsx` and `AiIdentity.stories.jsx`: the question is
+ * `ColorCandidates.stories.jsx` and `AiIdentity.stories.jsx`: the question is
  * Bill's, and shipping a default would make it the answer by inertia. Nothing
  * here changes a token. Every current size is READ FROM THE PAGE at render
  * time; every candidate is computed in front of you from a stated ratio.

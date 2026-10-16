@@ -5,8 +5,8 @@
  * WHY IT EXISTS. `scripts/generate-check-scripts.mjs` asserts that a row
  * declaring a `baseline` is pointing at a record its check really reads. Until
  * #602 it asked that of the ENTRY FILE'S OWN TEXT, as a basename search — and
- * the two fallback checks passed it by luck: `check:colour-fallbacks` spells
- * `scripts/baselines/colour-fallback-baseline.json` in the `Family` literal it hands
+ * the two fallback checks passed it by luck: `check:color-fallbacks` spells
+ * `scripts/baselines/color-fallback-baseline.json` in the `Family` literal it hands
  * to `scripts/lib/fallback-check.mjs`, and every piece of record logic — the
  * `openRatchet`, the read, the stale sweep, the `--update` write — is in that
  * file, one hop away. A source search that stops at the entry file therefore

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * `npm run check:figma-colour-drift` — the CSS still paints what Figma says,
+ * `npm run check:figma-color-drift` — the CSS still paints what Figma says,
  * or the difference is written down and argued.
  *
- * See `scripts/figma-colour-drift.mjs` for what was unwatched: the variables
+ * See `scripts/figma-color-drift.mjs` for what was unwatched: the variables
  * snapshot records every variable by NAME and by count and not one VALUE, so a
  * colour could move on either side and the names would still line up perfectly.
  * Two had, both found in the same sweep on 2026-08-29, and both have since been
@@ -18,18 +18,18 @@
  * never grow — a new divergence fails, and so does an entry that has stopped
  * diverging, because a stale exemption is how the next one gets waved through.
  *
- * Run: `npm run check:figma-colour-drift`.
+ * Run: `npm run check:figma-color-drift`.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { cssColours, compare, failures } from './figma-colour-drift.mjs';
+import { cssColours, compare, failures } from './figma-color-drift.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const RECORDING = 'design-system/figma/colour-values.json';
+const RECORDING = 'design-system/figma/color-values.json';
 
 /** Half a year, matching check:figma-snapshots — this is refreshed the same way. */
 export const MAX_AGE_DAYS = 180;
@@ -101,4 +101,4 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   );
 }
 
-main(import.meta.url, 'check:figma-colour-drift', { run, summary, remedy: REMEDY });
+main(import.meta.url, 'check:figma-color-drift', { run, summary, remedy: REMEDY });

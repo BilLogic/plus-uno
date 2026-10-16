@@ -302,13 +302,13 @@ test('a row pointing at a record its check never opens fails, however the check 
 });
 
 test('the reach is the whole import closure: the fallback pair opens its record one hop away', () => {
-  // The case the old basename search passed by luck. `check-colour-fallbacks.mjs`
+  // The case the old basename search passed by luck. `check-color-fallbacks.mjs`
   // names the file in the `Family` literal it hands over and opens nothing; the
   // `openRatchet`, the read, the stale sweep and the write are all in
   // `scripts/lib/fallback-check.mjs`. So the assertion has to follow the hop —
   // and it must also not be satisfied by the entry's own filename alone.
-  const row = byName('check:colour-fallbacks');
-  const entry = fs.readFileSync(path.join(REPO_ROOT, 'scripts/check-colour-fallbacks.mjs'), 'utf8');
+  const row = byName('check:color-fallbacks');
+  const entry = fs.readFileSync(path.join(REPO_ROOT, 'scripts/check-color-fallbacks.mjs'), 'utf8');
   assert.ok(entry.includes(row.baseline), 'the fixture assumes the entry still names the record');
   assert.equal(entry.includes('openRatchet'), false, 'the entry is not where the record is opened');
   assert.deepEqual(registryGenerator.baselineFindings(row, rootScripts()), []);
@@ -344,9 +344,9 @@ test('a record whose flag is advertised and offered nowhere fails', () => {
 
 test('a re-record line naming an npm script nobody has is a remedy nobody can type', () => {
   const messages = registryGenerator
-    .baselineFindings(byName('check:colour-fallbacks'), {})
+    .baselineFindings(byName('check:color-fallbacks'), {})
     .map((f) => f.message);
-  assert.ok(messages.some((m) => /no check:colour-fallbacks script exists/.test(m)), messages.join('\n'));
+  assert.ok(messages.some((m) => /no check:color-fallbacks script exists/.test(m)), messages.join('\n'));
 });
 
 test('a record that will not parse on its declared shape is reported, never read as empty', () => {

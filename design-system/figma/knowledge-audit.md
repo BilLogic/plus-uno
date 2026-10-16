@@ -26,7 +26,7 @@ npm run generate:agent
 
 | Composition doc | Path | Verified | Notes |
 | --- | --- | --- | --- |
-| guidelines/composition/form-behaviour.md | `design-system/guidelines/composition/form-behaviour.md` | — | — |
+| guidelines/composition/form-behavior.md | `design-system/guidelines/composition/form-behavior.md` | — | — |
 | guidelines/composition/forms.md | `design-system/guidelines/composition/forms.md` | — | — |
 | guidelines/composition/hierarchy.md | `design-system/guidelines/composition/hierarchy.md` | — | — |
 | guidelines/composition/layout.md | `design-system/guidelines/composition/layout.md` | — | — |

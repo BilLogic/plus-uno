@@ -2,7 +2,7 @@
 /**
  * `npm run check:size-fallbacks` — #268, the other half.
  *
- * `check:colour-fallbacks` holds the literal beside a COLOUR token to that
+ * `check:color-fallbacks` holds the literal beside a COLOUR token to that
  * token's value. This holds the literal beside a DIMENSION token to its value,
  * over the same corpus, with the same ratchet, from the same modules:
  * `scripts/token-fallbacks.mjs` says what the defect is,
@@ -66,7 +66,7 @@ const SIZE = fallbackCheck({
   reportUndefined: false,
   why:
     'Literal fallbacks that disagree with their own DIMENSION token (#268). The colour ' +
-    'half is scripts/baselines/colour-fallback-baseline.json; this is the bigger one. Keyed on ' +
+    'half is scripts/baselines/color-fallback-baseline.json; this is the bigger one. Keyed on ' +
     '"<token> <literal>" rather than file and line, because a line number churns on ' +
     'every edit above it while the pair is the actual decision. The set may shrink and ' +
     'never grow; delete an entry when it is fixed, and the check reports any recorded ' +

@@ -297,12 +297,12 @@ export const CHECKS = [
       'no component stylesheet colouring text in the same token as the surface under it. `Navbar` shipped one for the life of the component at 1.00:1 (#219); axe cannot see this class, because the text sits in a transparent box over a painted ancestor.',
   },
   {
-    name: 'check:colour-fallbacks',
-    script: 'node scripts/check-colour-fallbacks.mjs',
+    name: 'check:color-fallbacks',
+    script: 'node scripts/check-color-fallbacks.mjs',
     pkg: 'root',
     trigger: 'pull_request',
-    module: 'scripts/check-colour-fallbacks.mjs',
-    baseline: 'scripts/baselines/colour-fallback-baseline.json',
+    module: 'scripts/check-color-fallbacks.mjs',
+    baseline: 'scripts/baselines/color-fallback-baseline.json',
     guards:
       'the literal beside a colour token agreeing with that token (#268). `var(--color-on-surface-variant, #5c5c5c)` reads as one decision and is two — that token is `#3f484a`, and it carries TEN different fallbacks across its uses, none of them the token. 191 of 473 comparable fallbacks disagree, so the recorded set is ratcheted and only a NEW one fails. It also holds 27 `--color-*` names that are referenced and defined nowhere, where the fallback IS the colour. Static and sub-second, which is why it composes here while the browser checks do not.',
   },
@@ -314,7 +314,7 @@ export const CHECKS = [
     module: 'scripts/check-size-fallbacks.mjs',
     baseline: 'scripts/baselines/size-fallback-baseline.json',
     guards:
-      "the same rule as check:colour-fallbacks, over the tokens that decide layout rather than colour — and it is the bigger half. 454 of 1075 comparable fallbacks disagree with their token: `var(--size-section-gap-sm, 16px)` is written 61 times for a token that is `8px`, and `var(--size-element-pad-y-lg, 12px)` 52 times for one that is `8px`. Colour's version of this defect paints a wrong shade when the token sheet is late; this one lays out a different page. Ratcheted at 68 distinct pairs. One implementation (`scripts/lib/fallback-check.mjs`) and two entry points, because the families genuinely differ: dimensions have no shared name prefix and are selected by value, and an undefined dimension name is usually a component-local custom property rather than a defect.",
+      "the same rule as check:color-fallbacks, over the tokens that decide layout rather than colour — and it is the bigger half. 454 of 1075 comparable fallbacks disagree with their token: `var(--size-section-gap-sm, 16px)` is written 61 times for a token that is `8px`, and `var(--size-element-pad-y-lg, 12px)` 52 times for one that is `8px`. Colour's version of this defect paints a wrong shade when the token sheet is late; this one lays out a different page. Ratcheted at 68 distinct pairs. One implementation (`scripts/lib/fallback-check.mjs`) and two entry points, because the families genuinely differ: dimensions have no shared name prefix and are selected by value, and an undefined dimension name is usually a component-local custom property rather than a defect.",
   },
   {
     name: 'check:undefined-tokens',
@@ -325,7 +325,7 @@ export const CHECKS = [
     floors: { MIN_FILES: 1300 },
     baseline: 'scripts/baselines/undefined-token-baseline.json',
     guards:
-      "design tokens that are USED and defined nowhere. A bare `var(--x)` on a token that does not exist DROPS the whole declaration: `var(--font-weight-light)` was in six shipped components against a system that defines `--font-weight-normal: 300`, so text designed at 300 rendered at its inherited weight, and Tooltip's small variant reached for `--font-size-body4`, which does not exist, so its text had no size of its own. Nothing saw either — check:colour-fallbacks and check:size-fallbacks only read tokens written WITH a fallback and only in two namespaces, and check:doc-identifiers resolves names in docs pages, not in stylesheets. A ratchet: 145 names over 508 uses when it was written, and the count may fall and never rise, with the BARE count held down separately so converting a fallback into a bare use cannot pass by keeping the total flat.",
+      "design tokens that are USED and defined nowhere. A bare `var(--x)` on a token that does not exist DROPS the whole declaration: `var(--font-weight-light)` was in six shipped components against a system that defines `--font-weight-normal: 300`, so text designed at 300 rendered at its inherited weight, and Tooltip's small variant reached for `--font-size-body4`, which does not exist, so its text had no size of its own. Nothing saw either — check:color-fallbacks and check:size-fallbacks only read tokens written WITH a fallback and only in two namespaces, and check:doc-identifiers resolves names in docs pages, not in stylesheets. A ratchet: 145 names over 508 uses when it was written, and the count may fall and never rise, with the BARE count held down separately so converting a fallback into a bare use cannot pass by keeping the total flat.",
   },
   {
     name: 'check:font-families',
@@ -335,7 +335,7 @@ export const CHECKS = [
     module: 'scripts/check-font-families.mjs',
     floors: { MIN_FILES: 1300 },
     guards:
-      "every font stack ending in a CSS generic, and every inline fallback naming the face its token names. A fallback only paints when the token fails to load, so a wrong one is wrong everywhere at once and invisible until then — the reasoning check:colour-fallbacks applies to colour, which nothing applied to type. Seven findings when it was written and all seven fixed: --font-family-display4 named one face and no generic; three files fell back from --font-family-body to Lato, which is the HEADER face, so body text would have rendered in the heading font; two fell back to a bare `Lato`. It also keeps #267's monospace rule, where --font-family-code fell back to sans-serif and the stack measured 171.13px against monospace's 480.08px.",
+      "every font stack ending in a CSS generic, and every inline fallback naming the face its token names. A fallback only paints when the token fails to load, so a wrong one is wrong everywhere at once and invisible until then — the reasoning check:color-fallbacks applies to colour, which nothing applied to type. Seven findings when it was written and all seven fixed: --font-family-display4 named one face and no generic; three files fell back from --font-family-body to Lato, which is the HEADER face, so body text would have rendered in the heading font; two fell back to a bare `Lato`. It also keeps #267's monospace rule, where --font-family-code fell back to sans-serif and the stack measured 171.13px against monospace's 480.08px.",
   },
   {
     name: 'check:figma-scopes',
@@ -408,11 +408,11 @@ export const CHECKS = [
       "every bot skill keeping the authoring rules a check can see. A bot skill is a doc under the bundler's `bot-skills` section — its description ships in the prompt as the skill's pointer line, its body is read by name through `read_reference` — and which docs those are comes from the manifest `assemble()` returns in-process, so the check keeps no folder list. Each one names only tools that exist in agents/uno-bot/tool-definitions.json (every backticked snake_case name), ends in a `## Exit` section whose items each open with answer, file or hand off, and carries a one-line description within `BUDGETS.botSkillDescription`. A skill that tells the bot to call a tool it does not have, or to exit in a way it cannot (open a PR, post a review), is the defect the uno skills' per-skill Slack docs shipped before the bot skills replaced them. A grep guard fails any live file that still names those retired docs (plans, ADRs, todos, the archive and generated files are left as written); `--retired-faces` prints its hits alone. Mutation-tested over a fixture root: a missing tool, a missing or empty Exit, a fourth exit, a long or missing description, a live retired-face line.",
   },
   {
-    name: 'check:figma-colour-drift',
-    script: 'node scripts/check-figma-colour-drift.mjs',
+    name: 'check:figma-color-drift',
+    script: 'node scripts/check-figma-color-drift.mjs',
     pkg: 'root',
     trigger: 'pull_request',
-    module: 'scripts/check-figma-colour-drift.mjs',
+    module: 'scripts/check-figma-color-drift.mjs',
     floors: { MAX_AGE_DAYS: 180, MIN_COMPARED: 90 },
     guards:
       "the CSS still painting what Figma says, or the difference being written down and argued. `scripts/figma-variables-snapshot.json` records every variable in the library by NAME and by count, and check:figma-snapshots holds it to a date and a floor — neither records a single VALUE, so a colour could move on either side and the names would still line up perfectly. Two had, both found in one sweep of the BS4 library on 2026-08-29. `--color-success-container` is #bdf292 in the CSS and #a1eb83 in Figma, and both sides are internally consistent — the CSS state layers are built from rgba(189, 242, 146, …) and the Figma ones from #a1eb83 — so each looks correct alone and only the comparison shows the split. `--color-scrim` is 0.38 in the CSS against 0.32 in Figma: every Modal and Drawer in the product dims its page 19% harder than designed. Both are exempted rather than fixed because each is a decision and not a repair — whichever side changes, a shipping colour moves — and the exemption records what BOTH sides hold, so a change on either fails instead of sliding underneath it. Every non-state-layer colour variable maps to a CSS token except the `_Proposal/` candidates, which are reported and not failed. The alias chains are followed on both sides, which is why moving one base reports all three of its dependants. Mutation-tested three ways: a new divergence, a known one that stopped diverging, and a known one that changed shape.",

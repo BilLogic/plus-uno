@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * `npm run check:colour-fallbacks` — #268.
+ * `npm run check:color-fallbacks` — #268.
  *
  * What the defect is, and why one half of it is ratcheted and the other is not,
  * is written once in `scripts/token-fallbacks.mjs`. How a check of it reads the
@@ -14,9 +14,9 @@
  * it parses the token sources and the tree, and runs in well under a second.
  *
  * Usage:
- *   npm run check:colour-fallbacks              hold the ratchet
- *   npm run check:colour-fallbacks -- --update  re-record the baseline
- *   npm run check:colour-fallbacks -- --report  print the whole audit, and gate
+ *   npm run check:color-fallbacks              hold the ratchet
+ *   npm run check:color-fallbacks -- --update  re-record the baseline
+ *   npm run check:color-fallbacks -- --report  print the whole audit, and gate
  */
 
 import { fallbackCheck } from './lib/fallback-check.mjs';
@@ -29,9 +29,9 @@ import { main } from './lib/findings.mjs';
  * token is fiction.
  */
 const COLOUR = fallbackCheck({
-  check: 'check:colour-fallbacks',
+  check: 'check:color-fallbacks',
   label: '[colour]',
-  baseline: 'scripts/baselines/colour-fallback-baseline.json',
+  baseline: 'scripts/baselines/color-fallback-baseline.json',
   noun: 'colour',
   absent: '--color-*',
   prefix: '--color-',

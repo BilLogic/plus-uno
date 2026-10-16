@@ -25,7 +25,7 @@ import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const RECORDING = 'design-system/figma/colour-values.json';
+const RECORDING = 'design-system/figma/color-values.json';
 
 /*
  * A recording with no scopes would pass everything. The floor is the count of

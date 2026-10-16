@@ -4,13 +4,13 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { cssName, cssColours, normalise, compare, failures } from './figma-colour-drift.mjs';
-import { run } from './check-figma-colour-drift.mjs';
+import { cssName, cssColours, normalise, compare, failures } from './figma-color-drift.mjs';
+import { run } from './check-figma-color-drift.mjs';
 import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const RECORDING = JSON.parse(
-  fs.readFileSync(path.join(REPO_ROOT, 'design-system/figma/colour-values.json'), 'utf8'),
+  fs.readFileSync(path.join(REPO_ROOT, 'design-system/figma/color-values.json'), 'utf8'),
 );
 
 test('the Figma naming convention maps onto the CSS one', () => {
@@ -167,7 +167,7 @@ test('a CSS colour that drifted from Figma in a fixture tree is a finding', () =
   const { scss, recording } = colourPairs({ drift: true });
   const { root, done } = policyTree({
     'design-system/src/tokens/_colors.scss': scss,
-    'design-system/figma/colour-values.json': recording,
+    'design-system/figma/color-values.json': recording,
   });
   try {
     const found = messagesOf(run, root);
@@ -183,7 +183,7 @@ test('a CSS colour that drifted from Figma in a fixture tree is a finding', () =
 test('an empty token directory fires the sentinel floor, not a clean sweep', () => {
   const { recording } = colourPairs();
   const { root, done } = policyTree({
-    'design-system/figma/colour-values.json': recording,
+    'design-system/figma/color-values.json': recording,
   });
   try {
     const found = messagesOf(run, root);
