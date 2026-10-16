@@ -26,7 +26,7 @@ import type { ProposalOperation } from "../thread-state/index";
 
 /** One element of the where line, as Slack's rich text takes it. */
 export type WhereElement =
-  | { type: "text"; text: string; style?: { bold?: boolean } }
+  | { type: "text"; text: string; style?: { bold?: boolean; code?: boolean } }
   | { type: "channel"; channel_id: string }
   | { type: "user"; user_id: string }
   | { type: "link"; url: string; text?: string };
@@ -58,6 +58,10 @@ export interface DraftAnatomy {
   /** What Needs changes does on this card, when it does something other than
    *  redraft (`decisionWords` otherwise). */
   revise?: string;
+  /** How the draft reads once decided, opened from View, where that is more
+   *  than the same zones without the where line and the caveats: a blueprint
+   *  revision also drops the questions it asked before it was written. */
+  settled?: DraftAnatomy;
 }
 
 /** Slack's caps: a header's text 150, an alert's 200, a section field 2,000
@@ -243,7 +247,8 @@ const TITLES: Readonly<Record<string, string | ((input: Record<string, unknown>)
   ds_precedence_intake: "Review DS intake",
   sweep_share_post: "Review shared note",
   figma_dev_links: "Review Dev Mode links",
-  blueprint_revise: "Blueprint revision",
+  // A revision with a `variant` draws an idea beside today's path: a proposal.
+  blueprint_revise: (input) => (input.variant ? "Blueprint proposal" : "Blueprint revision"),
   blueprint_withdraw: "Remove proposal",
 };
 
@@ -291,7 +296,20 @@ const WORDS: Readonly<Record<string, readonly [string, string] | ((input: Record
   figma_dev_links: ["Adds the links and the comment in Figma.", "Adds nothing."],
   ds_precedence_intake: ["Adds it to this week's intake.", "Left as deliberate. Nothing is filed."],
   figma_tidy_up: ["Leaves the file as it is.", "Nothing is recorded."],
+  blueprint_revise: (input) => [blueprintApprove(input), "Nothing is written."],
 };
+
+/** A blueprint revision's Approve, by what it writes: "Writes the 4 changes
+ *  to the blueprint now.", a proposal's rows on their new path, or a path's
+ *  status alone. */
+export function blueprintApprove(input: Record<string, unknown>): string {
+  const rows = Array.isArray(input.rows) ? input.rows.length : 0;
+  const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? "" : "s"}`;
+  if (input.variant) return `Writes ${plural(rows, "proposed row")} on a new path beside today's.`;
+  const path = (input.path ?? null) as { to?: unknown } | null;
+  if (!rows && typeof path?.to === "string") return `Sets the path to ${path.to} now.`;
+  return `Writes the ${plural(rows, "change")} to the blueprint now.`;
+}
 
 /** A share-out's Approve: it posts, and pings however many it names. */
 export function shareoutApprove(input: Record<string, unknown>): string {

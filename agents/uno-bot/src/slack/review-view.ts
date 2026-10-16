@@ -280,10 +280,11 @@ export function draftView(
 }
 
 /** A decided card's reading: its content, without the where line and the
- *  caveats, which were about the decision. */
+ *  caveats, which were about the decision — or its own settled reading, where
+ *  it has one. */
 function settled(anatomy: DraftAnatomy): DraftAnatomy {
-  const { where: _where, alerts: _alerts, ...rest } = anatomy;
-  return rest;
+  const { where: _where, alerts: _alerts, settled: own, ...rest } = anatomy;
+  return own ?? rest;
 }
 
 /**

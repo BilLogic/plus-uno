@@ -1,8 +1,9 @@
 // Blueprint upkeep at real volume, at the job → sweep-section seam: a card
 // that changes several paths gets one card per path, all on its place's one
-// message; past the carousel's ten the opener says how many wait in the
-// thread, and they go up there; each draft's gaps are asked of the card's
-// owner by tag; a reply in the thread redrafts that card in place; the
+// message; past the carousel's ten the opener says the rest come in the
+// next report, and they wait for the next morning; each draft's gaps are
+// asked of the card's owner by tag; a reply in the thread that names a path
+// redrafts that card in place, and one that names none is asked which; the
 // end-of-day work spreads over its numbered jobs without any one passing the
 // lookup ceiling, PRD-heavy cards included; and a card is weighed once per
 // moment, however often it comes back.
@@ -10,7 +11,7 @@
 // Faked: the Roadmap, the card's words, `search_blueprint`'s rows, the paths,
 // the model, and an alarm's subrequest meter (each fake read charges what its
 // real one spends). Real: the gate, the drafting, the jobs, the section, the
-// sweep's post, the thread job and the redraft.
+// sweep's post and the redraft.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
@@ -23,7 +24,6 @@ import {
   handOverRevisions,
   MATCH_JOBS,
   matchShipped,
-  postOverflow,
   redraftRevision,
   replanRows,
   revisionSection,
@@ -42,7 +42,6 @@ import { sectionHandOffIn } from "../src/sweep/sections";
 import { runSweepJob } from "../src/sweep/index";
 import { memoryRunStorage, sweepHarness } from "./helpers/sweep-harness";
 import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
-import { reportRecord, type DecisionReport } from "../src/slack/decision-cards";
 import { SubrequestBudgetError } from "../src/net";
 import { LOOKUP_CEILING } from "../src/agent/loop-policy";
 
@@ -178,7 +177,7 @@ function world(opts: { cards: () => ShippedCard[]; rows: (card: string) => Bluep
     }),
     readPath: async (cellId) => (meterOf.spend(5), pathOfCell(cellId)),
     provider: { name: "metered", generate: async (p: ModelPrompt) => (meterOf.spend(1), ai.provider.generate(p)) } as unknown as ModelProvider,
-    ownerOf: async () => (meterOf.spend(2), OWNER),
+    ownersOf: async () => (meterOf.spend(2), [{ slack: OWNER }]),
     placeOf: () => TEAM,
     leadId: BILL,
     state: state.store,
@@ -222,14 +221,13 @@ function memoryThreads(): RevisionThreads & { all: Map<string, RevisionThread> }
   };
 }
 
-/** One morning: the hand-over, the sweep's post with the section, then the
- *  thread job. What a person sees, and what was staged. */
+/** One morning: the hand-over, then the sweep's post with the section. What
+ *  a person sees, and what was staged. */
 async function morning(state: ReturnType<typeof box<UpkeepState>>) {
   const threadState = createInMemoryThreadState({ now: () => NOW });
   const handOff = sectionHandOffIn<RevisionHanded>(memoryRunStorage(), UPKEEP_SECTION);
   const staged: PendingProposal[] = [];
   const lines: Array<{ channel: string; threadTs: string; text: string }> = [];
-  const threadReports: Array<{ channel: string; threadTs: string; report: DecisionReport; ts: string }> = [];
   const threads = memoryThreads();
   const stage = async (proposal: PendingProposal) => {
     staged.push(proposal);
@@ -241,21 +239,7 @@ async function morning(state: ReturnType<typeof box<UpkeepState>>) {
   h.deps.sections = [section];
   await handOverRevisions({ state: state.store, handOff, date: DATE });
   await runSweepJob({ key: "sweep-post", kind: "sweep-post" }, h.deps);
-  await postOverflow({
-    state: state.store,
-    async postReport(channel, threadTs, report, ttlMs) {
-      const ts = `${threadTs.split(".")[0]}.9${String(threadReports.length).padStart(5, "0")}`;
-      threadReports.push({ channel, threadTs, report, ts });
-      await threadState.putReport(reportRecord(channel, ts, report, ttlMs));
-      return ts;
-    },
-    stage,
-    threads,
-    post,
-    date: DATE,
-    now: () => NOW,
-  });
-  return { posts: h.posted, staged, lines, threadReports, threads, threadState, stage };
+  return { posts: h.posted, staged, lines, threads, threadState, stage };
 }
 
 describe("a card that changes several paths", () => {
@@ -270,22 +254,26 @@ describe("a card that changes several paths", () => {
       ["path-1", "path-2", "path-3"],
     );
     assert.equal(new Set(m.staged.map((p) => p.proposalTs)).size, 3, "each its own proposal");
-    assert.deepEqual(m.threadReports, [], "nothing past the carousel");
   });
 
-  it("past ten, shows ten and says how many more are in the thread, where they then go up", async () => {
+  it("past ten, shows ten and says the rest come in the next report, where they then go up", async () => {
     const w = world({ cards: () => [card(1)], rows: () => rowsFor(12) });
     await endOfDay(w, DATE);
     const m = await morning(w.state);
     assert.equal(m.posts.length, 1, "one message at the channel's top");
-    assert.match(m.posts[0]!.text, /\+2 more in the thread/);
-    assert.equal(m.threadReports.length, 1, "one report in its thread");
-    const inThread = m.threadReports[0]!;
-    assert.equal(inThread.threadTs, m.posts[0]!.ts, "in the morning message's thread");
-    assert.equal(inThread.report.shown.length, 2);
-    assert.match(inThread.report.shown[0]!.title, /^11\. Session swap › Path 11/, "numbered on from the carousel");
-    assert.equal(m.staged.length, 12, "every card decidable");
-    assert.deepEqual(w.state.b.value.waiting, [], "nothing left waiting");
+    assert.match(m.posts[0]!.text, /more come in the next report/, "the shared card's rule");
+    assert.doesNotMatch(m.posts[0]!.text, /in the thread/, "nothing overflows into the thread");
+    assert.equal(m.staged.length, 10, "the ten shown are decidable");
+    assert.deepEqual(m.lines, [], "nothing else posts in the thread");
+    assert.deepEqual(
+      w.state.b.value.waiting.map((r) => r.today.path),
+      ["Path 11", "Path 12"],
+      "the two not shown wait, unmarked",
+    );
+    assert.ok(w.state.b.value.waiting.every((r) => !r.overflow));
+    const next = await morning(w.state);
+    assert.equal(next.staged.length, 2, "and go up the next morning");
+    assert.deepEqual(w.state.b.value.waiting, []);
   });
 });
 
@@ -297,7 +285,8 @@ describe("what a draft could not verify", () => {
     assert.equal(m.lines.length, 1);
     const ask = m.lines[0]!;
     assert.equal(ask.threadTs, m.posts[0]!.ts);
-    assert.match(ask.text, new RegExp(`^<@${OWNER}> On 1\\. \\*Session swap › Path 1\\*`));
+    assert.match(ask.text, new RegExp(`^<@${OWNER}> On \\*Session swap › Path 1\\*`));
+    assert.match(ask.text, /reply here naming the path/);
     assert.match(ask.text, /whether the supervisor is told by email or in the app/);
   });
 
@@ -347,9 +336,9 @@ describe("a reply in the card's thread", () => {
   it("from the owner redrafts that card's revision on the same card", async () => {
     const { m, deps, edits, reply, redraftModel } = await upAndRunning();
     const old = m.staged[0]!;
-    const handled = await redraftRevision(deps, reply(OWNER, "The supervisor is told by email, not in the app."));
+    const handled = await redraftRevision(deps, reply(OWNER, "On Path 1, the supervisor is told by email, not in the app."));
     assert.equal(handled, true);
-    assert.match(redraftModel.asked[0]!.prompt, /The supervisor is told by email, not in the app\./, "the draft saw the correction");
+    assert.match(redraftModel.asked[0]!.prompt, /the supervisor is told by email, not in the app\./, "the draft saw the correction");
     const next = m.staged.at(-1)!;
     assert.notEqual(next.proposalTs, old.proposalTs);
     assert.equal(next.item?.messageTs, old.item?.messageTs, "the same report message");
@@ -359,13 +348,29 @@ describe("a reply in the card's thread", () => {
     assert.equal((await m.threadState.getProposalByTs(old.proposalTs)).state === "found", false, "the old draft can no longer be approved");
     assert.equal(edits.length, 1);
     assert.equal(edits[0]!.ts, m.posts[0]!.ts, "the morning message redrawn in place");
-    assert.match(m.lines.at(-1)!.text, /Redrafted 1\. \*Session swap › Path 1\*/);
+    assert.match(m.lines.at(-1)!.text, /Redrafted \*Session swap › Path 1\*/);
   });
 
-  it("names the card by number when its writer may approve several", async () => {
+  it("that names no path is asked which, even with one card open", async () => {
+    const { m, deps, reply } = await upAndRunning();
+    const before = m.staged.length;
+    assert.equal(await redraftRevision(deps, reply(OWNER, "The supervisor is told by email, not in the app.")), true);
+    assert.match(m.lines.at(-1)!.text, /Which blueprint path is that about\?.*Needs changes.*\*Session swap › Path 1\*/);
+    assert.equal(m.staged.length, before, "nothing redrafted");
+  });
+
+  it("names the card by its path when its writer may approve several", async () => {
     const { m, deps, reply } = await upAndRunning(2);
     assert.equal(await redraftRevision(deps, reply(BILL, "The supervisor is emailed.")), true);
-    assert.match(m.lines.at(-1)!.text, /Which revision/, "asked which");
+    assert.match(m.lines.at(-1)!.text, /Which blueprint path/, "asked which");
+    const before = m.staged.length;
+    assert.equal(await redraftRevision(deps, reply(BILL, "Path 2: the supervisor is emailed.")), true);
+    assert.equal(m.staged.length, before + 1);
+    assert.equal((m.staged.at(-1)!.input as { pathId: string }).pathId, "path-2");
+  });
+
+  it("still takes an older reply's number", async () => {
+    const { m, deps, reply } = await upAndRunning(2);
     const before = m.staged.length;
     assert.equal(await redraftRevision(deps, reply(BILL, "2: The supervisor is emailed.")), true);
     assert.equal(m.staged.length, before + 1);
@@ -440,7 +445,7 @@ describe("a design hand-off redrafted in its thread", () => {
         gaps: [],
       });
     const kit = redraftKit(w, m, settled);
-    assert.equal(await redraftRevision(kit.deps, kit.reply(OWNER, "It's the supervisor who's emailed, at the request.")), true);
+    assert.equal(await redraftRevision(kit.deps, kit.reply(OWNER, "On Path 1, it's the supervisor who's emailed, at the request.")), true);
 
     // ✅ on the redrafted card writes its rows, as the writer would.
     const approved = m.staged.at(-1)!;

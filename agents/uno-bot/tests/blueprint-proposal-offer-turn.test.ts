@@ -117,7 +117,7 @@ const HAND_OFF = [
 ].join("\n");
 
 const offerCards = (h: ReturnType<typeof world>["h"]) =>
-  h.delivery.stagedCards.filter((c) => /Draft this on the blueprint as a proposal\?/.test(c.lead ?? ""));
+  h.delivery.stagedCards.filter((c) => /Draft as a blueprint proposal\?/.test(c.lead ?? ""));
 
 async function liveCard(threadState: ThreadState, ts: string): Promise<PendingProposal> {
   const found = await threadState.getProposalByTs(ts);
@@ -131,7 +131,7 @@ test("a PRD that changes a path today gets the offer under its comparison, befor
 
   assert.equal(outcome.disposition, "staged");
   const order = w.h.delivery.calls.flatMap((c) =>
-    c.kind === "note" ? ["comparison"] : c.kind === "proposal" ? [/as a proposal\?/.test(c.card.lead ?? "") ? "offer" : "prd"] : [],
+    c.kind === "note" ? ["comparison"] : c.kind === "proposal" ? [/as a blueprint proposal\?/.test(c.card.lead ?? "") ? "offer" : "prd"] : [],
   );
   assert.deepEqual(order, ["comparison", "offer", "prd"], "the PRD's card stays the last message, so a typed ✅ still means it");
   assert.equal(outcome.staged?.proposal.toolName, "notion_create", "the PRD's card is the turn's own card");
@@ -192,7 +192,7 @@ test("an uno-prototype hand-off gets the offer after the reply that carries its 
   assert.deepEqual(kinds, ["answer", "proposal"]);
   const offer = await liveCard(w.threadState, w.h.delivery.stagedAt[0]!);
   assert.deepEqual(offer.confirmers, [REQUESTER]);
-  assert.match(offer.proposalText, /as a proposal\?/);
+  assert.match(offer.proposalText, /as a blueprint proposal\?/);
 });
 
 test("no comparison, no offer: a PRD that does not change the service drafts nothing", async () => {

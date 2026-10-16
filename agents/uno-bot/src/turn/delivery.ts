@@ -270,6 +270,11 @@ export interface ProposalCard {
    *  (`slack/sweep-card-blocks.ts`). The `lead` still states the whole card:
    *  it is the text copy, and what the card is staged with. */
   fixes?: CardFixes;
+  /** A stated card's short form in the thread, mrkdwn: its summary line and
+   *  the line under it, above the LLM line and Review, as a turn's card is
+   *  short (`proposalCardBlocks`). The `lead` still states the whole card as
+   *  its text copy; the Review pop-up draws it from the proposal's facts. */
+  short?: { summary: string; size: string };
 }
 
 /** A sweep card's fixes, as the blocks show them. */

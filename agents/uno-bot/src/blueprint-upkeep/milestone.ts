@@ -32,7 +32,7 @@
 import { rethrowIfBudget } from "../net";
 import type { ThreadRef } from "../thread-state/index";
 import { GATE_SUBREQUESTS, PATH_READ_COST } from "./budget";
-import type { PathToday } from "./draft";
+import type { DraftedChange, PathToday } from "./draft";
 import type { ServiceChangeGate, ServiceChangeInput } from "./gate";
 
 /** External subrequests one comparison may spend: the gate's judgement and
@@ -133,12 +133,18 @@ function stepsToday(today: PathToday): string {
 }
 
 /**
- * The comparison as a reply reads it.
+ * The comparison as a reply reads it. With the idea's drafted rows, one
+ * short block per step either side has (§ B1): the step in bold, a "Today:"
+ * line and a "Your idea:" line, each row's lane in code, "no such step" where
+ * a side has none; touchpoint lanes are left out, and past `MAX_COMPARED_STEPS`
+ * the rest are counted. Without them, today's steps and the idea's own words.
  *
  * @param today - The matched path
  * @param quote - The idea's sentence that shows the change
+ * @param idea - The idea's drafted rows, when the offer drafted them
  */
-export function comparisonText(today: PathToday, quote: string): string {
+export function comparisonText(today: PathToday, quote: string, idea?: ReadonlyArray<Pick<DraftedChange, "step" | "lane" | "content">>): string {
+  if (idea?.length) return stepComparison(today, idea);
   const place = `${today.scenario} › ${today.path}`;
   const named = today.link ? `[${place}](${today.link})` : place;
   return [
@@ -146,6 +152,32 @@ export function comparisonText(today: PathToday, quote: string): string {
     `- Today: ${stepsToday(today)}`,
     `- This idea: "${quote}"`,
   ].join("\n");
+}
+
+/** Steps the inline comparison shows before it counts the rest. */
+const MAX_COMPARED_STEPS = 6;
+/** A lane whose rows the inline comparison leaves to the pop-up. */
+const TOUCHPOINT_LANE = /touchpoint/i;
+
+function stepComparison(today: PathToday, idea: ReadonlyArray<Pick<DraftedChange, "step" | "lane" | "content">>): string {
+  const laneName = new Map(today.lanes.map((l) => [l.id, l.name]));
+  const said = (rows: ReadonlyArray<{ lane: string; content: string }>) =>
+    rows.filter((r) => !TOUCHPOINT_LANE.test(r.lane)).map((r) => `${r.content.replace(/\.$/, "")} (\`${r.lane.replace(/`/g, "'")}\`)`);
+  const steps = today.steps
+    .map((step) => {
+      const now = said(today.cells.filter((c) => c.stepId === step.id).map((c) => ({ lane: laneName.get(c.laneId) ?? "", content: c.content })));
+      const yours = said(idea.filter((r) => r.step === step.name));
+      return { name: step.name, now, yours };
+    })
+    .filter((s) => s.now.length || s.yours.length);
+  const scenario = today.link ? `[*${today.scenario}*](${today.link})` : `*${today.scenario}*`;
+  const lines = [`**Your idea changes how ${scenario} works today.** Today's path is *${today.path}*:`];
+  for (const s of steps.slice(0, MAX_COMPARED_STEPS)) {
+    lines.push("", `**${s.name}**`, `- Today: ${s.now.join("; ") || "no such step"}`, `- Your idea: ${s.yours.join("; ") || "no such step"}`);
+  }
+  const more = steps.length - MAX_COMPARED_STEPS;
+  if (more > 0) lines.push("", `…and ${more} more ${more === 1 ? "step" : "steps"} on the blueprint.`);
+  return lines.join("\n");
 }
 
 /**

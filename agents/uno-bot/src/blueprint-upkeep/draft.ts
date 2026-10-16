@@ -10,7 +10,10 @@
 //   • `added` on an occupied slot is a change to that cell, `changed` on an
 //     empty one an addition, and `deprecated` needs a cell to deprecate;
 //   • each row's `from` is the cell's status as read, so the writer can tell a
-//     slot that moved since the draft (a stale race) and take it all back.
+//     slot that moved since the draft (a stale race) and take it all back;
+//   • a row the work did not cause is INFERRED, and only a deprecation may be:
+//     a cell that contradicts the path's own cells, which the card marks and
+//     asks the owner about. An inferred addition or change is never written.
 //
 // The path's own status moves to the target too when it is behind it.
 //
@@ -51,6 +54,10 @@ export interface DraftedChange {
   content: string;
   /** The cell's text before, for a change. */
   before?: string;
+  /** A deprecation the shipped work did not cause: the cell contradicts the
+   *  path's own cells, so the owner is asked about it. Never on an added or a
+   *  changed row. */
+  inferred?: true;
 }
 
 export interface Draft {
@@ -92,8 +99,9 @@ export const DRAFT_SYSTEM = [
   "- Use only the step ids and lane ids you are shown. If the change needs a step or a lane the path does not have, do not invent an id: name it in new_steps_or_lanes.",
   "- Write each cell's text the way the path's cells are written: one short sentence about what that actor does at that step.",
   "- Change only what the work changes. Say in gaps what you could not verify from the text.",
+  '- A cell the work does not touch may be deprecated only when it contradicts the path\'s own cells (one step says the opposite of another). Mark that row "inferred": true. Never add or change a row the work does not cause.',
   "Reply with JSON only, no prose, in exactly this shape:",
-  '{"rows":[{"change":"added|changed|deprecated","step_id":"","lane_id":"","content":""}],"new_steps_or_lanes":[],"confidence":0.0,"gaps":[]}',
+  '{"rows":[{"change":"added|changed|deprecated","step_id":"","lane_id":"","content":"","inferred":false}],"new_steps_or_lanes":[],"confidence":0.0,"gaps":[]}',
 ].join("\n");
 
 /** The prompt: the work, then the grid with its ids. */
@@ -162,10 +170,16 @@ export function readDraft(reply: string, input: DraftInput): Draft | null {
     if (taken.has(slot)) continue;
     const cell = today.cells.find((c) => c.stepId === s.id && c.laneId === l.id);
     const kind = text(r.change);
+    const inferred = r.inferred === true;
     if (kind === "deprecated") {
       if (!cell || cell.status === "deprecated") continue;
       rows.push({ stepId: s.id, laneId: l.id, content: cell.content, from: cell.status, to: "deprecated" });
-      changes.push({ kind: "deprecated", step: s.name, lane: l.name, content: cell.content });
+      changes.push({ kind: "deprecated", step: s.name, lane: l.name, content: cell.content, ...(inferred ? { inferred: true as const } : {}) });
+      if (inferred) gaps.push(`${s.name} (${l.name}) contradicts the path's own rows, so I marked it deprecated though the work didn't cause it. Retire it?`);
+    } else if (inferred && (kind === "added" || kind === "changed")) {
+      // Only a deprecation may be inferred: an inferred row is never added.
+      gaps.push(`an inferred ${kind === "added" ? "addition" : "change"} at ${s.name} (${l.name}) was left out: only the work's own rows are written`);
+      continue;
     } else if (kind === "added" || kind === "changed") {
       const content = text(r.content);
       if (!content) continue;

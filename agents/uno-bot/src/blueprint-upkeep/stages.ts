@@ -6,12 +6,14 @@
 //     still happens until the work deploys, so it waits on the record below.
 //   • `Dev Status: Deployed` — the work is live: rows at `live`. When the
 //     card's design hand-off drafted rows, the deploy PROMOTES those rows
-//     (`planned → live`, and the held deprecations) first, then drafts the
+//     (`planned → live`, or `built → live` where the build was marked done,
+//     and the held deprecations) first, then drafts the
 //     same path again against the card's words as they are now, and adds to
 //     the same promotion card any cell that differs (`withRedraft`), so a
 //     change between the hand-off and the deploy reaches the blueprint. Only
-//     when none of the rows is `planned` on the blueprint today — the
-//     `planned` card was never approved — is a fresh `live` revision drafted.
+//     when none of the rows is `planned` or `built` on the blueprint today —
+//     the `planned` card was never approved — is a fresh `live` revision
+//     drafted.
 //
 // A card whose thread drew a PROPOSAL, linked to it (`./link.ts`), moves that
 // proposal on instead: its `proposed` variant path and the cells on it are
@@ -107,10 +109,14 @@ export function holdDeprecations(draft: Draft): { draft: Draft | null; deprecate
 const at = (today: PathToday, slot: Slot) => today.cells.find((c) => c.stepId === slot.stepId && c.laneId === slot.laneId);
 const nameOf = (list: Array<{ id: string; name: string }>, id: string) => list.find((x) => x.id === id)?.name ?? id;
 
+/** What a hand-off's cell may stand at when its deploy promotes it to `live`:
+ *  still `planned`, or `built` once someone marked the build done. */
+const PROMOTED_AT_DEPLOY: readonly EntityStatus[] = ["planned", "built"];
+
 /**
- * The deploy's promotion of a card's `planned` rows: each still `planned`
- * today to `live`, and each held deprecation. Null when none is `planned`
- * today, so the deploy drafts afresh.
+ * The deploy's promotion of a card's `planned` rows: each still `planned` or
+ * now `built` today to `live`, and each held deprecation. Null when none is
+ * either today, so the deploy drafts afresh.
  *
  * @param planned - What the design hand-off drafted
  * @param today - The path as the blueprint holds it now
@@ -122,11 +128,11 @@ export function promotionDraft(planned: PlannedRows, today: PathToday): Draft | 
   let moved = 0;
   for (const slot of planned.rows) {
     const cell = at(today, slot);
-    if (cell?.status !== "planned") {
+    if (!cell || !PROMOTED_AT_DEPLOY.includes(cell.status)) {
       moved += 1;
       continue;
     }
-    rows.push({ ...slot, content: cell.content, from: "planned", to: "live" });
+    rows.push({ ...slot, content: cell.content, from: cell.status, to: "live" });
     changes.push({ kind: "promoted", ...where(slot), content: cell.content });
   }
   if (!rows.length) return null;
@@ -146,7 +152,7 @@ export function promotionDraft(planned: PlannedRows, today: PathToday): Draft | 
     },
     changes,
     confidence: 1,
-    gaps: moved ? [`${moved} cell(s) drafted at planned are no longer planned on the blueprint and were left out`] : [],
+    gaps: moved ? [`${moved} cell(s) drafted at planned are no longer planned or built on the blueprint and were left out`] : [],
     promoted: true,
   };
 }
@@ -241,8 +247,12 @@ export function variantPromotionDraft(variant: PathToday, target: EntityStatus, 
 }
 
 /**
- * Today's path set to `deprecated` because a promoted proposal replaces it:
- * the path's status alone, no cell written. Null when it is retired already.
+ * Today's path set to `deprecated` because a promoted proposal replaces it.
+ * The write is the path's status alone: its cells are retired with it, and
+ * one write keeps the Approve affordable on a path of any size
+ * (`revisionWriteCalls`). The card still shows what retires — every row not
+ * already deprecated, as one Deprecated group (`changes`). Null when the path
+ * is retired already.
  *
  * @param today - Today's path, as the blueprint holds it now
  * @param replacement - The proposal's path going live beside it
@@ -251,10 +261,12 @@ export function retirementDraft(today: PathToday, replacement: Pick<PathToday, "
   if (today.status === "deprecated") return null;
   return {
     revision: { pathId: today.pathId, label: `${today.scenario} › ${today.path}`, rows: [], path: { from: today.status, to: "deprecated" } },
-    changes: [],
+    changes: today.cells
+      .filter((c) => c.status !== "deprecated")
+      .map((c) => ({ kind: "deprecated" as const, step: nameOf(today.steps, c.stepId), lane: nameOf(today.lanes, c.laneId), content: c.content })),
     confidence: 1,
     gaps: [],
     retires: true,
-    note: `If ${code(`${replacement.scenario} › ${replacement.path}`)} replaces this path once it is ${code("live")}, this path goes to ${code("deprecated")}; its cells are left as they are. Reject if both paths stay.`,
+    note: `If ${code(`${replacement.scenario} › ${replacement.path}`)} replaces this path once it is ${code("live")}, this path goes to ${code("deprecated")}, and its rows with it. Reject if both paths stay.`,
   };
 }

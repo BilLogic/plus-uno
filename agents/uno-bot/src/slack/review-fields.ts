@@ -24,6 +24,7 @@ import { placeholderIn } from "../agent/placeholder";
 import { MAX_FEEDBACK_QUESTIONS } from "../tools/share-out-render";
 import { issueUpdateFromInput } from "../tools/github-issue-update-render";
 import { proposalOperations, type PendingProposal, type ProposalOperation } from "../thread-state/index";
+import { blueprintReviseFields } from "./review-blueprint-fields";
 
 /** Where a select's options live: a database the Worker writes to, and the
  *  property, by its exact name. */
@@ -86,7 +87,7 @@ const MAX_OPTION_CHARS = 75;
 
 type Input = Record<string, unknown>;
 
-interface FieldSpec {
+export interface FieldSpec {
   path: string;
   label: string;
   kind: EditableField["kind"];
@@ -196,8 +197,9 @@ function issueUpdateFields(input: Input): FieldSpec[] {
 }
 
 /** What each tool lets a confirmer change: a fixed list, or one read off the
- *  call when the call's shape decides which fields exist. */
-const FIELDS: Record<string, FieldSpec[] | ((input: Input) => FieldSpec[])> = {
+ *  call — and, for a Worker-staged card, its facts — when those decide which
+ *  fields exist. */
+const FIELDS: Record<string, FieldSpec[] | ((input: Input, proposal: PendingProposal) => FieldSpec[])> = {
   notion_update: notionUpdateFields,
   shareout_post: shareoutFields,
   notion_create: [
@@ -227,6 +229,8 @@ const FIELDS: Record<string, FieldSpec[] | ((input: Input) => FieldSpec[])> = {
   ],
   github_issue_update: issueUpdateFields,
   dm_relay: [{ path: "text", label: "Message", kind: "multiline", required: true }],
+  // The text of a revision's added and changed rows, read off its facts.
+  blueprint_revise: blueprintReviseFields,
 };
 
 function readPath(input: Input, path: string): unknown {
@@ -290,7 +294,7 @@ function draftFields(proposal: PendingProposal): Array<{ field: EditableField; s
     const own: FieldSpec[] = (proposal.selects ?? [])
       .filter((s) => (s.op ?? 0) === index)
       .map((s) => ({ path: s.path, label: s.label, kind: "select", required: true, options: s.source }));
-    for (const spec of [...(typeof table === "function" ? table(op.input) : table), ...own]) {
+    for (const spec of [...(typeof table === "function" ? table(op.input, proposal) : table), ...own]) {
       if (spec.applies && !spec.applies(op.input)) continue;
       const raw = spec.read ? spec.read(op.input) : readPath(op.input, spec.path);
       if (raw !== undefined && typeof raw !== "string") continue;

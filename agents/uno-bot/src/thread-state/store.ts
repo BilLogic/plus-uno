@@ -428,7 +428,7 @@ export interface ProposalSelect {
  * What a stated card is about, as Review draws it (`PendingProposal.facts`):
  * one shape per Worker tool, in the words its stager's copy chose.
  */
-export type StatedFacts = TidyFacts | DevLinksFacts | PrecedenceFacts | ShareNoteFacts;
+export type StatedFacts = TidyFacts | DevLinksFacts | PrecedenceFacts | ShareNoteFacts | BlueprintRevisionFacts | BlueprintProposalFacts;
 
 /** A Figma tidy-up finding (`figma-tidy/copy.ts`). */
 export interface TidyFacts {
@@ -485,6 +485,89 @@ export interface ShareNoteFacts {
   from: string;
   /** Plain lines under the note. */
   notes: string[];
+}
+
+/** One row of a blueprint path as Review draws it: its lane and its text. */
+export interface BlueprintRowFact {
+  lane: string;
+  content: string;
+}
+
+/**
+ * One step of a blueprint comparison (`slack/review-blueprint.ts`): its rows
+ * today, then what changes in that step only. `row` is a change's index in the
+ * operation's `rows`, which its text's field is keyed by.
+ */
+export interface BlueprintStepFact {
+  step: string;
+  /** The step's rows today, in lane order; empty where the path has none. */
+  today: BlueprintRowFact[];
+  added?: Array<BlueprintRowFact & { row: number }>;
+  changed?: Array<BlueprintRowFact & { row: number; before: string }>;
+  /** `inferred`: deprecated because it contradicts the path's own rows, not
+   *  because of the shipped card; the owner is asked about it. */
+  deprecated?: Array<BlueprintRowFact & { inferred?: boolean }>;
+  promoted?: BlueprintRowFact[];
+  /** A proposal's rows in this step, on the new path. */
+  proposed?: BlueprintRowFact[];
+}
+
+/** Today's path as Review's card shows it. */
+export interface BlueprintPathFact {
+  name: string;
+  /** "17 rows, all live" or "6 rows: 4 live, 2 planned". */
+  rows: string;
+  /** View slice: a saved slice citing the path, else the first changed row. */
+  view?: string;
+}
+
+/** A blueprint revision from shipped work (`blueprint-upkeep/facts.ts`). The
+ *  rows the Approve writes are the operation's input. */
+export interface BlueprintRevisionFacts {
+  kind: "blueprint_revision";
+  scenario: string;
+  /** Where the scenario opens in the blueprint app. */
+  scenarioUrl?: string;
+  /** The status the rows are written at, and what they move from when the
+   *  revision promotes rows or retires the path. */
+  status: { from?: string; to: string };
+  counts: { added: number; changed: number; deprecated: number; promoted: number };
+  /** Why now, in the Roadmap's words: `RM-2567`, `Dev Status: Deployed`. */
+  card: { id: string; url: string; status: string; quote: string };
+  /** The Roadmap card's Contributors: a Slack person, or a name Team Members
+   *  maps to nobody. */
+  owners: CardOwner[];
+  today: BlueprintPathFact;
+  steps: BlueprintStepFact[];
+  /** Steps that change past the ones drawn. */
+  moreSteps: number;
+  /** What the owner is asked before it is written: the draft's gaps. */
+  questions: string[];
+  inferred: number;
+  /** Set when the grind tier was out of capacity and the default tier drafted. */
+  tierNote?: string;
+  /** Where promoted rows came from, or what a retirement makes way for. */
+  note?: string;
+  /** A card that retires today's path: one Deprecated group, never redrafted. */
+  retires?: boolean;
+}
+
+/** An idea offered as a blueprint proposal (`blueprint-upkeep/proposal.ts`):
+ *  a new `proposed` path beside today's. */
+export interface BlueprintProposalFacts {
+  kind: "blueprint_proposal";
+  scenario: string;
+  scenarioUrl?: string;
+  /** The new path's name. */
+  name: string;
+  today: BlueprintPathFact;
+  /** Each step either side has: today's rows, then the proposal's. */
+  steps: BlueprintStepFact[];
+  moreSteps: number;
+  /** Rows the Approve writes. */
+  rows: number;
+  /** What the draft could not verify: a lane it had to guess, a step it needs. */
+  gaps: string[];
 }
 
 // ── Decision reports ─────────────────────────────────────────────────────────

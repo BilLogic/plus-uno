@@ -90,7 +90,7 @@ Answered by the **spotter** (fallback: the designated maintainer) — never by t
   - harness docs (`docs/product-and-service/*`, conventions, skill references) describe post-ship behavior as current;
   - deployment/marketplace references (per uno-publish's references) resolve to live URLs.
 
-  The **blueprint** reflecting the shipped change (`docs/connectors/supabase/overview.md` § Two sources — ship-time is when "blueprint wins vs shipped docs" becomes true) is uno-bot's job, `blueprint-shipped` (`agents/uno-bot/src/blueprint-upkeep/`): each end of day it weighs the cards that reached `Dev Status: Deployed`, and a card that changes the service gets a **blueprint revision** card in the next morning's sweep at the card's place, written `live` on the owner's or Bill's ✅. A shipped change the job stays silent on — no confident scenario match, or a step or lane only a person adds — goes through `writers/blueprint`. Grow the check set here.
+  The **blueprint** reflecting the shipped change (`docs/connectors/supabase/overview.md` § Two sources — ship-time is when "blueprint wins vs shipped docs" becomes true) is uno-bot's job, `blueprint-shipped` (`agents/uno-bot/src/blueprint-upkeep/`): each end of day it weighs the cards that reached `Dev Status: Deployed`, and a card that changes the service gets a **blueprint revision** card in the next morning's sweep at the card's place, written `live` when a Contributor or Bill approves it in its Review pop-up. A shipped change the job stays silent on — no confident scenario match, or a step or lane only a person adds — goes through `writers/blueprint`. Grow the check set here.
 
 ## 7 · What the work leaves behind
 

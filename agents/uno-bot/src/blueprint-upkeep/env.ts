@@ -11,10 +11,13 @@
 //     matched cell's path, then that path, its cells, lanes and ordered steps
 //     (`PATH_READ_COST`);
 //   • the model: the Worker's provider (`selectProvider`), one tier a call;
-//   • the owner: the card's first Contributor, through the Team Members
-//     directory then by name (card follow-ups' `peopleFor`);
+//   • the owners: the card's Contributors, `MAX_OWNERS` at most, each through
+//     the Team Members directory then by name (card follow-ups' `peopleFor`);
+//     one Team Members maps to nobody in Slack is named, not tagged;
+//   • View slice: a saved slice citing the drafted path, one `slides` read
+//     (`sliceCiting`), else the first changed row's `?cell=` link;
 //   • the place: card follow-ups' ladder (`cardPlace`);
-//   • the lead: `LEAD_USER_ID`, the deployment's lead, the other confirmer;
+//   • the lead: `LEAD_USER_ID`, the deployment's lead, always a confirmer;
 //   • the state: one JSON record in HARNESS_KV; each card's weighed mark a
 //     key of its own there, kept for good; each revision thread a key too;
 //   • a turn's milestone comparison: the same gate, search and path read, and
@@ -38,31 +41,33 @@
 // each job sized by cost, not by a count (`./budget.ts`).
 // A match job: the Roadmap query (1, the first job only) and the model's
 // token (1), then per card a deploy's promotion try — the path read (5), and
-// when it promotes, the card's words (8) and one redraft (2) before the owner
-// (2): 17 — and, failing that, the page and up to three block pages (4), its one PRD
-// the same (4), the judgement (1), the search (≤3) and a Slack lookup or two
-// for the owner: `MATCH_COST` (20) at the worst. A draft job: the token,
-// then per path the path read (5) and the draft, grind then default (2):
-// `DRAFT_COST` (7). A job starts a card or a path only while the alarm's
-// headroom covers that worst case: after the first job's 2, 36 is left, so
-// one PRD-heavy card (20) leaves 16 and fills its job, while a light card
-// leaves room for another; across `MATCH_JOBS` that is six PRD-heavy cards a
-// night at the least. A card that still overruns stops on the ceiling and its
+// when it promotes, the card's words (8) and one redraft (2) before its
+// Contributors (the first a Slack lookup or two, each further one a lookup by
+// name, three at most: 4): 19 — and, failing that, the page and up to three
+// block pages (4), its one PRD the same (4), the judgement (1), the search
+// (≤3) and the Contributors (4): 21, so `MATCH_COST` (22) at the worst. A
+// draft job: the token, then per path the path read (5), the draft, grind
+// then default (2), and the slice that cites it (1): `DRAFT_COST` (8). A job
+// starts a card or a path only while the alarm's headroom covers that worst
+// case: after the first job's 2, 36 is left, so one PRD-heavy card (22)
+// leaves 14 and fills its job, while a light card leaves room for another;
+// across `MATCH_JOBS` that is six PRD-heavy cards a night at the least. A card that still overruns stops on the ceiling and its
 // job is deferred, the cards before it kept. What a night's jobs do not reach
 // waits on the cursor and the queue for the next.
 
 import type { Env } from "../types";
-import { budgetHeadroom, charge, countedFetch } from "../net";
+import { budgetHeadroom, charge, countedFetch, rethrowIfBudget } from "../net";
 import { getBotIdentity, postMessage, updateMessage } from "../slack/api";
 import type { SlackMessageEvent } from "../slack/types";
 import { ladderChannelsFor } from "../destination/env";
-import { reportRecord } from "../slack/decision-cards";
 import { redraftRevision } from "./revise";
+import { MAX_OWNERS } from "./budget";
+import type { CardOwner } from "../thread-state/index";
 import { selectProvider } from "../agent/run-agent";
 import { channelIdsFor } from "../destination/env";
 import { queryRowsWithAnyStatus, readNotionPage } from "../integrations/notion";
 import { searchBlueprint, isBlueprintConfigured } from "../integrations/blueprint";
-import { appRootUrl, cellUrl } from "../integrations/blueprint-link";
+import { appRootUrl, cellUrl, sliceUrl } from "../integrations/blueprint-link";
 import { ENTITY_STATUSES, type EntityStatus } from "../blueprint-write/index";
 import { kvJson } from "../figma-poll";
 import { measured } from "../sweep/env";
@@ -100,7 +105,6 @@ import {
   draftMatched,
   handOverRevisions,
   matchShipped,
-  postOverflow,
   replanRows,
   revisionSection,
   UPKEEP_SECTION,
@@ -256,6 +260,21 @@ export async function readPathById(env: Env, id: string, fallbackCell?: string):
 }
 
 /**
+ * A saved slice that cites one of these cells — the first one cut, by its
+ * position — as its View slice link; null when none does, or with no app URL.
+ * One anon-key read of `slides`, whose `cell_ids` are the cited cells.
+ *
+ * @param env - Worker bindings
+ * @param cellIds - A path's cells
+ */
+export async function sliceCiting(env: Env, cellIds: readonly string[]): Promise<string | null> {
+  if (!isBlueprintConfigured(env) || !cellIds.length || !appRootUrl(env.BLUEPRINT_APP_URL)) return null;
+  const ids = cellIds.map((id) => `"${id.replace(/"/g, "")}"`).join(",");
+  const [slide] = await rest<{ slice_id: string }>(env, "slides", `select=slice_id&cell_ids=ov.${encodeURIComponent(`{${ids}}`)}&order=position&limit=1`);
+  return slide?.slice_id ? (sliceUrl(env.BLUEPRINT_APP_URL, slide.slice_id) ?? null) : null;
+}
+
+/**
  * One end-of-day match job (`blueprint-shipped-N`) on `Env`.
  *
  * @param env - Worker bindings
@@ -295,9 +314,21 @@ function shippedDepsFor(env: Env): ShippedDeps | string {
       readPathById: (pathId) => measured(() => readPathById(env, pathId)),
       ...(proposals ? { proposals } : {}),
       provider,
-      async ownerOf(card) {
-        const first = card.contributors[0];
-        return first ? people.slackIdForNotionUser(first.id, first.name) : null;
+      async ownersOf(card) {
+        const owners: CardOwner[] = [];
+        for (const c of card.contributors.slice(0, MAX_OWNERS)) {
+          const slack = await people.slackIdForNotionUser(c.id, c.name).catch((err: unknown) => {
+            rethrowIfBudget(err);
+            return null;
+          });
+          if (slack) owners.push({ slack, ...(c.name ? { name: c.name } : {}) });
+          else if (c.name.trim()) owners.push({ name: c.name.trim() });
+        }
+        return owners;
+      },
+      views: {
+        cell: (cellId) => cellUrl(env.BLUEPRINT_APP_URL, cellId),
+        slice: (cellIds) => measured(() => sliceCiting(env, cellIds)),
       },
       placeOf: (card) => cardPlace(card, config),
       leadId: env.LEAD_USER_ID?.trim() || null,
@@ -357,36 +388,6 @@ async function stageRevisionCard(env: Env, proposal: PendingProposal): Promise<v
     ...supersededEvents(retired, now, "worker"),
     stagedEvent({ proposal, at: now, via: "worker", channelStored: true }),
   ]);
-}
-
-/**
- * The morning's thread job (`blueprint-revision-thread`) on `Env`: the cards
- * a carousel had no room for, up in its thread.
- *
- * @param env - Worker bindings
- * @param opts - The morning run
- */
-export async function runRevisionThreadOnEnv(env: Env, opts: JobContext): Promise<{ summary: string }> {
-  if (!env.HARNESS_KV) return { summary: "HARNESS_KV not bound — nothing to put in a thread" };
-  const store = threadStateFor(env);
-  return postOverflow(
-    {
-      state: stateFor(env),
-      async postReport(channel, threadTs, report, ttlMs) {
-        const res = await postMessage(env, { channel, thread_ts: threadTs, text: report.text, blocks: report.blocks });
-        if (!res.ok || !res.ts) throw new Error(`thread report not posted (${String(res.error ?? "unknown")})`);
-        await store.putReport(reportRecord(channel, res.ts, report, ttlMs));
-        return res.ts;
-      },
-      stage: (proposal) => stageRevisionCard(env, proposal),
-      threads: revisionThreadsOn(env.HARNESS_KV),
-      post: (channel, threadTs, text) => postLine(env, channel, threadTs, text),
-      meter: { headroom: budgetHeadroom },
-      date: opts.runDate,
-      now: () => Date.now(),
-    },
-    opts,
-  );
 }
 
 // ── A reply in a revision thread ─────────────────────────────────────────────

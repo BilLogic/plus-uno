@@ -151,13 +151,14 @@ import {
 } from "./delivery";
 import { cancelledRecently, RECENT_CANCEL_MS } from "../agent/cancel-note";
 import {
+  comparisonText,
   handOffMilestone,
   prdMilestone,
   type Comparison,
   type Milestone,
   type MilestoneComparison,
 } from "../blueprint-upkeep/milestone";
-import { proposalOfferCard, stagedProposalOffer, type ProposalDrafter } from "../blueprint-upkeep/proposal";
+import { proposalOfferCard, stagedProposalOffer, type ProposalDraft, type ProposalDrafter } from "../blueprint-upkeep/proposal";
 import { rethrowIfBudget } from "../net";
 
 // ── Policy ───────────────────────────────────────────────────────────────────
@@ -1652,15 +1653,19 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     ? null
     : (prdMilestone(result.operations) ?? handOffMilestone(result.previewText ?? "", request.text, run.references));
   const comparison = await compareAt(milestone, ref, deps);
-  if (comparison) await delivery.postNote(comparison.text);
+  // The idea's rows are drafted first, so the comparison can set them beside
+  // today's step by step.
+  const drafted = comparison && milestone ? await draftOffer(comparison, milestone, deps) : null;
+  const compared = comparison ? comparedText(comparison, drafted) : null;
+  if (compared) await delivery.postNote(compared);
   // The offer to draw the idea goes under its comparison and before this
   // turn's own card, which stays the last message: a typed ✅ answers the
   // thread's newest card, and that must stay the one the person asked for.
-  const offered = comparison && milestone ? await offerProposal(comparison, milestone, request, { ...deps, delivery }, staging) : null;
+  const offered = drafted ? await offerProposal(drafted, request, { ...deps, delivery }, staging) : null;
   const posted = inPlace ? { ok: true, text: inPlace.text, ts: inPlace.staged.proposalTs } : await delivery.card(card);
   // An answer-only surface declined the card on purpose: the person is told
   // what it would have done instead, so the turn answered, and nothing stages.
-  const remembered = [comparison?.text, offered?.proposalText, posted.text].filter(Boolean).join("\n\n");
+  const remembered = [compared, offered?.proposalText, posted.text].filter(Boolean).join("\n\n");
   if (!inPlace && posted.declined) {
     await memory.remember(remembered);
     return { disposition: "answered", posted: posted.text, wrote: memory.wrote(), telemetry, ...(comparison ? { comparison } : {}) };
@@ -1794,23 +1799,42 @@ async function compareAt(milestone: Milestone | null, ref: ThreadRef, deps: Pick
 }
 
 /**
- * Offer to draw a compared idea on the blueprint: draft its rows, post the ✅
- * card in the thread, and stage it for the requester alone, in its own slot,
- * so it never replaces the turn's own card. Null when there is no drafter, the
- * draft adds nothing, or the card did not stage. Fails quiet, past a budget
- * stop: the reply already stands without it.
+ * Draft a compared idea's rows for the offer to draw it on the blueprint.
+ * Null when there is no drafter or the draft adds nothing. Fails quiet, past
+ * a budget stop: the reply stands without it.
  */
-async function offerProposal(
+async function draftOffer(
   comparison: Comparison,
   milestone: Milestone,
+  deps: Pick<TurnDeps, "proposalDraft">,
+): Promise<ProposalDraft | null> {
+  if (!deps.proposalDraft) return null;
+  return deps.proposalDraft(comparison, milestone.idea).catch((err: unknown) => {
+    rethrowIfBudget(err);
+    console.warn(`[proposal] offer not drafted: ${err instanceof Error ? err.message : String(err)}`);
+    return null;
+  });
+}
+
+/** The comparison a reply carries: step by step beside the idea's drafted
+ *  rows, or today's steps and the idea's words when nothing was drafted. */
+function comparedText(comparison: Comparison, drafted: ProposalDraft | null): string {
+  return drafted ? comparisonText(comparison.today, comparison.quote, drafted.changes) : comparison.text;
+}
+
+/**
+ * Offer to draw a drafted idea on the blueprint: post the ✅ card in the
+ * thread, and stage it for the requester alone, in its own slot, so it never
+ * replaces the turn's own card. Null when the card did not stage. Fails quiet,
+ * past a budget stop: the reply already stands without it.
+ */
+async function offerProposal(
+  draft: ProposalDraft,
   request: TurnRequest,
-  deps: Pick<TurnDeps, "proposalDraft" | "delivery" | "threadState" | "usage">,
+  deps: Pick<TurnDeps, "delivery" | "threadState" | "usage">,
   staging: StagingFacts,
 ): Promise<PendingProposal | null> {
-  if (!deps.proposalDraft) return null;
   try {
-    const draft = await deps.proposalDraft(comparison, milestone.idea);
-    if (!draft) return null;
     const posted = await deps.delivery.card(proposalOfferCard(draft));
     if (!posted.ok || !posted.ts || posted.declined) return null;
     const proposal: PendingProposal = {
@@ -2378,7 +2402,8 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   // after the judge, in code's words.
   const handOff = handOffMilestone(answered, request.text, run.references);
   const comparison = await compareAt(handOff, ref, deps);
-  const prose = comparison ? `${answered}\n\n${comparison.text}` : answered;
+  const drafted = comparison && handOff ? await draftOffer(comparison, handOff, deps) : null;
+  const prose = comparison ? `${answered}\n\n${comparedText(comparison, drafted)}` : answered;
 
   // The table rides with the answer; what comes back as `posted.text` is then
   // the prose and its plain list, which is what the thread remembers below.
@@ -2409,7 +2434,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   }
 
   // The offer to draw the idea follows the reply that carries its comparison.
-  const offered = comparison && handOff ? await offerProposal(comparison, handOff, request, deps, ctx.staging) : null;
+  const offered = drafted ? await offerProposal(drafted, request, deps, ctx.staging) : null;
 
   // Record what was actually POSTED (capped, placeholder and all), not the raw
   // text.

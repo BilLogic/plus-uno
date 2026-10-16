@@ -168,7 +168,7 @@ async function world(model: ReturnType<typeof scripted>, cards: ShippedCard[], o
     readPathById: async (pathId) => (pathId === blueprint.today.pathId ? blueprint.today : pathId === blueprint.variant?.pathId ? blueprint.variant : null),
     proposals: records,
     provider: model.provider,
-    ownerOf: async () => OWNER,
+    ownersOf: async () => [{ slack: OWNER }],
     placeOf: () => TEAM,
     leadId: BILL,
     state: state.store,

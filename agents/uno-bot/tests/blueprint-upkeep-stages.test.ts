@@ -125,7 +125,7 @@ function world(model: ReturnType<typeof scripted>, cards: ShippedCard[]) {
     gate: serviceChangeGate({ provider: model.provider, search: async () => MATCH }),
     readPath: async (cellId) => (cellId === "cell-2" ? blueprint.path : null),
     provider: model.provider,
-    ownerOf: async () => OWNER,
+    ownersOf: async () => [{ slack: OWNER }],
     placeOf: () => TEAM,
     leadId: BILL,
     state: state.store,
@@ -257,8 +257,8 @@ describe("the same card's deploy", () => {
     w.blueprint.path = PATH_PLANNED;
     w.roadmap.cards = [DEPLOYED];
     const asked = model.asked.length;
-    // Room for the card and its promotion, not for the card's words and a draft.
-    let left = 20;
+    // Room for the card (`MATCH_COST`) and its promotion, not for the card's words and a draft.
+    let left = 22;
     w.deps.readPath = async (cellId) => {
       left -= 9; // the read, and what else the alarm spent beside it
       return cellId === "cell-2" ? w.blueprint.path : null;

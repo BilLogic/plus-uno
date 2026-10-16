@@ -16,7 +16,8 @@ export {
   type ServiceChangeInput,
 } from "./gate";
 export { draftRevision, readDraft, type Draft, type DraftedChange, type DraftInput, type PathToday } from "./draft";
-export { revisionItem, revisionText, type RevisionSource } from "./card";
+export { revisionBody, revisionItem, revisionSays, revisionText, type RevisionSource } from "./card";
+export { firstChangedCell, proposalFacts, revisionFacts, rowsLine } from "./facts";
 export { cardEvidence, MAX_PRDS, prdIdsOf, type EvidencePage } from "./evidence";
 export { promotionDraft, retirementDraft, stageOf, STAGES, variantPromotionDraft, type PlannedRows, type ShipStage } from "./stages";
 export { cardKey, keepProposalLinks, prdCardOf, type LinkDeps, type ThreadCards } from "./link";
@@ -39,9 +40,11 @@ export {
   MATCH_COST,
   MATCH_JOBS,
   matchShipped,
-  postOverflow,
+  ownersOf,
   replanRows,
   REVISION_CARD_TTL_MS,
+  REVISION_REDRAFT_POINTER,
+  REVISION_SENT_BACK,
   revisionSection,
   runShippedRevisions,
   stagedRevision,
@@ -49,7 +52,6 @@ export {
   weighedKey,
   type HandOverDeps,
   type MatchedPath,
-  type OverflowDeps,
   type RevisionHanded,
   type RevisionThread,
   type RevisionThreadCard,

@@ -27,40 +27,37 @@
 //   • the HAND-OVER — every morning (`blueprint-revision-post`), before the
 //     sweep's post: each waiting revision is handed to the sweep's message at
 //     its card's place, the posting ladder card follow-ups take.
-//   • the SECTION — on that place's one message, one card per revision, each
-//     its own proposal: the `blueprint_revise` operation, confirmed by the
-//     card's owner or the lead and nobody else. Cards the carousel has no room
-//     for are said as "+N more in the thread" and go up there, in the
-//     morning's `blueprint-revision-thread`, after the sweep's post. The
+//   • the SECTION — on that place's one message, one card per revision in the
+//     place's one carousel, shared with every other section, each its own
+//     proposal: the `blueprint_revise` operation, confirmed by the Roadmap
+//     card's Contributors and the lead and nobody else, and decided in its
+//     Review pop-up (its Approve is the approval; a ✅ on a carousel cannot
+//     say which card it means). Its facts ride the proposal (`./facts.ts`),
+//     so the pop-up draws the revision step by step. Past the carousel's ten
+//     the shared card's rule holds — "Showing 10 of 13; the rest come in the
+//     next report" — and what did not show waits for the next morning. The
 //     thread is told, tagging the person, what each draft could not verify.
 //
 // WEIGHED ONCE. A card is weighed once per moment, and a card weighed at a
 // later moment counts as weighed at every earlier one. The marks are durable
 // (one key a card and moment), so a card edited again after it shipped comes
-// back from the query and is passed over. A redraft is only ever asked for in
-// the card's thread (`./revise.ts`).
+// back from the query and is passed over. A redraft is only ever asked for on
+// the card: Needs changes in its Review, or a reply in its thread that names
+// its path (`./revise.ts`).
 //
 // `Env` enters in `./env.ts`.
 
 import { rethrowIfBudget } from "../net";
-import type { PendingProposal } from "../thread-state/index";
-import { decisionReport, itemProposal, MAX_REPORT_ITEMS, type DecisionReport } from "../slack/decision-cards";
+import type { CardOwner, PendingProposal } from "../thread-state/index";
+import { itemProposal } from "../slack/decision-cards";
 import { renderProposalCard } from "../slack/proposal-render";
 import { handedSection, type SectionHandOff, type SweepSection } from "../sweep/sections";
 import { revisionCard, type EntityStatus } from "../blueprint-write/index";
 import type { ModelProvider } from "../agent/model-provider";
 import type { ServiceChangeGate } from "./gate";
 import { draftRevision, type Draft, type PathToday } from "./draft";
-import {
-  gapAskText,
-  overflowParent,
-  revisionItem,
-  revisionItemId,
-  revisionParent,
-  revisionProposalCard,
-  revisionTitle,
-  type RevisionSource,
-} from "./card";
+import { gapAskText, revisionItem, revisionItemId, revisionProposalCard, revisionSays, revisionTitle, type RevisionSource } from "./card";
+import { firstChangedCell, revisionFacts } from "./facts";
 import {
   holdDeprecations,
   promotionDraft,
@@ -116,7 +113,13 @@ interface Routed {
   /** The card's words and its PRD's, for the draft and any redraft. */
   text: string;
   channel: string;
+  /** The first Contributor Team Members maps to Slack: whom the section's
+   *  opener tags for the card, and whom the thread asks. */
   owner: string | null;
+  /** Every Contributor of the Roadmap card: a Slack person, or by name where
+   *  Team Members maps them to nobody. */
+  owners: CardOwner[];
+  /** Every Contributor in Slack, and the lead. */
   confirmers: string[];
   /** The blueprint status the shipped work puts rows at. */
   target: EntityStatus;
@@ -139,14 +142,26 @@ export interface WaitingRevision extends Partial<Pick<Routed, "text" | "target">
   draft: Draft;
   channel: string;
   owner: string | null;
+  /** Every Contributor; absent on a record kept before they were, which
+   *  reads as its one owner (`ownersOf`). */
+  owners?: CardOwner[];
   confirmers: string[];
   /** The matched path's key (`MatchedPath.key`); absent on older records. */
   key?: string;
   /** A matched cell, where a redraft's fresh read starts. */
   cellId?: string;
-  /** Set when a morning's carousel had no room: the thread it goes up in
-   *  that morning, and its number there. */
+  /** Where View slice opens: a saved slice citing the path, else the first
+   *  row the revision changes. Absent on older records: today's path. */
+  view?: string;
+  /** A record kept when the carousel's overflow went up in the thread, which
+   *  it no longer does: the next morning hands it over again, unmarked. */
   overflow?: { channel: string; ts: string; date: string; n: number };
+}
+
+/** A waiting revision's owners: its Contributors, or on an older record its
+ *  one owner. */
+export function ownersOf(r: Pick<WaitingRevision, "owner" | "owners">): CardOwner[] {
+  return r.owners ?? (r.owner ? [{ slack: r.owner }] : []);
 }
 
 /** What the job keeps between runs (one KV record). */
@@ -196,8 +211,16 @@ export interface ShippedDeps {
    *  without them, every card drafts. */
   proposals?: Pick<ProposalRecords, "byCard">;
   provider: ModelProvider;
-  /** The card owner's Slack id: its first Contributor, when one is found. */
-  ownerOf(card: ShippedCard): Promise<string | null>;
+  /** The card's Contributors, `MAX_OWNERS` at most: each a Slack person
+   *  where Team Members maps them, else by name. */
+  ownersOf(card: ShippedCard): Promise<CardOwner[]>;
+  /** Where View slice opens. Without it, a card opens today's path. */
+  views?: {
+    /** A cell's link in the blueprint app. */
+    cell(cellId: string): string | undefined;
+    /** A saved slice citing one of these cells (`SLICE_READ_COST`); null for none. */
+    slice(cellIds: readonly string[]): Promise<string | null>;
+  };
   /** The card's place by the posting ladder; null when none is configured. */
   placeOf(card: ShippedCard): string | null;
   /** The lead's Slack id (`LEAD_USER_ID`), the other confirmer. */
@@ -361,13 +384,23 @@ async function weigh(deps: ShippedDeps, card: ShippedCard, state: Settled): Prom
       state.matched = state.matched.filter((m) => m.source.pageId !== card.pageId);
       state.waiting = state.waiting.filter((w) => w.source.pageId !== card.pageId);
     }
+    let people: CardOwner[] | null = null;
     const route = async (quote: string): Promise<Omit<Routed, "text" | "target"> | string> => {
       const channel = deps.placeOf(card);
       if (!channel) return "no place to post";
-      const owner = await deps.ownerOf(card);
-      const confirmers = [...new Set([owner, deps.leadId].filter((id): id is string => !!id))];
+      // Every Contributor confirms, and the lead always does; one with no
+      // Slack person is named on the card, not tagged.
+      people ??= await deps.ownersOf(card);
+      const inSlack = people.flatMap((o) => ("slack" in o ? [o.slack] : []));
+      const confirmers = [...new Set([...inSlack, deps.leadId].filter((id): id is string => !!id))];
       if (!confirmers.length) return "nobody to confirm";
-      return { source: { pageId: card.pageId, url: card.url, title: card.title, number: card.number, status, quote }, channel, owner, confirmers };
+      return {
+        source: { pageId: card.pageId, url: card.url, title: card.title, number: card.number, status, quote },
+        channel,
+        owner: inSlack[0] ?? null,
+        owners: people,
+        confirmers,
+      };
     };
 
     // A card linked to a drawn proposal moves the proposal on, and drafts nothing.
@@ -377,7 +410,16 @@ async function weigh(deps: ShippedDeps, card: ShippedCard, state: Settled): Prom
       for (const l of linked) {
         const routed = await route("");
         if (typeof routed === "string") return routed;
-        promoted.push({ ...routed, today: l.today, draft: l.draft, key: `${weighedKey(card.pageId, card.stage)}|${l.key}`, cellId: l.cellId, target });
+        const view = cellView(deps, l.today, l.draft);
+        promoted.push({
+          ...routed,
+          today: l.today,
+          draft: l.draft,
+          key: `${weighedKey(card.pageId, card.stage)}|${l.key}`,
+          cellId: l.cellId,
+          target,
+          ...(view ? { view } : {}),
+        });
       }
       return promoted.length ? { paths: [], promoted } : "its linked proposal is already there";
     }
@@ -408,6 +450,7 @@ async function weigh(deps: ShippedDeps, card: ShippedCard, state: Settled): Prom
       }
       const routed = await route(p.quote);
       if (typeof routed === "string") return routed;
+      const view = cellView(deps, today, draft);
       promoted.push({
         ...routed,
         today,
@@ -415,6 +458,7 @@ async function weigh(deps: ShippedDeps, card: ShippedCard, state: Settled): Prom
         key: `${weighedKey(card.pageId, card.stage)}|${revisionTitle(today)}`,
         cellId: p.cellId,
         target,
+        ...(view ? { view } : {}),
         ...(words !== null ? { text: words.slice(0, MAX_KEPT_TEXT) } : {}),
       });
     }
@@ -546,6 +590,26 @@ export async function draftMatched(deps: ShippedDeps, opts: RunOpts = {}): Promi
   };
 }
 
+/** View slice on the first row the revision changes, by its cell's link;
+ *  undefined where it changes none yet on the blueprint, or with no link. */
+function cellView(deps: Pick<ShippedDeps, "views">, today: PathToday, draft: Draft): string | undefined {
+  const cell = firstChangedCell(today, draft);
+  return cell ? deps.views?.cell(cell) : undefined;
+}
+
+/** View slice for a drafted path: a saved slice citing it, when one does
+ *  (one read), else the first changed row. A failed read is no slice. */
+async function sliceView(deps: Pick<ShippedDeps, "views">, today: PathToday, draft: Draft): Promise<string | undefined> {
+  if (!deps.views || !today.cells.length) return cellView(deps, today, draft);
+  try {
+    return (await deps.views.slice(today.cells.map((c) => c.id))) ?? cellView(deps, today, draft);
+  } catch (err) {
+    rethrowIfBudget(err);
+    console.warn(`[blueprint-upkeep] ${revisionTitle(today)}: slice read failed: ${err instanceof Error ? err.message : String(err)}`);
+    return cellView(deps, today, draft);
+  }
+}
+
 /** One queued path drafted: its revision, and a hand-off's record for its deploy. */
 async function draftPath(deps: ShippedDeps, m: MatchedPath): Promise<{ revision: WaitingRevision; planned?: PlannedRows } | string> {
   try {
@@ -555,7 +619,8 @@ async function draftPath(deps: ShippedDeps, m: MatchedPath): Promise<{ revision:
     const held = drafted && m.stage === "designed" ? holdDeprecations(drafted) : { draft: drafted, deprecate: [] };
     if (!held.draft) return "no writable draft";
     const { stage: _stage, label: _label, ...routed } = m;
-    const revision: WaitingRevision = { ...routed, today, draft: held.draft };
+    const view = await sliceView(deps, today, held.draft);
+    const revision: WaitingRevision = { ...routed, today, draft: held.draft, ...(view ? { view } : {}) };
     if (m.stage !== "designed") return { revision };
     const rows = held.draft.revision.rows.map(({ stepId, laneId }) => ({ stepId, laneId }));
     return { revision, planned: { pageId: m.source.pageId, cellId: m.cellId, quote: m.source.quote, rows, deprecate: held.deprecate } };
@@ -628,7 +693,8 @@ export async function handOverRevisions(deps: HandOverDeps, opts: { dryRun?: boo
   const state = settled(await deps.state.read());
   if (!state.waiting.length) return { summary: "no revisions waiting" };
   if (opts.dryRun || !deps.handOff) return { summary: `would hand ${state.waiting.length} revision card(s) to the morning post` };
-  // An earlier morning's overflow that never went up starts again at the top.
+  // A record marked for a thread overflow, which no longer runs, starts again
+  // at the top.
   const waiting = state.waiting.map(({ overflow: _gone, ...r }) => r);
   if (state.waiting.some((w) => w.overflow)) await deps.state.write({ ...state, waiting });
   const byPlace = new Map<string, WaitingRevision[]>();
@@ -639,7 +705,8 @@ export async function handOverRevisions(deps: HandOverDeps, opts: { dryRun?: boo
 
 /** One revision card in a thread, as a reply there finds it. */
 export interface RevisionThreadCard {
-  /** Its number in the thread. */
+  /** Its place in the report, which an older reply named it by. A reply now
+   *  names its path. */
   n: number;
   /** The proposal it is staged as now. */
   proposalKey: string;
@@ -681,10 +748,11 @@ export interface SectionDeps {
 }
 
 /**
- * The revisions as a section of a place's one morning message: one card each,
- * each staged as its own proposal once the message is up. The cards the
- * carousel had no room for are said as waiting in the thread, and marked to
- * go up there after the sweep's post (`postOverflow`).
+ * The revisions as a section of a place's one morning message: one card each
+ * in the place's one carousel, each staged as its own proposal once the
+ * message is up. Past the carousel's ten, the shared card's rule: the opener
+ * says how many wait, and what did not show stays waiting for the next
+ * morning.
  *
  * @param deps - The store, the staging, the thread record and the thread's line
  * @param handOff - The morning run's hand-off
@@ -698,10 +766,12 @@ export function revisionSection(deps: SectionDeps, handOff: SectionHandOff<Revis
     handOff,
     cardsOf(value) {
       return {
-        cards: value.revisions.map((r, i) => ({ person: r.owner, item: revisionItem(r.source, r.today, r.draft, r, i + 1) })),
+        cards: value.revisions.map((r) => ({
+          person: r.owner,
+          item: revisionItem(r.source, r.today, r.draft, { owners: ownersOf(r), confirmers: r.confirmers }, r.view),
+        })),
         ttlMs: REVISION_CARD_TTL_MS,
-        overflowInThread: true,
-        says: (ids) => revisionParent(ids.length),
+        says: (ids) => revisionSays(value.revisions.filter((r) => ids.includes(idOf(r))).map((r) => r.source)),
         // The gap ask in the thread; each card's staging.
         cost: (shown) => ({ subrequests: 1, d1Queries: shown.length * STAGING_D1_QUERIES }),
       };
@@ -729,24 +799,16 @@ export function revisionSection(deps: SectionDeps, handOff: SectionHandOff<Revis
           await progress.mark(id, false);
         }
       }
-      if (staged.size) {
-        await recordCards(deps.threads, place.channel, thread, [...staged.values()], deps.now() + REVISION_CARD_TTL_MS);
-        if (!progress.done.has(GAP_ASK_MARK)) {
-          const ask = gapAskText([...staged.values()].map((c) => askOf(c)));
-          if (ask) await deps.post(place.channel, thread, ask);
-          await progress.mark(GAP_ASK_MARK, true);
-        }
+      if (!staged.size) return;
+      await recordCards(deps.threads, place.channel, thread, [...staged.values()], deps.now() + REVISION_CARD_TTL_MS);
+      if (!progress.done.has(GAP_ASK_MARK)) {
+        const ask = gapAskText([...staged.values()].map((c) => askOf(c)));
+        if (ask) await deps.post(place.channel, thread, ask);
+        await progress.mark(GAP_ASK_MARK, true);
       }
-      // What did not show waits in the thread, numbered as the opener counted it.
-      const overflow = new Map(numbered.filter(({ r }) => !shown.includes(idOf(r))).map(({ r, n }) => [keyOf(r), n]));
-      if (!staged.size && !overflow.size) return;
+      // What showed is staged; what did not stays waiting for the next morning.
       const state = settled(await deps.state.read());
-      await deps.state.write({
-        ...state,
-        waiting: state.waiting
-          .filter((w) => !staged.has(keyOf(w)))
-          .map((w) => (overflow.has(keyOf(w)) ? { ...w, overflow: { channel: place.channel, ts: thread, date, n: overflow.get(keyOf(w))! } } : w)),
-      });
+      await deps.state.write({ ...state, waiting: state.waiting.filter((w) => !staged.has(keyOf(w))) });
     },
     async notPosted(_value, _place, why) {
       console.error(`[blueprint-upkeep] the morning message did not carry the revisions (${why}) — kept for tomorrow`);
@@ -760,76 +822,7 @@ const STAGING_D1_QUERIES = 3;
 /** What a staged card's gap ask says. */
 function askOf(c: RevisionThreadCard): Parameters<typeof gapAskText>[0][number] {
   const r = c.revision;
-  return { n: c.n, label: revisionTitle(r.today), gaps: r.draft.gaps, who: r.owner ?? r.confirmers[0] ?? null };
-}
-
-export interface OverflowDeps {
-  state: Store<UpkeepState>;
-  /** Post a report in a thread and keep its record; its message's ts. */
-  postReport(channel: string, threadTs: string, report: DecisionReport, ttlMs: number): Promise<string>;
-  stage(proposal: PendingProposal): Promise<void>;
-  threads: RevisionThreads;
-  post(channel: string, threadTs: string, text: string): Promise<void>;
-  /** D1 queries the alarm has left; unbounded when absent. */
-  meter?: { headroom(): { d1Queries: number } };
-  date: string;
-  now(): number;
-}
-
-/**
- * The morning's cards that had no room on their place's carousel, up in that
- * message's thread as one more report of at most ten — after the sweep's
- * post, on an alarm of its own. Past ten more, the rest wait for the next
- * morning, and the thread report says so.
- *
- * @param deps - The store, the thread's post and the staging
- * @param opts - `dryRun` posts nothing
- */
-export async function postOverflow(deps: OverflowDeps, opts: { dryRun?: boolean } = {}): Promise<{ summary: string }> {
-  const state = settled(await deps.state.read());
-  const due = state.waiting.filter((w) => w.overflow?.date === deps.date);
-  if (!due.length) return { summary: "no revisions waiting in a thread" };
-  if (opts.dryRun) return { summary: `would put ${due.length} revision card(s) in their morning thread` };
-  const byThread = new Map<string, WaitingRevision[]>();
-  for (const w of due) byThread.set(`${w.overflow!.channel}:${w.overflow!.ts}`, [...(byThread.get(`${w.overflow!.channel}:${w.overflow!.ts}`) ?? []), w]);
-  const posted = new Set<string>();
-  const held = new Set<string>();
-  let threads = 0;
-  try {
-    for (const group of byThread.values()) {
-      const { channel, ts } = group[0]!.overflow!;
-      const shown = group.slice(0, MAX_REPORT_ITEMS);
-      if ((deps.meter?.headroom().d1Queries ?? Infinity) < shown.length * STAGING_D1_QUERIES + 2) break;
-      const items = group.map((r) => revisionItem(r.source, r.today, r.draft, r, r.overflow!.n));
-      const report = decisionReport(items, overflowParent(group.length), { channel });
-      const messageTs = await deps.postReport(channel, ts, report, REVISION_CARD_TTL_MS);
-      threads += 1;
-      const cards: RevisionThreadCard[] = [];
-      for (const r of shown) {
-        const id = revisionItemId(r.source, r.today);
-        try {
-          await deps.stage(stagedRevision(channel, messageTs, r, { threadTs: ts }));
-          posted.add(keyOf(r));
-          cards.push({ n: r.overflow!.n, proposalKey: itemProposal(messageTs, id).proposalTs, messageTs, itemId: id, revision: r });
-        } catch (err) {
-          rethrowIfBudget(err);
-          console.error(`[blueprint-upkeep] ${r.source.title} posted in the thread but not staged: ${err instanceof Error ? err.message : String(err)}`);
-        }
-      }
-      for (const r of group.slice(MAX_REPORT_ITEMS)) held.add(keyOf(r));
-      await recordCards(deps.threads, channel, ts, cards, deps.now() + REVISION_CARD_TTL_MS);
-      const ask = gapAskText(cards.map(askOf));
-      if (ask) await deps.post(channel, ts, ask);
-    }
-  } finally {
-    if (posted.size || held.size) {
-      await deps.state.write({
-        ...state,
-        waiting: state.waiting.filter((w) => !posted.has(keyOf(w))).map((w) => (held.has(keyOf(w)) ? (({ overflow: _o, ...r }) => r)(w) : w)),
-      });
-    }
-  }
-  return { summary: `put ${posted.size} revision card(s) in ${threads} morning thread(s)${held.size ? `; ${held.size} wait for the next morning` : ""}` };
+  return { label: revisionTitle(r.today), gaps: r.draft.gaps, who: r.owner ?? r.confirmers[0] ?? null };
 }
 
 /**
@@ -846,13 +839,18 @@ export async function replanRows(state: Store<UpkeepState>, record: PlannedRows)
   await state.write({ ...s, planned: [...others, record].slice(-PLANNED_KEPT) });
 }
 
-/** A revision card's line for a turn that would revise it: its thread revises it. */
+/** A revision card's line for a turn that would revise it: its Review, or its thread. */
 export const REVISION_REDRAFT_POINTER =
-  "To change this blueprint revision, someone who can approve it replies in this thread with what's wrong, starting with the revision's number when there are several — uno-bot redrafts it in its place.";
+  "To change this blueprint revision, choose Needs changes in its Review, or reply in this thread naming its path — uno-bot redrafts it in its place.";
+
+/** What Review's pop-up says once Needs changes sends a revision back (§ A6). */
+export const REVISION_SENT_BACK =
+  "Sent back with your note. I'm redrafting the rows from it. The new draft replaces this one on the same card; nothing is written until it's approved.";
 
 /**
  * One revision's card as ThreadState stages it: one item of its report, whose
- * one operation is `blueprint_revise`, confirmed by exactly the people named.
+ * one operation is `blueprint_revise`, confirmed by exactly the people named,
+ * with its facts for the Review pop-up (`./facts.ts`).
  *
  * @param channel - Where the report posted
  * @param messageTs - The report's message
@@ -879,8 +877,10 @@ export function stagedRevision(
     // Nobody asked: the Worker staged it.
     requesterUserId: "",
     ttlMs: opts.ttlMs ?? REVISION_CARD_TTL_MS,
-    // Its thread redrafts it (`./revise.ts`), never a turn.
+    // Its Review or its thread redrafts it (`./revise.ts`), never a turn.
     refuseRevision: REVISION_REDRAFT_POINTER,
+    afterNeedsChanges: REVISION_SENT_BACK,
+    facts: revisionFacts({ source: r.source, today: r.today, draft: r.draft, owners: ownersOf(r), ...(r.view ? { view: r.view } : {}) }),
     stated: {
       cancelled: "Rejected, nothing written to the blueprint",
       expired: "That card closed with no decision, so nothing was written to the blueprint.",

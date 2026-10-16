@@ -140,7 +140,7 @@ test("the probe dry-runs the named run's jobs", async () => {
   const body = report.body as { ok: boolean; run: string; planned: unknown[]; jobs: { key: string; outcome: string; subrequests: number }[] };
   assert.equal(body.ok, true);
   assert.equal(body.run, "morning");
-  assert.equal(body.planned.length, 13);
+  assert.equal(body.planned.length, 12);
   assert.deepEqual(body.jobs.map((j) => [j.key, j.outcome, j.subrequests]), [
     ["commitment-nudge", "handled", 0],
     ["ds-precedence-post", "handled", 0],
@@ -155,8 +155,6 @@ test("the probe dry-runs the named run's jobs", async () => {
     ["blueprint-revision-post", "handled", 0],
     ["blueprint-proposal-offer", "handled", 0],
     ["sweep-post", "handled", 0],
-    // No HARNESS_KV bound: nothing to put in a thread.
-    ["blueprint-revision-thread", "handled", 0],
     // No blueprint configured: no removal offered, nothing spent.
     // No Notion key: the roster read refuses before spending anything.
     ["team-roles-sync", "handled", 0],
