@@ -53,6 +53,7 @@ const SortControl = ({
         >
             <Select
                 aria-label="Sort by"
+                clearable={false}
                 size="small"
                 options={sortOptions}
                 value={sortBy}
@@ -61,6 +62,7 @@ const SortControl = ({
             />
             <Select
                 aria-label="Order"
+                clearable={false}
                 size="small"
                 options={orders}
                 value={sortOrder}

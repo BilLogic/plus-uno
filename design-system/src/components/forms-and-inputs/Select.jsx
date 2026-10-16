@@ -61,6 +61,7 @@ const Select = ({
     required = false,
     invalid = false,
     commitOnClose = false,
+    clearable,
     selectAll = false,
     maxSelections,
     dependsOn,
@@ -76,6 +77,8 @@ const Select = ({
     ...props
 }) => {
     const multi = mode === 'multi';
+    // A required single pick cannot be emptied; multi and optional fields can.
+    const canClear = clearable ?? (multi || !required);
     const fieldId = useFieldId(id);
     const listId = `${fieldId}-listbox`;
     const labelId = label ? `${fieldId}-label` : undefined;
@@ -298,7 +301,7 @@ const Select = ({
                 openList();
                 return;
             }
-            if (event.key === 'Delete' && hasValue && !typing) {
+            if (event.key === 'Delete' && canClear && hasValue && !typing) {
                 event.preventDefault();
                 clear();
             }
@@ -312,7 +315,7 @@ const Select = ({
             removeValue(current[current.length - 1]);
             return;
         }
-        if (event.key === 'Delete' && hasValue && !typing) {
+        if (event.key === 'Delete' && canClear && hasValue && !typing) {
             event.preventDefault();
             clear();
             return;
@@ -470,7 +473,7 @@ const Select = ({
 
     const trailing = (
         <>
-            {hasValue && live && (
+            {canClear && hasValue && live && (
                 <button
                     type="button"
                     className="plus-select-clear"
@@ -635,6 +638,12 @@ Select.propTypes = {
     invalid: PropTypes.bool,
     /** Multi mode: `onChange` fires once when the list closes, as a filter bar wants, not on each pick. */
     commitOnClose: PropTypes.bool,
+    /**
+     * Shows the clear × (Figma `_Field Clear`), and lets Delete empty the field.
+     * Defaults to true in multi mode and to `!required` in single mode; a sort
+     * passes `false`.
+     */
+    clearable: PropTypes.bool,
     /** Multi mode: a "Select all" button over the list, hidden past 50 matches. */
     selectAll: PropTypes.bool,
     /** Multi mode: the most values; past it the other rows are disabled and the list says why. */

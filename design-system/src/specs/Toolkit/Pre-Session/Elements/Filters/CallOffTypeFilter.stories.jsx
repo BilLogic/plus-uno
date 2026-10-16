@@ -26,6 +26,7 @@ const FilterWrapper = ({ label = 'Call-Off Type', value, defaultValue = 'this_we
     <div style={{ width: '240px' }}>
         <Select
             label={label}
+            clearable={false}
             options={filterOptions}
             value={value}
             defaultValue={defaultValue}

@@ -125,6 +125,7 @@ const GroupTrainingProgressPage = ({
                         {/* One group at a time, or all: a single Select. */}
                         <Select
                             aria-label="Group"
+                            clearable={false}
                             size="small"
                             options={groupOptions}
                             value={onGroupFilterChange ? selectedGroup : undefined}

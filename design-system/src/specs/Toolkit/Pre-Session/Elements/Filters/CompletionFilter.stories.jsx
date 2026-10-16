@@ -31,6 +31,7 @@ export const CompletionFilter = ({
 }) => (
     <FilterSelect
         aria-label="Completion"
+        clearable={false}
         options={options}
         value={value}
         defaultValue={defaultValue}

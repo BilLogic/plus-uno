@@ -80,6 +80,7 @@ export const SortingOptions = ({
         <div className="d-flex align-items-center" style={{ gap: 'var(--size-element-gap-sm)' }}>
             <Select
                 aria-label="Sort by"
+                clearable={false}
                 size="small"
                 options={sortOptions}
                 value={sort}
@@ -89,6 +90,7 @@ export const SortingOptions = ({
             />
             <Select
                 aria-label="Order"
+                clearable={false}
                 size="small"
                 options={SORT_CONFIG[sort].orders.map(({ id, label }) => ({ value: id, label }))}
                 value={order}

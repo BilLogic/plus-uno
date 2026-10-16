@@ -38,6 +38,7 @@ export const TimeframeFilter = ({ value, defaultValue = 'this_week', onChange, o
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)' }}>
             <FilterSelect
                 aria-label="Timeframe"
+                clearable={false}
                 options={timeframeOptions}
                 value={timeframe}
                 onChange={handleChange}

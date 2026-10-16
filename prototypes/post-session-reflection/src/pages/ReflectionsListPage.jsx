@@ -111,6 +111,7 @@ export default function ReflectionsListPage() {
                         <h5 className="h5 m-0" style={{ color: 'var(--color-on-surface)' }}>Your reflections</h5>
                         <FilterSelect
                             aria-label="Completion"
+                            clearable={false}
                             options={COMPLETION_OPTIONS}
                             value={completionFilter}
                             onChange={setCompletionFilter}

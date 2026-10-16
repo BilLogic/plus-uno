@@ -97,7 +97,7 @@ Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity 
 
 | Figma Variable | PLUS CSS Token | Notes |
 |----------------|----------------|-------|
-| Min Heights/listbox | `var(--layout-min-height-listbox)` | 140 at every breakpoint; the shortest an option list draws |
+| Min Heights/listbox | `var(--layout-min-height-listbox)` | 140 at every breakpoint. Code does not apply it: a list is as tall as its rows, so a short list has no empty band |
 | Max Heights/listbox | `var(--layout-max-height-listbox)` | 300 at every breakpoint, about eight rows; the body scrolls past it |
 | Min Heights/card-body | `var(--layout-min-height-card-body)` | 20 / 30 / 40 at MD / LG / XL |
 | Min Heights/modal-body | `var(--layout-min-height-modal-body)` | 40 / 50 / 60 at MD / LG / XL |

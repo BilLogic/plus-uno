@@ -72,6 +72,11 @@ export default {
             control: 'boolean',
             table: { category: 'Behavior' }
         },
+        clearable: {
+            control: 'boolean',
+            description: 'Shows the clear ×. Unset, it is on in multi mode and `!required` in single mode.',
+            table: { category: 'Behavior' }
+        },
         selectAll: {
             control: 'boolean',
             table: { category: 'Behavior' }

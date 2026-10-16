@@ -107,6 +107,7 @@ const ExportSearchFilterBar = ({
                 {sortOptions.length > 0 && (
                     <FilterSelect
                         aria-label="Sort"
+                        clearable={false}
                         options={sortOptions}
                         value={onSort ? (sortBy ?? sortOptions[0].value) : undefined}
                         defaultValue={sortBy ?? sortOptions[0].value}

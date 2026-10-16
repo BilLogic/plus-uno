@@ -17,8 +17,8 @@ import './OnboardingOverviewPage.scss';
 const OnboardingOverviewPage = ({
     featuredModules = [],
     allModules = [],
-    sortBy = 'Name',
-    sortOrder = 'A-Z',
+    sortBy = 'name',
+    sortOrder = 'az',
     onSortChange,
     onModuleClick,
     onCtaClick,
@@ -150,10 +150,9 @@ const OnboardingOverviewPage = ({
                             <h2 className="h4" style={{ margin: 0 }}>All Modules</h2>
                         </div>
                         <SortingDropdown
-                            status={false}
                             sortBy={sortBy}
                             sortOrder={sortOrder}
-                            onSortChange={onSortChange}
+                            onChange={onSortChange}
                         />
                     </div>
 
@@ -191,11 +190,11 @@ OnboardingOverviewPage.propTypes = {
         stage: PropTypes.string,
         ctaState: PropTypes.string,
     })),
-    /** Current sort field */
+    /** Sort by id: name, duration or progress */
     sortBy: PropTypes.string,
-    /** Current sort order */
+    /** Order id, one of the sort's orders */
     sortOrder: PropTypes.string,
-    /** Callback when sort changes */
+    /** `({ sortBy, sortOrder })` when the sort changes */
     onSortChange: PropTypes.func,
     /** Callback when module is clicked */
     onModuleClick: PropTypes.func,

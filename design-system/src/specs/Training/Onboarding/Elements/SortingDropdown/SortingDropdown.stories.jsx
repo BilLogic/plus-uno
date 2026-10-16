@@ -1,14 +1,13 @@
 /**
  * SortingDropdown - Training Onboarding Element
- * 
- * Dropdown button with open/closed states for sorting.
+ *
+ * Sort for the onboarding modules: what to sort by, and in which order.
  * Matches Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=74-121969
  */
 
 import React, { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import SortingDropdown from './SortingDropdown';
-import './SortingDropdown.scss';
-import '../DropdownListOptions/DropdownListOptions.scss';
 
 export default {
     title: 'Specs/Training/Onboarding/Elements/Sorting Dropdown',
@@ -17,37 +16,24 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'Dropdown button with open/closed states for sorting. When clicked, shows the DropdownListOptions menu. Includes click-outside handling to close the dropdown.'
+                component: 'Sort for the onboarding modules: two single Selects, Sort by (Name, Duration, Progress) and Order. The orders on offer follow the sort, and neither field can be cleared.'
             }
         }
     },
     argTypes: {
-        isOpen: {
-            control: 'boolean',
-            description: 'Whether dropdown is open',
-            table: { category: 'State' }
-        },
-        sortType: {
+        sortBy: {
             control: { type: 'select' },
             options: ['name', 'duration', 'progress'],
-            description: 'Sort type',
+            description: 'Sort by id',
             table: { category: 'Content' }
         },
-        label: {
+        sortOrder: {
             control: 'text',
-            description: 'Button label',
+            description: 'Order id, one of the sort\'s orders',
             table: { category: 'Content' }
         },
-        onToggle: {
-            action: 'toggled',
-            table: { category: 'Events' }
-        },
-        onSortChange: {
-            action: 'sortChanged',
-            table: { category: 'Events' }
-        },
-        onOrderChange: {
-            action: 'orderChanged',
+        onChange: {
+            action: 'changed',
             table: { category: 'Events' }
         }
     }
@@ -55,27 +41,14 @@ export default {
 
 /**
  * Overview
- * Shows both closed and open states matching Figma design
+ * Each sort with its first order
  */
 export const Overview = {
     render: () => (
-        <div style={{ 
-            padding: 'var(--size-section-pad-y-lg, 24px)',
-            backgroundColor: 'var(--color-surface)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--size-section-gap-lg, 32px)',
-            minHeight: '400px'
-        }}>
-            <section>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Closed State</h6>
-                <SortingDropdown isOpen={false} label="Name" sortType="name" />
-            </section>
-
-            <section>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Open State</h6>
-                <SortingDropdown isOpen={true} label="Name" sortType="name" onToggle={() => {}} />
-            </section>
+        <div style={{ padding: 'var(--size-section-pad-y-lg)', display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
+            <SortingDropdown sortBy="name" sortOrder="az" />
+            <SortingDropdown sortBy="duration" sortOrder="shortest-first" />
+            <SortingDropdown sortBy="progress" sortOrder="completed-first" />
         </div>
     )
 };
@@ -86,34 +59,41 @@ export const Overview = {
  */
 export const Interactive = {
     render: (args) => {
-        const [isOpen, setIsOpen] = useState(args.isOpen);
-        const [sortType, setSortType] = useState(args.sortType);
-        const [label, setLabel] = useState(args.label);
-
-        const handleSortChange = (newSort) => {
-            setSortType(newSort);
-            setLabel(newSort.charAt(0).toUpperCase() + newSort.slice(1));
-        };
+        const [sort, setSort] = useState({ sortBy: args.sortBy, sortOrder: args.sortOrder });
 
         return (
-            <div style={{ 
-                padding: 'var(--size-section-pad-y-lg, 24px)', 
-                backgroundColor: 'var(--color-surface)',
-                minHeight: '350px'
-            }}>
-                <SortingDropdown 
-                    isOpen={isOpen}
-                    sortType={sortType}
-                    label={label}
-                    onToggle={setIsOpen}
-                    onSortChange={handleSortChange}
+            <div style={{ padding: 'var(--size-section-pad-y-lg)', minHeight: '320px' }}>
+                <p className="body2-txt" style={{ marginBottom: 'var(--size-element-gap-lg)' }}>
+                    Sorted by: <strong data-testid="applied">{`${sort.sortBy} ${sort.sortOrder}`}</strong>
+                </p>
+                <SortingDropdown
+                    sortBy={sort.sortBy}
+                    sortOrder={sort.sortOrder}
+                    onChange={(next) => {
+                        setSort(next);
+                        if (args.onChange) args.onChange(next);
+                    }}
                 />
             </div>
         );
     },
     args: {
-        isOpen: false,
-        sortType: 'name',
-        label: 'Name'
+        sortBy: 'name',
+        sortOrder: 'az'
     }
+};
+
+Interactive.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(document.body);
+    const applied = canvas.getByTestId('applied');
+
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Sort by' }));
+    await userEvent.click(await page.findByRole('option', { name: 'Duration' }));
+    await expect(applied).toHaveTextContent('duration shortest-first');
+
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Order' }));
+    await userEvent.click(await page.findByRole('option', { name: 'Longest First' }));
+    await expect(applied).toHaveTextContent('duration longest-first');
+    await expect(canvas.queryByRole('button', { name: /^Clear/ })).toBeNull();
 };

@@ -42,6 +42,7 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 | `required` | bool | `false` | Shows an asterisk on the label and sets `aria-required`. |
 | `invalid` | bool | `false` | Draws the error border; `caption` becomes the announced error. |
 | `commitOnClose` | bool | `false` | Multi mode: `onChange` fires once when the list closes, as a filter bar wants, not on each pick. |
+| `clearable` | bool | — | Shows the clear ×. Unset, it is on in multi mode and `!required` in single mode. |
 | `selectAll` | bool | `false` | Multi mode: a "Select all" button over the list, hidden past 50 matches. |
 | `maxSelections` | number | — | Multi mode: the most values; past it the other rows are disabled and the list says why. |
 | `dependsOn` | shape or arrayOf or string | — | The field this one depends on: `{ value, label }`. Until `value` is set the field is disabled with "Choose {label} first"; when it changes, this field clears. |

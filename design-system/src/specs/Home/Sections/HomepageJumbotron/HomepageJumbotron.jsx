@@ -39,11 +39,11 @@ const HomepageJumbotron = ({
         }
     };
 
-    // Get selected session info for ButtonContainer
-    const selectedSessionData = sessionLinks.find(s => s.id === selectedSession);
-    const sessionInfo = selectedSessionData 
-        ? `${selectedSessionData.studentName}, ${selectedSessionData.time}, ${selectedSessionData.date}`
-        : 'Select a session';
+    // Today's session links, as the options ButtonContainer's Select offers
+    const sessionOptions = sessionLinks.map((s) => ({
+        value: s.id,
+        label: `${s.studentName}, ${s.time}, ${s.date}`,
+    }));
     
     const isSessionEnabled = !!selectedSession && sessionLinks.length > 0;
 
@@ -130,7 +130,8 @@ const HomepageJumbotron = ({
                         <ButtonContainer
                             enabled={isSessionEnabled}
                             buttonText="Join session"
-                            sessionInfo={sessionInfo}
+                            sessions={sessionOptions}
+                            selectedSession={selectedSession}
                             message="Session links will appear 5 minutes before your scheduled start time."
                             messageType="warning"
                             onButtonClick={onJoinSession}

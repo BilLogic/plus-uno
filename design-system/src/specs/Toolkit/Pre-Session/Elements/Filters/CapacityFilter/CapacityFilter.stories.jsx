@@ -25,6 +25,7 @@ const capacityOptions = [
 export const CapacityFilter = ({ value, defaultValue = 'not-filled', onChange, open }) => (
     <FilterSelect
         aria-label="Capacity"
+        clearable={false}
         options={capacityOptions}
         value={value}
         defaultValue={defaultValue}
