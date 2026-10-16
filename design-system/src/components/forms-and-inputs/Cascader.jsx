@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useCallback, useState, useEffect, useRef, useMemo } from 'react';
 import useFieldId from './useFieldId';
 import PropTypes from 'prop-types';
 import Field from './_internal/Field';
@@ -51,7 +51,8 @@ const Cascader = ({
     const wrapperRef = useRef(null);
     const inputRef = useRef(null);
     const menuRef = useRef(null);
-    const place = useAnchoredPopup({ open: isOpen, anchorRef: wrapperRef, popupRef: menuRef });
+    const close = useCallback(() => setIsOpen(false), []);
+    const place = useAnchoredPopup({ open: isOpen, anchorRef: wrapperRef, popupRef: menuRef, onClose: close });
     /**
      * #323. Where the keyboard cursor is: which column, and which row of it.
      * The options are real elements, so focus moves between them with a roving
@@ -66,20 +67,6 @@ const Cascader = ({
     useEffect(() => {
         setSelectedPath(value || []);
     }, [value]);
-
-    // Close dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-                setIsOpen(false);
-            }
-        };
-
-        if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-            return () => document.removeEventListener('mousedown', handleClickOutside);
-        }
-    }, [isOpen]);
 
     // Get display text for input field
     const displayText = useMemo(() => {

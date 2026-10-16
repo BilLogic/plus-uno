@@ -138,7 +138,8 @@ const TreeSelect = ({
     const wrapperRef = useRef(null);
     const inputRef = useRef(null);
     const menuRef = useRef(null);
-    const place = useAnchoredPopup({ open: isOpen, anchorRef: wrapperRef, popupRef: menuRef });
+    const close = useCallback(() => setIsOpen(false), []);
+    const place = useAnchoredPopup({ open: isOpen, anchorRef: wrapperRef, popupRef: menuRef, onClose: close });
     /**
      * #323. Focus moves between real elements rather than through
      * `aria-activedescendant`: every treeitem is in the DOM already, so a
@@ -161,20 +162,6 @@ const TreeSelect = ({
         () => visibleNodeList(options, expandedValues),
         [options, expandedValues],
     );
-
-    // Close the panel when clicking outside the component.
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-                setIsOpen(false);
-            }
-        };
-
-        if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-            return () => document.removeEventListener('mousedown', handleClickOutside);
-        }
-    }, [isOpen]);
 
     // When opening, reveal the branches that contain the current selection.
     useEffect(() => {

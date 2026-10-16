@@ -208,3 +208,35 @@ CascaderColumnsPassTheCap.play = async ({ canvasElement }) => {
     await expect(popup.width, 'at least the field').toBeGreaterThanOrEqual(field.width);
     await expect(popup.width, 'columns pass the cap').toBeGreaterThan(POPUP_MAX_WIDTH);
 };
+
+/* --------------------------------------------------------- outside press */
+
+/** A press inside the popup keeps it open; a press outside the field and popup closes it. */
+const expectOutsidePressCloses = async (canvasElement, kind, inside) => {
+    await openPopup(canvasElement, kind);
+    await userEvent.click(inside(within(canvasElement)));
+    await expect(document.querySelector(SURFACE[kind]), 'a press inside keeps it open').not.toBeNull();
+    await userEvent.click(within(canvasElement).getByText('Outside the field'));
+    await waitFor(() => expect(document.querySelector(SURFACE[kind]), 'a press outside closes it').toBeNull());
+};
+
+const WithOutside = ({ children }) => (
+    <AtTop>
+        {children}
+        <p>Outside the field</p>
+    </AtTop>
+);
+
+export const TreeSelectClosesOnAnOutsidePress = () => <WithOutside><TreeSelect options={TREE} /></WithOutside>;
+TreeSelectClosesOnAnOutsidePress.play = async ({ canvasElement }) => expectOutsidePressCloses(
+    canvasElement,
+    'treeSelect',
+    (canvas) => canvas.getByRole('treeitem', { name: /Mathematics/ }).querySelector('.plus-option-row-toggle'),
+);
+
+export const CascaderClosesOnAnOutsidePress = () => <WithOutside><Cascader options={CASCADE} /></WithOutside>;
+CascaderClosesOnAnOutsidePress.play = async ({ canvasElement }) => expectOutsidePressCloses(
+    canvasElement,
+    'cascader',
+    (canvas) => canvas.getByRole('option', { name: /Mathematics/ }),
+);
