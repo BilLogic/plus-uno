@@ -4781,16 +4781,19 @@ are real, so those links open the right board.
 - **A modal's `header` is plain text too**, so the status change cannot sit
   in it as code. The header is `scenario › path`; the line under it says the
   status change with `live` as a code element.
-- **A modal takes no `table`.** The diff is three `rich_text` groups, each
-  under an emoji and a bold count ("➕ Added · 2 rows", "✏️ Changed · 1 row",
-  "➖ Deprecated · 1 row"). Each row reads `step (lane) content`, the lane in
-  code style. A changed row shows its old text struck through in a quote,
-  and a deprecated row is struck through in place. The proposal's
-  today-beside-proposed view is `section` `fields`, which Slack lays out in
-  two columns and stacks on a phone, today first.
-- **The inline comparison is in a message**, which does take a table, so it
-  is a three-column Markdown table in the reply's `markdown` block
-  (`docs/connectors/slack/overview.md` § Tables work).
+- **One comparison, one section.** Every surface that compares today with a
+  change draws one section per `step`, never one grid of every step. The
+  step is a bold line. Under it come that step's rows today, then what changes
+  in that step only, and a `divider` closes the step. A modal takes no
+  `table` anyway. In the revision, a step's changes sit under the plain bold
+  labels **Added**, **Changed** and **Deprecated**, with no leading emoji.
+  Each row reads `` `lane` content `` (the step is already the heading). A
+  changed row shows its old text struck through, and a deprecated row is
+  struck through in place. The proposal's step reads *Today*, then
+  *Proposed*. The inline comparison uses the same per-step shape in
+  Markdown, so it needs no table.
+- **No leading emoji** on any blueprint card or pop-up line (§ Revisions
+  after Bill's review).
 
 ### Variant A: the blueprint revision
 
@@ -4802,12 +4805,11 @@ What changes:
   Roadmap card is the third button, labelled with its RM-ID, beside View
   slice.
 - The subtitle leads with the owner's tag, as every open card's does, then
-  `` `RM-2567` deployed · rows go in as `live` ``.
-- The body says what changes and how much ("2 added · 1 changed · 1
-  deprecated") and how many questions wait for the owner, in 200 characters.
+  `` `RM-2567` deployed · `live` ``.
+- The body says what changes and how much ("2 added, 1 changed, 1
+  deprecated · 2 questions"), in 200 characters.
 - The opener is the section's line for its one owner, where Slack notifies:
-  "@Suraj, `RM-2567` is deployed, so a `path` in the service blueprint needs
-  a revision."
+  "@Suraj, `RM-2567` is deployed: 1 blueprint `path` to revise."
 
 **Before: Revision card in the morning sweep** · 2 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%2C%20a%20Roadmap%20card%20shipped.%20Review%20the%20blueprint%20revision.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fwww.google.com%2Fs2%2Ffavicons%3Fdomain%3Dnotion.so%26sz%3D64%22%2C%22alt_text%22%3A%22Notion%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Transactional%20email%20%E2%80%94%202a%20call-off%20submitted%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20from%20the%20Roadmap%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Blueprint%20revision%3A%20Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%20(live)%20Why%20now%3A%20RM-2567%20reached%20Dev%20Status%3A%20Deployed.%20%5C%22Confirm%20a%20one-time%20or%20recurring%20call-off%20after%20the%20request%20is%20saved.%5C%22%20(from%20the%20card)%20Tod%E2%80%A6%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab1%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b1%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Open%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%5D%7D)
 
@@ -4868,7 +4870,7 @@ What changes:
 
 </details>
 
-**After: Revision card in the morning sweep** · 2 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%2C%20%60RM-2567%60%20is%20deployed%2C%20so%20a%20%60path%60%20in%20the%20service%20blueprint%20needs%20a%20revision.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20rows%20go%20in%20as%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Adds%20the%20call-off%20received%20email%20to%20Files%20call-off.%202%20added%20%C2%B7%201%20changed%20%C2%B7%201%20deprecated.%202%20questions%20for%20the%20owner.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab1%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b1%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%5D%7D)
+**After: Revision card in the morning sweep** · 2 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%2C%20%60RM-2567%60%20is%20deployed%3A%201%20blueprint%20%60path%60%20to%20revise.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Adds%20the%20call-off%20received%20email%20at%20Files%20call-off.%202%20added%2C%201%20changed%2C%201%20deprecated%20%C2%B7%202%20questions.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab1%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b1%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -4879,7 +4881,7 @@ What changes:
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "<@U0SURAJ001>, `RM-2567` is deployed, so a `path` in the service blueprint needs a revision."
+        "text": "<@U0SURAJ001>, `RM-2567` is deployed: 1 blueprint `path` to revise."
       }
     },
     {
@@ -4895,11 +4897,11 @@ What changes:
       },
       "subtitle": {
         "type": "mrkdwn",
-        "text": "<@U0SURAJ001> · `RM-2567` deployed · rows go in as `live`"
+        "text": "<@U0SURAJ001> · `RM-2567` deployed · `live`"
       },
       "body": {
         "type": "plain_text",
-        "text": "Adds the call-off received email to Files call-off. 2 added · 1 changed · 1 deprecated. 2 questions for the owner."
+        "text": "Adds the call-off received email at Files call-off. 2 added, 1 changed, 1 deprecated · 2 questions."
       },
       "actions": [
         {
@@ -5046,7 +5048,7 @@ are placeholders, there only to fill the carousel.
 
 </details>
 
-**After: Revision carousel, several paths** · 2 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%2C%20%60RM-2567%60%20is%20deployed%2C%20so%202%20%60path%60s%20in%20the%20service%20blueprint%20need%20a%20revision.%22%7D%7D%2C%7B%22type%22%3A%22carousel%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20rows%20go%20in%20as%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Adds%20the%20call-off%20received%20email%20to%20Files%20call-off.%202%20added%20%C2%B7%201%20changed%20%C2%B7%201%20deprecated.%202%20questions%20for%20the%20owner.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab1%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b1%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%20Under%2012%20hours%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20rows%20go%20in%20as%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Adds%20the%20pending-review%20email%20to%20Files%20late%20call-off.%201%20added%20%C2%B7%201%20changed.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab2%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b2%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%5D%7D%5D%7D)
+**After: Revision carousel, several paths** · 2 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%2C%20%60RM-2567%60%20is%20deployed%3A%202%20blueprint%20%60path%60s%20to%20revise.%22%7D%7D%2C%7B%22type%22%3A%22carousel%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Adds%20the%20call-off%20received%20email%20at%20Files%20call-off.%202%20added%2C%201%20changed%2C%201%20deprecated%20%C2%B7%202%20questions.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab1%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b1%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%20Under%2012%20hours%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Adds%20the%20pending-review%20email%20at%20Files%20late%20call-off.%201%20added%2C%201%20changed.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab2%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b2%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%5D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -5057,7 +5059,7 @@ are placeholders, there only to fill the carousel.
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "<@U0SURAJ001>, `RM-2567` is deployed, so 2 `path`s in the service blueprint need a revision."
+        "text": "<@U0SURAJ001>, `RM-2567` is deployed: 2 blueprint `path`s to revise."
       }
     },
     {
@@ -5076,11 +5078,11 @@ are placeholders, there only to fill the carousel.
           },
           "subtitle": {
             "type": "mrkdwn",
-            "text": "<@U0SURAJ001> · `RM-2567` deployed · rows go in as `live`"
+            "text": "<@U0SURAJ001> · `RM-2567` deployed · `live`"
           },
           "body": {
             "type": "plain_text",
-            "text": "Adds the call-off received email to Files call-off. 2 added · 1 changed · 1 deprecated. 2 questions for the owner."
+            "text": "Adds the call-off received email at Files call-off. 2 added, 1 changed, 1 deprecated · 2 questions."
           },
           "actions": [
             {
@@ -5123,11 +5125,11 @@ are placeholders, there only to fill the carousel.
           },
           "subtitle": {
             "type": "mrkdwn",
-            "text": "<@U0SURAJ001> · `RM-2567` deployed · rows go in as `live`"
+            "text": "<@U0SURAJ001> · `RM-2567` deployed · `live`"
           },
           "body": {
             "type": "plain_text",
-            "text": "Adds the pending-review email to Files late call-off. 1 added · 1 changed."
+            "text": "Adds the pending-review email at Files late call-off. 1 added, 1 changed."
           },
           "actions": [
             {
@@ -5167,7 +5169,7 @@ are placeholders, there only to fill the carousel.
 
 **Before: Revision carousel at the cap** · none: today's code has no such card, so nothing renders.
 
-**After: Revision carousel at the cap** · 2 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%2C%20%60RM-2567%60%20is%20deployed%2C%20so%2013%20%60path%60s%20in%20the%20service%20blueprint%20need%20a%20revision.%20Showing%2010%20of%2013%3B%20the%20rest%20come%20in%20the%20next%20report.%22%7D%7D%2C%7B%22type%22%3A%22carousel%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20rows%20go%20in%20as%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Adds%20the%20call-off%20received%20email%20to%20Files%20call-off.%202%20added%20%C2%B7%201%20changed%20%C2%B7%201%20deprecated.%202%20questions%20for%20the%20owner.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab1%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b1%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%20Under%2012%20hours%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20rows%20go%20in%20as%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Adds%20the%20pending-review%20email%20to%20Files%20late%20call-off.%201%20added%20%C2%B7%201%20changed.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab2%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b2%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20scenario%20%E2%80%BA%20path%203%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20rows%20go%20in%20as%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20revision%20for%20the%20cap%20check.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab3%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b3%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20scenario%20%E2%80%BA%20path%204%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20rows%20go%20in%20as%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20revision%20for%20the%20cap%20check.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab4%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b4%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20scenario%20%E2%80%BA%20path%205%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20rows%20go%20in%20as%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20revision%20for%20the%20cap%20check.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab5%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b5%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20scenario%20%E2%80%BA%20path%206%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20rows%20go%20in%20as%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20revision%20for%20the%20cap%20check.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab6%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b6%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20scenario%20%E2%80%BA%20path%207%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20rows%20go%20in%20as%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20revision%20for%20the%20cap%20check.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab7%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b7%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20scenario%20%E2%80%BA%20path%208%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20rows%20go%20in%20as%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20revision%20for%20the%20cap%20check.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab8%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b8%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20scenario%20%E2%80%BA%20path%209%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20rows%20go%20in%20as%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20revision%20for%20the%20cap%20check.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab9%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b9%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20scenario%20%E2%80%BA%20path%2010%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20rows%20go%20in%20as%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20revision%20for%20the%20cap%20check.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab10%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b10%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%5D%7D%5D%7D)
+**After: Revision carousel at the cap** · 2 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%2C%20%60RM-2567%60%20is%20deployed%3A%2013%20blueprint%20%60path%60s%20to%20revise.%20Showing%2010%20of%2013%3B%20the%20rest%20come%20in%20the%20next%20report.%22%7D%7D%2C%7B%22type%22%3A%22carousel%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Adds%20the%20call-off%20received%20email%20at%20Files%20call-off.%202%20added%2C%201%20changed%2C%201%20deprecated%20%C2%B7%202%20questions.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab1%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b1%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%20Under%2012%20hours%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Adds%20the%20pending-review%20email%20at%20Files%20late%20call-off.%201%20added%2C%201%20changed.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab2%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b2%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20scenario%20%E2%80%BA%20path%203%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20revision%20for%20the%20cap%20check.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab3%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b3%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20scenario%20%E2%80%BA%20path%204%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20revision%20for%20the%20cap%20check.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab4%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b4%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20scenario%20%E2%80%BA%20path%205%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20revision%20for%20the%20cap%20check.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab5%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b5%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20scenario%20%E2%80%BA%20path%206%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20revision%20for%20the%20cap%20check.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab6%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b6%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20scenario%20%E2%80%BA%20path%207%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20revision%20for%20the%20cap%20check.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab7%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b7%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20scenario%20%E2%80%BA%20path%208%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20revision%20for%20the%20cap%20check.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab8%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b8%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20scenario%20%E2%80%BA%20path%209%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20revision%20for%20the%20cap%20check.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab9%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b9%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20scenario%20%E2%80%BA%20path%2010%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%20%C2%B7%20%60RM-2567%60%20deployed%20%C2%B7%20%60live%60%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sample%20revision%20for%20the%20cap%20check.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab10%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b10%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Db0000000-0000-4000-8000-000000180303%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%5D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -5178,7 +5180,7 @@ are placeholders, there only to fill the carousel.
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "<@U0SURAJ001>, `RM-2567` is deployed, so 13 `path`s in the service blueprint need a revision. Showing 10 of 13; the rest come in the next report."
+        "text": "<@U0SURAJ001>, `RM-2567` is deployed: 13 blueprint `path`s to revise. Showing 10 of 13; the rest come in the next report."
       }
     },
     {
@@ -5197,11 +5199,11 @@ are placeholders, there only to fill the carousel.
           },
           "subtitle": {
             "type": "mrkdwn",
-            "text": "<@U0SURAJ001> · `RM-2567` deployed · rows go in as `live`"
+            "text": "<@U0SURAJ001> · `RM-2567` deployed · `live`"
           },
           "body": {
             "type": "plain_text",
-            "text": "Adds the call-off received email to Files call-off. 2 added · 1 changed · 1 deprecated. 2 questions for the owner."
+            "text": "Adds the call-off received email at Files call-off. 2 added, 1 changed, 1 deprecated · 2 questions."
           },
           "actions": [
             {
@@ -5244,11 +5246,11 @@ are placeholders, there only to fill the carousel.
           },
           "subtitle": {
             "type": "mrkdwn",
-            "text": "<@U0SURAJ001> · `RM-2567` deployed · rows go in as `live`"
+            "text": "<@U0SURAJ001> · `RM-2567` deployed · `live`"
           },
           "body": {
             "type": "plain_text",
-            "text": "Adds the pending-review email to Files late call-off. 1 added · 1 changed."
+            "text": "Adds the pending-review email at Files late call-off. 1 added, 1 changed."
           },
           "actions": [
             {
@@ -5291,7 +5293,7 @@ are placeholders, there only to fill the carousel.
           },
           "subtitle": {
             "type": "mrkdwn",
-            "text": "<@U0SURAJ001> · `RM-2567` deployed · rows go in as `live`"
+            "text": "<@U0SURAJ001> · `RM-2567` deployed · `live`"
           },
           "body": {
             "type": "plain_text",
@@ -5338,7 +5340,7 @@ are placeholders, there only to fill the carousel.
           },
           "subtitle": {
             "type": "mrkdwn",
-            "text": "<@U0SURAJ001> · `RM-2567` deployed · rows go in as `live`"
+            "text": "<@U0SURAJ001> · `RM-2567` deployed · `live`"
           },
           "body": {
             "type": "plain_text",
@@ -5385,7 +5387,7 @@ are placeholders, there only to fill the carousel.
           },
           "subtitle": {
             "type": "mrkdwn",
-            "text": "<@U0SURAJ001> · `RM-2567` deployed · rows go in as `live`"
+            "text": "<@U0SURAJ001> · `RM-2567` deployed · `live`"
           },
           "body": {
             "type": "plain_text",
@@ -5432,7 +5434,7 @@ are placeholders, there only to fill the carousel.
           },
           "subtitle": {
             "type": "mrkdwn",
-            "text": "<@U0SURAJ001> · `RM-2567` deployed · rows go in as `live`"
+            "text": "<@U0SURAJ001> · `RM-2567` deployed · `live`"
           },
           "body": {
             "type": "plain_text",
@@ -5479,7 +5481,7 @@ are placeholders, there only to fill the carousel.
           },
           "subtitle": {
             "type": "mrkdwn",
-            "text": "<@U0SURAJ001> · `RM-2567` deployed · rows go in as `live`"
+            "text": "<@U0SURAJ001> · `RM-2567` deployed · `live`"
           },
           "body": {
             "type": "plain_text",
@@ -5526,7 +5528,7 @@ are placeholders, there only to fill the carousel.
           },
           "subtitle": {
             "type": "mrkdwn",
-            "text": "<@U0SURAJ001> · `RM-2567` deployed · rows go in as `live`"
+            "text": "<@U0SURAJ001> · `RM-2567` deployed · `live`"
           },
           "body": {
             "type": "plain_text",
@@ -5573,7 +5575,7 @@ are placeholders, there only to fill the carousel.
           },
           "subtitle": {
             "type": "mrkdwn",
-            "text": "<@U0SURAJ001> · `RM-2567` deployed · rows go in as `live`"
+            "text": "<@U0SURAJ001> · `RM-2567` deployed · `live`"
           },
           "body": {
             "type": "plain_text",
@@ -5620,7 +5622,7 @@ are placeholders, there only to fill the carousel.
           },
           "subtitle": {
             "type": "mrkdwn",
-            "text": "<@U0SURAJ001> · `RM-2567` deployed · rows go in as `live`"
+            "text": "<@U0SURAJ001> · `RM-2567` deployed · `live`"
           },
           "body": {
             "type": "plain_text",
@@ -5667,36 +5669,39 @@ are placeholders, there only to fill the carousel.
 Top to bottom:
 
 1. **`header`**: "Call-off Request › 12+ hours ahead".
-2. **Where and what changes.** A rich text line: the scenario as a link into
-   the blueprint app, "its main route", then "New rows go in as `live`: 2
-   added, 1 changed, 1 deprecated". A promotion reads "`planned` → `live`"
-   here instead.
+2. **Where and what changes.** One rich text line: "Pre-session › Call-off
+   Request" as a link into the blueprint app, then "· main route · written as
+   `live` · 2 added, 1 changed, 1 deprecated". A promotion reads "`planned` →
+   `live`" here instead.
 3. **Why now.** The RM-ID as a link, `Dev Status: Deployed` in code, the
    owner as a pill. Then the one quoted sentence, linked to the card's section
    it came from.
-4. **Alert.** One `warning` for what was not verified. A second, `info`,
-   only when the draft ran on the default tier instead of the grind tier:
-   "Drafted on the default model: the deep one was out of capacity."
-5. **Today.** A `card` for the path ("Today: 12+ hours ahead", "Call-off
-   Request · main route · 17 rows, all live") with **View slice**. Under it,
-   the rows of the steps the revision touches, as `step (lane) content`
-   (§ Decisions for Bill, 5 has the reasoning).
-6. **The diff**, grouped Added, Changed, Deprecated. The new text of every
-   added and changed row is a prefilled input (§ Decisions for Bill, 1).
-   Each label names the step and lane, which stay locked. A deprecated row is
-   a struck-through list item. An inferred one is marked "inferred".
-7. **The owner's questions.** The owner as a pill, then an ordered list of
-   specific questions, with frame words in code. A context line says
-   answering in the thread or in Needs changes' note redrafts the card.
-8. **Who writes it.** A context line: uno-bot's own blueprint identity, each
-   row in the authoring record with its undo.
-9. **The decision.** Approve: "Writes the 4 row changes to the service
-   blueprint now." Needs changes: "I redraft the rows from your note, on this
-   same card." Reject: "Nothing is written to the blueprint." Then the open
-   line naming the owner and Bill.
+4. **Alert.** One `warning`: "2 things unverified and 1 row inferred. The
+   owner is asked below." A second, `info`, only when the draft ran on the
+   default tier instead of the grind tier: "Drafted on the default model; the
+   deep one was out of capacity."
+5. **Today's path.** A `card` ("Today: 12+ hours ahead", "Call-off Request ·
+   main route · 17 rows, all live") with **View slice**.
+6. **One section per changed step**, a `divider` after each. The step in
+   bold, then *Today* and that step's rows as `` `lane` content `` (§
+   Decisions for Bill, 5). Then that step's changes under plain bold labels.
+   **Added** has one prefilled input per row, labelled by its lane.
+   **Changed** has the old text struck through, then a prefilled input, "Lane,
+   new text". **Deprecated** is a struck-through list item, marked
+   "inferred" when it is (§ Decisions for Bill, 1). Step and lane stay
+   locked.
+7. **The owner's questions.** The owner as a pill, "before this is written:",
+   then an ordered list of specific questions, with frame words in code. A
+   context line: "Answer in the thread or in Needs changes' note. Either
+   redrafts this card."
+8. **Who writes it.** "Written by uno-bot's blueprint identity, each row
+   logged with its undo."
+9. **The decision.** Approve: "Writes the 4 changes to the blueprint now."
+   Needs changes: "I redraft the rows from your note, on this card." Reject:
+   "Nothing is written." Then the open line naming the owner and Bill.
 
 The title is "Blueprint revision", the glossary's term, at 18 characters.
-The after has 19 blocks against the before's 6. Only the owner and Bill get
+The after has 23 blocks against the before's 6. Only the owner and Bill get
 inputs and Submit.
 
 **Before: Revision Review pop-up** · 6 blocks · modal surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%20proposal%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22submit%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Submit%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0PLUSDES1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760605200.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*The%20draft*%22%7D%7D%2C%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*Blueprint%20revision%3A%20Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead*%20(%60live%60)%5Cn*Why%20now%3A*%20%3Chttps%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%7CRM-2567%3E%20reached%20%60Dev%20Status%3A%20Deployed%60.%20%5C%22Confirm%20a%20one-time%20or%20recurring%20call-off%20after%20the%20request%20is%20saved.%5C%22%20(%3Chttps%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%7Cfrom%20the%20card%3E)%5Cn*Today%3A*%20%3Chttps%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%7CView%20slice%3E%5Cn%E2%80%A2%20Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%60Regular%20Tutor%60)%3A%20Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session.%5Cn%E2%80%A2%20Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%60Front%20Stage%20Touchpoints%60)%3A%20PLUS%20App%5Cn%E2%80%A2%20Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%60Back%20Stage%20Touchpoints%60)%3A%20Auto-approval%20rules%5Cn%E2%80%A2%20Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%60Back%20Stage%20Actions%60)%3A%20Takes%20no%20action%20on%20auto-approved%20call-offs.%5Cn%E2%80%A2%20Files%20late%20call-off%20(%26lt%3B12h%2C%20immediate%20removal)%20(%60Regular%20Tutor%60)%3A%20If%20it%20is%20less%20than%2012%20hours%20before%20session%2C%20tutor%20emails%20supervisor.%5Cn%E2%80%A2%20Files%20late%20call-off%20(%26lt%3B12h%2C%20immediate%20removal)%20(%60Front%20Stage%20Touchpoints%60)%3A%20Email%5Cn%E2%80%A2%20Files%20late%20call-off%20(%26lt%3B12h%2C%20immediate%20removal)%20(%60Front%20Stage%20Actions%60)%3A%20Tutor%20supervisor%20receives%20email%20request%20for%20shift%20swap.%5Cn*Proposed%3A*%5Cn%E2%80%A2%20Added%3A%20Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%60Front%20Stage%20Actions%60)%3A%20Emails%20the%20tutor%20that%20the%20call-off%20was%20received%20and%20excused.%5Cn%E2%80%A2%20Added%3A%20Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%60Front%20Stage%20Touchpoints%60)%3A%20Call-off%20received%20email%5Cn%E2%80%A2%20Changed%3A%20Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%60Regular%20Tutor%60)%3A%20Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session%20and%20gets%20an%20email%20confirming%20it.%5Cn%E2%80%A2%20Deprecated%3A%20Files%20late%20call-off%20(%26lt%3B12h%2C%20immediate%20removal)%20(%60Regular%20Tutor%60)%3A%20If%20it%20is%20less%20than%2012%20hours%20before%20session%2C%20tutor%20emails%20supervisor.%5Cn*Confidence%20and%20gaps%3A*%202%20things%20not%20verified.%5Cn*The%20ask%3A*%20%3C%40U0SURAJ001%3E%2C%20The%20email%20also%20covers%20recurring%20withdrawals.%20Is%20there%20a%20%60path%60%20for%20them%2C%20or%20should%20those%20cases%20stay%20off%20the%20blueprint%3F%20Step%206%20says%20a%20late%20call-off%20is%20emailed%20to%20a%20supervisor%2C%20but%20the%20%60Under%2012%20hours%60%20%60path%60%20files%20it%20in%20the%20app.%20Retire%20that%20%60cell%60%3F%22%7D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_choice%22%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Decision%22%7D%2C%22element%22%3A%7B%22type%22%3A%22radio_buttons%22%2C%22action_id%22%3A%22uno_review_choice_input%22%2C%22options%22%3A%5B%7B%22value%22%3A%22confirm%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Approve%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Runs%20it%20now.%22%7D%7D%2C%7B%22value%22%3A%22revise%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22I%20redraft%20it%20from%20your%20note%20and%20post%20a%20new%20card.%22%7D%7D%2C%7B%22value%22%3A%22cancel%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Reject%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Nothing%20runs.%22%7D%7D%5D%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_note%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Note%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%3A%20what%20should%20change.%20I%20revise%20the%20draft%20from%20it.%20Reject%3A%20an%20optional%20reason.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22uno_review_note_input%22%2C%22multiline%22%3Atrue%2C%22max_length%22%3A3000%7D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Open%20until%20Fri%209%3A00%20ET%20%C2%B7%20%3C%40U0SURAJ001%3E%20or%20%3C%40U0BILL0001%3E%20can%20decide.%22%7D%5D%7D%5D%7D)
@@ -5819,7 +5824,7 @@ inputs and Submit.
 
 </details>
 
-**After: Revision Review pop-up** · 19 blocks · modal surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Blueprint%20revision%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22submit%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Submit%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0PLUSDES1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760605200.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%22%7D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22In%20the%20service%20blueprint%2C%20%22%7D%2C%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%2C%22text%22%3A%22Pre-session%20%E2%80%BA%20Call-off%20Request%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%2C%20its%20main%20route.%20New%20rows%20go%20in%20as%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22live%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%3A%202%20added%2C%201%20changed%2C%201%20deprecated.%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Why%20now%20%20%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%2C%22text%22%3A%22RM-2567%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20reached%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Dev%20Status%3A%20Deployed%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%C2%B7%20owner%20%22%7D%2C%7B%22type%22%3A%22user%22%2C%22user_id%22%3A%22U0SURAJ001%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_quote%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%E2%80%9CConfirm%20a%20one-time%20or%20recurring%20call-off%20after%20the%20request%20is%20saved.%E2%80%9D%20%22%7D%2C%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%2C%22text%22%3A%22Scope%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22warning%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%222%20things%20I%20couldn't%20verify%2C%20and%201%20row%20is%20inferred%20rather%20than%20from%20the%20card.%20They're%20asked%20of%20the%20owner%20below.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Today%3A%2012%2B%20hours%20ahead%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%C2%B7%20main%20route%20%C2%B7%2017%20rows%2C%20all%20live%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22In%20the%202%20steps%20this%20changes%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22PLUS%20App%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Back%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Auto-approval%20rules%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Back%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Takes%20no%20action%20on%20auto-approved%20call-offs.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20late%20call-off%20(%3C12h%2C%20immediate%20removal)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22If%20it%20is%20less%20than%2012%20hours%20before%20session%2C%20tutor%20emails%20supervisor.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20late%20call-off%20(%3C12h%2C%20immediate%20removal)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Email%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20late%20call-off%20(%3C12h%2C%20immediate%20removal)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Tutor%20supervisor%20receives%20email%20request%20for%20shift%20swap.%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22emoji%22%2C%22name%22%3A%22heavy_plus_sign%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20Added%20%C2%B7%202%20rows%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_field%3A0.rows.added.0.content%22%2C%22optional%22%3Afalse%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20%C2%B7%20Front%20Stage%20Actions%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22The%20cell's%20sentence%20of%20record.%20Its%20step%20and%20lane%20are%20locked%3A%20Needs%20changes%20moves%20a%20row.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22value%22%2C%22multiline%22%3Afalse%2C%22max_length%22%3A3000%2C%22initial_value%22%3A%22Emails%20the%20tutor%20that%20the%20call-off%20was%20received%20and%20excused.%22%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_field%3A0.rows.added.1.content%22%2C%22optional%22%3Afalse%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20%C2%B7%20Front%20Stage%20Touchpoints%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22value%22%2C%22multiline%22%3Afalse%2C%22max_length%22%3A3000%2C%22initial_value%22%3A%22Call-off%20received%20email%22%7D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22emoji%22%2C%22name%22%3A%22pencil2%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20Changed%20%C2%B7%201%20row%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%2C%20today%3A%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_quote%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session.%22%2C%22style%22%3A%7B%22strike%22%3Atrue%7D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_field%3A0.rows.changed.0.content%22%2C%22optional%22%3Afalse%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22New%20text%20%C2%B7%20Regular%20Tutor%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22value%22%2C%22multiline%22%3Afalse%2C%22max_length%22%3A3000%2C%22initial_value%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session%20and%20gets%20an%20email%20confirming%20it.%22%7D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22emoji%22%2C%22name%22%3A%22heavy_minus_sign%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20Deprecated%20%C2%B7%201%20row%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20late%20call-off%20(%3C12h%2C%20immediate%20removal)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22If%20it%20is%20less%20than%2012%20hours%20before%20session%2C%20tutor%20emails%20supervisor.%22%2C%22style%22%3A%7B%22strike%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%20inferred%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22user%22%2C%22user_id%22%3A%22U0SURAJ001%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%2C%20two%20things%20to%20check%20before%20this%20is%20written%3A%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22ordered%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22The%20email%20also%20covers%20recurring%20withdrawals.%20Is%20there%20a%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22path%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20for%20them%2C%20or%20should%20those%20cases%20stay%20off%20the%20blueprint%3F%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Step%206%20says%20a%20late%20call-off%20is%20emailed%20to%20a%20supervisor%2C%20but%20the%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Under%2012%20hours%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22path%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20files%20it%20in%20the%20app.%20Retire%20that%20row%3F%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Answer%20in%20the%20thread%2C%20or%20choose%20Needs%20changes%20with%20the%20answer%20as%20your%20note.%20Either%20redrafts%20this%20card.%22%7D%5D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Written%20through%20uno-bot's%20own%20blueprint%20identity.%20Every%20row%20lands%20in%20the%20authoring%20record%20with%20its%20undo.%22%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_choice%22%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Decision%22%7D%2C%22element%22%3A%7B%22type%22%3A%22radio_buttons%22%2C%22action_id%22%3A%22uno_review_choice_input%22%2C%22options%22%3A%5B%7B%22value%22%3A%22confirm%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Approve%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Writes%20the%204%20row%20changes%20to%20the%20service%20blueprint%20now.%22%7D%7D%2C%7B%22value%22%3A%22revise%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22I%20redraft%20the%20rows%20from%20your%20note%2C%20on%20this%20same%20card.%22%7D%7D%2C%7B%22value%22%3A%22cancel%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Reject%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Nothing%20is%20written%20to%20the%20blueprint.%22%7D%7D%5D%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_note%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Note%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%3A%20what%20should%20change.%20Reject%3A%20an%20optional%20reason.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22uno_review_note_input%22%2C%22multiline%22%3Atrue%2C%22max_length%22%3A3000%7D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Open%20until%20Fri%209%3A00%20ET%20%C2%B7%20%3C%40U0SURAJ001%3E%20or%20%3C%40U0BILL0001%3E%20can%20decide.%22%7D%5D%7D%5D%7D)
+**After: Revision Review pop-up** · 23 blocks · modal surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Blueprint%20revision%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22submit%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Submit%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0PLUSDES1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760605200.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%22%7D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%2C%22text%22%3A%22Pre-session%20%E2%80%BA%20Call-off%20Request%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%C2%B7%20main%20route%20%C2%B7%20written%20as%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22live%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%C2%B7%202%20added%2C%201%20changed%2C%201%20deprecated%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Why%20now%20%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%2C%22text%22%3A%22RM-2567%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Dev%20Status%3A%20Deployed%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%C2%B7%20%22%7D%2C%7B%22type%22%3A%22user%22%2C%22user_id%22%3A%22U0SURAJ001%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_quote%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%E2%80%9CConfirm%20a%20one-time%20or%20recurring%20call-off%20after%20the%20request%20is%20saved.%E2%80%9D%20%22%7D%2C%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%2C%22text%22%3A%22Scope%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22warning%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%222%20things%20unverified%20and%201%20row%20inferred.%20The%20owner%20is%20asked%20below.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Today%3A%2012%2B%20hours%20ahead%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%C2%B7%20main%20route%20%C2%B7%2017%20rows%2C%20all%20live%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Today%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22PLUS%20App%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Back%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Auto-approval%20rules%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Back%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Takes%20no%20action%20on%20auto-approved%20call-offs.%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Added%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_field%3A0.rows.0.added.0.content%22%2C%22optional%22%3Afalse%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Front%20Stage%20Actions%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22The%20cell's%20sentence%20of%20record.%20Step%20and%20lane%20are%20locked%3B%20Needs%20changes%20moves%20a%20row.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22value%22%2C%22multiline%22%3Afalse%2C%22max_length%22%3A3000%2C%22initial_value%22%3A%22Emails%20the%20tutor%20that%20the%20call-off%20was%20received%20and%20excused.%22%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_field%3A0.rows.0.added.1.content%22%2C%22optional%22%3Afalse%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22value%22%2C%22multiline%22%3Afalse%2C%22max_length%22%3A3000%2C%22initial_value%22%3A%22Call-off%20received%20email%22%7D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Changed%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20today%3A%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session.%22%2C%22style%22%3A%7B%22strike%22%3Atrue%7D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_field%3A0.rows.0.changed.0.content%22%2C%22optional%22%3Afalse%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Regular%20Tutor%2C%20new%20text%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22value%22%2C%22multiline%22%3Afalse%2C%22max_length%22%3A3000%2C%22initial_value%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session%20and%20gets%20an%20email%20confirming%20it.%22%7D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20late%20call-off%20(%3C12h%2C%20immediate%20removal)%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Today%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22If%20it%20is%20less%20than%2012%20hours%20before%20session%2C%20tutor%20emails%20supervisor.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Email%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Tutor%20supervisor%20receives%20email%20request%20for%20shift%20swap.%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Deprecated%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22If%20it%20is%20less%20than%2012%20hours%20before%20session%2C%20tutor%20emails%20supervisor.%22%2C%22style%22%3A%7B%22strike%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%20inferred%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22user%22%2C%22user_id%22%3A%22U0SURAJ001%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%2C%20before%20this%20is%20written%3A%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22ordered%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22The%20email%20covers%20recurring%20withdrawals%20too.%20Is%20there%20a%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22path%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20for%20them%2C%20or%20leave%20them%20off%3F%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Step%206%20says%20late%20call-offs%20are%20emailed%20to%20a%20supervisor%3B%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Under%2012%20hours%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20files%20them%20in%20the%20app.%20Retire%20that%20row%3F%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Answer%20in%20the%20thread%20or%20in%20Needs%20changes'%20note.%20Either%20redrafts%20this%20card.%22%7D%5D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Written%20by%20uno-bot's%20blueprint%20identity%2C%20each%20row%20logged%20with%20its%20undo.%22%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_choice%22%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Decision%22%7D%2C%22element%22%3A%7B%22type%22%3A%22radio_buttons%22%2C%22action_id%22%3A%22uno_review_choice_input%22%2C%22options%22%3A%5B%7B%22value%22%3A%22confirm%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Approve%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Writes%20the%204%20changes%20to%20the%20blueprint%20now.%22%7D%7D%2C%7B%22value%22%3A%22revise%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22I%20redraft%20the%20rows%20from%20your%20note%2C%20on%20this%20card.%22%7D%7D%2C%7B%22value%22%3A%22cancel%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Reject%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Nothing%20is%20written.%22%7D%7D%5D%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_note%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Note%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%3A%20what%20should%20change.%20Reject%3A%20an%20optional%20reason.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22uno_review_note_input%22%2C%22multiline%22%3Atrue%2C%22max_length%22%3A3000%7D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Open%20until%20Fri%209%3A00%20ET%20%C2%B7%20%3C%40U0SURAJ001%3E%20or%20%3C%40U0BILL0001%3E%20can%20decide.%22%7D%5D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -5855,17 +5860,13 @@ inputs and Submit.
           "type": "rich_text_section",
           "elements": [
             {
-              "type": "text",
-              "text": "In the service blueprint, "
-            },
-            {
               "type": "link",
               "url": "https://plus-uno.netlify.app/blueprint/?cell=a0000000-0000-4000-8000-000000170203",
               "text": "Pre-session › Call-off Request"
             },
             {
               "type": "text",
-              "text": ", its main route. New rows go in as "
+              "text": " · main route · written as "
             },
             {
               "type": "text",
@@ -5876,7 +5877,7 @@ inputs and Submit.
             },
             {
               "type": "text",
-              "text": ": 2 added, 1 changed, 1 deprecated."
+              "text": " · 2 added, 1 changed, 1 deprecated"
             }
           ]
         }
@@ -5890,7 +5891,7 @@ inputs and Submit.
           "elements": [
             {
               "type": "text",
-              "text": "Why now  ",
+              "text": "Why now ",
               "style": {
                 "bold": true
               }
@@ -5902,7 +5903,7 @@ inputs and Submit.
             },
             {
               "type": "text",
-              "text": " reached "
+              "text": " "
             },
             {
               "type": "text",
@@ -5913,7 +5914,7 @@ inputs and Submit.
             },
             {
               "type": "text",
-              "text": " · owner "
+              "text": " · "
             },
             {
               "type": "user",
@@ -5942,7 +5943,7 @@ inputs and Submit.
       "level": "warning",
       "text": {
         "type": "plain_text",
-        "text": "2 things I couldn't verify, and 1 row is inferred rather than from the card. They're asked of the owner below."
+        "text": "2 things unverified and 1 row inferred. The owner is asked below."
       }
     },
     {
@@ -5968,6 +5969,9 @@ inputs and Submit.
       ]
     },
     {
+      "type": "divider"
+    },
+    {
       "type": "rich_text",
       "elements": [
         {
@@ -5975,9 +5979,21 @@ inputs and Submit.
           "elements": [
             {
               "type": "text",
-              "text": "In the 2 steps this changes",
+              "text": "Files call-off (12h+, auto-approved)",
               "style": {
                 "bold": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Today",
+              "style": {
+                "italic": true
               }
             }
           ]
@@ -5991,10 +6007,6 @@ inputs and Submit.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files call-off (12h+, auto-approved) ("
-                },
-                {
-                  "type": "text",
                   "text": "Regular Tutor",
                   "style": {
                     "code": true
@@ -6002,7 +6014,7 @@ inputs and Submit.
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -6015,10 +6027,6 @@ inputs and Submit.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files call-off (12h+, auto-approved) ("
-                },
-                {
-                  "type": "text",
                   "text": "Front Stage Touchpoints",
                   "style": {
                     "code": true
@@ -6026,7 +6034,7 @@ inputs and Submit.
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -6039,10 +6047,6 @@ inputs and Submit.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files call-off (12h+, auto-approved) ("
-                },
-                {
-                  "type": "text",
                   "text": "Back Stage Touchpoints",
                   "style": {
                     "code": true
@@ -6050,7 +6054,7 @@ inputs and Submit.
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -6063,10 +6067,6 @@ inputs and Submit.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files call-off (12h+, auto-approved) ("
-                },
-                {
-                  "type": "text",
                   "text": "Back Stage Actions",
                   "style": {
                     "code": true
@@ -6074,21 +6074,164 @@ inputs and Submit.
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
                   "text": "Takes no action on auto-approved call-offs."
                 }
               ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "rich_text",
+      "elements": [
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Added",
+              "style": {
+                "bold": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "input",
+      "block_id": "uno_field:0.rows.0.added.0.content",
+      "optional": false,
+      "label": {
+        "type": "plain_text",
+        "text": "Front Stage Actions"
+      },
+      "hint": {
+        "type": "plain_text",
+        "text": "The cell's sentence of record. Step and lane are locked; Needs changes moves a row."
+      },
+      "element": {
+        "type": "plain_text_input",
+        "action_id": "value",
+        "multiline": false,
+        "max_length": 3000,
+        "initial_value": "Emails the tutor that the call-off was received and excused."
+      }
+    },
+    {
+      "type": "input",
+      "block_id": "uno_field:0.rows.0.added.1.content",
+      "optional": false,
+      "label": {
+        "type": "plain_text",
+        "text": "Front Stage Touchpoints"
+      },
+      "element": {
+        "type": "plain_text_input",
+        "action_id": "value",
+        "multiline": false,
+        "max_length": 3000,
+        "initial_value": "Call-off received email"
+      }
+    },
+    {
+      "type": "rich_text",
+      "elements": [
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Changed",
+              "style": {
+                "bold": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Regular Tutor",
+              "style": {
+                "code": true
+              }
             },
+            {
+              "type": "text",
+              "text": " today: "
+            },
+            {
+              "type": "text",
+              "text": "Files a one-time call-off 12 or more hours before the session.",
+              "style": {
+                "strike": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "input",
+      "block_id": "uno_field:0.rows.0.changed.0.content",
+      "optional": false,
+      "label": {
+        "type": "plain_text",
+        "text": "Regular Tutor, new text"
+      },
+      "element": {
+        "type": "plain_text_input",
+        "action_id": "value",
+        "multiline": false,
+        "max_length": 3000,
+        "initial_value": "Files a one-time call-off 12 or more hours before the session and gets an email confirming it."
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "rich_text",
+      "elements": [
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Files late call-off (<12h, immediate removal)",
+              "style": {
+                "bold": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Today",
+              "style": {
+                "italic": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_list",
+          "style": "bullet",
+          "elements": [
             {
               "type": "rich_text_section",
               "elements": [
-                {
-                  "type": "text",
-                  "text": "Files late call-off (<12h, immediate removal) ("
-                },
                 {
                   "type": "text",
                   "text": "Regular Tutor",
@@ -6098,7 +6241,7 @@ inputs and Submit.
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -6111,10 +6254,6 @@ inputs and Submit.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files late call-off (<12h, immediate removal) ("
-                },
-                {
-                  "type": "text",
                   "text": "Front Stage Touchpoints",
                   "style": {
                     "code": true
@@ -6122,7 +6261,7 @@ inputs and Submit.
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -6135,10 +6274,6 @@ inputs and Submit.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files late call-off (<12h, immediate removal) ("
-                },
-                {
-                  "type": "text",
                   "text": "Front Stage Actions",
                   "style": {
                     "code": true
@@ -6146,7 +6281,7 @@ inputs and Submit.
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -6165,138 +6300,8 @@ inputs and Submit.
           "type": "rich_text_section",
           "elements": [
             {
-              "type": "emoji",
-              "name": "heavy_plus_sign"
-            },
-            {
               "type": "text",
-              "text": " Added · 2 rows",
-              "style": {
-                "bold": true
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "input",
-      "block_id": "uno_field:0.rows.added.0.content",
-      "optional": false,
-      "label": {
-        "type": "plain_text",
-        "text": "Files call-off (12h+, auto-approved) · Front Stage Actions"
-      },
-      "hint": {
-        "type": "plain_text",
-        "text": "The cell's sentence of record. Its step and lane are locked: Needs changes moves a row."
-      },
-      "element": {
-        "type": "plain_text_input",
-        "action_id": "value",
-        "multiline": false,
-        "max_length": 3000,
-        "initial_value": "Emails the tutor that the call-off was received and excused."
-      }
-    },
-    {
-      "type": "input",
-      "block_id": "uno_field:0.rows.added.1.content",
-      "optional": false,
-      "label": {
-        "type": "plain_text",
-        "text": "Files call-off (12h+, auto-approved) · Front Stage Touchpoints"
-      },
-      "element": {
-        "type": "plain_text_input",
-        "action_id": "value",
-        "multiline": false,
-        "max_length": 3000,
-        "initial_value": "Call-off received email"
-      }
-    },
-    {
-      "type": "rich_text",
-      "elements": [
-        {
-          "type": "rich_text_section",
-          "elements": [
-            {
-              "type": "emoji",
-              "name": "pencil2"
-            },
-            {
-              "type": "text",
-              "text": " Changed · 1 row",
-              "style": {
-                "bold": true
-              }
-            }
-          ]
-        },
-        {
-          "type": "rich_text_section",
-          "elements": [
-            {
-              "type": "text",
-              "text": "Files call-off (12h+, auto-approved) ("
-            },
-            {
-              "type": "text",
-              "text": "Regular Tutor",
-              "style": {
-                "code": true
-              }
-            },
-            {
-              "type": "text",
-              "text": "), today:"
-            }
-          ]
-        },
-        {
-          "type": "rich_text_quote",
-          "elements": [
-            {
-              "type": "text",
-              "text": "Files a one-time call-off 12 or more hours before the session.",
-              "style": {
-                "strike": true
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "input",
-      "block_id": "uno_field:0.rows.changed.0.content",
-      "optional": false,
-      "label": {
-        "type": "plain_text",
-        "text": "New text · Regular Tutor"
-      },
-      "element": {
-        "type": "plain_text_input",
-        "action_id": "value",
-        "multiline": false,
-        "max_length": 3000,
-        "initial_value": "Files a one-time call-off 12 or more hours before the session and gets an email confirming it."
-      }
-    },
-    {
-      "type": "rich_text",
-      "elements": [
-        {
-          "type": "rich_text_section",
-          "elements": [
-            {
-              "type": "emoji",
-              "name": "heavy_minus_sign"
-            },
-            {
-              "type": "text",
-              "text": " Deprecated · 1 row",
+              "text": "Deprecated",
               "style": {
                 "bold": true
               }
@@ -6312,10 +6317,6 @@ inputs and Submit.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files late call-off (<12h, immediate removal) ("
-                },
-                {
-                  "type": "text",
                   "text": "Regular Tutor",
                   "style": {
                     "code": true
@@ -6323,7 +6324,7 @@ inputs and Submit.
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -6346,6 +6347,9 @@ inputs and Submit.
       ]
     },
     {
+      "type": "divider"
+    },
+    {
       "type": "rich_text",
       "elements": [
         {
@@ -6357,7 +6361,7 @@ inputs and Submit.
             },
             {
               "type": "text",
-              "text": ", two things to check before this is written:"
+              "text": ", before this is written:"
             }
           ]
         },
@@ -6370,7 +6374,7 @@ inputs and Submit.
               "elements": [
                 {
                   "type": "text",
-                  "text": "The email also covers recurring withdrawals. Is there a "
+                  "text": "The email covers recurring withdrawals too. Is there a "
                 },
                 {
                   "type": "text",
@@ -6381,7 +6385,7 @@ inputs and Submit.
                 },
                 {
                   "type": "text",
-                  "text": " for them, or should those cases stay off the blueprint?"
+                  "text": " for them, or leave them off?"
                 }
               ]
             },
@@ -6390,7 +6394,7 @@ inputs and Submit.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Step 6 says a late call-off is emailed to a supervisor, but the "
+                  "text": "Step 6 says late call-offs are emailed to a supervisor; "
                 },
                 {
                   "type": "text",
@@ -6401,18 +6405,7 @@ inputs and Submit.
                 },
                 {
                   "type": "text",
-                  "text": " "
-                },
-                {
-                  "type": "text",
-                  "text": "path",
-                  "style": {
-                    "code": true
-                  }
-                },
-                {
-                  "type": "text",
-                  "text": " files it in the app. Retire that row?"
+                  "text": " files them in the app. Retire that row?"
                 }
               ]
             }
@@ -6425,7 +6418,7 @@ inputs and Submit.
       "elements": [
         {
           "type": "mrkdwn",
-          "text": "Answer in the thread, or choose Needs changes with the answer as your note. Either redrafts this card."
+          "text": "Answer in the thread or in Needs changes' note. Either redrafts this card."
         }
       ]
     },
@@ -6434,7 +6427,7 @@ inputs and Submit.
       "elements": [
         {
           "type": "mrkdwn",
-          "text": "Written through uno-bot's own blueprint identity. Every row lands in the authoring record with its undo."
+          "text": "Written by uno-bot's blueprint identity, each row logged with its undo."
         }
       ]
     },
@@ -6460,7 +6453,7 @@ inputs and Submit.
             },
             "description": {
               "type": "plain_text",
-              "text": "Writes the 4 row changes to the service blueprint now."
+              "text": "Writes the 4 changes to the blueprint now."
             }
           },
           {
@@ -6471,7 +6464,7 @@ inputs and Submit.
             },
             "description": {
               "type": "plain_text",
-              "text": "I redraft the rows from your note, on this same card."
+              "text": "I redraft the rows from your note, on this card."
             }
           },
           {
@@ -6482,7 +6475,7 @@ inputs and Submit.
             },
             "description": {
               "type": "plain_text",
-              "text": "Nothing is written to the blueprint."
+              "text": "Nothing is written."
             }
           }
         ]
@@ -6522,31 +6515,31 @@ inputs and Submit.
 
 </details>
 
-**How a big diff truncates.** Blocks are spent on inputs, so the input count
-is what is capped, not the row count:
+**How a big diff truncates.** Each step costs blocks of its own, so steps
+and inputs are what get capped, not rows:
 
-- Today's rows are one `rich_text` list, one block, however many rows there
-  are. Past 40 items it ends "and N more on the blueprint", as `review-stated`
-  lists do.
-- Each diff group is one `rich_text` block, plus one input per editable row.
-  At most **20 rows are editable in place**, Added first, then Changed. Past
-  that, the rest of a group shows as list items, and Needs changes is how to
-  correct them.
-- A group past 40 items ends "and N more rows in the thread". On staging,
-  the thread gets the whole diff as a Markdown table (`step` · `lane` · today
-  · proposed), which a message renders.
-- That bounds the view at about 60 blocks: 8 for the head, 3 for the groups
-  and their labels, 20 inputs, 4 for the ask, 4 for the decision. `fitBody`
-  never cuts an input, and `modal()` slices at 100, which would drop the
-  decision itself if inputs alone passed it. The cap is what keeps Submit on
-  the view.
+- A step is at most 5 blocks besides its inputs: its today block, the Added
+  and Changed labels, Deprecated, and the divider. Its today list is one
+  block however many rows it has, and past 40 items it ends "and N more on
+  the blueprint", as `review-stated` lists do.
+- At most **12 steps** are drawn. Past that, a context line says "N more
+  steps change; the whole diff is in the thread". On staging, the thread gets
+  the whole diff as Markdown, one block per step as in B1, which a message
+  renders.
+- At most **20 rows are editable in place**, in step order. Past that, a
+  step's remaining Added and Changed rows show as list items, and Needs
+  changes is how to correct them.
+- That bounds the view at 92 blocks: 6 for the head, 60 for 12 steps, 20
+  inputs, 3 for the ask, 4 for the decision. `fitBody` never cuts an input,
+  and `modal()` slices at 100, which would drop the decision itself if the
+  body passed it. The caps are what keep Submit on the view.
 
 #### A4. Read-only
 
 Anyone but the owner or Bill gets the read-only view. The `info` alert comes
 first ("Read-only. Only @Suraj or @Bill can decide this proposal."). The same
-zones follow with the diff as lists, the old text struck through before an
-arrow. There are no inputs, no decision and no Submit. Today's code already
+zones follow, each step one block with its changes as lists, the old text
+struck through before an arrow. There are no inputs, no decision and no Submit. Today's code already
 puts that alert first; the change is everything under it.
 
 **Before: Revision, read-only** · 3 blocks · modal surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%20proposal%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0PLUSDES1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760605200.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22info%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Read-only.%20Only%20%3C%40U0SURAJ001%3E%20or%20%3C%40U0BILL0001%3E%20can%20decide%20this%20proposal.%22%7D%7D%2C%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*The%20draft*%22%7D%7D%2C%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*Blueprint%20revision%3A%20Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead*%20(%60live%60)%5Cn*Why%20now%3A*%20%3Chttps%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%7CRM-2567%3E%20reached%20%60Dev%20Status%3A%20Deployed%60.%20%5C%22Confirm%20a%20one-time%20or%20recurring%20call-off%20after%20the%20request%20is%20saved.%5C%22%20(%3Chttps%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%7Cfrom%20the%20card%3E)%5Cn*Today%3A*%20%3Chttps%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%7CView%20slice%3E%5Cn%E2%80%A2%20Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%60Regular%20Tutor%60)%3A%20Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session.%5Cn%E2%80%A2%20Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%60Front%20Stage%20Touchpoints%60)%3A%20PLUS%20App%5Cn%E2%80%A2%20Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%60Back%20Stage%20Touchpoints%60)%3A%20Auto-approval%20rules%5Cn%E2%80%A2%20Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%60Back%20Stage%20Actions%60)%3A%20Takes%20no%20action%20on%20auto-approved%20call-offs.%5Cn%E2%80%A2%20Files%20late%20call-off%20(%26lt%3B12h%2C%20immediate%20removal)%20(%60Regular%20Tutor%60)%3A%20If%20it%20is%20less%20than%2012%20hours%20before%20session%2C%20tutor%20emails%20supervisor.%5Cn%E2%80%A2%20Files%20late%20call-off%20(%26lt%3B12h%2C%20immediate%20removal)%20(%60Front%20Stage%20Touchpoints%60)%3A%20Email%5Cn%E2%80%A2%20Files%20late%20call-off%20(%26lt%3B12h%2C%20immediate%20removal)%20(%60Front%20Stage%20Actions%60)%3A%20Tutor%20supervisor%20receives%20email%20request%20for%20shift%20swap.%5Cn*Proposed%3A*%5Cn%E2%80%A2%20Added%3A%20Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%60Front%20Stage%20Actions%60)%3A%20Emails%20the%20tutor%20that%20the%20call-off%20was%20received%20and%20excused.%5Cn%E2%80%A2%20Added%3A%20Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%60Front%20Stage%20Touchpoints%60)%3A%20Call-off%20received%20email%5Cn%E2%80%A2%20Changed%3A%20Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%60Regular%20Tutor%60)%3A%20Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session%20and%20gets%20an%20email%20confirming%20it.%5Cn%E2%80%A2%20Deprecated%3A%20Files%20late%20call-off%20(%26lt%3B12h%2C%20immediate%20removal)%20(%60Regular%20Tutor%60)%3A%20If%20it%20is%20less%20than%2012%20hours%20before%20session%2C%20tutor%20emails%20supervisor.%5Cn*Confidence%20and%20gaps%3A*%202%20things%20not%20verified.%5Cn*The%20ask%3A*%20%3C%40U0SURAJ001%3E%2C%20The%20email%20also%20covers%20recurring%20withdrawals.%20Is%20there%20a%20%60path%60%20for%20them%2C%20or%20should%20those%20cases%20stay%20off%20the%20blueprint%3F%20Step%206%20says%20a%20late%20call-off%20is%20emailed%20to%20a%20supervisor%2C%20but%20the%20%60Under%2012%20hours%60%20%60path%60%20files%20it%20in%20the%20app.%20Retire%20that%20%60cell%60%3F%22%7D%7D%5D%7D)
@@ -6595,7 +6588,7 @@ puts that alert first; the change is everything under it.
 
 </details>
 
-**After: Revision, read-only** · 12 blocks · modal surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Blueprint%20revision%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0PLUSDES1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760605200.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22info%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Read-only.%20Only%20%3C%40U0SURAJ001%3E%20or%20%3C%40U0BILL0001%3E%20can%20decide%20this%20proposal.%22%7D%7D%2C%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%22%7D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22In%20the%20service%20blueprint%2C%20%22%7D%2C%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%2C%22text%22%3A%22Pre-session%20%E2%80%BA%20Call-off%20Request%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%2C%20its%20main%20route.%20New%20rows%20go%20in%20as%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22live%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%3A%202%20added%2C%201%20changed%2C%201%20deprecated.%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Why%20now%20%20%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%2C%22text%22%3A%22RM-2567%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20reached%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Dev%20Status%3A%20Deployed%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%C2%B7%20owner%20%22%7D%2C%7B%22type%22%3A%22user%22%2C%22user_id%22%3A%22U0SURAJ001%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_quote%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%E2%80%9CConfirm%20a%20one-time%20or%20recurring%20call-off%20after%20the%20request%20is%20saved.%E2%80%9D%20%22%7D%2C%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%2C%22text%22%3A%22Scope%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22warning%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%222%20things%20I%20couldn't%20verify%2C%20and%201%20row%20is%20inferred%20rather%20than%20from%20the%20card.%20They're%20asked%20of%20the%20owner%20below.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Today%3A%2012%2B%20hours%20ahead%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%C2%B7%20main%20route%20%C2%B7%2017%20rows%2C%20all%20live%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22In%20the%202%20steps%20this%20changes%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22PLUS%20App%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Back%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Auto-approval%20rules%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Back%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Takes%20no%20action%20on%20auto-approved%20call-offs.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20late%20call-off%20(%3C12h%2C%20immediate%20removal)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22If%20it%20is%20less%20than%2012%20hours%20before%20session%2C%20tutor%20emails%20supervisor.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20late%20call-off%20(%3C12h%2C%20immediate%20removal)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Email%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20late%20call-off%20(%3C12h%2C%20immediate%20removal)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Tutor%20supervisor%20receives%20email%20request%20for%20shift%20swap.%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22emoji%22%2C%22name%22%3A%22heavy_plus_sign%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20Added%20%C2%B7%202%20rows%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Emails%20the%20tutor%20that%20the%20call-off%20was%20received%20and%20excused.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Call-off%20received%20email%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22emoji%22%2C%22name%22%3A%22pencil2%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20Changed%20%C2%B7%201%20row%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session.%22%2C%22style%22%3A%7B%22strike%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%E2%86%92%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session%20and%20gets%20an%20email%20confirming%20it.%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22emoji%22%2C%22name%22%3A%22heavy_minus_sign%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20Deprecated%20%C2%B7%201%20row%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20late%20call-off%20(%3C12h%2C%20immediate%20removal)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22If%20it%20is%20less%20than%2012%20hours%20before%20session%2C%20tutor%20emails%20supervisor.%22%2C%22style%22%3A%7B%22strike%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%20inferred%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22user%22%2C%22user_id%22%3A%22U0SURAJ001%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%2C%20two%20things%20to%20check%20before%20this%20is%20written%3A%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22ordered%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22The%20email%20also%20covers%20recurring%20withdrawals.%20Is%20there%20a%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22path%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20for%20them%2C%20or%20should%20those%20cases%20stay%20off%20the%20blueprint%3F%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Step%206%20says%20a%20late%20call-off%20is%20emailed%20to%20a%20supervisor%2C%20but%20the%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Under%2012%20hours%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22path%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20files%20it%20in%20the%20app.%20Retire%20that%20row%3F%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Written%20through%20uno-bot's%20own%20blueprint%20identity.%20Every%20row%20lands%20in%20the%20authoring%20record%20with%20its%20undo.%22%7D%5D%7D%5D%7D)
+**After: Revision, read-only** · 13 blocks · modal surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Blueprint%20revision%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0PLUSDES1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760605200.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22info%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Read-only.%20Only%20%3C%40U0SURAJ001%3E%20or%20%3C%40U0BILL0001%3E%20can%20decide%20this%20proposal.%22%7D%7D%2C%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%22%7D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%2C%22text%22%3A%22Pre-session%20%E2%80%BA%20Call-off%20Request%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%C2%B7%20main%20route%20%C2%B7%20written%20as%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22live%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%C2%B7%202%20added%2C%201%20changed%2C%201%20deprecated%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Why%20now%20%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%2C%22text%22%3A%22RM-2567%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Dev%20Status%3A%20Deployed%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%C2%B7%20%22%7D%2C%7B%22type%22%3A%22user%22%2C%22user_id%22%3A%22U0SURAJ001%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_quote%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%E2%80%9CConfirm%20a%20one-time%20or%20recurring%20call-off%20after%20the%20request%20is%20saved.%E2%80%9D%20%22%7D%2C%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%2C%22text%22%3A%22Scope%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22warning%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%222%20things%20unverified%20and%201%20row%20inferred.%20The%20owner%20is%20asked%20below.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Today%3A%2012%2B%20hours%20ahead%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%C2%B7%20main%20route%20%C2%B7%2017%20rows%2C%20all%20live%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Today%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22PLUS%20App%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Back%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Auto-approval%20rules%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Back%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Takes%20no%20action%20on%20auto-approved%20call-offs.%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Added%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Emails%20the%20tutor%20that%20the%20call-off%20was%20received%20and%20excused.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Call-off%20received%20email%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Changed%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session.%22%2C%22style%22%3A%7B%22strike%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%E2%86%92%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session%20and%20gets%20an%20email%20confirming%20it.%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20late%20call-off%20(%3C12h%2C%20immediate%20removal)%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Today%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22If%20it%20is%20less%20than%2012%20hours%20before%20session%2C%20tutor%20emails%20supervisor.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Email%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Tutor%20supervisor%20receives%20email%20request%20for%20shift%20swap.%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Deprecated%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22If%20it%20is%20less%20than%2012%20hours%20before%20session%2C%20tutor%20emails%20supervisor.%22%2C%22style%22%3A%7B%22strike%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%20inferred%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22user%22%2C%22user_id%22%3A%22U0SURAJ001%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%2C%20before%20this%20is%20written%3A%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22ordered%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22The%20email%20covers%20recurring%20withdrawals%20too.%20Is%20there%20a%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22path%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20for%20them%2C%20or%20leave%20them%20off%3F%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Step%206%20says%20late%20call-offs%20are%20emailed%20to%20a%20supervisor%3B%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Under%2012%20hours%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20files%20them%20in%20the%20app.%20Retire%20that%20row%3F%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Written%20by%20uno-bot's%20blueprint%20identity%2C%20each%20row%20logged%20with%20its%20undo.%22%7D%5D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -6635,17 +6628,13 @@ puts that alert first; the change is everything under it.
           "type": "rich_text_section",
           "elements": [
             {
-              "type": "text",
-              "text": "In the service blueprint, "
-            },
-            {
               "type": "link",
               "url": "https://plus-uno.netlify.app/blueprint/?cell=a0000000-0000-4000-8000-000000170203",
               "text": "Pre-session › Call-off Request"
             },
             {
               "type": "text",
-              "text": ", its main route. New rows go in as "
+              "text": " · main route · written as "
             },
             {
               "type": "text",
@@ -6656,7 +6645,7 @@ puts that alert first; the change is everything under it.
             },
             {
               "type": "text",
-              "text": ": 2 added, 1 changed, 1 deprecated."
+              "text": " · 2 added, 1 changed, 1 deprecated"
             }
           ]
         }
@@ -6670,7 +6659,7 @@ puts that alert first; the change is everything under it.
           "elements": [
             {
               "type": "text",
-              "text": "Why now  ",
+              "text": "Why now ",
               "style": {
                 "bold": true
               }
@@ -6682,7 +6671,7 @@ puts that alert first; the change is everything under it.
             },
             {
               "type": "text",
-              "text": " reached "
+              "text": " "
             },
             {
               "type": "text",
@@ -6693,7 +6682,7 @@ puts that alert first; the change is everything under it.
             },
             {
               "type": "text",
-              "text": " · owner "
+              "text": " · "
             },
             {
               "type": "user",
@@ -6722,7 +6711,7 @@ puts that alert first; the change is everything under it.
       "level": "warning",
       "text": {
         "type": "plain_text",
-        "text": "2 things I couldn't verify, and 1 row is inferred rather than from the card. They're asked of the owner below."
+        "text": "2 things unverified and 1 row inferred. The owner is asked below."
       }
     },
     {
@@ -6748,6 +6737,9 @@ puts that alert first; the change is everything under it.
       ]
     },
     {
+      "type": "divider"
+    },
+    {
       "type": "rich_text",
       "elements": [
         {
@@ -6755,9 +6747,21 @@ puts that alert first; the change is everything under it.
           "elements": [
             {
               "type": "text",
-              "text": "In the 2 steps this changes",
+              "text": "Files call-off (12h+, auto-approved)",
               "style": {
                 "bold": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Today",
+              "style": {
+                "italic": true
               }
             }
           ]
@@ -6771,10 +6775,6 @@ puts that alert first; the change is everything under it.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files call-off (12h+, auto-approved) ("
-                },
-                {
-                  "type": "text",
                   "text": "Regular Tutor",
                   "style": {
                     "code": true
@@ -6782,7 +6782,7 @@ puts that alert first; the change is everything under it.
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -6795,10 +6795,6 @@ puts that alert first; the change is everything under it.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files call-off (12h+, auto-approved) ("
-                },
-                {
-                  "type": "text",
                   "text": "Front Stage Touchpoints",
                   "style": {
                     "code": true
@@ -6806,7 +6802,7 @@ puts that alert first; the change is everything under it.
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -6819,10 +6815,6 @@ puts that alert first; the change is everything under it.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files call-off (12h+, auto-approved) ("
-                },
-                {
-                  "type": "text",
                   "text": "Back Stage Touchpoints",
                   "style": {
                     "code": true
@@ -6830,7 +6822,7 @@ puts that alert first; the change is everything under it.
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -6843,10 +6835,6 @@ puts that alert first; the change is everything under it.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files call-off (12h+, auto-approved) ("
-                },
-                {
-                  "type": "text",
                   "text": "Back Stage Actions",
                   "style": {
                     "code": true
@@ -6854,103 +6842,22 @@ puts that alert first; the change is everything under it.
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
                   "text": "Takes no action on auto-approved call-offs."
                 }
               ]
-            },
-            {
-              "type": "rich_text_section",
-              "elements": [
-                {
-                  "type": "text",
-                  "text": "Files late call-off (<12h, immediate removal) ("
-                },
-                {
-                  "type": "text",
-                  "text": "Regular Tutor",
-                  "style": {
-                    "code": true
-                  }
-                },
-                {
-                  "type": "text",
-                  "text": ") "
-                },
-                {
-                  "type": "text",
-                  "text": "If it is less than 12 hours before session, tutor emails supervisor."
-                }
-              ]
-            },
-            {
-              "type": "rich_text_section",
-              "elements": [
-                {
-                  "type": "text",
-                  "text": "Files late call-off (<12h, immediate removal) ("
-                },
-                {
-                  "type": "text",
-                  "text": "Front Stage Touchpoints",
-                  "style": {
-                    "code": true
-                  }
-                },
-                {
-                  "type": "text",
-                  "text": ") "
-                },
-                {
-                  "type": "text",
-                  "text": "Email"
-                }
-              ]
-            },
-            {
-              "type": "rich_text_section",
-              "elements": [
-                {
-                  "type": "text",
-                  "text": "Files late call-off (<12h, immediate removal) ("
-                },
-                {
-                  "type": "text",
-                  "text": "Front Stage Actions",
-                  "style": {
-                    "code": true
-                  }
-                },
-                {
-                  "type": "text",
-                  "text": ") "
-                },
-                {
-                  "type": "text",
-                  "text": "Tutor supervisor receives email request for shift swap."
-                }
-              ]
             }
           ]
-        }
-      ]
-    },
-    {
-      "type": "rich_text",
-      "elements": [
+        },
         {
           "type": "rich_text_section",
           "elements": [
             {
-              "type": "emoji",
-              "name": "heavy_plus_sign"
-            },
-            {
               "type": "text",
-              "text": " Added · 2 rows",
+              "text": "Added",
               "style": {
                 "bold": true
               }
@@ -6966,10 +6873,6 @@ puts that alert first; the change is everything under it.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files call-off (12h+, auto-approved) ("
-                },
-                {
-                  "type": "text",
                   "text": "Front Stage Actions",
                   "style": {
                     "code": true
@@ -6977,7 +6880,7 @@ puts that alert first; the change is everything under it.
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -6990,10 +6893,6 @@ puts that alert first; the change is everything under it.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files call-off (12h+, auto-approved) ("
-                },
-                {
-                  "type": "text",
                   "text": "Front Stage Touchpoints",
                   "style": {
                     "code": true
@@ -7001,7 +6900,7 @@ puts that alert first; the change is everything under it.
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -7010,22 +6909,13 @@ puts that alert first; the change is everything under it.
               ]
             }
           ]
-        }
-      ]
-    },
-    {
-      "type": "rich_text",
-      "elements": [
+        },
         {
           "type": "rich_text_section",
           "elements": [
             {
-              "type": "emoji",
-              "name": "pencil2"
-            },
-            {
               "type": "text",
-              "text": " Changed · 1 row",
+              "text": "Changed",
               "style": {
                 "bold": true
               }
@@ -7041,10 +6931,6 @@ puts that alert first; the change is everything under it.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files call-off (12h+, auto-approved) ("
-                },
-                {
-                  "type": "text",
                   "text": "Regular Tutor",
                   "style": {
                     "code": true
@@ -7052,7 +6938,7 @@ puts that alert first; the change is everything under it.
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -7076,18 +6962,107 @@ puts that alert first; the change is everything under it.
       ]
     },
     {
+      "type": "divider"
+    },
+    {
       "type": "rich_text",
       "elements": [
         {
           "type": "rich_text_section",
           "elements": [
             {
-              "type": "emoji",
-              "name": "heavy_minus_sign"
-            },
+              "type": "text",
+              "text": "Files late call-off (<12h, immediate removal)",
+              "style": {
+                "bold": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_section",
+          "elements": [
             {
               "type": "text",
-              "text": " Deprecated · 1 row",
+              "text": "Today",
+              "style": {
+                "italic": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_list",
+          "style": "bullet",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Regular Tutor",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "If it is less than 12 hours before session, tutor emails supervisor."
+                }
+              ]
+            },
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Front Stage Touchpoints",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "Email"
+                }
+              ]
+            },
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Front Stage Actions",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "Tutor supervisor receives email request for shift swap."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Deprecated",
               "style": {
                 "bold": true
               }
@@ -7103,10 +7078,6 @@ puts that alert first; the change is everything under it.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files late call-off (<12h, immediate removal) ("
-                },
-                {
-                  "type": "text",
                   "text": "Regular Tutor",
                   "style": {
                     "code": true
@@ -7114,7 +7085,7 @@ puts that alert first; the change is everything under it.
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -7137,6 +7108,9 @@ puts that alert first; the change is everything under it.
       ]
     },
     {
+      "type": "divider"
+    },
+    {
       "type": "rich_text",
       "elements": [
         {
@@ -7148,7 +7122,7 @@ puts that alert first; the change is everything under it.
             },
             {
               "type": "text",
-              "text": ", two things to check before this is written:"
+              "text": ", before this is written:"
             }
           ]
         },
@@ -7161,7 +7135,7 @@ puts that alert first; the change is everything under it.
               "elements": [
                 {
                   "type": "text",
-                  "text": "The email also covers recurring withdrawals. Is there a "
+                  "text": "The email covers recurring withdrawals too. Is there a "
                 },
                 {
                   "type": "text",
@@ -7172,7 +7146,7 @@ puts that alert first; the change is everything under it.
                 },
                 {
                   "type": "text",
-                  "text": " for them, or should those cases stay off the blueprint?"
+                  "text": " for them, or leave them off?"
                 }
               ]
             },
@@ -7181,7 +7155,7 @@ puts that alert first; the change is everything under it.
               "elements": [
                 {
                   "type": "text",
-                  "text": "Step 6 says a late call-off is emailed to a supervisor, but the "
+                  "text": "Step 6 says late call-offs are emailed to a supervisor; "
                 },
                 {
                   "type": "text",
@@ -7192,18 +7166,7 @@ puts that alert first; the change is everything under it.
                 },
                 {
                   "type": "text",
-                  "text": " "
-                },
-                {
-                  "type": "text",
-                  "text": "path",
-                  "style": {
-                    "code": true
-                  }
-                },
-                {
-                  "type": "text",
-                  "text": " files it in the app. Retire that row?"
+                  "text": " files them in the app. Retire that row?"
                 }
               ]
             }
@@ -7216,7 +7179,7 @@ puts that alert first; the change is everything under it.
       "elements": [
         {
           "type": "mrkdwn",
-          "text": "Written through uno-bot's own blueprint identity. Every row lands in the authoring record with its undo."
+          "text": "Written by uno-bot's blueprint identity, each row logged with its undo."
         }
       ]
     }
@@ -7229,7 +7192,7 @@ puts that alert first; the change is everything under it.
 #### A5. Decided, from View
 
 As T4 draws a decided card (§ 2, Decision 5): a `success` alert, "Approved
-by @Bill. 4 row changes written to the service blueprint.", over the content
+by @Bill. 4 changes written to the blueprint.", over the step sections
 read-only, without the where line, the gaps alert and the questions, which
 were about the decision. A closing line says when the identity wrote it and
 that each write has its undo. In the sweep the card turns to "Approved by
@@ -7275,7 +7238,7 @@ that each write has its undo. In the sweep the card turns to "Approved by
 
 </details>
 
-**After: Revision, decided (View)** · 8 blocks · modal surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Blueprint%20revision%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0PLUSDES1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760605200.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22success%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Approved%20by%20%3C%40U0BILL0001%3E.%204%20row%20changes%20written%20to%20the%20service%20blueprint.%22%7D%7D%2C%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%22%7D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Why%20now%20%20%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%2C%22text%22%3A%22RM-2567%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20reached%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Dev%20Status%3A%20Deployed%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%C2%B7%20owner%20%22%7D%2C%7B%22type%22%3A%22user%22%2C%22user_id%22%3A%22U0SURAJ001%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_quote%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%E2%80%9CConfirm%20a%20one-time%20or%20recurring%20call-off%20after%20the%20request%20is%20saved.%E2%80%9D%20%22%7D%2C%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%2C%22text%22%3A%22Scope%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Today%3A%2012%2B%20hours%20ahead%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%C2%B7%20main%20route%20%C2%B7%2017%20rows%2C%20all%20live%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22emoji%22%2C%22name%22%3A%22heavy_plus_sign%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20Added%20%C2%B7%202%20rows%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Emails%20the%20tutor%20that%20the%20call-off%20was%20received%20and%20excused.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Call-off%20received%20email%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22emoji%22%2C%22name%22%3A%22pencil2%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20Changed%20%C2%B7%201%20row%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session.%22%2C%22style%22%3A%7B%22strike%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%E2%86%92%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session%20and%20gets%20an%20email%20confirming%20it.%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22emoji%22%2C%22name%22%3A%22heavy_minus_sign%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20Deprecated%20%C2%B7%201%20row%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20late%20call-off%20(%3C12h%2C%20immediate%20removal)%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22If%20it%20is%20less%20than%2012%20hours%20before%20session%2C%20tutor%20emails%20supervisor.%22%2C%22style%22%3A%7B%22strike%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%20inferred%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Written%20by%20uno-bot's%20blueprint%20identity%20at%209%3A41%20ET.%20Each%20write%20is%20in%20the%20authoring%20record%20with%20its%20undo.%22%7D%5D%7D%5D%7D)
+**After: Revision, decided (View)** · 10 blocks · modal surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Blueprint%20revision%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0PLUSDES1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760605200.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22success%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Approved%20by%20%3C%40U0BILL0001%3E.%204%20changes%20written%20to%20the%20blueprint.%22%7D%7D%2C%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%22%7D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Why%20now%20%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%2C%22text%22%3A%22RM-2567%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Dev%20Status%3A%20Deployed%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%C2%B7%20%22%7D%2C%7B%22type%22%3A%22user%22%2C%22user_id%22%3A%22U0SURAJ001%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_quote%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%E2%80%9CConfirm%20a%20one-time%20or%20recurring%20call-off%20after%20the%20request%20is%20saved.%E2%80%9D%20%22%7D%2C%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%2C%22text%22%3A%22Scope%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Today%3A%2012%2B%20hours%20ahead%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%C2%B7%20main%20route%20%C2%B7%2017%20rows%2C%20all%20live%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20call-off%20(12h%2B%2C%20auto-approved)%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Today%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22PLUS%20App%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Back%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Auto-approval%20rules%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Back%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Takes%20no%20action%20on%20auto-approved%20call-offs.%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Added%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Emails%20the%20tutor%20that%20the%20call-off%20was%20received%20and%20excused.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Call-off%20received%20email%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Changed%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session.%22%2C%22style%22%3A%7B%22strike%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%E2%86%92%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20a%20one-time%20call-off%2012%20or%20more%20hours%20before%20the%20session%20and%20gets%20an%20email%20confirming%20it.%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Files%20late%20call-off%20(%3C12h%2C%20immediate%20removal)%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Today%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22If%20it%20is%20less%20than%2012%20hours%20before%20session%2C%20tutor%20emails%20supervisor.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Email%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Tutor%20supervisor%20receives%20email%20request%20for%20shift%20swap.%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Deprecated%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22If%20it%20is%20less%20than%2012%20hours%20before%20session%2C%20tutor%20emails%20supervisor.%22%2C%22style%22%3A%7B%22strike%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%20inferred%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Written%209%3A41%20ET%20by%20uno-bot's%20blueprint%20identity%2C%20each%20row%20logged%20with%20its%20undo.%22%7D%5D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -7298,7 +7261,7 @@ that each write has its undo. In the sweep the card turns to "Approved by
       "level": "success",
       "text": {
         "type": "mrkdwn",
-        "text": "Approved by <@U0BILL0001>. 4 row changes written to the service blueprint."
+        "text": "Approved by <@U0BILL0001>. 4 changes written to the blueprint."
       }
     },
     {
@@ -7316,7 +7279,7 @@ that each write has its undo. In the sweep the card turns to "Approved by
           "elements": [
             {
               "type": "text",
-              "text": "Why now  ",
+              "text": "Why now ",
               "style": {
                 "bold": true
               }
@@ -7328,7 +7291,7 @@ that each write has its undo. In the sweep the card turns to "Approved by
             },
             {
               "type": "text",
-              "text": " reached "
+              "text": " "
             },
             {
               "type": "text",
@@ -7339,7 +7302,7 @@ that each write has its undo. In the sweep the card turns to "Approved by
             },
             {
               "type": "text",
-              "text": " · owner "
+              "text": " · "
             },
             {
               "type": "user",
@@ -7386,18 +7349,127 @@ that each write has its undo. In the sweep the card turns to "Approved by
       ]
     },
     {
+      "type": "divider"
+    },
+    {
       "type": "rich_text",
       "elements": [
         {
           "type": "rich_text_section",
           "elements": [
             {
-              "type": "emoji",
-              "name": "heavy_plus_sign"
-            },
+              "type": "text",
+              "text": "Files call-off (12h+, auto-approved)",
+              "style": {
+                "bold": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_section",
+          "elements": [
             {
               "type": "text",
-              "text": " Added · 2 rows",
+              "text": "Today",
+              "style": {
+                "italic": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_list",
+          "style": "bullet",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Regular Tutor",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "Files a one-time call-off 12 or more hours before the session."
+                }
+              ]
+            },
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Front Stage Touchpoints",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "PLUS App"
+                }
+              ]
+            },
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Back Stage Touchpoints",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "Auto-approval rules"
+                }
+              ]
+            },
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Back Stage Actions",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "Takes no action on auto-approved call-offs."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Added",
               "style": {
                 "bold": true
               }
@@ -7413,10 +7485,6 @@ that each write has its undo. In the sweep the card turns to "Approved by
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files call-off (12h+, auto-approved) ("
-                },
-                {
-                  "type": "text",
                   "text": "Front Stage Actions",
                   "style": {
                     "code": true
@@ -7424,7 +7492,7 @@ that each write has its undo. In the sweep the card turns to "Approved by
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -7437,10 +7505,6 @@ that each write has its undo. In the sweep the card turns to "Approved by
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files call-off (12h+, auto-approved) ("
-                },
-                {
-                  "type": "text",
                   "text": "Front Stage Touchpoints",
                   "style": {
                     "code": true
@@ -7448,7 +7512,7 @@ that each write has its undo. In the sweep the card turns to "Approved by
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -7457,22 +7521,13 @@ that each write has its undo. In the sweep the card turns to "Approved by
               ]
             }
           ]
-        }
-      ]
-    },
-    {
-      "type": "rich_text",
-      "elements": [
+        },
         {
           "type": "rich_text_section",
           "elements": [
             {
-              "type": "emoji",
-              "name": "pencil2"
-            },
-            {
               "type": "text",
-              "text": " Changed · 1 row",
+              "text": "Changed",
               "style": {
                 "bold": true
               }
@@ -7488,10 +7543,6 @@ that each write has its undo. In the sweep the card turns to "Approved by
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files call-off (12h+, auto-approved) ("
-                },
-                {
-                  "type": "text",
                   "text": "Regular Tutor",
                   "style": {
                     "code": true
@@ -7499,7 +7550,7 @@ that each write has its undo. In the sweep the card turns to "Approved by
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -7523,18 +7574,107 @@ that each write has its undo. In the sweep the card turns to "Approved by
       ]
     },
     {
+      "type": "divider"
+    },
+    {
       "type": "rich_text",
       "elements": [
         {
           "type": "rich_text_section",
           "elements": [
             {
-              "type": "emoji",
-              "name": "heavy_minus_sign"
-            },
+              "type": "text",
+              "text": "Files late call-off (<12h, immediate removal)",
+              "style": {
+                "bold": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_section",
+          "elements": [
             {
               "type": "text",
-              "text": " Deprecated · 1 row",
+              "text": "Today",
+              "style": {
+                "italic": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_list",
+          "style": "bullet",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Regular Tutor",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "If it is less than 12 hours before session, tutor emails supervisor."
+                }
+              ]
+            },
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Front Stage Touchpoints",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "Email"
+                }
+              ]
+            },
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Front Stage Actions",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "Tutor supervisor receives email request for shift swap."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Deprecated",
               "style": {
                 "bold": true
               }
@@ -7550,10 +7690,6 @@ that each write has its undo. In the sweep the card turns to "Approved by
               "elements": [
                 {
                   "type": "text",
-                  "text": "Files late call-off (<12h, immediate removal) ("
-                },
-                {
-                  "type": "text",
                   "text": "Regular Tutor",
                   "style": {
                     "code": true
@@ -7561,7 +7697,7 @@ that each write has its undo. In the sweep the card turns to "Approved by
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -7584,11 +7720,14 @@ that each write has its undo. In the sweep the card turns to "Approved by
       ]
     },
     {
+      "type": "divider"
+    },
+    {
       "type": "context",
       "elements": [
         {
           "type": "mrkdwn",
-          "text": "Written by uno-bot's blueprint identity at 9:41 ET. Each write is in the authoring record with its undo."
+          "text": "Written 9:41 ET by uno-bot's blueprint identity, each row logged with its undo."
         }
       ]
     }
@@ -7600,7 +7739,7 @@ that each write has its undo. In the sweep the card turns to "Approved by
 
 **Before: Decided card in the sweep** · none: today's code has no such card, so nothing renders.
 
-**After: Decided card in the sweep** · 2 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%2C%20%60RM-2567%60%20is%20deployed%2C%20so%20a%20%60path%60%20in%20the%20service%20blueprint%20needs%20a%20revision.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Approved%20by%20%3C%40U0BILL0001%3E%20%C2%B7%20written%209%3A41%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Written%3A%202%20added%20%C2%B7%201%20changed%20%C2%B7%201%20deprecated%2C%20as%20live.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab1%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%22%7D%2C%22value%22%3A%22b1%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%5D%7D)
+**After: Decided card in the sweep** · 2 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%2C%20%60RM-2567%60%20is%20deployed%3A%201%20blueprint%20%60path%60%20to%20revise.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Approved%20by%20%3C%40U0BILL0001%3E%20%C2%B7%20written%209%3A41%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Written%3A%202%20added%2C%201%20changed%2C%201%20deprecated.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab1%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%22%7D%2C%22value%22%3A%22b1%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -7611,7 +7750,7 @@ that each write has its undo. In the sweep the card turns to "Approved by
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "<@U0SURAJ001>, `RM-2567` is deployed, so a `path` in the service blueprint needs a revision."
+        "text": "<@U0SURAJ001>, `RM-2567` is deployed: 1 blueprint `path` to revise."
       }
     },
     {
@@ -7631,7 +7770,7 @@ that each write has its undo. In the sweep the card turns to "Approved by
       },
       "body": {
         "type": "plain_text",
-        "text": "Written: 2 added · 1 changed · 1 deprecated, as live."
+        "text": "Written: 2 added, 1 changed, 1 deprecated."
       },
       "actions": [
         {
@@ -7713,7 +7852,7 @@ redraft replaces it under the same number (`replaceItem`).
 
 </details>
 
-**After: Revision, sent back to redraft** · 2 blocks · modal surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Blueprint%20revision%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0PLUSDES1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760605200.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22info%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sent%20back%20with%20your%20note.%22%7D%7D%2C%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22I'm%20redrafting%20the%20rows%20from%20it.%20The%20new%20draft%20replaces%20this%20one%20on%20the%20same%20card%20in%20the%20morning%20message%2C%20and%20nothing%20is%20written%20until%20it's%20approved.%22%7D%7D%5D%7D)
+**After: Revision, sent back to redraft** · 2 blocks · modal surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Blueprint%20revision%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22C0PLUSDES1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760605200.000100%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22info%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Sent%20back%20with%20your%20note.%22%7D%7D%2C%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22I'm%20redrafting%20the%20rows%20from%20it.%20The%20new%20draft%20replaces%20this%20one%20on%20the%20same%20card%3B%20nothing%20is%20written%20until%20it's%20approved.%22%7D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -7743,7 +7882,7 @@ redraft replaces it under the same number (`replaceItem`).
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "I'm redrafting the rows from it. The new draft replaces this one on the same card in the morning message, and nothing is written until it's approved."
+        "text": "I'm redrafting the rows from it. The new draft replaces this one on the same card; nothing is written until it's approved."
       }
     }
   ]
@@ -7754,7 +7893,7 @@ redraft replaces it under the same number (`replaceItem`).
 
 **Before: Redrafting card in the sweep** · none: today's code has no such card, so nothing renders.
 
-**After: Redrafting card in the sweep** · 2 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%2C%20%60RM-2567%60%20is%20deployed%2C%20so%20a%20%60path%60%20in%20the%20service%20blueprint%20needs%20a%20revision.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Changes%20asked%20by%20%3C%40U0SURAJ001%3E%20%C2%B7%20redrafting%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Adds%20the%20call-off%20received%20email%20to%20Files%20call-off.%202%20added%20%C2%B7%201%20changed%20%C2%B7%201%20deprecated.%202%20questions%20for%20the%20owner.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab1%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b1%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%5D%7D)
+**After: Redrafting card in the sweep** · 2 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3C%40U0SURAJ001%3E%2C%20%60RM-2567%60%20is%20deployed%3A%201%20blueprint%20%60path%60%20to%20revise.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22icon%22%3A%7B%22type%22%3A%22image%22%2C%22image_url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Funo-bot%2Flogos%2Funo-blueprint.png%22%2C%22alt_text%22%3A%22uno-blueprint%22%7D%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Call-off%20Request%20%E2%80%BA%2012%2B%20hours%20ahead%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Changes%20asked%20by%20%3C%40U0SURAJ001%3E%20%C2%B7%20redrafting%22%7D%2C%22body%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Adds%20the%20call-off%20received%20email%20at%20Files%20call-off.%202%20added%2C%201%20changed%2C%201%20deprecated%20%C2%B7%202%20questions.%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_decision_review%3Ab1%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22b1%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000170203%22%7D%2C%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22RM-2567%22%7D%2C%22url%22%3A%22https%3A%2F%2Fapp.notion.com%2Fp%2FTransactional-email-2a-call-off-submitted-3b2b7cca498281d1b54bde940b6fc403%22%7D%5D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -7765,7 +7904,7 @@ redraft replaces it under the same number (`replaceItem`).
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "<@U0SURAJ001>, `RM-2567` is deployed, so a `path` in the service blueprint needs a revision."
+        "text": "<@U0SURAJ001>, `RM-2567` is deployed: 1 blueprint `path` to revise."
       }
     },
     {
@@ -7785,7 +7924,7 @@ redraft replaces it under the same number (`replaceItem`).
       },
       "body": {
         "type": "plain_text",
-        "text": "Adds the call-off received email to Files call-off. 2 added · 1 changed · 1 deprecated. 2 questions for the owner."
+        "text": "Adds the call-off received email at Files call-off. 2 added, 1 changed, 1 deprecated · 2 questions."
       },
       "actions": [
         {
@@ -7827,10 +7966,13 @@ redraft replaces it under the same number (`replaceItem`).
 
 At draft-a-prd's exit, the reply's `markdown` block gains a short
 comparison after its own answer. A bold lead says the idea changes how the
-scenario works today. A three-column table follows (`step` · Today · Your
-idea), one row per step either side has, with lanes in code. A link opens
-the scenario in the blueprint app. Path and scenario names are bold, since
-they are names, not frame words. Nothing is written.
+scenario works today. Then one short block per step either side has: the
+step in bold, a "Today:" line and a "Your idea:" line, lanes in code, and
+"no such step" where one side has none. Touchpoint rows are left out to
+keep it short; the pop-up has them. A link opens the scenario in the
+blueprint app. Path and scenario names are bold, since they are names, not
+frame words. Past 6 steps it ends "and N more steps on the blueprint".
+Nothing is written.
 
 **Before: Inline comparison in the reply** · 2 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22markdown%22%2C%22text%22%3A%22**The%20PRD%20is%20drafted%3A%20Session%20Sign%20Up%20waitlist.**%20It's%20on%20the%20Roadmap%20card's%20draft%20below.%20Review%20it%20before%20I%20create%20the%20card.%22%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22_LLM-written%20%C2%B7%20check%20before%20acting_%22%7D%5D%7D%5D%7D)
 
@@ -7858,7 +8000,7 @@ they are names, not frame words. Nothing is written.
 
 </details>
 
-**After: Inline comparison in the reply** · 2 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22markdown%22%2C%22text%22%3A%22**The%20PRD%20is%20drafted%3A%20Session%20Sign%20Up%20waitlist.**%20It's%20on%20the%20Roadmap%20card's%20draft%20below.%20Review%20it%20before%20I%20create%20the%20card.%5Cn%5Cn**Your%20waitlist%20idea%20changes%20how%20*Session%20Sign%20Up*%20works%20today.**%20Here%20is%20today's%20main%20route%2C%20*No%20conflicts*%2C%20beside%20it%3A%5Cn%5Cn%7C%20%60step%60%20%7C%20Today%20%7C%20Your%20idea%20%7C%5Cn%7C---%7C---%7C---%7C%5Cn%7C%20Sign%20up%20%7C%20Signs%20up%20for%20recurring%20sessions%20(%60Regular%20Tutor%60)%20%7C%20Finds%20the%20session%20full%20and%20joins%20its%20waitlist%20(%60Regular%20Tutor%60)%20%7C%5Cn%7C%20Waitlist%20offer%20%7C%20%E2%80%94%20%7C%20Gets%20an%20offer%20when%20a%20seat%20frees%2C%20accepts%20within%2012%20hours%20(%60Regular%20Tutor%60)%3B%20the%20next%20tutor%20is%20offered%20the%20seat%20(%60Back%20Stage%20Actions%60)%20%7C%5Cn%7C%20Review%20scheduling%20%7C%20Sees%20signed-up%20sessions%20in%20My%20Sessions%20(%60Regular%20Tutor%60)%20%7C%20Sees%20the%20accepted%20session%20in%20My%20Sessions%20(%60Regular%20Tutor%60)%20%7C%5Cn%5Cn%5BOpen%20*Session%20Sign%20Up*%20on%20the%20blueprint%5D(https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000130103)%22%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22_LLM-written%20%C2%B7%20check%20before%20acting_%22%7D%5D%7D%5D%7D)
+**After: Inline comparison in the reply** · 2 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22markdown%22%2C%22text%22%3A%22**The%20PRD%20is%20drafted%3A%20Session%20Sign%20Up%20waitlist.**%20Review%20the%20Roadmap%20card's%20draft%20below%20before%20I%20create%20it.%5Cn%5Cn**Your%20waitlist%20idea%20changes%20how%20*Session%20Sign%20Up*%20works%20today.**%20Today's%20main%20route%20is%20*No%20conflicts*%3A%5Cn%5Cn**Sign%20up**%5Cn-%20Today%3A%20signs%20up%20for%20recurring%20sessions%20for%20the%20rest%20of%20the%20semester%20(%60Regular%20Tutor%60)%3B%20tutor%20supervisor%20team%20monitors%20incoming%20sign-ups%20from%20the%20Admin%20%E2%80%BA%20Sessions%20portal%20(%60Back%20Stage%20Actions%60)%5Cn-%20Your%20idea%3A%20finds%20the%20session%20full%20and%20joins%20its%20waitlist%20(%60Regular%20Tutor%60)%5Cn%5Cn**Waitlist%20offer**%5Cn-%20Today%3A%20no%20such%20step%5Cn-%20Your%20idea%3A%20gets%20an%20offer%20when%20a%20seat%20frees%2C%20and%20accepts%20it%20within%2012%20hours%20(%60Regular%20Tutor%60)%3B%20offers%20the%20seat%20to%20the%20next%20tutor%20on%20the%20waitlist%20when%20a%20sign-up%20is%20cancelled%20(%60Back%20Stage%20Actions%60)%5Cn%5Cn**Review%20scheduling**%5Cn-%20Today%3A%20sees%20signed-up%20sessions%20in%20My%20Sessions%20and%20cancels%20any%20accidental%20sign-ups%20(%60Regular%20Tutor%60)%3B%20tutor%20supervisor%20team%20reviews%20sign-ups%20and%20session%20rosters%20in%20the%20Admin%20%E2%80%BA%20Sessions%20portal%20(%60Back%20Stage%20Actions%60)%5Cn-%20Your%20idea%3A%20sees%20the%20accepted%20session%20in%20My%20Sessions%20(%60Regular%20Tutor%60)%5Cn%5Cn%5BOpen%20*Session%20Sign%20Up*%20on%20the%20blueprint%5D(https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000130103)%22%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22_LLM-written%20%C2%B7%20check%20before%20acting_%22%7D%5D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -7867,7 +8009,7 @@ they are names, not frame words. Nothing is written.
   "blocks": [
     {
       "type": "markdown",
-      "text": "**The PRD is drafted: Session Sign Up waitlist.** It's on the Roadmap card's draft below. Review it before I create the card.\n\n**Your waitlist idea changes how *Session Sign Up* works today.** Here is today's main route, *No conflicts*, beside it:\n\n| `step` | Today | Your idea |\n|---|---|---|\n| Sign up | Signs up for recurring sessions (`Regular Tutor`) | Finds the session full and joins its waitlist (`Regular Tutor`) |\n| Waitlist offer | — | Gets an offer when a seat frees, accepts within 12 hours (`Regular Tutor`); the next tutor is offered the seat (`Back Stage Actions`) |\n| Review scheduling | Sees signed-up sessions in My Sessions (`Regular Tutor`) | Sees the accepted session in My Sessions (`Regular Tutor`) |\n\n[Open *Session Sign Up* on the blueprint](https://plus-uno.netlify.app/blueprint/?cell=a0000000-0000-4000-8000-000000130103)"
+      "text": "**The PRD is drafted: Session Sign Up waitlist.** Review the Roadmap card's draft below before I create it.\n\n**Your waitlist idea changes how *Session Sign Up* works today.** Today's main route is *No conflicts*:\n\n**Sign up**\n- Today: signs up for recurring sessions for the rest of the semester (`Regular Tutor`); tutor supervisor team monitors incoming sign-ups from the Admin › Sessions portal (`Back Stage Actions`)\n- Your idea: finds the session full and joins its waitlist (`Regular Tutor`)\n\n**Waitlist offer**\n- Today: no such step\n- Your idea: gets an offer when a seat frees, and accepts it within 12 hours (`Regular Tutor`); offers the seat to the next tutor on the waitlist when a sign-up is cancelled (`Back Stage Actions`)\n\n**Review scheduling**\n- Today: sees signed-up sessions in My Sessions and cancels any accidental sign-ups (`Regular Tutor`); tutor supervisor team reviews sign-ups and session rosters in the Admin › Sessions portal (`Back Stage Actions`)\n- Your idea: sees the accepted session in My Sessions (`Regular Tutor`)\n\n[Open *Session Sign Up* on the blueprint](https://plus-uno.netlify.app/blueprint/?cell=a0000000-0000-4000-8000-000000130103)"
     },
     {
       "type": "context",
@@ -7886,11 +8028,12 @@ they are names, not frame words. Nothing is written.
 
 #### B2. The ✅ card under it (#1290)
 
-The house proposal card, as `proposalCardBlocks` draws it: one summary line
-("Ready to *draft this on the blueprint as a proposal*: _Session Sign Up ›
-Joins the waitlist_ · 6 `proposed` rows"), a context saying it is a new
-`path` beside today's main route and that only the requester can decide, the
-footer note, and Review.
+The house proposal card's shape (`proposalCardBlocks`), without its leading
+`:warning:`: one summary line ("*Draft as a blueprint proposal?* _Session
+Sign Up › Joins the waitlist_ · 6 `proposed` rows"), a context saying it is a
+new `path` beside today's main route and that only the requester can decide,
+the footer note, and Review. Dropping the emoji here diverges from every
+other posted card until Bill rules on the list below.
 
 **Before: “Draft this as a proposal?” card** · 2 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*Draft%20this%20on%20the%20blueprint%20as%20a%20proposal%3F*%5Cn*Session%20Sign%20Up%20%E2%80%BA%20Joins%20the%20waitlist*%20(new%20%60path%60%2C%20%60proposed%60)%5Cn%E2%80%A2%20Sign%20up%20(%60Regular%20Tutor%60)%3A%20Finds%20the%20session%20full%20and%20joins%20its%20waitlist.%5Cn%E2%80%A2%20Sign%20up%20(%60Front%20Stage%20Touchpoints%60)%3A%20PLUS%20App%5Cn%E2%80%A2%20Waitlist%20offer%20(%60Regular%20Tutor%60)%3A%20Gets%20an%20offer%20when%20a%20seat%20frees%2C%20and%20accepts%20it%20within%2012%20hours.%5Cn%E2%80%A2%20Waitlist%20offer%20(%60Front%20Stage%20Touchpoints%60)%3A%20Waitlist%20offer%20email%5Cn%E2%80%A2%20Waitlist%20offer%20(%60Back%20Stage%20Actions%60)%3A%20Offers%20the%20seat%20to%20the%20next%20tutor%20on%20the%20waitlist%20when%20a%20sign-up%20is%20cancelled.%5Cn%E2%80%A2%20Review%20scheduling%20(%60Regular%20Tutor%60)%3A%20Sees%20the%20accepted%20session%20in%20My%20Sessions.%5CnPress%20Review%20to%20approve%20it%2C%20ask%20for%20changes%20or%20reject%20it.%22%7D%7D%2C%7B%22type%22%3A%22actions%22%2C%22block_id%22%3A%22uno_proposal_actions%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_proposal_review%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22review%22%7D%5D%7D%5D%7D)
 
@@ -7927,7 +8070,7 @@ footer note, and Review.
 
 </details>
 
-**After: “Draft this as a proposal?” card** · 4 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22%3Awarning%3A%20Ready%20to%20*draft%20this%20on%20the%20blueprint%20as%20a%20proposal*%3A%20_Session%20Sign%20Up%20%E2%80%BA%20Joins%20the%20waitlist_%20%C2%B7%206%20%60proposed%60%20rows%22%7D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22New%20%60path%60%20beside%20today's%20main%20route%20%C2%B7%20only%20you%20can%20decide%22%7D%5D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22_LLM-written%20%C2%B7%20check%20before%20acting_%22%7D%5D%7D%2C%7B%22type%22%3A%22actions%22%2C%22block_id%22%3A%22uno_proposal_actions%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_proposal_review%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22review%22%7D%5D%7D%5D%7D)
+**After: “Draft this as a proposal?” card** · 4 blocks · message surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22blocks%22%3A%5B%7B%22type%22%3A%22section%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*Draft%20as%20a%20blueprint%20proposal%3F*%20_Session%20Sign%20Up%20%E2%80%BA%20Joins%20the%20waitlist_%20%C2%B7%206%20%60proposed%60%20rows%22%7D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22New%20%60path%60%20beside%20today's%20main%20route%20%C2%B7%20only%20you%20can%20decide%22%7D%5D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22_LLM-written%20%C2%B7%20check%20before%20acting_%22%7D%5D%7D%2C%7B%22type%22%3A%22actions%22%2C%22block_id%22%3A%22uno_proposal_actions%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_proposal_review%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Review%22%7D%2C%22value%22%3A%22review%22%7D%5D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -7938,7 +8081,7 @@ footer note, and Review.
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": ":warning: Ready to *draft this on the blueprint as a proposal*: _Session Sign Up › Joins the waitlist_ · 6 `proposed` rows"
+        "text": "*Draft as a blueprint proposal?* _Session Sign Up › Joins the waitlist_ · 6 `proposed` rows"
       }
     },
     {
@@ -7986,15 +8129,19 @@ footer note, and Review.
   is a new `path`, links the scenario, and says it is written as `proposed`
   and that nothing `live` changes.
 - Two alerts at most: a `warning` for a lane the drafter had to guess ("Your
-  PRD doesn't say who offers the freed seat. I put it on Back Stage
-  Actions."), and an `info` naming the scenario's other proposals, so a
-  designer sees *Soft-conflict gate* before adding a second idea beside it.
+  PRD doesn't say who offers the freed seat; I put it on Back Stage Actions.
+  Say otherwise in your note."), and an `info` naming the scenario's other
+  proposals, so a designer sees *Soft-conflict gate* before adding a second
+  idea beside it.
 - A `card` for today's path with View slice.
-- **Today beside proposed**: one `section` per up to five steps. Each step
-  is two `fields`: the step's lanes today on the left, proposed on the
-  right, and "No such step today" where the proposal adds a step.
-- The context lines say where it is written and that shipping the Roadmap
-  card the PRD becomes promotes these rows instead of drafting new ones.
+- **One section per step**, a `divider` after each. The step in bold, then
+  *Today* with that step's rows, then *Proposed* with that step's rows, each
+  row `` `lane` content ``. "No such step" stands where one side has none.
+  Each step is one `rich_text` block plus its divider, so at most 40 steps
+  are drawn. Past that, a context line says "N more steps on the blueprint"
+  beside View slice. Paths run 3 to 8 steps today.
+- A context line says where it is written and that, once the PRD is a
+  Roadmap card, shipping it promotes these rows.
 - Approve: "Writes 6 proposed rows and replies with the slice link."
 
 The title is "Blueprint proposal". The proposal's rows are not inputs
@@ -8111,7 +8258,7 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
 
 </details>
 
-**After: Proposal Review pop-up** · 11 blocks · modal surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Blueprint%20proposal%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22submit%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Submit%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22D0BRYANDM1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760612400.000200%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%20%E2%80%BA%20Joins%20the%20waitlist%22%7D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22A%20new%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22path%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20in%20%22%7D%2C%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000130103%22%2C%22text%22%3A%22Onboarding%20%E2%80%BA%20Session%20Sign%20Up%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%2C%20written%20as%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22proposed%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22.%20It%20sits%20beside%20today's%20rows%3B%20nothing%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22live%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20changes.%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22warning%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Your%20PRD%20doesn't%20say%20who%20offers%20the%20freed%20seat.%20I%20put%20it%20on%20Back%20Stage%20Actions%3B%20say%20otherwise%20in%20your%20note.%22%7D%7D%2C%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22info%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%20has%201%20other%20proposal%20already%3A%20Soft-conflict%20gate.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Today%3A%20No%20conflicts%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%20%C2%B7%20main%20route%20%C2%B7%206%20rows%2C%20all%20live%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000130103%22%7D%5D%7D%2C%7B%22type%22%3A%22section%22%2C%22fields%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*Sign%20up*%20%C2%B7%20today%5Cn%60Regular%20Tutor%60%20Signs%20up%20for%20recurring%20sessions%20for%20the%20rest%20of%20the%20semester.%5Cn%60Front%20Stage%20Touchpoints%60%20PLUS%20App%5Cn%60Back%20Stage%20Actions%60%20Tutor%20supervisor%20team%20monitors%20incoming%20sign-ups%20from%20the%20Admin%20%E2%80%BA%20Sessions%20portal.%22%7D%2C%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*Sign%20up*%20%C2%B7%20proposed%5Cn%60Regular%20Tutor%60%20Finds%20the%20session%20full%20and%20joins%20its%20waitlist.%5Cn%60Front%20Stage%20Touchpoints%60%20PLUS%20App%22%7D%2C%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*Waitlist%20offer*%20%C2%B7%20today%5Cn_No%20such%20step%20today_%22%7D%2C%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*Waitlist%20offer*%20%C2%B7%20proposed%5Cn%60Regular%20Tutor%60%20Gets%20an%20offer%20when%20a%20seat%20frees%2C%20and%20accepts%20it%20within%2012%20hours.%5Cn%60Front%20Stage%20Touchpoints%60%20Waitlist%20offer%20email%5Cn%60Back%20Stage%20Actions%60%20Offers%20the%20seat%20to%20the%20next%20tutor%20on%20the%20waitlist%20when%20a%20sign-up%20is%20cancelled.%22%7D%2C%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*Review%20scheduling*%20%C2%B7%20today%5Cn%60Regular%20Tutor%60%20Sees%20signed-up%20sessions%20in%20My%20Sessions%20and%20cancels%20any%20accidental%20sign-ups.%5Cn%60Front%20Stage%20Touchpoints%60%20PLUS%20App%5Cn%60Back%20Stage%20Actions%60%20Tutor%20supervisor%20team%20reviews%20sign-ups%20and%20session%20rosters%20in%20the%20Admin%20%E2%80%BA%20Sessions%20portal.%22%7D%2C%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22*Review%20scheduling*%20%C2%B7%20proposed%5Cn%60Regular%20Tutor%60%20Sees%20the%20accepted%20session%20in%20My%20Sessions.%22%7D%5D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Each%20step%20reads%20today%20on%20the%20left%2C%20your%20proposal%20on%20the%20right.%20On%20a%20phone%20the%20two%20stack%2C%20today%20first.%22%7D%5D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Written%20through%20uno-bot's%20own%20blueprint%20identity.%20When%20your%20PRD%20becomes%20a%20Roadmap%20card%2C%20shipping%20it%20promotes%20these%20rows%20instead%20of%20drafting%20new%20ones.%22%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_choice%22%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Decision%22%7D%2C%22element%22%3A%7B%22type%22%3A%22radio_buttons%22%2C%22action_id%22%3A%22uno_review_choice_input%22%2C%22options%22%3A%5B%7B%22value%22%3A%22confirm%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Approve%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Writes%206%20proposed%20rows%20and%20replies%20with%20the%20slice%20link.%22%7D%7D%2C%7B%22value%22%3A%22revise%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22I%20redraft%20the%20proposal%20from%20your%20note.%22%7D%7D%2C%7B%22value%22%3A%22cancel%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Reject%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Nothing%20is%20written%20to%20the%20blueprint.%22%7D%7D%5D%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_note%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Note%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%3A%20what%20should%20change.%20Reject%3A%20an%20optional%20reason.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22uno_review_note_input%22%2C%22multiline%22%3Atrue%2C%22max_length%22%3A3000%7D%7D%5D%7D)
+**After: Proposal Review pop-up** · 15 blocks · modal surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Blueprint%20proposal%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22submit%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Submit%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22D0BRYANDM1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760612400.000200%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%20%E2%80%BA%20Joins%20the%20waitlist%22%7D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22New%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22path%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20in%20%22%7D%2C%7B%22type%22%3A%22link%22%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000130103%22%2C%22text%22%3A%22Onboarding%20%E2%80%BA%20Session%20Sign%20Up%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%C2%B7%20written%20as%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22proposed%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%C2%B7%20nothing%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22live%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20changes%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22warning%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Your%20PRD%20doesn't%20say%20who%20offers%20the%20freed%20seat%3B%20I%20put%20it%20on%20Back%20Stage%20Actions.%20Say%20otherwise%20in%20your%20note.%22%7D%7D%2C%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22info%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%20already%20has%201%20other%20proposal%3A%20Soft-conflict%20gate.%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Today%3A%20No%20conflicts%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%20%C2%B7%20main%20route%20%C2%B7%206%20rows%2C%20all%20live%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000130103%22%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Sign%20up%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Today%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Signs%20up%20for%20recurring%20sessions%20for%20the%20rest%20of%20the%20semester.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22PLUS%20App%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Back%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Tutor%20supervisor%20team%20monitors%20incoming%20sign-ups%20from%20the%20Admin%20%E2%80%BA%20Sessions%20portal.%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Proposed%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Finds%20the%20session%20full%20and%20joins%20its%20waitlist.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22PLUS%20App%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Waitlist%20offer%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Today%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22No%20such%20step%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Proposed%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Gets%20an%20offer%20when%20a%20seat%20frees%2C%20and%20accepts%20it%20within%2012%20hours.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Waitlist%20offer%20email%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Back%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Offers%20the%20seat%20to%20the%20next%20tutor%20on%20the%20waitlist%20when%20a%20sign-up%20is%20cancelled.%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Review%20scheduling%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Today%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Sees%20signed-up%20sessions%20in%20My%20Sessions%20and%20cancels%20any%20accidental%20sign-ups.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22PLUS%20App%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Back%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Tutor%20supervisor%20team%20reviews%20sign-ups%20and%20session%20rosters%20in%20the%20Admin%20%E2%80%BA%20Sessions%20portal.%22%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Proposed%22%2C%22style%22%3A%7B%22italic%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Sees%20the%20accepted%20session%20in%20My%20Sessions.%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Written%20by%20uno-bot's%20blueprint%20identity.%20Once%20your%20PRD%20is%20a%20Roadmap%20card%2C%20shipping%20it%20promotes%20these%20rows.%22%7D%5D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_choice%22%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Decision%22%7D%2C%22element%22%3A%7B%22type%22%3A%22radio_buttons%22%2C%22action_id%22%3A%22uno_review_choice_input%22%2C%22options%22%3A%5B%7B%22value%22%3A%22confirm%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Approve%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Writes%206%20proposed%20rows%20and%20replies%20with%20the%20slice%20link.%22%7D%7D%2C%7B%22value%22%3A%22revise%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22I%20redraft%20the%20proposal%20from%20your%20note.%22%7D%7D%2C%7B%22value%22%3A%22cancel%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Reject%22%7D%2C%22description%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Nothing%20is%20written.%22%7D%7D%5D%7D%7D%2C%7B%22type%22%3A%22input%22%2C%22block_id%22%3A%22uno_review_note%22%2C%22optional%22%3Atrue%2C%22label%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Note%22%7D%2C%22hint%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Needs%20changes%3A%20what%20should%20change.%20Reject%3A%20an%20optional%20reason.%22%7D%2C%22element%22%3A%7B%22type%22%3A%22plain_text_input%22%2C%22action_id%22%3A%22uno_review_note_input%22%2C%22multiline%22%3Atrue%2C%22max_length%22%3A3000%7D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -8148,7 +8295,7 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
           "elements": [
             {
               "type": "text",
-              "text": "A new "
+              "text": "New "
             },
             {
               "type": "text",
@@ -8168,7 +8315,7 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
             },
             {
               "type": "text",
-              "text": ", written as "
+              "text": " · written as "
             },
             {
               "type": "text",
@@ -8179,7 +8326,7 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
             },
             {
               "type": "text",
-              "text": ". It sits beside today's rows; nothing "
+              "text": " · nothing "
             },
             {
               "type": "text",
@@ -8190,7 +8337,7 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
             },
             {
               "type": "text",
-              "text": " changes."
+              "text": " changes"
             }
           ]
         }
@@ -8201,7 +8348,7 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
       "level": "warning",
       "text": {
         "type": "plain_text",
-        "text": "Your PRD doesn't say who offers the freed seat. I put it on Back Stage Actions; say otherwise in your note."
+        "text": "Your PRD doesn't say who offers the freed seat; I put it on Back Stage Actions. Say otherwise in your note."
       }
     },
     {
@@ -8209,7 +8356,7 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
       "level": "info",
       "text": {
         "type": "plain_text",
-        "text": "Session Sign Up has 1 other proposal already: Soft-conflict gate."
+        "text": "Session Sign Up already has 1 other proposal: Soft-conflict gate."
       }
     },
     {
@@ -8235,54 +8382,430 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
       ]
     },
     {
-      "type": "section",
-      "fields": [
-        {
-          "type": "mrkdwn",
-          "text": "*Sign up* · today\n`Regular Tutor` Signs up for recurring sessions for the rest of the semester.\n`Front Stage Touchpoints` PLUS App\n`Back Stage Actions` Tutor supervisor team monitors incoming sign-ups from the Admin › Sessions portal."
-        },
-        {
-          "type": "mrkdwn",
-          "text": "*Sign up* · proposed\n`Regular Tutor` Finds the session full and joins its waitlist.\n`Front Stage Touchpoints` PLUS App"
-        },
-        {
-          "type": "mrkdwn",
-          "text": "*Waitlist offer* · today\n_No such step today_"
-        },
-        {
-          "type": "mrkdwn",
-          "text": "*Waitlist offer* · proposed\n`Regular Tutor` Gets an offer when a seat frees, and accepts it within 12 hours.\n`Front Stage Touchpoints` Waitlist offer email\n`Back Stage Actions` Offers the seat to the next tutor on the waitlist when a sign-up is cancelled."
-        },
-        {
-          "type": "mrkdwn",
-          "text": "*Review scheduling* · today\n`Regular Tutor` Sees signed-up sessions in My Sessions and cancels any accidental sign-ups.\n`Front Stage Touchpoints` PLUS App\n`Back Stage Actions` Tutor supervisor team reviews sign-ups and session rosters in the Admin › Sessions portal."
-        },
-        {
-          "type": "mrkdwn",
-          "text": "*Review scheduling* · proposed\n`Regular Tutor` Sees the accepted session in My Sessions."
-        }
-      ]
+      "type": "divider"
     },
     {
-      "type": "context",
+      "type": "rich_text",
       "elements": [
         {
-          "type": "mrkdwn",
-          "text": "Each step reads today on the left, your proposal on the right. On a phone the two stack, today first."
-        }
-      ]
-    },
-    {
-      "type": "context",
-      "elements": [
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Sign up",
+              "style": {
+                "bold": true
+              }
+            }
+          ]
+        },
         {
-          "type": "mrkdwn",
-          "text": "Written through uno-bot's own blueprint identity. When your PRD becomes a Roadmap card, shipping it promotes these rows instead of drafting new ones."
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Today",
+              "style": {
+                "italic": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_list",
+          "style": "bullet",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Regular Tutor",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "Signs up for recurring sessions for the rest of the semester."
+                }
+              ]
+            },
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Front Stage Touchpoints",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "PLUS App"
+                }
+              ]
+            },
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Back Stage Actions",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "Tutor supervisor team monitors incoming sign-ups from the Admin › Sessions portal."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Proposed",
+              "style": {
+                "italic": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_list",
+          "style": "bullet",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Regular Tutor",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "Finds the session full and joins its waitlist."
+                }
+              ]
+            },
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Front Stage Touchpoints",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "PLUS App"
+                }
+              ]
+            }
+          ]
         }
       ]
     },
     {
       "type": "divider"
+    },
+    {
+      "type": "rich_text",
+      "elements": [
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Waitlist offer",
+              "style": {
+                "bold": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Today",
+              "style": {
+                "italic": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "No such step",
+              "style": {
+                "italic": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Proposed",
+              "style": {
+                "italic": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_list",
+          "style": "bullet",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Regular Tutor",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "Gets an offer when a seat frees, and accepts it within 12 hours."
+                }
+              ]
+            },
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Front Stage Touchpoints",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "Waitlist offer email"
+                }
+              ]
+            },
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Back Stage Actions",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "Offers the seat to the next tutor on the waitlist when a sign-up is cancelled."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "rich_text",
+      "elements": [
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Review scheduling",
+              "style": {
+                "bold": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Today",
+              "style": {
+                "italic": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_list",
+          "style": "bullet",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Regular Tutor",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "Sees signed-up sessions in My Sessions and cancels any accidental sign-ups."
+                }
+              ]
+            },
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Front Stage Touchpoints",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "PLUS App"
+                }
+              ]
+            },
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Back Stage Actions",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "Tutor supervisor team reviews sign-ups and session rosters in the Admin › Sessions portal."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Proposed",
+              "style": {
+                "italic": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_list",
+          "style": "bullet",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Regular Tutor",
+                  "style": {
+                    "code": true
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": " "
+                },
+                {
+                  "type": "text",
+                  "text": "Sees the accepted session in My Sessions."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "context",
+      "elements": [
+        {
+          "type": "mrkdwn",
+          "text": "Written by uno-bot's blueprint identity. Once your PRD is a Roadmap card, shipping it promotes these rows."
+        }
+      ]
     },
     {
       "type": "input",
@@ -8325,7 +8848,7 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
             },
             "description": {
               "type": "plain_text",
-              "text": "Nothing is written to the blueprint."
+              "text": "Nothing is written."
             }
           }
         ]
@@ -8398,7 +8921,7 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
 
 </details>
 
-**After: Proposal, decided (View)** · 5 blocks · modal surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Blueprint%20proposal%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22D0BRYANDM1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760612400.000200%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22success%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Approved%20by%20%3C%40U0BRYAN001%3E.%206%20proposed%20rows%20written%20to%20the%20service%20blueprint.%22%7D%7D%2C%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%20%E2%80%BA%20Joins%20the%20waitlist%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Proposed%3A%20Joins%20the%20waitlist%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%20%C2%B7%20new%20path%20%C2%B7%206%20rows%2C%20proposed%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000130103%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Written%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Sign%20up%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Finds%20the%20session%20full%20and%20joins%20its%20waitlist.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Sign%20up%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22PLUS%20App%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Waitlist%20offer%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Gets%20an%20offer%20when%20a%20seat%20frees%2C%20and%20accepts%20it%20within%2012%20hours.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Waitlist%20offer%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Waitlist%20offer%20email%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Waitlist%20offer%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Back%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Offers%20the%20seat%20to%20the%20next%20tutor%20on%20the%20waitlist%20when%20a%20sign-up%20is%20cancelled.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Review%20scheduling%20(%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22)%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Sees%20the%20accepted%20session%20in%20My%20Sessions.%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Say%20%E2%80%9Cremove%20it%E2%80%9D%20in%20the%20thread%20to%20withdraw%20it.%20With%20no%20Roadmap%20card%20after%2030%20days%2C%20I'll%20offer%20to%20remove%20it.%22%7D%5D%7D%5D%7D)
+**After: Proposal, decided (View)** · 11 blocks · modal surface · [Open in Block Kit Builder](https://app.slack.com/block-kit-builder#%7B%22type%22%3A%22modal%22%2C%22callback_id%22%3A%22uno_review_draft%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Blueprint%20proposal%22%7D%2C%22close%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Close%22%7D%2C%22private_metadata%22%3A%22%7B%5C%22channel%5C%22%3A%5C%22D0BRYANDM1%5C%22%2C%5C%22ts%5C%22%3A%5C%221760612400.000200%5C%22%7D%22%2C%22blocks%22%3A%5B%7B%22type%22%3A%22alert%22%2C%22level%22%3A%22success%22%2C%22text%22%3A%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Approved%20by%20%3C%40U0BRYAN001%3E.%206%20proposed%20rows%20written.%22%7D%7D%2C%7B%22type%22%3A%22header%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%20%E2%80%BA%20Joins%20the%20waitlist%22%7D%7D%2C%7B%22type%22%3A%22card%22%2C%22title%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Proposed%3A%20Joins%20the%20waitlist%22%7D%2C%22subtitle%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22Session%20Sign%20Up%20%C2%B7%20new%20path%20%C2%B7%206%20rows%2C%20proposed%22%7D%2C%22actions%22%3A%5B%7B%22type%22%3A%22button%22%2C%22action_id%22%3A%22uno_review_open%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22text%22%3A%22View%20slice%22%7D%2C%22url%22%3A%22https%3A%2F%2Fplus-uno.netlify.app%2Fblueprint%2F%3Fcell%3Da0000000-0000-4000-8000-000000130103%22%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Sign%20up%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Finds%20the%20session%20full%20and%20joins%20its%20waitlist.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22PLUS%20App%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Waitlist%20offer%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Gets%20an%20offer%20when%20a%20seat%20frees%2C%20and%20accepts%20it%20within%2012%20hours.%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Front%20Stage%20Touchpoints%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Waitlist%20offer%20email%22%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Back%20Stage%20Actions%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Offers%20the%20seat%20to%20the%20next%20tutor%20on%20the%20waitlist%20when%20a%20sign-up%20is%20cancelled.%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22rich_text%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Review%20scheduling%22%2C%22style%22%3A%7B%22bold%22%3Atrue%7D%7D%5D%7D%2C%7B%22type%22%3A%22rich_text_list%22%2C%22style%22%3A%22bullet%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22rich_text_section%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Regular%20Tutor%22%2C%22style%22%3A%7B%22code%22%3Atrue%7D%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22%20%22%7D%2C%7B%22type%22%3A%22text%22%2C%22text%22%3A%22Sees%20the%20accepted%20session%20in%20My%20Sessions.%22%7D%5D%7D%5D%7D%5D%7D%2C%7B%22type%22%3A%22divider%22%7D%2C%7B%22type%22%3A%22context%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22mrkdwn%22%2C%22text%22%3A%22Say%20%E2%80%9Cremove%20it%E2%80%9D%20in%20the%20thread%20to%20withdraw%20it.%20With%20no%20Roadmap%20card%20after%2030%20days%2C%20I'll%20offer%20to%20remove%20it.%22%7D%5D%7D%5D%7D)
 
 <details><summary>Block Kit JSON</summary>
 
@@ -8421,7 +8944,7 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
       "level": "success",
       "text": {
         "type": "mrkdwn",
-        "text": "Approved by <@U0BRYAN001>. 6 proposed rows written to the service blueprint."
+        "text": "Approved by <@U0BRYAN001>. 6 proposed rows written."
       }
     },
     {
@@ -8454,6 +8977,9 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
       ]
     },
     {
+      "type": "divider"
+    },
+    {
       "type": "rich_text",
       "elements": [
         {
@@ -8461,7 +8987,7 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
           "elements": [
             {
               "type": "text",
-              "text": "Written",
+              "text": "Sign up",
               "style": {
                 "bold": true
               }
@@ -8477,10 +9003,6 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
               "elements": [
                 {
                   "type": "text",
-                  "text": "Sign up ("
-                },
-                {
-                  "type": "text",
                   "text": "Regular Tutor",
                   "style": {
                     "code": true
@@ -8488,7 +9010,7 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -8501,10 +9023,6 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
               "elements": [
                 {
                   "type": "text",
-                  "text": "Sign up ("
-                },
-                {
-                  "type": "text",
                   "text": "Front Stage Touchpoints",
                   "style": {
                     "code": true
@@ -8512,21 +9030,43 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
                   "text": "PLUS App"
                 }
               ]
-            },
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "rich_text",
+      "elements": [
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Waitlist offer",
+              "style": {
+                "bold": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_list",
+          "style": "bullet",
+          "elements": [
             {
               "type": "rich_text_section",
               "elements": [
-                {
-                  "type": "text",
-                  "text": "Waitlist offer ("
-                },
                 {
                   "type": "text",
                   "text": "Regular Tutor",
@@ -8536,7 +9076,7 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -8549,10 +9089,6 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
               "elements": [
                 {
                   "type": "text",
-                  "text": "Waitlist offer ("
-                },
-                {
-                  "type": "text",
                   "text": "Front Stage Touchpoints",
                   "style": {
                     "code": true
@@ -8560,7 +9096,7 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -8573,10 +9109,6 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
               "elements": [
                 {
                   "type": "text",
-                  "text": "Waitlist offer ("
-                },
-                {
-                  "type": "text",
                   "text": "Back Stage Actions",
                   "style": {
                     "code": true
@@ -8584,21 +9116,43 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
                   "text": "Offers the seat to the next tutor on the waitlist when a sign-up is cancelled."
                 }
               ]
-            },
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "rich_text",
+      "elements": [
+        {
+          "type": "rich_text_section",
+          "elements": [
+            {
+              "type": "text",
+              "text": "Review scheduling",
+              "style": {
+                "bold": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "rich_text_list",
+          "style": "bullet",
+          "elements": [
             {
               "type": "rich_text_section",
               "elements": [
-                {
-                  "type": "text",
-                  "text": "Review scheduling ("
-                },
                 {
                   "type": "text",
                   "text": "Regular Tutor",
@@ -8608,7 +9162,7 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
                 },
                 {
                   "type": "text",
-                  "text": ") "
+                  "text": " "
                 },
                 {
                   "type": "text",
@@ -8619,6 +9173,9 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
           ]
         }
       ]
+    },
+    {
+      "type": "divider"
     },
     {
       "type": "context",
@@ -8638,6 +9195,54 @@ The title is "Blueprint proposal". The proposal's rows are not inputs
 Read-only and redraft for the proposal are A4 and A6 with the proposal's
 title. On a turn's card the redraft line is the one T4 already uses: "the
 new card posts in the thread."
+
+### Revisions after Bill's review (2026-10-15)
+
+Bill reviewed the first draft on the comparison page and asked for two
+changes. Every variant listed below was redrawn, and its Builder links in
+this doc and on the page were regenerated.
+
+1. **One comparison, one section.** The proposal pop-up (card 30) set today
+   and the proposal in one two-column grid of `fields`, which read as one
+   table of unrelated pairs. Every comparison now gets its own section per
+   step, as § What the sweep and the modal take describes:
+   - **Card 30 (B3)**: the grid became one `rich_text` per step (the step in
+     bold, *Today*, *Proposed*), each followed by a divider. 15 blocks, up to
+     40 steps.
+   - **Card 28 (B1)**: the three-column table became one Markdown block per
+     step, with a "Today:" line and a "Your idea:" line.
+   - **Card 22 (A3)**: today's rows and the Added / Changed / Deprecated
+     groups no longer sit in two separate lists across the path. Each changed
+     step is its own section: its rows today, then its own changes, inputs
+     included. 23 blocks, capped at 12 steps and 20 inputs, so 92 at most.
+   - **Cards 23, 24 and 31 (A4, A5, B4)**: the read-only and decided views
+     use the same step sections.
+2. **No leading emoji.** The ➕ / ✏️ / ➖ group markers became the plain bold
+   labels **Added**, **Changed** and **Deprecated**, and card 29 (B2) lost its
+   `:warning:`. Lines were tightened to the same meaning in fewer words, as
+   on the sweep cards (19–21, 25, 27): "`RM-2567` is deployed: 1 blueprint
+   `path` to revise", "2 added, 1 changed, 1 deprecated · 2 questions". The
+   pop-ups' where lines, alerts, questions, context lines and decision
+   descriptions were tightened the same way. Card 26 (A6) is only shorter.
+
+**Emoji that still lead a line in the shipped cards.** The list is for
+Bill's ruling. None of it is changed here, since it is shipped code on main.
+
+| # | Where (on `main`) | Line | Recommend |
+|---|---|---|---|
+| 1 | `proposal-render.ts` `shortCardOf`, the posted card's summary | `:warning: Ready to *verb*: …`, and `:warning: Ready for review: …` | **Cut.** It is on every card, so it warns of nothing. "Ready to *verb*" already says it waits for a decision, and a real caveat has its own line |
+| 2 | `proposal-render.ts` heading in the card's text copy | `:warning: About to *verb*:` | **Keep for now.** It is the notification and history copy, not the short card. `shortCardOf`, `caveatsOf` and the share-out's heading regex all parse it, so cutting it waits on the "caveats as data" note (§ Implementation notes) |
+| 3 | `proposal-render.ts` caveats: bundle incomplete, public or maybe-public repo, cut-off rerun, no open questions | `:warning: *…*` | **Keep.** These are real warnings, the one place the house's ⚠️ line convention applies (`shapes.md` § The ⚠️ line), and the pop-up already turns each into an alert |
+| 4 | `review-view.ts` `draftView`, the edited-fields context | `:pencil2: Edited here: …. Approve writes these values.` | **Cut.** "Edited here:" says it, and it sits under Edit fields |
+| 5 | `button-door.ts`, the decided card's last line | `:white_check_mark: Approved by @…`, `:no_entry: Rejected by @…`, `:no_entry: Cancelled by @… — tell me what to change…` | **Cut**, so the line reads "Approved by @Bill". The word carries the state. `outcomeOf` in `review-view.ts` reads the emoji to pick View's alert level, so it has to read the word instead in the same change |
+| 6 | `gate-note.ts` `statedCancelledNote`, a stated card's ⛔ line | `:no_entry: <cancelled words>, decided by @…` | **Cut**, with 5 and for the same reason |
+| 7 | `review-door.ts`, Needs changes with no note | `:warning: Needs changes needs a note. …` (a `noticeView` line) | **Cut.** Draw it as a `warning` alert plus the line, as every other pop-up state now is (§ 14) |
+| 8 | `gate-note.ts`, a gesture refused or ambiguous, edited onto the card | `:warning: <@…> I saw your :glyph:, but…`, `:warning: N proposals are waiting…`, `:warning: … — nothing was executed.`, `:warning: …That approved run was cut off…` | **Keep.** Each says nothing ran, or that a run may be partial, which is a real warning |
+| 9 | `gate-note.ts` and `review-door.ts`, a failure | `:x: I caught your :glyph: but hit a snag…`, `:warning: I couldn't start the revision…` | **Keep.** The failure post's shape (`overview.md` § Writing style) |
+
+The sweep and report cards (`decision-cards.ts`, `sweep-card-blocks.ts`)
+lead with no emoji. `failureReason` even strips one from a failed write's
+line. The T1–T5 pop-up builders add none beyond row 4.
 
 ### Decisions for Bill
 
@@ -8738,8 +9343,9 @@ new card posts in the thread."
     words above.
   - T1, `card-block.ts`: `objectCardBlocks` for the today card and its View
     slice button, with `sendWithCardFallback` covering a refused card.
-  - T3, `review-notion-create.ts`: `factsSection`'s two-column `fields`
-    pattern, for B3's today-beside-proposed.
+  - T3, `review-notion-create.ts`: nothing for the comparisons. Its
+    two-column `factsSection` stays for short facts, and a step comparison
+    is never drawn as `fields`.
   - T4, `review-view.ts` and `review-batch.ts`: `draftView`'s read-only
     `info` alert, `decidedAlert` and `settled` for View, `stateView` with
     `afterNeedsChanges` for the redraft words, and `openLine`.
@@ -8750,12 +9356,14 @@ new card posts in the thread."
     `SweepSection`. The opener comes from the section's `says`.
   - Variant B's card: `proposalCardBlocks` as is. B1's table goes in the
     turn's `markdown` block.
-- **New rich text styles.** The diff uses `strike` and `italic`, and an
-  `emoji` element in the group labels. `review-anatomy.ts`'s `WhereElement`
-  and `review-stated.ts`'s `RichElement` take only bold and code today.
+- **New rich text styles.** The step sections use `strike` and `italic`.
+  `review-anatomy.ts`'s `WhereElement` and `review-stated.ts`'s
+  `RichElement` take only bold and code today. A step section is one
+  builder (step, today rows, changes) shared by A3, A4, A5, B3 and B4, so
+  the per-step rule holds by construction.
 - **Fields.** `review-fields.ts`'s `FIELDS` gains a row for the revision
   tool: one text field per added or changed row's `content`, keyed
-  `0.rows.<group>.<i>.content`, all required (an emptied sentence is a
+  `0.rows.<step>.<group>.<i>.content`, all required (an emptied sentence is a
   deleted row, which is a redraft), capped at 20. Approve writes the edited
   sentences through the same authoring RPCs.
 - **Unchanged contracts.** The decision block ids, option values,
@@ -8765,6 +9373,6 @@ new card posts in the thread."
   sweep-section seam for the cards (#1286's tests), and a live open of each
   payload in the le goat DM before building. None of these payloads has been
   opened in Slack. They were checked in code against the limits: ≤100 blocks
-  (the largest is 19), title ≤24, text ≤3,000, alert ≤200, card body ≤200,
+  (the largest is 23), title ≤24, text ≤3,000, alert ≤200, card body ≤200,
   ≤3 card buttons, option description ≤75, ≤10 fields, no message-only block
   in a modal and no `alert` in a message.
