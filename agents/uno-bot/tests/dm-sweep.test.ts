@@ -369,7 +369,7 @@ describe("C7: a decision told to uno-bot", () => {
 // ── C6 ───────────────────────────────────────────────────────────────────────
 
 describe("C6: a disagreement uno-bot noticed while answering", () => {
-  const root = msg(MAYA, ts(29, 15), "What's our warning colour? I need it for the alert banner mock.", {
+  const root = msg(MAYA, ts(29, 15), "What's our warning color? I need it for the alert banner mock.", {
     reply_count: 1,
     latest_reply: ts(29, 15, 1),
   });
@@ -377,7 +377,7 @@ describe("C6: a disagreement uno-bot noticed while answering", () => {
     thread_ts: root.ts,
   });
   const noticed = dmReply({
-    disagreements: [{ answer_ts: answer.ts, topic: "the warning colour", sources: ["Figma", "the code"], design_system: true, confidence: 0.9 }],
+    disagreements: [{ answer_ts: answer.ts, topic: "the warning color", sources: ["Figma", "the code"], design_system: true, confidence: 0.9 }],
   });
 
   async function raised() {
@@ -394,7 +394,7 @@ describe("C6: a disagreement uno-bot noticed while answering", () => {
     const card = w.posts[0]!;
     assert.equal(card.channel, DM);
     assert.equal(card.threadTs, root.ts);
-    assert.match(card.text, /Yesterday I noticed Figma and the code disagree on the warning colour\. Want me to post a note about it in #plus-universal\?/);
+    assert.match(card.text, /Yesterday I noticed Figma and the code disagree on the warning color\. Want me to post a note about it in #plus-universal\?/);
 
     const proposal = w.staged[0]!;
     assert.equal(proposal.channel, DM);
@@ -406,7 +406,7 @@ describe("C6: a disagreement uno-bot noticed while answering", () => {
     assert.equal(op.toolName, RAISE_TOOL);
     assert.equal(op.input.channel, UNIVERSAL, "the design system's rung");
     const note = String(op.input.text);
-    assert.match(note, /Figma and the code disagree on the warning colour/);
+    assert.match(note, /Figma and the code disagree on the warning color/);
     // No quote, no requester.
     assert.equal(note.includes(MAYA), false);
     assert.equal(/<@/.test(note), false);
@@ -471,7 +471,7 @@ describe("nothing from a DM reaches a channel without the person's ✅", () => {
         dmReply({ unanswered: [{ answer_ts: a1.ts, what: "the tutor ratio", confidence: 0.9 }] }),
         dmReply({
           decisions: [{ message_ts: r2.ts, confidence: 0.9 }],
-          disagreements: [{ answer_ts: a2.ts, topic: "the warning colour", sources: ["Figma", "the code"], design_system: true, confidence: 0.9 }],
+          disagreements: [{ answer_ts: a2.ts, topic: "the warning color", sources: ["Figma", "the code"], design_system: true, confidence: 0.9 }],
         }),
       ],
       sweepReplies: [
@@ -569,12 +569,12 @@ describe("the DM list", () => {
 
 describe("uno-bot never reads its own posts back as new", () => {
   // A fresh root each case: the cases move its latest reply.
-  let root = msg(MAYA, ts(29, 15), "What's our warning colour?", { reply_count: 1, latest_reply: ts(29, 15, 1) });
+  let root = msg(MAYA, ts(29, 15), "What's our warning color?", { reply_count: 1, latest_reply: ts(29, 15, 1) });
   beforeEach(() => {
-    root = msg(MAYA, ts(29, 15), "What's our warning colour?", { reply_count: 1, latest_reply: ts(29, 15, 1) });
+    root = msg(MAYA, ts(29, 15), "What's our warning color?", { reply_count: 1, latest_reply: ts(29, 15, 1) });
   });
   const answer = bot(ts(29, 15, 1), "Figma has warning at #FFB020, but the code's token is #715C00, so they disagree.", { thread_ts: root.ts });
-  const warning = { topic: "the warning colour", sources: ["Figma", "the code"], design_system: true, confidence: 0.9 };
+  const warning = { topic: "the warning color", sources: ["Figma", "the code"], design_system: true, confidence: 0.9 };
 
   it("a ⛔'d raise card is never offered again: its own post that night is context, not an answer", async () => {
     const dm: FakeChannel = { kind: "dm", history: [root], threads: { [root.ts]: [root, answer] } };
@@ -608,12 +608,12 @@ describe("uno-bot never reads its own posts back as new", () => {
   it("the same disagreement said again in the thread is one offer", async () => {
     const dm: FakeChannel = { kind: "dm", history: [root], threads: { [root.ts]: [root, answer] } };
     const later = msg(MAYA, ts(30, 16), "Which one should I use?", { thread_ts: root.ts });
-    const again = bot(ts(30, 16, 1), "Still the same: Figma and the code disagree on the warning colour.", { thread_ts: root.ts });
+    const again = bot(ts(30, 16, 1), "Still the same: Figma and the code disagree on the warning color.", { thread_ts: root.ts });
     const w = world({
       dm,
       dmReplies: [
         dmReply({ disagreements: [{ answer_ts: answer.ts, ...warning }] }),
-        dmReply({ disagreements: [{ answer_ts: again.ts, ...warning, topic: "The warning colour." }] }),
+        dmReply({ disagreements: [{ answer_ts: again.ts, ...warning, topic: "The warning color." }] }),
       ],
       now: at(29, 22),
     });
@@ -752,7 +752,7 @@ describe("uno-bot never reads its own posts back as new", () => {
     const rows = rowsOf(w.store);
     assert.equal(rows.length, 2);
     const added = rows.find((r) => r.threadTs === root2.ts)!;
-    assert.equal(added.id, raiseId(DM, ["the PRD", "the Roadmap card"], root2.ts), "the launch date, not the quiet warning colour");
+    assert.equal(added.id, raiseId(DM, ["the PRD", "the Roadmap card"], root2.ts), "the launch date, not the quiet warning color");
   });
 });
 
@@ -788,7 +788,7 @@ describe("a DM ask waits behind a person's own asks", () => {
       { ...base, id: `${DM}:self`, kind: "self_reminder", dueAt: at(30, 13) },
     ]);
     for (const id of [`${DM}:a:unanswered`, `${DM}:b:unanswered`, `${DM}:self`]) await store.saveText(id, { what: "the ratio", bodies: {} }, at(60, 0));
-    await store.saveText(`${DM}:c:raise`, { what: "the warning colour", bodies: {}, raise: { sources: ["Figma", "the code"], to: "plus-universal" } }, at(60, 0));
+    await store.saveText(`${DM}:c:raise`, { what: "the warning color", bodies: {}, raise: { sources: ["Figma", "the code"], to: "plus-universal" } }, at(60, 0));
     const now = at(30, 13, 5);
     const order: string[] = [];
     const nudges = await runCommitmentNudges(NUDGE, {

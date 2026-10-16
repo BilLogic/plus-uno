@@ -15,7 +15,7 @@
 // on every run.
 //
 // WHAT IT CANNOT REACH: a dead schema word used as ordinary English. `layers`
-// became `lanes`, but "a labelled future layer" is a correct sentence, so the
+// became `lanes`, but "a labeled future layer" is a correct sentence, so the
 // sweep matches BACKTICKED identifiers and named conventions only. A bare word
 // is left to review — the alternative is a check that fails on English.
 //
@@ -416,9 +416,9 @@ test("every qualified identifier in the tool schemas resolves against the accoun
 
 test("the allowlist bites — a column the schema lacks is caught, on a table it has", () => {
   const schema = catalog();
-  assert.deepEqual(unresolved("read `cells.picture` first, then `cells.colour`.", schema, "planted"), [
+  assert.deepEqual(unresolved("read `cells.picture` first, then `cells.color`.", schema, "planted"), [
     "planted:1 names `cells.picture`, which the schema lacks",
-    "planted:1 names `cells.colour`, which the schema lacks",
+    "planted:1 names `cells.color`, which the schema lacks",
   ]);
   // A live column passes; a `file.ext` span is not an identifier claim.
   assert.deepEqual(unresolved("read `cells.frame`; see `AGENT.md` and `SKILL.md`.", schema, "planted"), []);

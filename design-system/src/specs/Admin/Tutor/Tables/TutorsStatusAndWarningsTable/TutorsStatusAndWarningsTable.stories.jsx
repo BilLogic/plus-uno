@@ -101,7 +101,7 @@ export const Interactive = {
     },
 };
 
-/** "Check-In Needed" carries the info colour role on its field; other statuses are neutral. */
+/** "Check-In Needed" carries the info color role on its field; other statuses are neutral. */
 Interactive.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const [first] = canvas.getAllByRole('combobox', { name: 'Status for Floyd Miles' });

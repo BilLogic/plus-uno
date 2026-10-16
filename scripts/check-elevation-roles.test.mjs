@@ -20,7 +20,7 @@
  * ─── WHAT IT DELIBERATELY CANNOT SEE ────────────────────────────────────────
  *
  *  1. WHETHER THE TABLE IS RIGHT. If Light/2 is the wrong shadow for a card,
- *     this passes happily. It checks agreement, not judgement.
+ *     this passes happily. It checks agreement, not judgment.
  *  2. COMPONENTS THAT USE A LEVEL DIRECTLY. `PatternModal.scss` names
  *     `--elevation-light-4` and does not go through a role — correctly, since
  *     no `modal` role exists. Auditing every `box-shadow` against the table is
@@ -47,7 +47,7 @@ const MAPPING = path.join(REPO_ROOT, 'design-system/guidelines/figma/token-mappi
  * Which table row each shadow role answers.
  *
  * The role is matched to a row by the row's own words rather than by position,
- * so re-ordering the table is not a failure and re-labelling it is.
+ * so re-ordering the table is not a failure and re-labeling it is.
  */
 const ROLES = [
   { token: '--surface-raised-shadow', rowMatches: /cards/i },
@@ -87,7 +87,7 @@ test('the mapping table is still parseable', () => {
 for (const role of ROLES) {
   test(`${role.token} points at the level the mapping table assigns`, () => {
     const row = rows.find((r) => role.rowMatches.test(r.uses));
-    assert.ok(row, `no row in token-mapping.md matches ${role.rowMatches} — the table was relabelled`);
+    assert.ok(row, `no row in token-mapping.md matches ${role.rowMatches} — the table was relabeled`);
 
     const actual = roleLevel(scss, role.token);
     assert.ok(actual !== null, `${role.token} is not a var(--elevation-light-N) in _elevation.scss`);

@@ -4,7 +4,7 @@ summary: How a PLUS form behaves — when it validates, how errors surface on su
 
 <!-- Tier: 2 | Load when: building or reviewing a form that validates, submits, or edits saved values -->
 
-# Form behaviour
+# Form behavior
 
 What a form does over time: when it checks a value, what happens on submit,
 and what a field shows when the person cannot change it. Where the fields sit

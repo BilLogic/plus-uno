@@ -4,7 +4,7 @@
 // "here is the answer", "approve this?" — and this file decides how Slack
 // renders it. Three renderings live here and nowhere else now:
 //
-//   • the ONE acknowledgement rule: 👀 off the assistant surface only, because
+//   • the ONE acknowledgment rule: 👀 off the assistant surface only, because
 //     there the working signal, the titled thread and the streamed reply
 //     already say it and a fourth signal on one message is noise. The working
 //     signal itself is raised on EVERY surface — this once read "never both",
@@ -376,7 +376,7 @@ export function isAssistantThread(channel: string): boolean {
 // external-subrequest cap (SUBREQUEST_CAP) or was hard-killed mid-turn. Neither
 // produces a Slack response, so neither produced a line, and a stuck "Working…"
 // therefore had three possible causes and one symptom. That is why the same
-// artefact kept being diagnosed from screenshots.
+// artifact kept being diagnosed from screenshots.
 //
 // So the pairing reports itself EVERY time, success included, carrying the
 // turn's external spend. The instrument is not any one line: it is that a `set`

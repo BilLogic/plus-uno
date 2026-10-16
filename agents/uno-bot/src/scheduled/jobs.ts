@@ -178,9 +178,9 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
     const store = askCategoriesFor(env);
     if (!store) return;
     const r = await runClassifyBatch({ store, provider: selectProvider(env), now: () => Date.now(), dryRun });
-    const verb = dryRun ? "would label" : "labelled";
+    const verb = dryRun ? "would label" : "labeled";
     console.log(
-      `[usage] ${job.key}: ${verb} ${r.labelled} ask(s) (${r.blank} blank), ${r.failed} failed, ${r.givenUp} given up`,
+      `[usage] ${job.key}: ${verb} ${r.labeled} ask(s) (${r.blank} blank), ${r.failed} failed, ${r.givenUp} given up`,
     );
   },
   // Both runs: text past the purge cutoff goes, whatever happened to it.

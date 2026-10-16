@@ -1,10 +1,10 @@
 {
-  "_readme": "Eval cases for uno-bot's Figma comment-decision detector (agents/uno-bot/src/figma-comments/detector.ts, #900). Each case is one file's comment threads under Specs or For Review, the cards its title names, the card's PRD, the detector reply recorded for it, and what the parse must keep. agents/uno-bot/tests/figma-comments.test.ts replays every case through the real detector over the fake ModelProvider and fails when what is kept differs from `expect`. The shapes to tell apart: a settled behaviour rule (PRD: a new line under its section, or a rewrite of the block that states the old rule), a status decision (a card field), a design-system decision (an intake), and a visual detail or an open question (nothing). Plain text, under docs/evals/, so uno-bot's read guard withholds it from the bot being measured (docs/evals/fixtures/README.md).",
+  "_readme": "Eval cases for uno-bot's Figma comment-decision detector (agents/uno-bot/src/figma-comments/detector.ts, #900). Each case is one file's comment threads under Specs or For Review, the cards its title names, the card's PRD, the detector reply recorded for it, and what the parse must keep. agents/uno-bot/tests/figma-comments.test.ts replays every case through the real detector over the fake ModelProvider and fails when what is kept differs from `expect`. The shapes to tell apart: a settled behavior rule (PRD: a new line under its section, or a rewrite of the block that states the old rule), a status decision (a card field), a design-system decision (an intake), and a visual detail or an open question (nothing). Plain text, under docs/evals/, so uno-bot's read guard withholds it from the bot being measured (docs/evals/fixtures/README.md).",
   "cases": [
     {
       "id": "FD1",
-      "name": "a resolved behaviour rule the PRD does not state yet: one line under its section",
-      "judgeNote": "Sarah's comment, agreed by Meryem and resolved, settles a behaviour rule: the progress bar stays hidden until the first goal is set. The PRD's Goal states section says nothing of it, so the rule is added after that section's last block (b-goal-2), in the PRD's voice.",
+      "name": "a resolved behavior rule the PRD does not state yet: one line under its section",
+      "judgeNote": "Sarah's comment, agreed by Meryem and resolved, settles a behavior rule: the progress bar stays hidden until the first goal is set. The PRD's Goal states section says nothing of it, so the rule is added after that section's last block (b-goal-2), in the PRD's voice.",
       "input": {
         "file": { "title": "Goal Setting / Card 2482 / Sarah", "url": "https://www.figma.com/design/GoalFile1" },
         "threads": [

@@ -5,11 +5,11 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { run } from './check-focus-ring.mjs';
-import { AFFORDANCE, NEGATED, colours, failures, focusRules, indicators, invisible, ratio } from './focus-ring.mjs';
+import { AFFORDANCE, NEGATED, colors, failures, focusRules, indicators, invisible, ratio } from './focus-ring.mjs';
 import { declarationErrors } from './lib/declared-grounds.mjs';
 import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
-const VALUES = colours();
+const VALUES = colors();
 
 function corpus(files) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'focus-ring-'));

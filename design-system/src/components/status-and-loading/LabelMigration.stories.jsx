@@ -157,9 +157,9 @@ export const TagInputChips = {
         await expect(getComputedStyle(tagOf('Fractions')).borderTopColor, 'a Tag color is taken as given')
             .toBe(tokenColor(canvasElement, '--color-mastering-content-border-subtle'));
         await expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('[TagInput] color "success" is deprecated; use "green"'));
-        await expect(getComputedStyle(tagOf('Ratios')).borderTopColor, 'an unknown color is grey')
+        await expect(getComputedStyle(tagOf('Ratios')).borderTopColor, 'an unknown color is gray')
             .toBe(getComputedStyle(tagOf('Algebra')).borderTopColor);
-        await expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('[TagInput] color "lime" is not a Tag color; it falls back to grey.'));
+        await expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('[TagInput] color "lime" is not a Tag color; it falls back to gray.'));
 
         await userEvent.click(within(group).getByRole('button', { name: 'Remove Geometry' }));
         await expect(onRemove).toHaveBeenCalledWith(1, { text: 'Geometry', color: 'success' });

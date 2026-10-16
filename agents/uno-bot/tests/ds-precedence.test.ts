@@ -532,7 +532,7 @@ describe("the end-of-day check", () => {
     assert.match(morning.staged[0]!.proposalText, /week of Dec 4/);
   });
 
-  it("a report kept before the run's date was recorded is labelled with its check's date", async () => {
+  it("a report kept before the run's date was recorded is labeled with its check's date", async () => {
     const kept = { checkedAt: "2026-09-25T22:00:00.000Z", items: (await weekReport()).items };
     const morning = postDeps(kept);
     await morning.morning();

@@ -2,7 +2,7 @@
 //
 // The loop decides what a turn DOES: whether another iteration is affordable,
 // whether `/stop` was pressed, what a side-effect call becomes, when a lookup
-// is refused, when to give up and synthesise, whether to retry after a failure.
+// is refused, when to give up and synthesize, whether to retry after a failure.
 // An adapter decides what a model SEES and how its answer is read: the wire
 // shape, the system-prompt mechanics, the tier's model and dials, the cache, the
 // backup model, the tool-result echo discipline.

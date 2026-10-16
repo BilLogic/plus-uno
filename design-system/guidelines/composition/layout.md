@@ -89,7 +89,7 @@ The sidebar is a collapsible tree with three categories:
 The active item is highlighted. The sidebar collapses to icons on narrow viewports.
 `PageLayout` renders it; do not build a second navigation surface.
 
-## Responsive behaviour
+## Responsive behavior
 
 - **Desktop (≥1200px)** — full sidebar and content area side by side.
 - **Tablet (768–1199px)** — sidebar collapses to an icon-only rail; content fills the width.

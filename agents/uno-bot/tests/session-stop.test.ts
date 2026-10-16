@@ -17,7 +17,7 @@
 // the run's thread from the same call posted into the wrong conversation, and
 // it goes green on a door nobody ever calls. The doors are modules now, so the
 // suite drives them instead. (The manifest-to-dispatcher check that also lived
-// here is not about the stop control and could not become behavioural; it moved
+// here is not about the stop control and could not become behavioral; it moved
 // intact to `manifest-subscriptions.test.ts`.)
 //
 // The properties worth the file are the ones that are easy to get wrong, and
@@ -326,7 +326,7 @@ describe("the Home-tab button answers the thread first and the presser second", 
     assert.equal(speak.attempts().length, 2);
   });
 
-  it("honours the press when Slack will not open a DM to report it", async () => {
+  it("honors the press when Slack will not open a DM to report it", async () => {
     const speak = stage();
     await runHomeStopDoor({ userId: PRESSER }, homeDeps(speak, running(CHANNEL, THREAD), null));
     assert.deepEqual(speak.attempts(), [

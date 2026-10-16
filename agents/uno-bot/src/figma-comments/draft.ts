@@ -32,7 +32,7 @@ export type DecisionUpdate =
   | { kind: "prd"; change: "add" | "change"; section: string | null; page: { title: string; url: string } }
   | { kind: "card"; card: number; field: string; from: string | null; to: string; url: string }
   | { kind: "intake"; title: string }
-  /** A behaviour or scope decision with no PRD to write to: no card, or a card with no PRD subpage. */
+  /** A behavior or scope decision with no PRD to write to: no card, or a card with no PRD subpage. */
   | { kind: "no-prd"; card: number | null };
 
 /** Where the decision was said, for the intake's body. */

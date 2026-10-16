@@ -49,7 +49,7 @@ export function splitBalanced(text: string, limit: number): string[] {
   // plain `let`s it narrows `openFence` to `null` at every read after the
   // declaration, so `openFence ? openFence.length : 0` fails with "Property
   // 'length' does not exist on type 'never'". Narrowing of a property is reset
-  // after any function call, which is exactly the behaviour this needs.
+  // after any function call, which is exactly the behavior this needs.
   const state: {
     /** Lines of the chunk being built. */
     current: string[];

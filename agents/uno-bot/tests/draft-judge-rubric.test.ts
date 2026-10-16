@@ -1,6 +1,6 @@
 // The judge's condensed rubric is a COPY of docs/evals/rubrics/bot-answer.md,
 // and a copy is a thing that drifts. It did, silently, for weeks: the confidence
-// ritual was redesigned on 2026-07-16 from a trailing labelled rating to one
+// ritual was redesigned on 2026-07-16 from a trailing labeled rating to one
 // woven clause. AGENT.md and the canonical rubric were both updated; the judge's
 // prompt was not, so the mechanism meant to catch rubric violations went on
 // requiring the retired format while nothing checked that the replacement was
@@ -63,7 +63,7 @@ test("D9 still fails a false freshness claim", () => {
 
 test("D9 treats the trailing label as retired, not required", () => {
   const d9 = d9Line();
-  assert.match(d9, /RETIRED/, "D9 should name the trailing labelled rating as retired");
+  assert.match(d9, /RETIRED/, "D9 should name the trailing labeled rating as retired");
   // The exact shape of the 2026-07-12 prompt, which told the judge a factual
   // answer "ends with a confidence line". Requiring it is the regression.
   assert.doesNotMatch(

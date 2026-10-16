@@ -146,7 +146,7 @@ Figma cleanup executed (phases 4–5): File 1 pages renamed/regrouped under labe
   consistently. Verified in-browser.
 - **Do's & don'ts.** Now a sectioned, side-by-side two-column block (green Do /
   red Don't with icons) via `GridStories.DosAndDonts`. Verified in-browser.
-- **Sidebar 164.** Reconciled the 164↔184 drift in favour of **164px**
+- **Sidebar 164.** Reconciled the 164↔184 drift in favor of **164px**
   (`--layout-sidebar-width`). Finding: the 184 was a hardcoded tab width, not a
   different grouping. Introduced `SIDEBAR_WIDTH = 164` constant in PageLayout and
   fixed all shell refs: PageLayout wrapper+inner, both SidebarTab copies

@@ -1,17 +1,17 @@
 import React from 'react';
 import { expect } from 'storybook/test';
 
-import { contrast as contrastOf, parseColour } from '../lib/tokens.mjs';
+import { contrast as contrastOf, parseColor } from '../lib/tokens.mjs';
 
 /**
- * The two colour defects #312 measured, and what each one could become (#268).
+ * The two color defects #312 measured, and what each one could become (#268).
  *
  * WHAT THIS PAGE IS. A decision aid, in the same shape as
  * `AiIdentity.stories.jsx` and for the same reason: both questions are Bill's,
  * and shipping a default would make it the answer by inertia. Nothing here adds
  * a token. Every current value is READ FROM THE PAGE at render time, so this
  * cannot quietly describe a palette that has moved on; every candidate is a
- * local constant, labelled as one.
+ * local constant, labeled as one.
  *
  * THE TWO FINDINGS, from #312's sweep of all 65 style x fill combinations:
  *
@@ -22,7 +22,7 @@ import { contrast as contrastOf, parseColour } from '../lib/tokens.mjs';
  *      oversight: `--color-warning` is a YELLOW, and a yellow dark enough to
  *      carry white text has stopped looking like a warning.
  *
- *   2. `info` and `tertiary` are the same colour. Not similar — the same. One
+ *   2. `info` and `tertiary` are the same color. Not similar — the same. One
  *      line: `--color-info: var(--color-tertiary)`. Two names, one appearance,
  *      and a caller choosing between them is making a distinction the interface
  *      does not render.
@@ -46,7 +46,7 @@ import { contrast as contrastOf, parseColour } from '../lib/tokens.mjs';
  * teal we already use for `tertiary`.
  */
 export default {
-    title: 'Foundations/Colour candidates',
+    title: 'Foundations/Color candidates',
     tags: ['!dev', '!autodocs'],
 };
 
@@ -64,7 +64,7 @@ const channels = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)
  * The adapter is only about SHAPE: everything below speaks in `#rrggbb`, the
  * module in `{r, g, b, a}`.
  */
-const contrast = (a, b) => contrastOf(parseColour(a), parseColour(b));
+const contrast = (a, b) => contrastOf(parseColor(a), parseColor(b));
 
 /** Hue in degrees, for the arc diagram. Saturation and lightness as percents. */
 const hsl = (hex) => {
@@ -102,7 +102,7 @@ const AA_TEXT = 4.5;
 /**
  * Three ways out of 3.70:1, and what each one costs.
  *
- * `ink` and `white` are not new colours — they are the two label choices the
+ * `ink` and `white` are not new colors — they are the two label choices the
  * system already has. Only `darkened` invents a value, and it is the same hue
  * at 85% of each channel, which is the smallest change that reaches AA with a
  * white label.
@@ -114,7 +114,7 @@ const WARNING_CANDIDATES = [
         label: 'ink',
         argument:
             'Atlassian’s shape: a bold warning is a light ground with dark text, because a ' +
-            'yellow dark enough for white text is no longer yellow. Costs no new colour at all — ' +
+            'yellow dark enough for white text is no longer yellow. Costs no new color at all — ' +
             'the ink is --color-on-warning-container, which the system already has.',
         cost: 'Filled warning surfaces change from white text to dark. Visible, and only on warning.',
     },
@@ -125,7 +125,7 @@ const WARNING_CANDIDATES = [
         argument:
             'The same hue at 85% of each channel. Reaches AA with a white label and leaves every ' +
             'caller’s markup untouched.',
-        cost: 'The warning colour itself moves, so containers, text and state layers derived from ' +
+        cost: 'The warning color itself moves, so containers, text and state layers derived from ' +
             'it all shift with it — and at 85% it is closer to olive than to a caution yellow.',
     },
     {
@@ -216,7 +216,7 @@ export const WarningGround = () => {
             <h2 className="h4">A filled warning button, three ways</h2>
             <p className="body2-txt" style={{ maxWidth: '62ch' }}>
                 Every ratio below is computed from <code>--color-warning</code> as this page
-                renders it. <strong>None of these is a proposal.</strong> A and C keep the colour
+                renders it. <strong>None of these is a proposal.</strong> A and C keep the color
                 the system has; B moves it, and everything derived from it moves too.
             </p>
 
@@ -306,7 +306,7 @@ WarningGround.play = async () => {
 };
 
 /**
- * `info` and `tertiary` are one colour — and the arc the palette leaves empty.
+ * `info` and `tertiary` are one color — and the arc the palette leaves empty.
  */
 export const InfoRegister = () => {
     const info = readToken('--color-info') ?? '#0e8175';
@@ -324,7 +324,7 @@ export const InfoRegister = () => {
 
     return (
         <div style={{ maxWidth: '1000px', padding: '24px' }}>
-            <h2 className="h4">Two names, one colour</h2>
+            <h2 className="h4">Two names, one color</h2>
             <div
                 data-finding="info-equals-tertiary"
                 data-same={String(same)}
@@ -392,8 +392,8 @@ export const InfoRegister = () => {
             <p className="body3-txt" style={{ maxWidth: '62ch', marginTop: '12px', color: 'var(--color-on-surface-variant)' }}>
                 <strong>The other answer is subtraction.</strong> If nothing in the product needs a
                 register distinct from <code>tertiary</code>, the honest fix is to delete the
-                <code> info</code> alias rather than to give it a colour — two names for one thing
-                is the defect, and a second colour is only one of the two ways to end it.
+                <code> info</code> alias rather than to give it a color — two names for one thing
+                is the defect, and a second color is only one of the two ways to end it.
             </p>
         </div>
     );
@@ -407,7 +407,7 @@ InfoRegister.play = async () => {
     // The finding. When someone re-points `info`, this goes red — which is the
     // point: the page describes a decision that has not been made yet, and it
     // must not keep saying so after it has.
-    await expect(info, 'info and tertiary are the same colour (#312)').toBe(tertiary);
+    await expect(info, 'info and tertiary are the same color (#312)').toBe(tertiary);
 
     // The candidate has to be usable, or showing it is showing something that
     // could never ship.

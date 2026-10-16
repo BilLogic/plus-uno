@@ -29,7 +29,7 @@ Do not bulk-load. Two or three documents per task is the budget.
 
 | Folder | Holds | Start at |
 |--------|-------|----------|
-| [`foundations/`](foundations/overview.md) | The fourteen foundations — tokens, colour, type, spacing, grid, elevation, iconography, accessibility, content, and the five not yet authored | `foundations/overview.md` |
+| [`foundations/`](foundations/overview.md) | The fourteen foundations — tokens, color, type, spacing, grid, elevation, iconography, accessibility, content, and the five not yet authored | `foundations/overview.md` |
 | [`components/`](components/overview.md) | Per-component guidance: when to use, correct and incorrect, accessibility | `components/overview.md` |
 | [`composition/`](composition/overview.md) | How components combine — layout, hierarchy, surfaces, forms | `composition/overview.md` |
 | [`figma/`](figma/overview.md) | Design-to-code: registries, the load gate, token mapping, MCP workflows | `figma/overview.md` |
@@ -118,7 +118,7 @@ Read component source and stories before using unfamiliar components. Never hall
 
 ### The agent's role
 
-The coding agent is an **implementation assistant**. It faithfully realises
+The coding agent is an **implementation assistant**. It faithfully realizes
 designer intent while enforcing the design system. It does not make UX, IA, or
 product decisions.
 
@@ -134,7 +134,7 @@ product decisions.
 - **No hallucinated props or layouts** — use the skeletons in `composition/layout.md` and read the source for prop names.
 - **Minimal scope** — match surrounding conventions; do not add unrelated changes.
 
-### How this knowledge is organised
+### How this knowledge is organized
 
 - **One responsibility per document** — load only what the task requires; `overview.md` routes.
 - **Discovery over duplication** — route to the canonical doc; never copy knowledge into a prompt or a stub.

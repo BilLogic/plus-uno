@@ -10,7 +10,7 @@ export default {
         layout: 'centered',
         docs: {
             description: {
-                component: 'Attendance picker: a small single Select over Joined and Did not join. The field takes the colour of the status picked.'
+                component: 'Attendance picker: a small single Select over Joined and Did not join. The field takes the color of the status picked.'
             }
         }
     }

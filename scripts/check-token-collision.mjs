@@ -17,11 +17,11 @@
  * `visibility: collapse`, and axe skips what is not visible. A gate that only
  * runs a browser cannot be the only gate for this.
  *
- * WHAT IT LOOKS AT. Not colour, and not contrast: identity. Two declarations in
+ * WHAT IT LOOKS AT. Not color, and not contrast: identity. Two declarations in
  * ONE component stylesheet, naming ONE custom property, one as a background and
  * one as a foreground over it. That is mechanically decidable from the file, it
  * needs no browser, and it cannot be an accident — the ratio is exactly 1.00:1
- * every time. Contrast that is merely poor is a judgement call and stays with
+ * every time. Contrast that is merely poor is a judgment call and stays with
  * axe and with review; this is the subset that never has a defensible answer.
  *
  * IT MODELS THE CASCADE, because the fix for #219 does not delete the offending
@@ -30,7 +30,7 @@
  * re-states the same links at higher specificity in `--color-on-primary`. A
  * check that stopped at "both tokens appear in this file" would fail the fixed
  * file, so it would be turned off. So each candidate pair is exonerated when
- * another rule re-colours the same target in a different token, is guaranteed
+ * another rule re-colors the same target in a different token, is guaranteed
  * to apply wherever that background is painted (its whole scope chain, not just
  * its first segment, matched by the painted element's — which is what excludes
  * both a sibling variant's rule and an override that only reaches part of the
@@ -335,7 +335,7 @@ export function collisions(source) {
  * painted element's own chain, in order, each of the override's compounds a
  * subset of the painted segment it lands on. `.plus-navbar .nav-link` qualifies
  * against `.plus-navbar.plus-navbar-bg-primary`; `.plus-navbar .card .nav-link`
- * does not, because it only re-colours the links that happen to sit inside a
+ * does not, because it only re-colors the links that happen to sit inside a
  * `.card` and leaves every other link on the painted bar exactly as it was.
  *
  * Comparing only the first segment — what this did until #233 — answered a
@@ -360,8 +360,8 @@ function scopedInside(ovSelector, bgSelector) {
 }
 
 /**
- * Is the pair already neutralised by the cascade? True when some other rule
- * re-colours the same target in a different token, is guaranteed to apply
+ * Is the pair already neutralized by the cascade? True when some other rule
+ * re-colors the same target in a different token, is guaranteed to apply
  * wherever that background is painted, and wins — on specificity, or on source
  * order at a tie.
  */

@@ -5,12 +5,12 @@ import Input from './Input';
 import TagInput from './TagInput';
 
 /**
- * `TagInput` — a field of Tags with a text entry after them, modelled on
+ * `TagInput` — a field of Tags with a text entry after them, modeled on
  * Notion's multi-select: typing filters a list of options, and Enter picks the
  * highlighted one or creates a new tag.
  *
  * THE TEST SEAM IS THIS FILE. Story `play:` functions run by `check:storybook`
- * in a real browser, and each behaviour the field promises has one. The list
+ * in a real browser, and each behavior the field promises has one. The list
  * renders in a portal on `document.body`, so the tests look for it there.
  */
 
@@ -21,7 +21,7 @@ export default {
 };
 
 const TOPICS = [
-    { value: 'design-judgment', label: 'Design judgment', color: 'grey' },
+    { value: 'design-judgment', label: 'Design judgment', color: 'gray' },
     { value: 'decision-recall', label: 'Decision recall', color: 'purple' },
     { value: 'design-taxonomy', label: 'Design system taxonomy', color: 'blue' },
     { value: 'dev-coordination', label: 'Dev coordination', color: 'teal' },
@@ -83,11 +83,11 @@ const Owned = ({ onCreateSpy, initialOptions = TOPICS, ...props }) => {
     );
 };
 
-const TAG_COLORS = ['grey', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal'];
+const TAG_COLORS = ['gray', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal'];
 
 /**
  * When nothing matches, Create is highlighted and Enter creates the tag. The
- * new tag's random colour is reported once, with its value.
+ * new tag's random color is reported once, with its value.
  */
 export const CreateWhenNothingMatches = {
     args: { onCreateSpy: fn() },
@@ -104,7 +104,7 @@ export const CreateWhenNothingMatches = {
         const create = within(listbox).getByRole('option', { name: 'Create Music' });
         await expect(input).toHaveAttribute('aria-activedescendant', create.id);
 
-        // The row previews the tag it will create: a real Tag, in its colour.
+        // The row previews the tag it will create: a real Tag, in its color.
         const preview = create.querySelector('.plus-tag');
         await expect(preview).not.toBeNull();
         await expect(preview).toHaveTextContent('Music');
@@ -229,8 +229,8 @@ export const PasteSplitsOnCommas = {
     },
 };
 
-/** Each pasted tag gets one of Tag's seven colours, reported with its value. */
-export const PastedTagsGetTagColours = {
+/** Each pasted tag gets one of Tag's seven colors, reported with its value. */
+export const PastedTagsGetTagColors = {
     args: { onCreateSpy: fn() },
     render: (args) => <div style={stack}><Owned {...args} initialOptions={[]} /></div>,
     play: async ({ canvasElement, args }) => {
@@ -249,7 +249,7 @@ export const PastedTagsGetTagColours = {
     },
 };
 
-/** A new value is cut to `maxLength`, and `onCreate` reports the cut value in a Tag colour. */
+/** A new value is cut to `maxLength`, and `onCreate` reports the cut value in a Tag color. */
 export const MaxLength = {
     args: { onCreateSpy: fn() },
     render: (args) => <div style={stack}><Owned {...args} maxLength={5} /></div>,
@@ -469,7 +469,7 @@ Controlled.play = async ({ canvasElement }) => {
 
 /**
  * A screen that owns its options and lets people tidy them where they pick
- * them: rename, delete, recolour and reorder, each reported to the caller,
+ * them: rename, delete, recolor and reorder, each reported to the caller,
  * which updates its list, as a real caller would.
  */
 const Tidy = ({
@@ -574,10 +574,10 @@ export const OptionMenuDeletes = {
 };
 
 /**
- * The menu lists Tag's seven colours with the current one checked. A click
+ * The menu lists Tag's seven colors with the current one checked. A click
  * picks one; so do the arrow keys and Enter from the name field.
  */
-export const OptionMenuChangesColour = {
+export const OptionMenuChangesColor = {
     args: tidyArgs(),
     render: (args) => <div style={stack}><Tidy {...args} /></div>,
     play: async ({ canvasElement, args }) => {
@@ -585,9 +585,9 @@ export const OptionMenuChangesColour = {
         const more = await openMenuButton(canvasElement, 'Decision recall');
         await userEvent.click(more);
         const menu = await body.findByRole('listbox', { name: 'Options for Decision recall' });
-        const colours = within(within(menu).getByRole('group', { name: 'Colour' })).getAllByRole('option');
-        await expect(colours.map((row) => row.textContent)).toEqual(
-            ['Grey', 'Blue', 'Green', 'Purple', 'Magenta', 'Yellow', 'Teal']
+        const colors = within(within(menu).getByRole('group', { name: 'Color' })).getAllByRole('option');
+        await expect(colors.map((row) => row.textContent)).toEqual(
+            ['Gray', 'Blue', 'Green', 'Purple', 'Magenta', 'Yellow', 'Teal']
         );
         await expect(within(menu).getByRole('option', { name: 'Purple' })).toHaveAttribute('aria-selected', 'true');
 
@@ -637,7 +637,7 @@ export const KeyboardReorder = {
         await expect(body.getByRole('option', { name: 'Dev coordination' })).toHaveClass('has-drop-indicator');
         await userEvent.keyboard('{Escape}');
         await expect(args.onReorderSpy).not.toHaveBeenCalled();
-        await waitFor(() => expect(announcer(canvasElement)).toHaveTextContent('Reorder cancelled'));
+        await waitFor(() => expect(announcer(canvasElement)).toHaveTextContent('Reorder canceled'));
         await expect(body.getByRole('option', { name: 'Design judgment' })).not.toHaveClass('is-dragging');
 
         await userEvent.keyboard(' {ArrowDown}{ArrowDown}{Enter}');

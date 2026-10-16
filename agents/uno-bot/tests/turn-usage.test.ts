@@ -191,7 +191,7 @@ test("a greeting with no ask — a reaction and nothing asked — is test traffi
 
 const DM = { channel: "D0DM", surface: "assistant" as const, threaded: false };
 
-test("a DM ask is labelled in the turn, and its row never holds text", async () => {
+test("a DM ask is labeled in the turn, and its row never holds text", async () => {
   const asked: string[] = [];
   const h = harness({
     now: ticking(),
@@ -258,7 +258,7 @@ test("channel asks and test traffic are never classified in the turn", async () 
   assert.deepEqual([g.testTraffic, g.requestText, g.painCategory], [true, null, null]);
 });
 
-test("a group-DM ask is labelled in the turn, and its text is never stored", async () => {
+test("a group-DM ask is labeled in the turn, and its text is never stored", async () => {
   const h = harness({ classifyAsk: async () => "Relay/routing" });
   await runTurn(request({ conversationType: "mpim", text: "who owns the tutor import?" }), h.deps);
   const row = only(h.usage.records());
@@ -269,7 +269,7 @@ test("a group-DM ask is labelled in the turn, and its text is never stored", asy
   assert.ok(!JSON.stringify(h.usage.records()).includes("tutor import"), "no trace of the words");
 });
 
-test("an ask whose conversation type is unknown (an app_mention) is labelled in the turn, with no text", async () => {
+test("an ask whose conversation type is unknown (an app_mention) is labeled in the turn, with no text", async () => {
   const h = harness({ classifyAsk: async () => "Artifact location" });
   await runTurn(request(), h.deps);
   const row = only(h.usage.records());

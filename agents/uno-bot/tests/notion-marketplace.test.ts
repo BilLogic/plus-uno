@@ -116,7 +116,7 @@ test("publishing a new prototype creates one row with every field it was given a
   assert.match(posted.at(-1)!, /Prototype Marketplace/);
 });
 
-test("publishing a prototype already in the catalogue updates its row instead of adding a second", async () => {
+test("publishing a prototype already in the catalog updates its row instead of adding a second", async () => {
   const existing = [{ id: ROW, url: `https://www.notion.so/${ROW}`, properties: { Name: { type: "title", title: [{ plain_text: "Session review" }] } } }];
   serve(routes({ [`PATCH /pages/${ROW}`]: { body: { id: ROW, url: `https://www.notion.so/${ROW}` } } }, { existing }));
   const { executeNotionCreate } = await tool();

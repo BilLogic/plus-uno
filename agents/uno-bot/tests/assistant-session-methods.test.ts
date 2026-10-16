@@ -3,14 +3,14 @@
 // SOURCE-READ ON PURPOSE, and it is not a door. `slack/assistant.ts` is the
 // Slack CLIENT — a thin currying of `slackCall` onto Slack's method names — and
 // the acceptance criterion behind it is a NEGATIVE one: "no bridged assistant
-// status or title calls remain". A negative is exactly what a behavioural test
+// status or title calls remain". A negative is exactly what a behavioral test
 // cannot see, because a bridged call still works today. It works until February
 // 2027, and it no longer clears the indicator when the answer posts, which is
 // the defect (#574).
 //
 // The regexes that went in #594 were the ones over the ADAPTER, which decides
 // things and can therefore be driven (`tests/working-signal.test.ts`). This one
-// asks only which string is sent to Slack, and nothing behavioural can replace
+// asks only which string is sent to Slack, and nothing behavioral can replace
 // it — so it moved here intact rather than being deleted with them, the way the
 // manifest-to-dispatcher check moved out of `session-stop.test.ts` in #593.
 import { describe, it } from "node:test";

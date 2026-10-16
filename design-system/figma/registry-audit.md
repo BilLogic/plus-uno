@@ -72,12 +72,12 @@ A plain `COMPONENT` is not an error — a component with no variants has no set 
 but the field name says otherwise, and a write-back that assumed
 `componentPropertyDefinitions` on one of these would fail on the getter (see
 `figma-use` rule 18). The four repointed above now carry
-`"isComponentSet": false`. The rest are left as they are: relabelling nine
+`"isComponentSet": false`. The rest are left as they are: relabeling nine
 entries is a schema change to the generator and its check, and belongs in its
 own pass rather than being smuggled into a fix for four broken links.
 
 `DatePicker / Date & Time Picker → 13549:6703` is the one that is arguably
-wrong rather than merely mislabelled: it is a `verified`, `manual`-sourced
+wrong rather than merely mislabeled: it is a `verified`, `manual`-sourced
 mapping to a PAGE. That page holds four sets — `Month (Date Picker)`
 `13574:1150` and `Time (Date Picker)` `16560:4508` are already mapped
 separately, and `Time (no label)` `13662:9119` and `Month (no label)`
@@ -94,7 +94,7 @@ above.
 
 - **Whether the mapped node is the RIGHT one.** `Alert → 11:324` resolves to a
   component set named `Alert`. Whether it is the alert the code implements is a
-  judgement no id check makes.
+  judgment no id check makes.
 - **Whether the variant props still line up.** `figmaMeta.variantProps` records
   name divergences (TopBar's Figma `expand?` vs code's `mode`). Nothing
   re-reads them.
@@ -192,7 +192,7 @@ problem:
   it is the same question the `13549:6703` entry above raises.
 
 So the number worth acting on is smaller than 28, and every reduction above is
-a judgement rather than a measurement — which is exactly why the list is
+a judgment rather than a measurement — which is exactly why the list is
 recorded whole rather than filtered down to a number.
 
 ### Correcting an earlier claim
@@ -244,7 +244,7 @@ that direction too — a flag claiming "not a set" over a set is as wrong as the
 reverse, and the check says both.
 
 `DatePicker → 13549:6703` is still the one that is arguably wrong rather than
-merely mislabelled, for the reason given above: it is a page holding four sets,
+merely mislabeled, for the reason given above: it is a page holding four sets,
 two of which are mapped separately and two of which are mapped nowhere. The
 flag makes the entry honest about what it points at. It does not answer which
 set the component corresponds to, and that is still a design question.
@@ -279,8 +279,8 @@ component set cannot show without inventing content for it.
 `Dismissible Badges` → `Tag`, on the grounds that static-versus-dismissible is
 exactly #276's badge/tag split. Read live, the set's variant props are
 `style = default | primary | secondary | tertiary | danger | success | warning | info`
-and `state`. That colour axis is precisely what a tag must not offer — #276's
-argument is that a tag's colour is a category and never a status, and a green
+and `state`. That color axis is precisely what a tag must not offer — #276's
+argument is that a tag's color is a category and never a status, and a green
 tag beside a red one reads as "this went well" when it only means "Science". So
 the shape was right and the vocabulary was wrong, and mapping the two would have
 told a designer that `<Tag color="danger">` exists while `check:doc-identifiers`

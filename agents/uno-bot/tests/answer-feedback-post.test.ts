@@ -68,7 +68,7 @@ describe("an answer's feedback buttons", () => {
     assert.deepEqual(feedbackOf(value("negative_button")), { rating: "down", turnId: FEEDBACK.turnId });
   });
 
-  it("are not offered under an acknowledgement", async () => {
+  it("are not offered under an acknowledgment", async () => {
     const slack = recordingPosting();
     await postTextVerified(slack.deps({ streamingOn: false }), "C1", "100.1", "Got it, cancelled.", RECIPIENT, undefined, {
       feedback: FEEDBACK,

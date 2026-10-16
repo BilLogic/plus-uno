@@ -119,7 +119,7 @@ const RecurringNAModalBody = () => (
 
 /**
  * Recurring NA
- * Delete session modal for cancelling recurring sessions with no date
+ * Delete session modal for canceling recurring sessions with no date
  * dropdown expanded.
  *
  * Layout:

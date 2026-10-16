@@ -19,7 +19,7 @@ export default {
         style: {
             control: 'select',
             options: ['success', 'warning', 'danger', 'secondary'],
-            description: 'Green for Fully engaged, Yellow for Partially engaged, Red for Not engaged at all, Grey for N/A and Select.'
+            description: 'Green for Fully engaged, Yellow for Partially engaged, Red for Not engaged at all, Gray for N/A and Select.'
         },
         size: {
             control: 'select',
@@ -103,7 +103,7 @@ export const NotEngagedAtAllStatic = {
 
 /**
  * N/A Badge
- * Grey background with secondary state
+ * Gray background with secondary state
  */
 export const NA = {
     args: {
@@ -126,7 +126,7 @@ export const NAStatic = {
 
 /**
  * Select Badge
- * Grey background with secondary state and dropdown
+ * Gray background with secondary state and dropdown
  */
 export const Select = {
     args: {

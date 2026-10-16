@@ -6,7 +6,7 @@
 // extracted — as data, which a test reads directly.
 //
 // The manifest carries only the menu label and callback_id; these strings are
-// the actual behaviour, kept in code so they are reviewable in a diff.
+// the actual behavior, kept in code so they are reviewable in a diff.
 
 import { GRIND } from "./effort";
 import type { FooterKind } from "./footer-kind";

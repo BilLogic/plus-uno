@@ -12,7 +12,7 @@
 // PostgREST `/rpc/<name>` path. The route already requires the debug token, but
 // an arbitrary name would turn "look at search results" into "invoke any
 // function the bot's key can reach", which is a different permission wearing
-// the same one's clothes. Defence in depth, on a route whose whole job is to be
+// the same one's clothes. Defense in depth, on a route whose whole job is to be
 // pointed somewhere unusual.
 //
 // Its own module because the test build compiles only pure modules — importing

@@ -28,7 +28,7 @@
  * WHERE THE RESULT GOES NOW. Into `design-system/figma/node-types.json`, as
  * data rather than prose, and `npm run check:figma-node-types` holds the
  * registry to it on every run — a mapping nobody has measured, a stale
- * recording, an id recorded against the wrong file and a mislabelled
+ * recording, an id recorded against the wrong file and a mislabeled
  * `componentSetNodeId` are all findings there. That check is why re-running
  * this one is worth the trouble: the measurement it produces is read.
  *

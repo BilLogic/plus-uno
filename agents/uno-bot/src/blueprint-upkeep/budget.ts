@@ -11,7 +11,7 @@
 export const PATH_READ_COST = 5;
 /** The saved slice that cites a drafted path, for its View slice: one read. */
 export const SLICE_READ_COST = 1;
-/** The service-change gate at its worst: the judgement (1) and the search (up to 3). */
+/** The service-change gate at its worst: the judgment (1) and the search (up to 3). */
 export const GATE_SUBREQUESTS = 4;
 /** One draft: grind, then default when grind is out of capacity. */
 export const DRAFT_CALLS = 2;
@@ -33,7 +33,7 @@ export const PROMOTION_REDRAFT_COST = EVIDENCE_COST + DRAFT_CALLS + OWNERS_COST;
 export const MATCH_JOBS = 6;
 /** External subrequests one card's weighing may spend at its worst: a
  *  deploy's promotion try (the path read, 5), then the card and its PRD (8),
- *  the judgement and the search (4) and its Contributors (4) — 21, kept at
+ *  the judgment and the search (4) and its Contributors (4) — 21, kept at
  *  22. A job starts a card only while this much is left, so one such card
  *  fills a job; lighter cards fit several. A card linked to a drawn proposal
  *  reads at most three paths and its Contributors instead, inside it. */

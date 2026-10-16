@@ -6,7 +6,7 @@
 // newest first, autosaves included), which the morning reads anyway for the
 // intake's publisher. Only a file that changed after the decision costs a
 // `nodes` read of the linked frame (Tier 1, the scarce tier on Bill's token)
-// and one judgement (`./judge.ts`). Each read is made once per file, or per
+// and one judgment (`./judge.ts`). Each read is made once per file, or per
 // frame, per run, however many threads discussed it.
 //
 // A FAILED READ IS "UNKNOWN", NEVER "UNCHANGED": the question then goes out
@@ -97,7 +97,7 @@ export interface DecisionCheck {
   change: FileChange;
   /** The frame now shows the decision — no question, or a withdrawn one. */
   shows: boolean;
-  /** A judgement was asked for (a frame read and a model call spent). */
+  /** A judgment was asked for (a frame read and a model call spent). */
   judged: boolean;
 }
 

@@ -25,7 +25,7 @@ import { canonicalNotionUrl, createdDesignStatus, extractNotionIds } from "../in
 import {
   alertsFromCaveats,
   factsSection,
-  labelledText,
+  labeledText,
   type DraftAlert,
   type DraftAnatomy,
   type Fact,
@@ -307,7 +307,7 @@ export function notionCreateAnatomy(input: Input, context: NotionCreateContext):
   const part = (path: string, label: string) => {
     const field = context.inline?.get(`0.${path}`);
     if (field) content.push(...fieldInputBlocks([field]));
-    else if (str(input[path])) content.push(labelledText(label, str(input[path])));
+    else if (str(input[path])) content.push(labeledText(label, str(input[path])));
   };
 
   part("title", "Title");

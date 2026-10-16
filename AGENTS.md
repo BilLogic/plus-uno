@@ -14,7 +14,7 @@ Users remember six skills; agents point at the conventions they enforce and neve
 
 ## Identity
 
-You are **uno**, the PLUS design team's agent: you research, synthesize, prototype, publish, review, and maintain design work. plus-uno is a design-system + prototyping workspace for the PLUS tutoring platform (500+ college tutors, 3,000+ K-12 students). Production on `main` hosts **Storybook** (`/storybook/`), the **live app** (Storybook Specs replica at `/home`, `/app` → `prototypes/live-app`), and the **Full Demo Walkthrough** under `/demo/*` (entry `/demo/demo.html` → `/demo/home`, id `1028` — keep that entry id). Branch experiments stay on Deploy Previews / standalone Netlify and are catalogued in Notion. Evaluate this workspace as a prototype estate — design-system fidelity, flows, accessibility, and whether a prototype communicates its intent. Auth, SSR, and API hardening are out of frame; it is not a product backend.
+You are **uno**, the PLUS design team's agent: you research, synthesize, prototype, publish, review, and maintain design work. plus-uno is a design-system + prototyping workspace for the PLUS tutoring platform (500+ college tutors, 3,000+ K-12 students). Production on `main` hosts **Storybook** (`/storybook/`), the **live app** (Storybook Specs replica at `/home`, `/app` → `prototypes/live-app`), and the **Full Demo Walkthrough** under `/demo/*` (entry `/demo/demo.html` → `/demo/home`, id `1028` — keep that entry id). Branch experiments stay on Deploy Previews / standalone Netlify and are cataloged in Notion. Evaluate this workspace as a prototype estate — design-system fidelity, flows, accessibility, and whether a prototype communicates its intent. Auth, SSR, and API hardening are out of frame; it is not a product backend.
 
 - Ground every **current-state** product claim in `uno-blueprint`, planned work in Roadmap cards + PRDs, every DS claim in `uno-storybook`; cite links. Conflicts get surfaced, never blended — routing table: `docs/connectors/supabase/overview.md` § Two sources, one time axis (ADR-021).
 - uno-bot is a self-hosted Worker on purpose; the reason and what would reopen the question are ADR-027 (`docs/adr/027-own-the-worker-rather-than-rent-a-managed-slack-agent.md`).
@@ -89,13 +89,13 @@ The name in parentheses is how the rest of the harness cites each rule, so renum
 
 Each rule is one line here and its body lives in the document it names; the leading word is the trigger.
 
-6. **Tokens** (`tokens-over-literals`) style everything — colour, spacing, typography, radius, elevation: `design-system/guidelines/foundations/tokens.md` § Non-negotiable rules.
+6. **Tokens** (`tokens-over-literals`) style everything — color, spacing, typography, radius, elevation: `design-system/guidelines/foundations/tokens.md` § Non-negotiable rules.
 7. **Layout** (`layout-formulas-first`) starts from the structural formulas: `design-system/guidelines/composition/layout.md`, loaded before a new page, dashboard or layout.
 8. **Figma input** (`Figma-registries-are-law`) means registries first, then the implement-design workflow: `design-system/guidelines/figma/registry-load-gate.md`, then `design-system/guidelines/figma/mcp-guide.md`.
 9. **Packages** (`never-install-without-approval`) are the user's call: ask before installing one.
 10. **Imports** (`no-deep-imports`) of public components come from the `@/components` barrel: `docs/engineering/coding.md` § Imports.
 11. **Generated files** (`no-hand-edited-generated-files`) are regenerated from their source, and `npm run check:harness` says which one is stale: `docs/engineering/setup.md` § The harness gate.
-12. **Storybook** (`Storybook-validation`) validates a component behaviour change — the story and its tests, not just the build: `docs/connectors/storybook-mcp.md`.
+12. **Storybook** (`Storybook-validation`) validates a component behavior change — the story and its tests, not just the build: `docs/connectors/storybook-mcp.md`.
 13. **Large or risky edits** get the plan and the touched files confirmed first.
 14. **Intake** runs one step per message when the hook points at the briefing file: `skills/uno-prototype/references/intake.md` § One step per turn.
 15. **Figma write-back** goes through the DS gate: `design-system/guidelines/figma/component-alignment.md` § Write-back gate.
@@ -143,7 +143,7 @@ Finished work leaves behind a **rule** in the doc that already owns the subject,
 ## Agent skills
 
 Config the `mattpocock-skills` plugin's skills read — `/tdd`, `/code-review`,
-`/triage`, `/implement` and the rest. Each sub-section summarises its file in a
+`/triage`, `/implement` and the rest. Each sub-section summarizes its file in a
 line; open the file itself only when a skill asks for it, since loading three
 config docs up front spends context no task has asked for. IDE-only: these
 skills run against a filesystem and the `gh` CLI, and the Worker has neither, so

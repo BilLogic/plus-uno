@@ -1,7 +1,7 @@
 /**
  * #622 — the harness has one token grammar.
  *
- * The docs check used to carry its own reader, alias resolver, colour key,
+ * The docs check used to carry its own reader, alias resolver, color key,
  * dimension key and family map. The registry generator used the loosest
  * `var()` in the tree (`var((--[^)]+))`, which swallows a fallback as the
  * name). The font-family check restated the declaration and `var()` patterns
@@ -42,7 +42,7 @@ test('every declaration and var() pattern in the named checks comes from the gra
       `${file} restates the font-family prefix instead of composing the module's patterns`,
     );
     assert.equal(
-      /function (terminal|colourKey|dimensionKey|readTokenDefinitions)\(/.test(src),
+      /function (terminal|colorKey|dimensionKey|readTokenDefinitions)\(/.test(src),
       false,
       `${file} still holds a token parser of its own`,
     );

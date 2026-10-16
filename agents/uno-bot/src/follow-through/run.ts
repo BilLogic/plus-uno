@@ -95,7 +95,7 @@ import { cardTodoId, LIVE_STATES, type CommitmentPatch, type CommitmentRecord, t
 import {
   ANSWER_ON_CARD,
   answeredBy,
-  cardAcknowledgement,
+  cardAcknowledgment,
   DRAFT_NOT_POSTED,
   cardAnswer,
   draftTitle,
@@ -1354,7 +1354,7 @@ export async function answerCardFollowUp(c: CommitmentRecord, r: CardReaction, d
       staged = true;
     }
   }
-  const shown = await acknowledge(deps, c, text, r, `${cardAcknowledgement(answer, staged)} ${answeredBy(r.userId)}`);
+  const shown = await acknowledge(deps, c, text, r, `${cardAcknowledgment(answer, staged)} ${answeredBy(r.userId)}`);
   return shown ? undefined : { unedited: true };
 }
 
@@ -1535,7 +1535,7 @@ async function ownerReply(c: CommitmentRecord, reply: CardReply, deps: ReplyDeps
     slot: proposalSlotFor(c),
   });
   if (!staged) return true;
-  await acknowledge(deps, c, text, { channel: reply.channel, messageTs: c.nudgeTs ?? reply.threadTs }, cardAcknowledgement("owner", true));
+  await acknowledge(deps, c, text, { channel: reply.channel, messageTs: c.nudgeTs ?? reply.threadTs }, cardAcknowledgment("owner", true));
   return true;
 }
 
@@ -1570,7 +1570,7 @@ async function statusReply(c: CommitmentRecord, reply: CardReply, deps: ReplyDep
   });
   if (!staged) return true;
   await deps.store.saveText(c.id, { ...text, choosing: { ...choosing, staged: true } }, keep);
-  await acknowledge(deps, c, text, { channel: reply.channel, messageTs: c.nudgeTs ?? reply.threadTs }, `${cardAcknowledgement("status", true)} ${answeredBy(choosing.by ?? reply.user)}`);
+  await acknowledge(deps, c, text, { channel: reply.channel, messageTs: c.nudgeTs ?? reply.threadTs }, `${cardAcknowledgment("status", true)} ${answeredBy(choosing.by ?? reply.user)}`);
   return true;
 }
 

@@ -27,7 +27,7 @@ import { createdDesignStatus } from "../integrations/notion";
 import { CARD_BODY_CHARS } from "./card-block";
 import {
   alertsFromCaveats,
-  labelledText,
+  labeledText,
   listBlock,
   quoteBlock,
   shareoutApprove,
@@ -563,7 +563,7 @@ function shareoutAnatomy(input: Input, detail: AnatomyContext): DraftAnatomy {
     const inline = field(path);
     if (inline) content.push(...fieldInputBlocks([inline]));
     else if (value) {
-      content.push(labelledText(label, value));
+      content.push(labeledText(label, value));
       if (editing && value.length > MAX_INPUT_CHARS) content.push(context(TOO_LONG_TO_EDIT));
     }
   };

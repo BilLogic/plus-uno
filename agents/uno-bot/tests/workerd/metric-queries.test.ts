@@ -334,7 +334,7 @@ describe("metric queries on the seed", () => {
     // Four asks reached the lead over ten weekdays. f1, a follow-up in t2's
     // thread, is a fifth turn but not a fifth ask.
     // Twelve asks reached the bot: judgment t2 t4 t11; unlabelled t6 (a DM
-    // not yet labelled); housekeeping the other eight. Turns add f1
+    // not yet labeled); housekeeping the other eight. Turns add f1
     // (classified blank: unlabelled) and r1 (a staged revision: 7).
     expect(await run("load-on-lead")).toEqual([
       { unit: "ask", reaching_lead: 4, workdays: 10, per_workday: 0.4, lead_unknown: 1, asks_to_bot: 12, asks_to_bot_per_workday: 1.2, housekeeping: 8, judgment: 3, unlabelled: 1 },

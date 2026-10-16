@@ -41,14 +41,14 @@
  *   canvases pick a surface by eye because there is nothing else to pick by.
  *
  * WHAT THIS IS AND IS NOT. It is a naming layer over values that already exist:
- * every token below is an alias, no new colour and no new shadow is introduced,
+ * every token below is an alias, no new color and no new shadow is introduced,
  * and NOTHING ABOVE IS REMOVED. Both models are usable side by side, which is
  * the point — the decision in #268 ("shadow or lightness?") is Bill's, and this
  * makes it comparable in a browser instead of in a document.
  *
  * THE PAIRING IS THE WHOLE IDEA. `--surface-raised` is a fill; on its own it is
  * indistinguishable from `--surface-default`, because in this model that is
- * TRUE — a raised card is the same colour as the page and is lifted by its
+ * TRUE — a raised card is the same color as the page and is lifted by its
  * shadow. So each raised role ships with the shadow it must be used with, named
  * so the two cannot drift apart:
  *

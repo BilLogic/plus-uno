@@ -54,7 +54,7 @@ let repoRoot, bundler, harnessTs, companionMd, referencesTs;
 before(() => {
   // The real path, because macOS's tmpdir is behind a symlink: node runs the
   // copied bundler from its resolved path, and a script started under the
-  // other spelling does not recognise itself as the entry point and exits 0
+  // other spelling does not recognize itself as the entry point and exits 0
   // having done nothing — which every test below would read as a pass.
   repoRoot = realpathSync(mkdtempSync(path.join(tmpdir(), "harness-tree-")));
   for (const rel of COPIED) cpSync(path.join(checkout, rel), path.join(repoRoot, rel), { recursive: true });

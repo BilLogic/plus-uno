@@ -30,7 +30,7 @@ date: YYYY-MM-DD
 ## Problem
 
 The exact error message, visual symptom, or wrong assumption — specific enough
-that someone hitting it again recognises it here.
+that someone hitting it again recognizes it here.
 
 ## Root cause
 

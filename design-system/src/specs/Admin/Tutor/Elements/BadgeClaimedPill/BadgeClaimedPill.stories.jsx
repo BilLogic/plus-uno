@@ -16,7 +16,7 @@ export default {
 **States:**
 - **Yes**: Badge claimed (Green)
 - **No**: Badge available but not claimed (Red)
-- **N/A**: Tutor ineligible (Grey)
+- **N/A**: Tutor ineligible (Gray)
 `
             }
         }

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * `npm run check:intent-roles` — an edge painted from an intent colour names the
+ * `npm run check:intent-roles` — an edge painted from an intent color names the
  * `-border` ROLE, not the base (#368).
  *
  * See `scripts/intent-roles.mjs` for what is scanned and for the three things
@@ -43,7 +43,7 @@ export const MIN_FILES = 150;
 const INTENTS = ['primary', 'secondary', 'tertiary', 'danger', 'success', 'warning', 'info'];
 
 export const REMEDY =
-  '  -> An intent colour on an edge names the role: `var(--color-danger-border)`,\n' +
+  '  -> An intent color on an edge names the role: `var(--color-danger-border)`,\n' +
   `     not \`var(--color-danger)\`. The roles are defined in ${ROLES_FILE}.\n` +
   `     If a call site genuinely needs the base, record it in ${BASELINE} with a reason.`;
 

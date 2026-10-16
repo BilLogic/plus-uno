@@ -418,7 +418,7 @@ describe("the alarm's look, when nobody else looks", () => {
         mention: REQUESTER,
       },
     ]);
-    // The mention survives the markup sanitiser because it is a real user id.
+    // The mention survives the markup sanitizer because it is a real user id.
     const line = renderGateNote(delivery.gateNotes[0]!);
     assert.match(line, new RegExp(`^:warning: <@${REQUESTER}> That approved run was cut off`));
     assert.equal(sanitizeSlackMarkup(line), line);

@@ -24,15 +24,15 @@
  *
  * The third is the one with teeth, in two directions:
  *
- *   WIDER than `parseColour`: two harness checks each carried their own color
+ *   WIDER than `parseColor`: two harness checks each carried their own color
  *   key. #621 retired the fallback checks' rival; #622 retired the docs
  *   check's. Both are spelled below, so the parity stays a measurement against
  *   the implementations that were deleted rather than against the module
  *   agreeing with itself.
  *
- *   FINER than `normaliseColour`: alpha is part of this key and is not part of
+ *   FINER than `normalizeColor`: alpha is part of this key and is not part of
  *   that one. Over the live corpus that is 357 token pairs, and the two tests
- *   under "finer than the normaliser" assert the difference directly and then
+ *   under "finer than the normalizer" assert the difference directly and then
  *   pin the narrow reason today's output does not move — rather than asserting
  *   "output unchanged", which is a property of the fallback CAPTURE and not of
  *   this key. #621 migrated the fallback checks onto this key and MEASURED the
@@ -47,11 +47,11 @@ import { describe, it, expect } from 'vitest';
 
 import { documents, text } from '../../scripts/lib/corpus.mjs';
 import { fallbackUsages } from '../../scripts/token-fallbacks.mjs';
-import { parseColour, toHex } from '../src/lib/tokens.mjs';
+import { parseColor, toHex } from '../src/lib/tokens.mjs';
 import {
   FAMILIES,
   TOKEN_DIR,
-  colourKey,
+  colorKey,
   dimensionKey,
   familyOf,
   sameValue,
@@ -61,37 +61,37 @@ import {
 } from '../src/lib/tokens-node.mjs';
 
 /**
- * THE RETIRED NORMALISER, SPELLED HERE BECAUSE #621 DELETED IT.
+ * THE RETIRED NORMALIZER, SPELLED HERE BECAUSE #621 DELETED IT.
  *
- * `scripts/token-fallbacks.mjs` compared two colours as `parseColour` followed
+ * `scripts/token-fallbacks.mjs` compared two colors as `parseColor` followed
  * by `toHex` — and `toHex` drops alpha — until #621 moved the fallback checks
- * on to `colourKey`. The assertions below measure what that migration cost, so
+ * on to `colorKey`. The assertions below measure what that migration cost, so
  * they need the thing that was retired; two lines of test scaffolding is not a
  * second production key, and writing it out is what keeps "finer than the
- * normaliser" from quietly becoming "the module agrees with itself".
+ * normalizer" from quietly becoming "the module agrees with itself".
  *
  * There is no dimension twin, because there was no difference to keep:
- * `normaliseDimension` and `dimensionKey` were the same function, which is why
+ * `normalizeDimension` and `dimensionKey` were the same function, which is why
  * #621 could delete one of them without measuring anything.
  */
-const normaliseColour = (value) => {
-  const colour = parseColour(value);
-  return colour ? toHex(colour) : null;
+const normalizeColor = (value) => {
+  const color = parseColor(value);
+  return color ? toHex(color) : null;
 };
 
 /**
  * THE RETIRED DOCS KEYS, SPELLED HERE BECAUSE #622 DELETED THEM.
  *
- * `check:docs-token-literals` compared colours as a syntactic canonicaliser
+ * `check:docs-token-literals` compared colors as a syntactic canonicaliser
  * (hex expanded, `rgba()` kept as `rgba(...)`) and dimensions that refused a
- * bare `0`. The module's keys are finer (alpha is part of the colour) and
+ * bare `0`. The module's keys are finer (alpha is part of the color) and
  * wider on zero. The assertions below still measure that difference, so they
  * need the thing that was retired.
  *
  * @param {string} literal
  * @returns {string|null}
  */
-const docsColourKey = (literal) => {
+const docsColorKey = (literal) => {
   const v = literal.trim().toLowerCase();
   const hex = /^#([0-9a-f]{3,8})$/.exec(v);
   if (hex) {
@@ -132,7 +132,7 @@ describe('the corpus — where tokens live, answered once and read through the o
    * directory with its own `fs.readdirSync` and resolved its own `REPO_ROOT`
    * from `import.meta.url` — a second way to resolve the corpus, inside the
    * module whose point is that it is resolved once. A static scan is the only
-   * thing that can see that come back, because the behaviour is identical
+   * thing that can see that come back, because the behavior is identical
    * until a caller passes a root.
    */
   it('imports no file reader and no root of its own', () => {
@@ -217,9 +217,9 @@ describe('the corpus — where tokens live, answered once and read through the o
   });
 
   it('narrows to a prefix when a caller asks for one', () => {
-    const colours = tokenCorpus({ prefix: '--color-' });
-    expect(colours.size).toBeGreaterThan(100);
-    for (const name of colours.keys()) expect(name.startsWith('--color-')).toBe(true);
+    const colors = tokenCorpus({ prefix: '--color-' });
+    expect(colors.size).toBeGreaterThan(100);
+    for (const name of colors.keys()) expect(name.startsWith('--color-')).toBe(true);
   });
 
   it('takes the first definition by default and the last on request', () => {
@@ -237,7 +237,7 @@ describe('the family map — one statement of which family a name is in', () => 
     expect(familyOf('--font-size-body1')).toBe('font-size');
     expect(familyOf('--font-line-height-body1')).toBe('font-line-height');
     expect(familyOf('--font-weight-bold')).toBe('font-weight');
-    expect(familyOf('--color-primary')).toBe('colour');
+    expect(familyOf('--color-primary')).toBe('color');
     expect(familyOf('--size-spacing-medium-space-300')).toBe('size');
   });
 
@@ -294,10 +294,10 @@ describe('a state overlay is mixed from the base it is named after', () => {
       .filter((name) => /^--color-.+-state-(08|12|16)$/.test(name))
       .map((name) => {
         const base = name.replace(/-state-(08|12|16)$/, '');
-        const mixed = colourKey(corpus.get(name).value);
-        const solid = corpus.get(base) ? colourKey(corpus.get(base).value) : null;
+        const mixed = colorKey(corpus.get(name).value);
+        const solid = corpus.get(base) ? colorKey(corpus.get(base).value) : null;
         // Channels only: the overlay's whole job is to carry an alpha the solid
-        // does not have, so `colourKey`'s alpha byte is the one thing that must
+        // does not have, so `colorKey`'s alpha byte is the one thing that must
         // differ. `#rrggbb` is the first seven characters of either key.
         return { name, base, mixed: mixed?.slice(0, 7) ?? null, solid: solid?.slice(0, 7) ?? null };
       });
@@ -327,7 +327,7 @@ describe('a state overlay is mixed from the base it is named after', () => {
     const found = {};
     for (const { base, mixed, solid } of overlays()) {
       if (mixed !== null && mixed === solid) continue;
-      // Every step of a base has to mix the SAME colour, or the name is not the
+      // Every step of a base has to mix the SAME color, or the name is not the
       // only thing that has stopped describing the family.
       if (base in found) expect(found[base]).toBe(mixed);
       found[base] = mixed;
@@ -340,41 +340,41 @@ describe('a state overlay is mixed from the base it is named after', () => {
       const solid = tokenCorpus().get(base);
       // `--color-shadow` is the row with no solid, which is its whole reason.
       if (base === '--color-shadow') expect(solid).toBe(undefined);
-      else expect(colourKey(solid.value)?.slice(0, 7)).not.toBe(KNOWN[base]);
+      else expect(colorKey(solid.value)?.slice(0, 7)).not.toBe(KNOWN[base]);
     }
   });
 });
 
-describe('the colour key — every form the checks accept', () => {
+describe('the color key — every form the checks accept', () => {
   it('reads three-, four-, six- and eight-digit hex', () => {
-    expect(colourKey('#abc')).toBe('#aabbcc');
-    expect(colourKey('#AABBCC')).toBe('#aabbcc');
-    expect(colourKey('#aabbccff')).toBe('#aabbcc');
-    expect(colourKey('#abcd')).toBe(colourKey('#aabbccdd'));
-    expect(colourKey('#aabbcc80')).toBe('#aabbcc80');
+    expect(colorKey('#abc')).toBe('#aabbcc');
+    expect(colorKey('#AABBCC')).toBe('#aabbcc');
+    expect(colorKey('#aabbccff')).toBe('#aabbcc');
+    expect(colorKey('#abcd')).toBe(colorKey('#aabbccdd'));
+    expect(colorKey('#aabbcc80')).toBe('#aabbcc80');
   });
 
   it('reads rgb() and rgba() in comma and space syntax', () => {
-    expect(colourKey('rgb(4, 114, 168)')).toBe('#0472a8');
-    expect(colourKey('rgb(4 114 168)')).toBe('#0472a8');
-    expect(colourKey('rgba( 4 , 114 ,168, 1 )')).toBe('#0472a8');
-    expect(colourKey('rgb(4 114 168 / 50%)')).toBe(colourKey('rgba(4,114,168,0.5)'));
-    expect(colourKey('rgb(100%, 0%, 0%)')).toBe('#ff0000');
+    expect(colorKey('rgb(4, 114, 168)')).toBe('#0472a8');
+    expect(colorKey('rgb(4 114 168)')).toBe('#0472a8');
+    expect(colorKey('rgba( 4 , 114 ,168, 1 )')).toBe('#0472a8');
+    expect(colorKey('rgb(4 114 168 / 50%)')).toBe(colorKey('rgba(4,114,168,0.5)'));
+    expect(colorKey('rgb(100%, 0%, 0%)')).toBe('#ff0000');
   });
 
-  it('reads hsl() and hsla(), which `parseColour` cannot', () => {
-    expect(parseColour('hsl(0, 100%, 50%)')).toBe(null);
-    expect(colourKey('hsl(0, 100%, 50%)')).toBe('#ff0000');
-    expect(colourKey('hsl(120deg 100% 25%)')).toBe('#008000');
-    expect(colourKey('hsla(0, 0%, 0%, 0.5)')).toBe(colourKey('rgba(0,0,0,0.5)'));
+  it('reads hsl() and hsla(), which `parseColor` cannot', () => {
+    expect(parseColor('hsl(0, 100%, 50%)')).toBe(null);
+    expect(colorKey('hsl(0, 100%, 50%)')).toBe('#ff0000');
+    expect(colorKey('hsl(120deg 100% 25%)')).toBe('#008000');
+    expect(colorKey('hsla(0, 0%, 0%, 0.5)')).toBe(colorKey('rgba(0,0,0,0.5)'));
   });
 
   it('answers null rather than guessing', () => {
-    expect(colourKey('currentColor')).toBe(null);
-    expect(colourKey('#ab')).toBe(null);
-    expect(colourKey('rgb(300, 0, 0)')).toBe(null);
-    expect(colourKey('var(--color-primary)')).toBe(null);
-    expect(colourKey(undefined)).toBe(null);
+    expect(colorKey('currentColor')).toBe(null);
+    expect(colorKey('#ab')).toBe(null);
+    expect(colorKey('rgb(300, 0, 0)')).toBe(null);
+    expect(colorKey('var(--color-primary)')).toBe(null);
+    expect(colorKey(undefined)).toBe(null);
   });
 
   /*
@@ -398,44 +398,44 @@ describe('the colour key — every form the checks accept', () => {
       '#0472a8',
     ];
     for (const literal of literals) {
-      const rivals = [docsColourKey(literal), normaliseColour(literal)];
+      const rivals = [docsColorKey(literal), normalizeColor(literal)];
       if (rivals.every((key) => key === null)) continue;
       expect(
-        colourKey(literal),
+        colorKey(literal),
         `${literal} is read by a rival and not by the module`,
       ).not.toBe(null);
     }
   });
 
-  it('agrees with the old normaliser on every OPAQUE form it can read', () => {
+  it('agrees with the old normalizer on every OPAQUE form it can read', () => {
     for (const literal of ['#abc', '#0472a8', 'rgb(4, 114, 168)', 'rgba(4,114,168,1)']) {
-      expect(colourKey(literal)).toBe(normaliseColour(literal));
+      expect(colorKey(literal)).toBe(normalizeColor(literal));
     }
   });
 });
 
-describe('the colour key is finer than the normaliser it replaces', () => {
+describe('the color key is finer than the normalizer it replaces', () => {
   /*
    * ONE PAIR, NAMED. `--color-secondary-state-08` is the 8% overlay of the
-   * color `--color-secondary-border` is; the old normaliser is `parseColour`
+   * color `--color-secondary-border` is; the old normalizer is `parseColor`
    * followed by `toHex`, and `toHex` drops alpha, so it calls them the same
    * color.
    */
-  it('calls a translucent overlay and its solid DIFFERENT, where the normaliser called them equal', () => {
+  it('calls a translucent overlay and its solid DIFFERENT, where the normalizer called them equal', () => {
     const corpus = tokenCorpus();
     const solid = corpus.get('--color-secondary-border').value;
     const overlay = corpus.get('--color-secondary-state-08').value;
 
     expect(overlay).toMatch(/^rgba\(/);
-    expect(normaliseColour(solid)).toBe(normaliseColour(overlay));
-    expect(colourKey(solid)).not.toBe(colourKey(overlay));
-    expect(colourKey(overlay)).toBe(`${colourKey(solid)}14`);
+    expect(normalizeColor(solid)).toBe(normalizeColor(overlay));
+    expect(colorKey(solid)).not.toBe(colorKey(overlay));
+    expect(colorKey(overlay)).toBe(`${colorKey(solid)}14`);
     expect(sameValue(solid, overlay)).toBe(false);
   });
 
   /*
    * AND HOW MANY OF THEM THERE ARE, counted rather than recalled: every
-   * unordered pair of live color tokens the old normaliser could read, where
+   * unordered pair of live color tokens the old normalizer could read, where
    * it says equal and this key says unequal. 315 on 2026-09-18; 357 on
    * 2026-09-29, when the ten `-border-subtle` label borders added 45% washes of
    * bases already in the corpus; 405 the same day, when ten state-layer bases
@@ -448,16 +448,16 @@ describe('the colour key is finer than the normaliser it replaces', () => {
    * rather than logged because a migrating caller's exposure is this number,
    * and a drift in it is news either way.
    */
-  it('differs from the normaliser on 426 live token pairs', () => {
+  it('differs from the normalizer on 426 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
       .map((entry) => entry.value)
-      .filter((value) => normaliseColour(value) !== null);
+      .filter((value) => normalizeColor(value) !== null);
 
     let pairs = 0;
     for (let i = 0; i < readable.length; i += 1) {
       for (let j = i + 1; j < readable.length; j += 1) {
-        if (normaliseColour(readable[i]) !== normaliseColour(readable[j])) continue;
-        if (colourKey(readable[i]) === colourKey(readable[j])) continue;
+        if (normalizeColor(readable[i]) !== normalizeColor(readable[j])) continue;
+        if (colorKey(readable[i]) === colorKey(readable[j])) continue;
         pairs += 1;
       }
     }
@@ -465,7 +465,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
   });
 
   /*
-   * WHAT `check:colour-fallbacks` COMPARES WITH ALPHA — and it is a fact about
+   * WHAT `check:color-fallbacks` COMPARES WITH ALPHA — and it is a fact about
    * the CAPTURE, not a property of the key, which is why it is pinned with its
    * mechanism over the whole live corpus rather than asserted as "output
    * unchanged".
@@ -479,11 +479,10 @@ describe('the colour key is finer than the normaliser it replaces', () => {
    * base left its washes stale and nothing said so.
    *
    * Measured over the live tree: 85 `var(--color-*, rgba(…))` sites, every one
-   * captured. 82 name a defined token and are compared with
-   * alpha on both sides; the other 3 name tokens that are defined nowhere,
-   * and are the check's undefined-token finding instead. All 82 agree,
-   * because the disagreeing washes were fixed when the capture widened, and
-   * the test asserts it: a stale wash here is a failure, not a recount.
+   * captured, and every one names a defined token and is compared with
+   * alpha on both sides. All 85 agree, because the disagreeing washes were
+   * fixed when the capture widened, and the test asserts it: a stale wash
+   * here is a failure, not a recount.
    */
   it('compares every live rgba() color fallback with its alpha, because the capture reads a whole color function', () => {
     const roots = ['design-system/src', '.storybook', 'prototypes'];
@@ -523,8 +522,8 @@ describe('the colour key is finer than the normaliser it replaces', () => {
     let withAlpha = 0;
     for (const use of usages) {
       if (use.literal === null || !tokens.has(use.token)) continue;
-      const literal = colourKey(use.literal);
-      const tokenValue = colourKey(tokens.get(use.token));
+      const literal = colorKey(use.literal);
+      const tokenValue = colorKey(tokens.get(use.token));
       if (literal === null || tokenValue === null) continue;
       comparable += 1;
       if (literal.length !== 9 && tokenValue.length !== 9) continue;
@@ -533,19 +532,24 @@ describe('the colour key is finer than the normaliser it replaces', () => {
     }
     // 82: the old Dropdown option list and its rows' state washes were
     // deleted when value pickers moved to Select and the shared option row.
-    expect(withAlpha).toBe(82);
+    // 85: the last three washes that named undefined tokens
+    // (`surface-container-hover`, `surface-container-active`,
+    // `primary-state-04`) now name the on-surface and primary state layers,
+    // so they are compared here rather than skipped.
+    expect(withAlpha).toBe(85);
     // 643: MultipleChoice.scss left with ChoiceGroup, and its three hex
     // fallbacks with it. 620: the date pickers moved onto the shared field and
     // calendar, and the old Dropdown option list went, each with its fallbacks.
-    expect(comparable).toBe(620);
+    // 623: the same three washes, now naming defined tokens, became comparable.
+    expect(comparable).toBe(623);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.
   }, 30_000);
 });
 
-describe('the dimension key — one normaliser, rem at 16px', () => {
-  it('normalises px, rem and zero, and keeps a percentage a percentage', () => {
+describe('the dimension key — one normalizer, rem at 16px', () => {
+  it('normalizes px, rem and zero, and keeps a percentage a percentage', () => {
     expect(dimensionKey('16px')).toBe('16px');
     expect(dimensionKey('1rem')).toBe('16px');
     expect(dimensionKey(' 0.75REM ')).toBe('12px');
@@ -556,10 +560,10 @@ describe('the dimension key — one normaliser, rem at 16px', () => {
 
   /*
    * THE ONE PLACE THE TWO RIVALS DISAGREED, measured rather than asserted from
-   * the docblock: a bare `0`. `normaliseDimension` read it and the docs
+   * the docblock: a bare `0`. `normalizeDimension` read it and the docs
    * check's key answers null, so the module had to CHOOSE, and it took the
    * reading that loses no comparison — which is why #621 could retire
-   * `normaliseDimension` outright, and why the surviving rival is still
+   * `normalizeDimension` outright, and why the surviving rival is still
    * asserted against here. `0em` stays null, because both rivals refuse it and
    * a widening nobody asked for is a migration surprise.
    */

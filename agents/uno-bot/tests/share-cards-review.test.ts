@@ -30,7 +30,7 @@ const OPERATIONS = [{ toolName: SWEEP_SHARE_TOOL, input: { channel: "C0DESIGN", 
 const cards = {
   "the DM sweep's raise card": raiseCard({
     when: "Yesterday",
-    topic: "the warning colour",
+    topic: "the warning color",
     sources: ["Figma", "the code"],
     channel: "C0UNIVERSAL",
     to: "plus-universal",

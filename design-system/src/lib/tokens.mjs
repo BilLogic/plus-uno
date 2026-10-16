@@ -3,10 +3,10 @@
  * contrast maths (#506, parent #491 § "Tokens module (C)").
  *
  * IT NO LONGER HOLDS THE RATCHET. #506 put the baseline classifier here because
- * nine of the baselines it served were colour records; #599 moved it to
+ * nine of the baselines it served were color records; #599 moved it to
  * `scripts/lib/ratchet.mjs`, with the record's shape, its reasons and its
  * `--update` write, because a baseline record is a harness concern and has
- * nothing to do with colour maths. What stays here is what a colour is.
+ * nothing to do with color maths. What stays here is what a color is.
  *
  * WHY IT LIVES HERE AND NOT IN `scripts/`. The WCAG core this file now holds
  * was correct and well tested inside `scripts/button-contrast.mjs` — and
@@ -135,7 +135,7 @@ export function readTokens(source, { prefix = '--' } = {}) {
  * A `var()` FALLBACK is followed through to the token, not to the fallback: the
  * fallback is what a browser paints when the token is missing, and a token that
  * resolves is the case this answers. What the fallback says instead is
- * `check:colour-fallbacks`' question, and it stays its own check.
+ * `check:color-fallbacks`' question, and it stays its own check.
  *
  * @param {string} token
  * @param {Map<string, string>} values
@@ -159,7 +159,7 @@ export function resolveToken(token, values, seen = new Set()) {
  * @param {string} value
  * @returns {{r: number, g: number, b: number, a: number}|null}
  */
-export function parseColour(value) {
+export function parseColor(value) {
   if (typeof value !== 'string') return null;
   const text = value.trim().toLowerCase();
 
@@ -188,7 +188,7 @@ export function parseColour(value) {
 
 /**
  * Lay `top` over `bottom`. `bottom` is assumed opaque, which it is in every
- * caller here: the page is a solid colour and only state layers carry alpha.
+ * caller here: the page is a solid color and only state layers carry alpha.
  *
  * @param {{r: number, g: number, b: number, a: number}} top
  * @param {{r: number, g: number, b: number, a: number}} bottom
@@ -215,7 +215,7 @@ export function contrast(foreground, background) {
   return Math.round(((light + 0.05) / (dark + 0.05)) * 100) / 100;
 }
 
-/** `#rrggbb` for a resolved colour, so two grounds can be compared by name. */
+/** `#rrggbb` for a resolved color, so two grounds can be compared by name. */
 export function toHex({ r, g, b }) {
   return `#${[r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('')}`;
 }

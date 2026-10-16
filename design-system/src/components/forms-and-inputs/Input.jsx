@@ -13,7 +13,7 @@ const renderVisual = (visual) => {
 };
 
 /**
- * Input — a labelled single-line text field on `_Field`.
+ * Input — a labeled single-line text field on `_Field`.
  *
  * Label, field and caption: the caption shows a validation message (or
  * standing help) on the left and, when `maxLength` is set, a count on the

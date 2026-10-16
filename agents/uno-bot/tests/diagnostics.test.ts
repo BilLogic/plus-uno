@@ -145,7 +145,7 @@ test("a probe's own build/ms/subrequests win over the envelope's", async () => {
   assert.equal(body.budget_trips, 1);
 });
 
-test("a probe's status is honoured", async () => {
+test("a probe's status is honored", async () => {
   const route = DIAGNOSTIC_ROUTES["slack-stream"];
   const res = await routeProbes(
     [fake(route, { body: { ok: false, error: "channel required" }, status: 400 })],

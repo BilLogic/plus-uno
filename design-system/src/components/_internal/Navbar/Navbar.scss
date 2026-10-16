@@ -18,7 +18,7 @@
         background-color: var(--color-inverse-surface);
         border-bottom: 1px solid var(--color-inverse-surface);
 
-        // Mandatory, not decorative. The brand and link colours further down
+        // Mandatory, not decorative. The brand and link colors further down
         // are `--color-on-surface` and `--color-primary`, which land at 1.31:1
         // and 2.48:1 on this background — the same invisible-text defect #153
         // removed. Inverse-on-surface is 11.59:1. `.nav-link.active` is spelled
@@ -42,7 +42,7 @@
         background-color: var(--color-primary);
         border-bottom: 1px solid var(--color-primary-border);
 
-        // Mandatory, not decorative. The link colour further down is
+        // Mandatory, not decorative. The link color further down is
         // `--color-primary` itself — the same token as this background — so
         // the links rendered at 1.00:1: invisible, not merely low-contrast
         // (#219). The brand was 3.24:1 and Bootstrap's black active link

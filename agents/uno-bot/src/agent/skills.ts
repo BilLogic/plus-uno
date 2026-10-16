@@ -46,7 +46,7 @@ export async function buildSystemBlocks(
   assistantContext?: string | null,
 ): Promise<SystemBlock[]> {
   const stable = getStableSystem(env);
-  // NB: only the Claude adapter honours this. The Gemini adapter flattens these
+  // NB: only the Claude adapter honors this. The Gemini adapter flattens these
   // blocks into one `systemInstruction` string and the Gemini API has no
   // cache_control, so on the PRODUCTION provider the harness rides uncached on
   // every iteration unless Google's implicit caching picks up the stable prefix.

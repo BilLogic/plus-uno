@@ -16,7 +16,7 @@ describe("the bot's own mention is dropped", () => {
     assert.equal(stripBotMentions(`<@${BOT}> what's RM-2436?`, BOT), "what's RM-2436?");
   });
 
-  it("drops a labelled form of it too", () => {
+  it("drops a labeled form of it too", () => {
     assert.equal(stripBotMentions(`<@${BOT}|le goat> hi`, BOT), "hi");
   });
 });

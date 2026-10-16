@@ -5,7 +5,7 @@ import Button from '@/components/actions/Button/Button';
 /**
  * ResponsiveFrame — the display well for spec Pages & Sections in Storybook docs.
  *
- * Behaviour:
+ * Behavior:
  *  1. **Chrome-less.** The well has no background, border, radius or padding of its own — the page
  *     (PageLayout) provides its own surface, so there is exactly ONE frame, not a page-on-a-panel.
  *  2. **Breakpoint sizing**

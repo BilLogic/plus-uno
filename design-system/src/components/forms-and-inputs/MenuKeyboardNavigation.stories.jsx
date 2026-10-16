@@ -11,7 +11,7 @@ import TreeSelect from './TreeSelect';
  * only a pointer could use.
  *
  * `TreeSelect` carried the right roles and none of
- * the behaviour they promise. The trigger was a `combobox` with `aria-expanded`;
+ * the behavior they promise. The trigger was a `combobox` with `aria-expanded`;
  * the panel was a `tree`; every node was a `treeitem` with `aria-selected` and
  * `aria-expanded`. Not one of them was a tab stop, and there was no key handler
  * anywhere in the file — so a screen-reader user was told there was a tree,
@@ -23,7 +23,7 @@ import TreeSelect from './TreeSelect';
  * A role that describes an interaction the component does not implement is
  * worse than no role: it is an announcement that turns out to be false. axe
  * cannot see that — it checks that roles are used legally, not that they are
- * honoured — and the story suite clicked, so the whole keyboard half of this
+ * honored — and the story suite clicked, so the whole keyboard half of this
  * component was unexercised.
  *
  * The assertions below are the contract, not the implementation: Down moves,
@@ -202,7 +202,7 @@ MultipleTogglesWithoutClosing.play = async ({ canvasElement }) => {
 };
 
 /* ---------------------------------------------------------------------------
- * `Cascader`, which was the worse of the two: it had neither the behaviour nor
+ * `Cascader`, which was the worse of the two: it had neither the behavior nor
  * the roles. The trigger was a read-only text input with no `combobox` role and
  * no `aria-expanded`, so nothing said a menu existed, let alone that it had
  * opened; the options were `div`s with an `onClick`; the columns previewed on

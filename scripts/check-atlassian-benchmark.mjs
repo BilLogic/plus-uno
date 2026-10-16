@@ -18,7 +18,7 @@
  *   · no record at all — the module's one stated absent-record mode, because an
  *     empty baseline reads as a green ratchet.
  *
- * It does NOT fail on distance from Atlassian. They ship 100 chart colours and
+ * It does NOT fail on distance from Atlassian. They ship 100 chart colors and
  * 21 elevation tokens for a product surface we do not have, and a gate that
  * demanded parity would be demanding the wrong thing loudly.
  *
@@ -237,7 +237,7 @@ function update(repoRoot = REPO_ROOT) {
 // terminal, and reports its refusal as a finding so the exit code still comes
 // from the one place that decides exit codes.
 //
-// `--print` is the older spelling of `--table` and both are honoured, so typing
+// `--print` is the older spelling of `--table` and both are honored, so typing
 // both has to print one table rather than two.
 let tabled = false;
 const printTableOnce = () => {

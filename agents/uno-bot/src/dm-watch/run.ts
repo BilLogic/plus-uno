@@ -60,11 +60,11 @@ import { GATE_RESERVED } from "../gate/reactions";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import type { SweepMessage } from "../sweep/finding";
 import type { SweepSlackMessage } from "../sweep/run";
-import { acknowledgement, REMINDER_CHOICES, reminderAnswer, reminderBlocks, reminderText, TAP_REFUSED, type ReminderOutcome } from "../commitments/copy";
+import { acknowledgment, REMINDER_CHOICES, reminderAnswer, reminderBlocks, reminderText, TAP_REFUSED, type ReminderOutcome } from "../commitments/copy";
 import { detectorChars, MAX_COMMITMENT_THREAD_CHARS, type CommitmentDetector, type DetectedCommitment, type EvidenceJudge } from "../commitments/detector";
 import { commitmentDueAt, dayLabel, dueDayOf, etDayOf, isMorningRunTime, maySnooze, nudgeAt, rearmedDueAt } from "../commitments/due";
 import { LIVE_STATES } from "../commitments/store";
-import { madeFollowUpText, madeToAcknowledgement, MADE_LAST_CHOICES, MADE_TO_LAST_CHOICES, MADE_TO_CHOICES, madeToFollowUpText, madeToText } from "./copy";
+import { madeFollowUpText, madeToAcknowledgment, MADE_LAST_CHOICES, MADE_TO_LAST_CHOICES, MADE_TO_CHOICES, madeToFollowUpText, madeToText } from "./copy";
 import {
   CAPTURE_FEATURE,
   DM_WATCH_FEATURES,
@@ -796,14 +796,14 @@ async function answerOrThrow(r: DmReminderReaction, deps: DmReminderDoorDeps): P
     const dueAt = rearmedDueAt(now);
     await deps.records.update(c.id, { state: "snoozed", snoozes: c.snoozes + 1, dueAt });
     const day = dayLabel(etDayOf(nudgeAt(dueAt)), etDayOf(now));
-    ack = c.kind === "made" ? acknowledgement("soon", day) : madeToAcknowledgement("soon", day);
+    ack = c.kind === "made" ? acknowledgment("soon", day) : madeToAcknowledgment("soon", day);
   } else if (c.kind === "made_to") {
     if (answer === "not_promise") return refused(TAP_REFUSED.notAnAnswer);
     await deps.records.update(c.id, { state: answer === "done" ? "done" : "dropped", resolvedAt: now });
-    ack = madeToAcknowledgement(answer);
+    ack = madeToAcknowledgment(answer);
   } else {
     await deps.records.update(c.id, { state: answer === "done" ? "done" : answer === "not_doing" ? "dropped" : "not_promise", resolvedAt: now });
-    ack = acknowledgement(answer);
+    ack = acknowledgment(answer);
   }
   const body = await deps.reminderBody(r.channel, r.messageTs);
   if (!body || !(await deps.update(r.channel, r.messageTs, { text: body, blocks: reminderBlocks(body, ack) }))) {

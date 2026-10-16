@@ -119,7 +119,7 @@ test('all six shipped skills pass at the chosen threshold', () => {
 test('a multi-line HTML comment is discounted whole, not just its opening line', () => {
   // The 2026-08-26 measurement's only cross-document hit: four method.md files
   // open with the same two-line authoring banner. Line 1 was discounted as a
-  // comment and line 2 was not, which is a classifier artefact, not drift.
+  // comment and line 2 was not, which is a classifier artifact, not drift.
   const banner =
     '<!-- Runtime-neutral core — loaded by SKILL.md on invocation.\n' +
     '     No IDE tool names, no Slack formatting here; execution specifics live in SKILL.md. -->';
@@ -146,7 +146,7 @@ test('every document pairs with every other, and a copy is named on both sides',
   const rule = 'A rule states itself once, and every other mention of it is a citation.';
   const { findings, pairings } = findSharedAcross([
     doc('AGENTS.md', `# constitution\n\n${rule}\n`),
-    doc('GLOSSARY.md', '# context\n\nNothing in common with either neighbouring document.\n'),
+    doc('GLOSSARY.md', '# context\n\nNothing in common with either neighboring document.\n'),
     doc('docs/connectors/slack.md', `# slack\n\nSome delta.\n\n${rule}\n`),
   ]);
   assert.equal(pairings, 3, 'three documents make three pairs');

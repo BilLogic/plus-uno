@@ -1,5 +1,5 @@
 ---
-summary: Badge, Progress or Spinner — labelling state versus showing work in flight
+summary: Badge, Progress or Spinner — labeling state versus showing work in flight
 ---
 
 <!-- Tier: 2 | Load when: choosing a component from the status-and-loading group -->
@@ -60,7 +60,7 @@ on every render, which assistive technology polls rather than announces. If a
 change genuinely needs to interrupt, that is `Toast` — see
 `design-system/guidelines/components/messaging.md`.
 
-Colour is never the whole message: `Badge`'s style only changes the palette, so
+Color is never the whole message: `Badge`'s style only changes the palette, so
 the text has to say what the badge means, per
 `design-system/guidelines/foundations/accessibility.md`.
 

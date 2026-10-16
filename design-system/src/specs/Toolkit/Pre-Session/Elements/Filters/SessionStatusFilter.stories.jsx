@@ -16,7 +16,7 @@ const defaultStatuses = [
     { value: 'in-progress', label: 'In progress', count: 20 },
     { value: 'starting-soon', label: 'Starting soon', count: 20 },
     { value: 'scheduled', label: 'Scheduled', count: 20 },
-    { value: 'cancelled', label: 'Cancelled', count: 20 },
+    { value: 'canceled', label: 'Canceled', count: 20 },
     { value: 'completed', label: 'Completed', count: 20 },
 ];
 
@@ -66,8 +66,8 @@ export const Overview = () => (
             <SessionStatusFilter defaultValue={['in-progress']} />
         </section>
         <section>
-            <h6 className="h6 mb-3">Completed and cancelled picked</h6>
-            <SessionStatusFilter defaultValue={['completed', 'cancelled']} />
+            <h6 className="h6 mb-3">Completed and canceled picked</h6>
+            <SessionStatusFilter defaultValue={['completed', 'canceled']} />
         </section>
     </div>
 );

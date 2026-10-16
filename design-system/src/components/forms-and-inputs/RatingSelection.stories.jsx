@@ -16,7 +16,7 @@ import Rating from './Rating';
  * No guard the repo had could see it. axe has no rule that says "this row of
  * buttons is really one value"; the render assertions see the class change,
  * which was there and correct; and the component's own stories clicked and
- * looked right. The information existed only as a fill colour, and a colour is
+ * looked right. The information existed only as a fill color, and a color is
  * exactly what an automated check cannot read a meaning out of.
  *
  * The fix is the model, not an attribute: one value out of five is a
@@ -26,7 +26,7 @@ import Rating from './Rating';
  * well as the state.
  *
  * `disabled` is asserted separately because it used to drop `role`, `tabIndex`
- * and `aria-label` together: a disabled rating was five unlabelled `div`s,
+ * and `aria-label` together: a disabled rating was five unlabeled `div`s,
  * invisible rather than unavailable, which is a different failure from the one
  * above and had to be fixed in the same place.
  */

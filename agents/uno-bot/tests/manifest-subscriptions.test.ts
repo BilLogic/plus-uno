@@ -16,7 +16,7 @@
 // IT LIVED IN `session-stop.test.ts` while `agent_session_stopped` was the
 // newest subscription and the one at risk. It is not a claim about the stop
 // control — it is a claim about every subscription — and that file is now a
-// behavioural suite that drives the three stop doors, with nothing left in it
+// behavioral suite that drives the three stop doors, with nothing left in it
 // that reads source (#593). So the check moved rather than being deleted.
 //
 // Read as text rather than imported: `events.ts` names `Env` and the Durable

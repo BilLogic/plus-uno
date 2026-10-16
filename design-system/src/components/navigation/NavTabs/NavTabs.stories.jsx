@@ -168,7 +168,7 @@ Overview.parameters = {
  *
  * The difference is not visual, which is the point — inspect the two, or reach
  * them with a keyboard. Navigation gives three anchors and three stops in the
- * tab sequence, with the selected one carried by colour alone. Tabs gives one
+ * tab sequence, with the selected one carried by color alone. Tabs gives one
  * stop, arrow keys within the strip, `aria-selected`, and a panel each tab is
  * wired to.
  */

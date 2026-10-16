@@ -23,9 +23,9 @@
 // what they record. Whatever is still owed is dispatched again, so a run that
 // gave up is completed by a later night's.
 //
-// UNLABELLED, SETTLED ON DISPATCH. A publish left with no label or
+// UNLABELED, SETTLED ON DISPATCH. A publish left with no label or
 // description reads like an autosave, so the poll owes a refresh for every new
-// version and marks those (`unlabelled`). The repo's snapshot records labelled
+// version and marks those (`unlabelled`). The repo's snapshot records labeled
 // versions only and never shows one of them landing, so the dispatch GitHub
 // accepts settles it; a version that changed nothing costs one refresh that
 // finds nothing.
@@ -213,7 +213,7 @@ export async function runSnapshotRefresh(deps: SnapshotRefreshDeps): Promise<Sna
   }
 
   // A publish with no label is one the repo's snapshot never records, so the
-  // refresh GitHub accepts settles it; a labelled one waits to land.
+  // refresh GitHub accepts settles it; a labeled one waits to land.
   const sent = dispatched ? left.filter((id) => owed.unlabelled?.includes(id)) : [];
   const waiting = left.filter((id) => !sent.includes(id));
 

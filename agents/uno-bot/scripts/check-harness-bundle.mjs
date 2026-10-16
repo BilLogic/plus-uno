@@ -6,7 +6,7 @@
 // It is a thin caller of `assemble()` in bundle-harness.mjs: the assembly reads
 // the tree and returns the three artifacts, the committed bytes snapshotted
 // before it ran, and every defect it found on the way — a doc under a section
-// root with no embodiment, a `disclosure` nothing can honour, a per-file or
+// root with no embodiment, a `disclosure` nothing can honor, a per-file or
 // assembled budget blown, the bundle cut under the cache floor, an empty glob.
 // This file turns those into findings and adds one per stale artifact.
 //

@@ -453,7 +453,7 @@ test("an approved intake naming a repo off the list is refused, and nothing reac
 // The Gate seam's cut-off cases (`tests/cut-off-run.test.ts`) have to stop a
 // run by hand. These drive `executeVerdict` itself, on an in-memory store
 // standing in for the Durable Object — its methods take the same arguments,
-// and ignore the adapter's trailing clock in favour of their own.
+// and ignore the adapter's trailing clock in favor of their own.
 
 async function realStore() {
   const [{ createInMemoryThreadState, EXECUTION_CUTOFF_MS }, { resolveSignal }] = await Promise.all([

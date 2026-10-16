@@ -47,7 +47,7 @@ const NOT_ROUTABLE = [
   'skills/uno-publish/examples', 'skills/uno-maintain/references/skill-quality/examples',
 ];
 
-/** Reading paths — the one part of this file that is a judgement, not a glob. */
+/** Reading paths — the one part of this file that is a judgment, not a glob. */
 const ROLE_PATHS = [
   ['New here, any role', ['README.md', 'SETUP.md', 'GLOSSARY.md']],
   ['Designer building UI', ['design-system/guidelines/overview.md', 'design-system/agent-views/components/index.md', 'design-system/guidelines/composition/layout.md']],
@@ -66,7 +66,7 @@ const rel = (p) => path.relative(REPO_ROOT, p).replace(/\\/g, '/');
  * `/`) and orders `README.md` against `agents/` by byte, where a browser's
  * listing — and this index, since it was first generated — uses the locale's
  * collation. Corpus hands back the paths; which order they read in is this
- * file's judgement, and it is the one already committed to INDEX.md.
+ * file's judgment, and it is the one already committed to INDEX.md.
  */
 function byEntry(a, b) {
   const as = a.split('/');

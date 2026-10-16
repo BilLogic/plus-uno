@@ -24,7 +24,7 @@ component.
 
 ### Unnamed variant properties — 4
 
-The property has no name at all, so the picker shows an unlabelled dropdown and
+The property has no name at all, so the picker shows an unlabeled dropdown and
 the values carry the whole meaning:
 
 | set | node | values | what they mean |
@@ -101,7 +101,7 @@ Recorded because a sweep that reports everything reports nothing:
   pieces rather than products, and they are excluded from this count.
 - **Duplicate sets kept on purpose.** `Input Group Text` exists three times
   (`13125:6054`, `53:20700`, `13659:1414`), `tree_dropdown component ver 1` sits
-  beside `tree_select_ver2`, and the student-row colour sample exists twice. The
+  beside `tree_select_ver2`, and the student-row color sample exists twice. The
   library keeps obsoleted work beside its replacement deliberately. Each
   description now says which siblings exist and that choosing between them is a
   design decision — it does not choose.
@@ -130,7 +130,7 @@ icon from an intent BASE. That was measured rather than guessed.
 
 **The first measurement over-counted, and the correction is the finding.** It
 reported 391 nodes across 23 sets, counting every node that resolved to an
-intent base colour. Most of those are not decisions. A stroke inside an INSTANCE
+intent base color. Most of those are not decisions. A stroke inside an INSTANCE
 belongs to the set that instance came from: change the owner and every instance
 follows. Splitting the same scan by ownership:
 
@@ -177,14 +177,14 @@ its replacement rather than deleted. Together they cover all 122.
 
 Two things the verification pass established. The originals were already bound
 to intent **variables** rather than to raw hexes, so each proposal is a
-variable-to-variable move and not a re-colouring. And every non-intent stroke
+variable-to-variable move and not a re-coloring. And every non-intent stroke
 was correctly left alone: `Neutral Colors/outline` and `outline-variant`,
 `_Primary/Inverse Primary` — which is the focus ring, not an intent — and
 `_Primary/Primary Container`.
 
 ### One gap the proposals surfaced
 
-`Tag` binds five SMART **subject** colours as strokes — Advocacy,
+`Tag` binds five SMART **subject** colors as strokes — Advocacy,
 Mastering-Content, Relationship, Social-Emotional, Technology-Tools — and none
 of them has a `Border` role, because #368 scoped the role layer to the seven
 intents. Measured against the five surface steps, all five clear 3:1 as a
@@ -210,7 +210,7 @@ and the role tokens do not cover it.
 
 ## Type scale, incorporated — 2026-08-29
 
-The colour work put role variables into the library and eight proposal sets
+The color work put role variables into the library and eight proposal sets
 beside their originals. The type work had produced candidates and no component
 had been drawn at them. Four now are.
 
@@ -255,9 +255,9 @@ display3 all alias `--font-family-header`. So this is not a drift to reconcile;
 it is a design question nothing has asked out loud. Recorded, not changed: a
 face is Bill's call.
 
-## Colour candidates, rendered — 2026-08-29
+## Color candidates, rendered — 2026-08-29
 
-`DOC — Colour candidates (#312 / #268)` on the Color page was **text only**. It
+`DOC — Color candidates (#312 / #268)` on the Color page was **text only**. It
 described three warning candidates and an info candidate in prose, gave their
 ratios as numbers, and pointed at Storybook for the visuals — so in the tool
 where the decision is actually made, the candidates could not be SEEN.
@@ -301,7 +301,7 @@ anything that points at it.
 
 `DOC — Focus ring (#368): 29 rings nobody could see` sits on the **Color** page
 at (1180, 32100), id `17596:5105`, beside the intent-roles frame. It draws all
-seven of the old ring colours as real 2px rings on real fields, so the failure
+seven of the old ring colors as real 2px rings on real fields, so the failure
 is visible rather than argued:
 
 | drawn with | on the page | rules |

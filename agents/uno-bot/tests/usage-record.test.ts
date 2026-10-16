@@ -316,13 +316,13 @@ test("a real turn that staged a card is pain_category 7 before any classifier ru
 });
 
 test("an in-turn label sets the Sub-type, its pain_category and when, and keeps a staged 7", () => {
-  const labelled = withAskLabel(
+  const labeled = withAskLabel(
     buildTurnRecord(facts({ surface: "assistant", conversationType: "im", channel: "D9" })),
     "Sync/drift",
     99,
   );
   assert.deepEqual(
-    [labelled.subType, labelled.painCategory, labelled.classifiedAt, labelled.requestText],
+    [labeled.subType, labeled.painCategory, labeled.classifiedAt, labeled.requestText],
     ["Sync/drift", 3, 99, null],
   );
   const staged = buildTurnRecord(facts({ surface: "assistant", channel: "D9", proposalId: "1.2" }));

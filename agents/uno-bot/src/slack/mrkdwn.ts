@@ -95,7 +95,7 @@ export function sanitizeSlackBlocks<T>(blocks: T): T {
   return walk(blocks) as T;
 }
 
-/** One `<…>` token: the valid markup it holds, normalised,
+/** One `<…>` token: the valid markup it holds, normalized,
  *  or the whole token entity-escaped when Slack could not parse it.
  *
  * @param token - The token, brackets included

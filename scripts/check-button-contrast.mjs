@@ -14,7 +14,7 @@
  * names render one appearance. No tool compares token values for equality,
  * because no tool knows they were meant to differ.
  *
- * WHY IT IS A RATCHET AND NOT A THRESHOLD. Both findings are colour-token
+ * WHY IT IS A RATCHET AND NOT A THRESHOLD. Both findings are color-token
  * decisions (#268): does `--color-warning` need a darker filled variant, and
  * should `info` be re-pointed or merged? Neither is Button's to make, and
  * failing the build on someone else's open question would get the check turned
@@ -84,7 +84,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 
   /*
    * A RECORDED ENTRY WITH NO REASON. Both findings here are somebody else's
-   * open colour-token decision, and the `notes` entry is the whole of what makes
+   * open color-token decision, and the `notes` entry is the whole of what makes
    * recording one honest rather than a way of turning the check off. An entry
    * with no note is a number nobody can argue with.
    */

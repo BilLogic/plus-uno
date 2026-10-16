@@ -49,7 +49,7 @@ const LIVE = [
   },
 ];
 
-test("renders one line per phase, labelling each scenario's future paths", () => {
+test("renders one line per phase, labeling each scenario's future paths", () => {
   const index = renderBlueprintIndex(LIVE, READ_AT);
   assert.deepEqual(index.phases, [
     "Application: Discovery(1), Interview & Offer(2)[proposed]",

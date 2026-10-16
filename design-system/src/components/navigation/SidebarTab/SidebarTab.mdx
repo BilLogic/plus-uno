@@ -117,7 +117,7 @@ is on by default and `trailingVisual` off. The row is capped at 164px wide.
 
 ## Usage notes
 
-### `state` is a prop, not a behaviour.
+### `state` is a prop, not a behavior.
 
 ```jsx
 // Incorrect — hover and focus are drawn from the prop, so wiring them to mouse
@@ -152,13 +152,13 @@ render an anchor inside, or use `NavPills` with real links.
   a key handler for both, so it is operable by keyboard as well as by pointer
   (#320). Space is prevented, so pressing it does not scroll the page.
 - **The selected row says so.** `state="selected"` carries `aria-current="page"`
-  as well as the background and text colour, so which section you are in is
+  as well as the background and text color, so which section you are in is
   announced rather than only drawn.
 - **Disabled is announced.** `state="disabled"` sets `aria-disabled`, drops the
   click handler and takes the row out of the tab order.
-- **The disabled colour is deliberate.** It uses a solid muted colour rather than
+- **The disabled color is deliberate.** It uses a solid muted color rather than
   an opacity, so the text still meets AA — an opacity would have taken it below.
-- **The icon is decoration.** It carries the state's colour and no text. The
+- **The icon is decoration.** It carries the state's color and no text. The
   label is what names the row, so never ship an icon-only row.
 
 </div>

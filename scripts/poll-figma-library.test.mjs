@@ -1,7 +1,7 @@
 /**
  * `--dry-run` on `scripts/poll-figma-library.js` must not publish anything.
  *
- * WHY THIS IS A SOURCE TEST AND NOT A BEHAVIOUR TEST, said first because it is
+ * WHY THIS IS A SOURCE TEST AND NOT A BEHAVIOR TEST, said first because it is
  * the weakness. Running the script needs a real `FIGMA_ACCESS_TOKEN`, a real
  * Figma file and a real Slack webhook; the only way to observe the bug was to
  * let it post to a channel. So this reads the source and asserts a structural
@@ -98,7 +98,7 @@ for (const effect of EFFECTS) {
 
 test('the usage banner does not promise less than the flag delivers', () => {
   // The banner said "Check without updating snapshot", which is what made the
-  // behaviour defensible to whoever wrote it. It has to describe the stronger
+  // behavior defensible to whoever wrote it. It has to describe the stronger
   // rule, or the next person narrows the guard back to the snapshot.
   const banner = source.slice(0, source.indexOf('*/'));
   assert.match(banner, /--dry-run/);

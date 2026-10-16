@@ -18,7 +18,7 @@ export default {
         style: {
             control: 'select',
             options: ['success', 'danger', 'secondary'],
-            description: 'Green for Joined, Red for Absent, Grey for Unknown.'
+            description: 'Green for Joined, Red for Absent, Gray for Unknown.'
         },
         size: {
             control: 'select',

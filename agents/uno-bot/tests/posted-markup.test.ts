@@ -138,7 +138,7 @@ test("a mention id needs six characters after its U or W — the share-out's own
   assert.equal(renderReviewer("U0A8JF"), "U0A8JF");
 });
 
-test("a DM link the Worker builds itself survives, and so does a labelled channel", async () => {
+test("a DM link the Worker builds itself survives, and so does a labeled channel", async () => {
   assert.equal(await posted("thread in <#D0APTB20SK0>"), "thread in <#D0APTB20SK0>");
   assert.equal(await posted("see <#C0APTB20SK0|uno-bot>"), "see <#C0APTB20SK0|uno-bot>");
 });
@@ -151,7 +151,7 @@ test("a quote marker opening a line stays a quote; a `>` mid-line is escaped", a
   assert.equal(await posted("> quoted\n>>> the rest\na > b"), "> quoted\n>>> the rest\na &gt; b");
 });
 
-test("a section block's mrkdwn is sanitised, its valid mention kept, its plain_text untouched", async () => {
+test("a section block's mrkdwn is sanitized, its valid mention kept, its plain_text untouched", async () => {
   const { postMessage } = await import("../src/slack/api.js");
   const { textSections } = await import("../src/slack/render.js");
   sent = [];
@@ -170,7 +170,7 @@ test("a section block's mrkdwn is sanitised, its valid mention kept, its plain_t
   assert.equal(sent[0]!.text, "Ask <@U0A8JFHQPU2>: the `&lt;@teammate&gt;` token is gone");
 });
 
-test("a card replaced over response_url is sanitised, text and blocks", async () => {
+test("a card replaced over response_url is sanitized, text and blocks", async () => {
   const { postToResponseUrl } = await import("../src/slack/api.js");
   const { proposalCardBlocks } = await import("../src/slack/proposal-render.js");
   sent = [];

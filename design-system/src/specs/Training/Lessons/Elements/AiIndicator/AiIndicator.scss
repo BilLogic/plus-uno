@@ -27,11 +27,11 @@
         transition: background-color 0.2s ease;
 
         &:hover {
-            background-color: var(--color-surface-container-hover, rgba(0, 0, 0, 0.05));
+            background-color: var(--color-on-surface-state-08, rgba(25, 28, 30, 0.08));
         }
 
         &:active {
-            background-color: var(--color-surface-container-active, rgba(0, 0, 0, 0.1));
+            background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
         }
 
         &:focus-visible {

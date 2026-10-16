@@ -10,7 +10,7 @@ This repo is the design system, prototyping workspace, and agent infrastructure 
 ## What This Is
 
 - **Design System** (`design-system/src/`) — 56 UI components (forms grouped under `components/forms-and-inputs/`), 25 DataViz chart components, 7 spec areas, generated token SCSS. Counts come from `design-system/agent-views/` — regenerate with `npm run generate:agent` rather than trusting the numbers below. Published internally as `@plus-ds` alias. (Exact counts: § Design System Inventory below.)
-- **Prototypes** (`prototypes/`) — on `main`: live app + Full Demo Walkthrough (`/demo/demo.html`, id `1028`) via `home-redesign/` (+ content modules). Branch experiments catalogued in Notion.
+- **Prototypes** (`prototypes/`) — on `main`: live app + Full Demo Walkthrough (`/demo/demo.html`, id `1028`) via `home-redesign/` (+ content modules). Branch experiments cataloged in Notion.
 - **Storybook** (`.storybook/`) — Interactive component documentation. Site landing at `/storybook/`.
 - **Agent Harness** (`AGENTS.md`, `skills/`, `agents/`) — the constitution, six dual-face skills, and the agent roster incl. the uno-bot Slack Worker (`agents/uno-bot/`).
 - **Product Documentation** (`docs/`) — context (descriptive), conventions (normative), rubrics, knowledge, plans.

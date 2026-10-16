@@ -5,8 +5,8 @@ import './StatusSelect.scss';
 
 /**
  * StatusSelect — a small single Select that sets a row's status, such as a
- * student's attendance or a tutor's standing. The field takes the colour role
- * of the status picked (`tone`), so a table still scans by colour.
+ * student's attendance or a tutor's standing. The field takes the color role
+ * of the status picked (`tone`), so a table still scans by color.
  */
 export const StatusSelect = ({ tone, className = '', ...props }) => (
     <Select
@@ -17,7 +17,7 @@ export const StatusSelect = ({ tone, className = '', ...props }) => (
 );
 
 StatusSelect.propTypes = {
-    /** The colour role of the picked status. Without one the field is neutral. */
+    /** The color role of the picked status. Without one the field is neutral. */
     tone: PropTypes.oneOf(['success', 'warning', 'danger', 'info']),
     'aria-label': PropTypes.string.isRequired,
     className: PropTypes.string,

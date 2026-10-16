@@ -146,7 +146,7 @@ export type AgentResult =
  *
  * A port rather than a direct `net.ts` import for two reasons: `net.ts` names
  * runtime fetch types this file's test compile does not have, and a budget trip
- * is one of the behaviours most worth testing — a test that has to spend 38 real
+ * is one of the behaviors most worth testing — a test that has to spend 38 real
  * subrequests to prove a lookup gets marked partial is a test nobody writes.
  */
 export interface LoopBudget {
@@ -226,7 +226,7 @@ export interface LoopInput {
    * Anchored at the START of the turn rather than here, because the gather that
    * runs before the loop takes real time and a press during it is a real press
    * (`turn/turn.ts` passes its own clock through `run-agent.ts`). Omitted, every
-   * flag counts, which is the old behaviour.
+   * flag counts, which is the old behavior.
    */
   cancelSince?: number;
 
@@ -510,7 +510,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
 
     if (reply.stop === "end" || reply.toolCalls.length === 0) {
       // The turn has its answer and is about to hand it over — the last moment
-      // a press can still be honoured.
+      // a press can still be honored.
       if (await stopPressed()) {
         console.log(`[stop] stopped at iteration ${iter}, answer undelivered`);
         return finish({ kind: "stopped" });

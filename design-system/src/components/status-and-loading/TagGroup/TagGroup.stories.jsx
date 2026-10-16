@@ -571,7 +571,7 @@ ConditionalChildrenAreNotCounted.play = async ({ canvasElement }) => {
 };
 
 /**
- * `+n` is the Figma set's: a grey selectable tag with no swatch, hover the
+ * `+n` is the Figma set's: a gray selectable tag with no swatch, hover the
  * on-surface-variant 08 state layer and pressed its 12. It opens a menu, so it
  * reports expanded, never pressed.
  */

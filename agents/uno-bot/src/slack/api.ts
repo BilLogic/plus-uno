@@ -279,7 +279,7 @@ export async function conversationsList(env: Env, types: string, cursor?: string
   );
 }
 
-/** One message as conversations.history returns it, threads summarised. */
+/** One message as conversations.history returns it, threads summarized. */
 export interface HistoryMessage {
   ts: string;
   user?: string;

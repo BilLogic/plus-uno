@@ -56,7 +56,7 @@ function briefingPath(conversationId) {
  * The session for this conversation, or null. A session idle past the intake
  * TTL is released rather than resumed — otherwise a conversation left
  * mid-reflection silently consumes the next unrelated prompt as the answer
- * (ce:review 064). One whose recorded owner differs (two ids that sanitise to
+ * (ce:review 064). One whose recorded owner differs (two ids that sanitize to
  * the same file name) is not this conversation's.
  * @param {string} conversationId
  * @returns {SessionState | null}

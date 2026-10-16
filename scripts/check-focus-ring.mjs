@@ -8,7 +8,7 @@
  * had no affordance reaching WCAG 1.4.11's 3:1 — `.plus-input:focus` announced
  * itself with a #84cfff border at 1.62:1, the AM/PM toggle and the file drop
  * zone with an 8% tint at 1.13:1, four textarea states at 2.22:1, and six
- * readonly fields with the same grey they wear at rest. All 29 are fixed, and
+ * readonly fields with the same gray they wear at rest. All 29 are fixed, and
  * `scripts/baselines/focus-ring.json` records the sweep with no exceptions.
  *
  * A RING ON A GROUND ITS CALLER PAINTS is measured, not excused. A rule can
@@ -35,7 +35,7 @@ import path from 'node:path';
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import {
   REPO_ROOT,
-  colours,
+  colors,
   failures,
   focusRules,
   indicators,
@@ -51,7 +51,7 @@ const ROLES_FILE = `${TOKEN_DIR}/_color_roles.scss`;
 
 /*
  * Floors. A resolver that stopped finding stylesheets, or a selector scan that
- * stopped recognising `:focus`, would report a clean sweep — which is the one
+ * stopped recognizing `:focus`, would report a clean sweep — which is the one
  * result this check must never give by accident.
  */
 export const MIN_FILES = 150;
@@ -61,7 +61,7 @@ export const REMEDY =
   `  -> A focus indicator is held to ${NON_TEXT}:1 against what it sits on (WCAG 1.4.11),\n` +
   '     and it is the only thing telling a keyboard user where they are. Use\n' +
   '     `var(--color-focus-ring)` — 5.02:1 on the page — rather than a state tint or\n' +
-  '     an inverse colour meant for dark grounds. A ring drawn on a ground its caller\n' +
+  '     an inverse color meant for dark grounds. A ring drawn on a ground its caller\n' +
   '     paints declares that ground (`// @grounds: --color-…` in its block) and is\n' +
   '     measured on each one.';
 
@@ -69,7 +69,7 @@ export const REMEDY =
 // same for both questions, so it happens once per root.
 const inputs = byRoot((repoRoot) => {
   const files = stylesheets(repoRoot);
-  const values = colours(repoRoot);
+  const values = colors(repoRoot);
   const rolesPath = path.join(repoRoot, ROLES_FILE);
   const raw = focusRules(files, repoRoot);
   return {
@@ -97,7 +97,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     found.push({
       message:
         `only ${rules.length} focus rules found (floor ${MIN_RULES}). ` +
-        'A scan that stopped recognising focus selectors reports every ring as fine.',
+        'A scan that stopped recognizing focus selectors reports every ring as fine.',
     });
   }
 

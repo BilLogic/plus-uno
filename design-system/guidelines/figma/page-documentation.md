@@ -11,7 +11,7 @@ Every page in the BS4 Foundation library (`zAecJNRdvJzAUOcjV32tRX`) documents
 its component families. Each family lives in one **Section** that holds its
 parts, its sets and its **Docs frame**, laid out with an 80 px gap: the public
 sets and their parts in a column on the left, the Docs frame on the right.
-Each set sits in a labelled variant matrix, and the Docs frame's live
+Each set sits in a labeled variant matrix, and the Docs frame's live
 instances carry the annotations a developer reads in Dev Mode, each on the
 layer it describes. The model is the Textarea page.
 
@@ -45,7 +45,7 @@ Divider pages (`─── Components · Forms & Inputs ───`) stay empty. T
 ## Layout and spacing
 
 A reader opening a Section meets the public component first, with every
-variant labelled, then reads its documentation. Inside a Section, two columns,
+variant labeled, then reads its documentation. Inside a Section, two columns,
 top-aligned:
 
 1. **The component column**, left. The primary public set first, then the
@@ -104,7 +104,7 @@ wholly inside its Section.
    gap is 80 again.
 3. Resize the Section to its content plus 80 on every side.
 4. Move every Section to the right of it by the same growth.
-5. Re-run the scan; it reads zero overlaps, tight gaps, spills and unlabelled
+5. Re-run the scan; it reads zero overlaps, tight gaps, spills and unlabeled
    sets.
 
 ## Annotations
@@ -126,14 +126,14 @@ page:
   border, a disabled fade).
 - **They say what Dev Mode cannot.** Dev Mode already shows the layer's
   name, variant properties and token bindings, so an annotation carries
-  behaviour (Interaction), the role, name, keys and cues beyond colour
+  behavior (Interaction), the role, name, keys and cues beyond color
   (Accessibility), copy rules (Content), or a code constraint on that layer
   that no property exposes (Development). Values the inspect panel shows are
   neither typed nor pinned.
 - **One line each**, at most 120 characters. An Anatomy callout leads with its
   part's number and name from the key, in bold: `**3 Resize grip** · …`. The
   key stays as text beside the instance, since exports render no annotations.
-- **The categories are the six labels, at their colours.** The BS4 file
+- **The categories are the six labels, at their colors.** The BS4 file
   carries only the four presets plus Before, Guidance and two Tooltips; its
   component pages use the four presets until the file is brought in line.
 
@@ -160,10 +160,10 @@ in this order:
 | Header | Title, one paragraph on what it is and when to reach for it, the `@/components` import line, and the Figma sets it covers with their node ids. The Code and Storybook links live on the set as dev resources; the Header says so. |
 | Anatomy | One live instance in an example card, with numbered callouts and a key that names each part. |
 | Properties | A table: Property · Type · Values · Default · Code prop. One row per set and property. Write "—" where code has no matching prop, and say why. |
-| Variants | One example card per variant axis, each cell labelled `axis=value`. |
+| Variants | One example card per variant axis, each cell labeled `axis=value`. |
 | States | Each Figma state as a live instance, and a line on any state that exists only in code (hover, focus). |
-| Usage | First, when to use it: the conditions that pick this component over its neighbours, such as how many options, one choice or several, whether a good default exists, or how long the answer runs, each with the reason. Then rules, each a short imperative heading, a paragraph, and a do and don't card where a picture settles it. |
-| Related | A bulleted line per neighbour: "• A need → Component." |
+| Usage | First, when to use it: the conditions that pick this component over its neighbors, such as how many options, one choice or several, whether a good default exists, or how long the answer runs, each with the reason. Then rules, each a short imperative heading, a paragraph, and a do and don't card where a picture settles it. |
+| Related | A bulleted line per neighbor: "• A need → Component." |
 
 Every section is present. When one has nothing to show, it says so in a line
 ("One state in Figma (default).") rather than disappearing.
@@ -191,7 +191,7 @@ Each of these is a violation the scan counts:
 - **Overlaps and tight gaps**: see Layout and spacing.
 - **Unsectioned nodes**: anything on the canvas outside a Section, and a
   family Section with no `Docs / <Section name>` frame.
-- **Unlabelled sets**: a set of two or more variants outside its
+- **Unlabeled sets**: a set of two or more variants outside its
   `<Set> / Variant matrix`. See Layout and spacing.
 - **Misplaced annotations**: an annotation on a set, variant or part, or
   anywhere outside a Docs frame; a label over its length limit; a category
@@ -225,7 +225,7 @@ Bind every value inside the Docs frame to a semantic variable, as
 Text uses the library's text styles: Title/H4 for the page title, Title/H5 for
 section headings, Body/B2 for prose and table cells (Bold for table headers),
 Body/B3 for the Header's Figma line, Body/Special/Code for code and property
-names. Colour comes from `on-surface` and `on-surface-variant`.
+names. Color comes from `on-surface` and `on-surface-variant`.
 
 ## Done
 
@@ -235,7 +235,7 @@ A page is done when a read-only scan of it finds:
   `Docs / <Component>` with all seven sections in order;
 - zero overlaps, gaps under 80 px, spills past a Section's edge, and nodes
   outside a Section;
-- every set of two or more variants in a labelled variant matrix, public sets
+- every set of two or more variants in a labeled variant matrix, public sets
   above parts, and the Docs frame rightmost;
 - no annotation on a set, variant or part; every annotation on a layer inside
   a Docs frame, in one of the six labels, within its length limit;

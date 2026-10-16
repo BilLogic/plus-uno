@@ -20,7 +20,7 @@ import SidebarTab from './SidebarTab/SidebarTab';
  * has to be pressed to be found.
  *
  * The second assertion is the other half of the same issue: which row you are
- * on was a background colour and nothing else, so `aria-current` had to arrive
+ * on was a background color and nothing else, so `aria-current` had to arrive
  * with the key handler.
  */
 
@@ -91,7 +91,7 @@ EnterAndSpaceActivate.play = async ({ canvasElement }) => {
 };
 
 /**
- * Which row is current, said rather than coloured.
+ * Which row is current, said rather than colored.
  */
 export const SelectedIsAnnounced = () => (
     <div style={stack}>

@@ -123,9 +123,9 @@ export default defineConfig({
         //
         // The browser-mode Vite server pre-bundles whatever its pre-run scan can
         // reach statically, then discovers the rest at runtime. A dependency
-        // discovered mid-run forces a re-optimisation, which reloads the page —
+        // discovered mid-run forces a re-optimization, which reloads the page —
         // Vitest's own browser provider warns that this "may cause tests to fail,
-        // lead to flaky behaviour" and prescribes exactly this field. A test file
+        // lead to flaky behavior" and prescribes exactly this field. A test file
         // whose setup import is in flight when the reload lands aborts with a
         // spurious error naming .storybook/vitest.setup.ts, which is the shape the
         // flake took: 7 of 382 files, one run in three, on a cold dep cache.
@@ -133,7 +133,7 @@ export default defineConfig({
         // `axe-core` and `storybook/test` are the two that were resolving at
         // runtime — addon-a11y reaches axe through a dynamic `import("axe-core")`,
         // so no static scan can see it. The rest are the setup file's own imports,
-        // pinned so the first optimise pass is the only one.
+        // pinned so the first optimize pass is the only one.
         //
         // `framer-motion` and `react-router-dom` were added after the flake came
         // back on 2026-08-29 and took three PRs red at once, each naming a
@@ -150,7 +150,7 @@ export default defineConfig({
         // scan can reach is precisely the one that arrives mid-run. `include`
         // forces it into the first pass anyway, which is the whole point of the
         // field, and pre-bundling a package the suite may never execute costs one
-        // optimise pass and nothing else.
+        // optimize pass and nothing else.
         //
         // To check: delete node_modules/.cache/storybook, run the suite, and read
         // `optimized` in .cache/storybook/*/sb-vitest/deps/_metadata.json. Every
@@ -195,11 +195,11 @@ export default defineConfig({
             // Pass `null` to restore the default. Skeleton's ReducedMotion
             // story uses it.
             commands: {
-              // There is deliberately no forced-colours twin. Emulating
+              // There is deliberately no forced-colors twin. Emulating
               // `forced-colors` repaints the whole page, which other story files
               // share, and leaving it on made later files fail axe
-              // colour-contrast. The Focus visibility stories read the
-              // forced-colours rules from the stylesheet instead.
+              // color-contrast. The Focus visibility stories read the
+              // forced-colors rules from the stylesheet instead.
               emulateReducedMotion: async ({ page }, value) => {
                 await page.emulateMedia({ reducedMotion: value });
               }

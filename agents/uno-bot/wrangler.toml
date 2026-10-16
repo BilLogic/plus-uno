@@ -105,7 +105,7 @@ SLACK_STREAM_PLAN = "on"
 # which would drop the footer from every answer while looking fine. Enable,
 # look at one real answer, then make it the default.
 # Phase 5 context management: derived {goal, constraints, decisions, artifacts},
-# progressive summarisation, drift detection. Off because it changes what the
+# progressive summarization, drift detection. Off because it changes what the
 # model sees on EVERY turn and its failure mode is subtly worse answers rather
 # than an error. Gated on real answers read CASE BY CASE — a stable 19/19
 # total hid a live BLOCKER once already (r48).

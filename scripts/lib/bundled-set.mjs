@@ -16,7 +16,7 @@
  * describe the docs, which is what the guards over them measure.
  *
  * A TREE THE BUNDLER REFUSES STOPS THE CALLER. `assemble()` refuses a doc with
- * no `embodiment`, a `disclosure` it cannot honour or a blown hard budget, and
+ * no `embodiment`, a `disclosure` it cannot honor or a blown hard budget, and
  * none of those is a finding of the calling guard (#204) — so the failure path
  * is a report that says whose problem it is and relays the bundler's own words.
  * `tryHarnessManifest` returns it, for a check the harness runner calls

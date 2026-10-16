@@ -141,7 +141,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
   themselves. Where only one half matters, use `DatePicker`.
 - **`showDate={false}` gives a time-only control** without reaching for a
   different component, which keeps the time half's parsing and its AM/PM
-  behaviour rather than reimplementing them beside it.
+  behavior rather than reimplementing them beside it.
 - **Not for a duration.** This picks a point, not a length. Two of these, or a
   `NumberInput` of minutes, says what a single one cannot.
 
@@ -239,7 +239,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
   last, so a caller's `aria-labelledby` wins over the generated one, matching
   `Input`. One dependency worth knowing: the wrapper is only a `group` when the
   field has a `label`, per the third bullet above, so a description forwarded to
-  an unlabelled picker lands on a plain `<div>` and is announced by nothing.
+  an unlabeled picker lands on a plain `<div>` and is announced by nothing.
   Pass a `label` — with `showLabel={false}` if it should not be seen.
 - **What that rule costs you: a forwarded `aria-invalid` marks the group, not
   the inputs.** It is the honest consequence of one spread target, and the

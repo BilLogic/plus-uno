@@ -237,7 +237,7 @@ export async function sweepRecords(job: ScheduledJob, deps: SweepDeps): Promise<
       try {
         got = await deps.notion.edited(db, cursor, after);
       } catch (err) {
-        // A kept page Notion no longer honours starts the minute over; the
+        // A kept page Notion no longer honors starts the minute over; the
         // handled ids still keep anything from being read twice.
         rethrowIfBudget(err);
         if (!after || page > 0) throw err;

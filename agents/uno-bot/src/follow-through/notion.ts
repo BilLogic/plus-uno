@@ -28,7 +28,7 @@ import {
   readPageRow,
   type EditedRow,
 } from "../integrations/notion";
-import { normalisePersonName } from "../usage/roles";
+import { normalizePersonName } from "../usage/roles";
 import { ACTIVE_DESIGN_STATUSES, type ActiveCard } from "./rules";
 
 export { notionBotUserId, notionUserName } from "../integrations/notion";
@@ -103,7 +103,7 @@ export async function lastCommentAt(env: Env, pageId: string, now: number): Prom
 
 /** The one Notion person with this name, as an id; null for none or several. */
 export function notionUserForName(env: Env, name: string): Promise<string | null> {
-  return notionUserIdForName(env, name, normalisePersonName);
+  return notionUserIdForName(env, name, normalizePersonName);
 }
 
 /** Titles of Roadmap cards holding any of these words — the title search

@@ -65,7 +65,7 @@ its `description` as an always-loaded pointer line and serves its body through
    names them.
 4. **Cite a tool's rules; never restate them.** A tool's description is the one
    home of its rules, gate included.
-5. **Positive phrasing:** state the target behaviour.
+5. **Positive phrasing:** state the target behavior.
 6. **No budget numbers;** the bundler holds the body to `BUDGETS.botSkill` and
    the check holds the description to `BUDGETS.botSkillDescription`.
 7. **Steps end on a completion criterion**, and the body stays short enough that

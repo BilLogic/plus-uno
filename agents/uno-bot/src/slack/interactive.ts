@@ -120,7 +120,7 @@ export function parseInteraction(rawBody: string): InteractionPayload | null {
  * Handle one interaction. Returns the body to ack with.
  *
  * Unknown interaction types ack 200 and log rather than erroring: Slack retries
- * a non-2xx, and an unrecognised payload is a deploy-order problem (manifest
+ * a non-2xx, and an unrecognized payload is a deploy-order problem (manifest
  * ahead of Worker), not something a retry fixes.
  */
 export function handleInteraction(
@@ -209,7 +209,7 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
 }
 
 // A button under a reminder (commitment, card follow-up, DM ask). It is the
-// reaction it is labelled with, tapped: the action id carries the glyph's Slack
+// reaction it is labeled with, tapped: the action id carries the glyph's Slack
 // name, and the reminder doors do the rest (`handleReminderButton`). A tap
 // that changed nothing tells the tapper why, to them alone: a button that
 // does nothing reads as broken.

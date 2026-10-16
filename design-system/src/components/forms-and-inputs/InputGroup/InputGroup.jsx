@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Form } from 'react-bootstrap';
 import Button from '@/components/actions/Button/Button';
 import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
 import useFieldId from '@/components/forms-and-inputs/useFieldId';
 import Checkbox from '../Checkbox';
+import Radio from '../Radio';
 import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from '../_internal/Field';
 import './InputGroup.scss';
 
@@ -170,7 +170,7 @@ InputGroupText.propTypes = {
     className: PropTypes.string
 };
 
-/** Checkbox addon — code's Checkbox box (18), centred. Name it: the default is generic. */
+/** Checkbox addon — code's Checkbox box (18), centered. Name it: the default is generic. */
 const InputGroupCheckbox = ({
     checked = false,
     disabled = false,
@@ -199,29 +199,39 @@ InputGroupCheckbox.propTypes = {
     'aria-label': PropTypes.string
 };
 
-/** Radio addon. Name it: the default is generic. */
+/**
+ * Radio addon — code's Radio, drawn at the checkbox's box (18) and centered.
+ * Name it: the default is generic. A lone addon is its own group unless the
+ * caller passes a shared `name`.
+ */
 const InputGroupRadio = ({
     checked = false,
     disabled = false,
     onChange,
+    name,
     className = '',
     'aria-label': ariaLabel = 'Select option',
     size: _size,
     ...props
-}) => (
-    <span className={`plus-input-group-addon plus-input-group-radio ${className}`.trim()} {...props}>
-        <Form.Check
-            type="radio"
-            checked={checked}
-            disabled={disabled}
-            onChange={onChange || (() => {})}
-            aria-label={ariaLabel}
-        />
-    </span>
-);
+}) => {
+    const groupName = useFieldId(name);
+    return (
+        <span className={`plus-input-group-addon plus-input-group-radio ${className}`.trim()} {...props}>
+            <Radio
+                name={groupName}
+                checked={checked}
+                disabled={disabled}
+                onChange={onChange || (() => {})}
+                aria-label={ariaLabel}
+            />
+        </span>
+    );
+};
 
 InputGroupRadio.propTypes = {
     checked: PropTypes.bool,
+    /** Shared by the radios of one group. Each addon is its own group without it. */
+    name: PropTypes.string,
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
     onChange: PropTypes.func,

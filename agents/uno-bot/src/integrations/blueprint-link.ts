@@ -153,20 +153,20 @@ export function chunkBody(chunk: string | undefined, title: string | undefined):
  *  breadcrumb rewrite both read. */
 export const PLACE_LABEL = `(?:${[...BLUEPRINT_CONTRACT.breadcrumb.labels, "Layer"].join("|")})`;
 const PLACE_VALUE = "[^·›\\n,;.():]+(?:\\((?:happy|variant|exception|named)\\))?";
-/** Two or more labelled segments, `·` or `›` between them — the index's form,
+/** Two or more labeled segments, `·` or `›` between them — the index's form,
  *  and the half-converted one an answer carried from an older turn keeps. */
-const LABELLED_PLACE = new RegExp(
+const LABELED_PLACE = new RegExp(
   `\\b${PLACE_LABEL}:[^\\S\\n]*${PLACE_VALUE}(?:[^\\S\\n]*[·›][^\\S\\n]*${PLACE_LABEL}:[^\\S\\n]*${PLACE_VALUE})+`,
   "g",
 );
 
-/** True when the prose names a blueprint place in the index's labelled form. */
-export function namesLabelledPlace(text: string): boolean {
-  return new RegExp(LABELLED_PLACE.source).test(text);
+/** True when the prose names a blueprint place in the index's labeled form. */
+export function namesLabeledPlace(text: string): boolean {
+  return new RegExp(LABELED_PLACE.source).test(text);
 }
 
 /**
- * Prose with every labelled blueprint place rewritten as its breadcrumb —
+ * Prose with every labeled blueprint place rewritten as its breadcrumb —
  * "Phase: Release › Scenario: Version cut" reads "Release › Version cut".
  *
  * A place carried over from an earlier answer keeps whatever form that answer
@@ -174,7 +174,7 @@ export function namesLabelledPlace(text: string): boolean {
  * the model.
  */
 export function breadcrumbsInProse(text: string): string {
-  return text.replace(LABELLED_PLACE, (match) => {
+  return text.replace(LABELED_PLACE, (match) => {
     const crumb = blueprintBreadcrumb(parseChunkTitle(match.replace(/›/g, "·")));
     return crumb ? `${crumb}${/\s*$/.exec(match)![0]}` : match;
   });

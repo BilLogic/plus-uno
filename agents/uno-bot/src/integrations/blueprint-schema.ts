@@ -83,7 +83,7 @@ export function columnFrom(table: DirectReadTable, column: string): string {
  *  `column` comes from `ROLES`, so this no longer CATCHES a rename — the
  *  vendored contract follows it. What it still does is hold the two halves of
  *  the contract to each other: a role naming a column the same table's list
- *  does not declare means the app labelled one thing and promised another, and
+ *  does not declare means the app labeled one thing and promised another, and
  *  the reads that role feeds span tables the label is only stated on one of.
  *  `tests/blueprint-contract-read-strings.test.ts` asserts the same agreement
  *  for every table and role, where a red test beats a Worker that will not

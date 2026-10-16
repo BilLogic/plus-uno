@@ -11,7 +11,7 @@
 // These were "haiku" | "sonnet" | "opus" until 2026-08-07: Claude model names,
 // on a deployment that has run Gemini in production for months. Naming a tier
 // after a model means every model swap turns the name into a lie, and this one
-// already had. Renamed with no behaviour change; the model wiring is separate.
+// already had. Renamed with no behavior change; the model wiring is separate.
 //
 // NO MODEL IDS LIVE HERE. A tier is a model plus its dials, moving together
 // (ADR-028), and both belong to the adapter that sends them: the Claude ids are

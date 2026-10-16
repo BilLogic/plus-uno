@@ -11,7 +11,7 @@ import ChoiceGroup from './ChoiceGroup';
  * WHY THIS FILE EXISTS (#325). Two components in this group got the empty case
  * wrong, in opposite directions.
  *
- * `Scale`, uncontrolled, initialised to `options[0].value`. A scale question
+ * `Scale`, uncontrolled, initialized to `options[0].value`. A scale question
  * therefore arrived already showing "1", and a genuine answer of 1 could not be
  * told apart from no answer at all. That is a data defect wearing an interface:
  * every response set collected through an uncontrolled scale has a floor of

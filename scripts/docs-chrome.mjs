@@ -10,7 +10,7 @@
  * These three assertions are the narrow version the ticket asked for. They are
  * kept apart from the Playwright driver so they can be exercised by
  * `test:scripts` without a browser: the measurement is the hard part to fake,
- * the judgement is the part worth testing.
+ * the judgment is the part worth testing.
  */
 
 /** Sub-pixel slack. Layout widths are fractional; 1px of it is not a defect. */
@@ -121,7 +121,7 @@ export function chromeFailures(pages) {
       if (t.color !== PROSE_COLOR) {
         failures.push(
           `${where}: prose "${t.label}" is ${t.color}, not ${PROSE_COLOR} — that is ` +
-            `Storybook's own text colour, not the design system's.`,
+            `Storybook's own text color, not the design system's.`,
         );
       }
       if (t.measure > MAX_MEASURE) {

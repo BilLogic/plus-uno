@@ -129,7 +129,7 @@ it is what a "select all" control needs when only some rows are ticked.
 
 `readOnly` shows an answer the person may read but not change: the box stays in
 the tab order at full contrast, says `aria-readonly`, and ignores clicks and
-Space. `disabled` takes it out of the tab order and greys it, for a box that does
+Space. `disabled` takes it out of the tab order and grays it, for a box that does
 not apply right now.
 
 ### A description describes; the label names.
@@ -169,7 +169,7 @@ box resolves it like any other, so it cannot be used as a third stored value.
 - **`name` is not an id.** It is a form key, it is not unique on the page, and no
   element carries it as one; it no longer stands in for a missing `id` (#213).
 - **A checkbox with no `label` has no accessible name.** Nothing substitutes for
-  it — not a neighbouring `<span>`, not the column it sits under. Where the
+  it — not a neighboring `<span>`, not the column it sits under. Where the
   design has no room for visible text, pass `aria-label`; it is spread onto the
   input.
 - **`required` is forwarded.** Unlike `Input`, the `required` prop reaches the

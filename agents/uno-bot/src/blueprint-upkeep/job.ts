@@ -8,7 +8,7 @@
 //     words and its PRD's (`./evidence.ts`). A card that passes queues one
 //     path to draft for EVERY `scenario › path` the gate matched
 //     confidently. A deploy whose design hand-off drafted rows promotes them
-//     instead (`./stages.ts`), with no judgement, adding what a redraft of
+//     instead (`./stages.ts`), with no judgment, adding what a redraft of
 //     the same path against the card's words now changes — and so does a
 //     card linked to a drawn proposal (`./link.ts`), at either moment: the
 //     proposal's own variant path moves on, today's path is offered for

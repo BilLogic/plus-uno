@@ -443,16 +443,16 @@ does not.
 
 `success`, `warning` and `danger` say something happened. The five SMART
 domains — `social-emotional`, `mastering-content`, `advocacy`, `relationship`,
-`technology-tools` — are subject colours, and a button wearing one is about
+`technology-tools` — are subject colors, and a button wearing one is about
 that domain, not about an outcome. The props table lists all thirteen values
 side by side; the enum does not tell you which half you are in.
 
 ```jsx
-// Incorrect — advocacy is the colour of a curriculum domain. Nothing about it
+// Incorrect — advocacy is the color of a curriculum domain. Nothing about it
 // says "this deletes something".
 <Button text="Delete session" style="advocacy" />
 
-// Correct — severity from the semantic set, domain colour where the button is
+// Correct — severity from the semantic set, domain color where the button is
 // genuinely about that domain.
 <Button text="Delete session" style="danger" />
 <Button text="Open advocacy plan" style="advocacy" />
@@ -478,7 +478,7 @@ side by side; the enum does not tell you which half you are in.
 - **Disabled.** `disabled` sets both the native attribute and `aria-disabled`.
   A natively disabled button leaves the tab order, so any explanation of *why*
   it is disabled must live outside the button, where it can still be reached.
-- **Pass-through.** Unrecognised props are spread onto the rendered element, so
+- **Pass-through.** Unrecognized props are spread onto the rendered element, so
   `aria-pressed`, `aria-expanded`, `aria-controls` and `aria-describedby` all
   work without a wrapper.
 

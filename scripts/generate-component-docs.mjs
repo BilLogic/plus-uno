@@ -121,7 +121,7 @@ function parsePropTypes(source, name) {
   //
   // A COMMENT IS ATOMIC, and that is what `inBlockComment` is for. Without it
   // this scanner reads the PROSE inside a JSDoc as source: depth is 0 while
-  // scanning a comment, so the comma in "A colour square, for a tag acting as a
+  // scanning a comment, so the comma in "A color square, for a tag acting as a
   // chart legend entry" split the entry in two. Neither half survived — the
   // first has an unterminated `/**` and no `name:`, the second has a stray `*/`
   // and starts mid-sentence, so both failed the `^propName:` match below and

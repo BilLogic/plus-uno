@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { footerKindFor, footerNoteFor } from "../src/slack/footer-kind";
 
-test("acknowledgements get no footer", () => {
+test("acknowledgments get no footer", () => {
   for (const ack of [
     "Got it — cancelled.",
     "Noted, thanks.",

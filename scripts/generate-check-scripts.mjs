@@ -34,7 +34,7 @@
 // AND EVERY TRIGGER IS ASSERTED, NOT JUST THE ONE THIS SCRIPT WRITES. The
 // `trigger` column names three places a check runs, and generation reaches one
 // of them. The other two — the pull-request workflows and the Worker's `deploy`
-// chain — were honoured by hand: a row could claim `pull_request` and be run by
+// chain — were honored by hand: a row could claim `pull_request` and be run by
 // nothing, or the chain could gain a step no row knew about, and each file read
 // as correct alone. Both are now READ and compared in both directions, at the
 // bottom of this file: a row with a trigger and no step fails, and a step with
@@ -262,7 +262,7 @@ const PARSES_ITS_OWN_RECORD = new Map([
  * the entry script's whole import reach now (`scripts/lib/script-reach.mjs`),
  * and asked as the strong question: is the record OPENED through
  * `scripts/lib/ratchet.mjs` somewhere in that reach, with `openRatchet({ file:
- * BASELINE })` recognised when `BASELINE` is imported or destructured rather
+ * BASELINE })` recognized when `BASELINE` is imported or destructured rather
  * than spelled. A check that reads its record through the module and never
  * names the file passes — which is the point, because the alternative is
  * eleven checks carrying a header line naming a file they no longer open.
@@ -577,7 +577,7 @@ export function consistencyFindings() {
 }
 
 // ---------------------------------------------------------------------------
-// the two triggers that are honoured by hand-written files
+// the two triggers that are honored by hand-written files
 //
 // `storybook-gate` is asserted above, against WORKFLOW_STEPS, because the
 // registry writes those steps. The other two are not written from
@@ -641,7 +641,7 @@ export const pullRequestRuns = () =>
   new Map(PULL_REQUEST_WORKFLOWS.map((file) => [file, runsIn(read(file))]));
 
 /**
- * The `pull_request` trigger against the steps that honour it, both ways.
+ * The `pull_request` trigger against the steps that honor it, both ways.
  *
  * A row reaches a pull request by one of three routes, and the registry states
  * all three: a step names it; it is composed into `COMPOSITE`, which a step
@@ -723,7 +723,7 @@ export const deployChain = () =>
     .filter(Boolean);
 
 /**
- * The `deploy` trigger against the chain that honours it, both ways.
+ * The `deploy` trigger against the chain that honors it, both ways.
  *
  * @param {string} [script]  the `deploy` script; the manifest's, by default.
  * @returns {import('./lib/findings.mjs').Finding[]}

@@ -220,7 +220,7 @@ export type SetReminderResult =
  * corrected time — starts that reminder over; a different one is refused
  * (`ONE_PER_MESSAGE`).
  *
- * @param input - `when` as said, `what` as the model summarised it
+ * @param input - `when` as said, `what` as the model summarized it
  * @param place - Where it was asked, and by whom
  * @param deps - The store, #uno-bot's id, the clock
  */

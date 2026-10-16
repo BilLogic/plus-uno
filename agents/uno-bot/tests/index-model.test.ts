@@ -106,7 +106,7 @@ test("a row that names no model is not an answer", async () => {
 test("each function reads the index it searches", () => {
   assert.equal(indexSource("search_blueprint"), "blueprint");
   assert.equal(indexSource("search_blueprint_cand001"), "blueprint_cand001");
-  // A name this does not recognise answers for the live index rather than
+  // A name this does not recognize answers for the live index rather than
   // inventing a source that no row describes.
   assert.equal(indexSource("something_else"), "blueprint");
 });

@@ -18,7 +18,7 @@ import { Toast } from './Toast';
  * `role="alert"` with `aria-live="polite"` — is less predictable than either
  * value alone.
  *
- * axe cannot help: both pairs are legal markup. This is a judgement about the
+ * axe cannot help: both pairs are legal markup. This is a judgment about the
  * message, so the assertion has to name which styles are which.
  */
 

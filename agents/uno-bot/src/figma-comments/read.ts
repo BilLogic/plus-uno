@@ -27,7 +27,7 @@
 //      only threads pinned under 📐 Specs or 🔍 For Review stay (`./sections.ts`);
 //   3. its cards, from `Card <n>` in its title (`./title.ts`): each card's page,
 //      offering only its status, owner and timing fields, and the first card's
-//      PRD subpage as the PRD — a card with none has no PRD, and a behaviour
+//      PRD subpage as the PRD — a card with none has no PRD, and a behavior
 //      decision is then said in the thread, never written into the card's
 //      body. The confirmers are every card's Contributors; the owner asked is
 //      the card's design owner — the first Contributor the team's roles name a

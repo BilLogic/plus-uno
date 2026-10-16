@@ -1,9 +1,9 @@
 /**
  * Negation ratchet over the bundled harness.
  *
- * Steering by prohibition drags the forbidden behaviour into context and makes
+ * Steering by prohibition drags the forbidden behavior into context and makes
  * it MORE available, not less — "don't think of an elephant". The fix is to
- * prompt the positive: state the target behaviour so the banned one is never
+ * prompt the positive: state the target behavior so the banned one is never
  * spoken. A prohibition earns its place only as a hard guardrail that cannot be
  * phrased positively, and even then it should carry its positive twin.
  *
@@ -36,7 +36,7 @@
  *     "state signals are protocol, not personality". That construction STATES A
  *     TARGET and names the near miss beside it. It is the idiom #229's rewrite
  *     produced when it turned 51 bans into targets. Broadening counts it, so
- *     the ratchet would penalise the writing it exists to encourage, and the
+ *     the ratchet would penalize the writing it exists to encourage, and the
  *     cheapest way to clear it would be to delete the disambiguation.
  *   - 166 are `no <noun>`, mostly conditional antecedents and plain facts
  *     rather than bans: "no clear match → offer the closest candidates", "the
@@ -323,7 +323,7 @@ export function roseReport({ scope, was, now, counts, baseCounts }) {
   return (
     `[negation] ${METRIC} across the ${scope.noun} rose ${was} -> ${now}.\n` +
     risen.join('\n') +
-    '\n  -> state the target behaviour instead of banning its opposite. A ban that is a real\n' +
+    '\n  -> state the target behavior instead of banning its opposite. A ban that is a real\n' +
     '     guardrail keeps its place, but pair it with the positive so attention lands on\n' +
     '     what to do. If the rise is deliberate, re-baseline with `--update` and say why.'
   );
@@ -363,7 +363,7 @@ export function corpusShrankReport({ scope, was, now }) {
  * one to the other moves its number without a single doc changing — downward,
  * in the direction a ratchet never fails on. Unifying the two paths would land
  * as bundled 200 -> 200 and IDE 107 -> 105, both green, and the guard would go
- * on reporting a number whose definition it had stopped honouring. So the
+ * on reporting a number whose definition it had stopped honoring. So the
  * baseline records the reading it was taken under and this compares them.
  *
  * Pure, for the same reason as `roseReport`.
@@ -566,7 +566,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 /**
  * Both sets of every scope, opened over the record.
  *
- * Opened per call rather than memoised: `--update` writes the record and the
+ * Opened per call rather than memoized: `--update` writes the record and the
  * next question reads it back, and a cached ratchet would answer with the
  * record from before the write.
  *

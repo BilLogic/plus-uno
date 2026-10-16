@@ -69,7 +69,7 @@ export type TurnSettlement =
 // ── The card ─────────────────────────────────────────────────────────────────
 
 /**
- * One labelled thing on a card: a staged parameter, or a parameter inside one.
+ * One labeled thing on a card: a staged parameter, or a parameter inside one.
  *
  * `label` is the tool input's OWN key, raw — `page_url`, not `Page link`.
  * Turning a key into words a designer reads is presentation, so the adapter
@@ -80,7 +80,7 @@ export interface CardField {
   /** A scalar value, which belongs on the label's own line. */
   value?: string;
   /** What sits UNDER the label, in the order the input had it: a bare bullet
-   *  for a scalar, a labelled sub-field for anything with structure. */
+   *  for a scalar, a labeled sub-field for anything with structure. */
   under?: CardRow[];
 }
 
@@ -89,7 +89,7 @@ export type CardRow = { item: string } | { field: CardField };
 /**
  * Something the turn decided a person must see BEFORE pressing ✅.
  *
- * A caveat is a JUDGEMENT, so it is the turn's: "this brief named no open
+ * A caveat is a JUDGMENT, so it is the turn's: "this brief named no open
  * questions" and "this share-out bundle is missing two of its three links" are
  * both reached by reading the staged input, and both used to be reached inside
  * the renderer. The WORDS are the adapter's — a caveat carries only which
@@ -405,7 +405,7 @@ export interface PostResult {
 }
 
 export interface Delivery {
-  /** React on the person's own message. The one acknowledgement a channel
+  /** React on the person's own message. The one acknowledgment a channel
    *  turn gets, and the ❌ a failed one carries. */
   react(emoji: string): Promise<void>;
 

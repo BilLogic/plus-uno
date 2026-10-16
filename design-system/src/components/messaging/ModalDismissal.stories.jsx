@@ -17,7 +17,7 @@ import Modal from './Modal';
  * None of that was exercised. Every story in `Modal.stories.jsx` renders
  * `renderAs="inline"`, which returns the panel markup and never mounts the
  * react-bootstrap `Modal` at all — so the overlay, the backdrop, the Escape
- * handler and the focus behaviour had no coverage of any kind, and a render
+ * handler and the focus behavior had no coverage of any kind, and a render
  * assertion cannot reach them: an inline panel renders identically whether or
  * not the overlay it stands in for can be closed.
  *

@@ -10,7 +10,7 @@ import LessonWelcomeSection from './LessonWelcomeSection/LessonWelcomeSection';
  * `aria-selected` — an attribute ARIA does not allow on a button, because a
  * button has no selected state. axe reported `aria-allowed-attr` on all six
  * rendered instances, and the attribute did nothing: which tab was current was
- * a colour and an underline, and nothing else. A screen-reader user was told
+ * a color and an underline, and nothing else. A screen-reader user was told
  * "button, Sign Up / Edit" three times with no indication that they were a set
  * or that one of them was showing.
  *
@@ -27,7 +27,7 @@ import LessonWelcomeSection from './LessonWelcomeSection/LessonWelcomeSection';
  * follows focus.
  *
  * axe cannot see any of that — it checks that roles are used legally, not that
- * they are honoured. These assertions are the contract.
+ * they are honored. These assertions are the contract.
  */
 export default {
     title: 'Specs/Training/Lesson tabs — roles and keys',

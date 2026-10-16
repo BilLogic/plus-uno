@@ -51,7 +51,7 @@ export const CtaSignUpRelated = () => (
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Copy Message</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
-                {/* Dark grey button, closest is probably secondary or needs custom style. 
+                {/* Dark gray button, closest is probably secondary or needs custom style. 
                     Using 'secondary' for now based on 'secondary' text color in Figma code. 
                     Icon 'copy' for copy message. */}
                 <Button text="Copy recruitment message" leadingVisual="copy" style="secondary" />

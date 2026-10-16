@@ -77,7 +77,7 @@ body,
  *   .css-1cymxic :where(p:not(.sb-anchor, .sb-unstyled, .sb-unstyled p))
  *       font-family: "Nunito Sans", …;  font-size: 14px;  color: rgb(46, 51, 56)
  *
- * So prose rendered in Storybook's font, at 14px, in Storybook's grey, on every
+ * So prose rendered in Storybook's font, at 14px, in Storybook's gray, on every
  * docs page. The rules meant to prevent it targeted `.sbdocs-content > p`, a
  * DIRECT child — which is why a page whose prose sat one div deep rendered at
  * 14px while a sibling page rendered correctly.
@@ -136,7 +136,7 @@ body,
 /*
  * Code blocks.
  *
- * The COLOUR is not cosmetic. Bootstrap's default `code` colour is `#d63384`,
+ * The COLOR is not cosmetic. Bootstrap's default `code` color is `#d63384`,
  * which measures 4.28:1 against this docs ground (`--color-surface`, #f9f9fc) —
  * under AA's 4.5:1 for body text, on every inline `<code>` in every docs page.
  * It surfaced when a new Foundations story put ten `<code>` labels on one page
@@ -146,7 +146,7 @@ body,
  *
  * `--color-secondary` measures 6.70:1 and carries no meaning that code should
  * not have. The near-hue alternative, `--color-relationship` (5.34:1), was
- * rejected on purpose: it is a curriculum-domain colour, and painting literals
+ * rejected on purpose: it is a curriculum-domain color, and painting literals
  * in it would say a code span IS that domain — the same borrowed-meaning
  * mistake #269 argues against for the AI palette.
  */
@@ -171,7 +171,7 @@ body,
  * spacing step: it is the height of Storybook’s own sticky chrome, and the same
  * number is duplicated as a plain integer in `unsafeTocbotOptions.headingsOffset`
  * over in preview.jsx, because Tocbot scrolls in JS and reads no custom property.
- * Tokenising one side would leave the two halves of one measurement unable to be
+ * Tokenizing one side would leave the two halves of one measurement unable to be
  * compared by eye, which is exactly how they drift.
  */
 html {
@@ -983,11 +983,11 @@ a.sbdocs-a {
  * none !important` would have survived and the card would still hang open. This
  * mirrors it and adds the one `:has()`, which is `(0,7,1)`.
  *
- * The closing border has to name its COLOUR as well as its width and style.
+ * The closing border has to name its COLOR as well as its width and style.
  * `border-bottom: none` in the rule above is a shorthand, so it reset that edge's
- * colour to the initial `currentColor` along with its width — restoring width and
- * style alone drew the bottom edge in the text colour, a near-black line under
- * three grey ones. Measured before it shipped.
+ * color to the initial `currentColor` along with its width — restoring width and
+ * style alone drew the bottom edge in the text color, a near-black line under
+ * three gray ones. Measured before it shipped.
  */
 .sbdocs
   .sb-ds-docs-canvas-shell--source-attached

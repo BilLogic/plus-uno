@@ -4,7 +4,7 @@ import { expect, fireEvent, fn, userEvent, waitFor, within } from 'storybook/tes
 import Select from './Select';
 
 /**
- * Choosing a value in a `Select`: one play test per behaviour.
+ * Choosing a value in a `Select`: one play test per behavior.
  *
  * The list renders in a portal on `document.body`, so rows are found from the
  * document, not the canvas. The field is a combobox: focus stays in it, and

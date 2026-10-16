@@ -322,7 +322,7 @@ export function shortCardOf(text: string): { summary: string; size: string } | n
  * what an approved card says from then on, in the thread and in View.
  *
  * Each change is written where this module wrote the field — its
- * `• *Label:* value` line, labelled from the input key's last segment as
+ * `• *Label:* value` line, labeled from the input key's last segment as
  * `renderField` labels it — and only where that line's whole value is the old
  * one: a line that merely starts with it (`Goal` on a card showing `Goal
  * cycles`) holds another value, and is left alone. The thread's summary is
@@ -582,7 +582,7 @@ function revisionBody(revision: CardRevision): string {
 /**
  * A caveat, in words.
  *
- * WHETHER a caveat is on the card is the turn's judgement and lives in
+ * WHETHER a caveat is on the card is the turn's judgment and lives in
  * `turn/turn.ts`; this is only how each one reads. Every one of them is informed
  * consent rather than decoration — "stage, but flag gaps loudly" (Bill,
  * 2026-07-16) — which is why they sit above the footer and not in the prompt: a
@@ -676,7 +676,7 @@ export interface OperationPlan {
 /**
  * Splice the batch's plan into a card that renders one operation's body: every
  * operation, grouped by the page, data source, repo, channel or recipient it
- * touches, each labelled by kind, in the order they will run.
+ * touches, each labeled by kind, in the order they will run.
  *
  * NEVER truncated, at either fidelity. A card that shows three of four
  * operations is the failure this exists to end: the person's ✅ is consent to

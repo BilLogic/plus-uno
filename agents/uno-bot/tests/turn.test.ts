@@ -154,7 +154,7 @@ test("an image on the request reaches the model, and the tier routed in Turn goe
   const withImages = started.conversation.filter((t) => (t.images?.length ?? 0) > 0);
   assert.equal(withImages.length, 1);
   assert.equal(withImages[0]!.images![0]!.data, "aGVsbG8=");
-  // Routing happened HERE and travelled down as an opaque name.
+  // Routing happened HERE and traveled down as an opaque name.
   assert.equal(started.tier, "default");
   assert.equal(outcome.telemetry.tier, "default");
   assert.equal(outcome.telemetry.route, "default-tier");
@@ -877,7 +877,7 @@ test("follow-ups on two issues are one card with each issue's operations", async
   const h = harness({
     replies: [
       {
-        text: "Relabelling both.",
+        text: "Relabeling both.",
         toolCalls: [
           { name: "github_issue_update", args: { repo: "plus-uno-blueprint", issue_number: 4, remove_labels: ["bug"] } },
           { name: "github_issue_update", args: { issue_number: 688, state: "open" } },
@@ -1110,7 +1110,7 @@ test("a comment on the weekly intake itself is still refused with the card's not
 test("a separate intake in a filing week's thread stages beside the weekly card, both live", async () => {
   const { h, outcome } = await inWeeklyThread(WEEKLY_CREATE, {
     name: "github_issue_create",
-    args: { title: "Tooltip colour differs between code and Figma", body: "Seen in the list." },
+    args: { title: "Tooltip color differs between code and Figma", body: "Seen in the list." },
   });
 
   assert.equal(outcome.disposition, "staged");
@@ -2657,9 +2657,9 @@ test("the scope hint and the correction directive land after the question, never
 });
 
 test("a brief staged with no named gap carries that caveat as data, not as Slack copy", async () => {
-  // WHETHER the caveat is on the card is the turn's judgement (#623); the
+  // WHETHER the caveat is on the card is the turn's judgment (#623); the
   // words are the adapter's. A test matching `:mag:` here would pass on a
-  // recording that spelled the card and fail to notice the judgement moving.
+  // recording that spelled the card and fail to notice the judgment moving.
   const h = harness({
     replies: [
       {

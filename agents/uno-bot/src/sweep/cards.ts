@@ -244,7 +244,7 @@ export function sweepParent(items: readonly PendingFinding[], destination: Desti
   const pageOf = (f: PendingFinding) => `*${escapeSlackText(flat(f.target.title) || "untitled")}*`;
   if (n === 1) {
     const f = items[0]!;
-    const who = capitalised(saidIn(f, inThread(destination)));
+    const who = capitalized(saidIn(f, inThread(destination)));
     return f.add ? `${who} answered something that ${pageOf(f)} doesn't say yet.` : `${who} settled something that ${pageOf(f)} still states the old way.`;
   }
   if (items.every((f) => f.add)) return `${n} answers are on no page yet.`;
@@ -309,7 +309,7 @@ export function sweepItemText(f: PendingFinding): string {
  *  it. Its card's Why line, and Review's Issue (`PendingProposal.issue`). */
 export function sweepIssue(f: PendingFinding): string {
   const at = saidAt(f);
-  return `${capitalised(saidIn(f, true))} said “${escapeSlackText(flat(f.threadSays))}”${at ? ` · <${at}|see it>` : ""}`;
+  return `${capitalized(saidIn(f, true))} said “${escapeSlackText(flat(f.threadSays))}”${at ? ` · <${at}|see it>` : ""}`;
 }
 
 /** What a sweep fix says at the gate (`PendingProposal.stated`). */
@@ -372,7 +372,7 @@ export const FIX_INSERT_REFUSAL =
 export const FIX_SCOPE_REFUSAL =
   "That would change more than this fix's own line, so it stays as drafted. Say what the line should read instead.";
 
-function capitalised(text: string): string {
+function capitalized(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 

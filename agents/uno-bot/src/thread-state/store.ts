@@ -39,7 +39,7 @@ export type { AssistantContext, VisionReference };
 
 // ── Timings ──────────────────────────────────────────────────────────────────
 //
-// Every TTL and lease the module honours, owned here rather than split across
+// Every TTL and lease the module honors, owned here rather than split across
 // the Durable Object and its scheduler. `RUN_LEASE_MS` and `DEFER_RETRY_MS` are
 // two halves of one rule — how long a lease is trusted, and how often a
 // deferred job comes back to test it — and lived in two files (thread-state.ts
@@ -690,7 +690,7 @@ export type ReportChange =
 /** How long a report's record outlives its items' TTL. */
 export const REPORT_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
 
-/** Storage envelope for expiry delivery. Revision fences an edit acknowledgement
+/** Storage envelope for expiry delivery. Revision fences an edit acknowledgment
  * from a decision that changed the report while Slack was being called. */
 export interface ReportExpiryRecord {
   report: DecisionReportRecord;
@@ -1302,7 +1302,7 @@ export interface ThreadState {
    * unthreaded DM is the constant `"dm"` — every ask on that surface shares it,
    * so retiring by conversation would let one ask retire an unrelated one, and
    * answer a ✅ on it with "that was replaced" when it was nothing of the kind.
-   * In a channel `replyTs` IS the thread root, so channel behaviour is
+   * In a channel `replyTs` IS the thread root, so channel behavior is
    * unchanged; in a DM each ask has its own thread since the agent_view
    * migration, so a revision still retires the card it revises.
    *

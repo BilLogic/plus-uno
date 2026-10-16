@@ -50,7 +50,7 @@ export function cardAnswer(kind: "card_todo" | "card_unowned" | "card_stale", gl
 }
 
 /** What replaces the legend once someone answers. */
-export function cardAcknowledgement(answer: CardAnswer | "owner" | "status", staged: boolean): string {
+export function cardAcknowledgment(answer: CardAnswer | "owner" | "status", staged: boolean): string {
   switch (answer) {
     case "draft":
       return "On it. The draft card is in this thread; a ✅ there files it.";

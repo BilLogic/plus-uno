@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect } from 'storybook/test';
 
-import { composite, contrast as contrastOf, parseColour, toHex } from '../lib/tokens.mjs';
+import { composite, contrast as contrastOf, parseColor, toHex } from '../lib/tokens.mjs';
 
 /**
  * The focus ring — what 29 of this system's focus styles looked like before
@@ -15,11 +15,11 @@ import { composite, contrast as contrastOf, parseColour, toHex } from '../lib/to
  * cannot.
  *
  * THE FINDING. Of 84 focus rules in the design system, 29 had no affordance
- * reaching WCAG 1.4.11's 3:1 against its own ground. Four colours did all the
+ * reaching WCAG 1.4.11's 3:1 against its own ground. Four colors did all the
  * damage:
  *
  *   --color-inverse-primary      1.62:1   14 rules — a tint meant for DARK grounds
- *   --color-outline-variant      1.62:1    6 rules — the same grey the field wears at rest
+ *   --color-outline-variant      1.62:1    6 rules — the same gray the field wears at rest
  *   --color-primary-container    2.22:1    4 rules
  *   --color-*-state-08           1.13:1    4 rules — an 8% tint, used alone
  *   --color-on-surface-state-12  1.28:1    1 rule
@@ -71,7 +71,7 @@ export default {
  * The adapter is only about SHAPE: everything below speaks in `#rrggbb`, the
  * module in `{r, g, b, a}`.
  */
-const contrast = (a, b) => contrastOf(parseColour(a), parseColour(b));
+const contrast = (a, b) => contrastOf(parseColor(a), parseColor(b));
 
 /**
  * Read a token as it renders, compositing translucency over the page.
@@ -85,14 +85,14 @@ const PAGE = '--color-surface';
 
 const readToken = (name, over = null) => {
     const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-    const colour = parseColour(raw);
-    if (!colour) return null;
-    if (colour.a === 1) return toHex(colour);
-    const ground = parseColour(over ?? readToken(PAGE));
+    const color = parseColor(raw);
+    if (!color) return null;
+    if (color.a === 1) return toHex(color);
+    const ground = parseColor(over ?? readToken(PAGE));
     // No ground to lay it on is not a reason to invent one: the raw channels
     // are what the old reader returned, and they are at least honest about
-    // which colour this is.
-    return toHex(ground ? composite(colour, ground) : colour);
+    // which color this is.
+    return toHex(ground ? composite(color, ground) : color);
 };
 
 /** WCAG 1.4.11 — a focus ring is a non-text indicator. */
@@ -173,7 +173,7 @@ export const BeforeAndAfter = () => (
         <h1 className="h4" style={{ margin: '0 0 8px' }}>The focus ring</h1>
         <p className="body2-txt" style={{ maxWidth: 640, margin: '0 0 32px', color: 'var(--color-on-surface-variant)' }}>
             29 of this system&apos;s 84 focus rules had no affordance reaching 3:1 against their own
-            ground. Each ring below is drawn with the colour those rules used, on the ground they
+            ground. Each ring below is drawn with the color those rules used, on the ground they
             used it on.
         </p>
 

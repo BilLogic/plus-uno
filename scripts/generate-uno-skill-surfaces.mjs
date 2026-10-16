@@ -39,7 +39,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 // at all for anyone on Windows, which is precisely who is most likely to cause
 // drift. Read through this everywhere endings could leak in.
 const LINES = (text) => text.split(/\r?\n/);
-/** Normalise for comparison only; what we WRITE stays "\n" as before. */
+/** Normalize for comparison only; what we WRITE stays "\n" as before. */
 const NORM = (text) => text.replace(/\r\n/g, "\n");
 
 /**
@@ -129,10 +129,10 @@ export function artifacts({ repoRoot = ROOT } = {}) {
 /**
  * One artifact against what is committed.
  *
- * Compare on normalised endings. The generated `content` is always "\n",
+ * Compare on normalized endings. The generated `content` is always "\n",
  * while `current` comes off a working copy that may be CRLF — without this
  * every artifact reads as drifted on Windows even when byte-identical in the
- * repository. Nothing is lost: endings are normalised on commit, so a
+ * repository. Nothing is lost: endings are normalized on commit, so a
  * difference that survives only in the working copy is not drift anyone can
  * act on. (A missing file leaves `current` null, which falls through to drift.)
  */

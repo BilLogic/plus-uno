@@ -113,7 +113,7 @@ function notionSurfaceName(input: Record<string, unknown>): string {
   }
 }
 
-/** Every scanned field of a `notion_create`, labelled as a person would say it. */
+/** Every scanned field of a `notion_create`, labeled as a person would say it. */
 function notionCreateFields(
   input: Record<string, unknown>,
 ): Array<{ name: string; value: string }> {

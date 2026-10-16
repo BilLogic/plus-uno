@@ -139,7 +139,7 @@ describe("the note the model is handed", () => {
       assert.ok(FIGMA_NOTE.includes(dropped), `note should name ${dropped}`);
     }
     assert.match(FIGMA_NOTE, /unread here rather than missing/i);
-    assert.doesNotMatch(FIGMA_NOTE, /\bnever\b/i, "the target behaviour, stated positively");
+    assert.doesNotMatch(FIGMA_NOTE, /\bnever\b/i, "the target behavior, stated positively");
   });
 
   it("the truncation note says the missing part is unknown, not absent", () => {
@@ -350,7 +350,7 @@ describe("the comments pinned to a pasted frame (#899)", () => {
     note:
       "The frame's name, node type and text layers — nothing else. This payload carries no fills, " +
       "tokens, variable bindings or measurements: never state one from it, and never report one as " +
-      "absent, because they are unread here rather than missing. Visual judgement comes from the " +
+      "absent, because they are unread here rather than missing. Visual judgment comes from the " +
       "frame's rendered image when one is attached to this turn; this text describes no pixels.",
   };
 
@@ -462,7 +462,7 @@ describe("the comments pinned to a pasted frame (#899)", () => {
       assert.deepEqual(fields, { ...fieldsBefore, annotations: [], fills: [] });
       // The note's closing sentences are the ones it carried then; it gains
       // one sentence saying no comment is pinned.
-      assert.ok(noteBefore.endsWith(FIGMA_NOTE.slice(FIGMA_NOTE.indexOf("Visual judgement"))));
+      assert.ok(noteBefore.endsWith(FIGMA_NOTE.slice(FIGMA_NOTE.indexOf("Visual judgment"))));
       assert.equal(note, `${FIGMA_NOTE} ${FIGMA_NO_COMMENTS_NOTE}`);
     }
     // The text read itself is the drift check's, unchanged.

@@ -13,7 +13,7 @@ PLUS Uno production (`plus-uno.netlify.app`) ships:
 2. **Live app** — Storybook Specs pages wired as one product (`prototypes/live-app` → `/home`, alias `/app`)
 3. **Full Demo Walkthrough** under `/demo/*` (entry `/demo/demo.html` → `/demo/home`; id `1028` — **do not change** the entry path)
 
-Individual experiments are **not** added to `main` as numeric routes. They ship as preview URLs and are catalogued in Notion.
+Individual experiments are **not** added to `main` as numeric routes. They ship as preview URLs and are cataloged in Notion.
 
 ## Stage 1 — Experiment on a branch (multiple URLs OK)
 

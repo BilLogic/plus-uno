@@ -1,7 +1,7 @@
 // What the thread is told once an approved batch has run.
 //
 // Slack's, not Gate's (#623). The account of a finished batch is grouped and
-// labelled exactly as the card grouped and labelled the plan — the person is
+// labeled exactly as the card grouped and labeled the plan — the person is
 // checking the result AGAINST the card they approved, and two different shapes
 // for the same batch make them do that matching by hand. That grouping is
 // `proposal-render.ts`'s, which is why this line belongs on this side of the
@@ -51,8 +51,8 @@ const placesOf = (outcomes: OperationOutcome[]) =>
  * or failed, so a partial result is visible rather than hidden behind the one
  * that succeeded.
  *
- * Grouped by target and labelled by kind, the same way the card grouped and
- * labelled the plan: the person is checking the result AGAINST the card they
+ * Grouped by target and labeled by kind, the same way the card grouped and
+ * labeled the plan: the person is checking the result AGAINST the card they
  * approved, and two different shapes for the same batch make them do that
  * matching by hand.
  *

@@ -96,7 +96,7 @@ export const AllSessionsTableHeaderRow = () => {
  * - timeRange: string (e.g., "1:00 PM - 1:50 PM")
  * - school: string (e.g., "Hogwarts")
  * - teacher: string (e.g., "Mr. Snape")
- * - status: 'in-progress' | 'upcoming' | 'completed' | 'cancelled'
+ * - status: 'in-progress' | 'upcoming' | 'completed' | 'canceled'
  * - tutorCount: string (e.g., "1/5")
  * - needLead: boolean - shows "Need Lead" badge
  * - studentCount: number (e.g., 25)
@@ -137,8 +137,8 @@ export const AllSessionsTableRow = ({
                 return { text: 'Upcoming', style: 'secondary' };
             case 'completed':
                 return { text: 'Completed', style: 'success' };
-            case 'cancelled':
-                return { text: 'Cancelled', style: 'danger' };
+            case 'canceled':
+                return { text: 'Canceled', style: 'danger' };
             default:
                 return { text: 'In progress', style: 'info' };
         }
@@ -400,7 +400,7 @@ export const Overview = () => (
                 timeRange="3:00 PM - 3:50 PM"
                 school="Daily Bugle"
                 teacher="Mr. Jameson"
-                status="cancelled"
+                status="canceled"
                 tutorCount="0/5"
                 studentCount={0}
                 interactive={false}
@@ -476,7 +476,7 @@ export const Interactive = () => {
         'in-progress': sessions.filter(s => s.status === 'in-progress').length,
         'upcoming': sessions.filter(s => s.status === 'upcoming').length,
         'completed': sessions.filter(s => s.status === 'completed').length,
-        'cancelled': sessions.filter(s => s.status === 'cancelled').length,
+        'canceled': sessions.filter(s => s.status === 'canceled').length,
     };
 
     return (
@@ -518,7 +518,7 @@ export const Interactive = () => {
                 <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
                     Filter by Status:
                 </span>
-                {['all', 'in-progress', 'upcoming', 'completed', 'cancelled'].map(status => (
+                {['all', 'in-progress', 'upcoming', 'completed', 'canceled'].map(status => (
                     <Button
                         key={status}
                         text={status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' ')}

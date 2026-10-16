@@ -200,7 +200,7 @@ export type OwnerRung = "claimed" | "contributor" | "starter";
  * Who a finding belongs to.
  *
  * @param input.claimedBy - Who the detector read as having claimed or done the
- *   work; honoured only when that person posted in the thread, since a name the
+ *   work; honored only when that person posted in the thread, since a name the
  *   thread never shows is a guess
  * @param input.participants - Everyone who posted in the thread
  * @param input.contributorIds - The linked card's Contributors, as Slack ids

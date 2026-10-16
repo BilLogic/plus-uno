@@ -18,7 +18,7 @@
 
 ## Variants
 
-**`type`** — `session created` · `session updated` · `session canceled` · `sessions cancelled`
+**`type`** — `session created` · `session updated` · `session canceled` · `sessions canceled`
 
 Anything not listed is not a valid value.
 

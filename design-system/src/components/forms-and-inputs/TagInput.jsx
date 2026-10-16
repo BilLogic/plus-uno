@@ -15,7 +15,7 @@ import './TagInput.scss';
  * carries a meaning.
  */
 const TAG_INPUT_COLOR_ALIASES = {
-    default: 'grey',
+    default: 'gray',
     success: 'green',
     danger: 'magenta',
     warning: 'yellow',
@@ -25,9 +25,9 @@ const TAG_INPUT_COLOR_ALIASES = {
 /** Every name a tag's `color` accepts: what Tag accepts, then TagInput's own aliases. */
 const ACCEPTED_COLORS = [...TAG_ACCEPTED_COLORS, ...Object.keys(TAG_INPUT_COLOR_ALIASES)];
 
-/** Tag's seven colours as the option menu names them. */
+/** Tag's seven colors as the option menu names them. */
 const COLOR_NAMES = {
-    grey: 'Grey',
+    gray: 'Gray',
     blue: 'Blue',
     green: 'Green',
     purple: 'Purple',
@@ -36,7 +36,7 @@ const COLOR_NAMES = {
     teal: 'Teal',
 };
 
-/** The option menu's Delete row; no Tag colour has this name. */
+/** The option menu's Delete row; no Tag color has this name. */
 const DELETE = '__delete';
 
 /** The list's hint while a row moves, as Figma's reordering state words it. */
@@ -56,20 +56,20 @@ const warn = (message) => {
 /**
  * The color to hand Tag. A Tag name goes through as given, so Tag decides and
  * warns about its own aliases. TagInput's aliases resolve here, and anything
- * else falls back to grey, each with a development warning.
+ * else falls back to gray, each with a development warning.
  */
 const tagColorOf = (color) => {
-    if (color === undefined || color === null || color === '') return 'grey';
+    if (color === undefined || color === null || color === '') return 'gray';
     if (Object.hasOwn(TAG_INPUT_COLOR_ALIASES, color)) {
         warn(`color "${color}" is deprecated; use "${TAG_INPUT_COLOR_ALIASES[color]}".`);
         return TAG_INPUT_COLOR_ALIASES[color];
     }
     if (resolveTagColor(color)) return color;
-    warn(`color "${color}" is not a Tag color; it falls back to grey.`);
-    return 'grey';
+    warn(`color "${color}" is not a Tag color; it falls back to gray.`);
+    return 'gray';
 };
 
-/** A new tag's colour: one of Tag's seven, grey included, picked at random. */
+/** A new tag's color: one of Tag's seven, gray included, picked at random. */
 const randomColor = () => TAG_COLORS[Math.floor(Math.random() * TAG_COLORS.length)];
 
 /** The text a tag or an option shows. */
@@ -87,20 +87,20 @@ const same = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase();
 let temporaryIds = 0;
 
 /**
- * TagInput — a field of Tags with a text entry after them, modelled on
+ * TagInput — a field of Tags with a text entry after them, modeled on
  * Notion's multi-select.
  *
  * Focusing the field opens a list of the options. Typing filters it and
  * highlights the first match; Enter or a click adds the highlighted option. A
  * "Create *text*" row is offered when no option matches the text exactly,
  * ignoring case. It previews the new tag as the Tag it will be, in the random
- * Tag colour it will get, and creating reports that colour once through
+ * Tag color it will get, and creating reports that color once through
  * `onCreate`. Backspace in an empty entry removes the last tag, and Esc
  * closes the list and clears only the typed text.
  *
  * People can tidy the options where they pick them, as in Notion. With
  * `onRename`, `onDelete` or `onColorChange`, the highlighted row shows a "…"
- * that opens the option's menu: its name, Delete, and Tag's seven colours.
+ * that opens the option's menu: its name, Delete, and Tag's seven colors.
  * With `onReorder`, each row has a handle to drag, or to pick up with Space
  * and move with the arrows. Without these handlers neither appears.
  *
@@ -159,7 +159,7 @@ const TagInput = ({
     const [filter, setFilter] = useState('');
     const [activeId, setActiveId] = useState();
     const [announcement, setAnnouncement] = useState('');
-    /** The colour the next created tag gets, picked ahead so the Create row can show it. */
+    /** The color the next created tag gets, picked ahead so the Create row can show it. */
     const [nextColor, setNextColor] = useState(randomColor);
 
     const editable = !disabled && !readOnly;
@@ -306,7 +306,7 @@ const TagInput = ({
         announce(`${textOf(removed)} removed`);
     };
 
-    /* ---------- the "…" menu: rename, delete, colour ---------- */
+    /* ---------- the "…" menu: rename, delete, color ---------- */
     const menuOption = menu ? options[menu.index] : undefined;
     const menuListId = `${fieldId}-option-menu`;
     const menuListRef = useRef(null);
@@ -386,7 +386,7 @@ const TagInput = ({
         closeMenu('entry');
     };
 
-    const recolour = (color) => {
+    const recolor = (color) => {
         const option = menuOption;
         onColorChange(valueOf(option), color);
         updatePicked(option, (tag) => [typeof tag === 'object' ? { ...tag, color } : { value: tag, text: tag, color }]);
@@ -407,7 +407,7 @@ const TagInput = ({
             TAG_COLORS.forEach((color) => rows.push({
                 value: color,
                 label: <Tag color={color}>{COLOR_NAMES[color]}</Tag>,
-                group: 'Colour',
+                group: 'Color',
             }));
         }
         return rows;
@@ -418,7 +418,7 @@ const TagInput = ({
         if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
             event.preventDefault();
             if (!menuNavigated) {
-                // The cursor starts on the current colour; the first arrow starts from an end instead.
+                // The cursor starts on the current color; the first arrow starts from an end instead.
                 setMenuNavigated(true);
                 list?.highlight(event.key === 'ArrowDown' ? 0 : menuOptions.length - 1);
             } else {
@@ -477,7 +477,7 @@ const TagInput = ({
         if (!current) return;
         reorderRef.current = null;
         setReorder(null);
-        announce(`Reorder cancelled. ${reorderText(current.from)} is back at ${position(current.from)}`);
+        announce(`Reorder canceled. ${reorderText(current.from)} is back at ${position(current.from)}`);
     };
 
     const handleGripKeyDown = (index, event) => {
@@ -824,7 +824,7 @@ const TagInput = ({
                     align="right"
                     options={menuOptions}
                     value={onColorChange ? tagColorOf(typeof menuOption === 'object' ? menuOption.color : undefined) : null}
-                    onChange={(next) => (next === DELETE ? remove() : recolour(next))}
+                    onChange={(next) => (next === DELETE ? remove() : recolor(next))}
                     onActiveChange={setMenuActiveId}
                     onClose={(reason) => {
                         if (reason !== 'select') closeMenu(reason === 'outside' ? null : 'more');
@@ -910,7 +910,7 @@ TagInput.propTypes = {
     /** `(tag)`: a tag was added, picked or created. */
     onAdd: PropTypes.func,
     /**
-     * `({ value, color })`: a new value was created, with the colour it was
+     * `({ value, color })`: a new value was created, with the color it was
      * given. Store both on the option. Return a promise of the stored id to
      * hold the tag on a temporary id, saving, until it resolves; a rejection
      * removes the tag and puts the text back.
@@ -931,7 +931,7 @@ TagInput.propTypes = {
      */
     onDelete: PropTypes.func,
     /**
-     * `(value, color)`: an option was given another of Tag's seven colours
+     * `(value, color)`: an option was given another of Tag's seven colors
      * from its "…" menu. Store it on the option.
      */
     onColorChange: PropTypes.func,

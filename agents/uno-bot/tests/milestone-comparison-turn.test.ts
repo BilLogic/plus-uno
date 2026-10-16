@@ -9,7 +9,7 @@
 // nothing is written.
 //
 // The seam is the whole turn: the real agent loop on a scripted model, the
-// real gate on a scripted judgement, and the in-memory thread store.
+// real gate on a scripted judgment, and the in-memory thread store.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -58,9 +58,9 @@ const NOT_A_SERVICE_CHANGE = JSON.stringify({ changes_service: false, confidence
 
 const IDEA_SUMMARY = "Tutors post their own call-off and the first free tutor claims it. The supervisor only sees the result.";
 
-function world(opts: { replies: ScriptedReply[]; judgements: string[]; threadState?: ThreadState; affordable?: boolean; unreadable?: boolean }) {
+function world(opts: { replies: ScriptedReply[]; judgments: string[]; threadState?: ThreadState; affordable?: boolean; unreadable?: boolean }) {
   const threadState = opts.threadState ?? createInMemoryThreadState();
-  const gateModel: FakeProvider = fakeProvider({ generateReplies: opts.judgements });
+  const gateModel: FakeProvider = fakeProvider({ generateReplies: opts.judgments });
   const searched: string[] = [];
   const pathReads: string[] = [];
   const h = harness({ replies: opts.replies, threadState });
@@ -110,7 +110,7 @@ const HAND_OFF = [
 ].join("\n");
 
 test("a PRD that changes a path today is set beside that path, before its card", async () => {
-  const w = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE] });
+  const w = world({ replies: [stagePrd()], judgments: [SERVICE_CHANGE] });
   const outcome = await runTurn(request({ text: "turn this thread into a PRD" }), w.h.deps);
 
   assert.equal(outcome.disposition, "staged");
@@ -128,7 +128,7 @@ test("a PRD that changes a path today is set beside that path, before its card",
 });
 
 test("an uno-prototype hand-off that changes a path today carries the comparison in the reply", async () => {
-  const w = world({ replies: [{ text: HAND_OFF }], judgements: [SERVICE_CHANGE] });
+  const w = world({ replies: [{ text: HAND_OFF }], judgments: [SERVICE_CHANGE] });
   const outcome = await runTurn(request({ text: "build the call-off board from the PRD" }), w.h.deps);
 
   assert.equal(outcome.disposition, "answered");
@@ -143,7 +143,7 @@ test("an uno-prototype hand-off that changes a path today carries the comparison
 test("a PRD that does not change the service gets nothing beside it", async () => {
   const w = world({
     replies: [stagePrd("Swap the Button's hover token for the new primary-hover token across the library.")],
-    judgements: [NOT_A_SERVICE_CHANGE],
+    judgments: [NOT_A_SERVICE_CHANGE],
   });
   const outcome = await runTurn(request({ text: "write up the button token update as a PRD" }), w.h.deps);
 
@@ -159,11 +159,11 @@ test("a PRD that does not change the service gets nothing beside it", async () =
 
 test("a second milestone on the same scenario in the thread shows nothing; the first one stands", async () => {
   const threadState = createInMemoryThreadState();
-  const first = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE], threadState });
+  const first = world({ replies: [stagePrd()], judgments: [SERVICE_CHANGE], threadState });
   await runTurn(request({ text: "turn this thread into a PRD" }), first.h.deps);
   assert.ok(first.h.delivery.posted.some((p) => /Call-off › Standard/.test(p)));
 
-  const second = world({ replies: [{ text: HAND_OFF }], judgements: [SERVICE_CHANGE], threadState });
+  const second = world({ replies: [{ text: HAND_OFF }], judgments: [SERVICE_CHANGE], threadState });
   const outcome = await runTurn(request({ text: "now hand it to the IDE", userMsgTs: "1700000000.000300" }), second.h.deps);
 
   assert.equal(outcome.comparison, undefined);
@@ -173,11 +173,11 @@ test("a second milestone on the same scenario in the thread shows nothing; the f
 
 test("a milestone whose path could not be read leaves the scenario's one comparison for the next", async () => {
   const threadState = createInMemoryThreadState();
-  const failed = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE], threadState, unreadable: true });
+  const failed = world({ replies: [stagePrd()], judgments: [SERVICE_CHANGE], threadState, unreadable: true });
   const first = await runTurn(request({ text: "turn this thread into a PRD" }), failed.h.deps);
   assert.equal(first.comparison, undefined);
 
-  const next = world({ replies: [{ text: HAND_OFF }], judgements: [SERVICE_CHANGE], threadState });
+  const next = world({ replies: [{ text: HAND_OFF }], judgments: [SERVICE_CHANGE], threadState });
   const outcome = await runTurn(request({ text: "now hand it to the IDE", userMsgTs: "1700000000.000300" }), next.h.deps);
   assert.equal(outcome.comparison?.scenario, "Call-off", "the failed read did not use up the offer");
   assert.match(next.h.delivery.posted.join("\n"), /Call off a session \(Tutor\)/);
@@ -185,10 +185,10 @@ test("a milestone whose path could not be read leaves the scenario's one compari
 
 test("the same scenario in another thread is compared again", async () => {
   const threadState = createInMemoryThreadState();
-  const first = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE], threadState });
+  const first = world({ replies: [stagePrd()], judgments: [SERVICE_CHANGE], threadState });
   await runTurn(request({ text: "turn this thread into a PRD" }), first.h.deps);
 
-  const other = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE], threadState });
+  const other = world({ replies: [stagePrd()], judgments: [SERVICE_CHANGE], threadState });
   const outcome = await runTurn(request({ text: "turn this thread into a PRD", conversationTs: "1700000000.900000" }), other.h.deps);
   assert.equal(outcome.comparison?.scenario, "Call-off");
 });
@@ -196,7 +196,7 @@ test("the same scenario in another thread is compared again", async () => {
 test("an answer that is no milestone never asks the gate", async () => {
   const w = world({
     replies: [{ text: "Today a call-off goes to the supervisor, who finds a fill-in in Slack." }],
-    judgements: [SERVICE_CHANGE],
+    judgments: [SERVICE_CHANGE],
   });
   const outcome = await runTurn(request(), w.h.deps);
 
@@ -208,7 +208,7 @@ test("an answer that is no milestone never asks the gate", async () => {
 test("a reply that only mentions uno-prototype, before any PRD exists, is no hand-off", async () => {
   const w = world({
     replies: [{ text: "A build needs a PRD before uno-prototype can take it, so let's draft that first. What should the board do?" }],
-    judgements: [SERVICE_CHANGE],
+    judgments: [SERVICE_CHANGE],
   });
   await runTurn(request({ text: "build me a call-off board" }), w.h.deps);
   assert.equal(w.gateModel.generated.length, 0);
@@ -220,7 +220,7 @@ test("a critique turn is no milestone, whatever its reply names", async () => {
       { text: "Reading the critique guide.", toolCalls: [{ name: "read_reference", args: { name: "critique-a-design" } }] },
       { text: HAND_OFF },
     ],
-    judgements: [SERVICE_CHANGE],
+    judgments: [SERVICE_CHANGE],
   });
   const outcome = await runTurn(request({ text: "critique this call-off board frame" }), w.h.deps);
   assert.equal(outcome.disposition, "answered");
@@ -228,7 +228,7 @@ test("a critique turn is no milestone, whatever its reply names", async () => {
 });
 
 test("a turn without the budget left for it shows nothing and spends nothing", async () => {
-  const w = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE], affordable: false });
+  const w = world({ replies: [stagePrd()], judgments: [SERVICE_CHANGE], affordable: false });
   const outcome = await runTurn(request({ text: "turn this thread into a PRD" }), w.h.deps);
   assert.equal(outcome.disposition, "staged");
   assert.equal(w.gateModel.generated.length, 0);

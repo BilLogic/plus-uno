@@ -184,12 +184,12 @@ it leaves the accordion with no edge to hold it.
   sentence.
 - **`disabled` stops the keyboard too.** The prop reaches the header button as
   a real `disabled` attribute (#331), so the section is out of the tab order and
-  announced as unavailable rather than merely greyed. It still is not a way to
+  announced as unavailable rather than merely grayed. It still is not a way to
   withhold content: the body stays in the DOM, so leave the item out if what is
   inside it is not for this reader.
 - **Focus stays on the header after a toggle.** Opening an item does not move
   focus into the body and does not scroll it into view. That is the right
-  behaviour — the user keeps their place — but it means a tall body opened low
+  behavior — the user keeps their place — but it means a tall body opened low
   in the viewport is off-screen until they scroll.
 
 </div>

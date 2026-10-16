@@ -10,7 +10,7 @@
 
 /** The asker and their workspace: `chat.startStream`'s `recipient_user_id` and
  *  `recipient_team_id`. The argument contract is stated once, in `slack/api.ts`
- *  above `startStream`; this is only the pair travelling to the call.
+ *  above `startStream`; this is only the pair traveling to the call.
  *
  *  `team` is optional here because a Slack event may not carry one — not
  *  because the API treats it as optional. `decideStream` refuses the half, and names it. */

@@ -7,7 +7,7 @@
 // picks up whatever is still pending.
 //
 // ONE BAD ASK MUST NOT STALL THE REST. A batch call that fails is retried one
-// ask at a time in the same job, so the asks that can be labelled are, and each
+// ask at a time in the same job, so the asks that can be labeled are, and each
 // that still fails has the failure counted against it. After
 // `MAX_CLASSIFY_ATTEMPTS` it is given up on — blank, text nulled — and until
 // then it ranks behind every ask with fewer failures. A failure that is not
@@ -65,8 +65,8 @@ export const PURGE_AFTER_MS = TEXT_RETENTION_MS - (3 * 24 + 2) * 60 * 60 * 1000;
 
 /** What one classify job did. */
 export interface ClassifyReport {
-  /** Asks labelled, blank answers included. */
-  labelled: number;
+  /** Asks labeled, blank answers included. */
+  labeled: number;
   /** Of those, how many came back blank. */
   blank: number;
   /** Asks whose classification failed and was counted against them. */
@@ -82,7 +82,7 @@ export interface ClassifyReport {
  * nothing — so what it reports is what it WOULD write.
  *
  * @throws ClassifyError when the classifier is unavailable, or no ask in the
- *   batch could be labelled — nothing is written
+ *   batch could be labeled — nothing is written
  */
 export async function runClassifyBatch(deps: {
   store: AskCategoryStore;
@@ -91,7 +91,7 @@ export async function runClassifyBatch(deps: {
   dryRun: boolean;
 }): Promise<ClassifyReport> {
   const asks = await deps.store.pendingAsks(CLASSIFY_BATCH_SIZE);
-  if (asks.length === 0) return { labelled: 0, blank: 0, failed: 0, givenUp: 0 };
+  if (asks.length === 0) return { labeled: 0, blank: 0, failed: 0, givenUp: 0 };
 
   const { labels, failed } = await classifyWithFallback(deps.provider, asks);
   const at = deps.now();
@@ -103,7 +103,7 @@ export async function runClassifyBatch(deps: {
     givenUp = asks.filter((a) => failed.includes(a.turnId) && a.attempts + 1 >= MAX_CLASSIFY_ATTEMPTS).length;
   }
   return {
-    labelled: labels.length,
+    labeled: labels.length,
     blank: labels.filter((l) => l.subType === null).length,
     failed: failed.length,
     givenUp,
@@ -159,7 +159,7 @@ async function classifyWithFallback(
       if (transientInARow >= OUTAGE_AFTER) break;
     }
   }
-  // Nothing labelled and nothing that was the asks' fault: the classifier is
+  // Nothing labeled and nothing that was the asks' fault: the classifier is
   // down. The next run tries again, with nothing counted.
   if (labels.length === 0 && failed.length === 0) {
     throw lastTransient instanceof Error ? lastTransient : new Error(String(lastTransient ?? batchError));

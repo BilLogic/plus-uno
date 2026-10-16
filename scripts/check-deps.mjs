@@ -35,7 +35,7 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..
  */
 const ALLOWED = new Map([
   ["typescript", "the compiler. Invoked as `tsc` by typecheck and the test build; never imported."],
-  ["sass", "the SCSS compiler Vite reaches for. Named in vite.config's preprocessorOptions by behaviour, not by specifier."],
+  ["sass", "the SCSS compiler Vite reaches for. Named in vite.config's preprocessorOptions by behavior, not by specifier."],
   ["@cloudflare/workers-types", "the Worker runtime's ambient types. Loaded through tsconfig's `types`, which names it there rather than importing it."],
   ["@types/node", "ambient Node types for the Worker's build scripts. Same shape: a tsconfig entry, never an import."],
   ["@vitest/coverage-v8", "vitest loads it by convention when --coverage is passed; there is no import site."],
@@ -63,7 +63,7 @@ const ALLOWED = new Map([
 const CDN_BASELINE = new Map([
   [
     "fontawesome",
-    { versions: ["6.4.0", "7.2.0"], why: "6.4.0 on cdnjs in six prototype templates, 7.2.0 on jsdelivr in eleven files including index.html and both Storybook head files. FA7 renamed and re-categorised icons, so unifying means loading the six prototypes and looking at them — not a find-and-replace. Until then this is two icon fonts in one repo." },
+    { versions: ["6.4.0", "7.2.0"], why: "6.4.0 on cdnjs in six prototype templates, 7.2.0 on jsdelivr in eleven files including index.html and both Storybook head files. FA7 renamed and re-categorized icons, so unifying means loading the six prototypes and looking at them — not a find-and-replace. Until then this is two icon fonts in one repo." },
   ],
   [
     "bootstrap",
@@ -173,7 +173,7 @@ const inputs = byRoot((repoRoot) => {
 export function run({ repoRoot = REPO_ROOT } = {}) {
   const { unused, stale, conflicts, unresolved } = inputs(repoRoot);
 
-  // A recorded split is not a blank cheque for that library. The baseline names
+  // A recorded split is not a blank check for that library. The baseline names
   // the exact versions; a THIRD FontAwesome appearing is new, and has to fail.
   // This is the a11y ratchet's rule: the recorded set may only shrink.
   const newConflicts = [];

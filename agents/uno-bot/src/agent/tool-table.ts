@@ -33,7 +33,7 @@
 // body with no row fails the typecheck.
 //
 // Importing nothing is also what lets its readers reach it: `confidence.ts`
-// and `pending-notice.ts` are pure judgement modules a plain Node test drives
+// and `pending-notice.ts` are pure judgment modules a plain Node test drives
 // directly, and `proposal-render.ts` renders card text without `Env`. A column
 // on a table that dragged the Workers type graph behind it would have been a
 // column they could not have read.
@@ -268,7 +268,7 @@ export const TOOL_TABLE = {
       verb: "update this Notion page",
       // `notion_update` is the one card that names its own operations — a
       // `current → new` diff per field — so "update" is the label for a page
-      // whose input named no recognisable change.
+      // whose input named no recognizable change.
       kind: "update",
       nouns: ["card", "update", "notion", "property"],
     },
@@ -376,7 +376,7 @@ export const TOOL_TABLE = {
   },
   // A Dev Mode links card's one operation (src/figma-links/): add the
   // card's Code, Storybook or PR links in Figma, and the first time a
-  // component gets its links, one labelled comment. The Worker stages it; the
+  // component gets its links, one labeled comment. The Worker stages it; the
   // model is never offered it.
   figma_dev_links: {
     access: "worker",
