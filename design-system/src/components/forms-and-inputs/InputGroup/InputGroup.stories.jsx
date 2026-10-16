@@ -302,6 +302,11 @@ export const AddonsInSlots = () => (
             label="Agreement note"
             leadingVisual={{ type: 'checkbox', checked: true, 'aria-label': 'Include a note' }}
         />
+        <InputGroup
+            id="ig-primary"
+            label="Primary contact"
+            leadingVisual={{ type: 'radio', checked: true, 'aria-label': 'Make primary' }}
+        />
     </div>
 );
 
@@ -343,4 +348,18 @@ AddonsInSlots.play = async ({ canvasElement }) => {
     const [addonX, addonY] = center(addonBox);
     await expect(Math.abs(checkX - addonX)).toBeLessThanOrEqual(0.5);
     await expect(Math.abs(checkY - addonY)).toBeLessThanOrEqual(0.5);
+
+    // A radio addon is the PLUS Radio, named, 18 square and centred the same way.
+    const primary = box('Primary contact');
+    const radio = within(primary).getByRole('radio', { name: 'Make primary' });
+    await expect(radio).toBeChecked();
+    await expect(radio.closest('.plus-form-radio-wrapper')).not.toBeNull();
+    const radioBox = radio.getBoundingClientRect();
+    await expect(Math.round(radioBox.width)).toBe(18);
+    await expect(Math.round(radioBox.height)).toBe(18);
+    const radioAddon = radio.closest('.plus-input-group-radio').getBoundingClientRect();
+    const [radioX, radioY] = centre(radioBox);
+    const [radioAddonX, radioAddonY] = centre(radioAddon);
+    await expect(Math.abs(radioX - radioAddonX)).toBeLessThanOrEqual(0.5);
+    await expect(Math.abs(radioY - radioAddonY)).toBeLessThanOrEqual(0.5);
 };

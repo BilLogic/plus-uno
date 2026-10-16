@@ -97,9 +97,6 @@
     "--color-on-surface-variant-2",
     "--color-on-surface-variant-3",
     "--color-on-surface-variant-light",
-    "--color-primary-state-04",
-    "--color-progress-ring-fill",
-    "--color-surface-container-active",
-    "--color-surface-container-hover"
+    "--color-progress-ring-fill"
   ]
 }

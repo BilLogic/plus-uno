@@ -28,10 +28,21 @@
         float: none;
     }
 
-    // The Checkbox fills a row by default; in an addon it is as wide as its box.
-    .plus-form-checkbox-wrapper {
+    // The Checkbox and Radio fill a row by default; in an addon each is as wide as its box.
+    .plus-form-checkbox-wrapper,
+    .plus-form-radio-wrapper {
         width: auto;
     }
+}
+
+// The radio addon matches the checkbox addon's box, with no gap for a label.
+// Doubled class: beats the Radio's own size and label gap.
+.plus-input-group-radio .plus-form-radio .form-check-input.form-check-input {
+    width: var(--layout-control-checkbox);
+    height: var(--layout-control-checkbox);
+    min-width: var(--layout-control-checkbox);
+    min-height: var(--layout-control-checkbox);
+    margin: 0;
 }
 
 // The small Dropdown button, cut to the field's line like the button addons.
