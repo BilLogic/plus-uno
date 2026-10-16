@@ -91,6 +91,34 @@ export async function cardMatter(
 }
 
 /**
+ * The card a new one corrects, for the usage record (#1320): the thread's
+ * previous card — the newest live one — when the new card undoes the call it
+ * was staged under. Two ways, as the ids show them:
+ *
+ *   • it was staged as a separate proposal, and the new card revises a card it
+ *     was staged beside ("that was meant to update the first one");
+ *   • it was staged as a revision, and the new card is a separate proposal.
+ *
+ * A revision the Worker decided by a fact of its own — a card sent back with
+ * Needs changes, a card the Worker staged — corrects nothing: nobody's call
+ * is being undone. Neither does revising the previous card itself, which is
+ * an edit of it. A previous card no turn made the call on (no `stagedAs`) is
+ * never corrected. Ids only.
+ *
+ * @param live - Every live card in the reply thread, newest first, before the
+ *   new card is staged.
+ */
+export function correctedCard(matter: CardMatter, live: readonly PendingProposal[]): string | undefined {
+  const previous = live[0];
+  if (!previous?.stagedAs) return undefined;
+  if (matter.kind === "separate") return previous.stagedAs === "revision" ? previous.proposalTs : undefined;
+  if (matter.why === "sent-back" || matter.why === "touched") return undefined;
+  return previous.stagedAs === "separate" && matter.of.proposalTs !== previous.proposalTs
+    ? previous.proposalTs
+    : undefined;
+}
+
+/**
  * What the person is told the staging did, said just above the card: the
  * card a revision replaced, or the cards a separate proposal posts beside.
  * Null when a separate proposal posts alone.

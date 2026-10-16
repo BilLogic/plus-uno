@@ -57,6 +57,10 @@ export type ProposalEventVia =
   | "end-of-day"
   | "executor";
 
+/** What a turn made a card: a revision of a waiting card, or a separate
+ *  proposal (GLOSSARY.md § uno-bot). */
+export type StagedAs = "revision" | "separate";
+
 /** One thing that happened to one card, as `proposal_events` holds it. Field
  *  names are camelCase here and snake_case in SQL; `./proposal-events-d1.ts`
  *  is the one place they are mapped. Columns an event does not use are null. */
@@ -101,6 +105,21 @@ export interface ProposalEvent {
   revisesProposalId: string | null;
 
   // ── staged ──
+  /**
+   * What the staging turn made the card (#1318, `turn/card-matter.ts`): a
+   * `revision` of a waiting card — `revisesProposalId` names it — or a
+   * `separate` proposal, a matter of its own. Null where no turn made that
+   * call: a card the Worker or a re-stage staged, and every row written
+   * before the column existed (migration 0018) — unknown, not either.
+   */
+  stagedAs: StagedAs | null;
+  /**
+   * The card this one corrected: the thread's previous card, when this one
+   * undid the call it was staged under — a revision of a card that one had
+   * been staged as separate from, or a separate proposal right after a
+   * revision (`correctedCard`). Its id only, never why.
+   */
+  correctsProposalId: string | null;
   /** The staging turn, when a turn staged it — the join to `turns`. */
   turnId: string | null;
   requesterId: string | null;
@@ -177,6 +196,8 @@ const EMPTY: Omit<ProposalEvent, "proposalId" | "event" | "at" | "via"> = {
   testTraffic: null,
   originProposalId: null,
   revisesProposalId: null,
+  stagedAs: null,
+  correctsProposalId: null,
   turnId: null,
   requesterId: null,
   tools: [],
@@ -249,6 +270,10 @@ export function stagedEvent(input: {
   testTraffic?: boolean;
   askText?: string;
   roles?: Readonly<Record<string, TeamRole>>;
+  /** What the staging turn made the card; absent, unknown (see the field). */
+  stagedAs?: StagedAs;
+  /** The card it corrected, when it corrected one (see the field). */
+  corrects?: string;
 }): ProposalEvent {
   const { proposal } = input;
   const requester = proposal.requesterUserId || null;
@@ -266,6 +291,8 @@ export function stagedEvent(input: {
     testTraffic: input.testTraffic ?? null,
     originProposalId: proposal.originProposalTs ?? null,
     revisesProposalId: proposal.revisesProposalTs ?? null,
+    stagedAs: input.stagedAs ?? null,
+    correctsProposalId: input.corrects ?? null,
     requesterId: requester,
     tools: proposalOperations(proposal).map((op) => op.toolName),
     ttlMs: proposalTtlMs(proposal),

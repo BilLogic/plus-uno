@@ -114,7 +114,7 @@ import {
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
-import { cardMatter, stagingNote } from "./card-matter";
+import { cardMatter, correctedCard, stagingNote } from "./card-matter";
 import { judgedList, presentedProse, presenter, proseBudgetRepair, type Presenter } from "./presentation";
 import { figmaAnswerCopy } from "./figma-answer-copy";
 import { breadcrumbsInProse } from "../integrations/blueprint-link";
@@ -1553,6 +1553,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     threadState,
   );
   const replaced = matter.kind === "revision" ? matter.of : null;
+  // Read off the live cards before this one stages: the thread's previous
+  // card, when this one undoes the call it was staged under (usage record).
+  const corrects = correctedCard(matter, liveCards);
 
   // A keyed card that revises only its own way (a weekly DS precedence card,
   // decided as it stands in its Review) is not revised by a turn at all: the batch is
@@ -1750,6 +1753,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     ...inheritedTerms(replaced),
     // And names it, for the usage record's "approved with edits".
     ...(replaced ? { revisesProposalTs: replaced.proposalTs } : {}),
+    // Which call this turn made, so the thread's next card can tell whether
+    // it undid it (`correctedCard`).
+    stagedAs: matter.kind,
     // Its slot is its matter (`turnCardKey`): a revision is staged into the
     // slot of the card it supersedes, and a separate proposal opens one of
     // its own, named by this card, so it posts beside the waiting cards and
@@ -1815,6 +1821,10 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
         testTraffic: staging.testTraffic,
         askText: request.text,
         roles: await teamRolesOf(deps.usage),
+        // Which call this turn made, and the call it undid, for how often
+        // the bot tells matters apart (#1320).
+        stagedAs: matter.kind,
+        ...(corrects ? { corrects } : {}),
       }),
     ],
     deps.usage.writeTimeoutMs,
