@@ -229,6 +229,7 @@ const PrototypeMarket = () => {
           <label className="prototype-market__filter-label body3-txt">Stage</label>
           <Select
             id="market-stage-filter"
+            aria-label="Stage"
             mode="multi"
             options={stageOptions}
             value={selectedStages}
@@ -242,6 +243,7 @@ const PrototypeMarket = () => {
           <label className="prototype-market__filter-label body3-txt">Pillar</label>
           <Select
             id="market-pillar-filter"
+            aria-label="Pillar"
             mode="multi"
             options={pillarOptions}
             value={selectedPillars}
@@ -255,6 +257,7 @@ const PrototypeMarket = () => {
           <label className="prototype-market__filter-label body3-txt">Creator</label>
           <Select
             id="market-creator-filter"
+            aria-label="Creator"
             mode="multi"
             options={creatorOptions}
             value={selectedCreators}

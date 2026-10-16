@@ -86,6 +86,7 @@ const Listbox = ({
     filter = '',
     onFilterChange,
     onCreate,
+    createLabel,
     open = true,
     onClose,
     anchorRef,
@@ -380,7 +381,7 @@ const Listbox = ({
                         <OptionRow
                             kind="create"
                             id={createId}
-                            label={filter.trim()}
+                            label={createLabel ? createLabel(filter.trim()) : filter.trim()}
                             highlighted={createId === resolvedActive}
                             onSelect={create}
                             onMouseMove={() => { if (createId !== resolvedActive) setActiveId(createId); }}
@@ -458,6 +459,8 @@ Listbox.propTypes = {
     onFilterChange: PropTypes.func,
     /** Offers a "Create *text*" row when nothing matches the filter exactly, ignoring case. */
     onCreate: PropTypes.func,
+    /** `(text)`: what the Create row shows after "Create". Defaults to the text. */
+    createLabel: PropTypes.func,
     open: PropTypes.bool,
     /** `(reason)`: 'select', 'escape' or 'outside'. */
     onClose: PropTypes.func,

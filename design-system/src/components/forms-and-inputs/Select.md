@@ -29,8 +29,9 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 | `searchable` | bool | `false` | Typing in the field filters the list. |
 | `creatable` | bool | `false` | Offers "Create text " when nothing matches exactly, ignoring case. Implies typing. |
 | `onCreate` | func | — | Called with the text of a created option, which is then picked. |
-| `open` | bool | — | Holds the list open or shut, for documentation. |
+| `open` | bool | — | Holds the list open or shut. Controlled: Escape, a press outside and a pick ask through `onOpenChange`, and the list stays as it is until the parent changes `open`. |
 | `defaultOpen` | bool | `false` | — |
+| `onOpenChange` | func | — | `(open)`: the list asks to open or close. |
 | `defaultSearchTerm` | string | `''` | — |
 | `displayMode` | enum | `'tags'` | Multi mode: `tags` (Tag chips), `badges` (the older Badge chips) or `text` (comma-separated). |
 | `lineWrap` | bool | `true` | Badges only: wrap onto more lines. |

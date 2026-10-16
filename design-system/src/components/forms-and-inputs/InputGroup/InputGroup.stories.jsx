@@ -330,5 +330,17 @@ AddonsInSlots.play = async ({ canvasElement }) => {
 
     // A checkbox addon is named and sits in Leading.
     const agree = box('Agreement note');
-    await expect(within(agree).getByRole('checkbox', { name: 'Include a note' })).toBeChecked();
+    const check = within(agree).getByRole('checkbox', { name: 'Include a note' });
+    await expect(check).toBeChecked();
+
+    // It is the Checkbox at code's size, 18 square, centred in its addon.
+    const checkBox = check.getBoundingClientRect();
+    await expect(Math.round(checkBox.width)).toBe(18);
+    await expect(Math.round(checkBox.height)).toBe(18);
+    const addonBox = check.closest('.plus-input-group-checkbox').getBoundingClientRect();
+    const centre = (r) => [r.left + r.width / 2, r.top + r.height / 2];
+    const [checkX, checkY] = centre(checkBox);
+    const [addonX, addonY] = centre(addonBox);
+    await expect(Math.abs(checkX - addonX)).toBeLessThanOrEqual(0.5);
+    await expect(Math.abs(checkY - addonY)).toBeLessThanOrEqual(0.5);
 };

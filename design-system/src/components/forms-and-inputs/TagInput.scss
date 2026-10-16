@@ -64,6 +64,15 @@
     min-height: label.$tag-height;
 }
 
+/*
+ * Small: Tag has one height, 22, two more than the small field's 20 line. The
+ * field gives the difference back from its block padding, so it holds 22 tags
+ * and "+n" and stays as tall as any small field.
+ */
+.plus-tag-input__field.plus-field--small {
+    padding-block: calc(var(--size-element-pad-y-sm) - var(--size-element-border) - (#{label.$tag-height} - 1lh) / 2);
+}
+
 .plus-tag-input__hint {
     padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
     color: var(--color-on-surface-variant);

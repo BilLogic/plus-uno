@@ -3,13 +3,13 @@
 
 # TagInput
 
-Notion's multi-select. Focusing the field opens a list of the options. Typing filters it and highlights the first match; Enter or a click adds the highlighted option. A "Create *text*" row is offered when no option matches the text exactly, ignoring case, and creating gives the new tag a random Tag colour, reported once through `onCreate`. Backspace in an empty entry removes the last tag, and Esc closes the list and clears only the typed text. Built on the shared parts: `_Field` is the box, `Listbox` the list and its rows, and the chips are Tags in a TagGroup. Without focus the tags collapse into "+n"; with focus they wrap, up to three rows, then scroll.
+Notion's multi-select. Focusing the field opens a list of the options. Typing filters it and highlights the first match; Enter or a click adds the highlighted option. A "Create *text*" row is offered when no option matches the text exactly, ignoring case. It previews the new tag as the Tag it will be, in the random Tag colour it will get, and creating reports that colour once through `onCreate`. Backspace in an empty entry removes the last tag, and Esc closes the list and clears only the typed text. Built on the shared parts: `_Field` is the box, `Listbox` the list and its rows, and the chips are Tags in a TagGroup. Without focus the tags collapse into "+n"; with focus they wrap, up to three rows, then scroll.
 
 **Import:** `import { TagInput } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/TagInput.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TagInput.stories.jsx` — TypingFilters, CreateWhenNothingMatches, MatchIgnoresCase, ClickPicks, BackspaceRemovesTheLastTag, EscClearsOnlyTheText, PasteSplitsOnCommas, MaxLength, PickLimit, CollapsesWithoutFocus, TemporaryIdUntilConfirmed, ReadOnly, Invalid, Disabled, Controlled, Overview, Sizes, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/TagInput.stories.jsx` — TypingFilters, CreateWhenNothingMatches, MatchIgnoresCase, ClickPicks, BackspaceRemovesTheLastTag, EscClearsOnlyTheText, PasteSplitsOnCommas, MaxLength, PickLimit, CollapsesWithoutFocus, SmallFitsItsTags, TemporaryIdUntilConfirmed, ReadOnly, Invalid, Disabled, Controlled, Overview, Sizes, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TagInput.mdx`
 
@@ -51,7 +51,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface-variant` · `--font-line-height-body3` · `--font-size-body3` · `--plus-tag-input-max-height` · `--size-element-gap-sm` · `--size-element-pad-x-md` · `--size-element-pad-y-sm`
+`--color-on-surface-variant` · `--font-line-height-body3` · `--font-size-body3` · `--plus-tag-input-max-height` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-pad-x-md` · `--size-element-pad-y-sm`
 
 From `design-system/src/components/forms-and-inputs/TagInput.scss`. Override these through the token layer, never with a literal.
 

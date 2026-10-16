@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fireEvent, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import Select from './Select';
 
@@ -595,4 +595,70 @@ ClearableDefaults.play = async ({ canvasElement }) => {
     sort.focus();
     await userEvent.keyboard('{Delete}');
     await expect(sort).toHaveTextContent('North High');
+};
+
+/* ------------------------------------------------------------- open state */
+
+/**
+ * A controlled `open` belongs to the parent. Escape and a press outside ask
+ * through `onOpenChange`; the list stays open until the parent says otherwise.
+ */
+export const ControlledOpenAsksTheParent = {
+    args: { onOpenChange: fn() },
+    render: (args) => (
+        <div style={stack}>
+            <Select id="sopen-controlled" label="School" options={schools} open onOpenChange={args.onOpenChange} />
+            <p>Outside the field</p>
+        </div>
+    ),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const field = canvas.getByRole('combobox', { name: 'School' });
+        await page().findByRole('option', { name: 'North High' });
+
+        field.focus();
+        await userEvent.keyboard('{Escape}');
+        await expect(args.onOpenChange).toHaveBeenLastCalledWith(false);
+        await expect(page().getByRole('option', { name: 'North High' })).toBeVisible();
+
+        args.onOpenChange.mockClear();
+        await userEvent.click(canvas.getByText('Outside the field'));
+        await expect(args.onOpenChange).toHaveBeenLastCalledWith(false);
+        await expect(page().getByRole('option', { name: 'North High' })).toBeVisible();
+    },
+};
+
+/**
+ * The list follows the field when picks wrap it onto a second line, without
+ * Select firing a window `resize` of its own: the shared placement watches
+ * the field's size.
+ */
+export const ListFollowsWrappingChips = () => (
+    <div style={{ ...stack, maxWidth: '220px' }}>
+        <Select id="sopen-wrap" label="Schools" mode="multi" options={schools} />
+    </div>
+);
+
+ListFollowsWrappingChips.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const field = canvas.getByRole('combobox', { name: 'Schools' });
+    let resizes = 0;
+    const count = () => { resizes += 1; };
+    window.addEventListener('resize', count);
+    try {
+        await userEvent.click(field);
+        const box = field.closest('.plus-field');
+        const before = box.getBoundingClientRect().height;
+        for (const name of ['North High', 'South High', 'Riverside Academy']) {
+            await userEvent.click(await page().findByRole('option', { name }));
+        }
+        await waitFor(() => expect(box.getBoundingClientRect().height).toBeGreaterThan(before));
+        const list = page().getByRole('listbox').closest('.plus-listbox');
+        await waitFor(() => expect(
+            Math.round(list.getBoundingClientRect().top - box.getBoundingClientRect().bottom)
+        ).toBe(4));
+        await expect(resizes).toBe(0);
+    } finally {
+        window.removeEventListener('resize', count);
+    }
 };
