@@ -38,30 +38,6 @@
         margin-left: auto;
     }
 
-    &__filter {
-        white-space: nowrap;
-        height: 28px !important;
-        min-height: 28px !important;
-        border-radius: var(--element-radius-sm, 2px);
-
-        // Override small button padding to match Figma
-        padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-sm, 8px) !important;
-        line-height: 1.5 !important;
-
-        // Override Button default active/focus styles to prevent "Selected" look
-        &:active,
-        &:focus,
-        &.active,
-        &:focus-visible {
-            background-color: transparent !important;
-            border-color: transparent !important;
-            box-shadow: none !important;
-            color: var(--color-on-surface-variant, #3f484a) !important;
-        }
-
-        // Ensure text color matches expected secondary text color
-        color: var(--color-on-surface-variant, #3f484a);
-    }
 }
 
 /* Responsive: full width, allow wrap on narrow viewports */

@@ -10,14 +10,20 @@ import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { OverviewCard } from '@/specs/Universal/Cards';
 import NavTabs from '@/components/navigation/NavTabs/NavTabs';
-import Button from '@/components/actions/Button/Button';
+import { Select } from '@/components';
 import GroupTrainingProgressTable from '@/specs/Admin/Group/Tables/GroupTrainingProgressTable/GroupTrainingProgressTable';
 import '@/specs/Admin/Group/Tables/GroupTrainingProgressTable/GroupTrainingProgressTable.scss';
 import './GroupTrainingProgressPage.scss';
 
 const GroupTrainingProgressPage = ({
     trainingData = [],
-    selectedGroup = 'All Groups',
+    selectedGroup = 'all',
+    groupOptions = [
+        { value: 'all', label: 'All Groups' },
+        { value: 'math-masters', label: 'Math Masters' },
+        { value: 'science-explorers', label: 'Science Explorers' },
+        { value: 'reading-champions', label: 'Reading Champions' },
+    ],
     onTabChange,
     onGroupFilterChange,
     onAssignClick,
@@ -116,13 +122,15 @@ const GroupTrainingProgressPage = ({
                         <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
                             Group Training Progress
                         </h2>
-                        <Button
-                            text={selectedGroup}
-                            style="primary"
-                            fill="outline"
+                        {/* One group at a time, or all: a single Select. */}
+                        <Select
+                            aria-label="Group"
                             size="small"
-                            trailingVisual="caret-down"
-                            onClick={onGroupFilterChange}
+                            options={groupOptions}
+                            value={onGroupFilterChange ? selectedGroup : undefined}
+                            defaultValue={selectedGroup}
+                            onChange={onGroupFilterChange}
+                            className="group-training-progress-page__group-select"
                         />
                     </div>
 
@@ -185,11 +193,16 @@ const GroupTrainingProgressPage = ({
 GroupTrainingProgressPage.propTypes = {
     /** Array of training progress data */
     trainingData: PropTypes.array,
-    /** Selected group filter */
+    /** Selected group id */
     selectedGroup: PropTypes.string,
+    /** Groups to pick from, including "all" */
+    groupOptions: PropTypes.arrayOf(PropTypes.shape({
+        value: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+    })),
     /** Callback when tab changes */
     onTabChange: PropTypes.func,
-    /** Callback when group filter changes */
+    /** `(groupId)` when the group changes */
     onGroupFilterChange: PropTypes.func,
     /** Callback when Assign is clicked */
     onAssignClick: PropTypes.func,

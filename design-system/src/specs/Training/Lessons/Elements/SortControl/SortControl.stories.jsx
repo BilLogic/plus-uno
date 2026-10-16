@@ -1,13 +1,13 @@
 /**
  * SortControl Stories
- * 
- * Sort control dropdown component stories
+ *
+ * Sort control: what to sort by, and in which order.
  * Matches Figma design: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=747-54853
  */
 
 import React, { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import SortControl from './SortControl';
-import './SortControl.scss';
 
 export default {
     title: 'Specs/Training/Lessons/Elements/Sort Control',
@@ -16,19 +16,19 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'Dropdown sort control with Sort by (Name, Status, Competency Areas) and Order (A-Z, Z-A) sections.',
+                component: 'Sort control: two single Selects, Sort by (Name, SMART Competency, Status, Competency Areas) and Order. The orders on offer follow the sort.',
             },
         },
     },
     argTypes: {
         sortBy: {
             control: { type: 'select' },
-            options: ['Name', 'SMART Competency', 'Status', 'Competency Areas'],
-            description: 'Current sort by value'
+            options: ['name', 'smart-competency', 'status', 'competency-areas'],
+            description: 'Current sort by id'
         },
         sortOrder: {
             control: { type: 'text' },
-            description: 'Current sort order'
+            description: 'Current order id'
         }
     }
 };
@@ -39,7 +39,7 @@ export default {
  */
 export const Default = {
     render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg, 32px)' }}>
+        <div style={{ padding: 'var(--size-section-pad-y-lg)' }}>
             <SortControl />
         </div>
     )
@@ -52,28 +52,39 @@ export const Default = {
 export const Interactive = {
     render: (args) => {
         const [sortState, setSortState] = useState({
-            sortBy: args.sortBy || 'Name',
-            sortOrder: args.sortOrder || 'A-Z'
+            sortBy: args.sortBy || 'name',
+            sortOrder: args.sortOrder || 'az'
         });
 
         return (
-            <div style={{ padding: 'var(--size-section-pad-y-lg, 32px)' }}>
-                <p className="body2-txt" style={{ marginBottom: '16px' }}>
-                    Sort by: {sortState.sortBy} | Order: {sortState.sortOrder}
+            <div style={{ padding: 'var(--size-section-pad-y-lg)', minHeight: '320px' }}>
+                <p className="body2-txt" style={{ marginBottom: 'var(--size-element-gap-lg)' }}>
+                    Sorted by: <strong data-testid="applied">{`${sortState.sortBy} ${sortState.sortOrder}`}</strong>
                 </p>
                 <SortControl
                     sortBy={sortState.sortBy}
                     sortOrder={sortState.sortOrder}
-                    onChange={(newState) => {
-                        setSortState(newState);
-                        console.log('Sort changed:', newState);
-                    }}
+                    onChange={setSortState}
                 />
             </div>
         );
     },
     args: {
-        sortBy: 'Name',
-        sortOrder: 'A-Z'
+        sortBy: 'name',
+        sortOrder: 'az'
     }
+};
+
+Interactive.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(document.body);
+    const applied = canvas.getByTestId('applied');
+
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Sort by' }));
+    await userEvent.click(await page.findByRole('option', { name: 'Status' }));
+    await expect(applied).toHaveTextContent('status least-progress');
+
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Order' }));
+    await userEvent.click(await page.findByRole('option', { name: 'Most Progress First' }));
+    await expect(applied).toHaveTextContent('status most-progress');
 };
