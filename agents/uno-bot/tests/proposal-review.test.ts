@@ -26,7 +26,8 @@ import {
 } from "../src/slack/review-door";
 import type { CardMessage } from "../src/slack/button-door";
 import { proposalCardBlocks, renderProposalCard } from "../src/slack/proposal-render";
-import { draftSubmitOf } from "../src/slack/review-view";
+import { draftSubmitOf, outcomeView } from "../src/slack/review-view";
+import { statedCancelledNote } from "../src/slack/gate-note";
 import { runTurn, type ProposalCard, type TurnDeps } from "../src/turn/index";
 import { harness as turnHarness, request as turnRequest, PENDING } from "./helpers/turn-harness";
 import { verdictEvents } from "../src/usage/index";
@@ -143,7 +144,7 @@ describe("the card offers Review", () => {
     const words = blocks.map((b) => JSON.stringify(b));
 
     assert.equal(blocks[0]!.type, "section");
-    assert.match(words[0]!, /:warning: Ready to \*create a Notion page\*: _Goal cycle resets per session_ · Roadmap · Toolkit · Need PRD/);
+    assert.match(words[0]!, /"text":"Ready to \*create a Notion page\*: _Goal cycle resets per session_ · Roadmap · Toolkit · Need PRD/);
     assert.match(words[1]!, new RegExp(`Body ${body.length} characters · review before approving`));
     assert.match(words[2]!, /LLM-written · check before acting/);
     assert.deepEqual(cardButtons(blocks), ["Review"]);
@@ -171,7 +172,7 @@ describe("the card offers Review", () => {
       caveats: [],
       operations: [],
     });
-    const blocks = proposalCardBlocks(card.text, ":white_check_mark: Approved by <@U2>") as CardBlock[];
+    const blocks = proposalCardBlocks(card.text, "Approved by <@U2>") as CardBlock[];
     const words = JSON.stringify(blocks);
     assert.match(words, /Ready to \*file a GitHub issue\*: _Badge colour drift_/);
     assert.match(words, /Approved by <@U2>/);
@@ -180,7 +181,7 @@ describe("the card offers Review", () => {
   });
 
   it("keeps a decided card's draft one press away, as View", () => {
-    const blocks = proposalCardBlocks("(card)", ":white_check_mark: Approved by <@U2>") as CardBlock[];
+    const blocks = proposalCardBlocks("(card)", "Approved by <@U2>") as CardBlock[];
     assert.deepEqual(cardButtons(blocks), ["View"]);
     const row = blocks.find((b) => b.type === "actions");
     assert.deepEqual(row?.elements?.map((e) => e.action_id), ["uno_proposal_review"]);
@@ -366,7 +367,7 @@ describe("Approve in the pop-up", () => {
     assert.deepEqual(delivery.gateNotes, [{ kind: "resolved", decision: "confirm" }]);
     // The card is edited in place, as the button leaves it.
     assert.deepEqual(cardUpdates, [
-      { channel: CHANNEL, ts: CARD_TS, text: PROPOSAL.proposalText, note: ":white_check_mark: Approved by <@U2>" },
+      { channel: CHANNEL, ts: CARD_TS, text: PROPOSAL.proposalText, note: "Approved by <@U2>" },
     ]);
     // And the pop-up confirms the decision in one line, with nothing left to press.
     assert.deepEqual(views.calls.map((c) => c.kind), ["update"]);
@@ -706,7 +707,7 @@ describe("Reject in the pop-up", () => {
     ]);
     assert.deepEqual(
       cardUpdates.map((u) => u.note),
-      [":no_entry: Rejected by <@U2>: Wrong database"],
+      ["Rejected by <@U2>: Wrong database"],
     );
     assert.match(viewText(views.calls[0]!.view), /Rejected/);
     assert.deepEqual(actionIds(views.calls[0]!.view), []);
@@ -720,7 +721,7 @@ describe("Reject in the pop-up", () => {
   it("takes no reason at all", async () => {
     const { deps, cardUpdates, delivery } = harness(await staged());
     await runReviewDecision(decide("cancel", ""), deps);
-    assert.deepEqual(cardUpdates.map((u) => u.note), [":no_entry: Rejected by <@U2>"]);
+    assert.deepEqual(cardUpdates.map((u) => u.note), ["Rejected by <@U2>"]);
     assert.deepEqual(delivery.gateNotes, [{ kind: "resolved", decision: "cancel", rejected: {} }]);
   });
 });
@@ -739,6 +740,29 @@ describe("a decided card", () => {
     assert.match(view.blocks[1]!.text!.text, /no longer kept, so only its outcome shows here/);
     assert.equal(view.submit, undefined);
     assert.deepEqual(actionIds(view), []);
+  });
+
+  it("reads its outcome's level off the words, and off the emoji a card decided before them still leads with", () => {
+    const cases: Array<[string, string, string]> = [
+      ["Approved by <@U0BILL0001>", "success", "Approved by <@U0BILL0001>"],
+      [":white_check_mark: Approved by <@U0BILL0001>", "success", "Approved by <@U0BILL0001>"],
+      ["Answered by <@U0BILL0001>.", "success", "Answered by <@U0BILL0001>."],
+      ["Rejected by <@U0BILL0001>: Wrong database", "default", "Rejected by <@U0BILL0001>: Wrong database"],
+      [":no_entry: Rejected by <@U0BILL0001>: Wrong database", "default", "Rejected by <@U0BILL0001>: Wrong database"],
+      ["Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again.", "default", "Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again."],
+      [":no_entry: Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again.", "default", "Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again."],
+      ["Left as deliberate, nothing filed, decided by <@U0BILL0001>.", "default", "Left as deliberate, nothing filed, decided by <@U0BILL0001>."],
+      [":no_entry: Left as deliberate, nothing filed, decided by <@U0BILL0001>.", "default", "Left as deliberate, nothing filed, decided by <@U0BILL0001>."],
+      [":warning: This run was cut off before it reported back — see the thread for what finished.", "warning", "This run was cut off before it reported back — see the thread for what finished."],
+    ];
+    // The stated card's note as its writer words it, so a change to that
+    // wording reads here too.
+    const stated = statedCancelledNote({ cancelled: "No intake filed" }, "U0BILL0001");
+    cases.push([stated, "default", stated]);
+    for (const [last, level, text] of cases) {
+      const view = outcomeView({ channel: CHANNEL, ts: CARD_TS }, `${PROPOSAL.proposalText}\n${last}`) as { blocks: Array<{ type: string; level?: string; text?: { text: string } }> };
+      assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level, view.blocks[0]!.text!.text], ["alert", level, text], last);
+    }
   });
 
   it("falls back to a plain decided line when the card's text carries no outcome", async () => {

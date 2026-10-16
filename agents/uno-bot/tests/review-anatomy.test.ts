@@ -29,6 +29,7 @@ import {
   withoutCardBlocks,
 } from "../src/slack/card-block";
 import { decidedView, draftView } from "../src/slack/review-view";
+import { caveatsOf } from "../src/slack/review-draft";
 import { CONFIRM_FOOTER, shortCardOf, withoutInternalFields } from "../src/slack/proposal-render";
 import { TOOL_TABLE, runsPastGate, type ToolName } from "../src/agent/tool-table";
 import type { PendingProposal, ProposalOperation } from "../src/thread-state/index";
@@ -231,7 +232,7 @@ describe("the posted card's summary line", () => {
 
   it("labels a numeric key field: Round 1, never a bare 1", () => {
     const summary = summaryOf(["• *Deadline:* EOD Friday", "• *Round:* 1", "• *Project:* Live App"]);
-    assert.equal(summary, ":warning: Ready to *share this for feedback in #plus-design-feedback*: EOD Friday · Round 1 · Live App");
+    assert.equal(summary, "Ready to *share this for feedback in #plus-design-feedback*: EOD Friday · Round 1 · Live App");
   });
 
   it("skips internal inputs, raw ids and flags", () => {
@@ -243,7 +244,22 @@ describe("the posted card's summary line", () => {
       "• *File key:* AbCdEf123",
       "• *Project:* Live App",
     ]);
-    assert.equal(summary, ":warning: Ready to *share this for feedback in #plus-design-feedback*: Live App");
+    assert.equal(summary, "Ready to *share this for feedback in #plus-design-feedback*: Live App");
+  });
+
+  it("leads with its words, while the card's About to heading and caveats read as before", () => {
+    const text = [
+      ":warning: About to *share this for feedback in <#C0SANDBOX1|uno-bot-sandbox>*:",
+      "• *Project:* Live App",
+      ":warning: The prototype link is a Deploy Preview.",
+      CONFIRM_FOOTER,
+    ].join("\n");
+    const short = shortCardOf(text)!;
+    assert.equal(short.summary, "Ready to *share this for feedback in <#C0SANDBOX1|uno-bot-sandbox>*: Live App");
+    assert.match(short.size, /· 1 warning in the draft$/, "the heading is not counted as a caveat");
+    assert.deepEqual(caveatsOf(text), [":warning: The prototype link is a Deploy Preview."]);
+    const view = draftView(card, { ...BASE, toolName: "shareout_post", input: { project: "Live App", place: "here" }, proposalText: text }, access);
+    assert.match(JSON.stringify(view), /"channel_id":"C0SANDBOX1"/, "the share-out's where line still reads the heading's channel");
   });
 
   it("keeps an all-caps word that only looks like an id", () => {

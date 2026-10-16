@@ -223,7 +223,7 @@ export function draftView(
     ...(opts.databases ? { databases: opts.databases } : {}),
   };
   const editedLabels = labelsOf(proposal, Object.keys(edits));
-  const edited = editedLabels.length ? [context(`:pencil2: Edited here: ${editedLabels.join(", ")}. Approve writes these values.`)] : [];
+  const edited = editedLabels.length ? [context(`Edited here: ${editedLabels.join(", ")}. Approve writes these values.`)] : [];
 
   // A tool read in the shared anatomy (`review-anatomy.ts`), or a batch
   // (`review-batch.ts`), opens on what it does; any other draft opens on its
@@ -514,14 +514,33 @@ export function decidedView(card: ReviewedCard, cardText: string): View {
  *  decided before its record kept it, or past its lifetime. */
 export const DRAFT_NOT_KEPT = "The draft behind this card is no longer kept, so only its outcome shows here. The card in the thread has the rest.";
 
+/** An outcome line led by an emoji: a run cut off before it reported back,
+ *  which still leads with `:warning:`, or a card decided before an Approve or
+ *  a Reject said so in words alone, which still ends with ✅ or ⛔. */
+const EMOJI_OUTCOME = /^:(white_check_mark|no_entry|warning):\s*/;
+
+/** An outcome line's level, from its words: "Approved by", "Answered by",
+ *  "Rejected by", "Cancelled by", or a stated card's ⛔ phrase ending
+ *  ", decided by <@U>." (`statedCancelledNote`). */
+function outcomeLevelOf(words: string): DraftAlert["level"] | null {
+  if (/^(Approved|Answered) by /.test(words)) return "success";
+  if (/^(Rejected|Cancelled)\b/.test(words)) return "default";
+  const stated = /, decided by <@([^>]+)>\.$/.exec(words);
+  return stated && SLACK_USER_ID.test(stated[1]!) ? "default" : null;
+}
+
 /** A decided card's outcome line, as the card's message ends with it: the
- *  level its emoji means, and its words without the emoji. */
+ *  level its words mean — or, on a line led by an emoji, the level its emoji
+ *  means — and its words without the emoji. */
 function outcomeOf(cardText: string): { level: DraftAlert["level"]; text: string } | null {
   const last = cardText.split("\n").map((l) => l.trim()).filter(Boolean).at(-1) ?? "";
-  const emoji = /^:(white_check_mark|no_entry|warning):\s*/.exec(last);
-  if (!emoji) return null;
-  const level = emoji[1] === "white_check_mark" ? "success" : emoji[1] === "warning" ? "warning" : "default";
-  return { level, text: last.slice(emoji[0].length) };
+  const emoji = EMOJI_OUTCOME.exec(last);
+  if (emoji) {
+    const level = emoji[1] === "white_check_mark" ? "success" : emoji[1] === "warning" ? "warning" : "default";
+    return { level, text: last.slice(emoji[0].length) };
+  }
+  const level = outcomeLevelOf(last);
+  return level ? { level, text: last } : null;
 }
 
 /**

@@ -277,9 +277,9 @@ describe("what a stated card says at the gate", () => {
   });
 
   it("a ⛔ closes the card with what it did and who decided", () => {
-    assert.equal(statedCancelledNote(weekly, "U0AAAAAA2"), ":no_entry: Left as deliberate, nothing filed, decided by <@U0AAAAAA2>.");
+    assert.equal(statedCancelledNote(weekly, "U0AAAAAA2"), "Left as deliberate, nothing filed, decided by <@U0AAAAAA2>.");
     // Only a Slack id is mentioned; anything else would blank the post.
-    assert.equal(statedCancelledNote(weekly, "someone"), ":no_entry: Left as deliberate, nothing filed.");
+    assert.equal(statedCancelledNote(weekly, "someone"), "Left as deliberate, nothing filed.");
     passesGateAnswer(statedCancelledNote(weekly, "U0AAAAAA2"), [":no_entry:"]);
   });
 
@@ -397,7 +397,7 @@ describe("the drift card (#886 § 3.3)", () => {
   it("answers the gate in its own words: a Reject files nothing, and a late decision is told nothing was filed", () => {
     const words = driftCardWords(DRIFT_CARD_TTL_MS / 3_600_000);
     assert.deepEqual(words, { cancelled: "No intake filed", expired: "That card closed after 72 h with no decision, so nothing was filed." });
-    assert.equal(statedCancelledNote(words, "U0AAAAAA2"), ":no_entry: No intake filed, decided by <@U0AAAAAA2>.");
+    assert.equal(statedCancelledNote(words, "U0AAAAAA2"), "No intake filed, decided by <@U0AAAAAA2>.");
     passesGateAnswer(statedCancelledNote(words, "U0AAAAAA2"), [":no_entry:"]);
     for (const note of [
       { kind: "resolved", decision: "cancel", cancelled: words.cancelled },
@@ -490,7 +490,7 @@ describe("the comment-decision thread (#886 § 3.5)", () => {
 
   it("a ⛔ closes a decision card with what it did and who decided, and a late answer says nothing was written", () => {
     const words = decisionCardWords();
-    assert.equal(statedCancelledNote(words, "U0AAAAAA2"), ":no_entry: Dropped, nothing written, decided by <@U0AAAAAA2>.");
+    assert.equal(statedCancelledNote(words, "U0AAAAAA2"), "Dropped, nothing written, decided by <@U0AAAAAA2>.");
     assert.equal(words.expired, "That card closed after 72 h with no decision, so nothing was written.");
     passesGateAnswer(statedCancelledNote(words, "U0AAAAAA2"), [":no_entry:"]);
     passesGateAnswer(renderGateNote({ kind: "expired", ttlMs: DECISION_CARD_TTL_MS, words: words.expired }));

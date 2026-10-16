@@ -227,7 +227,7 @@ describe("Approve with a field edited in place", () => {
     await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", ...request }, deps);
     assert.deepEqual(ran[0]?.execute?.input, PROPOSAL.input);
     assert.equal(ran[0]?.edited, undefined);
-    assert.deepEqual(cardUpdates.map((u) => u.note), [":white_check_mark: Approved by <@U2>"]);
+    assert.deepEqual(cardUpdates.map((u) => u.note), ["Approved by <@U2>"]);
   });
 
   it("holds a field typed in place to the guards, and keeps the typing on the redrawn draft", async () => {
@@ -270,7 +270,7 @@ describe("Approve with edits", () => {
     assert.equal(ran[0]?.execute?.operations[0]?.input.title, "Reflection, shorter form");
     assert.equal(ran[0]?.execute?.input.summary, PROPOSAL.input.summary);
     assert.deepEqual(cardUpdates.map((u) => u.note), [
-      "<@U2> edited Title\n:white_check_mark: Approved by <@U2>",
+      "<@U2> edited Title\nApproved by <@U2>",
     ]);
   });
 
@@ -292,7 +292,7 @@ describe("Approve with edits", () => {
         "0.properties.product_pillar": ("Universal"),
       });
     const [update] = cardUpdates;
-    assert.match(update!.note, /^<@U2> edited Title, Summary, Product Pillar\n:white_check_mark: Approved by <@U2>$/);
+    assert.match(update!.note, /^<@U2> edited Title, Summary, Product Pillar\nApproved by <@U2>$/);
     for (const edited of ["Reflection, shorter form", "One question after each session.", "Universal"]) {
       assert.ok(update!.text.includes(edited), edited);
     }
@@ -320,7 +320,7 @@ describe("Approve with edits", () => {
     const { deps, ran, cardUpdates } = harness(await staged());
     await approveWith(deps, { "0.title": ("Reflection redesign") });
     assert.deepEqual(ran[0]?.execute?.input, PROPOSAL.input);
-    assert.deepEqual(cardUpdates.map((u) => u.note), [":white_check_mark: Approved by <@U2>"]);
+    assert.deepEqual(cardUpdates.map((u) => u.note), ["Approved by <@U2>"]);
   });
 
   it("lets a standing confirmer's edit run with nobody else asked", async () => {

@@ -301,8 +301,8 @@ export function shortCardOf(text: string): { summary: string; size: string } | n
   const named = title ? `_${clip(title, SUMMARY_TITLE_CHARS)}_` : "";
   const after = [named, ...keys].filter(Boolean).join(" · ");
   const summary = verb
-    ? `:warning: Ready to *${verb}*${after ? `: ${after}` : ""}`
-    : `:warning: Ready for review: ${clip(lines.find((l) => l.trim())?.trim() ?? "a proposal", SUMMARY_TITLE_CHARS)}`;
+    ? `Ready to *${verb}*${after ? `: ${after}` : ""}`
+    : `Ready for review: ${clip(lines.find((l) => l.trim())?.trim() ?? "a proposal", SUMMARY_TITLE_CHARS)}`;
 
   // The size of the prose the pop-up holds: its body field, or the draft.
   const body = fields
