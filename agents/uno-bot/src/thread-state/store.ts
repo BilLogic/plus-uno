@@ -919,6 +919,32 @@ export function proposalTtlMs(proposal: Pick<PendingProposal, "ttlMs">): number 
 export const REVISING_MARK_MS = 15 * 60 * 1000;
 
 /**
+ * Newest first, for the lookups that order live cards (`getProposalByThread`,
+ * `getProposalsByThread`, `getProposalsByChannel`): by when the store staged
+ * them, and on a tie — two cards staged in the same millisecond — by the
+ * card's own Slack ts, which is unique and rises with posting order. Without
+ * the tie-break the order of two such cards depended on insertion, and
+ * "which one?" listed them differently from run to run.
+ *
+ * @param a - One card's record
+ * @param b - The other's
+ */
+export function newestCardFirst(
+  a: { createdAt: number; proposalTs: string },
+  b: { createdAt: number; proposalTs: string },
+): number {
+  return b.createdAt - a.createdAt || compareSlackTs(b.proposalTs, a.proposalTs);
+}
+
+/** Slack ts order, digit runs compared as numbers: "1700000000.000300" after
+ *  "…000200", an item's `<ts>#<id>` key by its ts first, and any other key
+ *  (a test delivery's `posted-10`) the same way rather than as plain text. */
+const TS_ORDER = new Intl.Collator("en", { numeric: true });
+function compareSlackTs(a: string, b: string): number {
+  return TS_ORDER.compare(a, b);
+}
+
+/**
  * The card as every lookup hands it back: a mark past `REVISING_MARK_MS`
  * reads as cleared. A mark written before marks carried a time keeps holding.
  *

@@ -88,6 +88,7 @@ import {
   proposalSlot,
   proposalTtlMs,
   stampedTtl,
+  newestCardFirst,
   withLiveMark,
   type CutOffNoteReport,
   type DecisionReportRecord,
@@ -594,7 +595,7 @@ export class ThreadState extends DurableObject<Env> {
       const proposal = rec.payload as PendingProposal | null;
       if (!proposal || proposal.channel !== ref.channel) continue;
       if (proposalReplyThread(proposal) !== ref.thread) continue; // keyed on the card's thread
-      if (!best || rec.createdAt > best.createdAt) best = rec;
+      if (!best || newestCardFirst(card(rec), card(best)) < 0) best = rec;
     }
     return best ? withLiveMark(best.payload as PendingProposal, at) : null;
   }
@@ -613,7 +614,7 @@ export class ThreadState extends DurableObject<Env> {
       live.push(rec);
     }
     return live
-      .sort((a, b) => b.createdAt - a.createdAt)
+      .sort((a, b) => newestCardFirst(card(a), card(b)))
       .map((rec) => withLiveMark(rec.payload as PendingProposal, at));
   }
 
@@ -630,7 +631,7 @@ export class ThreadState extends DurableObject<Env> {
       live.push(rec);
     }
     return live
-      .sort((a, b) => b.createdAt - a.createdAt)
+      .sort((a, b) => newestCardFirst(card(a), card(b)))
       .map((rec) => withLiveMark(rec.payload as PendingProposal, at));
   }
 
@@ -1051,6 +1052,11 @@ function historyKey(channel: string, thread: string): string {
 
 // A proposal record's lifetime, read off the card it holds. The payload is
 // stored opaque, and a record with none reads as the default hour.
+/** A record as `newestCardFirst` reads it. */
+function card(rec: ProposalRecord): { createdAt: number; proposalTs: string } {
+  return { createdAt: rec.createdAt, proposalTs: (rec.payload as PendingProposal | null)?.proposalTs ?? "" };
+}
+
 function recordTtlMs(rec: ProposalRecord): number {
   return proposalTtlMs((rec.payload as PendingProposal | null) ?? {});
 }

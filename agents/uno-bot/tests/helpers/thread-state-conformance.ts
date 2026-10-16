@@ -472,6 +472,19 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByThread(THREAD))?.proposalTs, "1700.3");
   });
 
+  // Two cards staged in the same millisecond — a turn that stages a separate
+  // proposal right after another, on a fast store — still list in the order
+  // they were posted: the card's Slack ts breaks the tie, so the newest-card
+  // lookup and "which one?" never flip between runs.
+  it("list-by-thread and get-by-thread break a same-millisecond tie by the card's ts", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700000000.000200", replyTs: THREAD.thread, supersedeKey: "card:a" }));
+    await store.putProposal(proposal({ proposalTs: "1700000000.000300", replyTs: THREAD.thread, supersedeKey: "card:b" }));
+    assert.deepEqual((await store.getProposalsByThread(THREAD)).map((p) => p.proposalTs), ["1700000000.000300", "1700000000.000200"]);
+    assert.equal((await store.getProposalByThread(THREAD))?.proposalTs, "1700000000.000300");
+    assert.deepEqual((await store.getProposalsByChannel(THREAD.channel)).map((p) => p.proposalTs), ["1700000000.000300", "1700000000.000200"]);
+  });
+
   it("list-by-thread leaves out superseded, retired, decided and expired cards", async () => {
     const { store, clock } = setup();
     // Expired: staged first, aged out by the end.

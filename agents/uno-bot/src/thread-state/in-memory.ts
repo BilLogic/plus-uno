@@ -47,6 +47,7 @@ import {
   proposalSlot,
   proposalTtlMs,
   stampedTtl,
+  newestCardFirst,
   withLiveMark,
   type DecisionReportRecord,
   type Execution,
@@ -105,6 +106,9 @@ interface EventRecord {
 }
 
 const threadKey = (ref: ThreadRef): string => `${ref.channel}:${ref.thread}`;
+
+/** A record as `newestCardFirst` reads it. */
+const card = (rec: { createdAt: number; proposal: PendingProposal }) => ({ createdAt: rec.createdAt, proposalTs: rec.proposal.proposalTs });
 
 export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadState {
   const now = deps.now ?? Date.now;
@@ -304,7 +308,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         if (rec.supersededBy || rec.retired || rec.decided) continue; // retired or decided, so never the thread's live card
         if (rec.proposal.channel !== ref.channel) continue;
         if (proposalReplyThread(rec.proposal) !== ref.thread) continue; // keyed on the card's thread
-        if (!best || rec.createdAt > best.createdAt) best = rec;
+        if (!best || newestCardFirst(card(rec), card(best)) < 0) best = rec;
       }
       return best ? withLiveMark(best.proposal, now()) : null;
     },
@@ -314,7 +318,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         .filter((rec) => now() - rec.createdAt <= proposalTtlMs(rec.proposal))
         .filter((rec) => !rec.supersededBy && !rec.retired && !rec.decided)
         .filter((rec) => rec.proposal.channel === ref.channel && proposalReplyThread(rec.proposal) === ref.thread)
-        .sort((a, b) => b.createdAt - a.createdAt)
+        .sort((a, b) => newestCardFirst(card(a), card(b)))
         .map((rec) => withLiveMark(rec.proposal, now()));
     },
 
@@ -323,7 +327,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         .filter((rec) => now() - rec.createdAt <= proposalTtlMs(rec.proposal))
         .filter((rec) => !rec.supersededBy && !rec.retired && !rec.decided)
         .filter((rec) => rec.proposal.channel === channel)
-        .sort((a, b) => b.createdAt - a.createdAt)
+        .sort((a, b) => newestCardFirst(card(a), card(b)))
         .map((rec) => withLiveMark(rec.proposal, now()));
     },
 
