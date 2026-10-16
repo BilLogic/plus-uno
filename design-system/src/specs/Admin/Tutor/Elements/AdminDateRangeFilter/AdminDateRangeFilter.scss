@@ -8,24 +8,22 @@
     align-items: center;
     gap: var(--element-gap-lg, 12px);
 
-    &__dropdowns {
-        display: flex;
-        align-items: center;
-        gap: var(--element-gap-sm, 8px);
-    }
-
-    &__dropdown {
-        // Button styles are handled by the Dropdown component
-    }
-
+    &__selects,
     &__date-range {
         display: flex;
         align-items: center;
         gap: var(--element-gap-sm, 8px);
     }
 
-    &__date-button {
-        // Button styles are handled by the Dropdown component
+    // In a row, Select's full width would share the row out unevenly.
+    &__select.plus-select-wrapper {
+        flex: 0 0 auto;
+        width: 14rem;
+    }
+
+    &__date.plus-select-wrapper {
+        flex: 0 0 auto;
+        width: 8rem;
     }
 
     &__separator {

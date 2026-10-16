@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Button from '@/components/actions/Button/Button';
-import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
+import { FilterSelect } from '@/specs/Toolkit/Pre-Session/Elements/Filters/FilterSelect';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { TableRow, TableHeaderRow } from '../Tables/StudentList.stories';
 import SessionControlsConsolidated from '../Elements/SessionControlsConsolidated/SessionControlsConsolidated';
@@ -42,7 +42,7 @@ The page uses the **PageLayout** component which provides:
 | AttendanceDropdown | in-session/elements | Attendance status selection |
 | EngagementDropdown | in-session/elements | Engagement status selection |
 | SortingOptions | in-session/elements | Sort by Name, Status, Bookmark, Progress |
-| Dropdown | plus-ds/components | Status filter |
+| FilterSelect | pre-session/elements/filters | Status filter (multi Select, applies on close) |
 | Button | plus-ds/components | Mark Helped action |
 | MATHiaGoalStatusBanner | in-session/elements | Goal status banner |
 
@@ -73,34 +73,28 @@ The Interactive story includes:
 // session-selection dropdown is gone; the consolidated header controls replace it.
 
 /**
- * Status Filter Dropdown
- * Filter students by their current status
+ * Status Filter
+ * Filter students by any number of statuses; no pick shows every student.
+ * The list refilters once, when the filter's list closes.
  */
-const StatusFilter = ({ currentStatus, onSelect, isInteractive = false }) => {
-    const statusOptions = [
-        { id: 'all', label: 'All' },
-        { id: 'needs-motivation', label: 'Needs motivation' },
-        { id: 'needs-goals', label: 'Needs to set goals' },
-        { id: 'on-track', label: 'On track' },
-        { id: 'exceeding', label: 'Exceeding goals' }
-    ];
+const statusOptions = [
+    { value: 'needs-motivation', label: 'Needs motivation' },
+    { value: 'needs-goals', label: 'Needs to set goals' },
+    { value: 'on-track', label: 'On track' },
+    { value: 'exceeding', label: 'Exceeding goals' }
+];
 
-    const items = statusOptions.map(status => ({
-        label: status.label,
-        selected: status.id === currentStatus,
-        onClick: () => isInteractive && onSelect(status.id)
-    }));
-
-    return (
-        <Dropdown
-            buttonText="Status"
-            items={items}
-            style="secondary"
-            fill="ghost"
-            size="small"
-        />
-    );
-};
+const StatusFilter = ({ statuses, onChange }) => (
+    <FilterSelect
+        aria-label="Status"
+        mode="multi"
+        placeholder="All statuses"
+        options={statusOptions}
+        value={onChange ? statuses : undefined}
+        defaultValue={statuses}
+        onChange={onChange}
+    />
+);
 
 /**
  * Main Content Area (used by Overview and Interactive stories)
@@ -153,9 +147,8 @@ const MainContent = ({
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)' }}>
                 <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Students</h2>
                 <StatusFilter
-                    currentStatus={statusFilter}
-                    onSelect={onStatusFilterChange}
-                    isInteractive={isInteractive}
+                    statuses={statusFilter}
+                    onChange={isInteractive ? onStatusFilterChange : undefined}
                 />
             </div>
 
@@ -229,7 +222,7 @@ export const Overview = () => (
                 students={defaultStudents}
                 currentSession={defaultSessions[0]}
                 sessions={defaultSessions}
-                statusFilter="all"
+                statusFilter={[]}
                 onSessionChange={() => { }}
                 onStatusFilterChange={() => { }}
                 onAttendanceChange={() => { }}
@@ -251,7 +244,7 @@ export const Overview = () => (
  */
 export const Interactive = () => {
     const [currentSession, setCurrentSession] = useState(defaultSessions[0]);
-    const [statusFilter, setStatusFilter] = useState('all');
+    const [statusFilter, setStatusFilter] = useState([]);
     const [students, setStudents] = useState(defaultStudents);
 
     const handleAttendanceChange = (studentId, newStatus) => {
@@ -267,9 +260,9 @@ export const Interactive = () => {
     };
 
     // Filter students based on status filter
-    const filteredStudents = statusFilter === 'all'
+    const filteredStudents = statusFilter.length === 0
         ? students
-        : students.filter(s => s.status === statusFilter);
+        : students.filter(s => statusFilter.includes(s.status));
 
     // Breakpoint/responsive width is provided by the global Breakpoint toolbar via the
     // ResponsiveFrame decorator — the story renders the page directly.
@@ -628,7 +621,7 @@ const RegularTutorLoadedContent = ({
                     gap: 'var(--size-element-gap-sm)',
                 }}
             >
-                <SortingOptions initialSort="status" initialOrder="needs_motivation" isInteractive={true} />
+                <SortingOptions initialSort="status" initialOrder="needs_motivation" />
                 <SessionControlsConsolidated
                     role="tutor"
                     studentCount={`${students.filter((s) => s.attendanceStatus === 'present').length}/${students.length}`}
@@ -713,7 +706,7 @@ const RegularTutorEmptyContent = ({
                     gap: 'var(--size-element-gap-sm)',
                 }}
             >
-                <SortingOptions initialSort="status" initialOrder="needs_motivation" isInteractive={true} />
+                <SortingOptions initialSort="status" initialOrder="needs_motivation" />
                 <SessionControlsConsolidated role="tutor" studentCount="0/0" />
             </div>
         </div>
@@ -792,7 +785,7 @@ const LeadSupervisorLoadedContent = ({
                     gap: 'var(--size-element-gap-sm)',
                 }}
             >
-                <SortingOptions initialSort="status" initialOrder="needs_motivation" isInteractive={true} />
+                <SortingOptions initialSort="status" initialOrder="needs_motivation" />
                 <SessionControlsConsolidated
                     role="lead"
                     studentCount={`${students.filter((s) => s.attendanceStatus === 'present').length}/${students.length}`}
@@ -877,7 +870,7 @@ const LeadSupervisorEmptyContent = ({
                     gap: 'var(--size-element-gap-sm)',
                 }}
             >
-                <SortingOptions initialSort="status" initialOrder="needs_motivation" isInteractive={true} />
+                <SortingOptions initialSort="status" initialOrder="needs_motivation" />
                 <SessionControlsConsolidated role="lead" studentCount="0/0" />
             </div>
         </div>

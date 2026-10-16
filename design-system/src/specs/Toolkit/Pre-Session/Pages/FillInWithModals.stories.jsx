@@ -40,7 +40,7 @@ const defaultSessions = [
 ];
 
 const defaultFilters = {
-    school: 'All schools'
+    school: []
 };
 
 /**
@@ -76,7 +76,7 @@ const BackgroundContent = ({ tabs, selectedTab }) => (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <SectionTitle title="Session Fill-ins" />
                 <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
-                    <SiteFilter initialSelection={defaultFilters.school} />
+                    <SiteFilter defaultValue={defaultFilters.school} />
                 </div>
             </div>
 

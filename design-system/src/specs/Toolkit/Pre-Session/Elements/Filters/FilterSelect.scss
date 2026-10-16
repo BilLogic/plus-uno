@@ -1,0 +1,12 @@
+// A filter bar lays its controls out in a row, where Select's full width
+// would share the row out unevenly. Each control takes the same width.
+.filter-select.plus-select-wrapper {
+    flex: 0 0 auto;
+    width: 12rem;
+}
+
+// A row's count, such as the sessions in a status, trails its label.
+.filter-select-count {
+    font-size: var(--font-size-body3);
+    color: var(--color-on-surface-variant);
+}

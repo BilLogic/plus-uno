@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
+import { Select } from '@/components';
+import { FilterSelect } from './FilterSelect';
+import { playCommitsOnClose } from './filterPlay';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Site Filter',
-    component: Dropdown,
+    component: Select,
     tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
@@ -11,89 +13,65 @@ export default {
 };
 
 const defaultSchools = [
-    { text: 'All schools', value: 'all' },
-    { text: 'School #1', value: 'school_1' },
-    { text: 'School #2', value: 'school_2' },
-    { text: 'School #3', value: 'school_3' },
-    { text: 'School #4', value: 'school_4' },
+    { value: 'school_1', label: 'School #1' },
+    { value: 'school_2', label: 'School #2' },
+    { value: 'school_3', label: 'School #3' },
+    { value: 'school_4', label: 'School #4' },
 ];
 
 /**
- * Site Filter Component
- * Dropdown for filtering by school/site
- * Uses semantic tokens:
- * - Dropdown: style="secondary", fill="outline", size="default"
- * - Gap: --size-element-gap-sm (when combined with other filters)
+ * Site filter: pick any number of schools. No pick means every school, so the
+ * empty field reads "All schools". The table refilters once, when the list closes.
  */
-export const SiteFilter = ({
-    initialSelection = 'All schools',
-    schools = defaultSchools,
-    interactive = true,
-    isOpen
-}) => {
-    const [selected, setSelected] = useState(initialSelection);
+export const SiteFilter = ({ value, defaultValue = [], onChange, open, schools = defaultSchools }) => (
+    <FilterSelect
+        aria-label="Schools"
+        mode="multi"
+        placeholder="All schools"
+        options={schools}
+        value={value}
+        defaultValue={defaultValue}
+        onChange={onChange}
+        open={open}
+    />
+);
 
-    const dropdownItems = schools.map(school => ({
-        text: school.text,
-        selected: selected === school.text,
-        onClick: interactive ? () => {
-            setSelected(school.text);
-        } : undefined
-    }));
+/** Every state: all schools, open, and one school picked. */
+export const Overview = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg)' }}>
+        <section>
+            <h6 className="h6 mb-3">Default state (closed)</h6>
+            <SiteFilter />
+        </section>
+        <section style={{ paddingBottom: 'var(--size-section-gap-lg)' }}>
+            <h6 className="h6 mb-3">Open state</h6>
+            <SiteFilter open />
+        </section>
+        <section style={{ marginTop: 'var(--size-section-gap-lg)' }}>
+            <h6 className="h6 mb-3">School picked</h6>
+            <SiteFilter defaultValue={['school_2']} />
+        </section>
+    </div>
+);
 
+/** Pick schools; the filter applies when the list closes. */
+export const Interactive = () => {
+    const [schools, setSchools] = useState([]);
     return (
-        <Dropdown
-            buttonText={selected}
-            items={dropdownItems}
-            style="secondary"
-            fill="outline"
-            size="small"
-            isOpen={isOpen}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+            <SiteFilter value={schools} onChange={setSchools} />
+            <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--color-on-surface)' }}>
+                    {schools.length ? schools.join(', ') : 'all schools'}
+                </strong>
+            </p>
+        </div>
     );
 };
 
-/**
- * Overview - All States
- * Shows visual states of the Site Filter
- */
-export const Overview = () => (
-    <div
-        style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--size-section-gap-lg)'
-        }}
-    >
-        <section>
-            <h6 className="h6 mb-3">Default State (Closed)</h6>
-            <SiteFilter initialSelection="All schools" interactive={false} />
-        </section>
-
-        <section>
-            <h6 className="h6 mb-3">Open State (Dropdown Menu)</h6>
-            <div style={{ height: '220px' }}>
-                <SiteFilter initialSelection="All schools" interactive={false} isOpen={true} />
-            </div>
-        </section>
-
-        <section>
-            <h6 className="h6 mb-3">Selected School</h6>
-            <SiteFilter initialSelection="School #2" interactive={false} />
-        </section>
-    </div>
-);
-
-/**
- * Interactive Demo
- * Allows user to interact with the filter
- */
-export const Interactive = () => (
-    <div>
-        <h6 className="h6 mb-3">Interactive Demo</h6>
-        <p className="body2-txt mb-4">
-            Select a school from the dropdown.
-        </p>
-        <SiteFilter />
-    </div>
-);
+Interactive.play = playCommitsOnClose({
+    name: 'Schools',
+    picks: ['School #1', 'School #3'],
+    before: 'all schools',
+    after: 'school_1, school_3',
+});
