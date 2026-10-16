@@ -50,6 +50,7 @@ const Select = ({
     onCreate,
     open,
     defaultOpen = false,
+    onOpenChange,
     defaultSearchTerm = '',
     displayMode = 'tags',
     lineWrap = true,
@@ -106,13 +107,15 @@ const Select = ({
     };
 
     /* ---------- open, filter ---------- */
-    const [isOpen, setIsOpen] = useState(Boolean(open ?? defaultOpen));
+    // A controlled `open` is the parent's: Select asks through `onOpenChange`.
+    const openControlled = open !== undefined;
+    const [internalOpen, setInternalOpen] = useState(Boolean(defaultOpen));
+    const isOpen = openControlled ? Boolean(open) : internalOpen;
     const shown = isOpen && live;
     const [query, setQuery] = useState(defaultSearchTerm || null);
     const filter = query ?? '';
     const [focused, setFocused] = useState(false);
 
-    useEffect(() => { if (open !== undefined) setIsOpen(Boolean(open)); }, [open]);
     useEffect(() => { setQuery(defaultSearchTerm || null); }, [defaultSearchTerm]);
 
     /* ---------- options: given, created, loaded ---------- */
@@ -193,15 +196,13 @@ const Select = ({
     const listRef = useRef(null);
     const [activeId, setActiveId] = useState();
 
-    const openList = () => {
-        if (!live || isOpen) return;
+    /** What opening does to the field, whoever opened it. */
+    const startOpen = () => {
         if (multi && commitOnClose) setDraft(committedList);
-        setIsOpen(true);
     };
 
-    const closeList = () => {
-        if (!isOpen) return;
-        setIsOpen(false);
+    /** What closing does: the typed text goes, and staged picks land. */
+    const finishClose = () => {
         setQuery(null);
         if (draft !== null) {
             const changed = draft.length !== committedList.length || draft.some((v) => !committedList.includes(v));
@@ -209,6 +210,32 @@ const Select = ({
             if (changed) commit(draft);
         }
     };
+
+    const openList = () => {
+        if (!live || isOpen) return;
+        if (onOpenChange) onOpenChange(true);
+        if (openControlled) return;
+        startOpen();
+        setInternalOpen(true);
+    };
+
+    const closeList = () => {
+        if (!isOpen) return;
+        if (onOpenChange) onOpenChange(false);
+        if (openControlled) return;
+        setInternalOpen(false);
+        finishClose();
+    };
+
+    // A controlled `open` that changes runs the same opening and closing work.
+    const lastOpen = useRef(isOpen);
+    useEffect(() => {
+        const was = lastOpen.current;
+        lastOpen.current = isOpen;
+        if (!openControlled || was === isOpen) return;
+        if (isOpen) startOpen(); else finishClose();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen]);
 
     /* ---------- choosing ---------- */
     const choose = (next) => {
@@ -264,13 +291,6 @@ const Select = ({
         // Only a change of parent clears; the child's own value is not a cause.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [parentValue]);
-
-    /* ---------- the list follows the field when chips wrap ---------- */
-    useEffect(() => {
-        if (!shown) return undefined;
-        const frame = requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
-        return () => cancelAnimationFrame(frame);
-    }, [shown, current]);
 
     /* ---------- loadOptions: the next page on scroll ---------- */
     const loadMoreRef = useRef(loadMore);
@@ -616,9 +636,15 @@ Select.propTypes = {
     creatable: PropTypes.bool,
     /** Called with the text of a created option, which is then picked. */
     onCreate: PropTypes.func,
-    /** Holds the list open or shut, for documentation. */
+    /**
+     * Holds the list open or shut. Controlled: Escape, a press outside and a
+     * pick ask through `onOpenChange`, and the list stays as it is until the
+     * parent changes `open`.
+     */
     open: PropTypes.bool,
     defaultOpen: PropTypes.bool,
+    /** `(open)`: the list asks to open or close. */
+    onOpenChange: PropTypes.func,
     defaultSearchTerm: PropTypes.string,
     /** Multi mode: `tags` (Tag chips), `badges` (the older Badge chips) or `text` (comma-separated). */
     displayMode: PropTypes.oneOf(['tags', 'badges', 'text']),

@@ -5,6 +5,7 @@ import Button from '@/components/actions/Button/Button';
 import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
 import useFieldId from '@/components/forms-and-inputs/useFieldId';
 import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription } from '../_internal/Field';
+import '../Checkbox.scss';
 import './InputGroup.scss';
 
 /** One addon from a descriptor: a string, an object with a `type`, or a node. */
@@ -170,7 +171,7 @@ InputGroupText.propTypes = {
     className: PropTypes.string
 };
 
-/** Checkbox addon. Name it: the default is generic. */
+/** Checkbox addon — code's Checkbox box (18), centred. Name it: the default is generic. */
 const InputGroupCheckbox = ({
     checked = false,
     disabled = false,
@@ -187,6 +188,7 @@ const InputGroupCheckbox = ({
             disabled={disabled}
             onChange={onChange || (() => {})}
             aria-label={ariaLabel}
+            className="plus-form-checkbox"
         />
     </span>
 );

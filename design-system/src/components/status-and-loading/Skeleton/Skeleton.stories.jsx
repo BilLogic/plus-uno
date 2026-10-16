@@ -81,17 +81,6 @@ export default {
             },
         },
     },
-    /*
-     * Every story in this file starts, and ends, with no motion preference, so
-     * a ReducedMotion run that times out cannot leave the page reduced for the
-     * stories after it.
-     */
-    beforeEach: async () => {
-        await emulateReducedMotion(null);
-        return async () => {
-            await emulateReducedMotion(null);
-        };
-    },
 };
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
@@ -345,6 +334,17 @@ export const ReducedMotion = () => (
         <Skeleton shape="text" lines={2} width={160} data-testid="lines" />
     </div>
 );
+/*
+ * Only this story touches the motion preference, so only it pays for the
+ * runner round trip. Each `emulateReducedMotion` is a Playwright command over
+ * the runner's RPC, which waits seconds while a full run is still importing
+ * story files; run before every story in the file, those waits pushed the
+ * first stories toward the timeout. The cleanup puts the preference back even
+ * when the play function fails or times out.
+ */
+ReducedMotion.beforeEach = async () => async () => {
+    await emulateReducedMotion(null);
+};
 ReducedMotion.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const shapes = [canvas.getByTestId('status'), ...canvas.getByTestId('lines').children];
@@ -354,7 +354,7 @@ ReducedMotion.play = async ({ canvasElement }) => {
     });
 
     if (!(await emulateReducedMotion('reduce'))) return;
-    // The file's beforeEach puts the preference back, even if this times out.
+    // The story's beforeEach cleanup puts the preference back, even if this times out.
     await expect(window.matchMedia('(prefers-reduced-motion: reduce)').matches, 'the runner emulates the preference').toBe(true);
     const reduced = measure();
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
+import Input from './Input';
 import TagInput from './TagInput';
 
 /**
@@ -103,12 +104,19 @@ export const CreateWhenNothingMatches = {
         const create = within(listbox).getByRole('option', { name: 'Create Music' });
         await expect(input).toHaveAttribute('aria-activedescendant', create.id);
 
+        // The row previews the tag it will create: a real Tag, in its colour.
+        const preview = create.querySelector('.plus-tag');
+        await expect(preview).not.toBeNull();
+        await expect(preview).toHaveTextContent('Music');
+        const previewColor = TAG_COLORS.find((name) => preview.classList.contains(`plus-tag--${name}`));
+
         await userEvent.keyboard('{Enter}');
         await expect(tagsIn(canvas, 'Topics').getByText('Music')).toBeInTheDocument();
         await expect(args.onCreateSpy).toHaveBeenCalledTimes(1);
         const [{ value, color }] = args.onCreateSpy.mock.calls[0];
         await expect(value).toBe('Music');
         await expect(TAG_COLORS).toContain(color);
+        await expect(color).toBe(previewColor);
 
         // Created once: typing it again offers the option, not a second Create.
         await userEvent.type(input, 'music');
@@ -279,6 +287,49 @@ CollapsesWithoutFocus.play = async ({ canvasElement }) => {
     await expect(canvas.getByRole('combobox', { name: 'Topics' })).toHaveFocus();
     await waitFor(() => expect(within(list).queryByRole('button', { name: /more tag/ })).not.toBeInTheDocument());
     await expect(within(list).getByText('Probability')).toBeVisible();
+};
+
+/**
+ * The small field fits its tags: every tag, "+n" included, is Tag's one
+ * height, 22, and sits inside the field's border at any width, and the field
+ * stays as tall as a small Input.
+ */
+const SMALL_WIDTHS = [160, 200, 240, 280, 360];
+
+export const SmallFitsItsTags = () => (
+    <div style={stack}>
+        <Input label="Small input" size="small" />
+        {SMALL_WIDTHS.map((width) => (
+            <div key={width} style={{ width }}>
+                <TagInput label={`Topics at ${width}`} size="small" options={TOPICS} defaultTags={MANY} />
+            </div>
+        ))}
+    </div>
+);
+
+SmallFitsItsTags.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const smallInput = canvas.getByRole('textbox', { name: 'Small input' }).closest('.plus-field');
+    const smallHeight = smallInput.getBoundingClientRect().height;
+    for (const width of SMALL_WIDTHS) {
+        const list = canvas.getByRole('list', { name: `Selected: Topics at ${width}` });
+        await within(list).findByRole('button', { name: /^\+\d+ more tags?$/ });
+
+        const field = list.closest('.plus-field');
+        const border = parseFloat(getComputedStyle(field).borderTopWidth);
+        const inner = field.getBoundingClientRect();
+        await expect(Math.abs(inner.height - smallHeight)).toBeLessThanOrEqual(0.5);
+        const shown = [...list.querySelectorAll('.plus-tag')]
+            .filter((tag) => tag.checkVisibility({ visibilityProperty: true }));
+        await expect(shown.some((tag) => tag.matches('.plus-tag-group__overflow'))).toBe(true);
+        for (const tag of shown) {
+            const box = tag.getBoundingClientRect();
+            await expect(Math.round(box.height)).toBe(22);
+            await expect(box.top).toBeGreaterThanOrEqual(inner.top + border);
+            await expect(box.bottom).toBeLessThanOrEqual(inner.bottom - border);
+            await expect(box.right).toBeLessThanOrEqual(inner.right - border);
+        }
+    }
 };
 
 /**

@@ -72,9 +72,10 @@ let temporaryIds = 0;
  * Focusing the field opens a list of the options. Typing filters it and
  * highlights the first match; Enter or a click adds the highlighted option. A
  * "Create *text*" row is offered when no option matches the text exactly,
- * ignoring case, and creating gives the new tag a random Tag colour, reported
- * once through `onCreate`. Backspace in an empty entry removes the last tag,
- * and Esc closes the list and clears only the typed text.
+ * ignoring case. It previews the new tag as the Tag it will be, in the random
+ * Tag colour it will get, and creating reports that colour once through
+ * `onCreate`. Backspace in an empty entry removes the last tag, and Esc
+ * closes the list and clears only the typed text.
  *
  * Built on the shared parts: `_Field` is the box, `Listbox` the list and its
  * rows, and the chips are Tags in a TagGroup. Without focus the tags collapse
@@ -127,6 +128,8 @@ const TagInput = ({
     const [filter, setFilter] = useState('');
     const [activeId, setActiveId] = useState();
     const [announcement, setAnnouncement] = useState('');
+    /** The colour the next created tag gets, picked ahead so the Create row can show it. */
+    const [nextColor, setNextColor] = useState(randomColor);
 
     const editable = !disabled && !readOnly;
     // A × is offered only where pressing it can remove something: a list
@@ -190,14 +193,13 @@ const TagInput = ({
         return add(tag);
     };
 
-    const create = (raw) => {
+    const create = (raw, color = randomColor()) => {
         const text = maxLength !== undefined ? raw.trim().slice(0, maxLength) : raw.trim();
         if (!text) return;
         const existing = options.find((option) => same(textOf(option), text));
         if (existing) { pickOption(existing); return; }
         if (hasTag(text)) return;
 
-        const color = randomColor();
         temporaryIds += 1;
         const temporaryId = `new-${temporaryIds}`;
         const result = onCreate ? onCreate({ value: text, color }) : undefined;
@@ -406,7 +408,12 @@ const TagInput = ({
                 }}
                 filter={filter}
                 onFilterChange={setFilter}
-                onCreate={atLimit ? undefined : (text) => { create(text); setFilter(''); }}
+                onCreate={atLimit ? undefined : (text) => {
+                    create(text, nextColor);
+                    setNextColor(randomColor());
+                    setFilter('');
+                }}
+                createLabel={(text) => <Tag color={nextColor}>{text}</Tag>}
                 onActiveChange={setActiveId}
                 onClose={handleClose}
                 header={<div className="plus-tag-input__hint">Select an option or create one</div>}
