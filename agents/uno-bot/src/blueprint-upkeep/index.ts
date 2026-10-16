@@ -15,7 +15,7 @@ export {
   type ServiceChangeGate,
   type ServiceChangeInput,
 } from "./gate";
-export { draftRevision, readDraft, type Draft, type DraftedChange, type DraftInput, type PathToday } from "./draft";
+export { DRAFT_MAX_TOKENS, draftRevision, readDraft, whyNoDraft, type Draft, type DraftedChange, type DraftInput, type PathToday } from "./draft";
 export { revisionItem, revisionText, type RevisionSource } from "./card";
 export { cardEvidence, MAX_PRDS, prdIdsOf, type EvidencePage } from "./evidence";
 export { promotionDraft, retirementDraft, stageOf, STAGES, variantPromotionDraft, type PlannedRows, type ShipStage } from "./stages";
@@ -68,11 +68,13 @@ export {
   PROPOSAL_CARD_TTL_MS,
   PROPOSAL_DRAFT_TIER,
   PROPOSAL_OFFER_SUBREQUESTS,
+  PROPOSAL_SYSTEM,
   proposalOfferCard,
   proposalPathName,
   proposalSlotKey,
   readProposalDraft,
   stagedProposalOffer,
+  whyNoProposal,
   type ProposalDraft,
   type ProposalDrafter,
 } from "./proposal";
