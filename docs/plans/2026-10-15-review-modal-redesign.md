@@ -4720,7 +4720,7 @@ everywhere, the posted card's summary line included.
   check is `tests/proposal-review.test.ts` extended per reader, plus a live
   open of each variant in the le goat DM, never in #plus-design.
 
-## Blueprint cards (specced in #1279, not built)
+## Blueprint cards (specced in #1279, decided, not built)
 
 A separate session specced uno-bot keeping the service blueprint current
 (#1279). Its tickets add two kinds of card the anatomy above has not drawn
@@ -9245,6 +9245,8 @@ lead with no emoji. `failureReason` even strips one from a failed write's
 line. The T1–T5 pop-up builders add none beyond row 4.
 
 ### Decisions for Bill
+
+**Decided (Bill, 2026-10-15):** all five recommendations below are accepted as written. The blueprint tickets build these cards to this section; the spec fixes in § Where the spec conflicts are folded into #1279 and its tickets.
 
 1. **Which rows are editable in place.** Recommend: in a revision, the text
    of every **added and changed** row is a prefilled input, up to 20. A
