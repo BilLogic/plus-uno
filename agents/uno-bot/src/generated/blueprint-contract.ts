@@ -65,7 +65,7 @@ export const BLUEPRINT_CONTRACT = {
     separator: ' · ',
     /** Extra labels a parser must accept for a segment, keyed by the canonical
      *  field name — `{ lane: ['layer'] }` would say the lane segment may be
-     *  labeled either way.
+     *  labelled either way.
      *
      *  EMPTY, and worth keeping empty. This is the mechanism that made the
      *  `Layer`→`Lane` crossing survivable: for the window between the view
