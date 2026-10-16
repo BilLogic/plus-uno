@@ -27,6 +27,7 @@ import {
 import type { CardMessage } from "../src/slack/button-door";
 import { proposalCardBlocks, renderProposalCard } from "../src/slack/proposal-render";
 import { draftSubmitOf, outcomeView } from "../src/slack/review-view";
+import { statedCancelledNote } from "../src/slack/gate-note";
 import { runTurn, type ProposalCard, type TurnDeps } from "../src/turn/index";
 import { harness as turnHarness, request as turnRequest, PENDING } from "./helpers/turn-harness";
 import { verdictEvents } from "../src/usage/index";
@@ -754,6 +755,10 @@ describe("a decided card", () => {
       [":no_entry: Left as deliberate, nothing filed, decided by <@U0BILL0001>.", "default", "Left as deliberate, nothing filed, decided by <@U0BILL0001>."],
       [":warning: This run was cut off before it reported back — see the thread for what finished.", "warning", "This run was cut off before it reported back — see the thread for what finished."],
     ];
+    // The stated card's note as its writer words it, so a change to that
+    // wording reads here too.
+    const stated = statedCancelledNote({ cancelled: "No intake filed" }, "U0BILL0001");
+    cases.push([stated, "default", stated]);
     for (const [last, level, text] of cases) {
       const view = outcomeView({ channel: CHANNEL, ts: CARD_TS }, `${PROPOSAL.proposalText}\n${last}`) as { blocks: Array<{ type: string; level?: string; text?: { text: string } }> };
       assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level, view.blocks[0]!.text!.text], ["alert", level, text], last);
