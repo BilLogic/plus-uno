@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Badge from '@/components/status-and-loading/Badge';
 import Tag from '@/components/status-and-loading/Tag';
 import TagGroup from '@/components/status-and-loading/TagGroup';
 import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription } from './_internal/Field';
 import Listbox from './_internal/Listbox';
+import useFieldId from './useFieldId';
 import './Select.scss';
 
 /** Past this many options the list is search-first, and "Select all" hides. */
@@ -14,7 +15,8 @@ const PAGE_SIZE = 50;
 /** How close to the bottom of the list, in px, the next page is asked for. */
 const LOAD_MORE_WITHIN = 48;
 
-const labelOf = (option) => option.label ?? option.text ?? String(option.value);
+/** The option's words as a string, for filtering and the input; a node label falls back to `text`. */
+const labelOf = (option) => (typeof option.label === 'string' ? option.label : option.text ?? String(option.value));
 const isEmpty = (value) => value === undefined || value === null || value === ''
     || (Array.isArray(value) && value.length === 0);
 
@@ -74,8 +76,7 @@ const Select = ({
     ...props
 }) => {
     const multi = mode === 'multi';
-    const generatedId = useId().replace(/:/g, '');
-    const fieldId = id || name || `select-${generatedId}`;
+    const fieldId = useFieldId(id);
     const listId = `${fieldId}-listbox`;
     const labelId = label ? `${fieldId}-label` : undefined;
     const isReadOnly = readOnly !== undefined ? Boolean(readOnly) : Boolean(readonly);
@@ -131,10 +132,14 @@ const Select = ({
 
     /* ---------- loadOptions ---------- */
     const request = useRef(0);
+    // Held in a ref, so an inline `loadOptions` does not refetch on every render.
+    const loadOptionsRef = useRef(loadOptions);
+    loadOptionsRef.current = loadOptions;
+    const hasLoader = Boolean(loadOptions);
     const load = useCallback((text, offset) => {
         const ticket = ++request.current;
         setLoaded((prev) => ({ ...prev, busy: true, ...(offset === 0 ? { query: text } : {}) }));
-        Promise.resolve(loadOptions(text, { offset, limit: PAGE_SIZE })).then((result) => {
+        Promise.resolve(loadOptionsRef.current(text, { offset, limit: PAGE_SIZE })).then((result) => {
             if (ticket !== request.current) return;
             setLoaded((prev) => ({
                 query: text,
@@ -145,11 +150,11 @@ const Select = ({
         }, () => {
             if (ticket === request.current) setLoaded((prev) => ({ ...prev, busy: false }));
         });
-    }, [loadOptions]);
+    }, []);
 
     useEffect(() => {
-        if (shown && loadOptions) load(filter, 0);
-    }, [shown, filter, loadOptions, load]);
+        if (shown && hasLoader) load(filter, 0);
+    }, [shown, filter, hasLoader, load]);
 
     const more = loadOptions && loaded.options.length < loaded.total;
     const loadMore = () => {
@@ -225,9 +230,10 @@ const Select = ({
     };
 
     const clear = () => {
-        setDraft(null);
         setQuery(null);
-        commit(empty);
+        // Staging for `commitOnClose`: the clear lands with the rest, on close.
+        if (draft !== null) setDraft([]);
+        else commit(empty);
     };
 
     const toggleAll = () => {
@@ -264,16 +270,18 @@ const Select = ({
     }, [shown, current]);
 
     /* ---------- loadOptions: the next page on scroll ---------- */
+    const loadMoreRef = useRef(loadMore);
+    loadMoreRef.current = loadMore;
     useEffect(() => {
-        if (!shown || !loadOptions) return undefined;
+        if (!shown || !hasLoader) return undefined;
         const body = document.getElementById(listId)?.closest('.plus-listbox-body');
         if (!body) return undefined;
         const onScroll = () => {
-            if (body.scrollHeight - body.scrollTop - body.clientHeight < LOAD_MORE_WITHIN) loadMore();
+            if (body.scrollHeight - body.scrollTop - body.clientHeight < LOAD_MORE_WITHIN) loadMoreRef.current();
         };
         body.addEventListener('scroll', onScroll);
         return () => body.removeEventListener('scroll', onScroll);
-    });
+    }, [shown, hasLoader, listId]);
 
     /* ---------- events ---------- */
     const hasValue = !isEmpty(current);
@@ -348,6 +356,7 @@ const Select = ({
     /* ---------- the caption ---------- */
     let message = caption;
     if (waiting) message = `Choose ${dependsOn.label || 'the field above'} first`;
+    else if (atLimit && !caption) message = `You can pick up to ${maxSelections}`;
     const { messageId, describedBy } = fieldDescription({
         fieldId,
         message,
@@ -566,8 +575,8 @@ const Select = ({
                     emptyMessage={searchFirst && !filter ? 'Type to search' : 'No results'}
                 />
             </div>
-            {name && (multi ? current : (hasValue ? [current] : [])).map((v) => (
-                <input key={v} type="hidden" name={name} value={v} />
+            {name && (multi ? committedList : (isEmpty(committedList) ? [] : [committedList])).map((v) => (
+                <input key={v} type="hidden" name={name} value={v} disabled={isDisabled} />
             ))}
             <FieldCaption messageId={messageId} message={message} tone={invalid ? 'invalid' : 'help'} />
         </FieldStack>
@@ -617,9 +626,9 @@ Select.propTypes = {
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
     /** Shows the value, stays focusable, and cannot be changed. */
-    readonly: PropTypes.bool,
-    /** Alias of `readonly`. */
     readOnly: PropTypes.bool,
+    /** @deprecated Prefer `readOnly` */
+    readonly: PropTypes.bool,
     /** Shows an asterisk on the label and sets `aria-required`. */
     required: PropTypes.bool,
     /** Draws the error border; `caption` becomes the announced error. */

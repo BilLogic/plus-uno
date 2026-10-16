@@ -329,7 +329,10 @@ PickLimitDisablesRows.play = async ({ canvasElement }) => {
     await userEvent.click(page().getByRole('option', { name: 'South High' }));
 
     await expect(page().getByRole('option', { name: 'Riverside Academy' })).toHaveAttribute('aria-disabled', 'true');
-    await expect(page().getByText('You can pick up to 2')).toBeInTheDocument();
+    // The list's footer says why, and so does the field's caption.
+    const listbox = page().getByRole('listbox').closest('.plus-listbox');
+    await expect(within(listbox).getByText('You can pick up to 2')).toBeInTheDocument();
+    await expect(within(canvasElement).getByText('You can pick up to 2')).toBeInTheDocument();
     // A picked row can still be taken back.
     await expect(page().getByRole('option', { name: 'North High' })).not.toHaveAttribute('aria-disabled');
 };
@@ -385,7 +388,10 @@ ClearButton.play = async ({ canvasElement }) => {
 
     const clear = canvas.getByRole('button', { name: 'Clear School' });
     await expect(clear).toHaveAttribute('tabindex', '-1');
-    await expect(clear.querySelector('.fa-circle-xmark')).not.toBeNull();
+    // One step smaller than the caret, as the Figma `_Field Clear`.
+    const size = (el) => parseFloat(getComputedStyle(el).fontSize);
+    await expect(size(clear.querySelector('.fa-circle-xmark')))
+        .toBeLessThan(size(canvasElement.querySelector('.plus-select-caret')));
     await userEvent.click(clear);
     await expect(chosen.textContent).toBe('');
     await expect(canvas.queryByRole('button', { name: 'Clear School' })).toBeNull();

@@ -37,8 +37,8 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 | `truncate` | bool | `false` | Badges only: clip the row with a fade. |
 | `size` | enum | `'medium'` | — |
 | `disabled` | bool | `false` | — |
-| `readonly` | bool | `false` | Shows the value, stays focusable, and cannot be changed. |
-| `readOnly` | bool | — | Alias of `readonly`. |
+| `readOnly` | bool | — | Shows the value, stays focusable, and cannot be changed. |
+| `readonly` | bool | `false` | @deprecated Prefer `readOnly` |
 | `required` | bool | `false` | Shows an asterisk on the label and sets `aria-required`. |
 | `invalid` | bool | `false` | Draws the error border; `caption` becomes the announced error. |
 | `commitOnClose` | bool | `false` | Multi mode: `onChange` fires once when the list closes, as a filter bar wants, not on each pick. |
@@ -67,7 +67,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-focus-ring` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-on-surface-variant` · `--color-outline` · `--color-primary` · `--color-primary-border` · `--color-secondary-text` · `--font-family-body` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body2` · `--font-size-body3` · `--font-size-fa-body2-solid` · `--font-weight-normal` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-sm` · `--size-element-stroke-lg`
+`--color-focus-ring` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-on-surface-variant` · `--color-outline` · `--color-primary` · `--color-primary-border` · `--color-secondary-text` · `--font-family-body` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body2` · `--font-size-body3` · `--font-size-fa-body2-solid` · `--font-size-fa-body3-solid` · `--font-weight-normal` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-sm` · `--size-element-stroke-lg`
 
 From `design-system/src/components/forms-and-inputs/Select.scss`. Override these through the token layer, never with a literal.
 

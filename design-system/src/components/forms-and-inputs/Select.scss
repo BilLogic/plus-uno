@@ -70,13 +70,14 @@
     padding: 0;
     border: 0;
     background: none;
-    font-size: var(--font-size-body3);
+    font-size: var(--font-size-fa-body3-solid);
     line-height: 1;
     cursor: pointer;
 
     .fa-solid {
         // @contrast: non-text
         color: var(--color-outline);
+        font-size: var(--font-size-fa-body3-solid);
     }
 
     &:hover .fa-solid {
