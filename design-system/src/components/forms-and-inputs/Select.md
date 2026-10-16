@@ -41,7 +41,10 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 | `readOnly` | bool | — | Shows the value, stays focusable, and cannot be changed. |
 | `readonly` | bool | `false` | @deprecated Prefer `readOnly` |
 | `required` | bool | `false` | Shows an asterisk on the label and sets `aria-required`. |
-| `invalid` | bool | `false` | Draws the error border; `caption` becomes the announced error. |
+| `info` | node | — | Text for the info tooltip beside the label. |
+| `validation` | enum | `'none'` | The field's validation tone, as on Input: an error, a confirmation, or neither. |
+| `validationMessage` | node | — | Shown under the field in place of `caption` while `validation` is set; an error is announced. |
+| `invalid` | bool | `false` | Same as `validation="invalid"`: draws the error border, and `caption` becomes the announced error. |
 | `commitOnClose` | bool | `false` | Multi mode: `onChange` fires once when the list closes, as a filter bar wants, not on each pick. |
 | `clearable` | bool | — | Shows the clear ×. Unset, it is on in multi mode and `!required` in single mode. |
 | `selectAll` | bool | `false` | Multi mode: a "Select all" button over the list, hidden past 50 matches. |
@@ -64,6 +67,8 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 **`displayMode`** — `tags` · `badges` · `text`
 
 **`size`** — `small` · `medium` · `large`
+
+**`validation`** — `none` · `invalid` · `success`
 
 Anything not listed is not a valid value.
 

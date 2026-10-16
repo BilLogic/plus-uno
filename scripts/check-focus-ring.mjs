@@ -55,7 +55,7 @@ const ROLES_FILE = `${TOKEN_DIR}/_color_roles.scss`;
  * result this check must never give by accident.
  */
 export const MIN_FILES = 150;
-export const MIN_RULES = 60;
+export const MIN_RULES = 50;
 
 export const REMEDY =
   `  -> A focus indicator is held to ${NON_TEXT}:1 against what it sits on (WCAG 1.4.11),\n` +

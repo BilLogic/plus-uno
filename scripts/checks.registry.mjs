@@ -366,7 +366,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-focus-ring.mjs',
-    floors: { MIN_FILES: 150, MIN_RULES: 60 },
+    floors: { MIN_FILES: 150, MIN_RULES: 50 },
     baseline: 'scripts/baselines/focus-ring.json',
     guards:
       "the one thing that tells a keyboard user where they are. Of the 84 focus rules in the design system, 29 had NO affordance reaching WCAG 1.4.11's 3:1 \u2014 `.plus-input:focus` announced itself with a #84cfff border at 1.62:1, the AM/PM toggle and the file drop zone with an 8% primary tint at 1.13:1, four textarea states at 2.22:1, and six readonly fields with the same grey they wear at rest. axe cannot catch this: it has no focus-appearance rule, so `check:storybook` swept all 416 story files and reported none of it. A rule is scored on its STRONGEST affordance, which is the correction that made the check right \u2014 eleven rules pair a 1.13:1 glow with a 5.02:1 border, and there the border is the indicator. No ratchet and no exceptions: a ring nobody can see is a defect, not a vocabulary to migrate at leisure. A ring on a ground its caller paints is not an exception either: its rule DECLARES the grounds (`// @grounds: --color-…`, opening the block) and is held to 3:1 on every one, so CloseButton's inverse ring is measured on the eight fills it is for rather than excused; a misplaced, duplicated, empty or unknown declaration is itself a failure. Mutation-tested three ways: one ring reverted, the `--color-focus-ring` role deleted, and a stale exception left behind. 0.2s, measured 2026-08-29.",

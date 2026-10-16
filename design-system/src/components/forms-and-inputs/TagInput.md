@@ -9,7 +9,7 @@ Notion's multi-select. Focusing the field opens a list of the options. Typing fi
 
 **Source:** `design-system/src/components/forms-and-inputs/TagInput.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TagInput.stories.jsx` — TypingFilters, CreateWhenNothingMatches, MatchIgnoresCase, ClickPicks, BackspaceRemovesTheLastTag, EscClearsOnlyTheText, PasteSplitsOnCommas, MaxLength, PickLimit, CollapsesWithoutFocus, SmallFitsItsTags, TemporaryIdUntilConfirmed, ReadOnly, Invalid, Disabled, Controlled, Overview, Sizes, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/TagInput.stories.jsx` — TypingFilters, CreateWhenNothingMatches, MatchIgnoresCase, ClickPicks, BackspaceRemovesTheLastTag, EscClearsOnlyTheText, PasteSplitsOnCommas, PastedTagsGetTagColours, MaxLength, PickLimit, CollapsesWithoutFocus, SmallFitsItsTags, TemporaryIdUntilConfirmed, ReadOnly, Invalid, Disabled, Controlled, Overview, Sizes, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TagInput.mdx`
 
