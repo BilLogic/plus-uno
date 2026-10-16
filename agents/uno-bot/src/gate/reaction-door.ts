@@ -32,7 +32,7 @@ import { isResolvingReaction, type AnswerReaction } from "../usage/resolution";
 import { thanksEmojiOf } from "../usage/appreciation";
 import type { ThreadState } from "../thread-state/index";
 import { withWorkingSignal, type Delivery } from "../turn/index";
-import { resolveSignal, type GateRestage, type GateVerdict } from "./gate";
+import { otherCardWaits, resolveSignal, type GateRestage, type GateVerdict } from "./gate";
 
 /** One reaction, in the facts the envelope already has. */
 export interface ReactionRequest {
@@ -227,12 +227,14 @@ export async function runReactionDoor(
           .postGateNote({ kind: "resolve-failed", glyph: request.glyph })
           .catch(() => {});
       }
+      // A win decided one card; another in the thread may still wait.
+      return verdict.outcome === "won" && verdict.proposal ? otherCardWaits(verdict.proposal, deps.threadState) : false;
     },
     // What the thread needs afterwards, stated rather than defaulted: this
-    // door RESOLVED the card, so nothing in the thread is waiting on anybody.
-    // The argument is required precisely so a door cannot inherit an answer it
-    // never thought about (#575). A re-staged card is the one thing this door
-    // can leave waiting on somebody.
-    () => (verdict.restage ? "waiting-on-person" : "idle"),
+    // door RESOLVED the card, so the thread waits on nobody — unless a card
+    // still waits in it: one re-staged here, or another beside the one
+    // decided (#1319). The argument is required precisely so a door cannot
+    // inherit an answer it never thought about (#575).
+    (moreLive) => (verdict.restage || moreLive ? "waiting-on-person" : "idle"),
   );
 }

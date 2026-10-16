@@ -91,43 +91,97 @@ export async function cardMatter(
 }
 
 /**
- * The card a new one corrects, for the usage record (#1320): the thread's
- * previous card — the newest live one — when the new card undoes the call it
- * was staged under. Two ways, as the ids show them:
+ * The card a new one corrects (#1320): the card the thread's PREVIOUS TURN
+ * staged, still live, when the new card undoes the call it was staged under.
+ * Two ways, as the ids show them (Bill, 2026-10-16, the second "require
+ * overlap"):
  *
- *   • it was staged as a separate proposal, and the new card revises a card it
- *     was staged beside ("that was meant to update the first one");
- *   • it was staged as a revision, and the new card is a separate proposal.
+ *   • it was staged as a separate proposal, and the new card revises a
+ *     different card it was staged beside ("that was meant to update the
+ *     first one") — and when the ask says so in words (`undoesStaging`), the turn
+ *     withdraws it, as the revision's (story 9);
+ *   • it was staged as a revision, and the new card is a separate proposal
+ *     aimed at the same Notion page or GitHub issue (`sameWriteTarget`).
+ *     While the same-target rule makes such a card a revision of it
+ *     (`cardMatter`), this one never fires; it is kept so the record stays
+ *     right if that rule changes.
+ *
+ * "The previous turn" is by adjacency, not the clock: the card whose ask
+ * (`userMsgTs`) is the last ask the thread's memory holds before this one.
+ * An answer in between — a question, a look at what is waiting — and the
+ * card is no longer just staged.
  *
  * A revision the Worker decided by a fact of its own — a card sent back with
  * Needs changes, a card the Worker staged — corrects nothing: nobody's call
- * is being undone. Neither does revising the previous card itself, which is
- * an edit of it. A previous card no turn made the call on (no `stagedAs`) is
- * never corrected. Ids only.
+ * is being undone. Neither does revising the just-staged card itself, which
+ * is an edit of it. A card no turn made the call on (no `stagedAs`) is never
+ * corrected. Ids only.
  *
- * @param live - Every live card in the reply thread, newest first, before the
- *   new card is staged.
+ * @param facts.matter - What the new card is (`cardMatter`)
+ * @param facts.live - Every live card in the reply thread, newest first,
+ *   before the new card is staged
+ * @param facts.operations - The new card's batch
+ * @param facts.previousAsk - The ts of the thread's previous ask, as its
+ *   memory holds it; absent, nothing is corrected
  */
-export function correctedCard(matter: CardMatter, live: readonly PendingProposal[]): string | undefined {
-  const previous = live[0];
-  if (!previous?.stagedAs) return undefined;
-  if (matter.kind === "separate") return previous.stagedAs === "revision" ? previous.proposalTs : undefined;
+export function correctedCard(facts: {
+  matter: CardMatter;
+  live: readonly PendingProposal[];
+  operations: readonly ProposalOperation[];
+  previousAsk: string | undefined;
+}): PendingProposal | undefined {
+  const { matter, previousAsk } = facts;
+  if (!previousAsk) return undefined;
+  const previous = facts.live.find((card) => card.userMsgTs === previousAsk && card.stagedAs);
+  if (!previous) return undefined;
+  if (matter.kind === "separate") {
+    const overlaps = facts.operations.some((op) => proposalOperations(previous).some((own) => sameWriteTarget(op, own)));
+    return previous.stagedAs === "revision" && overlaps ? previous : undefined;
+  }
   if (matter.why === "sent-back" || matter.why === "touched") return undefined;
-  return previous.stagedAs === "separate" && matter.of.proposalTs !== previous.proposalTs
-    ? previous.proposalTs
-    : undefined;
+  return previous.stagedAs === "separate" && matter.of.proposalTs !== previous.proposalTs ? previous : undefined;
+}
+
+/** How a person says the card just staged went to the wrong place: "that was
+ *  meant to update the first one", "it should have gone on the first card",
+ *  "not a new card". Narrow on purpose — see `undoesStaging`. */
+const UNDOES_STAGING: RegExp[] = [
+  /\bmeant\s+(to|for)\b/i,
+  /\bsupposed\s+to\b/i,
+  /\b(i|we)\s+meant\b/i,
+  /\bshould\s+(have\s+)?(been|gone|go|update|updated|change|changed|revise|revised)\b/i,
+  /\bnot\s+(a\s+)?(new|separate|another)\s+(card|one|proposal)\b/i,
+  /\binstead\s+of\s+(a\s+)?(new|separate)\b/i,
+  /\bwrong\s+card\b/i,
+];
+
+/**
+ * Whether the ask says, in plain words, that the card the previous turn
+ * staged was the wrong call (story 9). A revision that corrects a separate
+ * card withdraws it only then: the ids alone cannot tell "that was meant to
+ * update the first one" from "now change the first one's title", and the
+ * second must leave the other card waiting, decided on its own (#1318).
+ *
+ * @param text - The person's ask
+ */
+export function undoesStaging(text: string): boolean {
+  return UNDOES_STAGING.some((re) => re.test(text));
 }
 
 /**
  * What the person is told the staging did, said just above the card: the
- * card a revision replaced, or the cards a separate proposal posts beside.
- * Null when a separate proposal posts alone.
+ * card a revision replaced — and the separate card it withdraws, when that
+ * card was the mistake it corrects — or the cards a separate proposal posts
+ * beside. Null when a separate proposal posts alone.
  */
 export function stagingNote(
   matter: CardMatter,
   live: readonly PendingProposal[],
-): { kind: "revised"; replaced: string } | { kind: "staged-beside"; waiting: string[] } | null {
-  if (matter.kind === "revision") return { kind: "revised", replaced: cardHeadline(matter.of) };
+  withdrawn?: PendingProposal,
+): { kind: "revised"; replaced: string; withdrawn?: string } | { kind: "staged-beside"; waiting: string[] } | null {
+  if (matter.kind === "revision") {
+    return { kind: "revised", replaced: cardHeadline(matter.of), ...(withdrawn ? { withdrawn: cardHeadline(withdrawn) } : {}) };
+  }
   return live.length ? { kind: "staged-beside", waiting: live.map(cardHeadline) } : null;
 }
 
@@ -177,12 +231,14 @@ function touchesCard(operations: readonly ProposalOperation[], card: PendingProp
 
 /**
  * Whether two operations use the same tool on the same target, as a keyed
- * card is touched: an issue update on the same `issue_number`, an issue
- * create under the same title. Any other tool is matched by the tool alone.
+ * card is touched: an issue update on the same issue, read as the same-target
+ * rule reads it (`sameWriteTarget`: "#12", " 12" and 12 are one issue, in one
+ * repo), an issue create under the same title. Any other tool is matched by
+ * the tool alone.
  */
 function sameTool(a: ProposalOperation, b: ProposalOperation): boolean {
   if (a.toolName !== b.toolName) return false;
-  if (a.toolName === "github_issue_update") return String(a.input.issue_number) === String(b.input.issue_number);
+  if (a.toolName === "github_issue_update") return sameWriteTarget(a, b);
   if (a.toolName === "github_issue_create") {
     const title = (op: ProposalOperation) => String(op.input.title ?? "").trim().toLowerCase();
     return title(a) === title(b);

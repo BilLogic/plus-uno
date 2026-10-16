@@ -34,6 +34,7 @@ import type { ChannelRole } from "../destination/index";
 import type { AssistantContext } from "../slack/types";
 import type { VisionReference } from "../slack/vision-reference";
 import type { CardFixes } from "../turn/delivery";
+import type { ConversationType } from "../turn/turn";
 import { cardTtlMs } from "../card-expiry";
 
 export type { AssistantContext, VisionReference };
@@ -120,7 +121,7 @@ export const CUT_OFF_SWEEP_RETRY_MS = 2 * 60 * 1000;
 /**
  * How long the alarm keeps looking at one cut-off run, whatever the card's own
  * TTL: the hour, or the TTL when that is shorter. Each look re-arms the alarm
- * `CUT_OFF_SWEEP_RETRY_MS` out, so a 72 h card measured by its TTL would be
+ * `CUT_OFF_SWEEP_RETRY_MS` out, so a weekend card (72 h) measured by its TTL would be
  * retried about 2,160 times on a hand-off that keeps failing; capped, about 30.
  * A person's own look — a press, a reaction, the next turn in the thread — can
  * still take the record for the card's whole TTL.
@@ -981,11 +982,14 @@ export function ownOperations(
   return proposal.toolName ? { operations: [{ toolName: proposal.toolName, input: proposal.input ?? {} }] } : {};
 }
 
-/** The live card a superseded one was replaced by: its ts, and its batch,
- *  which is what its headline is read from (`agent/card-identity.ts`). */
+/** The card a superseded one was replaced by: its ts, and its batch, which
+ *  is what its headline is read from (`agent/card-identity.ts`). */
 export interface ReplacingCard {
   proposalTs: string;
   operations: ProposalOperation[];
+  /** Set when it no longer waits — decided, retired or aged out — so the
+   *  person is told that rather than sent to it (#1319, story 18). */
+  waiting?: false;
 }
 
 /** How many revisions a "superseded" lookup follows to the live card. A
@@ -993,8 +997,9 @@ export interface ReplacingCard {
 export const REPLACED_BY_HOPS = 10;
 
 /**
- * The live card at the end of a superseded card's chain, spread onto its
- * "superseded" lookup — absent when the chain ends in a card that is not live.
+ * The card at the end of a superseded card's chain, spread onto its
+ * "superseded" lookup, marked when it no longer waits — absent when the
+ * chain ends in a card the store no longer holds.
  *
  * @param first - The card's direct successor's ts
  * @param read - The store's own record read, by ts
@@ -1015,8 +1020,9 @@ export async function replacedByOf<R extends { supersededBy?: string }>(
       continue;
     }
     const proposal = proposalOf(rec);
-    if (!live(rec) || !proposal.toolName) return {};
-    return { replacedBy: { proposalTs: ts, ...(ownOperations(proposal) as { operations: ProposalOperation[] }) } };
+    if (!proposal.toolName) return {};
+    const operations = ownOperations(proposal) as { operations: ProposalOperation[] };
+    return { replacedBy: { proposalTs: ts, ...operations, ...(live(rec) ? {} : { waiting: false as const }) } };
   }
   return {};
 }
@@ -1564,8 +1570,13 @@ export interface ThreadState {
    * `retired` is true only when THIS call took a live card out of reach: a
    * card already claimed (so gone), already retired or replaced, or aged out
    * answers false — nothing was replaced by this revision.
+   *
+   * `by` names the card that replaces it when that card is already staged in
+   * another slot — a separate card withdrawn by the revision that corrects it
+   * (story 9) — so the card answers as replaced by it, as `putProposal`
+   * stamps a card in its own slot.
    */
-  retireProposal(proposalTs: string): Promise<{ retired: boolean }>;
+  retireProposal(proposalTs: string, by?: string): Promise<{ retired: boolean }>;
 
   /**
    * Mark a live card as being revised: Needs changes, accepted.
@@ -1896,15 +1907,16 @@ export interface ThreadState {
   //
   // One record a thread and scenario (`CheckRecord`, under `comparisonKey`),
   // whichever offer it was pressed on — a PRD card's or an IDE hand-off's
-  // (#1324) — so the thread checks a scenario once, whichever asked first.
-  // Each step is one hop and one transaction.
+  // (#1324) — so the thread runs one check of a scenario at a time, whichever
+  // asked first. A finished one does not stop a later Check it: the idea may
+  // have moved on since. Each step is one hop and one transaction.
 
   /**
    * Claim the thread's check of a scenario for a Check it press: "claimed"
-   * with the new run's id when nothing holds it, when what held it ended
-   * stopped or failed, or when a running one outlived `CHECK_LEASE_MS` (a job
-   * killed mid-run); otherwise "running" or "done" with the record, and
-   * nothing changes. Of two racing presses one is told "claimed".
+   * with the new run's id unless a check is running, including when what
+   * held it finished, stopped or failed, or when a running one outlived
+   * `CHECK_LEASE_MS` (a job killed mid-run); otherwise "running" with the
+   * record, and nothing changes. Of two racing presses one is told "claimed".
    */
   claimCheck(ref: ThreadRef, scenario: string, start: CheckStart): Promise<CheckClaim>;
 
@@ -1956,6 +1968,12 @@ export interface BlueprintCheckOffer {
   /** Who asked for the work the offer is under: the Draw on blueprint card's
    *  only confirmer. */
   requesterUserId: string;
+  /** The conversation the milestone came up in, as its turn read it: where
+   *  it is answered, and whose conversation it is. A card the results stage
+   *  is built and recorded by it (`usage/record.ts` `storesChannel`), so a
+   *  DM or group DM card names no channel on the usage record. */
+  surface: "assistant" | "channel";
+  conversationType?: ConversationType;
   /** The card the offer was posted under; absent for a milestone with no
    *  card (the IDE hand-off). */
   cardTs?: string;
@@ -2028,7 +2046,7 @@ export interface CheckStart {
 }
 
 /** The answer to a Check it press (`ThreadState.claimCheck`). */
-export type CheckClaim = { state: "claimed"; run: string } | { state: "running" | "done"; record: CheckRecord };
+export type CheckClaim = { state: "claimed"; run: string } | { state: "running"; record: CheckRecord };
 
 /** How long a running check holds its claim before it is taken as a job
  *  killed mid-run, and may be claimed again: past the check's own deadline
@@ -2062,7 +2080,7 @@ export function liveCheck(stored: StoredCheck | undefined, at: number): CheckRec
  */
 export function claimedCheck(stored: StoredCheck | undefined, at: number, start: CheckStart, run: string): { claim: CheckClaim; store: CheckRecord | null } {
   const live = liveCheck(stored, at);
-  if (live?.state === "done") return { claim: { state: "done", record: live }, store: null };
+  // Only a running check holds the claim; a done one is checked again (Bill, 2026-10-16).
   if (live?.state === "running" && at - live.at < CHECK_LEASE_MS) return { claim: { state: "running", record: live }, store: null };
   return { claim: { state: "claimed", run }, store: { state: "running", run, ...start, at } };
 }

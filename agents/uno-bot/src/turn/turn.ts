@@ -104,6 +104,7 @@ import {
   supersededEvents,
   turnIdOf,
   type ProposalEventLog,
+  type StagedAs,
   withAskLabel,
   type SubType,
   type TurnOrigin,
@@ -114,7 +115,7 @@ import {
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
-import { cardMatter, correctedCard, stagingNote } from "./card-matter";
+import { cardMatter, correctedCard, stagingNote, undoesStaging } from "./card-matter";
 import { cardHeadline } from "../agent/card-identity";
 import { judgedList, presentedProse, presenter, proseBudgetRepair, type Presenter } from "./presentation";
 import { figmaAnswerCopy } from "./figma-answer-copy";
@@ -1492,6 +1493,13 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     });
   }
 
+  // The thread's memory as it stands before this turn: read once, for the
+  // cancel check and for which card the previous turn staged.
+  const stored = await threadState.readHistory(ref).catch((err: unknown) => {
+    console.warn(`[turn] history read failed: ${err instanceof Error ? err.message : String(err)}`);
+    return null;
+  });
+
   // Gate idempotency (b): the person JUST cancelled this same action (the same
   // tool on the same target; a redirect is a new card, `agent/cancel-note.ts`),
   // and the store's outcome note is authoritative — the live thread only shows the
@@ -1500,8 +1508,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // (`RECENT_CANCEL_MS`), so one clarifying exchange clears it, and so does a
   // night: in a DM the last few turns can be hours old. Best-effort: a store hiccup must not block a legitimate proposal.
   try {
-    const stored = await threadState.readHistory(ref);
-    const justCancelled = stored
+    const justCancelled = (stored ?? [])
       .slice(-3)
       .some((t) => cancelledRecently(t, result.toolName, result.input, deps.now?.() ?? Date.now()));
     if (justCancelled) {
@@ -1537,9 +1544,18 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     threadState,
   );
   const replaced = matter.kind === "revision" ? matter.of : null;
-  // Read off the live cards before this one stages: the thread's previous
-  // card, when this one undoes the call it was staged under (usage record).
-  const corrects = correctedCard(matter, liveCards);
+  // Read off the live cards before this one stages: the card the previous
+  // turn staged, when this one undoes the call it was staged under (usage
+  // record). A separate card this revision corrects, when the ask says in
+  // words that it was the wrong call, is withdrawn with it (story 9).
+  const corrected = correctedCard({
+    matter,
+    live: liveCards,
+    operations: result.operations,
+    previousAsk: [...(stored ?? [])].reverse().find((t) => t.role === "user")?.ts,
+  });
+  const corrects = corrected?.proposalTs;
+  const withdrawn = matter.kind === "revision" && undoesStaging(request.text) ? corrected : undefined;
 
   // A keyed card that revises only its own way (a weekly DS precedence card,
   // decided as it stands in its Review) is not revised by a turn at all: the batch is
@@ -1678,16 +1694,17 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // waiting beside it. Not for a report's item, which redraws in its report.
   const announced = inPlace
     ? null
-    : stagingNote(matter, liveCards.filter((card) => card.proposalTs !== replaced?.proposalTs));
+    : stagingNote(matter, liveCards.filter((card) => card.proposalTs !== replaced?.proposalTs), withdrawn);
   const said = announced ? await delivery.postGateNote(announced) : null;
   // The card says its deadline and is staged with the lifetime that ends
   // there, both from one reading of the clock (`cardWindow`): what is left of
   // a sweep card's window, or the rule's from now. An item revised in place
   // has none of its own to say: its report shows the deadline.
   const window = cardWindow(staging.now(), sweepLeftMs);
+  const shown: ProposalCard = inPlace ? card : { ...card, expiresAt: window.expiresAt };
   const posted = inPlace
     ? { ok: true, text: inPlace.text, ts: inPlace.staged.proposalTs }
-    : await delivery.card({ ...card, expiresAt: window.expiresAt });
+    : await delivery.card(shown);
   // An answer-only surface declined the card on purpose: the person is told
   // what it would have done instead, so the turn answered, and nothing stages.
   const remembered = [said?.ok ? said.text : null, posted.text].filter(Boolean).join("\n\n");
@@ -1709,48 +1726,23 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // ✅ that lands before the proposal is saved would look up nothing and be
   // silently lost. Save first so the confirmation always finds it.
   const proposal: PendingProposal = {
-    // The WHOLE batch, untruncated: what the card renders is a rendering, and
-    // what a later ✅ executes is this list.
-    operations: result.operations,
-    toolName: result.toolName,
-    input: result.input,
-    channel: request.channel,
-    threadTs: request.conversationTs,
-    ...(request.replyTs ? { replyTs: request.replyTs } : {}),
-    userMsgTs: request.userMsgTs,
-    proposalTs: posted.ts,
-    // What the adapter actually posted — or, for an item revised in place,
-    // what the report's port spelled for its Review — never a copy rendered
-    // here: the button
-    // door re-renders the resolved card from this field, so a second rendering
-    // that drifted would repaint the card with words it never had (#623).
-    proposalText: posted.text,
-    ...ownBlocks(posted),
-    requesterUserId: request.userId,
     // Until the deadline the card says; an item revised in place overrides
-    // it below with the time its item had left.
-    ttlMs: window.ttlMs,
+    // it below with the time its item had left. Which call this turn made
+    // is kept, so the thread's next card can tell whether it undid it
+    // (`correctedCard`).
+    ...stagedTurnCard({
+      operations: result.operations,
+      toolName: result.toolName,
+      input: result.input,
+      origin: cardOriginOf(request),
+      posted: { ...posted, ts: posted.ts },
+      ttlMs: window.ttlMs,
+      before,
+      replaced,
+      stagedAs: matter.kind,
+    }),
     ...(prd?.id ? { notionPrdId: prd.id } : {}),
     ...(prd?.url ? { notionPrdUrl: prd.url } : {}),
-    ...before,
-    // A revision is held to the terms of the card it replaces — its lifetime
-    // and who may confirm it. A fresh card has none and gets the defaults.
-    ...inheritedTerms(replaced),
-    // And names it, for the usage record's "approved with edits".
-    ...(replaced ? { revisesProposalTs: replaced.proposalTs } : {}),
-    // Which call this turn made, so the thread's next card can tell whether
-    // it undid it (`correctedCard`).
-    stagedAs: matter.kind,
-    // Its slot is its matter (`turnCardKey`): a revision is staged into the
-    // slot of the card it supersedes, and a separate proposal opens one of
-    // its own, named by this card, so it posts beside the waiting cards and
-    // retires none. A revision of a card staged before slots were keyed
-    // stays in the thread's slot, which retires that card.
-    ...(replaced
-      ? replaced.supersedeKey
-        ? { supersedeKey: replaced.supersedeKey }
-        : {}
-      : { supersedeKey: turnCardKey(posted.ts) }),
     // A revision of a sweep card stays a sweep card, in the sweep's slot, so
     // its items are still recorded (`sweep/outcomes.ts`); it keeps the card's
     // deadline, and its outcome joins the row the Worker's staging wrote. A
@@ -1794,6 +1786,12 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // finishes finds the staged row and the turn id it joins to; a ticket that
   // ✅ files waits on that row until the turn writes its own (`runTurn`).
   await recordSuperseded(retiredByStaging);
+  // The separate card this revision corrects, withdrawn now the revision is
+  // stored: superseded by it, so its buttons name the card that replaced it.
+  if (withdrawn) {
+    const { retired } = await threadState.retireProposal(withdrawn.proposalTs, proposal.proposalTs);
+    await recordSuperseded(retired ? [withdrawn.proposalTs] : []);
+  }
   await recordProposalEvents(
     deps.usage.proposalEvents,
     [
@@ -1816,7 +1814,19 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   );
   // The card is up and stored, so the person can review it while the quick
   // judgement decides whether to offer the blueprint check under it.
-  const offered = milestone ? await offerCheck(milestone, { ...proposal, cardTs: proposal.proposalTs, ...(proposal.supersedeKey ? { cardKey: proposal.supersedeKey } : {}) }, { ...deps, delivery }, staging.now()) : null;
+  const offered = milestone
+    ? await offerCheck(
+        milestone,
+        {
+          ...cardOriginOf(request),
+          ...cardConversationOf(request),
+          cardTs: proposal.proposalTs,
+          ...(proposal.supersedeKey ? { cardKey: proposal.supersedeKey } : {}),
+        },
+        { ...deps, delivery },
+        staging.now(),
+      )
+    : null;
   // A proposal is still a completed conversational turn. An agent_view DM has
   // no Slack thread to rebuild, so preserving this exchange in the store is the
   // only way its image pointer reaches the immediate follow-up.
@@ -1825,7 +1835,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   return {
     disposition: "staged",
     posted: posted.text,
-    staged: { proposal, card: inPlace ? card : { ...card, expiresAt: window.expiresAt } },
+    staged: { proposal, card: shown },
     wrote: memory.wrote(),
     telemetry,
   };
@@ -1853,7 +1863,7 @@ function cardWindow(stagedAt: number, leftMs?: number): { expiresAt: number; ttl
  * the card it posts under — absent at a hand-off to the IDE, which stages
  * none (#1324).
  */
-type CheckOfferPlace = Pick<PendingProposal, "channel" | "threadTs" | "replyTs" | "userMsgTs" | "requesterUserId"> & {
+type CheckOfferPlace = CardOrigin & CardConversation & {
   cardTs?: string;
   /** The card's matter (`supersedeKey`), which the results' action finds
    *  the matter's current card by (#1323). */
@@ -1892,6 +1902,8 @@ async function offerCheck(
       ...(at.replyTs ? { replyTs: at.replyTs } : {}),
       userMsgTs: at.userMsgTs,
       requesterUserId: at.requesterUserId,
+      surface: at.surface,
+      ...(at.conversationType ? { conversationType: at.conversationType } : {}),
       ...(at.cardTs ? { cardTs: at.cardTs } : {}),
       ...(at.cardKey ? { cardKey: at.cardKey } : {}),
       milestone: milestone.kind,
@@ -2253,16 +2265,18 @@ export async function restageExecution(
  * What a button asks Turn to stage (#1323), with no model in the loop: the
  * batch is already decided, and Turn builds and stages the card for it.
  */
-export type ButtonStaging =
+export type ButtonStaging = (
   /** A revision of a waiting card: staged in its slot, held to its confirmer
    *  set, and superseding it, as a turn's revision is. */
   | { kind: "revision"; of: PendingProposal; operations: ProposalOperation[] }
   /** A separate proposal in a thread: a slot of its own, retiring nothing. */
-  | {
-      kind: "separate";
-      thread: Pick<PendingProposal, "channel" | "threadTs" | "replyTs" | "userMsgTs" | "requesterUserId">;
-      operations: ProposalOperation[];
-    };
+  | { kind: "separate"; thread: CardOrigin; operations: ProposalOperation[] }
+) & {
+  /** The conversation the card stages in, as the turn that began the matter
+   *  had it: whether the card is a DM's, and whether the usage record may
+   *  name the channel. */
+  conversation: CardConversation;
+};
 
 /**
  * Stage a card a button asked for — a check's notes added to the card, or
@@ -2282,29 +2296,31 @@ export type ButtonStaging =
 export async function stageFromButton(
   ask: ButtonStaging,
   deps: Pick<TurnDeps, "threadState" | "delivery" | "cards" | "now"> & {
-    /** Where the card's staging is recorded. */
-    proposalEvents: ProposalEventLog;
+    /** Where the card's staging is recorded, and how long a write may take. */
+    usage: Pick<TurnUsage, "proposalEvents" | "writeTimeoutMs">;
   },
 ): Promise<PendingProposal | null> {
-  const clock = () => deps.now?.() ?? Date.now();
-  const thread = ask.kind === "revision" ? ask.of : ask.thread;
+  const { proposalEvents, writeTimeoutMs } = deps.usage;
+  const origin: CardOrigin = ask.kind === "revision" ? ask.of : ask.thread;
+  const replaced = ask.kind === "revision" ? ask.of : null;
   const first = ask.operations[0]!;
   // Out of reach before the revision is written, as a turn's revision is: the
   // old card must not run while its replacement is being built.
-  const retiredAhead = ask.kind === "revision" ? await deps.threadState.retireProposal(ask.of.proposalTs) : null;
+  const retiredAhead = replaced ? await deps.threadState.retireProposal(replaced.proposalTs) : null;
   if (retiredAhead && !retiredAhead.retired) return null;
-  const at = clock();
-  if (ask.kind === "revision") {
-    await recordProposalEvents(deps.proposalEvents, supersededEvents([ask.of.proposalTs], at, "revision"));
+  // One reading of the clock: the card's deadline and its record.
+  const at = deps.now?.() ?? Date.now();
+  if (replaced) {
+    await recordProposalEvents(proposalEvents, supersededEvents([replaced.proposalTs], at, "revision"), writeTimeoutMs);
   }
   const built = await buildCard(
     { kind: "proposal", operations: ask.operations, toolName: first.toolName, input: first.input },
     deps,
-    thread.channel.startsWith("D"),
-    { channel: thread.channel, requestedBy: thread.requesterUserId },
+    ask.conversation.surface === "assistant",
+    { channel: origin.channel, requestedBy: origin.requesterUserId },
   );
   const before = await batchBefore(ask.operations, built.revision, deps.cards);
-  if (ask.kind === "revision") await deps.delivery.postGateNote({ kind: "revised", replaced: cardHeadline(ask.of) });
+  if (replaced) await deps.delivery.postGateNote({ kind: "revised", replaced: cardHeadline(replaced) });
   const window = cardWindow(at);
   const posted = await deps.delivery.card({ ...built, expiresAt: window.expiresAt });
   if (posted.declined) return null;
@@ -2314,39 +2330,128 @@ export async function stageFromButton(
     return null;
   }
   const proposal: PendingProposal = {
-    operations: ask.operations,
-    toolName: first.toolName,
-    input: first.input,
-    channel: thread.channel,
-    threadTs: thread.threadTs,
-    ...(thread.replyTs ? { replyTs: thread.replyTs } : {}),
-    userMsgTs: thread.userMsgTs,
-    proposalTs: posted.ts,
-    proposalText: posted.text,
-    ...ownBlocks(posted),
-    requesterUserId: thread.requesterUserId,
-    ttlMs: window.ttlMs,
-    ...before,
-    stagedAs: ask.kind,
-    ...(ask.kind === "revision"
-      ? {
-          ...(ask.of.notionPrdId ? { notionPrdId: ask.of.notionPrdId } : {}),
-          ...(ask.of.notionPrdUrl ? { notionPrdUrl: ask.of.notionPrdUrl } : {}),
-          ...inheritedTerms(ask.of),
-          revisesProposalTs: ask.of.proposalTs,
-          // The matter's slot; a card staged before slots were keyed keeps
-          // the thread's.
-          ...(ask.of.supersedeKey ? { supersedeKey: ask.of.supersedeKey } : {}),
-        }
-      : { supersedeKey: turnCardKey(posted.ts) }),
+    ...stagedTurnCard({
+      operations: ask.operations,
+      toolName: first.toolName,
+      input: first.input,
+      origin,
+      posted: { ...posted, ts: posted.ts },
+      ttlMs: window.ttlMs,
+      before,
+      replaced,
+      stagedAs: ask.kind,
+    }),
+    // The notes go on the same PRD: a revision keeps the page its card names.
+    ...(replaced?.notionPrdId ? { notionPrdId: replaced.notionPrdId } : {}),
+    ...(replaced?.notionPrdUrl ? { notionPrdUrl: replaced.notionPrdUrl } : {}),
   };
   const { retired } = await deps.threadState.putProposal(proposal);
-  await recordProposalEvents(deps.proposalEvents, [
-    ...supersededEvents(retired, clock(), "revision"),
-    // A channel is named on the record; a DM or group DM is not.
-    stagedEvent({ proposal, at: clock(), via: "worker", channelStored: proposal.channel.startsWith("C"), stagedAs: ask.kind }),
-  ]);
+  await recordProposalEvents(
+    proposalEvents,
+    [
+      ...supersededEvents(retired, at, "revision"),
+      stagedEvent({
+        proposal,
+        at,
+        via: "worker",
+        // Named on the record by the turns' own rule: a DM or a group DM
+        // names no channel.
+        channelStored: storesChannel(ask.conversation.surface, ask.conversation.conversationType),
+        stagedAs: ask.kind,
+      }),
+    ],
+    writeTimeoutMs,
+  );
   return proposal;
+}
+
+/**
+ * The thread a card is staged in and the ask it answers — what every card
+ * Turn stages, and every Check it offer, keeps of where it came from.
+ */
+export type CardOrigin = Pick<PendingProposal, "channel" | "threadTs" | "replyTs" | "userMsgTs" | "requesterUserId">;
+
+/**
+ * The conversation a card stages in, as the usage record reads it: where it
+ * is answered and whose conversation it is (`usage/record.ts` `storesChannel`).
+ */
+export type CardConversation = Pick<TurnRequest, "surface" | "conversationType">;
+
+/** A request's card origin: its reply thread and its asker. */
+function cardOriginOf(request: TurnRequest): CardOrigin {
+  return {
+    channel: request.channel,
+    threadTs: request.conversationTs,
+    ...(request.replyTs ? { replyTs: request.replyTs } : {}),
+    userMsgTs: request.userMsgTs,
+    requesterUserId: request.userId,
+  };
+}
+
+/** A request's conversation, as `CardConversation`. */
+function cardConversationOf(request: TurnRequest): CardConversation {
+  return {
+    surface: request.surface,
+    ...(request.conversationType ? { conversationType: request.conversationType } : {}),
+  };
+}
+
+/**
+ * The record of a card Turn staged, a turn's and a button's alike: the batch,
+ * where it came from, what Slack took, and its slot.
+ *
+ * Its slot is its matter (`turnCardKey`): a revision is staged into the slot
+ * of the card it supersedes, and a separate proposal opens one of its own,
+ * named by this card, so it posts beside the waiting cards and retires none.
+ * A revision of a card staged before slots were keyed stays in the thread's
+ * slot, which retires that card.
+ */
+function stagedTurnCard(card: {
+  operations: ProposalOperation[];
+  toolName: string;
+  input: PendingProposal["input"];
+  origin: CardOrigin;
+  posted: PostResult & { ts: string };
+  ttlMs: number;
+  before: { before?: Record<string, string> };
+  /** The card this one revises, when it revises one. */
+  replaced: PendingProposal | null | undefined;
+  stagedAs: StagedAs;
+}): PendingProposal {
+  const { origin, posted, replaced } = card;
+  return {
+    // The WHOLE batch, untruncated: what the card renders is a rendering, and
+    // what a later ✅ executes is this list.
+    operations: card.operations,
+    toolName: card.toolName,
+    input: card.input,
+    channel: origin.channel,
+    threadTs: origin.threadTs,
+    ...(origin.replyTs ? { replyTs: origin.replyTs } : {}),
+    userMsgTs: origin.userMsgTs,
+    proposalTs: posted.ts,
+    // What the adapter actually posted — or, for an item revised in place,
+    // what the report's port spelled for its Review — never a copy rendered
+    // here: the button door re-renders the resolved card from this field, so
+    // a second rendering that drifted would repaint the card with words it
+    // never had (#623).
+    proposalText: posted.text,
+    ...ownBlocks(posted),
+    requesterUserId: origin.requesterUserId,
+    ttlMs: card.ttlMs,
+    ...card.before,
+    // A revision is held to the terms of the card it replaces — who may
+    // confirm it. A fresh card has none and gets the defaults.
+    ...inheritedTerms(replaced),
+    // And names it, for the usage record's "approved with edits".
+    ...(replaced ? { revisesProposalTs: replaced.proposalTs } : {}),
+    stagedAs: card.stagedAs,
+    ...(replaced
+      ? replaced.supersedeKey
+        ? { supersedeKey: replaced.supersedeKey }
+        : {}
+      : { supersedeKey: turnCardKey(posted.ts) }),
+  };
 }
 
 // ── The reply path ───────────────────────────────────────────────────────────
@@ -2581,13 +2686,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   const offered = handOff
     ? await offerCheck(
         handOff,
-        {
-          channel: request.channel,
-          threadTs: request.conversationTs,
-          ...(request.replyTs ? { replyTs: request.replyTs } : {}),
-          userMsgTs: request.userMsgTs,
-          requesterUserId: request.userId,
-        },
+        { ...cardOriginOf(request), ...cardConversationOf(request) },
         { ...deps, delivery },
         ctx.staging.now(),
       )

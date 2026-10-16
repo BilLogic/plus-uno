@@ -1344,13 +1344,13 @@ export function runThreadStateConformance(
     assert.deepEqual(await store.claimFiling("week"), { state: "claimed" }, "a lease past its time was a caller killed mid-filing");
   });
 
-  it("a thread's check of a scenario is its own: another thread or scenario is claimed apart, and a done one is kept as long as the thread's memory", async () => {
+  it("a thread's check of a scenario is its own: another thread or scenario is claimed apart, and a check is kept as long as the thread's memory", async () => {
     const { store, clock } = setup();
     const ref = { channel: "C1", thread: "1.0" };
     const start = { by: "U1", statusTs: "5.0" };
     const first = await store.claimCheck(ref, "Call-off", start);
     assert.equal(await store.stepCheck(ref, "Call-off", (first as { run: string }).run, "done"), true);
-    assert.equal((await store.claimCheck(ref, "call-off", start)).state, "done", "the same scenario, however it is cased");
+    assert.equal((await store.claimCheck(ref, "call-off", start)).state, "claimed", "a done check is checked again, the same scenario however it is cased");
     assert.equal((await store.claimCheck(ref, "Reschedule", start)).state, "claimed");
     assert.equal((await store.claimCheck({ channel: "C1", thread: "2.0" }, "Call-off", start)).state, "claimed");
     clock.advance(HISTORY_TTL_MS + 1);
@@ -1358,7 +1358,7 @@ export function runThreadStateConformance(
     assert.equal((await store.claimCheck(ref, "Call-off", start)).state, "claimed");
   });
 
-  it("a thread's check of a scenario runs once at a time: stopped or failed it is claimed anew, done it stays done", async () => {
+  it("a thread's check of a scenario runs once at a time: stopped, failed or done it is claimed anew", async () => {
     const { store, clock } = setup();
     const ref = { channel: "C1", thread: "1.0" };
     const first = await store.claimCheck(ref, "Call-off", { by: "U1", statusTs: "5.0" });
@@ -1382,8 +1382,12 @@ export function runThreadStateConformance(
     const last = (retry as { run: string }).run;
     assert.equal(await store.stepCheck(ref, "Call-off", last, "done"), true);
     assert.equal(await store.stepCheck(ref, "Call-off", last, "stopped"), false, "a finished check cannot be stopped");
-    assert.equal((await store.claimCheck(ref, "Call-off", { by: "U2", statusTs: "5.0" })).state, "done");
-    assert.equal(await store.stepCheck(ref, "Call-off", last, "failed"), true, "a done run whose results did not post fails");
+    const later = await store.claimCheck(ref, "Call-off", { by: "U2", statusTs: "5.0" });
+    assert.equal(later.state, "claimed", "a later Check it checks a done scenario again");
+    assert.equal(await store.stepCheck(ref, "Call-off", last, "failed"), false, "the finished run no longer holds it");
+    const latest = (later as { run: string }).run;
+    assert.equal(await store.stepCheck(ref, "Call-off", latest, "done"), true);
+    assert.equal(await store.stepCheck(ref, "Call-off", latest, "failed"), true, "a done run whose results did not post fails");
   });
 
   it("a running check past its lease was a job killed mid-run, and is claimed again", async () => {
@@ -1399,7 +1403,7 @@ export function runThreadStateConformance(
   it("a Check it offer is kept under its message ts, past its deadline, for as long as the thread's memory", async () => {
     const { store, clock } = setup();
     const offer: BlueprintCheckOffer = {
-      offerTs: "5.0", channel: "C1", threadTs: "1.0", replyTs: "1.0", userMsgTs: "1.1", requesterUserId: "U1", cardTs: "4.0",
+      offerTs: "5.0", channel: "C1", threadTs: "1.0", replyTs: "1.0", userMsgTs: "1.1", requesterUserId: "U1", surface: "channel", conversationType: "channel", cardTs: "4.0",
       milestone: "prd", idea: { title: "Self-serve call-offs", text: "Tutors post their own call-off." },
       scenario: "Call-off", path: "Standard", cellId: "cell-2", quote: "Tutors post their own call-off.", expiresAt: 1_000,
     };
@@ -1514,6 +1518,29 @@ export function runThreadStateConformance(
     assert.ok(await store.claimProposal("1700.4"));
     const after = await store.getProposalByTs("1700.2");
     assert.equal(after.state === "superseded" ? after.replacedBy : undefined, undefined, "a decided card is no card to send anyone to");
+  });
+
+  // Story 18: a replacement decided since is still named, marked as no longer
+  // waiting, so the person is not sent to some other card.
+  it("a superseded card names a replacement that was decided since, as no longer waiting", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    assert.ok(await store.claimProposal("1700.3", { decision: "confirm", by: "U2" }));
+    const lookup = await store.getProposalByTs("1700.2");
+    assert.deepEqual(lookup.state === "superseded" && lookup.replacedBy, { proposalTs: "1700.3", operations: STAGED, waiting: false });
+  });
+
+  // Story 9: a separate card withdrawn by the revision that corrects it lives
+  // in another slot, so the retire names its replacement.
+  it("a retire that names its replacement reads as superseded by it", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", supersedeKey: "card:1700.2" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3", supersedeKey: "card:1700.3" }));
+    assert.deepEqual(await store.retireProposal("1700.2", "1700.3"), { retired: true });
+    const lookup = await store.getProposalByTs("1700.2");
+    assert.deepEqual(lookup.state === "superseded" && lookup.replacedBy, { proposalTs: "1700.3", operations: STAGED });
+    assert.deepEqual((await store.getProposalsByThread(THREAD)).map((p) => p.proposalTs), ["1700.3"]);
   });
 
   it("a retired stated card carries its words, and a card without words answers with its lifetime alone", async () => {

@@ -351,10 +351,12 @@ export type GateNote =
   | {
       kind: "superseded";
       stated?: true;
-      /** The headline of the live card that replaced it, when the store knows
+      /** The headline of the card that replaced it, when the store knows
        *  it: with several live cards, "the newest card" may be another
        *  matter's (#1319). */
       by?: string;
+      /** Set when that card no longer waits either (story 18). */
+      byWaiting?: false;
     }
   /** A reaction that landed somewhere other than the card it claims: say where
    *  the live card is, and resolve nothing. `stated` when the live card is a
@@ -370,7 +372,13 @@ export type GateNote =
   /** A turn staged a REVISION: the card that follows replaces the waiting
    *  card `replaced` names (its headline, `turn/card-matter.ts`). Said just
    *  before the card, so a wrong call is caught at once (#1318). */
-  | { kind: "revised"; replaced: string }
+  | {
+      kind: "revised";
+      replaced: string;
+      /** The headline of the separate card the revision withdraws, staged
+       *  the turn before as the mistake this one corrects (story 9). */
+      withdrawn?: string;
+    }
   /** A turn staged a SEPARATE PROPOSAL while other cards wait: the card that
    *  follows posts beside them, and each `waiting` headline is still live. */
   | { kind: "staged-beside"; waiting: string[] }

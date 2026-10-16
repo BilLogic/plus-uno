@@ -370,7 +370,7 @@ export function stageFromButtonFor(
 ): (ask: ButtonStaging, delivery: Delivery) => Promise<PendingProposal | null> {
   const cards = cardReadsFor(env);
   const proposalEvents = proposalEventLogFor(env);
-  return (ask, delivery) => stageFromButton(ask, { threadState, delivery, cards, proposalEvents });
+  return (ask, delivery) => stageFromButton(ask, { threadState, delivery, cards, usage: { proposalEvents } });
 }
 
 /**

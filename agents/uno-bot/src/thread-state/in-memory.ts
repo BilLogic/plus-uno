@@ -239,11 +239,12 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
 
     // Retire without consuming — the counterpart to the claim, and why the two
     // are different methods is on the interface (#583).
-    async retireProposal(proposalTs) {
+    async retireProposal(proposalTs, by) {
       const rec = proposals.get(proposalTs);
       if (!rec || rec.decided || rec.retired || rec.supersededBy) return { retired: false };
       if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) return { retired: false };
       rec.retired = true;
+      if (by) rec.supersededBy = by;
       delete rec.kept;
       return { retired: true };
     },
@@ -303,7 +304,18 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         if (!cardExpiryOwed(rec, rec.proposal, now())) proposals.delete(proposalTs);
         return { state: "expired", ...ownTtl(rec.proposal), ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal) };
       }
-      if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal) };
+      if (rec.supersededBy || rec.retired) {
+        // A replacement that no longer waits is still named (story 18).
+        const replacedBy = rec.supersededBy
+          ? await replacedByOf(
+              rec.supersededBy,
+              (ts) => proposals.get(ts),
+              (next) => !next.decided && !next.retired && now() - next.createdAt <= proposalTtlMs(next.proposal),
+              (next) => next.proposal,
+            )
+          : {};
+        return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal), ...structuredClone(replacedBy) };
+      }
       return { state: "found", proposal: withLiveMark(rec.proposal, now()), createdAt: rec.createdAt, ...(rec.kept ? { kept: structuredClone(rec.kept) } : {}) };
     },
 

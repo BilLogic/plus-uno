@@ -182,10 +182,6 @@ export function checkNotStartedReply(offer: CheckSubject): string {
 export function alreadyCheckedReply(scenario: string): string {
   return `${scenarioOf(scenario)} is already being checked in this thread — the results post here.`;
 }
-/** Said to the presser alone when the thread's check of the scenario is done. */
-export function checkedAlreadyReply(scenario: string): string {
-  return `${scenarioOf(scenario)} was already checked in this thread — the results are above.`;
-}
 /** Said to whoever pressed Stop once the check finished. */
 export const CHECK_FINISHED_REPLY = "That check already finished — the results are in the thread.";
 /** Said to whoever pressed Stop on a check that is not running. */
@@ -230,8 +226,8 @@ export interface CheckItDoorDeps {
  * One Check it press: the thread's check of the scenario claimed as a new run,
  * the offer edited to the checking line, and the check queued on a runner of
  * its own. Past the deadline, for an offer the store no longer holds, or for
- * a check already running or done in the thread, nothing is queued and the
- * presser is told. A job the runner refuses fails the run: the presser is
+ * a check already running in the thread, nothing is queued and the presser
+ * is told. A check that finished is checked again. A job the runner refuses fails the run: the presser is
  * told, and the message offers Try again.
  *
  * @param press - Who pressed, on which offer
@@ -253,7 +249,7 @@ export async function runCheckItDoor(press: CheckItPress, deps: CheckItDoorDeps)
   const ref = checkRefOf(offer);
   const claim = await deps.store.claimCheck(ref, offer.scenario, { by: press.userId, statusTs: offer.offerTs });
   if (claim.state !== "claimed") {
-    await deps.replyEphemeral(claim.state === "running" ? alreadyCheckedReply(offer.scenario) : checkedAlreadyReply(offer.scenario));
+    await deps.replyEphemeral(alreadyCheckedReply(offer.scenario));
     return;
   }
   // The checking line goes up before the job is queued, so the job's own
@@ -381,6 +377,13 @@ export function pageRequesterOnlyReply(requester: string): string {
   return `Only ${who} can propose this update to the Roadmap page.`;
 }
 
+/** The conversation the offer came up in, which a card it stages is built
+ *  and recorded by. */
+const conversationOf = (offer: BlueprintCheckOffer): ButtonStaging["conversation"] => ({
+  surface: offer.surface,
+  ...(offer.conversationType ? { conversationType: offer.conversationType } : {}),
+});
+
 const byLine = (userId: string) => (SLACK_USER_ID.test(userId) ? ` — <@${userId}>` : "");
 
 /** A press on a results button, in the facts the envelope has. */
@@ -442,7 +445,12 @@ export async function runResultsDoor(press: ResultsPress, deps: ResultsDoorDeps)
       await deps.replyEphemeral(revisionRefusal(cardConfirmers(now.card, deps.standingConfirmers) ?? [], press.userId));
       return;
     }
-    const staged = await deps.stage({ kind: "revision", of: now.card, operations: prdWithNotes(now.card, results.text) });
+    const staged = await deps.stage({
+      kind: "revision",
+      of: now.card,
+      operations: prdWithNotes(now.card, results.text),
+      conversation: conversationOf(offer),
+    });
     if (!staged) return deps.replyEphemeral(CARD_MOVED_REPLY);
     await deps.replaceResults(resultsMessage(offer.offerTs, shown, `Added to the card${byLine(press.userId)}.`));
     return;
@@ -461,6 +469,7 @@ export async function runResultsDoor(press: ResultsPress, deps: ResultsDoorDeps)
       requesterUserId: offer.requesterUserId,
     },
     operations: pageUpdateWithNotes(now.pageUrl, results.text),
+    conversation: conversationOf(offer),
   });
   if (!staged) return;
   await deps.replaceResults(resultsMessage(offer.offerTs, shown, `Proposed as an update to the Roadmap page${byLine(press.userId)}.`));

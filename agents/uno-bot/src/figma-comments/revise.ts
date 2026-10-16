@@ -149,7 +149,7 @@ export async function reviseDecision(deps: ReviseDeps, reply: DecisionReply): Pr
     await deps.post({ text, thread_ts: thread.ts });
     return true;
   };
-  const live = async (proposalKey: string) => (deps.now() < thread.expiresAt ? deps.card(proposalKey) : null);
+  const live = async (proposalKey: string) => (deps.now() <= thread.expiresAt ? deps.card(proposalKey) : null);
 
   let entry: DecisionThread["decisions"][number] | undefined;
   let wording: string;

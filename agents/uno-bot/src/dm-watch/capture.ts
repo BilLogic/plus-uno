@@ -101,7 +101,7 @@ import {
   type ReadProgress,
 } from "./run";
 import { CAPTURE_FEATURE, positionScope, type DmReadPosition, type DmWatchRecords } from "./store";
-import { CARD_WINDOW_WORDS, cardExpiresAt, cardTtlMs } from "../card-expiry";
+import { CARD_WINDOW_WORDS, cardExpiresAt, cardLiveAt, cardTtlMs } from "../card-expiry";
 
 /** What one window may spend: two model calls, the pages it reads and
  *  searches for, and what a stop saves. */
@@ -730,7 +730,7 @@ function onMessage(card: PendingProposal, messages: ReadonlySet<string>): boolea
 async function liveCard(queue: readonly DmCaptureFinding[], now: number, deps: Pick<DmCapturePostDeps, "liveCards">): Promise<boolean> {
   const posted = new Map<string, Set<string>>();
   for (const f of queue) {
-    if (f.state !== "proposed" || !f.cardChannel || !f.proposalTs || cardExpiresAt(f.postedAt ?? 0) <= now) continue;
+    if (f.state !== "proposed" || !f.cardChannel || !f.proposalTs || !cardLiveAt(f.postedAt ?? 0, now)) continue;
     posted.set(f.cardChannel, (posted.get(f.cardChannel) ?? new Set()).add(f.proposalTs));
   }
   for (const [channel, messages] of posted) {

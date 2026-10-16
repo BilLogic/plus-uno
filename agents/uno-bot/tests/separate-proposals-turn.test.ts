@@ -159,6 +159,45 @@ test("a change to a different issue is a separate proposal", async () => {
   assert.equal((await live(h)).length, 2);
 });
 
+test("an issue named \"#42\", \" #42\" or 42 is one issue: a change to it is a revision of the waiting card", async () => {
+  for (const named of ["#42", " #42"]) {
+    const h = harness({
+      replies: [
+        call("github_issue_update", { issue_number: 42, comment: "Seen on staging too." }),
+        call("github_issue_update", { issue_number: named, state: "closed" }),
+      ],
+    });
+    const first = await turn(h, { text: "comment on #42 that it's on staging too" });
+    const second = await turn(h, { text: "close it instead", userMsgTs: "1700000000.000300" });
+
+    assert.equal(second.staged!.proposal.revisesProposalTs, first.staged!.proposal.proposalTs, `issue_number ${JSON.stringify(named)}`);
+    assert.deepEqual(await live(h), [second.staged!.proposal.proposalTs]);
+  }
+});
+
+test("a card the Worker staged is touched by a change to its issue, read as a turn card's is: the same number in another repo is not it", async () => {
+  for (const [repo, issue, revises] of [["example-org/harness", "#42", true], ["example-org/other", 42, false]] as const) {
+    const h = harness({ replies: [call("github_issue_update", { repo, issue_number: issue, state: "closed" })] });
+    // A follow-up card on issue 42, under a key of the Worker's own.
+    const input = { repo: "example-org/harness", issue_number: 42, comment: "Following up." };
+    await h.threadState.putProposal({
+      operations: [{ toolName: "github_issue_update", input }],
+      toolName: "github_issue_update",
+      input,
+      channel: CHANNEL,
+      threadTs: CONVERSATION,
+      userMsgTs: "1700000000.000100",
+      proposalTs: "worker-1",
+      proposalText: "Follow up on #42",
+      requesterUserId: "U1",
+      supersedeKey: "follow-through:42",
+    });
+    const second = await turn(h, { text: "close #42", userMsgTs: "1700000000.000300" });
+
+    assert.equal(second.staged!.proposal.revisesProposalTs, revises ? "worker-1" : undefined, repo);
+  }
+});
+
 /** Two separate PRD cards live in the thread: backup tutors, then reflections. */
 async function twoCards(h: Harness): Promise<{ a: string; b: string }> {
   const first = await turn(h, { text: "draft a PRD for backup tutor matching" });

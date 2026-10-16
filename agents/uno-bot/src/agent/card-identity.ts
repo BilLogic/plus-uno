@@ -95,5 +95,5 @@ function issueTarget(op: ProposalOperation): { repo?: string; number: string } |
   const n = op.input.issue_number;
   if (n === undefined || n === null || String(n).trim() === "") return null;
   const repo = typeof op.input.repo === "string" && op.input.repo.trim() ? op.input.repo.trim().toLowerCase() : undefined;
-  return { ...(repo ? { repo } : {}), number: String(n).replace(/^#/, "").trim() };
+  return { ...(repo ? { repo } : {}), number: String(n).trim().replace(/^#/, "").trim() };
 }

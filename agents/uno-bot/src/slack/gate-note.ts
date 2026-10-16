@@ -64,9 +64,14 @@ export const SUPERSEDED_POST =
 
 /** The ✅/⛔ on a proposal a revision replaced, naming the card that did:
  *  with several live cards in a thread, the newest may be another matter's
- *  (#1319). The headline is the model's input, so escaped. */
-export function supersededBy(headline: string): string {
-  return `That proposal was replaced by *${escapeSlackText(headline)}* — nothing was executed. Confirm on that card instead.`;
+ *  (#1319). When that card no longer waits either, it is still named, and
+ *  said to be done, rather than the person sent to some other card (story
+ *  18). The headline is the model's input, so escaped. */
+export function supersededBy(headline: string, waiting = true): string {
+  const named = `*${escapeSlackText(headline)}*`;
+  return waiting
+    ? `That proposal was replaced by ${named} — nothing was executed. Confirm on that card instead.`
+    : `That proposal was replaced by ${named}, which is no longer waiting either — nothing was executed. Ask again for a fresh card.`;
 }
 
 /** The ✅/⛔ on a stated card a revision replaced. */
@@ -109,7 +114,12 @@ export const REVIEW_ONLY_POST = "Each card here is decided from its own Review b
  * correct it in words. The headlines are the model's input, so escaped.
  */
 export function stagingLine(note: Extract<GateNote, { kind: "revised" | "staged-beside" }>): string {
-  if (note.kind === "revised") return `Revised *${escapeSlackText(note.replaced)}*: the card below replaces the one above.`;
+  if (note.kind === "revised") {
+    const revised = `Revised *${escapeSlackText(note.replaced)}*: the card below replaces the one above`;
+    return note.withdrawn
+      ? `${revised}, and *${escapeSlackText(note.withdrawn)}*, posted as a separate card by mistake, is withdrawn.`
+      : `${revised}.`;
+  }
   const names = note.waiting.map((w) => `*${escapeSlackText(w)}*`);
   const listed = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)} above are` : `${names[0]} above is`;
   return `Added a new card below. ${listed} still waiting.`;
@@ -151,7 +161,7 @@ export function renderGateNote(note: GateNote): string {
       return note.words ?? EXPIRED_CARD;
     case "superseded":
       if (note.stated) return STATED_SUPERSEDED_POST;
-      return note.by ? supersededBy(note.by) : SUPERSEDED_POST;
+      return note.by ? supersededBy(note.by, note.byWaiting !== false) : SUPERSEDED_POST;
     case "not-on-the-card":
       // Say where the card is, and name who is being answered: this is the one
       // verdict aimed at a specific person's specific gesture, so it is the one

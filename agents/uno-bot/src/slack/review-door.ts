@@ -438,6 +438,7 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
       }),
       replaceCard: (message) => deps.updateCard(request.channel, verdict.proposal?.item?.messageTs ?? request.messageTs, message),
       reports: deps.threadState,
+      threadState: deps.threadState,
       ...(deps.now ? { now: deps.now } : {}),
     },
   );

@@ -200,14 +200,19 @@ test("two Check it presses run one check; the second hears it is already running
   assert.equal(w.told[0]!.text, "*Call-off* is already being checked in this thread — the results post here.");
 });
 
-test("a press after the check finished is told it was checked, and nothing more runs", async () => {
+test("a press after the check finished checks the scenario again: only a running check is refused", async () => {
   const { threadState, clock, offerTs } = await offered();
   const w = world(threadState, clock, offerTs);
   await w.press(PRESSER);
   await w.runJob(0);
   await w.press(BYSTANDER);
-  assert.equal(w.queued.length, 1);
-  assert.deepEqual(w.told, [{ to: BYSTANDER, text: "*Call-off* was already checked in this thread — the results are above." }]);
+  assert.equal(w.queued.length, 2, "a second check is queued");
+  assert.notEqual((w.queued[1]!.job as BlueprintCheckJob).run, (w.queued[0]!.job as BlueprintCheckJob).run, "as a run of its own");
+  assert.deepEqual(w.told, []);
+
+  await w.press(PRESSER);
+  assert.equal(w.queued.length, 2, "while it runs, a third press queues nothing");
+  assert.deepEqual(w.told, [{ to: PRESSER, text: "*Call-off* is already being checked in this thread — the results post here." }]);
 });
 
 // ── Failures ─────────────────────────────────────────────────────────────────

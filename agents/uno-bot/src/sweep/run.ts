@@ -194,7 +194,7 @@ import type {
   SweepStore,
 } from "./store";
 import { aloneKeyOf, FOLLOW_UPS_SECTION, placeKeyOf, type SectionCards, type SectionPlace, type SweepSection } from "./sections";
-import { MAX_CARD_TTL_MS, cardExpiresAt, cardTtlMs } from "../card-expiry";
+import { MAX_CARD_TTL_MS, cardExpiresAt, cardLiveAt, cardTtlMs } from "../card-expiry";
 
 /** A first sweep of a channel reads its last day. */
 export const FIRST_SWEEP_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -1243,7 +1243,7 @@ async function postPlaces(job: ScheduledJob, deps: SweepDeps, scope: SectionPlac
       if (outcome === "held") for (const i of items) held.add(i.findingId);
     }
     for (const i of open) {
-      if (i.proposalTs !== null && cardExpiresAt(i.postedAt ?? 0) > now) live.add(i.destination);
+      if (i.proposalTs !== null && cardLiveAt(i.postedAt ?? 0, now)) live.add(i.destination);
     }
     for (const place of await placesLiveInThreadState(deps, open, live)) live.add(place);
 
@@ -1868,7 +1868,7 @@ export const WITHDRAWN_TEXT = "This end-of-day report didn't go through, so noth
  *   • posted, but with no snapshot or a digest that differs → withdrawn and
  *     released: staging it would run text nobody was shown;
  *   • not known (a failed read, or too many pages) → held for the next try,
- *     and released once its 72 h would have run out anyway;
+ *     and released once its 24 weekday hours would have run out anyway;
  *   • posted, with some fixes already staged — the earlier try got that far —
  *     → those are recorded as they stand and never staged again (a fix
  *     someone decided meanwhile, staged afresh, would run or offer what was
@@ -2206,7 +2206,7 @@ export async function sweepCardState(
 
 /**
  * One fix as ThreadState stages it: one item of its report, no Turn behind
- * it, its own terms — its one operation, the report's confirmers and 72 h.
+ * it, its own terms — its one operation, the report's confirmers and 24 weekday hours.
  */
 export function sweepProposal(
   plan: SweepCardPlan,

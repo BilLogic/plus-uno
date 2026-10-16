@@ -118,7 +118,7 @@ function createdPages(): MatterPages & { kept: Map<string, string> } {
 
 /** A thread where a PRD turn posted its card and the Check it offer; `more`
  *  are the model's replies to later turns in the same thread. */
-async function offered(more: ScriptedReply[] = []) {
+async function offered(more: ScriptedReply[] = [], asked: Partial<Parameters<typeof request>[0]> = {}) {
   const clock = { t: NOW };
   const threadState = createInMemoryThreadState({ now: () => clock.t });
   const h = harness({ replies: [stagePrd, ...more], threadState, now: () => clock.t });
@@ -126,7 +126,7 @@ async function offered(more: ScriptedReply[] = []) {
     gate: serviceChangeGate({ provider: fakeProvider({ generateReplies: [SERVICE_CHANGE] }), search: async () => MATCH }),
     affordable: () => true,
   });
-  const outcome = await runTurn(request({ userId: REQUESTER, text: "turn this thread into a PRD" }), h.deps);
+  const outcome = await runTurn(request({ userId: REQUESTER, text: "turn this thread into a PRD", ...asked }), h.deps);
   const at = h.delivery.calls.findIndex((c) => c.kind === "check-offer");
   assert.ok(at >= 0, "the turn offered the check");
   const offerTs = `offer-${at + 1}`;
@@ -188,7 +188,7 @@ function resultsDoor(w: World) {
       {
         store: w.threadState,
         createdPage: w.pages.pageOf,
-        stage: (ask) => stageFromButton(ask, { ...w.h.deps, proposalEvents: w.h.deps.usage.proposalEvents }),
+        stage: (ask) => stageFromButton(ask, w.h.deps),
         replaceResults: async (message) => void redrawn.push(message),
         replyEphemeral: async (text) => void told.push(text),
         now: () => w.clock.t,
@@ -239,6 +239,17 @@ test("card waiting: the results carry Add these notes, which stages a revision o
   // The results lose the button: the notes are on the card.
   assert.deepEqual(actionsOf(d.redrawn[0]!), []);
   assert.match(d.redrawn[0]!.text, /Added to the card/);
+});
+
+test("the usage record names the channel of a card the notes stage in a channel, and not in a group DM", async () => {
+  for (const [conversationType, named] of [["channel", CHANNEL], ["mpim", null]] as const) {
+    const w = await offered([], { conversationType });
+    await checked(w);
+    await resultsDoor(w).press(REQUESTER, "add-notes");
+    const [revised] = await turnCards(w.h);
+    const staged = w.h.proposalEvents.events().find((e) => e.proposalId === revised!.proposalTs && e.event === "staged");
+    assert.equal(staged?.channelId, named, `a ${conversationType} card`);
+  }
 });
 
 test("card edited while the check ran: the notes land on the edited version, keeping the edit", async () => {

@@ -16,7 +16,7 @@
 // and no workday is swept twice.
 //
 // Detection runs in the end-of-day jobs and posting at the morning run, so
-// people see a card at the start of their day and its 72 h clock starts when
+// people see a card at the start of their day and its 24 weekday hours start when
 // they can act on it. Stated as a function of the detection time, not of which
 // run is asking, so a morning job that runs late, twice, or on a rehearsal
 // cannot post a finding before its morning.

@@ -25,7 +25,7 @@
 //     is. Nothing typed in the thread decides a card.
 //   • A thread whose drift card is still live is not asked again until it is
 //     decided or lapses: its findings wait, so no card ever retires another.
-//   • Each card lives 72 h, with no re-ping; its confirmers are its file's
+//   • Each card lives 24 weekday hours (`cardExpiresAt`), with no re-ping; its confirmers are its file's
 //     owner plus everyone who posted in the threads that discussed it that
 //     morning. A revision is refused (`DRIFT_NO_REVISION`): the intake is
 //     drafted from the thread as it stands.
@@ -33,13 +33,13 @@
 // private place its evidence is in — and never in #uno-bot.
 //
 // WHILE IT IS LIVE. Each message's cards are kept as a live record for their
-// 72 h. Both scheduled runs look at each record's Figma files again. A card
+// window. Both scheduled runs look at each record's Figma files again. A card
 // whose file now shows its decision is retired, so no Approve can file it,
 // and redrawn in place on the message to say "Updated Sep 30. Nothing to
 // do." Pointers on the morning's message are not edited: other sections share
 // it. A pointer-only message from before the sweep carried them is still
 // edited once every file it names shows its decision. Nothing is ever
-// posted. Past 72 h a card is left as it is: no re-ping, no edit.
+// posted. Past its deadline a card is left as it is: no re-ping, no edit.
 //
 // A SHOWN CARD IS STAGED OR SAYS SO. A file's intake mark is written at the
 // hand-over, so a retried morning never drafts a second card for it; a
@@ -90,7 +90,7 @@ import type { FrameJudge } from "./judge";
 import { draftIntake, matchPillar, pillarCandidates } from "./draft";
 import { askGroupOf, type FileDriftFinding } from "./finding";
 import { slackPersonOfFigma, type FigmaPeople } from "../usage/roles";
-import { cardExpiresAt } from "../card-expiry";
+import { cardExpiresAt, cardLiveAt } from "../card-expiry";
 
 /** Reports with cards per morning; files whose card would be past it wait. */
 export const MAX_REPORTS_PER_MORNING = 4;
@@ -413,7 +413,7 @@ export async function runDriftAsks(job: { key: string }, deps: DriftPostDeps): P
   const byGroup = groupBy([...threads.values()].flatMap((t) => t.findings), askGroupOf);
   for (const [group, list] of [...byGroup].sort((a, b) => earliest(a[1]) - earliest(b[1]))) {
     const mark = deps.dryRun ? null : await deps.store.intakeMark(group);
-    if (mark?.cardTs && cardExpiresAt(mark.markedAt) > now && (await deps.cardLive(markProposalKey({ ...mark, cardTs: mark.cardTs })))) {
+    if (mark?.cardTs && cardLiveAt(mark.markedAt, now) && (await deps.cardLive(markProposalKey({ ...mark, cardTs: mark.cardTs })))) {
       homes.set(group, { kind: "live", mark });
       continue;
     }
@@ -479,12 +479,12 @@ export async function runDriftAsks(job: { key: string }, deps: DriftPostDeps): P
 
 /**
  * Whether a thread holds a drift report with a card still live: one whose
- * live record is within its 72 h and names a file whose card's proposal
+ * live record is within its window (`cardLiveAt`) and names a file whose card's proposal
  * ThreadState still holds.
  */
 async function threadBusy(deps: Pick<DriftPostDeps, "store" | "cardLive">, channel: string, threadTs: string, now: number): Promise<boolean> {
   for (const ask of await deps.store.liveAsksIn(channel, threadTs)) {
-    if (ask.role !== "card" || cardExpiresAt(ask.askedAt) <= now) continue;
+    if (ask.role !== "card" || !cardLiveAt(ask.askedAt, now)) continue;
     // A record from before the shared card names no card per file: its
     // message was the one proposal.
     const keys = ask.files.some((f) => f.itemId) ? ask.files.flatMap((f) => (f.itemId ? [itemProposalKey(ask.ts, f.itemId)] : [])) : [ask.ts];
@@ -865,7 +865,7 @@ function liveFileOf(f: FileDriftFinding, checkedThrough: number): LiveAskFile {
 /**
  * Keep a posted report as live, so the re-check can withdraw it. Best-effort:
  * the report is up whether or not its record lands, and without one it simply
- * lives out its 72 h.
+ * lives out its window.
  */
 async function keepLive(
   store: Pick<DriftStore, "saveLiveAsk" | "markLiveFile">,
@@ -975,7 +975,7 @@ export interface DriftRecheckReport {
 /**
  * Look again at each live report's Figma files. A card whose file now shows
  * its decision is retired and redrawn to say so; a pointer-only message is
- * edited once every file it names does. Never a post. A report past its 72 h
+ * edited once every file it names does. Never a post. A report past its deadline
  * is left as it is.
  *
  * @param job - The `figma-drift-recheck` job
@@ -1007,7 +1007,7 @@ export async function recheckLiveAsks(
   const live: LiveAsk[] = [];
   for (const ask of await deps.store.liveAsks()) {
     // Past its card's window: no re-ping, and no edit either.
-    if (cardExpiresAt(ask.askedAt) <= now) {
+    if (!cardLiveAt(ask.askedAt, now)) {
       if (!deps.dryRun) await deps.store.dropLiveAsk(ask);
       continue;
     }

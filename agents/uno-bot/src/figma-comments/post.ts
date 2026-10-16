@@ -17,7 +17,7 @@
 // and the sweep's fixes. Once the message is up, each card it showed is its
 // own proposal, staged as one item of the message (`itemProposal`):
 //   • its own slot, so every decision is live at once and decided on its own;
-//   • 72 h, with no re-ping when it lapses;
+//   • 24 weekday hours (`cardExpiresAt`), with no re-ping when it lapses;
 //   • confirmers: its file's cards' Contributors; a file with no card, its
 //     place's members, read at the hand-over;
 //   • its own words at the gate, and `refuseRevision`, which points a turn at

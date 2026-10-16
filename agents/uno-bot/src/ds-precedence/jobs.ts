@@ -15,7 +15,7 @@
 //     `../sweep/sections.ts`). It posts nothing of its own: the channel gets
 //     one message a morning. The section is a line with the rule linked, then
 //     one card per component, each its own proposal (`itemProposal`), decided
-//     by the channel's members for six days. A card's Approve runs
+//     by the channel's members within 24 weekday hours (`cardExpiresAt`). Approve runs
 //     `ds_precedence_intake` (`./intake.ts`), which files the week's intake or
 //     comments on it; its Needs changes writes a dispute there
 //     (`./dispute.ts`); its Reject leaves the difference as deliberate.

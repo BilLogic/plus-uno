@@ -82,3 +82,17 @@ export function cardExpiresAt(stagedAt: number): number {
 export function cardTtlMs(stagedAt: number): number {
   return cardExpiresAt(stagedAt) - stagedAt;
 }
+
+/**
+ * Whether a card staged at `stagedAt` is still confirmable at `now`: through
+ * its exact deadline, and not a millisecond past it — as the thread store,
+ * which holds the card, reads it (`thread-state/store.ts` `cardExpiryDueAt`).
+ * A job that asks whether one of its cards is live asks this, so the two
+ * never disagree at the deadline.
+ *
+ * @param stagedAt - When the card was staged, epoch ms
+ * @param now - The time asked about, epoch ms
+ */
+export function cardLiveAt(stagedAt: number, now: number): boolean {
+  return now <= cardExpiresAt(stagedAt);
+}

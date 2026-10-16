@@ -1198,7 +1198,7 @@ async function noteUntagged(deps: Pick<DueDeps, "gaps" | "dryRun">, group: Follo
 
 /**
  * One card's proposal as ThreadState stages it: one item of its report, in
- * the follow-up's thread, for 72 hours. No confirmer set: a card is the
+ * the follow-up's thread, for 24 weekday hours. No confirmer set: a card is the
  * team's, so whoever knows where it stands decides it.
  */
 function itemProposalFor(a: Asked, group: FollowUpGroup, thread: string, messageTs: string): PendingProposal {
@@ -1577,7 +1577,7 @@ async function statusReply(c: CommitmentRecord, reply: CardReply, deps: ReplyDep
 
 /**
  * A posted follow-through card as ThreadState stages it: no Turn behind it,
- * its own slot in the thread, 72 hours, and its confirmers only.
+ * its own slot in the thread, 24 weekday hours, and its confirmers only.
  *
  * @param p - The card and where it went
  * @param posted - Its message's ts and text

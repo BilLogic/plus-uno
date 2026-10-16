@@ -316,7 +316,8 @@ function supersededNote(stated: boolean, replacedBy: ReplacingCard | undefined):
   if (stated) return { kind: "superseded", stated: true };
   const first = replacedBy?.operations[0];
   const by = replacedBy && first ? cardHeadline({ operations: replacedBy.operations, toolName: first.toolName, input: first.input }) : undefined;
-  return { kind: "superseded", ...(by ? { by } : {}) };
+  if (!by) return { kind: "superseded" };
+  return { kind: "superseded", by, ...(replacedBy?.waiting === false ? { byWaiting: false as const } : {}) };
 }
 
 /** Where a resolution speaks: the card's own reply target, never `threadTs` —
@@ -324,6 +325,27 @@ function supersededNote(stated: boolean, replacedBy: ReplacingCard | undefined):
  *  rejects (live 2026-08-22: an approved write said nothing at all). */
 function replyTarget(proposal: PendingProposal): string {
   return proposal.replyTs ?? proposal.threadTs;
+}
+
+/**
+ * Whether another card still waits in the reply thread of the one a door just
+ * decided. A ✅ or ⛔ decides ONE card, never the thread's others (#1318), so
+ * a door that leaves one waiting settles the thread as waiting on the person,
+ * as Turn does when it resolves one of several (`settlementOf`). A failed read
+ * answers no: the settlement the doors had before.
+ *
+ * @param decided - The card the door decided
+ * @param threadState - The thread's live cards
+ */
+export async function otherCardWaits(
+  decided: PendingProposal,
+  threadState: Pick<ThreadState, "getProposalsByThread">,
+): Promise<boolean> {
+  const thread = replyTarget(decided);
+  const live = await threadState
+    .getProposalsByThread({ channel: decided.channel, thread: decided.threadTs })
+    .catch(() => [] as PendingProposal[]);
+  return live.some((card) => card.proposalTs !== decided.proposalTs && replyTarget(card) === thread);
 }
 
 // ── The gate ─────────────────────────────────────────────────────────────────

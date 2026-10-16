@@ -4,10 +4,10 @@
 //   • The store: HARNESS_KV. The queue is one key per channel under
 //     `figma-drift:findings:` (each end-of-day channel job writes only its
 //     own), a finding older than 30 days dropped as it is read; a file's intake
-//     mark under `figma-drift:intake:`, kept past its card's 72 h; a thread's
+//     mark under `figma-drift:intake:`, kept past its card's window; a thread's
 //     ask record under `figma-drift:ask:`, kept 30 days; each posted ask's live
 //     record under `figma-drift:live:<channel>:<thread>:<ts>`, kept the card's
-//     72 h, and beside it `figma-drift:live-file:<file>`, the one read a
+//     window, and beside it `figma-drift:live-file:<file>`, the one read a
 //     file-change notification makes before it looks further. KV, not D1: the queue and the live records hold the thread's words
 //     (ADR-030), and expire.
 //   • Slack: nothing posted — each thread's cards go up on the sweep's

@@ -134,10 +134,11 @@ How the **confirmation gate** actually works at the platform level. This isn't a
 
 **Audit 2026-08-24 — corrected in two places.** The retired `marketplace_add` /
 `marketplace_edit` transitions are gone, and `marketplace_search` was the only
-example of the read-only branch. The TTL is **60 minutes**
-(`PROPOSAL_TTL_MS`, `src/thread-state.ts:85`), not the 15 the diagram claimed —
-the value was tuned after this doc was written. Confirmed: pending proposals
-really are keyed by the proposal message `ts` in the Durable Object.
+example of the read-only branch. A card expires **24 weekday hours** after
+it is staged, counted in ET with Saturday and Sunday skipped (#1315,
+`agents/uno-bot/src/card-expiry.ts`), not the 15 minutes the diagram claimed;
+it is live through its exact deadline. Confirmed: pending proposals really are
+keyed by the proposal message `ts` in the Durable Object.
 
 ```mermaid
 stateDiagram-v2
@@ -154,7 +155,7 @@ stateDiagram-v2
 
   WaitingForConfirm --> Confirmed: user reacts check (matching proposal ts)
   WaitingForConfirm --> Canceled: user reacts x OR replies w/ correction
-  WaitingForConfirm --> TimedOut: 60 min elapsed (PROPOSAL_TTL_MS)
+  WaitingForConfirm --> TimedOut: 24 weekday hours elapsed (cardExpiresAt)
 
   Confirmed --> ToolFired: run the staged operations, react handshake on user msg
   Canceled --> Replied: react wave, ack
@@ -167,7 +168,7 @@ stateDiagram-v2
 
 Key behaviors:
 - **State is stored in the Durable Object.** Keyed by the proposal message's `ts` (Slack message timestamp). When a reaction comes in, the Worker queries the DO by `item.ts` to find the matching pending call.
-- **TTL of 60 min on pending proposals** (`PROPOSAL_TTL_MS`, `src/thread-state.ts`). Prevents stale proposals from being fired hours later.
+- **24 weekday hours on pending proposals** (`cardExpiresAt`, `agents/uno-bot/src/card-expiry.ts`; the store stamps it as the card's `ttlMs`). Prevents stale proposals from being fired days later; a card's last line says its deadline.
 - **User can cancel via ❌ or correction.** If they reply with a correction, the agent re-prompts (back to ProposalPosted with updated parameters).
 
 ---
@@ -182,7 +183,7 @@ Key behaviors:
 
 ## Open questions on these diagrams
 
-1. ~~**Confirmation TTL (15 min)** — right number?~~ **Settled:** 60 min, in `PROPOSAL_TTL_MS`.
+1. ~~**Confirmation TTL (15 min)** — right number?~~ **Settled:** 24 weekday hours, one rule for every card (#1315, `cardExpiresAt`).
 2. **Should the `:warning:` reaction on the bot's proposal also work the other way — bot proposes → user reacts `:warning:` to mean "yes do it"?** That's confusing UX. Better: ✅ for confirm, ❌ for cancel, everything else ignored.
 
 End of flowcharts.

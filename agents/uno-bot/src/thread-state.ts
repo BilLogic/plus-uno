@@ -491,7 +491,7 @@ export class ThreadState extends DurableObject<Env> {
   // Retire without consuming — the counterpart to the claim, and why the two
   // are different methods is on the interface (#583). A missing record is a
   // no-op: there is nothing left that could be acted on.
-  async retireProposal(proposalTs: string, at: number): Promise<{ retired: boolean }> {
+  async retireProposal(proposalTs: string, at: number, by?: string): Promise<{ retired: boolean }> {
     const key = proposalKey(proposalTs);
     return this.storage.transaction(async (txn) => {
       const rec = await txn.get<ProposalRecord>(key);
@@ -500,7 +500,7 @@ export class ThreadState extends DurableObject<Env> {
       if (!rec || rec.decided || rec.retired || rec.supersededBy) return { retired: false };
       if (at - rec.createdAt > recordTtlMs(rec)) return { retired: false };
       const { kept: _, ...settled } = rec;
-      await txn.put<ProposalRecord>(key, { ...settled, retired: true });
+      await txn.put<ProposalRecord>(key, { ...settled, retired: true, ...(by ? { supersededBy: by } : {}) });
       return { retired: true };
     });
   }
@@ -592,7 +592,18 @@ export class ThreadState extends DurableObject<Env> {
         if (!cardExpiryOwed(rec, rec.payload as PendingProposal | null, at)) await txn.delete(proposalKey(proposalTs));
         return { state: "expired", ...ownTtl(proposal), ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal) };
       }
-      if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal) };
+      if (rec.supersededBy || rec.retired) {
+        // A replacement that no longer waits is still named (story 18).
+        const replacedBy = rec.supersededBy
+          ? await replacedByOf(
+              rec.supersededBy,
+              (ts) => txn.get<ProposalRecord>(proposalKey(ts)),
+              (next) => !next.decided && !next.retired && at - next.createdAt <= recordTtlMs(next),
+              (next) => (next.payload as PendingProposal | null) ?? {},
+            )
+          : {};
+        return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal), ...replacedBy };
+      }
       return {
         state: "found",
         proposal: withLiveMark(rec.payload as PendingProposal, at),

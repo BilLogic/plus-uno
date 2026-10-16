@@ -15,7 +15,7 @@
 //
 // EACH FIX IS ITS OWN PROPOSAL: its card's Review opens it alone, decided in
 // the pop-up, and its card redraws in place. CONFIRMERS are the report's
-// owners plus everyone who posted in the thread, and each fix lives 72 hours,
+// owners plus everyone who posted in the thread, and each fix lives 24 weekday hours,
 // with no re-ping when it lapses. Each card names its owner, who is
 // @-mentioned; nobody else is.
 //

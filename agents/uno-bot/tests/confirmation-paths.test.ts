@@ -85,6 +85,20 @@ async function staged(opts: { at?: () => number } = {}): Promise<ThreadState> {
   return store;
 }
 
+/** The card staged, and a separate one beside it in the same reply thread,
+ *  each in a slot of its own (#1318). */
+async function twoCards(): Promise<ThreadState> {
+  const store = createInMemoryThreadState();
+  await store.putProposal({ ...PROPOSAL, supersedeKey: `card:${CARD_TS}` });
+  await store.putProposal({
+    ...PROPOSAL,
+    input: { title: "Session reflections" },
+    proposalTs: "1700000000.000196",
+    supersedeKey: "card:1700000000.000196",
+  });
+  return store;
+}
+
 const reaction = (over: Partial<Extract<GateSignal, { kind: "reaction" }>> = {}): GateSignal => ({
   kind: "reaction",
   messageTs: CARD_TS,
@@ -631,6 +645,24 @@ describe("a card a revision replaced", () => {
     assert.equal(verdict.execute, undefined);
   });
 
+  // Story 18: with several cards waiting, "the newest card in this thread"
+  // may be another matter's, so a replacement that is no longer waiting is
+  // still named, and said to be done.
+  it("names the replacement even once it was decided, and says it is no longer waiting", async () => {
+    const { threadState, revisedTs } = await twoCards();
+    await threadState.putProposal({ ...PROPOSAL, proposalTs: "1700000000.000296", input: { title: "Session reflections" }, supersedeKey: "card:1700000000.000296" });
+    assert.equal((await resolveSignal({ ...button(), messageTs: revisedTs } as GateSignal, { threadState })).outcome, "won");
+
+    const verdict = await resolveSignal(reaction(), { threadState });
+    assert.equal(verdict.outcome, "stale");
+    assert.equal(verdict.execute, undefined);
+    assert.deepEqual(verdict.post?.note, { kind: "superseded", by: "Reflection redesign, tutors only", byWaiting: false });
+    const line = renderGateNote(verdict.post!.note);
+    assert.match(line, /\*Reflection redesign, tutors only\*/, "names the replacement");
+    assert.match(line, /no longer waiting/);
+    assert.doesNotMatch(line, /newest card/, "points at no other card");
+  });
+
   it("declines on the older card without executing or resolving the newer one", async () => {
     const { threadState, revisedTs } = await twoCards();
     const verdict = await resolveSignal(reaction({ glyph: "no_entry" }), { threadState });
@@ -872,6 +904,12 @@ describe("the reaction door", () => {
     return { delivery, ran, targets, reads, threadState, saidBeforeRunning, restaged };
   }
 
+  it("with another card still waiting in the thread, settles as waiting on the person", async () => {
+    const threadState = await twoCards();
+    const { delivery } = await drive({ threadState });
+    assert.equal(clearedWith(delivery), "waiting-on-person", "the other card still waits");
+  });
+
   it("speaks the verdict, runs the tool, and leaves nothing up", async () => {
     const { delivery, ran, saidBeforeRunning } = await drive();
 
@@ -1031,6 +1069,12 @@ describe("the button door", () => {
 
     return { delivery, ran, targets, ephemerals, replacements, threadState, saidBeforeRunning, restaged };
   }
+
+  it("with another card still waiting in the thread, settles as waiting on the person", async () => {
+    const threadState = await twoCards();
+    const { delivery } = await drive({ threadState });
+    assert.equal(clearedWith(delivery), "waiting-on-person", "the other card still waits");
+  });
 
   it("speaks the verdict, runs the tool, and leaves nothing up", async () => {
     const { delivery, ran, saidBeforeRunning, replacements } = await drive();

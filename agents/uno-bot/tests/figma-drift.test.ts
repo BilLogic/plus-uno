@@ -49,6 +49,7 @@ import { proposalEvent, recordProposalEvents } from "../src/usage/index";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
 import { mentionCount, notified } from "./helpers/notified";
 import { at, DESIGN, memoryRunStorage, msg, notionPage, sweepHarness, ts, UNO_BOT, type SweepHarness } from "./helpers/sweep-harness";
+import { cardExpiresAt } from "../src/card-expiry";
 
 type Card = {
   type: string;
@@ -1107,6 +1108,34 @@ describe("the drift check, while the report is live (#897)", () => {
     assert.deepEqual(r.edits, [], "the card already says what happened");
     assert.deepEqual(await drifts.liveAsks(), []);
     assert.match(result.note ?? "", /its card is no longer live/);
+  });
+
+  it("a card is live through its exact deadline, as the store holds it", async () => {
+    const { h, drifts, m } = await recapMorning();
+    await m.run();
+    const key = itemProposalKey(m.posted[0]!.ts, "drift-1");
+    const [ask] = await drifts.liveAsks();
+    const deadline = cardExpiresAt(ask!.askedAt);
+    seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
+
+    h.clock.now = deadline;
+    assert.equal((await h.threadState.getProposalByTs(key)).state, "found", "the store still holds the card");
+    const onTime = recheck(h, drifts, m.figma, { judge: [SHOWS] });
+    await recheckLiveAsks(RECHECK, onTime.deps);
+    assert.deepEqual(onTime.edits.map((e) => cardsOf(e.blocks)[0]!.subtitle!.text), ["Updated Sep 30. Nothing to do."], "withdrawn at the deadline");
+  });
+
+  it("a card one millisecond past its deadline is left as it is", async () => {
+    const { h, drifts, m } = await recapMorning();
+    await m.run();
+    const [ask] = await drifts.liveAsks();
+    seedFigmaFile(m.figma, { changedAt: "2026-09-30T18:00:00Z", frameA: UPDATED });
+
+    h.clock.now = cardExpiresAt(ask!.askedAt) + 1;
+    const late = recheck(h, drifts, m.figma, { judge: [SHOWS] });
+    await recheckLiveAsks(RECHECK, late.deps);
+    assert.deepEqual(late.edits, []);
+    assert.deepEqual(await drifts.liveAsks(), []);
   });
 
   it("looks and judges on a dry run, and edits, retires and writes nothing", async () => {

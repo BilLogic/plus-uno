@@ -9,7 +9,7 @@
 // #plus-design, never #uno-bot. It is decided from Review:
 // Approve posts exactly that text there (`sweep_share_post`, a `worker`
 // tool); Reject drops it. It has the
-// fix card's confirmers, 72 h, and its own slot in the thread
+// fix card's confirmers, 24 weekday hours, and its own slot in the thread
 // (`SWEEP_SHARE_KEY`), so it never replaces the fix card or a turn's card.
 //
 // The note names each page the batch brought up to date and says a group

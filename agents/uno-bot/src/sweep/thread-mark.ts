@@ -9,7 +9,7 @@
 // thread's history or the bot's other posts there.
 //
 // Set when a card is staged into a thread the bot had no history in, and kept
-// past the card's own 72 h by a few days, so the replies that come after it is
+// past the card's own 24 weekday hours by a few days, so the replies that come after it is
 // resolved are read by the same rule.
 //
 // PURE of `Env`: the KV namespace is handed in.
