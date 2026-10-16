@@ -479,11 +479,10 @@ describe('the colour key is finer than the normaliser it replaces', () => {
    * base left its washes stale and nothing said so.
    *
    * Measured over the live tree: 85 `var(--color-*, rgba(…))` sites, every one
-   * captured. 82 name a defined token and are compared with
-   * alpha on both sides; the other 3 name tokens that are defined nowhere,
-   * and are the check's undefined-token finding instead. All 82 agree,
-   * because the disagreeing washes were fixed when the capture widened, and
-   * the test asserts it: a stale wash here is a failure, not a recount.
+   * captured, and every one names a defined token and is compared with
+   * alpha on both sides. All 85 agree, because the disagreeing washes were
+   * fixed when the capture widened, and the test asserts it: a stale wash
+   * here is a failure, not a recount.
    */
   it('compares every live rgba() color fallback with its alpha, because the capture reads a whole color function', () => {
     const roots = ['design-system/src', '.storybook', 'prototypes'];
@@ -533,11 +532,16 @@ describe('the colour key is finer than the normaliser it replaces', () => {
     }
     // 82: the old Dropdown option list and its rows' state washes were
     // deleted when value pickers moved to Select and the shared option row.
-    expect(withAlpha).toBe(82);
+    // 85: the last three washes that named undefined tokens
+    // (`surface-container-hover`, `surface-container-active`,
+    // `primary-state-04`) now name the on-surface and primary state layers,
+    // so they are compared here rather than skipped.
+    expect(withAlpha).toBe(85);
     // 643: MultipleChoice.scss left with ChoiceGroup, and its three hex
     // fallbacks with it. 620: the date pickers moved onto the shared field and
     // calendar, and the old Dropdown option list went, each with its fallbacks.
-    expect(comparable).toBe(620);
+    // 623: the same three washes, now naming defined tokens, became comparable.
+    expect(comparable).toBe(623);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

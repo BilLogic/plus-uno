@@ -52,7 +52,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface-variant`
+`--color-on-surface-variant` · `--layout-control-checkbox`
 
 From `design-system/src/components/forms-and-inputs/InputGroup/InputGroup.scss`. Override these through the token layer, never with a literal.
 
@@ -87,6 +87,7 @@ Implemented as `InputGroupRadio`.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `checked` | bool | — | — |
+| `name` | string | — | Shared by the radios of one group. Each addon is its own group without it. |
 | `size` | enum | — | — |
 | `disabled` | bool | — | — |
 | `onChange` | func | — | — |

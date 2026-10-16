@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 83,
-    "uses": 254,
+    "names": 80,
+    "uses": 248,
     "bare": 5
   },
   "tokens": {
@@ -68,19 +68,7 @@
       "uses": 1,
       "bare": 0
     },
-    "--color-primary-state-04": {
-      "uses": 1,
-      "bare": 0
-    },
     "--color-progress-ring-fill": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--color-surface-container-active": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--color-surface-container-hover": {
       "uses": 1,
       "bare": 0
     },
@@ -101,11 +89,11 @@
       "bare": 0
     },
     "--element-gap-sm": {
-      "uses": 4,
+      "uses": 3,
       "bare": 0
     },
     "--element-radius-sm": {
-      "uses": 2,
+      "uses": 1,
       "bare": 0
     },
     "--font-family-base": {
@@ -229,7 +217,7 @@
       "bare": 0
     },
     "--size-small-gap-xs": {
-      "uses": 31,
+      "uses": 30,
       "bare": 0
     },
     "--size-space-medium": {
