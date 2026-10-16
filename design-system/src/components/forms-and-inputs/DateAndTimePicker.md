@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/DateAndTimePicker.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DateAndTimePicker.stories.jsx` — Overview, Content, Sizes, Styles, InteractionStates, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/DateAndTimePicker.stories.jsx` — Overview, Content, Sizes, Styles, InteractionStates, TimeZones, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DateAndTimePicker.mdx`
 
@@ -34,6 +34,10 @@
 | `minDate` | string or instanceOf | — | — |
 | `maxDate` | string or instanceOf | — | — |
 | `calendarAlign` | enum | `'left'` | — |
+| `timeZone` | string | — | The viewer's IANA time zone, such as `America/New_York`; defaults to the browser's. |
+| `showTimeZone` | bool | `true` | Name the viewer's zone under the time: "Eastern Time (ET)". |
+| `otherTimeZone` | string | — | The other person's IANA zone; when it differs, the caption adds their time. |
+| `otherPerson` | string | — | Who the other person is, as the caption says it: "the student". |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 | `onChange` | func | — | — |
@@ -52,7 +56,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-danger` · `--color-danger-border` · `--color-danger-state-12` · `--color-danger-text` · `--color-focus-ring` · `--color-inverse-primary` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-primary-text` · `--color-success` · `--color-success-border` · `--color-success-state-12` · `--color-success-text` · `--color-surface` · `--color-surface-container` · `--font-family-body` · `--font-family-header` · `--font-line-height-body1` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-line-height-fa-h6-solid` · `--font-line-height-h6` · `--font-size-body1` · `--font-size-body2` · `--font-size-body3` · `--font-size-fa-h6-solid` · `--font-size-h6` · `--font-weight-medium` · `--font-weight-normal` · `--font-weight-semibold-2` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-md` · `--size-element-radius-sm` · `--size-element-stroke-sm` · `--size-modal-gap-md` · `--size-modal-gap-sm` · `--size-modal-pad-x-md` · `--size-modal-pad-y-md` · `--size-modal-radius-md`
+`--color-danger` · `--color-danger-border` · `--color-danger-state-12` · `--color-danger-text` · `--color-focus-ring` · `--color-inverse-primary` · `--color-on-surface` · `--color-on-surface-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-primary-text` · `--color-success` · `--color-success-border` · `--color-success-state-12` · `--color-success-text` · `--color-surface` · `--color-surface-container` · `--font-family-body` · `--font-family-header` · `--font-line-height-body1` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-line-height-fa-h6-solid` · `--font-line-height-h6` · `--font-size-body1` · `--font-size-body2` · `--font-size-body3` · `--font-size-fa-h6-solid` · `--font-size-h6` · `--font-weight-medium` · `--font-weight-normal` · `--font-weight-semibold-2` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-md` · `--size-element-radius-sm`
 
 From `design-system/src/components/forms-and-inputs/DateAndTimePicker.scss`. Override these through the token layer, never with a literal.
 

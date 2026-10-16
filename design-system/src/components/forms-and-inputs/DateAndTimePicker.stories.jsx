@@ -10,7 +10,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'Date and Time Picker component for selecting dates and times. Supports various states including default, focus, disabled, error, and success validation states.',
+                    'A date field and a time field read as one moment, with the viewer’s time zone named beneath. The date half opens the same calendar as DatePicker.',
             },
         },
     },
@@ -182,6 +182,35 @@ export const InteractionStates = () => (
         </div>
     </div>
 );
+
+export const TimeZones = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '600px', paddingBottom: '300px' }}>
+        <DateAndTimePicker
+            id="datetime-tz-same"
+            label="Session start"
+            timeZone="America/New_York"
+            dateValue="2026-10-21"
+            timeValue="04:00 PM"
+        />
+        <DateAndTimePicker
+            id="datetime-tz-other"
+            label="Session start"
+            timeZone="America/Los_Angeles"
+            otherTimeZone="America/New_York"
+            otherPerson="the student"
+            dateValue="2026-10-21"
+            timeValue="01:00 PM"
+        />
+    </div>
+);
+TimeZones.storyName = 'Time zones';
+TimeZones.parameters = {
+    docs: {
+        description: {
+            story: 'The caption names the viewer’s zone. When the other person is elsewhere, it adds their time too.',
+        },
+    },
+};
 
 export const Interactive = (args) => {
     const [value, setValue] = useState(null);
