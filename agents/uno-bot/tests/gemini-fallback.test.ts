@@ -180,3 +180,25 @@ test("a failed turn call logs how long it waited and how big the request was", a
   assert.match(line!, /turns=1/);
   assert.match(line!, /cached=(true|false)/);
 });
+
+test("a successful turn call logs how long it took and what it spent thinking and writing", async () => {
+  stubTimeout({ "gemini-main": [] });
+  const lines: string[] = [];
+  const log = console.log;
+  console.log = (...args: unknown[]) => void lines.push(args.join(" "));
+  try {
+    const provider = await geminiProvider(ENV);
+    await provider.start({ tier: "default", tools: [], system: [{ text: "harness", stable: true }], conversation: [{ role: "user", text: "hi" }] });
+    await provider.send({ toolsEnabled: false });
+  } finally {
+    console.log = log;
+  }
+  const line = lines.find((l) => l.startsWith("[gemini] call ok"));
+  assert.ok(line, `no success line in ${JSON.stringify(lines)}`);
+  assert.match(line!, /model=gemini-main/);
+  assert.match(line!, /ms=\d+/);
+  assert.match(line!, /in=1 out=1/);
+  // The stub's usage carries no thoughtsTokenCount: absent, not zero.
+  assert.match(line!, /thoughts=-/);
+  assert.match(line!, /calls=\[\]/);
+});

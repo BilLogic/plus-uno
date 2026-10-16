@@ -310,6 +310,18 @@ export function geminiProvider(env: Env): ModelProvider {
       usage.cachedInputTokens += parsed.usageMetadata?.cachedContentTokenCount ?? 0;
 
       lastParts = parsed.candidates?.[0]?.content?.parts ?? [];
+      // Every call, not just a failed one: whether a slow call was spent
+      // thinking (nothing on the wire, which streaming would not help) or
+      // writing (which it would) is out / thoughts against ms. `thoughts=-`
+      // is a response that carried no thoughtsTokenCount at all, which is
+      // what a 0 in the usage record cannot tell apart from no thinking.
+      const meta = parsed.usageMetadata;
+      console.log(
+        `[gemini] call ok model=${model} ms=${Date.now() - started} turns=${contents.length} ` +
+          `in=${meta?.promptTokenCount ?? 0} out=${meta?.candidatesTokenCount ?? 0} ` +
+          `thoughts=${meta?.thoughtsTokenCount ?? "-"} finish=${parsed.candidates?.[0]?.finishReason ?? "-"} ` +
+          `calls=[${lastParts.filter((p) => p.functionCall?.name).map((p) => p.functionCall!.name).join(",")}]`,
+      );
       const toolCalls: ModelToolCall[] = lastParts
         .filter((p) => p.functionCall?.name)
         // Gemini has no per-call id: the functionResponse is paired by NAME and
