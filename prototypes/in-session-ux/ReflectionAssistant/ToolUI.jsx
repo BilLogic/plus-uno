@@ -196,7 +196,7 @@ export const QuestionFlow = ({
                                 borderRadius: '8px',
                                 border: '1px solid',
                                 borderColor: isSelected ? 'var(--color-primary, #0472a8)' : 'var(--chat-outline, #e5e7eb)',
-                                background: isSelected ? 'var(--color-primary-state-04, rgba(4, 114, 168, 0.04))' : 'transparent',
+                                background: isSelected ? 'var(--color-primary-state-08, rgba(4, 114, 168, 0.08))' : 'transparent',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s ease',
                                 display: 'flex',
