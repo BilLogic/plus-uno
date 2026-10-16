@@ -1,8 +1,8 @@
 import React from 'react';
 import Modal from '@/components/messaging/Modal';
-import Radio from '@/components/forms-and-inputs/Radio';
+import { ChoiceGroup } from '@/components';
 import { DeleteModalSessionCard } from '@/specs/Toolkit/Pre-Session/Cards/DeleteModalSessionCard.stories';
-import { DeleteSessionRadioItem } from '@/specs/Toolkit/Pre-Session/Elements/DeleteSessionRadioSelection.stories';
+import { dateRangeOption } from '@/specs/Toolkit/Pre-Session/Elements/DeleteSessionRadioSelection.stories';
 import { CancelButton, ConfirmCancelButton } from '@/specs/Toolkit/Pre-Session/Elements/SupervisorManagementButtons.stories';
 
 export default {
@@ -81,37 +81,18 @@ const RecurringNAModalBody = () => (
             />
 
             {/* Radio Options Section */}
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--size-section-gap-md)',
-                    padding: 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)',
-                }}
-            >
-                <Radio
-                    id="delete-only-upcoming"
-                    name="delete-session"
-                    label={<OnlyUpcomingLabel />}
-                    value="only-upcoming"
-                    defaultChecked
-                />
-                <Radio
-                    id="delete-all-recurring"
-                    name="delete-session"
-                    label="All upcoming recurring sessions"
-                    value="all-recurring"
-                />
-                <Radio
-                    id="delete-all-at-school-date"
-                    name="delete-session"
-                    label={<AllAtSchoolOnDateLabel />}
-                    value="all-at-school-date"
-                />
-                <DeleteSessionRadioItem
-                    selected={false}
-                />
-            </div>
+            <ChoiceGroup
+                name="delete-session"
+                aria-label="Sessions to cancel"
+                defaultValue="only-upcoming"
+                style={{ padding: 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)' }}
+                options={[
+                    { id: 'delete-only-upcoming', value: 'only-upcoming', label: <OnlyUpcomingLabel /> },
+                    { id: 'delete-all-recurring', value: 'all-recurring', label: 'All upcoming recurring sessions' },
+                    { id: 'delete-all-at-school-date', value: 'all-at-school-date', label: <AllAtSchoolOnDateLabel /> },
+                    dateRangeOption(),
+                ]}
+            />
 
             {/* Bottom Buttons */}
             <div

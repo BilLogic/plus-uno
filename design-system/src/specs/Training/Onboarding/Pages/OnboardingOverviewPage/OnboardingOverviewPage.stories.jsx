@@ -38,14 +38,14 @@ export default {
         },
         sortBy: {
             control: { type: 'select' },
-            options: ['Name', 'Duration', 'Progress'],
-            description: 'Sort field',
+            options: ['name', 'duration', 'progress'],
+            description: 'Sort by id',
             table: { category: 'Filters' },
         },
         sortOrder: {
             control: { type: 'select' },
-            options: ['A-Z', 'Z-A'],
-            description: 'Sort order',
+            options: ['az', 'za', 'shortest-first', 'longest-first', 'completed-first', 'completed-last'],
+            description: 'Order id',
             table: { category: 'Filters' },
         },
         showEmptyState: {
@@ -74,8 +74,8 @@ export const Overview = {
  */
 export const Interactive = {
     render: (args) => {
-        const [sortBy, setSortBy] = useState(args.sortBy || 'Name');
-        const [sortOrder, setSortOrder] = useState(args.sortOrder || 'A-Z');
+        const [sortBy, setSortBy] = useState(args.sortBy || 'name');
+        const [sortOrder, setSortOrder] = useState(args.sortOrder || 'az');
 
         const handleSortChange = (newSort) => {
             if (newSort.sortBy) setSortBy(newSort.sortBy);
@@ -111,8 +111,8 @@ export const Interactive = {
     },
     args: {
         breakpoint: 'native',
-        sortBy: 'Name',
-        sortOrder: 'A-Z',
+        sortBy: 'name',
+        sortOrder: 'az',
         showEmptyState: false,
     },
 };

@@ -1,63 +1,120 @@
+@use '../status-and-loading/label-heights' as label;
+
 /**
- * TagInput Component Styles
- * The field: a dashed container around its tags. The tags are Tag, in a
- * TagGroup that owns their gaps and wrapping, so nothing here styles a chip.
+ * TagInput — the tags and the entry inside `_Field`'s Content slot.
+ *
+ * The box, its border, fill and states are `_Field`'s; the tags are Tag in a
+ * TagGroup, which owns their look. This file arranges the two: one line with
+ * "+n" while the field is at rest, and, with focus, tags that wrap with the
+ * entry inline after the last one, up to three rows before the content scrolls.
  */
 
-.plus-form-tag-input-wrapper {
-    display: flex;
-    flex-direction: column;
+.plus-tag-input {
+    /* Three rows of tags and the two gaps between them. */
+    --plus-tag-input-max-height: calc(3 * #{label.$tag-height} + 2 * var(--size-element-gap-sm));
+}
+
+.plus-tag-input__anchor {
     width: 100%;
 }
 
-.plus-form-tag-input-label {
-    margin-bottom: var(--size-element-gap-sm, 8px);
-    color: var(--color-on-surface);
-    font-weight: var(--font-weight-normal);
-    
-    .plus-form-tag-input-required {
-        color: var(--color-danger);
-        margin-left: 2px;
-    }
+.plus-tag-input__content {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: var(--size-element-gap-sm);
+    min-width: 0;
+    width: 100%;
 }
 
-.plus-form-tag-input-container {
-    // Container with dashed border and light background
-    min-height: 48px;
-    padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
-    background-color: var(--color-surface-container-low, #f3f3f6);
-    border: 1px dashed var(--color-primary-border, #0472a8);
-    border-radius: var(--size-element-radius-md, 4px);
-    display: flex;
-    flex-direction: column;
-    gap: var(--size-element-gap-sm, 8px);
-    
-    // If empty, show as drop zone
-    &:empty::before {
-        content: '';
-        display: block;
-        height: 24px;
+/* At rest: one line. The group takes the room the entry leaves and counts what fits. */
+.plus-tag-input__content--collapsed {
+    flex-wrap: nowrap;
+
+    .plus-tag-input__tags {
+        flex: 1 1 0;
+    }
+
+    &.plus-tag-input__content--has-tags .plus-tag-input__entry {
+        flex: 0 0 auto;
+        width: var(--size-element-gap-sm);
     }
 }
 
 /*
- * Disabled is carried by the tags, which TagGroup disables: a neutral fill and
- * Secondary (Text), as every disabled tag shows. The field only quiets its
- * dashed edge. An opacity here would dim those tags a second time, past what
- * can be read.
+ * With focus: the tags join the content's own flow, so the entry sits after
+ * the last tag and wraps with them.
  */
-.plus-form-tag-input-disabled {
-    border-color: var(--color-outline-variant);
-    cursor: not-allowed;
+.plus-tag-input__content--expanded {
+    flex-wrap: wrap;
+    max-height: var(--plus-tag-input-max-height);
+    overflow-y: auto;
+
+    .plus-tag-input__tags {
+        display: contents;
+    }
+
+    .plus-tag-input__entry {
+        flex: 1 0 8ch;
+    }
 }
 
-// Size Variants
-.plus-form-tag-input-small {
-    min-height: 40px;
-    padding: var(--size-element-pad-y-sm, 8px) var(--size-element-pad-x-sm, 12px);
+/* The entry's line is a tag's height, so a field with tags is as tall as one without. */
+.plus-tag-input__entry {
+    min-height: label.$tag-height;
 }
 
-.plus-form-tag-input-large {
-    min-height: 56px;
-    padding: var(--size-element-pad-y-lg, 16px) var(--size-element-pad-x-lg, 20px);
+/*
+ * Small: Tag has one height, 22, two more than the small field's 20 line. The
+ * field gives the difference back from its block padding, so it holds 22 tags
+ * and "+n" and stays as tall as any small field.
+ */
+.plus-tag-input__field.plus-field--small {
+    padding-block: calc(var(--size-element-pad-y-sm) - var(--size-element-border) - (#{label.$tag-height} - 1lh) / 2);
+}
+
+/* The handle drawn on every option row while the list can be reordered. */
+.plus-tag-input__grip-mark {
+    color: var(--color-on-surface-variant);
+
+    /* Under the handle button, which draws the same mark. */
+    &.is-covered {
+        visibility: hidden;
+    }
+}
+
+/* The highlighted row's handle and "…", laid over the row by the Listbox. */
+.plus-tag-input__grip {
+    cursor: grab;
+    touch-action: none;
+}
+
+.plus-tag-input__more {
+    margin-left: auto;
+}
+
+/*
+ * The option menu (Figma _Option menu): 240 wide, and as tall as its rows —
+ * Delete and the seven colours fit without the list's scroll.
+ */
+.plus-listbox.plus-tag-input__menu {
+    --plus-listbox-max-height: none;
+
+    width: var(--layout-width-option-menu);
+}
+
+/* The name field in the header, and Delete set off from the colours. */
+.plus-tag-input__rename {
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+}
+
+.plus-tag-input__menu .plus-listbox-options > [role='option'] + [role='group'] {
+    border-top: var(--size-element-border) solid var(--color-outline-variant);
+}
+
+.plus-tag-input__hint {
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
 }

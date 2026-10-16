@@ -78,7 +78,7 @@ const MainContent = ({
                     {user === 'supervisor' && (
                         <TutorFilter value={filters.tutor} onChange={(val) => onFilterChange?.('tutor', val)} />
                     )}
-                    <SiteFilter initialSelection={filters.school} />
+                    <SiteFilter defaultValue={filters.school} />
                 </div>
             </div>
 
@@ -124,8 +124,8 @@ const defaultSessions = [
 ];
 
 const defaultFilters = {
-    tutor: 'All sessions',
-    school: 'All schools'
+    tutor: [],
+    school: []
 };
 
 // Supervisor tabs (includes "All sessions")

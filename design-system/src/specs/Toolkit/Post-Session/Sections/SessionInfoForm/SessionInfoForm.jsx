@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import Checkbox from '@/components/forms-and-inputs/Checkbox';
+import { ChoiceGroup } from '@/components';
 import NavigationButtons from '@/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons';
 import LastUpdated from '@/specs/Toolkit/Post-Session/Elements/LastUpdated/LastUpdated';
 import SessionDate from '@/specs/Toolkit/Post-Session/Elements/SessionDate/SessionDate';
@@ -82,18 +82,6 @@ const SessionInfoForm = ({
     };
 
     /**
-     * @param {string} id
-     */
-    const toggleCancellationReason = (id) => {
-        const selected = formData.cancellationReasons.includes(id);
-        patchForm({
-            cancellationReasons: selected
-                ? formData.cancellationReasons.filter((value) => value !== id)
-                : [...formData.cancellationReasons, id],
-        });
-    };
-
-    /**
      * @returns {object}
      */
     const snapshot = () => ({
@@ -169,25 +157,23 @@ const SessionInfoForm = ({
 
             {hasDateAndSession && formData.didNotHappen && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)', maxWidth: 'var(--col-8)' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                        <p className="body1-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
-                            Select one or more reasons why the session did not happen.
-                            <span style={{ color: 'var(--color-danger)' }}> *</span>
-                        </p>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                            {CANCELLATION_REASON_OPTIONS.map((reason) => (
-                                <Checkbox
-                                    key={reason.id}
-                                    id={`cancel-reason-${reason.id}`}
-                                    label={reason.example
-                                        ? `${reason.label} (${reason.example})`
-                                        : reason.label}
-                                    checked={formData.cancellationReasons.includes(reason.id)}
-                                    onChange={() => toggleCancellationReason(reason.id)}
-                                />
-                            ))}
-                        </div>
-                    </div>
+                    <ChoiceGroup
+                        id="cancel-reason"
+                        name="cancel-reason"
+                        type="checkbox"
+                        required
+                        legend={(
+                            <span className="body1-txt font-weight-semibold">
+                                Select one or more reasons why the session did not happen.
+                            </span>
+                        )}
+                        options={CANCELLATION_REASON_OPTIONS.map((reason) => ({
+                            value: reason.id,
+                            label: reason.example ? `${reason.label} (${reason.example})` : reason.label,
+                        }))}
+                        value={formData.cancellationReasons}
+                        onChange={(cancellationReasons) => patchForm({ cancellationReasons })}
+                    />
 
                     <FreeResponseQuestion
                         id="cancellation-description"

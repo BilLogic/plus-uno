@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import InputGroup from './InputGroup';
 
@@ -28,7 +29,7 @@ export default {
             description: 'Disable the input group',
             table: { category: 'Behavior' }
         },
-        readonly: {
+        readOnly: {
             control: 'boolean',
             description: 'Make the input read-only',
             table: { category: 'Behavior' }
@@ -61,9 +62,6 @@ export default {
             table: { disable: true, category: 'Development' }
         },
         name: {
-            table: { disable: true, category: 'Development' }
-        },
-        trailingVisual2: {
             table: { disable: true, category: 'Development' }
         },
         className: {
@@ -220,7 +218,7 @@ export const InteractionStates = () => (
                 />
                 <InputGroup
                     placeholder="Read-only"
-                    readonly
+                    readOnly
                     value="Read-only value"
                     leadingVisual={{ type: 'text', children: 'Text' }}
                     trailingVisual={{ type: 'text', children: 'Text' }}
@@ -257,7 +255,7 @@ export const Interactive = (args) => {
             <InputGroup
                 size={args.size}
                 disabled={args.disabled}
-                readonly={args.readonly}
+                readOnly={args.readOnly}
                 placeholder={args.placeholder}
                 leadingVisual={visuals.leadingVisual}
                 trailingVisual={visuals.trailingVisual}
@@ -270,7 +268,7 @@ export const Interactive = (args) => {
 Interactive.args = {
     size: 'medium',
     disabled: false,
-    readonly: false,
+    readOnly: false,
     placeholder: 'Placeholder',
     addonPreset: 'baseline',
 };
@@ -280,3 +278,69 @@ Interactive.args = {
  * Comprehensive view of Input Group configurations matching Figma specifications.
  */
 
+
+/**
+ * AddonsInSlots — addons go in the field's Leading and Trailing slots and
+ * draw no box of their own. Buttons are small and cut to the line, so the
+ * field stays 34 high; a side takes one addon or an array.
+ */
+export const AddonsInSlots = () => (
+    <div style={docsCol}>
+        <InputGroup
+            id="ig-price"
+            label="Hourly rate"
+            leadingVisual="$"
+            trailingVisual=".00"
+        />
+        <InputGroup
+            id="ig-invite"
+            label="Invite by email"
+            trailingVisual={[{ type: 'button', text: 'Copy' }, { type: 'button', text: 'Send' }]}
+        />
+        <InputGroup
+            id="ig-agree"
+            label="Agreement note"
+            leadingVisual={{ type: 'checkbox', checked: true, 'aria-label': 'Include a note' }}
+        />
+    </div>
+);
+
+AddonsInSlots.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const box = (name) => canvas.getByRole('textbox', { name }).closest('.plus-field');
+
+    const price = box('Hourly rate');
+    await expect(price.querySelector('.plus-field__leading')).toHaveTextContent('$');
+    await expect(price.querySelector('.plus-field__trailing')).toHaveTextContent('.00');
+
+    // No addon draws a border: the field is the only box.
+    for (const addon of canvasElement.querySelectorAll('.plus-input-group-text')) {
+        await expect(getComputedStyle(addon).borderTopStyle).toBe('none');
+    }
+
+    // Two buttons in Trailing, small and 22 high, and the field stays 34.
+    const invite = box('Invite by email');
+    const buttons = within(invite.querySelector('.plus-field__trailing')).getAllByRole('button');
+    await expect(buttons.map((button) => button.textContent)).toEqual(['Copy', 'Send']);
+    for (const button of buttons) {
+        await expect(button.classList.contains('plus-btn--small')).toBe(true);
+        await expect(Math.round(button.getBoundingClientRect().height)).toBe(22);
+    }
+    await expect(Math.round(invite.getBoundingClientRect().height)).toBe(34);
+
+    // A checkbox addon is named and sits in Leading.
+    const agree = box('Agreement note');
+    const check = within(agree).getByRole('checkbox', { name: 'Include a note' });
+    await expect(check).toBeChecked();
+
+    // It is the Checkbox at code's size, 18 square, centred in its addon.
+    const checkBox = check.getBoundingClientRect();
+    await expect(Math.round(checkBox.width)).toBe(18);
+    await expect(Math.round(checkBox.height)).toBe(18);
+    const addonBox = check.closest('.plus-input-group-checkbox').getBoundingClientRect();
+    const centre = (r) => [r.left + r.width / 2, r.top + r.height / 2];
+    const [checkX, checkY] = centre(checkBox);
+    const [addonX, addonY] = centre(addonBox);
+    await expect(Math.abs(checkX - addonX)).toBeLessThanOrEqual(0.5);
+    await expect(Math.abs(checkY - addonY)).toBeLessThanOrEqual(0.5);
+};

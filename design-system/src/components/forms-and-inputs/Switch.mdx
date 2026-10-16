@@ -29,7 +29,7 @@ Use switch when a user needs to toggle between two states: on and off, true and 
 
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12006"
-    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -72,6 +72,10 @@ Use switch when a user needs to toggle between two states: on and off, true and 
 
 <DocsCanvasShell description={<>Off, on, and disabled.</>}>
     <DsCanvasQuiet of={SwitchStories.InteractionStates} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Read-only: focusable, full contrast, announced read-only, and the setting does not change.</>}>
+    <DsCanvasQuiet of={SwitchStories.ReadOnly} />
 </DocsCanvasShell>
 
 </div>
@@ -118,6 +122,12 @@ component does not name.
 <div className="sb-ds-doc-section">
 
 ## Usage notes
+
+### Read-only shows a setting the person cannot change.
+
+`readOnly` keeps the switch focusable and at full contrast, sets
+`aria-readonly`, and ignores clicks and Space. Use `disabled` for a setting that
+does not apply right now.
 
 ### A switch acts now; a checkbox saves later.
 
@@ -233,7 +243,7 @@ name is empty, and a screen reader announces only "switch, on".
 
 - For a value saved with the rest of a form, use `Checkbox`.
 - For accepting terms, use `Checkbox` — the decision is submitted, not applied on the spot.
-- For one of two named options, use `RadioButtonGroup`.
+- For one of two named options, use `ChoiceGroup`.
 
 </div>
 

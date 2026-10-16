@@ -3,12 +3,11 @@ import { expect, within } from 'storybook/test';
 
 import DateAndTimePicker from './DateAndTimePicker';
 import FileUpload from './FileUpload';
+import ChoiceGroup from './ChoiceGroup';
 import Input from './Input';
-import MultipleChoice from './MultipleChoice';
 import NumberInput from './NumberInput';
 import Radio from './Radio';
 import Rating from './Rating';
-import Scale from './RadioButtonGroup';
 import TagInput from './TagInput';
 import Textarea from './Textarea';
 
@@ -95,9 +94,9 @@ export const NameWithoutId = () => (
         <NumberInput name="quantity" label="Quantity" />
         <FileUpload name="transcript" label="Transcript" />
         <DateAndTimePicker name="starts" label="Session start" />
-        <Scale name="confidence" label="Confidence" options={scaleOptions} />
+        <ChoiceGroup name="confidence" legend="Confidence" orientation="inline" options={scaleOptions} />
         <Rating name="overall" label="Overall rating" value={3} />
-        <TagInput name="topics" label="Topics" tags={['Algebra', 'Geometry']} />
+        <TagInput name="topics" label="Topics" options={['Algebra', 'Geometry']} tags={['Algebra', 'Geometry']} />
     </div>
 );
 
@@ -120,7 +119,8 @@ NameWithoutId.play = async ({ canvasElement }) => {
     // is what this file is about and it did not change; the role did, and this
     // line is where that is recorded.
     canvas.getByRole('radiogroup', { name: /Overall rating/ });
-    canvas.getByRole('group', { name: /Topics/ });
+    // TagInput has a text entry, so its label names that, as any input's does.
+    canvas.getByRole('combobox', { name: /Topics/ });
 };
 
 /**
@@ -133,7 +133,7 @@ export const RadioGroupWithoutIds = () => (
         <Radio name="cadence" label="Every session" value="every" defaultChecked />
         <Radio name="cadence" label="Every other session" value="alternate" />
         <Radio name="cadence" label="Once a month" value="monthly" />
-        <MultipleChoice name="reminder" options={reminderOptions} />
+        <ChoiceGroup name="reminder" legend="Reminder" options={reminderOptions} />
     </div>
 );
 
@@ -263,7 +263,8 @@ ForwardedProps.play = async ({ canvasElement }) => {
 
     // The discriminator. `null` before #230, because the rest object was
     // collected and dropped.
-    await expect(group.getAttribute('aria-describedby')).toBe('fp-starts-error');
+    // The caller's id leads; the field's own time zone caption follows it.
+    await expect(group.getAttribute('aria-describedby').split(' ')[0]).toBe('fp-starts-error');
 
     // And it resolves — a `for`/`describedby` that points at nothing is #206's
     // defect wearing a different attribute.
@@ -304,11 +305,11 @@ export const ExplicitIds = () => (
         <NumberInput id="la-quantity" name="quantity" label="Quantity" />
         <FileUpload id="la-transcript" name="transcript" label="Transcript" />
         <DateAndTimePicker id="la-starts" name="starts" label="Session start" />
-        <Scale id="la-confidence" name="confidence" label="Confidence" options={scaleOptions} />
+        <ChoiceGroup id="la-confidence" name="confidence" legend="Confidence" orientation="inline" options={scaleOptions} />
         <Rating id="la-overall" name="overall" label="Overall rating" value={3} />
-        <TagInput id="la-topics" name="topics" label="Topics" tags={['Algebra']} />
+        <TagInput id="la-topics" name="topics" label="Topics" options={['Algebra']} tags={['Algebra']} />
         <Radio id="la-cadence" name="cadence" label="Every session" value="every" />
-        <MultipleChoice id="la-reminder" name="reminder" options={reminderOptions} />
+        <ChoiceGroup id="la-reminder" name="reminder" legend="Reminder" options={reminderOptions} />
     </div>
 );
 

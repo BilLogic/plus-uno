@@ -44,10 +44,10 @@ const defaultSessions = [
 ];
 
 const defaultFilters = {
-    status: 'All status',
-    tutor: 'All tutors',
-    school: 'All schools',
-    timeframe: 'This week'
+    status: [],
+    tutor: [],
+    school: [],
+    timeframe: 'this_week'
 };
 
 /**
@@ -83,10 +83,10 @@ const BackgroundContent = ({ tabs, selectedTab }) => (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <SectionTitle title="All Sessions" />
                 <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
-                    <SessionStatusFilter initialSelection={defaultFilters.status} />
-                    <TutorFilter value={defaultFilters.tutor} />
-                    <SiteFilter initialSelection={defaultFilters.school} />
-                    <TimeframeFilter value={defaultFilters.timeframe} />
+                    <SessionStatusFilter defaultValue={defaultFilters.status} />
+                    <TutorFilter defaultValue={defaultFilters.tutor} />
+                    <SiteFilter defaultValue={defaultFilters.school} />
+                    <TimeframeFilter defaultValue={defaultFilters.timeframe} />
                 </div>
             </div>
 

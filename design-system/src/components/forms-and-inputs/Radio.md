@@ -9,7 +9,7 @@ Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
 
 **Source:** `design-system/src/components/forms-and-inputs/Radio.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Radio.stories.jsx` — Overview, Content, Layout, Sizes, InteractionStates, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Radio.stories.jsx` — Overview, Content, Layout, Sizes, InteractionStates, Interactive, ReadOnly, DescriptionAndCard
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Radio.mdx`
 
@@ -25,9 +25,13 @@ Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
 | `defaultChecked` | bool | — | — |
 | `size` | enum | `'medium'` | Size variant |
 | `disabled` | bool | `false` | Disable the radio |
+| `readOnly` | bool | `false` | — |
+| `description` | node | — | — |
+| `appearance` | enum | `'plain'` | — |
 | `onChange` | func | — | — |
 | `onFocus` | func | — | — |
 | `onBlur` | func | — | — |
+| `onClick` | func | — | — |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
@@ -35,17 +39,19 @@ Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
 
 **`size`** — `small` · `medium` · `large`
 
+**`appearance`** — `plain` · `card`
+
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-inverse-primary` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-surface-variant` · `--font-family-body` · `--font-weight-normal` · `--size-element-gap-sm` · `--size-element-radius-full` · `--size-element-stroke-lg`
+`--color-inverse-primary` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-surface-variant` · `--font-family-body` · `--font-weight-normal` · `--layout-control-radio` · `--size-element-gap-sm` · `--size-element-radius-full` · `--size-element-stroke-lg`
 
 From `design-system/src/components/forms-and-inputs/Radio.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `MultipleChoice` · `NumberInput` · `OptionList` · `RadioButtonGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

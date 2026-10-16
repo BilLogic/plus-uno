@@ -6,13 +6,45 @@
  * Matches Figma: node-id=258-262435
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Table from '@/components/_internal/Table/Table';
-import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
+import { StatusSelect } from '@/specs/Toolkit/In-Session/Elements/StatusSelect';
 import Badge from '@/components/status-and-loading/Badge/Badge';
 import UserAvatar from '@/components/_internal/UserAvatar/UserAvatar';
 import './TutorsStatusAndWarningsTable.scss';
+
+/**
+ * A tutor's status, set from the table. "Check-In Needed" asks the admin to
+ * act, so its field carries the info colour role.
+ */
+const StatusCell = ({ tutor, options, onStatusChange }) => {
+    const [status, setStatus] = useState(tutor.status);
+    return (
+        <StatusSelect
+            aria-label={`Status for ${tutor.tutorName}`}
+            clearable={false}
+            options={options}
+            value={status}
+            onChange={(next) => {
+                setStatus(next);
+                if (onStatusChange) onStatusChange(tutor.id, next);
+            }}
+            tone={status === 'Check-In Needed' ? 'info' : undefined}
+            className="tutors-status-and-warnings-table__status-select"
+        />
+    );
+};
+
+StatusCell.propTypes = {
+    tutor: PropTypes.shape({
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        tutorName: PropTypes.string,
+        status: PropTypes.string,
+    }).isRequired,
+    options: PropTypes.array.isRequired,
+    onStatusChange: PropTypes.func,
+};
 
 const TutorsStatusAndWarningsTable = ({
     tutors = [],
@@ -36,12 +68,12 @@ const TutorsStatusAndWarningsTable = ({
     const displayTutors = tutors.length > 0 ? tutors : defaultTutors;
 
     const statusOptions = [
-        { text: 'On Track', value: 'On Track' },
-        { text: 'Check-In Needed', value: 'Check-In Needed' },
-        { text: 'On Watch', value: 'On Watch' },
-        { text: 'On TIP', value: 'On TIP' },
-        { text: 'Recommended for Termination', value: 'Recommended for Termination' },
-        { text: 'Inactive', value: 'Inactive' }
+        { label: 'On Track', value: 'On Track' },
+        { label: 'Check-In Needed', value: 'Check-In Needed' },
+        { label: 'On Watch', value: 'On Watch' },
+        { label: 'On TIP', value: 'On TIP' },
+        { label: 'Recommended for Termination', value: 'Recommended for Termination' },
+        { label: 'Inactive', value: 'Inactive' }
     ];
 
     // Define Headers matching standard Table prop format
@@ -133,17 +165,10 @@ const TutorsStatusAndWarningsTable = ({
         },
         {
             content: (
-                <Dropdown
-                    buttonText={tutor.status}
-                    items={statusOptions.map(opt => ({
-                        text: opt.text,
-                        selected: opt.value === tutor.status,
-                        onClick: () => onStatusChange && onStatusChange(tutor.id, opt.value)
-                    }))}
-                    size="small"
-                    style={tutor.status === 'Check-In Needed' ? 'info' : 'secondary'}
-                    fill="ghost"
-                    className="tutors-status-and-warnings-table__status-dropdown"
+                <StatusCell
+                    tutor={tutor}
+                    options={statusOptions}
+                    onStatusChange={onStatusChange}
                 />
             ),
             className: 'tutors-status-and-warnings-table__cell--status'

@@ -1,7 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
-import { Form, Dropdown, InputGroup } from 'react-bootstrap';
+import Dropdown from './Dropdown/Dropdown';
 import useFieldId from './useFieldId';
+import Calendar from './_internal/Calendar';
+import Field, { FieldCaption, toneProps } from './_internal/Field';
+import { useAnchoredPopup } from './_internal/anchorPlacement';
+import { formatIso } from './_internal/dates';
+import { knownZone, localTimeZone, timeZoneCaption, wallTimeToUtc } from './_internal/timeZones';
+import './_internal/Listbox.scss';
 import './DateAndTimePicker.scss';
 
 const DateAndTimePicker = ({
@@ -29,6 +36,14 @@ const DateAndTimePicker = ({
     minDate,
     maxDate,
     calendarAlign = 'left',
+    /** The viewer's IANA time zone; times are shown in it and stored in UTC. */
+    timeZone,
+    /** Name the viewer's zone in a caption under the time. */
+    showTimeZone = true,
+    /** The other person's zone; when it differs, the caption adds their time. */
+    otherTimeZone,
+    /** Who the other person is in the caption, such as "the student". */
+    otherPerson,
     className = '',
     style,
     onChange,
@@ -42,9 +57,6 @@ const DateAndTimePicker = ({
      */
     ...props
 }) => {
-    const [isFocused, setIsFocused] = useState(false);
-    const [dateFocused, setDateFocused] = useState(false);
-    const [timeFocused, setTimeFocused] = useState(false);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
     const [viewDate, setViewDate] = useState(new Date());
@@ -53,9 +65,14 @@ const DateAndTimePicker = ({
     const [amPm, setAmPm] = useState('AM');
     const [isAmPmOpen, setIsAmPmOpen] = useState(false);
     
+    const dateFieldRef = useRef(null);
     const dateInputRef = useRef(null);
     const timeInputRef = useRef(null);
     const calendarRef = useRef(null);
+    // A zone the browser does not know falls back to the viewer's own, and the
+    // caption stays off rather than name a zone nobody asked for.
+    const zone = knownZone(timeZone) || localTimeZone();
+    const showCaption = showTimeZone && (!timeZone || zone === timeZone);
 
     /**
      * Ids for a field that renders two controls (#206).
@@ -80,6 +97,7 @@ const DateAndTimePicker = ({
     const validationId = validation !== 'none' && validationMessage
         ? `${fieldId}-validation`
         : undefined;
+    const timeZoneId = showCaption ? `${fieldId}-time-zone` : undefined;
     const dateInputId = `${fieldId}-date`;
     const timeInputId = `${fieldId}-time`;
     const dateSectionLabelId = showSectionLabels ? `${dateInputId}-section-label` : undefined;
@@ -115,12 +133,6 @@ const DateAndTimePicker = ({
         const day = String(date.getDate()).padStart(2, '0');
         const year = String(date.getFullYear()).slice(-2);
         return `${month}/${day}/${year}`;
-    };
-
-    const formatMonthYear = (date) => {
-        const months = ['January', 'February', 'March', 'April', 'May', 'June',
-            'July', 'August', 'September', 'October', 'November', 'December'];
-        return `${months[date.getMonth()]} ${date.getFullYear()}`;
     };
 
     // Sync with external values
@@ -169,31 +181,53 @@ const DateAndTimePicker = ({
         }
     }, [timeValue]);
 
+    /**
+     * The UTC moment a date and a 12-hour time stand for in the viewer's zone,
+     * or null until both halves are set.
+     *
+     * @param {Date|null} date
+     * @param {string} hours "01"–"12"
+     * @param {string} minutes
+     * @param {'AM'|'PM'} period
+     * @returns {string|null}
+     */
+    const toUtc = (date, hours, minutes, period) => {
+        if (!date || !hours || !minutes) return null;
+        const h12 = parseInt(hours, 10) % 12;
+        return wallTimeToUtc({
+            date: formatIso(date),
+            hours: period === 'PM' ? h12 + 12 : h12,
+            minutes: parseInt(minutes, 10),
+            timeZone: zone,
+        });
+    };
+
+    /**
+     * Tells the caller the value: the date and time as shown, and the moment
+     * in UTC, which is what to store.
+     */
+    const report = (date, hours, minutes, period) => {
+        if (!onChange) return;
+        onChange({
+            date: date ? formatDateForInput(date) : null,
+            time: hours && minutes ? `${hours}:${minutes} ${period}` : null,
+            utc: toUtc(date, hours, minutes, period),
+        });
+    };
+
+    // Focus and hover are drawn by `_Field` from `:focus-within`; these only
+    // tell the caller.
     const handleFocus = (e) => {
-        setIsFocused(true);
         if (onFocus) onFocus(e);
     };
 
     const handleBlur = (e) => {
-        // Don't blur if clicking on calendar or AM/PM dropdown
-        if (calendarRef.current?.contains(e.relatedTarget) || 
+        // Moving into the calendar or the AM/PM menu is not leaving the field.
+        if (calendarRef.current?.contains(e.relatedTarget) ||
             e.relatedTarget?.closest('.plus-datetime-am-pm-dropdown')) {
             return;
         }
-        setIsFocused(false);
-        setDateFocused(false);
-        setTimeFocused(false);
         if (onBlur) onBlur(e);
-    };
-
-    const handleDateFocus = (e) => {
-        setDateFocused(true);
-        handleFocus(e);
-    };
-
-    const handleTimeFocus = (e) => {
-        setTimeFocused(true);
-        handleFocus(e);
     };
 
     const handleCalendarToggle = (nextShow) => {
@@ -224,20 +258,9 @@ const DateAndTimePicker = ({
 
         if (isValid) {
             setSelectedDate(date);
-            const formattedDate = formatDateForInput(date);
-            if (onChange) {
-                onChange({
-                    date: formattedDate,
-                    time: timeHours && timeMinutes ? `${timeHours}:${timeMinutes} ${amPm}` : null
-                });
-            }
+            report(date, timeHours, timeMinutes, amPm);
             setIsCalendarOpen(false);
         }
-    };
-
-    const handleNav = (dir) => {
-        const newDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + dir, 1);
-        setViewDate(newDate);
     };
 
     const handleTimeChange = (type, value) => {
@@ -271,12 +294,7 @@ const DateAndTimePicker = ({
         const currentHours = type === 'hours' ? (value ? String(parseInt(value) || 0).padStart(2, '0') : '') : timeHours;
         const currentMinutes = type === 'minutes' ? (value ? String(parseInt(value) || 0).padStart(2, '0') : '') : timeMinutes;
         
-        if (onChange) {
-            onChange({
-                date: selectedDate ? formatDateForInput(selectedDate) : null,
-                time: currentHours && currentMinutes ? `${currentHours}:${currentMinutes} ${amPm}` : null
-            });
-        }
+        report(selectedDate, currentHours, currentMinutes, amPm);
     };
 
     const handleAmPmChange = (newAmPm) => {
@@ -293,138 +311,58 @@ const DateAndTimePicker = ({
          * that is silent about a change the reader can see is worse than one
          * that reports a half-complete value.
          */
-        if (onChange) {
-            onChange({
-                date: selectedDate ? formatDateForInput(selectedDate) : null,
-                time: timeHours && timeMinutes ? `${timeHours}:${timeMinutes} ${newAmPm}` : null
-            });
-        }
+        report(selectedDate, timeHours, timeMinutes, newAmPm);
     };
 
-    // Determine border color based on state
-    const getBorderColor = () => {
-        if (disabled || readonly) return 'var(--color-outline-variant)';
-        if (validation === 'invalid') return 'var(--color-danger)';
-        if (validation === 'success') return 'var(--color-success)';
-        if (isFocused) return 'var(--color-primary)';
-        return 'var(--color-outline-variant)';
-    };
+    const interactive = !disabled && !readonly;
+    const tone = validation === 'invalid' ? 'invalid' : (validation === 'success' ? 'success' : 'help');
+    const tones = toneProps(tone);
 
-    // Determine background color based on state
-    const getBackgroundColor = () => {
-        if (disabled) return 'var(--color-surface-container-low)';
-        if (readonly) return 'var(--color-surface-container)';
-        return 'var(--color-surface-container-lowest)';
-    };
+    /* The shared calendar, placed by the popup rule: 4px under the date
+     * field, left-aligned (or as `calendarAlign` asks), flipping above. */
+    const closeCalendar = useCallback(() => setIsCalendarOpen(false), []);
+    const calendarPlace = useAnchoredPopup({
+        open: isCalendarOpen,
+        anchorRef: dateFieldRef,
+        popupRef: calendarRef,
+        align: calendarAlign,
+        onClose: closeCalendar,
+    });
 
-    // Determine text color based on state
-    const getTextColor = () => {
-        if (disabled) return 'var(--color-on-surface-variant)';
-        if (readonly && !selectedDate) return 'var(--color-on-surface-variant)';
-        return 'var(--color-on-surface)';
-    };
+    const utc = toUtc(selectedDate, timeHours, timeMinutes, amPm);
+    const caption = useMemo(
+        () => (showCaption ? timeZoneCaption({ timeZone: zone, otherTimeZone, otherPerson, utc }) : ''),
+        [showCaption, zone, otherTimeZone, otherPerson, utc],
+    );
 
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
-
-    // Calendar Render Logic
-    const renderCalendarDays = () => {
-        const year = viewDate.getFullYear();
-        const month = viewDate.getMonth();
-
-        const firstDay = new Date(year, month, 1);
-        const firstDayOfWeek = firstDay.getDay();
-
-        const lastDay = new Date(year, month + 1, 0);
-        const daysInMonth = lastDay.getDate();
-        const prevMonthLastDay = new Date(year, month, 0).getDate();
-
-        const days = [];
-
-        // Previous month days
-        for (let i = firstDayOfWeek - 1; i >= 0; i--) {
-            days.push(
-                <div key={`prev-${i}`} className="plus-datetime-calendar-day plus-datetime-calendar-day-other-month body2-txt">
-                    {prevMonthLastDay - i}
-                </div>
-            );
-        }
-
-        // Current month days
-        const normalizedMin = minDate ? parseDate(minDate) : null;
-        if (normalizedMin) normalizedMin.setHours(0, 0, 0, 0);
-
-        const normalizedMax = maxDate ? parseDate(maxDate) : null;
-        if (normalizedMax) normalizedMax.setHours(23, 59, 59, 999);
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        for (let i = 1; i <= daysInMonth; i++) {
-            const date = new Date(year, month, i);
-            const dateVal = date.getTime();
-
-            let isDisabled = false;
-            if (normalizedMin && dateVal < normalizedMin.getTime()) isDisabled = true;
-            if (normalizedMax && dateVal > normalizedMax.getTime()) isDisabled = true;
-
-            let isSelected = selectedDate &&
-                date.getDate() === selectedDate.getDate() &&
-                date.getMonth() === selectedDate.getMonth() &&
-                date.getFullYear() === selectedDate.getFullYear();
-
-            let isToday = date.getDate() === today.getDate() &&
-                date.getMonth() === today.getMonth() &&
-                date.getFullYear() === today.getFullYear();
-
-            days.push(
-                <button
-                    key={`curr-${i}`}
-                    type="button"
-                    disabled={isDisabled}
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDayClick(date); }}
-                    className={`
-                        plus-datetime-calendar-day body2-txt
-                        ${isDisabled ? 'plus-datetime-calendar-day-disabled' : ''}
-                        ${isSelected ? 'plus-datetime-calendar-day-selected' : ''}
-                        ${isToday ? 'plus-datetime-calendar-day-today' : ''}
-                    `}
-                >
-                    {i}
-                </button>
-            );
-        }
-
-        // Next month days
-        const totalCells = days.length;
-        const remaining = 42 - totalCells;
-        for (let i = 1; i <= remaining; i++) {
-            days.push(
-                <div key={`next-${i}`} className="plus-datetime-calendar-day plus-datetime-calendar-day-other-month body2-txt">
-                    {i}
-                </div>
-            );
-        }
-
-        return days;
-    };
-
-    const validationIcon = validation === 'invalid' ? (
-        <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" />
-    ) : validation === 'success' ? (
-        <i className="fa-solid fa-circle-check" aria-hidden="true" />
-    ) : null;
-
-    // Custom date toggle for calendar
-    const DateToggle = React.forwardRef(({ children, onClick }, ref) => (
-        <div
-            ref={ref}
-            onClick={(e) => {
-                e.preventDefault();
-                onClick(e);
-            }}
-            style={{ display: 'contents' }}
+    /* The AM/PM control sits in the time field's Trailing slot. Live, it is
+     * the PLUS Dropdown, whose menu opens 4px under it by the shared popup
+     * rule; disabled or read-only, it only shows the period. */
+    const periodToggle = (
+        <button
+            type="button"
+            className="plus-datetime-am-pm-toggle"
+            disabled={!interactive}
+            aria-haspopup={interactive ? 'true' : undefined}
+            aria-expanded={interactive ? isAmPmOpen : undefined}
+        >
+            {amPm}
+            {!readonly && <i className="fa-solid fa-caret-down" aria-hidden="true" />}
+        </button>
+    );
+    const period = interactive ? (
+        <Dropdown
+            className="plus-datetime-am-pm-dropdown"
+            isOpen={isAmPmOpen}
+            onToggle={setIsAmPmOpen}
+            toggle={periodToggle}
+            items={['AM', 'PM'].map((option) => ({
+                text: option,
+                selected: amPm === option,
+                onClick: () => handleAmPmChange(option),
+            }))}
         />
-    ));
+    ) : periodToggle;
 
     /*
      * `{...props}` lands on the wrapper, which is also the `group` (#206), so
@@ -446,11 +384,11 @@ const DateAndTimePicker = ({
              * error does not drop your help text. #230 left the caller's value
              * to win outright, which was right when there was nothing of ours to
              * lose. */
-            aria-describedby={[props['aria-describedby'], validationId]
+            aria-describedby={[props['aria-describedby'], timeZoneId, validationId]
                 .filter(Boolean).join(' ') || undefined}
         >
             {hasLabel && (
-                <Form.Label
+                <label
                     id={labelId}
                     htmlFor={showDate ? dateInputId : timeInputId}
                     className={`plus-datetime-label${showLabel ? '' : ' plus-datetime-label-hidden'}`}
@@ -459,93 +397,94 @@ const DateAndTimePicker = ({
                     {required && (
                         <span className="plus-datetime-required" aria-label="required">*</span>
                     )}
-                </Form.Label>
+                </label>
             )}
-            
-            {/* Date Picker Section */}
+
+            {/* Date: `_Field` with the calendar icon in Trailing, as DatePicker draws it. */}
             {showDate && <div className="plus-datetime-section">
                 {showSectionLabels && <div id={dateSectionLabelId} className="plus-datetime-section-label">Date</div>}
-                <div className="plus-datetime-date-wrapper">
-                    <Dropdown
-                        show={isCalendarOpen}
-                        onToggle={handleCalendarToggle}
-                        className="plus-datetime-date-dropdown"
-                    >
-                        <Dropdown.Toggle as={DateToggle} />
-                        <div className="plus-datetime-date-input-container">
-                            <Form.Control
-                                ref={dateInputRef}
-                                type="text"
-                                id={dateInputId}
-                                name={name ? `${name}-date` : undefined}
-                                aria-labelledby={dateLabelledBy || undefined}
-                                aria-label={dateLabelledBy ? undefined : 'Date'}
-                                placeholder={datePlaceholder}
-                                value={selectedDate ? formatDateForInput(selectedDate) : ''}
-                                disabled={disabled}
-                                readOnly={readonly}
-                                className={`plus-datetime-date-input ${sizeClass}`}
-                                style={{
-                                    borderColor: getBorderColor(),
-                                    backgroundColor: getBackgroundColor(),
-                                    color: getTextColor(),
-                                    paddingRight: '40px'
-                                }}
-                                onFocus={handleDateFocus}
-                                onBlur={handleBlur}
-                                onClick={() => !disabled && !readonly && setIsCalendarOpen(true)}
-                            />
-                            <div 
-                                className="plus-datetime-calendar-icon"
-                                onClick={() => !disabled && !readonly && setIsCalendarOpen(!isCalendarOpen)}
-                            >
-                                <i className="fa-regular fa-calendar" aria-hidden="true" />
-                            </div>
-                        </div>
-                        <Dropdown.Menu
-                            ref={calendarRef}
-                            className={`plus-datetime-calendar plus-datetime-calendar-align-${calendarAlign}`}
-                            renderOnMount
+                <Field
+                    ref={dateFieldRef}
+                    size={size}
+                    disabled={disabled}
+                    readOnly={readonly}
+                    {...tones.field}
+                    className="plus-datetime-date-field"
+                    trailing={(
+                        <span
+                            className="plus-datetime-calendar-icon"
+                            aria-hidden="true"
+                            onMouseDown={(event) => {
+                                if (!interactive) return;
+                                event.preventDefault();
+                                dateInputRef.current?.focus();
+                                handleCalendarToggle(!isCalendarOpen);
+                            }}
                         >
-                            <div className="plus-datetime-calendar-header">
-                                <button 
-                                    type="button" 
-                                    className="plus-datetime-calendar-nav" 
-                                    onClick={() => handleNav(-1)} 
-                                    aria-label="Previous month"
-                                >
-                                    <i className="fas fa-chevron-left"></i>
-                                </button>
-                                <div className="plus-datetime-calendar-month-year h6">
-                                    {formatMonthYear(viewDate)}
-                                </div>
-                                <button 
-                                    type="button" 
-                                    className="plus-datetime-calendar-nav" 
-                                    onClick={() => handleNav(1)} 
-                                    aria-label="Next month"
-                                >
-                                    <i className="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-                            <div className="plus-datetime-calendar-weekdays">
-                                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-                                    <div key={d} className="plus-datetime-calendar-weekday body3-txt">{d}</div>
-                                ))}
-                            </div>
-                            <div className="plus-datetime-calendar-days">
-                                {renderCalendarDays()}
-                            </div>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </div>
+                            <i className="fa-solid fa-calendar-day" />
+                        </span>
+                    )}
+                >
+                    <input
+                        ref={dateInputRef}
+                        type="text"
+                        id={dateInputId}
+                        name={name ? `${name}-date` : undefined}
+                        aria-labelledby={dateLabelledBy || undefined}
+                        aria-label={dateLabelledBy ? undefined : 'Date'}
+                        placeholder={datePlaceholder}
+                        value={selectedDate ? formatDateForInput(selectedDate) : ''}
+                        disabled={disabled}
+                        readOnly={readonly}
+                        className="plus-field__control plus-datetime-date-input"
+                        {...tones.control}
+                        onFocus={handleFocus}
+                        onBlur={handleBlur}
+                        onClick={() => interactive && handleCalendarToggle(true)}
+                    />
+                </Field>
+                {isCalendarOpen && createPortal(
+                    <div
+                        ref={calendarRef}
+                        id={`${dateInputId}-calendar`}
+                        role="dialog"
+                        aria-label="Choose a date"
+                        className="plus-listbox plus-listbox--floating plus-date-popup"
+                        data-placement={calendarPlace?.placement ?? 'bottom'}
+                        style={{
+                            top: calendarPlace?.top ?? 0,
+                            left: calendarPlace?.left ?? 0,
+                            minWidth: calendarPlace?.minWidth,
+                            visibility: calendarPlace ? undefined : 'hidden',
+                        }}
+                        onMouseDown={(event) => event.preventDefault()}
+                    >
+                        <Calendar
+                            viewDate={viewDate}
+                            onViewDateChange={setViewDate}
+                            selected={selectedDate}
+                            minDate={minDate}
+                            maxDate={maxDate}
+                            size={size}
+                            onPick={handleDayClick}
+                        />
+                    </div>,
+                    document.body,
+                )}
             </div>}
 
-            {/* Time Picker Section */}
+            {/* Time: `_Field` with the AM/PM menu in Trailing. */}
             <div className="plus-datetime-section">
                 {showSectionLabels && <div id={timeSectionLabelId} className="plus-datetime-section-label">Time</div>}
-                <InputGroup className="plus-datetime-time-input-group">
-                    <Form.Control
+                <Field
+                    size={size}
+                    disabled={disabled}
+                    readOnly={readonly}
+                    {...tones.field}
+                    className="plus-datetime-time-field"
+                    trailing={period}
+                >
+                    <input
                         ref={timeInputRef}
                         type="text"
                         id={timeInputId}
@@ -556,13 +495,9 @@ const DateAndTimePicker = ({
                         value={timeHours && timeMinutes ? `${timeHours}:${timeMinutes}` : (timeHours ? `${timeHours}:` : '')}
                         disabled={disabled}
                         readOnly={readonly}
-                        className={`plus-datetime-time-input ${sizeClass}`}
-                        style={{
-                            borderColor: getBorderColor(),
-                            backgroundColor: timeFocused ? 'var(--color-primary-state-08)' : getBackgroundColor(),
-                            color: getTextColor()
-                        }}
-                        onFocus={handleTimeFocus}
+                        className="plus-field__control plus-datetime-time-input"
+                        {...tones.control}
+                        onFocus={handleFocus}
                         onBlur={handleBlur}
                         onChange={(e) => {
                             const value = e.target.value.replace(/\s/g, '');
@@ -578,53 +513,18 @@ const DateAndTimePicker = ({
                             } else if (value === '') {
                                 setTimeHours('');
                                 setTimeMinutes('');
-                                if (onChange) {
-                                    onChange({
-                                        date: selectedDate ? formatDateForInput(selectedDate) : null,
-                                        time: null
-                                    });
-                                }
+                                report(selectedDate, '', '', amPm);
                             }
                         }}
                     />
-                    <div className={`plus-datetime-am-pm-wrapper ${validation === 'invalid' ? 'plus-datetime-validation-invalid' : ''} ${validation === 'success' ? 'plus-datetime-validation-success' : ''}`}>
-                        <Dropdown
-                            show={isAmPmOpen}
-                            onToggle={setIsAmPmOpen}
-                            className="plus-datetime-am-pm-dropdown"
-                        >
-                            <Dropdown.Toggle
-                                className={`plus-datetime-am-pm-toggle ${sizeClass} ${isAmPmOpen ? 'plus-datetime-am-pm-toggle-active' : ''} ${readonly ? 'plus-datetime-am-pm-toggle-readonly' : ''} ${validation === 'invalid' ? 'plus-datetime-am-pm-toggle-invalid' : ''} ${validation === 'success' ? 'plus-datetime-am-pm-toggle-success' : ''}`}
-                                disabled={disabled || readonly}
-                                style={{
-                                    backgroundColor: isAmPmOpen 
-                                        ? (validation === 'invalid' ? 'var(--color-danger-state-12)' : validation === 'success' ? 'var(--color-success-state-12)' : 'var(--color-primary-state-12)') 
-                                        : (timeFocused ? (validation === 'invalid' ? 'var(--color-danger-state-12)' : validation === 'success' ? 'var(--color-success-state-12)' : 'var(--color-primary-state-12)') : 'transparent'),
-                                    color: isAmPmOpen 
-                                        ? (validation === 'invalid' ? 'var(--color-danger-text)' : validation === 'success' ? 'var(--color-success-text)' : 'var(--color-primary-text)') 
-                                        : (validation === 'invalid' ? 'var(--color-danger-text)' : validation === 'success' ? 'var(--color-success-text)' : 'var(--color-primary-text)')
-                                }}
-                            >
-                                {amPm}
-                                {!readonly && <i className="fa-solid fa-caret-down" aria-hidden="true" />}
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                <Dropdown.Item onClick={() => handleAmPmChange('AM')}>AM</Dropdown.Item>
-                                <Dropdown.Item onClick={() => handleAmPmChange('PM')}>PM</Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </div>
-                </InputGroup>
+                </Field>
+                {showCaption && (
+                    <div id={timeZoneId} className="plus-datetime-time-zone body3-txt">{caption}</div>
+                )}
             </div>
 
             {validation !== 'none' && validationMessage && (
-                <div
-                    id={validationId}
-                    className={`plus-datetime-validation plus-datetime-validation-${validation}`}
-                >
-                    {validationIcon}
-                    <span className="plus-datetime-validation-message">{validationMessage}</span>
-                </div>
+                <FieldCaption messageId={validationId} message={validationMessage} tone={tone} />
             )}
         </div>
     );
@@ -650,6 +550,14 @@ DateAndTimePicker.propTypes = {
     minDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     maxDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     calendarAlign: PropTypes.oneOf(['left', 'center', 'right']),
+    /** The viewer's IANA time zone, such as `America/New_York`; defaults to the browser's, as does a zone the browser does not know, which also hides the caption. */
+    timeZone: PropTypes.string,
+    /** Name the viewer's zone under the time: "Eastern Time (ET)". */
+    showTimeZone: PropTypes.bool,
+    /** The other person's IANA zone; when it differs, the caption adds their time. */
+    otherTimeZone: PropTypes.string,
+    /** Who the other person is, as the caption says it: "the student". */
+    otherPerson: PropTypes.string,
     className: PropTypes.string,
     style: PropTypes.object,
     onChange: PropTypes.func,

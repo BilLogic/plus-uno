@@ -441,11 +441,14 @@ describe('the colour key is finer than the normaliser it replaces', () => {
    * bases already in the corpus; 405 the same day, when ten state-layer bases
    * were re-mixed from their Figma solids and their washes joined those
    * channels; 411 when `--color-focus-ring-inverse` arrived as another solid
-   * #f9f9fc and paired with the six surface overlays. The number is asserted
+   * #f9f9fc and paired with the six surface overlays; 426 when the four
+   * `--color-surface-default|overlay|raised|sunken` roles arrived as aliases
+   * of solid neutrals already in the corpus and brought 15 pairs with their
+   * overlays, every one of the new pairs touching one of the four. The number is asserted
    * rather than logged because a migrating caller's exposure is this number,
    * and a drift in it is news either way.
    */
-  it('differs from the normaliser on 411 live token pairs', () => {
+  it('differs from the normaliser on 426 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
       .map((entry) => entry.value)
       .filter((value) => normaliseColour(value) !== null);
@@ -458,7 +461,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
         pairs += 1;
       }
     }
-    expect(pairs).toBe(411);
+    expect(pairs).toBe(426);
   });
 
   /*
@@ -475,10 +478,10 @@ describe('the colour key is finer than the normaliser it replaces', () => {
    * not seen. That is how every state-layer wash was written, so a re-mixed
    * base left its washes stale and nothing said so.
    *
-   * Measured over the live tree: 90 `var(--color-*, rgba(…))` sites across 20
-   * files, every one captured. 87 name a defined token and are compared with
+   * Measured over the live tree: 85 `var(--color-*, rgba(…))` sites, every one
+   * captured. 82 name a defined token and are compared with
    * alpha on both sides; the other 3 name tokens that are defined nowhere,
-   * and are the check's undefined-token finding instead. All 87 agree,
+   * and are the check's undefined-token finding instead. All 82 agree,
    * because the disagreeing washes were fixed when the capture widened, and
    * the test asserts it: a stale wash here is a failure, not a recount.
    */
@@ -499,7 +502,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
       (n, s) => n + (s.text.match(/var\(\s*--color-[a-z0-9-]+\s*,\s*rgba\(/g) ?? []).length,
       0,
     );
-    expect(washes).toBe(90);
+    expect(washes).toBe(85);
 
     const tokens = new Map(
       [...tokenCorpus({ prefix: '--color-', precedence: 'last' })].map(([name, entry]) => [
@@ -528,8 +531,13 @@ describe('the colour key is finer than the normaliser it replaces', () => {
       withAlpha += 1;
       expect(literal, `${use.path}:${use.line} ${use.token}`).toBe(tokenValue);
     }
-    expect(withAlpha).toBe(87);
-    expect(comparable).toBe(646);
+    // 82: the old Dropdown option list and its rows' state washes were
+    // deleted when value pickers moved to Select and the shared option row.
+    expect(withAlpha).toBe(82);
+    // 643: MultipleChoice.scss left with ChoiceGroup, and its three hex
+    // fallbacks with it. 620: the date pickers moved onto the shared field and
+    // calendar, and the old Dropdown option list went, each with its fallbacks.
+    expect(comparable).toBe(620);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

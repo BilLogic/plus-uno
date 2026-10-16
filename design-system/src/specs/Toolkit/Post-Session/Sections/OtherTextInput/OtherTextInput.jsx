@@ -50,7 +50,6 @@ const OtherTextInput = ({
                 onChange={onChange}
                 placeholder={placeholder}
                 rows={1}
-                variant="short"
                 size="medium"
             />
         </div>

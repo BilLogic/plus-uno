@@ -8,37 +8,34 @@ export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
   "sets": [
     {
-      "id": "date-time-picker",
-      "name": "Date & Time Picker",
-      "componentSetNodeId": "13549:6703",
-      "isComponentSet": false,
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703",
-      "source": "manual",
-      "status": "verified"
-    },
-    {
-      "id": "month-date-picker",
-      "name": "Month (Date Picker)",
+      "id": "date-picker",
+      "name": "DatePicker",
       "componentSetNodeId": "13574:1150",
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13574-1150",
       "source": "manual",
-      "status": "verified"
+      "status": "unpublished",
+      "isComponentSet": true,
+      "notes": "state closed · open · invalid · valid · read-only · disabled × filled? × range? × size. A `_Field` trigger with the calendar-day icon in Trailing; the open variants show `_Calendar` in `_Listbox` Body, 4px (`gap-xs`) below the field, left-aligned, flipping above when there is no room. `range` and `size` are the code props of the same names. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
     },
     {
-      "id": "date-picker-single-date",
-      "name": "Date Picker (Single Date)",
-      "componentSetNodeId": "9413:1764",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9413-1764",
-      "source": "node-chart",
-      "status": "verified"
+      "id": "calendar",
+      "name": "_Calendar",
+      "componentSetNodeId": "18819:40157",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18819-40157",
+      "source": "manual",
+      "status": "unpublished",
+      "isComponentSet": true,
+      "notes": "The month grid both pickers open, one variant per size. In code it is `_internal/Calendar.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
     },
     {
-      "id": "date-picker-range",
-      "name": "Date Picker (Range)",
-      "componentSetNodeId": "9538:17087",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9538-17087",
-      "source": "node-chart",
-      "status": "verified"
+      "id": "calendar-day",
+      "name": "_Calendar Day",
+      "componentSetNodeId": "9413:1755",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9413-1755",
+      "source": "manual",
+      "status": "unpublished",
+      "isComponentSet": true,
+      "notes": "One day cell: default, hover, selected, disabled, today, in range and outside the month, at three sizes. In code it is the day button inside `_internal/Calendar.jsx`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
     }
   ]
 };
@@ -54,7 +51,7 @@ Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (no
 <DocsTab tab="examples">
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9279-4480"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/DatePicker"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -66,7 +63,7 @@ Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (no
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Medium trigger with placeholder — opens calendar on focus.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Medium field with placeholder — a click or Down opens the calendar.</>}>
     <Canvas of={DatePickerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -86,8 +83,18 @@ Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (no
 
 ## Date ranges
 
-<DocsCanvasShell description={<>Paired pickers for a start and end date range.</>}>
+<DocsCanvasShell description={<>One picker with <code>range</code>: a first day, then a last day.</>}>
     <DsCanvasQuiet of={DatePickerStories.PickRange} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Earliest and latest dates
+
+<DocsCanvasShell description={<>Days outside <code>minDate</code> and <code>maxDate</code> are disabled.</>}>
+    <DsCanvasQuiet of={DatePickerStories.Bounds} />
 </DocsCanvasShell>
 
 </div>
@@ -140,9 +147,9 @@ Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (no
 
 ## When to use
 
-Use `DatePicker` for a single calendar date the user picks rather than types — a
-session date, a deadline, a birthday within a bounded range. The trigger is a
-read-only field; the calendar opens beneath it.
+Use `DatePicker` for a calendar date — a session date, a deadline, a birthday
+within a bounded range — or, with `range`, a first and a last day. The field
+takes a typed `MM/DD/YYYY` as well as a click in the calendar.
 
 `value` and `onChange` speak ISO `YYYY-MM-DD`. The closed field displays
 `MM/DD/YYYY`, and the two formats are not the same string — do not read what is
@@ -166,6 +173,31 @@ on screen as the value. `minDate` and `maxDate` accept either an ISO string or a
 <DatePicker value="2026-08-29" onChange={setDate} />
 ```
 
+### A range is one picker, not two.
+
+```jsx
+// value and onChange speak [start, end]; either end may be null while picking.
+<DatePicker range value={[start, end]} onChange={([s, e]) => setSpan([s, e])} />
+```
+
+The first click sets the first day and the second the last; a click before the
+first day starts again. Typed, a range is two dates joined by a dash.
+
+### Typed dates are checked when the person is done.
+
+The field is checked on Enter or when focus leaves it. A real day inside
+`minDate`…`maxDate` is picked and `onChange` fires. Anything else stays as typed,
+the field is drawn invalid, and `onChange` is not called, so the last good value
+is still yours.
+
+### The calendar opens 4px below the field.
+
+The popup sits `--size-element-gap-xs` below the field, its left edge on the
+field's, and at least as wide. With no room below it opens above, the same gap
+away. `calendarAlign` moves it to the centre or the right; near the right edge
+of the viewport it right-aligns on its own. This is the rule every field popup
+shares with `Select`.
+
 ### It gives you a date, not a time.
 
 `onChange` hands back the ISO day and nothing else. For a moment in time, use
@@ -182,8 +214,8 @@ on screen as the value. `minDate` and `maxDate` accept either an ISO string or a
 
 ### Bounds disable days; they do not clamp a value.
 
-A `value` outside `minDate`/`maxDate` is still displayed and still returned. The
-bounds only stop the user from choosing another one, so validate the incoming
+A `value` outside `minDate`/`maxDate` that you pass in is still displayed. The
+bounds stop the user picking or typing another one, so validate the incoming
 value yourself.
 
 </div>
@@ -194,7 +226,8 @@ value yourself.
 
 - **The trigger is wired correctly.** `role="combobox"` with
   `aria-haspopup="dialog"`, `aria-expanded`, and `aria-controls` pointing at the
-  calendar. Enter, Space and Down all open it from the keyboard.
+  calendar. Down opens it from the keyboard, Escape closes it, and Enter checks
+  what was typed.
 - **The days are real buttons.** Each is a `button` with a genuine `disabled`
   attribute outside the bounds, so they are reachable by Tab and announced as
   unavailable rather than doing nothing.
@@ -206,7 +239,12 @@ value yourself.
   against the calendar surface — still lighter than the current month's 13.98:1,
   and above the 4.5:1 that 14px text needs.
 - **There is no arrow-key movement inside the calendar.** Tab steps through the
-  days one at a time; up to 31 tab stops to reach the end of a month.
+  days one at a time; up to 31 tab stops to reach the end of a month. Typing the
+  date is the faster path, and the field accepts it.
+- **A rejected date is announced.** The input carries `aria-invalid` when what
+  was typed is not a day it can take.
+- **In a range, the ends and the span are marked.** Both ends carry
+  `aria-pressed`; the days between are drawn as in range.
 - **`readOnly` and `disabled` both stop the calendar opening.** `disabled` takes
   the input out of the tab order; `readOnly` leaves it focusable and inert,
   which is the right difference between "not for you" and "not now".
@@ -218,10 +256,7 @@ value yourself.
 ## Related
 
 - For a date and a time together, use `DateAndTimePicker`.
-- For a date typed rather than picked, use `Input` with your own validation —
-  a typed date is faster for anyone who knows it.
-- For a range, use two pickers and bound the second with the first's value
-  through `minDate`.
+- For a range, set `range` on one picker rather than pairing two.
 
 </div>
 

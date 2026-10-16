@@ -195,6 +195,11 @@ export default defineConfig({
             // Pass `null` to restore the default. Skeleton's ReducedMotion
             // story uses it.
             commands: {
+              // There is deliberately no forced-colours twin. Emulating
+              // `forced-colors` repaints the whole page, which other story files
+              // share, and leaving it on made later files fail axe
+              // colour-contrast. The Focus visibility stories read the
+              // forced-colours rules from the stylesheet instead.
               emulateReducedMotion: async ({ page }, value) => {
                 await page.emulateMedia({ reducedMotion: value });
               }

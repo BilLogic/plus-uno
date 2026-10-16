@@ -9,7 +9,7 @@ Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
 
 **Source:** `design-system/src/components/forms-and-inputs/Checkbox.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Checkbox.stories.jsx` — Overview, Content, Sizes, InteractionStates, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Checkbox.stories.jsx` — Overview, Content, Sizes, InteractionStates, Interactive, ReadOnly, DescriptionAndCard
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Checkbox.mdx`
 
@@ -26,10 +26,14 @@ Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
 | `indeterminate` | bool | `false` | Indeterminate visual state |
 | `size` | enum | `'medium'` | Size variant |
 | `disabled` | bool | `false` | Disable the checkbox |
+| `readOnly` | bool | `false` | — |
 | `required` | bool | `false` | Show required indicator |
+| `description` | node | — | — |
+| `appearance` | enum | `'plain'` | — |
 | `onChange` | func | — | — |
 | `onFocus` | func | — | — |
 | `onBlur` | func | — | — |
+| `onClick` | func | — | — |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
@@ -37,18 +41,18 @@ Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
 
 **`size`** — `small` · `medium` · `large`
 
+**`appearance`** — `plain` · `card`
+
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-danger` · `--color-focus-ring` · `--color-on-primary` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-surface-container-lowest` · `--color-surface-variant` · `--font-family-body` · `--font-weight-normal` · `--size-element-gap-sm` · `--size-element-radius-sm` · `--size-element-stroke-md`
+`--color-danger` · `--color-focus-ring` · `--color-on-primary` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-surface-container-lowest` · `--color-surface-variant` · `--font-family-body` · `--font-weight-normal` · `--layout-control-checkbox` · `--size-element-gap-sm` · `--size-element-radius-sm` · `--size-element-stroke-md`
 
 From `design-system/src/components/forms-and-inputs/Checkbox.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Cascader` · `ChoiceGrid` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `MultipleChoice` · `NumberInput` · `OptionList` · `Radio` · `RadioButtonGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Cascader` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -14,6 +14,16 @@ export const figmaMeta = {
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=39-4802",
       "source": "node-chart",
       "status": "verified"
+    },
+    {
+      "id": "field",
+      "name": "_Field",
+      "componentSetNodeId": "14841:25919",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
+      "source": "manual",
+      "status": "unpublished",
+      "isComponentSet": true,
+      "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
     }
   ]
 };
@@ -28,8 +38,8 @@ The labeled text input box allows users to enter textual inputs and receive vali
 <DocsTab tab="examples">
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-14133"
-    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-6957"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -70,7 +80,7 @@ The labeled text input box allows users to enter textual inputs and receive vali
 
 ## Sizes
 
-<DocsCanvasShell description={<>Available in medium (default) size.</>}>
+<DocsCanvasShell description={<>Small, medium (default) and large. Heights 28, 34 and 40, as in the library.</>}>
     <DsCanvasQuiet of={InputStories.Sizes} />
 </DocsCanvasShell>
 
@@ -82,6 +92,40 @@ The labeled text input box allows users to enter textual inputs and receive vali
 
 <DocsCanvasShell description={<>Default, hover, focus, disabled, and read-only.</>}>
     <DsCanvasQuiet of={InputStories.InteractionStates} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+<DocsCanvasShell description={<>The label row (label, required asterisk, info tooltip), the `_Field` box with its Leading, Content and Trailing slots, and the caption: a message on the left and a count on the right.</>}>
+    <DsCanvasQuiet of={InputStories.Anatomy} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>An error and a count share the caption; neither replaces the other.</>}>
+    <DsCanvasQuiet of={InputStories.CaptionErrorAndCount} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Subtle
+
+<DocsCanvasShell description={<>Reads as plain text until it is hovered or edited, for record pages where people mostly read. Saves on blur or Enter, Esc cancels, and a failed save stays open in invalid.</>}>
+    <DsCanvasQuiet of={InputStories.Subtle} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Search
+
+<DocsCanvasShell description={<>An Input with the magnifier in Leading and a visually hidden label. It is an example, not a component.</>}>
+    <DsCanvasQuiet of={InputStories.Search} />
 </DocsCanvasShell>
 
 </div>
@@ -141,8 +185,18 @@ a matching icon.
   gets an id and the input an `aria-describedby` naming it, alongside
   `aria-invalid` for `invalid`. A caller's own `aria-describedby` is kept and
   the generated id appended, so passing one does not silence the error.
-- **Extra props land on the input**, so `maxLength`, `autoComplete`, `readOnly`,
-  `pattern` and the rest reach the control rather than its wrapper.
+- **The caption holds a message and a count.** `caption` is standing help;
+  a `validationMessage` takes its place while `validation` is not `none`.
+  `maxLength` adds a count on the right ("24 / 30"), beside either.
+- **Set `autoComplete` on every field the browser can fill.** Login email is
+  `email`, the password is `current-password`, and an access code is
+  `one-time-code`. Extra props land on the input, so `autoComplete`,
+  `pattern`, `inputMode` and the rest reach the control rather than its box.
+- **`subtle` is for editing in place**, on record and profile pages, never in a
+  form someone fills from top to bottom. Pass `onSave`; it is called on blur or
+  Enter, Esc cancels, and while it runs Trailing shows "saving…". Throw or
+  reject and the field stays open in `invalid`, keeping what was typed, with
+  your error as the caption.
 - **`type` is passed straight through.** `type="email"` and `type="tel"` change
   the mobile keyboard as well as the validation, which is worth setting even
   where the form validates server-side.
@@ -161,15 +215,21 @@ a matching icon.
   `name` is a form key, not an id, and no longer stands in for one (#206).
 - **`showLabel={false}` hides the label, it does not remove it.** The label is
   rendered either way and always carries `htmlFor`; `showLabel={false}` only
-  clips it out of sight with `.plus-input-label-hidden`. So a field that has a
+  clips it out of sight with `.plus-field-label--hidden`. So a field that has a
   `label` has an accessible name whether or not you show it, and turning the
   label off costs nothing but the pixels. This was the other way round until
   #213 — see *Why `showLabel` cannot take the name away* below.
-- **`required` is visual only.** It renders a `*` span marked
-  `aria-label="required"` and is not forwarded to the input.
+- **`required` shows an asterisk and sets `aria-required`.** The asterisk is
+  hidden from assistive technology, which hears "required" from the input. The
+  form explains the asterisk once, in a legend above the fields; there are no
+  "(optional)" marks. The browser's own `required` is not set, so the form
+  decides when to validate.
+- **`info` puts a tooltip button beside the label**, outside the `<label>`, so
+  its name is never part of the field's name.
 - **`validation` is announced, not only drawn.** The message gets an id, the
   input points at it with `aria-describedby`, and `validation="invalid"` sets
-  `aria-invalid` (#327). A `success` message describes without claiming an
+  `aria-invalid` and renders the message with `role="alert"`, so it is read out
+  when it appears. A `success` message describes without claiming an
   error. Your own `aria-describedby` is kept and the message id is appended, so
   standing help and a new error are both read, in that order.
 - **A field with no `label` still has no name.** `showLabel` decides whether the
@@ -181,42 +241,26 @@ a matching icon.
   so the native affordances are available even though the wrapper does not use
   them.
 
-### Always pass `id`, or the label points at nothing.
+### Name the field, even when the design shows no label.
 
 ```jsx
-// Incorrect — the label's htmlFor falls back to `name`, but `name` is not used
-// as the input's id. The label ends up pointing at an element that does not
-// exist, and clicking it does nothing.
-<Input name="email" label="Email address" value={email} onChange={onEmail} />
+// Incorrect — a placeholder is not a name, and it disappears as soon as
+// someone types.
+<Input placeholder="Search tutors" />
 
-// Correct — id is what the input actually receives.
-<Input id="email" name="email" label="Email address" value={email} onChange={onEmail} />
+// Correct — the label names the field; showLabel={false} only hides it.
+<Input label="Search tutors" showLabel={false} placeholder="Search tutors" />
 ```
 
-### `required` draws an asterisk; it does not mark the field required.
+### Explain the asterisk once, not on every field.
 
 ```jsx
-// Incorrect — the star appears, but the input carries neither the `required`
-// attribute nor `aria-required`, so nothing outside the visual layer knows.
-<Input id="school" label="School" required value={school} onChange={onSchool} />
+// Incorrect — "(required)" in every label, and an asterisk as well.
+<Input label="School (required)" required />
 
-// Correct — unknown props are spread onto the input, so declare it as well.
-<Input id="school" label="School" required aria-required="true"
-       value={school} onChange={onSchool} />
-```
-
-### `validation` styles the field; it does not announce the error.
-
-```jsx
-// Incorrect — red border, red message, and a screen reader that hears none
-// of it. `validation` only adds classes.
-<Input id="email" label="Email" validation="invalid"
-       validationMessage="Enter a valid email address." />
-
-// Correct — say it in ARIA too, and give the message an id to point at.
-<Input id="email" label="Email" validation="invalid"
-       validationMessage="Enter a valid email address."
-       aria-invalid={true} aria-describedby="email-error" />
+// Correct — the asterisk, with one legend above the form:
+// "Fields marked * are required."
+<Input label="School" required />
 ```
 
 </div>

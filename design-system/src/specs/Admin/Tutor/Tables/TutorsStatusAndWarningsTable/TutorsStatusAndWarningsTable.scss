@@ -64,11 +64,8 @@
         }
 
         &--status {
-            .pdropdown-default-toggle {
-                padding: 4px 0;
-                font-family: 'Merriweather Sans', sans-serif;
-                font-size: 12px !important; // Match Figma Body B3
-                font-weight: 500;
+            .tutors-status-and-warnings-table__status-select {
+                min-width: 12rem;
             }
         }
 

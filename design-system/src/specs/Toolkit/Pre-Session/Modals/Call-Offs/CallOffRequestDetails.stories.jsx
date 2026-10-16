@@ -148,7 +148,6 @@ const AdditionalDetailsTextarea = ({ value, onChange }) => (
             value={value}
             onChange={onChange}
             rows={3}
-            variant="long"
         />
     </div>
 );

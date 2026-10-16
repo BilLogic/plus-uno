@@ -305,7 +305,7 @@ Each component belongs to a Pattern Pack that groups it by interaction role.
 
 ### ListGroup
 **Purpose**: Display lists of related content items.
-**Subcomponents**: ListGroup.Item, ListGroup.Option, ListGroup.OptionList
+**Subcomponents**: ListGroup.Item
 **Props**:
 - `flush`: Remove borders
 - `horizontal`: Horizontal layout

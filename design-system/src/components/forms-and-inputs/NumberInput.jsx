@@ -1,24 +1,48 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { InputGroup as BootstrapInputGroup, Form } from 'react-bootstrap';
+import Button from '../actions/Button/Button';
 import useFieldId from './useFieldId';
-import './NumberInput.scss';
+import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
 
+const toText = (value) => (value === undefined || value === null ? '' : String(value));
+
+/** Decimal places in a number, so 0.1 + 0.2 steps land on 0.3. */
+const decimals = (number) => {
+    const [, fraction = ''] = String(number).split('.');
+    return fraction.length;
+};
+
+/**
+ * NumberInput — a number on `_Field`, with steppers in Trailing.
+ *
+ * Empty is not 0: an empty field stays empty, and stepping from it starts at
+ * 0 (or the nearest bound). A typed value outside `min`/`max` is clamped when
+ * the field loses focus, not while it is typed. The steppers are named
+ * "Decrease {label}" and "Increase {label}", minus before plus as in Figma.
+ * The field is a text input, so the scroll wheel never changes the value.
+ */
 const NumberInput = ({
     id,
     name,
     label,
     required = false,
     showLabel = true,
+    info,
+    caption,
     placeholder = 'Number',
     value,
+    defaultValue,
+    size = 'medium',
     disabled = false,
-    readonly = false,
+    readOnly,
+    /** @deprecated Prefer `readOnly` */
+    readonly,
     validation = 'none', // 'none', 'invalid', 'success'
     validationMessage,
     min,
     max,
     step = 1,
+    subtle = false,
     className = '',
     style,
     onChange,
@@ -28,218 +52,122 @@ const NumberInput = ({
     onDecrement,
     ...props
 }) => {
-    const [isFocused, setIsFocused] = useState(false);
-    const [internalValue, setInternalValue] = useState(value !== undefined ? value : '');
-    /** One id for the label and the input — see `useFieldId` (#206). */
+    /** One id for the label and the input — see `useFieldId`. */
     const fieldId = useFieldId(id);
+    const isReadOnly = readOnly !== undefined ? readOnly : Boolean(readonly);
 
-    /* #327 — see `Input.jsx`, where this pattern is explained once. */
-    const validationId = validation !== 'none' && validationMessage
-        ? `${fieldId}-validation`
-        : undefined;
-    const describedBy = [props['aria-describedby'], validationId]
-        .filter(Boolean).join(' ') || undefined;
-
-    // Sync internal value when external value prop changes
+    const [text, setText] = useState(toText(value !== undefined ? value : defaultValue));
+    // A held value replaces what is shown whenever the caller changes it.
     useEffect(() => {
-        if (value !== undefined) {
-            setInternalValue(value);
-        }
+        if (value !== undefined) setText(toText(value));
     }, [value]);
 
-    const handleFocus = (e) => {
-        setIsFocused(true);
-        if (onFocus) onFocus(e);
+    const tone = validation === 'invalid' ? 'invalid' : (validation === 'success' ? 'success' : 'help');
+    const message = (validation !== 'none' && validationMessage) || caption;
+    const { messageId, countId, describedBy } = fieldDescription({
+        fieldId,
+        message,
+        describedBy: props['aria-describedby'],
+    });
+
+    const clamp = (number) => {
+        let next = number;
+        if (max !== undefined) next = Math.min(next, max);
+        if (min !== undefined) next = Math.max(next, min);
+        return next;
     };
 
-    const handleBlur = (e) => {
-        setIsFocused(false);
-        if (onBlur) onBlur(e);
+    /** Tells the caller, in the shape of a change event. */
+    const emit = (nextText) => {
+        setText(nextText);
+        if (onChange) onChange({ target: { name, value: nextText, type: 'number' } });
     };
 
-    const handleChange = (e) => {
-        const newValue = e.target.value;
-        setInternalValue(newValue);
-        if (onChange) {
-            onChange(e);
+    const stepBy = (direction) => {
+        if (disabled || isReadOnly) return;
+        const current = parseFloat(text);
+        const start = Number.isFinite(current) ? current : 0;
+        const places = Math.max(decimals(step), decimals(start));
+        const next = clamp(Number((start + direction * step).toFixed(places)));
+        emit(String(next));
+        if (direction > 0 && onIncrement) onIncrement(next);
+        if (direction < 0 && onDecrement) onDecrement(next);
+    };
+
+    const handleChange = (event) => {
+        setText(event.target.value);
+        if (onChange) onChange(event);
+    };
+
+    const handleBlur = (event) => {
+        const typed = parseFloat(text);
+        if (text.trim() !== '' && Number.isFinite(typed)) {
+            const clamped = clamp(typed);
+            if (clamped !== typed) emit(String(clamped));
         }
+        if (onBlur) onBlur(event);
     };
 
-    const handleIncrement = () => {
-        if (disabled || readonly) return;
-        
-        /*
-         * #318. An empty field reads as 0, so `min={5}` used to step to 1 —
-         * below its own floor. Clamping to BOTH bounds is what makes the
-         * stepper unable to leave the range it was given, from any start.
-         */
-        const currentValue = parseFloat(value || internalValue) || 0;
-        let finalValue = currentValue + step;
-        if (max !== undefined) finalValue = Math.min(finalValue, max);
-        if (min !== undefined) finalValue = Math.max(finalValue, min);
-        
-        const syntheticEvent = {
-            target: {
-                name: name,
-                value: finalValue.toString(),
-                type: 'number'
-            }
-        };
-        
-        setInternalValue(finalValue.toString());
-        if (onChange) onChange(syntheticEvent);
-        if (onIncrement) onIncrement(finalValue);
-    };
+    const current = parseFloat(text);
+    const atMin = min !== undefined && Number.isFinite(current) && current <= min;
+    const atMax = max !== undefined && Number.isFinite(current) && current >= max;
+    const fieldName = typeof label === 'string' && label ? label : 'value';
 
-    const handleDecrement = () => {
-        if (disabled || readonly) return;
-        
-        const currentValue = parseFloat(value || internalValue) || 0;
-        let finalValue = currentValue - step;
-        if (min !== undefined) finalValue = Math.max(finalValue, min);
-        if (max !== undefined) finalValue = Math.min(finalValue, max);
-        
-        const syntheticEvent = {
-            target: {
-                name: name,
-                value: finalValue.toString(),
-                type: 'number'
-            }
-        };
-        
-        setInternalValue(finalValue.toString());
-        if (onChange) onChange(syntheticEvent);
-        if (onDecrement) onDecrement(finalValue);
-    };
+    const stepper = (direction, icon, words, atBound) => (
+        <Button
+            size="small"
+            style="secondary"
+            fill="outline"
+            leadingVisual={icon}
+            className="plus-field-stepper"
+            disabled={disabled || atBound}
+            onClick={() => stepBy(direction)}
+        >
+            <span className="visually-hidden">{`${words} ${fieldName}`}</span>
+        </Button>
+    );
 
-    // Determine border color based on state
-    const getBorderColor = () => {
-        if (disabled || readonly) return 'var(--color-outline-variant)';
-        if (validation === 'invalid') return 'var(--color-danger)';
-        if (validation === 'success') return 'var(--color-success)';
-        if (isFocused) return 'var(--color-primary)';
-        return 'var(--color-outline-variant)';
-    };
-
-    // Determine background color based on state
-    const getBackgroundColor = () => {
-        if (disabled) return 'var(--color-surface-container-low)';
-        if (readonly) return 'var(--color-surface-container)';
-        return 'var(--color-surface-container-lowest)';
-    };
-
-    // Determine text color based on state
-    const getTextColor = () => {
-        if (disabled) return 'var(--color-on-surface-variant)';
-        if (readonly && !value) return 'var(--color-on-surface-variant)';
-        return 'var(--color-on-surface)';
-    };
-
-
-    const wrapperClasses = [
-        'plus-number-input-wrapper',
-        'plus-number-input-medium',
-        'body2-txt',
-        disabled ? 'plus-number-input-disabled' : '',
-        readonly ? 'plus-number-input-readonly' : '',
-        isFocused ? 'plus-number-input-focused' : '',
-        validation !== 'none' ? `plus-number-input-${validation}` : '',
-        className
-    ].filter(Boolean).join(' ');
-
-    const inputGroupStyle = {
-        '--border-color': getBorderColor(),
-        '--bg-color': getBackgroundColor(),
-        '--text-color': getTextColor(),
-        ...style
-    };
-
-    const validationIcon = validation === 'invalid' ? (
-        <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" />
-    ) : validation === 'success' ? (
-        <i className="fa-solid fa-check" aria-hidden="true" />
-    ) : null;
-
-    const displayValue = value !== undefined ? value : internalValue;
+    const steppers = isReadOnly ? null : (
+        <>
+            {stepper(-1, 'minus', 'Decrease', atMin)}
+            {stepper(1, 'plus', 'Increase', atMax)}
+        </>
+    );
 
     return (
-        <div className="plus-number-input-container">
-            {/*
-              * #318. `showLabel={false}` HIDES the label; it does not delete it.
-              * Deleting it left the input with no accessible name at all, which
-              * is the defect `Input` was fixed for in #213 and which
-              * `LabelAssociation.stories.jsx` states as a rule for the whole
-              * group: showLabel moves pixels only.
-              */}
-            {label && (
-                <Form.Label
-                    htmlFor={fieldId}
-                    className={`plus-number-input-label${showLabel ? '' : ' plus-number-input-label-hidden'}`}
-                >
-                    {label}
-                    {required && (
-                        <span className="plus-number-input-required" aria-label="required">*</span>
-                    )}
-                </Form.Label>
-            )}
-            {/*
-              * #318. Extra props go to the FIELD, not to the group. The group is
-              * a `div` with no role and no name, so a caller's `aria-describedby`
-              * landed somewhere it could not help. `DateAndTimePicker` forwards
-              * to a wrapper that IS the named group (#230); this component has no
-              * such wrapper, so the input is the only correct destination.
-              */}
-            <BootstrapInputGroup
-                className={wrapperClasses}
-                style={inputGroupStyle}
+        <FieldStack disabled={disabled} className={`plus-number-input ${className}`.trim()} style={style}>
+            <FieldLabel htmlFor={fieldId} required={required} info={info} hidden={!showLabel}>
+                {label}
+            </FieldLabel>
+            <Field
+                size={size}
+                subtle={subtle}
+                disabled={disabled}
+                readOnly={isReadOnly}
+                {...toneProps(tone).field}
+                trailing={steppers}
             >
-                <Form.Control
+                <input
                     id={fieldId}
                     name={name}
                     type="text"
+                    inputMode="decimal"
                     placeholder={placeholder}
-                    value={displayValue}
+                    value={text}
                     disabled={disabled}
-                    readOnly={readonly}
+                    readOnly={isReadOnly}
                     onChange={handleChange}
-                    onFocus={handleFocus}
+                    onFocus={onFocus}
                     onBlur={handleBlur}
-                    className="plus-number-input-field"
+                    className="plus-field__control plus-number-input__control"
+                    aria-required={required || undefined}
                     {...props}
                     aria-describedby={describedBy}
-                    aria-invalid={validation === 'invalid' || undefined}
+                    {...toneProps(tone).control}
                 />
-                <BootstrapInputGroup.Text className="plus-number-input-buttons">
-                    <button
-                        type="button"
-                        className="plus-number-input-button plus-number-input-button-increment"
-                        disabled={disabled || readonly || (max !== undefined && parseFloat(displayValue) >= max)}
-                        onClick={handleIncrement}
-                        aria-label="Increment"
-                    >
-                        <i className="fa-solid fa-plus" aria-hidden="true" />
-                    </button>
-                    <button
-                        type="button"
-                        className="plus-number-input-button plus-number-input-button-decrement"
-                        disabled={disabled || readonly || (min !== undefined && parseFloat(displayValue) <= min)}
-                        onClick={handleDecrement}
-                        aria-label="Decrement"
-                    >
-                        <i className="fa-solid fa-minus" aria-hidden="true" />
-                    </button>
-                </BootstrapInputGroup.Text>
-            </BootstrapInputGroup>
-            {validation !== 'none' && validationMessage && (
-                <div
-                    id={validationId}
-                    className={`plus-number-input-validation plus-number-input-validation-${validation}`}
-                >
-                    {validationIcon}
-                    <span className="plus-number-input-validation-message">{validationMessage}</span>
-                </div>
-            )}
-        </div>
+            </Field>
+            <FieldCaption messageId={messageId} message={message} tone={tone} countId={countId} />
+        </FieldStack>
     );
 };
 
@@ -247,17 +175,32 @@ NumberInput.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
     label: PropTypes.node,
+    /** Shows an asterisk and sets `aria-required`. */
     required: PropTypes.bool,
     showLabel: PropTypes.bool,
+    /** Text for an info tooltip beside the label. */
+    info: PropTypes.node,
+    /** Standing help under the field. A validation message takes its place. */
+    caption: PropTypes.node,
     placeholder: PropTypes.string,
+    /** Empty (`''` or `null`) stays empty; it is never read as 0. */
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
+    /** Hides the steppers; the value can be read and copied. */
+    readOnly: PropTypes.bool,
+    /** @deprecated Prefer `readOnly` */
     readonly: PropTypes.bool,
     validation: PropTypes.oneOf(['none', 'invalid', 'success']),
-    validationMessage: PropTypes.string,
+    validationMessage: PropTypes.node,
+    /** Lower bound. A typed value below it is raised to it when the field loses focus. */
     min: PropTypes.number,
+    /** Upper bound. A typed value above it is lowered to it when the field loses focus. */
     max: PropTypes.number,
     step: PropTypes.number,
+    /** Borderless until hovered or edited. */
+    subtle: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,
     onChange: PropTypes.func,
@@ -268,6 +211,3 @@ NumberInput.propTypes = {
 };
 
 export default NumberInput;
-
-
-

@@ -8,7 +8,7 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
-## UI components (64)
+## UI components (61)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [Alert](../../src/components/messaging/Alert/index.md)
@@ -22,6 +22,7 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [Cascader](../../src/components/forms-and-inputs/Cascader.md)
 - [Checkbox](../../src/components/forms-and-inputs/Checkbox.md)
 - [ChoiceGrid](../../src/components/forms-and-inputs/ChoiceGrid.md)
+- [ChoiceGroup](../../src/components/forms-and-inputs/ChoiceGroup.md)
 - [CloseButton](../../src/components/actions/CloseButton/index.md)
 - [Collapse](../../src/components/layout-and-structure/Collapse/index.md)
 - [Count](../../src/components/status-and-loading/Count/index.md)
@@ -38,12 +39,10 @@ This index is the existence list. Each entry links to its generated doc — prop
 - Logo — exported here, implemented outside `src/components/`; read the source
 - [MediaObject](../../src/components/layout-and-structure/MediaObject/index.md)
 - [Modal](../../src/components/messaging/Modal/index.md)
-- [MultipleChoice](../../src/components/forms-and-inputs/MultipleChoice.md)
 - [NavPills](../../src/components/navigation/NavPills/index.md)
 - [NavTabs](../../src/components/navigation/NavTabs/index.md)
 - [Navbar](../../src/components/_internal/Navbar/index.md)
 - [NumberInput](../../src/components/forms-and-inputs/NumberInput.md)
-- [OptionList](../../src/components/forms-and-inputs/OptionList.md)
 - [Pagination](../../src/components/navigation/Pagination/index.md)
 - [Popover](../../src/components/overlays/Popover/index.md)
 - [Progress](../../src/components/status-and-loading/Progress/index.md)
@@ -51,11 +50,9 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [Range](../../src/components/forms-and-inputs/Range.md)
 - [Rating](../../src/components/forms-and-inputs/Rating.md)
 - [RichTextEditor](../../src/components/forms-and-inputs/RichTextEditor/index.md)
-- [Scale](../../src/components/forms-and-inputs/RadioButtonGroup.md) — alias of `RadioButtonGroup`, same props
 - [ScrollBar](../../src/components/layout-and-structure/ScrollBar/index.md)
 - [Scrollspy](../../src/components/navigation/Scrollspy/index.md)
 - [Select](../../src/components/forms-and-inputs/Select.md)
-- [SelectMultiple](../../src/components/forms-and-inputs/SelectMultiple.md)
 - [Sidebar](../../src/components/_internal/Sidebar/index.md)
 - [SidebarTab](../../src/components/navigation/SidebarTab/index.md)
 - [Skeleton](../../src/components/status-and-loading/Skeleton/index.md)

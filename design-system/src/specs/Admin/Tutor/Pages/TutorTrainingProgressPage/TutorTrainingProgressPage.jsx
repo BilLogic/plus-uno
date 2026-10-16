@@ -327,11 +327,6 @@ const TutorTrainingProgressPage = ({
                         searchPlaceholder="Search"
                         onSearch={onSearchChange}
                         onExport={onExportCSV}
-                        filters={[
-                            { key: 'lessons', label: 'All Lessons' },
-                            { key: 'startDate', label: 'All Start Date' },
-                            { key: 'name', label: 'Name' }
-                        ]}
                     />
 
                     {/* Tutors Training Progress Table */}

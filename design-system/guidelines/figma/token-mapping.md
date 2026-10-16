@@ -31,6 +31,11 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 | Outline Variant | `var(--color-outline-variant)` | Subtle borders |
 | Focus / Focus Ring | `var(--color-focus-ring)` | Every focus indicator on a neutral ground |
 | Focus / Focus Ring Inverse | `var(--color-focus-ring-inverse)` | Focus indicator on a colored or dark ground; aliases surface |
+| Element/opacity-disabled | `var(--color-disabled-opacity)` | 0.38 on the whole disabled control. Figma files it in size / semantics as 38, because it reads an opacity variable as a percentage |
+| Surface roles/surface-default | `var(--color-surface-default)` | The page; aliases `--surface-default` |
+| Surface roles/surface-sunken | `var(--color-surface-sunken)` | The ground behind grouped things; aliases `--surface-sunken` |
+| Surface roles/surface-raised | `var(--color-surface-raised)` | A card that lifts; pair with `--surface-raised-shadow` |
+| Surface roles/surface-overlay | `var(--color-surface-overlay)` | Popovers and toasts; pair with `--surface-overlay-shadow` |
 
 ### SMART Competency Colors
 | Figma | PLUS CSS Token |
@@ -87,6 +92,20 @@ Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity 
 | Elevation Light/3 (popovers, toasts) | `var(--elevation-light-3)` |
 | Elevation Light/4 (modals) | `var(--elevation-light-4)` |
 | Elevation Light/5 (dialogs) | `var(--elevation-light-5)` |
+
+## Layout Tokens
+
+| Figma Variable | PLUS CSS Token | Notes |
+|----------------|----------------|-------|
+| Min Heights/listbox | `var(--layout-min-height-listbox)` | 140 at every breakpoint. Code does not apply it: a list is as tall as its rows, so a short list has no empty band |
+| Max Heights/listbox | `var(--layout-max-height-listbox)` | 300 at every breakpoint, about eight rows; the body scrolls past it |
+| Min Heights/card-body | `var(--layout-min-height-card-body)` | 20 / 30 / 40 at MD / LG / XL |
+| Min Heights/modal-body | `var(--layout-min-height-modal-body)` | 40 / 50 / 60 at MD / LG / XL |
+| — (code only) | `var(--layout-z-index-overlay)` | 1070, the layer floating listboxes and menus draw on: above a modal, level with popovers. Figma has no z-index |
+| — (code only) | `var(--layout-max-width-listbox)` | 320, the widest a popup from a field or button grows. A popup with columns (Cascader, the calendar) is exempt |
+| — (code only) | `var(--layout-control-checkbox)` · `var(--layout-control-radio)` | 18 and 12, the checkbox box and radio dot; a description or reveal under the label indents by one plus the label gap |
+| — (code only) | `var(--layout-calendar-day-sm)` · `var(--layout-calendar-day-md)` · `var(--layout-calendar-day-lg)` · `var(--layout-calendar-nav)` | 28 / 36 / 44 calendar days by picker size, and the 32 month buttons |
+| — (code only) | `var(--layout-width-join-row)` | 520, the Home Join button with the session Select beside it |
 
 ## Rules for create_design_system_rules
 

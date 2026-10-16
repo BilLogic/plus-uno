@@ -7,6 +7,7 @@
 .plus-file-upload-wrapper {
     display: flex;
     flex-direction: column;
+    gap: var(--size-element-gap-xs, 4px);
     width: 100%;
 }
 
@@ -28,7 +29,7 @@
         box-shadow: 0 0 0 0.2rem var(--color-danger-state-08);
     }
     
-    &.plus-file-upload-success {
+    &.plus-file-upload-valid {
         box-shadow: 0 0 0 0.2rem var(--color-success-state-08);
     }
     
@@ -37,6 +38,12 @@
     // keep sufficient color contrast (WCAG AA). The button handles its own disabled style.
     &.plus-file-upload-disabled {
         cursor: not-allowed;
+    }
+
+    // Read-only: the field box reads as a fixed value, like the Input read-only state.
+    &.plus-file-upload-readonly {
+        background-color: var(--color-surface-variant);
+        cursor: default;
     }
 }
 
@@ -53,7 +60,7 @@
     }
 }
 
-.plus-file-upload-disabled .plus-file-upload-label {
+.plus-file-upload-label-disabled {
     color: var(--color-on-surface-variant);
 }
 
@@ -85,6 +92,13 @@
     pointer-events: none;
 }
 
+// Uploaded-file list, below the framed field
+.plus-file-upload-files {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
 // Validation message
 .plus-file-upload-validation {
     display: flex;
@@ -92,7 +106,6 @@
     gap: var(--size-element-gap-xs, 4px);
     font-size: var(--font-size-body3);
     line-height: var(--font-line-height-body3);
-    margin-top: var(--size-element-gap-xs, 4px);
     
     i {
         font-size: var(--font-size-body3);
@@ -108,7 +121,7 @@
     }
 }
 
-.plus-file-upload-validation-success {
+.plus-file-upload-validation-valid {
     color: var(--color-success);
     
     i {

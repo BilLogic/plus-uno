@@ -25,6 +25,11 @@
       "Outline Variant": "var(--color-outline-variant)",
       "Focus / Focus Ring": "var(--color-focus-ring)",
       "Focus / Focus Ring Inverse": "var(--color-focus-ring-inverse)",
+      "Element/opacity-disabled": "var(--color-disabled-opacity)",
+      "Surface roles/surface-default": "var(--color-surface-default)",
+      "Surface roles/surface-sunken": "var(--color-surface-sunken)",
+      "Surface roles/surface-raised": "var(--color-surface-raised)",
+      "Surface roles/surface-overlay": "var(--color-surface-overlay)",
       "Mastering Content": "var(--color-mastering-content)",
       "Relationship": "var(--color-relationship)",
       "Social Emotional": "var(--color-social-emotional)",
@@ -98,6 +103,7 @@
     "colors / accent": {
       "Advocacy/Advocacy": "var(--color-advocacy)",
       "Advocacy/Advocacy (Text)": "var(--color-advocacy-text)",
+      "Advocacy/Advocacy Border Subtle": "var(--color-advocacy-border-subtle)",
       "Advocacy/Advocacy Container": "var(--color-advocacy-container)",
       "Advocacy/On Advocacy": "var(--color-on-advocacy)",
       "Advocacy/On Advocacy Container": "var(--color-on-advocacy-container)",
@@ -111,6 +117,7 @@
       "Danger/Danger": "var(--color-danger)",
       "Danger/Danger (Text)": "var(--color-danger-text)",
       "Danger/Danger Border": "var(--color-danger-border)",
+      "Danger/Danger Border Subtle": "var(--color-danger-border-subtle)",
       "Danger/Danger Container": "var(--color-danger-container)",
       "Danger/Danger Icon": "var(--color-danger-icon)",
       "Danger/On Danger": "var(--color-on-danger)",
@@ -122,6 +129,7 @@
       "Danger/State-layers/Danger Container 12": "var(--color-danger-container-state-12)",
       "Danger/State-layers/Danger Container 16": "var(--color-danger-container-state-16)",
       "Focus/Focus Ring": "var(--color-focus-ring)",
+      "Focus/Focus Ring Inverse": "var(--color-focus-ring-inverse)",
       "Info/Info": "var(--color-info)",
       "Info/Info (Text)": "var(--color-info-text)",
       "Info/Info Border": "var(--color-info-border)",
@@ -137,6 +145,7 @@
       "Info/State-layers/Info Container 16": "var(--color-info-container-state-16)",
       "Mastering-Content/Mastering-Content": "var(--color-mastering-content)",
       "Mastering-Content/Mastering-Content (Text)": "var(--color-mastering-content-text)",
+      "Mastering-Content/Mastering-Content Border Subtle": "var(--color-mastering-content-border-subtle)",
       "Mastering-Content/Mastering-Content Container": "var(--color-mastering-content-container)",
       "Mastering-Content/On Mastering-Content": "var(--color-on-mastering-content)",
       "Mastering-Content/On Mastering-Content Container": "var(--color-on-mastering-content-container)",
@@ -164,6 +173,7 @@
       "Relationship/On Relationship Container": "var(--color-on-relationship-container)",
       "Relationship/Relationship": "var(--color-relationship)",
       "Relationship/Relationship (Text)": "var(--color-relationship-text)",
+      "Relationship/Relationship Border Subtle": "var(--color-relationship-border-subtle)",
       "Relationship/Relationship Container": "var(--color-relationship-container)",
       "Relationship/State-layers/Relationship 08": "var(--color-relationship-state-08)",
       "Relationship/State-layers/Relationship 12": "var(--color-relationship-state-12)",
@@ -188,6 +198,7 @@
       "Social-Emotional/On Social-Emotional Container": "var(--color-on-social-emotional-container)",
       "Social-Emotional/Social-Emotional": "var(--color-social-emotional)",
       "Social-Emotional/Social-Emotional (Text)": "var(--color-social-emotional-text)",
+      "Social-Emotional/Social-Emotional Border Subtle": "var(--color-social-emotional-border-subtle)",
       "Social-Emotional/Social-Emotional Container": "var(--color-social-emotional-container)",
       "Social-Emotional/State-layers/Social-Emotional 08": "var(--color-social-emotional-state-08)",
       "Social-Emotional/State-layers/Social-Emotional 12": "var(--color-social-emotional-state-12)",
@@ -206,6 +217,7 @@
       "Success/Success": "var(--color-success)",
       "Success/Success (Text)": "var(--color-success-text)",
       "Success/Success Border": "var(--color-success-border)",
+      "Success/Success Border Subtle": "var(--color-success-border-subtle)",
       "Success/Success Container": "var(--color-success-container)",
       "Success/Success Icon": "var(--color-success-icon)",
       "Technology-Tools/On Technology-Tools": "var(--color-on-technology-tools)",
@@ -218,6 +230,7 @@
       "Technology-Tools/State-layers/Technology-Tools Container 16": "var(--color-technology-tools-container-state-16)",
       "Technology-Tools/Technology-Tools": "var(--color-technology-tools)",
       "Technology-Tools/Technology-Tools (Text)": "var(--color-technology-tools-text)",
+      "Technology-Tools/Technology-Tools Border Subtle": "var(--color-technology-tools-border-subtle)",
       "Technology-Tools/Technology-Tools Container": "var(--color-technology-tools-container)",
       "Tertiary/On Tertiary": "var(--color-on-tertiary)",
       "Tertiary/On Tertiary Container": "var(--color-on-tertiary-container)",
@@ -230,6 +243,7 @@
       "Tertiary/Tertiary": "var(--color-tertiary)",
       "Tertiary/Tertiary (Text)": "var(--color-tertiary-text)",
       "Tertiary/Tertiary Border": "var(--color-tertiary-border)",
+      "Tertiary/Tertiary Border Subtle": "var(--color-tertiary-border-subtle)",
       "Tertiary/Tertiary Container": "var(--color-tertiary-container)",
       "Tertiary/Tertiary Icon": "var(--color-tertiary-icon)",
       "Warning/On Warning": "var(--color-on-warning)",
@@ -243,6 +257,7 @@
       "Warning/Warning": "var(--color-warning)",
       "Warning/Warning (Text)": "var(--color-warning-text)",
       "Warning/Warning Border": "var(--color-warning-border)",
+      "Warning/Warning Border Subtle": "var(--color-warning-border-subtle)",
       "Warning/Warning Container": "var(--color-warning-container)",
       "Warning/Warning Icon": "var(--color-warning-icon)"
     },
@@ -309,7 +324,11 @@
       "State-layers/surface/opacity-0_08": "var(--color-surface-state-08)",
       "State-layers/surface/opacity-0_12": "var(--color-surface-state-12)",
       "State-layers/surface/opacity-0_16": "var(--color-surface-state-16)",
-      "Surface roles/surface-container": "var(--color-surface-container)"
+      "Surface roles/surface-container": "var(--color-surface-container)",
+      "Surface roles/surface-default": "var(--color-surface-default)",
+      "Surface roles/surface-overlay": "var(--color-surface-overlay)",
+      "Surface roles/surface-raised": "var(--color-surface-raised)",
+      "Surface roles/surface-sunken": "var(--color-surface-sunken)"
     },
     "size / layout": {
       "Columns/col-1": "var(--col-1)",
@@ -323,7 +342,11 @@
       "Columns/col-6": "var(--col-6)",
       "Columns/col-7": "var(--col-7)",
       "Columns/col-8": "var(--col-8)",
-      "Columns/col-9": "var(--col-9)"
+      "Columns/col-9": "var(--col-9)",
+      "Max Heights/listbox": "var(--layout-max-height-listbox)",
+      "Min Heights/card-body": "var(--layout-min-height-card-body)",
+      "Min Heights/listbox": "var(--layout-min-height-listbox)",
+      "Min Heights/modal-body": "var(--layout-min-height-modal-body)"
     },
     "size / primitive": {
       "Border/Radius/radius-0": "var(--size-border-radius-radius-0)",
@@ -380,6 +403,7 @@
       "Element/pad-x-lg": "var(--size-element-pad-x-lg)",
       "Element/pad-x-md": "var(--size-element-pad-x-md)",
       "Element/pad-x-sm": "var(--size-element-pad-x-sm)",
+      "Element/pad-x-xs": "var(--size-element-pad-x-xs)",
       "Element/pad-y-lg": "var(--size-element-pad-y-lg)",
       "Element/pad-y-md": "var(--size-element-pad-y-md)",
       "Element/pad-y-sm": "var(--size-element-pad-y-sm)",
@@ -439,12 +463,12 @@
     }
   },
   "validation": {
-    "scssTokenCount": 506,
+    "scssTokenCount": 524,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 361,
-      "resolved": 332,
-      "percent": 92,
+      "total": 375,
+      "resolved": 351,
+      "percent": 94,
       "unresolved": [
         {
           "collection": "colors / accent",
@@ -493,38 +517,6 @@
           "tried": [
             "--color-warning-bold-candidate-b",
             "--color-proposal-warning-bold-candidate-b"
-          ]
-        },
-        {
-          "collection": "colors / neutral",
-          "figmaVariable": "Surface roles/surface-default",
-          "tried": [
-            "--color-surface-default",
-            "--color-surface-roles-surface-default"
-          ]
-        },
-        {
-          "collection": "colors / neutral",
-          "figmaVariable": "Surface roles/surface-overlay",
-          "tried": [
-            "--color-surface-overlay",
-            "--color-surface-roles-surface-overlay"
-          ]
-        },
-        {
-          "collection": "colors / neutral",
-          "figmaVariable": "Surface roles/surface-raised",
-          "tried": [
-            "--color-surface-raised",
-            "--color-surface-roles-surface-raised"
-          ]
-        },
-        {
-          "collection": "colors / neutral",
-          "figmaVariable": "Surface roles/surface-sunken",
-          "tried": [
-            "--color-surface-sunken",
-            "--color-surface-roles-surface-sunken"
           ]
         },
         {
@@ -654,21 +646,10 @@
           ]
         },
         {
-          "collection": "size / layout",
-          "figmaVariable": "Min Heights/card-body",
+          "collection": "size / semantics",
+          "figmaVariable": "Element/opacity-disabled",
           "tried": [
-            "--card-body",
-            "--size-min-heights-card-body",
-            "--size-card-body"
-          ]
-        },
-        {
-          "collection": "size / layout",
-          "figmaVariable": "Min Heights/modal-body",
-          "tried": [
-            "--modal-body",
-            "--size-min-heights-modal-body",
-            "--size-modal-body"
+            "--size-element-opacity-disabled"
           ]
         },
         {

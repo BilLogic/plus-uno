@@ -14,6 +14,16 @@ export const figmaMeta = {
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13644-11268",
       "source": "node-chart",
       "status": "verified"
+    },
+    {
+      "id": "field",
+      "name": "_Field",
+      "componentSetNodeId": "14841:25919",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
+      "source": "manual",
+      "status": "unpublished",
+      "isComponentSet": true,
+      "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
     }
   ]
 };
@@ -28,7 +38,7 @@ export const figmaMeta = {
 
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812"
-    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -51,6 +61,20 @@ export const figmaMeta = {
 
 <DocsCanvasShell description={<>Placeholder and editable value.</>}>
     <DsCanvasQuiet of={NumberInputStories.Content} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Steppers
+
+<DocsCanvasShell description={<>Small secondary outlined buttons in the field's Trailing slot, minus before plus, cut to 22 high so the field stays 34. They turn off at the bounds.</>}>
+    <DsCanvasQuiet of={NumberInputStories.Steppers} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Empty stays empty, and stepping from it starts at the floor.</>}>
+    <DsCanvasQuiet of={NumberInputStories.EmptyIsNotZero} />
 </DocsCanvasShell>
 
 </div>
@@ -118,37 +142,23 @@ and `onDecrement` with the new number.
 
 ## Usage notes
 
-### The field is a text input, so `min` and `max` bind the buttons only.
+### Typed values clamp when the field loses focus.
 
-```jsx
-// Incorrect — the stepper stops at 10, and typing 400 does not. The control
-// renders type="text", so nothing constrains what is typed.
-<NumberInput label="Sessions" min={1} max={10} value={v} onChange={setV} />
+`min` and `max` bind the steppers at once and a typed value on blur: "1" on the
+way to "12" is left alone while it is typed, and "12" becomes "10" when the field
+loses focus, with `onChange` called. The steppers turn off at the bounds.
 
-// Correct — clamp on change, or validate before submit and say so.
-<NumberInput
-    label="Sessions" min={1} max={10}
-    value={v}
-    onChange={(e) => setV(clamp(e.target.value, 1, 10))}
-    validation={v > 10 ? 'invalid' : 'none'}
-    validationMessage="Ten sessions is the maximum."
-/>
-```
+### Empty is not 0.
 
-### An empty field steps to its floor.
+An empty field stays empty and `onChange` reports `''`; 0 is a value of its own.
+Stepping from empty starts at 0 and clamps, so an empty field with `min={5}`
+steps to `5`. Give a field with a floor a starting value anyway — a field that
+shows nothing and means five is one the user has to press to understand.
 
-Increment and decrement read the current value as `parseFloat(value) || 0` and
-then clamp to both bounds, so an empty field with `min={5}` steps to `5` rather
-than to `1` (#318). Give the field a starting value anyway when it has a floor —
-a field that shows nothing and means five is a field the user has to press to
-understand.
+### The scroll wheel never changes the value.
 
-### `required` marks the label, not the field.
-
-The asterisk beside the label is decorative. The input carries no `required`
-attribute and no `aria-required`, so the browser will not block a submit and a
-screen reader will not announce the field as required. Enforce it in your own
-validation and set `validation="invalid"` with a message.
+The control is a text input with `inputMode="decimal"`, so scrolling the page
+over a focused field does not nudge the number, and phones show a number pad.
 
 </div>
 
@@ -161,19 +171,21 @@ validation and set `validation="invalid"` with a message.
   — see the `showLabel` section in the `Input` docs for why a name cannot be
   taken away. Prefer a visible label regardless: a field whose name only exists
   in the accessibility tree is a field sighted users have to guess at.
-- **The stepper buttons are named.** "Increment" and "Decrement", with the icons
-  `aria-hidden`. They also take the real `disabled` attribute at the bounds, so
-  they announce as disabled rather than doing nothing.
+- **The steppers are named for the field.** "Decrease {label}" and "Increase
+  {label}", minus before plus, so a form with three number fields does not read
+  out three identical "Increase" buttons. They take the real `disabled`
+  attribute at the bounds. Read-only hides them.
+- **`required` shows an asterisk and sets `aria-required`.** Explain the
+  asterisk once, in the form's legend.
 - **The validation message is attached to the input.** It carries an id, the
-  field points at it with `aria-describedby`, and an invalid field carries
-  `aria-invalid` (#327) — so the error is heard with the name rather than seen
-  beside it.
+  field points at it with `aria-describedby`, an invalid field carries
+  `aria-invalid`, and the message renders with `role="alert"` — so the error is
+  heard when it appears and again with the name.
 - **Forwarded props reach the input.** `aria-describedby`, `aria-invalid` and
-  anything else you pass lands on the field itself (#318), and your
-  `aria-describedby` is composed with the message's rather than replaced by it.
-- **The value is text to assistive technology.** With `type="text"` there is no
-  `aria-valuenow`, no spinbutton role and no numeric keypad on a phone. The label
-  and the unit carry the meaning.
+  anything else you pass lands on the field itself, and your `aria-describedby`
+  is composed with the message's rather than replaced by it.
+- **The value is text to assistive technology.** There is no spinbutton role,
+  so the label and the unit carry the meaning.
 
 </div>
 

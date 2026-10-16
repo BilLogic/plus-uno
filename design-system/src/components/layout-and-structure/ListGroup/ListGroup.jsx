@@ -1,46 +1,28 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { ListOption as ListOptionComponent } from './ListOption';
-import SelectionIndicator from './SelectionIndicator';
 import './ListGroup.scss';
 
 /**
- * ListGroupItem - Unified list item component
- * 
- * Modes:
- * - selectable="none": Regular list item (clickable, static) - default
- * - selectable="single": Radio button selection (single select)
- * - selectable="multi": Checkbox selection (multi select)
- * 
- * All modes support size (b1, b2, b3), states, and styling.
+ * ListGroupItem - a row in a list of content, links or actions.
+ *
+ * A list of options to pick from is not a ListGroup: that is the option list
+ * under a field, built on the forms `_internal` Listbox and OptionRow.
+ *
+ * Supports size (b1, b2, b3), active and disabled states, and contextual styles.
  */
 export const ListGroupItem = ({
     children,
-    label,
-    value,
     active = false,
-    selected = false,
     disabled = false,
     href,
     action,
     style, // color variant
     size = 'b2', // 'b1', 'b2', 'b3' - default b2
-    selectable = 'none', // 'none', 'single', 'multi'
-    name,
     onClick,
     className = '',
     as = 'div',
-    /**
-     * #331. Whether this option holds the list's single tab stop. Defaults to
-     * true so a selectable item used on its own stays reachable; `ListGroup`
-     * passes false to all but one when it is managing a listbox.
-     */
-    tabbable = true,
     ...props
 }) => {
-    // Determine if this is a selectable item
-    const isSelectable = selectable === 'single' || selectable === 'multi';
-
     // Font size based on size prop
     const fontSizeMap = {
         'b1': 'var(--font-size-body1)',
@@ -49,17 +31,10 @@ export const ListGroupItem = ({
     };
     const fontSize = fontSizeMap[size] || fontSizeMap['b2'];
 
-    // For selectable items, use selected prop; otherwise use active
-    const isActive = isSelectable ? selected : active;
-
     // Determine the element type
     let Tag = as;
-    if (!isSelectable) {
-        if (href) Tag = 'a';
-        else if (onClick || action) Tag = 'button';
-    } else {
-        Tag = 'div'; // Selectable items are always div with role="option"
-    }
+    if (href) Tag = 'a';
+    else if (onClick || action) Tag = 'button';
 
     // Map size to typography class
     const sizeClass = {
@@ -72,49 +47,19 @@ export const ListGroupItem = ({
         'list-group-item',
         'plus-list-group-item',
         `plus-list-group-item--${size}`,
-        isActive ? 'active' : '',
+        active ? 'active' : '',
         disabled ? 'disabled' : '',
-        (href || onClick || action || isSelectable) ? 'list-group-item-action' : '',
-        isSelectable ? 'plus-list-option' : '',
+        (href || onClick || action) ? 'list-group-item-action' : '',
         style ? `plus-list-group-item-${style}` : '',
         sizeClass,
         className
     ].filter(Boolean).join(' ');
 
-    // Handle click for selectable items
     const handleClick = (e) => {
         if (disabled) return;
-        if (isSelectable) {
-            e.stopPropagation();
-            if (onClick) onClick(value);
-        } else if (onClick) {
-            onClick(e);
-        }
+        if (onClick) onClick(e);
     };
 
-    // Display label for selectable items
-    const displayLabel = label || children;
-
-    // Render selectable item with radio/checkbox
-    if (isSelectable) {
-        return (
-            <div
-                className={classes}
-                style={{ fontSize }}
-                onClick={handleClick}
-                role="option"
-                aria-selected={selected}
-                aria-disabled={disabled}
-                tabIndex={disabled || !tabbable ? -1 : 0}
-                {...props}
-            >
-                <SelectionIndicator mode={selectable} selected={selected} disabled={disabled} />
-                <span className="plus-list-option-label">{displayLabel}</span>
-            </div>
-        );
-    }
-
-    // Render regular item
     const itemProps = {
         className: classes,
         onClick: disabled ? undefined : handleClick,
@@ -137,54 +82,15 @@ export const ListGroupItem = ({
 
 ListGroupItem.propTypes = {
     children: PropTypes.node,
-    label: PropTypes.node,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     active: PropTypes.bool,
-    selected: PropTypes.bool,
     disabled: PropTypes.bool,
     href: PropTypes.string,
     action: PropTypes.bool,
     style: PropTypes.oneOf(['primary', 'secondary', 'tertiary', 'success', 'danger', 'warning', 'info', 'light', 'dark']),
     size: PropTypes.oneOf(['b1', 'b2', 'b3']),
-    selectable: PropTypes.oneOf(['none', 'single', 'multi']),
-    name: PropTypes.string,
     onClick: PropTypes.func,
     className: PropTypes.string,
-    as: PropTypes.elementType,
-    /** Holds the listbox's single tab stop. Managed by `ListGroup`. */
-    tabbable: PropTypes.bool
-};
-
-/**
- * A list is only a valid ARIA `listbox` if every option-like child carries
- * `role="option"` (i.e. `ListGroup.Item selectable="single|multi"` or
- * `ListGroup.Option`). Plain navigation/action items don't get that role, so
- * mixing them in must not trigger `listbox` semantics on the container.
- *
- * @param {React.ReactNode} children
- * @returns {{ isOptionList: boolean, isMultiSelect: boolean }}
- */
-const getOptionListInfo = (children) => {
-    const childArray = React.Children.toArray(children);
-    let isOptionList = childArray.length > 0;
-    let isMultiSelect = false;
-
-    childArray.forEach((child) => {
-        if (!React.isValidElement(child)) {
-            isOptionList = false;
-            return;
-        }
-        if (child.type === ListGroupItem) {
-            if (child.props.selectable === 'multi') isMultiSelect = true;
-            else if (child.props.selectable !== 'single') isOptionList = false;
-        } else if (child.type === ListOptionComponent) {
-            if (child.props.mode === 'multi') isMultiSelect = true;
-        } else {
-            isOptionList = false;
-        }
-    });
-
-    return { isOptionList, isMultiSelect };
+    as: PropTypes.elementType
 };
 
 const ListGroup = ({
@@ -196,14 +102,6 @@ const ListGroup = ({
     ...props
 }) => {
     const Tag = as;
-    /*
-     * #331. A listbox is ONE tab stop with arrow keys inside it, and this list
-     * gave every option its own — usable, and not the pattern a screen-reader
-     * user is told to expect when they hear "listbox". The cursor is held here
-     * rather than in each item because only the container knows the order.
-     */
-    const listRef = useRef(null);
-    const [activeIndex, setActiveIndex] = useState(0);
 
     const listClasses = [
         'list-group',
@@ -213,88 +111,9 @@ const ListGroup = ({
         className
     ].filter(Boolean).join(' ');
 
-    // role="option" children need a `listbox` (or `group`) ancestor per ARIA;
-    // only add it when every child is actually option-shaped.
-    const { isOptionList, isMultiSelect } = getOptionListInfo(children);
-    const listboxProps = isOptionList
-        ? { role: 'listbox', 'aria-multiselectable': isMultiSelect || undefined }
-        : {};
-
-    /** The options as the DOM has them — the only order that matters. */
-    const optionNodes = () => (listRef.current
-        ? Array.from(listRef.current.querySelectorAll('[role="option"]'))
-        : []);
-
-    const moveTo = (index) => {
-        const nodes = optionNodes();
-        if (!nodes.length) return;
-        const next = Math.min(Math.max(index, 0), nodes.length - 1);
-        setActiveIndex(next);
-        nodes[next].focus();
-    };
-
-    /**
-     * The listbox keyboard contract, and only when the list is actually one.
-     * A list of links and buttons is walked with Tab, and taking that away
-     * would be a regression dressed as a fix.
-     *
-     * @param {React.KeyboardEvent} event
-     */
-    const handleKeyDown = (event) => {
-        if (!isOptionList) return;
-        const nodes = optionNodes();
-        const current = nodes.indexOf(document.activeElement);
-        const from = current >= 0 ? current : activeIndex;
-
-        switch (event.key) {
-            case 'ArrowDown':
-            case 'ArrowRight':
-                event.preventDefault();
-                moveTo(from + 1);
-                return;
-            case 'ArrowUp':
-            case 'ArrowLeft':
-                event.preventDefault();
-                moveTo(from - 1);
-                return;
-            case 'Home':
-                event.preventDefault();
-                moveTo(0);
-                return;
-            case 'End':
-                event.preventDefault();
-                moveTo(nodes.length - 1);
-                return;
-            default:
-        }
-    };
-
-    /*
-     * The single tab stop, handed to the option at the cursor. Cloning is what
-     * lets `ListGroup.Item` and `ListGroup.Option` both take it without either
-     * of them knowing where they sit.
-     */
-    const renderedChildren = isOptionList
-        ? React.Children.map(children, (child, index) => (
-            React.isValidElement(child)
-                ? React.cloneElement(child, { tabbable: index === activeIndex })
-                : child
-        ))
-        : children;
-
     return (
-        <Tag
-            ref={listRef}
-            className={listClasses}
-            onKeyDown={handleKeyDown}
-            onFocus={(event) => {
-                const index = optionNodes().indexOf(event.target);
-                if (index >= 0) setActiveIndex(index);
-            }}
-            {...listboxProps}
-            {...props}
-        >
-            {renderedChildren}
+        <Tag className={listClasses} {...props}>
+            {children}
         </Tag>
     );
 };
@@ -310,8 +129,4 @@ ListGroup.propTypes = {
 // Sub-component exports
 ListGroup.Item = ListGroupItem;
 
-// Attach ListOption for individual option use cases
-ListGroup.Option = ListOptionComponent;
-
 export default ListGroup;
-export { ListOption as ListOptionComponent } from './ListOption';

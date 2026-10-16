@@ -30,9 +30,9 @@ const REGISTRY = 'design-system/figma/component-registry.json';
 const RECORDING = 'design-system/figma/node-types.json';
 
 /**
- * The floor. 100 distinct ids across 102 mappings — two ids carry two mappings
- * each: `13574:1150` is shared by `DatePicker` and `DateAndTimePicker`, and
- * `13543:5904` is listed twice by `Textarea`, once as its MDX link. A
+ * The floor, measured over 100 recorded ids. The recording has since grown to
+ * 104 ids across 107 mappings: `14841:25919` (`_Field`) is claimed by `Input`,
+ * `InputGroup`, `NumberInput` and `Textarea`, the parts they share. A
  * comparison over an empty recording agrees with everything, so the size is
  * asserted rather than assumed. Lower it only when a mapping is genuinely
  * deleted, and say which one in the commit.

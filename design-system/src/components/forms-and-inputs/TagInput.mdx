@@ -15,23 +15,48 @@ export const figmaMeta = {
         "large"
       ]
     },
-    "disabled": { "type": "boolean" }
+    "disabled": { "type": "boolean" },
+    "readOnly": { "type": "boolean" }
   },
-  "sets": []
+  "sets": [
+    {
+      "id": "tag-input",
+      "name": "TagInput",
+      "componentSetNodeId": "18233:48345",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18233-48345",
+      "source": "manual",
+      "status": "unpublished",
+      "isComponentSet": true,
+      "notes": "3 sizes × 10 states: empty, filled, focus, typing, create, option menu, reordering, invalid, read-only and disabled. `size` is the code prop of the same name. `state` draws code's live states still: empty and filled are the tags, focus and typing are focus and the typed text (the hovered row shows its \"…\" when the field has a menu handler), create is a Create row in the list, option menu is the `_Option menu` open from a row's \"…\" (`onRename`, `onDelete`, `onColorChange`), reordering is a row lifted by its handle with the drop line and the keys in the hint (`onReorder`), and invalid, read-only and disabled are `validation=\"invalid\"`, `readOnly` and `disabled`. The rows are Dropdown list Item, whose `state=dragging` and `drop indicator?` are OptionRow's `dragging` and `dropIndicator=\"before\"`. Signed off; the library publishes it once the Specs file's text migration is ready, and the status becomes `verified` then."
+    },
+    {
+      "id": "option-menu",
+      "name": "_Option menu",
+      "componentSetNodeId": "19150:44293",
+      "isComponentSet": false,
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19150-44293",
+      "source": "manual",
+      "status": "unpublished",
+      "notes": "The menu a TagInput row's \"…\" opens: a `_Listbox` whose Header holds a small field for the name, the Figma Form (code: `Input size=\"small\"`, Enter renames, Esc cancels), and whose Body holds Dropdown list Item rows: Delete with a trash icon and a divider, then a Colour heading and one row per Tag colour showing the Tag, the current one `state=selected`. It opens 4px under the \"…\", right-aligned to it. Each part shows only when its handler is passed."
+    }
+  ]
 };
 
 <Meta of={TagInputStories} />
 
 <Title />
-Use tag input for a field that holds a set of short values, such as the topics
-a session covers.
+Use tag input for a field that holds a set of short values the person picks
+from a list or adds, such as the topics a session covers.
 
 <DocsTabs of={TagInputStories}>
 
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18233-48345"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -40,8 +65,42 @@ a session covers.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>A labelled field of removable tags. Uncontrolled, so the field keeps its own list.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Two tags at rest. Focus the field to type, pick and create.</>}>
     <Canvas of={TagInputStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Behaviour
+
+<DocsCanvasShell description={<>Typing filters the list and highlights the first match. Enter or a click adds it.</>}>
+    <DsCanvasQuiet of={TagInputStories.TypingFilters} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>When nothing matches, Create is highlighted and Enter adds the text as a new tag in a random Tag colour.</>}>
+    <DsCanvasQuiet of={TagInputStories.CreateWhenNothingMatches} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Backspace in an empty entry removes the last tag. Esc closes the list and clears only the typed text.</>}>
+    <DsCanvasQuiet of={TagInputStories.BackspaceRemovesTheLastTag} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Without focus, tags past one line collapse into "+n". With focus, they wrap up to three rows, then scroll.</>}>
+    <DsCanvasQuiet of={TagInputStories.CollapsesWithoutFocus} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>At `maxTags`, Create hides and the list says why.</>}>
+    <DsCanvasQuiet of={TagInputStories.PickLimit} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Option menu: with `onRename`, `onDelete` or `onColorChange`, the row under the pointer or the highlight shows a "…". It opens a menu to rename the option, delete it, or pick one of Tag's seven colours.</>}>
+    <DsCanvasQuiet of={TagInputStories.OptionMenu} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Reordering: with `onReorder`, each row has a handle. Drag it, or Tab to it and press Space; the arrows move the row and a line marks where it lands.</>}>
+    <DsCanvasQuiet of={TagInputStories.Reordering} />
 </DocsCanvasShell>
 
 </div>
@@ -50,12 +109,8 @@ a session covers.
 
 ## Appearance
 
-<DocsCanvasShell description={<>Size variants: small, medium, and large.</>}>
+<DocsCanvasShell description={<>Size variants: small, medium and large.</>}>
     <DsCanvasQuiet of={TagInputStories.Sizes} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>A tag given as an object takes a Tag color; a plain string is grey.</>}>
-    <DsCanvasQuiet of={TagInputStories.Colors} />
 </DocsCanvasShell>
 
 </div>
@@ -64,7 +119,15 @@ a session covers.
 
 ## States
 
-<DocsCanvasShell description={<>Disabled: every tag is disabled and none has a ×.</>}>
+<DocsCanvasShell description={<>Invalid: the danger border, and the message under the field is announced.</>}>
+    <DsCanvasQuiet of={TagInputStories.Invalid} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Read-only: the tags on the read-only fill, with no × and no list.</>}>
+    <DsCanvasQuiet of={TagInputStories.ReadOnly} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled: every tag is disabled, with no × and no entry.</>}>
     <DsCanvasQuiet of={TagInputStories.Disabled} />
 </DocsCanvasShell>
 
@@ -102,10 +165,15 @@ a session covers.
 
 ## When to use
 
-Use `TagInput` when a field's value is a set of short labels: the topics a
-session covered, or the subjects a tutor teaches. The tags are `Tag`s in a
-`TagGroup`, so a picked value looks like every other category in the product.
-The field shows and removes tags; it has no text entry of its own.
+Use `TagInput` when a field's value is a set of short labels the person picks
+from a list and may add to: the topics a session covered, or the languages a
+tutor teaches. It behaves like Notion's multi-select. The field holds the
+picked values as `Tag`s in a `TagGroup`, with a text entry after them, and
+focusing it opens the list of options under it.
+
+- For one value from a list, use `Select`.
+- For several values from a fixed list nobody adds to, use `Select mode="multi"`.
+- For fewer than 5 options, use `ChoiceGroup type="checkbox"`.
 
 </div>
 
@@ -113,26 +181,104 @@ The field shows and removes tags; it has no text entry of its own.
 
 ## Usage notes
 
+### The caller owns the options, and stores what is created.
+
+`options` is required. When the person creates a value, `onCreate` reports it
+once, with the colour it was given. Store both on a new option, so the colour
+stays the same everywhere the tag appears.
+
+```jsx
+// Incorrect — the created value is never stored, so its colour is lost on the next render.
+<TagInput label="Topics" options={topics} />
+
+// Correct — the new value joins the options with its colour.
+<TagInput
+    label="Topics"
+    options={topics}
+    onCreate={({ value, color }) => setTopics((list) => [...list, { value, label: value, color }])}
+/>
+```
+
+### A value saved to a server holds a temporary id until it is confirmed.
+
+Return a promise from `onCreate` that resolves to the stored id. Until it
+does, the tag is saving and its `value` is a temporary id starting `new-`. If
+it rejects, the tag is removed, the text goes back in the entry, and the
+failure is announced.
+
+```jsx
+<TagInput
+    label="Topics"
+    options={topics}
+    onCreate={({ value, color }) => api.createTopic({ name: value, color }).then((topic) => topic.id)}
+/>
+```
+
 ### A controlled field needs a handler to offer a ×.
 
 ```jsx
 // Incorrect — controlled with no handler, so no tag can be removed and none shows a ×.
-<TagInput label="Topics" tags={topics} />
+<TagInput label="Topics" options={topics} tags={picked} />
 
-// Correct — onChange receives the new list. onRemove, which receives the index
-// and the tag, offers the × as well.
-<TagInput label="Topics" tags={topics} onChange={setTopics} />
+// Correct — onChange receives the new list.
+<TagInput label="Topics" options={topics} tags={picked} onChange={setPicked} />
 ```
 
-### A tag's color is a Tag color.
+### Let people tidy options where they pick them.
+
+Pass a handler for each change the screen can store. The caller owns the
+options, so each handler updates the list. TagInput only reports the change.
+A field with none of them works as before, with no "…" and no handle.
 
 ```jsx
-// Incorrect — the status names are deprecated aliases and warn in development.
-<TagInput label="Subjects" defaultTags={[{ value: 'math', text: 'Math', color: 'success' }]} />
-
-// Correct — a tag is a category, so it takes a Tag color.
-<TagInput label="Subjects" defaultTags={[{ value: 'math', text: 'Math', color: 'green' }]} />
+<TagInput
+    label="Topics"
+    options={topics}
+    onRename={(value, name) => setTopics((list) => list.map((t) => (t.value === value ? { ...t, label: name } : t)))}
+    onDelete={(value) => setTopics((list) => list.filter((t) => t.value !== value))}
+    onColorChange={(value, color) => setTopics((list) => list.map((t) => (t.value === value ? { ...t, color } : t)))}
+    onReorder={(from, to) => setTopics((list) => {
+        const next = [...list];
+        next.splice(to, 0, ...next.splice(from, 1));
+        return next;
+    })}
+/>
 ```
+
+- **Delete** also removes a picked tag made from that option, through
+  `onChange` and `onRemove`. Rename and a colour change update that tag too.
+- **Reorder** works on the whole list, so the handles hide while text is
+  typed. `onReorder(fromIndex, toIndex)` gives places in `options`.
+
+### A tag's colour is a Tag colour.
+
+The status names the chips once took (`success`, `danger` and the rest) are
+deprecated aliases and warn in development. A tag is a category, so it takes a
+Tag colour.
+
+### The keys behave as in Notion.
+
+| Key | In the field |
+|-----|--------------|
+| Typing | Filters the list and highlights the first match. |
+| ↑ ↓ | Move the highlight; opens the list when it is closed. |
+| Enter | Adds the highlighted option, or creates the typed text when Create is highlighted. Text matching an option, ignoring case, picks that option. |
+| Backspace | In an empty entry, removes the last tag. |
+| Esc | Closes the list and clears only the typed text. The tags stay. |
+| Paste | Text with commas or line breaks becomes one tag per part, trimmed. |
+| Tab | With a handler for the menu or reordering, moves from the entry to the highlighted row's handle, then its "…". |
+
+On a row's handle and in its menu:
+
+| Key | Does |
+|-----|------|
+| Space or Enter on the handle | Picks the row up. |
+| ↑ ↓ | Move the picked-up row. |
+| Space or Enter | Drops it there. |
+| Esc | Cancels, and the row goes back. |
+| Enter on the "…" | Opens the menu with focus in the name. |
+| Enter in the name | Renames the option. After ↑ ↓, picks the highlighted row instead. |
+| Esc in the menu | Closes it without renaming, and focus goes back to the "…". |
 
 </div>
 
@@ -140,14 +286,27 @@ The field shows and removes tags; it has no text entry of its own.
 
 ## Accessibility
 
-- **The label names a group.** TagInput renders tags, not an input, so its
-  label is a `span` that names the tag container through `aria-labelledby`,
-  and the container takes `role="group"`. With no `label` the container has
-  no role and no name, so give every TagInput a label.
-- **Each × names its tag.** The remove button is named `Remove <tag>`, so a
-  row of them is not a row of identical controls.
-- **Disabled leaves nothing to press.** TagInput draws no ×, and `TagGroup`
-  disables every tag.
+- **The label names the entry.** The text entry is a `combobox` that points at
+  the list with `aria-controls` and at the highlighted row with
+  `aria-activedescendant`, so focus stays in the field while the arrow keys
+  move through the list.
+- **The tags are a named list.** `TagGroup` is a list named "Selected:" and the
+  label, and each × is named `Remove <tag>`.
+- **Changes are announced.** Adding or removing a tag says so in a live
+  region, such as "Music added".
+- **Invalid is announced.** The message under the field has `role="alert"`,
+  and the entry has `aria-invalid` and is described by it.
+- **Read-only and disabled leave nothing to press.** Neither draws a × or opens
+  the list.
+- **A row's handle and "…" are real buttons.** They sit beside the listbox,
+  laid over the highlighted row, because an option's content is presentational
+  and a button inside one would be lost to a screen reader. They are named `Reorder <option>` and
+  `Options for <option>`, and the handle is described by its keys.
+- **Reordering is announced.** Picking up, each move, the drop and a cancel
+  each say the row and its position, such as "Design judgment dropped,
+  position 3 of 4".
+- **The menu takes focus and gives it back.** Opening it moves focus to the
+  name field. Closing it returns focus to the "…".
 
 </div>
 
@@ -157,7 +316,7 @@ The field shows and removes tags; it has no text entry of its own.
 
 - For one value rather than a set, use `Tag`.
 - For the set without a field around it, use `TagGroup`.
-- For picking several values from a known list, use `SelectMultiple`.
+- For several values from a fixed list, use `Select mode="multi"`.
 
 </div>
 

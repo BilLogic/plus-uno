@@ -1,254 +1,38 @@
 /**
- * DatePicker — Figma Forms · Date & Time Picker · Month (Date Picker).
- * Trigger matches form/Select chrome (surface + outline-variant) with calendar-day
- * trailing icon — not the Dropdown caret used by Session Selection / Select.
+ * DatePicker — Figma `DatePicker`.
+ *
+ * The field is `_Field` (Field.scss draws the box, its states and focus); the
+ * calendar is the shared Calendar on the `_Listbox` surface (Calendar.scss,
+ * Listbox.scss). This file only places the input and the calendar icon.
  */
 
-.plus-date-picker-wrapper {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    --bs-dropdown-spacer: 0px;
-
-    /* Kill Bootstrap caret if any dropdown-toggle slips in */
-    .dropdown-toggle::after {
-        display: none !important;
-        content: none !important;
-    }
-}
-
-/* ===== TRIGGER (Month / no label form field) ===== */
-/* Figma Body/B2 — match Select trigger (not Dropdown B1). */
-.plus-date-picker-trigger {
-    display: flex;
-    align-items: center;
-    gap: var(--size-element-gap-md);
-    width: 100%;
-    box-sizing: border-box;
-    min-width: 140px;
-    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-body2);
-    font-weight: var(--font-weight-normal);
-    line-height: var(--font-line-height-body2);
-    background-color: var(--color-surface);
-    border: 0.8px solid var(--color-outline-variant);
-    border-radius: var(--size-border-radius-radius-50, 2px);
-    cursor: pointer;
-    transition: border-color 0.15s ease;
-
-    &:hover:not(.plus-date-picker-trigger--disabled):not(.plus-date-picker-trigger--readonly) {
-        border-color: var(--color-outline);
-    }
-
-    &.plus-date-picker-trigger--open,
-    &:focus-within {
-        border-color: var(--color-primary-border);
-        outline: none;
-    }
-}
-
-.plus-date-picker-trigger--small {
-    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
-    font-size: var(--font-size-body3);
-    line-height: var(--font-line-height-body3);
-}
-
-.plus-date-picker-trigger--large {
-    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
-    /* Large stays B2 per Figma Month field — do not bump to B1 */
-    font-size: var(--font-size-body2);
-    line-height: var(--font-line-height-body2);
-}
-
-.plus-date-picker-input {
+.plus-date-picker__input {
     flex: 1 1 auto;
     min-width: 0;
-    background: transparent;
-    border: none;
+    width: 100%;
     padding: 0;
     margin: 0;
-    width: 100%;
+    border: none;
+    background: transparent;
     outline: none;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-body2);
-    font-weight: var(--font-weight-normal);
-    line-height: var(--font-line-height-body2);
-    color: var(--color-on-surface);
-    cursor: inherit;
+    font: inherit;
+    color: inherit;
 
     &::placeholder {
         color: var(--color-on-surface-variant);
         opacity: 1;
-        font-size: var(--font-size-body2);
-        line-height: var(--font-line-height-body2);
     }
 }
 
-.plus-date-picker-trigger--small .plus-date-picker-input,
-.plus-date-picker-trigger--small .plus-date-picker-input::placeholder {
-    font-size: var(--font-size-body3);
-    line-height: var(--font-line-height-body3);
-}
-
-.plus-date-picker-trigger:not(.plus-date-picker-trigger--filled) .plus-date-picker-input {
-    color: var(--color-on-surface-variant);
-}
-
-.plus-date-picker-trigger__icon {
-    display: flex;
-    flex: 0 0 auto;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-on-surface-variant);
-    font-size: var(--font-size-fa-body2-solid, 12px);
-    line-height: 1;
-    pointer-events: none;
-}
-
-/* ===== CALENDAR POPUP ===== */
-.plus-date-picker-calendar {
-    min-width: 280px;
-    padding: 8px 10px !important;
-    background-color: var(--color-surface-container-high);
-    border: var(--size-element-stroke-sm) solid var(--color-outline-variant);
-    border-radius: var(--size-modal-radius-sm, 4px);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
-}
-
-.plus-date-picker-calendar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: var(--size-element-gap-md);
-}
-
-.plus-date-picker-calendar-nav {
+.plus-date-picker__icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: transparent;
-    border: none;
-    border-radius: var(--size-element-radius-sm);
     color: var(--color-on-surface-variant);
     cursor: pointer;
-    transition: background-color 0.15s ease;
-
-    &:hover {
-        background-color: var(--color-surface-container-high);
-    }
-
-    i {
-        color: inherit;
-    }
 }
 
-.plus-date-picker-calendar-month-year {
-    color: var(--color-on-surface);
-}
-
-.plus-date-picker-calendar-weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: var(--size-element-gap-xs);
-    margin-bottom: var(--size-element-gap-sm);
-}
-
-.plus-date-picker-calendar-weekday {
-    text-align: center;
-    color: var(--color-on-surface-variant);
-    font-weight: var(--font-weight-semibold-1);
-}
-
-.plus-date-picker-calendar-days {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: var(--size-element-gap-xs);
-}
-
-.plus-date-picker-calendar-day {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    background: transparent;
-    border: none;
-    border-radius: var(--size-element-radius-sm);
-    color: var(--color-on-surface-variant);
-    cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease;
-
-    &:hover:not(.plus-date-picker-calendar-day-disabled):not(.plus-date-picker-calendar-day-other-month) {
-        background-color: var(--color-surface-container-high);
-    }
-
-    // #331. `--color-outline` measured 3.65:1 against the calendar's surface —
-    // under AA for 14px text, and these cells are text, whatever their job.
-    // `--color-on-surface-variant` measures 7.66:1 and is still visibly lighter
-    // than the current month's `--color-on-surface` (13.98:1), so the cells stay
-    // de-emphasised without being unreadable. Measured, not eyeballed.
-    &-other-month {
-        color: var(--color-on-surface-variant);
-        pointer-events: none;
-    }
-
-    &-today {
-        border: var(--size-element-stroke-sm) solid var(--color-primary-border);
-        color: var(--color-primary-text);
-    }
-
-    &-selected {
-        background-color: var(--color-primary);
-        color: var(--color-on-primary);
-
-        &:hover {
-            filter: brightness(0.92);
-        }
-    }
-
-    &-disabled {
-        opacity: var(--color-disabled-opacity);
-        pointer-events: none;
-        cursor: not-allowed;
-    }
-}
-
-.plus-date-picker-calendar-align-left {
-    left: 0;
-}
-
-.plus-date-picker-calendar-align-center {
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.plus-date-picker-calendar-align-right {
-    left: auto;
-    right: 0;
-}
-
-.plus-date-picker-wrapper.small {
-    .plus-date-picker-calendar-day {
-        width: 28px;
-        height: 28px;
-    }
-}
-
-.plus-date-picker-wrapper.large {
-    .plus-date-picker-calendar-day {
-        width: 44px;
-        height: 44px;
-    }
-}
-
-.plus-date-picker-disabled {
-    opacity: var(--color-disabled-opacity);
-    pointer-events: none;
-}
-
-.plus-date-picker-readonly {
-    pointer-events: none;
+.plus-field--disabled .plus-date-picker__icon,
+.plus-field--readonly .plus-date-picker__icon {
+    cursor: default;
 }

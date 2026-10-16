@@ -3,13 +3,13 @@
 
 # Input
 
-Prefer `readOnly` (camelCase); legacy `readonly` is still accepted.
+Label, field and caption: the caption shows a validation message (or standing help) on the left and, when `maxLength` is set, a count on the right. With `subtle`, the field reads as plain text until it is hovered or edited, and saves on blur or Enter through `onSave`. Prefer `readOnly` (camelCase); legacy `readonly` is still accepted.
 
 **Import:** `import { Input } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/Input.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Input.stories.jsx` — Overview, Content, Styles, Sizes, InteractionStates, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Input.stories.jsx` — Overview, Content, Styles, Sizes, InteractionStates, Interactive, Anatomy, CaptionErrorAndCount, Autofill, Search, Subtle
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Input.mdx`
 
@@ -22,23 +22,31 @@ Prefer `readOnly` (camelCase); legacy `readonly` is still accepted.
 | `label` | node | — | Visible field label |
 | `required` | bool | `false` | Toggle the required switch to show or hide a * next to the label to show if the input is required. |
 | `showLabel` | bool | `true` | Show the label, or hide it visually. Off still renders it and still names the input. |
+| `info` | node | — | Text for an info tooltip beside the label. |
+| `caption` | node | — | Standing help under the field. A validation message takes its place. |
 | `placeholder` | string | — | Placeholder text |
 | `value` | string or number | — | — |
+| `defaultValue` | string or number | — | — |
 | `inputRef` | func or shape or any | — | — |
 | `size` | enum | `'medium'` | Available in 3 sizes: small, medium (default), large. |
 | `disabled` | bool | `false` | Disable the input component |
 | `readOnly` | bool | — | — |
 | `readonly` | bool | — | Make the input read-only |
 | `validation` | enum | `'none'` | Validation types include: none, invalid, success. |
-| `validationMessage` | string | — | Validation message displayed below the input |
+| `validationMessage` | node | — | Validation message displayed below the input |
 | `leadingVisual` | string or node | — | Leading visual preset |
 | `trailingVisual` | string or node | — | Trailing visual preset |
 | `type` | string | `'text'` | — |
+| `maxLength` | number | — | Limits the length and shows a count on the right of the caption. |
+| `subtle` | bool | `false` | Borderless until hovered or edited, for editing in place. |
+| `onSave` | func | — | Subtle only: called on blur or Enter with the new value. Throw or reject to keep the field open in `invalid`. |
+| `autoComplete` | string | — | Browser autofill token, e.g. `email`, `current-password`, `one-time-code`. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 | `onChange` | func | — | — |
 | `onFocus` | func | — | — |
 | `onBlur` | func | — | — |
+| `onKeyDown` | func | — | — |
 
 ## Variants
 
@@ -48,16 +56,8 @@ Prefer `readOnly` (camelCase); legacy `readonly` is still accepted.
 
 Anything not listed is not a valid value.
 
-## Tokens touched
-
-`--color-danger` · `--color-danger-border` · `--color-focus-ring` · `--color-inverse-primary` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline` · `--color-outline-variant` · `--color-success` · `--color-success-border` · `--color-surface` · `--color-surface-variant` · `--font-family-body` · `--font-line-height-body1` · `--font-line-height-body3` · `--font-size-body1` · `--font-size-body3` · `--font-weight-normal` · `--size-element-gap-lg` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-sm`
-
-From `design-system/src/components/forms-and-inputs/Input.scss`. Override these through the token layer, never with a literal.
-
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InputGroup` · `MultipleChoice` · `NumberInput` · `OptionList` · `Radio` · `RadioButtonGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

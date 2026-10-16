@@ -37,6 +37,7 @@ export function LoginAccessCodeField({
                 label="Enter Your Access Code"
                 required={required}
                 showLabel={false}
+                autoComplete="one-time-code"
                 placeholder="e.g., funny-walrus"
                 trailingVisual="fa-solid fa-circle-info"
                 value={value}

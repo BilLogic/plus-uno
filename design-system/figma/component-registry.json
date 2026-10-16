@@ -592,8 +592,9 @@
           {
             "id": "carousel",
             "name": "Carousel",
-            "componentSetNodeId": "34:8261",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=34-8261",
+            "componentSetNodeId": "34:7879",
+            "isComponentSet": false,
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=34-7879",
             "source": "node-chart",
             "status": "verified"
           }
@@ -606,7 +607,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Cascader.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Cascader.jsx",
         "storybookId": "components-forms-and-inputs-cascader--docs"
       },
@@ -614,15 +615,17 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "cascade-list",
-            "name": "Cascade list",
-            "componentSetNodeId": "13584:55731",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13584-55731",
-            "source": "node-chart",
-            "status": "verified"
+            "id": "cascader",
+            "name": "Cascader",
+            "componentSetNodeId": "18550:28181",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18550-28181",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "A `_Field` trigger over `_Listbox`, whose Body holds a Columns frame of equal `_Listbox Column`s of `Dropdown list Item` rows; a row with children shows caret-right in Trailing. state default · filled · open · disabled. In code the field is `_internal/Field.jsx` and each row is `_internal/OptionRow.jsx` with `OptionRow.Chevron` in Trailing. Built in the library and signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-5947"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18550-28181"
       }
     },
     "Checkbox": {
@@ -630,7 +633,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Checkbox.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Checkbox.jsx",
         "storybookId": "components-forms-and-inputs-checkbox--docs"
       },
@@ -654,31 +657,90 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/ChoiceGrid.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/ChoiceGrid.jsx",
-        "storybookId": "components-forms-and-inputs-choice-grid--docs"
+        "storybookId": "components-forms-and-inputs-choice-grid--docs",
+        "props": {
+          "type": {
+            "type": "enum",
+            "values": [
+              "radio",
+              "checkbox"
+            ]
+          }
+        }
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "multiple-choice-grid",
-            "name": "Multiple Choice Grid",
+            "id": "choice-grid",
+            "name": "Choice Grid",
             "componentSetNodeId": "13541:9229",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-9229",
             "source": "node-chart",
-            "status": "verified"
-          },
-          {
-            "id": "checkbox-grid",
-            "name": "CheckBox Grid",
-            "componentSetNodeId": "13541:9240",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-9240",
-            "source": "node-chart",
-            "status": "verified"
+            "status": "verified",
+            "verifiedAt": "2026-10-15",
+            "notes": "Rebuilt on Form Checkbox and Form Radio Button with a `type` axis and a `_Choice Grid Row` part. The separate CheckBox Grid set (13541:9240) was deleted."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13317-2958"
+      }
+    },
+    "ChoiceGroup": {
+      "code": {
+        "import": "@/components/forms-and-inputs",
+        "export": "default",
+        "mdxPath": "design-system/src/components/forms-and-inputs/ChoiceGroup.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
+        "source": "design-system/src/components/forms-and-inputs/ChoiceGroup.jsx",
+        "storybookId": "components-forms-and-inputs-choice-group--docs",
+        "props": {
+          "type": {
+            "type": "enum",
+            "values": [
+              "radio",
+              "checkbox"
+            ]
+          },
+          "orientation": {
+            "type": "enum",
+            "values": [
+              "stacked",
+              "inline"
+            ]
+          },
+          "appearance": {
+            "type": "enum",
+            "values": [
+              "plain",
+              "card"
+            ]
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "choice-group",
+            "name": "ChoiceGroup",
+            "componentSetNodeId": "18265:52386",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-52386",
+            "source": "node-chart",
+            "status": "verified",
+            "verifiedAt": "2026-10-15",
+            "notes": "Four variants, type × orientation. Legend, then a row of Leading text, the Options slot (Form Radio Button or Form Checkbox, at least two) and Trailing text, then Other and Error. Replaces the deleted Multiple Choice (Radio) 13540:9207, Multiple Choice (Checkbox) 13540:9717 and Scale Radio Button 13536:6785. Linear Scale stays in the library, deprecated, until the Specs file swaps its six instances."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-52386",
+        "deliberate": {
+          "appearance": "Figma sets appearance on each Form Checkbox and Form Radio Button in the Options slot, since a group cannot reach into its slot; code sets it once on ChoiceGroup and passes it to every choice.",
+          "description": "Figma sets description on each choice in the Options slot; code takes it per option in `options` and passes it to that choice."
+        }
       }
     },
     "CloseButton": {
@@ -792,7 +854,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/DateAndTimePicker.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/DateAndTimePicker.jsx",
         "storybookId": "components-forms-and-inputs-date-time-picker--docs"
       },
@@ -800,20 +862,24 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "month-date-picker",
-            "name": "Month (Date Picker)",
-            "componentSetNodeId": "13574:1150",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13574-1150",
-            "source": "node-chart",
-            "status": "verified"
+            "id": "date-and-time-picker",
+            "name": "DateAndTimePicker",
+            "componentSetNodeId": "18804:38420",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18804-38420",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "A date field and a `_Time Field` side by side with the time-zone caption beneath: state closed · date open · time open · read-only · disabled × validation none · invalid · success × filled? × size. The calendar is the shared `_Calendar` DatePicker opens, 4px (`gap-xs`) below the date field, left-aligned, flipping above. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
           },
           {
-            "id": "time-date-picker",
-            "name": "Time (Date Picker)",
+            "id": "time-field",
+            "name": "_Time Field",
             "componentSetNodeId": "16560:4508",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508",
-            "source": "node-chart",
-            "status": "verified"
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "The time half, state × filled? × size: hours, minutes and the AM/PM menu, which opens 4px (`gap-xs`) below. In code it lives inside `DateAndTimePicker.jsx`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
@@ -832,40 +898,37 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "date-time-picker",
-            "name": "Date & Time Picker",
-            "componentSetNodeId": "13549:6703",
-            "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703",
-            "source": "manual",
-            "status": "verified"
-          },
-          {
-            "id": "month-date-picker",
-            "name": "Month (Date Picker)",
+            "id": "date-picker",
+            "name": "DatePicker",
             "componentSetNodeId": "13574:1150",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13574-1150",
             "source": "manual",
-            "status": "verified"
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "state closed · open · invalid · valid · read-only · disabled × filled? × range? × size. A `_Field` trigger with the calendar-day icon in Trailing; the open variants show `_Calendar` in `_Listbox` Body, 4px (`gap-xs`) below the field, left-aligned, flipping above when there is no room. `range` and `size` are the code props of the same names. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
           },
           {
-            "id": "date-picker-single-date",
-            "name": "Date Picker (Single Date)",
-            "componentSetNodeId": "9413:1764",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9413-1764",
-            "source": "node-chart",
-            "status": "verified"
+            "id": "calendar",
+            "name": "_Calendar",
+            "componentSetNodeId": "18819:40157",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18819-40157",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "The month grid both pickers open, one variant per size. In code it is `_internal/Calendar.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
           },
           {
-            "id": "date-picker-range",
-            "name": "Date Picker (Range)",
-            "componentSetNodeId": "9538:17087",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9538-17087",
-            "source": "node-chart",
-            "status": "verified"
+            "id": "calendar-day",
+            "name": "_Calendar Day",
+            "componentSetNodeId": "9413:1755",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9413-1755",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "One day cell: default, hover, selected, disabled, today, in range and outside the month, at three sizes. In code it is the day button inside `_internal/Calendar.jsx`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9279-4480"
       }
     },
     "Divider": {
@@ -897,7 +960,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Dropdown/Dropdown.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs/Dropdown",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Dropdown",
         "source": "design-system/src/components/forms-and-inputs/Dropdown/Dropdown.jsx",
         "storybookId": "components-forms-and-inputs-dropdown--docs"
       },
@@ -938,7 +1001,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/FileUpload.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/FileUpload.jsx",
         "storybookId": "components-forms-and-inputs-file-upload--docs"
       },
@@ -988,7 +1051,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Input.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Input.jsx",
         "storybookId": "components-forms-and-inputs-input--docs"
       },
@@ -1002,9 +1065,19 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=39-4802",
             "source": "node-chart",
             "status": "verified"
+          },
+          {
+            "id": "field",
+            "name": "_Field",
+            "componentSetNodeId": "14841:25919",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-14133"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-6957"
       }
     },
     "InputGroup": {
@@ -1012,7 +1085,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/InputGroup/InputGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs/InputGroup",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/InputGroup",
         "source": "design-system/src/components/forms-and-inputs/InputGroup/InputGroup.jsx",
         "storybookId": "components-forms-and-inputs-input-group--docs"
       },
@@ -1026,6 +1099,16 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13671-3218",
             "source": "node-chart",
             "status": "verified"
+          },
+          {
+            "id": "field",
+            "name": "_Field",
+            "componentSetNodeId": "14841:25919",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19496"
@@ -1060,7 +1143,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/LabelAndCaption.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/LabelAndCaption.stories.jsx",
         "storybookId": "components-forms-and-inputs-label-caption--docs"
       },
@@ -1259,38 +1342,6 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502"
       }
     },
-    "MultipleChoice": {
-      "code": {
-        "import": "@/components/forms-and-inputs",
-        "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/MultipleChoice.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/MultipleChoice.jsx",
-        "storybookId": "components-forms-and-inputs-multiple-choice--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "multiple-choice-radio",
-            "name": "Multiple Choice (Radio)",
-            "componentSetNodeId": "13540:9207",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13540-9207",
-            "source": "node-chart",
-            "status": "verified"
-          },
-          {
-            "id": "multiple-choice-checkbox",
-            "name": "Multiple Choice (Checkbox)",
-            "componentSetNodeId": "13540:9717",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13540-9717",
-            "source": "node-chart",
-            "status": "verified"
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13332-2508"
-      }
-    },
     "Navbar": {
       "code": {
         "import": "@/components",
@@ -1357,7 +1408,7 @@
           },
           {
             "id": "pill-dropdown",
-            "name": "Pill Dropdown",
+            "name": "_Pill Dropdown",
             "componentSetNodeId": "4209:29770",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-29770",
             "source": "node-chart",
@@ -1389,7 +1440,7 @@
           },
           {
             "id": "tab-dropdown",
-            "name": "Tab Dropdown",
+            "name": "_Tab Dropdown",
             "componentSetNodeId": "4209:29375",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-29375",
             "source": "node-chart",
@@ -1404,7 +1455,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/NumberInput.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/NumberInput.jsx",
         "storybookId": "components-forms-and-inputs-number-input--docs"
       },
@@ -1418,6 +1469,16 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13644-11268",
             "source": "node-chart",
             "status": "verified"
+          },
+          {
+            "id": "field",
+            "name": "_Field",
+            "componentSetNodeId": "14841:25919",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812"
@@ -1553,8 +1614,8 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "popovers",
-            "name": "Popovers",
+            "id": "popover",
+            "name": "Popover",
             "componentSetNodeId": "49:19534",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-19534",
             "source": "node-chart",
@@ -1593,7 +1654,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Radio.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Radio.jsx",
         "storybookId": "components-forms-and-inputs-radio--docs"
       },
@@ -1612,56 +1673,12 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005"
       }
     },
-    "RadioButtonGroup": {
-      "code": {
-        "import": "@/components/forms-and-inputs",
-        "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/RadioButtonGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/RadioButtonGroup.jsx",
-        "storybookId": "components-forms-and-inputs-scale--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "scale-radio-button",
-            "name": "Scale Radio Button",
-            "componentSetNodeId": "13536:6785",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-6785",
-            "source": "node-chart",
-            "status": "verified"
-          },
-          {
-            "id": "scale-options",
-            "name": "Scale Options",
-            "componentSetNodeId": "13536:9083",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-9083",
-            "source": "node-chart",
-            "status": "verified",
-            "isComponentSet": false,
-            "notes": "Was 13536:9084, which resolves to nothing in the file. A plain COMPONENT, not a set. Re-read from the Scale page 2026-08-29."
-          },
-          {
-            "id": "linear-scale",
-            "name": "Linear Scale",
-            "componentSetNodeId": "13536:9208",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-9208",
-            "source": "node-chart",
-            "status": "verified",
-            "isComponentSet": false,
-            "notes": "Was 13611:16853, which resolves to nothing in the file — not an off-by-one, a different node entirely. A plain COMPONENT, not a set. Re-read from the Scale page 2026-08-29."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005"
-      }
-    },
     "Range": {
       "code": {
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Range.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Range.jsx",
         "storybookId": "components-forms-and-inputs-range--docs"
       },
@@ -1685,7 +1702,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Rating.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Rating.jsx",
         "storybookId": "components-forms-and-inputs-rating--docs"
       },
@@ -1719,7 +1736,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs/RichTextEditor",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/RichTextEditor",
         "source": "design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.jsx",
         "storybookId": "components-forms-and-inputs-rich-text-editor--docs"
       },
@@ -1729,9 +1746,8 @@
           {
             "id": "rich-text-editor",
             "name": "Rich Text Editor",
-            "componentSetNodeId": "10010:37927",
-            "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10010-37927",
+            "componentSetNodeId": "18729:36579",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18729-36579",
             "source": "node-chart",
             "status": "verified"
           }
@@ -1794,7 +1810,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Select.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Select.jsx",
         "storybookId": "components-forms-and-inputs-select--docs"
       },
@@ -1807,10 +1823,15 @@
             "componentSetNodeId": "8583:12093",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=8583-12093",
             "source": "node-chart",
-            "status": "verified"
+            "status": "verified",
+            "verifiedAt": "2026-10-15",
+            "notes": "28 variants, mode (single · multi · multi (badges)) × state (closed · open · invalid · read-only · disabled) × filled?. Built on Form (`_Field`): Content holds `_Field Text`, or a TagGroup of removable Tags in multi; Trailing holds `_Field Clear` (18756:36409) and the `_Dropdown icon` caret; open variants float a `_Listbox` of Dropdown list Item rows. Searchable and creatable are list content (a `_Listbox Hint` header, a create row footer), not properties. Docs frame: Docs / Select 18729:33744."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10266"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10342",
+        "deliberate": {
+          "displayMode": "Code has a third value, `text`, a comma-separated list with no Figma column; `badges` is kept on both sides until the screens that draw Badge chips move to Tags."
+        }
       }
     },
     "Sidebar": {
@@ -1983,7 +2004,7 @@
         "sets": [
           {
             "id": "spinner-animation",
-            "name": "Spinner Animation",
+            "name": "Spinner",
             "componentSetNodeId": "44:4872",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4872",
             "source": "node-chart",
@@ -1991,7 +2012,7 @@
           },
           {
             "id": "loading-animations-1-growing",
-            "name": "Loading Animations 1 - Growing",
+            "name": "Spinner Growing",
             "componentSetNodeId": "9296:3061",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9296-3061",
             "source": "node-chart",
@@ -1999,7 +2020,7 @@
           },
           {
             "id": "loading-animations-2-rotating",
-            "name": "Loading Animations 2 - rotating",
+            "name": "Spinner Rotating",
             "componentSetNodeId": "9297:3104",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3104",
             "source": "node-chart",
@@ -2007,7 +2028,7 @@
           },
           {
             "id": "loading-animations-3-stacking",
-            "name": "Loading Animations 3 - stacking",
+            "name": "Spinner Stacking",
             "componentSetNodeId": "9297:3156",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3156",
             "source": "node-chart",
@@ -2116,7 +2137,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Switch.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Switch.jsx",
         "storybookId": "components-forms-and-inputs-switch--docs"
       },
@@ -2395,7 +2416,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/TagInput.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/TagInput.jsx",
         "storybookId": "components-forms-and-inputs-tag-input--docs",
         "props": {
@@ -2409,12 +2430,37 @@
           },
           "disabled": {
             "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
           }
         }
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": []
+        "sets": [
+          {
+            "id": "tag-input",
+            "name": "TagInput",
+            "componentSetNodeId": "18233:48345",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18233-48345",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "3 sizes × 10 states: empty, filled, focus, typing, create, option menu, reordering, invalid, read-only and disabled. `size` is the code prop of the same name. `state` draws code's live states still: empty and filled are the tags, focus and typing are focus and the typed text (the hovered row shows its \"…\" when the field has a menu handler), create is a Create row in the list, option menu is the `_Option menu` open from a row's \"…\" (`onRename`, `onDelete`, `onColorChange`), reordering is a row lifted by its handle with the drop line and the keys in the hint (`onReorder`), and invalid, read-only and disabled are `validation=\"invalid\"`, `readOnly` and `disabled`. The rows are Dropdown list Item, whose `state=dragging` and `drop indicator?` are OptionRow's `dragging` and `dropIndicator=\"before\"`. Signed off; the library publishes it once the Specs file's text migration is ready, and the status becomes `verified` then."
+          },
+          {
+            "id": "option-menu",
+            "name": "_Option menu",
+            "componentSetNodeId": "19150:44293",
+            "isComponentSet": false,
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19150-44293",
+            "source": "manual",
+            "status": "unpublished",
+            "notes": "The menu a TagInput row's \"…\" opens: a `_Listbox` whose Header holds a small field for the name, the Figma Form (code: `Input size=\"small\"`, Enter renames, Esc cancels), and whose Body holds Dropdown list Item rows: Delete with a trash icon and a divider, then a Colour heading and one row per Tag colour showing the Tag, the current one `state=selected`. It opens 4px under the \"…\", right-aligned to it. Each part shows only when its handler is passed."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18233-48345"
       }
     },
     "Textarea": {
@@ -2422,17 +2468,10 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Textarea.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Textarea.jsx",
         "storybookId": "components-forms-and-inputs-textarea--docs",
         "props": {
-          "variant": {
-            "type": "enum",
-            "values": [
-              "long",
-              "short"
-            ]
-          },
           "size": {
             "type": "enum",
             "values": [
@@ -2458,13 +2497,10 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "form-textarea",
-            "name": "Form Textarea",
+            "id": "textarea",
+            "name": "Textarea",
             "componentSetNodeId": "13541:10731",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731",
-            "codeDefaults": {
-              "variant": "long"
-            },
             "variantValueMap": {
               "validation": {
                 "invalid": "error",
@@ -2472,32 +2508,21 @@
               }
             },
             "status": "verified",
-            "verifiedAt": "2026-06-13",
-            "notes": "variantProps TBD — add from Figma variant inspection."
+            "verifiedAt": "2026-10-15",
+            "notes": "One set. Form Short Textarea was merged into it and deleted from the library; a short textarea is `rows={1}` in code and an instance resized to 34 high in Figma. `rows` is code-only: Figma sets the height by resizing the instance."
           },
           {
-            "id": "form-short-textarea",
-            "name": "Form Short Textarea",
-            "componentSetNodeId": "13543:5904",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904",
-            "codeDefaults": {
-              "variant": "short"
-            },
-            "variantValueMap": {
-              "validation": {
-                "invalid": "error",
-                "valid": "success"
-              }
-            },
-            "status": "verified",
-            "verifiedAt": "2026-06-13",
-            "notes": "Also the node the Resources card's Figma link opens."
+            "id": "field",
+            "name": "_Field",
+            "componentSetNodeId": "14841:25919",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904",
-        "deliberate": {
-          "variant": "Code carries long and short as one `variant` prop; the library draws them as two sets, Form Textarea and Form Short Textarea."
-        }
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731"
       }
     },
     "Tile": {
@@ -2570,7 +2595,7 @@
             "notes": "On the Iconography, Logos & Imagery page. Figma marks defaults in the value name (\"32 (default)\", \"subtle (default)\", \"grey (default)\"); code takes the bare value. Logo and image variants hold a media slot, which code fills with `children` or `src`. Image variants exist for grey only, since the picture covers the ground."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17906-48560"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-53755"
       }
     },
     "Toast": {
@@ -2666,7 +2691,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/TreeSelect.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/TreeSelect.jsx",
         "storybookId": "components-forms-and-inputs-tree-select--docs"
       },
@@ -2675,33 +2700,33 @@
         "sets": [
           {
             "id": "tree-select",
-            "name": "_tree_select",
-            "componentSetNodeId": "13526:17500",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13526-17500",
+            "name": "Tree Select",
+            "componentSetNodeId": "18550:42560",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18550-42560",
             "source": "manual",
             "status": "unpublished",
-            "isComponentSet": false,
-            "notes": "The assembled tree select panel — a single COMPONENT, `_`-prefixed per the library's private convention. Owner named it canonical on 2026-09-15, with the two building-block sets below CONTAINED as instances; it still mixes tree_dropdown ver 1 and ver 3 parts internally. ⚠ The Figma design is NOT finalized — confirm with the owner before treating this mapping or the panel's visuals as final. PROVENANCE: resolved by the MCP get_metadata tool on 2026-09-15, which is where its COMPONENT type comes from. It is NOT in scripts/figma-component-snapshot.json — private components are never published, so `unpublished` is its settled state rather than a step on the way to `verified`, and the link opens for someone with access to the file rather than from the library. tree_select_ver2 (13529:2016), mapped here until 2026-09-15, IS published, and was dropped all the same: the owner does not count it part of the canonical trio."
+            "isComponentSet": true,
+            "notes": "A `_Field` trigger over `_Listbox`, whose Body holds a flat run of `Dropdown list Item` rows: state default · filled · open · disabled × multiple? false · true. In code the field is `_internal/Field.jsx` and each row is `_internal/OptionRow.jsx` in the `treeitem` role. Built in the library and signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
           },
           {
-            "id": "tree-dropdown-layers",
-            "name": "tree_dropdown layers",
-            "componentSetNodeId": "13529:1075",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13529-1075",
+            "id": "tree-indent",
+            "name": "_Tree Indent",
+            "componentSetNodeId": "13520:72548",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13520-72548",
             "source": "manual",
-            "status": "verified",
+            "status": "unpublished",
             "isComponentSet": true,
-            "notes": "Building block: the indent layers a tree select row is drawn from — 8 variants over open? and # of indents (0-3). Instantiated inside _tree_select. PROVENANCE: all 8 variants are in the 2026-09-15 components snapshot, so this one is published, not merely resolvable."
+            "notes": "Part: the row's depth, level 1 · 2 · 3, in steps bound to `Tree/indent` (20px, aliasing space-400). In code it is `OptionRow.Indent`, depth × 20px. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state. Every row is `Dropdown list Item` (37:6472), the row OptionRow draws; its Leading slot holds this part."
           },
           {
-            "id": "indented-tree-select-item-list",
-            "name": "Indented Tree Select Item List",
-            "componentSetNodeId": "13520:70443",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13520-70443",
+            "id": "tree-toggle",
+            "name": "_Tree Toggle",
+            "componentSetNodeId": "18607:41718",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18607-41718",
             "source": "manual",
-            "status": "verified",
+            "status": "unpublished",
             "isComponentSet": true,
-            "notes": "Building block: the indented item list — 9 variants over '# of items' (1-9). Instantiated inside _tree_select. PROVENANCE: typed by get_metadata on 2026-09-15, and all 9 variants (13520:70444 through 13520:70488) are in the components snapshot of that date, so it is published. The earlier note calling this set Legacy-and-deliberately-unmapped was wrong; the owner names it part of the canonical trio."
+            "notes": "Part: the caret, state collapsed · expanded · leaf (an empty cell of the same size, `Tree/toggle` 16px), with gap? before a checkbox. In code it is `OptionRow.Toggle`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state. Every row is `Dropdown list Item` (37:6472), the row OptionRow draws; its Leading slot holds this part."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-"

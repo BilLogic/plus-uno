@@ -452,6 +452,38 @@
         "3969:1": 50,
         "3969:2": 60
       }
+    },
+    {
+      "id": "VariableID:18257:29",
+      "name": "Min Heights/listbox",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "3969:0": 140,
+        "3969:1": 140,
+        "3969:2": 140
+      },
+      "resolvedValuesByMode": {
+        "3969:0": 140,
+        "3969:1": 140,
+        "3969:2": 140
+      }
+    },
+    {
+      "id": "VariableID:18257:30",
+      "name": "Max Heights/listbox",
+      "variableCollectionId": "VariableCollectionId:3969:18402",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "3969:0": 300,
+        "3969:1": 300,
+        "3969:2": 300
+      },
+      "resolvedValuesByMode": {
+        "3969:0": 300,
+        "3969:1": 300,
+        "3969:2": 300
+      }
     }
   ]
 }

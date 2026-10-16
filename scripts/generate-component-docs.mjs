@@ -24,6 +24,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { documents } from './lib/corpus.mjs';
+import { AUTHORED_SECTIONS, authoredCoverage } from './lib/authored-coverage.mjs';
 import { resolveNamedOneOf } from './doc-identifiers.mjs';
 import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 
@@ -43,17 +44,6 @@ const GROUP_TITLES = {
   'status-and-loading': 'Status and loading',
   _internal: 'Internal',
 };
-
-/**
- * The authored sections that change agent behaviour (#166). Detection is by
- * heading text in the component's MDX; a section that is not there is omitted
- * from the page and counted as missing, never stubbed.
- */
-const AUTHORED_SECTIONS = [
-  { key: 'whenToUse', label: 'When to use', match: /^#{2,4}\s*when (to use|not to use)/i },
-  { key: 'correctIncorrect', label: 'Correct/incorrect', match: /^#{2,4}\s*(correct|do(s)? and don|usage (do|guidance))/i },
-  { key: 'accessibility', label: 'Accessibility', match: /^#{2,4}\s*accessibility/i },
-];
 
 const fail = (msg) => {
   console.error(`✗ ${msg}`);
@@ -300,13 +290,6 @@ const storyExports = (src) =>
 /** Every token the component's stylesheet uses. Grammar from the module (#507). */
 const scssTokens = (src) =>
   src ? [...new Set([...src.matchAll(varReferencePattern())].map((m) => m[1]))].sort() : [];
-
-function authoredCoverage(mdxSource) {
-  const found = {};
-  const lines = mdxSource ? mdxSource.split('\n') : [];
-  for (const s of AUTHORED_SECTIONS) found[s.key] = lines.some((l) => s.match.test(l.trim()));
-  return found;
-}
 
 /* ---------------------------------------------------------------- discovery */
 

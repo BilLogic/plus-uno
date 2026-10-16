@@ -24,7 +24,7 @@ Group labeled inputs, selection controls, and actions into a coherent data-entry
 | Text | `Input` | `@/components` |
 | Multi-line | `Textarea` | `@/components` |
 | Pick one | `Select`, `Radio` | `@/components` |
-| Pick many | `Checkbox`, `SelectMultiple` | `@/components` |
+| Pick many | `Checkbox`, `Select mode="multi"` | `@/components` |
 | Toggle | `Switch` | `@/components` |
 | Date/time | `DatePicker`, `DateAndTimePicker` | `@/components` |
 | Grouped field | `InputGroup` | `@/components` |
@@ -117,6 +117,7 @@ Footer actions: either extra `Button` row in `children`, or `primaryButton` / `s
 - `design-system/agent-views/components/index.md` — confirm `Input`, `Button`, `Modal`, `Card` exist
 - their Storybook MDX and `*.stories.jsx` — props, variants, usage
 - `surfaces.md` — the modal this form sits in when it is an overlay
+- `form-behaviour.md` — when the form validates, what submit does with errors, read-only and unsaved changes
 
 ## Rules
 

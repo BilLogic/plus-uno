@@ -13,23 +13,28 @@ export const figmaMeta = {
       "componentSetNodeId": "8583:12093",
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=8583-12093",
       "source": "node-chart",
-      "status": "verified"
+      "status": "verified",
+      "verifiedAt": "2026-10-15",
+      "notes": "28 variants, mode (single · multi · multi (badges)) × state (closed · open · invalid · read-only · disabled) × filled?. Built on Form (`_Field`): Content holds `_Field Text`, or a TagGroup of removable Tags in multi; Trailing holds `_Field Clear` (18756:36409) and the `_Dropdown icon` caret; open variants float a `_Listbox` of Dropdown list Item rows. Searchable and creatable are list content (a `_Listbox Hint` header, a create row footer), not properties. Docs frame: Docs / Select 18729:33744."
     }
-  ]
+  ],
+  "deliberate": {
+    "displayMode": "Code has a third value, `text`, a comma-separated list with no Figma column; `badges` is kept on both sides until the screens that draw Badge chips move to Tags."
+  }
 };
 
 <Meta of={SelectStories} />
 
 <Title />
-Use a select input when a user needs to select one or multiple options from a long list.
+Use a select when someone picks one value, or several, from a list too long to show in full.
 
 <DocsTabs of={SelectStories}>
 
 <DocsTab tab="examples">
 
 <ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10266"
-    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10342"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -50,7 +55,7 @@ Use a select input when a user needs to select one or multiple options from a lo
 
 ## Content
 
-<DocsCanvasShell description={<>Placeholder and value display in single-select mode.</>}>
+<DocsCanvasShell description={<>Placeholder and value in single-select mode.</>}>
     <DsCanvasQuiet of={SelectStories.Content} />
 </DocsCanvasShell>
 
@@ -60,7 +65,7 @@ Use a select input when a user needs to select one or multiple options from a lo
 
 ## Modes
 
-<DocsCanvasShell description={<>Multi-select, searchable, and creatable behaviors.</>}>
+<DocsCanvasShell description={<>Multi-select with Tags or Badges; searchable and creatable fields take typing.</>}>
     <DsCanvasQuiet of={SelectStories.Modes} />
 </DocsCanvasShell>
 
@@ -80,8 +85,28 @@ Use a select input when a user needs to select one or multiple options from a lo
 
 ## States
 
-<DocsCanvasShell description={<>Enabled, disabled, and read-only.</>}>
+<DocsCanvasShell description={<>Enabled, invalid, read-only and disabled.</>}>
     <DsCanvasQuiet of={SelectStories.InteractionStates} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Dependent fields
+
+<DocsCanvasShell description={<>The teacher waits for a school, and clears when the school changes.</>}>
+    <DsCanvasQuiet of={SelectStories.DependentFields} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Long lists
+
+<DocsCanvasShell description={<>Past 50 options, Recent and Suggested come first, and typing searches the rest.</>}>
+    <DsCanvasQuiet of={SelectStories.LongList} />
 </DocsCanvasShell>
 
 </div>
@@ -114,15 +139,13 @@ Use a select input when a user needs to select one or multiple options from a lo
 
 ## When to use
 
-Use `Select` when the user picks from a known list of values and the choice is
-part of a form's data. It covers the cases a plain list of radios cannot:
-`mode="multi"` for several values shown as dismissible badges in the trigger,
-`searchable` for lists long enough to need filtering, `creatable` for lists the
-user may extend.
+Use `Select` when someone picks from a known list and the choice is part of a
+form's data:
 
-`Select` composes the rest of the system — `Badge` for the selected values,
-`ListGroup` for multi-select options, `Input` for the search field — so it stays
-visually consistent with the fields around it.
+- 5 to 15 options when space is tight, or when there is a good default.
+- `mode="multi"` for several values, shown as Tags, with a checkbox on each row.
+- `searchable` past about 8 options: typing in the field filters the list.
+- `creatable` when the list may grow: "Create *text*" appears when nothing matches.
 
 </div>
 
@@ -130,68 +153,81 @@ visually consistent with the fields around it.
 
 ## Usage notes
 
-### Do not expect form semantics that are not there.
-
-```jsx
-// Incorrect — `name` names nothing. There is no hidden input, so the form
-// submits without this field, and `required` cannot block a submit it is not
-// part of.
-<form onSubmit={submit}>
-  <Select name="grade" options={grades} required />
-</form>
-
-// Correct — controlled value, `required` for the announcement, and the
-// validation you actually enforce driven from onChange and onBlur.
-<Select
-  id="grade"
-  options={grades}
-  value={grade}
-  required
-  onChange={(next) => { setGrade(next); setGradeError(!next); }}
-  onBlur={() => setGradeTouched(true)}
-/>
-```
-
-### `onFocus` and `onBlur` are the field's, not the search box's.
-
-```jsx
-// Incorrect — expecting a blur each time focus moves inside the control. It
-// does not fire when the user goes from the trigger into the search field, so
-// a "close the menu when the search box is left" effect never runs.
-<Select searchable options={grades} onBlur={closeMenu} />
-
-// Correct — they report the boundary: once when focus enters the control from
-// outside, once when it leaves for good. That is the "touched" signal.
-<Select
-  searchable
-  options={grades}
-  value={grade}
-  onChange={setGrade}
-  onBlur={() => setTouched(true)}
-/>
-```
-
 ### `onChange` hands you the value, not an event.
 
 ```jsx
-// Incorrect — there is no event. `handleSelect` calls `onChange(newValue)`
-// with a string in single mode and an array in multi mode, so this throws.
+// Incorrect — there is no event. `onChange` gets an id in single mode and an
+// array of ids in multi mode, so this throws.
 <Select options={grades} onChange={(e) => setGrade(e.target.value)} />
 
 // Correct — take the value straight.
 <Select options={grades} onChange={(value) => setGrade(value)} />
 ```
 
-### Multi-select badges are dismissible only when the field is live.
+### A filter bar commits when the list closes.
 
 ```jsx
-// Incorrect — expecting the badges to still be removable while read-only.
-// `readonly` (and `disabled`) turn the badge X off, by design.
-<Select mode="multi" readonly value={selected} options={topics} onChange={setTopics} />
+// Incorrect — every tick refetches the table while the person is still choosing.
+<Select mode="multi" options={subjects} value={filters} onChange={refetch} />
 
-// Correct — read-only shows the values; the editable field lets them go.
-<Select mode="multi" value={selected} options={topics} onChange={setTopics} />
+// Correct — one commit, when the list closes.
+<Select mode="multi" options={subjects} value={filters} onChange={refetch} commitOnClose />
 ```
+
+### A sort, or a required pick, has no clear ×.
+
+`clearable` defaults to true in multi mode and to `!required` in single mode. A
+sort always has a value, so it passes `clearable={false}`. In Figma the clear is
+`_Field Clear` in the `filled?=true` variants.
+
+```jsx
+// Incorrect — the × empties the sort, and the list has no order.
+<Select aria-label="Sort" options={sorts} value={sort} onChange={setSort} />
+
+// Correct — the sort can change but never empty.
+<Select aria-label="Sort" options={sorts} value={sort} onChange={setSort} clearable={false} />
+```
+
+### Read-only is not disabled.
+
+```jsx
+// Incorrect — disabled takes the field out of the tab order and fades it, so
+// a value the person can read but not change looks broken.
+<Select options={terms} value={term} disabled />
+
+// Correct — read-only stays focusable, shows the value, and cannot open or clear.
+<Select options={terms} value={term} readonly />
+```
+
+### A dependent field says what it is waiting for.
+
+```jsx
+// Incorrect — an empty, disabled teacher field, and a stale teacher kept when
+// the school changes.
+<Select options={teachersFor(school)} value={teacher} disabled={!school} />
+
+// Correct — disabled with "Choose a school first" until there is a school, and
+// cleared whenever the school changes.
+<Select
+  label="Teacher"
+  options={teachersFor(school)}
+  value={teacher}
+  onChange={setTeacher}
+  dependsOn={{ value: school, label: 'a school' }}
+/>
+```
+
+### `name` submits through hidden inputs.
+
+```jsx
+// A plain form gets the ids: one hidden input per value, named `name`.
+<form onSubmit={submit}>
+  <Select name="grade" label="Grade" options={grades} required />
+</form>
+```
+
+`required` sets `aria-required` and the label's asterisk. It does not block a
+submit; drive `invalid` and `caption` from your own validation.
 
 </div>
 
@@ -199,41 +235,27 @@ visually consistent with the fields around it.
 
 ## Accessibility
 
-- **This is not a native `select` and not an ARIA combobox.** The trigger is a
-  `div` with `role="button"` and `tabIndex={0}`; the options are `button`
-  elements in single mode and `ListGroup` options in multi mode. There is no
-  `aria-expanded` on the trigger and no `aria-activedescendant`, so the open
-  list is not announced as a list of options.
-- **Keyboard.** The trigger is reachable and can be activated, but there is no
-  arrow-key navigation between options — the options are reached by tabbing.
-  Keep the option list short, or use `MultipleChoice` where every option is a
-  native radio or checkbox.
-- **Name the trigger.** `id` is forwarded to the trigger element, so an external
-  `label htmlFor` is the reliable way to give it a name.
-- **`required` is announced as a description, not as `aria-required`.** ARIA
-  does not allow `aria-required` on `role="button"`, so the trigger gets an
-  `aria-describedby` pointing at a visually hidden "Required" instead — the
-  field announces as required without inventing invalid markup. The visible
-  asterisk is still the caller's, drawn in the caller's own label.
-- **The search field has a placeholder, not a label.** It is a real `Input`
-  rendered internally with `showLabel={false}` and the placeholder `Search`, and
-  the component exposes no prop to label it. That is a known gap, not something
-  the call site can fix.
-- **Selected values are `Badge`s.** Each carries the same hard-coded `Dismiss`
-  label, so a multi-select with several values exposes several identically named
-  buttons.
-
-### Label it, because the component will not.
-
-```jsx
-// Incorrect — the trigger is a div with role="button" and no name. A screen
-// reader announces "button", and nothing more.
-<Select id="subject" options={subjects} value={subject} onChange={setSubject} />
-
-// Correct — a visible label wired to the trigger by id.
-<label htmlFor="subject">Subject</label>
-<Select id="subject" options={subjects} value={subject} onChange={setSubject} />
-```
+- **The field is a combobox.** A searchable field is an `<input role="combobox">`;
+  a plain one is a `div role="combobox"`. Both carry `aria-expanded`,
+  `aria-controls` while open and `aria-activedescendant` on the highlighted row,
+  so focus never leaves the field.
+- **The list is a listbox.** Each row is a `role="option"` with
+  `aria-selected`, in single mode and multi mode alike. Group headings
+  (Recent, Suggested) label their `role="group"`.
+- **Keys.** Down, Up or Enter opens the list (Space too, on a plain field).
+  The arrow keys, Home and End move; Enter picks; Esc closes and leaves the
+  value alone; Tab closes. Delete clears the value. In multi mode, Backspace in
+  an empty field removes the last value.
+- **Naming.** `label` names the field. Without one, pass `aria-label` or
+  `aria-labelledby`; both reach the combobox. A field with neither falls back
+  to its placeholder.
+- **The clear × is not a tab stop.** It is named "Clear *label*", and Delete
+  does the same from the keyboard. Without `clearable`, neither the × nor
+  Delete empties the field.
+- **`invalid`** sets `aria-invalid`, and `caption` becomes an error announced
+  with `role="alert"` and described by the field.
+- **Tags.** Each Tag's × is named "Remove *value*". Without focus, tags that
+  do not fit collapse into "+n", named "+n more tags".
 
 </div>
 
@@ -242,9 +264,9 @@ visually consistent with the fields around it.
 ## Related
 
 - For actions rather than a value, use `Dropdown`.
-- For five or fewer options that all fit on screen, use `Radio` or `RadioButtonGroup`.
+- For fewer than five options that all fit on screen, use `ChoiceGroup`.
 - For hierarchical values, use `TreeSelect` or `Cascader`.
-- For a native form you intend to submit without JavaScript, use a plain `<select>`; this component does not participate in form submission.
+- For several values that people mostly type and add, use `TagInput`.
 
 </div>
 

@@ -16,9 +16,9 @@ import './LessonsOverviewPage.scss';
 
 const LessonsOverviewPage = ({
     lessons = [],
-    statusFilter = 'All',
-    sortBy = 'Name',
-    sortOrder = 'A-Z',
+    statusFilter = [],
+    sortBy = 'name',
+    sortOrder = 'az',
     currentView = 'list',
     statusCounts = {
         all: 20,
@@ -135,7 +135,7 @@ const LessonsOverviewPage = ({
                     {/* Filter Left - Status Select */}
                     <div className="lessons-overview-page__filter-left">
                         <TrainingLessonStatusSelect
-                            selectedStatus={statusFilter}
+                            selectedStatuses={statusFilter}
                             counts={statusCounts}
                             onStatusChange={onStatusChange}
                         />
@@ -218,8 +218,8 @@ LessonsOverviewPage.propTypes = {
         duration: PropTypes.string,
         showAiIndicator: PropTypes.bool,
     })),
-    /** Status filter value */
-    statusFilter: PropTypes.oneOf(['All', 'Assigned', 'In Progress', 'Completed', 'Not Started']),
+    /** Picked lesson status ids; empty means all */
+    statusFilter: PropTypes.arrayOf(PropTypes.oneOf(['assigned', 'in-progress', 'completed', 'not-started'])),
     /** Status counts object */
     statusCounts: PropTypes.shape({
         all: PropTypes.number,
@@ -228,9 +228,9 @@ LessonsOverviewPage.propTypes = {
         completed: PropTypes.number,
         notStarted: PropTypes.number
     }),
-    /** Sort by value */
+    /** Sort by id */
     sortBy: PropTypes.string,
-    /** Sort order */
+    /** Order id */
     sortOrder: PropTypes.string,
     /** Current view mode */
     currentView: PropTypes.oneOf(['list', 'grid']),

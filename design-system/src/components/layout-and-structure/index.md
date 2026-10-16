@@ -7,17 +7,17 @@ authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [Accordion](Accordion/index.md) | 9 | ✅ | ✕ | ✅ |
-| [Card](Card/index.md) | 19 | ✅ | ✕ | ✅ |
-| [Carousel](Carousel/index.md) | 16 | ✅ | ✕ | ✅ |
-| [Collapse](Collapse/index.md) | 12 | ✅ | ✕ | ✅ |
-| [Divider](Divider/index.md) | 7 | ✅ | ✕ | ✅ |
-| [Jumbotron](Jumbotron/index.md) | 12 | ✅ | ✕ | ✅ |
+| [Accordion](Accordion/index.md) | 9 | ✅ | ✅ | ✅ |
+| [Card](Card/index.md) | 19 | ✅ | ✅ | ✅ |
+| [Carousel](Carousel/index.md) | 16 | ✅ | ✅ | ✅ |
+| [Collapse](Collapse/index.md) | 12 | ✅ | ✅ | ✅ |
+| [Divider](Divider/index.md) | 7 | ✅ | ✅ | ✅ |
+| [Jumbotron](Jumbotron/index.md) | 12 | ✅ | ✅ | ✅ |
 | [ListGroup](ListGroup/index.md) | 5 | ✅ | ✕ | ✅ |
-| [MediaObject](MediaObject/index.md) | 8 | ✅ | ✕ | ✅ |
-| [ScrollBar](ScrollBar/index.md) | 6 | ✅ | ✕ | ✅ |
+| [MediaObject](MediaObject/index.md) | 8 | ✅ | ✅ | ✅ |
+| [ScrollBar](ScrollBar/index.md) | 6 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 9/9 (100%) · Correct/incorrect 0/9 (0%) · Accessibility 9/9 (100%)
+**Authored coverage:** When to use 9/9 (100%) · Correct/incorrect 8/9 (89%) · Accessibility 9/9 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

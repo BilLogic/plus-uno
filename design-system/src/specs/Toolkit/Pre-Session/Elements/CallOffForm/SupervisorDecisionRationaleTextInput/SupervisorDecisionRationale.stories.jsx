@@ -15,7 +15,6 @@ export default {
  * Shows all visual states of the Supervisor Decision Rationale text input
  * 
  * Uses design system Textarea component with:
- * - variant="long" for boxed style
  * - placeholder for unfilled state
  * - rows=2 for appropriate height
  */
@@ -34,7 +33,6 @@ export const Overview = () => (
                     label={<>Rationale <span style={{ color: 'var(--color-danger)' }}>*</span></>}
                     placeholder="Please provide a reason for this decision..."
                     rows={2}
-                    variant="long"
                 />
             </div>
         </section>
@@ -46,7 +44,6 @@ export const Overview = () => (
                     label={<>Rationale <span style={{ color: 'var(--color-danger)' }}>*</span></>}
                     defaultValue="Bla bla bla bla"
                     rows={2}
-                    variant="long"
                 />
             </div>
         </section>
@@ -73,7 +70,6 @@ export const Interactive = () => {
                     value={rationale}
                     onChange={(e) => setRationale(e.target.value)}
                     rows={2}
-                    variant="long"
                 />
             </div>
             {rationale && (

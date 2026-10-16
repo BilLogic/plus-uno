@@ -80,11 +80,15 @@ $dropdown-themes: (
     // --- DROPDOWN MENU ---
     .dropdown-menu {
         position: absolute;
-        top: 100%;
+        // The popup placement rule: the gap to the toggle is the token, on
+        // whichever side the menu opens, so Bootstrap's own spacer margin goes.
+        top: calc(100% + var(--size-element-gap-xs));
         left: 0;
+        margin: 0;
         z-index: 1000;
-        min-width: 200px;
-        max-width: 320px;
+        // At least the toggle (the wrapper is its width), and never under 200px.
+        min-width: max(200px, 100%);
+        max-width: var(--layout-max-width-listbox);
         padding: var(--size-element-pad-y-sm) 0;
         // Canonical menu surface per Figma (BS4 Dropdown → surface-container #edeef0).
         // This is the single source: consumers must NOT re-declare the menu background,
@@ -289,7 +293,7 @@ $dropdown-themes: (
     // --- DIRECTION VARIANTS ---
     &.dropup .dropdown-menu {
         top: auto;
-        bottom: 100%;
+        bottom: calc(100% + var(--size-element-gap-xs));
     }
 
     &.dropleft .dropdown-menu {

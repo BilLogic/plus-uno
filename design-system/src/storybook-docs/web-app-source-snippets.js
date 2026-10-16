@@ -245,7 +245,6 @@ export const webAppSourceSnippets = {
         '  id="textarea-overview"',
         '  label="Label"',
         '  placeholder="Enter text..."',
-        '  variant="long"',
         '  rows={3}',
         '/>'
     ]),
@@ -288,6 +287,7 @@ export const webAppSourceSnippets = {
     formNumber: snippet([
         '<NumberInput',
         '  id="number-input-overview"',
+        '  label="Number of sessions"',
         '  placeholder="Number"',
         '/>'
     ]),
@@ -343,31 +343,17 @@ export const webAppSourceSnippets = {
         '  onChange={(rowId, columnId) => setRadioValues({ ...radioValues, [rowId]: columnId })}',
         '/>'
     ]),
-    formMultipleChoice: snippet([
-        'const [radioValue, setRadioValue] = useState(null);',
+    formChoiceGroup: snippet([
+        'const [value, setValue] = useState(null);',
         '',
-        '<MultipleChoice',
-        '  id="multiple-choice-overview"',
-        '  name="multiple-choice-overview"',
-        '  type="radio"',
-        '  options={overviewRadioOptions}',
-        '  value={radioValue}',
-        '  onChange={setRadioValue}',
-        '/>'
-    ]),
-    formScale: snippet([
-        'const [value, setValue] = useState("option2");',
-        '',
-        '<Scale',
-        '  id="scale-overview"',
-        '  name="scale-overview"',
-        '  label="Confidence"',
-        '  lowestLabel="Lowest"',
-        '  highestLabel="Highest"',
+        '<ChoiceGroup',
+        '  id="cg-overview"',
+        '  name="cg-overview"',
+        '  legend="Which subject did you tutor?"',
         '  options={[',
-        '    { value: "option1", label: "Text" },',
-        '    { value: "option2", label: "Text" },',
-        '    { value: "option3", label: "Text" },',
+        '    { value: "math", label: "Math" },',
+        '    { value: "reading", label: "Reading" },',
+        '    { value: "science", label: "Science" },',
         '  ]}',
         '  value={value}',
         '  onChange={setValue}',

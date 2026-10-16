@@ -70,9 +70,11 @@ const Stepper = ({
                 className="stepper-input-group"
             />
             <style>{`
-                .stepper-input-group .plus-input-group-input {
-                    text-align: center;
+                .plus-field.stepper-input-group {
                     background-color: var(--color-surface-container-lowest);
+                }
+                .stepper-input-group .plus-field__control {
+                    text-align: center;
                 }
             `}</style>
         </div>

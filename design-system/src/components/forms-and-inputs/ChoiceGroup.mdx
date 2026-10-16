@@ -1,0 +1,256 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as ChoiceGroupStories from './ChoiceGroup.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "type": {
+      "type": "enum",
+      "values": [
+        "radio",
+        "checkbox"
+      ]
+    },
+    "orientation": {
+      "type": "enum",
+      "values": [
+        "stacked",
+        "inline"
+      ]
+    },
+    "appearance": {
+      "type": "enum",
+      "values": [
+        "plain",
+        "card"
+      ]
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "sets": [
+    {
+      "id": "choice-group",
+      "name": "ChoiceGroup",
+      "componentSetNodeId": "18265:52386",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-52386",
+      "source": "node-chart",
+      "status": "verified",
+      "verifiedAt": "2026-10-15",
+      "notes": "Four variants, type × orientation. Legend, then a row of Leading text, the Options slot (Form Radio Button or Form Checkbox, at least two) and Trailing text, then Other and Error. Replaces the deleted Multiple Choice (Radio) 13540:9207, Multiple Choice (Checkbox) 13540:9717 and Scale Radio Button 13536:6785. Linear Scale stays in the library, deprecated, until the Specs file swaps its six instances."
+    }
+  ],
+  "deliberate": {
+    "appearance": "Figma sets appearance on each Form Checkbox and Form Radio Button in the Options slot, since a group cannot reach into its slot; code sets it once on ChoiceGroup and passes it to every choice.",
+    "description": "Figma sets description on each choice in the Options slot; code takes it per option in `options` and passes it to that choice."
+  }
+};
+
+<Meta of={ChoiceGroupStories} />
+
+<Title />
+Use a choice group when a user answers one question by picking one option, or any number of options, from a short list they can see in full.
+
+<DocsTabs of={ChoiceGroupStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock 
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-52386"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>One question, three answers, pick one.</>}>
+    <Canvas of={ChoiceGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Type
+
+<DocsCanvasShell description={<>Radio (pick one) and checkbox (pick any).</>}>
+    <DsCanvasQuiet of={ChoiceGroupStories.Types} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Layout & composition
+
+<DocsCanvasShell description={<>Stacked and inline.</>}>
+    <DsCanvasQuiet of={ChoiceGroupStories.Orientation} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A numbered scale: inline radios between a leading and a trailing end label.</>}>
+    <DsCanvasQuiet of={ChoiceGroupStories.ScaleEnds} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>An "Other" answer with its own text box. Typing in it chooses it.</>}>
+    <DsCanvasQuiet of={ChoiceGroupStories.Other} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>An option's follow-up, shown under it while it is chosen.</>}>
+    <DsCanvasQuiet of={ChoiceGroupStories.Reveal} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<DocsCanvasShell description={<>Descriptions under each option, plain and as cards.</>}>
+    <DsCanvasQuiet of={ChoiceGroupStories.Descriptions} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Disabled, read-only radios and read-only checkboxes.</>}>
+    <DsCanvasQuiet of={ChoiceGroupStories.States} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Required, with one error for the group.</>}>
+    <DsCanvasQuiet of={ChoiceGroupStories.Validation} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ChoiceGroupStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `ChoiceGroup` for one question whose answers fit on screen — about two to
+seven. `type="radio"` (the default) takes one answer, `type="checkbox"` any
+number. Past that, or when space is short, use `Select`.
+
+It is also the numbered scale: `orientation="inline"` with `leadingText` and
+`trailingText` for the two ends.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### The value is the answer.
+
+A radio group's value is one option value, or `null` while unanswered; a
+checkbox group's is an array. `onChange` hands you the next answer, not an
+event. Pass `value` to control it or `defaultValue` to let it hold its own.
+
+```jsx
+const [subject, setSubject] = useState(null);
+<ChoiceGroup legend="Subject" options={subjects} value={subject} onChange={setSubject} />
+
+const [days, setDays] = useState([]);
+<ChoiceGroup type="checkbox" legend="Available days" options={weekdays} value={days} onChange={setDays} />
+```
+
+### A radio group starts unanswered.
+
+Nothing is chosen until someone chooses. Pre-choosing the first option makes a
+real answer of 1 indistinguishable from no answer; pass `defaultValue` only when
+the default is itself an answer.
+
+### Options can be strings or objects.
+
+A string is its own value and label. An object takes `value` and `label`, and
+optionally `description`, `disabled`, `id` and `reveal` — content shown under the
+option while it is chosen, such as the date range for "during a date period".
+
+### "Other" is an answer with a text box.
+
+`other={{ label, placeholder, text, onTextChange }}` adds a last choice (value
+`'other'` unless you pass `value`) and a text box beside it. Typing in the box
+chooses it. Keep the typed text in your own state.
+
+### `appearance` and `required` belong to the group.
+
+`appearance="card"` draws every choice as a bordered tile. `required` puts the
+mark on the legend; for radios it also sets `required` on each radio, and for
+checkboxes the group cannot enforce it, so check it on submit. Show the
+failure with `error`, once, for the group.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The legend names the group.** It is a real `fieldset` and `legend`. A radio
+  group takes `role="radiogroup"`, which can carry `aria-required` and
+  `aria-readonly`; a checkbox group stays a `group`, and each box carries its own
+  `aria-readonly`. With no visible question, pass `aria-label`.
+- **Scale ends describe the group.** `leadingText` and `trailingText` are joined
+  to the group with `aria-describedby`, so they are read once for the question
+  rather than attached to the first and last option.
+- **One error, announced.** `error` renders with `role="alert"` and the group
+  points at it with `aria-describedby`.
+- **Descriptions describe, labels name.** Each option's `description` is wired to
+  its control with `aria-describedby`.
+- **Read-only stays reachable.** `readOnly` keeps every choice in the tab order at
+  full contrast and ignores clicks and keys; `disabled` takes them out.
+- **Ids never collide.** Without an `id`, the group generates its own base for
+  option ids and the radio `name`, so two groups on one page stay independent.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For one independent yes or no, use `Checkbox`; for a setting that applies at once, use `Switch`.
+- For the same question asked of several rows, use `ChoiceGrid`.
+- For a long list of options, use `Select`.
+- For a star rating, use `Rating`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

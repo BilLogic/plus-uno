@@ -1,33 +1,96 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { InputGroup as BootstrapInputGroup, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import Button from '@/components/actions/Button/Button';
 import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
 import useFieldId from '@/components/forms-and-inputs/useFieldId';
+import Checkbox from '../Checkbox';
+import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from '../_internal/Field';
 import './InputGroup.scss';
 
+/** One addon from a descriptor: a string, an object with a `type`, or a node. */
+const renderAddon = (addon, key) => {
+    if (!addon) return null;
+    if (React.isValidElement(addon)) return React.cloneElement(addon, { key });
+
+    if (typeof addon === 'string') {
+        switch (addon.toLowerCase()) {
+            case 'checkbox':
+                return <InputGroupCheckbox key={key} checked />;
+            case 'radio':
+                return <InputGroupRadio key={key} checked />;
+            case 'icon':
+            case 'plus':
+                return <InputGroupIcon key={key} />;
+            case 'button':
+                return <InputGroupButton key={key}>Button</InputGroupButton>;
+            case 'dropdown':
+                return <InputGroupDropdown key={key}>Dropdown</InputGroupDropdown>;
+            default:
+                return <InputGroupText key={key}>{addon}</InputGroupText>;
+        }
+    }
+
+    if (typeof addon === 'object') {
+        const { type, ...addonProps } = addon;
+        const content = addonProps.children || addonProps.text;
+        switch (type) {
+            case 'checkbox':
+                return <InputGroupCheckbox key={key} {...addonProps} />;
+            case 'radio':
+                return <InputGroupRadio key={key} {...addonProps} />;
+            case 'icon':
+            case 'plus':
+                return <InputGroupIcon key={key} {...addonProps} />;
+            case 'text':
+                return <InputGroupText key={key} {...addonProps}>{content}</InputGroupText>;
+            case 'button':
+                return <InputGroupButton key={key} {...addonProps}>{content || 'Button'}</InputGroupButton>;
+            case 'dropdown':
+                return <InputGroupDropdown key={key} {...addonProps}>{content || 'Dropdown'}</InputGroupDropdown>;
+            default:
+                return null;
+        }
+    }
+    return null;
+};
+
+/** A slot takes one addon or a list of them. */
+const renderSlot = (visual) => {
+    if (!visual) return null;
+    const addons = (Array.isArray(visual) ? visual : [visual]).map(renderAddon).filter(Boolean);
+    return addons.length ? addons : null;
+};
+
+/**
+ * InputGroup — an Input whose addons sit in the field's Leading and Trailing
+ * slots: text affixes ("$", ".00"), a checkbox or radio, an icon, small
+ * buttons and a small dropdown. No addon draws a box; the field is the box.
+ *
+ * `leadingVisual` and `trailingVisual` each take one addon or an array.
+ */
 const InputGroup = ({
     id,
     name,
-    /**
-     * #329. The field's name. This component had none, and no way to acquire
-     * one: `id` was applied to the GROUP and extra props were spread there too,
-     * so nothing a caller could pass reached the input. It was the only field in
-     * this directory that could not be labelled at all.
-     */
+    /** The field's name. Render one unless something else on the page names it. */
     label,
-    /** Hides the label; it does not remove it. Same rule as `Input` (#213). */
+    /** Hides the label; it does not remove it. Same rule as `Input`. */
     showLabel = true,
     required = false,
+    info,
+    caption,
     placeholder,
     value,
+    defaultValue,
     size = 'medium',
     disabled = false,
-    readonly = false,
+    readOnly,
+    /** @deprecated Prefer `readOnly` */
+    readonly,
+    validation = 'none',
+    validationMessage,
     leadingVisual,
     trailingVisual,
-    leadingVisual2,
-    trailingVisual2,
     className = '',
     style,
     onChange,
@@ -36,183 +99,96 @@ const InputGroup = ({
     inputRef,
     ...props
 }) => {
-    const [isFocused, setIsFocused] = useState(false);
-    /** One id for the label and the input — see `useFieldId` (#206). */
+    /** One id for the label and the input — see `useFieldId`. */
     const fieldId = useFieldId(id);
+    const isReadOnly = readOnly !== undefined ? readOnly : Boolean(readonly);
 
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
-    const bsSize = size === 'small' ? 'sm' : (size === 'large' ? 'lg' : undefined);
-
-    const handleFocus = (e) => {
-        setIsFocused(true);
-        if (onFocus) onFocus(e);
-    };
-
-    const handleBlur = (e) => {
-        setIsFocused(false);
-        if (onBlur) onBlur(e);
-    };
-
-    // Render addon component
-    const renderAddon = (addon, position) => {
-        if (!addon) return null;
-
-        // If it's already a React element, use it directly
-        if (React.isValidElement(addon)) {
-            return addon;
-        }
-
-        // If it's a string descriptor, create the appropriate component
-        if (typeof addon === 'string') {
-            // Check if it's a type descriptor like "checkbox", "radio", etc.
-            const type = addon.toLowerCase();
-            switch (type) {
-                case 'checkbox':
-                    return <InputGroup.Checkbox size={size} checked />;
-                case 'radio':
-                    return <InputGroup.Radio size={size} checked />;
-                case 'icon':
-                case 'plus':
-                    return <InputGroup.Icon size={size} />;
-                case 'button':
-                    return <InputGroup.Button size={size}>Button</InputGroup.Button>;
-                case 'dropdown':
-                    return <InputGroup.Dropdown size={size}>Dropdown</InputGroup.Dropdown>;
-                default:
-                    // Treat as text
-                    return <InputGroup.Text size={size}>{addon}</InputGroup.Text>;
-            }
-        }
-
-        // If it's an object descriptor
-        if (typeof addon === 'object' && addon !== null) {
-            const { type, ...addonProps } = addon;
-            switch (type) {
-                case 'checkbox':
-                    return <InputGroup.Checkbox size={size} {...addonProps} />;
-                case 'radio':
-                    return <InputGroup.Radio size={size} {...addonProps} />;
-                case 'icon':
-                case 'plus':
-                    return <InputGroup.Icon size={size} {...addonProps} />;
-                case 'text':
-                    return <InputGroup.Text size={size} {...addonProps}>{addonProps.children || addonProps.text}</InputGroup.Text>;
-                case 'button':
-                    return <InputGroup.Button size={size} {...addonProps}>{addonProps.children || addonProps.text || 'Button'}</InputGroup.Button>;
-                case 'dropdown':
-                    return <InputGroup.Dropdown size={size} {...addonProps}>{addonProps.children || addonProps.text || 'Dropdown'}</InputGroup.Dropdown>;
-                default:
-                    return null;
-            }
-        }
-
-        return null;
-    };
-
-    const wrapperClasses = [
-        'plus-input-group-wrapper',
-        `plus-input-group-${size}`,
-        sizeClass,
-        disabled ? 'plus-input-group-disabled' : '',
-        readonly ? 'plus-input-group-readonly' : '',
-        isFocused ? 'plus-input-group-focused' : '',
-        className
-    ].filter(Boolean).join(' ');
+    const tone = validation === 'invalid' ? 'invalid' : (validation === 'success' ? 'success' : 'help');
+    const message = (validation !== 'none' && validationMessage) || caption;
+    const { messageId, describedBy } = fieldDescription({
+        fieldId,
+        message,
+        describedBy: props['aria-describedby'],
+    });
 
     return (
-        <div className="plus-input-group-container">
-            {label && (
-                <Form.Label
-                    htmlFor={fieldId}
-                    className={`plus-input-group-label${showLabel ? '' : ' plus-input-group-label-hidden'}`}
-                >
-                    {label}
-                    {required && (
-                        <span className="plus-input-group-required" aria-label="required">*</span>
-                    )}
-                </Form.Label>
-            )}
-            <BootstrapInputGroup
-                size={bsSize}
-                className={wrapperClasses}
+        <FieldStack disabled={disabled} className="plus-input-group-container">
+            <FieldLabel htmlFor={fieldId} required={required} info={info} hidden={!showLabel}>
+                {label}
+            </FieldLabel>
+            <Field
+                size={size}
+                disabled={disabled}
+                readOnly={isReadOnly}
+                {...toneProps(tone).field}
+                leading={renderSlot(leadingVisual)}
+                trailing={renderSlot(trailingVisual)}
+                className={`plus-input-group-wrapper ${className}`.trim()}
                 style={style}
             >
-                {/* Leading visuals */}
-                {leadingVisual && renderAddon(leadingVisual, 'leading')}
-                {leadingVisual2 && renderAddon(leadingVisual2, 'leading2')}
-
                 {/*
-                  * #329. Extra props go to the FIELD, not to the group — the
-                  * same move `NumberInput` made in #318, and for the same
-                  * reason: the group is a `div` with no role and no name, so a
-                  * caller's `aria-label` or `aria-describedby` landed somewhere
-                  * it could not help.
+                  * Extra props go to the FIELD, not to the box: the box is a
+                  * `div` with no role and no name, so a caller's `aria-label`
+                  * or `aria-describedby` would land somewhere it cannot help.
                   */}
-                <Form.Control
+                <input
                     ref={inputRef}
                     id={fieldId}
                     name={name}
                     type="text"
                     placeholder={placeholder}
                     value={value}
+                    defaultValue={defaultValue}
                     disabled={disabled}
-                    readOnly={readonly}
+                    readOnly={isReadOnly}
                     onChange={onChange}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                    className="plus-input-group-input"
+                    onFocus={onFocus}
+                    onBlur={onBlur}
+                    className="plus-field__control plus-input-group-input"
+                    aria-required={required || undefined}
                     {...props}
+                    aria-describedby={describedBy}
+                    {...toneProps(tone).control}
                 />
-
-                {/* Trailing visuals */}
-                {trailingVisual && renderAddon(trailingVisual, 'trailing')}
-                {trailingVisual2 && renderAddon(trailingVisual2, 'trailing2')}
-            </BootstrapInputGroup>
-        </div>
+            </Field>
+            <FieldCaption messageId={messageId} message={message} tone={tone} />
+        </FieldStack>
     );
 };
 
-// Subcomponent: Text
-const InputGroupText = ({ children, size = 'medium', className = '', ...props }) => {
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
-    return (
-        <BootstrapInputGroup.Text className={`plus-input-group-addon plus-input-group-text ${sizeClass} ${className}`} {...props}>
-            {children}
-        </BootstrapInputGroup.Text>
-    );
-};
+/** Text addon — the field's affix: "$", ".00", "https://". */
+const InputGroupText = ({ children, className = '', ...props }) => (
+    <span className={`plus-field-affix plus-input-group-addon plus-input-group-text ${className}`.trim()} {...props}>
+        {children}
+    </span>
+);
 
 InputGroupText.propTypes = {
     children: PropTypes.node,
+    /** Accepted for older call sites; the field sets the size. */
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     className: PropTypes.string
 };
 
-// Subcomponent: Checkbox
+/** Checkbox addon — code's Checkbox box (18), centred. Name it: the default is generic. */
 const InputGroupCheckbox = ({
     checked = false,
-    size = 'medium',
     disabled = false,
     onChange,
     className = '',
     'aria-label': ariaLabel = 'Toggle option',
+    size: _size,
     ...props
-}) => {
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
-    return (
-        <BootstrapInputGroup.Text className={`plus-input-group-addon plus-input-group-checkbox ${sizeClass} ${className}`} {...props}>
-            <div className="plus-input-group-checkbox-input">
-                <Form.Check
-                    type="checkbox"
-                    checked={checked}
-                    disabled={disabled}
-                    onChange={onChange}
-                    aria-label={ariaLabel}
-                />
-            </div>
-        </BootstrapInputGroup.Text>
-    );
-};
+}) => (
+    <span className={`plus-input-group-addon plus-input-group-checkbox ${className}`.trim()} {...props}>
+        <Checkbox
+            checked={checked}
+            disabled={disabled}
+            onChange={onChange || (() => {})}
+            aria-label={ariaLabel}
+        />
+    </span>
+);
 
 InputGroupCheckbox.propTypes = {
     checked: PropTypes.bool,
@@ -223,31 +199,26 @@ InputGroupCheckbox.propTypes = {
     'aria-label': PropTypes.string
 };
 
-// Subcomponent: Radio
+/** Radio addon. Name it: the default is generic. */
 const InputGroupRadio = ({
     checked = false,
-    size = 'medium',
     disabled = false,
     onChange,
     className = '',
     'aria-label': ariaLabel = 'Select option',
+    size: _size,
     ...props
-}) => {
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
-    return (
-        <BootstrapInputGroup.Text className={`plus-input-group-addon plus-input-group-radio ${sizeClass} ${className}`} {...props}>
-            <div className="plus-input-group-radio-input">
-                <Form.Check
-                    type="radio"
-                    checked={checked}
-                    disabled={disabled}
-                    onChange={onChange}
-                    aria-label={ariaLabel}
-                />
-            </div>
-        </BootstrapInputGroup.Text>
-    );
-};
+}) => (
+    <span className={`plus-input-group-addon plus-input-group-radio ${className}`.trim()} {...props}>
+        <Form.Check
+            type="radio"
+            checked={checked}
+            disabled={disabled}
+            onChange={onChange || (() => {})}
+            aria-label={ariaLabel}
+        />
+    </span>
+);
 
 InputGroupRadio.propTypes = {
     checked: PropTypes.bool,
@@ -258,53 +229,51 @@ InputGroupRadio.propTypes = {
     'aria-label': PropTypes.string
 };
 
-// Subcomponent: Icon (Plus)
-const InputGroupIcon = ({ size = 'medium', className = '', ...props }) => {
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
-    return (
-        <BootstrapInputGroup.Text className={`plus-input-group-addon plus-input-group-icon ${sizeClass} ${className}`} {...props}>
-            <div className="plus-input-group-icon-wrapper">
-                <i className="fa-solid fa-plus" aria-hidden="true" />
-            </div>
-        </BootstrapInputGroup.Text>
-    );
-};
+/** Icon addon. Decoration: it is hidden from assistive technology. */
+const InputGroupIcon = ({ icon = 'fa-solid fa-plus', className = '', size: _size, ...props }) => (
+    <span className={`plus-input-group-addon plus-input-group-icon ${className}`.trim()} {...props}>
+        <i className={icon} aria-hidden="true" />
+    </span>
+);
 
 InputGroupIcon.propTypes = {
+    /** A Font Awesome Free class. */
+    icon: PropTypes.string,
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     className: PropTypes.string
 };
 
-// Subcomponent: Button
+/**
+ * Button addon — always a small button, cut to the field's line so the field
+ * keeps its height (22 in a medium field), as in Figma.
+ */
 const InputGroupButton = ({
     children,
     text,
-    size = 'medium',
     disabled = false,
     onClick,
     style = 'primary',
     fill = 'outline',
     className = '',
+    size: _size,
     ...props
-}) => {
-    return (
-        <div className={`plus-input-group-button-wrapper ${className}`} {...props}>
-            <Button
-                text={text || children}
-                size={size}
-                disabled={disabled}
-                onClick={onClick}
-                style={style}
-                fill={fill}
-                className="plus-input-group-button-element"
-            />
-        </div>
-    );
-};
+}) => (
+    <Button
+        text={text || children}
+        size="small"
+        disabled={disabled}
+        onClick={onClick}
+        style={style}
+        fill={fill}
+        className={`plus-input-group-addon plus-input-group-button-element ${className}`.trim()}
+        {...props}
+    />
+);
 
 InputGroupButton.propTypes = {
     children: PropTypes.node,
     text: PropTypes.string,
+    /** Accepted for older call sites; addon buttons are always small. */
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
     onClick: PropTypes.func,
@@ -316,39 +285,37 @@ InputGroupButton.propTypes = {
     className: PropTypes.string
 };
 
-// Subcomponent: Dropdown
+/** Dropdown addon — always the small Dropdown button. */
 const InputGroupDropdown = ({
     children,
     text,
     buttonText,
-    size = 'medium',
     disabled = false,
     items = [],
     style = 'primary',
     className = '',
+    size: _size,
     ...props
 }) => {
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
-    // Map InputGroup size to Dropdown size
-    const dropdownSize = size === 'small' ? 'small' : (size === 'large' ? 'large' : 'default');
-
     const dropdownClassName = [
         'plus-input-group-dropdown-element',
         `pdropdown-${style}`,
         disabled ? 'plus-input-group-dropdown-disabled' : ''
     ].filter(Boolean).join(' ');
 
+    // The rest props are the Dropdown's (`id`, `ariaLabel`, `onToggle`…), so
+    // they go to it alone, once.
     return (
-        <BootstrapInputGroup.Text className={`plus-input-group-addon plus-input-group-dropdown ${sizeClass} ${disabled ? 'plus-input-group-addon-disabled' : ''} ${className}`} {...props}>
+        <span className={`plus-input-group-addon plus-input-group-dropdown ${disabled ? 'plus-input-group-addon-disabled' : ''} ${className}`.trim()}>
             <Dropdown
                 buttonText={buttonText || text || children || 'Dropdown'}
-                size={dropdownSize}
+                size="small"
                 style={style}
                 items={items}
                 className={dropdownClassName}
                 {...props}
             />
-        </BootstrapInputGroup.Text>
+        </span>
     );
 };
 
@@ -356,6 +323,7 @@ InputGroupDropdown.propTypes = {
     children: PropTypes.node,
     text: PropTypes.string,
     buttonText: PropTypes.string,
+    /** Accepted for older call sites; the addon is always small. */
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
     items: PropTypes.array,
@@ -371,6 +339,8 @@ InputGroup.Icon = InputGroupIcon;
 InputGroup.Button = InputGroupButton;
 InputGroup.Dropdown = InputGroupDropdown;
 
+const addon = PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.node]);
+
 InputGroup.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
@@ -378,32 +348,26 @@ InputGroup.propTypes = {
     label: PropTypes.node,
     /** Hides the label without removing it. */
     showLabel: PropTypes.bool,
+    /** Shows an asterisk and sets `aria-required`. */
     required: PropTypes.bool,
+    /** Text for an info tooltip beside the label. */
+    info: PropTypes.node,
+    /** Standing help under the field. A validation message takes its place. */
+    caption: PropTypes.node,
     placeholder: PropTypes.string,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
+    readOnly: PropTypes.bool,
+    /** @deprecated Prefer `readOnly` */
     readonly: PropTypes.bool,
-    leadingVisual: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.object,
-        PropTypes.node
-    ]),
-    trailingVisual: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.object,
-        PropTypes.node
-    ]),
-    leadingVisual2: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.object,
-        PropTypes.node
-    ]),
-    trailingVisual2: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.object,
-        PropTypes.node
-    ]),
+    validation: PropTypes.oneOf(['none', 'invalid', 'success']),
+    validationMessage: PropTypes.node,
+    /** One addon, or an array of them, for the Leading slot. */
+    leadingVisual: PropTypes.oneOfType([addon, PropTypes.arrayOf(addon)]),
+    /** One addon, or an array of up to two, for the Trailing slot. */
+    trailingVisual: PropTypes.oneOfType([addon, PropTypes.arrayOf(addon)]),
     className: PropTypes.string,
     style: PropTypes.object,
     onChange: PropTypes.func,
@@ -416,6 +380,3 @@ InputGroup.propTypes = {
 };
 
 export default InputGroup;
-
-
-

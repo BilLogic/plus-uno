@@ -71,24 +71,12 @@ html.market-active #root {
     min-inline-size: 0;
   }
 
-  &__filter-group .plus-select-wrapper,
-  &__filter-group .plus-select-trigger,
-  &__filter-group .plus-select-badges {
+  // The picks are Select's default Tags, which collapse into "+n" at rest,
+  // so the field keeps the group's width without overrides of its own.
+  &__filter-group .plus-select-wrapper {
     width: 100%;
     min-width: 0;
     max-width: 100%;
-  }
-
-  // Keep Select chevron inline with selected chips and let field height
-  // grow/shrink naturally as chip rows change.
-  &__filter-group .plus-select-trigger {
-    flex-wrap: nowrap;
-    align-items: center;
-  }
-
-  &__filter-group .plus-select-badges {
-    flex: 1 1 auto;
-    max-width: none;
   }
 
   &__filter-label {

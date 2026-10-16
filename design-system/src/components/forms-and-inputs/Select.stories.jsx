@@ -3,10 +3,8 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import Select from './Select';
 
 /**
- * Select Component
- * 
- * Enhanced dropdown select with single/multi-select modes, searchable,
- * and creatable options. Uses ListGroup.Item for option rendering.
+ * Select — pick one value, or several, from a list. The field is `_Field`
+ * and the list is the internal Listbox; searchable means typing in the field.
  */
 export default {
     title: 'Components/Forms and inputs/Select',
@@ -15,7 +13,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'Enhanced select input with single/multi selection plus optional searchable and creatable modes.'
+                component: 'Pick one value, or several, from a list. Type in the field to filter it.'
             }
         }
     },
@@ -35,10 +33,18 @@ export default {
         },
         displayMode: {
             control: { type: 'select' },
-            options: ['badges', 'text'],
+            options: ['tags', 'badges', 'text'],
             table: { category: 'Design' }
         },
+        label: {
+            control: 'text',
+            table: { category: 'Content' }
+        },
         placeholder: {
+            control: 'text',
+            table: { category: 'Content' }
+        },
+        caption: {
             control: 'text',
             table: { category: 'Content' }
         },
@@ -50,6 +56,10 @@ export default {
             control: 'boolean',
             table: { category: 'Behavior' }
         },
+        invalid: {
+            control: 'boolean',
+            table: { category: 'Behavior' }
+        },
         disabled: {
             control: 'boolean',
             table: { category: 'Behavior' }
@@ -58,51 +68,46 @@ export default {
             control: 'boolean',
             table: { category: 'Behavior' }
         },
-        required: {
-            table: { disable: true, category: 'Development' }
+        commitOnClose: {
+            control: 'boolean',
+            table: { category: 'Behavior' }
         },
-        options: {
-            table: { disable: true, category: 'Development' }
+        clearable: {
+            control: 'boolean',
+            description: 'Shows the clear ×. Unset, it is on in multi mode and `!required` in single mode.',
+            table: { category: 'Behavior' }
         },
-        value: {
-            control: false,
-            table: { disable: true, category: 'Development' }
+        selectAll: {
+            control: 'boolean',
+            table: { category: 'Behavior' }
         },
-        defaultValue: {
-            control: false,
-            table: { disable: true, category: 'Development' }
+        maxSelections: {
+            control: 'number',
+            table: { category: 'Behavior' }
         },
-        onChange: {
-            control: false,
-            table: { disable: true, category: 'Development' }
-        },
-        defaultOpen: {
-            table: { disable: true, category: 'Development' }
-        },
-        defaultSearchTerm: {
-            table: { disable: true, category: 'Development' }
-        },
-        lineWrap: {
-            table: { disable: true, category: 'Development' }
-        },
-        truncate: {
-            table: { disable: true, category: 'Development' }
-        },
-        open: {
-            table: { disable: true, category: 'Development' }
-        },
-        id: {
-            control: false,
-            table: { disable: true, category: 'Development' }
-        },
-        name: {
-            control: false,
-            table: { disable: true, category: 'Development' }
-        },
-        className: {
-            control: false,
-            table: { disable: true, category: 'Development' }
-        },}
+        readOnly: { table: { disable: true, category: 'Development' } },
+        required: { table: { disable: true, category: 'Development' } },
+        options: { table: { disable: true, category: 'Development' } },
+        value: { control: false, table: { disable: true, category: 'Development' } },
+        defaultValue: { control: false, table: { disable: true, category: 'Development' } },
+        onChange: { control: false, table: { disable: true, category: 'Development' } },
+        onCreate: { control: false, table: { disable: true, category: 'Development' } },
+        onFocus: { control: false, table: { disable: true, category: 'Development' } },
+        onBlur: { control: false, table: { disable: true, category: 'Development' } },
+        loadOptions: { control: false, table: { disable: true, category: 'Development' } },
+        dependsOn: { control: false, table: { disable: true, category: 'Development' } },
+        recent: { control: false, table: { disable: true, category: 'Development' } },
+        suggested: { control: false, table: { disable: true, category: 'Development' } },
+        loading: { table: { disable: true, category: 'Development' } },
+        defaultOpen: { table: { disable: true, category: 'Development' } },
+        defaultSearchTerm: { table: { disable: true, category: 'Development' } },
+        lineWrap: { table: { disable: true, category: 'Development' } },
+        truncate: { table: { disable: true, category: 'Development' } },
+        open: { table: { disable: true, category: 'Development' } },
+        id: { control: false, table: { disable: true, category: 'Development' } },
+        name: { control: false, table: { disable: true, category: 'Development' } },
+        className: { control: false, table: { disable: true, category: 'Development' } },
+    }
 };
 
 const sampleOptions = [
@@ -113,38 +118,26 @@ const sampleOptions = [
     { value: 'option-5', label: 'Option #5' },
 ];
 
-/** Content — Placeholder and value display in single-select mode. */
+const grid = { pointerEvents: 'auto', display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' };
+
+/** Content — Placeholder and value in single-select mode. */
 export const Content = {
     render: () => (
-        <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", display: "grid", gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Closed, empty</span>
-                <Select options={sampleOptions} placeholder="Select (a/an) {value} from below" />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Closed, filled</span>
-                <Select defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
-            </div>
+        <div className="sb-select-interactive-override" style={grid}>
+            <Select label="Closed, empty" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+            <Select label="Closed, filled" defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
         </div>
     )
 };
 
-/** Modes — Multi-select, searchable, and creatable behaviors. */
+/** Modes — Multi-select with Tags or Badges, searchable and creatable. */
 export const Modes = {
     render: () => (
-        <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", display: "grid", gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Multi-select</span>
-                <Select mode="multi" options={sampleOptions} placeholder="Select {value(s)} from below" />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Searchable</span>
-                <Select searchable options={sampleOptions} placeholder="Select (a/an) {value} from below" />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Creatable</span>
-                <Select mode="multi" searchable creatable options={sampleOptions} placeholder="Select {value(s)} from below" />
-            </div>
+        <div className="sb-select-interactive-override" style={grid}>
+            <Select label="Multi (tags)" mode="multi" options={sampleOptions} defaultValue={['option-1', 'option-2']} placeholder="Select {value(s)} from below" />
+            <Select label="Multi (badges)" mode="multi" displayMode="badges" options={sampleOptions} defaultValue={['option-1', 'option-2']} placeholder="Select {value(s)} from below" />
+            <Select label="Searchable" searchable options={sampleOptions} placeholder="Type to search" />
+            <Select label="Creatable" mode="multi" creatable options={sampleOptions} placeholder="Type to search or create" />
         </div>
     )
 };
@@ -152,39 +145,62 @@ export const Modes = {
 /** Sizes — Small, medium, and large. */
 export const Sizes = {
     render: () => (
-        <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", display: "flex", flexDirection: "column", gap: 20 }}>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Small</span>
-                <Select size="small" options={sampleOptions} placeholder="Select..." />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Medium (default)</span>
-                <Select size="medium" options={sampleOptions} placeholder="Select..." />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Large</span>
-                <Select size="large" options={sampleOptions} placeholder="Select..." />
-            </div>
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <Select label="Small" size="small" options={sampleOptions} placeholder="Select..." />
+            <Select label="Medium (default)" size="medium" options={sampleOptions} placeholder="Select..." />
+            <Select label="Large" size="large" options={sampleOptions} placeholder="Select..." />
         </div>
     )
 };
 
-/** InteractionStates — Enabled, disabled, and read-only. */
+/** InteractionStates — Enabled, invalid, read-only and disabled. */
 export const InteractionStates = {
     render: () => (
-        <div className="sb-select-interactive-override" style={{ pointerEvents: "auto", display: "grid", gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Enabled</span>
-                <Select defaultValue="option-1" options={sampleOptions} placeholder="Select..." />
+        <div className="sb-select-interactive-override" style={grid}>
+            <Select label="Enabled" defaultValue="option-1" options={sampleOptions} />
+            <Select label="Invalid" invalid caption="Choose an option" options={sampleOptions} />
+            <Select label="Read only" readonly defaultValue="option-1" options={sampleOptions} />
+            <Select label="Disabled" disabled defaultValue="option-1" options={sampleOptions} />
+        </div>
+    )
+};
+
+const schools = [
+    { value: 'north', label: 'North High' },
+    { value: 'south', label: 'South High' },
+];
+const teachers = {
+    north: [{ value: 'ng', label: 'Ms. Garcia' }, { value: 'nl', label: 'Mr. Lee' }],
+    south: [{ value: 'sp', label: 'Ms. Patel' }],
+};
+
+/** DependentFields — the child waits for its parent and clears when the parent changes. */
+export const DependentFields = {
+    render: () => {
+        const [school, setSchool] = useState('');
+        const [teacher, setTeacher] = useState('');
+        return (
+            <div className="sb-select-interactive-override" style={grid}>
+                <Select label="School" options={schools} value={school} onChange={setSchool} />
+                <Select
+                    label="Teacher"
+                    options={teachers[school] || []}
+                    value={teacher}
+                    onChange={setTeacher}
+                    dependsOn={{ value: school, label: 'a school' }}
+                />
             </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Disabled</span>
-                <Select disabled defaultValue="option-1" options={sampleOptions} placeholder="Select..." />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Read only</span>
-                <Select readonly defaultValue="option-1" options={sampleOptions} placeholder="Select..." />
-            </div>
+        );
+    }
+};
+
+const people = Array.from({ length: 80 }, (_, i) => ({ value: `p${i + 1}`, label: `Tutor ${i + 1}` }));
+
+/** LongList — past 50 options, Recent and Suggested come first and typing searches the rest. */
+export const LongList = {
+    render: () => (
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: 400, paddingBottom: 320 }}>
+            <Select label="Tutor" options={people} recent={['p3']} suggested={['p8', 'p21']} />
         </div>
     )
 };
@@ -202,7 +218,7 @@ export const Overview = {
                 paddingBottom: 320,
             }}
         >
-            <Select options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+            <Select aria-label="Option" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
         </div>
     ),
     parameters: {
@@ -233,14 +249,7 @@ export const Interactive = {
                     }
                 </p>
                 <Select
-                    mode={args.mode}
-                    placeholder={args.placeholder}
-                    searchable={args.searchable}
-                    creatable={args.creatable}
-                    displayMode={args.displayMode}
-                    size={args.size}
-                    disabled={args.disabled}
-                    readonly={args.readonly}
+                    {...args}
                     options={sampleOptions}
                     value={value}
                     onChange={setValue}
@@ -250,12 +259,17 @@ export const Interactive = {
     },
     args: {
         mode: 'single',
+        label: 'Option',
         placeholder: 'Select...',
+        caption: '',
         searchable: false,
         creatable: false,
-        displayMode: 'badges',
+        displayMode: 'tags',
         size: 'medium',
+        invalid: false,
         disabled: false,
-        readonly: false
+        readonly: false,
+        commitOnClose: false,
+        selectAll: false,
     }
 };

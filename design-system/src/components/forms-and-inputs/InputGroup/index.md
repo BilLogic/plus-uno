@@ -3,11 +3,13 @@
 
 # InputGroup
 
+slots: text affixes ("$", ".00"), a checkbox or radio, an icon, small buttons and a small dropdown. No addon draws a box; the field is the box. `leadingVisual` and `trailingVisual` each take one addon or an array.
+
 **Import:** `import { InputGroup } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/InputGroup/InputGroup.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/InputGroup/InputGroup.stories.jsx` — Overview, Content, Variants, Sizes, InteractionStates, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/InputGroup/InputGroup.stories.jsx` — Overview, Content, Variants, Sizes, InteractionStates, Interactive, AddonsInSlots
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/InputGroup/InputGroup.mdx`
 
@@ -19,16 +21,20 @@
 | `name` | string | — | — |
 | `label` | node | — | The field's name. Render one unless something else on the page names it. |
 | `showLabel` | bool | `true` | Hides the label without removing it. |
-| `required` | bool | `false` | — |
+| `required` | bool | `false` | Shows an asterisk and sets `aria-required`. |
+| `info` | node | — | Text for an info tooltip beside the label. |
+| `caption` | node | — | Standing help under the field. A validation message takes its place. |
 | `placeholder` | string | — | Placeholder text for the input |
 | `value` | string or number | — | — |
+| `defaultValue` | string or number | — | — |
 | `size` | enum | `'medium'` | Size variant of the input group |
 | `disabled` | bool | `false` | Disable the input group |
-| `readonly` | bool | `false` | Make the input read-only |
-| `leadingVisual` | string or object or node | — | — |
-| `trailingVisual` | string or object or node | — | — |
-| `leadingVisual2` | string or object or node | — | — |
-| `trailingVisual2` | string or object or node | — | — |
+| `readOnly` | bool | — | Make the input read-only |
+| `readonly` | bool | — | @deprecated Prefer `readOnly` |
+| `validation` | enum | `'none'` | — |
+| `validationMessage` | node | — | — |
+| `leadingVisual` | arrayOf | — | One addon, or an array of them, for the Leading slot. |
+| `trailingVisual` | arrayOf | — | One addon, or an array of up to two, for the Trailing slot. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 | `onChange` | func | — | — |
@@ -40,11 +46,13 @@
 
 **`size`** — `small` · `medium` · `large`
 
+**`validation`** — `none` · `invalid` · `success`
+
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-danger` · `--color-focus-ring` · `--color-inverse-primary` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-surface-container` · `--color-surface-container-low` · `--color-surface-container-lowest` · `--color-surface-variant` · `--font-family-body` · `--font-line-height-body1` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body1` · `--font-size-body2` · `--font-size-body3` · `--font-weight-normal` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-full` · `--size-element-radius-md` · `--size-element-radius-sm` · `--size-element-stroke-md`
+`--color-on-surface-variant`
 
 From `design-system/src/components/forms-and-inputs/InputGroup/InputGroup.scss`. Override these through the token layer, never with a literal.
 
@@ -57,7 +65,7 @@ Implemented as `InputGroupText`.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | node | — | — |
-| `size` | enum | — | — |
+| `size` | enum | — | Accepted for older call sites; the field sets the size. |
 | `className` | string | — | — |
 
 ### `InputGroup.Checkbox`
@@ -90,6 +98,7 @@ Implemented as `InputGroupIcon`.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
+| `icon` | string | — | A Font Awesome Free class. |
 | `size` | enum | — | — |
 | `className` | string | — | — |
 
@@ -101,7 +110,7 @@ Implemented as `InputGroupButton`.
 |------|------|---------|-------------|
 | `children` | node | — | — |
 | `text` | string | — | — |
-| `size` | enum | — | — |
+| `size` | enum | — | Accepted for older call sites; addon buttons are always small. |
 | `disabled` | bool | — | — |
 | `onClick` | func | — | — |
 | `style` | enum | — | — |
@@ -117,7 +126,7 @@ Implemented as `InputGroupDropdown`.
 | `children` | node | — | — |
 | `text` | string | — | — |
 | `buttonText` | string | — | — |
-| `size` | enum | — | — |
+| `size` | enum | — | Accepted for older call sites; the addon is always small. |
 | `disabled` | bool | — | — |
 | `items` | array | — | — |
 | `style` | enum | — | — |
@@ -125,8 +134,6 @@ Implemented as `InputGroupDropdown`.
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `MultipleChoice` · `NumberInput` · `OptionList` · `Radio` · `RadioButtonGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

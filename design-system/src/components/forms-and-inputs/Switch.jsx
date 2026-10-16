@@ -2,6 +2,7 @@ import React from 'react';
 import useFieldId from './useFieldId';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
+import { choiceInputProps, choiceClasses } from './choiceItem';
 import './Switch.scss';
 
 /**
@@ -18,6 +19,7 @@ import './Switch.scss';
  * @param {boolean} [props.defaultChecked]
  * @param {'small'|'medium'|'large'} [props.size='medium'] - Label density; control geometry matches Figma (large scales up)
  * @param {boolean} [props.disabled=false]
+ * @param {boolean} [props.readOnly=false] - Shown, focusable and announced read-only; the state does not change
  * @param {(event: React.ChangeEvent) => void} [props.onChange]
  * @param {(event: React.FocusEvent) => void} [props.onFocus]
  * @param {(event: React.FocusEvent) => void} [props.onBlur]
@@ -34,6 +36,7 @@ const Switch = ({
     defaultChecked,
     size = 'medium',
     disabled = false,
+    readOnly = false,
     onChange,
     onFocus,
     onBlur,
@@ -55,10 +58,14 @@ const Switch = ({
         `plus-form-switch-${size}`,
         sizeClass,
         disabled ? 'plus-form-switch-disabled' : '',
+        choiceClasses({ readOnly }),
         className,
     ].filter(Boolean).join(' ');
 
-    const { type: _ignoredType, ...safeInputProps } = inputProps;
+    const { type: _ignoredType, onClick, 'aria-describedby': describedBy, ...safeInputProps } = inputProps;
+    const { inputProps: readOnlyProps } = choiceInputProps({
+        fieldId, readOnly, onChange, onClick, describedBy,
+    });
 
     return (
         <div className={wrapperClasses} style={style}>
@@ -89,7 +96,8 @@ const Switch = ({
                 checked={isControlled ? checked : undefined}
                 defaultChecked={!isControlled ? defaultChecked : undefined}
                 disabled={disabled}
-                onChange={onChange}
+                {...readOnlyProps}
+                aria-readonly={readOnly || undefined}
                 onFocus={onFocus}
                 onBlur={onBlur}
                 label={label}
@@ -108,6 +116,7 @@ Switch.propTypes = {
     defaultChecked: PropTypes.bool,
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
+    readOnly: PropTypes.bool,
     onChange: PropTypes.func,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,

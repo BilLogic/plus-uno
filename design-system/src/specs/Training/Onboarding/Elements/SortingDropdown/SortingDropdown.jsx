@@ -1,105 +1,86 @@
 /**
  * SortingDropdown Component
- * 
- * Dropdown button with open/closed states for sorting.
+ *
+ * Sort for the onboarding modules. Sort is one choice, so it is two small
+ * single Selects: what to sort by, and in which order. The orders on offer
+ * follow the sort; changing the sort resets the order. A sort always has a
+ * value, so neither field can be cleared.
  * Matches Figma design: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=74-121969
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import DropdownListOptions from '../DropdownListOptions/DropdownListOptions';
+import { Select } from '@/components';
 import './SortingDropdown.scss';
 
+/** What to sort by, and the orders each offers. */
+const SORTS = {
+    name: {
+        label: 'Name',
+        orders: [
+            { value: 'az', label: 'A-Z' },
+            { value: 'za', label: 'Z-A' },
+        ],
+    },
+    duration: {
+        label: 'Duration',
+        orders: [
+            { value: 'shortest-first', label: 'Shortest First' },
+            { value: 'longest-first', label: 'Longest First' },
+        ],
+    },
+    progress: {
+        label: 'Progress',
+        orders: [
+            { value: 'completed-first', label: 'Completed First' },
+            { value: 'completed-last', label: 'Completed Last' },
+        ],
+    },
+};
+
+const sortOptions = Object.entries(SORTS).map(([value, { label }]) => ({ value, label }));
+
 const SortingDropdown = ({
-    isOpen = false,
-    sortType = 'name',
-    label = 'Name',
-    onToggle,
-    onSortChange,
-    onOrderChange,
+    sortBy = 'name',
+    sortOrder,
+    onChange,
     className = '',
     ...props
 }) => {
-    const [internalOpen, setInternalOpen] = useState(isOpen);
-    const dropdownRef = useRef(null);
-
-    // Use controlled or uncontrolled state
-    const open = onToggle !== undefined ? isOpen : internalOpen;
-
-    const handleToggle = () => {
-        if (onToggle) {
-            onToggle(!open);
-        } else {
-            setInternalOpen(!internalOpen);
-        }
-    };
-
-    // Close dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                if (onToggle) {
-                    onToggle(false);
-                } else {
-                    setInternalOpen(false);
-                }
-            }
-        };
-
-        if (open) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [open, onToggle]);
+    const orders = (SORTS[sortBy] || SORTS.name).orders;
+    const order = sortOrder ?? orders[0].value;
 
     return (
-        <div 
-            className={`sorting-dropdown ${className}`} 
-            ref={dropdownRef}
-            {...props}
-        >
-            <button
-                type="button"
-                className={`sorting-dropdown__button ${open ? 'sorting-dropdown__button--open' : ''}`}
-                onClick={handleToggle}
-                aria-expanded={open}
-                aria-haspopup="listbox"
-            >
-                <span className="sorting-dropdown__label">{label}</span>
-                <span className="sorting-dropdown__icon">
-                    <i className="fas fa-caret-down" aria-hidden="true" />
-                </span>
-            </button>
-
-            {open && (
-                <div className="sorting-dropdown__menu">
-                    <DropdownListOptions 
-                        type={sortType}
-                        onSortChange={onSortChange}
-                        onOrderChange={onOrderChange}
-                    />
-                </div>
-            )}
+        <div className={`sorting-dropdown ${className}`} {...props}>
+            <Select
+                aria-label="Sort by"
+                size="small"
+                options={sortOptions}
+                value={sortBy}
+                onChange={(next) => onChange && onChange({ sortBy: next, sortOrder: SORTS[next].orders[0].value })}
+                clearable={false}
+                className="sorting-dropdown__by"
+            />
+            <Select
+                aria-label="Order"
+                size="small"
+                options={orders}
+                value={order}
+                onChange={(next) => onChange && onChange({ sortBy, sortOrder: next })}
+                clearable={false}
+                className="sorting-dropdown__order"
+            />
         </div>
     );
 };
 
 SortingDropdown.propTypes = {
-    /** Whether dropdown is open */
-    isOpen: PropTypes.bool,
-    /** Sort type: "name", "duration", "progress" */
-    sortType: PropTypes.oneOf(['name', 'duration', 'progress']),
-    /** Button label text */
-    label: PropTypes.string,
-    /** Callback when dropdown is toggled */
-    onToggle: PropTypes.func,
-    /** Callback when sort option changes */
-    onSortChange: PropTypes.func,
-    /** Callback when order option changes */
-    onOrderChange: PropTypes.func,
+    /** What to sort by */
+    sortBy: PropTypes.oneOf(Object.keys(SORTS)),
+    /** The order's id, one of the sort's orders; defaults to its first */
+    sortOrder: PropTypes.string,
+    /** `({ sortBy, sortOrder })` when either changes */
+    onChange: PropTypes.func,
     /** Additional CSS classes */
     className: PropTypes.string,
 };

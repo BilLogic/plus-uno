@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import GroupTrainingProgressPage from './GroupTrainingProgressPage';
 import { linkTo } from '@storybook/addon-links';
 import './GroupTrainingProgressPage.scss';
@@ -105,14 +106,14 @@ export default {
         layout: 'fullscreen',
         docs: {
             description: {
-                component: `Full page layout for the Group Training Progress section of Group Admin. Includes tab navigation, title with group filter dropdown, overview cards (Student Need, Completion Rate, Avg Accuracy, Avg Time Spent), and hierarchical training progress table (default 9 rows).
+                component: `Full page layout for the Group Training Progress section of Group Admin. Includes tab navigation, title with a group Select, overview cards (Student Need, Completion Rate, Avg Accuracy, Avg Time Spent), and hierarchical training progress table (default 9 rows).
 
 ## Figma Reference
 Node ID: 531-62962
 
 ## Features
 - Tab navigation between Group Info and Training Progress
-- Group filter dropdown
+- Group Select: one group, or all groups
 - Overview cards with SMART visualization
 - Hierarchical training progress table with expand/collapse
 - Default 9 table rows
@@ -123,8 +124,8 @@ Node ID: 531-62962
     argTypes: {
         selectedGroup: {
             control: 'select',
-            options: ['All Groups', 'Math Masters', 'Science Explorers', 'Reading Champions'],
-            description: 'Selected group for filtering',
+            options: ['all', 'math-masters', 'science-explorers', 'reading-champions'],
+            description: 'Selected group id',
             table: { category: 'Filters' },
         },
         rowCount: {
@@ -153,7 +154,7 @@ export const Overview = {
     render: (args) => (
         <GroupTrainingProgressPage
             trainingData={generateTableData(20)}
-            selectedGroup="All Groups"
+            selectedGroup="all"
             onTabChange={(tab) => {
                 console.log('Tab changed:', tab);
                 const linkMap = {
@@ -162,7 +163,7 @@ export const Overview = {
                 };
                 if (linkMap[tab]) linkTo(linkMap[tab][0], linkMap[tab][1])();
             }}
-            onGroupFilterChange={() => console.log('Group filter clicked')}
+            onGroupFilterChange={(group) => console.log('Group:', group)}
             onAssignClick={(item) => console.log('Assign clicked:', item)}
         />
     ),
@@ -192,19 +193,23 @@ export const Interactive = {
                     };
                     if (linkMap[tab]) linkTo(linkMap[tab][0], linkMap[tab][1])();
                 }}
-                onGroupFilterChange={() => {
-                    const groups = ['All Groups', 'Math Masters', 'Science Explorers'];
-                    const currentIndex = groups.indexOf(selectedGroup);
-                    const nextIndex = (currentIndex + 1) % groups.length;
-                    setSelectedGroup(groups[nextIndex]);
-                }}
+                onGroupFilterChange={setSelectedGroup}
                 onAssignClick={(item) => console.log('Assign clicked:', item)}
             />
         );
     },
     args: {
         breakpoint: 'native',
-        selectedGroup: 'All Groups',
+        selectedGroup: 'all',
         rowCount: 20,
     },
+};
+
+Interactive.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const field = canvas.getByRole('combobox', { name: 'Group' });
+
+    await userEvent.click(field);
+    await userEvent.click(await within(document.body).findByRole('option', { name: 'Science Explorers' }));
+    await expect(field).toHaveTextContent('Science Explorers');
 };

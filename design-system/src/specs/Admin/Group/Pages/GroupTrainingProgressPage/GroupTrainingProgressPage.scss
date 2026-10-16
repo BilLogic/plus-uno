@@ -31,6 +31,12 @@
         width: 100%;
     }
 
+    // The group Select hugs its label rather than filling the title row.
+    &__group-select.plus-select-wrapper {
+        flex: 0 0 auto;
+        width: 14rem;
+    }
+
     &__cards {
         display: flex;
         gap: var(--size-section-gap-sm);

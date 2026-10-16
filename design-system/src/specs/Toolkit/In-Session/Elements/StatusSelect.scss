@@ -1,0 +1,21 @@
+// A status field sits in a table cell: it hugs its value rather than filling the row.
+.status-select.plus-select-wrapper {
+    width: auto;
+    min-width: 10rem;
+}
+
+// The picked status's colour role tints the field: its container fill, a
+// subtle border, and the role's text colour.
+@each $role in success, warning, danger, info {
+    .status-select--#{$role} {
+        .plus-field {
+            background-color: var(--color-#{$role}-container);
+            border-color: var(--color-#{$role}-border-subtle);
+        }
+
+        .plus-select-text,
+        .plus-select-caret {
+            color: var(--color-#{$role}-text);
+        }
+    }
+}

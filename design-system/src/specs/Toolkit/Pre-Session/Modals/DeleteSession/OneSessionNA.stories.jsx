@@ -1,8 +1,8 @@
 import React from 'react';
 import Modal from '@/components/messaging/Modal';
-import Radio from '@/components/forms-and-inputs/Radio';
+import { ChoiceGroup } from '@/components';
 import { DeleteModalSessionCard } from '@/specs/Toolkit/Pre-Session/Cards/DeleteModalSessionCard.stories';
-import { DeleteSessionRadioItem } from '@/specs/Toolkit/Pre-Session/Elements/DeleteSessionRadioSelection.stories';
+import { dateRangeOption } from '@/specs/Toolkit/Pre-Session/Elements/DeleteSessionRadioSelection.stories';
 import { CancelButton, ConfirmCancelButton } from '@/specs/Toolkit/Pre-Session/Elements/SupervisorManagementButtons.stories';
 
 export default {
@@ -81,37 +81,18 @@ const OneSessionNAModalBody = () => (
             />
 
             {/* Radio Options Section */}
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--size-section-gap-md)',
-                    padding: 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)',
-                }}
-            >
-                <Radio
-                    id="delete-this-session"
-                    name="delete-session"
-                    label="This session"
-                    value="this-session"
-                    defaultChecked
-                />
-                <Radio
-                    id="delete-all-at-school-date"
-                    name="delete-session"
-                    label={<AllAtSchoolOnDateLabel />}
-                    value="all-at-school-date"
-                />
-                <DeleteSessionRadioItem
-                    selected={false}
-                />
-                <Radio
-                    id="delete-all-following"
-                    name="delete-session"
-                    label={<AllFollowingLabel />}
-                    value="all-following"
-                />
-            </div>
+            <ChoiceGroup
+                name="delete-session"
+                aria-label="Sessions to cancel"
+                defaultValue="this-session"
+                style={{ padding: 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)' }}
+                options={[
+                    { id: 'delete-this-session', value: 'this-session', label: 'This session' },
+                    { id: 'delete-all-at-school-date', value: 'all-at-school-date', label: <AllAtSchoolOnDateLabel /> },
+                    dateRangeOption(),
+                    { id: 'delete-all-following', value: 'all-following', label: <AllFollowingLabel /> },
+                ]}
+            />
         </div>
 
         {/* Bottom Buttons */}

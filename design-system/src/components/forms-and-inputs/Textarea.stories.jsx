@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Textarea from './Textarea';
 
@@ -10,7 +11,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'Textarea ver 2 provides two variants: Long Form (boxed) and Short Form (underlined), implementing the updated Figma designs.',
+                    'Free text over several lines, on the same field as Input. `rows` sets the height; a one-line textarea is `rows={1}`.',
             },
         },
     },
@@ -30,8 +31,13 @@ export default {
         },
         rows: {
             control: 'number',
-            description: 'Visible text rows',
+            description: 'Visible text rows. One row is the short textarea.',
             table: { category: 'Layout' },
+        },
+        maxLength: {
+            control: 'number',
+            description: 'Limits the length and shows a count in the caption',
+            table: { category: 'Content' },
         },
         size: {
             control: 'radio',
@@ -39,18 +45,26 @@ export default {
             description: 'Size variant',
             table: { category: 'Design' },
         },
-        variant: {
-            control: 'radio',
-            options: ['long', 'short'],
-            description: 'The visual style of the textarea',
-            table: { category: 'Design' },
-        },
-        state: {
+        validation: {
             control: 'select',
-            options: ['default', 'focus', 'success', 'error', 'readonly', 'disabled'],
-            description: 'The visual state of the component',
+            options: ['none', 'invalid', 'success'],
+            description: 'Validation result',
+            table: { category: 'Validation' },
+        },
+        validationMessage: {
+            control: 'text',
+            description: 'Message under the field when validation is not none',
+            table: { category: 'Validation' },
+        },
+        disabled: {
+            control: 'boolean',
             table: { category: 'Behavior' },
         },
+        readOnly: {
+            control: 'boolean',
+            table: { category: 'Behavior' },
+        },
+        state: { table: { disable: true } },
         value: {
             control: false,
             table: { disable: true, category: 'Development' }
@@ -63,6 +77,7 @@ export default {
             control: false,
             table: { disable: true, category: 'Development' }
         },
+        onSave: { table: { disable: true } },
         id: {
             control: false,
             table: { disable: true, category: 'Development' }
@@ -74,157 +89,190 @@ export default {
         className: {
             control: false,
             table: { disable: true, category: 'Development' }
-        },},
+        },
+    },
 };
+
+const label = 'text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3';
 
 export const Overview = () => (
     <div style={{ maxWidth: '600px' }}>
-        <Textarea id="textarea-overview" label="Label" placeholder="Enter text..." variant="long" rows={3} />
+        <Textarea id="textarea-overview" label="Label" placeholder="Enter text..." rows={3} />
     </div>
 );
+
 Overview.parameters = {
     docs: {
         source: { language: 'jsx', code: webAppSourceSnippets.formTextarea }
     }
 };
 
-export const Styles = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1000px' }}>
-        <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-            Long (boxed) vs short (underlined) at default state.
-        </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LONG FORM</span>
-                <Textarea placeholder="Enter text..." variant="long" />
+/** Rows — `rows` sets the height. One row replaces the old short textarea. */
+export const Rows = () => (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', maxWidth: '1000px' }}>
+        {[1, 3, 6].map((rows) => (
+            <div key={rows}>
+                <span className={label}>{rows === 1 ? '1 ROW' : `${rows} ROWS`}</span>
+                <Textarea id={`textarea-rows-${rows}`} label={`${rows} rows`} showLabel={false} placeholder="Enter text..." rows={rows} />
             </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SHORT FORM</span>
-                <Textarea placeholder="Enter text..." variant="short" />
-            </div>
-        </div>
+        ))}
     </div>
 );
 
+Rows.play = async ({ canvasElement }) => {
+    const height = (rows) => canvasElement.querySelector(`#textarea-rows-${rows}`).getBoundingClientRect().height;
+    await expect(canvasElement.querySelector('#textarea-rows-1').getAttribute('rows')).toBe('1');
+    await expect(height(3)).toBeGreaterThan(height(1));
+    await expect(height(6)).toBeGreaterThan(height(3));
+    // A one-row textarea is as tall as an Input of the same size: 34.
+    const box = canvasElement.querySelector('#textarea-rows-1').closest('.plus-field');
+    await expect(Math.round(box.getBoundingClientRect().height)).toBe(34);
+};
+
+/** Sizes — small, medium and large type and padding, from `_Field`. */
 export const Sizes = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1000px' }}>
-        <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-            Size variants: small, medium, large.
-        </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block">LONG FORM</span>
-                <div>
-                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-2">SMALL</span>
-                    <Textarea placeholder="Enter text..." variant="long" size="small" />
-                </div>
-                <div>
-                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-2">MEDIUM</span>
-                    <Textarea placeholder="Enter text..." variant="long" size="medium" />
-                </div>
-                <div>
-                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-2">LARGE</span>
-                    <Textarea placeholder="Enter text..." variant="long" size="large" />
-                </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '600px' }}>
+        {['small', 'medium', 'large'].map((size) => (
+            <div key={size}>
+                <span className={label}>{size.toUpperCase()}</span>
+                <Textarea label={`${size} textarea`} showLabel={false} placeholder="Enter text..." size={size} rows={2} />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block">SHORT FORM</span>
-                <div>
-                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-2">SMALL</span>
-                    <Textarea placeholder="Enter text..." variant="short" size="small" />
-                </div>
-                <div>
-                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-2">MEDIUM</span>
-                    <Textarea placeholder="Enter text..." variant="short" size="medium" />
-                </div>
-                <div>
-                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-2">LARGE</span>
-                    <Textarea placeholder="Enter text..." variant="short" size="large" />
-                </div>
-            </div>
+        ))}
+    </div>
+);
+
+/** InteractionStates — every state, drawn the same way as Input's. */
+export const InteractionStates = () => (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px', maxWidth: '1000px' }}>
+        <div>
+            <span className={label}>DEFAULT</span>
+            <Textarea aria-label="Textarea, default state" placeholder="Enter text..." />
+        </div>
+        <div>
+            <span className={label}>FOCUS (STATIC)</span>
+            <Textarea aria-label="Textarea, focus state" placeholder="Enter text..." state="focus" />
+        </div>
+        <div>
+            <span className={label}>FILLED</span>
+            <Textarea aria-label="Textarea, filled state" defaultValue="Some content here" />
+        </div>
+        <div>
+            <span className={label}>VALID</span>
+            <Textarea aria-label="Textarea, valid state" defaultValue="Looks good" validation="success" validationMessage="Looks good." />
+        </div>
+        <div>
+            <span className={label}>INVALID</span>
+            <Textarea aria-label="Textarea, invalid state" defaultValue="Invalid content" validation="invalid" validationMessage="Say what you covered." />
+        </div>
+        <div>
+            <span className={label}>DISABLED</span>
+            <Textarea aria-label="Textarea, disabled state" defaultValue="Disabled content" disabled />
+        </div>
+        <div>
+            <span className={label}>READ ONLY</span>
+            <Textarea aria-label="Textarea, read only state" defaultValue="Read only content" readOnly />
+        </div>
+        <div>
+            <span className={label}>READ ONLY (PLACEHOLDER)</span>
+            <Textarea aria-label="Textarea, read only placeholder state" placeholder="Read only placeholder" readOnly />
         </div>
     </div>
 );
 
-export const InteractionStatesLong = () => (
-    <div style={{ maxWidth: '1000px' }}>
-        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-4">LONG FORM</span>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
-                <Textarea aria-label="Long form textarea, default state" placeholder="Enter text..." variant="long" />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FOCUS (STATIC)</span>
-                <Textarea aria-label="Long form textarea, focus state" placeholder="Enter text..." variant="long" state="focus" />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FILLED</span>
-                <Textarea aria-label="Long form textarea, filled state" defaultValue="Some content here" variant="long" />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VALID</span>
-                <Textarea aria-label="Long form textarea, valid state" defaultValue="Looks good" variant="long" state="success" />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ERROR</span>
-                <Textarea aria-label="Long form textarea, error state" defaultValue="Invalid content" variant="long" state="error" />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
-                <Textarea aria-label="Long form textarea, disabled state" defaultValue="Disabled content" variant="long" disabled />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
-                <Textarea aria-label="Long form textarea, read only state" defaultValue="Read only content" variant="long" readOnly />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY (PLACEHOLDER)</span>
-                <Textarea aria-label="Long form textarea, read only placeholder state" placeholder="Read only placeholder" variant="long" readOnly />
-            </div>
+/** Count — with `maxLength`, a count on the right of the caption, beside any error. */
+export const Count = () => {
+    const [value, setValue] = useState('We covered linear equations.');
+    return (
+        <div style={{ maxWidth: '600px' }}>
+            <Textarea
+                id="textarea-count"
+                label="Session notes"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                maxLength={120}
+                validation={value.length < 40 ? 'invalid' : 'none'}
+                validationMessage="Add a little more detail."
+            />
         </div>
-    </div>
-);
+    );
+};
 
-export const InteractionStatesShort = () => (
-    <div style={{ maxWidth: '1000px' }}>
-        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-4">SHORT FORM</span>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
-                <Textarea aria-label="Short form textarea, default state" placeholder="Enter text..." variant="short" />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FOCUS (STATIC)</span>
-                <Textarea aria-label="Short form textarea, focus state" placeholder="Enter text..." variant="short" state="focus" />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FILLED</span>
-                <Textarea aria-label="Short form textarea, filled state" defaultValue="Short content" variant="short" />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VALID</span>
-                <Textarea aria-label="Short form textarea, valid state" defaultValue="Looks good" variant="short" state="success" />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ERROR</span>
-                <Textarea aria-label="Short form textarea, error state" defaultValue="Invalid short content" variant="short" state="error" />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
-                <Textarea aria-label="Short form textarea, disabled state" defaultValue="Disabled short content" variant="short" disabled />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
-                <Textarea aria-label="Short form textarea, read only state" defaultValue="Read only short content" variant="short" readOnly />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY (PLACEHOLDER)</span>
-                <Textarea aria-label="Short form textarea, read only placeholder state" placeholder="Read only placeholder" variant="short" readOnly />
-            </div>
+Count.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const field = canvas.getByRole('textbox', { name: 'Session notes' });
+    const count = canvasElement.querySelector('.plus-field-caption__count');
+
+    await expect(count).toHaveTextContent('28 / 120');
+    await expect(canvas.getByRole('alert')).toHaveTextContent('Add a little more detail.');
+    await expect(field.getAttribute('maxlength')).toBe('120');
+
+    await userEvent.type(field, ' And slope, and intercepts.');
+    await expect(count).toHaveTextContent('55 / 120');
+    // The error clears; the count stays.
+    await expect(canvas.queryByRole('alert')).toBeNull();
+};
+
+/**
+ * Subtle — plain text until hovered or edited. Save and Cancel show while
+ * editing, and the field stays open when focus leaves it.
+ */
+export const Subtle = (args) => {
+    const [saved, setSaved] = useState('Worked through slope.');
+    return (
+        <div style={{ maxWidth: '600px' }}>
+            <Textarea
+                id="textarea-subtle"
+                label="Session notes"
+                subtle
+                rows={2}
+                value={saved}
+                onSave={async (next) => {
+                    if (args.onSave) args.onSave(next);
+                    await new Promise((resolve) => setTimeout(resolve, 150));
+                    if (next.includes('fail')) throw new Error('Notes could not be saved.');
+                    setSaved(next);
+                }}
+            />
         </div>
-    </div>
-);
+    );
+};
+Subtle.args = { onSave: fn() };
+
+Subtle.play = async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const field = canvas.getByRole('textbox', { name: 'Session notes' });
+
+    await expect(canvas.queryByRole('button', { name: 'Save' })).toBeNull();
+
+    // Typing opens the editor; leaving the field does not save or close it.
+    await userEvent.click(field);
+    await userEvent.type(field, ' Then intercepts.');
+    await expect(canvas.getByRole('button', { name: 'Save' })).toBeTruthy();
+    await userEvent.tab({ shift: true });
+    await expect(args.onSave).not.toHaveBeenCalled();
+    await expect(canvas.getByRole('button', { name: 'Save' })).toBeTruthy();
+
+    // Save saves, with "saving…" in Trailing.
+    await userEvent.click(canvas.getByRole('button', { name: 'Save' }));
+    await expect(args.onSave).toHaveBeenCalledWith('Worked through slope. Then intercepts.');
+    await expect(canvas.getByRole('status')).toHaveTextContent('saving…');
+    await waitFor(() => expect(canvas.queryByRole('button', { name: 'Save' })).toBeNull());
+
+    // Cancel puts the saved text back.
+    await userEvent.click(field);
+    await userEvent.type(field, ' Scratch that.');
+    await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
+    await expect(field).toHaveValue('Worked through slope. Then intercepts.');
+
+    // A failed save stays open in invalid and keeps the text.
+    await userEvent.click(field);
+    await userEvent.type(field, ' fail');
+    await userEvent.click(canvas.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(canvas.getByRole('alert')).toHaveTextContent('Notes could not be saved.'));
+    await expect(field).toHaveValue('Worked through slope. Then intercepts. fail');
+    await expect(field.getAttribute('aria-invalid')).toBe('true');
+    await expect(canvas.getByRole('button', { name: 'Save' })).toBeTruthy();
+};
 
 export const Interactive = (args) => {
     const [value, setValue] = useState(args.value || '');
@@ -239,8 +287,10 @@ export const Interactive = (args) => {
 Interactive.args = {
     label: 'Interactive Label',
     placeholder: 'Type something...',
-    variant: 'long',
     size: 'medium',
     rows: 3,
-    state: 'default',
+    validation: 'none',
+    validationMessage: '',
+    disabled: false,
+    readOnly: false,
 };
