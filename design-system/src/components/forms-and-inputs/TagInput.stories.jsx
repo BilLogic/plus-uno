@@ -229,22 +229,46 @@ export const PasteSplitsOnCommas = {
     },
 };
 
-/** A new value is cut to `maxLength`. */
-export const MaxLength = () => (
-    <div style={stack}>
-        <TagInput label="Topics" options={TOPICS} maxLength={5} />
-    </div>
-);
+/** Each pasted tag gets one of Tag's seven colours, reported with its value. */
+export const PastedTagsGetTagColours = {
+    args: { onCreateSpy: fn() },
+    render: (args) => <div style={stack}><Owned {...args} initialOptions={[]} /></div>,
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const input = canvas.getByRole('combobox', { name: 'Topics' });
 
-MaxLength.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const input = canvas.getByRole('combobox', { name: 'Topics' });
-    await expect(input).toHaveAttribute('maxlength', '5');
+        await userEvent.click(input);
+        await userEvent.paste('a, b, c');
+        await expect(tagsIn(canvas, 'Topics').getAllByRole('listitem')).toHaveLength(3);
+        await expect(args.onCreateSpy).toHaveBeenCalledTimes(3);
+        const reported = args.onCreateSpy.mock.calls.map(([call]) => call);
+        await expect(reported.map(({ value }) => value)).toEqual(['a', 'b', 'c']);
+        for (const { color } of reported) {
+            await expect(TAG_COLORS).toContain(color);
+        }
+    },
+};
 
-    await userEvent.click(input);
-    await userEvent.paste('Photography, Art');
-    await expect(tagsIn(canvas, 'Topics').getByText('Photo')).toBeInTheDocument();
-    await expect(tagsIn(canvas, 'Topics').getByText('Art')).toBeInTheDocument();
+/** A new value is cut to `maxLength`, and `onCreate` reports the cut value in a Tag colour. */
+export const MaxLength = {
+    args: { onCreateSpy: fn() },
+    render: (args) => <div style={stack}><Owned {...args} maxLength={5} /></div>,
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const input = canvas.getByRole('combobox', { name: 'Topics' });
+        await expect(input).toHaveAttribute('maxlength', '5');
+
+        await userEvent.click(input);
+        await userEvent.paste('Photography, Art');
+        await expect(tagsIn(canvas, 'Topics').getByText('Photo')).toBeInTheDocument();
+        await expect(tagsIn(canvas, 'Topics').getByText('Art')).toBeInTheDocument();
+        await expect(args.onCreateSpy).toHaveBeenCalledTimes(2);
+        const reported = args.onCreateSpy.mock.calls.map(([call]) => call);
+        await expect(reported.map(({ value }) => value)).toEqual(['Photo', 'Art']);
+        for (const { color } of reported) {
+            await expect(TAG_COLORS).toContain(color);
+        }
+    },
 };
 
 /** At the pick limit, Create hides and the list says why. */

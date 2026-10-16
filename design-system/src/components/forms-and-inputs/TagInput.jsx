@@ -252,7 +252,7 @@ const TagInput = ({
         const text = event.clipboardData.getData('text');
         if (!PASTE_SEPARATOR.test(text)) return;
         event.preventDefault();
-        text.split(PASTE_SEPARATOR).map((part) => part.trim()).filter(Boolean).forEach(create);
+        text.split(PASTE_SEPARATOR).map((part) => part.trim()).filter(Boolean).forEach((part) => create(part));
         setFilter('');
     };
 
