@@ -37,9 +37,11 @@ export const CHECK_IT_ACTION_ID = "uno_blueprint_check";
 
 const scenarioOf = (scenario: string) => `*${escapeSlackText(scenario)}*`;
 
-/** The offer's words, without its deadline. */
-function offerWords(scenario: string): string {
-  return `This changes how ${scenarioOf(scenario)} works today — check it against the blueprint? Takes a few minutes; review the card meanwhile.`;
+/** The offer's words, without its deadline: the card is named only where
+ *  one waits above the offer — a hand-off to the IDE stages none. */
+function offerWords(scenario: string, underCard: boolean): string {
+  const meanwhile = underCard ? "; review the card meanwhile." : ".";
+  return `This changes how ${scenarioOf(scenario)} works today — check it against the blueprint? Takes a few minutes${meanwhile}`;
 }
 
 /**
@@ -47,10 +49,10 @@ function offerWords(scenario: string): string {
  * button's value is nothing the press needs — the message's own ts names the
  * offer — so no idea text ever rides on it.
  *
- * @param offer - The scenario and the deadline
+ * @param offer - The scenario, the deadline, and whether a card waits above it
  */
 export function checkOfferMessage(offer: CheckOfferNote): CardMessage {
-  const words = offerWords(offer.scenario);
+  const words = offerWords(offer.scenario, offer.underCard);
   return {
     text: withDeadline(words, offer.expiresAt),
     blocks: [
@@ -145,7 +147,7 @@ export async function runCheckItDoor(press: CheckItPress, deps: CheckItDoorDeps)
   if ((deps.now ?? Date.now)() > offer.expiresAt) {
     console.log(`[blueprint-check] press on ${press.channel}/${press.offerTs} after its deadline`);
     await deps.replyEphemeral(CHECK_EXPIRED_REPLY);
-    await deps.replaceOffer(line(`${offerWords(offer.scenario)}\nExpired.`));
+    await deps.replaceOffer(line(`${offerWords(offer.scenario, !!offer.cardTs)}\nExpired.`));
     return;
   }
   if (!(await deps.store.claimComparison(conversationOf(offer), offer.scenario))) {

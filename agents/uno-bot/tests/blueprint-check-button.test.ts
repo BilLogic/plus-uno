@@ -190,7 +190,7 @@ async function liveCard(threadState: ThreadState, ts: string): Promise<PendingPr
 
 test("the offer names the scenario, says it takes a few minutes, shows its deadline and carries Check it", () => {
   const expiresAt = cardExpiresAt(NOW);
-  const message = checkOfferMessage({ scenario: "Call-off", expiresAt });
+  const message = checkOfferMessage({ scenario: "Call-off", expiresAt, underCard: true });
   assert.equal(messageBlocksRefusal(message.blocks), null, "Slack takes it");
   assert.match(message.text, /This changes how \*Call-off\* works today — check it against the blueprint\? Takes a few minutes; review the card meanwhile\./);
   assert.match(message.text, new RegExp(`Expires <!date\\^${Math.floor(expiresAt / 1000)}\\^`), "its deadline is the shared rule's");

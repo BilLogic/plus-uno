@@ -418,12 +418,15 @@ export interface NoteCard {
   blocks?: unknown[];
 }
 
-/** The Check it offer a milestone posts after its card (#1321): the
- *  scenario the idea touches today, and when the button stops answering
- *  (`cardExpiresAt`). Its words and its button are the adapter's. */
+/** The Check it offer a milestone posts after its card (#1321), or after
+ *  the reply that hands a build to the IDE (#1324): the scenario the idea
+ *  touches today, when the button stops answering (`cardExpiresAt`), and
+ *  whether a card waits above it to review meanwhile. Its words and its
+ *  button are the adapter's. */
 export interface CheckOfferNote {
   scenario: string;
   expiresAt: number;
+  underCard: boolean;
 }
 
 /** What a post actually did. `text` is what was posted, which is not always

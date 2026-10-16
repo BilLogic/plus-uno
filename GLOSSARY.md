@@ -160,7 +160,7 @@ A new proposal card for a different matter than any waiting in its thread; each 
 _Avoid_: "second card", "batch" (a batch is one card running several operations)
 
 **blueprint check**:
-The opt-in comparison of an idea against today's **uno-blueprint**, offered after its proposal card posts; its result can become a revision of that card or a **blueprint proposal**.
+The opt-in comparison of an idea against today's **uno-blueprint**, offered after its proposal card posts or a build is handed to the IDE; its result can become a revision of that card or a **blueprint proposal**.
 _Avoid_: "comparison" alone, "blueprint revision" (that is shipped work's)
 
 **sweep**:
