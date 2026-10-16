@@ -1,3 +1,4 @@
+import { cardTtlMs } from "../src/card-expiry";
 // The Review pop-up around the draft: a batch, the read-only view, a decided
 // card opened from View, and the states after a decision or once a card has
 // closed (`docs/plans/2026-10-15-review-modal-redesign.md` § 2, § 9, § 14 and
@@ -10,7 +11,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import type { GateVerdict } from "../src/gate/index";
-import { createInMemoryThreadState, DECIDED_TTL_MS, PROPOSAL_TTL_MS, type PendingProposal, type ProposalOperation, type ThreadState } from "../src/thread-state/index";
+import { createInMemoryThreadState, DECIDED_TTL_MS, type PendingProposal, type ProposalOperation, type ThreadState } from "../src/thread-state/index";
 import { recordingDelivery } from "../src/turn/index";
 import { runReviewDecision, runReviewOpen, runReviewPush, type ReviewDoorDeps } from "../src/slack/review-door";
 import { batchHeader } from "../src/slack/review-batch";
@@ -404,7 +405,7 @@ describe("after a decision, and closed", () => {
     let t = 1_760_540_000_000;
     const now = () => t;
     const h = harness(await store({}, now), now);
-    t += PROPOSAL_TTL_MS + 1;
+    t += cardTtlMs(t) + 1;
     await runReviewOpen(open(BILL), h.deps);
     const view = lastView(h);
     assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "warning"], ["section", undefined]]);
@@ -430,7 +431,7 @@ describe("after a decision, and closed", () => {
     let t = 1_760_540_000_000;
     const now = () => t;
     const h = harness(await store({}, now), now);
-    t += PROPOSAL_TTL_MS + 1;
+    t += cardTtlMs(t) + 1;
     await runReviewDecision(decide("confirm"), h.deps);
     assert.equal(h.ran.length, 0);
     assert.equal(lastView(h).title.text, "Review share-out");
@@ -448,7 +449,7 @@ describe("after a decision, and closed", () => {
     let t = 1_760_540_000_000;
     const now = () => t;
     const h = harness(await store({}, now), now);
-    t += PROPOSAL_TTL_MS + 1;
+    t += cardTtlMs(t) + 1;
     await runReviewPush({ triggerId: "T.trigger", card: { channel: CHANNEL, ts: CARD_TS }, userId: BILL }, h.deps);
     assert.equal(lastView(h).title.text, "Review share-out");
   });

@@ -38,9 +38,7 @@ import type { CardFixes, ProposalCard } from "../turn/index";
 import { FOUND_BY_SEARCH, addedContent, saidAt, saidIn } from "./capture-lines";
 import { pickDestination, shareDestination, type Destination } from "./finding";
 import type { PendingFinding } from "./store";
-
-/** How long a sweep card stays confirmable. */
-export const SWEEP_CARD_TTL_MS = 72 * 60 * 60 * 1000;
+import { CARD_WINDOW_WORDS } from "../card-expiry";
 
 /** In-place replacements one card may hold. */
 export const MAX_ITEMS_PER_CARD = 10;
@@ -189,7 +187,7 @@ export const SHARE_CHANNEL_NAMES = Object.fromEntries(CHANNEL_ROLES.map((role) =
  *  says at the gate (`PendingProposal.stated`). */
 export const SHARE_CARD_WORDS: StatedCardWords = {
   cancelled: "Rejected, nothing posted",
-  expired: `That card closed after ${SWEEP_CARD_TTL_MS / 3_600_000} h with no decision, so nothing was posted.`,
+  expired: `That card closed after ${CARD_WINDOW_WORDS} with no decision, so nothing was posted.`,
 };
 
 /**
@@ -316,7 +314,7 @@ export function sweepIssue(f: PendingFinding): string {
 export function sweepItemWords(): StatedCardWords {
   return {
     cancelled: "Rejected, nothing written",
-    expired: "That fix closed after 72 h with no decision, so nothing was written.",
+    expired: `That fix closed after ${CARD_WINDOW_WORDS} with no decision, so nothing was written.`,
   };
 }
 

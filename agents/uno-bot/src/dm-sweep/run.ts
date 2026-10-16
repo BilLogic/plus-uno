@@ -58,7 +58,7 @@ import { dayLabel, etDayOf, rearmedDueAt, TEXT_KEEP_MS } from "../commitments/du
 import { MAX_HOLDS, type CommitmentAction, type ReminderReaction } from "../commitments/run";
 import { LIVE_STATES, type CommitmentPatch, type CommitmentRecord, type CommitmentStore, type CommitmentText } from "../commitments/store";
 import { shareDestination } from "../sweep/finding";
-import { SHARE_CARD_WORDS, SWEEP_CARD_TTL_MS } from "../sweep/cards";
+import { SHARE_CARD_WORDS } from "../sweep/cards";
 import type { DmThread, DmThreadVerdict } from "../sweep/run";
 import type { PendingProposal, ThreadState } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
@@ -398,7 +398,6 @@ async function dueOne(deps: DmMorningDeps, c: CommitmentRecord, now: number, run
     proposalTs: sent.ts,
     proposalText: sent.text ?? card.lead ?? "",
     requesterUserId: c.promiserId,
-    ttlMs: SWEEP_CARD_TTL_MS,
     // The person the DM is with, and nobody else.
     confirmers: [c.promiserId],
     supersedeKey: raiseSlot(c.id),

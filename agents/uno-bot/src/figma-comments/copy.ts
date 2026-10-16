@@ -33,6 +33,7 @@ import { dayWords } from "../figma-drift/copy";
 import type { DecisionUpdate } from "./draft";
 import { operationsOf, type FileOwner, type QueuedDecision, type QueuedFile } from "./queue";
 import { rowWords } from "../decisions-db/row";
+import { CARD_WINDOW_WORDS } from "../card-expiry";
 
 /** The file's name, on one line. */
 function fileName(file: Pick<QueuedFile, "title">): string {
@@ -201,7 +202,7 @@ export function noPrdNote(d: Pick<QueuedDecision, "quote" | "by" | "section" | "
 export function decisionCardWords(): StatedCardWords {
   return {
     cancelled: "Dropped, nothing written",
-    expired: "That card closed after 72 h with no decision, so nothing was written.",
+    expired: `That card closed after ${CARD_WINDOW_WORDS} with no decision, so nothing was written.`,
   };
 }
 

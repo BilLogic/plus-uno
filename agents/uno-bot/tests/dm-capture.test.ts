@@ -618,7 +618,8 @@ describe("a DM finding", () => {
     const w = world();
     await turnOn(w, MAYA, [CAPTURE_FEATURE]);
     await runDmCaptureRead(readJob(MAYA), readDeps(w));
-    await runDmCapturePost(postJob(MAYA), postDeps(w));
+    // Posted late in Wednesday's 09:00 ET run, so it is still live early in Thursday's.
+    await runDmCapturePost(postJob(MAYA), postDeps(w, at(30, 13, 45)));
     const card = w.staged[0]!;
     // A new decision the next day, and the same fix said again.
     w.messages.get(DM_BEA)!.push(

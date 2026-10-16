@@ -44,6 +44,7 @@ import { handedSection, type SectionHandOff, type SweepSection } from "../sweep/
 import { authoringCall, authoringCallCost, type WriterDeps } from "../blueprint-write/index";
 import { rethrowIfBudget } from "../net";
 import type { DrawnProposal, ProposalRecords } from "./proposal-records";
+import { CARD_WINDOW_WORDS } from "../card-expiry";
 
 /** The removal card's one operation. */
 export const WITHDRAW_TOOL = "blueprint_withdraw" as const;
@@ -62,23 +63,14 @@ export const WITHDRAW_SLOT_PREFIX = "blueprint-withdraw:";
 /** Why the removal is offered: the requester asked, or the check found it aged. */
 export type WithdrawalReason = "asked" | "aged";
 
-/**
- * How long each card can be decided. An ask is answered while the person is
- * there; an offer nobody asked for waits out a weekend.
- */
-export const WITHDRAWAL_CARD_TTL_MS: Record<WithdrawalReason, number> = {
-  asked: 24 * 60 * 60 * 1000,
-  aged: 4 * 24 * 60 * 60 * 1000,
-};
-
 const WORDS: Record<WithdrawalReason, StatedCardWords> = {
   asked: {
     cancelled: "Kept, nothing removed from the blueprint",
-    expired: `That card closed after ${WITHDRAWAL_CARD_TTL_MS.asked / 3_600_000} h with no decision, so the proposal stays on the blueprint.`,
+    expired: `That card closed after ${CARD_WINDOW_WORDS} with no decision, so the proposal stays on the blueprint.`,
   },
   aged: {
     cancelled: "Kept on the blueprint, and not offered again",
-    expired: `That card closed after ${WITHDRAWAL_CARD_TTL_MS.aged / 86_400_000} days with no decision, so the proposal stays on the blueprint and is not offered again.`,
+    expired: `That card closed after ${CARD_WINDOW_WORDS} with no decision, so the proposal stays on the blueprint and is not offered again.`,
   },
 };
 
@@ -130,8 +122,8 @@ export function withdrawalCard(p: DrawnProposal, reason: WithdrawalReason, link?
       : `*Remove this proposal from the blueprint?* It was drawn here on ${day(p.writtenAt)} and no Roadmap card has been linked to it in 30 days.`,
     `Deletes ${where} drawn in this thread and its ${cells(p.cellIds.length)}, as uno-bot. Today's path is not touched.`,
     reason === "asked"
-      ? `Only <@${p.requesterId}> can approve; Reject, or no answer in ${WITHDRAWAL_CARD_TTL_MS.asked / 3_600_000} h, keeps it.`
-      : `Only <@${p.requesterId}> can approve; Reject, or no answer in ${WITHDRAWAL_CARD_TTL_MS.aged / 86_400_000} days, keeps it, and it is not offered again.`,
+      ? `Only <@${p.requesterId}> can approve; Reject, or no answer in ${CARD_WINDOW_WORDS}, keeps it.`
+      : `Only <@${p.requesterId}> can approve; Reject, or no answer in ${CARD_WINDOW_WORDS}, keeps it, and it is not offered again.`,
   ].join("\n");
   const input: Withdrawal = { proposalTs: p.proposalTs, pathId: p.pathId, cellIds: [...p.cellIds], reason };
   return {
@@ -171,7 +163,6 @@ export function stagedWithdrawal(p: DrawnProposal, reason: WithdrawalReason, pos
     proposalTs: posted.ts,
     proposalText: posted.text,
     requesterUserId: p.requesterId,
-    ttlMs: WITHDRAWAL_CARD_TTL_MS[reason],
     confirmers: [p.requesterId],
     exclusiveConfirmers: true,
     supersedeKey: withdrawSlotKey(p.proposalTs),
@@ -384,7 +375,6 @@ export function removalOfferSection(deps: RemovalSectionDeps, handOff: SectionHa
     cardsOf(value) {
       return {
         cards: value.proposals.map((p) => ({ person: p.requesterId, item: withdrawalItem(p, deps.linkOf(p)) })),
-        ttlMs: WITHDRAWAL_CARD_TTL_MS.aged,
         says: (ids) =>
           ids.length === 1
             ? "the proposal drawn here has had no Roadmap card linked in 30 days: remove it from the blueprint?"

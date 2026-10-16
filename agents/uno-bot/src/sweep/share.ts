@@ -33,7 +33,8 @@ import { escapeSlackText } from "../slack/mrkdwn";
 import type { PendingProposal, ProposalOperation, ShareNoteFacts, SweepShare, ThreadState } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { recordProposalEvents, stagedEvent, storesChannel, supersededEvents, type ProposalEventLog } from "../usage/index";
-import { SHARE_CARD_WORDS, SHARE_CHANNEL_NAMES, SWEEP_CARD_MARK, SWEEP_CARD_TTL_MS, shareCard } from "./cards";
+import { SHARE_CARD_WORDS, SHARE_CHANNEL_NAMES, SWEEP_CARD_MARK, shareCard } from "./cards";
+import { CARD_WINDOW_WORDS } from "../card-expiry";
 
 /** The share card's own slot in its thread (`proposalSlot`). */
 export const SWEEP_SHARE_KEY = "sweep-share";
@@ -106,7 +107,7 @@ export const SWEEP_SHARE_FACTS: ShareNoteFacts = {
   kind: "sweep_share_post",
   header: "Share what was settled",
   from: "this group DM",
-  notes: [`The people who could confirm the fix can confirm this. Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`],
+  notes: [`The people who could confirm the fix can confirm this. Expires after ${CARD_WINDOW_WORDS}, with no reminder.`],
 };
 
 /**
@@ -132,7 +133,7 @@ export function sweepShareCard(operations: readonly ProposalOperation[]): Propos
   lines.push(
     "",
     "The people who could confirm the fix can confirm this. " +
-      `Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`,
+      `Expires after ${CARD_WINDOW_WORDS}, with no reminder.`,
   );
   return shareCard({ where, lead: lines.join("\n"), operations });
 }
@@ -180,7 +181,6 @@ export async function stageSweepShare(
       proposalTs: sent.ts,
       proposalText: sent.text ?? offer.card.lead ?? "",
       requesterUserId: "",
-      ttlMs: SWEEP_CARD_TTL_MS,
       confirmers: [...(fix.confirmers ?? [])],
       supersedeKey: SWEEP_SHARE_KEY,
       stated: SHARE_CARD_WORDS,

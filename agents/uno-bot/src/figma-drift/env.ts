@@ -49,7 +49,7 @@ import { SWEEP_CARD_EVENT } from "../sweep/cards";
 import { markSweepThread } from "../sweep/thread-mark";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { sectionHandOffIn, type SweepSection } from "../sweep/sections";
-import { DRIFT_CARD_TTL_MS } from "./copy";
+import { MAX_CARD_TTL_MS, cardExpiresAt } from "../card-expiry";
 import { LEGACY_DRIFT_KEY, type FileDriftFinding, type FileDriftSink } from "./finding";
 import { proposalReplyThread } from "../thread-state/index";
 import { modelFrameJudge } from "./judge";
@@ -78,11 +78,11 @@ const DAY_S = 24 * 60 * 60;
 /** A queued finding not asked within 30 days is dropped as the queue is read. */
 const QUEUE_MAX_AGE_MS = 30 * DAY_S * 1000;
 /** A mark outlives its card by a day, so a retry still finds it. */
-const MARK_TTL_S = DRIFT_CARD_TTL_MS / 1000 + DAY_S;
+const MARK_TTL_S = MAX_CARD_TTL_MS / 1000 + DAY_S;
 /** A thread is not asked twice about a file for this long. */
 const ASK_TTL_S = 30 * DAY_S;
 /** A live record lasts as long as its question may be withdrawn. */
-const LIVE_TTL_S = DRIFT_CARD_TTL_MS / 1000;
+const LIVE_TTL_S = MAX_CARD_TTL_MS / 1000;
 
 /**
  * Where the end-of-day sweep hands its file drift, or undefined when there is
@@ -324,7 +324,7 @@ function kvDriftStore(kv: KVNamespace): DriftStore & FileDriftSink {
     async saveLiveAsk(ask) {
       charge(1, "kv");
       // Its TTL runs from when it was asked, so a re-save never lengthens it.
-      const left = Math.ceil((ask.askedAt + DRIFT_CARD_TTL_MS - Date.now()) / 1000);
+      const left = Math.ceil((cardExpiresAt(ask.askedAt) - Date.now()) / 1000);
       if (left < 60) return;
       await kv.put(liveKey(ask), JSON.stringify(ask), { expirationTtl: Math.min(left, LIVE_TTL_S) });
     },

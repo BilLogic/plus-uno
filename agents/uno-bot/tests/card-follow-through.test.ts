@@ -36,7 +36,6 @@ import {
   cardFollowUps,
   draftCard,
   followThroughProposal,
-  FOLLOW_THROUGH_CARD_TTL_MS,
   FOLLOW_THROUGH_KEY,
   handleCardReply,
   handleCardReplySafely,
@@ -929,9 +928,10 @@ describe("F5: a stuck card", () => {
     assert.equal((a.staged[0]!.card.operations[0]!.input.properties as Record<string, string>)["Design Status"], "Under Dev");
   });
 
-  it("the choice closes with its 72 h: a later pick is the thread's own", async () => {
+  it("the choice closes with a card's 24 weekday hours: a later pick is the thread's own", async () => {
     const { a, reply } = await answered("raised_hands");
-    a.clock.now += 73 * 60 * 60 * 1000;
+    // Listed Friday 11:00 ET, so it closed Monday 11:00 ET.
+    a.clock.now = at(35, 15, 1);
     assert.equal(await reply(MAYA, "Shipped"), false);
     assert.equal(a.staged.length, 0);
   });
@@ -1103,7 +1103,7 @@ describe("shared rules", () => {
     assert.equal(only(store).state, "lapsed");
   });
 
-  it("a follow-through card is staged in its own slot, for 72 h, confirmable by its confirmers", () => {
+  it("a follow-through card is staged in its own slot, for 24 weekday hours, confirmable by its confirmers", async () => {
     const p = followThroughProposal(
       {
         card: { kind: "confirm", verb: "v", fields: [], caveats: [], operations: [{ toolName: "notion_update", input: {} }] },
@@ -1115,8 +1115,12 @@ describe("shared rules", () => {
       },
       { ts: "1.3", text: "card" },
     );
-    assert.equal(p.ttlMs, FOLLOW_THROUGH_CARD_TTL_MS);
-    assert.equal(p.ttlMs, 72 * 60 * 60 * 1000);
+    // Staged Friday 11:00 ET: live until Monday 11:00 ET.
+    const threadState = createInMemoryThreadState({ now: () => at(32, 15) });
+    await threadState.putProposal(p);
+    const stored = await threadState.getProposalByTs("1.3");
+    assert.ok(stored.state === "found");
+    assert.equal(stored.createdAt + stored.proposal.ttlMs!, at(35, 15));
     assert.equal(p.supersedeKey, "follow-through:card:p1");
     assert.ok(p.supersedeKey!.startsWith(FOLLOW_THROUGH_KEY));
     assert.deepEqual(p.confirmers, [MAYA]);
@@ -1320,7 +1324,7 @@ describe("one card per follow-up", () => {
     assert.deepEqual(weekOn.posts.flatMap((p) => p.cards.map((c) => c.title.text)), ["Step 1", "Step 3"]);
   });
 
-  it("a report already live closes card by card: a decided card keeps its decision, an undecided one closes past 72 h", async () => {
+  it("a report already live closes card by card: a decided card keeps its decision, an undecided one closes past its 24 weekday hours", async () => {
     const store = await manyTodos(2);
     const clock = { now: at(32, 13) };
     const threadState = createInMemoryThreadState({ now: () => clock.now });
@@ -1330,8 +1334,8 @@ describe("one card per follow-up", () => {
     const decided = await review(threadState, m.posts[0]!, first!.id, "confirm", { userId: MAYA });
     assert.match(decided.redrawn.at(-1)![0]!.subtitle!.text, /^Approved by <@U0MAYA>/);
     assert.equal(decided.redrawn.at(-1)![1]!.actions[0]!.text.text, "Review");
-    // Past its 72 h, the report as it is redrawn: the undecided card closed, the decided one as it was.
-    clock.now = at(32, 13) + FOLLOW_THROUGH_CARD_TTL_MS + 60_000;
+    // Staged Friday 09:00 ET; past Monday 09:00 ET, the report as it is redrawn: the undecided card closed, the decided one as it was.
+    clock.now = at(35, 13, 1);
     const cards = cardsOf((await currentReport(threadState, m.posts[0]!.ts, clock.now))!.blocks);
     assert.match(cards[0]!.subtitle!.text, /^Approved by <@U0MAYA>/);
     assert.equal(cards[1]!.subtitle!.text, "Closed, no decision");

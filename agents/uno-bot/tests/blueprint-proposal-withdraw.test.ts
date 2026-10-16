@@ -244,8 +244,8 @@ describe("nothing is deleted", () => {
   });
 
   it("when the offer goes unanswered past its window: the proposal is kept", async () => {
-    const { WITHDRAWAL_CARD_TTL_MS } = await cleanup();
-    const verdict = await decide("aged", REQUESTER, undefined, WITHDRAWAL_CARD_TTL_MS.aged + 3_600_000);
+    // Staged Tuesday 17:13 ET, so its 24 weekday hours ran out Wednesday 17:13 ET.
+    const verdict = await decide("aged", REQUESTER, undefined, 25 * 3_600_000);
     assert.notEqual(verdict.outcome, "won");
     await execute(verdict);
     assert.deepEqual(rpcCalls(), []);

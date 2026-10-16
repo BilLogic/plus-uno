@@ -42,7 +42,6 @@ export {
   matchShipped,
   ownersOf,
   replanRows,
-  REVISION_CARD_TTL_MS,
   REVISION_REDRAFT_POINTER,
   REVISION_SENT_BACK,
   revisionSection,
@@ -67,7 +66,6 @@ export {
 export {
   draftProposal,
   drawnProposalOf,
-  PROPOSAL_CARD_TTL_MS,
   PROPOSAL_DRAFT_TIER,
   PROPOSAL_OFFER_SUBREQUESTS,
   PROPOSAL_SYSTEM,

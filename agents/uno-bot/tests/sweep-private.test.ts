@@ -10,7 +10,6 @@ import type { ScheduledJob } from "../src/scheduled/runs";
 import {
   runSweepJob,
   stageSweepShare,
-  SWEEP_CARD_TTL_MS,
   SWEEP_SHARE_KEY,
   sweepShareNotes,
   sweepShareOffer,
@@ -234,10 +233,11 @@ test("the share card appears only after the fix batch wrote a page", async () =>
   assert.ok(share);
   assert.deepEqual(posts.map((p) => [p.channel, p.threadTs]), [[MPIM, fix.replyTs]], "in the same group DM thread");
   assert.equal(share.supersedeKey, SWEEP_SHARE_KEY);
-  assert.equal(share.ttlMs, SWEEP_CARD_TTL_MS);
   assert.deepEqual(share.confirmers, fix.confirmers);
   assert.equal(share.sweepRun, undefined, "not a fix card");
-  assert.equal((await h.threadState.getProposalByTs(share.proposalTs)).state, "found");
+  const stored = await h.threadState.getProposalByTs(share.proposalTs);
+  assert.ok(stored.state === "found");
+  assert.equal(stored.createdAt + stored.proposal.ttlMs!, at(31, 14), "staged Wednesday 10:00 ET, live until Thursday 10:00 ET");
   const [staged] = await h.proposalEvents.eventsOf(share.proposalTs);
   assert.deepEqual([staged?.event, staged?.via, staged?.channelId], ["staged", "worker", null]);
 });

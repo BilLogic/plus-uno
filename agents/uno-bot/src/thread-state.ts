@@ -81,6 +81,7 @@ import {
   proposalReplyThread,
   proposalSlot,
   proposalTtlMs,
+  stampedTtl,
   withLiveMark,
   type CutOffNoteReport,
   type DecisionReportRecord,
@@ -390,7 +391,8 @@ export class ThreadState extends DurableObject<Env> {
   //
   // Retire first, then write — a choice, not an accident: the new card is the
   // one a racing ✅ has to be able to find, so it is the last thing to land.
-  async putProposal(proposal: PendingProposal, at: number): Promise<{ retired: string[] }> {
+  async putProposal(staged: PendingProposal, at: number): Promise<{ retired: string[] }> {
+    const proposal = stampedTtl(staged, at);
     const slot = proposalSlot(proposal);
     const expiresAt = at + proposalTtlMs(proposal) + 1;
     const retired = await this.storage.transaction(async (txn) => {

@@ -76,7 +76,6 @@ import {
   driftItem,
   driftParent,
   driftReview,
-  DRIFT_CARD_TTL_MS,
   DRIFT_NO_REVISION,
   DRIFT_NOT_POSTED_TEXT,
   DRIFT_NOT_STAGED,
@@ -91,6 +90,7 @@ import type { FrameJudge } from "./judge";
 import { draftIntake, matchPillar, pillarCandidates } from "./draft";
 import { askGroupOf, type FileDriftFinding } from "./finding";
 import { slackPersonOfFigma, type FigmaPeople } from "../usage/roles";
+import { cardExpiresAt } from "../card-expiry";
 
 /** Reports with cards per morning; files whose card would be past it wait. */
 export const MAX_REPORTS_PER_MORNING = 4;
@@ -182,7 +182,7 @@ export interface LiveAskFile {
   cardTs?: string;
 }
 
-/** A report posted and still within its 72 h: the message to edit, and the
+/** A report posted and still within its card's window: the message to edit, and the
  *  files whose catching up withdraws it. */
 export interface LiveAsk {
   channel: string;
@@ -208,7 +208,7 @@ export interface DriftStore {
   clearIntakeMark(group: string): Promise<void>;
   asked(channel: string, threadTs: string): Promise<AskRecord>;
   saveAsked(channel: string, threadTs: string, record: AskRecord): Promise<void>;
-  /** Every live ask, oldest first. Kept for the card's 72 h. */
+  /** Every live ask, oldest first. Kept for the card's window. */
   liveAsks(): Promise<LiveAsk[]>;
   /** The live asks posted in one thread. */
   liveAsksIn(channel: string, threadTs: string): Promise<LiveAsk[]>;
@@ -413,7 +413,7 @@ export async function runDriftAsks(job: { key: string }, deps: DriftPostDeps): P
   const byGroup = groupBy([...threads.values()].flatMap((t) => t.findings), askGroupOf);
   for (const [group, list] of [...byGroup].sort((a, b) => earliest(a[1]) - earliest(b[1]))) {
     const mark = deps.dryRun ? null : await deps.store.intakeMark(group);
-    if (mark?.cardTs && mark.markedAt + DRIFT_CARD_TTL_MS > now && (await deps.cardLive(markProposalKey({ ...mark, cardTs: mark.cardTs })))) {
+    if (mark?.cardTs && cardExpiresAt(mark.markedAt) > now && (await deps.cardLive(markProposalKey({ ...mark, cardTs: mark.cardTs })))) {
       homes.set(group, { kind: "live", mark });
       continue;
     }
@@ -484,7 +484,7 @@ export async function runDriftAsks(job: { key: string }, deps: DriftPostDeps): P
  */
 async function threadBusy(deps: Pick<DriftPostDeps, "store" | "cardLive">, channel: string, threadTs: string, now: number): Promise<boolean> {
   for (const ask of await deps.store.liveAsksIn(channel, threadTs)) {
-    if (ask.role !== "card" || ask.askedAt + DRIFT_CARD_TTL_MS <= now) continue;
+    if (ask.role !== "card" || cardExpiresAt(ask.askedAt) <= now) continue;
     // A record from before the shared card names no card per file: its
     // message was the one proposal.
     const keys = ask.files.some((f) => f.itemId) ? ask.files.flatMap((f) => (f.itemId ? [itemProposalKey(ask.ts, f.itemId)] : [])) : [ask.ts];
@@ -749,7 +749,6 @@ export function driftSection(deps: DriftSectionDeps, handOff: SectionHandOff<Dri
       return {
         cards: value.cards.map((c) => ({ person: c.here.owner || null, item: itemOf(c) })),
         whole: true,
-        ttlMs: DRIFT_CARD_TTL_MS,
         lines: value.cards.length ? lines : [driftParent(value.kinds), ...lines],
         // An edit when a card did not stage; each card that shows, a staging;
         // the marks and records are internal.
@@ -836,10 +835,9 @@ function cardProposal(channel: string, root: string, ts: string, c: DriftCard): 
     proposalText: renderProposalCard(driftReview({ ...c.words, lane: c.lane, note: c.note }, c.operation)).text,
     // Nobody asked: the Worker staged it.
     requesterUserId: "",
-    ttlMs: DRIFT_CARD_TTL_MS,
     confirmers: [...c.confirmers],
     // Nobody asked, so the gate's "ask me again" lines would be wrong.
-    stated: driftCardWords(DRIFT_CARD_TTL_MS / 3_600_000),
+    stated: driftCardWords(),
     choices: driftChoices(),
     refuseRevision: DRIFT_NO_REVISION,
   };
@@ -881,7 +879,7 @@ async function keepLive(
     // A file-change notification reads this, and looks no further for a file
     // no live report names (`recheckOnUpdate`).
     for (const key of new Set(ask.files.filter((f) => isFigmaKind(f.kind)).map((f) => f.fileKey))) {
-      await store.markLiveFile(key, now + DRIFT_CARD_TTL_MS);
+      await store.markLiveFile(key, cardExpiresAt(now));
     }
   } catch (err) {
     rethrowIfBudget(err);
@@ -1008,8 +1006,8 @@ export async function recheckLiveAsks(
   const reads = cachedReads(deps.figma);
   const live: LiveAsk[] = [];
   for (const ask of await deps.store.liveAsks()) {
-    // Past its 72 h: no re-ping, and no edit either.
-    if (ask.askedAt + DRIFT_CARD_TTL_MS <= now) {
+    // Past its card's window: no re-ping, and no edit either.
+    if (cardExpiresAt(ask.askedAt) <= now) {
       if (!deps.dryRun) await deps.store.dropLiveAsk(ask);
       continue;
     }

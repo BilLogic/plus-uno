@@ -27,6 +27,7 @@
 // PURE: no `Env`, no Slack, no Workers global.
 
 import { etDayOf } from "../sweep/schedule";
+import { cardExpiresAt } from "../card-expiry";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -60,9 +61,11 @@ export function isStaleCheckInMorning(now: number): boolean {
   return new Date(etDayOf(now)).getUTCDay() === STALE_CHECK_IN_WEEKDAY;
 }
 
-/** How long an F5 owner's choice of Design Status stays open: a proposal
- *  card's life. */
-export const CHOICE_TTL_MS = 72 * 60 * 60 * 1000;
+/** When an F5 owner's choice of Design Status, listed at `listedAt`, closes:
+ *  a proposal card's life, on the one expiry rule. */
+export function choiceClosesAt(listedAt: number): number {
+  return cardExpiresAt(listedAt);
+}
 
 /** An active Roadmap card, as the end of day reads it. */
 export interface ActiveCard {

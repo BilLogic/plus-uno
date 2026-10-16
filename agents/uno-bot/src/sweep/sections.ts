@@ -50,8 +50,6 @@ export interface SectionCards extends SectionPlace {
    *  messages. It goes first, and past the carousel's ten it shows ten and
    *  says so. */
   whole?: boolean;
-  /** How long its cards stay decidable, so the report's record outlives them. */
-  ttlMs?: number;
   /** Lines with no card of their own, said under the opener (a pointer to a
    *  card in another thread). */
   lines?: string[];
@@ -202,7 +200,7 @@ export interface HandedSectionSpec<P> {
   date: string;
   handOff: SectionHandOff<P>;
   /** The place's cards and what the opener says of them. */
-  cardsOf(value: P): Pick<SectionCards, "cards" | "says"> & Partial<Pick<SectionCards, "whole" | "ttlMs" | "lines" | "cost">>;
+  cardsOf(value: P): Pick<SectionCards, "cards" | "says"> & Partial<Pick<SectionCards, "whole" | "lines" | "cost">>;
   /** The cards it showed, by item id, staged, and the rest kept. Each card
    *  `progress` holds was handled by an earlier try: it is not staged again,
    *  and counts as it came out. Each card handled now is marked at once. */

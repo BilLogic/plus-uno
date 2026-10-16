@@ -13,6 +13,7 @@
 import type { Env } from "../types";
 import { HARNESS } from "../generated/harness";
 import { proposalOperations, type PendingProposal } from "../thread-state/index";
+import { CARD_WINDOW_WORDS } from "../card-expiry";
 import { cardHeadline, cardTargets } from "./card-identity";
 import { REVISES_CARD } from "./tool-table";
 
@@ -174,7 +175,7 @@ export function renderPendingBlock(cards: readonly PendingContext[], sender: Sen
     `- A decision on a card: if it says yes in any words — "go ahead", "sure", "ok", "sounds good", "yep do it" — invoke \`proposal_resolve\` with decision "confirm"; if it says no, cancel.${several ? " `proposal_resolve` decides card 1, the newest; for any other card, ask them to press Review on that card." : ""}`,
     `- A change to a waiting card (an edit, "make the title shorter", a reply about that card): call that card's tool again with its whole input, the change applied, and \`${REVISES_CARD}\` set to the card's id. The new card replaces it and keeps everything else it held.${several ? " If it is unclear which card the change means, ask which, naming them." : ""}`,
     `- A request for a different matter: call its tool without \`${REVISES_CARD}\`. It posts as a separate card beside the waiting ones, and each is decided on its own, in any order. Something that builds on a waiting card is the same matter: revise that card instead.`,
-    "- Anything else: reply conversationally; the proposal sits until someone presses ✅ / ⛔ on the card, reacts, or it expires after 60 minutes.",
+    `- Anything else: reply conversationally; the proposal sits until someone presses ✅ / ⛔ on the card, reacts, or it expires ${CARD_WINDOW_WORDS} after it was staged — Saturday and Sunday do not count.`,
     "",
     "A new card that writes the same Notion page or GitHub issue as a waiting card always replaces it — the Worker treats it as a revision of that card. Re-invoking a card's tool with identical parameters confirms that card rather than posting a second one.",
     "",

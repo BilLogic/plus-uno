@@ -34,6 +34,7 @@ import type { ChannelRole } from "../destination/index";
 import type { AssistantContext } from "../slack/types";
 import type { VisionReference } from "../slack/vision-reference";
 import type { CardFixes } from "../turn/delivery";
+import { cardTtlMs } from "../card-expiry";
 
 export type { AssistantContext, VisionReference };
 
@@ -54,11 +55,11 @@ export const MAX_HISTORY_TURNS = 50;
 /** How long a conversation is remembered. */
 export const HISTORY_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
-/** How long a staged proposal stays confirmable, unless it carries its own
- *  `ttlMs` — read it through `proposalTtlMs`. 60 min, not 15: the gate waits
- *  on a HUMAN, and live 2026-07-10 a designer's delayed ✅ landed on an expired
- *  card and nothing happened. An hour tolerates meetings; the gate — not the
- *  clock — is still the safety. */
+/** How long a card stored WITHOUT a `ttlMs` stays confirmable: the hour every
+ *  turn's card got before the one expiry rule (#1315). Since then the store
+ *  stamps every staging with the rule (`stampedTtl`), so only a record stored
+ *  before it is read by this — it keeps the deadline it was staged with. Read
+ *  through `proposalTtlMs`. */
 export const PROPOSAL_TTL_MS = 60 * 60 * 1000;
 
 /** How long a decided card is kept for Review's View, counted from the
@@ -250,8 +251,10 @@ export interface PendingProposal {
   notionPrdId?: string;
   notionPrdUrl?: string;
   /**
-   * How long this card stays confirmable, when it is not the hour every turn's
-   * card gets (`PROPOSAL_TTL_MS`). Read through `proposalTtlMs`, and by every
+   * How long this card stays confirmable. Stamped by the store at staging from
+   * the one expiry rule (`card-expiry.ts`) unless the stager set it — a revision
+   * in place that keeps what is left of its card's window does; absent only on
+   * a record stored before the rule (`PROPOSAL_TTL_MS`). Read through `proposalTtlMs`, and by every
    * TTL decision the module makes about the record: the lookups, the cut-off
    * window of the execution it becomes, and the garbage collection — which
    * runs daily, so a longer-lived card measured by the default would be
@@ -808,7 +811,20 @@ export interface SweepShare {
 
 export type ProposalTerms = Pick<PendingProposal, "ttlMs" | "confirmers" | "exclusiveConfirmers">;
 
-/** How long a proposal stays confirmable: its own `ttlMs`, or the hour. */
+/**
+ * The card as the store keeps it: with its own `ttlMs`, or the one expiry
+ * rule's from the moment it is staged (#1315). Both adapters' `putProposal`
+ * stamp through this, so no stager can stage a card on another clock.
+ *
+ * @param proposal - The card being staged
+ * @param at - The store's now
+ */
+export function stampedTtl(proposal: PendingProposal, at: number): PendingProposal {
+  return proposal.ttlMs !== undefined ? proposal : { ...proposal, ttlMs: cardTtlMs(at) };
+}
+
+/** How long a proposal stays confirmable: its own `ttlMs`, or — on a record
+ *  stored before the rule — the hour. */
 export function proposalTtlMs(proposal: Pick<PendingProposal, "ttlMs">): number {
   return proposal.ttlMs ?? PROPOSAL_TTL_MS;
 }
@@ -928,13 +944,14 @@ export function isImChannel(channel: string): boolean {
 }
 
 /**
- * What a revision inherits from the card it replaces: its lifetime and who
- * may confirm it. A person pushing back on a card is asking for different
- * content, not a different gate, so the revision is held to the same terms.
+ * What a revision inherits from the card it replaces: who may confirm it. A
+ * person pushing back on a card is asking for different content, not a
+ * different gate, so the revision is held to the same people. Not its
+ * lifetime: the revision is a card staged now, and the store gives it the
+ * expiry rule's full window from now (`stampedTtl`).
  */
 export function inheritedTerms(replaced: ProposalTerms | null | undefined): ProposalTerms {
   return {
-    ...(replaced?.ttlMs !== undefined ? { ttlMs: replaced.ttlMs } : {}),
     ...(replaced?.confirmers ? { confirmers: [...replaced.confirmers] } : {}),
     ...(replaced?.confirmers && replaced.exclusiveConfirmers ? { exclusiveConfirmers: true as const } : {}),
   };

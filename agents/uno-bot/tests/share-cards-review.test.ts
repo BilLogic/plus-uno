@@ -8,7 +8,7 @@ import assert from "node:assert/strict";
 
 import { raiseCard } from "../src/dm-sweep/copy";
 import { sweepShareCard, SWEEP_SHARE_KEY, SWEEP_SHARE_TOOL } from "../src/sweep/share";
-import { INSERT_CARD_REFUSAL, SHARE_CARD_WORDS, SWEEP_CARD_TTL_MS } from "../src/sweep/cards";
+import { INSERT_CARD_REFUSAL, SHARE_CARD_WORDS } from "../src/sweep/cards";
 import { proposalCardBlocks, renderProposalCard } from "../src/slack/proposal-render";
 import { renderGateNote } from "../src/slack/gate-note";
 import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
@@ -95,7 +95,8 @@ const LEGACY: PendingProposal = {
     "Nothing from here has left this group DM. ✅ posts exactly this note in #plus-design; ⛔ drops it.\n\n" +
     `In #plus-design:\n> ${NOTE}\n\n:warning: About to *post this note in #plus-design*:\nPress Review to approve it, ask for changes or reject it.`,
   requesterUserId: "",
-  ttlMs: SWEEP_CARD_TTL_MS,
+  // A share card staged before the one expiry rule kept the 72 h it was stored with.
+  ttlMs: 72 * 3_600_000,
   confirmers: ["U2"],
   supersedeKey: SWEEP_SHARE_KEY,
 };

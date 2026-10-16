@@ -23,7 +23,6 @@ import {
   type DevLinksWriteJob,
   type DevLinkRegistry,
   type DevLinksDeps,
-  DEV_LINKS_CARD_TTL_MS,
   type CardedMark,
 } from "../src/figma-links/run";
 import { devLinksRequestOf } from "../src/figma-links/gate";
@@ -510,7 +509,8 @@ describe("a decided card stops counting as open", () => {
   it("a card past its time stops counting as open", async () => {
     const w = world();
     await runDevLinksPost(w.deps, { components: ["Button"] });
-    w.deps.now = () => NOW + DEV_LINKS_CARD_TTL_MS + 1;
+    // Staged Monday 09:01 ET; a moment past Tuesday 09:01 ET.
+    w.deps.now = () => NOW + 24 * 3_600_000 + 1;
     const again = await runDevLinksPost(w.deps, { components: ["Button"] });
     assert.equal(again.cards, 1, again.summary);
   });

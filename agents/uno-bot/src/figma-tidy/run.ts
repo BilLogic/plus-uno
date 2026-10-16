@@ -87,8 +87,6 @@ export type { TidyCard, TidyFile, TidyFolder } from "./checks";
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** How long a shown card's fingerprint is remembered. */
 export const MEMORY_MS = 35 * DAY_MS;
-/** How long a card stays answerable: gone before next Monday's. */
-export const TIDY_CARD_TTL_MS = 6 * DAY_MS;
 /** Likely-card lookups one post makes, one Roadmap query each. */
 export const LIKELY_LOOKUPS = 5;
 /** External subrequests one listing may take: the client tries a call up to three times. */
@@ -443,7 +441,6 @@ export function tidySection(deps: TidySectionDeps, handOff: SectionHandOff<TidyH
       if (value.allClear !== undefined) return { cards: [], lines: [allClearText(value.allClear)], cost: () => ({ subrequests: 2, d1Queries: 0 }), says: () => "" };
       return {
         cards: value.shown.map((s) => ({ person: s.finding.owner, item: tidyItem(s.finding, s.likely, s.ownerName) })),
-        ttlMs: TIDY_CARD_TTL_MS,
         lines: [value.carriedFrom ? tidyCarriedParent(value.carriedFrom, value.shown.length) : tidyParent(date, value.fresh, value.stillOpen)],
         // The memory and the waiting cards, an edit when a card did not
         // stage, and each card that shows, a staging.
@@ -523,9 +520,8 @@ export function stagedFinding(channel: string, messageTs: string, shown: Shown, 
     ...itemProposal(messageTs, tidyItem(shown.finding, shown.likely).id),
     proposalText: renderProposalCard(card).text,
     requesterUserId: "",
-    ttlMs: TIDY_CARD_TTL_MS,
     confirmers: [...confirmers],
-    stated: tidyCardWords(TIDY_CARD_TTL_MS / 3_600_000),
+    stated: tidyCardWords(),
     refuseRevision: TIDY_REVISION_REFUSAL,
     choices: tidyChoices(),
     facts: tidyFacts(shown.finding, shown.likely),

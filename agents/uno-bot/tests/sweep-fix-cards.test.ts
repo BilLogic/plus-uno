@@ -135,12 +135,17 @@ test("one fix posts as a parent line naming its page, and one card", async () =>
 test("each fix is its own proposal: one operation, keyed by the message and its block", async () => {
   const { h, post } = await postedCard();
   assert.equal(h.staged.length, 3);
+  for (const p of h.staged) {
+    // Staged Wednesday 10:00 ET: live until Thursday 10:00 ET.
+    const stored = await h.threadState.getProposalByTs(p.proposalTs);
+    assert.ok(stored.state === "found");
+    assert.equal(stored.createdAt + stored.proposal.ttlMs!, at(31, 14));
+  }
   h.staged.forEach((p, i) => {
     assert.equal(p.operations!.length, 1);
     assert.equal((p.operations![0]!.input.replace as Array<{ content: string }>)[0]!.content, FIXES[i]);
     assert.deepEqual(p.item, { messageTs: post.ts, id: PAGE.blocks[i]!.id });
     assert.equal(p.proposalTs, `${post.ts}#${PAGE.blocks[i]!.id}`);
-    assert.equal(p.ttlMs, 72 * 60 * 60 * 1000);
     // The whole change, which the pop-up shows: the page's words now and what they become.
     assert.match(p.proposalText, new RegExp(`Page says now: ${PAGE.blocks[i]!.text}`));
     assert.match(p.proposalText, new RegExp(`Will say: ${FIXES[i]}`));

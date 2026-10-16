@@ -29,7 +29,6 @@ import { allClearText, findingBody, ownerLine, tidyCard, tidyItem, tidyParent, T
 import type { TidyFinding } from "../src/figma-tidy/checks";
 import { decisionReport, reportMessage, reportRecord } from "../src/slack/decision-cards";
 import type { ReportItemState } from "../src/thread-state/index";
-import { PRECEDENCE_CARD_TTL_MS } from "../src/ds-precedence/jobs";
 import { CONFIRM_FOOTER, renderProposalCard } from "../src/slack/proposal-render";
 import { renderGateNote, statedCancelledNote } from "../src/slack/gate-note";
 import {
@@ -39,7 +38,6 @@ import {
   driftItem,
   driftParent,
   driftReview,
-  DRIFT_CARD_TTL_MS,
   DRIFT_NO_REVISION,
   DRIFT_NOT_POSTED_TEXT,
   DRIFT_NOT_STAGED,
@@ -51,7 +49,6 @@ import {
 import type { GateNote } from "../src/turn/index";
 import { STANDING_TOO } from "../src/sweep/capture-lines";
 import { decisionCard, decisionCardWords, decisionItem, decisionParent, rewordInstead, whichOne } from "../src/figma-comments/copy";
-import { DECISION_CARD_TTL_MS } from "../src/figma-comments/post";
 import type { QueuedDecision } from "../src/figma-comments/queue";
 import { figmaReplyText, type FigmaReply } from "../src/figma-ask/copy";
 import {
@@ -266,13 +263,16 @@ function passesGateAnswer(text: string, glyphs: readonly string[] = []): void {
   }
 }
 
-describe("what a stated card says at the gate", () => {
-  const weekly = precedenceCardWords(PRECEDENCE_CARD_TTL_MS / 3_600_000);
+/** A card's lifetime, as an expired note carries it: a weekday staging's 24 h. */
+const DAY_TTL_MS = 24 * 3_600_000;
 
-  it("a precedence card: a Reject leaves the difference as deliberate, and its window is the whole six days", () => {
+describe("what a stated card says at the gate", () => {
+  const weekly = precedenceCardWords();
+
+  it("a precedence card: a Reject leaves the difference as deliberate, and its window is a card's 24 weekday hours", () => {
     assert.deepEqual(weekly, {
       cancelled: "Left as deliberate, nothing filed",
-      expired: "That card closed after 6 days with no decision, so nothing was filed.",
+      expired: "That card closed after 24 weekday hours with no decision, so nothing was filed.",
     });
   });
 
@@ -286,7 +286,7 @@ describe("what a stated card says at the gate", () => {
   it("every answer the gate gives a stated card holds to the copy rules, and names no tool", () => {
     const answers: Array<[GateNote, string[]]> = [
       [{ kind: "resolved", decision: "cancel", cancelled: weekly.cancelled }, []],
-      [{ kind: "expired", ttlMs: PRECEDENCE_CARD_TTL_MS, words: weekly.expired }, []],
+      [{ kind: "expired", ttlMs: DAY_TTL_MS, words: weekly.expired }, []],
       [{ kind: "superseded", stated: true }, []],
       [{ kind: "not-on-the-card", toolName: "github_issue_create", glyph: "no_entry", userId: "U0AAAAAA2", stated: true }, [":no_entry:"]],
     ];
@@ -395,17 +395,17 @@ describe("the drift card (#886 § 3.3)", () => {
   });
 
   it("answers the gate in its own words: a Reject files nothing, and a late decision is told nothing was filed", () => {
-    const words = driftCardWords(DRIFT_CARD_TTL_MS / 3_600_000);
-    assert.deepEqual(words, { cancelled: "No intake filed", expired: "That card closed after 72 h with no decision, so nothing was filed." });
+    const words = driftCardWords();
+    assert.deepEqual(words, { cancelled: "No intake filed", expired: "That card closed after 24 weekday hours with no decision, so nothing was filed." });
     assert.equal(statedCancelledNote(words, "U0AAAAAA2"), "No intake filed, decided by <@U0AAAAAA2>.");
     passesGateAnswer(statedCancelledNote(words, "U0AAAAAA2"), [":no_entry:"]);
     for (const note of [
       { kind: "resolved", decision: "cancel", cancelled: words.cancelled },
-      { kind: "expired", ttlMs: DRIFT_CARD_TTL_MS, words: words.expired },
+      { kind: "expired", ttlMs: DAY_TTL_MS, words: words.expired },
     ] as GateNote[]) {
       passesGateAnswer(renderGateNote(note));
     }
-    assert.equal(renderGateNote({ kind: "expired", ttlMs: DRIFT_CARD_TTL_MS, words: words.expired }), words.expired);
+    assert.equal(renderGateNote({ kind: "expired", ttlMs: DAY_TTL_MS, words: words.expired }), words.expired);
   });
 });
 
@@ -491,9 +491,9 @@ describe("the comment-decision thread (#886 § 3.5)", () => {
   it("a ⛔ closes a decision card with what it did and who decided, and a late answer says nothing was written", () => {
     const words = decisionCardWords();
     assert.equal(statedCancelledNote(words, "U0AAAAAA2"), "Dropped, nothing written, decided by <@U0AAAAAA2>.");
-    assert.equal(words.expired, "That card closed after 72 h with no decision, so nothing was written.");
+    assert.equal(words.expired, "That card closed after 24 weekday hours with no decision, so nothing was written.");
     passesGateAnswer(statedCancelledNote(words, "U0AAAAAA2"), [":no_entry:"]);
-    passesGateAnswer(renderGateNote({ kind: "expired", ttlMs: DECISION_CARD_TTL_MS, words: words.expired }));
+    passesGateAnswer(renderGateNote({ kind: "expired", ttlMs: DAY_TTL_MS, words: words.expired }));
   });
 
   it("the lines a reply gets hold to the vocabulary, and point at Review", () => {

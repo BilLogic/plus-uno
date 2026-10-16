@@ -42,6 +42,7 @@ import {
   type ThreadState,
   type ThreadStateDeps,
 } from "../../src/thread-state/store";
+import { cardTtlMs } from "../../src/card-expiry";
 
 /** A hand-wound clock. `now()` is what the store reads; `advance` is the only
  *  way time passes in this suite. */
@@ -66,7 +67,15 @@ const OTHER = { channel: "C1", thread: "1700.9" } as const;
 /** The batch `proposal()` stages, as a replaced or expired lookup names it. */
 const STAGED = [{ toolName: "notion_create", input: { title: "Onboarding checklist" } }];
 
+/** A card on a fixed hour, so the suite's TTL assertions read the same on any
+ *  weekday it runs: the store stamps the expiry rule only on a card staged
+ *  without a `ttlMs`, which `bare()` stages. */
 function proposal(overrides: Partial<PendingProposal> = {}): PendingProposal {
+  return { ttlMs: PROPOSAL_TTL_MS, ...bare(), ...overrides };
+}
+
+/** The card as a turn stages it: no `ttlMs` of its own. */
+function bare(overrides: Partial<PendingProposal> = {}): PendingProposal {
   return {
     toolName: "notion_create",
     input: { title: "Onboarding checklist" },
@@ -1370,13 +1379,20 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
   });
 
-  it("a proposal without its own TTL still expires after the hour", async () => {
+  // The one expiry rule (#1315): a card staged without a lifetime of its own
+  // gets 24 weekday hours from its staging, whatever weekday the suite runs on.
+  it("a proposal staged without its own TTL lives 24 weekday hours from its staging", async () => {
     const { store, clock } = setup();
-    await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: LONG_TTL_MS }));
+    const ttl = cardTtlMs(clock.now());
+    await store.putProposal(bare({ proposalTs: "1700.2" }));
     await store.putProposal(proposal({ proposalTs: "1700.4", threadTs: OTHER.thread }));
     clock.advance(PROPOSAL_TTL_MS + 1);
     assert.equal((await store.getProposalByTs("1700.2")).state, "found");
     assert.equal((await store.getProposalByTs("1700.4")).state, "expired");
+    clock.advance(ttl - PROPOSAL_TTL_MS - 2);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found");
+    clock.advance(2);
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "expired", ttlMs: ttl, proposalText: "Create the card?", operations: STAGED });
   });
 
   // The successor's own TTL decides whether it is still live to point at.
@@ -1404,7 +1420,7 @@ export function runThreadStateConformance(
     assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "expired", ttlMs: LONG_TTL_MS, stated, proposalText: "Create the card?", operations: STAGED });
   });
 
-  it("a retired stated card carries its words, and a turn's card answers as it always has", async () => {
+  it("a retired stated card carries its words, and a card without words answers with its lifetime alone", async () => {
     const { store, clock } = setup();
     const stated = { cancelled: "Nothing filed this week", expired: "That card closed after 6 days with no decision." };
     await store.putProposal(proposal({ proposalTs: "1700.2", stated }));
@@ -1415,7 +1431,7 @@ export function runThreadStateConformance(
     assert.deepEqual(await store.getProposalByTs("1700.4"), { state: "superseded", proposalText: "Create the card?", operations: STAGED });
     await store.putProposal(proposal({ proposalTs: "1700.6", threadTs: "1700.5" }));
     clock.advance(PROPOSAL_TTL_MS + 1);
-    assert.deepEqual(await store.getProposalByTs("1700.6"), { state: "expired", proposalText: "Create the card?", operations: STAGED });
+    assert.deepEqual(await store.getProposalByTs("1700.6"), { state: "expired", ttlMs: PROPOSAL_TTL_MS, proposalText: "Create the card?", operations: STAGED });
   });
 
   it("an execution of a proposal with its own TTL is takeable at 71 h and gone at 73 h", async () => {
