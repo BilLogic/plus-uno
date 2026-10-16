@@ -40,6 +40,12 @@ export function cardKey(pageId: string): string {
  * @param outcomes - What a decided card's batch ran
  */
 export function prdCardOf(outcomes: readonly OperationOutcome[] | undefined): string | null {
+  return prdPageOf(outcomes)?.id ?? null;
+}
+
+/** The Roadmap page a batch's PRD created, as its result named it: the page's
+ *  bare id and its URL; null when it wrote none. */
+function prdPageOf(outcomes: readonly OperationOutcome[] | undefined): { id: string; url: string } | null {
   for (const o of outcomes ?? []) {
     if (o.toolName !== "notion_create" || !o.ok) continue;
     let result: { ok?: unknown; surface?: unknown; url?: unknown };
@@ -51,9 +57,44 @@ export function prdCardOf(outcomes: readonly OperationOutcome[] | undefined): st
     const surface = typeof result.surface === "string" ? result.surface : String(o.input?.surface ?? "");
     if (result.ok !== true || surface.toLowerCase() !== "prd" || typeof result.url !== "string") continue;
     const id = parseNotionPageId(result.url);
-    if (id) return cardKey(id);
+    if (id) return { id: cardKey(id), url: result.url };
   }
   return null;
+}
+
+/**
+ * The Roadmap page each PRD matter's ✅ created, kept by the card's matter
+ * (`PendingProposal.supersedeKey`) rather than its thread (#1323): a thread
+ * can hold several PRDs now, each its own matter, and a check's results
+ * offer to update the page of the PRD they were checked against.
+ */
+export interface MatterPages {
+  pageOf(channel: string, matter: string): Promise<string | null>;
+  remember(channel: string, matter: string, pageUrl: string): Promise<void>;
+}
+
+/**
+ * Keep the page a decided PRD card created under the card's matter. Nothing
+ * for a ⛔, a write that did not land, or a card with no matter (one staged
+ * before turn cards had keys). Best-effort: a failure is logged, and the page
+ * stands.
+ *
+ * @param pages - Where the matter's page is kept
+ * @param proposal - The decided card
+ * @param outcomes - What its batch ran; undefined for a ⛔
+ */
+export async function rememberCreatedPage(
+  pages: MatterPages,
+  proposal: Pick<PendingProposal, "channel" | "supersedeKey" | "proposalTs">,
+  outcomes: readonly OperationOutcome[] | undefined,
+): Promise<void> {
+  const page = prdPageOf(outcomes);
+  if (!page || !proposal.supersedeKey) return;
+  try {
+    await pages.remember(proposal.channel, proposal.supersedeKey, page.url);
+  } catch (err) {
+    warn(`the page ${proposal.proposalTs} created not kept`, err);
+  }
 }
 
 export interface LinkDeps {

@@ -55,7 +55,7 @@ import { capacityOutage, NOT_WATCHED, watchedTurnDeps, type CapacityOutage } fro
 import { capacityOutageStoreFor } from "../thread-state/production";
 import { milestoneComparisonOn, serviceChangeJudgementOn } from "../blueprint-upkeep/env";
 import type { Delivery } from "./delivery";
-import { restageExecution, type TurnDeps, type TurnRequest } from "./turn";
+import { restageExecution, stageFromButton, type ButtonStaging, type TurnDeps, type TurnRequest } from "./turn";
 
 /**
  * What a caller reports the run through, beside the outcome.
@@ -357,6 +357,21 @@ export function restageFor(
       onRestaged: (from, to) => followRestageFor(env, from, to),
     });
   };
+}
+
+/**
+ * A door's staging of a card a button asked for (#1323), bound to `Env`:
+ * Turn's own card builder and staging (`stageFromButton`), on the door's
+ * store and Delivery, so a check's notes go up on the card a turn would have
+ * staged.
+ */
+export function stageFromButtonFor(
+  env: Env,
+  threadState: ThreadState,
+): (ask: ButtonStaging, delivery: Delivery) => Promise<PendingProposal | null> {
+  const cards = cardReadsFor(env);
+  const proposalEvents = proposalEventLogFor(env);
+  return (ask, delivery) => stageFromButton(ask, { threadState, delivery, cards, proposalEvents });
 }
 
 /**

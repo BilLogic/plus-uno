@@ -165,7 +165,8 @@ function job(threadState: ThreadState, opts: { drafts?: string[]; unreadable?: b
         return opts.unreadable ? null : TODAY;
       },
       draft: draftProposal({ provider: draftModel, affordable: () => true }),
-      post: async (_offer, text) => {
+      createdPage: async () => null,
+      postResults: async (_offer, { text }) => {
         if (opts.postFails) throw new Error("channel_not_found");
         seen.push({ kind: "post", text });
       },

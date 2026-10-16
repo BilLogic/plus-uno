@@ -91,9 +91,9 @@ import type { ThreadState } from "../thread-state/index";
 import type { PathToday } from "./draft";
 import { draftProposal, drawnProposalOf, PROPOSAL_OFFER_SUBREQUESTS, type ProposalDrafter } from "./proposal";
 import { JUDGEMENT_SUBREQUESTS, runBlueprintCheck, serviceChangeJudgement, type ServiceChangeJudgement } from "./check";
-import { checkedMessage } from "../slack/blueprint-check";
+import { checkedMessage, resultsMessage } from "../slack/blueprint-check";
 import { createD1ProposalRecords } from "./proposal-records-d1";
-import { keepProposalLinks, prdCardOf, type ThreadCards } from "./link";
+import { keepProposalLinks, prdCardOf, rememberCreatedPage, type MatterPages, type ThreadCards } from "./link";
 import type { ProposalRecords } from "./proposal-records";
 import {
   handOverAgedRemovals,
@@ -132,6 +132,8 @@ const THREAD_PREFIX = "blueprint-upkeep:thread:";
 const THREAD_CARD_PREFIX = "blueprint-upkeep:thread-card:";
 /** How long a thread's PRD card is remembered for a proposal drawn after it. */
 const THREAD_CARD_TTL_S = 45 * 24 * 60 * 60;
+/** The page a PRD matter's ✅ created, one KV key a matter (#1323). */
+const MATTER_PAGE_PREFIX = "blueprint-upkeep:matter-page:";
 const EMPTY: UpkeepState = { cursor: null, read: null, matched: [], waiting: [] };
 
 const stateFor = (env: Env) => kvJson<UpkeepState>(env, STATE_KV_KEY, EMPTY);
@@ -526,9 +528,10 @@ export function serviceChangeJudgementOn(env: Env): { serviceChangeJudgement?: S
 /**
  * One blueprint check on `Env` (#1321), as its runner job runs it: on an
  * AgentRunner of its own, so on a fresh 50-subrequest budget — the offer's
- * record (1), the path read (5), the draft (≤2), the results post (1), the
- * Draw on blueprint card's post, staging and events (≤4) and the status edit
- * (1). The draft runs only while that much is left beside the delivery
+ * record (1), the path read (5), the draft (≤2), the card's state (≤2: the
+ * thread's cards, the matter's page) and the results' post and keeping (2),
+ * the Draw on blueprint card's post, staging and events (≤4) and the status
+ * edit (1). The draft runs only while that much is left beside the delivery
  * reserve.
  *
  * @param env - Worker bindings
@@ -544,8 +547,10 @@ export async function runBlueprintCheckOnEnv(env: Env, offerTs: string): Promise
       provider: selectProvider(env),
       affordable: () => budgetHeadroom().subrequests >= PROPOSAL_OFFER_SUBREQUESTS + DELIVERY_RESERVE,
     }),
-    async post(offer, text) {
-      const sent = await postMessage(env, { channel: offer.channel, thread_ts: replyThread(offer), text });
+    createdPage: createdPageOn(env),
+    async postResults(offer, results) {
+      const message = resultsMessage(offer.offerTs, results);
+      const sent = await postMessage(env, { channel: offer.channel, thread_ts: replyThread(offer), text: message.text, blocks: message.blocks });
       if (!sent.ok) throw new Error(sent.error ?? "Slack refused the results");
     },
     async postCard(offer, card) {
@@ -582,6 +587,33 @@ export function proposalRecordsFor(env: Pick<Env, "USAGE_DB">): ProposalRecords 
   return env.USAGE_DB ? createD1ProposalRecords({ db: env.USAGE_DB }) : null;
 }
 
+/** The page each PRD matter's ✅ created, one KV key a matter, kept as long
+ *  as a thread's card. */
+function matterPagesOn(kv: KVNamespace): MatterPages {
+  const key = (channel: string, matter: string) => `${MATTER_PAGE_PREFIX}${channel}:${matter}`;
+  return {
+    async pageOf(channel, matter) {
+      charge(1, "kv");
+      return kv.get(key(channel, matter));
+    },
+    async remember(channel, matter, pageUrl) {
+      charge(1, "kv");
+      await kv.put(key(channel, matter), pageUrl, { expirationTtl: THREAD_CARD_TTL_S });
+    },
+  };
+}
+
+/**
+ * The page a PRD matter's ✅ created, on `Env`, as a check's results and
+ * their button read it; none without HARNESS_KV, when no page is known.
+ *
+ * @param env - Carries HARNESS_KV
+ */
+export function createdPageOn(env: Pick<Env, "HARNESS_KV">): (channel: string, matter: string) => Promise<string | null> {
+  const pages = env.HARNESS_KV ? matterPagesOn(env.HARNESS_KV) : null;
+  return async (channel, matter) => (pages ? pages.pageOf(channel, matter) : null);
+}
+
 /** The Roadmap card a thread's PRD created, one KV key a thread. */
 function threadCardsOn(kv: KVNamespace): ThreadCards {
   const key = (channel: string, ts: string) => `${THREAD_CARD_PREFIX}${channel}:${ts}`;
@@ -599,9 +631,10 @@ function threadCardsOn(kv: KVNamespace): ThreadCards {
 
 /**
  * Keep what a decided card means for its thread's proposals (`./link.ts`):
- * what a proposal offer drew on the blueprint, and the link to the Roadmap
- * card the thread's PRD created. Nothing for any other card, a ⛔ or a write
- * that did not land. Best-effort: a failure is logged, and the rows, the PRD
+ * what a proposal offer drew on the blueprint, the link to the Roadmap card
+ * the thread's PRD created, and that page under the PRD's matter, for a
+ * blueprint check's results to update (#1323). Nothing for any other card, a
+ * ⛔ or a write that did not land. Best-effort: a failure is logged, and the rows, the PRD
  * and the thread's reply stand.
  *
  * @param env - Carries USAGE_DB and HARNESS_KV
@@ -614,6 +647,7 @@ export async function recordDrawnProposalFor(
   outcomes: readonly OperationOutcome[] | undefined,
 ): Promise<void> {
   if (!drawnProposalOf(proposal, outcomes, Date.now()) && !prdCardOf(outcomes)) return;
+  if (env.HARNESS_KV) await rememberCreatedPage(matterPagesOn(env.HARNESS_KV), proposal, outcomes);
   const records = proposalRecordsFor(env);
   if (!records) return;
   await keepProposalLinks({ records, threadCards: env.HARNESS_KV ? threadCardsOn(env.HARNESS_KV) : null, now: () => Date.now() }, proposal, outcomes);

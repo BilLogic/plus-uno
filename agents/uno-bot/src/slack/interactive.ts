@@ -24,7 +24,7 @@
 import type { Env } from "../types";
 import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
-import { restageFor } from "../turn/env-deps";
+import { restageFor, stageFromButtonFor } from "../turn/env-deps";
 import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsPush, viewsUpdate } from "./api";
 import { executeVerdict, runVerdict } from "../agent/resolve-proposal";
 import { REVIEW_ACTION_ID } from "./proposal-render";
@@ -61,7 +61,9 @@ import { slackDelivery } from "./slack-delivery";
 import { standingConfirmersOf } from "./standing-confirmers";
 import { runButtonDoor, type ButtonDoorDeps, type CardMessage } from "./button-door";
 import { WHICH_ACTION_PREFIX, runWhichCardDoor, whichPressOf } from "./which-card";
-import { CHECK_IT_ACTION_ID, runCheckItDoor } from "./blueprint-check";
+import { CHECK_IT_ACTION_ID, resultsActionOf, runCheckItDoor, runResultsDoor } from "./blueprint-check";
+import { createdPageOn } from "../blueprint-upkeep/env";
+import type { ResultsAction } from "../blueprint-upkeep/check";
 import { DM_WATCH_ACTION_ID, saveDmWatchAction } from "../dm-watch/index";
 import { setDmWatchOnEnv } from "../dm-watch/env";
 import { publishHomeView } from "./home";
@@ -192,6 +194,8 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
   if (actionId.startsWith(WHICH_ACTION_PREFIX)) return resolveFromWhichCard(env, payload, actionId);
   if (actionId === CHECK_IT_ACTION_ID) return checkIt(env, payload);
+  const resultsAction = resultsActionOf(actionId);
+  if (resultsAction) return actOnResults(env, payload, resultsAction);
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
   if (actionId.startsWith(DECISION_REVIEW_ACTION_PREFIX)) return openReview(env, payload, actionId);
   if (actionId === REVIEW_EDIT_ACTION_ID) return editInReview(env, payload);
@@ -308,6 +312,35 @@ async function checkIt(env: Env, payload: InteractionPayload): Promise<void> {
       enqueue: (job, runnerKey) => enqueueAgentJob(env, job, runnerKey),
       replaceOffer: (message) => replaceCard(payload, message),
       replyEphemeral: (text) => replyEphemeral(payload, text),
+    },
+  );
+}
+
+// Add these notes to the card / Update the Roadmap page, under a blueprint
+// check's results (#1323): the value names the offer, whose record holds the
+// results; the door reads the card's state again and stages through Turn,
+// in the card's own thread.
+//
+// `Env` enters here and stops here.
+async function actOnResults(env: Env, payload: InteractionPayload, action: ResultsAction): Promise<void> {
+  const channel = payload.channel?.id;
+  const offerTs = payload.actions?.[0]?.value;
+  const userId = payload.user?.id ?? "someone";
+  if (!channel || !offerTs) return;
+  const threadState = threadStateFor(env);
+  const stage = stageFromButtonFor(env, threadState);
+  await runResultsDoor(
+    { channel, offerTs, userId, action },
+    {
+      store: threadState,
+      createdPage: createdPageOn(env),
+      stage: (ask) => {
+        const at = ask.kind === "revision" ? ask.of : ask.thread;
+        return stage(ask, slackDelivery(env, { channel: at.channel, replyTs: at.replyTs ?? at.threadTs, userMsgTs: at.userMsgTs, userId }));
+      },
+      replaceResults: (message) => replaceCard(payload, message),
+      replyEphemeral: (text) => replyEphemeral(payload, text),
+      standingConfirmers: standingConfirmersOf(env),
     },
   );
 }

@@ -20,16 +20,23 @@ export { revisionBody, revisionItem, revisionSays, revisionText, type RevisionSo
 export { firstChangedCell, proposalFacts, revisionFacts, rowsLine } from "./facts";
 export { cardEvidence, MAX_PRDS, prdIdsOf, type EvidencePage } from "./evidence";
 export { promotionDraft, retirementDraft, stageOf, STAGES, variantPromotionDraft, type PlannedRows, type ShipStage } from "./stages";
-export { cardKey, keepProposalLinks, prdCardOf, type LinkDeps, type ThreadCards } from "./link";
+export { cardKey, keepProposalLinks, prdCardOf, rememberCreatedPage, type LinkDeps, type MatterPages, type ThreadCards } from "./link";
 export {
   blueprintCheckRunnerKey,
+  cardNow,
   JUDGEMENT_SUBREQUESTS,
+  NOTES_HEADING,
+  pageUpdateWithNotes,
+  prdWithNotes,
   runBlueprintCheck,
   serviceChangeJudgement,
   type BlueprintCheckDeps,
   type CheckMatch,
+  type CardNow,
   type CheckOutcome,
+  type CheckResults,
   type PostedCard,
+  type ResultsAction,
   type JudgementDeps,
   type ServiceChangeJudgement,
 } from "./check";

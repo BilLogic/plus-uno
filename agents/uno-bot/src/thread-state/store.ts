@@ -1942,6 +1942,11 @@ export interface BlueprintCheckOffer {
   /** The card the offer was posted under; absent for a milestone with no
    *  card (the IDE hand-off). */
   cardTs?: string;
+  /** The matter of the card the offer was posted under: its `supersedeKey`,
+   *  which every revision of it carries (`turnCardKey`). The results' action
+   *  finds the matter's current card by it (#1323). Absent with no card, and
+   *  for a card staged before turn cards had keys. */
+  cardKey?: string;
   milestone: "prd" | "prototype-hand-off";
   /** The idea as the judgement read it. */
   idea: { title: string; text: string };
@@ -1953,6 +1958,11 @@ export interface BlueprintCheckOffer {
   quote: string;
   /** When Check it stops answering, epoch ms (`cardExpiresAt`). */
   expiresAt: number;
+  /** The check's results once they posted (#1323): the follow-up's own
+   *  words, which Add these notes / Update the Roadmap page put on the card
+   *  or the page, and when its buttons stop answering (`cardExpiresAt` from
+   *  the post). The button carries only the offer's ts. */
+  results?: { text: string; expiresAt: number };
 }
 
 /** How long an offer is kept from its put: past any offer's deadline

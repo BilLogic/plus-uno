@@ -115,6 +115,7 @@ import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
 import { cardMatter, correctedCard, stagingNote } from "./card-matter";
+import { cardHeadline } from "../agent/card-identity";
 import { judgedList, presentedProse, presenter, proseBudgetRepair, type Presenter } from "./presentation";
 import { figmaAnswerCopy } from "./figma-answer-copy";
 import { breadcrumbsInProse } from "../integrations/blueprint-link";
@@ -1907,6 +1908,7 @@ async function offerCheck(
       userMsgTs: card.userMsgTs,
       requesterUserId: card.requesterUserId,
       cardTs: card.proposalTs,
+      ...(card.supersedeKey ? { cardKey: card.supersedeKey } : {}),
       milestone: milestone.kind,
       idea: milestone.idea,
       ...match,
@@ -2349,6 +2351,106 @@ export async function restageExecution(
     console.error(`[turn] re-staged card's records not moved: ${err instanceof Error ? err.message : String(err)}`);
   });
   return { proposal, card };
+}
+
+/**
+ * What a button asks Turn to stage (#1323), with no model in the loop: the
+ * batch is already decided, and Turn builds and stages the card for it.
+ */
+export type ButtonStaging =
+  /** A revision of a waiting card: staged in its slot, held to its confirmer
+   *  set, and superseding it, as a turn's revision is. */
+  | { kind: "revision"; of: PendingProposal; operations: ProposalOperation[] }
+  /** A separate proposal in a thread: a slot of its own, retiring nothing. */
+  | {
+      kind: "separate";
+      thread: Pick<PendingProposal, "channel" | "threadTs" | "replyTs" | "userMsgTs" | "requesterUserId">;
+      operations: ProposalOperation[];
+    };
+
+/**
+ * Stage a card a button asked for — a check's notes added to the card, or
+ * the page an approved PRD created updated with them (`slack/blueprint-check.ts`).
+ * The card is built exactly as a staged proposal's is, reads included, and
+ * gets the one rule's deadline from now. A revision retires the card it
+ * replaces first, says so just above the new card, and keeps its matter's
+ * slot and its confirmers; a separate proposal opens a slot of its own.
+ *
+ * Exported because a button is a door outside Turn, and a card is Turn's to
+ * build. The envelope binds this with the card reads a turn gets.
+ *
+ * @returns the staged card, or null when the card to revise is no longer
+ *          live, or Slack refused the new one — said out loud, as every
+ *          failed staging is
+ */
+export async function stageFromButton(
+  ask: ButtonStaging,
+  deps: Pick<TurnDeps, "threadState" | "delivery" | "cards" | "now"> & {
+    /** Where the card's staging is recorded. */
+    proposalEvents: ProposalEventLog;
+  },
+): Promise<PendingProposal | null> {
+  const clock = () => deps.now?.() ?? Date.now();
+  const thread = ask.kind === "revision" ? ask.of : ask.thread;
+  const first = ask.operations[0]!;
+  // Out of reach before the revision is written, as a turn's revision is: the
+  // old card must not run while its replacement is being built.
+  const retiredAhead = ask.kind === "revision" ? await deps.threadState.retireProposal(ask.of.proposalTs) : null;
+  if (retiredAhead && !retiredAhead.retired) return null;
+  const at = clock();
+  if (ask.kind === "revision") {
+    await recordProposalEvents(deps.proposalEvents, supersededEvents([ask.of.proposalTs], at, "revision"));
+  }
+  const built = await buildCard(
+    { kind: "proposal", operations: ask.operations, toolName: first.toolName, input: first.input },
+    deps,
+    thread.channel.startsWith("D"),
+    { channel: thread.channel, requestedBy: thread.requesterUserId },
+  );
+  const before = await batchBefore(ask.operations, built.revision, deps.cards);
+  if (ask.kind === "revision") await deps.delivery.postGateNote({ kind: "revised", replaced: cardHeadline(ask.of) });
+  const window = cardWindow(at);
+  const posted = await deps.delivery.card({ ...built, expiresAt: window.expiresAt });
+  if (posted.declined) return null;
+  if (!posted.ok || !posted.ts) {
+    console.error(`[turn] card from a button was not posted (${first.toolName})`);
+    await deps.delivery.postFailure("delivery");
+    return null;
+  }
+  const proposal: PendingProposal = {
+    operations: ask.operations,
+    toolName: first.toolName,
+    input: first.input,
+    channel: thread.channel,
+    threadTs: thread.threadTs,
+    ...(thread.replyTs ? { replyTs: thread.replyTs } : {}),
+    userMsgTs: thread.userMsgTs,
+    proposalTs: posted.ts,
+    proposalText: posted.text,
+    ...ownBlocks(posted),
+    requesterUserId: thread.requesterUserId,
+    ttlMs: window.ttlMs,
+    ...before,
+    stagedAs: ask.kind,
+    ...(ask.kind === "revision"
+      ? {
+          ...(ask.of.notionPrdId ? { notionPrdId: ask.of.notionPrdId } : {}),
+          ...(ask.of.notionPrdUrl ? { notionPrdUrl: ask.of.notionPrdUrl } : {}),
+          ...inheritedTerms(ask.of),
+          revisesProposalTs: ask.of.proposalTs,
+          // The matter's slot; a card staged before slots were keyed keeps
+          // the thread's.
+          ...(ask.of.supersedeKey ? { supersedeKey: ask.of.supersedeKey } : {}),
+        }
+      : { supersedeKey: turnCardKey(posted.ts) }),
+  };
+  const { retired } = await deps.threadState.putProposal(proposal);
+  await recordProposalEvents(deps.proposalEvents, [
+    ...supersededEvents(retired, clock(), "revision"),
+    // A channel is named on the record; a DM or group DM is not.
+    stagedEvent({ proposal, at: clock(), via: "worker", channelStored: proposal.channel.startsWith("C"), stagedAs: ask.kind }),
+  ]);
+  return proposal;
 }
 
 // ── The reply path ───────────────────────────────────────────────────────────
