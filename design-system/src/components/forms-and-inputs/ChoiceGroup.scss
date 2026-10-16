@@ -64,11 +64,11 @@
 
 // Under the option's label, past its control and the label gap.
 .plus-choice-group-reveal {
-    padding-left: calc(12px + var(--size-element-gap-sm));
+    padding-left: calc(var(--layout-control-radio) + var(--size-element-gap-sm));
 }
 
 .plus-choice-group-checkbox .plus-choice-group-reveal {
-    padding-left: calc(18px + var(--size-element-gap-sm));
+    padding-left: calc(var(--layout-control-checkbox) + var(--size-element-gap-sm));
 }
 
 .plus-choice-group-other {

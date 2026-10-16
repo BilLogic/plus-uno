@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../actions/Button/Button';
 import useFieldId from './useFieldId';
-import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription } from './_internal/Field';
+import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
 import useInlineEdit from './_internal/useInlineEdit';
 
 /** Older `state` names, kept for existing call sites. */
@@ -117,8 +117,7 @@ const Textarea = ({
                 subtle={subtle}
                 disabled={isDisabled}
                 readOnly={isReadOnly}
-                invalid={tone === 'invalid'}
-                valid={tone === 'success'}
+                {...toneProps(tone).field}
                 busy={edit.enabled && edit.saving}
                 state={state === 'focus' ? 'focus' : undefined}
                 trailing={edit.enabled && edit.saving
@@ -143,7 +142,7 @@ const Textarea = ({
                     aria-required={required || undefined}
                     {...props}
                     aria-describedby={describedBy}
-                    aria-invalid={tone === 'invalid' || undefined}
+                    {...toneProps(tone).control}
                 />
             </Field>
             {showActions && (

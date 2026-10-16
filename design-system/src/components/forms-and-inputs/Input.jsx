@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import useFieldId from './useFieldId';
-import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription } from './_internal/Field';
+import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
 import useInlineEdit from './_internal/useInlineEdit';
 
 /** A string visual is a Font Awesome class; `'dropdown'` is the caret. */
@@ -134,8 +134,7 @@ const Input = ({
                 subtle={subtle}
                 disabled={disabled}
                 readOnly={isReadOnly}
-                invalid={tone === 'invalid'}
-                valid={tone === 'success'}
+                {...toneProps(tone).field}
                 busy={edit.enabled && edit.saving}
                 leading={renderVisual(leadingVisual)}
                 trailing={trailing}
@@ -161,7 +160,7 @@ const Input = ({
                     /* After the spread: this value already contains the
                      * caller's, so letting the spread win would drop ours. */
                     aria-describedby={describedBy}
-                    aria-invalid={tone === 'invalid' || undefined}
+                    {...toneProps(tone).control}
                 />
             </Field>
             <FieldCaption

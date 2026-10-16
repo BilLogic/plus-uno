@@ -508,6 +508,24 @@ const CODE_ONLY_LAYERS = {
 };
 
 /**
+ * Fixed dimensions Figma draws but has no variable for, written in px with
+ * `figmaName`, the slug the variable would have in `size / layout`. The
+ * spacing scale is pads, gaps and radii, so a box's own width (a checkbox, a
+ * calendar day) has no semantic token to bind to; these are those widths,
+ * named once so the components that share one stay in step.
+ */
+const CODE_ONLY_DIMENSIONS = {
+    'layout-max-width-listbox': { value: 320, note: 'widest a field or button popup grows; a popup with columns is exempt', figmaName: 'max-widths-listbox' },
+    'layout-width-join-row': { value: 520, note: 'Home Join button with the session Select beside it', figmaName: 'widths-join-row' },
+    'layout-control-checkbox': { value: 18, note: 'checkbox box', figmaName: 'controls-checkbox' },
+    'layout-control-radio': { value: 12, note: 'radio dot', figmaName: 'controls-radio' },
+    'layout-calendar-day-sm': { value: 28, note: 'calendar day, small picker', figmaName: 'calendar-day-sm' },
+    'layout-calendar-day-md': { value: 36, note: 'calendar day, medium picker', figmaName: 'calendar-day-md' },
+    'layout-calendar-day-lg': { value: 44, note: 'calendar day, large picker', figmaName: 'calendar-day-lg' },
+    'layout-calendar-nav': { value: 32, note: 'calendar previous and next month buttons', figmaName: 'calendar-nav' },
+};
+
+/**
  * The semantic token the grid gutter is documented as equal to. The note is
  * checked, not trusted: Figma's `Grid/content-gutter` and this token's
  * resolved value have to match.
@@ -556,6 +574,9 @@ function generateLayoutSCSS() {
     for (const [token, { figmaName }] of Object.entries(CODE_ONLY_LAYOUT)) {
         if (figmaNames.has(figmaName)) stale('CODE_ONLY_LAYOUT', `Figma now has ${figmaName}; read --${token} from the export.`);
     }
+    for (const [token, { figmaName }] of Object.entries(CODE_ONLY_DIMENSIONS)) {
+        if (figmaNames.has(figmaName)) stale('CODE_ONLY_DIMENSIONS', `Figma now has ${figmaName}; read --${token} from the export.`);
+    }
     Object.assign(breakpoints, BREAKPOINT_OVERRIDES, CODE_ONLY_BREAKPOINTS);
 
     const gutter = variable('Grid/content-gutter');
@@ -602,6 +623,8 @@ ${Object.entries(CODE_ONLY_LAYOUT).map(([token, { value, note }]) => `    --${to
 ${Object.entries(CODE_ONLY_LAYERS).map(([token, { value, note }]) => `    --${token}: ${value}; /* ${note} */\n`).join('')}
     /* Min and max heights — ${modes[0].key.toUpperCase()} values where they differ by breakpoint */
 ${heightLines(modes[0], '    ', () => true)}
+    /* Fixed dimensions; not Figma variables (CODE_ONLY_DIMENSIONS) */
+${Object.entries(CODE_ONLY_DIMENSIONS).map(([token, { value, note }]) => `    --${token}: ${px(value)}; /* ${note} */\n`).join('')}
     /* Content-grid column spans — ${modes[0].key.toUpperCase()} values; wider breakpoints override below */
 ${columns(modes[0], '    ')}}
 `;

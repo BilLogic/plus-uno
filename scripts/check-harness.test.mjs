@@ -403,13 +403,13 @@ test('a sentinel the check enforces but the row does not declare is a finding', 
     messages.join('\n'),
   );
   assert.ok(
-    messages.some((m) => /MIN_RULES = 60 as a private constant/.test(m)),
+    messages.some((m) => /MIN_RULES = 50 as a private constant/.test(m)),
     messages.join('\n'),
   );
 });
 
 test('a floor the row declares that the check does not enforce is a finding', () => {
-  const row = { ...byName('check:focus-ring'), floors: { MIN_FILES: 150, MIN_RULES: 60, MIN_WIDGETS: 3 } };
+  const row = { ...byName('check:focus-ring'), floors: { MIN_FILES: 150, MIN_RULES: 50, MIN_WIDGETS: 3 } };
   const messages = registryGenerator.floorFindings(row).map((f) => f.message);
   assert.ok(
     messages.some((m) => /floors\.MIN_WIDGETS = 3, which .+ never enforces/.test(m)),
@@ -418,7 +418,7 @@ test('a floor the row declares that the check does not enforce is a finding', ()
 });
 
 test('a declared floor that disagrees with the number the check enforces is a finding', () => {
-  const row = { ...byName('check:focus-ring'), floors: { MIN_FILES: 1, MIN_RULES: 60 } };
+  const row = { ...byName('check:focus-ring'), floors: { MIN_FILES: 1, MIN_RULES: 50 } };
   const messages = registryGenerator.floorFindings(row).map((f) => f.message);
   assert.ok(
     messages.some((m) => /floors\.MIN_FILES = 1, but .+ enforces 150/.test(m)),

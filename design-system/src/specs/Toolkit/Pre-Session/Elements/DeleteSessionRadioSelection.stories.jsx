@@ -1,5 +1,5 @@
 import React from 'react';
-import ChoiceGroup from '@/components/forms-and-inputs/ChoiceGroup';
+import { ChoiceGroup } from '@/components';
 import DatePicker from '@/components/forms-and-inputs/DatePicker';
 
 export default {

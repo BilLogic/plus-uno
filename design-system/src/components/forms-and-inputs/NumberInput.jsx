@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../actions/Button/Button';
 import useFieldId from './useFieldId';
-import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription } from './_internal/Field';
+import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
 
 const toText = (value) => (value === undefined || value === null ? '' : String(value));
 
@@ -144,8 +144,7 @@ const NumberInput = ({
                 subtle={subtle}
                 disabled={disabled}
                 readOnly={isReadOnly}
-                invalid={tone === 'invalid'}
-                valid={tone === 'success'}
+                {...toneProps(tone).field}
                 trailing={steppers}
             >
                 <input
@@ -164,7 +163,7 @@ const NumberInput = ({
                     aria-required={required || undefined}
                     {...props}
                     aria-describedby={describedBy}
-                    aria-invalid={tone === 'invalid' || undefined}
+                    {...toneProps(tone).control}
                 />
             </Field>
             <FieldCaption messageId={messageId} message={message} tone={tone} countId={countId} />

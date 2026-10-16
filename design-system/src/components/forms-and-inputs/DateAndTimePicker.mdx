@@ -219,10 +219,11 @@ Date and time pickers let people select a date or range of dates and/or a time f
   (`useFieldId`), so omitting `id` is safe and unique. Repeating one is not: both
   fields' labels and `aria-labelledby` targets then collide, and every label on
   the page lands on whichever control the browser reached first (#222).
-- **`required` and `validation` are visual only.** `required` renders a `*` span
-  marked `aria-label="required"`; `validation` colours the field and renders the
-  message with an `aria-hidden` icon. Neither sets `aria-invalid`, and neither
-  links `validationMessage` to an input. Until #230 there was no escape hatch
+- **`validation` marks both inputs.** Both halves are `_Field`, so
+  `validation="invalid"` draws both boxes in the error state and sets
+  `aria-invalid` on both inputs, and the message is the shared field caption,
+  announced as an alert, which describes the group. `required` renders a `*`
+  span marked `aria-label="required"`. Until #230 a caller had no escape hatch
   either — this component collected the props it does not name into a rest
   object and never spread it, so passing `aria-describedby` yourself did
   nothing, silently. It forwards them now; the rule for where they land is the
@@ -240,13 +241,9 @@ Date and time pickers let people select a date or range of dates and/or a time f
   field has a `label`, per the third bullet above, so a description forwarded to
   an unlabelled picker lands on a plain `<div>` and is announced by nothing.
   Pass a `label` — with `showLabel={false}` if it should not be seen.
-- **What that rule costs you: `aria-invalid` marks the group, not the inputs.**
-  It is the honest consequence of one spread target. A description on the group
-  is the right place for one — it describes the field, and screen readers
-  generally announce it on entering the group — but `aria-invalid` is expected
-  on the control that is invalid, and a group is not a control. So wiring a
-  validation message with `aria-describedby` works today; marking the two inputs
-  invalid still needs the component changed.
+- **What that rule costs you: a forwarded `aria-invalid` marks the group, not
+  the inputs.** It is the honest consequence of one spread target, and the
+  reason to use `validation` instead, which marks the inputs themselves.
 - **The time-zone caption is part of the description.** It is linked through
   `aria-describedby` after any description you pass, so a reader hears the zone
   along with the field.

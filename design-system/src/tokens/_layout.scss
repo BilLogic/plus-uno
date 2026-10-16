@@ -26,6 +26,16 @@
     --layout-min-height-listbox: 140px; /* Figma Min Heights/listbox */
     --layout-min-height-modal-body: 40px; /* Figma Min Heights/modal-body */
 
+    /* Fixed dimensions; not Figma variables (CODE_ONLY_DIMENSIONS) */
+    --layout-max-width-listbox: 320px; /* widest a field or button popup grows; a popup with columns is exempt */
+    --layout-width-join-row: 520px; /* Home Join button with the session Select beside it */
+    --layout-control-checkbox: 18px; /* checkbox box */
+    --layout-control-radio: 12px; /* radio dot */
+    --layout-calendar-day-sm: 28px; /* calendar day, small picker */
+    --layout-calendar-day-md: 36px; /* calendar day, medium picker */
+    --layout-calendar-day-lg: 44px; /* calendar day, large picker */
+    --layout-calendar-nav: 32px; /* calendar previous and next month buttons */
+
     /* Content-grid column spans — MD values; wider breakpoints override below */
     --col-1: 48.67px;
     --col-2: 105.33px;

@@ -131,8 +131,10 @@ reverts. A textarea shows Save and Cancel and stays open when it loses focus.
 A failed save keeps the field open in its invalid state, with the server's
 message under it. One surface uses one look.
 
-No component takes a `subtle` prop yet; until one does, build with standard
-fields.
+Input, Textarea and NumberInput take a `subtle` prop. Input and Textarea save
+through `onSave`; NumberInput takes the look only, so its caller saves on
+blur. Select and the other pickers have no subtle look yet, so a surface that
+needs one of them stays standard throughout.
 
 ## Forms still to move
 
