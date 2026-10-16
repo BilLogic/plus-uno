@@ -14,6 +14,13 @@
     --plus-listbox-min-height: var(--layout-min-height-listbox);
     --plus-listbox-max-height: var(--layout-max-height-listbox);
     --plus-listbox-z-index: var(--layout-z-index-overlay);
+    /*
+     * The popup placement rule: content grows a list past its field up to
+     * 320px. `min-width` (the field's width) wins over this, so a field wider
+     * than the cap keeps its own width. Not a Figma variable.
+     */
+    --plus-listbox-max-width: 320px;
+    --plus-listbox-viewport-width: calc(100vw - 2 * var(--size-section-pad-x-md));
 
     display: flex;
     flex-direction: column;
@@ -28,13 +35,36 @@
     box-shadow: var(--elevation-light-2);
 }
 
-/* In a portal: placed against its field, at least the field's width, and
-   free to grow with its content up to the viewport. */
+/* In a portal: placed against its field by `useAnchoredPopup`, at least the
+   field's width (set inline), and free to grow with its content to the cap. */
 .plus-listbox--floating {
     position: fixed;
     z-index: var(--plus-listbox-z-index);
     width: max-content;
-    max-width: calc(100vw - 2 * var(--size-section-pad-x-md));
+    max-width: min(var(--plus-listbox-max-width), var(--plus-listbox-viewport-width));
+}
+
+/* In place, inside a `position: relative` wrapper that is the field: below it
+   with the gap, or above it and right-aligned as `useAnchoredPopup` decides
+   (`data-placement`, `data-side`). At least the field's width. */
+.plus-listbox--anchored {
+    position: absolute;
+    top: calc(100% + var(--size-element-gap-xs));
+    left: 0;
+    z-index: var(--plus-listbox-z-index);
+    width: max-content;
+    min-width: 100%;
+    max-width: min(var(--plus-listbox-max-width), var(--plus-listbox-viewport-width));
+
+    &[data-placement='top'] {
+        top: auto;
+        bottom: calc(100% + var(--size-element-gap-xs));
+    }
+
+    &[data-side='end'] {
+        left: auto;
+        right: 0;
+    }
 }
 
 /* Inside another menu, which already draws the surface. */

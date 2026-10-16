@@ -454,6 +454,35 @@ PlacementFlippedAbove.play = async ({ canvasElement }) => {
     await expect(menu.left, 'left edges line up').toBeCloseTo(toggle.left, 0);
 };
 
+/** The menu's floor: a short toggle still gets a menu wide enough to read. */
+const MENU_MIN_WIDTH = 200;
+
+/** A short toggle's menu stays at the 200px floor. */
+export const PlacementWidthFloor = () => (
+    <div style={{ padding: '24px 24px 240px' }}>
+        <Dropdown buttonText="Go" items={basicItems} />
+    </div>
+);
+
+PlacementWidthFloor.play = async ({ canvasElement }) => {
+    const { toggle, menu } = await openAndMeasure(canvasElement, 'Go');
+    await expect(toggle.width, 'the toggle is under the floor').toBeLessThan(MENU_MIN_WIDTH);
+    await expect(menu.width, 'the menu holds the floor').toBeCloseTo(MENU_MIN_WIDTH, 0);
+};
+
+/** A toggle wider than the floor gets a menu at least as wide as itself. */
+export const PlacementWidthFollowsAWideToggle = () => (
+    <div style={{ padding: '24px 24px 240px' }}>
+        <Dropdown buttonText="Assign this session to another tutor group" items={basicItems} />
+    </div>
+);
+
+PlacementWidthFollowsAWideToggle.play = async ({ canvasElement }) => {
+    const { toggle, menu } = await openAndMeasure(canvasElement, 'Assign this session to another tutor group');
+    await expect(toggle.width, 'the toggle is past the floor').toBeGreaterThan(MENU_MIN_WIDTH);
+    await expect(menu.width, 'as wide as the toggle').toBeCloseTo(toggle.width, 0);
+};
+
 /* ------------------------------------------------------------- menu rows */
 
 /**

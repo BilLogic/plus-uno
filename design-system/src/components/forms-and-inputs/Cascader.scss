@@ -29,15 +29,10 @@
     }
 }
 
-// The listbox surface, placed under the field and at least as wide.
+// The listbox surface is placed by `.plus-listbox--anchored`. Its columns are
+// exempt from the 320px cap: they grow it up to the viewport.
 .plus-listbox.plus-cascader-menu {
-    position: absolute;
-    top: calc(100% + var(--size-element-gap-xs));
-    left: 0;
-    z-index: var(--plus-listbox-z-index);
-    width: max-content;
-    min-width: 100%;
-    max-width: calc(100vw - 2 * var(--size-section-pad-x-md));
+    max-width: var(--plus-listbox-viewport-width);
 }
 
 // Columns side by side; each scrolls on its own inside the surface's height.

@@ -131,12 +131,15 @@ rule: `Select`, `TagInput`, `TreeSelect`, `Cascader`, `DatePicker`,
 
 - **Gap:** `--size-element-gap-xs` (4px) between the trigger's edge and the
   popup surface, as a token, with Bootstrap's spacer margin reset to zero.
-  The shared `Listbox` holds it as `ANCHOR_GAP`; anything placed in CSS uses
+  Every popup in the family decides its flip and alignment through one
+  module, `_internal/anchorPlacement.js`; a popup placed in CSS uses
   `calc(100% + var(--size-element-gap-xs))`.
 - **Alignment:** the popup's left edge sits on the trigger's left edge. Near
   the viewport's right edge it right-aligns instead.
-- **Width:** at least the trigger's width and at most 320px. A popup with
-  columns (`Cascader`, the calendar) grows past 320px.
+- **Width:** at least the trigger's width. Content grows it up to 320px, and
+  a trigger wider than that keeps its own width. A popup with columns
+  (`Cascader`, the calendar) grows past 320px. The `Dropdown` menu is never
+  under 200px.
 - **Flip:** with no room below, the popup opens above, keeping the same gap.
 - **Arrowed exception:** a `Popover` or `Tooltip` with an arrow keeps its 8px
   gap, because the arrow fills it. They sit outside this family.
