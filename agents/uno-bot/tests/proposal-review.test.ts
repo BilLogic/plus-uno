@@ -98,6 +98,15 @@ function viewText(view: unknown): string {
   return JSON.stringify((view as { blocks: unknown[] }).blocks);
 }
 
+/** A rich text block's words, its pills written back as mentions. */
+function richWords(e: unknown): string {
+  const el = e as { text?: unknown; user_id?: string; channel_id?: string; url?: string; elements?: unknown[] };
+  if (typeof el.text === "string") return el.text;
+  if (el.user_id) return `<@${el.user_id}>`;
+  if (el.channel_id) return `<#${el.channel_id}>`;
+  return (el.elements ?? []).map(richWords).join("");
+}
+
 type CardBlock = { type: string; elements?: Array<{ action_id?: string; text?: { text: string } | string }> };
 
 /** The buttons a card's blocks offer, by label. */
@@ -291,7 +300,7 @@ describe("Review opens the draft", () => {
     assert.doesNotMatch(viewText(draft), /uno_review_edit/);
     assert.equal(draft.submit, undefined, "only Close");
     assert.equal(draft.close?.text, "Close");
-    assert.match(viewText(draft), /<@U07CONFIRM>/);
+    assert.match(viewText(draft), /"user_id":"U07CONFIRM"/);
   });
 
   it("lets a standing confirmer decide a card whose own set leaves them out", async () => {
@@ -734,10 +743,11 @@ describe("a decided card", () => {
     const { deps, views } = harness(threadState);
     await runReviewOpen({ ...open(), cardText: `${PROPOSAL.proposalText}\n:white_check_mark: Approved by <@U0BILL0001>` }, deps);
     const view = views.calls[1]!.view as { blocks: Array<{ type: string; level?: string; text?: { type: string; text: string } }>; submit?: unknown };
-    assert.deepEqual(view.blocks.map((b) => b.type), ["alert", "section"]);
+    assert.deepEqual(view.blocks.map((b) => b.type), ["alert", "rich_text", "section"]);
     assert.equal(view.blocks[0]!.level, "success");
-    assert.equal(view.blocks[0]!.text!.text, "Approved by <@U0BILL0001>");
-    assert.match(view.blocks[1]!.text!.text, /no longer kept, so only its outcome shows here/);
+    assert.deepEqual(view.blocks[0]!.text, { type: "plain_text", text: "This proposal has already been decided." });
+    assert.equal(richWords(view.blocks[1]), "Approved by <@U0BILL0001>");
+    assert.match(view.blocks[2]!.text!.text, /no longer kept, so only its outcome shows here/);
     assert.equal(view.submit, undefined);
     assert.deepEqual(actionIds(view), []);
   });
@@ -760,8 +770,10 @@ describe("a decided card", () => {
     const stated = statedCancelledNote({ cancelled: "No intake filed" }, "U0BILL0001");
     cases.push([stated, "default", stated]);
     for (const [last, level, text] of cases) {
-      const view = outcomeView({ channel: CHANNEL, ts: CARD_TS }, `${PROPOSAL.proposalText}\n${last}`) as { blocks: Array<{ type: string; level?: string; text?: { text: string } }> };
-      assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level, view.blocks[0]!.text!.text], ["alert", level, text], last);
+      const view = outcomeView({ channel: CHANNEL, ts: CARD_TS }, `${PROPOSAL.proposalText}\n${last}`) as { blocks: Array<{ type: string; level?: string; text?: { type: string; text: string } }> };
+      // The level on a plain alert, and the outcome, pills and all, on the line under it.
+      assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level, view.blocks[0]!.text!.type], ["alert", level, "plain_text"], last);
+      assert.equal(richWords(view.blocks[1]), text, last);
     }
   });
 
@@ -783,7 +795,8 @@ describe("a decided card", () => {
     assert.equal(views.refused.length, 0);
     assert.equal(view.blocks[0]!.type, "alert");
     assert.equal(view.blocks[0]!.level, "success");
-    assert.equal(view.blocks[0]!.text!.text, "Approved by <@U0BILL0001>.");
+    assert.equal(view.blocks[0]!.text!.text, "Approved.");
+    assert.equal(richWords(view.blocks[1]), "Approved by <@U0BILL0001>.");
     assert.match(viewText(view), /Reflection redesign/, "the draft, not the card's text");
     assert.doesNotMatch(viewText(view), /the decided card/);
     assert.equal(view.submit, undefined);
@@ -798,7 +811,8 @@ describe("a decided card", () => {
     await runReviewOpen(open("U0BILL0001"), deps);
     const view = views.calls.at(-1)!.view as { blocks: Array<{ type: string; level?: string; text?: { text: string } }> };
     assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level], ["alert", "default"]);
-    assert.equal(view.blocks[0]!.text!.text, "Rejected by <@U0BILL0001>: Not this week.");
+    assert.equal(view.blocks[0]!.text!.text, "Rejected.");
+    assert.equal(richWords(view.blocks[1]), "Rejected by <@U0BILL0001>: Not this week.");
     assert.match(viewText(view), /Reflection redesign/);
   });
 

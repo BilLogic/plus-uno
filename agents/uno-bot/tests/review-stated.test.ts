@@ -334,7 +334,9 @@ const applied: OperationOutcome = {
 };
 
 /** A group DM's share card, as `stageSweepShare` stages it. */
-async function shareCard(): Promise<PendingProposal> {
+async function shareCard(
+  over: { pages?: NonNullable<PendingProposal["sweepShare"]>["pages"]; outcomes?: OperationOutcome[] } = {},
+): Promise<PendingProposal> {
   const fix: PendingProposal = {
     toolName: "notion_update",
     input: {},
@@ -346,10 +348,10 @@ async function shareCard(): Promise<PendingProposal> {
     proposalText: "",
     requesterUserId: "",
     confirmers: [BILL],
-    sweepShare: { pages: [{ url: PAGE_URL, title: "Tutor guide & FAQ <draft>", to: "plus-design" }] },
+    sweepShare: { pages: over.pages ?? [{ url: PAGE_URL, title: "Tutor guide & FAQ <draft>", to: "plus-design" }] },
   };
-  const staged = await stageSweepShare(fix, [applied], {
-    channels: { plusDesign: "C0PLUSDES1" },
+  const staged = await stageSweepShare(fix, over.outcomes ?? [applied], {
+    channels: { plusDesign: "C0PLUSDES1", plusUniversal: "C0UNIVERS1" },
     async post(_to, card) {
       return { ok: true, ts: MESSAGE, text: renderProposalCard(card).text };
     },
@@ -407,13 +409,66 @@ describe("a sweep's shared note in Review", () => {
     assertFits(view);
     assert.ok(!types(view).includes("input"));
     // Who can decide opens the view as an info alert (§ The shared anatomy,
-    // Read-only); the draft's zones follow from the header.
-    assert.deepEqual(types(view).slice(0, 2), ["alert", "header"]);
+    // Read-only), the people as pills on a line under it; the draft's zones
+    // follow from the header.
+    assert.deepEqual(types(view).slice(0, 3), ["alert", "rich_text", "header"]);
     assert.equal((view.blocks[0] as { level?: string }).level, "info");
   });
 
   it("staged before its facts, shows the card's text", async () => {
     const proposal = stagedBefore(await shareCard());
     assertTextFallback(decide(proposal), proposal.proposalText);
+  });
+
+  it("draws two notes as a batch of quotes, each under its channel's pill", async () => {
+    const universal = "https://www.notion.so/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+    const proposal = await shareCard({
+      pages: [
+        { url: PAGE_URL, title: "Tutor guide & FAQ <draft>", to: "plus-design" },
+        { url: universal, title: "Session rules", to: "plus-universal" },
+      ],
+      outcomes: [applied, { ...applied, input: { page_url: universal, replace: [] } }],
+    });
+    assert.equal(proposal.operations?.length, 2);
+    const view = decide(proposal);
+    assertFits(view);
+    assert.equal(view.title.text, "Review shared notes");
+    assert.equal(blocksOf(view)[0]!.text!.text, "Share what was settled");
+    assert.doesNotMatch(JSON.stringify(view), /\*The draft\*/, "not the card's text");
+    const where = elementsOf(blocksOf(view)[1]!);
+    assert.deepEqual(where.filter((e) => e.type === "channel").map((e) => e.channel_id), ["C0PLUSDES1", "C0UNIVERS1"]);
+    assert.match(where.at(-1)!.text!, /Nothing else leaves this group DM\./);
+    // Each note: a numbered label with its channel's pill, then the note quoted as it posts.
+    const quotes = blocksOf(view).filter((b) => b.elements?.[0]?.type === "rich_text_quote");
+    assert.equal(quotes.length, 2);
+    proposal.operations!.forEach((op, i) => {
+      const at = blocksOf(view).indexOf(quotes[i]!);
+      const label = elementsOf(blocksOf(view)[at - 1]!);
+      assert.equal(label.find((e) => e.style?.bold)?.text, `${i + 1} · `);
+      assert.deepEqual(label.find((e) => e.type === "channel"), { type: "channel", channel_id: op.input.channel });
+      const posted = op.input.text as string;
+      assert.equal(quotes[i]!.elements![0]!.elements![0]!.text, posted.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&"));
+    });
+    assert.deepEqual(options(view).map((o) => o.description?.text)[0], "Posts exactly these two notes.");
+  });
+
+  it("draws two notes read-only, and once decided, the same way", async () => {
+    const universal = "https://www.notion.so/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+    const proposal = await shareCard({
+      pages: [
+        { url: PAGE_URL, title: "Tutor guide", to: "plus-design" },
+        { url: universal, title: "Session rules", to: "plus-universal" },
+      ],
+      outcomes: [applied, { ...applied, input: { page_url: universal, replace: [] } }],
+    });
+    const readOnly = decide(proposal, false);
+    assertFits(readOnly);
+    assert.equal(blocksOf(readOnly).filter((b) => b.elements?.[0]?.type === "rich_text_quote").length, 2);
+    const decided = draftView(CARD, proposal, { mayDecide: false, confirmers: [], decided: { decision: "confirm", by: BILL } }) as unknown as View;
+    assertFits(decided);
+    assert.equal(blocksOf(decided).filter((b) => b.elements?.[0]?.type === "rich_text_quote").length, 2);
+    assert.doesNotMatch(JSON.stringify(decided), /Nothing else leaves/, "no where line once decided");
+    const said = elementsOf(blocksOf(decided)[1]!);
+    assert.deepEqual(said.filter((e) => e.type === "channel").map((e) => e.channel_id), ["C0PLUSDES1", "C0UNIVERS1"], "where they posted, as pills");
   });
 });

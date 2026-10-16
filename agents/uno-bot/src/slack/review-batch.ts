@@ -18,6 +18,7 @@ import { fieldInputBlocks } from "./review-fields";
 import { relayRecipientId } from "../tools/relayed-dm-render";
 import { alertsFromCaveats, labelledText, whereMrkdwn, type DraftAnatomy, type WhereElement } from "./review-anatomy";
 import { caveatsOf, operationParts, type DraftDetail } from "./review-draft";
+import { shareNoteChannel, shareNoteFacts, shareNoteLines, shareNoteQuote, shareNoteText } from "./review-stated";
 import type { ProposalOperation } from "../thread-state/index";
 
 type Input = Record<string, unknown>;
@@ -71,6 +72,40 @@ export function batchHeader(operations: readonly ProposalOperation[]): string {
   return phrase.charAt(0).toUpperCase() + phrase.slice(1);
 }
 
+/** The sweep's shared note: a card of one is read on its own
+ *  (`review-stated.ts`), a card of several here. */
+const SHARE_NOTE_TOOL = "sweep_share_post";
+
+/**
+ * A card of several shared notes, one per team channel: what it does, every
+ * channel as a pill on the where line, then each note quoted exactly as it
+ * posts under a numbered label naming its channel. Null when the card carries
+ * no facts, or a note is empty, so the pop-up shows the card's text as before.
+ *
+ * @param operations - The card's `sweep_share_post` operations
+ * @param detail - The proposal's facts
+ */
+export function shareNotesAnatomy(operations: readonly ProposalOperation[], detail: DraftDetail = {}): DraftAnatomy | null {
+  const facts = shareNoteFacts(detail);
+  const texts = operations.map((op) => shareNoteText(op.input));
+  if (!facts || texts.some((t) => !t)) return null;
+  const channels = operations.map((op) => shareNoteChannel(op.input));
+  const content: unknown[] = [];
+  operations.forEach((_op, i) => content.push(opLabel(i + 1, [{ type: "text", text: "In ", style: { bold: true } }, channels[i]!]), shareNoteQuote(texts[i]!)));
+  const n = operations.length;
+  return {
+    header: facts.header,
+    where: [
+      { type: "text", text: `Posts ${n === 2 ? "these two notes" : `these ${n} notes`}, one in each of ` },
+      ...channels.flatMap((c, i): WhereElement[] => [...(i === 0 ? [] : [{ type: "text" as const, text: i === n - 1 ? " and " : ", " }]), c]),
+      { type: "text", text: `. Nothing else leaves ${facts.from}.` },
+    ],
+    content: [...content, ...shareNoteLines(facts)],
+    approve: n === 2 ? "Posts exactly these two notes." : `Posts exactly these ${n} notes.`,
+    destination: `post in ${andList(channels.map(whereMrkdwn))}`,
+  };
+}
+
 /** A DM's recipient, as a where-line element: a user pill where the input
  *  holds an id, the name as written where it does not. */
 function recipientElement(input: Input): WhereElement {
@@ -99,6 +134,7 @@ function opLabel(n: number, rest: readonly WhereElement[]): unknown {
  */
 export function batchAnatomy(operations: readonly ProposalOperation[], cardText: string, detail: DraftDetail = {}): DraftAnatomy | null {
   if (operations.length < 2) return null;
+  if (operations.every((op) => op.toolName === SHARE_NOTE_TOOL)) return shareNotesAnatomy(operations, detail);
   const parts = operationParts(operations, detail);
   if (!parts) return null;
   const dms = operations.every((op) => op.toolName === "dm_relay");

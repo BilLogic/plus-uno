@@ -34,7 +34,7 @@
 // Takes named dependencies, as the button door does; `Env` is turned into
 // `ReviewDoorDeps` once, in `slack/interactive.ts`. PURE by design: no `Env`,
 // no Workers global, no fetch — so `tests/proposal-review.test.ts` drives it.
-import { proposalOperations, withArgs, type PendingProposal, type ReviewChoice, type ThreadState } from "../thread-state/index";
+import { proposalOperations, withArgs, type PendingProposal, type ProposalLookup, type ReviewChoice, type ThreadState } from "../thread-state/index";
 import { currentReport, itemText, settleItem } from "./decision-cards";
 import type { OperationOutcome } from "../gate/run-batch";
 import type { Delivery } from "../turn/index";
@@ -43,6 +43,7 @@ import { applyPressVerdict, decidedCard, liveCard, type ButtonDoorTarget, type C
 import { renderGateNote } from "./gate-note";
 import { escapeSlackText } from "./mrkdwn";
 import { withEditedFields } from "./proposal-render";
+import { issueStepChanges } from "./review-draft-writes";
 import { reviewTitle } from "./review-anatomy";
 import {
   closedView,
@@ -259,7 +260,7 @@ export async function runReviewPush(request: ReviewPushRequest, deps: ReviewDoor
     standingConfirmers: deps.standingConfirmers,
   });
   if (look.state !== "live" || !look.mayDecide || look.proposal.revising) {
-    await deps.views.update(viewId, look.state === "live" ? noticeView(card, "This proposal can't be edited from here now.") : closedView(card, look));
+    await deps.views.update(viewId, look.state === "live" ? noticeView(card, CANNOT_EDIT, titleOf(look.proposal)) : closedView(card, look));
     return;
   }
   // What the draft holds in place is edited there, not here.
@@ -295,7 +296,7 @@ export async function keepReviewPick(request: ReviewPick, deps: ReviewDoorDeps):
     await deps.views.update(request.rootViewId, why);
   };
   if (look.state !== "live" || !look.mayDecide || look.proposal.revising) {
-    await cannot(look.state === "live" ? noticeView(card, CANNOT_EDIT) : closedView(card, look));
+    await cannot(look.state === "live" ? noticeView(card, CANNOT_EDIT, titleOf(look.proposal)) : closedView(card, look));
     return;
   }
   const drafts = draftValuesOf(look.proposal);
@@ -316,7 +317,7 @@ export async function keepReviewPick(request: ReviewPick, deps: ReviewDoorDeps):
     .keepPick(card.ts, request.userId, pick.key, drafts.get(pick.key) === pick.value ? null : pick.value)
     .catch(() => null);
   if (!kept) {
-    await cannot(noticeView(card, CANNOT_EDIT));
+    await cannot(noticeView(card, CANNOT_EDIT, titleOf(look.proposal)));
     return;
   }
   await deps.views.update(
@@ -353,14 +354,18 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
   let own: ReviewChoice | undefined;
   const look = await deps.threadState.getProposalByTs(request.messageTs).catch(() => ({ state: "none" }) as const);
   const live = look?.state === "found" ? look.proposal : undefined;
+  // Every answer from here is titled for the card's tool, as this one read
+  // found it: live, decided, expired or replaced alike.
+  const title = lookupTitle(look);
+  const notice = (text: string) => noticeView(card, text, title);
   if (live?.choices?.length && !request.choice) {
-    await show(noticeView(card, "Choose one of this card's answers. Press Review again."));
+    await show(notice("Choose one of this card's answers. Press Review again."));
     return;
   }
   if (request.choice) {
     own = live?.choices?.find((c) => c.value === request.choice);
     if (live && !own) {
-      await show(noticeView(card, "That answer isn't on this card any more, so nothing changed. Press Review again."));
+      await show(notice("That answer isn't on this card any more, so nothing changed. Press Review again."));
       return;
     }
   }
@@ -380,6 +385,7 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
   }
   const operations =
     own?.args && decision === "confirm" && live ? withArgs(edits.operations ?? proposalOperations(live), own.args) : edits.operations;
+  const steps = live && edits.operations ? issueStepChanges(proposalOperations(live), edits.operations) : [];
   const verdict = await resolveSignal(
     {
       kind: "review",
@@ -396,7 +402,7 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
   );
 
   if (decision === "revise") {
-    await applyRevise(request, card, verdict, deps);
+    await applyRevise(request, card, verdict, deps, title);
     return;
   }
 
@@ -407,7 +413,7 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
   } else if (verdict.post && verdict.post.note.kind !== "cut-off") {
     // A non-win is answered where the person is looking, which is the pop-up
     // — even a note the button door would edit onto the card.
-    await show(noticeView(card, renderGateNote(verdict.post.note)));
+    await show(notice(renderGateNote(verdict.post.note)));
     return;
   }
   await applyPressVerdict(
@@ -418,12 +424,14 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
       applyVerdict: deps.applyVerdict,
       restage: deps.restage,
       // A non-win is answered where the person is looking, which is the pop-up.
-      replyEphemeral: async (text) => void (await show(noticeView(card, text))),
+      replyEphemeral: async (text) => void (await show(notice(text))),
       // The card records who edited what, above who decided, and from then on
       // says what was approved: the edited values, not the draft's, which is
       // also what View opens.
+      // A field's own line, and any step line that names it: a cleared
+      // comment leaves an issue follow-up's steps too.
       reword: (text, note) => ({
-        text: edits.changes.length ? withEditedFields(text, edits.changes) : text,
+        text: edits.changes.length ? withEditedFields(text, [...edits.changes, ...steps]) : text,
         note: edits.edited.length ? `${editedNote(request.userId, edits.edited)}\n${note}` : note,
         edited: edits.changes.length > 0,
       }),
@@ -434,7 +442,7 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
   );
   // A cut-off card speaks in the thread, and the pop-up points there.
   if (verdict.post?.note.kind === "cut-off") {
-    await show(noticeView(card, renderGateNote(verdict.post.note)));
+    await show(notice(renderGateNote(verdict.post.note)));
   }
 }
 
@@ -458,9 +466,10 @@ async function applyRevise(
   card: ReviewedCard,
   verdict: GateVerdict,
   deps: ReviewDoorDeps,
+  title?: string,
 ): Promise<void> {
   if (verdict.outcome !== "won" || !verdict.revise || !verdict.proposal) {
-    if (verdict.post) await showIn(request, deps)(noticeView(card, renderGateNote(verdict.post.note)));
+    if (verdict.post) await showIn(request, deps)(noticeView(card, renderGateNote(verdict.post.note), title));
     return;
   }
   await showIn(request, deps)(
@@ -562,6 +571,15 @@ export async function startRevision(
 /** A state's title: the card's own, where the view has the card. */
 function titleOf(proposal: PendingProposal | undefined): string | undefined {
   return proposal ? reviewTitle(proposalOperations(proposal)) : undefined;
+}
+
+/** The card's title, as one lookup of it found the card: live, kept decided,
+ *  or expired or replaced with its batch named. A card with no record left
+ *  keeps the generic title: nothing cheap says what it was. */
+function lookupTitle(look: ProposalLookup): string | undefined {
+  if (look.state === "found") return titleOf(look.proposal);
+  if (look.state === "none") return titleOf(look.decided?.proposal);
+  return look.operations?.length ? reviewTitle(look.operations) : undefined;
 }
 
 /** What the pop-up says once one of the card's own answers wins: the answer,

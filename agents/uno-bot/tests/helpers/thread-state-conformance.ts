@@ -23,6 +23,7 @@ import assert from "node:assert/strict";
 import {
   CANCEL_TTL_MS,
   CUT_OFF_NOTE_ATTEMPTS,
+  DECIDED_TTL_MS,
   DM_CONVERSATION,
   EVENT_DEDUP_TTL_MS,
   EXECUTION_CUTOFF_MS,
@@ -61,6 +62,9 @@ export function makeTestClock(start = 1_700_000_000_000): TestClock {
 
 const THREAD = { channel: "C1", thread: "1700.1" } as const;
 const OTHER = { channel: "C1", thread: "1700.9" } as const;
+
+/** The batch `proposal()` stages, as a replaced or expired lookup names it. */
+const STAGED = [{ toolName: "notion_create", input: { title: "Onboarding checklist" } }];
 
 function proposal(overrides: Partial<PendingProposal> = {}): PendingProposal {
   return {
@@ -645,19 +649,34 @@ export function runThreadStateConformance(
     assert.deepEqual([look.decided.decision, look.decided.reason], ["cancel", "Not this week"]);
   });
 
-  it("lets the decided card go with the card's own lifetime, measured from staging", async () => {
+  it("keeps the decided card for its own lifetime, measured from the decision, not from staging", async () => {
     const { store, clock } = setup();
     await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: 2 * 60_000 }));
     clock.advance(60_000);
     assert.equal(await store.claimProposal("1700.2", { decision: "confirm", by: "U2" }), true);
-    clock.advance(60_000);
+    // Long past the two minutes the card would have lived, View still has it.
+    clock.advance(DECIDED_TTL_MS);
     const kept = await store.getProposalByTs("1700.2");
-    assert.ok(kept.state === "none" && kept.decided, "kept while the card would have lived");
+    assert.ok(kept.state === "none" && kept.decided, "kept for its lifetime from the decision");
     clock.advance(1);
     assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "none" });
     // Gone, not expired: a decided card never reads as one nobody decided.
     clock.advance(PROPOSAL_TTL_MS);
     assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "none" });
+  });
+
+  it("names the card's batch on a replaced or expired lookup, so its pop-up can be titled", async () => {
+    const { store, clock } = setup();
+    const update = { toolName: "github_issue_update", input: { issue_number: 7, comment: "Done." } };
+    await store.putProposal(proposal({ proposalTs: "1700.2", ...update }));
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    const replaced = await store.getProposalByTs("1700.2");
+    assert.ok(replaced.state === "superseded");
+    assert.deepEqual(replaced.operations, [update]);
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    const expired = await store.getProposalByTs("1700.3");
+    assert.ok(expired.state === "expired");
+    assert.deepEqual(expired.operations, [{ toolName: "notion_create", input: { title: "Onboarding checklist" } }]);
   });
 
   it("is neither replaced by a newer card in its thread nor in that card's way", async () => {
@@ -1329,9 +1348,9 @@ export function runThreadStateConformance(
     const stated = { cancelled: "Rejected, nothing filed", expired: "That card closed after 3 days with no decision." };
     await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: LONG_TTL_MS, stated }));
     await store.putProposal(proposal({ proposalTs: "1700.3", ttlMs: LONG_TTL_MS }));
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?" });
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?", operations: STAGED });
     clock.advance(LONG_TTL_MS + HOUR_MS);
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "expired", ttlMs: LONG_TTL_MS, stated, proposalText: "Create the card?" });
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "expired", ttlMs: LONG_TTL_MS, stated, proposalText: "Create the card?", operations: STAGED });
   });
 
   it("a retired stated card carries its words, and a turn's card answers as it always has", async () => {
@@ -1339,13 +1358,13 @@ export function runThreadStateConformance(
     const stated = { cancelled: "Nothing filed this week", expired: "That card closed after 6 days with no decision." };
     await store.putProposal(proposal({ proposalTs: "1700.2", stated }));
     await store.retireProposal("1700.2");
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?" });
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?", operations: STAGED });
     await store.putProposal(proposal({ proposalTs: "1700.4", threadTs: OTHER.thread }));
     await store.retireProposal("1700.4");
-    assert.deepEqual(await store.getProposalByTs("1700.4"), { state: "superseded", proposalText: "Create the card?" });
+    assert.deepEqual(await store.getProposalByTs("1700.4"), { state: "superseded", proposalText: "Create the card?", operations: STAGED });
     await store.putProposal(proposal({ proposalTs: "1700.6", threadTs: "1700.5" }));
     clock.advance(PROPOSAL_TTL_MS + 1);
-    assert.deepEqual(await store.getProposalByTs("1700.6"), { state: "expired", proposalText: "Create the card?" });
+    assert.deepEqual(await store.getProposalByTs("1700.6"), { state: "expired", proposalText: "Create the card?", operations: STAGED });
   });
 
   it("an execution of a proposal with its own TTL is takeable at 71 h and gone at 73 h", async () => {

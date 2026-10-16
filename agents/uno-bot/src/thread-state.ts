@@ -60,6 +60,8 @@ import {
   ownTtl,
   ownWords,
   ownText,
+  ownOperations,
+  decidedLive,
   REPORT_GRACE_MS,
   changedReport,
   expiredReport,
@@ -121,10 +123,14 @@ interface ProposalRecord {
   /** Picks kept on the card's Review pop-up, by user id (`keepPick`). */
   kept?: Record<string, Record<string, string>>;
   /** Claimed with what was decided (`claimProposal`): the payload is the
-   *  decided card, kept for View until the card's own TTL and swept with it,
-   *  and out of reach of every other lookup. Absent on a card still pending;
-   *  a claim before this was kept deleted the record instead. */
+   *  decided card, kept for View and out of reach of every other lookup.
+   *  Absent on a card still pending; a claim before this was kept deleted the
+   *  record instead. */
   decided?: DecidedNote;
+  /** When the claim decided it: the decided card is kept for
+   *  `DECIDED_TTL_MS` from here, and swept after (`decidedLive`). Absent on a
+   *  card decided before it was stamped, which keeps its staged lifetime. */
+  decidedAt?: number;
 }
 
 // Latest assistant-panel context (what surface the user has open) per thread.
@@ -243,7 +249,8 @@ export class ThreadState extends DurableObject<Env> {
 
   // Delete expired records by their own TTL. Keys: event:{id}
   // (EVENT_DEDUP_TTL_MS), hist:{…} (HISTORY_TTL_MS), prop:{ts} and exec:{ts}
-  // (each card's own, `proposalTtlMs`). Answers when the next sweep is due: a
+  // (each card's own, `proposalTtlMs`; a decided card's from its decision,
+  // `decidedLive`). Answers when the next sweep is due: a
   // day away if anything remains, never if the store is empty.
   private async collectGarbage(now: number): Promise<number> {
     return this.storage.transaction(async (txn): Promise<number> => {
@@ -260,7 +267,8 @@ export class ThreadState extends DurableObject<Env> {
       }
       const props = await txn.list<ProposalRecord>({ prefix: "prop:" });
       for (const [key, rec] of props) {
-        if (now - rec.createdAt > recordTtlMs(rec)) await txn.delete(key);
+        const live = rec.decided ? decidedLive(rec, (rec.payload as PendingProposal | null) ?? {}, now) : now - rec.createdAt <= recordTtlMs(rec);
+        if (!live) await txn.delete(key);
         else remaining++;
       }
       const reports = await txn.list<ReportRecord>({ prefix: "report:" });
@@ -493,9 +501,10 @@ export class ThreadState extends DurableObject<Env> {
     return this.storage.transaction(async (txn): Promise<ProposalLookup> => {
       const rec = await txn.get<ProposalRecord>(proposalKey(proposalTs));
       if (!rec) return { state: "none" };
-      // Decided: kept for View until its TTL, then gone as a claimed card is.
+      // Decided: kept for View for its own lifetime from the decision, then
+      // gone as a claimed card is.
       if (rec.decided) {
-        if (at - rec.createdAt > recordTtlMs(rec)) {
+        if (!decidedLive(rec, (rec.payload as PendingProposal | null) ?? {}, at)) {
           await txn.delete(proposalKey(proposalTs));
           return { state: "none" };
         }
@@ -503,13 +512,13 @@ export class ThreadState extends DurableObject<Env> {
       }
       const proposal = (rec.payload as PendingProposal | null) ?? {};
       if (rec.supersededBy && (await this.successorIsLive(rec.supersededBy, at, txn))) {
-        return { state: "superseded", ...ownWords(proposal), ...ownText(proposal) };
+        return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal) };
       }
       if (at - rec.createdAt > recordTtlMs(rec)) {
         await txn.delete(proposalKey(proposalTs));
-        return { state: "expired", ...ownTtl(proposal), ...ownWords(proposal), ...ownText(proposal) };
+        return { state: "expired", ...ownTtl(proposal), ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal) };
       }
-      if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(proposal), ...ownText(proposal) };
+      if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal) };
       return {
         state: "found",
         proposal: withLiveMark(rec.payload as PendingProposal, at),
@@ -564,8 +573,8 @@ export class ThreadState extends DurableObject<Env> {
   //
   // Won with what was decided, the record is rewritten instead of deleted: one
   // put in place of one delete, in the same transaction, so View's record
-  // costs no extra hop. Its `createdAt` is kept, so it ages out, and is swept,
-  // exactly when the pending card would have.
+  // costs no extra hop. It is stamped with when it was decided, and ages out,
+  // and is swept, `DECIDED_TTL_MS` after that (`decidedLive`).
   async claimProposal(proposalTs: string, at: number, decided?: DecidedMark): Promise<boolean> {
     const key = proposalKey(proposalTs);
     return this.storage.transaction(async (txn) => {
@@ -579,6 +588,7 @@ export class ThreadState extends DurableObject<Env> {
         payload: decidedPayload(pending, decided),
         createdAt: rec.createdAt,
         decided: decidedNoteOf(decided),
+        decidedAt: at,
       });
       return true;
     });

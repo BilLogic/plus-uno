@@ -12,7 +12,7 @@
 //
 // PURE: blocks out, nothing posted, nothing read.
 import { reviewSections } from "./render";
-import { fieldInputBlocks, MAX_INPUT_CHARS } from "./review-fields";
+import { fieldInputBlocks, MAX_INPUT_CHARS, type FieldChange } from "./review-fields";
 import {
   alertsFromCaveats,
   factsSection,
@@ -22,7 +22,8 @@ import {
   type DraftAnatomy,
   type WhereElement,
 } from "./review-anatomy";
-import { issueUpdateFromInput, stateWords, type IssueUpdate } from "../tools/github-issue-update-render";
+import { describeIssueUpdate, issueUpdateFromInput, stateWords, type IssueUpdate } from "../tools/github-issue-update-render";
+import type { ProposalOperation } from "../thread-state/index";
 import type { AnatomyContext } from "./review-draft";
 
 type Input = Record<string, unknown>;
@@ -219,6 +220,29 @@ export function issueUpdateAnatomy(input: Input, detail: AnatomyContext): DraftA
     alerts: [...otherAlerts(detail.cardText, input), ...(notice ? [repoAlert(notice, "comment")] : [])],
     content,
   };
+}
+
+/**
+ * The card's step lines an edit changed, as changes `withEditedFields` writes
+ * onto the decided card: an issue follow-up's `Operations` line names its
+ * comment, so clearing an optional comment drops "comment" from the steps as
+ * well as the comment's own line. Each operation is held to the one at its
+ * place in the staged batch; one whose steps did not change gives nothing.
+ *
+ * @param staged - The batch as the card was staged
+ * @param edited - The batch as approved, edits applied
+ */
+export function issueStepChanges(staged: readonly ProposalOperation[], edited: readonly ProposalOperation[]): FieldChange[] {
+  return edited.flatMap((op, i) => {
+    const was = staged[i];
+    if (op.toolName !== "github_issue_update" || was?.toolName !== "github_issue_update") return [];
+    const before = issueUpdateFromInput(was.input);
+    const after = issueUpdateFromInput(op.input);
+    if (!before.ok || !after.ok) return [];
+    const from = describeIssueUpdate(before.update).join(" · ");
+    const to = describeIssueUpdate(after.update).join(" · ");
+    return from && to && from !== to ? [{ key: `${i}.operations`, from, to }] : [];
+  });
 }
 
 // ── github_workflow_run ─────────────────────────────────────────────────────

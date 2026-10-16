@@ -10,9 +10,9 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import type { GateVerdict } from "../src/gate/index";
-import { createInMemoryThreadState, PROPOSAL_TTL_MS, type PendingProposal, type ProposalOperation, type ThreadState } from "../src/thread-state/index";
+import { createInMemoryThreadState, DECIDED_TTL_MS, PROPOSAL_TTL_MS, type PendingProposal, type ProposalOperation, type ThreadState } from "../src/thread-state/index";
 import { recordingDelivery } from "../src/turn/index";
-import { runReviewDecision, runReviewOpen, type ReviewDoorDeps } from "../src/slack/review-door";
+import { runReviewDecision, runReviewOpen, runReviewPush, type ReviewDoorDeps } from "../src/slack/review-door";
 import { batchHeader } from "../src/slack/review-batch";
 import { CONFIRM_FOOTER } from "../src/slack/proposal-render";
 import { recordingViews } from "./helpers/recording-slack";
@@ -229,13 +229,15 @@ describe("a batch's header", () => {
 });
 
 describe("the read-only view, for someone who can't decide", () => {
-  it("opens on an info alert naming who can, then the draft with no input and no Submit", async () => {
+  it("opens on a plain-text info alert, who can decide as pills under it, then the draft with no input and no Submit", async () => {
     const h = harness(await store());
     await runReviewOpen(open("U0OTHER001"), h.deps);
     const view = lastView(h);
     assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level], ["alert", "info"]);
-    assert.equal(view.blocks[0]!.text!.text, `Read-only. Only <@${BILL}> can decide this proposal.`);
-    assert.equal(view.blocks[1]!.type, "header");
+    assert.deepEqual(view.blocks[0]!.text, { type: "plain_text", text: "Read-only." });
+    assert.equal(view.blocks[1]!.type, "rich_text");
+    assert.equal(richText(view.blocks[1]), `Only <@${BILL}> can decide this proposal.`);
+    assert.equal(view.blocks[2]!.type, "header");
     assert.equal(inputs(view).length, 0, "no inputs at all, the decision's included");
     assert.equal(view.submit, undefined);
     assert.equal(view.blocks.filter((b) => b.type === "context" && /Read-only/.test(JSON.stringify(b))).length, 0, "no footnote at the bottom");
@@ -269,16 +271,26 @@ describe("a decided card, opened from View", () => {
     return { h, view: lastView(h) };
   }
 
-  it("draws the same content read-only, under a success alert saying who approved and where it posts", async () => {
+  it("draws the same content read-only, under a success alert, then who approved and where it posts as pills", async () => {
     const { view } = await decided("confirm");
     assert.equal(view.title.text, "Review share-out");
-    assert.deepEqual(view.blocks.map((b) => b.type).slice(0, 3), ["alert", "header", "card"]);
+    assert.deepEqual(view.blocks.map((b) => b.type).slice(0, 4), ["alert", "rich_text", "header", "card"]);
     assert.equal(view.blocks[0]!.level, "success");
-    assert.equal(view.blocks[0]!.text!.type, "mrkdwn");
-    assert.equal(view.blocks[0]!.text!.text, `Approved by <@${BILL}> to post in <#C0SANDBOX1>.`);
+    assert.deepEqual(view.blocks[0]!.text, { type: "plain_text", text: "Approved." });
+    assert.equal(richText(view.blocks[1]), `Approved by <@${BILL}> to post in <#C0SANDBOX1>.`);
     assert.equal(view.blocks.find((b) => b.type === "card")!.body!.text, SHAREOUT.summary);
     assert.equal(inputs(view).length, 0);
     assert.equal(view.submit, undefined);
+  });
+
+  it("puts no mention inside any alert", async () => {
+    for (const [decision, over] of [["confirm", {}], ["cancel", {}], ["confirm", TWO_DMS]] as const) {
+      const { view } = await decided(decision, over, decision === "cancel" ? "Wrong channel" : undefined);
+      for (const alert of view.blocks.filter((b) => b.type === "alert")) {
+        assert.equal(alert.text!.type, "plain_text");
+        assert.doesNotMatch(alert.text!.text, /<[@#]/);
+      }
+    }
   });
 
   it("leaves out the where line and the caveats, which were about the decision", async () => {
@@ -287,39 +299,53 @@ describe("a decided card, opened from View", () => {
     assert.doesNotMatch(JSON.stringify(view), /Posts in|Bundle incomplete/);
   });
 
-  it("says a Reject the same way, under a plain alert with the reason", async () => {
+  it("says a Reject the same way, under a plain alert, then who and the reason", async () => {
     const { view } = await decided("cancel", {}, "Wrong channel");
     assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level], ["alert", "default"]);
-    assert.equal(view.blocks[0]!.text!.text, `Rejected by <@${BILL}>: Wrong channel.`);
-    assert.equal(view.blocks[1]!.type, "header");
+    assert.equal(view.blocks[0]!.text!.text, "Rejected.");
+    assert.equal(richText(view.blocks[1]), `Rejected by <@${BILL}>: Wrong channel.`);
+    assert.equal(view.blocks[2]!.type, "header");
   });
 
-  it("cuts a long reason inside the alert's 200, never through an escaped character", async () => {
-    const { view } = await decided("cancel", {}, "R&D ".repeat(100));
-    const text = view.blocks[0]!.text!.text;
-    assert.ok(text.length <= 200, String(text.length));
-    assert.match(text, /^Rejected by <@U0BILL0001>: R&amp;D/);
-    assert.doesNotMatch(text, /&(a|am|amp)?…/, "no entity cut in half");
+  it("keeps a long reason whole and as typed, since rich text needs no escaping", async () => {
+    const reason = "R&D <maybe> ".repeat(30).trim();
+    const { view } = await decided("cancel", {}, reason);
+    assert.equal(richText(view.blocks[1]), `Rejected by <@${BILL}>: ${reason}.`);
+    assert.ok(texts(view).every((t) => t.length <= 3000));
   });
 
   it("says who a batch of DMs went to", async () => {
     const { view } = await decided("confirm", TWO_DMS);
-    assert.equal(view.blocks[0]!.text!.text, `Approved by <@${BILL}> to send to <@${BRYAN}> and <@${COCO}>.`);
-    assert.equal(view.blocks[1]!.text!.text, "Send 2 DMs");
+    assert.equal(richText(view.blocks[1]), `Approved by <@${BILL}> to send to <@${BRYAN}> and <@${COCO}>.`);
+    assert.equal(view.blocks[2]!.text!.text, "Send 2 DMs");
     assert.equal(inputs(view).length, 0);
   });
 
-  it("falls back to the outcome alone once the card's lifetime is over", async () => {
+  it("still draws the draft long after the card's own hour, counted from the decision", async () => {
+    let t = 1_760_540_000_000;
+    const now = () => t;
+    const h = harness(await store({}, now), now);
+    await runReviewDecision(decide("confirm"), h.deps);
+    t += DECIDED_TTL_MS - 1;
+    await runReviewOpen(open(BILL, { cardText: "(the decided card)" }), h.deps);
+    const view = lastView(h);
+    assert.deepEqual(view.blocks.map((b) => b.type).slice(0, 4), ["alert", "rich_text", "header", "card"]);
+    assert.doesNotMatch(JSON.stringify(view), /no longer kept/);
+  });
+
+  it("falls back to the outcome alone once the decided card's lifetime is over", async () => {
     let t = 1_760_540_000_000;
     const now = () => t;
     const threadState = await store({}, now);
     const h = harness(threadState, now);
     await runReviewDecision(decide("confirm"), h.deps);
-    t += PROPOSAL_TTL_MS + 1;
+    t += DECIDED_TTL_MS + 1;
     await runReviewOpen(open(BILL, { cardText: `${SHAREOUT_TEXT}\nApproved by <@${BILL}>` }), h.deps);
     const view = lastView(h);
-    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "success"], ["section", undefined]]);
-    assert.match(view.blocks[1]!.text!.text, /no longer kept/);
+    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "success"], ["rich_text", undefined], ["section", undefined]]);
+    assert.deepEqual(view.blocks[0]!.text, { type: "plain_text", text: "This proposal has already been decided." });
+    assert.equal(richText(view.blocks[1]), `Approved by <@${BILL}>`);
+    assert.match(view.blocks[2]!.text!.text, /no longer kept/);
     assert.deepEqual(await threadState.getProposalByTs(CARD_TS), { state: "none" }, "and the record is gone");
   });
 });
@@ -385,6 +411,7 @@ describe("after a decision, and closed", () => {
     assert.equal(view.blocks[0]!.text!.text, "This proposal expired, so it can't be approved now.");
     assert.equal(view.blocks[1]!.text!.text, "Ask me again and I'll set it up fresh.");
     assert.equal(view.submit, undefined);
+    assert.equal(view.title.text, "Review share-out", "titled for its tool, read in the same lookup");
   });
 
   it("answers a replaced card with a warning, then where the newer one is", async () => {
@@ -396,5 +423,33 @@ describe("after a decision, and closed", () => {
     assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "warning"], ["section", undefined]]);
     assert.equal(view.blocks[0]!.text!.text, "This proposal was replaced by a newer one.");
     assert.match(view.blocks[1]!.text!.text, /newest card in the thread/);
+    assert.equal(view.title.text, "Review share-out");
+  });
+
+  it("titles the answer to a decision that lands on an expired card for its tool", async () => {
+    let t = 1_760_540_000_000;
+    const now = () => t;
+    const h = harness(await store({}, now), now);
+    t += PROPOSAL_TTL_MS + 1;
+    await runReviewDecision(decide("confirm"), h.deps);
+    assert.equal(h.ran.length, 0);
+    assert.equal(lastView(h).title.text, "Review share-out");
+  });
+
+  it("titles the answer to a second decision on a card already decided for its tool", async () => {
+    const h = harness(await store());
+    await runReviewDecision(decide("confirm"), h.deps);
+    await runReviewDecision(decide("cancel"), h.deps);
+    assert.equal(h.ran.length, 1);
+    assert.equal(lastView(h).title.text, "Review share-out");
+  });
+
+  it("titles Edit fields on an expired card for its tool", async () => {
+    let t = 1_760_540_000_000;
+    const now = () => t;
+    const h = harness(await store({}, now), now);
+    t += PROPOSAL_TTL_MS + 1;
+    await runReviewPush({ triggerId: "T.trigger", card: { channel: CHANNEL, ts: CARD_TS }, userId: BILL }, h.deps);
+    assert.equal(lastView(h).title.text, "Review share-out");
   });
 });
