@@ -68,7 +68,7 @@ const MainContent = ({
                 <SectionTitle title="Session Sign-ups" />
                 <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
                     <TutorFilter value={filters.tutor} onChange={(val) => onFilterChange?.('tutor', val)} />
-                    <SiteFilter initialSelection={filters.school} />
+                    <SiteFilter defaultValue={filters.school} />
                     <DaysFilter value={filters.days} onChange={(val) => onFilterChange?.('days', val)} />
                     <CapacityFilter value={filters.capacity} onChange={(val) => onFilterChange?.('capacity', val)} />
                 </div>
@@ -114,10 +114,10 @@ const defaultSessions = [
 ];
 
 const defaultFilters = {
-    tutor: 'All tutors',
-    school: 'All schools',
-    days: 'All days',
-    capacity: 'Not filled'
+    tutor: [],
+    school: [],
+    days: [],
+    capacity: 'not-filled'
 };
 
 /**
