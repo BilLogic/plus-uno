@@ -1,7 +1,8 @@
 // The Gemini adapter's backup model, on the wire (#1228).
 //
 // A quota or capacity failure — Vertex's 429 RESOURCE_EXHAUSTED, a 503
-// UNAVAILABLE / overloaded, a 500, a 404 for a model not served — fails over
+// UNAVAILABLE / overloaded, a 500, a 404 for a model not served, a 504 or a
+// proxy's 524 timeout — fails over
 // to `GEMINI_FALLBACK_MODEL`, on a turn (`send`, which the loop retries) and on
 // a one-shot (`generate`, which every scheduled job's model call goes through).
 // The loop's side of the retry is `tests/agent-loop.test.ts`'s. Driven against a stubbed fetch on the AI Studio key path, which needs no
@@ -111,4 +112,71 @@ test("a one-shot that stops at MAX_TOKENS reports cutOff; one that ends does not
     assert.equal(res.ok, true);
     assert.equal(res.ok ? res.cutOff : "failed", cutOff, finishReason);
   }
+});
+
+// A 524 is not Google's: it is Cloudflare's proxy giving up when the origin has
+// sent no response headers for 125s, and its body is Cloudflare's HTML page,
+// not JSON. Seen in production on r660 (2026-10-16): two DM thread turns on the
+// default tier each waited the full window and failed with no retry. A 504 is
+// the same timeout said by a gateway. Both are worth one try on the backup —
+// a different model is a different generation, and the alternative is a ❌.
+const CLOUDFLARE_524 = "<!DOCTYPE html><html><head><title>A timeout occurred | 524</title></head></html>";
+
+function stubTimeout(byModel: Record<string, number[]>): string[] {
+  const asked: string[] = [];
+  route = (async (input: unknown) => {
+    const model = /models\/([^:]+):generateContent/.exec(String(input))?.[1] ?? "?";
+    asked.push(model);
+    const status = byModel[model]?.shift() ?? 200;
+    return status === 200
+      ? new Response(JSON.stringify(OK), { status, headers: { "content-type": "application/json" } })
+      : new Response(CLOUDFLARE_524, { status, headers: { "content-type": "text/html" } });
+  }) as typeof fetch;
+  return asked;
+}
+
+for (const status of [524, 504]) {
+  test(`a ${status} timeout on a turn falls back to the backup model, and says it was a timeout`, async () => {
+    const asked = stubTimeout({ "gemini-main": [status] });
+    const provider = await geminiProvider(ENV);
+    await provider.start({ tier: "default", tools: [], system: [{ text: "harness", stable: true }], conversation: [{ role: "user", text: "hi" }] });
+    const first = await provider.send({ toolsEnabled: false });
+    assert.equal(first.ok, false);
+    assert.equal(!first.ok && first.status, status);
+    assert.match(!first.ok ? first.message : "", /no response .*timed out/i);
+    assert.equal(provider.fallback(status), true);
+    const second = await provider.send({ toolsEnabled: false });
+    assert.equal(second.ok, true);
+    assert.deepEqual(asked, ["gemini-main", "gemini-backup"]);
+  });
+
+  test(`a ${status} timeout on a one-shot keeps its status through the HTML body and falls back`, async () => {
+    const asked = stubTimeout({ "gemini-main": [status] });
+    const res = await (await geminiProvider(ENV)).generate({ tier: "default", prompt: "hi" });
+    assert.equal(res.ok, true);
+    assert.equal(res.model, "gemini-backup");
+    assert.deepEqual(asked, ["gemini-main", "gemini-backup"]);
+  });
+}
+
+test("a failed turn call logs how long it waited and how big the request was", async () => {
+  stubTimeout({ "gemini-main": [524] });
+  const lines: string[] = [];
+  const warn = console.warn;
+  console.warn = (...args: unknown[]) => void lines.push(args.join(" "));
+  try {
+    const provider = await geminiProvider(ENV);
+    await provider.start({ tier: "default", tools: [], system: [{ text: "harness", stable: true }], conversation: [{ role: "user", text: "hi" }] });
+    await provider.send({ toolsEnabled: false });
+  } finally {
+    console.warn = warn;
+  }
+  const line = lines.find((l) => l.startsWith("[gemini] call failed"));
+  assert.ok(line, `no failure line in ${JSON.stringify(lines)}`);
+  assert.match(line!, /status=524/);
+  assert.match(line!, /model=gemini-main/);
+  assert.match(line!, /ms=\d+/);
+  assert.match(line!, /body_chars=\d+/);
+  assert.match(line!, /turns=1/);
+  assert.match(line!, /cached=(true|false)/);
 });
