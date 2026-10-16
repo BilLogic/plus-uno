@@ -10,7 +10,7 @@ import {
 
 <Title />
 
-Action-button container used on home-page cards. Switches between enabled and disabled styling.
+Joins a session from the home-page jumbotron: a single `Select` of today's sessions beside the Join button, which stays disabled until a session is picked. A session is required to join, so the field has no clear ×.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=563-206909"
@@ -25,10 +25,24 @@ Action-button container used on home-page cards. Switches between enabled and di
 
 <DocsCanvasShell
     attachSourceBelow
-    description={<>Enabled and disabled button-container states stacked.</>}
+    description={<>A session picked and ready to join, and nothing picked yet.</>}
 >
     <Canvas
         of={ButtonContainerStories.Overview}
+        story={{ inline: true }}
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive
+
+<DocsCanvasShell description={<>Pick a session; Join turns on.</>}>
+    <Canvas
+        of={ButtonContainerStories.Interactive}
         story={{ inline: true }}
         sourceState="hidden"
     />

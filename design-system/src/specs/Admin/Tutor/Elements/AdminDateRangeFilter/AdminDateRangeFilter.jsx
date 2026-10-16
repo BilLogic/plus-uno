@@ -22,6 +22,7 @@ const toOptions = (labels) => labels.map((label) => ({ value: label, label }));
 const FilterField = ({ label, value, options, onChange, className }) => (
     <Select
         aria-label={label}
+        clearable={false}
         size="small"
         options={toOptions(options)}
         value={onChange ? value : undefined}

@@ -565,3 +565,34 @@ LoadOptionsPages.play = async ({ canvasElement }) => {
     await waitFor(() => expect(page().getAllByRole('option')).toHaveLength(11));
     await expect(page().queryByText(/^Showing/)).toBeNull();
 };
+
+/* -------------------------------------------------------------- clearable */
+
+/**
+ * `clearable` decides whether the clear × shows. Multi defaults to true; a
+ * single field defaults to `!required`, so a required pick cannot be emptied;
+ * a sort passes `clearable={false}`.
+ */
+export const ClearableDefaults = () => (
+    <div style={stack}>
+        <Select id="sclear-multi" label="Subjects" mode="multi" options={schools} defaultValue={['north']} />
+        <Select id="sclear-single" label="School" options={schools} defaultValue="north" />
+        <Select id="sclear-required" label="Home school" options={schools} defaultValue="north" required />
+        <Select id="sclear-sort" label="Sort" options={schools} defaultValue="north" clearable={false} />
+    </div>
+);
+
+ClearableDefaults.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.queryByRole('button', { name: 'Clear Subjects' })).not.toBeNull();
+    await expect(canvas.queryByRole('button', { name: 'Clear School' })).not.toBeNull();
+    await expect(canvas.queryByRole('button', { name: 'Clear Home school' })).toBeNull();
+    await expect(canvas.queryByRole('button', { name: 'Clear Sort' })).toBeNull();
+
+    // Delete does not empty a field that cannot be cleared.
+    const sort = canvas.getByRole('combobox', { name: 'Sort' });
+    sort.focus();
+    await userEvent.keyboard('{Delete}');
+    await expect(sort).toHaveTextContent('North High');
+};

@@ -192,6 +192,7 @@ export const RequestTutorOffCanvas = ({
                         ))}
                         <Select
                             aria-label="Other closing time"
+                            clearable={false}
                             placeholder="Other"
                             size="small"
                             options={OTHER_CLOSING_TIMES.map((t) => ({ value: t, label: `${t}pm` }))}

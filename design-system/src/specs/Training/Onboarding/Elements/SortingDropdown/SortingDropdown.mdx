@@ -12,7 +12,7 @@ import {
 
 <Title />
 
-Sort-by control used on the Onboarding Overview page — drives the table's row order without leaving the page.
+Sort for the Onboarding Overview page's modules table: two small single `Select`s, what to sort by and in which order. The orders follow the sort, and neither field can be cleared.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=74-121969"
@@ -27,7 +27,7 @@ Sort-by control used on the Onboarding Overview page — drives the table's row 
 
 <DocsCanvasShell
     attachSourceBelow
-    description={<>Default sorting dropdown in resting state.</>}
+    description={<>Each sort with its first order.</>}
 >
     <DsCanvasHero of={SortingDropdownStories.Overview} />
 </DocsCanvasShell>
@@ -40,7 +40,7 @@ Sort-by control used on the Onboarding Overview page — drives the table's row 
 
 <DocsInteractivePlayground
     of={SortingDropdownStories.Interactive}
-    description={<>Open the dropdown and cycle through the sort options inline.</>}
+    description={<>Pick a sort and an order, and see what applies.</>}
 />
 
 </div>

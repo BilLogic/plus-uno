@@ -23,6 +23,7 @@ const StatusCell = ({ tutor, options, onStatusChange }) => {
     return (
         <StatusSelect
             aria-label={`Status for ${tutor.tutorName}`}
+            clearable={false}
             options={options}
             value={status}
             onChange={(next) => {

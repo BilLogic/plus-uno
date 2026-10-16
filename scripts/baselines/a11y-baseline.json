@@ -1,16 +1,13 @@
 {
-  "measured": "2026-08-29",
+  "measured": "2026-10-16",
   "suite": {
-    "storyFiles": 418,
-    "tests": 1226
+    "storyFiles": 431,
+    "tests": 1445
   },
-  "violatingStories": 54,
+  "violatingStories": 45,
   "rules": {
-    "color-contrast": 45,
-    "nested-interactive": 4,
+    "color-contrast": 41,
     "scrollable-region-focusable": 2,
-    "aria-input-field-name": 1,
-    "aria-required-parent": 1,
     "landmark-no-duplicate-main": 1,
     "landmark-unique": 1,
     "select-name": 1
@@ -25,9 +22,6 @@
     "design-system/src/specs/Home/Cards/ResourceCard/ResourceCard.stories.jsx::Overview": [
       "color-contrast"
     ],
-    "design-system/src/specs/Home/Elements/ProductAreaDropdown/ProductAreaDropdown.stories.jsx::Overview": [
-      "aria-required-parent"
-    ],
     "design-system/src/specs/Home/Sections/StudentsOverviewSection/StudentsOverviewSection.stories.jsx::Default": [
       "color-contrast"
     ],
@@ -37,29 +31,17 @@
     "design-system/src/specs/Home/Sections/StudentsOverviewSection/StudentsOverviewSection.stories.jsx::Variant 2": [
       "color-contrast"
     ],
-    "design-system/src/specs/Login/Elements/InstitutionSelection/InstitutionSelection.stories.jsx::Overview": [
-      "aria-input-field-name"
-    ],
     "design-system/src/specs/Login/Modals/LoginNotificationsModal/LoginNotificationsModal.stories.jsx::Overview": [
       "color-contrast"
     ],
     "design-system/src/specs/Login/Modals/LoginNotificationsModal/LoginNotificationsModal.stories.jsx::Type B": [
       "color-contrast"
     ],
-    "design-system/src/specs/Profile/Elements/LanguagePreferences.stories.jsx::Variants": [
-      "nested-interactive"
-    ],
-    "design-system/src/specs/Profile/Elements/MathLevel.stories.jsx::Variants": [
-      "nested-interactive"
-    ],
     "design-system/src/specs/Profile/Pages/TutorProfilePage/TutorProfilePage.stories.jsx::Variants": [
       "landmark-no-duplicate-main",
       "landmark-unique"
     ],
     "design-system/src/specs/Toolkit/In-Session/Elements/EngagementDropdown.stories.jsx::All States": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/In-Session/Elements/EngagementDropdown.stories.jsx::Disabled": [
       "color-contrast"
     ],
     "design-system/src/specs/Toolkit/In-Session/Elements/EngagementListItems.stories.jsx::Interactive": [
@@ -83,15 +65,11 @@
     "design-system/src/specs/Toolkit/Post-Session/Elements/FileListItem/FileListItem.stories.jsx::Overview": [
       "color-contrast"
     ],
-    "design-system/src/specs/Toolkit/Post-Session/Elements/StudentsDropdown/StudentsDropdown.stories.jsx::Overview": [
-      "nested-interactive"
-    ],
     "design-system/src/specs/Toolkit/Post-Session/Elements/UploadFiles/UploadFiles.stories.jsx::Overview": [
       "color-contrast"
     ],
     "design-system/src/specs/Toolkit/Post-Session/Pages/SessionInfo/SessionInfo.stories.jsx::Default": [
-      "color-contrast",
-      "nested-interactive"
+      "color-contrast"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Elements/CallOffForm/ToggleOrganism/ToggleOrganism.stories.jsx::Overview": [
       "color-contrast"
@@ -166,15 +144,6 @@
       "select-name"
     ],
     "design-system/src/specs/Training/Lessons/Tables/LessonsTable/LessonsTable.stories.jsx::Overview": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Training/Onboarding/Elements/DropdownListOptions/DropdownListOptions.stories.jsx::Interactive": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Training/Onboarding/Elements/DropdownListOptions/DropdownListOptions.stories.jsx::Overview": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Training/Onboarding/Elements/SortingDropdown/SortingDropdown.stories.jsx::Overview": [
       "color-contrast"
     ],
     "design-system/src/specs/Training/Training.stories.jsx::Overview": [

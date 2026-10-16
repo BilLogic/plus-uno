@@ -1,16 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/actions/Button';
+import { Select } from '@/components';
 import './ButtonContainer.scss';
 
 /**
  * ButtonContainer Component
- * A button group with a button and select dropdown, with enabled/disabled states
+ * Join a session: a Select of today's sessions beside the Join button, which
+ * waits for a pick. A session is required to join, so the field has no clear ×.
  */
 export const ButtonContainer = ({
     enabled = false,
     buttonText = 'Join session',
-    sessionInfo = 'Jackson, 9:05 am - 9:55 am, 10/13/2023',
+    sessions = [],
+    selectedSession,
     message = enabled 
         ? 'Session starting soon — join early to check your setup and be ready to tutor.'
         : 'Session links will appear 5 minutes before your scheduled start time.',
@@ -42,16 +45,16 @@ export const ButtonContainer = ({
                     disabled={!enabled}
                     className="plus-button-container-button"
                 />
-                <div className="plus-button-container-select-wrapper">
-                    <div className="plus-button-container-select-inner">
-                        <span className="plus-button-container-select-text body2-txt">
-                            {sessionInfo}
-                        </span>
-                        <div className="plus-button-container-select-icon">
-                            <i className="fa-solid fa-caret-down" aria-hidden="true"></i>
-                        </div>
-                    </div>
-                </div>
+                <Select
+                    aria-label="Session"
+                    placeholder="Select a session"
+                    options={sessions}
+                    value={onSelectChange ? (selectedSession ?? '') : undefined}
+                    defaultValue={selectedSession ?? ''}
+                    onChange={onSelectChange}
+                    clearable={false}
+                    className="plus-button-container-select"
+                />
             </div>
             <div className={`plus-button-container-message ${messageColorClass}`}>
                 <div className="plus-button-container-message-icon">
@@ -70,15 +73,20 @@ ButtonContainer.propTypes = {
     enabled: PropTypes.bool,
     /** Text for the button */
     buttonText: PropTypes.string,
-    /** Session information text */
-    sessionInfo: PropTypes.string,
+    /** Today's sessions: `value` is the id, `label` what is shown */
+    sessions: PropTypes.arrayOf(PropTypes.shape({
+        value: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+    })),
+    /** The picked session's id */
+    selectedSession: PropTypes.string,
     /** Message text to display below */
     message: PropTypes.string,
     /** Message type (success or warning) */
     messageType: PropTypes.oneOf(['success', 'warning']),
     /** Callback when button is clicked */
     onButtonClick: PropTypes.func,
-    /** Callback when select changes */
+    /** `(id)` when a session is picked */
     onSelectChange: PropTypes.func,
     /** Additional CSS classes */
     className: PropTypes.string,
