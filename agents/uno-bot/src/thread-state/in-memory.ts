@@ -27,6 +27,8 @@ import {
   ownTtl,
   ownWords,
   ownText,
+  ownOperations,
+  decidedLive,
   REPORT_GRACE_MS,
   changedReport,
   expiredReport,
@@ -73,8 +75,10 @@ interface ProposalRecord {
   /** Picks kept on the card's Review pop-up, by user id (`keepPick`). */
   kept?: Record<string, Record<string, string>>;
   /** Claimed with what was decided: `proposal` is the decided card, kept for
-   *  View until its TTL, and out of reach of every other lookup. */
+   *  View for `DECIDED_TTL_MS` from `decidedAt`, and out of reach of every
+   *  other lookup. */
   decided?: DecidedNote;
+  decidedAt?: number;
 }
 
 interface AssistantContextRecord {
@@ -255,9 +259,10 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     async getProposalByTs(proposalTs): Promise<ProposalLookup> {
       const rec = proposals.get(proposalTs);
       if (!rec) return { state: "none" };
-      // Decided: kept for View until its TTL, then gone as a claimed card is.
+      // Decided: kept for View for its own lifetime from the decision, then
+      // gone as a claimed card is.
       if (rec.decided) {
-        if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) {
+        if (!decidedLive(rec, rec.proposal, now())) {
           proposals.delete(proposalTs);
           return { state: "none" };
         }
@@ -265,12 +270,12 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       }
       // A live successor beats the TTL — the ordering, and the third card it
       // stops the person from asking for, are in `ProposalLookup`.
-      if (rec.supersededBy && successorIsLive(rec.supersededBy)) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal) };
+      if (rec.supersededBy && successorIsLive(rec.supersededBy)) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal) };
       if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) {
         proposals.delete(proposalTs);
-        return { state: "expired", ...ownTtl(rec.proposal), ...ownWords(rec.proposal), ...ownText(rec.proposal) };
+        return { state: "expired", ...ownTtl(rec.proposal), ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal) };
       }
-      if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal) };
+      if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal) };
       return { state: "found", proposal: withLiveMark(rec.proposal, now()), createdAt: rec.createdAt, ...(rec.kept ? { kept: structuredClone(rec.kept) } : {}) };
     },
 
@@ -308,7 +313,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     // interface.
     //
     // Won with what was decided, the record stays as the decided card, for
-    // View, until its TTL (`claimProposal` on the interface).
+    // View, for its own lifetime from now (`claimProposal` on the interface).
     async claimProposal(proposalTs, decided) {
       const rec = proposals.get(proposalTs);
       // A card being revised is refused too: its revision is on the way.
@@ -318,6 +323,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         proposal: decidedPayload(rec.proposal, structuredClone(decided)),
         createdAt: rec.createdAt,
         decided: decidedNoteOf(decided),
+        decidedAt: now(),
       });
       return true;
     },

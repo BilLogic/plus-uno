@@ -4649,8 +4649,11 @@ everywhere, the posted card's summary line included.
 4. **Alerts near the top.** Yes: one `alert` per caveat, at most two, right
    under the what-and-where line. A refused edit's `error` alert stays first.
 5. **View on a decided card keeps the record.** Yes. The decided batch stays on
-   the thread's record (`ThreadState`) for the card's lifetime, so View draws
-   the same content read-only under a `success` alert (§ 2).
+   the thread's record (`ThreadState`) so View draws the same content
+   read-only under a `success` alert (§ 2). Built: the record is kept for
+   `DECIDED_TTL_MS` (seven days, the thread's own memory) from the decision,
+   not for what was left of the card's hour, and the daily sweep deletes it
+   after.
 6. **The share-out's deadline is editable.** Yes, as a prefilled optional
    text input (§ 1). It is free text, as the tool takes it; clearing it posts
    with no deadline.
@@ -4674,7 +4677,10 @@ everywhere, the posted card's summary line included.
 - **mrkdwn mentions inside an `alert`** (the read-only and decided alerts use
   `<@U…>`). Alerts take mrkdwn text, but a mention there is untried. The
   fallback is the plain-text alert plus a `rich_text` line with the `user`
-  element.
+  element. Built as the fallback: Slack's `alert` reference allows mrkdwn but
+  says nothing of mentions, so no alert names anyone. The read-only, decided
+  and outcome-only views say their outcome in a plain-text alert, and who
+  (and where) on a `rich_text` line under it.
 
 ## Implementation notes (for the tickets)
 

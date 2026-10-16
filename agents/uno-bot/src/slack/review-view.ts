@@ -39,7 +39,7 @@ import { CONFIRM_FOOTER, withoutInternalFields } from "./proposal-render";
 import { clip } from "./card-block";
 import { anatomyBlocks, decisionWords, DESCRIPTION_CHARS, reviewTitle, type DecisionWords, type DraftAlert, type DraftAnatomy } from "./review-anatomy";
 import { batchAnatomy } from "./review-batch";
-import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
+import { SLACK_USER_ID, escapeSlackText, unescapeSlackText } from "./mrkdwn";
 import {
   draftValuesOf,
   FIELD_ACTION_ID,
@@ -55,7 +55,7 @@ import {
 } from "./review-fields";
 import { anatomyOf, caveatsOf, draftHeadline, readableDraft } from "./review-draft";
 import type { NotionDatabaseLinks } from "./review-notion-create";
-import type { DecidedProposal, PendingProposal, ReviewChoice, StatedCardWords } from "../thread-state/index";
+import { proposalOperations, type DecidedProposal, type PendingProposal, type ProposalOperation, type ReviewChoice, type StatedCardWords } from "../thread-state/index";
 import type { ReviewDecision } from "../gate/index";
 
 /** The draft's one button; `slack/interactive.ts` routes it. */
@@ -129,9 +129,44 @@ export function alertBlock(level: "error" | "success", text: string): unknown {
 /** Slack's cap on an alert's text. */
 const ALERT_CHARS = 200;
 
-/** An alert that names people or a channel: mrkdwn, so a mention is a pill. */
-function mentionAlert(level: DraftAlert["level"], text: string): unknown {
-  return { type: "alert", level, text: { type: "mrkdwn", text: clip(text, ALERT_CHARS) } };
+// AN ALERT NAMES NOBODY. Slack's alert takes mrkdwn, but its docs say nothing
+// of a mention inside one, and none has been seen to render; a pill that came
+// out as `<@U…>` would be the one line a person reads first. So an alert that
+// would name someone says its outcome in plain text, and the people and the
+// channel go on a `rich_text` line under it, as `user` and `channel`
+// elements, which render as pills everywhere a modal does.
+
+/** Slack's cap on a text element of a rich text line. */
+const RICH_TEXT_CHARS = 3000;
+
+/** A mention, a channel or a link in mrkdwn, as this file and the card write them. */
+const MRKDWN_TOKEN = /<@([UW][A-Z0-9]{6,})>|<#([CG][A-Z0-9]{6,})(?:\|[^>]*)?>|<(https?:\/\/[^|>\s]+)(?:\|([^>]*))?>/g;
+
+/** mrkdwn's entities back to the characters: rich text is read as written. */
+const unescaped = unescapeSlackText;
+
+/** A line of mrkdwn as rich text elements: each `<@U…>` a user pill, each
+ *  `<#C…>` a channel pill, each `<url|text>` a link, the rest its words. */
+export function richElements(mrkdwn: string): unknown[] {
+  const out: unknown[] = [];
+  let at = 0;
+  const words = (t: string) => {
+    if (t) out.push({ type: "text", text: clip(unescaped(t), RICH_TEXT_CHARS) });
+  };
+  for (const m of mrkdwn.matchAll(MRKDWN_TOKEN)) {
+    words(mrkdwn.slice(at, m.index));
+    if (m[1]) out.push({ type: "user", user_id: m[1] });
+    else if (m[2]) out.push({ type: "channel", channel_id: m[2] });
+    else out.push({ type: "link", url: m[3]!, ...(m[4] ? { text: unescaped(m[4]) } : {}) });
+    at = m.index + m[0].length;
+  }
+  words(mrkdwn.slice(at));
+  return out;
+}
+
+/** One rich text line: what an alert would have said with a pill in it. */
+function richLine(elements: readonly unknown[]): unknown {
+  return { type: "rich_text", elements: [{ type: "rich_text_section", elements }] };
 }
 
 function line(text: string): unknown {
@@ -246,8 +281,8 @@ export function draftView(
   // A refused edit's alert stays first, above every zone; then, for a view
   // that cannot decide, why not.
   if (opts.alert) head.push(alertBlock(opts.alert.level, opts.alert.text));
-  if (access.decided) head.push(decidedAlert(access.decided, proposal, reading));
-  else if (!mayDecide) head.push(mentionAlert("info", readOnlyLine(access.confirmers)));
+  if (access.decided) head.push(...decidedAlert(access.decided, proposal, reading));
+  else if (!mayDecide) head.push(stateAlert("info", "Read-only."), richLine(readOnlyLine(access.confirmers)));
   if (!anatomy) {
     const headline = draftHeadline(operations);
     head.push({
@@ -287,28 +322,29 @@ function settled(anatomy: DraftAnatomy): DraftAnatomy {
 }
 
 /**
- * What a decided card's alert says: "Approved by @Bill to post in #channel.",
- * "Rejected by @Bill: not this week.", or, on a card with its own answers,
- * "Answered by @Bill." — `success` for an Approve, a plain alert otherwise.
+ * What a decided card says at the top: the outcome as a plain alert —
+ * "Approved.", "Rejected." or, on a card with its own answers, "Answered." —
+ * `success` for an Approve and a plain alert otherwise; then, where there is
+ * someone or somewhere to name, a rich text line with the pills: "Approved by
+ * @Bill to post in #channel.", "Rejected by @Bill: not this week.".
  */
 function decidedAlert(
   decided: NonNullable<DraftAccess["decided"]>,
   proposal: PendingProposal,
   reading: DraftAnatomy | null,
-): unknown {
-  const by = decided.by && SLACK_USER_ID.test(decided.by) ? ` by <@${decided.by}>` : "";
+): unknown[] {
+  const who = decided.by && SLACK_USER_ID.test(decided.by) ? decided.by : undefined;
+  const by = who ? [{ type: "text", text: " by " }, { type: "user", user_id: who }] : [];
   const level = decided.decision === "confirm" ? "success" : "default";
-  if (proposal.choices?.length) return mentionAlert(level, `Answered${by}.`);
-  if (decided.decision === "cancel") {
-    // Cut before it is escaped, so the alert's own clip never splits an
-    // entity or the mention ahead of it.
-    const reason = decided.reason?.trim() ?? "";
-    const room = ALERT_CHARS - `Rejected${by}: .`.length;
-    let cut = Math.min(reason.length, room);
-    while (cut > 0 && escapeSlackText(clip(reason, cut)).length > room) cut--;
-    return mentionAlert(level, `Rejected${by}${cut ? `: ${escapeSlackText(clip(reason, cut))}` : ""}.`);
-  }
-  return mentionAlert(level, `Approved${by}${reading?.destination ? ` to ${reading.destination}` : ""}.`);
+  const outcome = proposal.choices?.length ? "Answered" : decided.decision === "cancel" ? "Rejected" : "Approved";
+  const reason = decided.decision === "cancel" && !proposal.choices?.length ? (decided.reason?.trim() ?? "") : "";
+  const where = outcome === "Approved" && reading?.destination ? [{ type: "text", text: " to " }, ...richElements(reading.destination)] : [];
+  const tail = reason ? [{ type: "text", text: `: ${clip(reason, RICH_TEXT_CHARS - 2)}` }] : [];
+  const alert = stateAlert(level, `${outcome}.`);
+  // Nobody and nowhere to name: the alert says it all.
+  if (!by.length && !where.length && !tail.length) return [alert];
+  const stop = /[.!?]$/.test(reason) ? [] : [{ type: "text", text: "." }];
+  return [alert, richLine([{ type: "text", text: outcome }, ...by, ...where, ...tail, ...stop])];
 }
 
 /** The keys of the fields the draft holds as inputs in place: every text
@@ -503,11 +539,12 @@ function reviewNoteOf(state: unknown): string {
  * record no longer keeps the decided draft: its words off the report's
  * record, read-only, outcome included.
  */
-export function decidedView(card: ReviewedCard, cardText: string): View {
-  return modal(card, [
-    ...textSections(withoutInternalFields(draftBody(cardText))),
-    context("Read-only. This proposal has already been decided."),
-  ]);
+export function decidedView(card: ReviewedCard, cardText: string, title?: string): View {
+  return modal(
+    card,
+    [...textSections(withoutInternalFields(draftBody(cardText))), context("Read-only. This proposal has already been decided.")],
+    title ? { title } : {},
+  );
 }
 
 /** Said under the outcome when the decided draft is no longer kept: a card
@@ -546,13 +583,16 @@ function outcomeOf(cardText: string): { level: DraftAlert["level"]; text: string
 /**
  * A decided card opened from View when its record keeps no draft — decided
  * before the record was kept, or past the card's lifetime: the outcome the
- * card's message ends with, as an alert, and a line saying the draft is gone.
- * A message with no outcome line reads as decided, plainly.
+ * card's message ends with, under a plain alert at the level its words mean
+ * (the line names who decided, so it is rich text, not the alert), and a line
+ * saying the draft is gone. A message with no outcome line reads as decided,
+ * plainly.
  */
 export function outcomeView(card: ReviewedCard, cardText: string): View {
   const outcome = outcomeOf(cardText);
   return modal(card, [
-    outcome ? mentionAlert(outcome.level, outcome.text) : stateAlert("info", "This proposal has already been decided."),
+    stateAlert(outcome?.level ?? "info", "This proposal has already been decided."),
+    ...(outcome ? [richLine(richElements(outcome.text))] : []),
     line(DRAFT_NOT_KEPT),
   ]);
 }
@@ -566,11 +606,16 @@ export function openLine(closesAt: number, confirmers: readonly string[]): strin
   return `Open until ${when} ET${names ? ` · ${names} can decide.` : "."}`;
 }
 
-function readOnlyLine(confirmers: readonly string[]): string {
-  const who = confirmers.filter((id) => SLACK_USER_ID.test(id)).map((id) => `<@${id}>`);
-  if (!who.length) return "Read-only. Nobody here can decide this proposal.";
-  const names = who.length === 1 ? who[0]! : `${who.slice(0, -1).join(", ")} or ${who.at(-1)!}`;
-  return `Read-only. Only ${names} can decide this proposal.`;
+/** Who can decide a read-only draft, as rich text elements: "Only @A or @B
+ *  can decide this proposal." */
+function readOnlyLine(confirmers: readonly string[]): unknown[] {
+  const who = confirmers.filter((id) => SLACK_USER_ID.test(id));
+  if (!who.length) return [{ type: "text", text: "Nobody here can decide this proposal." }];
+  const names = who.flatMap((id, i) => [
+    ...(i === 0 ? [] : [{ type: "text", text: i === who.length - 1 ? " or " : ", " }]),
+    { type: "user", user_id: id },
+  ]);
+  return [{ type: "text", text: "Only " }, ...names, { type: "text", text: " can decide this proposal." }];
 }
 
 /** A state's alert: plain text, the outcome only. */
@@ -595,25 +640,39 @@ export function stateView(card: ReviewedCard, level: DraftAlert["level"], text: 
   return modal({ channel: card.channel, ts: card.ts }, [stateAlert(level, outcome), ...(next ? [line(next)] : [])], title ? { title } : {});
 }
 
-/** A card that cannot be decided any more, and why. No decision. */
+/** A card that cannot be decided any more, and why. No decision. Titled for
+ *  the card's tool where the lookup that found it named its batch. */
 export function closedView(
   card: ReviewedCard,
-  why: { state: "expired"; stated?: StatedCardWords } | { state: "superseded" } | { state: "gone" },
+  why:
+    | { state: "expired"; stated?: StatedCardWords; operations?: readonly ProposalOperation[] }
+    | { state: "superseded"; operations?: readonly ProposalOperation[] }
+    | { state: "gone"; decided?: Pick<DecidedProposal, "proposal"> },
 ): View {
+  const title = closedTitle(why);
   switch (why.state) {
     case "expired":
-      return stateView(card, "warning", why.stated?.expired ?? "This proposal expired, so it can't be approved now. Ask me again and I'll set it up fresh.");
+      return stateView(card, "warning", why.stated?.expired ?? "This proposal expired, so it can't be approved now. Ask me again and I'll set it up fresh.", title);
     case "superseded":
-      return stateView(card, "warning", "This proposal was replaced by a newer one. Review the newest card in the thread instead.");
+      return stateView(card, "warning", "This proposal was replaced by a newer one. Review the newest card in the thread instead.", title);
     case "gone":
-      return stateView(card, "info", "This proposal has already been decided. Its outcome is on the card in the thread.");
+      return stateView(card, "info", "This proposal has already been decided. Its outcome is on the card in the thread.", title);
   }
 }
 
+/** A closed card's title: its tool's, from the batch its lookup named, or
+ *  nothing (the generic title) when the lookup named none. */
+export function closedTitle(
+  why: { operations?: readonly ProposalOperation[]; decided?: Pick<DecidedProposal, "proposal"> },
+): string | undefined {
+  const operations = why.operations ?? (why.decided ? proposalOperations(why.decided.proposal) : undefined);
+  return operations?.length ? reviewTitle(operations) : undefined;
+}
+
 /** One line in place of the draft: the decision registered, or the Gate's
- *  answer when it did not. */
-export function noticeView(card: ReviewedCard, text: string): View {
-  return modal({ channel: card.channel, ts: card.ts }, [line(text)]);
+ *  answer when it did not — under the card's title where the door knows it. */
+export function noticeView(card: ReviewedCard, text: string, title?: string): View {
+  return modal({ channel: card.channel, ts: card.ts }, [line(text)], title ? { title } : {});
 }
 
 /** The card a view's `private_metadata` names, or null for one this Worker
