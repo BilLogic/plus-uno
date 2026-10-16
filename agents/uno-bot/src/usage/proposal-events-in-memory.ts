@@ -74,6 +74,8 @@ export function createInMemoryProposalEventLog(
           via: "end-of-day",
           originProposalId: null,
           revisesProposalId: null,
+          stagedAs: null,
+          correctsProposalId: null,
           turnId: null,
           requesterId: null,
           tools: [],

@@ -364,6 +364,14 @@ export interface PendingProposal {
    */
   revisesProposalTs?: string;
   /**
+   * What the staging turn made this card: a `revision` of a waiting card or a
+   * `separate` proposal (`turn/card-matter.ts`). Absent on a card the Worker
+   * staged, or staged before this field. Read only by the usage record: the
+   * next card in the thread reads it to tell whether it undid that call
+   * (`correctedCard`).
+   */
+  stagedAs?: "revision" | "separate";
+  /**
    * Set on one item of a decision report (`slack/decision-cards.ts`): the
    * message its card is in, and its id there. Several items share one
    * message, so `proposalTs` is a key built from both rather than the ts; an

@@ -18,7 +18,10 @@ proposal drawn from a conversation keeps its thread, the `proposed` path it
 created beside today's and that path's cells in `blueprint_proposals` (`0016_blueprint_proposals.sql`,
 `agents/uno-bot/src/blueprint-upkeep/proposal-records.ts`): ids and times, no
 cell text. When its removal was offered and when it was withdrawn are two
-times on the same row (`0017_blueprint_proposal_cleanup.sql`). The bot's
+times on the same row (`0017_blueprint_proposal_cleanup.sql`). A card's
+staged row says whether its turn made it a revision or a separate proposal,
+and names the card a correction undid (`0018_card_matter.sql`): ids and a
+label, no text. The bot's
 semantic-retrieval schema does **not** — see the second half.
 
 ## The usage database (`usage/`)
