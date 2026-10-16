@@ -25,6 +25,7 @@
 // PURE: blocks out, nothing posted, nothing read.
 import { clip, isLink } from "./card-block";
 import { fieldInputBlocks } from "./review-fields";
+import { rowPath } from "./review-blueprint-fields";
 import { blueprintApprove, type DraftAlert, type DraftAnatomy, type WhereElement } from "./review-anatomy";
 import { codeStyled } from "./review-stated";
 import type { AnatomyContext } from "./review-draft";
@@ -55,6 +56,14 @@ const context = (text: string) => ({ type: "context", elements: [{ type: "mrkdwn
 
 /** A row as a step lists it: its lane in code, then its text. */
 const rowLine = (row: BlueprintRowFact): Element[] => [t(row.lane, { code: true }), t(` ${row.content}`)];
+
+/** A changed row: its lane in code, today's text struck through, an arrow, the new text. */
+const changedLine = (row: BlueprintRowFact & { before: string }): Element[] => [
+  t(row.lane, { code: true }),
+  t(" "),
+  t(row.before, { strike: true }),
+  t(` → ${row.content}`),
+];
 
 /** A step's rows as a list, past `MAX_ROWS` ending "and N more on the
  *  blueprint"; a line in italics where it has none. */
@@ -94,7 +103,7 @@ const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? o
  */
 function revisionStep(step: BlueprintStepFact, input: Input, ctx: AnatomyContext): unknown[] {
   const head = [section([t(step.step, { bold: true })]), section([t("Today", { italic: true })]), rowsOf(step.today, "No rows today")];
-  const field = (row: number) => ctx.inline?.get(`0.rows.${row}.content`);
+  const field = (row: number) => ctx.inline?.get(`0.${rowPath(row)}`);
   const added = (step.added ?? []).map((r) => ({ ...r, content: contentAt(input, r.row, r.content) }));
   const changed = (step.changed ?? []).map((r) => ({ ...r, content: contentAt(input, r.row, r.content) }));
   const inputs = [...added, ...changed].some((r) => field(r.row));
@@ -106,7 +115,6 @@ function revisionStep(step: BlueprintStepFact, input: Input, ctx: AnatomyContext
       ]
     : [];
   const promoted = step.promoted?.length ? [section([t("Promoted", { bold: true })]), bullets(step.promoted.map(rowLine))] : [];
-  const changedLine = (r: (typeof changed)[number]) => [t(r.lane, { code: true }), t(" "), t(r.before, { strike: true }), t(` → ${r.content}`)];
 
   if (!inputs) {
     const parts = [
@@ -136,13 +144,34 @@ function revisionStep(step: BlueprintStepFact, input: Input, ctx: AnatomyContext
   return blocks;
 }
 
-/** Every drawn step, then a line for the steps past the cap. */
+/** Rows of the later steps listed, at most; past them a line says how many
+ *  more, and Needs changes splits the card. */
+const MAX_LATER_ROWS = 40;
+
+/**
+ * The steps past the cap as one block of text: every row each adds, changes,
+ * deprecates or promotes, under its step's name, so nothing the Approve
+ * writes is out of sight. Their rows are not inputs; Needs changes corrects
+ * them.
+ */
+function laterSteps(later: readonly BlueprintStepFact[]): unknown[] {
+  if (!later.length) return [];
+  const lines = later.flatMap((step) =>
+    [
+      ...(step.added ?? []).map((r) => [t("Added ", { bold: true }), ...rowLine(r)]),
+      ...(step.changed ?? []).map((r) => [t("Changed ", { bold: true }), ...changedLine(r)]),
+      ...(step.deprecated ?? []).map((r) => [t("Deprecated ", { bold: true }), t(r.lane, { code: true }), t(" "), t(r.content, { strike: true })]),
+      ...(step.promoted ?? []).map((r) => [t("Promoted ", { bold: true }), ...rowLine(r)]),
+    ].map((row) => [t(`${step.step}: `, { italic: true }), ...row]),
+  );
+  const shown = lines.slice(0, MAX_LATER_ROWS);
+  if (lines.length > MAX_LATER_ROWS) shown.push([t(`and ${plural(lines.length - MAX_LATER_ROWS, "more row")}: Needs changes splits this card`)]);
+  return [rich(section([t(`${plural(later.length, "more step")}, as text`, { bold: true })]), bullets(shown)), divider];
+}
+
+/** Every step drawn in full, then the later ones as text. */
 function revisionSteps(facts: BlueprintRevisionFacts, input: Input, ctx: AnatomyContext): unknown[] {
-  return [
-    divider,
-    ...facts.steps.flatMap((s) => revisionStep(s, input, ctx)),
-    ...(facts.moreSteps ? [context(`${plural(facts.moreSteps, "more step changes", "more steps change")} beyond these. View slice shows the whole path.`)] : []),
-  ];
+  return [divider, ...facts.steps.flatMap((s) => revisionStep(s, input, ctx)), ...laterSteps(facts.later ?? [])];
 }
 
 /** The status the revision is written as, in rich text: "written as `live`",
@@ -177,7 +206,7 @@ function revisionAlerts(facts: BlueprintRevisionFacts): DraftAlert[] {
   ];
   return [
     ...(parts.length ? [{ level: "warning" as const, text: `${parts.join(" and ")}. The owner is asked below.` }] : []),
-    ...(facts.tierNote ? [{ level: "info" as const, text: "Drafted on the default model: the grind tier was out of capacity." }] : []),
+    ...(facts.tierNote ? [{ level: "info" as const, text: facts.tierNote }] : []),
   ];
 }
 
@@ -187,7 +216,7 @@ function questionBlocks(facts: BlueprintRevisionFacts, editing: boolean): unknow
   const lead = facts.owners.length ? [...ownerElements(facts.owners), t(", before this is written:")] : [t("Before this is written:")];
   return [
     rich(section(lead), bullets(facts.questions.map((q) => codeStyled(q) as Element[]), "ordered")),
-    ...(editing ? [context("Answer in the thread or in Needs changes' note. Either redrafts this card.")] : []),
+    ...(editing ? [context("Answer in Needs changes' note, or in the thread naming this path. Either redrafts this card.")] : []),
   ];
 }
 
@@ -252,7 +281,7 @@ function proposalStep(step: BlueprintStepFact): unknown[] {
     rich(
       section([t(step.step, { bold: true })]),
       section([t("Today", { italic: true })]),
-      rowsOf(step.today, "No such step"),
+      rowsOf(step.today, "No rows today"),
       section([t("Proposed", { italic: true })]),
       rowsOf(step.proposed ?? [], "No such step"),
     ),

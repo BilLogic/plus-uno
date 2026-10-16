@@ -248,10 +248,11 @@ export function variantPromotionDraft(variant: PathToday, target: EntityStatus, 
 
 /**
  * Today's path set to `deprecated` because a promoted proposal replaces it.
- * The write is the path's status alone: its cells are retired with it, and
- * one write keeps the Approve affordable on a path of any size
- * (`revisionWriteCalls`). The card still shows what retires — every row not
- * already deprecated, as one Deprecated group (`changes`). Null when the path
+ * The write is the path's status alone, and one write keeps the Approve
+ * affordable on a path of any size (`revisionWriteCalls`): each cell keeps
+ * its own status, and retires as part of the deprecated path. The card still
+ * shows what retires — every row not already deprecated, as one Deprecated
+ * group (`changes`) — and its note says the cells are left. Null when the path
  * is retired already.
  *
  * @param today - Today's path, as the blueprint holds it now
@@ -267,6 +268,6 @@ export function retirementDraft(today: PathToday, replacement: Pick<PathToday, "
     confidence: 1,
     gaps: [],
     retires: true,
-    note: `If ${code(`${replacement.scenario} › ${replacement.path}`)} replaces this path once it is ${code("live")}, this path goes to ${code("deprecated")}, and its rows with it. Reject if both paths stay.`,
+    note: `If ${code(`${replacement.scenario} › ${replacement.path}`)} replaces this path once it is ${code("live")}, this path goes to ${code("deprecated")}: the rows below retire with it, each cell left at its own status. Reject if both paths stay.`,
   };
 }

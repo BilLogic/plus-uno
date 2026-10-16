@@ -538,9 +538,11 @@ export interface BlueprintRevisionFacts {
    *  maps to nobody. */
   owners: CardOwner[];
   today: BlueprintPathFact;
+  /** The steps drawn in full: today's rows, the changes, the inputs. */
   steps: BlueprintStepFact[];
-  /** Steps that change past the ones drawn. */
-  moreSteps: number;
+  /** Steps that change past the ones drawn in full, listed as text so the
+   *  confirmer sees every row the Approve writes. */
+  later?: BlueprintStepFact[];
   /** What the owner is asked before it is written: the draft's gaps. */
   questions: string[];
   inferred: number;

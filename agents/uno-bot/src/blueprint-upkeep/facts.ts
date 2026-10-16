@@ -24,7 +24,7 @@ import type {
 import type { Draft, DraftedChange, PathToday } from "./draft";
 import type { RevisionSource } from "./card";
 
-/** Steps a revision's pop-up draws; past them a line counts the rest. */
+/** Steps a revision's pop-up draws in full; past them each is listed as text. */
 export const MAX_REVISION_STEPS = 12;
 /** Steps a proposal's pop-up draws: one block each, so the view holds them. */
 export const MAX_PROPOSAL_STEPS = 40;
@@ -158,7 +158,7 @@ export function revisionFacts(r: {
     owners: [...r.owners],
     today: pathFact,
     steps: steps.slice(0, MAX_REVISION_STEPS),
-    moreSteps: Math.max(0, steps.length - MAX_REVISION_STEPS),
+    ...(steps.length > MAX_REVISION_STEPS ? { later: steps.slice(MAX_REVISION_STEPS) } : {}),
     questions: [...draft.gaps],
     inferred: draft.changes.filter((c) => c.inferred).length,
     ...(draft.tierNote ? { tierNote: draft.tierNote } : {}),

@@ -255,7 +255,7 @@ describe("a blueprint revision in Review", () => {
     assert.equal((list as unknown as { style: string }).style, "ordered");
     assert.ok(flat(questions).some((e) => e.style?.code && e.text === "path"), "frame words in code");
     const contexts = v.blocks.filter((b) => b.type === "context").map((b) => json(b));
-    assert.ok(contexts.some((c) => c.includes("Answer in the thread or in Needs changes' note. Either redrafts this card.")));
+    assert.ok(contexts.some((c) => c.includes("Answer in Needs changes' note, or in the thread naming this path. Either redrafts this card.")));
     assert.ok(contexts.some((c) => c.includes("Written by uno-bot's blueprint identity, each row logged with its undo.")));
     assert.deepEqual(
       options(v).map((o) => [o.text.text, o.description?.text]),
@@ -268,7 +268,7 @@ describe("a blueprint revision in Review", () => {
     assert.ok(v.submit, "a confirmer has Submit");
   });
 
-  it("caps what it draws: twelve steps, twenty inputs, forty rows a step, the decision always on the view", () => {
+  it("caps what it draws in full: twelve steps, twenty inputs, forty rows a step; the later steps' rows listed as text; the decision always on the view", () => {
     const steps = Array.from({ length: 14 }, (_, i) => ({ id: `s${i}`, name: `Step ${i + 1}` }));
     const lanes = Array.from({ length: 3 }, (_, i) => ({ id: `l${i}`, name: `Lane ${i + 1}` }));
     const big: PathToday = {
@@ -295,7 +295,12 @@ describe("a blueprint revision in Review", () => {
     assertFits(v);
     assert.equal(inputs(v).length, MAX_EDITABLE_ROWS, "twenty inputs");
     assert.equal(v.blocks.filter((b) => b.type === "rich_text" && /^Step \d+Today/.test(textOf(b))).length, 12, "twelve steps");
-    assert.ok(json(v.blocks).includes("2 more steps change beyond these."));
+    const later = v.blocks.find((b) => b.type === "rich_text" && textOf(b).startsWith("2 more steps, as text"));
+    assert.ok(later, "the steps past twelve are one block of text");
+    for (const s of ["Step 13", "Step 14"]) {
+      assert.ok(textOf(later!).includes(`${s}: Added Lane 2 New in ${s}`), `${s}'s rows are in sight before Approve`);
+      assert.ok(textOf(later!).includes(`${s}: Added Lane 3 Also new in ${s}`));
+    }
     assert.ok(json(v.blocks).includes("and 6 more on the blueprint"), "a step's rows past forty are counted");
     assert.equal(v.blocks.at(-2)!.block_id, "uno_review_choice", "the decision is on the view");
   });
