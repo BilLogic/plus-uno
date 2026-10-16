@@ -119,6 +119,8 @@ const RowChevron = () => <i aria-hidden="true" className="fa-solid fa-caret-righ
  * - `group`: a heading over the options that follow it. Not focusable.
  *
  * The row fills its list's width, and its highlight spans the whole row.
+ * While a list is reordered, `dragging` lifts the row being moved and
+ * `dropIndicator` draws the line where it will land.
  *
  * Focus works two ways. In a list that keeps focus itself and points at the
  * highlighted row with `aria-activedescendant`, leave `tabbable` unset: the row
@@ -139,6 +141,8 @@ const OptionRow = ({
     disabled = false,
     highlighted = false,
     check = true,
+    dragging = false,
+    dropIndicator,
     leading,
     trailing,
     tabbable,
@@ -164,6 +168,9 @@ const OptionRow = ({
         selected ? 'is-selected' : '',
         highlighted ? 'is-highlighted' : '',
         disabled ? 'is-disabled' : '',
+        dragging ? 'is-dragging' : '',
+        dropIndicator === 'before' ? 'has-drop-indicator' : '',
+        dropIndicator === 'after' ? 'has-drop-indicator-after' : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -260,6 +267,14 @@ OptionRow.propTypes = {
     highlighted: PropTypes.bool,
     /** Draws a check at the end of a selected row. Multi-select lists turn it off and use a checkbox. */
     check: PropTypes.bool,
+    /** The row lifted by its handle while it is being reordered (Figma `state=dragging`). */
+    dragging: PropTypes.bool,
+    /**
+     * A line on the row's top (`before`) or bottom (`after`) edge marking where a
+     * dragged row lands. Figma's `drop indicator?` is `before`; `after` marks the
+     * end of the list.
+     */
+    dropIndicator: PropTypes.oneOf(['before', 'after']),
     /** Up to 4 items: `OptionRow.Indent`, `.Toggle`, `.Checkbox`, `.Radio`, an icon, an avatar or a drag handle. */
     leading: PropTypes.node,
     /** One item: a Count, a "…" menu, or `OptionRow.Chevron`. */

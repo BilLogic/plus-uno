@@ -58,6 +58,44 @@
     }
 }
 
+/*
+ * Reordering (Figma state=dragging and `drop indicator?`): the lifted row on
+ * Elevation Light/3 with an outline-variant border, and a primary line on the
+ * edge where the dragged row lands.
+ */
+.plus-option-row.is-dragging {
+    position: relative;
+    z-index: 1;
+    background-color: var(--color-surface-overlay);
+    box-shadow: var(--elevation-light-3);
+    outline: var(--size-element-border) solid var(--color-outline-variant);
+    outline-offset: calc(-1 * var(--size-element-border));
+    cursor: grabbing;
+}
+
+.plus-option-row.has-drop-indicator,
+.plus-option-row.has-drop-indicator-after {
+    position: relative;
+
+    &::before {
+        content: '';
+        position: absolute;
+        right: 0;
+        left: 0;
+        height: var(--size-element-stroke-lg);
+        background-color: var(--color-primary);
+        pointer-events: none;
+    }
+}
+
+.plus-option-row.has-drop-indicator::before {
+    top: 0;
+}
+
+.plus-option-row.has-drop-indicator-after::before {
+    bottom: 0;
+}
+
 .plus-option-row--group {
     padding-top: var(--size-element-pad-y-lg);
     color: var(--color-on-surface-variant);

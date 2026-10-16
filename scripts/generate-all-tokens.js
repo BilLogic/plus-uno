@@ -517,6 +517,7 @@ const CODE_ONLY_LAYERS = {
 const CODE_ONLY_DIMENSIONS = {
     'layout-max-width-listbox': { value: 320, note: 'widest a field or button popup grows; a popup with columns is exempt', figmaName: 'max-widths-listbox' },
     'layout-width-join-row': { value: 520, note: 'Home Join button with the session Select beside it', figmaName: 'widths-join-row' },
+    'layout-width-option-menu': { value: 240, note: 'the "…" menu on a TagInput row (Figma _Option menu)', figmaName: 'widths-option-menu' },
     'layout-control-checkbox': { value: 18, note: 'checkbox box', figmaName: 'controls-checkbox' },
     'layout-control-radio': { value: 12, note: 'radio dot', figmaName: 'controls-radio' },
     'layout-calendar-day-sm': { value: 28, note: 'calendar day, small picker', figmaName: 'calendar-day-sm' },

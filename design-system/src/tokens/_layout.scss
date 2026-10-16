@@ -29,6 +29,7 @@
     /* Fixed dimensions; not Figma variables (CODE_ONLY_DIMENSIONS) */
     --layout-max-width-listbox: 320px; /* widest a field or button popup grows; a popup with columns is exempt */
     --layout-width-join-row: 520px; /* Home Join button with the session Select beside it */
+    --layout-width-option-menu: 240px; /* the "…" menu on a TagInput row (Figma _Option menu) */
     --layout-control-checkbox: 18px; /* checkbox box */
     --layout-control-radio: 12px; /* radio dot */
     --layout-calendar-day-sm: 28px; /* calendar day, small picker */

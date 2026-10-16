@@ -91,10 +91,32 @@
 }
 
 .plus-listbox-body {
+    position: relative;
     flex: 1;
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
+}
+
+/*
+ * A row's own controls, laid over the highlighted row at its padding: the
+ * first child over the Leading slot, the last over the Trailing end. The band
+ * lets presses through to the row except on the controls themselves.
+ */
+.plus-listbox-row-actions {
+    position: absolute;
+    right: 0;
+    left: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--size-element-pad-x-sm);
+    pointer-events: none;
+
+    > * {
+        pointer-events: auto;
+    }
 }
 
 .plus-listbox-options {

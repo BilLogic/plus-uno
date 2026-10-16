@@ -27,7 +27,17 @@ export const figmaMeta = {
       "source": "manual",
       "status": "unpublished",
       "isComponentSet": true,
-      "notes": "3 sizes × 8 states: empty, filled, focus, typing, create, invalid, read-only and disabled. `size` is the code prop of the same name. `state` draws code's live states still: empty and filled are the tags, focus and typing are focus and the typed text, create is a Create row in the list, and invalid, read-only and disabled are `validation=\"invalid\"`, `readOnly` and `disabled`. Signed off; the library publishes it once the Specs file's text migration is ready, and the status becomes `verified` then."
+      "notes": "3 sizes × 10 states: empty, filled, focus, typing, create, option menu, reordering, invalid, read-only and disabled. `size` is the code prop of the same name. `state` draws code's live states still: empty and filled are the tags, focus and typing are focus and the typed text (the hovered row shows its \"…\" when the field has a menu handler), create is a Create row in the list, option menu is the `_Option menu` open from a row's \"…\" (`onRename`, `onDelete`, `onColorChange`), reordering is a row lifted by its handle with the drop line and the keys in the hint (`onReorder`), and invalid, read-only and disabled are `validation=\"invalid\"`, `readOnly` and `disabled`. The rows are Dropdown list Item, whose `state=dragging` and `drop indicator?` are OptionRow's `dragging` and `dropIndicator=\"before\"`. Signed off; the library publishes it once the Specs file's text migration is ready, and the status becomes `verified` then."
+    },
+    {
+      "id": "option-menu",
+      "name": "_Option menu",
+      "componentSetNodeId": "19150:44293",
+      "isComponentSet": false,
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19150-44293",
+      "source": "manual",
+      "status": "unpublished",
+      "notes": "The menu a TagInput row's \"…\" opens: a `_Listbox` whose Header holds a small field for the name, the Figma Form (code: `Input size=\"small\"`, Enter renames, Esc cancels), and whose Body holds Dropdown list Item rows: Delete with a trash icon and a divider, then a Colour heading and one row per Tag colour showing the Tag, the current one `state=selected`. It opens 4px under the \"…\", right-aligned to it. Each part shows only when its handler is passed."
     }
   ]
 };
@@ -83,6 +93,14 @@ from a list or adds, such as the topics a session covers.
 
 <DocsCanvasShell description={<>At `maxTags`, Create hides and the list says why.</>}>
     <DsCanvasQuiet of={TagInputStories.PickLimit} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Option menu: with `onRename`, `onDelete` or `onColorChange`, the row under the pointer or the highlight shows a "…". It opens a menu to rename the option, delete it, or pick one of Tag's seven colours.</>}>
+    <DsCanvasQuiet of={TagInputStories.OptionMenu} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Reordering: with `onReorder`, each row has a handle. Drag it, or Tab to it and press Space; the arrows move the row and a line marks where it lands.</>}>
+    <DsCanvasQuiet of={TagInputStories.Reordering} />
 </DocsCanvasShell>
 
 </div>
@@ -206,6 +224,32 @@ failure is announced.
 <TagInput label="Topics" options={topics} tags={picked} onChange={setPicked} />
 ```
 
+### Let people tidy options where they pick them.
+
+Pass a handler for each change the screen can store. The caller owns the
+options, so each handler updates the list. TagInput only reports the change.
+A field with none of them works as before, with no "…" and no handle.
+
+```jsx
+<TagInput
+    label="Topics"
+    options={topics}
+    onRename={(value, name) => setTopics((list) => list.map((t) => (t.value === value ? { ...t, label: name } : t)))}
+    onDelete={(value) => setTopics((list) => list.filter((t) => t.value !== value))}
+    onColorChange={(value, color) => setTopics((list) => list.map((t) => (t.value === value ? { ...t, color } : t)))}
+    onReorder={(from, to) => setTopics((list) => {
+        const next = [...list];
+        next.splice(to, 0, ...next.splice(from, 1));
+        return next;
+    })}
+/>
+```
+
+- **Delete** also removes a picked tag made from that option, through
+  `onChange` and `onRemove`. Rename and a colour change update that tag too.
+- **Reorder** works on the whole list, so the handles hide while text is
+  typed. `onReorder(fromIndex, toIndex)` gives places in `options`.
+
 ### A tag's colour is a Tag colour.
 
 The status names the chips once took (`success`, `danger` and the rest) are
@@ -222,6 +266,19 @@ Tag colour.
 | Backspace | In an empty entry, removes the last tag. |
 | Esc | Closes the list and clears only the typed text. The tags stay. |
 | Paste | Text with commas or line breaks becomes one tag per part, trimmed. |
+| Tab | With a handler for the menu or reordering, moves from the entry to the highlighted row's handle, then its "…". |
+
+On a row's handle and in its menu:
+
+| Key | Does |
+|-----|------|
+| Space or Enter on the handle | Picks the row up. |
+| ↑ ↓ | Move the picked-up row. |
+| Space or Enter | Drops it there. |
+| Esc | Cancels, and the row goes back. |
+| Enter on the "…" | Opens the menu with focus in the name. |
+| Enter in the name | Renames the option. After ↑ ↓, picks the highlighted row instead. |
+| Esc in the menu | Closes it without renaming, and focus goes back to the "…". |
 
 </div>
 
@@ -241,6 +298,15 @@ Tag colour.
   and the entry has `aria-invalid` and is described by it.
 - **Read-only and disabled leave nothing to press.** Neither draws a × or opens
   the list.
+- **A row's handle and "…" are real buttons.** They sit beside the listbox,
+  laid over the highlighted row, because an option's content is presentational
+  and a button inside one would be lost to a screen reader. They are named `Reorder <option>` and
+  `Options for <option>`, and the handle is described by its keys.
+- **Reordering is announced.** Picking up, each move, the drop and a cancel
+  each say the row and its position, such as "Design judgment dropped,
+  position 3 of 4".
+- **The menu takes focus and gives it back.** Opening it moves focus to the
+  name field. Closing it returns focus to the "…".
 
 </div>
 
