@@ -406,6 +406,54 @@ EscapeRefusedThenParentCloses.play = async ({ canvasElement }) => {
     await expect(closer, 'focus does not jump to the toggle').toHaveFocus();
 };
 
+/* --------------------------------------------------------------- placement */
+
+/** Open the story's one menu and return the toggle's box and the menu's. */
+const openAndMeasure = async (canvasElement, name) => {
+    const canvas = within(canvasElement);
+    const toggle = canvas.getByRole('button', { name });
+    await userEvent.click(toggle);
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    const menu = canvasElement.querySelector('.dropdown-menu');
+    await waitFor(() => expect(menu).toBeVisible());
+    return { toggle: toggle.getBoundingClientRect(), menu: menu.getBoundingClientRect() };
+};
+
+/**
+ * The popup placement rule: the menu opens `--size-element-gap-xs` below its
+ * toggle, with its left edge on the toggle's left edge.
+ */
+export const PlacementBelow = () => (
+    <div style={{ padding: '24px 24px 240px' }}>
+        <Dropdown buttonText="Opens below" items={basicItems} />
+    </div>
+);
+
+PlacementBelow.play = async ({ canvasElement }) => {
+    const gap = tokenLength(canvasElement, '--size-element-gap-xs');
+    const { toggle, menu } = await openAndMeasure(canvasElement, 'Opens below');
+    await expect(menu.top - toggle.bottom, 'the gap below the toggle').toBeCloseTo(gap, 0);
+    await expect(menu.left, 'left edges line up').toBeCloseTo(toggle.left, 0);
+};
+
+/**
+ * With no room below, the menu flips above its toggle and keeps the same
+ * `--size-element-gap-xs` gap.
+ */
+export const PlacementFlippedAbove = () => (
+    <div style={{ height: '100vh', display: 'flex', alignItems: 'flex-end', padding: '240px 24px 0', boxSizing: 'border-box' }}>
+        <Dropdown buttonText="Opens above" items={basicItems} />
+    </div>
+);
+
+PlacementFlippedAbove.play = async ({ canvasElement }) => {
+    const gap = tokenLength(canvasElement, '--size-element-gap-xs');
+    const { toggle, menu } = await openAndMeasure(canvasElement, 'Opens above');
+    await expect(menu.bottom, 'the menu flipped above').toBeLessThanOrEqual(toggle.top);
+    await expect(toggle.top - menu.bottom, 'the gap above the toggle').toBeCloseTo(gap, 0);
+    await expect(menu.left, 'left edges line up').toBeCloseTo(toggle.left, 0);
+};
+
 /* ------------------------------------------------------------- menu rows */
 
 /**
