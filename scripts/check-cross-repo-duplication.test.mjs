@@ -294,9 +294,8 @@ test('an exemption whose OWN repos were both read is still asserted', () => {
   // The regression: suspension was gated on ALL THREE repos being reachable, so
   // one missing sibling silenced every entry — including a pair whose own two
   // repos had both been read and whose shared-word count had just been
-  // computed. harness-integrity-sweep.yml clones with continue-on-error, which
-  // makes a single absent repo a normal month rather than an exceptional one,
-  // so a deduplicated pair could survive as a stale entry indefinitely.
+  // computed. A single absent repo is a normal state rather than an
+  // exceptional one, so a deduplicated pair could survive as a stale entry indefinitely.
   //
   // Every RECORDED entry is blueprint↔sb, so dropping plus-uno leaves them all
   // fully reachable while the run as a whole is not. Counted from the list

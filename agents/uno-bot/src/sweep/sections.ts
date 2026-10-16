@@ -1,7 +1,8 @@
 // What other morning jobs hand the sweep's post: their cards for a place, to
 // go up on that place's one message.
 //
-// ONE MESSAGE A PLACE. The card follow-ups, the weekly DS precedence report,
+// ONE MESSAGE A PLACE. The card follow-ups, Monday's stuck cards, the weekly
+// DS precedence report,
 // the Figma comment decisions, the Figma drift questions and the weekly Figma
 // tidy-up each used to post on their own. Now each job that finds them runs
 // before `sweep-post` and leaves its cards here, by place — a channel's top, or
@@ -51,6 +52,10 @@ export interface SectionCards extends SectionPlace {
   whole?: boolean;
   /** How long its cards stay decidable, so the report's record outlives them. */
   ttlMs?: number;
+  /** Its cards past the carousel's room go up in the message's thread that
+   *  morning, by its own job, so the opener says "+N more in the thread"
+   *  rather than "in the next report". */
+  overflowInThread?: boolean;
   /** Lines with no card of their own, said under the opener (a pointer to a
    *  card in another thread). */
   lines?: string[];
@@ -92,6 +97,10 @@ export interface SweepSection {
 
 /** The card follow-ups' section (`../follow-through/`). */
 export const FOLLOW_UPS_SECTION = "follow-ups";
+
+/** The stuck Roadmap cards' weekly section, Monday's only, shown whole
+ *  (`../follow-through/`). */
+export const STALE_CARDS_SECTION = "stale-cards";
 
 /** A place as one key: `<channel>:<thread ts>`, empty for a channel's top. */
 export function placeKeyOf(place: SectionPlace): string {
@@ -197,7 +206,7 @@ export interface HandedSectionSpec<P> {
   date: string;
   handOff: SectionHandOff<P>;
   /** The place's cards and what the opener says of them. */
-  cardsOf(value: P): Pick<SectionCards, "cards" | "says"> & Partial<Pick<SectionCards, "whole" | "ttlMs" | "lines" | "cost">>;
+  cardsOf(value: P): Pick<SectionCards, "cards" | "says"> & Partial<Pick<SectionCards, "whole" | "ttlMs" | "lines" | "cost" | "overflowInThread">>;
   /** The cards it showed, by item id, staged, and the rest kept. Each card
    *  `progress` holds was handled by an earlier try: it is not staged again,
    *  and counts as it came out. Each card handled now is marked at once. */

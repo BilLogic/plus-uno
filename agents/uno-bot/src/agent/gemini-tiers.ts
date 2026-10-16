@@ -10,6 +10,9 @@
 //   gemini-3.5-flash-lite   accepts minimal|low|medium|high, defaults to minimal
 //   gemini-3.8-flash        accepts         low|medium|high, defaults to medium
 //   gemini-3.1-pro-preview  accepts         low|medium|high, defaults to high
+// and 2026-10-15 at the Vertex model page for gemini-4-argon (GA 2026-10-13,
+// served on `global`):
+//   gemini-4-argon          accepts         low|medium|high, defaults to medium
 //
 // chill runs ONE RUNG ABOVE flash-lite's own default. A chill turn is the one
 // that resolves a gated proposal ("yes please" against a staged notion_create),
@@ -38,7 +41,7 @@ export interface GeminiTierConfig {
 export const GEMINI_TIERS: Record<ModelTier, GeminiTierConfig> = {
   chill: { model: "gemini-3.5-flash-lite", level: "low" },
   default: { model: "gemini-3.8-flash", level: "medium" },
-  grind: { model: "gemini-3.1-pro-preview", level: "high" },
+  grind: { model: "gemini-4-argon", level: "high" },
 };
 
 /** The subset of Env the tier resolution reads. Each model is overridable so
@@ -84,10 +87,18 @@ export interface GeminiDials {
  * changes underneath it, and the level is re-derived against the new model.
  */
 export function geminiDials(tier: ModelTier, model: string): GeminiDials {
-  const isGemini3 = /^gemini-3/.test(model);
+  const takesDials = takesThinkingLevel(model);
   return {
     model,
-    thinkingLevel: isGemini3 ? GEMINI_TIERS[tier].level : null,
-    builtinSearchTools: isGemini3 ? [{ googleSearch: {} }, { urlContext: {} }] : [],
+    thinkingLevel: takesDials ? GEMINI_TIERS[tier].level : null,
+    builtinSearchTools: takesDials ? [{ googleSearch: {} }, { urlContext: {} }] : [],
   };
+}
+
+/** Whether `model` takes the thinking_level dial: Gemini 3 and later. The
+ *  2.x generation 400s on it, so the gate is on the generation number, not on
+ *  one family's prefix — a `^gemini-3` test silently sent Gemini 4 no level. */
+export function takesThinkingLevel(model: string): boolean {
+  const generation = /^gemini-(\d+)/.exec(model)?.[1];
+  return generation !== undefined && Number(generation) >= 3;
 }

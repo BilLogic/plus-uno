@@ -21,6 +21,7 @@ import {
   type TurnRecordFacts,
   withAskLabel,
 } from "../src/usage/index";
+import { GEMINI_TIERS } from "../src/agent/gemini-tiers";
 import type { TurnDisposition } from "../src/turn/index";
 import { conversationTypeOf } from "../src/turn/request";
 import { slackTurnRequest } from "../src/slack/turn-request";
@@ -109,6 +110,17 @@ test("Claude's cache reads arrive apart from its input count", () => {
 test("a dated rate gives way to the next one", () => {
   assert.equal(ratesFor("gemini-3.8-flash", SEP_2026)?.input, 0.75);
   assert.equal(ratesFor("gemini-3.8-flash", Date.UTC(2027, 0, 1))?.input, 1.5);
+});
+
+test("every tier's default model is priced, so no tier's turns read as unpriced", () => {
+  for (const [tier, cfg] of Object.entries(GEMINI_TIERS)) {
+    assert.notEqual(ratesFor(cfg.model, SEP_2026), null, `${tier}: ${cfg.model} is unpriced`);
+  }
+});
+
+test("Gemini 4 Argon's launch rate gives way on 1 December 2026", () => {
+  assert.deepEqual(ratesFor("gemini-4-argon", Date.UTC(2026, 10, 30)), { input: 2, output: 10, cachedInput: 0.1 });
+  assert.deepEqual(ratesFor("gemini-4-argon", Date.UTC(2026, 11, 1)), { input: 4, output: 20, cachedInput: 0.2 });
 });
 
 test("a Vertex snapshot suffix is priced as its model", () => {

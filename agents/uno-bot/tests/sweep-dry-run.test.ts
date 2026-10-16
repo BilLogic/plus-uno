@@ -140,7 +140,7 @@ test("the probe dry-runs the named run's jobs", async () => {
   const body = report.body as { ok: boolean; run: string; planned: unknown[]; jobs: { key: string; outcome: string; subrequests: number }[] };
   assert.equal(body.ok, true);
   assert.equal(body.run, "morning");
-  assert.equal(body.planned.length, 10);
+  assert.equal(body.planned.length, 13);
   assert.deepEqual(body.jobs.map((j) => [j.key, j.outcome, j.subrequests]), [
     ["commitment-nudge", "handled", 0],
     ["ds-precedence-post", "handled", 0],
@@ -151,7 +151,13 @@ test("the probe dry-runs the named run's jobs", async () => {
     // Every morning: the week's tidy-up cards that had no room yet.
     ["figma-tidy-post", "handled", 0],
     ["figma-dev-links-post", "handled", 0],
+    // No HARNESS_KV bound: no revisions kept, nothing handed over.
+    ["blueprint-revision-post", "handled", 0],
+    ["blueprint-proposal-offer", "handled", 0],
     ["sweep-post", "handled", 0],
+    // No HARNESS_KV bound: nothing to put in a thread.
+    ["blueprint-revision-thread", "handled", 0],
+    // No blueprint configured: no removal offered, nothing spent.
     // No Notion key: the roster read refuses before spending anything.
     ["team-roles-sync", "handled", 0],
     // No usage database bound: nothing to purge, nothing spent.
@@ -169,11 +175,11 @@ test("Monday's morning plans the role-map sync and no weekly gaps DM", async () 
   assert.deepEqual(keys.filter((k) => /gap/.test(k)), []);
 });
 
-test("the probe rehearses another weekday's jobs: Friday's DS precedence check on any day", async () => {
+test("the probe rehearses another weekday's jobs: Monday's DS precedence check on any day", async () => {
   // Unconfigured, so the check says so and spends nothing — what matters is
   // that it is planned second, before the batches spend the ceiling, and
   // rehearsed, not skipped.
-  const url = new URL("https://w/debug/sweep?dry_run=1&run=end-of-day&weekday=fri");
+  const url = new URL("https://w/debug/sweep?dry_run=1&run=end-of-day&weekday=mon");
   const report = await runMetered(() => sweepProbe({} as Env, url, new Request(url)));
   assert.ok("body" in report);
   const body = report.body as {

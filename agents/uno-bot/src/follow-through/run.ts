@@ -2,7 +2,8 @@
 //
 // Each is a `commitments` row of its own kind (`../commitments/store.ts`), so
 // it shares a promise's life: detected at the end of the day, nudged at the
-// next weekday morning run (9 am ET), one follow-up at most, then `lapsed`,
+// next weekday morning run (9 am ET) — an F5's first ask the next Monday's
+// (`isStaleCheckInMorning`) — one follow-up at most, then `lapsed`,
 // and at most `MAX_REMINDERS_PER_PERSON` reminders a person a morning, counted
 // across promises and cards alike. The commitment job schedules them and
 // hands each to this module (`CardFollowUps`).
@@ -39,7 +40,9 @@
 //   run's own runner storage, one key a morning, `handOffIn`), `flush` leaves
 //   the cards for a channel's top there, and `sweep-post`, queued after this
 //   job, puts them on that channel's report beside its fixes: a bullet per
-//   person, one carousel (`followUpsForSweep`, `sweep/run.ts`). A channel the
+//   person, one carousel (`followUpsForSweep`, `sweep/run.ts`). Monday's
+//   F5 cards wait under a key of their own (`DueDeps.weeklyHandOff`) and go
+//   up as a whole section (`STALE_CARDS_SECTION`). A channel the
 //   sweep has no report for gets them alone, as this job would have posted
 //   them. A sweep report claims a channel's cards before it posts, so a
 //   retried post finds them by its card key and never sends them twice. A
@@ -83,7 +86,7 @@ import type { ProposalCard } from "../turn/index";
 import type { PendingProposal, ProposalOperation, ProposalSelect, ReportItem, ReviewChoice, ThreadState } from "../thread-state/index";
 import { decisionReport, itemProposal, markNotStaged, MAX_REPORT_ITEMS, reportRecord, roundRobin, type ReportStore } from "../slack/decision-cards";
 import type { RunnerStorage } from "../runner/storage";
-import { FOLLOW_UPS_SECTION, isAloneKey, type SectionCards, type SweepSection } from "../sweep/sections";
+import { FOLLOW_UPS_SECTION, isAloneKey, STALE_CARDS_SECTION, type SectionCards, type SweepSection } from "../sweep/sections";
 import { renderProposalCard } from "../slack/proposal-render";
 import { reminderBlocks, TAP_REFUSED, type TapAnswer } from "../commitments/copy";
 import { addWorkingDays, commitmentDueAt, endOfEtDay, etDayOf, maySnooze, TEXT_KEEP_MS } from "../commitments/due";
@@ -116,6 +119,7 @@ import {
   cardCondition,
   cardFollowUpId,
   isActive,
+  isStaleCheckInMorning,
   matchesTodo,
   MAX_CARD_POSTS_PER_CHANNEL,
   mayFollowUpCard,
@@ -385,7 +389,7 @@ async function scanCard(
 
 /** The channel a card's follow-up goes to: `pickDestination` with no thread,
  *  so by its pillar. */
-function cardPlace(card: Pick<ActiveCard, "url" | "title" | "pillars">, config: FollowThroughConfig): string | null {
+export function cardPlace(card: Pick<ActiveCard, "url" | "title" | "pillars">, config: FollowThroughConfig): string | null {
   const destination = pickDestination({
     evidence: { channel: "", channelKind: "public", threadTs: null, messageTs: [], permalinks: [] },
     target: { url: card.url, kind: "notion", writable: true, title: card.title, pillars: card.pillars },
@@ -652,6 +656,10 @@ export interface DueDeps {
   /** Where the cards for a channel's top wait for the sweep's morning post;
    *  absent, `flush` posts them itself. */
   handOff?: FollowUpHandOff;
+  /** Where Monday's stuck cards for a channel's top wait, as the weekly
+   *  section of their own (`STALE_CARDS_SECTION`); absent, they wait with
+   *  the rest in `handOff`. */
+  weeklyHandOff?: FollowUpHandOff;
   dryRun?: boolean;
 }
 
@@ -675,18 +683,18 @@ export interface HandedOff {
   claimedBy?: string;
 }
 
-/** Where a morning's hand-off is kept in the run's storage. */
-const HAND_OFF_PREFIX = "follow-ups:";
-
 /**
- * The hand-off in the morning run's runner storage: one key a morning, its
- * places by channel, read and written whole by that exact key — consistent
- * between the run's alarms, which share the instance.
+ * The hand-off in the morning run's runner storage: one key a section a
+ * morning (`<section>:<date>`), its places by channel, read and written whole
+ * by that exact key — consistent between the run's alarms, which share the
+ * instance.
  *
  * @param storage - The run's storage (`JobContext.runStorage`)
+ * @param section - Whose hand-off: the daily follow-ups', or Monday's stuck
+ *   cards' (`STALE_CARDS_SECTION`)
  */
-export function handOffIn(storage: Pick<RunnerStorage, "get" | "put" | "delete">): FollowUpHandOff {
-  const keyOf = (runDate: string) => `${HAND_OFF_PREFIX}${runDate}`;
+export function handOffIn(storage: Pick<RunnerStorage, "get" | "put" | "delete">, section: string = FOLLOW_UPS_SECTION): FollowUpHandOff {
+  const keyOf = (runDate: string) => `${section}:${runDate}`;
   const read = async (runDate: string) => new Map(Object.entries((await storage.get<Record<string, HandedOff>>(keyOf(runDate))) ?? {}));
   const write = async (runDate: string, places: Map<string, HandedOff>) => {
     if (places.size) await storage.put(keyOf(runDate), Object.fromEntries(places));
@@ -773,8 +781,16 @@ export function cardFollowUps(deps: DueDeps): CardFollowUps {
       const actions: CommitmentAction[] = [];
       for (const [key, group] of morning.groups) {
         if (deps.handOff && !group.to.threadTs) {
-          // The sweep's post puts them on the channel's one message.
-          await deps.handOff.put(runDate, group);
+          // The sweep's post puts them on the channel's one message: Monday's
+          // stuck cards as a weekly section of their own, shown whole.
+          const weekly = group.asked.filter((a) => a.c.kind === "card_stale");
+          const daily = group.asked.filter((a) => a.c.kind !== "card_stale");
+          if (weekly.length && deps.weeklyHandOff) {
+            await deps.weeklyHandOff.put(runDate, { ...group, asked: weekly });
+            if (daily.length) await deps.handOff.put(runDate, { ...group, asked: daily });
+          } else {
+            await deps.handOff.put(runDate, group);
+          }
           for (const a of group.asked) {
             morning.held.delete(a.c.id);
             actions.push({ id: a.c.id, action: "held", note: HANDED_OFF });
@@ -827,6 +843,14 @@ export async function cardFollowUpDue(
   const settle = async (patch: Parameters<CommitmentStore["update"]>[1]): Promise<void> => {
     if (!deps.dryRun) await deps.store.update(c.id, { checkedOn: runDate, ...patch });
   };
+  // A stuck card's first ask is weekly: it waits, unread and still open, for
+  // Monday's morning. Its follow-up and a snooze's ask go in its own thread on
+  // their own rhythm, as every card's do.
+  const firstAtTop = c.nudges === 0 && !c.threadTs && !c.nudgeTs;
+  if (kind === "card_stale" && firstAtTop && !isStaleCheckInMorning(now)) {
+    await settle({});
+    return { id: c.id, action: "held", note: "a stuck card is first asked on Monday's morning" };
+  }
   if (c.channel === deps.config.unoBot) {
     await settle({ state: "lapsed", resolvedAt: now });
     return { id: c.id, action: "refused", note: "never posted in #uno-bot" };
@@ -875,10 +899,12 @@ export async function cardFollowUpDue(
   const group = groups.get(key);
   // A card's question and a note's offer open a thread at the channel's top,
   // at most a few cards a morning; the rest wait a morning, which is no hold.
+  // Monday's stuck cards are a weekly section, never split: none is held
+  // back here, and none counts against the rest.
   const opened = [...groups.values()]
     .filter((g) => !g.to.threadTs && g.to.channel === c.channel)
-    .reduce((n, g) => n + g.asked.filter((a) => a.c.nudges === 0).length, 0);
-  if (first && !to.threadTs && opened >= MAX_CARD_POSTS_PER_CHANNEL) {
+    .reduce((n, g) => n + g.asked.filter((a) => a.c.nudges === 0 && a.c.kind !== "card_stale").length, 0);
+  if (first && !to.threadTs && kind !== "card_stale" && opened >= MAX_CARD_POSTS_PER_CHANNEL) {
     await settle({});
     return { id: c.id, action: "held", note: "the channel's card follow-ups for this morning are posted; tomorrow" };
   }
@@ -1088,7 +1114,8 @@ const HANDED_OFF = "handed to the sweep's morning post";
 /**
  * The cards the commitment job handed over, for the sweep's morning post
  * (`SweepFollowUps`): each channel's cards, and what the opener says of a
- * person's. A sweep report claims a place before it posts, and finds it again
+ * person's. With `weekly`, Monday's stuck cards (`STALE_CARDS_SECTION`), a
+ * section shown whole, out of `DueDeps.weeklyHandOff`. A sweep report claims a place before it posts, and finds it again
  * by its card key on a retry; a place is cleared from the hand-off before its
  * rows are asked, so a stop past that point leaves them checked and not
  * asked, and they come back the next morning.
@@ -1096,13 +1123,16 @@ const HANDED_OFF = "handed to the sweep's morning post";
  * @param deps - Its reads, Slack, store and the hand-off
  * @param now - Now, epoch ms
  * @param runDate - The morning's date
+ * @param opts - `weekly` for Monday's stuck cards' section
  */
-export function followUpsForSweep(deps: DueDeps, now: number, runDate: string): SweepSection {
-  const handOff = deps.handOff;
+export function followUpsForSweep(deps: DueDeps, now: number, runDate: string, opts: { weekly?: boolean } = {}): SweepSection {
+  const handOff = opts.weekly ? deps.weeklyHandOff : deps.handOff;
+  const source = opts.weekly ? STALE_CARDS_SECTION : FOLLOW_UPS_SECTION;
   const dateOf = (cardKey: string) => cardKey.slice(0, 10);
   const cardsOf = (date: string, group: FollowUpGroup): SectionCards => ({
-    source: FOLLOW_UPS_SECTION,
+    source,
     date,
+    ...(opts.weekly ? { whole: true } : {}),
     channel: group.to.channel,
     threadTs: group.to.threadTs,
     cards: group.asked.map((a) => ({ person: a.c.promiserId, item: a.item })),
@@ -1123,7 +1153,7 @@ export function followUpsForSweep(deps: DueDeps, now: number, runDate: string): 
     return kept.group;
   };
   return {
-    source: FOLLOW_UPS_SECTION,
+    source,
     async waiting() {
       const places = (await handOff?.places(runDate)) ?? new Map<string, HandedOff>();
       return [...places.values()].filter((p) => !p.claimedBy).map((p) => cardsOf(runDate, p.group));

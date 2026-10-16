@@ -34,6 +34,7 @@ import type { GateVerdict, OperationOutcome } from "../gate/index";
 import { proposalOperations, stagingCardOf, type PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { offerSweepShareFor, recordSweepResolutionFor } from "../sweep/env";
+import { recordDrawnProposalFor } from "../blueprint-upkeep/env";
 import { sweepPostMetadata } from "../sweep/cards";
 import { dmResultTag } from "../dm-sweep/run";
 import {
@@ -204,6 +205,9 @@ async function runWonVerdict(
   // refused because the block moved since the read, or failed. Best-effort,
   // and before anything below can return early.
   await recordSweepResolutionFor(env, pending, outcomes);
+  // A blueprint proposal's rows are kept by its thread, for linking them to
+  // the Roadmap card its PRD becomes and for offering their removal.
+  await recordDrawnProposalFor(env, pending, outcomes);
   await onBatchBack(outcomes);
 
   // Past the batch every operation has come back, or the fence stopped it, so

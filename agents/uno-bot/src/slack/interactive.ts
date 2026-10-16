@@ -52,7 +52,7 @@ import { FIELD_ACTION_ID, type OptionSource } from "./review-fields";
 import { canonicalNotionUrl, databaseOptions } from "../integrations/notion";
 import type { NotionDatabaseLinks } from "./review-notion-create";
 import { proposalReplyThread, type PendingProposal } from "../thread-state/index";
-import { conversationKey, enqueueAgentJob, replyHandlerAt } from "./events";
+import { conversationKey, enqueueAgentJob, replyHandlerAt, reviewNoteHandler } from "./events";
 import type { SlackMessageEvent } from "./types";
 import { isPrecedenceCard } from "../ds-precedence/dispute";
 import { disputeOnEnv } from "../tools/ds-precedence-intake";
@@ -389,10 +389,10 @@ async function reviseFromReview(
         thread_ts: thread,
         revises: proposal.proposalTs,
       };
-      // A Figma comment decision revises its own way: its handler takes the
-      // note at the head of the job (`figma-comments/revise.ts`). Every other
-      // card goes to the turn, as before.
-      const own = (await replyHandlerAt(env, event)) === "figma-decisions" ? "figma-decisions" : null;
+      // A Figma comment decision and a blueprint revision revise their own
+      // way: their thread's handler takes the note at the head of the job.
+      // Every other card goes to the turn, as before.
+      const own = reviewNoteHandler(await replyHandlerAt(env, event));
       await enqueueAgentJob(env, { kind: "message", event, reply: own }, conversationKey(event));
     },
     updateCard: async (message) => {

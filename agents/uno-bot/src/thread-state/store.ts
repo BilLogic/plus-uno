@@ -261,6 +261,14 @@ export interface PendingProposal {
    */
   confirmers?: string[];
   /**
+   * Set when `confirmers` is the whole set: the deployment's standing
+   * confirmers are NOT added (`cardConfirmers`). For a card only particular
+   * people may decide — a blueprint revision is its card owner's and the lead's,
+   * a drawn proposal its requester's. Absent, the card keeps the rule every
+   * other card has. Meaningless without `confirmers`.
+   */
+  exclusiveConfirmers?: true;
+  /**
    * Set by the store, never by a stager: a confirmer pressed Needs changes and
    * the revision is being written (`ThreadState.markRevising`). The card stays
    * findable, for the revision turn that replaces it, and is decided by no one
@@ -702,7 +710,7 @@ export interface SweepShare {
   pages: Array<{ url: string; title: string; to: ChannelRole }>;
 }
 
-export type ProposalTerms = Pick<PendingProposal, "ttlMs" | "confirmers">;
+export type ProposalTerms = Pick<PendingProposal, "ttlMs" | "confirmers" | "exclusiveConfirmers">;
 
 /** How long a proposal stays confirmable: its own `ttlMs`, or the hour. */
 export function proposalTtlMs(proposal: Pick<PendingProposal, "ttlMs">): number {
@@ -764,7 +772,7 @@ export function ownBlocks(posted: { blocks?: unknown[] }): { proposalBlocks?: un
  * person behind it is refused, since the set cannot be checked against it.
  */
 export function mayConfirm(
-  proposal: Pick<PendingProposal, "confirmers" | "channel">,
+  proposal: Pick<PendingProposal, "confirmers" | "exclusiveConfirmers" | "channel">,
   userId: string | undefined,
   standing: readonly string[] = [],
 ): boolean {
@@ -776,17 +784,18 @@ export function mayConfirm(
 /**
  * Everyone who may resolve a card with a confirmer set: its own confirmers,
  * then the deployment's standing confirmers (`STANDING_CONFIRMER_IDS`), each
- * once. Null for a card with no set, which anyone may resolve. The standing
+ * once — unless the card's set is exclusive, when its own people are the
+ * whole answer. Null for a card with no set, which anyone may resolve. The standing
  * set is read at resolution, never stored on the card, so a change to it
  * reaches cards already open — and it never reaches a card in a 1:1 DM, which
  * is the person's own and nobody else's.
  */
 export function cardConfirmers(
-  proposal: Pick<PendingProposal, "confirmers" | "channel">,
+  proposal: Pick<PendingProposal, "confirmers" | "exclusiveConfirmers" | "channel">,
   standing: readonly string[] = [],
 ): string[] | null {
   if (!proposal.confirmers) return null;
-  if (isImChannel(proposal.channel)) return [...proposal.confirmers];
+  if (proposal.exclusiveConfirmers || isImChannel(proposal.channel)) return [...proposal.confirmers];
   return [...new Set([...proposal.confirmers, ...standing])];
 }
 
@@ -808,6 +817,7 @@ export function inheritedTerms(replaced: ProposalTerms | null | undefined): Prop
   return {
     ...(replaced?.ttlMs !== undefined ? { ttlMs: replaced.ttlMs } : {}),
     ...(replaced?.confirmers ? { confirmers: [...replaced.confirmers] } : {}),
+    ...(replaced?.confirmers && replaced.exclusiveConfirmers ? { exclusiveConfirmers: true as const } : {}),
   };
 }
 
@@ -1541,6 +1551,21 @@ export interface ThreadState {
   /** Settle a claimed filing: the issue it filed, or null to release the
    *  claim with nothing filed. */
   settleFiling(key: string, issue: FiledIssue | null): Promise<void>;
+
+  // ----- one comparison per scenario per thread -----
+
+  /**
+   * Claim the one blueprint comparison a thread gets for a scenario
+   * (`blueprint-upkeep/milestone.ts`): true the first time, and recorded in
+   * the same step, so of two racing turns one shows it. Kept as long as the
+   * thread's memory (`HISTORY_TTL_MS`).
+   */
+  claimComparison(ref: ThreadRef, scenario: string): Promise<boolean>;
+}
+
+/** The record a thread's one comparison for a scenario is kept under. */
+export function comparisonKey(ref: ThreadRef, scenario: string): string {
+  return `cmp:${ref.channel}:${ref.thread}:${scenario.trim().toLowerCase()}`;
 }
 
 // ── One filing per key ───────────────────────────────────────────────────────

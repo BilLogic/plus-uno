@@ -15,7 +15,7 @@ apart.
 |---|---|---|---|
 | `chill` | `gemini-3.5-flash-lite` | **low** | minimal |
 | `default` | `gemini-3.6-flash` (→ `gemini-3.8-flash` with #416) | **medium** | medium |
-| `grind` | `gemini-3.1-pro-preview` | **high** | high |
+| `grind` | `gemini-3.1-pro-preview` (→ `gemini-4-argon`, 2026-10-15) | **high** | high (Argon: medium) |
 
 The level is a property of the tier and lives in code
 (`agents/uno-bot/src/agent/gemini-tiers.ts`); only the model is overridable
@@ -99,6 +99,18 @@ the draft judge's 25s timer, so six of six judged drafts that day shipped
 unread, the shortest 2,729 characters. The draft judge names `default` now —
 still a tier, still no level of its own, so the rule above holds; only which
 tier changed. The eval judge stays on `grind`: it has no Turn waiting on it.
+
+**Grind moved to Gemini 4 (2026-10-15).** Grind's model is `gemini-4-argon`
+(GA on Vertex 2026-10-13, served on `global`), still at `high`; this is the
+only tier changed, so a regression in grind turns is attributed to it.
+Argon's own default is `medium`, so grind now sits one rung above its model's
+default, the way chill does. Argon accepts `low|medium|high` and 400s on
+`minimal`, the same contract as the 3.x flash and pro models. The dial gate
+reads the generation number rather than a `gemini-3` prefix:
+`takesThinkingLevel` in `gemini-tiers.ts` is shared with `gemini/client.ts`,
+so a fallback re-derives the dials for any model of generation 3 or later. That
+gate is the reason for the change: a prefix test would have sent Argon no
+level at all. `GEMINI_GRIND_MODEL` still swaps the model without a deploy.
 
 `docs/plans/2026-08-07-006` stays as written; it is the record of the decision
 this one reverses, and the "one dial, held constant" reasoning in it is the

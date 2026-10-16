@@ -105,7 +105,7 @@ jobs:
           TITLE="uno-bot embed-blueprint: nightly backfill is blocked"
 
           # `gh issue create --label X` errors when the label is missing —
-          # ensure it idempotently, same as harness-integrity-sweep.
+          # ensure it idempotently.
           gh label create automation-blocked --repo "$GITHUB_REPOSITORY" \
             --description "A scheduled automation could not run — ops signal, not a design intake" \
             --color B60205 || true

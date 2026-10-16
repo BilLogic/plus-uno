@@ -24,7 +24,7 @@ test("a short reply to a pending proposal runs chill at low", () => {
 test("'think harder' runs grind at high", () => {
   const d = dialsFor("Think harder about this: what is the difference between Card and Surface?", false);
   assert.equal(d.tier, "grind");
-  assert.equal(d.model, "gemini-3.1-pro-preview");
+  assert.equal(d.model, "gemini-4-argon");
   assert.equal(d.thinkingLevel, "high");
 });
 
@@ -48,6 +48,20 @@ test("the level belongs to the tier and survives a model fallback", () => {
   // the dial recomputes to "none sent" there rather than being carried blind.
   assert.equal(geminiDials("grind", "gemini-2.5-pro").thinkingLevel, null);
   assert.deepEqual(geminiDials("grind", "gemini-2.5-pro").builtinSearchTools, []);
+});
+
+test("Gemini 4 takes the dials a Gemini 3 model does", () => {
+  // gemini-4-argon accepts low|medium|high and 400s on minimal (Vertex model
+  // page, read 2026-10-15) — the same dial contract as 3.x flash and pro, so
+  // the tier's level and the built-in search tools go on the wire.
+  assert.equal(geminiDials("grind", "gemini-4-argon").thinkingLevel, "high");
+  assert.deepEqual(geminiDials("grind", "gemini-4-argon").builtinSearchTools, [
+    { googleSearch: {} },
+    { urlContext: {} },
+  ]);
+  // A grind turn that falls back to the 3.x backup re-derives against it and
+  // keeps the tier's level.
+  assert.equal(geminiDials("grind", "gemini-3.7-flash").thinkingLevel, "high");
 });
 
 test("env overrides the model and never the level", () => {
