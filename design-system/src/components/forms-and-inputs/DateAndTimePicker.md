@@ -34,7 +34,7 @@
 | `minDate` | string or instanceOf | — | — |
 | `maxDate` | string or instanceOf | — | — |
 | `calendarAlign` | enum | `'left'` | — |
-| `timeZone` | string | — | The viewer's IANA time zone, such as `America/New_York`; defaults to the browser's. |
+| `timeZone` | string | — | The viewer's IANA time zone, such as `America/New_York`; defaults to the browser's, as does a zone the browser does not know, which also hides the caption. |
 | `showTimeZone` | bool | `true` | Name the viewer's zone under the time: "Eastern Time (ET)". |
 | `otherTimeZone` | string | — | The other person's IANA zone; when it differs, the caption adds their time. |
 | `otherPerson` | string | — | Who the other person is, as the caption says it: "the student". |

@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect } from 'vitest';
-import { timeZoneCaption, wallTimeToUtc, zoneName } from './timeZones';
+import { knownZone, timeZoneCaption, wallTimeToUtc, zoneName } from './timeZones';
 
 const oct21 = new Date(Date.UTC(2026, 9, 21, 12));
 
@@ -41,5 +41,20 @@ describe('timeZoneCaption', () => {
         expect(timeZoneCaption({
             timeZone: 'America/Los_Angeles', otherTimeZone: 'America/New_York', otherPerson: 'the student', at: oct21,
         })).toBe('Pacific Time (PT)');
+    });
+
+    it('leaves the other person out when their zone is not a real one', () => {
+        expect(timeZoneCaption({
+            timeZone: 'America/New_York', otherTimeZone: 'Sample', otherPerson: 'the student', utc: '2026-10-21T20:00:00.000Z',
+        })).toBe('Eastern Time (ET)');
+    });
+});
+
+describe('knownZone', () => {
+    it('keeps a real IANA zone and drops anything else', () => {
+        expect(knownZone('America/New_York')).toBe('America/New_York');
+        expect(knownZone('Sample')).toBeNull();
+        expect(knownZone('')).toBeNull();
+        expect(knownZone(undefined)).toBeNull();
     });
 });

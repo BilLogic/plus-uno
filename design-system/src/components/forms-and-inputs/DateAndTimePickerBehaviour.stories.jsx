@@ -106,3 +106,37 @@ TimeZoneCaption.play = async ({ args, canvasElement }) => {
     await expect(last.utc).toBe('2026-10-21T08:00:00.000Z');
     await expect(canvas.getByText('Pacific Time (PT) · 4:00 AM for the student (ET)')).toBeVisible();
 };
+
+/**
+ * A zone the browser does not know falls back to the viewer's own and drops the
+ * caption rather than throwing: a stored zone can be stale or mistyped.
+ */
+export const UnknownTimeZone = (args) => (
+    <div style={{ maxWidth: '296px' }}>
+        <DateAndTimePicker
+            data-testid="tz-unknown"
+            label="Session time"
+            dateValue="2026-10-21"
+            timeValue="01:00 PM"
+            timeZone="Sample"
+            otherTimeZone="Sample"
+            otherPerson="the student"
+            onChange={args.onChange}
+        />
+    </div>
+);
+UnknownTimeZone.args = { onChange: fn() };
+
+UnknownTimeZone.play = async ({ args, canvasElement }) => {
+    const field = within(canvasElement).getByTestId('tz-unknown');
+
+    await expect(field.querySelector('.plus-datetime-time-zone')).toBeNull();
+    await expect(field.getAttribute('aria-describedby') ?? '').not.toMatch(/time-zone/);
+
+    // Stored in the viewer's own zone: 1:00 AM local on 21 Oct 2026.
+    await userEvent.click(field.querySelector('.plus-datetime-am-pm-toggle'));
+    await userEvent.click(await within(field).findByRole('button', { name: 'AM' }));
+    await waitFor(() => expect(args.onChange).toHaveBeenCalled());
+    const last = args.onChange.mock.calls.at(-1)[0];
+    await expect(last.utc).toBe(new Date(2026, 9, 21, 1, 0).toISOString());
+};
