@@ -25,6 +25,36 @@ export default {
 
 const page = within(document.body);
 
+/**
+ * Both halves are the shared field: the date on `_Field` with the calendar
+ * icon in Trailing, as DatePicker draws it, and the time on `_Field` with the
+ * AM/PM menu in Trailing. A state marks both boxes.
+ */
+export const BothHalvesAreTheSharedField = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '296px' }}>
+        <DateAndTimePicker data-testid="dt-plain" label="Session time" dateValue="2026-10-21" timeValue="09:15 AM" timeZone="America/New_York" />
+        <DateAndTimePicker data-testid="dt-invalid" label="Session end" validation="invalid" validationMessage="Pick an end time" timeZone="America/New_York" />
+    </div>
+);
+
+BothHalvesAreTheSharedField.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const plain = within(canvas.getByTestId('dt-plain'));
+    const date = plain.getByRole('textbox', { name: 'Session time Date' });
+    const time = plain.getByRole('textbox', { name: 'Session time Time' });
+    await expect(date.closest('.plus-field')).not.toBeNull();
+    await expect(date.closest('.plus-field').querySelector('.plus-field__trailing .fa-calendar-day')).not.toBeNull();
+    await expect(time.closest('.plus-field')).not.toBeNull();
+    await expect(time.closest('.plus-field').querySelector('.plus-field__trailing .plus-datetime-am-pm-toggle')).not.toBeNull();
+    await expect(canvasElement.querySelector('.form-control, .input-group, .form-label')).toBeNull();
+
+    const invalid = canvas.getByTestId('dt-invalid');
+    const boxes = [...invalid.querySelectorAll('.plus-field')];
+    await expect(boxes).toHaveLength(2);
+    for (const box of boxes) await expect(box).toHaveClass('plus-field--invalid');
+    await expect(within(invalid).getByRole('textbox', { name: 'Session end Date' })).toHaveAttribute('aria-invalid', 'true');
+};
+
 /** The date half opens the shared calendar, 4px under the date field. */
 export const CalendarOpensFourPixelsBelow = () => (
     <div style={{ maxWidth: '296px' }}>
@@ -41,7 +71,8 @@ CalendarOpensFourPixelsBelow.play = async ({ canvasElement }) => {
         return found;
     });
     await expect(popup.querySelector('.plus-calendar')).not.toBeNull();
-    const field = date.getBoundingClientRect();
+    // Measured from the field's box, as DatePicker's placement test measures it.
+    const field = date.closest('.plus-field').getBoundingClientRect();
     const box = popup.getBoundingClientRect();
     await expect(Math.round(box.top - field.bottom)).toBe(4);
     await expect(Math.round(box.left)).toBe(Math.round(field.left));

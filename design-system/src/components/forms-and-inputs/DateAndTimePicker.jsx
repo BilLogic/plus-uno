@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
-import { Form, Dropdown, InputGroup } from 'react-bootstrap';
+import Dropdown from './Dropdown/Dropdown';
 import useFieldId from './useFieldId';
 import Calendar from './_internal/Calendar';
-import { readAnchorGap, useAnchoredPopup } from './_internal/anchorPlacement';
+import Field, { FieldCaption, toneProps } from './_internal/Field';
+import { useAnchoredPopup } from './_internal/anchorPlacement';
 import { formatIso } from './_internal/dates';
 import { knownZone, localTimeZone, timeZoneCaption, wallTimeToUtc } from './_internal/timeZones';
 import './_internal/Listbox.scss';
@@ -56,9 +57,6 @@ const DateAndTimePicker = ({
      */
     ...props
 }) => {
-    const [isFocused, setIsFocused] = useState(false);
-    const [dateFocused, setDateFocused] = useState(false);
-    const [timeFocused, setTimeFocused] = useState(false);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
     const [viewDate, setViewDate] = useState(new Date());
@@ -67,6 +65,7 @@ const DateAndTimePicker = ({
     const [amPm, setAmPm] = useState('AM');
     const [isAmPmOpen, setIsAmPmOpen] = useState(false);
     
+    const dateFieldRef = useRef(null);
     const dateInputRef = useRef(null);
     const timeInputRef = useRef(null);
     const calendarRef = useRef(null);
@@ -216,31 +215,19 @@ const DateAndTimePicker = ({
         });
     };
 
+    // Focus and hover are drawn by `_Field` from `:focus-within`; these only
+    // tell the caller.
     const handleFocus = (e) => {
-        setIsFocused(true);
         if (onFocus) onFocus(e);
     };
 
     const handleBlur = (e) => {
-        // Don't blur if clicking on calendar or AM/PM dropdown
-        if (calendarRef.current?.contains(e.relatedTarget) || 
+        // Moving into the calendar or the AM/PM menu is not leaving the field.
+        if (calendarRef.current?.contains(e.relatedTarget) ||
             e.relatedTarget?.closest('.plus-datetime-am-pm-dropdown')) {
             return;
         }
-        setIsFocused(false);
-        setDateFocused(false);
-        setTimeFocused(false);
         if (onBlur) onBlur(e);
-    };
-
-    const handleDateFocus = (e) => {
-        setDateFocused(true);
-        handleFocus(e);
-    };
-
-    const handleTimeFocus = (e) => {
-        setTimeFocused(true);
-        handleFocus(e);
     };
 
     const handleCalendarToggle = (nextShow) => {
@@ -327,43 +314,16 @@ const DateAndTimePicker = ({
         report(selectedDate, timeHours, timeMinutes, newAmPm);
     };
 
-    // Determine border color based on state
-    const getBorderColor = () => {
-        if (disabled || readonly) return 'var(--color-outline-variant)';
-        if (validation === 'invalid') return 'var(--color-danger)';
-        if (validation === 'success') return 'var(--color-success)';
-        if (isFocused) return 'var(--color-primary)';
-        return 'var(--color-outline-variant)';
-    };
-
-    // Determine background color based on state
-    const getBackgroundColor = () => {
-        if (disabled) return 'var(--color-surface-container-low)';
-        if (readonly) return 'var(--color-surface-container)';
-        return 'var(--color-surface-container-lowest)';
-    };
-
-    // Determine text color based on state
-    const getTextColor = () => {
-        if (disabled) return 'var(--color-on-surface-variant)';
-        if (readonly && !selectedDate) return 'var(--color-on-surface-variant)';
-        return 'var(--color-on-surface)';
-    };
-
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
-
-    const validationIcon = validation === 'invalid' ? (
-        <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" />
-    ) : validation === 'success' ? (
-        <i className="fa-solid fa-circle-check" aria-hidden="true" />
-    ) : null;
+    const interactive = !disabled && !readonly;
+    const tone = validation === 'invalid' ? 'invalid' : (validation === 'success' ? 'success' : 'help');
+    const tones = toneProps(tone);
 
     /* The shared calendar, placed by the popup rule: 4px under the date
      * field, left-aligned (or as `calendarAlign` asks), flipping above. */
     const closeCalendar = useCallback(() => setIsCalendarOpen(false), []);
     const calendarPlace = useAnchoredPopup({
         open: isCalendarOpen,
-        anchorRef: dateInputRef,
+        anchorRef: dateFieldRef,
         popupRef: calendarRef,
         align: calendarAlign,
         onClose: closeCalendar,
@@ -374,10 +334,35 @@ const DateAndTimePicker = ({
         () => (showCaption ? timeZoneCaption({ timeZone: zone, otherTimeZone, otherPerson, utc }) : ''),
         [showCaption, zone, otherTimeZone, otherPerson, utc],
     );
-    const periodMenuOffset = useMemo(
-        () => ({ modifiers: [{ name: 'offset', options: { offset: [0, readAnchorGap()] } }] }),
-        [],
+
+    /* The AM/PM control sits in the time field's Trailing slot. Live, it is
+     * the PLUS Dropdown, whose menu opens 4px under it by the shared popup
+     * rule; disabled or read-only, it only shows the period. */
+    const periodToggle = (
+        <button
+            type="button"
+            className="plus-datetime-am-pm-toggle"
+            disabled={!interactive}
+            aria-haspopup={interactive ? 'true' : undefined}
+            aria-expanded={interactive ? isAmPmOpen : undefined}
+        >
+            {amPm}
+            {!readonly && <i className="fa-solid fa-caret-down" aria-hidden="true" />}
+        </button>
     );
+    const period = interactive ? (
+        <Dropdown
+            className="plus-datetime-am-pm-dropdown"
+            isOpen={isAmPmOpen}
+            onToggle={setIsAmPmOpen}
+            toggle={periodToggle}
+            items={['AM', 'PM'].map((option) => ({
+                text: option,
+                selected: amPm === option,
+                onClick: () => handleAmPmChange(option),
+            }))}
+        />
+    ) : periodToggle;
 
     /*
      * `{...props}` lands on the wrapper, which is also the `group` (#206), so
@@ -403,7 +388,7 @@ const DateAndTimePicker = ({
                 .filter(Boolean).join(' ') || undefined}
         >
             {hasLabel && (
-                <Form.Label
+                <label
                     id={labelId}
                     htmlFor={showDate ? dateInputId : timeInputId}
                     className={`plus-datetime-label${showLabel ? '' : ' plus-datetime-label-hidden'}`}
@@ -412,80 +397,94 @@ const DateAndTimePicker = ({
                     {required && (
                         <span className="plus-datetime-required" aria-label="required">*</span>
                     )}
-                </Form.Label>
+                </label>
             )}
-            
-            {/* Date Picker Section */}
+
+            {/* Date: `_Field` with the calendar icon in Trailing, as DatePicker draws it. */}
             {showDate && <div className="plus-datetime-section">
                 {showSectionLabels && <div id={dateSectionLabelId} className="plus-datetime-section-label">Date</div>}
-                <div className="plus-datetime-date-wrapper">
-                    <div className="plus-datetime-date-input-container">
-                        <Form.Control
-                            ref={dateInputRef}
-                            type="text"
-                            id={dateInputId}
-                            name={name ? `${name}-date` : undefined}
-                            aria-labelledby={dateLabelledBy || undefined}
-                            aria-label={dateLabelledBy ? undefined : 'Date'}
-                            placeholder={datePlaceholder}
-                            value={selectedDate ? formatDateForInput(selectedDate) : ''}
-                            disabled={disabled}
-                            readOnly={readonly}
-                            className={`plus-datetime-date-input ${sizeClass}`}
-                            style={{
-                                borderColor: getBorderColor(),
-                                backgroundColor: getBackgroundColor(),
-                                color: getTextColor(),
-                                paddingRight: '40px'
-                            }}
-                            onFocus={handleDateFocus}
-                            onBlur={handleBlur}
-                            onClick={() => !disabled && !readonly && handleCalendarToggle(true)}
-                        />
-                        <div 
+                <Field
+                    ref={dateFieldRef}
+                    size={size}
+                    disabled={disabled}
+                    readOnly={readonly}
+                    {...tones.field}
+                    className="plus-datetime-date-field"
+                    trailing={(
+                        <span
                             className="plus-datetime-calendar-icon"
-                            onMouseDown={(event) => event.preventDefault()}
-                            onClick={() => !disabled && !readonly && handleCalendarToggle(!isCalendarOpen)}
-                        >
-                            <i className="fa-regular fa-calendar" aria-hidden="true" />
-                        </div>
-                    </div>
-                    {isCalendarOpen && createPortal(
-                        <div
-                            ref={calendarRef}
-                            id={`${dateInputId}-calendar`}
-                            role="dialog"
-                            aria-label="Choose a date"
-                            className="plus-listbox plus-listbox--floating plus-date-popup"
-                            data-placement={calendarPlace?.placement ?? 'bottom'}
-                            style={{
-                                top: calendarPlace?.top ?? 0,
-                                left: calendarPlace?.left ?? 0,
-                                minWidth: calendarPlace?.minWidth,
-                                visibility: calendarPlace ? undefined : 'hidden',
+                            aria-hidden="true"
+                            onMouseDown={(event) => {
+                                if (!interactive) return;
+                                event.preventDefault();
+                                dateInputRef.current?.focus();
+                                handleCalendarToggle(!isCalendarOpen);
                             }}
-                            onMouseDown={(event) => event.preventDefault()}
                         >
-                            <Calendar
-                                viewDate={viewDate}
-                                onViewDateChange={setViewDate}
-                                selected={selectedDate}
-                                minDate={minDate}
-                                maxDate={maxDate}
-                                size={size}
-                                onPick={handleDayClick}
-                            />
-                        </div>,
-                        document.body,
+                            <i className="fa-solid fa-calendar-day" />
+                        </span>
                     )}
-                </div>
+                >
+                    <input
+                        ref={dateInputRef}
+                        type="text"
+                        id={dateInputId}
+                        name={name ? `${name}-date` : undefined}
+                        aria-labelledby={dateLabelledBy || undefined}
+                        aria-label={dateLabelledBy ? undefined : 'Date'}
+                        placeholder={datePlaceholder}
+                        value={selectedDate ? formatDateForInput(selectedDate) : ''}
+                        disabled={disabled}
+                        readOnly={readonly}
+                        className="plus-field__control plus-datetime-date-input"
+                        {...tones.control}
+                        onFocus={handleFocus}
+                        onBlur={handleBlur}
+                        onClick={() => interactive && handleCalendarToggle(true)}
+                    />
+                </Field>
+                {isCalendarOpen && createPortal(
+                    <div
+                        ref={calendarRef}
+                        id={`${dateInputId}-calendar`}
+                        role="dialog"
+                        aria-label="Choose a date"
+                        className="plus-listbox plus-listbox--floating plus-date-popup"
+                        data-placement={calendarPlace?.placement ?? 'bottom'}
+                        style={{
+                            top: calendarPlace?.top ?? 0,
+                            left: calendarPlace?.left ?? 0,
+                            minWidth: calendarPlace?.minWidth,
+                            visibility: calendarPlace ? undefined : 'hidden',
+                        }}
+                        onMouseDown={(event) => event.preventDefault()}
+                    >
+                        <Calendar
+                            viewDate={viewDate}
+                            onViewDateChange={setViewDate}
+                            selected={selectedDate}
+                            minDate={minDate}
+                            maxDate={maxDate}
+                            size={size}
+                            onPick={handleDayClick}
+                        />
+                    </div>,
+                    document.body,
+                )}
             </div>}
 
-            {/* Time Picker Section */}
+            {/* Time: `_Field` with the AM/PM menu in Trailing. */}
             <div className="plus-datetime-section">
                 {showSectionLabels && <div id={timeSectionLabelId} className="plus-datetime-section-label">Time</div>}
-                <InputGroup className="plus-datetime-time-input-group">
-                    <Form.Control
+                <Field
+                    size={size}
+                    disabled={disabled}
+                    readOnly={readonly}
+                    {...tones.field}
+                    className="plus-datetime-time-field"
+                    trailing={period}
+                >
+                    <input
                         ref={timeInputRef}
                         type="text"
                         id={timeInputId}
@@ -496,13 +495,9 @@ const DateAndTimePicker = ({
                         value={timeHours && timeMinutes ? `${timeHours}:${timeMinutes}` : (timeHours ? `${timeHours}:` : '')}
                         disabled={disabled}
                         readOnly={readonly}
-                        className={`plus-datetime-time-input ${sizeClass}`}
-                        style={{
-                            borderColor: getBorderColor(),
-                            backgroundColor: timeFocused ? 'var(--color-primary-state-08)' : getBackgroundColor(),
-                            color: getTextColor()
-                        }}
-                        onFocus={handleTimeFocus}
+                        className="plus-field__control plus-datetime-time-input"
+                        {...tones.control}
+                        onFocus={handleFocus}
                         onBlur={handleBlur}
                         onChange={(e) => {
                             const value = e.target.value.replace(/\s/g, '');
@@ -522,48 +517,14 @@ const DateAndTimePicker = ({
                             }
                         }}
                     />
-                    <div className={`plus-datetime-am-pm-wrapper ${validation === 'invalid' ? 'plus-datetime-validation-invalid' : ''} ${validation === 'success' ? 'plus-datetime-validation-success' : ''}`}>
-                        <Dropdown
-                            show={isAmPmOpen}
-                            onToggle={setIsAmPmOpen}
-                            className="plus-datetime-am-pm-dropdown"
-                        >
-                            <Dropdown.Toggle
-                                className={`plus-datetime-am-pm-toggle ${sizeClass} ${isAmPmOpen ? 'plus-datetime-am-pm-toggle-active' : ''} ${readonly ? 'plus-datetime-am-pm-toggle-readonly' : ''} ${validation === 'invalid' ? 'plus-datetime-am-pm-toggle-invalid' : ''} ${validation === 'success' ? 'plus-datetime-am-pm-toggle-success' : ''}`}
-                                disabled={disabled || readonly}
-                                style={{
-                                    backgroundColor: isAmPmOpen 
-                                        ? (validation === 'invalid' ? 'var(--color-danger-state-12)' : validation === 'success' ? 'var(--color-success-state-12)' : 'var(--color-primary-state-12)') 
-                                        : (timeFocused ? (validation === 'invalid' ? 'var(--color-danger-state-12)' : validation === 'success' ? 'var(--color-success-state-12)' : 'var(--color-primary-state-12)') : 'transparent'),
-                                    color: isAmPmOpen 
-                                        ? (validation === 'invalid' ? 'var(--color-danger-text)' : validation === 'success' ? 'var(--color-success-text)' : 'var(--color-primary-text)') 
-                                        : (validation === 'invalid' ? 'var(--color-danger-text)' : validation === 'success' ? 'var(--color-success-text)' : 'var(--color-primary-text)')
-                                }}
-                            >
-                                {amPm}
-                                {!readonly && <i className="fa-solid fa-caret-down" aria-hidden="true" />}
-                            </Dropdown.Toggle>
-                            {/* 4px (`--size-element-gap-xs`) under the toggle, not Bootstrap's 2px spacer. */}
-                            <Dropdown.Menu popperConfig={periodMenuOffset}>
-                                <Dropdown.Item onClick={() => handleAmPmChange('AM')}>AM</Dropdown.Item>
-                                <Dropdown.Item onClick={() => handleAmPmChange('PM')}>PM</Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </div>
-                </InputGroup>
+                </Field>
                 {showCaption && (
                     <div id={timeZoneId} className="plus-datetime-time-zone body3-txt">{caption}</div>
                 )}
             </div>
 
             {validation !== 'none' && validationMessage && (
-                <div
-                    id={validationId}
-                    className={`plus-datetime-validation plus-datetime-validation-${validation}`}
-                >
-                    {validationIcon}
-                    <span className="plus-datetime-validation-message">{validationMessage}</span>
-                </div>
+                <FieldCaption messageId={validationId} message={validationMessage} tone={tone} />
             )}
         </div>
     );
