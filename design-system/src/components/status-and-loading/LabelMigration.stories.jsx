@@ -134,6 +134,7 @@ export const TagInputChips = {
     render: () => (
         <TagInput
             label="Topics"
+            options={[]}
             tags={['Algebra', { text: 'Geometry', color: 'success' }, { text: 'Fractions', color: 'purple' }, { text: 'Ratios', color: 'lime' }]}
             onRemove={onRemove}
         />
@@ -145,7 +146,7 @@ export const TagInputChips = {
      */
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const group = canvas.getByRole('group', { name: 'Topics' });
+        const group = canvas.getByRole('list', { name: 'Selected: Topics' });
         const items = within(group).getAllByRole('listitem');
         await expect(items).toHaveLength(4);
 
@@ -166,7 +167,7 @@ export const TagInputChips = {
 };
 
 export const TagInputUncontrolled = {
-    render: () => <TagInput label="Subjects" defaultTags={['Algebra', 'Geometry']} />,
+    render: () => <TagInput label="Subjects" options={[]} defaultTags={['Algebra', 'Geometry']} />,
     /** With no `tags`, TagInput keeps its own list: `defaultTags` seeds it and the × removes from it. */
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -179,8 +180,8 @@ export const TagInputUncontrolled = {
 
 export const TagInputReadOnlyAndDisabled = () => (
     <div style={{ display: 'grid', gap: '16px' }}>
-        <TagInput label="Controlled" tags={['Algebra']} />
-        <TagInput label="Disabled" defaultTags={['Geometry']} disabled onRemove={() => {}} />
+        <TagInput label="Controlled" options={[]} tags={['Algebra']} />
+        <TagInput label="Disabled" options={[]} defaultTags={['Geometry']} disabled onRemove={() => {}} />
     </div>
 );
 
@@ -192,6 +193,6 @@ export const TagInputReadOnlyAndDisabled = () => (
 TagInputReadOnlyAndDisabled.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.queryAllByRole('button')).toHaveLength(0);
-    const disabled = canvas.getByRole('group', { name: 'Disabled' });
+    const disabled = canvas.getByRole('list', { name: 'Selected: Disabled' });
     await expect(within(disabled).getByRole('listitem')).toHaveTextContent('Geometry, disabled');
 };

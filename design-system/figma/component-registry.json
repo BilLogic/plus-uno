@@ -2429,12 +2429,27 @@
           },
           "disabled": {
             "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
           }
         }
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": []
+        "sets": [
+          {
+            "id": "tag-input",
+            "name": "TagInput",
+            "componentSetNodeId": "18233:48345",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18233-48345",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "3 sizes × 8 states: empty, filled, focus, typing, create, invalid, read-only and disabled. `size` is the code prop of the same name. `state` draws code's live states still: empty and filled are the tags, focus and typing are focus and the typed text, create is a Create row in the list, and invalid, read-only and disabled are `validation=\"invalid\"`, `readOnly` and `disabled`. Signed off; the library publishes it once the Specs file's text migration is ready, and the status becomes `verified` then."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18233-48345"
       }
     },
     "Textarea": {

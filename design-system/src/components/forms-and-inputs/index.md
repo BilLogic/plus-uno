@@ -24,7 +24,7 @@ authored half (#166), counted rather than assumed.
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
 | [Select](Select.md) | 37 | ✅ | ✅ | ✅ |
 | [Switch](Switch.md) | 15 | ✅ | ✅ | ✅ |
-| [TagInput](TagInput.md) | 13 | ✅ | ✅ | ✅ |
+| [TagInput](TagInput.md) | 23 | ✅ | ✅ | ✅ |
 | [Textarea](Textarea.md) | 26 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect.md) | 9 | ✅ | ✕ | ✅ |
 
