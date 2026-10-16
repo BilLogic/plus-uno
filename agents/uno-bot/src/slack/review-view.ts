@@ -39,7 +39,7 @@ import { CONFIRM_FOOTER, withoutInternalFields } from "./proposal-render";
 import { clip } from "./card-block";
 import { anatomyBlocks, decisionWords, DESCRIPTION_CHARS, reviewTitle, type DecisionWords, type DraftAlert, type DraftAnatomy } from "./review-anatomy";
 import { batchAnatomy } from "./review-batch";
-import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
+import { SLACK_USER_ID, escapeSlackText, unescapeSlackText } from "./mrkdwn";
 import {
   draftValuesOf,
   FIELD_ACTION_ID,
@@ -143,7 +143,7 @@ const RICH_TEXT_CHARS = 3000;
 const MRKDWN_TOKEN = /<@([UW][A-Z0-9]{6,})>|<#([CG][A-Z0-9]{6,})(?:\|[^>]*)?>|<(https?:\/\/[^|>\s]+)(?:\|([^>]*))?>/g;
 
 /** mrkdwn's entities back to the characters: rich text is read as written. */
-const unescaped = (t: string) => t.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+const unescaped = unescapeSlackText;
 
 /** A line of mrkdwn as rich text elements: each `<@U…>` a user pill, each
  *  `<#C…>` a channel pill, each `<url|text>` a link, the rest its words. */
@@ -340,11 +340,11 @@ function decidedAlert(
   const reason = decided.decision === "cancel" && !proposal.choices?.length ? (decided.reason?.trim() ?? "") : "";
   const where = outcome === "Approved" && reading?.destination ? [{ type: "text", text: " to " }, ...richElements(reading.destination)] : [];
   const tail = reason ? [{ type: "text", text: `: ${clip(reason, RICH_TEXT_CHARS - 2)}` }] : [];
-  const named = by.length || where.length || tail.length;
-  return [
-    stateAlert(level, `${outcome}.`),
-    ...(named ? [richLine([{ type: "text", text: outcome }, ...by, ...where, ...tail, ...(reason && /[.!?]$/.test(reason) ? [] : [{ type: "text", text: "." }])])] : []),
-  ];
+  const alert = stateAlert(level, `${outcome}.`);
+  // Nobody and nowhere to name: the alert says it all.
+  if (!by.length && !where.length && !tail.length) return [alert];
+  const stop = /[.!?]$/.test(reason) ? [] : [{ type: "text", text: "." }];
+  return [alert, richLine([{ type: "text", text: outcome }, ...by, ...where, ...tail, ...stop])];
 }
 
 /** The keys of the fields the draft holds as inputs in place: every text
@@ -539,11 +539,12 @@ function reviewNoteOf(state: unknown): string {
  * record no longer keeps the decided draft: its words off the report's
  * record, read-only, outcome included.
  */
-export function decidedView(card: ReviewedCard, cardText: string): View {
-  return modal(card, [
-    ...textSections(withoutInternalFields(draftBody(cardText))),
-    context("Read-only. This proposal has already been decided."),
-  ]);
+export function decidedView(card: ReviewedCard, cardText: string, title?: string): View {
+  return modal(
+    card,
+    [...textSections(withoutInternalFields(draftBody(cardText))), context("Read-only. This proposal has already been decided.")],
+    title ? { title } : {},
+  );
 }
 
 /** Said under the outcome when the decided draft is no longer kept: a card
@@ -661,7 +662,7 @@ export function closedView(
 
 /** A closed card's title: its tool's, from the batch its lookup named, or
  *  nothing (the generic title) when the lookup named none. */
-function closedTitle(
+export function closedTitle(
   why: { operations?: readonly ProposalOperation[]; decided?: Pick<DecidedProposal, "proposal"> },
 ): string | undefined {
   const operations = why.operations ?? (why.decided ? proposalOperations(why.decided.proposal) : undefined);

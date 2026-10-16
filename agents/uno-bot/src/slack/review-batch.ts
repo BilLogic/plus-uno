@@ -96,7 +96,7 @@ export function shareNotesAnatomy(operations: readonly ProposalOperation[], deta
   return {
     header: facts.header,
     where: [
-      { type: "text", text: `Posts ${n === 2 ? "these two notes" : `these ${n} notes`}, one in each of ` },
+      { type: "text", text: `Posts ${n === 2 ? "these two notes" : `these ${n} notes`} in ` },
       ...channels.flatMap((c, i): WhereElement[] => [...(i === 0 ? [] : [{ type: "text" as const, text: i === n - 1 ? " and " : ", " }]), c]),
       { type: "text", text: `. Nothing else leaves ${facts.from}.` },
     ],

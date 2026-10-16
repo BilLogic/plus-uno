@@ -46,6 +46,7 @@ import { withEditedFields } from "./proposal-render";
 import { issueStepChanges } from "./review-draft-writes";
 import { reviewTitle } from "./review-anatomy";
 import {
+  closedTitle,
   closedView,
   decidedView,
   draftView,
@@ -192,7 +193,7 @@ export async function runReviewOpen(request: ReviewOpenRequest, deps: ReviewDoor
   const view = look.state === "gone" && look.decided
     ? draftView(card, look.decided.proposal, { mayDecide: false, confirmers: [], decided: look.decided })
     : item
-    ? decidedView(card, item)
+    ? decidedView(card, item, look.state === "live" ? undefined : closedTitle(look))
     :
     look.state === "live" && look.proposal.revising
       ? // Sent back with Needs changes: the revised card is the one to decide.
@@ -577,9 +578,7 @@ function titleOf(proposal: PendingProposal | undefined): string | undefined {
  *  or expired or replaced with its batch named. A card with no record left
  *  keeps the generic title: nothing cheap says what it was. */
 function lookupTitle(look: ProposalLookup): string | undefined {
-  if (look.state === "found") return titleOf(look.proposal);
-  if (look.state === "none") return titleOf(look.decided?.proposal);
-  return look.operations?.length ? reviewTitle(look.operations) : undefined;
+  return look.state === "found" ? titleOf(look.proposal) : closedTitle(look);
 }
 
 /** What the pop-up says once one of the card's own answers wins: the answer,

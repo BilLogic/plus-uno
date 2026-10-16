@@ -11,7 +11,7 @@
 //
 // PURE: blocks out, nothing posted, nothing read.
 import { clip, isLink, OPEN_ACTION_ID } from "./card-block";
-import { escapeSlackText } from "./mrkdwn";
+import { escapeSlackText, unescapeSlackText } from "./mrkdwn";
 import type { DraftAnatomy, WhereElement } from "./review-anatomy";
 import type { DevLinksFacts, PrecedenceFacts, ShareNoteFacts, StatedFacts, TidyFacts } from "../thread-state/index";
 
@@ -39,7 +39,7 @@ const CHANNEL_ID = /^[CG][A-Z0-9]{6,}$/;
 /** A mrkdwn text's entities back to the characters they stand for: rich
  *  text is read as written. The sweep's notes are escaped plain text, so the
  *  quote reads as the post does. */
-const unescaped = (t: string) => t.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+const unescaped = unescapeSlackText;
 
 const text = (t: string, style?: { bold?: boolean; code?: boolean }): RichElement => ({ type: "text", text: clip(t, TEXT_CHARS), ...(style ? { style } : {}) });
 const link = (url: string, label: string): RichElement => (isLink(url) ? { type: "link", url, text: clip(label, TEXT_CHARS) } : text(label));

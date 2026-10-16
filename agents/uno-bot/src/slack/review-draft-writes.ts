@@ -12,6 +12,7 @@
 //
 // PURE: blocks out, nothing posted, nothing read.
 import { reviewSections } from "./render";
+import { unescapeSlackText } from "./mrkdwn";
 import { fieldInputBlocks, MAX_INPUT_CHARS, type FieldChange } from "./review-fields";
 import {
   alertsFromCaveats,
@@ -33,7 +34,7 @@ const DEFAULT_REPO = "BilLogic/plus-uno";
 const str = (v: unknown): string => (typeof v === "string" ? v.trim() : "");
 const capital = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 /** A card value back to the words it escaped. */
-const unescaped = (s: string) => s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+const unescaped = unescapeSlackText;
 const context = (text: string): unknown => ({ type: "context", elements: [{ type: "mrkdwn", text }] });
 
 /** The card's `• *Label:* value` line's value, as written; "" when it has none. */

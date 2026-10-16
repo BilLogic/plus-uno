@@ -30,6 +30,13 @@
 export function escapeSlackText(text: string): string {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
+
+/** `escapeSlackText` undone: mrkdwn's three entities back to the characters
+ *  they stand for, for text that is read as written (rich text, plain text). */
+export function unescapeSlackText(text: string): string {
+  return text.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+}
+
 /**
  * Keep the `<…>` markup Slack can parse, and entity-escape every other `<`,
  * `>` and bare `&`.
