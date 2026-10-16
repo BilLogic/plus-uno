@@ -243,7 +243,7 @@ test('a rise names the scope it happened in, and the docs that caused it', () =>
   assert.match(msg, /skills\/uno-review\/SKILL\.md: 6 -> 8/);
   // Only the risers are listed — a doc that held steady is noise in a failure.
   assert.doesNotMatch(msg, /coding\.md/);
-  assert.match(msg, /state the target behaviour/);
+  assert.match(msg, /state the target behavior/);
 });
 
 // ── The IDE corpus is the bundler's own rows ─────────────────────────────────

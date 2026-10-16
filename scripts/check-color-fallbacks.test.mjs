@@ -2,7 +2,7 @@
  * The POLICY half of `check:color-fallbacks` (#611).
  *
  * `token-fallbacks.test.mjs` already watches the measurement — a disagreeing
- * literal, an undefined name, the three colour spellings. What it cannot watch
+ * literal, an undefined name, the three color spellings. What it cannot watch
  * is the gate: a run against a fixture tree, the finding that run reports, and
  * the sentinel floor that fires when the token directory is empty rather than
  * a clean sweep.
@@ -21,7 +21,7 @@ const BASELINE = JSON.stringify({
   undefinedTokens: [],
 });
 
-test('a disagreeing colour fallback in a fixture tree is a finding', () => {
+test('a disagreeing color fallback in a fixture tree is a finding', () => {
   const { root, done } = policyTree(
     {
       'design-system/src/tokens/_colors.scss': ':root { --color-primary: #0472a8; }\n',

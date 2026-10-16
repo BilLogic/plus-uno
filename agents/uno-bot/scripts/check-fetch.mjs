@@ -4,7 +4,7 @@
 // can't see makes the gate say "plenty of headroom" while the invocation is
 // already past Cloudflare's 50 — the 👀-then-silence failure.
 //
-// This is the SECOND line of defence, not the only one: net.ts also meters
+// This is the SECOND line of defense, not the only one: net.ts also meters
 // globalThis.fetch, so a call that slips these regexes is still counted. The
 // guard's job is to keep call sites on countedFetch (which is also where the
 // timeout policy lives) and to catch the one case the runtime patch can't — an
@@ -81,9 +81,9 @@ const HANDLER_DEF = /^\s*(?:async\s+)?fetch\s*\(\s*\w+\s*:/;
 // close (net.ts may evaluate after the file that captured it).
 const ALIAS_FETCH = /=\s*fetch\s*(?![(\w])|[([,]\s*fetch\s*[,)\]]/;
 
-// Each offence already carries its own `->` line, because what to do about it
+// Each offense already carries its own `->` line, because what to do about it
 // depends on which of the four shapes matched. This paragraph carries the one
-// thing the deleted banner said and no single offence does: why an uncounted
+// thing the deleted banner said and no single offense does: why an uncounted
 // call site matters at all.
 export const REMEDY =
   "  -> See ADR-022. The budget gate reads a real subrequest counter, so a call\n" +
@@ -96,7 +96,7 @@ export const REMEDY =
  */
 export function run({ repoRoot = REPO_ROOT } = {}) {
   const srcDir = srcDirIn(repoRoot);
-  const offences = [];
+  const offenses = [];
   for (const rel of readdirSync(srcDir, { recursive: true })) {
     if (!rel.endsWith(".ts") || rel.startsWith("generated/")) continue;
     const unix = rel.split(path.sep).join("/");
@@ -108,27 +108,27 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
       const at = `src/${unix}:${i + 1}: ${line.trim()}`;
       // First, because routing this call through countedFetch would not fix it.
       if (FIGMA_API.test(line) && unix !== FIGMA_CLIENT) {
-        offences.push(`${at}\n    -> only src/figma/rest.ts talks to Figma (#892), where every call is paced\n       against the budget Bill's tokens share; add a method to the Figma client.`);
+        offenses.push(`${at}\n    -> only src/figma/rest.ts talks to Figma (#892), where every call is paced\n       against the budget Bill's tokens share; add a method to the Figma client.`);
         return;
       }
       if (GLOBAL_FETCH.test(line)) {
-        offences.push(`${at}\n    -> globalThis/self/window.fetch bypasses the meter; import countedFetch.`);
+        offenses.push(`${at}\n    -> globalThis/self/window.fetch bypasses the meter; import countedFetch.`);
         return;
       }
       if (BARE_FETCH.test(line) && !HANDLER_DEF.test(line) && !ALLOWED_BARE_FETCH.has(unix)) {
-        offences.push(`${at}\n    -> bare fetch(); import countedFetch from net.ts.`);
+        offenses.push(`${at}\n    -> bare fetch(); import countedFetch from net.ts.`);
         return;
       }
       if (ALIAS_FETCH.test(line) && !ALLOWED_BARE_FETCH.has(unix)) {
-        offences.push(`${at}\n    -> aliases the global fetch. A module-scope alias can be captured before\n       net.ts patches the global, escaping the meter; use countedFetch.`);
+        offenses.push(`${at}\n    -> aliases the global fetch. A module-scope alias can be captured before\n       net.ts patches the global, escaping the meter; use countedFetch.`);
         return;
       }
       if (STUB_FETCH.test(line) && !GLOBAL_FETCH.test(line) && !CHARGED_STUB_CALLS.has(unix)) {
-        offences.push(`${at}\n    -> looks like a Durable Object / service-binding call. Those are INTERNAL\n       subrequests (separate 1,000 cap) the meter can't see: charge(1, "<label>")\n       next to it, then add this file to CHARGED_STUB_CALLS.`);
+        offenses.push(`${at}\n    -> looks like a Durable Object / service-binding call. Those are INTERNAL\n       subrequests (separate 1,000 cap) the meter can't see: charge(1, "<label>")\n       next to it, then add this file to CHARGED_STUB_CALLS.`);
       }
     });
   }
-  return offences.map((message) => ({ message }));
+  return offenses.map((message) => ({ message }));
 }
 
 /** The green line. The ✓ says "ok"; this says what was proved. */

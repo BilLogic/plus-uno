@@ -25,7 +25,7 @@
  * Three cases, and the first is the one that bites: an UNSET GitHub repo
  * variable interpolates to the empty string, not to undefined. If that fell
  * through to `Number("")` it would be 0 — silently disabling the hold on every
- * deploy, which is the behaviour this whole module exists to remove, restored
+ * deploy, which is the behavior this whole module exists to remove, restored
  * with no error and no log line saying so.
  *
  * @returns {number|null} null when the value is unusable, so the caller can
@@ -51,7 +51,7 @@ export function diagnose(serving) {
   if (/\bok dev\b/.test(serving)) {
     return (
       "`dev` means deploy.mjs DID run — so the gates ran — but outside any CI it " +
-      "recognises. Most likely a deploy from a laptop; if it followed a push, the " +
+      "recognizes. Most likely a deploy from a laptop; if it followed a push, the " +
       "other CI is running deploy.mjs without the variables that name it. See #278."
     );
   }

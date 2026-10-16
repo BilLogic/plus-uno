@@ -239,7 +239,7 @@ export function buildBatch(batch, prompt) {
  * batch's whole `{"labels": [...]}` or a single label. Blank lines are skipped.
  * The labels are held to every id the count needs (see checkLabels).
  * @param {string} jsonl
- * @param {string[]} ids every id to be labelled, in order
+ * @param {string[]} ids every id to be labeled, in order
  * @returns {Label[]}
  */
 export function parseLabelLines(jsonl, ids) {
@@ -429,7 +429,7 @@ export function calibrationReport(rows, expected, labels, workdayCount = workday
   const modelSplit = Object.fromEntries(WHAT_IT_TOOK.map((w) => [w, 0]));
   /** @type {Record<string, Record<string, number>>} */
   const confusion = Object.fromEntries(WHAT_IT_TOOK.map((a) => [a, Object.fromEntries([...WHAT_IT_TOOK, NOT_A_REQUEST].map((b) => [b, 0]))]));
-  let corpusHk = 0, modelHk = 0, modelRequests = 0, both = 0, agree = 0, labelled = 0, kindOverlap = 0;
+  let corpusHk = 0, modelHk = 0, modelRequests = 0, both = 0, agree = 0, labeled = 0, kindOverlap = 0;
   for (const r of rows) {
     const e = expected.get(r.id);
     if (!e) continue;
@@ -437,7 +437,7 @@ export function calibrationReport(rows, expected, labels, workdayCount = workday
     if (e.what_it_took !== JUDGMENT) corpusHk++;
     const l = byId.get(r.id);
     if (!l) continue;
-    labelled++;
+    labeled++;
     confusion[e.what_it_took][l.is_request ? /** @type {string} */ (l.what_it_took) : NOT_A_REQUEST]++;
     if (!l.is_request) continue;
     modelRequests++;
@@ -451,11 +451,11 @@ export function calibrationReport(rows, expected, labels, workdayCount = workday
   const share = (/** @type {Record<string, number>} */ s, /** @type {number} */ d) => Object.fromEntries(Object.entries(s).map(([k, v]) => [k, d ? Math.round((1000 * v) / d) / 10 : 0]));
   return {
     rows: n,
-    labelled,
+    labeled,
     workdays: workdayCount,
     corpus: { housekeeping: corpusHk, housekeepingPerWorkday: round1(corpusHk / workdayCount), splitPercent: share(corpusSplit, n) },
     model: { requests: modelRequests, housekeeping: modelHk, housekeepingPerWorkday: round1(modelHk / workdayCount), splitPercent: share(modelSplit, modelRequests) },
-    requestRecall: labelled ? round1((100 * modelRequests) / labelled) : 0,
+    requestRecall: labeled ? round1((100 * modelRequests) / labeled) : 0,
     whatItTookAgreementPercent: both ? round1((100 * agree) / both) : 0,
     kindOverlapPercent: both ? round1((100 * kindOverlap) / both) : 0,
     confusion,

@@ -16,7 +16,7 @@ scope and left untouched. Four promotions, two conversions, nine deletions.
 
 - `lessons/ui-patterns.md` → `docs/engineering/coding.md` § Known gotchas — one Router provider per tree, and how a shell mounted under a prefixed route finds its content.
 - `lessons/2026-07-10-harness-consistency-sweep.md` → `docs/engineering/coding.md` § Renames — a rename is finished when `validate-doc-links.sh` passes.
-- `lessons/2026-08-25-storybook-vitest-setup-import-race.md` → `docs/engineering/coding.md` § Known gotchas — a setup-file import failure with a bogus `SyntaxError` is a mid-run Vite re-optimise; pin the dependency in `optimizeDeps.include`.
+- `lessons/2026-08-25-storybook-vitest-setup-import-race.md` → `docs/engineering/coding.md` § Known gotchas — a setup-file import failure with a bogus `SyntaxError` is a mid-run Vite re-optimize; pin the dependency in `optimizeDeps.include`.
 - `preferences.md` → `docs/engineering/setup.md` § Prototype conventions — the pinned Font Awesome jsdelivr URL. Its other six entries were already AGENTS.md hard rules or ADRs 002/003/004/009, and the capitalization rule already lived in `design-system/guidelines/foundations/content/voice-and-tone.md` § Capitalization.
 
 **Converted to ADRs**
@@ -36,7 +36,7 @@ because the folder needs a contract and a ledger.
 **Archived** — moved to `archive/`, which is itself a disposition
 
 `archive/2026-04-19-harness-audit.md` — its own closing note asks that it not be
-deleted and prescribes a counter-lesson instead; that instruction is honoured. It
+deleted and prescribes a counter-lesson instead; that instruction is honored. It
 is archived rather than kept live because all three things it audits (`.agent/skills/`,
 `docs/rubrics/`, `hd-config.md`) are absent from the repo, so every finding resolves
 to nothing.

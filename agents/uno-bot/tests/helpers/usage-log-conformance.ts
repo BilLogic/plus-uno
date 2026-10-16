@@ -204,7 +204,7 @@ export function runCategoryConformance(
       generateReplies: [JSON.stringify({ "1": "Artifact location", "2": "Status recap", "3": "Made up" })],
     });
     const result = await runClassifyBatch({ store, provider, now: () => NOW, dryRun: false });
-    assert.deepEqual(result, { labelled: 3, blank: 1, failed: 0, givenUp: 0 });
+    assert.deepEqual(result, { labeled: 3, blank: 1, failed: 0, givenUp: 0 });
 
     const one = await log.get("C1:1");
     assert.deepEqual(
@@ -266,12 +266,12 @@ export function runCategoryConformance(
     }
     const ok = JSON.stringify({ "1": "Domain fact" });
     // Run 1: the batch answer is unreadable, so each ask is tried alone; the
-    // poison fails again, the other 19 are labelled.
+    // poison fails again, the other 19 are labeled.
     const run1 = fakeProvider({
       generateReplies: ["not json", "not json", ...Array.from({ length: CLASSIFY_BATCH_SIZE - 1 }, () => ok)],
     });
     assert.deepEqual(await runClassifyBatch({ store, provider: run1, now: () => NOW, dryRun: false }), {
-      labelled: CLASSIFY_BATCH_SIZE - 1,
+      labeled: CLASSIFY_BATCH_SIZE - 1,
       blank: 0,
       failed: 1,
       givenUp: 0,
@@ -288,12 +288,12 @@ export function runCategoryConformance(
     const run2 = fakeProvider({ generateReplies: ["not json", ok, "not json"] });
     await runClassifyBatch({ store, provider: run2, now: () => NOW + 1, dryRun: false });
     for (let i = 1; i <= CLASSIFY_BATCH_SIZE; i++) {
-      assert.equal((await log.get(`C1:${i}`))?.subType, "Domain fact", `C1:${i} is labelled`);
+      assert.equal((await log.get(`C1:${i}`))?.subType, "Domain fact", `C1:${i} is labeled`);
     }
     // Run 3: its last attempt fails, and it is stored blank with its text gone.
     const run3 = fakeProvider({ generateReplies: ["not json"] });
     assert.deepEqual(await runClassifyBatch({ store, provider: run3, now: () => NOW + 2, dryRun: false }), {
-      labelled: 0,
+      labeled: 0,
       blank: 0,
       failed: 1,
       givenUp: 1,
@@ -313,7 +313,7 @@ export function runCategoryConformance(
     // Every call is refused for its content — never a rate limit.
     const refusing = fakeProvider({ generateFailMessage: "HTTP 400: prompt blocked" });
     assert.deepEqual(await runClassifyBatch({ store, provider: refusing, now: () => NOW, dryRun: false }), {
-      labelled: 0,
+      labeled: 0,
       blank: 0,
       failed: 4,
       givenUp: 0,

@@ -60,7 +60,7 @@ to them through the notion-plus connector, per `docs/connectors/notion/overview.
    ```
 
    Both steps only read. Run each query twice, once for the week and once for the window to date (from 2026-09-01, and from 2026-10-13 for the after-lock line). Cite every result as `agents/uno-bot/README.md` § Metrics says: query file, commit, window, graded-answers commit, run date.
-2. **Sort the lead's inbox.** The sort calls no model and needs no API key. A Claude Code session does the labelling, by the pinned prompt.
+2. **Sort the lead's inbox.** The sort calls no model and needs no API key. A Claude Code session does the labeling, by the pinned prompt.
    1. Export the week's DMs, channel messages and meeting notes to a local JSONL file outside the repo.
    2. Prepare the batches:
 
@@ -77,7 +77,7 @@ to them through the notion-plus connector, per `docs/connectors/notion/overview.
       ```
 
       It refuses a labels file with a missing, a repeated or an unknown id. It prints housekeeping requests per workday and the prompt's sha256.
-   5. Record the count, the sha256, "labelled in a Claude Code session" and the session's model id.
+   5. Record the count, the sha256, "labeled in a Claude Code session" and the session's model id.
 
    The batch files and labels stay where they were written, outside the repo.
 3. **Count the thanks.** The D1 counts come from `agents/uno-bot/queries/usage/appreciation-weekly.sql` (reactions on uno-bot's messages, thanks replies to it). Then search the week's channels and Figma comments for shout-outs that were not addressed to the bot, and add each to the **Appreciation log** with Permission unset and Quote empty.

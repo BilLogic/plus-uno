@@ -115,7 +115,7 @@ export async function resolveIndexModel(
  *
  * The candidate functions are generated as `search_blueprint_<suffix>` and
  * read `blueprint_<suffix>`, so the suffix carries straight across. A name
- * this does not recognise falls back to the live index rather than inventing
+ * this does not recognize falls back to the live index rather than inventing
  * a source, which is the same answer the constant used to give.
  *
  * @param rpcName - the search function being called

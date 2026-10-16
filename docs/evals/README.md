@@ -9,7 +9,7 @@ What "good" means for each artifact, the scenarios a skill must pass, and the fr
 | Dir | Holds | Read by |
 |---|---|---|
 | `rubrics/` | what "good" means, one rubric per artifact type (the six skills, bot-answer D1–D9) — YAML criteria + prose rationale | `reviewers/rubric-applier`, summoned from each skill's quality bar; the Worker's draft judge for `bot-answer.md` |
-| `scenarios/` | `<skill>.md` — ≥3 scenarios (query + expected behaviour) per skill, **written before the skill body**: baseline without the skill, then write the minimal skill that passes | each skill's quality bar |
+| `scenarios/` | `<skill>.md` — ≥3 scenarios (query + expected behavior) per skill, **written before the skill body**: baseline without the skill, then write the minimal skill that passes | each skill's quality bar |
 | `fixtures/` | frozen golden inputs + answer keys (see `fixtures/README.md`) | the rubric benchmarks; the Worker's detector unit tests |
 
 A rubric review returns its scored verdict to the skill that asked for it; nothing is logged here. The results measured before that — the 2026-07-08 golden runs, the retrieval baselines, the Cursor acceptance runs — are in `docs/knowledge/archive/eval-runs/`.

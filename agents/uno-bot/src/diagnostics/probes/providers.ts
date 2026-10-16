@@ -63,7 +63,7 @@ export const vertexClaudeProbe: ProbeRun = async (env) => {
 // Is the Gemini adapter's system prompt actually being cached? Reports the
 // cachedContents resource (or the exact reason there isn't one) plus the size
 // of the harness it would hold. Cheap: no model call, and the create is
-// memoised for the hour either way. Token-gated like every /debug route.
+// memoized for the hour either way. Token-gated like every /debug route.
 export const geminiCacheProbe: ProbeRun = async (env) => {
   const model = env.GEMINI_MODEL ?? "gemini-3.8-flash";
   const blocks = await buildSystemBlocks(env, null, null);

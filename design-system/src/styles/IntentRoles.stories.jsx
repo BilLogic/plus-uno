@@ -4,7 +4,7 @@ import { expect } from 'storybook/test';
 import { contrast as contrastOf, parseColour } from '../lib/tokens.mjs';
 
 /**
- * What each intent colour is FOR — the role layer, and the measurement it came
+ * What each intent color is FOR — the role layer, and the measurement it came
  * from.
  *
  * WHAT THIS PAGE IS. The evidence behind
@@ -15,7 +15,7 @@ import { contrast as contrastOf, parseColour } from '../lib/tokens.mjs';
  * THE FINDING. All seven intents carry the same nine tokens — a base, a
  * container, a `-text`, six state overlays — which names two roles and uses
  * three. There is no `--color-warning-border` and no `--color-warning-icon`, so
- * an intent-coloured stroke or glyph reaches for the BASE, which is also the
+ * an intent-colored stroke or glyph reaches for the BASE, which is also the
  * ground. `_colors.scss` says as much in a comment beside the value ("for
  * borders/backgrounds"); a comment cannot enforce anything, and 108
  * declarations in this repository set a foreground from an intent base.
@@ -35,7 +35,7 @@ import { contrast as contrastOf, parseColour } from '../lib/tokens.mjs';
  * AND 3:1 IS A FLOOR, NOT A VALUE. The first version of the role layer gave
  * every `-icon` the base, since the base already clears 3:1. Binding the tokens
  * to the real Alert component set in Figma showed what that would do: four of
- * its six variants already draw their icon from the `-text` colour, and the
+ * its six variants already draw their icon from the `-text` color, and the
  * base-valued token would have LIGHTENED them — danger 6.7:1 down to 5.0:1,
  * warning 8.7:1 down to 5.0:1. Clearing the icon bar is not a reason to stop
  * clearing the text one, so `-icon` resolves to `-text` and exists as its own
@@ -49,7 +49,7 @@ import { contrast as contrastOf, parseColour } from '../lib/tokens.mjs';
  * `scripts/baselines/intent-role-adoption.json`. Six of the seven roles alias their
  * base, so those 111 changed no pixel — what changed is that an edge now says
  * it is an edge, and the value can move for edges alone. The `-icon` roles
- * still have no users: an icon colour is usually set by `color:` on a glyph,
+ * still have no users: an icon color is usually set by `color:` on a glyph,
  * which `check:text-contrast` already measures against the 4.5:1 bar.
  *
  * The sweep also found the role that was missing rather than unused. 25 focus
@@ -58,7 +58,7 @@ import { contrast as contrastOf, parseColour } from '../lib/tokens.mjs';
  * Foundations/Focus ring, and `--color-focus-ring` beside these tokens.
  */
 export default {
-    title: 'Foundations/Intent colour roles',
+    title: 'Foundations/Intent color roles',
     tags: ['!dev', '!autodocs'],
 };
 
@@ -98,7 +98,7 @@ const AA_NON_TEXT = 3;
 
 const INTENTS = ['primary', 'secondary', 'tertiary', 'danger', 'success', 'warning', 'info'];
 
-/** The surface ladder every one of these colours has to survive. */
+/** The surface ladder every one of these colors has to survive. */
 const GROUNDS = [
     ['lowest', '--color-surface-container-lowest'],
     ['low', '--color-surface-container-low'],
@@ -201,7 +201,7 @@ export const RolesAndBars = () => {
 
     return (
         <div style={{ maxWidth: '1000px', padding: '24px' }} data-testid="intent-roles">
-            <h2 className="h4">What each intent colour is for</h2>
+            <h2 className="h4">What each intent color is for</h2>
             <p className="body2-txt" style={{ maxWidth: '62ch' }}>
                 Every ratio is computed from the tokens as this page renders them, against the five
                 surface steps the system ships. Nothing here has been repointed — the role tokens
@@ -229,7 +229,7 @@ export const RolesAndBars = () => {
             <p className="body2-txt" style={{ maxWidth: '62ch' }}>
                 Held to 3:1 rather than 4.5:1 — WCAG 1.4.11, non-text contrast — but 3:1 is the
                 floor an icon must reach, not the value it should take. Every <code>-icon</code>
-                resolves to its <code>-text</code> colour, which clears both bars on all five
+                resolves to its <code>-text</code> color, which clears both bars on all five
                 grounds; it exists as its own name so an icon can be lightened deliberately later,
                 against a bar that is written down. Every <code>-border</code> keeps the base, where
                 3:1 is the right bar.

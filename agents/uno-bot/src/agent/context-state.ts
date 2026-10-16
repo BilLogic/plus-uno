@@ -1,4 +1,4 @@
-// Phase 5: structured conversation state, progressive summarisation, and drift
+// Phase 5: structured conversation state, progressive summarization, and drift
 // detection. FLAGGED OFF by default (env.CONTEXT_STATE === "on").
 //
 // ─────────────────────────────────────────────────────────────────────────────
@@ -20,7 +20,7 @@
 //   • It costs a round-trip on every turn, on a path that already fights a
 //     50-subrequest cap — to save tokens. The arithmetic does not obviously
 //     work, and nothing here would measure whether it did.
-//   • A summariser hallucinating a constraint is strictly worse than no state
+//   • A summarizer hallucinating a constraint is strictly worse than no state
 //     at all. The whole point of the block is that the model can TRUST it; a
 //     block that is itself a generation is just more prompt.
 //   • It cannot be tested. A derived state is a pure function of the history,
@@ -166,7 +166,7 @@ export function withoutAgedCancels<T extends HistoryTurn>(history: T[], now: num
   );
 }
 
-// ── Progressive summarisation ────────────────────────────────────────────────
+// ── Progressive summarization ────────────────────────────────────────────────
 //
 // Same shape as thread-transcript's window, one difference that is the whole
 // point: what gets dropped is REPLACED by a count, not deleted silently. A

@@ -18,7 +18,7 @@ a dozen messages and that is not a readable form.
 **Status 2026-08-22 (pm): decided and implemented.** The user's call: *"our
 reaction should be ✅ versus ⛔ … if one wants to approve, click the check mark;
 if they disapprove, click the cancellation button and then articulate what
-else to fix … if someone sends an emoji, fine, recognise the common mapped
+else to fix … if someone sends an emoji, fine, recognize the common mapped
 ones … but if it's a text response, just go straight to the model route.
 There are too many complications; I don't think it's worth it."* So: Proposal
 A (buttons) shipped, Proposal C (retire the typed classifiers) shipped, ⛔ is
@@ -33,7 +33,7 @@ in `slack-app-manifest.yaml`. `slack manifest diff --app A0APS0L8HJR` reports
 *"Project manifest and app settings match"*, and the remote manifest's
 `settings.interactivity.request_url` is the Worker route. Nothing was pending.
 
-The organising question: **when the bot needs a person's approval before it
+The organizing question: **when the bot needs a person's approval before it
 acts, what counts as approval, and what happens to it?**
 
 Three things had been conflated under that question — a feedback vote, a
@@ -94,7 +94,7 @@ Same for "no go ahead" and "ok cancel" — mixed signals are never guessed.
 
 > **Bryan:** actually cancel that
 >
-> **uno-bot:** Cancelled — nothing was filed. Want it re-staged with a different tier?
+> **uno-bot:** Canceled — nothing was filed. Want it re-staged with a different tier?
 
 A ✅ on a card that was already superseded says so instead of filing the newer
 one. A ✅ ten minutes after the card expired gets the hourglass, not silence.
@@ -135,7 +135,7 @@ answer on each path — and that is deliberate.
 Slack message
   └─ handleSlackEnvelope → dispatchInnerEvent  case "message"
        └─ enqueueAgentJob  (per-thread DO; the Worker's own invocation is
-                            cancelled ~30s after the ack, so the run moves
+                            canceled ~30s after the ack, so the run moves
                             to a DO alarm — live incident 2026-07-09)
             └─ handleUserMessage
                  ├─ loadPendingProposalByThread          ← is anything staged?
@@ -198,7 +198,7 @@ Slack block_actions        (a DIFFERENT endpoint from events — interactive.ts)
               └─ resolveProposal           ✅ NO MODEL CALL
                     └─ won the claim → re-render the card via response_url:
                        buttons off, "✅ Approved by @who" or
-                       "⛔ Cancelled by @who — tell me what to change"
+                       "⛔ Canceled by @who — tell me what to change"
 ```
 
 Buttons arrive on Slack's interactivity endpoint, not the events one. The live
@@ -236,7 +236,7 @@ reacting cannot file two cards.
 | Button | No | Same — the control names the decision exactly |
 
 The design principle holds, and is now literally true: **no fixed list decides
-what a person meant.** The only list left recognises emoji, where there is
+what a person meant.** The only list left recognizes emoji, where there is
 nothing to decide.
 
 
@@ -266,7 +266,7 @@ Listed so nothing here has to be re-litigated.
 
 | # | What | Commit |
 | --- | --- | --- |
-| 8 | **👍/👎 removed.** The vote could only ever be `console.log`ged — Slack's data policy forbids retaining retrieved workspace content — so nothing counted it and nothing could query it. The acknowledgement claimed to replace the buttons "so a second vote is not invited" while sending `replace_original: false`, so one person could vote endlessly. The honesty line, `LLM-written · check before acting`, stays: that was the footer's actual job. | `965107b2` |
+| 8 | **👍/👎 removed.** The vote could only ever be `console.log`ged — Slack's data policy forbids retaining retrieved workspace content — so nothing counted it and nothing could query it. The acknowledgment claimed to replace the buttons "so a second vote is not invited" while sending `replace_original: false`, so one person could vote endlessly. The honesty line, `LLM-written · check before acting`, stays: that was the footer's actual job. | `965107b2` |
 | 9 | **Delete dropped with it, deliberately.** `buildThreadHistory` rebuilds every turn by re-reading the raw Slack thread, so deleting a bot message deletes the bot's own memory of having said it — `priorAssistantText`, which the correction gate compares a corrected reply against — and punches a hole in the transcripts the team analyses. A wrong answer with its correction underneath beats a gap. | `965107b2` |
 | 10 | **👍 confirms again.** Removed in the morning, restored in the afternoon. The gesture was never the problem; the gesture *meaning two things* was. With the footer no longer using it (#8) and reactions resolving only their own card (#1), the collision is gone, and making someone hunt for ✅ is friction with nothing left to protect. It now means the same thing reacted as typed. | `0a16ad19` |
 
@@ -278,7 +278,7 @@ Listed so nothing here has to be re-litigated.
 **Standing invariant from #10:** *a confirmation gesture may have exactly one
 meaning in the product.* If 👍 is ever given a second job, it leaves
 `CONFIRM_REACTIONS` the same day. Pinned by a test that also keeps 👎 out —
-cancelling is ❌.
+canceling is ❌.
 
 ---
 
@@ -513,7 +513,7 @@ vocabulary, the resolution matcher, the consequence tier, the confidence
 predicates. These are **not**, and cannot be without Miniflare plus a Slack
 fake:
 
-- the claim actually serialising two racing resolvers
+- the claim actually serializing two racing resolvers
 - the reaction fallback pointing rather than executing
 - the card's block rendering, and its silent degradation path
 - `cached` surviving the DO round trip
@@ -533,7 +533,7 @@ Shipped work is verified; these cover what is proposed.
 - [x] The card has been eyeballed once on a real answer — live DM test 2026-08-22. The manifest note was wrong: interactivity already pointed at the Worker (`slack manifest diff` reports a match), so nothing was pending there.
 - [x] No typed words resolve a proposal without the model (`resolution.ts`, `react-only.ts`, the phrase lists: deleted)
 - [x] An identical re-stage while pending executes as a confirm instead of bouncing
-- [x] A pure acknowledgement can end as a reaction with no reply (model-chosen via `slack_react`)
+- [x] A pure acknowledgment can end as a reaction with no reply (model-chosen via `slack_react`)
 - [ ] A turn that leaves a pending proposal unresolved and unaddressed is logged (Proposal B — open)
 - [x] `npm run typecheck` clean, `npm test` passing (167)
 - [x] New pure logic (`typedEmojiDecision`, `GATE_RESERVED`) lives in `gate-reactions.ts`, already in `tsconfig.test.json`

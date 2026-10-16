@@ -60,7 +60,7 @@ export interface NotionBlock {
 // The underscore forms carry word-boundary lookarounds on purpose. This
 // codebase's own vocabulary is full of snake_case (`notion_create`,
 // `search_blueprint`, `proposal_resolve`) and without them "notion_create and
-// source_read" would italicise the span between the two underscores — turning
+// source_read" would italicize the span between the two underscores — turning
 // tool names the bot writes constantly into mangled emphasis.
 const INLINE_SOURCE = [
   "(`[^`\\n]+`)", // 1 code span

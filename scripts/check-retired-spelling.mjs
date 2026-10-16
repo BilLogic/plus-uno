@@ -104,8 +104,8 @@ export const RETIRED = [
     why: 'there is one agent loop and two adapters behind the ModelProvider seam — count adapters or providers, not lanes',
   },
   {
-    re: /\blanes?[- ](?:honours?|honors?|report|reports|run|runs|log|logs)\b/gi,
-    why: 'an adapter honours/reports/runs — "lane" in the provider sense is retired',
+    re: /\blanes?[- ](?:honors?|honors?|report|reports|run|runs|log|logs)\b/gi,
+    why: 'an adapter honors/reports/runs — "lane" in the provider sense is retired',
   },
 ];
 

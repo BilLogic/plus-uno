@@ -12,7 +12,7 @@ test("a transcript that fits is untouched", () => {
 });
 
 test("the PARENT survives the cap — the regression this exists for", () => {
-  // Old behaviour dropped oldest-first, so the parent went first and the model
+  // Old behavior dropped oldest-first, so the parent went first and the model
   // got replies to a question it could not see.
   const lines = [ "PARENT: what did we decide about spacing?", ...Array.from({ length: 40 }, (_, i) => line(i)) ];
   const out = windowTranscript(lines, 300);

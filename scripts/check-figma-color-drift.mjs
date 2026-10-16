@@ -5,14 +5,14 @@
  *
  * See `scripts/figma-color-drift.mjs` for what was unwatched: the variables
  * snapshot records every variable by NAME and by count and not one VALUE, so a
- * colour could move on either side and the names would still line up perfectly.
+ * color could move on either side and the names would still line up perfectly.
  * Two had, both found in the same sweep on 2026-08-29, and both have since been
  * resolved — `--color-scrim` on the CSS side, `--color-success-container` on the
  * Figma side on 2026-09-15. `KNOWN` below is empty, which is the state to keep
  * it in.
  *
  * WHAT `KNOWN` IS FOR. A divergence that is a decision rather than a repair:
- * whichever side you change, a colour that ships today moves. Such an entry
+ * whichever side you change, a color that ships today moves. Such an entry
  * records what both sides say, so a change on EITHER side fails rather than
  * sliding under the exemption. The ratchet is that the list may SHRINK and
  * never grow — a new divergence fails, and so does an entry that has stopped
@@ -24,7 +24,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { cssColours, compare, failures } from './figma-color-drift.mjs';
+import { cssColors, compare, failures } from './figma-color-drift.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -62,7 +62,7 @@ export const REMEDY =
  */
 const inputs = byRoot((repoRoot) => {
   const recording = JSON.parse(fs.readFileSync(path.join(repoRoot, RECORDING), 'utf8'));
-  const result = compare(recording, cssColours(repoRoot));
+  const result = compare(recording, cssColors(repoRoot));
   const age = Math.floor((Date.now() - Date.parse(recording.measuredAt)) / 86400000);
   return { recording, result, age };
 });
@@ -76,7 +76,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     found.push(`${RECORDING} has no readable measuredAt.`);
   } else if (age > MAX_AGE_DAYS) {
     found.push(
-      `${RECORDING} is ${age} days old (ceiling ${MAX_AGE_DAYS}). A colour that has not been ` +
+      `${RECORDING} is ${age} days old (ceiling ${MAX_AGE_DAYS}). A color that has not been ` +
         're-read from Figma this year cannot report drift.',
     );
   }
@@ -95,7 +95,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 export function summary({ repoRoot = REPO_ROOT } = {}) {
   const { recording, result, age } = inputs(repoRoot);
   return (
-    `${result.compared} colours compared against Figma ` +
+    `${result.compared} colors compared against Figma ` +
     `(${recording.measuredAt}, ${age}d), ${KNOWN.length} known divergence(s), ` +
     `${result.unmapped.length} Figma-only`
   );

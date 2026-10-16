@@ -8,7 +8,7 @@ import Scrollspy, { ScrollspyContent } from './Scrollspy/Scrollspy';
  *
  * WHY THIS FILE EXISTS (#325). `Scrollspy` marked the current item with a class
  * and nothing else. The whole purpose of the component — "you are here" — was
- * therefore available only to someone looking at the colour: a screen-reader
+ * therefore available only to someone looking at the color: a screen-reader
  * user got a list of links with no indication of position, which is the same
  * list they would have got with no scrollspy at all.
  *

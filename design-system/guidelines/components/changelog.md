@@ -68,7 +68,7 @@ nobody an edit, and is the one source that cannot drift from what happened. It
 is worse prose than a written entry, which is why it is the fallback rather than
 the first move.
 
-The trigger to switch is a judgement, not a threshold: when the tab is empty for
+The trigger to switch is a judgment, not a threshold: when the tab is empty for
 components that have visibly changed.
 
 ## Related

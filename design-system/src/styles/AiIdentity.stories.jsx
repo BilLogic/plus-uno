@@ -4,7 +4,7 @@ import { expect } from 'storybook/test';
 import { contrast as contrastOf, parseColour } from '../lib/tokens.mjs';
 
 /**
- * Four candidate register colours for a PLUS agent, measured (#269).
+ * Four candidate register colors for a PLUS agent, measured (#269).
  *
  * WHAT THIS PAGE IS. A decision aid, not a proposal with a preferred answer.
  * #269 concluded that we have no AI brand and that this blocks the components
@@ -20,7 +20,7 @@ import { contrast as contrastOf, parseColour } from '../lib/tokens.mjs';
  *
  * Three things in that shape are decisions, and all three are copyable:
  *   1. ONE BOLD GROUND, AND IT IS BLACK — not a hue. AI is a different
- *      REGISTER, not another semantic colour competing with success and danger.
+ *      REGISTER, not another semantic color competing with success and danger.
  *   2. THE ACCENTS ONLY EVER APPEAR AS BORDER AND ICON. There is no
  *      `rovo.text` and no `rovo.background` in those hues: the identity marks an
  *      edge and a glyph, it never floods a surface.
@@ -30,12 +30,12 @@ import { contrast as contrastOf, parseColour } from '../lib/tokens.mjs';
  * WHY NO TOKENS ARE ADDED BY THIS FILE. Picking `--color-ai-bold` is picking a
  * brand, and that is Bill's call — #269 says so and I am not going to make it
  * by shipping a default that then becomes the answer by inertia. Every value
- * below is local to this story and labelled a candidate.
+ * below is local to this story and labeled a candidate.
  *
  * WHAT IS MEASURED, because "these four look different" is not evidence:
  *   contrast   white text on the candidate, WCAG AA needs 4.5:1
- *   distance   how far the candidate is from the NEAREST colour this system
- *              already uses, on a weighted RGB metric. A register colour that
+ *   distance   how far the candidate is from the NEAREST color this system
+ *              already uses, on a weighted RGB metric. A register color that
  *              sits next to `--color-mastering-content` would say the agent IS
  *              a curriculum domain, which is the borrowed-meaning mistake #269
  *              argues against.
@@ -46,8 +46,8 @@ export default {
 };
 
 /**
- * The colours this system already uses, as grounds — every `--color-*` that is
- * a literal hex and is not a container, state layer, on-colour or surface. A
+ * The colors this system already uses, as grounds — every `--color-*` that is
+ * a literal hex and is not a container, state layer, on-color or surface. A
  * candidate is measured against all of them.
  */
 const EXISTING = {
@@ -70,13 +70,13 @@ const CANDIDATES = [
         name: 'Near-black',
         hex: '#1c1f21',
         argument:
-            'Atlassian’s own answer. Says "different register" rather than "another hue", and cannot collide with a semantic colour because it is not one.',
+            'Atlassian’s own answer. Says "different register" rather than "another hue", and cannot collide with a semantic color because it is not one.',
     },
     {
         name: 'Indigo',
         hex: '#3b3fa8',
         argument:
-            'Reads as a distinct product voice while staying in the blue family the app already speaks. Nearest neighbour is technology-tools.',
+            'Reads as a distinct product voice while staying in the blue family the app already speaks. Nearest neighbor is technology-tools.',
     },
     {
         name: 'Deep violet',
@@ -88,7 +88,7 @@ const CANDIDATES = [
         name: 'Plum',
         hex: '#6d2f6b',
         argument:
-            'Quieter than violet, still clearly not a status colour. No close neighbour in the current palette.',
+            'Quieter than violet, still clearly not a status color. No close neighbor in the current palette.',
     },
 ];
 
@@ -108,8 +108,8 @@ const contrast = (a, b) => contrastOf(parseColour(a), parseColour(b));
 
 /**
  * Weighted RGB distance (the "Compuphase" approximation). Not CIEDE2000 — this
- * runs in a story with no colour-science dependency, and the question it answers
- * is coarse: "could someone mistake this for a colour the system already uses?"
+ * runs in a story with no color-science dependency, and the question it answers
+ * is coarse: "could someone mistake this for a color the system already uses?"
  * A finer metric would give more decimal places to the same answer.
  */
 const distance = (a, b) => {
@@ -170,7 +170,7 @@ export const Candidates = () => (
         <p className="body2-txt" style={{ maxWidth: '62ch' }}>
             Each row shows the candidate as a bold ground, as the border-and-icon accent it would
             mostly appear as, and the two numbers that decide whether it is usable at all.
-            <strong> None of these is a proposal.</strong> The colour is a branding decision; this
+            <strong> None of these is a proposal.</strong> The color is a branding decision; this
             page exists so it is made against evidence rather than a swatch.
         </p>
 
@@ -238,7 +238,7 @@ export const Candidates = () => (
             Still yours to decide
         </h3>
         <ol className="body2-txt" style={{ maxWidth: '62ch' }}>
-            <li>Which register colour, if any of these.</li>
+            <li>Which register color, if any of these.</li>
             <li>
                 What &ldquo;verified&rdquo; means for a PLUS agent. In a product touching student
                 data that is a policy answer before a visual one.
@@ -260,7 +260,7 @@ Candidates.play = async () => {
         // showing it as one would be showing something unusable.
         await expect(white, `${name}: white on ${hex}`).toBeGreaterThanOrEqual(4.5);
 
-        // And it must not be mistakable for a colour that already means
+        // And it must not be mistakable for a color that already means
         // something. 60 is well below every pair in the current palette that
         // people distinguish in practice; a candidate under it would be arguing
         // that the agent IS whatever it sits next to.

@@ -42,7 +42,7 @@ export const DefaultButtonsTakeADefinedSize = () => (
     <Jumbotron
         title="Autumn 2026"
         subtitle="12 weeks, 48 sessions"
-        primaryButton={{ text: 'Enrol' }}
+        primaryButton={{ text: 'Enroll' }}
         secondaryButton={{ text: 'Read the outline' }}
     />
 );
@@ -50,7 +50,7 @@ export const DefaultButtonsTakeADefinedSize = () => (
 DefaultButtonsTakeADefinedSize.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    for (const name of ['Enrol', 'Read the outline']) {
+    for (const name of ['Enroll', 'Read the outline']) {
         const button = canvas.getByRole('button', { name });
         // The discriminator: `plus-btn--default` before the fix, and no rule
         // anywhere matches it.
@@ -65,12 +65,12 @@ DefaultButtonsTakeADefinedSize.play = async ({ canvasElement }) => {
 export const CallerSizeStillWins = () => (
     <Jumbotron
         title="Autumn 2026"
-        primaryButton={{ text: 'Enrol', size: 'large' }}
+        primaryButton={{ text: 'Enroll', size: 'large' }}
     />
 );
 
 CallerSizeStillWins.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const button = canvas.getByRole('button', { name: 'Enrol' });
+    const button = canvas.getByRole('button', { name: 'Enroll' });
     await expect(button.classList.contains('plus-btn--large')).toBe(true);
 };

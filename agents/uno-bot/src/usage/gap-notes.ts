@@ -21,7 +21,7 @@
 
 import { rethrowIfBudget } from "../net";
 import { escapeSlackText } from "../slack/mrkdwn";
-import { normalisePersonName } from "./roles";
+import { normalizePersonName } from "./roles";
 import type { StoredTeamRoles } from "./team-roles-sync";
 
 /** How long a person, once noted, is not noted again. */
@@ -53,9 +53,9 @@ export interface GapNotes {
   untagged(names: readonly string[]): Promise<void>;
 }
 
-/** The KV key a person's mark is kept under: a SHA-256 of their normalised name. */
+/** The KV key a person's mark is kept under: a SHA-256 of their normalized name. */
 export async function gapNoteKey(name: string): Promise<string> {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(normalisePersonName(name)));
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(normalizePersonName(name)));
   return `gap-note:${[...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("")}`;
 }
 
@@ -71,8 +71,8 @@ export function gapNoteText(name: string, column: GapColumn, why: keyof typeof W
 
 /** The row name a list holds for `name`, compared as `matchRoster` compares names. */
 function rowNamed(name: string, rows: readonly string[] | undefined): string | null {
-  const key = normalisePersonName(name);
-  return key ? (rows ?? []).find((r) => normalisePersonName(r) === key) ?? null : null;
+  const key = normalizePersonName(name);
+  return key ? (rows ?? []).find((r) => normalizePersonName(r) === key) ?? null : null;
 }
 
 /**

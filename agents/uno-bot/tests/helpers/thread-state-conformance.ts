@@ -336,7 +336,7 @@ export function runThreadStateConformance(
   });
 
   // Nothing is retired by a card that was already dead: an aged-out record stays
-  // expired rather than being relabelled by the next turn's staging.
+  // expired rather than being relabeled by the next turn's staging.
   it("staging does not relabel an aged-out card", async () => {
     const { store, clock } = setup();
     await store.putProposal(proposal({ proposalTs: "1700.2" }));
@@ -1287,7 +1287,7 @@ export function runThreadStateConformance(
 
   // ----- a record's own lifetime -----
   //
-  // A proposal may carry its own `ttlMs`, and every TTL read honours it: the
+  // A proposal may carry its own `ttlMs`, and every TTL read honors it: the
   // lookups, the claim, the cut-off window. 72 h is the case it exists for —
   // a card that has to outlive a weekend — and 71 h / 73 h put it either side
   // of the line, both far past the hour every other card lives by.

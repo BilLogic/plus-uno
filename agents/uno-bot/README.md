@@ -24,7 +24,7 @@ Because the brain is bundled, **guidance changes reach the bot on `deploy`, not 
 
 ### Worker seams
 
-The words the Worker's code is organised by; `GLOSSARY.md` keeps the words people use about the bot. A **Turn** runs the one agent loop through **ModelProvider**; each tool call is dispatched by its **tool table** row, a staged one waits on **Gate**, and **ThreadState** carries the thread from one turn to the next.
+The words the Worker's code is organized by; `GLOSSARY.md` keeps the words people use about the bot. A **Turn** runs the one agent loop through **ModelProvider**; each tool call is dispatched by its **tool table** row, a staged one waits on **Gate**, and **ThreadState** carries the thread from one turn to the next.
 
 **Turn**:
 One uno-bot turn (`agents/uno-bot/src/turn/`): one request in (who, where, the text, the images, the pending proposal), one outcome out (what was posted, what is staged, what the conversation remembers). What a person sees while it runs goes through its **Delivery** port.
@@ -83,7 +83,7 @@ Deleting the second loop is what made `/stop` work on Claude (#496): `claude-age
 
 **Autonomous (no ask — scheduled runs):** the **Figma library poll** (`agents/uno-bot/src/figma-poll.ts`) checks the DS Figma file once a weekday, as the end-of-day run's job. It posts nothing: a publish it finds starts one refresh of the repo's copy of the library snapshot (`figma-snapshot-refresh.yml`, by `repository_dispatch`), at the end of the same run, re-sent each night until the snapshot records it. The **weekly DS precedence check** (`agents/uno-bot/src/ds-precedence/`) runs on Monday's end-of-day run (06:00 ET): it compares the component index and the registry's props with the library, and hands its report to Monday morning's sweep message in `#plus-universal`, where it is one section on the shared decision card: how many components disagree, then one card per component with Review, Code and Figma. Every morning job with cards for a team channel hands them to that one message the same way (`agents/uno-bot/scheduled-actions/sweep/ACTION.md` § One message a place). The week's first Approve files one `harness-intake` issue and each later one comments on it; Needs changes puts a dispute with its note on that issue; Reject leaves the difference as deliberate; a clean week posts nothing. The copy all of these follow: `docs/connectors/slack/shapes.md` § Figma messages. Details: `docs/connectors/figma/overview.md`.
 
-The end-of-day run also tags asks on the **usage record** with the corpus Sub-type and its pain_category (1–7; 7 is a turn that staged a card or intake — `agents/uno-bot/src/usage/categories.ts`): one `chill` call per batch of channel asks, whose text is nulled in the same write; a batch that fails is retried one ask at a time, and an ask that fails three times is stored blank. Only an ask in a conversation Slack typed as a channel keeps its text for that; a DM, a group DM, or a mention whose event carried no channel type is labelled during its turn and never stored as text. Both weekday runs purge text older than 11 days less two hours, so none outlives 14 across a weekend, one missed run and a purge that starts late. Bill's spot-check is `agents/uno-bot/queries/usage/categories-spot-check.sql`.
+The end-of-day run also tags asks on the **usage record** with the corpus Sub-type and its pain_category (1–7; 7 is a turn that staged a card or intake — `agents/uno-bot/src/usage/categories.ts`): one `chill` call per batch of channel asks, whose text is nulled in the same write; a batch that fails is retried one ask at a time, and an ask that fails three times is stored blank. Only an ask in a conversation Slack typed as a channel keeps its text for that; a DM, a group DM, or a mention whose event carried no channel type is labeled during its turn and never stored as text. Both weekday runs purge text older than 11 days less two hours, so none outlives 14 across a weekend, one missed run and a purge that starts late. Bill's spot-check is `agents/uno-bot/queries/usage/categories-spot-check.sql`.
 
 **Quality loop, pre-send:** substantive text drafts (≥1500 chars — deliverable-shaped output, not ordinary replies) get ONE cheap judge call against a condensed D1–D9 rubric (`agents/uno-bot/src/agent/draft-judge.ts`) and are revised once if flagged; short replies skip it, and any judge error/timeout ships the original draft (fail open). Verdicts land in the telemetry stream as `[uno-bot] draft-judge …` lines.
 
@@ -234,7 +234,7 @@ A file that reads an input fails with `no such table` if you run it without rend
 
 **The measurement window** (2026-09-01 to 2027-01-01, each file's default; the usage record starts 2026-09-29) tracks five numbers:
 
-- `load-on-lead`: asks reaching the lead, and beside them every ask to the bot (`asks_to_bot`, per workday), split into housekeeping (pain_category 1–5 and 7), judgment (6) and unlabelled.
+- `load-on-lead`: asks reaching the lead, and beside them every ask to the bot (`asks_to_bot`, per workday), split into housekeeping (pain_category 1–5 and 7), judgment (6) and unlabeled.
 - `adoption`: distinct askers, the ones who asked in 3 or more weeks, and askers per Monday week. The lead is excluded.
 - `responsiveness`: the waits as before, with `unanswered`, the real asks the bot never answered.
 - `proposal-outcomes`: approved, approved with edits, rejected, refused, expired and still live, for cards, upkeep fixes, reminders, card follow-ups and DM follow-ups.
@@ -259,7 +259,7 @@ The same rows and seed always give the same picks. The output is CSV: `turn_id,s
 - the graded-answers commit, when the query reads the grading;
 - the date it was run.
 
-**Asks and turns.** A turn is one row per message the bot answered, follow-ups included. An ask is a turn whose own message opened a thread, which is the unit to set against the inbox count. `self-serve-rate`, `where-lead-time-goes`, `load-on-lead` and `repeats-reaching-lead` print one of each, labelled in a `unit` column, and `return-rate` counts asks with the turns beside them. The usage record keeps no thread root, so the ask count is an approximation, and each header says which way it leans.
+**Asks and turns.** A turn is one row per message the bot answered, follow-ups included. An ask is a turn whose own message opened a thread, which is the unit to set against the inbox count. `self-serve-rate`, `where-lead-time-goes`, `load-on-lead` and `repeats-reaching-lead` print one of each, labeled in a `unit` column, and `return-rate` counts asks with the turns beside them. The usage record keeps no thread root, so the ask count is an approximation, and each header says which way it leans.
 
 Numbers taken while the window is still open move as the end-of-day pass settles the last day's asks, so cite a closed window when you can. The known limits are in each file's header. Two of them apply to several files: the expired count is a lower bound, and a ticket's role reads `unknown` when its requester is not on the role map (`agents/uno-bot/src/usage/roles.ts`, synced daily from Team Members), and for every card staged before the map was first synced.
 

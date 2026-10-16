@@ -386,7 +386,7 @@ describe("a Figma drift at the morning run", () => {
       [["versions", FILE_KEY]],
       "one Figma read: the file's versions, for its last change and its publisher",
     );
-    assert.equal(m.provider.generated.length, 0, "an unchanged file needs no judgement");
+    assert.equal(m.provider.generated.length, 0, "an unchanged file needs no judgment");
   });
 
   /** One thread that discussed FIGMA_A, swept, and the morning ready to run. */
@@ -1269,7 +1269,7 @@ describe("a caught-up card's withdrawal and the budget (#897 review)", () => {
     await assert.rejects(recheckLiveAsks(RECHECK, tight.deps), SubrequestBudgetError);
     assert.equal((await h.threadState.getProposalByTs(card!.proposalTs)).state, "found", "not retired with its buttons still up");
     assert.deepEqual(tight.edits, []);
-    assert.equal(tight.provider.generated.length, 0, "stopped before the judgement, so the retry repeats nothing");
+    assert.equal(tight.provider.generated.length, 0, "stopped before the judgment, so the retry repeats nothing");
 
     const retry = recheck(h, drifts, m.figma, { judge: [SHOWS] });
     await recheckLiveAsks(RECHECK, retry.deps);

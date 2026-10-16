@@ -1,5 +1,5 @@
 /**
- * What a colour token says, and what the literal beside it says (#268).
+ * What a color token says, and what the literal beside it says (#268).
  *
  * `var(--color-on-surface-variant, #5c5c5c)` reads as one decision. It is two,
  * and in this repository they disagree 191 times out of 473 comparable uses —
@@ -8,7 +8,7 @@
  * falls back in one place to `#6750a4`, which is Material's default purple and
  * appears nowhere else in this system.
  *
- * A wrong emergency colour is invisible until the token fails to load, and then
+ * A wrong emergency color is invisible until the token fails to load, and then
  * it is wrong everywhere at once — and, as that spread shows, wrong DIFFERENTLY
  * in each place. The tokens really can fail to load: the Storybook docs iframe
  * and six prototype pages carry no token sheet, which is why the answer is "the
@@ -28,7 +28,7 @@
  * not aliases waiting for a definition: `--color-border` is used with three
  * different fallbacks (`#e5e7eb`, `#c4c7c5`, and a nested
  * `var(--color-outline-variant)`), so defining it means DECIDING a value, not
- * recording one. A check that cannot pass until someone makes 27 colour
+ * recording one. A check that cannot pass until someone makes 27 color
  * decisions is a check that ships red and gets switched off.
  *
  * They are kept in their own section of the baseline rather than merged with the
@@ -37,60 +37,60 @@
  * to zero deliberately.
  *
  * ─── WHY THIS FILE IS NOT CALLED `color-fallbacks` ─────────────────────────
- * Because the defect is not about colour. #268 asks for "a fallback that
- * disagrees with its token", unqualified, and the colour half turned out to be
+ * Because the defect is not about color. #268 asks for "a fallback that
+ * disagrees with its token", unqualified, and the color half turned out to be
  * the SMALLER half. The same measurement over dimension tokens finds 546
- * disagreements inside `design-system/src` alone, against 191 for colour, and
+ * disagreements inside `design-system/src` alone, against 191 for color, and
  * they are worse: `var(--size-section-gap-sm, 16px)` appears 61 times and that
- * token is `8px`. A wrong emergency colour is wrong; a gap that doubles when
+ * token is `8px`. A wrong emergency color is wrong; a gap that doubles when
  * the token sheet is late is a different layout.
  *
- * So the machinery below is parameterised by FAMILY — which tokens it looks at,
+ * So the machinery below is parameterized by FAMILY — which tokens it looks at,
  * and how two values of that kind are compared — and the two families differ in
  * exactly three ways, each of which is a fact about the corpus rather than a
  * preference:
  *
- *   which tokens      colour matches `--color-*` by name. Dimensions have no
+ *   which tokens      color matches `--color-*` by name. Dimensions have no
  *                     single prefix (`--size-*`, `--spacing-*`, `--font-size-*`,
  *                     `--font-line-height-*` and more), so that family is
  *                     defined by VALUE: a token counts if its resolved value is
  *                     a length. Nothing has to be added here when a new
  *                     dimension family is minted.
  *
- *   undefined names   reported for colour, ignored for dimensions. `--color-border`
+ *   undefined names   reported for color, ignored for dimensions. `--color-border`
  *                     with no definition is a real defect: the fallback IS the
- *                     colour. `var(--table-cell-x, 10px)` is not — it is a
+ *                     color. `var(--table-cell-x, 10px)` is not — it is a
  *                     component-local custom property, defined in the component's
  *                     own stylesheet, and the fallback is its documented default.
  *                     Reporting those would bury the finding in 324 non-findings.
  *
  *   aliases           resolved for both, and it is only load-bearing for
- *                     dimensions: 11 of 195 colour tokens are `var()` aliases
+ *                     dimensions: 11 of 195 color tokens are `var()` aliases
  *                     against 124 of 207 dimension tokens. Without resolution
  *                     most of the semantic size names are simply incomparable
  *                     and the check silently sees a fraction of its corpus.
- *                     Colour's recorded set is unchanged by it — measured, not
+ *                     Color's recorded set is unchanged by it — measured, not
  *                     assumed; the test below pins that.
  *
  * ─── WHERE THE GRAMMAR, THE MATHS AND THE CORPUS COME FROM ──────────────────
  * `design-system/src/lib/tokens.mjs` (#506), not from this file (#507): the
- * token grammar and colour parsing are the module's. THE RECORD IS
+ * token grammar and color parsing are the module's. THE RECORD IS
  * `scripts/lib/ratchet.mjs`'s, entire: #599 moved the classification there — a
- * baseline record is a harness concern rather than a colour one — and #600
+ * baseline record is a harness concern rather than a color one — and #600
  * moved the read, the stale sweep and the absent-record error mode with it, so
  * this file no longer knows a baseline exists.
  *
  * THE CORPUS AND THE EQUALITY ANSWER ARE `tokens-node.mjs`'s (#620), since
  * #621. This file used to carry `tokenDefinitions` and `resolveAliases` — a
- * second walk of the token sources — and `normaliseColour` and
- * `normaliseDimension`, one of the two colour keys and two dimension
- * normalisers #620 exists to collapse. `tokenCorpus` is the walk;
+ * second walk of the token sources — and `normalizeColor` and
+ * `normalizeDimension`, one of the two color keys and two dimension
+ * normalizers #620 exists to collapse. `tokenCorpus` is the walk;
  * `colourKey` and `dimensionKey` are the keys. What is left here is what is
  * about FALLBACKS — capturing the literal beside a token, auditing a FAMILY's
  * uses against their tokens, and the wording of the two reports.
  *
  * THE KEY KEEPS ALPHA, AND THE CAPTURE NOW READS IT. `colourKey` keeps alpha
- * where the `normaliseColour` it replaced (`parseColour` then `toHex`) dropped
+ * where the `normalizeColor` it replaced (`parseColour` then `toHex`) dropped
  * it. For a long time that reached no comparison here, because the fallback
  * literal was captured with `[^),]+` alone: it admits neither a comma nor a
  * `)`, so a whole `var(--color-x, rgba(…))` was not matched at all — not
@@ -173,7 +173,7 @@ export function fallbackUsages(files, { prefix = '--color-' } = {}) {
  *
  * @param {{tokens: Map<string,string>, usages: Usage[]}} o
  */
-export function fallbackAudit({ tokens, usages, normalise = colourKey, reportUndefined = true }) {
+export function fallbackAudit({ tokens, usages, normalize = colourKey, reportUndefined = true }) {
   const disagreements = [];
   const undefinedTokens = new Map();
   let comparable = 0;
@@ -189,8 +189,8 @@ export function fallbackAudit({ tokens, usages, normalise = colourKey, reportUnd
       continue;
     }
     if (use.literal === null) continue;
-    const tokenValue = normalise(tokens.get(use.token));
-    const literal = normalise(use.literal);
+    const tokenValue = normalize(tokens.get(use.token));
+    const literal = normalize(use.literal);
     // Either side may be a nested `var()` or a keyword. Counted, so the check
     // can say what share of the corpus it was actually able to compare.
     if (tokenValue === null || literal === null) {
@@ -225,7 +225,7 @@ export function fallbackAudit({ tokens, usages, normalise = colourKey, reportUnd
 /**
  * The audit in the SHAPE ITS RECORD IS WRITTEN IN — two arrays of keys, in the
  * order the audit found them, because both reports render in that order. That
- * is the whole of what the ratchet is handed: the colour record holds two
+ * is the whole of what the ratchet is handed: the color record holds two
  * `keys` sets and the dimension record one, and a check on
  * `scripts/lib/ratchet.mjs` measures its side on the form its record declares
  * (#600).
@@ -279,7 +279,7 @@ export function fallbackSides(audit) {
  * @param {{disagreements?: string[], undefinedTokens?: string[]}} fresh
  *        the keys the ratchet reported NEW, per set, in the order it found them.
  */
-export function fallbackFailures(audit, fresh, { noun = 'colour' } = {}) {
+export function fallbackFailures(audit, fresh, { noun = 'color' } = {}) {
   const failures = [];
   const found = fallbackSides(audit);
   const newUndefined = fresh.undefinedTokens ?? [];

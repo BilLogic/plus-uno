@@ -2,11 +2,11 @@
  * Guard for the transient `.storybook/vitest.setup.ts` import failure (#157).
  *
  * The flake was a dependency discovered at runtime: the browser-mode Vite server
- * re-optimises and reloads the page, and whichever test files were mid-import
+ * re-optimizes and reloads the page, and whichever test files were mid-import
  * abort with a spurious error naming the setup file. Two properties of the root
  * config keep that from recurring, and both are easy to undo by accident:
  *
- *   1. `optimizeDeps.include` pins the setup graph, so the first optimise pass is
+ *   1. `optimizeDeps.include` pins the setup graph, so the first optimize pass is
  *      the only one. `axe-core` is the load-bearing entry — addon-a11y reaches it
  *      through a dynamic `import("axe-core")` that no static scan can see.
  *   2. `setupFiles` names the addon's internal setup file alongside ours, so the

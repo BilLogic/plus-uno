@@ -21,14 +21,14 @@
  * the blueprint pins it. The kit's package and repo are `uno-blueprint`
  * (`BilLogic/uno-blueprint`, renamed from `agentic-service-blueprinting` at its
  * v2.0.0) — not the PLUS blueprint estate of the same name, which this sweep
- * calls `blueprint` and reads from `plus-uno-blueprint`. So the kit is labelled
+ * calls `blueprint` and reads from `plus-uno-blueprint`. So the kit is labeled
  * as the template kit and its sibling checkout is `uno-blueprint-kit`, never a
  * bare `uno-blueprint` directory, which is the deployment's local checkout. Neither sibling depends on this repo, so
  * hosting the sweep there would mean giving one of them an edge it does not have.
  *
  * ── THE UNIT IS A PASSAGE, NOT A PARAGRAPH ──────────────────────────────────
  *
- * The first draft compared normalised PARAGRAPHS and would have missed the very
+ * The first draft compared normalized PARAGRAPHS and would have missed the very
  * maps it was written for. Measured against the two glossaries as they stood
  * before #365 and #137, exact-paragraph matching found ONE shared block in the
  * whole of both files — the `sprawl` row — while two rename maps and two
@@ -36,7 +36,7 @@
  * differing by a migration id per row. Any unit that has to match end to end is
  * defeated by one edited cell.
  *
- * So the unit is a SHINGLE — {@link SHINGLE} consecutive normalised words — and
+ * So the unit is a SHINGLE — {@link SHINGLE} consecutive normalized words — and
  * a finding is a maximal RUN of shared shingles covering at least
  * {@link MIN_WORDS} words. That survives an edited cell in the middle of a
  * table, is wrap-independent (all three repos hard-wrap, and a re-wrap must not

@@ -9,7 +9,7 @@ import './ChoiceGroup.scss';
 const OTHER_VALUE = 'other';
 
 /** An option as `{ value, label, ... }`, whether it was given as a string or an object. */
-const normalise = (option) => (
+const normalize = (option) => (
     typeof option === 'object' && option !== null
         ? option
         : { value: option, label: String(option) }
@@ -93,7 +93,7 @@ const ChoiceGroup = ({
     );
 
     const renderChoice = (option, index) => {
-        const { value: optionValue, label, description, disabled: optionDisabled, id: optionId, reveal } = normalise(option);
+        const { value: optionValue, label, description, disabled: optionDisabled, id: optionId, reveal } = normalize(option);
         const Control = isCheckbox ? Checkbox : Radio;
         const checked = isPicked(optionValue);
         return (

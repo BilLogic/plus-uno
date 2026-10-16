@@ -66,7 +66,7 @@ StringSlidesRenderAsText.play = async ({ canvasElement }) => {
  * The image path branch is unchanged, and has to stay unchanged.
  *
  * A fix that escaped everything would have taken the `img` slide with it, which
- * is the shipped behaviour every existing call site depends on.
+ * is the shipped behavior every existing call site depends on.
  */
 export const ImagePathsStillRenderAsImages = () => (
     <div style={{ maxWidth: '640px' }}>

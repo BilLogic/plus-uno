@@ -50,7 +50,7 @@ test('the role itself is not a use of the base', () => {
   assert.equal(edgeUses(stylesheets(root), root).length, 0);
 });
 
-test('properties that carry no colour do not match', () => {
+test('properties that carry no color do not match', () => {
   // `border-radius: var(--color-…)` is nonsense, but `border-width` and
   // `border-style` sit beside real borders everywhere and an alternation that
   // ended at `border` would swallow them.

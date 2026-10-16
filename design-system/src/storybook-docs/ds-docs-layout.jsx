@@ -94,7 +94,7 @@ export function FigmaNodesTable({ sets, fileKey }) {
     // first is the docs chrome's own shadcn variable (storybook-tailwind.css
     // aliases it to --border, a zinc), the second is Bootstrap's, and neither
     // is a design-system Token. Storybook injects its own borders on ALL FOUR
-    // sides of th/td (its text colour at 15%); under border-collapse those
+    // sides of th/td (its text color at 15%); under border-collapse those
     // merged away, but this table is border-separate (see below), where they
     // stack — doubled inner lines, and a thickened top/left frame edge.
     // Inline 'none' on every side Storybook draws zeroes them; the row line and
@@ -134,8 +134,8 @@ export function FigmaNodesTable({ sets, fileKey }) {
                     borderRadius: 'var(--size-card-radius-sm)',
                     // The frame draws the same line as the cells inside it, so
                     // the table is one palette and moves with the Token. (The
-                    // Token has no dark value today — one grey, both themes —
-                    // which is a question for the colour roles, not for a table.)
+                    // Token has no dark value today — one gray, both themes —
+                    // which is a question for the color roles, not for a table.)
                     border: `1px solid ${lineColor}`,
                     // The Resources cards' lift, from the one place it is defined
                     // (storybook-tailwind.css), so the two read as one family.

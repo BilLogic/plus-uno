@@ -146,7 +146,7 @@ test('14px prose is reported', () => {
   assert.match(f[0], /14px, not 16px/);
 });
 
-test("Storybook's grey is reported", () => {
+test("Storybook's gray is reported", () => {
   // The one property the old rules never set, which is why prose read #2E3338
   // even on pages where the family was already right.
   const f = chromeFailures([page({ prose: [prose({ color: 'rgb(46, 51, 56)' })] })]);

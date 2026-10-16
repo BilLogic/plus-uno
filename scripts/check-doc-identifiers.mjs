@@ -35,10 +35,10 @@
  *
  * WHAT IT DELIBERATELY DOES NOT CHECK.
  *
- *   Behaviour. `Select` declares `required`, `onFocus` and `onBlur` and never
+ *   Behavior. `Select` declares `required`, `onFocus` and `onBlur` and never
  *   wires them (#207); eight components mis-wire `htmlFor` (#206). Those props
  *   EXIST — the docs are right that they are there and right that they do
- *   nothing. Existence is this check's remit; #206 and #207 own the behaviour.
+ *   nothing. Existence is this check's remit; #206 and #207 own the behavior.
  *   A check that failed on a correctly-documented bug would be teaching authors
  *   to stop documenting bugs.
  *
@@ -258,7 +258,7 @@ function check(repoRoot = REPO_ROOT) {
   }
 
   /**
-   * Runs of segments inside real token names. The colour roles are referred to
+   * Runs of segments inside real token names. The color roles are referred to
    * by role — "additive `on-surface` overlays" — and `--color-on-surface` is
    * where that role is defined. A run that appears in no token name is still a
    * fabrication.

@@ -34,7 +34,7 @@ const stack = { display: 'flex', flexDirection: 'column', gap: '24px', maxWidth:
  * `userEvent` refuses to click through that — correctly, since a user cannot.
  * So a disabled control is asserted unreachable by pointer *and* announced as
  * disabled: either alone can be true of a control that still works, and the
- * grey styling that usually comes with them is true of one that works fine.
+ * gray styling that usually comes with them is true of one that works fine.
  */
 async function expectUnreachable(element) {
     await expect(element).toHaveAttribute('aria-disabled', 'true');
@@ -182,7 +182,7 @@ PageSelection.play = async ({ canvasElement }) => {
     const log = canvas.getByTestId('page-log');
 
     // On page 1 there is nowhere back to go, so Previous is unreachable rather
-    // than merely styled grey — and, since #223, it also refuses a click
+    // than merely styled gray — and, since #223, it also refuses a click
     // dispatched straight past the CSS shield instead of following its own
     // `href="#"`. Reporting nothing is only half of it: the page has to still
     // be here to report it.

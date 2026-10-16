@@ -3,7 +3,7 @@
 /**
  * The pinned housekeeping sort for the lead's inbox: the same LLM sort as the
  * baseline, with its prompt (prompt.md) pinned so a count can be re-run and
- * cited. The labelling happens in a Claude Code session; this script does the
+ * cited. The labeling happens in a Claude Code session; this script does the
  * arithmetic on either side of it and calls no model. The definitions it
  * counts by, and where each came from, are at the top of lib.mjs.
  *
@@ -23,7 +23,7 @@
  * --out-dir defaults OUTSIDE the repo (~/Documents/Claude/Projects/PLUS/
  * uno-bot-measurement/) and is refused when it falls inside a git working
  * tree, as is a labels file: message text, labels and exports never go in git.
- * A run is recorded as the prompt sha256, "labelled in a Claude Code session",
+ * A run is recorded as the prompt sha256, "labeled in a Claude Code session",
  * and the session's model id, written by whoever ran it.
  */
 
@@ -157,7 +157,7 @@ export async function run(argv, io = {}) {
   const labels = parseLabelLines(x.readFile(labelsPath), rows.map((r) => r.id));
   const result = expected ? calibrationReport(rows, expected, labels) : countPerWorkday(rows, labels, window);
   x.log(printable(result, !!expected));
-  x.log(`prompt sha256 ${promptSha} · labelled in a Claude Code session; record the session's model id beside the count`);
+  x.log(`prompt sha256 ${promptSha} · labeled in a Claude Code session; record the session's model id beside the count`);
   return { promptSha, result };
 }
 
@@ -198,7 +198,7 @@ export function windowOf(rows, from, to) {
 function printable(r, calibration) {
   if (calibration) {
     return [
-      `calibration over ${r.rows} corpus rows (Spring 2026, ${r.workdays} workdays), ${r.labelled} labelled`,
+      `calibration over ${r.rows} corpus rows (Spring 2026, ${r.workdays} workdays), ${r.labeled} labeled`,
       `housekeeping per workday: model ${r.model.housekeepingPerWorkday} · corpus ${r.corpus.housekeepingPerWorkday}`,
       `  (the published "about ${r.published.perWorkday}" also counts the inbox count's DM asks: ${r.published.how})`,
       `model called ${r.requestRecall}% of the corpus asks requests; What it took agreed on ${r.whatItTookAgreementPercent}%; a kind overlapped on ${r.kindOverlapPercent}%`,

@@ -20,9 +20,9 @@ The other docs keep their value as *reasoning*; this one is the *schedule*.
 | # | Item | Why now |
 |---|---|---|
 | 1 | **Message shortcuts** (one, then more) | Slash commands work in neither threads nor the agent container (playbook 4.2), so **every thread is unreachable except by @-mention**. Biggest functional hole. |
-| 2 | **Conditional disclaimer** | Firing on acknowledgements trains people to ignore it (4.5). Cheap. |
-| 3 | **Dynamic suggested prompts** | Search capability varies per person; a fixed set offers what the bot cannot do for that user (4.4). The playbook calls this correctness, not personalisation. |
-| 4 | **Thread tail, not head** | Long threads keep the OLDEST 50 replies. The parent survives, recency dies — worst on the threads where summarising matters most. |
+| 2 | **Conditional disclaimer** | Firing on acknowledgments trains people to ignore it (4.5). Cheap. |
+| 3 | **Dynamic suggested prompts** | Search capability varies per person; a fixed set offers what the bot cannot do for that user (4.4). The playbook calls this correctness, not personalization. |
+| 4 | **Thread tail, not head** | Long threads keep the OLDEST 50 replies. The parent survives, recency dies — worst on the threads where summarizing matters most. |
 | 5 | **Error handling with options** | "I hit an internal error" is a dead end. Progress + blocker + next step. |
 | 6 | **`conversations.history` window** | A root @-mention has no antecedent for "this". Narrow per playbook 3.3: event's channel only, before the anchor, ~12, **no pagination**. |
 | 7 | **Native feedback elements** | `context_actions` + `feedback_buttons` and `icon_button` delete, replacing hand-rolled buttons. |
@@ -77,8 +77,8 @@ makes multi-turn work and what the structured-state plan builds on.
 
 Complying means rebuilding history from `conversations.replies` every turn: more
 subrequests against a 50 cap, and it pulls directly against Phase 2's goal of
-spending fewer tokens. **These two cannot both be maximised.** Needs an explicit
-retention judgement with a recorded rationale before either is built.
+spending fewer tokens. **These two cannot both be maximized.** Needs an explicit
+retention judgment with a recorded rationale before either is built.
 
 ## Phases
 
@@ -131,7 +131,7 @@ deployed app, then link answers. Both cheap, neither blocking.
 
 ### Phase 5 — Context management (separate track, gated)
 
-Structured state → progressive summarisation → drift detection. Highest blast
+Structured state → progressive summarization → drift detection. Highest blast
 radius in the backlog: it changes what the model sees on *every* turn, and the
 failure mode is subtly worse answers.
 
@@ -216,7 +216,7 @@ things that were:
 | Item | Why it landed here |
 |---|---|
 | **Scope keywords** (`ds:` `notion:` `blueprint:` `slack:` `github:`) | The read-grounds-the-write idea (adopted item 2) inverted: the ASKER often knows where the answer lives, and had no way to say so. A hint, never a filter. |
-| **`react` tier** | User decision, 2026-08-07: *"in the future if helpful to minimize the cost, just let the agent respond with slack reaction"*. A closed acknowledgement set answers with an emoji and no model call. |
+| **`react` tier** | User decision, 2026-08-07: *"in the future if helpful to minimize the cost, just let the agent respond with slack reaction"*. A closed acknowledgment set answers with an emoji and no model call. |
 | **Draft footer variant** | The `draft` shortcut shipped in Phase 2 with the standard disclaimer, which describes the wrong risk — a draft goes out under the person's name, not the bot's. |
 
 ### Flags shipped off, and what turning each one on needs

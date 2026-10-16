@@ -32,7 +32,7 @@
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { ArgTypes, useOf } from '@storybook/addon-docs/blocks';
 
-import { CHANGELOG_ADOPTED, TABS, normaliseChangelog } from './lib/component-tabs-contract.js';
+import { CHANGELOG_ADOPTED, TABS, normalizeChangelog } from './lib/component-tabs-contract.js';
 
 /**
  * The window whose query string holds the tab — the manager's, normally.
@@ -185,7 +185,7 @@ export function DocsTabs({ of, examplesTitle, children }) {
 
   const resolved = useOf(of || 'meta');
   const entries = useMemo(
-    () => normaliseChangelog(resolved?.preparedMeta?.parameters?.changelog ?? resolved?.parameters?.changelog),
+    () => normalizeChangelog(resolved?.preparedMeta?.parameters?.changelog ?? resolved?.parameters?.changelog),
     [resolved],
   );
 

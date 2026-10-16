@@ -383,7 +383,7 @@ describe("a sweep's shared note in Review", () => {
   });
 
   it("draws the DM sweep's raise note the same way, from its own facts", () => {
-    const { operations, facts } = raiseCard({ when: "Yesterday", topic: "the warning colour", sources: ["Figma", "the code"], channel: "C0UNIVERSAL", to: "plus-universal" });
+    const { operations, facts } = raiseCard({ when: "Yesterday", topic: "the warning color", sources: ["Figma", "the code"], channel: "C0UNIVERSAL", to: "plus-universal" });
     const proposal: PendingProposal = {
       operations,
       toolName: SWEEP_SHARE_TOOL,
@@ -401,7 +401,7 @@ describe("a sweep's shared note in Review", () => {
     assert.equal(blocksOf(view)[0]!.text!.text, "Raise a disagreement");
     assert.deepEqual(elementsOf(blocksOf(view)[1]!).find((e) => e.type === "channel"), { type: "channel", channel_id: "C0UNIVERSAL" });
     assert.match(JSON.stringify(blocksOf(view)[1]), /Nothing else leaves this DM/);
-    assert.match(JSON.stringify(blocksOf(view)[2]), /disagree on the warning colour/);
+    assert.match(JSON.stringify(blocksOf(view)[2]), /disagree on the warning color/);
   });
 
   it("is read-only for someone who can't decide: the same zones, no decision", async () => {

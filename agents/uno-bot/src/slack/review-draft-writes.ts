@@ -17,7 +17,7 @@ import { fieldInputBlocks, MAX_INPUT_CHARS, type FieldChange } from "./review-fi
 import {
   alertsFromCaveats,
   factsSection,
-  labelledText,
+  labeledText,
   TOO_LONG_TO_EDIT,
   type DraftAlert,
   type DraftAnatomy,
@@ -123,7 +123,7 @@ function textOrInput(
   path: string,
   label: string,
   value: string,
-  shown: (label: string, value: string) => unknown[] = (l, v) => [labelledText(l, v)],
+  shown: (label: string, value: string) => unknown[] = (l, v) => [labeledText(l, v)],
 ): void {
   const inline = detail.inline?.get(`0.${path}`);
   if (inline) {

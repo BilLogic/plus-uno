@@ -16,7 +16,7 @@
 // PURE: blocks out, nothing posted, nothing read.
 import { fieldInputBlocks } from "./review-fields";
 import { relayRecipientId } from "../tools/relayed-dm-render";
-import { alertsFromCaveats, labelledText, whereMrkdwn, type DraftAnatomy, type WhereElement } from "./review-anatomy";
+import { alertsFromCaveats, labeledText, whereMrkdwn, type DraftAnatomy, type WhereElement } from "./review-anatomy";
 import { caveatsOf, operationParts, type DraftDetail } from "./review-draft";
 import { shareNoteChannel, shareNoteFacts, shareNoteLines, shareNoteQuote, shareNoteText } from "./review-stated";
 import type { ProposalOperation } from "../thread-state/index";
@@ -149,7 +149,7 @@ export function batchAnatomy(operations: readonly ProposalOperation[], cardText:
     const field = detail.inline?.get(`${i}.text`);
     const text = str(op.input.text);
     if (field) content.push(...fieldInputBlocks([field]));
-    else if (text) content.push(labelledText("Message", text));
+    else if (text) content.push(labeledText("Message", text));
   });
   const recipients = dms ? operations.map((op) => recipientElement(op.input)) : [];
   const where: WhereElement[] = recipients.length

@@ -268,7 +268,7 @@ export function createDurableObjectThreadState(
  * The capacity outage's record on the same single instance: one hop per call,
  * charged like every other. Its own adapter rather than three more methods on
  * `ThreadState`, because it is not thread memory; it lives in this object
- * only because this is the workspace's one serialised store.
+ * only because this is the workspace's one serialized store.
  *
  * @param deps - The binding, and an instance for the conformance suite
  */

@@ -2,7 +2,7 @@
 //
 // uno-bot's first Figma write is checked live on ONE component with Bill
 // before the rest (#904): whether a link on a component's library component
-// reaches its variants is Figma behaviour no fixture can show. Bill named the
+// reaches its variants is Figma behavior no fixture can show. Bill named the
 // component: Button. So until the `FIGMA_DEV_LINKS` setting reads `on`, a run
 // names Button alone, and the 68 do not run. Bill confirmed the check on
 // 2026-10-12, and the setting is on: `all=1` posts the rest on one batch card.

@@ -13,7 +13,7 @@
  * is where those things stayed. So did the RATCHET's, which lived here between
  * #506 and #599 and now live in `scripts/lib/ratchet.test.mjs`: a baseline
  * record is a harness concern, and its tests belong beside the module that
- * reads it rather than beside the colour maths.
+ * reads it rather than beside the color maths.
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -81,8 +81,8 @@ describe('the token grammar', () => {
 
   it('builds a declaration pattern scoped to a prefix', () => {
     const source = ':root { --color-primary: #123456; --space-2: 8px; }';
-    const colours = [...source.matchAll(tokenDeclarationPattern('--color-'))].map((m) => m[1]);
-    expect(colours).toEqual(['--color-primary']);
+    const colors = [...source.matchAll(tokenDeclarationPattern('--color-'))].map((m) => m[1]);
+    expect(colors).toEqual(['--color-primary']);
     const all = [...source.matchAll(tokenDeclarationPattern())].map((m) => m[1]);
     expect(all).toEqual(['--color-primary', '--space-2']);
   });
@@ -152,7 +152,7 @@ describe('parseColour', () => {
 });
 
 describe('the contrast maths', () => {
-  it('lays an alpha colour over an opaque one', () => {
+  it('lays an alpha color over an opaque one', () => {
     expect(composite({ r: 0, g: 0, b: 0, a: 0.5 }, { r: 255, g: 255, b: 255, a: 1 })).toEqual({
       r: 128, g: 128, b: 128, a: 1,
     });
@@ -177,7 +177,7 @@ describe('the contrast maths', () => {
     expect(luminance({ r: 255, g: 255, b: 255 })).toBe(1);
   });
 
-  it('round-trips a parsed colour through toHex', () => {
+  it('round-trips a parsed color through toHex', () => {
     expect(toHex(parseColour('#9f8205'))).toBe('#9f8205');
   });
 });

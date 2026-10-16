@@ -148,11 +148,11 @@ export { renderDeliveredBody, textSections } from "./render";
 //   • the record the team analyses performance from, leaving a correction in
 //     the thread with nothing left to correct.
 //
-// A wrong answer with its correction underneath is a better artefact than a
+// A wrong answer with its correction underneath is a better artifact than a
 // gap. If channel hygiene becomes the real problem, the shape to reach for is
 // striking the answer through in place — which keeps the thread whole.
 //
-// `kind === "none"` still means no footer at all: a short acknowledgement is
+// `kind === "none"` still means no footer at all: a short acknowledgment is
 // not making checkable claims and does not need the label.
 /** Slack's error code and its own account of a refused post, for the log. */
 function refusalOf(posted: { ok: boolean; error?: string }): string {
@@ -209,7 +209,7 @@ function pointedBlock(posted: { ok: boolean; error?: string }): number | null {
   return null;
 }
 
-/** A split answer's `(i/n)`, as the small grey line under its part. */
+/** A split answer's `(i/n)`, as the small gray line under its part. */
 function markerBlocks(marker: string | null): Array<Record<string, unknown>> {
   return marker ? [{ type: "context", elements: [{ type: "mrkdwn", text: marker }] }] : [];
 }
@@ -280,11 +280,11 @@ export async function postTextVerified(
   // A chart, a table of rows or a set of cards is a checkable claim however
   // short the prose above it, and so is anything a ⚠️ line qualifies: the
   // honesty line goes beneath it even when the prose alone would read as an
-  // acknowledgement.
+  // acknowledgment.
   const qualified = charts.length > 0 || Boolean(resultTable) || Boolean(cards) || warnings.length > 0;
   const footerKind: FooterKind = qualified && footerHint !== "draft" ? "full" : footerKindFor(body, footerHint);
   const footer = footerBlocks(footerKind);
-  // The feedback buttons ride a full footer only: an acknowledgement has
+  // The feedback buttons ride a full footer only: an acknowledgment has
   // nothing to judge, and a draft is the person's own words.
   const feedback = extras.feedback && footerKind === "full" ? [feedbackBlock(extras.feedback)] : [];
   // The charts, the table, the cards, the ⚠️ line and the box ride where the

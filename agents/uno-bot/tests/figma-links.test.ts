@@ -1,7 +1,7 @@
 // Dev Mode links on the registry's components, end to end on fakes: a run
 // posts one Review card per component that still needs its Code and
 // Storybook links, Approve writes exactly those links through the one Figma
-// client and leaves one labelled comment the first time, and the morning
+// client and leaves one labeled comment the first time, and the morning
 // hands one card for the components that PRs merged into main changed.
 //
 // What an outsider sees: which cards post where, what each would write,
@@ -388,7 +388,7 @@ describe("Approve on a card", () => {
     return { w, decide, ran, updates };
   }
 
-  it("runs the card's one operation, which adds exactly its links and one labelled comment on the first library component", async () => {
+  it("runs the card's one operation, which adds exactly its links and one labeled comment on the first library component", async () => {
     const { w, decide, ran } = await posted();
     await decide("confirm");
     assert.equal(ran.length, 1);

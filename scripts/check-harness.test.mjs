@@ -153,7 +153,7 @@ test('every findings module answers the interface its row claims for it', async 
 });
 
 test('a row whose module exports no run() falls back to the spawn and says so', async () => {
-  const row = { name: 'check:mislabelled', pkg: 'root', module: 'fake/empty.mjs', guards: 'x' };
+  const row = { name: 'check:mislabeled', pkg: 'root', module: 'fake/empty.mjs', guards: 'x' };
   const result = await runCheck(row, {
     repoRoot: REPO_ROOT,
     load: fakeLoad,
@@ -477,7 +477,7 @@ test('the migrated example check answers the findings interface', async () => {
 // The other two triggers: `pull_request` and `deploy`
 //
 // `storybook-gate` has been asserted against WORKFLOW_STEPS since
-// the registry existed. These two were honoured by hand — the pull-request
+// the registry existed. These two were honored by hand — the pull-request
 // workflows are not generated and nothing compared their run lines to the
 // rows, and the Worker's deploy chain agreed with its seven `deploy` rows only
 // because someone kept both lists in step.

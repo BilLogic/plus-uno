@@ -20,7 +20,7 @@
  *
  * IT READS TEXT, NOT AN AST, and that is a deliberate ceiling. The questions
  * are "is this record opened through the module here", "is this flag offered
- * here" — both about a FORM a reader recognises, not about what the program
+ * here" — both about a FORM a reader recognizes, not about what the program
  * computes. A one-file regex pass over ~15 stripped sources answers them in
  * milliseconds with no dependency; an AST would answer the same questions and
  * still not resolve an identifier through a function parameter, which is what

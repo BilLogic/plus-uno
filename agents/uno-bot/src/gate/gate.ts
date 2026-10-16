@@ -356,7 +356,7 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
       post: {
         note: { kind: "superseded", ...(found.stated ? { stated: true } : {}) },
         replyTs: replyTargetOf(signal),
-        ...cardSignalled(signal, found),
+        ...cardSignaled(signal, found),
       },
     };
   }
@@ -377,7 +377,7 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
           ...(found.stated ? { words: found.stated.expired } : {}),
         },
         replyTs: replyTargetOf(signal),
-        ...cardSignalled(signal, found),
+        ...cardSignaled(signal, found),
       },
     };
   }
@@ -642,7 +642,7 @@ async function claim(
     // one who knows (#583). Two doors reach this function with a proposal they
     // are holding in memory rather than one they looked up — the model's
     // `proposal_resolve` and Turn's identical re-stage — so this is the first
-    // point on either path at which a replaced card can be recognised. Telling
+    // point on either path at which a replaced card can be recognized. Telling
     // that person "another confirmation got there first" invents a second
     // person; what happened is that their card was revised. One extra read, on
     // the losing path only.
@@ -839,7 +839,7 @@ function threadRefOf(
 
 /** The card a by-ts signal was placed on: a reaction's or a press's own
  *  message. A typed signal names no card. */
-function cardSignalled(
+function cardSignaled(
   signal: Exclude<GateSignal, { kind: "model" }>,
   posted: Parameters<typeof cardOf>[1],
 ): { card?: GateCard } {

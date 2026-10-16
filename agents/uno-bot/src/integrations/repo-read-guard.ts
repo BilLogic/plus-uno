@@ -55,10 +55,10 @@ const WITHHELD = [
  * most: it is how a HISTORICAL read is spelled, and history is where the
  * plaintext this guard protects still lives.
  *
- * Collapsing repeated slashes is the only normalisation that earns its place.
+ * Collapsing repeated slashes is the only normalization that earns its place.
  * An earlier draft also stripped the scheme, the `owner/repo/blob/<ref>/`
  * prefix and a leading `./`; mutation-testing each one showed the result was
- * identical with them removed, so they were defence against nothing and are
+ * identical with them removed, so they were defense against nothing and are
  * gone. `docs//evals//x` is the sole spelling the bare pattern misses.
  */
 export function isWithheldRepoPath(path: string): boolean {

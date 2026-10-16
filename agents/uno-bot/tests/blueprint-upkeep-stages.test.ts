@@ -187,7 +187,7 @@ describe("a design hand-off", () => {
 });
 
 describe("the same card's deploy", () => {
-  it("promotes the same rows `planned → live` on a promotion card, with no judgement", async () => {
+  it("promotes the same rows `planned → live` on a promotion card, with no judgment", async () => {
     // The redraft at the deploy finds the card's words unchanged since the hand-off.
     const model = scripted({ default: [SERVICE], grind: [DRAFT, DRAFT] });
     const w = world(model, [DESIGNED]);
@@ -202,7 +202,7 @@ describe("the same card's deploy", () => {
     assert.deepEqual(
       model.asked.slice(asked).map((p) => p.tier),
       ["grind"],
-      "no judgement — the path is known — and one redraft against the card's words now",
+      "no judgment — the path is known — and one redraft against the card's words now",
     );
     const [card] = await morning(w.state);
     assert.ok(card);
@@ -308,7 +308,7 @@ describe("a card weighed at a status", () => {
     const w = world(model, [DESIGNED]);
     await runShippedRevisions(w.deps);
     assert.equal((await runShippedRevisions(w.deps)).drafted, 0);
-    assert.equal(model.asked.length, 2, "one judgement and one draft, once");
+    assert.equal(model.asked.length, 2, "one judgment and one draft, once");
   });
 
   it("is not weighed at an earlier status once weighed at a later one", async () => {
@@ -361,7 +361,7 @@ describe("the evidence", () => {
     };
     w.deps.evidence = (card) => cardEvidence(async (id) => pages[id]!, card.pageId);
     await runShippedRevisions(w.deps);
-    assert.ok(model.asked[0]!.prompt.includes(PRD_TEXT), "the judgement saw the PRD");
+    assert.ok(model.asked[0]!.prompt.includes(PRD_TEXT), "the judgment saw the PRD");
     const [card] = await morning(w.state);
     assert.match(card!.proposalText, /“Tutors now confirm their own swaps/);
   });

@@ -12,7 +12,7 @@
 // dispatches used to be hand-written string chains beside this table — the
 // eleven-arm `if` chain in `agent/run-agent.ts` and the seven-arm `switch` in
 // `agent/resolve-proposal.ts`, each ending in an `ok:false` for a name it did
-// not recognise. Both are one lookup now, `TOOLS_BY_NAME[name]`, filtered on
+// not recognize. Both are one lookup now, `TOOLS_BY_NAME[name]`, filtered on
 // the row's `access`: `ungated` inside the turn, `gated` past the Gate. The
 // arm cannot be the missing thing, because a row with no body does not
 // compile.

@@ -16,7 +16,7 @@ export default {
     argTypes: {
         type: {
             control: { type: 'select' },
-            options: ['session created', 'session updated', 'session canceled', 'sessions cancelled']
+            options: ['session created', 'session updated', 'session canceled', 'sessions canceled']
         },
         timestamp: {
             control: 'text'
@@ -51,8 +51,8 @@ export const AllVariations = () => (
             </div>
 
             <div className="d-flex flex-column gap-3">
-                <h6 className="text-muted small text-uppercase fw-bold m-0" style={{ letterSpacing: '0.5px', fontSize: '11px' }}>Sessions Cancelled (Plural)</h6>
-                <SessionManagementSnackbar type="sessions cancelled" timestamp="1 mins ago" />
+                <h6 className="text-muted small text-uppercase fw-bold m-0" style={{ letterSpacing: '0.5px', fontSize: '11px' }}>Sessions Canceled (Plural)</h6>
+                <SessionManagementSnackbar type="sessions canceled" timestamp="1 mins ago" />
             </div>
         </div>
     </div>

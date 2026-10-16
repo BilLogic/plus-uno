@@ -93,7 +93,7 @@ test("the parse keeps only new messages of the right side, over the floor, with 
 test("a quote is five of the person's words in a row", () => {
   assert.equal(repeatsPerson("the staffing plan draft now", ["for the staffing plan draft now please"]), true);
   assert.equal(repeatsPerson("the staffing plan", ["for the staffing plan draft"]), false);
-  assert.equal(repeatsPerson("the warning colour", ["what's our warning colour?"]), false);
+  assert.equal(repeatsPerson("the warning color", ["what's our warning color?"]), false);
 });
 
 test("a thread with nothing new costs no model call", async () => {

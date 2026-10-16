@@ -200,7 +200,7 @@ export const TOO_LONG_TO_EDIT =
   "This text is over the 3,000 characters a pop-up field holds, so it can't be edited here. Choose Needs changes to ask for a different wording.";
 
 /** Zone 4: a text shown, not edited, under a bold label. */
-export function labelledText(label: string, text: string): unknown {
+export function labeledText(label: string, text: string): unknown {
   return { type: "rich_text", elements: [boldLine(label), textSection(text)] };
 }
 

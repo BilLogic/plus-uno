@@ -11,7 +11,7 @@
 // the answer stops being cut to fit it: the body is split into continuation
 // messages in the same thread, in order, numbered when there is more than one.
 // The number is not part of a message's Markdown: it rides under the part as a
-// small grey context line (`partMarker`), so it never competes with the answer.
+// small gray context line (`partMarker`), so it never competes with the answer.
 //
 // Where the cut goes, in preference order: a blank line between paragraphs; a
 // line boundary inside one (`splitBalanced`, which also keeps a code fence

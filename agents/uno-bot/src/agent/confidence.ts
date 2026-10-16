@@ -26,9 +26,9 @@
 //
 // The one import is the tool table, which imports nothing: whether a tool
 // fetched from a source is the table's `retrieval` column, and the regexes
-// below are all that is left of this module's own judgement.
+// below are all that is left of this module's own judgment.
 import { rowFor } from "./tool-table";
-import { namesLabelledPlace } from "../integrations/blueprint-link";
+import { namesLabeledPlace } from "../integrations/blueprint-link";
 
 /**
  * True when any tool that reaches a source ran this turn.
@@ -150,7 +150,7 @@ const GROUNDED_IN_BLUEPRINT = [
 /** A blueprint place as the reader's breadcrumb, whole: four segments, phase
  *  to step, and the lane in parentheses. A Figma or Notion path
  *  (`Specs › Goal states`, `Card 12 › Status`) has neither the depth nor the
- *  lane. The index's labelled form is `namesLabelledPlace`'s. */
+ *  lane. The index's labeled form is `namesLabeledPlace`'s. */
 const BREADCRUMB_PLACE = /(?:[^›\n,;.:()]+[^\S\n]›[^\S\n]){3}[^›\n,;.:()]+\([^()\n]{1,40}\)/;
 
 /** Does this reply speak of the blueprint as read? A claim of grounding is
@@ -158,7 +158,7 @@ const BREADCRUMB_PLACE = /(?:[^›\n,;.:()]+[^\S\n]›[^\S\n]){3}[^›\n,;.:()]+
  *  and owes a word on where it came from even inside a suggestion. */
 function speaksOfBlueprintAsRead(text: string): boolean {
   if (matchesAny(text, GROUNDED_IN_BLUEPRINT)) return true;
-  const namesPlace = BREADCRUMB_PLACE.test(text) || namesLabelledPlace(text);
+  const namesPlace = BREADCRUMB_PLACE.test(text) || namesLabeledPlace(text);
   return namesPlace && !hasHedge(text) && !FROM_EARLIER_ANSWER.test(text);
 }
 
@@ -232,7 +232,7 @@ export function hasTrailingLabel(text: string): boolean {
  * Kept short and literal: this is not a general classifier, it is a list of
  * things that are not claims.
  */
-const ACKNOWLEDGEMENT =
+const ACKNOWLEDGMENT =
   /^(?:ok(?:ay)?|got\s+it|sure|done|on\s+it|will\s+do|no\s+problem|cancell?ed|thanks?|you'?re\s+welcome|yep|yes|no)\b[\s\S]{0,40}$/i;
 
 /**
@@ -241,14 +241,14 @@ const ACKNOWLEDGEMENT =
  * NOT `footerKindFor(...) === "none"`, which was the first design and is wrong.
  * That classifier asks "is this short, unlinked and listless" — so
  * *"Yep — and that card moved to In Review yesterday"* (48 characters, no link,
- * no list) reads as an acknowledgement and would be exempted, while carrying a
- * factual claim about the board. An acknowledgement is a reply that says
- * nothing beyond the acknowledgement itself.
+ * no list) reads as an acknowledgment and would be exempted, while carrying a
+ * factual claim about the board. An acknowledgment is a reply that says
+ * nothing beyond the acknowledgment itself.
  */
 export function assertsSomething(text: string): boolean {
   const body = text.trim();
   if (!body) return false;
-  if (ACKNOWLEDGEMENT.test(body)) return false;
+  if (ACKNOWLEDGMENT.test(body)) return false;
 
   // A reply that is only questions is asking, not telling.
   const sentences = body

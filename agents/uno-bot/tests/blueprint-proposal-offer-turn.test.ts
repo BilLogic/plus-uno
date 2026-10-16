@@ -2,7 +2,7 @@
 // blueprint as a proposal.
 //
 // The seam is the whole turn, as in `milestone-comparison-turn.test.ts`: the
-// real agent loop on a scripted model, the real gate on a scripted judgement,
+// real agent loop on a scripted model, the real gate on a scripted judgment,
 // the real drafter on a scripted draft, and the in-memory thread store. What
 // is asserted is what the person sees posted and what a ✅ on the card would
 // run, as the store holds it.
@@ -81,9 +81,9 @@ const ONLY_REMOVES = JSON.stringify({
 const REQUESTER = "U1";
 const IDEA_SUMMARY = "Tutors post their own call-off and the first free tutor claims it. The supervisor only sees the result.";
 
-function world(opts: { replies: ScriptedReply[]; judgements: string[]; drafts?: string[]; threadState?: ThreadState; draftAffordable?: boolean }) {
+function world(opts: { replies: ScriptedReply[]; judgments: string[]; drafts?: string[]; threadState?: ThreadState; draftAffordable?: boolean }) {
   const threadState = opts.threadState ?? createInMemoryThreadState();
-  const gateModel: FakeProvider = fakeProvider({ generateReplies: opts.judgements });
+  const gateModel: FakeProvider = fakeProvider({ generateReplies: opts.judgments });
   const draftModel: FakeProvider = fakeProvider({ generateReplies: opts.drafts ?? [DRAFT] });
   const h = harness({ replies: opts.replies, threadState });
   h.deps.milestoneComparison = milestoneComparison({
@@ -126,7 +126,7 @@ async function liveCard(threadState: ThreadState, ts: string): Promise<PendingPr
 }
 
 test("a PRD that changes a path today gets the offer under its comparison, before the PRD's own card", async () => {
-  const w = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE] });
+  const w = world({ replies: [stagePrd()], judgments: [SERVICE_CHANGE] });
   const outcome = await runTurn(request({ text: "turn this thread into a PRD" }), w.h.deps);
 
   assert.equal(outcome.disposition, "staged");
@@ -145,7 +145,7 @@ test("a PRD that changes a path today gets the offer under its comparison, befor
 });
 
 test("the offer draws a new `proposed` variant path with the added and changed cells, and only the requester may approve it", async () => {
-  const w = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE] });
+  const w = world({ replies: [stagePrd()], judgments: [SERVICE_CHANGE] });
   await runTurn(request({ text: "turn this thread into a PRD" }), w.h.deps);
 
   const ts = w.h.delivery.stagedAt[0]!;
@@ -175,7 +175,7 @@ test("the offer draws a new `proposed` variant path with the added and changed c
 });
 
 test("the card shows which of today's cells the idea changes, and which moments it removes", async () => {
-  const w = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE] });
+  const w = world({ replies: [stagePrd()], judgments: [SERVICE_CHANGE] });
   await runTurn(request({ text: "turn this thread into a PRD" }), w.h.deps);
 
   const lead = offerCards(w.h)[0]!.lead!;
@@ -184,7 +184,7 @@ test("the card shows which of today's cells the idea changes, and which moments 
 });
 
 test("an uno-prototype hand-off gets the offer after the reply that carries its comparison", async () => {
-  const w = world({ replies: [{ text: HAND_OFF }], judgements: [SERVICE_CHANGE] });
+  const w = world({ replies: [{ text: HAND_OFF }], judgments: [SERVICE_CHANGE] });
   const outcome = await runTurn(request({ text: "build the call-off board from the PRD" }), w.h.deps);
 
   assert.equal(outcome.disposition, "answered");
@@ -196,7 +196,7 @@ test("an uno-prototype hand-off gets the offer after the reply that carries its 
 });
 
 test("no comparison, no offer: a PRD that does not change the service drafts nothing", async () => {
-  const w = world({ replies: [stagePrd("Swap the Button's hover token across the library.")], judgements: [NOT_A_SERVICE_CHANGE] });
+  const w = world({ replies: [stagePrd("Swap the Button's hover token across the library.")], judgments: [NOT_A_SERVICE_CHANGE] });
   await runTurn(request({ text: "write up the button token update as a PRD" }), w.h.deps);
   assert.deepEqual(offerCards(w.h), []);
   assert.equal(w.draftModel.generated.length, 0);
@@ -204,18 +204,18 @@ test("no comparison, no offer: a PRD that does not change the service drafts not
 
 test("a second milestone on the same scenario in the thread offers nothing again", async () => {
   const threadState = createInMemoryThreadState();
-  const first = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE], threadState });
+  const first = world({ replies: [stagePrd()], judgments: [SERVICE_CHANGE], threadState });
   await runTurn(request({ text: "turn this thread into a PRD" }), first.h.deps);
   assert.equal(offerCards(first.h).length, 1);
 
-  const second = world({ replies: [{ text: HAND_OFF }], judgements: [SERVICE_CHANGE], threadState });
+  const second = world({ replies: [{ text: HAND_OFF }], judgments: [SERVICE_CHANGE], threadState });
   await runTurn(request({ text: "now hand it to the IDE", userMsgTs: "1700000000.000300" }), second.h.deps);
   assert.deepEqual(offerCards(second.h), []);
   assert.equal(second.draftModel.generated.length, 0);
 });
 
 test("an idea that only changes today's steps gets the offer, drawn as its own path", async () => {
-  const w = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE], drafts: [ONLY_CHANGES] });
+  const w = world({ replies: [stagePrd()], judgments: [SERVICE_CHANGE], drafts: [ONLY_CHANGES] });
   const outcome = await runTurn(request({ text: "turn this thread into a PRD" }), w.h.deps);
   assert.equal(outcome.disposition, "staged");
   const [card] = offerCards(w.h);
@@ -230,18 +230,18 @@ test("an idea that only changes today's steps gets the offer, drawn as its own p
 });
 
 test("an idea that only removes a moment draws no path, and gets no offer", async () => {
-  const w = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE], drafts: [ONLY_REMOVES] });
+  const w = world({ replies: [stagePrd()], judgments: [SERVICE_CHANGE], drafts: [ONLY_REMOVES] });
   await runTurn(request({ text: "turn this thread into a PRD" }), w.h.deps);
   assert.deepEqual(offerCards(w.h), []);
 });
 
 test("the draft runs on the default tier, and not at all without the budget for it", async () => {
-  const w = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE] });
+  const w = world({ replies: [stagePrd()], judgments: [SERVICE_CHANGE] });
   await runTurn(request({ text: "turn this thread into a PRD" }), w.h.deps);
   assert.equal(w.draftModel.generated[0]!.tier, "default");
   assert.match(w.draftModel.generated[0]!.prompt, /Self-serve call-offs/);
 
-  const poor = world({ replies: [stagePrd()], judgements: [SERVICE_CHANGE], draftAffordable: false });
+  const poor = world({ replies: [stagePrd()], judgments: [SERVICE_CHANGE], draftAffordable: false });
   await runTurn(request({ text: "turn this thread into a PRD" }), poor.h.deps);
   assert.equal(poor.draftModel.generated.length, 0);
   assert.deepEqual(offerCards(poor.h), []);

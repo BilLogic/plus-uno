@@ -8,7 +8,7 @@
 //
 // Hard policies:
 //   • SKIP entirely for short replies (< MIN_DRAFT_CHARS) — quick lookups and
-//     acknowledgements never pay the judge tax — unless the draft carries an
+//     acknowledgments never pay the judge tax — unless the draft carries an
 //     emoji, which is read at any length (`voice/emoji.ts`), and a breach of
 //     the count fails whatever the judge says.
 //   • VERDICT ONLY past the revision window (MAX_DRAFT_CHARS): a long draft
@@ -63,7 +63,7 @@ import { BUILD } from "../version";
 //
 // KEEP IT IN SYNC WITH THE CANONICAL RUBRIC — this is a copy, and a copy drifts.
 // It already did once, and the drift was invisible for weeks: the confidence
-// ritual was redesigned on 2026-07-16 from a trailing labelled rating to one
+// ritual was redesigned on 2026-07-16 from a trailing labeled rating to one
 // woven clause, AGENT.md and bot-answer.md were both updated, and this prompt
 // was not. The mechanism whose job is catching rubric violations went on
 // REQUIRING the retired format, while nothing checked that the replacement
@@ -96,7 +96,7 @@ Rubric (condensed from the team's D1–D9 bot-answer rubric):
 - D3 clarify-vs-act: if required inputs are clearly missing, the draft asks for them instead of guessing or using placeholders.
 - D5 routing: people are referenced correctly (<@U…> mentions or names), channels as <#C…>; resources are hyperlinked [label](url) at the point of mention.
 - D8 grounding: no fabrication signals — no URLs that look constructed rather than fetched, no confident claims explicitly from memory, no internal contradictions.
-- D9 confidence: a live or cached read this turn needs no clause — the Sources box beneath shows what was read and marks a cached source. When every read this turn failed, or none ran and the answer rests on what the bot already knows, a factual draft carries one woven clause saying what it rests on and how sure that makes it ("I could not open the story, so treat the status as unconfirmed"); fail one without it. One read failing among others is the warning line's to say. Fail a freshness claim ("just now", "current") when no lookup tool ran this turn. A trailing label — "_Confidence: high — …_", a one-word rating, a "based on…" footer — is RETIRED: fail a draft that ends with one. Pure acknowledgements are exempt.
+- D9 confidence: a live or cached read this turn needs no clause — the Sources box beneath shows what was read and marks a cached source. When every read this turn failed, or none ran and the answer rests on what the bot already knows, a factual draft carries one woven clause saying what it rests on and how sure that makes it ("I could not open the story, so treat the status as unconfirmed"); fail one without it. One read failing among others is the warning line's to say. Fail a freshness claim ("just now", "current") when no lookup tool ran this turn. A trailing label — "_Confidence: high — …_", a one-word rating, a "based on…" footer — is RETIRED: fail a draft that ends with one. Pure acknowledgments are exempt.
 
 HARD GATES (any one → verdict "fail"):
 - Claims a gated action already happened ("I've filed the card") — actions must stay future/conditional until confirmed.
@@ -185,7 +185,7 @@ const MIN_SHORTENED_FROM_DRAFT = 0.5;
  *
  * `default`, and no longer `grind`. #605 moved the judge to grind on the theory
  * that a judge should be at least as strong as what it grades, and accepted
- * "more latency" for it. It was not more latency, it was no judgement: on the
+ * "more latency" for it. It was not more latency, it was no judgment: on the
  * Gemini lane grind was `gemini-3.1-pro-preview` at `high`, and on 2026-10-07
  * every judged draft in `wrangler tail` — six of six across five builds, from
  * 2,729 to 17,614 characters — hit JUDGE_TIMEOUT_MS and shipped unread. The
@@ -195,7 +195,7 @@ const MIN_SHORTENED_FROM_DRAFT = 0.5;
  * `low`; `default` is that model one rung up, and it is the tier
  * most drafts are written on, so the judge is still as strong as what it
  * usually grades. A grind turn is now graded by a lighter tier than wrote it —
- * accepted, because the other choice is a timer no grind judgement fits in.
+ * accepted, because the other choice is a timer no grind judgment fits in.
  */
 export const JUDGE_TIER: ModelTier = "default";
 
@@ -386,7 +386,7 @@ export async function reviewDraft(
     /** Why this draft must be judged regardless of length — set by a caller
      *  that already found something wrong (the confidence pre-check passes the
      *  verdict kind). Bypasses the length floor exactly as `correction` does,
-     *  and is logged so a forced judgement is distinguishable from a routine
+     *  and is logged so a forced judgment is distinguishable from a routine
      *  one when reading `wrangler tail`. */
     forceReason?: string;
     /** One extra line appended to the judge prompt. Carries the specific repair
@@ -495,7 +495,7 @@ export async function reviewDraft(
       reason = `timed out after ${timeoutMs}ms`;
       console.warn("[draft-judge] timed out — sending the original draft");
     } else if (answer.ok === false && answer.unavailable === true) {
-      // NEVER ASKED: the adapter has no credential, so there is no judgement to
+      // NEVER ASKED: the adapter has no credential, so there is no judgment to
       // report either way. A skip, not an error — the distinction the seam's
       // third disposition exists to carry (#605), and the reason is the
       // adapter's own words about what is missing.

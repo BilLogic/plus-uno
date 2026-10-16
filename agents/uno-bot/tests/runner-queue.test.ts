@@ -200,7 +200,7 @@ test("a job the budget keeps stopping is given up on, not retried forever", asyn
   assert.equal(h.ran.at(-1), "b");
 });
 
-test("thread jobs keep their behaviour: one per alarm, a deferred one kept", async () => {
+test("thread jobs keep their behavior: one per alarm, a deferred one kept", async () => {
   let deferOnce = true;
   const h = harness();
   h.deps.runThreadJob = async (job) => {

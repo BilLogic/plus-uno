@@ -59,8 +59,8 @@ export const JoinSessionButton = ({ block = false, ...props }) => (
     <Button text="Join session" leadingVisual="video" style="primary" block={block} {...props} />
 );
 
-export const SessionCancelledButton = (props) => (
-    <Button text="Session cancelled" leadingVisual="user" style="primary" disabled {...props} />
+export const SessionCanceledButton = (props) => (
+    <Button text="Session canceled" leadingVisual="user" style="primary" disabled {...props} />
 );
 
 // Request Buttons
@@ -129,8 +129,8 @@ export const CtaTutorViewButtons = () => (
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
                 {/* Join session (video icon) */}
                 <Button text="Join session" leadingVisual="video" style="primary" />
-                {/* Session cancelled (disabled state) */}
-                <Button text="Session cancelled" leadingVisual="user" style="primary" disabled />
+                {/* Session canceled (disabled state) */}
+                <Button text="Session canceled" leadingVisual="user" style="primary" disabled />
             </div>
         </section>
 

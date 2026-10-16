@@ -321,7 +321,7 @@ describe("[durable-object] the cut-off alarm", () => {
 });
 
 // The capacity outage's record (`turn/capacity-outage.ts`) on the real object:
-// the point of keeping it here is that the object serialises every
+// the point of keeping it here is that the object serializes every
 // transition, so failures arriving together hand the lead's DM to one caller.
 describe("[durable-object] the capacity outage record", () => {
   const MIN = 60_000;

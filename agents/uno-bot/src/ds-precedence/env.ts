@@ -52,7 +52,7 @@ const INDEX_FILE = "design-system/agent-views/components/index.md";
 /**
  * The check job on `Env`.
  * @param env - Worker bindings
- * @param opts - `dryRun` writes nothing; `runDate` is the week the report is labelled with
+ * @param opts - `dryRun` writes nothing; `runDate` is the week the report is labeled with
  */
 export async function runDsPrecedenceCheck(env: Env, opts: JobContext): Promise<CheckResult> {
   const figma = figmaClientFor(env);

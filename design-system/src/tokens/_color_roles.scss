@@ -1,5 +1,5 @@
 /**
- * Intent colour ROLES — what each intent colour is FOR.
+ * Intent color ROLES — what each intent color is FOR.
  *
  * HAND-MAINTAINED, ON PURPOSE. Every other file in this directory is written by
  * `scripts/generate-all-tokens.js` from a Figma export. These are not exports:
@@ -12,7 +12,7 @@
  * success, warning, info — carry the identical nine tokens: a base, a
  * container, a `-text`, and six state overlays. That names two roles and uses
  * three. There is no `--color-warning-border` and no `--color-warning-icon`, so
- * an intent-coloured stroke or glyph reaches for the BASE, which is also the
+ * an intent-colored stroke or glyph reaches for the BASE, which is also the
  * ground. `_colors.scss` used to say so in a comment beside the value —
  * "for borders/backgrounds" — which was a rule nothing could enforce.
  *
@@ -70,17 +70,17 @@
  *       ground, clearing the 3:1 non-text bar, so there is no defect there to
  *       fix — only the choice #312 has not made.
  *
- * The `-icon` roles still have no users: an icon colour is usually set by
+ * The `-icon` roles still have no users: an icon color is usually set by
  * `color:` on a glyph, which `check:text-contrast` already measures against the
  * 4.5:1 bar, and moving those is that check's ratchet rather than this one's.
  *
- * The five SMART subject colours (advocacy, mastering-content, relationship,
+ * The five SMART subject colors (advocacy, mastering-content, relationship,
  * social-emotional, technology-tools) are deliberately out of scope: they are
- * category colours rather than intents, and their bar is a separate question.
+ * category colors rather than intents, and their bar is a separate question.
  */
 
 :root {
-    /* Every -icon resolves to its -text colour: 6.70:1 at worst, clearing the
+    /* Every -icon resolves to its -text color: 6.70:1 at worst, clearing the
        4.5:1 text bar as well as the 3:1 icon one. Every -border keeps the base,
        whose worst ratio is noted beside it. */
 
@@ -93,7 +93,7 @@
     --color-secondary-border: var(--color-secondary);
 
     /* Tertiary — border base 3.68. Clears 3:1 everywhere; fails 4.5:1 on four
-       of the five, which is why the border is a role token and not a licence to
+       of the five, which is why the border is a role token and not a license to
        use the base as text. */
     --color-tertiary-icon: var(--color-tertiary-text);
     --color-tertiary-border: var(--color-tertiary);
@@ -133,7 +133,7 @@
      * on `.plus-input:focus` at 1.62:1, an 8% primary glow at 1.13:1 on the
      * AM/PM toggle and the file drop zone, a #d1e4ff textarea edge at 2.22:1,
      * and six readonly fields whose focus was `--color-outline-variant`, the
-     * same grey they wear at rest. `--color-primary` is 5.02:1 on the page and
+     * same gray they wear at rest. `--color-primary` is 5.02:1 on the page and
      * was already the majority spelling.
      *
      * It aliases primary today. It is a token so that the ring can stop
@@ -165,7 +165,7 @@
      *
      * Figma files these four in colors / neutral, so a binding read back from
      * Figma names `--color-surface-default`, not the `--surface-default` that
-     * `_elevation.scss` defines. Each aliases the same neutral colour that
+     * `_elevation.scss` defines. Each aliases the same neutral color that
      * Figma's variable aliases, and that its elevation role aliases, so
      * `check:figma-color-drift` can follow the chain to a value. The raised and
      * overlay roles still need their `--surface-*-shadow` beside them.

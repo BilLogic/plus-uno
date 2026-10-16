@@ -1,7 +1,7 @@
 // Explicit context caching for the Gemini adapter's system prompt.
 //
 // Why this exists: skills.ts marks the stable harness block with a 1h
-// `cache_control`, and ONLY the Claude adapter honours it. The Gemini API has
+// `cache_control`, and ONLY the Claude adapter honors it. The Gemini API has
 // no such field, so on the production provider (`MODEL_PROVIDER = "gemini"`) the
 // ~40k-token harness was billed as fresh input on every iteration of every
 // turn — up to MAX_ITERATIONS per user message. Vertex's `cachedContents`
@@ -10,7 +10,7 @@
 //
 // Three things this must never do, in order of severity:
 //   1. Break a turn. Every failure path returns null and the caller falls back
-//      to sending the system prompt inline — the old behaviour, exactly.
+//      to sending the system prompt inline — the old behavior, exactly.
 //   2. Retry a hopeless call every turn. A failure is remembered (negative
 //      cache) for the same hour, so an unsupported configuration costs ONE
 //      wasted subrequest per hour, not one per message.

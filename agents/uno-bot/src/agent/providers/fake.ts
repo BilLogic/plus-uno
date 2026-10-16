@@ -5,7 +5,7 @@
 // whether a backup exists. The one-shot `generate` is scripted the same way,
 // and records the tier and prompt it was asked on, so a caller of the seam's
 // second call is as testable as the loop. That is the whole surface: the loop's
-// behaviour is then observable without a network call, a credential or a
+// behavior is then observable without a network call, a credential or a
 // Cloudflare runtime.
 //
 // Workers-global-free on purpose — no `Env`, no fetch — so `tsconfig.test.json`

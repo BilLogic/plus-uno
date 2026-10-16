@@ -66,8 +66,8 @@ test('a stylesheet that names every value in a token is silent — the green twi
   assert.deepEqual(findings(clean, index), []);
 });
 
-test('1. a hand-planted hex colour is caught, and named with the token that already holds it', () => {
-  // The #e4e4e7-shaped defect the ticket opens with: a colour picked by hand a
+test('1. a hand-planted hex color is caught, and named with the token that already holds it', () => {
+  // The #e4e4e7-shaped defect the ticket opens with: a color picked by hand a
   // few lines from a `var(--color-…)` doing the same job.
   const found = findings(rule('  border-bottom: 1px solid #bec8ca;'), index);
   assert.equal(found.length, 1);
@@ -75,12 +75,12 @@ test('1. a hand-planted hex colour is caught, and named with the token that alre
   assert.deepEqual(found[0].tokens, ['--color-outline-variant']);
 });
 
-test('1b. shorthand hex is the same colour — `#BCA` is `#bbccaa`, and case does not hide it', () => {
+test('1b. shorthand hex is the same color — `#BCA` is `#bbccaa`, and case does not hide it', () => {
   const short = buildTokenIndex(new Map([['--color-x', { value: '#bbccaa', file: '_colors.scss' }]]));
   const found = findings(rule('  color: #BCA;'), short);
   assert.equal(found.length, 1, 'a three-digit hex must expand before it is compared');
   assert.deepEqual(found[0].tokens, ['--color-x']);
-  // Green twin: an unrelated colour, correctly spelled, is not a finding.
+  // Green twin: an unrelated color, correctly spelled, is not a finding.
   assert.deepEqual(literals(rule('  color: #123456;'), short), []);
 });
 
@@ -162,7 +162,7 @@ test('7. ALLOWANCE — a fallback inside `var(--token, fallback)` is the token b
     literals(rule('  background: color-mix(in srgb, var(--color-a, #bec8ca) 70%, #bec8ca);')),
     ['#bec8ca'],
   );
-  // Red twin: the same colour written bare is a finding.
+  // Red twin: the same color written bare is a finding.
   assert.deepEqual(literals(rule('  color: #bec8ca;')), ['#bec8ca']);
 });
 
@@ -207,7 +207,7 @@ test('10. a NEAR MISS is invisible, and that is written into the check', () => {
   assert.deepEqual(literals(rule('  font-size: 13px;')), []);
 });
 
-test('11. token families outside colour / font-size / line-height / size are not offered', () => {
+test('11. token families outside color / font-size / line-height / size are not offered', () => {
   // `--layout-sidebar-width` is 164px. A docs-chrome pixel equal to an app-shell
   // grid measurement is a coincidence, not a token being ignored.
   assert.deepEqual(literals(rule('  width: 164px;')), []);
@@ -227,7 +227,7 @@ test('unit — the allowances and the fallback blanker', () => {
  */
 
 /**
- * Enough colour tokens to clear the 200-token floor, plus one whose value
+ * Enough color tokens to clear the 200-token floor, plus one whose value
  * matches a planted docs literal.
  *
  * @returns {string}

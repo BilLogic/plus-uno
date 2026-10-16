@@ -89,7 +89,7 @@ export function buildSearchResponse(input: SearchResponseInput): Record<string, 
  * bot DM with no user token and no action_token — which is exactly the eval
  * surface, and exactly a fresh install — the tool returned "workspace search
  * unavailable" from above the loop and the link the reply was supposed to offer
- * had not been computed yet. S3 read 0/3 for that reason: not a judgement call
+ * had not been computed yet. S3 read 0/3 for that reason: not a judgment call
  * the model got wrong, an offer it was never handed.
  */
 export function connectOffer(connectUrl: string): string {

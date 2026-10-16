@@ -64,7 +64,7 @@ test("a ✅ from the person posts exactly the raise note in the team channel: no
       resolvedAt: null,
     },
   ]);
-  await store.saveText(id, { what: "the warning colour", bodies: {}, raise: { sources: ["Figma", "the code"], to: "plus-universal" } }, now + 86_400_000);
+  await store.saveText(id, { what: "the warning color", bodies: {}, raise: { sources: ["Figma", "the code"], to: "plus-universal" } }, now + 86_400_000);
   const posts: string[] = [];
   const handler = dmAsksDue({
     store,
@@ -108,7 +108,7 @@ test("a ✅ from the person posts exactly the raise note in the team channel: no
   const body = sent[0]!.body;
   assert.equal(body.channel, UNIVERSAL, "the design system's channel");
   const text = String(body.text);
-  assert.match(text, /Figma and the code disagree on the warning colour/);
+  assert.match(text, /Figma and the code disagree on the warning color/);
   assert.ok(posts[0]!.includes(String(ops[0]!.input.text)), "the card showed exactly this note");
   for (const leak of [MAYA, "<@", DM, "alert banner", "#FFB020"]) assert.equal(text.includes(leak), false, `no ${leak}`);
 });
@@ -131,7 +131,7 @@ test("a raise id holds the DM and a hash of the source pair — no topic, no sou
     assert.equal(raiseId(DM, named, "1.0"), a, `${named.join(" / ")} is the same pair`);
   }
   assert.equal(raiseId(DM, ["the Storybook docs", "the service blueprint"], "1.0"), raiseId(DM, ["Storybook", "Blueprint"], "1.0"));
-  assert.notEqual(raiseId(DM, ["the Brand deck", "Figma"], "1.0"), a, "an unknown name keeps its own normalised name");
+  assert.notEqual(raiseId(DM, ["the Brand deck", "Figma"], "1.0"), a, "an unknown name keeps its own normalized name");
   assert.equal(raiseId(DM, ["the Brand deck", "Figma"], "1.0"), raiseId(DM, ["brand deck", "figma"], "1.0"));
   assert.match(a, /^D0MAYA:raise:[0-9a-f]{8}:1\.0$/);
 });

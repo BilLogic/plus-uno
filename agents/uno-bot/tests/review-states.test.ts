@@ -31,7 +31,7 @@ const SHAREOUT = {
   round: 1,
   summary: "Hi-fi prototype of the new session sign-up flow, with the waitlist state.",
   feedback_wanted: ["Is the waitlist state clear before a tutor commits?", "Does the confirmation step need the calendar add?"],
-  not_looking_for: "Visual polish; colours are placeholders.",
+  not_looking_for: "Visual polish; colors are placeholders.",
   link: "https://plus-uno.netlify.app/prototypes/session-sign-up",
   reviewers: [BRYAN],
   deadline: "EOD Friday",

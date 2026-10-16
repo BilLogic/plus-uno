@@ -231,7 +231,7 @@ describe("a blueprint revision in Review", () => {
     assert.ok(v.blocks.flatMap((b) => leaves(b)).some((e) => e.style?.italic && e.text?.trim() === "inferred"), "the inferred row is marked");
   });
 
-  it("offers the added and changed rows' text as prefilled inputs, labelled by lane, and nothing else", () => {
+  it("offers the added and changed rows' text as prefilled inputs, labeled by lane, and nothing else", () => {
     const v = view(staged());
     const fields = inputs(v);
     assert.deepEqual(

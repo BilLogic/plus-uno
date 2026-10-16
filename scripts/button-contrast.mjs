@@ -78,7 +78,7 @@ export const AA_TEXT = 4.5;
  * Every `--color-*: value;` in the token stylesheet, as a Map.
  *
  * The `--color-` narrowing is the whole difference from the module's
- * `readTokens`: this check resolves colours, and a colour that resolved through
+ * `readTokens`: this check resolves colors, and a color that resolved through
  * a spacing token would be a different defect wearing this check's name.
  *
  * @param {string} source
@@ -111,7 +111,7 @@ export function themeMap(source) {
 }
 
 /**
- * Ground and label for one style × fill, resolved to colours.
+ * Ground and label for one style × fill, resolved to colors.
  *
  * @returns {{ground: object, label: object}|{unresolved: string[]}}
  */
@@ -153,7 +153,7 @@ export function sweep(themes, values) {
  * Styles whose FILLED ground is identical to another's.
  *
  * Filled is the discriminator: it is the only fill that paints the style's own
- * colour, so two styles sharing it share their whole appearance.
+ * color, so two styles sharing it share their whole appearance.
  *
  * @returns {string[][]} groups of two or more style names
  */

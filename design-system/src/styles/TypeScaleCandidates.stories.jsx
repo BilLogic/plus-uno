@@ -136,7 +136,7 @@ const candidates = (current) => {
             blast: 'nothing',
             note:
                 'Worth stating as an option rather than assuming it away. The cost is not a ' +
-                'rendering defect: it is that every new size is a judgement call, because ' +
+                'rendering defect: it is that every new size is a judgment call, because ' +
                 'there is no rule for the next one.',
         },
     ];

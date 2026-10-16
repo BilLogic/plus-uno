@@ -3,7 +3,7 @@
 // shipped-work job here, and any turn that weighs an idea against today's
 // journey.
 //
-// TWO SIGNALS, BOTH REQUIRED. A default-tier judgement that the text changes
+// TWO SIGNALS, BOTH REQUIRED. A default-tier judgment that the text changes
 // who does what, or when, for an actor in the service; AND a confident
 // `search_blueprint` match on one `scenario › path`. Either failing is
 // silence: one weak signal never produces a card, and a change that matches no
@@ -23,9 +23,9 @@ import { CONFIDENCE_FLOOR, jsonObjectIn } from "../sweep/detector";
 
 /** A lone retriever's similarity that still counts as a match. */
 export const MATCH_SCORE_FLOOR = 0.75;
-/** The judgement's tier: a one-line classification. */
+/** The judgment's tier: a one-line classification. */
 export const GATE_TIER = "default" as const;
-/** Characters of the work's text the judgement is shown. */
+/** Characters of the work's text the judgment is shown. */
 const MAX_TEXT_CHARS = 6_000;
 
 export const SERVICE_CHANGE_SYSTEM = [
@@ -65,7 +65,7 @@ export type GateResult =
       quote: string;
       query: string;
     }
-  | { pass: false; reason: "not-a-service-change" | "no-confident-match" | "judgement-failed" };
+  | { pass: false; reason: "not-a-service-change" | "no-confident-match" | "judgment-failed" };
 
 export interface GateDeps {
   provider: ModelProvider;
@@ -128,7 +128,7 @@ export function serviceChangeGate(deps: GateDeps): ServiceChangeGate {
       prompt: `TITLE: ${input.title}\n\nTEXT:\n${input.text.slice(0, MAX_TEXT_CHARS) || "(no text)"}`,
       maxTokens: 400,
     });
-    if (!reply.ok) return { pass: false, reason: "judgement-failed" };
+    if (!reply.ok) return { pass: false, reason: "judgment-failed" };
     const judged = jsonObjectIn(reply.text) as Record<string, unknown> | null;
     const confidence = Number(judged?.confidence);
     const query = typeof judged?.query === "string" ? judged.query.trim() : "";

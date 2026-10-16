@@ -17,12 +17,12 @@ For every message, return one label with five fields.
 For a request, pick exactly one. Judge what the request needed, not how it happened to be answered. Picture a well-connected team assistant that can read the team's chat history, docs, design files, code and component library, meeting recaps and project cards, and can post, remind and relay, but has no authority to make design or product calls and cannot know what was never written down.
 
 - **Could be looked up**: the answer already exists somewhere findable, or the need is a routine action. Where a file or link is, what was decided before, what the convention is, who owns something, the status the board records, how a tool works, what a term means; or a reminder, a relay to the right person, filing or moving a card.
-- **Needs prep, then a person**: a person has to decide, review or create, but much of the work is gathering context first. Feedback on a draft against the design system, a design or product call with recorded precedent, scoping or prioritising work, a policy question with history behind it.
+- **Needs prep, then a person**: a person has to decide, review or create, but much of the work is gathering context first. Feedback on a draft against the design system, a design or product call with recorded precedent, scoping or prioritizing work, a policy question with history behind it.
 - **Needs the lead's judgment**: only the lead can supply it and there is little written down to gather. A request to talk or huddle, mentoring or career advice, interpersonal matters, a new call with no precedent, information that lives only in someone's head, or a permission only the lead can grant.
 
 Tie-breakers, in order:
 1. A decision already made and recorded, asked again, is **Could be looked up**: it is recall, not judgment.
-2. A request that mixes a relay or reminder with a judgment (redirect someone's work, reprioritise) is **Needs prep, then a person**.
+2. A request that mixes a relay or reminder with a judgment (redirect someone's work, reprioritize) is **Needs prep, then a person**.
 3. Access: a documented path, or an invite a routine can send, is **Could be looked up**; access only the lead can grant is **Needs the lead's judgment**.
 4. When torn between two adjacent values, pick the one that gives the assistant less credit.
 
@@ -43,7 +43,7 @@ For a request, one to three kinds from this list, the most specific first. Use t
 - **Convention explainer**: how the team does something here: naming, file structure, process.
 - **Decision recall**: what was decided about something before.
 - **Design judgment**: a call on a design: is this right, which option, what should it be.
-- **Design system taxonomy**: how the design system is organised and named.
+- **Design system taxonomy**: how the design system is organized and named.
 - **Dev coordination**: lining work up with developers: timing, ownership, who builds what.
 - **Dev handoff docs**: what a handoff to developers needs, and in what form.
 - **Documentation standard**: how something should be documented.

@@ -22,7 +22,7 @@ import Switch from './Switch';
  * that emits nothing emits nothing wrong. And a screenshot of a dropdown that
  * cannot close looks exactly like a screenshot of one that can.
  *
- * So the cover has to be behavioural: call the prop and assert the effect.
+ * So the cover has to be behavioral: call the prop and assert the effect.
  * Every story below fails on the code that shipped before #207.
  */
 

@@ -1,7 +1,7 @@
 // A capacity outage, told to the lead only when it lasts (#1228).
 //
-// Driven over the module's own dependencies: the serialised in-memory store
-// (the Durable Object's stand-in; its own serialisation is the workerd
+// Driven over the module's own dependencies: the serialized in-memory store
+// (the Durable Object's stand-in; its own serialization is the workerd
 // suite's), a hint that counts its reads and writes, a recording DM and a
 // clock the test moves.
 

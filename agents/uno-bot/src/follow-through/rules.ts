@@ -215,7 +215,7 @@ export function todoWords(text: string): string[] {
  * more. "facelift last stage" matches "Facelift — last stage polish"; it does
  * not match "Facelift kickoff".
  *
- * @param what - The to-do's subject, as the detector summarised it
+ * @param what - The to-do's subject, as the detector summarized it
  * @param title - A card's title
  */
 export function matchesTodo(what: string, title: string): boolean {

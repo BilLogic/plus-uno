@@ -1,5 +1,5 @@
 /**
- * `npm run check:docs-token-literals` — no hand-picked colour or size in the
+ * `npm run check:docs-token-literals` — no hand-picked color or size in the
  * docs stylesheet that the design system already has a token for.
  *
  * WHY IT EXISTS. `.storybook/storybook-overrides.css` is the one stylesheet in
@@ -21,15 +21,15 @@
  *
  * WHAT IT LOOKS AT. Declaration values, split into two kinds of literal:
  *
- *   colour     `#abc` / `#aabbcc` / `rgb()` / `rgba()` / `hsl()` / `hsla()`
+ *   color     `#abc` / `#aabbcc` / `rgb()` / `rgba()` / `hsl()` / `hsla()`
  *              matched against every `--color-*` token, by value.
- *   dimension  `<n>px` / `<n>rem` / `<n>%`, normalised to px at 16px/rem, and
+ *   dimension  `<n>px` / `<n>rem` / `<n>%`, normalized to px at 16px/rem, and
  *              matched against `--font-size-*` for a `font-size`,
  *              `--font-line-height-*` for a `line-height`, and `--size-*`
  *              otherwise.
  *
  * The token table is `tokenCorpus` (#620): one read, aliases followed, family
- * from the name, colour and dimension keys from the same module. This check
+ * from the name, color and dimension keys from the same module. This check
  * used to carry its own copies of all four; they disagreed with `parseColour`
  * on alpha and with each other on a bare `0`. Indexing still prefers the
  * semantic name over the primitive `_primitives.scss` bans.
@@ -43,7 +43,7 @@
  * this exists to catch.
  *
  * ─── WHAT IT DELIBERATELY CANNOT SEE ────────────────────────────────────────
- * Written down because the sibling check this is modelled on,
+ * Written down because the sibling check this is modeled on,
  * `check-token-collision.mjs`, only ever catches a foreground token IDENTICAL
  * to its background — near-misses are invisible to it — and it says so. The
  * same honesty is owed here.
@@ -51,7 +51,7 @@
  *  1. A NEAR MISS. `13px` is not `12px`, so `font-size: 13px` passes even
  *     though `--font-size-body3` is plainly what was meant. This check tests
  *     equality, never proximity. Choosing a tolerance would mean choosing which
- *     deliberate one-off is a mistake, and that is a judgement no exit code
+ *     deliberate one-off is a mistake, and that is a judgment no exit code
  *     should make.
  *  2. A FALLBACK THAT DISAGREES WITH ITS OWN TOKEN. `var(--token, fallback)` is
  *     an allowance (see below), and this check does not compare the fallback to
@@ -60,7 +60,7 @@
  *     `var(--color-on-surface-variant, #5c5c5c)` where it is `#3f484a`,
  *     `var(--color-surface, #fff)` where it is `#f9f9fc`. Those fallbacks only
  *     ever paint when the token sheet failed to load, so they are a different
- *     defect — a wrong emergency colour, not a hand-picked one — and they need
+ *     defect — a wrong emergency color, not a hand-picked one — and they need
  *     their own check, not a widening of this one. They now have two:
  *     `check:color-fallbacks` and `check:size-fallbacks` (#268), which read
  *     the same token sources this does. This limitation stays written down
@@ -111,8 +111,8 @@
  * must not use it: `scroll-padding-top: 5rem/6rem` is the height of Storybook's
  * own sticky chrome, and the same number is duplicated as a plain integer in
  * `unsafeTocbotOptions.headingsOffset` in preview.jsx, because Tocbot scrolls in
- * JS and reads no custom property. Tokenising one half of a measurement whose
- * other half cannot be tokenised is how the two drift. A gate with no
+ * JS and reads no custom property. Tokenizing one half of a measurement whose
+ * other half cannot be tokenized is how the two drift. A gate with no
  * legitimate way past a case like that is a gate that gets deleted rather than
  * satisfied (`check-harness.mjs` § rule 2 again). Second, the hatch is not free and not
  * quiet: the comment must sit against the declaration, so it lands in the diff
@@ -170,7 +170,7 @@ const PRIMITIVES_FILE = '_primitives.scss';
  * Index token names by comparable value. `defs` is injected so the tests can
  * run against a stub table; production reads `tokenCorpus`.
  *
- * Family comes from `familyOf`. Alias follow and the colour/dimension keys
+ * Family comes from `familyOf`. Alias follow and the color/dimension keys
  * come from the tokens module. What stays this check's is WHICH of the
  * families it offers — limitation 5 in the header.
  *
@@ -178,7 +178,7 @@ const PRIMITIVES_FILE = '_primitives.scss';
  */
 export function buildTokenIndex(defs = new Map()) {
   const index = {
-    colour: new Map(),
+    color: new Map(),
     'font-size': new Map(),
     'font-line-height': new Map(),
     size: new Map(),
@@ -194,7 +194,7 @@ export function buildTokenIndex(defs = new Map()) {
     if (value === undefined) continue;
     const bucket = familyOf(name);
     if (!bucket || !(bucket in index)) continue;
-    const key = bucket === 'colour' ? colourKey(value) : dimensionKey(value);
+    const key = bucket === 'color' ? colourKey(value) : dimensionKey(value);
     if (key) push(bucket, key, name, def.file);
   }
 
@@ -333,7 +333,7 @@ export function alwaysAllowed(literal) {
  * `12pxel` without depending on what kind of character the unit ends with.
  */
 const DIMENSION = /-?\d*\.?\d+(?:px|rem|%)(?![a-z0-9%-])/gi;
-const COLOUR = /#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?)\([^)]*\)/gi;
+const COLOR = /#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?)\([^)]*\)/gi;
 
 const bucketFor = (prop) =>
   prop === 'font-size' ? 'font-size' : prop === 'line-height' ? 'font-line-height' : 'size';
@@ -360,7 +360,7 @@ export function findings(source, index) {
       found.push({ ...decl, literal, tokens: tokens.map((t) => t.name) });
     };
 
-    for (const m of value.matchAll(COLOUR)) add(m[0], 'colour', colourKey(m[0]));
+    for (const m of value.matchAll(COLOR)) add(m[0], 'color', colourKey(m[0]));
     for (const m of value.matchAll(DIMENSION)) {
       if (alwaysAllowed(m[0])) continue;
       add(m[0], bucketFor(decl.prop), dimensionKey(m[0]));
@@ -449,7 +449,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 /** The green line, which carries the size of the corpus that was read. */
 export function summary({ repoRoot = REPO_ROOT } = {}) {
   const { files } = inputs(repoRoot);
-  return `${files.length} docs stylesheet(s), no literal the design system already tokenises`;
+  return `${files.length} docs stylesheet(s), no literal the design system already tokenizes`;
 }
 
 /**

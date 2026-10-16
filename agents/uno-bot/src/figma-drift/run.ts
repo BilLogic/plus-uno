@@ -107,7 +107,7 @@ export const MAX_RECHECKS_PER_RUN = 6;
 /** How long a mark with no card holds its file for a try still posting. */
 const POSTING_HOLD_MS = 60 * 60 * 1000;
 /** What one decision's look at its file may spend: a `versions` read, a
- *  `nodes` read and the judgement. */
+ *  `nodes` read and the judgment. */
 const CHECK_SUBREQUESTS = 3;
 /** What withdrawing a caught-up file spends after its look: for a card, the
  *  retire, the report's update, the edit, the usage record's row and the live

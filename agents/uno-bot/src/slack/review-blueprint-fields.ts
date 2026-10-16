@@ -29,7 +29,7 @@ export const ROW_HINT = "The cell's sentence of record. Step and lane are locked
 export const rowPath = (row: number) => `rows.${row}.content`;
 
 /**
- * A revision's editable rows: each added row's text, labelled by its lane,
+ * A revision's editable rows: each added row's text, labeled by its lane,
  * and each changed row's, "Lane, new text", in the order its pop-up draws
  * them. None for a proposal, a retirement, or a card with no facts.
  *

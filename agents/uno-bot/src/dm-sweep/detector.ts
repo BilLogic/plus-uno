@@ -4,7 +4,7 @@
 //   • UNANSWERED (F6) — uno-bot's own new answer said it could not find what
 //     was asked, or was not sure of it. An answer that gave a source is none.
 //   • DISAGREEMENT (C6) — uno-bot's own new answer said two sources disagree
-//     (Figma and code on the warning colour, a PRD and a Roadmap card).
+//     (Figma and code on the warning color, a PRD and a Roadmap card).
 //   • DECISION (C7) — the person's new message states a decision the team has
 //     made ("we decided the recap goes weekly"). An opinion, a wish or a
 //     question is none.

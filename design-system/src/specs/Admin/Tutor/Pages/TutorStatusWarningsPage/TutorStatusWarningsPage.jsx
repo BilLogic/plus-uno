@@ -227,7 +227,7 @@ const TutorStatusWarningsPage = ({
                                             { label: 'Check-In Needed', color: '#85ECD5' }, // Cyan
                                             { label: 'Recommended for Termination', color: '#FFDAD6' }, // Pink
                                             { label: 'On TIP', color: '#FFE17A' }, // Yellow
-                                            { label: 'Inactive', color: '#807878' }, // Grey
+                                            { label: 'Inactive', color: '#807878' }, // Gray
                                         ]}
                                         hideLegend={true} // Hide internal visual legend, but keep data for colors
                                         className="tutor-status-overview-card__chart"

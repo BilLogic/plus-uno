@@ -90,7 +90,7 @@ The in-session workspace. What tutors interact with during and around sessions.
 | 2 | **No Camera** | Zoom metadata | Camera off during session |
 | 3 | **No Laptop** | Zoom/Pencil | Using phone instead of laptop |
 | 4 | **Foul Language** | Pencil/AI transcription | Inappropriate language detected |
-| 5 | **Late Call-Off** | Platform data | Session cancelled < 24h before start |
+| 5 | **Late Call-Off** | Platform data | Session canceled < 24h before start |
 | 6 | **No Mic** | Zoom metadata | Microphone not used (no verbal engagement) |
 | 7 | **No Help Offer** | Pencil interaction | Tutor didn't offer help to struggling students |
 | 8 | **No Greeting** | Pencil/AI | Tutor didn't greet students |

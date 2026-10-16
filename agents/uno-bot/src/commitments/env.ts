@@ -3,7 +3,7 @@
 // What each port becomes:
 //   • Slack: the sweep's own measured reads (`sweepSlackFor`), `chat.getPermalink`,
 //     `chat.postMessage` for a reminder and `chat.update` for an answer's
-//     acknowledgement, all with the bot token.
+//     acknowledgment, all with the bot token.
 //   • Sources: the sweep's `readSource` — Notion in full, GitHub as read-only
 //     context.
 //   • The detector and the judge: `selectProvider(env)`, the Worker's one

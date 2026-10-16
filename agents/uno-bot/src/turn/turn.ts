@@ -215,7 +215,7 @@ export const ASK_CLASSIFY_TIMEOUT_MS = 4_000;
  * `assistant` is the app DM under agent_view — the surface that has a status
  * line, a titled thread and a streamed reply, which is why it does NOT also get
  * a 👀. A `channel` has none of those, so the reaction is the only
- * acknowledgement there is. The Worker draws no third distinction: an app DM and
+ * acknowledgment there is. The Worker draws no third distinction: an app DM and
  * the assistant panel are the same conversation. Which channel id is which
  * surface is `request.ts` § `turnSurfaceOf` — the one statement of the rule,
  * read by both callers and by `slack/assistant.ts`.
@@ -429,7 +429,7 @@ export interface TurnAgentRun {
   spend?: TurnSpend;
 }
 
-export interface TurnJudgement {
+export interface TurnJudgment {
   text: string;
   verdict: string;
 }
@@ -516,7 +516,7 @@ export interface TurnDeps {
     /** The draft is over its prose budget: shorten it, at any length the
      *  judge reads. */
     shorten?: boolean;
-  }): Promise<TurnJudgement>;
+  }): Promise<TurnJudgment>;
 
   /** Clarify-vs-act: what this tool call still needs before it may be staged,
    *  or null when it is actionable. */
@@ -650,7 +650,7 @@ export interface TurnDeps {
    */
   lookupOptions?(lookup: string, field: string): Promise<readonly string[] | null>;
 
-  /** Structured state + progressive summarisation (`CONTEXT_STATE`). Flagged
+  /** Structured state + progressive summarization (`CONTEXT_STATE`). Flagged
    *  off in production; see the header of `agent/context-state.ts`. */
   contextState?: boolean;
 
@@ -743,7 +743,7 @@ export function settlementOf(settle: {
  * One turn, with the working signal guaranteed down when it ends.
  *
  * The turn leaves by ten doors — an answer, a clarifying ask, a staged card,
- * a card Slack refused, four flavours of gate resolution, a stop pressed
+ * a card Slack refused, four flavors of gate resolution, a stop pressed
  * before the answer landed, a dead model — and a signal cleared at ten sites
  * is a signal the eleventh door forgets. So the set
  * stays where it belongs (beside the work it describes) and the clear is a
@@ -761,7 +761,7 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
   // conversation would let a card staged under ask A suspend the unrelated
   // thread of ask B, and a ✅ on A settles A's thread only — leaving B
   // suspended with nothing in it to click. In a channel `replyTs` IS the
-  // thread root, so channel behaviour is unchanged.
+  // thread root, so channel behavior is unchanged.
   //
   // It costs no read of its own: the adapter's read at the top of the request
   // is where it came from. It is also the card as of the turn's START, which
@@ -905,8 +905,8 @@ interface StagingFacts {
 
 /**
  * An ask whose row will never hold its text — a DM, a group DM, a conversation
- * of unknown type — labelled in the turn: the one moment its text exists.
- * A channel ask (labelled at the end of the day), test traffic (greetings
+ * of unknown type — labeled in the turn: the one moment its text exists.
+ * A channel ask (labeled at the end of the day), test traffic (greetings
  * included) and a caller with no classifier are left as they are. A call that
  * fails or outlasts its timeout leaves the row unlabelled and is logged
  * without the model's words — it never fails the turn.
@@ -1236,7 +1236,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   }
   const modelText = modelBlocks.join("\n\n");
 
-  // Progressive summarisation, same flag. Replaces the dropped middle of a long
+  // Progressive summarization, same flag. Replaces the dropped middle of a long
   // conversation with a COUNT rather than deleting it silently — a model told
   // the record is partial can say so; a model handed a gap reasons across it.
   const historyForModel = deps.contextState
@@ -1362,7 +1362,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // second message beside it. Every other exit below closes it itself, because
   // nothing that follows them would.
   if (result.kind === "text") {
-    // An answer the loop synthesised once its round-trips ran out rests on
+    // An answer the loop synthesized once its round-trips ran out rests on
     // fewer lookups than it wanted: a ⚠️ line says so.
     if (result.cutShort) presenting.budgetSpent();
     return finishTextTurn(result.text, {
@@ -2232,7 +2232,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   const bodyText = request.attachmentsText ?? request.text;
   const historyText = [bodyText, ...(request.visionMarkers ?? [])].join("\n");
 
-  // A reaction and no words. The model answered a pure acknowledgement
+  // A reaction and no words. The model answered a pure acknowledgment
   // ("thanks", "got it") with slack_react and ended its turn without text. An
   // empty reply after a reaction is a finished turn, not a failure — the only
   // thing the Worker has to know about that shape.
@@ -2350,7 +2350,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     ...(walkRepair ? { shorten: true } : {}),
     ...(extra ? { extraInstruction: extra } : {}),
     // The reader gets the prose AND the table beneath it, so the judge grades
-    // both: a draft that summarises and points at the table has answered.
+    // both: a draft that summarizes and points at the table has answered.
     ...(judgedList(presentation) ? { tableList: judgedList(presentation) } : {}),
   });
   telemetry.judge = reviewed.verdict;
@@ -2542,7 +2542,7 @@ function threadMemory(
  * it actually posted.
  *
  * The card is still the SOURCE OF TRUTH for what a ✅ runs: `operations` is the
- * batch untruncated, which is what lets the adapter group and never summarise
+ * batch untruncated, which is what lets the adapter group and never summarize
  * it away.
  */
 async function buildCard(
@@ -2823,7 +2823,7 @@ function verbFor(toolName: string): string {
 }
 
 /**
- * The staged input as the card's labelled fields, nesting exactly as the input
+ * The staged input as the card's labeled fields, nesting exactly as the input
  * nests.
  *
  * Labels are the input's OWN keys: turning `page_url` into `Page link` is
@@ -2871,7 +2871,7 @@ function cardFieldOf(label: string, value: unknown): CardField {
 /**
  * What a person must be told about this staged input before they press ✅.
  *
- * A JUDGEMENT, which is why it is here and not in the renderer: the caveats
+ * A JUDGMENT, which is why it is here and not in the renderer: the caveats
  * are reached by READING the staged input, and the renderer only knows how each
  * one reads.
  *

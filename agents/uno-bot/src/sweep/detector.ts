@@ -19,7 +19,7 @@
 //     that drops more than `MAX_DROPPED_SHARE` of the block's words when no
 //     evidence message asks for a removal (`replacementProblem`);
 //   • a confidence under `CONFIDENCE_FLOOR`.
-// `claimed_by` survives only as a candidate: owner routing honours it when the
+// `claimed_by` survives only as a candidate: owner routing honors it when the
 // person posted in the thread (`routeOwner`).
 //
 // PURE: the provider is a parameter, so tests replay recorded replies through

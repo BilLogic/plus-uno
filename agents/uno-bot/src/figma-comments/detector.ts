@@ -5,12 +5,12 @@
 //
 // A DECISION is something the team agreed, chose, changed or settled. A
 // resolved thread usually is, and so is clear decision wording. An open
-// question, an option still weighed, praise, or a visual detail — a colour,
+// question, an option still weighed, praise, or a visual detail — a color,
 // spacing, alignment, an icon — is not: visual details stay in Figma (#891
 // story 5).
 //
 // THE ROUTES (#891):
-//   • `prd` — behaviour or scope. The PRD's one block that states the old
+//   • `prd` — behavior or scope. The PRD's one block that states the old
 //     rule, rewritten whole; or one line added under the section it belongs
 //     to.
 //   • `card` — status, owner or timing: one of the card's own fields, and its
@@ -143,9 +143,9 @@ export interface DecisionDetector {
 export const DECISION_DETECTOR_SYSTEM = [
   "You read comment threads left on a Figma design file's Specs and For Review pages, and say which threads record a DECISION and where each belongs.",
   "A decision is something the team agreed, chose, changed or settled. A resolved thread usually is, and so is clear wording such as \"let's go with\", \"we'll\", \"agreed\", \"decided\".",
-  "Not a decision: an open question, an option still being weighed, praise, or a visual detail — a colour, spacing, alignment, an icon, a font — which stays in Figma.",
+  "Not a decision: an open question, an option still being weighed, praise, or a visual detail — a color, spacing, alignment, an icon, a font — which stays in Figma.",
   "Pick one route per decision:",
-  "- prd: behaviour or scope — what the product does, for whom, what is in or out. Either rewrite the PRD's one block that states the old rule (block_id, and replacement: the block's full new text, changing only what the decision changed), or add one line under the section it belongs to (section_block_id, a heading's id, and text: the rule, one line, in the PRD's own voice).",
+  "- prd: behavior or scope — what the product does, for whom, what is in or out. Either rewrite the PRD's one block that states the old rule (block_id, and replacement: the block's full new text, changing only what the decision changed), or add one line under the section it belongs to (section_block_id, a heading's id, and text: the rule, one line, in the PRD's own voice).",
   "- card: status, owner or timing of the work — one of the card's listed fields (field, verbatim) and its new value.",
   "- design-system: a change to a shared component, token or pattern — an intake title (the change, one line) and body (what was decided, where, and why, in a few sentences).",
   "- none: anything else.",
@@ -154,7 +154,7 @@ export const DECISION_DETECTOR_SYSTEM = [
   "- thread_id: a thread id as listed; decision: what was decided, one sentence, no names.",
   "- Give only the keys your route uses; prd takes either block_id and replacement, or section_block_id and text.",
   "- card: the card's number as listed, and only a status, owner or timing field it lists. With no card listed there is no card route.",
-  "- With no PRD listed, a behaviour or scope decision still takes route prd, with no block_id, section_block_id or text: it is reported, not written.",
+  "- With no PRD listed, a behavior or scope decision still takes route prd, with no block_id, section_block_id or text: it is reported, not written.",
   "- confidence: 0 to 1 that this thread settled what you say, and that it belongs where you put it.",
   'Nothing → {"decisions":[]}.',
   ROW_INSTRUCTIONS,
@@ -299,7 +299,7 @@ function prdDecision(f: Record<string, unknown>, prd: SweepSource | null, base: 
 }
 
 /**
- * A behaviour or scope decision on a file with no PRD: kept with no target,
+ * A behavior or scope decision on a file with no PRD: kept with no target,
  * so it is said in the thread rather than lost. One that names a block or a
  * section names something it was never shown, and is dropped.
  */

@@ -4,7 +4,7 @@
  * The fixtures are the real shapes, measured across `design-system/src`,
  * `.storybook` and `prototypes`.
  *
- * COLOUR: 473 comparable literal fallbacks, 282 agreeing, 191 disagreeing
+ * COLOR: 473 comparable literal fallbacks, 282 agreeing, 191 disagreeing
  * across 90 distinct token/literal pairs, and 27 `--color-*` names referenced
  * and never defined. The worst single case is `--color-on-surface-variant`,
  * which resolves to `#3f484a` and carries ten different fallbacks, none of them
@@ -31,7 +31,7 @@ import {
  * WHAT IS NOT TESTED HERE ANY MORE. The value keys and the walk of the token
  * sources were this file's until #621 and are `tokens-node.mjs`'s now, pinned
  * in `design-system/tests/tokens-node.test.js` — including the two facts this
- * file used to assert for itself: that the three spellings of one colour key
+ * file used to assert for itself: that the three spellings of one color key
  * together, and that the token sources are read with the LAST definition
  * winning, which is what the cascade does. What is left below is what is about
  * FALLBACKS.
@@ -132,7 +132,7 @@ test('a nested var() fallback is captured as the outer literal, and the inner va
 
 test('a fallback that disagrees with its token is reported', () => {
   // The real worst case: the token is #3f484a and the literal is one of ten
-  // greys that is not it.
+  // grays that is not it.
   const audit = fallbackAudit({
     tokens: new Map([['--color-on-surface-variant', '#3f484a']]),
     usages: [{ path: 'a.scss', line: 4, token: '--color-on-surface-variant', literal: '#5c5c5c' }],
@@ -175,7 +175,7 @@ test('an rgba() fallback is compared with its alpha, so a stale wash is reported
 
 test('an undefined token is reported with a count, not as a disagreement', () => {
   // `--color-neutral-text` is read 40 times and defined nowhere, so its
-  // fallback IS the colour. That is a different defect from a wrong shade.
+  // fallback IS the color. That is a different defect from a wrong shade.
   const audit = fallbackAudit({
     tokens: new Map([['--color-primary', '#0472a8']]),
     usages: [
@@ -276,7 +276,7 @@ test('an incomparable value is counted rather than called equal', () => {
   const audit = fallbackAudit({
     tokens: new Map([['--a', 'var(--b)']]),
     usages: [{ path: 'a.scss', line: 1, token: '--a', literal: '16px' }],
-    normalise: dimensionKey,
+    normalize: dimensionKey,
     reportUndefined: false,
   });
   assert.equal(audit.incomparable, 1);
@@ -292,11 +292,11 @@ test('the name pattern selects which family is read', () => {
   assert.equal(fallbackUsages([{ path: 'a.scss', text: use }], { prefix: '--' }).length, 1);
 });
 
-test('a disagreeing length is reported the same way a disagreeing colour is', () => {
+test('a disagreeing length is reported the same way a disagreeing color is', () => {
   const audit = fallbackAudit({
     tokens: new Map([['--size-section-gap-sm', '8px']]),
     usages: [{ path: 'a.scss', line: 2, token: '--size-section-gap-sm', literal: '1rem' }],
-    normalise: dimensionKey,
+    normalize: dimensionKey,
     reportUndefined: false,
   });
   assert.equal(audit.disagreements.length, 1);
@@ -304,15 +304,15 @@ test('a disagreeing length is reported the same way a disagreeing colour is', ()
   assert.equal(audit.disagreements[0].found, '16px');
 });
 
-test('an undefined name is ignored for dimensions and reported for colours', () => {
+test('an undefined name is ignored for dimensions and reported for colors', () => {
   // `var(--table-cell-x, 10px)` is a component-local custom property with a
-  // documented default — correct code, and 324 of them would bury the colour
+  // documented default — correct code, and 324 of them would bury the color
   // finding that is a real defect.
   const usages = [{ path: 'a.scss', line: 1, token: '--table-cell-x', literal: '10px' }];
-  const quiet = fallbackAudit({ tokens: new Map(), usages, normalise: dimensionKey, reportUndefined: false });
+  const quiet = fallbackAudit({ tokens: new Map(), usages, normalize: dimensionKey, reportUndefined: false });
   assert.deepEqual(quiet.undefinedTokens, []);
 
-  const loud = fallbackAudit({ tokens: new Map(), usages, normalise: dimensionKey });
+  const loud = fallbackAudit({ tokens: new Map(), usages, normalize: dimensionKey });
   assert.equal(loud.undefinedTokens.length, 1);
 });
 
@@ -320,7 +320,7 @@ test('the failure text names the family it is talking about', () => {
   const audit = fallbackAudit({
     tokens: new Map(),
     usages: [{ path: 'a.scss', line: 1, token: '--size-invented', literal: '4px' }],
-    normalise: dimensionKey,
+    normalize: dimensionKey,
   });
   const failures = fallbackFailures(audit, { undefinedTokens: ['--size-invented'] }, { noun: 'dimension' });
   assert.match(failures[0], /dimension token/);

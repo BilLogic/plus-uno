@@ -90,7 +90,7 @@ and its column.
   `Select mode="multi"`.
 - `TagInput` is the field for a set of tags the user picks or adds, as in
   Notion's multi-select: typing filters its options, and a Create row adds a
-  new value with a random Tag colour, reported through `onCreate`. Its
+  new value with a random Tag color, reported through `onCreate`. Its
   `options` are required and owned by the caller.
 - `DatePicker` is a bare date control with no `label`, no `required`, no
   `validation`, and no rest props, so nothing can name it. Reach for

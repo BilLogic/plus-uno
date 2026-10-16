@@ -320,11 +320,11 @@ export interface BlueprintSearchOptions {
    *  slices whose frames reference the matched cells; fetchSlices answers a
    *  different question — a title/actor ILIKE over the QUERY TEXT, plus an
    *  unfiltered head-count so "how many slices are there" is not answered with
-   *  a filtered number. Swapping one for the other would be a behaviour change
-   *  wearing an optimisation's clothes. */
+   *  a filtered number. Swapping one for the other would be a behavior change
+   *  wearing an optimization's clothes. */
   include?: readonly ("edges" | "findings")[];
   /** Scope filters and the granularity rung, chosen by the model (#413). Sent
-   *  on the fused path only — the ladder below cannot honour them, so a scoped
+   *  on the fused path only — the ladder below cannot honor them, so a scoped
    *  search never falls through to it: an unfiltered answer to a filtered
    *  question is wrong, not degraded. With at least one filter set, `query`
    *  may be empty (filter-only predicate mode). */
@@ -1111,7 +1111,7 @@ export async function fetchPhaseOutline(env: Env): Promise<unknown[] | undefined
 /**
  * Cells that trigger, or are triggered by, the given cells — one hop.
  *
- * One subrequest: PostgREST embeds both ends of the FK, so the neighbour's
+ * One subrequest: PostgREST embeds both ends of the FK, so the neighbor's
  * content arrives with the edge instead of needing a second lookup per id.
  *
  * One hop only, deliberately. The plugin walks the graph with a dedicated

@@ -153,11 +153,11 @@ stateDiagram-v2
   ProposalPosted --> WaitingForConfirm: subscribe to reaction_added
 
   WaitingForConfirm --> Confirmed: user reacts check (matching proposal ts)
-  WaitingForConfirm --> Cancelled: user reacts x OR replies w/ correction
+  WaitingForConfirm --> Canceled: user reacts x OR replies w/ correction
   WaitingForConfirm --> TimedOut: 60 min elapsed (PROPOSAL_TTL_MS)
 
   Confirmed --> ToolFired: run the staged operations, react handshake on user msg
-  Cancelled --> Replied: react wave, ack
+  Canceled --> Replied: react wave, ack
   TimedOut --> ExpiredNotice: post proposal expired
 
   ToolFired --> Replied: post what each operation did

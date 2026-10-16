@@ -16,7 +16,7 @@
 //   • failed    a lookup's source errored, timed out or refused access — and
 //               no later call of the same lookup came back whole
 //   • budget    a lookup was refused or cut short for the turn's lookup
-//               budget, or the loop ran out of round-trips and synthesised
+//               budget, or the loop ran out of round-trips and synthesized
 //   • stale     a lookup's newest dated row is older than its cutoff
 //   • absence   the absence pre-check fired (`agent/absence.ts`)
 //   • degraded  a shape the presentation step asked for posted plainer, the
@@ -139,7 +139,7 @@ function joined(names: readonly string[]): string {
   return names.length < 2 ? (names[0] ?? "") : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
 }
 
-const capitalised = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
+const capitalized = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** Emoji and Slack shortcodes — the sign is code's, and no other belongs in the line. */
 const EMOJI = /[☀-➿⬀-⯿]|️|[\uD83C-\uD83E][\uDC00-\uDFFF]|:[a-z][a-z0-9_+-]*:/;
@@ -239,7 +239,7 @@ export function warningLog(now: () => number = Date.now): WarningLog {
       case "failed": {
         const names = [...new Map([...failed.values()].map((s) => [s.label, s])).values()];
         if (!names.length) return null;
-        return `${capitalised(joined(names.map((s) => s.subject)))} could not be read, so this answer goes without ${names.length > 1 ? "them" : "it"}.`;
+        return `${capitalized(joined(names.map((s) => s.subject)))} could not be read, so this answer goes without ${names.length > 1 ? "them" : "it"}.`;
       }
       case "budget":
         return "This answer stopped before every lookup finished, so some sources went unchecked.";

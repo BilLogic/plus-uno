@@ -308,7 +308,7 @@ async function runWonVerdict(
  * What remains is the gate's own invariant, checked once: only a `gated` tool
  * runs from here. A proposal naming an `ungated` read or the `control` tool is
  * a caller bug, not a user error, so it answers `ok:false` — the resolution
- * path is mid-flight and a throw here would cost the acknowledgement, the
+ * path is mid-flight and a throw here would cost the acknowledgment, the
  * history note and the rest of the batch.
  *
  * Each body returns a JSON string that goes straight into a `tool_result`

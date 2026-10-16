@@ -177,7 +177,7 @@ test("a revision inside the same DM thread still supersedes that thread's card",
 
 // ── a gate emoji typed as a new, unthreaded DM line ─────────────────────────
 //
-// It sits in no card's thread. Today's behaviour is kept where it is safe —
+// It sits in no card's thread. Today's behavior is kept where it is safe —
 // with one live card in the DM, that is the card it means — and where it is
 // not, the turn asks rather than guesses: two cards, two different writes.
 

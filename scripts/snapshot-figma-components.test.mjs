@@ -382,7 +382,7 @@ test('each wait is at least Retry-After and at least 1 s doubling, as the Worker
   const { waits, sleep } = recordedSleep();
   await figmaGet('/files/K/versions', 't', { fetchImpl, sleep, log: quiet });
   assert.deepEqual(waits, [1_000, 2_000]);
-  assert.equal(backoffMs(1, '600'), 600_000, 'a long Retry-After is honoured, not cut short');
+  assert.equal(backoffMs(1, '600'), 600_000, 'a long Retry-After is honored, not cut short');
 });
 
 test('a Retry-After the run cannot afford fails now, without sleeping or trying again', async () => {

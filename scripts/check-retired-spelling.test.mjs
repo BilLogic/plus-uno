@@ -63,7 +63,7 @@ test('every provider-sense phrase is caught, with its why', () => {
     'MODEL_PROVIDER selects the loop — the Gemini lane runs every turn',
     'the Claude lane needs the models enabled in Model Garden',
     'the Vertex-Claude lane has web search',
-    'ONLY the Anthropic lane honours cache_control',
+    'ONLY the Anthropic lane honors cache_control',
     'a surface rule that must hold on every model lane belongs in the renderer',
     'capabilities differ by provider lane (see the table above)',
     'both agent lanes log `mcp=off`',
@@ -116,9 +116,9 @@ test('the glossary entry that names the old spelling in its _Avoid_ line is exem
   assert.equal(findingsIn(entry, 'docs/other.md').length, 1, 'the exemption is the glossary entry, not the words');
 });
 
-test('only the owning entry\'s _Avoid_ line is exempt — a neighbour or its definition is swept', () => {
-  const neighbour = '**sweep**:\nThe end-of-day read.\n_Avoid_: "Tier 1 fix"';
-  assert.equal(findingsIn(neighbour, 'GLOSSARY.md').length, 1);
+test('only the owning entry\'s _Avoid_ line is exempt — a neighbor or its definition is swept', () => {
+  const neighbor = '**sweep**:\nThe end-of-day read.\n_Avoid_: "Tier 1 fix"';
+  assert.equal(findingsIn(neighbor, 'GLOSSARY.md').length, 1);
   const definition = '**ModelProvider**:\nOne agent loop, no Gemini lane.\n_Avoid_: "the provider loop"';
   assert.equal(findingsIn(definition, 'agents/uno-bot/README.md').length, 1);
 });

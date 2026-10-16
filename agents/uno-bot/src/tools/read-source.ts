@@ -26,7 +26,7 @@ import { isWithheldRepoPath, WITHHELD_NOTE } from "../integrations/repo-read-gua
 
 const GENERIC_TIMEOUT_MS = 8000;
 const GENERIC_TEXT_CAP = 8000;
-/** How much of a block's text the index echoes. Enough to recognise which
+/** How much of a block's text the index echoes. Enough to recognize which
  *  block is which; the full text is already in `content`. */
 const BLOCK_INDEX_PREVIEW = 120;
 

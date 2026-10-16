@@ -37,7 +37,7 @@ const languageOptions = [
  *
  * `value` and `defaultValue` are arrays of language values, such as
  * `['english', 'french']`; `onChange` receives the same shape. A created
- * language joins the options with the colour TagInput gave it.
+ * language joins the options with the color TagInput gave it.
  */
 export const LanguagePreferences = ({
     id = 'language-preferences',

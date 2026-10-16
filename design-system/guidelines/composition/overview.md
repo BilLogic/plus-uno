@@ -11,7 +11,7 @@ answers "what goes where, and inside what".
 
 | Doc | Answers |
 |-----|---------|
-| [layout.md](layout.md) | The approved page skeletons — app shell, overlay, navigation, responsive behaviour |
+| [layout.md](layout.md) | The approved page skeletons — app shell, overlay, navigation, responsive behavior |
 | [hierarchy.md](hierarchy.md) | The four context levels (element → card → section → page) and the token layer each draws from |
 | [surfaces.md](surfaces.md) | Cards, tables, modals, empty and loading states |
 | [forms.md](forms.md) | Field composition, spacing, validation, the modal form variant |

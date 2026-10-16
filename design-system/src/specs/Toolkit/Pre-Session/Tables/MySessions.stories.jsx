@@ -17,7 +17,7 @@ const getStatusConfig = (status) => {
         'Live': { style: 'primary', icon: 'circle-check' },
         'In progress': { style: 'info', icon: 'play' },
         'Starting soon': { style: 'warning', icon: 'clock' },
-        'Cancelled': { style: 'danger', icon: 'circle-xmark' }
+        'Canceled': { style: 'danger', icon: 'circle-xmark' }
     };
     return configs[status] || configs['Scheduled'];
 };

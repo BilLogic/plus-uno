@@ -12,7 +12,7 @@ const toneFor = { present: 'success', absent: 'danger' };
 
 /**
  * Attendance picker: Joined or Did not join, on a small single Select. Before
- * a pick it reads "Select"; the field takes the colour of the status picked.
+ * a pick it reads "Select"; the field takes the color of the status picked.
  */
 export const AttendanceDropdown = ({
     initialStatus = 'unknown',

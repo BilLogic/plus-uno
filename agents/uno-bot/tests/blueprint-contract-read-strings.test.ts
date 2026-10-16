@@ -84,7 +84,7 @@ test("every derived read string is the contract's own label", () => {
 
 test("every role names a column its own table declares", () => {
   // This is what the module-load throw used to do, and all it can still do now
-  // that the roles and the column list travel together: catch the app labelling
+  // that the roles and the column list travel together: catch the app labeling
   // one thing and promising another. A red test on the branch beats a Worker
   // that will not start — and beats a 400 every call site reports to Slack as
   // "the blueprint has nothing on that".

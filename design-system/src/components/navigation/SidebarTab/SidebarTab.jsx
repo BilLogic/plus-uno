@@ -15,7 +15,7 @@ import './SidebarTab.scss';
  * - disabled: transparent bg, on-surface text, 0.38 opacity
  * - focus: primary-12 bg, primary-text color, 2px outline
  *
- * `hover` AND `focus` ARE DOCUMENTATION VALUES, NOT BEHAVIOUR (#320). They
+ * `hover` AND `focus` ARE DOCUMENTATION VALUES, NOT BEHAVIOR (#320). They
  * exist so the design's five states can be laid out side by side in a docs
  * canvas — the real hover and focus appearances come from CSS on the rendered
  * element and need no prop at all.
@@ -99,9 +99,9 @@ const SidebarTab = ({
             role="button"
             aria-disabled={disabled || undefined}
             /*
-             * #320. Which section you are in was a background colour and
+             * #320. Which section you are in was a background color and
              * nothing else. `aria-current="page"` is what says it to anyone
-             * not looking at the colour.
+             * not looking at the color.
              */
             aria-current={isSelected ? 'page' : undefined}
             tabIndex={disabled ? -1 : 0}

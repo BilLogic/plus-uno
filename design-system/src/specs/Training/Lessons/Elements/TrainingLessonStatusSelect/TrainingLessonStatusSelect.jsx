@@ -12,7 +12,7 @@ import PropTypes from 'prop-types';
 import { FilterSelect } from '@/specs/Toolkit/Pre-Session/Elements/Filters/FilterSelect';
 import './TrainingLessonStatusSelect.scss';
 
-/** Each status: its label, icon, colour role, and the key of its count. */
+/** Each status: its label, icon, color role, and the key of its count. */
 const STATUSES = [
     { value: 'assigned', label: 'Assigned', icon: 'circle-check', role: 'info', countKey: 'assigned' },
     { value: 'in-progress', label: 'In Progress', icon: 'spinner', role: 'warning', countKey: 'inProgress' },

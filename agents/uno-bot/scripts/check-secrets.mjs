@@ -53,7 +53,7 @@ export const REMEDY =
   "  The declaration is scripts/secrets.mjs. Live state: npm run secrets:audit.";
 
 /**
- * `--fix` writes a file, so it is honoured only when a human ran this script.
+ * `--fix` writes a file, so it is honored only when a human ran this script.
  * The harness runner imports this module into its own process, and a `--fix` on
  * somebody else's command line must not turn a read-only check into a write.
  */

@@ -200,7 +200,7 @@ test("a network error during the HOLD does not invent an overwrite", async () =>
   assert.equal(result.ok, true);
 });
 
-test("holdAttempts: 0 restores the old first-answer-wins behaviour", async () => {
+test("holdAttempts: 0 restores the old first-answer-wins behavior", async () => {
   // The escape hatch, so the hold can be turned off from the workflow without
   // a code change if it ever becomes the thing standing between a fix and
   // production. It must be a deliberate 0, never the default.
@@ -252,7 +252,7 @@ test("every read is bounded — a hung edge counts as unreachable, not as a stal
 
 test("an UNSET repo variable arrives as an empty string, and must not read as 0", () => {
   // The case that bites. `Number("")` is 0, which would silently disable the
-  // hold on every deploy — the behaviour this module exists to remove, restored
+  // hold on every deploy — the behavior this module exists to remove, restored
   // with no error and no log line saying so.
   assert.equal(holdSamples(""), 30);
   assert.equal(holdSamples("   "), 30);

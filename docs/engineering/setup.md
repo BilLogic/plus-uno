@@ -219,7 +219,7 @@ npm --prefix agents/uno-bot run bundle:harness
 
 ### Harness seams
 
-The words the harness checks are organised by.
+The words the harness checks are organized by.
 
 **check registry**:
 `scripts/checks.registry.mjs`, the one list of the repo's checks: each row says what a check runs and where it runs, and every place that runs checks is held to agree with it.
@@ -288,7 +288,7 @@ Two kinds of failure, two mechanisms:
   `display:` in inline style objects, and #209 re-measured it at zero. The five
   are `LabelAssociation` (#206), `DeclaredApi` (#207), and `ModalDismissal`,
   `PageAndTabSelection` and `SelectCommit` (#209), which cover the four
-  highest-usage components whose behaviour is the product. Everything else in
+  highest-usage components whose behavior is the product. Everything else in
   the corpus is asserted to render, and to survive axe, and nothing more.)
 - **Accessibility is a ratchet**, not a threshold. `scripts/baselines/a11y-baseline.json`
   records which axe rules each story already violates (54 stories, 8 rules at
@@ -304,7 +304,7 @@ Two kinds of failure, two mechanisms:
   outside the entry, so `--update` is a merge that leaves every key the module
   does not own exactly as it found it. A check migrating onto the module adds no
   row: it opens its record by the path it already names. The design-system
-  checks read it — colour fallbacks, size fallbacks, undefined tokens, button
+  checks read it — color fallbacks, size fallbacks, undefined tokens, button
   contrast, focus ring, icon-button name and intent roles (#600), the first two
   through `scripts/lib/fallback-check.mjs`, which is where both families reach
   their record.
@@ -334,7 +334,7 @@ Two kinds of failure, two mechanisms:
 
 **Which components carry `play` blocks, and why not all of them.** A `play`
 block costs runtime on every PR, so the set is chosen rather than grown: a
-component earns one when its behaviour *is* the product and its usage is high
+component earns one when its behavior *is* the product and its usage is high
 enough that a break is expensive. Usage is #166's measurement, recorded in
 `design-system/guidelines/components/overview.md` and re-run on today's tree:
 files under `design-system/src/specs/` and `prototypes/` that import a component
@@ -343,12 +343,12 @@ and render it. Ranked that way, #209 took `Modal` (33 files), `Select` (24),
 are pure state machines and had no interaction cover.
 
 The absences are as deliberate as the set. `Button` (138) and `Alert` (11) are
-behavioural and already have unit tests beside their source, so a second
+behavioral and already have unit tests beside their source, so a second
 assertion in a browser buys nothing. `Badge` (62) does one thing, dismiss, and
 `SelectCommit` exercises it where it actually matters. `Dropdown` (21) and
 `Switch` (7) are covered by `DeclaredApi` (#207). `Table` (19), `ButtonGroup`
 (17) and `Card` (14) render and do not act. Below that the ranking falls away
-fast — `Accordion` is 2 files and `TagInput` is 0, so behaviour alone does not
+fast — `Accordion` is 2 files and `TagInput` is 0, so behavior alone does not
 earn a slot. Adding to the set is fine; adding without a usage number and a
 sentence saying what breaks is how a four-minute gate becomes a ten-minute one.
 

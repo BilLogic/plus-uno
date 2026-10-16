@@ -55,7 +55,7 @@ test('a property a component sets on itself in JSX is DEFINED', () => {
   // read back by `background: var(--bg-color)` in its SCSS. A scanner that only
   // read stylesheets would call every one of those undefined.
   const { undefinedTokens } = audit([
-    file('N.jsx', "const s = { '--bg-color': colour, };"),
+    file('N.jsx', "const s = { '--bg-color': color, };"),
     file('N.scss', '.n { background: var(--bg-color); }'),
   ]);
   assert.deepEqual(undefinedTokens, {});

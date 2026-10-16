@@ -7,7 +7,7 @@
  * tree is written once in `scripts/lib/fallback-check.mjs`, and how its RECORD
  * is read, compared and written is written once in `scripts/lib/ratchet.mjs`,
  * which both families reach through that same file (#600). This file is none of
- * the three: it is the colour family's differences, and nothing else (#610).
+ * the three: it is the color family's differences, and nothing else (#610).
  *
  * WHY IT COMPOSES INTO `check:harness` when `check:storybook` and
  * `check:docs-chrome` do not: it is static. No browser, no server, no `npm ci` —
@@ -23,16 +23,16 @@ import { fallbackCheck } from './lib/fallback-check.mjs';
 import { main } from './lib/findings.mjs';
 
 /**
- * The colour family. It is selected BY NAME — `--color-*` is one namespace and
+ * The color family. It is selected BY NAME — `--color-*` is one namespace and
  * the whole of it — and an undefined name here is a real defect: there is no
- * component-local population of them, so the fallback IS the colour and the
+ * component-local population of them, so the fallback IS the color and the
  * token is fiction.
  */
-const COLOUR = fallbackCheck({
+const COLOR = fallbackCheck({
   check: 'check:color-fallbacks',
-  label: '[colour]',
+  label: '[color]',
   baseline: 'scripts/baselines/color-fallback-baseline.json',
-  noun: 'colour',
+  noun: 'color',
   absent: '--color-*',
   prefix: '--color-',
   reportUndefined: true,
@@ -42,11 +42,11 @@ const COLOUR = fallbackCheck({
     'every edit above it while the pair is the actual decision. The set may shrink ' +
     'and never grow; delete an entry when it is fixed and the check reports any that ' +
     'no longer disagree. `undefinedTokens` is a separate list with a different ' +
-    'endpoint: those names have no definition at all, so the fallback IS the colour, ' +
+    'endpoint: those names have no definition at all, so the fallback IS the color, ' +
     'and the list should be driven to zero deliberately rather than shrinking as ' +
     'files are touched.',
 });
 
-export const { run, summary } = COLOUR;
+export const { run, summary } = COLOR;
 
-main(import.meta.url, COLOUR.check, COLOUR);
+main(import.meta.url, COLOR.check, COLOR);

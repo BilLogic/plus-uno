@@ -223,7 +223,7 @@ export async function runHomeStopDoor(
   const dm = await deps.dmChannelFor(request.userId).catch(() => null);
   if (!dm) {
     // The flag is already raised, so the turn will stop either way. Worth a
-    // line: the press was honoured and this receipt was not delivered.
+    // line: the press was honored and this receipt was not delivered.
     console.error(`[stop] home-tab receipt undeliverable for ${request.userId}: no DM channel`);
     return;
   }

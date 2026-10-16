@@ -63,7 +63,7 @@ describe("an answer with a card table", () => {
   });
 
   it("keeps the footer beneath a table whose prose is a single short line", async () => {
-    // Short prose alone reads as an acknowledgement and goes out bare; the
+    // Short prose alone reads as an acknowledgment and goes out bare; the
     // table beneath it is thirteen checkable claims.
     const { blocks } = await post(wip(13), "Here they are.");
 

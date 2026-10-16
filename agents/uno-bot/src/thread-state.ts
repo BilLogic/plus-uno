@@ -910,7 +910,7 @@ export class ThreadState extends DurableObject<Env> {
   // ----- the capacity outage (turn/capacity-outage.ts) -----
   //
   // One record for the workspace, kept here because this is the one
-  // serialised store it has: each transition is a read-modify-write in one
+  // serialized store it has: each transition is a read-modify-write in one
   // transaction, which is what lets only one caller be handed the lead's DM.
   // Outside the GC sweep's prefixes, on purpose: a told outage stays until it
   // is over, however long that takes.
@@ -1000,7 +1000,7 @@ function eventKey(eventId: string): string {
 
 // Cancel flags expire fast on purpose: a stale one would abort the NEXT
 // question, which reads as the bot ignoring you. (The duration itself now lives
-// in src/thread-state/store.ts with every other TTL this class honours.)
+// in src/thread-state/store.ts with every other TTL this class honors.)
 function cancelKey(channel: string, thread: string): string {
   return `cancel:${channel}:${thread}`;
 }

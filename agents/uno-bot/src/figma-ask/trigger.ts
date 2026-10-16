@@ -33,7 +33,7 @@ const OLD_LABEL_HEAD = `${GOAT} le goat`;
  *
  * @param lines - What the comment says, at least one line
  */
-export function labelled(lines: readonly string[]): string {
+export function labeled(lines: readonly string[]): string {
   const [first = "", ...rest] = lines;
   return [`${FIGMA_LABEL} ${first}`, ...rest].join("\n");
 }

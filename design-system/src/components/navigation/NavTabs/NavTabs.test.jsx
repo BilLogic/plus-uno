@@ -6,7 +6,7 @@
  * navigation bar styled like tabs. It produces `<a href="#" role="button">`
  * items, no `role="tablist"`, no `aria-selected`, and `tabindex="0"` on every
  * item, so a set of six tabs is six stops in the tab sequence and the selected
- * one is conveyed by colour alone.
+ * one is conveyed by color alone.
  *
  * `mode="tabs"` is the opt-in fix. The navigation cases below are not padding:
  * three specs under `src/specs/Home` render this component as navigation today,

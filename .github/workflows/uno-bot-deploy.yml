@@ -109,7 +109,7 @@ on:
     branches: [main]
   workflow_dispatch: {}
 
-# One deploy at a time. Superseded runs are cancelled rather than queued: an
+# One deploy at a time. Superseded runs are canceled rather than queued: an
 # older commit finishing last would leave the Worker behind main.
 concurrency:
   group: uno-bot-deploy
@@ -225,7 +225,7 @@ jobs:
         env:
           # Escape hatch. Set the repo variable to 0 if this hold is ever the
           # thing standing between a fix and production; it restores the old
-          # first-answer-wins behaviour, loudly, in the log.
+          # first-answer-wins behavior, loudly, in the log.
           UNO_BOT_HOLD_SAMPLES: ${{ vars.UNO_BOT_HOLD_SAMPLES }}
           # Which Worker to check. Unset — the normal case — interpolates to the
           # empty string and falls back to the default in scripts/worker-url.mjs.

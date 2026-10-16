@@ -50,7 +50,7 @@ Setup specifics (aliases, package structure, token workflow) are
 Two rules that will bite you otherwise:
 
 - Import from the barrel — `import { Button } from '@/components'` — never deep-import from `design-system/src/`.
-- Every colour, space, radius and shadow comes from a token. `design-system/agent-views/tokens/tokens.md` is the generated list of names.
+- Every color, space, radius and shadow comes from a token. `design-system/agent-views/tokens/tokens.md` is the generated list of names.
 
 ## Working on the harness
 

@@ -283,15 +283,15 @@ DateWithAStateAppearance.play = async ({ canvasElement }) => {
  * label is visually hidden text, and the visible words are hidden from
  * assistive technology.
  */
-export const LabelledStatus = () => (
+export const LabeledStatus = () => (
     <div style={row}>
-        <BadgeVariants variant="status" appearance="positive" label="Session completed" data-testid="labelled">Done</BadgeVariants>
+        <BadgeVariants variant="status" appearance="positive" label="Session completed" data-testid="labeled">Done</BadgeVariants>
     </div>
 );
 
-LabelledStatus.play = async ({ canvasElement }) => {
+LabeledStatus.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const status = canvas.getByTestId('labelled');
+    const status = canvas.getByTestId('labeled');
     await expect(status).not.toHaveAttribute('aria-label');
     await expect(canvas.getByText('Done')).toBeVisible();
     await expect(canvas.getByText('Done').closest('[aria-hidden="true"]'), 'the visible words are hidden from a screen reader').not.toBeNull();

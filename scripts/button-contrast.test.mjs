@@ -32,10 +32,10 @@ import {
   tokenValues,
 } from './button-contrast.mjs';
 
-test('tokenValues reads the colour tokens and only those', () => {
+test('tokenValues reads the color tokens and only those', () => {
   const values = tokenValues(':root { --color-primary: #123456; --space-2: 8px; }');
   assert.equal(values.get('--color-primary'), '#123456');
-  assert.equal(values.has('--space-2'), false, 'a spacing token is not a colour this check can resolve');
+  assert.equal(values.has('--space-2'), false, 'a spacing token is not a color this check can resolve');
 });
 
 test('themeMap reads the map rather than a copy of it', () => {
@@ -106,7 +106,7 @@ test('a baseline entry that no longer fails is itself a finding', () => {
   assert.match(found[0], /baseline entry "ok\/filled" no longer fails/);
 });
 
-test('duplicateGrounds finds two styles pointing at one colour', () => {
+test('duplicateGrounds finds two styles pointing at one color', () => {
   const themes = [
     { style: 'tertiary', main: '--t', onMain: '--on', state: '--s', text: '--x' },
     { style: 'info', main: '--i', onMain: '--on', state: '--s', text: '--x' },

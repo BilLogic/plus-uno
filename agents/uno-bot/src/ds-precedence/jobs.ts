@@ -117,7 +117,7 @@ export const NOT_STAGED = "Didn't go through, so it comes back in tomorrow's rep
 /** What the check keeps for the morning. */
 export interface PrecedenceReport {
   checkedAt: string;
-  /** The check run's date, `YYYY-MM-DD` — the week the intake is labelled
+  /** The check run's date, `YYYY-MM-DD` — the week the intake is labeled
    *  with. Absent from a report kept before it was recorded; `checkedAt`'s
    *  date stands in. */
   weekOf?: string;

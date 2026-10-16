@@ -7,7 +7,7 @@
  * — a generator — and sweeps everything it can produce. This reads arbitrary
  * `color:` declarations, which no generator produces and no story necessarily
  * renders. `--color-warning` is 3.52:1 on the page, below AA's 4.5:1, and was
- * the declared text colour in seven places: a form tag, two status icons, a
+ * the declared text color in seven places: a form tag, two status icons, a
  * table cell, a select, a button-container message, and a `.color-warning`
  * utility class anyone could reach for. Nothing rendered any of them in a
  * story, so the a11y ratchet never measured one. `--color-warning-text`
@@ -18,7 +18,7 @@
  *
  *   EXEMPT        eight inactive table sort arrows. WCAG 1.4.11 exempts
  *                 inactive components outright, and their `&--active` state is
- *                 `--color-secondary`. Not defects; unrecognisable as such from
+ *                 `--color-secondary`. Not defects; unrecognizable as such from
  *                 a stylesheet.
  *   UNKNOWN       a snackbar header whose background is set by a child modifier
  *                 (`&--created`), and a carousel control on `--color-scrim`

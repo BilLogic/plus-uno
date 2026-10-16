@@ -105,10 +105,10 @@ const Rating = ({
             {/*
               * #319. The row is a `radiogroup` and each item is a `radio`, not a
               * button. A rating is one value out of five, and `role="button"`
-              * could not say which one was chosen — selection was a fill colour
+              * could not say which one was chosen — selection was a fill color
               * and nothing in the accessibility tree. `aria-checked` says it.
               *
-              * The role brings the keyboard behaviour with it: a radio group is
+              * The role brings the keyboard behavior with it: a radio group is
               * ONE tab stop, and the arrow keys move within it. That is the
               * roving-tabindex below — the checked item is tabbable, and if
               * nothing is checked the first item is, so the group is always
@@ -199,7 +199,7 @@ const RatingItem = ({
             {/*
               * #319. `role="radio"` and `aria-checked`, kept on the item even
               * when disabled: a disabled rating used to drop the role, the
-              * tabindex and the label together, which made it five unlabelled
+              * tabindex and the label together, which made it five unlabeled
               * `div`s — invisible rather than unavailable. `aria-disabled` is
               * how a control says "not now" and stays a control.
               *

@@ -15,7 +15,7 @@ import Popover from './Popover';
  * A caller could not fix it from outside either. Extra props are spread onto
  * the overlay's CONTENT, not onto `OverlayTrigger`, so `rootClose` passed to
  * this component landed on the popover panel and did nothing there. The
- * behaviour was unreachable from the public API in both directions.
+ * behavior was unreachable from the public API in both directions.
  *
  * This is #209's defect class in a second component: something that opens,
  * looks right in a screenshot, and cannot be closed by the route everyone

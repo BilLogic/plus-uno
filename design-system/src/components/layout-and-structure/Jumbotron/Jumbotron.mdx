@@ -88,7 +88,7 @@ export const figmaMeta = {
 
 Use `Jumbotron` for the one block at the top of a page that states what the page
 is and what to do first — a landing hero, an empty state that has something to
-say, the opening panel of a programme. One per page, at most.
+say, the opening panel of a program. One per page, at most.
 
 `title` renders as the page's `h1` and `subtitle` as a paragraph styled like an
 `h4`. `children` is the body. `primaryButton` and `secondaryButton` are prop
@@ -105,7 +105,7 @@ objects spread into `Button`, so anything `Button` takes goes in them.
 ```jsx
 // Incorrect — two jumbotrons on a page, or one on a page that already has its
 // own h1, produce two level-one headings and a broken outline.
-<h1>Programme</h1>
+<h1>Program</h1>
 <Jumbotron title="Autumn 2026" subtitle="12 weeks, 48 sessions" />
 
 // Correct — the jumbotron IS the page heading, or it does not carry a title.
@@ -117,10 +117,10 @@ objects spread into `Button`, so anything `Button` takes goes in them.
 ```jsx
 // Incorrect — an empty object still renders a button, and its default text is
 // the placeholder "Primary Action".
-<Jumbotron title="Autumn 2026" primaryButton={{ onClick: enrol }} />
+<Jumbotron title="Autumn 2026" primaryButton={{ onClick: enroll }} />
 
 // Correct.
-<Jumbotron title="Autumn 2026" primaryButton={{ text: 'Enrol', onClick: enrol }} />
+<Jumbotron title="Autumn 2026" primaryButton={{ text: 'Enroll', onClick: enroll }} />
 ```
 
 ### The buttons are `medium` unless you say otherwise.

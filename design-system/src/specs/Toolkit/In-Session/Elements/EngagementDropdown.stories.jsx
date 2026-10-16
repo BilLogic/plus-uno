@@ -11,7 +11,7 @@ export default {
         layout: 'centered',
         docs: {
             description: {
-                component: 'Engagement picker: a small single Select for the student\'s engagement during a session. Partially engaged adds a Reason Select, and applies once a reason is picked. The field takes the colour of the status picked.'
+                component: 'Engagement picker: a small single Select for the student\'s engagement during a session. Partially engaged adds a Reason Select, and applies once a reason is picked. The field takes the color of the status picked.'
             }
         }
     },

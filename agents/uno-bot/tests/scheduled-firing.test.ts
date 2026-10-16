@@ -168,7 +168,7 @@ test("no other firing enqueues a run", async () => {
     assert.deepEqual(runs, [], new Date(t).toISOString());
   }
   // A firing that lands a few seconds late is still the same slot; one in the
-  // neighbouring quarter-hour is not.
+  // neighboring quarter-hour is not.
   assert.deepEqual(runsForFiring(MORNING + 20_000), ["morning"]);
   assert.deepEqual(runsForFiring(at(13, 15)), []);
   // Nor does a firing on a day with no run, whatever a trigger says:

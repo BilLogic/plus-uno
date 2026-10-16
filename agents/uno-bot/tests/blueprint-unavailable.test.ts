@@ -99,7 +99,7 @@ test("the read entry puts the search FIRST, so an unconfigured deployment still 
 });
 
 test("and if the order ever moved, each enrichment read still says `unavailable`", async () => {
-  // Defence in depth for the test above: the ordering is the guarantee, and
+  // Defense in depth for the test above: the ordering is the guarantee, and
   // this is what stops a reordering from being SILENT. Every one of these
   // answers an unconfigured deployment with an empty page rather than a throw
   // — which is indistinguishable from "the blueprint has nothing on this"

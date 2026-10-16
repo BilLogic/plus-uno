@@ -69,7 +69,7 @@ export interface TurnRecord {
    *  model is not on it, so an unpriced turn is findable rather than free. */
   costUsd: number | null;
 
-  // ── behaviour ──
+  // ── behavior ──
   /** Ungated tools the loop ran, in call order. */
   toolsCalled: string[];
   /** The references `read_reference` served this turn, by name, in the order
@@ -105,7 +105,7 @@ export interface TurnRecord {
   subType: SubType | null;
   /** 1–7 (`painCategoryOf`); 7 is a turn that staged a card or intake. */
   painCategory: PainCategory | null;
-  /** When a classifier labelled the ask, epoch ms; null until one has. */
+  /** When a classifier labeled the ask, epoch ms; null until one has. */
   classifiedAt: number | null;
 }
 

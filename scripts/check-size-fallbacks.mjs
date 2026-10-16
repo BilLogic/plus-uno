@@ -2,7 +2,7 @@
 /**
  * `npm run check:size-fallbacks` — #268, the other half.
  *
- * `check:color-fallbacks` holds the literal beside a COLOUR token to that
+ * `check:color-fallbacks` holds the literal beside a COLOR token to that
  * token's value. This holds the literal beside a DIMENSION token to its value,
  * over the same corpus, with the same ratchet, from the same modules:
  * `scripts/token-fallbacks.mjs` says what the defect is,
@@ -12,7 +12,7 @@
  * here is the three ways this family differs (#610).
  *
  * IT IS THE BIGGER HALF. 546 disagreements inside `design-system/src` against
- * colour's 191 across the whole corpus, and the spread is worse: 61 uses of
+ * color's 191 across the whole corpus, and the spread is worse: 61 uses of
  * `var(--size-section-gap-sm, 16px)` for a token that is `8px`, 52 of
  * `var(--size-element-pad-y-lg, 12px)` for a token that is `8px`. When the token
  * sheet is late — the Storybook docs iframe and six prototype pages carry none —
@@ -24,10 +24,10 @@
  * prefix list is a thing to forget to update. Selecting by value means a new
  * family is covered the day it is minted.
  *
- * WHY UNDEFINED NAMES ARE NOT REPORTED HERE, when they are for colour: 324 of
+ * WHY UNDEFINED NAMES ARE NOT REPORTED HERE, when they are for color: 324 of
  * them are component-local custom properties — `var(--table-cell-x, 10px)`,
  * defined a few lines up in the component's own stylesheet, where the fallback
- * is the documented default and the whole construction is correct. Colour has no
+ * is the documented default and the whole construction is correct. Color has no
  * equivalent population, so there the undefined name really is a defect. Putting
  * both under one exit code would bury one finding under 324 non-findings, which
  * is how a check stops being read.
@@ -57,7 +57,7 @@ const SIZE = fallbackCheck({
   absent: 'dimension',
   census: 'dimension',
   prefix: ANY_TOKEN,
-  normalise: dimensionKey,
+  normalize: dimensionKey,
   // The value-level half of "which tokens count": read every custom property,
   // then keep the ones whose resolved value is a length. The kind is read off
   // the VALUE and the answer is `tokens-node`'s (#620/#621) — which is the same
@@ -65,7 +65,7 @@ const SIZE = fallbackCheck({
   select: (tokens) => new Map([...tokens].filter(([, value]) => dimensionKey(value) !== null)),
   reportUndefined: false,
   why:
-    'Literal fallbacks that disagree with their own DIMENSION token (#268). The colour ' +
+    'Literal fallbacks that disagree with their own DIMENSION token (#268). The color ' +
     'half is scripts/baselines/color-fallback-baseline.json; this is the bigger one. Keyed on ' +
     '"<token> <literal>" rather than file and line, because a line number churns on ' +
     'every edit above it while the pair is the actual decision. The set may shrink and ' +

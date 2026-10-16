@@ -22,7 +22,7 @@ import NumberInput from './NumberInput';
  * neither is visible in a screenshot.
  *
  * axe cannot catch it. There is no rule that says "this text near this input
- * ought to be its description" — that is a judgement about meaning, and the
+ * ought to be its description" — that is a judgment about meaning, and the
  * component is the only place that knows the two belong together.
  *
  * The composing case is asserted separately because it is where a naive fix

@@ -5,13 +5,13 @@
  * indicator against what it sits on, and 2.4.11 (Focus Appearance) asks the
  * indicator to be at least as large as a 2px perimeter and to reach 3:1 against
  * the unfocused state. This measures the first of those, because it is the one
- * a stylesheet can answer: the colour of the ring against the ground its own
+ * a stylesheet can answer: the color of the ring against the ground its own
  * rule puts it on.
  *
  * WHAT THE SWEEP FOUND, 2026-08-29. 53 focus-affordance declarations across the
  * design system, written **20 different ways** — six width tokens (`2px`,
  * `0.2rem`, `--size-element-stroke-sm|md|lg`, `--size-border-stroke-stroke-150`,
- * `--size-card-border-lg`) and seven colours. Three of those colours cannot be
+ * `--size-card-border-lg`) and seven colors. Three of those colors cannot be
  * seen against the page:
  *
  *   --color-primary-state-08    1.13:1     an 8% tint of primary
@@ -74,7 +74,7 @@ export { REPO_ROOT, stylesheets };
  * `background-color` is NOT one of them, and the reason is worth stating: a
  * focus style whose only change is its own background has to be measured
  * against the UNFOCUSED background, which is blind spot 1. Scoring it against
- * the ground its own rule sets measures a colour against itself and returns
+ * the ground its own rule sets measures a color against itself and returns
  * 1.00:1 for every one of them — four findings in the first run, all of them
  * the check misreading its own input. Backgrounds are read as the GROUND here,
  * never as the indicator.
@@ -92,7 +92,7 @@ export const AFFORDANCE = new RegExp(
 export const NEGATED = /:not\(\s*:focus[^)]*\)/gi;
 
 /**
- * Token definitions, from the colour file and the role layer that follows it.
+ * Token definitions, from the color file and the role layer that follows it.
  *
  * Missing files are skipped rather than thrown: a vanished token directory is
  * the sentinel-floor case, and throwing would report a crash instead of the
@@ -101,7 +101,7 @@ export const NEGATED = /:not\(\s*:focus[^)]*\)/gi;
  * @param {string} [root]
  * @returns {Map<string, string>}
  */
-export function colours(root = REPO_ROOT) {
+export function colors(root = REPO_ROOT) {
   const source = [`${TOKEN_DIR}/_colors.scss`, `${TOKEN_DIR}/_color_roles.scss`]
     .map((file) => path.join(root, file))
     .filter((file) => fs.existsSync(file))
@@ -178,12 +178,12 @@ export function selectorChain(source, offset) {
  * measured against it.
  */
 export function ratio(token, ground, values, page = PAGE_TOKEN) {
-  const colour = parseColour(resolveToken(token, values));
+  const color = parseColour(resolveToken(token, values));
   const raw = parseColour(resolveToken(ground, values));
   const surface = parseColour(resolveToken(page, values));
-  if (!colour || !raw || !surface) return null;
+  if (!color || !raw || !surface) return null;
   const base = raw.a < 1 ? composite(raw, surface) : raw;
-  return contrast(composite(colour, base), base);
+  return contrast(composite(color, base), base);
 }
 
 /**

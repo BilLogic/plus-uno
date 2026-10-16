@@ -641,7 +641,7 @@ ${columns(modes[0], '    ')}}
 // produced, immediately below a warning that said generation was "DISABLED to
 // protect existing tokens" — a `console.warn` with no return and no exit, so
 // the protection it announced did not exist. One run on 2026-08-29 took
-// `_colors.scss` from 195 colour tokens to 5 and reported success. See
+// `_colors.scss` from 195 color tokens to 5 and reported success. See
 // `scripts/token-generation.mjs` for the rule and the measurement.
 console.log('Generating token SCSS files...');
 

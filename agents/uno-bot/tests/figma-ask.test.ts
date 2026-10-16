@@ -897,7 +897,7 @@ describe("a Team Members gap the ask ran into", () => {
     await ask(w, comment("101", "@uno and the label?", { user: RAE }));
     assert.equal(w.notes.length, 1);
     w.clock.now = NOW + 31 * DAY_MS;
-    await ask(w, comment("102", "@uno and the colour?", { user: RAE }));
+    await ask(w, comment("102", "@uno and the color?", { user: RAE }));
     assert.equal(w.notes.length, 2);
   });
 
@@ -1017,7 +1017,7 @@ describe("both models out of capacity", () => {
     await ask(w, c);
     assert.equal(w.replies().length, 1);
     assert.ok(w.replies()[0]!.message.includes(OVERLOADED), w.replies()[0]!.message);
-    assert.ok(w.replies()[0]!.message.includes("🐐"), "labelled as uno-bot's");
+    assert.ok(w.replies()[0]!.message.includes("🐐"), "labeled as uno-bot's");
     // Figma redelivers, the runner retries: the mark keeps it to one reply.
     await w.run(c);
     assert.equal(w.replies().length, 1);

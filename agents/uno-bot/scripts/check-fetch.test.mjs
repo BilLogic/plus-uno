@@ -16,7 +16,7 @@ import { run, summary } from "./check-fetch.mjs";
 const CLIENT = { "figma/rest.ts": 'const FIGMA_API = "https://api.figma.com";\n' };
 
 /** What the guard says about a repo whose `agents/uno-bot/src` holds `files`. */
-function offences(files) {
+function offenses(files) {
   const root = mkdtempSync(path.join(tmpdir(), "check-fetch-"));
   try {
     for (const [rel, text] of Object.entries(files)) {
@@ -31,7 +31,7 @@ function offences(files) {
 }
 
 test("a Figma call outside the client fails, even through countedFetch", () => {
-  const found = offences({
+  const found = offenses({
     ...CLIENT,
     "jobs/poll.ts": "const res = await countedFetch(`https://api.figma.com/v1/files/${key}/versions`, init);\n",
   });
@@ -42,7 +42,7 @@ test("a Figma call outside the client fails, even through countedFetch", () => {
 
 test("the client itself, and prose that names the host, pass", () => {
   assert.deepEqual(
-    offences({
+    offenses({
       ...CLIENT,
       "integrations/notes.ts": "// Figma is reached at api.figma.com, through src/figma/.\n/**\n * api.figma.com, again\n */\nexport {};\n",
     }),
@@ -51,11 +51,11 @@ test("the client itself, and prose that names the host, pass", () => {
 });
 
 test("the host is Figma's however it is spelled", () => {
-  assert.equal(offences({ ...CLIENT, "probe.ts": 'const me = "https://API.Figma.com/v1/me";\n' }).length, 1);
+  assert.equal(offenses({ ...CLIENT, "probe.ts": 'const me = "https://API.Figma.com/v1/me";\n' }).length, 1);
 });
 
 test("only the client's own path is the client", () => {
-  assert.equal(offences({ ...CLIENT, "other/figma/rest.ts": 'const FIGMA_API = "https://api.figma.com";\n' }).length, 1);
+  assert.equal(offenses({ ...CLIENT, "other/figma/rest.ts": 'const FIGMA_API = "https://api.figma.com";\n' }).length, 1);
 });
 
 test("the green line says what was proved", () => {

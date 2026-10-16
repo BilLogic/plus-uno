@@ -710,11 +710,11 @@ describe("the morning's decisions on the sweep's message in #plus-design (#900)"
 
   it("replies about at most MAX_NO_PRD_REPLIES decisions with no PRD a morning, and keeps the rest queued", async () => {
     const seven = Array.from({ length: MAX_NO_PRD_REPLIES + 2 }, (_, i) =>
-      comment(`p${i + 1}`, { created_at: `2026-09-29T16:${String(10 + i).padStart(2, "0")}:00Z`, message: `Behaviour ${i + 1}`, client_meta: pin("4:2") }),
+      comment(`p${i + 1}`, { created_at: `2026-09-29T16:${String(10 + i).padStart(2, "0")}:00Z`, message: `Behavior ${i + 1}`, client_meta: pin("4:2") }),
     );
     const figma = createInMemoryFigma();
     figma.seedFile(FILE, { name: "Goal Setting / Card 2482 / Sarah", document: DOCUMENT, comments: seven });
-    const reply = JSON.stringify({ decisions: seven.map((c, i) => ({ thread_id: c.id, route: "prd", decision: `Behaviour ${i + 1}.`, confidence: 0.9 })) });
+    const reply = JSON.stringify({ decisions: seven.map((c, i) => ({ thread_id: c.id, route: "prd", decision: `Behavior ${i + 1}.`, confidence: 0.9 })) });
     const { h } = await nightHarness({ figma, sources: [{ ...CARD, subpages: [] }, PRD], replies: [reply] });
     await runSweepJob(NIGHT, h.deps);
     h.clock.now = at(30, 13);
@@ -728,7 +728,7 @@ describe("the morning's decisions on the sweep's message in #plus-design (#900)"
     assert.equal(h.figma.queue.size, 0);
   });
 
-  it("says a behaviour decision on a card with no PRD page in the thread, and writes it nowhere", async () => {
+  it("says a behavior decision on a card with no PRD page in the thread, and writes it nowhere", async () => {
     const noPrd: SweepSource = { ...CARD, subpages: [] };
     const reply = JSON.stringify({
       decisions: [{ thread_id: "c1", route: "prd", decision: "The progress bar stays hidden until the first goal is set.", confidence: 0.9 }],

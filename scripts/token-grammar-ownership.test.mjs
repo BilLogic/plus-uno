@@ -1,7 +1,7 @@
 /**
  * #622 — the harness has one token grammar.
  *
- * The docs check used to carry its own reader, alias resolver, colour key,
+ * The docs check used to carry its own reader, alias resolver, color key,
  * dimension key and family map. The registry generator used the loosest
  * `var()` in the tree (`var((--[^)]+))`, which swallows a fallback as the
  * name). The font-family check restated the declaration and `var()` patterns

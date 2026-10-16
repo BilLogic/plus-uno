@@ -65,7 +65,7 @@ describe("inline annotations", () => {
     assert.equal(out[0]!.annotations?.bold, undefined);
   });
 
-  it("does NOT italicise snake_case", () => {
+  it("does NOT italicize snake_case", () => {
     // The regression this codebase would actually hit: its own vocabulary is
     // full of snake_case, and a naive `_..._` rule turns "notion_create and
     // source_read" into mangled emphasis.

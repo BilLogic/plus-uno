@@ -95,7 +95,7 @@ plain form.
 // anything a user can influence is executed as markup.
 <RichTextEditor value={note.bodyFromApi} onChange={setBody} />
 
-// Correct — sanitise on the way in, and again on the way out before storing.
+// Correct — sanitize on the way in, and again on the way out before storing.
 <RichTextEditor value={sanitize(note.bodyFromApi)} onChange={(html) => setBody(sanitize(html))} />
 ```
 
@@ -130,13 +130,13 @@ matters, leave those two buttons out of `toolbarButtons`.
   control for `htmlFor` to bind to. Without a `label` the region is a named role
   with no name, which axe reports and a screen-reader user hears as nothing.
 - **The toolbar buttons are named.** Each carries an `aria-label` from its
-  definition, and the bold/italic/underline set is a `role="group"` labelled
+  definition, and the bold/italic/underline set is a `role="group"` labeled
   "Bold, italic, and underline". Their pressed state is tracked internally and is
   not exposed as `aria-pressed`.
 - **The placeholder is CSS.** It is drawn from a `data-placeholder` attribute, so
   it is not part of the accessible name and may not be announced at all.
 - **Keep the formatting optional.** Anything that only exists as bold text or a
-  colour in the body is invisible to someone hearing the page. Structure it with
+  color in the body is invisible to someone hearing the page. Structure it with
   lists and headings instead.
 
 </div>
@@ -145,11 +145,11 @@ matters, leave those two buttons out of `toolbarButtons`.
 
 ## Related
 
-- For plain multi-line text, use `Textarea` — smaller, labelled, and with none
+- For plain multi-line text, use `Textarea` — smaller, labeled, and with none
   of the above.
 - For one line, use `Input`.
 - For displaying formatted content the user cannot edit, render the HTML
-  yourself after sanitising it.
+  yourself after sanitizing it.
 
 </div>
 

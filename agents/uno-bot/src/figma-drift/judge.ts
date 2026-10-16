@@ -1,5 +1,5 @@
 // Whether a Figma frame now shows what a thread settled (#897): the one
-// judgement behind "don't ask" and "withdraw the question".
+// judgment behind "don't ask" and "withdraw the question".
 //
 // It reads the frame's TEXT LAYERS, the same evidence the drift detector read
 // when it found the drift (`sweep/detector.ts`), because the model seam takes
@@ -26,13 +26,13 @@ export const FRAME_MATCH_SYSTEM = [
   "A Slack thread settled a change to a Figma design. You are shown what it settled, what the frame showed when the change was found, and the frame's text layers now.",
   "Decide whether the frame NOW shows the settled change.",
   "- shows: true only when the text layers plainly show it — the new copy, the new label, the item now there or now gone.",
-  "- A change the text layers cannot show (a layout, a colour, spacing, an icon, an interaction) is shows: false. So is a frame that only partly shows it, or that you are unsure of.",
+  "- A change the text layers cannot show (a layout, a color, spacing, an icon, an interaction) is shows: false. So is a frame that only partly shows it, or that you are unsure of.",
   "Reply with JSON only, no prose, in exactly this shape:",
   '{"shows":true|false,"confidence":0.0}',
   "- confidence: 0 to 1 that your answer is right.",
 ].join("\n");
 
-/** What one judgement is made from. */
+/** What one judgment is made from. */
 export interface FrameJudgeInput {
   /** What the thread settled. */
   threadSays: string;

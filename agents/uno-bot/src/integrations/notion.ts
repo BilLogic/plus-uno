@@ -197,7 +197,7 @@ export interface TeamMember {
   /** Slack user id (e.g. "U0123ABC"), if the DB carries one — enables @-mention. */
   slackUserId?: string;
   /** The member's Figma User ID cell as they filled it in; `usage/roles.ts`
-   *  `normaliseFigmaId` reads the id out of it. */
+   *  `normalizeFigmaId` reads the id out of it. */
   figmaUserId?: string;
   /** The Notion users in the member's Notion Person cell, when it names any. */
   notionUserIds?: string[];
@@ -1154,24 +1154,24 @@ export async function notionUserName(env: Env, userId: string): Promise<string |
 export const USER_LIST_PAGES = 3;
 
 /**
- * The one Notion person whose name, compared by `normalise`, is this one; null
+ * The one Notion person whose name, compared by `normalize`, is this one; null
  * for none or several. Up to `USER_LIST_PAGES` subrequests.
  */
-export async function notionUserIdForName(env: Env, name: string, normalise: (s: string) => string): Promise<string | null> {
-  return (await notionUserIdsForNames(env, [name], normalise)).get(name) ?? null;
+export async function notionUserIdForName(env: Env, name: string, normalize: (s: string) => string): Promise<string | null> {
+  return (await notionUserIdsForNames(env, [name], normalize)).get(name) ?? null;
 }
 
 /**
- * Each name's one Notion person, compared by `normalise`; null for none or
+ * Each name's one Notion person, compared by `normalize`; null for none or
  * several. One listing serves every name: up to `USER_LIST_PAGES` subrequests.
  */
 export async function notionUserIdsForNames(
   env: Env,
   names: readonly string[],
-  normalise: (s: string) => string,
+  normalize: (s: string) => string,
 ): Promise<Map<string, string | null>> {
   if (!env.NOTION_API_KEY) throw new Error("NOTION_API_KEY not configured on the Worker");
-  const wanted = names.map((n) => [n, normalise(n)] as const).filter(([, w]) => w);
+  const wanted = names.map((n) => [n, normalize(n)] as const).filter(([, w]) => w);
   const hits = new Map(names.map((n) => [n, new Set<string>()] as const));
   if (wanted.length) {
     let cursor: string | undefined;
@@ -1182,7 +1182,7 @@ export async function notionUserIdsForNames(
       if (!res.ok) throw notionError(res.status, data, "user list failed");
       for (const u of data.results ?? []) {
         if (!u.id || u.type !== "person" || !u.name) continue;
-        const key = normalise(u.name);
+        const key = normalize(u.name);
         for (const [n, w] of wanted) if (w === key) hits.get(n)!.add(u.id);
       }
       if (!data.has_more || !data.next_cursor) break;
@@ -1864,7 +1864,7 @@ function carriesChildren(block: NotionBlock): boolean {
  * read. Returns how many blocks landed, plus a refusal line when something
  * did not.
  *
- * The GET is not an optimisation — it IS the check. `last_edited_time` is the
+ * The GET is not an optimization — it IS the check. `last_edited_time` is the
  * only thing Notion gives us that moves when a human edits the block, and the
  * API has no conditional write, so the compare has to happen here.
  *

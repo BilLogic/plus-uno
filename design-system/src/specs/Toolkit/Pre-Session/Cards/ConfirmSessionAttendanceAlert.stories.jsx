@@ -73,7 +73,7 @@ export const SessionCanceled = () => (
             onDismiss={() => { }}
         >
             <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
-                Your session on <span className="font-weight-bold">Tues, Oct 28</span> at <span className="font-weight-bold">2:00 PM</span> has been cancelled.
+                Your session on <span className="font-weight-bold">Tues, Oct 28</span> at <span className="font-weight-bold">2:00 PM</span> has been canceled.
             </span>
         </Alert>
     </AlertContainer>

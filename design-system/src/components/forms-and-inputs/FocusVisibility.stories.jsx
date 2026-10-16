@@ -10,27 +10,27 @@ import Textarea from './Textarea';
 import Listbox from './_internal/Listbox';
 
 /**
- * Seeing where focus is, and what is selected, in every colour mode.
+ * Seeing where focus is, and what is selected, in every color mode.
  *
  * WHY THIS FILE EXISTS. Two ways a sighted keyboard user lost track of a field.
  *
- * `Select`'s trigger reset its border to the resting colour on focus, with the
+ * `Select`'s trigger reset its border to the resting color on focus, with the
  * outline and shadow removed, so tabbing onto it changed nothing on screen.
  *
- * In forced-colours mode (Windows High Contrast) the browser repaints every
- * colour from a short system palette and drops box-shadows. The fields here
- * draw focus as a border-colour change, and a selected row's mark is a
- * primary-filled box or dot: all of it repainted to the same system colour as
+ * In forced-colors mode (Windows High Contrast) the browser repaints every
+ * color from a short system palette and drops box-shadows. The fields here
+ * draw focus as a border-color change, and a selected row's mark is a
+ * primary-filled box or dot: all of it repainted to the same system color as
  * its resting state, so neither focus nor selection showed. The fix draws
- * focus as an `outline`, which forced colours keep, and paints the selected
- * mark in the system `Highlight` colour.
+ * focus as an `outline`, which forced colors keep, and paints the selected
+ * mark in the system `Highlight` color.
  *
- * HOW FORCED COLOURS ARE TESTED. Not by turning the mode on. The runner can
+ * HOW FORCED COLORS ARE TESTED. Not by turning the mode on. The runner can
  * emulate it only for the whole browser page, which the other story files
  * share, and a story that did so left later files rendering forced and failing
- * axe colour-contrast. So the forced-colours story reads the stylesheet
+ * axe color-contrast. So the forced-colors story reads the stylesheet
  * instead: of the rules under `@media (forced-colors: active)`, which apply to
- * the focused field, and to the selected mark and not its unselected neighbour.
+ * the focused field, and to the selected mark and not its unselected neighbor.
  */
 
 const stack = { display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '420px' };
@@ -64,7 +64,7 @@ const forcedColorRules = () => {
 };
 
 /**
- * The value a forced-colours rule gives `property` on `element` in its current
+ * The value a forced-colors rule gives `property` on `element` in its current
  * state, or '' when none does. `matches` is read now, so a `:focus-visible` or
  * `:focus-within` rule counts only while the element is focused.
  *
@@ -96,7 +96,7 @@ export default {
             description: {
                 component:
                     'Regression cover: a focused field and a selected option can be seen, '
-                    + 'including in forced-colours mode.',
+                    + 'including in forced-colors mode.',
             },
         },
     },
@@ -123,7 +123,7 @@ SelectTriggerShowsFocus.play = async ({ canvasElement }) => {
 };
 
 /**
- * In forced-colours mode a focused field draws a solid outline, and a selected
+ * In forced-colors mode a focused field draws a solid outline, and a selected
  * option's mark is painted where an unselected one's is not.
  */
 export const ForcedColorsKeepFocusAndSelection = () => (

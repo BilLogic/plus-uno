@@ -30,7 +30,7 @@ filled and offer `direction="vertical"`.
 **`Pagination` is fully controlled.** `currentPage` and `totalPages` are
 required, and every click calls `preventDefault` before `onPageChange`, so
 without a handler it renders a row of links that visibly do nothing. `maxVisible`
-(default 5) centres the window and pins the first and last pages with an
+(default 5) centers the window and pins the first and last pages with an
 ellipsis.
 
 **`Scrollspy` needs a scroll container it can find.** It spies on the element
@@ -63,7 +63,7 @@ react-bootstrap's `Tab.Container` when the widget semantics matter.
 **`SidebarTab` is not keyboard operable.** It renders a `div` with
 `role="button"` and `tabIndex={0}`, but no key handler — so it can be focused and
 cannot be activated with Enter or Space. `state="selected"` also conveys
-selection with colour alone, with no `aria-current` or `aria-selected`. Until
+selection with color alone, with no `aria-current` or `aria-selected`. Until
 that changes, use it where a real link or `Button` sits behind the same action,
 or add the handling at the call site.
 

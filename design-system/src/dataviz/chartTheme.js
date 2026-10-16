@@ -19,7 +19,7 @@ const chartTheme = {
     // The two sub-options exist because Highcharts' defaults assume a chart
     // owns its page, and these charts are widgets inside one:
     //
-    // - `landmarkVerbosity: 'disabled'` keeps the chart a labelled
+    // - `landmarkVerbosity: 'disabled'` keeps the chart a labeled
     //   `role="group"` instead of a `role="region"` landmark. Untitled charts
     //   all generate the same label, so 'all' both fails axe `landmark-unique`
     //   and puts six identical entries in a six-chart dashboard's landmark menu.

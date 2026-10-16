@@ -1,6 +1,6 @@
 // figma_dev_links executor — a Dev Mode links card's one operation, past its
 // Review's Approve: the card's links that are still missing go into Figma
-// (and a Code link under its old name is renamed), with one labelled comment
+// (and a Code link under its old name is renamed), with one labeled comment
 // the first time a component gets its links. A batch card's write that is
 // more than this press can hold carries on as a runner job
 // (`figma-links/env.ts` `runDevLinksWriteJobOnEnv`). What it decides is

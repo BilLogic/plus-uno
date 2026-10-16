@@ -105,8 +105,8 @@ export const RAISE_QUIET_MS = 14 * 24 * 60 * 60 * 1000;
 /**
  * The names the detector gives the estates, each to one canonical name, so
  * "the Figma library" and "Figma", or "the codebase" and "the code", are one
- * source. Matched after `raisePrefix` normalises (lower case, no punctuation,
- * no leading article); a name not here keeps its normalised self.
+ * source. Matched after `raisePrefix` normalizes (lower case, no punctuation,
+ * no leading article); a name not here keeps its normalized self.
  */
 const SOURCE_ALIASES: Readonly<Record<string, readonly string[]>> = {
   figma: ["figma", "figma library", "figma file", "figma design", "figma designs", "figma spec"],
@@ -121,11 +121,11 @@ const CANONICAL_SOURCE = new Map(Object.entries(SOURCE_ALIASES).flatMap(([canon,
 
 /**
  * The prefix every raise about one pair of sources shares in one person's DM
- * (a 1:1 DM is one person's): the DM, then the pair, normalised, mapped to
+ * (a 1:1 DM is one person's): the DM, then the pair, normalized, mapped to
  * its canonical names (`SOURCE_ALIASES`: "the Figma library" and "the code"
  * → `code|figma`), sorted and hashed, so no source name and no topic wording
  * reaches D1 (ADR-030). Keyed by the pair rather than the topic, so the same
- * disagreement reworded ("the warning colour", "the warning token") is the
+ * disagreement reworded ("the warning color", "the warning token") is the
  * same raise.
  *
  * @param channel - The DM
