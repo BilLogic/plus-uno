@@ -8,6 +8,23 @@
 export const localTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 /**
+ * The zone if the browser knows it, else null. A stored zone can be stale or
+ * mistyped, and Intl throws on one it does not know.
+ *
+ * @param {string|undefined} timeZone IANA name
+ * @returns {string|null}
+ */
+export const knownZone = (timeZone) => {
+    if (!timeZone) return null;
+    try {
+        new Intl.DateTimeFormat('en-US', { timeZone });
+        return timeZone;
+    } catch {
+        return null;
+    }
+};
+
+/**
  * One part of a date formatted in a zone.
  *
  * @param {Date} at
@@ -80,7 +97,7 @@ export const wallTimeToUtc = ({ date, hours, minutes, timeZone }) => {
 export const timeZoneCaption = ({ timeZone, otherTimeZone, otherPerson, utc, at }) => {
     const moment = utc ? new Date(utc) : (at || new Date());
     const own = zoneName(timeZone, moment);
-    if (!utc || !otherTimeZone || zoneName(otherTimeZone, moment) === own) return own;
+    if (!utc || !knownZone(otherTimeZone) || zoneName(otherTimeZone, moment) === own) return own;
     const theirs = new Intl.DateTimeFormat('en-US', { timeZone: otherTimeZone, hour: 'numeric', minute: '2-digit' }).format(moment);
     const who = otherPerson ? ` for ${otherPerson}` : '';
     return `${own} · ${theirs}${who} (${zonePart(moment, otherTimeZone, 'shortGeneric')})`;

@@ -6,7 +6,7 @@ import useFieldId from './useFieldId';
 import Calendar from './_internal/Calendar';
 import { readAnchorGap, useAnchoredPopup } from './_internal/anchorPlacement';
 import { formatIso } from './_internal/dates';
-import { localTimeZone, timeZoneCaption, wallTimeToUtc } from './_internal/timeZones';
+import { knownZone, localTimeZone, timeZoneCaption, wallTimeToUtc } from './_internal/timeZones';
 import './_internal/Listbox.scss';
 import './DateAndTimePicker.scss';
 
@@ -70,7 +70,10 @@ const DateAndTimePicker = ({
     const dateInputRef = useRef(null);
     const timeInputRef = useRef(null);
     const calendarRef = useRef(null);
-    const zone = timeZone || localTimeZone();
+    // A zone the browser does not know falls back to the viewer's own, and the
+    // caption stays off rather than name a zone nobody asked for.
+    const zone = knownZone(timeZone) || localTimeZone();
+    const showCaption = showTimeZone && (!timeZone || zone === timeZone);
 
     /**
      * Ids for a field that renders two controls (#206).
@@ -95,7 +98,7 @@ const DateAndTimePicker = ({
     const validationId = validation !== 'none' && validationMessage
         ? `${fieldId}-validation`
         : undefined;
-    const timeZoneId = showTimeZone ? `${fieldId}-time-zone` : undefined;
+    const timeZoneId = showCaption ? `${fieldId}-time-zone` : undefined;
     const dateInputId = `${fieldId}-date`;
     const timeInputId = `${fieldId}-time`;
     const dateSectionLabelId = showSectionLabels ? `${dateInputId}-section-label` : undefined;
@@ -368,8 +371,8 @@ const DateAndTimePicker = ({
 
     const utc = toUtc(selectedDate, timeHours, timeMinutes, amPm);
     const caption = useMemo(
-        () => (showTimeZone ? timeZoneCaption({ timeZone: zone, otherTimeZone, otherPerson, utc }) : ''),
-        [showTimeZone, zone, otherTimeZone, otherPerson, utc],
+        () => (showCaption ? timeZoneCaption({ timeZone: zone, otherTimeZone, otherPerson, utc }) : ''),
+        [showCaption, zone, otherTimeZone, otherPerson, utc],
     );
     const periodMenuOffset = useMemo(
         () => ({ modifiers: [{ name: 'offset', options: { offset: [0, readAnchorGap()] } }] }),
@@ -548,7 +551,7 @@ const DateAndTimePicker = ({
                         </Dropdown>
                     </div>
                 </InputGroup>
-                {showTimeZone && (
+                {showCaption && (
                     <div id={timeZoneId} className="plus-datetime-time-zone body3-txt">{caption}</div>
                 )}
             </div>
@@ -586,7 +589,7 @@ DateAndTimePicker.propTypes = {
     minDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     maxDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     calendarAlign: PropTypes.oneOf(['left', 'center', 'right']),
-    /** The viewer's IANA time zone, such as `America/New_York`; defaults to the browser's. */
+    /** The viewer's IANA time zone, such as `America/New_York`; defaults to the browser's, as does a zone the browser does not know, which also hides the caption. */
     timeZone: PropTypes.string,
     /** Name the viewer's zone under the time: "Eastern Time (ET)". */
     showTimeZone: PropTypes.bool,
