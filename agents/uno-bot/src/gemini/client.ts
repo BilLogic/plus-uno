@@ -186,7 +186,8 @@ export async function geminiGenerate(
 
   try {
     const res = await countedFetch(url, { method: "POST", headers, body: JSON.stringify(body) });
-    const data = (await res.json()) as GenerateContentResponse;
+    // A proxy's own failure (Cloudflare's 524 page) is HTML: keep the status.
+    const data = (await res.json().catch(() => ({}))) as GenerateContentResponse;
     if (!res.ok) {
       return {
         ok: false,
