@@ -39,6 +39,8 @@ import {
   type ReportExpiryRecord,
   claimedFiling,
   comparisonKey,
+  CHECK_OFFER_KEEP_MS,
+  type CheckOfferRecord,
   decidedNoteOf,
   decidedOf,
   decidedPayload,
@@ -129,6 +131,8 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
   const filings = new Map<string, FilingRecord>();
   /** When each thread's comparison for a scenario was shown, by `comparisonKey`. */
   const compared = new Map<string, number>();
+  /** Each Check it offer, by its message ts, with when it was put. */
+  const checkOffers = new Map<string, CheckOfferRecord>();
   const executions = new Map<string, Execution>();
 
   /** Take an execution if it has been cut off; drop it if it has aged out;
@@ -542,6 +546,20 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       if (at !== undefined && now() - at < HISTORY_TTL_MS) return false;
       compared.set(key, now());
       return true;
+    },
+
+    async putCheckOffer(offer) {
+      checkOffers.set(offer.offerTs, { offer: structuredClone(offer), at: now() });
+    },
+
+    async getCheckOffer(offerTs) {
+      const rec = checkOffers.get(offerTs);
+      if (!rec) return null;
+      if (now() - rec.at > CHECK_OFFER_KEEP_MS) {
+        checkOffers.delete(offerTs);
+        return null;
+      }
+      return structuredClone(rec.offer);
     },
   };
 }

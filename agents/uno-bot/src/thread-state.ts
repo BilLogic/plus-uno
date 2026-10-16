@@ -10,7 +10,7 @@
 //
 // Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `exec:{ts}`, `report:{ts}`,
 // `event:{event_id}`, `actx:{channel}:{thread}`, `cancel:{channel}:{thread}`,
-// `run:{user}`, `filing:{key}`, `cmp:{channel}:{thread}:{scenario}`, and the
+// `run:{user}`, `filing:{key}`, `cmp:{channel}:{thread}:{scenario}`, `chk:{ts}`, and the
 // alarm's own `gc:next`.
 //
 // ── THE CONTRACT IS THIS CLASS'S OWN SIGNATURE (#493, #494) ─────────────────
@@ -23,7 +23,8 @@
 // `takeCutOffExecutionInThread`, `findCutOffExecutions`,
 // `reportCutOffNote`, `get/putAssistantContext`, `requestCancel`,
 // `consumeCancel`, `cancelForUser`, `setActiveRun`, `checkAndRecordEvent`,
-// `claimRun`, `markRunDone`, `claimFiling`, `settleFiling`, `claimComparison`. A rename is a type error rather than a runtime
+// `claimRun`, `markRunDone`, `claimFiling`, `settleFiling`, `claimComparison`,
+// `putCheckOffer`, `getCheckOffer`. A rename is a type error rather than a runtime
 // 404, which is the whole point.
 //
 // There is NO `fetch()` and no route table. Until #494 this class carried a
@@ -78,6 +79,10 @@ import {
   expiredCardEdit,
   claimedFiling,
   comparisonKey,
+  CHECK_OFFER_KEEP_MS,
+  checkOfferKey,
+  type BlueprintCheckOffer,
+  type CheckOfferRecord,
   decidedNoteOf,
   decidedOf,
   decidedPayload,
@@ -342,6 +347,11 @@ export class ThreadState extends DurableObject<Env> {
       const compared = await txn.list<{ at: number }>({ prefix: "cmp:" });
       for (const [key, rec] of compared) {
         if (now - rec.at > HISTORY_TTL_MS) await txn.delete(key);
+        else remaining++;
+      }
+      const checkOffers = await txn.list<CheckOfferRecord>({ prefix: "chk:" });
+      for (const [key, rec] of checkOffers) {
+        if (now - rec.at > CHECK_OFFER_KEEP_MS) await txn.delete(key);
         else remaining++;
       }
       const filings = await txn.list<FilingRecord>({ prefix: "filing:" });
@@ -994,6 +1004,20 @@ export class ThreadState extends DurableObject<Env> {
       await this.ensureGcAlarm(txn);
       return true;
     });
+  }
+
+  // ----- the blueprint check's offers (#1321) -----
+
+  async putCheckOffer(offer: BlueprintCheckOffer, at: number): Promise<void> {
+    await this.storage.transaction(async (txn) => {
+      await txn.put<CheckOfferRecord>(checkOfferKey(offer.offerTs), { offer, at });
+      await this.ensureGcAlarm(txn);
+    });
+  }
+
+  async getCheckOffer(offerTs: string, at: number): Promise<BlueprintCheckOffer | null> {
+    const rec = await this.storage.get<CheckOfferRecord>(checkOfferKey(offerTs));
+    return rec && at - rec.at <= CHECK_OFFER_KEEP_MS ? rec.offer : null;
   }
 
   // ----- the capacity outage (turn/capacity-outage.ts) -----

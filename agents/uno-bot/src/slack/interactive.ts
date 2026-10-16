@@ -61,6 +61,7 @@ import { slackDelivery } from "./slack-delivery";
 import { standingConfirmersOf } from "./standing-confirmers";
 import { runButtonDoor, type ButtonDoorDeps, type CardMessage } from "./button-door";
 import { WHICH_ACTION_PREFIX, runWhichCardDoor, whichPressOf } from "./which-card";
+import { CHECK_IT_ACTION_ID, runCheckItDoor } from "./blueprint-check";
 import { DM_WATCH_ACTION_ID, saveDmWatchAction } from "../dm-watch/index";
 import { setDmWatchOnEnv } from "../dm-watch/env";
 import { publishHomeView } from "./home";
@@ -190,6 +191,7 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
   if (actionId.startsWith(WHICH_ACTION_PREFIX)) return resolveFromWhichCard(env, payload, actionId);
+  if (actionId === CHECK_IT_ACTION_ID) return checkIt(env, payload);
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
   if (actionId.startsWith(DECISION_REVIEW_ACTION_PREFIX)) return openReview(env, payload, actionId);
   if (actionId === REVIEW_EDIT_ACTION_ID) return editInReview(env, payload);
@@ -284,6 +286,28 @@ async function resolveFromWhichCard(env: Env, payload: InteractionPayload, actio
         if (!res.ok) console.warn(`[interactive] card re-render after a which-card press failed on ${channel}/${ts}`);
       },
       replaceQuestion: (message) => replaceCard(payload, message),
+    },
+  );
+}
+
+// Check it, under a milestone's card (#1321): anyone in the thread may press
+// it, since the check only reads (`blueprint-check.ts`). The press claims,
+// edits the offer and queues the check on a runner of its own; the check
+// itself never runs in this `waitUntil`.
+//
+// `Env` enters here and stops here.
+async function checkIt(env: Env, payload: InteractionPayload): Promise<void> {
+  const channel = payload.channel?.id;
+  const offerTs = payload.message?.ts;
+  const userId = payload.user?.id ?? "someone";
+  if (!channel || !offerTs) return;
+  await runCheckItDoor(
+    { channel, offerTs, userId },
+    {
+      store: threadStateFor(env),
+      enqueue: (job, runnerKey) => enqueueAgentJob(env, job, runnerKey),
+      replaceOffer: (message) => replaceCard(payload, message),
+      replyEphemeral: (text) => replyEphemeral(payload, text),
     },
   );
 }

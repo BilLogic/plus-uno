@@ -194,6 +194,10 @@ export type RunnerJobPayload =
   | { kind: "report-expiry"; messageTs: string }
   /** A card that aged out untouched, to edit to "Expired" (#1316). */
   | { kind: "card-expiry"; proposalTs: string }
+  /** A blueprint check someone pressed Check it for (#1321): the offer it
+   *  checks, by its message ts, and who pressed. Runs on a runner of its own
+   *  (`blueprintCheckRunnerKey`), never the thread's. */
+  | { kind: "blueprint-check"; offerTs: string; by: string }
   /** A Figma notification, kept as ids and times (`figma-notify/event.ts`). */
   | { kind: "figma-event"; event: FigmaEventJob }
   /** The rest of an approved Dev Mode links write (`figma-links/run.ts`). */

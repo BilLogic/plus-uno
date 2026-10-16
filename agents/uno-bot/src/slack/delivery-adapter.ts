@@ -74,6 +74,7 @@ import { notedCardBlocks, proposalCardBlocks, renderProposalCard } from "./propo
 import { toPlainText } from "./mrkdwn";
 import { cardStaysLive, renderCardNote, renderGateNote } from "./gate-note";
 import { whichCardMessage } from "./which-card";
+import { checkOfferMessage } from "./blueprint-check";
 import { planBlock } from "./plan-block";
 import { retryValue } from "./try-again";
 import type { Presentation, Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
@@ -1122,6 +1123,16 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       if (updated.ok) return { ok: true, text: line, ts: card.ts };
       console.warn(`[slack] gate note could not be edited onto ${channel}/${card.ts}; posting it`);
       return postNote(renderGateNote(note));
+    },
+
+    async postCheckOffer(offer) {
+      // The offer carries a button, so it goes up with its own blocks
+      // (`blueprint-check.ts`), under the card in the same reply thread.
+      const message = checkOfferMessage(offer);
+      const posted = await slack
+        .postMessage({ channel, thread_ts: replyTs, text: message.text, blocks: message.blocks })
+        .catch(() => ({ ok: false as const }));
+      return { ok: !!posted.ok, text: message.text, ...("ts" in posted && posted.ts ? { ts: posted.ts } : {}) };
     },
 
     async reopenCard(card) {

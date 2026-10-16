@@ -3,6 +3,11 @@
 // shipped-work job here, and any turn that weighs an idea against today's
 // journey.
 //
+// A JUDGMENT THAT FAILED DECIDES NOTHING. A model error, an answer cut off
+// at the ceiling (`GATE_MAX_TOKENS`, which thinking shares) or one with no
+// JSON in it is `judgment-failed`, never "not a service change": a caller may
+// say nothing either way, but the two must not be confused.
+//
 // TWO SIGNALS, BOTH REQUIRED. A default-tier judgment that the text changes
 // who does what, or when, for an actor in the service; AND a confident
 // `search_blueprint` match on one `scenario › path`. Either failing is
@@ -25,6 +30,15 @@ import { CONFIDENCE_FLOOR, jsonObjectIn } from "../sweep/detector";
 export const MATCH_SCORE_FLOOR = 0.75;
 /** The judgment's tier: a one-line classification. */
 export const GATE_TIER = "default" as const;
+/**
+ * The judgment's output ceiling. The model's thinking spends the same ceiling
+ * as its answer, so a ceiling sized for the JSON alone (400, until #1321) was
+ * cut off whenever the model thought longer than usual — and a cut-off answer
+ * read as "not a service change", so one idea got opposite verdicts from run
+ * to run. This leaves the answer room past a long think; a judgment that is
+ * still cut off fails (`judgment-failed`) rather than deciding anything.
+ */
+export const GATE_MAX_TOKENS = 4_096;
 /** Characters of the work's text the judgment is shown. */
 const MAX_TEXT_CHARS = 6_000;
 
@@ -126,10 +140,12 @@ export function serviceChangeGate(deps: GateDeps): ServiceChangeGate {
       tier: GATE_TIER,
       system: SERVICE_CHANGE_SYSTEM,
       prompt: `TITLE: ${input.title}\n\nTEXT:\n${input.text.slice(0, MAX_TEXT_CHARS) || "(no text)"}`,
-      maxTokens: 400,
+      maxTokens: GATE_MAX_TOKENS,
     });
-    if (!reply.ok) return { pass: false, reason: "judgment-failed" };
+    // Cut off or unreadable is no judgment at all — never a "no".
+    if (!reply.ok || reply.cutOff) return { pass: false, reason: "judgment-failed" };
     const judged = jsonObjectIn(reply.text) as Record<string, unknown> | null;
+    if (!judged) return { pass: false, reason: "judgment-failed" };
     const confidence = Number(judged?.confidence);
     const query = typeof judged?.query === "string" ? judged.query.trim() : "";
     if (judged?.changes_service !== true || !(confidence >= CONFIDENCE_FLOOR) || confidence > 1 || !query) {

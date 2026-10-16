@@ -53,7 +53,7 @@ import { charge } from "../net";
 import { resolveGeminiModel } from "../agent/gemini-tiers";
 import { capacityOutage, NOT_WATCHED, watchedTurnDeps, type CapacityOutage } from "./capacity-outage";
 import { capacityOutageStoreFor } from "../thread-state/production";
-import { milestoneComparisonOn } from "../blueprint-upkeep/env";
+import { milestoneComparisonOn, serviceChangeJudgementOn } from "../blueprint-upkeep/env";
 import type { Delivery } from "./delivery";
 import { restageExecution, type TurnDeps, type TurnRequest } from "./turn";
 
@@ -282,8 +282,10 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     // `agent/context-state.ts` for why this one does not get to ship on.
     contextState: env.CONTEXT_STATE === "on",
 
-    // A milestone's idea beside today's blueprint, and the offer to draw it
-    // there as a proposal; absent where the blueprint is not configured.
+    // A PRD card's quick judgement, which offers the blueprint check under
+    // it (#1321); and an IDE hand-off's comparison and the offer to draw it
+    // as a proposal. Absent where the blueprint is not configured.
+    ...serviceChangeJudgementOn(env),
     ...milestoneComparisonOn(env, wiring.threadState),
     },
   );

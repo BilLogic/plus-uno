@@ -28,6 +28,8 @@ import {
   EVENT_DEDUP_TTL_MS,
   EXECUTION_CUTOFF_MS,
   HISTORY_TTL_MS,
+  CHECK_OFFER_KEEP_MS,
+  type BlueprintCheckOffer,
   MAX_HISTORY_TURNS,
   PROPOSAL_TTL_MS,
   REVISING_MARK_MS,
@@ -1350,6 +1352,22 @@ export function runThreadStateConformance(
     assert.equal(await store.claimComparison({ channel: "C1", thread: "2.0" }, "Call-off"), true);
     clock.advance(HISTORY_TTL_MS + 1);
     assert.equal(await store.claimComparison(ref, "Call-off"), true, "kept as long as the thread's memory");
+  });
+
+  it("a Check it offer is kept under its message ts, past its deadline, for as long as the thread's memory", async () => {
+    const { store, clock } = setup();
+    const offer: BlueprintCheckOffer = {
+      offerTs: "5.0", channel: "C1", threadTs: "1.0", replyTs: "1.0", userMsgTs: "1.1", requesterUserId: "U1", cardTs: "4.0",
+      milestone: "prd", idea: { title: "Self-serve call-offs", text: "Tutors post their own call-off." },
+      scenario: "Call-off", path: "Standard", cellId: "cell-2", quote: "Tutors post their own call-off.", expiresAt: 1_000,
+    };
+    assert.equal(await store.getCheckOffer("5.0"), null);
+    await store.putCheckOffer(offer);
+    assert.deepEqual(await store.getCheckOffer("5.0"), offer);
+    clock.advance(CHECK_OFFER_KEEP_MS);
+    assert.deepEqual(await store.getCheckOffer("5.0"), offer, "still there at the end of its keep");
+    clock.advance(1);
+    assert.equal(await store.getCheckOffer("5.0"), null);
   });
 
   it("the one-shot dedup and the lease share one record", async () => {

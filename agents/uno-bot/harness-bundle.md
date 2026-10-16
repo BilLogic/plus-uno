@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 136,108 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 136,137 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -54,7 +54,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,554 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,332 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,138 |
-| `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,695 |
+| `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,724 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 1,808 |
 | `figma-comments` | [`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) | 8,899 |
 | `file-a-ticket` | [`agents/uno-bot/skills/file-a-ticket/SKILL.md`](../../agents/uno-bot/skills/file-a-ticket/SKILL.md) | 3,305 |
@@ -2000,7 +2000,7 @@ Every line traces to the PRD, the conversation or a design-system read.
 
 ## Exit
 
-- **file** — the PRD card through `notion_create`; a prompt-spec appended to its PRD through `notion_update`. A PRD that changes a path on the blueprint today gets that path's steps set beside it, by the Worker, once per thread; the reply keeps to the PRD.
+- **file** — the PRD card through `notion_create`; a prompt-spec appended to its PRD through `notion_update`. When the PRD changes a path on the blueprint today, the Worker posts a Check it offer under its card, and the blueprint check runs only on a press; the reply keeps to the PRD.
 - **hand off** — the paired blueprint write and the Design Status move to Ready for Design, as a ready-to-paste IDE prompt naming uno-synthesize with the PRD link. A document too long for one card files its essentials and hands off the expansion the same way.
 - **answer** — a prompt-spec with no PRD page to store it on lives in the thread.
 

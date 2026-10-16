@@ -1,8 +1,9 @@
 // An idea set beside today's blueprint, offered as a proposal the requester
 // can draw on it.
 //
-// Under a milestone's comparison (`./milestone.ts`) the turn drafts the idea's
-// rows against the matched path and posts a ✅ card: "Draft this on the
+// Under a comparison — the blueprint check's results (`./check.ts`), or an IDE
+// hand-off's reply (`./milestone.ts`) — the idea's rows are drafted against
+// the matched path and a ✅ card is posted: "Draft this on the
 // blueprint as a proposal?". The card's one operation is a blueprint revision
 // with a `variant` (`revisionCard`), and its only confirmer is the person who
 // asked — the deployment's standing confirmers are not added. ✅ draws the

@@ -52,6 +52,7 @@ import {
   isRevisionReplyCandidate,
   isRevisionThread,
   isWithdrawRequestCandidate,
+  runBlueprintCheckOnEnv,
 } from "../blueprint-upkeep/env";
 import { recheckOnUpdateOnEnv } from "../figma-drift/env";
 import { typedEmojiDecision } from "../gate/reactions";
@@ -199,7 +200,7 @@ export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey
     // A cut-off job has nobody waiting on it: the record stays untaken, and
     // the ThreadState alarm hands it over again. A Figma event has no thread
     // to speak in, and never comes this way: its route enqueues it once.
-    if (job.kind === "cut-off" || job.kind === "figma-event" || job.kind === "report-expiry" || job.kind === "card-expiry" || job.kind === "figma-dev-links-write") return;
+    if (job.kind === "cut-off" || job.kind === "figma-event" || job.kind === "report-expiry" || job.kind === "card-expiry" || job.kind === "figma-dev-links-write" || job.kind === "blueprint-check") return;
     const target =
       job.kind === "message"
         ? { channel: job.event.channel, thread_ts: replyThreadTs(job.event) }
@@ -284,6 +285,10 @@ export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<Thre
         if (!result.ok) throw new Error(result.error ?? "Slack refused the expiry edit");
       },
     });
+    return "handled";
+  }
+  if (job.kind === "blueprint-check") {
+    await runBlueprintCheckOnEnv(env, job.offerTs);
     return "handled";
   }
   if (job.kind === "figma-event") {

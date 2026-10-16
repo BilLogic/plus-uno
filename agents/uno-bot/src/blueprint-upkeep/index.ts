@@ -1,7 +1,7 @@
 // Blueprint upkeep: the service-change gate, a revision drafted from shipped
 // work, its card on the morning sweep, and an idea set beside today's path at
-// a conversation's milestones, with the offer to draft it on the blueprint as
-// a proposal. `Env` enters in `./env.ts`.
+// a conversation's milestones — the blueprint check a milestone's card offers,
+// and the offer to draft the idea on the blueprint as a proposal. `Env` enters in `./env.ts`.
 
 export {
   confidentMatch,
@@ -21,6 +21,18 @@ export { firstChangedCell, proposalFacts, revisionFacts, rowsLine } from "./fact
 export { cardEvidence, MAX_PRDS, prdIdsOf, type EvidencePage } from "./evidence";
 export { promotionDraft, retirementDraft, stageOf, STAGES, variantPromotionDraft, type PlannedRows, type ShipStage } from "./stages";
 export { cardKey, keepProposalLinks, prdCardOf, type LinkDeps, type ThreadCards } from "./link";
+export {
+  blueprintCheckRunnerKey,
+  JUDGEMENT_SUBREQUESTS,
+  runBlueprintCheck,
+  serviceChangeJudgement,
+  type BlueprintCheckDeps,
+  type CheckMatch,
+  type CheckOutcome,
+  type PostedCard,
+  type JudgementDeps,
+  type ServiceChangeJudgement,
+} from "./check";
 export {
   COMPARISON_SUBREQUESTS,
   comparisonText,

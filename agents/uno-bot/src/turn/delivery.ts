@@ -418,6 +418,14 @@ export interface NoteCard {
   blocks?: unknown[];
 }
 
+/** The Check it offer a milestone posts after its card (#1321): the
+ *  scenario the idea touches today, and when the button stops answering
+ *  (`cardExpiresAt`). Its words and its button are the adapter's. */
+export interface CheckOfferNote {
+  scenario: string;
+  expiresAt: number;
+}
+
 /** What a post actually did. `text` is what was posted, which is not always
  *  what was handed in — the body is stripped and capped on the way out. */
 export interface PostResult {
@@ -577,6 +585,15 @@ export interface Delivery {
    */
   card(proposal: ProposalCard): Promise<PostResult>;
 
+  /**
+   * Offer the blueprint check under a milestone's card (#1321): this changes
+   * how the scenario works today — check it? — with a Check it button and
+   * its deadline. The ts is the offer's identity: the check's record is kept
+   * under it, and a press hands it back. A surface that cannot carry a
+   * button answers `ok: false`, and nothing is offered.
+   */
+  postCheckOffer(offer: CheckOfferNote): Promise<PostResult>;
+
   /** Make a failure visible. Best-effort and never throwing, because the one
    *  thing worse than an error message is silence. `ask` is the person's
    *  question when the turn can run again on it: a surface that can offer a
@@ -601,6 +618,7 @@ export type DeliveryCall =
   | { kind: "gate-note"; note: GateNote; card?: NoteCard }
   | { kind: "reopen-card"; card: NoteCard }
   | { kind: "proposal"; card: ProposalCard }
+  | { kind: "check-offer"; offer: CheckOfferNote }
   | { kind: "failure"; stage: DeliveryFailureStage; message?: string; ask?: string };
 
 export interface RecordingDelivery extends Delivery {
@@ -768,6 +786,14 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       const ts = `card-${++staged}`;
       stagedAt.push(ts);
       return { ok: true, text, ts, ...(blocks ? { blocks } : {}) };
+    },
+
+    async postCheckOffer(offer) {
+      calls.push({ kind: "check-offer", offer });
+      const text = `offer: check ${offer.scenario} against today's blueprint`;
+      if (opts.noteFails) return { ok: false, text };
+      posted.push(text);
+      return { ok: true, text, ts: `offer-${calls.length}` };
     },
 
     async postFailure(stage, err, ask) {

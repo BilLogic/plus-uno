@@ -2,11 +2,14 @@
 //
 // While someone explores an idea with the bot, two moments mean the idea has a
 // concrete flow: a PRD staged on its card (draft-a-prd's exit), and a build
-// handed to the IDE with `uno-prototype`. At either, the turn runs the
-// service-change gate on the idea. When the gate passes — the idea changes who
-// does what on a path it matched with confidence — the reply carries a short
-// comparison: that path's steps today as `step (lane)`, the idea's own words
-// beside them, and a link into the blueprint app.
+// handed to the IDE with `uno-prototype`. A PRD's card is followed by the
+// Check it offer, and its comparison is the blueprint check's, run as a job on
+// a press (`./check.ts`, #1321); this file reads both milestones and writes
+// the comparison text the check posts. At a hand-off the turn still runs the
+// service-change gate on the idea itself. When the gate passes — the idea
+// changes who does what on a path it matched with confidence — the reply
+// carries a short comparison: that path's steps today as `step (lane)`, the
+// idea's own words beside them, and a link into the blueprint app.
 //
 // AT MOST ONCE PER THREAD PER SCENARIO, claimed in the thread's store once the
 // path is read and the comparison is ready to show, so a read that fails

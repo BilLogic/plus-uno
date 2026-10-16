@@ -1901,6 +1901,73 @@ export interface ThreadState {
    * thread's memory (`HISTORY_TTL_MS`).
    */
   claimComparison(ref: ThreadRef, scenario: string): Promise<boolean>;
+
+  // ----- the blueprint check's offers (#1321) -----
+
+  /**
+   * Keep what a Check it offer's check will need, under the offer's message
+   * ts (`blueprint-upkeep/check.ts`): the idea, the match, and the card it
+   * was offered under. A second put replaces it. Kept `CHECK_OFFER_KEEP_MS`
+   * from the put, past the offer's own deadline, so a check pressed at the
+   * last moment still finds it when its job runs; whether a press is in time
+   * is the offer's `expiresAt`, read by the door.
+   */
+  putCheckOffer(offer: BlueprintCheckOffer): Promise<void>;
+
+  /** The offer kept under a message ts, or null once it is gone. */
+  getCheckOffer(offerTs: string): Promise<BlueprintCheckOffer | null>;
+}
+
+// ── The blueprint check's offers ─────────────────────────────────────────────
+
+/**
+ * A Check it offer, as kept for its press and its check (#1321). Ids and the
+ * idea's words, never Slack copy: the button carries nothing but its message
+ * ts, and everything else is read back from here.
+ */
+export interface BlueprintCheckOffer {
+  /** The offer's own message: the record's key, and the check's status
+   *  message from the press on. */
+  offerTs: string;
+  channel: string;
+  /** The conversation (`ThreadRef.thread`). */
+  threadTs: string;
+  /** The reply thread the offer sits in, when it is not the conversation. */
+  replyTs?: string;
+  /** The person's message the milestone answered. */
+  userMsgTs: string;
+  /** Who asked for the work the offer is under: the Draw on blueprint card's
+   *  only confirmer. */
+  requesterUserId: string;
+  /** The card the offer was posted under; absent for a milestone with no
+   *  card (the IDE hand-off). */
+  cardTs?: string;
+  milestone: "prd" | "prototype-hand-off";
+  /** The idea as the judgement read it. */
+  idea: { title: string; text: string };
+  scenario: string;
+  path: string;
+  /** The matched cell: where the check's path read starts. */
+  cellId: string;
+  /** The idea's sentence that shows the change. */
+  quote: string;
+  /** When Check it stops answering, epoch ms (`cardExpiresAt`). */
+  expiresAt: number;
+}
+
+/** How long an offer is kept from its put: past any offer's deadline
+ *  (`MAX_CARD_TTL_MS`), as long as the thread's memory. */
+export const CHECK_OFFER_KEEP_MS = HISTORY_TTL_MS;
+
+/** The record an offer is kept under. */
+export function checkOfferKey(offerTs: string): string {
+  return `chk:${offerTs}`;
+}
+
+/** An offer as stored: the offer, and when it was put. */
+export interface CheckOfferRecord {
+  offer: BlueprintCheckOffer;
+  at: number;
 }
 
 /** The record a thread's one comparison for a scenario is kept under. */

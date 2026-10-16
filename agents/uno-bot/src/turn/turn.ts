@@ -147,6 +147,7 @@ import {
   type DeliveryFailureStage,
   type InterimKind,
   type IssueTarget,
+  type PostResult,
   type ProposalCard,
   type TurnSettlement,
 } from "./delivery";
@@ -159,6 +160,7 @@ import {
   type Milestone,
   type MilestoneComparison,
 } from "../blueprint-upkeep/milestone";
+import type { ServiceChangeJudgement } from "../blueprint-upkeep/check";
 import { proposalOfferCard, stagedProposalOffer, type ProposalDraft, type ProposalDrafter } from "../blueprint-upkeep/proposal";
 import { rethrowIfBudget } from "../net";
 import { cardExpiresAt } from "../card-expiry";
@@ -665,12 +667,20 @@ export interface TurnDeps {
   contextState?: boolean;
 
   /**
-   * The idea set beside today's blueprint, at a milestone — a PRD staged, a
-   * build handed to the IDE (`blueprint-upkeep/milestone.ts`). Null when the
+   * The idea set beside today's blueprint at a build handed to the IDE
+   * (`blueprint-upkeep/milestone.ts`); a PRD's card gets the Check it offer
+   * instead (`serviceChangeJudgement`). Null when the
    * idea changes no path today, or the thread has seen this scenario's. Absent,
    * no reply carries one.
    */
   milestoneComparison?: MilestoneComparison;
+
+  /**
+   * The quick service-change judgement a milestone's card is followed by
+   * (`blueprint-upkeep/check.ts`): where the idea touches today's blueprint,
+   * or null for "offer nothing". Absent, no card is followed by an offer.
+   */
+  serviceChangeJudgement?: ServiceChangeJudgement;
 
   /**
    * The idea's rows on the compared path, drafted for the ✅ card that offers
@@ -1684,21 +1694,12 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
         return null;
       })
     : null;
-  // A staged PRD is a milestone: its comparison posts BEFORE the card, so the
-  // card stays the last message in the thread.
+  // A staged PRD is a milestone. Nothing of the blueprint runs in front of
+  // its card (#1321): the quick judgement waits until the card is up, and the
+  // check itself is a job someone asks for (`offerCheck`).
   const milestone = inPlace
     ? null
     : (prdMilestone(result.operations) ?? handOffMilestone(result.previewText ?? "", request.text, run.references));
-  const comparison = await compareAt(milestone, ref, deps);
-  // The idea's rows are drafted first, so the comparison can set them beside
-  // today's step by step.
-  const drafted = comparison && milestone ? await draftOffer(comparison, milestone, deps) : null;
-  const compared = comparison ? comparedText(comparison, drafted) : null;
-  if (compared) await delivery.postNote(compared);
-  // The offer to draw the idea goes under its comparison and before this
-  // turn's own card, which stays the last message: a typed ✅ answers the
-  // thread's newest card, and that must stay the one the person asked for.
-  const offered = drafted ? await offerProposal(drafted, request, { ...deps, delivery }, staging) : null;
   // Say which it was, just above the card, so a wrong call is caught at once
   // and corrected in one message: the card it replaced, or the cards still
   // waiting beside it. Not for a report's item, which redraws in its report.
@@ -1716,10 +1717,10 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     : await delivery.card({ ...card, expiresAt: window.expiresAt });
   // An answer-only surface declined the card on purpose: the person is told
   // what it would have done instead, so the turn answered, and nothing stages.
-  const remembered = [compared, offered?.proposalText, said?.ok ? said.text : null, posted.text].filter(Boolean).join("\n\n");
+  const remembered = [said?.ok ? said.text : null, posted.text].filter(Boolean).join("\n\n");
   if (!inPlace && posted.declined) {
     await memory.remember(remembered);
-    return { disposition: "answered", posted: posted.text, wrote: memory.wrote(), telemetry, ...(comparison ? { comparison } : {}) };
+    return { disposition: "answered", posted: posted.text, wrote: memory.wrote(), telemetry };
   }
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] proposal card was not staged (${result.toolName})`);
@@ -1840,10 +1841,13 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     ],
     deps.usage.writeTimeoutMs,
   );
+  // The card is up and stored, so the person can review it while the quick
+  // judgement decides whether to offer the blueprint check under it.
+  const offered = milestone ? await offerCheck(milestone, proposal, { ...deps, delivery }, staging.now()) : null;
   // A proposal is still a completed conversational turn. An agent_view DM has
   // no Slack thread to rebuild, so preserving this exchange in the store is the
   // only way its image pointer reaches the immediate follow-up.
-  await memory.remember(remembered);
+  await memory.remember([remembered, offered?.text].filter(Boolean).join("\n\n"));
 
   return {
     disposition: "staged",
@@ -1851,7 +1855,6 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     staged: { proposal, card: inPlace ? card : { ...card, expiresAt: window.expiresAt } },
     wrote: memory.wrote(),
     telemetry,
-    ...(comparison ? { comparison } : {}),
   };
 }
 
@@ -1870,6 +1873,51 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
 function cardWindow(stagedAt: number, leftMs?: number): { expiresAt: number; ttlMs: number } {
   const expiresAt = leftMs === undefined ? cardExpiresAt(stagedAt) : stagedAt + leftMs;
   return { expiresAt, ttlMs: expiresAt - stagedAt };
+}
+
+/**
+ * Offer the blueprint check under a milestone's card (#1321), when the quick
+ * judgement finds the idea touches today's blueprint: the offer posts after
+ * the card, and what its check will need is kept under the offer's ts. Null
+ * — nothing posted — for no port, no match, a failed judgement, or an offer
+ * that did not post. Fails quiet past a budget stop: the card stands.
+ *
+ * @param milestone - The idea the card stages
+ * @param card - The card as stored: its ts, thread and requester
+ * @param now - When the offer goes up, for its deadline
+ */
+async function offerCheck(
+  milestone: Milestone,
+  card: PendingProposal,
+  deps: Pick<TurnDeps, "serviceChangeJudgement" | "delivery" | "threadState">,
+  now: number,
+): Promise<PostResult | null> {
+  if (!deps.serviceChangeJudgement) return null;
+  try {
+    const match = await deps.serviceChangeJudgement(milestone.idea);
+    if (!match) return null;
+    const expiresAt = cardExpiresAt(now);
+    const posted = await deps.delivery.postCheckOffer({ scenario: match.scenario, expiresAt });
+    if (!posted.ok || !posted.ts) return null;
+    await deps.threadState.putCheckOffer({
+      offerTs: posted.ts,
+      channel: card.channel,
+      threadTs: card.threadTs,
+      ...(card.replyTs ? { replyTs: card.replyTs } : {}),
+      userMsgTs: card.userMsgTs,
+      requesterUserId: card.requesterUserId,
+      cardTs: card.proposalTs,
+      milestone: milestone.kind,
+      idea: milestone.idea,
+      ...match,
+      expiresAt,
+    });
+    return posted;
+  } catch (err) {
+    rethrowIfBudget(err);
+    console.warn(`[blueprint-check] offer not made: ${err instanceof Error ? err.message : String(err)}`);
+    return null;
+  }
 }
 
 /**

@@ -35,6 +35,7 @@ import type { AssistantContext } from "../slack/types";
 import type { ThreadState as ThreadStateDurableObject } from "../thread-state";
 import type { OutageStore } from "../turn/capacity-outage";
 import type {
+  BlueprintCheckOffer,
   CutOffNoteReport,
   DecidedMark,
   DecisionReportRecord,
@@ -272,6 +273,16 @@ export function createDurableObjectThreadState(
 
     claimComparison(ref: ThreadRef, scenario: string): Promise<boolean> {
       return hop().claimComparison(ref, scenario, now());
+    },
+
+    // ----- the blueprint check's offers -----
+
+    putCheckOffer(offer: BlueprintCheckOffer): Promise<void> {
+      return hop().putCheckOffer(offer, now());
+    },
+
+    getCheckOffer(offerTs: string): Promise<BlueprintCheckOffer | null> {
+      return hop().getCheckOffer(offerTs, now());
     },
   };
 }

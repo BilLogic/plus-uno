@@ -20,7 +20,12 @@
 //   • the lead: `LEAD_USER_ID`, the deployment's lead, always a confirmer;
 //   • the state: one JSON record in HARNESS_KV; each card's weighed mark a
 //     key of its own there, kept for good; each revision thread a key too;
-//   • a turn's milestone comparison: the same gate, search and path read, and
+//   • a milestone's quick judgement after its card: the same gate and search,
+//     inside the turn's budget; the blueprint check a Check it press queues:
+//     the offer kept in the thread's store, the same path read, the draft on
+//     the same provider, Slack posts in the offer's thread and the Draw on
+//     blueprint card staged as the Worker's (`runBlueprintCheckOnEnv`);
+//   • an IDE hand-off's comparison: the same gate, search and path read, and
 //     the thread's store for its once-per-scenario claim; the offer under it
 //     drafts on the same provider;
 //   • a drawn proposal's thread → rows record: `blueprint_proposals` in the
@@ -78,13 +83,15 @@ import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/in
 import { proposalEventLogFor } from "../usage/production";
 import { threadStateFor } from "../thread-state/production";
 import type { JobContext } from "../scheduled/runs";
-import type { PendingProposal } from "../thread-state/index";
+import type { BlueprintCheckOffer, PendingProposal } from "../thread-state/index";
 import { serviceChangeGate } from "./gate";
 import { COMPARISON_SUBREQUESTS, milestoneComparison, type MilestoneComparison } from "./milestone";
 import { DELIVERY_RESERVE } from "../agent/loop-policy";
 import type { ThreadState } from "../thread-state/index";
 import type { PathToday } from "./draft";
 import { draftProposal, drawnProposalOf, PROPOSAL_OFFER_SUBREQUESTS, type ProposalDrafter } from "./proposal";
+import { JUDGEMENT_SUBREQUESTS, runBlueprintCheck, serviceChangeJudgement, type ServiceChangeJudgement } from "./check";
+import { checkedMessage } from "../slack/blueprint-check";
 import { createD1ProposalRecords } from "./proposal-records-d1";
 import { keepProposalLinks, prdCardOf, type ThreadCards } from "./link";
 import type { ProposalRecords } from "./proposal-records";
@@ -495,6 +502,79 @@ export function milestoneComparisonOn(
       affordable: () => budgetHeadroom().subrequests >= COMPARISON_SUBREQUESTS + DELIVERY_RESERVE,
     }),
   };
+}
+
+/**
+ * The quick service-change judgement a milestone's card is followed by, on
+ * `Env`, as a turn dependency; none where the blueprint is not configured.
+ * It spends the gate's calls only when the turn still has them beside its
+ * delivery reserve.
+ *
+ * @param env - Worker bindings
+ */
+export function serviceChangeJudgementOn(env: Env): { serviceChangeJudgement?: ServiceChangeJudgement } {
+  if (!isBlueprintConfigured(env)) return {};
+  return {
+    serviceChangeJudgement: serviceChangeJudgement({
+      gate: serviceChangeGate({ provider: selectProvider(env), search: async (q) => (await searchBlueprint(env, q)).rows }),
+      // The gate, then the offer's own post.
+      affordable: () => budgetHeadroom().subrequests >= JUDGEMENT_SUBREQUESTS + 1 + DELIVERY_RESERVE,
+    }),
+  };
+}
+
+/**
+ * One blueprint check on `Env` (#1321), as its runner job runs it: on an
+ * AgentRunner of its own, so on a fresh 50-subrequest budget — the offer's
+ * record (1), the path read (5), the draft (≤2), the results post (1), the
+ * Draw on blueprint card's post, staging and events (≤4) and the status edit
+ * (1). The draft runs only while that much is left beside the delivery
+ * reserve.
+ *
+ * @param env - Worker bindings
+ * @param offerTs - The offer's message ts, as the job carries it
+ */
+export async function runBlueprintCheckOnEnv(env: Env, offerTs: string): Promise<void> {
+  const store = threadStateFor(env);
+  const replyThread = (offer: BlueprintCheckOffer) => offer.replyTs ?? offer.threadTs;
+  await runBlueprintCheck(offerTs, {
+    store,
+    readPath: (cellId) => readPathOf(env, cellId),
+    draft: draftProposal({
+      provider: selectProvider(env),
+      affordable: () => budgetHeadroom().subrequests >= PROPOSAL_OFFER_SUBREQUESTS + DELIVERY_RESERVE,
+    }),
+    async post(offer, text) {
+      const sent = await postMessage(env, { channel: offer.channel, thread_ts: replyThread(offer), text });
+      if (!sent.ok) throw new Error(sent.error ?? "Slack refused the results");
+    },
+    async postCard(offer, card) {
+      // Posted now and staged on the one rule from now: it says that deadline.
+      const due = dueFromNow(card);
+      const rendered = renderProposalCard(due.card);
+      const sent = await postMessage(env, {
+        channel: offer.channel,
+        thread_ts: replyThread(offer),
+        text: rendered.text,
+        blocks: rendered.blocks ?? proposalCardBlocks(rendered.text),
+      });
+      if (!sent.ok || !sent.ts) return null;
+      return { ts: sent.ts, text: rendered.text, ...(rendered.blocks ? { blocks: rendered.blocks } : {}), ttlMs: due.ttlMs };
+    },
+    async recordStaged(proposal, retired) {
+      const now = Date.now();
+      await recordProposalEvents(proposalEventLogFor(env), [
+        ...supersededEvents(retired, now, "revision"),
+        // A channel is named on the record; a DM or group DM is not.
+        stagedEvent({ proposal, at: now, via: "worker", channelStored: proposal.channel.startsWith("C") }),
+      ]);
+    },
+    async settle(offer, outcome) {
+      const message = checkedMessage(offer.scenario, outcome);
+      const edited = await updateMessage(env, { channel: offer.channel, ts: offer.offerTs, text: message.text, blocks: message.blocks });
+      if (!edited.ok) console.warn(`[blueprint-check] status message ${offer.channel}/${offer.offerTs} not edited: ${edited.error ?? "refused"}`);
+    },
+  });
 }
 
 /** The thread → rows records, or null without the usage database. */

@@ -105,6 +105,11 @@ export function figmaAskDelivery(opts: { teammate: boolean }): FigmaAskDelivery 
       return { ok: true, text: shown(text) };
     },
 
+    // An answer-only surface: no button to press, so no offer.
+    async postCheckOffer() {
+      return { ok: false, text: "" };
+    },
+
     async card(card) {
       const first = card.operations[0]?.toolName;
       refused = { verb: (first && gateWordsFor(first)?.verb) || "" };
