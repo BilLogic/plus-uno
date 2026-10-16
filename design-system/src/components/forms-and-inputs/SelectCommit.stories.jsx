@@ -662,3 +662,41 @@ ListFollowsWrappingChips.play = async ({ canvasElement }) => {
         window.removeEventListener('resize', count);
     }
 };
+
+/* ------------------------------------------------------------- validation */
+
+/**
+ * Select takes the text fields' validation: `validation` and
+ * `validationMessage` set the tone, `invalid` still means an error, and
+ * `info` puts the tooltip button beside the label.
+ */
+export const ValidationTones = () => (
+    <div style={stack}>
+        <Select id="stone-success" label="School" options={schools} defaultValue="north" validation="success" validationMessage="School saved" caption="Pick the school you tutor at" />
+        <Select id="stone-invalid" label="District" options={schools} validation="invalid" validationMessage="Pick a district" caption="Districts near you" />
+        <Select id="stone-legacy" label="Region" options={schools} invalid caption="Pick a region" />
+        <Select id="stone-info" label="Teacher" options={schools} info="The teacher whose class you join" />
+    </div>
+);
+
+ValidationTones.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const boxOf = (name) => canvas.getByRole('combobox', { name }).closest('.plus-field');
+
+    const school = canvas.getByRole('combobox', { name: 'School' });
+    await expect(boxOf('School')).toHaveClass('plus-field--valid');
+    await expect(school).not.toHaveAttribute('aria-invalid');
+    await expect(school).toHaveAccessibleDescription('School saved');
+
+    const district = canvas.getByRole('combobox', { name: 'District' });
+    await expect(boxOf('District')).toHaveClass('plus-field--invalid');
+    await expect(district).toHaveAttribute('aria-invalid', 'true');
+    await expect(district).toHaveAccessibleDescription('Pick a district');
+
+    const region = canvas.getByRole('combobox', { name: 'Region' });
+    await expect(boxOf('Region')).toHaveClass('plus-field--invalid');
+    await expect(region).toHaveAttribute('aria-invalid', 'true');
+    await expect(region).toHaveAccessibleDescription('Pick a region');
+
+    await expect(canvas.getByRole('button', { name: 'About Teacher' })).toBeInTheDocument();
+};

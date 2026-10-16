@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Badge from '@/components/status-and-loading/Badge';
 import Tag from '@/components/status-and-loading/Tag';
 import TagGroup from '@/components/status-and-loading/TagGroup';
-import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription } from './_internal/Field';
+import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
 import Listbox from './_internal/Listbox';
 import useFieldId from './useFieldId';
 import './Select.scss';
@@ -60,6 +60,9 @@ const Select = ({
     readonly = false,
     readOnly,
     required = false,
+    info,
+    validation = 'none',
+    validationMessage,
     invalid = false,
     commitOnClose = false,
     clearable,
@@ -377,7 +380,11 @@ const Select = ({
     };
 
     /* ---------- the caption ---------- */
-    let message = caption;
+    // `invalid` is the older spelling of `validation="invalid"`; both still work.
+    const result = validation !== 'none' ? validation : (invalid ? 'invalid' : 'none');
+    const tone = result === 'invalid' ? 'invalid' : (result === 'success' ? 'success' : 'help');
+    const tones = toneProps(tone);
+    let message = (result !== 'none' && validationMessage) || caption;
     if (waiting) message = `Choose ${dependsOn.label || 'the field above'} first`;
     else if (atLimit && !caption) message = `You can pick up to ${maxSelections}`;
     const { messageId, describedBy } = fieldDescription({
@@ -402,7 +409,7 @@ const Select = ({
         'aria-labelledby': props['aria-labelledby'] || labelId,
         'aria-label': props['aria-label'] || comboName,
         'aria-required': required || undefined,
-        'aria-invalid': invalid || undefined,
+        ...tones.control,
         'aria-readonly': isReadOnly || undefined,
         'aria-describedby': describedBy,
         onKeyDown: handleKeyDown,
@@ -557,7 +564,7 @@ const Select = ({
     return (
         <FieldStack disabled={disabled} className={wrapperClasses} style={style}>
             {label && (
-                <FieldLabel htmlFor={typeable ? fieldId : undefined} required={required}>
+                <FieldLabel htmlFor={typeable ? fieldId : undefined} required={required} info={info} name={typeof label === 'string' ? label : undefined}>
                     <span id={labelId}>{label}</span>
                 </FieldLabel>
             )}
@@ -567,7 +574,7 @@ const Select = ({
                     size={size}
                     disabled={isDisabled}
                     readOnly={isReadOnly}
-                    invalid={invalid}
+                    {...tones.field}
                     trailing={trailing}
                     onClick={handleFieldClick}
                 >
@@ -601,7 +608,7 @@ const Select = ({
             {name && (multi ? committedList : (isEmpty(committedList) ? [] : [committedList])).map((v) => (
                 <input key={v} type="hidden" name={name} value={v} disabled={isDisabled} />
             ))}
-            <FieldCaption messageId={messageId} message={message} tone={invalid ? 'invalid' : 'help'} />
+            <FieldCaption messageId={messageId} message={message} tone={tone} />
         </FieldStack>
     );
 };
@@ -660,7 +667,13 @@ Select.propTypes = {
     readonly: PropTypes.bool,
     /** Shows an asterisk on the label and sets `aria-required`. */
     required: PropTypes.bool,
-    /** Draws the error border; `caption` becomes the announced error. */
+    /** Text for the info tooltip beside the label. */
+    info: PropTypes.node,
+    /** The field's validation tone, as on Input: an error, a confirmation, or neither. */
+    validation: PropTypes.oneOf(['none', 'invalid', 'success']),
+    /** Shown under the field in place of `caption` while `validation` is set; an error is announced. */
+    validationMessage: PropTypes.node,
+    /** Same as `validation="invalid"`: draws the error border, and `caption` becomes the announced error. */
     invalid: PropTypes.bool,
     /** Multi mode: `onChange` fires once when the list closes, as a filter bar wants, not on each pick. */
     commitOnClose: PropTypes.bool,

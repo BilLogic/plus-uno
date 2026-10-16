@@ -104,6 +104,21 @@ Field.propTypes = {
 };
 
 /**
+ * What a caption tone means for the box and the control. One place, so every
+ * host maps it the same way: an error marks both, a confirmation marks only
+ * the box, and help leaves the field plain.
+ *
+ * @param {'help'|'invalid'|'success'} [tone]
+ * @returns {{ field: { invalid: boolean, valid: boolean }, control: { 'aria-invalid'?: true } }}
+ */
+export function toneProps(tone) {
+    return {
+        field: { invalid: tone === 'invalid', valid: tone === 'success' },
+        control: { 'aria-invalid': tone === 'invalid' || undefined },
+    };
+}
+
+/**
  * The ids a field's control points at, and the `aria-describedby` that names
  * them. One place, so every host describes itself the same way.
  *
@@ -139,6 +154,7 @@ export const FieldLabel = ({
     required = false,
     info,
     hidden = false,
+    name,
     className = '',
 }) => {
     if (!children) return null;
@@ -156,7 +172,7 @@ export const FieldLabel = ({
                 <button
                     type="button"
                     className="plus-field-info"
-                    aria-label={`About ${typeof children === 'string' ? children : 'this field'}`}
+                    aria-label={`About ${name ?? (typeof children === 'string' ? children : 'this field')}`}
                 >
                     <i className="fa-solid fa-circle-info" aria-hidden="true" />
                 </button>
@@ -173,6 +189,8 @@ FieldLabel.propTypes = {
     info: PropTypes.node,
     /** Clips the label out of sight. It is still rendered and still names the field. */
     hidden: PropTypes.bool,
+    /** The field's name for the info button, when `children` is not plain text. */
+    name: PropTypes.string,
     className: PropTypes.string,
 };
 

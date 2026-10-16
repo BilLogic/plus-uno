@@ -5,7 +5,7 @@ import Button from '@/components/actions/Button/Button';
 import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
 import useFieldId from '@/components/forms-and-inputs/useFieldId';
 import Checkbox from '../Checkbox';
-import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription } from '../_internal/Field';
+import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from '../_internal/Field';
 import './InputGroup.scss';
 
 /** One addon from a descriptor: a string, an object with a `type`, or a node. */
@@ -120,8 +120,7 @@ const InputGroup = ({
                 size={size}
                 disabled={disabled}
                 readOnly={isReadOnly}
-                invalid={tone === 'invalid'}
-                valid={tone === 'success'}
+                {...toneProps(tone).field}
                 leading={renderSlot(leadingVisual)}
                 trailing={renderSlot(trailingVisual)}
                 className={`plus-input-group-wrapper ${className}`.trim()}
@@ -149,7 +148,7 @@ const InputGroup = ({
                     aria-required={required || undefined}
                     {...props}
                     aria-describedby={describedBy}
-                    aria-invalid={tone === 'invalid' || undefined}
+                    {...toneProps(tone).control}
                 />
             </Field>
             <FieldCaption messageId={messageId} message={message} tone={tone} />

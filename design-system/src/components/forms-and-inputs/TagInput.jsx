@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Tag, { TAG_ACCEPTED_COLORS, TAG_COLORS, resolveTagColor } from '@/components/status-and-loading/Tag';
 import TagGroup from '@/components/status-and-loading/TagGroup';
 import useFieldId from './useFieldId';
-import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription } from './_internal/Field';
+import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
 import Listbox, { ListboxMessage } from './_internal/Listbox';
 import './TagInput.scss';
 
@@ -318,7 +318,7 @@ const TagInput = ({
                     size={size}
                     disabled={disabled}
                     readOnly={readOnly}
-                    invalid={tone === 'invalid'}
+                    {...toneProps(tone).field}
                     className="plus-tag-input__field"
                 >
                     <div
@@ -375,7 +375,7 @@ const TagInput = ({
                             aria-autocomplete="list"
                             aria-activedescendant={listOpen ? activeId : undefined}
                             aria-required={required || undefined}
-                            aria-invalid={tone === 'invalid' || undefined}
+                            {...toneProps(tone).control}
                             aria-describedby={describedBy}
                             autoComplete="off"
                             spellCheck={false}
