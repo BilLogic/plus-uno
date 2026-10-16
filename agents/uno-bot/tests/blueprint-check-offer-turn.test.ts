@@ -94,24 +94,6 @@ test("a PRD that touches today's blueprint posts its card, then the Check it off
   assert.match(w.gateModel.generated[0]!.prompt, /first free tutor claims it/);
 });
 
-test("a PRD turn reads no path and drafts no rows: that is the check's, after a press", async () => {
-  const w = world({ replies: [stagePrd()], judgments: [SERVICE_CHANGE] });
-  const read: string[] = [];
-  // The hand-off's comparison and drafter, wired as production wires them:
-  // a PRD's turn must reach neither.
-  w.h.deps.milestoneComparison = async () => {
-    read.push("path");
-    return null;
-  };
-  w.h.deps.proposalDraft = async () => {
-    read.push("draft");
-    return null;
-  };
-  await runTurn(request({ text: "turn this thread into a PRD" }), w.h.deps);
-  assert.deepEqual(read, []);
-  assert.deepEqual(order(w), ["card", "offer"]);
-});
-
 test("the offer keeps what its check will need: the idea, the match, and the card it is under", async () => {
   const w = world({ replies: [stagePrd()], judgments: [SERVICE_CHANGE] });
   const outcome = await runTurn(request({ text: "turn this thread into a PRD" }), w.h.deps);

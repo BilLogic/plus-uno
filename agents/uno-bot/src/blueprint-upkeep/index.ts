@@ -41,15 +41,11 @@ export {
   type ServiceChangeJudgement,
 } from "./check";
 export {
-  COMPARISON_SUBREQUESTS,
   comparisonText,
   handOffMilestone,
-  milestoneComparison,
   prdMilestone,
   type Comparison,
-  type ComparisonDeps,
   type Milestone,
-  type MilestoneComparison,
 } from "./milestone";
 export {
   DRAFT_COST,

@@ -1,21 +1,14 @@
-// An idea at a milestone, set beside today's blueprint.
+// An idea at a milestone, and the words that set it beside today's blueprint.
 //
 // While someone explores an idea with the bot, two moments mean the idea has a
 // concrete flow: a PRD staged on its card (draft-a-prd's exit), and a build
-// handed to the IDE with `uno-prototype`. A PRD's card is followed by the
-// Check it offer, and its comparison is the blueprint check's, run as a job on
-// a press (`./check.ts`, #1321); this file reads both milestones and writes
-// the comparison text the check posts. At a hand-off the turn still runs the
-// service-change gate on the idea itself. When the gate passes — the idea
-// changes who does what on a path it matched with confidence — the reply
-// carries a short comparison: that path's steps today as `step (lane)`, the
-// idea's own words beside them, and a link into the blueprint app.
-//
-// AT MOST ONCE PER THREAD PER SCENARIO, claimed in the thread's store once the
-// path is read and the comparison is ready to show, so a read that fails
-// leaves the offer for the next milestone. A repeat costs the judgment, the
-// search and the read, and shows nothing. Nothing is written anywhere: the
-// comparison is words in a reply.
+// handed to the IDE with `uno-prototype`. Each is followed by the same Check
+// it offer when the quick judgement finds the idea touches today's blueprint
+// — under the card (#1321), or under the hand-off reply (#1324) — and the
+// comparison is the blueprint check's, run as a job on a press (`./check.ts`).
+// This file reads both milestones and writes the comparison text the check
+// posts: that path's steps today as `step (lane)`, the idea's own words or
+// its drafted rows beside them, and a link into the blueprint app.
 //
 // WHAT IS NOT A MILESTONE. An answer, a critique (a turn that read
 // `critique-a-design`), and a reply that names `uno-prototype` without the
@@ -26,21 +19,11 @@
 // step, lane — and quotes the idea as written; it never names a Roadmap
 // status (GLOSSARY.md § Two vocabularies).
 //
-// THE SEAM AFTER IT. A `Comparison` carries the match and today's path, which
-// is everything an offer to draft the idea on the blueprint needs; the turn
-// hands it back on its outcome (`TurnOutcome.comparison`).
-//
-// PURE: the gate, the path read, the claim and the budget arrive as ports.
+// PURE: no ports, no I/O.
 
-import { rethrowIfBudget } from "../net";
-import type { ThreadRef } from "../thread-state/index";
-import { GATE_SUBREQUESTS, PATH_READ_COST } from "./budget";
 import type { DraftedChange, PathToday } from "./draft";
-import type { ServiceChangeGate, ServiceChangeInput } from "./gate";
+import type { ServiceChangeInput } from "./gate";
 
-/** External subrequests one comparison may spend: the gate's judgment and
- *  search, then the path read. */
-export const COMPARISON_SUBREQUESTS = GATE_SUBREQUESTS + PATH_READ_COST;
 /** Steps shown before the rest are counted. */
 const MAX_STEPS = 8;
 /** The bot skill whose turns are critique, never a milestone. */
@@ -56,7 +39,7 @@ export interface Milestone {
   idea: ServiceChangeInput;
 }
 
-/** The comparison a reply carries. */
+/** The comparison a blueprint check posts (`./check.ts`). */
 export interface Comparison {
   milestone: MilestoneKind;
   scenario: string;
@@ -66,21 +49,9 @@ export interface Comparison {
   /** The idea's sentence that shows the change, in its own words. */
   quote: string;
   today: PathToday;
-  /** The comparison as the reply reads it, in Markdown. */
+  /** The comparison as the thread reads it, in Markdown. */
   text: string;
 }
-
-export interface ComparisonDeps {
-  gate: ServiceChangeGate;
-  /** Today's path holding a cell, or null when it cannot be read. */
-  readPath(cellId: string): Promise<PathToday | null>;
-  /** True the first time a thread is shown a scenario's comparison; records it. */
-  firstInThread(ref: ThreadRef, scenario: string): Promise<boolean>;
-  /** Whether the turn has `COMPARISON_SUBREQUESTS` left beside its delivery. */
-  affordable(): boolean;
-}
-
-export type MilestoneComparison = (ref: ThreadRef, milestone: Milestone) => Promise<Comparison | null>;
 
 const str = (v: unknown): string => (typeof v === "string" ? v.trim() : "");
 
@@ -181,44 +152,4 @@ function stepComparison(today: PathToday, idea: ReadonlyArray<Pick<DraftedChange
   const more = steps.length - MAX_COMPARED_STEPS;
   if (more > 0) lines.push("", `…and ${more} more ${more === 1 ? "step" : "steps"} on the blueprint.`);
   return lines.join("\n");
-}
-
-/**
- * The comparison at a milestone, over its ports. Fails quiet past a budget
- * stop: any other error is no comparison, and the reply goes out as it was.
- *
- * @param deps - The gate, the path read, the thread's claim and the budget
- */
-export function milestoneComparison(deps: ComparisonDeps): MilestoneComparison {
-  return async (ref, milestone) => {
-    try {
-      if (!deps.affordable()) return null;
-      const gated = await deps.gate(milestone.idea);
-      if (!gated.pass) {
-        console.log(`[milestone] ${milestone.kind}: no comparison (${gated.reason})`);
-        return null;
-      }
-      const { scenario, path, cellId } = gated.match;
-      const today = await deps.readPath(cellId);
-      if (!today) return null;
-      // Claimed only now: a failed read leaves the offer for the next milestone.
-      if (!(await deps.firstInThread(ref, scenario))) {
-        console.log(`[milestone] ${milestone.kind}: ${scenario} already compared in this thread`);
-        return null;
-      }
-      return {
-        milestone: milestone.kind,
-        scenario,
-        path,
-        cellId,
-        quote: gated.quote,
-        today,
-        text: comparisonText(today, gated.quote),
-      };
-    } catch (err) {
-      rethrowIfBudget(err);
-      console.warn(`[milestone] comparison skipped: ${err instanceof Error ? err.message : String(err)}`);
-      return null;
-    }
-  };
 }

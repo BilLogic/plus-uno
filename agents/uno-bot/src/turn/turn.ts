@@ -153,16 +153,8 @@ import {
   type TurnSettlement,
 } from "./delivery";
 import { cancelledRecently, RECENT_CANCEL_MS } from "../agent/cancel-note";
-import {
-  comparisonText,
-  handOffMilestone,
-  prdMilestone,
-  type Comparison,
-  type Milestone,
-  type MilestoneComparison,
-} from "../blueprint-upkeep/milestone";
+import { handOffMilestone, prdMilestone, type Milestone } from "../blueprint-upkeep/milestone";
 import type { ServiceChangeJudgement } from "../blueprint-upkeep/check";
-import { proposalOfferCard, stagedProposalOffer, type ProposalDraft, type ProposalDrafter } from "../blueprint-upkeep/proposal";
 import { rethrowIfBudget } from "../net";
 import { cardExpiresAt } from "../card-expiry";
 
@@ -376,10 +368,6 @@ export interface TurnOutcome {
   /** What a ✅ taken during this turn ran, operation by operation, when the
    *  executor reported it. */
   executed?: OperationOutcome[];
-  /** The idea set beside today's blueprint at a milestone, when the reply
-   *  carried one: the match and today's path, for whatever offers to draft
-   *  the idea on the blueprint next. */
-  comparison?: Comparison;
 }
 
 // ── The dependencies ─────────────────────────────────────────────────────────
@@ -668,28 +656,12 @@ export interface TurnDeps {
   contextState?: boolean;
 
   /**
-   * The idea set beside today's blueprint at a build handed to the IDE
-   * (`blueprint-upkeep/milestone.ts`); a PRD's card gets the Check it offer
-   * instead (`serviceChangeJudgement`). Null when the
-   * idea changes no path today, or the thread has seen this scenario's. Absent,
-   * no reply carries one.
-   */
-  milestoneComparison?: MilestoneComparison;
-
-  /**
-   * The quick service-change judgement a milestone's card is followed by
-   * (`blueprint-upkeep/check.ts`): where the idea touches today's blueprint,
-   * or null for "offer nothing". Absent, no card is followed by an offer.
+   * The quick service-change judgement a milestone is followed by — a PRD's
+   * card, or a reply handing a build to the IDE (`blueprint-upkeep/check.ts`):
+   * where the idea touches today's blueprint, or null for "offer nothing".
+   * Absent, no milestone is followed by an offer.
    */
   serviceChangeJudgement?: ServiceChangeJudgement;
-
-  /**
-   * The idea's rows on the compared path, drafted for the ✅ card that offers
-   * to draw them on the blueprint as a proposal (`blueprint-upkeep/proposal.ts`).
-   * Null when the draft adds nothing beside today's cells. Absent, a
-   * comparison carries no offer.
-   */
-  proposalDraft?: ProposalDrafter;
 
   now?(): number;
 }
@@ -1844,7 +1816,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   );
   // The card is up and stored, so the person can review it while the quick
   // judgement decides whether to offer the blueprint check under it.
-  const offered = milestone ? await offerCheck(milestone, proposal, { ...deps, delivery }, staging.now()) : null;
+  const offered = milestone ? await offerCheck(milestone, { ...proposal, cardTs: proposal.proposalTs, ...(proposal.supersedeKey ? { cardKey: proposal.supersedeKey } : {}) }, { ...deps, delivery }, staging.now()) : null;
   // A proposal is still a completed conversational turn. An agent_view DM has
   // no Slack thread to rebuild, so preserving this exchange in the store is the
   // only way its image pointer reaches the immediate follow-up.
@@ -1877,19 +1849,32 @@ function cardWindow(stagedAt: number, leftMs?: number): { expiresAt: number; ttl
 }
 
 /**
- * Offer the blueprint check under a milestone's card (#1321), when the quick
- * judgement finds the idea touches today's blueprint: the offer posts after
- * the card, and what its check will need is kept under the offer's ts. Null
- * — nothing posted — for no port, no match, a failed judgement, or an offer
- * that did not post. Fails quiet past a budget stop: the card stands.
+ * Where a Check it offer goes and whose it is: the thread, the requester, and
+ * the card it posts under — absent at a hand-off to the IDE, which stages
+ * none (#1324).
+ */
+type CheckOfferPlace = Pick<PendingProposal, "channel" | "threadTs" | "replyTs" | "userMsgTs" | "requesterUserId"> & {
+  cardTs?: string;
+  /** The card's matter (`supersedeKey`), which the results' action finds
+   *  the matter's current card by (#1323). */
+  cardKey?: string;
+};
+
+/**
+ * Offer the blueprint check under a milestone's card (#1321) or its hand-off
+ * reply (#1324), when the quick judgement finds the idea touches today's
+ * blueprint: the offer posts after them, and what its check will need is kept
+ * under the offer's ts. Null — nothing posted — for no port, no match, a
+ * failed judgement, or an offer that did not post. Fails quiet past a budget
+ * stop: the card or the reply stands.
  *
- * @param milestone - The idea the card stages
- * @param card - The card as stored: its ts, thread and requester
+ * @param milestone - The idea the card stages or the reply hands off
+ * @param at - The thread and requester, and the card's ts when there is one
  * @param now - When the offer goes up, for its deadline
  */
 async function offerCheck(
   milestone: Milestone,
-  card: PendingProposal,
+  at: CheckOfferPlace,
   deps: Pick<TurnDeps, "serviceChangeJudgement" | "delivery" | "threadState">,
   now: number,
 ): Promise<PostResult | null> {
@@ -1898,17 +1883,17 @@ async function offerCheck(
     const match = await deps.serviceChangeJudgement(milestone.idea);
     if (!match) return null;
     const expiresAt = cardExpiresAt(now);
-    const posted = await deps.delivery.postCheckOffer({ scenario: match.scenario, expiresAt });
+    const posted = await deps.delivery.postCheckOffer({ scenario: match.scenario, expiresAt, underCard: !!at.cardTs });
     if (!posted.ok || !posted.ts) return null;
     await deps.threadState.putCheckOffer({
       offerTs: posted.ts,
-      channel: card.channel,
-      threadTs: card.threadTs,
-      ...(card.replyTs ? { replyTs: card.replyTs } : {}),
-      userMsgTs: card.userMsgTs,
-      requesterUserId: card.requesterUserId,
-      cardTs: card.proposalTs,
-      ...(card.supersedeKey ? { cardKey: card.supersedeKey } : {}),
+      channel: at.channel,
+      threadTs: at.threadTs,
+      ...(at.replyTs ? { replyTs: at.replyTs } : {}),
+      userMsgTs: at.userMsgTs,
+      requesterUserId: at.requesterUserId,
+      ...(at.cardTs ? { cardTs: at.cardTs } : {}),
+      ...(at.cardKey ? { cardKey: at.cardKey } : {}),
       milestone: milestone.kind,
       idea: milestone.idea,
       ...match,
@@ -1918,95 +1903,6 @@ async function offerCheck(
   } catch (err) {
     rethrowIfBudget(err);
     console.warn(`[blueprint-check] offer not made: ${err instanceof Error ? err.message : String(err)}`);
-    return null;
-  }
-}
-
-/**
- * The comparison a milestone earns, or null: no milestone, no port, or the
- * port found nothing to compare. Fails quiet — the reply never waits on it.
- */
-async function compareAt(milestone: Milestone | null, ref: ThreadRef, deps: Pick<TurnDeps, "milestoneComparison">): Promise<Comparison | null> {
-  if (!milestone || !deps.milestoneComparison) return null;
-  return deps.milestoneComparison(ref, milestone).catch((err: unknown) => {
-    rethrowIfBudget(err);
-    return null;
-  });
-}
-
-/**
- * Draft a compared idea's rows for the offer to draw it on the blueprint.
- * Null when there is no drafter or the draft adds nothing. Fails quiet, past
- * a budget stop: the reply stands without it.
- */
-async function draftOffer(
-  comparison: Comparison,
-  milestone: Milestone,
-  deps: Pick<TurnDeps, "proposalDraft">,
-): Promise<ProposalDraft | null> {
-  if (!deps.proposalDraft) return null;
-  return deps.proposalDraft(comparison, milestone.idea).catch((err: unknown) => {
-    rethrowIfBudget(err);
-    console.warn(`[proposal] offer not drafted: ${err instanceof Error ? err.message : String(err)}`);
-    return null;
-  });
-}
-
-/** The comparison a reply carries: step by step beside the idea's drafted
- *  rows, or today's steps and the idea's words when nothing was drafted. */
-function comparedText(comparison: Comparison, drafted: ProposalDraft | null): string {
-  return drafted ? comparisonText(comparison.today, comparison.quote, drafted.changes) : comparison.text;
-}
-
-/**
- * Offer to draw a drafted idea on the blueprint: post the ✅ card in the
- * thread, and stage it for the requester alone, in its own slot, so it never
- * replaces the turn's own card. Null when the card did not stage. Fails quiet,
- * past a budget stop: the reply already stands without it.
- */
-async function offerProposal(
-  draft: ProposalDraft,
-  request: TurnRequest,
-  deps: Pick<TurnDeps, "delivery" | "threadState" | "usage">,
-  staging: StagingFacts,
-): Promise<PendingProposal | null> {
-  try {
-    const window = cardWindow(staging.now());
-    const posted = await deps.delivery.card({ ...proposalOfferCard(draft), expiresAt: window.expiresAt });
-    if (!posted.ok || !posted.ts || posted.declined) return null;
-    const proposal: PendingProposal = {
-      ttlMs: window.ttlMs,
-      ...stagedProposalOffer(draft, {
-        channel: request.channel,
-        threadTs: request.conversationTs,
-        ...(request.replyTs ? { replyTs: request.replyTs } : {}),
-        userMsgTs: request.userMsgTs,
-        requesterUserId: request.userId,
-        proposalTs: posted.ts,
-        proposalText: posted.text,
-      }),
-      ...ownBlocks(posted),
-    };
-    const { retired } = await deps.threadState.putProposal(proposal);
-    await recordProposalEvents(
-      deps.usage.proposalEvents,
-      [
-        ...supersededEvents(retired, staging.now(), "revision"),
-        stagedEvent({
-          proposal,
-          at: staging.now(),
-          via: "turn",
-          channelStored: staging.channelStored,
-          turnId: staging.turnId,
-          testTraffic: staging.testTraffic,
-        }),
-      ],
-      deps.usage.writeTimeoutMs,
-    );
-    return proposal;
-  } catch (err) {
-    rethrowIfBudget(err);
-    console.warn(`[proposal] offer not staged: ${err instanceof Error ? err.message : String(err)}`);
     return null;
   }
 }
@@ -2649,16 +2545,9 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   // A blueprint place carried from an earlier answer keeps that answer's
   // form; the reader gets the breadcrumb either way.
   const answered = breadcrumbsInProse(figmaAnswerCopy(stripped.text, presentation?.sources));
-  // A build handed to the IDE is a milestone: the comparison rides the reply,
-  // after the judge, in code's words.
-  const handOff = handOffMilestone(answered, request.text, run.references);
-  const comparison = await compareAt(handOff, ref, deps);
-  const drafted = comparison && handOff ? await draftOffer(comparison, handOff, deps) : null;
-  const prose = comparison ? `${answered}\n\n${comparedText(comparison, drafted)}` : answered;
-
   // The table rides with the answer; what comes back as `posted.text` is then
   // the prose and its plain list, which is what the thread remembers below.
-  const posted = await delivery.postAnswer(prose, presentation);
+  const posted = await delivery.postAnswer(answered, presentation);
 
   // The receipt rides the USER turn, keyed by the user message's ts. It
   // describes the TURN, not the message, and the user ts is the only id this
@@ -2684,12 +2573,29 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     };
   }
 
-  // The offer to draw the idea follows the reply that carries its comparison.
-  const offered = drafted ? await offerProposal(drafted, request, deps, ctx.staging) : null;
+  // A build handed to the IDE is a milestone (#1324): the reply posts as
+  // written, and the same Check it offer a PRD's card gets follows it once the
+  // stream has stopped. There is no card, so the offer names none and its
+  // check has none to add notes to.
+  const handOff = handOffMilestone(answered, request.text, run.references);
+  const offered = handOff
+    ? await offerCheck(
+        handOff,
+        {
+          channel: request.channel,
+          threadTs: request.conversationTs,
+          ...(request.replyTs ? { replyTs: request.replyTs } : {}),
+          userMsgTs: request.userMsgTs,
+          requesterUserId: request.userId,
+        },
+        { ...deps, delivery },
+        ctx.staging.now(),
+      )
+    : null;
 
   // Record what was actually POSTED (capped, placeholder and all), not the raw
   // text.
-  await ctx.memory.rememberAssistant(offered ? `${posted.text}\n\n${offered.proposalText}` : posted.text);
+  await ctx.memory.rememberAssistant(offered ? `${posted.text}\n\n${offered.text}` : posted.text);
 
   // A card was staged at turn start and this turn neither resolved it (that
   // would be kind:"resolved") nor said anything about it. The approval has
@@ -2708,7 +2614,6 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     posted: posted.text,
     wrote: ctx.memory.wrote(),
     telemetry,
-    ...(comparison ? { comparison } : {}),
   };
 }
 

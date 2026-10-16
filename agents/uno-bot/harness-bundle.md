@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **99,498 chars from 9 files**, against an assembled budget of 175,500 (76,002 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 79,114 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **99,530 chars from 9 files**, against an assembled budget of 175,500 (75,970 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 79,146 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,113 (−7,715 ide-only) | 10,113 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 14,518 | 24,660 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,249 | 45,950 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 47,596 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 48,844 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 54,537 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 66,323 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 17,312 (−6,007 ide-only) | 83,686 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 87,154 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 93,670 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 98,643 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 802 | 99,498 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 14,550 | 24,692 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,249 | 45,982 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 47,628 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 48,876 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 54,569 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 66,355 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 17,312 (−6,007 ide-only) | 83,718 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 87,186 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 93,702 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 98,675 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 802 | 99,530 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 136,137 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 136,248 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -57,7 +57,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,724 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 1,808 |
 | `figma-comments` | [`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) | 8,899 |
-| `file-a-ticket` | [`agents/uno-bot/skills/file-a-ticket/SKILL.md`](../../agents/uno-bot/skills/file-a-ticket/SKILL.md) | 3,305 |
+| `file-a-ticket` | [`agents/uno-bot/skills/file-a-ticket/SKILL.md`](../../agents/uno-bot/skills/file-a-ticket/SKILL.md) | 3,416 |
 | `find-the-right-person` | [`agents/uno-bot/skills/find-the-right-person/SKILL.md`](../../agents/uno-bot/skills/find-the-right-person/SKILL.md) | 2,558 |
 | `follow-through` | [`agents/uno-bot/scheduled-actions/follow-through/ACTION.md`](../../agents/uno-bot/scheduled-actions/follow-through/ACTION.md) | 11,181 |
 | `prepare-the-call` | [`agents/uno-bot/skills/prepare-the-call/SKILL.md`](../../agents/uno-bot/skills/prepare-the-call/SKILL.md) | 2,202 |
@@ -316,7 +316,7 @@ A new proposal card for a different matter than any waiting in its thread; each 
 _Avoid_: "second card", "batch" (a batch is one card running several operations)
 
 **blueprint check**:
-The opt-in comparison of an idea against today's **uno-blueprint**, offered after its proposal card posts; its result can become a revision of that card or a **blueprint proposal**.
+The opt-in comparison of an idea against today's **uno-blueprint**, offered after its proposal card posts or a build is handed to the IDE; its result can become a revision of that card or a **blueprint proposal**.
 _Avoid_: "comparison" alone, "blueprint revision" (that is shipped work's)
 
 **sweep**:
@@ -2094,7 +2094,7 @@ The build hand-off:
 ## Exit
 
 - **file** — the GitHub issue or the Roadmap intake on one card; ✅ files it.
-- **hand off** — a build with its PRD: the ticket filed, plus the ready-to-paste IDE prompt naming uno-prototype in the shape above, its `Run in the IDE` line as written: the Worker reads it to set a build that changes the service beside today's blueprint. A direct fix the reporter wants made now: an IDE prompt naming uno-maintain with the quoted fix.
+- **hand off** — a build with its PRD: the ticket filed, plus the ready-to-paste IDE prompt naming uno-prototype in the shape above, its `Run in the IDE` line as written: the Worker reads it, and when the build changes a path on the blueprint today, posts a Check it offer under the reply; the blueprint check runs only on a press, so the reply keeps to the hand-off. A direct fix the reporter wants made now: an IDE prompt naming uno-maintain with the quoted fix.
 - **answer** — an open intake already covers it: its link, and whether to add this to it.
 
 
