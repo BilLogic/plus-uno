@@ -42,7 +42,7 @@
 
 import type { FrameAnnotation, FrameFill } from "./figma-frame-detail";
 
-/** An RGBA colour, each channel 0–1, as Figma's REST API sends it. */
+/** An RGBA color, each channel 0–1, as Figma's REST API sends it. */
 export interface FigmaColor {
   r: number;
   g: number;
@@ -123,7 +123,7 @@ export const FIGMA_NOTE =
   "and visible fills, each fill as it renders (hex, gradient or image). Token and variable names " +
   "and measurements are unread: a fill marked `variable` is bound to a variable whose name is " +
   "unread. Asked for a token, variable names or measurements, say they are unread here rather than " +
-  "missing, and name the route that reads them. Visual judgement comes from the frame's " +
+  "missing, and name the route that reads them. Visual judgment comes from the frame's " +
   "rendered image when one is attached to this turn; this text describes no pixels.";
 
 /** Appended when the frame carries annotations. */

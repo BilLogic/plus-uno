@@ -65,7 +65,7 @@ import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { classifyLink, linksIn, pickDestination, resolveDestination, type SweepMessage, type SweepSource, type SweepThread, type TargetKind } from "../sweep/finding";
 import type { SweepSlack, SweepSlackMessage } from "../sweep/run";
 import {
-  acknowledgement,
+  acknowledgment,
   followUpText,
   REMINDER_CHOICES,
   reminderAnswer,
@@ -74,7 +74,7 @@ import {
   SELF_REMINDER_LAST_CHOICES,
   SELF_REMINDER_CHOICES,
   selfReminderText,
-  snoozeAcknowledgement,
+  snoozeAcknowledgment,
   TAP_REFUSED,
   type ReminderOutcome,
   type TapAnswer,
@@ -728,11 +728,11 @@ async function answerOrThrow(r: ReminderReaction, deps: ReminderDoorDeps): Promi
     // 🙌 and ⏳ only; a ⏳ only while a post is left to bring it back.
     if (answer === "done") {
       patch = { state: "done", resolvedAt: now };
-      ack = acknowledgement("done");
+      ack = acknowledgment("done");
     } else if (answer === "soon" && c.nudges < 2 && maySnooze(c.snoozes)) {
       const dueAt = snoozedRunAt(now);
       patch = { state: "snoozed", snoozes: c.snoozes + 1, dueAt };
-      ack = snoozeAcknowledgement(dayLabel(etDayOf(dueAt), etDayOf(now)));
+      ack = snoozeAcknowledgment(dayLabel(etDayOf(dueAt), etDayOf(now)));
     } else {
       return refused(answer === "soon" ? TAP_REFUSED.snoozeSpent : TAP_REFUSED.notAnAnswer);
     }
@@ -742,10 +742,10 @@ async function answerOrThrow(r: ReminderReaction, deps: ReminderDoorDeps): Promi
     const dueAt = rearmedDueAt(now);
     // The date moves; the reminder and its follow-up stay the only two posts.
     patch = { state: "snoozed", snoozes: c.snoozes + 1, dueAt };
-    ack = acknowledgement("soon", dayLabel(etDayOf(nudgeAt(dueAt)), etDayOf(now)));
+    ack = acknowledgment("soon", dayLabel(etDayOf(nudgeAt(dueAt)), etDayOf(now)));
   } else {
     patch = { state: answer === "done" ? "done" : answer === "not_doing" ? "dropped" : "not_promise", resolvedAt: now };
-    ack = acknowledgement(answer);
+    ack = acknowledgment(answer);
   }
   // Two answers at once both read a live row: the claim lets one through.
   if (!(await deps.store.claim(c.id, patch))) return refused(TAP_REFUSED.settled);

@@ -15,8 +15,8 @@
  * every tabs-mode case.
  *
  * The reference implementation is `src/storybook-docs/docs-tabs.jsx`, which has
- * run the documentation's own tab strip since #253. This is that behaviour
- * generalised: roving tabindex, arrow keys that move selection and focus
+ * run the documentation's own tab strip since #253. This is that behavior
+ * generalized: roving tabindex, arrow keys that move selection and focus
  * together, and real `<button>` elements rather than anchors with `href="#"`
  * that push a history entry and move the scroll position on every tab change.
  */

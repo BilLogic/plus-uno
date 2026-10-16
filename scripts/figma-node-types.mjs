@@ -24,7 +24,7 @@
  *
  * WHAT IT STILL CANNOT TELL YOU. Whether the node is the RIGHT one. `Alert →
  * 11:324` resolves to a component set named `Alert`; whether it is the alert
- * the code implements is a judgement no id check makes. See
+ * the code implements is a judgment no id check makes. See
  * `design-system/figma/registry-audit.md`.
  */
 

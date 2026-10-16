@@ -8,7 +8,7 @@
 // refused — the model names the items in prose instead.
 //
 // THE LINKS are a row's own addresses: its `url` first, as "Open", then any
-// other field holding an http(s) address, labelled by its field, up to 3 —
+// other field holding an http(s) address, labeled by its field, up to 3 —
 // Slack's limit on a card's buttons.
 //
 // THE PLAIN LIST is the answer of record, as it is for a table: the message's

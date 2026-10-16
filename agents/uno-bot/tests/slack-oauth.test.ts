@@ -5,7 +5,7 @@
 // two of its sentences: tokens are keyed by the consenting identity, and the
 // legacy workspace slot is BOOTSTRAPPED by the first-ever consent and never
 // overwritten by a later one. Those two sentences are asserted here, so that
-// the module they describe can be reshaped without the behaviour drifting.
+// the module they describe can be reshaped without the behavior drifting.
 //
 // NO REAL CREDENTIALS. Every value below is an obvious fake — `fake-client-id`,
 // `not-a-real-secret`, `xoxp-not-a-real-token`. Nothing here reaches slack.com:

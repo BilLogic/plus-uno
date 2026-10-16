@@ -119,7 +119,7 @@ const OneSessionNAModalBody = () => (
 
 /**
  * One-Session NA
- * Delete session modal for cancelling a single session with no date
+ * Delete session modal for canceling a single session with no date
  * dropdown expanded.
  *
  * Layout:

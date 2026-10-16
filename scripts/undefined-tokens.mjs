@@ -12,7 +12,7 @@
  * Measured 2026-08-29 over design-system/src, .storybook and prototypes: 145
  * token names used and never defined, across 508 uses.
  *
- * WHY NOTHING CAUGHT IT. `check:colour-fallbacks` and `check:size-fallbacks`
+ * WHY NOTHING CAUGHT IT. `check:color-fallbacks` and `check:size-fallbacks`
  * compare a fallback to its token and report an undefined `--color-*` or
  * `--size-*` on the way — but only for tokens written WITH a fallback, and only
  * in those two namespaces. Two thirds of these have no fallback at all, and the

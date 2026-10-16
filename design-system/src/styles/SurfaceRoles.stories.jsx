@@ -17,10 +17,10 @@ import { expect, within } from 'storybook/test';
  * position — as an alias over values we already had, deleting nothing.
  *
  * WHAT THE `play` FUNCTIONS ASSERT, and why they are not decoration: the whole
- * claim of the role model is that a raised card is the SAME COLOUR as the page
+ * claim of the role model is that a raised card is the SAME COLOR as the page
  * and is lifted by its shadow. That is exactly the kind of statement a
  * screenshot cannot hold and a resolved computed style can. If someone later
- * "fixes" `--surface-raised` to a lighter grey — the intuitive edit, and the
+ * "fixes" `--surface-raised` to a lighter gray — the intuitive edit, and the
  * wrong one under this model — the assertion below goes red and says so.
  */
 export default {
@@ -34,8 +34,8 @@ const resolve = (name) =>
 /**
  * A token name, rendered as code.
  *
- * The colour is set here rather than inherited, and that is a finding rather
- * than a preference: Bootstrap's default `code` colour is `#d63384`, which
+ * The color is set here rather than inherited, and that is a finding rather
+ * than a preference: Bootstrap's default `code` color is `#d63384`, which
  * measures 4.28:1 on this ground — under AA's 4.5:1 — so a bare `<code>` in a
  * story canvas fails `check:storybook`'s a11y pass. The docs stylesheet is
  * fixed for docs pages (`.sbdocs code`), but a story canvas is not inside
@@ -87,8 +87,8 @@ export const RoleModel = () => (
     <div style={{ maxWidth: '1100px', padding: '24px', background: 'var(--surface-sunken)' }}>
         <h2 className="h4">By role — what a surface is for</h2>
         <p className="body2-txt" style={{ maxWidth: '62ch' }}>
-            Three of these five are the same colour. That is the model, not a mistake: a raised
-            card and an overlay are the page&rsquo;s own colour, lifted by shadow. Only{' '}
+            Three of these five are the same color. That is the model, not a mistake: a raised
+            card and an overlay are the page&rsquo;s own color, lifted by shadow. Only{' '}
             <Token>sunken</Token> changes fill, and it goes down.
         </p>
         <Grid>
@@ -142,7 +142,7 @@ RoleModel.play = async ({ canvasElement }) => {
     // The overlay role stops short of modals on purpose — see _elevation.scss.
     await expect(resolve('--surface-overlay-shadow')).not.toBe(resolve('--elevation-light-4'));
 
-    // Every role is an ALIAS. Nothing here introduced a colour, so each one has
+    // Every role is an ALIAS. Nothing here introduced a color, so each one has
     // to equal the level token it points at — that is what "nothing deleted,
     // nothing added" means, checked rather than asserted in a comment.
     await expect(resolve('--surface-default')).toBe(resolve('--color-surface-container-lowest'));
@@ -194,7 +194,7 @@ export const LevelModel = () => (
 LevelModel.play = async () => {
     // The point of this story is that the nine are genuinely different values —
     // that is what makes "pick one by eye" possible at all. If two of them ever
-    // collapse to the same colour, the ramp has a step that means nothing.
+    // collapse to the same color, the ramp has a step that means nothing.
     const levels = [
         '--color-surface-container-lowest',
         '--color-surface',

@@ -2,12 +2,12 @@
  * One fallback check, twice — the filesystem half of #268.
  *
  * WHY IT EXISTS. `scripts/token-fallbacks.mjs` already says, once, what the
- * defect is and how the colour and dimension families differ. What it does not
+ * defect is and how the color and dimension families differ. What it does not
  * own is the FILESYSTEM: the repo root, the `git ls-files` helper that exists
  * because this repository keeps agent worktrees under `.claude/worktrees/`, the
  * read, the memoized parse, the empty-corpus floor, the `--report` dump, and
  * the one place both families reach their RECORD. Those were spelled out twice,
- * 110 lines each, in `check-colour-fallbacks.mjs` and
+ * 110 lines each, in `check-color-fallbacks.mjs` and
  * `check-size-fallbacks.mjs`, and the two copies had already drifted in wording
  * while agreeing in fact.
  *
@@ -62,21 +62,21 @@ const SEARCH_ROOTS = ['design-system/src', '.storybook', 'prototypes'];
 /**
  * @typedef {object} Family
  * @property {string} check      the npm script name, for the banner.
- * @property {string} label      the `[colour]` / `[size]` prefix on `--update`.
+ * @property {string} label      the `[color]` / `[size]` prefix on `--update`.
  * @property {string} baseline   repo-relative path to the ratcheted record.
  * @property {string} noun       what one of this family's tokens is called, in
- *           a finding and in the green line: `colour`, `dimension`.
+ *           a finding and in the green line: `color`, `dimension`.
  * @property {string} absent     how the empty-corpus floor names what it looked
- *           for — a name pattern for colour, a kind for dimensions.
+ *           for — a name pattern for color, a kind for dimensions.
  * @property {string} [census]   the word before `token(s)` in the green line.
  *           Absent for the family whose whole namespace is its own name.
  * @property {string} prefix     the name `tokenCorpus` narrows to, and the one
  *           `fallbackUsages` scans for. Stated by both families rather than
  *           defaulted: `--color-` used to be the default of two separate
- *           functions, which made the colour family's most load-bearing fact
+ *           functions, which made the color family's most load-bearing fact
  *           the one thing its descriptor did not say.
- * @property {(value: string) => unknown} [normalise]  how two values of this
- *           family are compared. Defaults to colour's.
+ * @property {(value: string) => unknown} [normalize]  how two values of this
+ *           family are compared. Defaults to color's.
  * @property {(tokens: Map<string, string>) => Map<string, string>} [select]
  *           a second, VALUE-level narrowing after aliases resolve — which is
  *           how the dimension family is defined at all, since it has no shared
@@ -98,7 +98,7 @@ const SEARCH_ROOTS = ['design-system/src', '.storybook', 'prototypes'];
  * @param {Family} family
  */
 export function fallbackCheck(family) {
-  const { check, label, baseline: BASELINE, noun, absent, census, prefix, normalise, select, reportUndefined, why } =
+  const { check, label, baseline: BASELINE, noun, absent, census, prefix, normalize, select, reportUndefined, why } =
     family;
 
   // `git ls-files`, not a filesystem walk: this repository keeps agent worktrees
@@ -121,16 +121,16 @@ export function fallbackCheck(family) {
     // Aliases are resolved by `tokenCorpus`, so `--color-x: var(--color-y)`
     // compares as `--color-y`'s value rather than as an incomparable `var()`.
     // Load-bearing for dimensions (124 of 207 tokens are aliases) and measured,
-    // not assumed, for colour: adding it found two more `--color-info-*`
+    // not assumed, for color: adding it found two more `--color-info-*`
     // disagreements, one alias hop from `--color-tertiary-*` and so invisible to
     // the check that shipped in #313. Both were fixed rather than recorded;
-    // colour's set is still 191.
+    // color's set is still 191.
     //
     // The corpus resolves the WHOLE table before narrowing to the prefix, where
-    // the walk this replaced resolved inside the narrowed map — so a colour
+    // the walk this replaced resolved inside the narrowed map — so a color
     // token aliased to a name outside `--color-*` now resolves where it used to
     // come back as a `var()`. Measured over this tree: no such token exists, and
-    // both families' maps are byte-identical across the move (210 colour, 231
+    // both families' maps are byte-identical across the move (210 color, 231
     // dimension, no differing value).
     const resolved = new Map(
       [...tokenCorpus({ root: repoRoot, prefix, precedence: 'last' })].map(([name, entry]) => [
@@ -146,7 +146,7 @@ export function fallbackCheck(family) {
     const audit = fallbackAudit({
       tokens,
       usages: fallbackUsages(sources, { prefix }),
-      ...(normalise ? { normalise } : {}),
+      ...(normalize ? { normalize } : {}),
       reportUndefined,
     });
 
@@ -163,7 +163,7 @@ export function fallbackCheck(family) {
    * OPENED PER CALL rather than memoized with the audit. `openRatchet` reads
    * the record when it is opened and `update` merges into what it read, so a
    * ratchet held across a write would write the pre-write record back. The
-   * colour family writes two sets into one file and would undo its own first
+   * color family writes two sets into one file and would undo its own first
    * write; one named JSON file per call is nothing beside the corpus parse.
    */
   const gate = (repoRoot, set) => openRatchet({ file: BASELINE, set, repoRoot });

@@ -3,10 +3,10 @@
 // Slack asks for an LLM disclaimer. Attaching it to EVERY message — including
 // "Got it, cancelled" — is how people learn to skip it on the messages that
 // actually carry claims. The playbook's rule: substantive answers get the
-// footer, acknowledgements get nothing, and anything unrecognised falls back to
+// footer, acknowledgments get nothing, and anything unrecognized falls back to
 // the footer rather than to silence.
 //
-// The RELAY decides, not the model. The judgement is exactly the part a model
+// The RELAY decides, not the model. The judgment is exactly the part a model
 // would sometimes get wrong, and we already know everything needed to classify.
 //
 // THREE kinds, not two. A DRAFT is the one case where the standard footer is
@@ -17,14 +17,14 @@
 
 export type FooterKind = "full" | "draft" | "none";
 
-/** Below this, with no links and no structure, a reply is an acknowledgement:
+/** Below this, with no links and no structure, a reply is an acknowledgment:
  *  "Got it", "Cancelled", "Noted — thanks". There is nothing in it to check. */
 const ACK_MAX_CHARS = 220;
 
 /**
  * Classify a reply body.
  *
- * Biased toward "full" on purpose — a disclaimer on an acknowledgement is
+ * Biased toward "full" on purpose — a disclaimer on an acknowledgment is
  * noise, but a missing disclaimer on a factual answer is the failure the
  * footer exists to prevent. Every signal of substance wins.
  *

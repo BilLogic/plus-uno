@@ -44,7 +44,7 @@
 // when it promotes, the card's words (8) and one redraft (2) before its
 // Contributors (the first a Slack lookup or two, each further one a lookup by
 // name, three at most: 4): 19 — and, failing that, the page and up to three
-// block pages (4), its one PRD the same (4), the judgement (1), the search
+// block pages (4), its one PRD the same (4), the judgment (1), the search
 // (≤3) and the Contributors (4): 21, so `MATCH_COST` (22) at the worst. A
 // draft job: the token, then per path the path read (5), the draft, grind
 // then default (2), and the slice that cites it (1): `DRAFT_COST` (8). A job

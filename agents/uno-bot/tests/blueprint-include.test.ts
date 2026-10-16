@@ -1,7 +1,7 @@
 // `include` rows → the shapes fetchEdges/fetchFindings used to return.
 //
-// These two mappers are the seam where an optimisation could quietly become a
-// behaviour change. The bot stopped making two subrequests and started reading
+// These two mappers are the seam where an optimization could quietly become a
+// behavior change. The bot stopped making two subrequests and started reading
 // the same facts out of rows the search already returned; if the mapping drifts,
 // the model still gets a well-formed payload — just a wrong one. That reads in
 // Slack as the blueprint having changed, not as a bug.

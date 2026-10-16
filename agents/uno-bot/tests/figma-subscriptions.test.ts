@@ -82,7 +82,7 @@ describe("ensuring the subscriptions", () => {
     assert.deepEqual(figma.writes(), []);
   });
 
-  it("creates exactly #895's one subscription, ACTIVE, labelled, with the passcode — and a re-run creates none", async () => {
+  it("creates exactly #895's one subscription, ACTIVE, labeled, with the passcode — and a re-run creates none", async () => {
     const figma = await figmaWith();
     const first = await ensureSubscriptions({
       figma,

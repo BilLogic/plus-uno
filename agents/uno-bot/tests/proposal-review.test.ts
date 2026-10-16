@@ -175,7 +175,7 @@ describe("the card offers Review", () => {
       kind: "confirm",
       verb: "file a GitHub issue",
       fields: [
-        { label: "title", value: "Badge colour drift" },
+        { label: "title", value: "Badge color drift" },
         { label: "body", value: "The warning badge differs between code and Figma." },
       ],
       caveats: [],
@@ -183,7 +183,7 @@ describe("the card offers Review", () => {
     });
     const blocks = proposalCardBlocks(card.text, "Approved by <@U2>") as CardBlock[];
     const words = JSON.stringify(blocks);
-    assert.match(words, /Ready to \*file a GitHub issue\*: _Badge colour drift_/);
+    assert.match(words, /Ready to \*file a GitHub issue\*: _Badge color drift_/);
     assert.match(words, /Approved by <@U2>/);
     assert.doesNotMatch(words, /review before approving/);
     assert.deepEqual(cardButtons(blocks), ["View"]);

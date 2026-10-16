@@ -4,7 +4,7 @@
 //
 // WHY IT IS ITS OWN FILE. `loop.ts` is provider-free AND runtime-free: it names
 // no `Env`, no Workers type, no `fetch`, so `tsconfig.test.json` compiles it and
-// the loop's own behaviour is testable against a fake adapter without a network
+// the loop's own behavior is testable against a fake adapter without a network
 // or a Durable Object. These values used to live in the shared-constants bag
 // (`loop-shared.ts`), which reached every tool body and so dragged the whole
 // Workers type graph behind it — importing them from there would have put the

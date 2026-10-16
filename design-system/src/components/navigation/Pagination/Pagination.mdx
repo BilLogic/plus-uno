@@ -108,7 +108,7 @@ move between them or jump to a known one — admin tables of sessions, students,
 tutors. It is fully controlled: `currentPage` and `totalPages` are required, and
 every click calls `onPageChange` with the target page. It holds no state.
 
-The window of numbers is computed for you. `maxVisible` (default 5) centres the
+The window of numbers is computed for you. `maxVisible` (default 5) centers the
 window on the current page, and first and last pages are pinned with an ellipsis
 whenever the window does not reach them.
 
@@ -135,7 +135,7 @@ whenever the window does not reach them.
 
 ## Accessibility
 
-- **The structure is right.** A `nav` labelled by `ariaLabel` (default "Page
+- **The structure is right.** A `nav` labeled by `ariaLabel` (default "Page
   navigation") wraps a `ul` of `li`s, and the active page carries
   `aria-current="page"`.
 - **Page numbers announce as bare numbers.** Only the previous and next controls

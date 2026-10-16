@@ -7,7 +7,7 @@
  * spelled twelve times and never the same way twice. `ratchet()` in
  * `design-system/src/lib/tokens.mjs` (#506) already unified the CLASSIFICATION
  * for nine of them, and #599 moved it here, because a baseline record has
- * nothing to do with colour maths and because classification was only the
+ * nothing to do with color maths and because classification was only the
  * middle third of the job. What was still twelve-times-over is the READ (which
  * container in the record holds the set, and where the human's reason lives)
  * and the WRITE.
@@ -193,7 +193,7 @@ const number = (value, file, where) => {
 };
 
 /**
- * Normalise one side of the comparison — the record's container, or what a run
+ * Normalize one side of the comparison — the record's container, or what a run
  * just measured — into `Map<key, {counts: Map<field, number>, reason, raw}>`.
  *
  * The SAME function reads both sides, from the SAME declared form. That is what

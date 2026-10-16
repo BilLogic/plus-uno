@@ -112,7 +112,7 @@ export function postingDeps(env: Env): PostingDeps {
  *
  * Each method is a thin currying of the module-level function the Worker has
  * always used — nothing is decided here, which is the point: a line of
- * judgement in this file is a line the Node suite cannot reach.
+ * judgment in this file is a line the Node suite cannot reach.
  */
 function slackClientFor(env: Env): SlackDeliveryClient {
   const posting = postingDeps(env);
@@ -178,7 +178,7 @@ function postingClientFor(env: Env): PostingClient {
  * agent loop's own callbacks, mid-lookup, and the lookup limit is one field on
  * the per-invocation meter. Unlabelled, a card update was charged to the lookup
  * ceiling, could be refused by it, and stamped a complete result as partial
- * (`net.ts` § asDelivery). Labelled here, at the record, so every Slack call
+ * (`net.ts` § asDelivery). Labeled here, at the record, so every Slack call
  * Delivery makes — the checklist and the answer above all — carries it, and a
  * method added to either record carries it without anyone remembering to.
  */

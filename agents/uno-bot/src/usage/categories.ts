@@ -80,7 +80,7 @@ export function painCategoryOf(subType: SubType | null, staged: boolean): PainCa
   return subType ? PAIN_CATEGORY_OF_SUB_TYPE[subType] : null;
 }
 
-/** Classification is a short labelling call: the cheapest tier. */
+/** Classification is a short labeling call: the cheapest tier. */
 export const CLASSIFY_TIER: ModelTier = "chill";
 
 /** Each ask is cut to this before it is sent — a label needs the gist. */

@@ -13,11 +13,11 @@ import Accordion from './Accordion/Accordion';
  * for anyone using a keyboard — the mouse was stopped and nobody else was.
  *
  * That is the worst shape a disabled control can take, because it reads as
- * handled: it is greyed out, the mouse does nothing, and the defect is only
+ * handled: it is grayed out, the mouse does nothing, and the defect is only
  * visible to someone who tabs to it and presses Enter.
  *
  * axe cannot see it either. `aria-disabled` was not set and no rule says "this
- * greyed-out button should be disabled" — the class is styling, and styling is
+ * grayed-out button should be disabled" — the class is styling, and styling is
  * not a contract.
  */
 

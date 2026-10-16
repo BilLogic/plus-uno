@@ -37,7 +37,7 @@ export default function useInlineEdit({ enabled, multiline = false, value, defau
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState(null);
     const [focused, setFocused] = useState(false);
-    const cancelling = useRef(false);
+    const canceling = useRef(false);
     const controlRef = useRef(null);
 
     const setDraft = useCallback((next) => {
@@ -72,11 +72,11 @@ export default function useInlineEdit({ enabled, multiline = false, value, defau
     }, [controlled, onSave, saved]);
 
     const cancel = useCallback(() => {
-        cancelling.current = true;
+        canceling.current = true;
         setDraft(saved);
         setError(null);
         if (controlRef.current) controlRef.current.blur();
-        cancelling.current = false;
+        canceling.current = false;
     }, [saved, setDraft]);
 
     if (!enabled) {
@@ -105,7 +105,7 @@ export default function useInlineEdit({ enabled, multiline = false, value, defau
 
     const onBlur = () => {
         setFocused(false);
-        if (multiline || cancelling.current) return;
+        if (multiline || canceling.current) return;
         save();
     };
 

@@ -1,4 +1,4 @@
-// The loop's behaviour, driven through `runLoop` with the fake ModelProvider.
+// The loop's behavior, driven through `runLoop` with the fake ModelProvider.
 //
 // Every case here is one of the things that used to exist twice, once per
 // provider, and therefore worked on one provider and not the other: `/stop`,
@@ -252,14 +252,14 @@ test("a stop landing during the last call of a multi-iteration turn suppresses t
   assert.deepEqual(rec.executed, ["search_blueprint", "search_blueprint"]);
 });
 
-test("a stop landing during the synthesis pass suppresses what it synthesised", async () => {
+test("a stop landing during the synthesis pass suppresses what it synthesized", async () => {
   // The budget-exhausted pass delivers text like any other exit, so it reads
   // the flag like any other exit — the case that had no coverage at all.
   const store = createInMemoryThreadState();
   const rec = recorder({ budget: { used: () => LOOKUP_CEILING - 1 } });
   rec.deps.threadState = store;
   const scripted = fake({ replies: [{ text: "what I managed to gather" }] });
-  const pressedWhileSynthesising: LoopInput["provider"] = {
+  const pressedWhileSynthesizing: LoopInput["provider"] = {
     ...scripted,
     async send(opts) {
       const reply = await scripted.send(opts);
@@ -268,7 +268,7 @@ test("a stop landing during the synthesis pass suppresses what it synthesised", 
     },
   };
 
-  const result = await runLoop(loopInput(pressedWhileSynthesising, rec, { cancelKey: CANCEL_REF }));
+  const result = await runLoop(loopInput(pressedWhileSynthesizing, rec, { cancelKey: CANCEL_REF }));
 
   assert.deepEqual(result, { kind: "stopped" });
   // The synthesis pass itself ran — the flag is read after it, not instead of

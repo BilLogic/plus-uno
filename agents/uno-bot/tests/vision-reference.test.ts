@@ -48,7 +48,7 @@ test("an image-only Slack message survives thread-history reconstruction", () =>
   );
 });
 
-test("a stored figma reference is one the renderer can actually honour", () => {
+test("a stored figma reference is one the renderer can actually honor", () => {
   // These four were accepted by the old substring pattern and refused by
   // parseFigmaUrl, so each stored a reference the next turn could never
   // render — and made the turn look like it carried files, which costs it the

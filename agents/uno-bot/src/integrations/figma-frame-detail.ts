@@ -23,7 +23,7 @@
 // Layers are matched by node id, which Figma keeps across versions. Added and
 // removed are said of the outermost layer only — a removed group's children
 // went with it. Position is not compared: a layer that moved because its
-// neighbour grew did not change.
+// neighbor grew did not change.
 
 import type { FigmaAnnotation, FigmaColor, FigmaNode, FigmaPaint } from "./figma-reading";
 

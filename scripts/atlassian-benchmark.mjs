@@ -9,13 +9,13 @@
  * token files on every run.
  *
  * WHAT IT IS NOT. It is not a target. Differing from Atlassian is often
- * correct — they ship 100 chart colours and 21 elevation tokens for a product
+ * correct — they ship 100 chart colors and 21 elevation tokens for a product
  * surface we do not have. The check that consumes this fails on DIRECTION, not
  * on distance, and only on the rows where a direction has actually been argued
  * for.
  *
  * THE FINDINGS, measured 2026-08-29. The first draft of this file recorded
- * that we have "no role namespace in colour at all", which is false and worth
+ * that we have "no role namespace in color at all", which is false and worth
  * saying plainly: `--color-surface*` (36) is the background role and
  * `--color-outline*` (8) is the border role, under Material's names rather than
  * Atlassian's. Counting only the literal strings `background` and `border` in
@@ -26,14 +26,14 @@
  *    49 and `color.icon` 23 — because the bars differ: text must reach 4.5:1
  *    and an icon 3:1. We have one `--color-on-*` family (32) serving both, so
  *    no token records which bar its value was chosen against. Nothing in the
- *    system can tell you whether a colour passing as an icon was ever checked
+ *    system can tell you whether a color passing as an icon was ever checked
  *    as text.
  *
  * 2. EVERY INTENT NAMES TWO ROLES AND USES THREE. All seven intents — primary,
  *    secondary, tertiary, danger, success, warning, info — have the identical
  *    9-token shape: a base, a container, a `-text`, and six state overlays.
  *    There is no `--color-warning-border` and no `--color-warning-icon`, so an
- *    intent-coloured border or icon reaches for the BASE, which is also the
+ *    intent-colored border or icon reaches for the BASE, which is also the
  *    ground. That is exactly the gap #312's warning defect lived in:
  *    `--color-warning` measures 3.70:1 against white — failing both as a ground
  *    under white text and as text on white — while `--color-warning-text`
@@ -145,22 +145,22 @@ export const ROWS = [
   {
     key: 'intent.borderTokens',
     ours: (t) => t.filter((n) => INTENT.test(n) && n.endsWith('-border')).length,
-    theirs: (b) => b.colourByRole['color.border'],
+    theirs: (b) => b.colorByRole['color.border'],
     direction: 'up',
     why:
       'Zero. All seven intents have the same 9 tokens — base, container, -text and ' +
-      'six state overlays — so an intent-coloured BORDER reaches for the base, which ' +
-      'is also the ground. Atlassian name 39 border colours precisely so a stroke ' +
+      'six state overlays — so an intent-colored BORDER reaches for the base, which ' +
+      'is also the ground. Atlassian name 39 border colors precisely so a stroke ' +
       'never has to borrow a fill.',
   },
   {
     key: 'intent.iconTokens',
     ours: (t) => t.filter((n) => INTENT.test(n) && n.endsWith('-icon')).length,
-    theirs: (b) => b.colourByRole['color.icon'],
+    theirs: (b) => b.colorByRole['color.icon'],
     direction: 'up',
     why:
       'Zero, and the bar is different: an icon must reach 3:1 where text must reach ' +
-      '4.5:1. Atlassian keep 23 icon colours apart from their 49 text colours for ' +
+      '4.5:1. Atlassian keep 23 icon colors apart from their 49 text colors for ' +
       'that reason. --color-warning is 3.70:1 on white — legal as an icon, illegal ' +
       'as text — and nothing in its name says so, which is where #312 came from.',
   },
@@ -201,11 +201,11 @@ export const ROWS = [
    */
   { key: 'type.textSizes', ours: (t, repoRoot) => textScale(repoRoot).sizes.length, theirs: (b) => b.typeSteps.count, direction: null },
   { key: 'type.fontSizeTokens', ours: (t) => t.filter((n) => n.startsWith('--font-size-')).length, theirs: (b) => b.typeSteps.count, direction: null },
-  { key: 'role.background(surface)', ours: (t) => t.filter((n) => n.startsWith('--color-surface')).length, theirs: (b) => b.colourByRole['color.background'], direction: null },
-  { key: 'role.foreground(on-*)', ours: (t) => t.filter((n) => n.startsWith('--color-on-')).length, theirs: (b) => b.colourByRole['color.text'] + b.colourByRole['color.icon'], direction: null },
-  { key: 'role.border(outline)', ours: (t) => t.filter((n) => n.startsWith('--color-outline')).length, theirs: (b) => b.colourByRole['color.border'], direction: null },
-  { key: 'intent.textTokens', ours: (t) => t.filter((n) => INTENT.test(n) && n.endsWith('-text')).length, theirs: (b) => b.colourByRole['color.text'], direction: null },
-  { key: 'colour.total', ours: (t) => t.filter((n) => n.startsWith('--color-')).length, theirs: (b) => b.totals.color, direction: null },
+  { key: 'role.background(surface)', ours: (t) => t.filter((n) => n.startsWith('--color-surface')).length, theirs: (b) => b.colorByRole['color.background'], direction: null },
+  { key: 'role.foreground(on-*)', ours: (t) => t.filter((n) => n.startsWith('--color-on-')).length, theirs: (b) => b.colorByRole['color.text'] + b.colorByRole['color.icon'], direction: null },
+  { key: 'role.border(outline)', ours: (t) => t.filter((n) => n.startsWith('--color-outline')).length, theirs: (b) => b.colorByRole['color.border'], direction: null },
+  { key: 'intent.textTokens', ours: (t) => t.filter((n) => INTENT.test(n) && n.endsWith('-text')).length, theirs: (b) => b.colorByRole['color.text'], direction: null },
+  { key: 'color.total', ours: (t) => t.filter((n) => n.startsWith('--color-')).length, theirs: (b) => b.totals.color, direction: null },
   { key: 'font.total', ours: (t) => t.filter((n) => n.startsWith('--font-')).length, theirs: (b) => b.totals.font, direction: null },
   { key: 'space', ours: (t) => t.filter((n) => n.startsWith('--size-spacing-')).length, theirs: (b) => b.totals.space, direction: null },
   { key: 'elevation', ours: (t) => t.filter((n) => n.startsWith('--elevation-')).length, theirs: (b) => b.totals.elevation, direction: null },

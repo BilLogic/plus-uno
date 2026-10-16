@@ -56,7 +56,7 @@ import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import {
   composite,
   contrast,
-  parseColour,
+  parseColor,
   readTokens,
   resolveToken,
   toHex,
@@ -78,7 +78,7 @@ export const AA_TEXT = 4.5;
  * Every `--color-*: value;` in the token stylesheet, as a Map.
  *
  * The `--color-` narrowing is the whole difference from the module's
- * `readTokens`: this check resolves colours, and a colour that resolved through
+ * `readTokens`: this check resolves colors, and a color that resolved through
  * a spacing token would be a different defect wearing this check's name.
  *
  * @param {string} source
@@ -111,19 +111,19 @@ export function themeMap(source) {
 }
 
 /**
- * Ground and label for one style × fill, resolved to colours.
+ * Ground and label for one style × fill, resolved to colors.
  *
  * @returns {{ground: object, label: object}|{unresolved: string[]}}
  */
 export function combination(theme, fill, values) {
-  const page = parseColour(resolveToken(PAGE_TOKEN, values));
+  const page = parseColor(resolveToken(PAGE_TOKEN, values));
   const need = fill === 'filled' ? [theme.main, theme.onMain] : [theme.state, theme.text];
-  const unresolved = [PAGE_TOKEN, ...need].filter((token) => !parseColour(resolveToken(token, values)));
+  const unresolved = [PAGE_TOKEN, ...need].filter((token) => !parseColor(resolveToken(token, values)));
   if (unresolved.length) return { unresolved };
 
-  const label = parseColour(resolveToken(fill === 'filled' ? theme.onMain : theme.text, values));
-  if (fill === 'filled') return { ground: parseColour(resolveToken(theme.main, values)), label };
-  if (fill === 'tonal') return { ground: composite(parseColour(resolveToken(theme.state, values)), page), label };
+  const label = parseColor(resolveToken(fill === 'filled' ? theme.onMain : theme.text, values));
+  if (fill === 'filled') return { ground: parseColor(resolveToken(theme.main, values)), label };
+  if (fill === 'tonal') return { ground: composite(parseColor(resolveToken(theme.state, values)), page), label };
   return { ground: page, label };
 }
 
@@ -153,7 +153,7 @@ export function sweep(themes, values) {
  * Styles whose FILLED ground is identical to another's.
  *
  * Filled is the discriminator: it is the only fill that paints the style's own
- * colour, so two styles sharing it share their whole appearance.
+ * color, so two styles sharing it share their whole appearance.
  *
  * @returns {string[][]} groups of two or more style names
  */

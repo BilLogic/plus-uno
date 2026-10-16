@@ -159,7 +159,7 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
       // reachable from the thread the person is already reading.
       //
       // Handled INLINE rather than enqueued onto the AgentRunner. The runner
-      // serialises work per thread, and the work this thread is running is
+      // serializes work per thread, and the work this thread is running is
       // exactly what the press is trying to stop — a stop queued behind it
       // would arrive after the run it was meant to interrupt. It is also two
       // Slack calls and two store reads, which fits the ack window that the

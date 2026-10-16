@@ -1,7 +1,7 @@
 // The eight fixes the blueprint tool used to carry as comments, as assertions
 // (#607).
 //
-// WHAT CHANGED THAT MADE THIS FILE POSSIBLE. Every one of these behaviours was
+// WHAT CHANGED THAT MADE THIS FILE POSSIBLE. Every one of these behaviors was
 // a fix applied to `blueprint-search.ts` and then guarded by a paragraph of
 // prose above it, because the only way to reach the tool was through `Env`,
 // `searchBlueprint` and the network — so the alternative to a comment was a

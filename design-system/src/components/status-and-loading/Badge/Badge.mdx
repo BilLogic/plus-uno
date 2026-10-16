@@ -226,10 +226,10 @@ Reach for it when the label is a *property* of the row, not an action on it.
 ```jsx
 // Incorrect — a badge with a click handler. `onClick` is not a prop, so it is
 // silently dropped, and even spread onto the element it would have no role.
-<Badge text="Cancelled" style="danger" onClick={reopen} />
+<Badge text="Canceled" style="danger" onClick={reopen} />
 
 // Correct — the badge states the status, a Button changes it.
-<Badge text="Cancelled" style="danger" />
+<Badge text="Canceled" style="danger" />
 <Button text="Reopen session" fill="text" size="small" onClick={reopen} />
 ```
 
@@ -260,7 +260,7 @@ that follows it. It is not a width or a height, and two badges at the same
 - **The badge itself is not interactive, on purpose.** The source says so: a
   `role="button"` wrapper would nest one control inside another once
   `dismissible` adds its own button, which ARIA forbids.
-- **The dismiss control is a real `button`, labelled `Dismiss`.** That string is
+- **The dismiss control is a real `button`, labeled `Dismiss`.** That string is
   hard-coded and there is no prop to change it, so several dismissible badges in
   a row expose several identically named buttons. Give the row a named
   `role="group"` so each one is announced in context.

@@ -41,7 +41,7 @@ test("a conversation the bot opened keeps what the bot said, ahead of the first 
   // A relayed DM, a share-out post, a notification a reply hangs off: the
   // bot's message comes first, and "what's this about?" is a question about
   // it. The provider needs a user turn first, so the opening rides at the head
-  // of that turn, labelled as the bot's own — dropping it left the bot unable
+  // of that turn, labeled as the bot's own — dropping it left the bot unable
   // to say what it had sent.
   const conversation = buildProviderConversation(
     [{ role: "assistant", content: "<@U0REQ> asked me to pass this on:\n\nRM-2436 is Ready for QA." }],

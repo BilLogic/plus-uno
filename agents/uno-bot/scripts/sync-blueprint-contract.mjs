@@ -49,7 +49,7 @@ const check = process.argv.includes("--check");
 // moved what that deployment still owns to `deployment/`. The path was written
 // down in two places that run — this constant and finish-cutover.sh's checkout
 // probe — and the second was not found when the first was fixed, so the cutover
-// helper would have gone on failing to recognise a perfectly good checkout.
+// helper would have gone on failing to recognize a perfectly good checkout.
 // `--source-path` prints this string so the shell can ask rather than repeat.
 // The test keeps its own literal on purpose: a fixture that derived the path
 // from the script under test would assert nothing.
@@ -274,7 +274,7 @@ function announce(level, message) {
 // listed it as one of four gates protecting an auto-deploy to main. A gate that
 // cannot fail is worse than no gate: it is a gate everyone believes in.
 //
-// Set BLUEPRINT_CONTRACT_OPTIONAL=1 to get the old behaviour, and say so out
+// Set BLUEPRINT_CONTRACT_OPTIONAL=1 to get the old behavior, and say so out
 // loud when you do — the deploy workflow sets it only when the checkout secret
 // is unconfigured. BLUEPRINT_CONTRACT_REQUIRED=1 overrides it either way, so
 // the skip can be closed off from repo settings without editing this file: set

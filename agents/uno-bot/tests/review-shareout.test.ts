@@ -34,7 +34,7 @@ const INPUT = {
     "Does the confirmation step need the calendar add?",
     "Anything in the copy that reads as a promise we can't keep?",
   ],
-  not_looking_for: "Visual polish; colours are placeholders.",
+  not_looking_for: "Visual polish; colors are placeholders.",
   link: "https://plus-uno.netlify.app/prototypes/session-sign-up",
   reviewers: ["U0BRYAN001"],
   deadline: "EOD Friday",

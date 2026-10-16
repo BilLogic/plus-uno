@@ -8,7 +8,7 @@
 // review it. The guard replaces both properties — it holds at every ref, and
 // it keeps the answer key legible to humans.
 //
-// The cases below are the ways around it that a normalisation bug would open.
+// The cases below are the ways around it that a normalization bug would open.
 import { describe, it } from "node:test";
 import { readdirSync } from "node:fs";
 import { resolve } from "node:path";

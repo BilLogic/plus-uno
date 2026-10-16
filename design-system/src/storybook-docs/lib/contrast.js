@@ -1,4 +1,4 @@
-import { composite, contrast, parseColour } from '../../lib/tokens.mjs';
+import { composite, contrast, parseColor } from '../../lib/tokens.mjs';
 
 /**
  * WCAG contrast between two COMPUTED colors, for story `play:` functions.
@@ -38,8 +38,8 @@ export function paintedOver(color, background) {
 
 /** Both colors parsed, the front one laid over the (opaque) back one. */
 function flatten(color, background) {
-    const back = parseColour(background);
-    const front = parseColour(color);
+    const back = parseColor(background);
+    const front = parseColor(color);
     if (!back || !front) throw new Error(`cannot read ${color} on ${background}`);
     return { front: front.a < 1 ? composite(front, back) : front, back };
 }

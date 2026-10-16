@@ -73,7 +73,7 @@ function componentNameFromMdx(mdxAbsPath) {
 
 /**
  * Every authored `.mdx` under `dir`, absolute. The walk is the corpus's (#503);
- * what stays local is the one judgement — a ` 2.mdx` name is a Finder copy, not
+ * what stays local is the one judgment — a ` 2.mdx` name is a Finder copy, not
  * a page.
  */
 function walkMdxFiles(dir) {

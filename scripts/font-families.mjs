@@ -6,7 +6,7 @@
  * load — a stylesheet that has not arrived, a page rendered outside the design
  * system, an email client. So a wrong one is wrong everywhere at once and
  * invisible until the one moment it is used. This is the reasoning
- * `check:colour-fallbacks` already applies to colour; nothing applied it to
+ * `check:color-fallbacks` already applies to color; nothing applied it to
  * type.
  *
  * THREE SHAPES, EACH MEASURED 2026-08-29.

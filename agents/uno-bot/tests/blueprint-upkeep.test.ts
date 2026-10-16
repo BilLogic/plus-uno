@@ -198,7 +198,7 @@ describe("a deployed card that changes the service", () => {
     assert.deepEqual(w.state.b.value.waiting, [], "staged, so no longer waiting");
   });
 
-  it("drafts on the grind tier after a default-tier judgement", async () => {
+  it("drafts on the grind tier after a default-tier judgment", async () => {
     const model = scripted({ default: [SERVICE], grind: [DRAFT] });
     await runShippedRevisions(world({ model }).deps);
     assert.deepEqual(model.asked.map((p) => p.tier), ["default", "grind"]);

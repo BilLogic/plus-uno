@@ -146,14 +146,14 @@ test("every card whose title contains the phrase comes back, and the count is th
 
   assert.equal(out.ok, true);
   // The bug itself: the six-candidate cap kept the newest six and dropped the
-  // rest, whatever they were labelled.
+  // rest, whatever they were labeled.
   const returned = out.cards.map((c) => c.card_number);
   for (const n of DS_UPDATE) assert.ok(returned.includes(n), `RM-${n} is missing from the result`);
   const hits = out.cards.filter((c) => c.title_match === "contains").map((c) => c.card_number);
   assert.deepEqual(hits.sort(byNumber), [...DS_UPDATE].sort(byNumber));
   assert.equal(out.contains_count, 9);
   // Nine hits fill the list; cards that only share the word "update" are not
-  // padded in after them, and none is ever labelled a hit.
+  // padded in after them, and none is ever labeled a hit.
   assert.equal(out.count, 9);
   for (const c of out.cards) {
     assert.equal(c.title_match === "contains", c.title.toLowerCase().includes("ds update"), c.title);

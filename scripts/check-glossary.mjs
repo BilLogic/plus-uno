@@ -128,7 +128,7 @@ export function measure(text) {
 const measured = byRoot((repoRoot) => measure(readFileSync(path.join(repoRoot, SUBJECT), 'utf8')));
 
 /**
- * The ratchet over the record, opened fresh on every call rather than memoised:
+ * The ratchet over the record, opened fresh on every call rather than memoized:
  * `--update` writes the record and then FALLS THROUGH to the gate, which reads
  * it back, and a cached record would answer with the one from before the write.
  */

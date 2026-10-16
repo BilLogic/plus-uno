@@ -38,7 +38,7 @@ export const MADE_LAST_CHOICES: readonly ReminderChoice[] = [
 ];
 
 /** What replaces that legend once the owner answers. 🤔 means nothing here. */
-export function madeToAcknowledgement(answer: Exclude<ReminderAnswer, "not_promise">, checkBackDay?: string): string {
+export function madeToAcknowledgment(answer: Exclude<ReminderAnswer, "not_promise">, checkBackDay?: string): string {
   switch (answer) {
     case "done":
       return "Got it. I'll leave it there.";

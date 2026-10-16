@@ -115,7 +115,7 @@ export const slackStreamProbe: ProbeRun = async (env, url) => {
 // verdict verbatim, `response_metadata` included. The stream probe proves what
 // a stream takes; this proves what an ordinary post takes, so a new block shape
 // is tried against production Slack in a DM before anything is switched on for
-// the team. Nothing is sanitised on the way out, on purpose — a shape the
+// the team. Nothing is sanitized on the way out, on purpose — a shape the
 // Worker would mend is not the shape being asked about.
 //
 // ?channel= (required) ?blocks=<JSON array> (required) ?text= (the plain-text
@@ -178,7 +178,7 @@ export const slackPostProbe: ProbeRun = async (env, url) => {
 };
 
 /** One Slack Web API call as the bot, the body sent as JSON exactly as given —
- *  the stream and post probes' one way out, unsanitised on purpose. */
+ *  the stream and post probes' one way out, unsanitized on purpose. */
 function slackPost(env: Env, method: string, body: Record<string, unknown>): Promise<Response> {
   return countedFetch(`https://slack.com/api/${method}`, {
     method: "POST",

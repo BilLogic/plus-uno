@@ -128,7 +128,7 @@ test("a config file's bare string DOES count — that is where addons live", () 
   assert.deepEqual(unused, []);
 });
 
-test("every import spelling is recognised", () => {
+test("every import spelling is recognized", () => {
   for (const text of [
     'import x from "pkg";',
     "import 'pkg';",
@@ -231,7 +231,7 @@ test("markdown counts — a README is where a setup snippet gets copied from", (
 
 test("a baselined library with a NEW version is still a finding", () => {
   // The ratchet's rule: the recorded set may only shrink. A baseline entry for
-  // "fontawesome" must not become a blank cheque for every future fontawesome.
+  // "fontawesome" must not become a blank check for every future fontawesome.
   const recorded = ["6.4.0", "7.2.0"];
   const live = pinConflicts(
     cdnPins([

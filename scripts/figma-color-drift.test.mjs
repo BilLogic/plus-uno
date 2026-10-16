@@ -4,13 +4,13 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { cssName, cssColours, normalise, compare, failures } from './figma-colour-drift.mjs';
-import { run } from './check-figma-colour-drift.mjs';
+import { cssName, cssColors, normalize, compare, failures } from './figma-color-drift.mjs';
+import { run } from './check-figma-color-drift.mjs';
 import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const RECORDING = JSON.parse(
-  fs.readFileSync(path.join(REPO_ROOT, 'design-system/figma/colour-values.json'), 'utf8'),
+  fs.readFileSync(path.join(REPO_ROOT, 'design-system/figma/color-values.json'), 'utf8'),
 );
 
 test('the Figma naming convention maps onto the CSS one', () => {
@@ -48,30 +48,30 @@ test('a name recorded before the 2026-09-06 rename still maps', () => {
   assert.equal(cssName('_Proposal/Info Bold (candidate)'), null);
 });
 
-test('normalise reads every form both sides write', () => {
-  assert.equal(normalise('#ABCDEF'), '#abcdef');
-  assert.equal(normalise('#abc'), '#aabbcc');
-  assert.equal(normalise('rgba(189, 242, 146, 0.5)'), '#bdf292@0.50');
-  assert.equal(normalise('rgb(0, 0, 0)'), '#000000');
-  assert.equal(normalise('rgba(0, 0, 0, 1)'), '#000000', 'fully opaque loses the suffix on both sides');
-  assert.equal(normalise('#000000@0.320'), '#000000@0.32');
-  assert.equal(normalise('var(--something)'), null);
+test('normalize reads every form both sides write', () => {
+  assert.equal(normalize('#ABCDEF'), '#abcdef');
+  assert.equal(normalize('#abc'), '#aabbcc');
+  assert.equal(normalize('rgba(189, 242, 146, 0.5)'), '#bdf292@0.50');
+  assert.equal(normalize('rgb(0, 0, 0)'), '#000000');
+  assert.equal(normalize('rgba(0, 0, 0, 1)'), '#000000', 'fully opaque loses the suffix on both sides');
+  assert.equal(normalize('#000000@0.320'), '#000000@0.32');
+  assert.equal(normalize('var(--something)'), null);
 });
 
 test('the CSS side follows alias chains', () => {
-  const colours = cssColours(REPO_ROOT);
+  const colors = cssColors(REPO_ROOT);
   // --color-info is `var(--color-tertiary)`, and --color-info-icon is
   // `var(--color-info-text)` -> `var(--color-tertiary-text)` — two hops, and
   // across two files, since the role layer lives in its own stylesheet. A
   // scanner that stopped at the first hop would report `var(...)` and be
   // unreadable rather than wrong, which is worse.
-  assert.equal(colours.get('--color-info'), colours.get('--color-tertiary'));
-  assert.equal(colours.get('--color-info-icon'), colours.get('--color-tertiary-text'));
-  assert.match(colours.get('--color-info-icon'), /^#[0-9a-f]{6}$/);
+  assert.equal(colors.get('--color-info'), colors.get('--color-tertiary'));
+  assert.equal(colors.get('--color-info-icon'), colors.get('--color-tertiary-text'));
+  assert.match(colors.get('--color-info-icon'), /^#[0-9a-f]{6}$/);
 });
 
 test('the repository is in the state the check records', () => {
-  const result = compare(RECORDING, cssColours(REPO_ROOT));
+  const result = compare(RECORDING, cssColors(REPO_ROOT));
   assert.ok(result.compared >= 90, `only ${result.compared} compared`);
   assert.equal(result.unreadable.length, 0);
   assert.deepEqual(
@@ -144,7 +144,7 @@ test('the recording is a measurement with its method attached', () => {
  * @param {{drift?: boolean}} [opts]
  * @returns {{scss: string, recording: string}}
  */
-function colourPairs({ drift = false } = {}) {
+function colorPairs({ drift = false } = {}) {
   const variables = {};
   const decls = [];
   for (let i = 0; i < 90; i += 1) {
@@ -163,11 +163,11 @@ function colourPairs({ drift = false } = {}) {
   };
 }
 
-test('a CSS colour that drifted from Figma in a fixture tree is a finding', () => {
-  const { scss, recording } = colourPairs({ drift: true });
+test('a CSS color that drifted from Figma in a fixture tree is a finding', () => {
+  const { scss, recording } = colorPairs({ drift: true });
   const { root, done } = policyTree({
     'design-system/src/tokens/_colors.scss': scss,
-    'design-system/figma/colour-values.json': recording,
+    'design-system/figma/color-values.json': recording,
   });
   try {
     const found = messagesOf(run, root);
@@ -181,9 +181,9 @@ test('a CSS colour that drifted from Figma in a fixture tree is a finding', () =
 });
 
 test('an empty token directory fires the sentinel floor, not a clean sweep', () => {
-  const { recording } = colourPairs();
+  const { recording } = colorPairs();
   const { root, done } = policyTree({
-    'design-system/figma/colour-values.json': recording,
+    'design-system/figma/color-values.json': recording,
   });
   try {
     const found = messagesOf(run, root);

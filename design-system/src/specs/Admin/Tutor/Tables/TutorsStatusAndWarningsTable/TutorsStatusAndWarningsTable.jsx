@@ -16,7 +16,7 @@ import './TutorsStatusAndWarningsTable.scss';
 
 /**
  * A tutor's status, set from the table. "Check-In Needed" asks the admin to
- * act, so its field carries the info colour role.
+ * act, so its field carries the info color role.
  */
 const StatusCell = ({ tutor, options, onStatusChange }) => {
     const [status, setStatus] = useState(tutor.status);

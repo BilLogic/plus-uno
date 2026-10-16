@@ -1,5 +1,5 @@
 {
-  "why": "Literal fallbacks that disagree with their own token (#268). Keyed on \"<token> <literal>\" rather than file and line, because a line number churns on every edit above it while the pair is the actual decision. The set may shrink and never grow; delete an entry when it is fixed and the check reports any that no longer disagree. `undefinedTokens` is a separate list with a different endpoint: those names have no definition at all, so the fallback IS the colour, and the list should be driven to zero deliberately rather than shrinking as files are touched.",
+  "why": "Literal fallbacks that disagree with their own token (#268). Keyed on \"<token> <literal>\" rather than file and line, because a line number churns on every edit above it while the pair is the actual decision. The set may shrink and never grow; delete an entry when it is fixed and the check reports any that no longer disagree. `undefinedTokens` is a separate list with a different endpoint: those names have no definition at all, so the fallback IS the color, and the list should be driven to zero deliberately rather than shrinking as files are touched.",
   "disagreements": [
     "--color-danger #d32f2f",
     "--color-danger #ef4444",

@@ -90,7 +90,7 @@ export interface RosterRow {
   /** The row's own Slack id, when the database carries one. */
   slackUserId?: string;
   /** The row's Figma User ID cell as the member filled it in;
-   *  `normaliseFigmaId` reads the id out of it. */
+   *  `normalizeFigmaId` reads the id out of it. */
   figmaUserId?: string;
   /** The Notion users in the row's Notion Person cell. */
   notionUserIds?: readonly string[];
@@ -107,7 +107,7 @@ export interface DirectoryPerson {
 
 /** A name compared by what it says: case, accents and runs of whitespace do
  *  not count. Nothing looser — no initials, nicknames or partial names. */
-export function normalisePersonName(name: string): string {
+export function normalizePersonName(name: string): string {
   return name.normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase().replace(/\s+/g, " ").trim();
 }
 
@@ -116,7 +116,7 @@ export function normalisePersonName(name: string): string {
  * pasted Figma URL, else the first run of six or more digits. Undefined when
  * the cell holds neither.
  */
-export function normaliseFigmaId(raw: string): string | undefined {
+export function normalizeFigmaId(raw: string): string | undefined {
   return raw.match(/fuid=(\d+)/)?.[1] ?? raw.match(/\d{6,}/)?.[0];
 }
 
@@ -133,7 +133,7 @@ export interface RosterMatch {
   /** Each Figma user id a row carries, to the one Slack member that row
    *  matched. An id two rows give different members maps to nobody. */
   figmaPeople: FigmaPeople;
-  /** Rows whose Figma User ID is filled in but holds no id `normaliseFigmaId` reads. */
+  /** Rows whose Figma User ID is filled in but holds no id `normalizeFigmaId` reads. */
   unreadableFigma: string[];
   /** Each Notion user a row's Notion Person names, to the one Slack member
    *  that row matched, by the Figma map's rule. */
@@ -145,13 +145,13 @@ export interface RosterMatch {
   gaps: string[];
   /** Rows with a role matched to one Slack member, whose Notion Person is empty. */
   noNotionPerson: string[];
-  /** Rows, Past Collaborators aside, with no Figma User ID `normaliseFigmaId` reads. */
+  /** Rows, Past Collaborators aside, with no Figma User ID `normalizeFigmaId` reads. */
   noFigmaId: string[];
 }
 
 /**
  * The role map and the Figma people map. The role map: each roster row with a role, matched to the one Slack member
- * whose real name or display name is the row's name once normalised. A row
+ * whose real name or display name is the row's name once normalized. A row
  * that matches nobody, or more than one member, gives nobody a role; so does
  * a member two rows give different roles. A row's own Slack id, when it has
  * one, is taken as the match — but only when it is an active, non-bot member
@@ -172,7 +172,7 @@ export function matchRoster(roster: readonly RosterRow[], directory: readonly Di
   const deactivated = new Set<string>();
   for (const person of directory) {
     if (person.is_bot || person.id === "USLACKBOT") continue;
-    const names = [person.real_name, person.profile?.display_name].map((n) => (n ? normalisePersonName(n) : "")).filter(Boolean);
+    const names = [person.real_name, person.profile?.display_name].map((n) => (n ? normalizePersonName(n) : "")).filter(Boolean);
     if (person.deleted) {
       deactivated.add(person.id);
       for (const key of names) deactivated.add(`name:${key}`);
@@ -197,11 +197,11 @@ export function matchRoster(roster: readonly RosterRow[], directory: readonly Di
     if (row.affiliation === PAST_COLLABORATORS) continue;
     const ids = row.slackUserId
       ? active.has(row.slackUserId) ? [row.slackUserId] : []
-      : [...(byName.get(normalisePersonName(row.name)) ?? [])];
+      : [...(byName.get(normalizePersonName(row.name)) ?? [])];
     const [id] = ids;
     // A row that matches nobody, or more than one member, maps its ids to nobody.
     const member = id && ids.length === 1 ? id : "";
-    const figmaId = row.figmaUserId?.trim() ? normaliseFigmaId(row.figmaUserId) : undefined;
+    const figmaId = row.figmaUserId?.trim() ? normalizeFigmaId(row.figmaUserId) : undefined;
     if (row.figmaUserId?.trim() && !figmaId) unreadableFigma.push(row.name);
     if (!figmaId) noFigmaId.push(row.name);
     if (figmaId) figma.set(figmaId, (figma.get(figmaId) ?? new Set<string>()).add(member));
@@ -210,7 +210,7 @@ export function matchRoster(roster: readonly RosterRow[], directory: readonly Di
     }
     const role = row.group && Object.hasOwn(GROUP_ROLES, row.group) ? GROUP_ROLES[row.group] : undefined;
     if (!role) continue;
-    const left = row.slackUserId ? deactivated.has(row.slackUserId) : deactivated.has(`name:${normalisePersonName(row.name)}`);
+    const left = row.slackUserId ? deactivated.has(row.slackUserId) : deactivated.has(`name:${normalizePersonName(row.name)}`);
     if (!id) {
       unmatched.push(row.name);
       if (!left) gaps.push(row.name);

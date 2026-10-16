@@ -26,7 +26,7 @@ A tutor flagging a session for supervisor review.
 _Avoid_: "report", "incident", "alert"
 
 **Call-Off**:
-A tutor cancelling a session.
+A tutor canceling a session.
 _Avoid_: "cancel", "absence", "no-show" (no-show is a separate behavior)
 
 **Fill-In**:

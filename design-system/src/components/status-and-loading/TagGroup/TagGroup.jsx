@@ -255,7 +255,7 @@ export const TagGroup = ({
     const menuIsOpen = menuOpen && !isDisabled;
 
     /*
-     * The `+n` is the Figma set's: a grey selectable tag with no swatch (the
+     * The `+n` is the Figma set's: a gray selectable tag with no swatch (the
      * swatch is hidden in TagGroup.scss). It opens something rather than
      * toggling, so it reports `aria-expanded`, which is also what keeps Tag
      * from announcing it as a toggle.
@@ -263,7 +263,7 @@ export const TagGroup = ({
     const overflowTag = (label, extra) => (
         <Tag
             behavior="selectable"
-            color="grey"
+            color="gray"
             className="plus-tag-group__overflow"
             {...extra}
         >

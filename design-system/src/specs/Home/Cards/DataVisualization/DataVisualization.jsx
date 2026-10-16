@@ -33,7 +33,7 @@ const DataVisualization = ({
     const averagePerformance = skillsOverviewData?.averagePerformance || [70, 70, 65, 75, 60, 70, 60];
 
     // "Your performance" - blue filled area
-    // "Average tutor performance" - dashed grey line
+    // "Average tutor performance" - dashed gray line
     const radarSeries = [
         { 
             name: 'Your performance', 
@@ -44,7 +44,7 @@ const DataVisualization = ({
         { 
             name: 'Average tutor performance', 
             data: averagePerformance,
-            color: '#445c6a', // grey
+            color: '#445c6a', // gray
             dashStyle: 'Dash' // dashed line
         }
     ];

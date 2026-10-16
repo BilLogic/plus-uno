@@ -33,7 +33,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'Behaviour cover for the time half of DateAndTimePicker: a 12-hour value renders '
+                    'Behavior cover for the time half of DateAndTimePicker: a 12-hour value renders '
                     + 'as it was given, a 24-hour value is split into an hour and a period, the hour '
                     + 'field refuses a number the control cannot show, and an AM/PM change is '
                     + 'reported with or without a date.',
@@ -42,7 +42,7 @@ export default {
     },
 };
 
-/** The time field is the one labelled `Time`; the date field sits beside it. */
+/** The time field is the one labeled `Time`; the date field sits beside it. */
 const timeField = (canvas) => canvas.getByLabelText('Time');
 
 /**

@@ -8,7 +8,7 @@ import { StatusSelect } from './StatusSelect.jsx';
  * - **Partially engaged** needs a reason, so it adds a Reason Select beside
  *   the field, and `onStatusChange` fires once a reason is picked.
  * - The other statuses apply at once.
- * - Before a pick the field reads "Select"; it takes the colour of the status
+ * - Before a pick the field reads "Select"; it takes the color of the status
  *   picked.
  */
 

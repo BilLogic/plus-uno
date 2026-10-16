@@ -99,7 +99,7 @@ export function buildProviderConversation(
  *  name, status and link, not a document. */
 export const OPENING_QUOTE_MAX_CHARS = 1500;
 
-/** The opening as data: labelled, every line quoted, cut at the cap. */
+/** The opening as data: labeled, every line quoted, cut at the cap. */
 function quotedOpening(text: string): string {
   const cut =
     text.length > OPENING_QUOTE_MAX_CHARS ? `${text.slice(0, OPENING_QUOTE_MAX_CHARS).trimEnd()} …[cut]` : text;

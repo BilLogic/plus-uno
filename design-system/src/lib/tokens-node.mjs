@@ -9,8 +9,8 @@
  * filesystem" — and for two releases the file did not exist, so every check
  * answered the three questions below privately: seventeen hardcoded the token
  * directory, the family map was restated beside them, and `scripts/` carried
- * two color keys and two dimension normalisers that agreed neither with each
- * other nor with `parseColour`. #621 moved the checks and the generators on to
+ * two color keys and two dimension normalizers that agreed neither with each
+ * other nor with `parseColor`. #621 moved the checks and the generators on to
  * this file; #622 retired the docs check's remaining color key, alias
  * resolver and declaration regex, and replaced the registry generator's
  * `var()` — the loosest in the tree.
@@ -21,7 +21,7 @@
  *                 the table they define, read once, aliases followed. Moving
  *                 `design-system/src/tokens` becomes one edit here.
  *   THE FAMILIES  `FAMILIES` / `familyOf` — which family a token NAME is in.
- *   EQUALITY      `colourKey` / `dimensionKey` / `valueKey` / `sameValue` —
+ *   EQUALITY      `colorKey` / `dimensionKey` / `valueKey` / `sameValue` —
  *                 whether two VALUES are the same value.
  *
  * ─── IT READS THROUGH THE CORPUS, AND THAT IS THE POINT ─────────────────────
@@ -60,7 +60,7 @@
  * that, but until 2026-09-29 thirty were washes of a different color than
  * their name pointed at, because the solids were re-picked in Figma and the
  * washes never followed. The one remaining exception, shadow, is pinned in
- * `tokens-node.test.js`, and `colourKey` keeps alpha partly so a comparison
+ * `tokens-node.test.js`, and `colorKey` keeps alpha partly so a comparison
  * across that pairing cannot report an agreement nobody wrote.
  *
  * So the kind of a value is read off the VALUE — which is also the lesson
@@ -68,9 +68,9 @@
  * what they resolve to rather than by a prefix list, "so a new family is
  * covered the day it is minted". `valueKey` is that rule, once.
  *
- * ─── THE COLOR KEY IS WIDER THAN `parseColour` AND FINER THAN THE NORMALISER
+ * ─── THE COLOR KEY IS WIDER THAN `parseColor` AND FINER THAN THE NORMALIZER
  *
- * WIDER. `parseColour` in the browser half reads `#rgb`, `#rrggbb`, `rgb()`
+ * WIDER. `parseColor` in the browser half reads `#rgb`, `#rrggbb`, `rgb()`
  * and `rgba()`, and null for anything else — right for it, since what it feeds
  * is WCAG maths that needs channels. But `check:docs-token-literals` scans
  * stylesheets that contain `#abcd`, `#aabbccdd` and `hsl()`, and a module that
@@ -82,11 +82,11 @@
  * different colors.
  *
  * FINER, AND THE NUMBER IS MEASURED. Alpha is part of this key and was not
- * part of `normaliseColour`, the normaliser `scripts/token-fallbacks.mjs`
- * carried until #621 moved the fallback checks here: `parseColour` followed by
+ * part of `normalizeColor`, the normalizer `scripts/token-fallbacks.mjs`
+ * carried until #621 moved the fallback checks here: `parseColor` followed by
  * `toHex`, and `toHex` drops alpha. Over the live token corpus that is not a
  * rounding difference: 315 pairs of color tokens are EQUAL under the old
- * normaliser and UNEQUAL under this key — every one of them a translucent
+ * normalizer and UNEQUAL under this key — every one of them a translucent
  * state overlay keyed against a solid of the same channels, such
  * as `--color-secondary-state-08` (`rgba(68, 92, 106, 0.08)`) against
  * `--color-secondary-border` (`#445c6a`).
@@ -101,7 +101,7 @@
  * `var(--color-x, rgba(…))` are not matched AT ALL and never reach a
  * comparison in any form. That is a fact about the capture, not a property of
  * the key — the day a check reads a whole `rgba()` fallback, 315 pairs' worth
- * of behaviour changes, and the test says so where an "output unchanged"
+ * of behavior changes, and the test says so where an "output unchanged"
  * assertion would have hidden it.
  *
  * ALPHA IS PART OF THE KEY, then, deliberately: `rgba(0,0,0,.5)` keys as
@@ -109,7 +109,7 @@
  * forgot alpha reports agreement with something nobody wrote.
  *
  * OUT OF RANGE IS NOT A COLOR. `rgb(300, 0, 0)` keys as null rather than
- * clamping to red, which is `parseColour`'s rule and for its reason: a typo
+ * clamping to red, which is `parseColor`'s rule and for its reason: a typo
  * that clamped would report agreement with something nobody wrote.
  *
  * NAMED COLORS ARE NOT READ. `white` and `transparent` key as null. Neither
@@ -231,18 +231,18 @@ export function tokenCorpus({ root = REPO_ROOT, prefix = '--', precedence = 'fir
  *
  * The order here is not the matching order — `familyOf` takes the LONGEST
  * prefix, so `--font-size-h1` cannot be read as `--font-` — but it is the order
- * a reader wants: colour, then type, then space, then the app shell.
+ * a reader wants: color, then type, then space, then the app shell.
  *
  * A family absent from this list is a token name nothing in the harness can
  * classify, which `tokens-node.test.js` asserts is the empty set over the live
  * corpus. Minting a family means adding a row.
  */
 export const FAMILIES = [
-  { family: 'colour', prefix: '--color-', what: 'every colour value and role' },
+  { family: 'color', prefix: '--color-', what: 'every color value and role' },
   {
     family: 'surface',
     prefix: '--surface-',
-    what: 'a surface: its colour and, separately, its shadow',
+    what: 'a surface: its color and, separately, its shadow',
   },
   { family: 'font-size', prefix: '--font-size-', what: 'the type scale, icon sizes included' },
   { family: 'font-line-height', prefix: '--font-line-height-', what: 'line height per type step' },
@@ -335,27 +335,27 @@ function hslToRgb(h, s, l) {
 const hex2 = (n) => n.toString(16).padStart(2, '0');
 
 /**
- * A colour literal as a comparable key: `#rrggbb`, or `#rrggbbaa` when it is
+ * A color literal as a comparable key: `#rrggbb`, or `#rrggbbaa` when it is
  * not opaque. Null for anything this cannot read, rather than a guess.
  *
  * Reads `#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`, `rgb()`, `rgba()`, `hsl()`
  * and `hsla()`, in comma or space syntax, with an alpha after `/` or after the
  * third comma, and channels as numbers or percentages. See the header for why
- * this is wider than `parseColour`, finer than the normaliser the fallback
+ * this is wider than `parseColor`, finer than the normalizer the fallback
  * checks carried before #621, and what the finer half costs a migrating
  * caller.
  *
  * @param {string} value
  * @returns {string|null}
  */
-export function colourKey(value) {
+export function colorKey(value) {
   if (typeof value !== 'string') return null;
   const literal = value.trim().toLowerCase();
 
   const hex = HEX.exec(literal);
   if (hex) {
     const digits = hex[1];
-    // Four and eight digits carry alpha; five and seven are not a colour.
+    // Four and eight digits carry alpha; five and seven are not a color.
     const expanded =
       digits.length === 3 || digits.length === 4
         ? [...digits].map((d) => d + d).join('')
@@ -408,7 +408,7 @@ export function colourKey(value) {
  * eleven times, and on a non-square box those are different shapes.
  *
  * A BARE `0` is `0px`, because zero is zero, and that is the one place the two
- * normalisers this replaces disagreed: `normaliseDimension`, retired from
+ * normalizers this replaces disagreed: `normalizeDimension`, retired from
  * `scripts/token-fallbacks.mjs` by #621, read it, and the docs check's key,
  * retired by #622, answered null. This takes the reading that loses nothing —
  * the check that answered null was passing up a comparison it could have made.
@@ -438,14 +438,14 @@ export function dimensionKey(value) {
  * A value as a comparable key, whichever kind it is — the kind read off the
  * value rather than off the token's name (see the header).
  *
- * Colour is tried first and the two cannot collide: no string is both a colour
+ * Color is tried first and the two cannot collide: no string is both a color
  * and a length.
  *
  * @param {string} value
  * @returns {string|null}
  */
 export function valueKey(value) {
-  return colourKey(value) ?? dimensionKey(value);
+  return colorKey(value) ?? dimensionKey(value);
 }
 
 /**

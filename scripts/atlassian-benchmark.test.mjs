@@ -68,9 +68,9 @@ test('a `down` row that GROWS is a finding, and one that shrinks is not', () => 
 });
 
 test('a row with no direction is never a finding, however far apart', () => {
-  // Differing from Atlassian is often correct — they ship 100 chart colours for
+  // Differing from Atlassian is often correct — they ship 100 chart colors for
   // a surface we do not have. Only the argued rows are gated.
-  const rows = [{ key: 'colour.total', ours: 1, theirs: 441, direction: null }];
+  const rows = [{ key: 'color.total', ours: 1, theirs: 441, direction: null }];
   assert.deepEqual(failures(rows, {}, opts), []);
 });
 
@@ -129,7 +129,7 @@ test('the seven intents all still carry the same shape', () => {
     }
   }
   assert.ok(INTENT.test('--color-warning-text'));
-  assert.ok(!INTENT.test('--color-advocacy-text'), 'a subject colour is not an intent');
+  assert.ok(!INTENT.test('--color-advocacy-text'), 'a subject color is not an intent');
 });
 
 test('the roles we DO have are counted under our own names, not Atlassian spelling', () => {
@@ -167,7 +167,7 @@ test('the recorded Atlassian side is the measurement, not a guess', () => {
   // These are the numbers read from atlassian.design on 2026-08-29. If someone
   // edits them to make a row pass, this notices.
   assert.equal(BENCHMARK.totals.color, 441);
-  assert.equal(BENCHMARK.colourByRole['color.background'], 208);
+  assert.equal(BENCHMARK.colorByRole['color.background'], 208);
   assert.equal(BENCHMARK.typeSteps.count, 14);
   assert.equal(BENCHMARK.typeSteps.names.length, 14);
   assert.ok(BENCHMARK.source.startsWith('https://atlassian.design/'));

@@ -12,7 +12,7 @@ A report lands where it gets worked. Every intake runs one rule: inspect, route,
 
 ## Steps
 
-1. **Inspect the evidence yourself.** `source_read`, `slack_thread_read` or `github_read` the linked page, thread or file and confirm what is wrong. Done when you can quote the offending line, frame or behaviour, or have said you could not reach it and are filing on the reporter's word.
+1. **Inspect the evidence yourself.** `source_read`, `slack_thread_read` or `github_read` the linked page, thread or file and confirm what is wrong. Done when you can quote the offending line, frame or behavior, or have said you could not reach it and are filing on the reporter's word.
 2. **Route it.** The one rule:
    - implementation in a listed repo (uno-bot, the harness, the blueprint app, the marketing site, Storybook docs, a prototype) → a GitHub issue on the repo whose purpose matches what would change, through `github_issue_create`;
    - product or design, including a live PLUS app bug → a Roadmap intake: the named card through `notion_update`, else a new one through `notion_create` with surface intake.

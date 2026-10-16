@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/BadgeVariants.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/BadgeVariants.stories.jsx` — Appearances, Density, Counters, CounterFormatting, TrailingMetric, TrailingMetricIsGatedToStatus, DateAndCustom, DateWithAStateAppearance, LabelledStatus, Truncation, WithIcon, DeprecationWarnings, Interactive
+**Stories:** `design-system/src/components/status-and-loading/BadgeVariants.stories.jsx` — Appearances, Density, Counters, CounterFormatting, TrailingMetric, TrailingMetricIsGatedToStatus, DateAndCustom, DateWithAStateAppearance, LabeledStatus, Truncation, WithIcon, DeprecationWarnings, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/BadgeVariants.mdx`
 

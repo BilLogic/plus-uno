@@ -7,8 +7,8 @@ import assert from "node:assert/strict";
 import {
   aimedAtOf,
   matchRoster,
-  normaliseFigmaId,
-  normalisePersonName,
+  normalizeFigmaId,
+  normalizePersonName,
   notionPersonOfSlack,
   roleOf,
   slackPersonOfFigma,
@@ -54,7 +54,7 @@ test("a Past Collaborator is skipped, whatever their group", () => {
 });
 
 test("names match across case, accents and whitespace, and nothing looser", () => {
-  assert.equal(normalisePersonName("  ÁNA   Pérez "), "ana perez");
+  assert.equal(normalizePersonName("  ÁNA   Pérez "), "ana perez");
   const { roles, unmatched } = matchRoster(
     [
       { name: "Ana P.", group: "Product Manager" },
@@ -179,12 +179,12 @@ test("a Figma id follows the role map's matching: no match, an ambiguous name or
 });
 
 test("a Figma id is read out of a pasted URL or a bare id; anything else is unreadable", () => {
-  assert.equal(normaliseFigmaId("https://www.figma.com/files/team/123456789/recents?fuid=1105000000000000003"), "1105000000000000003");
-  assert.equal(normaliseFigmaId(" 1105000000000000003 "), "1105000000000000003");
-  assert.equal(normaliseFigmaId("id: 1105000000000000003."), "1105000000000000003");
-  assert.equal(normaliseFigmaId("my figma"), undefined);
-  assert.equal(normaliseFigmaId("12345"), undefined);
-  assert.equal(normaliseFigmaId(""), undefined);
+  assert.equal(normalizeFigmaId("https://www.figma.com/files/team/123456789/recents?fuid=1105000000000000003"), "1105000000000000003");
+  assert.equal(normalizeFigmaId(" 1105000000000000003 "), "1105000000000000003");
+  assert.equal(normalizeFigmaId("id: 1105000000000000003."), "1105000000000000003");
+  assert.equal(normalizeFigmaId("my figma"), undefined);
+  assert.equal(normalizeFigmaId("12345"), undefined);
+  assert.equal(normalizeFigmaId(""), undefined);
 
   const { figmaPeople, unreadableFigma } = matchRoster(
     [

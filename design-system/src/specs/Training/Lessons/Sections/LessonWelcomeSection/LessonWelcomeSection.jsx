@@ -74,7 +74,7 @@ const LessonWelcomeSection = ({
                       * roles that have a selected state — `tab`, `option`,
                       * `row` — and axe reported `aria-allowed-attr` on all six
                       * of these. The attribute was doing nothing: which tab was
-                      * current was a colour and an underline, and nothing else.
+                      * current was a color and an underline, and nothing else.
                       *
                       * The fix is the role the markup already means. A `tablist`
                       * around `tab`s makes `aria-selected` legal AND meaningful,

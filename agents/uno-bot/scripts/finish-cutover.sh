@@ -242,7 +242,7 @@ already_set() { "$WRANGLER" secret list 2>/dev/null | grep -q "\"$1\""; }
 # "blueprint contract not found ... (set BLUEPRINT_REPO)" AFTER the secrets are
 # already in — a stop with nothing wrong and no obvious next move.
 #
-# So: honour an existing BLUEPRINT_REPO, else look where the checkout actually
+# So: honor an existing BLUEPRINT_REPO, else look where the checkout actually
 # tends to live, else ask. A checkout is identified by the contract file itself
 # rather than by its directory name, because the name has been both
 # uno-blueprint and plus-uno-blueprint.
@@ -250,7 +250,7 @@ already_set() { "$WRANGLER" secret list 2>/dev/null | grep -q "\"$1\""; }
 # WHERE that file sits inside the checkout is not spelled out here: this asked
 # the sync script instead after the app repo moved it (src/lib → deployment/lib,
 # plus-uno-blueprint#332) and only the sync script's copy of the path was
-# updated, leaving this probe silently unable to recognise any checkout at all.
+# updated, leaving this probe silently unable to recognize any checkout at all.
 contract_rel_path() {
   node "$BOT_DIR/scripts/sync-blueprint-contract.mjs" --source-path 2>/dev/null
 }

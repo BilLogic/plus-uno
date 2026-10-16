@@ -47,7 +47,7 @@ test('a dependency the repo does not have is not a finding', () => {
 });
 
 test('every armed tripwire still points at a file that exists and uses the API', () => {
-  // Generalised from a hard-coded read of `register.jsx`, which is exactly what
+  // Generalized from a hard-coded read of `register.jsx`, which is exactly what
   // this test was for: ADR-025 deleted that file when it retired `types.TAB`,
   // and this went red rather than letting a tripwire outlive its code. Driven off
   // TRIPWIRES now, so the next one is covered without an edit here.

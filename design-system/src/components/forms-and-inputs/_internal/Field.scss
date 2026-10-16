@@ -4,7 +4,7 @@
  * One 1px border (`--size-element-border`) in outline-variant on one fill
  * (`--color-surface`). Hover turns the border inverse-primary. Focus draws a
  * 2px ring (`--size-element-stroke-lg`) inside the box in the focus-ring
- * colour; hover and focus are both blue, so the width is what tells them
+ * color; hover and focus are both blue, so the width is what tells them
  * apart. Figma draws its stroke inside the box, so the border is taken out of
  * the padding here and the heights match the library: 28 · 34 · 40.
  */
@@ -361,8 +361,8 @@ textarea.plus-field__control {
     gap: var(--size-element-gap-xs);
 }
 
-// Forced colours (Windows High Contrast) repaint the ring's colour to match
-// the border at rest, so the ring is named in the system Highlight colour.
+// Forced colors (Windows High Contrast) repaint the ring's color to match
+// the border at rest, so the ring is named in the system Highlight color.
 @media (forced-colors: active) {
     .plus-field:focus-within {
         outline: var(--size-element-stroke-lg) solid Highlight;

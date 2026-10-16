@@ -2,7 +2,7 @@
  * The pure half of `check:intent-roles` (#368).
  *
  * WHAT THE ROLE TOKENS ARE. `design-system/src/tokens/_color_roles.scss` names
- * two roles the seven intent colours never had: `--color-X-icon` and
+ * two roles the seven intent colors never had: `--color-X-icon` and
  * `--color-X-border`. Six of the seven borders resolve to the base, because the
  * base already clears WCAG 1.4.11's 3:1 on all five surface steps. Warning does
  * not — #9f8205 falls to 2.87:1 on `--color-surface-container-highest` — so
@@ -19,7 +19,7 @@
  * WHY A RENAME THAT CHANGES NO PIXEL IS WORTH DOING. `border-color:
  * var(--color-danger)` and `border-color: var(--color-danger-border)` resolve to
  * the same bytes today. They do not say the same thing. The first is a use of
- * the bold fill colour that happens to land on an edge; the second is a
+ * the bold fill color that happens to land on an edge; the second is a
  * declaration that an edge was intended and 3:1 was the bar it was chosen
  * against. The value can then move for borders alone — which is exactly what
  * warning needs and what no amount of care at 110 call sites can deliver.
@@ -62,7 +62,7 @@ export const INTENTS = ['primary', 'secondary', 'tertiary', 'danger', 'success',
  * An edge declaration and its value.
  *
  * The property alternation is explicit so that `border-radius`, `border-width`
- * and `border-style` — which carry no colour — cannot match. The value part
+ * and `border-style` — which carry no color — cannot match. The value part
  * spans newlines on purpose: `border:\n  1px solid var(--color-primary);` is
  * one declaration written across two lines and a line-anchored scanner misses
  * it. `[^;{}]` stops the match at the end of the declaration rather than

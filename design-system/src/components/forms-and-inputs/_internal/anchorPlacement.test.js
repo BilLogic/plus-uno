@@ -25,12 +25,12 @@ describe('placePopup', () => {
         expect(placePopup({ anchor: middle, width: 296, height: 600, viewport }).placement).toBe('bottom');
     });
 
-    it('honours a caller gap', () => {
+    it('honors a caller gap', () => {
         expect(placePopup({ anchor: field, width: 296, height: 330, viewport, gap: 8 }).top).toBe(142);
     });
 
-    it('centres or right-aligns on request', () => {
-        // Centring would start at -10, so it is held at the viewport's edge.
+    it('centers or right-aligns on request', () => {
+        // Centering would start at -10, so it is held at the viewport's edge.
         expect(placePopup({ anchor: field, width: 300, height: 330, viewport, align: 'center' }).left).toBe(0);
         expect(placePopup({ anchor: { ...field, left: 400, right: 600 }, width: 300, height: 330, viewport, align: 'center' }).left).toBe(350);
         expect(placePopup({ anchor: { ...field, left: 400, right: 600 }, width: 300, height: 330, viewport, align: 'right' }).left).toBe(300);

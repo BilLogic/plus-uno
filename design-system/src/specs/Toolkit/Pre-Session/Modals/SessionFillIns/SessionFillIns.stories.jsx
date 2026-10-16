@@ -225,7 +225,7 @@ const consentFormItems = [
     { title: 'Background Check Consent', description: 'Consent for background check verification.' },
     { title: 'Attendance Policy', description: "Agree to follow PLUS's 'three strikes' attendance policy." },
     { title: 'General Policies', description: 'Acknowledge CMU HR and PLUS general policies.' },
-    { title: 'Job Duties Acknowledgement', description: 'Agree to fulfill all tutor responsibilities during shifts.' },
+    { title: 'Job Duties Acknowledgment', description: 'Agree to fulfill all tutor responsibilities during shifts.' },
     { title: 'Photo Release', description: 'Consent to use of your likeness in PLUS and CMU materials.' },
     { title: 'Tutor Consent Form', description: 'Consent to session recording and research participation.' },
     { title: 'Tutor Reflection Form Agreement', description: 'Agree to complete reflection form after each tutoring shift.' },

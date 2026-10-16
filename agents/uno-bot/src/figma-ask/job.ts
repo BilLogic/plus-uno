@@ -17,7 +17,7 @@
 //   2a. THE 🐐. The ask gets a `:goat:` reaction before anything else is
 //      done, so the asker sees it was picked up before the reply lands. Sent
 //      once — the mark says so — and a refusal is logged and passed over: the
-//      reply matters more than the acknowledgement.
+//      reply matters more than the acknowledgment.
 //   3. WHO ASKED. Figma's user id, through the Team Members map
 //      (`usage/roles.ts`). A teammate's turn reads the team's public estates
 //      and remembers the thread; anyone the map does not know gets a turn that
@@ -424,7 +424,7 @@ function sameReadLink(cited: string, read: string): boolean {
  * trailing slash, no fragment, and the query kept only on Figma, where it
  * names the frame. Null for what is not a URL.
  */
-function normalisedLink(url: string): { host: string; path: string; query: string } | null {
+function normalizedLink(url: string): { host: string; path: string; query: string } | null {
   let u: URL;
   try {
     u = new URL(url);
@@ -437,7 +437,7 @@ function normalisedLink(url: string): { host: string; path: string; query: strin
 }
 
 /**
- * What `sameReadLink` compares: the normalised link as one `key`, and for a
+ * What `sameReadLink` compares: the normalized link as one `key`, and for a
  * GitHub file or directory link (`github.com/<owner>/<repo>/<blob|tree>/<ref>/<path>`)
  * its parts. A link a read returned holds a one-segment ref; a cited ref may
  * hold slashes, so the cited side's `refAndPath` is matched at its end against
@@ -446,7 +446,7 @@ function normalisedLink(url: string): { host: string; path: string; query: strin
 function linkKey(
   url: string,
 ): { key: string; github?: { repoAndKind: string; refAndPath: string; pathAfterRef: string } } | null {
-  const link = normalisedLink(url);
+  const link = normalizedLink(url);
   if (!link) return null;
   const key = `${link.host}${link.path}${link.query}`;
   const repo = link.host === "github.com" ? /^\/([^/]+\/[^/]+)\/(blob|tree)\/(.+)$/.exec(link.path) : null;
@@ -465,7 +465,7 @@ function linkKey(
 /** Whether two links open the same Figma frame, or the same file with no frame. */
 function sameFigmaPlace(a: string, b: string): boolean {
   const key = (url: string): string | null => {
-    const link = normalisedLink(url);
+    const link = normalizedLink(url);
     if (!link || !/(^|\.)figma\.com$/.test(link.host)) return null;
     const file = /^\/(?:design|file|proto)\/([A-Za-z0-9]+)/i.exec(link.path)?.[1];
     if (!file) return null;

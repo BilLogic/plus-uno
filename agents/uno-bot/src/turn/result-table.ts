@@ -268,7 +268,7 @@ export interface TableRequest {
 export type TableReading = { table: ResultTable } | { refusal: string };
 
 /** A field longer than this, or with a line break in it, is prose: a table
- *  cell cannot show it, and the prose should summarise it instead. */
+ *  cell cannot show it, and the prose should summarize it instead. */
 const LONG_TEXT = 120;
 
 type Record_ = Record<string, unknown>;
@@ -305,7 +305,7 @@ function columnRefusal(field: string, rows: Record_[], usable: string[]): string
   if (values.some((v) => typeof v === "object")) return `'${field}' holds lists or records, which a table cell cannot show.`;
   if (values.some(isAddress)) return `'${field}' is a link; the first column links to each row's url by itself.`;
   if (values.some((v) => typeof v === "string" && (v.length > LONG_TEXT || v.includes("\n"))))
-    return `'${field}' is long text, which a table cell cannot show; summarise it in your prose instead.`;
+    return `'${field}' is long text, which a table cell cannot show; summarize it in your prose instead.`;
   return null;
 }
 

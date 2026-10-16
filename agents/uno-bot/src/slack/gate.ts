@@ -52,7 +52,7 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
 
 /**
  * A tap on one of a reminder's buttons. A button stands in for the reaction it
- * is labelled with, so it takes the same two doors a reaction on a reminder
+ * is labeled with, so it takes the same two doors a reaction on a reminder
  * does — the answer, the store write and the in-place edit are theirs. Unlike
  * a reaction, a tap is never left unanswered: the outcome says why one that
  * changed nothing did not, for the tapper to be told.

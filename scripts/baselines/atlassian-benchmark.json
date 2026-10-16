@@ -13,7 +13,7 @@
     "opacity": 2,
     "utility": 2
   },
-  "colourByRole": {
+  "colorByRole": {
     "color.background": 208,
     "color.chart": 100,
     "color.text": 49,

@@ -22,7 +22,7 @@
 // starts the count again, so two blips an hour apart are two blips.
 //
 // THE RECORD LIVES IN A DURABLE OBJECT, the workspace's one ThreadState
-// instance, because "exactly one DM" needs a serialised read-modify-write:
+// instance, because "exactly one DM" needs a serialized read-modify-write:
 // KV is eventually consistent, and two turns failing together each read the
 // same record. The transitions below are pure and run inside the object's
 // transaction, which is where "told" is claimed, so only one caller is ever
@@ -124,7 +124,7 @@ export function outageOnRelease(held: OutageRecord | null, told: number): Outage
   return rest;
 }
 
-/** The serialised record: the Durable Object in production. */
+/** The serialized record: the Durable Object in production. */
 export interface OutageStore {
   failed(at: number): Promise<OutageStep>;
   succeeded(at: number): Promise<OutageStep>;
@@ -239,8 +239,8 @@ export function capacityOutage(deps: OutageDeps): CapacityOutage {
 }
 
 /**
- * A serialised in-memory store over the same transitions: the Node suite's
- * stand-in for the Durable Object, whose own serialisation the workerd suite
+ * A serialized in-memory store over the same transitions: the Node suite's
+ * stand-in for the Durable Object, whose own serialization the workerd suite
  * holds (`tests/workerd/thread-state.conformance.test.ts`).
  */
 export function inMemoryOutageStore(): OutageStore & { held(): OutageRecord | null } {

@@ -69,7 +69,7 @@ const bannerOf = (text, name) =>
   text.split('\n').find((line) => line.startsWith(`✓ ${name} —`) || line.startsWith(`✗ ${name} —`)) ?? null;
 
 const CASES = [
-  { name: 'check:colour-fallbacks', script: 'check-colour-fallbacks.mjs', flag: '--report', prints: /"disagreements"/ },
+  { name: 'check:color-fallbacks', script: 'check-color-fallbacks.mjs', flag: '--report', prints: /"disagreements"/ },
   { name: 'check:size-fallbacks', script: 'check-size-fallbacks.mjs', flag: '--report', prints: /"disagreements"/ },
   { name: 'check:atlassian-benchmark', script: 'check-atlassian-benchmark.mjs', flag: '--table', prints: /atlassian/ },
   { name: 'check:atlassian-benchmark', script: 'check-atlassian-benchmark.mjs', flag: '--how', prints: /Re-measuring/ },

@@ -10,7 +10,7 @@ import Listbox from './Listbox';
  * field for picking a value. It is not exported from the barrel; Select,
  * TagInput, Cascader, TreeSelect and the date pickers build on it.
  *
- * Every keyboard behaviour has a play test here. Two shapes are covered:
+ * Every keyboard behavior has a play test here. Two shapes are covered:
  * a standalone listbox that takes focus itself, and a combobox, where focus
  * stays in the field and the field hands its keys to the list.
  */

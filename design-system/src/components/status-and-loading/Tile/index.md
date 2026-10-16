@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/Tile/Tile.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/Tile/Tile.stories.jsx` — Sizes, DefaultSize, IconSubtle, IconBold, OrangeIsYellow, Logos, LogoDefaultsToWhite, Images, WithBorder, Decorative, Labeled, Interactive
+**Stories:** `design-system/src/components/status-and-loading/Tile/Tile.stories.jsx` — Sizes, DefaultSize, IconSubtle, IconBold, OrangeIsYellow, GreyIsGray, Logos, LogoDefaultsToWhite, Images, WithBorder, Decorative, Labeled, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/Tile/Tile.mdx`
 
@@ -18,7 +18,7 @@
 | `content` | enum | `'icon'` | What the tile frames. Icons and logos are inset; an image fills and crops. |
 | `size` | enum | `32` | 16, 20, 24, 32, 40 or 48, for every kind of content. |
 | `appearance` | enum | `'subtle'` | Icons only. `subtle` is the color's container; `bold` is the solid color. |
-| `color` | oneOf | — | A category color from the Tag set. `white` is for logos. Defaults to white for a logo, grey otherwise. `orange` is a deprecated alias for `yellow`. |
+| `color` | oneOf | — | A category color from the Tag set. `white` is for logos. Defaults to white for a logo, gray otherwise. `orange` is a deprecated alias for `yellow`, and `grey` for `gray`. |
 | `icon` | string or node | — | `icon` only: a Font Awesome Free name (`book-open`), a class list, or a node. |
 | `src` | string | — | `logo` or `image`: the picture's URL. |
 | `children` | node | — | `logo` or `image`: the picture as a node, in place of `src`. |

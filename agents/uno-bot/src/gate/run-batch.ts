@@ -24,7 +24,7 @@ import type { ProposalOperation, ThreadState } from "../thread-state/index";
 export interface OperationOutcome {
   toolName: string;
   /** The operation's own input, carried through so the result message can group
-   *  and label an outcome exactly as the card grouped and labelled the plan.
+   *  and label an outcome exactly as the card grouped and labeled the plan.
    *  Optional for an outcome recorded before this shipped. */
   input?: Record<string, unknown>;
   ok: boolean;

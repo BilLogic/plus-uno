@@ -107,13 +107,13 @@ States.play = async ({ canvasElement }) => {
     await expect(style('focus').outlineStyle).toBe('solid');
     await expect(px(style('focus').outlineWidth)).toBe(2);
     await expect(px(style('focus').outlineOffset)).toBe(-2);
-    // Hover changes the border colour, not its width.
+    // Hover changes the border color, not its width.
     await expect(style('hover').borderTopColor).not.toBe(style('default').borderTopColor);
     // One fill, and read-only's own.
     await expect(style('read-only').backgroundColor).not.toBe(style('default').backgroundColor);
     // The disabled box fades once.
     await expect(Number(style('disabled').opacity)).toBeCloseTo(0.38, 2);
-    // Invalid and valid each own a border colour.
+    // Invalid and valid each own a border color.
     await expect(style('invalid').borderTopColor).not.toBe(style('default').borderTopColor);
     await expect(style('valid').borderTopColor).not.toBe(style('invalid').borderTopColor);
 };
@@ -133,7 +133,7 @@ LiveFocus.play = async ({ canvasElement }) => {
     await expect(px(getComputedStyle(box).outlineWidth)).toBe(2);
 };
 
-/** Subtle: plain text at rest, a grey fill and the caret on hover, the standard field while editing. */
+/** Subtle: plain text at rest, a gray fill and the caret on hover, the standard field while editing. */
 export const Subtle = () => (
     <div style={row}>
         {[['rest', {}], ['hover', { state: 'hover' }], ['focus', { state: 'focus' }]].map(([name, props]) => (

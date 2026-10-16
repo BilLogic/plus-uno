@@ -17,9 +17,9 @@ A designer links a frame, a prototype, a spec or a coded component and asks what
 3. **Apply the lenses one at a time**, at the manifest's fidelity:
    - **DS:** components, tokens, layout, the constitution's hard rules. Fills come back as rendered hex; the token behind one is unread.
    - **Product:** the artifact against its PRD and the `search_blueprint` rows for the flow.
-   - **Access:** contrast, target size, keyboard and focus, semantics, colour carrying meaning alone, motion.
+   - **Access:** contrast, target size, keyboard and focus, semantics, color carrying meaning alone, motion.
 
-   Screenshot depth is the bot's: layout, hierarchy, alignment, spacing feel, glaring contrast, flow logic, terminology, copy, PRD conformance. Computed values are measured depth: exact contrast ratios, token fidelity, target measurement, focus order, responsive behaviour. Mark a finding that needs them *partial*. Done when each lens has run or is marked partial.
+   Screenshot depth is the bot's: layout, hierarchy, alignment, spacing feel, glaring contrast, flow logic, terminology, copy, PRD conformance. Computed values are measured depth: exact contrast ratios, token fidelity, target measurement, focus order, responsive behavior. Mark a finding that needs them *partial*. Done when each lens has run or is marked partial.
 4. **Write each finding** with severity · lens · evidence from the artifact · the rule or doc it rests on · where it re-enters (the fidelity choice or the content). Blockers and majors flip the verdict; minors are advisory. Three strong findings beat seven weak ones. Name one to three specific strengths with the principle each matches. Done when every finding carries all five parts.
 5. **Post the critique**, then the next steps in the same message. A version-diff ask posts the changes instead: the version compared with (its name and date), then each change in plain words, then any finding a change raises. No actionable findings → say so and ask what worried them. A critique too long for Slack → the summary in the thread and an offer to append the rest to the card with `notion_update`. Done when the verdict is stated.
 

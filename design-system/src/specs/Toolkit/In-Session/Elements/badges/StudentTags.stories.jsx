@@ -22,7 +22,7 @@ All render from the shared **StudentTag** component (warning-tonal Badge + signa
 - **Misc**: Overflow indicator ("…")
 
 ## Signal
-- **positive** (green \`fa-circle-check\`) — favourable status
+- **positive** (green \`fa-circle-check\`) — favorable status
 - **negative** (red \`fa-triangle-exclamation\`) — attention needed
 - **neutral** — no icon (overflow)
 
@@ -78,7 +78,7 @@ export const AllVariations = () => (
         <div>
             <h5 className="text-muted mb-2">Student Tags (PLUS Tags)</h5>
             <p className="text-muted small mb-0">
-                Pill tags with signal icons, labelling students across goal, engagement, and content categories.
+                Pill tags with signal icons, labeling students across goal, engagement, and content categories.
             </p>
         </div>
 

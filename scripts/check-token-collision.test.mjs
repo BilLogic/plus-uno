@@ -5,7 +5,7 @@
  * A guard nobody has watched fail is a guard nobody knows works (#191), and for
  * this one the harder half is the opposite: a guard that fires on the FIXED file
  * gets switched off within a week. The `Navbar` fix (#219) does not delete the
- * `--color-primary` link colour — the light bar still wants it — it overrides it
+ * `--color-primary` link color — the light bar still wants it — it overrides it
  * inside the primary variant. So the exoneration cases below are as load-bearing
  * as the detection case.
  *
@@ -36,7 +36,7 @@ const DEFECT = `
 }
 `;
 
-/** The fix: the bare rule stays, the variant re-colours it. */
+/** The fix: the bare rule stays, the variant re-colors it. */
 const FIXED = `
 .plus-navbar {
     &.plus-navbar-bg-primary {
@@ -260,7 +260,7 @@ test('blanking keeps every line, so a reported line is the line in the file', ()
 });
 
 test('an override that only reaches part of the painted subtree exonerates nothing', () => {
-  // `.plus-navbar .plus-navbar-search .nav-link` re-colours the links inside the
+  // `.plus-navbar .plus-navbar-search .nav-link` re-colors the links inside the
   // search box and no others, so every other link on the primary bar is still
   // primary-on-primary. Comparing only the first segment of the chain saw
   // `.plus-navbar`, called it a subset of the painted scope, and dismissed a

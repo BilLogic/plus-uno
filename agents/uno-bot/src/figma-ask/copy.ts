@@ -16,7 +16,7 @@
 
 import { toPlainText } from "../slack/mrkdwn";
 import { OVERLOADED_LEAD, OVERLOADED_NEXT } from "../slack/failure-message";
-import { labelled } from "./trigger";
+import { labeled } from "./trigger";
 
 /** Lines of answer a reply carries, at most. */
 export const MAX_ANSWER_LINES = 3;
@@ -69,7 +69,7 @@ const TO_SLACK = "Ask le goat in Slack, and I'll draft it there for a teammate t
  * @param reply - What the turn came to
  */
 export function figmaReplyText(reply: FigmaReply): string {
-  return labelled(figmaReplyLines(reply));
+  return labeled(figmaReplyLines(reply));
 }
 
 /** `Source: <name> — <link>`: Figma posts plain text, so the name sits beside

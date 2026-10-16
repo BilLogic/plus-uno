@@ -16,7 +16,7 @@ export function notionAttribution(name: string): string {
   return `Written by le goat on behalf of ${name}`;
 }
 
-/** The sentence as the block that opens the written content: a quiet grey
+/** The sentence as the block that opens the written content: a quiet gray
  *  italic paragraph, the same register as the PRD's placeholder notes. */
 export function attributionBlock(name: string): Record<string, unknown> {
   return {

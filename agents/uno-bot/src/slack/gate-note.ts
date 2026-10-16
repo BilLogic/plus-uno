@@ -81,7 +81,7 @@ export const STATED_SUPERSEDED_POST =
 /**
  * A stated card's last line once a ⛔ has decided it, where its buttons were:
  * what the ⛔ did, and who decided. Only a Slack user id is mentioned, which is
- * what the markup sanitiser keeps (`SLACK_USER_ID`).
+ * what the markup sanitizer keeps (`SLACK_USER_ID`).
  */
 export function statedCancelledNote(words: Pick<StatedCardWords, "cancelled">, userId: string): string {
   return `${words.cancelled}${SLACK_USER_ID.test(userId) ? `, decided by <@${userId}>` : ""}.`;
@@ -176,7 +176,7 @@ export function cardStaysLive(note: GateNote): boolean {
 /**
  * A signal from someone the card does not accept. Names who can confirm,
  * since that is what the person needs in order to get it moving. Only Slack
- * user ids are mentioned, which is what the markup sanitiser keeps
+ * user ids are mentioned, which is what the markup sanitizer keeps
  * (`SLACK_USER_ID`); anything else would blank the post, so it is left out.
  */
 function notAConfirmerLine(note: Extract<GateNote, { kind: "not-a-confirmer" }>): string {
@@ -202,7 +202,7 @@ function joinNames(names: string[]): string {
  * escaping.
  */
 function cutOffLine(note: Extract<GateNote, { kind: "cut-off" }>): string {
-  // Only a Slack user id is mentioned, which is what the markup sanitiser
+  // Only a Slack user id is mentioned, which is what the markup sanitizer
   // keeps (`SLACK_USER_ID`); anything else would blank the post.
   const to = note.mention && SLACK_USER_ID.test(note.mention) ? `<@${note.mention}> ` : "";
   const lines = [

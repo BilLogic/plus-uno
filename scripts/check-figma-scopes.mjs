@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * `npm run check:figma-scopes` — no Figma colour variable offers itself for a
+ * `npm run check:figma-scopes` — no Figma color variable offers itself for a
  * role its contrast cannot carry, and no group disagrees with its peers.
  *
  * See `scripts/figma-scopes.mjs` for the convention and for the five variables
@@ -25,11 +25,11 @@ import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const RECORDING = 'design-system/figma/colour-values.json';
+const RECORDING = 'design-system/figma/color-values.json';
 
 /*
  * A recording with no scopes would pass everything. The floor is the count of
- * accent colour variables that carry a role, measured on 2026-08-29.
+ * accent color variables that carry a role, measured on 2026-08-29.
  */
 export const MIN_SCOPED = 75;
 

@@ -21,7 +21,7 @@ import {
   isTabbedDocsPage,
   TAB_IDS,
   componentIdentity,
-  normaliseChangelog,
+  normalizeChangelog,
 } from '../src/storybook-docs/lib/component-tabs-contract.js';
 
 describe('componentIdentity', () => {
@@ -89,15 +89,15 @@ describe('componentIdentity', () => {
   });
 });
 
-describe('normaliseChangelog', () => {
+describe('normalizeChangelog', () => {
   it('is empty for a component that has declared nothing', () => {
-    expect(normaliseChangelog(undefined)).toEqual([]);
-    expect(normaliseChangelog([])).toEqual([]);
-    expect(normaliseChangelog('2026-08-26 shipped')).toEqual([]);
+    expect(normalizeChangelog(undefined)).toEqual([]);
+    expect(normalizeChangelog([])).toEqual([]);
+    expect(normalizeChangelog('2026-08-26 shipped')).toEqual([]);
   });
 
   it('orders entries newest first', () => {
-    const entries = normaliseChangelog([
+    const entries = normalizeChangelog([
       { date: '2026-08-01', kind: 'added', summary: 'first' },
       { date: '2026-09-01', kind: 'fixed', summary: 'second' },
     ]);
@@ -106,7 +106,7 @@ describe('normaliseChangelog', () => {
 
   it('drops an entry that is missing a date or a summary', () => {
     expect(
-      normaliseChangelog([
+      normalizeChangelog([
         { kind: 'added', summary: 'no date' },
         { date: 'last Tuesday', summary: 'no ISO date' },
         { date: '2026-08-26', summary: '   ' },
@@ -115,8 +115,8 @@ describe('normaliseChangelog', () => {
     ).toEqual(['kept']);
   });
 
-  it('leaves an unrecognised kind off rather than inventing one', () => {
-    const [entry] = normaliseChangelog([
+  it('leaves an unrecognized kind off rather than inventing one', () => {
+    const [entry] = normalizeChangelog([
       { date: '2026-08-26', kind: 'refactored', summary: 'moved' },
     ]);
     expect(entry.kind).toBeNull();
@@ -125,7 +125,7 @@ describe('normaliseChangelog', () => {
 });
 
 describe('the tab contract', () => {
-  it('declares four tabs, in Atlassian order, with Examples first and unparameterised', () => {
+  it('declares four tabs, in Atlassian order, with Examples first and unparameterized', () => {
     expect(TABS.map((t) => t.key)).toEqual(['examples', 'code', 'usage', 'changelog']);
     expect(TABS.map((t) => t.title)).toEqual(['Examples', 'Code', 'Usage', 'Changelog']);
     // Examples is the DEFAULT tab, so it carries no query param — the addon tabs

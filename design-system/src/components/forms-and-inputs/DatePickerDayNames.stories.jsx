@@ -55,7 +55,7 @@ DaysAnnounceTheirDate.play = async ({ canvasElement }) => {
     const seventeenth = await waitFor(() => page.getByRole('button', { name: /August 17, 2026/ }));
     await expect(seventeenth).toBeTruthy();
 
-    // Which day is chosen is in the tree, not only in the fill colour.
+    // Which day is chosen is in the tree, not only in the fill color.
     await expect(seventeenth.getAttribute('aria-pressed')).toBe('true');
 
     const pressed = page.getAllByRole('button')

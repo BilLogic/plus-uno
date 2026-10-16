@@ -33,9 +33,9 @@ export const SessionManagementSnackbar = ({
             title: 'Session canceled',
             body: 'The session has been removed.'
         },
-        'sessions cancelled': {
+        'sessions canceled': {
             icon: 'fa-circle-exclamation',
-            headerClass: 'plus-session-snackbar__header--cancelled',
+            headerClass: 'plus-session-snackbar__header--canceled',
             title: 'Sessions canceled',
             body: 'The sessions have been removed.'
         }
@@ -66,7 +66,7 @@ export const SessionManagementSnackbar = ({
 };
 
 SessionManagementSnackbar.propTypes = {
-    type: PropTypes.oneOf(['session created', 'session updated', 'session canceled', 'sessions cancelled']),
+    type: PropTypes.oneOf(['session created', 'session updated', 'session canceled', 'sessions canceled']),
     onClose: PropTypes.func,
     timestamp: PropTypes.string,
     className: PropTypes.string

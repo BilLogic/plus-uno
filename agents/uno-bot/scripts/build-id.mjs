@@ -43,7 +43,7 @@ export function buildId({ runNumber, sha } = {}) {
  * production served `dev` on every sample while the Actions run had just
  * deployed r128 (#278).
  *
- * Recognising Cloudflare's own variables does not fix that — the decision about
+ * Recognizing Cloudflare's own variables does not fix that — the decision about
  * which deployer owns production is in #278 — but it makes the answer visible.
  * After this, /health says which path produced what is serving:
  *

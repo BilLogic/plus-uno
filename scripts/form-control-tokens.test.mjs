@@ -16,7 +16,7 @@ test('the small element radius stays 4px: Storybook won the conflict with Figma'
   assert.equal(token?.value, '4px');
 });
 
-test('the four Figma surface roles resolve under their colour names', () => {
+test('the four Figma surface roles resolve under their color names', () => {
   // Figma's `Surface roles/*` alias Surface Container Lowest (#ffffff), except
   // sunken, which aliases Surface (#f9f9fc).
   const expected = {

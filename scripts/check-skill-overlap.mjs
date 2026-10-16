@@ -78,7 +78,7 @@
  * was designed to avoid: a line that genuinely belongs to both faces belongs in
  * `method.md`, and moving it there is the fix the finding is asking for.
  *
- * Comparison is normalised — case, whitespace, emphasis markers and list markers
+ * Comparison is normalized — case, whitespace, emphasis markers and list markers
  * are ignored — so re-bolding or re-bulleting a copied rule does not hide it.
  * It stops at verbatim-modulo-formatting on purpose: a fuzzy match would need a
  * similarity number, and that number is the thing that gets argued about.
@@ -178,7 +178,7 @@ export function blankComments(text) {
 }
 
 /**
- * Index a document's substantive lines by normalised text, first occurrence
+ * Index a document's substantive lines by normalized text, first occurrence
  * wins. A line repeated inside one file is that file's business — this guard is
  * about a rule living in two files.
  */

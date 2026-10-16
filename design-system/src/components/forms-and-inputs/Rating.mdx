@@ -114,7 +114,7 @@ export const figmaMeta = {
 ## When to use
 
 Use `Rating` for a single satisfaction score out of five — the end of a session,
-a piece of feedback, a quick judgement the user makes in one gesture. Five items
+a piece of feedback, a quick judgment the user makes in one gesture. Five items
 is the whole scale; there is no other length.
 
 `variant` chooses what the row says about itself: `comments` puts one caption
@@ -170,13 +170,13 @@ substitute.
 - **It is one value out of five, and says so.** The row is a `radiogroup` and
   each item is a `radio` carrying `aria-checked` and an `aria-label` of "Rate 1"
   … "Rate 5" (#319). The chosen value is in the accessibility tree, not only in
-  the fill colour.
+  the fill color.
 - **One tab stop, arrow keys within it.** Tab reaches the group once — landing
   on the checked item, or the first when nothing is checked — and Left/Right,
   Up/Down, Home and End move the value. Enter and Space still activate an item
   directly.
 - **Moving the selection is changing it.** There is no "focused but not chosen"
-  state: an arrow key calls `onChange`. That is the usual radio-group behaviour
+  state: an arrow key calls `onChange`. That is the usual radio-group behavior
   and it means a keyboard user cannot browse the scale without setting it.
 - **Disabled stays announced.** The items keep their role, label and
   `aria-checked` and take `aria-disabled` — an unavailable rating rather than an
@@ -195,7 +195,7 @@ substitute.
 ## Related
 
 - For a value on a longer scale, use `Range`.
-- For a choice among labelled options rather than a score, use `ChoiceGroup`
+- For a choice among labeled options rather than a score, use `ChoiceGroup`
   or `Radio`.
 - For the comment that usually accompanies a rating, use `Textarea`.
 

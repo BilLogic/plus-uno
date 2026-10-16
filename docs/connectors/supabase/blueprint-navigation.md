@@ -1,6 +1,6 @@
 ---
 embodiment: all
-summary: uno-bot's voice over the blueprint — citation shape, confidence language, absence behaviour and source routing; the blueprint's own account of its shape is blueprint.md beside this file, its schema blueprint-schema.md
+summary: uno-bot's voice over the blueprint — citation shape, confidence language, absence behavior and source routing; the blueprint's own account of its shape is blueprint.md beside this file, its schema blueprint-schema.md
 ---
 
 # uno-blueprint — Answering Guide

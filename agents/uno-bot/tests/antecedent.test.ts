@@ -27,7 +27,7 @@ test("the block is framed as an antecedent, not as a brief", () => {
   ]);
   assert.match(block, /WHAT CAME BEFORE/);
   assert.match(block, /NOT the subject/);
-  assert.match(block, /do not summarise/i);
+  assert.match(block, /do not summarize/i);
 });
 
 test("empty input produces no block at all", () => {

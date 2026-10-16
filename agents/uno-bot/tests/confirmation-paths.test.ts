@@ -876,7 +876,7 @@ describe("the reaction door", () => {
     assert.equal(clearedWith(delivery), "idle");
 
     // The tool runs AFTER the verdict is posted — the person sees the
-    // acknowledgement before the work, the same order every door keeps.
+    // acknowledgment before the work, the same order every door keeps.
     assert.deepEqual(saidBeforeRunning, ["working", "gate-note"]);
     assert.equal(ran.length, 1);
     assert.deepEqual(ran[0]?.execute?.input, { title: "Reflection redesign" });
@@ -1035,7 +1035,7 @@ describe("the button door", () => {
     assert.notEqual(clearedWith(delivery), "waiting-on-person");
 
     // The tool runs AFTER the verdict is posted — the person sees the
-    // acknowledgement before the work, the same order every door keeps.
+    // acknowledgment before the work, the same order every door keeps.
     assert.deepEqual(saidBeforeRunning, ["working", "gate-note"]);
     assert.equal(ran.length, 1);
     assert.deepEqual(ran[0]?.execute?.input, { title: "Reflection redesign" });

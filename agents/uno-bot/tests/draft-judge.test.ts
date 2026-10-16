@@ -1,6 +1,6 @@
 // The draft judge, on the fake adapter (#605).
 //
-// The judge's own behaviour — which tier it asks on, how it reads a verdict,
+// The judge's own behavior — which tier it asks on, how it reads a verdict,
 // when it takes a revision, the extra gate on a correction turn, and the two
 // ways it declines to grade — was reachable only by running the Worker against
 // a live credential until it stopped reading `MODEL_PROVIDER` and started
@@ -15,7 +15,7 @@ import { fakeProvider } from "../src/agent/providers/fake";
 /**
  * A draft long enough to clear MIN_DRAFT_CHARS (1000) and varied enough to
  * clear the stall guard's 25-distinct-word floor, so "is this a restatement"
- * is a real measurement here rather than a threshold artefact.
+ * is a real measurement here rather than a threshold artifact.
  */
 const words = Array.from({ length: 140 }, (_, i) => `clause${i}`).join(" ");
 const LONG_DRAFT = `The blueprint's call-off path is the one that changed. ${words}`;

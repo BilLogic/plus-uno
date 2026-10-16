@@ -53,11 +53,11 @@ Draft the concrete fix on every path *before* worth is judged. Drafting is cheap
 agent doc — load the `writing-for-agents` skill and review the draft against it
 before the gate.** Two questions carry most of the weight. *Is this a no-op?* — an
 instruction the model already obeys by default pays context to say nothing, and
-the test is whether behaviour changes versus the default, settled by running it
+the test is whether behavior changes versus the default, settled by running it
 rather than by debate. *Is this a ban that could be a target?* — a prohibition
-makes the forbidden behaviour more available, so state what to do and let the
+makes the forbidden behavior more available, so state what to do and let the
 banned thing go unspoken. `npm run check:negation` counts the bans mechanically;
-the no-op test is judgement and lives here.
+the no-op test is judgment and lives here.
 
 ## 3 · The human gate — "worth incorporating?"
 

@@ -55,7 +55,7 @@ import 'highcharts/esm/modules/variwide';
 
 /**
  * Kept as a no-op for callers that expect it. The `esm/` imports above register
- * on import, so there is nothing left to initialise — but returning the
+ * on import, so there is nothing left to initialize — but returning the
  * instance keeps `initHighchartsModules()` truthful rather than removing a name
  * something outside this repo may still call.
  */

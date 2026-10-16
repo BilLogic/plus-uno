@@ -17,7 +17,7 @@ topic, which today only `content/` does.
 | [content/](content/overview.md) | ◐ | What does this button, error, or empty state say? |
 | [spacing.md](spacing.md) | ✅ | How much padding, margin, gap? |
 | [grid.md](grid.md) | ✅ | Breakpoints and column spans |
-| [color.md](color.md) | ✅ | Which colour, and what does it mean? |
+| [color.md](color.md) | ✅ | Which color, and what does it mean? |
 | [typography.md](typography.md) | ✅ | Which type class and weight? |
 | [motion.md](motion.md) | ✕ | Duration, easing, what may animate |
 | [iconography.md](iconography.md) | ✅ | Which icon set, which size |

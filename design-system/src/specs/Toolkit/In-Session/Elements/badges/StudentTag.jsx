@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import Badge from '@/components/status-and-loading/Badge/Badge';
 
 /**
- * StudentTag — a "PLUS Tag": a tonal pill labelling a student on one dimension
+ * StudentTag — a "PLUS Tag": a tonal pill labeling a student on one dimension
  * (goal, engagement, content…). All tags share the warning-tonal surface; the
  * `signal` sets the leading status icon:
- *   - positive → green circle-check (favourable)
+ *   - positive → green circle-check (favorable)
  *   - negative → red triangle-exclamation (needs attention)
  *   - neutral  → no icon (e.g. the overflow "…")
  *

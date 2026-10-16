@@ -6,11 +6,11 @@ import Badge from '@/components/status-and-loading/Badge/Badge';
  * Reusable badge for displaying engagement status
  * 
  * States:
- * - unknown/select: Grey secondary badge with "Select" text
+ * - unknown/select: Gray secondary badge with "Select" text
  * - fully-engaged: Green success badge with "Fully engaged" text
  * - partially-engaged: Yellow warning badge with "Partially engaged" text
  * - not-engaged: Red danger badge with "Not engaged at all" text
- * - na: Grey secondary badge with "N/A" text
+ * - na: Gray secondary badge with "N/A" text
  */
 
 const caretIcon = <i className="fa-solid fa-caret-down"></i>;

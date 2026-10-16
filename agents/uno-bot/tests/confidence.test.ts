@@ -19,7 +19,7 @@ const UNGROUNDED = { retrievalRan: false, blueprintLookupRan: false } as const;
 const FAILED = { retrievalRan: true, blueprintLookupRan: true, readFailed: true } as const;
 
 describe("woven confidence detection", () => {
-  it("recognises sureness the model earned by looking", () => {
+  it("recognizes sureness the model earned by looking", () => {
     for (const text of [
       "I checked the Roadmap board just now — there are four maintenance cards.",
       "I've read the reconfirm step; it sits under Standard Scheduling.",
@@ -30,7 +30,7 @@ describe("woven confidence detection", () => {
     }
   });
 
-  it("recognises sureness the model is disclaiming", () => {
+  it("recognizes sureness the model is disclaiming", () => {
     for (const text of [
       "Going from memory here, but the deadline is Friday.",
       "I'm not entirely sure — the docs I found are from May.",
@@ -119,7 +119,7 @@ describe("the retired trailing label", () => {
 });
 
 describe("does the reply assert anything", () => {
-  it("exempts a bare acknowledgement", () => {
+  it("exempts a bare acknowledgment", () => {
     for (const text of ["Got it.", "Cancelled.", "On it", "Will do.", "Sure!"]) {
       assert.equal(assertsSomething(text), false, text);
     }
@@ -128,7 +128,7 @@ describe("does the reply assert anything", () => {
   it("does NOT exempt a short reply carrying a claim", () => {
     // The case that broke the first design, which keyed the exemption on
     // footerKindFor === "none": 48 characters, no link, no list — classified as
-    // an acknowledgement, and asserting a fact about the board.
+    // an acknowledgment, and asserting a fact about the board.
     const text = "Yep — and that card moved to In Review yesterday.";
     assert.equal(assertsSomething(text), true);
   });
@@ -293,7 +293,7 @@ describe("verdicts", () => {
     );
   });
 
-  it("exempts an acknowledgement even on a turn that fetched", () => {
+  it("exempts an acknowledgment even on a turn that fetched", () => {
     assert.equal(judgeConfidence("Got it.", GROUNDED).kind, "exempt");
   });
 

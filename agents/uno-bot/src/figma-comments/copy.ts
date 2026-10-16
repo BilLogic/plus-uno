@@ -22,7 +22,7 @@
 //   • the number, which ties a revision and the thread's record to one card;
 //   • the commenter and a file's creator by Figma handle, never mentioned:
 //     nothing maps a Figma person to a Slack one yet.
-// "Read like decisions" admits a judgement call, which invites correction.
+// "Read like decisions" admits a judgment call, which invites correction.
 //
 // PURE.
 

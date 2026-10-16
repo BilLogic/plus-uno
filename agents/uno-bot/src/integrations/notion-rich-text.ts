@@ -3,7 +3,7 @@
 // A replace writes the block's `rich_text` from plain text (markdown), so it
 // keeps the block's type and per-type state (a to-do's tick, a heading's
 // level) but not what the old rich text carried beyond its words: a link, a
-// mention, an equation, bold, code, a colour. A block that has any of those is
+// mention, an equation, bold, code, a color. A block that has any of those is
 // refused rather than flattened (`notion.ts` `replaceBlock`), and the sweep
 // offers only blocks a replace can write (`sweep/detector.ts`).
 //

@@ -2,7 +2,7 @@
 //
 // The words are the persona's, drafted with /ux-copy and fixed by the ticket:
 // the reminder with and without a stated deadline, the legend of four
-// answers, each answer's acknowledgement (which replaces the legend in place,
+// answers, each answer's acknowledgment (which replaces the legend in place,
 // with no new ping), and the one follow-up. A reminder mentions the promiser
 // and nobody else — the summary it quotes back is the detector's paraphrase,
 // stripped of any mention before it is ever stored.
@@ -42,7 +42,7 @@ export interface ReminderChoice {
 }
 
 /** What sits under a reminder: the answers as buttons, with an optional hint
- *  line below them, or only a line of words (an answer's acknowledgement, or
+ *  line below them, or only a line of words (an answer's acknowledgment, or
  *  a prompt that wants a typed reply). */
 export type ReminderFooter = string | { hint?: string; choices: readonly ReminderChoice[] };
 
@@ -60,7 +60,7 @@ export const REMINDER_CHOICES: readonly ReminderChoice[] = [
 ];
 
 /** What replaces the legend once the promiser answers. */
-export function acknowledgement(answer: ReminderAnswer, checkBackDay?: string): string {
+export function acknowledgment(answer: ReminderAnswer, checkBackDay?: string): string {
   switch (answer) {
     case "done":
       return "Nice, marked done.";
@@ -168,7 +168,7 @@ const HEADED = /^(\*[^*\n]+\*)\n(.+)$/s;
 
 /** A reminder as Slack blocks: its body, then either the answers as buttons
  *  (with a hint line under them, when the footer has one) or a line of words,
- *  such as an answer's acknowledgement, as a context line.
+ *  such as an answer's acknowledgment, as a context line.
  *
  *  A body that opens with a bold heading line (`reminderText`) is laid out the
  *  way a card is: the heading as the section, the lines under it as a small
@@ -237,6 +237,6 @@ export function selfReminderText(input: { requester: string; what: string; perma
 }
 
 /** What replaces the legend once a ⏳ moves a "remind me". */
-export function snoozeAcknowledgement(day: string): string {
+export function snoozeAcknowledgment(day: string): string {
   return `Got it. I'll remind you again ${day}.`;
 }

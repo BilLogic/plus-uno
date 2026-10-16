@@ -10,7 +10,7 @@
 //
 // AT MOST ONCE PER THREAD PER SCENARIO, claimed in the thread's store once the
 // path is read and the comparison is ready to show, so a read that fails
-// leaves the offer for the next milestone. A repeat costs the judgement, the
+// leaves the offer for the next milestone. A repeat costs the judgment, the
 // search and the read, and shows nothing. Nothing is written anywhere: the
 // comparison is words in a reply.
 //
@@ -35,7 +35,7 @@ import { GATE_SUBREQUESTS, PATH_READ_COST } from "./budget";
 import type { DraftedChange, PathToday } from "./draft";
 import type { ServiceChangeGate, ServiceChangeInput } from "./gate";
 
-/** External subrequests one comparison may spend: the gate's judgement and
+/** External subrequests one comparison may spend: the gate's judgment and
  *  search, then the path read. */
 export const COMPARISON_SUBREQUESTS = GATE_SUBREQUESTS + PATH_READ_COST;
 /** Steps shown before the rest are counted. */

@@ -66,7 +66,7 @@ export const SUGGESTED_PROMPTS: SuggestedPrompt[] = [...BASE_PROMPTS, CONNECTED_
 /** A fixed prompt set LIES when capability varies per person: it offers someone
  *  a query the agent cannot run for them, and their first experience is a
  *  refusal. Search reach depends on individual OAuth, so the set depends on it
- *  too. This is a correctness fix, not personalisation. */
+ *  too. This is a correctness fix, not personalization. */
 export function promptsFor(connected: boolean): SuggestedPrompt[] {
   return [...BASE_PROMPTS, connected ? CONNECTED_PROMPT : CONNECT_PROMPT];
 }
@@ -139,7 +139,7 @@ export async function setSessionStatus(
   // channel-level session can go without one. So the guard that stood here for
   // `assistant.threads.setStatus` stands unchanged: without a thread there is
   // nothing to address, and we skip rather than send a bad request. Both
-  // callers already guard on the same thing, so this is defence, not a path:
+  // callers already guard on the same thing, so this is defense, not a path:
   // the sentinel is spelled out of Slack's vocabulary (`outcomeOf` gives it its
   // own kind) so that it can never be read back as a refusal Slack never made.
   if (!thread_ts) return { ok: false, error: "no_thread" };

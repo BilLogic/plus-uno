@@ -45,12 +45,12 @@
     // genuinely :disabled — it cannot be clicked and it announces as disabled,
     // which is right. But inheriting the disabled LOOK repainted the ground to
     // --color-on-surface-state-12 (near-white) and dimmed everything to 0.38,
-    // while the spinner below kept the variant's on-main colour: white on
-    // near-white at 38%, i.e. an empty grey box. Measured on the docs States
+    // while the spinner below kept the variant's on-main color: white on
+    // near-white at 38%, i.e. an empty gray box. Measured on the docs States
     // demo before this change.
     //
     // A loading button therefore keeps its own ground, and the spinner is drawn
-    // on the colour it was designed against.
+    // on the color it was designed against.
     &:disabled:not(.plus-btn--loading),
     &.disabled:not(.plus-btn--loading) {
         opacity: 0.38;
@@ -196,7 +196,7 @@ $btn-themes: (
     //
     // WHY ADDING THEM RATHER THAN NARROWING THE PROP, which #304's acceptance
     // allows equally: `Badge` already ships all twelve of the same vocabulary,
-    // each with its own colour, measured. Narrowing here would leave two
+    // each with its own color, measured. Narrowing here would leave two
     // components in one design system disagreeing about what the vocabulary IS —
     // `<Badge style="advocacy">` pink and `<Button style="advocacy">` not a
     // thing. Badge is also the working precedent that these tokens render.

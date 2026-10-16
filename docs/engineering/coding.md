@@ -41,9 +41,9 @@ alias.
 **What the code actually does**, so the rule is read for what it is rather than
 as a description: about 400 deep imports live inside `design-system/src/specs/`
 and roughly 70 call sites use the barrel. The spec-side deep imports predate the
-rule and are **grandfathered** — they are not a licence to copy the pattern into
+rule and are **grandfathered** — they are not a license to copy the pattern into
 a new file, and sweeping them is its own piece of work, not a side effect of
-touching a neighbouring line. Two cases are not violations at all: a component
+touching a neighboring line. Two cases are not violations at all: a component
 importing its own siblings inside `design-system/src/components/`, and a spec
 shell imported from its area group index (`@/specs/Universal/Pages`).
 
@@ -118,4 +118,4 @@ rename that reached `AGENTS.md` and stopped there.
 | Raw HTML in marketplace pages | Breaks DS consistency | Use DS components: Button, Input, Badge, Card, Select |
 | Nested Router providers | `MemoryRouter` inside `BrowserRouter` renders an empty root in React 19, with a silent console | One Router provider per tree — a shell mounted under another app takes its route from props |
 | A shell mounted under `<Route path="/x/*">` | Descendant `<Routes>` sees only the remainder after the prefix, so every path collapses to `/` and the index route always wins | Declare the named shell paths (`/monthly-reports/*`, `/admin/*`) above `/:prototypeId/*` — v6 ranks static segments first — and pass the shell a `contentKey` prop so it knows what to render at `index` |
-| `Failed to import test file` naming a setup file, with a `SyntaxError` that is not a real syntax error | A dependency discovered mid-run forced a Vite re-optimise and the page reloaded through the setup import. Look for `Vite unexpectedly reloaded a test` in the same run | Add the dependency to `optimizeDeps.include` on the `storybook` test project in `vite.config.js` — that is the one field the browser server reads. `design-system/tests/storybook-vitest-project.test.js` holds the assertions |
+| `Failed to import test file` naming a setup file, with a `SyntaxError` that is not a real syntax error | A dependency discovered mid-run forced a Vite re-optimize and the page reloaded through the setup import. Look for `Vite unexpectedly reloaded a test` in the same run | Add the dependency to `optimizeDeps.include` on the `storybook` test project in `vite.config.js` — that is the one field the browser server reads. `design-system/tests/storybook-vitest-project.test.js` holds the assertions |

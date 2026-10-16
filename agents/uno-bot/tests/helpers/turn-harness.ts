@@ -7,7 +7,7 @@
 // rely on.
 //
 // SHARED, because the cases that catch the interesting bugs span more than one
-// module. `tests/turn.test.ts` drives Turn's own behaviour; the flow tests
+// module. `tests/turn.test.ts` drives Turn's own behavior; the flow tests
 // (`tests/replaced-card-message.test.ts`, #583) drive Turn and then ask Gate
 // what a person would be told — and they have to be looking at the same store
 // a real thread would, or they prove nothing about production.

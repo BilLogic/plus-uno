@@ -45,7 +45,7 @@
 // instead by "the bot's own schema constants" below, which asserts each
 // exported name in `blueprint-schema.ts` against the same contract. A table
 // passed as a plain ARGUMENT is out of subject too — `fetchRows(env, "slices",
-// …)` builds its own `/rest/v1/${table}`, and recognising it would mean this
+// …)` builds its own `/rest/v1/${table}`, and recognizing it would mean this
 // file knowing the name of that helper. `slices` is covered where it belongs,
 // in `botReadTables` and its `table_slices` probe.
 //
@@ -95,7 +95,7 @@ const NOT_A_RELATION: ReadonlySet<string> = new Set(["rpc"]);
  *
  * The exemption is narrow on purpose: it applies to a source file only where
  * that file names the schema in a profile header, so a public-schema read
- * cannot hide behind a neighbour's exemption — and the whole file is reported
+ * cannot hide behind a neighbor's exemption — and the whole file is reported
  * as before if the header ever goes away.
  */
 const NON_PUBLIC_PROFILE = /"(?:accept|content)-profile"\s*\]?\s*[:=]\s*[^,\n]*semantic_search|SCHEMA\s*=\s*"semantic_search"/;

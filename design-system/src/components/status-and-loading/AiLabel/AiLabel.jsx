@@ -10,27 +10,27 @@ import './AiLabel.scss';
  *
  *   AiIndicator (Training/Lessons)      sparkle SVG with fill="#0472A8" — the
  *                                       primary blue, HARD-CODED as a literal.
- *                                       So the AI mark is the same colour as an
+ *                                       So the AI mark is the same color as an
  *                                       ordinary primary action.
  *   AiPromptedQuestionBox (Toolkit)     --color-mastering-content-state-16 — a
- *                                       CURRICULUM DOMAIN colour, borrowed for a
+ *                                       CURRICULUM DOMAIN color, borrowed for a
  *                                       meaning it does not have.
  *   RecommendedLessons (Home)           its own class, and `title="AI
  *                                       recommended"` as the whole accessible
  *                                       story.
  *   AlertForSupervisors (Training)      prose, no mark at all.
  *
- * Three marks, three colours, none of them shared. That is #269's argument with
+ * Three marks, three colors, none of them shared. That is #269's argument with
  * the evidence attached, and it is why this is a component rather than a fifth
  * local one.
  *
- * NO BRAND HUE IS PICKED HERE, ON PURPOSE. #269 says the colour is Bill's call
+ * NO BRAND HUE IS PICKED HERE, ON PURPOSE. #269 says the color is Bill's call
  * and this file does not make it. What it does take from Atlassian's Rovo — read
  * from `@atlaskit/tokens` and recorded on #269 — are the three decisions that
  * are NOT about which hue:
  *
  *   1. THE BOLD GROUND IS ACHROMATIC. `color.rovo.background.brand.bold` is
- *      #000000. AI is a different REGISTER, not another semantic colour
+ *      #000000. AI is a different REGISTER, not another semantic color
  *      competing with success and danger — so this uses the neutral surface
  *      ramp the system already has, and adding a hue later changes one token.
  *   2. THE ACCENT IS ONLY EVER A BORDER AND AN ICON. Rovo has no `rovo.text`
@@ -61,7 +61,7 @@ const DEFAULT_TEXT = {
 /**
  * The accessible name has to say what the mark MEANS, not what it is.
  *
- * `AiIndicator` today is labelled "AI-powered feature", which tells a
+ * `AiIndicator` today is labeled "AI-powered feature", which tells a
  * screen-reader user the category of the thing and nothing about the content it
  * is attached to. `RecommendedLessons` uses a `title` attribute, which is not a
  * reliable accessible name at all.

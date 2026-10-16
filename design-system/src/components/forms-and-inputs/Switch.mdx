@@ -184,7 +184,7 @@ name is empty, and a screen reader announces only "switch, on".
   makes the switch purely visual, so the component adds `role="switch"` to the
   input itself. Screen readers say "on" / "off" rather than "checked" /
   "not checked". The element underneath is still a real checkbox, so keyboard
-  behaviour, the checked state and `name`/`value` in a form are the browser's,
+  behavior, the checked state and `name`/`value` in a form are the browser's,
   unchanged — and assistive technology that does not know the role falls back
   to the checkbox it really is.
 
@@ -208,7 +208,7 @@ name is empty, and a screen reader announces only "switch, on".
   support, and the two named holdouts have since been addressed: NVDA reported
   switches as checkboxes until it fixed that in 2023.1, and iOS VoiceOver's
   long-standing bug was closed against WebKit 17.4. Everywhere the role is not
-  honoured it degrades to a correctly announced checkbox with its state — in
+  honored it degrades to a correctly announced checkbox with its state — in
   the published test matrices there is no case of a native-checkbox switch
   going unannounced or losing its state.
 

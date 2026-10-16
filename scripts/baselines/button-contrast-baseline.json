@@ -1,6 +1,6 @@
 {
   "measured": "2026-08-29",
-  "why": "Two colour-token decisions (#312) that Button cannot make for itself. The set may shrink and must never grow: an entry that stops failing is itself reported, so a fix cannot be made and then quietly forgotten here.",
+  "why": "Two color-token decisions (#312) that Button cannot make for itself. The set may shrink and must never grow: an entry that stops failing is itself reported, so a fix cannot be made and then quietly forgotten here.",
   "contrast": [
     "warning/filled"
   ],

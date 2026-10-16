@@ -3,7 +3,7 @@
  *
  * WHAT WAS UNWATCHED. `scripts/figma-variables-snapshot.json` records every
  * variable in the library by NAME and by count, and `check:figma-snapshots`
- * holds it to a date and a floor. Neither records a single VALUE. So a colour
+ * holds it to a date and a floor. Neither records a single VALUE. So a color
  * could move in Figma, or be hand-edited in `_colors.scss`, and nothing in this
  * repository would notice — the names would still line up perfectly.
  *
@@ -14,12 +14,12 @@
  * Both sides were internally consistent — the CSS state layers built from
  * `rgba(189, 242, 146, …)` and the Figma ones from `#a1eb83` — so each looked
  * correct on its own, and only the comparison showed the split. Which side was
- * right was a decision, not a repair: changing either moves a colour that
+ * right was a decision, not a repair: changing either moves a color that
  * ships. It sat as a KNOWN divergence until 2026-09-15, when the owner chose
  * #bdf292 and the live library turned out to already hold it: the variable
  * re-measured to #bdf292 into the recording that day. The state layers are NOT
- * evidence either way — `colour-values.json` excludes them by design, because
- * they are the base colour at 8/12/16% and drift with it. The count of
+ * evidence either way — `color-values.json` excludes them by design, because
+ * they are the base color at 8/12/16% and drift with it. The count of
  * divergences is a ratchet.
  *
  * WHY THE MAPPING RUNS FIGMA -> CSS. Figma is the source, and the CSS is
@@ -64,7 +64,7 @@ export function cssName(figmaName) {
 }
 
 /** Every `--color-*` declaration, with `var()` chains followed to a literal. */
-export function cssColours(repoRoot) {
+export function cssColors(repoRoot) {
   const files = ['_colors.scss', '_color_roles.scss']
     .map((f) => path.join(repoRoot, TOKEN_DIR, f))
     .filter((f) => fs.existsSync(f));
@@ -87,7 +87,7 @@ export function cssColours(repoRoot) {
 }
 
 /** `#RRGGBB`, or `#RRGGBB@0.32` when translucent. Null when unreadable. */
-export function normalise(value) {
+export function normalize(value) {
   const v = value.trim().toLowerCase();
   const short = /^#([0-9a-f])([0-9a-f])([0-9a-f])$/.exec(v);
   if (short) return `#${short[1]}${short[1]}${short[2]}${short[2]}${short[3]}${short[3]}`;
@@ -112,20 +112,20 @@ export function normalise(value) {
  * `divergences` is `{token, figmaName, figma, css}` for every pair that maps and
  * disagrees.
  */
-export function compare(recording, colours) {
+export function compare(recording, colors) {
   const result = { compared: 0, unmapped: [], unreadable: [], divergences: [] };
 
   for (const [key, figmaValue] of Object.entries(recording.variables)) {
     const figmaName = key.split('::')[1] ?? key;
     const token = cssName(figmaName);
-    if (!token || !colours.has(token)) {
+    if (!token || !colors.has(token)) {
       result.unmapped.push(figmaName);
       continue;
     }
-    const theirs = normalise(figmaValue);
-    const ours = normalise(colours.get(token));
+    const theirs = normalize(figmaValue);
+    const ours = normalize(colors.get(token));
     if (theirs === null || ours === null) {
-      result.unreadable.push(`${token} (${figmaName}): figma ${figmaValue}, css ${colours.get(token)}`);
+      result.unreadable.push(`${token} (${figmaName}): figma ${figmaValue}, css ${colors.get(token)}`);
       continue;
     }
     result.compared += 1;

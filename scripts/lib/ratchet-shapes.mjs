@@ -14,7 +14,7 @@
  * The survey, entire, as of 2026-09-18 (#599):
  *
  *   FORM        records                                    what a key is
- *   keys        button-contrast, colour-fallback,          a string in an array;
+ *   keys        button-contrast, color-fallback,          a string in an array;
  *               size-fallback                              presence only, no count
  *   lists       a11y `stories`                             key → array of member
  *                                                          ids; each MEMBER is a
@@ -46,7 +46,7 @@
  *             maintained by hand and has no `--update`.
  *   prose     dotted path to the record's own explanatory key, for the reader.
  *   sets      one or more ratcheted containers. A record with two sets (a11y,
- *             button-contrast, colour-fallback) has two rows here and each is
+ *             button-contrast, color-fallback) has two rows here and each is
  *             the other's unowned sibling.
  *
  * SET SHAPE.
@@ -138,9 +138,9 @@ export const SHAPES = [
     ],
   },
   {
-    file: 'scripts/baselines/colour-fallback-baseline.json',
-    check: 'check:colour-fallbacks',
-    command: 'npm run check:colour-fallbacks -- --update',
+    file: 'scripts/baselines/color-fallback-baseline.json',
+    check: 'check:color-fallbacks',
+    command: 'npm run check:color-fallbacks -- --update',
     prose: 'why',
     sets: [
       { name: 'disagreements', at: 'disagreements', form: 'keys' },

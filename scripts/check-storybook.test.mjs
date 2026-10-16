@@ -23,7 +23,7 @@ import {
   baselineRecord,
   classify,
   ratchet,
-  reoptimisationFailures,
+  reoptimizationFailures,
   ruleCounts,
   verdict,
 } from './check-storybook.mjs';
@@ -208,7 +208,7 @@ test('rule counts are ordered heaviest first', () => {
   assert.deepEqual(Object.keys(counts), ['label', 'button-name']);
 });
 
-/* ------------------------------------------ the re-optimisation flake shape */
+/* ------------------------------------------ the re-optimization flake shape */
 
 test('a blocking failure that names the setup file is identified as the flake', () => {
   // The real message, from run 33239327882: the file blamed is a story, the
@@ -219,7 +219,7 @@ test('a blocking failure that names the setup file is identified as the flake', 
       message: 'Error: Failed to import test file /home/runner/work/plus-uno/plus-uno/.storybook/vitest.setup.ts',
     },
   ];
-  assert.equal(reoptimisationFailures(blocking).length, 1);
+  assert.equal(reoptimizationFailures(blocking).length, 1);
 });
 
 test('a genuine play-function failure is not mistaken for the flake', () => {
@@ -228,7 +228,7 @@ test('a genuine play-function failure is not mistaken for the flake', () => {
     { where: 'a.stories.jsx::Story', message: 'AssertionError: expected 1 to equal 2' },
     { where: 'b.stories.jsx', message: 'Failed to import test file /repo/b.stories.jsx' },
   ];
-  assert.deepEqual(reoptimisationFailures(blocking), []);
+  assert.deepEqual(reoptimizationFailures(blocking), []);
 });
 
 test('the flake is reported alongside the real failures, never instead of them', () => {
@@ -238,7 +238,7 @@ test('the flake is reported alongside the real failures, never instead of them',
     { where: 'a.stories.jsx::Story', message: 'AssertionError: nope' },
     { where: 'b.stories.jsx', message: 'Failed to import test file /repo/.storybook/vitest.setup.ts' },
   ];
-  assert.equal(reoptimisationFailures(blocking).length, 1);
+  assert.equal(reoptimizationFailures(blocking).length, 1);
   assert.equal(blocking.length, 2);
 });
 

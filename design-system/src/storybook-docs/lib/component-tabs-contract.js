@@ -102,7 +102,7 @@ const componentNameOf = (file) => file.replace(/\.(stories|test)\.[jt]sx?$/, '')
  * title, because the path is what the generated docs are keyed by — the two
  * agree today, and if they ever stop, the path is the one that can be opened.
  *
- * Both component shapes the doc generator recognises are handled: a nested
+ * Both component shapes the doc generator recognizes are handled: a nested
  * `<group>/<Name>/<Name>.jsx` documented in `<Name>/index.md`, and a flat
  * `<group>/<Name>.jsx` documented in `<group>/<Name>.md`.
  *
@@ -157,14 +157,14 @@ export function componentIdentity(entry) {
 /**
  * The entries a component declares, newest first. Anything without an ISO date
  * and a summary is dropped rather than rendered half-formed, and an
- * unrecognised `kind` becomes `null` rather than being coerced into one of the
+ * unrecognized `kind` becomes `null` rather than being coerced into one of the
  * five — a changelog that guesses is the failure this mechanism is meant to
  * avoid.
  *
  * @param {unknown} raw The story meta's `parameters.changelog`.
  * @returns {{date: string, kind: string|null, summary: string}[]}
  */
-export function normaliseChangelog(raw) {
+export function normalizeChangelog(raw) {
   if (!Array.isArray(raw)) return [];
 
   return raw

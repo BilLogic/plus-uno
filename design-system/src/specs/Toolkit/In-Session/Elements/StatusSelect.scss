@@ -4,8 +4,8 @@
     min-width: 10rem;
 }
 
-// The picked status's colour role tints the field: its container fill, a
-// subtle border, and the role's text colour.
+// The picked status's color role tints the field: its container fill, a
+// subtle border, and the role's text color.
 @each $role in success, warning, danger, info {
     .status-select--#{$role} {
         .plus-field {

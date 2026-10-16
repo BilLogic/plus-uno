@@ -59,7 +59,7 @@ export const Toast = ({
      *
      * So passing them is silently ignored — which means the explicit
      * `role="alert"` this component used to pass was never doing anything
-     * either; it only looked like the source of the behaviour. Setting them on
+     * either; it only looked like the source of the behavior. Setting them on
      * the node we are handed is the one place the value can actually change.
      * Measured: the assertion in `ToastPoliteness.stories.jsx` fails without it.
      */

@@ -10,7 +10,7 @@ import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const RECORDING = JSON.parse(
-  fs.readFileSync(path.join(REPO_ROOT, 'design-system/figma/colour-values.json'), 'utf8'),
+  fs.readFileSync(path.join(REPO_ROOT, 'design-system/figma/color-values.json'), 'utf8'),
 );
 
 test('every role in the accent naming is classified', () => {
@@ -186,7 +186,7 @@ function scopedLibrary({ violateBase = false } = {}) {
 
 test('a base offered as text in a fixture recording is a finding', () => {
   const { root, done } = policyTree({
-    'design-system/figma/colour-values.json': JSON.stringify({ scopes: scopedLibrary({ violateBase: true }) }),
+    'design-system/figma/color-values.json': JSON.stringify({ scopes: scopedLibrary({ violateBase: true }) }),
   });
   try {
     const found = messagesOf(run, root);
@@ -201,7 +201,7 @@ test('a base offered as text in a fixture recording is a finding', () => {
 
 test('an emptied scopes recording fires the sentinel floor, not a clean sweep', () => {
   const { root, done } = policyTree({
-    'design-system/figma/colour-values.json': JSON.stringify({ scopes: {} }),
+    'design-system/figma/color-values.json': JSON.stringify({ scopes: {} }),
   });
   try {
     const found = messagesOf(run, root);

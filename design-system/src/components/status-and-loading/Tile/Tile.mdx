@@ -21,7 +21,7 @@ export const figmaMeta = {
     },
     "color": {
       "type": "enum",
-      "values": ["grey", "blue", "green", "purple", "magenta", "yellow", "teal", "white"]
+      "values": ["gray", "blue", "green", "purple", "magenta", "yellow", "teal", "white"]
     },
     "hasBorder": { "type": "boolean" }
   },
@@ -37,7 +37,7 @@ export const figmaMeta = {
       "variantProps": {
         "hasBorder": "border?"
       },
-      "notes": "On the Iconography, Logos & Imagery page. Figma marks defaults in the value name (\"32 (default)\", \"subtle (default)\", \"grey (default)\"); code takes the bare value. Logo and image variants hold a media slot, which code fills with `children` or `src`. Image variants exist for grey only, since the picture covers the ground."
+      "notes": "On the Iconography, Logos & Imagery page. Figma marks defaults in the value name (\"32 (default)\", \"subtle (default)\", \"gray (default)\"); code takes the bare value. Logo and image variants hold a media slot, which code fills with `children` or `src`. Image variants exist for gray only, since the picture covers the ground."
     }
   ]
 };
@@ -76,11 +76,11 @@ its size.
 
 ## Icon colors
 
-<DocsCanvasShell description={<>Subtle is the color's container with its on-container icon. Grey is surface-container-high with on-surface-variant.</>}>
+<DocsCanvasShell description={<>Subtle is the color's container with its on-container icon. Gray is surface-container-high with on-surface-variant.</>}>
     <DsCanvasQuiet of={TileStories.IconSubtle} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Bold is the solid color with its on-color icon. Grey bold is the inverse surface.</>}>
+<DocsCanvasShell description={<>Bold is the solid color with its on-color icon. Gray bold is the inverse surface.</>}>
     <DsCanvasQuiet of={TileStories.IconBold} />
 </DocsCanvasShell>
 
@@ -90,7 +90,7 @@ its size.
 
 ## Logos
 
-<DocsCanvasShell description={<>A logo is inset like an icon and keeps its own colors. It sits on white by default, or on grey or a color's container when it needs contrast.</>}>
+<DocsCanvasShell description={<>A logo is inset like an icon and keeps its own colors. It sits on white by default, or on gray or a color's container when it needs contrast.</>}>
     <DsCanvasQuiet of={TileStories.Logos} />
 </DocsCanvasShell>
 
@@ -179,7 +179,7 @@ logo keeps its own. Images cover the whole tile, so color does not apply.
 
 `color` takes the Tag color set from the label spec, where `yellow` replaces
 `orange` (`orange` still works as a deprecated alias): plain names, never a status. Keep one color per kind of
-item across the app, or leave tiles grey.
+item across the app, or leave tiles gray.
 
 </div>
 

@@ -150,7 +150,7 @@ const THINKING_BUDGET_TOKENS = 6000;
 const MAX_PAUSE_RESUMES = 4;
 
 // Default ceiling for a one-shot `generate` when the caller names none. Modest
-// on purpose: a one-shot is a judgement or a classification, and a caller that
+// on purpose: a one-shot is a judgment or a classification, and a caller that
 // wants a long answer back (a re-drafted reply) says so.
 const ONE_SHOT_MAX_TOKENS = 2048;
 
@@ -221,7 +221,7 @@ export function claudeProvider(opts: ClaudeProviderOptions): ModelProvider {
      * belong to the turn, so a one-shot beside a turn in flight leaves it
      * exactly as it was. Only the transport is shared.
      *
-     * No extended thinking here either. A one-shot is a judgement or a
+     * No extended thinking here either. A one-shot is a judgment or a
      * classification, and the budget would double its latency for a caller that
      * asked for a short answer.
      */
@@ -256,7 +256,7 @@ export function claudeProvider(opts: ClaudeProviderOptions): ModelProvider {
       thinkingBudget = tier === "chill" ? null : THINKING_BUDGET_TOKENS;
 
       // The loop says WHICH block is stable; the `cache_control` shape that
-      // exploits it is this adapter's. Vertex honours it for Claude, so the
+      // exploits it is this adapter's. Vertex honors it for Claude, so the
       // harness rides as a cached prefix and the per-request blocks after it do
       // not — which is the whole point of the distinction.
       system = turn.system

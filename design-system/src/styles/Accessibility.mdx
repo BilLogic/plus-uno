@@ -119,7 +119,7 @@ both of which bit during #243:
   `SectionTitle` is an `h3` under a page's own header and an `h2` on the
   Reflection page, which has no such header.
 - Tag-keyed CSS has to be widened in the same edit, exactly as § Heading levels
-  says. `.lesson-content__title-section h4` silently dropped a colour and a
+  says. `.lesson-content__title-section h4` silently dropped a color and a
   margin the moment those titles became `h2`.
 </div>
 
@@ -172,14 +172,14 @@ a chart built on the theme needs no per-component work:
   no title, that label was empty and every chart announced as an unlabeled
   image.
 - **Charts are groups, not landmarks.** `landmarkVerbosity: 'disabled'` keeps
-  the chart a labelled `role="group"` instead of a `role="region"` landmark. A
+  the chart a labeled `role="group"` instead of a `role="region"` landmark. A
   chart here is a widget inside a page region, not a region of its own, so a
   dashboard with six charts adds six groups rather than six entries to the
   landmark menu.
 
 A chart that assembles its own options instead of spreading `chartTheme` has to
 carry `accessibility: chartTheme.accessibility` itself. Do not wrap a chart in
-`aria-hidden` to quiet a labelling warning — that hides the keyboard-navigation
+`aria-hidden` to quiet a labeling warning — that hides the keyboard-navigation
 proxies the module creates, which is a worse defect than the one it silences.
 </div>
 
@@ -202,7 +202,7 @@ Violations surface in the test UI (the `a11y.test` parameter in
 
 ## Related
 
-- For the contrast every colour pair measures at, see **Colors** — the bold and `(Text)` halves of each semantic, with ratios.
+- For the contrast every color pair measures at, see **Colors** — the bold and `(Text)` halves of each semantic, with ratios.
 - For the type sizes and line-heights, see **Typography**.
 - For when an icon needs a label and when it is decorative, see **Icons**.
 

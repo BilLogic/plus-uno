@@ -9,7 +9,7 @@
  *      `background-color: var(--color-success)` as white-on-white at 1:1.
  *   2. READING A STATE LAYER AS PAINT. The second draft read the ground from
  *      the rule and then treated `rgba(4, 114, 168, 0.08)` as solid. 34 of its
- *      48 findings were an 8% wash mistaken for a colour — the same arithmetic
+ *      48 findings were an 8% wash mistaken for a color — the same arithmetic
  *      #268's audit made and had to correct.
  *
  * The ratchet's WORDING is tested here — the NEW / ROSE / STALE columns this
@@ -75,7 +75,7 @@ test('a background in the SAME rule is the ground', () => {
 });
 
 test('a background in a CHILD rule is not this rule’s ground', () => {
-  // The shape that actually occurs: the header sets the text colour, the
+  // The shape that actually occurs: the header sets the text color, the
   // variant modifier sets the fill. Reported as a page finding, and the
   // baseline records why — a wrong answer here would be worse than no answer.
   const { root, file } = fixture(
@@ -107,7 +107,7 @@ test('the -text sibling is offered only when the token file defines one', () => 
   assert.equal(textSibling('--color-primary', VALUES), null);
 });
 
-test('a warning text colour on the page is a finding, and names its sibling', () => {
+test('a warning text color on the page is a finding, and names its sibling', () => {
   const { root, file } = fixture('tag.scss', `.a {\n  color: var(--color-warning);\n}\n`);
   const [found] = findings(textDeclarations([file], root), VALUES);
   assert.equal(found.token, '--color-warning');
@@ -116,7 +116,7 @@ test('a warning text colour on the page is a finding, and names its sibling', ()
   assert.ok(found.siblingRatio > 8);
 });
 
-test('the same colour via the -text sibling is not a finding', () => {
+test('the same color via the -text sibling is not a finding', () => {
   const { root, file } = fixture('tag.scss', `.a {\n  color: var(--color-warning-text);\n}\n`);
   assert.deepEqual(findings(textDeclarations([file], root), VALUES), []);
 });

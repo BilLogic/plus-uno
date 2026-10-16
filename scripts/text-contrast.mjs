@@ -6,14 +6,14 @@
  * produce. This reads arbitrary `color:` declarations in the design system's
  * stylesheets, which no generator produces and no story necessarily renders.
  * `--color-warning` is 3.52:1 on the page ground, below AA's 4.5:1, and it was
- * the declared text colour in seven places: a form tag, two status icons, a
+ * the declared text color in seven places: a form tag, two status icons, a
  * table cell, a select, a button-container message and a `.color-warning`
  * utility class anyone can reach for. The token file has carried
  * `--color-warning-text` (#5b4a00, 8.24:1) the whole time.
  *
  * WHY THE PAIR EXISTS AT ALL, benchmarked: `@atlaskit/tokens` 16.9.0 separates
  * `color.text.warning` from `color.background.warning.bold` and the two are not
- * the same value — the split exists precisely so a bold fill colour cannot be
+ * the same value — the split exists precisely so a bold fill color cannot be
  * used as body text. We have the same split (`--color-X` / `--color-X-text`)
  * for all twelve semantics. Nothing enforced it, so 123 `color:` declarations
  * name the bold half. Most of those pass AA; this check is about the ones that
@@ -40,7 +40,7 @@
  *  2. INLINE STYLES. `style={{ color: 'var(--color-warning)' }}` in JSX is
  *     invisible here. The corpus is stylesheets.
  *  3. `--color-on-*` AND `--color-inverse-*`. Skipped by design: they exist to
- *     be drawn on a coloured or dark ground, so measuring them against a light
+ *     be drawn on a colored or dark ground, so measuring them against a light
  *     page would report a wall of failures that are not failures.
  *  4. GRAPHIC-ONLY CONTRAST, AND THE INACTIVE EXEMPTION. WCAG asks 3:1 of a
  *     graphical object, 4.5:1 of text, and NOTHING AT ALL of an inactive
@@ -58,7 +58,7 @@
  *     not a lower bar.
  *  5. WHETHER THE REPLACEMENT IS RIGHT. It reports that a token is unreadable
  *     on the page and names the `-text` sibling where one exists. Whether that
- *     sibling is the correct colour for the role is a design question.
+ *     sibling is the correct color for the role is a design question.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -71,7 +71,7 @@ import { NON_TEXT, analyzeSheet, groundAt, isNonText } from './lib/declared-grou
 import {
   composite,
   contrast,
-  parseColour,
+  parseColor,
   resolveToken,
   varReferencePattern,
 } from '../design-system/src/lib/tokens.mjs';
@@ -86,11 +86,11 @@ export const TOKENS_FILE = `${TOKEN_DIR}/_colors.scss`;
 /** Stylesheets that consume tokens. The files that DEFINE them are not scanned. */
 export const CORPUS = 'design-system/src';
 
-/** Roles that are meant to sit on a colour, not on the page. See blind spot 3. */
+/** Roles that are meant to sit on a color, not on the page. See blind spot 3. */
 export const OFF_PAGE = /^--color-(on|inverse)-/;
 
 export function stylesheets(root = REPO_ROOT, dir = CORPUS) {
-  // `tokens/` DEFINES the colours; a definition is not a use of one.
+  // `tokens/` DEFINES the colors; a definition is not a use of one.
   return documents(dir, { root, ext: ['.scss', '.css'] }).filter(
     (file) => !file.includes('/tokens/'),
   );
@@ -170,15 +170,15 @@ export function textSibling(token, values) {
  * is composited over the page before anything is measured.
  */
 export function opaqueGround(ground, values, page = PAGE_TOKEN) {
-  const paint = parseColour(resolveToken(ground, values));
+  const paint = parseColor(resolveToken(ground, values));
   if (!paint) return null;
   if (paint.a >= 1) return paint;
-  const beneath = parseColour(resolveToken(page, values));
+  const beneath = parseColor(resolveToken(page, values));
   return beneath ? composite(paint, beneath) : null;
 }
 
 export function ratio(token, values, ground = PAGE_TOKEN) {
-  const foreground = parseColour(resolveToken(token, values));
+  const foreground = parseColor(resolveToken(token, values));
   const background = opaqueGround(ground, values);
   if (!foreground || !background) return null;
   // A translucent FOREGROUND is a different question — text at 8% alpha is a
@@ -188,7 +188,7 @@ export function ratio(token, values, ground = PAGE_TOKEN) {
 }
 
 /**
- * Declarations whose colour is unreadable on the page.
+ * Declarations whose color is unreadable on the page.
  *
  * A token that cannot be resolved to a literal is NOT a finding — it is a
  * different defect (a dangling token) with a different check, and reporting it
@@ -198,7 +198,7 @@ export function findings(uses, values, { threshold = AA_TEXT } = {}) {
   const out = [];
   for (const use of uses) {
     const ground = use.ground || PAGE_TOKEN;
-    // `--color-on-*` and `--color-inverse-*` exist to be drawn on a colour. If
+    // `--color-on-*` and `--color-inverse-*` exist to be drawn on a color. If
     // the rule names its ground they are measured like anything else; only the
     // page-assumption case is skipped, because that is the one that would be
     // measuring them against a surface they were never for.
@@ -244,7 +244,7 @@ export function report(found, { threshold = AA_TEXT } = {}) {
       (f.sibling ? `\n      → ${f.sibling} is ${f.siblingRatio}:1 and exists for exactly this.` : ''),
   );
   return (
-    `[text-contrast] ${found.length} text colour${found.length === 1 ? '' : 's'} below AA:\n\n` +
+    `[text-contrast] ${found.length} text color${found.length === 1 ? '' : 's'} below AA:\n\n` +
     `${lines.join('\n\n')}\n\n` +
     `  A ground is resolved outward from the declaration's rule: the first rule with a\n` +
     `  --color-* background or a @grounds decides, and the page if none does. If the\n` +

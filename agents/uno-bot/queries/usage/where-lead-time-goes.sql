@@ -4,7 +4,7 @@
 -- Definition: of real asks in the window with escalated_to_lead = 1 (the lead
 -- replied in the thread, or the asker DMed the lead on the same topic, within
 -- 24 h), the share whose pain_category is 6 (judgment). Two shares:
---   - judgment_share: over every escalated ask, so an ask not yet labelled
+--   - judgment_share: over every escalated ask, so an ask not yet labeled
 --     counts against it;
 --   - classified_share: over escalated asks with a pain_category.
 -- Beside them, the unlabelled are split: `blank` asks were classified and no

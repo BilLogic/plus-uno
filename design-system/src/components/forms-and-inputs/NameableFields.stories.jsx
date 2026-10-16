@@ -96,7 +96,7 @@ EveryFieldCanBeNamed.play = async ({ canvasElement }) => {
 export const HidingTheLabelKeepsTheName = () => (
     <div style={stack}>
         <InputGroup id="nf-hidden" label="Search" showLabel={false} trailingVisual="icon" />
-        <ChoiceGroup name="unlabelled" aria-label="Pick one" options={['One', 'Two']} />
+        <ChoiceGroup name="unlabeled" aria-label="Pick one" options={['One', 'Two']} />
     </div>
 );
 

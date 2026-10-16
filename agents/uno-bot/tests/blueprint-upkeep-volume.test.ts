@@ -468,7 +468,7 @@ describe("a design hand-off redrafted in its thread", () => {
     w.deps.provider = atDeploy.provider;
     const asked = w.ai.asked.length;
     await endOfDay(w, "2026-10-17");
-    assert.equal(w.ai.asked.length, asked, "a promotion: no judgement");
+    assert.equal(w.ai.asked.length, asked, "a promotion: no judgment");
     assert.equal(atDeploy.asked.length, 1, "one redraft against the card's words now");
     const promoted = (await morning(w.state)).staged;
     assert.equal(promoted.length, 1);

@@ -224,7 +224,7 @@ export const MAX_REQUEST_TEXT_CHARS = 2_000;
  * Whether an ask made here may be stored as text for the end-of-day
  * classifier: only in a conversation KNOWN to be a channel, public or private.
  * A DM, a group DM and a conversation of unknown type never store text; their
- * asks are labelled in the turn instead (`turn/turn.ts`).
+ * asks are labeled in the turn instead (`turn/turn.ts`).
  */
 export function keepsRequestText(conversationType: ConversationType | null | undefined): boolean {
   return conversationType === "channel" || conversationType === "group";
@@ -301,7 +301,7 @@ export function buildTurnRecord(facts: TurnRecordFacts): TurnRecord {
 }
 
 /**
- * A record with its ask labelled — a DM turn's in-turn classification. The
+ * A record with its ask labeled — a DM turn's in-turn classification. The
  * pain_category keeps a staged turn's 7; the text stays null.
  *
  * @param record - The turn's record

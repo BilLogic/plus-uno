@@ -17,7 +17,7 @@ import './Listbox.scss';
 
 /** Past this many options, only the rows on screen are drawn. */
 export const VIRTUALIZE_ABOVE = 100;
-/** Rows drawn beyond each edge of the visible window while virtualised. */
+/** Rows drawn beyond each edge of the visible window while virtualized. */
 const OVERSCAN = 6;
 /** A row's height before one has been measured. */
 const FALLBACK_ROW_HEIGHT = 36;
@@ -29,7 +29,7 @@ const FALLBACK_ROW_HEIGHT = 36;
  * @param {number} index Its place in the caller's array, which keeps its id stable while filtering.
  * @returns {{ value: *, label: *, text: string, description?: *, disabled: boolean, group?: string, leading?: *, trailing?: *, index: number, source: * }}
  */
-const normalise = (option, index) => {
+const normalize = (option, index) => {
     if (typeof option === 'string' || typeof option === 'number') {
         return { value: option, label: option, text: String(option), disabled: false, index, source: option };
     }
@@ -122,7 +122,7 @@ const Listbox = ({
     );
 
     /* ---------- the rows: filtered options, then the Create row ---------- */
-    const all = useMemo(() => options.map(normalise), [options]);
+    const all = useMemo(() => options.map(normalize), [options]);
     const query = filter.trim().toLowerCase();
     const shown = useMemo(
         () => (query ? all.filter((option) => option.text.toLowerCase().includes(query)) : all),
@@ -262,7 +262,7 @@ const Listbox = ({
         ));
     });
 
-    /* ---------- virtualisation ---------- */
+    /* ---------- virtualization ---------- */
     const virtual = shown.length > VIRTUALIZE_ABOVE;
     const [rowHeight, setRowHeight] = useState(FALLBACK_ROW_HEIGHT);
     const [scrollTop, setScrollTop] = useState(0);

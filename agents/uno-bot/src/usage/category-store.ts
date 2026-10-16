@@ -36,7 +36,7 @@ export interface AskCategoryStore {
    *  newer ones instead of heading every batch. */
   pendingAsks(limit: number): Promise<PendingAsk[]>;
   /** Label these asks and null their text, in ONE write: no row is ever
-   *  labelled with its text still on it, or stripped of text unlabelled. */
+   *  labeled with its text still on it, or stripped of text unlabelled. */
   label(labels: readonly AskLabel[], at: number): Promise<void>;
   /**
    * Count one failed classification against each of these asks, in ONE write.

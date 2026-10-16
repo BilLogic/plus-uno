@@ -10,7 +10,7 @@
 //   • THE WRITE — `writeDevLinks`, the card's one operation past Approve:
 //     read the nodes' links again, rename a Code link still under its old
 //     name, add only what is still missing (a re-run or a second card never
-//     doubles one), and leave one labelled comment on a component's first
+//     doubles one), and leave one labeled comment on a component's first
 //     library component the first time it gets its links — unless that
 //     comment is already there, or this write already posted it. Every step
 //     re-reads what Figma has, so a write may stop between any two calls and

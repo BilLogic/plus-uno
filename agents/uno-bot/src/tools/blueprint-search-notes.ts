@@ -162,7 +162,7 @@ export const NOT_CONFIGURED_NOTE =
  *  this invocation simply cannot spend another read. Narrating that as
  *  unreachable invites "so it's not in the blueprint". */
 export const BUDGET_NOTE =
-  "This invocation ran OUT OF READ BUDGET before the query finished — the blueprint was reachable and this says NOTHING about whether the answer is in it. Do not report absence, do not fabricate. Say the lookup was cut short, and either answer from what you already have (labelled as partial) or offer to retry with a narrower question.";
+  "This invocation ran OUT OF READ BUDGET before the query finished — the blueprint was reachable and this says NOTHING about whether the answer is in it. Do not report absence, do not fabricate. Say the lookup was cut short, and either answer from what you already have (labeled as partial) or offer to retry with a narrower question.";
 
 /** Anything else: the source of truth exists and this turn could not read it. */
 export const UNREACHABLE_NOTE =

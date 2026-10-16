@@ -37,7 +37,7 @@ const FULL = {
     "Does the two-step confirm feel like one decision or two?",
     "Is the 24h reminder copy clear enough to act on?",
   ],
-  not_looking_for: "Visual polish — colour and spacing are still placeholder.",
+  not_looking_for: "Visual polish — color and spacing are still placeholder.",
   link: "https://figma.com/file/x",
   reviewers: ["U03FYQJRQHX", "Alex"],
   deadline: "EOD Friday",

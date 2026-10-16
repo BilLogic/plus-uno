@@ -93,7 +93,7 @@ test("countPerWorkday counts housekeeping requests over Monday-to-Friday days", 
     row("4", "meeting", "2026-10-17"), // Saturday: counted, and reported apart
     row("5", "dm", "2026-10-14"), // chatter
     row("6", "dm", "2026-10-30"), // outside the window
-    row("7", "dm", "2026-10-15"), // never labelled
+    row("7", "dm", "2026-10-15"), // never labeled
   ].join("\n"));
   const labels = [
     label("1", true, "Could be looked up"),
@@ -239,7 +239,7 @@ test("calibration counts a Spring 2026 corpus row dated before the window opens,
   const { io } = fakeIo({ "rows.jsonl": corpus, "/out/cal.jsonl": both });
   const out = /** @type {any} */ (await run(["--calibrate", "--count", "/out/cal.jsonl", "rows.jsonl"], io));
   assert.equal(out.result.rows, 2);
-  assert.equal(out.result.labelled, 2);
+  assert.equal(out.result.labeled, 2);
   assert.equal(out.result.corpus.housekeeping, 2);
   assert.equal(out.result.model.housekeeping, 2);
 
@@ -257,7 +257,7 @@ test("--count prints housekeeping requests per workday and the prompt sha256", a
   const out = await run(["--count", "/out/labels.jsonl", "export.jsonl"], io);
   const text = lines.join("\n");
   assert.match(text, new RegExp(`prompt sha256 ${promptHash()}`));
-  assert.match(text, /labelled in a Claude Code session/);
+  assert.match(text, /labeled in a Claude Code session/);
   assert.match(text, /housekeeping per workday: 1 \(2 in all/);
   assert.equal(/** @type {any} */ (out.result).housekeeping, 2);
   assert.deepEqual(written, {}, "count writes nothing");

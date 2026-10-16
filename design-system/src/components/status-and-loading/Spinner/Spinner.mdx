@@ -154,8 +154,8 @@ and that is all it says.
 
 `variant` picks the animation: `border` and `grow` are the Bootstrap two,
 `growing`, `rotating` and `stacking` are drawn from blocks in CSS. `size` takes
-`sm` and nothing else. The colour is fixed at `--color-on-surface-variant` for
-every variant, deliberately — a spinner is not a status colour.
+`sm` and nothing else. The color is fixed at `--color-on-surface-variant` for
+every variant, deliberately — a spinner is not a status color.
 
 </div>
 
@@ -163,14 +163,14 @@ every variant, deliberately — a spinner is not a status colour.
 
 ## Usage notes
 
-### The colour prop is swallowed on purpose.
+### The color prop is swallowed on purpose.
 
 ```jsx
 // Incorrect — color is destructured away and never reaches the DOM. Every
 // variant is --color-on-surface-variant, by design.
 <Spinner variant="border" color="primary" />
 
-// Correct — if a surface needs a different spinner colour, set it on the
+// Correct — if a surface needs a different spinner color, set it on the
 // element, not through a prop that does not exist.
 <Spinner variant="border" className="on-inverse-surface" />
 ```

@@ -136,7 +136,7 @@ describe("the failure post", () => {
 });
 
 describe("Try again", () => {
-  it("honours only the person who asked: anyone else is told to ask it themselves", async () => {
+  it("honors only the person who asked: anyone else is told to ask it themselves", async () => {
     const d = door();
     const value = retryValue("U0000001", QUESTION);
     await runTryAgainDoor({ userId: "U0000002", channel: "C1", messageTs: "1.000200", threadTs: "1.000100", value }, d.deps);

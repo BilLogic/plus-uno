@@ -293,7 +293,7 @@ function precededByIncorrectComment(code, elementStart) {
   return INCORRECT.test(block);
 }
 
-/** Index of the `>` closing the tag that starts at `from`, honouring {} and quotes. */
+/** Index of the `>` closing the tag that starts at `from`, honoring {} and quotes. */
 function endOfTag(code, from) {
   let depth = 0;
   let quote = null;
@@ -449,7 +449,7 @@ function dedupe(list, key) {
  *
  * SAME FILE ONLY, AND NEVER AN EMPTY LIST. A constant imported from another
  * module is not followed — that needs module resolution. Anything this cannot
- * read returns `null`, meaning "not checked", which is the behaviour that was
+ * read returns `null`, meaning "not checked", which is the behavior that was
  * already there. It must never return `[]`: that reads as "no legal value" and
  * would fail every correct page on the five props below rather than no page.
  * The two ways to get there are an import, and an array whose contents this

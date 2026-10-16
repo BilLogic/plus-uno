@@ -3,7 +3,7 @@
  *
  * ACHROMATIC BY DESIGN, AND THAT IS THE DECISION RATHER THAN A PLACEHOLDER.
  * Atlassian's `color.rovo.background.brand.bold` is #000000: AI is a different
- * REGISTER, not another semantic colour competing with success and danger. So
+ * REGISTER, not another semantic color competing with success and danger. So
  * the ground here is the neutral surface ramp this system already has, and the
  * only accent is the glyph and the edge.
  *
@@ -52,9 +52,9 @@
 
 /*
  * `reviewed` is the one origin a person has signed off, so it is the one that
- * loses the caution edge and takes the system's own success colour. `generated`
+ * loses the caution edge and takes the system's own success color. `generated`
  * and `assisted` keep the neutral edge: neither has been checked, and telling
- * them apart is the caller's words, not a colour.
+ * them apart is the caller's words, not a color.
  */
 .plus-ai-label--reviewed {
     --plus-ai-accent: var(--color-success);

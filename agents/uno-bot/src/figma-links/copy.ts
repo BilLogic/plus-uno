@@ -11,7 +11,7 @@ import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
 import { namesInWords, windowInWords } from "../slack/copy-words";
 import type { ToolName } from "../agent/tool-table";
-import { isOwnComment, labelled, withoutLabel } from "../figma-ask/trigger";
+import { isOwnComment, labeled, withoutLabel } from "../figma-ask/trigger";
 import type { DevLink } from "./links";
 
 /** The tool a card names: Approve runs it. */
@@ -247,7 +247,7 @@ export function devLinksIdle(steps: number): string {
  * first time it gets its links. Plain text: Figma shows a comment as typed.
  */
 export function devLinksComment(component: string): string {
-  return labelled([
+  return labeled([
     `Added Dev Mode links to ${component}: Code (plus-uno) opens its source on GitHub, and Storybook opens its docs page. They're under Dev resources in Dev Mode.`,
   ]);
 }

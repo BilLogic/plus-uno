@@ -56,7 +56,7 @@ thinking rung of the flash model.
 
 | Tier | Model | Level | Reached by |
 |---|---|---|---|
-| `react` | *(no model call)* | — | closed set of acknowledgements — answer with an emoji reaction |
+| `react` | *(no model call)* | — | closed set of acknowledgments — answer with an emoji reaction |
 | `chill` | `gemini-3.5-flash-lite` | medium | greetings, proposal resolutions, `/chill` |
 | `default` | `gemini-3.6-flash` | medium | anything unmatched |
 | `grind` | `gemini-3.1-pro-preview` | medium | decision/contradiction-shaped questions, a real complaint, `/grind`, the "think harder" shortcut |
@@ -83,7 +83,7 @@ Notes that matter:
 
 ## The `react` tier — answering without a model
 
-For a closed set of acknowledgements ("thanks", "got it", "nice", 👍), the
+For a closed set of acknowledgments ("thanks", "got it", "nice", 👍), the
 cheapest correct answer is **an emoji reaction and no model call at all**.
 A reaction is one Slack subrequest against zero tokens, and it is what a person
 would do.
@@ -110,7 +110,7 @@ mr-mule separates them, and the separation is the useful part:
 
 - **Tier** = *how hard to think*. A cost decision: explicit, visible, named for
   effort.
-- **Scope** = *where to look*. An optimisation: a leading keyword the relay
+- **Scope** = *where to look*. An optimization: a leading keyword the relay
   parses, so adding a source is a one-line change with no manifest edit and no
   reinstall.
 
@@ -178,14 +178,14 @@ mr-mule's `/breed` stays theirs: their platform has subagents, ours does not.
 
 1. **Telemetry** (`tier=`, `why=`, `model=`) — nothing below is measurable without it
 2. **Reorder**: route before gathering context (A4)
-3. **Rename tiers** to `chill | default | grind`, no behaviour change
+3. **Rename tiers** to `chill | default | grind`, no behavior change
 4. **Wire models per tier**, including dropping `default` from `high` to `medium`
 5. Measure, then `/chill` and `/grind`
 6. Scope keywords
 7. `react` tier, once `why=trivial` shows how often it would fire
 
 Steps 3 and 4 are separable on purpose: a mechanical rename reviewable by grep,
-then a behaviour change that can be judged on its own.
+then a behavior change that can be judged on its own.
 
 ## Open
 

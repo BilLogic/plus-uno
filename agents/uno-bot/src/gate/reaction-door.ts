@@ -207,7 +207,7 @@ export async function runReactionDoor(
       await delivery.setWorking({ status: "is working on that…" });
       try {
         // The narrative first, then the tool — the same order every door keeps, so
-        // the person sees the acknowledgement before the work.
+        // the person sees the acknowledgment before the work.
         const posted = await delivery.postGateNote(post.note, post.card);
         // A resolution that cannot speak is the failure this whole path guards
         // against, so it is never silent in the logs even when it is in Slack.

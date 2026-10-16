@@ -10,10 +10,10 @@ export default {
             description: {
                 component: `## Sunburst Chart
 
-A sunburst chart displays **hierarchical data as nested rings**, radiating from centre outward.
+A sunburst chart displays **hierarchical data as nested rings**, radiating from center outward.
 
 ### Overview
-A sunburst chart displays **hierarchical data as nested rings**, radiating from centre outward.
+A sunburst chart displays **hierarchical data as nested rings**, radiating from center outward.
 
 ---
 

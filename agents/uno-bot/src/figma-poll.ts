@@ -5,7 +5,7 @@
 // src/scheduled/runs.ts): a publish is rare and nobody needs it noticed
 // within minutes. It reads the DS file's versions from the Figma REST API and
 // compares their ids with the ones it saw last time, kept in KV. A new
-// version, labelled or not, owes the repo's copy of the snapshot a refresh,
+// version, labeled or not, owes the repo's copy of the snapshot a refresh,
 // recorded in KV for the `figma-snapshot-refresh` job later in the same run
 // (src/figma-library/snapshot-refresh.ts). It posts nothing.
 //
@@ -29,11 +29,11 @@ const SNAPSHOT_KV_KEY = "figma-poll:snapshot";
 /** What the poll remembers between runs. */
 export interface Snapshot {
   lastChecked: string;
-  /** Every recent version id, labelled or not (`everyVersionIdIn`). */
+  /** Every recent version id, labeled or not (`everyVersionIdIn`). */
   versionIds: string[];
 }
 
-/** One labelled publish, as `versionsFrom` reads it. */
+/** One labeled publish, as `versionsFrom` reads it. */
 export interface PublishedVersion {
   id: string;
   label: string;
@@ -94,8 +94,8 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
   const newVersionIds = everyVersionId.filter((id) => !known.has(id));
   let refreshOwed: number | undefined;
   if (newVersionIds.length) {
-    const labelled = new Set(versionsFrom(versionsResponse).map((v) => v.id));
-    const owed = owedWith(await deps.owed.read(), newVersionIds, at, newVersionIds.filter((id) => !labelled.has(id)));
+    const labeled = new Set(versionsFrom(versionsResponse).map((v) => v.id));
+    const owed = owedWith(await deps.owed.read(), newVersionIds, at, newVersionIds.filter((id) => !labeled.has(id)));
     refreshOwed = owed.versionIds.length;
     if (!opts.dryRun) await deps.owed.write(owed);
   }
@@ -110,7 +110,7 @@ export async function pollFigmaLibrary(deps: PollDeps, opts: { dryRun?: boolean 
   };
 }
 
-/** Recent labelled publishes only, newest first. Figma autosaves have a null
+/** Recent labeled publishes only, newest first. Figma autosaves have a null
  *  label AND description, and so does a publish left without either, so this
  *  cannot tell those two apart; the poll counts every version instead
  *  (`everyVersionIdIn`). */
@@ -128,7 +128,7 @@ export function versionsFrom(result: FigmaVersionsResponse): PublishedVersion[] 
     }));
 }
 
-/** Every recent version id, newest first, labelled or not — what the poll
+/** Every recent version id, newest first, labeled or not — what the poll
  *  remembers having seen, and what owes the repo's snapshot a refresh. */
 export function everyVersionIdIn(result: FigmaVersionsResponse): string[] {
   return (result.versions ?? []).slice(0, 30).map((v) => v.id);

@@ -188,7 +188,7 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
           req.historicalImages,
         ),
         slack,
-        // What the turn classified, travelling down rather than being guessed
+        // What the turn classified, traveling down rather than being guessed
         // at: the blueprint cache must not answer a pushback.
         correction: req.correction,
         // The conversation key, beside the tool-side context, because cancel
@@ -277,7 +277,7 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
         : null,
 
     // Phase 5 — structured state, drift detection and progressive
-    // summarisation. FLAGGED OFF by default; see the header of
+    // summarization. FLAGGED OFF by default; see the header of
     // `agent/context-state.ts` for why this one does not get to ship on.
     contextState: env.CONTEXT_STATE === "on",
 

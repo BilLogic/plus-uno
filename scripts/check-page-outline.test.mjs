@@ -95,7 +95,7 @@ test('a display:none heading before the h1 is ignored too', () => {
 
 test('the two page predicates agree, in both directions', () => {
   // They are written twice, once per language. `assertRegistered` guards the
-  // shape of the runtime one; this guards the behaviour.
+  // shape of the runtime one; this guards the behavior.
   const cases = [
     'Specs/Toolkit/Pre-Session/Pages/All Sessions',
     'Specs/Admin/Overview',

@@ -87,7 +87,7 @@ const ReflectionFlow = ({
     /** @type {[null|'discard'|'saved', Function]} */
     const [exitModal, setExitModal] = useState(initialExitModal);
     const [submitted, setSubmitted] = useState(showSubmittedOnMount);
-    const [cancelled, setCancelled] = useState(Boolean(initialSessionInfo.didNotHappen));
+    const [canceled, setCanceled] = useState(Boolean(initialSessionInfo.didNotHappen));
 
     const selectedStudentIndex = activeTab.startsWith('student-')
         ? Number(activeTab.replace('student-', ''))
@@ -117,7 +117,7 @@ const ReflectionFlow = ({
      * SideNav Submit enablement — prior steps only (navigates to Form Feedback when needed).
      * Finalization still requires a Form Feedback rating when that step is shown.
      */
-    const canSubmit = !cancelled && !submitted && prerequisitesMet;
+    const canSubmit = !canceled && !submitted && prerequisitesMet;
 
     /**
      * @param {string} section
@@ -224,14 +224,14 @@ const ReflectionFlow = ({
     const handleSessionInfoNext = (data) => {
         setSessionInfo(data);
         if (data.didNotHappen) {
-            setCancelled(true);
+            setCanceled(true);
             markComplete('cancellation');
             markComplete('session-information');
             setSubmitted(true);
-            onSubmitted?.({ cancelled: true, data });
+            onSubmitted?.({ canceled: true, data });
             return;
         }
-        setCancelled(false);
+        setCanceled(false);
         markComplete('session-information');
         setActiveTab(students.length ? 'student-0' : 'session-reflection');
     };
@@ -288,7 +288,7 @@ const ReflectionFlow = ({
      * @param {object} [data]
      */
     const handleSubmit = (data) => {
-        if (cancelled || submitted || !prerequisitesMet) return;
+        if (canceled || submitted || !prerequisitesMet) return;
 
         if (showFormFeedback && activeTab !== 'form-feedback' && !data) {
             setActiveTab('form-feedback');

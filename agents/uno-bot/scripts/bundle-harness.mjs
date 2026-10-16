@@ -766,7 +766,7 @@ export function assemble({ repoRoot = REPO_ROOT } = {}) {
     const found = [];
     for (const root of section.roots) {
       for (const rel of walk(repoRoot, root)) {
-        // Endings normalised at the read boundary for the same reason the member
+        // Endings normalized at the read boundary for the same reason the member
         // read below does it: a body length that depends on WHO checked the repo
         // out is not a measurement, and the manifest publishes this one.
         const { meta, body } = frontmatter(readFileSync(path.join(repoRoot, rel), "utf8").replace(/\r\n/g, "\n"));
@@ -829,7 +829,7 @@ export function assemble({ repoRoot = REPO_ROOT } = {}) {
   if (misdisclosed.length) {
     findings.push({
       message:
-        `${misdisclosed.length} doc(s) carry a \`disclosure\` this script cannot honour:\n` +
+        `${misdisclosed.length} doc(s) carry a \`disclosure\` this script cannot honor:\n` +
         misdisclosed.map(({ rel, why }) => `  ${rel}: ${why}`).join("\n") +
         "\n  -> the one value is `disclosure: reference`, and only a doc the Worker reads (`embodiment: all`" +
         "\n     or `uno-bot`) can carry it. Absent means loaded into the prompt.",
@@ -881,7 +881,7 @@ export function assemble({ repoRoot = REPO_ROOT } = {}) {
   // having made membership declarative.
   const raw = members.map(({ rel }) => {
     const abs = path.join(repoRoot, rel);
-    // Normalise endings at the read boundary. Line endings are a checkout
+    // Normalize endings at the read boundary. Line endings are a checkout
     // artifact — no .gitattributes here and core.autocrlf defaults on for
     // Windows — so bundling on Windows baked ~1,500 stray CRs into the prompt
     // and dirtied this generated file on every run. Semantically inert to a
@@ -891,7 +891,7 @@ export function assemble({ repoRoot = REPO_ROOT } = {}) {
     return frontmatter(text).body;
   });
 
-  // The disclosed docs, read the same way: frontmatter off, endings normalised,
+  // The disclosed docs, read the same way: frontmatter off, endings normalized,
   // `ide-only` regions dropped — the Worker is the reader, so the IDE's regions
   // are as foreign here as in the prompt. Keyed by name for the map.
   const disclosedRaw = disclosed.map(({ rel }) => {
@@ -1083,7 +1083,7 @@ export function assemble({ repoRoot = REPO_ROOT } = {}) {
  * The artifacts whose committed bytes differ from what this assembly would
  * write, in the order a report names them.
  *
- * Compared on NORMALISED endings. The HARNESS string itself is JSON-escaped, so
+ * Compared on NORMALIZED endings. The HARNESS string itself is JSON-escaped, so
  * the only real newlines in that file are the two wrapper ones — and on a
  * Windows checkout those arrive as CRLF while the assembly builds with "\n".
  * That 2-char difference reported the harness as STALE on every Windows run,

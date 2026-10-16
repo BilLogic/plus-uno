@@ -117,7 +117,7 @@
     }
 }
 
-// Forced colours drop the fills; keep the picked day and the range readable.
+// Forced colors drop the fills; keep the picked day and the range readable.
 @media (forced-colors: active) {
     .plus-calendar-day--selected {
         forced-color-adjust: none;

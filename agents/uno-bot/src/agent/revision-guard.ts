@@ -60,7 +60,7 @@ const MIN_RETAINED_VOCABULARY = 0.5;
 const MAX_LENGTH_GROWTH = 2.0;
 
 /**
- * True when the revision should be discarded in favour of the original draft.
+ * True when the revision should be discarded in favor of the original draft.
  *
  * Short drafts (a one-line greeting) are exempt from the vocabulary test: with
  * a dozen words, dropping three crosses any ratio, so the test is noise there.

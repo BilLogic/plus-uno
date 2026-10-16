@@ -1,12 +1,12 @@
 // The approval card as the SOURCE OF TRUTH for what a ✅ runs.
 //
 // A batch's plan is rendered here and nowhere else — grouped by what each
-// operation touches, labelled by kind, with a rewrite showing before and after
+// operation touches, labeled by kind, with a rewrite showing before and after
 // — and the Gate's result message is rendered from the same grouping, because
 // the person reads the result against the card they approved.
 //
 // What every case guards is the same property in a different place: nothing is
-// summarised away. Past Slack's limits the groups collapse and the complete
+// summarized away. Past Slack's limits the groups collapse and the complete
 // list moves to follow-up messages; it is never shortened to "and N more".
 import { test } from "node:test";
 import assert from "node:assert/strict";

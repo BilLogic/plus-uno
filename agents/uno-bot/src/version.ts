@@ -36,7 +36,7 @@ declare const __BUILD_ID__: string;
  * Now they are not, and the distinction costs nothing and depends on nothing:
  *
  *   unstamped     no --define reached the bundle. deploy.mjs did NOT run.
- *   dev           deploy.mjs ran, outside any CI it recognises.
+ *   dev           deploy.mjs ran, outside any CI it recognizes.
  *   r<n>-<sha>    the gated GitHub Actions deploy.
  *   cf<id>-<sha>  Cloudflare Workers Builds, through deploy.mjs (#280).
  *

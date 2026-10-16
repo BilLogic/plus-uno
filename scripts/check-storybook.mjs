@@ -95,7 +95,7 @@ const RULE_FROM_HELP_URL = /dequeuniversity\.com\/rules\/axe\/[^/]+\/([a-z0-9-]+
 
 /**
  * The setup file every browser test imports. Named here rather than inline so
- * `reoptimisationFailures` and its test agree on one string.
+ * `reoptimizationFailures` and its test agree on one string.
  */
 const SETUP_FILE = '.storybook/vitest.setup.ts';
 
@@ -202,10 +202,10 @@ export function classify(report, root = REPO_ROOT) {
 }
 
 /**
- * The blocking failures that are the Vite re-optimisation flake, not a broken
+ * The blocking failures that are the Vite re-optimization flake, not a broken
  * story (#157, and again on 2026-08-29).
  *
- * When Vite discovers a dependency mid-run it re-optimises and reloads the page.
+ * When Vite discovers a dependency mid-run it re-optimizes and reloads the page.
  * Any test file whose setup import is in flight when that lands aborts with
  * `Failed to import test file <the setup file>` — so the report blames a file
  * chosen by timing. Three PRs went red on one morning naming three different
@@ -219,7 +219,7 @@ export function classify(report, root = REPO_ROOT) {
  * @param {{where: string, message: string}[]} blocking
  * @param {string} setupFile the setup file's path, matched as a suffix
  */
-export function reoptimisationFailures(blocking, setupFile = SETUP_FILE) {
+export function reoptimizationFailures(blocking, setupFile = SETUP_FILE) {
   return blocking.filter(
     (b) => b.message?.includes('Failed to import test file') && b.message.includes(setupFile),
   );
@@ -257,7 +257,7 @@ export function ratchet(a11y, baselineStories) {
   return { regressions, cleared };
 }
 
-/** The committed baseline's serialised shape, in one place so the writer and the reader agree. */
+/** The committed baseline's serialized shape, in one place so the writer and the reader agree. */
 export function baselineRecord({ a11y, totals }) {
   return {
     // What the numbers describe, so a reader does not have to re-derive them.
@@ -312,7 +312,7 @@ export function verdict(report, baseline, { root = REPO_ROOT, update = false, se
   );
 
   // A run that ran no tests at all is the emptiest version of the same defect the
-  // floors below catch, and it needs no baseline to recognise: the suite either
+  // floors below catch, and it needs no baseline to recognize: the suite either
   // matched no files or listed files and executed nothing in them. Checked before
   // --update as well, because recording a baseline from a run that did not happen
   // would set every floor to zero and disarm the gate permanently.
@@ -358,11 +358,11 @@ export function verdict(report, baseline, { root = REPO_ROOT, update = false, se
         '       npx vitest run --project=storybook -t "<story name>"',
     );
 
-    const reopt = reoptimisationFailures(blocking);
+    const reopt = reoptimizationFailures(blocking);
     if (reopt.length) {
       err(
         `\n  !! ${reopt.length} of those name ${SETUP_FILE} rather than a story.\n` +
-          '     That is the Vite re-optimisation flake, and the story above is a bystander\n' +
+          '     That is the Vite re-optimization flake, and the story above is a bystander\n' +
           '     picked by timing — do not go and read it. Search this log for:\n' +
           '         new dependencies optimized:\n' +
           '     and add every name it lists to `optimizeDeps.include` in vite.config.js,\n' +

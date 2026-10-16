@@ -10,7 +10,7 @@
  * and then, four lines later, wrote all four token files anyway. The warning was
  * a `console.warn` and nothing else — no return, no exit — so the protection it
  * announced did not exist. Measured on 2026-08-29: one run of the documented,
- * one-word command took `_colors.scss` from 195 colour tokens to 5, keeping only
+ * one-word command took `_colors.scss` from 195 color tokens to 5, keeping only
  * `--color-primary`, `--color-secondary`, `--color-tertiary`, `--color-danger`
  * and `--color-success`, and reported `✅ All token files generated
  * successfully!` while doing it. `--color-warning-text` — the token that carries

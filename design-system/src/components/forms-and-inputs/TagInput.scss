@@ -95,7 +95,7 @@
 
 /*
  * The option menu (Figma _Option menu): 240 wide, and as tall as its rows —
- * Delete and the seven colours fit without the list's scroll.
+ * Delete and the seven colors fit without the list's scroll.
  */
 .plus-listbox.plus-tag-input__menu {
     --plus-listbox-max-height: none;
@@ -103,7 +103,7 @@
     width: var(--layout-width-option-menu);
 }
 
-/* The name field in the header, and Delete set off from the colours. */
+/* The name field in the header, and Delete set off from the colors. */
 .plus-tag-input__rename {
     padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
 }

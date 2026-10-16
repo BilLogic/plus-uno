@@ -20,7 +20,7 @@ const Radio = ({
     disabled = false,
     /**
      * Shown, focusable, not changeable. ARIA allows `aria-readonly` on a
-     * radiogroup and not on a radio, so a lone Radio carries the behaviour and
+     * radiogroup and not on a radio, so a lone Radio carries the behavior and
      * the group (ChoiceGroup) carries the announcement.
      */
     readOnly = false,

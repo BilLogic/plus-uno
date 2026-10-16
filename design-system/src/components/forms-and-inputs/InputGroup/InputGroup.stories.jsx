@@ -338,18 +338,18 @@ AddonsInSlots.play = async ({ canvasElement }) => {
     const check = within(agree).getByRole('checkbox', { name: 'Include a note' });
     await expect(check).toBeChecked();
 
-    // It is the Checkbox at code's size, 18 square, centred in its addon.
+    // It is the Checkbox at code's size, 18 square, centered in its addon.
     const checkBox = check.getBoundingClientRect();
     await expect(Math.round(checkBox.width)).toBe(18);
     await expect(Math.round(checkBox.height)).toBe(18);
     const addonBox = check.closest('.plus-input-group-checkbox').getBoundingClientRect();
-    const centre = (r) => [r.left + r.width / 2, r.top + r.height / 2];
-    const [checkX, checkY] = centre(checkBox);
-    const [addonX, addonY] = centre(addonBox);
+    const center = (r) => [r.left + r.width / 2, r.top + r.height / 2];
+    const [checkX, checkY] = center(checkBox);
+    const [addonX, addonY] = center(addonBox);
     await expect(Math.abs(checkX - addonX)).toBeLessThanOrEqual(0.5);
     await expect(Math.abs(checkY - addonY)).toBeLessThanOrEqual(0.5);
 
-    // A radio addon is the PLUS Radio, named, 18 square and centred the same way.
+    // A radio addon is the PLUS Radio, named, 18 square and centered the same way.
     const primary = box('Primary contact');
     const radio = within(primary).getByRole('radio', { name: 'Make primary' });
     await expect(radio).toBeChecked();
@@ -358,8 +358,8 @@ AddonsInSlots.play = async ({ canvasElement }) => {
     await expect(Math.round(radioBox.width)).toBe(18);
     await expect(Math.round(radioBox.height)).toBe(18);
     const radioAddon = radio.closest('.plus-input-group-radio').getBoundingClientRect();
-    const [radioX, radioY] = centre(radioBox);
-    const [radioAddonX, radioAddonY] = centre(radioAddon);
+    const [radioX, radioY] = center(radioBox);
+    const [radioAddonX, radioAddonY] = center(radioAddon);
     await expect(Math.abs(radioX - radioAddonX)).toBeLessThanOrEqual(0.5);
     await expect(Math.abs(radioY - radioAddonY)).toBeLessThanOrEqual(0.5);
 };

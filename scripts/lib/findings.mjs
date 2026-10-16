@@ -155,7 +155,7 @@ export const isEntry = (moduleUrl) =>
  * checks, `--table` and `--how` on the benchmark, `--stats` on
  * `check-doc-identifiers.mjs`, `--update` on `check-glossary.mjs`: each prints
  * or writes and then the GATE STILL RUNS, with the exit code still the
- * findings'. #609 modelled only the terminal kind, and warned that dropping
+ * findings'. #609 modeled only the terminal kind, and warned that dropping
  * one of these into `flags` would make it terminal and quietly stop the check
  * gating — green, for whoever typed the flag. So the two kinds are two slots,
  * and which one a flag belongs in is a reading of what it does rather than of

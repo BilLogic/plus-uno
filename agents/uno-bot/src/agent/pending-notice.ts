@@ -14,7 +14,7 @@
 // So the Worker learns how often this happens first.
 //
 // Pure, and its one import is the tool table, which imports nothing — so the
-// judgement is still testable under plain Node.
+// judgment is still testable under plain Node.
 
 import { gateWordsFor } from "./tool-table";
 

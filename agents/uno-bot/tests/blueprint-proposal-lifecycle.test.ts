@@ -7,7 +7,7 @@
 //
 // THE PROMOTION, at the job → sweep-section seam. A linked card reaching
 // `Design Status: Shipped` promotes the proposal's own `proposed` variant path
-// and its cells to `planned` — no judgement, no draft; at `Dev Status:
+// and its cells to `planned` — no judgment, no draft; at `Dev Status:
 // Deployed`, to `live`, with a second card of its own offering to set today's
 // path beside it to `deprecated`. An unlinked card drafts as before.
 //
@@ -215,7 +215,7 @@ describe("a linked card's design hand-off", () => {
     const model = scripted({ default: [SERVICE], grind: [DRAFT] });
     const w = await world(model, [DESIGNED]);
     assert.equal((await runShippedRevisions(w.deps)).drafted, 1);
-    assert.equal(model.asked.length, 0, "no judgement, no draft: the rows are the proposal's");
+    assert.equal(model.asked.length, 0, "no judgment, no draft: the rows are the proposal's");
     const cards = await morning(w.state);
     assert.equal(cards.length, 1, "one card: the variant path's");
     const [card] = cards;
@@ -293,7 +293,7 @@ describe("an unlinked card", () => {
     const model = scripted({ default: [SERVICE], grind: [DRAFT] });
     const w = await world(model, [DESIGNED], { linked: false });
     assert.equal((await runShippedRevisions(w.deps)).drafted, 1);
-    assert.equal(model.asked.length, 2, "one judgement and one draft");
+    assert.equal(model.asked.length, 2, "one judgment and one draft");
     const [card] = await morning(w.state);
     assert.equal(card!.input.pathId, TODAY.pathId);
     assert.deepEqual(rowsOf(card!), [["lane-tutor", null, "planned"]]);

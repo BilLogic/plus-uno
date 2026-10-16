@@ -4,7 +4,7 @@
     "design-system/src/components/_internal/SessionManagementSnackbar/SessionManagementSnackbar.scss|--color-surface|--color-surface": {
       "count": 1,
       "ratio": 1,
-      "why": "NOT A DEFECT — the check's blind spot 1. The header's ground is set by child modifiers (&--created is --color-success, &--updated --color-info, &--cancelled --color-warning), which this reads as the page. White on those three is 6.17 / 4.53 / 3.52:1; the last is the same --color-warning question recorded below, in a place that is genuinely white-on-gold."
+      "why": "NOT A DEFECT — the check's blind spot 1. The header's ground is set by child modifiers (&--created is --color-success, &--updated --color-info, &--canceled --color-warning), which this reads as the page. White on those three is 6.17 / 4.53 / 3.52:1; the last is the same --color-warning question recorded below, in a place that is genuinely white-on-gold."
     },
     "design-system/src/components/forms-and-inputs/Rating.scss|--color-outline-variant|--color-surface": {
       "count": 1,
@@ -24,7 +24,7 @@
     "design-system/src/components/status-and-loading/Progress/Progress.scss|--color-on-warning|--color-warning": {
       "count": 1,
       "ratio": 3.7,
-      "why": "OPEN DECISION, ALREADY RECORDED — 3.7:1, the same pair in scripts/baselines/button-contrast-baseline.json. Does --color-warning need a darker filled variant, or --color-on-warning a darker on-colour? That is #268 and Bill's. Two checks reaching the same fact from different directions is the system working; it is one decision, not two."
+      "why": "OPEN DECISION, ALREADY RECORDED — 3.7:1, the same pair in scripts/baselines/button-contrast-baseline.json. Does --color-warning need a darker filled variant, or --color-on-warning a darker on-color? That is #268 and Bill's. Two checks reaching the same fact from different directions is the system working; it is one decision, not two."
     },
     "design-system/src/specs/Admin/Session/Tables/SessionBreakdownTable/SessionBreakdownTable.scss|--color-outline-variant|--color-surface": {
       "count": 1,
@@ -64,7 +64,7 @@
     "design-system/src/specs/Home/Cards/ResourceCard/ResourceCard.scss|--color-outline|--color-surface": {
       "count": 1,
       "ratio": 4.26,
-      "why": "LIVE — 4.26:1 on a `span` of real text, the closest miss in the corpus. --color-outline is a BORDER token being used as a text colour; --color-on-surface-variant (8.93:1) is what the rest of the system uses for subtle text. Not fixed here only because it is a visible change to a shipped card and belongs with the wider `-text` sweep, not with the seven warning fixes."
+      "why": "LIVE — 4.26:1 on a `span` of real text, the closest miss in the corpus. --color-outline is a BORDER token being used as a text color; --color-on-surface-variant (8.93:1) is what the rest of the system uses for subtle text. Not fixed here only because it is a visible change to a shipped card and belongs with the wider `-text` sweep, not with the seven warning fixes."
     },
     "design-system/src/specs/Home/Sections/StudentsOverviewSection/StudentsOverviewSection.scss|--color-outline-variant|--color-surface": {
       "count": 1,

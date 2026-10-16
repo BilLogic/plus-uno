@@ -94,7 +94,7 @@ test("an answer that says it is going from the earlier answer ships as written",
   assert.equal(h.judged[0]!.forceReason, undefined);
 });
 
-test("a place carried in the index's labelled form reaches the reader as a › breadcrumb", async () => {
+test("a place carried in the index's labeled form reaches the reader as a › breadcrumb", async () => {
   const h = harness({
     replies: [
       {

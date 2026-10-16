@@ -118,7 +118,7 @@ the component renders the `Button` pair for you, with a divider above them.
 
 ## Usage notes
 
-### Width must be a length the component recognises.
+### Width must be a length the component recognizes.
 
 ```jsx
 // Incorrect — `clamp(...)` is not in the allowlist, so this silently falls back
@@ -159,7 +159,7 @@ the component renders the `Button` pair for you, with a divider above them.
   both default to `true`. Turning either off leaves the header close button as
   the only exit, so keep that button — it is only rendered when the modal is not
   in body-only mode (`title` absent *and* `showBottomButtons` false).
-- **The close button is labelled `Close modal`**, hard-coded. Its icon is
+- **The close button is labeled `Close modal`**, hard-coded. Its icon is
   `aria-hidden`.
 - **The title is not the dialog's accessible name.** It renders as a styled div
   inside the dialog, and the component does not spread unknown props, so there

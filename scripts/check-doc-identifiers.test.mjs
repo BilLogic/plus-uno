@@ -2,7 +2,7 @@
  * Tests for the docs-identifier guard.
  *
  * Two jobs. The first is #191's rule: a guard nobody has watched fail is a
- * guard nobody knows works, so the centrepiece here is the real defect —
+ * guard nobody knows works, so the centerpiece here is the real defect —
  * `elevation.md` exactly as it stood before `0c454cce`, written into a fixture
  * root that links the real source, with the real check pointed at that root.
  * If that page stops producing findings, this file goes red. (The corpus as it
@@ -334,7 +334,7 @@ test('a comma inside a prop\'s JSDoc does not delete the prop', () => {
     'Tag.propTypes = {',
     "  /** The label (alternative to children). */",
     '  text: PropTypes.string,',
-    "  /** A colour square, for a tag acting as a chart legend entry. */",
+    "  /** A color square, for a tag acting as a chart legend entry. */",
     '  swatchBefore: PropTypes.string,',
     "  /** `selectable` only: the toggle's state, published as `aria-pressed`. */",
     '  isSelected: PropTypes.bool,',
