@@ -688,6 +688,11 @@ export interface DecisionReportRecord {
   /** The Slack message metadata it posted with, sent again on every edit so
    *  the tag a later search finds it by stays. */
   metadata?: { event_type: string; event_payload: Record<string, unknown> };
+  /** When its items stop taking a decision, epoch ms — the one rule's
+   *  deadline from when it posted (`cardExpiresAt`), which its items are
+   *  staged on. Shown as "Expires …" while any item is open (#1316); absent
+   *  on a report posted before it was kept. */
+  expiresAt?: number;
 }
 
 /** The key one item of a report's proposal is staged under: its message and
@@ -719,6 +724,75 @@ export interface ReportExpiryRecord {
 export interface ReportExpiryLook { expiresAt: number; executing: boolean }
 export interface ReportExpiryEdit { report: DecisionReportRecord; revision: number }
 export const REPORT_EXPIRY_RETRY_MS = 2 * 60 * 1000;
+
+// ── A card's own expiry edit (#1316) ─────────────────────────────────────────
+//
+// A card that ages out with nobody touching it is edited to say so at its
+// deadline: "Expired. Ask again for a fresh card." The store's alarm finds it
+// (`cardExpiryDueAt`) and hands it over, and a runner job edits the message
+// outside this store (`slack/card-expiry-edit.ts`), as a report's redraw is:
+// prepare, edit, acknowledge. Until acknowledged the record is kept — a late
+// gesture's lookup still reads it as expired without collecting it — so the
+// edit can be retried; once acknowledged it is collected as every aged-out
+// card is. A report's item is its report's to redraw, and a decided, replaced
+// or retired card already says what became of it, so none of those is owed.
+
+/** How long past its deadline a card's expiry edit is still tried. A day:
+ *  the alarm comes back every `REPORT_EXPIRY_RETRY_MS` while one is owed, so
+ *  only a message Slack keeps refusing gets anywhere near it. */
+export const CARD_EXPIRY_EDIT_GRACE_MS = 24 * 60 * 60 * 1000;
+
+/** What a proposal record says about its card, as the expiry edit reads it. */
+export interface CardExpiryMarks {
+  createdAt: number;
+  decided?: unknown;
+  supersededBy?: string;
+  retired?: boolean;
+  /** Set once the card's message says it expired (`acknowledgeCardExpiry`). */
+  expiryShown?: true;
+}
+
+/**
+ * When a card's expiry edit falls due — the first instant the store reads it
+ * as expired — or null when none is owed.
+ *
+ * @param rec - The record's marks
+ * @param proposal - The card it holds
+ */
+export function cardExpiryDueAt(rec: CardExpiryMarks, proposal: PendingProposal | null): number | null {
+  if (!proposal || proposal.item || rec.decided || rec.supersededBy || rec.retired || rec.expiryShown) return null;
+  return rec.createdAt + proposalTtlMs(proposal) + 1;
+}
+
+/**
+ * Whether a card's expiry edit is owed at `at`: due, and not past its grace.
+ *
+ * @param rec - The record's marks
+ * @param proposal - The card it holds
+ * @param at - The store's now
+ */
+export function cardExpiryOwed(rec: CardExpiryMarks, proposal: PendingProposal | null, at: number): boolean {
+  const due = cardExpiryDueAt(rec, proposal);
+  return due !== null && at >= due && at - due <= CARD_EXPIRY_EDIT_GRACE_MS;
+}
+
+/** The card an expiry edit redraws: where it is, and what it was posted as. */
+export interface ExpiredCardEdit {
+  channel: string;
+  proposalTs: string;
+  text: string;
+  blocks?: unknown[];
+}
+
+/** An owed card, as the edit needs it. */
+export function expiredCardEdit(proposal: PendingProposal): ExpiredCardEdit {
+  return {
+    channel: proposal.channel,
+    proposalTs: proposal.proposalTs,
+    text: proposal.proposalText,
+    ...(proposal.proposalBlocks ? { blocks: proposal.proposalBlocks } : {}),
+  };
+}
 
 /** The look every expiry path takes at an item: its staged proposal's own
  *  window, and whether its write is running. */
@@ -1604,6 +1678,17 @@ export interface ThreadState {
   prepareReportExpiry(messageTs: string): Promise<ReportExpiryEdit | null>;
   /** A successful edit acknowledges only the revision actually sent to Slack. */
   acknowledgeReportExpiry(messageTs: string, revision: number): Promise<void>;
+
+  /**
+   * The card to edit to "Expired" (#1316), while that edit is owed
+   * (`cardExpiryOwed`): past its deadline, undecided, not replaced, not a
+   * report's item, and not yet acknowledged. Null otherwise — before the
+   * deadline too. Reads only; the edit is the caller's, outside the store.
+   */
+  prepareCardExpiry(proposalTs: string): Promise<ExpiredCardEdit | null>;
+  /** The card's message says it expired: owed no more, and collected as any
+   *  aged-out card is from here. */
+  acknowledgeCardExpiry(proposalTs: string): Promise<void>;
 
   // ----- executions: a won ✅, from the claim until its outcome is told -----
 

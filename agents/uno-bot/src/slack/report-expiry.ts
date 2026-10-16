@@ -6,7 +6,7 @@ import type { ThreadState } from "../thread-state/index";
 import { reportMessage, type ReportMessage } from "./decision-cards";
 
 /** Slack errors that say the message can never take the edit. */
-const PERMANENT_SLACK_ERRORS = new Set([
+export const PERMANENT_SLACK_ERRORS = new Set([
   "message_not_found", "channel_not_found", "cant_update_message", "not_in_channel",
   "is_archived", "invalid_auth", "account_inactive",
 ]);

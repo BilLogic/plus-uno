@@ -1374,7 +1374,9 @@ async function postCard(
     if (!deps.dryRun) await deps.store.removeFindings(planned.items.map((f) => f.id));
     return { items: planned.items.length, tookSections: false };
   }
-  const shared = handed.length ? sharedReport(planned, handed, to.channel) : null;
+  // Its items' deadline, said under its cards (#1316): staged as it posts.
+  const expiresAt = cardExpiresAt(now);
+  const shared = handed.length ? sharedReport(planned, handed, to.channel, expiresAt) : null;
   const plan = shared?.plan ?? planned;
 
   // Everything the report will send, counted before any of it is: a report
@@ -1399,7 +1401,7 @@ async function postCard(
     });
     if (link) item.evidence.permalinks = [link];
   }
-  const report = shared?.report ?? sweepReport(plan);
+  const report = shared?.report ?? sweepReport(plan, expiresAt);
   const card: SweepCardReport = {
     key: plan.key,
     destination: plan.destination,
@@ -1502,7 +1504,7 @@ async function postSectionsAlone(ctx: MorningCtx, handed: readonly Handed[], pos
     for (const h of handed) await h.section.notPosted(h.place, "never posted in #uno-bot");
     return;
   }
-  const built = sectionsReport(handed, to.channel);
+  const built = sectionsReport(handed, to.channel, cardExpiresAt(ctx.now));
   const theirs = sectionsCost(handed, built.shown);
   ensureHeadroom(deps, { subrequests: ALONE_SUBREQUESTS + theirs.subrequests, d1Queries: theirs.d1Queries });
   for (const h of handed) await h.section.claim(h.place, cardKey, built.shown[h.section.source] ?? []);
@@ -1590,7 +1592,7 @@ async function finishStranded(ctx: MorningCtx, postDate: string, here: (place: S
     const first = handed[0]!.place;
     const to: SectionPlace = { channel: first.channel, threadTs: first.threadTs };
     // Rebuilt as it posted: what it shows is what its sections still stage.
-    const built = sectionsReport(handed, to.channel);
+    const built = sectionsReport(handed, to.channel, cardExpiresAt(ctx.now));
     const theirs = sectionsCost(handed, built.shown);
     ensureHeadroom(deps, { subrequests: FIND_POSTED_PAGES + ALONE_SUBREQUESTS + theirs.subrequests, d1Queries: theirs.d1Queries });
     const found = await deps.delivery.findPosted(to, cardKey, tsOf(Date.parse(`${postDate}T00:00:00Z`)));
@@ -1608,8 +1610,8 @@ async function finishStranded(ctx: MorningCtx, postDate: string, here: (place: S
 }
 
 /** A message of sections alone: `composeReport` with no fixes. */
-function sectionsReport(handed: readonly Handed[], channel: string): { report: DecisionReport; shown: Record<string, string[]> } {
-  const composed = composeReport([], null, handed, channel);
+function sectionsReport(handed: readonly Handed[], channel: string, expiresAt?: number): { report: DecisionReport; shown: Record<string, string[]> } {
+  const composed = composeReport([], null, handed, channel, expiresAt);
   return { report: composed.report, shown: composed.shown };
 }
 
@@ -1620,6 +1622,7 @@ function sectionsReport(handed: readonly Handed[], channel: string): { report: D
  * @param plan - The sweep's report for the place, its overflow among `rest`
  * @param handed - The place's sections
  * @param channel - Where it posts
+ * @param expiresAt - When its items stop taking a decision, said under them
  * @returns The plan cut to the fixes shown, the report, and each section's
  *   cards shown, by item id
  */
@@ -1627,9 +1630,10 @@ function sharedReport(
   plan: SweepCardPlan,
   handed: readonly Handed[],
   channel: string,
+  expiresAt?: number,
 ): { plan: SweepCardPlan; report: DecisionReport; shown: Record<string, string[]> } {
   const fixes = [...plan.items, ...(plan.rest ?? [])];
-  const composed = composeReport(fixes, plan.destination, handed, channel);
+  const composed = composeReport(fixes, plan.destination, handed, channel, expiresAt);
   const rest = fixes.filter((fix) => !composed.fixes.includes(fix));
   const cut = { ...cardPlan(plan.key, plan.destination, composed.fixes), ...(rest.length ? { rest } : {}) };
   return { plan: cut, report: composed.report, shown: composed.shown };
@@ -1650,12 +1654,14 @@ function sharedReport(
  * @param destination - Where they go; null when there are none
  * @param handed - The place's sections
  * @param channel - Where it posts
+ * @param expiresAt - When its items stop taking a decision, said under them
  */
 function composeReport(
   fixes: readonly PendingFinding[],
   destination: Destination | null,
   handed: readonly Handed[],
   channel: string,
+  expiresAt?: number,
 ): { fixes: PendingFinding[]; report: DecisionReport; shown: Record<string, string[]> } {
   type Card = { person: string | null; item: ReportItem };
   type Entry = { fix: PendingFinding } | { at: number; card: Card };
@@ -1730,7 +1736,7 @@ function composeReport(
   });
   return {
     fixes: fixes.filter((fix) => [...shown].some((e) => isFix(e) && e.fix === fix)),
-    report: decisionReport(items, "", { channel, ownerLines }),
+    report: decisionReport(items, "", { channel, ownerLines, ...(expiresAt !== undefined ? { expiresAt } : {}) }),
     shown: shownIds,
   };
 }
@@ -1745,13 +1751,14 @@ function waitWords(shown: number, total: number): string {
 /**
  * A plan's report: a card per fix, and a parent line counting every finding
  * waiting for the place — the ones past the card's ten are held, and say so.
+ * With `expiresAt`, it says under its cards when they stop taking a decision.
  */
-export function sweepReport(plan: SweepCardPlan): DecisionReport {
+export function sweepReport(plan: SweepCardPlan, expiresAt?: number): DecisionReport {
   const all = [...plan.items, ...(plan.rest ?? [])];
   return decisionReport(
     all.map((f) => sweepItem(f, plan.destination)),
     sweepParent(all, plan.destination),
-    { channel: plan.destination.channel },
+    { channel: plan.destination.channel, ...(expiresAt !== undefined ? { expiresAt } : {}) },
   );
 }
 
@@ -1933,7 +1940,9 @@ async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" 
   const staged = await stageReport(
     ctx,
     plan,
-    handed.length ? sharedReport(plan, handed, to.channel).report : sweepReport(plan),
+    handed.length
+      ? sharedReport(plan, handed, to.channel, cardExpiresAt(Number.isFinite(postedAt) ? postedAt : now)).report
+      : sweepReport(plan, cardExpiresAt(Number.isFinite(postedAt) ? postedAt : now)),
     { channel: to.channel, root: to.threadTs ?? posted.ts, ts: posted.ts, postDate, ttlMs: reportTtl(handed, Number.isFinite(postedAt) ? postedAt : now), ...(posted.plain ? { plain: true } : {}) },
     Number.isFinite(postedAt) ? postedAt : now,
     already,

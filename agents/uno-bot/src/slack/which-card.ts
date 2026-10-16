@@ -24,6 +24,7 @@
 import type { GateNote, WhichCard } from "../turn/index";
 import { cardExpiresAt } from "../card-expiry";
 import { renderGateNote, whichCardQuestion } from "./gate-note";
+import { deadlineBlock, isDeadlineBlock, withDeadline } from "./card-deadline";
 import { runButtonDoor, type ButtonDoorDeps, type CardMessage } from "./button-door";
 import type { ThreadState } from "../thread-state/index";
 
@@ -38,13 +39,21 @@ export const WHICH_ACTION_PREFIX = "uno_which_";
 const MAX_BUTTONS = 25;
 const LABEL_MAX = 75;
 
-/** The question as Slack gets it: its words (`gate-note.ts`), and a row of
- *  one button per card. */
-export function whichCardMessage(note: WhichNote): CardMessage {
+/** The question as Slack gets it: its words (`gate-note.ts`), when its
+ *  buttons stop answering (#1316) — the rule's deadline from when it is
+ *  asked, which the door holds a press to by the question's ts — and a row
+ *  of one button per card.
+ *
+ * @param note - The question
+ * @param askedAt - When it goes up, epoch ms
+ */
+export function whichCardMessage(note: WhichNote, askedAt: number = Date.now()): CardMessage {
+  const expiresAt = cardExpiresAt(askedAt);
   return {
-    text: renderGateNote(note),
+    text: withDeadline(renderGateNote(note), expiresAt),
     blocks: [
       { type: "section", text: { type: "mrkdwn", text: whichCardQuestion(note) } },
+      deadlineBlock(expiresAt),
       { type: "actions", elements: note.cards.slice(0, MAX_BUTTONS).map((card, i) => button(note.decision, card, i)) },
     ],
   };
@@ -129,10 +138,14 @@ export async function runWhichCardDoor(press: WhichPress, deps: WhichCardDoorDep
 
 /**
  * The question with only the buttons `keep` keeps. With none left, the row
- * gives way to a context line saying why.
+ * gives way to a context line saying why, and its deadline goes with it.
  */
 function withButtons(question: CardMessage, keep: (cardTs: string) => boolean, done: string): CardMessage {
+  const anyKept = (question.blocks as Array<{ type?: string; elements?: Array<{ value?: string }> }>).some(
+    (block) => block.type === "actions" && (block.elements ?? []).some((e) => typeof e.value === "string" && keep(e.value)),
+  );
   const blocks = (question.blocks as Array<{ type?: string; elements?: Array<{ value?: string }> }>).flatMap((block): unknown[] => {
+    if (isDeadlineBlock(block)) return anyKept ? [block] : [];
     if (block.type !== "actions") return [block];
     const elements = (block.elements ?? []).filter((e) => typeof e.value === "string" && keep(e.value));
     return elements.length ? [{ ...block, elements }] : [{ type: "context", elements: [{ type: "mrkdwn", text: done }] }];

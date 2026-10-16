@@ -319,7 +319,7 @@ export interface DmMorningDeps {
       to: { channel: string; threadTs: string },
       card: ProposalCard,
       metadata: DmAskMessage["metadata"],
-    ): Promise<{ ok: boolean; ts?: string; text?: string }>;
+    ): Promise<{ ok: boolean; ts?: string; text?: string; ttlMs?: number }>;
   };
   threadState: Pick<ThreadState, "putProposal">;
   proposalEvents: ProposalEventLog;
@@ -403,6 +403,8 @@ async function dueOne(deps: DmMorningDeps, c: CommitmentRecord, now: number, run
     supersedeKey: raiseSlot(c.id),
     stated: SHARE_CARD_WORDS,
     facts,
+    // The lifetime its deadline line was said from, when it said one.
+    ...(sent.ttlMs !== undefined ? { ttlMs: sent.ttlMs } : {}),
   };
   const { retired } = await deps.threadState.putProposal(proposal);
   // A DM is never named on the record (`storesChannel`).

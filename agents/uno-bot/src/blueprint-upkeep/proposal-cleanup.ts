@@ -122,8 +122,8 @@ export function withdrawalCard(p: DrawnProposal, reason: WithdrawalReason, link?
       : `*Remove this proposal from the blueprint?* It was drawn here on ${day(p.writtenAt)} and no Roadmap card has been linked to it in 30 days.`,
     `Deletes ${where} drawn in this thread and its ${cells(p.cellIds.length)}, as uno-bot. Today's path is not touched.`,
     reason === "asked"
-      ? `Only <@${p.requesterId}> can approve; Reject, or no answer in ${CARD_WINDOW_WORDS}, keeps it.`
-      : `Only <@${p.requesterId}> can approve; Reject, or no answer in ${CARD_WINDOW_WORDS}, keeps it, and it is not offered again.`,
+      ? `Only <@${p.requesterId}> can approve; Reject, or no answer before it expires, keeps it.`
+      : `Only <@${p.requesterId}> can approve; Reject, or no answer before it expires, keeps it, and it is not offered again.`,
   ].join("\n");
   const input: Withdrawal = { proposalTs: p.proposalTs, pathId: p.pathId, cellIds: [...p.cellIds], reason };
   return {
@@ -150,7 +150,7 @@ export function withdrawSlotKey(proposalTs: string): string {
  * @param reason - Asked for, or offered by the check
  * @param posted - The card's message ts and its text
  */
-export function stagedWithdrawal(p: DrawnProposal, reason: WithdrawalReason, posted: { ts: string; text: string }): PendingProposal {
+export function stagedWithdrawal(p: DrawnProposal, reason: WithdrawalReason, posted: { ts: string; text: string; ttlMs?: number }): PendingProposal {
   const operation = withdrawalCard(p, reason).operations![0]!;
   return {
     operations: [operation],
@@ -167,6 +167,8 @@ export function stagedWithdrawal(p: DrawnProposal, reason: WithdrawalReason, pos
     exclusiveConfirmers: true,
     supersedeKey: withdrawSlotKey(p.proposalTs),
     stated: WORDS[reason],
+    // The lifetime the card's deadline line was said from, when it said one.
+    ...(posted.ttlMs !== undefined ? { ttlMs: posted.ttlMs } : {}),
   };
 }
 
@@ -252,7 +254,7 @@ export interface OfferDeps {
   records: ProposalRecords;
   /** Post the card under the proposal's thread; its ts and text, or null when
    *  Slack refused it. */
-  postCard(p: DrawnProposal, card: ProposalCard): Promise<{ ts: string; text: string } | null>;
+  postCard(p: DrawnProposal, card: ProposalCard): Promise<{ ts: string; text: string; ttlMs?: number } | null>;
   /** Stage a posted card at the Gate. */
   stage(proposal: PendingProposal): Promise<void>;
   /** The proposal's first cell in the blueprint app, for the card's link. */

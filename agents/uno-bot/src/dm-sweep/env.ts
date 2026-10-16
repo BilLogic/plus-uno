@@ -33,6 +33,7 @@ import { activeDms } from "./active";
 import { modelDmDetector } from "./detector";
 import { answerDmAsk, dmAsksDue, dmThreadHook } from "./run";
 import type { JobContext } from "../scheduled/runs";
+import { dueFromNow } from "../slack/card-deadline";
 
 /**
  * The DMs uno-bot answered in since a time, or undefined without the usage
@@ -97,7 +98,9 @@ export function dmAsksFor(
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
       async postCard(to, card, metadata) {
-        const rendered = renderProposalCard(card);
+        // Posted now and staged on the one rule from now: it says that deadline.
+        const due = dueFromNow(card);
+        const rendered = renderProposalCard(due.card);
         const res = await postMessage(env, {
           channel: to.channel,
           thread_ts: to.threadTs,
@@ -105,7 +108,7 @@ export function dmAsksFor(
           blocks: rendered.blocks ?? proposalCardBlocks(rendered.text),
           metadata,
         });
-        return res.ok && res.ts ? { ok: true, ts: res.ts, text: rendered.text } : { ok: false };
+        return res.ok && res.ts ? { ok: true, ts: res.ts, text: rendered.text, ttlMs: due.ttlMs } : { ok: false };
       },
     },
     threadState: threadStateFor(env),

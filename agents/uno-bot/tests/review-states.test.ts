@@ -409,8 +409,8 @@ describe("after a decision, and closed", () => {
     await runReviewOpen(open(BILL), h.deps);
     const view = lastView(h);
     assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "warning"], ["section", undefined]]);
-    assert.equal(view.blocks[0]!.text!.text, "This proposal expired, so it can't be approved now.");
-    assert.equal(view.blocks[1]!.text!.text, "Ask me again and I'll set it up fresh.");
+    assert.equal(view.blocks[0]!.text!.text, "Expired.");
+    assert.equal(view.blocks[1]!.text!.text, "Ask again for a fresh card.");
     assert.equal(view.submit, undefined);
     assert.equal(view.title.text, "Review share-out", "titled for its tool, read in the same lookup");
   });

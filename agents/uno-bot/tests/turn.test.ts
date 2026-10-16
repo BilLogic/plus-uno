@@ -12,7 +12,10 @@
 //
 // The harness itself lives in `tests/helpers/turn-harness.ts`, shared with the
 // flow tests that drive a turn and then ask Gate what a person was told (#583).
-import { MAX_CARD_TTL_MS } from "../src/card-expiry";
+import { MAX_CARD_TTL_MS, cardTtlMs } from "../src/card-expiry";
+
+/** Tuesday 13 October 2026, 10:00 ET. */
+const TUESDAY_10_ET = Date.UTC(2026, 9, 13, 14, 0);
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
@@ -1013,6 +1016,8 @@ test("staging a revised card supersedes the one it replaces", async () => {
 test("a revised card inherits the confirmer set of the card it replaces, and a fresh window", async () => {
   const held: PendingProposal = { ...PENDING, ttlMs: 72 * 60 * 60 * 1000, confirmers: ["U7", "U8"] };
   const h = harness({
+    // A Tuesday, 10:00 ET: the rule's window from it is 24 hours.
+    now: () => TUESDAY_10_ET,
     replies: [
       {
         text: "Filing the revised card.",
@@ -1028,7 +1033,7 @@ test("a revised card inherits the confirmer set of the card it replaces, and a f
   );
 
   assert.equal(outcome.disposition, "staged");
-  assert.equal(outcome.staged!.proposal.ttlMs, undefined, "the store stamps the rule");
+  assert.equal(outcome.staged!.proposal.ttlMs, 24 * 60 * 60 * 1000, "the rule's window from now, the deadline its card says");
   assert.deepEqual(outcome.staged!.proposal.confirmers, ["U7", "U8"]);
   const stored = await h.threadState.getProposalByThread(REF);
   assert.ok(stored?.ttlMs !== undefined && stored.ttlMs >= 24 * 60 * 60 * 1000 - 60_000 && stored.ttlMs <= MAX_CARD_TTL_MS);
@@ -1665,6 +1670,7 @@ test("a bystander's revision of a sweep card is refused, and the card stays", as
 // default terms — whoever asks.
 test("an unrelated ask in a sweep card's thread stages as its own card and leaves the sweep card live", async () => {
   const h = harness({
+    now: () => TUESDAY_10_ET,
     replies: [
       {
         text: "Filing it.",
@@ -1684,7 +1690,7 @@ test("an unrelated ask in a sweep card's thread stages as its own card and leave
   assert.equal(staged.toolName, "github_issue_create");
   assert.equal(staged.sweepRun, undefined);
   assert.equal("confirmers" in staged, false);
-  assert.equal("ttlMs" in staged, false);
+  assert.equal(staged.ttlMs, cardTtlMs(TUESDAY_10_ET), "its own window from now, not what the sweep card has left");
   assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found", "the sweep card stays live");
   assert.equal((await h.threadState.getProposalByTs(staged.proposalTs)).state, "found");
 });
@@ -1806,13 +1812,14 @@ test("a re-staged share card still quotes the exact note it posts", async () => 
   assert.equal(restaged.proposal.supersedeKey, SWEEP_SHARE_KEY);
 });
 
-test("a fresh card carries neither a lifetime nor a confirmer set of its own", async () => {
+test("a fresh card carries the rule's window from now and no confirmer set of its own", async () => {
   const h = harness({
+    now: () => TUESDAY_10_ET,
     replies: [{ text: "Filing it.", toolCalls: [{ name: "notion_create", args: { title: "One" } }] }],
   });
   const outcome = await runTurn(request({ text: "file a card" }), h.deps);
   assert.equal(outcome.disposition, "staged");
-  assert.equal("ttlMs" in outcome.staged!.proposal, false);
+  assert.equal(outcome.staged!.proposal.ttlMs, cardTtlMs(TUESDAY_10_ET));
   assert.equal("confirmers" in outcome.staged!.proposal, false);
 });
 

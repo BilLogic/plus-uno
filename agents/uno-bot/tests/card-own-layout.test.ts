@@ -19,7 +19,7 @@ import { runReactionDoor } from "../src/gate/index";
 import { runButtonDoor } from "../src/slack/button-door";
 import { deliveryAdapter } from "../src/slack/delivery-adapter";
 import { renderProposalCard } from "../src/slack/proposal-render";
-import { expiredPost, renderGateNote } from "../src/slack/gate-note";
+import { EXPIRED_CARD, renderGateNote } from "../src/slack/gate-note";
 import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
 import { recordingDelivery, runTurn, type ProposalCard } from "../src/turn/index";
 import { recordingSlack, type RecordingSlack } from "./helpers/recording-slack";
@@ -124,7 +124,7 @@ describe("a sweep card keeps its carousel", () => {
     });
     const blocks = edit(slack);
     assert.equal(blocks.filter((b) => b.type === "carousel").length, 1, "the carousel stays");
-    assert.equal(lastLine(blocks), expiredPost(72 * HOUR));
+    assert.equal(lastLine(blocks), EXPIRED_CARD);
     assert.deepEqual(buttons(blocks), ["View"]);
   });
 
@@ -211,7 +211,7 @@ describe("the button follows the card's own", () => {
     });
     const blocks = edit(slack);
     assert.match(JSON.stringify(blocks), /DS precedence this week/, "its own words stay");
-    assert.equal(lastLine(blocks), "That card expired, so nothing was filed.");
+    assert.equal(lastLine(blocks), EXPIRED_CARD, "the card says the one expired line, whoever staged it");
     assert.deepEqual(buttons(blocks), ["View"]);
   });
 

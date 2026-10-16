@@ -109,6 +109,7 @@ import { stageSweepShare } from "./share";
 import { activeDmsFor } from "../dm-sweep/env";
 import { FIND_POSTED_PAGES, runSweepJob, stageSweepCard, sweepCardState, type CardTag, type SweepDeps, type SweepJobReport } from "./run";
 import { mergeFindings, type CardSnapshot, type FindingQueue, type PendingFinding, type SweepStore } from "./store";
+import { dueFromNow } from "../slack/card-deadline";
 
 /** One key per channel: `sweep:findings:<channel>`. */
 const QUEUE_KV_PREFIX = "sweep:findings:";
@@ -445,7 +446,9 @@ export async function offerSweepShareFor(
   await stageSweepShare(proposal, outcomes, {
     channels: channelIdsFor(env),
     async post(to, card) {
-      const rendered = renderProposalCard(card);
+      // Posted now and staged on the one rule from now: it says that deadline.
+      const due = dueFromNow(card);
+      const rendered = renderProposalCard(due.card);
       const res = await postMessage(env, {
         channel: to.channel,
         thread_ts: to.threadTs,
@@ -453,7 +456,7 @@ export async function offerSweepShareFor(
         blocks: rendered.blocks ?? proposalCardBlocks(rendered.text),
         metadata: sweepPostMetadata("note"),
       });
-      return res.ok && res.ts ? { ok: true, ts: res.ts, text: rendered.text } : { ok: false };
+      return res.ok && res.ts ? { ok: true, ts: res.ts, text: rendered.text, ttlMs: due.ttlMs } : { ok: false };
     },
     threadState: threadStateFor(env),
     proposalEvents: proposalEventLogFor(env),

@@ -96,13 +96,14 @@ test("pressing one card's button approves that card only; the other stays live",
   const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B)] });
   const { a, b, note } = await asked(h);
 
-  const { cardEdits, questionEdits } = await press(h, whichCardMessage(note), a, ASKED_AT_MS + 60_000);
+  const { cardEdits, questionEdits } = await press(h, whichCardMessage(note, ASKED_AT_MS), a, ASKED_AT_MS + 60_000);
 
   assert.deepEqual(h.resolved.map((r) => [r.decision, r.executed]), [["confirm", true]]);
   assert.deepEqual(await live(h), [b], "card A was claimed, card B is still waiting");
   assert.deepEqual(cardEdits.map((e) => e.ts), [a], "the card decided is the one edited");
-  // The question keeps a button only for the card still waiting.
+  // The question keeps a button only for the card still waiting, and its deadline.
   assert.deepEqual(buttonsOf(questionEdits.at(-1)!).map((x) => x.value), [b]);
+  assert.match(JSON.stringify(questionEdits.at(-1)!.blocks), /Expires <!date/);
 });
 
 test("the question's buttons lapse 24 weekday hours after it was asked", async () => {
@@ -110,13 +111,20 @@ test("the question's buttons lapse 24 weekday hours after it was asked", async (
   const { a, b, note } = await asked(h);
 
   const late = cardExpiresAt(ASKED_AT_MS) + 1;
-  const { ephemerals, questionEdits, cardEdits } = await press(h, whichCardMessage(note), a, late);
+  const asking = whichCardMessage(note, ASKED_AT_MS);
+  // It says when, in each reader's timezone, and in ET in its text copy:
+  // Thursday 11:00 ET, 24 weekday hours after Wednesday's.
+  const deadline = `Expires <!date^${cardExpiresAt(ASKED_AT_MS) / 1000}^{date_short_pretty}|Thu, Oct 15> at <!date^${cardExpiresAt(ASKED_AT_MS) / 1000}^{time}|11:00 AM ET>`;
+  assert.ok(asking.text.endsWith(`\n${deadline}`));
+  assert.match(JSON.stringify(asking.blocks), /Expires <!date/);
+  const { ephemerals, questionEdits, cardEdits } = await press(h, asking, a, late);
 
   assert.deepEqual(h.resolved, [], "nothing ran");
   assert.deepEqual(await live(h), [a, b].sort());
   assert.deepEqual(cardEdits, []);
   assert.match(ephemerals[0] ?? "", /expired/i);
   assert.deepEqual(buttonsOf(questionEdits.at(-1)!), [], "the lapsed question keeps no buttons");
+  assert.doesNotMatch(JSON.stringify(questionEdits.at(-1)!.blocks), /Expires/, "nor a deadline");
 });
 
 test("a press on a card a revision replaced names the card that replaced it", async () => {

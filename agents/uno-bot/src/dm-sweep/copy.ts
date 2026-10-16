@@ -95,7 +95,7 @@ export function raiseCard(o: {
     `In ${where}:`,
     `> ${text}`,
     "",
-    `Expires after ${CARD_WINDOW_WORDS}, with no reminder.`,
+    "No reminder comes before it expires.",
   ];
   return {
     card: shareCard({ where, lead: lines.join("\n"), operations }),

@@ -129,6 +129,13 @@ export type GateSignal =
        * thread, and asks which when there are several.
        */
       wholeDm?: true;
+      /**
+       * The card the turn held as its thread's pending one when the message
+       * came in. Read only when nothing in the thread is live any more: a card
+       * that aged out while the message waited its turn is answered as
+       * expired, on the card itself, rather than as a lost race (#1316).
+       */
+      cardTs?: string;
     }
   | {
       kind: "model";
@@ -387,9 +394,11 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
         // The card's own lifetime rides along when it had one, so the note
         // says how long it was live rather than assuming the hour — and a
         // stated card's own line, which says it in that card's terms.
+        // A stated card's own line rides along for the thread, where the
+        // person who acted is told what that card's lapse means; the card
+        // itself says the one expired line (`slack/gate-note.ts`).
         note: {
           kind: "expired",
-          ...(found.ttlMs !== undefined ? { ttlMs: found.ttlMs } : {}),
           ...(found.stated ? { words: found.stated.expired } : {}),
         },
         replyTs: replyTargetOf(signal),
@@ -846,7 +855,14 @@ async function locate(
   // same one read the newest-only lookup cost — and asks when it could mean
   // more than one (#1319).
   const inThread = pickCard(await deps.threadState.getProposalsByThread(ref).catch(() => []));
-  if (inThread.state !== "none" || !signal.wholeDm) return inThread;
+  if (inThread.state !== "none") return inThread;
+  // Nothing live in the thread, and the turn held a card when the message
+  // came in: say what became of that card rather than "already resolved".
+  if (signal.cardTs) {
+    const held = await deps.threadState.getProposalByTs(signal.cardTs).catch(() => ({ state: "none" }) as const);
+    if (held.state === "expired" || held.state === "superseded") return held;
+  }
+  if (!signal.wholeDm) return inThread;
   return pickCard(await deps.threadState.getProposalsByChannel(signal.channel).catch(() => []));
 }
 
@@ -904,7 +920,9 @@ function cardSignaled(
   signal: Exclude<GateSignal, { kind: "model" }>,
   posted: Parameters<typeof cardOf>[1],
 ): { card?: GateCard } {
-  return signal.kind === "typed" ? {} : cardOf(signal.messageTs, posted);
+  if (signal.kind !== "typed") return cardOf(signal.messageTs, posted);
+  // A typed emoji names no card, unless the turn held one (`cardTs`).
+  return signal.cardTs ? cardOf(signal.cardTs, posted) : {};
 }
 
 /** Where to answer a signal whose proposal was never found. */

@@ -173,6 +173,14 @@ export function createDurableObjectThreadState(
       return hop().acknowledgeReportExpiry(messageTs, revision, now());
     },
 
+    prepareCardExpiry(proposalTs) {
+      return hop().prepareCardExpiry(proposalTs, now());
+    },
+
+    acknowledgeCardExpiry(proposalTs) {
+      return hop().acknowledgeCardExpiry(proposalTs);
+    },
+
     // ----- executions -----
 
     beginExecution(proposal: PendingProposal): Promise<void> {

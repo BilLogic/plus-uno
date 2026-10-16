@@ -15,7 +15,7 @@ import assert from "node:assert/strict";
 import { resolveSignal, runReactionDoor } from "../src/gate/index";
 import { runButtonDoor } from "../src/slack/button-door";
 import { deliveryAdapter } from "../src/slack/delivery-adapter";
-import { expiredPost, supersededBy } from "../src/slack/gate-note";
+import { EXPIRED_CARD, supersededBy } from "../src/slack/gate-note";
 import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
 import { recordingSlack, type RecordingSlack } from "./helpers/recording-slack";
 
@@ -102,7 +102,7 @@ describe("on the reaction door", () => {
       clock.at += cardTtlMs(clock.at) + 1;
     });
     const { line, button } = edited(slack, OLD_CARD);
-    assert.equal(line, expiredPost(cardTtlMs(1_790_000_000_000)));
+    assert.equal(line, EXPIRED_CARD);
     assert.equal(button, "View");
     assert.deepEqual(slack.of("message"), []);
   });
@@ -142,7 +142,7 @@ describe("on the card's button", () => {
         restage: async () => {},
       },
     );
-    assert.equal(edited(slack, OLD_CARD).line, expiredPost(cardTtlMs(1_790_000_000_000)));
+    assert.equal(edited(slack, OLD_CARD).line, EXPIRED_CARD);
     assert.deepEqual(slack.of("message"), []);
     assert.deepEqual(aside, []);
   });

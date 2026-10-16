@@ -275,6 +275,13 @@ export interface ProposalCard {
    *  short (`proposalCardBlocks`). The `lead` still states the whole card as
    *  its text copy; the Review pop-up draws it from the proposal's facts. */
   short?: { summary: string; size: string };
+  /** When the card stops taking an answer, epoch ms: the one rule's deadline
+   *  from when it is staged (`card-expiry.ts` `cardExpiresAt`), or what is
+   *  left of the card a revision keeps the window of. Set by the stager from
+   *  the same clock it stages with, and stored as the card's `ttlMs`, so the
+   *  card says the deadline the store holds it to. The adapter spells it as
+   *  "Expires …" in each reader's timezone (`slack/card-deadline.ts`). */
+  expiresAt?: number;
 }
 
 /** A sweep card's fixes, as the blocks show them. */
@@ -335,10 +342,10 @@ export type GateNote =
   | { kind: "said"; text: string }
   /** The lost race: someone else's confirmation got there first. */
   | { kind: "already-resolved" }
-  /** A ✅ on a card that aged out of the store. `ttlMs` is the card's own
-   *  lifetime when it set one; absent, it lived the default hour. `words` is
-   *  a stated card's own line for it, which is said instead. */
-  | { kind: "expired"; ttlMs?: number; words?: string }
+  /** A ✅ on a card that aged out of the store. `words` is a stated card's
+   *  own line for it, which the thread is told instead; the card itself says
+   *  the one expired line whatever card it is (#1316). */
+  | { kind: "expired"; words?: string }
   /** A ✅ on a card a revision replaced (#573). `stated` when that card was a
    *  stated one, which has no ⚠️ to point at. */
   | {

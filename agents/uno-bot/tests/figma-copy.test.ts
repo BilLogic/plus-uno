@@ -263,9 +263,6 @@ function passesGateAnswer(text: string, glyphs: readonly string[] = []): void {
   }
 }
 
-/** A card's lifetime, as an expired note carries it: a weekday staging's 24 h. */
-const DAY_TTL_MS = 24 * 3_600_000;
-
 describe("what a stated card says at the gate", () => {
   const weekly = precedenceCardWords();
 
@@ -286,7 +283,7 @@ describe("what a stated card says at the gate", () => {
   it("every answer the gate gives a stated card holds to the copy rules, and names no tool", () => {
     const answers: Array<[GateNote, string[]]> = [
       [{ kind: "resolved", decision: "cancel", cancelled: weekly.cancelled }, []],
-      [{ kind: "expired", ttlMs: DAY_TTL_MS, words: weekly.expired }, []],
+      [{ kind: "expired", words: weekly.expired }, []],
       [{ kind: "superseded", stated: true }, []],
       [{ kind: "not-on-the-card", toolName: "github_issue_create", glyph: "no_entry", userId: "U0AAAAAA2", stated: true }, [":no_entry:"]],
     ];
@@ -401,11 +398,11 @@ describe("the drift card (#886 § 3.3)", () => {
     passesGateAnswer(statedCancelledNote(words, "U0AAAAAA2"), [":no_entry:"]);
     for (const note of [
       { kind: "resolved", decision: "cancel", cancelled: words.cancelled },
-      { kind: "expired", ttlMs: DAY_TTL_MS, words: words.expired },
+      { kind: "expired", words: words.expired },
     ] as GateNote[]) {
       passesGateAnswer(renderGateNote(note));
     }
-    assert.equal(renderGateNote({ kind: "expired", ttlMs: DAY_TTL_MS, words: words.expired }), words.expired);
+    assert.equal(renderGateNote({ kind: "expired", words: words.expired }), words.expired);
   });
 });
 
@@ -493,7 +490,7 @@ describe("the comment-decision thread (#886 § 3.5)", () => {
     assert.equal(statedCancelledNote(words, "U0AAAAAA2"), "Dropped, nothing written, decided by <@U0AAAAAA2>.");
     assert.equal(words.expired, "That card closed after 24 weekday hours with no decision, so nothing was written.");
     passesGateAnswer(statedCancelledNote(words, "U0AAAAAA2"), [":no_entry:"]);
-    passesGateAnswer(renderGateNote({ kind: "expired", ttlMs: DAY_TTL_MS, words: words.expired }));
+    passesGateAnswer(renderGateNote({ kind: "expired", words: words.expired }));
   });
 
   it("the lines a reply gets hold to the vocabulary, and point at Review", () => {

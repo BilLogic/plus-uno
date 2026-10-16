@@ -161,6 +161,7 @@ import {
 } from "../blueprint-upkeep/milestone";
 import { proposalOfferCard, stagedProposalOffer, type ProposalDraft, type ProposalDrafter } from "../blueprint-upkeep/proposal";
 import { rethrowIfBudget } from "../net";
+import { cardExpiresAt } from "../card-expiry";
 
 // ── Policy ───────────────────────────────────────────────────────────────────
 
@@ -1057,7 +1058,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
         thread: cardThread,
         text: request.text,
         userId: request.userId,
-        ...(request.pending ? {} : { wholeDm: true as const }),
+        ...(request.pending ? { cardTs: request.pending.proposalTs } : { wholeDm: true as const }),
       },
       { threadState, standingConfirmers: deps.standingConfirmers },
     );
@@ -1705,7 +1706,14 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     ? null
     : stagingNote(matter, liveCards.filter((card) => card.proposalTs !== replaced?.proposalTs));
   const said = announced ? await delivery.postGateNote(announced) : null;
-  const posted = inPlace ? { ok: true, text: inPlace.text, ts: inPlace.staged.proposalTs } : await delivery.card(card);
+  // The card says its deadline and is staged with the lifetime that ends
+  // there, both from one reading of the clock (`cardWindow`): what is left of
+  // a sweep card's window, or the rule's from now. An item revised in place
+  // has none of its own to say: its report shows the deadline.
+  const window = cardWindow(staging.now(), sweepLeftMs);
+  const posted = inPlace
+    ? { ok: true, text: inPlace.text, ts: inPlace.staged.proposalTs }
+    : await delivery.card({ ...card, expiresAt: window.expiresAt });
   // An answer-only surface declined the card on purpose: the person is told
   // what it would have done instead, so the turn answered, and nothing stages.
   const remembered = [compared, offered?.proposalText, said?.ok ? said.text : null, posted.text].filter(Boolean).join("\n\n");
@@ -1745,6 +1753,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     proposalText: posted.text,
     ...ownBlocks(posted),
     requesterUserId: request.userId,
+    // Until the deadline the card says; an item revised in place overrides
+    // it below with the time its item had left.
+    ttlMs: window.ttlMs,
     ...(prd?.id ? { notionPrdId: prd.id } : {}),
     ...(prd?.url ? { notionPrdUrl: prd.url } : {}),
     ...before,
@@ -1837,11 +1848,28 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   return {
     disposition: "staged",
     posted: posted.text,
-    staged: { proposal, card },
+    staged: { proposal, card: inPlace ? card : { ...card, expiresAt: window.expiresAt } },
     wrote: memory.wrote(),
     telemetry,
     ...(comparison ? { comparison } : {}),
   };
+}
+
+/**
+ * The deadline a card says and the lifetime it is staged with, from ONE
+ * reading of the clock (#1316), so the deadline shown is the one enforced.
+ * The store counts `ttlMs` from its own clock a hop later: the card lives
+ * those milliseconds past what it says, and never a weekend past it, as
+ * stamping the rule from the store's clock would when the hop crosses
+ * Saturday 00:00 ET.
+ *
+ * @param stagedAt - The clock as the card goes up
+ * @param leftMs - The lifetime the card keeps — what is left of the window a
+ *   revision keeps; absent, the one rule's (`cardExpiresAt`)
+ */
+function cardWindow(stagedAt: number, leftMs?: number): { expiresAt: number; ttlMs: number } {
+  const expiresAt = leftMs === undefined ? cardExpiresAt(stagedAt) : stagedAt + leftMs;
+  return { expiresAt, ttlMs: expiresAt - stagedAt };
 }
 
 /**
@@ -1893,9 +1921,11 @@ async function offerProposal(
   staging: StagingFacts,
 ): Promise<PendingProposal | null> {
   try {
-    const posted = await deps.delivery.card(proposalOfferCard(draft));
+    const window = cardWindow(staging.now());
+    const posted = await deps.delivery.card({ ...proposalOfferCard(draft), expiresAt: window.expiresAt });
     if (!posted.ok || !posted.ts || posted.declined) return null;
     const proposal: PendingProposal = {
+      ttlMs: window.ttlMs,
       ...stagedProposalOffer(draft, {
         channel: request.channel,
         threadTs: request.conversationTs,
@@ -2049,7 +2079,9 @@ async function dropFromSweepCard(
       { channel: request.channel, requestedBy: pending.requesterUserId },
     ),
   );
-  const card: ProposalCard = fixes ? { ...built, fixes } : built;
+  // It says the deadline it keeps: what was left of the card's.
+  const window = cardWindow(staging.now(), leftMs);
+  const card: ProposalCard = { ...(fixes ? { ...built, fixes } : built), expiresAt: window.expiresAt };
   const posted = await delivery.card(card);
   // Declined on an answer-only surface, as a fresh card is (`PostResult.declined`).
   if (posted.declined) {
@@ -2073,7 +2105,7 @@ async function dropFromSweepCard(
     ...ownBlocks(posted),
     requesterUserId: request.userId,
     ...inheritedTerms(pending),
-    ttlMs: leftMs,
+    ttlMs: window.ttlMs,
     ...(pending.sweepRun ? { sweepRun: pending.sweepRun } : {}),
     ...(fixes ? { fixes } : {}),
     supersedeKey: pending.supersedeKey ?? SWEEP_KEY,
@@ -2211,8 +2243,15 @@ export async function restageExecution(
         );
   // The warning rides the card, not only the note before it: a note that
   // failed to post must not leave a card that reads like any other.
-  const card: ProposalCard = { ...built, caveats: [{ kind: "cut-off-rerun" }, ...built.caveats] };
   const before = await batchBefore(restage.operations, built.revision, deps.cards);
+  // A fresh card, on a fresh window: the lifetime the stuck card was staged
+  // with, from now, or else the one rule's — said on the card, and stored.
+  const window = cardWindow(Date.now(), original.ttlMs);
+  const card: ProposalCard = {
+    ...built,
+    caveats: [{ kind: "cut-off-rerun" }, ...built.caveats],
+    expiresAt: window.expiresAt,
+  };
   const posted = await deps.delivery.card(card);
   // Declined on an answer-only surface: nothing re-staged, and nothing failed.
   if (posted.declined) return null;
@@ -2241,6 +2280,7 @@ export async function restageExecution(
     proposalText: posted.text,
     ...ownBlocks(posted),
     ...before,
+    ttlMs: window.ttlMs,
     // The ask's own card, carried across however many re-stagings.
     originProposalTs: stagingCardOf(original),
   };

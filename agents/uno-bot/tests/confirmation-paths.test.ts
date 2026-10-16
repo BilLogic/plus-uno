@@ -56,7 +56,7 @@ import {
   type TurnSettlement,
 } from "../src/turn/index";
 import { runButtonDoor, type ButtonDoorTarget } from "../src/slack/button-door";
-import { STALE_POST, STATED_SUPERSEDED_POST, renderGateNote } from "../src/slack/gate-note";
+import { STALE_POST, STATED_SUPERSEDED_POST, renderCardNote, renderGateNote } from "../src/slack/gate-note";
 import { verdictEvents } from "../src/usage/index";
 import { cardWords } from "./helpers/card-message";
 
@@ -552,7 +552,7 @@ describe("standing confirmers", () => {
 });
 
 describe("a card that is no longer there", () => {
-  it("tells a card with its own lifetime how long it was live", async () => {
+  it("says a card with its own lifetime expired in the one expired line", async () => {
     const HOUR_MS = 60 * 60 * 1000;
     let clock = 1_000_000;
     const threadState = createInMemoryThreadState({ now: () => clock });
@@ -561,10 +561,9 @@ describe("a card that is no longer there", () => {
 
     const verdict = await resolveSignal(reaction(), { threadState });
     assert.equal(verdict.outcome, "stale");
-    assert.deepEqual(verdict.post?.note, { kind: "expired", ttlMs: 72 * HOUR_MS });
-    assert.match(renderGateNote(verdict.post!.note), /It stayed live for 72 hours\./);
-    // And the default card still reads as the hour.
-    assert.match(renderGateNote({ kind: "expired" }), /It stayed live for an hour\./);
+    assert.deepEqual(verdict.post?.note, { kind: "expired" });
+    // The card showed its deadline all along, so the line names no lifetime.
+    assert.equal(renderGateNote(verdict.post!.note), "Expired. Ask again for a fresh card.");
   });
 
   it("reports an expired proposal as stale, in the expired wording", async () => {
@@ -574,7 +573,7 @@ describe("a card that is no longer there", () => {
 
     const verdict = await resolveSignal(reaction(), { threadState });
     assert.equal(verdict.outcome, "stale");
-    assert.deepEqual(verdict.post?.note, { kind: "expired", ttlMs: cardTtlMs(1_000_000) });
+    assert.deepEqual(verdict.post?.note, { kind: "expired" });
     assert.equal(verdict.execute, undefined);
     // Expiry is the store's answer, not a second clock in the gate — and the
     // by-thread fallback must not resurrect an aged-out card either.
@@ -1266,11 +1265,11 @@ describe("a stated card answers in its own words", () => {
     clock += 73 * HOUR_MS;
     const verdict = await resolveSignal(reaction(), { threadState: late });
     assert.equal(verdict.outcome, "stale");
-    assert.deepEqual(verdict.post?.note, { kind: "expired", ttlMs: 72 * HOUR_MS, words: WORDS.expired });
+    assert.deepEqual(verdict.post?.note, { kind: "expired", words: WORDS.expired });
     assert.equal(renderGateNote(verdict.post!.note), WORDS.expired);
 
-    // Through the button door it is said on the card itself, nothing is
-    // posted, and nothing runs.
+    // Through the button door it is said on the card itself — in the one
+    // expired line every card ends on — nothing is posted, and nothing runs.
     clock = 1_000_000;
     const pressed = await stagedStated(STATED, at);
     clock += 73 * HOUR_MS;
@@ -1279,7 +1278,7 @@ describe("a stated card answers in its own words", () => {
       delivery.calls.filter((c) => c.kind === "gate-note").map((c) => c.kind === "gate-note" && c.card?.ts),
       [CARD_TS],
     );
-    assert.equal(renderGateNote(delivery.gateNotes[0]!), WORDS.expired);
+    assert.equal(renderCardNote(delivery.gateNotes[0]!), "Expired. Ask again for a fresh card.");
     assert.deepEqual(delivery.posted, []);
     assert.deepEqual(ephemerals, []);
     assert.deepEqual(notes, []);
@@ -1313,6 +1312,6 @@ describe("a stated card answers in its own words", () => {
     const { notes } = await press(await staged(), "cancel");
     assert.deepEqual(notes, [`Cancelled by <@${PRESSER}> — tell me what to change and I'll stage it again.`]);
     assert.match(renderGateNote({ kind: "superseded" }), /newest card in this thread/);
-    assert.match(renderGateNote({ kind: "expired" }), /Ask me again/);
+    assert.equal(renderGateNote({ kind: "expired" }), "Expired. Ask again for a fresh card.");
   });
 });

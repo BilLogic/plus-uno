@@ -132,8 +132,7 @@ export function sweepShareCard(operations: readonly ProposalOperation[]): Propos
   for (const n of notes) lines.push("", `In ${n.where}:`, ...n.text.split("\n").map((l) => `> ${l}`));
   lines.push(
     "",
-    "The people who could confirm the fix can confirm this. " +
-      `Expires after ${CARD_WINDOW_WORDS}, with no reminder.`,
+    "The people who could confirm the fix can confirm this. No reminder comes before it expires.",
   );
   return shareCard({ where, lead: lines.join("\n"), operations });
 }
@@ -154,7 +153,8 @@ export async function stageSweepShare(
   outcomes: readonly OperationOutcome[],
   deps: {
     channels: ShareChannels;
-    post(to: { channel: string; threadTs: string }, card: ProposalCard): Promise<{ ok: boolean; ts?: string; text?: string }>;
+    /** `ttlMs`: the lifetime its deadline line was said from, when it said one. */
+    post(to: { channel: string; threadTs: string }, card: ProposalCard): Promise<{ ok: boolean; ts?: string; text?: string; ttlMs?: number }>;
     threadState: Pick<ThreadState, "putProposal">;
     proposalEvents: ProposalEventLog;
     now(): number;
@@ -185,6 +185,7 @@ export async function stageSweepShare(
       supersedeKey: SWEEP_SHARE_KEY,
       stated: SHARE_CARD_WORDS,
       facts: offer.facts,
+      ...(sent.ttlMs !== undefined ? { ttlMs: sent.ttlMs } : {}),
     };
     const { retired } = await deps.threadState.putProposal(proposal);
     const now = deps.now();

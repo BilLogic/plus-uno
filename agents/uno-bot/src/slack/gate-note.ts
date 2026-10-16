@@ -21,7 +21,10 @@
 //     differs by door is a message that drifts by door.
 //   • AN AGED-OUT CARD is never met with silence. Live 2026-07-10, silence
 //     read as "the bot is broken" to someone who believed they had just
-//     confirmed something.
+//     confirmed something. Every card, whoever staged it, ends on the one
+//     line `EXPIRED_CARD` once its deadline passes — edited on by the gesture
+//     that found it or by the store's alarm at the deadline (#1316). The
+//     card showed its deadline all along, so the line names none.
 //   • A REPLACED CARD gets its own line rather than the expiry one (#573). The
 //     person did not wait too long, they acted on the card above the one being
 //     held — and unlike an aged-out card there is a live one in the thread to
@@ -38,7 +41,7 @@
 // Import-free and Env-free: it renders and posts nothing.
 
 import type { GateNote } from "../turn/index";
-import { PROPOSAL_TTL_MS, type StatedCardWords } from "../thread-state/index";
+import type { StatedCardWords } from "../thread-state/index";
 import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
 
 /** The lost race. */
@@ -47,27 +50,12 @@ export const STALE_POST =
   "so nothing was executed twice.";
 
 /**
- * The delayed ✅/❌ on a card that aged out, naming how long it was live — the
- * card's own lifetime, which is an hour unless it set one.
+ * An expired card's message, on every path that expires one (#1316): the
+ * line a card ends on once its deadline passed, and the answer to a gesture
+ * that came after it. Nothing ran — an expired card cannot run anything — and
+ * a fresh card is one ask away.
  */
-export function expiredPost(ttlMs?: number): string {
-  return (
-    "That proposal had already expired — nothing was executed. " +
-    `It stayed live for ${lifetimeWords(ttlMs ?? PROPOSAL_TTL_MS)}. ` +
-    "Ask me again and I'll set the same thing up fresh."
-  );
-}
-
-/** The expiry line for a card on the default hour. */
-export const EXPIRED_POST = expiredPost();
-
-/** A lifetime as a person says it: "an hour", "72 hours", "30 minutes". */
-function lifetimeWords(ms: number): string {
-  const minutes = Math.round(ms / 60_000);
-  if (minutes % 60 !== 0) return minutes === 1 ? "a minute" : `${minutes} minutes`;
-  const hours = minutes / 60;
-  return hours === 1 ? "an hour" : `${hours} hours`;
-}
+export const EXPIRED_CARD = "Expired. Ask again for a fresh card.";
 
 /** The ✅/⛔ on a proposal a revision replaced (#573). */
 export const SUPERSEDED_POST =
@@ -160,7 +148,7 @@ export function renderGateNote(note: GateNote): string {
     case "already-resolved":
       return STALE_POST;
     case "expired":
-      return note.words ?? expiredPost(note.ttlMs);
+      return note.words ?? EXPIRED_CARD;
     case "superseded":
       if (note.stated) return STATED_SUPERSEDED_POST;
       return note.by ? supersededBy(note.by) : SUPERSEDED_POST;
@@ -199,9 +187,11 @@ export function renderGateNote(note: GateNote): string {
  * A verdict as the line edited onto its card (`Delivery.postGateNote` with a
  * card): the same words as in the thread, without the mention of the person
  * whose gesture it answered — a line on the card stays there for everyone,
- * and an edit notifies no one anyway.
+ * and an edit notifies no one anyway. An expired card says `EXPIRED_CARD`,
+ * a stated one too: its own words are for the person who acted.
  */
 export function renderCardNote(note: GateNote): string {
+  if (note.kind === "expired") return EXPIRED_CARD;
   return note.kind === "not-a-confirmer" ? notAConfirmerLine({ ...note, userId: undefined }) : renderGateNote(note);
 }
 

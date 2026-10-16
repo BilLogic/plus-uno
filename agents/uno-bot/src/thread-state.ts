@@ -71,6 +71,11 @@ import {
   REPORT_EXPIRY_RETRY_MS,
   type ReportExpiryRecord,
   type ReportExpiryEdit,
+  type ExpiredCardEdit,
+  CARD_EXPIRY_EDIT_GRACE_MS,
+  cardExpiryDueAt,
+  cardExpiryOwed,
+  expiredCardEdit,
   claimedFiling,
   comparisonKey,
   decidedNoteOf,
@@ -133,6 +138,8 @@ interface ProposalRecord {
    *  `DECIDED_TTL_MS` from here, and swept after (`decidedLive`). Absent on a
    *  card decided before it was stamped, which keeps its staged lifetime. */
   decidedAt?: number;
+  /** The card's message says it expired (`acknowledgeCardExpiry`, #1316). */
+  expiryShown?: true;
 }
 
 // Latest assistant-panel context (what surface the user has open) per thread.
@@ -175,7 +182,21 @@ export interface ThreadStateAlarmDeps {
    *  may fail: a record nobody took is found again on the next pass. */
   handOffCutOffRuns?(due: Execution[]): Promise<void>;
   handOffExpiredReports?(due: DecisionReportRecord[]): Promise<void>;
+  /** Hand over cards whose "Expired" edit is owed (`cardExpiryOwed`), at
+   *  most `CARD_EXPIRY_HANDOFFS_PER_PASS` a pass. Takes nothing: a card
+   *  nobody edited is handed over again on the next pass. */
+  handOffExpiredCards?(due: PendingProposal[]): Promise<void>;
 }
+
+/**
+ * Cards one alarm pass hands over for their "Expired" edit (#1316). Each
+ * hand-off is one enqueue — one subrequest of the alarm's 50 on Workers Free —
+ * beside the cut-off runs and report redraws the same pass hands over; cards
+ * past the cap wait `REPORT_EXPIRY_RETRY_MS` for the next pass. Each edit then
+ * runs as its own runner job, on a fresh budget: three subrequests (the read,
+ * `chat.update`, the acknowledgement).
+ */
+export const CARD_EXPIRY_HANDOFFS_PER_PASS = 20;
 
 // Extends the `cloudflare:workers` base class — that is what makes the public
 // methods below callable as Durable Object RPC (compatibility_date 2026-05-01).
@@ -237,6 +258,17 @@ export class ThreadState extends DurableObject<Env> {
       });
     }
 
+    // Cards that aged out untouched, oldest deadline first, to say so on.
+    const owed = [...proposals.values()]
+      .filter((rec) => cardExpiryOwed(rec, rec.payload as PendingProposal | null, now))
+      .sort((a, b) => a.createdAt + recordTtlMs(a) - (b.createdAt + recordTtlMs(b)));
+    if (owed.length && this.alarmDeps.handOffExpiredCards) {
+      const due = owed.slice(0, CARD_EXPIRY_HANDOFFS_PER_PASS).map((rec) => rec.payload as PendingProposal);
+      await this.alarmDeps.handOffExpiredCards(due).catch((err: unknown) => {
+        console.error(`[thread-state] card expiry hand-off failed: ${err instanceof Error ? err.message : String(err)}`);
+      });
+    }
+
     const gcAt = (await this.storage.get<number>(GC_NEXT_KEY)) ?? 0;
     let next = now >= gcAt ? await this.collectGarbage(now) : gcAt;
     const execs = await this.storage.list<Execution>({ prefix: "exec:" });
@@ -245,6 +277,12 @@ export class ThreadState extends DurableObject<Env> {
       if (now - rec.createdAt > rec.report.ttlMs + REPORT_GRACE_MS) continue;
       const expiryAt = reportExpiryAt(rec, look, now);
       next = Math.min(next, expiryAt <= now ? now + REPORT_EXPIRY_RETRY_MS : expiryAt);
+    }
+    // Each live card's deadline, and a retry for one still owed its edit.
+    for (const rec of proposals.values()) {
+      const due = cardExpiryDueAt(rec, rec.payload as PendingProposal | null);
+      if (due === null || now - due > CARD_EXPIRY_EDIT_GRACE_MS) continue;
+      next = Math.min(next, due <= now ? now + REPORT_EXPIRY_RETRY_MS : due);
     }
     if (next !== Infinity) await this.storage.transaction((txn) => this.armAlarmBy(txn, next, true));
   }
@@ -269,7 +307,10 @@ export class ThreadState extends DurableObject<Env> {
       }
       const props = await txn.list<ProposalRecord>({ prefix: "prop:" });
       for (const [key, rec] of props) {
-        const live = rec.decided ? decidedLive(rec, (rec.payload as PendingProposal | null) ?? {}, now) : now - rec.createdAt <= recordTtlMs(rec);
+        // An aged-out card still owed its "Expired" edit is kept for it.
+        const live = rec.decided
+          ? decidedLive(rec, (rec.payload as PendingProposal | null) ?? {}, now)
+          : now - rec.createdAt <= recordTtlMs(rec) || cardExpiryOwed(rec, rec.payload as PendingProposal | null, now);
         if (!live) await txn.delete(key);
         else remaining++;
       }
@@ -418,8 +459,10 @@ export class ThreadState extends DurableObject<Env> {
         const item = proposal.item;
         const rec = await txn.get<ReportRecord>(reportKey(item.messageTs));
         if (rec) await txn.put(reportKey(item.messageTs), { ...rec, deadlines: { ...rec.deadlines, [item.id]: expiresAt } });
-        await this.armAlarmBy(txn, expiresAt);
       }
+      // Woken at the deadline: an item's report redraws, any other card is
+      // edited to say it expired (#1316).
+      await this.armAlarmBy(txn, expiresAt);
       await this.ensureGcAlarm(txn);
       return retired;
     });
@@ -526,7 +569,8 @@ export class ThreadState extends DurableObject<Env> {
         return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal), ...replacedBy };
       }
       if (at - rec.createdAt > recordTtlMs(rec)) {
-        await txn.delete(proposalKey(proposalTs));
+        // Kept while its expiry edit is owed, so the edit still finds it.
+        if (!cardExpiryOwed(rec, rec.payload as PendingProposal | null, at)) await txn.delete(proposalKey(proposalTs));
         return { state: "expired", ...ownTtl(proposal), ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal) };
       }
       if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal) };
@@ -661,6 +705,21 @@ export class ThreadState extends DurableObject<Env> {
       const next = expiredReport(rec, reportLook(proposals, executions), at);
       if (next !== rec) await txn.put(reportKey(messageTs), next);
       return next.expiryPending ? { report: next.report, revision: next.revision ?? 0 } : null;
+    });
+  }
+
+  // A card's "Expired" edit (#1316): read only while owed; the edit is the
+  // caller's, outside this object, and its acknowledgement settles it.
+  async prepareCardExpiry(proposalTs: string, at: number): Promise<ExpiredCardEdit | null> {
+    const rec = await this.storage.get<ProposalRecord>(proposalKey(proposalTs));
+    const proposal = (rec?.payload as PendingProposal | null | undefined) ?? null;
+    return rec && proposal && cardExpiryOwed(rec, proposal, at) ? expiredCardEdit(proposal) : null;
+  }
+
+  async acknowledgeCardExpiry(proposalTs: string): Promise<void> {
+    await this.storage.transaction(async (txn) => {
+      const rec = await txn.get<ProposalRecord>(proposalKey(proposalTs));
+      if (rec && !rec.expiryShown) await txn.put<ProposalRecord>(proposalKey(proposalTs), { ...rec, expiryShown: true });
     });
   }
 

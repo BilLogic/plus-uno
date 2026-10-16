@@ -15,6 +15,7 @@ import { handleAppHomeOpened } from "./home";
 import { handleReaction } from "./gate";
 import { cutOffRunJob, handleCutOffRun } from "./cut-off-sweep";
 import { redrawExpiredReport } from "./report-expiry";
+import { showExpiredCard } from "./card-expiry-edit";
 import { runDevLinksWriteJobOnEnv } from "../figma-links/env";
 import { extractPrdFromThreadRoot } from "./notion-prd";
 import {
@@ -198,7 +199,7 @@ export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey
     // A cut-off job has nobody waiting on it: the record stays untaken, and
     // the ThreadState alarm hands it over again. A Figma event has no thread
     // to speak in, and never comes this way: its route enqueues it once.
-    if (job.kind === "cut-off" || job.kind === "figma-event" || job.kind === "report-expiry" || job.kind === "figma-dev-links-write") return;
+    if (job.kind === "cut-off" || job.kind === "figma-event" || job.kind === "report-expiry" || job.kind === "card-expiry" || job.kind === "figma-dev-links-write") return;
     const target =
       job.kind === "message"
         ? { channel: job.event.channel, thread_ts: replyThreadTs(job.event) }
@@ -240,6 +241,22 @@ export function handOffExpiredReportsFor(env: Env): (due: DecisionReportRecord[]
   };
 }
 
+/**
+ * The ThreadState alarm's `handOffExpiredCards`, bound to `Env`: one runner
+ * job per card whose "Expired" edit is owed (#1316), each on a runner of its
+ * own — keyed by the card, never the thread's, so the edit neither waits
+ * behind the thread's turns nor spends their budget.
+ */
+export function handOffExpiredCardsFor(env: Env): (due: PendingProposal[]) => Promise<void> {
+  return async (due) => {
+    for (const card of due) {
+      await enqueueAgentJob(env, { kind: "card-expiry", proposalTs: card.proposalTs }, `${card.channel}:card-expiry:${card.proposalTs}`).catch((err: unknown) => {
+        console.error(`[slack] card expiry hand-off for ${card.proposalTs} failed: ${err instanceof Error ? err.message : String(err)}`);
+      });
+    }
+  };
+}
+
 // (The open-stream registry that lived here is gone: a stream is now opened and
 // closed inside delivery, within one function, so there is no window in which a
 // turn can end holding one.)
@@ -251,6 +268,16 @@ export function handOffExpiredReportsFor(env: Env): (due: DecisionReportRecord[]
 export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<ThreadJobOutcome> {
   if (job.kind === "report-expiry") {
     await redrawExpiredReport(job.messageTs, {
+      store: threadStateFor(env),
+      edit: async (channel, ts, message) => {
+        const result = await updateMessage(env, { channel, ts, ...message });
+        if (!result.ok) throw new Error(result.error ?? "Slack refused the expiry edit");
+      },
+    });
+    return "handled";
+  }
+  if (job.kind === "card-expiry") {
+    await showExpiredCard(job.proposalTs, {
       store: threadStateFor(env),
       edit: async (channel, ts, message) => {
         const result = await updateMessage(env, { channel, ts, ...message });

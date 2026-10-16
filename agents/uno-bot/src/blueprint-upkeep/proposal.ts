@@ -218,7 +218,7 @@ export function proposalOfferCard(draft: ProposalDraft): ProposalCard {
     ...draft.removed.map((c) => `• No longer happens at ${at(c)}: ${esc(c.content)} (left empty on the new path)`),
     `*Confidence:* ${draft.confidence.toFixed(1)}`,
     ...(draft.gaps.length ? [`*Could not verify:* ${draft.gaps.map(esc).join("; ")}`] : []),
-    `*The ask:* Approve creates the path at ${code(PROPOSED)} and writes these cells on it, as uno-bot, all or nothing; today's path is not touched. Only the person who asked can approve; Reject, or no answer in ${CARD_WINDOW_WORDS}, writes nothing.`,
+    `*The ask:* Approve creates the path at ${code(PROPOSED)} and writes these cells on it, as uno-bot, all or nothing; today's path is not touched. Only the person who asked can approve; Reject, or no answer before it expires, writes nothing.`,
   ].join("\n");
   const operation = revisionCard(draft.revision, []).operations![0]!;
   return { kind: "stated", verb: "draft this on the blueprint as a proposal", lead, footer: "", fields: [], caveats: [], operations: [operation], short };

@@ -1571,6 +1571,36 @@ export function runThreadStateConformance(
     assert.deepEqual(edit?.report.entries.map((e) => e.state.kind), ["expired", "open"]);
   });
 
+  // A card that ages out untouched is edited to say so (#1316): the edit is
+  // owed from the first instant it reads as expired until acknowledged, and
+  // the record waits for it through any lookup in between.
+  it("a card past its deadline is owed its expiry edit until acknowledged, and kept for it", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalBlocks: [{ type: "section" }] }));
+    clock.advance(PROPOSAL_TTL_MS);
+    assert.equal(await store.prepareCardExpiry("1700.2"), null, "live at its deadline");
+    clock.advance(1);
+    const owed = { channel: THREAD.channel, proposalTs: "1700.2", text: "Create the card?", blocks: [{ type: "section" }] };
+    assert.deepEqual(await store.prepareCardExpiry("1700.2"), owed);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
+    assert.deepEqual(await store.prepareCardExpiry("1700.2"), owed, "a lookup does not collect it");
+    await store.acknowledgeCardExpiry("1700.2");
+    assert.equal(await store.prepareCardExpiry("1700.2"), null);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
+  });
+
+  it("no expiry edit is owed on a decided, replaced or report-item card", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.claimProposal("1700.2", { decision: "confirm", by: "U1" });
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    await store.putProposal(proposal({ proposalTs: "1700.4" }));
+    await store.putProposal(proposal({ proposalTs: "1700.9#a", supersedeKey: "item", item: { messageTs: "1700.9", id: "a" } }));
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    for (const ts of ["1700.2", "1700.3", "1700.9#a"]) assert.equal(await store.prepareCardExpiry(ts), null, ts);
+    assert.ok(await store.prepareCardExpiry("1700.4"), "the card that replaced the other is owed its own");
+  });
+
   it("a report's item is replaced by its revision in place, open again under a new id", async () => {
     const { store } = setup();
     await store.putReport(report());

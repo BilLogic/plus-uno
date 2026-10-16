@@ -295,7 +295,7 @@ export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksReque
   }
 
   const { subject, write } = planned;
-  const report = decisionReport([devLinksItem(subject, write)], devLinksParent(subject));
+  const report = decisionReport([devLinksItem(subject, write)], devLinksParent(subject), { expiresAt: cardExpiresAt(now) });
   const sent = await deps.post({ text: report.text, blocks: report.blocks });
   if (!sent.ok || !sent.ts) return { posted: false, cards: 0, retry: true, summary: `the message did not post${tail}` };
   const ts = sent.ts;

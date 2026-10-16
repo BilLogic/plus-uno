@@ -317,7 +317,7 @@ describe("Review opens the draft", () => {
     const { deps, views } = harness(threadState);
     await runReviewOpen(open(), deps);
     const view = views.calls[1]!.view;
-    assert.match(viewText(view), /expired/);
+    assert.match(viewText(view), /Expired/);
     assert.doesNotMatch(viewText(view), /Reflection redesign/);
     assert.deepEqual(actionIds(view), []);
   });
@@ -443,7 +443,7 @@ describe("Approve in the pop-up", () => {
     const { deps, views, ran } = harness(threadState);
     await runReviewDecision(approve(), deps);
     assert.deepEqual(ran, []);
-    assert.match(viewText(views.calls[0]!.view), /expired/);
+    assert.match(viewText(views.calls[0]!.view), /Expired/);
     assert.deepEqual(actionIds(views.calls[0]!.view), []);
   });
 });

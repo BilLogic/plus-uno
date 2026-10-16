@@ -28,8 +28,10 @@ import {
   ownWords,
   ownText,
   ownOperations,
+  cardExpiryOwed,
   replacedByOf,
   decidedLive,
+  expiredCardEdit,
   REPORT_GRACE_MS,
   changedReport,
   expiredReport,
@@ -81,6 +83,8 @@ interface ProposalRecord {
    *  other lookup. */
   decided?: DecidedNote;
   decidedAt?: number;
+  /** The card's message says it expired (`acknowledgeCardExpiry`). */
+  expiryShown?: true;
 }
 
 interface AssistantContextRecord {
@@ -283,7 +287,8 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal), ...structuredClone(replacedBy) };
       }
       if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) {
-        proposals.delete(proposalTs);
+        // Kept while its expiry edit is owed, so the edit still finds it.
+        if (!cardExpiryOwed(rec, rec.proposal, now())) proposals.delete(proposalTs);
         return { state: "expired", ...ownTtl(rec.proposal), ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal) };
       }
       if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal) };
@@ -380,6 +385,16 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     async acknowledgeReportExpiry(messageTs, revision) {
       const rec = liveReport(messageTs);
       if (rec && (rec.revision ?? 0) === revision) reports.set(messageTs, { ...rec, expiryPending: false });
+    },
+
+    async prepareCardExpiry(proposalTs) {
+      const rec = proposals.get(proposalTs);
+      return rec && cardExpiryOwed(rec, rec.proposal, now()) ? structuredClone(expiredCardEdit(rec.proposal)) : null;
+    },
+
+    async acknowledgeCardExpiry(proposalTs) {
+      const rec = proposals.get(proposalTs);
+      if (rec) rec.expiryShown = true;
     },
 
     // ----- executions -----

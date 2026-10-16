@@ -117,6 +117,7 @@ import {
   type UpkeepState,
   type WeighedMarks,
 } from "./job";
+import { dueFromNow } from "../slack/card-deadline";
 
 const STATE_KV_KEY = "blueprint-upkeep:state";
 const WEIGHED_PREFIX = "blueprint-upkeep:weighed:";
@@ -550,14 +551,16 @@ function proposalOfferDepsFor(env: Env): OfferDeps | null {
   return {
     records,
     async postCard(p, card) {
-      const rendered = renderProposalCard(card);
+      // Posted now and staged on the one rule from now: it says that deadline.
+      const due = dueFromNow(card);
+      const rendered = renderProposalCard(due.card);
       const sent = await postMessage(env, {
         channel: p.channel,
         thread_ts: p.replyTs,
         text: rendered.text,
         blocks: rendered.blocks ?? proposalCardBlocks(rendered.text),
       });
-      return sent.ok && sent.ts ? { ts: sent.ts, text: rendered.text } : null;
+      return sent.ok && sent.ts ? { ts: sent.ts, text: rendered.text, ttlMs: due.ttlMs } : null;
     },
     stage: (proposal) => stageRevisionCard(env, proposal),
     linkOf: (p) => (p.cellIds[0] ? cellUrl(env.BLUEPRINT_APP_URL, p.cellIds[0]) : undefined),

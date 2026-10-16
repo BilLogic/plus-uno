@@ -551,7 +551,7 @@ export async function runDmCapturePost(job: ScheduledJob, deps: DmCapturePostDep
 
   // The first ten are shown; the parent line counts every fix due, and the
   // rest stay queued for the next card.
-  const built = decisionReport(due.map(dmCaptureItem), dmCaptureParent(due));
+  const built = decisionReport(due.map(dmCaptureItem), dmCaptureParent(due), { expiresAt: cardExpiresAt(deps.now()) });
   const shown = due.slice(0, built.shown.length);
   const fixes = `${shown.length} fix(es)`;
   if (deps.dryRun) return { ...report("handled", null, `would post 1 card holding ${fixes}`), text: built.text };

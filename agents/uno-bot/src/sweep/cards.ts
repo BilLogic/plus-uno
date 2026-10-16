@@ -521,7 +521,7 @@ export function sweepCardPick(text: string, count: number): number[] | null {
  * next `drop N` names the card that reads N, under a head and a confirm line
  * whose counts are the revision's own. The confirmers' sentence is the card's,
  * since the same people may confirm; the revision keeps its card's deadline,
- * so the "expires in" hours are not repeated.
+ * which it states under its fixes (`ProposalCard.expiresAt`).
  *
  * @param fixes - The card's fixes, as staged with it
  * @param kept - The 0-based indexes kept (`sweepCardPick`), in card order
@@ -533,9 +533,7 @@ export function keptFixes(fixes: CardFixes, kept: readonly number[]): CardFixes 
     return { ...fix, detail: fix.detail.replace(/^\d+\. /, `${i + 1}. `) };
   });
   const applies = `One ✅ applies ${n === 1 ? "it" : `all ${n}`}${n === 1 ? "." : "; reply `drop 2` to leave one out."}`;
-  const tail = fixes.tail
-    .replace(/One ✅ applies (?:it|all \d+); reply `drop 2` to leave one out\./, applies)
-    .replace(/Expires in \d+ h, with no reminder\./, "Expires when the card it revises would have, with no reminder.");
+  const tail = fixes.tail.replace(/One ✅ applies (?:it|all \d+); reply `drop 2` to leave one out\./, applies);
   return { head: `**${SWEEP_CARD_MARK}** — revised: ${n === 1 ? "one fix" : `${n} fixes`} left.`, items, tail };
 }
 

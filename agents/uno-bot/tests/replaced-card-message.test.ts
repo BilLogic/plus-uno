@@ -32,7 +32,7 @@ import {
   type GateVerdict,
 } from "../src/gate/index";
 import {
-  EXPIRED_POST,
+  EXPIRED_CARD,
   STALE_POST,
   SUPERSEDED_POST,
   supersededBy,
@@ -278,7 +278,7 @@ test("the Slack renderer is the one place a verdict becomes words", () => {
   // What a person reads, pinned at the renderer so a wording change in Gate
   // cannot silently ship (#623). The mention and the emoji live here; Gate
   // hands over the facts.
-  assert.equal(renderGateNote({ kind: "expired" }), EXPIRED_POST);
+  assert.equal(renderGateNote({ kind: "expired" }), EXPIRED_CARD);
   assert.equal(renderGateNote({ kind: "already-resolved" }), STALE_POST);
   assert.equal(renderGateNote({ kind: "superseded" }), SUPERSEDED_POST);
   assert.equal(renderGateNote({ kind: "resolved", decision: "confirm" }), defaultNarrative("confirm"));

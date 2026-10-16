@@ -192,6 +192,8 @@ export type RunnerJobPayload =
   /** A cut-off run the ThreadState alarm found and nobody has looked at. */
   | { kind: "cut-off"; proposalTs: string }
   | { kind: "report-expiry"; messageTs: string }
+  /** A card that aged out untouched, to edit to "Expired" (#1316). */
+  | { kind: "card-expiry"; proposalTs: string }
   /** A Figma notification, kept as ids and times (`figma-notify/event.ts`). */
   | { kind: "figma-event"; event: FigmaEventJob }
   /** The rest of an approved Dev Mode links write (`figma-links/run.ts`). */

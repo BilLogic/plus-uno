@@ -135,7 +135,7 @@ import {
 } from "./rules";
 import type { CardTodoDetector } from "./todo";
 import type { GapNotes } from "../usage/gap-notes";
-import { CARD_WINDOW_WORDS, MAX_CARD_TTL_MS } from "../card-expiry";
+import { CARD_WINDOW_WORDS, MAX_CARD_TTL_MS, cardExpiresAt } from "../card-expiry";
 
 /** New card follow-ups one end of day keeps; the rest wait a night. */
 export const MAX_NEW_PER_NIGHT = 15;
@@ -1011,7 +1011,8 @@ async function postGroup(deps: DueDeps, group: FollowUpGroup, now: number, runDa
   const report = decisionReport(
     [...shown, ...waiting].map((a) => a.item),
     followUpParent(kinds, first),
-    { channel: group.to.channel },
+    // Each card is staged as it posts, so this is when they all close.
+    { channel: group.to.channel, expiresAt: cardExpiresAt(now) },
   );
   // Checked this morning already, so each comes back with the next report.
   const later = waiting.map(heldForNext);
@@ -1418,7 +1419,7 @@ export async function draftCard(c: CommitmentRecord, text: CommitmentText, deps:
   return {
     kind: "confirm",
     verb: "file this Roadmap card",
-    lead: `Draft card for the to-do: *${escapeLead(String(operation.input.title))}*. A ✅ from the people named above, or whoever asked for it, files it. Expires after ${CARD_WINDOW_WORDS}.`,
+    lead: `Draft card for the to-do: *${escapeLead(String(operation.input.title))}*. A ✅ from the people named above, or whoever asked for it, files it.`,
     fields: [],
     caveats: [],
     operations: [operation],
@@ -1430,7 +1431,7 @@ export function statusCard(card: { title: string; url: string }, status: string,
   return {
     kind: "confirm",
     verb: `move this card to ${status}`,
-    lead: `${answer === "done" ? "Done" : "Dropped"}: <${card.url}|${escapeLead(card.title)}> → *${escapeLead(status)}*. A ✅ applies it. Expires after ${CARD_WINDOW_WORDS}.`,
+    lead: `${answer === "done" ? "Done" : "Dropped"}: <${card.url}|${escapeLead(card.title)}> → *${escapeLead(status)}*. A ✅ applies it.`,
     fields: [],
     caveats: [],
     operations: [statusOperation(card, status)],
@@ -1443,7 +1444,7 @@ export function contributorCard(card: { title: string; url: string }, slackUser:
   return {
     kind: "confirm",
     verb: "set this card's Contributor",
-    lead: `Contributor for <${card.url}|${escapeLead(card.title)}>: <@${slackUser}>. A ✅ applies it. Expires after ${CARD_WINDOW_WORDS}.`,
+    lead: `Contributor for <${card.url}|${escapeLead(card.title)}>: <@${slackUser}>. A ✅ applies it.`,
     fields: [],
     caveats: [],
     operations: [contributorOperation(card, notionUser)],
