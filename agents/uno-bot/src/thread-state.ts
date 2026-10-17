@@ -49,6 +49,7 @@ import { DurableObject } from "cloudflare:workers";
 import type { Env } from "./types";
 import {
   CANCEL_TTL_MS,
+  compactedTurns,
   CUT_OFF_SWEEP_RETRY_MS,
   CUT_OFF_SWEEP_SLACK_MS,
   EVENT_DEDUP_TTL_MS,
@@ -457,10 +458,8 @@ export class ThreadState extends DurableObject<Env> {
   ): Promise<{ turns: HistoryTurn[]; dropped: number }> {
     return this.storage.transaction(async (txn) => {
       const turns = await this.liveTurns(ref, at, txn);
-      // Nothing to gain once the tail is the whole conversation (or all but the
-      // opening turn, which is kept either way).
-      if (turns.length <= keepRecent + 1) return { turns, dropped: 0 };
-      const kept = [turns[0]!, ...turns.slice(-keepRecent)];
+      const kept = compactedTurns(turns, keepRecent);
+      if (!kept) return { turns, dropped: 0 };
       await txn.put<HistoryRecord>(historyKey(ref.channel, ref.thread), { turns: kept, updatedAt: at });
       return { turns: kept, dropped: turns.length - kept.length };
     });

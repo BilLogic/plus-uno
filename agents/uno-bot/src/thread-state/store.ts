@@ -163,10 +163,19 @@ export interface HistoryTurn {
    *  invisible. */
   ts?: string;
   /** When the turn was recorded, in epoch ms, where its writer stamps it. A
-   *  ⛔ note does, so "just cancelled" can mean recent: the code guard holds a
+   *  ⛔ note does, so "just canceled" can mean recent: the code guard holds a
    *  card back only inside the window (`agent/cancel-note.ts`), and an older
    *  note is left out of what the model reads (`agent/context-state.ts`). */
   at?: number;
+  /** On a ⛔ note, the reply thread of the card it cancels
+   *  (`proposalReplyThread`). In a DM every top-level ask shares one history,
+   *  so without it a cancel in one thread read as "just canceled" to every
+   *  other: the guard holds back a card staged in this thread, and the model
+   *  reads another thread's note as a past fact (`agent/cancel-note.ts`). */
+  cardThread?: string;
+  /** On a ⛔ note, the canceled batch's fingerprint (`proposalFingerprint`):
+   *  from another thread, only the very same card is held back. */
+  cardFingerprint?: string;
   /** Names of the references `read_reference` served on this turn. The TEXT is
    *  deliberately not persisted (#423): a later turn sees a one-line stub per
    *  name and a re-read is one baked-map lookup. */
@@ -1274,13 +1283,32 @@ export function editedOnConfirm(proposal: PendingProposal, operations: readonly 
     staged,
     ...(proposal.choices ?? []).flatMap((c) => (c.verdict === "confirm" && c.args ? [withArgs(staged, c.args)] : [])),
   ];
-  const confirmed = canonical(operations);
-  return !untouched.some((batch) => canonical(batch) === confirmed);
+  const confirmed = canonicalJson(operations);
+  return !untouched.some((batch) => canonicalJson(batch) === confirmed);
+}
+
+/**
+ * A conversation trimmed to its goal turn plus the most recent `keepRecent`,
+ * or null when that would drop nothing — the one statement of the trim both
+ * adapters' `compactHistory` store.
+ *
+ * The goal turn is the first USER turn. A history can open on an assistant
+ * note no one asked for there — a relayed DM, or a ⛔ note recorded in a DM
+ * card's own thread (`appendHistory`) — and keeping that as "the goal" would
+ * drop the ask itself. A history with no user turn keeps its first turn.
+ */
+export function compactedTurns(turns: readonly HistoryTurn[], keepRecent: number): HistoryTurn[] | null {
+  // Nothing to gain once the tail is the whole conversation (or all but the
+  // opening turn, which is kept either way).
+  if (turns.length <= keepRecent + 1) return null;
+  const goalAt = Math.max(0, turns.findIndex((t) => t.role === "user"));
+  const tailFrom = turns.length - keepRecent;
+  return goalAt < tailFrom ? [turns[goalAt]!, ...turns.slice(tailFrom)] : turns.slice(tailFrom);
 }
 
 /** A value as JSON with every object's keys sorted, so key order never reads
  *  as a difference. */
-function canonical(value: unknown): string {
+export function canonicalJson(value: unknown): string {
   return JSON.stringify(value, (_key, v: unknown) =>
     v && typeof v === "object" && !Array.isArray(v)
       ? Object.fromEntries(Object.entries(v as Record<string, unknown>).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
@@ -1527,7 +1555,10 @@ export interface ThreadState {
    *  missed half is a corrupted memory. The one exception is a message the bot
    *  opens a conversation with and no one asked for there: a relayed DM is
    *  recorded alone, as an assistant turn in the recipient's DM, because the
-   *  request behind it lives in the requester's conversation, not this one. */
+   *  request behind it lives in the requester's conversation, not this one.
+   *  The ⛔ note is the other: in a DM it is also recorded alone in the
+   *  canceled card's own thread, a conversation of its own, so a re-ask typed
+   *  there finds it (`agent/cancel-note.ts` § `cancelNoteWrites`). */
   appendHistory(ref: ThreadRef, turn: HistoryTurn): Promise<{ length: number }>;
 
   /**

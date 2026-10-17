@@ -113,7 +113,10 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
 
 /** Thread history and the execution record land in a Durable Object; here
  *  history lands in a list, and the record's calls are kept to be asserted. */
-let appended: Array<{ ref: { channel: string; thread: string }; turn: { role: string; content: string } }> = [];
+let appended: Array<{
+  ref: { channel: string; thread: string };
+  turn: { role: string; content: string; cardThread?: string; cardFingerprint?: string };
+}> = [];
 let executionCalls: string[] = [];
 const THREAD_STATE = {
   idFromName: () => "thread-state",
@@ -572,6 +575,50 @@ test("a won ⛔ is recorded cancelled, and runs nothing", async () => {
   await run(env(), by({ ...declined, decision: "cancel" }, "button", "U0REQUESTR1"), { events, now: CLOCK });
   assert.deepEqual(events.events().map((e) => [e.event, e.via, e.confirmedByOther]), [["cancelled", "button", null]]);
   assert.equal(calls.some((c) => c.url.includes("api.github.com")), false);
+});
+
+// A DM card is kept under the shared "dm" conversation and lives in a thread of
+// its own, which a reply typed there reads as its own conversation. The ⛔ note
+// has to land in both, naming the card's thread and fingerprint, or the guard
+// either bounces every DM ask or misses the re-ask in the card's thread.
+test("a won ⛔ on a DM card leaves its note in the DM's conversation and in the card's own thread", async () => {
+  calls = [];
+  appended = [];
+  const run = await executeVerdict();
+  const { execute: _none, ...declined } = won(intake);
+  await run(env(), by({ ...declined, decision: "cancel" }, "button", "U0REQUESTR1"));
+  const { proposalFingerprint } = await import("../src/agent/cancel-note.js");
+  const notes = appended.filter((a) => /^\(Canceled the proposed github_issue_create/.test(a.turn.content));
+  assert.deepEqual(
+    notes.map((n) => [n.ref.thread, n.turn.cardThread, n.turn.cardFingerprint]),
+    [
+      ["dm", "1700000000.000100", proposalFingerprint(intake)],
+      ["1700000000.000100", "1700000000.000100", proposalFingerprint(intake)],
+    ],
+  );
+});
+
+test("a ⛔ whose card-thread note fails still records the DM's note, and does not fail", async () => {
+  calls = [];
+  appended = [];
+  const run = await executeVerdict();
+  const { execute: _none, ...declined } = won(intake);
+  const failingThread = {
+    idFromName: () => "thread-state",
+    get: () => ({
+      ...THREAD_STATE.get(),
+      appendHistory: async (ref: (typeof appended)[number]["ref"], turn: (typeof appended)[number]["turn"]) => {
+        if (ref.thread !== "dm") throw new Error("thread write refused");
+        appended.push({ ref, turn });
+        return { length: 1 };
+      },
+    }),
+  };
+  await run(
+    { SLACK_BOT_TOKEN: "xoxb-test", THREAD_STATE: failingThread } as unknown as Env,
+    by({ ...declined, decision: "cancel" }, "button", "U0REQUESTR1"),
+  );
+  assert.deepEqual(appended.map((a) => a.ref.thread), ["dm"]);
 });
 
 test("a lost race records nothing", async () => {

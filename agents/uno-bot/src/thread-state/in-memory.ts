@@ -18,6 +18,7 @@
 
 import {
   CANCEL_TTL_MS,
+  compactedTurns,
   EVENT_DEDUP_TTL_MS,
   HISTORY_TTL_MS,
   MAX_HISTORY_TURNS,
@@ -202,10 +203,8 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
 
     async compactHistory(ref, { keepRecent }) {
       const turns = liveHistory(ref)?.turns ?? [];
-      // Nothing to gain once the tail is the whole conversation (or all but the
-      // opening turn, which is kept either way).
-      if (turns.length <= keepRecent + 1) return { turns, dropped: 0 };
-      const kept = [turns[0]!, ...turns.slice(-keepRecent)];
+      const kept = compactedTurns(turns, keepRecent);
+      if (!kept) return { turns, dropped: 0 };
       const dropped = turns.length - kept.length;
       history.set(threadKey(ref), { turns: kept, updatedAt: now() });
       return { turns: kept, dropped };

@@ -196,6 +196,19 @@ export function runThreadStateConformance(
     );
   });
 
+  // A DM card's own thread can open on its ⛔ note, recorded alone; the goal
+  // is the first thing the person asked there, not that note.
+  it("compaction keeps the first user turn as the goal when the history opens on an assistant note", async () => {
+    const { store } = setup();
+    await store.appendHistory(THREAD, { role: "assistant", content: "note" });
+    for (let i = 0; i < 6; i++) {
+      await store.appendHistory(THREAD, { role: i % 2 ? "assistant" : "user", content: `t${i}` });
+    }
+    const compacted = await store.compactHistory(THREAD, { keepRecent: 2 });
+    assert.deepEqual(compacted.turns.map((t) => t.content), ["t0", "t4", "t5"]);
+    assert.equal(compacted.dropped, 4);
+  });
+
   it("compaction of a short history drops nothing", async () => {
     const { store } = setup();
     await store.appendHistory(THREAD, { role: "user", content: "one" });
