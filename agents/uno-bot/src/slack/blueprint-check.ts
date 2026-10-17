@@ -78,8 +78,8 @@ function offerWords(scenario: string, underCard: boolean): string {
 }
 
 /** A button. Its value is nothing a door needs — the message's own ts names
- *  the offer — so no idea text ever rides on it. Only Stop is colored
- *  (`danger`, red); every other button keeps Slack's default. */
+ *  the offer — so no idea text ever rides on it. `style` is Slack's
+ *  `danger`, for a button that warrants red. */
 function button(actionId: string, label: string, value: string, style?: "danger") {
   return { type: "button", action_id: actionId, text: { type: "plain_text", text: label, emoji: true }, value, ...(style ? { style } : {}) };
 }

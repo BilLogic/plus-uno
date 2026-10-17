@@ -106,11 +106,11 @@ const buttonsOf = (message: CardMessage | undefined) =>
     .match(/"action_id":"[^"]+","text":\{"type":"plain_text","text":"[^"]+"/g)
     ?.map((b) => b.replace(/"action_id":"([^"]+)".*"text":"([^"]+)"$/, "$1 $2")) ?? [];
 
-/** Each button's Slack style, or "default" where it has none. */
+/** Each button's Slack style: undefined where it has none, Slack's default. */
 const stylesOf = (message: CardMessage | undefined) =>
   ((message?.blocks ?? []) as Array<{ type: string; elements?: Array<{ style?: string }> }>)
     .filter((b) => b.type === "actions")
-    .flatMap((b) => (b.elements ?? []).map((e) => e.style ?? "default"));
+    .flatMap((b) => (b.elements ?? []).map((e) => e.style));
 
 // ── Stop ─────────────────────────────────────────────────────────────────────
 
@@ -138,7 +138,7 @@ test("the presser stops a running check: its model call is aborted, nothing is p
   assert.equal(w.status.length, 2, "the job did not redraw the stopped message");
   assert.equal(w.status[1]!.text, "Stopped the blueprint check. Your card isn't affected.");
   assert.deepEqual(buttonsOf(w.status[1]), [`${CHECK_IT_ACTION_ID} Check again`]);
-  assert.deepEqual(stylesOf(w.status[1]), ["default"], "Check again keeps Slack's default");
+  assert.deepEqual(stylesOf(w.status[1]), [undefined], "Check again keeps Slack's default");
   assert.equal(messageBlocksRefusal(w.status[1]!.blocks), null);
   assert.deepEqual(w.told, []);
 });
@@ -264,6 +264,7 @@ test("a draft cut off at the output ceiling still posts the results, and the che
   const undrafted = w.status.at(-1)!;
   assert.equal(undrafted.text, UNDRAFTED);
   assert.deepEqual(buttonsOf(undrafted), [`${CHECK_IT_ACTION_ID} Check again`]);
+  assert.deepEqual(stylesOf(undrafted), [undefined], "Check again keeps Slack's default");
   assert.equal(messageBlocksRefusal(undrafted.blocks), null);
 
   // Check again cut off again: still no second results, and it says so again.
@@ -346,6 +347,7 @@ test("a check that runs too long is stopped at its deadline and says so, with Tr
   const failed = w.status.at(-1)!;
   assert.equal(failed.text, "The blueprint check didn't finish — it ran too long. Your card isn't affected.");
   assert.deepEqual(buttonsOf(failed), [`${CHECK_IT_ACTION_ID} Try again`]);
+  assert.deepEqual(stylesOf(failed), [undefined], "Try again keeps Slack's default");
   assert.equal(messageBlocksRefusal(failed.blocks), null);
 
   await w.press(BYSTANDER);

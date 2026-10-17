@@ -78,6 +78,14 @@ describe("the strict fake refuses what Slack refuses", () => {
     }
     assert.equal((await verdicts([button({ style: "default" })])).length, 3);
     assert.equal((await verdicts([button({ style: "green" })])).length, 3);
+    // A card's buttons are held to the same values.
+    const cardWith = (style: string) => ({
+      type: "card",
+      title: { type: "plain_text", text: "A card" },
+      actions: [{ type: "button", action_id: "a", text: { type: "plain_text", text: "Open" }, value: "v", style }],
+    });
+    assert.deepEqual(await verdicts([cardWith("danger")]), []);
+    assert.equal((await verdicts([cardWith("green")])).length, 3);
   });
 
   it("refuses a context with no elements or more than ten", async () => {
