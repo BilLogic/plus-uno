@@ -23,9 +23,16 @@
 // losing Stop; then follow-ups in the offer's thread: today's steps beside the
 // idea's, step by step where the idea's rows could be drafted
 // (`comparisonText`), and the existing Draw on blueprint ✅ card
-// (`./proposal.ts`, requester only) when the draft draws anything. A path
-// that cannot be read, a check that throws or one past `CHECK_DEADLINE_MS`
-// says it didn't finish, with Try again, and posts nothing else.
+// (`./proposal.ts`, requester only) when the draft draws anything. A draft
+// that did not finish — the model failed, or was cut off at its ceiling —
+// still posts the results, in the idea's own words, and the message says no
+// proposal was drafted, with Check again: the card is never silently absent.
+// The offer is kept marked undrafted, and Check again on a marked offer
+// drafts only: it posts no second results, and the card follows the ones
+// already up (which stay in the idea's own words) when the draft draws.
+// A path that cannot be read, a check that throws or one past
+// `CHECK_DEADLINE_MS` says it didn't finish, with Try again, and posts
+// nothing else.
 //
 // STOP (#1322). A stopped run posts nothing: Stop marks the record, which the
 // job reads before it starts and steps against before it posts, and aborts
@@ -70,7 +77,7 @@ import { GATE_SUBREQUESTS } from "./budget";
 import type { PathToday } from "./draft";
 import type { ServiceChangeGate, ServiceChangeInput } from "./gate";
 import { comparisonText, type Comparison } from "./milestone";
-import { proposalOfferCard, stagedProposalOffer, type ProposalDraft, type ProposalDrafter } from "./proposal";
+import { CheckPastDeadline, proposalOfferCard, stagedProposalOffer, type ProposalDraft, type ProposalDrafter } from "./proposal";
 
 /** External subrequests the judgement spends in a turn: the gate's judgment
  *  and its search. The offer's own post is the turn's delivery. */
@@ -279,7 +286,8 @@ export interface BlueprintCheckDeps {
   /** Today's path holding a cell, or null when it cannot be read. */
   readPath(cellId: string): Promise<PathToday | null>;
   /** The idea's rows on today's path, for the step-by-step comparison and the
-   *  Draw on blueprint card; null when nothing could be drafted. */
+   *  Draw on blueprint card, or why there are none (`NoProposal`): nothing to
+   *  draw, a draft that did not finish, or a path with no scenario. */
   draft: ProposalDrafter;
   /** The Roadmap page a matter's ✅ created, or null (`MatterPages.pageOf`). */
   createdPage(channel: string, matter: string): Promise<string | null>;
@@ -308,8 +316,13 @@ export interface PostedCard {
 }
 
 /** What a check came to, as its status message says it. A stopped check is
- *  not here: Stop says that itself. */
-export type CheckOutcome = { kind: "done" } | { kind: "failed"; reason: "unreadable" | "error" | "timed-out" };
+ *  not here: Stop says that itself. `undrafted`: the results stand, but the
+ *  idea's rows could not be drafted (`NoProposal` `unfinished`), so there is
+ *  no Draw on blueprint card and the message says so, with Check again. */
+export type CheckOutcome =
+  | { kind: "done" }
+  | { kind: "undrafted" }
+  | { kind: "failed"; reason: "unreadable" | "error" | "timed-out" };
 
 /**
  * Run one check: read today's path, draft the idea's rows on it, post today's
@@ -343,7 +356,7 @@ export async function runBlueprintCheck(job: BlueprintCheckJob, deps: BlueprintC
   // not wait on: a check held only by its deadline let the process exit
   // before the deadline fired.
   const deadline = new AbortController();
-  const timer = setTimeout(() => deadline.abort(new Error("the blueprint check ran past its deadline")), deps.deadlineMs ?? CHECK_DEADLINE_MS);
+  const timer = setTimeout(() => deadline.abort(new CheckPastDeadline()), deps.deadlineMs ?? CHECK_DEADLINE_MS);
   const signal = AbortSignal.any([stop.signal, deadline.signal]);
   let outcome: CheckOutcome | "stopped";
   try {
@@ -359,7 +372,7 @@ export async function runBlueprintCheck(job: BlueprintCheckJob, deps: BlueprintC
     clearTimeout(timer);
     inFlight.delete(job.run);
   }
-  if (outcome === "stopped" || outcome.kind === "done") return;
+  if (outcome === "stopped" || outcome.kind !== "failed") return;
   // Said on the message only while the run still holds the record, so a Stop
   // that won the race keeps its own words there.
   if (await deps.store.stepCheck(ref, offer.scenario, job.run, "failed")) await deps.settle(offer, outcome);
@@ -378,22 +391,39 @@ async function check(offer: BlueprintCheckOffer, run: string, signal: AbortSigna
     text: comparisonText(today, offer.quote),
   };
   // The drafter fails quiet, an abort included, so the signal is read again.
-  const drafted = await untilAborted(deps.draft(comparison, offer.idea, signal), signal);
+  const result = await untilAborted(deps.draft(comparison, offer.idea, signal), signal);
   signal.throwIfAborted();
+  // No second try mends a path read without its scenario.
+  if (result === "no-scenario") return { kind: "failed", reason: "unreadable" };
+  const proposal = typeof result === "string" ? null : result;
+  const outcome: CheckOutcome = result === "unfinished" ? { kind: "undrafted" } : { kind: "done" };
   // Done before anything posts: a Stop that landed first wins, and one that
   // lands after finds the check finished. Then Stop leaves the message.
   if (!(await deps.store.stepCheck(checkRefOf(offer), offer.scenario, run, "done"))) return "stopped";
-  await deps.settle(offer, { kind: "done" });
-  await postResults(offer, drafted ? comparisonText(today, offer.quote, drafted.changes) : comparison.text, deps);
+  await deps.settle(offer, outcome);
+  // A redraft (`BlueprintCheckOffer.undrafted`) posts no second results: the
+  // first stand in the thread, so it only drafts, and marks or clears.
+  const marked = outcome.kind === "undrafted" ? { ...offer, undrafted: true as const } : withoutMark(offer);
+  if (offer.undrafted) {
+    if (marked.undrafted !== offer.undrafted) await deps.store.putCheckOffer(marked);
+  } else {
+    await postResults(marked, proposal ? comparisonText(today, offer.quote, proposal.changes) : comparison.text, deps);
+  }
   // The check is done and its results stand: a card that fails to go up
   // under them is logged, never the check's failure — that would step a done
   // run to failed and offer a Try again that posts the results twice.
-  if (drafted) {
-    await offerDraw(offer, drafted, deps).catch((err: unknown) => {
+  if (proposal) {
+    await offerDraw(offer, proposal, deps).catch((err: unknown) => {
       console.error(`[blueprint-check] ${offer.scenario}: the Draw on blueprint card was not staged: ${err instanceof Error ? err.message : String(err)}`);
     });
   }
-  return { kind: "done" };
+  return outcome;
+}
+
+/** The offer with no undrafted mark. */
+function withoutMark(offer: BlueprintCheckOffer): BlueprintCheckOffer {
+  const { undrafted: _mark, ...rest } = offer;
+  return rest;
 }
 
 /** `work`, or a rejection as soon as `signal` aborts: for a step whose own
@@ -409,13 +439,15 @@ function untilAborted<T>(work: Promise<T>, signal: AbortSignal): Promise<T> {
 
 /**
  * The results, with the action the card's state offers now and a deadline
- * from now; then kept on the offer, so a press finds their words.
+ * from now; then kept on the offer, so a press finds their words, along with
+ * an undrafted mark, so Check again drafts and posts no second results.
  */
 async function postResults(offer: BlueprintCheckOffer, text: string, deps: BlueprintCheckDeps): Promise<void> {
   const action = actionFor(await cardNow(offer, deps));
   const expiresAt = cardExpiresAt((deps.now ?? Date.now)());
   await deps.postResults(offer, { text, action, expiresAt });
   if (action) await deps.store.putCheckOffer({ ...offer, results: { text, expiresAt } });
+  else if (offer.undrafted) await deps.store.putCheckOffer(offer);
 }
 
 /**

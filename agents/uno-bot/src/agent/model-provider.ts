@@ -204,7 +204,9 @@ export type ModelText =
   // `cutOff`: the reply stopped at the output ceiling rather than ending on its
   // own, so `text` may be a fragment. Each adapter reads its own stop signal;
   // a caller that parses the text can name a truncation instead of guessing.
-  | { ok: true; model: string; text: string; cutOff?: boolean }
+  // `thinkingTokens`: what the model's thinking spent of that ceiling, where
+  // the adapter reports it, so a caller can size its ceiling from data.
+  | { ok: true; model: string; text: string; cutOff?: boolean; thinkingTokens?: number }
   | { ok: false; unavailable?: false; model: string; message: string }
   | { ok: false; unavailable: true; model: string; message: string };
 

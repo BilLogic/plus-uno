@@ -2060,6 +2060,10 @@ export interface BlueprintCheckOffer {
    *  or the page, and when its buttons stop answering (`cardExpiresAt` from
    *  the post). The button carries only the offer's ts. */
   results?: { text: string; expiresAt: number };
+  /** The check's results posted, but its draft did not finish
+   *  (`CheckOutcome` `undrafted`): Check again drafts only, posting no
+   *  second results. Cleared once a draft finishes. */
+  undrafted?: true;
 }
 
 /** How long an offer is kept from its put: past any offer's deadline

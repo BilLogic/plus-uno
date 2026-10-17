@@ -208,6 +208,7 @@ export function geminiProvider(env: Env): ModelProvider {
         model: res.model,
         text: res.text ?? "",
         ...(res.finishReason === "MAX_TOKENS" ? { cutOff: true } : {}),
+        ...(res.usage ? { thinkingTokens: res.usage.thinking } : {}),
       };
     },
 
