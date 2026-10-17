@@ -185,6 +185,20 @@ test("a worded cancel after \"Cancel which one?\" closes the card it named, and 
   );
 });
 
+test("the model re-staging the waiting card byte for byte approves it, and closes it", async () => {
+  const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_A)] });
+  const first = await turn(h, { text: "draft a PRD for backup tutor matching" });
+
+  const outcome = await turn(h, { text: "go ahead", userMsgTs: "1700000000.000400" });
+
+  assert.equal(outcome.disposition, "resolved");
+  const closed = h.delivery.calls.flatMap((c) => (c.kind === "close-card" ? [c] : []));
+  assert.deepEqual(
+    closed.map((c) => [c.card.ts, c.outcome]),
+    [[first.staged!.proposal.proposalTs, { decision: "confirm", by: "U1" }]],
+  );
+});
+
 test("a typed ✅ on the one live card closes it to its outcome", async () => {
   const h = harness({ replies: [call("notion_create", PRD_A)] });
   const first = await turn(h, { text: "draft a PRD for backup tutor matching" });

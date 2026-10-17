@@ -171,11 +171,6 @@ export async function settleVerdict(
     : undefined;
   const posted = said?.text;
   const executed = await ctx.deps.applyVerdict(verdict);
-  // The card it decided ends as a press leaves it, outcome line and View —
-  // after the run, as the button door edits its card, so the card never says
-  // more than the thread already has.
-  const decided = decidedCardOf(verdict);
-  if (decided) await ctx.deps.delivery.closeCard(decided.card, decided.outcome);
   const remembered = (verdict.outcome === "won" ? ctx.note : undefined) ?? posted;
   if (remembered) await ctx.memory.remember(remembered);
   if (ctx.aside) {
@@ -191,6 +186,12 @@ export async function settleVerdict(
       })
     : null;
   if (staged) await ctx.memory.remember(staged.proposal.proposalText);
+  // The card it decided ends as a press leaves it, outcome line and View.
+  // LAST, after everything the person must read: the edit is cosmetic, and
+  // the adapter sends it only while the settle after it still fits the
+  // delivery reserve (`CLOSE_CARD_HEADROOM`).
+  const decided = decidedCardOf(verdict);
+  if (decided) await ctx.deps.delivery.closeCard(decided.card, decided.outcome);
   // "Approve which one?" resolved nothing: it asked, and every card it names
   // is still waiting on the person (#1319).
   const asked = verdict.post?.note.kind === "which-card";

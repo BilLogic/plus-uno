@@ -1637,6 +1637,9 @@ test("\"keep 2\" keeps only that fix; dropping every fix cancels the card", asyn
   assert.equal(dropped.staged, undefined);
   assert.equal(all.provider.sends.length, 0);
   assert.notEqual((await all.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found");
+  // The card it canceled ends as a ⛔ press leaves it.
+  const closed = all.delivery.calls.flatMap((c) => (c.kind === "close-card" ? [[c.card.ts, c.outcome]] : []));
+  assert.deepEqual(closed, [[SWEEP_CARD.proposalTs, { decision: "cancel", by: "U0OWNER" }]]);
 });
 
 test("a fix number the sweep card does not have goes to the model", async () => {

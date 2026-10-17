@@ -365,20 +365,28 @@ export async function otherCardWaits(
  */
 export function decidedCardOf(verdict: GateVerdict): { card: GateCard; outcome: CardOutcome } | null {
   const proposal = verdict.proposal;
-  if (verdict.outcome !== "won" || !verdict.decision || !proposal || proposal.item) return null;
+  const outcome = cardOutcomeOf(verdict);
+  if (!outcome || !proposal || proposal.item) return null;
   const { card } = cardOf(proposal.proposalTs, proposal);
-  if (!card) return null;
-  const note = verdict.post?.note;
-  const rejected = note?.kind === "resolved" ? note.rejected : undefined;
+  return card ? { card, outcome } : null;
+}
+
+/**
+ * What a won verdict decided, and who decided it: the one builder of a
+ * decided card's outcome, for the doors that close it here and for a press
+ * (`slack/button-door.ts`), which adds the pop-up's Reject reason only it
+ * carries. Null for a verdict that did not win or decided nothing.
+ */
+export function cardOutcomeOf(verdict: GateVerdict): CardOutcome | null {
+  const proposal = verdict.proposal;
+  if (verdict.outcome !== "won" || !verdict.decision || !proposal) return null;
+  // From the card, not the note: a ⛔ the model said in its own words posts
+  // a `said` note, which carries none of the resolved note's fields.
   const cancelled = verdict.decision === "cancel" ? statedCancelOf(proposal) : undefined;
   return {
-    card,
-    outcome: {
-      decision: verdict.decision,
-      ...(verdict.by?.userId ? { by: verdict.by.userId } : {}),
-      ...(cancelled ? { cancelled } : {}),
-      ...(verdict.decision === "cancel" && rejected ? { rejected } : {}),
-    },
+    decision: verdict.decision,
+    ...(verdict.by?.userId ? { by: verdict.by.userId } : {}),
+    ...(cancelled ? { cancelled } : {}),
   };
 }
 

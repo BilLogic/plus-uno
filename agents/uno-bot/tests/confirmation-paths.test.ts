@@ -28,6 +28,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 
 import {
+  decidedCardOf,
   resolveSignal,
   runReactionDoor,
   type GateRestage,
@@ -52,6 +53,7 @@ import {
 import {
   recordingDelivery,
   withWorkingSignal,
+  type DeliveryCall,
   type RecordingDelivery,
   type TurnSettlement,
 } from "../src/turn/index";
@@ -159,8 +161,13 @@ const DOORS: Array<{ name: string; signal: GateSignal }> = [
 describe("five signals, one verdict", () => {
   it("wins, posts the same verdict, and executes the same tool on every door", async () => {
     const verdicts: GateVerdict[] = [];
+    // Each door stages a fresh card, and its lifetime runs from staging to a
+    // fixed deadline — over a weekend, Monday's (`card-expiry.ts`) — so on the
+    // wall clock each card's `ttlMs` is a millisecond or so shorter than the
+    // last. One pinned staging clock gives every door the same card.
+    const at = () => Date.UTC(2026, 9, 17, 15);
     for (const door of DOORS) {
-      const threadState = await staged();
+      const threadState = await staged({ at });
       // The model reads its card from the store, as the turn hands it over:
       // stamped with its lifetime, like the card every other door finds.
       const signal = door.signal.kind === "model"
@@ -202,14 +209,10 @@ describe("five signals, one verdict", () => {
 
     // Not "each looks right" but "all five are the same verdict" — past the
     // door it came through, which each one names for the record.
-    // The card's lifetime is what is left of it when each door read it, which
-    // over a weekend counts down by the millisecond (`card-expiry.ts`), so it
-    // is left out of the proposal as well as the run.
     const unstamped = (v: GateVerdict) => {
       const { by: _by, ...rest } = v;
       const { ttlMs: _ttl, ...execute } = (rest.execute ?? {}) as { ttlMs?: number };
-      const { ttlMs: _left, ...proposal } = (rest.proposal ?? {}) as { ttlMs?: number };
-      return { ...rest, execute, proposal };
+      return { ...rest, execute };
     };
     const first = unstamped(verdicts[0]!);
     for (const verdict of verdicts.slice(1)) {
@@ -1391,5 +1394,99 @@ describe("a stated card answers in its own words", () => {
     assert.deepEqual(notes, [`Canceled by <@${PRESSER}> — tell me what to change and I'll stage it again.`]);
     assert.match(renderGateNote({ kind: "superseded" }), /newest card in this thread/);
     assert.equal(renderGateNote({ kind: "expired" }), "Expired. Ask again for a fresh card.");
+  });
+});
+
+// ── what a decision leaves on the card ───────────────────────────────────────
+
+describe("the card a decision closes", () => {
+  /** What a door would edit the card to, for one signal on a store. */
+  const closes = async (signal: GateSignal, threadState: ThreadState) => decidedCardOf(await resolveSignal(signal, { threadState }));
+
+  /** A reaction door run, and the cards its Delivery was asked to close. */
+  async function reactWith(threadState: ThreadState, glyph: string, userId = "U2"): Promise<DeliveryCall[]> {
+    const delivery = recordingDelivery();
+    await runReactionDoor(
+      { channel: CHANNEL, messageTs: CARD_TS, glyph, userId },
+      {
+        threadState,
+        delivery: () => delivery,
+        threadRootOf: async () => THREAD,
+        botUserId: async () => "UBOT",
+        applyVerdict: async () => {},
+        restage: async () => {},
+      },
+    );
+    return delivery.calls.filter((c) => c.kind === "close-card");
+  }
+
+  it("closes the card a reaction, a typed emoji or the model wins, naming who decided", async () => {
+    for (const signal of [reaction(), typed(), { ...model(), userId: "U2" } as GateSignal]) {
+      const decided = await closes(signal, await staged());
+      assert.deepEqual(
+        decided,
+        { card: { ts: CARD_TS, text: PROPOSAL.proposalText }, outcome: { decision: "confirm", by: "U2" } },
+        signal.kind,
+      );
+    }
+  });
+
+  it("closes nothing on a second ⛔ once the card is decided", async () => {
+    const threadState = await staged();
+    assert.equal((await reactWith(threadState, "white_check_mark")).length, 1, "the win closes it");
+    assert.deepEqual(await reactWith(threadState, "no_entry"), [], "the late ⛔ closes nothing");
+    assert.equal(await closes(typed("⛔"), threadState), null);
+  });
+
+  it("closes nothing for the race a reaction lost", async () => {
+    const threadState = await staged();
+    assert.ok(await closes(button(), threadState), "the press won");
+    assert.equal(await closes(reaction(), threadState), null);
+  });
+
+  it("closes nothing on a card a revision replaced", async () => {
+    const threadState = await staged();
+    await threadState.putProposal({
+      ...PROPOSAL,
+      proposalTs: "1700000000.000295",
+      input: { title: "Tutors only" },
+      proposalText: "(the revised card)",
+    });
+    assert.equal(await closes(reaction(), threadState), null);
+  });
+
+  it("closes nothing for someone outside the card's confirmer set", async () => {
+    const threadState = createInMemoryThreadState();
+    await threadState.putProposal({ ...PROPOSAL, confirmers: ["U7"] });
+    assert.deepEqual(await reactWith(threadState, "white_check_mark", "U2"), []);
+  });
+
+  it("closes nothing on a Needs changes, which decides nothing", async () => {
+    const threadState = await staged();
+    const revise: GateSignal = { kind: "review", messageTs: CARD_TS, decision: "revise", note: "shorter", userId: "U2" };
+    assert.equal(await closes(revise, threadState), null);
+  });
+
+  it("closes nothing on an item of a decision report, which redraws its report instead", async () => {
+    const threadState = createInMemoryThreadState();
+    await threadState.putProposal({ ...PROPOSAL, item: { messageTs: "1700000000.000150", id: "c1" } });
+    const verdict = await resolveSignal(button("cancel"), { threadState });
+    assert.equal(verdict.outcome, "won");
+    assert.equal(decidedCardOf(verdict), null);
+  });
+
+  it("closes a stated card with its own ⛔ phrase, typed or the model's", async () => {
+    const stated: PendingProposal = { ...PROPOSAL, stated: { cancelled: "Rejected, nothing filed", expired: "Closed." } };
+    const signals: GateSignal[] = [
+      typed("⛔"),
+      // The model's own words post a `said` note, so the phrase comes off the card.
+      { kind: "model", pending: stated, decision: "cancel", messageToUser: "Dropping it.", userId: "U2" },
+    ];
+    for (const signal of signals) {
+      const threadState = createInMemoryThreadState();
+      await threadState.putProposal(stated);
+      const decided = await closes(signal, threadState);
+      assert.deepEqual(decided?.outcome, { decision: "cancel", by: "U2", cancelled: "Rejected, nothing filed" }, signal.kind);
+    }
   });
 });

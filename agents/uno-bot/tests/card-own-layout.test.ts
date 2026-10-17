@@ -16,6 +16,8 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { runReactionDoor } from "../src/gate/index";
+import { runMetered, withSubrequestLimit } from "../src/net";
+import { CLOSE_CARD_HEADROOM } from "../src/agent/loop-policy";
 import { runButtonDoor } from "../src/slack/button-door";
 import { deliveryAdapter } from "../src/slack/delivery-adapter";
 import { renderProposalCard } from "../src/slack/proposal-render";
@@ -172,6 +174,20 @@ describe("a card decided outside its own buttons", () => {
     assert.equal(lastLine(blocks), `Canceled by <@${BEA}> — tell me what to change and I'll stage it again.`);
     assert.deepEqual(buttons(blocks), ["View"]);
     assert.match(slack.of("update")[0]!.text, /Canceled by/, "the fallback copy says the outcome too");
+  });
+
+  it("is left as it was when the edit and the settle after it would not both fit", async () => {
+    const card = { ts: CARD, ...sweepCard() };
+    const closeWith = async (headroom: number) => {
+      const slack = recordingSlack();
+      // A lookup limit is the one way a test sets what is left in the meter.
+      await runMetered(() =>
+        withSubrequestLimit(headroom, () => deliveryAdapter(slack.deps(false), target).closeCard(card, { decision: "confirm", by: BEA })),
+      );
+      return slack.of("update").length;
+    };
+    assert.equal(await closeWith(CLOSE_CARD_HEADROOM - 1), 0, "the clear keeps its subrequest");
+    assert.equal(await closeWith(CLOSE_CARD_HEADROOM), 1);
   });
 
   it("by a reaction that wins it", async () => {

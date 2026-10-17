@@ -427,18 +427,11 @@ export interface NoteCard {
 
 /**
  * What decided a card, as its message is closed to it (`Delivery.closeCard`):
- * the decision and who made it. `cancelled` is a stated card's own phrase for
- * what its ⛔ did (`PendingProposal.stated`), and `rejected` marks a ⛔ made
- * as the Review pop-up's Reject, with the person's reason. The words are the
- * adapter's: the same line a press leaves on the card.
+ * the resolved verdict's own facts (`GateNote` "resolved") and `by`, the Slack
+ * id of who decided, when the signal named one. The words are the adapter's:
+ * the same line a press leaves on the card.
  */
-export interface CardOutcome {
-  decision: "confirm" | "cancel";
-  /** The Slack id of who decided, when the signal named one. */
-  by?: string;
-  cancelled?: string;
-  rejected?: { reason?: string };
-}
+export type CardOutcome = Omit<Extract<GateNote, { kind: "resolved" }>, "kind"> & { by?: string };
 
 /** The Check it offer a milestone posts after its card (#1321), or after
  *  the reply that hands a build to the IDE (#1324): the scenario the idea
@@ -568,7 +561,7 @@ export interface Delivery {
   postAnswer(text: string, presentation?: Presentation): Promise<PostResult>;
 
   /** A note that is not an answer: a clarifying question, a cancellation, a
-   *  "you just cancelled that" bounce. No footer, no confidence pre-check.
+   *  "you just canceled that" bounce. No footer, no confidence pre-check.
    *  `tag` is the Worker's own tag on the message, as on a card. */
   postNote(text: string, tag?: ProposalCard["tag"]): Promise<PostResult>;
 
