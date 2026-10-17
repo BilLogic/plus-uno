@@ -15,7 +15,7 @@ import type { SlackEventFile } from "./types";
 import { cardLinks } from "./plan-block";
 import type { SlackIcon } from "./estate-glyphs";
 import { sendWithCardFallback } from "./card-block";
-import { keepLastLine } from "./split";
+import { keepLastLine, utf8Bytes } from "./split";
 
 interface SlackOk {
   ok: true;
@@ -339,30 +339,32 @@ export interface PostMessageInput {
 }
 
 /**
- * `chat.update`'s ceiling on `text`: past it Slack answers `msg_too_long` and
- * the edit does not land (its method reference, read 2026-10-17).
- * `chat.postMessage` truncates a long text instead, so a card whose whole
- * draft is its text posts fine and then fails its first edit — live on Worker
- * r671, a revised PRD card rejected from Review that kept its Review button.
- * Counted as UTF-16 `.length`, never fewer than Slack's characters: safe, at
- * the cost of cutting a little early on text with emoji.
+ * `chat.update`'s ceiling on `text`, in UTF-8 bytes: past it Slack answers
+ * `msg_too_long` and the edit does not land. `chat.postMessage` truncates a
+ * long text instead, so a card whose whole draft is its text posts fine and
+ * then fails its first edit — a revised PRD card rejected from Review kept its
+ * Review button.
+ *
+ * Bytes, though Slack's method reference says 4,000 characters: it refused
+ * edits of 3,946 characters / 4,030 bytes and 3,962 / 4,038 live, so its count
+ * is bytes. Held to this, a long card's edit lands on its first chat.update.
  */
-export const UPDATE_TEXT_CHARS = 4000;
+export const UPDATE_TEXT_BYTES = 4000;
 
 /**
- * The text an edit Slack refused as too long is sent again with — its opening
- * and its last line, as `UPDATE_TEXT_CHARS` keeps them, but short enough for
- * any reading of Slack's rule. A revised PRD card was refused live (Worker
- * r674) with its text already held to `UPDATE_TEXT_CHARS`.
+ * The text an edit Slack refused as too long anyway is sent again with, in
+ * UTF-8 bytes — its opening and its last line, as `UPDATE_TEXT_BYTES` keeps
+ * them, but short enough for any reading of Slack's rule. A safety net: an
+ * edit held to `UPDATE_TEXT_BYTES` should not need it.
  */
-export const UPDATE_RETRY_TEXT_CHARS = 1000;
+export const UPDATE_RETRY_TEXT_BYTES = 1000;
 
 /**
  * Replace one of the bot's own messages — chat.update, which Slack allows a
  * bot token on the bot's messages only.
  *
  * Every edit leaves here, so this is where its text is held to
- * `UPDATE_TEXT_CHARS`: its opening and its last line, which on a card is the
+ * `UPDATE_TEXT_BYTES`: its opening and its last line, which on a card is the
  * note the edit is for (`split.ts` § keepLastLine). An edit with blocks shows
  * its blocks, built from the whole text before it gets here, so the cut is
  * only its fallback copy; a text-only edit shows the cut itself, which beats
@@ -375,17 +377,16 @@ export async function updateMessage(
   const full = sanitizeSlackMarkup(toSlackMrkdwn(input.text));
   const blocks = input.blocks ?? [];
   const send = (text: string) => slackCall<SlackResponse & { ts?: string }>(env, "chat.update", { ...input, text, blocks });
-  const text = keepLastLine(full, UPDATE_TEXT_CHARS);
+  const text = keepLastLine(full, UPDATE_TEXT_BYTES);
   const res = await send(text);
   if (res.ok || res.error !== "msg_too_long") return res;
-  // Refused under the documented ceiling (live on Worker r674): say what was
-  // sent, so the real rule can be read off it, and land the edit with a text
-  // short enough for any reading of it.
+  // Refused under the byte ceiling: say what was sent, so the rule can be read
+  // off it, and land the edit with a text short enough for any reading of it.
   console.warn(
-    `[slack] chat.update msg_too_long: text ${text.length} chars / ${new TextEncoder().encode(text).length} bytes, ` +
-      `blocks ${JSON.stringify(blocks).length} chars; sending it again with ${UPDATE_RETRY_TEXT_CHARS}`,
+    `[slack] chat.update msg_too_long: text ${text.length} chars / ${utf8Bytes(text)} bytes, ` +
+      `blocks ${JSON.stringify(blocks).length} chars; sending it again with ${UPDATE_RETRY_TEXT_BYTES} bytes`,
   );
-  return send(keepLastLine(full, UPDATE_RETRY_TEXT_CHARS));
+  return send(keepLastLine(full, UPDATE_RETRY_TEXT_BYTES));
 }
 
 // NOTE ON THE DISPLAY NAME. The bot presents as "Le Goat" because the bot

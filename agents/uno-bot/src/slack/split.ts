@@ -151,7 +151,11 @@ function balancedCut(s: string, max: number): number {
     if (lastSpace === -1) lastSpace = i;
     if (isBalanced(window.slice(0, i))) return i;
   }
-  return lastSpace > 0 ? lastSpace : max;
+  if (lastSpace > 0) return lastSpace;
+  // No space to cut at, so cut at `max` — but not between the two halves of a
+  // surrogate pair, which leaves half an emoji on each side of the cut.
+  const code = s.charCodeAt(max - 1);
+  return code >= 0xd800 && code <= 0xdbff ? max - 1 : max;
 }
 
 function isBalanced(s: string): boolean {
@@ -168,33 +172,63 @@ export const ELIDED_LINE = "… (middle cut to fit Slack's edit limit)";
 /** The least head worth keeping beside a last line. */
 const MIN_HEAD = 80;
 
+const encoder = new TextEncoder();
+
+/** `s`'s length in UTF-8 bytes, the unit Slack's edit limit is counted in. */
+export function utf8Bytes(s: string): number {
+  return encoder.encode(s).length;
+}
+
+const ELIDED_BYTES = utf8Bytes(ELIDED_LINE);
+
 /**
- * A text cut to at most `limit` characters that keeps its opening and its last
- * line, with `ELIDED_LINE` where the middle came out.
+ * A text cut to at most `limit` UTF-8 bytes that keeps its opening and its
+ * last line, with `ELIDED_LINE` where the middle came out.
+ *
+ * Bytes, not characters: chat.update counts its limit in UTF-8 bytes whatever
+ * its reference says. It refused edits of 3,946 characters / 4,030 bytes and
+ * 3,962 / 4,038 live, and a card's "·", "—", "›" and emoji are two to four
+ * bytes each, so a character count let a long card through to a refusal and a
+ * second, shorter edit.
  *
  * For a message edited in place, whose last line is the news: a decided card's
  * outcome, a gate note, "Expired" — each door puts it there. A View pressed
  * once a card's record is gone reads the outcome off that line
  * (`review-view.ts` § outcomeView, from the pressed message's text), so it is
  * the one line never cut. The head is cut by `splitBalanced`, so a fence open
- * at the cut is closed and no inline markup is left half open.
+ * at the cut is closed, no inline markup is left half open, and no character
+ * is cut in half.
  *
  * The text is cut from its start alone when its last line is no use to keep:
  * none, blank, a bare fence (kept alone it would open one), or too long to sit
  * beside any head.
  *
  * @param text - The whole text
- * @param limit - The most characters it may have
+ * @param limit - The most UTF-8 bytes it may have
  */
 export function keepLastLine(text: string, limit: number): string {
-  if (text.length <= limit) return text;
+  if (utf8Bytes(text) <= limit) return text;
   const trimmed = text.trimEnd();
-  if (trimmed.length <= limit) return trimmed;
+  if (utf8Bytes(trimmed) <= limit) return trimmed;
   const at = trimmed.lastIndexOf("\n");
   const last = at === -1 ? "" : trimmed.slice(at + 1);
-  const room = limit - last.length - ELIDED_LINE.length - 2;
+  const room = limit - utf8Bytes(last) - ELIDED_BYTES - 2;
   if (!last.trim() || FENCE.test(last) || room < MIN_HEAD) {
-    return `${splitBalanced(trimmed, limit - ELIDED_LINE.length - 1)[0]!}\n${ELIDED_LINE}`;
+    return `${headWithin(trimmed, limit - ELIDED_BYTES - 1)}\n${ELIDED_LINE}`;
   }
-  return `${splitBalanced(trimmed.slice(0, at), room)[0]!}\n${ELIDED_LINE}\n${last}`;
+  return `${headWithin(trimmed.slice(0, at), room)}\n${ELIDED_LINE}\n${last}`;
+}
+
+/**
+ * `splitBalanced`'s first chunk of `text`, in at most `bytes` UTF-8 bytes.
+ *
+ * Its character limit is the length of the longest opening of `text` that fits
+ * in `bytes` — `encodeInto` stops before a character that would not fit whole,
+ * so that opening never ends inside one. The chunk is that opening or less: it
+ * cuts at a boundary inside it, and a closing fence it adds takes the place of
+ * at least as many characters, each of them a byte or more.
+ */
+function headWithin(text: string, bytes: number): string {
+  const { read } = encoder.encodeInto(text, new Uint8Array(Math.max(0, bytes)));
+  return splitBalanced(text, read)[0]!;
 }

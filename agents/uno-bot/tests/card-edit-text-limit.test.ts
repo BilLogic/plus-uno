@@ -13,7 +13,7 @@
 // (`helpers/report-expiry-fetch.ts`), so the assertion is what Slack was
 // handed and whether it took it.
 // First: the stub has to be in place before net.ts captures fetch.
-import { expiryEdits, UPDATE_TEXT_LIMIT } from "./helpers/report-expiry-fetch";
+import { expiryEdits, UPDATE_TEXT_LIMIT, utf8Bytes } from "./helpers/report-expiry-fetch";
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
@@ -126,7 +126,7 @@ describe("a long card's edits stay inside chat.update's text limit", () => {
     const edit = expiryEdits[0]!;
     assert.equal(edit.ts, CARD_TS, "on the card itself");
     const sent = String(edit.text);
-    assert.ok(sent.length <= UPDATE_TEXT_LIMIT, `text of ${sent.length} characters`);
+    assert.ok(utf8Bytes(sent) <= UPDATE_TEXT_LIMIT, `text of ${utf8Bytes(sent)} bytes`);
     assert.equal(messageBlocksRefusal(edit.blocks as unknown[]), null);
     const { line, buttons } = drawn(edit);
     assert.match(line, /Rejected/);
@@ -158,9 +158,33 @@ describe("a long card's edits stay inside chat.update's text limit", () => {
 
     assert.equal(expiryEdits.length, 1);
     const sent = String(expiryEdits[0]!.text);
-    assert.ok(sent.length <= UPDATE_TEXT_LIMIT);
+    assert.ok(utf8Bytes(sent) <= UPDATE_TEXT_LIMIT);
     assert.equal(drawn(expiryEdits[0]!).line, EXPIRED_CARD);
     assert.equal(sent.split("\n").at(-1), EXPIRED_CARD, "the copy says it too, as its last line");
+    assert.ok(sent.includes(`\n${ELIDED_LINE}\n`), "the cut says it is one");
+  });
+
+  // Slack counts the limit in UTF-8 bytes, and a card's "·", "—", "›" and
+  // emoji are two to four each: an edit of 3,946 characters / 4,030 bytes was
+  // refused, and landed only on a second, shorter chat.update.
+  it("lands a card under 4,000 characters but over 4,000 bytes in one edit", async () => {
+    const step = (i: number) => `Step ${i} · Supervisor lane — asks around in Slack › confirms by DM 🐐`;
+    const outcome = "Rejected, so nothing runs.";
+    const text = `${Array.from({ length: 56 }, (_, i) => step(i + 1)).join("\n")}\n${outcome}`;
+    assert.ok(
+      text.length < UPDATE_TEXT_LIMIT && utf8Bytes(text) > UPDATE_TEXT_LIMIT,
+      `${text.length} characters / ${utf8Bytes(text)} bytes`,
+    );
+    expiryEdits.length = 0;
+
+    const res = await updateMessage(env, { channel: CHANNEL, ts: CARD_TS, text, blocks: [] });
+
+    assert.ok(res.ok);
+    assert.equal(expiryEdits.length, 1, "one chat.update, not a refusal and a retry");
+    const sent = String(expiryEdits[0]!.text);
+    assert.ok(utf8Bytes(sent) <= UPDATE_TEXT_LIMIT, `text of ${utf8Bytes(sent)} bytes`);
+    assert.ok(sent.startsWith(step(1)));
+    assert.equal(sent.split("\n").at(-1), outcome);
     assert.ok(sent.includes(`\n${ELIDED_LINE}\n`), "the cut says it is one");
   });
 
