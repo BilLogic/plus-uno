@@ -485,15 +485,27 @@ test("a debug-origin thanks and a sandbox thanks are not counted; an ordinary as
   assert.equal(only(ask.usage.records()).thanks, false);
 });
 
-test("a revision Slack refused still records the card it retired as superseded", async () => {
-  // The old card is out of reach either way (`ThreadState.retireProposal`),
-  // so the expiry pass must not later read it as one that aged out untouched.
+test("a revision Slack refused gives back the card it retired, and records it superseded only when it cannot", async () => {
+  // Nothing replaced the old card, so it waits again; were it left out of
+  // reach, the expiry pass must not later read it as one that aged out
+  // untouched (`ThreadState.retireProposal`).
   const h = harness({ replies: [REVISION], delivery: recordingDelivery({ stagingFails: true }) });
   await h.threadState.putProposal(PENDING);
   const outcome = await runTurn(request({ text: "change the title to v2", pending: PENDING }), h.deps);
   assert.equal(outcome.disposition, "failed");
+  assert.equal((await h.threadState.getProposalByTs(PENDING.proposalTs)).state, "found", "the card waits again");
+  assert.deepEqual(h.proposalEvents.events().map((e) => [e.proposalId, e.event]), []);
+
+  const stuck = harness({ replies: [REVISION], delivery: recordingDelivery({ stagingFails: true }) });
+  await stuck.threadState.putProposal(PENDING);
+  const putProposal = stuck.threadState.putProposal.bind(stuck.threadState);
+  stuck.threadState.putProposal = async () => {
+    throw new Error("store unavailable");
+  };
+  await runTurn(request({ text: "change the title to v2", pending: PENDING }), stuck.deps);
+  stuck.threadState.putProposal = putProposal;
   assert.deepEqual(
-    h.proposalEvents.events().map((e) => [e.proposalId, e.event]),
+    stuck.proposalEvents.events().map((e) => [e.proposalId, e.event]),
     [[PENDING.proposalTs, "superseded"]],
   );
 });

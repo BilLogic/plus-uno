@@ -115,7 +115,7 @@ import {
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
-import { cardMatter, correctedCard, stagingNote, undoesStaging } from "./card-matter";
+import { cardMatter, correctedCard, stagingNote } from "./card-matter";
 import { cardHeadline } from "../agent/card-identity";
 import { judgedList, presentedProse, presenter, proseBudgetRepair, type Presenter } from "./presentation";
 import { figmaAnswerCopy } from "./figma-answer-copy";
@@ -570,6 +570,11 @@ export interface TurnDeps {
      *  visibility — so the card names where the issue will actually land and
      *  who can read it. */
     issueTarget(input: Record<string, unknown>): Promise<IssueTarget>;
+    /** The repo an issue's `repo` input names, resolved as the executor
+     *  resolves it — absent is the default repo — with no read: what two
+     *  cards' issue targets are compared on (`agent/card-identity.ts`
+     *  `sameWriteTarget`). An input off the list is returned as given. */
+    issueRepo(repo: unknown): string;
     /** Where a `github_workflow_run` would run: the listed repo its `repo`
      *  resolves to and that repo's default branch — the only ref a run goes
      *  to — or null when the repo is off the list. `branch` is null when the
@@ -949,7 +954,7 @@ function watchFirstAnswer(delivery: Delivery, onFirst: () => void): Delivery {
     postAnswer: (text, presentation) => noted(delivery.postAnswer(text, presentation)),
     postNote: (text, tag) => noted(delivery.postNote(text, tag)),
     postGateNote: (note, card) => noted(delivery.postGateNote(note, card)),
-    card: (proposal) => noted(delivery.card(proposal)),
+    card: (proposal, lead) => noted(delivery.card(proposal, lead)),
   };
 }
 
@@ -1540,22 +1545,35 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       operations: result.operations,
       ...(result.revises ? { named: result.revises } : {}),
       userId: request.userId,
+      repoOf: deps.cards.issueRepo,
     },
     threadState,
   );
+  // A revision named for one card that writes another card's page or issue
+  // is staged as neither (`cardMatter`): both cards keep waiting, and the
+  // person — and the model, from the thread's memory — is told which two.
+  if (matter.kind === "aimed-elsewhere") {
+    const said = await delivery.postGateNote({
+      kind: "aimed-elsewhere",
+      named: cardHeadline(matter.named),
+      other: cardHeadline(matter.other),
+    });
+    await memory.remember(said.text);
+    return { disposition: "asked", posted: said.text, wrote: memory.wrote(), telemetry };
+  }
   const replaced = matter.kind === "revision" ? matter.of : null;
   // Read off the live cards before this one stages: the card the previous
   // turn staged, when this one undoes the call it was staged under (usage
-  // record). A separate card this revision corrects, when the ask says in
-  // words that it was the wrong call, is withdrawn with it (story 9).
+  // record). It is only recorded: a card the correction leaves behind still
+  // waits, for the person to decide.
   const corrected = correctedCard({
     matter,
     live: liveCards,
     operations: result.operations,
     previousAsk: [...(stored ?? [])].reverse().find((t) => t.role === "user")?.ts,
+    repoOf: deps.cards.issueRepo,
   });
   const corrects = corrected?.proposalTs;
-  const withdrawn = matter.kind === "revision" && undoesStaging(request.text) ? corrected : undefined;
 
   // A keyed card that revises only its own way (a weekly DS precedence card,
   // decided as it stands in its Review) is not revised by a turn at all: the batch is
@@ -1619,11 +1637,14 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     await memory.remember(refusal);
     return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
   }
-  // And it keeps the card's deadline, read before the card is retired.
-  const sweepLeftMs = replaced?.sweepRun ? await timeLeftOn(replaced, threadState, staging.now()) : undefined;
-  // An item of a report keeps its window too: its revision lives as long as
-  // the item had left, as the report's own revisions do.
-  const itemLeftMs = replaced?.item ? await timeLeftOn(replaced, threadState, staging.now()) : undefined;
+  // What the card being replaced had left, read once, before it is retired:
+  // a revision that never stages gives the card back for that long. A sweep
+  // card's revision keeps it as its deadline; an item of a report keeps its
+  // window too: its revision lives as long as the item had left, as the
+  // report's own revisions do.
+  const replacedLeftMs = replaced ? await timeLeftOn(replaced, threadState, staging.now()) : undefined;
+  const sweepLeftMs = replaced?.sweepRun ? replacedLeftMs : undefined;
+  const itemLeftMs = replaced?.item ? replacedLeftMs : undefined;
   if (itemLeftMs !== undefined && itemLeftMs <= 0) {
     await delivery.postNote(CARD_CLOSED);
     await memory.remember(CARD_CLOSED);
@@ -1651,15 +1672,27 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   const retiredAhead =
     replaced && (await threadState.retireProposal(replaced.proposalTs)).retired ? [replaced.proposalTs] : [];
   // On the record only when a retire took a live card out of reach — not one
-  // a ✅ claimed meanwhile, which has its own outcome — and at once, so a card
-  // whose revision then fails to post is not later read as aged out.
+  // a ✅ claimed meanwhile, which has its own outcome — and only once its
+  // revision is staged: a revision that never stages gives the card back.
   const recordSuperseded = (retired: readonly string[]) =>
     recordProposalEvents(
       deps.usage.proposalEvents,
       supersededEvents(retired, staging.now(), "revision"),
       deps.usage.writeTimeoutMs,
     );
-  await recordSuperseded(retiredAhead);
+  // The card retired ahead, back as it was for the time it had left, when
+  // the card that was to replace it was declined or never posted: nothing
+  // replaced it, so it still waits. A card that cannot be put back is out of
+  // reach after all, and is recorded so, lest it later read as aged out.
+  const giveBackReplaced = async (): Promise<void> => {
+    if (!replaced || !retiredAhead.length) return;
+    try {
+      await threadState.putProposal({ ...replaced, ttlMs: replacedLeftMs });
+    } catch (err) {
+      console.error(`[turn] ${replaced.proposalTs} not given back: ${err instanceof Error ? err.message : String(err)}`);
+      await recordSuperseded(retiredAhead);
+    }
+  };
 
   const built = await buildCard(result, deps, request.surface === "assistant", { channel: request.channel, requestedBy: request.userId });
   // A revision of a sweep card is still one, so replies under it are read by
@@ -1692,10 +1725,11 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // Say which it was, just above the card, so a wrong call is caught at once
   // and corrected in one message: the card it replaced, or the cards still
   // waiting beside it. Not for a report's item, which redraws in its report.
+  // It rides the card (`Delivery.card`'s `lead`): true only of a card that
+  // stages, so a declined card says neither and a failed one takes it back.
   const announced = inPlace
     ? null
-    : stagingNote(matter, liveCards.filter((card) => card.proposalTs !== replaced?.proposalTs), withdrawn);
-  const said = announced ? await delivery.postGateNote(announced) : null;
+    : stagingNote(matter, liveCards.filter((card) => card.proposalTs !== replaced?.proposalTs));
   // The card says its deadline and is staged with the lifetime that ends
   // there, both from one reading of the clock (`cardWindow`): what is left of
   // a sweep card's window, or the rule's from now. An item revised in place
@@ -1704,16 +1738,18 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   const shown: ProposalCard = inPlace ? card : { ...card, expiresAt: window.expiresAt };
   const posted = inPlace
     ? { ok: true, text: inPlace.text, ts: inPlace.staged.proposalTs }
-    : await delivery.card(shown);
+    : await delivery.card(shown, announced ?? undefined);
   // An answer-only surface declined the card on purpose: the person is told
   // what it would have done instead, so the turn answered, and nothing stages.
-  const remembered = [said?.ok ? said.text : null, posted.text].filter(Boolean).join("\n\n");
+  const remembered = [posted.lead, posted.text].filter(Boolean).join("\n\n");
   if (!inPlace && posted.declined) {
+    await giveBackReplaced();
     await memory.remember(remembered);
     return { disposition: "answered", posted: posted.text, wrote: memory.wrote(), telemetry };
   }
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] proposal card was not staged (${result.toolName})`);
+    await giveBackReplaced();
     return {
       disposition: "failed",
       failure: { stage: "delivery" },
@@ -1785,13 +1821,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // On the record as soon as it is stored, so a ✅ that lands before the turn
   // finishes finds the staged row and the turn id it joins to; a ticket that
   // ✅ files waits on that row until the turn writes its own (`runTurn`).
-  await recordSuperseded(retiredByStaging);
-  // The separate card this revision corrects, withdrawn now the revision is
-  // stored: superseded by it, so its buttons name the card that replaced it.
-  if (withdrawn) {
-    const { retired } = await threadState.retireProposal(withdrawn.proposalTs, proposal.proposalTs);
-    await recordSuperseded(retired ? [withdrawn.proposalTs] : []);
-  }
+  await recordSuperseded([...retiredAhead, ...retiredByStaging]);
   await recordProposalEvents(
     deps.usage.proposalEvents,
     [
@@ -2165,9 +2195,10 @@ async function settleVerdict(
  * The card is built exactly as a staged proposal's is, reads included (the
  * repo an intake lands in and whether it is public, a workflow's branch), so
  * the person approves what will actually run rather than a copy of the old
- * card. It keeps the original's requester, thread, PRD and terms (lifetime and
- * confirmer set — the same `ProposalTerms` a revision inherits), and gets a ts
- * and a fresh run of that lifetime; staging it retires any card still live in
+ * card. It keeps the original's requester, thread, PRD and confirmer set, and
+ * gets a ts and a window of its own: a re-staging is a fresh staging, so it
+ * lives by the one rule from the turn's clock, never the window the stuck
+ * card was staged with days before; staging it retires any card still live in
  * that reply thread, as every staging does (`ThreadState.putProposal`).
  *
  * Exported because two doors outside Turn — the reaction and the button on the
@@ -2179,7 +2210,7 @@ async function settleVerdict(
  */
 export async function restageExecution(
   restage: GateRestage,
-  deps: Pick<TurnDeps, "threadState" | "delivery" | "cards" | "onRestaged"> & {
+  deps: Pick<TurnDeps, "threadState" | "delivery" | "cards" | "onRestaged" | "now"> & {
     /** Where the fresh card's staging is recorded. */
     proposalEvents: ProposalEventLog;
   },
@@ -2202,9 +2233,11 @@ export async function restageExecution(
   // The warning rides the card, not only the note before it: a note that
   // failed to post must not leave a card that reads like any other.
   const before = await batchBefore(restage.operations, built.revision, deps.cards);
-  // A fresh card, on a fresh window: the lifetime the stuck card was staged
-  // with, from now, or else the one rule's — said on the card, and stored.
-  const window = cardWindow(Date.now(), original.ttlMs);
+  // A fresh card, on a fresh window: the one rule's, from now — said on the
+  // card, and stored. Every card carries a ttlMs now, so the stuck card's
+  // would keep a window that may have run from a Friday.
+  const now = deps.now ?? Date.now;
+  const window = cardWindow(now());
   const card: ProposalCard = {
     ...built,
     caveats: [{ kind: "cut-off-rerun" }, ...built.caveats],
@@ -2247,10 +2280,10 @@ export async function restageExecution(
   // `originProposalTs` it takes that card's turn, channel and test-traffic
   // flag, so a ticket its ✅ files still finds the turn that asked for it.
   await recordProposalEvents(deps.proposalEvents, [
-    ...supersededEvents(retired, Date.now(), "restage"),
+    ...supersededEvents(retired, now(), "restage"),
     stagedEvent({
       proposal,
-      at: Date.now(),
+      at: now(),
       via: "restage",
       channelStored: false,
     }),
@@ -2304,15 +2337,30 @@ export async function stageFromButton(
   const origin: CardOrigin = ask.kind === "revision" ? ask.of : ask.thread;
   const replaced = ask.kind === "revision" ? ask.of : null;
   const first = ask.operations[0]!;
+  // One reading of the clock: the card's deadline and its record.
+  const at = deps.now?.() ?? Date.now();
+  // What the card being replaced had left, read before it is retired, so a
+  // revision that never stages gives it back for that long — as a turn's does.
+  const replacedLeftMs = replaced ? await timeLeftOn(replaced, deps.threadState, at) : undefined;
   // Out of reach before the revision is written, as a turn's revision is: the
   // old card must not run while its replacement is being built.
   const retiredAhead = replaced ? await deps.threadState.retireProposal(replaced.proposalTs) : null;
   if (retiredAhead && !retiredAhead.retired) return null;
-  // One reading of the clock: the card's deadline and its record.
-  const at = deps.now?.() ?? Date.now();
-  if (replaced) {
-    await recordProposalEvents(proposalEvents, supersededEvents([replaced.proposalTs], at, "revision"), writeTimeoutMs);
-  }
+  // Superseded on the record only once its revision stages; a card that
+  // cannot be put back is out of reach after all, and recorded so.
+  const recordReplaced = () =>
+    replaced
+      ? recordProposalEvents(proposalEvents, supersededEvents([replaced.proposalTs], at, "revision"), writeTimeoutMs)
+      : Promise.resolve();
+  const giveBackReplaced = async (): Promise<void> => {
+    if (!replaced) return;
+    try {
+      await deps.threadState.putProposal({ ...replaced, ttlMs: replacedLeftMs });
+    } catch (err) {
+      console.error(`[turn] ${replaced.proposalTs} not given back: ${err instanceof Error ? err.message : String(err)}`);
+      await recordReplaced();
+    }
+  };
   const built = await buildCard(
     { kind: "proposal", operations: ask.operations, toolName: first.toolName, input: first.input },
     deps,
@@ -2320,12 +2368,18 @@ export async function stageFromButton(
     { channel: origin.channel, requestedBy: origin.requesterUserId },
   );
   const before = await batchBefore(ask.operations, built.revision, deps.cards);
-  if (replaced) await deps.delivery.postGateNote({ kind: "revised", replaced: cardHeadline(replaced) });
   const window = cardWindow(at);
-  const posted = await deps.delivery.card({ ...built, expiresAt: window.expiresAt });
-  if (posted.declined) return null;
+  const posted = await deps.delivery.card(
+    { ...built, expiresAt: window.expiresAt },
+    replaced ? { kind: "revised", replaced: cardHeadline(replaced) } : undefined,
+  );
+  if (posted.declined) {
+    await giveBackReplaced();
+    return null;
+  }
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] card from a button was not posted (${first.toolName})`);
+    await giveBackReplaced();
     await deps.delivery.postFailure("delivery");
     return null;
   }
@@ -2346,6 +2400,7 @@ export async function stageFromButton(
     ...(replaced?.notionPrdUrl ? { notionPrdUrl: replaced.notionPrdUrl } : {}),
   };
   const { retired } = await deps.threadState.putProposal(proposal);
+  await recordReplaced();
   await recordProposalEvents(
     proposalEvents,
     [

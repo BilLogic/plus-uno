@@ -130,9 +130,14 @@ export async function runWhichCardDoor(press: WhichPress, deps: WhichCardDoorDep
   );
 
   // Whatever the press came to — won, lost to another door, aged out — a card
-  // that is no longer waiting keeps no button here.
-  const after = await deps.threadState.getProposalByTs(press.cardTs).catch(() => ({ state: "none" }) as const);
-  if (after.state === "found") return;
+  // that is no longer waiting keeps no button here. A read that fails says
+  // nothing either way, so the button stays: a second press on a decided card
+  // is told so, while a dropped button on a waiting one cannot be had back.
+  const after = await deps.threadState.getProposalByTs(press.cardTs).catch((err: unknown) => {
+    console.warn(`[interactive] which-card: ${press.channel}/${press.cardTs} not read after the press: ${err instanceof Error ? err.message : String(err)}`);
+    return null;
+  });
+  if (!after || after.state === "found") return;
   await deps.replaceQuestion(withButtons(press.question, (ts) => ts !== press.cardTs, "Decided."));
 }
 

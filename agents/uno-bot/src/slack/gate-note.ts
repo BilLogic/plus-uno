@@ -114,15 +114,22 @@ export const REVIEW_ONLY_POST = "Each card here is decided from its own Review b
  * correct it in words. The headlines are the model's input, so escaped.
  */
 export function stagingLine(note: Extract<GateNote, { kind: "revised" | "staged-beside" }>): string {
-  if (note.kind === "revised") {
-    const revised = `Revised *${escapeSlackText(note.replaced)}*: the card below replaces the one above`;
-    return note.withdrawn
-      ? `${revised}, and *${escapeSlackText(note.withdrawn)}*, posted as a separate card by mistake, is withdrawn.`
-      : `${revised}.`;
-  }
+  if (note.kind === "revised") return `Revised *${escapeSlackText(note.replaced)}*: the card below replaces the one above.`;
   const names = note.waiting.map((w) => `*${escapeSlackText(w)}*`);
   const listed = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)} above are` : `${names[0]} above is`;
   return `Added a new card below. ${listed} still waiting.`;
+}
+
+/**
+ * A revision named one card but writes what another card writes: say so,
+ * name both, and that nothing changed, so the person can say which card the
+ * change belongs on. The headlines are the model's input, so escaped.
+ */
+export function aimedElsewhereLine(note: Extract<GateNote, { kind: "aimed-elsewhere" }>): string {
+  return (
+    `That change was for *${escapeSlackText(note.named)}*, but it writes the same page or issue as *${escapeSlackText(note.other)}*, ` +
+    "so I didn't stage it and both cards are still waiting. Say which card it belongs on."
+  );
 }
 
 /**
@@ -148,6 +155,8 @@ export function renderGateNote(note: GateNote): string {
     case "revised":
     case "staged-beside":
       return stagingLine(note);
+    case "aimed-elsewhere":
+      return aimedElsewhereLine(note);
     case "resolved":
       // A stated card's ⛔ says what its footer promised, in the card's words.
       if (note.decision === "cancel" && note.cancelled) return `${note.cancelled}.`;

@@ -1715,6 +1715,23 @@ test("re-staging a cut-off sweep card tells onRestaged which card replaced which
   assert.deepEqual(moved, [[SWEEP_CARD.proposalTs, staged.proposal.proposalTs, "2026-09-30"]]);
 });
 
+// A re-staged card is a fresh staging: the rule's window from the turn's own
+// clock, never the window the stuck card was staged with days before.
+test("a card re-staged on Tuesday 10:00 ET expires Wednesday 10:00, whatever window the stuck card had", async () => {
+  const friday = Date.parse("2026-10-16T19:00:00Z"); // Fri 15:00 ET
+  const tuesday = Date.parse("2026-10-20T14:00:00Z"); // Tue 10:00 ET
+  const stuck: PendingProposal = { ...SWEEP_CARD, ttlMs: cardTtlMs(friday) };
+  const h = harness({ now: () => tuesday });
+  await h.threadState.putProposal(stuck);
+  const restaged = await restageExecution(
+    { proposal: stuck, operations: [{ toolName: "notion_update", input: FIX_TWO }] },
+    { ...h.deps, proposalEvents: h.deps.usage.proposalEvents },
+  );
+  assert.ok(restaged);
+  assert.equal(restaged.card.expiresAt, Date.parse("2026-10-21T14:00:00Z"), "Wed 10:00 ET");
+  assert.equal(restaged.proposal.ttlMs, 24 * 3_600_000);
+});
+
 // A group DM's share is offered only after the card people were shown: a
 // revision or a re-staged card carries no pages to share, so its ✅ applies
 // the fix and never leads to a share card.

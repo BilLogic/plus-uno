@@ -331,8 +331,10 @@ function replyTarget(proposal: PendingProposal): string {
  * Whether another card still waits in the reply thread of the one a door just
  * decided. A ✅ or ⛔ decides ONE card, never the thread's others (#1318), so
  * a door that leaves one waiting settles the thread as waiting on the person,
- * as Turn does when it resolves one of several (`settlementOf`). A failed read
- * answers no: the settlement the doors had before.
+ * as Turn does when it resolves one of several (`settlementOf`). The store
+ * keys cards on their reply thread (`proposalReplyThread`), never on
+ * `threadTs` — the literal "dm" in a DM. A failed read answers no: the
+ * settlement the doors had before.
  *
  * @param decided - The card the door decided
  * @param threadState - The thread's live cards
@@ -343,7 +345,7 @@ export async function otherCardWaits(
 ): Promise<boolean> {
   const thread = replyTarget(decided);
   const live = await threadState
-    .getProposalsByThread({ channel: decided.channel, thread: decided.threadTs })
+    .getProposalsByThread({ channel: decided.channel, thread })
     .catch(() => [] as PendingProposal[]);
   return live.some((card) => card.proposalTs !== decided.proposalTs && replyTarget(card) === thread);
 }

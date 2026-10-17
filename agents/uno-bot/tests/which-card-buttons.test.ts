@@ -106,6 +106,25 @@ test("pressing one card's button approves that card only; the other stays live",
   assert.match(JSON.stringify(questionEdits.at(-1)!.blocks), /Expires <!date/);
 });
 
+test("a press whose card cannot be read afterwards keeps that card's button: a failed read is no answer", async () => {
+  const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B)] });
+  const { a, note } = await asked(h);
+  // The store answers the door, then fails the read that follows the press.
+  const store = h.threadState;
+  let claimed = false;
+  const claim = store.claimProposal.bind(store);
+  const read = store.getProposalByTs.bind(store);
+  store.claimProposal = async (...args) => {
+    claimed = true;
+    return claim(...args);
+  };
+  store.getProposalByTs = async (ts) => (claimed ? Promise.reject(new Error("store unavailable")) : read(ts));
+
+  const { questionEdits } = await press(h, whichCardMessage(note, ASKED_AT_MS), a, ASKED_AT_MS + 60_000);
+
+  assert.deepEqual(questionEdits, [], "the question is left with every button");
+});
+
 test("the question's buttons lapse 24 weekday hours after it was asked", async () => {
   const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B)] });
   const { a, b, note } = await asked(h);

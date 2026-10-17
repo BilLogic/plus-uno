@@ -743,6 +743,12 @@ export const REPORT_EXPIRY_RETRY_MS = 2 * 60 * 1000;
  *  only a message Slack keeps refusing gets anywhere near it. */
 export const CARD_EXPIRY_EDIT_GRACE_MS = 24 * 60 * 60 * 1000;
 
+/** How long a card handed over for its expiry edit is left to its job before
+ *  the alarm hands it over again (`takeCardExpiries`): long enough that a job
+ *  still queued is not doubled on every `REPORT_EXPIRY_RETRY_MS` pass, short
+ *  enough that a job lost on the way is retried well inside the grace. */
+export const CARD_EXPIRY_HANDOFF_RETRY_MS = 10 * 60 * 1000;
+
 /** What a proposal record says about its card, as the expiry edit reads it. */
 export interface CardExpiryMarks {
   createdAt: number;
@@ -751,6 +757,8 @@ export interface CardExpiryMarks {
   retired?: boolean;
   /** Set once the card's message says it expired (`acknowledgeCardExpiry`). */
   expiryShown?: true;
+  /** When the alarm last handed the card over for its edit (`takeCardExpiries`). */
+  expiryHandedOffAt?: number;
 }
 
 /**
@@ -775,6 +783,43 @@ export function cardExpiryDueAt(rec: CardExpiryMarks, proposal: PendingProposal 
 export function cardExpiryOwed(rec: CardExpiryMarks, proposal: PendingProposal | null, at: number): boolean {
   const due = cardExpiryDueAt(rec, proposal);
   return due !== null && at >= due && at - due <= CARD_EXPIRY_EDIT_GRACE_MS;
+}
+
+/**
+ * When an owed card is next to be handed over for its edit: at its deadline,
+ * or — handed over already — once that hand-off has lapsed
+ * (`CARD_EXPIRY_HANDOFF_RETRY_MS`). Null when no edit is owed.
+ *
+ * @param rec - The record's marks
+ * @param proposal - The card it holds
+ */
+export function cardExpiryHandOffAt(rec: CardExpiryMarks, proposal: PendingProposal | null): number | null {
+  const due = cardExpiryDueAt(rec, proposal);
+  if (due === null) return null;
+  return rec.expiryHandedOffAt === undefined ? due : Math.max(due, rec.expiryHandedOffAt + CARD_EXPIRY_HANDOFF_RETRY_MS);
+}
+
+/**
+ * Of a store's proposal records, the ones to hand over for their expiry edit
+ * at `at` — owed, and not handed over within `CARD_EXPIRY_HANDOFF_RETRY_MS` —
+ * oldest deadline first, at most `limit`. Both adapters' `takeCardExpiries`.
+ *
+ * @param records - Each record with its card
+ * @param at - The store's now
+ * @param limit - How many one pass hands over
+ */
+export function cardExpiriesToTake<R extends CardExpiryMarks>(
+  records: Iterable<{ rec: R; proposal: PendingProposal | null }>,
+  at: number,
+  limit: number,
+): Array<{ rec: R; proposal: PendingProposal }> {
+  const due: Array<{ rec: R; proposal: PendingProposal; deadline: number }> = [];
+  for (const { rec, proposal } of records) {
+    const handOffAt = cardExpiryHandOffAt(rec, proposal);
+    if (!proposal || handOffAt === null || at < handOffAt || !cardExpiryOwed(rec, proposal, at)) continue;
+    due.push({ rec, proposal, deadline: cardExpiryDueAt(rec, proposal)! });
+  }
+  return due.sort((a, b) => a.deadline - b.deadline).slice(0, limit);
 }
 
 /** The card an expiry edit redraws: where it is, and what it was posted as. */
@@ -935,6 +980,19 @@ export function newestCardFirst(
   b: { createdAt: number; proposalTs: string },
 ): number {
   return b.createdAt - a.createdAt || compareSlackTs(b.proposalTs, a.proposalTs);
+}
+
+/**
+ * A proposal record as `newestCardFirst` reads it: when the store staged it,
+ * and its card's ts. Either store's record shape — the in-memory one holds the
+ * card as `proposal`, the Durable Object's as an opaque `payload` — and a
+ * record with no card sorts on its time alone.
+ *
+ * @param rec - A proposal record
+ */
+export function cardOrder(rec: { createdAt: number; proposal?: unknown; payload?: unknown }): { createdAt: number; proposalTs: string } {
+  const card = (rec.proposal ?? rec.payload) as Pick<PendingProposal, "proposalTs"> | null | undefined;
+  return { createdAt: rec.createdAt, proposalTs: card?.proposalTs ?? "" };
 }
 
 /** Slack ts order, digit runs compared as numbers: "1700000000.000300" after
@@ -1570,13 +1628,9 @@ export interface ThreadState {
    * `retired` is true only when THIS call took a live card out of reach: a
    * card already claimed (so gone), already retired or replaced, or aged out
    * answers false — nothing was replaced by this revision.
-   *
-   * `by` names the card that replaces it when that card is already staged in
-   * another slot — a separate card withdrawn by the revision that corrects it
-   * (story 9) — so the card answers as replaced by it, as `putProposal`
-   * stamps a card in its own slot.
+
    */
-  retireProposal(proposalTs: string, by?: string): Promise<{ retired: boolean }>;
+  retireProposal(proposalTs: string): Promise<{ retired: boolean }>;
 
   /**
    * Mark a live card as being revised: Needs changes, accepted.
@@ -1726,6 +1780,14 @@ export interface ThreadState {
   /** The card's message says it expired: owed no more, and collected as any
    *  aged-out card is from here. */
   acknowledgeCardExpiry(proposalTs: string): Promise<void>;
+  /**
+   * The cards to hand over for their "Expired" edit now, oldest deadline
+   * first, at most `limit` — each marked handed over, so the alarm's next
+   * pass, two minutes on, does not queue its job again. The mark lapses after
+   * `CARD_EXPIRY_HANDOFF_RETRY_MS`, and a card still owed then is taken again:
+   * a job lost on the way is retried. The alarm's (`cardExpiriesToTake`).
+   */
+  takeCardExpiries(limit: number): Promise<PendingProposal[]>;
 
   // ----- executions: a won ✅, from the claim until its outcome is told -----
 

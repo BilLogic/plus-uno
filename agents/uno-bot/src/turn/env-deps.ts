@@ -320,6 +320,13 @@ export function cardReadsFor(env: Env, shareoutReads: ShareoutReads = shareoutRe
       if (!target.ok) return { repo: env.GITHUB_REPO, visibility: "unknown" };
       return { repo: target.entry.repo, visibility: await githubRepoVisibility(env, target.entry) };
     },
+    // The same resolver, with no read: absent is `GITHUB_REPO`, a short name
+    // its listed repo; a repo off the list compares as given.
+    issueRepo(repo) {
+      const target = resolveRepoFor(env, repo);
+      if (target.ok) return target.entry.repo;
+      return typeof repo === "string" && repo.trim() ? repo.trim() : env.GITHUB_REPO;
+    },
     // A run's repo and branch as the executor will send them: the same
     // resolver, and the same cached default-branch read.
     async workflowTarget(input) {

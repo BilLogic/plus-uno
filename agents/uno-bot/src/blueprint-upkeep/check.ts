@@ -385,7 +385,14 @@ async function check(offer: BlueprintCheckOffer, run: string, signal: AbortSigna
   if (!(await deps.store.stepCheck(checkRefOf(offer), offer.scenario, run, "done"))) return "stopped";
   await deps.settle(offer, { kind: "done" });
   await postResults(offer, drafted ? comparisonText(today, offer.quote, drafted.changes) : comparison.text, deps);
-  if (drafted) await offerDraw(offer, drafted, deps);
+  // The check is done and its results stand: a card that fails to go up
+  // under them is logged, never the check's failure — that would step a done
+  // run to failed and offer a Try again that posts the results twice.
+  if (drafted) {
+    await offerDraw(offer, drafted, deps).catch((err: unknown) => {
+      console.error(`[blueprint-check] ${offer.scenario}: the Draw on blueprint card was not staged: ${err instanceof Error ? err.message : String(err)}`);
+    });
+  }
   return { kind: "done" };
 }
 
@@ -414,8 +421,8 @@ async function postResults(offer: BlueprintCheckOffer, text: string, deps: Bluep
 /**
  * The Draw on blueprint ✅ card under the results (`./proposal.ts`): posted
  * in the offer's thread and staged for the requester alone, in its own slot,
- * so it never replaces the PRD's card. Best-effort past the post: the
- * results already stand without it.
+ * so it never replaces the PRD's card. Best-effort: the results already
+ * stand without it, so its caller logs a throw rather than fail the check.
  */
 async function offerDraw(offer: BlueprintCheckOffer, draft: ProposalDraft, deps: BlueprintCheckDeps): Promise<void> {
   const posted = await deps.postCard(offer, proposalOfferCard(draft));

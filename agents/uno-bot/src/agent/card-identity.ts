@@ -57,10 +57,18 @@ export function cardTargets(card: Pick<PendingProposal, "operations" | "toolName
     const page = notionPageOf(op);
     if (page) out.push(String(op.input.page_url));
     const issue = issueTarget(op);
-    if (issue) out.push(`${issue.repo ?? "(default repo)"}#${issue.number}`);
+    if (issue) out.push(`${issue.repo?.toLowerCase() ?? "(default repo)"}#${issue.number}`);
   }
   return [...new Set(out)];
 }
+
+/**
+ * The repo a GitHub issue change's `repo` input names, as the executor
+ * resolves it (`integrations/github.ts` `resolveRepoFor`): absent names the
+ * default repo, `GITHUB_REPO`; a short name names the listed repo it is.
+ * Handed in, so this module stays pure.
+ */
+export type IssueRepoOf = (repo: unknown) => string;
 
 /**
  * Whether two operations are aimed at the same Notion page or the same GitHub
@@ -68,25 +76,31 @@ export function cardTargets(card: Pick<PendingProposal, "operations" | "toolName
  * says (`turn/card-matter.ts`). Two cards that would both write one page or
  * one issue can never both be live: approving both would have the second
  * overwrite the first. An issue named without a repo goes to the default
- * repo, so it matches the same number named with one.
+ * repo, so it matches the same number in that repo and no other: each side's
+ * repo is read through `repoOf` before the two are compared.
+ *
+ * @param repoOf - The repo an issue's `repo` input resolves to
  */
-export function sameWriteTarget(a: ProposalOperation, b: ProposalOperation): boolean {
+export function sameWriteTarget(a: ProposalOperation, b: ProposalOperation, repoOf: IssueRepoOf): boolean {
   const pageA = notionPageOf(a);
   if (pageA) return pageA === notionPageOf(b);
   const issueA = issueTarget(a);
   const issueB = issueTarget(b);
   if (!issueA || !issueB || issueA.number !== issueB.number) return false;
-  return !issueA.repo || !issueB.repo || issueA.repo === issueB.repo;
+  return repoOf(issueA.repo).toLowerCase() === repoOf(issueB.repo).toLowerCase();
 }
 
 const NOTION_ID = /[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}/i;
 
-/** The Notion page an update or archive writes, as its bare 32-hex id. */
+/** The Notion page an update or archive writes, as its bare 32-hex id — or,
+ *  for a link that carries none, the link itself, so two writes to one link
+ *  are still one page. */
 function notionPageOf(op: ProposalOperation): string | null {
   if (op.toolName !== "notion_update" && op.toolName !== "notion_archive") return null;
-  const url = op.input.page_url;
-  const m = typeof url === "string" ? url.match(NOTION_ID) : null;
-  return m ? m[0].replace(/-/g, "").toLowerCase() : null;
+  const url = typeof op.input.page_url === "string" ? op.input.page_url.trim() : "";
+  if (!url) return null;
+  const m = url.match(NOTION_ID);
+  return m ? m[0].replace(/-/g, "").toLowerCase() : url;
 }
 
 /** The issue a GitHub issue change is aimed at. */
@@ -94,6 +108,6 @@ function issueTarget(op: ProposalOperation): { repo?: string; number: string } |
   if (op.toolName !== "github_issue_update") return null;
   const n = op.input.issue_number;
   if (n === undefined || n === null || String(n).trim() === "") return null;
-  const repo = typeof op.input.repo === "string" && op.input.repo.trim() ? op.input.repo.trim().toLowerCase() : undefined;
+  const repo = typeof op.input.repo === "string" && op.input.repo.trim() ? op.input.repo.trim() : undefined;
   return { ...(repo ? { repo } : {}), number: String(n).trim().replace(/^#/, "").trim() };
 }

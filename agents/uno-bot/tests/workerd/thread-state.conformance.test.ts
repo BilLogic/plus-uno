@@ -29,6 +29,7 @@ import {
   DECIDED_TTL_MS,
   EXECUTION_CUTOFF_MS,
   REPORT_EXPIRY_RETRY_MS,
+  CARD_EXPIRY_HANDOFF_RETRY_MS,
   type DecisionReportRecord,
   type Execution,
   type PendingProposal,
@@ -75,10 +76,11 @@ describe("[durable-object] report expiry alarm", () => {
 });
 
 describe("[durable-object] card expiry alarm", () => {
-  it("arms at the card's deadline, hands it over for its edit, and retries until acknowledged", async () => {
+  it("arms at the card's deadline, hands it over for its edit once, and again only when that hand-off lapses, until acknowledged", async () => {
     const instance = `card-alarm-${instanceCounter++}`;
     const start = Date.now() + 60_000;
     const expiredAt = start + 1001;
+    let firedAt = expiredAt;
     const store = createDurableObjectThreadState({ namespace, instance, now: () => start });
     const stub = namespace.get(namespace.idFromName(instance));
     const card: PendingProposal = {
@@ -90,7 +92,7 @@ describe("[durable-object] card expiry alarm", () => {
     const handed: PendingProposal[][] = [];
     const fire = () => runInDurableObject(stub, async (_o, state) => {
       await state.storage.deleteAlarm();
-      const clock = vi.spyOn(Date, "now").mockReturnValue(expiredAt);
+      const clock = vi.spyOn(Date, "now").mockReturnValue(firedAt);
       try {
         await new ThreadStateObject(state, env as Env, { handOffExpiredCards: async (due) => void handed.push(due) }).alarm();
       } finally {
@@ -99,12 +101,18 @@ describe("[durable-object] card expiry alarm", () => {
     });
     await fire();
     expect(handed[0]?.map((p) => p.proposalTs)).toEqual(["1700.2"]);
-    expect(await runInDurableObject(stub, (_o, state) => state.storage.getAlarm())).toBe(expiredAt + REPORT_EXPIRY_RETRY_MS);
+    // Back when the hand-off lapses, not on every two-minute pass.
+    expect(await runInDurableObject(stub, (_o, state) => state.storage.getAlarm())).toBe(expiredAt + CARD_EXPIRY_HANDOFF_RETRY_MS);
+    firedAt = expiredAt + REPORT_EXPIRY_RETRY_MS;
     await fire();
-    expect(handed).toHaveLength(2);
-    const liveStore = createDurableObjectThreadState({ namespace, instance, now: () => expiredAt });
+    expect(handed, "its job is still out: not queued again").toHaveLength(1);
+    firedAt = expiredAt + CARD_EXPIRY_HANDOFF_RETRY_MS;
+    await fire();
+    expect(handed, "a lapsed hand-off is retried").toHaveLength(2);
+    const liveStore = createDurableObjectThreadState({ namespace, instance, now: () => firedAt });
     expect((await liveStore.prepareCardExpiry("1700.2"))?.text).toBe("Create the card?");
     await liveStore.acknowledgeCardExpiry("1700.2");
+    firedAt += CARD_EXPIRY_HANDOFF_RETRY_MS;
     await fire();
     expect(handed).toHaveLength(2);
   });

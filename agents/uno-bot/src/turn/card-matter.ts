@@ -17,7 +17,11 @@
 //     a revision of it, even when the model called it separate. Two such
 //     cards both live could both be approved, and the second would
 //     overwrite the first. The override runs one way only: the Worker never
-//     turns a revision the model named into a separate proposal.
+//     turns a revision the model named into a separate proposal — and never
+//     moves it to another card either. A batch that names one live card and
+//     writes another's target is refused (`aimed-elsewhere`), both cards left
+//     waiting: revising the named card would leave two cards on one target,
+//     and revising the other would retire a card the model did not name.
 //   • A card the Worker staged under a key of its own (a sweep card, an item
 //     of a decision report, a follow-through draft) is revised by a batch
 //     that touches it, as before: the model never staged it and may not know
@@ -27,7 +31,7 @@
 // record's revision-or-separate telemetry hooks in (#1320): its `why` says
 // who decided.
 
-import { cardHeadline, sameWriteTarget } from "../agent/card-identity";
+import { cardHeadline, sameWriteTarget, type IssueRepoOf } from "../agent/card-identity";
 import { replacedBlocks } from "../sweep/cards";
 import {
   isTurnCard,
@@ -41,6 +45,9 @@ import {
 /** What a turn's new card is, against the cards waiting in its thread. */
 export type CardMatter =
   | { kind: "separate" }
+  /** The model named `named` as the card it revises, but the batch writes
+   *  the page or issue `other` writes. Staged as neither: refused. */
+  | { kind: "aimed-elsewhere"; named: PendingProposal; other: PendingProposal }
   | {
       kind: "revision";
       /** The waiting card it supersedes. */
@@ -64,6 +71,8 @@ export type CardMatter =
  * @param facts.operations - The batch the model staged.
  * @param facts.named - The card the model said it revises (`revises_card`).
  * @param facts.userId - Whose turn this is.
+ * @param facts.repoOf - The repo an issue change's `repo` input resolves to,
+ *   so an issue named without one is read as the default repo's.
  * @param threadState - The two reads a decision report's fixes need.
  */
 export async function cardMatter(
@@ -73,20 +82,24 @@ export async function cardMatter(
     operations: readonly ProposalOperation[];
     named?: string;
     userId: string;
+    repoOf: IssueRepoOf;
   },
   threadState: Pick<ThreadState, "getReport" | "getProposalByTs">,
 ): Promise<CardMatter> {
-  const { live, pending, operations } = facts;
+  const { live, pending, operations, repoOf } = facts;
   if (pending && isTurnCard(pending) && pending.revising?.userId === facts.userId) {
     return { kind: "revision", of: pending, why: "sent-back" };
   }
   const sameTarget = live.find((card) =>
-    operations.some((op) => proposalOperations(card).some((own) => sameWriteTarget(op, own))),
+    operations.some((op) => proposalOperations(card).some((own) => sameWriteTarget(op, own, repoOf))),
   );
-  if (sameTarget) return { kind: "revision", of: sameTarget, why: "same-target" };
   const named = facts.named ? live.find((card) => card.proposalTs === facts.named) : undefined;
+  if (sameTarget && named && sameTarget.proposalTs !== named.proposalTs) {
+    return { kind: "aimed-elsewhere", named, other: sameTarget };
+  }
+  if (sameTarget) return { kind: "revision", of: sameTarget, why: "same-target" };
   if (named) return { kind: "revision", of: named, why: "named" };
-  const touched = await workerCardTouched(live, operations, threadState);
+  const touched = await workerCardTouched(live, operations, repoOf, threadState);
   return touched ? { kind: "revision", of: touched, why: "touched" } : { kind: "separate" };
 }
 
@@ -98,8 +111,9 @@ export async function cardMatter(
  *
  *   • it was staged as a separate proposal, and the new card revises a
  *     different card it was staged beside ("that was meant to update the
- *     first one") — and when the ask says so in words (`undoesStaging`), the turn
- *     withdraws it, as the revision's (story 9);
+ *     first one"). The card stays waiting, decided on its own: the turn never
+ *     withdraws a card for the person (Bill, 2026-10-17), and the line above
+ *     the revision says which card it replaced, so they can cancel the other;
  *   • it was staged as a revision, and the new card is a separate proposal
  *     aimed at the same Notion page or GitHub issue (`sameWriteTarget`).
  *     While the same-target rule makes such a card a revision of it
@@ -123,65 +137,37 @@ export async function cardMatter(
  * @param facts.operations - The new card's batch
  * @param facts.previousAsk - The ts of the thread's previous ask, as its
  *   memory holds it; absent, nothing is corrected
+ * @param facts.repoOf - The repo an issue change's `repo` input resolves to
  */
 export function correctedCard(facts: {
   matter: CardMatter;
   live: readonly PendingProposal[];
   operations: readonly ProposalOperation[];
   previousAsk: string | undefined;
+  repoOf: IssueRepoOf;
 }): PendingProposal | undefined {
   const { matter, previousAsk } = facts;
-  if (!previousAsk) return undefined;
+  if (!previousAsk || matter.kind === "aimed-elsewhere") return undefined;
   const previous = facts.live.find((card) => card.userMsgTs === previousAsk && card.stagedAs);
   if (!previous) return undefined;
   if (matter.kind === "separate") {
-    const overlaps = facts.operations.some((op) => proposalOperations(previous).some((own) => sameWriteTarget(op, own)));
+    const overlaps = facts.operations.some((op) => proposalOperations(previous).some((own) => sameWriteTarget(op, own, facts.repoOf)));
     return previous.stagedAs === "revision" && overlaps ? previous : undefined;
   }
   if (matter.why === "sent-back" || matter.why === "touched") return undefined;
   return previous.stagedAs === "separate" && matter.of.proposalTs !== previous.proposalTs ? previous : undefined;
 }
 
-/** How a person says the card just staged went to the wrong place: "that was
- *  meant to update the first one", "it should have gone on the first card",
- *  "not a new card". Narrow on purpose — see `undoesStaging`. */
-const UNDOES_STAGING: RegExp[] = [
-  /\bmeant\s+(to|for)\b/i,
-  /\bsupposed\s+to\b/i,
-  /\b(i|we)\s+meant\b/i,
-  /\bshould\s+(have\s+)?(been|gone|go|update|updated|change|changed|revise|revised)\b/i,
-  /\bnot\s+(a\s+)?(new|separate|another)\s+(card|one|proposal)\b/i,
-  /\binstead\s+of\s+(a\s+)?(new|separate)\b/i,
-  /\bwrong\s+card\b/i,
-];
-
-/**
- * Whether the ask says, in plain words, that the card the previous turn
- * staged was the wrong call (story 9). A revision that corrects a separate
- * card withdraws it only then: the ids alone cannot tell "that was meant to
- * update the first one" from "now change the first one's title", and the
- * second must leave the other card waiting, decided on its own (#1318).
- *
- * @param text - The person's ask
- */
-export function undoesStaging(text: string): boolean {
-  return UNDOES_STAGING.some((re) => re.test(text));
-}
-
 /**
  * What the person is told the staging did, said just above the card: the
- * card a revision replaced — and the separate card it withdraws, when that
- * card was the mistake it corrects — or the cards a separate proposal posts
- * beside. Null when a separate proposal posts alone.
+ * card a revision replaced, or the cards a separate proposal posts beside.
+ * Null when a separate proposal posts alone.
  */
 export function stagingNote(
-  matter: CardMatter,
+  matter: Extract<CardMatter, { kind: "revision" | "separate" }>,
   live: readonly PendingProposal[],
-  withdrawn?: PendingProposal,
-): { kind: "revised"; replaced: string; withdrawn?: string } | { kind: "staged-beside"; waiting: string[] } | null {
-  if (matter.kind === "revision") {
-    return { kind: "revised", replaced: cardHeadline(matter.of), ...(withdrawn ? { withdrawn: cardHeadline(withdrawn) } : {}) };
-  }
+): { kind: "revised"; replaced: string } | { kind: "staged-beside"; waiting: string[] } | null {
+  if (matter.kind === "revision") return { kind: "revised", replaced: cardHeadline(matter.of) };
   return live.length ? { kind: "staged-beside", waiting: live.map(cardHeadline) } : null;
 }
 
@@ -194,6 +180,7 @@ export function stagingNote(
 async function workerCardTouched(
   live: readonly PendingProposal[],
   operations: readonly ProposalOperation[],
+  repoOf: IssueRepoOf,
   threadState: Pick<ThreadState, "getReport" | "getProposalByTs">,
 ): Promise<PendingProposal | null> {
   const reportsRead = new Set<string>();
@@ -207,11 +194,11 @@ async function workerCardTouched(
       for (const entry of record?.entries ?? [card.item]) {
         if ("state" in entry && entry.state.kind !== "open" && entry.state.kind !== "changes-asked") continue;
         const look = await threadState.getProposalByTs(itemProposalKey(messageTs, entry.id)).catch(() => null);
-        if (look?.state === "found" && touchesCard(operations, look.proposal)) return look.proposal;
+        if (look?.state === "found" && touchesCard(operations, look.proposal, repoOf)) return look.proposal;
       }
       continue;
     }
-    if (touchesCard(operations, card)) return card;
+    if (touchesCard(operations, card, repoOf)) return card;
   }
   return null;
 }
@@ -220,28 +207,36 @@ async function workerCardTouched(
  * Whether a batch touches a keyed card: for a sweep card, replaces one of its
  * blocks; for any other, aims one of its tools at the same target.
  */
-function touchesCard(operations: readonly ProposalOperation[], card: PendingProposal): boolean {
+function touchesCard(operations: readonly ProposalOperation[], card: PendingProposal, repoOf: IssueRepoOf): boolean {
   if (card.sweepRun) {
     const theirs = replacedBlocks(proposalOperations(card));
     return [...replacedBlocks(operations)].some((b) => theirs.has(b));
   }
   const theirs = proposalOperations(card);
-  return operations.some((op) => theirs.some((own) => sameTool(op, own)));
+  return operations.some((op) => theirs.some((own) => sameTool(op, own, repoOf)));
 }
 
 /**
  * Whether two operations use the same tool on the same target, as a keyed
- * card is touched: an issue update on the same issue, read as the same-target
- * rule reads it (`sameWriteTarget`: "#12", " 12" and 12 are one issue, in one
- * repo), an issue create under the same title. Any other tool is matched by
- * the tool alone.
+ * card is touched: a Notion update or archive of the same page, or an issue
+ * update on the same issue, read as the same-target rule reads them
+ * (`sameWriteTarget`: one page id, however linked; "#12", " 12" and 12 are
+ * one issue, in one repo); an issue create under the same title. Any other
+ * tool — a Notion create among them, so a keyed draft is revised by the turn
+ * that rewrites it unnamed — is matched by the tool alone.
  */
-function sameTool(a: ProposalOperation, b: ProposalOperation): boolean {
+function sameTool(a: ProposalOperation, b: ProposalOperation, repoOf: IssueRepoOf): boolean {
   if (a.toolName !== b.toolName) return false;
-  if (a.toolName === "github_issue_update") return sameWriteTarget(a, b);
-  if (a.toolName === "github_issue_create") {
-    const title = (op: ProposalOperation) => String(op.input.title ?? "").trim().toLowerCase();
-    return title(a) === title(b);
+  switch (a.toolName) {
+    case "notion_update":
+    case "notion_archive":
+    case "github_issue_update":
+      return sameWriteTarget(a, b, repoOf);
+    case "github_issue_create": {
+      const title = (op: ProposalOperation) => String(op.input.title ?? "").trim().toLowerCase();
+      return title(a) === title(b);
+    }
+    default:
+      return true;
   }
-  return true;
 }

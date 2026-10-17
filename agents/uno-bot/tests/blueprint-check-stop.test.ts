@@ -34,6 +34,8 @@ interface WorldOptions {
   enqueueFails?: boolean;
   /** Today's path, as the read returns it. */
   readPath?: () => Promise<PathToday | null>;
+  /** Posting the Draw on blueprint card throws. */
+  postCardThrows?: boolean;
 }
 
 /** The thread around one offer: both doors, the job, and what each person
@@ -78,6 +80,7 @@ function world(threadState: ThreadState, clock: { t: number }, offerTs: string, 
       createdPage: async () => null,
       postResults: async (_offer, results) => void posts.push(results.text),
       postCard: async (_offer, card) => {
+        if (opts.postCardThrows) throw new Error("chat.postMessage: ratelimited");
         posts.push(`card: ${card.lead ?? ""}`);
         return { ts: `draw-${posts.length}`, text: card.lead ?? "", ttlMs: cardExpiresAt(NOW) - NOW };
       },
@@ -216,6 +219,20 @@ test("a press after the check finished checks the scenario again: only a running
 });
 
 // ── Failures ─────────────────────────────────────────────────────────────────
+
+test("a Draw on blueprint card that throws after the results post leaves the check done: no Try again, no second results", async () => {
+  const { threadState, clock, offerTs } = await offered();
+  const w = world(threadState, clock, offerTs, { postCardThrows: true });
+  await w.press(PRESSER);
+  await w.runJob(0);
+
+  assert.equal(w.posts.length, 1, "the results posted, once");
+  const done = w.status.at(-1)!;
+  assert.match(done.text, /^Checked \*Call-off\* against today's blueprint/, "the message still says the check finished");
+  assert.deepEqual(buttonsOf(done), []);
+  await w.stop(PRESSER);
+  assert.deepEqual(w.told, [{ to: PRESSER, text: "That check already finished — the results are in the thread." }]);
+});
 
 test("a check that runs too long is stopped at its deadline and says so, with Try again", async () => {
   const { threadState, clock, offerTs } = await offered();

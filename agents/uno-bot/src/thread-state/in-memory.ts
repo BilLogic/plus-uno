@@ -29,6 +29,7 @@ import {
   ownText,
   ownOperations,
   cardExpiryOwed,
+  cardExpiriesToTake,
   replacedByOf,
   decidedLive,
   expiredCardEdit,
@@ -54,6 +55,7 @@ import {
   proposalTtlMs,
   stampedTtl,
   newestCardFirst,
+  cardOrder,
   withLiveMark,
   type DecisionReportRecord,
   type Execution,
@@ -92,6 +94,8 @@ interface ProposalRecord {
   decidedAt?: number;
   /** The card's message says it expired (`acknowledgeCardExpiry`). */
   expiryShown?: true;
+  /** When it was last taken for its edit (`takeCardExpiries`). */
+  expiryHandedOffAt?: number;
 }
 
 interface AssistantContextRecord {
@@ -112,9 +116,6 @@ interface EventRecord {
 }
 
 const threadKey = (ref: ThreadRef): string => `${ref.channel}:${ref.thread}`;
-
-/** A record as `newestCardFirst` reads it. */
-const card = (rec: { createdAt: number; proposal: PendingProposal }) => ({ createdAt: rec.createdAt, proposalTs: rec.proposal.proposalTs });
 
 export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadState {
   const now = deps.now ?? Date.now;
@@ -239,12 +240,11 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
 
     // Retire without consuming — the counterpart to the claim, and why the two
     // are different methods is on the interface (#583).
-    async retireProposal(proposalTs, by) {
+    async retireProposal(proposalTs) {
       const rec = proposals.get(proposalTs);
       if (!rec || rec.decided || rec.retired || rec.supersededBy) return { retired: false };
       if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) return { retired: false };
       rec.retired = true;
-      if (by) rec.supersededBy = by;
       delete rec.kept;
       return { retired: true };
     },
@@ -328,7 +328,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         if (rec.supersededBy || rec.retired || rec.decided) continue; // retired or decided, so never the thread's live card
         if (rec.proposal.channel !== ref.channel) continue;
         if (proposalReplyThread(rec.proposal) !== ref.thread) continue; // keyed on the card's thread
-        if (!best || newestCardFirst(card(rec), card(best)) < 0) best = rec;
+        if (!best || newestCardFirst(cardOrder(rec), cardOrder(best)) < 0) best = rec;
       }
       return best ? withLiveMark(best.proposal, now()) : null;
     },
@@ -338,7 +338,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         .filter((rec) => now() - rec.createdAt <= proposalTtlMs(rec.proposal))
         .filter((rec) => !rec.supersededBy && !rec.retired && !rec.decided)
         .filter((rec) => rec.proposal.channel === ref.channel && proposalReplyThread(rec.proposal) === ref.thread)
-        .sort((a, b) => newestCardFirst(card(a), card(b)))
+        .sort((a, b) => newestCardFirst(cardOrder(a), cardOrder(b)))
         .map((rec) => withLiveMark(rec.proposal, now()));
     },
 
@@ -347,7 +347,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         .filter((rec) => now() - rec.createdAt <= proposalTtlMs(rec.proposal))
         .filter((rec) => !rec.supersededBy && !rec.retired && !rec.decided)
         .filter((rec) => rec.proposal.channel === channel)
-        .sort((a, b) => newestCardFirst(card(a), card(b)))
+        .sort((a, b) => newestCardFirst(cardOrder(a), cardOrder(b)))
         .map((rec) => withLiveMark(rec.proposal, now()));
     },
 
@@ -419,6 +419,13 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     async acknowledgeCardExpiry(proposalTs) {
       const rec = proposals.get(proposalTs);
       if (rec) rec.expiryShown = true;
+    },
+
+    async takeCardExpiries(limit) {
+      const at = now();
+      const taken = cardExpiriesToTake([...proposals.values()].map((rec) => ({ rec, proposal: rec.proposal })), at, limit);
+      for (const { rec } of taken) rec.expiryHandedOffAt = at;
+      return taken.map(({ proposal }) => structuredClone(proposal));
     },
 
     // ----- executions -----

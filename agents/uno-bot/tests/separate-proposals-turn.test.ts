@@ -14,7 +14,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { runTurn, type TurnRequest } from "../src/turn/index";
+import { recordingDelivery, runTurn, type TurnRequest } from "../src/turn/index";
 import { resolveSignal } from "../src/gate/index";
 import type { ScriptedReply } from "../src/agent/providers/fake";
 import { harness, request, REF, CHANNEL, CONVERSATION, type Harness } from "./helpers/turn-harness";
@@ -159,6 +159,33 @@ test("a change to a different issue is a separate proposal", async () => {
   assert.equal((await live(h)).length, 2);
 });
 
+test("an issue named without a repo is the default repo's: the same number in another repo is a separate proposal", async () => {
+  const h = harness({
+    replies: [
+      call("github_issue_update", { repo: "example-org/plus-marketing-website", issue_number: 12, comment: "Seen on staging too." }),
+      call("github_issue_update", { issue_number: 12, comment: "Same on the harness." }),
+    ],
+  });
+  await turn(h, { text: "comment on plus-marketing-website#12" });
+  const second = await turn(h, { text: "and on #12 here", userMsgTs: "1700000000.000300" });
+
+  assert.equal(second.staged!.proposal.revisesProposalTs, undefined, "a different repo's #12 is a different matter");
+  assert.equal((await live(h)).length, 2);
+});
+
+test("an issue named without a repo matches the same number named in the default repo", async () => {
+  const h = harness({
+    replies: [
+      call("github_issue_update", { issue_number: 12, comment: "Seen on staging too." }),
+      call("github_issue_update", { repo: "Example-Org/Harness", issue_number: 12, state: "closed" }),
+    ],
+  });
+  const first = await turn(h, { text: "comment on #12" });
+  const second = await turn(h, { text: "close it instead", userMsgTs: "1700000000.000300" });
+
+  assert.equal(second.staged!.proposal.revisesProposalTs, first.staged!.proposal.proposalTs);
+});
+
 test("an issue named \"#42\", \" #42\" or 42 is one issue: a change to it is a revision of the waiting card", async () => {
   for (const named of ["#42", " #42"]) {
     const h = harness({
@@ -195,6 +222,34 @@ test("a card the Worker staged is touched by a change to its issue, read as a tu
     const second = await turn(h, { text: "close #42", userMsgTs: "1700000000.000300" });
 
     assert.equal(second.staged!.proposal.revisesProposalTs, revises ? "worker-1" : undefined, repo);
+  }
+});
+
+test("a card the Worker staged on one Notion page is touched by a change to that page only, never another page or a new one", async () => {
+  const mine = { page_url: "https://www.notion.so/0123456789abcdef0123456789abcdef", properties: { "Design Status": "Done" } };
+  const cases = [
+    [call("notion_update", { page_url: "https://www.notion.so/fedcba9876543210fedcba9876543210", properties: { "Design Status": "WIP" } }), undefined],
+    [call("notion_create", PRD_B), undefined],
+    [call("notion_update", { ...mine, properties: { "Design Status": "WIP" } }), "worker-1"],
+  ] as const;
+  for (const [reply, revises] of cases) {
+    const h = harness({ replies: [reply] });
+    // A follow-through status change on page 0123…, under a key of the Worker's own.
+    await h.threadState.putProposal({
+      operations: [{ toolName: "notion_update", input: mine }],
+      toolName: "notion_update",
+      input: mine,
+      channel: CHANNEL,
+      threadTs: CONVERSATION,
+      userMsgTs: "1700000000.000100",
+      proposalTs: "worker-1",
+      proposalText: "Mark it done",
+      requesterUserId: "",
+      supersedeKey: "follow-through:c1",
+    });
+    const second = await turn(h, { text: "and this one", userMsgTs: "1700000000.000300" });
+
+    assert.equal(second.staged!.proposal.revisesProposalTs, revises, JSON.stringify(reply.toolCalls![0]!.args));
   }
 });
 
@@ -249,6 +304,58 @@ test("with two cards live, a change naming one revises that card only, and so do
   const fourth = await turn(h, { text: "shorter still", userMsgTs: "1700000000.000500" });
   assert.deepEqual((await live(h)).sort(), [b, fourth.staged!.proposal.proposalTs].sort());
 });
+
+test("a change naming one card but aimed at what another card writes is refused, naming both, and both still wait", async () => {
+  const page = "https://www.notion.so/0123456789abcdef0123456789abcdef";
+  const misaimed = call("notion_update", { page_url: page, properties: { "Design Status": "Done" } });
+  const h = harness({
+    replies: [
+      call("notion_create", PRD_A),
+      call("notion_update", { page_url: page, title: "Status of backup tutors", properties: { "Design Status": "WIP" } }),
+      misaimed,
+    ],
+  });
+  const first = await turn(h, { text: "draft a PRD for backup tutor matching" });
+  const second = await turn(h, { text: "and mark that card WIP", userMsgTs: "1700000000.000300" });
+  const [a, b] = [first.staged!.proposal.proposalTs, second.staged!.proposal.proposalTs];
+  naming(misaimed, a);
+
+  const third = await turn(h, { text: "mark the backup tutor one done", userMsgTs: "1700000000.000400" });
+
+  assert.equal(third.disposition, "asked", "nothing staged");
+  assert.deepEqual((await live(h)).sort(), [a, b].sort(), "neither card is retired");
+  assert.deepEqual(h.delivery.gateNotes.at(-1), { kind: "aimed-elsewhere", named: "Backup tutor matching", other: "Status of backup tutors" });
+});
+
+// The line above a card says what its staging did, so it is said only with a
+// card under it: a card the surface declines, or one that fails to post,
+// leaves no "Revised" line behind, and the card it would have replaced waits
+// as it did.
+for (const [why, opts] of [
+  ["the surface declines the card", { cardDeclined: true }],
+  ["the card fails to post", { stagingFails: true }],
+] as const) {
+  test(`a revision whose card is not staged — ${why} — says nothing above it and leaves the old card waiting`, async () => {
+    const edit = call("notion_create", { ...PRD_A, title: "Backup tutors" });
+    const h = harness({ replies: [call("notion_create", PRD_A), edit] });
+    const first = await turn(h, { text: "draft a PRD for backup tutor matching" });
+    const a = first.staged!.proposal.proposalTs;
+    naming(edit, a);
+
+    const delivery = recordingDelivery(opts);
+    const liveCards = await h.threadState.getProposalsByThread(REF);
+    const second = await runTurn(
+      request({ text: "make the title shorter", userMsgTs: "1700000000.000300", pending: liveCards[0] ?? null, liveCards }),
+      { ...h.deps, delivery },
+    );
+
+    assert.equal(second.staged, undefined);
+    assert.deepEqual(delivery.gateNotes, [], "no staging line");
+    assert.ok(!delivery.posted.some((p) => /revised/i.test(p)), "nothing says the card was revised");
+    assert.equal((await h.threadState.getProposalByTs(a)).state, "found", "the old card still waits");
+    assert.deepEqual(await live(h), [a]);
+  });
+}
 
 test("a model naming a card that is not live stages a separate proposal", async () => {
   const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B, "1699999999.000001")] });

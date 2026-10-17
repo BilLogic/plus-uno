@@ -372,16 +372,15 @@ export type GateNote =
   /** A turn staged a REVISION: the card that follows replaces the waiting
    *  card `replaced` names (its headline, `turn/card-matter.ts`). Said just
    *  before the card, so a wrong call is caught at once (#1318). */
-  | {
-      kind: "revised";
-      replaced: string;
-      /** The headline of the separate card the revision withdraws, staged
-       *  the turn before as the mistake this one corrects (story 9). */
-      withdrawn?: string;
-    }
+  | { kind: "revised"; replaced: string }
   /** A turn staged a SEPARATE PROPOSAL while other cards wait: the card that
    *  follows posts beside them, and each `waiting` headline is still live. */
   | { kind: "staged-beside"; waiting: string[] }
+  /** A turn's batch named the waiting card `named` as the one it revises,
+   *  but writes the page or issue the waiting card `other` writes: nothing is
+   *  staged and both still wait, since two live cards never share a target
+   *  and neither may be retired on a guess (`turn/card-matter.ts`). */
+  | { kind: "aimed-elsewhere"; named: string; other: string }
   /** A signal from someone outside the card's confirmer set: resolve
    *  nothing, and name who can. `userId` is who was refused, when the signal
    *  carried one. */
@@ -453,7 +452,14 @@ export interface PostResult {
    *  nothing stages; the turn ends answered, remembering `text` — what the
    *  person is told instead. */
   declined?: true;
+  /** On a card: the staging line that went up just above it, as posted —
+   *  absent when none was handed in, or the card did not stage. */
+  lead?: string;
 }
+
+/** What a turn's staging did, said just above its card (#1318): the card a
+ *  revision replaced, or the cards a separate proposal posts beside. */
+export type StagingNote = Extract<GateNote, { kind: "revised" | "staged-beside" }>;
 
 export interface Delivery {
   /** React on the person's own message. The one acknowledgment a channel
@@ -592,9 +598,16 @@ export interface Delivery {
    * buttons stay the last thing in the thread. That is the adapter's business
    * because it is Slack's size limits doing the deciding.
    *
+   * `lead` is the staging line that goes just above the card (`StagingNote`).
+   * It rides the card rather than going up first on its own, because it is
+   * true only of a card that stages: an adapter that declines the card says
+   * neither, and one whose card fails to post takes the line back. Reported
+   * as `PostResult.lead`.
+   *
    * @param proposal what the person is being asked to approve
+   * @param lead the line that says what the staging did
    */
-  card(proposal: ProposalCard): Promise<PostResult>;
+  card(proposal: ProposalCard, lead?: StagingNote): Promise<PostResult>;
 
   /**
    * Offer the blueprint check under a milestone's card (#1321): this changes
@@ -678,6 +691,8 @@ export interface RecordingDeliveryOptions {
   answerFails?: boolean;
   /** Stage nothing — a card Slack rejected outright. */
   stagingFails?: boolean;
+  /** Decline every card, as an answer-only surface does (`PostResult.declined`). */
+  cardDeclined?: boolean;
   /**
    * Make a note fail, the way Slack refuses a post into a conversation the bot
    * was removed from.
@@ -781,8 +796,20 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       calls.push({ kind: "reopen-card", card });
     },
 
-    async card(proposal) {
+    async card(proposal, lead) {
       const { text, followUp, blocks } = spelling.card(proposal);
+      if (opts.cardDeclined) {
+        calls.push({ kind: "proposal", card: proposal });
+        return { ok: true, declined: true, text };
+      }
+      // The staging line goes up first, and only with a card that lands: one
+      // that fails takes it back, as the Slack adapter deletes it.
+      const leadText = lead ? spelling.gateNote(lead) : undefined;
+      if (lead && leadText && !opts.stagingFails) {
+        calls.push({ kind: "gate-note", note: lead });
+        gateNotes.push(lead);
+        posted.push(leadText);
+      }
       // A plan too long for one Slack message goes out as its own messages
       // BEFORE the card, so the buttons stay last — recorded here in that same
       // order, and recorded whether or not the card itself then lands.
@@ -796,7 +823,7 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       posted.push(text);
       const ts = `card-${++staged}`;
       stagedAt.push(ts);
-      return { ok: true, text, ts, ...(blocks ? { blocks } : {}) };
+      return { ok: true, text, ts, ...(blocks ? { blocks } : {}), ...(leadText ? { lead: leadText } : {}) };
     },
 
     async postCheckOffer(offer) {

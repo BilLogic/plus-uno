@@ -33,6 +33,8 @@ import {
   MAX_HISTORY_TURNS,
   PROPOSAL_TTL_MS,
   REVISING_MARK_MS,
+  REPORT_EXPIRY_RETRY_MS,
+  CARD_EXPIRY_HANDOFF_RETRY_MS,
   REPORT_GRACE_MS,
   FILING_LEASE_MS,
   CHECK_LEASE_MS,
@@ -1531,18 +1533,6 @@ export function runThreadStateConformance(
     assert.deepEqual(lookup.state === "superseded" && lookup.replacedBy, { proposalTs: "1700.3", operations: STAGED, waiting: false });
   });
 
-  // Story 9: a separate card withdrawn by the revision that corrects it lives
-  // in another slot, so the retire names its replacement.
-  it("a retire that names its replacement reads as superseded by it", async () => {
-    const { store } = setup();
-    await store.putProposal(proposal({ proposalTs: "1700.2", supersedeKey: "card:1700.2" }));
-    await store.putProposal(proposal({ proposalTs: "1700.3", supersedeKey: "card:1700.3" }));
-    assert.deepEqual(await store.retireProposal("1700.2", "1700.3"), { retired: true });
-    const lookup = await store.getProposalByTs("1700.2");
-    assert.deepEqual(lookup.state === "superseded" && lookup.replacedBy, { proposalTs: "1700.3", operations: STAGED });
-    assert.deepEqual((await store.getProposalsByThread(THREAD)).map((p) => p.proposalTs), ["1700.3"]);
-  });
-
   it("a retired stated card carries its words, and a card without words answers with its lifetime alone", async () => {
     const { store, clock } = setup();
     const stated = { cancelled: "Nothing filed this week", expired: "That card closed after 6 days with no decision." };
@@ -1687,6 +1677,26 @@ export function runThreadStateConformance(
     await store.acknowledgeCardExpiry("1700.2");
     assert.equal(await store.prepareCardExpiry("1700.2"), null);
     assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
+  });
+
+  // The alarm takes owed cards to hand over for their edit, and a card taken
+  // is not taken again on every two-minute pass while its job is queued — only
+  // once the mark lapses, so a job lost on the way is still retried.
+  it("an owed card is taken for its expiry edit once, again after the hand-off lapses, and never once acknowledged", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: 1000, supersedeKey: "card:1700.2" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3", ttlMs: 2000, supersedeKey: "card:1700.3" }));
+    await store.putProposal(proposal({ proposalTs: "1700.4", ttlMs: PROPOSAL_TTL_MS, supersedeKey: "card:1700.4" }));
+    clock.advance(2001);
+    assert.deepEqual((await store.takeCardExpiries(1)).map((p) => p.proposalTs), ["1700.2"], "oldest deadline first, up to the limit");
+    assert.deepEqual((await store.takeCardExpiries(5)).map((p) => p.proposalTs), ["1700.3"], "a live card is not owed");
+    clock.advance(REPORT_EXPIRY_RETRY_MS);
+    assert.deepEqual(await store.takeCardExpiries(5), [], "handed over, not handed again on the next pass");
+    clock.advance(CARD_EXPIRY_HANDOFF_RETRY_MS);
+    assert.deepEqual((await store.takeCardExpiries(5)).map((p) => p.proposalTs), ["1700.2", "1700.3"], "a lapsed hand-off is retried");
+    await store.acknowledgeCardExpiry("1700.2");
+    clock.advance(CARD_EXPIRY_HANDOFF_RETRY_MS);
+    assert.deepEqual((await store.takeCardExpiries(5)).map((p) => p.proposalTs), ["1700.3"]);
   });
 
   it("no expiry edit is owed on a decided, replaced or report-item card", async () => {

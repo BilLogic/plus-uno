@@ -407,6 +407,10 @@ export function harness(opts: {
       async issueTarget(input) {
         return opts.issueTarget?.(input) ?? { repo: ISSUE_REPO, visibility: "public" };
       },
+      // Absent is the default repo, as the executor's resolver reads it.
+      issueRepo(repo) {
+        return typeof repo === "string" && repo.trim() ? repo.trim() : ISSUE_REPO;
+      },
       async workflowTarget(input) {
         const repo = typeof input.repo === "string" && input.repo ? input.repo : ISSUE_REPO;
         return { repo, branch: opts.workflowBranch === undefined ? WORKFLOW_DEFAULT_REF : opts.workflowBranch };

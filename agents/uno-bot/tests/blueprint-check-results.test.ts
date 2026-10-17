@@ -21,7 +21,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { runTurn, stageFromButton } from "../src/turn/index";
+import { recordingDelivery, runTurn, stageFromButton } from "../src/turn/index";
 import { fakeProvider, type ScriptedReply } from "../src/agent/providers/fake";
 import {
   draftProposal,
@@ -239,6 +239,31 @@ test("card waiting: the results carry Add these notes, which stages a revision o
   // The results lose the button: the notes are on the card.
   assert.deepEqual(actionsOf(d.redrawn[0]!), []);
   assert.match(d.redrawn[0]!.text, /Added to the card/);
+});
+
+test("card waiting: Add these notes whose card fails to post gives the card back, waiting as it was and never recorded superseded", async () => {
+  const w = await offered();
+  await checked(w);
+  const delivery = recordingDelivery({ stagingFails: true });
+  await runResultsDoor(
+    { channel: CHANNEL, offerTs: w.offerTs, userId: REQUESTER, action: "add-notes" },
+    {
+      store: w.threadState,
+      createdPage: w.pages.pageOf,
+      stage: (ask) => stageFromButton(ask, { ...w.h.deps, delivery }),
+      replaceResults: async () => {},
+      replyEphemeral: async () => {},
+      now: () => w.clock.t,
+    },
+  );
+
+  assert.equal((await w.threadState.getProposalByTs(w.cardTs)).state, "found", "the card waits again");
+  assert.deepEqual((await turnCards(w.h)).map((p) => p.proposalTs), [w.cardTs]);
+  assert.ok(
+    !w.h.proposalEvents.events().some((e) => e.proposalId === w.cardTs && e.event === "superseded"),
+    "nothing replaced it on the record",
+  );
+  assert.deepEqual(delivery.gateNotes, [], "no line says it was revised");
 });
 
 test("the usage record names the channel of a card the notes stage in a channel, and not in a group DM", async () => {

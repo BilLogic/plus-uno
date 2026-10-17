@@ -6,9 +6,8 @@
 // the one it corrected (Bill: "require overlap"):
 //
 //   • separate → revision: that card was staged separate, and this one
-//     revises a different card — it was meant as this change, so it is
-//     withdrawn in the same turn, superseded by the revision, and the note
-//     above the new card says so (story 9);
+//     revises a different card. That card still waits: the turn never
+//     withdraws a card for the person (Bill, 2026-10-17);
 //   • revision → separate: that card was a revision, and this separate one
 //     is aimed at the same Notion page or GitHub issue.
 //
@@ -23,7 +22,6 @@ import assert from "node:assert/strict";
 
 import { runTurn, type TurnRequest } from "../src/turn/index";
 import { resolveSignal } from "../src/gate/index";
-import { renderGateNote } from "../src/slack/gate-note";
 import type { ScriptedReply } from "../src/agent/providers/fake";
 import { harness, request, REF, type Harness } from "./helpers/turn-harness";
 
@@ -97,7 +95,10 @@ test("a separate proposal moved into the card beside it is a correction, recorde
   assert.equal(row.correctsProposalId, b);
 });
 
-test("fixing a wrong separate call takes one message: the mistaken card is withdrawn, superseded by the revision, and the note says so", async () => {
+test("a wrong separate call, corrected in words, leaves the mistaken card waiting for the person to cancel", async () => {
+  // Bill, 2026-10-17: the turn never withdraws a card for the person. The
+  // correction is on the record; the line above the revision names the card
+  // it replaced, and the other card keeps its own buttons.
   const fold = call("notion_create", { ...PRD_A, summary: "Match a backup tutor; shorter reflections too." });
   const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B), fold] });
   const first = await turn(h, { text: "draft a PRD for backup tutor matching" });
@@ -108,19 +109,16 @@ test("fixing a wrong separate call takes one message: the mistaken card is withd
   const third = await turn(h, { text: "that was meant to update the first one", userMsgTs: "1700000000.000400" });
   const revised = third.staged!.proposal.proposalTs;
 
-  assert.deepEqual((await h.threadState.getProposalsByThread(REF)).map((p) => p.proposalTs), [revised], "one card waits");
-  assert.equal((await h.threadState.getProposalByTs(b)).state, "superseded");
-  assert.ok(h.proposalEvents.events().some((e) => e.proposalId === b && e.event === "superseded"), "on the record as superseded");
-  assert.deepEqual(h.delivery.gateNotes.at(-1), { kind: "revised", replaced: "Backup tutor matching", withdrawn: "Session reflections" });
-  assert.match(renderGateNote(h.delivery.gateNotes.at(-1)!), /\*Session reflections\*/, "the reply names the card withdrawn");
+  assert.equal(stagedRow(h, revised).correctsProposalId, b, "on the record as a correction");
+  assert.deepEqual((await h.threadState.getProposalsByThread(REF)).map((p) => p.proposalTs).sort(), [b, revised].sort(), "both cards wait");
+  assert.ok(!h.proposalEvents.events().some((e) => e.proposalId === b && e.event === "superseded"));
+  assert.deepEqual(h.delivery.gateNotes.at(-1), { kind: "revised", replaced: "Backup tutor matching" });
 
-  // Its buttons say what replaced it, and run nothing.
-  const pressed = await resolveSignal({ kind: "button", messageTs: b, decision: "confirm", userId: "U1" }, { threadState: h.threadState });
-  assert.equal(pressed.outcome, "stale");
-  assert.deepEqual(pressed.post?.note, { kind: "superseded", by: "Backup tutor matching" });
+  const cancelled = await resolveSignal({ kind: "button", messageTs: b, decision: "cancel", userId: "U1" }, { threadState: h.threadState });
+  assert.equal(cancelled.outcome, "won", "the person cancels it themselves");
 });
 
-test("an edit of the first card right after a separate one is recorded as a correction, but leaves that card waiting unless the ask says it was the wrong call", async () => {
+test("an edit of the first card right after a separate one is recorded as a correction, and leaves that card waiting", async () => {
   const edit = call("notion_create", { ...PRD_A, title: "Backup tutors" });
   const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B), edit] });
   const first = await turn(h, { text: "draft a PRD for backup tutor matching" });

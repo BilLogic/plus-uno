@@ -160,6 +160,28 @@ describe("a sweep card keeps its carousel", () => {
   });
 });
 
+describe("the line above a card", () => {
+  const target = { channel: CHANNEL, replyTs: ROOT, userMsgTs: ROOT, userId: BEA };
+  const lead = { kind: "revised", replaced: "Backup tutor matching" } as const;
+
+  it("goes up just before the card, and is reported with it", async () => {
+    const slack = recordingSlack();
+    const posted = await deliveryAdapter(slack.deps(false), target).card(SWEEP, lead);
+    const messages = slack.of("message");
+    assert.equal(messages[0]!.text, renderGateNote(lead));
+    assert.equal(messages.at(-1)!.blocks, true, "the card is last");
+    assert.equal(posted.lead, renderGateNote(lead));
+  });
+
+  it("is taken back when the card under it never goes up", async () => {
+    const slack = recordingSlack({ postsLand: 1 });
+    const posted = await deliveryAdapter(slack.deps(false), target).card(SWEEP, lead);
+    assert.equal(posted.ok, false);
+    assert.equal(posted.lead, undefined);
+    assert.deepEqual(slack.of("delete").map((d) => d.ts), ["posted-1"], "the line is deleted");
+  });
+});
+
 describe("the record keeps a card's own blocks", () => {
   it("the Slack adapter reports the blocks a card went up with, and none for a text-only card", async () => {
     const slack = recordingSlack();

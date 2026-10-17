@@ -57,6 +57,7 @@ export type SlackCall =
       blockList?: unknown[];
     }
   | { kind: "update"; channel: string; ts: string; text: string; blocks: unknown[] }
+  | { kind: "delete"; channel: string; ts: string }
   | {
       kind: "answer";
       channel: string;
@@ -241,6 +242,9 @@ export interface RecordingSlackOptions {
   /** Refuse only a post carrying blocks, so the card's text-only retry is
    *  reachable. */
   blocksFail?: boolean;
+  /** Land only this many plain posts and refuse every one after: a line
+   *  that goes up, and the card after it that does not. */
+  postsLand?: number;
   /** What `startStream` opens. `null` is a stream Slack would not open. */
   streamTs?: string | null;
   /** Throw out of the answer post, so the adapter's "close the stream nobody
@@ -332,7 +336,11 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
       });
       if (refuseBlocks(refused, "post", input.blocks)) return { ok: false };
       if (opts.messageFails || (blocks && opts.blocksFail)) return { ok: false };
+      if (opts.postsLand !== undefined && posted >= opts.postsLand) return { ok: false };
       return { ok: true, ts: `posted-${++posted}` };
+    },
+    async deleteMessage(channel, ts) {
+      record({ kind: "delete", channel, ts });
     },
     async updateMessage(input) {
       record({ kind: "update", channel: input.channel, ts: input.ts, text: input.text, blocks: input.blocks });

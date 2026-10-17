@@ -114,8 +114,8 @@ export function createDurableObjectThreadState(
 
     // Retire, as distinct from claim: the record stays readable so a ✅ on the
     // replaced card can be told it was replaced (#583).
-    retireProposal(proposalTs: string, by?: string): Promise<{ retired: boolean }> {
-      return hop().retireProposal(proposalTs, now(), by);
+    retireProposal(proposalTs: string): Promise<{ retired: boolean }> {
+      return hop().retireProposal(proposalTs, now());
     },
 
     // Needs changes' lock: one hop, so of two racing presses one marks it.
@@ -184,6 +184,10 @@ export function createDurableObjectThreadState(
 
     acknowledgeCardExpiry(proposalTs) {
       return hop().acknowledgeCardExpiry(proposalTs);
+    },
+
+    takeCardExpiries(limit) {
+      return hop().takeCardExpiries(limit, now());
     },
 
     // ----- executions -----

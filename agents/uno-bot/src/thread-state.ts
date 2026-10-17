@@ -75,6 +75,8 @@ import {
   type ExpiredCardEdit,
   CARD_EXPIRY_EDIT_GRACE_MS,
   cardExpiryDueAt,
+  cardExpiryHandOffAt,
+  cardExpiriesToTake,
   cardExpiryOwed,
   expiredCardEdit,
   claimedFiling,
@@ -102,6 +104,7 @@ import {
   proposalTtlMs,
   stampedTtl,
   newestCardFirst,
+  cardOrder,
   withLiveMark,
   type CutOffNoteReport,
   type DecisionReportRecord,
@@ -154,6 +157,8 @@ interface ProposalRecord {
   decidedAt?: number;
   /** The card's message says it expired (`acknowledgeCardExpiry`, #1316). */
   expiryShown?: true;
+  /** When the alarm last handed it over for that edit (`takeCardExpiries`). */
+  expiryHandedOffAt?: number;
 }
 
 // Latest assistant-panel context (what surface the user has open) per thread.
@@ -261,6 +266,17 @@ export class ThreadState extends DurableObject<Env> {
       });
     }
 
+    // Cards that aged out untouched, oldest deadline first, to say so on —
+    // each handed over once, and again only once that hand-off has lapsed.
+    if (this.alarmDeps.handOffExpiredCards) {
+      const due = await this.takeCardExpiries(CARD_EXPIRY_HANDOFFS_PER_PASS, now);
+      if (due.length) {
+        await this.alarmDeps.handOffExpiredCards(due).catch((err: unknown) => {
+          console.error(`[thread-state] card expiry hand-off failed: ${err instanceof Error ? err.message : String(err)}`);
+        });
+      }
+    }
+
     const reports = await this.storage.list<ReportRecord>({ prefix: "report:" });
     const proposals = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
     const executions = await this.storage.list<Execution>({ prefix: "exec:" });
@@ -269,17 +285,6 @@ export class ThreadState extends DurableObject<Env> {
     if (expired.length && this.alarmDeps.handOffExpiredReports) {
       await this.alarmDeps.handOffExpiredReports(expired.map((rec) => rec.report)).catch((err: unknown) => {
         console.error(`[thread-state] report expiry hand-off failed: ${err instanceof Error ? err.message : String(err)}`);
-      });
-    }
-
-    // Cards that aged out untouched, oldest deadline first, to say so on.
-    const owed = [...proposals.values()]
-      .filter((rec) => cardExpiryOwed(rec, rec.payload as PendingProposal | null, now))
-      .sort((a, b) => a.createdAt + recordTtlMs(a) - (b.createdAt + recordTtlMs(b)));
-    if (owed.length && this.alarmDeps.handOffExpiredCards) {
-      const due = owed.slice(0, CARD_EXPIRY_HANDOFFS_PER_PASS).map((rec) => rec.payload as PendingProposal);
-      await this.alarmDeps.handOffExpiredCards(due).catch((err: unknown) => {
-        console.error(`[thread-state] card expiry hand-off failed: ${err instanceof Error ? err.message : String(err)}`);
       });
     }
 
@@ -292,11 +297,14 @@ export class ThreadState extends DurableObject<Env> {
       const expiryAt = reportExpiryAt(rec, look, now);
       next = Math.min(next, expiryAt <= now ? now + REPORT_EXPIRY_RETRY_MS : expiryAt);
     }
-    // Each live card's deadline, and a retry for one still owed its edit.
+    // Each live card's deadline, and a retry for one still owed its edit:
+    // when its hand-off lapses, or on the next pass when none is out.
     for (const rec of proposals.values()) {
-      const due = cardExpiryDueAt(rec, rec.payload as PendingProposal | null);
-      if (due === null || now - due > CARD_EXPIRY_EDIT_GRACE_MS) continue;
-      next = Math.min(next, due <= now ? now + REPORT_EXPIRY_RETRY_MS : due);
+      const proposal = rec.payload as PendingProposal | null;
+      const due = cardExpiryDueAt(rec, proposal);
+      const handOffAt = cardExpiryHandOffAt(rec, proposal);
+      if (due === null || handOffAt === null || now - due > CARD_EXPIRY_EDIT_GRACE_MS) continue;
+      next = Math.min(next, handOffAt <= now ? now + REPORT_EXPIRY_RETRY_MS : handOffAt);
     }
     if (next !== Infinity) await this.storage.transaction((txn) => this.armAlarmBy(txn, next, true));
   }
@@ -491,7 +499,7 @@ export class ThreadState extends DurableObject<Env> {
   // Retire without consuming — the counterpart to the claim, and why the two
   // are different methods is on the interface (#583). A missing record is a
   // no-op: there is nothing left that could be acted on.
-  async retireProposal(proposalTs: string, at: number, by?: string): Promise<{ retired: boolean }> {
+  async retireProposal(proposalTs: string, at: number): Promise<{ retired: boolean }> {
     const key = proposalKey(proposalTs);
     return this.storage.transaction(async (txn) => {
       const rec = await txn.get<ProposalRecord>(key);
@@ -500,7 +508,7 @@ export class ThreadState extends DurableObject<Env> {
       if (!rec || rec.decided || rec.retired || rec.supersededBy) return { retired: false };
       if (at - rec.createdAt > recordTtlMs(rec)) return { retired: false };
       const { kept: _, ...settled } = rec;
-      await txn.put<ProposalRecord>(key, { ...settled, retired: true, ...(by ? { supersededBy: by } : {}) });
+      await txn.put<ProposalRecord>(key, { ...settled, retired: true });
       return { retired: true };
     });
   }
@@ -624,7 +632,7 @@ export class ThreadState extends DurableObject<Env> {
       const proposal = rec.payload as PendingProposal | null;
       if (!proposal || proposal.channel !== ref.channel) continue;
       if (proposalReplyThread(proposal) !== ref.thread) continue; // keyed on the card's thread
-      if (!best || newestCardFirst(card(rec), card(best)) < 0) best = rec;
+      if (!best || newestCardFirst(cardOrder(rec), cardOrder(best)) < 0) best = rec;
     }
     return best ? withLiveMark(best.payload as PendingProposal, at) : null;
   }
@@ -643,7 +651,7 @@ export class ThreadState extends DurableObject<Env> {
       live.push(rec);
     }
     return live
-      .sort((a, b) => newestCardFirst(card(a), card(b)))
+      .sort((a, b) => newestCardFirst(cardOrder(a), cardOrder(b)))
       .map((rec) => withLiveMark(rec.payload as PendingProposal, at));
   }
 
@@ -660,7 +668,7 @@ export class ThreadState extends DurableObject<Env> {
       live.push(rec);
     }
     return live
-      .sort((a, b) => newestCardFirst(card(a), card(b)))
+      .sort((a, b) => newestCardFirst(cardOrder(a), cardOrder(b)))
       .map((rec) => withLiveMark(rec.payload as PendingProposal, at));
   }
 
@@ -750,6 +758,23 @@ export class ThreadState extends DurableObject<Env> {
     await this.storage.transaction(async (txn) => {
       const rec = await txn.get<ProposalRecord>(proposalKey(proposalTs));
       if (rec && !rec.expiryShown) await txn.put<ProposalRecord>(proposalKey(proposalTs), { ...rec, expiryShown: true });
+    });
+  }
+
+  // Taken and marked in one transaction, so a pass never hands over a card
+  // the previous pass's job still holds (`cardExpiriesToTake`).
+  async takeCardExpiries(limit: number, at: number): Promise<PendingProposal[]> {
+    return this.storage.transaction(async (txn) => {
+      const records = await txn.list<ProposalRecord>({ prefix: "prop:" });
+      const taken = cardExpiriesToTake(
+        [...records.values()].map((rec) => ({ rec, proposal: (rec.payload as PendingProposal | null) ?? null })),
+        at,
+        limit,
+      );
+      for (const { rec, proposal } of taken) {
+        await txn.put<ProposalRecord>(proposalKey(proposal.proposalTs), { ...rec, expiryHandedOffAt: at });
+      }
+      return taken.map(({ proposal }) => proposal);
     });
   }
 
@@ -1112,11 +1137,6 @@ function historyKey(channel: string, thread: string): string {
 
 // A proposal record's lifetime, read off the card it holds. The payload is
 // stored opaque, and a record with none reads as the default hour.
-/** A record as `newestCardFirst` reads it. */
-function card(rec: ProposalRecord): { createdAt: number; proposalTs: string } {
-  return { createdAt: rec.createdAt, proposalTs: (rec.payload as PendingProposal | null)?.proposalTs ?? "" };
-}
-
 function recordTtlMs(rec: ProposalRecord): number {
   return proposalTtlMs((rec.payload as PendingProposal | null) ?? {});
 }

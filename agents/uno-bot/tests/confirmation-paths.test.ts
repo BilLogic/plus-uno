@@ -1076,6 +1076,33 @@ describe("the button door", () => {
     assert.equal(clearedWith(delivery), "waiting-on-person", "the other card still waits");
   });
 
+  // In a DM the history key is the literal "dm" and the cards sit under their
+  // real reply thread, which is the grain the store keys them on.
+  it("in a DM, with another card still waiting under the same reply, settles as waiting on the person", async () => {
+    const threadState = createInMemoryThreadState();
+    const dm = { ...PROPOSAL, channel: "D1", threadTs: "dm", replyTs: THREAD };
+    await threadState.putProposal({ ...dm, supersedeKey: `card:${CARD_TS}` });
+    await threadState.putProposal({
+      ...dm,
+      input: { title: "Session reflections" },
+      proposalTs: "1700000000.000196",
+      supersedeKey: "card:1700000000.000196",
+    });
+    const delivery = recordingDelivery();
+    await runButtonDoor(
+      { channel: "D1", messageTs: CARD_TS, decision: "confirm", userId: "U1" },
+      {
+        threadState,
+        delivery: () => delivery,
+        async applyVerdict() {},
+        async replyEphemeral() {},
+        async replaceCard() {},
+        async restage() {},
+      },
+    );
+    assert.equal(clearedWith(delivery), "waiting-on-person", "the other card still waits");
+  });
+
   it("speaks the verdict, runs the tool, and leaves nothing up", async () => {
     const { delivery, ran, saidBeforeRunning, replacements } = await drive();
 

@@ -77,7 +77,7 @@ import { whichCardMessage } from "./which-card";
 import { checkOfferMessage } from "./blueprint-check";
 import { planBlock } from "./plan-block";
 import { retryValue } from "./try-again";
-import type { Presentation, Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
+import type { Presentation, Delivery, DeliveryFailureStage, PostResult, ProposalCard, StagingNote } from "../turn/index";
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
 import { SUBREQUEST_CAP } from "../agent/loop-policy";
 import { taskCardFor } from "../agent/tool-table";
@@ -305,6 +305,9 @@ export interface SlackDeliveryClient {
   /** Rewrite one of the bot's own messages in place — how a static checklist
    *  settles where no stream could open. */
   updateMessage(input: { channel: string; ts: string; text: string; blocks: unknown[] }): Promise<{ ok: boolean }>;
+  /** Delete one of the bot's own messages: a card's staging line, when the
+   *  card under it never went up. */
+  deleteMessage(channel: string, ts: string): Promise<void>;
   /** Move the agent session's lifecycle status — the working signal itself. */
   setSessionStatus(channel: string, threadTs: string, status: SessionStatus): Promise<StatusResult>;
   /** Name the session, so the conversation is findable in History / Messages. */
@@ -1142,11 +1145,14 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       if (!updated.ok) console.warn(`[slack] card ${channel}/${card.ts} could not be reopened`);
     },
 
-    async card(card: ProposalCard): Promise<PostResult> {
+    async card(card: ProposalCard, lead?: StagingNote): Promise<PostResult> {
       // THE CARD ARRIVES AS DATA and is spelled here (#623): the turn decided
       // what a person is being asked to approve, and this is where that becomes
       // mrkdwn, an ⚠️, a confirm footer and a button row.
       const rendered = renderProposalCard(card);
+      // What the staging did, said just above the card — first, so the card
+      // stays the last thing in the thread.
+      const said = lead ? await postNote(renderGateNote(lead)) : null;
       // A batch too long for one Slack message posts its full plan as its own
       // messages FIRST, so the card — which carries the buttons — stays the
       // last thing in the thread. Slack's size limits are what decide there is
@@ -1180,11 +1186,19 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
         posted = await slack.postMessage({ channel, thread_ts: replyTs, text: rendered.text, ...(metadata ? { metadata } : {}) });
         own = undefined;
       }
+      // A line above a card that never went up says a staging that did not
+      // happen: taken back.
+      if (!posted.ok && said?.ts) {
+        await slack.deleteMessage(channel, said.ts).catch(() => {
+          console.warn(`[slack] staging line ${channel}/${said.ts} not taken back`);
+        });
+      }
       return {
         ok: !!posted.ok,
         text: rendered.text,
         ...(posted.ok && posted.ts ? { ts: posted.ts } : {}),
         ...(posted.ok && own ? { blocks: own } : {}),
+        ...(posted.ok && said?.ok ? { lead: said.text } : {}),
       };
     },
 
