@@ -44,6 +44,7 @@ import type { ServiceChangeInput } from "./gate";
 import type { Comparison } from "./milestone";
 import type { DrawnProposal } from "./proposal-records";
 import { CARD_WINDOW_WORDS } from "../card-expiry";
+import { jsonObjectIn } from "../sweep/detector";
 
 /** The status a proposal's rows are written at. */
 export const PROPOSED = "proposed" as const;
@@ -78,10 +79,23 @@ export interface ProposalDraftDeps {
   affordable(): boolean;
 }
 
-/** Drafts the idea a comparison carries; null when there is nothing to offer.
- *  `signal` aborts the model call in flight (a stopped check), which is
- *  nothing to offer too. */
-export type ProposalDrafter = (comparison: Comparison, idea: ServiceChangeInput, signal?: AbortSignal) => Promise<ProposalDraft | null>;
+/**
+ * Why a draft makes no offer, in the two kinds its check tells apart:
+ *   `nothing-to-draw` — the draft finished and the idea draws no cell on the
+ *     path (it only removes moments, or needs only steps the path does not
+ *     have). The results say all there is; nothing more is said.
+ *   `unfinished` — the draft itself did not finish: the model failed, or was
+ *     cut off at the output ceiling, or its reply could not be read, or the
+ *     budget had no room for it. The results still post, and the check says
+ *     no proposal was drafted, so the offer they lead the person to expect is
+ *     never silently missing.
+ */
+export type NoProposal = "nothing-to-draw" | "unfinished";
+
+/** Drafts the idea a comparison carries, or says why there is nothing to
+ *  offer. `signal` aborts the model call in flight (a stopped check), which
+ *  is `unfinished`; the check reads its own signal to say stopped. */
+export type ProposalDrafter = (comparison: Comparison, idea: ServiceChangeInput, signal?: AbortSignal) => Promise<ProposalDraft | NoProposal>;
 
 export const PROPOSAL_SYSTEM = [
   "You keep a service blueprint. Someone is exploring an idea that changes how one path works today. You are shown the idea, and the path as it is today: its steps, its lanes, and each cell (the square where a step meets a lane) with its text.",
@@ -163,33 +177,65 @@ export function whyNoProposal(reply: string, comparison: Comparison, idea: Servi
 }
 
 /**
- * The drafter, over its ports. Fails quiet: any error is no offer.
+ * Why an aborted draft was aborted, in a log line's words: the check's
+ * deadline names itself (`CHECK_DEADLINE_MS` aborts with an Error of its
+ * own); any other abort is Stop's, whose reason is the bare AbortError.
+ */
+function abortedBecause(signal: AbortSignal): string {
+  const reason: unknown = signal.reason;
+  return reason instanceof Error && reason.name !== "AbortError" ? reason.message : "the check was stopped";
+}
+
+/**
+ * The drafter, over its ports. Fails quiet: any error is no offer, and an
+ * error or a cut-off reply is `unfinished`, never `nothing-to-draw`.
  *
  * @param deps - The model and the budget
  */
 export function draftProposal(deps: ProposalDraftDeps): ProposalDrafter {
   return async (comparison, idea, signal) => {
+    const input = { title: idea.title, text: idea.text, today: comparison.today, target: PROPOSED };
     try {
-      if (!deps.affordable()) return null;
+      if (!deps.affordable()) {
+        console.warn(`[proposal] ${comparison.scenario}: no offer — the budget had no room for the draft`);
+        return "unfinished";
+      }
       const reply = await deps.provider.generate({
         tier: PROPOSAL_DRAFT_TIER,
         system: PROPOSAL_SYSTEM,
-        prompt: draftPrompt({ title: idea.title, text: idea.text, today: comparison.today, target: PROPOSED }),
+        prompt: draftPrompt(input),
         maxTokens: DRAFT_MAX_TOKENS,
         ...(signal ? { signal } : {}),
       });
+      // An abort comes back as a failed call: Stop pressed is not the model
+      // failing, and a log that said so sent a live read of r671 looking for
+      // a model fault that was not there.
+      if (signal?.aborted) {
+        console.log(`[proposal] ${comparison.scenario}: no offer — ${abortedBecause(signal)}`);
+        return "unfinished";
+      }
       if (!reply.ok) {
         console.warn(`[proposal] ${comparison.scenario}: no offer — the model failed: ${reply.message}`);
-        return null;
+        return "unfinished";
       }
       const draft = readProposalDraft(reply.text, comparison, idea);
-      if (!draft) console.log(`[proposal] ${comparison.scenario}: no offer — ${whyNoProposal(reply.text, comparison, idea, reply.cutOff)}`);
-      return draft;
+      if (draft) return draft;
+      console.log(`[proposal] ${comparison.scenario}: no offer — ${whyNoProposal(reply.text, comparison, idea, reply.cutOff)}`);
+      // A reply read whole that draws no cell is the idea's answer; a cut-off
+      // or unreadable one is no answer at all.
+      return !reply.cutOff && comparison.today.scenarioId && readsAsJson(reply.text) ? "nothing-to-draw" : "unfinished";
     } catch (err) {
-      console.warn(`[proposal] draft skipped: ${err instanceof Error ? err.message : String(err)}`);
-      return null;
+      if (signal?.aborted) console.log(`[proposal] ${comparison.scenario}: no offer — ${abortedBecause(signal)}`);
+      else console.warn(`[proposal] draft skipped: ${err instanceof Error ? err.message : String(err)}`);
+      return "unfinished";
     }
   };
+}
+
+/** Whether a reply holds the draft's JSON shape at all: rows to read. */
+function readsAsJson(reply: string): boolean {
+  const parsed = jsonObjectIn(reply) as Record<string, unknown> | null;
+  return !!parsed && Array.isArray(parsed.rows);
 }
 
 const code = (word: string) => `\`${word.replace(/`/g, "'")}\``;

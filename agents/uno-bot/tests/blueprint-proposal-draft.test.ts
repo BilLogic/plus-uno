@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { fakeProvider } from "../src/agent/providers/fake";
 import { DRAFT_MAX_TOKENS, draftProposal, draftRevision, PROPOSAL_SYSTEM, type PathToday } from "../src/blueprint-upkeep/index";
 import type { Comparison } from "../src/blueprint-upkeep/milestone";
+import { MAX_TOKENS as TURN_MAX_TOKENS } from "../src/agent/loop-policy";
 
 const TODAY: PathToday = {
   pathId: "path-1",
@@ -50,8 +51,9 @@ test("the drafter leaves room for the model's thinking and the JSON after it", a
   const { asked } = await draftWith(reply({ rows: [{ change: "changed", step_id: "s-open", lane_id: "l-tutor", content: "Tutor writes a two-line recap" }] }));
   assert.equal(asked[0]!.maxTokens, DRAFT_MAX_TOKENS);
   // Thinking spends the same ceiling as the answer: 2,000 left a medium-level
-  // model cut off mid-JSON. The draft judge's 6,000 is the floor here.
-  assert.ok(DRAFT_MAX_TOKENS >= 6_000);
+  // model cut off mid-JSON, and live on r671 8,000 was cut off too. A turn's
+  // own ceiling, sized for the same all-thinking risk, is the floor here.
+  assert.ok(DRAFT_MAX_TOKENS >= TURN_MAX_TOKENS);
 });
 
 test("a shipped-work revision is asked with the same ceiling", async () => {
@@ -60,27 +62,27 @@ test("a shipped-work revision is asked with the same ceiling", async () => {
   assert.equal(model.generated[0]!.maxTokens, DRAFT_MAX_TOKENS);
 });
 
-test("a reply cut off at the ceiling is logged as cut off, not as drawing no cell", async () => {
+test("a reply cut off at the ceiling is logged as cut off, and is a draft that did not finish", async () => {
   const { draft, lines } = await draftWith('{"rows":[{"change":"added","step_id":"s-op', { cutOff: true });
-  assert.equal(draft, null);
+  assert.equal(draft, "unfinished");
   assert.ok(lines.some((l) => /\[proposal\] Session Reflection: no offer — the reply stopped at the output ceiling/.test(l)), lines.join("\n"));
 });
 
 test("an idea that only needs a step the path does not have is logged with that step", async () => {
   const { draft, lines } = await draftWith(reply({ new_steps_or_lanes: ["Write a two-line recap (step)"] }));
-  assert.equal(draft, null);
+  assert.equal(draft, "nothing-to-draw");
   assert.ok(lines.some((l) => /no offer — it needs only steps or lanes the path does not have: Write a two-line recap \(step\)/.test(l)), lines.join("\n"));
 });
 
 test("an idea that only removes moments is logged as such", async () => {
   const { draft, lines } = await draftWith(reply({ rows: [{ change: "deprecated", step_id: "s-submit", lane_id: "l-tutor", content: "" }] }));
-  assert.equal(draft, null);
+  assert.equal(draft, "nothing-to-draw");
   assert.ok(lines.some((l) => /no offer — it only removes moments/.test(l)), lines.join("\n"));
 });
 
 test("a reply with no JSON in it is logged as unreadable", async () => {
   const { draft, lines } = await draftWith("I think the tutor would write a recap.");
-  assert.equal(draft, null);
+  assert.equal(draft, "unfinished");
   assert.ok(lines.some((l) => /no offer — the reply held no rows to read/.test(l)), lines.join("\n"));
 });
 
@@ -92,7 +94,13 @@ test("a moment with no step of its own is drawn at the nearest step, with the mi
       new_steps_or_lanes: ["Write a two-line recap (step)"],
     }),
   );
-  assert.ok(draft, "the offer stands");
-  assert.equal(draft!.changes.length, 1);
-  assert.ok(draft!.gaps.some((g) => /Write a two-line recap/.test(g)));
+  assert.ok(typeof draft === "object", "the offer stands");
+  assert.equal(draft.changes.length, 1);
+  assert.ok(draft.gaps.some((g) => /Write a two-line recap/.test(g)));
+});
+
+test("a model that fails is a draft that did not finish", async () => {
+  const model = fakeProvider({ generateFailMessage: "HTTP 503: overloaded" });
+  const draft = await draftProposal({ provider: model, affordable: () => true })(COMPARISON, IDEA);
+  assert.equal(draft, "unfinished");
 });

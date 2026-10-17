@@ -23,9 +23,13 @@
 // losing Stop; then follow-ups in the offer's thread: today's steps beside the
 // idea's, step by step where the idea's rows could be drafted
 // (`comparisonText`), and the existing Draw on blueprint ✅ card
-// (`./proposal.ts`, requester only) when the draft draws anything. A path
-// that cannot be read, a check that throws or one past `CHECK_DEADLINE_MS`
-// says it didn't finish, with Try again, and posts nothing else.
+// (`./proposal.ts`, requester only) when the draft draws anything. A draft
+// that did not finish — the model failed, or was cut off at its ceiling —
+// still posts the results, in the idea's own words, and the message says no
+// proposal was drafted, with Check again: the card is never silently absent.
+// A path that cannot be read, a check that throws or one past
+// `CHECK_DEADLINE_MS` says it didn't finish, with Try again, and posts
+// nothing else.
 //
 // STOP (#1322). A stopped run posts nothing: Stop marks the record, which the
 // job reads before it starts and steps against before it posts, and aborts
@@ -308,8 +312,12 @@ export interface PostedCard {
 }
 
 /** What a check came to, as its status message says it. A stopped check is
- *  not here: Stop says that itself. */
-export type CheckOutcome = { kind: "done" } | { kind: "failed"; reason: "unreadable" | "error" | "timed-out" };
+ *  not here: Stop says that itself. `undrafted`: done, but the idea's rows
+ *  could not be drafted (`NoProposal` `unfinished`), so its results post with
+ *  no Draw on blueprint card and the message says so, with Check again. */
+export type CheckOutcome =
+  | { kind: "done"; undrafted?: true }
+  | { kind: "failed"; reason: "unreadable" | "error" | "timed-out" };
 
 /**
  * Run one check: read today's path, draft the idea's rows on it, post today's
@@ -378,12 +386,15 @@ async function check(offer: BlueprintCheckOffer, run: string, signal: AbortSigna
     text: comparisonText(today, offer.quote),
   };
   // The drafter fails quiet, an abort included, so the signal is read again.
-  const drafted = await untilAborted(deps.draft(comparison, offer.idea, signal), signal);
+  const drawn = await untilAborted(deps.draft(comparison, offer.idea, signal), signal);
   signal.throwIfAborted();
+  const drafted = typeof drawn === "string" ? null : drawn;
   // Done before anything posts: a Stop that landed first wins, and one that
   // lands after finds the check finished. Then Stop leaves the message.
   if (!(await deps.store.stepCheck(checkRefOf(offer), offer.scenario, run, "done"))) return "stopped";
-  await deps.settle(offer, { kind: "done" });
+  // A draft that did not finish is said on the message, never left as a
+  // Draw on blueprint card that silently never comes (live on r671).
+  await deps.settle(offer, drawn === "unfinished" ? { kind: "done", undrafted: true } : { kind: "done" });
   await postResults(offer, drafted ? comparisonText(today, offer.quote, drafted.changes) : comparison.text, deps);
   // The check is done and its results stand: a card that fails to go up
   // under them is logged, never the check's failure — that would step a done

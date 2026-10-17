@@ -93,6 +93,7 @@ export {
   readProposalDraft,
   stagedProposalOffer,
   whyNoProposal,
+  type NoProposal,
   type ProposalDraft,
   type ProposalDrafter,
 } from "./proposal";

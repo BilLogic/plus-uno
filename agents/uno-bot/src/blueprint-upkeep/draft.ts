@@ -95,8 +95,13 @@ const MAX_TEXT_CHARS = 6_000;
 /** The output ceiling a draft is asked with. Thinking spends the same ceiling
  *  as the answer (`ModelText.cutOff`), so it is room for the model's thinking
  *  and then the JSON: 2,000 left a medium-level model cut off mid-JSON, which
- *  read as a draft with no rows. */
-export const DRAFT_MAX_TOKENS = 8_000;
+ *  read as a draft with no rows, and live on r671 8,000 was cut off too, on
+ *  the default tier's proposal draft. A one-shot cannot bound its
+ *  thinking (the tier is model and level together, ADR-028), so the ceiling
+ *  is a turn's own (`loop-policy.ts` `MAX_TOKENS`), raised for the same
+ *  all-thinking risk. The draft's JSON is a few hundred tokens, so the rest
+ *  is spent only by a model that thinks that long. */
+export const DRAFT_MAX_TOKENS = 16_384;
 
 export const DRAFT_SYSTEM = [
   "You keep a service blueprint current. A piece of work has shipped. You are shown its title and text, and one path of the blueprint as it is today: its steps, its lanes, and each cell (the square where a step meets a lane) with its text.",

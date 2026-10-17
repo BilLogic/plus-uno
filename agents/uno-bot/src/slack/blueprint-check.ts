@@ -6,7 +6,8 @@
 // ("this changes how *Call-off* works today — check it against the
 // blueprint?") with a Check it button; a press edits it to
 // the checking line, with Stop; the job edits it to what the check came to
-// (`checkedMessage`: done, or failed with Try again); Stop edits it to the
+// (`checkedMessage`: done, done with no proposal drafted and Check again, or
+// failed with Try again); Stop edits it to the
 // stopped line, with Check again. One ts for the check's whole life — the
 // offer's (`BlueprintCheckOffer.offerTs`) — which is where every button on it,
 // and a result's action, finds the check.
@@ -146,7 +147,17 @@ export function stoppedMessage(offer: CheckSubject): CardMessage {
  * @param outcome - What the check came to
  */
 export function checkedMessage(offer: CheckSubject, outcome: CheckOutcome): CardMessage {
-  if (outcome.kind === "done") return line(`Checked ${scenarioOf(offer.scenario)} against today's blueprint. The results are below.`);
+  const checked = `Checked ${scenarioOf(offer.scenario)} against today's blueprint.`;
+  // The results lead the requester to expect a Draw on blueprint card; when
+  // its draft did not finish, the message says there is none and offers
+  // Check again, rather than leave the card to never come.
+  if (outcome.kind === "done" && outcome.undrafted) {
+    return line(
+      `${checked} The results are below, but I couldn't draft your idea as a blueprint proposal this time.${cardStands(offer)}`,
+      button(CHECK_IT_ACTION_ID, "Check again", "check"),
+    );
+  }
+  if (outcome.kind === "done") return line(`${checked} The results are below.`);
   const why =
     outcome.reason === "unreadable"
       ? `. Today's ${scenarioOf(offer.scenario)} path couldn't be read.`
