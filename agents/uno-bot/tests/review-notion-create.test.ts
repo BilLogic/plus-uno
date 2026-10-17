@@ -23,6 +23,7 @@ import {
 import { reviewSubmitOf } from "../src/slack/review-view";
 import { CONFIRM_FOOTER } from "../src/slack/proposal-render";
 import { NO_OPEN_QUESTIONS, proseElements } from "../src/slack/review-notion-create";
+import { markdownToNotionBlocks, type NotionBlock } from "../src/integrations/notion-blocks";
 import { recordingViews } from "./helpers/recording-slack";
 import { cardWords } from "./helpers/card-message";
 
@@ -450,6 +451,32 @@ describe("Submit and Edit fields still reach the created page", () => {
   }
 });
 
+/** The body from the bug report: numbered items, each with its own bullets. */
+const NESTED = [
+  "1. **One-Tap Absence UI:**",
+  "   - Display an 'Absent' toggle…",
+  "   - Distinct visual state…",
+  "2. **Form Section Validation:**",
+  "   - …",
+].join("\n");
+
+const item = (text: string) => ({ type: "rich_text_section", elements: [{ type: "text", text }] });
+const boldItem = (text: string) => ({ type: "rich_text_section", elements: [{ type: "text", text, style: { bold: true } }] });
+
+/** How many levels of list the Notion write nests. */
+function notionDepth(blocks: readonly NotionBlock[]): number {
+  let depth = 0;
+  for (const b of blocks) {
+    const children = (b[b.type] as { children?: NotionBlock[] }).children ?? [];
+    if (b.type.endsWith("list_item") || b.type === "to_do") depth = Math.max(depth, 1 + notionDepth(children));
+  }
+  return depth;
+}
+
+/** How many levels of list the pop-up draws. */
+const popupDepth = (elements: unknown[]) =>
+  Math.max(0, ...(elements as Array<{ type: string; indent?: number }>).filter((e) => e.type === "rich_text_list").map((e) => (e.indent ?? 0) + 1));
+
 describe("a body's Markdown as rich text", () => {
   it("reads bullets, numbers, headings, bold, code and links, and keeps paragraphs", () => {
     assert.deepEqual(proseElements("## Plan\n1. **First** step\n2. Run `npm test`\n\nSee [the doc](https://example.com/doc)."), [
@@ -467,6 +494,39 @@ describe("a body's Markdown as rich text", () => {
         elements: [{ type: "text", text: "See " }, { type: "link", url: "https://example.com/doc", text: "the doc" }, { type: "text", text: "." }],
       },
     ]);
+  });
+
+  it("nests the sub-bullets under each numbered item and keeps counting", () => {
+    assert.deepEqual(proseElements(NESTED), [
+      { type: "rich_text_list", style: "ordered", elements: [boldItem("One-Tap Absence UI:")] },
+      { type: "rich_text_list", style: "bullet", indent: 1, elements: [item("Display an 'Absent' toggle…"), item("Distinct visual state…")] },
+      { type: "rich_text_list", style: "ordered", offset: 1, elements: [boldItem("Form Section Validation:")] },
+      { type: "rich_text_list", style: "bullet", indent: 1, elements: [item("…")] },
+    ]);
+  });
+
+  it("shows the depth the Notion write builds for the same body, however deep it is written", () => {
+    const deeper = `${NESTED}\n     - one more level down\n3. **Last:** with _italic_, \`code\` and [a link](https://example.com/a)`;
+    for (const body of [NESTED, deeper, PRD.sections[1]!.body]) {
+      assert.equal(popupDepth(proseElements(body)), notionDepth(markdownToNotionBlocks(body)), body);
+    }
+    const last = (proseElements(deeper) as Array<{ offset?: number; elements: Array<{ elements: unknown[] }> }>).at(-1)!;
+    assert.equal(last.offset, 2, "the third item reads 3");
+    assert.deepEqual(last.elements[0]!.elements, [
+      { type: "text", text: "Last:", style: { bold: true } },
+      { type: "text", text: " with " },
+      { type: "text", text: "italic", style: { italic: true } },
+      { type: "text", text: ", " },
+      { type: "text", text: "code", style: { code: true } },
+      { type: "text", text: " and " },
+      { type: "link", url: "https://example.com/a", text: "a link" },
+    ]);
+  });
+
+  it("draws a nested body in a pop-up Slack takes", async () => {
+    const input = { ...PRD, sections: [{ heading: "Requirements", body: NESTED }] };
+    const { draft } = await openDraft({ input, proposalText: textOf(input, CAVEAT) });
+    assert.match(JSON.stringify(draft), /"indent":1/);
   });
 
   it("leaves a snake_case word and a lone asterisk as written", () => {

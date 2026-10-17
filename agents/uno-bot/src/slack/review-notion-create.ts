@@ -22,6 +22,7 @@
 // PURE: blocks out, nothing posted, nothing read.
 import { clip, isLink } from "./card-block";
 import { canonicalNotionUrl, createdDesignStatus, extractNotionIds } from "../integrations/notion";
+import { markdownToNotionBlocks, type Annotations, type NotionBlock, type RichTextRun } from "../integrations/notion-blocks";
 import {
   alertsFromCaveats,
   factsSection,
@@ -195,85 +196,150 @@ function factsOf(surface: string, input: Input): Fact[] {
   return source ? [...facts, isLink(source) ? linkFact("Source", source) : ["Source", source]] : facts;
 }
 
-// ── The body: Markdown as rich text ─────────────────────────────────────────
+// ── The body: the Notion write's own blocks, as rich text ───────────────────
+//
+// The pop-up shows what Approve writes, so it draws from the same parse:
+// `markdownToNotionBlocks` reads the Markdown once, into the block tree the
+// create sends, and this walks that tree into Slack rich text. A second
+// Markdown reader here once drifted from the writer: it ignored indentation,
+// so a numbered item's own bullets sat level with it and every number read
+// "1.". Whatever depth the tree has, the pop-up draws: a child list is the next
+// `rich_text_list` with one more `indent`, and its parent list picks up after
+// it with an `offset`, so the numbers keep counting.
 
-type InlineElement =
-  | { type: "text"; text: string; style?: { bold?: boolean; italic?: boolean; code?: boolean } }
-  | { type: "link"; url: string; text: string };
+type Style = { bold?: boolean; italic?: boolean; strike?: boolean; code?: boolean };
+type InlineElement = { type: "text"; text: string; style?: Style } | { type: "link"; url: string; text: string; style?: Style };
+type Section = { type: "rich_text_section"; elements: InlineElement[] };
 
-/** `**bold**`, `` `code` ``, `_italic_` and `[label](url)`, as rich text
- *  styles and links; anything else as it is written. */
-const INLINE = /\*\*([^*]+)\*\*|`([^`]+)`|\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(?<![\w*])[_*]([^_*\n]+)[_*](?![\w*])/g;
+/** The deepest `indent` Slack takes on a list. */
+const MAX_INDENT = 8;
 
-function inlineOf(text: string): InlineElement[] {
-  const out: InlineElement[] = [];
-  let last = 0;
-  for (const m of text.matchAll(INLINE)) {
-    if (m.index > last) out.push({ type: "text", text: text.slice(last, m.index) });
-    if (m[1]) out.push({ type: "text", text: m[1], style: { bold: true } });
-    else if (m[2]) out.push({ type: "text", text: m[2], style: { code: true } });
-    else if (m[3] && m[4]) out.push({ type: "link", url: m[4], text: m[3] });
-    else if (m[5]) out.push({ type: "text", text: m[5], style: { italic: true } });
-    last = m.index + m[0].length;
-  }
-  if (last < text.length) out.push({ type: "text", text: text.slice(last) });
-  return out.filter((e) => e.text);
+/** A Notion run's annotations as a Slack style, `extra` laid over them. */
+function styleOf(annotations: Annotations = {}, extra: Style = {}): Style | undefined {
+  const style: Style = {
+    ...(annotations.bold ? { bold: true } : {}),
+    ...(annotations.italic ? { italic: true } : {}),
+    ...(annotations.strikethrough ? { strike: true } : {}),
+    ...(annotations.code ? { code: true } : {}),
+    ...extra,
+  };
+  return Object.keys(style).length ? style : undefined;
 }
 
-const sectionOf = (text: string) => ({ type: "rich_text_section", elements: inlineOf(clip(text, TEXT_CHARS)) });
-const boldLine = (text: string) => ({ type: "rich_text_section", elements: [{ type: "text", text: clip(text, TEXT_CHARS), style: { bold: true } }] });
-
-/** A list item: `- `, `* `, `• `, or `1. ` / `1) `. */
-const ITEM = /^\s*(?:([-*•])|(\d+)[.)])\s+(.*)$/;
-/** A Markdown heading or a task box, read as a plain line. */
-const HEADING = /^\s*#{1,6}\s+(.*)$/;
-const TASK = /^\[[ xX]\]\s+/;
-
-/**
- * A Markdown body as rich text elements: each run of list lines a rich text
- * list (bullet or ordered, as written), each heading a bold line, every other
- * run of lines a paragraph.
- */
-export function proseElements(markdown: string): unknown[] {
-  const out: unknown[] = [];
-  let paragraph: string[] = [];
-  let list: { style: "bullet" | "ordered"; items: string[] } | null = null;
-  const flushParagraph = () => {
-    if (paragraph.length) out.push(sectionOf(paragraph.join("\n")));
-    paragraph = [];
-  };
-  const flushList = () => {
-    if (list?.items.length) out.push({ type: "rich_text_list", style: list.style, elements: list.items.map(sectionOf) });
-    list = null;
-  };
-  for (const line of markdown.split("\n")) {
-    const item = ITEM.exec(line);
-    const heading = HEADING.exec(line);
-    if (item && item[3]!.trim()) {
-      flushParagraph();
-      const style = item[2] ? "ordered" : "bullet";
-      if (list && list.style !== style) flushList();
-      list ??= { style, items: [] };
-      list.items.push(item[3]!.trim().replace(TASK, ""));
-    } else if (heading) {
-      flushParagraph();
-      flushList();
-      out.push(boldLine(heading[1]!.trim()));
-    } else if (!line.trim()) {
-      flushParagraph();
-    } else {
-      flushList();
-      paragraph.push(line.trim());
-    }
+/** Notion runs as rich text elements, a link kept as a link, the whole held to
+ *  TEXT_CHARS. */
+function inlineOf(runs: readonly RichTextRun[] = [], extra: Style = {}): InlineElement[] {
+  const out: InlineElement[] = [];
+  let room = TEXT_CHARS;
+  for (const run of runs) {
+    if (room <= 0) break;
+    const text = clip(run.text.content, room);
+    room -= text.length;
+    if (!text) continue;
+    const style = styleOf(run.annotations, extra);
+    const url = run.text.link?.url;
+    out.push(url ? { type: "link", url, text, ...(style ? { style } : {}) } : { type: "text", text, ...(style ? { style } : {}) });
   }
-  flushParagraph();
-  flushList();
   return out;
 }
 
-/** One body section: its heading as a bold line, its words as rich text. */
-function bodyBlock(heading: string, markdown: string): unknown {
-  return { type: "rich_text", elements: [...(heading ? [boldLine(heading)] : []), ...proseElements(markdown)] };
+const sectionOf = (elements: InlineElement[]): Section => ({ type: "rich_text_section", elements });
+const boldLine = (text: string) => ({ type: "rich_text_section", elements: [{ type: "text", text: clip(text, TEXT_CHARS), style: { bold: true } }] });
+
+/** The list a Notion list item belongs to in Slack; a task is a bullet. */
+const LIST_STYLE: Record<string, "bullet" | "ordered"> = {
+  bulleted_list_item: "bullet",
+  numbered_list_item: "ordered",
+  to_do: "bullet",
+};
+
+type Payload = { rich_text?: RichTextRun[]; children?: NotionBlock[]; cells?: RichTextRun[][] };
+const payloadOf = (block: NotionBlock) => (block[block.type] ?? {}) as Payload;
+
+/** A table row's cells as one line, a dot between each. */
+function rowOf(row: NotionBlock, extra: Style = {}): Section {
+  const cells = (payloadOf(row).cells ?? []).map((cell) => inlineOf(cell, extra)).filter((c) => c.length);
+  return sectionOf(cells.flatMap((cell, n) => (n ? [{ type: "text", text: " · " } as InlineElement, ...cell] : cell)));
+}
+
+/**
+ * Notion blocks as rich text elements: each run of list items a rich text list
+ * (bullet or ordered, as Notion has it), an item's children the next list one
+ * `indent` deeper, each heading a bold line, a quote a quote, code
+ * preformatted, a table its header in bold over a bullet per row, and every
+ * paragraph a section. A divider draws nothing.
+ *
+ * @param blocks - What `markdownToNotionBlocks` built
+ * @param indent - How deep these blocks sit in a list
+ */
+function richTextOf(blocks: readonly NotionBlock[], indent = 0): unknown[] {
+  const out: unknown[] = [];
+  // The open list: its style, the items since a child list last broke it, and
+  // how many it drew before them, so an ordered list keeps counting.
+  let list: { style: "bullet" | "ordered"; items: Section[]; before: number } | null = null;
+  const flush = () => {
+    if (!list?.items.length) return;
+    const offset = list.style === "ordered" && list.before ? { offset: list.before } : {};
+    out.push({ type: "rich_text_list", style: list.style, ...(indent ? { indent } : {}), ...offset, elements: list.items });
+    list.before += list.items.length;
+    list.items = [];
+  };
+  const close = () => {
+    flush();
+    list = null;
+  };
+  for (const block of blocks) {
+    const { rich_text, children = [] } = payloadOf(block);
+    const style = LIST_STYLE[block.type];
+    if (style) {
+      if (list && list.style !== style) close();
+      list ??= { style, items: [], before: 0 };
+      const line = inlineOf(rich_text);
+      if (line.length) list.items.push(sectionOf(line));
+      if (children.length) {
+        flush();
+        out.push(...richTextOf(children, Math.min(indent + 1, MAX_INDENT)));
+      }
+      continue;
+    }
+    close();
+    if (block.type.startsWith("heading_")) {
+      const line = inlineOf(rich_text, { bold: true });
+      if (line.length) out.push(sectionOf(line));
+    } else if (block.type === "quote") {
+      const line = inlineOf(rich_text);
+      if (line.length) out.push({ type: "rich_text_quote", elements: line });
+    } else if (block.type === "code") {
+      const line = inlineOf(rich_text);
+      if (line.length) out.push({ type: "rich_text_preformatted", elements: line });
+    } else if (block.type === "table") {
+      const [header, ...rows] = children;
+      if (header) out.push(rowOf(header, { bold: true }));
+      const lines = rows.map((row) => rowOf(row)).filter((row) => row.elements.length);
+      if (lines.length) out.push({ type: "rich_text_list", style: "bullet", ...(indent ? { indent } : {}), elements: lines });
+    } else if (rich_text) {
+      const line = inlineOf(rich_text);
+      if (line.length) out.push(sectionOf(line));
+    }
+  }
+  close();
+  return out;
+}
+
+/**
+ * A Markdown body as rich text elements, read by the parse the Notion write
+ * uses, so the pop-up and the page agree on every list and its depth.
+ */
+export function proseElements(markdown: string): unknown[] {
+  return richTextOf(markdownToNotionBlocks(markdown));
+}
+
+/** One body section: its heading as a bold line, its words as rich text. A
+ *  section that draws nothing (a lone divider) is no block, since Slack
+ *  refuses a rich_text without elements. */
+function bodyBlock(heading: string, markdown: string): unknown[] {
+  const elements = [...(heading ? [boldLine(heading)] : []), ...proseElements(markdown)];
+  return elements.length ? [{ type: "rich_text", elements }] : [];
 }
 
 /** The body as the create writes it: each section, in the array's order, then
@@ -282,9 +348,9 @@ function bodyOf(input: Input): unknown[] {
   const sections = (Array.isArray(input.sections) ? input.sections : [])
     .map((s) => ({ heading: str(obj(s).heading), text: str(obj(s).body) }))
     .filter((s) => s.heading || s.text);
-  const blocks = sections.map((s) => bodyBlock(s.heading, s.text));
+  const blocks = sections.flatMap((s) => bodyBlock(s.heading, s.text));
   const criteria = Array.isArray(input.acceptance_criteria) ? input.acceptance_criteria.map(str).filter(Boolean) : [];
-  if (criteria.length) blocks.push(bodyBlock("Acceptance criteria", criteria.map((c) => `- ${c}`).join("\n")));
+  if (criteria.length) blocks.push(...bodyBlock("Acceptance criteria", criteria.map((c) => `- ${c}`).join("\n")));
   return blocks;
 }
 
