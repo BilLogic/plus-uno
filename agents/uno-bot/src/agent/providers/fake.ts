@@ -65,6 +65,13 @@ export interface FakeProviderOptions {
   /** When true, every `generate` reply reports it stopped at the output
    *  ceiling (`cutOff`), as an adapter does on a truncated one-shot. */
   generateCutOff?: boolean;
+  /** When set, only the first this-many `generate` replies report they were
+   *  cut off, and the rest answer whole: a model that fails on one try and
+   *  not the next. */
+  generateCutOffFirst?: number;
+  /** When set, every `generate` reply reports its thinking spent this many
+   *  tokens (`thinkingTokens`), as the Gemini adapter does. */
+  generateThinkingTokens?: number;
   /** When set, every `generate` waits for this before it answers — or until
    *  the prompt's `signal` aborts, which fails it as a transport abort does:
    *  how a test holds a one-shot mid-call and stops it. */
@@ -149,7 +156,8 @@ export function fakeProvider(opts: FakeProviderOptions = {}): FakeProvider {
         ok: true,
         model,
         text: generateReplies[generateCursor++] ?? "",
-        ...(opts.generateCutOff ? { cutOff: true } : {}),
+        ...(opts.generateCutOff || generateCursor <= (opts.generateCutOffFirst ?? 0) ? { cutOff: true } : {}),
+        ...(opts.generateThinkingTokens !== undefined ? { thinkingTokens: opts.generateThinkingTokens } : {}),
       };
     },
 
