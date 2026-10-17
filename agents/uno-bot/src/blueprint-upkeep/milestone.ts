@@ -106,19 +106,29 @@ function stepsToday(today: PathToday): string {
   return named.length > MAX_STEPS ? `${shown} → …and ${named.length - MAX_STEPS} more` : shown;
 }
 
+/** A drafted row as the comparison reads it: a removal when `kind` is
+ *  `deprecated`, else a cell the idea adds or changes. */
+type ComparedRow = Pick<DraftedChange, "step" | "lane" | "content"> & Partial<Pick<DraftedChange, "kind" | "inferred">>;
+
 /**
  * The comparison as a reply reads it. With the idea's drafted rows, one
- * short block per step either side has (§ B1): the step in bold, a "Today:"
- * line and a "Your idea:" line, each row's lane in code, "no such step" where
- * a side has none; touchpoint lanes are left out, and past `MAX_COMPARED_STEPS`
- * the rest are counted. Without them, today's steps and the idea's own words.
+ * short block per step those rows touch (§ B1): the step in bold, a "Today:"
+ * line and a "Your idea:" line, each row's lane in code. Only the touched
+ * steps, and in them only the touched lanes, because a step or lane listed
+ * with nothing beside it reads as one the idea removes; one closing line says
+ * the rest is unchanged. A removal is said only where the draft drew one, and
+ * never an inferred one, which the card asks about instead. Touchpoint rows
+ * are the card's: the closing line says so, and an idea whose rows are all
+ * touchpoints falls back to the reply without rows. Past `MAX_COMPARED_STEPS`
+ * the rest are counted. Without rows, today's steps and the idea's own words.
  *
  * @param today - The matched path
  * @param quote - The idea's sentence that shows the change
- * @param idea - The idea's drafted rows, when the offer drafted them
+ * @param idea - The idea's drafted rows, its removals among them, when the offer drafted them
  */
-export function comparisonText(today: PathToday, quote: string, idea?: ReadonlyArray<Pick<DraftedChange, "step" | "lane" | "content">>): string {
-  if (idea?.length) return stepComparison(today, idea);
+export function comparisonText(today: PathToday, quote: string, idea?: readonly ComparedRow[]): string {
+  const compared = idea?.length ? stepComparison(today, idea) : null;
+  if (compared) return compared;
   const place = `${today.scenario} › ${today.path}`;
   const named = today.link ? `[${place}](${today.link})` : place;
   return [
@@ -130,26 +140,44 @@ export function comparisonText(today: PathToday, quote: string, idea?: ReadonlyA
 
 /** Steps the inline comparison shows before it counts the rest. */
 const MAX_COMPARED_STEPS = 6;
-/** A lane whose rows the inline comparison leaves to the pop-up. */
+/** A lane whose rows the inline comparison leaves to the card. */
 const TOUCHPOINT_LANE = /touchpoint/i;
 
-function stepComparison(today: PathToday, idea: ReadonlyArray<Pick<DraftedChange, "step" | "lane" | "content">>): string {
+/** The step-by-step comparison; null when no step has a row it shows. */
+function stepComparison(today: PathToday, idea: readonly ComparedRow[]): string | null {
   const laneName = new Map(today.lanes.map((l) => [l.id, l.name]));
-  const said = (rows: ReadonlyArray<{ lane: string; content: string }>) =>
-    rows.filter((r) => !TOUCHPOINT_LANE.test(r.lane)).map((r) => `${r.content.replace(/\.$/, "")} (\`${r.lane.replace(/`/g, "'")}\`)`);
-  const steps = today.steps
-    .map((step) => {
-      const now = said(today.cells.filter((c) => c.stepId === step.id).map((c) => ({ lane: laneName.get(c.laneId) ?? "", content: c.content })));
-      const yours = said(idea.filter((r) => r.step === step.name));
-      return { name: step.name, now, yours };
-    })
-    .filter((s) => s.now.length || s.yours.length);
+  const inline = (lane: string) => !TOUCHPOINT_LANE.test(lane);
+  const code = (lane: string) => `\`${lane.replace(/`/g, "'")}\``;
+  const said = (r: { lane: string; content: string }) => `${r.content.replace(/\.$/, "")} (${code(r.lane)})`;
+  let leftAlone = false;
+  let touchpoints = false;
+  const steps = today.steps.flatMap((step) => {
+    const cells = today.cells
+      .filter((c) => c.stepId === step.id)
+      .map((c) => ({ lane: laneName.get(c.laneId) ?? "", content: c.content }));
+    const rows = idea.filter((r) => r.step === step.name && !r.inferred);
+    if (rows.some((r) => !inline(r.lane))) touchpoints = true;
+    const shown = rows.filter((r) => inline(r.lane));
+    const touched = new Set(shown.map((r) => r.lane));
+    const now = cells.filter((c) => inline(c.lane) && touched.has(c.lane));
+    if (cells.some((c) => inline(c.lane) && !touched.has(c.lane))) leftAlone = true;
+    if (!shown.length) return [];
+    const drops = shown.filter((r) => r.kind === "deprecated");
+    const yours = shown.filter((r) => r.kind !== "deprecated");
+    const gone = new Set(rows.filter((r) => r.kind === "deprecated").map((r) => r.lane));
+    const stepGoes = rows.every((r) => r.kind === "deprecated") && cells.every((c) => gone.has(c.lane));
+    const todaySays = now.length ? now.map(said).join("; ") : `nothing in ${[...touched].map(code).join(", ")}`;
+    const ideaSays = stepGoes ? "this step no longer happens" : [...yours.map(said), ...drops.map((r) => `no longer happens (${code(r.lane)})`)].join("; ");
+    return [[`**${step.name}**`, `- Today: ${todaySays}`, `- Your idea: ${ideaSays}`]];
+  });
+  if (!steps.length) return null;
   const scenario = today.link ? `[*${today.scenario}*](${today.link})` : `*${today.scenario}*`;
-  const lines = [`**Your idea changes how ${scenario} works today.** Today's path is *${today.path}*:`];
-  for (const s of steps.slice(0, MAX_COMPARED_STEPS)) {
-    lines.push("", `**${s.name}**`, `- Today: ${s.now.join("; ") || "no such step"}`, `- Your idea: ${s.yours.join("; ") || "no such step"}`);
-  }
+  const lines = [`**Your idea changes how ${scenario} works today.** On *${today.path}*:`];
+  for (const block of steps.slice(0, MAX_COMPARED_STEPS)) lines.push("", ...block);
   const more = steps.length - MAX_COMPARED_STEPS;
-  if (more > 0) lines.push("", `…and ${more} more ${more === 1 ? "step" : "steps"} on the blueprint.`);
+  if (more > 0) lines.push("", `…and ${more} more ${more === 1 ? "step" : "steps"}.`);
+  if (leftAlone && touchpoints) lines.push("", "Nothing else on the path changes; the touchpoint changes are on the card.");
+  else if (leftAlone) lines.push("", "Nothing else on the path changes.");
+  else if (touchpoints) lines.push("", "The touchpoint changes are on the card.");
   return lines.join("\n");
 }
