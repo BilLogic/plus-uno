@@ -77,6 +77,7 @@ export function figmaAskDelivery(opts: { teammate: boolean }): FigmaAskDelivery 
     beginProgress: quiet,
     endProgress: quiet,
     reopenCard: quiet,
+    closeCard: quiet,
     postInterim() {},
     // A failure is told in the reply the job posts, from the turn's outcome:
     // only whether it was capacity is kept, so the reply can say so plainly.

@@ -70,16 +70,16 @@ import type { FooterKind } from "./footer-kind";
 import type { AnswerFeedback } from "./feedback";
 import { SLACK_TS, turnIdOf } from "../usage/record";
 import type { SlackMessageMetadata } from "./api";
-import { notedCardBlocks, proposalCardBlocks, renderProposalCard } from "./proposal-render";
+import { decidedCard, notedCardBlocks, proposalCardBlocks, renderProposalCard } from "./proposal-render";
 import { toPlainText } from "./mrkdwn";
-import { cardStaysLive, renderCardNote, renderGateNote } from "./gate-note";
+import { cardStaysLive, decidedCardLine, renderCardNote, renderGateNote } from "./gate-note";
 import { whichCardMessage } from "./which-card";
 import { checkOfferMessage } from "./blueprint-check";
 import { planBlock } from "./plan-block";
 import { retryValue } from "./try-again";
 import type { Presentation, Delivery, DeliveryFailureStage, PostResult, ProposalCard, StagingNote } from "../turn/index";
-import { isSubrequestBudgetError, subrequestsUsed } from "../net";
-import { SUBREQUEST_CAP } from "../agent/loop-policy";
+import { budgetHeadroom, isSubrequestBudgetError, subrequestsUsed } from "../net";
+import { CLOSE_CARD_HEADROOM, SUBREQUEST_CAP } from "../agent/loop-policy";
 import { taskCardFor } from "../agent/tool-table";
 import { readoutFor, type TaskCardDecision } from "../agent/task-card-readout";
 import { threadVisibleSources, type CardSource } from "./card-sources";
@@ -1145,6 +1145,24 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
         .updateMessage({ channel, ts: card.ts, text: card.text, blocks: card.blocks ?? proposalCardBlocks(card.text) })
         .catch(() => ({ ok: false }));
       if (!updated.ok) console.warn(`[slack] card ${channel}/${card.ts} could not be reopened`);
+    },
+
+    // A card decided from anywhere but its own buttons ends as a press leaves
+    // it: the outcome as its last line, onto its own blocks, and View. An edit
+    // Slack refuses costs only the edit — the thread already has the verdict.
+    // It is the one cosmetic call in the delivery reserve, so it goes only
+    // when the turn's settle still fits after it: a turn near the cap keeps
+    // its clear, and the card keeps Review rather than the thread its 👀.
+    async closeCard(card, outcome) {
+      if (budgetHeadroom().subrequests < CLOSE_CARD_HEADROOM) {
+        console.warn(`[slack] decided card ${channel}/${card.ts} left as it was: no headroom for the edit and the settle`);
+        return;
+      }
+      const message = decidedCard({ proposalText: card.text, ...(card.blocks ? { proposalBlocks: card.blocks } : {}) }, decidedCardLine(outcome));
+      const updated = await slack
+        .updateMessage({ channel, ts: card.ts, text: message.text, blocks: message.blocks })
+        .catch(() => ({ ok: false }));
+      if (!updated.ok) console.warn(`[slack] decided card ${channel}/${card.ts} could not be closed`);
     },
 
     async card(card: ProposalCard, lead?: StagingNote): Promise<PostResult> {

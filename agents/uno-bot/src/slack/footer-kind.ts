@@ -18,7 +18,7 @@
 export type FooterKind = "full" | "draft" | "none";
 
 /** Below this, with no links and no structure, a reply is an acknowledgment:
- *  "Got it", "Cancelled", "Noted — thanks". There is nothing in it to check. */
+ *  "Got it", "Canceled", "Noted — thanks". There is nothing in it to check. */
 const ACK_MAX_CHARS = 220;
 
 /**

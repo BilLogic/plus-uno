@@ -561,11 +561,12 @@ export const DRAFT_NOT_KEPT = "The draft behind this card is no longer kept, so 
 const EMOJI_OUTCOME = /^:(white_check_mark|no_entry|warning):\s*/;
 
 /** An outcome line's level, from its words: "Approved by", "Answered by",
- *  "Rejected by", "Cancelled by", or a stated card's ⛔ phrase ending
+ *  "Rejected by", "Canceled by", or a stated card's ⛔ phrase ending
  *  ", decided by <@U>." (`statedCancelledNote`). */
 function outcomeLevelOf(words: string): DraftAlert["level"] | null {
   if (/^(Approved|Answered) by /.test(words)) return "success";
-  if (/^(Rejected|Cancelled)\b/.test(words)) return "default";
+  // Either spelling: a card decided before "Canceled" still says "Cancelled".
+  if (/^(Rejected|Cancell?ed)\b/.test(words)) return "default";
   const stated = /, decided by <@([^>]+)>\.$/.exec(words);
   return stated && SLACK_USER_ID.test(stated[1]!) ? "default" : null;
 }

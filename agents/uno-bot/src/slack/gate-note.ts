@@ -40,7 +40,7 @@
 //
 // Import-free and Env-free: it renders and posts nothing.
 
-import type { GateNote } from "../turn/index";
+import type { CardOutcome, GateNote } from "../turn/index";
 import type { StatedCardWords } from "../thread-state/index";
 import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
 
@@ -87,9 +87,26 @@ export function statedCancelledNote(words: Pick<StatedCardWords, "cancelled">, u
   return `${words.cancelled}${SLACK_USER_ID.test(userId) ? `, decided by <@${userId}>` : ""}.`;
 }
 
+/**
+ * A decided card's last line, where its buttons were: who approved it, or who
+ * canceled it and how to have it staged again — a stated card in its own
+ * words, the pop-up's Reject with its reason. One line whatever the door, so
+ * a card decided by a press reads the same as one decided by a reaction or in
+ * words (`Delivery.closeCard`).
+ */
+export function decidedCardLine(outcome: CardOutcome): string {
+  const by = outcome.by ? ` by <@${outcome.by}>` : "";
+  if (outcome.decision === "confirm") return `Approved${by}`;
+  if (outcome.cancelled) return statedCancelledNote({ cancelled: outcome.cancelled }, outcome.by ?? "");
+  if (outcome.rejected) {
+    return `Rejected${by}${outcome.rejected.reason ? `: ${escapeSlackText(outcome.rejected.reason)}` : ""}`;
+  }
+  return `Canceled${by} — tell me what to change and I'll stage it again.`;
+}
+
 /** The default narrative, when the winning signal brought no words of its own. */
 export function defaultNarrative(decision: "confirm" | "cancel"): string {
-  return decision === "confirm" ? "Got it — kicking that off." : "Cancelled.";
+  return decision === "confirm" ? "Got it — kicking that off." : "Canceled.";
 }
 
 /** The pop-up's Reject, and the reason given with it: the person's own words,
