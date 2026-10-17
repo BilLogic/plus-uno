@@ -135,7 +135,7 @@ function refuseBlocks(list: SlackRefusal[], call: string, blocks: readonly unkno
 export type ViewCall =
   | { kind: "open"; triggerId: string; view: unknown }
   | { kind: "push"; triggerId: string; view: unknown }
-  | { kind: "update"; viewId: string; view: unknown };
+  | { kind: "update"; viewId: string; view: unknown; hash?: string; conflict?: true };
 
 export interface RecordingViews {
   client: ReviewViews;
@@ -155,10 +155,12 @@ export interface RecordingViews {
  * (`push_limit_reached`), and with nothing open there is nothing to push over.
  *
  * @param opts.openFails - Refuse every open, as an expired trigger is refused
+ * @param opts.hash - The open view's hash as Slack holds it now: an update
+ *   carrying another is a `hash_conflict`
  * @param opts.alreadyOpen - Views open before the test began: the pop-up a
  *   decision is pressed in
  */
-export function recordingViews(opts: { openFails?: boolean; alreadyOpen?: string[] } = {}): RecordingViews {
+export function recordingViews(opts: { openFails?: boolean; alreadyOpen?: string[]; hash?: () => string } = {}): RecordingViews {
   const calls: ViewCall[] = [];
   const refused: SlackRefusal[] = [];
   const opened = new Set<string>(opts.alreadyOpen ?? []);
@@ -197,8 +199,14 @@ export function recordingViews(opts: { openFails?: boolean; alreadyOpen?: string
       opened.add(id);
       return id;
     },
-    async update(viewId, view) {
-      calls.push({ kind: "update", viewId, view });
+    async update(viewId, view, hash) {
+      // A view changed since the press that carries `hash`: Slack answers
+      // `hash_conflict`, and the caller drops the update.
+      if (hash !== undefined && opts.hash && hash !== opts.hash()) {
+        calls.push({ kind: "update", viewId, view, hash, conflict: true });
+        return false;
+      }
+      calls.push({ kind: "update", viewId, view, ...(hash !== undefined ? { hash } : {}) });
       const why = viewRefusal(view);
       if (why) {
         refuse(refused, `views.update with ${why}`, "invalid_arguments");

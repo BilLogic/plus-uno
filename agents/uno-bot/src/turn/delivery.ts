@@ -366,7 +366,7 @@ export type GateNote =
    *  emoji typed in a thread holding more than one live card, or outside any
    *  card's thread in a DM holding several, or the model's
    *  `proposal_resolve` that never said which. Resolve none of them, and ask
-   *  "Approve which one?" (or "Cancel which one?") with one button per card:
+   *  which, with one Choose… button that opens a pop-up of the cards:
    *  `cards` is each card's ts and headline, newest first. */
   | { kind: "which-card"; decision: "confirm" | "cancel"; cards: WhichCard[] }
   /** A turn staged a REVISION: the card that follows replaces the waiting
@@ -409,12 +409,14 @@ export type GateNote =
       mention?: string;
     };
 
-/** The most cards one "which one?" question lists: Slack's limit on an
- *  actions row, 25 elements, one button per card. */
-export const MAX_WHICH_CARDS = 25;
+/** The most cards one "which one?" question lists: Slack's limit on radio
+ *  buttons and checkboxes, 10 options, since its pop-up offers each card as
+ *  one (`slack/which-card-view.ts`). */
+export const MAX_WHICH_CARDS = 10;
 
-/** One card a "which one?" question offers: its ts, which its button
- *  carries, and its headline, which the button reads (`agent/card-identity.ts`). */
+/** One card a "which one?" question offers: its ts, which its Choose…
+ *  button carries, and its headline, which its pop-up names it by
+ *  (`agent/card-identity.ts`). */
 export interface WhichCard {
   ts: string;
   headline: string;
@@ -606,13 +608,13 @@ export interface Delivery {
   closeCard(card: NoteCard, outcome: CardOutcome): Promise<void>;
 
   /**
-   * Redraw an open "Approve which one?" question as it now stands
-   * (`ThreadState.decideInWhichQuestion`): each decided card's line marked
-   * and its button gone, the numbers unchanged, and no buttons at all once
-   * every card is decided. For every door that decides a listed card, after
-   * the card is closed, so the question stops offering a decision already
-   * made; a press on the question itself redraws it where it was pressed
-   * instead. Posts nothing; best-effort.
+   * Redraw an open "which one?" question as it now stands
+   * (`ThreadState.decideInWhichQuestion`): each decided card's headline
+   * struck under the count still waiting, and no Choose… once every card is
+   * decided. For every door that decides a listed card, after the card is
+   * closed, so the question stops offering a decision already made; a Submit
+   * from the question's own pop-up redraws it there instead. Posts nothing;
+   * best-effort.
    */
   redrawWhichCard(question: WhichQuestion): Promise<void>;
 

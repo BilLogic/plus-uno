@@ -967,8 +967,8 @@ function pickCard(
  * naming one (`AgentResult` `text` with `askWhich`).
  */
 export function whichCardNote(decision: Decision, cards: readonly PendingProposal[]): GateNote {
-  // No more than one actions row holds: the question, its record and its
-  // buttons all list the same cards.
+  // No more than its pop-up's one list holds: the question, its record and
+  // its pop-up all list the same cards.
   return {
     kind: "which-card",
     decision,

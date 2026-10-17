@@ -88,8 +88,10 @@ export interface ReviewViews {
   /** `views.push` over the view a click came from: the pushed view's id, or
    *  null when Slack refused. */
   push(triggerId: string, view: Record<string, unknown>): Promise<string | null>;
-  /** `views.update` on a view already open: whether Slack took it. */
-  update(viewId: string, view: Record<string, unknown>): Promise<boolean>;
+  /** `views.update` on a view already open: whether Slack took it. With
+   *  `hash`, the view as the press found it: Slack refuses the update
+   *  (`hash_conflict`) when the view has changed since. */
+  update(viewId: string, view: Record<string, unknown>, hash?: string): Promise<boolean>;
 }
 
 export interface ReviewDoorDeps {

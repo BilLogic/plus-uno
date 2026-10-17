@@ -379,7 +379,7 @@ export class ThreadState extends DurableObject<Env> {
         if (now - rec.at > CHECK_OFFER_KEEP_MS) await txn.delete(key);
         else remaining++;
       }
-      // A question lapses with its buttons, on the card rule from its own ts,
+      // A question lapses with its Choose…, on the card rule from its own ts,
       // and a card's pointer with the question it names.
       const questions = await txn.list<WhichQuestionRecord>({ prefix: "whq:" });
       for (const [key, rec] of questions) {
