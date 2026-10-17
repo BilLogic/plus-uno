@@ -4,19 +4,29 @@
 // or a "yes" the model could not tie to one card, resolves nothing: Gate
 // answers with a `which-card` note (`gate/gate.ts` § `whichCardNote`) and this
 // file is where it becomes a message — one short line, "2 cards are waiting,
-// nothing ran yet.", and one Choose… button that opens a pop-up
+// nothing ran yet." (and, asked by an approval, "Approve from a card's
+// Review."), and one Choose… button that opens a pop-up
 // (`which-card-view.ts`). It replaced a row of numbered buttons, one per card
 // (#1319): the headlines had to be listed above them for "Approve 2" to mean
 // anything, and a draft could only be read on its own card.
 //
-// THE POP-UP DECIDES EACH CARD THROUGH THAT CARD'S OWN DOOR. Approve picks one
-// card and Cancel ticks several; Submit hands each one to the Gate as a press
-// on that card would (`button-door.ts`): the claim, the confirmer set, the
-// pointer rule, the card edited to its outcome. A Cancel with a note goes as
-// the Review pop-up's Reject, its reason said on the card. So each pick acts
-// only on its own card, the cards left unpicked stay live, and a card decided
-// elsewhere while the pop-up was open loses its claim and is named in the
-// pop-up's answer instead of being decided twice.
+// THE POP-UP ONLY CANCELS. It ticks the cards to cancel, and an approval is
+// made from the card's own Review, which the question says when a ✅ or a
+// "yes" asked it. Nothing on this path asks the Gate to approve: every card a
+// Submit decides goes as a cancel, whatever the question was asked with, and
+// the Submit is read from the checkboxes in the view's state alone
+// (`which-card-view.ts` § `whichSubmitOf`), never from its metadata. A
+// pop-up that once offered Approve kept its choice there, and on a phone the
+// switch to Cancel never arrived: the card ticked to cancel was approved.
+//
+// THE POP-UP DECIDES EACH CARD THROUGH THAT CARD'S OWN DOOR. Submit hands
+// each ticked card to the Gate as a ⛔ press on that card would
+// (`button-door.ts`): the claim, the confirmer set, the pointer rule, the
+// card edited to its outcome. A cancel with a note goes as the Review
+// pop-up's Reject, its reason said on the card. So each tick acts only on its
+// own card, the cards left unticked stay live, and a card decided elsewhere
+// while the pop-up was open loses its claim and is named in the pop-up's
+// answer instead of being decided twice.
 //
 // THE QUESTION LAPSES ON THE CARD RULE. Choose… stops working `cardExpiresAt`
 // after the question was asked — 24 weekday hours (`card-expiry.ts`) — counted
@@ -42,13 +52,13 @@
 // land out of order and show one decided card too few until the next
 // decision. Neither costs a wrong decision.
 //
-// A CANCEL SAYS ONE LINE. A press posts its outcome in the thread; a Cancel of
-// several from here would post one bare "Canceled." per card, naming none. So
-// a Cancel's cards post nothing each (`ButtonRequest.quiet`), and the Submit
-// posts one line naming the cards it canceled (`canceledLine`) — none for a
-// card refused, decided elsewhere or past the budget. An Approve is one card,
-// and keeps its press's own post. A stated card canceled here is named in that
-// one line like any other; its stated words stay on the card.
+// A CANCEL SAYS ONE LINE. A press posts its outcome in the thread; a cancel
+// of several from here would post one bare "Canceled." per card, naming
+// none. So the cards post nothing each (`ButtonRequest.quiet`), and the
+// Submit posts one line naming the cards it canceled (`canceledLine`) — none
+// for a card refused, decided elsewhere or past the budget. A stated card
+// canceled here is named in that one line like any other; its stated words
+// stay on the card.
 //
 // A CANCEL OF SEVERAL IS HELD TO THE BUDGET. Each card a Submit decides edits
 // its card and its record, as a press would, so a Submit checks the
@@ -60,7 +70,7 @@
 
 import { MAX_WHICH_CARDS, type Delivery, type GateNote } from "../turn/index";
 import { cardExpiresAt } from "../card-expiry";
-import { renderGateNote, whichCardQuestion } from "./gate-note";
+import { WHICH_APPROVE_HINT, renderGateNote, whichCardQuestion } from "./gate-note";
 import { escapeSlackText } from "./mrkdwn";
 import { isDeadlineBlock } from "./card-deadline";
 import { applyPressVerdict, type ButtonDoorTarget } from "./button-door";
@@ -82,7 +92,9 @@ import {
 } from "./which-card-view";
 
 type WhichNote = Extract<GateNote, { kind: "which-card" }>;
-type Decision = WhichNote["decision"];
+
+/** The one decision this pop-up makes. */
+const CANCEL = "cancel" as const;
 
 /** The question's one button: Choose…, which opens the pop-up. */
 export const WHICH_CHOOSE_ACTION_ID = "uno_which_choose";
@@ -132,14 +144,15 @@ export function whichCardMessage(note: WhichNote, decided: readonly string[] = [
   const struck = cards
     .filter((card) => decided.includes(card.ts))
     .map((card) => `~${escapeSlackText(card.headline.trim()).replaceAll("~", "\u223C")}~`);
-  const lead = !decided.length ? whichCardQuestion(note) : open ? `${open === 1 ? "1 card is" : `${open} cards are`} still waiting.` : "";
+  const still = `${open === 1 ? "1 card is" : `${open} cards are`} still waiting.`;
+  const lead = !decided.length ? whichCardQuestion(note) : open ? (note.decision === "confirm" ? `${still} ${WHICH_APPROVE_HINT}` : still) : "";
   const text = [lead, ...struck].filter(Boolean).join("\n");
   return {
     text: renderGateNote(note),
     blocks: [
       { type: "section", text: { type: "mrkdwn", text } },
       open
-        ? { type: "actions", elements: [chooseButton(note.decision, cards.map((card) => card.ts))] }
+        ? { type: "actions", elements: [chooseButton(cards.map((card) => card.ts))] }
         : { type: "context", elements: [{ type: "mrkdwn", text: DECIDED }] },
     ],
   };
@@ -150,24 +163,26 @@ export function keptQuestionMessage(question: WhichQuestion): CardMessage {
   return whichCardMessage({ kind: "which-card", decision: question.decision, cards: question.cards }, question.decided);
 }
 
-/** Choose…: its value is the decision and every card the question lists, in
- *  its order — ten ts at most, well inside a value's 2,000 characters. */
-function chooseButton(decision: Decision, cards: readonly string[]): Record<string, unknown> {
+/** Choose…: its value is every card the question lists, in its order — ten
+ *  ts at most, well inside a value's 2,000 characters — after `cancel:`, the
+ *  one thing its pop-up does. */
+function chooseButton(cards: readonly string[]): Record<string, unknown> {
   return {
     type: "button",
     action_id: WHICH_CHOOSE_ACTION_ID,
     text: { type: "plain_text", text: "Choose…", emoji: true },
-    value: `${decision}:${cards.join(",")}`,
+    value: `cancel:${cards.join(",")}`,
   };
 }
 
-/** Choose…'s value back as the decision and the cards' ts; null for anything
- *  else. */
-export function chooseValueOf(value: string | undefined): { decision: Decision; cards: string[] } | null {
-  const m = /^(confirm|cancel):(.+)$/.exec(value ?? "");
+/** Choose…'s value back as the cards' ts; null for anything else. A question
+ *  posted while the pop-up also approved carries `confirm:` instead, and its
+ *  pop-up only cancels too: the prefix is never read as a decision. */
+export function chooseValueOf(value: string | undefined): { cards: string[] } | null {
+  const m = /^(?:confirm|cancel):(.+)$/.exec(value ?? "");
   if (!m) return null;
-  const cards = m[2]!.split(",").filter(Boolean);
-  return cards.length ? { decision: m[1] as Decision, cards } : null;
+  const cards = m[1]!.split(",").filter(Boolean);
+  return cards.length ? { cards } : null;
 }
 
 // ── The doors ───────────────────────────────────────────────────────────────
@@ -215,7 +230,7 @@ export interface WhichOpenRequest {
  * Choose…, pressed: past the question's deadline the presser is told and the
  * question loses its button; otherwise a loading view opens at once, inside
  * the trigger's three seconds, and is filled with the cards still waiting,
- * the decision preset from the one that asked.
+ * to tick for a cancel, whatever decision asked the question.
  */
 export async function runWhichOpen(request: WhichOpenRequest, deps: WhichDoorDeps): Promise<void> {
   const asked = chooseValueOf(request.value);
@@ -226,7 +241,7 @@ export async function runWhichOpen(request: WhichOpenRequest, deps: WhichDoorDep
     await deps.editQuestion(withoutChoose(request.question, "Expired."));
     return;
   }
-  const loading: WhichPopup = { channel: request.channel, questionTs: request.questionTs, decision: asked.decision, cards: [] };
+  const loading: WhichPopup = { channel: request.channel, questionTs: request.questionTs, cards: [] };
   const viewId = await deps.views.open(request.triggerId, whichLoadingView(loading));
   if (!viewId) {
     console.warn(`[which-card] views.open refused for ${request.channel}/${request.questionTs}`);
@@ -246,12 +261,13 @@ export async function runWhichOpen(request: WhichOpenRequest, deps: WhichDoorDep
 
 /** A press inside the pop-up that redraws it. */
 export type WhichRedraw =
-  /** Approve or Cancel, switched at the top. */
-  | { kind: "decision"; decision: Decision }
   /** A card chosen under "Show a draft…": its draft opens below. */
   | { kind: "draft"; cardTs: string }
   /** Hide draft, after the open draft. */
-  | { kind: "hide" };
+  | { kind: "hide" }
+  /** The Approve / Cancel switch on a view drawn before the pop-up only
+   *  canceled: the view redrawn as it is now, without it. */
+  | { kind: "redraw" };
 
 export interface WhichRedrawRequest {
   viewId: string;
@@ -269,11 +285,9 @@ export interface WhichRedrawRequest {
 }
 
 /**
- * A switch of the decision, a draft chosen, or Hide draft pressed: the pop-up
- * redrawn from the cards still waiting, read now, with what was picked and
- * typed set back in its inputs. A switch to Approve keeps the first card that
- * was ticked; a switch to Cancel ticks the one that was picked. Past the
- * question's deadline the pop-up says so instead.
+ * A draft chosen, or Hide draft pressed: the pop-up redrawn from the cards
+ * still waiting, read now, with what was ticked and typed set back in its
+ * inputs. Past the question's deadline the pop-up says so instead.
  */
 export async function runWhichRedraw(request: WhichRedrawRequest, deps: WhichDoorDeps): Promise<void> {
   const { popup, press } = request;
@@ -283,18 +297,16 @@ export async function runWhichRedraw(request: WhichRedrawRequest, deps: WhichDoo
     await show(whichNoticeView(popup, WHICH_EXPIRED_REPLY));
     return;
   }
-  const pick = whichPickOf(request.state, popup.decision, popup.note);
-  const decision = press.kind === "decision" ? press.decision : popup.decision;
+  const pick = whichPickOf(request.state);
   const shown = press.kind === "draft" ? press.cardTs : press.kind === "hide" ? undefined : popup.shown;
-  const { shown: _was, note: _note, ...rest } = popup;
-  const next: WhichPopup = { ...rest, decision, ...(shown ? { shown } : {}) };
+  const { shown: _was, ...rest } = popup;
+  const next: WhichPopup = { ...rest, ...(shown ? { shown } : {}) };
   const waiting = await waitingCards(popup.cards.map((card) => card.ts), popup.channel, deps);
   if (!waiting.length) {
     await show(whichNoticeView(next, NOTHING_WAITING));
     return;
   }
-  const picked = decision === "confirm" ? pick.picked.slice(0, 1) : pick.picked;
-  await show(whichView(next, waiting, { picked, note: pick.note }, databasesOf(deps)));
+  await show(whichView(next, waiting, pick, databasesOf(deps)));
 }
 
 /** A Submit from the pop-up, as the ack read it. */
@@ -318,21 +330,17 @@ export function canceledLine(headlines: readonly string[]): string {
   return `Canceled ${names.length ? `${names.join(", ")} and ${last}` : last}.`;
 }
 
-/** What each decision is said as in the pop-up's answer. */
-const DONE: Readonly<Record<Decision, string>> = { confirm: "Approved", cancel: "Canceled" };
-
-/** The subrequests one card's decision spends, as a press does: its note in
- *  the thread (an Approve's; a Cancel's cards post none), the working signal
- *  raised and settled, its card edited, the decision's record, and its mark
- *  on this question — with room to spare. And what the Submit spends after
- *  the last card: a Cancel's one line in the thread, the pop-up's answer and
+/** The subrequests one card's cancel spends, as a press does: the working
+ *  signal raised and settled, its card edited, the decision's record, and its
+ *  mark on this question — with room to spare. And what the Submit spends
+ *  after the last card: the one line in the thread, the pop-up's answer and
  *  the question redrawn. */
 const PER_CARD_SUBREQUESTS = 10;
 const FINISH_SUBREQUESTS = 3;
 
 /**
- * A Submit, decided: each picked card in turn, through the Gate as a press
- * on that card (`applyPressVerdict`), and then the question redrawn from its
+ * A Submit, decided: each ticked card in turn canceled, through the Gate as a
+ * ⛔ press on that card (`applyPressVerdict`), and then the question redrawn from its
  * record and the pop-up answered with one line per card.
  *
  * Past the question's deadline nothing is resolved: the pop-up says so, and
@@ -369,19 +377,21 @@ export async function runWhichSubmit(request: WhichSubmitRequest, deps: WhichDoo
     }
     lines.push(`${headline}: ${decided.line}`);
   }
-  console.log(`[which-card] ${popup.decision} on ${where} by=${request.userId} cards=${pick.picked.length} canceled=${canceled.length}`);
-  // A Cancel's cards posted no note each (`ButtonRequest.quiet`): the thread
-  // hears one line naming the ones it canceled, and none if it canceled none.
+  console.log(`[which-card] cancel on ${where} by=${request.userId} cards=${pick.picked.length} canceled=${canceled.length}`);
+  // The cards posted no note each (`ButtonRequest.quiet`): the thread hears
+  // one line naming the ones it canceled, and none if it canceled none.
   if (thread) await deps.delivery(thread).postNote(canceledLine(canceled));
   if (kept) await deps.editQuestion(keptQuestionMessage(kept));
   await deps.views.update(request.viewId, whichResultView(popup, lines));
 }
 
 /**
- * One picked card, decided as a press on it would be: the claim, and on a
- * win the press's own path (`applyPressVerdict`) — the note in the thread,
- * the run, the card edited. A non-win is answered in the pop-up, as the
- * Review pop-up answers one, never edited onto the card.
+ * One ticked card, canceled as a ⛔ press on it would be: the claim, and on a
+ * win the press's own path (`applyPressVerdict`) — the card edited to its
+ * outcome. A non-win is answered in the pop-up, as the Review pop-up answers
+ * one, never edited onto the card. The decision is the constant `CANCEL`,
+ * and a verdict that comes back as anything but a cancel is refused before
+ * the press path sees it, so no Submit can reach a run.
  */
 async function decideOne(
   cardTs: string,
@@ -389,24 +399,26 @@ async function decideOne(
   deps: WhichDoorDeps,
 ): Promise<{ line: string; question: WhichQuestion | null; canceledIn?: ButtonDoorTarget }> {
   const { popup, pick, userId } = request;
-  const decision = popup.decision;
-  // A Cancel with a note is the Review pop-up's Reject: the note is its reason,
-  // said on the card. Without one, it is the card's ⛔, pressed.
-  const signal: GateSignal =
-    decision === "cancel" && pick.note
-      ? { kind: "review", messageTs: cardTs, decision, note: pick.note, userId }
-      : { kind: "button", messageTs: cardTs, decision, userId };
+  const decision = CANCEL;
+  // A cancel with a note is the Review pop-up's Reject: the note is its
+  // reason, said on the card. Without one, it is the card's ⛔, pressed.
+  const signal: GateSignal = pick.note
+    ? { kind: "review", messageTs: cardTs, decision, note: pick.note, userId }
+    : { kind: "button", messageTs: cardTs, decision, userId };
   const verdict = await resolveSignal(signal, { threadState: deps.threadState, standingConfirmers: deps.standingConfirmers });
-  console.log(`[which-card] ${decision} on ${popup.channel}/${cardTs} by=${userId} outcome=${verdict.outcome}`);
+  console.log(`[which-card] cancel on ${popup.channel}/${cardTs} by=${userId} outcome=${verdict.outcome}`);
+  if (verdict.decision !== undefined && verdict.decision !== CANCEL) {
+    console.error(`[which-card] ${popup.channel}/${cardTs} came back as ${verdict.decision}, not a cancel: refused`);
+    return { line: "Nothing ran. Use its card's Review.", question: null };
+  }
   if (verdict.outcome !== "won" && verdict.post && verdict.post.note.kind !== "cut-off") {
     return { line: renderGateNote(verdict.post.note), question: await markHere(cardTs, popup, deps) };
   }
   let said = "";
-  // A Cancel's win posts no note of its own: the Submit says one line for
-  // every card it canceled. An Approve is one card, and keeps its post.
-  const quiet = decision === "cancel";
+  // A win posts no note of its own: the Submit says one line for every card
+  // it canceled.
   const question = await applyPressVerdict(
-    { channel: popup.channel, messageTs: cardTs, decision, userId, fromQuestion: popup.questionTs, ...(quiet ? { quiet } : {}) },
+    { channel: popup.channel, messageTs: cardTs, decision, userId, fromQuestion: popup.questionTs, quiet: true },
     verdict,
     {
       delivery: deps.delivery,
@@ -423,10 +435,10 @@ async function decideOne(
     const marked = question ?? (await markHere(cardTs, popup, deps));
     const { proposal, post } = verdict;
     const canceledIn =
-      quiet && proposal && post?.note.kind === "resolved"
+      proposal && post?.note.kind === "resolved"
         ? { channel: proposal.channel, replyTs: post.replyTs, userMsgTs: proposal.userMsgTs, userId }
         : undefined;
-    return { line: `${DONE[decision]}.`, question: marked, ...(canceledIn ? { canceledIn } : {}) };
+    return { line: "Canceled.", question: marked, ...(canceledIn ? { canceledIn } : {}) };
   }
   return { line: said || (verdict.post ? renderGateNote(verdict.post.note) : "Nothing changed."), question: question ?? (await markHere(cardTs, popup, deps)) };
 }

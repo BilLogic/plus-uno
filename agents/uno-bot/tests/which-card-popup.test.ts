@@ -2,12 +2,12 @@
 //
 // A decision that named no card, with several waiting, is answered with one
 // short line and one Choose… button (`tests/which-card-turn.test.ts` drives
-// the asking). The pop-up presets Approve or Cancel from the decision that
-// asked; Approve picks one card (radio buttons), Cancel ticks several
-// (checkboxes); each card's draft opens under its row on Show draft; and
-// Submit decides each picked card through the same door as its own button,
-// leaving the others live. The question lapses on the card rule, 24 weekday
-// hours after it was asked.
+// the asking). The pop-up only cancels, whatever asked: the waiting cards as
+// checkboxes, each card's draft under "Show a draft…", and Submit cancels the
+// ticked cards through the same door as each card's own ⛔, leaving the
+// others live. An approval is made from the card's own Review, which the
+// question says when an approval asked it. The question lapses on the card
+// rule, 24 weekday hours after it was asked.
 //
 // Cards are staged by real turns on the in-memory store; the doors run on the
 // recording Delivery and a views client that refuses what Slack refuses.
@@ -31,7 +31,9 @@ import {
   type WhichDoorDeps,
   type WhichRedraw,
 } from "../src/slack/which-card";
-import { DRAFT_LEFT_OUT, WHICH_CALLBACK_ID, whichPopupOf, whichSubmitOf } from "../src/slack/which-card-view";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { DRAFT_LEFT_OUT, REOPEN, TICK_ONE, WHICH_CALLBACK_ID, WHICH_LEAD, whichPopupOf, whichSubmitOf } from "../src/slack/which-card-view";
 import { draftBlocks } from "../src/slack/review-view";
 import { cardExpiresAt } from "../src/card-expiry";
 import type { ScriptedReply } from "../src/agent/providers/fake";
@@ -125,19 +127,14 @@ const draftSelects = (view: View) =>
   view.blocks.flatMap((b, at) => (b.type === "input" && b.element?.action_id === "uno_which_draft" ? [{ at, select: b.element as unknown as Select }] : []));
 /** Where Hide draft sits, or -1. */
 const hideAt = (view: View) => view.blocks.findIndex((b) => b.type === "actions" && b.elements?.[0]?.action_id === "uno_which_hide");
-const decisionOf = (view: View) =>
-  (view.blocks.find((x) => x.type === "input" && x.element?.action_id === "uno_which_decision")!.element as { initial_option: { value: string }; options: Array<Record<string, unknown>> });
 const noteOf = (view: View) => view.blocks.find((x) => x.block_id === "uno_which_note");
 const optionsOf = (view: View) => ((listOf(view).element!.options as Array<{ value: string; text: { text: string }; description: { text: string } }>));
 
-/** A view state as Slack sends it: the list's pick and the note. */
+/** A view state as Slack sends it: the list's ticks and the note. */
 function stateOf(view: View, picked: string[], note = "") {
   const list = listOf(view);
   const element = list.element!;
-  const value =
-    element.type === "radio_buttons"
-      ? { selected_option: picked[0] ? { value: picked[0] } : null }
-      : { selected_options: picked.map((value) => ({ value })) };
+  const value = { type: "checkboxes", selected_options: picked.map((value) => ({ value })) };
   const typed = noteOf(view) ? { uno_which_note: { uno_which_note_input: { value: note } } } : {};
   return { values: { [list.block_id!]: { [String(element.action_id)]: value }, ...typed } };
 }
@@ -149,7 +146,7 @@ async function redraw(d: ReturnType<typeof doors>, view: View, press: WhichRedra
 
 async function submit(d: ReturnType<typeof doors>, view: View, state: unknown) {
   const popup = whichPopupOf(view.private_metadata)!;
-  const sent = whichSubmitOf(state, popup.decision);
+  const sent = whichSubmitOf(state);
   assert.ok(sent.ok, "a pick is sent");
   await runWhichSubmit({ viewId: "V1", popup, pick: sent.pick, userId: "U1" }, d.deps);
   return d.views.calls.at(-1)!.view as View;
@@ -169,15 +166,24 @@ test("the question is one line and one Choose… button: no numbered buttons, no
   const buttons = buttonsOf(question);
   assert.deepEqual(buttons.map((x) => [x.action_id, x.text.text]), [[WHICH_CHOOSE_ACTION_ID, "Choose…"]]);
   assert.equal((buttons[0] as { style?: string }).style, undefined, "Choose… is not colored");
-  assert.deepEqual(chooseValueOf(buttons[0]!.value), { decision: "confirm", cards: [b, a] });
-  assert.equal(sectionOf(question), "2 cards are waiting, nothing ran yet.");
+  assert.deepEqual(chooseValueOf(buttons[0]!.value), { cards: [b, a] });
+  assert.match(buttons[0]!.value, /^cancel:/, "the button carries no approval");
+  // Asked by a ✅, the line says where an approval is made: the pop-up only
+  // cancels.
+  assert.equal(sectionOf(question), "2 cards are waiting, nothing ran yet. Approve from a card's Review.");
   assert.doesNotMatch(JSON.stringify(question.blocks), /Session reflections|Backup tutor matching/);
   // The text copy, which a notification reads, still names them.
-  assert.match(question.text, /^2 cards are waiting, nothing ran yet\. Waiting: \*Session reflections\*, \*Backup tutor matching\*\.$/);
+  assert.match(question.text, /^2 cards are waiting, nothing ran yet\. Approve from a card's Review\. Waiting: \*Session reflections\*, \*Backup tutor matching\*\.$/);
   assert.doesNotMatch(JSON.stringify(question.blocks), /Expires|<!date/, "no deadline shown");
 });
 
-test("Choose… opens a loading view, then the cards with Approve preset from a ✅: one radio pick, headline and what it does", async () => {
+test("a question posted while the pop-up also approved still opens, and its pop-up only cancels", () => {
+  assert.deepEqual(chooseValueOf("confirm:1.1,1.2"), { cards: ["1.1", "1.2"] });
+  assert.deepEqual(chooseValueOf("cancel:1.1"), { cards: ["1.1"] });
+  assert.equal(chooseValueOf("1.1"), null);
+});
+
+test("Choose… from a ✅ opens a loading view, then the cards to cancel: checkboxes, no Approve anywhere", async () => {
   const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
   const { a, b, question } = await asked(h);
   clock.now = SOON;
@@ -188,11 +194,12 @@ test("Choose… opens a loading view, then the cards with Approve preset from a 
   assert.deepEqual(d.views.refused, []);
   assert.deepEqual(d.views.calls.map((c) => c.kind), ["open", "update"], "opened first, filled after the read");
   assert.equal(view.callback_id, WHICH_CALLBACK_ID);
-  assert.ok(view.submit, "Submit is the footer");
-  const decision = decisionOf(view);
-  assert.equal(decision.initial_option.value, "confirm");
-  assert.deepEqual(decision.options.map((o) => Object.keys(o).sort()), [["text", "value"], ["text", "value"]], "no caption under Approve or Cancel");
-  assert.equal(listOf(view).element!.type, "radio_buttons");
+  assert.deepEqual(view.submit, { type: "plain_text", text: "Cancel cards" }, "the footer says what Submit does");
+  assert.equal((view.blocks[0] as Block).text?.text, WHICH_LEAD);
+  assert.equal(listOf(view).element!.type, "checkboxes");
+  assert.doesNotMatch(words(view), /radio_buttons|uno_which_decision|Approve which/, "no switch and no Approve list");
+  assert.doesNotMatch(view.private_metadata, /"d"|confirm/, "no decision in the metadata");
+  assert.ok(noteOf(view), "the note is the cancel's reason");
   assert.deepEqual(optionsOf(view).map((o) => [o.value, o.text.text, o.description.text]), [
     [b, "Session reflections", "New PRD card on the Roadmap"],
     [a, "Backup tutor matching", "New PRD card on the Roadmap"],
@@ -207,40 +214,31 @@ test("Choose… opens a loading view, then the cards with Approve preset from a 
   assert.deepEqual(select.options.map((o) => [o.value, o.text.text]), [[b, "Session reflections"], [a, "Backup tutor matching"]]);
   assert.equal(select.initial_option, undefined);
   assert.equal(hideAt(view), -1, "no Hide draft with no draft open");
-  assert.equal(noteOf(view), undefined, "no note under Approve");
 });
 
-test("a ⛔ presets Cancel: the cards as checkboxes", async () => {
+test("a ⛔ asks with the plain line, and opens the same pop-up", async () => {
   const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
   const { question } = await asked(h, "⛔");
+  assert.equal(sectionOf(question), "2 cards are waiting, nothing ran yet.");
   clock.now = SOON;
   const view = (await choose(doors(h, clock), question))!;
   assert.equal(listOf(view).element!.type, "checkboxes");
-  assert.equal(decisionOf(view).initial_option.value, "cancel");
   const note = noteOf(view)!;
   assert.equal((note as { hint?: unknown }).hint, undefined, "the note has no hint");
 });
 
-test("switching the decision swaps radio buttons for checkboxes, keeping the pick and the note", async () => {
+test("a press on the old Approve / Cancel switch redraws the view without it, keeping the ticks and the note", async () => {
   const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
   const { a, question } = await asked(h);
   clock.now = SOON;
   const d = doors(h, clock);
-  const approve = (await choose(d, question))!;
+  const view = (await choose(d, question))!;
 
-  const cancel = await redraw(d, approve, { kind: "decision", decision: "cancel" }, stateOf(approve, [a]));
+  const again = await redraw(d, view, { kind: "redraw" }, stateOf(view, [a], "not this week"));
 
   assert.deepEqual(d.views.refused, []);
-  const list = listOf(cancel).element!;
-  assert.equal(list.type, "checkboxes");
-  assert.deepEqual((list.initial_options as Array<{ value: string }>).map((o) => o.value), [a], "the picked card is ticked");
-
-  // Back to Approve: one of the ticked cards stays picked, and the note
-  // typed under Cancel waits in the metadata, to come back with Cancel.
-  const back = await redraw(d, cancel, { kind: "decision", decision: "confirm" }, stateOf(cancel, [a], "not this week"));
-  assert.equal((listOf(back).element!.initial_option as { value: string }).value, a);
-  assert.equal(noteOf(back), undefined);
-  const again = await redraw(d, back, { kind: "decision", decision: "cancel" }, stateOf(back, [a]));
+  assert.deepEqual(h.resolved, [], "a redraw decides nothing");
+  assert.deepEqual((listOf(again).element!.initial_options as Array<{ value: string }>).map((o) => o.value), [a]);
   assert.equal(noteOf(again)!.element!.initial_value, "not this week");
 });
 
@@ -299,23 +297,16 @@ test("the pop-up keeps its choices in input blocks: no radio buttons, checkboxes
   const { a, question } = await asked(h);
   clock.now = SOON;
   const d = doors(h, clock);
-  const approve = (await choose(d, question))!;
-  const cancel = await redraw(d, approve, { kind: "decision", decision: "cancel" }, stateOf(approve, [a]));
-  const cancelDraft = await redraw(d, cancel, { kind: "draft", cardTs: a }, stateOf(cancel, [a]));
-  const back = await redraw(d, cancelDraft, { kind: "decision", decision: "confirm" }, stateOf(cancelDraft, [a]));
-  const approveDraft = await redraw(d, back, { kind: "draft", cardTs: a }, stateOf(back, [a]));
+  const closed = (await choose(d, question))!;
+  const shown = await redraw(d, closed, { kind: "draft", cardTs: a }, stateOf(closed, [a]));
+  const hidden = await redraw(d, shown, { kind: "hide" }, stateOf(shown, [a]));
 
   assert.deepEqual(d.views.refused, []);
   const choices = new Set(["radio_buttons", "checkboxes", "static_select"]);
-  for (const view of [approve, cancel, cancelDraft, back, approveDraft]) {
+  for (const view of [closed, shown, hidden]) {
     const misplaced = view.blocks.filter((b) => b.type === "actions" && (b.elements ?? []).some((e) => choices.has(String(e.type))));
     assert.deepEqual(misplaced, [], "no choice in an actions block");
-    const decision = view.blocks.find((b) => b.type === "input" && b.element?.action_id === "uno_which_decision")! as Block & {
-      dispatch_action?: unknown;
-      optional?: unknown;
-    };
-    assert.equal(decision.dispatch_action, true, "the switch redraws on a press");
-    assert.equal(decision.optional, undefined, "the switch is not optional");
+    assert.doesNotMatch(words(view), /radio_buttons/, "no radio group anywhere");
     const draft = view.blocks.find((b) => b.type === "input" && b.element?.action_id === "uno_which_draft")! as Block & {
       dispatch_action?: unknown;
       optional?: unknown;
@@ -325,10 +316,10 @@ test("the pop-up keeps its choices in input blocks: no radio buttons, checkboxes
     assert.equal(draft.optional, true, "Submit needs no draft open");
     assert.equal(draft.label?.text, "Draft");
   }
-  assert.ok(hideAt(approveDraft) > 0, "Hide draft stays a button");
+  assert.ok(hideAt(shown) > 0, "Hide draft stays a button");
 });
 
-test("the switch's and the select's block ids change with the decision and the open draft, so a redraw resets them", async () => {
+test("the select's block id changes with the open draft, so a redraw resets it", async () => {
   // Slack keeps an input's own pick across a views.update while its block_id
   // is unchanged and ignores the new initial_option, so the block_id carries
   // what the redraw shows: after Hide draft the select reads empty again, and
@@ -337,43 +328,67 @@ test("the switch's and the select's block ids change with the decision and the o
   const { a, b, question } = await asked(h);
   clock.now = SOON;
   const d = doors(h, clock);
-  const approve = (await choose(d, question))!;
-  const cancel = await redraw(d, approve, { kind: "decision", decision: "cancel" }, stateOf(approve, [a]));
-  const shownA = await redraw(d, cancel, { kind: "draft", cardTs: a }, stateOf(cancel, [a]));
+  const closed = (await choose(d, question))!;
+  const shownA = await redraw(d, closed, { kind: "draft", cardTs: a }, stateOf(closed, [a]));
   const shownB = await redraw(d, shownA, { kind: "draft", cardTs: b }, stateOf(shownA, [a]));
   const hidden = await redraw(d, shownB, { kind: "hide" }, stateOf(shownB, [a]));
 
   const blockOf = (view: View, actionId: string) => view.blocks.find((x) => x.type === "input" && x.element?.action_id === actionId)!.block_id;
-  assert.equal(blockOf(approve, "uno_which_decision"), "uno_which_decision_confirm");
-  assert.equal(blockOf(cancel, "uno_which_decision"), "uno_which_decision_cancel");
-  assert.equal(blockOf(approve, "uno_which_draft"), "uno_which_draft_none");
+  assert.equal(blockOf(closed, "uno_which_draft"), "uno_which_draft_none");
   assert.equal(blockOf(shownA, "uno_which_draft"), `uno_which_draft_${a}`);
   assert.equal(blockOf(shownB, "uno_which_draft"), `uno_which_draft_${b}`);
   assert.equal(blockOf(hidden, "uno_which_draft"), "uno_which_draft_none");
 });
 
-// A regression guard: Submit takes the decision from the metadata and reads
-// only the list and the note, so the switch's and the select's own values in
-// the state, there since they became inputs, never change the pick.
-test("Submit reads only the pick, whatever the switch and the select hold in the state", () => {
+test("Submit reads the cancel list's ticks and the note, whatever the select holds in the state", () => {
   const state = {
     values: {
-      uno_which_decision_cancel: { uno_which_decision: { selected_option: { value: "cancel" } } },
-      uno_which_draft_none: { uno_which_draft: { selected_option: { value: "1.2" } } },
-      uno_which_cards_confirm: { uno_which_cards_input: { selected_option: { value: "1.1" } } },
+      uno_which_draft_none: { uno_which_draft: { type: "static_select", selected_option: { value: "1.2" } } },
+      uno_which_cards_cancel: { uno_which_cards_input: { type: "checkboxes", selected_options: [{ value: "1.1" }, { value: "1.3" }] } },
+      uno_which_note: { uno_which_note_input: { type: "plain_text_input", value: "  later  " } },
     },
   };
-  assert.deepEqual(whichSubmitOf(state, "confirm"), { ok: true, pick: { picked: ["1.1"], note: "" } });
+  assert.deepEqual(whichSubmitOf(state), { ok: true, pick: { picked: ["1.1", "1.3"], note: "later" } });
 });
 
-test("Submit with nothing picked is an error under the list", () => {
-  const confirm = whichSubmitOf({ values: {} }, "confirm");
-  assert.deepEqual(confirm, { ok: false, errors: { uno_which_cards_confirm: "Choose the card to approve." } });
-  const cancel = whichSubmitOf({ values: {} }, "cancel");
-  assert.equal(cancel.ok, false);
+test("Submit with nothing ticked, or no checkboxes in its state, is an error under the list", () => {
+  for (const state of [undefined, { values: {} }, { values: { uno_which_cards_cancel: { uno_which_cards_input: { type: "checkboxes", selected_options: [] } } } }]) {
+    assert.deepEqual(whichSubmitOf(state), { ok: false, errors: { uno_which_cards_cancel: TICK_ONE } });
+  }
+  // A list that is not checkboxes is not ticks.
+  const other = { values: { uno_which_cards_cancel: { uno_which_cards_input: { type: "multi_static_select", selected_options: [{ value: "1.1" }] } } } };
+  assert.equal(whichSubmitOf(other).ok, false);
 });
 
-test("Approve decides the one card picked through its own door; the other stays live, and the question strikes it", async () => {
+test("Submit refuses a state holding a radio pick, as a view drawn with the old Approve / Cancel switch sends", () => {
+  const approveList = { values: { uno_which_cards_confirm: { uno_which_cards_input: { type: "radio_buttons", selected_option: { value: "1.1" } } } } };
+  assert.deepEqual(whichSubmitOf(approveList), { ok: false, errors: { uno_which_cards_confirm: REOPEN } });
+  const switchBeside = {
+    values: {
+      uno_which_decision_cancel: { uno_which_decision: { type: "radio_buttons", selected_option: { value: "cancel" } } },
+      uno_which_cards_cancel: { uno_which_cards_input: { type: "checkboxes", selected_options: [{ value: "1.1" }] } },
+    },
+  };
+  assert.deepEqual(whichSubmitOf(switchBeside), { ok: false, errors: { uno_which_decision_cancel: REOPEN } });
+});
+
+test("no code path from the pop-up's Submit asks the Gate to approve", () => {
+  // The Submit's two functions, as written: neither names an approval, and
+  // the one decision they hand the Gate is the constant cancel.
+  const source = readFileSync(resolve(process.cwd(), "src/slack/which-card.ts"), "utf8");
+  const from = source.indexOf("export async function runWhichSubmit");
+  const to = source.indexOf("async function markHere");
+  assert.ok(from > 0 && to > from, "the Submit's functions are found");
+  const submitPath = source.slice(from, to);
+  assert.doesNotMatch(submitPath, /confirm|Approv/);
+  assert.match(submitPath, /const decision = CANCEL;/);
+  assert.match(source, /const CANCEL = "cancel" as const;/);
+  // And the request it takes has no decision to carry.
+  const request = source.slice(source.indexOf("export interface WhichSubmitRequest"));
+  assert.doesNotMatch(request.slice(0, request.indexOf("\n}\n")), /decision/);
+});
+
+test("a Submit from a ✅'s question cancels the ticked card through its own door: nothing is approved, the other stays live", async () => {
   const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
   const { a, b, question } = await asked(h);
   clock.now = SOON;
@@ -382,13 +397,13 @@ test("Approve decides the one card picked through its own door; the other stays 
 
   const answer = await submit(d, view, stateOf(view, [a]));
 
-  assert.deepEqual(h.resolved.map((r) => [r.decision, r.executed]), [["confirm", true]]);
-  assert.deepEqual(await live(h), [b], "card A was claimed, card B is still waiting");
+  assert.deepEqual(h.resolved.map((r) => [r.decision, r.executed]), [["cancel", false]]);
+  assert.deepEqual(await live(h), [b], "card A was canceled, card B is still waiting");
   assert.deepEqual(d.cardEdits.map((e) => e.ts), [a], "the card decided is the one edited");
-  assert.match(words(answer), /Backup tutor matching\*: Approved\./);
+  assert.match(words(answer), /Backup tutor matching\*: Canceled\./);
   const redrawn = d.questionEdits.at(-1)!;
   assert.equal(messageBlocksRefusal(redrawn.blocks), null);
-  assert.equal(sectionOf(redrawn), "1 card is still waiting.\n~Backup tutor matching~");
+  assert.equal(sectionOf(redrawn), "1 card is still waiting. Approve from a card's Review.\n~Backup tutor matching~");
   assert.deepEqual(buttonsOf(redrawn).map((x) => x.text.text), ["Choose…"], "Choose… stays for the card still waiting");
   assert.equal(d.questionEdits.length, 1, "one edit of the question");
   assert.deepEqual(h.delivery.calls.filter((c) => c.kind === "redraw-which"), [], "its own question is redrawn here, not by the door");
@@ -710,20 +725,6 @@ test("three or more canceled are joined with commas and \"and\"", () => {
   assert.equal(canceledLine(["A"]), "Canceled *A*.");
   assert.equal(canceledLine(["A", "B"]), "Canceled *A* and *B*.");
   assert.equal(canceledLine(["<A> & B"]), "Canceled *&lt;A&gt; &amp; B*.", "headlines escaped");
-});
-
-test("an Approve from the pop-up keeps its card's own outcome post", async () => {
-  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
-  const { a, question } = await asked(h);
-  clock.now = SOON;
-  const d = doors(h, clock);
-  const view = (await choose(d, question))!;
-  const from = h.delivery.calls.length;
-
-  await submit(d, view, stateOf(view, [a]));
-
-  assert.deepEqual(h.delivery.calls.slice(from).flatMap((c) => (c.kind === "gate-note" ? [c.note.kind] : [])), ["resolved"]);
-  assert.equal(h.delivery.calls.slice(from).filter((c) => c.kind === "note").length, 0);
 });
 
 test("a card's own Cancel still posts its own outcome line", async () => {
