@@ -252,7 +252,7 @@ export function inThreadStopLine(userId: string): string {
  *
  * WHAT IS GUARANTEED. The handler computes the CARD-BASED ARM of the turn's own
  * rule: `settledStatus` over whether this reply thread holds a live card, which
- * is what `settlementOf` (`turn/turn.ts`) returns for `answered`, `reacted` and
+ * is what `settlementOf` (`turn/settlement.ts`) returns for `answered`, `reacted` and
  * `failed`. On those three endings the two writers compute one function of one
  * piece of state and agree, whichever lands last.
  *

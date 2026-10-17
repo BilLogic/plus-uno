@@ -95,7 +95,7 @@ export interface ReactionDoorDeps {
    * Stage a fresh card for what a cut-off run never finished, through the
    * door's own Delivery, after the note that explains it. Only a cut-off
    * verdict carries anything to re-stage; building the card is Turn's
-   * (`turn/turn.ts` `restageExecution`), and the envelope binds it.
+   * (`turn/card-staging.ts` `restageExecution`), and the envelope binds it.
    */
   restage(restage: GateRestage, delivery: Delivery): Promise<void>;
 

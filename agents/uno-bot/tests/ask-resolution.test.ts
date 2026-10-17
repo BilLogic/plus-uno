@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { runReactionDoor } from "../src/gate/index";
 import { createInMemoryThreadState, stagingCardOf, type PendingProposal } from "../src/thread-state/index";
 import { recordingDelivery } from "../src/turn/index";
-import { restageExecution } from "../src/turn/turn";
+import { restageExecution } from "../src/turn/card-staging";
 import { createInMemoryUsageLog } from "../src/usage/in-memory";
 import {
   answeredAskOf,
