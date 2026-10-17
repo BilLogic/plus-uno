@@ -80,7 +80,7 @@ import {
   whichPopupOf,
   whichSubmitOf,
 } from "./which-card-view";
-import { CHECK_IT_ACTION_ID, resultsActionOf, runCheckItDoor, runResultsDoor, runStopCheckDoor, STOP_CHECK_ACTION_ID } from "./blueprint-check";
+import { CHECK_IT_ACTION_ID, type CheckItPress, resultsActionOf, runCheckItDoor, runResultsDoor, runStopCheckDoor, STOP_CHECK_ACTION_ID } from "./blueprint-check";
 import { createdPageOn } from "../blueprint-upkeep/env";
 import { blueprintCheckRunnerKey, type ResultsAction } from "../blueprint-upkeep/check";
 import { DM_WATCH_ACTION_ID, saveDmWatchAction } from "../dm-watch/index";
@@ -405,13 +405,10 @@ function whichDoorDeps(env: Env, payload: InteractionPayload, channel: string, q
 //
 // `Env` enters here and stops here.
 async function checkIt(env: Env, payload: InteractionPayload): Promise<void> {
-  const channel = payload.channel?.id;
-  const offerTs = payload.message?.ts;
-  const userId = payload.user?.id ?? "someone";
-  const team = payload.user?.team_id ?? payload.team?.id;
-  if (!channel || !offerTs) return;
+  const press = checkPressOf(payload);
+  if (!press) return;
   await runCheckItDoor(
-    { channel, offerTs, userId, ...(team ? { team } : {}) },
+    press,
     {
       store: threadStateFor(env),
       enqueue: (job, runnerKey) => enqueueAgentJob(env, job, runnerKey),
@@ -419,6 +416,21 @@ async function checkIt(env: Env, payload: InteractionPayload): Promise<void> {
       replyEphemeral: (text) => replyEphemeral(payload, text),
     },
   );
+}
+
+/**
+ * A Check it press as the door takes it: the offer's message, who pressed,
+ * and their workspace — the user's, else the envelope's — which the check's
+ * plan card is opened for. Null without a channel or a message.
+ *
+ * @param payload - The interaction envelope
+ */
+export function checkPressOf(payload: InteractionPayload): CheckItPress | null {
+  const channel = payload.channel?.id;
+  const offerTs = payload.message?.ts;
+  if (!channel || !offerTs) return null;
+  const team = payload.user?.team_id ?? payload.team?.id;
+  return { channel, offerTs, userId: payload.user?.id ?? "someone", ...(team ? { team } : {}) };
 }
 
 // Stop, on the checking line (#1322): the presser of Check it or the card's

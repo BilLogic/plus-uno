@@ -215,14 +215,27 @@ export function notAStopperReply(may: ReadonlyArray<string | undefined>): string
 // in `task_display_mode: "plan"` in the offer's thread with its first step,
 // and ticks each step as the check moves: one append a step, the step before
 // it complete and this one in progress, and the close riding the stop. So a
-// check spends five Slack calls on its card: the open, three appends, the
-// stop. Slack's task cards take no pending state, so a step is shown only
-// once it starts; their words are plain text, so the scenario goes in bare.
-// The card closes on how the check ended — every step complete, the running
-// step in error and saying Stopped, or in error saying why — and is titled
-// for it, since Slack titles an untitled plan with an error card "Something
-// went wrong". Best-effort throughout: a stream Slack will not open is tried
-// once, and no call here fails the check.
+// check spends five Slack calls on its card — the open, three appends, the
+// stop — or seven when the stop refuses its last changes
+// (`CHECK_PLAN_SUBREQUESTS`). Slack's task cards take no pending state, so a
+// step is shown only once it starts; their words are plain text, so the
+// scenario goes in bare. The card closes on how the check ended — every
+// step complete, the running step in error and saying Stopped, or in error
+// saying why; a run that lost the record to something other than its Stop
+// closes its step complete, saying nothing it cannot know. Its title is a
+// short "Blueprint check", sent with the first step and again with the
+// close: the checking message already names what is checked, and an
+// untitled plan holding an error card is titled "Something went wrong".
+// Best-effort throughout: a stream Slack will not open is tried once, and no
+// call here fails the check.
+
+/** External subrequests the plan card spends at the worst: the open, three
+ *  appends, and a stop that refused its last changes, which go as an append
+ *  and a bare stop. */
+export const CHECK_PLAN_SUBREQUESTS = 7;
+
+/** The plan card's title, the same from its first step to its close. */
+export const CHECK_PLAN_TITLE = "Blueprint check";
 
 /** The Slack calls the plan card makes: the open in the offer's thread, an
  *  append, and the stop that carries the card's last changes. */
@@ -239,17 +252,10 @@ function stepTitle(step: CheckStep, scenario: string): string {
   return step === "draft" ? "Drafting your idea against it" : "Comparing the paths";
 }
 
-/** The card's title, as the check stands. */
-function planTitle(scenario: string, end?: CheckEnd): string {
-  if (!end) return `Checking ${scenario} against today's blueprint`;
-  if (end === "stopped") return "Stopped the blueprint check";
-  return end.kind === "failed" ? "The blueprint check didn't finish" : `Checked ${scenario} against today's blueprint`;
-}
-
 /** What the running step says when the check ended on it. */
 function endedOutput(end: CheckEnd): string | undefined {
   if (end === "stopped") return "Stopped";
-  if (end.kind !== "failed") return undefined;
+  if (end === "superseded" || end.kind !== "failed") return undefined;
   return end.reason === "timed-out" ? "Ran too long" : end.reason === "unreadable" ? "Couldn't be read" : undefined;
 }
 
@@ -284,17 +290,17 @@ export function checkPlanCard(offer: Pick<BlueprintCheckOffer, "scenario">, slac
       if (!ts) return;
       const at = ts;
       const first = done.length === 0;
-      await quietly(() => slack.append(at, [...done, { ...running!, status: "in_progress" }], first ? planTitle(scenario) : undefined));
+      await quietly(() => slack.append(at, [...done, { ...running!, status: "in_progress" }], first ? CHECK_PLAN_TITLE : undefined));
     },
     async end(how) {
       if (ended) return;
       ended = true;
       if (!ts || !running) return;
       const at = ts;
-      const failed = how === "stopped" || how.kind === "failed";
+      const failed = how === "stopped" || (how !== "superseded" && how.kind === "failed");
       const output = endedOutput(how);
       const last: TaskChunk = { ...running, status: failed ? "error" : "complete", ...(output ? { output } : {}) };
-      await quietly(() => slack.close(at, [last], planTitle(scenario, how)));
+      await quietly(() => slack.close(at, [last], CHECK_PLAN_TITLE));
     },
   };
 }

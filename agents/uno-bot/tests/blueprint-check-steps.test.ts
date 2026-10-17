@@ -33,6 +33,8 @@ interface WorldOptions {
   streamRefused?: boolean;
   /** Every append to the plan throws. */
   appendThrows?: boolean;
+  /** What the job's step of its run to failed does instead of the store's. */
+  stepFailed?: () => Promise<boolean>;
 }
 
 /** One plan call as the thread sees it. */
@@ -88,8 +90,13 @@ function world(threadState: ThreadState, clock: { t: number }, offerTs: string, 
   const runJob = (at: number) => {
     const { job } = queued[at]!;
     assert.equal(job.kind, "blueprint-check");
+    const store: ThreadState = opts.stepFailed
+      ? Object.assign(Object.create(threadState) as ThreadState, {
+          stepCheck: (...args: Parameters<ThreadState["stepCheck"]>) => (args[3] === "failed" ? opts.stepFailed!() : threadState.stepCheck(...args)),
+        })
+      : threadState;
     return runBlueprintCheck(job as BlueprintCheckJob, {
-      store: threadState,
+      store,
       readPath: opts.readPath ?? (async () => TODAY),
       draft: draftProposal({ provider: draftModel, affordable: () => true }),
       createdPage: async () => null,
@@ -120,7 +127,7 @@ test("a check opens the plan card in the thread and ticks its steps as it moves,
   const calls = planCalls(w.seen);
   assert.deepEqual(calls.map((c) => c.call), ["open", "append", "append", "append", "close"]);
   const [, first, second, third, last] = calls as Array<Extract<PlanCall, { tasks: TaskChunk[] }>>;
-  assert.equal(first!.title, "Checking Call-off against today's blueprint");
+  assert.equal(first!.title, "Blueprint check", "a short title: the checking message already says what is checked");
   assert.deepEqual(first!.tasks.map((t) => t.title), ["Reading today's Call-off"]);
   assert.deepEqual(steps(first!.tasks), ["read in_progress"]);
   assert.deepEqual(steps(second!.tasks), ["read complete", "draft in_progress"]);
@@ -128,7 +135,7 @@ test("a check opens the plan card in the thread and ticks its steps as it moves,
   assert.deepEqual(steps(third!.tasks), ["draft complete", "compare in_progress"]);
   assert.equal(third!.tasks[1]!.title, "Comparing the paths");
   assert.deepEqual(steps(last!.tasks), ["compare complete"]);
-  assert.equal(last!.title, "Checked Call-off against today's blueprint");
+  assert.equal(last!.title, "Blueprint check", "the close keeps the title, so no error state retitles it");
   assert.ok(calls.every((c) => c.call === "open" || c.ts === "plan-1"), "one card");
 
   const closed = w.seen.findIndex((s) => s.call === "close");
@@ -159,7 +166,7 @@ test("Stop mid-check closes the card as stopped, and nothing else posts", async 
 
   const last = planCalls(w.seen).at(-1) as Extract<PlanCall, { tasks: TaskChunk[] }>;
   assert.equal(last.call, "close");
-  assert.equal(last.title, "Stopped the blueprint check");
+  assert.equal(last.title, "Blueprint check");
   assert.deepEqual(steps(last.tasks), ["draft error Stopped"]);
   assert.ok(!w.seen.some((s) => s.call === "post"), "no results");
   assert.equal((w.seen.filter((s) => s.call === "status").at(-1) as { text: string }).text, "Stopped the blueprint check. Your card isn't affected.");
@@ -173,7 +180,7 @@ test("a check that runs too long closes the card in error, and Try again opens a
 
   const last = planCalls(w.seen).at(-1) as Extract<PlanCall, { tasks: TaskChunk[] }>;
   assert.equal(last.call, "close");
-  assert.equal(last.title, "The blueprint check didn't finish");
+  assert.equal(last.title, "Blueprint check");
   assert.deepEqual(steps(last.tasks), ["draft error Ran too long"]);
 
   await w.press(PRESSER);
@@ -193,7 +200,6 @@ test("a path that cannot be read closes the card in error on its first step", as
   await w.runJob(0);
   const last = planCalls(w.seen).at(-1) as Extract<PlanCall, { tasks: TaskChunk[] }>;
   assert.equal(last.call, "close");
-  assert.equal(last.title, "The blueprint check didn't finish");
   assert.deepEqual(steps(last.tasks), ["read error Couldn't be read"]);
 });
 
@@ -230,4 +236,47 @@ test("the job carries the presser's workspace, which the plan stream is opened f
   const w = world(threadState, clock, offerTs);
   await w.press(PRESSER);
   assert.deepEqual(w.queued[0]!.job, { kind: "blueprint-check", offerTs, by: PRESSER, team: TEAM, run: (w.queued[0]!.job as { run: string }).run });
+});
+
+test("a check whose step to failed throws still closes its card", async () => {
+  const { threadState, clock, offerTs } = await offered();
+  const w = world(threadState, clock, offerTs, {
+    readPath: async () => Promise.reject(new Error("PostgREST 503")),
+    stepFailed: async () => Promise.reject(new Error("thread state unreachable")),
+  });
+  await w.press(PRESSER);
+  await w.runJob(0).catch(() => {});
+  const last = planCalls(w.seen).at(-1) as Extract<PlanCall, { tasks: TaskChunk[] }>;
+  assert.equal(last.call, "close", "the stream is not left open");
+  assert.deepEqual(steps(last.tasks), ["read error"]);
+});
+
+test("a failed run that lost the record to something other than Stop closes neutral, never saying Stopped", async () => {
+  const { threadState, clock, offerTs } = await offered();
+  const w = world(threadState, clock, offerTs, {
+    readPath: async () => Promise.reject(new Error("PostgREST 503")),
+    stepFailed: async () => false,
+  });
+  await w.press(PRESSER);
+  await w.runJob(0);
+  const last = planCalls(w.seen).at(-1) as Extract<PlanCall, { tasks: TaskChunk[] }>;
+  assert.equal(last.call, "close");
+  assert.deepEqual(steps(last.tasks), ["read complete"]);
+});
+
+test("a failed run that a Stop beat closes as stopped", async () => {
+  const { threadState, clock, offerTs } = await offered();
+  let stopFirst: (() => Promise<void>) | null = null;
+  const w = world(threadState, clock, offerTs, {
+    readPath: async () => Promise.reject(new Error("PostgREST 503")),
+    stepFailed: async () => {
+      await stopFirst!();
+      return false;
+    },
+  });
+  stopFirst = () => w.stop(PRESSER);
+  await w.press(PRESSER);
+  await w.runJob(0);
+  const last = planCalls(w.seen).at(-1) as Extract<PlanCall, { tasks: TaskChunk[] }>;
+  assert.deepEqual(steps(last.tasks), ["read error Stopped"]);
 });

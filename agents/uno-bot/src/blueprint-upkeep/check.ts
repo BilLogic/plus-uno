@@ -14,8 +14,9 @@
 //     scenario and queues this job on a runner of its own
 //     (`blueprintCheckRunnerKey`), never the thread's: the thread's turns are
 //     not serialized behind it, and it spends a 50-subrequest budget of its
-//     own — the path read (5), the draft (≤2), the plan card (5), the posts
-//     and the Draw on blueprint card's staging, about twenty at the worst.
+//     own — the path read (5), the draft (≤2), the plan card (≤7), the
+//     posts and the Draw on blueprint card's staging, under thirty at the
+//     worst (28, `runBlueprintCheckOnEnv`).
 //
 // WHAT THE CHECK POSTS. Once its results are ready, and only if its run still
 // holds the thread's record (`ThreadState.stepCheck` to done), the offer's
@@ -38,9 +39,12 @@
 // a plan card in the offer's thread (`CheckProgress`): reading today's path,
 // drafting the idea against it, comparing the two. Each step is shown as it
 // starts, the one before it complete — there is no pending state to show
-// the rest. The card is closed as the check ended, before anything else it
-// posts: done, stopped, or in error. Best-effort: a card that will not open
-// or update costs the check nothing.
+// the rest. The card closes as the check ends, before anything else it
+// posts: done, stopped, or in error — and whatever the ending, a throw on
+// the way out included. Best-effort: a card that will not open or update
+// costs the check nothing. A runner evicted mid-check leaves its card open,
+// as an evicted turn leaves its checklist: an accepted limit, since nothing
+// outlives the isolate to close it.
 //
 // STOP (#1322). A stopped run posts nothing: Stop marks the record, which the
 // job reads before it starts and steps against before it posts, and aborts
@@ -323,8 +327,9 @@ export interface BlueprintCheckDeps {
 /** A check's steps, in the order it takes them. */
 export type CheckStep = "read" | "draft" | "compare";
 
-/** How a check ended, as its plan card closes on it. */
-export type CheckEnd = CheckOutcome | "stopped";
+/** How a check ended, as its plan card closes on it. `superseded`: a failed
+ *  run that lost the record to something other than its Stop. */
+export type CheckEnd = CheckOutcome | "stopped" | "superseded";
 
 /** The plan card a check's steps tick on. Neither call throws, and a second
  *  `end` does nothing. */
@@ -405,17 +410,34 @@ export async function runBlueprintCheck(job: BlueprintCheckJob, deps: BlueprintC
     clearTimeout(timer);
     inFlight.delete(job.run);
   }
-  // A done check closed its card before its results posted; this closes
-  // the card of every other ending.
-  if (outcome === "stopped" || outcome.kind !== "failed") {
-    await progress.end(outcome);
-    return;
+  // A done check closed its card before its results posted; the card of
+  // every other ending closes here, in a `finally`, so a throw on the way
+  // out never leaves its stream open — it closes in error then.
+  let end: CheckEnd = { kind: "failed", reason: "error" };
+  try {
+    if (outcome === "stopped" || outcome.kind !== "failed") {
+      end = outcome;
+      return;
+    }
+    // Said on the message only while the run still holds the record, so a
+    // Stop that won the race keeps its own words there.
+    if (await deps.store.stepCheck(ref, offer.scenario, job.run, "failed")) {
+      end = outcome;
+      await deps.settle(offer, outcome);
+      return;
+    }
+    end = await lostTo(ref, offer.scenario, job.run, deps);
+  } finally {
+    await progress.end(end);
   }
-  // Said on the message only while the run still holds the record, so a Stop
-  // that won the race keeps its own words there, and the card says stopped.
-  const failed = await deps.store.stepCheck(ref, offer.scenario, job.run, "failed");
-  await progress.end(failed ? outcome : "stopped");
-  if (failed) await deps.settle(offer, outcome);
+}
+
+/** How a failed run that no longer holds the record ends on its card: as
+ *  stopped when its Stop took, else neutral (`superseded`) — whatever took
+ *  the record says the rest, and the card does not guess. */
+async function lostTo(ref: ThreadRef, scenario: string, run: string, deps: BlueprintCheckDeps): Promise<CheckEnd> {
+  const now = await deps.store.getCheck(ref, scenario);
+  return now?.run === run && now.state === "stopped" ? "stopped" : "superseded";
 }
 
 async function check(

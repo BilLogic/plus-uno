@@ -21,6 +21,7 @@ import {
   addReaction,
   appendStream,
   appendTasks,
+  closePlanStream,
   deleteMessage,
   postMessage,
   slackCall,
@@ -137,17 +138,7 @@ function slackClientFor(env: Env): SlackDeliveryClient {
     async appendTasks(channel, ts, tasks, title) {
       await appendTasks(env, channel, ts, tasks, title);
     },
-    async stopStream(channel, ts, tasks, title) {
-      if (!tasks?.length && !title) {
-        await stopStream(env, channel, ts);
-        return;
-      }
-      // A stop that refused the checklist's last changes left the stream open:
-      // they go as an append, and the stream stops bare.
-      if (await stopStream(env, channel, ts, undefined, { tasks: tasks ?? [], ...(title ? { title } : {}) })) return;
-      await appendTasks(env, channel, ts, tasks ?? [], title);
-      await stopStream(env, channel, ts);
-    },
+    stopStream: (channel, ts, tasks, title) => closePlanStream(env, channel, ts, tasks, title),
     updateMessage: (input) => updateMessage(env, input),
     async deleteMessage(channel, ts) {
       await deleteMessage(env, channel, ts);
