@@ -84,7 +84,8 @@ const CONSTRAINT_RE =
 // The relay's own outcome notes, written by resolveProposal / recordExchange.
 // Matching on OUR strings, never on model prose, is what makes this trustworthy.
 const CONFIRMED_RE = /\(confirmed\b[^)]*\)/i;
-const CANCELLED_RE = /\(Cancelled the proposed ([a-z_]+)/i;
+// Either spelling: stored history still holds notes written "Cancelled".
+const CANCELLED_RE = /\(Cancell?ed the proposed ([a-z_]+)/i;
 
 const URL_RE = /https?:\/\/[^\s<>|)\]]+/g;
 
@@ -154,7 +155,7 @@ export function renderState(state: ConversationState): string {
 // the note reaches the model on every turn, state block or none.
 
 /** The whole of a ⛔ note, as `agent/cancel-note.ts` writes it. */
-const CANCEL_NOTE_RE = /^\(Cancelled the proposed [a-z_]+\b[^\n]*\)$/;
+const CANCEL_NOTE_RE = /^\(Cancell?ed the proposed [a-z_]+\b[^\n]*\)$/;
 
 /** `history` without the ⛔ notes recorded more than `windowMs` before `now`. */
 export function withoutAgedCancels<T extends HistoryTurn>(history: T[], now: number, windowMs: number): T[] {

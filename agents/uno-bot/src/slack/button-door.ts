@@ -23,63 +23,16 @@
 
 import type { ThreadState } from "../thread-state/index";
 import { withWorkingSignal, type Delivery } from "../turn/index";
-import { otherCardWaits, resolveSignal, type GateRestage, type GateVerdict } from "../gate/index";
-import { renderGateNote, statedCancelledNote } from "./gate-note";
-import { escapeSlackText } from "./mrkdwn";
-import { notedCardBlocks, proposalCardBlocks } from "./proposal-render";
-import { statedCancelOf, type ChosenAs, type PendingProposal, type ReportItemState } from "../thread-state/index";
+import { cardOutcomeOf, otherCardWaits, resolveSignal, type GateRestage, type GateVerdict } from "../gate/index";
+import { decidedCardLine, renderGateNote } from "./gate-note";
+// The decided card is built beside `notedCardBlocks`, where the Slack
+// adapter's `closeCard` builds it too: one builder for every door.
+import { decidedCard, type CardMessage } from "./proposal-render";
+import type { ChosenAs, ReportItemState } from "../thread-state/index";
+
+export type { CardMessage };
 import type { OperationOutcome } from "../gate/run-batch";
 import { failureReason, settleItem, type ReportStore } from "./decision-cards";
-
-/** A card's message as it is edited: the fallback copy, and the blocks. */
-export interface CardMessage {
-  text: string;
-  blocks: unknown[];
-  /** A decision report's tag, sent again with its redraw. */
-  metadata?: { event_type: string; event_payload: Record<string, unknown> };
-}
-
-/**
- * A decided card, as its message is edited: the card as posted — its own
- * blocks when it had any, its text otherwise — with the outcome as its last
- * line and View where it had a button (`notedCardBlocks`), and the outcome
- * in the fallback copy too.
- *
- * @param pending - The card's record
- * @param note - The outcome, mrkdwn
- * @param text - The card's words, when they changed on the way: an approval
- *   with edits says what was approved
- * @param opts.edited - The decision changed the draft's values. Own blocks
- *   show the values they were posted with, so an edited card — or one whose
- *   words changed — is re-rendered from its words instead: a carousel left
- *   showing the draft's values would contradict the edit line beneath it.
- * @param opts.button - View once decided; Review on a card still live
- */
-export function decidedCard(
-  pending: Pick<PendingProposal, "proposalText" | "proposalBlocks">,
-  note: string,
-  text: string = pending.proposalText,
-  opts: { edited?: boolean; button?: "Review" | "View" } = {},
-): CardMessage {
-  const button = opts.button ?? "View";
-  const stale = opts.edited || text !== pending.proposalText;
-  const own = pending.proposalBlocks && !stale ? pending.proposalBlocks : undefined;
-  return {
-    text: `${text}\n${note}`,
-    blocks: notedCardBlocks({ text, ...(own ? { blocks: own } : {}) }, note, button),
-  };
-}
-
-/**
- * A card back in its live form, as it was posted: its words, its own blocks
- * or its text re-rendered, and Review — no note. What a card sent back with
- * Needs changes returns to when no revision replaces it.
- *
- * @param pending - The card's record
- */
-export function liveCard(pending: Pick<PendingProposal, "proposalText" | "proposalBlocks">): CardMessage {
-  return { text: pending.proposalText, blocks: pending.proposalBlocks ?? proposalCardBlocks(pending.proposalText) };
-}
 
 /** One button press, in the facts the envelope already has. */
 export interface ButtonRequest {
@@ -277,14 +230,9 @@ export async function applyPressVerdict(
     if (message) await deps.replaceCard(message);
     return;
   }
-  const note =
-    request.decision === "confirm"
-      ? `Approved by <@${request.userId}>`
-      : pending.stated
-        ? statedCancelledNote({ cancelled: statedCancelOf(pending)! }, request.userId)
-        : rejected
-          ? `Rejected by <@${request.userId}>${rejected.reason ? `: ${escapeSlackText(rejected.reason)}` : ""}`
-          : `Cancelled by <@${request.userId}> — tell me what to change and I'll stage it again.`;
+  // The outcome every other door closes a card with (`cardOutcomeOf`), and
+  // the pop-up's Reject with its reason, which only a press here carries.
+  const note = decidedCardLine({ ...cardOutcomeOf(verdict)!, ...(rejected ? { rejected } : {}) });
   const words: { text: string; note: string; edited?: boolean } = deps.reword
     ? deps.reword(pending.proposalText, note)
     : { text: pending.proposalText, note };

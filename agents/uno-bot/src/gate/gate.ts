@@ -54,7 +54,7 @@ import type {
   StatedCardWords,
   ThreadState,
 } from "../thread-state/index";
-import type { GateNote } from "../turn/index";
+import type { CardOutcome, GateNote } from "../turn/index";
 import { cardHeadline } from "../agent/card-identity";
 
 // ── The signal ───────────────────────────────────────────────────────────────
@@ -348,6 +348,46 @@ export async function otherCardWaits(
     .getProposalsByThread({ channel: decided.channel, thread })
     .catch(() => [] as PendingProposal[]);
   return live.some((card) => card.proposalTs !== decided.proposalTs && replyTarget(card) === thread);
+}
+
+/**
+ * The card a won verdict decided, and what decided it: what a door edits the
+ * card to (`Delivery.closeCard`) when the decision came from anywhere but the
+ * card's own buttons — a reaction, a typed emoji, the model's own
+ * `proposal_resolve`. A press edits its card itself (`slack/button-door.ts`);
+ * without this the card a person decided in words kept its Review button and
+ * no outcome line, and went on inviting a decision already made.
+ *
+ * Null for anything else. A verdict that did not win leaves the card as it is,
+ * or says so on it already (`GateCard`); a Needs changes has no decision; and
+ * an item of a decision report is redrawn from the report's own record
+ * (`slack/decision-cards.ts`), never edited as a card of its own.
+ */
+export function decidedCardOf(verdict: GateVerdict): { card: GateCard; outcome: CardOutcome } | null {
+  const proposal = verdict.proposal;
+  const outcome = cardOutcomeOf(verdict);
+  if (!outcome || !proposal || proposal.item) return null;
+  const { card } = cardOf(proposal.proposalTs, proposal);
+  return card ? { card, outcome } : null;
+}
+
+/**
+ * What a won verdict decided, and who decided it: the one builder of a
+ * decided card's outcome, for the doors that close it here and for a press
+ * (`slack/button-door.ts`), which adds the pop-up's Reject reason only it
+ * carries. Null for a verdict that did not win or decided nothing.
+ */
+export function cardOutcomeOf(verdict: GateVerdict): CardOutcome | null {
+  const proposal = verdict.proposal;
+  if (verdict.outcome !== "won" || !verdict.decision || !proposal) return null;
+  // From the card, not the note: a ⛔ the model said in its own words posts
+  // a `said` note, which carries none of the resolved note's fields.
+  const cancelled = verdict.decision === "cancel" ? statedCancelOf(proposal) : undefined;
+  return {
+    decision: verdict.decision,
+    ...(verdict.by?.userId ? { by: verdict.by.userId } : {}),
+    ...(cancelled ? { cancelled } : {}),
+  };
 }
 
 // ── The gate ─────────────────────────────────────────────────────────────────

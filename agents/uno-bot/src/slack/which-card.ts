@@ -28,7 +28,8 @@ import { cardExpiresAt } from "../card-expiry";
 import { renderGateNote, whichCardQuestion } from "./gate-note";
 import { escapeSlackText } from "./mrkdwn";
 import { isDeadlineBlock } from "./card-deadline";
-import { runButtonDoor, type ButtonDoorDeps, type CardMessage } from "./button-door";
+import { runButtonDoor, type ButtonDoorDeps } from "./button-door";
+import type { CardMessage } from "./proposal-render";
 import type { ThreadState } from "../thread-state/index";
 
 type WhichNote = Extract<GateNote, { kind: "which-card" }>;

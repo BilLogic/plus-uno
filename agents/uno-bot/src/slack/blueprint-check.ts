@@ -60,7 +60,7 @@ import { cardConfirmers, mayConfirm, type BlueprintCheckOffer, type PendingPropo
 import type { ButtonStaging, CheckOfferNote } from "../turn/index";
 import { revisionRefusal } from "../gate/refusal";
 import type { RunnerJobPayload } from "./types";
-import type { CardMessage } from "./button-door";
+import type { CardMessage } from "./proposal-render";
 import { escapeSlackText, SLACK_USER_ID } from "./mrkdwn";
 
 /** The Check it button's action id: also Check again and Try again. */

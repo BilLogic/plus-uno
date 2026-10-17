@@ -16,6 +16,8 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { runReactionDoor } from "../src/gate/index";
+import { runMetered, withSubrequestLimit } from "../src/net";
+import { CLOSE_CARD_HEADROOM } from "../src/agent/loop-policy";
 import { runButtonDoor } from "../src/slack/button-door";
 import { deliveryAdapter } from "../src/slack/delivery-adapter";
 import { renderProposalCard } from "../src/slack/proposal-render";
@@ -157,6 +159,42 @@ describe("a sweep card keeps its carousel", () => {
     assert.match(lastLine(blocks), new RegExp(`Approved by <@${BEA}>`));
     assert.deepEqual(buttons(blocks), ["View"]);
     assert.match(replaced[0]!.text, /Approved by/, "the fallback copy says the outcome too");
+  });
+});
+
+describe("a card decided outside its own buttons", () => {
+  const target = { channel: CHANNEL, replyTs: ROOT, userMsgTs: ROOT, userId: BEA };
+
+  it("is edited to the outcome a press leaves, with View and its own blocks", async () => {
+    const slack = recordingSlack();
+    const card = sweepCard();
+    await deliveryAdapter(slack.deps(false), target).closeCard({ ts: CARD, ...card }, { decision: "cancel", by: BEA });
+    const blocks = edit(slack);
+    assert.equal(blocks.filter((b) => b.type === "carousel").length, 1, "the carousel stays");
+    assert.equal(lastLine(blocks), `Canceled by <@${BEA}> — tell me what to change and I'll stage it again.`);
+    assert.deepEqual(buttons(blocks), ["View"]);
+    assert.match(slack.of("update")[0]!.text, /Canceled by/, "the fallback copy says the outcome too");
+  });
+
+  it("is left as it was when the edit and the settle after it would not both fit", async () => {
+    const card = { ts: CARD, ...sweepCard() };
+    const closeWith = async (headroom: number) => {
+      const slack = recordingSlack();
+      // A lookup limit is the one way a test sets what is left in the meter.
+      await runMetered(() =>
+        withSubrequestLimit(headroom, () => deliveryAdapter(slack.deps(false), target).closeCard(card, { decision: "confirm", by: BEA })),
+      );
+      return slack.of("update").length;
+    };
+    assert.equal(await closeWith(CLOSE_CARD_HEADROOM - 1), 0, "the clear keeps its subrequest");
+    assert.equal(await closeWith(CLOSE_CARD_HEADROOM), 1);
+  });
+
+  it("by a reaction that wins it", async () => {
+    const slack = await reactOn(async (s) => void (await s.putProposal(proposal())));
+    const blocks = edit(slack);
+    assert.equal(lastLine(blocks), `Approved by <@${BEA}>`);
+    assert.deepEqual(buttons(blocks), ["View"]);
   });
 });
 

@@ -19,7 +19,7 @@
 //
 // PURE as the turn is: no `Env`, no Workers type, no fetch.
 
-import type { GateVerdict } from "../gate/index";
+import { decidedCardOf, type GateVerdict } from "../gate/index";
 import { proposalReplyThread, type HistoryTurn, type PendingProposal } from "../thread-state/index";
 import { restageExecution } from "./card-staging";
 import type { TurnSettlement } from "./delivery";
@@ -186,6 +186,12 @@ export async function settleVerdict(
       })
     : null;
   if (staged) await ctx.memory.remember(staged.proposal.proposalText);
+  // The card it decided ends as a press leaves it, outcome line and View.
+  // LAST, after everything the person must read: the edit is cosmetic, and
+  // the adapter sends it only while the settle after it still fits the
+  // delivery reserve (`CLOSE_CARD_HEADROOM`).
+  const decided = decidedCardOf(verdict);
+  if (decided) await ctx.deps.delivery.closeCard(decided.card, decided.outcome);
   // "Approve which one?" resolved nothing: it asked, and every card it names
   // is still waiting on the person (#1319).
   const asked = verdict.post?.note.kind === "which-card";

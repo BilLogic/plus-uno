@@ -969,7 +969,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
         note:
           verdict.decision === "confirm"
             ? "(confirmed — executing the proposal)"
-            : "Cancelled.",
+            : "Canceled.",
         telemetry: {
           tier: "chill",
           route: "typed-gate-emoji",
@@ -1423,7 +1423,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       .some((t) => cancelledRecently(t, result.toolName, result.input, deps.now?.() ?? Date.now()));
     if (justCancelled) {
       const bounce =
-        `You cancelled that ${verbFor(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
+        `You canceled that ${verbFor(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
         `Changed your mind? Say so explicitly and I'll stage it again — or tell me what you'd like instead.`;
       const said = await delivery.postNote(bounce);
       await memory.remember(said.ok ? said.text : bounce);
@@ -1659,7 +1659,7 @@ async function dropFromSweepCard(
       { kind: "typed", channel: request.channel, thread: cardThread, text: "⛔", userId: request.userId },
       { threadState, standingConfirmers: deps.standingConfirmers },
     );
-    return settleVerdict(verdict, { deps, memory, note: "Cancelled.", telemetry });
+    return settleVerdict(verdict, { deps, memory, note: "Canceled.", telemetry });
   }
   const all = proposalOperations(pending);
   const operations = kept.map((i) => all[i]!);
