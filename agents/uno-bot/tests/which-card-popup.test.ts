@@ -21,6 +21,7 @@ import {
   LEGACY_WHICH_REPLY,
   WHICH_CHOOSE_ACTION_ID,
   WHICH_EXPIRED_REPLY,
+  canceledLine,
   chooseValueOf,
   isLegacyWhichPress,
   runWhichOpen,
@@ -532,4 +533,120 @@ test("each ticked card's mark on the question is spent inside its own budget ste
   assert.ok(events.indexOf("mark:b") >= 0 && events.indexOf("mark:b") < events.indexOf("check"), events.join(" "));
   assert.deepEqual(await live(h), []);
   assert.match(JSON.stringify(d.questionEdits.at(-1)!.blocks), /Decided\./);
+});
+
+/** What was said in the thread from the call `from` on: every post, a gate
+ *  note or a plain one, and never a note edited onto its card. */
+const threadLines = (h: Harness, from: number) =>
+  h.delivery.calls.slice(from).flatMap((c) => (c.kind === "note" ? [c.text] : c.kind === "gate-note" && !c.card ? [renderGateNote(c.note)] : []));
+
+test("a Cancel of several says one line in the thread, naming every card it canceled", async () => {
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { a, b, question } = await asked(h, "⛔");
+  clock.now = SOON;
+  const d = doors(h, clock);
+  const view = (await choose(d, question))!;
+  const from = h.delivery.calls.length;
+
+  await submit(d, view, stateOf(view, [a, b]));
+
+  assert.deepEqual(threadLines(h, from), ["Canceled *Backup tutor matching* and *Session reflections*."]);
+});
+
+test("a Cancel of one, with a note, says one line naming it; the reason stays on the card", async () => {
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { b, question } = await asked(h, "⛔");
+  clock.now = SOON;
+  const d = doors(h, clock);
+  const view = (await choose(d, question))!;
+  const from = h.delivery.calls.length;
+
+  await submit(d, view, stateOf(view, [b], "not this quarter"));
+
+  assert.deepEqual(threadLines(h, from), ["Canceled *Session reflections*."]);
+  const note = h.resolved.at(-1)?.note;
+  assert.equal(note?.kind === "resolved" && note.rejected?.reason, "not this quarter");
+});
+
+test("a Cancel names only the cards it canceled: one decided elsewhere is left out", async () => {
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { a, b, question } = await asked(h, "⛔");
+  clock.now = SOON;
+  const d = doors(h, clock);
+  const view = (await choose(d, question))!;
+  await runButtonDoor(
+    { channel: CHANNEL, messageTs: a, decision: "cancel", userId: "U2" },
+    { ...d.deps, replaceCard: async () => {}, replyEphemeral: async () => {} },
+  );
+  const from = h.delivery.calls.length;
+
+  await submit(d, view, stateOf(view, [a, b]));
+
+  assert.deepEqual(threadLines(h, from), ["Canceled *Session reflections*."]);
+});
+
+test("a Cancel names only the cards it canceled: one past the budget is left out", async () => {
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { a, b, question } = await asked(h, "⛔");
+  clock.now = SOON;
+  const d = doors(h, clock, { headroom: () => 5 });
+  const view = (await choose(d, question))!;
+  const from = h.delivery.calls.length;
+
+  await submit(d, view, stateOf(view, [b, a]));
+
+  assert.deepEqual(threadLines(h, from), ["Canceled *Session reflections*."]);
+});
+
+test("a Cancel that canceled nothing says nothing in the thread", async () => {
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { a, question } = await asked(h, "⛔");
+  clock.now = SOON;
+  const d = doors(h, clock);
+  const view = (await choose(d, question))!;
+  await runButtonDoor(
+    { channel: CHANNEL, messageTs: a, decision: "cancel", userId: "U2" },
+    { ...d.deps, replaceCard: async () => {}, replyEphemeral: async () => {} },
+  );
+  const from = h.delivery.calls.length;
+
+  await submit(d, view, stateOf(view, [a]));
+
+  assert.deepEqual(threadLines(h, from), []);
+});
+
+test("three or more canceled are joined with commas and \"and\"", () => {
+  assert.equal(canceledLine(["A", "B", "C"]), "Canceled *A*, *B* and *C*.");
+  assert.equal(canceledLine(["A"]), "Canceled *A*.");
+  assert.equal(canceledLine(["A", "B"]), "Canceled *A* and *B*.");
+  assert.equal(canceledLine(["<A> & B"]), "Canceled *&lt;A&gt; &amp; B*.", "headlines escaped");
+});
+
+test("an Approve from the pop-up keeps its card's own outcome post", async () => {
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { a, question } = await asked(h);
+  clock.now = SOON;
+  const d = doors(h, clock);
+  const view = (await choose(d, question))!;
+  const from = h.delivery.calls.length;
+
+  await submit(d, view, stateOf(view, [a]));
+
+  assert.deepEqual(h.delivery.calls.slice(from).flatMap((c) => (c.kind === "gate-note" ? [c.note.kind] : [])), ["resolved"]);
+  assert.equal(h.delivery.calls.slice(from).filter((c) => c.kind === "note").length, 0);
+});
+
+test("a card's own Cancel still posts its own outcome line", async () => {
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { a } = await asked(h, "⛔");
+  clock.now = SOON;
+  const d = doors(h, clock);
+  const from = h.delivery.calls.length;
+
+  await runButtonDoor(
+    { channel: CHANNEL, messageTs: a, decision: "cancel", userId: "U1" },
+    { ...d.deps, replaceCard: async () => {}, replyEphemeral: async () => {} },
+  );
+
+  assert.deepEqual(h.delivery.calls.slice(from).flatMap((c) => (c.kind === "gate-note" ? [c.note.kind] : [])), ["resolved"]);
 });

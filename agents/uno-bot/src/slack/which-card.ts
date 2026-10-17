@@ -42,9 +42,16 @@
 // land out of order and show one decided card too few until the next
 // decision. Neither costs a wrong decision.
 //
-// A CANCEL OF SEVERAL IS HELD TO THE BUDGET. Each card a Submit decides posts
-// its note in the thread and edits its card, as a press would, so a Submit
-// checks the invocation's subrequest headroom before each card after the first
+// A CANCEL SAYS ONE LINE. A press posts its outcome in the thread; a Cancel of
+// several from here would post one bare "Canceled." per card, naming none. So
+// a Cancel's cards post nothing each (`ButtonRequest.quiet`), and the Submit
+// posts one line naming the cards it canceled (`canceledLine`) — none for a
+// card refused, decided elsewhere or past the budget. An Approve is one card,
+// and keeps its press's own post.
+//
+// A CANCEL OF SEVERAL IS HELD TO THE BUDGET. Each card a Submit decides edits
+// its card and its record, as a press would, so a Submit checks the
+// invocation's subrequest headroom before each card after the first
 // (`headroom`); a card past it is left waiting and named in the answer, to be
 // ticked again.
 //
@@ -298,13 +305,26 @@ export interface WhichSubmitRequest {
   userId: string;
 }
 
+/**
+ * A Cancel's one line in the thread, naming the cards it canceled: "Canceled
+ * *A*.", "Canceled *A* and *B*.", "Canceled *A*, *B* and *C*.". Headlines
+ * come from the model's input, so escaped, and trimmed, since bold opened
+ * beside a space is not bold.
+ */
+export function canceledLine(headlines: readonly string[]): string {
+  const names = headlines.map((headline) => `*${escapeSlackText(headline.trim())}*`);
+  const last = names.pop();
+  return `Canceled ${names.length ? `${names.join(", ")} and ${last}` : last}.`;
+}
+
 /** What each decision is said as in the pop-up's answer. */
 const DONE: Readonly<Record<Decision, string>> = { confirm: "Approved", cancel: "Canceled" };
 
 /** The subrequests one card's decision spends, as a press does: its note in
- *  the thread, the working signal raised and settled, its card edited, the
- *  decision's record, and its mark on this question — with room to spare.
- *  And what the Submit spends after the last card: the pop-up's answer and
+ *  the thread (an Approve's; a Cancel's cards post none), the working signal
+ *  raised and settled, its card edited, the decision's record, and its mark
+ *  on this question — with room to spare. And what the Submit spends after
+ *  the last card: a Cancel's one line in the thread, the pop-up's answer and
  *  the question redrawn. */
 const PER_CARD_SUBREQUESTS = 10;
 const FINISH_SUBREQUESTS = 3;
@@ -330,17 +350,27 @@ export async function runWhichSubmit(request: WhichSubmitRequest, deps: WhichDoo
   }
   const lines: string[] = [];
   let kept: WhichQuestion | null = null;
+  const canceled: string[] = [];
+  let thread: ButtonDoorTarget | undefined;
   for (const [i, cardTs] of pick.picked.entries()) {
-    const headline = `*${escapeSlackText(popup.cards.find((c) => c.ts === cardTs)?.headline || "That card")}*`;
+    const named = popup.cards.find((c) => c.ts === cardTs)?.headline || "That card";
+    const headline = `*${escapeSlackText(named)}*`;
     if (i > 0 && (deps.headroom?.() ?? Infinity) < PER_CARD_SUBREQUESTS + FINISH_SUBREQUESTS) {
       lines.push(`${headline}: not reached this time, so it is still waiting. Choose it again.`);
       continue;
     }
     const decided = await decideOne(cardTs, request, deps);
     if (decided.question) kept = decided.question;
+    if (decided.canceledIn) {
+      canceled.push(named);
+      thread ??= decided.canceledIn;
+    }
     lines.push(`${headline}: ${decided.line}`);
   }
-  console.log(`[which-card] ${popup.decision} on ${where} by=${request.userId} cards=${pick.picked.length}`);
+  console.log(`[which-card] ${popup.decision} on ${where} by=${request.userId} cards=${pick.picked.length} canceled=${canceled.length}`);
+  // A Cancel's cards posted no note each (`ButtonRequest.quiet`): the thread
+  // hears one line naming the ones it canceled, and none if it canceled none.
+  if (thread) await deps.delivery(thread).postNote(canceledLine(canceled));
   if (kept) await deps.editQuestion(keptQuestionMessage(kept));
   await deps.views.update(request.viewId, whichResultView(popup, lines));
 }
@@ -355,7 +385,7 @@ async function decideOne(
   cardTs: string,
   request: WhichSubmitRequest,
   deps: WhichDoorDeps,
-): Promise<{ line: string; question: WhichQuestion | null }> {
+): Promise<{ line: string; question: WhichQuestion | null; canceledIn?: ButtonDoorTarget }> {
   const { popup, pick, userId } = request;
   const decision = popup.decision;
   // A Cancel with a note is the Review pop-up's Reject: the note is its reason,
@@ -370,8 +400,11 @@ async function decideOne(
     return { line: renderGateNote(verdict.post.note), question: await markHere(cardTs, popup, deps) };
   }
   let said = "";
+  // A Cancel's win posts no note of its own: the Submit says one line for
+  // every card it canceled. An Approve is one card, and keeps its post.
+  const quiet = decision === "cancel";
   const question = await applyPressVerdict(
-    { channel: popup.channel, messageTs: cardTs, decision, userId, fromQuestion: popup.questionTs },
+    { channel: popup.channel, messageTs: cardTs, decision, userId, fromQuestion: popup.questionTs, ...(quiet ? { quiet } : {}) },
     verdict,
     {
       delivery: deps.delivery,
@@ -384,7 +417,15 @@ async function decideOne(
       ...(deps.now ? { now: deps.now } : {}),
     },
   );
-  if (verdict.outcome === "won") return { line: `${DONE[decision]}.`, question: question ?? (await markHere(cardTs, popup, deps)) };
+  if (verdict.outcome === "won") {
+    const marked = question ?? (await markHere(cardTs, popup, deps));
+    const { proposal, post } = verdict;
+    const canceledIn =
+      quiet && proposal && post?.note.kind === "resolved"
+        ? { channel: proposal.channel, replyTs: post.replyTs, userMsgTs: proposal.userMsgTs, userId }
+        : undefined;
+    return { line: `${DONE[decision]}.`, question: marked, ...(canceledIn ? { canceledIn } : {}) };
+  }
   return { line: said || (verdict.post ? renderGateNote(verdict.post.note) : "Nothing changed."), question: question ?? (await markHere(cardTs, popup, deps)) };
 }
 
