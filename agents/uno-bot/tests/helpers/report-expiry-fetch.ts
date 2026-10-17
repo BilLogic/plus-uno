@@ -12,6 +12,13 @@ export const expiryEdits: Record<string, unknown>[] = [];
  *  Slack, so a wrong constant in the Worker fails a test instead of agreeing
  *  with itself. */
 export const UPDATE_TEXT_LIMIT = 4000;
+let textLimit = UPDATE_TEXT_LIMIT;
+/** Refuse `text` past `limit` instead: Slack refused a capped edit live
+ *  (2026-10-17, Worker r674), so its real ceiling sits below its documented
+ *  one on some text, and the Worker must land the edit anyway. */
+export function expiryTextLimit(limit: number = UPDATE_TEXT_LIMIT): void {
+  textLimit = limit;
+}
 let response: { ok: boolean; error?: string } = { ok: true };
 export function expiryFetchResponse(value: typeof response): void {
   response = value;
@@ -20,6 +27,6 @@ globalThis.fetch = (async (url: unknown, init?: RequestInit) => {
   if (String(url) !== "https://slack.com/api/chat.update") throw new Error(`Unexpected test request: ${String(url)}`);
   const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
   expiryEdits.push(body);
-  if (String(body.text ?? "").length > UPDATE_TEXT_LIMIT) return new Response(JSON.stringify({ ok: false, error: "msg_too_long" }));
+  if (String(body.text ?? "").length > textLimit) return new Response(JSON.stringify({ ok: false, error: "msg_too_long" }));
   return new Response(JSON.stringify(response));
 }) as typeof fetch;

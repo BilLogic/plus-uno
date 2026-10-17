@@ -350,6 +350,14 @@ export interface PostMessageInput {
 export const UPDATE_TEXT_CHARS = 4000;
 
 /**
+ * The text an edit Slack refused as too long is sent again with — its opening
+ * and its last line, as `UPDATE_TEXT_CHARS` keeps them, but short enough for
+ * any reading of Slack's rule. A revised PRD card was refused live (Worker
+ * r674) with its text already held to `UPDATE_TEXT_CHARS`.
+ */
+export const UPDATE_RETRY_TEXT_CHARS = 1000;
+
+/**
  * Replace one of the bot's own messages — chat.update, which Slack allows a
  * bot token on the bot's messages only.
  *
@@ -364,11 +372,20 @@ export async function updateMessage(
   env: Env,
   input: { channel: string; ts: string; text: string; blocks?: unknown[]; metadata?: SlackMessageMetadata },
 ) {
-  return slackCall<SlackResponse & { ts?: string }>(env, "chat.update", {
-    ...input,
-    text: keepLastLine(sanitizeSlackMarkup(toSlackMrkdwn(input.text)), UPDATE_TEXT_CHARS),
-    blocks: input.blocks ?? [],
-  });
+  const full = sanitizeSlackMarkup(toSlackMrkdwn(input.text));
+  const blocks = input.blocks ?? [];
+  const send = (text: string) => slackCall<SlackResponse & { ts?: string }>(env, "chat.update", { ...input, text, blocks });
+  const text = keepLastLine(full, UPDATE_TEXT_CHARS);
+  const res = await send(text);
+  if (res.ok || res.error !== "msg_too_long") return res;
+  // Refused under the documented ceiling (live on Worker r674): say what was
+  // sent, so the real rule can be read off it, and land the edit with a text
+  // short enough for any reading of it.
+  console.warn(
+    `[slack] chat.update msg_too_long: text ${text.length} chars / ${new TextEncoder().encode(text).length} bytes, ` +
+      `blocks ${JSON.stringify(blocks).length} chars; sending it again with ${UPDATE_RETRY_TEXT_CHARS}`,
+  );
+  return send(keepLastLine(full, UPDATE_RETRY_TEXT_CHARS));
 }
 
 // NOTE ON THE DISPLAY NAME. The bot presents as "Le Goat" because the bot
