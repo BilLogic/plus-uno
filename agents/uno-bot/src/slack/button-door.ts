@@ -45,10 +45,10 @@ export interface ButtonRequest {
   /** The card's own answer it was decided by, from the Review pop-up
    *  (`PendingProposal.choices`): the decided item names it. */
   as?: ChosenAs;
-  /** The "which one?" question the press was made on, by its ts
-   *  (`which-card.ts`): when a win drops the card from that question, the
-   *  question is handed back for the caller to redraw where it was pressed,
-   *  instead of being redrawn here. */
+  /** The "which one?" question whose pop-up the press was made from, by its
+   *  ts (`which-card.ts`): when a win drops the card from that question, the
+   *  question is handed back for the caller to redraw once every card picked
+   *  there is decided, instead of being redrawn here. */
   fromQuestion?: string;
 }
 

@@ -22,7 +22,7 @@
 // uses) or a normal chat.postMessage, never by holding the response open.
 
 import type { Env } from "../types";
-import { charge } from "../net";
+import { budgetHeadroom, charge } from "../net";
 import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
 import { restageFor, stageFromButtonFor } from "../turn/env-deps";
@@ -62,7 +62,23 @@ import { slackDelivery } from "./slack-delivery";
 import { standingConfirmersOf } from "./standing-confirmers";
 import { runButtonDoor, type ButtonDoorDeps } from "./button-door";
 import type { CardMessage } from "./proposal-render";
-import { WHICH_ACTION_PREFIX, runWhichCardDoor, whichPressOf } from "./which-card";
+import {
+  LEGACY_WHICH_REPLY,
+  WHICH_CHOOSE_ACTION_ID,
+  isLegacyWhichPress,
+  runWhichOpen,
+  runWhichRedraw,
+  runWhichSubmit,
+  type WhichDoorDeps,
+} from "./which-card";
+import {
+  WHICH_CALLBACK_ID,
+  WHICH_DECISION_ACTION_ID,
+  WHICH_DRAFT_ACTION_ID,
+  whichNoticeView,
+  whichPopupOf,
+  whichSubmitOf,
+} from "./which-card-view";
 import { CHECK_IT_ACTION_ID, resultsActionOf, runCheckItDoor, runResultsDoor, runStopCheckDoor, STOP_CHECK_ACTION_ID } from "./blueprint-check";
 import { createdPageOn } from "../blueprint-upkeep/env";
 import { blueprintCheckRunnerKey, type ResultsAction } from "../blueprint-upkeep/check";
@@ -176,6 +192,7 @@ export function handleInteraction(
         }));
         return ack ? Response.json(ack) : new Response("", { status: 200 });
       }
+      if (callbackId === WHICH_CALLBACK_ID) return submitWhich(env, payload, ctx);
       return submitReview(env, payload, ctx);
     }
     default:
@@ -194,7 +211,9 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_delete_answer") return deleteAnswer(env, payload);
   if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
-  if (actionId.startsWith(WHICH_ACTION_PREFIX)) return resolveFromWhichCard(env, payload, actionId);
+  if (actionId === WHICH_CHOOSE_ACTION_ID) return openWhich(env, payload);
+  if (actionId === WHICH_DECISION_ACTION_ID || actionId === WHICH_DRAFT_ACTION_ID) return redrawWhich(env, payload, actionId);
+  if (isLegacyWhichPress(actionId)) return replyEphemeral(payload, LEGACY_WHICH_REPLY);
   if (actionId === CHECK_IT_ACTION_ID) return checkIt(env, payload);
   if (actionId === STOP_CHECK_ACTION_ID) return stopCheck(env, payload);
   const resultsAction = resultsActionOf(actionId);
@@ -263,38 +282,106 @@ async function resolveFromButton(
   await runButtonDoor({ channel, messageTs: ts, decision, userId }, buttonDoorDeps(env, payload));
 }
 
-// A button under "Approve which one?" (#1319): one card's own ✅ or ⛔,
-// pressed from the question rather than the card (`which-card.ts`). The value
-// names the card; the card is edited by its ts, and the question — the message
-// pressed — through `response_url`.
+// Choose…, under a "which one?" question (#1342): the pop-up that decides
+// the cards it lists, each through its own door (`which-card.ts`). The press
+// carries the question in `message`, and every press inside the pop-up, and
+// its Submit, carries it in the view's `private_metadata`.
 //
 // `Env` enters here and stops here.
-async function resolveFromWhichCard(env: Env, payload: InteractionPayload, actionId: string): Promise<void> {
+async function openWhich(env: Env, payload: InteractionPayload): Promise<void> {
+  const triggerId = payload.trigger_id;
   const channel = payload.channel?.id;
   const questionTs = payload.message?.ts;
-  const userId = payload.user?.id ?? "someone";
-  const press = whichPressOf(actionId, payload.actions?.[0]?.value);
-  if (!channel || !questionTs || !press) return;
-  await runWhichCardDoor(
+  const userId = payload.user?.id;
+  if (!triggerId || !channel || !questionTs || !userId) return;
+  await runWhichOpen(
     {
+      triggerId,
       channel,
       questionTs,
       question: { text: payload.message?.text ?? "", blocks: payload.message?.blocks ?? [] },
-      cardTs: press.cardTs,
-      decision: press.decision,
+      value: payload.actions?.[0]?.value,
       userId,
     },
-    {
-      ...buttonDoorDeps(env, payload),
-      editCard: async (ts, message) => {
-        const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
-        // Cosmetic, as every card re-render is: the decision is already
-        // announced in the thread.
-        if (!res.ok) console.warn(`[interactive] card re-render after a which-card press failed on ${channel}/${ts}`);
-      },
-      replaceQuestion: (message) => replaceCard(payload, message),
-    },
+    whichDoorDeps(env, payload, channel, questionTs),
   );
+}
+
+/** Approve / Cancel switched, or Show draft / Hide draft pressed, inside the
+ *  pop-up: the pop-up redrawn in place. */
+async function redrawWhich(env: Env, payload: InteractionPayload, actionId: string): Promise<void> {
+  const viewId = payload.view?.id;
+  const popup = whichPopupOf(payload.view?.private_metadata);
+  const userId = payload.user?.id;
+  const action = payload.actions?.[0];
+  if (!viewId || !popup || !userId || !action) return;
+  const decision = action.selected_option?.value;
+  const press =
+    actionId === WHICH_DECISION_ACTION_ID
+      ? decision === "confirm" || decision === "cancel"
+        ? ({ kind: "decision", decision } as const)
+        : null
+      : action.value
+        ? ({ kind: "draft", cardTs: action.value } as const)
+        : null;
+  if (!press) return;
+  await runWhichRedraw({ viewId, popup, state: payload.view?.state, press, userId }, whichDoorDeps(env, payload, popup.channel, popup.questionTs));
+}
+
+/**
+ * The pop-up's Submit: nothing picked is an error under the list, in the ack
+ * itself; a pick is acked with a line that says it is under way, and the
+ * cards are decided after the ack, the pop-up answering once they are.
+ */
+function submitWhich(env: Env, payload: InteractionPayload, ctx: ExecutionContext): Response {
+  const viewId = payload.view?.id;
+  const popup = whichPopupOf(payload.view?.private_metadata);
+  const userId = payload.user?.id;
+  if (!viewId || !popup || !userId) {
+    console.log("[interactive] which-card submit without its question");
+    return new Response("", { status: 200 });
+  }
+  const submitted = whichSubmitOf(payload.view?.state, popup.decision);
+  if (!submitted.ok) return Response.json({ response_action: "errors", errors: submitted.errors });
+  ctx.waitUntil(
+    runWhichSubmit({ viewId, popup, pick: submitted.pick, userId }, whichDoorDeps(env, payload, popup.channel, popup.questionTs)).catch((err) => {
+      console.error(`[interactive] which-card ${popup.decision} failed: ${err instanceof Error ? err.message : String(err)}`);
+    }),
+  );
+  const underWay = popup.decision === "confirm" ? "Approving…" : "Canceling…";
+  return Response.json({ response_action: "update", view: whichNoticeView(popup, underWay) });
+}
+
+/** `Env`, once, as the dependencies the "which one?" doors read: the button
+ *  door's, Slack's views, and the question's message edited by its ts. */
+function whichDoorDeps(env: Env, payload: InteractionPayload, channel: string, questionTs: string): WhichDoorDeps {
+  const { threadState, standingConfirmers, delivery, applyVerdict, restage } = buttonDoorDeps(env, payload);
+  return {
+    threadState,
+    ...(standingConfirmers ? { standingConfirmers } : {}),
+    views: {
+      open: (triggerId, view) => viewsOpen(env, triggerId, view),
+      push: (triggerId, view) => viewsPush(env, triggerId, view),
+      update: (viewId, view) => viewsUpdate(env, viewId, view),
+    },
+    delivery,
+    applyVerdict,
+    restage,
+    editCard: async (ts, message) => {
+      const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
+      // Cosmetic, as every card re-render is: the decision is already
+      // announced in the thread.
+      if (!res.ok) console.warn(`[interactive] card re-render from the which-card pop-up failed on ${channel}/${ts}`);
+    },
+    editQuestion: async (message) => {
+      const res = await updateMessage(env, { channel, ts: questionTs, text: message.text, blocks: message.blocks });
+      if (!res.ok) console.warn(`[interactive] which-card question ${channel}/${questionTs} could not be redrawn`);
+    },
+    replyEphemeral: (text) => replyEphemeral(payload, text),
+    // A cancel records its decision in D1 too, whose queries are capped apart.
+    headroom: () => Math.min(budgetHeadroom().subrequests, budgetHeadroom().d1Queries),
+    notionDatabases: notionDatabaseLinks(env),
+  };
 }
 
 // Check it, under a milestone's card (#1321): anyone in the thread may press

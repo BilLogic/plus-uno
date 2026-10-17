@@ -583,5 +583,21 @@ function viewOnlyRefusal(block: Shape): string | null {
     }
     return null;
   }
+  if (element.type === "checkboxes") {
+    // The checkboxes reference: 1 to 10 options, each with short text, and
+    // any it opens ticked among them.
+    const options = Array.isArray(element.options) ? element.options : [];
+    if (options.length < CHECKBOX_OPTIONS.min || options.length > CHECKBOX_OPTIONS.max) return `checkboxes of ${options.length} options`;
+    for (const o of options) {
+      const text = isShape(o) && isShape(o.text) ? o.text.text : undefined;
+      if (!nonEmpty(text) || String(text).length > OPTION_TEXT_CHARS) return "a checkbox without short text";
+    }
+    const values = new Set(options.map((o) => (isShape(o) ? o.value : undefined)));
+    const ticked = Array.isArray(element.initial_options) ? element.initial_options : [];
+    if (ticked.some((o) => !isShape(o) || !values.has(o.value))) return "checkboxes opening ticked on an option they do not offer";
+    return null;
+  }
   return `an input of ${String(element.type)}`;
 }
+
+const CHECKBOX_OPTIONS = { min: 1, max: 10 };

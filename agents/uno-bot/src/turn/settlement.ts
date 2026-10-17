@@ -218,7 +218,8 @@ export async function settleVerdict(
  * card it lists can be dropped from it by whichever door decides that card
  * (`dropFromWhichQuestion`). Anything else, or a question that did not post,
  * keeps nothing. Best-effort: a question not kept still works, its own
- * presses redrawing it; only a decision made elsewhere leaves its button up.
+ * pop-up reading which cards still wait; only a decision made elsewhere
+ * leaves its headline unstruck.
  *
  * @param note - The gate note posted
  * @param said - What its post did
@@ -262,12 +263,13 @@ export async function whichQuestionOf(
 
 /**
  * A decided card, dropped from the open question that lists it: marked there
- * (`whichQuestionOf`) and the question redrawn without that card's button
+ * (`whichQuestionOf`) and the question redrawn with that card struck
  * (`Delivery.redrawWhichCard`). Every door that decides a card ends through
  * here once the card itself is closed — the turn's typed emoji and
  * `proposal_resolve`, a reaction, a press on the card or in its Review
  * pop-up — so a card decided anywhere stops being offered on the question.
- * A press made on a question redraws that one itself (`slack/which-card.ts`).
+ * A Submit from a question's own pop-up redraws that one itself
+ * (`slack/which-card.ts`).
  *
  * @param cardTs - The card a door just decided
  * @param deps - The store the question is kept in, and the door's Delivery

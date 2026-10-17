@@ -4,9 +4,9 @@
 // A thread can hold several live cards (#1318). A typed ✅ / ⛔, or a "yes"
 // the model reads as a decision, says nothing about WHICH card it means, and
 // two cards are two different writes — so with more than one waiting, the
-// decision resolves nothing and the bot asks which, one button per card. With
+// decision resolves nothing and the bot asks which, with one Choose… button. With
 // a single card waiting, a decision resolves it directly, as it always has.
-// The buttons themselves are driven in `tests/which-card-buttons.test.ts`.
+// The question's pop-up is driven in `tests/which-card-popup.test.ts`.
 //
 // Every case runs real turns on one in-memory store (one thread), handed the
 // thread's live cards the way `slack/events.ts` hands them over.
@@ -41,7 +41,7 @@ async function live(h: Harness): Promise<string[]> {
   return (await h.threadState.getProposalsByThread(REF)).map((p) => p.proposalTs).sort();
 }
 
-test("a typed ✅ with two live cards runs nothing and asks which, one numbered button per card", async () => {
+test("a typed ✅ with two live cards runs nothing and asks which", async () => {
   const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B)] });
   const { a, b } = await twoCards(h);
 
@@ -106,7 +106,7 @@ test("a typed \"yes\" with two live cards: the model's approval naming no card i
     .find((r) => r.name === "proposal_resolve");
   assert.ok(refusal?.isError, "the call was refused");
   assert.match(refusal!.text, /card/);
-  // And the person is asked, with a button per card — not in the model's words.
+  // And the person is asked, with the question's own Choose… — not in the model's words.
   assert.deepEqual(h.delivery.gateNotes.at(-1), {
     kind: "which-card",
     decision: "confirm",
@@ -218,7 +218,7 @@ function redraws(h: Harness) {
   return h.delivery.calls.flatMap((c) => (c.kind === "redraw-which" ? [c.question] : []));
 }
 
-test("a card decided in words drops out of the open \"Cancel which one?\": its button goes, its number stays", async () => {
+test("a card decided in words drops out of the open \"which one?\" question, which keeps its list", async () => {
   // Live 2026-10-17: "Cancel the mobile expiry-line one" canceled card 2, and
   // the question above kept its "Cancel 2" button.
   const resolve = { toolCalls: [{ name: "proposal_resolve", args: { decision: "cancel", card: "" } as Record<string, unknown> }] };
@@ -241,7 +241,7 @@ test("a card decided in words drops out of the open \"Cancel which one?\": its b
   assert.ok(asked < closed && closed < drawn, "the card is closed first, then the question redrawn");
 });
 
-test("the last card left, decided with a typed ✅, leaves the question with no buttons, and its record goes", async () => {
+test("the last card left, decided with a typed ✅, leaves the question with no Choose…, and its record goes", async () => {
   const resolve = { toolCalls: [{ name: "proposal_resolve", args: { decision: "cancel", card: "" } as Record<string, unknown> }] };
   const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B), resolve] });
   const { a, b } = await twoCards(h);

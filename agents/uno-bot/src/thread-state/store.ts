@@ -2041,17 +2041,17 @@ export interface ThreadState {
 
   // ----- the open "which one?" question -----
   //
-  // A decision that named no card asks "Approve which one?" with a button per
-  // card (`slack/which-card.ts`). A card can then be decided by any door —
-  // the question's own button, the card's, a reaction, a typed emoji, the
-  // model's `proposal_resolve` — and only the question's own press could find
-  // the question to take that card's button off it. This is what lets every
-  // other door find it too.
+  // A decision that named no card asks which, with one Choose… button that
+  // opens a pop-up of the cards (`slack/which-card.ts`). A card can then be
+  // decided by any door — the question's pop-up, the card's own Review, a
+  // reaction, a typed emoji, the model's `proposal_resolve` — and only the
+  // question's own pop-up could find the question to strike that card on it.
+  // This is what lets every other door find it too.
 
   /**
    * Keep a question as it was posted, under its message ts, and point each
    * card it lists at it. A card asked about again points at the newest
-   * question. Kept until its last card is decided, or until its buttons lapse
+   * question. Kept until its last card is decided, or until its Choose… lapses
    * on the card rule from its own ts (`whichQuestionLive`).
    */
   putWhichQuestion(question: WhichQuestion): Promise<void>;
@@ -2076,8 +2076,8 @@ export interface ThreadState {
 
 /**
  * A "which one?" question as kept: its message, the decision it asks for,
- * the cards it lists in their numbered order, and which of them are decided.
- * The list never shrinks, so "Cancel 2" goes on meaning card 2.
+ * the cards it lists in its order, and which of them are decided. The list
+ * never shrinks, so a decided card stays on it, struck.
  */
 export interface WhichQuestion {
   /** The question's own message: the record's key, and what is edited. */
@@ -2112,7 +2112,7 @@ export function whichCardKey(cardTs: string): string {
 }
 
 /**
- * Whether a question's buttons still answer at `at`: the card rule counted
+ * Whether a question's Choose… still answers at `at`: the card rule counted
  * from the question's own ts, the one clock its door reads
  * (`slack/which-card.ts`). A ts that is not Slack's — a test double's — is
  * counted from when the question was put instead.

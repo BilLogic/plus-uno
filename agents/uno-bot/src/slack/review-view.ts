@@ -202,6 +202,18 @@ export interface DraftAccess {
   decided?: Pick<DecidedProposal, "decision" | "by" | "reason">;
 }
 
+/** How `draftView` draws the draft beyond who may decide it. */
+export interface DraftOptions {
+  edits?: Readonly<Record<string, string>>;
+  /** What was typed into the fields in place, kept when the draft is redrawn
+   *  around an alert: shown, never stored. */
+  typed?: ReadonlyMap<string, string>;
+  editable?: boolean;
+  alert?: { level: "error" | "success"; text: string };
+  /** Where the Notion databases a create lands in open, for its where line. */
+  databases?: NotionDatabaseLinks;
+}
+
 /**
  * The draft, written for a person, under its tool's title. A tool read in the
  * shared anatomy (`review-draft.ts` § `anatomyOf`) is drawn in its zones —
@@ -225,17 +237,54 @@ export function draftView(
   card: ReviewedCard,
   proposal: PendingProposal,
   access: DraftAccess,
-  opts: {
-    edits?: Readonly<Record<string, string>>;
-    /** What was typed into the fields in place, kept when the draft is redrawn
-     *  around an alert: shown, never stored. */
-    typed?: ReadonlyMap<string, string>;
-    editable?: boolean;
-    alert?: { level: "error" | "success"; text: string };
-    /** Where the Notion databases a create lands in open, for its where line. */
-    databases?: NotionDatabaseLinks;
-  } = {},
+  opts: DraftOptions = {},
 ): View {
+  const { mayDecide, operations, anatomy, reading, body, editButton, edited } = drawDraft(proposal, access, opts);
+
+  const head: unknown[] = [];
+  // A refused edit's alert stays first, above every zone; then, for a view
+  // that cannot decide, why not.
+  if (opts.alert) head.push(alertBlock(opts.alert.level, opts.alert.text));
+  if (access.decided) head.push(...decidedAlert(access.decided, proposal, reading));
+  else if (!mayDecide) head.push(stateAlert("info", "Read-only."), richLine(readOnlyLine(access.confirmers)));
+  if (!anatomy) head.push(headlineBlock(operations, editButton), ...edited);
+
+  const words = decisionWords(operations);
+  const tail: unknown[] = mayDecide
+    ? [
+        { type: "divider" },
+        choiceInput(proposal.choices, {
+          ...words,
+          ...(anatomy?.approve ? { confirm: anatomy.approve } : {}),
+          ...(anatomy?.revise ? { revise: anatomy.revise } : {}),
+        }),
+        noteInput(Boolean(proposal.choices?.length), Boolean(anatomy)),
+        ...(access.closesAt !== undefined ? [context(openLine(access.closesAt, access.confirmers))] : []),
+      ]
+    : [];
+  const fitted = fitBody(body, MAX_VIEW_BLOCKS - head.length - tail.length);
+  return modal(
+    { channel: card.channel, ts: card.ts },
+    [...head, ...fitted, ...tail],
+    { title: reviewTitle(operations), ...(mayDecide ? { submit: SUBMIT } : {}) },
+  );
+}
+
+/** The draft drawn for this person: its reading, and its body as blocks,
+ *  before the head and the decision row a view puts around it. */
+function drawDraft(
+  proposal: PendingProposal,
+  access: DraftAccess,
+  opts: DraftOptions,
+): {
+  mayDecide: boolean;
+  operations: ProposalOperation[];
+  anatomy: DraftAnatomy | null;
+  reading: DraftAnatomy | null;
+  body: unknown[];
+  editButton: unknown;
+  edited: unknown[];
+} {
   const mayDecide = access.mayDecide && !access.decided;
   const edits = mayDecide ? (opts.edits ?? {}) : {};
   const operations = withValues(proposal, new Map(Object.entries(edits)));
@@ -278,42 +327,31 @@ export function draftView(
   const drawn = new Set(read.map((b) => (b as { block_id?: string }).block_id));
   const rest = [...inPlace.values()].filter((f) => !drawn.has(`${FIELD_BLOCK_PREFIX}${f.key}`));
   const body = rest.length ? [...read, { type: "divider" }, ...fieldInputBlocks(rest)] : read;
+  return { mayDecide, operations, anatomy, reading, body, editButton, edited };
+}
 
-  const head: unknown[] = [];
-  // A refused edit's alert stays first, above every zone; then, for a view
-  // that cannot decide, why not.
-  if (opts.alert) head.push(alertBlock(opts.alert.level, opts.alert.text));
-  if (access.decided) head.push(...decidedAlert(access.decided, proposal, reading));
-  else if (!mayDecide) head.push(stateAlert("info", "Read-only."), richLine(readOnlyLine(access.confirmers)));
-  if (!anatomy) {
-    const headline = draftHeadline(operations);
-    head.push({
-      type: "section",
-      text: { type: "mrkdwn", text: headline ? `*${escapeSlackText(headline)}*` : "*The draft*" },
-      ...(editButton ? { accessory: editButton } : {}),
-    });
-    head.push(...edited);
-  }
+/** A draft with no reading opens on its headline, and Edit fields beside it. */
+function headlineBlock(operations: readonly ProposalOperation[], editButton?: unknown): unknown {
+  const headline = draftHeadline(operations);
+  return {
+    type: "section",
+    text: { type: "mrkdwn", text: headline ? `*${escapeSlackText(headline)}*` : "*The draft*" },
+    ...(editButton ? { accessory: editButton } : {}),
+  };
+}
 
-  const words = decisionWords(operations);
-  const tail: unknown[] = mayDecide
-    ? [
-        { type: "divider" },
-        choiceInput(proposal.choices, {
-          ...words,
-          ...(anatomy?.approve ? { confirm: anatomy.approve } : {}),
-          ...(anatomy?.revise ? { revise: anatomy.revise } : {}),
-        }),
-        noteInput(Boolean(proposal.choices?.length), Boolean(anatomy)),
-        ...(access.closesAt !== undefined ? [context(openLine(access.closesAt, access.confirmers))] : []),
-      ]
-    : [];
-  const fitted = fitBody(body, MAX_VIEW_BLOCKS - head.length - tail.length);
-  return modal(
-    { channel: card.channel, ts: card.ts },
-    [...head, ...fitted, ...tail],
-    { title: reviewTitle(operations), ...(mayDecide ? { submit: SUBMIT } : {}) },
-  );
+/**
+ * A card's draft as its Review pop-up draws it for someone who cannot decide
+ * it — the same reading, without the alert saying so, the inputs or the
+ * decision — for a view that shows a draft beside others: the "which one?"
+ * pop-up's Show draft (`which-card-view.ts`).
+ *
+ * @param proposal - The card
+ * @param opts.databases - Where the Notion databases a create lands in open
+ */
+export function draftBlocks(proposal: PendingProposal, opts: { databases?: NotionDatabaseLinks } = {}): unknown[] {
+  const { anatomy, operations, body } = drawDraft(proposal, { mayDecide: false, confirmers: [] }, opts);
+  return anatomy ? body : [headlineBlock(operations), ...body];
 }
 
 /** A decided card's reading: its content, without the where line and the
@@ -367,7 +405,7 @@ const LEFT_OUT =
  *  push the decision out of the view; past the room, its later blocks go and a
  *  line says some was left out. A field in place is never cut: what can be
  *  edited stays editable, whatever is left out around it. */
-export function fitBody(draft: unknown[], room: number): unknown[] {
+export function fitBody(draft: unknown[], room: number, leftOut: string = LEFT_OUT): unknown[] {
   if (draft.length <= room) return draft;
   const isInput = (b: unknown) => (b as { type?: string }).type === "input";
   let others = Math.max(0, room - 1 - draft.filter(isInput).length);
@@ -379,7 +417,7 @@ export function fitBody(draft: unknown[], room: number): unknown[] {
       out.push(block);
       others--;
     } else if (!cut) {
-      out.push(context(LEFT_OUT));
+      out.push(context(leftOut));
       cut = true;
     }
   }

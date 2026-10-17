@@ -150,20 +150,22 @@ export function aimedElsewhereLine(note: Extract<GateNote, { kind: "aimed-elsewh
 }
 
 /**
- * "Approve which one?" (#1319): the question, and that nothing ran — what
- * sits above the question's buttons (`which-card.ts`).
+ * The "which one?" question (#1319): how many cards wait, and that nothing
+ * ran — the line above the question's Choose… button (`which-card.ts`). Which
+ * decision it asks for is preset in the pop-up the button opens, so the line
+ * does not say.
  */
 export function whichCardQuestion(note: Extract<GateNote, { kind: "which-card" }>): string {
-  const asked = note.decision === "confirm" ? "Approve which one?" : "Cancel which one?";
-  return `${asked} ${note.cards.length} proposals are waiting here, so nothing ran yet.`;
+  return `${note.cards.length} cards are waiting, nothing ran yet.`;
 }
 
 /** The question's text copy: the question, and the cards by headline — what
- *  a notification and a screen reader get. Headlines come from the model's
- *  input, so escaped. */
+ *  a notification and a screen reader get, since the message itself lists
+ *  them only in its pop-up. Headlines come from the model's input, so
+ *  escaped. */
 function whichCardText(note: Extract<GateNote, { kind: "which-card" }>): string {
   const names = note.cards.map((card) => `*${escapeSlackText(card.headline)}*`);
-  return `${whichCardQuestion(note)} ${names.join(", ")}.`;
+  return `${whichCardQuestion(note)} Waiting: ${names.join(", ")}.`;
 }
 
 /** One verdict, as the line a person reads. */

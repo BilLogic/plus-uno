@@ -248,7 +248,7 @@ export function validateProposalResolve(
       unnamed: decision,
       error:
         `${waiting.length} cards are waiting, so name the one this decides: set \`card\` to its id from <pending_proposal>. ` +
-        "If the person's message does not say which, do not guess — end your turn without calling a tool and I'll ask them which, with a button per card.",
+        "If the person's message does not say which, do not guess — end your turn without calling a tool and I'll ask them which, in a pop-up of the cards.",
     };
   }
   const card = waiting[0] ?? pending ?? liveCards[0]!;

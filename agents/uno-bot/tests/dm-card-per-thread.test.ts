@@ -216,7 +216,7 @@ test("an unthreaded ✅ with several live cards in the DM asks which, and runs n
   assert.deepEqual(h.delivery.gateNotes, [asked]);
   // And what the person reads says so, and names the cards.
   const line = renderGateNote(asked);
-  assert.match(line, /^Approve which one\? 2 proposals are waiting/);
+  assert.match(line, /^2 cards are waiting/);
   assert.match(line, /nothing ran/);
   assert.match(line, /\*Card B\*, \*Card A\*/);
   assert.equal((await h.threadState.getProposalByTs(cardA)).state, "found");
