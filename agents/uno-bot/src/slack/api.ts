@@ -15,6 +15,7 @@ import type { SlackEventFile } from "./types";
 import { cardLinks } from "./plan-block";
 import type { SlackIcon } from "./estate-glyphs";
 import { sendWithCardFallback } from "./card-block";
+import { keepLastLine } from "./split";
 
 interface SlackOk {
   ok: true;
@@ -338,8 +339,26 @@ export interface PostMessageInput {
 }
 
 /**
+ * `chat.update`'s ceiling on `text`: past it Slack answers `msg_too_long` and
+ * the edit does not land (its method reference, read 2026-10-17).
+ * `chat.postMessage` truncates a long text instead, so a card whose whole
+ * draft is its text posts fine and then fails its first edit — live on Worker
+ * r671, a revised PRD card rejected from Review that kept its Review button.
+ * Counted as UTF-16 `.length`, never fewer than Slack's characters: safe, at
+ * the cost of cutting a little early on text with emoji.
+ */
+export const UPDATE_TEXT_CHARS = 4000;
+
+/**
  * Replace one of the bot's own messages — chat.update, which Slack allows a
  * bot token on the bot's messages only.
+ *
+ * Every edit leaves here, so this is where its text is held to
+ * `UPDATE_TEXT_CHARS`: its opening and its last line, which on a card is the
+ * note the edit is for (`split.ts` § keepLastLine). An edit with blocks shows
+ * its blocks, built from the whole text before it gets here, so the cut is
+ * only its fallback copy; a text-only edit shows the cut itself, which beats
+ * an edit that does not land.
  */
 export async function updateMessage(
   env: Env,
@@ -347,7 +366,7 @@ export async function updateMessage(
 ) {
   return slackCall<SlackResponse & { ts?: string }>(env, "chat.update", {
     ...input,
-    text: sanitizeSlackMarkup(toSlackMrkdwn(input.text)),
+    text: keepLastLine(sanitizeSlackMarkup(toSlackMrkdwn(input.text)), UPDATE_TEXT_CHARS),
     blocks: input.blocks ?? [],
   });
 }

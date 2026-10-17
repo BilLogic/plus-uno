@@ -32,7 +32,9 @@ export async function showExpiredCard(proposalTs: string, deps: {
   if (!card) return;
   try {
     await deps.edit(card.channel, proposalTs, {
-      text: card.text,
+      // The note as the copy's last line too, as a decision's is
+      // (`decidedCard`): an edit cut to Slack's limit keeps that line.
+      text: `${card.text}\n${EXPIRED_CARD}`,
       blocks: notedCardBlocks({ text: card.text, ...(card.blocks ? { blocks: card.blocks } : {}) }, EXPIRED_CARD, "View"),
     });
   } catch (err) {

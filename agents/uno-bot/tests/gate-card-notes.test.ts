@@ -90,7 +90,7 @@ describe("on the reaction door", () => {
     });
     const { text, line, button } = edited(slack, OLD_CARD);
     assert.equal(line, supersededBy("Reflection redesign"), "names the card that replaced it");
-    assert.equal(text, card().proposalText, "re-rendered from the card's own words");
+    assert.equal(text, `${card().proposalText}\n${line}`, "re-rendered from the card's own words, the note as its copy's last line");
     assert.equal(button, "View", "nothing left to decide on it");
     assert.deepEqual(slack.of("message"), []);
     assert.deepEqual(ran, []);
