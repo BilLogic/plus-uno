@@ -47,7 +47,8 @@
 // a Cancel's cards post nothing each (`ButtonRequest.quiet`), and the Submit
 // posts one line naming the cards it canceled (`canceledLine`) — none for a
 // card refused, decided elsewhere or past the budget. An Approve is one card,
-// and keeps its press's own post.
+// and keeps its press's own post. A stated card canceled here is named in that
+// one line like any other; its stated words stay on the card.
 //
 // A CANCEL OF SEVERAL IS HELD TO THE BUDGET. Each card a Submit decides edits
 // its card and its record, as a press would, so a Submit checks the
@@ -353,7 +354,8 @@ export async function runWhichSubmit(request: WhichSubmitRequest, deps: WhichDoo
   const canceled: string[] = [];
   let thread: ButtonDoorTarget | undefined;
   for (const [i, cardTs] of pick.picked.entries()) {
-    const named = popup.cards.find((c) => c.ts === cardTs)?.headline || "That card";
+    // Trimmed before the fallback, so a blank headline is never drawn as `**`.
+    const named = popup.cards.find((c) => c.ts === cardTs)?.headline.trim() || "That card";
     const headline = `*${escapeSlackText(named)}*`;
     if (i > 0 && (deps.headroom?.() ?? Infinity) < PER_CARD_SUBREQUESTS + FINISH_SUBREQUESTS) {
       lines.push(`${headline}: not reached this time, so it is still waiting. Choose it again.`);

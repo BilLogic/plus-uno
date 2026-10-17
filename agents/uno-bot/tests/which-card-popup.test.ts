@@ -615,6 +615,22 @@ test("a Cancel that canceled nothing says nothing in the thread", async () => {
   assert.deepEqual(threadLines(h, from), []);
 });
 
+test("a blank headline is named as That card, never drawn as empty bold", async () => {
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { a, question } = await asked(h, "⛔");
+  clock.now = SOON;
+  const d = doors(h, clock);
+  const view = (await choose(d, question))!;
+  const popup = whichPopupOf(view.private_metadata)!;
+  const blank = { ...popup, cards: popup.cards.map((card) => (card.ts === a ? { ...card, headline: "   " } : card)) };
+  const from = h.delivery.calls.length;
+
+  await runWhichSubmit({ viewId: "V1", popup: blank, pick: { picked: [a], note: "" }, userId: "U1" }, d.deps);
+
+  assert.deepEqual(threadLines(h, from), ["Canceled *That card*."]);
+  assert.doesNotMatch(words(d.views.calls.at(-1)!.view as View), /\*\*/);
+});
+
 test("three or more canceled are joined with commas and \"and\"", () => {
   assert.equal(canceledLine(["A", "B", "C"]), "Canceled *A*, *B* and *C*.");
   assert.equal(canceledLine(["A"]), "Canceled *A*.");
