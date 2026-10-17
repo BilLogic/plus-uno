@@ -363,9 +363,9 @@ function settled(anatomy: DraftAnatomy): DraftAnatomy {
 }
 
 /**
- * What a decided card says at the top: the outcome as a plain alert —
+ * What a decided card says at the top: the outcome as an alert —
  * "Approved.", "Rejected." or, on a card with its own answers, "Answered." —
- * `success` for an Approve and a plain alert otherwise; then, where there is
+ * `success` for an Approve and `info` otherwise; then, where there is
  * someone or somewhere to name, a rich text line with the pills: "Approved by
  * @Bill to post in #channel.", "Rejected by @Bill: not this week.".
  */
@@ -626,7 +626,7 @@ function outcomeOf(cardText: string): { level: DraftAlert["level"]; text: string
 /**
  * A decided card opened from View when its record keeps no draft — decided
  * before the record was kept, or past the card's lifetime: the outcome the
- * card's message ends with, under a plain alert at the level its words mean
+ * card's message ends with, under an alert at the level its words mean
  * (the line names who decided, so it is rich text, not the alert), and a line
  * saying the draft is gone. A message with no outcome line reads as decided,
  * plainly.

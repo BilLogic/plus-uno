@@ -773,7 +773,7 @@ describe("a decided card", () => {
     cases.push([stated, "info", stated]);
     for (const [last, level, text] of cases) {
       const view = outcomeView({ channel: CHANNEL, ts: CARD_TS }, `${PROPOSAL.proposalText}\n${last}`) as { blocks: Array<{ type: string; level?: string; text?: { type: string; text: string } }> };
-      // The level on a plain alert, and the outcome, pills and all, on the line under it.
+      // The level on the alert, and the outcome, pills and all, on the line under it.
       assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level, view.blocks[0]!.text!.type], ["alert", level, "plain_text"], last);
       assert.equal(richWords(view.blocks[1]), text, last);
     }
@@ -806,7 +806,7 @@ describe("a decided card", () => {
     assert.deepEqual(actionIds(view), []);
   });
 
-  it("opens a rejected card the same way, under a plain alert with the reason", async () => {
+  it("opens a rejected card the same way, under an info alert with the reason", async () => {
     const threadState = await staged();
     const { deps, views } = harness(threadState);
     await runReviewDecision({ ...approve("U0BILL0001"), decision: "cancel", note: "Not this week" }, deps);
