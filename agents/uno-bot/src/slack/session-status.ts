@@ -49,7 +49,7 @@ export const WORKING_STATUS: SessionStatus = "processing";
  * The status a finished turn settles to, from what the turn left behind.
  *
  * TWO LAYERS, ON PURPOSE. Whether a person is being waited on is the TURN's
- * fact, decided once from its disposition and its thread (`turn.ts`
+ * fact, decided once from its disposition and its thread (`settlement.ts`
  * `settlementOf`), and it reaches the adapter as a `TurnSettlement`. Which of
  * Slack's lifecycle words says that fact is SLACK's, and it is this function —
  * so the Delivery port carries neither Slack's enum nor a literal at each exit,

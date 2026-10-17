@@ -18,6 +18,16 @@
 // other direction: it is where `Env` becomes `TurnDeps` for both callers, so it
 // necessarily names `Env`. A caller that HAS an `Env` imports it by path.
 export * from "./turn";
+// Only what doors outside Turn call; card staging and settlement keep the rest.
+export {
+  BEFORE_READS_PER_BATCH,
+  restageExecution,
+  stageFromButton,
+  type ButtonStaging,
+  type CardConversation,
+  type CardOrigin,
+} from "./card-staging";
+export { settlementOf } from "./settlement";
 export * from "./delivery";
 export * from "./request";
 export * from "./antecedent";

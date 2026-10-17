@@ -55,7 +55,8 @@ import { capacityOutage, NOT_WATCHED, watchedTurnDeps, type CapacityOutage } fro
 import { capacityOutageStoreFor } from "../thread-state/production";
 import { serviceChangeJudgementOn } from "../blueprint-upkeep/env";
 import type { Delivery } from "./delivery";
-import { restageExecution, stageFromButton, type ButtonStaging, type TurnDeps, type TurnRequest } from "./turn";
+import { restageExecution, stageFromButton, type ButtonStaging } from "./card-staging";
+import type { TurnDeps, TurnRequest } from "./turn";
 
 /**
  * What a caller reports the run through, beside the outcome.
