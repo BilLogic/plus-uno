@@ -3100,7 +3100,8 @@ test("a redirect after a ⛔ is never held back, recent or aged", async () => {
 // the history the next unrelated ask reads: live on r675 a PRD card rejected in
 // one thread bounced a different PRD asked as a new top-level message, "You
 // canceled that create this card in Notion a moment ago". The note names the
-// card's thread, and only a re-ask there is held back.
+// card's thread and fingerprint: a re-ask there is held back, and from another
+// thread only the very same card is.
 const DM = "D0DM";
 const THREAD_A = "1700000000.000300";
 const THREAD_B = "1700000000.000500";
@@ -3118,26 +3119,25 @@ async function dmAfterCancelInThreadA() {
     threadTs: DM_CONVERSATION,
     replyTs: THREAD_A,
   };
-  for (const { ref, turn } of cancelNoteWrites(canceled, NOW - 2 * 60_000)) await threadState.appendHistory(ref, turn);
+  const note = cancelNoteWrites(canceled, NOW - 2 * 60_000);
+  await threadState.appendHistory(note.conversation, note.turn);
+  if (note.cardThread) await threadState.appendHistory(note.cardThread, note.turn);
   return { threadState, canceled };
 }
 
-test("a ⛔ in one DM thread does not hold back an unrelated card asked as a new top-level message", async () => {
+/** A new top-level DM line, which opens thread B, under a model that stages
+ *  `args`; and what that model was shown. */
+async function composerLineAfterCancel(args: Record<string, unknown>, text: string) {
   const { threadState } = await dmAfterCancelInThreadA();
   const h = harness({
     threadState,
     now: () => NOW,
-    replies: [
-      {
-        text: "Staging the PRD.",
-        toolCalls: [{ name: "notion_create", args: { title: "The reflection form remembers last session's students" } }],
-      },
-    ],
+    replies: [{ text: "Staging the PRD.", toolCalls: [{ name: "notion_create", args }] }],
   });
-  let sawNote = false;
+  let shown: string[] = [];
   const start = h.provider.start.bind(h.provider);
   h.provider.start = async (turn) => {
-    sawNote = turn.conversation.some((t) => /Cancell?ed the proposed/.test(t.text));
+    shown = turn.conversation.map((t) => t.text);
     return start(turn);
   };
   const outcome = await runTurn(
@@ -3148,23 +3148,43 @@ test("a ⛔ in one DM thread does not hold back an unrelated card asked as a new
       replyTs: THREAD_B,
       userMsgTs: THREAD_B,
       threaded: false,
-      text: "PRD: the reflection form remembers the last session's student list",
+      text,
       history: await threadState.readHistory(DM_REF),
     }),
     h.deps,
   );
+  return { outcome, shown };
+}
+
+test("a ⛔ in one DM thread does not hold back an unrelated card asked as a new top-level message", async () => {
+  const { outcome, shown } = await composerLineAfterCancel(
+    { title: "The reflection form remembers last session's students" },
+    "PRD: the reflection form remembers the last session's student list",
+  );
   assert.equal(outcome.disposition, "staged");
   assert.doesNotMatch(outcome.posted ?? "", /canceled that/i);
-  // Another thread's ⛔ is not this thread's "just now", for the model either.
-  assert.equal(sawNote, false);
+  // Another thread's ⛔ is not this thread's "just now", for the model either —
+  // but it is still told, as a past fact, so card A does not read as waiting.
+  assert.equal(shown.some((t) => /Cancell?ed the proposed/.test(t)), false);
+  assert.ok(shown.some((t) => /Earlier, in another thread, the proposed notion_create card was canceled/.test(t)));
+});
+
+test("the very same card re-staged from a new top-level DM line, unprompted, still gets the bounce", async () => {
+  const { outcome } = await composerLineAfterCancel(
+    { title: "Skip the session-evaluation tab on no-shows" },
+    "what else is on my plate this week?",
+  );
+  assert.equal(outcome.disposition, "asked");
+  assert.match(outcome.posted ?? "", /You canceled that create this card in Notion a moment ago/);
 });
 
 test("a re-ask of the canceled card in its own DM thread still gets the bounce", async () => {
-  const { threadState, canceled } = await dmAfterCancelInThreadA();
+  const { threadState } = await dmAfterCancelInThreadA();
   const h = harness({
     threadState,
     now: () => NOW,
-    replies: [{ text: "Staging it again.", toolCalls: [{ name: "notion_create", args: canceled.input }] }],
+    // Not byte for byte the canceled card: in its own thread the rule is the tool.
+    replies: [{ text: "Staging it again.", toolCalls: [{ name: "notion_create", args: { title: "Skip the eval tab" } }] }],
   });
   const outcome = await runTurn(
     request({
@@ -3183,7 +3203,24 @@ test("a re-ask of the canceled card in its own DM thread still gets the bounce",
 });
 
 test("in a channel the ⛔ note is written once, in the thread that is both conversation and card thread", () => {
-  const writes = cancelNoteWrites(PENDING, NOW);
-  assert.deepEqual(writes.map((w) => w.ref), [REF]);
-  assert.equal(writes[0]!.turn.content, cancelNote(PENDING.toolName, PENDING.input));
+  const note = cancelNoteWrites(PENDING, NOW);
+  assert.deepEqual(note.conversation, REF);
+  assert.equal(note.cardThread, null);
+  assert.equal(note.turn.content, cancelNote(PENDING.toolName, PENDING.input));
+  assert.equal(note.turn.cardThread, CONVERSATION);
+});
+
+test("in a channel a stamped ⛔ note still holds the same tool back in its thread", async () => {
+  const threadState = createInMemoryThreadState();
+  await threadState.appendHistory(REF, { role: "user", content: "write up the reflection redesign PRD" });
+  const note = cancelNoteWrites(PENDING, NOW - 2 * 60_000);
+  await threadState.appendHistory(note.conversation, note.turn);
+  const h = harness({
+    threadState,
+    now: () => NOW,
+    replies: [{ text: "Staging it again.", toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign, v2" } }] }],
+  });
+  const outcome = await runTurn(request({ text: "hmm, what about the reflection redesign?" }), h.deps);
+  assert.equal(outcome.disposition, "asked");
+  assert.match(outcome.posted ?? "", /You canceled that create this card in Notion a moment ago/);
 });

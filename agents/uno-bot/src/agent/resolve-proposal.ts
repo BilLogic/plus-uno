@@ -152,7 +152,15 @@ async function runWonVerdict(
     );
     // In the conversation, and in a DM the card's own thread too
     // (`cancelNoteWrites`): a re-ask typed there reads that history, not "dm".
-    for (const { ref, turn } of cancelNoteWrites(pending, Date.now())) await store.appendHistory(ref, turn);
+    // The thread's copy is best-effort: it only sharpens the guard there, and
+    // must never cost the conversation's note or the sweep's resolution below.
+    const note = cancelNoteWrites(pending, Date.now());
+    await store.appendHistory(note.conversation, note.turn);
+    if (note.cardThread) {
+      await store.appendHistory(note.cardThread, note.turn).catch((err: unknown) => {
+        console.warn(`[gate] cancel note in the card's thread failed: ${err instanceof Error ? err.message : String(err)}`);
+      });
+    }
     // A sweep card's ⛔ drops its items (`sweep/outcomes.ts`).
     await recordSweepResolutionFor(env, pending, undefined);
     return;

@@ -19,20 +19,24 @@
 // card rejected in one thread bounced an unrelated PRD asked minutes later as a
 // new top-level message, because both read the one `"dm"` history. A card
 // belongs to its reply thread, as the card store already has it, so the note
-// carries that thread (`HistoryTurn.cardThread`) and holds back only a card
-// staged in the same one.
+// carries that thread (`HistoryTurn.cardThread`) and holds back a card staged
+// in the same one, or the very same card staged from another.
 
 import { channelRefText, shareoutChannelRef } from "../tools/share-out-render";
 import {
+  canonicalJson,
+  proposalOperations,
   proposalReplyThread,
   type HistoryTurn,
   type PendingProposal,
+  type ProposalOperation,
   type ThreadRef,
 } from "../thread-state/index";
 
 /** How long a ⛔ holds the same card back. A cancel and the model's own
  *  re-proposal land within one exchange, minutes apart; half an hour covers a
- *  slow reply, and stops well short of a card's own hour-long life. */
+ *  slow reply, and stops well short of a card's own life of 24 weekday hours
+ *  (`card-expiry.ts`). */
 export const RECENT_CANCEL_MS = 30 * 60_000;
 
 // Either spelling: the note is written "Canceled" now, and a thread's stored
@@ -71,49 +75,93 @@ export function cancelledSame(content: string, toolName: string, input: Record<s
   return note[2] === undefined || note[2] === targetOf(toolName, input);
 }
 
+/** A batch as one short, stable string: every operation's tool and input, keys
+ *  in any order reading the same (`canonicalJson`), through FNV-1a — the hash
+ *  `gemini/cache.ts` keys its cache with. It only has to tell one card from
+ *  another; a collision costs one bounce the person can answer. */
+export function proposalFingerprint(operations: readonly ProposalOperation[]): string {
+  const text = canonicalJson(operations.map(({ toolName, input }) => ({ toolName, input })));
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(16).padStart(8, "0");
+}
+
 /** Whether a ⛔ note is about another thread's card than `cardThread`. A note
  *  written before notes named their card's thread is about none in
- *  particular, and so about this one, as it always was. */
-export function cancelledElsewhere(turn: { cardThread?: string }, cardThread: string): boolean {
+ *  particular, and so about this one, as it always was. The model's half,
+ *  `context-state.ts` § `withStaleCancelsSettled`, makes the same comparison and
+ *  must agree with this one. */
+function canceledElsewhere(turn: { cardThread?: string }, cardThread: string): boolean {
   return turn.cardThread !== undefined && turn.cardThread !== cardThread;
 }
 
-/** Whether `turn` is a ⛔ note for this tool on this target, on the card of
- *  `cardThread` (the turn's own reply thread), recorded within
- *  `RECENT_CANCEL_MS` of `now`. */
+/**
+ * Whether `turn` is a ⛔ note that holds `proposed` back: recorded within
+ * `RECENT_CANCEL_MS` of `now`, and about the same matter.
+ *
+ * In the card's own thread (`cardThread`, the turn's reply thread) the matter
+ * is the tool on its target, as it always was. From another thread it is the
+ * same proposal only: a DM line typed in the composer opens a thread of its
+ * own, so the model re-staging the canceled card from there, byte for byte, is
+ * still the re-proposal this guard exists for, while any other card is a new
+ * matter (`HistoryTurn.cardFingerprint`). A note with no fingerprint holds
+ * nothing back from another thread.
+ */
 export function cancelledRecently(
-  turn: { role: string; content: string; at?: number; cardThread?: string },
-  toolName: string,
-  input: Record<string, unknown>,
+  turn: Pick<HistoryTurn, "role" | "content" | "at" | "cardThread" | "cardFingerprint">,
+  proposed: { toolName: string; input: Record<string, unknown>; operations: readonly ProposalOperation[] },
   now: number,
   cardThread: string,
 ): boolean {
   if (turn.role !== "assistant" || turn.at === undefined || now - turn.at > RECENT_CANCEL_MS) return false;
-  if (cancelledElsewhere(turn, cardThread)) return false;
-  return cancelledSame(turn.content, toolName, input);
+  if (!cancelledSame(turn.content, proposed.toolName, proposed.input)) return false;
+  if (!canceledElsewhere(turn, cardThread)) return true;
+  return turn.cardFingerprint !== undefined && turn.cardFingerprint === proposalFingerprint(proposed.operations);
+}
+
+/** Where a ⛔ is remembered (`cancelNoteWrites`). */
+export interface CancelNoteWrite {
+  /** The note, stamped with when, the card's reply thread and its fingerprint. */
+  turn: HistoryTurn;
+  /** The conversation the card was staged from. */
+  conversation: ThreadRef;
+  /** The card's own thread, when that is a conversation of its own; null
+   *  when it is the same one. */
+  cardThread: ThreadRef | null;
 }
 
 /**
- * Where a ⛔ is remembered, and what: the note, stamped with when and with the
- * card's reply thread, for each conversation that has to read it.
+ * Where a ⛔ is remembered, and what.
  *
- * The conversation the card was staged from always gets it — that history is
- * what the next turn there reads. In a channel that is the card's thread too,
- * and one write is the whole of it. In a DM it is not: a card staged from a
- * top-level line is kept under the shared `"dm"` conversation but lives in a
- * thread of its own, and a reply typed in that thread is a conversation of its
- * own (`slack/events.ts` § `conversationTs`). So the thread gets the note as
- * well, or the one re-ask the guard exists for would never find it.
+ * The conversation the card was staged from always gets the note — that
+ * history is what the next turn there reads. In a channel that is the card's
+ * thread too, and one write is the whole of it. In a DM it is not: a card
+ * staged from a top-level line is kept under the shared `"dm"` conversation
+ * but lives in a thread of its own, and a reply typed in that thread is a
+ * conversation of its own (`slack/events.ts` § `conversationTs`). So the thread
+ * gets the note as well, or the one re-ask the guard exists for would never
+ * find it.
  *
  * @param pending - The card that was ⛔'d.
  * @param at - When, in epoch ms.
  */
 export function cancelNoteWrites(
-  pending: Pick<PendingProposal, "toolName" | "input" | "channel" | "threadTs" | "replyTs">,
+  pending: Pick<PendingProposal, "operations" | "toolName" | "input" | "channel" | "threadTs" | "replyTs">,
   at: number,
-): Array<{ ref: ThreadRef; turn: HistoryTurn }> {
+): CancelNoteWrite {
   const cardThread = proposalReplyThread(pending);
-  const turn: HistoryTurn = { role: "assistant", content: cancelNote(pending.toolName, pending.input), at, cardThread };
-  const conversations = cardThread === pending.threadTs ? [pending.threadTs] : [pending.threadTs, cardThread];
-  return conversations.map((thread) => ({ ref: { channel: pending.channel, thread }, turn }));
+  return {
+    turn: {
+      role: "assistant",
+      content: cancelNote(pending.toolName, pending.input),
+      at,
+      cardThread,
+      cardFingerprint: proposalFingerprint(proposalOperations(pending)),
+    },
+    conversation: { channel: pending.channel, thread: pending.threadTs },
+    cardThread: cardThread === pending.threadTs ? null : { channel: pending.channel, thread: cardThread },
+  };
 }

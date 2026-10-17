@@ -87,7 +87,8 @@ const CONSTRAINT_RE =
 // Matching on OUR strings, never on model prose, is what makes this trustworthy.
 const CONFIRMED_RE = /\(confirmed\b[^)]*\)/i;
 // Either spelling: stored history still holds notes written "Cancelled".
-const CANCELLED_RE = /\(Cancell?ed the proposed ([a-z_]+)/i;
+// And another thread's note as the model is shown it (`withStaleCancelsSettled`).
+const CANCELLED_RE = /\((?:Cancell?ed the proposed|Earlier, in another thread, the proposed) ([a-z_]+)/i;
 
 const URL_RE = /https?:\/\/[^\s<>|)\]]+/g;
 
@@ -143,9 +144,9 @@ export function renderState(state: ConversationState): string {
   ].join("\n");
 }
 
-// ── Aged cancels ─────────────────────────────────────────────────────────────
+// ── Stale cancels ────────────────────────────────────────────────────────────
 //
-// A ⛔ note tells the model an action was just cancelled, and the model reads
+// A ⛔ note tells the model an action was just canceled, and the model reads
 // "just" into it: it declines to re-propose on its own. In a DM every top-level
 // message is one conversation, so the note can be hours old by the next ask,
 // and the model still bounced that ask as "a moment ago". A turn that is only
@@ -156,32 +157,43 @@ export function renderState(state: ConversationState): string {
 // and left out too. Unlike the rest of this file it is not behind the flag:
 // the note reaches the model on every turn, state block or none.
 //
-// The same goes for a fresh note about ANOTHER thread's card. The DM is one
-// conversation, so a ⛔ in one thread sits in the history of the next
-// unrelated ask, and the model read "just" into that too. A note names its
-// card's thread (`cardThread`); one naming another thread is left out, the
-// way the guard ignores it. A note naming none predates the field and stays.
+// A fresh note about ANOTHER thread's card is neither "just now" nor nothing.
+// The DM is one conversation, so a ⛔ in one thread sits in the history of the
+// next unrelated ask, and the model read "just" into that too (r675). Left out,
+// the model would see that card staged and never settled, and call it still
+// waiting. So it is told as a past fact, in words that do not read as "you just
+// canceled this", and the state block still lists the decision. A note names
+// its card's thread (`cardThread`); a note naming none predates the field and
+// stays as it is.
 
 /** The whole of a ⛔ note, as `agent/cancel-note.ts` writes it. */
-const CANCEL_NOTE_RE = /^\(Cancell?ed the proposed [a-z_]+\b[^\n]*\)$/;
+const CANCEL_NOTE_RE = /^\(Cancell?ed the proposed ([a-z_]+)\b[^\n]*\)$/;
 
-/** `history` without the ⛔ notes that are not this turn's "just now": those
- *  recorded more than `windowMs` before `now`, and those about a card in
- *  another thread than `cardThread`, the turn's own reply thread. */
-export function withoutStaleCancels<T extends HistoryTurn>(
+/** Another thread's ⛔ note, as this turn's model reads it. */
+function canceledInAnotherThread(toolName: string): string {
+  return `(Earlier, in another thread, the proposed ${toolName} card was canceled; nothing was done.)`;
+}
+
+/**
+ * `history` with the ⛔ notes that are not this turn's "just now" settled:
+ * those recorded more than `windowMs` before `now` left out, and those about a
+ * card in another thread than `cardThread` (the turn's own reply thread) told
+ * as a past fact. The same-thread test must agree with the code guard's,
+ * `agent/cancel-note.ts` § `canceledElsewhere`.
+ */
+export function withStaleCancelsSettled<T extends HistoryTurn>(
   history: T[],
   now: number,
   windowMs: number,
   cardThread: string,
 ): T[] {
-  return history.filter(
-    (t) =>
-      t.role !== "assistant" ||
-      !CANCEL_NOTE_RE.test(t.content.trim()) ||
-      (t.at !== undefined &&
-        now - t.at <= windowMs &&
-        (t.cardThread === undefined || t.cardThread === cardThread)),
-  );
+  return history.flatMap((t) => {
+    const note = t.role === "assistant" ? CANCEL_NOTE_RE.exec(t.content.trim()) : null;
+    if (!note) return [t];
+    if (t.at === undefined || now - t.at > windowMs) return [];
+    if (t.cardThread === undefined || t.cardThread === cardThread) return [t];
+    return [{ ...t, content: canceledInAnotherThread(note[1]!) }];
+  });
 }
 
 // ── Progressive summarization ────────────────────────────────────────────────
