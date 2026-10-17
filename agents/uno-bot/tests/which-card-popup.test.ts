@@ -82,8 +82,8 @@ async function asked(h: Harness, typed = "✅"): Promise<{ a: string; b: string;
 }
 
 /** The doors' dependencies on the harness, recording what they edited. */
-function doors(h: Harness, clock: { now: number }, over: Partial<WhichDoorDeps> = {}) {
-  const views = recordingViews({ alreadyOpen: ["V1"] });
+function doors(h: Harness, clock: { now: number }, over: Partial<WhichDoorDeps> = {}, hash?: () => string) {
+  const views = recordingViews({ alreadyOpen: ["V1"], ...(hash ? { hash } : {}) });
   const cardEdits: Array<{ ts: string; message: CardMessage }> = [];
   const questionEdits: CardMessage[] = [];
   const ephemerals: string[] = [];
@@ -118,6 +118,15 @@ async function choose(d: ReturnType<typeof doors>, question: CardMessage) {
 
 /** The input holding the card list, and its element. */
 const listOf = (view: View) => view.blocks.find((b) => b.type === "input" && b.block_id?.startsWith("uno_which_cards_"))!;
+/** Each card's Show draft row: its label and the card it names. */
+const draftRows = (view: View) =>
+  view.blocks.flatMap((b) => {
+    const button = b.type === "actions" ? (b.elements?.[0] as { action_id?: string; text: { text: string }; value: string } | undefined) : undefined;
+    return button?.action_id === "uno_which_draft" ? [{ at: view.blocks.indexOf(b), label: button.text.text, card: button.value, block: b }] : [];
+  });
+const decisionOf = (view: View) =>
+  (view.blocks.find((x) => x.block_id === "uno_which_decision_block")!.elements![0] as { initial_option: { value: string }; options: Array<Record<string, unknown>> });
+const noteOf = (view: View) => view.blocks.find((x) => x.block_id === "uno_which_note");
 const optionsOf = (view: View) => ((listOf(view).element!.options as Array<{ value: string; text: { text: string }; description: { text: string } }>));
 
 /** A view state as Slack sends it: the list's pick and the note. */
@@ -128,11 +137,12 @@ function stateOf(view: View, picked: string[], note = "") {
     element.type === "radio_buttons"
       ? { selected_option: picked[0] ? { value: picked[0] } : null }
       : { selected_options: picked.map((value) => ({ value })) };
-  return { values: { [list.block_id!]: { [String(element.action_id)]: value }, uno_which_note: { uno_which_note_input: { value: note } } } };
+  const typed = noteOf(view) ? { uno_which_note: { uno_which_note_input: { value: note } } } : {};
+  return { values: { [list.block_id!]: { [String(element.action_id)]: value }, ...typed } };
 }
 
-async function redraw(d: ReturnType<typeof doors>, view: View, press: WhichRedraw, state: unknown) {
-  await runWhichRedraw({ viewId: "V1", popup: whichPopupOf(view.private_metadata)!, state, press, userId: "U1" }, d.deps);
+async function redraw(d: ReturnType<typeof doors>, view: View, press: WhichRedraw, state: unknown, hash?: string) {
+  await runWhichRedraw({ viewId: "V1", popup: whichPopupOf(view.private_metadata)!, state, ...(hash ? { hash } : {}), press, userId: "U1" }, d.deps);
   return d.views.calls.at(-1)!.view as View;
 }
 
@@ -157,6 +167,7 @@ test("the question is one line and one Choose… button: no numbered buttons, no
   assert.equal(messageBlocksRefusal(question.blocks), null, "Slack takes it");
   const buttons = buttonsOf(question);
   assert.deepEqual(buttons.map((x) => [x.action_id, x.text.text]), [[WHICH_CHOOSE_ACTION_ID, "Choose…"]]);
+  assert.equal((buttons[0] as { style?: string }).style, undefined, "Choose… is not colored");
   assert.deepEqual(chooseValueOf(buttons[0]!.value), { decision: "confirm", cards: [b, a] });
   assert.equal(sectionOf(question), "2 cards are waiting, nothing ran yet.");
   assert.doesNotMatch(JSON.stringify(question.blocks), /Session reflections|Backup tutor matching/);
@@ -177,16 +188,20 @@ test("Choose… opens a loading view, then the cards with Approve preset from a 
   assert.deepEqual(d.views.calls.map((c) => c.kind), ["open", "update"], "opened first, filled after the read");
   assert.equal(view.callback_id, WHICH_CALLBACK_ID);
   assert.ok(view.submit, "Submit is the footer");
-  const decision = view.blocks.find((x) => x.type === "actions")!.elements![0] as { initial_option: { value: string } };
+  const decision = decisionOf(view);
   assert.equal(decision.initial_option.value, "confirm");
+  assert.deepEqual(decision.options.map((o) => Object.keys(o).sort()), [["text", "value"], ["text", "value"]], "no caption under Approve or Cancel");
   assert.equal(listOf(view).element!.type, "radio_buttons");
   assert.deepEqual(optionsOf(view).map((o) => [o.value, o.text.text, o.description.text]), [
     [b, "Session reflections", "New PRD card on the Roadmap"],
     [a, "Backup tutor matching", "New PRD card on the Roadmap"],
   ]);
-  // Each row offers its draft, closed.
-  const rows = view.blocks.filter((x) => x.accessory);
-  assert.deepEqual(rows.map((r) => [r.accessory!.text.text, r.accessory!.value]), [["Show draft", b], ["Show draft", a]]);
+  // Each card is listed once: its Show draft row, in the list's order, has
+  // the button and nothing else.
+  assert.deepEqual(draftRows(view).map((r) => [r.label, r.card]), [["Show draft", b], ["Show draft", a]]);
+  assert.deepEqual(draftRows(view).map((r) => r.block.elements!.length), [1, 1]);
+  assert.equal(words(view).split("Session reflections").length - 1, 1, "the headline once, in its option");
+  assert.equal(noteOf(view), undefined, "no note under Approve");
 });
 
 test("a ⛔ presets Cancel: the cards as checkboxes", async () => {
@@ -195,7 +210,9 @@ test("a ⛔ presets Cancel: the cards as checkboxes", async () => {
   clock.now = SOON;
   const view = (await choose(doors(h, clock), question))!;
   assert.equal(listOf(view).element!.type, "checkboxes");
-  assert.equal((view.blocks.find((x) => x.type === "actions")!.elements![0] as { initial_option: { value: string } }).initial_option.value, "cancel");
+  assert.equal(decisionOf(view).initial_option.value, "cancel");
+  const note = noteOf(view)!;
+  assert.equal((note as { hint?: unknown }).hint, undefined, "the note has no hint");
 });
 
 test("switching the decision swaps radio buttons for checkboxes, keeping the pick and the note", async () => {
@@ -205,23 +222,25 @@ test("switching the decision swaps radio buttons for checkboxes, keeping the pic
   const d = doors(h, clock);
   const approve = (await choose(d, question))!;
 
-  const cancel = await redraw(d, approve, { kind: "decision", decision: "cancel" }, stateOf(approve, [a], "not this week"));
+  const cancel = await redraw(d, approve, { kind: "decision", decision: "cancel" }, stateOf(approve, [a]));
 
   assert.deepEqual(d.views.refused, []);
   const list = listOf(cancel).element!;
   assert.equal(list.type, "checkboxes");
   assert.deepEqual((list.initial_options as Array<{ value: string }>).map((o) => o.value), [a], "the picked card is ticked");
-  const note = cancel.blocks.find((x) => x.block_id === "uno_which_note")!.element!;
-  assert.equal(note.initial_value, "not this week");
 
-  // And back: Approve keeps one of the ticked cards.
+  // Back to Approve: one of the ticked cards stays picked, and the note
+  // typed under Cancel waits in the metadata, to come back with Cancel.
   const back = await redraw(d, cancel, { kind: "decision", decision: "confirm" }, stateOf(cancel, [a], "not this week"));
   assert.equal((listOf(back).element!.initial_option as { value: string }).value, a);
+  assert.equal(noteOf(back), undefined);
+  const again = await redraw(d, back, { kind: "decision", decision: "cancel" }, stateOf(back, [a]));
+  assert.equal(noteOf(again)!.element!.initial_value, "not this week");
 });
 
 test("Show draft opens that card's draft under its row, as its Review draws it; Hide draft closes it; the pick survives", async () => {
   const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
-  const { a, b, question } = await asked(h);
+  const { a, b, question } = await asked(h, "⛔");
   clock.now = SOON;
   const d = doors(h, clock);
   const closed = (await choose(d, question))!;
@@ -232,22 +251,22 @@ test("Show draft opens that card's draft under its row, as its Review draws it; 
   const lookup = await h.threadState.getProposalByTs(a);
   assert.equal(lookup.state, "found");
   const draft = draftBlocks((lookup as Extract<typeof lookup, { state: "found" }>).proposal);
-  const rowAt = shown.blocks.findIndex((x) => x.accessory?.value === a);
-  assert.equal(shown.blocks[rowAt]!.accessory!.text.text, "Hide draft");
-  assert.deepEqual(shown.blocks.slice(rowAt + 1, rowAt + 1 + draft.length), draft, "the draft, under its own row");
-  assert.equal(shown.blocks.find((x) => x.accessory?.value === b)!.accessory!.text.text, "Show draft");
-  assert.equal((listOf(shown).element!.initial_option as { value: string }).value, b);
-  assert.equal(shown.blocks.find((x) => x.block_id === "uno_which_note")!.element!.initial_value, "hm");
+  const row = draftRows(shown).find((r) => r.card === a)!;
+  assert.equal(row.label, "Hide draft");
+  assert.deepEqual(shown.blocks.slice(row.at + 1, row.at + 1 + draft.length), draft, "the draft, under its own row");
+  assert.equal(draftRows(shown).find((r) => r.card === b)!.label, "Show draft");
+  assert.deepEqual((listOf(shown).element!.initial_options as Array<{ value: string }>).map((o) => o.value), [b]);
+  assert.equal(noteOf(shown)!.element!.initial_value, "hm");
 
   const hidden = await redraw(d, shown, { kind: "draft", cardTs: a }, stateOf(shown, [b], "hm"));
   assert.equal(hidden.blocks.length, closed.blocks.length, "the draft is gone again");
-  assert.equal((listOf(hidden).element!.initial_option as { value: string }).value, b);
+  assert.deepEqual((listOf(hidden).element!.initial_options as Array<{ value: string }>).map((o) => o.value), [b]);
 });
 
 test("a draft too long for the view is cut, and points at the card's own Review", async () => {
   const sections = Array.from({ length: 120 }, (_, i) => ({ heading: `Part ${i + 1}`, body: `Body ${i + 1}.` }));
   const { h, clock } = clocked([call("notion_create", { ...PRD_A, sections }), call("notion_create", PRD_B)]);
-  const { a, question } = await asked(h);
+  const { a, question } = await asked(h, "⛔");
   clock.now = SOON;
   const d = doors(h, clock);
   const closed = (await choose(d, question))!;
@@ -257,7 +276,7 @@ test("a draft too long for the view is cut, and points at the card's own Review"
   assert.deepEqual(d.views.refused, []);
   assert.equal(shown.blocks.length <= 100, true);
   assert.ok(words(shown).includes(DRAFT_LEFT_OUT));
-  assert.ok(shown.blocks.some((x) => x.block_id === "uno_which_note"), "the note is never pushed out");
+  assert.ok(noteOf(shown), "the note is never pushed out");
 });
 
 test("Submit with nothing picked is an error under the list", () => {
@@ -459,4 +478,46 @@ test("a press on a card a revision replaced names the card that replaced it", as
   assert.deepEqual(note, { kind: "superseded", by: "Backup tutors" });
   assert.match(renderGateNote(note), /replaced by \*Backup tutors\*/);
   assert.doesNotMatch(renderGateNote(note), /newest card/);
+});
+
+test("a redraw that lands after the view moved on is dropped: it carries the hash it was pressed on", async () => {
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { a, question } = await asked(h);
+  clock.now = SOON;
+  // Slack holds the view at hash H2 by the time the press is handled: the
+  // Submit's ack replaced it.
+  const d = doors(h, clock, {}, () => "H2");
+  const view = (await choose(d, question))!;
+
+  await redraw(d, view, { kind: "draft", cardTs: a }, stateOf(view, []), "H1");
+
+  const last = d.views.calls.at(-1)!;
+  assert.equal(last.kind === "update" && last.hash, "H1", "the press's own hash rides the update");
+  assert.equal(last.kind === "update" && last.conflict, true, "and Slack refuses it");
+  assert.deepEqual(d.views.refused, [], "a conflict is dropped quietly");
+});
+
+test("each ticked card's mark on the question is spent inside its own budget step, before the next card's check", async () => {
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { a, b, question } = await asked(h, "⛔");
+  clock.now = SOON;
+  const events: string[] = [];
+  const d = doors(h, clock, { headroom: () => (events.push("check"), 100) });
+  const view = (await choose(d, question))!;
+  // B is decided on its own card first, so here it loses and is only marked.
+  await runButtonDoor(
+    { channel: CHANNEL, messageTs: b, decision: "cancel", userId: "U2" },
+    { ...d.deps, replaceCard: async () => {}, replyEphemeral: async () => {} },
+  );
+  const store = h.threadState;
+  const mark = store.decideInWhichQuestion.bind(store);
+  store.decideInWhichQuestion = async (ts, q) => (events.push(`mark:${ts === b ? "b" : "a"}`), mark(ts, q));
+
+  await submit(d, view, stateOf(view, [b, a]));
+
+  // Counted against B's own step: a budget stop before A cannot leave B's
+  // mark unspent, and the question unstruck.
+  assert.ok(events.indexOf("mark:b") >= 0 && events.indexOf("mark:b") < events.indexOf("check"), events.join(" "));
+  assert.deepEqual(await live(h), []);
+  assert.match(JSON.stringify(d.questionEdits.at(-1)!.blocks), /Decided\./);
 });

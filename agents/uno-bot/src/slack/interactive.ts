@@ -325,7 +325,11 @@ async function redrawWhich(env: Env, payload: InteractionPayload, actionId: stri
         ? ({ kind: "draft", cardTs: action.value } as const)
         : null;
   if (!press) return;
-  await runWhichRedraw({ viewId, popup, state: payload.view?.state, press, userId }, whichDoorDeps(env, payload, popup.channel, popup.questionTs));
+  const hash = typeof payload.view?.hash === "string" ? payload.view.hash : undefined;
+  await runWhichRedraw(
+    { viewId, popup, state: payload.view?.state, ...(hash ? { hash } : {}), press, userId },
+    whichDoorDeps(env, payload, popup.channel, popup.questionTs),
+  );
 }
 
 /**
@@ -362,7 +366,7 @@ function whichDoorDeps(env: Env, payload: InteractionPayload, channel: string, q
     views: {
       open: (triggerId, view) => viewsOpen(env, triggerId, view),
       push: (triggerId, view) => viewsPush(env, triggerId, view),
-      update: (viewId, view) => viewsUpdate(env, viewId, view),
+      update: (viewId, view, hash) => viewsUpdate(env, viewId, view, hash),
     },
     delivery,
     applyVerdict,
@@ -379,7 +383,10 @@ function whichDoorDeps(env: Env, payload: InteractionPayload, channel: string, q
     },
     replyEphemeral: (text) => replyEphemeral(payload, text),
     // A cancel records its decision in D1 too, whose queries are capped apart.
-    headroom: () => Math.min(budgetHeadroom().subrequests, budgetHeadroom().d1Queries),
+    headroom: () => {
+      const left = budgetHeadroom();
+      return Math.min(left.subrequests, left.d1Queries);
+    },
     notionDatabases: notionDatabaseLinks(env),
   };
 }

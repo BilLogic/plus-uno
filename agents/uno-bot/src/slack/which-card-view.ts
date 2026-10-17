@@ -20,16 +20,21 @@
 // has the whole view's room; past it, the draft is cut and points at the
 // card's own Review, which has all of it. Every redraw sets each input's
 // value from the state the press carried, so the pick and the note survive
-// it.
+// it. The note is Cancel's reason and nothing under Approve, so it shows under
+// Cancel only; a switch to Approve keeps it in the view's metadata until the
+// switch back.
 //
-// Each card is offered by its headline (`agent/card-identity.ts`) and what it
-// does, one line (`cardDoes`). The view carries the question it answers in
-// `private_metadata` — the question's message, the decision, the cards it
-// listed — so every press and the Submit are read without the message.
+// EACH CARD IS LISTED ONCE: its option in the list, by its headline
+// (`agent/card-identity.ts`) and what it does (`cardDoes`). An option holds
+// no button, so each card's Show draft sits in a row of its own under the
+// list, in the list's order, with nothing else in it.
+//
+// The view carries the question it answers in `private_metadata` — the
+// question's message, the decision, the cards it listed — so every press and
+// the Submit are read without the message.
 import { proposalOperations, type PendingProposal } from "../thread-state/index";
 import { gateWordsFor } from "../agent/tool-table";
 import { clip } from "./card-block";
-import { escapeSlackText } from "./mrkdwn";
 import { DESCRIPTION_CHARS } from "./review-anatomy";
 import { anatomyOf, draftHeadline } from "./review-draft";
 import { draftBlocks, fitBody } from "./review-view";
@@ -64,7 +69,12 @@ const OPTION_CHARS = 75;
 const NOTE_MAX_CHARS = 3000;
 
 /** Said where an open draft was cut to the room the view has left. */
-export const DRAFT_LEFT_OUT = "The rest of this draft is too long to show here. Press Review on its card for all of it.";
+export const DRAFT_LEFT_OUT = "Cut here. Its card's Review has the rest.";
+
+/** Slack's cap on a view's `private_metadata`: 3,000 characters. Ten cards'
+ *  ts and headlines take about a third of it; a note carried across a switch
+ *  to Approve is clipped to the rest. */
+const METADATA_CHARS = 3000;
 
 /** The question a pop-up answers, as its `private_metadata` carries it. */
 export interface WhichPopup {
@@ -76,6 +86,8 @@ export interface WhichPopup {
   cards: WhichCard[];
   /** The card whose draft is open under its row, if any. */
   shown?: string;
+  /** Cancel's note, kept while the view shows Approve, which has none. */
+  note?: string;
 }
 
 /** What the person has picked and typed, as a press or the Submit carries it. */
@@ -87,25 +99,42 @@ export interface WhichPick {
 
 /** What a view's `private_metadata` holds for this question. */
 export function whichMetadata(popup: WhichPopup): string {
-  return JSON.stringify({
+  const base = {
     c: popup.channel,
     q: popup.questionTs,
     d: popup.decision,
     k: popup.cards.map((card) => [card.ts, card.headline]),
     ...(popup.shown ? { s: popup.shown } : {}),
-  });
+  };
+  const bare = JSON.stringify(base);
+  if (!popup.note) return bare;
+  // The note's escapes count too, so it is clipped until the whole fits.
+  let note = popup.note.slice(0, METADATA_CHARS);
+  let out = JSON.stringify({ ...base, n: note });
+  while (out.length > METADATA_CHARS && note) {
+    note = note.slice(0, Math.max(0, note.length - (out.length - METADATA_CHARS)));
+    out = JSON.stringify({ ...base, n: note });
+  }
+  return note ? out : bare;
 }
 
 /** The question back out of a view's `private_metadata`, or null for any
  *  other view's. */
 export function whichPopupOf(metadata: string | undefined): WhichPopup | null {
   try {
-    const m = JSON.parse(metadata ?? "") as { c?: unknown; q?: unknown; d?: unknown; k?: unknown; s?: unknown };
+    const m = JSON.parse(metadata ?? "") as { c?: unknown; q?: unknown; d?: unknown; k?: unknown; s?: unknown; n?: unknown };
     if (typeof m.c !== "string" || typeof m.q !== "string" || (m.d !== "confirm" && m.d !== "cancel") || !Array.isArray(m.k)) return null;
     const cards = m.k.flatMap((pair: unknown) =>
       Array.isArray(pair) && typeof pair[0] === "string" && typeof pair[1] === "string" ? [{ ts: pair[0], headline: pair[1] }] : [],
     );
-    return { channel: m.c, questionTs: m.q, decision: m.d, cards, ...(typeof m.s === "string" ? { shown: m.s } : {}) };
+    return {
+      channel: m.c,
+      questionTs: m.q,
+      decision: m.d,
+      cards,
+      ...(typeof m.s === "string" ? { shown: m.s } : {}),
+      ...(typeof m.n === "string" && m.n ? { note: m.n } : {}),
+    };
   } catch {
     return null;
   }
@@ -157,9 +186,9 @@ export function whichResultView(popup: WhichPopup, lines: readonly string[]): Vi
   return modal(popup, lines.map(line));
 }
 
-const DECISIONS: ReadonlyArray<[Decision, string, string]> = [
-  ["confirm", "Approve", "Runs one card. Each approval writes something."],
-  ["cancel", "Cancel", "Closes the cards you tick. Nothing runs."],
+const DECISIONS: ReadonlyArray<[Decision, string]> = [
+  ["confirm", "Approve"],
+  ["cancel", "Cancel"],
 ];
 
 /**
@@ -202,7 +231,7 @@ export function whichView(
           label: plain("Cancel which ones?"),
           element: { type: "checkboxes", action_id: CARDS_ACTION_ID, options, ...(chosen.length ? { initial_options: chosen } : {}) },
         };
-  const choice = DECISIONS.map(([value, text, does]) => ({ value, text: plain(text), description: plain(does, DESCRIPTION_CHARS) }));
+  const choice = DECISIONS.map(([value, text]) => ({ value, text: plain(text) }));
   const head: unknown[] = [
     {
       type: "actions",
@@ -214,12 +243,13 @@ export function whichView(
     cards,
     { type: "divider" },
   ];
+  // Cancel's reason, said on each card it closes. Approve has no use for
+  // one, so it shows under Cancel only.
   const note = {
     type: "input",
     block_id: NOTE_BLOCK,
     optional: true,
     label: plain("Note"),
-    hint: plain("Cancel: an optional reason, said on each card it closes.", 150),
     element: {
       type: "plain_text_input",
       action_id: NOTE_ACTION_ID,
@@ -228,18 +258,19 @@ export function whichView(
       ...(pick.note ? { initial_value: clip(pick.note, NOTE_MAX_CHARS) } : {}),
     },
   };
-  const tail: unknown[] = [{ type: "divider" }, note];
+  const tail: unknown[] = decision === "cancel" ? [{ type: "divider" }, note] : [];
+  // Under Approve, the note typed under Cancel waits in the metadata.
+  const kept: WhichPopup = decision === "confirm" && pick.note ? { ...popup, note: pick.note } : popup;
 
-  // Each card's row, and the open draft under its own: cut to the room the
-  // rest of the view leaves it.
+  // Each card's Show draft, alone in its row in the list's order, and the
+  // open draft under its own: cut to the room the rest of the view leaves it.
   const rows = waiting.map((card) => {
     const open = card.proposalTs === popup.shown;
     return {
       card,
       row: {
-        type: "section",
-        text: { type: "mrkdwn", text: `*${escapeSlackText(headlineOf(popup, card))}*\n${escapeSlackText(cardDoes(card))}` },
-        accessory: { type: "button", action_id: WHICH_DRAFT_ACTION_ID, text: plain(open ? "Hide draft" : "Show draft"), value: card.proposalTs },
+        type: "actions",
+        elements: [{ type: "button", action_id: WHICH_DRAFT_ACTION_ID, text: plain(open ? "Hide draft" : "Show draft"), value: card.proposalTs }],
       },
       open,
     };
@@ -249,7 +280,7 @@ export function whichView(
   const body = rows.flatMap(({ card, row, open }) =>
     open ? [row, ...fitBody(draftBlocks(card, opts), room, DRAFT_LEFT_OUT), { type: "divider" }] : [row],
   );
-  return modal(popup, [...head, ...body, ...tail], true);
+  return modal(kept, [...head, ...body, ...tail], true);
 }
 
 /** The headline the question listed the card by, or the card's own. */
@@ -266,17 +297,19 @@ type ViewValues = {
 
 /**
  * What the person has picked and typed, from a view's `state`: the cards in
- * the list `decision` shows, and the note.
+ * the list `decision` shows, and the note — or, under Approve, which has no
+ * note input, the one kept in the metadata (`kept`).
  */
-export function whichPickOf(state: unknown, decision: Decision): WhichPick {
+export function whichPickOf(state: unknown, decision: Decision, kept = ""): WhichPick {
   const values = (state as ViewValues | undefined)?.values;
   const input = values?.[CARDS_BLOCK[decision]]?.[CARDS_ACTION_ID];
   const picked =
     decision === "confirm"
       ? [input?.selected_option?.value]
       : (input?.selected_options ?? []).map((o) => o.value);
-  const note = values?.[NOTE_BLOCK]?.[NOTE_ACTION_ID]?.value;
-  return { picked: picked.filter((v): v is string => typeof v === "string" && v.length > 0), note: typeof note === "string" ? note : "" };
+  const typed = values?.[NOTE_BLOCK]?.[NOTE_ACTION_ID]?.value;
+  const note = decision === "cancel" ? (typeof typed === "string" ? typed : "") : kept;
+  return { picked: picked.filter((v): v is string => typeof v === "string" && v.length > 0), note };
 }
 
 /**

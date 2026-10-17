@@ -90,7 +90,7 @@ export function isLegacyWhichPress(actionId: string): boolean {
 
 /** Said to the presser alone on a numbered button a question posted before
  *  the pop-up still carries. */
-export const LEGACY_WHICH_REPLY = "That question has changed since it was asked, so nothing ran. Press Review on the card you mean.";
+export const LEGACY_WHICH_REPLY = "That question was redrawn, so nothing ran. Press Choose… on it, or Review on the card.";
 
 /** What the question says in place of Choose… once every card it lists is
  *  decided. */
@@ -100,7 +100,7 @@ const DECIDED = "Decided.";
 export const WHICH_EXPIRED_REPLY = "That question expired, so nothing ran. Press Review on the card you mean.";
 
 /** Said in the pop-up when no card it listed is waiting any more. */
-export const NOTHING_WAITING = "Every card this question listed has been decided or is no longer waiting, so there is nothing to choose.";
+export const NOTHING_WAITING = "None of these cards is waiting any more.";
 
 /**
  * The question as Slack gets it: how many cards are waiting, and Choose…,
@@ -148,7 +148,6 @@ function chooseButton(decision: Decision, cards: readonly string[]): Record<stri
   return {
     type: "button",
     action_id: WHICH_CHOOSE_ACTION_ID,
-    style: "primary",
     text: { type: "plain_text", text: "Choose…", emoji: true },
     value: `${decision}:${cards.join(",")}`,
   };
@@ -250,6 +249,11 @@ export interface WhichRedrawRequest {
   popup: WhichPopup;
   /** The view's `state`, as Slack sent it with the press. */
   state: unknown;
+  /** The view's `hash` as the press found it. Every redraw carries it, so a
+   *  redraw that lands after the Submit's ack or its answer is refused by
+   *  Slack (`hash_conflict`) and dropped, instead of drawing the pick over
+   *  them. */
+  hash?: string;
   press: WhichRedraw;
   userId: string;
 }
@@ -263,22 +267,24 @@ export interface WhichRedrawRequest {
  */
 export async function runWhichRedraw(request: WhichRedrawRequest, deps: WhichDoorDeps): Promise<void> {
   const { popup, press } = request;
+  // A refused update is the view having moved on: nothing to do about it.
+  const show = (view: Record<string, unknown>) => deps.views.update(request.viewId, view, request.hash);
   if (lapsed(popup.questionTs, (deps.now ?? Date.now)())) {
-    await deps.views.update(request.viewId, whichNoticeView(popup, WHICH_EXPIRED_REPLY));
+    await show(whichNoticeView(popup, WHICH_EXPIRED_REPLY));
     return;
   }
-  const pick = whichPickOf(request.state, popup.decision);
+  const pick = whichPickOf(request.state, popup.decision, popup.note);
   const decision = press.kind === "decision" ? press.decision : popup.decision;
   const shown = press.kind === "draft" ? (popup.shown === press.cardTs ? undefined : press.cardTs) : popup.shown;
-  const { shown: _was, ...rest } = popup;
+  const { shown: _was, note: _note, ...rest } = popup;
   const next: WhichPopup = { ...rest, decision, ...(shown ? { shown } : {}) };
   const waiting = await waitingCards(popup.cards.map((card) => card.ts), popup.channel, deps);
   if (!waiting.length) {
-    await deps.views.update(request.viewId, whichNoticeView(next, NOTHING_WAITING));
+    await show(whichNoticeView(next, NOTHING_WAITING));
     return;
   }
   const picked = decision === "confirm" ? pick.picked.slice(0, 1) : pick.picked;
-  await deps.views.update(request.viewId, whichView(next, waiting, { picked, note: pick.note }, databasesOf(deps)));
+  await show(whichView(next, waiting, { picked, note: pick.note }, databasesOf(deps)));
 }
 
 /** A Submit from the pop-up, as the ack read it. */
@@ -294,10 +300,11 @@ export interface WhichSubmitRequest {
 const DONE: Readonly<Record<Decision, string>> = { confirm: "Approved", cancel: "Canceled" };
 
 /** The subrequests one card's decision spends, as a press does: its note in
- *  the thread, the working signal raised and settled, its card edited and
- *  the cancel's record — with room to spare. And what the Submit spends
- *  after the last card: the pop-up's answer and the question redrawn. */
-const PER_CARD_SUBREQUESTS = 8;
+ *  the thread, the working signal raised and settled, its card edited, the
+ *  decision's record, and its mark on this question — with room to spare.
+ *  And what the Submit spends after the last card: the pop-up's answer and
+ *  the question redrawn. */
+const PER_CARD_SUBREQUESTS = 10;
 const FINISH_SUBREQUESTS = 3;
 
 /**
@@ -306,10 +313,10 @@ const FINISH_SUBREQUESTS = 3;
  * record and the pop-up answered with one line per card.
  *
  * Past the question's deadline nothing is resolved: the pop-up says so, and
- * the question is left for its next Choose… to find lapsed. A card that did not win — decided
- * elsewhere, lapsed, replaced, waiting on someone else — is named in the
- * answer with the Gate's own words for why, and is marked on this question
- * so it is not offered again.
+ * the question is left for its next Choose… to find lapsed. A card that did
+ * not win — decided elsewhere, lapsed, replaced, waiting on someone else — is
+ * named in the answer with the Gate's own words for why, and is marked on
+ * this question so it is not offered again.
  */
 export async function runWhichSubmit(request: WhichSubmitRequest, deps: WhichDoorDeps): Promise<void> {
   const { popup, pick } = request;
@@ -320,7 +327,6 @@ export async function runWhichSubmit(request: WhichSubmitRequest, deps: WhichDoo
     return;
   }
   const lines: string[] = [];
-  const marked: string[] = [];
   let kept: WhichQuestion | null = null;
   for (const [i, cardTs] of pick.picked.entries()) {
     const headline = `*${escapeSlackText(popup.cards.find((c) => c.ts === cardTs)?.headline || "That card")}*`;
@@ -331,17 +337,6 @@ export async function runWhichSubmit(request: WhichSubmitRequest, deps: WhichDoo
     const decided = await decideOne(cardTs, request, deps);
     if (decided.question) kept = decided.question;
     lines.push(`${headline}: ${decided.line}`);
-    marked.push(cardTs);
-  }
-
-  // Marked on THIS question's record too, whatever each came to, so a
-  // later redraw from it does not offer a card that did not win. Null when
-  // there is no record, or another door marked it already and redrew.
-  for (const cardTs of marked) {
-    const after = await deps.threadState.getProposalByTs(cardTs).catch(() => null);
-    if (!after || (after.state === "found" && awaitingDecision([after.proposal]).length)) continue;
-    const question = await deps.threadState.decideInWhichQuestion(cardTs, popup.questionTs).catch(() => null);
-    if (question) kept = question;
   }
   console.log(`[which-card] ${popup.decision} on ${where} by=${request.userId} cards=${pick.picked.length}`);
   if (kept) await deps.editQuestion(keptQuestionMessage(kept));
@@ -370,7 +365,7 @@ async function decideOne(
   const verdict = await resolveSignal(signal, { threadState: deps.threadState, standingConfirmers: deps.standingConfirmers });
   console.log(`[which-card] ${decision} on ${popup.channel}/${cardTs} by=${userId} outcome=${verdict.outcome}`);
   if (verdict.outcome !== "won" && verdict.post && verdict.post.note.kind !== "cut-off") {
-    return { line: renderGateNote(verdict.post.note), question: null };
+    return { line: renderGateNote(verdict.post.note), question: await markHere(cardTs, popup, deps) };
   }
   let said = "";
   const question = await applyPressVerdict(
@@ -387,8 +382,23 @@ async function decideOne(
       ...(deps.now ? { now: deps.now } : {}),
     },
   );
-  if (verdict.outcome === "won") return { line: `${DONE[decision]}.`, question };
-  return { line: said || (verdict.post ? renderGateNote(verdict.post.note) : "Nothing changed."), question };
+  if (verdict.outcome === "won") return { line: `${DONE[decision]}.`, question: question ?? (await markHere(cardTs, popup, deps)) };
+  return { line: said || (verdict.post ? renderGateNote(verdict.post.note) : "Nothing changed."), question: question ?? (await markHere(cardTs, popup, deps)) };
+}
+
+/**
+ * A picked card, marked on THIS question's record once it is no longer
+ * waiting — decided here, decided elsewhere, lapsed, replaced — whenever the
+ * press path did not mark it there itself (its pointer names a newer
+ * question, or it did not win), so a later redraw from the record does not
+ * offer it again. Inside the card's own step, so the budget held back for
+ * each card covers it. Null when the card still waits, there is no record,
+ * or another door marked it already and redrew.
+ */
+async function markHere(cardTs: string, popup: WhichPopup, deps: Pick<WhichDoorDeps, "threadState">): Promise<WhichQuestion | null> {
+  const after = await deps.threadState.getProposalByTs(cardTs).catch(() => null);
+  if (!after || (after.state === "found" && awaitingDecision([after.proposal]).length)) return null;
+  return deps.threadState.decideInWhichQuestion(cardTs, popup.questionTs).catch(() => null);
 }
 
 /**

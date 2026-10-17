@@ -143,8 +143,10 @@ export async function viewsPush(env: Env, triggerId: string, view: Record<string
 /** Replace an open modal's contents. Whether Slack took it. A view whose
  *  `card` Slack refuses goes once more with the card stepped down
  *  (`card-block.ts`), as `views.open` and `views.push` do. */
-export async function viewsUpdate(env: Env, viewId: string, view: Record<string, unknown>): Promise<boolean> {
-  const res = await sendWithCardFallback(view, (v) => slackCall<SlackResponse>(env, "views.update", { view_id: viewId, view: withSafeBlocks(v) }));
+export async function viewsUpdate(env: Env, viewId: string, view: Record<string, unknown>, hash?: string): Promise<boolean> {
+  const res = await sendWithCardFallback(view, (v) =>
+    slackCall<SlackResponse>(env, "views.update", { view_id: viewId, view: withSafeBlocks(v), ...(hash ? { hash } : {}) }),
+  );
   return res.ok;
 }
 
