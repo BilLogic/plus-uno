@@ -27,7 +27,7 @@ export {
   type CardConversation,
   type CardOrigin,
 } from "./card-staging";
-export { settlementOf } from "./settlement";
+export { dropFromWhichQuestion, settlementOf, whichQuestionOf } from "./settlement";
 export * from "./delivery";
 export * from "./request";
 export * from "./antecedent";

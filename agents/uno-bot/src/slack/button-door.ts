@@ -22,13 +22,13 @@
 // the Node suite DRIVE it rather than read it.
 
 import type { ThreadState } from "../thread-state/index";
-import { withWorkingSignal, type Delivery } from "../turn/index";
+import { whichQuestionOf, withWorkingSignal, type Delivery } from "../turn/index";
 import { cardOutcomeOf, otherCardWaits, resolveSignal, type GateRestage, type GateVerdict } from "../gate/index";
 import { decidedCardLine, renderGateNote } from "./gate-note";
 // The decided card is built beside `notedCardBlocks`, where the Slack
 // adapter's `closeCard` builds it too: one builder for every door.
 import { decidedCard, type CardMessage } from "./proposal-render";
-import type { ChosenAs, ReportItemState } from "../thread-state/index";
+import type { ChosenAs, ReportItemState, WhichQuestion } from "../thread-state/index";
 
 export type { CardMessage };
 import type { OperationOutcome } from "../gate/run-batch";
@@ -45,6 +45,11 @@ export interface ButtonRequest {
   /** The card's own answer it was decided by, from the Review pop-up
    *  (`PendingProposal.choices`): the decided item names it. */
   as?: ChosenAs;
+  /** The "which one?" question the press was made on, by its ts
+   *  (`which-card.ts`): when a win drops the card from that question, the
+   *  question is handed back for the caller to redraw where it was pressed,
+   *  instead of being redrawn here. */
+  fromQuestion?: string;
 }
 
 /** Where the door speaks: the verdict's own reply thread, against the person's
@@ -114,7 +119,7 @@ export interface ButtonDoorDeps {
 export async function runButtonDoor(
   request: ButtonRequest,
   deps: ButtonDoorDeps,
-): Promise<void> {
+): Promise<WhichQuestion | null> {
   const verdict = await resolveSignal(
     {
       kind: "button",
@@ -127,7 +132,7 @@ export async function runButtonDoor(
   console.log(
     `[interactive] ${request.decision} button on ${request.channel}/${request.messageTs} by=${request.userId} outcome=${verdict.outcome}`,
   );
-  await applyPressVerdict(request, verdict, deps);
+  return applyPressVerdict(request, verdict, deps);
 }
 
 /**
@@ -138,23 +143,30 @@ export async function runButtonDoor(
  * Shared with the Review pop-up's Approve (`review-door.ts`), which is the
  * same press made from a different surface: one path applies both, so the two
  * cannot drift apart on what a win posts or what the card is left saying.
+ *
+ * A won card is dropped from the open "which one?" question that lists it,
+ * after the card is closed (`whichQuestionOf`), and that question redrawn —
+ * unless it is the one the press was made on (`fromQuestion`), which comes
+ * back for the caller to redraw. Null for everything else.
  */
 export async function applyPressVerdict(
   request: ButtonRequest,
   verdict: GateVerdict,
   deps: Omit<ButtonDoorDeps, "threadState" | "standingConfirmers"> & {
     /** The thread's live cards, read after a win for whether another still
-     *  waits (`otherCardWaits`). Absent, the thread settles idle. */
-    threadState?: Pick<ThreadState, "getProposalsByThread">;
+     *  waits (`otherCardWaits`), and the open "which one?" question the card
+     *  decided is dropped from (`dropFromWhichQuestion`). Absent, the thread
+     *  settles idle and no question is redrawn. */
+    threadState?: Pick<ThreadState, "getProposalsByThread" | "decideInWhichQuestion">;
     /** The decided card's words and outcome line, changed on the way: the
      *  pop-up's approval with edits says what was approved, and by whom, and
      *  `edited` says the draft's values changed (`decidedCard`). */
     reword?(text: string, note: string): { text: string; note: string; edited?: boolean };
   },
-): Promise<void> {
+): Promise<WhichQuestion | null> {
   if (verdict.post?.note.kind === "cut-off" && verdict.proposal) {
     await speakCutOff(request, verdict, verdict.proposal, verdict.post, deps);
-    return;
+    return null;
   }
 
   if (verdict.outcome !== "won") {
@@ -163,7 +175,7 @@ export async function applyPressVerdict(
     // someone else — goes on the card, where the person pressed; anything
     // else is answered aside, and so is an edit Slack would not take.
     const post = verdict.post;
-    if (!post) return;
+    if (!post) return null;
     if (post.card) {
       const said = await deps
         .delivery({
@@ -173,15 +185,15 @@ export async function applyPressVerdict(
           userId: request.userId,
         })
         .postGateNote(post.note, post.card);
-      if (said.ok) return;
+      if (said.ok) return null;
     }
     await deps.replyEphemeral(renderGateNote(post.note));
-    return;
+    return null;
   }
 
   const pending = verdict.proposal;
   const post = verdict.post;
-  if (!pending || !post) return; // a won verdict always carries both
+  if (!pending || !post) return null; // a won verdict always carries both
   const door = deps.delivery({
     channel: pending.channel,
     replyTs: post.replyTs,
@@ -215,7 +227,7 @@ export async function applyPressVerdict(
   // the whole message is drawn again from it (`decision-cards.ts`), so the
   // other items keep theirs. Approved says whether the write went through.
   if (pending.item) {
-    if (!deps.reports) return;
+    if (!deps.reports) return null;
     const at = (deps.now ?? Date.now)();
     const failed = outcomes?.find((o) => !o.ok);
     const as = request.as ? { as: request.as } : {};
@@ -228,7 +240,7 @@ export async function applyPressVerdict(
           : { kind: "approved", by: request.userId, at, ...as, ...(done ? { done } : {}) };
     const message = await settleItem(deps.reports, pending.item, state, at);
     if (message) await deps.replaceCard(message);
-    return;
+    return null;
   }
   // The outcome every other door closes a card with (`cardOutcomeOf`), and
   // the pop-up's Reject with its reason, which only a press here carries.
@@ -237,6 +249,12 @@ export async function applyPressVerdict(
     ? deps.reword(pending.proposalText, note)
     : { text: pending.proposalText, note };
   await deps.replaceCard(decidedCard(pending, words.note, words.text, { edited: words.edited === true }));
+  // And a "which one?" that lists it stops offering it, after the card.
+  const question = deps.threadState ? await whichQuestionOf(pending.proposalTs, deps.threadState) : null;
+  if (!question) return null;
+  if (question.questionTs === request.fromQuestion) return question;
+  await door.redrawWhichCard(question);
+  return null;
 }
 
 /** A single write may return the actual destination for its report receipt.

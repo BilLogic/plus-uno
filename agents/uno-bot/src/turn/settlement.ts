@@ -20,9 +20,9 @@
 // PURE as the turn is: no `Env`, no Workers type, no fetch.
 
 import { decidedCardOf, type GateVerdict } from "../gate/index";
-import { proposalReplyThread, type HistoryTurn, type PendingProposal } from "../thread-state/index";
+import { proposalReplyThread, type HistoryTurn, type PendingProposal, type ThreadState, type WhichQuestion } from "../thread-state/index";
 import { restageExecution } from "./card-staging";
-import type { TurnSettlement } from "./delivery";
+import type { Delivery, GateNote, PostResult, TurnSettlement } from "./delivery";
 import type { TurnDeps, TurnDisposition, TurnOutcome, TurnRequest, TurnTelemetry } from "./turn";
 
 /** The part of the turn's memory a verdict writes: the exchange, both
@@ -159,6 +159,8 @@ export async function settleVerdict(
   verdict: GateVerdict,
   ctx: {
     deps: TurnDeps;
+    /** The turn's channel: where a "which one?" it asks is kept as asked. */
+    channel: string;
     memory: VerdictMemory;
     telemetry: TurnTelemetry;
     note?: string;
@@ -169,6 +171,9 @@ export async function settleVerdict(
   const said = verdict.post
     ? await ctx.deps.delivery.postGateNote(verdict.post.note, verdict.post.card)
     : undefined;
+  if (verdict.post && said) {
+    await keepWhichQuestion(verdict.post.note, said, ctx.channel, ctx.deps.threadState);
+  }
   const posted = said?.text;
   const executed = await ctx.deps.applyVerdict(verdict);
   const remembered = (verdict.outcome === "won" ? ctx.note : undefined) ?? posted;
@@ -191,7 +196,11 @@ export async function settleVerdict(
   // the adapter sends it only while the settle after it still fits the
   // delivery reserve (`CLOSE_CARD_HEADROOM`).
   const decided = decidedCardOf(verdict);
-  if (decided) await ctx.deps.delivery.closeCard(decided.card, decided.outcome);
+  if (decided) {
+    await ctx.deps.delivery.closeCard(decided.card, decided.outcome);
+    // And a "which one?" that lists it stops offering it, after the card.
+    await dropFromWhichQuestion(decided.card.ts, ctx.deps);
+  }
   // "Approve which one?" resolved nothing: it asked, and every card it names
   // is still waiting on the person (#1319).
   const asked = verdict.post?.note.kind === "which-card";
@@ -202,4 +211,71 @@ export async function settleVerdict(
     telemetry: ctx.telemetry,
     ...(executed ? { executed } : {}),
   };
+}
+
+/**
+ * A "which one?" question, kept as it was posted (`putWhichQuestion`), so a
+ * card it lists can be dropped from it by whichever door decides that card
+ * (`dropFromWhichQuestion`). Anything else, or a question that did not post,
+ * keeps nothing. Best-effort: a question not kept still works, its own
+ * presses redrawing it; only a decision made elsewhere leaves its button up.
+ *
+ * @param note - The gate note posted
+ * @param said - What its post did
+ * @param channel - Where it was posted
+ * @param threadState - The store it is kept in
+ */
+export async function keepWhichQuestion(
+  note: GateNote,
+  said: PostResult,
+  channel: string,
+  threadState: Pick<ThreadState, "putWhichQuestion">,
+): Promise<void> {
+  if (note.kind !== "which-card" || !said.ok || !said.ts) return;
+  await threadState
+    .putWhichQuestion({ questionTs: said.ts, channel, decision: note.decision, cards: note.cards, decided: [] })
+    .catch((err: unknown) => {
+      console.warn(`[turn] which-card question ${channel}/${said.ts} not kept: ${err instanceof Error ? err.message : String(err)}`);
+    });
+}
+
+/**
+ * A decided card, marked on the open "Approve which one?" question that
+ * lists it (`decideInWhichQuestion`): the question as it now stands, for the
+ * door to redraw, or null when there is nothing to redraw. Only the door that
+ * marks a card is handed the question, so two doors racing on one card edit
+ * it once. Best-effort: a failed read leaves the question as it was, and its
+ * button's press says the card is decided.
+ *
+ * @param cardTs - The card a door just decided
+ * @param threadState - The store the question is kept in
+ */
+export async function whichQuestionOf(
+  cardTs: string,
+  threadState: Pick<ThreadState, "decideInWhichQuestion">,
+): Promise<WhichQuestion | null> {
+  return threadState.decideInWhichQuestion(cardTs).catch((err: unknown) => {
+    console.warn(`[turn] which-card question for ${cardTs} not read: ${err instanceof Error ? err.message : String(err)}`);
+    return null;
+  });
+}
+
+/**
+ * A decided card, dropped from the open question that lists it: marked there
+ * (`whichQuestionOf`) and the question redrawn without that card's button
+ * (`Delivery.redrawWhichCard`). Every door that decides a card ends through
+ * here once the card itself is closed — the turn's typed emoji and
+ * `proposal_resolve`, a reaction, a press on the card or in its Review
+ * pop-up — so a card decided anywhere stops being offered on the question.
+ * A press made on a question redraws that one itself (`slack/which-card.ts`).
+ *
+ * @param cardTs - The card a door just decided
+ * @param deps - The store the question is kept in, and the door's Delivery
+ */
+export async function dropFromWhichQuestion(
+  cardTs: string,
+  deps: { threadState: Pick<ThreadState, "decideInWhichQuestion">; delivery: Pick<Delivery, "redrawWhichCard"> },
+): Promise<void> {
+  const question = await whichQuestionOf(cardTs, deps.threadState);
+  if (question) await deps.delivery.redrawWhichCard(question);
 }

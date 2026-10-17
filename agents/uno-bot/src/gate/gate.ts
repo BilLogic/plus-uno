@@ -54,7 +54,7 @@ import type {
   StatedCardWords,
   ThreadState,
 } from "../thread-state/index";
-import type { CardOutcome, GateNote } from "../turn/index";
+import { MAX_WHICH_CARDS, type CardOutcome, type GateNote } from "../turn/index";
 import { cardHeadline } from "../agent/card-identity";
 
 // ── The signal ───────────────────────────────────────────────────────────────
@@ -967,7 +967,13 @@ function pickCard(
  * naming one (`AgentResult` `text` with `askWhich`).
  */
 export function whichCardNote(decision: Decision, cards: readonly PendingProposal[]): GateNote {
-  return { kind: "which-card", decision, cards: cards.map((card) => ({ ts: card.proposalTs, headline: cardHeadline(card) })) };
+  // No more than one actions row holds: the question, its record and its
+  // buttons all list the same cards.
+  return {
+    kind: "which-card",
+    decision,
+    cards: cards.slice(0, MAX_WHICH_CARDS).map((card) => ({ ts: card.proposalTs, headline: cardHeadline(card) })),
+  };
 }
 
 function threadRefOf(

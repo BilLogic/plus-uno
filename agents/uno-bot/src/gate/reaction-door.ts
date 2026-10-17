@@ -31,7 +31,7 @@ import { mapReaction } from "./reactions";
 import { isResolvingReaction, type AnswerReaction } from "../usage/resolution";
 import { thanksEmojiOf } from "../usage/appreciation";
 import type { ThreadState } from "../thread-state/index";
-import { withWorkingSignal, type Delivery } from "../turn/index";
+import { dropFromWhichQuestion, withWorkingSignal, type Delivery } from "../turn/index";
 import { decidedCardOf, otherCardWaits, resolveSignal, type GateRestage, type GateVerdict } from "./gate";
 
 /** One reaction, in the facts the envelope already has. */
@@ -216,8 +216,12 @@ export async function runReactionDoor(
         }
         await deps.applyVerdict(verdict);
         // The card a reaction decided ends as a press leaves it (`decidedCardOf`).
+        // And a "which one?" that lists it stops offering it (`dropFromWhichQuestion`).
         const decided = decidedCardOf(verdict);
-        if (decided) await delivery.closeCard(decided.card, decided.outcome);
+        if (decided) {
+          await delivery.closeCard(decided.card, decided.outcome);
+          await dropFromWhichQuestion(decided.card.ts, { threadState: deps.threadState, delivery });
+        }
         if (verdict.restage) await deps.restage(verdict.restage, delivery);
       } catch (err) {
         // A reaction confirmation must NEVER die silently — that's the exact "✅

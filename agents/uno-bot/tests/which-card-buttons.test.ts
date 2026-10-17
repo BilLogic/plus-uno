@@ -21,6 +21,8 @@ import { runWhichCardDoor, whichCardMessage, whichPressOf } from "../src/slack/w
 import { cardExpiresAt } from "../src/card-expiry";
 import type { ScriptedReply } from "../src/agent/providers/fake";
 import { harness, request, REF, CHANNEL, type Harness } from "./helpers/turn-harness";
+import { createInMemoryThreadState } from "../src/thread-state/index";
+import { runReactionDoor } from "../src/gate/index";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
 
 async function turn(h: Harness, over: Partial<TurnRequest>) {
@@ -148,6 +150,144 @@ test("the question's buttons lapse 24 weekday hours after it was asked, without 
   assert.match(ephemerals[0] ?? "", /expired/i);
   assert.deepEqual(buttonsOf(questionEdits.at(-1)!), [], "the lapsed question keeps no buttons");
   assert.doesNotMatch(JSON.stringify(questionEdits.at(-1)!.blocks), /Expires/, "nor a deadline");
+});
+
+/** The card's own ✅ / ⛔, pressed on the card rather than the question. */
+async function pressCard(h: Harness, cardTs: string, decision: "confirm" | "cancel") {
+  await runButtonDoor(
+    { channel: CHANNEL, messageTs: cardTs, decision, userId: "U1" },
+    {
+      threadState: h.threadState,
+      delivery: () => h.delivery,
+      applyVerdict: (verdict) => h.deps.applyVerdict(verdict).then(() => {}),
+      replyEphemeral: async () => {},
+      replaceCard: async () => {},
+      restage: async () => {},
+    },
+  );
+}
+
+const redraws = (h: Harness) => h.delivery.calls.flatMap((c) => (c.kind === "redraw-which" ? [c.question] : []));
+const sectionOf = (message: CardMessage) =>
+  (message.blocks as Array<{ type: string; text?: { text: string } }>).find((x) => x.type === "section")?.text?.text ?? "";
+
+test("the question redrawn with a card decided strikes that card's line and drops its button, keeping every number", async () => {
+  const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B)] });
+  const { a, b, note } = await asked(h);
+
+  const one = whichCardMessage(note, [b]);
+  assert.equal(messageBlocksRefusal(one.blocks), null, "Slack takes it");
+  assert.deepEqual(buttonsOf(one).map((x) => [x.text.text, x.value]), [["Approve 2", a]], "card 2 is still card 2");
+  assert.match(sectionOf(one), /\n~1\. Session reflections~\n2\. \*Backup tutor matching\*$/);
+
+  const all = whichCardMessage(note, [a, b]);
+  assert.deepEqual(buttonsOf(all), []);
+  assert.match(JSON.stringify(all.blocks), /Decided\./);
+});
+
+/**
+ * A thread on a clock the cases move, so the cards, the question's record
+ * and the presses all read one time: the question is asked at `QUESTION_TS`.
+ */
+function clocked(replies: ScriptedReply[]) {
+  const clock = { now: ASKED_AT_MS - 60_000 };
+  const threadState = createInMemoryThreadState({ now: () => clock.now });
+  const h = harness({ replies, threadState, now: () => clock.now });
+  return { h, clock };
+}
+
+/** Asked as the turn asks it, and kept as the turn keeps it, under the ts
+ *  Slack gave the question's message. */
+async function askedAndKept(h: Harness) {
+  const got = await asked(h);
+  await h.threadState.putWhichQuestion({ questionTs: QUESTION_TS, channel: CHANNEL, decision: got.note.decision, cards: got.note.cards, decided: [] });
+  return got;
+}
+
+test("a card's own button, pressed while the question is open, drops that card from the question", async () => {
+  const { h } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { a, b } = await askedAndKept(h);
+
+  await pressCard(h, a, "confirm");
+
+  assert.deepEqual(redraws(h).map((q) => [q.questionTs, q.cards.map((c) => c.ts), q.decided]), [[QUESTION_TS, [b, a], [a]]]);
+  // Pressed again, nothing more is redrawn: the record has it already.
+  await pressCard(h, a, "confirm");
+  assert.equal(redraws(h).length, 1);
+});
+
+test("a press on the question redraws it once, from its record, and a later decision elsewhere finishes it", async () => {
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { a, b, note } = await askedAndKept(h);
+  clock.now = ASKED_AT_MS + 60_000;
+
+  const { questionEdits } = await press(h, whichCardMessage(note), a, clock.now);
+
+  assert.equal(questionEdits.length, 1, "one edit of the question, not one per door");
+  assert.deepEqual(questionEdits[0], whichCardMessage(note, [a]));
+  assert.deepEqual(redraws(h), [], "its own question is redrawn where it was pressed");
+
+  await pressCard(h, b, "confirm");
+  assert.deepEqual(redraws(h).map((q) => [q.questionTs, q.decided]), [[QUESTION_TS, [a, b]]]);
+});
+
+test("a card that lapsed before the question, pressed there, stays off it when another door later decides a card", async () => {
+  // Card A is staged a day before the question, so it lapses first: Tuesday
+  // 11:00 ET against a question asked Wednesday 10:00 ET.
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const asked = Date.UTC(2026, 9, 14, 14, 0);
+  const questionTs = `${asked / 1000}.000100`;
+  clock.now = Date.UTC(2026, 9, 13, 15, 0);
+  const first = await turn(h, { text: "draft a PRD for backup tutor matching" });
+  clock.now = asked;
+  const second = await turn(h, { text: "and one for session reflections", userMsgTs: "1700000000.000300" });
+  await turn(h, { text: "✅", userMsgTs: "1700000000.000400" });
+  const note = h.delivery.gateNotes.at(-1) as Extract<GateNote, { kind: "which-card" }>;
+  await h.threadState.putWhichQuestion({ questionTs, channel: CHANNEL, decision: note.decision, cards: note.cards, decided: [] });
+  const a = first.staged!.proposal.proposalTs;
+  const b = second.staged!.proposal.proposalTs;
+
+  // Wednesday 12:00 ET: A has lapsed, the question has not.
+  clock.now = Date.UTC(2026, 9, 14, 16, 0);
+  const questionEdits: CardMessage[] = [];
+  await runWhichCardDoor(
+    { channel: CHANNEL, questionTs, question: whichCardMessage(note), cardTs: a, decision: "confirm", userId: "U1" },
+    {
+      threadState: h.threadState,
+      delivery: () => h.delivery,
+      applyVerdict: (verdict) => h.deps.applyVerdict(verdict).then(() => {}),
+      replyEphemeral: async () => {},
+      restage: async () => {},
+      now: () => clock.now,
+      editCard: async () => {},
+      replaceQuestion: async (message) => void questionEdits.push(message),
+    },
+  );
+  assert.deepEqual(h.resolved, [], "nothing ran");
+  assert.deepEqual(questionEdits, [whichCardMessage(note, [a])], "marked on the question's record, and redrawn from it");
+
+  // B, decided by a reaction on its card, redraws the question from the record.
+  await runReactionDoor(
+    { channel: CHANNEL, messageTs: b, glyph: "white_check_mark", userId: "U1" },
+    {
+      threadState: h.threadState,
+      delivery: () => h.delivery,
+      threadRootOf: async () => REF.thread,
+      botUserId: async () => "UBOT",
+      applyVerdict: (verdict) => h.deps.applyVerdict(verdict).then(() => {}),
+      restage: async () => {},
+    },
+  );
+  assert.deepEqual(redraws(h).map((q) => q.decided), [[a, b]], "A's button does not come back");
+});
+
+test("a struck headline is trimmed, and a ~ in it cannot end the strike early", async () => {
+  const note: Extract<GateNote, { kind: "which-card" }> = {
+    kind: "which-card",
+    decision: "cancel",
+    cards: [{ ts: "1.0", headline: "  Approx ~2 tutors  " }, { ts: "2.0", headline: "Other" }],
+  };
+  assert.match(sectionOf(whichCardMessage(note, ["1.0"])), /\n~1\. Approx \u223C2 tutors~\n2\. \*Other\*$/);
 });
 
 test("a press on a card a revision replaced names the card that replaced it", async () => {

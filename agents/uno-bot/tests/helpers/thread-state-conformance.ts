@@ -46,8 +46,9 @@ import {
   type ReportItemState,
   type ThreadState,
   type ThreadStateDeps,
+  type WhichQuestion,
 } from "../../src/thread-state/store";
-import { cardTtlMs } from "../../src/card-expiry";
+import { cardExpiresAt, cardTtlMs } from "../../src/card-expiry";
 
 /** A hand-wound clock. `now()` is what the store reads; `advance` is the only
  *  way time passes in this suite. */
@@ -1429,6 +1430,61 @@ export function runThreadStateConformance(
     assert.deepEqual(await store.getCheckOffer("5.0"), offer, "still there at the end of its keep");
     clock.advance(1);
     assert.equal(await store.getCheckOffer("5.0"), null);
+  });
+
+  // ----- the open "which one?" question -----
+  //
+  // Kept so a card decided by any door can be dropped from the question that
+  // lists it: one decided card at a time, each told once, the record gone
+  // with its last card or its deadline.
+
+  /** A Slack ts for a moment on the suite's clock, as a question's message
+   *  carries: its buttons lapse on the card rule from it. */
+  const tsAt = (ms: number): string => `${Math.floor(ms / 1000)}.000000`;
+  const question = (clock: TestClock, over: Partial<WhichQuestion> = {}): WhichQuestion => ({
+    questionTs: tsAt(clock.now()), channel: "C1", decision: "cancel",
+    cards: [{ ts: "4.0", headline: "Backup tutor matching" }, { ts: "5.0", headline: "Session reflections" }],
+    decided: [], ...over,
+  });
+
+  it("a card decided from an open question is marked on it, once, and the question comes back as it now stands", async () => {
+    const { store, clock } = setup();
+    await store.putWhichQuestion(question(clock));
+    assert.deepEqual(await store.decideInWhichQuestion("5.0"), question(clock, { decided: ["5.0"] }));
+    assert.equal(await store.decideInWhichQuestion("5.0"), null, "a second door deciding it is told nothing changed");
+    assert.equal(await store.decideInWhichQuestion("6.0"), null, "a card no question lists");
+  });
+
+  it("the question's record goes with its last card", async () => {
+    const { store, clock } = setup();
+    const asked = question(clock);
+    await store.putWhichQuestion(asked);
+    await store.decideInWhichQuestion("4.0");
+    assert.deepEqual(await store.decideInWhichQuestion("5.0"), { ...asked, decided: ["4.0", "5.0"] }, "the last one still comes back, to be redrawn");
+    assert.equal(await store.decideInWhichQuestion("4.0", asked.questionTs), null, "nothing left of it");
+  });
+
+  it("a question lapses on the card rule from its own ts, not from when it was kept", async () => {
+    const { store, clock } = setup();
+    // Asked an hour before it was kept: its deadline is the question's.
+    const asked = Math.floor((clock.now() - 60 * 60 * 1000) / 1000) * 1000;
+    await store.putWhichQuestion(question(clock, { questionTs: tsAt(asked) }));
+    clock.advance(cardExpiresAt(asked) - clock.now());
+    assert.ok(await store.decideInWhichQuestion("4.0"), "live through its exact deadline");
+    clock.advance(1);
+    assert.equal(await store.decideInWhichQuestion("5.0"), null, "a millisecond past it, nothing");
+  });
+
+  it("a card asked about again is dropped from the newest question that lists it, or from the one named", async () => {
+    const { store, clock } = setup();
+    const first = question(clock);
+    await store.putWhichQuestion(first);
+    clock.advance(60_000);
+    const second = question(clock, { decision: "confirm" });
+    await store.putWhichQuestion(second);
+    assert.deepEqual(await store.decideInWhichQuestion("4.0", first.questionTs), { ...first, decided: ["4.0"] }, "the question pressed");
+    assert.deepEqual(await store.decideInWhichQuestion("4.0"), { ...second, decided: ["4.0"] }, "its pointer still names the newest");
+    assert.equal(await store.decideInWhichQuestion("4.0"), null);
   });
 
   it("the one-shot dedup and the lease share one record", async () => {

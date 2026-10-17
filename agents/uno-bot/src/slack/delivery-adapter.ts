@@ -73,7 +73,7 @@ import type { SlackMessageMetadata } from "./api";
 import { decidedCard, notedCardBlocks, proposalCardBlocks, renderProposalCard } from "./proposal-render";
 import { toPlainText } from "./mrkdwn";
 import { cardStaysLive, decidedCardLine, renderCardNote, renderGateNote } from "./gate-note";
-import { whichCardMessage } from "./which-card";
+import { keptQuestionMessage, whichCardMessage } from "./which-card";
 import { checkOfferMessage } from "./blueprint-check";
 import { planBlock } from "./plan-block";
 import { retryValue } from "./try-again";
@@ -1150,9 +1150,11 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
     // A card decided from anywhere but its own buttons ends as a press leaves
     // it: the outcome as its last line, onto its own blocks, and View. An edit
     // Slack refuses costs only the edit — the thread already has the verdict.
-    // It is the one cosmetic call in the delivery reserve, so it goes only
-    // when the turn's settle still fits after it: a turn near the cap keeps
-    // its clear, and the card keeps Review rather than the thread its 👀.
+    // It is one of the two cosmetic calls in the delivery reserve — the card,
+    // then any "which one?" question listing it (`redrawWhichCard`) — so it
+    // goes only when the turn's settle still fits after it: a turn near the
+    // cap keeps its clear, and the card keeps Review rather than the thread
+    // its 👀.
     async closeCard(card, outcome) {
       if (budgetHeadroom().subrequests < CLOSE_CARD_HEADROOM) {
         console.warn(`[slack] decided card ${channel}/${card.ts} left as it was: no headroom for the edit and the settle`);
@@ -1163,6 +1165,28 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
         .updateMessage({ channel, ts: card.ts, text: message.text, blocks: message.blocks })
         .catch(() => ({ ok: false }));
       if (!updated.ok) console.warn(`[slack] decided card ${channel}/${card.ts} could not be closed`);
+    },
+
+    // The open "which one?" question a decided card was listed on, redrawn
+    // without that card's button. Cosmetic as `closeCard` is, and spent from
+    // the same reserve under the same rule: it goes after the card's edit, and
+    // only while the settle still fits after it, so near the cap the card is
+    // closed and the question keeps a button whose press says "already
+    // decided". Rebuilt from the kept record, so nothing is read from Slack.
+    async redrawWhichCard(question) {
+      if (question.channel !== channel) {
+        console.warn(`[slack] which-card question ${question.channel}/${question.questionTs} not redrawn from ${channel}`);
+        return;
+      }
+      if (budgetHeadroom().subrequests < CLOSE_CARD_HEADROOM) {
+        console.warn(`[slack] which-card question ${channel}/${question.questionTs} left as it was: no headroom for the edit and the settle`);
+        return;
+      }
+      const message = keptQuestionMessage(question);
+      const updated = await slack
+        .updateMessage({ channel, ts: question.questionTs, text: message.text, blocks: message.blocks })
+        .catch(() => ({ ok: false }));
+      if (!updated.ok) console.warn(`[slack] which-card question ${channel}/${question.questionTs} could not be redrawn`);
     },
 
     async card(card: ProposalCard, lead?: StagingNote): Promise<PostResult> {

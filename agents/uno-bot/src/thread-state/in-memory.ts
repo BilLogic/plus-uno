@@ -47,6 +47,9 @@ import {
   comparisonKey,
   CHECK_OFFER_KEEP_MS,
   type CheckOfferRecord,
+  decidedInQuestion,
+  type WhichCardPointer,
+  type WhichQuestionRecord,
   decidedNoteOf,
   decidedOf,
   decidedPayload,
@@ -139,6 +142,10 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
   const checks = new Map<string, CheckRecord>();
   /** Each Check it offer, by its message ts, with when it was put. */
   const checkOffers = new Map<string, CheckOfferRecord>();
+  /** Each open "which one?" question, by its message ts, and each card it
+   *  lists, pointing at it. */
+  const whichQuestions = new Map<string, WhichQuestionRecord>();
+  const whichCards = new Map<string, WhichCardPointer>();
   const executions = new Map<string, Execution>();
 
   /** Take an execution if it has been cut off; drop it if it has aged out;
@@ -593,6 +600,29 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         return null;
       }
       return structuredClone(rec.offer);
+    },
+
+    async putWhichQuestion(question) {
+      const at = now();
+      whichQuestions.set(question.questionTs, { question: structuredClone(question), at });
+      for (const card of question.cards) whichCards.set(card.ts, { questionTs: question.questionTs, at });
+    },
+
+    async decideInWhichQuestion(cardTs, questionTs) {
+      const pointer = whichCards.get(cardTs);
+      const target = questionTs ?? pointer?.questionTs;
+      if (!target) return null;
+      const rec = whichQuestions.get(target);
+      const { question, keep } = decidedInQuestion(rec, cardTs, now());
+      // A card decided against the question its pointer names has spent it.
+      if (pointer?.questionTs === target) whichCards.delete(cardTs);
+      if (!keep) {
+        whichQuestions.delete(target);
+        for (const card of rec?.question.cards ?? []) {
+          if (whichCards.get(card.ts)?.questionTs === target) whichCards.delete(card.ts);
+        }
+      } else if (keep !== rec) whichQuestions.set(target, keep);
+      return question ? structuredClone(question) : null;
     },
   };
 }

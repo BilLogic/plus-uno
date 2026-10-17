@@ -29,7 +29,7 @@
 // the turn's own tests run on the recording adapter beside it, with no Worker
 // anywhere. (Not a compile property: `tsconfig.test.json` globs `src/**`.)
 
-import type { ProposalOperation } from "../thread-state/index";
+import type { ProposalOperation, WhichQuestion } from "../thread-state/index";
 import type { ToolProgressEvent } from "../agent/tool-progress";
 import { textCopy, type Presentation } from "./presentation";
 
@@ -409,6 +409,10 @@ export type GateNote =
       mention?: string;
     };
 
+/** The most cards one "which one?" question lists: Slack's limit on an
+ *  actions row, 25 elements, one button per card. */
+export const MAX_WHICH_CARDS = 25;
+
 /** One card a "which one?" question offers: its ts, which its button
  *  carries, and its headline, which the button reads (`agent/card-identity.ts`). */
 export interface WhichCard {
@@ -602,6 +606,17 @@ export interface Delivery {
   closeCard(card: NoteCard, outcome: CardOutcome): Promise<void>;
 
   /**
+   * Redraw an open "Approve which one?" question as it now stands
+   * (`ThreadState.decideInWhichQuestion`): each decided card's line marked
+   * and its button gone, the numbers unchanged, and no buttons at all once
+   * every card is decided. For every door that decides a listed card, after
+   * the card is closed, so the question stops offering a decision already
+   * made; a press on the question itself redraws it where it was pressed
+   * instead. Posts nothing; best-effort.
+   */
+  redrawWhichCard(question: WhichQuestion): Promise<void>;
+
+  /**
    * Stage a proposal card — the agreed hand-over (#623):
    * `Turn ──► Delivery.card({ kind, subject, fields, actions })`.
    *
@@ -660,6 +675,7 @@ export type DeliveryCall =
   | { kind: "gate-note"; note: GateNote; card?: NoteCard }
   | { kind: "reopen-card"; card: NoteCard }
   | { kind: "close-card"; card: NoteCard; outcome: CardOutcome }
+  | { kind: "redraw-which"; question: WhichQuestion }
   | { kind: "proposal"; card: ProposalCard }
   | { kind: "check-offer"; offer: CheckOfferNote }
   | { kind: "failure"; stage: DeliveryFailureStage; message?: string; ask?: string };
@@ -817,6 +833,10 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
 
     async closeCard(card, outcome) {
       calls.push({ kind: "close-card", card, outcome });
+    },
+
+    async redrawWhichCard(question) {
+      calls.push({ kind: "redraw-which", question: structuredClone(question) });
     },
 
     async card(proposal, lead) {

@@ -254,6 +254,17 @@ describe("Needs changes and Reject are decided from the draft, where they answer
     assert.deepEqual(views.refused, []);
   });
 
+  it("Approve drops the card from an open \"which one?\" question that lists it", async () => {
+    const threadState = await staged();
+    const cards = [{ ts: "1700000000.000999", headline: "Another card" }, { ts: CARD_TS, headline: "Goal cycle resets per session" }];
+    await threadState.putWhichQuestion({ questionTs: `${Math.floor(Date.now() / 1000)}.000500`, channel: CHANNEL, decision: "confirm", cards, decided: [] });
+    const { deps } = harness(threadState);
+    const delivery = recordingDelivery();
+    await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", decision: "confirm" }, { ...deps, delivery: () => delivery });
+    const redrawn = delivery.calls.flatMap((c) => (c.kind === "redraw-which" ? [c.question.decided] : []));
+    assert.deepEqual(redrawn, [[CARD_TS]]);
+  });
+
   it("Reject runs nothing", async () => {
     const { deps, views, ran } = harness(await staged());
     await runReviewDecision({ viewId: "V1", channel: CHANNEL, messageTs: CARD_TS, userId: "U2", decision: "cancel" }, deps);

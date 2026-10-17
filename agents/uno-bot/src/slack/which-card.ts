@@ -21,16 +21,33 @@
 // staged before the question can lapse first; a press on it then says so, as a
 // press on the card would.
 //
+// A CARD DECIDED ANYWHERE DROPS OUT OF IT. The turn keeps the question as
+// posted in the thread store (`putWhichQuestion`), and every door that decides
+// a listed card — this question's button, the card's own, its Review pop-up,
+// a reaction, a typed emoji, the model's `proposal_resolve` — marks it there
+// and redraws the question from that record (`gate.ts`
+// `dropFromWhichQuestion`): the card's line struck, its button gone, the
+// numbers unchanged, and "Decided." once none are left. A press on this
+// question marks it on this question's record whatever the press came to, so
+// a card that lapsed or was replaced stays off it too.
+//
+// TWO LIMITS, ACCEPTED. A card asked about again points at the newest
+// question only, so an older question listing it keeps its button; a press
+// there says the card is decided, and redraws that question. And two doors
+// deciding two different cards at once each redraw from their own read, so
+// the edits can land out of order and show one decided card too few until
+// the next decision; again, a press says so. Neither costs a wrong decision.
+//
 // Pure apart from its named dependencies: no `Env`, no fetch.
 
-import type { GateNote, WhichCard } from "../turn/index";
+import { MAX_WHICH_CARDS, type GateNote, type WhichCard } from "../turn/index";
 import { cardExpiresAt } from "../card-expiry";
 import { renderGateNote, whichCardQuestion } from "./gate-note";
 import { escapeSlackText } from "./mrkdwn";
 import { isDeadlineBlock } from "./card-deadline";
 import { runButtonDoor, type ButtonDoorDeps } from "./button-door";
 import type { CardMessage } from "./proposal-render";
-import type { ThreadState } from "../thread-state/index";
+import type { ThreadState, WhichQuestion } from "../thread-state/index";
 
 type WhichNote = Extract<GateNote, { kind: "which-card" }>;
 type Decision = WhichNote["decision"];
@@ -39,27 +56,47 @@ type Decision = WhichNote["decision"];
  *  decision and the button's place in the row, which keeps ids unique. */
 export const WHICH_ACTION_PREFIX = "uno_which_";
 
-/** Slack's limit on an actions row: 25 elements. */
-const MAX_BUTTONS = 25;
+/** What the question says in place of its buttons once every card it lists
+ *  is decided. */
+const DECIDED = "Decided.";
 
 /** The question as Slack gets it: its words (`gate-note.ts`) listing the
  *  cards by number, and a row of one numbered button per card. Its buttons
  *  still lapse on the card rule, counted from the question's ts by the door,
  *  but the message does not say when.
  *
+ * Redrawn after a door decides a card it lists (`Delivery.redrawWhichCard`),
+ * that card's line is struck and its button goes, and every other card keeps
+ * its number: "Cancel 2" goes on meaning card 2. With every card decided the
+ * row gives way to "Decided.", as a press leaves it (`withButtons`).
+ *
  * @param note - The question
+ * @param decided - The listed cards decided since it was asked, by ts
  */
-export function whichCardMessage(note: WhichNote): CardMessage {
-  const cards = note.cards.slice(0, MAX_BUTTONS);
-  // Headlines come from the model's input, so escaped.
-  const listed = cards.map((card, i) => `${i + 1}. *${escapeSlackText(card.headline)}*`).join("\n");
+export function whichCardMessage(note: WhichNote, decided: readonly string[] = []): CardMessage {
+  const cards = note.cards.slice(0, MAX_WHICH_CARDS);
+  // Headlines come from the model's input, so escaped — and trimmed, since
+  // a strike opened or closed beside a space is not a strike. A ~ inside
+  // one would close it early, so a struck line reads its look-alike.
+  const listed = cards
+    .map((card, i) => {
+      const headline = escapeSlackText(card.headline.trim());
+      return decided.includes(card.ts) ? `~${i + 1}. ${headline.replaceAll("~", "\u223C")}~` : `${i + 1}. *${headline}*`;
+    })
+    .join("\n");
+  const open = cards.flatMap((card, i) => (decided.includes(card.ts) ? [] : [button(note.decision, card, i)]));
   return {
     text: renderGateNote(note),
     blocks: [
       { type: "section", text: { type: "mrkdwn", text: `${whichCardQuestion(note)}\n${listed}` } },
-      { type: "actions", elements: cards.map((card, i) => button(note.decision, card, i)) },
+      open.length ? { type: "actions", elements: open } : { type: "context", elements: [{ type: "mrkdwn", text: DECIDED }] },
     ],
   };
+}
+
+/** A kept question (`ThreadState.decideInWhichQuestion`), as Slack gets it. */
+export function keptQuestionMessage(question: WhichQuestion): CardMessage {
+  return whichCardMessage({ kind: "which-card", decision: question.decision, cards: question.cards }, question.decided);
 }
 
 /** One card's button: the decision and the card's number in the list above. */
@@ -127,21 +164,34 @@ export async function runWhichCardDoor(press: WhichPress, deps: WhichCardDoorDep
     return;
   }
 
-  await runButtonDoor(
-    { channel: press.channel, messageTs: press.cardTs, decision: press.decision, userId: press.userId },
+  // A win drops its card from the question it is kept on (`button-door.ts`):
+  // when that is this question, it comes back to be redrawn here, where it
+  // was pressed, from its record.
+  const own = await runButtonDoor(
+    { channel: press.channel, messageTs: press.cardTs, decision: press.decision, userId: press.userId, fromQuestion: press.questionTs },
     { ...deps, replaceCard: (message) => deps.editCard(press.cardTs, message) },
   );
+  if (own) {
+    await deps.replaceQuestion(keptQuestionMessage(own));
+    return;
+  }
 
-  // Whatever the press came to — won, lost to another door, aged out — a card
-  // that is no longer waiting keeps no button here. A read that fails says
-  // nothing either way, so the button stays: a second press on a decided card
-  // is told so, while a dropped button on a waiting one cannot be had back.
+  // Whatever else the press came to — lost to another door, aged out,
+  // replaced — a card that is no longer waiting keeps no button here. A read
+  // that fails says nothing either way, so the button stays: a second press
+  // on a decided card is told so, while a dropped button on a waiting one
+  // cannot be had back.
   const after = await deps.threadState.getProposalByTs(press.cardTs).catch((err: unknown) => {
     console.warn(`[interactive] which-card: ${press.channel}/${press.cardTs} not read after the press: ${err instanceof Error ? err.message : String(err)}`);
     return null;
   });
   if (!after || after.state === "found") return;
-  await deps.replaceQuestion(withButtons(press.question, (ts) => ts !== press.cardTs, "Decided."));
+  // Marked on THIS question's record too, so a later redraw from it does not
+  // bring the button back. Null when there is no record, or another door
+  // marked it already and redrew; the question as Slack holds it is then
+  // redrawn instead.
+  const kept = await deps.threadState.decideInWhichQuestion(press.cardTs, press.questionTs).catch(() => null);
+  await deps.replaceQuestion(kept ? keptQuestionMessage(kept) : withButtons(press.question, (ts) => ts !== press.cardTs, DECIDED));
 }
 
 /**
