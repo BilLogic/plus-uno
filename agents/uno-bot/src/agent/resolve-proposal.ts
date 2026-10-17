@@ -49,7 +49,7 @@ import { proposalEventLogFor } from "../usage/production";
 import { recordTaskCompletion } from "../usage/resolution-env";
 import { isToolName, runsPastGate } from "./tool-table";
 import { TOOLS_BY_NAME } from "./tools";
-import { cancelNote } from "./cancel-note";
+import { cancelNoteWrites } from "./cancel-note";
 
 /**
  * Act on a verdict that won its claim: react on the person's ORIGINAL request
@@ -150,14 +150,17 @@ async function runWonVerdict(
     console.log(
       batchTelemetryLine({ proposalTs: pending.proposalTs, proposed, approved: 0, outcomes: [] }),
     );
-    await store.appendHistory(
-      { channel: pending.channel, thread: pending.threadTs },
-      {
-        role: "assistant",
-        content: cancelNote(pending.toolName, pending.input),
-        at: Date.now(),
-      },
-    );
+    // In the conversation, and in a DM the card's own thread too
+    // (`cancelNoteWrites`): a re-ask typed there reads that history, not "dm".
+    // The thread's copy is best-effort: it only sharpens the guard there, and
+    // must never cost the conversation's note or the sweep's resolution below.
+    const note = cancelNoteWrites(pending, Date.now());
+    await store.appendHistory(note.conversation, note.turn);
+    if (note.cardThread) {
+      await store.appendHistory(note.cardThread, note.turn).catch((err: unknown) => {
+        console.warn(`[gate] cancel note in the card's thread failed: ${err instanceof Error ? err.message : String(err)}`);
+      });
+    }
     // A sweep card's ⛔ drops its items (`sweep/outcomes.ts`).
     await recordSweepResolutionFor(env, pending, undefined);
     return;

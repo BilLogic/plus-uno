@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **99,914 chars from 9 files**, against an assembled budget of 175,500 (75,586 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 79,530 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **100,092 chars from 9 files**, against an assembled budget of 175,500 (75,408 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 79,708 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,113 (−7,715 ide-only) | 10,113 | 20,000 (constitution) |
 | 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 14,550 | 24,692 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,249 | 45,982 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 47,628 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 48,876 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 54,569 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 66,355 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 17,696 (−6,007 ide-only) | 84,102 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 87,570 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 94,086 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 99,059 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 802 | 99,914 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,427 | 46,160 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 47,806 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 49,054 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 54,747 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 66,533 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 17,696 (−6,007 ide-only) | 84,280 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 87,748 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 94,264 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 99,237 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 802 | 100,092 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -569,7 +569,7 @@ Every ✅-gated tool — its description opens by saying so — and zero irrever
 6. **Resolution:** a card expires 24 weekday hours after staging (ET; weekends skipped). `<pending_proposal>` in context + a decision on it → `proposal_resolve`, with `card` set to the card's id when several wait; a decision that names no card is asked about ("Approve which one?", a button per card). **One card, one firing:** `proposal_resolve` is the only call that completes a staged action; an action already staged gets no second card. Its Review pop-up decides: Approve (saved edits ride along), Needs changes (a note to revise from; locked until your revision lands) or Reject; ✅ / ⛔ reactions, a quiet fallback. A card that names who may confirm also takes the deployment's standing confirmers (the lead's), except a card in someone's own DM.
    - **Amendments aren't confirmations.** Someone trying to *change* an in-flight proposal ("actually make it X") rather than approve it → surface it ("<@other> suggests X — want me to update the proposal or hold?") and stage a fresh card if they say yes. A plain go-ahead/cancel from any participant still resolves the existing one as-is. **A change to a waiting card is a revision:** name it in `revises_card` and the fresh card retires it (a ✅ on the retired card executes nothing and says it was replaced), so speak about the new card alone. A different matter is a **separate proposal**: leave `revises_card` out and the card posts beside the waiting ones, each decided on its own. The Worker says which it did.
 7. **Cancel is a mode switch:** acknowledge, ask what they'd like instead, and let the next proposal wait until they ask for it. Anything you commit to happens this turn.
-   - **A repeat ask after a cancel needs an explicit revival.** When the same action comes up again in a thread where it was just canceled, name the cancel and ask ("You canceled that a moment ago — want me to stage it again as-is?"). The cancel may have meant wrong link, wrong channel, or not yet. The Worker enforces this deterministically too; this rule is the model-side half so the two agree.
+   - **A repeat ask after a cancel needs an explicit revival.** When the same action comes up again in a thread where it was just canceled, name the cancel and ask ("You canceled that a moment ago — want me to stage it again as-is?"). The cancel may have meant wrong link, wrong channel, or not yet. A cancel in another thread does not hold a different card back: in a DM it reaches you as "Earlier, in another thread, … was canceled" and is a past fact, not this ask's answer. The Worker enforces this deterministically too; this rule is the model-side half so the two agree.
 8. **An action stays in future tense until the Worker posts the real outcome**; stub or unsure → say so.
 
 ## Slack etiquette
