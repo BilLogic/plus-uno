@@ -50,6 +50,11 @@ export interface ButtonRequest {
    *  question is handed back for the caller to redraw once every card picked
    *  there is decided, instead of being redrawn here. */
   fromQuestion?: string;
+  /** A win posts no note of its own in the thread: the caller says one line
+   *  for every card it decided at once — the "which one?" pop-up's Cancel
+   *  (`which-card.ts` `canceledLine`). The card is still edited to its
+   *  outcome. */
+  quiet?: boolean;
 }
 
 /** Where the door speaks: the verdict's own reply thread, against the person's
@@ -207,7 +212,7 @@ export async function applyPressVerdict(
     door,
     async (delivery) => {
       await delivery.setWorking({ status: "is working on that…" });
-      await delivery.postGateNote(post.note);
+      if (!request.quiet) await delivery.postGateNote(post.note);
       const ran = await deps.applyVerdict(verdict);
       outcomes = Array.isArray(ran) ? ran : undefined;
       return deps.threadState ? otherCardWaits(pending, deps.threadState) : false;
