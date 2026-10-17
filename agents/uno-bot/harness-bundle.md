@@ -26,7 +26,7 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 49,054 | — |
 | 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 54,747 | — |
 | 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 66,533 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 18,653 (−6,916 ide-only) | 85,237 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 18,653 (−7,544 ide-only) | 85,237 | — |
 | 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 88,705 | — |
 | 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 95,221 | — |
 | 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 100,194 | — |

@@ -52,8 +52,11 @@ import {
   checkRefOf,
   pageUpdateWithNotes,
   prdWithNotes,
+  type CheckEnd,
   type CheckOutcome,
+  type CheckProgress,
   type CheckResults,
+  type CheckStep,
   type ResultsAction,
 } from "../blueprint-upkeep/check";
 import { cardConfirmers, mayConfirm, type BlueprintCheckOffer, type PendingProposal, type ThreadState } from "../thread-state/index";
@@ -61,7 +64,8 @@ import type { ButtonStaging, CheckOfferNote } from "../turn/index";
 import { revisionRefusal } from "../gate/refusal";
 import type { RunnerJobPayload } from "./types";
 import type { CardMessage } from "./proposal-render";
-import { escapeSlackText, SLACK_USER_ID } from "./mrkdwn";
+import { escapeSlackText, SLACK_USER_ID, toPlainText } from "./mrkdwn";
+import type { TaskChunk } from "./api";
 
 /** The Check it button's action id: also Check again and Try again. */
 export const CHECK_IT_ACTION_ID = "uno_blueprint_check";
@@ -205,6 +209,96 @@ export function notAStopperReply(may: ReadonlyArray<string | undefined>): string
   return who.length ? `Only ${who.join(" or ")} can stop this check.` : "Nobody here can stop this check.";
 }
 
+// ── The plan card ────────────────────────────────────────────────────────────
+//
+// THE CHECK'S STEPS, ON THE TURN'S PLAN CARD (#1344). The job opens a stream
+// in `task_display_mode: "plan"` in the offer's thread with its first step,
+// and ticks each step as the check moves: one append a step, the step before
+// it complete and this one in progress, and the close riding the stop. So a
+// check spends five Slack calls on its card: the open, three appends, the
+// stop. Slack's task cards take no pending state, so a step is shown only
+// once it starts; their words are plain text, so the scenario goes in bare.
+// The card closes on how the check ended — every step complete, the running
+// step in error and saying Stopped, or in error saying why — and is titled
+// for it, since Slack titles an untitled plan with an error card "Something
+// went wrong". Best-effort throughout: a stream Slack will not open is tried
+// once, and no call here fails the check.
+
+/** The Slack calls the plan card makes: the open in the offer's thread, an
+ *  append, and the stop that carries the card's last changes. */
+export interface CheckPlanClient {
+  /** Open the plan stream in the offer's thread: its ts, or null. */
+  open(): Promise<string | null>;
+  append(ts: string, tasks: readonly TaskChunk[], title?: string): Promise<void>;
+  close(ts: string, tasks: readonly TaskChunk[], title?: string): Promise<void>;
+}
+
+/** Each step's words on the card. */
+function stepTitle(step: CheckStep, scenario: string): string {
+  if (step === "read") return `Reading today's ${scenario}`;
+  return step === "draft" ? "Drafting your idea against it" : "Comparing the paths";
+}
+
+/** The card's title, as the check stands. */
+function planTitle(scenario: string, end?: CheckEnd): string {
+  if (!end) return `Checking ${scenario} against today's blueprint`;
+  if (end === "stopped") return "Stopped the blueprint check";
+  return end.kind === "failed" ? "The blueprint check didn't finish" : `Checked ${scenario} against today's blueprint`;
+}
+
+/** What the running step says when the check ended on it. */
+function endedOutput(end: CheckEnd): string | undefined {
+  if (end === "stopped") return "Stopped";
+  if (end.kind !== "failed") return undefined;
+  return end.reason === "timed-out" ? "Ran too long" : end.reason === "unreadable" ? "Couldn't be read" : undefined;
+}
+
+/**
+ * The plan card a check's steps tick on, in the offer's thread.
+ *
+ * @param offer - The offer checked: its scenario names the card
+ * @param slack - The open, the appends and the stop
+ */
+export function checkPlanCard(offer: Pick<BlueprintCheckOffer, "scenario">, slack: CheckPlanClient): CheckProgress {
+  const scenario = toPlainText(offer.scenario);
+  let ts: string | null = null;
+  let tried = false;
+  let ended = false;
+  let running: { id: CheckStep; title: string } | null = null;
+  const quietly = async (call: () => Promise<void>) => {
+    try {
+      await call();
+    } catch (err) {
+      console.warn(`[blueprint-check] plan card not updated: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  };
+  return {
+    async step(step) {
+      if (ended) return;
+      if (!tried) {
+        tried = true;
+        ts = await slack.open().catch(() => null);
+      }
+      const done: TaskChunk[] = running ? [{ ...running, status: "complete" }] : [];
+      running = { id: step, title: stepTitle(step, scenario) };
+      if (!ts) return;
+      const at = ts;
+      const first = done.length === 0;
+      await quietly(() => slack.append(at, [...done, { ...running!, status: "in_progress" }], first ? planTitle(scenario) : undefined));
+    },
+    async end(how) {
+      if (ended) return;
+      ended = true;
+      if (!ts || !running) return;
+      const at = ts;
+      const failed = how === "stopped" || how.kind === "failed";
+      const output = endedOutput(how);
+      const last: TaskChunk = { ...running, status: failed ? "error" : "complete", ...(output ? { output } : {}) };
+      await quietly(() => slack.close(at, [last], planTitle(scenario, how)));
+    },
+  };
+}
+
 // ── The press ────────────────────────────────────────────────────────────────
 
 /** A press on the status message, in the facts the envelope has. */
@@ -213,6 +307,9 @@ export interface CheckPress {
   /** The offer's own message: the record's key, and what the press edits. */
   offerTs: string;
   userId: string;
+  /** The presser's workspace, when the envelope names it: the check's plan
+   *  card is opened for the presser and it. */
+  team?: string;
 }
 
 /** A press on Check it, Check again or Try again. */
@@ -262,7 +359,13 @@ export async function runCheckItDoor(press: CheckItPress, deps: CheckItDoorDeps)
   // The checking line goes up before the job is queued, so the job's own
   // edit when it is done can never be overwritten by this one.
   await deps.replaceOffer(checkingMessage(offer, press.userId));
-  const job: RunnerJobPayload = { kind: "blueprint-check", offerTs: offer.offerTs, by: press.userId, run: claim.run };
+  const job: RunnerJobPayload = {
+    kind: "blueprint-check",
+    offerTs: offer.offerTs,
+    by: press.userId,
+    ...(press.team ? { team: press.team } : {}),
+    run: claim.run,
+  };
   const queued = await deps.enqueue(job, blueprintCheckRunnerKey(offer.channel, offer.offerTs)).catch((err: unknown) => {
     console.error(`[blueprint-check] queueing ${offer.channel}/${offer.offerTs} threw: ${err instanceof Error ? err.message : String(err)}`);
     return false;

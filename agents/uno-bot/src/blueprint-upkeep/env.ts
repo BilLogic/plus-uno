@@ -24,8 +24,10 @@
 //     reply: the same gate and search,
 //     inside the turn's budget; the blueprint check a Check it press queues:
 //     the offer kept in the thread's store, the same path read, the draft on
-//     the same provider, Slack posts in the offer's thread and the Draw on
-//     blueprint card staged as the Worker's (`runBlueprintCheckOnEnv`);
+//     the same provider, its steps on a plan stream in the offer's thread
+//     while the plan-stream switch is on (`SLACK_STREAM_PLAN`), Slack posts
+//     there and the Draw on blueprint card staged as the Worker's
+//     (`runBlueprintCheckOnEnv`);
 //   • a drawn proposal's thread → rows record: `blueprint_proposals` in the
 //     usage database (`proposalRecordsFor`); the Roadmap card a thread's PRD
 //     created, a HARNESS_KV key a thread for 45 days, so a proposal drawn
@@ -59,8 +61,10 @@
 // waits on the cursor and the queue for the next.
 
 import type { Env } from "../types";
-import { budgetHeadroom, charge, countedFetch, rethrowIfBudget } from "../net";
-import { getBotIdentity, postMessage, updateMessage } from "../slack/api";
+import { asDelivery, budgetHeadroom, charge, countedFetch, rethrowIfBudget } from "../net";
+import { appendTasks, getBotIdentity, postMessage, startStream, stopStream, updateMessage } from "../slack/api";
+import { streamFlagOn } from "../slack/slack-delivery";
+import { SLACK_USER_ID } from "../slack/mrkdwn";
 import type { SlackMessageEvent } from "../slack/types";
 import { ladderChannelsFor } from "../destination/env";
 import { redraftRevision } from "./revise";
@@ -87,7 +91,7 @@ import { DELIVERY_RESERVE } from "../agent/loop-policy";
 import type { PathToday } from "./draft";
 import { draftProposal, drawnProposalOf, PROPOSAL_OFFER_SUBREQUESTS } from "./proposal";
 import { JUDGEMENT_SUBREQUESTS, runBlueprintCheck, serviceChangeJudgement, type BlueprintCheckJob, type ServiceChangeJudgement } from "./check";
-import { checkedMessage, resultsMessage } from "../slack/blueprint-check";
+import { checkedMessage, checkPlanCard, resultsMessage, type CheckPlanClient } from "../slack/blueprint-check";
 import { createD1ProposalRecords } from "./proposal-records-d1";
 import { keepProposalLinks, prdCardOf, rememberCreatedPage, type MatterPages, type ThreadCards } from "./link";
 import type { ProposalRecords } from "./proposal-records";
@@ -500,8 +504,10 @@ export function serviceChangeJudgementOn(env: Env): { serviceChangeJudgement?: S
  * record (1), the thread's check record and the run's step to done or
  * failed (≤3, #1322), the path read (5), the draft (≤2), the card's state
  * (≤2: the thread's cards, the matter's page) and the results' post and
- * keeping (2), the Draw on blueprint card's post, staging and events (≤4)
- * and the status edit (≤2). The draft runs only while that much is left
+ * keeping (2), the Draw on blueprint card's post, staging and events (≤4),
+ * the status edit (≤2) and, with the plan-stream switch on, the plan card
+ * its steps tick on (5: the open, three appends, the stop; 7 when the stop
+ * refuses its last changes). The draft runs only while that much is left
  * beside the delivery reserve. Stop reaches the draft through this runner's
  * `/cancel` (`stopRunningCheck`), which costs the job nothing.
  *
@@ -550,7 +556,27 @@ export async function runBlueprintCheckOnEnv(env: Env, job: BlueprintCheckJob): 
       const edited = await updateMessage(env, { channel: offer.channel, ts: offer.offerTs, text: message.text, blocks: message.blocks });
       if (!edited.ok) console.warn(`[blueprint-check] status message ${offer.channel}/${offer.offerTs} not edited: ${edited.error ?? "refused"}`);
     },
+    ...(streamFlagOn(env, "SLACK_STREAM_PLAN") && job.by && SLACK_USER_ID.test(job.by) && job.team
+      ? { progress: (offer: BlueprintCheckOffer) => checkPlanCard(offer, checkPlanOn(env, offer.channel, replyThread(offer), job.by!, job.team!)) }
+      : {}),
   });
+}
+
+/** The check's plan card as Slack calls, opened for the presser in the
+ *  offer's thread — the turn's own plan stream (`slack-delivery.ts`), each
+ *  call labeled as delivery. A stop that refused the card's last changes
+ *  left the stream open: they go as an append, and the stream stops bare. */
+function checkPlanOn(env: Env, channel: string, threadTs: string, userId: string, team: string): CheckPlanClient {
+  return {
+    open: () => asDelivery(() => startStream(env, channel, threadTs, userId, team, "plan")),
+    append: (ts, tasks, title) => asDelivery(async () => void (await appendTasks(env, channel, ts, tasks, title))),
+    close: (ts, tasks, title) =>
+      asDelivery(async () => {
+        if (await stopStream(env, channel, ts, undefined, { tasks, ...(title ? { title } : {}) })) return;
+        await appendTasks(env, channel, ts, tasks, title);
+        await stopStream(env, channel, ts);
+      }),
+  };
 }
 
 /** The thread → rows records, or null without the usage database. */

@@ -100,7 +100,9 @@ import { answerFeedbackLogFor } from "../usage/feedback-env";
 interface InteractionPayload {
   type: string;
   response_url?: string;
-  user?: { id?: string };
+  user?: { id?: string; team_id?: string };
+  /** The workspace the click came from. */
+  team?: { id?: string };
   channel?: { id?: string };
   message?: { ts?: string; thread_ts?: string; text?: string; blocks?: unknown[] };
   actions?: Array<{
@@ -406,9 +408,10 @@ async function checkIt(env: Env, payload: InteractionPayload): Promise<void> {
   const channel = payload.channel?.id;
   const offerTs = payload.message?.ts;
   const userId = payload.user?.id ?? "someone";
+  const team = payload.user?.team_id ?? payload.team?.id;
   if (!channel || !offerTs) return;
   await runCheckItDoor(
-    { channel, offerTs, userId },
+    { channel, offerTs, userId, ...(team ? { team } : {}) },
     {
       store: threadStateFor(env),
       enqueue: (job, runnerKey) => enqueueAgentJob(env, job, runnerKey),
