@@ -214,7 +214,8 @@ test("card waiting: the results carry Add these notes, which stages a revision o
   const w = await offered();
   const results = await checked(w);
   assert.deepEqual(actionsOf(results), [ADD_NOTES_ACTION_ID]);
-  assert.match(results.text, /Expires <!date\^/, "the button says its deadline");
+  assert.doesNotMatch(results.text, /Expires/, "the button says no deadline");
+  assert.doesNotMatch(JSON.stringify(results.blocks), /Expires|<!date/);
 
   const d = resultsDoor(w);
   await d.press(REQUESTER, "add-notes");
@@ -429,12 +430,13 @@ test("a card that closes after the results posted: the press stages nothing, say
 
 // ── The deadline ─────────────────────────────────────────────────────────────
 
-test("the results' button follows the 24-weekday-hour rule from when they posted", async () => {
+test("the results' button follows the 24-weekday-hour rule from when they posted, without showing it", async () => {
   const w = await offered();
   w.clock.t = NOW + 60_000;
   const results = await checked(w);
   const deadline = cardExpiresAt(NOW + 60_000);
-  assert.match(results.text, new RegExp(`Expires <!date\\^${Math.floor(deadline / 1000)}\\^`));
+  assert.doesNotMatch(results.text, /Expires/);
+  assert.doesNotMatch(JSON.stringify(results.blocks), /Expires|<!date/);
 
   // The card's own deadline came first, so a press at the button's own is
   // in time for the button, and finds the card closed.

@@ -23,7 +23,6 @@
 import { carouselOf, logoFor } from "./answer-cards-block";
 import { escapeSlackText, toPlainText } from "./mrkdwn";
 import { cardLead, renderProposalCard } from "./proposal-render";
-import { deadlineBlock, deadlineLine } from "./card-deadline";
 import { textSections } from "./render";
 import { itemProposalKey } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
@@ -380,14 +379,9 @@ export function reportMessage(record: DecisionReportRecord): ReportMessage {
     throw new Error(`a decision report holds at most ${MAX_REPORT_ITEMS} items; hold the rest back (decisionReport)`);
   }
   const head = headLine(record);
-  // Its deadline, under the cards, while any of them can still be decided
-  // (#1316): in each reader's timezone, and in ET in the text copy.
-  const open = record.entries.some((e) => e.state.kind === "open" || e.state.kind === "changes-asked");
-  const until = open && record.expiresAt !== undefined ? record.expiresAt : undefined;
   const drawn = [
     ...textSections(head),
     ...(record.entries.length ? [carouselOf(record.entries.map((e) => entryCard(e, record.channel)))] : []),
-    ...(until !== undefined ? [deadlineBlock(until)] : []),
     ...(record.after ?? []),
   ];
   // A report that posted plain stays plain: Slack refused its cards once.
@@ -397,7 +391,6 @@ export function reportMessage(record: DecisionReportRecord): ReportMessage {
   const text = [
     head,
     ...record.entries.map((e) => `• ${escapeSlackText(clip(e.item.title, CARD_TITLE_CHARS))}: ${e.state.kind === "expired" ? "Closed, no decision. " : ""}${escapeSlackText(shownAs(e, record.channel).body)}`),
-    ...(until !== undefined ? [deadlineLine(until)] : []),
   ].join("\n");
   return { text, blocks, ...(record.metadata ? { metadata: record.metadata } : {}) };
 }

@@ -4,7 +4,7 @@
 //
 // THE OFFER'S MESSAGE IS THE CHECK'S STATUS MESSAGE. It goes up as the offer
 // ("this changes how *Call-off* works today — check it against the
-// blueprint?") with a Check it button and its deadline; a press edits it to
+// blueprint?") with a Check it button; a press edits it to
 // the checking line, with Stop; the job edits it to what the check came to
 // (`checkedMessage`: done, or failed with Try again); Stop edits it to the
 // stopped line, with Check again. One ts for the check's whole life — the
@@ -30,7 +30,7 @@
 //
 // THE DEADLINE IS THE CARD RULE. Check it (and so Check again and Try again)
 // stops answering at `BlueprintCheckOffer.expiresAt` — `cardExpiresAt` from
-// when the offer went up — and says so (`deadlineBlock`); a press past it
+// when the offer went up — without saying when; a press past it
 // checks nothing, and the offer loses its button.
 //
 // THE RESULTS CARRY THEIR ACTION (#1323). The follow-up with today's steps
@@ -60,7 +60,6 @@ import type { ButtonStaging, CheckOfferNote } from "../turn/index";
 import { revisionRefusal } from "../gate/refusal";
 import type { RunnerJobPayload } from "./types";
 import type { CardMessage } from "./button-door";
-import { deadlineBlock, withDeadline } from "./card-deadline";
 import { escapeSlackText, SLACK_USER_ID } from "./mrkdwn";
 
 /** The Check it button's action id: also Check again and Try again. */
@@ -84,17 +83,16 @@ function button(actionId: string, label: string, value: string) {
 }
 
 /**
- * The offer as Slack gets it: its words, its deadline, and Check it.
+ * The offer as Slack gets it: its words and Check it.
  *
  * @param offer - The scenario, the deadline, and whether a card waits above it
  */
 export function checkOfferMessage(offer: CheckOfferNote): CardMessage {
   const words = offerWords(offer.scenario, offer.underCard);
   return {
-    text: withDeadline(words, offer.expiresAt),
+    text: words,
     blocks: [
       { type: "section", text: { type: "mrkdwn", text: words } },
-      deadlineBlock(offer.expiresAt),
       { type: "actions", elements: [button(CHECK_IT_ACTION_ID, "Check it", "check")] },
     ],
   };
@@ -341,7 +339,7 @@ export function resultsActionOf(actionId: string): ResultsAction | null {
 
 /**
  * The results as Slack gets them: their words, then — while they offer an
- * action — its deadline and its button; or, once acted on or past it, a line
+ * action — its button; or, once acted on or past it, a line
  * saying what became of it. The button's value is the offer's ts: the words
  * are kept on the offer, never on the button.
  *
@@ -353,13 +351,13 @@ export function resultsMessage(offerTs: string, results: CheckResults, after?: s
   const button = results.action && !after ? ACTION_BUTTONS[results.action] : null;
   const blocks: unknown[] = [{ type: "markdown", text: results.text }];
   if (button) {
-    blocks.push(deadlineBlock(results.expiresAt), {
+    blocks.push({
       type: "actions",
       elements: [{ type: "button", action_id: button.actionId, text: { type: "plain_text", text: button.label, emoji: true }, value: offerTs }],
     });
   }
   if (after) blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: after }] });
-  const text = button ? withDeadline(results.text, results.expiresAt) : after ? `${results.text}\n\n${after}` : results.text;
+  const text = button ? results.text : after ? `${results.text}\n\n${after}` : results.text;
   return { text, blocks };
 }
 

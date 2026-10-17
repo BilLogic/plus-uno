@@ -80,14 +80,18 @@ async function live(h: Harness): Promise<string[]> {
   return (await h.threadState.getProposalsByThread(REF)).map((p) => p.proposalTs).sort();
 }
 
-test("the question is one button per card, named by its headline, each carrying its card", async () => {
+test("the question lists each card by headline and gives it a short numbered button carrying its card", async () => {
   const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B)] });
   const { a, b, note } = await asked(h);
   const message = whichCardMessage(note);
 
   assert.equal(messageBlocksRefusal(message.blocks), null, "Slack takes it");
   const buttons = buttonsOf(message);
-  assert.deepEqual(buttons.map((x) => [x.text.text, x.value]), [["Session reflections", b], ["Backup tutor matching", a]]);
+  // A headline is too long for a button Slack draws at its own width: the
+  // headlines go in the question, numbered, and each button names its number.
+  assert.deepEqual(buttons.map((x) => [x.text.text, x.value]), [["Approve 1", b], ["Approve 2", a]]);
+  const section = (message.blocks as Array<{ type: string; text?: { text: string } }>).find((x) => x.type === "section");
+  assert.match(section?.text?.text ?? "", /\n1\. \*Session reflections\*\n2\. \*Backup tutor matching\*$/);
   assert.equal(new Set(buttons.map((x) => x.action_id)).size, 2, "unique action ids");
   assert.match(message.text, /^Approve which one\?/);
 });
@@ -96,14 +100,15 @@ test("pressing one card's button approves that card only; the other stays live",
   const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B)] });
   const { a, b, note } = await asked(h);
 
-  const { cardEdits, questionEdits } = await press(h, whichCardMessage(note, ASKED_AT_MS), a, ASKED_AT_MS + 60_000);
+  const { cardEdits, questionEdits } = await press(h, whichCardMessage(note), a, ASKED_AT_MS + 60_000);
 
   assert.deepEqual(h.resolved.map((r) => [r.decision, r.executed]), [["confirm", true]]);
   assert.deepEqual(await live(h), [b], "card A was claimed, card B is still waiting");
   assert.deepEqual(cardEdits.map((e) => e.ts), [a], "the card decided is the one edited");
-  // The question keeps a button only for the card still waiting, and its deadline.
-  assert.deepEqual(buttonsOf(questionEdits.at(-1)!).map((x) => x.value), [b]);
-  assert.match(JSON.stringify(questionEdits.at(-1)!.blocks), /Expires <!date/);
+  // The question keeps a button only for the card still waiting, still named
+  // by that card's number in the list, and says no deadline.
+  assert.deepEqual(buttonsOf(questionEdits.at(-1)!).map((x) => [x.text.text, x.value]), [["Approve 1", b]]);
+  assert.doesNotMatch(JSON.stringify(questionEdits.at(-1)!.blocks), /Expires/);
 });
 
 test("a press whose card cannot be read afterwards keeps that card's button: a failed read is no answer", async () => {
@@ -120,22 +125,21 @@ test("a press whose card cannot be read afterwards keeps that card's button: a f
   };
   store.getProposalByTs = async (ts) => (claimed ? Promise.reject(new Error("store unavailable")) : read(ts));
 
-  const { questionEdits } = await press(h, whichCardMessage(note, ASKED_AT_MS), a, ASKED_AT_MS + 60_000);
+  const { questionEdits } = await press(h, whichCardMessage(note), a, ASKED_AT_MS + 60_000);
 
   assert.deepEqual(questionEdits, [], "the question is left with every button");
 });
 
-test("the question's buttons lapse 24 weekday hours after it was asked", async () => {
+test("the question's buttons lapse 24 weekday hours after it was asked, without saying when", async () => {
   const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B)] });
   const { a, b, note } = await asked(h);
 
   const late = cardExpiresAt(ASKED_AT_MS) + 1;
-  const asking = whichCardMessage(note, ASKED_AT_MS);
-  // It says when, in each reader's timezone, and in ET in its text copy:
-  // Thursday 11:00 ET, 24 weekday hours after Wednesday's.
-  const deadline = `Expires <!date^${cardExpiresAt(ASKED_AT_MS) / 1000}^{date_short_pretty}|Thu, Oct 15> at <!date^${cardExpiresAt(ASKED_AT_MS) / 1000}^{time}|11:00 AM ET>`;
-  assert.ok(asking.text.endsWith(`\n${deadline}`));
-  assert.match(JSON.stringify(asking.blocks), /Expires <!date/);
+  const asking = whichCardMessage(note);
+  // The deadline is enforced (Thursday 11:00 ET, 24 weekday hours after
+  // Wednesday's) but not shown: neither the text copy nor the blocks say it.
+  assert.doesNotMatch(asking.text, /Expires/);
+  assert.doesNotMatch(JSON.stringify(asking.blocks), /Expires|<!date/);
   const { ephemerals, questionEdits, cardEdits } = await press(h, asking, a, late);
 
   assert.deepEqual(h.resolved, [], "nothing ran");

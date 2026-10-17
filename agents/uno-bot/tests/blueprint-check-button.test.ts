@@ -195,12 +195,14 @@ async function liveCard(threadState: ThreadState, ts: string): Promise<PendingPr
 
 // ── The offer's message ──────────────────────────────────────────────────────
 
-test("the offer names the scenario, says it takes a few minutes, shows its deadline and carries Check it", () => {
+test("the offer names the scenario, says it takes a few minutes and carries Check it, without showing its deadline", () => {
   const expiresAt = cardExpiresAt(NOW);
   const message = checkOfferMessage({ scenario: "Call-off", expiresAt, underCard: true });
   assert.equal(messageBlocksRefusal(message.blocks), null, "Slack takes it");
   assert.match(message.text, /This changes how \*Call-off\* works today — check it against the blueprint\? Takes a few minutes; review the card meanwhile\./);
-  assert.match(message.text, new RegExp(`Expires <!date\\^${Math.floor(expiresAt / 1000)}\\^`), "its deadline is the shared rule's");
+  // The deadline is enforced (a press past it checks nothing, below) but not shown.
+  assert.doesNotMatch(message.text, /Expires/, "the text copy says no deadline");
+  assert.doesNotMatch(JSON.stringify(message.blocks), /Expires|<!date/, "nor do the blocks");
   const buttons = JSON.stringify(message.blocks);
   assert.match(buttons, new RegExp(`"action_id":"${CHECK_IT_ACTION_ID}"`));
   assert.match(buttons, /"text":"Check it"/);
@@ -319,7 +321,7 @@ test("the check posts today's steps beside the idea's as a follow-up, then the D
     { stepId: "s-3", laneId: "l-tutor", content: "Claiming tutor confirms on the board", from: null, to: "proposed" },
     { stepId: "s-2", laneId: "l-sup", content: "Supervisor sees who claimed it", from: null, to: "proposed" },
   ]);
-  assert.equal(draw.ttlMs, cardExpiresAt(NOW) - NOW, "staged with the deadline it shows");
+  assert.equal(draw.ttlMs, cardExpiresAt(NOW) - NOW, "staged with the rule's deadline");
   // The PRD's card still waits beside it.
   assert.equal((await liveCard(threadState, cardTs)).toolName, "notion_create");
 });

@@ -135,7 +135,7 @@ describe("the card offers Review", () => {
     assert.doesNotMatch(card.text, /white_check_mark|no_entry|✅|⛔/);
   });
 
-  it("is short in the thread: a summary, the body's size, the LLM line and Review; the draft rides in the text", () => {
+  it("is short in the thread: a summary, the LLM line and Review, with no size caption; the draft rides in the text", () => {
     const body = "Problem: tutors read goal cycles differently. ".repeat(14).trim();
     const card = renderProposalCard({
       kind: "confirm",
@@ -154,10 +154,10 @@ describe("the card offers Review", () => {
 
     assert.equal(blocks[0]!.type, "section");
     assert.match(words[0]!, /"text":"Ready to \*create a Notion page\*: _Goal cycle resets per session_ · Roadmap · Toolkit · Need PRD/);
-    assert.match(words[1]!, new RegExp(`Body ${body.length} characters · review before approving`));
-    assert.match(words[2]!, /LLM-written · check before acting/);
+    assert.match(words[1]!, /LLM-written · check before acting/);
+    assert.doesNotMatch(words.join(""), /characters|review before approving|warnings?\b/, "no size caption");
     assert.deepEqual(cardButtons(blocks), ["Review"]);
-    assert.equal(blocks.length, 4);
+    assert.equal(blocks.length, 3);
     assert.doesNotMatch(words.join(""), /Problem: tutors/, "the draft lives in the pop-up");
     // Notifications, history and the model reading it back get the whole draft.
     assert.ok(card.text.includes(body));
