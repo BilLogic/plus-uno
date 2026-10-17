@@ -206,6 +206,7 @@ test("the offer names the scenario, says it takes a few minutes and carries Chec
   const buttons = JSON.stringify(message.blocks);
   assert.match(buttons, new RegExp(`"action_id":"${CHECK_IT_ACTION_ID}"`));
   assert.match(buttons, /"text":"Check it"/);
+  assert.doesNotMatch(buttons, /"style"/, "Check it keeps Slack's default");
   assert.doesNotMatch(buttons, /first free tutor/, "no idea text rides on the button");
 });
 

@@ -78,9 +78,10 @@ function offerWords(scenario: string, underCard: boolean): string {
 }
 
 /** A button. Its value is nothing a door needs — the message's own ts names
- *  the offer — so no idea text ever rides on it. */
-function button(actionId: string, label: string, value: string) {
-  return { type: "button", action_id: actionId, text: { type: "plain_text", text: label, emoji: true }, value };
+ *  the offer — so no idea text ever rides on it. Only Stop is colored
+ *  (`danger`, red); every other button keeps Slack's default. */
+function button(actionId: string, label: string, value: string, style?: "danger") {
+  return { type: "button", action_id: actionId, text: { type: "plain_text", text: label, emoji: true }, value, ...(style ? { style } : {}) };
 }
 
 /**
@@ -127,7 +128,7 @@ function cardStands(offer: CheckSubject): string {
 export function checkingMessage(offer: CheckSubject, by: string): CardMessage {
   const who = SLACK_USER_ID.test(by) ? ` <@${by}> asked.` : "";
   const follow = offer.cardTs ? "The results will follow in this thread; your card isn't affected." : "The results will follow in this thread.";
-  return line(`Checking ${scenarioOf(offer.scenario)} against today's blueprint…${who} ${follow}`, button(STOP_CHECK_ACTION_ID, "Stop", "stop"));
+  return line(`Checking ${scenarioOf(offer.scenario)} against today's blueprint…${who} ${follow}`, button(STOP_CHECK_ACTION_ID, "Stop", "stop", "danger"));
 }
 
 /**

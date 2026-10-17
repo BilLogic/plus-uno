@@ -106,6 +106,12 @@ const buttonsOf = (message: CardMessage | undefined) =>
     .match(/"action_id":"[^"]+","text":\{"type":"plain_text","text":"[^"]+"/g)
     ?.map((b) => b.replace(/"action_id":"([^"]+)".*"text":"([^"]+)"$/, "$1 $2")) ?? [];
 
+/** Each button's Slack style, or "default" where it has none. */
+const stylesOf = (message: CardMessage | undefined) =>
+  ((message?.blocks ?? []) as Array<{ type: string; elements?: Array<{ style?: string }> }>)
+    .filter((b) => b.type === "actions")
+    .flatMap((b) => (b.elements ?? []).map((e) => e.style ?? "default"));
+
 // ── Stop ─────────────────────────────────────────────────────────────────────
 
 test("the checking message carries Stop", async () => {
@@ -113,6 +119,7 @@ test("the checking message carries Stop", async () => {
   const w = world(threadState, clock, offerTs);
   await w.press(PRESSER);
   assert.deepEqual(buttonsOf(w.status[0]), [`${STOP_CHECK_ACTION_ID} Stop`]);
+  assert.deepEqual(stylesOf(w.status[0]), ["danger"], "Stop is red");
   assert.equal(messageBlocksRefusal(w.status[0]!.blocks), null, "Slack takes it");
 });
 
@@ -131,6 +138,7 @@ test("the presser stops a running check: its model call is aborted, nothing is p
   assert.equal(w.status.length, 2, "the job did not redraw the stopped message");
   assert.equal(w.status[1]!.text, "Stopped the blueprint check. Your card isn't affected.");
   assert.deepEqual(buttonsOf(w.status[1]), [`${CHECK_IT_ACTION_ID} Check again`]);
+  assert.deepEqual(stylesOf(w.status[1]), ["default"], "Check again keeps Slack's default");
   assert.equal(messageBlocksRefusal(w.status[1]!.blocks), null);
   assert.deepEqual(w.told, []);
 });
