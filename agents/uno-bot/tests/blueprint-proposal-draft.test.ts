@@ -8,9 +8,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import { fakeProvider } from "../src/agent/providers/fake";
-import { DRAFT_MAX_TOKENS, draftProposal, draftRevision, PROPOSAL_SYSTEM, type PathToday } from "../src/blueprint-upkeep/index";
+import { DRAFT_MAX_TOKENS, draftProposal, draftRevision, PROPOSAL_MAX_TOKENS, PROPOSAL_SYSTEM, type PathToday } from "../src/blueprint-upkeep/index";
 import type { Comparison } from "../src/blueprint-upkeep/milestone";
 import { MAX_TOKENS as TURN_MAX_TOKENS } from "../src/agent/loop-policy";
+import { logsOf } from "./helpers/console-capture";
 
 const TODAY: PathToday = {
   pathId: "path-1",
@@ -34,32 +35,73 @@ const IDEA = { title: "Two-line session recap", text: "After every session the t
 
 const reply = (o: Record<string, unknown>) => JSON.stringify({ rows: [], new_steps_or_lanes: [], confidence: 0.7, gaps: [], ...o });
 
-async function draftWith(text: string, opts: { cutOff?: boolean } = {}) {
-  const model = fakeProvider({ generateReplies: [text], ...(opts.cutOff ? { generateCutOff: true } : {}) });
-  const lines: string[] = [];
-  const original = console.log;
-  console.log = (...args: unknown[]) => void lines.push(args.map(String).join(" "));
-  try {
-    const draft = await draftProposal({ provider: model, affordable: () => true })(COMPARISON, IDEA);
-    return { draft, lines, asked: model.generated };
-  } finally {
-    console.log = original;
-  }
+async function draftWith(text: string, opts: { cutOff?: boolean; thinking?: number; comparison?: Comparison } = {}) {
+  const model = fakeProvider({
+    generateReplies: [text],
+    ...(opts.cutOff ? { generateCutOff: true } : {}),
+    ...(opts.thinking !== undefined ? { generateThinkingTokens: opts.thinking } : {}),
+  });
+  const { value: draft, lines } = await logsOf(() => draftProposal({ provider: model, affordable: () => true })(opts.comparison ?? COMPARISON, IDEA));
+  return { draft, lines, asked: model.generated };
 }
 
-test("the drafter leaves room for the model's thinking and the JSON after it", async () => {
-  const { asked } = await draftWith(reply({ rows: [{ change: "changed", step_id: "s-open", lane_id: "l-tutor", content: "Tutor writes a two-line recap" }] }));
-  assert.equal(asked[0]!.maxTokens, DRAFT_MAX_TOKENS);
-  // Thinking spends the same ceiling as the answer: 2,000 left a medium-level
-  // model cut off mid-JSON, and live on r671 8,000 was cut off too. A turn's
-  // own ceiling, sized for the same all-thinking risk, is the floor here.
-  assert.ok(DRAFT_MAX_TOKENS >= TURN_MAX_TOKENS);
+const RECAP = reply({ rows: [{ change: "changed", step_id: "s-open", lane_id: "l-tutor", content: "Tutor writes a two-line recap" }] });
+
+test("the drafter leaves room for the model's thinking and the JSON after it: a turn's own ceiling", async () => {
+  const { asked } = await draftWith(RECAP);
+  assert.equal(asked[0]!.maxTokens, PROPOSAL_MAX_TOKENS);
+  // Thinking spends the same ceiling as the answer, and 8,000 left a
+  // medium-level proposal draft cut off: a turn's ceiling, sized for the
+  // same all-thinking risk, is what it gets.
+  assert.equal(PROPOSAL_MAX_TOKENS, TURN_MAX_TOKENS);
 });
 
-test("a shipped-work revision is asked with the same ceiling", async () => {
+test("a shipped-work revision keeps its own, smaller ceiling", async () => {
   const model = fakeProvider({ generateReplies: [reply({})] });
   await draftRevision(model, { title: "t", text: "x", today: TODAY, target: "live" });
   assert.equal(model.generated[0]!.maxTokens, DRAFT_MAX_TOKENS);
+  assert.equal(DRAFT_MAX_TOKENS, 8_000);
+});
+
+test("each draft logs what its thinking spent of the ceiling, drawn or cut off", async () => {
+  const drawn = await draftWith(RECAP, { thinking: 3_100 });
+  assert.ok(typeof drawn.draft === "object");
+  assert.ok(drawn.lines.some((l) => l === `[proposal] Session Reflection: drafted (thinking 3100 of ${PROPOSAL_MAX_TOKENS})`), drawn.lines.join("\n"));
+
+  const cut = await draftWith('{"rows":[', { cutOff: true, thinking: 16_300 });
+  assert.ok(cut.lines.some((l) => l.endsWith(`the reply stopped at the output ceiling (thinking 16300 of ${PROPOSAL_MAX_TOKENS})`)), cut.lines.join("\n"));
+
+  const { value: _draft, lines } = await logsOf(() =>
+    draftRevision(fakeProvider({ generateReplies: [reply({})], generateCutOff: true, generateThinkingTokens: 7_990 }), { title: "t", text: "x", today: TODAY, target: "live" }),
+  );
+  assert.ok(lines.some((l) => l.endsWith(`the reply stopped at the output ceiling (thinking 7990 of ${DRAFT_MAX_TOKENS})`)), lines.join("\n"));
+});
+
+test("rows that are all off the path's grid are a draft that did not finish", async () => {
+  const { draft, lines } = await draftWith(reply({ rows: [{ change: "added", step_id: "s-invented", lane_id: "l-nobody", content: "Tutor writes a recap" }] }));
+  assert.equal(draft, "unfinished");
+  assert.ok(lines.some((l) => /no offer — every row it drew was on a step or lane the path does not have/.test(l)), lines.join("\n"));
+});
+
+test("rows on the grid none of which can be written are a draft that did not finish", async () => {
+  // A change of no kind the draft knows, on a real step and lane, writes nothing.
+  const { draft, lines } = await draftWith(reply({ rows: [{ change: "moved", step_id: "s-submit", lane_id: "l-tutor", content: "Tutor submits later" }] }));
+  assert.equal(draft, "unfinished");
+  assert.ok(lines.some((l) => /no offer — no row it drew could be written/.test(l)), lines.join("\n"));
+});
+
+test("a path read without its scenario asks the model nothing, and says why", async () => {
+  const { scenarioId: _id, ...today } = TODAY;
+  const { draft, lines, asked } = await draftWith(RECAP, { comparison: { scenario: TODAY.scenario, today } as unknown as Comparison });
+  assert.equal(draft, "no-scenario");
+  assert.equal(asked.length, 0);
+  assert.ok(lines.some((l) => /no offer — today's path was read without its scenario/.test(l)), lines.join("\n"));
+});
+
+test("an idea with no rows and nothing missing draws nothing", async () => {
+  const { draft, lines } = await draftWith(reply({}));
+  assert.equal(draft, "nothing-to-draw");
+  assert.ok(lines.some((l) => /no offer — the reply drew no rows/.test(l)), lines.join("\n"));
 });
 
 test("a reply cut off at the ceiling is logged as cut off, and is a draft that did not finish", async () => {

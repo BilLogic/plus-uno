@@ -15,7 +15,7 @@ export {
   type ServiceChangeGate,
   type ServiceChangeInput,
 } from "./gate";
-export { DRAFT_MAX_TOKENS, draftRevision, readDraft, whyNoDraft, type Draft, type DraftedChange, type DraftInput, type PathToday } from "./draft";
+export { DRAFT_MAX_TOKENS, draftRevision, noDraftReason, readDraft, whyNoDraft, type Draft, type NoDraftReason, type DraftedChange, type DraftInput, type PathToday } from "./draft";
 export { revisionBody, revisionItem, revisionSays, revisionText, type RevisionSource } from "./card";
 export { firstChangedCell, proposalFacts, revisionFacts, rowsLine } from "./facts";
 export { cardEvidence, MAX_PRDS, prdIdsOf, type EvidencePage } from "./evidence";
@@ -82,7 +82,9 @@ export {
   type WeighedMarks,
 } from "./job";
 export {
+  CheckPastDeadline,
   draftProposal,
+  PROPOSAL_MAX_TOKENS,
   drawnProposalOf,
   PROPOSAL_DRAFT_TIER,
   PROPOSAL_OFFER_SUBREQUESTS,
@@ -93,7 +95,6 @@ export {
   readProposalDraft,
   stagedProposalOffer,
   whyNoProposal,
-  type NoProposal,
   type ProposalDraft,
   type ProposalDrafter,
 } from "./proposal";

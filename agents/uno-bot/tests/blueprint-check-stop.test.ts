@@ -19,6 +19,7 @@ import type { CardMessage } from "../src/slack/button-door";
 import type { RunnerJobPayload } from "../src/slack/types";
 import { cardExpiresAt } from "../src/card-expiry";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
+import { logsOf } from "./helpers/console-capture";
 import { CHANNEL } from "./helpers/turn-harness";
 import { DRAFT, NOW, offered, REQUESTER, TODAY, until } from "./helpers/blueprint-check";
 
@@ -36,8 +37,9 @@ interface WorldOptions {
   readPath?: () => Promise<PathToday | null>;
   /** Posting the Draw on blueprint card throws. */
   postCardThrows?: boolean;
-  /** Every draft reply stops at the output ceiling. */
-  draftCutOff?: boolean;
+  /** The first this-many draft replies stop at the output ceiling; the rest
+   *  answer whole. */
+  draftCutOff?: number;
 }
 
 /** The thread around one offer: both doors, the job, and what each person
@@ -48,10 +50,11 @@ function world(threadState: ThreadState, clock: { t: number }, offerTs: string, 
   const status: CardMessage[] = [];
   const posts: string[] = [];
   const told: Array<{ to: string; text: string }> = [];
+  const cutOff = '{"rows":[{"change":"added","step_id":"s-';
   const draftModel = fakeProvider({
-    generateReplies: opts.draftCutOff ? ['{"rows":[{"change":"added","step_id":"s-'] : [DRAFT, DRAFT, DRAFT],
+    generateReplies: [...Array<string>(opts.draftCutOff ?? 0).fill(cutOff), DRAFT, DRAFT, DRAFT],
     ...(opts.draftGate ? { generateGate: opts.draftGate } : {}),
-    ...(opts.draftCutOff ? { generateCutOff: true } : {}),
+    ...(opts.draftCutOff ? { generateCutOffFirst: opts.draftCutOff } : {}),
   });
   const doorDeps = (userId: string) => ({
     replaceOffer: async (message: CardMessage) => void status.push(message),
@@ -98,15 +101,6 @@ function world(threadState: ThreadState, clock: { t: number }, offerTs: string, 
   return { press, stop, runJob, queued, status, posts, told, draftModel };
 }
 
-/** Every console line while installed: log and warn alike. */
-function capturedLogs() {
-  const seen: string[] = [];
-  const { log, warn } = console;
-  console.log = (...args: unknown[]) => void seen.push(args.map(String).join(" "));
-  console.warn = (...args: unknown[]) => void seen.push(args.map(String).join(" "));
-  return { seen, restore: () => Object.assign(console, { log, warn }) };
-}
-
 const buttonsOf = (message: CardMessage | undefined) =>
   JSON.stringify(message?.blocks ?? [])
     .match(/"action_id":"[^"]+","text":\{"type":"plain_text","text":"[^"]+"/g)
@@ -144,18 +138,15 @@ test("the presser stops a running check: its model call is aborted, nothing is p
 test("a stopped check's draft is logged as stopped, never as the model failing", async () => {
   const { threadState, clock, offerTs } = await offered();
   const w = world(threadState, clock, offerTs, { draftGate: new Promise(() => {}) });
-  const lines = capturedLogs();
-  try {
+  const { lines } = await logsOf(async () => {
     await w.press(PRESSER);
     const running = w.runJob(0);
     await until(() => w.draftModel.generated.length === 1);
     await w.stop(PRESSER);
     await running;
-  } finally {
-    lines.restore();
-  }
-  assert.ok(lines.seen.some((l) => /\[proposal\] Call-off: no offer — the check was stopped/.test(l)), lines.seen.join("\n"));
-  assert.ok(!lines.seen.some((l) => /the model failed/.test(l)), lines.seen.join("\n"));
+  });
+  assert.ok(lines.some((l) => /\[proposal\] Call-off: no offer — the check was stopped/.test(l)), lines.join("\n"));
+  assert.ok(!lines.some((l) => /the model failed/.test(l)), lines.join("\n"));
 });
 
 test("the card's requester may stop someone else's check", async () => {
@@ -252,31 +243,74 @@ test("a press after the check finished checks the scenario again: only a running
 
 // ── Failures ─────────────────────────────────────────────────────────────────
 
+const UNDRAFTED = "Checked *Call-off* against today's blueprint. The results are below; I couldn't draft a proposal from them.";
+
 test("a draft cut off at the output ceiling still posts the results, and the check says no proposal was drafted, with Check again", async () => {
   const { threadState, clock, offerTs } = await offered();
-  const w = world(threadState, clock, offerTs, { draftCutOff: true });
+  const w = world(threadState, clock, offerTs, { draftCutOff: 2 });
   await w.press(PRESSER);
   await w.runJob(0);
 
   assert.equal(w.posts.length, 1, "the results posted, and no Draw on blueprint card");
   assert.match(w.posts[0]!, /Beside today's blueprint/, "today's steps beside the idea's own words");
-  const done = w.status.at(-1)!;
-  assert.equal(
-    done.text,
-    "Checked *Call-off* against today's blueprint. The results are below, but I couldn't draft your idea as a blueprint proposal this time. Your card isn't affected.",
-  );
-  assert.deepEqual(buttonsOf(done), [`${CHECK_IT_ACTION_ID} Check again`]);
-  assert.equal(messageBlocksRefusal(done.blocks), null);
+  const undrafted = w.status.at(-1)!;
+  assert.equal(undrafted.text, UNDRAFTED);
+  assert.deepEqual(buttonsOf(undrafted), [`${CHECK_IT_ACTION_ID} Check again`]);
+  assert.equal(messageBlocksRefusal(undrafted.blocks), null);
 
+  // Check again cut off again: still no second results, and it says so again.
   await w.press(BYSTANDER);
-  assert.equal(w.queued.length, 2, "Check again runs the check again");
+  await w.runJob(1);
+  assert.equal(w.posts.length, 1, "no second results");
+  assert.equal(w.status.at(-1)!.text, UNDRAFTED);
 });
 
-test("a cut-off draft at the hand-off says so without naming a card", () => {
-  assert.equal(
-    checkedMessage({ scenario: "Call-off" }, { kind: "done", undrafted: true }).text,
-    "Checked *Call-off* against today's blueprint. The results are below, but I couldn't draft your idea as a blueprint proposal this time.",
-  );
+test("Check again on an undrafted check drafts only: no second results, and the Draw on blueprint card follows the first", async () => {
+  const { threadState, clock, offerTs } = await offered();
+  const w = world(threadState, clock, offerTs, { draftCutOff: 1 });
+  await w.press(PRESSER);
+  await w.runJob(0);
+  assert.equal(w.posts.length, 1);
+
+  await w.press(BYSTANDER);
+  await w.runJob(1);
+  assert.equal(w.posts.length, 2, "one more post");
+  assert.match(w.posts[1]!, /^card: \*Draft as a blueprint proposal\?\*/, "and it is the card, not the results again");
+  const done = w.status.at(-1)!;
+  assert.match(done.text, /^Checked \*Call-off\* against today's blueprint\. The results are below\.$/);
+  assert.deepEqual(buttonsOf(done), []);
+
+  // A finished draft clears the mark: a further check posts its results anew.
+  await w.press(PRESSER);
+  await w.runJob(2);
+  assert.match(w.posts[2]!, /Your idea changes how/);
+});
+
+test("a cut-off draft at the hand-off says so in the same words, naming no card", () => {
+  assert.equal(checkedMessage({ scenario: "Call-off" }, { kind: "undrafted" }).text, UNDRAFTED);
+});
+
+test("a check whose path came without its scenario fails as unreadable, asking the model nothing", async () => {
+  const { threadState, clock, offerTs } = await offered();
+  const { scenarioId: _id, ...noScenario } = TODAY;
+  const w = world(threadState, clock, offerTs, { readPath: async () => noScenario });
+  await w.press(PRESSER);
+  await w.runJob(0);
+  assert.equal(w.draftModel.generated.length, 0);
+  assert.deepEqual(w.posts, []);
+  assert.match(w.status.at(-1)!.text, /didn't finish\. Today's \*Call-off\* path couldn't be read\./);
+});
+
+test("a check past its deadline logs its draft as past the deadline, never as the model failing", async () => {
+  const { threadState, clock, offerTs } = await offered();
+  const w = world(threadState, clock, offerTs, { draftGate: new Promise(() => {}), deadlineMs: 1 });
+  const { lines } = await logsOf(async () => {
+    await w.press(PRESSER);
+    await w.runJob(0);
+  });
+  assert.ok(lines.some((l) => /\[proposal\] Call-off: no offer — the blueprint check ran past its deadline/.test(l)), lines.join("\n"));
+  assert.ok(!lines.some((l) => /the model failed/.test(l)), lines.join("\n"));
+  assert.match(w.status.at(-1)!.text, /ran too long/);
 });
 
 test("a Draw on blueprint card that throws after the results post leaves the check done: no Try again, no second results", async () => {

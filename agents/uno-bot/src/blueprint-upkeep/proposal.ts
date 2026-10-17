@@ -39,17 +39,27 @@ import { escapeSlackText } from "../slack/mrkdwn";
 import type { BlueprintProposalFacts, PendingProposal, StatedCardWords } from "../thread-state/index";
 import { proposalFacts } from "./facts";
 import type { ProposalCard } from "../turn/delivery";
-import { DRAFT_MAX_TOKENS, draftPrompt, readDraft, whyNoDraft, type DraftedChange, type PathToday } from "./draft";
+import { draftPrompt, noDraftReason, noDraftWords, readDraft, thinkingSpent, type DraftedChange, type NoDraftReason, type PathToday } from "./draft";
+import { MAX_TOKENS } from "../agent/loop-policy";
 import type { ServiceChangeInput } from "./gate";
 import type { Comparison } from "./milestone";
 import type { DrawnProposal } from "./proposal-records";
 import { CARD_WINDOW_WORDS } from "../card-expiry";
-import { jsonObjectIn } from "../sweep/detector";
 
 /** The status a proposal's rows are written at. */
 export const PROPOSED = "proposed" as const;
 /** The tier the draft runs on (see the header). */
 export const PROPOSAL_DRAFT_TIER = "default" as const;
+/**
+ * The proposal draft's output ceiling: a turn's own (`MAX_TOKENS`). Thinking
+ * spends the same ceiling as the JSON, and a one-shot cannot bound its
+ * thinking (a tier is model and level together, ADR-028), so the draft gets
+ * the room a turn has for the same all-thinking risk; at 8,000 a medium-level
+ * draft was cut off before its JSON. Only the check runs it, off the thread's
+ * turns on a runner of its own, so the longer think costs no one a wait.
+ * Shipped-work drafts keep their own (`DRAFT_MAX_TOKENS`).
+ */
+export const PROPOSAL_MAX_TOKENS = MAX_TOKENS;
 /** External subrequests an offer spends: the draft (1) and the card (1). */
 export const PROPOSAL_OFFER_SUBREQUESTS = 2;
 /** The card's slot in its thread is `blueprint-proposal:<scenario>`. */
@@ -80,21 +90,29 @@ export interface ProposalDraftDeps {
 }
 
 /**
- * Why a draft makes no offer, in the two kinds its check tells apart:
- *   `nothing-to-draw` — the draft finished and the idea draws no cell on the
- *     path (it only removes moments, or needs only steps the path does not
- *     have). The results say all there is; nothing more is said.
- *   `unfinished` — the draft itself did not finish: the model failed, or was
- *     cut off at the output ceiling, or its reply could not be read, or the
- *     budget had no room for it. The results still post, and the check says
- *     no proposal was drafted, so the offer they lead the person to expect is
- *     never silently missing.
+ * Why a draft makes no offer, in the three kinds its check tells apart:
+ *   `nothing-to-draw` — the model answered and the idea draws no cell: no
+ *     rows at all, rows that only remove moments, or only steps or lanes the
+ *     path lacks (`NoDraftReason` `empty`, `removes-only`, `needs-steps`).
+ *     The results say all there is.
+ *   `unfinished` — no usable answer: the model failed or was aborted, the
+ *     reply was cut off at the ceiling or could not be read, its rows were
+ *     off the path's grid or none could be written, or the budget had no
+ *     room for the call. The results still post, and the check says no
+ *     proposal was drafted, with Check again: a second try can answer.
+ *   `no-scenario` — today's path came without its scenario, which the new
+ *     path is created in. Asked before the model is, and no second try can
+ *     mend it, so the check fails as a path it could not read.
  */
-export type NoProposal = "nothing-to-draw" | "unfinished";
+export type NoProposal = "nothing-to-draw" | "unfinished" | "no-scenario";
+
+/** Which reasons are the idea's own answer: it draws nothing. */
+const DRAWS_NOTHING: ReadonlySet<NoDraftReason["kind"]> = new Set(["empty", "removes-only", "needs-steps"]);
 
 /** Drafts the idea a comparison carries, or says why there is nothing to
- *  offer. `signal` aborts the model call in flight (a stopped check), which
- *  is `unfinished`; the check reads its own signal to say stopped. */
+ *  offer (`NoProposal`). `signal` aborts the model call in flight (a stopped
+ *  check, or one past its deadline), which is `unfinished`; the check reads
+ *  its own signal to say which. */
 export type ProposalDrafter = (comparison: Comparison, idea: ServiceChangeInput, signal?: AbortSignal) => Promise<ProposalDraft | NoProposal>;
 
 export const PROPOSAL_SYSTEM = [
@@ -160,6 +178,22 @@ export function readProposalDraft(reply: string, comparison: Comparison, idea: S
 }
 
 /**
+ * Why a reply `readProposalDraft` read as nothing makes no offer.
+ *
+ * @param reply - The model's text
+ * @param comparison - The comparison it was drafted from
+ * @param idea - The idea's title and text
+ * @param cutOff - Whether the reply stopped at the output ceiling
+ */
+export function noProposalReason(reply: string, comparison: Comparison, idea: ServiceChangeInput, cutOff?: boolean): NoDraftReason {
+  const { today } = comparison;
+  if (!today.scenarioId) return { kind: "no-scenario" };
+  const input = { title: idea.title, text: idea.text, today, target: PROPOSED };
+  if (!cutOff && readDraft(reply, input)) return { kind: "removes-only" };
+  return noDraftReason(reply, input, cutOff);
+}
+
+/**
  * Why a reply `readProposalDraft` read as nothing makes no offer, in a log
  * line's words.
  *
@@ -169,31 +203,42 @@ export function readProposalDraft(reply: string, comparison: Comparison, idea: S
  * @param cutOff - Whether the reply stopped at the output ceiling
  */
 export function whyNoProposal(reply: string, comparison: Comparison, idea: ServiceChangeInput, cutOff?: boolean): string {
-  const { today } = comparison;
-  if (!today.scenarioId) return "today's path was read without its scenario, which the new path is created in";
-  const input = { title: idea.title, text: idea.text, today, target: PROPOSED };
-  if (readDraft(reply, input)) return "it only removes moments, and a path with no cells shows nothing";
-  return whyNoDraft(reply, input, cutOff);
+  return noDraftWords(noProposalReason(reply, comparison, idea, cutOff));
 }
 
 /**
- * Why an aborted draft was aborted, in a log line's words: the check's
- * deadline names itself (`CHECK_DEADLINE_MS` aborts with an Error of its
- * own); any other abort is Stop's, whose reason is the bare AbortError.
+ * The reason a check aborts with at its deadline (`CHECK_DEADLINE_MS`), named
+ * so an aborted draft can tell it from Stop's, whose reason is the bare
+ * AbortError.
  */
+export class CheckPastDeadline extends Error {
+  constructor() {
+    super("the blueprint check ran past its deadline");
+    this.name = "CheckPastDeadline";
+  }
+}
+
+/** Why an aborted draft was aborted, in a log line's words. */
 function abortedBecause(signal: AbortSignal): string {
   const reason: unknown = signal.reason;
-  return reason instanceof Error && reason.name !== "AbortError" ? reason.message : "the check was stopped";
+  return reason instanceof Error && reason.name === "CheckPastDeadline" ? reason.message : "the check was stopped";
 }
 
 /**
- * The drafter, over its ports. Fails quiet: any error is no offer, and an
- * error or a cut-off reply is `unfinished`, never `nothing-to-draw`.
+ * The drafter, over its ports. Fails quiet: any error is no offer, and is
+ * `unfinished` (`NoProposal`). Each answer logs its thinking spend against
+ * the ceiling, so the ceiling is sized from what drafts cost.
  *
  * @param deps - The model and the budget
  */
 export function draftProposal(deps: ProposalDraftDeps): ProposalDrafter {
   return async (comparison, idea, signal) => {
+    const say = (why: string) => console.log(`[proposal] ${comparison.scenario}: no offer — ${why}`);
+    // Asked before the model is: nothing it answers can be drawn.
+    if (!comparison.today.scenarioId) {
+      say(noDraftWords({ kind: "no-scenario" }));
+      return "no-scenario";
+    }
     const input = { title: idea.title, text: idea.text, today: comparison.today, target: PROPOSED };
     try {
       if (!deps.affordable()) {
@@ -204,38 +249,35 @@ export function draftProposal(deps: ProposalDraftDeps): ProposalDrafter {
         tier: PROPOSAL_DRAFT_TIER,
         system: PROPOSAL_SYSTEM,
         prompt: draftPrompt(input),
-        maxTokens: DRAFT_MAX_TOKENS,
+        maxTokens: PROPOSAL_MAX_TOKENS,
         ...(signal ? { signal } : {}),
       });
-      // An abort comes back as a failed call: Stop pressed is not the model
-      // failing, and a log that said so sent a live read of r671 looking for
-      // a model fault that was not there.
+      // An abort comes back as a failed call: Stop pressed, or the deadline,
+      // is not the model failing, and a log that said so points at a fault
+      // that is not there.
       if (signal?.aborted) {
-        console.log(`[proposal] ${comparison.scenario}: no offer — ${abortedBecause(signal)}`);
+        say(abortedBecause(signal));
         return "unfinished";
       }
       if (!reply.ok) {
         console.warn(`[proposal] ${comparison.scenario}: no offer — the model failed: ${reply.message}`);
         return "unfinished";
       }
+      const spent = thinkingSpent(reply, PROPOSAL_MAX_TOKENS);
       const draft = readProposalDraft(reply.text, comparison, idea);
-      if (draft) return draft;
-      console.log(`[proposal] ${comparison.scenario}: no offer — ${whyNoProposal(reply.text, comparison, idea, reply.cutOff)}`);
-      // A reply read whole that draws no cell is the idea's answer; a cut-off
-      // or unreadable one is no answer at all.
-      return !reply.cutOff && comparison.today.scenarioId && readsAsJson(reply.text) ? "nothing-to-draw" : "unfinished";
+      if (draft) {
+        if (spent) console.log(`[proposal] ${comparison.scenario}: drafted${spent}`);
+        return draft;
+      }
+      const reason = noProposalReason(reply.text, comparison, idea, reply.cutOff);
+      say(`${noDraftWords(reason)}${spent}`);
+      return DRAWS_NOTHING.has(reason.kind) ? "nothing-to-draw" : "unfinished";
     } catch (err) {
-      if (signal?.aborted) console.log(`[proposal] ${comparison.scenario}: no offer — ${abortedBecause(signal)}`);
+      if (signal?.aborted) say(abortedBecause(signal));
       else console.warn(`[proposal] draft skipped: ${err instanceof Error ? err.message : String(err)}`);
       return "unfinished";
     }
   };
-}
-
-/** Whether a reply holds the draft's JSON shape at all: rows to read. */
-function readsAsJson(reply: string): boolean {
-  const parsed = jsonObjectIn(reply) as Record<string, unknown> | null;
-  return !!parsed && Array.isArray(parsed.rows);
 }
 
 const code = (word: string) => `\`${word.replace(/`/g, "'")}\``;
