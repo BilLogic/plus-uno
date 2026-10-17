@@ -106,18 +106,27 @@ function stepsToday(today: PathToday): string {
   return named.length > MAX_STEPS ? `${shown} → …and ${named.length - MAX_STEPS} more` : shown;
 }
 
+/** A drafted row as the comparison reads it: a removal when `kind` is
+ *  `deprecated`, else a cell the idea adds or changes. */
+export type ComparedRow = Pick<DraftedChange, "step" | "lane" | "content"> & Partial<Pick<DraftedChange, "kind">>;
+
 /**
  * The comparison as a reply reads it. With the idea's drafted rows, one
- * short block per step either side has (§ B1): the step in bold, a "Today:"
- * line and a "Your idea:" line, each row's lane in code, "no such step" where
- * a side has none; touchpoint lanes are left out, and past `MAX_COMPARED_STEPS`
- * the rest are counted. Without them, today's steps and the idea's own words.
+ * short block per step the idea touches (§ B1): the step in bold, a "Today:"
+ * line with that step's cells in the lanes the idea touches, and a "Your
+ * idea:" line, each row's lane in code. A step the idea only empties says it
+ * drops the step; a lane it empties beside a change says it drops that lane's
+ * cell; a step with no cell today in those lanes has no "Today:" line. What
+ * the idea leaves alone is left out and named in one closing line, so a
+ * missing row never reads as a removal. Touchpoint lanes are left out, and
+ * past `MAX_COMPARED_STEPS` the rest are counted. Without rows, today's steps
+ * and the idea's own words.
  *
  * @param today - The matched path
  * @param quote - The idea's sentence that shows the change
- * @param idea - The idea's drafted rows, when the offer drafted them
+ * @param idea - The idea's drafted rows, its removals among them, when the offer drafted them
  */
-export function comparisonText(today: PathToday, quote: string, idea?: ReadonlyArray<Pick<DraftedChange, "step" | "lane" | "content">>): string {
+export function comparisonText(today: PathToday, quote: string, idea?: readonly ComparedRow[]): string {
   if (idea?.length) return stepComparison(today, idea);
   const place = `${today.scenario} › ${today.path}`;
   const named = today.link ? `[${place}](${today.link})` : place;
@@ -133,23 +142,30 @@ const MAX_COMPARED_STEPS = 6;
 /** A lane whose rows the inline comparison leaves to the pop-up. */
 const TOUCHPOINT_LANE = /touchpoint/i;
 
-function stepComparison(today: PathToday, idea: ReadonlyArray<Pick<DraftedChange, "step" | "lane" | "content">>): string {
+function stepComparison(today: PathToday, idea: readonly ComparedRow[]): string {
   const laneName = new Map(today.lanes.map((l) => [l.id, l.name]));
-  const said = (rows: ReadonlyArray<{ lane: string; content: string }>) =>
-    rows.filter((r) => !TOUCHPOINT_LANE.test(r.lane)).map((r) => `${r.content.replace(/\.$/, "")} (\`${r.lane.replace(/`/g, "'")}\`)`);
-  const steps = today.steps
-    .map((step) => {
-      const now = said(today.cells.filter((c) => c.stepId === step.id).map((c) => ({ lane: laneName.get(c.laneId) ?? "", content: c.content })));
-      const yours = said(idea.filter((r) => r.step === step.name));
-      return { name: step.name, now, yours };
-    })
-    .filter((s) => s.now.length || s.yours.length);
+  const inline = (lane: string) => !TOUCHPOINT_LANE.test(lane);
+  const code = (lane: string) => `\`${lane.replace(/`/g, "'")}\``;
+  const said = (r: { lane: string; content: string }) => `${r.content.replace(/\.$/, "")} (${code(r.lane)})`;
+  let leftAlone = false;
+  const steps = today.steps.flatMap((step) => {
+    const cells = today.cells.filter((c) => c.stepId === step.id).map((c) => ({ lane: laneName.get(c.laneId) ?? "", content: c.content })).filter((c) => inline(c.lane));
+    const rows = idea.filter((r) => r.step === step.name && inline(r.lane));
+    const touched = new Set(rows.map((r) => r.lane));
+    const now = cells.filter((c) => touched.has(c.lane));
+    if (now.length < cells.length) leftAlone = true;
+    if (!rows.length) return [];
+    const drops = rows.filter((r) => r.kind === "deprecated");
+    const yours = rows.filter((r) => r.kind !== "deprecated");
+    const dropsStep = !yours.length && drops.length === cells.length;
+    const ideaSays = dropsStep ? "drops this step" : [...yours.map(said), ...drops.map((r) => `drops it (${code(r.lane)})`)].join("; ");
+    return [[`**${step.name}**`, ...(now.length ? [`- Today: ${now.map(said).join("; ")}`] : []), `- Your idea: ${ideaSays}`]];
+  });
   const scenario = today.link ? `[*${today.scenario}*](${today.link})` : `*${today.scenario}*`;
   const lines = [`**Your idea changes how ${scenario} works today.** Today's path is *${today.path}*:`];
-  for (const s of steps.slice(0, MAX_COMPARED_STEPS)) {
-    lines.push("", `**${s.name}**`, `- Today: ${s.now.join("; ") || "no such step"}`, `- Your idea: ${s.yours.join("; ") || "no such step"}`);
-  }
+  for (const block of steps.slice(0, MAX_COMPARED_STEPS)) lines.push("", ...block);
   const more = steps.length - MAX_COMPARED_STEPS;
-  if (more > 0) lines.push("", `…and ${more} more ${more === 1 ? "step" : "steps"} on the blueprint.`);
+  if (more > 0) lines.push("", `…and ${more} more changed ${more === 1 ? "step" : "steps"}.`);
+  if (leftAlone) lines.push("", "The rest of the path stays as it is.");
   return lines.join("\n");
 }

@@ -304,7 +304,9 @@ test("the check posts today's steps beside the idea's as a follow-up, then the D
   const results = (j.seen[1] as { text: string }).text;
   assert.match(results, /\*\*Your idea changes how \[\*Call-off\*\]\(https:\/\/blueprint\.example\/\?cell=cell-1\) works today\.\*\* Today's path is \*Standard\*:/);
   assert.match(results, /\*\*Find a fill-in\*\*\n- Today: Supervisor asks around in Slack \(`Supervisor`\)\n- Your idea: Free tutor claims the posted call-off \(`Tutor`\); Supervisor sees who claimed it \(`Supervisor`\)/);
-  assert.match(results, /\*\*Call off a session\*\*\n- Today: Tutor messages the supervisor \(`Tutor`\)\n- Your idea: no such step/);
+  assert.match(results, /\*\*Confirm the fill-in\*\*\n- Today: Supervisor confirms by DM \(`Supervisor`\)\n- Your idea: Claiming tutor confirms on the board \(`Tutor`\); drops it \(`Supervisor`\)\n/, "a moment the idea removes is said");
+  assert.doesNotMatch(results, /Call off a session|no such step/, "a step the idea leaves alone is left out");
+  assert.match(results, /\n\nThe rest of the path stays as it is\.$/);
   assert.deepEqual(j.seen[0], { kind: "settle", outcome: { kind: "done" }, ts: offerTs }, "the offer's own message says it is done");
   // The idea it drafted is the PRD's, read back from the offer.
   assert.match(j.draftModel.generated[0]!.prompt, /Self-serve call-offs/);

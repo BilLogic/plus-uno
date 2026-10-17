@@ -537,19 +537,65 @@ const offer = () =>
   });
 
 describe("the inline comparison (B1)", () => {
-  it("is one short block per step either side has, lanes in code, touchpoints left out", () => {
+  it("is one short block per step the idea touches, its lanes in code, touchpoints left out", () => {
     const text = comparisonText(TODAY, COMPARISON.quote, proposalDraft().changes);
     assert.match(text, /^\*\*Your idea changes how \[\*Call-off Request\*\]\(https:\/\/plus-uno\.netlify\.app\/blueprint\/\?cell=c-1\) works today\.\*\* Today's path is \*12\+ hours ahead\*:/);
-    assert.match(text, /\*\*Files call-off \(12h\+, auto-approved\)\*\*\n- Today: Files a one-time call-off 12 or more hours before the session \(`Regular Tutor`\); Takes no action on auto-approved call-offs \(`Back Stage Actions`\)\n- Your idea: Posts the call-off on the board \(`Regular Tutor`\)/);
-    assert.match(text, /\*\*Files late call-off \(<12h, immediate removal\)\*\*\n- Today: If it is less than 12 hours before session, tutor emails supervisor \(`Regular Tutor`\)\n- Your idea: no such step/);
+    assert.match(text, /\*\*Files call-off \(12h\+, auto-approved\)\*\*\n- Today: Files a one-time call-off 12 or more hours before the session \(`Regular Tutor`\)\n- Your idea: Posts the call-off on the board \(`Regular Tutor`\)\n/);
+    assert.match(text, /\*\*After the session\*\*\n- Your idea: Offers the seat to the next free tutor \(`Back Stage Actions`\)\n/, "a row where today has none stands alone");
+    assert.doesNotMatch(text, /Files late call-off|Takes no action|Sees the session removed/, "what the idea leaves alone is left out");
+    assert.match(text, /\n\nThe rest of the path stays as it is\.$/);
+    assert.doesNotMatch(text, /no such step/);
     assert.doesNotMatch(text, /Front Stage Touchpoints|PLUS App|Call-off board/, "touchpoints are the pop-up's");
     assert.doesNotMatch(text, /\| ---/, "no table");
   });
 
-  it("counts the steps past six", () => {
+  it("shows only the step an idea touches of six, and never claims a removal", () => {
+    const steps = ["Open the form", "Session information", "Session Evaluation", "Student Reflection", "Self Reflection", "Submit"].map((name, i) => ({ id: `s${i}`, name }));
+    const today: PathToday = { ...TODAY, steps, cells: steps.map((s, i) => ({ id: `c${i}`, laneId: "l-tutor", stepId: s.id, content: `Row ${i}.`, status: "live" as const })) };
+    assert.equal(
+      comparisonText(today, "", [{ kind: "changed", step: "Session Evaluation", lane: "Regular Tutor", content: "Rates the session in one tap." }]),
+      [
+        "**Your idea changes how [*Call-off Request*](https://plus-uno.netlify.app/blueprint/?cell=c-1) works today.** Today's path is *12+ hours ahead*:",
+        "",
+        "**Session Evaluation**",
+        "- Today: Row 2 (`Regular Tutor`)",
+        "- Your idea: Rates the session in one tap (`Regular Tutor`)",
+        "",
+        "The rest of the path stays as it is.",
+      ].join("\n"),
+    );
+  });
+
+  it("says a step the idea removes is dropped, and a lane it removes beside a change", () => {
+    const steps = [{ id: "s0", name: "Ask" }, { id: "s1", name: "Confirm" }, { id: "s2", name: "Wait" }];
+    const cells = [
+      { id: "c0", laneId: "l-tutor", stepId: "s0", content: "Asks.", status: "live" as const },
+      { id: "c1", laneId: "l-tutor", stepId: "s1", content: "Confirms.", status: "live" as const },
+      { id: "c2", laneId: "l-bsa", stepId: "s1", content: "Checks by DM.", status: "live" as const },
+      { id: "c3", laneId: "l-tutor", stepId: "s2", content: "Waits.", status: "live" as const },
+    ];
+    const text = comparisonText({ ...TODAY, steps, cells }, "", [
+      { kind: "changed", step: "Confirm", lane: "Regular Tutor", content: "Confirms on the board." },
+      { kind: "deprecated", step: "Confirm", lane: "Back Stage Actions", content: "Checks by DM." },
+      { kind: "deprecated", step: "Wait", lane: "Regular Tutor", content: "Waits." },
+    ]);
+    assert.match(text, /\*\*Confirm\*\*\n- Today: Confirms \(`Regular Tutor`\); Checks by DM \(`Back Stage Actions`\)\n- Your idea: Confirms on the board \(`Regular Tutor`\); drops it \(`Back Stage Actions`\)\n/);
+    assert.match(text, /\*\*Wait\*\*\n- Today: Waits \(`Regular Tutor`\)\n- Your idea: drops this step\n/);
+    assert.doesNotMatch(text, /\*\*Ask\*\*/);
+    assert.match(text, /The rest of the path stays as it is\.$/);
+  });
+
+  it("has no closing line when the idea touches all of the path", () => {
+    const steps = [{ id: "s0", name: "Ask" }];
+    const cells = [{ id: "c0", laneId: "l-tutor", stepId: "s0", content: "Asks.", status: "live" as const }];
+    assert.doesNotMatch(comparisonText({ ...TODAY, steps, cells }, "", [{ step: "Ask", lane: "Regular Tutor", content: "Asks twice." }]), /stays as it is/);
+  });
+
+  it("counts the steps it changes past six", () => {
     const steps = Array.from({ length: 9 }, (_, i) => ({ id: `s${i}`, name: `Step ${i}` }));
     const today: PathToday = { ...TODAY, steps, cells: steps.map((s, i) => ({ id: `c${i}`, laneId: "l-tutor", stepId: s.id, content: `Row ${i}`, status: "live" as const })) };
-    assert.match(comparisonText(today, "", [{ step: "Step 0", lane: "Regular Tutor", content: "Idea" }]), /…and 3 more steps on the blueprint\.$/);
+    const idea = steps.map((s) => ({ step: s.name, lane: "Regular Tutor", content: "Idea" }));
+    assert.match(comparisonText(today, "", idea), /…and 3 more changed steps\.$/);
   });
 });
 
