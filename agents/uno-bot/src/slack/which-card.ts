@@ -240,8 +240,10 @@ export async function runWhichOpen(request: WhichOpenRequest, deps: WhichDoorDep
 export type WhichRedraw =
   /** Approve or Cancel, switched at the top. */
   | { kind: "decision"; decision: Decision }
-  /** Show draft or Hide draft, on a card's row. */
-  | { kind: "draft"; cardTs: string };
+  /** A card chosen under "Show a draft…": its draft opens below. */
+  | { kind: "draft"; cardTs: string }
+  /** Hide draft, after the open draft. */
+  | { kind: "hide" };
 
 export interface WhichRedrawRequest {
   viewId: string;
@@ -259,7 +261,7 @@ export interface WhichRedrawRequest {
 }
 
 /**
- * A switch of the decision, or Show draft / Hide draft, pressed: the pop-up
+ * A switch of the decision, a draft chosen, or Hide draft pressed: the pop-up
  * redrawn from the cards still waiting, read now, with what was picked and
  * typed set back in its inputs. A switch to Approve keeps the first card that
  * was ticked; a switch to Cancel ticks the one that was picked. Past the
@@ -275,7 +277,7 @@ export async function runWhichRedraw(request: WhichRedrawRequest, deps: WhichDoo
   }
   const pick = whichPickOf(request.state, popup.decision, popup.note);
   const decision = press.kind === "decision" ? press.decision : popup.decision;
-  const shown = press.kind === "draft" ? (popup.shown === press.cardTs ? undefined : press.cardTs) : popup.shown;
+  const shown = press.kind === "draft" ? press.cardTs : press.kind === "hide" ? undefined : popup.shown;
   const { shown: _was, note: _note, ...rest } = popup;
   const next: WhichPopup = { ...rest, decision, ...(shown ? { shown } : {}) };
   const waiting = await waitingCards(popup.cards.map((card) => card.ts), popup.channel, deps);

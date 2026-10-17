@@ -118,12 +118,12 @@ async function choose(d: ReturnType<typeof doors>, question: CardMessage) {
 
 /** The input holding the card list, and its element. */
 const listOf = (view: View) => view.blocks.find((b) => b.type === "input" && b.block_id?.startsWith("uno_which_cards_"))!;
-/** Each card's Show draft row: its label and the card it names. */
-const draftRows = (view: View) =>
-  view.blocks.flatMap((b) => {
-    const button = b.type === "actions" ? (b.elements?.[0] as { action_id?: string; text: { text: string }; value: string } | undefined) : undefined;
-    return button?.action_id === "uno_which_draft" ? [{ at: view.blocks.indexOf(b), label: button.text.text, card: button.value, block: b }] : [];
-  });
+type Select = { type: string; placeholder: { text: string }; options: Array<{ value: string; text: { text: string } }>; initial_option?: { value: string } };
+/** Every "Show a draft…" select in the view, and where each sits. */
+const draftSelects = (view: View) =>
+  view.blocks.flatMap((b, at) => (b.type === "actions" && b.elements?.[0]?.action_id === "uno_which_draft" ? [{ at, select: b.elements[0] as unknown as Select }] : []));
+/** Where Hide draft sits, or -1. */
+const hideAt = (view: View) => view.blocks.findIndex((b) => b.type === "actions" && b.elements?.[0]?.action_id === "uno_which_hide");
 const decisionOf = (view: View) =>
   (view.blocks.find((x) => x.block_id === "uno_which_decision_block")!.elements![0] as { initial_option: { value: string }; options: Array<Record<string, unknown>> });
 const noteOf = (view: View) => view.blocks.find((x) => x.block_id === "uno_which_note");
@@ -196,11 +196,16 @@ test("Choose… opens a loading view, then the cards with Approve preset from a 
     [b, "Session reflections", "New PRD card on the Roadmap"],
     [a, "Backup tutor matching", "New PRD card on the Roadmap"],
   ]);
-  // Each card is listed once: its Show draft row, in the list's order, has
-  // the button and nothing else.
-  assert.deepEqual(draftRows(view).map((r) => [r.label, r.card]), [["Show draft", b], ["Show draft", a]]);
-  assert.deepEqual(draftRows(view).map((r) => r.block.elements!.length), [1, 1]);
-  assert.equal(words(view).split("Session reflections").length - 1, 1, "the headline once, in its option");
+  // One select under the list names each card's draft by headline, in the
+  // list's order, with none open.
+  const selects = draftSelects(view);
+  assert.equal(selects.length, 1);
+  const { select } = selects[0]!;
+  assert.equal(select.type, "static_select");
+  assert.equal(select.placeholder.text, "Show a draft…");
+  assert.deepEqual(select.options.map((o) => [o.value, o.text.text]), [[b, "Session reflections"], [a, "Backup tutor matching"]]);
+  assert.equal(select.initial_option, undefined);
+  assert.equal(hideAt(view), -1, "no Hide draft with no draft open");
   assert.equal(noteOf(view), undefined, "no note under Approve");
 });
 
@@ -238,7 +243,7 @@ test("switching the decision swaps radio buttons for checkboxes, keeping the pic
   assert.equal(noteOf(again)!.element!.initial_value, "not this week");
 });
 
-test("Show draft opens that card's draft under its row, as its Review draws it; Hide draft closes it; the pick survives", async () => {
+test("choosing a card under Show a draft… opens its draft below, as its Review draws it; Hide draft closes it; the pick survives", async () => {
   const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
   const { a, b, question } = await asked(h, "⛔");
   clock.now = SOON;
@@ -251,15 +256,22 @@ test("Show draft opens that card's draft under its row, as its Review draws it; 
   const lookup = await h.threadState.getProposalByTs(a);
   assert.equal(lookup.state, "found");
   const draft = draftBlocks((lookup as Extract<typeof lookup, { state: "found" }>).proposal);
-  const row = draftRows(shown).find((r) => r.card === a)!;
-  assert.equal(row.label, "Hide draft");
-  assert.deepEqual(shown.blocks.slice(row.at + 1, row.at + 1 + draft.length), draft, "the draft, under its own row");
-  assert.equal(draftRows(shown).find((r) => r.card === b)!.label, "Show draft");
+  const { at, select } = draftSelects(shown)[0]!;
+  assert.equal(select.initial_option?.value, a, "the select shows the open card");
+  assert.deepEqual(shown.blocks.slice(at + 1, at + 1 + draft.length), draft, "the draft, below the select");
+  assert.equal(hideAt(shown), at + 1 + draft.length, "Hide draft after it");
   assert.deepEqual((listOf(shown).element!.initial_options as Array<{ value: string }>).map((o) => o.value), [b]);
   assert.equal(noteOf(shown)!.element!.initial_value, "hm");
 
-  const hidden = await redraw(d, shown, { kind: "draft", cardTs: a }, stateOf(shown, [b], "hm"));
+  // Another card chosen replaces the open draft: one open at a time.
+  const other = await redraw(d, shown, { kind: "draft", cardTs: b }, stateOf(shown, [b], "hm"));
+  assert.equal(draftSelects(other)[0]!.select.initial_option?.value, b);
+  assert.equal(draftSelects(other).length, 1);
+
+  const hidden = await redraw(d, other, { kind: "hide" }, stateOf(other, [b], "hm"));
   assert.equal(hidden.blocks.length, closed.blocks.length, "the draft is gone again");
+  assert.equal(hideAt(hidden), -1);
+  assert.equal(noteOf(hidden)!.element!.initial_value, "hm");
   assert.deepEqual((listOf(hidden).element!.initial_options as Array<{ value: string }>).map((o) => o.value), [b]);
 });
 

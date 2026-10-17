@@ -75,6 +75,7 @@ import {
   WHICH_CALLBACK_ID,
   WHICH_DECISION_ACTION_ID,
   WHICH_DRAFT_ACTION_ID,
+  WHICH_HIDE_ACTION_ID,
   whichNoticeView,
   whichPopupOf,
   whichSubmitOf,
@@ -212,7 +213,9 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
   if (actionId === WHICH_CHOOSE_ACTION_ID) return openWhich(env, payload);
-  if (actionId === WHICH_DECISION_ACTION_ID || actionId === WHICH_DRAFT_ACTION_ID) return redrawWhich(env, payload, actionId);
+  if (actionId === WHICH_DECISION_ACTION_ID || actionId === WHICH_DRAFT_ACTION_ID || actionId === WHICH_HIDE_ACTION_ID) {
+    return redrawWhich(env, payload, actionId);
+  }
   if (isLegacyWhichPress(actionId)) return replyEphemeral(payload, LEGACY_WHICH_REPLY);
   if (actionId === CHECK_IT_ACTION_ID) return checkIt(env, payload);
   if (actionId === STOP_CHECK_ACTION_ID) return stopCheck(env, payload);
@@ -307,23 +310,25 @@ async function openWhich(env: Env, payload: InteractionPayload): Promise<void> {
   );
 }
 
-/** Approve / Cancel switched, or Show draft / Hide draft pressed, inside the
- *  pop-up: the pop-up redrawn in place. */
+/** Approve / Cancel switched, a draft chosen under "Show a draft…", or Hide
+ *  draft pressed, inside the pop-up: the pop-up redrawn in place. */
 async function redrawWhich(env: Env, payload: InteractionPayload, actionId: string): Promise<void> {
   const viewId = payload.view?.id;
   const popup = whichPopupOf(payload.view?.private_metadata);
   const userId = payload.user?.id;
   const action = payload.actions?.[0];
   if (!viewId || !popup || !userId || !action) return;
-  const decision = action.selected_option?.value;
+  const chosen = action.selected_option?.value;
   const press =
-    actionId === WHICH_DECISION_ACTION_ID
-      ? decision === "confirm" || decision === "cancel"
-        ? ({ kind: "decision", decision } as const)
-        : null
-      : action.value
-        ? ({ kind: "draft", cardTs: action.value } as const)
-        : null;
+    actionId === WHICH_HIDE_ACTION_ID
+      ? ({ kind: "hide" } as const)
+      : actionId === WHICH_DECISION_ACTION_ID
+        ? chosen === "confirm" || chosen === "cancel"
+          ? ({ kind: "decision", decision: chosen } as const)
+          : null
+        : chosen
+          ? ({ kind: "draft", cardTs: chosen } as const)
+          : null;
   if (!press) return;
   const hash = typeof payload.view?.hash === "string" ? payload.view.hash : undefined;
   await runWhichRedraw(

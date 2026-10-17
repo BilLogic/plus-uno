@@ -13,10 +13,11 @@
 // in one is never read as the other's, and the redraw carries the pick across
 // itself (`initial_option` / `initial_options`).
 //
-// A DRAFT OPENS UNDER ITS ROW. Slack modals have no accordion, so Show draft is
-// a button that redraws the pop-up with that card's draft under its row, drawn
-// as its own Review pop-up draws it (`review-view.ts` § `draftBlocks`), and
-// Hide draft redraws it without. One draft is open at a time, so a long one
+// A DRAFT OPENS BELOW THE LIST. Slack modals have no accordion, so one select
+// under the list, "Show a draft…", names each card by its headline, and a
+// choice redraws the pop-up with that card's draft below it, drawn as its own
+// Review pop-up draws it (`review-view.ts` § `draftBlocks`); a Hide draft
+// button after the draft redraws it without. One draft is open at a time, so a long one
 // has the whole view's room; past it, the draft is cut and points at the
 // card's own Review, which has all of it. Every redraw sets each input's
 // value from the state the press carried, so the pick and the note survive
@@ -24,10 +25,11 @@
 // Cancel only; a switch to Approve keeps it in the view's metadata until the
 // switch back.
 //
-// EACH CARD IS LISTED ONCE: its option in the list, by its headline
+// EACH CARD IS PICKED IN ONE PLACE: its option in the list, by its headline
 // (`agent/card-identity.ts`) and what it does (`cardDoes`). An option holds
-// no button, so each card's Show draft sits in a row of its own under the
-// list, in the list's order, with nothing else in it.
+// no button, and a bare Show draft per card would not say which card it
+// opens, so the drafts sit behind the one select, by headline, in the
+// list's order.
 //
 // The view carries the question it answers in `private_metadata` — the
 // question's message, the decision, the cards it listed — so every press and
@@ -51,8 +53,11 @@ export const WHICH_CALLBACK_ID = "uno_which_pick";
 export const WHICH_DECISION_ACTION_ID = "uno_which_decision";
 const DECISION_BLOCK = "uno_which_decision_block";
 
-/** A row's Show draft / Hide draft; its value is the card's ts. */
+/** "Show a draft…": each option's value is a card's ts. */
 export const WHICH_DRAFT_ACTION_ID = "uno_which_draft";
+
+/** Hide draft, after the open draft. */
+export const WHICH_HIDE_ACTION_ID = "uno_which_hide";
 
 /** The list of cards: one block per decision, so a pick never crosses over. */
 const CARDS_BLOCK: Readonly<Record<Decision, string>> = { confirm: "uno_which_cards_confirm", cancel: "uno_which_cards_cancel" };
@@ -262,24 +267,26 @@ export function whichView(
   // Under Approve, the note typed under Cancel waits in the metadata.
   const kept: WhichPopup = decision === "confirm" && pick.note ? { ...popup, note: pick.note } : popup;
 
-  // Each card's Show draft, alone in its row in the list's order, and the
-  // open draft under its own: cut to the room the rest of the view leaves it.
-  const rows = waiting.map((card) => {
-    const open = card.proposalTs === popup.shown;
-    return {
-      card,
-      row: {
-        type: "actions",
-        elements: [{ type: "button", action_id: WHICH_DRAFT_ACTION_ID, text: plain(open ? "Hide draft" : "Show draft"), value: card.proposalTs }],
+  // "Show a draft…", by headline in the list's order, opening on the card
+  // whose draft is open; then that draft, cut to the room the rest of the
+  // view leaves it, and Hide draft after it.
+  const drafts = waiting.map((card) => ({ value: card.proposalTs, text: plain(headlineOf(popup, card)) }));
+  const open = waiting.find((card) => card.proposalTs === popup.shown);
+  const select = {
+    type: "actions",
+    elements: [
+      {
+        type: "static_select",
+        action_id: WHICH_DRAFT_ACTION_ID,
+        placeholder: plain("Show a draft…"),
+        options: drafts,
+        ...(open ? { initial_option: drafts.find((o) => o.value === open.proposalTs)! } : {}),
       },
-      open,
-    };
-  });
-  // The open draft is closed off by a divider of its own.
-  const room = MAX_VIEW_BLOCKS - head.length - tail.length - rows.length - 1;
-  const body = rows.flatMap(({ card, row, open }) =>
-    open ? [row, ...fitBody(draftBlocks(card, opts), room, DRAFT_LEFT_OUT), { type: "divider" }] : [row],
-  );
+    ],
+  };
+  const hide = { type: "actions", elements: [{ type: "button", action_id: WHICH_HIDE_ACTION_ID, text: plain("Hide draft"), value: "hide" }] };
+  const room = MAX_VIEW_BLOCKS - head.length - tail.length - 2;
+  const body = open ? [select, ...fitBody(draftBlocks(open, opts), room, DRAFT_LEFT_OUT), hide] : [select];
   return modal(kept, [...head, ...body, ...tail], true);
 }
 
