@@ -363,9 +363,9 @@ function settled(anatomy: DraftAnatomy): DraftAnatomy {
 }
 
 /**
- * What a decided card says at the top: the outcome as a plain alert —
+ * What a decided card says at the top: the outcome as an alert —
  * "Approved.", "Rejected." or, on a card with its own answers, "Answered." —
- * `success` for an Approve and a plain alert otherwise; then, where there is
+ * `success` for an Approve and `info` otherwise; then, where there is
  * someone or somewhere to name, a rich text line with the pills: "Approved by
  * @Bill to post in #channel.", "Rejected by @Bill: not this week.".
  */
@@ -376,7 +376,7 @@ function decidedAlert(
 ): unknown[] {
   const who = decided.by && SLACK_USER_ID.test(decided.by) ? decided.by : undefined;
   const by = who ? [{ type: "text", text: " by " }, { type: "user", user_id: who }] : [];
-  const level = decided.decision === "confirm" ? "success" : "default";
+  const level = decided.decision === "confirm" ? "success" : "info";
   const outcome = proposal.choices?.length ? "Answered" : decided.decision === "cancel" ? "Rejected" : "Approved";
   const reason = decided.decision === "cancel" && !proposal.choices?.length ? (decided.reason?.trim() ?? "") : "";
   const where = outcome === "Approved" && reading?.destination ? [{ type: "text", text: " to " }, ...richElements(reading.destination)] : [];
@@ -604,9 +604,9 @@ const EMOJI_OUTCOME = /^:(white_check_mark|no_entry|warning):\s*/;
 function outcomeLevelOf(words: string): DraftAlert["level"] | null {
   if (/^(Approved|Answered) by /.test(words)) return "success";
   // Either spelling: a card decided before "Canceled" still says "Cancelled".
-  if (/^(Rejected|Cancell?ed)\b/.test(words)) return "default";
+  if (/^(Rejected|Cancell?ed)\b/.test(words)) return "info";
   const stated = /, decided by <@([^>]+)>\.$/.exec(words);
-  return stated && SLACK_USER_ID.test(stated[1]!) ? "default" : null;
+  return stated && SLACK_USER_ID.test(stated[1]!) ? "info" : null;
 }
 
 /** A decided card's outcome line, as the card's message ends with it: the
@@ -616,7 +616,7 @@ function outcomeOf(cardText: string): { level: DraftAlert["level"]; text: string
   const last = cardText.split("\n").map((l) => l.trim()).filter(Boolean).at(-1) ?? "";
   const emoji = EMOJI_OUTCOME.exec(last);
   if (emoji) {
-    const level = emoji[1] === "white_check_mark" ? "success" : emoji[1] === "warning" ? "warning" : "default";
+    const level = emoji[1] === "white_check_mark" ? "success" : emoji[1] === "warning" ? "warning" : "info";
     return { level, text: last.slice(emoji[0].length) };
   }
   const level = outcomeLevelOf(last);
@@ -626,7 +626,7 @@ function outcomeOf(cardText: string): { level: DraftAlert["level"]; text: string
 /**
  * A decided card opened from View when its record keeps no draft — decided
  * before the record was kept, or past the card's lifetime: the outcome the
- * card's message ends with, under a plain alert at the level its words mean
+ * card's message ends with, under an alert at the level its words mean
  * (the line names who decided, so it is rich text, not the alert), and a line
  * saying the draft is gone. A message with no outcome line reads as decided,
  * plainly.
@@ -672,7 +672,7 @@ function stateAlert(level: DraftAlert["level"], text: string): unknown {
  * first full stop: "Approved. I'm running it now…" is the alert "Approved."
  * over the line "I'm running it now…".
  *
- * @param level - `success` for an Approve, `default` for a Reject, `info` for
+ * @param level - `success` for an Approve, `info` for a Reject and for
  *   sent back and being revised, `warning` for expired and replaced
  * @param text - The outcome, and what happens next after its first sentence
  * @param title - The draft's title, where the view knows the card's tool

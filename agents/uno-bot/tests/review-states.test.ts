@@ -300,9 +300,9 @@ describe("a decided card, opened from View", () => {
     assert.doesNotMatch(JSON.stringify(view), /Posts in|Bundle incomplete/);
   });
 
-  it("says a Reject the same way, under a plain alert, then who and the reason", async () => {
+  it("says a Reject the same way, under an info alert, then who and the reason", async () => {
     const { view } = await decided("cancel", {}, "Wrong channel");
-    assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level], ["alert", "default"]);
+    assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level], ["alert", "info"]);
     assert.equal(view.blocks[0]!.text!.text, "Rejected.");
     assert.equal(richText(view.blocks[1]), `Rejected by <@${BILL}>: Wrong channel.`);
     assert.equal(view.blocks[2]!.type, "header");
@@ -362,11 +362,11 @@ describe("after a decision, and closed", () => {
     assert.equal(view.blocks[1]!.text!.text, "I'm running it now. The outcome posts in the thread.");
   });
 
-  it("answers Reject with a plain alert, then that nothing runs", async () => {
+  it("answers Reject with an info alert, then that nothing runs", async () => {
     const h = harness(await store());
     await runReviewDecision(decide("cancel"), h.deps);
     const view = lastView(h);
-    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "default"], ["section", undefined]]);
+    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "info"], ["section", undefined]]);
     assert.deepEqual(view.blocks.map((b) => b.text!.text), ["Rejected.", "Nothing will run."]);
   });
 

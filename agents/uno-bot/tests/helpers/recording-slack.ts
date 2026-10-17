@@ -116,6 +116,27 @@ afterEach(() => {
   throw new Error(`Slack would have refused: ${seen.map((r) => `${r.call} → ${r.error}`).join("; ")}`);
 });
 
+/** Every view a recording client was handed that breaks a uno-bot house rule. */
+const houseSlips: string[] = [];
+
+// uno-bot's own rule, not Slack's: Slack takes an alert at level `default`, but
+// draws it with the Slack logo, so a Review view that used it would read as
+// Slack's message. Held apart from `unread`, since Slack would not refuse it.
+afterEach(() => {
+  if (!houseSlips.length) return;
+  const seen = houseSlips.splice(0);
+  throw new Error(`A view broke a house rule: ${seen.join("; ")}`);
+});
+
+/** Note a view whose alert is at level `default`, which no uno-bot view uses. */
+function noteHouseSlips(call: string, view: unknown): void {
+  const blocks = (view as { blocks?: unknown })?.blocks;
+  if (!Array.isArray(blocks)) return;
+  if (blocks.some((b) => (b as { type?: unknown; level?: unknown })?.type === "alert" && (b as { level?: unknown }).level === "default")) {
+    houseSlips.push(`${call} with an alert at level default (use info)`);
+  }
+}
+
 /** Note a refusal: on the client's own list, and on the list the hook reads. */
 function refuse(list: SlackRefusal[], call: string, error: string): void {
   const refusal = { call, error };
@@ -169,6 +190,7 @@ export function recordingViews(opts: { openFails?: boolean; alreadyOpen?: string
   const client: ReviewViews = {
     async open(triggerId, view) {
       calls.push({ kind: "open", triggerId, view });
+      noteHouseSlips("views.open", view);
       if (opts.openFails) return null;
       const why = viewRefusal(view);
       if (why) {
@@ -181,6 +203,7 @@ export function recordingViews(opts: { openFails?: boolean; alreadyOpen?: string
     },
     async push(triggerId, view) {
       calls.push({ kind: "push", triggerId, view });
+      noteHouseSlips("views.push", view);
       const why = viewRefusal(view);
       if (why) {
         refuse(refused, `views.push with ${why}`, "invalid_arguments");
@@ -207,6 +230,7 @@ export function recordingViews(opts: { openFails?: boolean; alreadyOpen?: string
         return false;
       }
       calls.push({ kind: "update", viewId, view, ...(hash !== undefined ? { hash } : {}) });
+      noteHouseSlips("views.update", view);
       const why = viewRefusal(view);
       if (why) {
         refuse(refused, `views.update with ${why}`, "invalid_arguments");

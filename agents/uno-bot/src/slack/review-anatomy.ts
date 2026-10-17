@@ -33,7 +33,7 @@ export type WhereElement =
 
 /** A caveat, as the pop-up's alert says it. */
 export interface DraftAlert {
-  level: "default" | "info" | "warning" | "error" | "success";
+  level: "info" | "warning" | "error" | "success";
   text: string;
 }
 
