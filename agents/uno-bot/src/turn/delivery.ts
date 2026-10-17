@@ -409,6 +409,10 @@ export type GateNote =
       mention?: string;
     };
 
+/** The most cards one "which one?" question lists: Slack's limit on an
+ *  actions row, 25 elements, one button per card. */
+export const MAX_WHICH_CARDS = 25;
+
 /** One card a "which one?" question offers: its ts, which its button
  *  carries, and its headline, which the button reads (`agent/card-identity.ts`). */
 export interface WhichCard {
@@ -605,9 +609,10 @@ export interface Delivery {
    * Redraw an open "Approve which one?" question as it now stands
    * (`ThreadState.decideInWhichQuestion`): each decided card's line marked
    * and its button gone, the numbers unchanged, and no buttons at all once
-   * every card is decided. For the doors that decide a listed card anywhere
-   * but on the question, after the card is closed, so the question stops
-   * offering a decision already made. Posts nothing; best-effort.
+   * every card is decided. For every door that decides a listed card, after
+   * the card is closed, so the question stops offering a decision already
+   * made; a press on the question itself redraws it where it was pressed
+   * instead. Posts nothing; best-effort.
    */
   redrawWhichCard(question: WhichQuestion): Promise<void>;
 

@@ -310,8 +310,8 @@ export function createDurableObjectThreadState(
     },
 
     // One hop, one transaction, so of two doors deciding one card one redraws.
-    decideInWhichQuestion(cardTs: string): Promise<WhichQuestion | null> {
-      return hop().decideInWhichQuestion(cardTs, now());
+    decideInWhichQuestion(cardTs: string, questionTs?: string): Promise<WhichQuestion | null> {
+      return hop().decideInWhichQuestion(cardTs, questionTs, now());
     },
   };
 }

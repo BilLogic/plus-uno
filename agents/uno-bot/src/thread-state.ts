@@ -95,6 +95,7 @@ import {
   type BlueprintCheckOffer,
   type CheckOfferRecord,
   decidedInQuestion,
+  whichQuestionLive,
   whichCardKey,
   whichQuestionKey,
   type WhichCardPointer,
@@ -127,7 +128,6 @@ import {
   type ThreadRef,
 } from "./thread-state/store";
 import type { AssistantContext } from "./slack/types";
-import { cardLiveAt } from "./card-expiry";
 import {
   outageOnFailure,
   outageOnRelease,
@@ -378,16 +378,16 @@ export class ThreadState extends DurableObject<Env> {
         if (now - rec.at > CHECK_OFFER_KEEP_MS) await txn.delete(key);
         else remaining++;
       }
-      // A question lapses with its buttons, on the card rule from its put, and
-      // a card's pointer with it.
+      // A question lapses with its buttons, on the card rule from its own ts,
+      // and a card's pointer with the question it names.
       const questions = await txn.list<WhichQuestionRecord>({ prefix: "whq:" });
       for (const [key, rec] of questions) {
-        if (!cardLiveAt(rec.at, now)) await txn.delete(key);
+        if (!whichQuestionLive(rec.question.questionTs, rec.at, now)) await txn.delete(key);
         else remaining++;
       }
       const pointers = await txn.list<WhichCardPointer>({ prefix: "whc:" });
       for (const [key, rec] of pointers) {
-        if (!cardLiveAt(rec.at, now)) await txn.delete(key);
+        if (!whichQuestionLive(rec.questionTs, rec.at, now)) await txn.delete(key);
         else remaining++;
       }
       const filings = await txn.list<FilingRecord>({ prefix: "filing:" });
@@ -1109,31 +1109,32 @@ export class ThreadState extends DurableObject<Env> {
 
   async putWhichQuestion(question: WhichQuestion, at: number): Promise<void> {
     await this.storage.transaction(async (txn) => {
-      await txn.put<WhichQuestionRecord>(whichQuestionKey(question.questionTs), { question, at });
-      for (const card of question.cards) {
-        await txn.put<WhichCardPointer>(whichCardKey(card.ts), { questionTs: question.questionTs, at });
-      }
+      const entries: Record<string, WhichQuestionRecord | WhichCardPointer> = {
+        [whichQuestionKey(question.questionTs)]: { question, at },
+      };
+      for (const card of question.cards) entries[whichCardKey(card.ts)] = { questionTs: question.questionTs, at };
+      await txn.put(entries);
       await this.ensureGcAlarm(txn);
     });
   }
 
-  async decideInWhichQuestion(cardTs: string, at: number): Promise<WhichQuestion | null> {
+  async decideInWhichQuestion(cardTs: string, questionTs: string | undefined, at: number): Promise<WhichQuestion | null> {
     return this.storage.transaction(async (txn) => {
       const pointer = await txn.get<WhichCardPointer>(whichCardKey(cardTs));
-      if (!pointer) return null;
-      const key = whichQuestionKey(pointer.questionTs);
+      const target = questionTs ?? pointer?.questionTs;
+      if (!target) return null;
+      const key = whichQuestionKey(target);
       const rec = await txn.get<WhichQuestionRecord>(key);
       const { question, keep } = decidedInQuestion(rec, cardTs, at);
-      // The card is decided, or its question is gone: its pointer is spent.
-      await txn.delete(whichCardKey(cardTs));
-      if (keep) await txn.put<WhichQuestionRecord>(key, keep);
-      else {
+      // A card decided against the question its pointer names has spent it.
+      if (pointer?.questionTs === target) await txn.delete(whichCardKey(cardTs));
+      if (!keep) {
         await txn.delete(key);
-        for (const card of rec?.question.cards ?? []) {
-          const other = await txn.get<WhichCardPointer>(whichCardKey(card.ts));
-          if (other?.questionTs === pointer.questionTs) await txn.delete(whichCardKey(card.ts));
-        }
-      }
+        const keys = (rec?.question.cards ?? []).map((card) => whichCardKey(card.ts));
+        const pointers = keys.length ? await txn.get<WhichCardPointer>(keys) : new Map<string, WhichCardPointer>();
+        const stale = [...pointers].filter(([, other]) => other.questionTs === target).map(([k]) => k);
+        if (stale.length) await txn.delete(stale);
+      } else if (keep !== rec) await txn.put<WhichQuestionRecord>(key, keep);
       return question;
     });
   }

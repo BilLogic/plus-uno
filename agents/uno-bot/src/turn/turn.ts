@@ -1284,7 +1284,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       await delivery.endProgress("complete");
       const note = whichCardNote(result.askWhich, waiting);
       const said = await delivery.postGateNote(note);
-      await keepWhichQuestion(note, said, { channel: request.channel, ...(request.replyTs ? { replyTs: request.replyTs } : {}) }, threadState);
+      await keepWhichQuestion(note, said, request.channel, threadState);
       await memory.remember(said.text);
       return { disposition: "asked", posted: said.text, wrote: memory.wrote(), telemetry };
     }

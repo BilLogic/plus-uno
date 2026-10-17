@@ -1150,9 +1150,11 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
     // A card decided from anywhere but its own buttons ends as a press leaves
     // it: the outcome as its last line, onto its own blocks, and View. An edit
     // Slack refuses costs only the edit — the thread already has the verdict.
-    // It is the one cosmetic call in the delivery reserve, so it goes only
-    // when the turn's settle still fits after it: a turn near the cap keeps
-    // its clear, and the card keeps Review rather than the thread its 👀.
+    // It is one of the two cosmetic calls in the delivery reserve — the card,
+    // then any "which one?" question listing it (`redrawWhichCard`) — so it
+    // goes only when the turn's settle still fits after it: a turn near the
+    // cap keeps its clear, and the card keeps Review rather than the thread
+    // its 👀.
     async closeCard(card, outcome) {
       if (budgetHeadroom().subrequests < CLOSE_CARD_HEADROOM) {
         console.warn(`[slack] decided card ${channel}/${card.ts} left as it was: no headroom for the edit and the settle`);
@@ -1172,7 +1174,10 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
     // closed and the question keeps a button whose press says "already
     // decided". Rebuilt from the kept record, so nothing is read from Slack.
     async redrawWhichCard(question) {
-      if (question.channel !== channel) return;
+      if (question.channel !== channel) {
+        console.warn(`[slack] which-card question ${question.channel}/${question.questionTs} not redrawn from ${channel}`);
+        return;
+      }
       if (budgetHeadroom().subrequests < CLOSE_CARD_HEADROOM) {
         console.warn(`[slack] which-card question ${channel}/${question.questionTs} left as it was: no headroom for the edit and the settle`);
         return;

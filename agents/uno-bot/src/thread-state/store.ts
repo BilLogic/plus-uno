@@ -2020,8 +2020,8 @@ export interface ThreadState {
   /**
    * Keep a question as it was posted, under its message ts, and point each
    * card it lists at it. A card asked about again points at the newest
-   * question. Kept until its last card is decided, or for the card rule
-   * (`cardExpiresAt`) from the put, when its buttons lapse.
+   * question. Kept until its last card is decided, or until its buttons lapse
+   * on the card rule from its own ts (`whichQuestionLive`).
    */
   putWhichQuestion(question: WhichQuestion): Promise<void>;
 
@@ -2032,8 +2032,13 @@ export interface ThreadState {
    * door marked it already, or the question lapsed (and is dropped). So of
    * two doors deciding one card, one redraws. The question marked with its
    * last card comes back once more and is dropped.
+   *
+   * `questionTs` marks it on that question rather than the one the card's
+   * pointer names: a press on a question marks the question pressed, even
+   * when the card has since been asked about again or never got its own
+   * decision (it lapsed, or a revision replaced it).
    */
-  decideInWhichQuestion(cardTs: string): Promise<WhichQuestion | null>;
+  decideInWhichQuestion(cardTs: string, questionTs?: string): Promise<WhichQuestion | null>;
 }
 
 // ── The open "which one?" question ───────────────────────────────────────────
@@ -2047,8 +2052,6 @@ export interface WhichQuestion {
   /** The question's own message: the record's key, and what is edited. */
   questionTs: string;
   channel: string;
-  /** The reply thread it was posted in, when it was posted in one. */
-  replyTs?: string;
   decision: "confirm" | "cancel";
   cards: WhichCard[];
   /** The listed cards decided since, by ts, in the order they were. */
@@ -2078,12 +2081,28 @@ export function whichCardKey(cardTs: string): string {
 }
 
 /**
- * A card decided against the question its pointer names: the question as it
- * now stands, when this changed it, and the record to keep (null to drop it,
- * with its cards' pointers). A lapsed question changes nothing and is dropped;
- * one marked with its last card comes back and is dropped.
+ * Whether a question's buttons still answer at `at`: the card rule counted
+ * from the question's own ts, the one clock its door reads
+ * (`slack/which-card.ts`). A ts that is not Slack's — a test double's — is
+ * counted from when the question was put instead.
  *
- * @param rec - The question the card's pointer names, if it is still kept
+ * @param questionTs - The question's message ts
+ * @param putAt - When it was kept, epoch ms
+ * @param at - Now
+ */
+export function whichQuestionLive(questionTs: string, putAt: number, at: number): boolean {
+  const asked = Number.parseFloat(questionTs) * 1000;
+  return cardLiveAt(Number.isFinite(asked) ? asked : putAt, at);
+}
+
+/**
+ * A card decided against a kept question: the question as it now stands, when
+ * this changed it, and the record to keep — the same record when nothing
+ * changed, so nothing is written; null to drop it, with its cards' pointers.
+ * A lapsed question changes nothing and is dropped; one marked with its last
+ * card comes back and is dropped.
+ *
+ * @param rec - The question, if it is still kept
  * @param cardTs - The card decided
  * @param at - Now
  */
@@ -2092,7 +2111,7 @@ export function decidedInQuestion(
   cardTs: string,
   at: number,
 ): { question: WhichQuestion | null; keep: WhichQuestionRecord | null } {
-  if (!rec || !cardLiveAt(rec.at, at)) return { question: null, keep: null };
+  if (!rec || !whichQuestionLive(rec.question.questionTs, rec.at, at)) return { question: null, keep: null };
   const { question } = rec;
   if (!question.cards.some((card) => card.ts === cardTs) || question.decided.includes(cardTs)) return { question: null, keep: rec };
   const next = { ...question, decided: [...question.decided, cardTs] };

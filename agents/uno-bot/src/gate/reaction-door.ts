@@ -31,8 +31,8 @@ import { mapReaction } from "./reactions";
 import { isResolvingReaction, type AnswerReaction } from "../usage/resolution";
 import { thanksEmojiOf } from "../usage/appreciation";
 import type { ThreadState } from "../thread-state/index";
-import { withWorkingSignal, type Delivery } from "../turn/index";
-import { decidedCardOf, dropFromWhichQuestion, otherCardWaits, resolveSignal, type GateRestage, type GateVerdict } from "./gate";
+import { dropFromWhichQuestion, withWorkingSignal, type Delivery } from "../turn/index";
+import { decidedCardOf, otherCardWaits, resolveSignal, type GateRestage, type GateVerdict } from "./gate";
 
 /** One reaction, in the facts the envelope already has. */
 export interface ReactionRequest {

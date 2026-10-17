@@ -1642,6 +1642,18 @@ test("\"keep 2\" keeps only that fix; dropping every fix cancels the card", asyn
   assert.deepEqual(closed, [[SWEEP_CARD.proposalTs, { decision: "cancel", by: "U0OWNER" }]]);
 });
 
+test("dropping every fix of a sweep card a \"which one?\" lists drops it from that question too", async () => {
+  const all = harness();
+  await all.threadState.putProposal(SWEEP_CARD);
+  const cards = [{ ts: "1700000000.000999", headline: "Another card" }, { ts: SWEEP_CARD.proposalTs, headline: "Sweep fixes" }];
+  await all.threadState.putWhichQuestion({ questionTs: `${Math.floor(Date.now() / 1000)}.000500`, channel: SWEEP_CARD.channel, decision: "cancel", cards, decided: [] });
+
+  await runTurn(request({ text: "drop 1 and 2", pending: SWEEP_CARD, userId: "U0OWNER" }), all.deps);
+
+  const redrawn = all.delivery.calls.flatMap((c) => (c.kind === "redraw-which" ? [c.question.decided] : []));
+  assert.deepEqual(redrawn, [[SWEEP_CARD.proposalTs]]);
+});
+
 test("a fix number the sweep card does not have goes to the model", async () => {
   const h = harness({ replies: [{ text: "There are only two fixes on that card." }] });
   await h.threadState.putProposal(SWEEP_CARD);

@@ -609,20 +609,20 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       for (const card of question.cards) whichCards.set(card.ts, { questionTs: question.questionTs, at });
     },
 
-    async decideInWhichQuestion(cardTs) {
+    async decideInWhichQuestion(cardTs, questionTs) {
       const pointer = whichCards.get(cardTs);
-      if (!pointer) return null;
-      const rec = whichQuestions.get(pointer.questionTs);
+      const target = questionTs ?? pointer?.questionTs;
+      if (!target) return null;
+      const rec = whichQuestions.get(target);
       const { question, keep } = decidedInQuestion(rec, cardTs, now());
-      // The card is decided, or its question is gone: its pointer is spent.
-      whichCards.delete(cardTs);
-      if (keep) whichQuestions.set(pointer.questionTs, keep);
-      else {
-        whichQuestions.delete(pointer.questionTs);
+      // A card decided against the question its pointer names has spent it.
+      if (pointer?.questionTs === target) whichCards.delete(cardTs);
+      if (!keep) {
+        whichQuestions.delete(target);
         for (const card of rec?.question.cards ?? []) {
-          if (whichCards.get(card.ts)?.questionTs === pointer.questionTs) whichCards.delete(card.ts);
+          if (whichCards.get(card.ts)?.questionTs === target) whichCards.delete(card.ts);
         }
-      }
+      } else if (keep !== rec) whichQuestions.set(target, keep);
       return question ? structuredClone(question) : null;
     },
   };

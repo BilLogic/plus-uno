@@ -1434,7 +1434,7 @@ describe("the card a decision closes", () => {
   it("drops the card a reaction decided from the open \"which one?\" question that lists it, after closing the card", async () => {
     const threadState = await twoCards();
     const cards = [{ ts: "1700000000.000196", headline: "Session reflections" }, { ts: CARD_TS, headline: "Reflection redesign" }];
-    await threadState.putWhichQuestion({ questionTs: "1700000000.000300", channel: CHANNEL, replyTs: THREAD, decision: "confirm", cards, decided: [] });
+    await threadState.putWhichQuestion({ questionTs: `${Math.floor(Date.now() / 1000)}.000300`, channel: CHANNEL, decision: "confirm", cards, decided: [] });
     const delivery = recordingDelivery();
     await runReactionDoor(
       { channel: CHANNEL, messageTs: CARD_TS, glyph: "white_check_mark", userId: "U2" },

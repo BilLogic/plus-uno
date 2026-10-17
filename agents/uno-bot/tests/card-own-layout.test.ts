@@ -192,7 +192,7 @@ describe("a card decided outside its own buttons", () => {
 
   it("redraws the \"which one?\" question listing it from its record, in the same reserve as the card's edit", async () => {
     const question = {
-      questionTs: "1790000000.000300", channel: CHANNEL, replyTs: ROOT, decision: "cancel" as const,
+      questionTs: "1790000000.000300", channel: CHANNEL, decision: "cancel" as const,
       cards: [{ ts: "1790000000.000250", headline: "Other card" }, { ts: CARD, headline: "Sweep card" }], decided: [CARD],
     };
     const redrawWith = async (headroom: number) => {

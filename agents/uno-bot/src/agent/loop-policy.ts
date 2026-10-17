@@ -85,7 +85,9 @@ export const DELIVERY_RESERVE = 12;
 // the settle that clears the working signal after it. The edit is cosmetic and
 // the clear is not, so at the cap the card keeps Review and the clear goes.
 // The question's redraw asks the same after the card's edit has spent its
-// one, so near the cap the card is closed first and the question waits.
+// one, so near the cap the card is closed first and the question waits. On
+// the button and reaction doors the guard is conservative: their invocations
+// spend a handful of subrequests, so it is the turn it actually protects.
 export const CLOSE_CARD_HEADROOM = 2;
 // Lookups run under this limit; delivery runs unlimited against the real cap.
 export const LOOKUP_CEILING = SUBREQUEST_CAP - DELIVERY_RESERVE;
