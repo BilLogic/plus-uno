@@ -157,3 +157,35 @@ function isBalanced(s: string): boolean {
   const doubles = (s.match(/\*\*/g) ?? []).length;
   return backticks % 2 === 0 && doubles % 2 === 0;
 }
+
+/** Where `keepLastLine` cut a text: a line of its own. */
+const ELIDED = "…";
+
+/** The least head worth keeping beside a last line. */
+const MIN_HEAD = 80;
+
+/**
+ * A text cut to at most `limit` characters that keeps its opening and its last
+ * line, with `…` on a line of its own where the middle came out.
+ *
+ * For a message edited in place, whose last line is the news: a decided card's
+ * outcome, a gate note, "Expired". What reads the message back reads that line
+ * (`review-view.ts` § outcomeOf), so it is the one line never cut. The head is
+ * cut by `splitBalanced`, so a fence open at the cut is closed and no inline
+ * markup is left half open.
+ *
+ * A last line too long to keep beside any head is the one case the text is
+ * cut from its start alone.
+ *
+ * @param text - The whole text
+ * @param limit - The most characters it may have
+ */
+export function keepLastLine(text: string, limit: number): string {
+  if (text.length <= limit) return text;
+  const trimmed = text.trimEnd();
+  const at = trimmed.lastIndexOf("\n");
+  const last = at === -1 ? "" : trimmed.slice(at + 1);
+  const room = limit - last.length - ELIDED.length - 2;
+  if (!last.trim() || room < MIN_HEAD) return `${splitBalanced(trimmed, limit - ELIDED.length - 1)[0]!}\n${ELIDED}`;
+  return `${splitBalanced(trimmed.slice(0, at), room)[0]!}\n${ELIDED}\n${last}`;
+}
