@@ -1637,6 +1637,9 @@ test("\"keep 2\" keeps only that fix; dropping every fix cancels the card", asyn
   assert.equal(dropped.staged, undefined);
   assert.equal(all.provider.sends.length, 0);
   assert.notEqual((await all.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found");
+  // The card it canceled ends as a ⛔ press leaves it.
+  const closed = all.delivery.calls.flatMap((c) => (c.kind === "close-card" ? [[c.card.ts, c.outcome]] : []));
+  assert.deepEqual(closed, [[SWEEP_CARD.proposalTs, { decision: "cancel", by: "U0OWNER" }]]);
 });
 
 test("a fix number the sweep card does not have goes to the model", async () => {
@@ -2869,7 +2872,7 @@ test("a cancelled share-out re-staged for another place is a new card", async ()
 test("a cancelled share-out re-staged for the same place is still not re-proposed", async () => {
   const outcome = await afterCancel(cancelNote("shareout_post", { place: "feedback_channel" }), [shareout()]);
   assert.equal(outcome.disposition, "asked");
-  assert.match(outcome.posted ?? "", /You cancelled that share this for feedback a moment ago/);
+  assert.match(outcome.posted ?? "", /You canceled that share this for feedback a moment ago/);
 });
 
 test("a cancelled intake re-staged on another repo is a new card, and on the same repo is not", async () => {
@@ -3034,7 +3037,7 @@ async function inADm(
   const start = h.provider.start.bind(h.provider);
   h.provider.start = async (turn) => {
     // The note itself, or the state block's line for it (`deriveState`).
-    sawNote = turn.conversation.some((t) => t.text.includes("Cancelled the proposed") || /cancelled: [a-z_]+/.test(t.text));
+    sawNote = turn.conversation.some((t) => /Cancell?ed the proposed/.test(t.text) || /cancelled: [a-z_]+/.test(t.text));
     return start(turn);
   };
   const send = h.provider.send.bind(h.provider);

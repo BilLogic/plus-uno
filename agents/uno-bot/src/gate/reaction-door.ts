@@ -32,7 +32,7 @@ import { isResolvingReaction, type AnswerReaction } from "../usage/resolution";
 import { thanksEmojiOf } from "../usage/appreciation";
 import type { ThreadState } from "../thread-state/index";
 import { withWorkingSignal, type Delivery } from "../turn/index";
-import { otherCardWaits, resolveSignal, type GateRestage, type GateVerdict } from "./gate";
+import { decidedCardOf, otherCardWaits, resolveSignal, type GateRestage, type GateVerdict } from "./gate";
 
 /** One reaction, in the facts the envelope already has. */
 export interface ReactionRequest {
@@ -215,6 +215,9 @@ export async function runReactionDoor(
           console.error(`[gate] reaction post FAILED in ${channel} (thread=${post.replyTs})`);
         }
         await deps.applyVerdict(verdict);
+        // The card a reaction decided ends as a press leaves it (`decidedCardOf`).
+        const decided = decidedCardOf(verdict);
+        if (decided) await delivery.closeCard(decided.card, decided.outcome);
         if (verdict.restage) await deps.restage(verdict.restage, delivery);
       } catch (err) {
         // A reaction confirmation must NEVER die silently — that's the exact "✅

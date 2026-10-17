@@ -22,7 +22,9 @@ import { channelRefText, shareoutChannelRef } from "../tools/share-out-render";
  *  slow reply, and stops well short of a card's own hour-long life. */
 export const RECENT_CANCEL_MS = 30 * 60_000;
 
-const NOTE_RE = /\(Cancelled the proposed ([a-z_]+)(?: for ([^—)]+?))? — /;
+// Either spelling: the note is written "Canceled" now, and a thread's stored
+// history still holds notes written "Cancelled".
+const NOTE_RE = /\(Cancell?ed the proposed ([a-z_]+)(?: for ([^—)]+?))? — /;
 
 /** The target a tool's card names on its verb, as it compares: a share-out's
  *  place (a named channel by its id or lower-case name), an intake's repo by
@@ -46,7 +48,7 @@ function targetOf(toolName: string, input: Record<string, unknown>): string | nu
  *  one, the target. `context-state.ts` reads the tool back from the same note. */
 export function cancelNote(toolName: string, input: Record<string, unknown>): string {
   const target = targetOf(toolName, input);
-  return `(Cancelled the proposed ${toolName}${target ? ` for ${target}` : ""} — nothing was done.)`;
+  return `(Canceled the proposed ${toolName}${target ? ` for ${target}` : ""} — nothing was done.)`;
 }
 
 /** Whether `content` is a ⛔ note for this tool on this target. */
