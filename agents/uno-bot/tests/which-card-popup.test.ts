@@ -122,11 +122,11 @@ const listOf = (view: View) => view.blocks.find((b) => b.type === "input" && b.b
 type Select = { type: string; placeholder: { text: string }; options: Array<{ value: string; text: { text: string } }>; initial_option?: { value: string } };
 /** Every "Show a draft…" select in the view, and where each sits. */
 const draftSelects = (view: View) =>
-  view.blocks.flatMap((b, at) => (b.type === "actions" && b.elements?.[0]?.action_id === "uno_which_draft" ? [{ at, select: b.elements[0] as unknown as Select }] : []));
+  view.blocks.flatMap((b, at) => (b.type === "input" && b.element?.action_id === "uno_which_draft" ? [{ at, select: b.element as unknown as Select }] : []));
 /** Where Hide draft sits, or -1. */
 const hideAt = (view: View) => view.blocks.findIndex((b) => b.type === "actions" && b.elements?.[0]?.action_id === "uno_which_hide");
 const decisionOf = (view: View) =>
-  (view.blocks.find((x) => x.block_id === "uno_which_decision_block")!.elements![0] as { initial_option: { value: string }; options: Array<Record<string, unknown>> });
+  (view.blocks.find((x) => x.type === "input" && x.element?.action_id === "uno_which_decision")!.element as { initial_option: { value: string }; options: Array<Record<string, unknown>> });
 const noteOf = (view: View) => view.blocks.find((x) => x.block_id === "uno_which_note");
 const optionsOf = (view: View) => ((listOf(view).element!.options as Array<{ value: string; text: { text: string }; description: { text: string } }>));
 
@@ -290,6 +290,80 @@ test("a draft too long for the view is cut, and points at the card's own Review"
   assert.equal(shown.blocks.length <= 100, true);
   assert.ok(words(shown).includes(DRAFT_LEFT_OUT));
   assert.ok(noteOf(shown), "the note is never pushed out");
+});
+
+test("the pop-up keeps its choices in input blocks: no radio buttons, checkboxes or select in an actions block", async () => {
+  // Slack's mobile client drops a modal whose actions block holds a radio
+  // group, so every choice sits in an input block that dispatches its press.
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { a, question } = await asked(h);
+  clock.now = SOON;
+  const d = doors(h, clock);
+  const approve = (await choose(d, question))!;
+  const cancel = await redraw(d, approve, { kind: "decision", decision: "cancel" }, stateOf(approve, [a]));
+  const cancelDraft = await redraw(d, cancel, { kind: "draft", cardTs: a }, stateOf(cancel, [a]));
+  const back = await redraw(d, cancelDraft, { kind: "decision", decision: "confirm" }, stateOf(cancelDraft, [a]));
+  const approveDraft = await redraw(d, back, { kind: "draft", cardTs: a }, stateOf(back, [a]));
+
+  assert.deepEqual(d.views.refused, []);
+  const choices = new Set(["radio_buttons", "checkboxes", "static_select"]);
+  for (const view of [approve, cancel, cancelDraft, back, approveDraft]) {
+    const misplaced = view.blocks.filter((b) => b.type === "actions" && (b.elements ?? []).some((e) => choices.has(String(e.type))));
+    assert.deepEqual(misplaced, [], "no choice in an actions block");
+    const decision = view.blocks.find((b) => b.type === "input" && b.element?.action_id === "uno_which_decision")! as Block & {
+      dispatch_action?: unknown;
+      optional?: unknown;
+    };
+    assert.equal(decision.dispatch_action, true, "the switch redraws on a press");
+    assert.equal(decision.optional, undefined, "the switch is not optional");
+    const draft = view.blocks.find((b) => b.type === "input" && b.element?.action_id === "uno_which_draft")! as Block & {
+      dispatch_action?: unknown;
+      optional?: unknown;
+      label?: { text: string };
+    };
+    assert.equal(draft.dispatch_action, true, "a draft chosen redraws");
+    assert.equal(draft.optional, true, "Submit needs no draft open");
+    assert.equal(draft.label?.text, "Draft");
+  }
+  assert.ok(hideAt(approveDraft) > 0, "Hide draft stays a button");
+});
+
+test("the switch's and the select's block ids change with the decision and the open draft, so a redraw resets them", async () => {
+  // Slack keeps an input's own pick across a views.update while its block_id
+  // is unchanged and ignores the new initial_option, so the block_id carries
+  // what the redraw shows: after Hide draft the select reads empty again, and
+  // the same card chosen twice still fires.
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { a, b, question } = await asked(h);
+  clock.now = SOON;
+  const d = doors(h, clock);
+  const approve = (await choose(d, question))!;
+  const cancel = await redraw(d, approve, { kind: "decision", decision: "cancel" }, stateOf(approve, [a]));
+  const shownA = await redraw(d, cancel, { kind: "draft", cardTs: a }, stateOf(cancel, [a]));
+  const shownB = await redraw(d, shownA, { kind: "draft", cardTs: b }, stateOf(shownA, [a]));
+  const hidden = await redraw(d, shownB, { kind: "hide" }, stateOf(shownB, [a]));
+
+  const blockOf = (view: View, actionId: string) => view.blocks.find((x) => x.type === "input" && x.element?.action_id === actionId)!.block_id;
+  assert.equal(blockOf(approve, "uno_which_decision"), "uno_which_decision_confirm");
+  assert.equal(blockOf(cancel, "uno_which_decision"), "uno_which_decision_cancel");
+  assert.equal(blockOf(approve, "uno_which_draft"), "uno_which_draft_none");
+  assert.equal(blockOf(shownA, "uno_which_draft"), `uno_which_draft_${a}`);
+  assert.equal(blockOf(shownB, "uno_which_draft"), `uno_which_draft_${b}`);
+  assert.equal(blockOf(hidden, "uno_which_draft"), "uno_which_draft_none");
+});
+
+// A regression guard: Submit takes the decision from the metadata and reads
+// only the list and the note, so the switch's and the select's own values in
+// the state, there since they became inputs, never change the pick.
+test("Submit reads only the pick, whatever the switch and the select hold in the state", () => {
+  const state = {
+    values: {
+      uno_which_decision_cancel: { uno_which_decision: { selected_option: { value: "cancel" } } },
+      uno_which_draft_none: { uno_which_draft: { selected_option: { value: "1.2" } } },
+      uno_which_cards_confirm: { uno_which_cards_input: { selected_option: { value: "1.1" } } },
+    },
+  };
+  assert.deepEqual(whichSubmitOf(state, "confirm"), { ok: true, pick: { picked: ["1.1"], note: "" } });
 });
 
 test("Submit with nothing picked is an error under the list", () => {

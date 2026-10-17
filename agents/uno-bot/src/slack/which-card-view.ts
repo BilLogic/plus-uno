@@ -31,6 +31,16 @@
 // opens, so the drafts sit behind the one select, by headline, in the
 // list's order.
 //
+// EVERY CHOICE SITS IN AN INPUT BLOCK. The Approve / Cancel switch and "Show
+// a draft…" are input blocks with `dispatch_action`, so a press still arrives
+// as a `block_actions` and redraws the pop-up; only Hide draft, a button, is
+// in an actions block. Each one's block_id carries what it shows (the
+// decision, the open draft), since an input keeps its own pick across a
+// redraw under an unchanged block_id; presses are routed by action_id. On a phone, the pop-up with its switch in an actions
+// block opened blank while Review, whose radio buttons sit in an input block,
+// drew. Submit reads only the list and the note from the state; the decision
+// comes from the metadata.
+//
 // The view carries the question it answers in `private_metadata` — the
 // question's message, the decision, the cards it listed — so every press and
 // the Submit are read without the message.
@@ -51,10 +61,15 @@ export const WHICH_CALLBACK_ID = "uno_which_pick";
 
 /** The Approve / Cancel choice at the top; a change redraws the pop-up. */
 export const WHICH_DECISION_ACTION_ID = "uno_which_decision";
-const DECISION_BLOCK = "uno_which_decision_block";
+/** The switch's block, by the decision it shows: Slack keeps an input's own
+ *  pick across a redraw while its block_id holds, so a new id resets it. */
+const decisionBlock = (decision: Decision) => `uno_which_decision_${decision}`;
 
 /** "Show a draft…": each option's value is a card's ts. */
 export const WHICH_DRAFT_ACTION_ID = "uno_which_draft";
+/** The select's block, by the draft open, so Hide draft empties it and the
+ *  same card chosen again still fires. */
+const draftBlock = (shown: string | undefined) => `uno_which_draft_${shown ?? "none"}`;
 
 /** Hide draft, after the open draft. */
 export const WHICH_HIDE_ACTION_ID = "uno_which_hide";
@@ -239,11 +254,11 @@ export function whichView(
   const choice = DECISIONS.map(([value, text]) => ({ value, text: plain(text) }));
   const head: unknown[] = [
     {
-      type: "actions",
-      block_id: DECISION_BLOCK,
-      elements: [
-        { type: "radio_buttons", action_id: WHICH_DECISION_ACTION_ID, options: choice, initial_option: choice.find((c) => c.value === decision)! },
-      ],
+      type: "input",
+      block_id: decisionBlock(decision),
+      dispatch_action: true,
+      label: plain("Decision"),
+      element: { type: "radio_buttons", action_id: WHICH_DECISION_ACTION_ID, options: choice, initial_option: choice.find((c) => c.value === decision)! },
     },
     cards,
     { type: "divider" },
@@ -273,16 +288,18 @@ export function whichView(
   const drafts = waiting.map((card) => ({ value: card.proposalTs, text: plain(headlineOf(popup, card)) }));
   const open = waiting.find((card) => card.proposalTs === popup.shown);
   const select = {
-    type: "actions",
-    elements: [
-      {
-        type: "static_select",
-        action_id: WHICH_DRAFT_ACTION_ID,
-        placeholder: plain("Show a draft…"),
-        options: drafts,
-        ...(open ? { initial_option: drafts.find((o) => o.value === open.proposalTs)! } : {}),
-      },
-    ],
+    type: "input",
+    block_id: draftBlock(open?.proposalTs),
+    dispatch_action: true,
+    optional: true,
+    label: plain("Draft"),
+    element: {
+      type: "static_select",
+      action_id: WHICH_DRAFT_ACTION_ID,
+      placeholder: plain("Show a draft…"),
+      options: drafts,
+      ...(open ? { initial_option: drafts.find((o) => o.value === open.proposalTs)! } : {}),
+    },
   };
   const hide = { type: "actions", elements: [{ type: "button", action_id: WHICH_HIDE_ACTION_ID, text: plain("Hide draft"), value: "hide" }] };
   const room = MAX_VIEW_BLOCKS - head.length - tail.length - 2;
