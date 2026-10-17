@@ -64,6 +64,9 @@ function containerRefusal(block: Shape): string | null {
       if (why) return `${why} inside a container`;
     } else if (type === "rich_text" && !Array.isArray((child as Shape).elements)) {
       return "a rich_text without elements inside a container";
+    } else if (type === "rich_text") {
+      const why = richTextRefusal(child as Shape);
+      if (why) return `${why} inside a container`;
     }
   }
   return null;
@@ -339,6 +342,43 @@ function dataVisualizationRefusal(block: Shape): string | null {
   return null;
 }
 
+/** What a `rich_text` holds, per the rich text block reference (read
+ *  2026-10-17). blocks.validate on 2026-10-17 took a quote and a preformatted
+ *  run and refused a `rich_text_heading` there is no type for. */
+const RICH_TEXT_ELEMENTS: ReadonlySet<string> = new Set([
+  "rich_text_section", "rich_text_list", "rich_text_quote", "rich_text_preformatted",
+]);
+
+/** A list's `indent`, which Slack reads as a nesting level. The reference gives
+ *  no bounds; these were observed, not documented: blocks.validate on
+ *  2026-10-17 took 0 to 8 and refused 9, -1, 1.5 and "1". */
+const LIST_INDENT = { min: 0, max: 8 };
+
+/** Why Slack would refuse a `rich_text` block's elements, or null. The bounds
+ *  are observed, not documented: each is blocks.validate's verdict on
+ *  2026-10-17. A list's style is bullet or ordered ("numbered" refused), its
+ *  `offset` any whole number (1000 taken, -1 and 1.5 refused), its `border` 0
+ *  or 1 (2 refused), and it holds sections only, so a list inside a list was
+ *  refused: nesting is the next list's `indent`. */
+function richTextRefusal(block: Shape): string | null {
+  for (const element of block.elements as unknown[]) {
+    const type = isShape(element) ? String(element.type) : "non-object";
+    if (!RICH_TEXT_ELEMENTS.has(type)) return `a ${type} inside a rich_text`;
+    if (type !== "rich_text_list") continue;
+    const list = element as Shape;
+    if (list.style !== "bullet" && list.style !== "ordered") return `a rich_text_list of style ${String(list.style)}`;
+    const { indent, offset, border } = list;
+    if (indent !== undefined && !(Number.isInteger(indent) && (indent as number) >= LIST_INDENT.min && (indent as number) <= LIST_INDENT.max)) {
+      return `a rich_text_list indent of ${JSON.stringify(indent)}`;
+    }
+    if (offset !== undefined && !(Number.isInteger(offset) && (offset as number) >= 0)) return `a rich_text_list offset of ${JSON.stringify(offset)}`;
+    if (border !== undefined && border !== 0 && border !== 1) return `a rich_text_list border of ${JSON.stringify(border)}`;
+    const items = Array.isArray(list.elements) ? list.elements : [];
+    if (!items.every((i) => isShape(i) && i.type === "rich_text_section")) return "a rich_text_list holding something other than sections";
+  }
+  return null;
+}
+
 /** Why Slack would refuse one block, or null. */
 function blockRefusal(block: unknown): string | null {
   if (!isShape(block)) return "a block that is not an object";
@@ -350,6 +390,10 @@ function blockRefusal(block: unknown): string | null {
   }
   if (type === "markdown" && typeof block.text !== "string") return "a markdown block without text";
   if (type === "rich_text" && (!Array.isArray(block.elements) || !block.elements.length)) return "a rich_text without elements";
+  if (type === "rich_text") {
+    const why = richTextRefusal(block);
+    if (why) return why;
+  }
   if (type === "context") {
     const n = Array.isArray(block.elements) ? block.elements.length : 0;
     if (n < CONTEXT_ELEMENTS.min || n > CONTEXT_ELEMENTS.max) return `a context of ${n} elements`;

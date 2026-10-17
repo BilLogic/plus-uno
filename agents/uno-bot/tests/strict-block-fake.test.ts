@@ -190,6 +190,47 @@ describe("the strict fake holds a data_table to Slack's rules", () => {
   });
 });
 
+describe("the strict fake holds a rich text list to Slack's rules", () => {
+  const line = { type: "rich_text_section", elements: [{ type: "text", text: "a" }] };
+  const list = (over: Record<string, unknown> = {}) => ({
+    type: "rich_text",
+    elements: [{ type: "rich_text_list", style: "bullet", elements: [line], ...over }],
+  });
+
+  it("takes an indent of 0 to 8 and an offset of any whole number", async () => {
+    for (const over of [{ indent: 0 }, { indent: 8 }, { style: "ordered", offset: 0 }, { style: "ordered", offset: 1000 }, { border: 1 }]) {
+      assert.deepEqual(await verdicts([list(over)]), [], JSON.stringify(over));
+    }
+  });
+
+  it("refuses an indent past 8, a negative or fractional one, and one given as text", async () => {
+    for (const indent of [9, -1, 1.5, "1"]) assert.equal((await verdicts([list({ indent })])).length, 3, String(indent));
+  });
+
+  it("refuses a negative or fractional offset", async () => {
+    for (const offset of [-1, 1.5]) assert.equal((await verdicts([list({ style: "ordered", offset })])).length, 3, String(offset));
+  });
+
+  it("takes a list's style only as bullet or ordered, and its border only as 0 or 1", async () => {
+    assert.equal((await verdicts([list({ style: "numbered" })])).length, 3);
+    assert.equal((await verdicts([list({ border: 2 })])).length, 3);
+  });
+
+  it("refuses a list inside a list: nesting is an indent, not a child", async () => {
+    assert.equal((await verdicts([list({ elements: [{ type: "rich_text_list", style: "bullet", elements: [line] }] })])).length, 3);
+  });
+
+  it("holds a rich text list inside a container to the same rules", async () => {
+    const boxed = (over: Record<string, unknown>) => ({ type: "container", title: { type: "plain_text", text: "Sources" }, child_blocks: [list(over)] });
+    assert.deepEqual(await verdicts([boxed({ indent: 1 })]), []);
+    assert.equal((await verdicts([boxed({ indent: 9 })])).length, 3);
+  });
+
+  it("refuses a rich text element Slack has no type for", async () => {
+    assert.equal((await verdicts([{ type: "rich_text", elements: [{ type: "rich_text_heading", elements: [] }] }])).length, 3);
+  });
+});
+
 describe("the stream fake takes a named icon on a task", () => {
   // Any shape at all, past the type: judging it is the fake's job here.
   const task = (icon: unknown) => ({ id: "t1", title: "Reading Notion", status: "in_progress" as const, icon: icon as never });
