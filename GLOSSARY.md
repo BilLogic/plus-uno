@@ -151,6 +151,18 @@ _Avoid_: "confirmation dialog", "prompt", bare "card" where a Roadmap card could
 A proposal card retired by a later revision in its thread, or once a turn commits to writing one: it executes nothing and answers that it was replaced. Expired is different: the card's TTL ran out.
 _Avoid_: "expired card"
 
+**revision**:
+Of a proposal card: a new proposal card for the same matter as a waiting one — an edit, a change asked for in Review, notes added — that supersedes it and carries everything it held. Two cards aimed at the same Notion page or GitHub issue are always one matter.
+_Avoid_: "update card", "new version"
+
+**separate proposal**:
+A new proposal card for a different matter than any waiting in its thread; each is decided on its own, in any order.
+_Avoid_: "second card", "batch" (a batch is one card running several operations)
+
+**blueprint check**:
+The opt-in comparison of an idea against today's **uno-blueprint**, offered after its proposal card posts or a build is handed to the IDE; its result can become a revision of that card or a **blueprint proposal**.
+_Avoid_: "comparison" alone, "blueprint revision" (that is shipped work's)
+
 **sweep**:
 The end-of-day read of every source uno-bot watches, DMs with it included, for **drift** and each **commitment** (a task someone took on); the next weekday morning posts one message a place, each job's **decision cards** on it.
 _Avoid_: "digest", "scan"

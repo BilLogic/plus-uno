@@ -87,7 +87,7 @@ export async function redraftRevision(deps: RedraftDeps, reply: RevisionReply): 
   const note = reply.text.startsWith(NEEDS_CHANGES_LEAD) ? reply.text.slice(NEEDS_CHANGES_LEAD.length).trim() : null;
   if (note === null && (reply.mentionsBot || !isWording(withoutMentions(reply.text)))) return false;
   const thread = await deps.threads.read(reply.channel, reply.threadTs);
-  if (!thread || deps.now() >= thread.expiresAt) return false;
+  if (!thread || deps.now() > thread.expiresAt) return false;
   const say = async (text: string) => {
     await deps.post(thread.channel, thread.ts, text);
     return true;

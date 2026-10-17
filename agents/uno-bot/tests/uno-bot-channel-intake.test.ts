@@ -22,6 +22,10 @@ import { resolveSignal, runOperations, type GateSignal } from "../src/gate/index
 import { fileGithubIssue } from "../src/tools/github-issue";
 import type { CreatedIssue, GithubIssueClient, NewIssue } from "../src/integrations/github";
 import { CHANNEL, harness, postsOf, request } from "./helpers/turn-harness";
+import { cardTtlMs } from "../src/card-expiry";
+
+/** Tuesday 13 October 2026, 10:00 ET. */
+const TUESDAY_10_ET = Date.UTC(2026, 9, 13, 14, 0);
 
 const POSTER = "U1";
 /** The post itself: a top-level message, so the reply thread is its own ts. */
@@ -162,14 +166,17 @@ test("a reply in the intake thread names the thread's opener as the reporter, no
 
 test("a reply in the intake thread that refines the draft stages a revision, which supersedes the card", async () => {
   const revised = { ...DRAFT, body: `${DRAFT.body}\n\n**Also.** It happened twice today.` };
+  const call: Record<string, unknown> = { ...revised };
   const h = harness({
     replies: [
       { text: "Want me to file this?", toolCalls: [{ name: "github_issue_create", args: DRAFT }] },
-      { text: "Updated — want me to file this?", toolCalls: [{ name: "github_issue_create", args: revised }] },
+      { text: "Updated — want me to file this?", toolCalls: [{ name: "github_issue_create", args: call }] },
     ],
   });
   const first = await runTurn(intakePost(REPORT), h.deps);
   const originalTs = first.staged!.proposal.proposalTs;
+  // The model names the card it revises.
+  call.revises_card = originalTs;
   const pending = await h.threadState.getProposalByThread({ channel: CHANNEL, thread: POST_TS });
 
   const second = await runTurn(
@@ -211,13 +218,14 @@ test("the confirmers are the poster plus everyone who has replied, and the sende
   assert.deepEqual(intakeConfirmers({ participants: [] }, { requesterUserId: POSTER }, "U2"), [POSTER, "U2"]);
 });
 
-test("a card staged in #uno-bot admits the poster and the people in its thread, on the default lifetime", async () => {
+test("a card staged in #uno-bot admits the poster and the people in its thread, on the one rule's lifetime", async () => {
   const h = harness({
+    now: () => TUESDAY_10_ET,
     replies: [{ text: "Want me to file this?", toolCalls: [{ name: "github_issue_create", args: DRAFT }] }],
   });
   const outcome = await runTurn(intakePost(REPORT), h.deps);
   assert.deepEqual(outcome.staged!.proposal.confirmers, [POSTER]);
-  assert.equal(outcome.staged!.proposal.ttlMs, undefined, "the default TTL, not one of its own");
+  assert.equal(outcome.staged!.proposal.ttlMs, cardTtlMs(TUESDAY_10_ET), "the rule's, as every card's");
 });
 
 test("a card anywhere else has no confirmer set: anyone in the thread may confirm, as before", async () => {

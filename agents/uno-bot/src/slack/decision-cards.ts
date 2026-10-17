@@ -23,6 +23,7 @@
 import { carouselOf, logoFor } from "./answer-cards-block";
 import { escapeSlackText, toPlainText } from "./mrkdwn";
 import { cardLead, renderProposalCard } from "./proposal-render";
+import { deadlineBlock, deadlineLine } from "./card-deadline";
 import { textSections } from "./render";
 import { itemProposalKey } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
@@ -109,6 +110,8 @@ export interface DecisionReport extends ReportMessage {
   after?: unknown[];
   /** The opener's bullets, kept on the record (`DecisionReportRecord.ownerLines`). */
   ownerLines?: OwnerLine[];
+  /** Its items' deadline, kept on the record (`DecisionReportRecord.expiresAt`). */
+  expiresAt?: number;
 }
 
 /**
@@ -122,16 +125,22 @@ export interface DecisionReport extends ReportMessage {
  *   opener is then their bullets alone.
  * @param opts - `after`: blocks posted below the cards, such as a table;
  *   `channel`: where it posts, so a DM tags nobody; `ownerLines`: what the
- *   opener says of each owner, in place of their cards' titles
+ *   opener says of each owner, in place of their cards' titles; `expiresAt`:
+ *   when its items stop taking a decision, said under the cards
+ *   (`cardExpiresAt` of when it posts)
  */
 export function decisionReport(
   allItems: readonly ReportItem[],
   parent: string,
-  opts: { after?: unknown[]; channel?: string; ownerLines?: OwnerLine[] } = {},
+  opts: { after?: unknown[]; channel?: string; ownerLines?: OwnerLine[]; expiresAt?: number } = {},
 ): DecisionReport {
   const shown = allItems.slice(0, MAX_REPORT_ITEMS);
   const held = allItems.slice(MAX_REPORT_ITEMS);
-  const extra = { ...(opts.after?.length ? { after: opts.after } : {}), ...(opts.ownerLines?.length ? { ownerLines: opts.ownerLines } : {}) };
+  const extra = {
+    ...(opts.after?.length ? { after: opts.after } : {}),
+    ...(opts.ownerLines?.length ? { ownerLines: opts.ownerLines } : {}),
+    ...(opts.expiresAt !== undefined ? { expiresAt: opts.expiresAt } : {}),
+  };
   const message = reportMessage(reportRecord(opts.channel ?? "", "", { parent, shown, held, ...extra }, 0));
   return { ...message, parent, shown, held, ...extra };
 }
@@ -147,7 +156,7 @@ export function decisionReport(
 export function reportRecord(
   channel: string,
   messageTs: string,
-  report: Pick<DecisionReport, "parent" | "shown" | "held" | "after" | "ownerLines">,
+  report: Pick<DecisionReport, "parent" | "shown" | "held" | "after" | "ownerLines" | "expiresAt">,
   ttlMs: number,
 ): DecisionReportRecord {
   return {
@@ -159,6 +168,7 @@ export function reportRecord(
     ttlMs,
     ...(report.after?.length ? { after: report.after } : {}),
     ...(report.ownerLines?.length ? { ownerLines: report.ownerLines } : {}),
+    ...(report.expiresAt !== undefined ? { expiresAt: report.expiresAt } : {}),
   };
 }
 
@@ -370,16 +380,25 @@ export function reportMessage(record: DecisionReportRecord): ReportMessage {
     throw new Error(`a decision report holds at most ${MAX_REPORT_ITEMS} items; hold the rest back (decisionReport)`);
   }
   const head = headLine(record);
+  // Its deadline, under the cards, while any of them can still be decided
+  // (#1316): in each reader's timezone, and in ET in the text copy.
+  const open = record.entries.some((e) => e.state.kind === "open" || e.state.kind === "changes-asked");
+  const until = open && record.expiresAt !== undefined ? record.expiresAt : undefined;
   const drawn = [
     ...textSections(head),
     ...(record.entries.length ? [carouselOf(record.entries.map((e) => entryCard(e, record.channel)))] : []),
+    ...(until !== undefined ? [deadlineBlock(until)] : []),
     ...(record.after ?? []),
   ];
   // A report that posted plain stays plain: Slack refused its cards once.
   const blocks = record.plain ? plainReportBlocks(drawn) : drawn;
   // The fallback is mrkdwn and a card's words are plain text: escaped, so a
   // title holding `<!channel>` pings nobody from the notification either.
-  const text = [head, ...record.entries.map((e) => `• ${escapeSlackText(clip(e.item.title, CARD_TITLE_CHARS))}: ${e.state.kind === "expired" ? "Closed, no decision. " : ""}${escapeSlackText(shownAs(e, record.channel).body)}`)].join("\n");
+  const text = [
+    head,
+    ...record.entries.map((e) => `• ${escapeSlackText(clip(e.item.title, CARD_TITLE_CHARS))}: ${e.state.kind === "expired" ? "Closed, no decision. " : ""}${escapeSlackText(shownAs(e, record.channel).body)}`),
+    ...(until !== undefined ? [deadlineLine(until)] : []),
+  ].join("\n");
   return { text, blocks, ...(record.metadata ? { metadata: record.metadata } : {}) };
 }
 

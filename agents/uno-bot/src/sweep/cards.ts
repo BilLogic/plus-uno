@@ -15,7 +15,7 @@
 //
 // EACH FIX IS ITS OWN PROPOSAL: its card's Review opens it alone, decided in
 // the pop-up, and its card redraws in place. CONFIRMERS are the report's
-// owners plus everyone who posted in the thread, and each fix lives 72 hours,
+// owners plus everyone who posted in the thread, and each fix lives 24 weekday hours,
 // with no re-ping when it lapses. Each card names its owner, who is
 // @-mentioned; nobody else is.
 //
@@ -38,9 +38,7 @@ import type { CardFixes, ProposalCard } from "../turn/index";
 import { FOUND_BY_SEARCH, addedContent, saidAt, saidIn } from "./capture-lines";
 import { pickDestination, shareDestination, type Destination } from "./finding";
 import type { PendingFinding } from "./store";
-
-/** How long a sweep card stays confirmable. */
-export const SWEEP_CARD_TTL_MS = 72 * 60 * 60 * 1000;
+import { CARD_WINDOW_WORDS } from "../card-expiry";
 
 /** In-place replacements one card may hold. */
 export const MAX_ITEMS_PER_CARD = 10;
@@ -189,7 +187,7 @@ export const SHARE_CHANNEL_NAMES = Object.fromEntries(CHANNEL_ROLES.map((role) =
  *  says at the gate (`PendingProposal.stated`). */
 export const SHARE_CARD_WORDS: StatedCardWords = {
   cancelled: "Rejected, nothing posted",
-  expired: `That card closed after ${SWEEP_CARD_TTL_MS / 3_600_000} h with no decision, so nothing was posted.`,
+  expired: `That card closed after ${CARD_WINDOW_WORDS} with no decision, so nothing was posted.`,
 };
 
 /**
@@ -316,7 +314,7 @@ export function sweepIssue(f: PendingFinding): string {
 export function sweepItemWords(): StatedCardWords {
   return {
     cancelled: "Rejected, nothing written",
-    expired: "That fix closed after 72 h with no decision, so nothing was written.",
+    expired: `That fix closed after ${CARD_WINDOW_WORDS} with no decision, so nothing was written.`,
   };
 }
 
@@ -523,7 +521,7 @@ export function sweepCardPick(text: string, count: number): number[] | null {
  * next `drop N` names the card that reads N, under a head and a confirm line
  * whose counts are the revision's own. The confirmers' sentence is the card's,
  * since the same people may confirm; the revision keeps its card's deadline,
- * so the "expires in" hours are not repeated.
+ * which it states under its fixes (`ProposalCard.expiresAt`).
  *
  * @param fixes - The card's fixes, as staged with it
  * @param kept - The 0-based indexes kept (`sweepCardPick`), in card order
@@ -535,9 +533,7 @@ export function keptFixes(fixes: CardFixes, kept: readonly number[]): CardFixes 
     return { ...fix, detail: fix.detail.replace(/^\d+\. /, `${i + 1}. `) };
   });
   const applies = `One ✅ applies ${n === 1 ? "it" : `all ${n}`}${n === 1 ? "." : "; reply `drop 2` to leave one out."}`;
-  const tail = fixes.tail
-    .replace(/One ✅ applies (?:it|all \d+); reply `drop 2` to leave one out\./, applies)
-    .replace(/Expires in \d+ h, with no reminder\./, "Expires when the card it revises would have, with no reminder.");
+  const tail = fixes.tail.replace(/One ✅ applies (?:it|all \d+); reply `drop 2` to leave one out\./, applies);
   return { head: `**${SWEEP_CARD_MARK}** — revised: ${n === 1 ? "one fix" : `${n} fixes`} left.`, items, tail };
 }
 

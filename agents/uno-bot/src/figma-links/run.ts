@@ -73,11 +73,10 @@ import {
   type DevLinksSubject,
   type DevLinksWrite,
 } from "./copy";
+import { cardExpiresAt, cardTtlMs } from "../card-expiry";
 
 export type { DevLinkRegistry } from "./links";
 
-/** How long a card stays decidable. */
-export const DEV_LINKS_CARD_TTL_MS = 3 * 24 * 60 * 60 * 1000;
 
 /** What a run is asked for. */
 export type DevLinksRequest =
@@ -296,11 +295,11 @@ export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksReque
   }
 
   const { subject, write } = planned;
-  const report = decisionReport([devLinksItem(subject, write)], devLinksParent(subject));
+  const report = decisionReport([devLinksItem(subject, write)], devLinksParent(subject), { expiresAt: cardExpiresAt(now) });
   const sent = await deps.post({ text: report.text, blocks: report.blocks });
   if (!sent.ok || !sent.ts) return { posted: false, cards: 0, retry: true, summary: `the message did not post${tail}` };
   const ts = sent.ts;
-  const recorded = await deps.reports.putReport(reportRecord(deps.channel, ts, report, DEV_LINKS_CARD_TTL_MS)).then(
+  const recorded = await deps.reports.putReport(reportRecord(deps.channel, ts, report, cardTtlMs(now))).then(
     () => true,
     () => false,
   );
@@ -328,7 +327,7 @@ export async function runDevLinksPost(deps: DevLinksDeps, request: DevLinksReque
 export async function markCarded(deps: Pick<DevLinksDeps, "carded">, id: string, ts: string, now: number): Promise<void> {
   // Marks past their time go as a new one is kept.
   const carded = Object.fromEntries(Object.entries((await deps.carded.read()) ?? {}).filter(([, mark]) => closesOf(mark) > now));
-  carded[id] = { closes: now + DEV_LINKS_CARD_TTL_MS, ts };
+  carded[id] = { closes: cardExpiresAt(now), ts };
   await deps.carded.write(carded);
 }
 
@@ -363,9 +362,8 @@ export function stagedDevLinks(
     proposalText: renderProposalCard(card).text,
     // Nobody asked: the Worker staged it.
     requesterUserId: "",
-    ttlMs: DEV_LINKS_CARD_TTL_MS,
     confirmers: [...confirmers],
-    stated: devLinksCardWords(DEV_LINKS_CARD_TTL_MS / 3_600_000),
+    stated: devLinksCardWords(),
     refuseRevision: DEV_LINKS_REVISION_REFUSAL,
     facts: devLinksFacts(subject, write),
   };

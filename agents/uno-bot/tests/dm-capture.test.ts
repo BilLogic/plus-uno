@@ -618,7 +618,8 @@ describe("a DM finding", () => {
     const w = world();
     await turnOn(w, MAYA, [CAPTURE_FEATURE]);
     await runDmCaptureRead(readJob(MAYA), readDeps(w));
-    await runDmCapturePost(postJob(MAYA), postDeps(w));
+    // Posted late in Wednesday's 09:00 ET run, so it is still live early in Thursday's.
+    await runDmCapturePost(postJob(MAYA), postDeps(w, at(30, 13, 45)));
     const card = w.staged[0]!;
     // A new decision the next day, and the same fix said again.
     w.messages.get(DM_BEA)!.push(
@@ -648,7 +649,7 @@ describe("a DM finding", () => {
     await runDmCapturePost(postJob(MAYA), postDeps(w));
     const post = w.posts[0]!;
     assert.ok(post.text.startsWith("Your DMs settled 2 things your pages don't say yet."), post.text);
-    assert.equal((post.blocks as Array<{ type: string }>).at(-1)?.type, "carousel");
+    assert.deepEqual((post.blocks as Array<{ type: string }>).slice(-2).map((b) => b.type), ["carousel", "context"], "the cards, then when they expire");
     assert.deepEqual(
       cardsIn(post.blocks).map((c) => c.body.text),
       ["Page says “Launch date: October 15” · decision says “Launch date: November 1”", "Page says “Owner: design team” · decision says “Owner: Kai”"],

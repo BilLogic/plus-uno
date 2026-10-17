@@ -29,13 +29,13 @@ The **sweep** is uno-bot's end-of-day read of the design channels for **drift**:
 A finding takes the posting ladder (`docs/connectors/slack/overview.md` § The posting ladder), and reaches only people who could already see its evidence (ADR-031):
 
 - **Private channel:** the card goes in the source thread there, its owner and confirmers are people in that channel, and its text, links and names appear in no other message.
-- **Group DM:** the report goes back in that group DM, and a fix's Approve applies that fix only. Once a fix has written a page, a separate **share card** follows in the same thread. It shows the exact note and names its channel (rung 3 or 4): the page's name and link, with no quote and no names. It is decided from Review: Approve posts that note, Reject drops it. It has the fix's confirmers and 72 h. A re-staged fix offers no share.
+- **Group DM:** the report goes back in that group DM, and a fix's Approve applies that fix only. Once a fix has written a page, a separate **share card** follows in the same thread. It shows the exact note and names its channel (rung 3 or 4): the page's name and link, with no quote and no names. It is decided from Review: Approve posts that note, Reject drops it. It has the fix's confirmers and 24 weekday hours. A re-staged fix offers no share.
 - **DM with uno-bot:** the card goes back in that DM, for its person alone (§ DMs with uno-bot).
 - **Mixed evidence:** a fix found both in a public thread and in a private place goes only on the private report. A DM with uno-bot is the exception: it takes nothing off a channel card.
 
 ## The report
 
-- **Timing:** the report posts at the next weekday morning run (9 am ET), so its 72 h start when people can act on it.
+- **Timing:** the report posts at the next weekday morning run (9 am ET), so its 24 weekday hours start when people can act on it.
 - **The shape:** the shared decision card (`docs/connectors/slack/overview.md` § Two gates). A parent line says in one plain sentence what the sweep found: one fix names its source and page ("A card comment settled something that *Session Wrap-up PRD* still states the old way."), several count the pages ("3 pages still state what their threads changed."). Then one card per fix, a carousel when there are several: the page as its title, its owner and where it was said ("@Bea · from this thread", "from the running notes", "from a card comment", plus "page found by search"), and "Page says … · decision says …" as its body, each half clipped on its own so the decision always shows. Each card has **Review** and **Open page**. The parent line carries no mark and no instructions: the buttons are the instructions.
 - **Each fix is its own proposal.** Review opens that fix alone and shows its whole change: the page and owner, "Page says now", "Will say" (or where an answer goes and what it adds), and where it was said with its link. Approve writes that one block, Reject drops it, and the card redraws in place: "Approved by @X · written 9:41" with what the page now says, or "Rejected by @X". The other cards wait on their own decisions.
 - **One live report per thread,** holding up to 10 fixes. More fixes, and a later day's fixes for a thread whose report is still live, wait in the queue until every fix on it is decided or expires, then go out on the next one; the parent line says "Showing 10 of N". A fix the thread has already had on a report (proposed, dropped or applied) is left off later ones.
@@ -46,7 +46,7 @@ A finding takes the posting ladder (`docs/connectors/slack/overview.md` § The p
 - **Whole blocks only:** the detector sees every block it may rewrite in full, and a block too long for that is left alone. A drafted fix that carries a truncation mark, or comes back much shorter than its block when no one in the thread asked for a removal, is discarded.
 - **Owner:** each fix names one owner, who is @-mentioned. That is whoever claimed or did the work in the thread; failing that, the linked card's `Contributor`; failing that, the thread starter.
 - **Who can decide:** the owners plus everyone who posted in the thread, and the team's standing confirmers. Anyone else's Submit gets the line naming who can.
-- **Expiry:** after 72 hours undecided, a fix closes with nothing written and no re-ping. Review's last line says both: "Open until Mon 9:00 ET · @Ade or @Bea can decide."
+- **Expiry:** after 24 weekday hours undecided (ET, Saturday and Sunday skipped), a fix closes with nothing written and no re-ping. Review's last line says both: "Open until Mon 9:00 ET · @Ade or @Bea can decide."
 - **Where Slack refuses cards,** the report posts as plain sections, one per fix with its own Review, and stays plain on every redraw.
 - **A fix that did not stage** says so on its card, with nothing to review, and comes back in the next morning's report.
 
@@ -79,7 +79,7 @@ In a thread uno-bot entered through a sweep report, it answers a reply only when
 - **Needs changes revises one fix in place.** Its note reaches you as "Needs changes on the proposal card above: …"; restage that fix's own `notion_update` with the line narrowed or reworded as the note asks — the same block, the same `last_edited_time`, a `replace` only. The revision takes the fix's card in the report under the same number, for the time the fix had left. A batch reaching another block, moving the stamp, or adding a line is refused and the fix stays as drafted. A fix that adds an answer is decided as drafted: Reject it with what it should say.
 - **A reply in the thread that would change a fix** is pointed at that fix's Review and its Needs changes; nothing is staged beside it.
 
-Every item is recorded in `sweep_items` as confirmed, dropped, refused because the block had moved, refused because the block can no longer take a text replace, or failed. An item still proposed 72 h after its report posted is one that expired.
+Every item is recorded in `sweep_items` as confirmed, dropped, refused because the block had moved, refused because the block can no longer take a text replace, or failed. An item still proposed 24 weekday hours after its report posted is one that expired.
 
 ## Drift in a read-only file
 
@@ -91,7 +91,7 @@ When a thread settles something a linked Figma file, `design-system/` code, Stor
 - **The drafted intakes:** each card is its own proposal, holding one intake. Review offers **File an intake**, **Already updated** and **Didn't touch this file**. Filing creates a Roadmap card from the PRD template (`notion_create`, surface `prd`) for a Figma file, or a `harness-intake` issue (`github_issue_create`) for code or a repo file; the other answers close the card with nothing written. Review is the only way to decide a card: a typed reply, an emoji or the model's call decides none. Cards posted before these choices keep Approve/Reject. The Product Pillar is only ever a value the Roadmap already offers, taken from a Roadmap card the thread linked (Universal for the design-system library). An unknown value is left out, and Review says so.
 - **The public repo:** an issue drafted from a private channel, a group DM or a DM carries only the file and one neutral line, with no thread words and no link back. Any `@handle` in an issue's text is set in code. A Roadmap card from a private channel carries the thread's words after an Approve from someone in it.
 - **One intake per file:** when several threads discussed the same file, the first gets its card and the others get a one-line pointer to that card's thread, with no card. A thread whose files are all drafted elsewhere gets the thread's line and its pointers alone, which ping nobody. While that card is live, a new thread about the file gets the pointer too, and a thread whose own drift card is live waits for it. Each thread is asked about a given file once.
-- **Terms:** a card's confirmers are its file's owner, its mentioned publisher, and everyone who posted in the threads that discussed it that morning; the Review pop-up names who can decide. It's open for 72 h, then redraws to "Closed, no decision" with View instead of Review. It gets no re-ping; a late decision is told nothing was filed.
+- **Terms:** a card's confirmers are its file's owner, its mentioned publisher, and everyone who posted in the threads that discussed it that morning; the Review pop-up names who can decide. It's open for 24 weekday hours, then redraws to "Closed, no decision" with View instead of Review. It gets no re-ping; a late decision is told nothing was filed.
 
 ## DMs with uno-bot
 

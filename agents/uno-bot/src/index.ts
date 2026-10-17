@@ -7,7 +7,7 @@
 // it reads only the build id, and monitoring watches it.
 import type { Env } from "./types";
 import { verifySlackSignature } from "./slack/verify";
-import { handleSlackEnvelope, handOffCutOffRunsFor, handOffExpiredReportsFor, type SlackEnvelope } from "./slack/events";
+import { handleSlackEnvelope, handOffCutOffRunsFor, handOffExpiredCardsFor, handOffExpiredReportsFor, type SlackEnvelope } from "./slack/events";
 import { ThreadState as ThreadStateObject } from "./thread-state";
 import { handleSlashCommand } from "./slack/commands";
 import { parseInteraction, handleInteraction } from "./slack/interactive";
@@ -190,12 +190,17 @@ async function handleSlackInteractiveRequest(
 
 /**
  * The ThreadState Durable Object, with its alarm's one Worker-side dependency
- * bound by name: cut-off runs and overdue reports go to AgentRunner, which
- * tells or redraws them outside the owning object's input gate.
+ * bound by name: cut-off runs, overdue reports and aged-out cards go to
+ * AgentRunner, which tells, redraws or edits them outside the owning
+ * object's input gate.
  */
 export class ThreadState extends ThreadStateObject {
   constructor(state: DurableObjectState, env: Env) {
-    super(state, env, { handOffCutOffRuns: handOffCutOffRunsFor(env), handOffExpiredReports: handOffExpiredReportsFor(env) });
+    super(state, env, {
+      handOffCutOffRuns: handOffCutOffRunsFor(env),
+      handOffExpiredReports: handOffExpiredReportsFor(env),
+      handOffExpiredCards: handOffExpiredCardsFor(env),
+    });
   }
 }
 export { AgentRunner } from "./agent-runner";

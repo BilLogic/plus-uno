@@ -804,7 +804,7 @@
   },
   {
     "name": "proposal_resolve",
-    "description": "Resolve a side-effect proposal that is awaiting confirmation. Use it when the system prompt shows a pending proposal AND the user's current message is a decision about it, in whatever words — a yes ('go ahead', 'sure', 'ok', 'sounds good', 'yep do it') confirms; a no ('cancel', 'no', 'scrap it') cancels. Anyone in the thread may confirm or cancel, not just the original requester. A message that asks for a change, or asks something unrelated, gets a conversational reply instead, and the proposal sits until someone presses ✅ / ⛔ on the card, reacts, or it expires after 60 minutes.",
+    "description": "Resolve a side-effect proposal that is awaiting confirmation. Use it when the system prompt shows a pending proposal AND the user's current message is a decision about it, in whatever words — a yes ('go ahead', 'sure', 'ok', 'sounds good', 'yep do it') confirms; a no ('cancel', 'no', 'scrap it') cancels. Anyone in the thread may confirm or cancel, not just the original requester. A message that asks for a change, or asks something unrelated, gets a conversational reply instead, and the proposal sits until someone presses ✅ / ⛔ on the card, reacts, or it expires 24 weekday hours after it was staged.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -819,6 +819,10 @@
             "cancel"
           ],
           "description": "'confirm' to proceed with the proposed action as-is. 'cancel' to stop or change direction (for a parameter change, cancel then stage a fresh proposal)."
+        },
+        "card": {
+          "type": "string",
+          "description": "The id of the card this decides, as <pending_proposal> lists it. Required when more than one card is waiting; with one, it may be left out. If the person did not say which card they mean, do not guess: leave it out and end your turn, and they are asked which with a button per card."
         },
         "message_to_user": {
           "type": "string",

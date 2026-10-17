@@ -15,6 +15,7 @@ import { runLoop, type LoopBudget } from "../../src/agent/loop";
 import { fakeProvider, type FakeProvider, type ScriptedReply } from "../../src/agent/providers/fake";
 import { buildProviderConversation } from "../../src/agent/provider-conversation";
 import { referenceHitOf } from "../../src/agent/run-agent";
+import { pendingContextOf, renderPendingBlock } from "../../src/agent/skills";
 import { readReference } from "../../src/tools/read-reference";
 import {
   recordingDelivery,
@@ -302,9 +303,17 @@ export function harness(opts: {
           req.images ?? [],
           req.historicalImages,
         ),
-        system: [{ text: "(harness)", stable: true }],
+        // The pending-proposal block production builds (`agent/skills.ts`),
+        // so a case can read which waiting cards the model was shown.
+        system: [
+          { text: "(harness)", stable: true },
+          ...(req.liveCards.length
+            ? [{ text: renderPendingBlock(req.liveCards.map(pendingContextOf), req.currentSender), stable: false }]
+            : []),
+        ],
         tools: [],
         pending: req.pending,
+        liveCards: req.liveCards,
         currentSenderId: req.currentSender.userId,
         cancelKey: opts.cancelKey ?? null,
         ...(req.onInterim ? { onInterim: req.onInterim } : {}),
@@ -397,6 +406,10 @@ export function harness(opts: {
       },
       async issueTarget(input) {
         return opts.issueTarget?.(input) ?? { repo: ISSUE_REPO, visibility: "public" };
+      },
+      // Absent is the default repo, as the executor's resolver reads it.
+      issueRepo(repo) {
+        return typeof repo === "string" && repo.trim() ? repo.trim() : ISSUE_REPO;
       },
       async workflowTarget(input) {
         const repo = typeof input.repo === "string" && input.repo ? input.repo : ISSUE_REPO;

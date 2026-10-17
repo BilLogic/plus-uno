@@ -34,6 +34,8 @@ import type { ChannelRole } from "../destination/index";
 import type { AssistantContext } from "../slack/types";
 import type { VisionReference } from "../slack/vision-reference";
 import type { CardFixes } from "../turn/delivery";
+import type { ConversationType } from "../turn/turn";
+import { cardTtlMs } from "../card-expiry";
 
 export type { AssistantContext, VisionReference };
 
@@ -54,11 +56,11 @@ export const MAX_HISTORY_TURNS = 50;
 /** How long a conversation is remembered. */
 export const HISTORY_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
-/** How long a staged proposal stays confirmable, unless it carries its own
- *  `ttlMs` — read it through `proposalTtlMs`. 60 min, not 15: the gate waits
- *  on a HUMAN, and live 2026-07-10 a designer's delayed ✅ landed on an expired
- *  card and nothing happened. An hour tolerates meetings; the gate — not the
- *  clock — is still the safety. */
+/** How long a card stored WITHOUT a `ttlMs` stays confirmable: the hour every
+ *  turn's card got before the one expiry rule (#1315). Since then the store
+ *  stamps every staging with the rule (`stampedTtl`), so only a record stored
+ *  before it is read by this — it keeps the deadline it was staged with. Read
+ *  through `proposalTtlMs`. */
 export const PROPOSAL_TTL_MS = 60 * 60 * 1000;
 
 /** How long a decided card is kept for Review's View, counted from the
@@ -119,7 +121,7 @@ export const CUT_OFF_SWEEP_RETRY_MS = 2 * 60 * 1000;
 /**
  * How long the alarm keeps looking at one cut-off run, whatever the card's own
  * TTL: the hour, or the TTL when that is shorter. Each look re-arms the alarm
- * `CUT_OFF_SWEEP_RETRY_MS` out, so a 72 h card measured by its TTL would be
+ * `CUT_OFF_SWEEP_RETRY_MS` out, so a weekend card (72 h) measured by its TTL would be
  * retried about 2,160 times on a hand-off that keeps failing; capped, about 30.
  * A person's own look — a press, a reaction, the next turn in the thread — can
  * still take the record for the card's whole TTL.
@@ -250,8 +252,10 @@ export interface PendingProposal {
   notionPrdId?: string;
   notionPrdUrl?: string;
   /**
-   * How long this card stays confirmable, when it is not the hour every turn's
-   * card gets (`PROPOSAL_TTL_MS`). Read through `proposalTtlMs`, and by every
+   * How long this card stays confirmable. Stamped by the store at staging from
+   * the one expiry rule (`card-expiry.ts`) unless the stager set it — a revision
+   * in place that keeps what is left of its card's window does; absent only on
+   * a record stored before the rule (`PROPOSAL_TTL_MS`). Read through `proposalTtlMs`, and by every
    * TTL decision the module makes about the record: the lookups, the cut-off
    * window of the execution it becomes, and the garbage collection — which
    * runs daily, so a longer-lived card measured by the default would be
@@ -316,15 +320,20 @@ export interface PendingProposal {
    */
   fixes?: CardFixes;
   /**
-   * The card's own slot within its reply thread (`proposalSlot`). Absent —
-   * every turn's card — the card holds the thread's slot, and cards there
-   * replace one another. A card the Worker stages into a thread people also
-   * talk in sets one — `"sweep"` for an end-of-day sweep card, a report
-   * item's own key for each card of a decision report — so it and a turn's card stay live side
-   * by side, and only a card with the same key replaces it. A turn's batch
-   * revises it only when it touches it (`turn/turn.ts`); while both are live,
-   * a typed ✅ resolves the thread's newer card, as `getProposalByThread`
-   * always answers, and a reaction or button resolves the card it is on.
+   * The card's own slot within its reply thread (`proposalSlot`), and so its
+   * MATTER: a card and every revision of it share one key, and only a card
+   * with the same key replaces it. A turn's card is keyed by the first card
+   * of its matter (`turnCardKey`), so each separate proposal is live beside
+   * the others and a revision is staged into the slot of the card it
+   * supersedes (`turn/card-matter.ts`). A card the Worker stages into a
+   * thread people also talk in sets its own — `"sweep"` for an end-of-day
+   * sweep card, a report item's own key for each card of a decision report;
+   * a turn's batch revises it only when it touches it (`turn/turn.ts`).
+   * Absent only on a turn's card staged before keys were (#1318): it holds
+   * the thread's slot, and a revision of it stays there. While several are
+   * live, a typed ✅ resolves the thread's newer card, as
+   * `getProposalByThread` always answers, and a reaction or button resolves
+   * the card it is on.
    */
   supersedeKey?: string;
   /**
@@ -355,6 +364,14 @@ export interface PendingProposal {
    * (`ProposalEvent.revisesProposalId`).
    */
   revisesProposalTs?: string;
+  /**
+   * What the staging turn made this card: a `revision` of a waiting card or a
+   * `separate` proposal (`turn/card-matter.ts`). Absent on a card the Worker
+   * staged, or staged before this field. Read only by the usage record: the
+   * next card in the thread reads it to tell whether it undid that call
+   * (`correctedCard`).
+   */
+  stagedAs?: "revision" | "separate";
   /**
    * Set on one item of a decision report (`slack/decision-cards.ts`): the
    * message its card is in, and its id there. Several items share one
@@ -672,6 +689,11 @@ export interface DecisionReportRecord {
   /** The Slack message metadata it posted with, sent again on every edit so
    *  the tag a later search finds it by stays. */
   metadata?: { event_type: string; event_payload: Record<string, unknown> };
+  /** When its items stop taking a decision, epoch ms — the one rule's
+   *  deadline from when it posted (`cardExpiresAt`), which its items are
+   *  staged on. Shown as "Expires …" while any item is open (#1316); absent
+   *  on a report posted before it was kept. */
+  expiresAt?: number;
 }
 
 /** The key one item of a report's proposal is staged under: its message and
@@ -703,6 +725,120 @@ export interface ReportExpiryRecord {
 export interface ReportExpiryLook { expiresAt: number; executing: boolean }
 export interface ReportExpiryEdit { report: DecisionReportRecord; revision: number }
 export const REPORT_EXPIRY_RETRY_MS = 2 * 60 * 1000;
+
+// ── A card's own expiry edit (#1316) ─────────────────────────────────────────
+//
+// A card that ages out with nobody touching it is edited to say so at its
+// deadline: "Expired. Ask again for a fresh card." The store's alarm finds it
+// (`cardExpiryDueAt`) and hands it over, and a runner job edits the message
+// outside this store (`slack/card-expiry-edit.ts`), as a report's redraw is:
+// prepare, edit, acknowledge. Until acknowledged the record is kept — a late
+// gesture's lookup still reads it as expired without collecting it — so the
+// edit can be retried; once acknowledged it is collected as every aged-out
+// card is. A report's item is its report's to redraw, and a decided, replaced
+// or retired card already says what became of it, so none of those is owed.
+
+/** How long past its deadline a card's expiry edit is still tried. A day:
+ *  the alarm comes back every `REPORT_EXPIRY_RETRY_MS` while one is owed, so
+ *  only a message Slack keeps refusing gets anywhere near it. */
+export const CARD_EXPIRY_EDIT_GRACE_MS = 24 * 60 * 60 * 1000;
+
+/** How long a card handed over for its expiry edit is left to its job before
+ *  the alarm hands it over again (`takeCardExpiries`): long enough that a job
+ *  still queued is not doubled on every `REPORT_EXPIRY_RETRY_MS` pass, short
+ *  enough that a job lost on the way is retried well inside the grace. */
+export const CARD_EXPIRY_HANDOFF_RETRY_MS = 10 * 60 * 1000;
+
+/** What a proposal record says about its card, as the expiry edit reads it. */
+export interface CardExpiryMarks {
+  createdAt: number;
+  decided?: unknown;
+  supersededBy?: string;
+  retired?: boolean;
+  /** Set once the card's message says it expired (`acknowledgeCardExpiry`). */
+  expiryShown?: true;
+  /** When the alarm last handed the card over for its edit (`takeCardExpiries`). */
+  expiryHandedOffAt?: number;
+}
+
+/**
+ * When a card's expiry edit falls due — the first instant the store reads it
+ * as expired — or null when none is owed.
+ *
+ * @param rec - The record's marks
+ * @param proposal - The card it holds
+ */
+export function cardExpiryDueAt(rec: CardExpiryMarks, proposal: PendingProposal | null): number | null {
+  if (!proposal || proposal.item || rec.decided || rec.supersededBy || rec.retired || rec.expiryShown) return null;
+  return rec.createdAt + proposalTtlMs(proposal) + 1;
+}
+
+/**
+ * Whether a card's expiry edit is owed at `at`: due, and not past its grace.
+ *
+ * @param rec - The record's marks
+ * @param proposal - The card it holds
+ * @param at - The store's now
+ */
+export function cardExpiryOwed(rec: CardExpiryMarks, proposal: PendingProposal | null, at: number): boolean {
+  const due = cardExpiryDueAt(rec, proposal);
+  return due !== null && at >= due && at - due <= CARD_EXPIRY_EDIT_GRACE_MS;
+}
+
+/**
+ * When an owed card is next to be handed over for its edit: at its deadline,
+ * or — handed over already — once that hand-off has lapsed
+ * (`CARD_EXPIRY_HANDOFF_RETRY_MS`). Null when no edit is owed.
+ *
+ * @param rec - The record's marks
+ * @param proposal - The card it holds
+ */
+export function cardExpiryHandOffAt(rec: CardExpiryMarks, proposal: PendingProposal | null): number | null {
+  const due = cardExpiryDueAt(rec, proposal);
+  if (due === null) return null;
+  return rec.expiryHandedOffAt === undefined ? due : Math.max(due, rec.expiryHandedOffAt + CARD_EXPIRY_HANDOFF_RETRY_MS);
+}
+
+/**
+ * Of a store's proposal records, the ones to hand over for their expiry edit
+ * at `at` — owed, and not handed over within `CARD_EXPIRY_HANDOFF_RETRY_MS` —
+ * oldest deadline first, at most `limit`. Both adapters' `takeCardExpiries`.
+ *
+ * @param records - Each record with its card
+ * @param at - The store's now
+ * @param limit - How many one pass hands over
+ */
+export function cardExpiriesToTake<R extends CardExpiryMarks>(
+  records: Iterable<{ rec: R; proposal: PendingProposal | null }>,
+  at: number,
+  limit: number,
+): Array<{ rec: R; proposal: PendingProposal }> {
+  const due: Array<{ rec: R; proposal: PendingProposal; deadline: number }> = [];
+  for (const { rec, proposal } of records) {
+    const handOffAt = cardExpiryHandOffAt(rec, proposal);
+    if (!proposal || handOffAt === null || at < handOffAt || !cardExpiryOwed(rec, proposal, at)) continue;
+    due.push({ rec, proposal, deadline: cardExpiryDueAt(rec, proposal)! });
+  }
+  return due.sort((a, b) => a.deadline - b.deadline).slice(0, limit);
+}
+
+/** The card an expiry edit redraws: where it is, and what it was posted as. */
+export interface ExpiredCardEdit {
+  channel: string;
+  proposalTs: string;
+  text: string;
+  blocks?: unknown[];
+}
+
+/** An owed card, as the edit needs it. */
+export function expiredCardEdit(proposal: PendingProposal): ExpiredCardEdit {
+  return {
+    channel: proposal.channel,
+    proposalTs: proposal.proposalTs,
+    text: proposal.proposalText,
+    ...(proposal.proposalBlocks ? { blocks: proposal.proposalBlocks } : {}),
+  };
+}
 
 /** The look every expiry path takes at an item: its staged proposal's own
  *  window, and whether its write is running. */
@@ -803,7 +939,20 @@ export interface SweepShare {
 
 export type ProposalTerms = Pick<PendingProposal, "ttlMs" | "confirmers" | "exclusiveConfirmers">;
 
-/** How long a proposal stays confirmable: its own `ttlMs`, or the hour. */
+/**
+ * The card as the store keeps it: with its own `ttlMs`, or the one expiry
+ * rule's from the moment it is staged (#1315). Both adapters' `putProposal`
+ * stamp through this, so no stager can stage a card on another clock.
+ *
+ * @param proposal - The card being staged
+ * @param at - The store's now
+ */
+export function stampedTtl(proposal: PendingProposal, at: number): PendingProposal {
+  return proposal.ttlMs !== undefined ? proposal : { ...proposal, ttlMs: cardTtlMs(at) };
+}
+
+/** How long a proposal stays confirmable: its own `ttlMs`, or — on a record
+ *  stored before the rule — the hour. */
 export function proposalTtlMs(proposal: Pick<PendingProposal, "ttlMs">): number {
   return proposal.ttlMs ?? PROPOSAL_TTL_MS;
 }
@@ -814,6 +963,45 @@ export function proposalTtlMs(proposal: Pick<PendingProposal, "ttlMs">): number 
  * without a bound its card would stay undecidable until it aged out.
  */
 export const REVISING_MARK_MS = 15 * 60 * 1000;
+
+/**
+ * Newest first, for the lookups that order live cards (`getProposalByThread`,
+ * `getProposalsByThread`, `getProposalsByChannel`): by when the store staged
+ * them, and on a tie — two cards staged in the same millisecond — by the
+ * card's own Slack ts, which is unique and rises with posting order. Without
+ * the tie-break the order of two such cards depended on insertion, and
+ * "which one?" listed them differently from run to run.
+ *
+ * @param a - One card's record
+ * @param b - The other's
+ */
+export function newestCardFirst(
+  a: { createdAt: number; proposalTs: string },
+  b: { createdAt: number; proposalTs: string },
+): number {
+  return b.createdAt - a.createdAt || compareSlackTs(b.proposalTs, a.proposalTs);
+}
+
+/**
+ * A proposal record as `newestCardFirst` reads it: when the store staged it,
+ * and its card's ts. Either store's record shape — the in-memory one holds the
+ * card as `proposal`, the Durable Object's as an opaque `payload` — and a
+ * record with no card sorts on its time alone.
+ *
+ * @param rec - A proposal record
+ */
+export function cardOrder(rec: { createdAt: number; proposal?: unknown; payload?: unknown }): { createdAt: number; proposalTs: string } {
+  const card = (rec.proposal ?? rec.payload) as Pick<PendingProposal, "proposalTs"> | null | undefined;
+  return { createdAt: rec.createdAt, proposalTs: card?.proposalTs ?? "" };
+}
+
+/** Slack ts order, digit runs compared as numbers: "1700000000.000300" after
+ *  "…000200", an item's `<ts>#<id>` key by its ts first, and any other key
+ *  (a test delivery's `posted-10`) the same way rather than as plain text. */
+const TS_ORDER = new Intl.Collator("en", { numeric: true });
+function compareSlackTs(a: string, b: string): number {
+  return TS_ORDER.compare(a, b);
+}
 
 /**
  * The card as every lookup hands it back: a mark past `REVISING_MARK_MS`
@@ -850,6 +1038,51 @@ export function ownOperations(
 ): { operations?: ProposalOperation[] } {
   if (proposal.operations?.length) return { operations: proposal.operations };
   return proposal.toolName ? { operations: [{ toolName: proposal.toolName, input: proposal.input ?? {} }] } : {};
+}
+
+/** The card a superseded one was replaced by: its ts, and its batch, which
+ *  is what its headline is read from (`agent/card-identity.ts`). */
+export interface ReplacingCard {
+  proposalTs: string;
+  operations: ProposalOperation[];
+  /** Set when it no longer waits — decided, retired or aged out — so the
+   *  person is told that rather than sent to it (#1319, story 18). */
+  waiting?: false;
+}
+
+/** How many revisions a "superseded" lookup follows to the live card. A
+ *  chain longer than this is not a conversation anyone is still in. */
+export const REPLACED_BY_HOPS = 10;
+
+/**
+ * The card at the end of a superseded card's chain, spread onto its
+ * "superseded" lookup, marked when it no longer waits — absent when the
+ * chain ends in a card the store no longer holds.
+ *
+ * @param first - The card's direct successor's ts
+ * @param read - The store's own record read, by ts
+ * @param live - Whether that record is still waiting on a decision
+ */
+export async function replacedByOf<R extends { supersededBy?: string }>(
+  first: string,
+  read: (ts: string) => R | undefined | Promise<R | undefined>,
+  live: (rec: R) => boolean,
+  proposalOf: (rec: R) => Partial<PendingProposal>,
+): Promise<{ replacedBy?: ReplacingCard }> {
+  let ts = first;
+  for (let hop = 0; hop < REPLACED_BY_HOPS; hop++) {
+    const rec = await read(ts);
+    if (!rec) return {};
+    if (rec.supersededBy) {
+      ts = rec.supersededBy;
+      continue;
+    }
+    const proposal = proposalOf(rec);
+    if (!proposal.toolName) return {};
+    const operations = ownOperations(proposal) as { operations: ProposalOperation[] };
+    return { replacedBy: { proposalTs: ts, ...operations, ...(live(rec) ? {} : { waiting: false as const }) } };
+  }
+  return {};
 }
 
 /** The card's own `ttlMs`, spread onto an "expired" lookup — absent for a
@@ -923,13 +1156,14 @@ export function isImChannel(channel: string): boolean {
 }
 
 /**
- * What a revision inherits from the card it replaces: its lifetime and who
- * may confirm it. A person pushing back on a card is asking for different
- * content, not a different gate, so the revision is held to the same terms.
+ * What a revision inherits from the card it replaces: who may confirm it. A
+ * person pushing back on a card is asking for different content, not a
+ * different gate, so the revision is held to the same people. Not its
+ * lifetime: the revision is a card staged now, and the store gives it the
+ * expiry rule's full window from now (`stampedTtl`).
  */
 export function inheritedTerms(replaced: ProposalTerms | null | undefined): ProposalTerms {
   return {
-    ...(replaced?.ttlMs !== undefined ? { ttlMs: replaced.ttlMs } : {}),
     ...(replaced?.confirmers ? { confirmers: [...replaced.confirmers] } : {}),
     ...(replaced?.confirmers && replaced.exclusiveConfirmers ? { exclusiveConfirmers: true as const } : {}),
   };
@@ -951,10 +1185,10 @@ export function proposalReplyThread(
 /**
  * The grain one card retires another at: its reply thread, and within it the
  * card's own slot when it has a key (`supersedeKey`). Both adapters'
- * `putProposal` compare with this, so a thread holds one turn card and one
- * card per key at most, and staging retires only the card in its own slot —
- * a revision of a keyed card retires that card, an unrelated ask stages beside
- * it. The one supersession mechanism in the module.
+ * `putProposal` compare with this, so a thread holds one card per key at
+ * most, and staging retires only the card in its own slot — a revision
+ * retires the card it revises, a separate proposal stages beside it. The one
+ * supersession mechanism in the module.
  *
  * A sweep card staged before the key existed carries `sweepRun` and no key,
  * and is read as keyed `"sweep"` so it keeps its slot until it expires.
@@ -967,6 +1201,25 @@ export function proposalSlot(proposal: Pick<PendingProposal, "replyTs" | "thread
 
 /** The end-of-day sweep card's slot key. */
 export const SWEEP_KEY = "sweep";
+
+/** What every turn card's slot key starts with. */
+const TURN_CARD_KEY = "card:";
+
+/**
+ * A turn card's slot key: the ts of the first card of its matter, which every
+ * revision of it carries. So the key names the matter, stable across
+ * revisions, and the matter's current card is the live card with that key.
+ */
+export function turnCardKey(firstCardTs: string): string {
+  return `${TURN_CARD_KEY}${firstCardTs}`;
+}
+
+/** Whether a card is a turn's — keyed by `turnCardKey`, or staged before turn
+ *  cards had keys — rather than one the Worker staged under a key of its own. */
+export function isTurnCard(proposal: Pick<PendingProposal, "supersedeKey" | "sweepRun">): boolean {
+  const key = slotKeyOf(proposal);
+  return key === undefined || key.startsWith(TURN_CARD_KEY);
+}
 
 /** A card's slot key, or undefined for a card holding its thread's slot. */
 export function slotKeyOf(proposal: Pick<PendingProposal, "supersedeKey" | "sweepRun">): string | undefined {
@@ -1137,10 +1390,12 @@ export function unfinishedOperations(execution: Execution): ProposalOperation[] 
  * the successor is gone too, there is nothing to look at and the TTL owns the
  * record again, delete included.
  *
- * The successor's ts is deliberately NOT on this answer. Nothing outside the
- * store has a use for it that the thread's own newest card does not answer
- * better, and a chain (A replaced by B, B replaced by C) would hand out a
- * pointer to a card that is itself retired.
+ * The card that replaced it rides the answer as `replacedBy` (#1319): a thread
+ * holds several live cards now, so "the newest card in this thread" can be
+ * another matter's, and the person has to be told which card to decide
+ * instead. It is the END of the chain (A replaced by B, B replaced by C names
+ * C), and only while that card is live — a pointer to a card that is itself
+ * retired would send the person somewhere that answers "replaced" again.
  *
  * A card RETIRED by `retireProposal` and not yet replaced reads as
  * "superseded" too, for its remaining hour (#583): the revision it is making
@@ -1157,7 +1412,16 @@ export type ProposalLookup =
    *  of one by `retireProposal` — in which case it reads this way from the
    *  moment of retirement, and for the rest of its TTL if the revision it made
    *  way for never lands. `stated` is a stated card's own words. */
-  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[]; operations?: ProposalOperation[] }
+  /** `replacedBy` is the live card at the end of its revision chain, when
+   *  there is one: its ts and batch, which name it. */
+  | {
+      state: "superseded";
+      stated?: StatedCardWords;
+      proposalText?: string;
+      proposalBlocks?: unknown[];
+      operations?: ProposalOperation[];
+      replacedBy?: ReplacingCard;
+    }
   /** `ttlMs` is the card's own lifetime when it set one, so the person can be
    *  told how long it was live; absent, it lived the default hour. `stated` is
    *  a stated card's own words, whose `expired` line says it instead.
@@ -1364,6 +1628,7 @@ export interface ThreadState {
    * `retired` is true only when THIS call took a live card out of reach: a
    * card already claimed (so gone), already retired or replaced, or aged out
    * answers false — nothing was replaced by this revision.
+
    */
   retireProposal(proposalTs: string): Promise<{ retired: boolean }>;
 
@@ -1415,6 +1680,19 @@ export interface ThreadState {
    * to its thread. In a channel the two are the same value.
    */
   getProposalByThread(ref: ThreadRef): Promise<PendingProposal | null>;
+
+  /**
+   * Every live proposal in a REPLY THREAD, newest first — the list beside
+   * `getProposalByThread`, whose answer is always this list's first card.
+   *
+   * A thread can hold several live cards at once: each `supersedeKey` slot
+   * (a sweep card, a report item's card) stays live beside a turn's card, so
+   * the newest one alone does not say what is waiting there. Live means what
+   * `getProposalByThread` means — staged, in its TTL, and neither retired,
+   * superseded nor decided — and `ref.thread` is the card's reply thread, as
+   * there. A card marked as being revised is still live, and carries its mark.
+   */
+  getProposalsByThread(ref: ThreadRef): Promise<PendingProposal[]>;
 
   /**
    * Every live proposal in a CHANNEL, whatever thread or conversation it was
@@ -1491,6 +1769,25 @@ export interface ThreadState {
   prepareReportExpiry(messageTs: string): Promise<ReportExpiryEdit | null>;
   /** A successful edit acknowledges only the revision actually sent to Slack. */
   acknowledgeReportExpiry(messageTs: string, revision: number): Promise<void>;
+
+  /**
+   * The card to edit to "Expired" (#1316), while that edit is owed
+   * (`cardExpiryOwed`): past its deadline, undecided, not replaced, not a
+   * report's item, and not yet acknowledged. Null otherwise — before the
+   * deadline too. Reads only; the edit is the caller's, outside the store.
+   */
+  prepareCardExpiry(proposalTs: string): Promise<ExpiredCardEdit | null>;
+  /** The card's message says it expired: owed no more, and collected as any
+   *  aged-out card is from here. */
+  acknowledgeCardExpiry(proposalTs: string): Promise<void>;
+  /**
+   * The cards to hand over for their "Expired" edit now, oldest deadline
+   * first, at most `limit` — each marked handed over, so the alarm's next
+   * pass, two minutes on, does not queue its job again. The mark lapses after
+   * `CARD_EXPIRY_HANDOFF_RETRY_MS`, and a card still owed then is taken again:
+   * a job lost on the way is retried. The alarm's (`cardExpiriesToTake`).
+   */
+  takeCardExpiries(limit: number): Promise<PendingProposal[]>;
 
   // ----- executions: a won ✅, from the claim until its outcome is told -----
 
@@ -1668,15 +1965,203 @@ export interface ThreadState {
    *  claim with nothing filed. */
   settleFiling(key: string, issue: FiledIssue | null): Promise<void>;
 
-  // ----- one comparison per scenario per thread -----
+  // ----- one blueprint check per scenario per thread (#1322) -----
+  //
+  // One record a thread and scenario (`CheckRecord`, under `comparisonKey`),
+  // whichever offer it was pressed on — a PRD card's or an IDE hand-off's
+  // (#1324) — so the thread runs one check of a scenario at a time, whichever
+  // asked first. A finished one does not stop a later Check it: the idea may
+  // have moved on since. Each step is one hop and one transaction.
 
   /**
-   * Claim the one blueprint comparison a thread gets for a scenario
-   * (`blueprint-upkeep/milestone.ts`): true the first time, and recorded in
-   * the same step, so of two racing turns one shows it. Kept as long as the
-   * thread's memory (`HISTORY_TTL_MS`).
+   * Claim the thread's check of a scenario for a Check it press: "claimed"
+   * with the new run's id unless a check is running, including when what
+   * held it finished, stopped or failed, or when a running one outlived
+   * `CHECK_LEASE_MS` (a job killed mid-run); otherwise "running" with the
+   * record, and nothing changes. Of two racing presses one is told "claimed".
    */
-  claimComparison(ref: ThreadRef, scenario: string): Promise<boolean>;
+  claimCheck(ref: ThreadRef, scenario: string, start: CheckStart): Promise<CheckClaim>;
+
+  /** The thread's check of a scenario as it stands, or null when there is none. */
+  getCheck(ref: ThreadRef, scenario: string): Promise<CheckRecord | null>;
+
+  /**
+   * Move a run to `stopped`, `done` or `failed` (`steppedCheck`): true when
+   * it moved. Only the run named moves, and only from `running` — though a
+   * done run may still fail (its results did not post) — so a stopped run's
+   * late job is told false and posts nothing.
+   */
+  stepCheck(ref: ThreadRef, scenario: string, run: string, to: Exclude<CheckState, "running">): Promise<boolean>;
+
+  // ----- the blueprint check's offers (#1321) -----
+
+  /**
+   * Keep what a Check it offer's check will need, under the offer's message
+   * ts (`blueprint-upkeep/check.ts`): the idea, the match, and the card it
+   * was offered under. A second put replaces it. Kept `CHECK_OFFER_KEEP_MS`
+   * from the put, past the offer's own deadline, so a check pressed at the
+   * last moment still finds it when its job runs; whether a press is in time
+   * is the offer's `expiresAt`, read by the door.
+   */
+  putCheckOffer(offer: BlueprintCheckOffer): Promise<void>;
+
+  /** The offer kept under a message ts, or null once it is gone. */
+  getCheckOffer(offerTs: string): Promise<BlueprintCheckOffer | null>;
+}
+
+// ── The blueprint check's offers ─────────────────────────────────────────────
+
+/**
+ * A Check it offer, as kept for its press and its check (#1321). Ids and the
+ * idea's words, never Slack copy: the button carries nothing but its message
+ * ts, and everything else is read back from here.
+ */
+export interface BlueprintCheckOffer {
+  /** The offer's own message: the record's key, and the check's status
+   *  message from the press on. */
+  offerTs: string;
+  channel: string;
+  /** The conversation (`ThreadRef.thread`). */
+  threadTs: string;
+  /** The reply thread the offer sits in, when it is not the conversation. */
+  replyTs?: string;
+  /** The person's message the milestone answered. */
+  userMsgTs: string;
+  /** Who asked for the work the offer is under: the Draw on blueprint card's
+   *  only confirmer. */
+  requesterUserId: string;
+  /** The conversation the milestone came up in, as its turn read it: where
+   *  it is answered, and whose conversation it is. A card the results stage
+   *  is built and recorded by it (`usage/record.ts` `storesChannel`), so a
+   *  DM or group DM card names no channel on the usage record. */
+  surface: "assistant" | "channel";
+  conversationType?: ConversationType;
+  /** The card the offer was posted under; absent for a milestone with no
+   *  card (the IDE hand-off). */
+  cardTs?: string;
+  /** The matter of the card the offer was posted under: its `supersedeKey`,
+   *  which every revision of it carries (`turnCardKey`). The results' action
+   *  finds the matter's current card by it (#1323). Absent with no card, and
+   *  for a card staged before turn cards had keys. */
+  cardKey?: string;
+  milestone: "prd" | "prototype-hand-off";
+  /** The idea as the judgement read it. */
+  idea: { title: string; text: string };
+  scenario: string;
+  path: string;
+  /** The matched cell: where the check's path read starts. */
+  cellId: string;
+  /** The idea's sentence that shows the change. */
+  quote: string;
+  /** When Check it stops answering, epoch ms (`cardExpiresAt`). */
+  expiresAt: number;
+  /** The check's results once they posted (#1323): the follow-up's own
+   *  words, which Add these notes / Update the Roadmap page put on the card
+   *  or the page, and when its buttons stop answering (`cardExpiresAt` from
+   *  the post). The button carries only the offer's ts. */
+  results?: { text: string; expiresAt: number };
+}
+
+/** How long an offer is kept from its put: past any offer's deadline
+ *  (`MAX_CARD_TTL_MS`), as long as the thread's memory. */
+export const CHECK_OFFER_KEEP_MS = HISTORY_TTL_MS;
+
+/** The record an offer is kept under. */
+export function checkOfferKey(offerTs: string): string {
+  return `chk:${offerTs}`;
+}
+
+/** An offer as stored: the offer, and when it was put. */
+export interface CheckOfferRecord {
+  offer: BlueprintCheckOffer;
+  at: number;
+}
+
+// ── One blueprint check per scenario per thread (#1322) ─────────────────────
+
+/** Where a thread's check of a scenario is: under way, finished with its
+ *  results posted, stopped by someone, or failed (an error or its deadline). */
+export type CheckState = "running" | "done" | "stopped" | "failed";
+
+/**
+ * A thread's check of a scenario. Stopped and failed are not the end: Check
+ * again and Try again claim it anew, as a new run. Done is — the thread's
+ * results are posted.
+ */
+export interface CheckRecord {
+  state: CheckState;
+  /** This run's id, new at each claim: what tells a stopped run's late job
+   *  from the run that replaced it. */
+  run: string;
+  /** Who pressed Check it: with the offer's requester, who may stop it. */
+  by: string;
+  /** The check's status message: the offer's ts it was pressed on. */
+  statusTs: string;
+  /** When it last changed state, epoch ms. */
+  at: number;
+}
+
+/** What a Check it press starts a run with. */
+export interface CheckStart {
+  by: string;
+  statusTs: string;
+}
+
+/** The answer to a Check it press (`ThreadState.claimCheck`). */
+export type CheckClaim = { state: "claimed"; run: string } | { state: "running"; record: CheckRecord };
+
+/** How long a running check holds its claim before it is taken as a job
+ *  killed mid-run, and may be claimed again: past the check's own deadline
+ *  (`CHECK_DEADLINE_MS`, blueprint-upkeep/check.ts), with room for its
+ *  queue. */
+export const CHECK_LEASE_MS = 10 * 60 * 1000;
+
+/** A check's key as stored: a record, or the set-once mark from before #1322. */
+export type StoredCheck = CheckRecord | { at: number };
+
+/**
+ * A stored check, read as of `at`: null past the thread's memory. A mark
+ * from before #1322 (`{at}`) reads as a done check nobody can be named for.
+ *
+ * @param stored - What the key holds
+ * @param at - Now
+ */
+export function liveCheck(stored: StoredCheck | undefined, at: number): CheckRecord | null {
+  if (!stored || at - stored.at >= HISTORY_TTL_MS) return null;
+  return "state" in stored ? stored : { state: "done", run: "", by: "", statusTs: "", at: stored.at };
+}
+
+/**
+ * A claim against a check's record: the answer, and the record to store when
+ * the claim is taken (null when nothing changes).
+ *
+ * @param stored - What the key holds
+ * @param at - Now
+ * @param start - Who pressed, and the status message
+ * @param run - The new run's id, should the claim be taken
+ */
+export function claimedCheck(stored: StoredCheck | undefined, at: number, start: CheckStart, run: string): { claim: CheckClaim; store: CheckRecord | null } {
+  const live = liveCheck(stored, at);
+  // Only a running check holds the claim; a done one is checked again (Bill, 2026-10-16).
+  if (live?.state === "running" && at - live.at < CHECK_LEASE_MS) return { claim: { state: "running", record: live }, store: null };
+  return { claim: { state: "claimed", run }, store: { state: "running", run, ...start, at } };
+}
+
+/**
+ * A run's step to `to`, or null when it may not take it: another run holds
+ * the record, or the record is not running — though a done run may still
+ * fail.
+ *
+ * @param stored - What the key holds
+ * @param at - Now
+ * @param run - The run stepping
+ * @param to - Where to
+ */
+export function steppedCheck(stored: StoredCheck | undefined, at: number, run: string, to: Exclude<CheckState, "running">): CheckRecord | null {
+  const live = liveCheck(stored, at);
+  if (!live || live.run !== run) return null;
+  const from: CheckState[] = to === "failed" ? ["running", "done"] : ["running"];
+  return from.includes(live.state) ? { ...live, state: to, at } : null;
 }
 
 /** The record a thread's one comparison for a scenario is kept under. */

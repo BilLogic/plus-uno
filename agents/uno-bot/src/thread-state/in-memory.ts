@@ -28,14 +28,24 @@ import {
   ownWords,
   ownText,
   ownOperations,
+  cardExpiryOwed,
+  cardExpiriesToTake,
+  replacedByOf,
   decidedLive,
+  expiredCardEdit,
   REPORT_GRACE_MS,
   changedReport,
   expiredReport,
   reportItemLook,
   type ReportExpiryRecord,
   claimedFiling,
+  claimedCheck,
+  liveCheck,
+  steppedCheck,
+  type CheckRecord,
   comparisonKey,
+  CHECK_OFFER_KEEP_MS,
+  type CheckOfferRecord,
   decidedNoteOf,
   decidedOf,
   decidedPayload,
@@ -43,6 +53,9 @@ import {
   proposalReplyThread,
   proposalSlot,
   proposalTtlMs,
+  stampedTtl,
+  newestCardFirst,
+  cardOrder,
   withLiveMark,
   type DecisionReportRecord,
   type Execution,
@@ -79,6 +92,10 @@ interface ProposalRecord {
    *  other lookup. */
   decided?: DecidedNote;
   decidedAt?: number;
+  /** The card's message says it expired (`acknowledgeCardExpiry`). */
+  expiryShown?: true;
+  /** When it was last taken for its edit (`takeCardExpiries`). */
+  expiryHandedOffAt?: number;
 }
 
 interface AssistantContextRecord {
@@ -117,8 +134,10 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
   const activeRuns = new Map<string, ActiveRunRecord>();
   const events = new Map<string, EventRecord>();
   const filings = new Map<string, FilingRecord>();
-  /** When each thread's comparison for a scenario was shown, by `comparisonKey`. */
-  const compared = new Map<string, number>();
+  /** Each thread's check of a scenario, by `comparisonKey` (#1322). */
+  const checks = new Map<string, CheckRecord>();
+  /** Each Check it offer, by its message ts, with when it was put. */
+  const checkOffers = new Map<string, CheckOfferRecord>();
   const executions = new Map<string, Execution>();
 
   /** Take an execution if it has been cut off; drop it if it has aged out;
@@ -187,7 +206,8 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
 
     // ----- proposals -----
 
-    async putProposal(proposal) {
+    async putProposal(staged) {
+      const proposal = stampedTtl(staged, now());
       // The revised card retires the one it replaces, per REPLY THREAD — the
       // grain, and why a DM needs it, are in `putProposal`'s contract. Only
       // LIVE records are touched: an aged-out card is already answered by
@@ -270,12 +290,32 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       }
       // A live successor beats the TTL — the ordering, and the third card it
       // stops the person from asking for, are in `ProposalLookup`.
-      if (rec.supersededBy && successorIsLive(rec.supersededBy)) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal) };
+      if (rec.supersededBy && successorIsLive(rec.supersededBy)) {
+        const replacedBy = await replacedByOf(
+          rec.supersededBy,
+          (ts) => proposals.get(ts),
+          (next) => !next.decided && !next.retired && now() - next.createdAt <= proposalTtlMs(next.proposal),
+          (next) => next.proposal,
+        );
+        return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal), ...structuredClone(replacedBy) };
+      }
       if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) {
-        proposals.delete(proposalTs);
+        // Kept while its expiry edit is owed, so the edit still finds it.
+        if (!cardExpiryOwed(rec, rec.proposal, now())) proposals.delete(proposalTs);
         return { state: "expired", ...ownTtl(rec.proposal), ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal) };
       }
-      if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal) };
+      if (rec.supersededBy || rec.retired) {
+        // A replacement that no longer waits is still named (story 18).
+        const replacedBy = rec.supersededBy
+          ? await replacedByOf(
+              rec.supersededBy,
+              (ts) => proposals.get(ts),
+              (next) => !next.decided && !next.retired && now() - next.createdAt <= proposalTtlMs(next.proposal),
+              (next) => next.proposal,
+            )
+          : {};
+        return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal), ...structuredClone(replacedBy) };
+      }
       return { state: "found", proposal: withLiveMark(rec.proposal, now()), createdAt: rec.createdAt, ...(rec.kept ? { kept: structuredClone(rec.kept) } : {}) };
     },
 
@@ -288,9 +328,18 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         if (rec.supersededBy || rec.retired || rec.decided) continue; // retired or decided, so never the thread's live card
         if (rec.proposal.channel !== ref.channel) continue;
         if (proposalReplyThread(rec.proposal) !== ref.thread) continue; // keyed on the card's thread
-        if (!best || rec.createdAt > best.createdAt) best = rec;
+        if (!best || newestCardFirst(cardOrder(rec), cardOrder(best)) < 0) best = rec;
       }
       return best ? withLiveMark(best.proposal, now()) : null;
+    },
+
+    async getProposalsByThread(ref) {
+      return [...proposals.values()]
+        .filter((rec) => now() - rec.createdAt <= proposalTtlMs(rec.proposal))
+        .filter((rec) => !rec.supersededBy && !rec.retired && !rec.decided)
+        .filter((rec) => rec.proposal.channel === ref.channel && proposalReplyThread(rec.proposal) === ref.thread)
+        .sort((a, b) => newestCardFirst(cardOrder(a), cardOrder(b)))
+        .map((rec) => withLiveMark(rec.proposal, now()));
     },
 
     async getProposalsByChannel(channel) {
@@ -298,7 +347,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         .filter((rec) => now() - rec.createdAt <= proposalTtlMs(rec.proposal))
         .filter((rec) => !rec.supersededBy && !rec.retired && !rec.decided)
         .filter((rec) => rec.proposal.channel === channel)
-        .sort((a, b) => b.createdAt - a.createdAt)
+        .sort((a, b) => newestCardFirst(cardOrder(a), cardOrder(b)))
         .map((rec) => withLiveMark(rec.proposal, now()));
     },
 
@@ -360,6 +409,23 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     async acknowledgeReportExpiry(messageTs, revision) {
       const rec = liveReport(messageTs);
       if (rec && (rec.revision ?? 0) === revision) reports.set(messageTs, { ...rec, expiryPending: false });
+    },
+
+    async prepareCardExpiry(proposalTs) {
+      const rec = proposals.get(proposalTs);
+      return rec && cardExpiryOwed(rec, rec.proposal, now()) ? structuredClone(expiredCardEdit(rec.proposal)) : null;
+    },
+
+    async acknowledgeCardExpiry(proposalTs) {
+      const rec = proposals.get(proposalTs);
+      if (rec) rec.expiryShown = true;
+    },
+
+    async takeCardExpiries(limit) {
+      const at = now();
+      const taken = cardExpiriesToTake([...proposals.values()].map((rec) => ({ rec, proposal: rec.proposal })), at, limit);
+      for (const { rec } of taken) rec.expiryHandedOffAt = at;
+      return taken.map(({ proposal }) => structuredClone(proposal));
     },
 
     // ----- executions -----
@@ -497,12 +563,37 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       else filings.delete(key);
     },
 
-    async claimComparison(ref, scenario) {
+    async claimCheck(ref, scenario, start) {
       const key = comparisonKey(ref, scenario);
-      const at = compared.get(key);
-      if (at !== undefined && now() - at < HISTORY_TTL_MS) return false;
-      compared.set(key, now());
-      return true;
+      const { claim, store } = claimedCheck(checks.get(key), now(), start, crypto.randomUUID());
+      if (store) checks.set(key, store);
+      return structuredClone(claim);
+    },
+
+    async getCheck(ref, scenario) {
+      const live = liveCheck(checks.get(comparisonKey(ref, scenario)), now());
+      return live ? structuredClone(live) : null;
+    },
+
+    async stepCheck(ref, scenario, run, to) {
+      const key = comparisonKey(ref, scenario);
+      const stepped = steppedCheck(checks.get(key), now(), run, to);
+      if (stepped) checks.set(key, stepped);
+      return stepped !== null;
+    },
+
+    async putCheckOffer(offer) {
+      checkOffers.set(offer.offerTs, { offer: structuredClone(offer), at: now() });
+    },
+
+    async getCheckOffer(offerTs) {
+      const rec = checkOffers.get(offerTs);
+      if (!rec) return null;
+      if (now() - rec.at > CHECK_OFFER_KEEP_MS) {
+        checkOffers.delete(offerTs);
+        return null;
+      }
+      return structuredClone(rec.offer);
     },
   };
 }

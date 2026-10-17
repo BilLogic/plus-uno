@@ -21,7 +21,10 @@
 //     differs by door is a message that drifts by door.
 //   • AN AGED-OUT CARD is never met with silence. Live 2026-07-10, silence
 //     read as "the bot is broken" to someone who believed they had just
-//     confirmed something.
+//     confirmed something. Every card, whoever staged it, ends on the one
+//     line `EXPIRED_CARD` once its deadline passes — edited on by the gesture
+//     that found it or by the store's alarm at the deadline (#1316). The
+//     card showed its deadline all along, so the line names none.
 //   • A REPLACED CARD gets its own line rather than the expiry one (#573). The
 //     person did not wait too long, they acted on the card above the one being
 //     held — and unlike an aged-out card there is a live one in the thread to
@@ -38,7 +41,7 @@
 // Import-free and Env-free: it renders and posts nothing.
 
 import type { GateNote } from "../turn/index";
-import { PROPOSAL_TTL_MS, type StatedCardWords } from "../thread-state/index";
+import type { StatedCardWords } from "../thread-state/index";
 import { SLACK_USER_ID, escapeSlackText } from "./mrkdwn";
 
 /** The lost race. */
@@ -47,32 +50,29 @@ export const STALE_POST =
   "so nothing was executed twice.";
 
 /**
- * The delayed ✅/❌ on a card that aged out, naming how long it was live — the
- * card's own lifetime, which is an hour unless it set one.
+ * An expired card's message, on every path that expires one (#1316): the
+ * line a card ends on once its deadline passed, and the answer to a gesture
+ * that came after it. Nothing ran — an expired card cannot run anything — and
+ * a fresh card is one ask away.
  */
-export function expiredPost(ttlMs?: number): string {
-  return (
-    "That proposal had already expired — nothing was executed. " +
-    `It stayed live for ${lifetimeWords(ttlMs ?? PROPOSAL_TTL_MS)}. ` +
-    "Ask me again and I'll set the same thing up fresh."
-  );
-}
-
-/** The expiry line for a card on the default hour. */
-export const EXPIRED_POST = expiredPost();
-
-/** A lifetime as a person says it: "an hour", "72 hours", "30 minutes". */
-function lifetimeWords(ms: number): string {
-  const minutes = Math.round(ms / 60_000);
-  if (minutes % 60 !== 0) return minutes === 1 ? "a minute" : `${minutes} minutes`;
-  const hours = minutes / 60;
-  return hours === 1 ? "an hour" : `${hours} hours`;
-}
+export const EXPIRED_CARD = "Expired. Ask again for a fresh card.";
 
 /** The ✅/⛔ on a proposal a revision replaced (#573). */
 export const SUPERSEDED_POST =
   "That proposal was replaced by a newer one — nothing was executed. " +
   "Confirm on the newest card in this thread instead.";
+
+/** The ✅/⛔ on a proposal a revision replaced, naming the card that did:
+ *  with several live cards in a thread, the newest may be another matter's
+ *  (#1319). When that card no longer waits either, it is still named, and
+ *  said to be done, rather than the person sent to some other card (story
+ *  18). The headline is the model's input, so escaped. */
+export function supersededBy(headline: string, waiting = true): string {
+  const named = `*${escapeSlackText(headline)}*`;
+  return waiting
+    ? `That proposal was replaced by ${named} — nothing was executed. Confirm on that card instead.`
+    : `That proposal was replaced by ${named}, which is no longer waiting either — nothing was executed. Ask again for a fresh card.`;
+}
 
 /** The ✅/⛔ on a stated card a revision replaced. */
 export const STATED_SUPERSEDED_POST =
@@ -107,9 +107,56 @@ export const BEING_REVISED_POST =
  *  only its own Review decides. */
 export const REVIEW_ONLY_POST = "Each card here is decided from its own Review button, so nothing ran.";
 
+/**
+ * What a turn's staging did, said just above its card (#1318): a revision
+ * replaced the card it names; a separate proposal posted beside the cards
+ * still waiting. Either way the person can catch a wrong call at once and
+ * correct it in words. The headlines are the model's input, so escaped.
+ */
+export function stagingLine(note: Extract<GateNote, { kind: "revised" | "staged-beside" }>): string {
+  if (note.kind === "revised") return `Revised *${escapeSlackText(note.replaced)}*: the card below replaces the one above.`;
+  const names = note.waiting.map((w) => `*${escapeSlackText(w)}*`);
+  const listed = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)} above are` : `${names[0]} above is`;
+  return `Added a new card below. ${listed} still waiting.`;
+}
+
+/**
+ * A revision named one card but writes what another card writes: say so,
+ * name both, and that nothing changed, so the person can say which card the
+ * change belongs on. The headlines are the model's input, so escaped.
+ */
+export function aimedElsewhereLine(note: Extract<GateNote, { kind: "aimed-elsewhere" }>): string {
+  return (
+    `That change was for *${escapeSlackText(note.named)}*, but it writes the same page or issue as *${escapeSlackText(note.other)}*, ` +
+    "so I didn't stage it and both cards are still waiting. Say which card it belongs on."
+  );
+}
+
+/**
+ * "Approve which one?" (#1319): the question, and that nothing ran — what
+ * sits above the question's buttons (`which-card.ts`).
+ */
+export function whichCardQuestion(note: Extract<GateNote, { kind: "which-card" }>): string {
+  const asked = note.decision === "confirm" ? "Approve which one?" : "Cancel which one?";
+  return `${asked} ${note.cards.length} proposals are waiting here, so nothing ran yet.`;
+}
+
+/** The question's text copy: the question, and the cards by headline — what
+ *  a notification and a screen reader get. Headlines come from the model's
+ *  input, so escaped. */
+function whichCardText(note: Extract<GateNote, { kind: "which-card" }>): string {
+  const names = note.cards.map((card) => `*${escapeSlackText(card.headline)}*`);
+  return `${whichCardQuestion(note)} ${names.join(", ")}.`;
+}
+
 /** One verdict, as the line a person reads. */
 export function renderGateNote(note: GateNote): string {
   switch (note.kind) {
+    case "revised":
+    case "staged-beside":
+      return stagingLine(note);
+    case "aimed-elsewhere":
+      return aimedElsewhereLine(note);
     case "resolved":
       // A stated card's ⛔ says what its footer promised, in the card's words.
       if (note.decision === "cancel" && note.cancelled) return `${note.cancelled}.`;
@@ -120,9 +167,10 @@ export function renderGateNote(note: GateNote): string {
     case "already-resolved":
       return STALE_POST;
     case "expired":
-      return note.words ?? expiredPost(note.ttlMs);
+      return note.words ?? EXPIRED_CARD;
     case "superseded":
-      return note.stated ? STATED_SUPERSEDED_POST : SUPERSEDED_POST;
+      if (note.stated) return STATED_SUPERSEDED_POST;
+      return note.by ? supersededBy(note.by, note.byWaiting !== false) : SUPERSEDED_POST;
     case "not-on-the-card":
       // Say where the card is, and name who is being answered: this is the one
       // verdict aimed at a specific person's specific gesture, so it is the one
@@ -137,13 +185,10 @@ export function renderGateNote(note: GateNote): string {
         `nothing was executed. Press Review on the card for *${note.toolName}* just above.`
       );
     case "which-card":
-      // Only an unthreaded DM line reaches this: anywhere else a typed emoji
-      // sits in a card's own thread and answers that card. Two cards are two different writes, and a ✅ outside both threads says
-      // nothing about which one it meant. Guessing runs the wrong one.
-      return (
-        `:warning: ${note.count} proposals are waiting in this DM, so I can't tell which one that is for — ` +
-        `nothing was executed. Press Review on the card you mean.`
-      );
+      // Two cards are two different writes, and a decision that names neither
+      // says nothing about which one it meant. Guessing runs the wrong one.
+      // The buttons are the message's own (`which-card.ts`); this is its text.
+      return whichCardText(note);
     case "review-only":
       return REVIEW_ONLY_POST;
     case "not-a-confirmer":
@@ -161,9 +206,11 @@ export function renderGateNote(note: GateNote): string {
  * A verdict as the line edited onto its card (`Delivery.postGateNote` with a
  * card): the same words as in the thread, without the mention of the person
  * whose gesture it answered — a line on the card stays there for everyone,
- * and an edit notifies no one anyway.
+ * and an edit notifies no one anyway. An expired card says `EXPIRED_CARD`,
+ * a stated one too: its own words are for the person who acted.
  */
 export function renderCardNote(note: GateNote): string {
+  if (note.kind === "expired") return EXPIRED_CARD;
   return note.kind === "not-a-confirmer" ? notAConfirmerLine({ ...note, userId: undefined }) : renderGateNote(note);
 }
 

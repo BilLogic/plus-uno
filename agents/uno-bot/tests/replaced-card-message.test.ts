@@ -32,9 +32,10 @@ import {
   type GateVerdict,
 } from "../src/gate/index";
 import {
-  EXPIRED_POST,
+  EXPIRED_CARD,
   STALE_POST,
   SUPERSEDED_POST,
+  supersededBy,
   defaultNarrative,
   renderGateNote,
 } from "../src/slack/gate-note";
@@ -78,7 +79,8 @@ interface Flow {
  * is that argument the staging path used to consume.
  */
 async function stagedThenRevised(): Promise<Flow> {
-  const h = harness({ replies: REPLIES });
+  const replies = structuredClone(REPLIES);
+  const h = harness({ replies });
 
   const first: TurnOutcome = await runTurn(
     request({ text: "file a card for the reflection redesign" }),
@@ -86,6 +88,8 @@ async function stagedThenRevised(): Promise<Flow> {
   );
   assert.equal(first.disposition, "staged", "the first turn staged a card");
   const originalTs = first.staged!.proposal.proposalTs;
+  // The model names the card its revision replaces.
+  (replies[1]!.toolCalls[0]!.args as Record<string, unknown>).revises_card = originalTs;
 
   // What the Slack door would read and pass in on the next message.
   const pending = await h.threadState.getProposalByThread(REF);
@@ -135,7 +139,7 @@ test("a ✅ on the card a revision replaced is told it was replaced, through bot
     // is not on the proposal I am holding" — is a true thing to say about a
     // reaction that missed, and the wrong thing to say to someone whose card
     // was replaced out from under them.
-    assert.equal(said(verdict), SUPERSEDED_POST, door);
+    assert.equal(said(verdict), supersededBy("Reflection redesign, tutors only"), door);
     assert.equal(verdict.outcome, "stale", door);
     // And still the guarantee #573 bought: the input they pushed back on does
     // not run.
@@ -150,7 +154,7 @@ test("a ⛔ on the replaced card is told the same, and leaves the revision live"
     threadState: h.threadState,
   });
 
-  assert.equal(said(verdict), SUPERSEDED_POST);
+  assert.equal(said(verdict), supersededBy("Reflection redesign, tutors only"));
   assert.equal(verdict.execute, undefined);
   // A decision about a retired card is not a decision about the live one: the
   // person still has something to confirm.
@@ -274,7 +278,7 @@ test("the Slack renderer is the one place a verdict becomes words", () => {
   // What a person reads, pinned at the renderer so a wording change in Gate
   // cannot silently ship (#623). The mention and the emoji live here; Gate
   // hands over the facts.
-  assert.equal(renderGateNote({ kind: "expired" }), EXPIRED_POST);
+  assert.equal(renderGateNote({ kind: "expired" }), EXPIRED_CARD);
   assert.equal(renderGateNote({ kind: "already-resolved" }), STALE_POST);
   assert.equal(renderGateNote({ kind: "superseded" }), SUPERSEDED_POST);
   assert.equal(renderGateNote({ kind: "resolved", decision: "confirm" }), defaultNarrative("confirm"));

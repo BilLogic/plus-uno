@@ -275,6 +275,13 @@ export interface ProposalCard {
    *  short (`proposalCardBlocks`). The `lead` still states the whole card as
    *  its text copy; the Review pop-up draws it from the proposal's facts. */
   short?: { summary: string; size: string };
+  /** When the card stops taking an answer, epoch ms: the one rule's deadline
+   *  from when it is staged (`card-expiry.ts` `cardExpiresAt`), or what is
+   *  left of the card a revision keeps the window of. Set by the stager from
+   *  the same clock it stages with, and stored as the card's `ttlMs`, so the
+   *  card says the deadline the store holds it to. The adapter spells it as
+   *  "Expires …" in each reader's timezone (`slack/card-deadline.ts`). */
+  expiresAt?: number;
 }
 
 /** A sweep card's fixes, as the blocks show them. */
@@ -335,20 +342,45 @@ export type GateNote =
   | { kind: "said"; text: string }
   /** The lost race: someone else's confirmation got there first. */
   | { kind: "already-resolved" }
-  /** A ✅ on a card that aged out of the store. `ttlMs` is the card's own
-   *  lifetime when it set one; absent, it lived the default hour. `words` is
-   *  a stated card's own line for it, which is said instead. */
-  | { kind: "expired"; ttlMs?: number; words?: string }
+  /** A ✅ on a card that aged out of the store. `words` is a stated card's
+   *  own line for it, which the thread is told instead; the card itself says
+   *  the one expired line whatever card it is (#1316). */
+  | { kind: "expired"; words?: string }
   /** A ✅ on a card a revision replaced (#573). `stated` when that card was a
    *  stated one, which has no ⚠️ to point at. */
-  | { kind: "superseded"; stated?: true }
+  | {
+      kind: "superseded";
+      stated?: true;
+      /** The headline of the card that replaced it, when the store knows
+       *  it: with several live cards, "the newest card" may be another
+       *  matter's (#1319). */
+      by?: string;
+      /** Set when that card no longer waits either (story 18). */
+      byWaiting?: false;
+    }
   /** A reaction that landed somewhere other than the card it claims: say where
    *  the live card is, and resolve nothing. `stated` when the live card is a
    *  stated one: no ⚠️, and no tool name a person would know it by. */
   | { kind: "not-on-the-card"; toolName: string; glyph: string; userId: string; stated?: true }
-  /** A gate emoji typed outside any card's thread, in a DM holding several
-   *  live cards: ask which one, and resolve none of them. */
-  | { kind: "which-card"; count: number }
+  /** A decision that names no card, with several waiting (#1319): a gate
+   *  emoji typed in a thread holding more than one live card, or outside any
+   *  card's thread in a DM holding several, or the model's
+   *  `proposal_resolve` that never said which. Resolve none of them, and ask
+   *  "Approve which one?" (or "Cancel which one?") with one button per card:
+   *  `cards` is each card's ts and headline, newest first. */
+  | { kind: "which-card"; decision: "confirm" | "cancel"; cards: WhichCard[] }
+  /** A turn staged a REVISION: the card that follows replaces the waiting
+   *  card `replaced` names (its headline, `turn/card-matter.ts`). Said just
+   *  before the card, so a wrong call is caught at once (#1318). */
+  | { kind: "revised"; replaced: string }
+  /** A turn staged a SEPARATE PROPOSAL while other cards wait: the card that
+   *  follows posts beside them, and each `waiting` headline is still live. */
+  | { kind: "staged-beside"; waiting: string[] }
+  /** A turn's batch named the waiting card `named` as the one it revises,
+   *  but writes the page or issue the waiting card `other` writes: nothing is
+   *  staged and both still wait, since two live cards never share a target
+   *  and neither may be retired on a guess (`turn/card-matter.ts`). */
+  | { kind: "aimed-elsewhere"; named: string; other: string }
   /** A signal from someone outside the card's confirmer set: resolve
    *  nothing, and name who can. `userId` is who was refused, when the signal
    *  carried one. */
@@ -377,6 +409,13 @@ export type GateNote =
       mention?: string;
     };
 
+/** One card a "which one?" question offers: its ts, which its button
+ *  carries, and its headline, which the button reads (`agent/card-identity.ts`). */
+export interface WhichCard {
+  ts: string;
+  headline: string;
+}
+
 /** The card a gate note is about: its ts, its posted text, and its own blocks
  *  when it had any — what the note is edited onto. Gate's `GateCard`,
  *  restated in the port's words. */
@@ -384,6 +423,17 @@ export interface NoteCard {
   ts: string;
   text: string;
   blocks?: unknown[];
+}
+
+/** The Check it offer a milestone posts after its card (#1321), or after
+ *  the reply that hands a build to the IDE (#1324): the scenario the idea
+ *  touches today, when the button stops answering (`cardExpiresAt`), and
+ *  whether a card waits above it to review meanwhile. Its words and its
+ *  button are the adapter's. */
+export interface CheckOfferNote {
+  scenario: string;
+  expiresAt: number;
+  underCard: boolean;
 }
 
 /** What a post actually did. `text` is what was posted, which is not always
@@ -402,7 +452,14 @@ export interface PostResult {
    *  nothing stages; the turn ends answered, remembering `text` — what the
    *  person is told instead. */
   declined?: true;
+  /** On a card: the staging line that went up just above it, as posted —
+   *  absent when none was handed in, or the card did not stage. */
+  lead?: string;
 }
+
+/** What a turn's staging did, said just above its card (#1318): the card a
+ *  revision replaced, or the cards a separate proposal posts beside. */
+export type StagingNote = Extract<GateNote, { kind: "revised" | "staged-beside" }>;
 
 export interface Delivery {
   /** React on the person's own message. The one acknowledgment a channel
@@ -541,9 +598,25 @@ export interface Delivery {
    * buttons stay the last thing in the thread. That is the adapter's business
    * because it is Slack's size limits doing the deciding.
    *
+   * `lead` is the staging line that goes just above the card (`StagingNote`).
+   * It rides the card rather than going up first on its own, because it is
+   * true only of a card that stages: an adapter that declines the card says
+   * neither, and one whose card fails to post takes the line back. Reported
+   * as `PostResult.lead`.
+   *
    * @param proposal what the person is being asked to approve
+   * @param lead the line that says what the staging did
    */
-  card(proposal: ProposalCard): Promise<PostResult>;
+  card(proposal: ProposalCard, lead?: StagingNote): Promise<PostResult>;
+
+  /**
+   * Offer the blueprint check under a milestone's card (#1321): this changes
+   * how the scenario works today — check it? — with a Check it button and
+   * its deadline. The ts is the offer's identity: the check's record is kept
+   * under it, and a press hands it back. A surface that cannot carry a
+   * button answers `ok: false`, and nothing is offered.
+   */
+  postCheckOffer(offer: CheckOfferNote): Promise<PostResult>;
 
   /** Make a failure visible. Best-effort and never throwing, because the one
    *  thing worse than an error message is silence. `ask` is the person's
@@ -569,6 +642,7 @@ export type DeliveryCall =
   | { kind: "gate-note"; note: GateNote; card?: NoteCard }
   | { kind: "reopen-card"; card: NoteCard }
   | { kind: "proposal"; card: ProposalCard }
+  | { kind: "check-offer"; offer: CheckOfferNote }
   | { kind: "failure"; stage: DeliveryFailureStage; message?: string; ask?: string };
 
 export interface RecordingDelivery extends Delivery {
@@ -617,6 +691,8 @@ export interface RecordingDeliveryOptions {
   answerFails?: boolean;
   /** Stage nothing — a card Slack rejected outright. */
   stagingFails?: boolean;
+  /** Decline every card, as an answer-only surface does (`PostResult.declined`). */
+  cardDeclined?: boolean;
   /**
    * Make a note fail, the way Slack refuses a post into a conversation the bot
    * was removed from.
@@ -720,8 +796,20 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       calls.push({ kind: "reopen-card", card });
     },
 
-    async card(proposal) {
+    async card(proposal, lead) {
       const { text, followUp, blocks } = spelling.card(proposal);
+      if (opts.cardDeclined) {
+        calls.push({ kind: "proposal", card: proposal });
+        return { ok: true, declined: true, text };
+      }
+      // The staging line goes up first, and only with a card that lands: one
+      // that fails takes it back, as the Slack adapter deletes it.
+      const leadText = lead ? spelling.gateNote(lead) : undefined;
+      if (lead && leadText && !opts.stagingFails) {
+        calls.push({ kind: "gate-note", note: lead });
+        gateNotes.push(lead);
+        posted.push(leadText);
+      }
       // A plan too long for one Slack message goes out as its own messages
       // BEFORE the card, so the buttons stay last — recorded here in that same
       // order, and recorded whether or not the card itself then lands.
@@ -735,7 +823,15 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       posted.push(text);
       const ts = `card-${++staged}`;
       stagedAt.push(ts);
-      return { ok: true, text, ts, ...(blocks ? { blocks } : {}) };
+      return { ok: true, text, ts, ...(blocks ? { blocks } : {}), ...(leadText ? { lead: leadText } : {}) };
+    },
+
+    async postCheckOffer(offer) {
+      calls.push({ kind: "check-offer", offer });
+      const text = `offer: check ${offer.scenario} against today's blueprint`;
+      if (opts.noteFails) return { ok: false, text };
+      posted.push(text);
+      return { ok: true, text, ts: `offer-${calls.length}` };
     },
 
     async postFailure(stage, err, ask) {

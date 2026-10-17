@@ -123,6 +123,8 @@ interface ClaudeMessage {
 export type ClaudeTransport = (
   model: string,
   body: Record<string, unknown>,
+  /** Abort the round-trip in flight (a one-shot's `ModelPrompt.signal`). */
+  signal?: AbortSignal,
 ) => Promise<{ status: number; data: unknown }>;
 
 export interface ClaudeProviderOptions {
@@ -231,7 +233,7 @@ export function claudeProvider(opts: ClaudeProviderOptions): ModelProvider {
         max_tokens: prompt.maxTokens ?? ONE_SHOT_MAX_TOKENS,
         messages: [{ role: "user", content: prompt.prompt }],
         ...(prompt.system ? { system: prompt.system } : {}),
-      });
+      }, prompt.signal);
       const parsed = (data ?? {}) as ClaudeMessage;
       if (status !== 200) {
         return {

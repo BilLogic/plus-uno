@@ -37,6 +37,8 @@
 import { textSections } from "./render";
 import { CONFIRM_FOOTER, withoutInternalFields } from "./proposal-render";
 import { clip } from "./card-block";
+import { splitDeadline } from "./card-deadline";
+import { EXPIRED_CARD } from "./gate-note";
 import { anatomyBlocks, decisionWords, DESCRIPTION_CHARS, reviewTitle, type DecisionWords, type DraftAlert, type DraftAnatomy } from "./review-anatomy";
 import { batchAnatomy } from "./review-batch";
 import { SLACK_USER_ID, escapeSlackText, unescapeSlackText } from "./mrkdwn";
@@ -386,7 +388,8 @@ export function fitBody(draft: unknown[], room: number): unknown[] {
 
 /** The card's text without its footer, which points at the pop-up itself. */
 function draftBody(text: string): string {
-  return text.replace(CONFIRM_FOOTER, "").trim();
+  // The card's deadline is the thread's to show, not a line of the draft.
+  return splitDeadline(text).text.replace(CONFIRM_FOOTER, "").trim();
 }
 
 const CHOICES: ReadonlyArray<[ReviewDecision, string]> = [
@@ -653,7 +656,7 @@ export function closedView(
   const title = closedTitle(why);
   switch (why.state) {
     case "expired":
-      return stateView(card, "warning", why.stated?.expired ?? "This proposal expired, so it can't be approved now. Ask me again and I'll set it up fresh.", title);
+      return stateView(card, "warning", why.stated?.expired ?? EXPIRED_CARD, title);
     case "superseded":
       return stateView(card, "warning", "This proposal was replaced by a newer one. Review the newest card in the thread instead.", title);
     case "gone":

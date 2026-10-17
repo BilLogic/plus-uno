@@ -72,10 +72,9 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { AbsenceContext } from "./absence";
 import type { Env, SlackContext } from "../types";
-import { proposalOperations } from "../thread-state/index";
 import type { PendingProposal, ThreadRef } from "../thread-state/index";
 import type { ProviderConversationTurn } from "./provider-conversation";
-import { buildSystemBlocks } from "./skills";
+import { buildSystemBlocks, pendingContextOf } from "./skills";
 import { threadStateFor } from "../thread-state/production";
 import {
   isSubrequestBudgetError,
@@ -152,7 +151,13 @@ export interface AgentInput {
    */
   conversationTs: string;
   currentSender: { userId: string };
+  /** The card the turn was handed: the thread's newest, or the card a Needs
+   *  changes sent back. */
   pending: PendingProposal | null;
+  /** Every card waiting in the thread, newest first — what the model's
+   *  pending-proposal context lists, and what `proposal_resolve` names one
+   *  of (`validateProposalResolve`). */
+  liveCards: PendingProposal[];
   /** Pre-rendered one-line description of what the user has open in the
    *  assistant panel (e.g. "channel <#C123>"), when chatting from the panel.
    *  Injected as an advisory system block. Absent for channel/@mention turns. */
@@ -234,15 +239,7 @@ export async function runAgent(input: AgentInput): Promise<AgentRun> {
   const { env, conversation, tier, routeReason, currentSender, pending, slack, assistantContext } =
     input;
 
-  const pendingForSystem = pending
-    ? {
-        operations: proposalOperations(pending),
-        toolName: pending.toolName,
-        input: pending.input,
-        requesterUserId: pending.requesterUserId,
-      }
-    : null;
-  const blocks = await buildSystemBlocks(env, pendingForSystem, currentSender, assistantContext);
+  const blocks = await buildSystemBlocks(env, input.liveCards.map(pendingContextOf), currentSender, assistantContext);
   // Block 0 is the harness: identical for every request on this build, and so
   // the only block a provider cache can hold. Everything after it is
   // per-request — who sent this, what proposal is pending.
@@ -285,6 +282,7 @@ export async function runAgent(input: AgentInput): Promise<AgentRun> {
       system,
       tools,
       pending,
+      liveCards: input.liveCards,
       currentSenderId: currentSender.userId,
       cancelKey,
       ...(input.cancelSince !== undefined ? { cancelSince: input.cancelSince } : {}),
@@ -321,7 +319,7 @@ export function selectProvider(env: Env): ModelProvider {
   const provider = (env.MODEL_PROVIDER ?? "gemini").toLowerCase();
   if (provider === "vertex-claude" && claudeVertexConfigured(env)) {
     return claudeProvider({
-      transport: (model, body) => claudeVertexRaw(env, model, body),
+      transport: (model, body, signal) => claudeVertexRaw(env, model, body, signal),
       defaultModel: env.CLAUDE_MODEL,
     });
   }

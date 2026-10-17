@@ -138,6 +138,24 @@ describe("[d1] appreciation", () => {
       bindings.USAGE_DB.prepare("UPDATE proposal_events SET confirmed_edited = 2 WHERE proposal_id = '1700000000.000700'").run(),
     ).rejects.toThrow(/CHECK/);
   });
+
+  it("proposal_events.staged_as and corrects_proposal_id are on the schema, staged_as holding only its two values", async () => {
+    const events = createD1ProposalEventLog({ db: bindings.USAGE_DB });
+    await events.record(stagedRow({ proposalId: "1700000000.000800", stagedAs: "separate", correctsProposalId: "1700000000.000750" }));
+    const [row] = await events.eventsOf("1700000000.000800");
+    expect([row?.stagedAs, row?.correctsProposalId]).toEqual(["separate", "1700000000.000750"]);
+    await expect(
+      bindings.USAGE_DB.prepare("UPDATE proposal_events SET staged_as = 'merged' WHERE proposal_id = '1700000000.000800'").run(),
+    ).rejects.toThrow(/CHECK/);
+  });
+
+  it("a staged row written before 0018 reads its kind and correction as unknown", async () => {
+    await bindings.USAGE_DB.prepare(
+      "INSERT INTO proposal_events (proposal_id, event, at, via, test_traffic, tools) VALUES ('1700000000.000900', 'staged', 1700000000900, 'turn', 0, '[]')",
+    ).run();
+    const [row] = await createD1ProposalEventLog({ db: bindings.USAGE_DB }).eventsOf("1700000000.000900");
+    expect([row?.stagedAs, row?.correctsProposalId]).toEqual([null, null]);
+  });
 });
 
 describe("[d1] answer feedback", () => {

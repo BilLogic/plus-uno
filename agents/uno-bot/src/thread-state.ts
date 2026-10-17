@@ -10,7 +10,7 @@
 //
 // Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `exec:{ts}`, `report:{ts}`,
 // `event:{event_id}`, `actx:{channel}:{thread}`, `cancel:{channel}:{thread}`,
-// `run:{user}`, `filing:{key}`, `cmp:{channel}:{thread}:{scenario}`, and the
+// `run:{user}`, `filing:{key}`, `cmp:{channel}:{thread}:{scenario}` (a check's record), `chk:{ts}`, and the
 // alarm's own `gc:next`.
 //
 // ── THE CONTRACT IS THIS CLASS'S OWN SIGNATURE (#493, #494) ─────────────────
@@ -18,12 +18,13 @@
 // Every public method below is Durable Object RPC and its signature IS the
 // `src/thread-state` interface: `readHistory`, `appendHistory`,
 // `compactHistory`, `putProposal`, `retireProposal`, `keepPick`, `getProposalByTs`,
-// `getProposalByThread`, `getProposalsByChannel`, `claimProposal`,
+// `getProposalByThread`, `getProposalsByThread`, `getProposalsByChannel`, `claimProposal`,
 // `putReport`, `getReport`, `updateReport`, `beginExecution`, `settleOperation`, `endExecution`, `takeCutOffExecution`,
 // `takeCutOffExecutionInThread`, `findCutOffExecutions`,
 // `reportCutOffNote`, `get/putAssistantContext`, `requestCancel`,
 // `consumeCancel`, `cancelForUser`, `setActiveRun`, `checkAndRecordEvent`,
-// `claimRun`, `markRunDone`, `claimFiling`, `settleFiling`, `claimComparison`. A rename is a type error rather than a runtime
+// `claimRun`, `markRunDone`, `claimFiling`, `settleFiling`, `claimCheck`, `getCheck`, `stepCheck`,
+// `putCheckOffer`, `getCheckOffer`. A rename is a type error rather than a runtime
 // 404, which is the whole point.
 //
 // There is NO `fetch()` and no route table. Until #494 this class carried a
@@ -61,6 +62,7 @@ import {
   ownWords,
   ownText,
   ownOperations,
+  replacedByOf,
   decidedLive,
   REPORT_GRACE_MS,
   changedReport,
@@ -70,8 +72,27 @@ import {
   REPORT_EXPIRY_RETRY_MS,
   type ReportExpiryRecord,
   type ReportExpiryEdit,
+  type ExpiredCardEdit,
+  CARD_EXPIRY_EDIT_GRACE_MS,
+  cardExpiryDueAt,
+  cardExpiryHandOffAt,
+  cardExpiriesToTake,
+  cardExpiryOwed,
+  expiredCardEdit,
   claimedFiling,
+  claimedCheck,
+  liveCheck,
+  steppedCheck,
+  type CheckClaim,
+  type CheckRecord,
+  type CheckStart,
+  type CheckState,
+  type StoredCheck,
   comparisonKey,
+  CHECK_OFFER_KEEP_MS,
+  checkOfferKey,
+  type BlueprintCheckOffer,
+  type CheckOfferRecord,
   decidedNoteOf,
   decidedOf,
   decidedPayload,
@@ -81,6 +102,9 @@ import {
   proposalReplyThread,
   proposalSlot,
   proposalTtlMs,
+  stampedTtl,
+  newestCardFirst,
+  cardOrder,
   withLiveMark,
   type CutOffNoteReport,
   type DecisionReportRecord,
@@ -131,6 +155,10 @@ interface ProposalRecord {
    *  `DECIDED_TTL_MS` from here, and swept after (`decidedLive`). Absent on a
    *  card decided before it was stamped, which keeps its staged lifetime. */
   decidedAt?: number;
+  /** The card's message says it expired (`acknowledgeCardExpiry`, #1316). */
+  expiryShown?: true;
+  /** When the alarm last handed it over for that edit (`takeCardExpiries`). */
+  expiryHandedOffAt?: number;
 }
 
 // Latest assistant-panel context (what surface the user has open) per thread.
@@ -173,7 +201,21 @@ export interface ThreadStateAlarmDeps {
    *  may fail: a record nobody took is found again on the next pass. */
   handOffCutOffRuns?(due: Execution[]): Promise<void>;
   handOffExpiredReports?(due: DecisionReportRecord[]): Promise<void>;
+  /** Hand over cards whose "Expired" edit is owed (`cardExpiryOwed`), at
+   *  most `CARD_EXPIRY_HANDOFFS_PER_PASS` a pass. Takes nothing: a card
+   *  nobody edited is handed over again on the next pass. */
+  handOffExpiredCards?(due: PendingProposal[]): Promise<void>;
 }
+
+/**
+ * Cards one alarm pass hands over for their "Expired" edit (#1316). Each
+ * hand-off is one enqueue — one subrequest of the alarm's 50 on Workers Free —
+ * beside the cut-off runs and report redraws the same pass hands over; cards
+ * past the cap wait `REPORT_EXPIRY_RETRY_MS` for the next pass. Each edit then
+ * runs as its own runner job, on a fresh budget: three subrequests (the read,
+ * `chat.update`, the acknowledgement).
+ */
+export const CARD_EXPIRY_HANDOFFS_PER_PASS = 20;
 
 // Extends the `cloudflare:workers` base class — that is what makes the public
 // methods below callable as Durable Object RPC (compatibility_date 2026-05-01).
@@ -224,6 +266,17 @@ export class ThreadState extends DurableObject<Env> {
       });
     }
 
+    // Cards that aged out untouched, oldest deadline first, to say so on —
+    // each handed over once, and again only once that hand-off has lapsed.
+    if (this.alarmDeps.handOffExpiredCards) {
+      const due = await this.takeCardExpiries(CARD_EXPIRY_HANDOFFS_PER_PASS, now);
+      if (due.length) {
+        await this.alarmDeps.handOffExpiredCards(due).catch((err: unknown) => {
+          console.error(`[thread-state] card expiry hand-off failed: ${err instanceof Error ? err.message : String(err)}`);
+        });
+      }
+    }
+
     const reports = await this.storage.list<ReportRecord>({ prefix: "report:" });
     const proposals = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
     const executions = await this.storage.list<Execution>({ prefix: "exec:" });
@@ -243,6 +296,15 @@ export class ThreadState extends DurableObject<Env> {
       if (now - rec.createdAt > rec.report.ttlMs + REPORT_GRACE_MS) continue;
       const expiryAt = reportExpiryAt(rec, look, now);
       next = Math.min(next, expiryAt <= now ? now + REPORT_EXPIRY_RETRY_MS : expiryAt);
+    }
+    // Each live card's deadline, and a retry for one still owed its edit:
+    // when its hand-off lapses, or on the next pass when none is out.
+    for (const rec of proposals.values()) {
+      const proposal = rec.payload as PendingProposal | null;
+      const due = cardExpiryDueAt(rec, proposal);
+      const handOffAt = cardExpiryHandOffAt(rec, proposal);
+      if (due === null || handOffAt === null || now - due > CARD_EXPIRY_EDIT_GRACE_MS) continue;
+      next = Math.min(next, handOffAt <= now ? now + REPORT_EXPIRY_RETRY_MS : handOffAt);
     }
     if (next !== Infinity) await this.storage.transaction((txn) => this.armAlarmBy(txn, next, true));
   }
@@ -267,7 +329,10 @@ export class ThreadState extends DurableObject<Env> {
       }
       const props = await txn.list<ProposalRecord>({ prefix: "prop:" });
       for (const [key, rec] of props) {
-        const live = rec.decided ? decidedLive(rec, (rec.payload as PendingProposal | null) ?? {}, now) : now - rec.createdAt <= recordTtlMs(rec);
+        // An aged-out card still owed its "Expired" edit is kept for it.
+        const live = rec.decided
+          ? decidedLive(rec, (rec.payload as PendingProposal | null) ?? {}, now)
+          : now - rec.createdAt <= recordTtlMs(rec) || cardExpiryOwed(rec, rec.payload as PendingProposal | null, now);
         if (!live) await txn.delete(key);
         else remaining++;
       }
@@ -298,6 +363,11 @@ export class ThreadState extends DurableObject<Env> {
       const compared = await txn.list<{ at: number }>({ prefix: "cmp:" });
       for (const [key, rec] of compared) {
         if (now - rec.at > HISTORY_TTL_MS) await txn.delete(key);
+        else remaining++;
+      }
+      const checkOffers = await txn.list<CheckOfferRecord>({ prefix: "chk:" });
+      for (const [key, rec] of checkOffers) {
+        if (now - rec.at > CHECK_OFFER_KEEP_MS) await txn.delete(key);
         else remaining++;
       }
       const filings = await txn.list<FilingRecord>({ prefix: "filing:" });
@@ -390,7 +460,8 @@ export class ThreadState extends DurableObject<Env> {
   //
   // Retire first, then write — a choice, not an accident: the new card is the
   // one a racing ✅ has to be able to find, so it is the last thing to land.
-  async putProposal(proposal: PendingProposal, at: number): Promise<{ retired: string[] }> {
+  async putProposal(staged: PendingProposal, at: number): Promise<{ retired: string[] }> {
+    const proposal = stampedTtl(staged, at);
     const slot = proposalSlot(proposal);
     const expiresAt = at + proposalTtlMs(proposal) + 1;
     const retired = await this.storage.transaction(async (txn) => {
@@ -415,8 +486,10 @@ export class ThreadState extends DurableObject<Env> {
         const item = proposal.item;
         const rec = await txn.get<ReportRecord>(reportKey(item.messageTs));
         if (rec) await txn.put(reportKey(item.messageTs), { ...rec, deadlines: { ...rec.deadlines, [item.id]: expiresAt } });
-        await this.armAlarmBy(txn, expiresAt);
       }
+      // Woken at the deadline: an item's report redraws, any other card is
+      // edited to say it expired (#1316).
+      await this.armAlarmBy(txn, expiresAt);
       await this.ensureGcAlarm(txn);
       return retired;
     });
@@ -512,13 +585,33 @@ export class ThreadState extends DurableObject<Env> {
       }
       const proposal = (rec.payload as PendingProposal | null) ?? {};
       if (rec.supersededBy && (await this.successorIsLive(rec.supersededBy, at, txn))) {
-        return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal) };
+        // The live card it was replaced by, read in this same transaction:
+        // storage reads inside the object cost no subrequest.
+        const replacedBy = await replacedByOf(
+          rec.supersededBy,
+          (ts) => txn.get<ProposalRecord>(proposalKey(ts)),
+          (next) => !next.decided && !next.retired && at - next.createdAt <= recordTtlMs(next),
+          (next) => (next.payload as PendingProposal | null) ?? {},
+        );
+        return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal), ...replacedBy };
       }
       if (at - rec.createdAt > recordTtlMs(rec)) {
-        await txn.delete(proposalKey(proposalTs));
+        // Kept while its expiry edit is owed, so the edit still finds it.
+        if (!cardExpiryOwed(rec, rec.payload as PendingProposal | null, at)) await txn.delete(proposalKey(proposalTs));
         return { state: "expired", ...ownTtl(proposal), ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal) };
       }
-      if (rec.supersededBy || rec.retired) return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal) };
+      if (rec.supersededBy || rec.retired) {
+        // A replacement that no longer waits is still named (story 18).
+        const replacedBy = rec.supersededBy
+          ? await replacedByOf(
+              rec.supersededBy,
+              (ts) => txn.get<ProposalRecord>(proposalKey(ts)),
+              (next) => !next.decided && !next.retired && at - next.createdAt <= recordTtlMs(next),
+              (next) => (next.payload as PendingProposal | null) ?? {},
+            )
+          : {};
+        return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal), ...replacedBy };
+      }
       return {
         state: "found",
         proposal: withLiveMark(rec.payload as PendingProposal, at),
@@ -539,9 +632,27 @@ export class ThreadState extends DurableObject<Env> {
       const proposal = rec.payload as PendingProposal | null;
       if (!proposal || proposal.channel !== ref.channel) continue;
       if (proposalReplyThread(proposal) !== ref.thread) continue; // keyed on the card's thread
-      if (!best || rec.createdAt > best.createdAt) best = rec;
+      if (!best || newestCardFirst(cardOrder(rec), cardOrder(best)) < 0) best = rec;
     }
     return best ? withLiveMark(best.payload as PendingProposal, at) : null;
+  }
+
+  // Same scan, every live card in the reply thread, newest first: the list
+  // `getProposalByThread` answers the head of (#1317).
+  async getProposalsByThread(ref: ThreadRef, at: number): Promise<PendingProposal[]> {
+    const all = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
+    const live: ProposalRecord[] = [];
+    for (const rec of all.values()) {
+      if (at - rec.createdAt > recordTtlMs(rec)) continue;
+      if (rec.supersededBy || rec.retired || rec.decided) continue;
+      const proposal = rec.payload as PendingProposal | null;
+      if (!proposal || proposal.channel !== ref.channel) continue;
+      if (proposalReplyThread(proposal) !== ref.thread) continue;
+      live.push(rec);
+    }
+    return live
+      .sort((a, b) => newestCardFirst(cardOrder(a), cardOrder(b)))
+      .map((rec) => withLiveMark(rec.payload as PendingProposal, at));
   }
 
   // Same scan at channel grain, newest first: which cards are live anywhere in
@@ -557,7 +668,7 @@ export class ThreadState extends DurableObject<Env> {
       live.push(rec);
     }
     return live
-      .sort((a, b) => b.createdAt - a.createdAt)
+      .sort((a, b) => newestCardFirst(cardOrder(a), cardOrder(b)))
       .map((rec) => withLiveMark(rec.payload as PendingProposal, at));
   }
 
@@ -632,6 +743,38 @@ export class ThreadState extends DurableObject<Env> {
       const next = expiredReport(rec, reportLook(proposals, executions), at);
       if (next !== rec) await txn.put(reportKey(messageTs), next);
       return next.expiryPending ? { report: next.report, revision: next.revision ?? 0 } : null;
+    });
+  }
+
+  // A card's "Expired" edit (#1316): read only while owed; the edit is the
+  // caller's, outside this object, and its acknowledgement settles it.
+  async prepareCardExpiry(proposalTs: string, at: number): Promise<ExpiredCardEdit | null> {
+    const rec = await this.storage.get<ProposalRecord>(proposalKey(proposalTs));
+    const proposal = (rec?.payload as PendingProposal | null | undefined) ?? null;
+    return rec && proposal && cardExpiryOwed(rec, proposal, at) ? expiredCardEdit(proposal) : null;
+  }
+
+  async acknowledgeCardExpiry(proposalTs: string): Promise<void> {
+    await this.storage.transaction(async (txn) => {
+      const rec = await txn.get<ProposalRecord>(proposalKey(proposalTs));
+      if (rec && !rec.expiryShown) await txn.put<ProposalRecord>(proposalKey(proposalTs), { ...rec, expiryShown: true });
+    });
+  }
+
+  // Taken and marked in one transaction, so a pass never hands over a card
+  // the previous pass's job still holds (`cardExpiriesToTake`).
+  async takeCardExpiries(limit: number, at: number): Promise<PendingProposal[]> {
+    return this.storage.transaction(async (txn) => {
+      const records = await txn.list<ProposalRecord>({ prefix: "prop:" });
+      const taken = cardExpiriesToTake(
+        [...records.values()].map((rec) => ({ rec, proposal: (rec.payload as PendingProposal | null) ?? null })),
+        at,
+        limit,
+      );
+      for (const { rec, proposal } of taken) {
+        await txn.put<ProposalRecord>(proposalKey(proposal.proposalTs), { ...rec, expiryHandedOffAt: at });
+      }
+      return taken.map(({ proposal }) => proposal);
     });
   }
 
@@ -894,17 +1037,48 @@ export class ThreadState extends DurableObject<Env> {
     else await this.storage.delete(filingKey(key));
   }
 
-  // ----- one comparison per scenario per thread -----
+  // ----- one blueprint check per scenario per thread (#1322) -----
+  //
+  // Each read and its write are one transaction, so of two racing presses one
+  // claims, and a Stop and the job's own finish cannot both win.
 
-  async claimComparison(ref: ThreadRef, scenario: string, at: number): Promise<boolean> {
+  async claimCheck(ref: ThreadRef, scenario: string, start: CheckStart, at: number): Promise<CheckClaim> {
     const key = comparisonKey(ref, scenario);
     return this.storage.transaction(async (txn) => {
-      const held = await txn.get<{ at: number }>(key);
-      if (held && at - held.at < HISTORY_TTL_MS) return false;
-      await txn.put<{ at: number }>(key, { at });
-      await this.ensureGcAlarm(txn);
-      return true;
+      const { claim, store } = claimedCheck(await txn.get<StoredCheck>(key), at, start, crypto.randomUUID());
+      if (store) {
+        await txn.put<CheckRecord>(key, store);
+        await this.ensureGcAlarm(txn);
+      }
+      return claim;
     });
+  }
+
+  async getCheck(ref: ThreadRef, scenario: string, at: number): Promise<CheckRecord | null> {
+    return liveCheck(await this.storage.get<StoredCheck>(comparisonKey(ref, scenario)), at);
+  }
+
+  async stepCheck(ref: ThreadRef, scenario: string, run: string, to: Exclude<CheckState, "running">, at: number): Promise<boolean> {
+    const key = comparisonKey(ref, scenario);
+    return this.storage.transaction(async (txn) => {
+      const stepped = steppedCheck(await txn.get<StoredCheck>(key), at, run, to);
+      if (stepped) await txn.put<CheckRecord>(key, stepped);
+      return stepped !== null;
+    });
+  }
+
+  // ----- the blueprint check's offers (#1321) -----
+
+  async putCheckOffer(offer: BlueprintCheckOffer, at: number): Promise<void> {
+    await this.storage.transaction(async (txn) => {
+      await txn.put<CheckOfferRecord>(checkOfferKey(offer.offerTs), { offer, at });
+      await this.ensureGcAlarm(txn);
+    });
+  }
+
+  async getCheckOffer(offerTs: string, at: number): Promise<BlueprintCheckOffer | null> {
+    const rec = await this.storage.get<CheckOfferRecord>(checkOfferKey(offerTs));
+    return rec && at - rec.at <= CHECK_OFFER_KEEP_MS ? rec.offer : null;
   }
 
   // ----- the capacity outage (turn/capacity-outage.ts) -----

@@ -53,9 +53,9 @@ import { charge } from "../net";
 import { resolveGeminiModel } from "../agent/gemini-tiers";
 import { capacityOutage, NOT_WATCHED, watchedTurnDeps, type CapacityOutage } from "./capacity-outage";
 import { capacityOutageStoreFor } from "../thread-state/production";
-import { milestoneComparisonOn } from "../blueprint-upkeep/env";
+import { serviceChangeJudgementOn } from "../blueprint-upkeep/env";
 import type { Delivery } from "./delivery";
-import { restageExecution, type TurnDeps, type TurnRequest } from "./turn";
+import { restageExecution, stageFromButton, type ButtonStaging, type TurnDeps, type TurnRequest } from "./turn";
 
 /**
  * What a caller reports the run through, beside the outcome.
@@ -196,6 +196,7 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
         conversationTs: request.conversationTs,
         currentSender: req.currentSender,
         pending: req.pending,
+        liveCards: req.liveCards,
         ...(req.assistantContext ? { assistantContext: req.assistantContext } : {}),
         ...(req.preflight ? { preflight: req.preflight } : {}),
         onInterim: req.onInterim,
@@ -281,9 +282,10 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     // `agent/context-state.ts` for why this one does not get to ship on.
     contextState: env.CONTEXT_STATE === "on",
 
-    // A milestone's idea beside today's blueprint, and the offer to draw it
-    // there as a proposal; absent where the blueprint is not configured.
-    ...milestoneComparisonOn(env, wiring.threadState),
+    // The quick judgement that offers the blueprint check under a PRD's card
+    // (#1321) or an IDE hand-off's reply (#1324). Absent where the blueprint
+    // is not configured.
+    ...serviceChangeJudgementOn(env),
     },
   );
 }
@@ -317,6 +319,13 @@ export function cardReadsFor(env: Env, shareoutReads: ShareoutReads = shareoutRe
       const target = resolveRepoFor(env, input.repo);
       if (!target.ok) return { repo: env.GITHUB_REPO, visibility: "unknown" };
       return { repo: target.entry.repo, visibility: await githubRepoVisibility(env, target.entry) };
+    },
+    // The same resolver, with no read: absent is `GITHUB_REPO`, a short name
+    // its listed repo; a repo off the list compares as given.
+    issueRepo(repo) {
+      const target = resolveRepoFor(env, repo);
+      if (target.ok) return target.entry.repo;
+      return typeof repo === "string" && repo.trim() ? repo.trim() : env.GITHUB_REPO;
     },
     // A run's repo and branch as the executor will send them: the same
     // resolver, and the same cached default-branch read.
@@ -354,6 +363,21 @@ export function restageFor(
       onRestaged: (from, to) => followRestageFor(env, from, to),
     });
   };
+}
+
+/**
+ * A door's staging of a card a button asked for (#1323), bound to `Env`:
+ * Turn's own card builder and staging (`stageFromButton`), on the door's
+ * store and Delivery, so a check's notes go up on the card a turn would have
+ * staged.
+ */
+export function stageFromButtonFor(
+  env: Env,
+  threadState: ThreadState,
+): (ask: ButtonStaging, delivery: Delivery) => Promise<PendingProposal | null> {
+  const cards = cardReadsFor(env);
+  const proposalEvents = proposalEventLogFor(env);
+  return (ask, delivery) => stageFromButton(ask, { threadState, delivery, cards, usage: { proposalEvents } });
 }
 
 /**

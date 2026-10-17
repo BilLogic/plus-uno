@@ -44,7 +44,7 @@ const REPORT_KV_KEY = "ds-precedence:report";
 /** Every posted report is recorded under its own ts, so a later week's never
  *  displaces an earlier one's. */
 const THREAD_KV_PREFIX = "ds-precedence:thread:";
-/** How long a report's thread stays one: well past its cards' six days, so
+/** How long a report's thread stays one: well past its cards' 24 weekday hours, so
  *  the replies people still add to it are not taken as turns. */
 const THREAD_RECORD_TTL_S = 30 * 24 * 60 * 60;
 const INDEX_FILE = "design-system/agent-views/components/index.md";

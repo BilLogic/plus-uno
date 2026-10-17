@@ -23,7 +23,7 @@
 
 import type { ThreadState } from "../thread-state/index";
 import { withWorkingSignal, type Delivery } from "../turn/index";
-import { resolveSignal, type GateRestage, type GateVerdict } from "../gate/index";
+import { otherCardWaits, resolveSignal, type GateRestage, type GateVerdict } from "../gate/index";
 import { renderGateNote, statedCancelledNote } from "./gate-note";
 import { escapeSlackText } from "./mrkdwn";
 import { notedCardBlocks, proposalCardBlocks } from "./proposal-render";
@@ -190,6 +190,9 @@ export async function applyPressVerdict(
   request: ButtonRequest,
   verdict: GateVerdict,
   deps: Omit<ButtonDoorDeps, "threadState" | "standingConfirmers"> & {
+    /** The thread's live cards, read after a win for whether another still
+     *  waits (`otherCardWaits`). Absent, the thread settles idle. */
+    threadState?: Pick<ThreadState, "getProposalsByThread">;
     /** The decided card's words and outcome line, changed on the way: the
      *  pop-up's approval with edits says what was approved, and by whom, and
      *  `edited` says the draft's values changed (`decidedCard`). */
@@ -242,12 +245,13 @@ export async function applyPressVerdict(
       await delivery.postGateNote(post.note);
       const ran = await deps.applyVerdict(verdict);
       outcomes = Array.isArray(ran) ? ran : undefined;
+      return deps.threadState ? otherCardWaits(pending, deps.threadState) : false;
     },
     // What the thread needs afterwards, stated rather than defaulted: this
-    // door RESOLVED the card, so nothing in the thread is waiting on anybody.
-    // The argument is required precisely so a door cannot inherit an answer it
-    // never thought about (#575).
-    () => "idle",
+    // door RESOLVED the card, so the thread waits on nobody — unless another
+    // card in it still does (#1319). The argument is required precisely so a
+    // door cannot inherit an answer it never thought about (#575).
+    (moreLive) => (moreLive ? "waiting-on-person" : "idle"),
   );
 
   // A stated card's ⛔ is a decision its footer described, not a request to

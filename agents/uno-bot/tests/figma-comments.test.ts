@@ -20,7 +20,7 @@ import { runSweepJob, type SweepSource } from "../src/sweep/index";
 import type { ScheduledJob } from "../src/scheduled/runs";
 import { isWithheldRepoPath } from "../src/integrations/repo-read-guard";
 import { COMMENTS_CURSOR, etDatesOf, quoteOf, readCommentsCursor, writeCommentsCursor } from "../src/figma-comments/read";
-import { DECISION_CARD_TTL_MS, figmaDecisionsSection, MAX_NO_PRD_REPLIES } from "../src/figma-comments/post";
+import { figmaDecisionsSection, MAX_NO_PRD_REPLIES } from "../src/figma-comments/post";
 import { candidateThreads, readable } from "../src/figma-comments/threads";
 import { dividerSection, pageOf, pagesOf } from "../src/figma-comments/sections";
 import { cardNumbersOf } from "../src/figma-comments/title";
@@ -538,7 +538,7 @@ describe("the morning's decisions on the sweep's message in #plus-design (#900)"
     assert.ok(!JSON.stringify(posted.blocks).includes("The end."), "the card shows a cut of it");
   });
 
-  it("stages each decision on its own, for the card's people, for 72 hours — and writes nothing (AC 3)", async () => {
+  it("stages each decision on its own, for the card's people, for 24 weekday hours — and writes nothing (AC 3)", async () => {
     const { h, client } = await postedMorning();
     const parent = parentOf(h);
     assert.equal(h.staged.length, 4);
@@ -548,7 +548,7 @@ describe("the morning's decisions on the sweep's message in #plus-design (#900)"
       assert.equal(p.proposalTs, `${parent.ts}#${id}`, "its own proposal, on its card in the message");
       assert.equal(p.threadTs, parent.ts);
       assert.deepEqual(p.confirmers, ["U0MERYEM", "U0SARAH"]);
-      assert.equal(p.ttlMs, DECISION_CARD_TTL_MS);
+      assert.equal(p.ttlMs, 24 * 3_600_000, "staged Wednesday 09:00 ET, live until Thursday 09:00 ET");
       assert.equal(p.operations?.length, 1);
       assert.equal(p.stated?.cancelled, "Dropped, nothing written");
       assert.equal(p.refuseRevision, `To change decision ${i + 1}'s wording, press Review on its card and choose Needs changes.`);
@@ -1239,7 +1239,7 @@ describe("a reply with new wording revises a decision's draft (#900 AC 4)", () =
     assert.equal(revised.supersedeKey, before.proposalKey.replace(/^(.*)#c3$/, "report-item:$1:c3"), "the slot its card had");
     assert.deepEqual(revised.operations, [{ toolName: "notion_update", input: { page_url: CARD_URL, properties: { "Design Status": "Ready for Dev" } } }]);
     assert.deepEqual(revised.confirmers, ["U0MERYEM", "U0SARAH"]);
-    assert.equal(revised.ttlMs, at(30, 13) + DECISION_CARD_TTL_MS - at(30, 15), "the 72 h the thread started with, less the two since");
+    assert.equal(revised.ttlMs, at(31, 13) - at(30, 15), "the Thursday 09:00 ET deadline the thread started with, less the two hours since");
     // The revised card replaces the old one in place, under the same number:
     // no new message.
     assert.equal(h.figma.messages.filter((m) => m.threadTs === parent.ts).length, 0);

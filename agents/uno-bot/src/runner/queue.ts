@@ -92,16 +92,22 @@ export interface RunnerDeps {
  */
 export async function enqueueThreadJob(storage: RunnerStorage, job: RunnerJob, now: number): Promise<void> {
   // A report's redraw already queued, or running, covers a second hand-off of
-  // the same expiry; one that failed is gone by the alarm's next pass.
-  if (job.job.kind === "report-expiry") {
-    const { messageTs } = job.job;
-    const queued = await storage.list<RunnerJob>({ prefix: JOB_PREFIX });
-    if ([...queued.values()].some((q) => q.job.kind === "report-expiry" && q.job.messageTs === messageTs)) return;
+  // the same expiry; one that failed is gone by the alarm's next pass. So does
+  // a card's expiry edit (#1316).
+  if (job.job.kind === "report-expiry" || job.job.kind === "card-expiry") {
+    const queued = [...(await storage.list<RunnerJob>({ prefix: JOB_PREFIX })).values()];
+    if (queued.some((q) => sameExpiry(q.job, job.job))) return;
   }
   // Monotonic-enough key: jobs drain in enqueue order within the thread.
   const key = `${JOB_PREFIX}${String(job.enqueuedAt).padStart(15, "0")}:${crypto.randomUUID()}`;
   await storage.put(key, job);
   if ((await storage.getAlarm()) === null) await storage.setAlarm(now);
+}
+
+/** Whether two queued jobs are the same expiry's edit. */
+function sameExpiry(a: RunnerJob["job"], b: RunnerJob["job"]): boolean {
+  if (a.kind === "report-expiry" && b.kind === "report-expiry") return a.messageTs === b.messageTs;
+  return a.kind === "card-expiry" && b.kind === "card-expiry" && a.proposalTs === b.proposalTs;
 }
 
 /**

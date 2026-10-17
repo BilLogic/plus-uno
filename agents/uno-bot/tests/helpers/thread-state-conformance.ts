@@ -28,11 +28,16 @@ import {
   EVENT_DEDUP_TTL_MS,
   EXECUTION_CUTOFF_MS,
   HISTORY_TTL_MS,
+  CHECK_OFFER_KEEP_MS,
+  type BlueprintCheckOffer,
   MAX_HISTORY_TURNS,
   PROPOSAL_TTL_MS,
   REVISING_MARK_MS,
+  REPORT_EXPIRY_RETRY_MS,
+  CARD_EXPIRY_HANDOFF_RETRY_MS,
   REPORT_GRACE_MS,
   FILING_LEASE_MS,
+  CHECK_LEASE_MS,
   RUN_LEASE_MS,
   proposalOperations,
   unfinishedOperations,
@@ -42,6 +47,7 @@ import {
   type ThreadState,
   type ThreadStateDeps,
 } from "../../src/thread-state/store";
+import { cardTtlMs } from "../../src/card-expiry";
 
 /** A hand-wound clock. `now()` is what the store reads; `advance` is the only
  *  way time passes in this suite. */
@@ -66,7 +72,15 @@ const OTHER = { channel: "C1", thread: "1700.9" } as const;
 /** The batch `proposal()` stages, as a replaced or expired lookup names it. */
 const STAGED = [{ toolName: "notion_create", input: { title: "Onboarding checklist" } }];
 
+/** A card on a fixed hour, so the suite's TTL assertions read the same on any
+ *  weekday it runs: the store stamps the expiry rule only on a card staged
+ *  without a `ttlMs`, which `bare()` stages. */
 function proposal(overrides: Partial<PendingProposal> = {}): PendingProposal {
+  return { ttlMs: PROPOSAL_TTL_MS, ...bare(), ...overrides };
+}
+
+/** The card as a turn stages it: no `ttlMs` of its own. */
+function bare(overrides: Partial<PendingProposal> = {}): PendingProposal {
   return {
     toolName: "notion_create",
     input: { title: "Onboarding checklist" },
@@ -440,6 +454,70 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByThread({ channel: "D1", thread: "1700.4" }))?.proposalTs, "1700.5");
     // The conversation key names no thread a card was posted in.
     assert.equal(await store.getProposalByThread({ channel: "D1", thread: "dm" }), null);
+  });
+
+  // Every waiting card in one reply thread, newest first (#1317): what a turn
+  // that weighs revision against separate proposal has to see, where
+  // get-by-thread shows it only the newest.
+  it("list-by-thread lists a thread's one live card", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread }));
+    assert.deepEqual((await store.getProposalsByThread(THREAD)).map((p) => p.proposalTs), ["1700.2"]);
+  });
+
+  it("list-by-thread lists a turn's card and a keyed card side by side, newest first", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread }));
+    clock.advance(1_000);
+    await store.putProposal(proposal({ proposalTs: "1700.3", replyTs: THREAD.thread, supersedeKey: "sweep", sweepRun: "2026-09-30" }));
+    // Another thread's card, in the same channel, is not this thread's.
+    await store.putProposal(proposal({ proposalTs: "1700.4", threadTs: OTHER.thread, replyTs: OTHER.thread }));
+    assert.deepEqual((await store.getProposalsByThread(THREAD)).map((p) => p.proposalTs), ["1700.3", "1700.2"]);
+    // The newest-card lookup stays, and answers the list's head.
+    assert.equal((await store.getProposalByThread(THREAD))?.proposalTs, "1700.3");
+  });
+
+  // Two cards staged in the same millisecond — a turn that stages a separate
+  // proposal right after another, on a fast store — still list in the order
+  // they were posted: the card's Slack ts breaks the tie, so the newest-card
+  // lookup and "which one?" never flip between runs.
+  it("list-by-thread and get-by-thread break a same-millisecond tie by the card's ts", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700000000.000200", replyTs: THREAD.thread, supersedeKey: "card:a" }));
+    await store.putProposal(proposal({ proposalTs: "1700000000.000300", replyTs: THREAD.thread, supersedeKey: "card:b" }));
+    assert.deepEqual((await store.getProposalsByThread(THREAD)).map((p) => p.proposalTs), ["1700000000.000300", "1700000000.000200"]);
+    assert.equal((await store.getProposalByThread(THREAD))?.proposalTs, "1700000000.000300");
+    assert.deepEqual((await store.getProposalsByChannel(THREAD.channel)).map((p) => p.proposalTs), ["1700000000.000300", "1700000000.000200"]);
+  });
+
+  it("list-by-thread leaves out superseded, retired, decided and expired cards", async () => {
+    const { store, clock } = setup();
+    // Expired: staged first, aged out by the end.
+    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread, supersedeKey: "old" }));
+    clock.advance(10_000);
+    // Superseded by a revision in its own slot: out; the revision is in.
+    await store.putProposal(proposal({ proposalTs: "1700.3", replyTs: THREAD.thread }));
+    clock.advance(1_000);
+    await store.putProposal(proposal({ proposalTs: "1700.4", replyTs: THREAD.thread }));
+    clock.advance(1_000);
+    // Retired ahead of a revision: out.
+    await store.putProposal(proposal({ proposalTs: "1700.5", replyTs: THREAD.thread, supersedeKey: "sweep", sweepRun: "2026-09-30" }));
+    await store.retireProposal("1700.5");
+    // Decided: out.
+    await store.putProposal(proposal({ proposalTs: "1700.6", replyTs: THREAD.thread, supersedeKey: "report-item" }));
+    assert.equal(await store.claimProposal("1700.6", { decision: "confirm", by: "U2" }), true);
+    clock.advance(1_000);
+    // Marked as being revised: still live, mark and all.
+    await store.putProposal(proposal({ proposalTs: "1700.7", replyTs: THREAD.thread, supersedeKey: "ds-precedence" }));
+    assert.equal(await store.markRevising("1700.7", "U2"), "marked");
+    clock.advance(1_000);
+    assert.deepEqual(
+      (await store.getProposalsByThread(THREAD)).map((p) => [p.proposalTs, p.revising?.userId]),
+      [["1700.7", "U2"], ["1700.4", undefined], ["1700.2", undefined]],
+    );
+
+    clock.advance(PROPOSAL_TTL_MS - 6_000); // 1700.2 has aged out; the rest have not
+    assert.deepEqual((await store.getProposalsByThread(THREAD)).map((p) => p.proposalTs), ["1700.7", "1700.4"]);
   });
 
   // What an unthreaded ✅ in a DM needs: every card still live anywhere in the
@@ -1268,15 +1346,76 @@ export function runThreadStateConformance(
     assert.deepEqual(await store.claimFiling("week"), { state: "claimed" }, "a lease past its time was a caller killed mid-filing");
   });
 
-  it("a thread's comparison for a scenario is claimed once; another thread or scenario is its own", async () => {
+  it("a thread's check of a scenario is its own: another thread or scenario is claimed apart, and a check is kept as long as the thread's memory", async () => {
     const { store, clock } = setup();
     const ref = { channel: "C1", thread: "1.0" };
-    assert.equal(await store.claimComparison(ref, "Call-off"), true);
-    assert.equal(await store.claimComparison(ref, "call-off"), false, "the same scenario, however it is cased");
-    assert.equal(await store.claimComparison(ref, "Reschedule"), true);
-    assert.equal(await store.claimComparison({ channel: "C1", thread: "2.0" }, "Call-off"), true);
+    const start = { by: "U1", statusTs: "5.0" };
+    const first = await store.claimCheck(ref, "Call-off", start);
+    assert.equal(await store.stepCheck(ref, "Call-off", (first as { run: string }).run, "done"), true);
+    assert.equal((await store.claimCheck(ref, "call-off", start)).state, "claimed", "a done check is checked again, the same scenario however it is cased");
+    assert.equal((await store.claimCheck(ref, "Reschedule", start)).state, "claimed");
+    assert.equal((await store.claimCheck({ channel: "C1", thread: "2.0" }, "Call-off", start)).state, "claimed");
     clock.advance(HISTORY_TTL_MS + 1);
-    assert.equal(await store.claimComparison(ref, "Call-off"), true, "kept as long as the thread's memory");
+    assert.equal(await store.getCheck(ref, "Call-off"), null);
+    assert.equal((await store.claimCheck(ref, "Call-off", start)).state, "claimed");
+  });
+
+  it("a thread's check of a scenario runs once at a time: stopped, failed or done it is claimed anew", async () => {
+    const { store, clock } = setup();
+    const ref = { channel: "C1", thread: "1.0" };
+    const first = await store.claimCheck(ref, "Call-off", { by: "U1", statusTs: "5.0" });
+    assert.equal(first.state, "claimed");
+    const run = (first as { run: string }).run;
+    const second = await store.claimCheck(ref, "call-off", { by: "U2", statusTs: "5.0" });
+    assert.equal(second.state, "running", "the same scenario, however it is cased");
+    assert.deepEqual(await store.getCheck(ref, "Call-off"), { state: "running", run, by: "U1", statusTs: "5.0", at: clock.now() });
+
+    assert.equal(await store.stepCheck(ref, "Call-off", run, "stopped"), true);
+    assert.equal(await store.stepCheck(ref, "Call-off", run, "done"), false, "a stopped run's late job cannot finish it");
+    const again = await store.claimCheck(ref, "Call-off", { by: "U2", statusTs: "5.0" });
+    assert.equal(again.state, "claimed", "Check again");
+    const rerun = (again as { run: string }).run;
+    assert.notEqual(rerun, run);
+    assert.equal(await store.stepCheck(ref, "Call-off", run, "stopped"), false, "the old run no longer holds it");
+
+    assert.equal(await store.stepCheck(ref, "Call-off", rerun, "failed"), true);
+    const retry = await store.claimCheck(ref, "Call-off", { by: "U1", statusTs: "5.0" });
+    assert.equal(retry.state, "claimed", "Try again");
+    const last = (retry as { run: string }).run;
+    assert.equal(await store.stepCheck(ref, "Call-off", last, "done"), true);
+    assert.equal(await store.stepCheck(ref, "Call-off", last, "stopped"), false, "a finished check cannot be stopped");
+    const later = await store.claimCheck(ref, "Call-off", { by: "U2", statusTs: "5.0" });
+    assert.equal(later.state, "claimed", "a later Check it checks a done scenario again");
+    assert.equal(await store.stepCheck(ref, "Call-off", last, "failed"), false, "the finished run no longer holds it");
+    const latest = (later as { run: string }).run;
+    assert.equal(await store.stepCheck(ref, "Call-off", latest, "done"), true);
+    assert.equal(await store.stepCheck(ref, "Call-off", latest, "failed"), true, "a done run whose results did not post fails");
+  });
+
+  it("a running check past its lease was a job killed mid-run, and is claimed again", async () => {
+    const { store, clock } = setup();
+    const ref = { channel: "C1", thread: "1.0" };
+    await store.claimCheck(ref, "Call-off", { by: "U1", statusTs: "5.0" });
+    clock.advance(CHECK_LEASE_MS - 1);
+    assert.equal((await store.claimCheck(ref, "Call-off", { by: "U1", statusTs: "5.0" })).state, "running");
+    clock.advance(1);
+    assert.equal((await store.claimCheck(ref, "Call-off", { by: "U1", statusTs: "5.0" })).state, "claimed");
+  });
+
+  it("a Check it offer is kept under its message ts, past its deadline, for as long as the thread's memory", async () => {
+    const { store, clock } = setup();
+    const offer: BlueprintCheckOffer = {
+      offerTs: "5.0", channel: "C1", threadTs: "1.0", replyTs: "1.0", userMsgTs: "1.1", requesterUserId: "U1", surface: "channel", conversationType: "channel", cardTs: "4.0",
+      milestone: "prd", idea: { title: "Self-serve call-offs", text: "Tutors post their own call-off." },
+      scenario: "Call-off", path: "Standard", cellId: "cell-2", quote: "Tutors post their own call-off.", expiresAt: 1_000,
+    };
+    assert.equal(await store.getCheckOffer("5.0"), null);
+    await store.putCheckOffer(offer);
+    assert.deepEqual(await store.getCheckOffer("5.0"), offer);
+    clock.advance(CHECK_OFFER_KEEP_MS);
+    assert.deepEqual(await store.getCheckOffer("5.0"), offer, "still there at the end of its keep");
+    clock.advance(1);
+    assert.equal(await store.getCheckOffer("5.0"), null);
   });
 
   it("the one-shot dedup and the lease share one record", async () => {
@@ -1319,13 +1458,20 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
   });
 
-  it("a proposal without its own TTL still expires after the hour", async () => {
+  // The one expiry rule (#1315): a card staged without a lifetime of its own
+  // gets 24 weekday hours from its staging, whatever weekday the suite runs on.
+  it("a proposal staged without its own TTL lives 24 weekday hours from its staging", async () => {
     const { store, clock } = setup();
-    await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: LONG_TTL_MS }));
+    const ttl = cardTtlMs(clock.now());
+    await store.putProposal(bare({ proposalTs: "1700.2" }));
     await store.putProposal(proposal({ proposalTs: "1700.4", threadTs: OTHER.thread }));
     clock.advance(PROPOSAL_TTL_MS + 1);
     assert.equal((await store.getProposalByTs("1700.2")).state, "found");
     assert.equal((await store.getProposalByTs("1700.4")).state, "expired");
+    clock.advance(ttl - PROPOSAL_TTL_MS - 2);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found");
+    clock.advance(2);
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "expired", ttlMs: ttl, proposalText: "Create the card?", operations: STAGED });
   });
 
   // The successor's own TTL decides whether it is still live to point at.
@@ -1348,12 +1494,46 @@ export function runThreadStateConformance(
     const stated = { cancelled: "Rejected, nothing filed", expired: "That card closed after 3 days with no decision." };
     await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: LONG_TTL_MS, stated }));
     await store.putProposal(proposal({ proposalTs: "1700.3", ttlMs: LONG_TTL_MS }));
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?", operations: STAGED });
+    assert.deepEqual(await store.getProposalByTs("1700.2"), {
+      state: "superseded",
+      stated,
+      proposalText: "Create the card?",
+      operations: STAGED,
+      replacedBy: { proposalTs: "1700.3", operations: STAGED },
+    });
     clock.advance(LONG_TTL_MS + HOUR_MS);
     assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "expired", ttlMs: LONG_TTL_MS, stated, proposalText: "Create the card?", operations: STAGED });
   });
 
-  it("a retired stated card carries its words, and a turn's card answers as it always has", async () => {
+  // With several live cards in a thread, "the newest card" may be another
+  // matter's (#1319): a replaced card names the live card at the end of its
+  // revision chain, and names none once that card is decided.
+  it("a superseded card names the live card that replaced it, at the end of the chain", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    const last = [{ toolName: "notion_create", input: { title: "Third" } }];
+    await store.putProposal(proposal({ proposalTs: "1700.4", operations: last, toolName: "notion_create", input: { title: "Third" } }));
+    const lookup = await store.getProposalByTs("1700.2");
+    assert.equal(lookup.state, "superseded");
+    assert.deepEqual(lookup.state === "superseded" && lookup.replacedBy, { proposalTs: "1700.4", operations: last });
+    assert.ok(await store.claimProposal("1700.4"));
+    const after = await store.getProposalByTs("1700.2");
+    assert.equal(after.state === "superseded" ? after.replacedBy : undefined, undefined, "a decided card is no card to send anyone to");
+  });
+
+  // Story 18: a replacement decided since is still named, marked as no longer
+  // waiting, so the person is not sent to some other card.
+  it("a superseded card names a replacement that was decided since, as no longer waiting", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    assert.ok(await store.claimProposal("1700.3", { decision: "confirm", by: "U2" }));
+    const lookup = await store.getProposalByTs("1700.2");
+    assert.deepEqual(lookup.state === "superseded" && lookup.replacedBy, { proposalTs: "1700.3", operations: STAGED, waiting: false });
+  });
+
+  it("a retired stated card carries its words, and a card without words answers with its lifetime alone", async () => {
     const { store, clock } = setup();
     const stated = { cancelled: "Nothing filed this week", expired: "That card closed after 6 days with no decision." };
     await store.putProposal(proposal({ proposalTs: "1700.2", stated }));
@@ -1364,7 +1544,7 @@ export function runThreadStateConformance(
     assert.deepEqual(await store.getProposalByTs("1700.4"), { state: "superseded", proposalText: "Create the card?", operations: STAGED });
     await store.putProposal(proposal({ proposalTs: "1700.6", threadTs: "1700.5" }));
     clock.advance(PROPOSAL_TTL_MS + 1);
-    assert.deepEqual(await store.getProposalByTs("1700.6"), { state: "expired", proposalText: "Create the card?", operations: STAGED });
+    assert.deepEqual(await store.getProposalByTs("1700.6"), { state: "expired", ttlMs: PROPOSAL_TTL_MS, proposalText: "Create the card?", operations: STAGED });
   });
 
   it("an execution of a proposal with its own TTL is takeable at 71 h and gone at 73 h", async () => {
@@ -1479,6 +1659,56 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByTs("1700.9#a")).state, "expired", "this read collects the proposal");
     const edit = await store.prepareReportExpiry("1700.9");
     assert.deepEqual(edit?.report.entries.map((e) => e.state.kind), ["expired", "open"]);
+  });
+
+  // A card that ages out untouched is edited to say so (#1316): the edit is
+  // owed from the first instant it reads as expired until acknowledged, and
+  // the record waits for it through any lookup in between.
+  it("a card past its deadline is owed its expiry edit until acknowledged, and kept for it", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalBlocks: [{ type: "section" }] }));
+    clock.advance(PROPOSAL_TTL_MS);
+    assert.equal(await store.prepareCardExpiry("1700.2"), null, "live at its deadline");
+    clock.advance(1);
+    const owed = { channel: THREAD.channel, proposalTs: "1700.2", text: "Create the card?", blocks: [{ type: "section" }] };
+    assert.deepEqual(await store.prepareCardExpiry("1700.2"), owed);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
+    assert.deepEqual(await store.prepareCardExpiry("1700.2"), owed, "a lookup does not collect it");
+    await store.acknowledgeCardExpiry("1700.2");
+    assert.equal(await store.prepareCardExpiry("1700.2"), null);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
+  });
+
+  // The alarm takes owed cards to hand over for their edit, and a card taken
+  // is not taken again on every two-minute pass while its job is queued — only
+  // once the mark lapses, so a job lost on the way is still retried.
+  it("an owed card is taken for its expiry edit once, again after the hand-off lapses, and never once acknowledged", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: 1000, supersedeKey: "card:1700.2" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3", ttlMs: 2000, supersedeKey: "card:1700.3" }));
+    await store.putProposal(proposal({ proposalTs: "1700.4", ttlMs: PROPOSAL_TTL_MS, supersedeKey: "card:1700.4" }));
+    clock.advance(2001);
+    assert.deepEqual((await store.takeCardExpiries(1)).map((p) => p.proposalTs), ["1700.2"], "oldest deadline first, up to the limit");
+    assert.deepEqual((await store.takeCardExpiries(5)).map((p) => p.proposalTs), ["1700.3"], "a live card is not owed");
+    clock.advance(REPORT_EXPIRY_RETRY_MS);
+    assert.deepEqual(await store.takeCardExpiries(5), [], "handed over, not handed again on the next pass");
+    clock.advance(CARD_EXPIRY_HANDOFF_RETRY_MS);
+    assert.deepEqual((await store.takeCardExpiries(5)).map((p) => p.proposalTs), ["1700.2", "1700.3"], "a lapsed hand-off is retried");
+    await store.acknowledgeCardExpiry("1700.2");
+    clock.advance(CARD_EXPIRY_HANDOFF_RETRY_MS);
+    assert.deepEqual((await store.takeCardExpiries(5)).map((p) => p.proposalTs), ["1700.3"]);
+  });
+
+  it("no expiry edit is owed on a decided, replaced or report-item card", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.claimProposal("1700.2", { decision: "confirm", by: "U1" });
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    await store.putProposal(proposal({ proposalTs: "1700.4" }));
+    await store.putProposal(proposal({ proposalTs: "1700.9#a", supersedeKey: "item", item: { messageTs: "1700.9", id: "a" } }));
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    for (const ts of ["1700.2", "1700.3", "1700.9#a"]) assert.equal(await store.prepareCardExpiry(ts), null, ts);
+    assert.ok(await store.prepareCardExpiry("1700.4"), "the card that replaced the other is owed its own");
   });
 
   it("a report's item is replaced by its revision in place, open again under a new id", async () => {

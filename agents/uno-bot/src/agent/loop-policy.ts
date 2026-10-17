@@ -15,6 +15,7 @@
 // wire shape are the adapter's business (see `model-provider.ts`).
 
 import type { PendingProposal } from "../thread-state/index";
+import { awaitingDecision } from "../gate/gate";
 
 // ── Loop dials ───────────────────────────────────────────────────────────────
 
@@ -182,20 +183,38 @@ export function makeInterimFilter(onInterim?: (text: string) => void): (raw: str
 // ── proposal_resolve validation (Worker-side authorization) ──────────────────
 
 export type ResolveValidation =
-  | { ok: true; decision: "confirm" | "cancel"; messageToUser?: string }
-  | { ok: false; error: string };
+  | { ok: true; decision: "confirm" | "cancel"; card: PendingProposal; messageToUser?: string }
+  /** `unnamed` is set when the only fault was naming no card while several
+   *  wait: the decision itself was sound, and the person can be asked which
+   *  (#1319). */
+  | { ok: false; error: string; unnamed?: "confirm" | "cancel" };
 
-/** Validate a proposal_resolve call against the thread's pending state and the
- *  current sender. Enforced Worker-side even though the system prompt already
- *  tells the model — defense in depth. */
+/**
+ * Validate a proposal_resolve call against the cards waiting in the thread and
+ * the current sender, and say which card it decides. Enforced Worker-side even
+ * though the system prompt already tells the model — defense in depth.
+ *
+ * The card is the one the call names in `card` (its id, the card's ts), which
+ * must be live in the thread. A call that names none decides the one card
+ * waiting on a decision; with several waiting it is refused (#1319) — the
+ * newest is no likelier than the rest, and two cards are two different writes.
+ * "Waiting on a decision" is Gate's reading (`awaitingDecision`), so a "yes"
+ * is asked about exactly when a typed ✅ would be.
+ *
+ * @param pending - The card the turn was handed: the newest, or the card a
+ *   Needs changes sent back. What an unnamed call decides when nothing else
+ *   is waiting on a decision, as it always has.
+ * @param liveCards - Every card live in the thread, newest first
+ */
 export function validateProposalResolve(
-  args: { decision?: unknown; message_to_user?: unknown } | undefined,
+  args: { decision?: unknown; message_to_user?: unknown; card?: unknown } | undefined,
   pending: PendingProposal | null,
+  liveCards: readonly PendingProposal[],
   // Kept for signature stability + logging; no longer gated on — anyone in the
   // thread may confirm/cancel (2026-07-14).
   _currentSenderId: string,
 ): ResolveValidation {
-  if (!pending) {
+  if (!pending && liveCards.length === 0) {
     return { ok: false, error: "no pending proposal in this thread — reply conversationally instead" };
   }
   const decision = args?.decision;
@@ -203,5 +222,24 @@ export function validateProposalResolve(
     return { ok: false, error: "decision must be 'confirm' or 'cancel'" };
   }
   const msg = typeof args?.message_to_user === "string" ? args.message_to_user : undefined;
-  return { ok: true, decision, messageToUser: msg };
+  const named = typeof args?.card === "string" && args.card.trim() ? args.card.trim() : null;
+  if (named) {
+    const card = liveCards.find((c) => c.proposalTs === named) ?? (pending?.proposalTs === named ? pending : undefined);
+    if (!card) {
+      return { ok: false, error: `no waiting card has the id '${named}' — name one of the card ids listed in <pending_proposal>` };
+    }
+    return { ok: true, decision, card, messageToUser: msg };
+  }
+  const waiting = awaitingDecision(liveCards);
+  if (waiting.length > 1) {
+    return {
+      ok: false,
+      unnamed: decision,
+      error:
+        `${waiting.length} cards are waiting, so name the one this decides: set \`card\` to its id from <pending_proposal>. ` +
+        "If the person's message does not say which, do not guess — end your turn without calling a tool and I'll ask them which, with a button per card.",
+    };
+  }
+  const card = waiting[0] ?? pending ?? liveCards[0]!;
+  return { ok: true, decision, card, messageToUser: msg };
 }

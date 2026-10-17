@@ -35,6 +35,11 @@ import type { AssistantContext } from "../slack/types";
 import type { ThreadState as ThreadStateDurableObject } from "../thread-state";
 import type { OutageStore } from "../turn/capacity-outage";
 import type {
+  BlueprintCheckOffer,
+  CheckClaim,
+  CheckRecord,
+  CheckStart,
+  CheckState,
   CutOffNoteReport,
   DecidedMark,
   DecisionReportRecord,
@@ -136,6 +141,10 @@ export function createDurableObjectThreadState(
       return hop().getProposalByThread(ref, now());
     },
 
+    getProposalsByThread(ref: ThreadRef): Promise<PendingProposal[]> {
+      return hop().getProposalsByThread(ref, now());
+    },
+
     getProposalsByChannel(channel: string): Promise<PendingProposal[]> {
       return hop().getProposalsByChannel(channel, now());
     },
@@ -167,6 +176,18 @@ export function createDurableObjectThreadState(
 
     acknowledgeReportExpiry(messageTs, revision) {
       return hop().acknowledgeReportExpiry(messageTs, revision, now());
+    },
+
+    prepareCardExpiry(proposalTs) {
+      return hop().prepareCardExpiry(proposalTs, now());
+    },
+
+    acknowledgeCardExpiry(proposalTs) {
+      return hop().acknowledgeCardExpiry(proposalTs);
+    },
+
+    takeCardExpiries(limit) {
+      return hop().takeCardExpiries(limit, now());
     },
 
     // ----- executions -----
@@ -256,10 +277,29 @@ export function createDurableObjectThreadState(
       return hop().settleFiling(key, issue, now());
     },
 
-    // ----- one comparison per scenario per thread -----
+    // ----- one blueprint check per scenario per thread -----
 
-    claimComparison(ref: ThreadRef, scenario: string): Promise<boolean> {
-      return hop().claimComparison(ref, scenario, now());
+    // One hop, one transaction, so of two racing presses one claims.
+    claimCheck(ref: ThreadRef, scenario: string, start: CheckStart): Promise<CheckClaim> {
+      return hop().claimCheck(ref, scenario, start, now());
+    },
+
+    getCheck(ref: ThreadRef, scenario: string): Promise<CheckRecord | null> {
+      return hop().getCheck(ref, scenario, now());
+    },
+
+    stepCheck(ref: ThreadRef, scenario: string, run: string, to: Exclude<CheckState, "running">): Promise<boolean> {
+      return hop().stepCheck(ref, scenario, run, to, now());
+    },
+
+    // ----- the blueprint check's offers -----
+
+    putCheckOffer(offer: BlueprintCheckOffer): Promise<void> {
+      return hop().putCheckOffer(offer, now());
+    },
+
+    getCheckOffer(offerTs: string): Promise<BlueprintCheckOffer | null> {
+      return hop().getCheckOffer(offerTs, now());
     },
   };
 }

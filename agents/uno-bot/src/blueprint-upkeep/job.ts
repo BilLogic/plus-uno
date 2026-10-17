@@ -72,14 +72,13 @@ import {
 import { cardKey } from "./link";
 import type { DrawnProposal, ProposalRecords } from "./proposal-records";
 import { DRAFT_COST, DRAFT_JOBS, EVIDENCE_COST, MATCH_COST, MATCH_JOBS, PROMOTION_REDRAFT_COST } from "./budget";
+import { cardExpiresAt } from "../card-expiry";
 
 export { DRAFT_COST, DRAFT_JOBS, MATCH_COST, MATCH_JOBS };
 /** The section's name on the sweep's morning post. */
 export const UPKEEP_SECTION = "blueprint-revisions";
 /** How far back a first run looks: a weekend and a day. */
 export const FIRST_LOOKBACK_MS = 3 * 24 * 60 * 60 * 1000;
-/** How long a revision card stays confirmable. */
-export const REVISION_CARD_TTL_MS = 72 * 60 * 60 * 1000;
 /** Design hand-offs remembered until their deploy. */
 const PLANNED_KEPT = 200;
 /** Path reads a linked card's proposals may spend: a variant each at a design
@@ -770,7 +769,6 @@ export function revisionSection(deps: SectionDeps, handOff: SectionHandOff<Revis
           person: r.owner,
           item: revisionItem(r.source, r.today, r.draft, { owners: ownersOf(r), confirmers: r.confirmers }, r.view),
         })),
-        ttlMs: REVISION_CARD_TTL_MS,
         says: (ids) => revisionSays(value.revisions.filter((r) => ids.includes(idOf(r))).map((r) => r.source)),
         // The gap ask in the thread; each card's staging.
         cost: (shown) => ({ subrequests: 1, d1Queries: shown.length * STAGING_D1_QUERIES }),
@@ -800,7 +798,7 @@ export function revisionSection(deps: SectionDeps, handOff: SectionHandOff<Revis
         }
       }
       if (!staged.size) return;
-      await recordCards(deps.threads, place.channel, thread, [...staged.values()], deps.now() + REVISION_CARD_TTL_MS);
+      await recordCards(deps.threads, place.channel, thread, [...staged.values()], cardExpiresAt(deps.now()));
       if (!progress.done.has(GAP_ASK_MARK)) {
         const ask = gapAskText([...staged.values()].map((c) => askOf(c)));
         if (ask) await deps.post(place.channel, thread, ask);
@@ -876,7 +874,7 @@ export function stagedRevision(
     proposalText: renderProposalCard(card).text,
     // Nobody asked: the Worker staged it.
     requesterUserId: "",
-    ttlMs: opts.ttlMs ?? REVISION_CARD_TTL_MS,
+    ...(opts.ttlMs !== undefined ? { ttlMs: opts.ttlMs } : {}),
     // Its Review or its thread redrafts it (`./revise.ts`), never a turn.
     refuseRevision: REVISION_REDRAFT_POINTER,
     afterNeedsChanges: REVISION_SENT_BACK,

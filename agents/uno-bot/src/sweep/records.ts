@@ -39,7 +39,7 @@
 // target card's Contributor, then the record's own people (a note's Note
 // Takers, a card's Contributors); a finding with nobody to name is left.
 // Everything after the queue — the morning post, one card per destination per
-// day, confirmers, the 72 h expiry — is the sweep's own (`./run.ts`).
+// day, confirmers, the 24 weekday hours expiry — is the sweep's own (`./run.ts`).
 //
 // Discussion, an option, a question or a to-do records no decision, and the
 // detector passes it over (`./capture-detector.ts`); there is no "note with no

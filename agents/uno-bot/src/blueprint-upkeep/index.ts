@@ -1,7 +1,7 @@
 // Blueprint upkeep: the service-change gate, a revision drafted from shipped
 // work, its card on the morning sweep, and an idea set beside today's path at
-// a conversation's milestones, with the offer to draft it on the blueprint as
-// a proposal. `Env` enters in `./env.ts`.
+// a conversation's milestones — the blueprint check a milestone's card offers,
+// and the offer to draft the idea on the blueprint as a proposal. `Env` enters in `./env.ts`.
 
 export {
   confidentMatch,
@@ -20,17 +20,35 @@ export { revisionBody, revisionItem, revisionSays, revisionText, type RevisionSo
 export { firstChangedCell, proposalFacts, revisionFacts, rowsLine } from "./facts";
 export { cardEvidence, MAX_PRDS, prdIdsOf, type EvidencePage } from "./evidence";
 export { promotionDraft, retirementDraft, stageOf, STAGES, variantPromotionDraft, type PlannedRows, type ShipStage } from "./stages";
-export { cardKey, keepProposalLinks, prdCardOf, type LinkDeps, type ThreadCards } from "./link";
+export { cardKey, keepProposalLinks, prdCardOf, rememberCreatedPage, type LinkDeps, type MatterPages, type ThreadCards } from "./link";
 export {
-  COMPARISON_SUBREQUESTS,
+  blueprintCheckRunnerKey,
+  cardNow,
+  JUDGEMENT_SUBREQUESTS,
+  CHECK_DEADLINE_MS,
+  NOTES_HEADING,
+  pageUpdateWithNotes,
+  prdWithNotes,
+  runBlueprintCheck,
+  stopRunningCheck,
+  type BlueprintCheckJob,
+  serviceChangeJudgement,
+  type BlueprintCheckDeps,
+  type CheckMatch,
+  type CardNow,
+  type CheckOutcome,
+  type CheckResults,
+  type PostedCard,
+  type ResultsAction,
+  type JudgementDeps,
+  type ServiceChangeJudgement,
+} from "./check";
+export {
   comparisonText,
   handOffMilestone,
-  milestoneComparison,
   prdMilestone,
   type Comparison,
-  type ComparisonDeps,
   type Milestone,
-  type MilestoneComparison,
 } from "./milestone";
 export {
   DRAFT_COST,
@@ -42,7 +60,6 @@ export {
   matchShipped,
   ownersOf,
   replanRows,
-  REVISION_CARD_TTL_MS,
   REVISION_REDRAFT_POINTER,
   REVISION_SENT_BACK,
   revisionSection,
@@ -67,7 +84,6 @@ export {
 export {
   draftProposal,
   drawnProposalOf,
-  PROPOSAL_CARD_TTL_MS,
   PROPOSAL_DRAFT_TIER,
   PROPOSAL_OFFER_SUBREQUESTS,
   PROPOSAL_SYSTEM,

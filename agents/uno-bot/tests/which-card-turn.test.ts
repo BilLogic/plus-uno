@@ -1,0 +1,158 @@
+// "Approve which one?" when several proposal cards wait in one thread (#1319),
+// through the turn.
+//
+// A thread can hold several live cards (#1318). A typed ✅ / ⛔, or a "yes"
+// the model reads as a decision, says nothing about WHICH card it means, and
+// two cards are two different writes — so with more than one waiting, the
+// decision resolves nothing and the bot asks which, one button per card. With
+// a single card waiting, a decision resolves it directly, as it always has.
+// The buttons themselves are driven in `tests/which-card-buttons.test.ts`.
+//
+// Every case runs real turns on one in-memory store (one thread), handed the
+// thread's live cards the way `slack/events.ts` hands them over.
+import { test } from "node:test";
+import assert from "node:assert/strict";
+
+import { runTurn, type TurnRequest } from "../src/turn/index";
+import type { ScriptedReply } from "../src/agent/providers/fake";
+import { harness, request, REF, type Harness } from "./helpers/turn-harness";
+
+/** A turn in the thread, handed the cards live in it as production hands them. */
+async function turn(h: Harness, over: Partial<TurnRequest>) {
+  const liveCards = await h.threadState.getProposalsByThread(REF);
+  return runTurn(request({ pending: liveCards[0] ?? null, liveCards, ...over }), h.deps);
+}
+
+function call(name: string, args: Record<string, unknown>): ScriptedReply {
+  return { text: "Here's the card.", toolCalls: [{ name, args: { ...args } }] };
+}
+
+const PRD_A = { surface: "prd", title: "Backup tutor matching", summary: "Match a backup tutor when one calls off." };
+const PRD_B = { surface: "prd", title: "Session reflections", summary: "A shorter reflection form." };
+
+/** Two separate cards in the thread: A, then B beside it. */
+async function twoCards(h: Harness): Promise<{ a: string; b: string }> {
+  const first = await turn(h, { text: "draft a PRD for backup tutor matching" });
+  const second = await turn(h, { text: "and one for session reflections", userMsgTs: "1700000000.000300" });
+  return { a: first.staged!.proposal.proposalTs, b: second.staged!.proposal.proposalTs };
+}
+
+async function live(h: Harness): Promise<string[]> {
+  return (await h.threadState.getProposalsByThread(REF)).map((p) => p.proposalTs).sort();
+}
+
+test("a typed ✅ with two live cards runs nothing and asks which, one button per card by headline", async () => {
+  const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B)] });
+  const { a, b } = await twoCards(h);
+
+  const outcome = await turn(h, { text: "✅", userMsgTs: "1700000000.000400" });
+
+  assert.deepEqual(h.resolved, [], "nothing ran");
+  assert.deepEqual(await live(h), [a, b].sort(), "both cards still live");
+  assert.deepEqual(h.delivery.gateNotes.at(-1), {
+    kind: "which-card",
+    decision: "confirm",
+    cards: [
+      { ts: b, headline: "Session reflections" },
+      { ts: a, headline: "Backup tutor matching" },
+    ],
+  });
+  assert.equal(outcome.disposition, "asked", "the turn asked something, so the thread waits on the person");
+});
+
+test("a typed ⛔ with two live cards cancels nothing and asks \"Cancel which one?\"", async () => {
+  const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B)] });
+  const { a, b } = await twoCards(h);
+
+  await turn(h, { text: "⛔", userMsgTs: "1700000000.000400" });
+
+  assert.deepEqual(h.resolved, []);
+  assert.deepEqual(await live(h), [a, b].sort());
+  const note = h.delivery.gateNotes.at(-1);
+  assert.equal(note?.kind === "which-card" && note.decision, "cancel");
+});
+
+test("a typed \"yes\" with one live card approves it, as it always has", async () => {
+  const h = harness({
+    replies: [call("notion_create", PRD_A), { toolCalls: [{ name: "proposal_resolve", args: { decision: "confirm" } }] }],
+  });
+  await turn(h, { text: "draft a PRD for backup tutor matching" });
+
+  const outcome = await turn(h, { text: "yes", userMsgTs: "1700000000.000400" });
+
+  assert.equal(outcome.disposition, "resolved");
+  assert.deepEqual(h.resolved.map((r) => [r.decision, r.executed]), [["confirm", true]]);
+  assert.deepEqual(await live(h), []);
+});
+
+test("a typed \"yes\" with two live cards: the model's approval naming no card is refused, and the bot asks which", async () => {
+  const h = harness({
+    replies: [
+      call("notion_create", PRD_A),
+      call("notion_create", PRD_B),
+      { toolCalls: [{ name: "proposal_resolve", args: { decision: "confirm" } }] },
+      { text: "Which one do you mean?" },
+    ],
+  });
+  const { a, b } = await twoCards(h);
+
+  const outcome = await turn(h, { text: "yes", userMsgTs: "1700000000.000400" });
+
+  assert.deepEqual(h.resolved, [], "nothing ran");
+  assert.deepEqual(await live(h), [a, b].sort());
+  // The refusal went back to the model as its call's result.
+  const refusal = h.provider.transcript
+    .flatMap((t) => (t.kind === "results" ? t.results : []))
+    .find((r) => r.name === "proposal_resolve");
+  assert.ok(refusal?.isError, "the call was refused");
+  assert.match(refusal!.text, /card/);
+  // And the person is asked, with a button per card — not in the model's words.
+  assert.deepEqual(h.delivery.gateNotes.at(-1), {
+    kind: "which-card",
+    decision: "confirm",
+    cards: [
+      { ts: b, headline: "Session reflections" },
+      { ts: a, headline: "Backup tutor matching" },
+    ],
+  });
+  assert.ok(!h.delivery.posted.includes("Which one do you mean?"));
+  assert.equal(outcome.disposition, "asked");
+});
+
+test("the model's approval naming one of two cards approves that card only, and the thread still waits on the other", async () => {
+  const resolve = { toolCalls: [{ name: "proposal_resolve", args: { decision: "confirm", card: "" } as Record<string, unknown> }] };
+  const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B), resolve] });
+  const { a, b } = await twoCards(h);
+  resolve.toolCalls[0]!.args.card = a;
+  const before = h.delivery.calls.length;
+
+  // On the default tier, so the turn raises the working signal and settles it.
+  const outcome = await turn(h, { text: "yes to the backup tutor one", userMsgTs: "1700000000.000400", tierOverride: "default" });
+
+  assert.equal(outcome.disposition, "resolved");
+  assert.deepEqual(h.resolved.map((r) => [r.decision, r.executed]), [["confirm", true]]);
+  assert.deepEqual(await live(h), [b], "card A was the one claimed; the other stays live");
+  const cleared = h.delivery.calls.slice(before).find((c) => c.kind === "working-clear");
+  assert.equal(cleared?.kind === "working-clear" && cleared.settlement, "waiting-on-person");
+});
+
+test("the model's approval naming a card that is not waiting is refused back to it", async () => {
+  const h = harness({
+    replies: [
+      call("notion_create", PRD_A),
+      call("notion_create", PRD_B),
+      { toolCalls: [{ name: "proposal_resolve", args: { decision: "confirm", card: "9999999999.000000" } }] },
+      { text: "I couldn't find that card." },
+    ],
+  });
+  const { a, b } = await twoCards(h);
+
+  await turn(h, { text: "approve the old one", userMsgTs: "1700000000.000400" });
+
+  assert.deepEqual(h.resolved, []);
+  assert.deepEqual(await live(h), [a, b].sort());
+  const refusal = h.provider.transcript
+    .flatMap((t) => (t.kind === "results" ? t.results : []))
+    .find((r) => r.name === "proposal_resolve");
+  assert.match(refusal!.text, /no waiting card has the id/);
+});

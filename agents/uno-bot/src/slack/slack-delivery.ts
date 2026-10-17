@@ -21,6 +21,7 @@ import {
   addReaction,
   appendStream,
   appendTasks,
+  deleteMessage,
   postMessage,
   slackCall,
   startStream,
@@ -148,6 +149,9 @@ function slackClientFor(env: Env): SlackDeliveryClient {
       await stopStream(env, channel, ts);
     },
     updateMessage: (input) => updateMessage(env, input),
+    async deleteMessage(channel, ts) {
+      await deleteMessage(env, channel, ts);
+    },
     setSessionStatus: (channel, threadTs, status) =>
       setSessionStatus(env, channel, threadTs, status),
     renameSession: (channel, threadTs, title) => renameSession(env, channel, threadTs, title),

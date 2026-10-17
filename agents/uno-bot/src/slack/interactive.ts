@@ -22,9 +22,10 @@
 // uses) or a normal chat.postMessage, never by holding the response open.
 
 import type { Env } from "../types";
+import { charge } from "../net";
 import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
-import { restageFor } from "../turn/env-deps";
+import { restageFor, stageFromButtonFor } from "../turn/env-deps";
 import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsPush, viewsUpdate } from "./api";
 import { executeVerdict, runVerdict } from "../agent/resolve-proposal";
 import { REVIEW_ACTION_ID } from "./proposal-render";
@@ -60,6 +61,10 @@ import { runHomeStopDoor, type HomeStopDoorDeps } from "./stop-doors";
 import { slackDelivery } from "./slack-delivery";
 import { standingConfirmersOf } from "./standing-confirmers";
 import { runButtonDoor, type ButtonDoorDeps, type CardMessage } from "./button-door";
+import { WHICH_ACTION_PREFIX, runWhichCardDoor, whichPressOf } from "./which-card";
+import { CHECK_IT_ACTION_ID, resultsActionOf, runCheckItDoor, runResultsDoor, runStopCheckDoor, STOP_CHECK_ACTION_ID } from "./blueprint-check";
+import { createdPageOn } from "../blueprint-upkeep/env";
+import { blueprintCheckRunnerKey, type ResultsAction } from "../blueprint-upkeep/check";
 import { DM_WATCH_ACTION_ID, saveDmWatchAction } from "../dm-watch/index";
 import { setDmWatchOnEnv } from "../dm-watch/env";
 import { publishHomeView } from "./home";
@@ -79,7 +84,7 @@ interface InteractionPayload {
   response_url?: string;
   user?: { id?: string };
   channel?: { id?: string };
-  message?: { ts?: string; thread_ts?: string; text?: string };
+  message?: { ts?: string; thread_ts?: string; text?: string; blocks?: unknown[] };
   actions?: Array<{
     action_id?: string;
     block_id?: string;
@@ -188,6 +193,11 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_delete_answer") return deleteAnswer(env, payload);
   if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
+  if (actionId.startsWith(WHICH_ACTION_PREFIX)) return resolveFromWhichCard(env, payload, actionId);
+  if (actionId === CHECK_IT_ACTION_ID) return checkIt(env, payload);
+  if (actionId === STOP_CHECK_ACTION_ID) return stopCheck(env, payload);
+  const resultsAction = resultsActionOf(actionId);
+  if (resultsAction) return actOnResults(env, payload, resultsAction);
   if (actionId === REVIEW_ACTION_ID) return openReview(env, payload);
   if (actionId.startsWith(DECISION_REVIEW_ACTION_PREFIX)) return openReview(env, payload, actionId);
   if (actionId === REVIEW_EDIT_ACTION_ID) return editInReview(env, payload);
@@ -250,6 +260,122 @@ async function resolveFromButton(
   const userId = payload.user?.id ?? "someone";
   if (!channel || !ts) return;
   await runButtonDoor({ channel, messageTs: ts, decision, userId }, buttonDoorDeps(env, payload));
+}
+
+// A button under "Approve which one?" (#1319): one card's own ✅ or ⛔,
+// pressed from the question rather than the card (`which-card.ts`). The value
+// names the card; the card is edited by its ts, and the question — the message
+// pressed — through `response_url`.
+//
+// `Env` enters here and stops here.
+async function resolveFromWhichCard(env: Env, payload: InteractionPayload, actionId: string): Promise<void> {
+  const channel = payload.channel?.id;
+  const questionTs = payload.message?.ts;
+  const userId = payload.user?.id ?? "someone";
+  const press = whichPressOf(actionId, payload.actions?.[0]?.value);
+  if (!channel || !questionTs || !press) return;
+  await runWhichCardDoor(
+    {
+      channel,
+      questionTs,
+      question: { text: payload.message?.text ?? "", blocks: payload.message?.blocks ?? [] },
+      cardTs: press.cardTs,
+      decision: press.decision,
+      userId,
+    },
+    {
+      ...buttonDoorDeps(env, payload),
+      editCard: async (ts, message) => {
+        const res = await updateMessage(env, { channel, ts, text: message.text, blocks: message.blocks });
+        // Cosmetic, as every card re-render is: the decision is already
+        // announced in the thread.
+        if (!res.ok) console.warn(`[interactive] card re-render after a which-card press failed on ${channel}/${ts}`);
+      },
+      replaceQuestion: (message) => replaceCard(payload, message),
+    },
+  );
+}
+
+// Check it, under a milestone's card (#1321): anyone in the thread may press
+// it, since the check only reads (`blueprint-check.ts`). The press claims,
+// edits the offer and queues the check on a runner of its own; the check
+// itself never runs in this `waitUntil`.
+//
+// `Env` enters here and stops here.
+async function checkIt(env: Env, payload: InteractionPayload): Promise<void> {
+  const channel = payload.channel?.id;
+  const offerTs = payload.message?.ts;
+  const userId = payload.user?.id ?? "someone";
+  if (!channel || !offerTs) return;
+  await runCheckItDoor(
+    { channel, offerTs, userId },
+    {
+      store: threadStateFor(env),
+      enqueue: (job, runnerKey) => enqueueAgentJob(env, job, runnerKey),
+      replaceOffer: (message) => replaceCard(payload, message),
+      replyEphemeral: (text) => replyEphemeral(payload, text),
+    },
+  );
+}
+
+// Stop, on the checking line (#1322): the presser of Check it or the card's
+// requester stops the check (`blueprint-check.ts`). The record is marked here;
+// the model call in flight is aborted by asking the check's own runner, where
+// its job runs (`/cancel`, agent-runner.ts) — one hop, in this `waitUntil`.
+//
+// `Env` enters here and stops here.
+async function stopCheck(env: Env, payload: InteractionPayload): Promise<void> {
+  const channel = payload.channel?.id;
+  const offerTs = payload.message?.ts;
+  const userId = payload.user?.id;
+  if (!channel || !offerTs || !userId) return;
+  await runStopCheckDoor(
+    { channel, offerTs, userId },
+    {
+      store: threadStateFor(env),
+      async cancel(offer, run) {
+        const key = blueprintCheckRunnerKey(offer.channel, offer.offerTs);
+        charge(1, "agent-runner"); // DO stub call — a subrequest the meter can't see.
+        const res = await env.AGENT_RUNNER.get(env.AGENT_RUNNER.idFromName(key)).fetch("https://do/cancel", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ run }),
+        });
+        if (!res.ok) console.warn(`[blueprint-check] cancel refused on ${key}: ${res.status}`);
+      },
+      replaceOffer: (message) => replaceCard(payload, message),
+      replyEphemeral: (text) => replyEphemeral(payload, text),
+    },
+  );
+}
+
+// Add these notes to the card / Update the Roadmap page, under a blueprint
+// check's results (#1323): the value names the offer, whose record holds the
+// results; the door reads the card's state again and stages through Turn,
+// in the card's own thread.
+//
+// `Env` enters here and stops here.
+async function actOnResults(env: Env, payload: InteractionPayload, action: ResultsAction): Promise<void> {
+  const channel = payload.channel?.id;
+  const offerTs = payload.actions?.[0]?.value;
+  const userId = payload.user?.id ?? "someone";
+  if (!channel || !offerTs) return;
+  const threadState = threadStateFor(env);
+  const stage = stageFromButtonFor(env, threadState);
+  await runResultsDoor(
+    { channel, offerTs, userId, action },
+    {
+      store: threadState,
+      createdPage: createdPageOn(env),
+      stage: (ask) => {
+        const at = ask.kind === "revision" ? ask.of : ask.thread;
+        return stage(ask, slackDelivery(env, { channel: at.channel, replyTs: at.replyTs ?? at.threadTs, userMsgTs: at.userMsgTs, userId }));
+      },
+      replaceResults: (message) => replaceCard(payload, message),
+      replyEphemeral: (text) => replyEphemeral(payload, text),
+      standingConfirmers: standingConfirmersOf(env),
+    },
+  );
 }
 
 /**
@@ -507,7 +633,7 @@ async function tryAgain(env: Env, payload: InteractionPayload): Promise<void> {
     },
     {
       post: async (message) => (await postMessage(env, message))?.ts ?? null,
-      enqueue: (event) => enqueueAgentJob(env, { kind: "message", event, reply: null }, conversationKey(event)),
+      enqueue: async (event) => void (await enqueueAgentJob(env, { kind: "message", event, reply: null }, conversationKey(event))),
       replyEphemeral: (text) => replyEphemeral(payload, text),
     },
   );
@@ -521,7 +647,7 @@ async function tryAsking(env: Env, payload: InteractionPayload): Promise<void> {
     {
       dmChannelFor: (id) => conversationsOpen(env, id),
       post: async (message) => (await postMessage(env, message))?.ts ?? null,
-      enqueue: (event, key) => enqueueAgentJob(env, { kind: "message", event }, key),
+      enqueue: async (event, key) => void (await enqueueAgentJob(env, { kind: "message", event }, key)),
     },
   );
 }

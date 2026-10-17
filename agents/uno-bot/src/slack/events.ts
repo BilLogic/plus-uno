@@ -15,6 +15,7 @@ import { handleAppHomeOpened } from "./home";
 import { handleReaction } from "./gate";
 import { cutOffRunJob, handleCutOffRun } from "./cut-off-sweep";
 import { redrawExpiredReport } from "./report-expiry";
+import { showExpiredCard } from "./card-expiry-edit";
 import { runDevLinksWriteJobOnEnv } from "../figma-links/env";
 import { extractPrdFromThreadRoot } from "./notion-prd";
 import {
@@ -51,6 +52,7 @@ import {
   isRevisionReplyCandidate,
   isRevisionThread,
   isWithdrawRequestCandidate,
+  runBlueprintCheckOnEnv,
 } from "../blueprint-upkeep/env";
 import { recheckOnUpdateOnEnv } from "../figma-drift/env";
 import { typedEmojiDecision } from "../gate/reactions";
@@ -180,7 +182,9 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
 // Keyed per thread so runs within a thread stay ordered.
 // Exported for the slash-command route (commands.ts), which builds a synthetic
 // `message` job so a /grind or /chill run is an ordinary thread from here down.
-export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey: string): Promise<void> {
+// Resolves to whether the runner took the job, for a caller that tells its
+// person itself (a Check it press, which has its own words and Try again).
+export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey: string): Promise<boolean> {
   const stub = env.AGENT_RUNNER.get(env.AGENT_RUNNER.idFromName(threadKey));
   charge(1, "agent-runner"); // DO stub call — a subrequest the meter can't see.
   const res = await stub.fetch("https://do/enqueue", {
@@ -198,7 +202,8 @@ export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey
     // A cut-off job has nobody waiting on it: the record stays untaken, and
     // the ThreadState alarm hands it over again. A Figma event has no thread
     // to speak in, and never comes this way: its route enqueues it once.
-    if (job.kind === "cut-off" || job.kind === "figma-event" || job.kind === "report-expiry" || job.kind === "figma-dev-links-write") return;
+    // A blueprint check's press tells its presser itself.
+    if (job.kind === "cut-off" || job.kind === "figma-event" || job.kind === "report-expiry" || job.kind === "card-expiry" || job.kind === "figma-dev-links-write" || job.kind === "blueprint-check") return false;
     const target =
       job.kind === "message"
         ? { channel: job.event.channel, thread_ts: replyThreadTs(job.event) }
@@ -207,7 +212,9 @@ export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey
       ...target,
       text: ":warning: I couldn't start on that one — try again, and if it repeats flag it in #uno-bot.",
     }).catch(() => {});
+    return false;
   }
+  return true;
 }
 
 /**
@@ -240,6 +247,22 @@ export function handOffExpiredReportsFor(env: Env): (due: DecisionReportRecord[]
   };
 }
 
+/**
+ * The ThreadState alarm's `handOffExpiredCards`, bound to `Env`: one runner
+ * job per card whose "Expired" edit is owed (#1316), each on a runner of its
+ * own — keyed by the card, never the thread's, so the edit neither waits
+ * behind the thread's turns nor spends their budget.
+ */
+export function handOffExpiredCardsFor(env: Env): (due: PendingProposal[]) => Promise<void> {
+  return async (due) => {
+    for (const card of due) {
+      await enqueueAgentJob(env, { kind: "card-expiry", proposalTs: card.proposalTs }, `${card.channel}:card-expiry:${card.proposalTs}`).catch((err: unknown) => {
+        console.error(`[slack] card expiry hand-off for ${card.proposalTs} failed: ${err instanceof Error ? err.message : String(err)}`);
+      });
+    }
+  };
+}
+
 // (The open-stream registry that lived here is gone: a stream is now opened and
 // closed inside delivery, within one function, so there is no window in which a
 // turn can end holding one.)
@@ -257,6 +280,20 @@ export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<Thre
         if (!result.ok) throw new Error(result.error ?? "Slack refused the expiry edit");
       },
     });
+    return "handled";
+  }
+  if (job.kind === "card-expiry") {
+    await showExpiredCard(job.proposalTs, {
+      store: threadStateFor(env),
+      edit: async (channel, ts, message) => {
+        const result = await updateMessage(env, { channel, ts, ...message });
+        if (!result.ok) throw new Error(result.error ?? "Slack refused the expiry edit");
+      },
+    });
+    return "handled";
+  }
+  if (job.kind === "blueprint-check") {
+    await runBlueprintCheckOnEnv(env, job);
     return "handled";
   }
   if (job.kind === "figma-event") {
@@ -634,19 +671,25 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   let history: HistoryTurn[];
   let participants: string[];
   let pending: PendingProposal | null;
+  let liveCards: PendingProposal[];
   let prd: Awaited<ReturnType<typeof extractPrdFromThreadRoot>>;
   try {
-    [{ turns: history, participants }, pending, prd] = await Promise.all([
+    const cardRef = { channel, thread: cardThreadOf({ conversationTs: convTs, ...(threadTs ? { replyTs: threadTs } : {}) }) };
+    [{ turns: history, participants }, { pending, liveCards }, prd] = await Promise.all([
       buildThreadHistory(env, channel, convTs, event.thread_ts, event.ts, textReadsAsCorrection),
-      // The card, by contrast, is the REPLY THREAD's: in a DM a card staged
-      // under one ask is no business of the next unthreaded ask. A Needs
-      // changes note names the card it sent back, and revises that one.
-      event.revises
-        ? cardSentBack(threadStateFor(env), event.revises)
-        : threadStateFor(env).getProposalByThread({
-            channel,
-            thread: cardThreadOf({ conversationTs: convTs, ...(threadTs ? { replyTs: threadTs } : {}) }),
-          }),
+      // The cards, by contrast, are the REPLY THREAD's: in a DM a card staged
+      // under one ask is no business of the next unthreaded ask. Every live
+      // one, newest first, so the turn can tell a revision of one from a
+      // separate proposal; the newest is the card the turn was handed. A
+      // Needs changes note names the card it sent back, and revises that one.
+      (async () => {
+        const store = threadStateFor(env);
+        const [live, sentBack] = await Promise.all([
+          store.getProposalsByThread(cardRef),
+          event.revises ? cardSentBack(store, event.revises) : Promise.resolve(null),
+        ]);
+        return { pending: event.revises ? sentBack : (live[0] ?? null), liveCards: live };
+      })(),
       isThreadReply
         ? extractPrdFromThreadRoot(env, channel, event.thread_ts!)
         : Promise.resolve(null),
@@ -666,6 +709,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     text,
     history,
     pending,
+    liveCards,
     prd,
     // Who may confirm the card: the poster and everyone in the thread so far,
     // read off the thread the history rebuild already fetched.

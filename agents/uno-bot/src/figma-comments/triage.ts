@@ -21,6 +21,7 @@ import { handedSection, type SectionHandOff, type SweepSection } from "../sweep/
 import type { FileOwner } from "./queue";
 import type { CommentThread } from "./threads";
 import type { Section } from "./sections";
+import { cardTtlMs } from "../card-expiry";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -30,8 +31,6 @@ export const TRIAGE_WORKDAYS = 2;
 export const REREAD_COST = 3;
 /** Subrequests a DM costs: opening the conversation, and the post. */
 export const DM_COST = 2;
-/** How long a channel card stays on the usage record as live before it ages out. */
-export const TRIAGE_CARD_TTL_MS = 72 * 60 * 60 * 1000;
 
 /** A post's answer: its ts, or Slack's error code when it was refused. */
 export type Posted = { ok: true; ts: string } | { ok: false; error?: string };
@@ -296,7 +295,7 @@ export function questionsSection(ports: TriagePorts, handOff: SectionHandOff<Que
       for (const q of value.questions) {
         if (progress.done.has(q.commentId)) continue;
         await ports
-          .recordCard(workerCardEvent({ proposalId: itemProposalKey(report.ts, `question-${q.commentId}`), channelId: place.channel, at: now(), ttlMs: TRIAGE_CARD_TTL_MS }))
+          .recordCard(workerCardEvent({ proposalId: itemProposalKey(report.ts, `question-${q.commentId}`), channelId: place.channel, at: now(), ttlMs: cardTtlMs(now()) }))
           .catch((err: unknown) => {
             rethrowIfBudget(err);
             console.error(`[figma-triage] ${q.commentId} went up but is not on the usage record: ${err instanceof Error ? err.message : String(err)}`);

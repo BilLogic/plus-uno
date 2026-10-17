@@ -14,10 +14,11 @@
 import type { ReportItem, ReviewChoice, StatedCardWords, TidyFacts } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
-import { shortDate, windowInWords } from "../slack/copy-words";
+import { shortDate } from "../slack/copy-words";
 import type { ToolName } from "../agent/tool-table";
 import { figmaFileUrl } from "../figma/links";
 import { cardKey, isDeployed, type TidyCard, type TidyFinding, type TidyMove } from "./checks";
+import { CARD_WINDOW_WORDS } from "../card-expiry";
 
 /** The tool a card names: "Leave as is" runs it, "Moved it" decides as a cancel. */
 export const TIDY_TOOL: ToolName = "figma_tidy_up";
@@ -166,10 +167,10 @@ export function tidyChoices(): ReviewChoice[] {
 }
 
 /** What the gate says on a tidy-up card in place of its generic lines. */
-export function tidyCardWords(windowHours: number): StatedCardWords {
+export function tidyCardWords(): StatedCardWords {
   return {
     cancelled: "Nothing written",
-    expired: `That card closed after ${windowInWords(windowHours)} with no answer, so nothing changed.`,
+    expired: `That card closed after ${CARD_WINDOW_WORDS} with no answer, so nothing changed.`,
   };
 }
 

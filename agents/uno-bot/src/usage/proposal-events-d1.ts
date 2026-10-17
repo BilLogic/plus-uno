@@ -1,6 +1,7 @@
 // The D1 ProposalEventLog — production's `proposal_events` table
 // (migrations/usage/0003_proposal_events.sql, with the columns later
-// migrations added: 0013's revises_proposal_id, 0014's confirmed_edited).
+// migrations added: 0013's revises_proposal_id, 0014's confirmed_edited,
+// 0018's staged_as and corrects_proposal_id).
 //
 // As `./d1.ts`: every statement prepared with bound parameters, never
 // assembled from values, and charged to the meter before it is sent
@@ -16,6 +17,7 @@ import {
   type ProposalEventKind,
   type ProposalEventLog,
   type ProposalEventVia,
+  type StagedAs,
 } from "./proposal-events";
 import type { TeamRole } from "./roles";
 
@@ -39,6 +41,8 @@ const COLUMNS = [
   "test_traffic",
   "origin_proposal_id",
   "revises_proposal_id",
+  "staged_as",
+  "corrects_proposal_id",
   "turn_id",
   "requester_id",
   "tools",
@@ -137,6 +141,8 @@ function mapRow(e: ProposalEvent): Record<(typeof COLUMNS)[number], unknown[]> {
     test_traffic: boolOrNull(e.testTraffic),
     origin_proposal_id: e.originProposalId,
     revises_proposal_id: e.revisesProposalId,
+    staged_as: e.stagedAs,
+    corrects_proposal_id: e.correctsProposalId,
     turn_id: e.turnId,
     requester_id: e.requesterId,
     tools: JSON.stringify(e.tools),
@@ -170,6 +176,8 @@ function fromRow(row: Row): ProposalEvent {
     testTraffic: Number(row.test_traffic) === 1,
     originProposalId: strOrNull(row.origin_proposal_id),
     revisesProposalId: strOrNull(row.revises_proposal_id),
+    stagedAs: row.staged_as == null ? null : (String(row.staged_as) as StagedAs),
+    correctsProposalId: strOrNull(row.corrects_proposal_id),
     turnId: strOrNull(row.turn_id),
     requesterId: strOrNull(row.requester_id),
     tools: list(row.tools),

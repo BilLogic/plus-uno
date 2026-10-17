@@ -327,7 +327,7 @@ describe("shared gate copy", () => {
       decisionReport([item(1), item(2)], "Two pages.").text,
       renderGateNote({ kind: "not-on-the-card", toolName: "notion_update", glyph: "white_check_mark", userId: "U1" }),
       renderGateNote({ kind: "not-on-the-card", toolName: "notion_update", glyph: "white_check_mark", userId: "U1", stated: true }),
-      renderGateNote({ kind: "which-card", count: 2 }),
+      renderGateNote({ kind: "which-card", decision: "confirm", cards: [{ ts: "1700000000.000200", headline: "Backup tutor matching" }, { ts: "1700000000.000100", headline: "Session reflections" }] }),
       renderGateNote({ kind: "review-only" }),
     ];
     for (const line of lines) {

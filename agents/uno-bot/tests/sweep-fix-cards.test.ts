@@ -82,7 +82,8 @@ test("three fixes post as a parent line and three cards in a carousel, each with
   const { post } = await postedCard();
   const blocks = post.blocks as Block[];
   assert.equal(messageBlocksRefusal(blocks), null);
-  assert.equal(blocks.length, 2, "the parent line, then the carousel: nothing else");
+  assert.equal(blocks.length, 3, "the parent line, the carousel and when it expires: nothing else");
+  assert.match(String(blocks[2]!.elements[0].text), /^Expires <!date\^\d+\^\{date_short_pretty\}\|[^>]+> at <!date\^\d+\^\{time\}\|[^>]+ ET>$/);
   assert.equal(blocks[0]!.type, "section");
   assert.equal(String(blocks[0]!.text.text), "*Reflection PRD* still states 3 things its thread changed.\n• <@U0ADE> — Reflection PRD\n• <@U0BEA> — Reflection PRD", "one bullet per owner, each page once");
   assert.deepEqual(notified(post), ["U0ADE", "U0BEA"], "each owner pinged from the main text");
@@ -125,8 +126,9 @@ test("one fix posts as a parent line naming its page, and one card", async () =>
   assert.equal(messageBlocksRefusal(blocks), null);
   assert.equal(String(blocks[0]!.text.text), "<@U0ADE>, this thread settled something that *Reflection PRD* still states the old way.");
   assert.deepEqual(notified(h.posted[0]!), ["U0ADE"]);
-  assert.equal(blocks.length, 2);
+  assert.equal(blocks.length, 3);
   assert.equal(blocks[1]!.type, "card", "one card stands alone, no carousel");
+  assert.equal(blocks[2]!.type, "context", "then when it expires");
   assert.equal(plainOf(blocks[1]!.title), "Reflection PRD");
   assert.deepEqual(blocks[1]!.actions.map((a: Block) => a.text.text), ["Review", "Open page"]);
   assert.doesNotMatch(JSON.stringify(blocks), GATE_WORDS);
@@ -135,12 +137,17 @@ test("one fix posts as a parent line naming its page, and one card", async () =>
 test("each fix is its own proposal: one operation, keyed by the message and its block", async () => {
   const { h, post } = await postedCard();
   assert.equal(h.staged.length, 3);
+  for (const p of h.staged) {
+    // Staged Wednesday 10:00 ET: live until Thursday 10:00 ET.
+    const stored = await h.threadState.getProposalByTs(p.proposalTs);
+    assert.ok(stored.state === "found");
+    assert.equal(stored.createdAt + stored.proposal.ttlMs!, at(31, 14));
+  }
   h.staged.forEach((p, i) => {
     assert.equal(p.operations!.length, 1);
     assert.equal((p.operations![0]!.input.replace as Array<{ content: string }>)[0]!.content, FIXES[i]);
     assert.deepEqual(p.item, { messageTs: post.ts, id: PAGE.blocks[i]!.id });
     assert.equal(p.proposalTs, `${post.ts}#${PAGE.blocks[i]!.id}`);
-    assert.equal(p.ttlMs, 72 * 60 * 60 * 1000);
     // The whole change, which the pop-up shows: the page's words now and what they become.
     assert.match(p.proposalText, new RegExp(`Page says now: ${PAGE.blocks[i]!.text}`));
     assert.match(p.proposalText, new RegExp(`Will say: ${FIXES[i]}`));
@@ -185,8 +192,9 @@ test("where Slack refuses cards, the report posts as sections that each keep the
   assert.equal(messageBlocksRefusal(blocks), null);
   assert.equal(blocks.some((b) => b.type === "card" || b.type === "carousel"), false);
   assert.match(String(blocks[0]!.text.text), /^\*Reflection PRD\* still states 3 things/, "the parent line stays");
-  const fixes = blocks.slice(1);
+  const fixes = blocks.slice(1, -1);
   assert.equal(fixes.length, 3);
+  assert.match(String(blocks.at(-1)!.elements[0].text), /^Expires /, "and when they expire, last");
   fixes.forEach((b, i) => {
     assert.equal(b.type, "section");
     assert.equal(b.accessory.action_id, `uno_decision_review:${PAGE.blocks[i]!.id}`);

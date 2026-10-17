@@ -324,9 +324,11 @@ test("a typed ✅ that files an issue on the bot's own repo records the ticket",
 
 // ── proposal events ──────────────────────────────────────────────────────────
 
+/** The model revising `PENDING`, which it names; where `PENDING` is not live,
+ *  the name matches nothing and the card is a fresh one. */
 const REVISION = {
   text: "Revised — the title you asked for.",
-  toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign, v2" } }],
+  toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign, v2", revises_card: PENDING.proposalTs } }],
 };
 
 test("a staged card is recorded staged, joined to the turn, with when its thread began", async () => {
@@ -483,15 +485,27 @@ test("a debug-origin thanks and a sandbox thanks are not counted; an ordinary as
   assert.equal(only(ask.usage.records()).thanks, false);
 });
 
-test("a revision Slack refused still records the card it retired as superseded", async () => {
-  // The old card is out of reach either way (`ThreadState.retireProposal`),
-  // so the expiry pass must not later read it as one that aged out untouched.
+test("a revision Slack refused gives back the card it retired, and records it superseded only when it cannot", async () => {
+  // Nothing replaced the old card, so it waits again; were it left out of
+  // reach, the expiry pass must not later read it as one that aged out
+  // untouched (`ThreadState.retireProposal`).
   const h = harness({ replies: [REVISION], delivery: recordingDelivery({ stagingFails: true }) });
   await h.threadState.putProposal(PENDING);
   const outcome = await runTurn(request({ text: "change the title to v2", pending: PENDING }), h.deps);
   assert.equal(outcome.disposition, "failed");
+  assert.equal((await h.threadState.getProposalByTs(PENDING.proposalTs)).state, "found", "the card waits again");
+  assert.deepEqual(h.proposalEvents.events().map((e) => [e.proposalId, e.event]), []);
+
+  const stuck = harness({ replies: [REVISION], delivery: recordingDelivery({ stagingFails: true }) });
+  await stuck.threadState.putProposal(PENDING);
+  const putProposal = stuck.threadState.putProposal.bind(stuck.threadState);
+  stuck.threadState.putProposal = async () => {
+    throw new Error("store unavailable");
+  };
+  await runTurn(request({ text: "change the title to v2", pending: PENDING }), stuck.deps);
+  stuck.threadState.putProposal = putProposal;
   assert.deepEqual(
-    h.proposalEvents.events().map((e) => [e.proposalId, e.event]),
+    stuck.proposalEvents.events().map((e) => [e.proposalId, e.event]),
     [[PENDING.proposalTs, "superseded"]],
   );
 });
@@ -509,13 +523,13 @@ test("a card claimed while its revision was being written is never recorded supe
   );
 });
 
-test("a card the staging itself retired is recorded superseded, and the expiry pass leaves it alone", async () => {
-  // No pending card handed in, but one is live in the thread: the store's
-  // backstop retires it as the new card goes up.
+test("a card a revision retired is recorded superseded, and the expiry pass leaves it alone", async () => {
+  // A card staged before turn cards had slots of their own: its revision
+  // stays in the thread's slot, and the card is out of reach once it posts.
   const h = harness({ replies: [REVISION] });
   await h.proposalEvents.record(stagedEvent({ proposal: PENDING, at: 0, via: "turn", channelStored: true }));
   await h.threadState.putProposal(PENDING);
-  await runTurn(request({ text: "file the v2 card" }), h.deps);
+  await runTurn(request({ text: "file the v2 card", pending: PENDING }), h.deps);
   await runProposalExpiry(h.proposalEvents, 1_800_000_000_000, { dryRun: false });
   assert.deepEqual(
     (await h.proposalEvents.eventsOf(PENDING.proposalTs)).map((e) => e.event),

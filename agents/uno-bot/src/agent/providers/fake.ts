@@ -65,6 +65,10 @@ export interface FakeProviderOptions {
   /** When true, every `generate` reply reports it stopped at the output
    *  ceiling (`cutOff`), as an adapter does on a truncated one-shot. */
   generateCutOff?: boolean;
+  /** When set, every `generate` waits for this before it answers — or until
+   *  the prompt's `signal` aborts, which fails it as a transport abort does:
+   *  how a test holds a one-shot mid-call and stops it. */
+  generateGate?: Promise<unknown>;
   model?: string;
   usage?: Partial<ModelUsage>;
 }
@@ -120,6 +124,16 @@ export function fakeProvider(opts: FakeProviderOptions = {}): FakeProvider {
 
     async generate(prompt: ModelPrompt): Promise<ModelText> {
       generated.push(prompt);
+      if (opts.generateGate) {
+        const signal = prompt.signal;
+        const aborted = new Promise<"aborted">((resolve) => {
+          if (signal?.aborted) resolve("aborted");
+          signal?.addEventListener("abort", () => resolve("aborted"), { once: true });
+        });
+        if ((await Promise.race([opts.generateGate, aborted])) === "aborted") {
+          return { ok: false, model, message: "The operation was aborted" };
+        }
+      }
       if (opts.generateUnavailableMessage !== undefined) {
         return {
           ok: false,

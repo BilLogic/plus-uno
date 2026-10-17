@@ -50,10 +50,12 @@ import type {
   PendingProposal,
   ProposalOperation,
   ProposalLookup,
+  ReplacingCard,
   StatedCardWords,
   ThreadState,
 } from "../thread-state/index";
 import type { GateNote } from "../turn/index";
+import { cardHeadline } from "../agent/card-identity";
 
 // ── The signal ───────────────────────────────────────────────────────────────
 
@@ -127,6 +129,13 @@ export type GateSignal =
        * thread, and asks which when there are several.
        */
       wholeDm?: true;
+      /**
+       * The card the turn held as its thread's pending one when the message
+       * came in. Read only when nothing in the thread is live any more: a card
+       * that aged out while the message waited its turn is answered as
+       * expired, on the card itself, rather than as a lost race (#1316).
+       */
+      cardTs?: string;
     }
   | {
       kind: "model";
@@ -296,11 +305,49 @@ function pointerNote(live: PendingProposal, glyph: string, userId: string): Gate
   return { kind: "not-on-the-card", toolName: live.toolName, glyph, userId, ...(live.stated ? { stated: true } : {}) };
 }
 
+/**
+ * A signal on a card a revision replaced: say so, and name the card that
+ * replaced it when the store knows it — with several live cards in a thread,
+ * "the newest card" may be another matter's (#1319, story 18).
+ */
+function supersededNote(stated: boolean, replacedBy: ReplacingCard | undefined): GateNote {
+  // A stated card keeps its own line, held to the Figma copy rules
+  // (`gate-note.ts` § `STATED_SUPERSEDED_POST`).
+  if (stated) return { kind: "superseded", stated: true };
+  const first = replacedBy?.operations[0];
+  const by = replacedBy && first ? cardHeadline({ operations: replacedBy.operations, toolName: first.toolName, input: first.input }) : undefined;
+  if (!by) return { kind: "superseded" };
+  return { kind: "superseded", by, ...(replacedBy?.waiting === false ? { byWaiting: false as const } : {}) };
+}
+
 /** Where a resolution speaks: the card's own reply target, never `threadTs` —
  *  that is the history key and is the literal string "dm" in a DM, which Slack
  *  rejects (live 2026-08-22: an approved write said nothing at all). */
 function replyTarget(proposal: PendingProposal): string {
   return proposal.replyTs ?? proposal.threadTs;
+}
+
+/**
+ * Whether another card still waits in the reply thread of the one a door just
+ * decided. A ✅ or ⛔ decides ONE card, never the thread's others (#1318), so
+ * a door that leaves one waiting settles the thread as waiting on the person,
+ * as Turn does when it resolves one of several (`settlementOf`). The store
+ * keys cards on their reply thread (`proposalReplyThread`), never on
+ * `threadTs` — the literal "dm" in a DM. A failed read answers no: the
+ * settlement the doors had before.
+ *
+ * @param decided - The card the door decided
+ * @param threadState - The thread's live cards
+ */
+export async function otherCardWaits(
+  decided: PendingProposal,
+  threadState: Pick<ThreadState, "getProposalsByThread">,
+): Promise<boolean> {
+  const thread = replyTarget(decided);
+  const live = await threadState
+    .getProposalsByThread({ channel: decided.channel, thread })
+    .catch(() => [] as PendingProposal[]);
+  return live.some((card) => card.proposalTs !== decided.proposalTs && replyTarget(card) === thread);
 }
 
 // ── The gate ─────────────────────────────────────────────────────────────────
@@ -354,7 +401,7 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
       outcome: "stale",
       decision,
       post: {
-        note: { kind: "superseded", ...(found.stated ? { stated: true } : {}) },
+        note: supersededNote(!!found.stated, found.replacedBy),
         replyTs: replyTargetOf(signal),
         ...cardSignaled(signal, found),
       },
@@ -371,9 +418,11 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
         // The card's own lifetime rides along when it had one, so the note
         // says how long it was live rather than assuming the hour — and a
         // stated card's own line, which says it in that card's terms.
+        // A stated card's own line rides along for the thread, where the
+        // person who acted is told what that card's lapse means; the card
+        // itself says the one expired line (`slack/gate-note.ts`).
         note: {
           kind: "expired",
-          ...(found.ttlMs !== undefined ? { ttlMs: found.ttlMs } : {}),
           ...(found.stated ? { words: found.stated.expired } : {}),
         },
         replyTs: replyTargetOf(signal),
@@ -390,12 +439,12 @@ async function resolve(signal: GateSignal, deps: GateDeps): Promise<GateVerdict>
   }
 
   if (found.state === "several") {
-    // Outside every card's thread, and more than one card it could mean: two
-    // cards are two different writes, so ask rather than pick one.
+    // More than one card it could mean: two cards are two different writes,
+    // so ask rather than pick one — the newest is no likelier than the rest.
     return {
       outcome: "none",
       decision,
-      post: { note: { kind: "which-card", count: found.count }, replyTs: replyTargetOf(signal) },
+      post: { note: whichCardNote(decision, found.cards), replyTs: replyTargetOf(signal) },
     };
   }
 
@@ -658,7 +707,7 @@ async function claim(
       post: {
         note:
           why.state === "superseded"
-            ? { kind: "superseded", ...(proposal.stated ? { stated: true } : {}) }
+            ? supersededNote(!!proposal.stated, why.replacedBy)
             : { kind: "already-resolved" },
         replyTs: replyTarget(proposal),
         // A replaced card says so on itself; a lost race is about this
@@ -786,10 +835,10 @@ async function locate(
   deps: GateDeps,
 ): Promise<
   | { state: "found"; proposal: PendingProposal }
-  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
+  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[]; replacedBy?: ReplacingCard }
   | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[] }
   | { state: "cut-off"; execution: Execution }
-  | { state: "several"; count: number }
+  | { state: "several"; cards: PendingProposal[] }
   | { state: "none" }
 > {
   if (signal.kind !== "typed") {
@@ -820,13 +869,65 @@ async function locate(
 
   const ref = threadRefOf(signal);
   if (!ref) return { state: "none" };
-  const live = await deps.threadState.getProposalByThread(ref).catch(() => null);
-  if (live) return { state: "found", proposal: live };
+  // A reaction only needs the card it missed, to point at: the newest.
+  if (signal.kind !== "typed") {
+    const live = await deps.threadState.getProposalByThread(ref).catch(() => null);
+    return live ? { state: "found", proposal: live } : { state: "none" };
+  }
 
-  if (signal.kind !== "typed" || !signal.wholeDm) return { state: "none" };
-  const all = await deps.threadState.getProposalsByChannel(signal.channel).catch(() => []);
-  if (all.length === 1) return { state: "found", proposal: all[0]! };
-  return all.length > 1 ? { state: "several", count: all.length } : { state: "none" };
+  // A typed emoji names no card, so it reads every card in its thread — the
+  // same one read the newest-only lookup cost — and asks when it could mean
+  // more than one (#1319).
+  const inThread = pickCard(await deps.threadState.getProposalsByThread(ref).catch(() => []));
+  if (inThread.state !== "none") return inThread;
+  // Nothing live in the thread, and the turn held a card when the message
+  // came in: say what became of that card rather than "already resolved".
+  if (signal.cardTs) {
+    const held = await deps.threadState.getProposalByTs(signal.cardTs).catch(() => ({ state: "none" }) as const);
+    if (held.state === "expired" || held.state === "superseded") return held;
+  }
+  if (!signal.wholeDm) return inThread;
+  return pickCard(await deps.threadState.getProposalsByChannel(signal.channel).catch(() => []));
+}
+
+/**
+ * The live cards a decision that names no card could mean: every one still
+ * waiting on a decision. A card sent back with Needs changes is waiting on its
+ * revision instead, and an item of a decision report is decided from its own
+ * Review only, so neither is offered — a button for either could only answer
+ * that nothing ran. Newest first, as the store lists them.
+ *
+ * Exported because the model's `proposal_resolve` is held to the same reading
+ * (`agent/loop-policy.ts`): a "yes" that names no card is asked about exactly
+ * when a typed ✅ would be.
+ */
+export function awaitingDecision(cards: readonly PendingProposal[]): PendingProposal[] {
+  return cards.filter((card) => !card.revising && !card.item);
+}
+
+/**
+ * Which card, of the ones listed, a decision naming none of them means: the
+ * one waiting on a decision, or — with several — none, and the question. With
+ * none waiting, the newest card still answers for itself ("being revised",
+ * "decided from Review"), as it did when it was the only one looked at.
+ */
+function pickCard(
+  cards: readonly PendingProposal[],
+): { state: "found"; proposal: PendingProposal } | { state: "several"; cards: PendingProposal[] } | { state: "none" } {
+  const waiting = awaitingDecision(cards);
+  if (waiting.length > 1) return { state: "several", cards: waiting };
+  const card = waiting[0] ?? cards[0];
+  return card ? { state: "found", proposal: card } : { state: "none" };
+}
+
+/**
+ * The "which one?" question for a decision that named no card: the decision,
+ * and each card it could mean by its ts and headline, newest first. Exported
+ * for Turn, which asks it when the model tried to resolve a card without
+ * naming one (`AgentResult` `text` with `askWhich`).
+ */
+export function whichCardNote(decision: Decision, cards: readonly PendingProposal[]): GateNote {
+  return { kind: "which-card", decision, cards: cards.map((card) => ({ ts: card.proposalTs, headline: cardHeadline(card) })) };
 }
 
 function threadRefOf(
@@ -843,7 +944,9 @@ function cardSignaled(
   signal: Exclude<GateSignal, { kind: "model" }>,
   posted: Parameters<typeof cardOf>[1],
 ): { card?: GateCard } {
-  return signal.kind === "typed" ? {} : cardOf(signal.messageTs, posted);
+  if (signal.kind !== "typed") return cardOf(signal.messageTs, posted);
+  // A typed emoji names no card, unless the turn held one (`cardTs`).
+  return signal.cardTs ? cardOf(signal.cardTs, posted) : {};
 }
 
 /** Where to answer a signal whose proposal was never found. */

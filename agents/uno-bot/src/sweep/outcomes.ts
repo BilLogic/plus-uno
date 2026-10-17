@@ -16,11 +16,11 @@
 //                    integration refused it because the block moved since the
 //                    sweep read it, `failed` for any other error.
 //   ⛔ / Reject    → every item `dropped` (a report's fix: its own item).
-//   a revision    → each item still on the new card moves to it, its 72 h
+//   a revision    → each item still on the new card moves to it, its window
 //                    restarted with the card's; each one left off is `dropped`
 //                    (a reply dropping an item is how a person says "not this
 //                    one").
-//   no answer     → nothing: an item still `proposed` 72 h after it posted
+//   no answer     → nothing: an item still `proposed` 24 weekday hours after it posted
 //                    expired, and the queries read it that way.
 //
 // Best-effort by contract: a failed record is logged by the caller and never
@@ -167,7 +167,7 @@ export async function recordSweepRevision(
  * @param store - The records
  * @param from - The card whose run was cut off
  * @param to - The card staged with what it never finished
- * @param now - Epoch ms: the fresh card's 72 h start here
+ * @param now - Epoch ms: the fresh card's 24 weekday hours start here
  */
 export async function recordSweepRestage(
   store: Pick<SweepRecords, "itemsForProposal" | "updateItem">,

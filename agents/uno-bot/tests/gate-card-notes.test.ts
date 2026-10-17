@@ -1,3 +1,4 @@
+import { cardTtlMs } from "../src/card-expiry";
 // A note about a card's own state — it aged out, a revision replaced it, it is
 // waiting on someone else — is one line edited onto the card, not a new
 // message in the thread.
@@ -14,8 +15,8 @@ import assert from "node:assert/strict";
 import { resolveSignal, runReactionDoor } from "../src/gate/index";
 import { runButtonDoor } from "../src/slack/button-door";
 import { deliveryAdapter } from "../src/slack/delivery-adapter";
-import { EXPIRED_POST, SUPERSEDED_POST } from "../src/slack/gate-note";
-import { createInMemoryThreadState, PROPOSAL_TTL_MS, type PendingProposal } from "../src/thread-state/index";
+import { EXPIRED_CARD, supersededBy } from "../src/slack/gate-note";
+import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
 import { recordingSlack, type RecordingSlack } from "./helpers/recording-slack";
 
 const CHANNEL = "C0000001";
@@ -88,7 +89,7 @@ describe("on the reaction door", () => {
       await s.putProposal(card({ proposalTs: NEW_CARD, proposalText: "Ready to create a Roadmap card: Reflection, tutors only" }));
     });
     const { text, line, button } = edited(slack, OLD_CARD);
-    assert.equal(line, SUPERSEDED_POST);
+    assert.equal(line, supersededBy("Reflection redesign"), "names the card that replaced it");
     assert.equal(text, card().proposalText, "re-rendered from the card's own words");
     assert.equal(button, "View", "nothing left to decide on it");
     assert.deepEqual(slack.of("message"), []);
@@ -98,10 +99,10 @@ describe("on the reaction door", () => {
   it("a ✅ on an aged-out card says so on the card, and posts nothing", async () => {
     const { slack } = await reactOn(OLD_CARD, async (s, clock) => {
       await s.putProposal(card());
-      clock.at += PROPOSAL_TTL_MS + 1;
+      clock.at += cardTtlMs(clock.at) + 1;
     });
     const { line, button } = edited(slack, OLD_CARD);
-    assert.equal(line, EXPIRED_POST);
+    assert.equal(line, EXPIRED_CARD);
     assert.equal(button, "View");
     assert.deepEqual(slack.of("message"), []);
   });
@@ -127,7 +128,7 @@ describe("on the card's button", () => {
     const clock = { at: 1_790_000_000_000 };
     const threadState = createInMemoryThreadState({ now: () => clock.at });
     await threadState.putProposal(card());
-    clock.at += PROPOSAL_TTL_MS + 1;
+    clock.at += cardTtlMs(clock.at) + 1;
     const slack = recordingSlack();
     const aside: string[] = [];
     await runButtonDoor(
@@ -141,7 +142,7 @@ describe("on the card's button", () => {
         restage: async () => {},
       },
     );
-    assert.equal(edited(slack, OLD_CARD).line, EXPIRED_POST);
+    assert.equal(edited(slack, OLD_CARD).line, EXPIRED_CARD);
     assert.deepEqual(slack.of("message"), []);
     assert.deepEqual(aside, []);
   });

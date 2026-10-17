@@ -19,7 +19,7 @@ import { runReactionDoor } from "../src/gate/index";
 import { runButtonDoor } from "../src/slack/button-door";
 import { deliveryAdapter } from "../src/slack/delivery-adapter";
 import { renderProposalCard } from "../src/slack/proposal-render";
-import { expiredPost, renderGateNote } from "../src/slack/gate-note";
+import { EXPIRED_CARD, renderGateNote } from "../src/slack/gate-note";
 import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
 import { recordingDelivery, runTurn, type ProposalCard } from "../src/turn/index";
 import { recordingSlack, type RecordingSlack } from "./helpers/recording-slack";
@@ -124,7 +124,7 @@ describe("a sweep card keeps its carousel", () => {
     });
     const blocks = edit(slack);
     assert.equal(blocks.filter((b) => b.type === "carousel").length, 1, "the carousel stays");
-    assert.equal(lastLine(blocks), expiredPost(72 * HOUR));
+    assert.equal(lastLine(blocks), EXPIRED_CARD);
     assert.deepEqual(buttons(blocks), ["View"]);
   });
 
@@ -157,6 +157,28 @@ describe("a sweep card keeps its carousel", () => {
     assert.match(lastLine(blocks), new RegExp(`Approved by <@${BEA}>`));
     assert.deepEqual(buttons(blocks), ["View"]);
     assert.match(replaced[0]!.text, /Approved by/, "the fallback copy says the outcome too");
+  });
+});
+
+describe("the line above a card", () => {
+  const target = { channel: CHANNEL, replyTs: ROOT, userMsgTs: ROOT, userId: BEA };
+  const lead = { kind: "revised", replaced: "Backup tutor matching" } as const;
+
+  it("goes up just before the card, and is reported with it", async () => {
+    const slack = recordingSlack();
+    const posted = await deliveryAdapter(slack.deps(false), target).card(SWEEP, lead);
+    const messages = slack.of("message");
+    assert.equal(messages[0]!.text, renderGateNote(lead));
+    assert.equal(messages.at(-1)!.blocks, true, "the card is last");
+    assert.equal(posted.lead, renderGateNote(lead));
+  });
+
+  it("is taken back when the card under it never goes up", async () => {
+    const slack = recordingSlack({ postsLand: 1 });
+    const posted = await deliveryAdapter(slack.deps(false), target).card(SWEEP, lead);
+    assert.equal(posted.ok, false);
+    assert.equal(posted.lead, undefined);
+    assert.deepEqual(slack.of("delete").map((d) => d.ts), ["posted-1"], "the line is deleted");
   });
 });
 
@@ -211,7 +233,7 @@ describe("the button follows the card's own", () => {
     });
     const blocks = edit(slack);
     assert.match(JSON.stringify(blocks), /DS precedence this week/, "its own words stay");
-    assert.equal(lastLine(blocks), "That card expired, so nothing was filed.");
+    assert.equal(lastLine(blocks), EXPIRED_CARD, "the card says the one expired line, whoever staged it");
     assert.deepEqual(buttons(blocks), ["View"]);
   });
 

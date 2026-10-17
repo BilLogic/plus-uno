@@ -1,3 +1,4 @@
+import { cardTtlMs } from "../src/card-expiry";
 // The five ways to resolve a proposal agree with each other.
 //
 // This file used to assert a glyph table and call itself "the three
@@ -43,7 +44,6 @@ import {
 } from "../src/gate/reactions";
 import {
   EXECUTION_CUTOFF_MS,
-  PROPOSAL_TTL_MS,
   createInMemoryThreadState,
   type PendingProposal,
   type ProposalOperation,
@@ -56,7 +56,7 @@ import {
   type TurnSettlement,
 } from "../src/turn/index";
 import { runButtonDoor, type ButtonDoorTarget } from "../src/slack/button-door";
-import { STALE_POST, STATED_SUPERSEDED_POST, renderGateNote } from "../src/slack/gate-note";
+import { STALE_POST, STATED_SUPERSEDED_POST, renderCardNote, renderGateNote } from "../src/slack/gate-note";
 import { verdictEvents } from "../src/usage/index";
 import { cardWords } from "./helpers/card-message";
 
@@ -82,6 +82,20 @@ const PROPOSAL: PendingProposal = {
 async function staged(opts: { at?: () => number } = {}): Promise<ThreadState> {
   const store = createInMemoryThreadState(opts.at ? { now: opts.at } : {});
   await store.putProposal(PROPOSAL);
+  return store;
+}
+
+/** The card staged, and a separate one beside it in the same reply thread,
+ *  each in a slot of its own (#1318). */
+async function twoCards(): Promise<ThreadState> {
+  const store = createInMemoryThreadState();
+  await store.putProposal({ ...PROPOSAL, supersedeKey: `card:${CARD_TS}` });
+  await store.putProposal({
+    ...PROPOSAL,
+    input: { title: "Session reflections" },
+    proposalTs: "1700000000.000196",
+    supersedeKey: "card:1700000000.000196",
+  });
   return store;
 }
 
@@ -146,7 +160,13 @@ describe("five signals, one verdict", () => {
   it("wins, posts the same verdict, and executes the same tool on every door", async () => {
     const verdicts: GateVerdict[] = [];
     for (const door of DOORS) {
-      verdicts.push(await resolveSignal(door.signal, { threadState: await staged() }));
+      const threadState = await staged();
+      // The model reads its card from the store, as the turn hands it over:
+      // stamped with its lifetime, like the card every other door finds.
+      const signal = door.signal.kind === "model"
+        ? { ...door.signal, pending: (await threadState.getProposalByThread({ channel: CHANNEL, thread: THREAD }))! }
+        : door.signal;
+      verdicts.push(await resolveSignal(signal, { threadState }));
     }
 
     for (const [i, verdict] of verdicts.entries()) {
@@ -161,8 +181,10 @@ describe("five signals, one verdict", () => {
         { note: { kind: "resolved", decision: "confirm" }, replyTs: THREAD },
         where,
       );
+      // The card's lifetime is the store's stamp, not part of what runs.
+      const { ttlMs: _ttl, ...execute } = verdict.execute as NonNullable<typeof verdict.execute> & { ttlMs?: number };
       assert.deepEqual(
-        verdict.execute,
+        execute,
         {
           operations: [
             { toolName: "notion_create", input: { title: "Reflection redesign" } },
@@ -180,10 +202,14 @@ describe("five signals, one verdict", () => {
 
     // Not "each looks right" but "all five are the same verdict" — past the
     // door it came through, which each one names for the record.
-    const { by: _first, ...first } = verdicts[0]!;
+    const unstamped = (v: GateVerdict) => {
+      const { by: _by, ...rest } = v;
+      const { ttlMs: _ttl, ...execute } = (rest.execute ?? {}) as { ttlMs?: number };
+      return { ...rest, execute };
+    };
+    const first = unstamped(verdicts[0]!);
     for (const verdict of verdicts.slice(1)) {
-      const { by: _by, ...rest } = verdict;
-      assert.deepEqual(rest, first);
+      assert.deepEqual(unstamped(verdict), first);
     }
     assert.deepEqual(
       verdicts.map((v) => v.by),
@@ -532,7 +558,7 @@ describe("standing confirmers", () => {
     let now = 1_000_000;
     const threadState = createInMemoryThreadState({ now: () => now });
     await threadState.putProposal({ ...PROPOSAL, confirmers: [OWNER] });
-    now += PROPOSAL_TTL_MS + 1;
+    now += cardTtlMs(now) + 1;
     const verdict = await resolveSignal(reaction({ userId: LEAD }), { threadState, standingConfirmers });
     assert.equal(verdict.outcome, "stale");
     assert.equal(verdict.post?.note.kind, "expired");
@@ -540,7 +566,7 @@ describe("standing confirmers", () => {
 });
 
 describe("a card that is no longer there", () => {
-  it("tells a card with its own lifetime how long it was live", async () => {
+  it("says a card with its own lifetime expired in the one expired line", async () => {
     const HOUR_MS = 60 * 60 * 1000;
     let clock = 1_000_000;
     const threadState = createInMemoryThreadState({ now: () => clock });
@@ -549,16 +575,15 @@ describe("a card that is no longer there", () => {
 
     const verdict = await resolveSignal(reaction(), { threadState });
     assert.equal(verdict.outcome, "stale");
-    assert.deepEqual(verdict.post?.note, { kind: "expired", ttlMs: 72 * HOUR_MS });
-    assert.match(renderGateNote(verdict.post!.note), /It stayed live for 72 hours\./);
-    // And the default card still reads as the hour.
-    assert.match(renderGateNote({ kind: "expired" }), /It stayed live for an hour\./);
+    assert.deepEqual(verdict.post?.note, { kind: "expired" });
+    // The card showed its deadline all along, so the line names no lifetime.
+    assert.equal(renderGateNote(verdict.post!.note), "Expired. Ask again for a fresh card.");
   });
 
   it("reports an expired proposal as stale, in the expired wording", async () => {
     let clock = 1_000_000;
     const threadState = await staged({ at: () => clock });
-    clock += PROPOSAL_TTL_MS + 1;
+    clock += cardTtlMs(clock) + 1;
 
     const verdict = await resolveSignal(reaction(), { threadState });
     assert.equal(verdict.outcome, "stale");
@@ -608,7 +633,7 @@ describe("a card a revision replaced", () => {
     const { threadState } = await twoCards();
     const verdict = await resolveSignal(reaction(), { threadState });
     assert.equal(verdict.outcome, "stale");
-    assert.deepEqual(verdict.post?.note, { kind: "superseded" });
+    assert.deepEqual(verdict.post?.note, { kind: "superseded", by: "Reflection redesign, tutors only" });
     assert.equal(verdict.execute, undefined);
   });
 
@@ -616,8 +641,26 @@ describe("a card a revision replaced", () => {
     const { threadState } = await twoCards();
     const verdict = await resolveSignal(button(), { threadState });
     assert.equal(verdict.outcome, "stale");
-    assert.deepEqual(verdict.post?.note, { kind: "superseded" });
+    assert.deepEqual(verdict.post?.note, { kind: "superseded", by: "Reflection redesign, tutors only" });
     assert.equal(verdict.execute, undefined);
+  });
+
+  // Story 18: with several cards waiting, "the newest card in this thread"
+  // may be another matter's, so a replacement that is no longer waiting is
+  // still named, and said to be done.
+  it("names the replacement even once it was decided, and says it is no longer waiting", async () => {
+    const { threadState, revisedTs } = await twoCards();
+    await threadState.putProposal({ ...PROPOSAL, proposalTs: "1700000000.000296", input: { title: "Session reflections" }, supersedeKey: "card:1700000000.000296" });
+    assert.equal((await resolveSignal({ ...button(), messageTs: revisedTs } as GateSignal, { threadState })).outcome, "won");
+
+    const verdict = await resolveSignal(reaction(), { threadState });
+    assert.equal(verdict.outcome, "stale");
+    assert.equal(verdict.execute, undefined);
+    assert.deepEqual(verdict.post?.note, { kind: "superseded", by: "Reflection redesign, tutors only", byWaiting: false });
+    const line = renderGateNote(verdict.post!.note);
+    assert.match(line, /\*Reflection redesign, tutors only\*/, "names the replacement");
+    assert.match(line, /no longer waiting/);
+    assert.doesNotMatch(line, /newest card/, "points at no other card");
   });
 
   it("declines on the older card without executing or resolving the newer one", async () => {
@@ -861,6 +904,12 @@ describe("the reaction door", () => {
     return { delivery, ran, targets, reads, threadState, saidBeforeRunning, restaged };
   }
 
+  it("with another card still waiting in the thread, settles as waiting on the person", async () => {
+    const threadState = await twoCards();
+    const { delivery } = await drive({ threadState });
+    assert.equal(clearedWith(delivery), "waiting-on-person", "the other card still waits");
+  });
+
   it("speaks the verdict, runs the tool, and leaves nothing up", async () => {
     const { delivery, ran, saidBeforeRunning } = await drive();
 
@@ -1020,6 +1069,39 @@ describe("the button door", () => {
 
     return { delivery, ran, targets, ephemerals, replacements, threadState, saidBeforeRunning, restaged };
   }
+
+  it("with another card still waiting in the thread, settles as waiting on the person", async () => {
+    const threadState = await twoCards();
+    const { delivery } = await drive({ threadState });
+    assert.equal(clearedWith(delivery), "waiting-on-person", "the other card still waits");
+  });
+
+  // In a DM the history key is the literal "dm" and the cards sit under their
+  // real reply thread, which is the grain the store keys them on.
+  it("in a DM, with another card still waiting under the same reply, settles as waiting on the person", async () => {
+    const threadState = createInMemoryThreadState();
+    const dm = { ...PROPOSAL, channel: "D1", threadTs: "dm", replyTs: THREAD };
+    await threadState.putProposal({ ...dm, supersedeKey: `card:${CARD_TS}` });
+    await threadState.putProposal({
+      ...dm,
+      input: { title: "Session reflections" },
+      proposalTs: "1700000000.000196",
+      supersedeKey: "card:1700000000.000196",
+    });
+    const delivery = recordingDelivery();
+    await runButtonDoor(
+      { channel: "D1", messageTs: CARD_TS, decision: "confirm", userId: "U1" },
+      {
+        threadState,
+        delivery: () => delivery,
+        async applyVerdict() {},
+        async replyEphemeral() {},
+        async replaceCard() {},
+        async restage() {},
+      },
+    );
+    assert.equal(clearedWith(delivery), "waiting-on-person", "the other card still waits");
+  });
 
   it("speaks the verdict, runs the tool, and leaves nothing up", async () => {
     const { delivery, ran, saidBeforeRunning, replacements } = await drive();
@@ -1254,11 +1336,11 @@ describe("a stated card answers in its own words", () => {
     clock += 73 * HOUR_MS;
     const verdict = await resolveSignal(reaction(), { threadState: late });
     assert.equal(verdict.outcome, "stale");
-    assert.deepEqual(verdict.post?.note, { kind: "expired", ttlMs: 72 * HOUR_MS, words: WORDS.expired });
+    assert.deepEqual(verdict.post?.note, { kind: "expired", words: WORDS.expired });
     assert.equal(renderGateNote(verdict.post!.note), WORDS.expired);
 
-    // Through the button door it is said on the card itself, nothing is
-    // posted, and nothing runs.
+    // Through the button door it is said on the card itself — in the one
+    // expired line every card ends on — nothing is posted, and nothing runs.
     clock = 1_000_000;
     const pressed = await stagedStated(STATED, at);
     clock += 73 * HOUR_MS;
@@ -1267,7 +1349,7 @@ describe("a stated card answers in its own words", () => {
       delivery.calls.filter((c) => c.kind === "gate-note").map((c) => c.kind === "gate-note" && c.card?.ts),
       [CARD_TS],
     );
-    assert.equal(renderGateNote(delivery.gateNotes[0]!), WORDS.expired);
+    assert.equal(renderCardNote(delivery.gateNotes[0]!), "Expired. Ask again for a fresh card.");
     assert.deepEqual(delivery.posted, []);
     assert.deepEqual(ephemerals, []);
     assert.deepEqual(notes, []);
@@ -1301,6 +1383,6 @@ describe("a stated card answers in its own words", () => {
     const { notes } = await press(await staged(), "cancel");
     assert.deepEqual(notes, [`Cancelled by <@${PRESSER}> — tell me what to change and I'll stage it again.`]);
     assert.match(renderGateNote({ kind: "superseded" }), /newest card in this thread/);
-    assert.match(renderGateNote({ kind: "expired" }), /Ask me again/);
+    assert.equal(renderGateNote({ kind: "expired" }), "Expired. Ask again for a fresh card.");
   });
 });

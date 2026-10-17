@@ -73,9 +73,11 @@ import type { SlackMessageMetadata } from "./api";
 import { notedCardBlocks, proposalCardBlocks, renderProposalCard } from "./proposal-render";
 import { toPlainText } from "./mrkdwn";
 import { cardStaysLive, renderCardNote, renderGateNote } from "./gate-note";
+import { whichCardMessage } from "./which-card";
+import { checkOfferMessage } from "./blueprint-check";
 import { planBlock } from "./plan-block";
 import { retryValue } from "./try-again";
-import type { Presentation, Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
+import type { Presentation, Delivery, DeliveryFailureStage, PostResult, ProposalCard, StagingNote } from "../turn/index";
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
 import { SUBREQUEST_CAP } from "../agent/loop-policy";
 import { taskCardFor } from "../agent/tool-table";
@@ -303,6 +305,9 @@ export interface SlackDeliveryClient {
   /** Rewrite one of the bot's own messages in place — how a static checklist
    *  settles where no stream could open. */
   updateMessage(input: { channel: string; ts: string; text: string; blocks: unknown[] }): Promise<{ ok: boolean }>;
+  /** Delete one of the bot's own messages: a card's staging line, when the
+   *  card under it never went up. */
+  deleteMessage(channel: string, ts: string): Promise<void>;
   /** Move the agent session's lifecycle status — the working signal itself. */
   setSessionStatus(channel: string, threadTs: string, status: SessionStatus): Promise<StatusResult>;
   /** Name the session, so the conversation is findable in History / Messages. */
@@ -1099,6 +1104,15 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
     // still be decided or View once it cannot. An edit Slack refuses posts the
     // note in the thread as before, so the person is never left with silence.
     async postGateNote(note, card) {
+      // "Approve which one?" is the one note that carries buttons: one per
+      // card it could mean (`which-card.ts`).
+      if (note.kind === "which-card") {
+        const message = whichCardMessage(note);
+        const posted = await slack
+          .postMessage({ channel, thread_ts: replyTs, text: message.text, blocks: message.blocks })
+          .catch(() => ({ ok: false as const }));
+        return { ok: !!posted.ok, text: message.text, ...("ts" in posted && posted.ts ? { ts: posted.ts } : {}) };
+      }
       if (!card) return postNote(renderGateNote(note));
       const line = renderCardNote(note);
       const updated = await slack
@@ -1114,6 +1128,16 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       return postNote(renderGateNote(note));
     },
 
+    async postCheckOffer(offer) {
+      // The offer carries a button, so it goes up with its own blocks
+      // (`blueprint-check.ts`), under the card in the same reply thread.
+      const message = checkOfferMessage(offer);
+      const posted = await slack
+        .postMessage({ channel, thread_ts: replyTs, text: message.text, blocks: message.blocks })
+        .catch(() => ({ ok: false as const }));
+      return { ok: !!posted.ok, text: message.text, ...("ts" in posted && posted.ts ? { ts: posted.ts } : {}) };
+    },
+
     async reopenCard(card) {
       const updated = await slack
         .updateMessage({ channel, ts: card.ts, text: card.text, blocks: card.blocks ?? proposalCardBlocks(card.text) })
@@ -1121,11 +1145,14 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       if (!updated.ok) console.warn(`[slack] card ${channel}/${card.ts} could not be reopened`);
     },
 
-    async card(card: ProposalCard): Promise<PostResult> {
+    async card(card: ProposalCard, lead?: StagingNote): Promise<PostResult> {
       // THE CARD ARRIVES AS DATA and is spelled here (#623): the turn decided
       // what a person is being asked to approve, and this is where that becomes
       // mrkdwn, an ⚠️, a confirm footer and a button row.
       const rendered = renderProposalCard(card);
+      // What the staging did, said just above the card — first, so the card
+      // stays the last thing in the thread.
+      const said = lead ? await postNote(renderGateNote(lead)) : null;
       // A batch too long for one Slack message posts its full plan as its own
       // messages FIRST, so the card — which carries the buttons — stays the
       // last thing in the thread. Slack's size limits are what decide there is
@@ -1159,11 +1186,19 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
         posted = await slack.postMessage({ channel, thread_ts: replyTs, text: rendered.text, ...(metadata ? { metadata } : {}) });
         own = undefined;
       }
+      // A line above a card that never went up says a staging that did not
+      // happen: taken back.
+      if (!posted.ok && said?.ts) {
+        await slack.deleteMessage(channel, said.ts).catch(() => {
+          console.warn(`[slack] staging line ${channel}/${said.ts} not taken back`);
+        });
+      }
       return {
         ok: !!posted.ok,
         text: rendered.text,
         ...(posted.ok && posted.ts ? { ts: posted.ts } : {}),
         ...(posted.ok && own ? { blocks: own } : {}),
+        ...(posted.ok && said?.ok ? { lead: said.text } : {}),
       };
     },
 

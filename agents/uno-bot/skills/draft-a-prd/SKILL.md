@@ -34,6 +34,6 @@ Every line traces to the PRD, the conversation or a design-system read.
 
 ## Exit
 
-- **file** — the PRD card through `notion_create`; a prompt-spec appended to its PRD through `notion_update`. A PRD that changes a path on the blueprint today gets that path's steps set beside it, by the Worker, once per thread; the reply keeps to the PRD.
+- **file** — the PRD card through `notion_create`; a prompt-spec appended to its PRD through `notion_update`. When the PRD changes a path on the blueprint today, the Worker posts a Check it offer under its card, and the blueprint check runs only on a press; the reply keeps to the PRD.
 - **hand off** — the paired blueprint write and the Design Status move to Ready for Design, as a ready-to-paste IDE prompt naming uno-synthesize with the PRD link. A document too long for one card files its essentials and hands off the expansion the same way.
 - **answer** — a prompt-spec with no PRD page to store it on lives in the thread.

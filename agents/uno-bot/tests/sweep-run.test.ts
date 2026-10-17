@@ -10,7 +10,7 @@ import assert from "node:assert/strict";
 import { isSubrequestBudgetError, SubrequestBudgetError } from "../src/net";
 import type { ScheduledJob } from "../src/scheduled/runs";
 import { itemProposal, itemProposalKey } from "../src/slack/decision-cards";
-import { MAX_ITEMS_PER_CARD, MAX_REPLY_PAGES, runSweepJob, SWEEP_CARD_TTL_MS } from "../src/sweep/index";
+import { MAX_ITEMS_PER_CARD, MAX_REPLY_PAGES, runSweepJob } from "../src/sweep/index";
 import type { SectionCards, SweepSection } from "../src/sweep/sections";
 import { recordSweepResolution } from "../src/sweep/outcomes";
 import { resolveSignal } from "../src/gate/index";
@@ -110,10 +110,13 @@ test("two drifts from two owners in one thread make one card, in that thread, wi
   // One proposal per fix, each its own operation.
   assert.equal(h.staged.length, 2);
   for (const staged of h.staged) {
+    // Staged Wednesday 09:00 ET: live until Thursday 09:00 ET, on the one expiry rule.
+    const stored = await h.threadState.getProposalByTs(staged.proposalTs);
+    assert.ok(stored.state === "found");
+    assert.equal(stored.createdAt + stored.proposal.ttlMs!, at(31, 13));
     assert.equal(staged.operations!.length, 1);
     assert.equal(staged.operations![0]!.toolName, "notion_update");
     assert.deepEqual(staged.confirmers, ["U0ADE", "U0BEA", "U0STARTER"], "owners plus everyone who posted");
-    assert.equal(staged.ttlMs, SWEEP_CARD_TTL_MS);
     assert.equal(staged.sweepRun, "2026-09-30");
     assert.equal(staged.replyTs, t.root.ts);
   }
@@ -230,7 +233,8 @@ test("a card that lapsed unanswered frees its thread for the fixes that waited",
   h.clock.now = at(30, 13);
   await runSweepJob(MORNING, h.deps);
 
-  h.clock.now = at(30, 13) + SWEEP_CARD_TTL_MS + 60_000;
+  // A minute past its 24 weekday hours: Thursday 09:01 ET.
+  h.clock.now = at(31, 13, 1);
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 2);
   assert.equal(h.staged.length, MAX_ITEMS_PER_CARD + 2);
@@ -250,9 +254,9 @@ test("a place whose revision was never recorded is still live the next morning",
   // A drop, staged as the turn stages it, with its record lost.
   h.clock.now = at(30, 16);
   await h.threadState.retireProposal(card.proposalTs);
-  await h.threadState.putProposal({ ...card, proposalTs: ts(30, 16), ttlMs: SWEEP_CARD_TTL_MS - 2 * 3_600_000, operations: card.operations!.slice(1) });
+  await h.threadState.putProposal({ ...card, proposalTs: ts(30, 16), ttlMs: at(31, 13) - at(30, 16), operations: card.operations!.slice(1) });
 
-  h.clock.now = at(31, 13);
+  h.clock.now = at(31, 12);
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 1, "the two that wait keep waiting");
 });
@@ -272,7 +276,8 @@ test("a place is live while ThreadState holds its card, even after the records' 
   await h.threadState.retireProposal(card.proposalTs);
   await h.threadState.putProposal({ ...card, proposalTs: ts(32, 13) });
 
-  h.clock.now = at(30, 13) + SWEEP_CARD_TTL_MS + 60_000;
+  // Past the first card's Thursday deadline; the re-staged one runs to Monday.
+  h.clock.now = at(32, 14);
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 1, "the re-staged card still holds the thread");
 });
@@ -291,7 +296,7 @@ test("a section's card still live on the shared message does not hold the place"
   const { sweepRun: _sweep, ...theirs } = card;
   await h.threadState.putProposal({ ...theirs, ...itemProposal(h.posted[0]!.ts, "ds-Button"), ttlMs: 7 * 24 * 3_600_000 });
 
-  h.clock.now = at(30, 13) + SWEEP_CARD_TTL_MS + 60_000;
+  h.clock.now = at(31, 13, 1);
   await runSweepJob(MORNING, h.deps);
   assert.equal(h.posted.length, 2, "the fixes that waited go up");
 });
@@ -735,7 +740,7 @@ test("a card that cannot be found for sure is held, not posted again; once found
   await assertOneStagedCard(h);
 });
 
-test("a card still unknown after its 72 h is released and its fix carded afresh", async () => {
+test("a card still unknown after its window is released and its fix carded afresh", async () => {
   const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
   const h = sweepHarness({
     channels: channelOf(t),
@@ -751,7 +756,7 @@ test("a card still unknown after its 72 h is released and its fix carded afresh"
   h.unknownSearches.left = 1;
   h.clock.now = at(33, 13, 30);
   const morning = await runSweepJob(MORNING, h.deps);
-  assert.match(morning.note ?? "", /still not found after its 72 h/);
+  assert.match(morning.note ?? "", /still not found after its card's window/);
   assert.equal(h.posted.length, 2, "a fresh card");
   assert.equal(h.staged.length, 1);
 });

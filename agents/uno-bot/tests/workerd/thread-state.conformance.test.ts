@@ -29,6 +29,7 @@ import {
   DECIDED_TTL_MS,
   EXECUTION_CUTOFF_MS,
   REPORT_EXPIRY_RETRY_MS,
+  CARD_EXPIRY_HANDOFF_RETRY_MS,
   type DecisionReportRecord,
   type Execution,
   type PendingProposal,
@@ -69,6 +70,49 @@ describe("[durable-object] report expiry alarm", () => {
     const edit = await liveStore.prepareReportExpiry("1700.9");
     expect(edit?.report.entries[0]?.state.kind).toBe("expired");
     await liveStore.acknowledgeReportExpiry("1700.9", edit!.revision);
+    await fire();
+    expect(handed).toHaveLength(2);
+  });
+});
+
+describe("[durable-object] card expiry alarm", () => {
+  it("arms at the card's deadline, hands it over for its edit once, and again only when that hand-off lapses, until acknowledged", async () => {
+    const instance = `card-alarm-${instanceCounter++}`;
+    const start = Date.now() + 60_000;
+    const expiredAt = start + 1001;
+    let firedAt = expiredAt;
+    const store = createDurableObjectThreadState({ namespace, instance, now: () => start });
+    const stub = namespace.get(namespace.idFromName(instance));
+    const card: PendingProposal = {
+      toolName: "notion_create", input: {}, channel: "C1", threadTs: "1700.1", userMsgTs: "1700.1",
+      proposalTs: "1700.2", proposalText: "Create the card?", requesterUserId: "U1", ttlMs: 1000,
+    };
+    await store.putProposal(card);
+    expect(await runInDurableObject(stub, (_o, state) => state.storage.getAlarm())).toBe(start + 1001);
+    const handed: PendingProposal[][] = [];
+    const fire = () => runInDurableObject(stub, async (_o, state) => {
+      await state.storage.deleteAlarm();
+      const clock = vi.spyOn(Date, "now").mockReturnValue(firedAt);
+      try {
+        await new ThreadStateObject(state, env as Env, { handOffExpiredCards: async (due) => void handed.push(due) }).alarm();
+      } finally {
+        clock.mockRestore();
+      }
+    });
+    await fire();
+    expect(handed[0]?.map((p) => p.proposalTs)).toEqual(["1700.2"]);
+    // Back when the hand-off lapses, not on every two-minute pass.
+    expect(await runInDurableObject(stub, (_o, state) => state.storage.getAlarm())).toBe(expiredAt + CARD_EXPIRY_HANDOFF_RETRY_MS);
+    firedAt = expiredAt + REPORT_EXPIRY_RETRY_MS;
+    await fire();
+    expect(handed, "its job is still out: not queued again").toHaveLength(1);
+    firedAt = expiredAt + CARD_EXPIRY_HANDOFF_RETRY_MS;
+    await fire();
+    expect(handed, "a lapsed hand-off is retried").toHaveLength(2);
+    const liveStore = createDurableObjectThreadState({ namespace, instance, now: () => firedAt });
+    expect((await liveStore.prepareCardExpiry("1700.2"))?.text).toBe("Create the card?");
+    await liveStore.acknowledgeCardExpiry("1700.2");
+    firedAt += CARD_EXPIRY_HANDOFF_RETRY_MS;
     await fire();
     expect(handed).toHaveLength(2);
   });
@@ -288,16 +332,19 @@ describe("[durable-object] the cut-off alarm", () => {
         (await state.storage.get("exec:1700.2")) !== undefined,
       ]);
 
+    // A card past its deadline is kept while its "Expired" edit is owed
+    // (#1316) — a day, `CARD_EXPIRY_EDIT_GRACE_MS` — and its execution is not.
     for (const [ageHours, kept] of [
-      [71, true],
-      [73, false],
+      [71, [true, true]],
+      [73, [true, false]],
+      [72 + 24 + 1, [false, false]],
     ] as const) {
       const { store, stub, fire } = fresh(() => Date.now() - ageHours * HOUR_MS);
       await store.putProposal(long);
       await store.beginExecution(long);
       await runInDurableObject(stub, (_o, state) => state.storage.put("gc:next", Date.now() - 1));
       await fire();
-      expect(await keys(stub)).toEqual([kept, kept]);
+      expect(await keys(stub)).toEqual(kept);
     }
   });
 

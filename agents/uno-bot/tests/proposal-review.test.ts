@@ -1,3 +1,4 @@
+import { cardTtlMs } from "../src/card-expiry";
 // Review on a proposal card: the pop-up, and the Gate's fifth signal.
 //
 // Driven at the review door the interactive endpoint hands a Slack payload to,
@@ -9,7 +10,6 @@ import assert from "node:assert/strict";
 
 import { resolveSignal, runReactionDoor, type GateSignal, type GateVerdict } from "../src/gate/index";
 import {
-  PROPOSAL_TTL_MS,
   REVISING_MARK_MS,
   createInMemoryThreadState,
   type PendingProposal,
@@ -313,11 +313,11 @@ describe("Review opens the draft", () => {
   it("says an expired proposal expired, and offers no decision", async () => {
     let clock = 1_000_000;
     const threadState = await staged({}, () => clock);
-    clock += PROPOSAL_TTL_MS + 1;
+    clock += cardTtlMs(clock) + 1;
     const { deps, views } = harness(threadState);
     await runReviewOpen(open(), deps);
     const view = views.calls[1]!.view;
-    assert.match(viewText(view), /expired/);
+    assert.match(viewText(view), /Expired/);
     assert.doesNotMatch(viewText(view), /Reflection redesign/);
     assert.deepEqual(actionIds(view), []);
   });
@@ -439,11 +439,11 @@ describe("Approve in the pop-up", () => {
   it("runs nothing on a proposal that expired while the pop-up was open", async () => {
     let clock = 1_000_000;
     const threadState = await staged({}, () => clock);
-    clock += PROPOSAL_TTL_MS + 1;
+    clock += cardTtlMs(clock) + 1;
     const { deps, views, ran } = harness(threadState);
     await runReviewDecision(approve(), deps);
     assert.deepEqual(ran, []);
-    assert.match(viewText(views.calls[0]!.view), /expired/);
+    assert.match(viewText(views.calls[0]!.view), /Expired/);
     assert.deepEqual(actionIds(views.calls[0]!.view), []);
   });
 });

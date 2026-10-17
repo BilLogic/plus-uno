@@ -13,9 +13,10 @@
 
 import type { ChannelRole } from "../destination/index";
 import { escapeSlackText } from "../slack/mrkdwn";
-import { SHARE_CHANNEL_NAMES, SWEEP_CARD_TTL_MS, shareCard } from "../sweep/cards";
+import { SHARE_CHANNEL_NAMES, shareCard } from "../sweep/cards";
 import type { ProposalCard } from "../turn/index";
 import type { ProposalOperation, ShareNoteFacts } from "../thread-state/index";
+import { CARD_WINDOW_WORDS } from "../card-expiry";
 
 /** The tag on the raise card, as on every post uno-bot makes in a DM, so the
  *  next night reads it as uno-bot's own post and never as an answer. */
@@ -94,7 +95,7 @@ export function raiseCard(o: {
     `In ${where}:`,
     `> ${text}`,
     "",
-    `Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`,
+    "No reminder comes before it expires.",
   ];
   return {
     card: shareCard({ where, lead: lines.join("\n"), operations }),
@@ -103,7 +104,7 @@ export function raiseCard(o: {
       kind: "sweep_share_post",
       header: "Raise a disagreement",
       from: "this DM",
-      notes: [`No quote and no names go with it. Expires in ${SWEEP_CARD_TTL_MS / 3_600_000} h, with no reminder.`],
+      notes: [`No quote and no names go with it. Expires after ${CARD_WINDOW_WORDS}, with no reminder.`],
     },
   };
 }

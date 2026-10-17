@@ -31,7 +31,7 @@
 // it with a fake adapter and no network. Production builds those ports from
 // `Env` once, in `run-agent.ts`.
 
-import { rowFor } from "./tool-table";
+import { rowFor, REVISES_CARD } from "./tool-table";
 import { BUILD } from "../version";
 import type { ModelTier } from "./routing";
 import type { PendingProposal, ProposalOperation, ThreadRef } from "../thread-state/index";
@@ -82,7 +82,18 @@ export interface TurnDials {
 export type AgentResult =
   /** `cutShort`: the answer came from the tools-disabled synthesis pass, once
    *  the loop's round-trips ran out — what Turn's ⚠️ line reads. */
-  | { kind: "text"; text: string; cutShort?: true }
+  | {
+      kind: "text";
+      text: string;
+      cutShort?: true;
+      /**
+       * The model tried to decide a card with `proposal_resolve` while several
+       * were waiting, never said which, and ended its turn: the decision it
+       * meant, so Turn asks the person "Approve which one?" (or "Cancel which
+       * one?") instead of posting `text` (#1319).
+       */
+      askWhich?: "confirm" | "cancel";
+    }
   /**
    * The turn was stopped, and the answer goes undelivered.
    *
@@ -131,6 +142,11 @@ export type AgentResult =
        *  the model wrote nothing; absent on a proposal no model turn produced
        *  (a restage, a sweep revision), which gets no fallback lead. */
       replyText?: string;
+      /** The waiting card this proposal revises, as the model named it on
+       *  the call (`revises_card`, `tool-table.ts` § `REVISES_CARD`): a
+       *  card's ts, unchecked. Absent, the model staged a separate proposal.
+       *  The turn decides what it comes to (`turn/card-matter.ts`). */
+      revises?: string;
     }
   | {
       kind: "resolved";
@@ -207,6 +223,9 @@ export interface LoopInput {
   tools: ToolSpec[];
 
   pending: PendingProposal | null;
+  /** Every card live in the thread, newest first — what `proposal_resolve`
+   *  may name (`validateProposalResolve`). Absent, `pending` is the only one. */
+  liveCards?: PendingProposal[];
   currentSenderId: string;
 
   /**
@@ -274,6 +293,8 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
   let fellBack = false;
   /** The turn's one preflight correction, once it has been handed to the model. */
   let preflightSpent = false;
+  /** A `proposal_resolve` refused for naming no card while several wait. */
+  let askWhich: "confirm" | "cancel" | undefined;
   const toolNamesUsed: string[] = [];
   /** How many lookups this turn has announced — each one's card number. */
   let progressSeq = 0;
@@ -515,7 +536,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
         console.log(`[stop] stopped at iteration ${iter}, answer undelivered`);
         return finish({ kind: "stopped" });
       }
-      return finish({ kind: "text", text: reply.text || "(empty response)" });
+      return finish({ kind: "text", text: reply.text || "(empty response)", ...(askWhich ? { askWhich } : {}) });
     }
 
     for (const call of reply.toolCalls) {
@@ -537,11 +558,15 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
     const resolveCall = reply.toolCalls.find((c) => c.name === "proposal_resolve");
     if (resolveCall) {
       const verdict = validateProposalResolve(
-        resolveCall.args as { decision?: unknown; message_to_user?: unknown },
+        resolveCall.args as { decision?: unknown; message_to_user?: unknown; card?: unknown },
         pending,
+        input.liveCards ?? (pending ? [pending] : []),
         input.currentSenderId,
       );
       if (!verdict.ok) {
+        // A decision that named no card while several wait: if the turn ends
+        // without the model naming one, the person is asked which (#1319).
+        if (verdict.unnamed) askWhich = verdict.unnamed;
         // Reject, and answer EVERY call in this turn — an announced call left
         // without a result leaves a slot the next turn's call of the same name
         // fills by mistake (and, on some wire formats, 400s outright).
@@ -562,7 +587,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
       return finish({
         kind: "resolved",
         decision: verdict.decision,
-        pending: pending!,
+        pending: verdict.card,
         messageToUser: verdict.messageToUser,
       });
     }
@@ -570,7 +595,17 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
     // (b) Side-effect tools → staged as ONE ✅-gated proposal, never executed
     // here. Every one of them: the reply is the model's whole plan, and the
     // batch is what the person approves with a single ✅.
-    const sideEffects = reply.toolCalls.filter((c) => rowFor(c.name)?.access === "gated");
+    // The card a call revises rides the call as `revises_card`, and comes off
+    // it here, before anything reads the arguments: it says which card the
+    // batch replaces, and is no part of what the ✅ runs.
+    const named = new Set<string>();
+    const sideEffects = reply.toolCalls
+      .filter((c) => rowFor(c.name)?.access === "gated")
+      .map((c) => {
+        const { args, revises } = withoutRevisesCard(c.args);
+        if (revises) named.add(revises);
+        return { ...c, args };
+      });
     if (sideEffects.length) {
       // …unless preflight refuses one of them, and the turn still has its one
       // correction in hand: hand each reason back as that call's result and
@@ -661,6 +696,8 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
         input: operations[0]!.input,
         previewText: preview || undefined,
         replyText: (reply.text || "").trim(),
+        // One card per batch: the first card it names is the one it revises.
+        ...(named.size ? { revises: [...named][0] } : {}),
       });
     }
 
@@ -679,4 +716,15 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
     return finish({ kind: "stopped" });
   }
   return finish({ kind: "text", text: final.text || CLARIFY_FALLBACK, cutShort: true });
+}
+
+/**
+ * A gated call's arguments without `revises_card`, and the card it named. A
+ * value that is not a non-empty string names nothing. Arguments that are not
+ * an object pass through, to be refused where they are staged.
+ */
+function withoutRevisesCard(args: Record<string, unknown>): { args: Record<string, unknown>; revises?: string } {
+  if (!args || typeof args !== "object" || Array.isArray(args) || !(REVISES_CARD in args)) return { args };
+  const { [REVISES_CARD]: named, ...rest } = args;
+  return typeof named === "string" && named.trim() ? { args: rest, revises: named.trim() } : { args: rest };
 }

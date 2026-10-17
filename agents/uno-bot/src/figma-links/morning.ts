@@ -26,7 +26,7 @@ import { markNotStaged, type ReportMessage, type ReportStore } from "../slack/de
 import { handedSection, type SectionHandOff, type SweepSection } from "../sweep/sections";
 import { DEV_LINKS_NOT_STAGED, devLinksItem, devLinksItemId, devLinksParent } from "./copy";
 import { readMergedPrs, type FeedDeps, type SeenMark } from "./feed";
-import { DEV_LINKS_CARD_TTL_MS, markCarded, stagedDevLinks, type DevLinksDeps, type DevLinksPlan, type DevLinksRequest, type PlannedDevLinks } from "./run";
+import { markCarded, stagedDevLinks, type DevLinksDeps, type DevLinksPlan, type DevLinksRequest, type PlannedDevLinks } from "./run";
 
 /** The section's name on the sweep's morning post. */
 export const DEV_LINKS_SECTION = "figma-dev-links";
@@ -124,7 +124,6 @@ export function devLinksSection(deps: DevLinksSectionDeps, handOff: SectionHandO
     cardsOf(value) {
       return {
         cards: [{ person: null, item: devLinksItem(value.subject, value.write) }],
-        ttlMs: DEV_LINKS_CARD_TTL_MS,
         // The card's staging, the posted cards and the mark, and an edit when
         // it did not stage.
         cost: (shown) => ({ subrequests: shown.length ? 4 : 0, d1Queries: shown.length * 2 }),

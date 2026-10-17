@@ -9,16 +9,16 @@
 // thread's history or the bot's other posts there.
 //
 // Set when a card is staged into a thread the bot had no history in, and kept
-// past the card's own 72 h by a few days, so the replies that come after it is
+// past the card's own 24 weekday hours by a few days, so the replies that come after it is
 // resolved are read by the same rule.
 //
 // PURE of `Env`: the KV namespace is handed in.
 
 import { charge } from "../net";
-import { SWEEP_CARD_TTL_MS } from "./cards";
+import { MAX_CARD_TTL_MS } from "../card-expiry";
 
-/** How long a thread stays marked: the card's lifetime and four days. */
-export const SWEEP_THREAD_TTL_MS = SWEEP_CARD_TTL_MS + 4 * 24 * 60 * 60 * 1000;
+/** How long a thread stays marked: the longest a card lives, and four days. */
+export const SWEEP_THREAD_TTL_MS = MAX_CARD_TTL_MS + 4 * 24 * 60 * 60 * 1000;
 
 const PREFIX = "sweep:thread:";
 

@@ -17,7 +17,7 @@
 // and the sweep's fixes. Once the message is up, each card it showed is its
 // own proposal, staged as one item of the message (`itemProposal`):
 //   • its own slot, so every decision is live at once and decided on its own;
-//   • 72 h, with no re-ping when it lapses;
+//   • 24 weekday hours (`cardExpiresAt`), with no re-ping when it lapses;
 //   • confirmers: its file's cards' Contributors; a file with no card, its
 //     place's members, read at the hand-over;
 //   • its own words at the gate, and `refuseRevision`, which points a turn at
@@ -56,9 +56,8 @@ import { commentUrl } from "./draft";
 import { handOverUnanswered } from "./triage";
 import { resolveDestination, routeFinding, teamNamed } from "../destination/index";
 import { operationsOf, type DecisionFile, type FileOwner, type QueuedDecision, type QueuedFile, type SweepFigmaComments } from "./queue";
+import { cardTtlMs } from "../card-expiry";
 
-/** How long a decision card stays confirmable. */
-export const DECISION_CARD_TTL_MS = 72 * 60 * 60 * 1000;
 /** A card that failed to stage says this in its place. */
 export const NOT_STAGED = "Didn't go through, so it's queued again for tomorrow morning.";
 /** The section's name on the sweep's morning post. */
@@ -229,7 +228,6 @@ export function figmaDecisionsSection(fc: SweepFigmaComments, date: string, now:
       return {
         // One queue for the round-robin, so the numbers that show run on.
         cards: all.map(({ n, file, d }) => ({ person: null, item: decisionItem(n, d, commentUrl(file.fileKey, d.nodeId, d.commentId), file.owner) })),
-        ttlMs: DECISION_CARD_TTL_MS,
         ...(told.length ? { lines: told } : {}),
         // Each told decision's reply, an edit when a card did not stage, and
         // each card that shows, a staging.
@@ -251,13 +249,14 @@ export function figmaDecisionsSection(fc: SweepFigmaComments, date: string, now:
       const all = numbered(value);
       const showing = all.filter((e) => shown.includes(e.d.commentId));
       const [first] = value.files;
+      const ttlMs = cardTtlMs(now());
       const thread = {
         channel: place.channel,
         ts,
         fileKey: first!.fileKey,
         title: first!.title,
         confirmers: first!.confirmers,
-        expiresAt: now() + DECISION_CARD_TTL_MS,
+        expiresAt: now() + ttlMs,
         decisions: [] as Array<{ n: number; commentId: string; proposalKey: string; decision: QueuedDecision; file: DecisionFile }>,
         numbered: showing.length,
       };
@@ -271,7 +270,7 @@ export function figmaDecisionsSection(fc: SweepFigmaComments, date: string, now:
         if (before === false) failed.push(d.commentId);
         if (before === undefined) {
           try {
-            await slack.stage(stagedDecision(at, asFile, { messageTs: ts, id: d.commentId }, n, d, DECISION_CARD_TTL_MS));
+            await slack.stage(stagedDecision(at, asFile, { messageTs: ts, id: d.commentId }, n, d, ttlMs));
           } catch (err) {
             rethrowIfBudget(err);
             console.error(`[figma-comments] decision ${d.commentId} posted but not staged: ${err instanceof Error ? err.message : String(err)}`);

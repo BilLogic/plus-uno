@@ -82,6 +82,7 @@ import {
   type ScanReport,
 } from "./run";
 import { modelCardTodoDetector } from "./todo";
+import { dueFromNow } from "../slack/card-deadline";
 
 function configFor(env: Env, botUserId?: string | null): FollowThroughConfig {
   return {
@@ -315,7 +316,9 @@ function answerDepsFor(env: Env, botUserId?: string | null): AnswerDeps | undefi
 /** Post a follow-through card in its thread and stage it; false when it did
  *  not go up. */
 async function stageCardOnEnv(env: Env, kv: KVNamespace, p: CardProposal): Promise<boolean> {
-  const rendered = renderProposalCard(p.card);
+  // Posted now and staged on the one rule from now: it says that deadline.
+  const due = dueFromNow(p.card);
+  const rendered = renderProposalCard(due.card);
   const sent = await postMessage(env, {
     channel: p.channel,
     thread_ts: p.threadTs,
@@ -324,7 +327,7 @@ async function stageCardOnEnv(env: Env, kv: KVNamespace, p: CardProposal): Promi
   });
   if (!sent.ok || !sent.ts) return false;
   await stageSweepCard(
-    followThroughProposal(p, { ts: sent.ts, text: rendered.text }),
+    { ...followThroughProposal(p, { ts: sent.ts, text: rendered.text }), ttlMs: due.ttlMs },
     {
       threadState: threadStateFor(env),
       proposalEvents: proposalEventLogFor(env),

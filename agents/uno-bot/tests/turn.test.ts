@@ -12,6 +12,10 @@
 //
 // The harness itself lives in `tests/helpers/turn-harness.ts`, shared with the
 // flow tests that drive a turn and then ask Gate what a person was told (#583).
+import { MAX_CARD_TTL_MS, cardTtlMs } from "../src/card-expiry";
+
+/** Tuesday 13 October 2026, 10:00 ET. */
+const TUESDAY_10_ET = Date.UTC(2026, 9, 13, 14, 0);
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
@@ -44,6 +48,7 @@ import { executeRelayDm, type RelaySlack } from "../src/tools/relay-dm";
 import type { ShareoutReads } from "../src/tools/share-for-feedback";
 import {
   createInMemoryThreadState,
+  turnCardKey,
   type HistoryTurn,
   type PendingProposal,
   type ThreadState,
@@ -531,10 +536,11 @@ test("redirecting an intake's repo supersedes its card with one naming the new r
   const SITE = "BilLogic/plus-marketing-website";
   const HARNESS = "BilLogic/plus-uno";
   const draft = { title: "Hero CTA links nowhere", body: "The hero button on the home page 404s." };
+  const redirect: Record<string, unknown> = { ...draft, repo: HARNESS };
   const h = harness({
     replies: [
       { text: "Filing it on the marketing site.", toolCalls: [{ name: "github_issue_create", args: { ...draft, repo: SITE } }] },
-      { text: "Moving it to plus-uno.", toolCalls: [{ name: "github_issue_create", args: { ...draft, repo: HARNESS } }] },
+      { text: "Moving it to plus-uno.", toolCalls: [{ name: "github_issue_create", args: redirect }] },
     ],
     issueTarget: (staged) => ({ repo: String(staged.repo), visibility: "public" }),
   });
@@ -542,6 +548,8 @@ test("redirecting an intake's repo supersedes its card with one naming the new r
   const first = await runTurn(request({ text: "the hero button 404s — track this on GitHub" }), h.deps);
   assert.equal(first.staged!.card.verb, `file a GitHub issue on ${SITE}`);
   const firstTs = first.staged!.proposal.proposalTs;
+  // The model names the card it redirects: a revision of it.
+  redirect.revises_card = firstTs;
 
   const second = await runTurn(
     request({ text: "put it on plus-uno instead", pending: first.staged!.proposal }),
@@ -560,18 +568,18 @@ test("redirecting an intake's repo supersedes its card with one naming the new r
 // the requester redirected by surface, so the card has to say which one.
 test("redirecting a GitHub intake to the Roadmap supersedes it with a card naming the Roadmap", async () => {
   const draft = { title: "Button disabled state has no Figma spec", body: "Designers keep guessing the opacity." };
+  const redirect: Record<string, unknown> = { surface: "intake", title: draft.title, summary: draft.body };
   const h = harness({
     replies: [
       { text: "Filing it on plus-uno.", toolCalls: [{ name: "github_issue_create", args: draft }] },
-      {
-        text: "Moving it to the Roadmap.",
-        toolCalls: [{ name: "notion_create", args: { surface: "intake", title: draft.title, summary: draft.body } }],
-      },
+      { text: "Moving it to the Roadmap.", toolCalls: [{ name: "notion_create", args: redirect }] },
     ],
   });
 
   const first = await runTurn(request({ text: "track this on GitHub: the disabled Button has no spec" }), h.deps);
   const firstTs = first.staged!.proposal.proposalTs;
+  // The model names the card it redirects: a revision of it, on another tool.
+  redirect.revises_card = firstTs;
   const second = await runTurn(
     request({ text: "actually, put it on the Roadmap instead", pending: first.staged!.proposal }),
     h.deps,
@@ -984,7 +992,7 @@ test("staging a revised card supersedes the one it replaces", async () => {
     replies: [
       {
         text: "Filing the revised card.",
-        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2" } }],
+        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2", revises_card: PENDING.proposalTs } }],
       },
     ],
   });
@@ -1002,15 +1010,18 @@ test("staging a revised card supersedes the one it replaces", async () => {
   assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, revisedTs);
 });
 
-// A card with its own lifetime and confirmer set keeps both through a
-// revision: pushing back on the content is not a way round the gate.
-test("a revised card inherits the lifetime and confirmer set of the card it replaces", async () => {
+// A card's confirmer set survives a revision: pushing back on the content is
+// not a way round the gate. Its lifetime does not — the revision is a card
+// staged now, on the expiry rule's full window from now (#1315).
+test("a revised card inherits the confirmer set of the card it replaces, and a fresh window", async () => {
   const held: PendingProposal = { ...PENDING, ttlMs: 72 * 60 * 60 * 1000, confirmers: ["U7", "U8"] };
   const h = harness({
+    // A Tuesday, 10:00 ET: the rule's window from it is 24 hours.
+    now: () => TUESDAY_10_ET,
     replies: [
       {
         text: "Filing the revised card.",
-        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2" } }],
+        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2", revises_card: PENDING.proposalTs } }],
       },
     ],
   });
@@ -1022,10 +1033,10 @@ test("a revised card inherits the lifetime and confirmer set of the card it repl
   );
 
   assert.equal(outcome.disposition, "staged");
-  assert.equal(outcome.staged!.proposal.ttlMs, held.ttlMs);
+  assert.equal(outcome.staged!.proposal.ttlMs, 24 * 60 * 60 * 1000, "the rule's window from now, the deadline its card says");
   assert.deepEqual(outcome.staged!.proposal.confirmers, ["U7", "U8"]);
   const stored = await h.threadState.getProposalByThread(REF);
-  assert.equal(stored?.ttlMs, held.ttlMs);
+  assert.ok(stored?.ttlMs !== undefined && stored.ttlMs >= 24 * 60 * 60 * 1000 - 60_000 && stored.ttlMs <= MAX_CARD_TTL_MS);
   assert.deepEqual(stored?.confirmers, ["U7", "U8"]);
 });
 
@@ -1091,7 +1102,7 @@ test("a comment on another issue in a commenting week's thread stages beside the
 
   assert.equal(outcome.disposition, "staged");
   const staged = outcome.staged!.proposal;
-  assert.equal(staged.supersedeKey, undefined, "its own card, in the thread's slot");
+  assert.equal(staged.supersedeKey, turnCardKey(staged.proposalTs), "a separate proposal, in a slot of its own");
   assert.equal((await h.threadState.getProposalByTs(WEEKLY_UPDATE.proposalTs)).state, "found", "the weekly card stays live");
   assert.equal((await h.threadState.getProposalByTs(staged.proposalTs)).state, "found");
 });
@@ -1161,7 +1172,7 @@ test("a revision from outside the confirmer set is refused and leaves the card l
     replies: [
       {
         text: "Filing the revised card.",
-        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2" } }],
+        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2", revises_card: PENDING.proposalTs } }],
       },
     ],
   });
@@ -1185,7 +1196,7 @@ test("a standing confirmer's push-back stages a revision that keeps the card's o
     replies: [
       {
         text: "Filing the revised card.",
-        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2" } }],
+        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2", revises_card: PENDING.proposalTs } }],
       },
     ],
   });
@@ -1559,6 +1570,27 @@ test("a \"drop 2\" revision is superseded-and-staged on the record, rooted at th
   assert.equal(outcome.staged!.card.tag?.payload.role, "revision");
 });
 
+// A turn's card is staged on the one expiry rule (#1315): staged Friday 15:00
+// ET, it is confirmable until Monday 15:00 ET, the weekend not counted.
+test("a card a turn stages on Friday afternoon stays confirmable until Monday afternoon", async () => {
+  const friday = Date.parse("2026-10-16T19:00:00Z");
+  const clock = { now: friday };
+  const threadState = createInMemoryThreadState({ now: () => clock.now });
+  const h = harness({
+    threadState,
+    now: () => clock.now,
+    replies: [{ text: "Filing the card.", toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign" } }] }],
+  });
+  const outcome = await runTurn(request({ text: "file a card for the reflection redesign" }), h.deps);
+  assert.equal(outcome.disposition, "staged");
+  const ts = outcome.staged!.proposal.proposalTs;
+
+  clock.now = Date.parse("2026-10-19T18:59:00Z");
+  assert.equal((await threadState.getProposalByTs(ts)).state, "found", "Monday 14:59 ET: still live");
+  clock.now = Date.parse("2026-10-19T19:01:00Z");
+  assert.notEqual((await threadState.getProposalByTs(ts)).state, "found", "Monday 15:01 ET: expired");
+});
+
 // A revision lives only as long as the card it replaces had left: dropping
 // again and again, or asking the model for a revision, never extends a card.
 test("a sweep card's revisions inherit its deadline rather than a fresh lifetime", async () => {
@@ -1638,6 +1670,7 @@ test("a bystander's revision of a sweep card is refused, and the card stays", as
 // default terms — whoever asks.
 test("an unrelated ask in a sweep card's thread stages as its own card and leaves the sweep card live", async () => {
   const h = harness({
+    now: () => TUESDAY_10_ET,
     replies: [
       {
         text: "Filing it.",
@@ -1657,7 +1690,7 @@ test("an unrelated ask in a sweep card's thread stages as its own card and leave
   assert.equal(staged.toolName, "github_issue_create");
   assert.equal(staged.sweepRun, undefined);
   assert.equal("confirmers" in staged, false);
-  assert.equal("ttlMs" in staged, false);
+  assert.equal(staged.ttlMs, cardTtlMs(TUESDAY_10_ET), "its own window from now, not what the sweep card has left");
   assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found", "the sweep card stays live");
   assert.equal((await h.threadState.getProposalByTs(staged.proposalTs)).state, "found");
 });
@@ -1680,6 +1713,23 @@ test("re-staging a cut-off sweep card tells onRestaged which card replaced which
   );
   assert.ok(staged);
   assert.deepEqual(moved, [[SWEEP_CARD.proposalTs, staged.proposal.proposalTs, "2026-09-30"]]);
+});
+
+// A re-staged card is a fresh staging: the rule's window from the turn's own
+// clock, never the window the stuck card was staged with days before.
+test("a card re-staged on Tuesday 10:00 ET expires Wednesday 10:00, whatever window the stuck card had", async () => {
+  const friday = Date.parse("2026-10-16T19:00:00Z"); // Fri 15:00 ET
+  const tuesday = Date.parse("2026-10-20T14:00:00Z"); // Tue 10:00 ET
+  const stuck: PendingProposal = { ...SWEEP_CARD, ttlMs: cardTtlMs(friday) };
+  const h = harness({ now: () => tuesday });
+  await h.threadState.putProposal(stuck);
+  const restaged = await restageExecution(
+    { proposal: stuck, operations: [{ toolName: "notion_update", input: FIX_TWO }] },
+    { ...h.deps, proposalEvents: h.deps.usage.proposalEvents },
+  );
+  assert.ok(restaged);
+  assert.equal(restaged.card.expiresAt, Date.parse("2026-10-21T14:00:00Z"), "Wed 10:00 ET");
+  assert.equal(restaged.proposal.ttlMs, 24 * 3_600_000);
 });
 
 // A group DM's share is offered only after the card people were shown: a
@@ -1779,13 +1829,14 @@ test("a re-staged share card still quotes the exact note it posts", async () => 
   assert.equal(restaged.proposal.supersedeKey, SWEEP_SHARE_KEY);
 });
 
-test("a fresh card carries neither a lifetime nor a confirmer set of its own", async () => {
+test("a fresh card carries the rule's window from now and no confirmer set of its own", async () => {
   const h = harness({
+    now: () => TUESDAY_10_ET,
     replies: [{ text: "Filing it.", toolCalls: [{ name: "notion_create", args: { title: "One" } }] }],
   });
   const outcome = await runTurn(request({ text: "file a card" }), h.deps);
   assert.equal(outcome.disposition, "staged");
-  assert.equal("ttlMs" in outcome.staged!.proposal, false);
+  assert.equal(outcome.staged!.proposal.ttlMs, cardTtlMs(TUESDAY_10_ET));
   assert.equal("confirmers" in outcome.staged!.proposal, false);
 });
 

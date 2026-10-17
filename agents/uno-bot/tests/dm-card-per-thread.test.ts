@@ -160,9 +160,12 @@ test("a ✅ reaction on a non-card message in a DM thread points at that thread'
 });
 
 test("a revision inside the same DM thread still supersedes that thread's card", async () => {
+  const revision: Record<string, unknown> = { title: "Card A, revised" };
   const { h, cardA, cardB } = await twoThreadsTwoCards([
-    { text: "Revised.", toolCalls: [{ name: "notion_create", args: { title: "Card A, revised" } }] },
+    { text: "Revised.", toolCalls: [{ name: "notion_create", args: revision }] },
   ]);
+  // The model names the card it revises.
+  revision.revises_card = cardA;
   const revised = await turn(h, inThread(ASK_A, "1700000000.000700", "make it close as not planned"));
 
   assert.equal(revised.disposition, "staged");
@@ -200,13 +203,22 @@ test("an unthreaded ✅ with several live cards in the DM asks which, and runs n
   const { h, cardA, cardB } = await twoThreadsTwoCards();
   const outcome = await turn(h, dmLine("1700000000.000800", "✅"));
 
-  assert.equal(outcome.disposition, "resolved");
+  assert.equal(outcome.disposition, "asked");
   assert.deepEqual(h.resolved, []);
-  assert.deepEqual(h.delivery.gateNotes, [{ kind: "which-card", count: 2 }]);
-  // And what the person reads says so, and points them at the card.
-  const line = renderGateNote({ kind: "which-card", count: 2 });
-  assert.match(line, /2 proposals are waiting/);
-  assert.match(line, /nothing was executed/);
+  const asked = {
+    kind: "which-card" as const,
+    decision: "confirm" as const,
+    cards: [
+      { ts: cardB, headline: "Card B" },
+      { ts: cardA, headline: "Card A" },
+    ],
+  };
+  assert.deepEqual(h.delivery.gateNotes, [asked]);
+  // And what the person reads says so, and names the cards.
+  const line = renderGateNote(asked);
+  assert.match(line, /^Approve which one\? 2 proposals are waiting/);
+  assert.match(line, /nothing ran/);
+  assert.match(line, /\*Card B\*, \*Card A\*/);
   assert.equal((await h.threadState.getProposalByTs(cardA)).state, "found");
   assert.equal((await h.threadState.getProposalByTs(cardB)).state, "found");
 });
@@ -222,9 +234,12 @@ test("an unthreaded ✅ counts a card staged from inside a DM thread too, and as
 
   const outcome = await turn(h, dmLine("1700000000.000800", "✅"));
 
-  assert.equal(outcome.disposition, "resolved");
+  assert.equal(outcome.disposition, "asked");
   assert.deepEqual(h.resolved, []);
-  assert.deepEqual(h.delivery.gateNotes, [{ kind: "which-card", count: 2 }]);
+  assert.deepEqual(
+    h.delivery.gateNotes.map((n) => (n.kind === "which-card" ? n.cards.map((c) => c.headline) : n.kind)),
+    [["Card B", "Card A"]],
+  );
   assert.equal((await h.threadState.getProposalByTs(a.staged!.proposal.proposalTs)).state, "found");
 });
 

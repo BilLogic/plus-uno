@@ -115,7 +115,7 @@ import {
 } from "./copy";
 import {
   CARD_REARM_WORKING_DAYS,
-  CHOICE_TTL_MS,
+  choiceClosesAt,
   cardCondition,
   cardFollowUpId,
   isActive,
@@ -135,6 +135,7 @@ import {
 } from "./rules";
 import type { CardTodoDetector } from "./todo";
 import type { GapNotes } from "../usage/gap-notes";
+import { CARD_WINDOW_WORDS, MAX_CARD_TTL_MS, cardExpiresAt } from "../card-expiry";
 
 /** New card follow-ups one end of day keeps; the rest wait a night. */
 export const MAX_NEW_PER_NIGHT = 15;
@@ -148,8 +149,6 @@ export const SCAN_START_COST = { subrequests: 6, d1Queries: 1 };
 /** How long a card with nobody to ask, or no channel, is passed over before
  *  the scan looks again. */
 export const SKIP_RECHECK_MS = 7 * 24 * 60 * 60 * 1000;
-/** How long a proposal card a follow-up stages stays confirmable. */
-export const FOLLOW_THROUGH_CARD_TTL_MS = 72 * 60 * 60 * 1000;
 /** The thread slot those cards hold (`PendingProposal.supersedeKey`), one per
  *  follow-up: `follow-through:<row id>`. */
 export const FOLLOW_THROUGH_KEY = "follow-through";
@@ -1012,13 +1011,17 @@ async function postGroup(deps: DueDeps, group: FollowUpGroup, now: number, runDa
   const report = decisionReport(
     [...shown, ...waiting].map((a) => a.item),
     followUpParent(kinds, first),
-    { channel: group.to.channel },
+    // Each card is staged as it posts, so this is when they all close.
+    { channel: group.to.channel, expiresAt: cardExpiresAt(now) },
   );
   // Checked this morning already, so each comes back with the next report.
   const later = waiting.map(heldForNext);
   const sent = await deps.slack.post(group.to, { text: report.text, blocks: report.blocks });
   if (!sent.ok || !sent.ts) return [...(await Promise.all(shown.map((a) => holdCard(deps, a.c, now, runDate, "Slack refused the post")))), ...later];
-  const kept = await deps.reports.putReport(reportRecord(group.to.channel, sent.ts, report, FOLLOW_THROUGH_CARD_TTL_MS)).then(
+  // The record outlives its cards by the longest window any card gets, not
+  // this one's: a later morning reads a Still on it or a Reject off it
+  // (`declinedOnCard`), and a card's own deadline closes it either way.
+  const kept = await deps.reports.putReport(reportRecord(group.to.channel, sent.ts, report, MAX_CARD_TTL_MS)).then(
     () => true,
     (err: unknown) => {
       rethrowIfBudget(err);
@@ -1136,7 +1139,6 @@ export function followUpsForSweep(deps: DueDeps, now: number, runDate: string, o
     channel: group.to.channel,
     threadTs: group.to.threadTs,
     cards: group.asked.map((a) => ({ person: a.c.promiserId, item: a.item })),
-    ttlMs: FOLLOW_THROUGH_CARD_TTL_MS,
     says(ids) {
       const mine = group.asked.filter((a) => ids.includes(a.c.id));
       return followUpParent(
@@ -1196,7 +1198,7 @@ async function noteUntagged(deps: Pick<DueDeps, "gaps" | "dryRun">, group: Follo
 
 /**
  * One card's proposal as ThreadState stages it: one item of its report, in
- * the follow-up's thread, for 72 hours. No confirmer set: a card is the
+ * the follow-up's thread, for 24 weekday hours. No confirmer set: a card is the
  * team's, so whoever knows where it stands decides it.
  */
 function itemProposalFor(a: Asked, group: FollowUpGroup, thread: string, messageTs: string): PendingProposal {
@@ -1213,7 +1215,6 @@ function itemProposalFor(a: Asked, group: FollowUpGroup, thread: string, message
     proposalText: renderProposalCard(card).text,
     // Nobody asked: the Worker staged it.
     requesterUserId: "",
-    ttlMs: FOLLOW_THROUGH_CARD_TTL_MS,
     stated: FOLLOW_UP_CARD_WORDS,
     refuseRevision: FOLLOW_UP_REVISION[a.c.kind as CardKind],
     ...(a.choices ? { choices: a.choices } : {}),
@@ -1224,7 +1225,7 @@ function itemProposalFor(a: Asked, group: FollowUpGroup, thread: string, message
 /** A follow-up card's own words at the gate. */
 const FOLLOW_UP_CARD_WORDS = {
   cancelled: "Rejected, nothing written",
-  expired: "That card closed after 72 h with no decision, so nothing was written.",
+  expired: `That card closed after ${CARD_WINDOW_WORDS} with no decision, so nothing was written.`,
 };
 
 async function holdCard(deps: Pick<DueDeps, "store" | "dryRun">, c: CommitmentRecord, now: number, runDate: string, note: string): Promise<CommitmentAction> {
@@ -1350,7 +1351,7 @@ export async function answerCardFollowUp(c: CommitmentRecord, r: CardReaction, d
     if (text?.card && options.length) {
       await deps.post(thread, statusChoiceText({ owner: r.userId, card: text.card, options }));
       await deps.store.saveText(c.id, { ...text, choosing: { answer: choice, options, staged: false, listedAt: now, reposted: false, by: r.userId } }, now + TEXT_KEEP_MS);
-      await deps.markReplyThread(thread.channel, thread.threadTs, CHOICE_TTL_MS);
+      await deps.markReplyThread(thread.channel, thread.threadTs, choiceClosesAt(now) - now);
       staged = true;
     }
   }
@@ -1418,7 +1419,7 @@ export async function draftCard(c: CommitmentRecord, text: CommitmentText, deps:
   return {
     kind: "confirm",
     verb: "file this Roadmap card",
-    lead: `Draft card for the to-do: *${escapeLead(String(operation.input.title))}*. A ✅ from the people named above, or whoever asked for it, files it. Expires in 72 h.`,
+    lead: `Draft card for the to-do: *${escapeLead(String(operation.input.title))}*. A ✅ from the people named above, or whoever asked for it, files it.`,
     fields: [],
     caveats: [],
     operations: [operation],
@@ -1430,7 +1431,7 @@ export function statusCard(card: { title: string; url: string }, status: string,
   return {
     kind: "confirm",
     verb: `move this card to ${status}`,
-    lead: `${answer === "done" ? "Done" : "Dropped"}: <${card.url}|${escapeLead(card.title)}> → *${escapeLead(status)}*. A ✅ applies it. Expires in 72 h.`,
+    lead: `${answer === "done" ? "Done" : "Dropped"}: <${card.url}|${escapeLead(card.title)}> → *${escapeLead(status)}*. A ✅ applies it.`,
     fields: [],
     caveats: [],
     operations: [statusOperation(card, status)],
@@ -1443,7 +1444,7 @@ export function contributorCard(card: { title: string; url: string }, slackUser:
   return {
     kind: "confirm",
     verb: "set this card's Contributor",
-    lead: `Contributor for <${card.url}|${escapeLead(card.title)}>: <@${slackUser}>. A ✅ applies it. Expires in 72 h.`,
+    lead: `Contributor for <${card.url}|${escapeLead(card.title)}>: <@${slackUser}>. A ✅ applies it.`,
     fields: [],
     caveats: [],
     operations: [contributorOperation(card, notionUser)],
@@ -1542,7 +1543,7 @@ async function ownerReply(c: CommitmentRecord, reply: CardReply, deps: ReplyDeps
 /**
  * Under F5's list, a pick stages the Design Status change — only a reply from
  * an owner or from whoever answered counts, and only while the choice is open
- * (`CHOICE_TTL_MS`).
+ * (`choiceClosesAt`).
  * A reply that is no listed option gets the options again, on one line, once;
  * after that, replies are the thread's own. The value staged is the schema's
  * own spelling, and `notion_update` exact-matches it again when it runs.
@@ -1550,12 +1551,12 @@ async function ownerReply(c: CommitmentRecord, reply: CardReply, deps: ReplyDeps
 async function statusReply(c: CommitmentRecord, reply: CardReply, deps: ReplyDeps): Promise<boolean> {
   const text = await deps.store.text(c.id);
   const choosing = text?.choosing;
-  if (!text?.card || text.onCard || !choosing || choosing.staged || deps.now() > choosing.listedAt + CHOICE_TTL_MS) return false;
+  if (!text?.card || text.onCard || !choosing || choosing.staged || deps.now() > choiceClosesAt(choosing.listedAt)) return false;
   const owners = [c.promiserId, ...(text.mentions ?? [])];
   if (!owners.includes(reply.user) && reply.user !== choosing.by) return false;
   const thread = { channel: reply.channel, channelKind: c.channelKind, threadTs: reply.threadTs };
   const status = pickStatus(reply.text, choosing.options);
-  const keep = choosing.listedAt + CHOICE_TTL_MS + TEXT_KEEP_MS;
+  const keep = choiceClosesAt(choosing.listedAt) + TEXT_KEEP_MS;
   if (!status) {
     if (choosing.reposted) return false;
     await deps.post(thread, statusRetryText(choosing.options));
@@ -1576,7 +1577,7 @@ async function statusReply(c: CommitmentRecord, reply: CardReply, deps: ReplyDep
 
 /**
  * A posted follow-through card as ThreadState stages it: no Turn behind it,
- * its own slot in the thread, 72 hours, and its confirmers only.
+ * its own slot in the thread, 24 weekday hours, and its confirmers only.
  *
  * @param p - The card and where it went
  * @param posted - Its message's ts and text
@@ -1595,7 +1596,6 @@ export function followThroughProposal(p: CardProposal, posted: { ts: string; tex
     proposalText: posted.text,
     // Nobody asked: the Worker staged it.
     requesterUserId: "",
-    ttlMs: FOLLOW_THROUGH_CARD_TTL_MS,
     confirmers: [...p.confirmers],
     supersedeKey: p.slot,
   };
