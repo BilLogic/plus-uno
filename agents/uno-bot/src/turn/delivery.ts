@@ -425,6 +425,21 @@ export interface NoteCard {
   blocks?: unknown[];
 }
 
+/**
+ * What decided a card, as its message is closed to it (`Delivery.closeCard`):
+ * the decision and who made it. `cancelled` is a stated card's own phrase for
+ * what its ⛔ did (`PendingProposal.stated`), and `rejected` marks a ⛔ made
+ * as the Review pop-up's Reject, with the person's reason. The words are the
+ * adapter's: the same line a press leaves on the card.
+ */
+export interface CardOutcome {
+  decision: "confirm" | "cancel";
+  /** The Slack id of who decided, when the signal named one. */
+  by?: string;
+  cancelled?: string;
+  rejected?: { reason?: string };
+}
+
 /** The Check it offer a milestone posts after its card (#1321), or after
  *  the reply that hands a build to the IDE (#1324): the scenario the idea
  *  touches today, when the button stops answering (`cardExpiresAt`), and
@@ -584,6 +599,16 @@ export interface Delivery {
   reopenCard(card: NoteCard): Promise<void>;
 
   /**
+   * Edit a decided card to its outcome: its words as posted, the outcome as
+   * its last line, and View where Review was — what a press on the card
+   * leaves it saying (`slack/button-door.ts`). For the doors that decide a
+   * card from somewhere other than its own buttons — a reaction, a typed
+   * emoji, the model's own `proposal_resolve` — so a card decided in words
+   * stops inviting a second decision. Posts nothing; best-effort.
+   */
+  closeCard(card: NoteCard, outcome: CardOutcome): Promise<void>;
+
+  /**
    * Stage a proposal card — the agreed hand-over (#623):
    * `Turn ──► Delivery.card({ kind, subject, fields, actions })`.
    *
@@ -641,6 +666,7 @@ export type DeliveryCall =
   | { kind: "note"; text: string; tag?: ProposalCard["tag"] }
   | { kind: "gate-note"; note: GateNote; card?: NoteCard }
   | { kind: "reopen-card"; card: NoteCard }
+  | { kind: "close-card"; card: NoteCard; outcome: CardOutcome }
   | { kind: "proposal"; card: ProposalCard }
   | { kind: "check-offer"; offer: CheckOfferNote }
   | { kind: "failure"; stage: DeliveryFailureStage; message?: string; ask?: string };
@@ -794,6 +820,10 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
 
     async reopenCard(card) {
       calls.push({ kind: "reopen-card", card });
+    },
+
+    async closeCard(card, outcome) {
+      calls.push({ kind: "close-card", card, outcome });
     },
 
     async card(proposal, lead) {

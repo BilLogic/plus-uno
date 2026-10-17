@@ -24,8 +24,7 @@
 import type { ThreadState } from "../thread-state/index";
 import { withWorkingSignal, type Delivery } from "../turn/index";
 import { otherCardWaits, resolveSignal, type GateRestage, type GateVerdict } from "../gate/index";
-import { renderGateNote, statedCancelledNote } from "./gate-note";
-import { escapeSlackText } from "./mrkdwn";
+import { decidedCardLine, renderGateNote } from "./gate-note";
 import { notedCardBlocks, proposalCardBlocks } from "./proposal-render";
 import { statedCancelOf, type ChosenAs, type PendingProposal, type ReportItemState } from "../thread-state/index";
 import type { OperationOutcome } from "../gate/run-batch";
@@ -277,14 +276,13 @@ export async function applyPressVerdict(
     if (message) await deps.replaceCard(message);
     return;
   }
-  const note =
-    request.decision === "confirm"
-      ? `Approved by <@${request.userId}>`
-      : pending.stated
-        ? statedCancelledNote({ cancelled: statedCancelOf(pending)! }, request.userId)
-        : rejected
-          ? `Rejected by <@${request.userId}>${rejected.reason ? `: ${escapeSlackText(rejected.reason)}` : ""}`
-          : `Cancelled by <@${request.userId}> — tell me what to change and I'll stage it again.`;
+  // The same line every other door closes a card with (`Delivery.closeCard`).
+  const note = decidedCardLine({
+    decision: request.decision,
+    by: request.userId,
+    ...(request.decision === "cancel" && pending.stated ? { cancelled: statedCancelOf(pending)! } : {}),
+    ...(request.decision === "cancel" && rejected ? { rejected } : {}),
+  });
   const words: { text: string; note: string; edited?: boolean } = deps.reword
     ? deps.reword(pending.proposalText, note)
     : { text: pending.proposalText, note };

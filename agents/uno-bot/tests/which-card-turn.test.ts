@@ -156,3 +156,44 @@ test("the model's approval naming a card that is not waiting is refused back to 
     .find((r) => r.name === "proposal_resolve");
   assert.match(refusal!.text, /no waiting card has the id/);
 });
+
+test("a worded cancel after \"Cancel which one?\" closes the card it named, and only that card", async () => {
+  // Live 2026-10-17: ⛔ alone asked which; the person then said which in words,
+  // and the model's `proposal_resolve` canceled that card — but its message
+  // kept its Review button and no outcome line, where a press would have
+  // edited it to both.
+  const resolve = { toolCalls: [{ name: "proposal_resolve", args: { decision: "cancel", card: "" } as Record<string, unknown> }] };
+  const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B), resolve] });
+  const { a, b } = await twoCards(h);
+
+  await turn(h, { text: "⛔", userMsgTs: "1700000000.000400" });
+  assert.equal(h.delivery.gateNotes.at(-1)?.kind, "which-card", "asked which");
+
+  resolve.toolCalls[0]!.args.card = a;
+  const outcome = await turn(h, {
+    text: "Cancel the backup tutor one. Leave the session reflections one waiting.",
+    userMsgTs: "1700000000.000500",
+  });
+
+  assert.equal(outcome.disposition, "resolved");
+  assert.deepEqual(await live(h), [b], "only the card named was decided");
+  const closed = h.delivery.calls.flatMap((c) => (c.kind === "close-card" ? [c] : []));
+  assert.deepEqual(
+    closed.map((c) => [c.card.ts, c.outcome]),
+    [[a, { decision: "cancel", by: "U1" }]],
+    "the canceled card is edited to its outcome, as a press edits it",
+  );
+});
+
+test("a typed ✅ on the one live card closes it to its outcome", async () => {
+  const h = harness({ replies: [call("notion_create", PRD_A)] });
+  const first = await turn(h, { text: "draft a PRD for backup tutor matching" });
+
+  await turn(h, { text: "✅", userMsgTs: "1700000000.000400" });
+
+  const closed = h.delivery.calls.flatMap((c) => (c.kind === "close-card" ? [c] : []));
+  assert.deepEqual(
+    closed.map((c) => [c.card.ts, c.outcome]),
+    [[first.staged!.proposal.proposalTs, { decision: "confirm", by: "U1" }]],
+  );
+});

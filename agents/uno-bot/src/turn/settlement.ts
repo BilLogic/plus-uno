@@ -19,7 +19,7 @@
 //
 // PURE as the turn is: no `Env`, no Workers type, no fetch.
 
-import type { GateVerdict } from "../gate/index";
+import { decidedCardOf, type GateVerdict } from "../gate/index";
 import { proposalReplyThread, type HistoryTurn, type PendingProposal } from "../thread-state/index";
 import { restageExecution } from "./card-staging";
 import type { TurnSettlement } from "./delivery";
@@ -171,6 +171,11 @@ export async function settleVerdict(
     : undefined;
   const posted = said?.text;
   const executed = await ctx.deps.applyVerdict(verdict);
+  // The card it decided ends as a press leaves it, outcome line and View —
+  // after the run, as the button door edits its card, so the card never says
+  // more than the thread already has.
+  const decided = decidedCardOf(verdict);
+  if (decided) await ctx.deps.delivery.closeCard(decided.card, decided.outcome);
   const remembered = (verdict.outcome === "won" ? ctx.note : undefined) ?? posted;
   if (remembered) await ctx.memory.remember(remembered);
   if (ctx.aside) {

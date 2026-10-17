@@ -72,7 +72,7 @@ import { SLACK_TS, turnIdOf } from "../usage/record";
 import type { SlackMessageMetadata } from "./api";
 import { notedCardBlocks, proposalCardBlocks, renderProposalCard } from "./proposal-render";
 import { toPlainText } from "./mrkdwn";
-import { cardStaysLive, renderCardNote, renderGateNote } from "./gate-note";
+import { cardStaysLive, decidedCardLine, renderCardNote, renderGateNote } from "./gate-note";
 import { whichCardMessage } from "./which-card";
 import { checkOfferMessage } from "./blueprint-check";
 import { planBlock } from "./plan-block";
@@ -1143,6 +1143,17 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
         .updateMessage({ channel, ts: card.ts, text: card.text, blocks: card.blocks ?? proposalCardBlocks(card.text) })
         .catch(() => ({ ok: false }));
       if (!updated.ok) console.warn(`[slack] card ${channel}/${card.ts} could not be reopened`);
+    },
+
+    // A card decided from anywhere but its own buttons ends as a press leaves
+    // it: the outcome as its last line, onto its own blocks, and View. An edit
+    // Slack refuses costs only the edit — the thread already has the verdict.
+    async closeCard(card, outcome) {
+      const line = decidedCardLine(outcome);
+      const updated = await slack
+        .updateMessage({ channel, ts: card.ts, text: `${card.text}\n${line}`, blocks: notedCardBlocks(card, line, "View") })
+        .catch(() => ({ ok: false }));
+      if (!updated.ok) console.warn(`[slack] decided card ${channel}/${card.ts} could not be closed`);
     },
 
     async card(card: ProposalCard, lead?: StagingNote): Promise<PostResult> {

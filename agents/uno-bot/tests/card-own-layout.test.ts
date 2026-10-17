@@ -160,6 +160,28 @@ describe("a sweep card keeps its carousel", () => {
   });
 });
 
+describe("a card decided outside its own buttons", () => {
+  const target = { channel: CHANNEL, replyTs: ROOT, userMsgTs: ROOT, userId: BEA };
+
+  it("is edited to the outcome a press leaves, with View and its own blocks", async () => {
+    const slack = recordingSlack();
+    const card = sweepCard();
+    await deliveryAdapter(slack.deps(false), target).closeCard({ ts: CARD, ...card }, { decision: "cancel", by: BEA });
+    const blocks = edit(slack);
+    assert.equal(blocks.filter((b) => b.type === "carousel").length, 1, "the carousel stays");
+    assert.equal(lastLine(blocks), `Canceled by <@${BEA}> — tell me what to change and I'll stage it again.`);
+    assert.deepEqual(buttons(blocks), ["View"]);
+    assert.match(slack.of("update")[0]!.text, /Canceled by/, "the fallback copy says the outcome too");
+  });
+
+  it("by a reaction that wins it", async () => {
+    const slack = await reactOn(async (s) => void (await s.putProposal(proposal())));
+    const blocks = edit(slack);
+    assert.equal(lastLine(blocks), `Approved by <@${BEA}>`);
+    assert.deepEqual(buttons(blocks), ["View"]);
+  });
+});
+
 describe("the line above a card", () => {
   const target = { channel: CHANNEL, replyTs: ROOT, userMsgTs: ROOT, userId: BEA };
   const lead = { kind: "revised", replaced: "Backup tutor matching" } as const;

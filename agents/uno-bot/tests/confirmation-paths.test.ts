@@ -202,10 +202,14 @@ describe("five signals, one verdict", () => {
 
     // Not "each looks right" but "all five are the same verdict" — past the
     // door it came through, which each one names for the record.
+    // The card's lifetime is what is left of it when each door read it, which
+    // over a weekend counts down by the millisecond (`card-expiry.ts`), so it
+    // is left out of the proposal as well as the run.
     const unstamped = (v: GateVerdict) => {
       const { by: _by, ...rest } = v;
       const { ttlMs: _ttl, ...execute } = (rest.execute ?? {}) as { ttlMs?: number };
-      return { ...rest, execute };
+      const { ttlMs: _left, ...proposal } = (rest.proposal ?? {}) as { ttlMs?: number };
+      return { ...rest, execute, proposal };
     };
     const first = unstamped(verdicts[0]!);
     for (const verdict of verdicts.slice(1)) {
@@ -913,9 +917,12 @@ describe("the reaction door", () => {
   it("speaks the verdict, runs the tool, and leaves nothing up", async () => {
     const { delivery, ran, saidBeforeRunning } = await drive();
 
-    // The raise sits inside the pairing, the answer follows it, and the settle
-    // comes last — one clear, and the door never writes it by hand.
-    assert.deepEqual(kindsOf(delivery), ["working", "gate-note", "working-clear"]);
+    // The raise sits inside the pairing, the answer follows it, the card is
+    // closed to its outcome as a press closes it, and the settle comes last —
+    // one clear, and the door never writes it by hand.
+    assert.deepEqual(kindsOf(delivery), ["working", "gate-note", "close-card", "working-clear"]);
+    const closed = delivery.calls.find((c) => c.kind === "close-card");
+    assert.deepEqual(closed?.kind === "close-card" && [closed.card.ts, closed.outcome], [PROPOSAL.proposalTs, { decision: "confirm", by: "U2" }]);
     // The verdict as a MEANING — what it reads as in Slack is asserted in
     // `tests/replaced-card-message.test.ts` against the one renderer (#623).
     assert.deepEqual(delivery.gateNotes, [{ kind: "resolved", decision: "confirm" }]);
@@ -1381,7 +1388,7 @@ describe("a stated card answers in its own words", () => {
 
   it("leaves a turn's card on the generic lines", async () => {
     const { notes } = await press(await staged(), "cancel");
-    assert.deepEqual(notes, [`Cancelled by <@${PRESSER}> — tell me what to change and I'll stage it again.`]);
+    assert.deepEqual(notes, [`Canceled by <@${PRESSER}> — tell me what to change and I'll stage it again.`]);
     assert.match(renderGateNote({ kind: "superseded" }), /newest card in this thread/);
     assert.equal(renderGateNote({ kind: "expired" }), "Expired. Ask again for a fresh card.");
   });

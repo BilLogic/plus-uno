@@ -759,6 +759,8 @@ describe("a decided card", () => {
       ["Answered by <@U0BILL0001>.", "success", "Answered by <@U0BILL0001>."],
       ["Rejected by <@U0BILL0001>: Wrong database", "default", "Rejected by <@U0BILL0001>: Wrong database"],
       [":no_entry: Rejected by <@U0BILL0001>: Wrong database", "default", "Rejected by <@U0BILL0001>: Wrong database"],
+      ["Canceled by <@U0BILL0001> — tell me what to change and I'll stage it again.", "default", "Canceled by <@U0BILL0001> — tell me what to change and I'll stage it again."],
+      // A card decided before the American spelling still reads as canceled.
       ["Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again.", "default", "Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again."],
       [":no_entry: Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again.", "default", "Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again."],
       ["Left as deliberate, nothing filed, decided by <@U0BILL0001>.", "default", "Left as deliberate, nothing filed, decided by <@U0BILL0001>."],
