@@ -658,6 +658,27 @@ export async function stopStream(
   }
 }
 
+/**
+ * Close a plan stream with a checklist's last changes. A stop that refused
+ * them left the stream open: they go as an append, and the stream stops
+ * bare — three calls at the worst. With no changes it is one bare stop.
+ */
+export async function closePlanStream(
+  env: Env,
+  channel: string,
+  ts: string,
+  tasks: readonly TaskChunk[] = [],
+  title?: string,
+): Promise<void> {
+  if (!tasks.length && !title) {
+    await stopStream(env, channel, ts);
+    return;
+  }
+  if (await stopStream(env, channel, ts, undefined, { tasks, ...(title ? { title } : {}) })) return;
+  await appendTasks(env, channel, ts, tasks, title);
+  await stopStream(env, channel, ts);
+}
+
 export async function addReaction(
   env: Env,
   channel: string,

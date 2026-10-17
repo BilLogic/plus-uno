@@ -24,8 +24,10 @@
 //     reply: the same gate and search,
 //     inside the turn's budget; the blueprint check a Check it press queues:
 //     the offer kept in the thread's store, the same path read, the draft on
-//     the same provider, Slack posts in the offer's thread and the Draw on
-//     blueprint card staged as the Worker's (`runBlueprintCheckOnEnv`);
+//     the same provider, its steps on a plan stream in the offer's thread
+//     while the plan-stream switch is on (`SLACK_STREAM_PLAN`), Slack posts
+//     there and the Draw on blueprint card staged as the Worker's
+//     (`runBlueprintCheckOnEnv`);
 //   • a drawn proposal's thread → rows record: `blueprint_proposals` in the
 //     usage database (`proposalRecordsFor`); the Roadmap card a thread's PRD
 //     created, a HARNESS_KV key a thread for 45 days, so a proposal drawn
@@ -59,8 +61,10 @@
 // waits on the cursor and the queue for the next.
 
 import type { Env } from "../types";
-import { budgetHeadroom, charge, countedFetch, rethrowIfBudget } from "../net";
-import { getBotIdentity, postMessage, updateMessage } from "../slack/api";
+import { asDelivery, budgetHeadroom, charge, countedFetch, rethrowIfBudget } from "../net";
+import { appendTasks, closePlanStream, getBotIdentity, postMessage, startStream, updateMessage } from "../slack/api";
+import { streamFlagOn } from "../slack/slack-delivery";
+import { SLACK_USER_ID } from "../slack/mrkdwn";
 import type { SlackMessageEvent } from "../slack/types";
 import { ladderChannelsFor } from "../destination/env";
 import { redraftRevision } from "./revise";
@@ -87,7 +91,7 @@ import { DELIVERY_RESERVE } from "../agent/loop-policy";
 import type { PathToday } from "./draft";
 import { draftProposal, drawnProposalOf, PROPOSAL_OFFER_SUBREQUESTS } from "./proposal";
 import { JUDGEMENT_SUBREQUESTS, runBlueprintCheck, serviceChangeJudgement, type BlueprintCheckJob, type ServiceChangeJudgement } from "./check";
-import { checkedMessage, resultsMessage } from "../slack/blueprint-check";
+import { CHECK_PLAN_SUBREQUESTS, checkedMessage, checkPlanCard, resultsMessage, type CheckPlanClient } from "../slack/blueprint-check";
 import { createD1ProposalRecords } from "./proposal-records-d1";
 import { keepProposalLinks, prdCardOf, rememberCreatedPage, type MatterPages, type ThreadCards } from "./link";
 import type { ProposalRecords } from "./proposal-records";
@@ -500,9 +504,11 @@ export function serviceChangeJudgementOn(env: Env): { serviceChangeJudgement?: S
  * record (1), the thread's check record and the run's step to done or
  * failed (≤3, #1322), the path read (5), the draft (≤2), the card's state
  * (≤2: the thread's cards, the matter's page) and the results' post and
- * keeping (2), the Draw on blueprint card's post, staging and events (≤4)
- * and the status edit (≤2). The draft runs only while that much is left
- * beside the delivery reserve. Stop reaches the draft through this runner's
+ * keeping (2), the Draw on blueprint card's post, staging and events (≤4),
+ * the status edit (≤2) and, with the plan-stream switch on, the plan card
+ * its steps tick on (≤7, `CHECK_PLAN_SUBREQUESTS`): 28 at the worst. The
+ * draft runs only while its own spend, and the card's whole worst case
+ * beside it, is left above the delivery reserve. Stop reaches the draft through this runner's
  * `/cancel` (`stopRunningCheck`), which costs the job nothing.
  *
  * @param env - Worker bindings
@@ -511,12 +517,14 @@ export function serviceChangeJudgementOn(env: Env): { serviceChangeJudgement?: S
 export async function runBlueprintCheckOnEnv(env: Env, job: BlueprintCheckJob): Promise<void> {
   const store = threadStateFor(env);
   const replyThread = (offer: BlueprintCheckOffer) => offer.replyTs ?? offer.threadTs;
+  const recipient = checkPlanRecipient(env, job);
+  const card = recipient ? CHECK_PLAN_SUBREQUESTS : 0;
   await runBlueprintCheck(job, {
     store,
     readPath: (cellId) => readPathOf(env, cellId),
     draft: draftProposal({
       provider: selectProvider(env),
-      affordable: () => budgetHeadroom().subrequests >= PROPOSAL_OFFER_SUBREQUESTS + DELIVERY_RESERVE,
+      affordable: () => budgetHeadroom().subrequests >= PROPOSAL_OFFER_SUBREQUESTS + card + DELIVERY_RESERVE,
     }),
     createdPage: createdPageOn(env),
     async postResults(offer, results) {
@@ -550,7 +558,38 @@ export async function runBlueprintCheckOnEnv(env: Env, job: BlueprintCheckJob): 
       const edited = await updateMessage(env, { channel: offer.channel, ts: offer.offerTs, text: message.text, blocks: message.blocks });
       if (!edited.ok) console.warn(`[blueprint-check] status message ${offer.channel}/${offer.offerTs} not edited: ${edited.error ?? "refused"}`);
     },
+    ...(recipient
+      ? { progress: (offer: BlueprintCheckOffer) => checkPlanCard(offer, checkPlanOn(env, offer.channel, replyThread(offer), recipient)) }
+      : {}),
   });
+}
+
+/**
+ * Whom a check's plan card is opened for, or null for no card: the presser
+ * and their workspace, while the plan-stream switch is on (`streamFlagOn`).
+ * A presser who is not a Slack user id, or a press that named no workspace,
+ * gets none — `chat.startStream` wants both (`slack/api.ts`).
+ *
+ * @param env - The plan-stream switch and its probe
+ * @param job - The check, as its job carries it
+ */
+export function checkPlanRecipient(
+  env: Pick<Env, "SLACK_STREAMING" | "SLACK_STREAM_PLAN" | "SLACK_STREAM_MARKUP_PROBE">,
+  job: BlueprintCheckJob,
+): { userId: string; team: string } | null {
+  if (!streamFlagOn(env, "SLACK_STREAM_PLAN") || !job.by || !SLACK_USER_ID.test(job.by) || !job.team) return null;
+  return { userId: job.by, team: job.team };
+}
+
+/** The check's plan card as Slack calls, opened for the presser in the
+ *  offer's thread — the turn's own plan stream (`slack-delivery.ts`), each
+ *  call labeled as delivery. */
+function checkPlanOn(env: Env, channel: string, threadTs: string, to: { userId: string; team: string }): CheckPlanClient {
+  return {
+    open: () => asDelivery(() => startStream(env, channel, threadTs, to.userId, to.team, "plan")),
+    append: (ts, tasks, title) => asDelivery(async () => void (await appendTasks(env, channel, ts, tasks, title))),
+    close: (ts, tasks, title) => asDelivery(() => closePlanStream(env, channel, ts, tasks, title)),
+  };
 }
 
 /** The thread → rows records, or null without the usage database. */

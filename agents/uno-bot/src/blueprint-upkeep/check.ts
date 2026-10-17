@@ -14,8 +14,9 @@
 //     scenario and queues this job on a runner of its own
 //     (`blueprintCheckRunnerKey`), never the thread's: the thread's turns are
 //     not serialized behind it, and it spends a 50-subrequest budget of its
-//     own — the path read (5), the draft (≤2), the posts and the Draw on
-//     blueprint card's staging, about fifteen at the worst.
+//     own — the path read (5), the draft (≤2), the plan card (≤7), the
+//     posts and the Draw on blueprint card's staging, under thirty at the
+//     worst (28, `runBlueprintCheckOnEnv`).
 //
 // WHAT THE CHECK POSTS. Once its results are ready, and only if its run still
 // holds the thread's record (`ThreadState.stepCheck` to done), the offer's
@@ -33,6 +34,17 @@
 // A path that cannot be read, a check that throws or one past
 // `CHECK_DEADLINE_MS` says it didn't finish, with Try again, and posts
 // nothing else.
+//
+// ITS STEPS SHOW LIVE (#1344). While it runs, the check's steps tick on
+// a plan card in the offer's thread (`CheckProgress`): reading today's path,
+// drafting the idea against it, comparing the two. Each step is shown as it
+// starts, the one before it complete — there is no pending state to show
+// the rest. The card closes as the check ends, before anything else it
+// posts: done, stopped, or in error — and whatever the ending, a throw on
+// the way out included. Best-effort: a card that will not open or update
+// costs the check nothing. A runner evicted mid-check leaves its card open,
+// as an evicted turn leaves its checklist: an accepted limit, since nothing
+// outlives the isolate to close it.
 //
 // STOP (#1322). A stopped run posts nothing: Stop marks the record, which the
 // job reads before it starts and steps against before it posts, and aborts
@@ -274,11 +286,14 @@ export function stopRunningCheck(run: string): boolean {
   return running !== undefined;
 }
 
-/** A queued check, as its job carries it: the offer, and the run its press
- *  claimed. */
+/** A queued check, as its job carries it: the offer, the run its press
+ *  claimed, and who pressed, in which workspace — whom its plan card is
+ *  opened for. */
 export interface BlueprintCheckJob {
   offerTs: string;
   run: string;
+  by?: string;
+  team?: string;
 }
 
 export interface BlueprintCheckDeps {
@@ -301,10 +316,32 @@ export interface BlueprintCheckDeps {
   /** Edit the offer's message — the checking line since the press — to what
    *  the check came to. */
   settle(offer: BlueprintCheckOffer, outcome: CheckOutcome): Promise<void>;
+  /** The plan card the check's steps tick on, for the offer it checks;
+   *  none without it. */
+  progress?(offer: BlueprintCheckOffer): CheckProgress;
   now?(): number;
   /** The check's deadline; `CHECK_DEADLINE_MS` without it. */
   deadlineMs?: number;
 }
+
+/** A check's steps, in the order it takes them. */
+export type CheckStep = "read" | "draft" | "compare";
+
+/** How a check ended, as its plan card closes on it. `superseded`: a failed
+ *  run that lost the record to something other than its Stop. */
+export type CheckEnd = CheckOutcome | "stopped" | "superseded";
+
+/** The plan card a check's steps tick on. Neither call throws, and a second
+ *  `end` does nothing. */
+export interface CheckProgress {
+  /** A step has started; the one before it is complete. */
+  step(step: CheckStep): Promise<void>;
+  /** The check is over: the card closes on how it ended. */
+  end(how: CheckEnd): Promise<void>;
+}
+
+/** No card: what a check without `progress` ticks on. */
+const NO_PROGRESS: CheckProgress = { step: async () => {}, end: async () => {} };
 
 /** A card as posted: its ts and text, its own blocks, and the lifetime it is
  *  staged with — the one its deadline line says. */
@@ -358,9 +395,10 @@ export async function runBlueprintCheck(job: BlueprintCheckJob, deps: BlueprintC
   const deadline = new AbortController();
   const timer = setTimeout(() => deadline.abort(new CheckPastDeadline()), deps.deadlineMs ?? CHECK_DEADLINE_MS);
   const signal = AbortSignal.any([stop.signal, deadline.signal]);
+  const progress = deps.progress?.(offer) ?? NO_PROGRESS;
   let outcome: CheckOutcome | "stopped";
   try {
-    outcome = await check(offer, job.run, signal, deps);
+    outcome = await check(offer, job.run, signal, progress, deps);
   } catch (err) {
     if (stop.signal.aborted) outcome = "stopped";
     else if (signal.aborted) outcome = { kind: "failed", reason: "timed-out" };
@@ -372,13 +410,44 @@ export async function runBlueprintCheck(job: BlueprintCheckJob, deps: BlueprintC
     clearTimeout(timer);
     inFlight.delete(job.run);
   }
-  if (outcome === "stopped" || outcome.kind !== "failed") return;
-  // Said on the message only while the run still holds the record, so a Stop
-  // that won the race keeps its own words there.
-  if (await deps.store.stepCheck(ref, offer.scenario, job.run, "failed")) await deps.settle(offer, outcome);
+  // A done check closed its card before its results posted; the card of
+  // every other ending closes here, in a `finally`, so a throw on the way
+  // out never leaves its stream open — it closes in error then.
+  let end: CheckEnd = { kind: "failed", reason: "error" };
+  try {
+    if (outcome === "stopped" || outcome.kind !== "failed") {
+      end = outcome;
+      return;
+    }
+    // Said on the message only while the run still holds the record, so a
+    // Stop that won the race keeps its own words there.
+    if (await deps.store.stepCheck(ref, offer.scenario, job.run, "failed")) {
+      end = outcome;
+      await deps.settle(offer, outcome);
+      return;
+    }
+    end = await lostTo(ref, offer.scenario, job.run, deps);
+  } finally {
+    await progress.end(end);
+  }
 }
 
-async function check(offer: BlueprintCheckOffer, run: string, signal: AbortSignal, deps: BlueprintCheckDeps): Promise<CheckOutcome | "stopped"> {
+/** How a failed run that no longer holds the record ends on its card: as
+ *  stopped when its Stop took, else neutral (`superseded`) — whatever took
+ *  the record says the rest, and the card does not guess. */
+async function lostTo(ref: ThreadRef, scenario: string, run: string, deps: BlueprintCheckDeps): Promise<CheckEnd> {
+  const now = await deps.store.getCheck(ref, scenario);
+  return now?.run === run && now.state === "stopped" ? "stopped" : "superseded";
+}
+
+async function check(
+  offer: BlueprintCheckOffer,
+  run: string,
+  signal: AbortSignal,
+  progress: CheckProgress,
+  deps: BlueprintCheckDeps,
+): Promise<CheckOutcome | "stopped"> {
+  await progress.step("read");
   const today = await untilAborted(deps.readPath(offer.cellId), signal);
   if (!today) return { kind: "failed", reason: "unreadable" };
   const comparison: Comparison = {
@@ -390,6 +459,7 @@ async function check(offer: BlueprintCheckOffer, run: string, signal: AbortSigna
     today,
     text: comparisonText(today, offer.quote),
   };
+  await progress.step("draft");
   // The drafter fails quiet, an abort included, so the signal is read again.
   const result = await untilAborted(deps.draft(comparison, offer.idea, signal), signal);
   signal.throwIfAborted();
@@ -397,9 +467,12 @@ async function check(offer: BlueprintCheckOffer, run: string, signal: AbortSigna
   if (result === "no-scenario") return { kind: "failed", reason: "unreadable" };
   const proposal = typeof result === "string" ? null : result;
   const outcome: CheckOutcome = result === "unfinished" ? { kind: "undrafted" } : { kind: "done" };
+  await progress.step("compare");
   // Done before anything posts: a Stop that landed first wins, and one that
   // lands after finds the check finished. Then Stop leaves the message.
   if (!(await deps.store.stepCheck(checkRefOf(offer), offer.scenario, run, "done"))) return "stopped";
+  // The card closes first, so the results post beneath a finished card.
+  await progress.end(outcome);
   await deps.settle(offer, outcome);
   // A redraft (`BlueprintCheckOffer.undrafted`) posts no second results: the
   // first stand in the thread, so it only drafts, and marks or clears.

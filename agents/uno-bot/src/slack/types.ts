@@ -198,8 +198,9 @@ export type RunnerJobPayload =
    *  checks, by its message ts, who pressed, and the run the press claimed
    *  (#1322): a job whose run no longer holds the thread's record, running,
    *  does nothing. Runs on a runner of its own (`blueprintCheckRunnerKey`),
-   *  never the thread's. */
-  | { kind: "blueprint-check"; offerTs: string; by: string; run: string }
+   *  never the thread's. `team` is the presser's workspace, which the
+   *  check's plan card is opened for beside `by` (#1344). */
+  | { kind: "blueprint-check"; offerTs: string; by: string; team?: string; run: string }
   /** A Figma notification, kept as ids and times (`figma-notify/event.ts`). */
   | { kind: "figma-event"; event: FigmaEventJob }
   /** The rest of an approved Dev Mode links write (`figma-links/run.ts`). */
