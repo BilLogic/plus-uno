@@ -7,7 +7,7 @@
 // mangling both. Neither path had a single test.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { splitBalanced } from "../src/slack/split";
+import { ELIDED_LINE, keepLastLine, splitBalanced } from "../src/slack/split";
 
 /** Every chunk must carry an even number of fences, or it is broken. */
 function fenceCount(s: string): number {
@@ -131,5 +131,59 @@ describe("whitespace", () => {
     for (const c of splitBalanced(text, 100)) {
       assert.equal(c, c.trimEnd(), `chunk ends with whitespace: ${JSON.stringify(c)}`);
     }
+  });
+});
+
+// An edited message's text, cut to chat.update's limit: its opening, a line
+// saying the middle was cut, and its last line — the note the edit is for.
+describe("keepLastLine", () => {
+  const draft = (lines: number) => Array.from({ length: lines }, (_, i) => `Line ${i + 1} of the draft, long enough to count.`).join("\n");
+
+  it("leaves a text at exactly the limit as it is", () => {
+    const text = "x".repeat(200);
+    assert.equal(keepLastLine(text, 200), text);
+  });
+
+  it("returns the text trimmed when only trailing whitespace is over", () => {
+    const text = `${"x".repeat(195)}\nDone.`;
+    assert.equal(keepLastLine(`${text}  \n\n`, text.length), text);
+  });
+
+  it("keeps the opening and the last line, with the cut said between them", () => {
+    const text = `${draft(40)}\nRejected, so nothing runs.`;
+    const cut = keepLastLine(text, 600);
+    assert.ok(cut.length <= 600);
+    assert.ok(cut.startsWith("Line 1 of the draft"));
+    assert.ok(cut.endsWith(`\n${ELIDED_LINE}\nRejected, so nothing runs.`));
+  });
+
+  it("closes a fence open at the cut", () => {
+    const text = `Intro\n\`\`\`\n${draft(40)}\n\`\`\`\nExpired. Ask again for a fresh card.`;
+    const cut = keepLastLine(text, 600);
+    assert.ok(cut.length <= 600);
+    assert.equal(fenceCount(cut) % 2, 0, cut);
+    assert.ok(cut.endsWith("Expired. Ask again for a fresh card."));
+  });
+
+  it("cuts from the start alone when the last line is too long to keep", () => {
+    const text = `${draft(10)}\n${"y".repeat(590)}`;
+    const cut = keepLastLine(text, 600);
+    assert.ok(cut.length <= 600);
+    assert.ok(cut.startsWith("Line 1 of the draft"));
+    assert.ok(cut.endsWith(`\n${ELIDED_LINE}`));
+  });
+
+  it("cuts a single line from the start", () => {
+    const cut = keepLastLine("word ".repeat(200).trim(), 300);
+    assert.ok(cut.length <= 300);
+    assert.ok(cut.endsWith(`\n${ELIDED_LINE}`));
+  });
+
+  it("does not keep a bare fence as the last line", () => {
+    const text = `\`\`\`\n${draft(40)}\n\`\`\``;
+    const cut = keepLastLine(text, 600);
+    assert.ok(cut.length <= 600);
+    assert.equal(fenceCount(cut) % 2, 0, cut);
+    assert.ok(cut.endsWith(`\n${ELIDED_LINE}`));
   });
 });

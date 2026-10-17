@@ -1,9 +1,11 @@
 // Cutting a message without breaking what it is made of.
 //
-// Two callers, one problem. `answerMessages` cuts a long reply into messages of
-// at most MAX_POST_CHARS and `textSections` splits a body into ≤3000-character
-// Block Kit sections, and until 2026-08-22 both cut at "the last newline or
-// space before the limit" with no idea what they were cutting through. A cut
+// Three callers, one problem. `answerMessages` cuts a long reply into messages
+// of at most MAX_POST_CHARS, `textSections` splits a body into ≤3000-character
+// Block Kit sections, and `updateMessage` (`api.ts`) cuts an edit's text to
+// chat.update's limit through `keepLastLine`, below. Until 2026-08-22 the
+// first two cut at "the last newline or space before the limit" with no idea
+// what they were cutting through. A cut
 // inside a fenced code block leaves ONE ``` behind, so everything after it —
 // the rest of the message, or the whole next section — renders inside a code
 // block. A cut inside an inline code span does the same to the rest of the line.
@@ -158,24 +160,28 @@ function isBalanced(s: string): boolean {
   return backticks % 2 === 0 && doubles % 2 === 0;
 }
 
-/** Where `keepLastLine` cut a text: a line of its own. */
-const ELIDED = "…";
+/** Where `keepLastLine` cut a text, on a line of its own. Worded for the model
+ *  too: it reads a bot message's text back as thread history (`events.ts`),
+ *  and a bare `…` would read as the whole draft. */
+export const ELIDED_LINE = "… (middle cut to fit Slack's edit limit)";
 
 /** The least head worth keeping beside a last line. */
 const MIN_HEAD = 80;
 
 /**
  * A text cut to at most `limit` characters that keeps its opening and its last
- * line, with `…` on a line of its own where the middle came out.
+ * line, with `ELIDED_LINE` where the middle came out.
  *
  * For a message edited in place, whose last line is the news: a decided card's
- * outcome, a gate note, "Expired". What reads the message back reads that line
- * (`review-view.ts` § outcomeOf), so it is the one line never cut. The head is
- * cut by `splitBalanced`, so a fence open at the cut is closed and no inline
- * markup is left half open.
+ * outcome, a gate note, "Expired" — each door puts it there. A View pressed
+ * once a card's record is gone reads the outcome off that line
+ * (`review-view.ts` § outcomeView, from the pressed message's text), so it is
+ * the one line never cut. The head is cut by `splitBalanced`, so a fence open
+ * at the cut is closed and no inline markup is left half open.
  *
- * A last line too long to keep beside any head is the one case the text is
- * cut from its start alone.
+ * The text is cut from its start alone when its last line is no use to keep:
+ * none, blank, a bare fence (kept alone it would open one), or too long to sit
+ * beside any head.
  *
  * @param text - The whole text
  * @param limit - The most characters it may have
@@ -183,9 +189,12 @@ const MIN_HEAD = 80;
 export function keepLastLine(text: string, limit: number): string {
   if (text.length <= limit) return text;
   const trimmed = text.trimEnd();
+  if (trimmed.length <= limit) return trimmed;
   const at = trimmed.lastIndexOf("\n");
   const last = at === -1 ? "" : trimmed.slice(at + 1);
-  const room = limit - last.length - ELIDED.length - 2;
-  if (!last.trim() || room < MIN_HEAD) return `${splitBalanced(trimmed, limit - ELIDED.length - 1)[0]!}\n${ELIDED}`;
-  return `${splitBalanced(trimmed.slice(0, at), room)[0]!}\n${ELIDED}\n${last}`;
+  const room = limit - last.length - ELIDED_LINE.length - 2;
+  if (!last.trim() || FENCE.test(last) || room < MIN_HEAD) {
+    return `${splitBalanced(trimmed, limit - ELIDED_LINE.length - 1)[0]!}\n${ELIDED_LINE}`;
+  }
+  return `${splitBalanced(trimmed.slice(0, at), room)[0]!}\n${ELIDED_LINE}\n${last}`;
 }

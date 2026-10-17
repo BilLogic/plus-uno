@@ -1119,7 +1119,9 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
         .updateMessage({
           channel,
           ts: card.ts,
-          text: card.text,
+          // The note as the copy's last line too, as a decision's is
+          // (`decidedCard`): an edit cut to Slack's limit keeps that line.
+          text: `${card.text}\n${line}`,
           blocks: notedCardBlocks(card, line, cardStaysLive(note) ? "Review" : "View"),
         })
         .catch(() => ({ ok: false }));

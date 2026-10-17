@@ -7,7 +7,10 @@
 // up with that text). `chat.postMessage` truncates a long text instead, which
 // is how a card can post and then fail its first edit.
 export const expiryEdits: Record<string, unknown>[] = [];
-/** chat.update's `text` ceiling, as Slack refuses it. */
+/** chat.update's `text` ceiling, as Slack refuses it. Written out here rather
+ *  than read from `api.ts`'s `UPDATE_TEXT_CHARS` on purpose: the stub models
+ *  Slack, so a wrong constant in the Worker fails a test instead of agreeing
+ *  with itself. */
 export const UPDATE_TEXT_LIMIT = 4000;
 let response: { ok: boolean; error?: string } = { ok: true };
 export function expiryFetchResponse(value: typeof response): void {

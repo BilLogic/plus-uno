@@ -12,11 +12,14 @@
 // `chat.update` (`slack/api.ts`), on a fetch that refuses what Slack refuses
 // (`helpers/report-expiry-fetch.ts`), so the assertion is what Slack was
 // handed and whether it took it.
+// First: the stub has to be in place before net.ts captures fetch.
 import { expiryEdits, UPDATE_TEXT_LIMIT } from "./helpers/report-expiry-fetch";
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { updateMessage } from "../src/slack/api";
+import { ELIDED_LINE } from "../src/slack/split";
+import { EXPIRED_CARD } from "../src/slack/gate-note";
 import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
 import { showExpiredCard } from "../src/slack/card-expiry-edit";
 import { renderProposalCard } from "../src/slack/proposal-render";
@@ -128,10 +131,13 @@ describe("a long card's edits stay inside chat.update's text limit", () => {
     const { line, buttons } = drawn(edit);
     assert.match(line, /Rejected/);
     assert.deepEqual(buttons, ["View"]);
-    // The copy keeps the card's opening and ends with the outcome, which is
-    // what View reads once the record is gone (`review-view.ts` § outcomeOf).
+    // The copy keeps the card's opening and ends with the outcome: a View
+    // pressed once the record is gone reads it off the message
+    // (`review-view.ts` § outcomeView), and the model reading the thread back
+    // is told the middle was cut.
     assert.ok(sent.startsWith(text.split("\n")[0]!));
     assert.equal(sent.split("\n").at(-1), line);
+    assert.ok(sent.includes(`\n${ELIDED_LINE}\n`), "the cut says it is one");
   });
 
   it("marks the same card expired at its deadline", async () => {
@@ -151,8 +157,11 @@ describe("a long card's edits stay inside chat.update's text limit", () => {
     });
 
     assert.equal(expiryEdits.length, 1);
-    assert.ok(String(expiryEdits[0]!.text).length <= UPDATE_TEXT_LIMIT);
-    assert.match(drawn(expiryEdits[0]!).line, /Expired/);
+    const sent = String(expiryEdits[0]!.text);
+    assert.ok(sent.length <= UPDATE_TEXT_LIMIT);
+    assert.equal(drawn(expiryEdits[0]!).line, EXPIRED_CARD);
+    assert.equal(sent.split("\n").at(-1), EXPIRED_CARD, "the copy says it too, as its last line");
+    assert.ok(sent.includes(`\n${ELIDED_LINE}\n`), "the cut says it is one");
   });
 
   it("leaves a card that fits as it was", async () => {

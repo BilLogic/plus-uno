@@ -344,6 +344,8 @@ export interface PostMessageInput {
  * `chat.postMessage` truncates a long text instead, so a card whose whole
  * draft is its text posts fine and then fails its first edit — live on Worker
  * r671, a revised PRD card rejected from Review that kept its Review button.
+ * Counted as UTF-16 `.length`, never fewer than Slack's characters: safe, at
+ * the cost of cutting a little early on text with emoji.
  */
 export const UPDATE_TEXT_CHARS = 4000;
 
@@ -353,8 +355,10 @@ export const UPDATE_TEXT_CHARS = 4000;
  *
  * Every edit leaves here, so this is where its text is held to
  * `UPDATE_TEXT_CHARS`: its opening and its last line, which on a card is the
- * note the edit is for (`split.ts` § keepLastLine). The blocks are what a
- * reader sees, and they are built from the whole text before it gets here.
+ * note the edit is for (`split.ts` § keepLastLine). An edit with blocks shows
+ * its blocks, built from the whole text before it gets here, so the cut is
+ * only its fallback copy; a text-only edit shows the cut itself, which beats
+ * an edit that does not land.
  */
 export async function updateMessage(
   env: Env,
