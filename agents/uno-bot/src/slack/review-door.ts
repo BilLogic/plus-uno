@@ -413,7 +413,7 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
   // Said in the pop-up before the run starts, so the person sees it register
   // at once rather than after a write that can take a while.
   if (verdict.outcome === "won") {
-    await show(stateView(card, decision === "confirm" ? "success" : "default", own ? ownLine(own) : decidedLine(decision), titleOf(live ?? verdict.proposal)));
+    await show(stateView(card, decision === "confirm" ? "success" : "info", own ? ownLine(own) : decidedLine(decision), titleOf(live ?? verdict.proposal)));
   } else if (verdict.post && verdict.post.note.kind !== "cut-off") {
     // A non-win is answered where the person is looking, which is the pop-up
     // — even a note the button door would edit onto the card.

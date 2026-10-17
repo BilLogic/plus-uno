@@ -757,20 +757,20 @@ describe("a decided card", () => {
       ["Approved by <@U0BILL0001>", "success", "Approved by <@U0BILL0001>"],
       [":white_check_mark: Approved by <@U0BILL0001>", "success", "Approved by <@U0BILL0001>"],
       ["Answered by <@U0BILL0001>.", "success", "Answered by <@U0BILL0001>."],
-      ["Rejected by <@U0BILL0001>: Wrong database", "default", "Rejected by <@U0BILL0001>: Wrong database"],
-      [":no_entry: Rejected by <@U0BILL0001>: Wrong database", "default", "Rejected by <@U0BILL0001>: Wrong database"],
-      ["Canceled by <@U0BILL0001> — tell me what to change and I'll stage it again.", "default", "Canceled by <@U0BILL0001> — tell me what to change and I'll stage it again."],
+      ["Rejected by <@U0BILL0001>: Wrong database", "info", "Rejected by <@U0BILL0001>: Wrong database"],
+      [":no_entry: Rejected by <@U0BILL0001>: Wrong database", "info", "Rejected by <@U0BILL0001>: Wrong database"],
+      ["Canceled by <@U0BILL0001> — tell me what to change and I'll stage it again.", "info", "Canceled by <@U0BILL0001> — tell me what to change and I'll stage it again."],
       // A card decided before the American spelling still reads as canceled.
-      ["Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again.", "default", "Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again."],
-      [":no_entry: Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again.", "default", "Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again."],
-      ["Left as deliberate, nothing filed, decided by <@U0BILL0001>.", "default", "Left as deliberate, nothing filed, decided by <@U0BILL0001>."],
-      [":no_entry: Left as deliberate, nothing filed, decided by <@U0BILL0001>.", "default", "Left as deliberate, nothing filed, decided by <@U0BILL0001>."],
+      ["Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again.", "info", "Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again."],
+      [":no_entry: Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again.", "info", "Cancelled by <@U0BILL0001> — tell me what to change and I'll stage it again."],
+      ["Left as deliberate, nothing filed, decided by <@U0BILL0001>.", "info", "Left as deliberate, nothing filed, decided by <@U0BILL0001>."],
+      [":no_entry: Left as deliberate, nothing filed, decided by <@U0BILL0001>.", "info", "Left as deliberate, nothing filed, decided by <@U0BILL0001>."],
       [":warning: This run was cut off before it reported back — see the thread for what finished.", "warning", "This run was cut off before it reported back — see the thread for what finished."],
     ];
     // The stated card's note as its writer words it, so a change to that
     // wording reads here too.
     const stated = statedCancelledNote({ cancelled: "No intake filed" }, "U0BILL0001");
-    cases.push([stated, "default", stated]);
+    cases.push([stated, "info", stated]);
     for (const [last, level, text] of cases) {
       const view = outcomeView({ channel: CHANNEL, ts: CARD_TS }, `${PROPOSAL.proposalText}\n${last}`) as { blocks: Array<{ type: string; level?: string; text?: { type: string; text: string } }> };
       // The level on a plain alert, and the outcome, pills and all, on the line under it.
@@ -812,7 +812,7 @@ describe("a decided card", () => {
     await runReviewDecision({ ...approve("U0BILL0001"), decision: "cancel", note: "Not this week" }, deps);
     await runReviewOpen(open("U0BILL0001"), deps);
     const view = views.calls.at(-1)!.view as { blocks: Array<{ type: string; level?: string; text?: { text: string } }> };
-    assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level], ["alert", "default"]);
+    assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level], ["alert", "info"]);
     assert.equal(view.blocks[0]!.text!.text, "Rejected.");
     assert.equal(richWords(view.blocks[1]), "Rejected by <@U0BILL0001>: Not this week.");
     assert.match(viewText(view), /Reflection redesign/);
