@@ -68,6 +68,26 @@ describe("the strict fake refuses what Slack refuses", () => {
     assert.equal((await verdicts([{ type: "carousel" }])).length, 3);
   });
 
+  it("takes a button's style only as primary or danger, or none", async () => {
+    const button = (extra: Record<string, unknown> = {}) => ({
+      type: "actions",
+      elements: [{ type: "button", action_id: "a", text: { type: "plain_text", text: "Stop" }, value: "v", ...extra }],
+    });
+    for (const blocks of [[button()], [button({ style: "primary" })], [button({ style: "danger" })]]) {
+      assert.deepEqual(await verdicts(blocks), []);
+    }
+    assert.equal((await verdicts([button({ style: "default" })])).length, 3);
+    assert.equal((await verdicts([button({ style: "green" })])).length, 3);
+    // A card's buttons are held to the same values.
+    const cardWith = (style: string) => ({
+      type: "card",
+      title: { type: "plain_text", text: "A card" },
+      actions: [{ type: "button", action_id: "a", text: { type: "plain_text", text: "Open" }, value: "v", style }],
+    });
+    assert.deepEqual(await verdicts([cardWith("danger")]), []);
+    assert.equal((await verdicts([cardWith("green")])).length, 3);
+  });
+
   it("refuses a context with no elements or more than ten", async () => {
     assert.equal((await verdicts([{ type: "context", elements: [] }])).length, 3);
     const eleven = Array.from({ length: 11 }, () => ({ type: "mrkdwn", text: "x" }));

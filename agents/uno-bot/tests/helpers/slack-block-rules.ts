@@ -208,6 +208,16 @@ function dataTableRefusal(block: Shape): string | null {
   return null;
 }
 
+/** A button's `style`: `primary` or `danger`, or left out for Slack's
+ *  default. blocks.validate on 2026-10-17 took both and refused `default`
+ *  and `green` ("must be a valid enum value", expected primary, danger). */
+const BUTTON_STYLES: ReadonlySet<string> = new Set(["primary", "danger"]);
+
+/** Why Slack would refuse a button's style, or null. */
+function buttonStyleRefusal(button: Shape): string | null {
+  return "style" in button && !BUTTON_STYLES.has(String(button.style)) ? `a button of style ${JSON.stringify(button.style)}` : null;
+}
+
 /** A card's title and subtitle, and its buttons, per Slack's card block
  *  reference (read 2026-10-08): 150 characters each, at most 3 buttons. */
 const CARD_TITLE_CHARS = 150;
@@ -275,6 +285,8 @@ function cardRefusal(card: unknown): string | null {
     if (!isShape(button) || button.type !== "button") return "a card action that is not a button";
     const label = button.text;
     if (!isShape(label) || label.type !== "plain_text" || !nonEmpty(label.text)) return "a card button without a label";
+    const style = buttonStyleRefusal(button);
+    if (style) return style;
   }
   return null;
 }
@@ -341,6 +353,12 @@ function blockRefusal(block: unknown): string | null {
   if (type === "context") {
     const n = Array.isArray(block.elements) ? block.elements.length : 0;
     if (n < CONTEXT_ELEMENTS.min || n > CONTEXT_ELEMENTS.max) return `a context of ${n} elements`;
+  }
+  if (type === "actions") {
+    for (const element of Array.isArray(block.elements) ? block.elements : []) {
+      const why = isShape(element) && element.type === "button" ? buttonStyleRefusal(element) : null;
+      if (why) return why;
+    }
   }
   if (type === "context_actions") {
     // The block reference (read 2026-10-08): 1 to 5 elements, each a
