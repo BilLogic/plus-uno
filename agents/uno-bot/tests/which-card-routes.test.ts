@@ -135,3 +135,62 @@ test("a numbered button on a question posted before the pop-up is answered aside
   assert.equal(reply?.body?.response_type, "ephemeral");
   assert.equal(reply?.body?.text, LEGACY_WHICH_REPLY);
 });
+
+// THE POP-UP NEVER APPROVES. A Choose… on a phone once submitted the Approve
+// list while the person meant Cancel: the decision rode the view's metadata,
+// and the switch's press never arrived to change it. Now the pop-up only
+// cancels, and Submit decides nothing unless the state it carries holds the
+// cancel list's checkboxes — whatever an old view's metadata says.
+
+/** A view's metadata as a pop-up opened before it only canceled carried it. */
+const OLD_APPROVE_METADATA = JSON.stringify({ c: CHANNEL, q: QUESTION_TS, d: "confirm", k: [[CARD_B, "Session reflections"], [CARD_A, "Backup tutor matching"]] });
+const notionCalls = () => calls.filter((c) => c.url.includes("api.notion.com"));
+const submitWith = (send: (p: Record<string, unknown>) => Promise<Response>, metadata: string, state: unknown) =>
+  send({ type: "view_submission", user: { id: "U1" }, view: { id: "V1", callback_id: "uno_which_pick", private_metadata: metadata, state } });
+
+test("a Submit under an old view whose metadata says Approve, with a card ticked, cancels it: nothing is approved", async () => {
+  const { send, store } = await world();
+  const state = { values: { uno_which_cards_cancel: { uno_which_cards_input: { type: "checkboxes", selected_options: [{ value: CARD_A }] } } } };
+  const res = await submitWith(send, OLD_APPROVE_METADATA, state);
+  assert.equal(((await res.json()) as { response_action: string }).response_action, "update");
+  assert.deepEqual(notionCalls(), [], "nothing was written");
+  assert.match(JSON.stringify(lastView().blocks), /Backup tutor matching\*: Canceled\./);
+  assert.notEqual((await store.getProposalByTs(CARD_A)).state, "found");
+  assert.equal((await store.getProposalByTs(CARD_B)).state, "found");
+});
+
+test("a Submit whose state carries a radio pick, as an old view's Approve list does, is refused and decides nothing", async () => {
+  const { send, store } = await world();
+  const states = [
+    { values: { uno_which_cards_confirm: { uno_which_cards_input: { type: "radio_buttons", selected_option: { value: CARD_A } } } } },
+    // An old view under Cancel: its switch's radio pick beside the checkboxes.
+    {
+      values: {
+        uno_which_decision_cancel: { uno_which_decision: { type: "radio_buttons", selected_option: { value: "cancel" } } },
+        uno_which_cards_cancel: { uno_which_cards_input: { type: "checkboxes", selected_options: [{ value: CARD_A }] } },
+      },
+    },
+  ];
+  for (const state of states) {
+    for (const metadata of [OLD_APPROVE_METADATA, JSON.stringify({ c: CHANNEL, q: QUESTION_TS, k: [[CARD_A, "Backup tutor matching"]] })]) {
+      const res = await submitWith(send, metadata, state);
+      const ack = (await res.json()) as { response_action: string; errors?: Record<string, string> };
+      assert.equal(ack.response_action, "errors", JSON.stringify(state));
+      assert.ok(Object.keys(ack.errors ?? {}).length, "the error names a block");
+    }
+  }
+  assert.deepEqual(notionCalls(), []);
+  assert.equal((await store.getProposalByTs(CARD_A)).state, "found", "the card still waits");
+  assert.equal((await store.getProposalByTs(CARD_B)).state, "found");
+});
+
+test("a Submit with no checkboxes in its state is refused, whatever the metadata says", async () => {
+  const { send, store } = await world();
+  const states = [undefined, {}, { values: {} }, { values: { uno_which_cards_cancel: {} } }, { values: { uno_which_cards_cancel: { uno_which_cards_input: { value: CARD_A } } } }];
+  for (const state of states) {
+    const res = await submitWith(send, OLD_APPROVE_METADATA, state);
+    assert.equal(((await res.json()) as { response_action: string }).response_action, "errors", JSON.stringify(state));
+  }
+  assert.deepEqual(notionCalls(), []);
+  assert.equal((await store.getProposalByTs(CARD_A)).state, "found");
+});

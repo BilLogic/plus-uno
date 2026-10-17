@@ -287,8 +287,8 @@ async function resolveFromButton(
   await runButtonDoor({ channel, messageTs: ts, decision, userId }, buttonDoorDeps(env, payload));
 }
 
-// Choose…, under a "which one?" question (#1342): the pop-up that decides
-// the cards it lists, each through its own door (`which-card.ts`). The press
+// Choose…, under a "which one?" question (#1342): the pop-up that cancels
+// the cards ticked in it, each through its own door (`which-card.ts`). The press
 // carries the question in `message`, and every press inside the pop-up, and
 // its Submit, carries it in the view's `private_metadata`.
 //
@@ -321,13 +321,14 @@ async function redrawWhich(env: Env, payload: InteractionPayload, actionId: stri
   const action = payload.actions?.[0];
   if (!viewId || !popup || !userId || !action) return;
   const chosen = action.selected_option?.value;
+  // The Approve / Cancel switch is only on a view drawn before the pop-up
+  // only canceled: a press on it redraws the view as it is now, never a
+  // decision.
   const press =
     actionId === WHICH_HIDE_ACTION_ID
       ? ({ kind: "hide" } as const)
       : actionId === WHICH_DECISION_ACTION_ID
-        ? chosen === "confirm" || chosen === "cancel"
-          ? ({ kind: "decision", decision: chosen } as const)
-          : null
+        ? ({ kind: "redraw" } as const)
         : chosen
           ? ({ kind: "draft", cardTs: chosen } as const)
           : null;
@@ -340,9 +341,13 @@ async function redrawWhich(env: Env, payload: InteractionPayload, actionId: stri
 }
 
 /**
- * The pop-up's Submit: nothing picked is an error under the list, in the ack
- * itself; a pick is acked with a line that says it is under way, and the
- * cards are decided after the ack, the pop-up answering once they are.
+ * The pop-up's Submit, which only cancels: a state with no card ticked in
+ * the cancel list's checkboxes, or holding a radio pick as a view drawn with
+ * the old Approve / Cancel switch does, is an error in the ack itself and
+ * decides nothing (`whichSubmitOf`); ticks are acked with a line that says
+ * the cancel is under way, and the cards are canceled after the ack, the
+ * pop-up answering once they are. Nothing is read from the metadata but the
+ * question and its cards.
  */
 function submitWhich(env: Env, payload: InteractionPayload, ctx: ExecutionContext): Response {
   const viewId = payload.view?.id;
@@ -352,15 +357,17 @@ function submitWhich(env: Env, payload: InteractionPayload, ctx: ExecutionContex
     console.log("[interactive] which-card submit without its question");
     return new Response("", { status: 200 });
   }
-  const submitted = whichSubmitOf(payload.view?.state, popup.decision);
-  if (!submitted.ok) return Response.json({ response_action: "errors", errors: submitted.errors });
+  const submitted = whichSubmitOf(payload.view?.state);
+  if (!submitted.ok) {
+    console.log(`[interactive] which-card submit on ${popup.channel}/${popup.questionTs} refused: ${Object.keys(submitted.errors).join(",")}`);
+    return Response.json({ response_action: "errors", errors: submitted.errors });
+  }
   ctx.waitUntil(
     runWhichSubmit({ viewId, popup, pick: submitted.pick, userId }, whichDoorDeps(env, payload, popup.channel, popup.questionTs)).catch((err) => {
-      console.error(`[interactive] which-card ${popup.decision} failed: ${err instanceof Error ? err.message : String(err)}`);
+      console.error(`[interactive] which-card cancel failed: ${err instanceof Error ? err.message : String(err)}`);
     }),
   );
-  const underWay = popup.decision === "confirm" ? "Approving…" : "Canceling…";
-  return Response.json({ response_action: "update", view: whichNoticeView(popup, underWay) });
+  return Response.json({ response_action: "update", view: whichNoticeView(popup, "Canceling…") });
 }
 
 /** `Env`, once, as the dependencies the "which one?" doors read: the button
