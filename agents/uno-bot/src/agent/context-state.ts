@@ -52,6 +52,8 @@ export interface HistoryTurn {
   content: string;
   /** When the turn was recorded, in epoch ms, where its writer stamps it. */
   at?: number;
+  /** On a ⛔ note, the reply thread of the card it cancels. */
+  cardThread?: string;
 }
 
 export interface ConversationState {
@@ -153,17 +155,32 @@ export function renderState(state: ConversationState): string {
 // still reads it. A note with no `at` predates the stamp, so it is hours old
 // and left out too. Unlike the rest of this file it is not behind the flag:
 // the note reaches the model on every turn, state block or none.
+//
+// The same goes for a fresh note about ANOTHER thread's card. The DM is one
+// conversation, so a ⛔ in one thread sits in the history of the next
+// unrelated ask, and the model read "just" into that too. A note names its
+// card's thread (`cardThread`); one naming another thread is left out, the
+// way the guard ignores it. A note naming none predates the field and stays.
 
 /** The whole of a ⛔ note, as `agent/cancel-note.ts` writes it. */
 const CANCEL_NOTE_RE = /^\(Cancell?ed the proposed [a-z_]+\b[^\n]*\)$/;
 
-/** `history` without the ⛔ notes recorded more than `windowMs` before `now`. */
-export function withoutAgedCancels<T extends HistoryTurn>(history: T[], now: number, windowMs: number): T[] {
+/** `history` without the ⛔ notes that are not this turn's "just now": those
+ *  recorded more than `windowMs` before `now`, and those about a card in
+ *  another thread than `cardThread`, the turn's own reply thread. */
+export function withoutStaleCancels<T extends HistoryTurn>(
+  history: T[],
+  now: number,
+  windowMs: number,
+  cardThread: string,
+): T[] {
   return history.filter(
     (t) =>
       t.role !== "assistant" ||
       !CANCEL_NOTE_RE.test(t.content.trim()) ||
-      (t.at !== undefined && now - t.at <= windowMs),
+      (t.at !== undefined &&
+        now - t.at <= windowMs &&
+        (t.cardThread === undefined || t.cardThread === cardThread)),
   );
 }
 

@@ -56,7 +56,7 @@ import {
   retrievalRanIn,
   type ConfidenceVerdict,
 } from "../agent/confidence";
-import { buildContextBlock, compactHistory, withoutAgedCancels } from "../agent/context-state";
+import { buildContextBlock, compactHistory, withoutStaleCancels } from "../agent/context-state";
 import { cardHeadline } from "../agent/card-identity";
 import { correctionDirective, looksLikeCorrection } from "../agent/correction";
 import type { AgentResult, TurnSpend } from "../agent/loop";
@@ -1125,10 +1125,11 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // a reply cite a fetch or concede an error it never made — unsatisfiable by
   // construction. The text patterns lean broad on purpose; this is the guard
   // that keeps that safe.
-  // A ⛔ note past `RECENT_CANCEL_MS` is history, not "just now": the model is
-  // not shown it, and only the store keeps it (`agent/context-state.ts`). Not
-  // behind the state flag: it is about what any turn's model reads.
-  const shownHistory = withoutAgedCancels(request.history, startedAt, RECENT_CANCEL_MS);
+  // A ⛔ note past `RECENT_CANCEL_MS`, or about another thread's card, is not
+  // this turn's "just now": the model is not shown it, and only the store keeps
+  // it (`agent/context-state.ts`). Not behind the state flag: it is about what
+  // any turn's model reads.
+  const shownHistory = withoutStaleCancels(request.history, startedAt, RECENT_CANCEL_MS, cardThread);
   const priorAssistantTurn = [...shownHistory].reverse().find((t) => t.role === "assistant");
   // Receipts are attached to the USER turn of the exchange they describe, so
   // the search is by receipt, not by role.
@@ -1411,7 +1412,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   });
 
   // Gate idempotency (b): the person JUST cancelled this same action (the same
-  // tool on the same target; a redirect is a new card, `agent/cancel-note.ts`),
+  // tool on the same target, on a card in this same reply thread; a redirect
+  // is a new card, and so is an ask in another DM thread, `agent/cancel-note.ts`),
   // and the store's outcome note is authoritative — the live thread only shows the
   // narrative text. Don't re-card a cancelled action; require an explicit
   // revival. The window is the last few turns AND the last half hour
@@ -1420,7 +1422,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   try {
     const justCancelled = (stored ?? [])
       .slice(-3)
-      .some((t) => cancelledRecently(t, result.toolName, result.input, deps.now?.() ?? Date.now()));
+      .some((t) => cancelledRecently(t, result.toolName, result.input, deps.now?.() ?? Date.now(), cardThread));
     if (justCancelled) {
       const bounce =
         `You canceled that ${verbFor(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +

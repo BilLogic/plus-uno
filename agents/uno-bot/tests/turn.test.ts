@@ -42,7 +42,7 @@ import { sweepShareOffer, SWEEP_SHARE_KEY } from "../src/sweep/share";
 import { FIX_REVIEW_INSTEAD, FIX_SCOPE_REFUSAL, sweepTag } from "../src/sweep/cards";
 import { decisionReport, itemProposal, reportItems, reportRecord } from "../src/slack/decision-cards";
 import { renderProposalCard, shortCardOf } from "../src/slack/proposal-render";
-import { cancelNote, RECENT_CANCEL_MS } from "../src/agent/cancel-note";
+import { cancelNote, cancelNoteWrites, RECENT_CANCEL_MS } from "../src/agent/cancel-note";
 import { parseRepoList, resolveRepo } from "../src/integrations/repo-list.mjs";
 import { executeRelayDm, type RelaySlack } from "../src/tools/relay-dm";
 import type { ShareoutReads } from "../src/tools/share-for-feedback";
@@ -3093,4 +3093,97 @@ test("a redirect after a ⛔ is never held back, recent or aged", async () => {
   // Aged, under the imitating model: the DM ask that was bounced the next morning.
   const aged = await inADm(cancelNote("shareout_post", {}), [shareout({ place: "here" })], 11 * 60 * 60_000);
   assert.equal(aged.outcome.disposition, "staged");
+});
+
+// "The same action" is the same matter, and in a DM the matter is the reply
+// thread. Every top-level DM line is one conversation, so the ⛔ note sits in
+// the history the next unrelated ask reads: live on r675 a PRD card rejected in
+// one thread bounced a different PRD asked as a new top-level message, "You
+// canceled that create this card in Notion a moment ago". The note names the
+// card's thread, and only a re-ask there is held back.
+const DM = "D0DM";
+const THREAD_A = "1700000000.000300";
+const THREAD_B = "1700000000.000500";
+const DM_REF = { channel: DM, thread: DM_CONVERSATION };
+
+/** A DM whose thread A held a `notion_create` card that was ⛔'d two minutes
+ *  ago, its note written where the verdict writes it. */
+async function dmAfterCancelInThreadA() {
+  const threadState = createInMemoryThreadState();
+  await threadState.appendHistory(DM_REF, { role: "user", content: "PRD: skip the session-evaluation tab on no-shows" });
+  const canceled = {
+    toolName: "notion_create",
+    input: { title: "Skip the session-evaluation tab on no-shows" },
+    channel: DM,
+    threadTs: DM_CONVERSATION,
+    replyTs: THREAD_A,
+  };
+  for (const { ref, turn } of cancelNoteWrites(canceled, NOW - 2 * 60_000)) await threadState.appendHistory(ref, turn);
+  return { threadState, canceled };
+}
+
+test("a ⛔ in one DM thread does not hold back an unrelated card asked as a new top-level message", async () => {
+  const { threadState } = await dmAfterCancelInThreadA();
+  const h = harness({
+    threadState,
+    now: () => NOW,
+    replies: [
+      {
+        text: "Staging the PRD.",
+        toolCalls: [{ name: "notion_create", args: { title: "The reflection form remembers last session's students" } }],
+      },
+    ],
+  });
+  let sawNote = false;
+  const start = h.provider.start.bind(h.provider);
+  h.provider.start = async (turn) => {
+    sawNote = turn.conversation.some((t) => /Cancell?ed the proposed/.test(t.text));
+    return start(turn);
+  };
+  const outcome = await runTurn(
+    request({
+      channel: DM,
+      surface: "assistant",
+      conversationTs: DM_CONVERSATION,
+      replyTs: THREAD_B,
+      userMsgTs: THREAD_B,
+      threaded: false,
+      text: "PRD: the reflection form remembers the last session's student list",
+      history: await threadState.readHistory(DM_REF),
+    }),
+    h.deps,
+  );
+  assert.equal(outcome.disposition, "staged");
+  assert.doesNotMatch(outcome.posted ?? "", /canceled that/i);
+  // Another thread's ⛔ is not this thread's "just now", for the model either.
+  assert.equal(sawNote, false);
+});
+
+test("a re-ask of the canceled card in its own DM thread still gets the bounce", async () => {
+  const { threadState, canceled } = await dmAfterCancelInThreadA();
+  const h = harness({
+    threadState,
+    now: () => NOW,
+    replies: [{ text: "Staging it again.", toolCalls: [{ name: "notion_create", args: canceled.input }] }],
+  });
+  const outcome = await runTurn(
+    request({
+      channel: DM,
+      surface: "assistant",
+      conversationTs: THREAD_A,
+      replyTs: THREAD_A,
+      userMsgTs: "1700000000.000400",
+      threaded: true,
+      text: "ok, write that PRD up",
+    }),
+    h.deps,
+  );
+  assert.equal(outcome.disposition, "asked");
+  assert.match(outcome.posted ?? "", /You canceled that create this card in Notion a moment ago/);
+});
+
+test("in a channel the ⛔ note is written once, in the thread that is both conversation and card thread", () => {
+  const writes = cancelNoteWrites(PENDING, NOW);
+  assert.deepEqual(writes.map((w) => w.ref), [REF]);
+  assert.equal(writes[0]!.turn.content, cancelNote(PENDING.toolName, PENDING.input));
 });

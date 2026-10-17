@@ -14,8 +14,21 @@
 // note carries when it was recorded (`HistoryTurn.at`), and only a cancel
 // inside `RECENT_CANCEL_MS` holds anything back. A note with no time predates
 // the stamp, so it is hours old by now and holds nothing back.
+//
+// And "that" has to be the same matter. The same DM is why: live on r675 a PRD
+// card rejected in one thread bounced an unrelated PRD asked minutes later as a
+// new top-level message, because both read the one `"dm"` history. A card
+// belongs to its reply thread, as the card store already has it, so the note
+// carries that thread (`HistoryTurn.cardThread`) and holds back only a card
+// staged in the same one.
 
 import { channelRefText, shareoutChannelRef } from "../tools/share-out-render";
+import {
+  proposalReplyThread,
+  type HistoryTurn,
+  type PendingProposal,
+  type ThreadRef,
+} from "../thread-state/index";
 
 /** How long a ⛔ holds the same card back. A cancel and the model's own
  *  re-proposal land within one exchange, minutes apart; half an hour covers a
@@ -58,14 +71,49 @@ export function cancelledSame(content: string, toolName: string, input: Record<s
   return note[2] === undefined || note[2] === targetOf(toolName, input);
 }
 
-/** Whether `turn` is a ⛔ note for this tool on this target, recorded within
+/** Whether a ⛔ note is about another thread's card than `cardThread`. A note
+ *  written before notes named their card's thread is about none in
+ *  particular, and so about this one, as it always was. */
+export function cancelledElsewhere(turn: { cardThread?: string }, cardThread: string): boolean {
+  return turn.cardThread !== undefined && turn.cardThread !== cardThread;
+}
+
+/** Whether `turn` is a ⛔ note for this tool on this target, on the card of
+ *  `cardThread` (the turn's own reply thread), recorded within
  *  `RECENT_CANCEL_MS` of `now`. */
 export function cancelledRecently(
-  turn: { role: string; content: string; at?: number },
+  turn: { role: string; content: string; at?: number; cardThread?: string },
   toolName: string,
   input: Record<string, unknown>,
   now: number,
+  cardThread: string,
 ): boolean {
   if (turn.role !== "assistant" || turn.at === undefined || now - turn.at > RECENT_CANCEL_MS) return false;
+  if (cancelledElsewhere(turn, cardThread)) return false;
   return cancelledSame(turn.content, toolName, input);
+}
+
+/**
+ * Where a ⛔ is remembered, and what: the note, stamped with when and with the
+ * card's reply thread, for each conversation that has to read it.
+ *
+ * The conversation the card was staged from always gets it — that history is
+ * what the next turn there reads. In a channel that is the card's thread too,
+ * and one write is the whole of it. In a DM it is not: a card staged from a
+ * top-level line is kept under the shared `"dm"` conversation but lives in a
+ * thread of its own, and a reply typed in that thread is a conversation of its
+ * own (`slack/events.ts` § `conversationTs`). So the thread gets the note as
+ * well, or the one re-ask the guard exists for would never find it.
+ *
+ * @param pending - The card that was ⛔'d.
+ * @param at - When, in epoch ms.
+ */
+export function cancelNoteWrites(
+  pending: Pick<PendingProposal, "toolName" | "input" | "channel" | "threadTs" | "replyTs">,
+  at: number,
+): Array<{ ref: ThreadRef; turn: HistoryTurn }> {
+  const cardThread = proposalReplyThread(pending);
+  const turn: HistoryTurn = { role: "assistant", content: cancelNote(pending.toolName, pending.input), at, cardThread };
+  const conversations = cardThread === pending.threadTs ? [pending.threadTs] : [pending.threadTs, cardThread];
+  return conversations.map((thread) => ({ ref: { channel: pending.channel, thread }, turn }));
 }

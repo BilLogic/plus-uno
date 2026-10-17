@@ -6,7 +6,7 @@ import {
   deriveState,
   detectDrift,
   renderState,
-  withoutAgedCancels,
+  withoutStaleCancels,
   type HistoryTurn,
 } from "../src/agent/context-state";
 
@@ -98,5 +98,17 @@ test("an aged or unstamped cancel note is left out, and a recent one and everyth
     { role: "user", content: note },
     { role: "assistant", content: note, at: now - 60_000 },
   ];
-  assert.deepEqual(withoutAgedCancels(history, now, 30 * 60_000), [history[0], history[3], history[4], history[5]]);
+  assert.deepEqual(withoutStaleCancels(history, now, 30 * 60_000, "1700000000.000100"), [history[0], history[3], history[4], history[5]]);
+});
+
+// In a DM every top-level ask shares one history, so a fresh ⛔ in one thread
+// is not "just now" for another thread's turn.
+test("a recent cancel note about another thread's card is left out, and one about this thread's stays", () => {
+  const now = Date.parse("2026-10-17T14:00:00Z");
+  const note = "(Canceled the proposed notion_create — nothing was done.)";
+  const history: HistoryTurn[] = [
+    { role: "assistant", content: note, at: now - 60_000, cardThread: "1700000000.000300" },
+    { role: "assistant", content: note, at: now - 60_000, cardThread: "1700000000.000500" },
+  ];
+  assert.deepEqual(withoutStaleCancels(history, now, 30 * 60_000, "1700000000.000500"), [history[1]]);
 });

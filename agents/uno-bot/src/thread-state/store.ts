@@ -167,6 +167,12 @@ export interface HistoryTurn {
    *  card back only inside the window (`agent/cancel-note.ts`), and an older
    *  note is left out of what the model reads (`agent/context-state.ts`). */
   at?: number;
+  /** On a ⛔ note, the reply thread of the card it cancels
+   *  (`proposalReplyThread`). In a DM every top-level ask shares one history,
+   *  so without it a cancel in one thread read as "just cancelled" to every
+   *  other: the guard holds back only a card staged in this thread, and the
+   *  model is not shown another thread's note (`agent/cancel-note.ts`). */
+  cardThread?: string;
   /** Names of the references `read_reference` served on this turn. The TEXT is
    *  deliberately not persisted (#423): a later turn sees a one-line stub per
    *  name and a re-read is one baked-map lookup. */
