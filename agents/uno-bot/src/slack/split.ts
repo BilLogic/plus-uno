@@ -185,11 +185,10 @@ const ELIDED_BYTES = utf8Bytes(ELIDED_LINE);
  * A text cut to at most `limit` UTF-8 bytes that keeps its opening and its
  * last line, with `ELIDED_LINE` where the middle came out.
  *
- * Bytes, not characters: chat.update counts its limit in UTF-8 bytes whatever
- * its reference says. It refused edits of 3,946 characters / 4,030 bytes and
- * 3,962 / 4,038 live, and a card's "·", "—", "›" and emoji are two to four
- * bytes each, so a character count let a long card through to a refusal and a
- * second, shorter edit.
+ * Bytes, not characters: chat.update counts its limit in UTF-8 bytes
+ * (`api.ts` § UPDATE_TEXT_BYTES), and a card's "·", "—", "›" and emoji are two
+ * to four bytes each, so a character count let a long card through to a
+ * refusal and a second, shorter edit.
  *
  * For a message edited in place, whose last line is the news: a decided card's
  * outcome, a gate note, "Expired" — each door puts it there. A View pressed

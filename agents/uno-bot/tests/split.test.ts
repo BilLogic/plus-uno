@@ -130,11 +130,15 @@ describe("a single line longer than the limit", () => {
   });
 
   it("does not cut an emoji in half when there is no space to cut at", () => {
-    // Odd limits, so a cut at the limit lands between the two halves of a pair.
-    for (const limit of [99, 101, 127]) {
-      const chunks = splitBalanced("x🐐".repeat(300), limit);
+    // Limits whose cut lands between the halves of a pair on at least one
+    // chunk: a line is cut at `limit - 1`, so the first chunk's cut splits a
+    // pair whenever the unit before it is a high surrogate.
+    const text = "x🐐".repeat(300);
+    for (const limit of [99, 120, 150]) {
+      assert.match(text[limit - 2]!, /[\uD800-\uDBFF]/, `a cut at ${limit - 1} would split a pair`);
+      const chunks = splitBalanced(text, limit);
       for (const c of chunks) assert.doesNotMatch(c, LONE_SURROGATE, c);
-      assert.equal(chunks.join(""), "x🐐".repeat(300));
+      assert.equal(chunks.join(""), text);
     }
   });
 });
@@ -193,9 +197,8 @@ describe("keepLastLine", () => {
     assert.ok(cut.endsWith(`\n${ELIDED_LINE}`));
   });
 
-  // Slack's real ceiling on an edit's text is in UTF-8 bytes: a card's "·",
-  // "—", "›" and emoji are two to four bytes each, and an edit of 3,946
-  // characters / 4,030 bytes was refused.
+  // Slack counts an edit's text in UTF-8 bytes (api.ts § UPDATE_TEXT_BYTES),
+  // and a card's "·", "—", "›" and emoji are two to four bytes each.
   it("holds a text of multi-byte characters to the limit in bytes", () => {
     const line = (i: number) => `Step ${i} · Supervisor lane — asks around › confirms by DM 🐐`;
     const text = `${Array.from({ length: 14 }, (_, i) => line(i + 1)).join("\n")}\nRejected, so nothing runs.`;
@@ -213,7 +216,8 @@ describe("keepLastLine", () => {
   });
 
   it("does not cut an emoji in half", () => {
-    for (const limit of [301, 302, 303]) {
+    // Budgets that fit 64, 65 and 66 goats beside the elided line.
+    for (const limit of [300, 305, 310]) {
       const cut = keepLastLine("🐐".repeat(400), limit);
       assert.ok(bytes(cut) <= limit, `${bytes(cut)} bytes`);
       assert.doesNotMatch(cut, LONE_SURROGATE, cut);

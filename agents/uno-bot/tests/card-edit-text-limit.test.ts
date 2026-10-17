@@ -164,9 +164,9 @@ describe("a long card's edits stay inside chat.update's text limit", () => {
     assert.ok(sent.includes(`\n${ELIDED_LINE}\n`), "the cut says it is one");
   });
 
-  // Slack counts the limit in UTF-8 bytes, and a card's "·", "—", "›" and
-  // emoji are two to four each: an edit of 3,946 characters / 4,030 bytes was
-  // refused, and landed only on a second, shorter chat.update.
+  // Slack counts the limit in UTF-8 bytes (`api.ts` § UPDATE_TEXT_BYTES), and
+  // a card's "·", "—", "›" and emoji are two to four each, so a card under
+  // 4,000 characters was refused and landed only on a second chat.update.
   it("lands a card under 4,000 characters but over 4,000 bytes in one edit", async () => {
     const step = (i: number) => `Step ${i} · Supervisor lane — asks around in Slack › confirms by DM 🐐`;
     const outcome = "Rejected, so nothing runs.";
