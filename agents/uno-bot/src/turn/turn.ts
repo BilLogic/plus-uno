@@ -126,7 +126,7 @@ import {
   type StagingFacts,
 } from "./card-staging";
 import { offerCheck } from "./check-offer";
-import { cardLiveIn, liveCardsOf, moreLiveIn, settlementOf, settleVerdict } from "./settlement";
+import { cardLiveIn, keepWhichQuestion, liveCardsOf, moreLiveIn, settlementOf, settleVerdict } from "./settlement";
 import { judgedList, presentedProse, presenter, proseBudgetRepair, type Presenter } from "./presentation";
 import { figmaAnswerCopy } from "./figma-answer-copy";
 import { breadcrumbsInProse } from "../integrations/blueprint-link";
@@ -965,6 +965,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     if (verdict.decision && !nothingToSettle) {
       return settleVerdict(verdict, {
         deps,
+        channel: request.channel,
         memory,
         note:
           verdict.decision === "confirm"
@@ -1026,6 +1027,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       const verdict = cutOffVerdict(cutOff, "confirm");
       return settleVerdict(verdict, {
         deps,
+        channel: request.channel,
         memory,
         // Whatever they wrote went unanswered, and they should know it did
         // rather than read the note as the answer.
@@ -1280,7 +1282,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     const waiting = result.askWhich ? awaitingDecision(liveCardsOf(request)) : [];
     if (result.askWhich && waiting.length > 1) {
       await delivery.endProgress("complete");
-      const said = await delivery.postGateNote(whichCardNote(result.askWhich, waiting));
+      const note = whichCardNote(result.askWhich, waiting);
+      const said = await delivery.postGateNote(note);
+      await keepWhichQuestion(note, said, { channel: request.channel, ...(request.replyTs ? { replyTs: request.replyTs } : {}) }, threadState);
       await memory.remember(said.text);
       return { disposition: "asked", posted: said.text, wrote: memory.wrote(), telemetry };
     }
@@ -1342,7 +1346,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
       },
       { threadState, standingConfirmers: deps.standingConfirmers },
     );
-    return settleVerdict(verdict, { deps, memory, telemetry });
+    return settleVerdict(verdict, { deps, channel: request.channel, memory, telemetry });
   }
 
   // ── A new side-effect proposal ─────────────────────────────────────────────
@@ -1397,6 +1401,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
     );
     return settleVerdict(verdict, {
       deps,
+      channel: request.channel,
       memory,
       ...(result.previewText ? {} : { note: "(confirmed — executing the proposal)" }),
       telemetry,
@@ -1659,7 +1664,7 @@ async function dropFromSweepCard(
       { kind: "typed", channel: request.channel, thread: cardThread, text: "⛔", userId: request.userId },
       { threadState, standingConfirmers: deps.standingConfirmers },
     );
-    return settleVerdict(verdict, { deps, memory, note: "Canceled.", telemetry });
+    return settleVerdict(verdict, { deps, channel: request.channel, memory, note: "Canceled.", telemetry });
   }
   const all = proposalOperations(pending);
   const operations = kept.map((i) => all[i]!);

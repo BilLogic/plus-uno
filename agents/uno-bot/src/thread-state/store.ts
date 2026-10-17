@@ -33,9 +33,9 @@
 import type { ChannelRole } from "../destination/index";
 import type { AssistantContext } from "../slack/types";
 import type { VisionReference } from "../slack/vision-reference";
-import type { CardFixes } from "../turn/delivery";
+import type { CardFixes, WhichCard } from "../turn/delivery";
 import type { ConversationType } from "../turn/turn";
-import { cardTtlMs } from "../card-expiry";
+import { cardLiveAt, cardTtlMs } from "../card-expiry";
 
 export type { AssistantContext, VisionReference };
 
@@ -2007,6 +2007,97 @@ export interface ThreadState {
 
   /** The offer kept under a message ts, or null once it is gone. */
   getCheckOffer(offerTs: string): Promise<BlueprintCheckOffer | null>;
+
+  // ----- the open "which one?" question -----
+  //
+  // A decision that named no card asks "Approve which one?" with a button per
+  // card (`slack/which-card.ts`). A card can then be decided by any door —
+  // the question's own button, the card's, a reaction, a typed emoji, the
+  // model's `proposal_resolve` — and only the question's own press could find
+  // the question to take that card's button off it. This is what lets every
+  // other door find it too.
+
+  /**
+   * Keep a question as it was posted, under its message ts, and point each
+   * card it lists at it. A card asked about again points at the newest
+   * question. Kept until its last card is decided, or for the card rule
+   * (`cardExpiresAt`) from the put, when its buttons lapse.
+   */
+  putWhichQuestion(question: WhichQuestion): Promise<void>;
+
+  /**
+   * Mark a card decided on the open question that lists it, in one hop and
+   * one transaction: the question as it now stands, for the door to redraw,
+   * or null when nothing changed — no open question lists the card, another
+   * door marked it already, or the question lapsed (and is dropped). So of
+   * two doors deciding one card, one redraws. The question marked with its
+   * last card comes back once more and is dropped.
+   */
+  decideInWhichQuestion(cardTs: string): Promise<WhichQuestion | null>;
+}
+
+// ── The open "which one?" question ───────────────────────────────────────────
+
+/**
+ * A "which one?" question as kept: its message, the decision it asks for,
+ * the cards it lists in their numbered order, and which of them are decided.
+ * The list never shrinks, so "Cancel 2" goes on meaning card 2.
+ */
+export interface WhichQuestion {
+  /** The question's own message: the record's key, and what is edited. */
+  questionTs: string;
+  channel: string;
+  /** The reply thread it was posted in, when it was posted in one. */
+  replyTs?: string;
+  decision: "confirm" | "cancel";
+  cards: WhichCard[];
+  /** The listed cards decided since, by ts, in the order they were. */
+  decided: string[];
+}
+
+/** A question as stored: the question, and when it was put. */
+export interface WhichQuestionRecord {
+  question: WhichQuestion;
+  at: number;
+}
+
+/** A listed card's pointer to the question that lists it. */
+export interface WhichCardPointer {
+  questionTs: string;
+  at: number;
+}
+
+/** The record a question is kept under. */
+export function whichQuestionKey(questionTs: string): string {
+  return `whq:${questionTs}`;
+}
+
+/** The record a listed card's pointer is kept under. */
+export function whichCardKey(cardTs: string): string {
+  return `whc:${cardTs}`;
+}
+
+/**
+ * A card decided against the question its pointer names: the question as it
+ * now stands, when this changed it, and the record to keep (null to drop it,
+ * with its cards' pointers). A lapsed question changes nothing and is dropped;
+ * one marked with its last card comes back and is dropped.
+ *
+ * @param rec - The question the card's pointer names, if it is still kept
+ * @param cardTs - The card decided
+ * @param at - Now
+ */
+export function decidedInQuestion(
+  rec: WhichQuestionRecord | undefined,
+  cardTs: string,
+  at: number,
+): { question: WhichQuestion | null; keep: WhichQuestionRecord | null } {
+  if (!rec || !cardLiveAt(rec.at, at)) return { question: null, keep: null };
+  const { question } = rec;
+  if (!question.cards.some((card) => card.ts === cardTs) || question.decided.includes(cardTs)) return { question: null, keep: rec };
+  const next = { ...question, decided: [...question.decided, cardTs] };
+  const open = next.cards.some((card) => !next.decided.includes(card.ts));
+  return { question: next, keep: open ? { question: next, at: rec.at } : null };
 }
 
 // ── The blueprint check's offers ─────────────────────────────────────────────

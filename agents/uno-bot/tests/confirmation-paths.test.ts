@@ -1431,6 +1431,28 @@ describe("the card a decision closes", () => {
     }
   });
 
+  it("drops the card a reaction decided from the open \"which one?\" question that lists it, after closing the card", async () => {
+    const threadState = await twoCards();
+    const cards = [{ ts: "1700000000.000196", headline: "Session reflections" }, { ts: CARD_TS, headline: "Reflection redesign" }];
+    await threadState.putWhichQuestion({ questionTs: "1700000000.000300", channel: CHANNEL, replyTs: THREAD, decision: "confirm", cards, decided: [] });
+    const delivery = recordingDelivery();
+    await runReactionDoor(
+      { channel: CHANNEL, messageTs: CARD_TS, glyph: "white_check_mark", userId: "U2" },
+      {
+        threadState,
+        delivery: () => delivery,
+        threadRootOf: async () => THREAD,
+        botUserId: async () => "UBOT",
+        applyVerdict: async () => {},
+        restage: async () => {},
+      },
+    );
+    const kinds = delivery.calls.map((c) => c.kind).filter((k) => k === "close-card" || k === "redraw-which");
+    assert.deepEqual(kinds, ["close-card", "redraw-which"]);
+    const redrawn = delivery.calls.find((c) => c.kind === "redraw-which");
+    assert.deepEqual(redrawn?.kind === "redraw-which" && redrawn.question.decided, [CARD_TS]);
+  });
+
   it("closes nothing on a second ⛔ once the card is decided", async () => {
     const threadState = await staged();
     assert.equal((await reactWith(threadState, "white_check_mark")).length, 1, "the win closes it");

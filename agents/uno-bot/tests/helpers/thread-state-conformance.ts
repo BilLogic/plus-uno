@@ -46,6 +46,7 @@ import {
   type ReportItemState,
   type ThreadState,
   type ThreadStateDeps,
+  type WhichQuestion,
 } from "../../src/thread-state/store";
 import { cardTtlMs } from "../../src/card-expiry";
 
@@ -1416,6 +1417,50 @@ export function runThreadStateConformance(
     assert.deepEqual(await store.getCheckOffer("5.0"), offer, "still there at the end of its keep");
     clock.advance(1);
     assert.equal(await store.getCheckOffer("5.0"), null);
+  });
+
+  // ----- the open "which one?" question -----
+  //
+  // Kept so a card decided by any door can be dropped from the question that
+  // lists it: one decided card at a time, each told once, the record gone
+  // with its last card or its deadline.
+
+  const question = (over: Partial<WhichQuestion> = {}): WhichQuestion => ({
+    questionTs: "9.0", channel: "C1", replyTs: "1.0", decision: "cancel",
+    cards: [{ ts: "4.0", headline: "Backup tutor matching" }, { ts: "5.0", headline: "Session reflections" }],
+    decided: [], ...over,
+  });
+
+  it("a card decided from an open question is marked on it, once, and the question comes back as it now stands", async () => {
+    const { store } = setup();
+    await store.putWhichQuestion(question());
+    assert.deepEqual(await store.decideInWhichQuestion("5.0"), question({ decided: ["5.0"] }));
+    assert.equal(await store.decideInWhichQuestion("5.0"), null, "a second door deciding it is told nothing changed");
+    assert.equal(await store.decideInWhichQuestion("6.0"), null, "a card no question lists");
+  });
+
+  it("the question's record goes with its last card", async () => {
+    const { store } = setup();
+    await store.putWhichQuestion(question());
+    await store.decideInWhichQuestion("4.0");
+    assert.deepEqual(await store.decideInWhichQuestion("5.0"), question({ decided: ["4.0", "5.0"] }), "the last one still comes back, to be redrawn");
+    await store.putWhichQuestion(question({ questionTs: "9.5", cards: [{ ts: "7.0", headline: "Other" }] }));
+    assert.equal(await store.decideInWhichQuestion("4.0"), null, "nothing left of it");
+  });
+
+  it("a question lapses on the card rule from when it was kept, and a decision after that finds nothing", async () => {
+    const { store, clock } = setup();
+    await store.putWhichQuestion(question());
+    clock.advance(cardTtlMs(clock.now()) + 1);
+    assert.equal(await store.decideInWhichQuestion("4.0"), null);
+    assert.equal(await store.decideInWhichQuestion("5.0"), null);
+  });
+
+  it("a card asked about again is dropped from the newest question that lists it", async () => {
+    const { store } = setup();
+    await store.putWhichQuestion(question());
+    await store.putWhichQuestion(question({ questionTs: "9.9", decision: "confirm" }));
+    assert.deepEqual(await store.decideInWhichQuestion("4.0"), question({ questionTs: "9.9", decision: "confirm", decided: ["4.0"] }));
   });
 
   it("the one-shot dedup and the lease share one record", async () => {

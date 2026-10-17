@@ -55,6 +55,7 @@ import type {
   ThreadRef,
   ThreadState,
   ThreadStateDeps,
+  WhichQuestion,
 } from "./store";
 
 /** One global ThreadState instance per workspace. Never leaves this file. */
@@ -300,6 +301,17 @@ export function createDurableObjectThreadState(
 
     getCheckOffer(offerTs: string): Promise<BlueprintCheckOffer | null> {
       return hop().getCheckOffer(offerTs, now());
+    },
+
+    // ----- the open "which one?" question -----
+
+    putWhichQuestion(question: WhichQuestion): Promise<void> {
+      return hop().putWhichQuestion(question, now());
+    },
+
+    // One hop, one transaction, so of two doors deciding one card one redraws.
+    decideInWhichQuestion(cardTs: string): Promise<WhichQuestion | null> {
+      return hop().decideInWhichQuestion(cardTs, now());
     },
   };
 }

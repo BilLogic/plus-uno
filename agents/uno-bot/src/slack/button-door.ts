@@ -23,7 +23,7 @@
 
 import type { ThreadState } from "../thread-state/index";
 import { withWorkingSignal, type Delivery } from "../turn/index";
-import { cardOutcomeOf, otherCardWaits, resolveSignal, type GateRestage, type GateVerdict } from "../gate/index";
+import { cardOutcomeOf, dropFromWhichQuestion, otherCardWaits, resolveSignal, type GateRestage, type GateVerdict } from "../gate/index";
 import { decidedCardLine, renderGateNote } from "./gate-note";
 // The decided card is built beside `notedCardBlocks`, where the Slack
 // adapter's `closeCard` builds it too: one builder for every door.
@@ -144,8 +144,10 @@ export async function applyPressVerdict(
   verdict: GateVerdict,
   deps: Omit<ButtonDoorDeps, "threadState" | "standingConfirmers"> & {
     /** The thread's live cards, read after a win for whether another still
-     *  waits (`otherCardWaits`). Absent, the thread settles idle. */
-    threadState?: Pick<ThreadState, "getProposalsByThread">;
+     *  waits (`otherCardWaits`), and the open "which one?" question the card
+     *  decided is dropped from (`dropFromWhichQuestion`). Absent, the thread
+     *  settles idle and no question is redrawn. */
+    threadState?: Pick<ThreadState, "getProposalsByThread" | "decideInWhichQuestion">;
     /** The decided card's words and outcome line, changed on the way: the
      *  pop-up's approval with edits says what was approved, and by whom, and
      *  `edited` says the draft's values changed (`decidedCard`). */
@@ -237,6 +239,8 @@ export async function applyPressVerdict(
     ? deps.reword(pending.proposalText, note)
     : { text: pending.proposalText, note };
   await deps.replaceCard(decidedCard(pending, words.note, words.text, { edited: words.edited === true }));
+  // And a "which one?" that lists it stops offering it, after the card.
+  if (deps.threadState) await dropFromWhichQuestion(pending.proposalTs, { threadState: deps.threadState, delivery: door });
 }
 
 /** A single write may return the actual destination for its report receipt.

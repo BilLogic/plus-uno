@@ -21,6 +21,14 @@
 // staged before the question can lapse first; a press on it then says so, as a
 // press on the card would.
 //
+// A CARD DECIDED ANYWHERE DROPS OUT OF IT. The turn keeps the question as
+// posted in the thread store (`putWhichQuestion`), and every door that decides
+// a listed card — this question's button, the card's own, its Review pop-up,
+// a reaction, a typed emoji, the model's `proposal_resolve` — marks it there
+// and redraws the question from that record (`gate.ts`
+// `dropFromWhichQuestion`): the card's line struck, its button gone, the
+// numbers unchanged, and "Decided." once none are left.
+//
 // Pure apart from its named dependencies: no `Env`, no fetch.
 
 import type { GateNote, WhichCard } from "../turn/index";
@@ -30,7 +38,7 @@ import { escapeSlackText } from "./mrkdwn";
 import { isDeadlineBlock } from "./card-deadline";
 import { runButtonDoor, type ButtonDoorDeps } from "./button-door";
 import type { CardMessage } from "./proposal-render";
-import type { ThreadState } from "../thread-state/index";
+import type { ThreadState, WhichQuestion } from "../thread-state/index";
 
 type WhichNote = Extract<GateNote, { kind: "which-card" }>;
 type Decision = WhichNote["decision"];
@@ -47,19 +55,36 @@ const MAX_BUTTONS = 25;
  *  still lapse on the card rule, counted from the question's ts by the door,
  *  but the message does not say when.
  *
+ * Redrawn after a door decides a card it lists (`Delivery.redrawWhichCard`),
+ * that card's line is struck and its button goes, and every other card keeps
+ * its number: "Cancel 2" goes on meaning card 2. With every card decided the
+ * row gives way to "Decided.", as a press leaves it (`withButtons`).
+ *
  * @param note - The question
+ * @param decided - The listed cards decided since it was asked, by ts
  */
-export function whichCardMessage(note: WhichNote): CardMessage {
+export function whichCardMessage(note: WhichNote, decided: readonly string[] = []): CardMessage {
   const cards = note.cards.slice(0, MAX_BUTTONS);
   // Headlines come from the model's input, so escaped.
-  const listed = cards.map((card, i) => `${i + 1}. *${escapeSlackText(card.headline)}*`).join("\n");
+  const listed = cards
+    .map((card, i) => {
+      const headline = escapeSlackText(card.headline);
+      return decided.includes(card.ts) ? `~${i + 1}. ${headline}~` : `${i + 1}. *${headline}*`;
+    })
+    .join("\n");
+  const open = cards.flatMap((card, i) => (decided.includes(card.ts) ? [] : [button(note.decision, card, i)]));
   return {
     text: renderGateNote(note),
     blocks: [
       { type: "section", text: { type: "mrkdwn", text: `${whichCardQuestion(note)}\n${listed}` } },
-      { type: "actions", elements: cards.map((card, i) => button(note.decision, card, i)) },
+      open.length ? { type: "actions", elements: open } : { type: "context", elements: [{ type: "mrkdwn", text: "Decided." }] },
     ],
   };
+}
+
+/** A kept question (`ThreadState.decideInWhichQuestion`), as Slack gets it. */
+export function keptQuestionMessage(question: WhichQuestion): CardMessage {
+  return whichCardMessage({ kind: "which-card", decision: question.decision, cards: question.cards }, question.decided);
 }
 
 /** One card's button: the decision and the card's number in the list above. */
@@ -127,10 +152,29 @@ export async function runWhichCardDoor(press: WhichPress, deps: WhichCardDoorDep
     return;
   }
 
+  // A win drops its card from the question it is kept on (`button-door.ts`,
+  // `dropFromWhichQuestion`). When that is this question, it is redrawn here,
+  // where it was pressed, from its record — and only once.
+  let redrawn = false;
   await runButtonDoor(
     { channel: press.channel, messageTs: press.cardTs, decision: press.decision, userId: press.userId },
-    { ...deps, replaceCard: (message) => deps.editCard(press.cardTs, message) },
+    {
+      ...deps,
+      replaceCard: (message) => deps.editCard(press.cardTs, message),
+      delivery: (target) => {
+        const delivery = deps.delivery(target);
+        return {
+          ...delivery,
+          redrawWhichCard: async (question) => {
+            if (question.questionTs !== press.questionTs) return delivery.redrawWhichCard(question);
+            redrawn = true;
+            await deps.replaceQuestion(keptQuestionMessage(question));
+          },
+        };
+      },
+    },
   );
+  if (redrawn) return;
 
   // Whatever the press came to — won, lost to another door, aged out — a card
   // that is no longer waiting keeps no button here. A read that fails says

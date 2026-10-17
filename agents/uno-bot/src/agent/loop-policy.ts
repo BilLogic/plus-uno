@@ -76,13 +76,16 @@ export const UNGATED_TOOL_BUDGET = 12;
 export const SUBREQUEST_CAP = 50; // Cloudflare free-plan EXTERNAL cap per invocation.
 // Reserved for delivery — NEVER spent on lookups: final post + one retry + the
 // pre-send review-judge model call + margin. A resolved card's edit to its
-// outcome (`Delivery.closeCard`) spends from it too, and only when
-// `CLOSE_CARD_HEADROOM` is left. (History writes are Durable Object hops,
+// outcome (`Delivery.closeCard`) spends from it too, and so does the redraw
+// of a "which one?" question that listed the card (`Delivery.redrawWhichCard`),
+// each only when `CLOSE_CARD_HEADROOM` is left. (History writes are Durable Object hops,
 // which live in the separate 1,000 internal bucket — see net.ts charge.)
 export const DELIVERY_RESERVE = 12;
 // What a decided card's edit needs left before it goes: the edit itself, and
 // the settle that clears the working signal after it. The edit is cosmetic and
 // the clear is not, so at the cap the card keeps Review and the clear goes.
+// The question's redraw asks the same after the card's edit has spent its
+// one, so near the cap the card is closed first and the question waits.
 export const CLOSE_CARD_HEADROOM = 2;
 // Lookups run under this limit; delivery runs unlimited against the real cap.
 export const LOOKUP_CEILING = SUBREQUEST_CAP - DELIVERY_RESERVE;

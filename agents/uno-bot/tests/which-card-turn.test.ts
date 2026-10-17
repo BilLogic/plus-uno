@@ -210,4 +210,69 @@ test("a typed ✅ on the one live card closes it to its outcome", async () => {
     closed.map((c) => [c.card.ts, c.outcome]),
     [[first.staged!.proposal.proposalTs, { decision: "confirm", by: "U1" }]],
   );
+  assert.deepEqual(redraws(h), [], "no question was asked, so none is redrawn");
+});
+
+/** Every redraw of an open "which one?" question the turns asked for. */
+function redraws(h: Harness) {
+  return h.delivery.calls.flatMap((c) => (c.kind === "redraw-which" ? [c.question] : []));
+}
+
+test("a card decided in words drops out of the open \"Cancel which one?\": its button goes, its number stays", async () => {
+  // Live 2026-10-17: "Cancel the mobile expiry-line one" canceled card 2, and
+  // the question above kept its "Cancel 2" button.
+  const resolve = { toolCalls: [{ name: "proposal_resolve", args: { decision: "cancel", card: "" } as Record<string, unknown> }] };
+  const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B), resolve] });
+  const { a, b } = await twoCards(h);
+  await turn(h, { text: "⛔", userMsgTs: "1700000000.000400" });
+  assert.deepEqual(redraws(h), [], "asking redraws nothing");
+
+  resolve.toolCalls[0]!.args.card = a;
+  await turn(h, { text: "Cancel the backup tutor one.", userMsgTs: "1700000000.000500" });
+
+  const [redrawn, ...more] = redraws(h);
+  assert.equal(more.length, 0, "one redraw");
+  assert.equal(redrawn?.decision, "cancel");
+  assert.deepEqual(redrawn?.cards.map((c) => c.ts), [b, a], "the list keeps every card, in its numbered order");
+  assert.deepEqual(redrawn?.decided, [a], "the card decided is marked");
+  const asked = h.delivery.calls.findIndex((c) => c.kind === "gate-note" && c.note.kind === "which-card");
+  const closed = h.delivery.calls.findIndex((c) => c.kind === "close-card");
+  const drawn = h.delivery.calls.findIndex((c) => c.kind === "redraw-which");
+  assert.ok(asked < closed && closed < drawn, "the card is closed first, then the question redrawn");
+});
+
+test("the last card left, decided with a typed ✅, leaves the question with no buttons, and its record goes", async () => {
+  const resolve = { toolCalls: [{ name: "proposal_resolve", args: { decision: "cancel", card: "" } as Record<string, unknown> }] };
+  const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B), resolve] });
+  const { a, b } = await twoCards(h);
+  await turn(h, { text: "⛔", userMsgTs: "1700000000.000400" });
+  resolve.toolCalls[0]!.args.card = a;
+  await turn(h, { text: "Cancel the backup tutor one.", userMsgTs: "1700000000.000500" });
+
+  await turn(h, { text: "✅", userMsgTs: "1700000000.000600" });
+
+  assert.deepEqual(h.resolved.map((r) => r.decision), ["cancel", "confirm"]);
+  assert.deepEqual(redraws(h).map((q) => q.decided), [[a], [a, b]]);
+  assert.equal(await h.threadState.decideInWhichQuestion(b), null, "nothing is kept once every card is decided");
+});
+
+test("the question the model's undirected \"yes\" asked is kept too, and a card later approved by name drops out of it", async () => {
+  const resolve = { toolCalls: [{ name: "proposal_resolve", args: { decision: "confirm", card: "" } as Record<string, unknown> }] };
+  const h = harness({
+    replies: [
+      call("notion_create", PRD_A),
+      call("notion_create", PRD_B),
+      { toolCalls: [{ name: "proposal_resolve", args: { decision: "confirm" } }] },
+      { text: "Which one do you mean?" },
+      resolve,
+    ],
+  });
+  const { a, b } = await twoCards(h);
+  await turn(h, { text: "yes", userMsgTs: "1700000000.000400" });
+
+  resolve.toolCalls[0]!.args.card = b;
+  await turn(h, { text: "the session reflections one", userMsgTs: "1700000000.000500" });
+
+  assert.deepEqual(redraws(h).map((q) => [q.decision, q.decided]), [["confirm", [b]]]);
+  assert.deepEqual(await live(h), [a]);
 });

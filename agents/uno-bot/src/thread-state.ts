@@ -10,7 +10,8 @@
 //
 // Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `exec:{ts}`, `report:{ts}`,
 // `event:{event_id}`, `actx:{channel}:{thread}`, `cancel:{channel}:{thread}`,
-// `run:{user}`, `filing:{key}`, `cmp:{channel}:{thread}:{scenario}` (a check's record), `chk:{ts}`, and the
+// `run:{user}`, `filing:{key}`, `cmp:{channel}:{thread}:{scenario}` (a check's record), `chk:{ts}`,
+// `whq:{ts}` (an open "which one?" question) and `whc:{ts}` (a card it lists), and the
 // alarm's own `gc:next`.
 //
 // ── THE CONTRACT IS THIS CLASS'S OWN SIGNATURE (#493, #494) ─────────────────
@@ -24,7 +25,7 @@
 // `reportCutOffNote`, `get/putAssistantContext`, `requestCancel`,
 // `consumeCancel`, `cancelForUser`, `setActiveRun`, `checkAndRecordEvent`,
 // `claimRun`, `markRunDone`, `claimFiling`, `settleFiling`, `claimCheck`, `getCheck`, `stepCheck`,
-// `putCheckOffer`, `getCheckOffer`. A rename is a type error rather than a runtime
+// `putCheckOffer`, `getCheckOffer`, `putWhichQuestion`, `decideInWhichQuestion`. A rename is a type error rather than a runtime
 // 404, which is the whole point.
 //
 // There is NO `fetch()` and no route table. Until #494 this class carried a
@@ -93,6 +94,12 @@ import {
   checkOfferKey,
   type BlueprintCheckOffer,
   type CheckOfferRecord,
+  decidedInQuestion,
+  whichCardKey,
+  whichQuestionKey,
+  type WhichCardPointer,
+  type WhichQuestion,
+  type WhichQuestionRecord,
   decidedNoteOf,
   decidedOf,
   decidedPayload,
@@ -120,6 +127,7 @@ import {
   type ThreadRef,
 } from "./thread-state/store";
 import type { AssistantContext } from "./slack/types";
+import { cardLiveAt } from "./card-expiry";
 import {
   outageOnFailure,
   outageOnRelease,
@@ -368,6 +376,18 @@ export class ThreadState extends DurableObject<Env> {
       const checkOffers = await txn.list<CheckOfferRecord>({ prefix: "chk:" });
       for (const [key, rec] of checkOffers) {
         if (now - rec.at > CHECK_OFFER_KEEP_MS) await txn.delete(key);
+        else remaining++;
+      }
+      // A question lapses with its buttons, on the card rule from its put, and
+      // a card's pointer with it.
+      const questions = await txn.list<WhichQuestionRecord>({ prefix: "whq:" });
+      for (const [key, rec] of questions) {
+        if (!cardLiveAt(rec.at, now)) await txn.delete(key);
+        else remaining++;
+      }
+      const pointers = await txn.list<WhichCardPointer>({ prefix: "whc:" });
+      for (const [key, rec] of pointers) {
+        if (!cardLiveAt(rec.at, now)) await txn.delete(key);
         else remaining++;
       }
       const filings = await txn.list<FilingRecord>({ prefix: "filing:" });
@@ -1079,6 +1099,43 @@ export class ThreadState extends DurableObject<Env> {
   async getCheckOffer(offerTs: string, at: number): Promise<BlueprintCheckOffer | null> {
     const rec = await this.storage.get<CheckOfferRecord>(checkOfferKey(offerTs));
     return rec && at - rec.at <= CHECK_OFFER_KEEP_MS ? rec.offer : null;
+  }
+
+  // ----- the open "which one?" question -----
+  //
+  // A question and its cards' pointers are put together, and a decision reads
+  // and marks them in one transaction, so of two doors deciding one card only
+  // one is handed the question to redraw.
+
+  async putWhichQuestion(question: WhichQuestion, at: number): Promise<void> {
+    await this.storage.transaction(async (txn) => {
+      await txn.put<WhichQuestionRecord>(whichQuestionKey(question.questionTs), { question, at });
+      for (const card of question.cards) {
+        await txn.put<WhichCardPointer>(whichCardKey(card.ts), { questionTs: question.questionTs, at });
+      }
+      await this.ensureGcAlarm(txn);
+    });
+  }
+
+  async decideInWhichQuestion(cardTs: string, at: number): Promise<WhichQuestion | null> {
+    return this.storage.transaction(async (txn) => {
+      const pointer = await txn.get<WhichCardPointer>(whichCardKey(cardTs));
+      if (!pointer) return null;
+      const key = whichQuestionKey(pointer.questionTs);
+      const rec = await txn.get<WhichQuestionRecord>(key);
+      const { question, keep } = decidedInQuestion(rec, cardTs, at);
+      // The card is decided, or its question is gone: its pointer is spent.
+      await txn.delete(whichCardKey(cardTs));
+      if (keep) await txn.put<WhichQuestionRecord>(key, keep);
+      else {
+        await txn.delete(key);
+        for (const card of rec?.question.cards ?? []) {
+          const other = await txn.get<WhichCardPointer>(whichCardKey(card.ts));
+          if (other?.questionTs === pointer.questionTs) await txn.delete(whichCardKey(card.ts));
+        }
+      }
+      return question;
+    });
   }
 
   // ----- the capacity outage (turn/capacity-outage.ts) -----

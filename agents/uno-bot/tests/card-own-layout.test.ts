@@ -190,6 +190,23 @@ describe("a card decided outside its own buttons", () => {
     assert.equal(await closeWith(CLOSE_CARD_HEADROOM), 1);
   });
 
+  it("redraws the \"which one?\" question listing it from its record, in the same reserve as the card's edit", async () => {
+    const question = {
+      questionTs: "1790000000.000300", channel: CHANNEL, replyTs: ROOT, decision: "cancel" as const,
+      cards: [{ ts: "1790000000.000250", headline: "Other card" }, { ts: CARD, headline: "Sweep card" }], decided: [CARD],
+    };
+    const redrawWith = async (headroom: number) => {
+      const slack = recordingSlack();
+      await runMetered(() => withSubrequestLimit(headroom, () => deliveryAdapter(slack.deps(false), target).redrawWhichCard(question)));
+      return slack.of("update");
+    };
+    assert.deepEqual(await redrawWith(CLOSE_CARD_HEADROOM - 1), [], "the clear keeps its subrequest");
+    const [edited] = await redrawWith(CLOSE_CARD_HEADROOM);
+    assert.equal(edited?.ts, question.questionTs, "the question is what is edited");
+    assert.deepEqual(buttons(edited!.blocks as Block[]), ["Cancel 1"], "card 2's button is gone; card 1 keeps its number");
+    assert.match(JSON.stringify(edited!.blocks), /~2\. Sweep card~/);
+  });
+
   it("by a reaction that wins it", async () => {
     const slack = await reactOn(async (s) => void (await s.putProposal(proposal())));
     const blocks = edit(slack);

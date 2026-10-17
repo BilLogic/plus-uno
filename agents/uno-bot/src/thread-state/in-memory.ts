@@ -46,6 +46,9 @@ import {
   comparisonKey,
   CHECK_OFFER_KEEP_MS,
   type CheckOfferRecord,
+  decidedInQuestion,
+  type WhichCardPointer,
+  type WhichQuestionRecord,
   decidedNoteOf,
   decidedOf,
   decidedPayload,
@@ -138,6 +141,10 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
   const checks = new Map<string, CheckRecord>();
   /** Each Check it offer, by its message ts, with when it was put. */
   const checkOffers = new Map<string, CheckOfferRecord>();
+  /** Each open "which one?" question, by its message ts, and each card it
+   *  lists, pointing at it. */
+  const whichQuestions = new Map<string, WhichQuestionRecord>();
+  const whichCards = new Map<string, WhichCardPointer>();
   const executions = new Map<string, Execution>();
 
   /** Take an execution if it has been cut off; drop it if it has aged out;
@@ -594,6 +601,29 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         return null;
       }
       return structuredClone(rec.offer);
+    },
+
+    async putWhichQuestion(question) {
+      const at = now();
+      whichQuestions.set(question.questionTs, { question: structuredClone(question), at });
+      for (const card of question.cards) whichCards.set(card.ts, { questionTs: question.questionTs, at });
+    },
+
+    async decideInWhichQuestion(cardTs) {
+      const pointer = whichCards.get(cardTs);
+      if (!pointer) return null;
+      const rec = whichQuestions.get(pointer.questionTs);
+      const { question, keep } = decidedInQuestion(rec, cardTs, now());
+      // The card is decided, or its question is gone: its pointer is spent.
+      whichCards.delete(cardTs);
+      if (keep) whichQuestions.set(pointer.questionTs, keep);
+      else {
+        whichQuestions.delete(pointer.questionTs);
+        for (const card of rec?.question.cards ?? []) {
+          if (whichCards.get(card.ts)?.questionTs === pointer.questionTs) whichCards.delete(card.ts);
+        }
+      }
+      return question ? structuredClone(question) : null;
     },
   };
 }

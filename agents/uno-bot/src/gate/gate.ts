@@ -54,7 +54,7 @@ import type {
   StatedCardWords,
   ThreadState,
 } from "../thread-state/index";
-import type { CardOutcome, GateNote } from "../turn/index";
+import type { CardOutcome, Delivery, GateNote } from "../turn/index";
 import { cardHeadline } from "../agent/card-identity";
 
 // ── The signal ───────────────────────────────────────────────────────────────
@@ -369,6 +369,32 @@ export function decidedCardOf(verdict: GateVerdict): { card: GateCard; outcome: 
   if (!outcome || !proposal || proposal.item) return null;
   const { card } = cardOf(proposal.proposalTs, proposal);
   return card ? { card, outcome } : null;
+}
+
+/**
+ * A decided card, dropped from the open "Approve which one?" question that
+ * lists it: the question's record is marked (`decideInWhichQuestion`) and the
+ * question redrawn without that card's button (`Delivery.redrawWhichCard`).
+ * Every door that decides a card ends through here once the card itself is
+ * closed — the turn's typed emoji and `proposal_resolve`, a reaction, a press
+ * on the card or in its Review pop-up — so a card decided anywhere stops
+ * being offered on the question. Only the door that marks it redraws, so two
+ * doors racing on one card edit the question once. Best-effort: a failed read
+ * leaves the question as it was, and its button's press says the card is
+ * decided.
+ *
+ * @param cardTs - The card a door just decided
+ * @param deps - The store the question is kept in, and the door's Delivery
+ */
+export async function dropFromWhichQuestion(
+  cardTs: string,
+  deps: { threadState: Pick<ThreadState, "decideInWhichQuestion">; delivery: Pick<Delivery, "redrawWhichCard"> },
+): Promise<void> {
+  const question = await deps.threadState.decideInWhichQuestion(cardTs).catch((err: unknown) => {
+    console.warn(`[gate] which-card question for ${cardTs} not read: ${err instanceof Error ? err.message : String(err)}`);
+    return null;
+  });
+  if (question) await deps.delivery.redrawWhichCard(question);
 }
 
 /**

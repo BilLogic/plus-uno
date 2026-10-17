@@ -19,10 +19,10 @@
 //
 // PURE as the turn is: no `Env`, no Workers type, no fetch.
 
-import { decidedCardOf, type GateVerdict } from "../gate/index";
-import { proposalReplyThread, type HistoryTurn, type PendingProposal } from "../thread-state/index";
+import { decidedCardOf, dropFromWhichQuestion, type GateVerdict } from "../gate/index";
+import { proposalReplyThread, type HistoryTurn, type PendingProposal, type ThreadState } from "../thread-state/index";
 import { restageExecution } from "./card-staging";
-import type { TurnSettlement } from "./delivery";
+import type { GateNote, PostResult, TurnSettlement } from "./delivery";
 import type { TurnDeps, TurnDisposition, TurnOutcome, TurnRequest, TurnTelemetry } from "./turn";
 
 /** The part of the turn's memory a verdict writes: the exchange, both
@@ -159,6 +159,8 @@ export async function settleVerdict(
   verdict: GateVerdict,
   ctx: {
     deps: TurnDeps;
+    /** The turn's channel: where a "which one?" it asks is kept as asked. */
+    channel: string;
     memory: VerdictMemory;
     telemetry: TurnTelemetry;
     note?: string;
@@ -169,6 +171,9 @@ export async function settleVerdict(
   const said = verdict.post
     ? await ctx.deps.delivery.postGateNote(verdict.post.note, verdict.post.card)
     : undefined;
+  if (verdict.post && said) {
+    await keepWhichQuestion(verdict.post.note, said, { channel: ctx.channel, replyTs: verdict.post.replyTs }, ctx.deps.threadState);
+  }
   const posted = said?.text;
   const executed = await ctx.deps.applyVerdict(verdict);
   const remembered = (verdict.outcome === "won" ? ctx.note : undefined) ?? posted;
@@ -191,7 +196,11 @@ export async function settleVerdict(
   // the adapter sends it only while the settle after it still fits the
   // delivery reserve (`CLOSE_CARD_HEADROOM`).
   const decided = decidedCardOf(verdict);
-  if (decided) await ctx.deps.delivery.closeCard(decided.card, decided.outcome);
+  if (decided) {
+    await ctx.deps.delivery.closeCard(decided.card, decided.outcome);
+    // And a "which one?" that lists it stops offering it, after the card.
+    await dropFromWhichQuestion(decided.card.ts, ctx.deps);
+  }
   // "Approve which one?" resolved nothing: it asked, and every card it names
   // is still waiting on the person (#1319).
   const asked = verdict.post?.note.kind === "which-card";
@@ -202,4 +211,37 @@ export async function settleVerdict(
     telemetry: ctx.telemetry,
     ...(executed ? { executed } : {}),
   };
+}
+
+/**
+ * A "which one?" question, kept as it was posted (`putWhichQuestion`), so a
+ * card it lists can be dropped from it by whichever door decides that card
+ * (`dropFromWhichQuestion`). Anything else, or a question that did not post,
+ * keeps nothing. Best-effort: a question not kept still works, its own
+ * presses redrawing it; only a decision made elsewhere leaves its button up.
+ *
+ * @param note - The gate note posted
+ * @param said - What its post did
+ * @param where - The channel, and the reply thread it was posted in
+ * @param threadState - The store it is kept in
+ */
+export async function keepWhichQuestion(
+  note: GateNote,
+  said: PostResult,
+  where: { channel: string; replyTs?: string },
+  threadState: Pick<ThreadState, "putWhichQuestion">,
+): Promise<void> {
+  if (note.kind !== "which-card" || !said.ok || !said.ts) return;
+  await threadState
+    .putWhichQuestion({
+      questionTs: said.ts,
+      channel: where.channel,
+      ...(where.replyTs ? { replyTs: where.replyTs } : {}),
+      decision: note.decision,
+      cards: note.cards,
+      decided: [],
+    })
+    .catch((err: unknown) => {
+      console.warn(`[turn] which-card question ${where.channel}/${said.ts} not kept: ${err instanceof Error ? err.message : String(err)}`);
+    });
 }
