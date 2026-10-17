@@ -13,6 +13,11 @@ import { ELIDED_LINE, keepLastLine, splitBalanced } from "../src/slack/split";
 function fenceCount(s: string): number {
   return s.split("\n").filter((l) => /^\s*```/.test(l)).length;
 }
+/** UTF-8 bytes, as Slack measures a chat.update `text`. */
+const bytes = (s: string) => new TextEncoder().encode(s).length;
+/** A high surrogate with no low one after it, or a low one with no high one
+ *  before it: half an emoji, which Slack shows as a replacement character. */
+const LONE_SURROGATE = /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/;
 function assertAllBalanced(chunks: string[]): void {
   chunks.forEach((c, i) => {
     assert.equal(fenceCount(c) % 2, 0, `chunk ${i} has an unclosed fence:\n${c}`);
@@ -123,6 +128,19 @@ describe("a single line longer than the limit", () => {
     for (const c of chunks) assert.ok(c.length <= 100);
     assert.equal(chunks.join("").length, 500);
   });
+
+  it("does not cut an emoji in half when there is no space to cut at", () => {
+    // Limits whose cut lands between the halves of a pair on at least one
+    // chunk: a line is cut at `limit - 1`, so the first chunk's cut splits a
+    // pair whenever the unit before it is a high surrogate.
+    const text = "x🐐".repeat(300);
+    for (const limit of [99, 120, 150]) {
+      assert.match(text[limit - 2]!, /[\uD800-\uDBFF]/, `a cut at ${limit - 1} would split a pair`);
+      const chunks = splitBalanced(text, limit);
+      for (const c of chunks) assert.doesNotMatch(c, LONE_SURROGATE, c);
+      assert.equal(chunks.join(""), text);
+    }
+  });
 });
 
 describe("whitespace", () => {
@@ -177,6 +195,34 @@ describe("keepLastLine", () => {
     const cut = keepLastLine("word ".repeat(200).trim(), 300);
     assert.ok(cut.length <= 300);
     assert.ok(cut.endsWith(`\n${ELIDED_LINE}`));
+  });
+
+  // Slack counts an edit's text in UTF-8 bytes (api.ts § UPDATE_TEXT_BYTES),
+  // and a card's "·", "—", "›" and emoji are two to four bytes each.
+  it("holds a text of multi-byte characters to the limit in bytes", () => {
+    const line = (i: number) => `Step ${i} · Supervisor lane — asks around › confirms by DM 🐐`;
+    const text = `${Array.from({ length: 14 }, (_, i) => line(i + 1)).join("\n")}\nRejected, so nothing runs.`;
+    assert.ok(text.length < 900 && bytes(text) > 900, `${text.length} chars / ${bytes(text)} bytes`);
+    const cut = keepLastLine(text, 900);
+    assert.ok(bytes(cut) <= 900, `${bytes(cut)} bytes`);
+    assert.ok(cut.startsWith(line(1)));
+    assert.ok(cut.endsWith(`\n${ELIDED_LINE}\nRejected, so nothing runs.`));
+    assert.doesNotMatch(cut, LONE_SURROGATE);
+  });
+
+  it("leaves a multi-byte text that fits in bytes as it is", () => {
+    const text = "🐐".repeat(150);
+    assert.equal(keepLastLine(text, 600), text);
+  });
+
+  it("does not cut an emoji in half", () => {
+    // Budgets that fit 64, 65 and 66 goats beside the elided line.
+    for (const limit of [300, 305, 310]) {
+      const cut = keepLastLine("🐐".repeat(400), limit);
+      assert.ok(bytes(cut) <= limit, `${bytes(cut)} bytes`);
+      assert.doesNotMatch(cut, LONE_SURROGATE, cut);
+      assert.ok(cut.endsWith(`\n${ELIDED_LINE}`));
+    }
   });
 
   it("does not keep a bare fence as the last line", () => {
