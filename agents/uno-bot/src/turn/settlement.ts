@@ -5,7 +5,8 @@
 // person is a fact about the THREAD, not about the turn that just ran: a turn
 // that answered, failed or resolved one card leaves the thread waiting while
 // another card is live in it (#1319). `settlementOf` is the one place that
-// mapping lives, `liveCardsOf` says which cards are waiting, and
+// mapping lives. `liveCardsOf` says which cards are waiting, and `cardLiveIn`
+// and `moreLiveIn` which of them are live in the turn's own reply thread.
 // `settleVerdict` is the door both of the turn's gate paths — the typed emoji
 // and the model's own `proposal_resolve` — end through, so a lost race reads
 // the same on each.
@@ -14,15 +15,22 @@
 // new waiting rule or a new verdict shape edits this file and leaves the turn
 // loop (`turn.ts`) and card staging (`card-staging.ts`) alone. A verdict that
 // re-stages a cut-off run hands that to card staging (`restageExecution`),
-// which is why this module sits above it and never the other way round.
+// which is why this module sits above it and never the other way around.
 //
 // PURE as the turn is: no `Env`, no Workers type, no fetch.
 
 import type { GateVerdict } from "../gate/index";
-import type { PendingProposal } from "../thread-state/index";
+import { proposalReplyThread, type HistoryTurn, type PendingProposal } from "../thread-state/index";
 import { restageExecution } from "./card-staging";
 import type { TurnSettlement } from "./delivery";
-import type { ThreadMemory, TurnDeps, TurnDisposition, TurnOutcome, TurnRequest, TurnTelemetry } from "./turn";
+import type { TurnDeps, TurnDisposition, TurnOutcome, TurnRequest, TurnTelemetry } from "./turn";
+
+/** The part of the turn's memory a verdict writes: the exchange, both
+ *  halves in order, and what has been written so far. */
+interface VerdictMemory {
+  remember(assistantText: string): Promise<void>;
+  wrote(): { turns: HistoryTurn[]; compacted: number };
+}
 
 /**
  * What the turn leaves the thread needing — the one place the mapping lives.
@@ -95,6 +103,28 @@ export function settlementOf(settle: {
 }
 
 /**
+ * Whether the card the turn was handed is live in the turn's reply thread —
+ * the thread's card as of the turn's START, which `settlementOf` reads.
+ *
+ * @param turnThread - The turn's reply thread (`cardThreadOf`)
+ */
+export function cardLiveIn(request: Pick<TurnRequest, "pending">, turnThread: string): boolean {
+  return request.pending
+    ? proposalReplyThread(request.pending) === turnThread
+    : false;
+}
+
+/**
+ * Whether a SECOND card is live in the turn's reply thread (#1318): a
+ * resolution consumes one card, never the thread's others.
+ *
+ * @param turnThread - The turn's reply thread (`cardThreadOf`)
+ */
+export function moreLiveIn(request: Pick<TurnRequest, "pending" | "liveCards">, turnThread: string): boolean {
+  return liveCardsOf(request).filter((card) => proposalReplyThread(card) === turnThread).length > 1;
+}
+
+/**
  * Every card waiting in the turn's reply thread, newest first: the caller's
  * list, with `pending` in it — a card a Needs changes sent back is the one
  * the turn was queued for, wherever the list puts it. With no list, the one
@@ -129,7 +159,7 @@ export async function settleVerdict(
   verdict: GateVerdict,
   ctx: {
     deps: TurnDeps;
-    memory: ThreadMemory;
+    memory: VerdictMemory;
     telemetry: TurnTelemetry;
     note?: string;
     /** A line after the verdict's note and before any re-staged card. */

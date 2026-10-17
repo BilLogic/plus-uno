@@ -598,10 +598,11 @@ function revisionBody(revision: CardRevision): string {
  * A caveat, in words.
  *
  * WHETHER a caveat is on the card is the turn's judgment and lives in
- * `turn/card-staging.ts`; this is only how each one reads. Every one of them is informed
- * consent rather than decoration — "stage, but flag gaps loudly" (Bill,
- * 2026-07-16) — which is why they sit above the footer and not in the prompt: a
- * weaker model provider cannot silently skip a disclosure the renderer writes.
+ * `turn/card-staging.ts`; this is only how each one reads. Every one of them
+ * is informed consent rather than decoration — "stage, but flag gaps loudly"
+ * (Bill, 2026-07-16) — which is why they sit above the footer and not in the
+ * prompt: a weaker model provider cannot silently skip a disclosure the
+ * renderer writes.
  */
 function caveatText(caveat: CardCaveat): string {
   if (caveat.kind === "cut-off-rerun") {

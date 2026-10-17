@@ -1,14 +1,18 @@
 // Card staging — building a card for a batch and putting it into its matter's
 // slot.
 //
-// Three doors stage a card, and they must stage the same card: a turn whose
-// model proposed a batch (`runTurn`), a button that asked for one with no
-// model in the loop (`stageFromButton`), and a cut-off run put back in front
-// of a person (`restageExecution`). Each reads the same parts — the card the
-// batch gets (`buildCard`), what each page says now (`batchBefore`), the
-// deadline it says and the lifetime it keeps (`cardWindow`), and the record of
-// what Slack took, in its slot (`stagedTurnCard`) — so a card looks and lives
-// the same whichever door put it up.
+// Four doors stage a card, and they must stage the same card. Three stage it
+// here: a turn whose model proposed a batch (`stageTurnCard`), a button that
+// asked for one with no model in the loop (`stageFromButton`), and a cut-off
+// run put back in front of a person (`restageExecution`). The fourth, a sweep
+// card's "drop N" revision (`turn.ts` `dropFromSweepCard`), builds its card
+// and its deadline here but writes its own record, because it keeps the sweep
+// card's slot and terms and cancels through the gate when nothing is left.
+// Every door reads the same parts — the card the batch gets (`buildCard`),
+// the deadline it says and the lifetime it keeps (`cardWindow`), and, for the
+// three, what each page says now (`batchBefore`) and the record of what Slack
+// took, in its slot (`stagedTurnCard`) — so a card looks and lives the same
+// whichever door put it up.
 //
 // AND THE CARD IS DATA (#623). `buildCard` decides which card a staged
 // proposal gets, what verb names it, which caveats a person must see and which
@@ -31,12 +35,14 @@ import { collectStrings } from "../agent/tool-input";
 import { gateWordsFor } from "../agent/tool-table";
 import { cardExpiresAt } from "../card-expiry";
 import type { GateRestage } from "../gate/index";
+import { asSweepRevision } from "../sweep/cards";
 import { sweepShareCard, SWEEP_SHARE_KEY } from "../sweep/share";
 import {
   inheritedTerms,
   ownBlocks,
   proposalTtlMs,
   stagingCardOf,
+  SWEEP_KEY,
   turnCardKey,
   type PendingProposal,
   type ProposalOperation,
@@ -50,6 +56,7 @@ import {
   supersededEvents,
   type ProposalEventLog,
   type StagedAs,
+  type TeamRoles,
 } from "../usage/index";
 import type {
   CardAsk,
@@ -60,7 +67,34 @@ import type {
   PostResult,
   ProposalCard,
 } from "./delivery";
+import { stagingNote, type CardMatter } from "./card-matter";
+import { intakeConfirmers } from "./intake-channel";
 import type { CardAsked, TurnDeps, TurnRequest, TurnUsage } from "./turn";
+
+// ── Staging ──────────────────────────────────────────────────────────────────
+
+/** What a card this turn stages is recorded with (`usage/proposal-events.ts`). */
+export interface StagingFacts {
+  /** This turn's row — the staged event's join to `turns`. */
+  turnId: string;
+  testTraffic: boolean;
+  /** Whether the card may name its channel: `turns`' rule for DMs. */
+  channelStored: boolean;
+  /** The turn's clock. */
+  now: () => number;
+}
+
+/** The role map for a staged card; a read that fails reads as no map, so
+ *  every role is unknown and the card is staged all the same. */
+export async function teamRolesOf(usage: TurnUsage): Promise<TeamRoles> {
+  // The roles only label a usage record, which never costs the turn its
+  // reply: any failure here, a budget stop included, records no roles.
+  try {
+    return (await usage.teamRoles?.()) ?? {};
+  } catch {
+    return {};
+  }
+}
 
 /**
  * The thread a card is staged in and the ask it answers — what every card
@@ -149,6 +183,232 @@ export function stagedTurnCard(card: {
         : {}
       : { supersedeKey: turnCardKey(posted.ts) }),
   };
+}
+
+/**
+ * What staging a turn's card came to: declined on an answer-only surface,
+ * refused by Slack or the store, or staged — the record, the card as shown,
+ * what Slack took, and whether an item was revised in its report.
+ */
+export type TurnCardStaging =
+  | { kind: "declined"; text: string; remembered: string }
+  | { kind: "failed" }
+  | {
+      kind: "staged";
+      proposal: PendingProposal;
+      shown: ProposalCard;
+      text: string;
+      /** What the thread remembers of the card: its lead and its text. */
+      remembered: string;
+      inPlace: boolean;
+    };
+
+/**
+ * Stage the card a turn's model proposed into its matter's slot: retire the
+ * card it replaces ahead of it, build it, post it — or revise an item in its
+ * report — store it, and record it. The card it replaces goes back as it was
+ * when the new one never stages. What the person is told, and what the
+ * thread remembers, is the turn's (`turnBody`).
+ *
+ * @param result - The batch the model proposed
+ * @param at - The turn's request, deps and staging facts; the matter and the
+ *   card it replaces (`cardMatter`); the cards live beside it; the call it
+ *   undid; and the time the replaced card had left, as the turn read it
+ */
+export async function stageTurnCard(
+  result: Extract<AgentResult, { kind: "proposal" }>,
+  at: {
+    request: TurnRequest;
+    deps: TurnDeps;
+    staging: StagingFacts;
+    matter: Extract<CardMatter, { kind: "revision" | "separate" }>;
+    replaced: PendingProposal | null;
+    liveCards: readonly PendingProposal[];
+    corrects: string | undefined;
+    replacedLeftMs: number | undefined;
+    sweepLeftMs: number | undefined;
+    itemLeftMs: number | undefined;
+  },
+): Promise<TurnCardStaging> {
+  const { request, deps, staging, matter, replaced, liveCards, corrects, replacedLeftMs, sweepLeftMs, itemLeftMs } = at;
+  const { delivery, threadState } = deps;
+  const prd = request.prd ?? null;
+
+  // A different proposal is already pending: retire it, because the card about
+  // to go up replaces it. RETIRE, never claim (#583): a claim DELETES, and the
+  // record deleted here is the one a late ✅ needs in order to be told its card
+  // was replaced. With the delete in place the by-ts lookup answered "none",
+  // Gate fell through to the thread's newest card, and the person got "it is
+  // not on the proposal I am holding" — true of a reaction that missed, and the
+  // wrong thing to say to someone whose card was revised out from under them.
+  // Observed live in `#uno-bot-sandbox` against r332.
+  //
+  // Here rather than after the card posts, even though `putProposal` retires
+  // the thread's pending card too: this closes the seconds the revision spends
+  // being written, during which the old card would otherwise still execute the
+  // input the person just pushed back on.
+  const retiredAhead =
+    replaced && (await threadState.retireProposal(replaced.proposalTs)).retired ? [replaced.proposalTs] : [];
+  // On the record only when a retire took a live card out of reach — not one
+  // a ✅ claimed meanwhile, which has its own outcome — and only once its
+  // revision is staged: a revision that never stages gives the card back.
+  const recordSuperseded = (retired: readonly string[]) =>
+    recordProposalEvents(
+      deps.usage.proposalEvents,
+      supersededEvents(retired, staging.now(), "revision"),
+      deps.usage.writeTimeoutMs,
+    );
+  // The card retired ahead, back as it was for the time it had left, when
+  // the card that was to replace it was declined or never posted: nothing
+  // replaced it, so it still waits. A card that cannot be put back is out of
+  // reach after all, and is recorded so, lest it later read as aged out.
+  const giveBackReplaced = async (): Promise<void> => {
+    if (!replaced || !retiredAhead.length) return;
+    try {
+      await threadState.putProposal({ ...replaced, ttlMs: replacedLeftMs });
+    } catch (err) {
+      console.error(`[turn] ${replaced.proposalTs} not given back: ${err instanceof Error ? err.message : String(err)}`);
+      await recordSuperseded(retiredAhead);
+    }
+  };
+
+  const built = await buildCard(result, deps, request.surface === "assistant", { channel: request.channel, requestedBy: request.userId });
+  // A revision of a sweep card is still one, so replies under it are read by
+  // the sweep's rule.
+  // A report's fix is redrawn in its report instead.
+  const card = replaced?.sweepRun && !replaced.item ? asSweepRevision(built) : built;
+  // What each page says now: Review's Before, by operation. Read before the
+  // card posts, so the proposal is saved the moment it does.
+  const before = await batchBefore(result.operations, card.revision, deps.cards);
+  // Anything the batch's plan needs posted BEFORE the card — because the card
+  // holds the ✅/⛔ buttons and has to be the last message in the thread — is
+  // the adapter's to send, since it is Slack's message limits that decide
+  // whether there is anything to send at all (#623).
+  //
+  // An item of a decision report revises in place: its own card in the
+  // report's message, under the same number (`reportItems`), whichever report
+  // it is. An item whose report is gone posts as its own card, as any other.
+  const inPlace = replaced?.item && deps.reportItems
+    ? await deps.reportItems.revise(replaced.item, card).catch((err: unknown) => {
+        console.warn(`[turn] item ${replaced.item!.id} not revised in place: ${err instanceof Error ? err.message : String(err)}`);
+        return null;
+      })
+    : null;
+  // Say which it was, just above the card, so a wrong call is caught at once
+  // and corrected in one message: the card it replaced, or the cards still
+  // waiting beside it. Not for a report's item, which redraws in its report.
+  // It rides the card (`Delivery.card`'s `lead`): true only of a card that
+  // stages, so a declined card says neither and a failed one takes it back.
+  const announced = inPlace
+    ? null
+    : stagingNote(matter, liveCards.filter((card) => card.proposalTs !== replaced?.proposalTs));
+  // The card says its deadline and is staged with the lifetime that ends
+  // there, both from one reading of the clock (`cardWindow`): what is left of
+  // a sweep card's window, or the rule's from now. An item revised in place
+  // has none of its own to say: its report shows the deadline.
+  const window = cardWindow(staging.now(), sweepLeftMs);
+  const shown: ProposalCard = inPlace ? card : { ...card, expiresAt: window.expiresAt };
+  const posted = inPlace
+    ? { ok: true, text: inPlace.text, ts: inPlace.staged.proposalTs }
+    : await delivery.card(shown, announced ?? undefined);
+  // An answer-only surface declined the card on purpose: the person is told
+  // what it would have done instead, so the turn answered, and nothing stages.
+  const remembered = [posted.lead, posted.text].filter(Boolean).join("\n\n");
+  if (!inPlace && posted.declined) {
+    await giveBackReplaced();
+    return { kind: "declined", text: posted.text, remembered };
+  }
+  if (!posted.ok || !posted.ts) {
+    console.error(`[turn] proposal card was not staged (${result.toolName})`);
+    await giveBackReplaced();
+    return { kind: "failed" };
+  }
+
+  // Persisted the moment the card posts: it is reactable instantly, and a quick
+  // ✅ that lands before the proposal is saved would look up nothing and be
+  // silently lost. Save first so the confirmation always finds it.
+  const proposal: PendingProposal = {
+    // Until the deadline the card says; an item revised in place overrides
+    // it below with the time its item had left. Which call this turn made
+    // is kept, so the thread's next card can tell whether it undid it
+    // (`correctedCard`).
+    ...stagedTurnCard({
+      operations: result.operations,
+      toolName: result.toolName,
+      input: result.input,
+      origin: cardOriginOf(request),
+      posted: { ...posted, ts: posted.ts },
+      ttlMs: window.ttlMs,
+      before,
+      replaced,
+      stagedAs: matter.kind,
+    }),
+    ...(prd?.id ? { notionPrdId: prd.id } : {}),
+    ...(prd?.url ? { notionPrdUrl: prd.url } : {}),
+    // A revision of a sweep card stays a sweep card, in the sweep's slot, so
+    // its items are still recorded (`sweep/outcomes.ts`); it keeps the card's
+    // deadline, and its outcome joins the row the Worker's staging wrote. A
+    // rewording answers the same thread, so it keeps the fix's Issue.
+    ...(replaced?.sweepRun
+      ? {
+          sweepRun: replaced.sweepRun,
+          supersedeKey: replaced.supersedeKey ?? SWEEP_KEY,
+          ttlMs: sweepLeftMs,
+          originProposalTs: stagingCardOf(replaced),
+          ...(replaced.issue ? { issue: replaced.issue } : {}),
+        }
+      : {}),
+    // In #uno-bot the poster and the thread's repliers confirm, and a revision
+    // adds whoever staged it (`turn/intake-channel.ts`).
+    ...(request.intakeChannel
+      ? { confirmers: intakeConfirmers(request.intakeChannel, replaced, request.userId) }
+      : {}),
+    // An item revised in place is keyed on its report's message and its new
+    // entry, in the item's own slot, for the time the item had left.
+    ...(inPlace ? { ...inPlace.staged, ttlMs: itemLeftMs } : {}),
+  };
+  let retiredByStaging: string[];
+  try {
+    ({ retired: retiredByStaging } = await threadState.putProposal(proposal));
+  } catch (err) {
+    if (!inPlace || !replaced) throw err;
+    // The revision never staged, so the item it would have replaced goes back
+    // as it was, for the time it had left, and its card is left alone.
+    console.error(`[turn] revision of item ${replaced.item!.id} not staged: ${err instanceof Error ? err.message : String(err)}`);
+    const { revising: _lock, ...unlocked } = replaced;
+    await threadState.putProposal({ ...unlocked, ttlMs: itemLeftMs }).catch((restoreErr: unknown) => {
+      console.error(`[turn] item ${replaced.item!.id} not restored: ${restoreErr instanceof Error ? restoreErr.message : String(restoreErr)}`);
+    });
+    return { kind: "failed" };
+  }
+  // Swapped into the report only once staged, so a Review on the new card
+  // finds its proposal.
+  await inPlace?.place();
+  // On the record as soon as it is stored, so a ✅ that lands before the turn
+  // finishes finds the staged row and the turn id it joins to; a ticket that
+  // ✅ files waits on that row until the turn writes its own (`runTurn`).
+  await recordSuperseded([...retiredAhead, ...retiredByStaging]);
+  await recordProposalEvents(
+    deps.usage.proposalEvents,
+    [
+      stagedEvent({
+        proposal,
+        at: staging.now(),
+        via: "turn",
+        channelStored: staging.channelStored,
+        turnId: staging.turnId,
+        testTraffic: staging.testTraffic,
+        askText: request.text,
+        roles: await teamRolesOf(deps.usage),
+        // Which call this turn made, and the call it undid, for how often
+        // the bot tells matters apart (#1320).
+        stagedAs: matter.kind,
+        ...(corrects ? { corrects } : {}),
+      }),
+    ],
+    deps.usage.writeTimeoutMs,
+  );
+  return { kind: "staged", proposal, shown, text: posted.text, remembered, inPlace: !!inPlace };
 }
 
 /**

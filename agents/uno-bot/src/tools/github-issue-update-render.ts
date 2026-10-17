@@ -1,9 +1,9 @@
 // What a `github_issue_update` asks for, read out of the staged input — and the
 // words the card and the thread use for it.
 //
-// Pure, and apart from the executor, so the card (`turn/card-staging.ts`) and the
-// executor (`github-issue-update.ts`) read the same input the same way: what a
-// person approves is exactly what runs.
+// Pure, and apart from the executor, so the card (`turn/card-staging.ts`) and
+// the executor (`github-issue-update.ts`) read the same input the same way:
+// what a person approves is exactly what runs.
 
 import { TRIAGE_OUTCOME_LABELS } from "./github-issue-render";
 
