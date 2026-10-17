@@ -50,6 +50,7 @@ const CHARGED_STUB_CALLS = new Set([
   "scheduled/jobs.ts", // enqueueScheduledRun charges 1 for the run's AgentRunner hop
   "figma-notify/env.ts", // enqueueOnce charges 1 for the figma/events AgentRunner hop
   "tools/figma-dev-links.ts", // handOff charges 1 for the Dev Mode links AgentRunner hop
+  "slack/interactive.ts", // stopCheck charges 1 for the blueprint check runner's /cancel hop (#1322)
 ]);
 
 // A Durable Object RPC hop — `stub.readHistory(ref, at)` (#493) — is the same
