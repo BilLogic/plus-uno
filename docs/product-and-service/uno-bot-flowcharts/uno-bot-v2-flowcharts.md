@@ -168,7 +168,7 @@ stateDiagram-v2
 
 Key behaviors:
 - **State is stored in the Durable Object.** Keyed by the proposal message's `ts` (Slack message timestamp). When a reaction comes in, the Worker queries the DO by `item.ts` to find the matching pending call.
-- **24 weekday hours on pending proposals** (`cardExpiresAt`, `agents/uno-bot/src/card-expiry.ts`; the store stamps it as the card's `ttlMs`). Prevents stale proposals from being fired days later; a card's last line says its deadline.
+- **24 weekday hours on pending proposals** (`cardExpiresAt`, `agents/uno-bot/src/card-expiry.ts`; the store stamps it as the card's `ttlMs`). Prevents stale proposals from being fired days later; the card does not show its deadline, and says so once it has passed.
 - **User can cancel via ❌ or correction.** If they reply with a correction, the agent re-prompts (back to ProposalPosted with updated parameters).
 
 ---

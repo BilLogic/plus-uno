@@ -41,7 +41,7 @@ async function live(h: Harness): Promise<string[]> {
   return (await h.threadState.getProposalsByThread(REF)).map((p) => p.proposalTs).sort();
 }
 
-test("a typed ✅ with two live cards runs nothing and asks which, one button per card by headline", async () => {
+test("a typed ✅ with two live cards runs nothing and asks which, one numbered button per card", async () => {
   const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B)] });
   const { a, b } = await twoCards(h);
 

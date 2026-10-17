@@ -1,14 +1,14 @@
-// A proposal card says when it expires, and says so once it has (#1316).
+// A proposal card expires on the rule's deadline without saying when, and
+// says so once it has (#1316).
 //
-// Every card shows "Expires …" with its deadline in Slack's date markup, so
-// each reader sees their own timezone, and its text copy — what a
-// notification and the Review pop-up show — falls back to ET. Once the
-// deadline passes, the card's message reads "Expired. Ask again for a fresh
-// card." whichever path finds it: a late gesture, or the edit the store's
-// alarm hands over at the deadline itself.
+// No card shows "Expires …": not on the card, not in its text copy, not under
+// a report. The deadline is still enforced — the store lets the card go at
+// it. Once it passes, the card's message reads "Expired. Ask again for a
+// fresh card." whichever path finds it: a late gesture, or the edit the
+// store's alarm hands over at the deadline itself.
 //
-// Driven through the turn (a staged card shows its deadline; an expired card
-// says so) on the Slack spelling, so the assertion is what a person reads;
+// Driven through the turn (a staged card enforces its deadline unshown; an
+// expired card says so) on the Slack spelling, so the assertion is what a person reads;
 // and through the alarm's hand-off and the runner job it queues, onto Slack's
 // `chat.update`, for the card nobody touched.
 import { expiryEdits, expiryFetchResponse } from "./helpers/report-expiry-fetch";
@@ -31,8 +31,6 @@ type Block = Record<string, any>;
 const MONDAY_2PM_ET = Date.UTC(2026, 9, 12, 18, 0);
 /** The deadline the rule gives it: Tuesday 14:00 ET, in Unix seconds. */
 const TUESDAY_2PM_ET_S = 1791914400;
-const DEADLINE =
-  `Expires <!date^${TUESDAY_2PM_ET_S}^{date_short_pretty}|Tue, Oct 13> at <!date^${TUESDAY_2PM_ET_S}^{time}|2:00 PM ET>`;
 
 const slackSpelling = () =>
   recordingDelivery({ spelling: { card: (c) => renderProposalCard(c), gateNote: renderGateNote } });
@@ -43,16 +41,16 @@ function contextLines(blocks: unknown[]): string[] {
   return (blocks as Block[]).filter((b) => b.type === "context").map((b) => String(b.elements?.[0]?.text ?? ""));
 }
 
-describe("a staged card shows its deadline", () => {
-  it("in each reader's timezone on the card, and in ET in its text copy", async () => {
+describe("a staged card enforces its deadline without showing it", () => {
+  it("neither the card nor its text copy says it, and the store lets the card go at it", async () => {
     let now = MONDAY_2PM_ET;
     const h = harness({ now: () => now, threadState: createInMemoryThreadState({ now: () => now }), delivery: slackSpelling(), replies: FILE_IT });
     const outcome = await runTurn(request({ text: "file a card for the reflection redesign" }), h.deps);
     assert.equal(outcome.disposition, "staged");
     const text = outcome.staged!.proposal.proposalText;
-    assert.ok(text.endsWith(`\n${DEADLINE}`), `the text copy ends with the deadline:\n${text}`);
-    assert.ok(contextLines(proposalCardBlocks(text)).includes(DEADLINE), "the card shows it under its summary");
-    // What the store holds is the deadline the card shows.
+    assert.doesNotMatch(text, /Expires|<!date/, `the text copy says no deadline:\n${text}`);
+    assert.doesNotMatch(JSON.stringify(proposalCardBlocks(text)), /Expires|<!date/, "nor does the card");
+    // What the store holds is the rule's deadline.
     now = TUESDAY_2PM_ET_S * 1000;
     assert.equal((await h.threadState.getProposalByTs(outcome.staged!.proposal.proposalTs)).state, "found");
     now += 1;
@@ -60,8 +58,8 @@ describe("a staged card shows its deadline", () => {
   });
 });
 
-describe("the deadline shown is the one enforced", () => {
-  it("a card staged just before Saturday 00:00 ET shows and enforces Monday's, though the store stages it on Saturday", async () => {
+describe("the deadline enforced is the rule's, from when the card was staged", () => {
+  it("a card staged just before Saturday 00:00 ET enforces Monday's, unshown, though the store stages it on Saturday", async () => {
     // Friday 16 October, 23:59:59.900 ET; the store's clock reads 20 ms later,
     // past midnight into Saturday, as a hop to the store can.
     const FRIDAY_LAST = Date.UTC(2026, 9, 17, 3, 59, 59, 900);
@@ -71,12 +69,10 @@ describe("the deadline shown is the one enforced", () => {
     const threadState = createInMemoryThreadState({ now: () => now + HOP });
     const h = harness({ now: () => now, threadState, delivery: slackSpelling(), replies: FILE_IT });
     const outcome = await runTurn(request({ text: "file a card for the reflection redesign" }), h.deps);
-    const s = Math.floor(MONDAY_LAST / 1000);
-    const monday = `Expires <!date^${s}^{date_short_pretty}|Mon, Oct 19> at <!date^${s}^{time}|11:59 PM ET>`;
-    assert.ok(outcome.staged!.proposal.proposalText.endsWith(`\n${monday}`), "it says Monday");
+    assert.doesNotMatch(outcome.staged!.proposal.proposalText, /Expires/, "it says no deadline");
     const ts = outcome.staged!.proposal.proposalTs;
     now = MONDAY_LAST;
-    assert.equal((await threadState.getProposalByTs(ts)).state, "found", "live through the deadline it says, and the hop");
+    assert.equal((await threadState.getProposalByTs(ts)).state, "found", "live through Monday's deadline, and the hop");
     now = MONDAY_LAST + 1;
     assert.equal((await threadState.getProposalByTs(ts)).state, "expired", "and not into Tuesday");
   });
@@ -212,21 +208,21 @@ describe("a card nobody touched says it expired at its deadline", () => {
   });
 });
 
-describe("the bot's own decision report shows its deadline", () => {
+describe("the bot's own decision report enforces its deadline without showing it", () => {
   const items = ["a", "b"].map((id) => ({ id, title: `Page ${id}`, body: `Fix ${id}`, open: { url: `https://www.notion.so/${id}` } }));
 
-  it("under its cards and in its text copy while any card is open, and not once none is", () => {
+  it("neither under its cards nor in its text copy, open or closed", () => {
     const report = decisionReport(items, "Two pages drifted.", { channel: "C1", expiresAt: TUESDAY_2PM_ET_S * 1000 });
-    assert.ok(contextLines(report.blocks).includes(DEADLINE), "the morning message says it");
-    assert.ok(report.text.endsWith(`\n${DEADLINE}`), "and its notification copy, in ET where it falls back");
+    assert.ok(!contextLines(report.blocks).some((l) => l.startsWith("Expires")), "the morning message does not say it");
+    assert.ok(!report.text.includes("Expires"), "nor its notification copy");
     assert.equal(messageBlocksRefusal(report.blocks), null);
 
     const record = reportRecord("C1", "1791828000.000900", report, 1000);
-    assert.ok(contextLines(reportMessage(record).blocks).includes(DEADLINE), "every redraw keeps it");
+    assert.ok(!JSON.stringify(reportMessage(record).blocks).includes("Expires"), "nor a redraw");
     const oneLeft = { ...record, entries: [{ ...record.entries[0]!, state: { kind: "rejected" as const, by: "U1" } }, record.entries[1]!] };
-    assert.ok(contextLines(reportMessage(oneLeft).blocks).includes(DEADLINE));
+    assert.ok(!JSON.stringify(reportMessage(oneLeft).blocks).includes("Expires"));
     const closed = { ...record, entries: record.entries.map((e) => ({ ...e, state: { kind: "expired" as const } })) };
-    assert.ok(!reportMessage(closed).text.includes("Expires"), "a report with nothing left to decide drops it");
+    assert.ok(!reportMessage(closed).text.includes("Expires"), "nor a report with nothing left to decide");
     assert.ok(!contextLines(reportMessage(closed).blocks).some((l) => l.startsWith("Expires")));
   });
 });

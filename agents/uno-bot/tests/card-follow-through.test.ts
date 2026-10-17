@@ -1205,7 +1205,8 @@ describe("shared rules", () => {
     const bea = m.posts.find((p) => mentions(p.text).includes(BEA))!;
     const maya = m.posts.find((p) => mentions(p.text).includes(MAYA))!;
     assert.match(bea.text, /^Checking in on 2 Roadmap cards\.\n• <@U0BEA> — /);
-    assert.deepEqual((bea.blocks as Array<{ type: string }>).slice(-2).map((b) => b.type), ["carousel", "context"], "the cards, then when they expire");
+    assert.equal((bea.blocks as Array<{ type: string }>).at(-1)?.type, "carousel", "the cards last, with no deadline under them");
+    assert.doesNotMatch(JSON.stringify(bea.blocks), /Expires/);
     assert.deepEqual(bea.cards.map((c) => c.actions.map((x) => x.text.text)), [["Review", "Open card"], ["Review", "Open card"]]);
     assert.equal(maya.cards.length, 1);
     // Each card is its own proposal, on its own message.
@@ -2370,7 +2371,8 @@ describe("the morning's one message a channel", () => {
     // (a card's subtitle notifies nobody).
     for (const who of [STARTER, BEA]) assert.equal(mentions(post!.text).filter((x) => x === who).length, 1);
     const blocks = post!.blocks as Array<{ type: string }>;
-    assert.deepEqual(blocks.slice(-2).map((b) => b.type), ["carousel", "context"], "the cards, then when they expire");
+    assert.equal(blocks.at(-1)?.type, "carousel", "the cards last, with no deadline under them");
+    assert.doesNotMatch(JSON.stringify(blocks), /Expires/);
     assert.deepEqual(cardsOf(post!.blocks).map((c) => c.actions[0]!.text.text), ["Review", "Review"]);
 
     // Each card keeps its own proposal on the one message.

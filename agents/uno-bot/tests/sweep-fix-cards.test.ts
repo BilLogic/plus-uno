@@ -82,8 +82,8 @@ test("three fixes post as a parent line and three cards in a carousel, each with
   const { post } = await postedCard();
   const blocks = post.blocks as Block[];
   assert.equal(messageBlocksRefusal(blocks), null);
-  assert.equal(blocks.length, 3, "the parent line, the carousel and when it expires: nothing else");
-  assert.match(String(blocks[2]!.elements[0].text), /^Expires <!date\^\d+\^\{date_short_pretty\}\|[^>]+> at <!date\^\d+\^\{time\}\|[^>]+ ET>$/);
+  assert.equal(blocks.length, 2, "the parent line and the carousel: nothing else, no deadline");
+  assert.doesNotMatch(JSON.stringify(blocks), /Expires/);
   assert.equal(blocks[0]!.type, "section");
   assert.equal(String(blocks[0]!.text.text), "*Reflection PRD* still states 3 things its thread changed.\n• <@U0ADE> — Reflection PRD\n• <@U0BEA> — Reflection PRD", "one bullet per owner, each page once");
   assert.deepEqual(notified(post), ["U0ADE", "U0BEA"], "each owner pinged from the main text");
@@ -126,9 +126,9 @@ test("one fix posts as a parent line naming its page, and one card", async () =>
   assert.equal(messageBlocksRefusal(blocks), null);
   assert.equal(String(blocks[0]!.text.text), "<@U0ADE>, this thread settled something that *Reflection PRD* still states the old way.");
   assert.deepEqual(notified(h.posted[0]!), ["U0ADE"]);
-  assert.equal(blocks.length, 3);
-  assert.equal(blocks[1]!.type, "card", "one card stands alone, no carousel");
-  assert.equal(blocks[2]!.type, "context", "then when it expires");
+  assert.equal(blocks.length, 2);
+  assert.equal(blocks[1]!.type, "card", "one card stands alone, no carousel, no deadline under it");
+  assert.doesNotMatch(JSON.stringify(blocks), /Expires/);
   assert.equal(plainOf(blocks[1]!.title), "Reflection PRD");
   assert.deepEqual(blocks[1]!.actions.map((a: Block) => a.text.text), ["Review", "Open page"]);
   assert.doesNotMatch(JSON.stringify(blocks), GATE_WORDS);
@@ -192,9 +192,9 @@ test("where Slack refuses cards, the report posts as sections that each keep the
   assert.equal(messageBlocksRefusal(blocks), null);
   assert.equal(blocks.some((b) => b.type === "card" || b.type === "carousel"), false);
   assert.match(String(blocks[0]!.text.text), /^\*Reflection PRD\* still states 3 things/, "the parent line stays");
-  const fixes = blocks.slice(1, -1);
-  assert.equal(fixes.length, 3);
-  assert.match(String(blocks.at(-1)!.elements[0].text), /^Expires /, "and when they expire, last");
+  const fixes = blocks.slice(1);
+  assert.equal(fixes.length, 3, "the fixes, and no deadline after them");
+  assert.doesNotMatch(JSON.stringify(blocks), /Expires/);
   fixes.forEach((b, i) => {
     assert.equal(b.type, "section");
     assert.equal(b.accessory.action_id, `uno_decision_review:${PAGE.blocks[i]!.id}`);

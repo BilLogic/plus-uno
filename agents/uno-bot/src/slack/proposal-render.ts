@@ -20,7 +20,7 @@
 import { textSections } from "./render";
 import { sweepCardBlocks } from "./sweep-card-blocks";
 import { escapeSlackText } from "./mrkdwn";
-import { deadlineBlock, deadlineContext, isDeadlineBlock, splitDeadline, withDeadline } from "./card-deadline";
+import { isDeadlineBlock, splitDeadline } from "./card-deadline";
 import { footerNoteFor } from "./footer-kind";
 import type { CardAsk, CardCaveat, CardField, CardRevision, ProposalCard } from "../turn/index";
 import type { ProposalOperation } from "../thread-state/index";
@@ -76,7 +76,7 @@ export function proposalActionBlocks(label: "Review" | "View" = "Review"): unkno
  * View, which opens the draft read-only.
  *
  * A turn's card — one that ends with `CONFIRM_FOOTER` — is SHORT in the
- * thread: one summary line, the body's size, the LLM line and Review. Its
+ * thread: one summary line, the LLM line and Review. Its
  * whole draft is the text (Slack's notification and fallback copy, history,
  * what the model reads back) and the Review pop-up, where it is decided. The
  * summary is read off that text (`shortCardOf`), so a decided card, which the
@@ -84,20 +84,13 @@ export function proposalActionBlocks(label: "Review" | "View" = "Review"): unkno
  * one with its own footer — shows its text whole, as before.
  */
 export function proposalCardBlocks(posted: string, resolvedNote?: string, button?: "Review" | "View"): unknown[] {
-  // The deadline is the text's last line (`card-deadline.ts`): shown on its
-  // own while the card can be decided, and gone once a note closes or
-  // annotates it — the note is the card's last word.
-  const { text, deadline } = splitDeadline(posted);
-  const until = deadline && !resolvedNote ? [deadlineContext(deadline)] : [];
+  // A card posted before cards stopped showing their deadline carries it as
+  // its text's last line (`card-deadline.ts`); a redraw drops it.
+  const { text } = splitDeadline(posted);
   const short = shortCardOf(text);
   const blocks: unknown[] = short
-    ? [
-        { type: "section", text: { type: "mrkdwn", text: short.summary } },
-        context(resolvedNote ? short.size : `${short.size} · review before approving`),
-        ...until,
-        context(footerNoteFor("full")),
-      ]
-    : [...textSections(text), ...until];
+    ? [{ type: "section", text: { type: "mrkdwn", text: short.summary } }, context(footerNoteFor("full"))]
+    : textSections(text);
   if (resolvedNote) {
     // A note on a card still live — one waiting on someone else — keeps
     // Review; every other note closes the card, so it offers View.
@@ -440,18 +433,13 @@ export interface RenderedCard {
 export function renderProposalCard(card: ProposalCard): RenderedCard {
   // A stated card's footer names every operation it runs, so it carries no
   // plan of its own (`ProposalCard.footer`).
-  // The deadline, when the stager set one: the text copy's last line, and a
-  // context line of its own above the buttons on a card with its own blocks
-  // (`card-deadline.ts`).
-  const until = card.expiresAt === undefined ? [] : [deadlineBlock(card.expiresAt)];
   if (card.kind === "stated") {
-    const text = withDeadline(statedText(card), card.expiresAt);
+    const text = statedText(card);
     if (!card.short) return { text };
     // Short in the thread, as a turn's card is: the pop-up holds the rest.
     const blocks = [
       { type: "section", text: { type: "mrkdwn", text: card.short.summary } },
       context(card.short.size),
-      ...until,
       context(footerNoteFor("full")),
       ...proposalActionBlocks(),
     ];
@@ -459,13 +447,13 @@ export function renderProposalCard(card: ProposalCard): RenderedCard {
   }
   const body = card.kind === "revision" ? revisionText(card) : confirmText(card);
   const plan = withOperationPlan(body, card.operations, card.places);
-  const text = withDeadline(plan.text, card.expiresAt);
+  const text = plan.text;
   const followUp = plan.followUp ?? [];
   // A sweep card: one card per fix (`sweep-card-blocks.ts`). The planned text
   // is its notification and fallback copy, and what it is staged with.
   const fixes = card.fixes ? sweepCardBlocks(card.fixes, CONFIRM_FOOTER) : null;
   if (fixes) {
-    const blocks = [...fixes, ...until, ...proposalActionBlocks()];
+    const blocks = [...fixes, ...proposalActionBlocks()];
     return followUp.length ? { text, blocks, followUp } : { text, blocks };
   }
   return followUp.length ? { text, followUp } : { text };

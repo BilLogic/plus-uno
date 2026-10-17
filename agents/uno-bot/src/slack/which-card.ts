@@ -3,8 +3,10 @@
 // A thread can hold several live proposal cards (#1318). A typed ✅ / ⛔ there,
 // or a "yes" the model could not tie to one card, resolves nothing: Gate
 // answers with a `which-card` note (`gate/gate.ts` § `whichCardNote`) and this
-// file is where it becomes a message — the question, and one button per card
-// named by its headline (#1319).
+// file is where it becomes a message — the question listing the cards by
+// headline, numbered, and one short button per card naming its number (#1319).
+// A headline is too long for a button: Slack draws buttons at its own width and
+// cuts the label mid-word, so the headline lives in the question instead.
 //
 // EACH BUTTON IS THAT CARD'S OWN ✅ (or ⛔), pressed from here. Its value is
 // the card's ts, and a press goes through the button door exactly as a press
@@ -24,7 +26,8 @@
 import type { GateNote, WhichCard } from "../turn/index";
 import { cardExpiresAt } from "../card-expiry";
 import { renderGateNote, whichCardQuestion } from "./gate-note";
-import { deadlineBlock, isDeadlineBlock, withDeadline } from "./card-deadline";
+import { escapeSlackText } from "./mrkdwn";
+import { isDeadlineBlock } from "./card-deadline";
 import { runButtonDoor, type ButtonDoorDeps, type CardMessage } from "./button-door";
 import type { ThreadState } from "../thread-state/index";
 
@@ -35,36 +38,35 @@ type Decision = WhichNote["decision"];
  *  decision and the button's place in the row, which keeps ids unique. */
 export const WHICH_ACTION_PREFIX = "uno_which_";
 
-/** Slack's limits on an actions row: 25 elements; a button label, 75 chars. */
+/** Slack's limit on an actions row: 25 elements. */
 const MAX_BUTTONS = 25;
-const LABEL_MAX = 75;
 
-/** The question as Slack gets it: its words (`gate-note.ts`), when its
- *  buttons stop answering (#1316) — the rule's deadline from when it is
- *  asked, which the door holds a press to by the question's ts — and a row
- *  of one button per card.
+/** The question as Slack gets it: its words (`gate-note.ts`) listing the
+ *  cards by number, and a row of one numbered button per card. Its buttons
+ *  still lapse on the card rule, counted from the question's ts by the door,
+ *  but the message does not say when.
  *
  * @param note - The question
- * @param askedAt - When it goes up, epoch ms
  */
-export function whichCardMessage(note: WhichNote, askedAt: number = Date.now()): CardMessage {
-  const expiresAt = cardExpiresAt(askedAt);
+export function whichCardMessage(note: WhichNote): CardMessage {
+  const cards = note.cards.slice(0, MAX_BUTTONS);
+  // Headlines come from the model's input, so escaped.
+  const listed = cards.map((card, i) => `${i + 1}. *${escapeSlackText(card.headline)}*`).join("\n");
   return {
-    text: withDeadline(renderGateNote(note), expiresAt),
+    text: renderGateNote(note),
     blocks: [
-      { type: "section", text: { type: "mrkdwn", text: whichCardQuestion(note) } },
-      deadlineBlock(expiresAt),
-      { type: "actions", elements: note.cards.slice(0, MAX_BUTTONS).map((card, i) => button(note.decision, card, i)) },
+      { type: "section", text: { type: "mrkdwn", text: `${whichCardQuestion(note)}\n${listed}` } },
+      { type: "actions", elements: cards.map((card, i) => button(note.decision, card, i)) },
     ],
   };
 }
 
+/** One card's button: the decision and the card's number in the list above. */
 function button(decision: Decision, card: WhichCard, i: number): Record<string, unknown> {
-  const label = card.headline.length > LABEL_MAX ? `${card.headline.slice(0, LABEL_MAX - 1).trimEnd()}…` : card.headline;
   return {
     type: "button",
     action_id: `${WHICH_ACTION_PREFIX}${decision}_${i}`,
-    text: { type: "plain_text", text: label, emoji: true },
+    text: { type: "plain_text", text: `${decision === "confirm" ? "Approve" : "Cancel"} ${i + 1}`, emoji: true },
     value: card.ts,
   };
 }
