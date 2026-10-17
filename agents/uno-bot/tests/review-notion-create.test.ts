@@ -23,6 +23,7 @@ import {
 import { reviewSubmitOf } from "../src/slack/review-view";
 import { CONFIRM_FOOTER } from "../src/slack/proposal-render";
 import { NO_OPEN_QUESTIONS, proseElements } from "../src/slack/review-notion-create";
+import { acceptanceCriteriaBlocks } from "../src/integrations/notion";
 import { markdownToNotionBlocks, type NotionBlock } from "../src/integrations/notion-blocks";
 import { recordingViews } from "./helpers/recording-slack";
 import { cardWords } from "./helpers/card-message";
@@ -526,7 +527,66 @@ describe("a body's Markdown as rich text", () => {
   it("draws a nested body in a pop-up Slack takes", async () => {
     const input = { ...PRD, sections: [{ heading: "Requirements", body: NESTED }] };
     const { draft } = await openDraft({ input, proposalText: textOf(input, CAVEAT) });
-    assert.match(JSON.stringify(draft), /"indent":1/);
+    const lists = JSON.stringify(draft).match(/"type":"rich_text_list"[^\]]*?"elements"/g) ?? [];
+    assert.ok(lists.some((l) => l.includes('"indent":1')), "the bullets sit under their item");
+    assert.ok(lists.some((l) => l.includes('"style":"ordered"') && l.includes('"offset":1')), "the second item reads 2");
+  });
+
+  it("keeps an inline style inside a sub-bullet, and nests a numbered list under a bullet", () => {
+    assert.deepEqual(proseElements("- Parent\n  1. **Bold** child with `code`\n  2. [linked](https://example.com/c)"), [
+      { type: "rich_text_list", style: "bullet", elements: [item("Parent")] },
+      {
+        type: "rich_text_list",
+        style: "ordered",
+        indent: 1,
+        elements: [
+          {
+            type: "rich_text_section",
+            elements: [
+              { type: "text", text: "Bold", style: { bold: true } },
+              { type: "text", text: " child with " },
+              { type: "text", text: "code", style: { code: true } },
+            ],
+          },
+          { type: "rich_text_section", elements: [{ type: "link", url: "https://example.com/c", text: "linked" }] },
+        ],
+      },
+    ]);
+  });
+
+  it("counts a numbered item with no text, so the numbers after it match the page", () => {
+    const body = "1. First\n   - its bullet\n2. \n3. Third";
+    const ordered = (proseElements(body) as Array<{ style: string; offset?: number; elements: unknown[] }>).filter((e) => e.style === "ordered");
+    assert.deepEqual(ordered.map((l) => [l.offset ?? 0, l.elements.length]), [[0, 1], [1, 2]]);
+    assert.deepEqual(ordered[1]!.elements[0], { type: "rich_text_section", elements: [] });
+    const numbered = markdownToNotionBlocks(body).filter((b) => b.type === "numbered_list_item").length;
+    assert.equal(ordered.reduce((n, l) => n + l.elements.length, 0), numbered);
+  });
+
+  it("holds a section to 3,000 chars of text even when the write splits it into many blocks", () => {
+    const texts = (elements: unknown[]) => JSON.stringify(elements).match(/"text":"[^"]*"/g)!.map((t) => t.slice(8, -1));
+    for (const body of ["a".repeat(5000), ["b".repeat(1500), "c".repeat(1500), "d".repeat(1500)].join("\n\n")]) {
+      assert.ok(markdownToNotionBlocks(body).length > 1, "the write splits it");
+      const drawn = texts(proseElements(body));
+      const length = drawn.join("").length;
+      assert.ok(length >= 3000 && length <= 3001, `${length} chars`);
+      assert.ok(drawn.at(-1)!.endsWith("…"), "the cut shows");
+    }
+  });
+
+  it("draws the acceptance criteria from the tasks the write stores, not as Markdown", async () => {
+    const criteria = ["Shows **one** line\n- still the same criterion", "  ", "A second one"];
+    const input = { ...PRD, acceptance_criteria: criteria };
+    const { draft } = await openDraft({ input, proposalText: textOf(input, CAVEAT) });
+    const block = blocksOf(draft).find((b) => b.type === "rich_text" && JSON.stringify(b.elements?.[0] ?? null).includes("Acceptance criteria"))!;
+    const list = block.elements![1] as { style: string; elements: Array<{ elements: unknown[] }> };
+    assert.equal(list.style, "bullet");
+    assert.equal(list.elements.length, acceptanceCriteriaBlocks(criteria).length);
+    assert.deepEqual(list.elements[0]!.elements, [
+      { type: "text", text: "Shows " },
+      { type: "text", text: "one", style: { bold: true } },
+      { type: "text", text: " line\n- still the same criterion" },
+    ]);
   });
 
   it("leaves a snake_case word and a lone asterisk as written", () => {

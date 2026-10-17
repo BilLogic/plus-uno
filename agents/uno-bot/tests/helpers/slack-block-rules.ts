@@ -64,6 +64,9 @@ function containerRefusal(block: Shape): string | null {
       if (why) return `${why} inside a container`;
     } else if (type === "rich_text" && !Array.isArray((child as Shape).elements)) {
       return "a rich_text without elements inside a container";
+    } else if (type === "rich_text") {
+      const why = richTextRefusal(child as Shape);
+      if (why) return `${why} inside a container`;
     }
   }
   return null;
@@ -346,15 +349,17 @@ const RICH_TEXT_ELEMENTS: ReadonlySet<string> = new Set([
   "rich_text_section", "rich_text_list", "rich_text_quote", "rich_text_preformatted",
 ]);
 
-/** A list's `indent`, which Slack reads as a nesting level: blocks.validate on
+/** A list's `indent`, which Slack reads as a nesting level. The reference gives
+ *  no bounds; these were observed, not documented: blocks.validate on
  *  2026-10-17 took 0 to 8 and refused 9, -1, 1.5 and "1". */
 const LIST_INDENT = { min: 0, max: 8 };
 
-/** Why Slack would refuse a `rich_text` block's elements, or null. Each verdict
- *  was blocks.validate's on 2026-10-17: a list's style is bullet or ordered
- *  ("numbered" refused), its `offset` any whole number (1000 taken, -1 and 1.5
- *  refused), its `border` 0 or 1, and it holds sections only, so a list inside
- *  a list was refused: nesting is the next list's `indent`. */
+/** Why Slack would refuse a `rich_text` block's elements, or null. The bounds
+ *  are observed, not documented: each is blocks.validate's verdict on
+ *  2026-10-17. A list's style is bullet or ordered ("numbered" refused), its
+ *  `offset` any whole number (1000 taken, -1 and 1.5 refused), its `border` 0
+ *  or 1 (2 refused), and it holds sections only, so a list inside a list was
+ *  refused: nesting is the next list's `indent`. */
 function richTextRefusal(block: Shape): string | null {
   for (const element of block.elements as unknown[]) {
     const type = isShape(element) ? String(element.type) : "non-object";

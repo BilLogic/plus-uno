@@ -92,10 +92,18 @@ function heading(content: string) {
   return { object: "block", type: "heading_2", heading_2: { rich_text: richText(content) } };
 }
 
-function todo(content: string) {
-  // Inline-parsed: an acceptance criterion routinely carries a `code` term or a
-  // **bold** subject, and that is the same Markdown as everywhere else.
-  return { object: "block", type: "to_do", to_do: { checked: false, rich_text: parseInline(content) } };
+/**
+ * Acceptance criteria → one unchecked `to_do` each, blank ones skipped. The
+ * Review pop-up draws the criteria from these same blocks.
+ *
+ * Inline-parsed: an acceptance criterion routinely carries a `code` term or a
+ * **bold** subject, and that is the same Markdown as everywhere else.
+ */
+export function acceptanceCriteriaBlocks(items: readonly string[]): NotionBlock[] {
+  return items
+    .map((item) => item?.trim())
+    .filter(Boolean)
+    .map((content) => ({ object: "block", type: "to_do", to_do: { checked: false, rich_text: parseInline(content) } }));
 }
 
 /**
@@ -128,9 +136,7 @@ function buildChildren(input: PrdInput): unknown[] {
   // Acceptance Criteria as checkboxes (read by fetchNotionPRD downstream).
   if (input.acceptanceCriteria?.length) {
     children.push(heading("Acceptance Criteria"));
-    for (const item of input.acceptanceCriteria) {
-      if (item?.trim()) children.push(todo(item.trim()));
-    }
+    children.push(...acceptanceCriteriaBlocks(input.acceptanceCriteria));
   }
 
   // Implementation Notes heading (read by fetchNotionPRD downstream).

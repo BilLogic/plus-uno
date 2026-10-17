@@ -220,6 +220,12 @@ describe("the strict fake holds a rich text list to Slack's rules", () => {
     assert.equal((await verdicts([list({ elements: [{ type: "rich_text_list", style: "bullet", elements: [line] }] })])).length, 3);
   });
 
+  it("holds a rich text list inside a container to the same rules", async () => {
+    const boxed = (over: Record<string, unknown>) => ({ type: "container", title: { type: "plain_text", text: "Sources" }, child_blocks: [list(over)] });
+    assert.deepEqual(await verdicts([boxed({ indent: 1 })]), []);
+    assert.equal((await verdicts([boxed({ indent: 9 })])).length, 3);
+  });
+
   it("refuses a rich text element Slack has no type for", async () => {
     assert.equal((await verdicts([{ type: "rich_text", elements: [{ type: "rich_text_heading", elements: [] }] }])).length, 3);
   });
