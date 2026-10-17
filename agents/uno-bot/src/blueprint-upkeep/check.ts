@@ -407,7 +407,7 @@ async function check(offer: BlueprintCheckOffer, run: string, signal: AbortSigna
   if (offer.undrafted) {
     if (marked.undrafted !== offer.undrafted) await deps.store.putCheckOffer(marked);
   } else {
-    await postResults(marked, proposal ? comparisonText(today, offer.quote, proposal.changes) : comparison.text, deps);
+    await postResults(marked, proposal ? comparisonText(today, offer.quote, [...proposal.changes, ...proposal.removed]) : comparison.text, deps);
   }
   // The check is done and its results stand: a card that fails to go up
   // under them is logged, never the check's failure — that would step a done
