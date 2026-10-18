@@ -366,7 +366,7 @@ export type GateNote =
    *  emoji typed in a thread holding more than one live card, or outside any
    *  card's thread in a DM holding several, or the model's
    *  `proposal_resolve` that never said which. Resolve none of them, and ask
-   *  which, with one Choose… button that opens a pop-up of the cards:
+   *  which, with Approve… and Cancel…, each opening a pop-up of the cards:
    *  `cards` is each card's ts and headline, newest first. */
   | { kind: "which-card"; decision: "confirm" | "cancel"; cards: WhichCard[] }
   /** A turn staged a REVISION: the card that follows replaces the waiting
@@ -414,8 +414,8 @@ export type GateNote =
  *  one (`slack/which-card-view.ts`). */
 export const MAX_WHICH_CARDS = 10;
 
-/** One card a "which one?" question offers: its ts, which its Choose…
- *  button carries, and its headline, which its pop-up names it by
+/** One card a "which one?" question offers: its ts, which its Approve…
+ *  and Cancel… buttons carry, and its headline, which its pop-up names it by
  *  (`agent/card-identity.ts`). */
 export interface WhichCard {
   ts: string;
@@ -610,7 +610,7 @@ export interface Delivery {
   /**
    * Redraw an open "which one?" question as it now stands
    * (`ThreadState.decideInWhichQuestion`): each decided card's headline
-   * struck under the count still waiting, and no Choose… once every card is
+   * struck under the count still waiting, and no buttons once every card is
    * decided. For every door that decides a listed card, after the card is
    * closed, so the question stops offering a decision already made; a Submit
    * from the question's own pop-up redraws it there instead. Posts nothing;

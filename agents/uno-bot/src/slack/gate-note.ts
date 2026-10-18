@@ -151,18 +151,13 @@ export function aimedElsewhereLine(note: Extract<GateNote, { kind: "aimed-elsewh
 
 /**
  * The "which one?" question (#1319): how many cards wait, and that nothing
- * ran — the line above the question's Choose… button (`which-card.ts`). The
- * pop-up it opens only cancels, so a question an approval asked says where
- * one is made instead (`WHICH_APPROVE_HINT`).
+ * ran — the line above the question's Approve… and Cancel… buttons
+ * (`which-card.ts`). Both are offered whatever decision asked it, so the
+ * line is the same for a ✅ and a ⛔.
  */
 export function whichCardQuestion(note: Extract<GateNote, { kind: "which-card" }>): string {
-  const asked = `${note.cards.length} cards are waiting, nothing ran yet.`;
-  return note.decision === "confirm" ? `${asked} ${WHICH_APPROVE_HINT}` : asked;
+  return `${note.cards.length} cards are waiting, nothing ran yet.`;
 }
-
-/** Said after the question's count when an approval asked it: the pop-up
- *  only cancels, and an approval is made on the card. */
-export const WHICH_APPROVE_HINT = "Approve from a card's Review.";
 
 /** The question's text copy: the question, and the cards by headline — what
  *  a notification and a screen reader get, since the message itself lists

@@ -2041,8 +2041,8 @@ export interface ThreadState {
 
   // ----- the open "which one?" question -----
   //
-  // A decision that named no card asks which, with one Choose… button that
-  // opens a pop-up of the cards (`slack/which-card.ts`). A card can then be
+  // A decision that named no card asks which, with Approve… and Cancel…,
+  // each opening a pop-up of the cards (`slack/which-card.ts`). A card can then be
   // decided by any door — the question's pop-up, the card's own Review, a
   // reaction, a typed emoji, the model's `proposal_resolve` — and only the
   // question's own pop-up could find the question to strike that card on it.
@@ -2051,7 +2051,7 @@ export interface ThreadState {
   /**
    * Keep a question as it was posted, under its message ts, and point each
    * card it lists at it. A card asked about again points at the newest
-   * question. Kept until its last card is decided, or until its Choose… lapses
+   * question. Kept until its last card is decided, or until its buttons lapse
    * on the card rule from its own ts (`whichQuestionLive`).
    */
   putWhichQuestion(question: WhichQuestion): Promise<void>;
@@ -2083,6 +2083,9 @@ export interface WhichQuestion {
   /** The question's own message: the record's key, and what is edited. */
   questionTs: string;
   channel: string;
+  /** The ✅ or ⛔ that asked it. Kept so stored records still read; the
+   *  question offers Approve… and Cancel… whatever it was, so it is
+   *  display-only and decides nothing. */
   decision: "confirm" | "cancel";
   cards: WhichCard[];
   /** The listed cards decided since, by ts, in the order they were. */
@@ -2112,7 +2115,7 @@ export function whichCardKey(cardTs: string): string {
 }
 
 /**
- * Whether a question's Choose… still answers at `at`: the card rule counted
+ * Whether a question's buttons still answer at `at`: the card rule counted
  * from the question's own ts, the one clock its door reads
  * (`slack/which-card.ts`). A ts that is not Slack's — a test double's — is
  * counted from when the question was put instead.
