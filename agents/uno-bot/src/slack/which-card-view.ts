@@ -6,10 +6,10 @@
 // hands it to Slack.
 //
 // ONE POP-UP, ONE ROW PER CARD. The question's one button, Review, opens
-// "Review cards". Each waiting card is a row: a section with its headline and
-// what it does, a Show draft button as its accessory, and under it an input
-// block holding a three-way choice, Approve / Cancel / Leave, that starts on
-// Leave. An optional note under the rows is the reason said on each card
+// "Review cards". Each waiting card is a row: a section saying what it does,
+// a Show draft button as its accessory, and under it an input block labeled
+// with its headline, holding a three-way choice, Approve / Cancel / Leave,
+// that starts on Leave. No label or caption is repeated per row. An optional note under the rows is the reason said on each card
 // canceled. Done applies every row's choice; Leave does nothing.
 //
 // EACH ROW IS READ FROM ITS OWN BLOCK, AND NOWHERE ELSE. A row's input block
@@ -95,12 +95,18 @@ const CHOICES: ReadonlyArray<[WhichChoice, string]> = [
 
 /** Said in place of the view under a Done from a view opened before this
  *  pop-up. */
-export const REOPEN = "This pop-up is out of date, so nothing ran. Open the question again.";
+export const REOPEN = "Open the question again.";
 /** Said after a Done with every row on Leave. */
 export const NOTHING_CHOSEN = "Nothing changed. Every card is still waiting.";
+/** Said in the pop-up while Done is under way. */
+export const DECIDING = "Deciding…";
+/** Said in the pop-up when Done stopped on an error. */
+export const FAILED_PARTWAY = "Something failed, so open the question again.";
 
 /** Slack's caps: a view's blocks 100, a `plain_text_input` 3,000. */
 const MAX_VIEW_BLOCKS = 100;
+/** An input label's cap is 2,000; a headline is cut far short of it. */
+const LABEL_CHARS = 150;
 const NOTE_MAX_CHARS = 3000;
 
 /** Said where an open draft was cut to the room the view has left. */
@@ -149,9 +155,13 @@ export function whichPopupOf(metadata: string | undefined): WhichPopup | null {
   try {
     const m = JSON.parse(metadata ?? "") as { c?: unknown; q?: unknown; k?: unknown; s?: unknown };
     if (typeof m.c !== "string" || typeof m.q !== "string" || !Array.isArray(m.k)) return null;
-    const cards = m.k.flatMap((pair: unknown) =>
-      Array.isArray(pair) && typeof pair[0] === "string" && typeof pair[1] === "string" ? [{ ts: pair[0], headline: pair[1] }] : [],
-    );
+    // Each card once, by its first entry: a ts listed twice is one row.
+    const seen = new Set<string>();
+    const cards = m.k.flatMap((pair: unknown) => {
+      if (!Array.isArray(pair) || typeof pair[0] !== "string" || typeof pair[1] !== "string" || seen.has(pair[0])) return [];
+      seen.add(pair[0]);
+      return [{ ts: pair[0], headline: pair[1] }];
+    });
     return { channel: m.c, questionTs: m.q, cards, ...(typeof m.s === "string" ? { shown: m.s } : {}) };
   } catch {
     return null;
@@ -228,7 +238,7 @@ export function whichView(
     type: "input",
     block_id: NOTE_BLOCK,
     optional: true,
-    label: plain("Note for cards canceled"),
+    label: plain("Note"),
     element: {
       type: "plain_text_input",
       action_id: NOTE_ACTION_ID,
@@ -241,11 +251,10 @@ export function whichView(
   const blocks = waiting.flatMap((card) => {
     const ts = card.proposalTs;
     const shown = card === open;
-    const headline = escapeSlackText(headlineOf(popup, card).trim()) || "That card";
     const row = {
       type: "section",
       block_id: `${ROW_PREFIX}${ts}`,
-      text: { type: "mrkdwn", text: `*${headline}*\n${escapeSlackText(cardDoes(card))}` },
+      text: { type: "mrkdwn", text: escapeSlackText(cardDoes(card)) },
       accessory: {
         type: "button",
         action_id: shown ? WHICH_HIDE_ACTION_ID : WHICH_SHOW_ACTION_ID,
@@ -258,7 +267,8 @@ export function whichView(
     const choice = {
       type: "input",
       block_id: `${CHOICE_PREFIX}${ts}`,
-      label: plain("Decision"),
+      // The card's headline, said once: the row above says what it does.
+      label: plain(clip(headlineOf(popup, card).trim() || "That card", LABEL_CHARS)),
       element: { type: "radio_buttons", action_id: CHOICE_ACTION_ID, options, initial_option: initial },
     };
     const draft = shown ? fitBody(draftBlocks(card, opts), room, DRAFT_LEFT_OUT) : [];

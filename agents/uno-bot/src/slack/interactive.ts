@@ -63,7 +63,6 @@ import { standingConfirmersOf } from "./standing-confirmers";
 import { runButtonDoor, type ButtonDoorDeps } from "./button-door";
 import type { CardMessage } from "./proposal-render";
 import {
-  DECIDING,
   LEGACY_WHICH_REPLY,
   isLegacyWhichPress,
   isWhichOpenAction,
@@ -73,6 +72,7 @@ import {
   type WhichDoorDeps,
 } from "./which-card";
 import {
+  DECIDING,
   NOTHING_CHOSEN,
   WHICH_HIDE_ACTION_ID,
   WHICH_OLD_IN_VIEW_ACTION_IDS,
@@ -376,19 +376,14 @@ function submitWhich(env: Env, payload: InteractionPayload, ctx: ExecutionContex
     console.log(`[interactive] which-card done on ${popup.channel}/${popup.questionTs} with every card left`);
     return Response.json({ response_action: "update", view: whichNoticeView(popup, NOTHING_CHOSEN) });
   }
-  const deps = whichDoorDeps(env, payload, popup.channel, popup.questionTs);
+  // A throw partway answers the pop-up itself before it reaches here.
   ctx.waitUntil(
-    runWhichSubmit({ viewId, popup, submission, userId }, deps).catch(async (err) => {
+    runWhichSubmit({ viewId, popup, submission, userId }, whichDoorDeps(env, payload, popup.channel, popup.questionTs)).catch((err) => {
       console.error(`[interactive] which-card done failed: ${err instanceof Error ? err.message : String(err)}`);
-      // Never left on "Deciding…": what each card came to is on its card.
-      await deps.views.update(viewId, whichNoticeView(popup, FAILED_PARTWAY)).catch(() => false);
     }),
   );
   return Response.json({ response_action: "update", view: whichNoticeView(popup, DECIDING) });
 }
-
-/** Said in the pop-up when Done stopped on an error. */
-const FAILED_PARTWAY = "Something failed partway. Each card shows what it came to; open the question again for the rest.";
 
 /** `Env`, once, as the dependencies the "which one?" doors read: the button
  *  door's, Slack's views, and the question's message edited by its ts. */

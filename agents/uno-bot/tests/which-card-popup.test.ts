@@ -37,6 +37,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
   DRAFT_LEFT_OUT,
+  FAILED_PARTWAY,
   NOTHING_CHOSEN,
   REOPEN,
   WHICH_REVIEW_CALLBACK_ID,
@@ -237,8 +238,12 @@ test("Review opens a loading view, then one row per waiting card: headline, what
 
   const rows = rowsOf(view);
   assert.deepEqual(rows.map((r) => r.accessory!.value), [b, a], "the question's order");
-  assert.equal(rows[0]!.text!.text, "*Session reflections*\nNew PRD card on the Roadmap");
-  assert.equal(rows[1]!.text!.text, "*Backup tutor matching*\nNew PRD card on the Roadmap");
+  // The row says what the card does; its choice is labeled by its headline,
+  // so the headline is said once.
+  assert.equal(rows[0]!.text!.text, "New PRD card on the Roadmap");
+  assert.equal(rows[1]!.text!.text, "New PRD card on the Roadmap");
+  assert.deepEqual([b, a].map((ts) => choiceOf(view, ts)!.label!.text), ["Session reflections", "Backup tutor matching"]);
+  assert.doesNotMatch(words(view), /"Decision"/, "no repeated label");
   for (const [i, ts] of [b, a].entries()) {
     const row = rows[i]!;
     assert.equal(row.block_id, `uno_which_row_${ts}`, "block ids are the card's");
@@ -253,7 +258,7 @@ test("Review opens a loading view, then one row per waiting card: headline, what
   const note = noteOf(view)!;
   assert.equal(note.type, "input");
   assert.equal(note.optional, true);
-  assert.match(note.label!.text, /cancel/i, "the note says it is for the cards canceled");
+  assert.equal(note.label!.text, "Note");
   assert.doesNotMatch(words(view), /"context"/, "no caption lines");
 });
 
@@ -447,7 +452,7 @@ test("Done from a view opened before this pop-up is refused under its first inpu
       assert.deepEqual(sent, { ok: false, errors: { uno_which_cards_cancel: REOPEN } }, "never keyed to the actions block");
     }
   }
-  assert.match(REOPEN, /Open the question again\.$/);
+  assert.equal(REOPEN, "Open the question again.");
 });
 
 test("Done from a view opened before this pop-up with no input block is answered with a notice, not an error", () => {
@@ -616,6 +621,40 @@ test("Done naming a card the question did not list runs nothing for it", async (
 
   assert.deepEqual(h.resolved, []);
   assert.deepEqual(await live(h), [a, b].sort());
+});
+
+test("the pop-up's metadata lists each card once, whatever it was handed", () => {
+  const metadata = JSON.stringify({ c: "C1", q: "1.0", k: [["1.1", "A"], ["1.2", "B"], ["1.1", "A again"]] });
+  assert.deepEqual(whichPopupOf(metadata)?.cards, [{ ts: "1.1", headline: "A" }, { ts: "1.2", headline: "B" }]);
+});
+
+test("a throw on the second card still posts the first card's cancel line, redraws the question and says it failed", async () => {
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { a, b, question } = await asked(h, "⛔");
+  clock.now = SOON;
+  const d = doors(h, clock, {
+    applyVerdict: async (verdict) => {
+      if (verdict.decision === "confirm") throw new Error("Notion is down");
+      await h.deps.applyVerdict(verdict);
+    },
+  });
+  const view = (await press(d, question))!;
+  const from = h.delivery.calls.length;
+
+  // In the list's order: B canceled first, then A approved, whose run throws.
+  await assert.rejects(done(d, view, stateOf({ [b]: "cancel", [a]: "approve" })), /Notion is down/);
+
+  const answer = d.views.calls.at(-1)!.view as View;
+  assert.ok(words(answer).includes(FAILED_PARTWAY), words(answer));
+  assert.match(words(answer), /Session reflections\*: Canceled\./, "the card decided before the throw is named");
+  assert.deepEqual(
+    h.delivery.calls.slice(from).flatMap((x) => (x.kind === "note" ? [x.text] : [])),
+    ["Canceled *Session reflections*."],
+    "the first card's cancel line is posted",
+  );
+  const redrawn = d.questionEdits.at(-1);
+  assert.ok(redrawn, "the question is redrawn");
+  assert.match(sectionOf(redrawn!), /~Session reflections~/);
 });
 
 test("the budget is checked before each Approve: a card not reached stays waiting, as do the ones after it, and each is named", async () => {

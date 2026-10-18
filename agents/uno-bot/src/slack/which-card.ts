@@ -88,6 +88,7 @@ import type { NotionDatabaseLinks } from "./review-notion-create";
 import type { PendingProposal, ThreadState, WhichQuestion } from "../thread-state/index";
 import { cardHeadline } from "../agent/card-identity";
 import {
+  FAILED_PARTWAY,
   NOTHING_CHOSEN,
   REOPEN,
   WHICH_REVIEW_CALLBACK_ID,
@@ -141,14 +142,12 @@ export const WHICH_EXPIRED_REPLY = "That question expired, so nothing ran. Press
 /** Said in the pop-up when no card it listed is waiting any more. */
 export const NOTHING_WAITING = "None of these cards is waiting any more.";
 
-/** Said in the pop-up while Done is under way. */
-export const DECIDING = "Deciding…";
-
-/** Said for a card Done names that the question did not list. */
+/** Said for a card Done names that the question did not list: never drawn
+ *  by the pop-up, whose rows are the listed cards, so it is a second check. */
 const NOT_LISTED = "not on this question, so nothing ran.";
 
 /** Said for a card Done did not reach before the budget ran short. */
-const NOT_REACHED = "not reached this time, so it is still waiting. Choose it again.";
+const NOT_REACHED = "not reached, so still waiting.";
 
 /**
  * The question as Slack gets it: how many cards are waiting, and Review,
@@ -400,47 +399,58 @@ export async function runWhichSubmit(request: WhichSubmitRequest, deps: WhichDoo
   let thread: ButtonDoorTarget | undefined;
   let decidedOne = false;
   let stopped = false;
-  for (const { card: cardTs, choice } of submission.decide) {
-    const named = nameOf(popup, cardTs);
-    const headline = `*${escapeSlackText(named)}*`;
-    if (!listed(popup, cardTs)) {
-      console.warn(`[which-card] done on ${popup.channel}/${popup.questionTs} named ${cardTs}, which it did not list: refused`);
-      lines.push(`${headline}: ${NOT_LISTED}`);
-      continue;
-    }
-    // An Approve is a write, so it is always checked; a cancel is, after the
-    // first card decided. Once one card is not reached, none after it is.
-    const cost = (choice === "approve" ? APPROVE_SUBREQUESTS : CANCEL_SUBREQUESTS) + FINISH_SUBREQUESTS;
-    if (!stopped && (choice === "approve" || decidedOne) && (deps.headroom?.() ?? Infinity) < cost) stopped = true;
-    if (stopped) {
-      lines.push(`${headline}: ${NOT_REACHED}`);
-      continue;
-    }
-    decidedOne = true;
-    if (choice === "approve") {
-      const decided = await approveOne(cardTs, request, deps);
+  let failed = false;
+  try {
+    for (const { card: cardTs, choice } of submission.decide) {
+      const named = nameOf(popup, cardTs);
+      const headline = `*${escapeSlackText(named)}*`;
+      // Defense in depth: the pop-up draws a row only for a listed card, and
+      // Done reads only those rows.
+      if (!listed(popup, cardTs)) {
+        console.warn(`[which-card] done on ${popup.channel}/${popup.questionTs} named ${cardTs}, which it did not list: refused`);
+        lines.push(`${headline}: ${NOT_LISTED}`);
+        continue;
+      }
+      // An Approve is a write, so it is always checked; a cancel is, after the
+      // first card decided. Once one card is not reached, none after it is.
+      const cost = (choice === "approve" ? APPROVE_SUBREQUESTS : CANCEL_SUBREQUESTS) + FINISH_SUBREQUESTS;
+      if (!stopped && (choice === "approve" || decidedOne) && (deps.headroom?.() ?? Infinity) < cost) stopped = true;
+      if (stopped) {
+        lines.push(`${headline}: ${NOT_REACHED}`);
+        continue;
+      }
+      decidedOne = true;
+      if (choice === "approve") {
+        const decided = await approveOne(cardTs, request, deps);
+        if (decided.question) kept = decided.question;
+        lines.push(`${headline}: ${decided.line}`);
+        continue;
+      }
+      const decided = await cancelOne(cardTs, request, submission.note, deps);
       if (decided.question) kept = decided.question;
+      if (decided.canceledIn) {
+        canceled.push(named);
+        thread ??= decided.canceledIn;
+      }
       lines.push(`${headline}: ${decided.line}`);
-      continue;
     }
-    const decided = await cancelOne(cardTs, request, submission.note, deps);
-    if (decided.question) kept = decided.question;
-    if (decided.canceledIn) {
-      canceled.push(named);
-      thread ??= decided.canceledIn;
-    }
-    lines.push(`${headline}: ${decided.line}`);
+  } catch (err) {
+    failed = true;
+    throw err;
+  } finally {
+    console.log(
+      `[which-card] done on ${popup.channel}/${popup.questionTs} by=${request.userId} chosen=${submission.decide.length} canceled=${canceled.length} stopped=${stopped} failed=${failed}`,
+    );
+    // The pop-up's answer first: a stop after it leaves the question
+    // unstruck, never the pop-up on "Deciding…". A throw partway still names
+    // the cards decided before it, says so, and settles the thread and the
+    // question for them before it is rethrown.
+    await deps.views.update(request.viewId, whichResultView(popup, failed ? [...lines, FAILED_PARTWAY] : lines));
+    // The cards canceled posted no note each (`ButtonRequest.quiet`): the
+    // thread hears one line naming them, and none if there were none.
+    if (thread) await deps.delivery(thread).postNote(canceledLine(canceled));
+    if (kept) await deps.editQuestion(keptQuestionMessage(kept));
   }
-  console.log(
-    `[which-card] done on ${popup.channel}/${popup.questionTs} by=${request.userId} chosen=${submission.decide.length} canceled=${canceled.length} stopped=${stopped}`,
-  );
-  // The pop-up's answer first: a stop after it leaves the question unstruck,
-  // never the pop-up on "Deciding…".
-  await deps.views.update(request.viewId, whichResultView(popup, lines));
-  // The cards canceled posted no note each (`ButtonRequest.quiet`): the
-  // thread hears one line naming them, and none if there were none.
-  if (thread) await deps.delivery(thread).postNote(canceledLine(canceled));
-  if (kept) await deps.editQuestion(keptQuestionMessage(kept));
 }
 
 /** The card's name in the pop-up's answer: the headline the question listed
