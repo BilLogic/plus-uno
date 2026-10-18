@@ -1,13 +1,13 @@
-// The "which one?" pop-ups' routes on the interactive endpoint (#1342).
+// The "which one?" pop-up's routes on the interactive endpoint.
 //
 // `tests/which-card-popup.test.ts` drives the doors on named dependencies;
 // this file sends Slack's own payloads through `handleInteraction`, so what is
-// asserted is the wiring: Approve… and Cancel… each open their own pop-up, and
-// an old Choose… the Cancel one; a Submit with nothing picked, or with a
-// control that is not its pop-up's own, is answered with
-// `response_action: "errors"` in the ack; a pick is acked with `update` and
-// answered in the pop-up once decided; and a numbered button left on an old
-// question is answered aside.
+// asserted is the wiring: Review opens the Review cards pop-up, and so does
+// every button an earlier question carries (Choose…, Approve…, Cancel…); Show
+// draft redraws it under the view's hash; Done is acked with `update` and
+// decides each card by its own row; a Done under an older pop-up's callback
+// id is refused in the ack; and a numbered button left on an old question is
+// answered aside.
 //
 // HOW THE WORLD IS FAKED. One stub on `globalThis.fetch` before anything
 // imports `net.ts`, recording every Slack call; the modules under test loaded
@@ -84,8 +84,8 @@ function lastView(): SentView {
   return slackCalls("views.update").at(-1)!.body!.view as SentView;
 }
 
-/** A button on the question, pressed: Cancel… unless named. */
-async function opened(send: (p: Record<string, unknown>) => Promise<Response>, actionId = "uno_which_cancel", value = `cards:${CARD_B},${CARD_A}`) {
+/** A button on the question, pressed: Review unless named. */
+async function opened(send: (p: Record<string, unknown>) => Promise<Response>, actionId = "uno_which_review", value = `cards:${CARD_B},${CARD_A}`) {
   await send({
     type: "block_actions",
     trigger_id: "T1",
@@ -101,51 +101,83 @@ async function opened(send: (p: Record<string, unknown>) => Promise<Response>, a
 const submitWith = (send: (p: Record<string, unknown>) => Promise<Response>, callbackId: string, metadata: string, state: unknown, blocks?: unknown[]) =>
   send({ type: "view_submission", user: { id: "U1" }, view: { id: "V1", callback_id: callbackId, private_metadata: metadata, state, ...(blocks ? { blocks } : {}) } });
 
-test("Cancel… opens the Cancel pop-up on its trigger, then fills it with the cards", async () => {
+/** One row's radio pick, as Slack sends it under that card's own block. */
+const choice = (ts: string, value: string) => ({ [`uno_which_choice_${ts}`]: { uno_which_choice: { type: "radio_buttons", selected_option: { value } } } });
+const notionCalls = () => calls.filter((c) => c.url.includes("api.notion.com"));
+
+test("Review opens the Review cards pop-up on its trigger, then fills it with a row per card", async () => {
   const { send } = await world();
   const view = await opened(send);
   assert.equal(slackCalls("views.open")[0]?.body?.trigger_id, "T1");
-  assert.equal(view.callback_id, "uno_which_cancel_pick");
+  assert.equal(view.callback_id, "uno_which_review_cards");
   assert.match(JSON.stringify(view.blocks), /Session reflections.*Backup tutor matching/);
-  assert.match(JSON.stringify(view.blocks), /"checkboxes"/);
-});
-
-test("Approve… opens the Approve pop-up, a radio list", async () => {
-  const { send } = await world();
-  const view = await opened(send, "uno_which_approve");
-  assert.equal(view.callback_id, "uno_which_approve_pick");
-  assert.match(JSON.stringify(view.blocks), /"radio_buttons"/);
+  assert.ok(view.blocks.some((b) => b.block_id === `uno_which_choice_${CARD_B}`));
+  assert.ok(view.blocks.some((b) => b.block_id === `uno_which_choice_${CARD_A}`));
   assert.doesNotMatch(JSON.stringify(view.blocks), /"checkboxes"/);
 });
 
-test("an old Choose… opens the Cancel pop-up, whatever its value's prefix", async () => {
-  const { send } = await world();
-  const view = await opened(send, "uno_which_choose", `confirm:${CARD_B},${CARD_A}`);
-  assert.equal(view.callback_id, "uno_which_cancel_pick");
-  assert.match(JSON.stringify(view.blocks), /"checkboxes"/);
+test("every button an earlier question carries opens the same pop-up, whatever its value's prefix", async () => {
+  for (const [actionId, value] of [
+    ["uno_which_choose", `confirm:${CARD_B},${CARD_A}`],
+    ["uno_which_approve", `cards:${CARD_B},${CARD_A}`],
+    ["uno_which_cancel", `cards:${CARD_B},${CARD_A}`],
+  ] as const) {
+    const { send } = await world();
+    const view = await opened(send, actionId, value);
+    assert.equal(view.callback_id, "uno_which_review_cards", actionId);
+  }
 });
 
-test("a Submit with nothing picked is answered in the ack with the error under the list", async () => {
+test("Show draft redraws the pop-up under the view's hash, keeping the choices", async () => {
   const { send } = await world();
   const view = await opened(send);
-  const res = await submitWith(send, view.callback_id, view.private_metadata, { values: {} });
-  assert.deepEqual(await res.json(), { response_action: "errors", errors: { uno_which_cards_cancel: "Tick at least one card to cancel." } });
-  const approve = await opened(send, "uno_which_approve");
-  const none = await submitWith(send, approve.callback_id, approve.private_metadata, { values: {} });
-  assert.deepEqual(await none.json(), { response_action: "errors", errors: { uno_which_approve_card: "Pick the card to approve." } });
+  await send({
+    type: "block_actions",
+    user: { id: "U1" },
+    view: { id: "V1", hash: "H1", callback_id: view.callback_id, private_metadata: view.private_metadata, state: { values: choice(CARD_A, "cancel") } },
+    actions: [{ action_id: "uno_which_show", value: CARD_A }],
+  });
+  const update = slackCalls("views.update").at(-1)!.body!;
+  assert.equal(update.hash, "H1");
+  const blocks = (update.view as SentView).blocks;
+  const row = blocks.find((b) => b.block_id === `uno_which_choice_${CARD_A}`) as { element: { initial_option: { value: string } } };
+  assert.equal(row.element.initial_option.value, "cancel");
+  assert.match(JSON.stringify(blocks), /Hide draft/);
 });
 
-test("a Cancel Submit with a tick is acked with update, and the pop-up answered once the card is decided", async () => {
+test("Done with every row on Leave is acked with a notice and decides nothing", async () => {
   const { send, store } = await world();
   const view = await opened(send);
-  const state = { values: { uno_which_cards_cancel: { uno_which_cards_input: { selected_options: [{ value: CARD_A }] } } } };
-  const res = await submitWith(send, view.callback_id, view.private_metadata, state);
+  const before = calls.length;
+  const res = await submitWith(send, view.callback_id, view.private_metadata, { values: { ...choice(CARD_A, "leave"), ...choice(CARD_B, "leave") } });
   const ack = (await res.json()) as { response_action: string; view: { blocks: unknown[] } };
   assert.equal(ack.response_action, "update");
-  assert.match(JSON.stringify(ack.view.blocks), /Canceling…/);
+  assert.match(JSON.stringify(ack.view.blocks), /Nothing changed/);
+  assert.deepEqual(calls.slice(before), [], "no call at all");
+  assert.equal((await store.getProposalByTs(CARD_A)).state, "found");
+  assert.equal((await store.getProposalByTs(CARD_B)).state, "found");
+});
+
+test("Done with a Cancel is acked with update, and the pop-up answered once the card is decided", async () => {
+  const { send, store } = await world();
+  const view = await opened(send);
+  const res = await submitWith(send, view.callback_id, view.private_metadata, { values: { ...choice(CARD_A, "cancel"), ...choice(CARD_B, "leave") } });
+  const ack = (await res.json()) as { response_action: string; view: { blocks: unknown[] } };
+  assert.equal(ack.response_action, "update");
+  assert.match(JSON.stringify(ack.view.blocks), /Deciding…/);
   assert.match(JSON.stringify(lastView().blocks), /Backup tutor matching\*: Canceled\./);
   assert.notEqual((await store.getProposalByTs(CARD_A)).state, "found");
-  assert.equal((await store.getProposalByTs(CARD_B)).state, "found", "the card not picked stays live");
+  assert.equal((await store.getProposalByTs(CARD_B)).state, "found", "the card left stays live");
+});
+
+test("Done with an Approve decides only that card", async () => {
+  const { send, store } = await world();
+  const view = await opened(send);
+  const res = await submitWith(send, view.callback_id, view.private_metadata, { values: choice(CARD_A, "approve") });
+  assert.equal(((await res.json()) as { response_action: string }).response_action, "update");
+  assert.match(JSON.stringify(lastView().blocks), /Backup tutor matching\*: /);
+  assert.notEqual((await store.getProposalByTs(CARD_A)).state, "found", "the card chosen is decided");
+  assert.equal((await store.getProposalByTs(CARD_B)).state, "found", "the card left stays live");
 });
 
 test("a numbered button on a question posted before the pop-up is answered aside", async () => {
@@ -164,44 +196,21 @@ test("a numbered button on a question posted before the pop-up is answered aside
   assert.equal(reply?.body?.text, LEGACY_WHICH_REPLY);
 });
 
-// THE KIND IS THE VIEW'S, NEVER ITS METADATA'S. A Choose… on a phone once
-// submitted the Approve list while the person meant Cancel: the decision rode
-// the view's metadata, and the switch's press never arrived to change it. Now
-// the button pressed fixes the pop-up's kind in its callback id, and a Submit
-// decides nothing unless its state holds that kind's own control.
+// A Choose… on a phone once submitted an Approve while the person meant
+// Cancel: the decision rode the view's metadata, and the switch's press never
+// arrived to change it. A view opened before this pop-up decides nothing,
+// whatever its state or metadata holds, and no Done reads the metadata for a
+// decision.
 
 /** A view's metadata as a pop-up that once offered Approve carried it. */
 const OLD_APPROVE_METADATA = JSON.stringify({ c: CHANNEL, q: QUESTION_TS, d: "confirm", k: [[CARD_B, "Session reflections"], [CARD_A, "Backup tutor matching"]] });
 const METADATA = JSON.stringify({ c: CHANNEL, q: QUESTION_TS, k: [[CARD_B, "Session reflections"], [CARD_A, "Backup tutor matching"]] });
-const notionCalls = () => calls.filter((c) => c.url.includes("api.notion.com"));
 const TICK_A = { values: { uno_which_cards_cancel: { uno_which_cards_input: { type: "checkboxes", selected_options: [{ value: CARD_A }] } } } };
 const PICK_A = { values: { uno_which_approve_card: { uno_which_approve_input: { type: "radio_buttons", selected_option: { value: CARD_A } } } } };
 
-test("an Approve Submit with a pick is acked with update, and decides only that card", async () => {
+test("Done under an older pop-up's callback id is refused and decides nothing, whatever its state or metadata", async () => {
   const { send, store } = await world();
-  const view = await opened(send, "uno_which_approve");
-  const res = await submitWith(send, view.callback_id, view.private_metadata, PICK_A);
-  const ack = (await res.json()) as { response_action: string; view: { blocks: unknown[] } };
-  assert.equal(ack.response_action, "update");
-  assert.match(JSON.stringify(ack.view.blocks), /Approving…/);
-  assert.match(JSON.stringify(lastView().blocks), /Backup tutor matching\*: /);
-  assert.notEqual((await store.getProposalByTs(CARD_A)).state, "found", "the card picked is decided");
-  assert.equal((await store.getProposalByTs(CARD_B)).state, "found", "the card not picked stays live");
-});
-
-test("a Submit under a view opened before the two pop-ups is refused and decides nothing, whatever its state or metadata", async () => {
-  const { send, store } = await world();
-  const states = [
-    TICK_A,
-    PICK_A,
-    { values: { uno_which_cards_confirm: { uno_which_cards_input: { type: "radio_buttons", selected_option: { value: CARD_A } } } } },
-    {
-      values: {
-        uno_which_decision_cancel: { uno_which_decision: { type: "radio_buttons", selected_option: { value: "cancel" } } },
-        ...TICK_A.values,
-      },
-    },
-  ];
+  const states = [TICK_A, PICK_A, { values: choice(CARD_A, "approve") }];
   // As an old view drew itself: its list an input, or only its switch, in
   // an actions block, which Slack will not take an error under.
   const withInput = [
@@ -209,16 +218,18 @@ test("a Submit under a view opened before the two pop-ups is refused and decides
     { type: "input", block_id: "uno_which_cards_cancel", element: { type: "checkboxes", action_id: "uno_which_cards_input" } },
   ];
   const actionsOnly = [withInput[0]];
-  for (const state of states) {
-    for (const metadata of [OLD_APPROVE_METADATA, METADATA]) {
-      const res = await submitWith(send, "uno_which_pick", metadata, state, withInput);
-      const ack = (await res.json()) as { response_action: string; errors?: Record<string, string> };
-      assert.deepEqual(ack, { response_action: "errors", errors: { uno_which_cards_cancel: ack.errors?.uno_which_cards_cancel } }, JSON.stringify(state));
-      assert.match(ack.errors!.uno_which_cards_cancel!, /Open the question again/);
-      const bare = await submitWith(send, "uno_which_pick", metadata, state, actionsOnly);
-      const notice = (await bare.json()) as { response_action: string; view?: { blocks: unknown[] } };
-      assert.equal(notice.response_action, "update", "no input to key an error to: a notice instead");
-      assert.match(JSON.stringify(notice.view?.blocks), /Open the question again/);
+  for (const callbackId of ["uno_which_pick", "uno_which_approve_pick", "uno_which_cancel_pick"]) {
+    for (const state of states) {
+      for (const metadata of [OLD_APPROVE_METADATA, METADATA]) {
+        const res = await submitWith(send, callbackId, metadata, state, withInput);
+        const ack = (await res.json()) as { response_action: string; errors?: Record<string, string> };
+        assert.equal(ack.response_action, "errors", `${callbackId} ${JSON.stringify(state)}`);
+        assert.match(ack.errors!.uno_which_cards_cancel!, /Open the question again/);
+        const bare = await submitWith(send, callbackId, metadata, state, actionsOnly);
+        const notice = (await bare.json()) as { response_action: string; view?: { blocks: unknown[] } };
+        assert.equal(notice.response_action, "update", "no input to key an error to: a notice instead");
+        assert.match(JSON.stringify(notice.view?.blocks), /Open the question again/);
+      }
     }
   }
   assert.deepEqual(notionCalls(), []);
@@ -226,34 +237,12 @@ test("a Submit under a view opened before the two pop-ups is refused and decides
   assert.equal((await store.getProposalByTs(CARD_B)).state, "found");
 });
 
-test("a Submit whose control is not its pop-up's own is refused and decides nothing", async () => {
+test("Done never reads a decision from the metadata: an old \"d\" in it, with no row chosen, decides nothing", async () => {
   const { send, store } = await world();
-  const cases: Array<[string, unknown]> = [
-    ["uno_which_approve_pick", TICK_A],
-    ["uno_which_approve_pick", { values: { ...PICK_A.values, ...TICK_A.values } }],
-    ["uno_which_cancel_pick", PICK_A],
-    ["uno_which_cancel_pick", { values: { ...TICK_A.values, ...PICK_A.values } }],
-  ];
-  for (const [callbackId, state] of cases) {
-    for (const metadata of [OLD_APPROVE_METADATA, METADATA]) {
-      const res = await submitWith(send, callbackId, metadata, state);
-      assert.equal(((await res.json()) as { response_action: string }).response_action, "errors", `${callbackId} ${JSON.stringify(state)}`);
-    }
-  }
+  await opened(send);
+  const res = await submitWith(send, "uno_which_review_cards", OLD_APPROVE_METADATA, { values: {} });
+  assert.match(JSON.stringify(await res.json()), /Nothing changed/);
   assert.deepEqual(notionCalls(), []);
   assert.equal((await store.getProposalByTs(CARD_A)).state, "found");
   assert.equal((await store.getProposalByTs(CARD_B)).state, "found");
-});
-
-test("a Submit with no state for its list is refused, whatever the metadata says", async () => {
-  const { send, store } = await world();
-  const states = [undefined, {}, { values: {} }, { values: { uno_which_cards_cancel: {} } }, { values: { uno_which_cards_cancel: { uno_which_cards_input: { value: CARD_A } } } }];
-  for (const state of states) {
-    for (const callbackId of ["uno_which_cancel_pick", "uno_which_approve_pick"]) {
-      const res = await submitWith(send, callbackId, OLD_APPROVE_METADATA, state);
-      assert.equal(((await res.json()) as { response_action: string }).response_action, "errors", JSON.stringify(state));
-    }
-  }
-  assert.deepEqual(notionCalls(), []);
-  assert.equal((await store.getProposalByTs(CARD_A)).state, "found");
 });

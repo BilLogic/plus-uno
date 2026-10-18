@@ -65,22 +65,22 @@ import type { CardMessage } from "./proposal-render";
 import {
   LEGACY_WHICH_REPLY,
   isLegacyWhichPress,
+  isWhichOpenAction,
   runWhichOpen,
   runWhichRedraw,
   runWhichSubmit,
-  whichKindOfAction,
   type WhichDoorDeps,
 } from "./which-card";
 import {
-  WHICH_DECISION_ACTION_ID,
-  WHICH_DRAFT_ACTION_ID,
+  DECIDING,
+  NOTHING_CHOSEN,
   WHICH_HIDE_ACTION_ID,
+  WHICH_OLD_IN_VIEW_ACTION_IDS,
+  WHICH_SHOW_ACTION_ID,
   isWhichCallback,
-  whichKindOf,
   whichNoticeView,
   whichPopupOf,
   whichSubmitOf,
-  type WhichKind,
 } from "./which-card-view";
 import { CHECK_IT_ACTION_ID, type CheckItPress, resultsActionOf, runCheckItDoor, runResultsDoor, runStopCheckDoor, STOP_CHECK_ACTION_ID } from "./blueprint-check";
 import { createdPageOn } from "../blueprint-upkeep/env";
@@ -216,9 +216,8 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === "uno_delete_answer") return deleteAnswer(env, payload);
   if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
   if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
-  const whichKind = whichKindOfAction(actionId);
-  if (whichKind) return openWhich(env, payload, whichKind);
-  if (actionId === WHICH_DECISION_ACTION_ID || actionId === WHICH_DRAFT_ACTION_ID || actionId === WHICH_HIDE_ACTION_ID) {
+  if (isWhichOpenAction(actionId)) return openWhich(env, payload);
+  if (actionId === WHICH_SHOW_ACTION_ID || actionId === WHICH_HIDE_ACTION_ID || WHICH_OLD_IN_VIEW_ACTION_IDS.has(actionId)) {
     return redrawWhich(env, payload, actionId);
   }
   if (isLegacyWhichPress(actionId)) return replyEphemeral(payload, LEGACY_WHICH_REPLY);
@@ -290,15 +289,15 @@ async function resolveFromButton(
   await runButtonDoor({ channel, messageTs: ts, decision, userId }, buttonDoorDeps(env, payload));
 }
 
-// Approve… or Cancel… under a "which one?" question (#1342), or an old
-// Choose…, which opens Cancel: the pop-up of that kind, which decides each
-// card picked in it through its own door (`which-card.ts`). The press carries
-// the question in `message`; every press inside the pop-up, and its Submit,
-// carries it in the view's `private_metadata`, and its kind in the view's
-// `callback_id`.
+// Review under a "which one?" question, or a button an earlier question
+// carries (Choose…, Approve…, Cancel…): the Review cards pop-up, which
+// decides each card by its own row through that card's own door
+// (`which-card.ts`). The press carries the question in `message`; every
+// press inside the pop-up, and its Done, carries it in the view's
+// `private_metadata`, which holds no decision.
 //
 // `Env` enters here and stops here.
-async function openWhich(env: Env, payload: InteractionPayload, kind: WhichKind): Promise<void> {
+async function openWhich(env: Env, payload: InteractionPayload): Promise<void> {
   const triggerId = payload.trigger_id;
   const channel = payload.channel?.id;
   const questionTs = payload.message?.ts;
@@ -311,50 +310,48 @@ async function openWhich(env: Env, payload: InteractionPayload, kind: WhichKind)
       questionTs,
       question: { text: payload.message?.text ?? "", blocks: payload.message?.blocks ?? [] },
       value: payload.actions?.[0]?.value,
-      kind,
       userId,
     },
     whichDoorDeps(env, payload, channel, questionTs),
   );
 }
 
-/** A draft chosen under "Show a draft…", or Hide draft pressed, inside the
- *  pop-up: the pop-up redrawn in place, of the kind its `callback_id` says.
- *  A press inside a view opened before the two pop-ups — its Approve /
- *  Cancel switch included — is answered with a line to open the question
- *  again, never a decision. */
+/** Show draft or Hide draft on a row, inside the pop-up: the pop-up redrawn
+ *  in place under the view's hash, each row's choice kept. A press inside a
+ *  view opened before it — its Approve / Cancel switch or its draft select
+ *  included — is answered with a line to open the question again, never a
+ *  decision. */
 async function redrawWhich(env: Env, payload: InteractionPayload, actionId: string): Promise<void> {
   const viewId = payload.view?.id;
   const popup = whichPopupOf(payload.view?.private_metadata);
   const userId = payload.user?.id;
   const action = payload.actions?.[0];
   if (!viewId || !popup || !userId || !action) return;
-  const chosen = action.selected_option?.value;
   const press =
     actionId === WHICH_HIDE_ACTION_ID
       ? ({ kind: "hide" } as const)
-      : actionId === WHICH_DECISION_ACTION_ID
-        ? ({ kind: "redraw" } as const)
-        : chosen
-          ? ({ kind: "draft", cardTs: chosen } as const)
+      : actionId === WHICH_SHOW_ACTION_ID && action.value
+        ? ({ kind: "show", cardTs: action.value } as const)
+        : WHICH_OLD_IN_VIEW_ACTION_IDS.has(actionId)
+          ? ({ kind: "old" } as const)
           : null;
   if (!press) return;
   const hash = typeof payload.view?.hash === "string" ? payload.view.hash : undefined;
   await runWhichRedraw(
-    { viewId, popup, kind: whichKindOf(payload.view?.callback_id), state: payload.view?.state, ...(hash ? { hash } : {}), press, userId },
+    { viewId, popup, callbackId: payload.view?.callback_id, state: payload.view?.state, ...(hash ? { hash } : {}), press, userId },
     whichDoorDeps(env, payload, popup.channel, popup.questionTs),
   );
 }
 
 /**
- * A pop-up's Submit, read as its kind, from its `callback_id`: a state that
- * does not hold that kind's own control — an Approve's radio pick, a
- * Cancel's ticked checkboxes — or holds the other's, or a view opened before
- * the two pop-ups, is an error in the ack itself and decides nothing
- * (`whichSubmitOf`). A pick is acked with a line that says the decision is
- * under way, and the cards are decided after the ack, the pop-up answering
- * once they are. Nothing is read from the metadata but the question and its
- * cards.
+ * The pop-up's Done: each card the question listed, read by its own row's
+ * choice in the submitted state alone (`whichSubmitOf`) — a row with none
+ * readable is Leave. Nothing chosen is acked with a line and decides
+ * nothing; a Done from a view opened before this pop-up is an error in the
+ * ack itself, or a notice, and decides nothing. Otherwise the ack says the
+ * decisions are under way, and the cards are decided after it, the pop-up
+ * answering once they are. Nothing is read from the metadata but the
+ * question and its cards.
  */
 function submitWhich(env: Env, payload: InteractionPayload, ctx: ExecutionContext): Response {
   const viewId = payload.view?.id;
@@ -364,24 +361,28 @@ function submitWhich(env: Env, payload: InteractionPayload, ctx: ExecutionContex
     console.log("[interactive] which-card submit without its question");
     return new Response("", { status: 200 });
   }
-  const submitted = whichSubmitOf(payload.view?.callback_id, payload.view?.state, payload.view?.blocks);
+  const submitted = whichSubmitOf(payload.view?.callback_id, payload.view?.state, payload.view?.blocks, popup.cards);
   if (!submitted.ok) {
     if ("notice" in submitted) {
       // An old view with no input block Slack would take an error under.
       console.log(`[interactive] which-card submit on ${popup.channel}/${popup.questionTs} refused: an old view, answered with a notice`);
-      return Response.json({ response_action: "update", view: whichNoticeView(null, popup, submitted.notice) });
+      return Response.json({ response_action: "update", view: whichNoticeView(popup, submitted.notice) });
     }
     console.log(`[interactive] which-card submit on ${popup.channel}/${popup.questionTs} refused: ${Object.keys(submitted.errors).join(",")}`);
     return Response.json({ response_action: "errors", errors: submitted.errors });
   }
   const { submission } = submitted;
+  if (!submission.decide.length) {
+    console.log(`[interactive] which-card done on ${popup.channel}/${popup.questionTs} with every card left`);
+    return Response.json({ response_action: "update", view: whichNoticeView(popup, NOTHING_CHOSEN) });
+  }
+  // A throw partway answers the pop-up itself before it reaches here.
   ctx.waitUntil(
     runWhichSubmit({ viewId, popup, submission, userId }, whichDoorDeps(env, payload, popup.channel, popup.questionTs)).catch((err) => {
-      console.error(`[interactive] which-card ${submission.kind} failed: ${err instanceof Error ? err.message : String(err)}`);
+      console.error(`[interactive] which-card done failed: ${err instanceof Error ? err.message : String(err)}`);
     }),
   );
-  const underWay = submission.kind === "approve" ? "Approving…" : "Canceling…";
-  return Response.json({ response_action: "update", view: whichNoticeView(submission.kind, popup, underWay) });
+  return Response.json({ response_action: "update", view: whichNoticeView(popup, DECIDING) });
 }
 
 /** `Env`, once, as the dependencies the "which one?" doors read: the button

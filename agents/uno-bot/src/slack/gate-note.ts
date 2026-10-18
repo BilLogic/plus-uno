@@ -151,9 +151,9 @@ export function aimedElsewhereLine(note: Extract<GateNote, { kind: "aimed-elsewh
 
 /**
  * The "which one?" question (#1319): how many cards wait, and that nothing
- * ran — the line above the question's Approve… and Cancel… buttons
- * (`which-card.ts`). Both are offered whatever decision asked it, so the
- * line is the same for a ✅ and a ⛔.
+ * ran — the line above the question's Review button (`which-card.ts`).
+ * The same Review is offered whatever decision asked it, so the line is the
+ * same for a ✅ and a ⛔.
  */
 export function whichCardQuestion(note: Extract<GateNote, { kind: "which-card" }>): string {
   return `${note.cards.length} cards are waiting, nothing ran yet.`;

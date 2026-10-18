@@ -1,61 +1,56 @@
-// The "which one?" pop-ups' views: the waiting cards to pick one to approve
-// or to tick for a cancel, each card's draft on demand, and the lines that
-// follow a Submit.
+// The "which one?" pop-up's views: every waiting card as a row to approve,
+// cancel or leave, each card's draft on demand, and the lines that follow
+// Done.
 //
 // Renders and posts nothing; `which-card.ts` decides which view to show and
 // hands it to Slack.
 //
-// TWO POP-UPS, EACH OF ONE KIND. The question carries Approve… and Cancel…,
-// and the button pressed fixes which pop-up opens: Approve lists the waiting
-// cards as a pick-one radio list and Submit, "Approve card", approves the one
-// picked; Cancel lists them as checkboxes with an optional note and Submit,
-// "Cancel cards", cancels the ones ticked. Nothing inside a pop-up switches
-// its kind. The pop-up once carried an Approve / Cancel switch whose choice
-// the view's metadata kept, and on a phone the switch's press never arrived:
-// the metadata still said Approve, and a card ticked to cancel was approved.
-// So the kind is the view's `callback_id`, set when it opens and never
-// changed by a redraw, no decision rides the metadata, and a Submit decides
-// nothing unless its state holds that kind's own control under its own block
-// and nothing else (`whichSubmitOf`): an Approve Submit carrying ticks, a
-// Cancel Submit carrying a radio pick, or a view opened before the two
-// pop-ups, is refused. Each kind's list holds exactly its own control, and
-// an error is shown under an input block, the only kind Slack takes one
-// under; a view opened before the two pop-ups with none is answered with a
-// notice in place of the view instead.
+// ONE POP-UP, ONE ROW PER CARD. The question's one button, Review, opens
+// "Review cards". Each waiting card is a row: a section saying what it does,
+// a Show draft button as its accessory, and under it an input block labeled
+// with its headline, holding a three-way choice, Approve / Cancel / Leave,
+// that starts on Leave. No label or caption is repeated per row. An optional note under the rows is the reason said on each card
+// canceled. Done applies every row's choice; Leave does nothing.
 //
-// A DRAFT OPENS BELOW THE LIST. Slack modals have no accordion, so one select
-// under the list, "Show a draft…", names each card by its headline, and a
-// choice redraws the pop-up with that card's draft below it, drawn as its own
-// Review pop-up draws it (`review-view.ts` § `draftBlocks`); a Hide draft
-// button after the draft redraws it without. One draft is open at a time, so
-// a long one has the whole view's room; past it, the draft is cut and points
-// at the card's own Review, which has all of it. Every redraw sets each
-// input's value from the state the press carried, so the pick, the ticks and
-// the note survive it. The note is the cancel's reason, said on each card it
-// closes.
+// EACH ROW IS READ FROM ITS OWN BLOCK, AND NOWHERE ELSE. A row's input block
+// is keyed by its card's ts (`uno_which_choice_<ts>`), and Done reads each
+// listed card's choice only from the submitted state under that block, from
+// the one radio control it draws (`whichSubmitOf`). Nothing is read from the
+// view's metadata, the button's value or any stored decision. A row whose
+// state is missing, holds an unknown value, a control of another type, or
+// anything beside its own control, counts as Leave. So no card is decided
+// except by its own row's on-screen choice. Earlier pop-ups kept a decision
+// in the metadata, or fixed one by the button that opened them, and on a
+// phone a press that never arrived left a stored Approve standing over the
+// Cancel on screen.
 //
-// EACH CARD IS PICKED IN ONE PLACE: its option in the list, by its headline
-// (`agent/card-identity.ts`) and what it does (`cardDoes`). An option holds
-// no button, and a bare Show draft per card would not say which card it
-// opens, so the drafts sit behind the one select, by headline, in the
-// list's order.
+// A VIEW OPENED BEFORE THIS POP-UP DECIDES NOTHING. Its callback id is one of
+// the older ones, and its Done is refused with "Open the question again.",
+// keyed to the first input block it drew, the only kind Slack takes an error
+// under; one that drew none is answered with a notice in place of the view.
 //
-// EVERY CHOICE SITS IN AN INPUT BLOCK. The list, radio or checkboxes, is an
-// input block, and so is "Show a draft…", with `dispatch_action`, so a choice
-// still arrives as a `block_actions` and redraws the pop-up; only Hide draft,
-// a button, is in an actions block. The select's block_id carries the open
-// draft, since an input keeps its own pick across a redraw under an unchanged
-// block_id; presses are routed by action_id. On a phone, a pop-up with a
-// choice in an actions block opened blank.
+// A DRAFT OPENS UNDER ITS ROW. Slack modals have no accordion, so Show draft
+// redraws the pop-up with that card's draft between its row and its choice,
+// drawn as its own Review pop-up draws it (`review-view.ts` §
+// `draftBlocks`), and the row's button becomes Hide draft. One draft is open
+// at a time, so a long one has the whole view's room; past it, the draft is
+// cut and points at the card's own Review. Every redraw seeds each row's
+// choice and the note from the state the press carried, and keeps each
+// block's id, so the choices survive it; the id carries no draft, so it
+// never resets a choice.
+//
+// EVERY CHOICE SITS IN AN INPUT BLOCK. Slack's mobile client cannot draw a
+// radio group or a select in an actions block: a pop-up with one there
+// opened blank. Show draft and Hide draft are plain buttons, a section's
+// accessory, and no button is colored.
 //
 // The view carries the question it answers in `private_metadata` — the
-// question's message and the cards it listed — so every press and the Submit
-// are read without the message. It carries no decision: its kind is its
-// callback id.
+// question's message and the cards it listed, by ts and headline — and which
+// draft is open. It carries no decision.
 import { proposalOperations, type PendingProposal } from "../thread-state/index";
 import { gateWordsFor } from "../agent/tool-table";
 import { clip } from "./card-block";
-import { DESCRIPTION_CHARS } from "./review-anatomy";
+import { escapeSlackText } from "./mrkdwn";
 import { anatomyOf, draftHeadline } from "./review-draft";
 import { draftBlocks, fitBody } from "./review-view";
 import type { NotionDatabaseLinks } from "./review-notion-create";
@@ -63,73 +58,56 @@ import type { WhichCard } from "../turn/index";
 
 type View = Record<string, unknown>;
 
-/** What a pop-up does, fixed by the question's button that opened it. */
-export type WhichKind = "approve" | "cancel";
+/** The pop-up's `callback_id`. */
+export const WHICH_REVIEW_CALLBACK_ID = "uno_which_review_cards";
+/** The `callback_id`s pop-ups had before this one: a Done under any of them
+ *  is refused, since nothing in such a view says what each row is. */
+const OLD_CALLBACK_IDS: ReadonlySet<string> = new Set(["uno_which_pick", "uno_which_approve_pick", "uno_which_cancel_pick"]);
 
-/** Each pop-up's `callback_id`, which names its kind to the Submit. */
-export const WHICH_APPROVE_CALLBACK_ID = "uno_which_approve_pick";
-export const WHICH_CANCEL_CALLBACK_ID = "uno_which_cancel_pick";
-/** The one `callback_id` a pop-up had before there were two: a Submit under
- *  it is refused, since nothing in such a view says what it was for. */
-export const WHICH_OLD_CALLBACK_ID = "uno_which_pick";
-
-const CALLBACK_OF: Record<WhichKind, string> = { approve: WHICH_APPROVE_CALLBACK_ID, cancel: WHICH_CANCEL_CALLBACK_ID };
-
-/** A view's kind from its `callback_id`; null for a view opened before the
- *  two pop-ups, or any other. */
-export function whichKindOf(callbackId: string | undefined): WhichKind | null {
-  return callbackId === WHICH_APPROVE_CALLBACK_ID ? "approve" : callbackId === WHICH_CANCEL_CALLBACK_ID ? "cancel" : null;
-}
-
-/** Whether a `callback_id` is one of these pop-ups', old or new. */
+/** Whether a `callback_id` is this pop-up's, or an older one's. */
 export function isWhichCallback(callbackId: string | undefined): boolean {
-  return callbackId === WHICH_OLD_CALLBACK_ID || whichKindOf(callbackId) !== null;
+  return callbackId === WHICH_REVIEW_CALLBACK_ID || (callbackId !== undefined && OLD_CALLBACK_IDS.has(callbackId));
 }
 
-/** The Approve / Cancel switch a view opened before the two pop-ups may
- *  still carry. A press on it decides nothing. */
-export const WHICH_DECISION_ACTION_ID = "uno_which_decision";
-
-/** "Show a draft…": each option's value is a card's ts. */
-export const WHICH_DRAFT_ACTION_ID = "uno_which_draft";
-/** The select's block, by the draft open, so Hide draft empties it and the
- *  same card chosen again still fires. */
-const DRAFT_BLOCK_PREFIX = "uno_which_draft_";
-const draftBlock = (shown: string | undefined) => `${DRAFT_BLOCK_PREFIX}${shown ?? "none"}`;
-
-/** Hide draft, after the open draft. */
+/** Show draft and Hide draft, a row's accessory: each one's value is its
+ *  card's ts. */
+export const WHICH_SHOW_ACTION_ID = "uno_which_show";
 export const WHICH_HIDE_ACTION_ID = "uno_which_hide";
+/** The presses an older pop-up drew — its Approve / Cancel switch and its
+ *  "Show a draft…" select — still routed here so they are answered. */
+export const WHICH_OLD_IN_VIEW_ACTION_IDS: ReadonlySet<string> = new Set(["uno_which_decision", "uno_which_draft"]);
 
-/** The Cancel pop-up's list of cards to tick. Its block_id is the one the
- *  cancel list has always had. */
-const CARDS_BLOCK = "uno_which_cards_cancel";
-const CARDS_ACTION_ID = "uno_which_cards_input";
-
-/** The Approve pop-up's list of cards to pick one from: a block and an
- *  action of its own, which no view before it ever used. */
-const APPROVE_BLOCK = "uno_which_approve_card";
-const APPROVE_ACTION_ID = "uno_which_approve_input";
+/** A row's section and its choice's input block, each keyed by its card. */
+const ROW_PREFIX = "uno_which_row_";
+const CHOICE_PREFIX = "uno_which_choice_";
+const CHOICE_ACTION_ID = "uno_which_choice";
 
 const NOTE_BLOCK = "uno_which_note";
 const NOTE_ACTION_ID = "uno_which_note_input";
 
-/** Said under the list when a Cancel Submit carries no card ticked. */
-export const TICK_ONE = "Tick at least one card to cancel.";
-/** Said under the list when an Approve Submit carries no card picked. */
-export const PICK_ONE = "Pick the card to approve.";
-/** Said under a Submit from a view opened before the two pop-ups, or one
- *  whose state holds a control that is not its own. */
-export const REOPEN = "This pop-up is out of date, so nothing ran. Open the question again.";
+/** What a row says to do with its card. */
+export type WhichChoice = "approve" | "cancel" | "leave";
+const CHOICES: ReadonlyArray<[WhichChoice, string]> = [
+  ["approve", "Approve"],
+  ["cancel", "Cancel"],
+  ["leave", "Leave"],
+];
 
-/** Slack's caps: a view's title 24 characters, its blocks 100, an option's
- *  text 75, a `plain_text_input` 3,000. */
+/** Said in place of the view under a Done from a view opened before this
+ *  pop-up. */
+export const REOPEN = "Open the question again.";
+/** Said after a Done with every row on Leave. */
+export const NOTHING_CHOSEN = "Nothing changed. Every card is still waiting.";
+/** Said in the pop-up while Done is under way. */
+export const DECIDING = "Deciding…";
+/** Said in the pop-up when Done stopped on an error. */
+export const FAILED_PARTWAY = "Something failed, so open the question again.";
+
+/** Slack's caps: a view's blocks 100, a `plain_text_input` 3,000. */
 const MAX_VIEW_BLOCKS = 100;
-const OPTION_CHARS = 75;
+/** An input label's cap is 2,000; a headline is cut far short of it. */
+const LABEL_CHARS = 150;
 const NOTE_MAX_CHARS = 3000;
-
-/** Each kind's title, and what its Submit says it does. */
-const TITLE: Record<WhichKind, string> = { approve: "Approve a card", cancel: "Cancel cards" };
-const SUBMIT: Record<WhichKind, string> = { approve: "Approve card", cancel: "Cancel cards" };
 
 /** Said where an open draft was cut to the room the view has left. */
 export const DRAFT_LEFT_OUT = "Cut here. Its card's Review has the rest.";
@@ -141,24 +119,23 @@ export interface WhichPopup {
   questionTs: string;
   /** The cards the question listed, in its order, by ts and headline. */
   cards: WhichCard[];
-  /** The card whose draft is open under the list, if any. */
+  /** The card whose draft is open under its row, if any. */
   shown?: string;
 }
 
-/** What the person has picked and typed, as a redraw carries it back into
- *  the view: the one card picked to approve, or the cards ticked to cancel,
- *  by ts; and the note, which only the Cancel pop-up has. */
-export interface WhichPick {
-  picked: string[];
+/** What the person has chosen and typed, as a redraw carries it back into
+ *  the view: each row's choice by its card's ts, and the note. */
+export interface WhichChoices {
+  rows: Record<string, WhichChoice>;
   note: string;
 }
 
-/** A Submit, read from its view's kind and state: exactly what it decides. */
-export type WhichSubmission =
-  /** The one card picked in an Approve pop-up. */
-  | { kind: "approve"; card: string }
-  /** The cards ticked in a Cancel pop-up, and its note. */
-  | { kind: "cancel"; picked: string[]; note: string };
+/** Done, read from its state: the cards it decides, in the list's order,
+ *  and the note. A row on Leave is not in it. */
+export interface WhichSubmission {
+  decide: Array<{ card: string; choice: Exclude<WhichChoice, "leave"> }>;
+  note: string;
+}
 
 /** What a view's `private_metadata` holds for this question. Ten cards' ts
  *  and headlines take about a third of Slack's 3,000 characters. */
@@ -178,9 +155,13 @@ export function whichPopupOf(metadata: string | undefined): WhichPopup | null {
   try {
     const m = JSON.parse(metadata ?? "") as { c?: unknown; q?: unknown; k?: unknown; s?: unknown };
     if (typeof m.c !== "string" || typeof m.q !== "string" || !Array.isArray(m.k)) return null;
-    const cards = m.k.flatMap((pair: unknown) =>
-      Array.isArray(pair) && typeof pair[0] === "string" && typeof pair[1] === "string" ? [{ ts: pair[0], headline: pair[1] }] : [],
-    );
+    // Each card once, by its first entry: a ts listed twice is one row.
+    const seen = new Set<string>();
+    const cards = m.k.flatMap((pair: unknown) => {
+      if (!Array.isArray(pair) || typeof pair[0] !== "string" || typeof pair[1] !== "string" || seen.has(pair[0])) return [];
+      seen.add(pair[0]);
+      return [{ ts: pair[0], headline: pair[1] }];
+    });
     return { channel: m.c, questionTs: m.q, cards, ...(typeof m.s === "string" ? { shown: m.s } : {}) };
   } catch {
     return null;
@@ -200,86 +181,59 @@ export function cardDoes(proposal: PendingProposal): string {
   return verb.charAt(0).toUpperCase() + verb.slice(1);
 }
 
-/** A view of `kind`'s pop-up; a null kind is a view opened before the two,
- *  answered with a line and no Submit, under the old callback id. */
-function modal(kind: WhichKind | null, popup: WhichPopup, blocks: unknown[], submit = false): View {
+/** The pop-up's view: Done only where it lists rows to decide. */
+function modal(popup: WhichPopup, blocks: unknown[], submit = false): View {
   return {
     type: "modal",
-    callback_id: kind ? CALLBACK_OF[kind] : WHICH_OLD_CALLBACK_ID,
-    title: { type: "plain_text", text: kind ? TITLE[kind] : "Waiting cards" },
+    callback_id: WHICH_REVIEW_CALLBACK_ID,
+    title: { type: "plain_text", text: "Review cards" },
     close: { type: "plain_text", text: "Close" },
-    ...(submit && kind ? { submit: { type: "plain_text", text: SUBMIT[kind] } } : {}),
+    ...(submit ? { submit: { type: "plain_text", text: "Done" } } : {}),
     private_metadata: whichMetadata(popup),
     blocks: blocks.slice(0, MAX_VIEW_BLOCKS),
   };
 }
 
 const line = (text: string): unknown => ({ type: "section", text: { type: "mrkdwn", text } });
-const plain = (text: string, max = OPTION_CHARS) => ({ type: "plain_text", text: clip(text, max) });
+const plain = (text: string) => ({ type: "plain_text", text });
 
 /** The view `views.open` shows at once, inside Slack's three-second trigger
- *  window, before any card has been read — already of its kind. */
-export function whichLoadingView(kind: WhichKind, popup: WhichPopup): View {
-  return modal(kind, popup, [line("Loading the cards…")]);
+ *  window, before any card has been read. */
+export function whichLoadingView(popup: WhichPopup): View {
+  return modal(popup, [line("Loading the cards…")]);
 }
 
-/** One line in the pop-up, and Close: why there is nothing to pick, or that a
- *  Submit is under way. */
-export function whichNoticeView(kind: WhichKind | null, popup: WhichPopup, text: string): View {
-  return modal(kind, popup, [line(text)]);
+/** One line in the pop-up, and Close: why there is nothing to decide, or
+ *  that Done is under way. */
+export function whichNoticeView(popup: WhichPopup, text: string): View {
+  return modal(popup, [line(text)]);
 }
 
-/** After a Submit: one line per card it was made on, saying what came of it. */
-export function whichResultView(kind: WhichKind, popup: WhichPopup, lines: readonly string[]): View {
-  return modal(kind, popup, lines.map(line));
+/** After Done: one line per card it decided or could not reach. */
+export function whichResultView(popup: WhichPopup, lines: readonly string[]): View {
+  return modal(popup, lines.map(line));
 }
 
 /**
- * A pop-up of `kind`: the cards to pick or tick, under a label that says
- * what Submit does to them, "Show a draft…" with the open draft below it,
- * and, to cancel, the note. `waiting`
- * are the listed cards still waiting, read just now; a card no longer
- * waiting is not offered.
+ * The pop-up: one row per waiting card — its headline and what it does,
+ * Show draft (or Hide draft, with its draft under it), and its choice — and
+ * the note. `waiting` are the listed cards still waiting, read just now; a
+ * card no longer waiting is not offered.
  *
- * @param kind - What it does, fixed when it opened
  * @param popup - The question and the draft open
  * @param waiting - The listed cards still waiting, in the question's order
- * @param pick - What the person has picked and typed so far
+ * @param chosen - What the person has chosen and typed so far
  * @param opts.databases - Where a Notion create's database opens, for a draft
  */
 export function whichView(
-  kind: WhichKind,
   popup: WhichPopup,
   waiting: readonly PendingProposal[],
-  pick: WhichPick,
+  chosen: WhichChoices,
   opts: { databases?: NotionDatabaseLinks } = {},
 ): View {
-  const offered = new Set(waiting.map((card) => card.proposalTs));
-  const picked = pick.picked.filter((ts) => offered.has(ts));
-  const option = (card: PendingProposal) => ({
-    value: card.proposalTs,
-    text: plain(headlineOf(popup, card)),
-    description: plain(cardDoes(card), DESCRIPTION_CHARS),
-  });
-  const options = waiting.map(option);
-  const chosen = options.filter((o) => picked.includes(o.value));
-  const list =
-    kind === "approve"
-      ? {
-          type: "input",
-          block_id: APPROVE_BLOCK,
-          label: plain("Approve which one?"),
-          element: { type: "radio_buttons", action_id: APPROVE_ACTION_ID, options, ...(chosen[0] ? { initial_option: chosen[0] } : {}) },
-        }
-      : {
-          type: "input",
-          block_id: CARDS_BLOCK,
-          label: plain("Cancel which ones?"),
-          element: { type: "checkboxes", action_id: CARDS_ACTION_ID, options, ...(chosen.length ? { initial_options: chosen } : {}) },
-        };
-  const head: unknown[] = [list, { type: "divider" }];
-  // The cancel's reason, said on each card it closes. An approval takes no
-  // note here: one with edits is made from the card's own Review.
+  const open = waiting.find((card) => card.proposalTs === popup.shown);
+  // Each row is three blocks, its section, its choice and a divider; the
+  // note is the last. An open draft has the room the rest leaves it.
   const note = {
     type: "input",
     block_id: NOTE_BLOCK,
@@ -290,93 +244,76 @@ export function whichView(
       action_id: NOTE_ACTION_ID,
       multiline: true,
       max_length: NOTE_MAX_CHARS,
-      ...(pick.note ? { initial_value: clip(pick.note, NOTE_MAX_CHARS) } : {}),
+      ...(chosen.note ? { initial_value: clip(chosen.note, NOTE_MAX_CHARS) } : {}),
     },
   };
-  const tail: unknown[] = kind === "cancel" ? [{ type: "divider" }, note] : [];
-
-  // "Show a draft…", by headline in the list's order, opening on the card
-  // whose draft is open; then that draft, cut to the room the rest of the
-  // view leaves it, and Hide draft after it.
-  const drafts = waiting.map((card) => ({ value: card.proposalTs, text: plain(headlineOf(popup, card)) }));
-  const open = waiting.find((card) => card.proposalTs === popup.shown);
-  const select = {
-    type: "input",
-    block_id: draftBlock(open?.proposalTs),
-    dispatch_action: true,
-    optional: true,
-    label: plain("Draft"),
-    element: {
-      type: "static_select",
-      action_id: WHICH_DRAFT_ACTION_ID,
-      placeholder: plain("Show a draft…"),
-      options: drafts,
-      ...(open ? { initial_option: drafts.find((o) => o.value === open.proposalTs)! } : {}),
-    },
-  };
-  const hide = { type: "actions", elements: [{ type: "button", action_id: WHICH_HIDE_ACTION_ID, text: plain("Hide draft"), value: "hide" }] };
-  const room = MAX_VIEW_BLOCKS - head.length - tail.length - 2;
-  const body = open ? [select, ...fitBody(draftBlocks(open, opts), room, DRAFT_LEFT_OUT), hide] : [select];
-  return modal(kind, popup, [...head, ...body, ...tail], true);
+  const room = MAX_VIEW_BLOCKS - waiting.length * 3 - 1;
+  const blocks = waiting.flatMap((card) => {
+    const ts = card.proposalTs;
+    const shown = card === open;
+    const row = {
+      type: "section",
+      block_id: `${ROW_PREFIX}${ts}`,
+      text: { type: "mrkdwn", text: escapeSlackText(cardDoes(card)) },
+      accessory: {
+        type: "button",
+        action_id: shown ? WHICH_HIDE_ACTION_ID : WHICH_SHOW_ACTION_ID,
+        text: plain(shown ? "Hide draft" : "Show draft"),
+        value: ts,
+      },
+    };
+    const options = CHOICES.map(([value, text]) => ({ value, text: plain(text) }));
+    const initial = options.find((o) => o.value === (chosen.rows[ts] ?? "leave"))!;
+    const choice = {
+      type: "input",
+      block_id: `${CHOICE_PREFIX}${ts}`,
+      // The card's headline, said once: the row above says what it does.
+      label: plain(clip(headlineOf(popup, card).trim() || "That card", LABEL_CHARS)),
+      element: { type: "radio_buttons", action_id: CHOICE_ACTION_ID, options, initial_option: initial },
+    };
+    const draft = shown ? fitBody(draftBlocks(card, opts), room, DRAFT_LEFT_OUT) : [];
+    return [row, ...draft, choice, { type: "divider" }];
+  });
+  return modal(popup, [...blocks, note], true);
 }
 
-/** The headline the question listed the card by, or the card's own. */
+/** The headline the question listed the card by, or the card's own ts. */
 function headlineOf(popup: WhichPopup, card: PendingProposal): string {
   return popup.cards.find((c) => c.ts === card.proposalTs)?.headline ?? card.proposalTs;
 }
 
-type StateValue = { type?: unknown; value?: unknown; selected_option?: { value?: unknown } | null; selected_options?: unknown };
+type StateValue = { type?: unknown; value?: unknown; selected_option?: { value?: unknown } | null };
 type ViewValues = { values?: Record<string, Record<string, StateValue>> };
 
-/** The Cancel list's ticks, read from a view's state: null when the state
- *  holds no checkboxes value for it at all. */
-function ticksOf(values: ViewValues["values"]): string[] | null {
-  const input = values?.[CARDS_BLOCK]?.[CARDS_ACTION_ID];
-  if (!input || !Array.isArray(input.selected_options)) return null;
-  if (input.type !== undefined && input.type !== "checkboxes") return null;
-  return (input.selected_options as Array<{ value?: unknown } | null>)
-    .map((o) => o?.value)
-    .filter((v): v is string => typeof v === "string" && v.length > 0);
+/**
+ * One card's choice, read from its own block in a view's state and nowhere
+ * else: the one radio control the row draws, holding one of its three
+ * values. Anything else — no block, no pick, an unknown value, another
+ * control, or anything beside its own — is Leave.
+ */
+function choiceOf(values: ViewValues["values"], ts: string): WhichChoice {
+  const block = values?.[`${CHOICE_PREFIX}${ts}`];
+  if (!block || Object.keys(block).some((actionId) => actionId !== CHOICE_ACTION_ID)) return "leave";
+  const input = block[CHOICE_ACTION_ID];
+  if (!input || "selected_options" in input) return "leave";
+  if (input.type !== undefined && input.type !== "radio_buttons") return "leave";
+  const value = input.selected_option?.value;
+  return value === "approve" || value === "cancel" ? value : "leave";
 }
 
-/** The Approve list's one pick, read from a view's state: null when the
- *  state holds no radio pick for it. */
-function radioOf(values: ViewValues["values"]): string | null {
-  const input = values?.[APPROVE_BLOCK]?.[APPROVE_ACTION_ID];
-  if (!input || "selected_options" in input) return null;
-  if (input.type !== undefined && input.type !== "radio_buttons") return null;
-  const value = input.selected_option?.value;
-  return typeof value === "string" && value.length > 0 ? value : null;
+/** The note, as typed. */
+function noteOf(values: ViewValues["values"]): string {
+  const typed = values?.[NOTE_BLOCK]?.[NOTE_ACTION_ID]?.value;
+  return typeof typed === "string" ? typed : "";
 }
 
 /**
- * What the person has picked and typed, from a view's `state`, for a redraw
- * of a pop-up of `kind`: the one card picked, or the cards ticked, and the
- * note.
+ * What the person has chosen and typed, from a view's `state`, for a redraw:
+ * each listed card's choice from its own block, and the note.
  */
-export function whichPickOf(kind: WhichKind, state: unknown): WhichPick {
+export function whichChoicesOf(state: unknown, cards: readonly WhichCard[]): WhichChoices {
   const values = (state as ViewValues | undefined)?.values;
-  if (kind === "approve") {
-    const card = radioOf(values);
-    return { picked: card ? [card] : [], note: "" };
-  }
-  const typed = values?.[NOTE_BLOCK]?.[NOTE_ACTION_ID]?.value;
-  return { picked: ticksOf(values) ?? [], note: typeof typed === "string" ? typed : "" };
-}
-
-/** The blocks a pop-up of `kind` draws inputs in: its list, its select,
- *  and, to cancel, its note. */
-function ownBlock(kind: WhichKind, blockId: string): boolean {
-  if (blockId.startsWith(DRAFT_BLOCK_PREFIX)) return true;
-  return kind === "approve" ? blockId === APPROVE_BLOCK : blockId === CARDS_BLOCK || blockId === NOTE_BLOCK;
-}
-
-/** Whether the kind's list, if the state holds it, holds only its own
- *  control's action id. */
-function listIsOwn(kind: WhichKind, values: ViewValues["values"]): boolean {
-  const [block, action] = kind === "approve" ? [APPROVE_BLOCK, APPROVE_ACTION_ID] : [CARDS_BLOCK, CARDS_ACTION_ID];
-  const inputs = values?.[block];
-  return !inputs || Object.keys(inputs).every((actionId) => actionId === action);
+  return { rows: Object.fromEntries(cards.map((card) => [card.ts, choiceOf(values, card.ts)])), note: noteOf(values) };
 }
 
 /** The first input block a view drew, by its block_id: where Slack will take
@@ -390,36 +327,27 @@ function firstInputOf(blocks: readonly unknown[] | undefined): string | null {
 }
 
 /**
- * A Submit, read as exactly what it decides, or what the pop-up says
- * instead. Its kind is its view's `callback_id`, never its metadata: an
- * Approve pop-up's Submit is the one radio pick under the Approve list, a
- * Cancel pop-up's the checkboxes ticked under the Cancel list, each list
- * holding exactly that control. A state holding any block that kind does not
- * draw — the other kind's list, an old switch — or anything else under its
- * list, is refused under that list; a Submit with nothing picked is too.
- * A view opened before the two pop-ups is refused under the first input
- * block it drew (`blocks`), or, drawing none, answered with a notice in its
- * place. Nothing is decided.
+ * Done, read as exactly what it decides: each card the question listed
+ * (`cards`, in its order), by the choice under that card's own block in the
+ * submitted state alone, with every Leave and every unreadable row left out;
+ * and the note. A Done from a view opened before this pop-up is refused
+ * under the first input block it drew (`blocks`), or, drawing none, answered
+ * with a notice in its place, and decides nothing.
  */
 export function whichSubmitOf(
   callbackId: string | undefined,
   state: unknown,
-  blocks?: readonly unknown[],
+  blocks: readonly unknown[] | undefined,
+  cards: readonly WhichCard[],
 ): { ok: true; submission: WhichSubmission } | { ok: false; errors: Record<string, string> } | { ok: false; notice: string } {
-  const values = (state as ViewValues | undefined)?.values;
-  const kind = whichKindOf(callbackId);
-  if (!kind) {
+  if (callbackId !== WHICH_REVIEW_CALLBACK_ID) {
     const input = firstInputOf(blocks);
     return input ? { ok: false, errors: { [input]: REOPEN } } : { ok: false, notice: REOPEN };
   }
-  const list = kind === "approve" ? APPROVE_BLOCK : CARDS_BLOCK;
-  const stray = Object.keys(values ?? {}).some((blockId) => !ownBlock(kind, blockId));
-  if (stray || !listIsOwn(kind, values)) return { ok: false, errors: { [list]: REOPEN } };
-  if (kind === "approve") {
-    const card = radioOf(values);
-    return card ? { ok: true, submission: { kind, card } } : { ok: false, errors: { [APPROVE_BLOCK]: PICK_ONE } };
-  }
-  const ticks = ticksOf(values);
-  if (!ticks?.length) return { ok: false, errors: { [CARDS_BLOCK]: TICK_ONE } };
-  return { ok: true, submission: { kind, picked: ticks, note: whichPickOf(kind, state).note.trim() } };
+  const values = (state as ViewValues | undefined)?.values;
+  const decide = cards.flatMap((card) => {
+    const choice = choiceOf(values, card.ts);
+    return choice === "leave" ? [] : [{ card: card.ts, choice }];
+  });
+  return { ok: true, submission: { decide, note: noteOf(values).trim() } };
 }
