@@ -1279,7 +1279,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFa
   // nothing that follows them would.
   if (result.kind === "text") {
     // The model read a decision and could not say which card it was for: the
-    // person is asked, with the question's Choose…, in place of the model's
+    // person is asked, with the question's buttons, in place of the model's
     // own words — which could only have asked the same thing without the
     // pop-up (#1319).
     const waiting = result.askWhich ? awaitingDecision(liveCardsOf(request)) : [];

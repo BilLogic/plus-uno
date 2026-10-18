@@ -203,7 +203,7 @@ describe("a card decided outside its own buttons", () => {
     assert.deepEqual(await redrawWith(CLOSE_CARD_HEADROOM - 1), [], "the clear keeps its subrequest");
     const [edited] = await redrawWith(CLOSE_CARD_HEADROOM);
     assert.equal(edited?.ts, question.questionTs, "the question is what is edited");
-    assert.deepEqual(buttons(edited!.blocks as Block[]), ["Choose…"], "Choose… stays for the card still waiting");
+    assert.deepEqual(buttons(edited!.blocks as Block[]), ["Approve…", "Cancel…"], "both buttons stay for the card still waiting");
     assert.match(JSON.stringify(edited!.blocks), /1 card is still waiting\.\\n~Sweep card~/);
   });
 

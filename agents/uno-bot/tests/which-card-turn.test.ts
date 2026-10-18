@@ -4,7 +4,7 @@
 // A thread can hold several live cards (#1318). A typed ✅ / ⛔, or a "yes"
 // the model reads as a decision, says nothing about WHICH card it means, and
 // two cards are two different writes — so with more than one waiting, the
-// decision resolves nothing and the bot asks which, with one Choose… button. With
+// decision resolves nothing and the bot asks which, with Approve… and Cancel…. With
 // a single card waiting, a decision resolves it directly, as it always has.
 // The question's pop-up is driven in `tests/which-card-popup.test.ts`.
 //
@@ -106,7 +106,7 @@ test("a typed \"yes\" with two live cards: the model's approval naming no card i
     .find((r) => r.name === "proposal_resolve");
   assert.ok(refusal?.isError, "the call was refused");
   assert.match(refusal!.text, /card/);
-  // And the person is asked, with the question's own Choose… — not in the model's words.
+  // And the person is asked, with the question's own buttons — not in the model's words.
   assert.deepEqual(h.delivery.gateNotes.at(-1), {
     kind: "which-card",
     decision: "confirm",
@@ -241,7 +241,7 @@ test("a card decided in words drops out of the open \"which one?\" question, whi
   assert.ok(asked < closed && closed < drawn, "the card is closed first, then the question redrawn");
 });
 
-test("the last card left, decided with a typed ✅, leaves the question with no Choose…, and its record goes", async () => {
+test("the last card left, decided with a typed ✅, leaves the question with no buttons, and its record goes", async () => {
   const resolve = { toolCalls: [{ name: "proposal_resolve", args: { decision: "cancel", card: "" } as Record<string, unknown> }] };
   const h = harness({ replies: [call("notion_create", PRD_A), call("notion_create", PRD_B), resolve] });
   const { a, b } = await twoCards(h);
