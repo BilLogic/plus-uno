@@ -2041,8 +2041,8 @@ export interface ThreadState {
 
   // ----- the open "which one?" question -----
   //
-  // A decision that named no card asks which, with Approve… and Cancel…,
-  // each opening a pop-up of the cards (`slack/which-card.ts`). A card can then be
+  // A decision that named no card asks which, with one Review button
+  // opening a pop-up of the cards (`slack/which-card.ts`). A card can then be
   // decided by any door — the question's pop-up, the card's own Review, a
   // reaction, a typed emoji, the model's `proposal_resolve` — and only the
   // question's own pop-up could find the question to strike that card on it.
@@ -2084,7 +2084,7 @@ export interface WhichQuestion {
   questionTs: string;
   channel: string;
   /** The ✅ or ⛔ that asked it. Kept so stored records still read; the
-   *  question offers Approve… and Cancel… whatever it was, so it is
+   *  question offers the same Review whatever it was, so it is
    *  display-only and decides nothing. */
   decision: "confirm" | "cancel";
   cards: WhichCard[];

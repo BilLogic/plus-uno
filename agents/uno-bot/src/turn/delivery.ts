@@ -366,7 +366,7 @@ export type GateNote =
    *  emoji typed in a thread holding more than one live card, or outside any
    *  card's thread in a DM holding several, or the model's
    *  `proposal_resolve` that never said which. Resolve none of them, and ask
-   *  which, with Approve… and Cancel…, each opening a pop-up of the cards:
+   *  which, with one Review button opening a pop-up of the cards:
    *  `cards` is each card's ts and headline, newest first. */
   | { kind: "which-card"; decision: "confirm" | "cancel"; cards: WhichCard[] }
   /** A turn staged a REVISION: the card that follows replaces the waiting
@@ -414,8 +414,8 @@ export type GateNote =
  *  one (`slack/which-card-view.ts`). */
 export const MAX_WHICH_CARDS = 10;
 
-/** One card a "which one?" question offers: its ts, which its Approve…
- *  and Cancel… buttons carry, and its headline, which its pop-up names it by
+/** One card a "which one?" question offers: its ts, which its Review
+ *  button carries, and its headline, which its pop-up names it by
  *  (`agent/card-identity.ts`). */
 export interface WhichCard {
   ts: string;

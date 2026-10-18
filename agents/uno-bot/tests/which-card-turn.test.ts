@@ -4,7 +4,7 @@
 // A thread can hold several live cards (#1318). A typed ✅ / ⛔, or a "yes"
 // the model reads as a decision, says nothing about WHICH card it means, and
 // two cards are two different writes — so with more than one waiting, the
-// decision resolves nothing and the bot asks which, with Approve… and Cancel…. With
+// decision resolves nothing and the bot asks which, with one Review button. With
 // a single card waiting, a decision resolves it directly, as it always has.
 // The question's pop-up is driven in `tests/which-card-popup.test.ts`.
 //
