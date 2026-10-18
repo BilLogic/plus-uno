@@ -98,8 +98,8 @@ async function opened(send: (p: Record<string, unknown>) => Promise<Response>, a
   return lastView();
 }
 
-const submitWith = (send: (p: Record<string, unknown>) => Promise<Response>, callbackId: string, metadata: string, state: unknown) =>
-  send({ type: "view_submission", user: { id: "U1" }, view: { id: "V1", callback_id: callbackId, private_metadata: metadata, state } });
+const submitWith = (send: (p: Record<string, unknown>) => Promise<Response>, callbackId: string, metadata: string, state: unknown, blocks?: unknown[]) =>
+  send({ type: "view_submission", user: { id: "U1" }, view: { id: "V1", callback_id: callbackId, private_metadata: metadata, state, ...(blocks ? { blocks } : {}) } });
 
 test("Cancel… opens the Cancel pop-up on its trigger, then fills it with the cards", async () => {
   const { send } = await world();
@@ -202,12 +202,23 @@ test("a Submit under a view opened before the two pop-ups is refused and decides
       },
     },
   ];
+  // As an old view drew itself: its list an input, or only its switch, in
+  // an actions block, which Slack will not take an error under.
+  const withInput = [
+    { type: "actions", block_id: "uno_which_decision_cancel", elements: [{ type: "radio_buttons", action_id: "uno_which_decision" }] },
+    { type: "input", block_id: "uno_which_cards_cancel", element: { type: "checkboxes", action_id: "uno_which_cards_input" } },
+  ];
+  const actionsOnly = [withInput[0]];
   for (const state of states) {
     for (const metadata of [OLD_APPROVE_METADATA, METADATA]) {
-      const res = await submitWith(send, "uno_which_pick", metadata, state);
+      const res = await submitWith(send, "uno_which_pick", metadata, state, withInput);
       const ack = (await res.json()) as { response_action: string; errors?: Record<string, string> };
-      assert.equal(ack.response_action, "errors", JSON.stringify(state));
-      assert.deepEqual(Object.values(ack.errors ?? {}).map((e) => /Open the question again/.test(e)), [true]);
+      assert.deepEqual(ack, { response_action: "errors", errors: { uno_which_cards_cancel: ack.errors?.uno_which_cards_cancel } }, JSON.stringify(state));
+      assert.match(ack.errors!.uno_which_cards_cancel!, /Open the question again/);
+      const bare = await submitWith(send, "uno_which_pick", metadata, state, actionsOnly);
+      const notice = (await bare.json()) as { response_action: string; view?: { blocks: unknown[] } };
+      assert.equal(notice.response_action, "update", "no input to key an error to: a notice instead");
+      assert.match(JSON.stringify(notice.view?.blocks), /Open the question again/);
     }
   }
   assert.deepEqual(notionCalls(), []);

@@ -2083,6 +2083,9 @@ export interface WhichQuestion {
   /** The question's own message: the record's key, and what is edited. */
   questionTs: string;
   channel: string;
+  /** The ✅ or ⛔ that asked it. Kept so stored records still read; the
+   *  question offers Approve… and Cancel… whatever it was, so it is
+   *  display-only and decides nothing. */
   decision: "confirm" | "cancel";
   cards: WhichCard[];
   /** The listed cards decided since, by ts, in the order they were. */

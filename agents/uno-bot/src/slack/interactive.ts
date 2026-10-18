@@ -364,8 +364,13 @@ function submitWhich(env: Env, payload: InteractionPayload, ctx: ExecutionContex
     console.log("[interactive] which-card submit without its question");
     return new Response("", { status: 200 });
   }
-  const submitted = whichSubmitOf(payload.view?.callback_id, payload.view?.state);
+  const submitted = whichSubmitOf(payload.view?.callback_id, payload.view?.state, payload.view?.blocks);
   if (!submitted.ok) {
+    if ("notice" in submitted) {
+      // An old view with no input block Slack would take an error under.
+      console.log(`[interactive] which-card submit on ${popup.channel}/${popup.questionTs} refused: an old view, answered with a notice`);
+      return Response.json({ response_action: "update", view: whichNoticeView(null, popup, submitted.notice) });
+    }
     console.log(`[interactive] which-card submit on ${popup.channel}/${popup.questionTs} refused: ${Object.keys(submitted.errors).join(",")}`);
     return Response.json({ response_action: "errors", errors: submitted.errors });
   }

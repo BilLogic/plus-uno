@@ -18,7 +18,10 @@
 // nothing unless its state holds that kind's own control under its own block
 // and nothing else (`whichSubmitOf`): an Approve Submit carrying ticks, a
 // Cancel Submit carrying a radio pick, or a view opened before the two
-// pop-ups, is refused.
+// pop-ups, is refused. Each kind's list holds exactly its own control, and
+// an error is shown under an input block, the only kind Slack takes one
+// under; a view opened before the two pop-ups with none is answered with a
+// notice in place of the view instead.
 //
 // A DRAFT OPENS BELOW THE LIST. Slack modals have no accordion, so one select
 // under the list, "Show a draft…", names each card by its headline, and a
@@ -231,13 +234,10 @@ export function whichResultView(kind: WhichKind, popup: WhichPopup, lines: reado
   return modal(kind, popup, lines.map(line));
 }
 
-/** Said at the top of each pop-up: what it does. */
-export const WHICH_APPROVE_LEAD = "Pick one card to approve. The others stay waiting.";
-export const WHICH_CANCEL_LEAD = "Tick the cards to cancel. The others stay waiting.";
-
 /**
- * A pop-up of `kind`: what it does, the cards to pick or tick, "Show a
- * draft…" with the open draft below it, and, to cancel, the note. `waiting`
+ * A pop-up of `kind`: the cards to pick or tick, under a label that says
+ * what Submit does to them, "Show a draft…" with the open draft below it,
+ * and, to cancel, the note. `waiting`
  * are the listed cards still waiting, read just now; a card no longer
  * waiting is not offered.
  *
@@ -277,7 +277,7 @@ export function whichView(
           label: plain("Cancel which ones?"),
           element: { type: "checkboxes", action_id: CARDS_ACTION_ID, options, ...(chosen.length ? { initial_options: chosen } : {}) },
         };
-  const head: unknown[] = [line(kind === "approve" ? WHICH_APPROVE_LEAD : WHICH_CANCEL_LEAD), list, { type: "divider" }];
+  const head: unknown[] = [list, { type: "divider" }];
   // The cancel's reason, said on each card it closes. An approval takes no
   // note here: one with edits is made from the card's own Review.
   const note = {
@@ -371,25 +371,50 @@ function ownBlock(kind: WhichKind, blockId: string): boolean {
   return kind === "approve" ? blockId === APPROVE_BLOCK : blockId === CARDS_BLOCK || blockId === NOTE_BLOCK;
 }
 
+/** Whether the kind's list, if the state holds it, holds only its own
+ *  control's action id. */
+function listIsOwn(kind: WhichKind, values: ViewValues["values"]): boolean {
+  const [block, action] = kind === "approve" ? [APPROVE_BLOCK, APPROVE_ACTION_ID] : [CARDS_BLOCK, CARDS_ACTION_ID];
+  const inputs = values?.[block];
+  return !inputs || Object.keys(inputs).every((actionId) => actionId === action);
+}
+
+/** The first input block a view drew, by its block_id: where Slack will take
+ *  an error. */
+function firstInputOf(blocks: readonly unknown[] | undefined): string | null {
+  for (const block of blocks ?? []) {
+    const b = block as { type?: unknown; block_id?: unknown };
+    if (b?.type === "input" && typeof b.block_id === "string") return b.block_id;
+  }
+  return null;
+}
+
 /**
- * A Submit, read as exactly what it decides, or the error Slack shows in the
- * pop-up. Its kind is its view's `callback_id`, never its metadata: an
+ * A Submit, read as exactly what it decides, or what the pop-up says
+ * instead. Its kind is its view's `callback_id`, never its metadata: an
  * Approve pop-up's Submit is the one radio pick under the Approve list, a
- * Cancel pop-up's the checkboxes ticked under the Cancel list. A state
- * holding any block that kind does not draw — the other kind's list, an old
- * switch — or a view opened before the two pop-ups is refused, and so is a
- * Submit with nothing picked; nothing is decided.
+ * Cancel pop-up's the checkboxes ticked under the Cancel list, each list
+ * holding exactly that control. A state holding any block that kind does not
+ * draw — the other kind's list, an old switch — or anything else under its
+ * list, is refused under that list; a Submit with nothing picked is too.
+ * A view opened before the two pop-ups is refused under the first input
+ * block it drew (`blocks`), or, drawing none, answered with a notice in its
+ * place. Nothing is decided.
  */
 export function whichSubmitOf(
   callbackId: string | undefined,
   state: unknown,
-): { ok: true; submission: WhichSubmission } | { ok: false; errors: Record<string, string> } {
+  blocks?: readonly unknown[],
+): { ok: true; submission: WhichSubmission } | { ok: false; errors: Record<string, string> } | { ok: false; notice: string } {
   const values = (state as ViewValues | undefined)?.values;
-  const blocks = Object.keys(values ?? {});
   const kind = whichKindOf(callbackId);
-  if (!kind) return { ok: false, errors: { [blocks[0] ?? CARDS_BLOCK]: REOPEN } };
-  const stray = blocks.find((blockId) => !ownBlock(kind, blockId));
-  if (stray) return { ok: false, errors: { [stray]: REOPEN } };
+  if (!kind) {
+    const input = firstInputOf(blocks);
+    return input ? { ok: false, errors: { [input]: REOPEN } } : { ok: false, notice: REOPEN };
+  }
+  const list = kind === "approve" ? APPROVE_BLOCK : CARDS_BLOCK;
+  const stray = Object.keys(values ?? {}).some((blockId) => !ownBlock(kind, blockId));
+  if (stray || !listIsOwn(kind, values)) return { ok: false, errors: { [list]: REOPEN } };
   if (kind === "approve") {
     const card = radioOf(values);
     return card ? { ok: true, submission: { kind, card } } : { ok: false, errors: { [APPROVE_BLOCK]: PICK_ONE } };

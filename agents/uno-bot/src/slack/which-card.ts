@@ -130,7 +130,7 @@ export function isLegacyWhichPress(actionId: string): boolean {
 
 /** Said to the presser alone on a numbered button a question posted before
  *  the pop-up still carries. */
-export const LEGACY_WHICH_REPLY = "That question was redrawn, so nothing ran. Press Approve… or Cancel… on it, or Review on the card.";
+export const LEGACY_WHICH_REPLY = "Nothing ran: press Review on the card you mean.";
 
 /** What the question says in place of its buttons once every card it lists
  *  is decided. */
@@ -425,17 +425,20 @@ async function runWhichApprove(request: WhichSubmitRequest, submission: ApproveS
   }
   const decided = await approveOne(cardTs, request, deps);
   console.log(`[which-card] approve on ${popup.channel}/${popup.questionTs} by=${request.userId} card=${cardTs}`);
-  if (decided.question) await deps.editQuestion(keptQuestionMessage(decided.question));
+  // The pop-up's answer first: a budget stop after the write leaves the
+  // question unstruck, never the pop-up on "Approving…".
   await deps.views.update(request.viewId, whichResultView("approve", popup, [`${headline}: ${decided.line}`]));
+  if (decided.question) await deps.editQuestion(keptQuestionMessage(decided.question));
 }
 
 /**
  * The picked card, approved as a ✅ press on it would be: the claim, and on a
  * win the press's own path (`applyPressVerdict`) — its outcome posted in the
  * thread, the run, the card edited. A non-win is answered in the pop-up, as
- * the Review pop-up answers one, never edited onto the card. The decision is
- * the constant `CONFIRM`, and a verdict that comes back as anything else is
- * refused before the press path sees it.
+ * the Review pop-up answers one, never edited onto the card. The claim is
+ * made with the constant `CONFIRM`, so its verdict carries that decision; a
+ * verdict that came back as anything else would still hold its claim, and is
+ * kept from the press path, so nothing runs on it.
  */
 async function approveOne(cardTs: string, request: WhichSubmitRequest, deps: WhichDoorDeps): Promise<{ line: string; question: WhichQuestion | null }> {
   const { popup, userId } = request;
@@ -444,7 +447,8 @@ async function approveOne(cardTs: string, request: WhichSubmitRequest, deps: Whi
   const verdict = await resolveSignal(signal, { threadState: deps.threadState, standingConfirmers: deps.standingConfirmers });
   console.log(`[which-card] approve on ${popup.channel}/${cardTs} by=${userId} outcome=${verdict.outcome}`);
   if (verdict.decision !== undefined && verdict.decision !== CONFIRM) {
-    console.error(`[which-card] ${popup.channel}/${cardTs} came back as ${verdict.decision}, not an approval: refused`);
+    // Past the claim: the card is held, not run.
+    console.error(`[which-card] ${popup.channel}/${cardTs} came back as ${verdict.decision}, not an approval: not applied`);
     return { line: "Nothing ran. Use its card's Review.", question: null };
   }
   if (verdict.outcome !== "won" && verdict.post && verdict.post.note.kind !== "cut-off") {
@@ -501,9 +505,10 @@ async function runWhichCancel(request: WhichSubmitRequest, submission: CancelSub
  * One ticked card, canceled as a ⛔ press on it would be: the claim, and on a
  * win the press's own path (`applyPressVerdict`) — the card edited to its
  * outcome. A non-win is answered in the pop-up, as the Review pop-up answers
- * one, never edited onto the card. The decision is the constant `CANCEL`,
- * and a verdict that comes back as anything but a cancel is refused before
- * the press path sees it, so no Cancel Submit can reach a run.
+ * one, never edited onto the card. The claim is made with the constant
+ * `CANCEL`, so its verdict carries that decision; a verdict that came back
+ * as anything else would still hold its claim, and is kept from the press
+ * path, so no Cancel Submit can reach a run.
  */
 async function cancelOne(
   cardTs: string,
@@ -521,7 +526,8 @@ async function cancelOne(
   const verdict = await resolveSignal(signal, { threadState: deps.threadState, standingConfirmers: deps.standingConfirmers });
   console.log(`[which-card] cancel on ${popup.channel}/${cardTs} by=${userId} outcome=${verdict.outcome}`);
   if (verdict.decision !== undefined && verdict.decision !== CANCEL) {
-    console.error(`[which-card] ${popup.channel}/${cardTs} came back as ${verdict.decision}, not a cancel: refused`);
+    // Past the claim: the card is held, not run.
+    console.error(`[which-card] ${popup.channel}/${cardTs} came back as ${verdict.decision}, not a cancel: not applied`);
     return { line: "Nothing ran. Use its card's Review.", question: null };
   }
   if (verdict.outcome !== "won" && verdict.post && verdict.post.note.kind !== "cut-off") {

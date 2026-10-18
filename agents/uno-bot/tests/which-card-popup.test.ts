@@ -43,9 +43,7 @@ import {
   REOPEN,
   TICK_ONE,
   WHICH_APPROVE_CALLBACK_ID,
-  WHICH_APPROVE_LEAD,
   WHICH_CANCEL_CALLBACK_ID,
-  WHICH_CANCEL_LEAD,
   WHICH_OLD_CALLBACK_ID,
   whichKindOf,
   whichPopupOf,
@@ -171,7 +169,7 @@ async function redraw(d: ReturnType<typeof doors>, view: View, press: WhichRedra
 
 async function submit(d: ReturnType<typeof doors>, view: View, state: unknown) {
   const popup = whichPopupOf(view.private_metadata)!;
-  const sent = whichSubmitOf(view.callback_id, state);
+  const sent = whichSubmitOf(view.callback_id, state, view.blocks);
   assert.ok(sent.ok, "a pick is sent");
   await runWhichSubmit({ viewId: "V1", popup, submission: sent.submission, userId: "U1" }, d.deps);
   return d.views.calls.at(-1)!.view as View;
@@ -244,7 +242,7 @@ test("Cancel… opens a loading view, then the cards to tick: checkboxes, the no
   assert.equal(view.callback_id, WHICH_CANCEL_CALLBACK_ID);
   assert.equal(view.title.text, "Cancel cards");
   assert.deepEqual(view.submit, { type: "plain_text", text: "Cancel cards" }, "the footer says what Submit does");
-  assert.equal((view.blocks[0] as Block).text?.text, WHICH_CANCEL_LEAD);
+  assert.equal(view.blocks[0], listOf(view), "no lead line: the list's label says it");
   assert.equal(listOf(view).element!.type, "checkboxes");
   assert.doesNotMatch(words(view), /radio_buttons|uno_which_decision|uno_which_approve/, "no switch and no Approve list");
   assert.doesNotMatch(view.private_metadata, /"d"|confirm|cancel|approve/, "no decision in the metadata");
@@ -279,7 +277,7 @@ test("Approve… opens the cards to pick one: a radio list, no checkboxes, no no
     assert.equal(view.callback_id, WHICH_APPROVE_CALLBACK_ID, `asked by ${typed}`);
     assert.equal(view.title.text, "Approve a card");
     assert.deepEqual(view.submit, { type: "plain_text", text: "Approve card" });
-    assert.equal((view.blocks[0] as Block).text?.text, WHICH_APPROVE_LEAD);
+    assert.equal(view.blocks[0], listOf(view), "no lead line: the list's label says it");
     const list = listOf(view);
     assert.equal(list.block_id, "uno_which_approve_card");
     assert.equal(list.element!.type, "radio_buttons");
@@ -478,7 +476,7 @@ test("a Submit whose control does not match its pop-up's kind is refused", () =>
   const refused = (callbackId: string, values: Record<string, unknown>) => {
     const sent = whichSubmitOf(callbackId, { values });
     assert.equal(sent.ok, false, `${callbackId} ${JSON.stringify(values)}`);
-    return sent.ok ? {} : sent.errors;
+    return sent.ok || !("errors" in sent) ? {} : sent.errors;
   };
   // An Approve pop-up's Submit carrying ticks, beside its pick or alone.
   refused(WHICH_APPROVE_CALLBACK_ID, CANCEL_TICKS("1.1"));
@@ -496,19 +494,46 @@ test("a Submit whose control does not match its pop-up's kind is refused", () =>
     uno_which_decision_cancel: { uno_which_decision: { type: "radio_buttons", selected_option: { value: "cancel" } } },
     ...CANCEL_TICKS("1.1"),
   });
-  assert.deepEqual(errors, { uno_which_decision_cancel: REOPEN });
+  assert.deepEqual(errors, { uno_which_cards_cancel: REOPEN }, "under the list, an input Slack accepts");
 });
 
-test("a Submit from a view opened before the two pop-ups is refused, whatever its state holds", () => {
-  for (const values of [CANCEL_TICKS("1.1"), APPROVE_PICK("1.1"), { uno_which_cards_confirm: { uno_which_cards_input: { type: "radio_buttons", selected_option: { value: "1.1" } } } }]) {
-    const sent = whichSubmitOf(WHICH_OLD_CALLBACK_ID, { values });
-    assert.equal(sent.ok, false);
-    assert.deepEqual(sent.ok ? null : Object.values(sent.errors), [REOPEN], "one error, under a block the view has");
-    assert.ok(!sent.ok && Object.keys(values).includes(Object.keys(sent.errors)[0]!));
+test("a kind's list block holds exactly its own control: another action id beside it is refused", () => {
+  const extra = (block: string, action: string, value: Record<string, unknown>) => ({ values: { [block]: { [action]: value, uno_which_other: { type: "checkboxes", selected_options: [{ value: "1.2" }] } } } });
+  const approve = whichSubmitOf(WHICH_APPROVE_CALLBACK_ID, extra("uno_which_approve_card", "uno_which_approve_input", { type: "radio_buttons", selected_option: { value: "1.1" } }));
+  assert.deepEqual(approve, { ok: false, errors: { uno_which_approve_card: REOPEN } });
+  const cancel = whichSubmitOf(WHICH_CANCEL_CALLBACK_ID, extra("uno_which_cards_cancel", "uno_which_cards_input", { type: "checkboxes", selected_options: [{ value: "1.1" }] }));
+  assert.deepEqual(cancel, { ok: false, errors: { uno_which_cards_cancel: REOPEN } });
+  // Only its own action id under another name is not its control either.
+  const renamed = { values: { uno_which_approve_card: { uno_which_cards_input: { type: "radio_buttons", selected_option: { value: "1.1" } } } } };
+  assert.equal(whichSubmitOf(WHICH_APPROVE_CALLBACK_ID, renamed).ok, false);
+});
+
+test("a Submit from a view opened before the two pop-ups is refused under its first input block, whatever its state holds", () => {
+  // As such a view drew itself: the old switch in an actions block first,
+  // then the list as an input.
+  const blocks = [
+    { type: "section", block_id: "lead", text: { type: "mrkdwn", text: "Pick" } },
+    { type: "actions", block_id: "uno_which_decision_cancel", elements: [{ type: "radio_buttons", action_id: "uno_which_decision" }] },
+    { type: "input", block_id: "uno_which_cards_cancel", element: { type: "checkboxes", action_id: "uno_which_cards_input" } },
+  ];
+  const switchFirst = {
+    uno_which_decision_cancel: { uno_which_decision: { type: "radio_buttons", selected_option: { value: "cancel" } } },
+    ...CANCEL_TICKS("1.1"),
+  };
+  for (const values of [CANCEL_TICKS("1.1"), APPROVE_PICK("1.1"), switchFirst]) {
+    const sent = whichSubmitOf(WHICH_OLD_CALLBACK_ID, { values }, blocks);
+    assert.deepEqual(sent, { ok: false, errors: { uno_which_cards_cancel: REOPEN } }, "never keyed to the actions block");
   }
-  assert.deepEqual(whichSubmitOf(WHICH_OLD_CALLBACK_ID, undefined), { ok: false, errors: { uno_which_cards_cancel: REOPEN } });
-  assert.equal(whichSubmitOf("uno_review_submit", { values: CANCEL_TICKS("1.1") }).ok, false);
+  assert.equal(whichSubmitOf("uno_review_submit", { values: CANCEL_TICKS("1.1") }, blocks).ok, false);
   assert.match(REOPEN, /Open the question again/);
+});
+
+test("a Submit from a view opened before the two pop-ups with no input block is answered with a notice, not an error", () => {
+  const blocks = [{ type: "actions", block_id: "uno_which_decision_confirm", elements: [{ type: "radio_buttons", action_id: "uno_which_decision" }] }];
+  const values = { uno_which_decision_confirm: { uno_which_decision: { type: "radio_buttons", selected_option: { value: "confirm" } } } };
+  for (const [state, drawn] of [[{ values }, blocks], [undefined, blocks], [{ values }, undefined]] as const) {
+    assert.deepEqual(whichSubmitOf(WHICH_OLD_CALLBACK_ID, state, drawn as unknown[] | undefined), { ok: false, notice: REOPEN });
+  }
 });
 
 test("no Cancel path asks the Gate to approve, and no Approve path asks it to cancel", () => {
@@ -558,6 +583,41 @@ test("an Approve Submit approves exactly the picked card through its own door: t
   assert.equal(sectionOf(redrawn), "1 card is still waiting.\n~Backup tutor matching~");
   assert.deepEqual(buttonsOf(redrawn).map((x) => x.text.text), ["Approve…", "Cancel…"], "both stay for the card still waiting");
   assert.equal(d.questionEdits.length, 1, "one edit of the question");
+});
+
+test("an Approve Submit answers in the pop-up before it redraws the question", async () => {
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { a, question } = await asked(h);
+  clock.now = SOON;
+  const seen: number[] = [];
+  const d = doors(h, clock, { editQuestion: async () => void seen.push(d.views.calls.length) });
+  const view = (await press(d, question, "approve"))!;
+  const opened = d.views.calls.length;
+
+  await submit(d, view, stateOf(view, [a]));
+
+  assert.deepEqual(seen, [opened + 1], "the answer is drawn first, so a stop after it leaves no pop-up on Approving…");
+  assert.match(words(d.views.calls.at(-1)!.view as View), /Approved\./);
+});
+
+test("an Approve Submit from someone the card does not name as a confirmer runs nothing and says why", async () => {
+  const { h, clock } = clocked([call("notion_create", PRD_A), call("notion_create", PRD_B)]);
+  const { a, b, question } = await asked(h);
+  const lookup = await h.threadState.getProposalByTs(a);
+  assert.equal(lookup.state, "found");
+  const card = (lookup as Extract<typeof lookup, { state: "found" }>).proposal;
+  await h.threadState.putProposal({ ...card, confirmers: ["U9"], exclusiveConfirmers: true });
+  clock.now = SOON;
+  const d = doors(h, clock);
+  const view = (await press(d, question, "approve"))!;
+
+  const answer = await submit(d, view, stateOf(view, [a]));
+
+  assert.deepEqual(h.resolved, [], "nothing ran");
+  assert.deepEqual(await live(h), [a, b].sort(), "the card stays live");
+  assert.deepEqual(d.cardEdits, [], "the card is not edited");
+  assert.doesNotMatch(words(answer), /Approved\./);
+  assert.ok(words(answer).includes(renderGateNote({ kind: "not-a-confirmer", confirmers: ["U9"] } as GateNote).slice(0, 30)), words(answer));
 });
 
 test("an Approve Submit cannot cancel: every verdict it asks for is an approval", async () => {
@@ -756,7 +816,8 @@ test("a numbered button on a question posted before the pop-up says so", () => {
   assert.equal(isLegacyWhichPress(WHICH_CHOOSE_ACTION_ID), false);
   assert.equal(isLegacyWhichPress(WHICH_APPROVE_ACTION_ID), false);
   assert.equal(isLegacyWhichPress(WHICH_CANCEL_ACTION_ID), false);
-  assert.match(LEGACY_WHICH_REPLY, /Approve… or Cancel…/);
+  assert.match(LEGACY_WHICH_REPLY, /^[^.]+\.$/, "one sentence");
+  assert.ok(LEGACY_WHICH_REPLY.length <= 60, "short");
   assert.match(LEGACY_WHICH_REPLY, /Review/);
 });
 
