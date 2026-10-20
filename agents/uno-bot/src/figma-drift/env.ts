@@ -27,7 +27,8 @@
 //   • The pillar options: the Roadmap database's schema
 //     (`NOTION_ROADMAP_DB_ID`, `Product Pillar`).
 //   • The publisher's Slack person: the Team Members directory's Figma map,
-//     one KV read (`usage/production.ts` `figmaPeopleFor`).
+//     one KV read (`usage/production.ts` `figmaPeopleFor`), and who is active,
+//     one more (`activePeopleFor`).
 //
 // A Worker without HARNESS_KV asks nothing, and the sweep counts file drift
 // and leaves it, as it did before.
@@ -38,7 +39,7 @@ import { budgetHeadroom, charge } from "../net";
 import { getPermalink, updateMessage, type SlackMessageMetadata } from "../slack/api";
 import { threadStateFor } from "../thread-state/production";
 import { proposalEvent, recordProposalEvents } from "../usage/index";
-import { figmaPeopleFor, proposalEventLogFor } from "../usage/production";
+import { activePeopleFor, figmaPeopleFor, proposalEventLogFor } from "../usage/production";
 import { databaseOptions } from "../integrations/notion";
 import { figmaClientFor } from "../figma/production";
 import type { FigmaClient } from "../figma/client";
@@ -121,6 +122,7 @@ export async function runDriftAsksOnEnv(env: Env, job: ScheduledJob, ctx: JobCon
       return measured(() => databaseOptions(env, roadmap, "Product Pillar"));
     },
     figmaPeople: () => figmaPeopleFor(env),
+    active: activePeopleFor(env),
     config: channelIdsFor(env),
     meter: { headroom: budgetHeadroom },
     now: () => Date.now(),

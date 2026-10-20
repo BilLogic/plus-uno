@@ -2,7 +2,8 @@
 // that names it. The code side is read from `GITHUB_REPO`, the harness repo,
 // where the intake is filed too; the library is `FIGMA_FILE_KEY` over REST;
 // the report goes up in #plus-universal (`PLUS_UNIVERSAL_CHANNEL_ID`) as a
-// section of the sweep's morning message there. The report and each posted message's record are JSON
+// section of the sweep's morning message there, tagging the week's DS owner
+// from `DS_OWNER_USER_IDS`. The report and each posted message's record are JSON
 // in HARNESS_KV beside the library poll's keys; each report's cards and their
 // decisions are on ThreadState, as every decision report's are.
 
@@ -16,7 +17,8 @@ import { REVIEW_ONLY_POST } from "../slack/gate-note";
 import type { SlackMessageEvent } from "../slack/types";
 import { typedEmojiDecision } from "../gate/reactions";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
-import { proposalEventLogFor } from "../usage/production";
+import { activePeopleFor, proposalEventLogFor } from "../usage/production";
+import { SLACK_USER_ID } from "../slack/mrkdwn";
 import type { PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { githubLibraryReads, resolveRepoFor } from "../integrations/github";
@@ -81,6 +83,14 @@ export async function runDsPrecedenceCheck(env: Env, opts: JobContext): Promise<
   );
 }
 
+/** `DS_OWNER_USER_IDS` as Slack user ids, in turn; anything else is dropped. */
+function dsOwnersOf(env: Env): string[] {
+  return (env.DS_OWNER_USER_IDS ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter((id) => SLACK_USER_ID.test(id));
+}
+
 /** #plus-universal, where the report goes up; null when not configured. */
 function channelOf(env: Env): string | null {
   return precedenceChannel(channelIdsFor(env));
@@ -99,6 +109,8 @@ export async function runDsPrecedencePost(env: Env, opts: JobContext): Promise<P
     {
       report: kvJson<PrecedenceReport | null>(env, REPORT_KV_KEY, null),
       members: () => channelMembers(env, channel),
+      owners: dsOwnersOf(env),
+      active: activePeopleFor(env),
       ...(opts.runStorage ? { handOff: sectionHandOffIn<PrecedenceHanded>(opts.runStorage, PRECEDENCE_SECTION) } : {}),
       channel,
       date: opts.runDate,

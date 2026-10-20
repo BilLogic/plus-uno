@@ -303,4 +303,9 @@ export interface Env {
    *  someone's 1:1 DM. Unset, a card's own set is the whole of it
    *  (src/slack/standing-confirmers.ts). */
   STANDING_CONFIRMER_IDS?: string;
+  /** Comma-separated Slack user ids of the DS owners, in turn: the weekly DS
+   *  precedence report tags one a week, skipping anyone not active on Team
+   *  Members. Unset, it tags nobody (src/ds-precedence/jobs.ts
+   *  `precedenceOwner`). */
+  DS_OWNER_USER_IDS?: string;
 }

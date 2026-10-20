@@ -28,6 +28,7 @@ import {
   UNO_BOT,
   type FakeChannel,
 } from "./helpers/sweep-harness";
+import { activeFrom } from "./helpers/team";
 
 const END_OF_DAY: ScheduledJob = { key: `sweep:${DESIGN}`, kind: "sweep-channel", channel: DESIGN };
 const MORNING: ScheduledJob = { key: "sweep-post", kind: "sweep-post" };
@@ -338,6 +339,28 @@ test("owner routing falls through all three rungs", async () => {
       [PAGE_B.blocks[0]!.id, "U0SAM"],
     ],
   );
+});
+
+test("a card's Contributor owns a fix only while their Team Members row is active; else the thread starter (#1361)", async () => {
+  const doc = notionPage("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+  for (const [active, owner] of [
+    [activeFrom([{ name: "Cy Contributor", slack: "U0CY" }]), "U0CY"],
+    [activeFrom([{ name: "Cy Contributor", slack: "U0CY", affiliation: "Past Collaborators" }]), "U0STARTER"],
+    [activeFrom([], [{ id: "U0CY", real_name: "Cy Contributor" }]), "U0STARTER"],
+  ] as const) {
+    const one = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url, doc.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+    const h = sweepHarness({
+      channels: channelOf(one),
+      sources: [PAGE_A, doc],
+      people: { "Cy Contributor": "U0CY" },
+      active,
+      detectorReplies: [reply(drift({ source: doc, block: doc.blocks[0]!.id, evidence: [ts(29, 16)] }))],
+      now: at(29, 22),
+    });
+    const night = await runSweepJob(END_OF_DAY, h.deps);
+    assert.deepEqual(night.findings.map((f) => f.owner), [owner]);
+    assert.ok(!night.findings[0]!.participants.includes("U0CY") || owner === "U0CY", "never a confirmer either");
+  }
 });
 
 test("a fix a thread already had carded is not proposed again, and a new day's fix waits for the live card", async () => {

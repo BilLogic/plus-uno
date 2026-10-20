@@ -38,7 +38,7 @@ import type { SlackMessageEvent } from "../slack/types";
 import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render";
 import { findSlackUsers, slackDirectoryFor } from "../tools/slack-people";
 import { threadStateFor } from "../thread-state/production";
-import { gapNotesFor, notionPeopleFor, proposalEventLogFor } from "../usage/production";
+import { activePeopleFor, gapNotesFor, notionPeopleFor, proposalEventLogFor } from "../usage/production";
 import { throughDirectory } from "./people";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { STALE_CARDS_SECTION, type SweepSection } from "../sweep/sections";
@@ -144,6 +144,7 @@ function byNameFor(env: Env): CardPeople {
         }
         return null;
       }),
+    active: activePeopleFor(env),
   };
 }
 

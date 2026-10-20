@@ -102,15 +102,13 @@ test("no team, or a team with no channel, lands in #plus-design", () => {
   assert.deepEqual(routeFinding({ evidence: null, figmaFile: { team: "MISC" } }).destination, design);
 });
 
-test("the card's design owner is tagged; with no card, the file's creator is named by handle", () => {
+test("the card's design owner is tagged; with none, nobody is named, never the file's creator", () => {
   assert.deepEqual(
-    routeFinding({ evidence: null, card: { pillars: ["Toolkit"], designOwner: "U0OWNER" }, figmaFile: { team: "Toolkit", creatorHandle: "coco" } }).addressee,
+    routeFinding({ evidence: null, card: { pillars: ["Toolkit"], designOwner: "U0OWNER" }, figmaFile: { team: "Toolkit" } }).addressee,
     { slack: "U0OWNER" },
   );
-  assert.deepEqual(routeFinding({ evidence: null, figmaFile: { team: "Toolkit", creatorHandle: "coco" } }).addressee, { figma: "coco" });
-  assert.deepEqual(routeFinding({ evidence: null, card: { pillars: ["Toolkit"] }, figmaFile: { creatorHandle: "coco" } }).addressee, {
-    figma: "coco",
-  });
+  assert.equal(routeFinding({ evidence: null, figmaFile: { team: "Toolkit" } }).addressee, null);
+  assert.equal(routeFinding({ evidence: null, card: { pillars: ["Toolkit"], designOwner: null } }).addressee, null);
   assert.equal(routeFinding({ evidence: null, card: { pillars: ["Toolkit"] } }).addressee, null);
   assert.equal(routeFinding({ evidence: null }).addressee, null);
 });

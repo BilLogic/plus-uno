@@ -159,7 +159,7 @@ import { postFigmaDecisions } from "../figma-comments/post";
 import type { QueuedFile, SweepFigmaComments } from "../figma-comments/queue";
 import { draftRow, rowUpdateOf, rowWords, type DecisionRow } from "../decisions-db/row";
 import { escapeSlackText } from "../slack/mrkdwn";
-import { notionPersonOfSlack, type NotionPeople } from "../usage/roles";
+import { isActive, notionPersonOfSlack, type ActivePeople, type NotionPeople } from "../usage/roles";
 import { readUsable, searchGate } from "./surfaces";
 import { findBySearch, looksAnswered, namedThings, questionQuery, type SourceSearch } from "./search";
 import {
@@ -379,8 +379,13 @@ export interface SweepConfig extends ChannelIds {
 export interface SweepDeps extends Pick<JobContext, "runDate" | "spawn"> {
   slack: SweepSlack;
   sources: { read(url: string, kind: TargetKind): Promise<SweepSource | null> };
-  /** A Contributor's name as a Slack id, when exactly one person has it. */
-  people: { slackIdFor(name: string): Promise<string | null> };
+  people: {
+    /** A Contributor's name as a Slack id, when exactly one person has it. */
+    slackIdFor(name: string): Promise<string | null>;
+    /** Who may be tagged or named (`../usage/roles.ts` `isActive`), read once
+     *  a run; nobody when the read fails. */
+    active(): Promise<ActivePeople>;
+  };
   detector: DriftDetector;
   /** The Capture detectors beside drift — undocumented answers, and decisions
    *  in notes and cards (`./capture-detector.ts`). Absent, neither runs. */
@@ -1125,17 +1130,21 @@ async function inPlace(ids: readonly string[], membersOf: () => Promise<Readonly
   return ids.filter((id) => members.has(id));
 }
 
-/** The card's Contributors as Slack ids, each name looked up once per job. */
+/** The card's Contributors as Slack ids, each name looked up once per job:
+ *  only those active on Team Members, so someone who has left PLUS, or has
+ *  no row, is never an owner, a confirmer or a taker (#1361). */
 export async function contributorsOf(
   deps: SweepDeps,
   names: readonly string[],
   resolved: Map<string, string | null>,
 ): Promise<string[]> {
+  if (!names.length) return [];
+  const active = await deps.people.active();
   const ids: string[] = [];
   for (const name of names) {
     if (!resolved.has(name)) resolved.set(name, await deps.people.slackIdFor(name));
     const id = resolved.get(name);
-    if (id) ids.push(id);
+    if (id && isActive(id, active)) ids.push(id);
   }
   return ids;
 }

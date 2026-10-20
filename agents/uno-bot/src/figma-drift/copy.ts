@@ -19,8 +19,9 @@
 //
 // MENTIONS: the parent line tags each card's file owner, where Slack
 // notifies (`owners`, drawn by the shared card). A last publisher the Team
-// Members directory maps to a Slack person other than the owner is named on
-// the card's subtitle by Figma handle, in plain text. Nobody is tagged else.
+// Members directory maps to an active Slack person other than the owner is
+// named on the card's subtitle by Figma handle, in plain text. Nobody is
+// tagged else.
 //
 // EVERY NOTION- AND FIGMA-SOURCED STRING IN mrkdwn IS ESCAPED
 // (`escapeSlackText`): a file title or a thread paraphrase holding

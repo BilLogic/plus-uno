@@ -12,6 +12,7 @@
 
 import type { Env } from "../types";
 import { rethrowIfBudget } from "../net";
+import { PAST_COLLABORATORS } from "../usage/roles";
 import {
   canonicalNotionUrl,
   notionSearch,
@@ -136,7 +137,10 @@ export async function executeNotionSearch(env: Env, input: Record<string, unknow
 
   try {
     if (scope === "team") {
-      const { members, truncated } = await findTeamMembers(env);
+      const { members: rows, truncated } = await findTeamMembers(env);
+      // Only people still on the team are suggested or tagged (#1361): a
+      // Past Collaborators row is left out of what the turn sees.
+      const members = rows.filter((m) => m.affiliation !== PAST_COLLABORATORS);
       const anySlackIds = members.some((m) => m.slackUserId);
       return JSON.stringify({
         ok: true,
