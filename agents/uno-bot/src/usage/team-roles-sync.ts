@@ -4,7 +4,8 @@
 // Figma commenter can be matched to a teammate without a call to Notion, and
 // so is the Notion-user → Slack-id map card follow-ups tag through, with the
 // names of the rows missing an id, for a note to the lead when one costs
-// something (`./gap-notes.ts`).
+// something (`./gap-notes.ts`), and who is active — the only people a job
+// tags or names from a roster (`./roles.ts` `isActive`, #1361).
 //
 // One Notion query, paged, and one users.list read, paged — both inside the
 // run's lookup ceiling. A read that fails or stops short writes nothing, so a
@@ -20,7 +21,9 @@
 // expiry they already had. The Figma map is not held back with them: it is
 // rebuilt from every read that succeeds, so an id taken off a row stops
 // mapping at the next good sync, and a fall from some ids to none is called
-// out in the summary rather than held.
+// out in the summary rather than held. The active list is rebuilt the same
+// way, so someone moved to Past Collaborators stops being tagged at the next
+// good sync; a hollow read leaves fewer people tagged, never more.
 //
 // Free of `Env`: its reads and its store are passed in (`./production.ts`
 // binds them), so the Node suite drives it with fakes.
@@ -62,6 +65,11 @@ export interface StoredTeamRoles {
   /** The rows, not Past Collaborators, with no readable Figma User ID: a
    *  Figma asker whose handle is one of them gets the lead a note. */
   noFigmaId?: readonly string[];
+  /** The Slack ids an active row matched (`matchRoster` `active`). Absent
+   *  from a map stored before it was kept, which makes nobody active. */
+  active?: readonly string[];
+  /** The active rows' names, normalized (`matchRoster` `activeNames`). */
+  activeNames?: readonly string[];
 }
 
 /** What the sync reads and where it writes. */
@@ -132,6 +140,7 @@ export async function syncTeamRoles(deps: TeamRolesSyncDeps, opts: { dryRun: boo
   if (figmaIds) counts += `, ${figmaIds} Figma id${figmaIds === 1 ? "" : "s"}`;
   const notionIds = Object.keys(match.notionPeople).length;
   if (notionIds) counts += `, ${notionIds} Notion ${notionIds === 1 ? "person" : "people"}`;
+  counts += `, ${match.active.length} active`;
 
   let previous: StoredTeamRoles | null;
   try {
@@ -146,6 +155,8 @@ export async function syncTeamRoles(deps: TeamRolesSyncDeps, opts: { dryRun: boo
   if (shrunk) counts += ` — kept previous roles: new map had ${had} of ${of}`;
   const figmaBefore = Object.keys(previous?.figmaPeople ?? {}).length;
   if (figmaBefore && !figmaIds) counts += ` — warning: Figma ids fell from ${figmaBefore} to 0`;
+  const activeBefore = previous?.active?.length ?? 0;
+  if (activeBefore && !match.active.length) counts += ` — warning: active people fell from ${activeBefore} to 0, so nobody is tagged`;
 
   const write = !opts.dryRun;
   if (write) {
@@ -163,6 +174,8 @@ export async function syncTeamRoles(deps: TeamRolesSyncDeps, opts: { dryRun: boo
         gaps: match.gaps,
         noNotionPerson: match.noNotionPerson,
         noFigmaId: match.noFigmaId,
+        active: match.active,
+        activeNames: match.activeNames,
       },
       ttlS,
     );

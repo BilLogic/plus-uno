@@ -18,6 +18,16 @@
 // A row's optional Notion Person gives a Notion people map by the same rule,
 // which is how a card follow-up tags a Contributor before it tries a name.
 //
+// The same match also says who is active (#1361): the Slack people a row
+// matches alone, whatever its group, when its Affiliation is not Past
+// Collaborators, and those rows' names. A person read from a roster — a
+// card's Contributors, a design owner, the Figma or Notion people map, a
+// configured owner list — is tagged or named only when active (`isActive`),
+// and named in plain text only by an active row's name (`isActiveName`).
+// Someone with no row is never active, even by a Figma handle; a map that
+// cannot be read, or was stored before the list was kept, makes nobody
+// active, so a failed read names nobody.
+//
 // The roles are for analytics only, never for access: nothing is allowed or
 // refused on them. The Figma people map is for access: a commenter it does not
 // map gets public facts only and no write proposals, and one it does map still
@@ -61,12 +71,12 @@ export function notionPersonOfSlack(slackUserId: string | null | undefined, peop
   return ids.length === 1 ? ids[0]! : null;
 }
 
-/** A person's role, or null when they are not on the map. */
 /** The first of a card's Contributors, as Slack ids, the roles name a designer. */
 export function designerAmong(contributors: readonly string[], roles: TeamRoles): string | null {
   return contributors.find((id) => roleOf(id, roles) === "design") ?? null;
 }
 
+/** A person's role, or null when they are not on the map. */
 export function roleOf(userId: string | null | undefined, roles: TeamRoles = {}): TeamRole | null {
   return entryOf(userId, roles);
 }
@@ -81,6 +91,39 @@ export const GROUP_ROLES: TeamRoles = {
 
 /** The `Affiliation` option whose rows are skipped: no longer on the team. */
 export const PAST_COLLABORATORS = "Past Collaborators";
+
+/** Who may be tagged or named from a roster: the Slack people an active Team
+ *  Members row matches alone, and the active rows' names, normalized. */
+export interface ActivePeople {
+  slack: ReadonlySet<string>;
+  names: ReadonlySet<string>;
+}
+
+/** Nobody active: what a failed or missing read gives. */
+export const NOBODY_ACTIVE: ActivePeople = { slack: new Set(), names: new Set() };
+
+/** The active people a stored map lists; nobody for no map, or for one stored
+ *  before the list was kept. */
+export function activePeopleOf(stored: { active?: readonly string[]; activeNames?: readonly string[] } | null | undefined): ActivePeople {
+  if (!stored?.active) return NOBODY_ACTIVE;
+  return { slack: new Set(stored.active), names: new Set(stored.activeNames ?? []) };
+}
+
+/** Whether a Slack person may be tagged or named. */
+export function isActive(slackUserId: string | null | undefined, active: ActivePeople): boolean {
+  return !!slackUserId && active.slack.has(slackUserId);
+}
+
+/** The Slack people among `ids` who may be tagged or named, in order. */
+export function activeAmong(ids: readonly string[], active: ActivePeople): string[] {
+  return ids.filter((id) => isActive(id, active));
+}
+
+/** Whether a name is an active row's, compared as `normalizePersonName` compares. */
+export function isActiveName(name: string | null | undefined, active: ActivePeople): boolean {
+  const key = name ? normalizePersonName(name) : "";
+  return !!key && active.names.has(key);
+}
 
 /** One Team Members row, as the sync reads it. */
 export interface RosterRow {
@@ -147,6 +190,11 @@ export interface RosterMatch {
   noNotionPerson: string[];
   /** Rows, Past Collaborators aside, with no Figma User ID `normalizeFigmaId` reads. */
   noFigmaId: string[];
+  /** The Slack members a row that is not Past Collaborators matched alone,
+   *  whatever its group: who may be tagged or named (`isActive`). */
+  active: string[];
+  /** Those rows' names, normalized: who may be named in plain text (`isActiveName`). */
+  activeNames: string[];
 }
 
 /**
@@ -160,7 +208,8 @@ export interface RosterMatch {
  * A row's Figma user id, and each Notion user its Notion Person names, maps
  * to the member the row matched, by the same rule, whether or not the row has
  * a role. Only the role rows count towards
- * `matched`, `unmatched` and `ambiguous`.
+ * `matched`, `unmatched` and `ambiguous`. Every row that is not Past
+ * Collaborators puts its name, and the member it matched, among the active.
  *
  * @param roster - The Team Members rows
  * @param directory - The workspace's members
@@ -193,6 +242,8 @@ export function matchRoster(roster: readonly RosterRow[], directory: readonly Di
   /** Each Notion user's members, from every row that names it. */
   const notion = new Map<string, Set<string>>();
   const unreadableFigma: string[] = [];
+  const activeMembers = new Set<string>();
+  const activeNames = new Set<string>();
   for (const row of roster) {
     if (row.affiliation === PAST_COLLABORATORS) continue;
     const ids = row.slackUserId
@@ -201,6 +252,9 @@ export function matchRoster(roster: readonly RosterRow[], directory: readonly Di
     const [id] = ids;
     // A row that matches nobody, or more than one member, maps its ids to nobody.
     const member = id && ids.length === 1 ? id : "";
+    if (member) activeMembers.add(member);
+    const name = normalizePersonName(row.name);
+    if (name) activeNames.add(name);
     const figmaId = row.figmaUserId?.trim() ? normalizeFigmaId(row.figmaUserId) : undefined;
     if (row.figmaUserId?.trim() && !figmaId) unreadableFigma.push(row.name);
     if (!figmaId) noFigmaId.push(row.name);
@@ -247,6 +301,8 @@ export function matchRoster(roster: readonly RosterRow[], directory: readonly Di
     gaps,
     noNotionPerson,
     noFigmaId,
+    active: [...activeMembers],
+    activeNames: [...activeNames],
   };
 }
 

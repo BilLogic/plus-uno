@@ -14,7 +14,7 @@ import { createD1UsageLog } from "./d1";
 import { createD1ProposalEventLog } from "./proposal-events-d1";
 import type { ProposalEventLog } from "./proposal-events";
 import type { UsageLog } from "./store";
-import type { FigmaPeople, NotionPeople, TeamRoles } from "./roles";
+import { activePeopleOf, type ActivePeople, type FigmaPeople, type NotionPeople, type TeamRoles } from "./roles";
 import { charge, rethrowIfBudget } from "../net";
 import { findTeamMembers } from "../integrations/notion";
 import { slackDirectoryFor } from "../tools/slack-people";
@@ -123,6 +123,19 @@ export async function figmaPeopleFor(env: Pick<Env, "HARNESS_KV">): Promise<Figm
  */
 export async function notionPeopleFor(env: Pick<Env, "HARNESS_KV">): Promise<NotionPeople> {
   return (await storedTeamRoles(env))?.notionPeople ?? {};
+}
+
+/**
+ * Who may be tagged or named from a roster (`./roles.ts` `isActive`), read
+ * from the stored map once for the life of the returned function: one job's
+ * run. No map, a map stored before the list was kept, no KV or a failed read
+ * makes nobody active, so a failed read names nobody.
+ *
+ * @throws A budget stop, rather than nobody: the caller defers
+ */
+export function activePeopleFor(env: Pick<Env, "HARNESS_KV">): () => Promise<ActivePeople> {
+  let read: Promise<ActivePeople> | undefined;
+  return () => (read ??= storedTeamRoles(env).then(activePeopleOf));
 }
 
 /** The stored map, or null when none is stored, KV is not bound or the read
