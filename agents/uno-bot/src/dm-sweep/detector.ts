@@ -15,7 +15,9 @@
 // never repaired.
 //
 // WHAT IS NEW. A message after the DM's cursor — except uno-bot's own posts,
-// which it tags (a sweep card, the F6 ask, the raise card, a batch result):
+// which it tags (a sweep card, the F6 ask, the raise card, a batch result,
+// and every status post — a note, a card, a narration line, the blueprint
+// check's offer and results; `slack/status-tag.ts`):
 // those are shown as context and are never new, so a card uno-bot posted in
 // the morning is never read back as an answer that night (`isFresh`).
 //

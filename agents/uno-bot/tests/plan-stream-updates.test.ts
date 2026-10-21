@@ -18,6 +18,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { deliveryAdapter, type SlackDeliveryTarget } from "../src/slack/delivery-adapter";
+import { statusTag } from "../src/slack/status-tag";
 import type { ToolProgressEvent } from "../src/agent/tool-progress";
 import { recordingSlack, type SlackCall } from "./helpers/recording-slack";
 
@@ -171,6 +172,9 @@ describe("plan-stream updates", () => {
     ]);
   });
 
+  // A narration line is never an answer, so it goes up tagged as a status post.
+  const NARRATION = statusTag("narration");
+
   it("with the plan switch off, post exactly today's narration messages", async () => {
     const slack = recordingSlack();
     const delivery = deliveryAdapter(slack.deps(false), TARGET);
@@ -182,8 +186,8 @@ describe("plan-stream updates", () => {
     await delivery.endProgress("complete");
 
     assert.deepEqual(slack.calls, [
-      { kind: "message", channel: "C123", threadTs: "100.1", text: "checking Notion", blocks: false },
-      { kind: "message", channel: "C123", threadTs: "100.1", text: "checking Figma", blocks: false },
+      { kind: "message", channel: "C123", threadTs: "100.1", text: "checking Notion", blocks: false, metadata: NARRATION },
+      { kind: "message", channel: "C123", threadTs: "100.1", text: "checking Figma", blocks: false, metadata: NARRATION },
     ]);
   });
 });

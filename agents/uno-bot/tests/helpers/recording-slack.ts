@@ -55,6 +55,8 @@ export type SlackCall =
       /** The blocks themselves, when there were any — what a static checklist
        *  is asserted on. */
       blockList?: unknown[];
+      /** The Worker's own tag on the post, when it sent one. */
+      metadata?: { event_type: string; event_payload: Record<string, unknown> };
     }
   | { kind: "update"; channel: string; ts: string; text: string; blocks: unknown[] }
   | { kind: "delete"; channel: string; ts: string }
@@ -365,6 +367,7 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
         text: input.text,
         blocks,
         ...(input.blocks ? { blockList: input.blocks } : {}),
+        ...(input.metadata ? { metadata: input.metadata } : {}),
       });
       if (refuseBlocks(refused, "post", input.blocks)) return { ok: false };
       if (opts.messageFails || (blocks && opts.blocksFail)) return { ok: false };
