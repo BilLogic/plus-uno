@@ -557,7 +557,7 @@ export async function runBlueprintCheckOnEnv(env: Env, job: BlueprintCheckJob): 
     },
     async settle(offer, outcome) {
       const message = checkedMessage(offer, outcome);
-      const edited = await updateMessage(env, { channel: offer.channel, ts: offer.offerTs, text: message.text, blocks: message.blocks });
+      const edited = await updateMessage(env, { channel: offer.channel, ts: offer.offerTs, text: message.text, blocks: message.blocks, ...(message.metadata ? { metadata: message.metadata } : {}) });
       if (!edited.ok) console.warn(`[blueprint-check] status message ${offer.channel}/${offer.offerTs} not edited: ${edited.error ?? "refused"}`);
     },
     ...(recipient

@@ -850,7 +850,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   const beginStaticPlan = async (label: string): Promise<void> => {
     const opening: PlanTask = { id: OPENING_CARD, title: label, status: "in_progress" };
     const posted = await slack
-      .postMessage({ channel, text: label, blocks: [planBlock(label, [opening])] })
+      .postMessage({ channel, text: label, blocks: [planBlock(label, [opening])], metadata: statusTag("checklist") })
       .catch(() => ({ ok: false as const }));
     if (!posted.ok || !("ts" in posted) || !posted.ts) return;
     planOpen = true;
@@ -1205,8 +1205,11 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // messages FIRST, so the card — which carries the buttons — stays the
       // last thing in the thread. Slack's size limits are what decide there is
       // anything to send, so the decision is the adapter's and not the turn's.
+      // Its own tag, or a status post's: a card is never an answer, and its
+      // follow-ups carry the card's tag as the card does.
+      const metadata = card.tag ? { event_type: card.tag.eventType, event_payload: card.tag.payload } : statusTag("card");
       for (const message of rendered.followUp ?? []) {
-        await slack.postMessage({ channel, thread_ts: replyTs, text: message, metadata: statusTag("card") }).catch(() => ({}));
+        await slack.postMessage({ channel, thread_ts: replyTs, text: message, metadata }).catch(() => ({}));
       }
       // Every card carries ✅ Approve / ⛔ Cancel buttons (2026-08-22). Cards
       // with blocks of their own (the Figma preview) already include them; a
@@ -1217,8 +1220,6 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // Its own blocks, as long as they are what went up: the record keeps
       // them so a note or a decision is edited onto them.
       let own = rendered.blocks;
-      // Its own tag, or a status post's: a card is never an answer.
-      const metadata = card.tag ? { event_type: card.tag.eventType, event_payload: card.tag.payload } : statusTag("card");
       let posted = await slack.postMessage({
         channel,
         thread_ts: replyTs,

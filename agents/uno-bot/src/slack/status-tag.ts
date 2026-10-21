@@ -6,8 +6,8 @@
 // status line that says "I couldn't…" is never read back as an answer that
 // came up empty and asked about the next morning. An answer goes up untagged.
 //
-// Tag at post time only: `chat.update` keeps a message's metadata when the
-// edit sends none, so the line a status message is edited to stays tagged.
+// Tag at post time, and send the tag again with an edit that has one to hand
+// (as a decision report's redraw does), rather than lean on Slack keeping it.
 //
 // PURE.
 
@@ -16,12 +16,14 @@ import type { SlackMessageMetadata } from "./api";
 /** The message-metadata type of every status post. */
 export const STATUS_EVENT = "uno_status";
 
+/** What a status post is, for whoever reads the tag back. */
+export type StatusKind = "note" | "card" | "narration" | "checklist" | "blueprint_check";
+
 /**
  * A status post's tag.
  *
- * @param kind - What the post is ("note", "card", "blueprint_check"…), for
- *   whoever reads the tag back; nothing branches on it today
+ * @param kind - What the post is; nothing branches on it today
  */
-export function statusTag(kind: string): SlackMessageMetadata {
+export function statusTag(kind: StatusKind): SlackMessageMetadata {
   return { event_type: STATUS_EVENT, event_payload: { kind } };
 }

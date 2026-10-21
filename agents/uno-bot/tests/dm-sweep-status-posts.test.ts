@@ -20,7 +20,7 @@ import { fakeProvider } from "../src/agent/providers/fake";
 import { detectDmItems } from "../src/dm-sweep/index";
 import { checkedMessage, checkingMessage, checkOfferMessage, resultsMessage, stoppedMessage } from "../src/slack/blueprint-check";
 import { deliveryAdapter } from "../src/slack/delivery-adapter";
-import { STATUS_EVENT, statusTag } from "../src/slack/status-tag";
+import { STATUS_EVENT, statusTag, type StatusKind } from "../src/slack/status-tag";
 import type { DmMessage } from "../src/sweep/index";
 import { recordingSlack } from "./helpers/recording-slack";
 
@@ -38,8 +38,8 @@ const FLAGGED = JSON.stringify({
 });
 
 /** The thread as Slack holds it, each bot post with the tag it went up with. */
-function thread(tagOf: (kind: string) => DmMessage["tag"] | undefined): DmMessage[] {
-  const bot = (ts: string, text: string, kind: string | null): DmMessage => {
+function thread(tagOf: (kind: StatusKind) => DmMessage["tag"] | undefined): DmMessage[] {
+  const bot = (ts: string, text: string, kind: StatusKind | null): DmMessage => {
     const tag = kind ? tagOf(kind) : undefined;
     return { ts, user: BOT, text, byBot: true, ...(tag ? { tag } : {}) };
   };
@@ -120,6 +120,13 @@ describe("the Slack adapter's posts that are not answers go up tagged", () => {
     const messages = slack.of("message");
     assert.equal(messages.length, 5);
     for (const m of messages) assert.equal(m.metadata?.event_type, STATUS_EVENT, `tagged: ${m.text.slice(0, 40)}`);
+  });
+
+  it("the static checklist, posted where there is no thread to stream into", async () => {
+    const slack = recordingSlack();
+    await deliveryAdapter(slack.deps(true), { channel: DM, userMsgTs: ROOT, userId: PERSON }).beginProgress("Working on it");
+    const [checklist] = slack.of("message");
+    assert.equal(checklist?.metadata?.event_type, STATUS_EVENT);
   });
 
   it("a card keeps a tag of its own", async () => {

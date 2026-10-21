@@ -36,6 +36,7 @@ import type {
   WorkingSignalOutcome,
 } from "../../src/slack/delivery-adapter";
 import type { FooterKind } from "../../src/slack/footer-kind";
+import type { SlackMessageMetadata } from "../../src/slack/api";
 import type { PostingClient, PostingDeps } from "../../src/slack/delivery";
 import { textCopy, type Presentation, type DeliveryFailureStage } from "../../src/turn/index";
 import type { SessionStatus, StatusResult } from "../../src/slack/session-status";
@@ -56,7 +57,7 @@ export type SlackCall =
        *  is asserted on. */
       blockList?: unknown[];
       /** The Worker's own tag on the post, when it sent one. */
-      metadata?: { event_type: string; event_payload: Record<string, unknown> };
+      metadata?: SlackMessageMetadata;
     }
   | { kind: "update"; channel: string; ts: string; text: string; blocks: unknown[] }
   | { kind: "delete"; channel: string; ts: string }
