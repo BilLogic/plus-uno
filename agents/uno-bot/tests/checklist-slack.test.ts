@@ -11,6 +11,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { deliveryAdapter, type SlackDeliveryTarget } from "../src/slack/delivery-adapter";
+import { statusTag } from "../src/slack/status-tag";
 import { finishedProgress, type ToolProgressEvent } from "../src/agent/tool-progress";
 import { recordingSlack, type RecordingSlack } from "./helpers/recording-slack";
 
@@ -208,6 +209,7 @@ describe("the checklist", () => {
         threadTs: "100.1",
         text: "Still on it — this one needs a longer dig.",
         blocks: false,
+        metadata: statusTag("narration"),
       },
     ]);
   });
@@ -222,7 +224,7 @@ describe("the checklist", () => {
     await delivery.endProgress("complete");
 
     assert.deepEqual(slack.calls, [
-      { kind: "message", channel: "C123", threadTs: "100.1", text: "Checking the board", blocks: false },
+      { kind: "message", channel: "C123", threadTs: "100.1", text: "Checking the board", blocks: false, metadata: statusTag("narration") },
     ]);
   });
 

@@ -63,6 +63,7 @@
 import type { Env } from "../types";
 import { asDelivery, budgetHeadroom, charge, countedFetch, rethrowIfBudget } from "../net";
 import { appendTasks, closePlanStream, getBotIdentity, postMessage, startStream, updateMessage } from "../slack/api";
+import { statusTag } from "../slack/status-tag";
 import { streamFlagOn } from "../slack/slack-delivery";
 import { SLACK_USER_ID } from "../slack/mrkdwn";
 import type { SlackMessageEvent } from "../slack/types";
@@ -170,7 +171,7 @@ export function revisionThreadsOn(kv: KVNamespace): RevisionThreads {
 
 /** One line in a thread. */
 async function postLine(env: Env, channel: string, threadTs: string, text: string): Promise<void> {
-  const res = await postMessage(env, { channel, thread_ts: threadTs, text });
+  const res = await postMessage(env, { channel, thread_ts: threadTs, text, metadata: statusTag("note") });
   if (!res.ok) throw new Error(`thread line not posted (${String(res.error ?? "unknown")})`);
 }
 
@@ -529,7 +530,7 @@ export async function runBlueprintCheckOnEnv(env: Env, job: BlueprintCheckJob): 
     createdPage: createdPageOn(env),
     async postResults(offer, results) {
       const message = resultsMessage(offer.offerTs, results);
-      const sent = await postMessage(env, { channel: offer.channel, thread_ts: replyThread(offer), text: message.text, blocks: message.blocks });
+      const sent = await postMessage(env, { channel: offer.channel, thread_ts: replyThread(offer), text: message.text, blocks: message.blocks, ...(message.metadata ? { metadata: message.metadata } : {}) });
       if (!sent.ok) throw new Error(sent.error ?? "Slack refused the results");
     },
     async postCard(offer, card) {
@@ -541,6 +542,7 @@ export async function runBlueprintCheckOnEnv(env: Env, job: BlueprintCheckJob): 
         thread_ts: replyThread(offer),
         text: rendered.text,
         blocks: rendered.blocks ?? proposalCardBlocks(rendered.text),
+        metadata: statusTag("card"),
       });
       if (!sent.ok || !sent.ts) return null;
       return { ts: sent.ts, text: rendered.text, ...(rendered.blocks ? { blocks: rendered.blocks } : {}), ttlMs: due.ttlMs };
@@ -555,7 +557,7 @@ export async function runBlueprintCheckOnEnv(env: Env, job: BlueprintCheckJob): 
     },
     async settle(offer, outcome) {
       const message = checkedMessage(offer, outcome);
-      const edited = await updateMessage(env, { channel: offer.channel, ts: offer.offerTs, text: message.text, blocks: message.blocks });
+      const edited = await updateMessage(env, { channel: offer.channel, ts: offer.offerTs, text: message.text, blocks: message.blocks, ...(message.metadata ? { metadata: message.metadata } : {}) });
       if (!edited.ok) console.warn(`[blueprint-check] status message ${offer.channel}/${offer.offerTs} not edited: ${edited.error ?? "refused"}`);
     },
     ...(recipient
@@ -683,6 +685,7 @@ function proposalOfferDepsFor(env: Env): OfferDeps | null {
         thread_ts: p.replyTs,
         text: rendered.text,
         blocks: rendered.blocks ?? proposalCardBlocks(rendered.text),
+        metadata: statusTag("card"),
       });
       return sent.ok && sent.ts ? { ts: sent.ts, text: rendered.text, ttlMs: due.ttlMs } : null;
     },

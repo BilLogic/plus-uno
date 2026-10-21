@@ -75,6 +75,7 @@ import { toPlainText } from "./mrkdwn";
 import { cardStaysLive, decidedCardLine, renderCardNote, renderGateNote } from "./gate-note";
 import { keptQuestionMessage, whichCardMessage } from "./which-card";
 import { checkOfferMessage } from "./blueprint-check";
+import { statusTag } from "./status-tag";
 import { planBlock } from "./plan-block";
 import { retryValue } from "./try-again";
 import type { Presentation, Delivery, DeliveryFailureStage, PostResult, ProposalCard, StagingNote } from "../turn/index";
@@ -849,7 +850,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   const beginStaticPlan = async (label: string): Promise<void> => {
     const opening: PlanTask = { id: OPENING_CARD, title: label, status: "in_progress" };
     const posted = await slack
-      .postMessage({ channel, text: label, blocks: [planBlock(label, [opening])] })
+      .postMessage({ channel, text: label, blocks: [planBlock(label, [opening])], metadata: statusTag("checklist") })
       .catch(() => ({ ok: false as const }));
     if (!posted.ok || !("ts" in posted) || !posted.ts) return;
     planOpen = true;
@@ -871,7 +872,9 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
         channel,
         thread_ts: replyTs,
         text,
-        ...(tag ? { metadata: { event_type: tag.eventType, event_payload: tag.payload } } : {}),
+        // A note is never an answer: tagged, so the DM sweep never reads it
+        // as one (`status-tag.ts`).
+        metadata: tag ? { event_type: tag.eventType, event_payload: tag.payload } : statusTag("note"),
       })
       .catch(() => ({ ok: false as const }));
     return {
@@ -993,6 +996,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
           channel,
           thread_ts: replyTs,
           text,
+          metadata: statusTag("narration"),
         })
         .catch(() => {});
     },
@@ -1109,7 +1113,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       if (note.kind === "which-card") {
         const message = whichCardMessage(note);
         const posted = await slack
-          .postMessage({ channel, thread_ts: replyTs, text: message.text, blocks: message.blocks })
+          .postMessage({ channel, thread_ts: replyTs, text: message.text, blocks: message.blocks, metadata: statusTag("note") })
           .catch(() => ({ ok: false as const }));
         return { ok: !!posted.ok, text: message.text, ...("ts" in posted && posted.ts ? { ts: posted.ts } : {}) };
       }
@@ -1135,7 +1139,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // (`blueprint-check.ts`), under the card in the same reply thread.
       const message = checkOfferMessage(offer);
       const posted = await slack
-        .postMessage({ channel, thread_ts: replyTs, text: message.text, blocks: message.blocks })
+        .postMessage({ channel, thread_ts: replyTs, text: message.text, blocks: message.blocks, ...(message.metadata ? { metadata: message.metadata } : {}) })
         .catch(() => ({ ok: false as const }));
       return { ok: !!posted.ok, text: message.text, ...("ts" in posted && posted.ts ? { ts: posted.ts } : {}) };
     },
@@ -1201,8 +1205,11 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // messages FIRST, so the card — which carries the buttons — stays the
       // last thing in the thread. Slack's size limits are what decide there is
       // anything to send, so the decision is the adapter's and not the turn's.
+      // Its own tag, or a status post's: a card is never an answer, and its
+      // follow-ups carry the card's tag as the card does.
+      const metadata = card.tag ? { event_type: card.tag.eventType, event_payload: card.tag.payload } : statusTag("card");
       for (const message of rendered.followUp ?? []) {
-        await slack.postMessage({ channel, thread_ts: replyTs, text: message }).catch(() => ({}));
+        await slack.postMessage({ channel, thread_ts: replyTs, text: message, metadata }).catch(() => ({}));
       }
       // Every card carries ✅ Approve / ⛔ Cancel buttons (2026-08-22). Cards
       // with blocks of their own (the Figma preview) already include them; a
@@ -1213,13 +1220,12 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // Its own blocks, as long as they are what went up: the record keeps
       // them so a note or a decision is edited onto them.
       let own = rendered.blocks;
-      const metadata = card.tag ? { event_type: card.tag.eventType, event_payload: card.tag.payload } : undefined;
       let posted = await slack.postMessage({
         channel,
         thread_ts: replyTs,
         text: rendered.text,
         blocks,
-        ...(metadata ? { metadata } : {}),
+        metadata,
       });
       // If Slack rejected the blocks (it could not fetch the Figma image_url,
       // or a section overflowed), retry text-only so the confirmation gate
@@ -1227,7 +1233,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // the same.
       if (!posted.ok) {
         console.warn("[slack] proposal with blocks failed; retrying text-only");
-        posted = await slack.postMessage({ channel, thread_ts: replyTs, text: rendered.text, ...(metadata ? { metadata } : {}) });
+        posted = await slack.postMessage({ channel, thread_ts: replyTs, text: rendered.text, metadata });
         own = undefined;
       }
       // A line above a card that never went up says a staging that did not
