@@ -436,8 +436,10 @@ export function plainReportBlocks(blocks: readonly unknown[]): unknown[] {
   });
 }
 
-/** One item's words — title, state and body, then its whole detail — for View once its
- *  proposal is gone; null when the record has no such entry. */
+/** One item's words — title, state and body, then its whole detail — for View
+ *  on an item closed before its record kept the decided draft (#1362); every
+ *  item closed since is drawn from that draft. Null when the record has no
+ *  such entry. */
 export function itemText(record: DecisionReportRecord, id: string): string | null {
   const entry = record.entries.find((e) => e.id === id);
   if (!entry) return null;
