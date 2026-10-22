@@ -3,7 +3,7 @@ import NavPills from './NavPills';
 import { Nav } from 'react-bootstrap';
 
 export default {
-    title: 'Components/Navigation/Nav pills',
+    title: 'Components/Navigation/Nav Tabs & Nav Pills/Nav Pills',
     component: NavPills.Item,
     tags: ['!dev'],
     subcomponents: { 'NavPills.Dropdown': NavPills.Dropdown },

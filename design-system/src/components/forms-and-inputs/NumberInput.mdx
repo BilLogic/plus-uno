@@ -17,13 +17,13 @@ export const figmaMeta = {
     },
     {
       "id": "field",
-      "name": "_Field",
+      "name": "Form",
       "componentSetNodeId": "14841:25919",
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
       "source": "manual",
       "status": "unpublished",
       "isComponentSet": true,
-      "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
+      "notes": "The part this component is built on, still named Form in the Figma file: one box with Leading, Content and Trailing slots, 3 sizes × 7 states (21 variants). In code it is `_internal/Field.jsx`, which is not exported from the barrel, so `unpublished` is its settled state: a part to build on, not a component to place."
     }
   ]
 };
@@ -171,8 +171,8 @@ over a focused field does not nudge the number, and phones show a number pad.
   — see the `showLabel` section in the `Input` docs for why a name cannot be
   taken away. Prefer a visible label regardless: a field whose name only exists
   in the accessibility tree is a field sighted users have to guess at.
-- **The steppers are named for the field.** "Decrease {label}" and "Increase
-  {label}", minus before plus, so a form with three number fields does not read
+- **The steppers are named for the field.** `Decrease <label>` and `Increase <label>`,
+  minus before plus, so a form with three number fields does not read
   out three identical "Increase" buttons. They take the real `disabled`
   attribute at the bounds. Read-only hides them.
 - **`required` shows an asterisk and sets `aria-required`.** Explain the

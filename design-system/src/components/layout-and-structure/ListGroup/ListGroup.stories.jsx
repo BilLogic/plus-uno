@@ -4,7 +4,7 @@ import ListGroup from './ListGroup';
 import { Badge } from '@/components/status-and-loading/Badge';
 
 export default {
-    title: 'Components/Layout and structure/List group',
+    title: 'Components/Layout and structure/List Group',
     component: ListGroup,
     tags: ['!dev', '!autodocs'],
     subcomponents: { 'ListGroup.Item': ListGroup.Item },

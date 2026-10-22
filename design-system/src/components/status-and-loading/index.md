@@ -17,10 +17,10 @@ authored half (#166), counted rather than assumed.
 | [Status](Status/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Suggestion](Suggestion/index.md) | 8 | ✅ | ✅ | ✅ |
 | [Tag](Tag/index.md) | 22 | ✅ | ✅ | ✅ |
-| [TagGroup](TagGroup/index.md) | 10 | ✅ | ✅ | ✅ |
+| [TagGroup](TagGroup/index.md) | 10 | ✕ | ✕ | ✕ |
 | [Tile](Tile/index.md) | 10 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 12/12 (100%) · Correct/incorrect 12/12 (100%) · Accessibility 12/12 (100%)
+**Authored coverage:** When to use 11/12 (92%) · Correct/incorrect 11/12 (92%) · Accessibility 11/12 (92%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

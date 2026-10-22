@@ -2,7 +2,7 @@ import React from 'react';
 import Navbar from '@/components/_internal/Navbar';
 
 export default {
-    title: 'Components/Navigation/Navbar',
+    title: 'Components/Navigation/Nav Tabs & Nav Pills/Navbar',
     component: Navbar,
     tags: ['!dev', '!autodocs'],
     parameters: {

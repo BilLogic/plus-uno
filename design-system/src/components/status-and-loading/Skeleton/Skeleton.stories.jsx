@@ -69,7 +69,7 @@ const emulateReducedMotion = async (value) => {
 };
 
 export default {
-    title: 'Components/Status and loading/Skeleton',
+    title: 'Components/Status and loading/Loading/Skeleton',
     component: Skeleton,
     tags: ['!dev', '!autodocs'],
     parameters: {
@@ -267,6 +267,46 @@ Shapes.play = async ({ canvasElement }) => {
         await expect(s.animationName, 'shimmering by default').not.toBe('none');
         await expectInert(el, 'shape');
     }
+};
+
+
+/**
+ * Figma's `preset` names the free shapes too: `preset="rect"`, `"circle"` and
+ * `"text"` draw exactly what `shape` does, and resize the same way.
+ */
+export const PresetNamesAShape = () => (
+    <div style={{ display: 'grid', gap: '16px' }}>
+        <div style={row}>
+            <Skeleton preset="rect" width={160} height={64} data-testid="preset-rect" />
+            <Skeleton preset="circle" data-testid="preset-circle" />
+            <Skeleton preset="text" width={160} lines={2} data-testid="preset-text" />
+            <Skeleton preset="circle" width={40} data-testid="preset-circle-40" />
+        </div>
+        <div style={row}>
+            <Skeleton shape="rect" width={160} height={64} data-testid="shape-rect" />
+            <Skeleton shape="circle" data-testid="shape-circle" />
+            <Skeleton shape="text" width={160} lines={2} data-testid="shape-text" />
+        </div>
+    </div>
+);
+PresetNamesAShape.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const name of ['rect', 'circle', 'text']) {
+        const viaPreset = canvas.getByTestId(`preset-${name}`);
+        const viaShape = canvas.getByTestId(`shape-${name}`);
+        await expect(box(viaPreset).width, `preset="${name}" is as wide as shape="${name}"`).toBe(box(viaShape).width);
+        await expect(box(viaPreset).height, `preset="${name}" is as tall as shape="${name}"`).toBe(box(viaShape).height);
+        await expect(viaPreset.children.length, `preset="${name}" draws as many bars`).toBe(viaShape.children.length);
+        const bar = (el) => el.firstElementChild ?? el;
+        await expect(radius(bar(viaPreset)), `preset="${name}" has the same corners`).toBe(radius(bar(viaShape)));
+        await expectInert(bar(viaPreset), `preset="${name}"`);
+    }
+    await expect(canvas.getByTestId('preset-text').children, 'text lines repeat').toHaveLength(2);
+
+    const sized = canvas.getByTestId('preset-circle-40');
+    await expect(box(sized).width, 'a circle preset resizes').toBe(40);
+    await expect(box(sized).height, 'and stays a circle').toBe(40);
+    await expect(radius(sized)).toBeGreaterThanOrEqual(20);
 };
 
 /** `lines` repeats the text bar; the last line is shorter so it reads as text. */
@@ -537,6 +577,9 @@ export const IgnoredPropsWarn = () => {
         'Circle radius': <Skeleton shape="circle" radius="card-radius-sm" data-testid="circle-radius" />,
         'Same shape': <Skeleton preset="paragraph" shape="text" />,
         'Circle sizes': <Skeleton shape="circle" width={40} height={24} data-testid="circle-sizes" />,
+        'Shape preset clash': <Skeleton preset="circle" shape="text" />,
+        'Shape preset agrees': <Skeleton preset="text" shape="text" lines={2} />,
+        'Shape preset sized': <Skeleton preset="circle" width={40} />,
     };
     return (
         <div style={{ display: 'grid', gap: '12px' }}>
@@ -564,6 +607,9 @@ IgnoredPropsWarn.play = async ({ canvasElement }) => {
         'Circle radius': ['`radius` is ignored on a circle'],
         'Same shape': [],
         'Circle sizes': ['`height` is ignored on a circle when it differs from `width`'],
+        'Shape preset clash': ['`shape` is ignored with preset="circle", which names its own shape'],
+        'Shape preset agrees': [],
+        'Shape preset sized': [],
     };
     try {
         for (const [name, parts] of Object.entries(expected)) {

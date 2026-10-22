@@ -38,16 +38,6 @@ export const figmaMeta = {
         "isElevated": "elevated"
       },
       "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on gray, plain, read-only, rest and false. state=saving is isLoading; state=disabled comes from TagContext, never a prop; remove? on a link is link plus onRemove; count? is count. type is the same four values in code (plain, person, agent, team); the avatar slot is the avatar prop, with initials when it is missing. elevated=true is isElevated, drawn for read-only and link on plain, person, agent and team, including disabled (from TagContext) and focus × on a link's separate ×; code ignores it on removable and selectable with a warning."
-    },
-    {
-      "id": "remove-button",
-      "name": "Remove button",
-      "componentSetNodeId": "17827:846",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-846",
-      "source": "manual",
-      "status": "verified",
-      "isComponentSet": true,
-      "notes": "On the Button page. Tag uses size small (16, 12px ×); its states are the × inside a removable tag. Medium and large are not built in code yet."
     }
   ]
 };
@@ -307,10 +297,10 @@ and every tag inside follows:
 
 `useTagContext()` reads the same value from inside a custom tag.
 
-### Let the group own the gaps.
+### Let the container own the gaps.
 
-`Tag` sets no margin of its own. A row of tags is a `TagGroup`, which sets
-`gap` once for the set.
+`Tag` sets no margin of its own. The field that holds a row of tags, such as
+`TagInput`, sets `gap` once for the set.
 
 ### Renamed props.
 
@@ -333,8 +323,8 @@ with `aria-expanded`.
 - **Selectable publishes `aria-pressed`**, so the state is not only visible.
   Selected also changes the border to the full hue, so it does not rest on a
   change of lightness alone. A selectable tag given `aria-expanded` is a button
-  that opens something, such as TagGroup's `+n`: it publishes the expanded
-  state and no `aria-pressed`.
+  that opens something, such as the `+n` on a collapsed row of tags: it
+  publishes the expanded state and no `aria-pressed`.
 - **A link with a × is two tab stops**, link then ×, and pressing the × never
   follows the link.
 - **Saving is announced once.** The spinner is hidden; a status region beside
@@ -364,7 +354,6 @@ with `aria-expanded`.
 
 ## Related
 
-- For a set of tags, use `TagGroup`: it owns the gaps and the overflow.
 - For a number on its own, use `Count`.
 - For a labeled field where the person picks, creates and removes tags, use `TagInput`.
 - For a state, use `BadgeVariants` until Status lands.

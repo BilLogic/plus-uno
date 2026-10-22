@@ -25,7 +25,7 @@ import Tag from './Tag';
  */
 
 export default {
-    title: 'Components/Status and loading/Status, Count & Tag/Status/Deprecated/Badge variants',
+    title: 'Components/Status and loading/Status, Count & Tag/Deprecated/Badge Variants',
     component: BadgeVariants,
     tags: ['!dev', '!autodocs'],
     beforeEach: () => {

@@ -21,7 +21,7 @@ export const figmaMeta = {
       "source": "manual",
       "status": "verified",
       "isComponentSet": true,
-      "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from a disabled field's or TagGroup's TagContext, never a prop."
+      "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from a disabled field's TagContext, never a prop."
     }
   ]
 };
@@ -154,17 +154,17 @@ message or fills the text box, and stops offering the suggestion.
 A suggestion sits in a tag row, so its label is a value's name, not a
 sentence. For a prompt, pass the full words as `text` and a short `label`.
 
-### Disabled comes from the field or TagGroup.
+### Disabled comes from the field.
 
-Disabled comes from a disabled field or `TagGroup` through `TagContext`: inside
-one, a suggestion reads the same value a Tag does and is disabled with the tags
-beside it. Like Tag, it has no `disabled` prop of its own.
+Disabled comes from a disabled field through `TagContext`: inside one, a
+suggestion reads the same value a Tag does and is disabled with the tags beside
+it. Like Tag, it has no `disabled` prop of its own.
 
 ```jsx
-<TagGroup label="Focus areas" disabled={!canEdit}>
+<TagContext.Provider value={{ isDisabled: !canEdit }}>
   <Tag color="blue">Fractions</Tag>
   <Suggestion label="Ratios" onAccept={add} />
-</TagGroup>
+</TagContext.Provider>
 ```
 
 </div>
@@ -177,9 +177,9 @@ beside it. Like Tag, it has no `disabled` prop of its own.
 - **Disabled is a disabled button.** It keeps its name, is announced as
   disabled, is skipped by Tab, and never calls `onAccept`.
 - **Named for what pressing it does.** An insert suggestion is announced as
-  "Add {label}, suggested", so a screen-reader user knows pressing it adds a
+  `Add <label>, suggested`, so a screen-reader user knows pressing it adds a
   value. A prompt is not added to anything, so it is announced as
-  "{label}, suggested".
+  `<label>, suggested`.
 - **The glyph is decorative.** The plus and the sparkle wand are hidden from
   assistive technology; the name already says what the suggestion does.
 - **Focus is a ring, not a fill**: a 2px Focus Ring 2px outside the edge, so
@@ -191,7 +191,7 @@ beside it. Like Tag, it has no `disabled` prop of its own.
 
 ## Related
 
-- For a value already in the field, use `Tag`, inside a `TagGroup`.
+- For a value already in the field, use `Tag`.
 - To mark content the agent produced, use `AiLabel`.
 
 </div>

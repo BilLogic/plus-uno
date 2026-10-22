@@ -17,7 +17,7 @@ const icons = {
 };
 
 export default {
-    title: 'Components/Actions/Button',
+    title: 'Components/Actions/Button/Button',
     component: Button,
     /** Hide CSF stories from the sidebar; docs live on Button.mdx (Canvas still embeds them). */
     tags: ['!dev', '!autodocs'],

@@ -1,6 +1,6 @@
 {
-  "note": "What each mapped Figma node ACTUALLY is, read from Figma. Not derived from anything in this repo — it is a measurement, and check:figma-node-types holds the registry to it. Re-measure with npm run audit:figma-registry and record the date. measuredAt is the date of the MOST RECENT reading in this file, not a claim that every row was read that day: 98 rows were read 2026-08-29 with the Plugin API, and 13526:17500 and 13520:70443 were read 2026-09-15 with the MCP get_metadata tool when the owner named the tree select trio. 13529:2016 (tree_select_ver2) left the registry the same day and its row left with it. 17827:827 (Close button) was read 2026-09-29 with the MCP get_metadata tool: a set of eight state × tone variants. 17878:1928 (Tile) was read 2026-09-29 with the MCP get_metadata tool: a set of 138 variants. 17876:46653 (Count) was read 2026-09-29 with get_metadata when the Count component was added. 17876:1653 (Status) was read 2026-09-29 with get_metadata when the Status component was added: a set of 18 variants. 17877:47506 (Tag) and 17827:846 (Remove button) were read 2026-09-29 with get_metadata when Tag was rebuilt: sets of variants, replacing the retired 17558:1218. 17878:1769 (Suggestion) was read 2026-09-29 with get_metadata when Suggestion was added: a set of 8 variants. 17878:1851 (Skeleton) was read 2026-09-29 with get_metadata when the Skeleton component was added: a set of 10 variants. 17878:1713 (TagGroup) was read 2026-09-29 with the Plugin API when TagGroup gained alignment, disabled and overflow: a set of 5 variants. 18265:52386 (ChoiceGroup) was read 2026-10-15 with get_metadata when ChoiceGroup replaced MultipleChoice and Scale: a set of 4 variants. The same day 13541:9229 (Choice Grid) was re-read as a set of 2 variants, and the rows for the deleted Multiple Choice (Radio) 13540:9207, Multiple Choice (Checkbox) 13540:9717, CheckBox Grid 13541:9240 and Scale Radio Button 13536:6785 left with their mappings, as did Scale Options 13536:9083 and Linear Scale 13536:9208, which no code component maps once Scale is gone. 34:7879 (Carousel) was read 2026-10-15 with the Plugin API when Carousel's type axis became booleans: a plain component, replacing the deleted set 34:8261. 18729:36579 (Rich Text Editor) was read 2026-10-15 with the Plugin API when the single component became a set of 6 variants, toolbar preset × state; the row for 10010:37927, now its compact default variant, left with the mapping. 14841:25919 (_Field, still named Form in the file) was read 2026-10-15 with get_metadata when Input, Textarea, Number input and Input group moved onto it: a set of 21 variants. The same day the row for Form Short Textarea 13543:5904 left with its mapping; the set was merged into Textarea and deleted. 18550:42560 (Tree Select), 13520:72548 (_Tree Indent), 18607:41718 (_Tree Toggle) and 18550:28181 (Cascader) were read 2026-10-15 with get_metadata when Tree Select and Cascader were rebuilt on the shared field, listbox and row: sets of 8, 3, 3 and 4 variants. The rows for _tree_select 13526:17500, Indented Tree Select Item List 13520:70443, tree_dropdown layers 13529:1075 and Cascade list 13584:55731 left with their mappings; each was deleted at 0 instances. 18233:48345 (TagInput) was read 2026-10-15 with get_metadata when TagInput gained its text entry and list: a set of 24 variants, size × state. 18804:38420 (DateAndTimePicker), 18819:40157 (_Calendar) and 9413:1755 (_Calendar Day) were read 2026-10-15 with the Plugin API when the date pickers were rebuilt on the shared field and calendar: sets of 36, 3 and 21 variants. DateAndTimePicker stopped claiming DatePicker's 13574:1150 the same day, and the rows for the Date & Time Picker page 13549:6703 and the deprecated Date Picker (Single Date) 9413:1764 and Date Picker (Range) 9538:17087 left with their mappings. 19150:44293 (_Option menu) was read 2026-10-16 with get_metadata when TagInput gained its option menu and reordering: a plain component, the menu a row’s “…” opens. TagInput 18233:48345 was re-read the same day as a set of 30 variants, size × state.",
-  "measuredAt": "2026-10-16",
+  "note": "What each mapped Figma node ACTUALLY is, read from Figma. Not derived from anything in this repo — it is a measurement, and check:figma-node-types holds the registry to it. Re-measure with npm run audit:figma-registry and record the date. measuredAt is the date of the MOST RECENT reading in this file, not a claim that every row was read that day: 98 rows were read 2026-08-29 with the Plugin API, and 13526:17500 and 13520:70443 were read 2026-09-15 with the MCP get_metadata tool when the owner named the tree select trio. 13529:2016 (tree_select_ver2) left the registry the same day and its row left with it. 17827:827 (Close button) was read 2026-09-29 with the MCP get_metadata tool: a set of eight state × tone variants. 17878:1928 (Tile) was read 2026-09-29 with the MCP get_metadata tool: a set of 138 variants. 17876:46653 (Count) was read 2026-09-29 with get_metadata when the Count component was added. 17876:1653 (Status) was read 2026-09-29 with get_metadata when the Status component was added: a set of 18 variants. 17877:47506 (Tag) and 17827:846 (Remove button) were read 2026-09-29 with get_metadata when Tag was rebuilt: sets of variants, replacing the retired 17558:1218. 17878:1769 (Suggestion) was read 2026-09-29 with get_metadata when Suggestion was added: a set of 8 variants. 17878:1851 (Skeleton) was read 2026-09-29 with get_metadata when the Skeleton component was added: a set of 10 variants. 17878:1713 (TagGroup) was read 2026-09-29 with the Plugin API when TagGroup gained alignment, disabled and overflow: a set of 5 variants. 18265:52386 (ChoiceGroup) was read 2026-10-15 with get_metadata when ChoiceGroup replaced MultipleChoice and Scale: a set of 4 variants. The same day 13541:9229 (Choice Grid) was re-read as a set of 2 variants, and the rows for the deleted Multiple Choice (Radio) 13540:9207, Multiple Choice (Checkbox) 13540:9717, CheckBox Grid 13541:9240 and Scale Radio Button 13536:6785 left with their mappings, as did Scale Options 13536:9083 and Linear Scale 13536:9208, which no code component maps once Scale is gone. 34:7879 (Carousel) was read 2026-10-15 with the Plugin API when Carousel's type axis became booleans: a plain component, replacing the deleted set 34:8261. 18729:36579 (Rich Text Editor) was read 2026-10-15 with the Plugin API when the single component became a set of 6 variants, toolbar preset × state; the row for 10010:37927, now its compact default variant, left with the mapping. 14841:25919 (_Field, still named Form in the file) was read 2026-10-15 with get_metadata when Input, Textarea, Number input and Input group moved onto it: a set of 21 variants. The same day the row for Form Short Textarea 13543:5904 left with its mapping; the set was merged into Textarea and deleted. 18550:42560 (Tree Select), 13520:72548 (_Tree Indent), 18607:41718 (_Tree Toggle) and 18550:28181 (Cascader) were read 2026-10-15 with get_metadata when Tree Select and Cascader were rebuilt on the shared field, listbox and row: sets of 8, 3, 3 and 4 variants. The rows for _tree_select 13526:17500, Indented Tree Select Item List 13520:70443, tree_dropdown layers 13529:1075 and Cascade list 13584:55731 left with their mappings; each was deleted at 0 instances. 18233:48345 (TagInput) was read 2026-10-15 with get_metadata when TagInput gained its text entry and list: a set of 24 variants, size × state. 18804:38420 (DateAndTimePicker), 18819:40157 (_Calendar) and 9413:1755 (_Calendar Day) were read 2026-10-15 with the Plugin API when the date pickers were rebuilt on the shared field and calendar: sets of 36, 3 and 21 variants. DateAndTimePicker stopped claiming DatePicker's 13574:1150 the same day, and the rows for the Date & Time Picker page 13549:6703 and the deprecated Date Picker (Single Date) 9413:1764 and Date Picker (Range) 9538:17087 left with their mappings. 19150:44293 (_Option menu) was read 2026-10-16 with get_metadata when TagInput gained its option menu and reordering: a plain component, the menu a row’s “…” opens. TagInput 18233:48345 was re-read the same day as a set of 30 variants, size × state. On 2026-10-21 the rows for Remove button 17827:846 and TagGroup 17878:1713 left with their mappings, when the Tag docs page was narrowed to the Tag set and the TagGroup docs page was deleted; TagGroup stays in code as an internal building block of TagInput and Select. 4209:20411 (_Tab Item), 4209:29515 (_Pill Item), 72:16339 (Navbar Components), 4209:30087 (_NavBar Item) and 4209:30187 (_NavBar Item Dropdown) were read 2026-10-22 with get_metadata when Nav tabs, Nav pills and Navbar took their full sets: sets of 9, 9, 7, 9 and 9 variants. 31:548 (_Button) and 7204:6902 (_Vertical_Button) were read 2026-10-22 with get_metadata when Button took its base sets: sets of 3 variants each, by size. 17827:846 (Remove button) was re-read 2026-10-22 with get_metadata when it moved from the Tag page to the Close button page: a set of 12 variants, size × state. 18265:4067 (_Field Text) was read 2026-10-22 with get_metadata when Input took its full set list: a set of 2 variants, kind. The same day 14841:25919 was re-read as a set of 21 variants, still named Form in the file.",
+  "measuredAt": "2026-10-22",
   "method": "figma.getNodeByIdAsync(id).type, one call per file, via the Figma Plugin API; the rows added 2026-09-15 and 2026-09-29 came from the Figma MCP get_metadata tool, which reports the same node type.",
   "files": {
     "zAecJNRdvJzAUOcjV32tRX": "Design System - BS4 Foundation (Component Library)",
@@ -155,14 +155,6 @@
       "file": "zAecJNRdvJzAUOcjV32tRX",
       "type": "COMPONENT_SET"
     },
-    "17827:827": {
-      "file": "zAecJNRdvJzAUOcjV32tRX",
-      "type": "COMPONENT_SET"
-    },
-    "17827:846": {
-      "file": "zAecJNRdvJzAUOcjV32tRX",
-      "type": "COMPONENT_SET"
-    },
     "17876:1653": {
       "file": "zAecJNRdvJzAUOcjV32tRX",
       "type": "COMPONENT_SET"
@@ -172,10 +164,6 @@
       "type": "COMPONENT_SET"
     },
     "17877:47506": {
-      "file": "zAecJNRdvJzAUOcjV32tRX",
-      "type": "COMPONENT_SET"
-    },
-    "17878:1713": {
       "file": "zAecJNRdvJzAUOcjV32tRX",
       "type": "COMPONENT_SET"
     },
@@ -254,10 +242,6 @@
     "3497:19482": {
       "file": "zAecJNRdvJzAUOcjV32tRX",
       "type": "PAGE"
-    },
-    "34:5212": {
-      "file": "zAecJNRdvJzAUOcjV32tRX",
-      "type": "COMPONENT_SET"
     },
     "34:7879": {
       "file": "zAecJNRdvJzAUOcjV32tRX",
@@ -424,6 +408,50 @@
       "type": "COMPONENT_SET"
     },
     "979:20977": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "4209:20411": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "4209:29515": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "72:16339": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "4209:30087": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "4209:30187": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "31:548": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "7204:6902": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "17827:827": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "17827:846": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "18265:4067": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "34:5212": {
       "file": "zAecJNRdvJzAUOcjV32tRX",
       "type": "COMPONENT_SET"
     }

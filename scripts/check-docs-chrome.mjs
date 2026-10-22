@@ -52,7 +52,7 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
  * which is every element the three assertions read.
  */
 const PAGES = [
-  'components-actions-button--docs',
+  'components-actions-button-button--docs',
   'components-forms-and-inputs-checkbox--docs',
   'foundations-design-tokens--docs',
   // The prose page. A component page is almost all canvas — one paragraph each —

@@ -4,7 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import InputGroup from './InputGroup';
 
 export default {
-    title: 'Components/Forms and inputs/Input group',
+    title: 'Components/Forms and inputs/Input Group',
     component: InputGroup,
     tags: ['!dev', '!autodocs'],
     parameters: {

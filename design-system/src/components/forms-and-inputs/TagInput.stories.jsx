@@ -15,7 +15,7 @@ import TagInput from './TagInput';
  */
 
 export default {
-    title: 'Components/Forms and inputs/Tag input',
+    title: 'Components/Forms and inputs/Tag Input',
     component: TagInput,
     tags: ['!dev', '!autodocs'],
 };

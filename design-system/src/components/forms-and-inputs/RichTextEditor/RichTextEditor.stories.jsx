@@ -3,7 +3,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import RichTextEditor from './RichTextEditor';
 
 export default {
-    title: 'Components/Forms and inputs/Rich text editor',
+    title: 'Components/Forms and inputs/Rich Text Editor',
     component: RichTextEditor,
     tags: ['!dev', '!autodocs'],
     parameters: {

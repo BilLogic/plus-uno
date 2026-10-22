@@ -4,7 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import NumberInput from './NumberInput';
 
 export default {
-    title: 'Components/Forms and inputs/Number input',
+    title: 'Components/Forms and inputs/Number Input',
     component: NumberInput,
     tags: ['!dev', '!autodocs'],
     parameters: {

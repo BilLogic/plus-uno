@@ -37,7 +37,7 @@ function SurfaceContainerCompositionDemo() {
 }
 
 export default {
-    title: 'Foundations/Patterns/Surface container',
+    title: 'Foundations/Patterns/Surface Container',
     component: SurfaceContainer,
     tags: ['!dev', '!autodocs'],
     argTypes: {

@@ -25,6 +25,13 @@ import './Skeleton.scss';
 
 export const SKELETON_SHAPES = ['rect', 'circle', 'text'];
 
+/*
+ * Figma has one `preset` property for every value, the free shapes included,
+ * so a preset that names a shape is that shape: it resizes freely, exactly as
+ * `shape` does, and takes no entry in the map below.
+ */
+const isShapePreset = (preset) => SKELETON_SHAPES.includes(preset);
+
 /**
  * Every preset, in one place: the shape it draws, the bars it renders, the
  * default number of lines, and the props it ignores. The component and its
@@ -39,7 +46,7 @@ const PRESETS = {
     count: { shape: 'rect', bars: [['count']], ignores: ['width', 'height', 'radius'] },
     tag: { shape: 'rect', bars: [['tag']], ignores: ['height', 'radius'] },
     'tag-person': { shape: 'rect', bars: [['tag-person']], ignores: ['height', 'radius'] },
-    /* Three tag shapes at the TagGroup gap, as Figma draws them. */
+    /* Three tag shapes at the Element sm gap, as Figma draws them. */
     'tag-group': {
         shape: 'rect',
         group: 'tags',
@@ -49,7 +56,8 @@ const PRESETS = {
     paragraph: { shape: 'text', lines: 3, ignores: ['height', 'radius'] },
 };
 
-export const SKELETON_PRESETS = Object.keys(PRESETS);
+/** Every value `preset` takes, in Figma's order: the three shapes, then the map. */
+export const SKELETON_PRESETS = [...SKELETON_SHAPES, ...Object.keys(PRESETS)];
 
 /** Radius token names, each the full token with its fallback. */
 export const SKELETON_RADII = {
@@ -99,6 +107,10 @@ const ignoredProps = ({ preset, def, shape, resolvedShape, lines, passed }) => {
         const overridden = shape !== undefined && shape !== def.shape ? ['shape'] : [];
         add([...def.ignores, ...overridden], `with preset="${preset}", which sets its own size and shape`);
     } else {
+        // A preset that names a shape wins over `shape` the same way.
+        if (isShapePreset(preset) && shape !== undefined && shape !== preset) {
+            add(['shape'], `with preset="${preset}", which names its own shape`);
+        }
         if (resolvedShape === 'circle') {
             add(['radius'], 'on a circle, which is always round');
             // A circle takes one size. Given two that differ, the width wins.
@@ -125,7 +137,7 @@ export const Skeleton = ({
     ...rest
 }) => {
     const def = PRESETS[preset];
-    const resolvedShape = def ? def.shape : (shape ?? 'rect');
+    const resolvedShape = def ? def.shape : ((isShapePreset(preset) ? preset : shape) ?? 'rect');
     const count = resolvedShape === 'text' ? Math.max(1, Math.floor(lines ?? def?.lines ?? 1)) : 1;
     const passed = { shape, width, height, radius, lines };
 
@@ -170,9 +182,9 @@ export const Skeleton = ({
 };
 
 Skeleton.propTypes = {
-    /** `rect` by default; `circle` for avatars and round counts; `text` is a 16-tall bar that can repeat as `lines`. A preset wins over it, with a warning when they disagree. */
+    /** `rect` by default; `circle` for avatars and round counts; `text` is a 16-tall bar that can repeat as `lines`. The same three are also `preset` values, as Figma names them. A preset wins over it, with a warning when they disagree. */
     shape: PropTypes.oneOf(SKELETON_SHAPES),
-    /** Sized to a label (`status`, `status-spacious`, `count`, `tag`, `tag-person`), a loading TagGroup (`tag-group`) or three lines of text (`paragraph`). Sets shape, height and corners together and wins over them. */
+    /** Every value of Figma's `preset`. `rect`, `circle` and `text` name a shape and resize freely, exactly as `shape` does. The rest are sized to a label (`status`, `status-spacious`, `count`, `tag`, `tag-person`), a loading tag list (`tag-group`) or three lines of text (`paragraph`), set shape, height and corners together, and win over them. */
     preset: PropTypes.oneOf(SKELETON_PRESETS),
     /** Any CSS length, or a number of pixels. Text bars fill the line by default; a label preset has a stand-in width. Ignored by `count` and `tag-group`. A circle takes one size: `width`, or `height` when no width is given. */
     width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
