@@ -340,9 +340,10 @@ async function sweepDepsFor(
         return (await threadStateFor(env).getProposalsByChannel(channel)).filter((p) => !!p.sweepRun);
       },
       async withdraw(channel, ts, text, cardKey, proposalKeys) {
-        // Out of reach first: a report that says it didn't go through can't be decided.
+        // Out of reach first: a report that says it didn't go through can't be
+        // decided. Closed as withdrawn, so View still draws each fix.
         const store = threadStateFor(env);
-        for (const key of proposalKeys) await store.retireProposal(key);
+        for (const key of proposalKeys) await store.retireProposal(key, { decision: "withdrawn", reason: text });
         await updateMessage(env, {
           channel,
           ts,

@@ -690,7 +690,9 @@ export async function withdrawFixes(
 ): Promise<ReportMessage | null> {
   const neverStaged = new Set((await store.getReport(ts))?.entries.filter((e) => e.state.kind === "not-staged").map((e) => e.id));
   const taken: string[] = [];
-  for (const id of ids) if ((await store.retireProposal(itemProposalKey(ts, id))).retired || neverStaged.has(id)) taken.push(id);
+  // Closed as withdrawn, with what the card now says: View still draws the fix.
+  const closed = { decision: "withdrawn" as const, reason: note };
+  for (const id of ids) if ((await store.retireProposal(itemProposalKey(ts, id), closed)).retired || neverStaged.has(id)) taken.push(id);
   return taken.length ? markWithdrawn(store, ts, taken, note) : null;
 }
 

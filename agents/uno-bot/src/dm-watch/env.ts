@@ -310,7 +310,7 @@ export async function withdrawCaptureCard(env: Env, channel: string, ts: string,
   if (!ids) {
     // Edited only when it was this call that took it out of reach: a card
     // already claimed, running or gone keeps what it says.
-    const { retired } = await store.retireProposal(ts);
+    const { retired } = await store.retireProposal(ts, { decision: "withdrawn", reason: note });
     if (retired) await updateMessage(env, { channel, ts, text: note });
     return;
   }
@@ -322,7 +322,9 @@ export async function withdrawCaptureCard(env: Env, channel: string, ts: string,
  *  message deleted. */
 export async function removeCaptureCard(env: Env, channel: string, ts: string, ids: readonly string[]): Promise<void> {
   const store = threadStateFor(env);
-  await store.retireProposal(ts);
-  for (const id of ids) await store.retireProposal(itemProposalKey(ts, id));
+  // Closed as withdrawn, not replaced: nothing took their place (#1362).
+  const closed = { decision: "withdrawn" as const };
+  await store.retireProposal(ts, closed);
+  for (const id of ids) await store.retireProposal(itemProposalKey(ts, id), closed);
   await deleteMessage(env, channel, ts);
 }

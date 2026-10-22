@@ -65,7 +65,8 @@ import {
   ownText,
   ownOperations,
   replacedByOf,
-  decidedLive,
+  closedKept,
+  recordKept,
   REPORT_GRACE_MS,
   changedReport,
   expiredReport,
@@ -116,6 +117,7 @@ import {
   cardOrder,
   withLiveMark,
   type CutOffNoteReport,
+  type ClosedMark,
   type DecisionReportRecord,
   type Execution,
   type FiledIssue,
@@ -153,6 +155,10 @@ interface ProposalRecord {
    *  card exists to be named. Readable, and out of reach of every lookup that
    *  can lead to an execution. */
   retired?: boolean;
+  /** When it was retired or replaced: its draft is kept for View for
+   *  `DECIDED_TTL_MS` from here (`recordKept`, #1362). Absent on a card still
+   *  pending, and on one retired before the time was stamped. */
+  closedAt?: number;
   /** Picks kept on the card's Review pop-up, by user id (`keepPick`). */
   kept?: Record<string, Record<string, string>>;
   /** Claimed with what was decided (`claimProposal`): the payload is the
@@ -319,9 +325,9 @@ export class ThreadState extends DurableObject<Env> {
   }
 
   // Delete expired records by their own TTL. Keys: event:{id}
-  // (EVENT_DEDUP_TTL_MS), hist:{…} (HISTORY_TTL_MS), prop:{ts} and exec:{ts}
-  // (each card's own, `proposalTtlMs`; a decided card's from its decision,
-  // `decidedLive`). Answers when the next sweep is due: a
+  // (EVENT_DEDUP_TTL_MS), hist:{…} (HISTORY_TTL_MS), prop:{ts} (kept for
+  // View `DECIDED_TTL_MS` past its close, `recordKept`) and exec:{ts} (each
+  // card's own, `proposalTtlMs`). Answers when the next sweep is due: a
   // day away if anything remains, never if the store is empty.
   private async collectGarbage(now: number): Promise<number> {
     return this.storage.transaction(async (txn): Promise<number> => {
@@ -338,10 +344,11 @@ export class ThreadState extends DurableObject<Env> {
       }
       const props = await txn.list<ProposalRecord>({ prefix: "prop:" });
       for (const [key, rec] of props) {
-        // An aged-out card still owed its "Expired" edit is kept for it.
-        const live = rec.decided
-          ? decidedLive(rec, (rec.payload as PendingProposal | null) ?? {}, now)
-          : now - rec.createdAt <= recordTtlMs(rec) || cardExpiryOwed(rec, rec.payload as PendingProposal | null, now);
+        // Decided, replaced or aged out, a card is kept for View past its
+        // close (`recordKept`); one still owed its "Expired" edit is kept for it.
+        const live =
+          recordKept(rec, (rec.payload as PendingProposal | null) ?? {}, now) ||
+          (!rec.decided && cardExpiryOwed(rec, rec.payload as PendingProposal | null, now));
         if (!live) await txn.delete(key);
         else remaining++;
       }
@@ -496,7 +503,7 @@ export class ThreadState extends DurableObject<Env> {
         const pending = rec.payload as PendingProposal | null;
         if (!pending || pending.channel !== proposal.channel) continue;
         if (proposalSlot(pending) !== slot) continue;
-        await txn.put<ProposalRecord>(key, { ...rec, supersededBy: proposal.proposalTs });
+        await txn.put<ProposalRecord>(key, { ...rec, supersededBy: proposal.proposalTs, closedAt: rec.closedAt ?? at });
         // Reported only if this staging is what took it out of reach.
         if (!rec.retired) retired.push(pending.proposalTs);
       }
@@ -517,8 +524,9 @@ export class ThreadState extends DurableObject<Env> {
 
   // Retire without consuming — the counterpart to the claim, and why the two
   // are different methods is on the interface (#583). A missing record is a
-  // no-op: there is nothing left that could be acted on.
-  async retireProposal(proposalTs: string, at: number): Promise<{ retired: boolean }> {
+  // no-op: there is nothing left that could be acted on. With a mark, the
+  // card closes as decided, kept for View like a won claim's (#1362).
+  async retireProposal(proposalTs: string, at: number, closed?: ClosedMark): Promise<{ retired: boolean }> {
     const key = proposalKey(proposalTs);
     return this.storage.transaction(async (txn) => {
       const rec = await txn.get<ProposalRecord>(key);
@@ -526,8 +534,18 @@ export class ThreadState extends DurableObject<Env> {
       // out: this call retired nothing, and says so.
       if (!rec || rec.decided || rec.retired || rec.supersededBy) return { retired: false };
       if (at - rec.createdAt > recordTtlMs(rec)) return { retired: false };
+      const pending = rec.payload as PendingProposal | null;
+      if (closed && pending) {
+        await txn.put<ProposalRecord>(key, {
+          payload: decidedPayload(pending, {}),
+          createdAt: rec.createdAt,
+          decided: decidedNoteOf(closed),
+          decidedAt: at,
+        });
+        return { retired: true };
+      }
       const { kept: _, ...settled } = rec;
-      await txn.put<ProposalRecord>(key, { ...settled, retired: true });
+      await txn.put<ProposalRecord>(key, { ...settled, retired: true, closedAt: at });
       return { retired: true };
     });
   }
@@ -596,13 +614,15 @@ export class ThreadState extends DurableObject<Env> {
       // Decided: kept for View for its own lifetime from the decision, then
       // gone as a claimed card is.
       if (rec.decided) {
-        if (!decidedLive(rec, (rec.payload as PendingProposal | null) ?? {}, at)) {
+        if (!recordKept(rec, (rec.payload as PendingProposal | null) ?? {}, at)) {
           await txn.delete(proposalKey(proposalTs));
           return { state: "none" };
         }
-        return { state: "none", decided: decidedOf(rec.payload as PendingProposal, rec.decided) };
+        return { state: "none", decided: decidedOf(rec.payload as PendingProposal, rec.decided, rec.decidedAt) };
       }
       const proposal = (rec.payload as PendingProposal | null) ?? {};
+      // Replaced or aged out, the card is kept for View past its close too.
+      const kept = rec.payload ? { decided: closedKept(rec, rec.payload as PendingProposal) } : {};
       if (rec.supersededBy && (await this.successorIsLive(rec.supersededBy, at, txn))) {
         // The live card it was replaced by, read in this same transaction:
         // storage reads inside the object cost no subrequest.
@@ -612,12 +632,14 @@ export class ThreadState extends DurableObject<Env> {
           (next) => !next.decided && !next.retired && at - next.createdAt <= recordTtlMs(next),
           (next) => (next.payload as PendingProposal | null) ?? {},
         );
-        return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal), ...replacedBy };
+        return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal), ...replacedBy, ...kept };
       }
       if (at - rec.createdAt > recordTtlMs(rec)) {
-        // Kept while its expiry edit is owed, so the edit still finds it.
-        if (!cardExpiryOwed(rec, rec.payload as PendingProposal | null, at)) await txn.delete(proposalKey(proposalTs));
-        return { state: "expired", ...ownTtl(proposal), ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal) };
+        // Kept for View past its close, and while its expiry edit is owed, so
+        // the edit still finds it; gone after both.
+        const keep = recordKept(rec, proposal, at);
+        if (!keep && !cardExpiryOwed(rec, rec.payload as PendingProposal | null, at)) await txn.delete(proposalKey(proposalTs));
+        return { state: "expired", ...ownTtl(proposal), ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal), ...(keep ? kept : {}) };
       }
       if (rec.supersededBy || rec.retired) {
         // A replacement that no longer waits is still named (story 18).
@@ -629,7 +651,7 @@ export class ThreadState extends DurableObject<Env> {
               (next) => (next.payload as PendingProposal | null) ?? {},
             )
           : {};
-        return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal), ...replacedBy };
+        return { state: "superseded", ...ownWords(proposal), ...ownText(proposal), ...ownOperations(proposal), ...replacedBy, ...kept };
       }
       return {
         state: "found",

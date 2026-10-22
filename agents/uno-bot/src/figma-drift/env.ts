@@ -210,8 +210,8 @@ function recheckDepsFor(env: Env, kv: KVNamespace, dryRun: boolean): Parameters<
   return {
     store: kvDriftStore(kv),
     ...(figma ? { figma, judge: modelFrameJudge(selectProvider(env)) } : {}),
-    async retire(ts) {
-      return (await threadState.retireProposal(ts)).retired;
+    async retire(ts, why) {
+      return (await threadState.retireProposal(ts, { decision: "withdrawn", reason: why })).retired;
     },
     async edit(channel, ts, message) {
       // A card on the sweep's morning message keeps that message's tag.
