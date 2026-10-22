@@ -7,10 +7,6 @@
 
 **Source:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.stories.jsx` — Wrapping, Collapse, CollapseMenu, CollapseWithSuggestions, MenuKeepsActions, MaxVisible, OneMoreTag, CapNeverSqueezes, WrappedSuggestionsAreNotCounted, NoOverflowWhenItFits, ConditionalChildrenAreNotCounted, OverflowTag, DigitBoundary, StableOnParentRender, SqueezedFirstReplaced, AlignmentRight, Disabled, RemovableSet, CustomOverflowAction, Interactive
-
-**Storybook page:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.mdx`
-
 ## Props
 
 | Prop | Type | Default | Description |
@@ -44,4 +40,8 @@ From `design-system/src/components/status-and-loading/TagGroup/TagGroup.scss`. O
 
 Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Progress` · `Skeleton` · `Spinner` · `Status` · `Suggestion` · `Tag` · `Tile`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+
+> No authored guidance yet — when to use, correct/incorrect, and accessibility
+> are unwritten for this component (#166). Nothing above tells you whether
+> reaching for `TagGroup` is the right call, only what it accepts.

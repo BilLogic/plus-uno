@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import TreeSelect from './TreeSelect';
 
 export default {
-    title: 'Components/Forms and inputs/Tree select',
+    title: 'Components/Forms and inputs/Tree Select',
     component: TreeSelect,
     tags: ['!dev', '!autodocs'],
     parameters: {

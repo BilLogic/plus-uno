@@ -3,7 +3,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import SidebarTab from '@/components/navigation/SidebarTab';
 
 export default {
-    title: 'Components/Navigation/Sidebar tab',
+    title: 'Components/Navigation/Sidebar Tab',
     component: SidebarTab,
     tags: ['!dev', '!autodocs'],
     argTypes: {

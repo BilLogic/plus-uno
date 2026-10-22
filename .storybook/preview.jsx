@@ -151,25 +151,28 @@ const preview = {
           "Foundations",
           [
             "Introduction",
+            "Iconography, Logos & Imagery",
+            [
+              "Iconography",
+              "Logos",
+              "Imagery"
+            ],
             "Color",
+            "Elevation",
             "Typography",
             "Spacing",
-            "Grid",
+            "Layout & Grid",
             "Patterns",
             [
               "Introduction",
               "Surfaces",
-              "Surface container",
+              "Surface Container",
               "Card",
               "Section",
               "Modal",
               "Table"
             ],
-            "Elevation",
-            "Iconography",
-            "Logos",
             "Tile",
-            "Imagery",
             "Design tokens",
             "Accessibility"
           ],
@@ -178,32 +181,35 @@ const preview = {
             "Actions",
             [
               "Button",
-              "Button group",
-              "Close button"
+              [
+                "Button",
+                "Close Button"
+              ],
+              "Button Group"
             ],
             "Forms and inputs",
             [
               "Cascader",
               "Checkbox",
-              "Choice grid",
-              "Choice group",
-              "Date picker",
-              "Date & time picker",
+              "Choice Grid",
+              "Choice Group",
+              "Date Picker",
+              "Date & Time Picker",
               "Dropdown",
-              "File upload",
+              "File Upload",
               "Input",
-              "Input group",
-              "Label & caption",
-              "Number input",
+              "Input Group",
+              "Label & Caption",
+              "Number Input",
               "Radio",
               "Range",
               "Rating",
-              "Rich text editor",
+              "Rich Text Editor",
               "Select",
               "Switch",
-              "Tag input",
+              "Tag Input",
               "Textarea",
-              "Tree select"
+              "Tree Select"
             ],
             "Layout and structure",
             [
@@ -213,9 +219,9 @@ const preview = {
               "Collapse",
               "Divider",
               "Jumbotron",
-              "List group",
-              "Media object",
-              "Scroll bar"
+              "List Group",
+              "Media Object",
+              "Scroll Bar"
             ],
             "Messaging",
             [
@@ -226,11 +232,15 @@ const preview = {
             "Navigation",
             [
               "Breadcrumb",
-              "Nav pills",
-              "Nav tabs",
+              "Nav Tabs & Nav Pills",
+              [
+                "Nav Tabs",
+                "Nav Pills",
+                "Navbar"
+              ],
               "Pagination",
               "Scrollspy",
-              "Sidebar tab"
+              "Sidebar Tab"
             ],
             "Overlays",
             [
@@ -244,15 +254,19 @@ const preview = {
                 "Status",
                 "Count",
                 "Tag",
-                "Tag group"
+                "Deprecated"
               ],
               "AI Label",
               [
-                "AI label",
+                "AI Label",
                 "Suggestion"
               ],
               "Progress",
-              "Loading"
+              "Loading",
+              [
+                "Spinner",
+                "Skeleton"
+              ]
             ]
           ],
           "Data visualizations",

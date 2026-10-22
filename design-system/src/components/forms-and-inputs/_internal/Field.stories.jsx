@@ -12,7 +12,7 @@ import Field from './Field';
 export default {
     title: 'Components/Forms and inputs/_Field',
     component: Field,
-    tags: ['!autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {

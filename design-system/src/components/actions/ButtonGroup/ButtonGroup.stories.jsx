@@ -4,7 +4,7 @@ import ButtonGroup from './ButtonGroup';
 import Button from '@/components/actions/Button/Button';
 
 export default {
-    title: 'Components/Actions/Button group',
+    title: 'Components/Actions/Button Group',
     component: ButtonGroup,
     tags: ['!dev', '!autodocs'],
     parameters: {

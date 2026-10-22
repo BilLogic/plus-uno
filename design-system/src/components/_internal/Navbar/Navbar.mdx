@@ -24,6 +24,36 @@ export const figmaMeta = {
       "source": "designer-supplied",
       "status": "verified",
       "notes": "The Figma variant group is `background color` WITH A SPACE; the code prop is `backgroundColor`. Values match one-to-one."
+    },
+    {
+      "id": "navbar-components",
+      "name": "Navbar Components",
+      "componentSetNodeId": "72:16339",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16339",
+      "source": "designer-supplied",
+      "status": "no-code-equivalent",
+      "isComponentSet": true,
+      "notes": "The contents a Navbar can hold, by type: all, nav, nav dropdown, forms, input group, buttons, text (7 variants). Code builds only type=nav, as the `items` array of links beside `brand`; nav dropdown, forms, input group, buttons and text have no code equivalent yet."
+    },
+    {
+      "id": "navbar-item",
+      "name": "_NavBar Item",
+      "componentSetNodeId": "4209:30087",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-30087",
+      "source": "designer-supplied",
+      "status": "verified",
+      "isComponentSet": true,
+      "notes": "One link in the Navbar: an entry of `items`. state × selected, 9 variants. selected=true is the item's `active`; state=disabled is its `disabled`; hover, pressed and focus are the browser's own :hover, :active and :focus-visible, never a prop. Figma draws no disabled + selected variant."
+    },
+    {
+      "id": "navbar-item-dropdown",
+      "name": "_NavBar Item Dropdown",
+      "componentSetNodeId": "4209:30187",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-30187",
+      "source": "designer-supplied",
+      "status": "no-code-equivalent",
+      "isComponentSet": true,
+      "notes": "A Navbar item that opens a menu: state × selected, 9 variants. Navbar's `items` are links only, so code has no dropdown item yet."
     }
   ]
 };

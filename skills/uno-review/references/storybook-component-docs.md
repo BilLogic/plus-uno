@@ -38,7 +38,7 @@ That pattern is implemented with colocated `*.mdx` files, shared docs layout pri
 5. **Sidebar alias**
    A few sidebar labels are more user-facing than the implementation name. Current examples:
    - `Components/Loading` for `Spinner`
-   - `Components/Forms and inputs/Date & time picker` for `DateAndTimePicker`
+   - `Components/Forms and inputs/Date & Time Picker` for `DateAndTimePicker`
 
 These aliases are acceptable when intentional, but they should be rare and kept in sync with [`storySort`](../../../.storybook/preview.jsx).
 

@@ -3,7 +3,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import MediaObject from './MediaObject';
 
 export default {
-    title: 'Components/Layout and structure/Media object',
+    title: 'Components/Layout and structure/Media Object',
     component: MediaObject,
     tags: ['!dev', '!autodocs'],
     parameters: {

@@ -21,7 +21,7 @@ and regenerate rather than touching the literal.
 - **Components groups** (kebab-case folders under `design-system/src/components/`): `actions`, `forms-and-inputs`, `layout-and-structure`, `messaging`, `navigation`, `overlays`, `status-and-loading`. Undocumented internal composites live in `_internal/` until they graduate.
 - **Data viz** lives in `design-system/src/dataviz/<purpose>/` — comparison, correlation, distribution, flow-and-relationships, part-to-whole, temporal.
 - **Specs grammar:** `Specs/<Area>/(<Phase>/)<Type>/<Component>`, with Type order Overview → Elements → Cards → Tables → Modals → Sections → Pages. Title Case phases and types, PascalCase component folders, no spaces in folder names. Every area (and Admin sub-area) leads with an `Overview.mdx` featuring its flagship page.
-- **Naming:** sentence-case display names in titles ("Button group"); PascalCase code exports. A spec composes core components; a local organism reached from 2+ areas gets promoted into `components/` instead of being re-implemented.
+- **Naming:** Title Case display names in titles, matching the Figma page they document ("Button Group", "Date & Time Picker"); the group names under `Components/` keep their current form, since a group name is part of every page id beneath it. PascalCase code exports. A spec composes core components; a local organism reached from 2+ areas gets promoted into `components/` instead of being re-implemented.
 
 ## The MDX page shell
 

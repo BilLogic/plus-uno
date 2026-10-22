@@ -3,7 +3,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import NavPills from './NavPills';
 
 export default {
-    title: 'Components/Navigation/Nav pills',
+    title: 'Components/Navigation/Nav Tabs & Nav Pills/Nav Pills',
     component: NavPills,
     tags: ['!dev', '!autodocs'],
     parameters: {

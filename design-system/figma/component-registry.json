@@ -107,7 +107,7 @@
         "mdxPath": "design-system/src/components/status-and-loading/Badge/Badge.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Badge",
         "source": "design-system/src/components/status-and-loading/Badge/Badge.jsx",
-        "storybookId": "components-status-and-loading-status-count-tag-status-deprecated-badge--docs",
+        "storybookId": "components-status-and-loading-status-count-tag-deprecated-badge--docs",
         "props": {
           "style": {
             "type": "enum",
@@ -230,7 +230,7 @@
         "mdxPath": "design-system/src/components/actions/Button/Button.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/actions/Button",
         "source": "design-system/src/components/actions/Button/Button.jsx",
-        "storybookId": "components-actions-button--docs",
+        "storybookId": "components-actions-button-button--docs",
         "props": {
           "style": {
             "type": "enum",
@@ -515,6 +515,50 @@
             "status": "verified",
             "verifiedAt": "2026-06-13",
             "notes": "Maps to Button with fill=outline and vertical=true."
+          },
+          {
+            "id": "button-base",
+            "name": "_Button",
+            "componentSetNodeId": "31:548",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=31-548",
+            "codeDefaults": {},
+            "variantProps": {
+              "size": "size"
+            },
+            "variantValueMap": {
+              "size": {
+                "small": "small",
+                "medium (default)": "medium",
+                "large": "large"
+              }
+            },
+            "source": "designer-supplied",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "The base shape every horizontal fill set nests, by size only (3 variants): the label row, padding and corners. Not used on its own; in code it is Button's size, with fill, style and state coming from the fill set around it."
+          },
+          {
+            "id": "vertical-button-base",
+            "name": "_Vertical_Button",
+            "componentSetNodeId": "7204:6902",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=7204-6902",
+            "codeDefaults": {
+              "vertical": true
+            },
+            "variantProps": {
+              "size": "size"
+            },
+            "variantValueMap": {
+              "size": {
+                "small": "small",
+                "medium (default)": "medium",
+                "large": "large"
+              }
+            },
+            "source": "designer-supplied",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "The base shape Vertical outlined buttons nests, by size only (3 variants): icon over label. Not used on its own; in code it is Button with vertical=true and a size."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482"
@@ -750,7 +794,7 @@
         "mdxPath": "design-system/src/components/actions/CloseButton/CloseButton.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/actions/CloseButton",
         "source": "design-system/src/components/actions/CloseButton/CloseButton.jsx",
-        "storybookId": "components-actions-close-button--docs"
+        "storybookId": "components-actions-button-close-button--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -762,6 +806,16 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-827",
             "source": "node-chart",
             "status": "verified"
+          },
+          {
+            "id": "remove-button",
+            "name": "Remove button",
+            "componentSetNodeId": "17827:846",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-846",
+            "source": "designer-supplied",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "size × state, 12 variants (small (default) 16, medium 20, large 24; rest, hover, pressed, focus). Not drawn by CloseButton: in code the small size is the × inside a removable or link Tag (behavior=\"removable\", or a link with onRemove), and its states are the browser's own :hover, :active and :focus-visible. Medium and large are not built in code yet."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-827"
@@ -1068,13 +1122,23 @@
           },
           {
             "id": "field",
-            "name": "_Field",
+            "name": "Form",
             "componentSetNodeId": "14841:25919",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
             "source": "manual",
             "status": "unpublished",
             "isComponentSet": true,
-            "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
+            "notes": "The part this component is built on, still named Form in the Figma file: one box with Leading, Content and Trailing slots, 3 sizes × 7 states (21 variants). In code it is `_internal/Field.jsx`, which is not exported from the barrel, so `unpublished` is its settled state: a part to build on, not a component to place."
+          },
+          {
+            "id": "field-text",
+            "name": "_Field Text",
+            "componentSetNodeId": "18265:4067",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-4067",
+            "source": "designer-supplied",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "The text in Form's Content slot, by kind (2 variants): placeholder or value. No component of its own in code: Input renders it as the native input's placeholder and value, so like Form it is a part to build on, not a component to place."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-6957"
@@ -1099,16 +1163,6 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13671-3218",
             "source": "node-chart",
             "status": "verified"
-          },
-          {
-            "id": "field",
-            "name": "_Field",
-            "componentSetNodeId": "14841:25919",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
-            "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19496"
@@ -1209,7 +1263,7 @@
         "mdxPath": "design-system/src/assets/Logo/Logo.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/assets/Logo",
         "source": "design-system/src/assets/Logo/Logo.jsx",
-        "storybookId": "foundations-logos--docs",
+        "storybookId": "foundations-iconography-logos-imagery-logos--docs",
         "props": {
           "style": {
             "type": "enum",
@@ -1349,7 +1403,7 @@
         "mdxPath": "design-system/src/components/_internal/Navbar/Navbar.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/_internal/Navbar",
         "source": "design-system/src/components/_internal/Navbar/Navbar.jsx",
-        "storybookId": "components-navigation-navbar--docs",
+        "storybookId": "components-navigation-nav-tabs-nav-pills-navbar--docs",
         "props": {
           "backgroundColor": {
             "type": "enum",
@@ -1382,6 +1436,36 @@
             "source": "designer-supplied",
             "status": "verified",
             "notes": "The Figma variant group is `background color` WITH A SPACE; the code prop is `backgroundColor`. Values match one-to-one."
+          },
+          {
+            "id": "navbar-components",
+            "name": "Navbar Components",
+            "componentSetNodeId": "72:16339",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16339",
+            "source": "designer-supplied",
+            "status": "no-code-equivalent",
+            "isComponentSet": true,
+            "notes": "The contents a Navbar can hold, by type: all, nav, nav dropdown, forms, input group, buttons, text (7 variants). Code builds only type=nav, as the `items` array of links beside `brand`; nav dropdown, forms, input group, buttons and text have no code equivalent yet."
+          },
+          {
+            "id": "navbar-item",
+            "name": "_NavBar Item",
+            "componentSetNodeId": "4209:30087",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-30087",
+            "source": "designer-supplied",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "One link in the Navbar: an entry of `items`. state × selected, 9 variants. selected=true is the item's `active`; state=disabled is its `disabled`; hover, pressed and focus are the browser's own :hover, :active and :focus-visible, never a prop. Figma draws no disabled + selected variant."
+          },
+          {
+            "id": "navbar-item-dropdown",
+            "name": "_NavBar Item Dropdown",
+            "componentSetNodeId": "4209:30187",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-30187",
+            "source": "designer-supplied",
+            "status": "no-code-equivalent",
+            "isComponentSet": true,
+            "notes": "A Navbar item that opens a menu: state × selected, 9 variants. Navbar's `items` are links only, so code has no dropdown item yet."
           }
         ]
       }
@@ -1393,7 +1477,7 @@
         "mdxPath": "design-system/src/components/navigation/NavPills/NavPills.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/NavPills",
         "source": "design-system/src/components/navigation/NavPills/NavPills.jsx",
-        "storybookId": "components-navigation-nav-pills--docs"
+        "storybookId": "components-navigation-nav-tabs-nav-pills-nav-pills--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1405,6 +1489,16 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=69-16745",
             "source": "node-chart",
             "status": "verified"
+          },
+          {
+            "id": "pill-item",
+            "name": "_Pill Item",
+            "componentSetNodeId": "4209:29515",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-29515",
+            "source": "designer-supplied",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "One pill in the Nav Pills strip: NavPills.Item. state × selected, 9 variants. selected=true is `active` (or the strip's activeKey); state=disabled is `disabled`; hover, pressed and focus are the browser's own :hover, :active and :focus-visible, never a prop. Figma draws no disabled + selected variant."
           },
           {
             "id": "pill-dropdown",
@@ -1425,7 +1519,7 @@
         "mdxPath": "design-system/src/components/navigation/NavTabs/NavTabs.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/NavTabs",
         "source": "design-system/src/components/navigation/NavTabs/NavTabs.jsx",
-        "storybookId": "components-navigation-nav-tabs--docs"
+        "storybookId": "components-navigation-nav-tabs-nav-pills-nav-tabs--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1437,6 +1531,16 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=69-16779",
             "source": "node-chart",
             "status": "verified"
+          },
+          {
+            "id": "tab-item",
+            "name": "_Tab Item",
+            "componentSetNodeId": "4209:20411",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-20411",
+            "source": "designer-supplied",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "One tab in the Nav Tabs strip: NavTabs.Item. state × selected, 9 variants. selected=true is `active` (or the strip's activeKey); state=disabled is `disabled`; hover, pressed and focus are the browser's own :hover, :active and :focus-visible, never a prop. Figma draws no disabled + selected variant."
           },
           {
             "id": "tab-dropdown",
@@ -1472,13 +1576,13 @@
           },
           {
             "id": "field",
-            "name": "_Field",
+            "name": "Form",
             "componentSetNodeId": "14841:25919",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
             "source": "manual",
             "status": "unpublished",
             "isComponentSet": true,
-            "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
+            "notes": "The part this component is built on, still named Form in the Figma file: one box with Leading, Content and Trailing slots, 3 sizes × 7 states (21 variants). In code it is `_internal/Field.jsx`, which is not exported from the barrel, so `unpublished` is its settled state: a part to build on, not a component to place."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812"
@@ -1898,7 +2002,7 @@
         "mdxPath": "design-system/src/components/status-and-loading/Skeleton/Skeleton.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Skeleton",
         "source": "design-system/src/components/status-and-loading/Skeleton/Skeleton.jsx",
-        "storybookId": "components-status-and-loading-skeleton--docs",
+        "storybookId": "components-status-and-loading-loading-skeleton--docs",
         "props": {
           "shape": {
             "type": "enum",
@@ -1911,6 +2015,9 @@
           "preset": {
             "type": "enum",
             "values": [
+              "rect",
+              "circle",
+              "text",
               "status",
               "status-spacious",
               "count",
@@ -1936,7 +2043,7 @@
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
-            "notes": "On the Loading page. Figma has one preset property for shapes and presets alike (rect (default), circle, text, paragraph and the label presets); code splits it into shape and preset. shimmer? is isShimmering, off by default in Figma so static designs read clearly and on by default in code. Docs page: node 17885:47731."
+            "notes": "On the Loading page. Figma has one preset property for shapes and presets alike (rect (default), circle, text, paragraph and the label presets); code takes all ten values as preset, and rect, circle and text are also shape, which resize freely either way. shimmer? is isShimmering, off by default in Figma so static designs read clearly and on by default in code. Docs page: node 17885:47731."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-47731"
@@ -1997,7 +2104,7 @@
         "mdxPath": "design-system/src/components/status-and-loading/Spinner/Spinner.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Spinner",
         "source": "design-system/src/components/status-and-loading/Spinner/Spinner.jsx",
-        "storybookId": "components-status-and-loading-loading--docs"
+        "storybookId": "components-status-and-loading-loading-spinner--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -2126,7 +2233,7 @@
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
-            "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from a disabled field's or TagGroup's TagContext, never a prop."
+            "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from a disabled field's TagContext, never a prop."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-57"
@@ -2352,63 +2459,9 @@
               "isElevated": "elevated"
             },
             "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on gray, plain, read-only, rest and false. state=saving is isLoading; state=disabled comes from TagContext, never a prop; remove? on a link is link plus onRemove; count? is count. type is the same four values in code (plain, person, agent, team); the avatar slot is the avatar prop, with initials when it is missing. elevated=true is isElevated, drawn for read-only and link on plain, person, agent and team, including disabled (from TagContext) and focus × on a link's separate ×; code ignores it on removable and selectable with a warning."
-          },
-          {
-            "id": "remove-button",
-            "name": "Remove button",
-            "componentSetNodeId": "17827:846",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-846",
-            "source": "manual",
-            "status": "verified",
-            "isComponentSet": true,
-            "notes": "On the Button page. Tag uses size small (16, 12px ×); its states are the × inside a removable tag. Medium and large are not built in code yet."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17884-2099"
-      }
-    },
-    "TagGroup": {
-      "code": {
-        "import": "@/components/status-and-loading",
-        "export": "default",
-        "mdxPath": "design-system/src/components/status-and-loading/TagGroup/TagGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/TagGroup",
-        "source": "design-system/src/components/status-and-loading/TagGroup/TagGroup.jsx",
-        "storybookId": "components-status-and-loading-status-count-tag-tag-group--docs",
-        "props": {
-          "overflow": {
-            "type": "enum",
-            "values": [
-              "wrap",
-              "collapse"
-            ]
-          },
-          "alignment": {
-            "type": "enum",
-            "values": [
-              "left",
-              "right"
-            ]
-          },
-          "disabled": {
-            "type": "boolean"
-          }
-        }
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "tag-group",
-            "name": "TagGroup",
-            "componentSetNodeId": "17878:1713",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1713",
-            "source": "manual",
-            "status": "verified",
-            "isComponentSet": true,
-            "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on wrap, left and false. The Tags slot (preferred values Tag and Suggestion) is children. The +n is a gray behavior=selectable Tag with no swatch (TagGroup hides it); code sizes the collapsed row by width, where Figma draws two tags and +n. Suggestions are never counted into +n and stay after it; menu items keep their tag's action (selectable toggles, link opens with a trailing arrow); remove stays on the row."
-          }
-        ]
       }
     },
     "TagInput": {
@@ -2510,16 +2563,6 @@
             "status": "verified",
             "verifiedAt": "2026-10-15",
             "notes": "One set. Form Short Textarea was merged into it and deleted from the library; a short textarea is `rows={1}` in code and an instance resized to 34 high in Figma. `rows` is code-only: Figma sets the height by resizing the instance."
-          },
-          {
-            "id": "field",
-            "name": "_Field",
-            "componentSetNodeId": "14841:25919",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
-            "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731"

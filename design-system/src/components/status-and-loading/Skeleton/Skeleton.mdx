@@ -8,7 +8,7 @@ export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
   "props": {
     "shape": { "type": "enum", "values": ["rect", "circle", "text"] },
-    "preset": { "type": "enum", "values": ["status", "status-spacious", "count", "tag", "tag-person", "tag-group", "paragraph"] },
+    "preset": { "type": "enum", "values": ["rect", "circle", "text", "status", "status-spacious", "count", "tag", "tag-person", "tag-group", "paragraph"] },
     "isShimmering": { "type": "boolean" }
   },
   "sets": [
@@ -20,7 +20,7 @@ export const figmaMeta = {
       "source": "manual",
       "status": "verified",
       "isComponentSet": true,
-      "notes": "On the Loading page. Figma has one preset property for shapes and presets alike (rect (default), circle, text, paragraph and the label presets); code splits it into shape and preset. shimmer? is isShimmering, off by default in Figma so static designs read clearly and on by default in code. Docs page: node 17885:47731."
+      "notes": "On the Loading page. Figma has one preset property for shapes and presets alike (rect (default), circle, text, paragraph and the label presets); code takes all ten values as preset, and rect, circle and text are also shape, which resize freely either way. shimmer? is isShimmering, off by default in Figma so static designs read clearly and on by default in code. Docs page: node 17885:47731."
     }
   ]
 };
@@ -63,11 +63,15 @@ Status, Count and Tag, so nothing moves when the value arrives.
     <DsCanvasQuiet of={SkeletonStories.Shapes} />
 </DocsCanvasShell>
 
+<DocsCanvasShell description={<><code>preset</code> takes the shapes by Figma's names too: <code>preset="rect"</code>, <code>"circle"</code> and <code>"text"</code> draw what <code>shape</code> does and resize the same way.</>}>
+    <DsCanvasQuiet of={SkeletonStories.PresetNamesAShape} />
+</DocsCanvasShell>
+
 <DocsCanvasShell description={<><code>lines</code> repeats the text bar 8 apart, and the last line is shorter so the block reads as text. <code>preset="paragraph"</code> is three lines.</>}>
     <DsCanvasQuiet of={SkeletonStories.Paragraph} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<><code>preset="tag-group"</code> is three tag shapes at the TagGroup gap, for a tag list that loads on its own.</>}>
+<DocsCanvasShell description={<><code>preset="tag-group"</code> is three tag shapes at the Element sm gap, for a tag list that loads on its own.</>}>
     <DsCanvasQuiet of={SkeletonStories.TagGroupPreset} />
 </DocsCanvasShell>
 
