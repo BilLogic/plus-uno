@@ -56,7 +56,7 @@ const NOW = Number(FIRST_TS) * 1000 + 60_000;
 const REGISTRY: DevLinkRegistry = {
   components: {
     Button: {
-      code: { source: "design-system/src/components/actions/Button/Button.jsx", storybookId: "components-actions-button--docs" },
+      code: { source: "design-system/src/components/actions/Button/Button.jsx", storybookId: "components-actions-button-button--docs" },
       figma: {
         fileKey: LIB,
         sets: [
@@ -81,7 +81,7 @@ const REGISTRY: DevLinkRegistry = {
 };
 
 const BUTTON_CODE = "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/components/actions/Button/Button.jsx";
-const BUTTON_STORYBOOK = "https://plus-uno.netlify.app/storybook/?path=/docs/components-actions-button--docs";
+const BUTTON_STORYBOOK = "https://plus-uno.netlify.app/storybook/?path=/docs/components-actions-button-button--docs";
 
 interface Posted {
   text: string;
@@ -322,13 +322,13 @@ describe("only registry components", () => {
     const root = join(process.cwd(), "..", "..");
     const registry = JSON.parse(readFileSync(join(root, "design-system", "figma", "component-registry.json"), "utf8")) as DevLinkRegistry;
     const names = Object.keys(registry.components);
-    assert.equal(names.length, 68);
+    assert.equal(names.length, 67);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);
       assert.match(code.storybookId ?? "", /^[a-z0-9-]+--[a-z0-9-]+$/, name);
     }
-    assert.equal(registry.components.Button!.code!.storybookId, "components-actions-button--docs");
+    assert.equal(registry.components.Button!.code!.storybookId, "components-actions-button-button--docs");
   });
 });
 
