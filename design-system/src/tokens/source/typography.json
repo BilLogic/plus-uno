@@ -1,0 +1,495 @@
+{
+  "collection": "typography",
+  "modes": {
+    "19364:0": "Value"
+  },
+  "variables": [
+    {
+      "id": "VariableID:19364:99",
+      "name": "Font size/075",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "hiddenFromPublishing": true,
+      "codeSyntax": {
+        "WEB": "var(--font-size-075)"
+      },
+      "valuesByMode": {
+        "19364:0": 12
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 12
+      }
+    },
+    {
+      "id": "VariableID:19364:100",
+      "name": "Font size/0875",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "hiddenFromPublishing": true,
+      "codeSyntax": {
+        "WEB": "var(--font-size-0875)"
+      },
+      "valuesByMode": {
+        "19364:0": 14
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 14
+      }
+    },
+    {
+      "id": "VariableID:19364:101",
+      "name": "Font size/100",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "hiddenFromPublishing": true,
+      "codeSyntax": {
+        "WEB": "var(--font-size-100)"
+      },
+      "valuesByMode": {
+        "19364:0": 16
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 16
+      }
+    },
+    {
+      "id": "VariableID:19364:102",
+      "name": "Font size/125",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "hiddenFromPublishing": true,
+      "codeSyntax": {
+        "WEB": "var(--font-size-125)"
+      },
+      "valuesByMode": {
+        "19364:0": 20
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 20
+      }
+    },
+    {
+      "id": "VariableID:19364:103",
+      "name": "Font size/150",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "hiddenFromPublishing": true,
+      "codeSyntax": {
+        "WEB": "var(--font-size-150)"
+      },
+      "valuesByMode": {
+        "19364:0": 24
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 24
+      }
+    },
+    {
+      "id": "VariableID:19364:104",
+      "name": "Font size/175",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "hiddenFromPublishing": true,
+      "codeSyntax": {
+        "WEB": "var(--font-size-175)"
+      },
+      "valuesByMode": {
+        "19364:0": 28
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 28
+      }
+    },
+    {
+      "id": "VariableID:19364:105",
+      "name": "Font size/200",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "hiddenFromPublishing": true,
+      "codeSyntax": {
+        "WEB": "var(--font-size-200)"
+      },
+      "valuesByMode": {
+        "19364:0": 32
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 32
+      }
+    },
+    {
+      "id": "VariableID:19364:106",
+      "name": "Line height/100",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "hiddenFromPublishing": true,
+      "codeSyntax": {
+        "WEB": "var(--line-height-100)"
+      },
+      "valuesByMode": {
+        "19364:0": 16
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 16
+      }
+    },
+    {
+      "id": "VariableID:19364:107",
+      "name": "Line height/125",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "hiddenFromPublishing": true,
+      "codeSyntax": {
+        "WEB": "var(--line-height-125)"
+      },
+      "valuesByMode": {
+        "19364:0": 20
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 20
+      }
+    },
+    {
+      "id": "VariableID:19364:108",
+      "name": "Line height/150",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "hiddenFromPublishing": true,
+      "codeSyntax": {
+        "WEB": "var(--line-height-150)"
+      },
+      "valuesByMode": {
+        "19364:0": 24
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 24
+      }
+    },
+    {
+      "id": "VariableID:19364:109",
+      "name": "Line height/175",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "hiddenFromPublishing": true,
+      "codeSyntax": {
+        "WEB": "var(--line-height-175)"
+      },
+      "valuesByMode": {
+        "19364:0": 28
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 28
+      }
+    },
+    {
+      "id": "VariableID:19364:110",
+      "name": "Line height/200",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "hiddenFromPublishing": true,
+      "codeSyntax": {
+        "WEB": "var(--line-height-200)"
+      },
+      "valuesByMode": {
+        "19364:0": 32
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 32
+      }
+    },
+    {
+      "id": "VariableID:19364:111",
+      "name": "Line height/225",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "hiddenFromPublishing": true,
+      "codeSyntax": {
+        "WEB": "var(--line-height-225)"
+      },
+      "valuesByMode": {
+        "19364:0": 36
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 36
+      }
+    },
+    {
+      "id": "VariableID:19364:112",
+      "name": "Family/heading",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "hiddenFromPublishing": false,
+      "codeSyntax": {
+        "WEB": "var(--type-family-heading)"
+      },
+      "valuesByMode": {
+        "19364:0": "Lato"
+      },
+      "resolvedValuesByMode": {
+        "19364:0": "Lato"
+      }
+    },
+    {
+      "id": "VariableID:19364:113",
+      "name": "Family/body",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "hiddenFromPublishing": false,
+      "codeSyntax": {
+        "WEB": "var(--type-family-body)"
+      },
+      "valuesByMode": {
+        "19364:0": "Merriweather Sans"
+      },
+      "resolvedValuesByMode": {
+        "19364:0": "Merriweather Sans"
+      }
+    },
+    {
+      "id": "VariableID:19364:114",
+      "name": "Weight/regular",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "FONT_WEIGHT"
+      ],
+      "hiddenFromPublishing": false,
+      "codeSyntax": {
+        "WEB": "var(--type-weight-regular)"
+      },
+      "valuesByMode": {
+        "19364:0": 400
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 400
+      }
+    },
+    {
+      "id": "VariableID:19364:115",
+      "name": "Weight/medium",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "FONT_WEIGHT"
+      ],
+      "hiddenFromPublishing": false,
+      "codeSyntax": {
+        "WEB": "var(--type-weight-medium)"
+      },
+      "valuesByMode": {
+        "19364:0": 500
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 500
+      }
+    },
+    {
+      "id": "VariableID:19364:116",
+      "name": "Weight/semibold",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "FONT_WEIGHT"
+      ],
+      "hiddenFromPublishing": false,
+      "codeSyntax": {
+        "WEB": "var(--type-weight-semibold)"
+      },
+      "valuesByMode": {
+        "19364:0": 600
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 600
+      }
+    }
+  ],
+  "textStyles": [
+    {
+      "id": "S:0ed9850bc32acd70372f2267ea06dec4fdb425ce,",
+      "name": "Heading/xxlarge",
+      "description": "CSS: var(--heading-xxlarge)",
+      "boundVariables": {
+        "fontFamily": "VariableID:19364:112",
+        "fontSize": "VariableID:19364:105",
+        "lineHeight": "VariableID:19364:111",
+        "fontWeight": "VariableID:19364:116"
+      }
+    },
+    {
+      "id": "S:73116d2afedb2caa9861643023b0234cbb831071,",
+      "name": "Heading/xlarge",
+      "description": "CSS: var(--heading-xlarge)",
+      "boundVariables": {
+        "fontFamily": "VariableID:19364:112",
+        "fontSize": "VariableID:19364:104",
+        "lineHeight": "VariableID:19364:110",
+        "fontWeight": "VariableID:19364:116"
+      }
+    },
+    {
+      "id": "S:2a7efad1464e56c45c3682969b1e20d75c2283d2,",
+      "name": "Heading/large",
+      "description": "CSS: var(--heading-large)",
+      "boundVariables": {
+        "fontFamily": "VariableID:19364:112",
+        "fontSize": "VariableID:19364:103",
+        "lineHeight": "VariableID:19364:109",
+        "fontWeight": "VariableID:19364:116"
+      }
+    },
+    {
+      "id": "S:c5fc7d7d8e564872c98ae451b2191e74b41ab447,",
+      "name": "Heading/medium",
+      "description": "CSS: var(--heading-medium)",
+      "boundVariables": {
+        "fontFamily": "VariableID:19364:112",
+        "fontSize": "VariableID:19364:102",
+        "lineHeight": "VariableID:19364:108",
+        "fontWeight": "VariableID:19364:116"
+      }
+    },
+    {
+      "id": "S:c93ddcb756348f9b6263ad61b599d268e70b75ea,",
+      "name": "Heading/small",
+      "description": "CSS: var(--heading-small)",
+      "boundVariables": {
+        "fontFamily": "VariableID:19364:112",
+        "fontSize": "VariableID:19364:101",
+        "lineHeight": "VariableID:19364:107",
+        "fontWeight": "VariableID:19364:116"
+      }
+    },
+    {
+      "id": "S:730be28629d6bf631f2d46f665bea8f70018b531,",
+      "name": "Heading/xsmall",
+      "description": "CSS: var(--heading-xsmall)",
+      "boundVariables": {
+        "fontFamily": "VariableID:19364:112",
+        "fontSize": "VariableID:19364:100",
+        "lineHeight": "VariableID:19364:107",
+        "fontWeight": "VariableID:19364:116"
+      }
+    },
+    {
+      "id": "S:7e7932287e837cdb1dfb125c004af6fbc7287c56,",
+      "name": "Heading/xxsmall",
+      "description": "CSS: var(--heading-xxsmall)",
+      "boundVariables": {
+        "fontFamily": "VariableID:19364:112",
+        "fontSize": "VariableID:19364:99",
+        "lineHeight": "VariableID:19364:106",
+        "fontWeight": "VariableID:19364:116"
+      }
+    },
+    {
+      "id": "S:ba6312f40fa41923124bf3a88b3eda3e5b25969d,",
+      "name": "Body/large",
+      "description": "CSS: var(--body-large)",
+      "boundVariables": {
+        "fontFamily": "VariableID:19364:113",
+        "fontSize": "VariableID:19364:101",
+        "lineHeight": "VariableID:19364:108",
+        "fontWeight": "VariableID:19364:114"
+      }
+    },
+    {
+      "id": "S:8bcbf72aa38b48136701645b55d282efabe6ef3c,",
+      "name": "Body/default",
+      "description": "CSS: var(--body-default)",
+      "boundVariables": {
+        "fontFamily": "VariableID:19364:113",
+        "fontSize": "VariableID:19364:100",
+        "lineHeight": "VariableID:19364:107",
+        "fontWeight": "VariableID:19364:114"
+      }
+    },
+    {
+      "id": "S:22fc1dd33b8ea4831b40c53e2eacea69733fcff3,",
+      "name": "Body/small",
+      "description": "CSS: var(--body-small)",
+      "boundVariables": {
+        "fontFamily": "VariableID:19364:113",
+        "fontSize": "VariableID:19364:99",
+        "lineHeight": "VariableID:19364:106",
+        "fontWeight": "VariableID:19364:114"
+      }
+    },
+    {
+      "id": "S:a34307720a50ba4fed1bc0ba242e869a2e39894f,",
+      "name": "Metric/large",
+      "description": "CSS: var(--metric-large)",
+      "boundVariables": {
+        "fontFamily": "VariableID:19364:112",
+        "fontSize": "VariableID:19364:104",
+        "lineHeight": "VariableID:19364:110",
+        "fontWeight": "VariableID:19364:116"
+      }
+    },
+    {
+      "id": "S:52a40030528fcf2203affe70f95938707ba87b78,",
+      "name": "Metric/medium",
+      "description": "CSS: var(--metric-medium)",
+      "boundVariables": {
+        "fontFamily": "VariableID:19364:112",
+        "fontSize": "VariableID:19364:103",
+        "lineHeight": "VariableID:19364:109",
+        "fontWeight": "VariableID:19364:116"
+      }
+    },
+    {
+      "id": "S:71bd013c1444fe78265faf4d237107bd2f051003,",
+      "name": "Metric/small",
+      "description": "CSS: var(--metric-small)",
+      "boundVariables": {
+        "fontFamily": "VariableID:19364:112",
+        "fontSize": "VariableID:19364:101",
+        "lineHeight": "VariableID:19364:107",
+        "fontWeight": "VariableID:19364:116"
+      }
+    }
+  ]
+}

@@ -236,6 +236,44 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --table-radius
 ```
 
+## Type Scale
+The Atlassian scale, generated from Figma: `font: var(--heading-large)`. A button or tab label is `--body-default` with `font-weight: var(--type-weight-medium)`; there is no button style.
+
+```css
+--body-default
+--body-large
+--body-small
+--code
+--font-size-075
+--font-size-0875
+--font-size-100
+--font-size-125
+--font-size-150
+--font-size-175
+--font-size-200
+--heading-large
+--heading-medium
+--heading-small
+--heading-xlarge
+--heading-xsmall
+--heading-xxlarge
+--heading-xxsmall
+--line-height-100
+--line-height-125
+--line-height-150
+--line-height-175
+--line-height-200
+--line-height-225
+--metric-large
+--metric-medium
+--metric-small
+--type-family-body
+--type-family-heading
+--type-weight-medium
+--type-weight-regular
+--type-weight-semibold
+```
+
 ## Typography Tokens
 Use for font sizes, weights, and line heights.
 
@@ -299,7 +337,6 @@ Use for font sizes, weights, and line heights.
 --font-line-height-h5
 --font-line-height-h6
 --font-line-height-lead
---font-size-125
 --font-size-blockquote
 --font-size-body1
 --font-size-body2

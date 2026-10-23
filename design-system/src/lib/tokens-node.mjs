@@ -253,7 +253,16 @@ export const FAMILIES = [
     prefix: '--font-letter-spacing-',
     what: 'tracking per type step',
   },
-  { family: 'type', prefix: '--type-', what: 'the `font` shorthand for a type step' },
+  { family: 'line-height', prefix: '--line-height-', what: 'line height primitives, by rem × 100' },
+  { family: 'heading', prefix: '--heading-', what: 'a heading text style: the `font` shorthand' },
+  { family: 'body', prefix: '--body-', what: 'a body text style: the `font` shorthand' },
+  { family: 'metric', prefix: '--metric-', what: 'a metric text style: the `font` shorthand' },
+  { family: 'code', prefix: '--code', what: 'the code text style, relative to the text around it' },
+  {
+    family: 'type',
+    prefix: '--type-',
+    what: 'the typography family and weight variables, and the older `font` shorthands per type step',
+  },
   { family: 'size', prefix: '--size-', what: 'the old spacing, radius, border and component metrics, and the size primitives (`--size-200`)' },
   { family: 'space', prefix: '--space-', what: 'the space primitives, named by rem × 100' },
   { family: 'radius', prefix: '--radius-', what: 'the radius primitives' },
@@ -293,7 +302,11 @@ const BY_LENGTH = [...FAMILIES].sort((a, b) => b.prefix.length - a.prefix.length
  */
 export function familyOf(name) {
   if (typeof name !== 'string') return null;
-  const family = BY_LENGTH.find((f) => name.startsWith(f.prefix) && name.length > f.prefix.length);
+  // A prefix ending in `-` opens a family; one without names a family of one
+  // token, matched whole (`--code`).
+  const family = BY_LENGTH.find((f) =>
+    f.prefix.endsWith('-') ? name.startsWith(f.prefix) && name.length > f.prefix.length : name === f.prefix,
+  );
   return family ? family.family : null;
 }
 

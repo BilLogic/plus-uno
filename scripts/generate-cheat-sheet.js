@@ -40,6 +40,7 @@ function renderTokensDoc() {
     const colorTokens = extractScssVariables(path.join(TOKENS_DIR, '_colors.scss'));
     const spacingTokens = extractScssVariables(path.join(TOKENS_DIR, '_spacing_semantics.scss'));
     const fontTokens = extractScssVariables(path.join(TOKENS_DIR, '_fonts.scss'));
+    const typeTokens = extractScssVariables(path.join(TOKENS_DIR, '_type.scss'));
     const primitiveTokens = extractScssVariables(path.join(TOKENS_DIR, '_primitives.scss'));
     const elevationTokens = extractScssVariables(path.join(TOKENS_DIR, '_elevation.scss'));
     // _scales.scss holds both layers of the new scales: its spacing / primitives
@@ -67,6 +68,9 @@ function renderTokensDoc() {
     tokensDoc += `## Frame and Layer Tokens\n`;
     tokensDoc += `The page frame (\`--layout-*\`, per breakpoint) and the patterns on it: surface, section, card, table, overlay, modal, popover. These sit beside the spacing semantics above while uses move to them.\n\n`;
     tokensDoc += "```css\n" + frameLayerTokens.join('\n') + "\n```\n\n";
+    tokensDoc += `## Type Scale\n`;
+    tokensDoc += `The Atlassian scale, generated from Figma: \`font: var(--heading-large)\`. A button or tab label is \`--body-default\` with \`font-weight: var(--type-weight-medium)\`; there is no button style.\n\n`;
+    tokensDoc += "```css\n" + typeTokens.join('\n') + "\n```\n\n";
 
     tokensDoc += `## Typography Tokens\n`;
     tokensDoc += `Use for font sizes, weights, and line heights.\n\n`;

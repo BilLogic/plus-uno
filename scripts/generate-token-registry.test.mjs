@@ -26,3 +26,10 @@ test('a layout min or max height maps to its --layout-*-height-* token', () => {
   assert.equal(deriveCandidates('size / layout', 'Max Heights/listbox')[0], '--layout-max-height-listbox');
   assert.equal(deriveCandidates('size / layout', 'Min Heights/card-body')[0], '--layout-min-height-card-body');
 });
+
+test('a typography variable maps by its folder: the same rule the type generator uses', () => {
+  assert.deepEqual(deriveCandidates('typography', 'Font size/0875'), ['--font-size-0875']);
+  assert.deepEqual(deriveCandidates('typography', 'Line height/125'), ['--line-height-125']);
+  assert.deepEqual(deriveCandidates('typography', 'Family/heading'), ['--type-family-heading']);
+  assert.deepEqual(deriveCandidates('typography', 'Weight/medium'), ['--type-weight-medium']);
+});

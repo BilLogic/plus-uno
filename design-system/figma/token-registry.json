@@ -77,6 +77,60 @@
       "Code": [
         "var(--font-size-code)",
         "var(--font-family-code)"
+      ],
+      "Heading/xxlarge": [
+        "var(--heading-xxlarge)"
+      ],
+      "Heading/xlarge": [
+        "var(--heading-xlarge)"
+      ],
+      "Heading/large": [
+        "var(--heading-large)"
+      ],
+      "Heading/medium": [
+        "var(--heading-medium)"
+      ],
+      "Heading/small": [
+        "var(--heading-small)"
+      ],
+      "Heading/xsmall": [
+        "var(--heading-xsmall)"
+      ],
+      "Heading/xxsmall": [
+        "var(--heading-xxsmall)"
+      ],
+      "Body/large": [
+        "var(--body-large)"
+      ],
+      "Body/default": [
+        "var(--body-default)"
+      ],
+      "Body/small": [
+        "var(--body-small)"
+      ],
+      "Metric/large": [
+        "var(--metric-large)"
+      ],
+      "Metric/medium": [
+        "var(--metric-medium)"
+      ],
+      "Metric/small": [
+        "var(--metric-small)"
+      ],
+      "Family/heading": [
+        "var(--type-family-heading)"
+      ],
+      "Family/body": [
+        "var(--type-family-body)"
+      ],
+      "Weight/regular": [
+        "var(--type-weight-regular)"
+      ],
+      "Weight/medium": [
+        "var(--type-weight-medium)"
+      ],
+      "Weight/semibold": [
+        "var(--type-weight-semibold)"
       ]
     },
     "spacing": {
@@ -461,7 +515,26 @@
       "Table/cell-x": "var(--size-table-cell-x)",
       "Table/cell-y": "var(--size-table-cell-y)"
     },
-    "typography": {},
+    "typography": {
+      "Family/body": "var(--type-family-body)",
+      "Family/heading": "var(--type-family-heading)",
+      "Font size/075": "var(--font-size-075)",
+      "Font size/0875": "var(--font-size-0875)",
+      "Font size/100": "var(--font-size-100)",
+      "Font size/125": "var(--font-size-125)",
+      "Font size/150": "var(--font-size-150)",
+      "Font size/175": "var(--font-size-175)",
+      "Font size/200": "var(--font-size-200)",
+      "Line height/100": "var(--line-height-100)",
+      "Line height/125": "var(--line-height-125)",
+      "Line height/150": "var(--line-height-150)",
+      "Line height/175": "var(--line-height-175)",
+      "Line height/200": "var(--line-height-200)",
+      "Line height/225": "var(--line-height-225)",
+      "Weight/medium": "var(--type-weight-medium)",
+      "Weight/regular": "var(--type-weight-regular)",
+      "Weight/semibold": "var(--type-weight-semibold)"
+    },
     "spacing / primitives": {
       "Radius/radius-0125": "var(--radius-0125)",
       "Radius/radius-025": "var(--radius-025)",
@@ -651,12 +724,12 @@
     }
   },
   "validation": {
-    "scssTokenCount": 703,
+    "scssTokenCount": 734,
     "unknownTokens": [],
     "figmaVariableCoverage": {
       "total": 573,
-      "resolved": 528,
-      "percent": 92,
+      "resolved": 546,
+      "percent": 95,
       "unresolved": [
         {
           "collection": "colors / accent",
@@ -874,132 +947,6 @@
           "figmaVariable": "Tree/toggle",
           "tried": [
             "--size-tree-toggle"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Family/body",
-          "tried": [
-            "--body"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Family/heading",
-          "tried": [
-            "--heading"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Font size/075",
-          "tried": [
-            "--075"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Font size/0875",
-          "tried": [
-            "--0875"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Font size/100",
-          "tried": [
-            "--100"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Font size/125",
-          "tried": [
-            "--125"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Font size/150",
-          "tried": [
-            "--150"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Font size/175",
-          "tried": [
-            "--175"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Font size/200",
-          "tried": [
-            "--200"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Line height/100",
-          "tried": [
-            "--100"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Line height/125",
-          "tried": [
-            "--125"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Line height/150",
-          "tried": [
-            "--150"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Line height/175",
-          "tried": [
-            "--175"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Line height/200",
-          "tried": [
-            "--200"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Line height/225",
-          "tried": [
-            "--225"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Weight/medium",
-          "tried": [
-            "--medium"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Weight/regular",
-          "tried": [
-            "--regular"
-          ]
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Weight/semibold",
-          "tried": [
-            "--semibold"
           ]
         },
         {
