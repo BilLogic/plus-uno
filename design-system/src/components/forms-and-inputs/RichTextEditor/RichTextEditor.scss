@@ -19,18 +19,8 @@
     overflow: hidden;
     box-sizing: border-box;
 
-    &.plus-rich-text-editor-small {
-        --rte-content-pad-x: var(--size-element-pad-x-sm);
-        --rte-content-pad-y: var(--size-element-pad-y-sm);
-    }
-
-    &.plus-rich-text-editor-large {
-        --rte-toolbar-height: calc(
-            var(--size-spacing-medium-space-300) + var(--size-spacing-medium-space-400)
-        );
-        --rte-content-pad-x: var(--size-section-pad-x-md);
-        --rte-content-pad-y: var(--size-section-pad-y-md);
-    }
+    // `small` and `large` are deprecated and draw like `medium`; their classes
+    // stay so call sites that target them keep matching.
 
     &.plus-rich-text-editor--full {
         max-width: none;
@@ -198,9 +188,8 @@
 .plus-rich-text-editor-content {
     font: var(--body-default);
     flex: 1 1 auto;
-    min-height: calc(
-        var(--size-spacing-large-space-900) + var(--size-spacing-large-space-600)
-    );
+    // 120 at least, growing with what is typed.
+    min-height: var(--field-min-height-lg);
     padding: var(--rte-content-pad-y) var(--rte-content-pad-x);
     outline: none;
     color: var(--color-on-surface);

@@ -8,6 +8,11 @@ export default {
     component: InputGroup,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-23', kind: 'changed', summary: 'A single-line field became 32, its text centered and its side padding 12.' },
+            { date: '2026-10-23', kind: 'changed', summary: 'Button and dropdown addons became 24, 4 from the field\'s edge.' },
+            { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
+        ],
         docs: {
             description: {
                 component: 'Input Group component extends form controls by adding text, checkbox, radio, icon, button, or dropdown addons on either side of textual inputs. Supports multiple addons on each side and various size variants.'
@@ -281,8 +286,8 @@ Interactive.args = {
 
 /**
  * AddonsInSlots — addons go in the field's Leading and Trailing slots and
- * draw no box of their own. Buttons are small and cut to the line, so the
- * field stays 34 high; a side takes one addon or an array.
+ * draw no box of their own. Buttons are the 24 compact button, so the field
+ * stays 32 high; a side takes one addon or an array.
  */
 export const AddonsInSlots = () => (
     <div style={docsCol}>
@@ -323,13 +328,13 @@ AddonsInSlots.play = async ({ canvasElement }) => {
         await expect(getComputedStyle(addon).borderTopStyle).toBe('none');
     }
 
-    // Two buttons in Trailing, small and cut to the 20 text line, and the field stays 32.
+    // Two buttons in Trailing, small and 24 high, and the field stays 32.
     const invite = box('Invite by email');
     const buttons = within(invite.querySelector('.plus-field__trailing')).getAllByRole('button');
     await expect(buttons.map((button) => button.textContent)).toEqual(['Copy', 'Send']);
     for (const button of buttons) {
         await expect(button.classList.contains('plus-btn--small')).toBe(true);
-        await expect(Math.round(button.getBoundingClientRect().height)).toBe(20);
+        await expect(Math.round(button.getBoundingClientRect().height)).toBe(24);
     }
     await expect(Math.round(invite.getBoundingClientRect().height)).toBe(32);
 

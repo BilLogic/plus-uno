@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import Card from '@/components/layout-and-structure/Card';
 import Dropdown from '@/components/forms-and-inputs/Dropdown';
 import Modal from '@/components/messaging/Modal';
+import Sidebar from '@/components/_internal/Sidebar';
 import Table from '@/components/_internal/Table';
 import PatternModal from './PatternModal';
 import PatternSection from './PatternSection';
@@ -117,6 +118,16 @@ describe('group labels', () => {
         render(<Table headers={['Student', 'Grade']} rows={[['Ana', '7']]} />);
         expect(screen.getAllByRole('columnheader').map((th) => [th.textContent, th.getAttribute('scope')]))
             .toEqual([['Student', 'col'], ['Grade', 'col']]);
+        expect(screen.queryAllByRole('heading')).toEqual([]);
+    });
+});
+
+describe('the sidebar', () => {
+    it('names each section a group, and its label is not a heading', () => {
+        render(<Sidebar />);
+        const training = screen.getByRole('group', { name: 'Training' });
+        expect(within(training).getByRole('button', { name: /Lessons/ })).toBeTruthy();
+        expect(screen.getByRole('group', { name: 'Toolkit' })).toBeTruthy();
         expect(screen.queryAllByRole('heading')).toEqual([]);
     });
 });
