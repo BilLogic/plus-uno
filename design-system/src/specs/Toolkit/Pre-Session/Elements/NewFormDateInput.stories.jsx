@@ -149,7 +149,7 @@ const SessionDateInput = ({
                         fontWeight: 300,
                         lineHeight: 1.571,
                         width: 9,
-                        height: 34,
+                        height: 'var(--item-height-md)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',

@@ -467,7 +467,7 @@ const DateAndTimePicker = ({
                             selected={selectedDate}
                             minDate={minDate}
                             maxDate={maxDate}
-                            size={size}
+                            size="medium"
                             onPick={handleDayClick}
                         />
                     </div>,

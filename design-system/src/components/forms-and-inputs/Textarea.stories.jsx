@@ -9,7 +9,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-10-23', kind: 'changed', summary: 'The field is 80 high at least and grows with its rows.' },
+            { date: '2026-10-23', kind: 'changed', summary: 'The field became 80 high at least, growing with its rows.' },
             { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
         ],
         docs: {

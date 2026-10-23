@@ -272,7 +272,7 @@ const DatePicker = ({
                         rangeEnd={rangeEnd}
                         minDate={minDate}
                         maxDate={maxDate}
-                        size={size}
+                        size="medium"
                         onPick={pick}
                     />
                 </div>,

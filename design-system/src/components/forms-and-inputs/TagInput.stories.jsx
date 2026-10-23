@@ -20,7 +20,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-10-23', kind: 'changed', summary: 'The field is 32 with one row of tags and grows as they wrap.' },
+            { date: '2026-10-23', kind: 'changed', summary: 'The field became 32 with one row of tags, growing as they wrap.' },
             { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
         ],
     },
@@ -324,12 +324,12 @@ CollapsesWithoutFocus.play = async ({ canvasElement }) => {
  * and sits inside the field's border at any width, and the field stays as tall
  * as an Input. `small` is deprecated and draws like `medium`, so the two match.
  */
-const SMALL_WIDTHS = [160, 200, 240, 280, 360];
+const WIDTHS = [160, 200, 240, 280, 360];
 
 export const SmallFitsItsTags = () => (
     <div style={stack}>
         <Input label="Small input" size="small" />
-        {SMALL_WIDTHS.map((width) => (
+        {WIDTHS.map((width) => (
             <div key={width} style={{ width }}>
                 <TagInput label={`Topics at ${width}`} size="small" options={TOPICS} defaultTags={MANY} />
             </div>
@@ -341,7 +341,7 @@ SmallFitsItsTags.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const smallInput = canvas.getByRole('textbox', { name: 'Small input' }).closest('.plus-field');
     const smallHeight = smallInput.getBoundingClientRect().height;
-    for (const width of SMALL_WIDTHS) {
+    for (const width of WIDTHS) {
         const list = canvas.getByRole('list', { name: `Selected: Topics at ${width}` });
         await within(list).findByRole('button', { name: /^\+\d+ more tags?$/ });
 

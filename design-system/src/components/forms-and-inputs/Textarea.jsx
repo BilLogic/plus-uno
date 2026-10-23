@@ -20,7 +20,7 @@ const LEGACY_STATE = {
 /**
  * Textarea — free text over several lines, on `_Field`.
  *
- * `rows` sets the height; a one-line textarea is `rows={1}`. With
+ * The field is 80 high at least, and `rows` grows it from there. With
  * `maxLength`, the caption counts characters on the right. With `subtle`, it
  * reads as plain text until hovered or edited, shows Save and Cancel while
  * editing, and stays open when it loses focus.

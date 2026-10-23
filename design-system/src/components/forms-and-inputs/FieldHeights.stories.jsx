@@ -109,6 +109,15 @@ export const ButtonInside = () => (
         <div data-field="Steppers">
             <NumberInput label="Sessions" defaultValue={3} />
         </div>
+        <div data-field="Dropdown">
+            <InputGroup
+                label="Duration"
+                trailingVisual={{ type: 'dropdown', text: 'Minutes', items: [{ text: 'Minutes' }, { text: 'Hours' }] }}
+            />
+        </div>
+        <div data-field="AM/PM">
+            <DateAndTimePicker label="Starts" showDate={false} />
+        </div>
     </div>
 );
 
@@ -133,6 +142,22 @@ ButtonInside.play = async ({ canvasElement }) => {
             await expect(Math.round(first.left - outer.left), `${name} button start`).toBe(4);
         }
     }
+    // The Dropdown addon is 24, 4 from the box's edge.
+    const dropdownBox = fieldIn(canvasElement, 'Dropdown');
+    const toggle = rect(dropdownBox.querySelector('.dropdown-toggle'));
+    const outer = rect(dropdownBox);
+    await expect(heightOf(dropdownBox), 'Dropdown field height').toBe(32);
+    await expect(Math.round(toggle.height), 'Dropdown addon height').toBe(24);
+    await expect(Math.round(toggle.top - outer.top), 'Dropdown addon top').toBe(4);
+    await expect(Math.round(outer.right - toggle.right), 'Dropdown addon end').toBe(4);
+
+    // The AM/PM menu is 24, centered, and the time field stays 32.
+    const timeBox = fieldIn(canvasElement, 'AM/PM');
+    const period = rect(timeBox.querySelector('.plus-datetime-am-pm-toggle'));
+    await expect(heightOf(timeBox), 'Time field height').toBe(32);
+    await expect(Math.round(period.height), 'AM/PM height').toBe(24);
+    await expect(Math.round(period.top - rect(timeBox).top), 'AM/PM top').toBe(4);
+
     // Steppers are square.
     for (const stepper of fieldIn(canvasElement, 'Steppers').querySelectorAll('.plus-field-stepper')) {
         await expect(Math.round(rect(stepper).width)).toBe(24);
@@ -183,6 +208,34 @@ const DEPRECATED = [
     ['RichTextEditor', (size) => <RichTextEditor size={size} label={`Editor ${size}`} />],
 ];
 
+/** The calendar a deprecated-size Date picker opens is the medium one. */
+export const DeprecatedCalendar = () => (
+    <div style={stack}>
+        {['small', 'medium', 'large'].map((size) => (
+            <div key={size} data-field={`Calendar ${size}`}>
+                <DatePicker size={size} aria-label={`Calendar ${size}`} placeholder="MM/DD/YYYY" />
+            </div>
+        ))}
+    </div>
+);
+
+DeprecatedCalendar.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const dayCell = async (size) => {
+        await userEvent.click(canvas.getByRole('combobox', { name: `Calendar ${size}` }));
+        await waitFor(() => expect(document.body.querySelector('.plus-date-popup .plus-calendar')).not.toBeNull());
+        const calendar = document.body.querySelector('.plus-date-popup .plus-calendar');
+        const day = calendar.querySelector('button.plus-calendar-day');
+        const drawn = { medium: calendar.classList.contains('plus-calendar--medium'), w: Math.round(rect(day).width), h: Math.round(rect(day).height) };
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(document.body.querySelector('.plus-date-popup .plus-calendar')).toBeNull());
+        return drawn;
+    };
+    const medium = await dayCell('medium');
+    await expect(await dayCell('small'), 'small calendar').toEqual(medium);
+    await expect(await dayCell('large'), 'large calendar').toEqual(medium);
+};
+
 /** `small` and `large` are deprecated: they draw like `medium` and warn in development. */
 let sizeWarn;
 export const DeprecatedSizes = {
@@ -211,10 +264,22 @@ export const DeprecatedSizes = {
                 `${name} does not warn for medium`,
             ).toBe(false);
 
+            // The whole host and its box draw like medium: height, padding and type.
             const medium = canvasElement.querySelector(`[data-field="${name} medium"]`);
+            const drawn = (wrapper) => {
+                const box = wrapper.querySelector('.plus-field, .plus-rich-text-editor-content');
+                const style = getComputedStyle(box);
+                return {
+                    host: heightOf(wrapper),
+                    box: heightOf(box),
+                    padding: style.padding,
+                    fontSize: style.fontSize,
+                    lineHeight: style.lineHeight,
+                };
+            };
             for (const size of ['small', 'large']) {
                 const other = canvasElement.querySelector(`[data-field="${name} ${size}"]`);
-                await expect(heightOf(other), `${name} ${size} draws like medium`).toBe(heightOf(medium));
+                await expect(drawn(other), `${name} ${size} draws like medium`).toEqual(drawn(medium));
             }
         }
     },
