@@ -17,10 +17,11 @@
     --layout-height-topbar: var(--height-200);
     /* Sidebar */
     --layout-width-sidebar: var(--width-1500);
-    --layout-pad-left-container: 8px;
+    --layout-pad-left-container: var(--space-050);
     /* Grid */
     --layout-gutter: var(--space-100);
     --layout-width-column: 45.33px;
+    --layout-columns: 12;
     /* Content */
     --layout-max-width-content: var(--size-7700);
     --layout-max-width-reading: var(--size-5400);
@@ -28,14 +29,17 @@
     --layout-width-content: 720px;
     /* Modal */
     --layout-width-modal-sm: 384px;
-    --layout-width-modal-md: 506.67px;
-    --layout-width-modal-lg: 629.33px;
+    --layout-width-modal-md: 507px;
+    --layout-width-modal-lg: 629px;
     /* Surface */
     --surface-pad: var(--space-100);
     --surface-stack-sm: var(--space-100);
     --surface-stack-md: var(--space-150);
     --surface-stack-lg: var(--space-250);
     --surface-radius: var(--radius-100);
+    /* Screen */
+    --layout-width-screen: 768px;
+    --layout-pad-x-screen: var(--space-150);
 
     /* spacing / patterns */
     /* Surface container */
@@ -58,15 +62,19 @@
     --card-inline-md: var(--space-050);
     --card-inline-lg: var(--space-075);
     --card-min-width-sm: var(--width-1400);
-    --card-min-width-md: var(--size-1900);
+    --card-min-width-md: var(--width-1900);
     --card-min-width-lg: var(--width-3000);
     --card-radius: var(--radius-100);
     --card-radius-sm: var(--radius-075);
+    --card-max-height-sm: var(--size-1900);
+    --card-max-height-md: var(--size-2500);
+    --card-max-height-lg: var(--size-4000);
     /* Table */
     --table-pad-x-cell: var(--space-050);
     --table-pad-y-cell: var(--space-025);
     --table-indent: var(--space-150);
     --table-radius: var(--radius-050);
+    --table-stack: var(--space-050);
     /* Overlay */
     --overlay-pad-x: var(--space-100);
     --overlay-pad-y: var(--space-400);
@@ -109,12 +117,13 @@
 
 @media (min-width: 1024px) {
     :root {
-        --layout-pad-left-container: 0px;
+        --layout-pad-left-container: var(--space-0);
         --layout-width-column: 47.33px;
         --layout-width-content: 744px;
         --layout-width-modal-sm: 512px;
-        --layout-width-modal-md: 677.33px;
-        --layout-width-modal-lg: 842.67px;
+        --layout-width-modal-md: 677px;
+        --layout-width-modal-lg: 843px;
+        --layout-width-screen: 1024px;
     }
 }
 
@@ -126,6 +135,8 @@
         --layout-width-modal-md: 848px;
         --layout-width-modal-lg: 1056px;
         --surface-pad: var(--space-150);
+        --layout-width-screen: 1440px;
+        --layout-pad-x-screen: var(--space-200);
     }
 }
 

@@ -1295,6 +1295,27 @@
         "WEB": "var(--border-focused)"
       },
       "description": "focus ring, drawn 2 outside"
+    },
+    {
+      "id": "VariableID:19413:29",
+      "name": "Size/Width/1900",
+      "variableCollectionId": "VariableCollectionId:19378:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--width-1900)"
+      },
+      "valuesByMode": {
+        "19378:0": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:238"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19378:0": 304
+      }
     }
   ]
 }

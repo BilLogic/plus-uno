@@ -3,10 +3,10 @@
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "figmaFileName": "Design System - BS4 Foundation (Component LIbrary)",
   "capturedAt": "2026-10-23",
-  "totalVariables": 573,
+  "totalVariables": 582,
   "byType": {
     "COLOR": 232,
-    "FLOAT": 329,
+    "FLOAT": 338,
     "BOOLEAN": 9,
     "STRING": 3
   },
@@ -479,6 +479,7 @@
         "Size/size-2500",
         "Size/size-300",
         "Size/size-3000",
+        "Size/size-4000",
         "Size/size-4500",
         "Size/size-500",
         "Size/size-5400",
@@ -566,6 +567,7 @@
         "Size/Width/1000",
         "Size/Width/1400",
         "Size/Width/1500",
+        "Size/Width/1900",
         "Size/Width/2000",
         "Size/Width/2500",
         "Size/Width/3000",
@@ -583,11 +585,14 @@
         "Content/max-width-reading",
         "Content/min-width-content",
         "Content/width-content",
+        "Grid/columns",
         "Grid/gutter",
         "Grid/width-column",
         "Modal/width-modal-lg",
         "Modal/width-modal-md",
         "Modal/width-modal-sm",
+        "Screen/pad-x-screen",
+        "Screen/width-screen",
         "Sidebar/pad-left-container",
         "Sidebar/sidebar-docked",
         "Sidebar/width-sidebar",
@@ -607,6 +612,9 @@
         "Card/inline-lg",
         "Card/inline-md",
         "Card/inline-sm",
+        "Card/max-height-lg",
+        "Card/max-height-md",
+        "Card/max-height-sm",
         "Card/min-width-lg",
         "Card/min-width-md",
         "Card/min-width-sm",
@@ -655,7 +663,8 @@
         "Table/indent",
         "Table/pad-x-cell",
         "Table/pad-y-cell",
-        "Table/radius"
+        "Table/radius",
+        "Table/stack"
       ]
     },
     "color / patterns": {

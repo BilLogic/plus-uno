@@ -152,6 +152,7 @@ The new Size, Element and Border scales (spacing / foundations), beside the spac
 --width-1000
 --width-1400
 --width-1500
+--width-1900
 --width-2000
 --width-2500
 --width-3000
@@ -165,6 +166,9 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --card-inline-lg
 --card-inline-md
 --card-inline-sm
+--card-max-height-lg
+--card-max-height-md
+--card-max-height-sm
 --card-min-width-lg
 --card-min-width-md
 --card-min-width-sm
@@ -176,6 +180,7 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --card-stack-lg
 --card-stack-md
 --card-stack-sm
+--layout-columns
 --layout-gutter
 --layout-height-topbar
 --layout-max-height-modal
@@ -183,11 +188,13 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --layout-max-width-reading
 --layout-min-width-content
 --layout-pad-left-container
+--layout-pad-x-screen
 --layout-width-column
 --layout-width-content
 --layout-width-modal-lg
 --layout-width-modal-md
 --layout-width-modal-sm
+--layout-width-screen
 --layout-width-sidebar
 --modal-inline-lg
 --modal-inline-md
@@ -234,6 +241,7 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --table-pad-x-cell
 --table-pad-y-cell
 --table-radius
+--table-stack
 ```
 
 ## Type Scale
@@ -711,6 +719,7 @@ The new primitives (spacing / primitives), named by rem × 100; point semantic t
 --size-2500
 --size-300
 --size-3000
+--size-4000
 --size-4500
 --size-500
 --size-5400

@@ -660,6 +660,23 @@ const SCALE_COLLECTIONS = [
     { file: 'spacing _ foundations.json', heading: 'spacing / foundations' },
 ];
 
+/**
+ * The variables with each folder kept together at every depth, folders in the
+ * order they first appear. Figma adds a new variable at the end of its
+ * collection, so without this `Size/Width/1900` would land after `Size/Image`
+ * instead of beside the other widths.
+ */
+function byFolder(variables, depth = 0) {
+    const groups = new Map();
+    for (const v of variables) {
+        const parts = v.name.split('/');
+        const key = depth < parts.length - 1 ? parts[depth].trim() : '';
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(v);
+    }
+    return [...groups].flatMap(([key, vs]) => (key ? byFolder(vs, depth + 1) : vs));
+}
+
 /** `var(--element-pad-x-sm)` -> `--element-pad-x-sm`, or `null` when it is not a `var()` of one name. */
 const webName = (syntax) => /^var\((--[a-z0-9-]+)\)$/.exec(syntax ?? '')?.[1] ?? null;
 
@@ -691,7 +708,7 @@ function generateScalesSCSS() {
     for (const { file, heading, json, modes: [mode] } of sources) {
         scss += `\n    /* ${heading} */\n`;
         let folder = null;
-        for (const v of json.variables) {
+        for (const v of byFolder(json.variables)) {
             // A comment at each top-level folder (Space, Radius … Size, Element, Border).
             const top = v.name.split('/')[0];
             if (top !== folder) scss += `    /* ${(folder = top)} */\n`;
@@ -730,6 +747,9 @@ const FRAME_LAYER_MODES = ['Medium (768px)', 'Large (1024px)', 'X-Large (1440px)
  * sidebar layer. Code docks the sidebar with a media query instead.
  */
 const FIGMA_ONLY_FRAME_LAYERS = new Set(['sidebar-docked']);
+
+/** Figma numbers that are counts, not lengths, so CSS takes them without a unit. */
+const UNITLESS_FRAME_LAYERS = new Set(['columns']);
 
 /**
  * Tokens code needs that Figma cannot hold: a height relative to the screen,
@@ -788,7 +808,7 @@ function generateFrameLayersSCSS() {
         root += `\n    /* ${heading} */\n`;
         let folder = null;
 
-        for (const v of json.variables) {
+        for (const v of byFolder(json.variables)) {
             const leaf = v.name.split('/').pop();
             if (v.resolvedType === 'BOOLEAN') {
                 if (!FIGMA_ONLY_FRAME_LAYERS.has(leaf)) {
@@ -813,7 +833,7 @@ function generateFrameLayersSCSS() {
                     if (!scaleName[val.id]) throw new Error(`${file}: ${v.name} aliases ${val.id}, which none of the scale exports holds.`);
                     return `var(${scaleName[val.id]})`;
                 }
-                if (typeof val === 'number') return px(val);
+                if (typeof val === 'number') return UNITLESS_FRAME_LAYERS.has(leaf) ? String(val) : px(val);
                 if (val?.r !== undefined) return cssColor(val);
                 throw new Error(`${file}: ${v.name} has no value at ${mode.name}.`);
             };

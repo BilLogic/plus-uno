@@ -374,7 +374,7 @@
       "valuesByMode": {
         "19378:4": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:238"
+          "id": "VariableID:19413:29"
         }
       },
       "resolvedValuesByMode": {
@@ -1093,6 +1093,90 @@
       },
       "resolvedValuesByMode": {
         "19378:4": 8
+      }
+    },
+    {
+      "id": "VariableID:19413:33",
+      "name": "Table/stack",
+      "variableCollectionId": "VariableCollectionId:19378:46226",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--table-stack)"
+      },
+      "valuesByMode": {
+        "19378:4": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:203"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19378:4": 8
+      }
+    },
+    {
+      "id": "VariableID:19413:34",
+      "name": "Card/max-height-sm",
+      "variableCollectionId": "VariableCollectionId:19378:46226",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--card-max-height-sm)"
+      },
+      "valuesByMode": {
+        "19378:4": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:238"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19378:4": 304
+      }
+    },
+    {
+      "id": "VariableID:19413:35",
+      "name": "Card/max-height-md",
+      "variableCollectionId": "VariableCollectionId:19378:46226",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--card-max-height-md)"
+      },
+      "valuesByMode": {
+        "19378:4": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:240"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19378:4": 400
+      }
+    },
+    {
+      "id": "VariableID:19413:36",
+      "name": "Card/max-height-lg",
+      "variableCollectionId": "VariableCollectionId:19378:46226",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--card-max-height-lg)"
+      },
+      "valuesByMode": {
+        "19378:4": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19413:28"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19378:4": 640
       }
     }
   ]
