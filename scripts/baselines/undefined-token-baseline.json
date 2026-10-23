@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 73,
-    "uses": 231,
+    "names": 72,
+    "uses": 229,
     "bare": 5
   },
   "tokens": {
@@ -129,15 +129,11 @@
       "bare": 0
     },
     "--font-weight-light": {
-      "uses": 2,
+      "uses": 1,
       "bare": 0
     },
     "--font-weight-medium": {
       "uses": 3,
-      "bare": 0
-    },
-    "--font-weight-regular": {
-      "uses": 1,
       "bare": 0
     },
     "--line-height-h4": {
