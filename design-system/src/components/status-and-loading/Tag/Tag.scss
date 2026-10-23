@@ -213,19 +213,21 @@ $tag-colors: (
 }
 
 /*
- * Initials: Lato SemiBold 7, as in Figma. The 7px has no type token; it is the
- * one size that fits two letters in a 16 disc.
+ * Initials: Lato SemiBold 7, as in Figma. No text style is that small; 7 is
+ * the one size that fits two letters in the 16 disc, so it is the disc's size
+ * scaled, not a number of its own.
  */
 .plus-tag__initials {
     color: var(--color-on-surface, #191c1e);
-    font-family: var(--font-family-header, "Lato", sans-serif);
-    font-size: 7px;
-    font-weight: var(--font-weight-semibold-2, 600);
+    font-family: var(--type-family-heading);
+    font-size: calc(var(--icon-md) * 7 / 16);
+    font-weight: var(--type-weight-semibold);
     line-height: 1;
     letter-spacing: 0;
 }
 
 .plus-tag__label {
+    font: var(--body-small);
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -342,13 +344,13 @@ $tag-colors: (
     appearance: none;
     background: transparent;
     color: var(--color-on-surface-variant, #3f484a);
-    font-size: var(--font-size-fa-body2, 12px);
+    font-size: var(--icon-sm);
     line-height: 1;
     cursor: pointer;
 }
 
 .plus-tag__remove > i {
-    font-size: var(--font-size-fa-body2, 12px);
+    font-size: var(--icon-sm);
     line-height: 1;
 }
 

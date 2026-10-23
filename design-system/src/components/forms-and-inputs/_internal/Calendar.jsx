@@ -45,7 +45,7 @@ const Calendar = ({
 
     const cells = [];
     for (let i = firstWeekday - 1; i >= 0; i -= 1) {
-        cells.push(<div key={`prev-${i}`} className="plus-calendar-day plus-calendar-day--outside body2-txt">{lastOfPrevious - i}</div>);
+        cells.push(<div key={`prev-${i}`} className="plus-calendar-day plus-calendar-day--outside">{lastOfPrevious - i}</div>);
     }
     for (let day = 1; day <= daysInMonth; day += 1) {
         const date = new Date(year, month, day);
@@ -71,7 +71,6 @@ const Calendar = ({
                 }}
                 className={[
                     'plus-calendar-day',
-                    'body2-txt',
                     disabled && 'plus-calendar-day--disabled',
                     isSelected && 'plus-calendar-day--selected',
                     inRange && 'plus-calendar-day--in-range',
@@ -83,7 +82,7 @@ const Calendar = ({
         );
     }
     for (let day = 1; cells.length < 42; day += 1) {
-        cells.push(<div key={`next-${day}`} className="plus-calendar-day plus-calendar-day--outside body2-txt">{day}</div>);
+        cells.push(<div key={`next-${day}`} className="plus-calendar-day plus-calendar-day--outside">{day}</div>);
     }
 
     const turn = (step) => onViewDateChange(new Date(year, month + step, 1));
@@ -94,13 +93,13 @@ const Calendar = ({
                 <button type="button" className="plus-calendar-nav" onClick={() => turn(-1)} aria-label="Previous month">
                     <i className="fa-solid fa-chevron-left" aria-hidden="true" />
                 </button>
-                <div className="plus-calendar-month h6" aria-live="polite">{formatMonthYear(viewDate)}</div>
+                <div className="plus-calendar-month" aria-live="polite">{formatMonthYear(viewDate)}</div>
                 <button type="button" className="plus-calendar-nav" onClick={() => turn(1)} aria-label="Next month">
                     <i className="fa-solid fa-chevron-right" aria-hidden="true" />
                 </button>
             </div>
             <div className="plus-calendar-weekdays" aria-hidden="true">
-                {WEEKDAYS.map((day) => <div key={day} className="plus-calendar-weekday body3-txt">{day}</div>)}
+                {WEEKDAYS.map((day) => <div key={day} className="plus-calendar-weekday">{day}</div>)}
             </div>
             <div className="plus-calendar-days">{cells}</div>
         </div>

@@ -335,7 +335,7 @@ $btn-themes: (
     .plus-btn-visual--leading {
         margin-right: 0;
         margin-bottom: var(--size-element-gap-sm);
-        font-size: 1.5em;
+        font-size: var(--icon-lg);
     }
 }
 

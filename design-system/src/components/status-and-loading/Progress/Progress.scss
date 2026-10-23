@@ -22,10 +22,7 @@
         height: 100%;
         background-color: var(--color-primary);
         color: var(--color-on-primary);
-        font-family: var(--font-family-body);
-        font-size: var(--font-size-body3);
-        font-weight: var(--font-weight-semibold-1);
-        line-height: var(--font-line-height-body3);
+        font: var(--body-small);
         border-radius: var(--size-element-radius-full);
         transition: width 0.3s ease;
     }
@@ -36,7 +33,7 @@
 
         .plus-progress-bar,
         .progress-bar {
-            font-size: var(--font-size-body3);
+            font-size: var(--font-size-075);
         }
     }
 
@@ -45,7 +42,7 @@
 
         .plus-progress-bar,
         .progress-bar {
-            font-size: var(--font-size-body2);
+            font-size: var(--font-size-0875);
         }
     }
 

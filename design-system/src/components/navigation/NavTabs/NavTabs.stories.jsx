@@ -9,6 +9,7 @@ export default {
     parameters: {
         changelog: [
             { date: '2026-10-23', kind: 'changed', summary: 'Tabs and dropdown tabs are 32, with Body/default labels at the medium weight.' },
+            { date: '2026-10-23', kind: 'changed', summary: 'The selected tab keeps the medium weight; the underline and the color mark it.' },
         ],
         docs: {
             description: {

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useId, useLayoutEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useAnchoredPopup } from '../_internal/anchorPlacement';
 import './Dropdown.scss';
@@ -239,6 +239,117 @@ const Dropdown = ({
         </button>
     );
 
+    /*
+     * A `header` item is a group label, not a row: the items after it, up to
+     * the next header, sit in a group it names. It is 12 semibold and is not
+     * a heading, so it stays out of the page's heading outline.
+     */
+    const groupBaseId = useId();
+    const groups = [];
+    items.forEach((item, index) => {
+        if (item.header) {
+            groups.push({ key: index, header: item, entries: [] });
+            return;
+        }
+        const last = groups[groups.length - 1];
+        if (last) last.entries.push([item, index]);
+        else groups.push({ key: index, header: null, entries: [[item, index]] });
+    });
+
+    const renderItem = (item, index) => {
+        const itemClasses = `dropdown-item ${item.selected ? 'selected' : ''} ${item.disabled ? 'disabled' : ''}`;
+        const choose = (e) => {
+            if (item.onClick) item.onClick(e);
+            if (!item.keepOpen) closeDropdown(); // Allow optional keepOpen for things like multi-select
+        };
+        const inner = (
+            <div className="dropdown-item-inner">
+                {/*
+                  * The multi-select checkbox, Figma's `_Form
+                  * Checkbox Button`. Decorative: a toggle row says
+                  * whether it is on through `aria-pressed`. A row
+                  * without it has nothing before its leading icon
+                  * or words, so its words start at the padding.
+                  */}
+                {item.multiSelectCheckbox && (
+                    <span
+                        className={`pdropdown-checkbox${item.multiSelectChecked ? ' is-checked' : ''}`}
+                        aria-hidden="true"
+                    >
+                        {item.multiSelectChecked && <CheckGlyph />}
+                    </span>
+                )}
+
+                {item.leadingIcon && <i className={`fas fa-${item.leadingIcon}`} aria-hidden="true" />}
+
+                <span className="pdropdown-item-text">
+                    <span className="pdropdown-item-label">{item.text || item.label}</span>
+                    {/* A second line under the label; the row grows to hold it. */}
+                    {item.description && (
+                        <span className="pdropdown-item-description">{item.description}</span>
+                    )}
+                </span>
+
+                {/* Decorative, like the leading icon: the text names the item. */}
+                {item.trailingIcon && <i className={`fas fa-${item.trailingIcon}`} aria-hidden="true"></i>}
+
+                {item.counter !== undefined && (
+                    <span className="pdropdown-counter">
+                        {item.counter}
+                    </span>
+                )}
+
+                {item.dropright && <i className="fas fa-caret-right"></i>}
+            </div>
+        );
+        /*
+         * An item with `href` goes somewhere, so it is a link, not
+         * a button that navigates: it opens in the same tab, as
+         * Tag's link does, can be opened in a new one, and is
+         * announced as a link. `linkComponent` is a
+         * router's link, as Tag takes one.
+         */
+        const ItemLink = item.linkComponent || 'a';
+        // An `isStatic` item only says its words: a row, not a
+        // control, so nothing to press or focus, and a press on it
+        // leaves the menu open.
+        const renderControl = () => {
+            if (item.isStatic) {
+                return <div className={`${itemClasses} pdropdown-item-static`}>{inner}</div>;
+            }
+            if (item.href && !item.disabled) {
+                return (
+                    <ItemLink className={itemClasses} href={item.href} onClick={choose}>
+                        {inner}
+                    </ItemLink>
+                );
+            }
+            return (
+                <button
+                    type="button"
+                    className={itemClasses}
+                    disabled={item.disabled}
+                    // An `isToggle` item switches on and off in
+                    // place, so it says whether it is on.
+                    aria-pressed={item.isToggle ? Boolean(item.selected) : undefined}
+                    // `isBusy`: still working, so it says so.
+                    aria-busy={item.isBusy ? 'true' : undefined}
+                    onClick={choose}
+                >
+                    {inner}
+                </button>
+            );
+        };
+        return (
+            <React.Fragment key={index}>
+                {renderControl()}
+                {item.divider && index < items.length - 1 && (
+                    <div className="pdropdown-divider"></div>
+                )}
+            </React.Fragment>
+        );
+    };
+
     return (
         <div id={id} className={wrapperClasses} ref={dropdownRef} onKeyDown={handleKeyDown} onBlur={handleBlur}>
             {split ? (
@@ -271,97 +382,18 @@ const Dropdown = ({
                     ...(vertical && placement.shift ? { left: `${placement.shift}px` } : null),
                 }}
             >
-                {items.map((item, index) => {
-                    const itemClasses = `dropdown-item ${item.selected ? 'selected' : ''} ${item.disabled ? 'disabled' : ''} ${item.header ? 'dropdown-section-header' : ''}`;
-                    const choose = (e) => {
-                        if (item.onClick) item.onClick(e);
-                        if (!item.keepOpen) closeDropdown(); // Allow optional keepOpen for things like multi-select
-                    };
-                    const inner = (
-                        <div className="dropdown-item-inner">
-                            {/*
-                              * The multi-select checkbox, Figma's `_Form
-                              * Checkbox Button`. Decorative: a toggle row says
-                              * whether it is on through `aria-pressed`. A row
-                              * without it has nothing before its leading icon
-                              * or words, so its words start at the padding.
-                              */}
-                            {item.multiSelectCheckbox && (
-                                <span
-                                    className={`pdropdown-checkbox${item.multiSelectChecked ? ' is-checked' : ''}`}
-                                    aria-hidden="true"
-                                >
-                                    {item.multiSelectChecked && <CheckGlyph />}
-                                </span>
-                            )}
-
-                            {item.leadingIcon && <i className={`fas fa-${item.leadingIcon}`} aria-hidden="true" />}
-
-                            <span className="pdropdown-item-text">
-                                <span className="pdropdown-item-label">{item.text || item.label}</span>
-                                {/* A second line under the label; the row grows to hold it. */}
-                                {item.description && (
-                                    <span className="pdropdown-item-description">{item.description}</span>
-                                )}
-                            </span>
-
-                            {/* Decorative, like the leading icon: the text names the item. */}
-                            {item.trailingIcon && <i className={`fas fa-${item.trailingIcon}`} aria-hidden="true"></i>}
-
-                            {item.counter !== undefined && (
-                                <span className="pdropdown-counter">
-                                    {item.counter}
-                                </span>
-                            )}
-
-                            {item.dropright && <i className="fas fa-caret-right"></i>}
-                        </div>
-                    );
-                    /*
-                     * An item with `href` goes somewhere, so it is a link, not
-                     * a button that navigates: it opens in the same tab, as
-                     * Tag's link does, can be opened in a new one, and is
-                     * announced as a link. `linkComponent` is a
-                     * router's link, as Tag takes one.
-                     */
-                    const ItemLink = item.linkComponent || 'a';
-                    // An `isStatic` item only says its words: a row, not a
-                    // control, so nothing to press or focus, and a press on it
-                    // leaves the menu open.
-                    const renderControl = () => {
-                        if (item.isStatic) {
-                            return <div className={`${itemClasses} pdropdown-item-static`}>{inner}</div>;
-                        }
-                        if (item.href && !item.disabled) {
-                            return (
-                                <ItemLink className={itemClasses} href={item.href} onClick={choose}>
-                                    {inner}
-                                </ItemLink>
-                            );
-                        }
-                        return (
-                            <button
-                                type="button"
-                                className={itemClasses}
-                                disabled={item.disabled}
-                                // An `isToggle` item switches on and off in
-                                // place, so it says whether it is on.
-                                aria-pressed={item.isToggle ? Boolean(item.selected) : undefined}
-                                // `isBusy`: still working, so it says so.
-                                aria-busy={item.isBusy ? 'true' : undefined}
-                                onClick={choose}
-                            >
-                                {inner}
-                            </button>
-                        );
-                    };
+                {groups.map((group) => {
+                    const rows = group.entries.map(([item, index]) => renderItem(item, index));
+                    if (!group.header) return <React.Fragment key={group.key}>{rows}</React.Fragment>;
+                    const labelId = `${groupBaseId}-group-${group.key}`;
                     return (
-                        <React.Fragment key={index}>
-                            {renderControl()}
-                            {item.divider && index < items.length - 1 && (
-                                <div className="pdropdown-divider"></div>
-                            )}
-                        </React.Fragment>
+                        <div key={group.key} role="group" aria-labelledby={labelId}>
+                            <div id={labelId} className="dropdown-item dropdown-section-header">
+                                {group.header.text || group.header.label}
+                            </div>
+                            {group.header.divider && <div className="pdropdown-divider"></div>}
+                            {rows}
+                        </div>
                     );
                 })}
             </div>

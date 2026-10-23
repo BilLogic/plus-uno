@@ -24,9 +24,8 @@
             border: none;
             border-bottom: 1px solid var(--color-outline-variant);
             background-color: transparent;
-            font-weight: var(--font-weight-semibold-2, 600);
-            font-size: var(--font-size-body3, 12px);
-            line-height: var(--font-line-height-body3, 1.5);
+            // A column's label is a group label, not a heading: Heading/xxsmall 12/16.
+            font: var(--heading-xxsmall);
             color: var(--color-on-surface);
             text-align: left;
             vertical-align: middle;
@@ -48,9 +47,7 @@
             border: none;
             border-bottom: 1px solid var(--color-outline-variant);
             vertical-align: middle;
-            font-weight: var(--font-weight-normal, 400);
-            font-size: var(--font-size-body2, 14px);
-            line-height: var(--font-line-height-body2, 1.5);
+            font: var(--body-default);
             color: var(--color-on-surface);
             background-color: transparent;
         }

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import BootstrapModal from 'react-bootstrap/Modal';
 import Button from '@/components/actions/Button';
 import Skeleton from '@/components/status-and-loading/Skeleton';
+import { HeadingLevelContext } from '@/lib/headingLevel';
 
 /** Safe CSS length / custom-property patterns for Modal width. */
 const SAFE_WIDTH_RE = /^(?:\d+(?:\.\d+)?(?:px|rem|%)|var\(--[a-zA-Z0-9-]+(?:\s*,\s*[^)]+)?\))$/;
@@ -165,105 +166,109 @@ const Modal = ({
         ...(resolveModalWidth(width) || {}),
     };
 
+    // A dialog is its own page: its title is the h1, so a section in it opens at
+    // h2 whatever section the modal was raised from.
     const modalContent = (
-        <div id={id} ref={panelRef} className={classes} style={modalStyle} data-testid={dataTestId}>
-            {!bodyOnly && (
-                <>
-                    <div className="plus-modal-header">
-                        {(title || description) && (
-                            <div className="plus-modal-heading">
-                                {title && <h1 className="plus-modal-title" id={titleId}>{title}</h1>}
-                                {description && (
-                                    <div className="plus-modal-description" id={descriptionId}>{description}</div>
-                                )}
-                            </div>
-                        )}
-                        {headerActions && <div className="plus-modal-header-actions">{headerActions}</div>}
-                        {showCloseButton && (
-                            <button
-                                type="button"
-                                className="plus-modal-close-btn"
-                                aria-label="Close modal"
-                                onClick={onClose}
-                            >
-                                <i className="fa-solid fa-xmark" aria-hidden="true" />
-                            </button>
-                        )}
-                    </div>
-                    {dividers && <div className="plus-modal-divider" />}
-                </>
-            )}
-
-            <div
-                ref={bodyRef}
-                className={`plus-modal-body ${scrollable ? 'plus-modal-body-scrollable' : ''}`}
-                aria-busy={loading || undefined}
-                // A scrolling region must itself be reachable by keyboard
-                // (axe: scrollable-region-focusable) since its content isn't
-                // otherwise guaranteed to contain a focusable element.
-                tabIndex={scrollable || overflows ? 0 : undefined}
-            >
-                {loading ? (
-                    <div className="plus-modal-skeleton">
-                        <Skeleton shape="rect" width="100%" height={20} radius="element-radius-md" />
-                        <Skeleton shape="rect" width="100%" height={20} radius="element-radius-md" />
-                        <Skeleton shape="rect" width="60%" height={20} radius="element-radius-md" />
-                    </div>
-                ) : (
-                    <div className="plus-modal-content">
-                        {body && (typeof body === 'string' ? <div className="body1-txt">{body}</div> : body)}
-                        {children}
-                    </div>
+        <HeadingLevelContext.Provider value={1}>
+            <div id={id} ref={panelRef} className={classes} style={modalStyle} data-testid={dataTestId}>
+                {!bodyOnly && (
+                    <>
+                        <div className="plus-modal-header">
+                            {(title || description) && (
+                                <div className="plus-modal-heading">
+                                    {title && <h1 className="plus-modal-title" id={titleId}>{title}</h1>}
+                                    {description && (
+                                        <div className="plus-modal-description" id={descriptionId}>{description}</div>
+                                    )}
+                                </div>
+                            )}
+                            {headerActions && <div className="plus-modal-header-actions">{headerActions}</div>}
+                            {showCloseButton && (
+                                <button
+                                    type="button"
+                                    className="plus-modal-close-btn"
+                                    aria-label="Close modal"
+                                    onClick={onClose}
+                                >
+                                    <i className="fa-solid fa-xmark" aria-hidden="true" />
+                                </button>
+                            )}
+                        </div>
+                        {dividers && <div className="plus-modal-divider" />}
+                    </>
                 )}
-                {scrollable && (
-                    <div className="plus-modal-scrollbar">
-                        <div className="plus-modal-scrollbar-icon">
-                            <i className="fas fa-caret-up" />
+
+                <div
+                    ref={bodyRef}
+                    className={`plus-modal-body ${scrollable ? 'plus-modal-body-scrollable' : ''}`}
+                    aria-busy={loading || undefined}
+                    // A scrolling region must itself be reachable by keyboard
+                    // (axe: scrollable-region-focusable) since its content isn't
+                    // otherwise guaranteed to contain a focusable element.
+                    tabIndex={scrollable || overflows ? 0 : undefined}
+                >
+                    {loading ? (
+                        <div className="plus-modal-skeleton">
+                            <Skeleton shape="rect" width="100%" height={20} radius="element-radius-md" />
+                            <Skeleton shape="rect" width="100%" height={20} radius="element-radius-md" />
+                            <Skeleton shape="rect" width="60%" height={20} radius="element-radius-md" />
                         </div>
-                        <div className="plus-modal-scrollbar-track">
-                            <div className="plus-modal-scrollbar-bar" />
+                    ) : (
+                        <div className="plus-modal-content">
+                            {body && (typeof body === 'string' ? <div className="plus-modal-body-text">{body}</div> : body)}
+                            {children}
                         </div>
-                        <div className="plus-modal-scrollbar-icon">
-                            <i className="fas fa-caret-down" />
+                    )}
+                    {scrollable && (
+                        <div className="plus-modal-scrollbar">
+                            <div className="plus-modal-scrollbar-icon">
+                                <i className="fas fa-caret-up" />
+                            </div>
+                            <div className="plus-modal-scrollbar-track">
+                                <div className="plus-modal-scrollbar-bar" />
+                            </div>
+                            <div className="plus-modal-scrollbar-icon">
+                                <i className="fas fa-caret-down" />
+                            </div>
                         </div>
-                    </div>
+                    )}
+                </div>
+
+                {hasFooter && (
+                    <>
+                        {dividers && <div className="plus-modal-divider" />}
+                        <div className="plus-modal-footer">
+                            {footer || (
+                                <div className="plus-modal-button-row">
+                                    {secondaryButton && (
+                                        <Button
+                                            text={secondaryButton.text || 'Cancel'}
+                                            style={secondaryButton.style || 'secondary'}
+                                            fill={secondaryButton.fill || 'tonal'}
+                                            size={secondaryButton.size || 'medium'}
+                                            onClick={secondaryButton.onClick}
+                                            leadingVisual={secondaryButton.icon}
+                                            className="plus-modal-button plus-modal-button-secondary"
+                                        />
+                                    )}
+                                    {primaryButton && (
+                                        <Button
+                                            text={primaryButton.text || 'Confirm'}
+                                            style={primaryButton.style || 'primary'}
+                                            fill={primaryButton.fill || 'filled'}
+                                            size={primaryButton.size || 'medium'}
+                                            onClick={primaryButton.onClick}
+                                            leadingVisual={primaryButton.icon}
+                                            className="plus-modal-button plus-modal-button-primary"
+                                        />
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </>
                 )}
             </div>
-
-            {hasFooter && (
-                <>
-                    {dividers && <div className="plus-modal-divider" />}
-                    <div className="plus-modal-footer">
-                        {footer || (
-                            <div className="plus-modal-button-row">
-                                {secondaryButton && (
-                                    <Button
-                                        text={secondaryButton.text || 'Cancel'}
-                                        style={secondaryButton.style || 'secondary'}
-                                        fill={secondaryButton.fill || 'tonal'}
-                                        size={secondaryButton.size || 'medium'}
-                                        onClick={secondaryButton.onClick}
-                                        leadingVisual={secondaryButton.icon}
-                                        className="plus-modal-button plus-modal-button-secondary"
-                                    />
-                                )}
-                                {primaryButton && (
-                                    <Button
-                                        text={primaryButton.text || 'Confirm'}
-                                        style={primaryButton.style || 'primary'}
-                                        fill={primaryButton.fill || 'filled'}
-                                        size={primaryButton.size || 'medium'}
-                                        onClick={primaryButton.onClick}
-                                        leadingVisual={primaryButton.icon}
-                                        className="plus-modal-button plus-modal-button-primary"
-                                    />
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </>
-            )}
-        </div>
+        </HeadingLevelContext.Provider>
     );
 
     if (renderAs === 'inline') {

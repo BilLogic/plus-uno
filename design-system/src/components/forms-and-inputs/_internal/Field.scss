@@ -43,10 +43,7 @@
 .plus-field-label {
     margin-bottom: 0;
     color: var(--color-on-surface);
-    font-family: var(--font-family-body);
-    font-weight: var(--font-weight-normal);
-    font-size: var(--font-size-body3);
-    line-height: var(--font-line-height-body3);
+    font: var(--body-small);
 }
 
 .plus-field-required {
@@ -74,8 +71,7 @@
     border: 0;
     background: none;
     color: var(--color-on-surface-variant);
-    font-size: var(--font-size-body3);
-    line-height: var(--font-line-height-body3);
+    font: var(--body-small);
     cursor: help;
 
     &:focus-visible {
@@ -96,8 +92,6 @@
     border-radius: var(--size-element-radius-sm);
     background-color: var(--color-surface);
     color: var(--color-on-surface);
-    font-family: var(--font-family-body);
-    font-weight: var(--font-weight-normal);
     cursor: text;
     transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
 
@@ -105,8 +99,7 @@
     // the top and bottom.
     height: var(--item-height-md);
     padding: 0 calc(var(--element-pad-x-md) - var(--size-element-border));
-    font-size: var(--font-size-body2);
-    line-height: var(--font-line-height-body2);
+    font: var(--body-default);
 
     // Several lines (Text area): 80 at least, growing with its rows, and the
     // first line sits where a single-line field's text does.
@@ -324,8 +317,7 @@ textarea.plus-field__control {
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--size-element-gap-sm);
-    font-size: var(--font-size-body3);
-    line-height: var(--font-line-height-body3);
+    font: var(--body-small);
 }
 
 .plus-field-caption__message {
@@ -336,7 +328,7 @@ textarea.plus-field__control {
 
     i {
         flex-shrink: 0;
-        font-size: var(--font-size-body3);
+        font-size: var(--icon-sm);
     }
 
     &--help {

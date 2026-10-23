@@ -106,6 +106,5 @@
 .plus-tag-input__hint {
     padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
     color: var(--color-on-surface-variant);
-    font-size: var(--font-size-body3);
-    line-height: var(--font-line-height-body3);
+    font: var(--body-small);
 }

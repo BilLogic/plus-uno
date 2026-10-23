@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { HeadingLevelContext, headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './PatternSection.scss';
 
 /**
@@ -8,6 +9,11 @@ import './PatternSection.scss';
  * actions slot aligned to the title row, and content children. Standard
  * section padding/gap tokens; flat (no elevation on basic sections).
  * Mirrors the "Section" slot component in the Figma design system file.
+ *
+ * Its title is one heading level below what holds it, and one size smaller:
+ * a section on a page is an h2 at Heading/medium 20, a section inside a
+ * section is a subsection, an h3 at Heading/small 16. Deeper sections keep
+ * the subsection size.
  */
 const PatternSection = ({
     id,
@@ -31,28 +37,37 @@ const PatternSection = ({
     ].filter(Boolean).join(' ');
 
     const hasHeader = title || description || actions;
+    const parentLevel = useHeadingLevel();
+    const level = parentLevel + 1;
+    const Title = headingTag(level);
+    const rank = level > 2 ? 'subsection' : 'section';
 
     return (
         <section id={id} className={classes} style={style} {...props}>
             {hasHeader && (
                 <div className="plus-pattern-section-header">
                     <div className="plus-pattern-section-heading">
-                        {title && <h2 className="plus-pattern-section-title h5">{title}</h2>}
+                        {title && (
+                            <Title className={`plus-pattern-section-title plus-pattern-section-title--${rank}`}>{title}</Title>
+                        )}
                         {description && (
-                            <p className="plus-pattern-section-description body1-txt">{description}</p>
+                            <p className="plus-pattern-section-description">{description}</p>
                         )}
                     </div>
                     {actions && <div className="plus-pattern-section-actions">{actions}</div>}
                 </div>
             )}
-            <div className="plus-pattern-section-content">{children}</div>
+            {/* A section with no title is a wrapper: what it holds keeps the parent's level. */}
+            <HeadingLevelContext.Provider value={title ? level : parentLevel}>
+                <div className="plus-pattern-section-content">{children}</div>
+            </HeadingLevelContext.Provider>
         </section>
     );
 };
 
 PatternSection.propTypes = {
     id: PropTypes.string,
-    /** Section title */
+    /** Section title: an h2 at Heading/medium 20, or an h3 at Heading/small 16 inside another section */
     title: PropTypes.node,
     /** Optional description under the title */
     description: PropTypes.node,

@@ -30,10 +30,10 @@ const Jumbotron = ({
     return (
         <div id={id} className={classes} style={style} {...props}>
             <div className="plus-jumbotron-content">
-                {title && <h1 className="plus-jumbotron-title h1">{title}</h1>}
-                {subtitle && <p className="plus-jumbotron-subtitle h4">{subtitle}</p>}
+                {title && <h1 className="plus-jumbotron-title">{title}</h1>}
+                {subtitle && <p className="plus-jumbotron-subtitle">{subtitle}</p>}
 
-                {children && <div className="plus-jumbotron-body body1-txt">{children}</div>}
+                {children && <div className="plus-jumbotron-body">{children}</div>}
 
                 {(primaryButton || secondaryButton) && (
                     <div className="plus-jumbotron-actions">
@@ -71,6 +71,7 @@ const Jumbotron = ({
 };
 
 Jumbotron.propTypes = {
+    /** The page's title, rendered as its one h1: a page with a Jumbotron gives its Surface no `title`. */
     title: PropTypes.node,
     subtitle: PropTypes.node,
     children: PropTypes.node,

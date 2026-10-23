@@ -109,7 +109,7 @@ export const Count = ({
      */
     return (
         <span id={id} className={classes} {...rest}>
-            <span className="plus-count__value body3-txt" aria-hidden={label ? 'true' : undefined}>
+            <span className="plus-count__value" aria-hidden={label ? 'true' : undefined}>
                 {text}
             </span>
             {label && <span className="plus-count__label">{label}</span>}

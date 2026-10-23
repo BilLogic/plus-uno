@@ -50,9 +50,7 @@
 .plus-file-upload-label {
     margin-bottom: 0;
     color: var(--color-on-surface);
-    font-weight: var(--font-weight-normal);
-    font-size: var(--font-size-body2);
-    line-height: var(--font-line-height-body2);
+    font: var(--body-default);
     
     .plus-file-upload-required {
         color: var(--color-danger);
@@ -67,10 +65,7 @@
 .plus-file-upload-description {
     margin: 0;
     color: var(--color-on-surface);
-    font-family: var(--font-family-body);
-    font-weight: var(--font-weight-normal);
-    font-size: var(--font-size-body2);
-    line-height: var(--font-line-height-body2);
+    font: var(--body-default);
 }
 
 .plus-file-upload-disabled .plus-file-upload-description {
@@ -104,11 +99,10 @@
     display: flex;
     align-items: center;
     gap: var(--size-element-gap-xs, 4px);
-    font-size: var(--font-size-body3);
-    line-height: var(--font-line-height-body3);
+    font: var(--body-small);
     
     i {
-        font-size: var(--font-size-body3);
+        font-size: var(--icon-sm);
         flex-shrink: 0;
     }
 }

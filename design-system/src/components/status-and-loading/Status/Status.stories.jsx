@@ -413,8 +413,9 @@ DateStyleFallback.play = async ({ canvasElement }) => {
 };
 
 /**
- * The weight is pinned at both sizes: regular (B3) in medium, semibold (B2) in
- * large. A Status inside a table header or a heading does not inherit bold.
+ * The weight is pinned at both sizes: regular, from body.small in medium and
+ * body.default in large. A Status inside a table header or a heading does not
+ * inherit bold.
  */
 export const PinnedWeight = () => (
     <table>
@@ -438,11 +439,10 @@ PinnedWeight.play = async ({ canvasElement }) => {
     const header = getComputedStyle(canvasElement.querySelector('th')).fontWeight;
     await expect(Number(header), 'the header around it is bold').toBeGreaterThanOrEqual(600);
 
-    const regular = tokenWeight(canvasElement, '--font-weight-body3-regular');
-    const semibold = tokenWeight(canvasElement, '--font-weight-body2-semibold');
+    const regular = tokenWeight(canvasElement, '--type-weight-regular');
     for (const where of ['th', 'td']) {
-        await expect(weight(`${where}-medium`), `medium in a ${where} is B3 regular`).toBe(regular);
-        await expect(weight(`${where}-large`), `large in a ${where} is B2 semibold`).toBe(semibold);
+        await expect(weight(`${where}-medium`), `medium in a ${where} is regular`).toBe(regular);
+        await expect(weight(`${where}-large`), `large in a ${where} is regular`).toBe(regular);
     }
 };
 
