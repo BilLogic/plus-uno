@@ -2,6 +2,10 @@ import React, { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import './Popover.scss';
 import { Popover as BootstrapPopover, OverlayTrigger } from 'react-bootstrap';
+import { popoverOverlayProps } from '@/lib/popoverPlacement';
+
+/** The width tiers, Popover/width-sm · md · lg: 320 · 400 · 480. */
+const WIDTHS = ['sm', 'md', 'lg'];
 
 // Wrapper for the Popover content
 const PopoverContent = forwardRef(({
@@ -55,12 +59,14 @@ const Popover = ({
     show, // Controlled state
     onToggle, // Callback for controlled state
     container,
-    offset = [0, 8],
+    offset,
     rootClose,
+    width = 'sm',
     className = '',
     id,
     ...props
 }) => {
+    const widthClass = WIDTHS.includes(width) && width !== 'sm' ? `plus-popover--${width}` : '';
 
     // Map our trigger types to react-bootstrap trigger types
     // RB uses 'click', 'hover', 'focus' or arrays.
@@ -72,13 +78,15 @@ const Popover = ({
     const overlayTriggerProps = {
         placement,
         overlay: (
-            <PopoverContent title={title} className={className} id={id} {...props}>
+            <PopoverContent title={title} className={[widthClass, className].filter(Boolean).join(' ')} id={id} {...props}>
                 {children}
             </PopoverContent>
         ),
         defaultShow,
         container,
-        offset
+        // 4 from the trigger unless the caller passes `offset`, and never
+        // nearer than 8 to the screen's edge.
+        ...popoverOverlayProps(offset),
     };
 
     if (triggerType === 'manual') {
@@ -179,6 +187,8 @@ Popover.propTypes = {
     offset: PropTypes.array,
     /** Dismiss on a click outside. Defaults to true for every trigger but `manual`. */
     rootClose: PropTypes.bool,
+    /** The width tier: sm 320 (default), md 400 or lg 480. */
+    width: PropTypes.oneOf(WIDTHS),
     className: PropTypes.string,
     id: PropTypes.string
 };

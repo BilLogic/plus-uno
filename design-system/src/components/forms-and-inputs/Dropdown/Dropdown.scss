@@ -78,25 +78,33 @@ $dropdown-themes: (
     }
 
     // --- DROPDOWN MENU ---
+    // The Popover family's Menu (Figma Pattern/Menu): no scrim, rows inset
+    // pad-menu 4, 160 to 320 wide, and at most 320 tall, past which it scrolls
+    // and the row it cuts says so. This is the single source: consumers must
+    // NOT re-declare the menu background, radius, or shadow inline. Items are
+    // transparent and adopt this surface.
     .dropdown-menu {
         position: absolute;
-        // The popup placement rule: the gap to the toggle is the token, on
+        // The popup placement rule: the offset to the toggle is the token, on
         // whichever side the menu opens, so Bootstrap's own spacer margin goes.
-        top: calc(100% + var(--size-element-gap-xs));
+        top: calc(100% + var(--popover-offset));
         left: 0;
         margin: 0;
         z-index: 1000;
-        // At least the toggle (the wrapper is its width), and never under 200px.
-        min-width: max(200px, 100%);
-        max-width: var(--layout-max-width-listbox);
-        padding: var(--size-element-pad-y-sm) 0;
-        // Canonical menu surface per Figma (BS4 Dropdown → surface-container #edeef0).
-        // This is the single source: consumers must NOT re-declare the menu background,
-        // radius, or shadow inline. Items are transparent and adopt this surface.
-        background-color: var(--color-surface-container);
-        border: var(--size-element-stroke-sm) solid var(--color-outline-variant);
-        border-radius: var(--size-element-radius-md);
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+        box-sizing: border-box;
+        // As wide as its rows, at least the toggle (the wrapper is its width),
+        // and never under 160.
+        width: max-content;
+        min-width: max(var(--popover-min-width-menu), 100%);
+        max-width: var(--popover-max-width-menu);
+        max-height: var(--popover-max-height-menu);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding: var(--popover-pad-menu);
+        background-color: var(--color-surface-overlay);
+        border: var(--border-default) solid var(--color-outline-variant);
+        border-radius: var(--popover-radius-menu-md);
+        box-shadow: var(--elevation-light-2);
         display: none;
 
         &.show {
@@ -114,9 +122,14 @@ $dropdown-themes: (
         flex-direction: row;
         justify-content: flex-start;
         align-items: center;
-        gap: var(--size-element-gap-md);
+        gap: var(--element-inline-md);
+        box-sizing: border-box;
         width: 100%;
-        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
+        // An Item 32 (Figma _Pattern/Menu row): pad-y 6 around a 20 line, and
+        // a Description line makes it grow rather than squeeze.
+        min-height: var(--item-height-md);
+        padding: var(--element-pad-y-md) var(--element-pad-x-md);
+        border-radius: var(--element-radius-item-md);
         // Transparent so the item always adopts the menu container's surface — a hard-coded
         // --color-surface left items near-white on menus that use a darker container token
         // (e.g. the Engagement/Attendance menus on --color-surface-container-high), so the
@@ -125,10 +138,7 @@ $dropdown-themes: (
         background-color: transparent;
         border: none;
         color: var(--color-on-surface);
-        font-family: var(--font-family-body);
-        font-size: var(--font-size-body2);        // Body/B2
-        font-weight: var(--font-weight-normal);    // Regular
-        line-height: var(--font-line-height-body2);
+        font: var(--body-default);
         text-align: left;
         text-decoration: none;
         cursor: pointer;
@@ -152,23 +162,16 @@ $dropdown-themes: (
             background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
         }
 
-        // Selected (JSX uses 'selected'), as Figma's `state=selected`: the
-        // primary-container 16 ground, with a primary-container stroke of
-        // stroke-xl on the left edge only.
+        // Selected (JSX uses 'selected'), as Pattern/Menu's `state=selected`:
+        // the primary state layer 08 with primary text, label and description
+        // alike. There is no left bar.
         &.selected,
         &.active {
-            position: relative;
-            background-color: var(--color-primary-container-state-16);
-            color: var(--color-on-surface);
+            background-color: var(--color-primary-state-08);
+            color: var(--color-primary-text);
 
-            &::before {
-                content: '';
-                position: absolute;
-                left: 0;
-                top: 0;
-                bottom: 0;
-                width: var(--size-element-stroke-xl);
-                background-color: var(--color-primary-container);
+            .pdropdown-item-description {
+                color: var(--color-primary-text);
             }
         }
 
@@ -190,9 +193,14 @@ $dropdown-themes: (
             }
         }
 
-        // Icon/Badge styling
+        // Icons draw at 16 (Size/Icon/md), in a 16 box so a glyph's own line
+        // box never makes the row taller than 32.
         i {
-            font-size: var(--font-size-fa-body1-solid);
+            flex-shrink: 0;
+            width: var(--icon-md);
+            font-size: var(--icon-md);
+            line-height: var(--icon-md);
+            text-align: center;
             color: var(--color-on-surface-variant);
         }
 
@@ -202,17 +210,19 @@ $dropdown-themes: (
     }
 
     // --- DROPDOWN HEADER/DIVIDER ---
+    // Pattern/Menu's Group heading: heading.xxsmall 12/16 in on-surface-variant,
+    // padded like a row, and no hover or press layer.
     .dropdown-header,
-    .pdropdown-header {
+    .pdropdown-header,
+    .dropdown-item.dropdown-section-header {
         display: block;
-        padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
+        min-height: 0;
+        padding: var(--element-pad-y-md) var(--element-pad-x-md);
         color: var(--color-on-surface-variant);
-        font-family: var(--font-family-body);
-        font-size: var(--font-size-body3);
-        font-weight: var(--font-weight-semibold-1);
+        font: var(--heading-xxsmall);
         white-space: nowrap;
         pointer-events: none;
-        padding-top: var(--size-element-pad-y-md);
+        background-color: transparent;
     }
 
     // --- MULTI-SELECT CHECKBOX ---
@@ -255,14 +265,23 @@ $dropdown-themes: (
     .dropdown-item-inner {
         display: flex;
         align-items: center;
-        gap: var(--size-element-gap-md);
+        gap: var(--element-inline-md);
         width: 100%;
     }
 
     // Label takes the free space so trailing icons (caret, counter, submenu chevron) sit flush right.
     .pdropdown-item-text {
+        display: flex;
+        flex-direction: column;
         flex: 1 1 auto;
         min-width: 0;
+    }
+
+    // The Description line under a row's label: body.small, and the row grows
+    // to hold it.
+    .pdropdown-item-description {
+        font: var(--body-small);
+        color: var(--color-on-surface-variant);
     }
 
     // --- COUNTER BADGE ---
@@ -293,7 +312,7 @@ $dropdown-themes: (
     // --- DIRECTION VARIANTS ---
     &.dropup .dropdown-menu {
         top: auto;
-        bottom: calc(100% + var(--size-element-gap-xs));
+        bottom: calc(100% + var(--popover-offset));
     }
 
     &.dropleft .dropdown-menu {
@@ -309,6 +328,25 @@ $dropdown-themes: (
 
     // --- SIZE VARIANTS ---
     &.small {
+
+        // Pattern/Menu size=sm: rows are an Item 24, pad 2 · 8 on
+        // radius-item-sm 6, in a menu on radius-menu-sm 10.
+        .dropdown-menu {
+            border-radius: var(--popover-radius-menu-sm);
+        }
+
+        .dropdown-item,
+        .pdropdown-item {
+            min-height: var(--item-height-sm);
+            padding: var(--element-pad-y-sm) var(--element-pad-x-sm);
+            border-radius: var(--element-radius-item-sm);
+        }
+
+        .dropdown-header,
+        .pdropdown-header,
+        .dropdown-item.dropdown-section-header {
+            padding: var(--element-pad-y-sm) var(--element-pad-x-sm);
+        }
 
         .pdropdown-toggle,
         .pdropdown-default-toggle,

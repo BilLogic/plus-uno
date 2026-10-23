@@ -1,57 +1,42 @@
 /*
- * Tooltip Component Styles
- * Per Figma specs - extends React Bootstrap Tooltip
- * Uses design system tokens - no hardcoded values
+ * Tooltip Component Styles: the Popover family's Tooltip (Figma
+ * Pattern/Tooltip). body.small 12/16 on the inverse surface, pad-y
+ * Popover/pad-y-tooltip 4, pad-x Element/pad-x-sm 8, radius
+ * Popover/radius-tooltip 6, and it wraps past Popover/max-width-tooltip 240.
+ * No arrow: it sits Popover/offset 4 from its trigger.
+ *
+ * Every size draws the one tooltip; `size` is kept so no call site breaks.
  */
 
-// Override Bootstrap tooltip styles
 .tooltip {
 
     &.plus-tooltip-default,
     &.plus-tooltip-small,
     &.plus-tooltip-large {
-        // Bootstrap tooltip variables (keeps arrow + bubble in sync)
+        // Bootstrap tooltip variables
         --bs-tooltip-bg: var(--color-inverse-surface);
         --bs-tooltip-color: var(--color-inverse-on-surface);
-        --bs-tooltip-border-radius: var(--size-element-radius-md);
+        --bs-tooltip-border-radius: var(--popover-radius-tooltip);
         --bs-tooltip-opacity: 1;
-        --bs-tooltip-padding-x: var(--size-element-pad-x-sm);
-        --bs-tooltip-padding-y: var(--size-element-pad-y-lg);
-        --bs-tooltip-max-width: 293.33px;
-        --bs-tooltip-arrow-width: var(--size-spacing-small-space-150); // 10px
-        --bs-tooltip-arrow-height: calc(
-            var(--size-spacing-small-space-050) + var(--size-border-stroke-stroke-100)
-        ); // 4px + 1px = 5px
+        --bs-tooltip-padding-x: var(--element-pad-x-sm);
+        --bs-tooltip-padding-y: var(--popover-pad-y-tooltip);
+        --bs-tooltip-max-width: var(--popover-max-width-tooltip);
+        // Bootstrap pads the tooltip by the arrow's height to make room for
+        // it; with no arrow the offset alone sets the distance.
+        --bs-tooltip-arrow-height: 0px;
+        --bs-tooltip-arrow-width: 0px;
+        --bs-tooltip-margin: 0;
 
-        .tooltip-inner {
-            font-family: var(--font-family-body);
-            font-weight: var(--font-weight-normal);
-            box-shadow: var(--elevation-light-2);
-            text-align: center;
+        padding: 0;
+
+        .tooltip-arrow {
+            display: none;
         }
-    }
 
-    // --- SIZE: SMALL ---
-    &.plus-tooltip-small {
         .tooltip-inner {
-            font-size: var(--font-size-body3);
-            line-height: var(--font-line-height-body3);
-        }
-    }
-
-    // --- SIZE: DEFAULT (MEDIUM) ---
-    &.plus-tooltip-default {
-        .tooltip-inner {
-            font-size: var(--font-size-body3);
-            line-height: var(--font-line-height-body3);
-        }
-    }
-
-    // --- SIZE: LARGE ---
-    &.plus-tooltip-large {
-        .tooltip-inner {
-            font-size: var(--font-size-body2);
-            line-height: var(--font-line-height-body2);
+            box-sizing: border-box;
+            font: var(--body-small);
+            text-align: left;
         }
     }
 }

@@ -1,26 +1,28 @@
 /*
- * Listbox — the internal option list (Figma _Listbox).
- * Surface roles/surface-overlay, an outline-variant border, Modal/radius-sm and
- * Elevation Light/2, as Figma binds them.
+ * Listbox — the internal option list (Figma _Listbox), a Popover family Menu.
+ * Surface roles/surface-overlay, an outline-variant border,
+ * Popover/radius-menu-md and Elevation Light/2, with its options inset
+ * Popover/pad-menu 4.
  */
 
 .plus-listbox {
     /*
-     * Figma Max Heights/listbox. 300px is about eight rows: the steering law
-     * keeps a scrolling list short and wide. There is no floor: a short list
-     * is as tall as its rows, so two options leave no empty band under them.
-     * The overlay layer sits above a modal, so a list opened from a field
-     * inside one is not covered by it.
+     * Popover/max-height-menu 320: nine rows and the cut tenth that says the
+     * list scrolls. There is no floor: a short list is as tall as its rows, so
+     * two options leave no empty band under them. The overlay layer sits
+     * above a modal, so a list opened from a field inside one is not covered
+     * by it.
      */
-    --plus-listbox-max-height: var(--layout-max-height-listbox);
+    --plus-listbox-max-height: var(--popover-max-height-menu);
     --plus-listbox-z-index: var(--layout-z-index-overlay);
     /*
      * The popup placement rule: content grows a list past its field up to
-     * 320px. `min-width` (the field's width) wins over this, so a field wider
-     * than the cap keeps its own width. Not a Figma variable.
+     * Popover/max-width-menu 320. `min-width` (the field's width) wins over
+     * this, so a field wider than the cap keeps its own width. It never comes
+     * nearer than Popover/gap-screen 8 to either side of the screen.
      */
-    --plus-listbox-max-width: var(--layout-max-width-listbox);
-    --plus-listbox-viewport-width: calc(100vw - 2 * var(--size-section-pad-x-md));
+    --plus-listbox-max-width: var(--popover-max-width-menu);
+    --plus-listbox-viewport-width: calc(100vw - 2 * var(--popover-gap-screen));
 
     display: flex;
     flex-direction: column;
@@ -30,7 +32,7 @@
     overflow: hidden;
     background-color: var(--color-surface-overlay);
     border: var(--size-element-border) solid var(--color-outline-variant);
-    border-radius: var(--size-modal-radius-sm);
+    border-radius: var(--popover-radius-menu-md);
     box-shadow: var(--elevation-light-2);
 }
 
@@ -48,7 +50,7 @@
    (`data-placement`, `data-side`). At least the field's width. */
 .plus-listbox--anchored {
     position: absolute;
-    top: calc(100% + var(--size-element-gap-xs));
+    top: calc(100% + var(--popover-offset));
     left: 0;
     z-index: var(--plus-listbox-z-index);
     width: max-content;
@@ -57,7 +59,7 @@
 
     &[data-placement='top'] {
         top: auto;
-        bottom: calc(100% + var(--size-element-gap-xs));
+        bottom: calc(100% + var(--popover-offset));
     }
 
     &[data-side='end'] {
@@ -75,6 +77,10 @@
     border: none;
     border-radius: 0;
     box-shadow: none;
+
+    .plus-listbox-options {
+        padding: 0;
+    }
 }
 
 .plus-listbox-header,
@@ -122,6 +128,7 @@
 .plus-listbox-options {
     display: flex;
     flex-direction: column;
+    padding: var(--popover-pad-menu);
     outline: none;
 
     &:focus-visible {

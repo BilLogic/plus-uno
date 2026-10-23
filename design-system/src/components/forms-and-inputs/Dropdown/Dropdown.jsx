@@ -173,7 +173,9 @@ const Dropdown = ({
     const place = useAnchoredPopup({ open: show && vertical, anchorRef: dropdownRef, popupRef: menuRef });
     const placement = {
         vertical: direction === 'dropup' || place?.placement === 'top' ? 'up' : 'down',
-        horizontal: place?.side ?? 'start',
+        // How far the menu's left edge sits from the toggle's: left-aligned,
+        // right-aligned, or pulled in to keep 8 from the screen edge.
+        shift: place?.shift ?? 0,
     };
 
     const wrapperClasses = [
@@ -265,8 +267,8 @@ const Dropdown = ({
                 className={menuClasses}
                 ref={menuRef}
                 style={{
-                    ...(placement.vertical === 'up' ? { top: 'auto', bottom: 'calc(100% + var(--size-element-gap-xs))' } : null),
-                    ...(placement.horizontal === 'end' ? { left: 'auto', right: 0 } : null),
+                    ...(placement.vertical === 'up' ? { top: 'auto', bottom: 'calc(100% + var(--popover-offset))' } : null),
+                    ...(vertical && placement.shift ? { left: `${placement.shift}px` } : null),
                 }}
             >
                 {items.map((item, index) => {
@@ -295,8 +297,12 @@ const Dropdown = ({
 
                             {item.leadingIcon && <i className={`fas fa-${item.leadingIcon}`} aria-hidden="true" />}
 
-                            <span className="pdropdown-item-text" style={{ flexGrow: 1, minWidth: 0 }}>
-                                {item.text || item.label}
+                            <span className="pdropdown-item-text">
+                                <span className="pdropdown-item-label">{item.text || item.label}</span>
+                                {/* A second line under the label; the row grows to hold it. */}
+                                {item.description && (
+                                    <span className="pdropdown-item-description">{item.description}</span>
+                                )}
                             </span>
 
                             {/* Decorative, like the leading icon: the text names the item. */}
@@ -374,6 +380,8 @@ Dropdown.propTypes = {
     items: PropTypes.arrayOf(PropTypes.shape({
         text: PropTypes.string,
         label: PropTypes.string,
+        /** A second line under the label, in body.small; the row grows from 32 to hold it. */
+        description: PropTypes.string,
         selected: PropTypes.bool,
         disabled: PropTypes.bool,
         header: PropTypes.bool,

@@ -24,8 +24,9 @@
 | `show` | bool | — | — |
 | `onToggle` | func | — | — |
 | `container` | any | — | — |
-| `offset` | array | `[0` | — |
+| `offset` | array | — | — |
 | `rootClose` | bool | — | Dismiss on a click outside. Defaults to true for every trigger but `manual`. |
+| `width` | enum | `'sm'` | The width tier: sm 320 (default), md 400 or lg 480. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |
 
@@ -33,11 +34,13 @@
 
 **`placement`** — `auto` · `top` · `bottom` · `left` · `right` · `top-start` · `top-end` · `bottom-start` · `bottom-end` · `right-start` · `right-end` · `left-start` · `left-end`
 
+**`width`** — `sm` · `md` · `lg`
+
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-inverse-on-surface` · `--color-inverse-surface` · `--color-on-surface` · `--color-surface-container` · `--font-family-body` · `--font-size-body2` · `--font-weight-light` · `--font-weight-regular` · `--size-element-gap-sm` · `--size-modal-radius-sm` · `--size-spacing-medium-space-400`
+`--body-default` · `--border-default` · `--color-on-surface` · `--color-outline-variant` · `--color-surface-overlay` · `--element-stack-md` · `--elevation-light-2` · `--heading-xsmall` · `--popover-offset` · `--popover-pad` · `--popover-radius` · `--popover-width-lg` · `--popover-width-md` · `--popover-width-sm` · `--size-spacing-medium-space-400`
 
 From `design-system/src/components/overlays/Popover/Popover.scss`. Override these through the token layer, never with a literal.
 

@@ -3,11 +3,13 @@
 
 # Toast
 
+The Popover family's Flag (Figma Pattern/Flag; the code name is still Toast). One surface, 400 wide, padded 16: a 16 icon in the style's icon color on the title's first line, the title and its message, and the close button.
+
 **Import:** `import { Toast } from '@/components';`
 
 **Source:** `design-system/src/components/messaging/Toast/Toast.jsx`
 
-**Stories:** `design-system/src/components/messaging/Toast/Toast.stories.jsx` — Styles, Overview, Interactive, Dismiss, HeaderContent, UnknownStyle
+**Stories:** `design-system/src/components/messaging/Toast/Toast.stories.jsx` — Styles, Overview, Interactive, Dismiss, FlagContent, UnknownStyle
 
 **Storybook page:** `design-system/src/components/messaging/Toast/Toast.mdx`
 
@@ -22,8 +24,8 @@
 | `dismissible` | bool | `true` | — |
 | `show` | bool | — | — |
 | `onClose` | func | — | — |
-| `delay` | number | `5000` | — |
-| `autohide` | bool | `true` | — |
+| `delay` | number | `FLAG_AUTO_CLOSE_MS` | How long it stays before closing itself, in ms. 8000 by default. |
+| `autohide` | bool | — | Close itself after `delay`. Defaults to true for success, info, primary and secondary, false for warning and danger. |
 | `className` | string | `''` | — |
 | `headerClass` | string | `''` | — |
 | `bodyClass` | string | `''` | — |
@@ -37,7 +39,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-danger` · `--color-info` · `--color-on-danger` · `--color-on-info` · `--color-on-primary` · `--color-on-secondary` · `--color-on-success` · `--color-on-surface` · `--color-on-surface-variant` · `--color-on-warning` · `--color-outline-variant` · `--color-primary` · `--color-secondary` · `--color-success` · `--color-surface` · `--color-surface-container-high` · `--color-surface-container-lowest` · `--color-warning` · `--font-family-body` · `--font-line-height-body1` · `--font-line-height-body3` · `--font-size-body1` · `--font-size-body3` · `--font-size-fa-body1-solid` · `--font-weight-bold` · `--font-weight-normal` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-y-lg` · `--size-element-radius-md` · `--size-modal-radius-md` · `--size-spacing-medium-space-400`
+`--body-default` · `--body-small` · `--border-default` · `--color-danger-icon` · `--color-info-icon` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary-text` · `--color-success-icon` · `--color-surface-container-lowest` · `--color-surface-overlay` · `--color-warning-icon` · `--element-inline-lg` · `--element-inline-md` · `--element-stack-sm` · `--elevation-light-3` · `--heading-xsmall` · `--icon-md` · `--label-height-md` · `--popover-gap-screen` · `--popover-pad` · `--popover-radius` · `--popover-stack-flag` · `--popover-width-flag` · `--size-element-radius-md` · `--size-spacing-medium-space-400`
 
 From `design-system/src/components/messaging/Toast/Toast.scss`. Override these through the token layer, never with a literal.
 

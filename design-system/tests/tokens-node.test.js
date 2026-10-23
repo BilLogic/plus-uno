@@ -543,9 +543,11 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // fallbacks with it. 620: the date pickers moved onto the shared field and
     // calendar, and the old Dropdown option list went, each with its fallbacks.
     // 623: the same three washes, now naming defined tokens, became comparable.
-    // 622: PageLayout moved onto the SurfaceContainer frame, and its surface
+    // 615: the Popover took the Popup pattern's tokens, and its eight hex
+    // fallbacks went with the dark header.
+    // 614: PageLayout moved onto the SurfaceContainer frame, and its surface
     // fill's hex fallback went with the inline styles.
-    expect(comparable).toBe(622);
+    expect(comparable).toBe(614);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.
