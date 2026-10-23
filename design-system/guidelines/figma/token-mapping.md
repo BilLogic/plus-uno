@@ -85,11 +85,11 @@ Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity 
 
 ### Scale Tokens
 
-The Spacing / Primitives and Spacing / Foundations collections (Foundations holds the Size, Element and Border folders), beside the old `--size-*` tokens until every use moves. Each Figma variable's code syntax is its CSS name.
+The spacing / primitives and spacing / foundations collections (Foundations holds the Size, Element and Border folders), beside the old `--size-*` tokens until every use moves. Each Figma variable's code syntax is its CSS name.
 
 | Figma Variable | PLUS CSS Token | Notes |
 |----------------|----------------|-------|
-| Spacing / Primitives `Space/space-*`, `Radius/radius-*`, `Stroke/stroke-*`, `Size/size-*` | `var(--space-025)`, `var(--radius-050)`, `var(--stroke-1)`, `var(--size-200)` | Named by rem × 100 (`space-025` is 4). Hidden in Figma; semantic tokens point at them |
+| spacing / primitives `Space/space-*`, `Radius/radius-*`, `Stroke/stroke-*`, `Size/size-*` | `var(--space-025)`, `var(--radius-050)`, `var(--stroke-1)`, `var(--size-200)` | Named by rem × 100 (`space-025` is 4). Hidden in Figma; semantic tokens point at them |
 | Foundations `Element/pad-x-{xs\|sm\|md}`, `pad-y-{sm\|md}` | `var(--element-pad-x-sm)` | 4 · 8 · 12 and 2 · 6. The old `--size-element-pad-y-sm` is 4; the new one is 2 |
 | Foundations `Element/stack-*`, `inline-*` | `var(--element-stack-md)`, `var(--element-inline-sm)` | 4 · 8 · 12 |
 | Foundations `Element/radius-{sm\|md\|lg}`, `radius-item-{sm\|md}`, `radius-full` | `var(--element-radius-item-md)` | 2 · 4 · 8, items 6 · 8 |

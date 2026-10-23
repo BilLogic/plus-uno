@@ -109,8 +109,8 @@ Figma export → design-system/src/tokens/source/*.json → npm run generate:tok
   carries `id`, `name`, `resolvedType`, `valuesByMode` (aliases kept as
   `VARIABLE_ALIAS`) and `resolvedValuesByMode` (every alias resolved to its
   final value).
-- The new scale collections (`Spacing _ Primitives.json` and
-  `Spacing _ Foundations.json`, whose folders are Size, Element and Border)
+- The new scale collections (`spacing _ primitives.json` and
+  `spacing _ foundations.json`, whose folders are Size, Element and Border)
   sit beside the old size files and generate
   `_scales.scss`. Each records `hiddenFromPublishing`, and its variables
   carry `scopes` and `codeSyntax`. A variable's `codeSyntax.WEB`

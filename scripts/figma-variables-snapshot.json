@@ -426,7 +426,7 @@
         "Tree/toggle"
       ]
     },
-    "Spacing / Primitives": {
+    "spacing / primitives": {
       "modes": [
         "Value"
       ],
@@ -480,7 +480,7 @@
         "Stroke/stroke-2"
       ]
     },
-    "Spacing / Foundations": {
+    "spacing / foundations": {
       "modes": [
         "Value"
       ],

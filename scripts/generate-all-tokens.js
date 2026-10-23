@@ -639,8 +639,8 @@ ${columns(modes[0], '    ')}}
  * THE NEW SCALES
  *
  * The collections the layout, token and type system adds beside the old
- * `size / *` ones: Spacing / Primitives (space, radius, stroke and size,
- * hidden in Figma) and Spacing / Foundations, whose folders are Size (common
+ * `size / *` ones: spacing / primitives (space, radius, stroke and size,
+ * hidden in Figma) and spacing / foundations, whose folders are Size (common
  * Height/Width plus Item, Row, Label, Field, Icon, Image), Element and Border.
  * They carry their own CSS names, so the old tokens keep resolving while each
  * use moves across.
@@ -653,8 +653,8 @@ ${columns(modes[0], '    ')}}
 
 /** The exports, in the order they are written; an alias may point at any of them. */
 const SCALE_COLLECTIONS = [
-    { file: 'Spacing _ Primitives.json', heading: 'Spacing / Primitives (hidden in Figma; point semantic tokens at these, not components)' },
-    { file: 'Spacing _ Foundations.json', heading: 'Spacing / Foundations' },
+    { file: 'spacing _ primitives.json', heading: 'spacing / primitives (hidden in Figma; point semantic tokens at these, not components)' },
+    { file: 'spacing _ foundations.json', heading: 'spacing / foundations' },
 ];
 
 /** `var(--element-pad-x-sm)` -> `--element-pad-x-sm`, or `null` when it is not a `var()` of one name. */
@@ -679,7 +679,7 @@ function generateScalesSCSS() {
 
     let scss = `/**
  * Scale Tokens
- * Generated from the Spacing / Primitives and Spacing / Foundations collections in Figma.
+ * Generated from the spacing / primitives and spacing / foundations collections in Figma.
  * Each name is the variable's WEB code syntax; an alias is a var() of its target.
  */
 

@@ -1,7 +1,7 @@
 /**
  * The scale tokens the layout, token and type system adds beside the old
  * `--size-*` ones, as code reads them after generation from the BS4
- * Foundation export: the Spacing / Primitives and Spacing / Foundations
+ * Foundation export: the spacing / primitives and spacing / foundations
  * collections (Foundations holds the Size, Element and Border folders).
  *
  * - Primitives are named by rem × 100 (`--space-025` is 4) and the radius,
@@ -173,8 +173,8 @@ test('one-property collections skip the property word', () => {
 const SOURCE = path.join(REPO_ROOT, 'design-system/src/tokens/source');
 const exported = (file) => JSON.parse(fs.readFileSync(path.join(SOURCE, file), 'utf8'));
 
-const PRIMITIVES_FILE = 'Spacing _ Primitives.json';
-const FOUNDATIONS_FILE = 'Spacing _ Foundations.json';
+const PRIMITIVES_FILE = 'spacing _ primitives.json';
+const FOUNDATIONS_FILE = 'spacing _ foundations.json';
 
 test('Primitives are hidden; Foundations is published', () => {
   assert.equal(exported(PRIMITIVES_FILE).hiddenFromPublishing, true);

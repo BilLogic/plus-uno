@@ -42,9 +42,9 @@ function renderTokensDoc() {
     const fontTokens = extractScssVariables(path.join(TOKENS_DIR, '_fonts.scss'));
     const primitiveTokens = extractScssVariables(path.join(TOKENS_DIR, '_primitives.scss'));
     const elevationTokens = extractScssVariables(path.join(TOKENS_DIR, '_elevation.scss'));
-    // _scales.scss holds both layers of the new scales: its Spacing / Primitives
+    // _scales.scss holds both layers of the new scales: its spacing / primitives
     // names (--space-, --radius-, --stroke-, --size-NNN) join the primitives,
-    // and its Spacing / Foundations names get their own section.
+    // and its spacing / foundations names get their own section.
     const scaleTokens = extractScssVariables(path.join(TOKENS_DIR, '_scales.scss'));
     const isScalePrimitive = (name) => /^--(space|radius|stroke|size)-[0-9]/.test(name) || name === '--radius-full';
     const scaleFoundations = scaleTokens.filter((name) => !isScalePrimitive(name));
@@ -61,7 +61,7 @@ function renderTokensDoc() {
     tokensDoc += "```css\n" + spacingTokens.join('\n') + "\n```\n\n";
 
     tokensDoc += `## Scale Tokens\n`;
-    tokensDoc += `The new Size, Element and Border scales (Spacing / Foundations), beside the spacing semantics above until every use moves.\n\n`;
+    tokensDoc += `The new Size, Element and Border scales (spacing / foundations), beside the spacing semantics above until every use moves.\n\n`;
     tokensDoc += "```css\n" + scaleFoundations.join('\n') + "\n```\n\n";
 
     tokensDoc += `## Typography Tokens\n`;
@@ -80,7 +80,7 @@ function renderTokensDoc() {
     tokensDoc += "```css\n" + primitiveTokens.join('\n') + "\n```\n\n";
 
     tokensDoc += `## Scale Primitives\n`;
-    tokensDoc += `The new primitives (Spacing / Primitives), named by rem × 100; point semantic tokens at these, not components.\n\n`;
+    tokensDoc += `The new primitives (spacing / primitives), named by rem × 100; point semantic tokens at these, not components.\n\n`;
     tokensDoc += "```css\n" + scalePrimitives.join('\n') + "\n```\n";
     return tokensDoc;
 }

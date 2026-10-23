@@ -1,12 +1,12 @@
 /**
  * Scale Tokens
- * Generated from the Spacing / Primitives and Spacing / Foundations collections in Figma.
+ * Generated from the spacing / primitives and spacing / foundations collections in Figma.
  * Each name is the variable's WEB code syntax; an alias is a var() of its target.
  */
 
 :root {
 
-    /* Spacing / Primitives (hidden in Figma; point semantic tokens at these, not components) */
+    /* spacing / primitives (hidden in Figma; point semantic tokens at these, not components) */
     /* Space */
     --space-0: 0px;
     --space-00625: 1px;
@@ -59,7 +59,7 @@
     --size-5400: 864px;
     --size-7700: 1232px;
 
-    /* Spacing / Foundations */
+    /* spacing / foundations */
     /* Size */
     --height-100: var(--size-100);
     --height-125: var(--size-125);

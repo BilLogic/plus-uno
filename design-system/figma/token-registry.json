@@ -461,7 +461,7 @@
       "Table/cell-x": "var(--size-table-cell-x)",
       "Table/cell-y": "var(--size-table-cell-y)"
     },
-    "Spacing / Primitives": {
+    "spacing / primitives": {
       "Radius/radius-0125": "var(--radius-0125)",
       "Radius/radius-025": "var(--radius-025)",
       "Radius/radius-0375": "var(--radius-0375)",
@@ -510,7 +510,7 @@
       "Stroke/stroke-1": "var(--stroke-1)",
       "Stroke/stroke-2": "var(--stroke-2)"
     },
-    "Spacing / Foundations": {
+    "spacing / foundations": {
       "Border/default": "var(--border-default)",
       "Border/focused": "var(--border-focused)",
       "Border/selected": "var(--border-selected)",

@@ -93,7 +93,7 @@ Use for padding, margin, and gaps.
 ```
 
 ## Scale Tokens
-The new Size, Element and Border scales (Spacing / Foundations), beside the spacing semantics above until every use moves.
+The new Size, Element and Border scales (spacing / foundations), beside the spacing semantics above until every use moves.
 
 ```css
 --border-default
@@ -570,7 +570,7 @@ Base raw variables (only use if a semantic token doesn't exist).
 ```
 
 ## Scale Primitives
-The new primitives (Spacing / Primitives), named by rem × 100; point semantic tokens at these, not components.
+The new primitives (spacing / primitives), named by rem × 100; point semantic tokens at these, not components.
 
 ```css
 --radius-0125
