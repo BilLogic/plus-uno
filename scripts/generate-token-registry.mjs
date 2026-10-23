@@ -199,6 +199,14 @@ export function deriveCandidates(collection, name) {
     return out;
   }
 
+  // The new scale collections carry their code names in Figma's code syntax,
+  // which the snapshot does not record, so these candidates restate the rule
+  // that syntax follows. A spacing / foundations variable is its path, minus
+  // the Size folder ("Element/pad-x-sm" -> --element-pad-x-sm,
+  // "Size/Height/200" -> --height-200); a spacing / primitives variable is its
+  // leaf ("Space/space-025" -> --space-025), the candidate every collection
+  // ends with. A candidate that misses shows up as unresolved.
+  if (collection === 'spacing / foundations') out.push(`--${slug(name.replace(/^Size\//, ''))}`);
   out.push(`--${slug(leaf)}`);
   return out;
 }

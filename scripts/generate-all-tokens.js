@@ -635,6 +635,79 @@ ${columns(modes[0], '    ')}}
     return scss;
 }
 
+/*
+ * THE NEW SCALES
+ *
+ * The collections the layout, token and type system adds beside the old
+ * `size / *` ones: spacing / primitives (space, radius, stroke and size,
+ * hidden in Figma) and spacing / foundations, whose folders are Size (common
+ * Height/Width plus Item, Row, Label, Field, Icon, Image), Element and Border.
+ * They carry their own CSS names, so the old tokens keep resolving while each
+ * use moves across.
+ *
+ * Nothing here derives a name. Each variable's WEB code syntax in Figma is its
+ * CSS name, so a variable without one is a refusal rather than a guess, and
+ * an alias is written as a `var()` of its target's code syntax, which keeps
+ * "category tokens point at the common scales" true in the stylesheet too.
+ */
+
+/** The exports, in the order they are written; an alias may point at any of them. */
+const SCALE_COLLECTIONS = [
+    { file: 'spacing _ primitives.json', heading: 'spacing / primitives (hidden in Figma; point semantic tokens at these, not components)' },
+    { file: 'spacing _ foundations.json', heading: 'spacing / foundations' },
+];
+
+/** `var(--element-pad-x-sm)` -> `--element-pad-x-sm`, or `null` when it is not a `var()` of one name. */
+const webName = (syntax) => /^var\((--[a-z0-9-]+)\)$/.exec(syntax ?? '')?.[1] ?? null;
+
+/**
+ * Generate the new scales SCSS
+ */
+function generateScalesSCSS() {
+    const sources = SCALE_COLLECTIONS.map(({ file, heading }) => ({ file, heading, ...readSource(file, { oneMode: true }) }));
+    const nameById = {};
+    const seen = new Set();
+    for (const { file, json } of sources) {
+        for (const v of json.variables) {
+            const name = webName(v.codeSyntax?.WEB);
+            if (!name) throw new Error(`${file}: ${v.name} has no WEB code syntax of the form var(--name). Set it in Figma and export again.`);
+            if (seen.has(name)) throw new Error(`${file}: ${name} is the code syntax of two variables.`);
+            seen.add(name);
+            nameById[v.id] = name;
+        }
+    }
+
+    let scss = `/**
+ * Scale Tokens
+ * Generated from the spacing / primitives and spacing / foundations collections in Figma.
+ * Each name is the variable's WEB code syntax; an alias is a var() of its target.
+ */
+
+:root {
+`;
+    for (const { file, heading, json, modes: [mode] } of sources) {
+        scss += `\n    /* ${heading} */\n`;
+        let folder = null;
+        for (const v of json.variables) {
+            // A comment at each top-level folder (Space, Radius … Size, Element, Border).
+            const top = v.name.split('/')[0];
+            if (top !== folder) scss += `    /* ${(folder = top)} */\n`;
+            const value = v.valuesByMode[mode];
+            let css;
+            if (value?.type === 'VARIABLE_ALIAS') {
+                if (!nameById[value.id]) throw new Error(`${file}: ${v.name} aliases ${value.id}, which none of the scale exports holds.`);
+                css = `var(${nameById[value.id]})`;
+            } else if (typeof value === 'number') {
+                css = px(value);
+            } else {
+                throw new Error(`${file}: ${v.name} has neither an alias nor a number.`);
+            }
+            scss += `    ${nameById[v.id]}: ${css};\n`;
+        }
+    }
+    return `${scss}}\n`;
+}
+
 // Generate all files
 //
 // EVERY FILE IS BUILT IN MEMORY FIRST. This used to write each one as it was
@@ -653,6 +726,7 @@ try {
         { file: '_primitives.scss', generated: generatePrimitivesSCSS() },
         { file: '_spacing_semantics.scss', generated: generateSemanticsSCSS() },
         { file: '_layout.scss', generated: generateLayoutSCSS() },
+        { file: '_scales.scss', generated: generateScalesSCSS() },
     ];
 } catch (error) {
     console.error(`\n❌ Generation failed. ${error.message}\n   Nothing was written.\n`);

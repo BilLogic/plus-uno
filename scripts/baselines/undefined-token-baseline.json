@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 80,
-    "uses": 248,
+    "names": 74,
+    "uses": 233,
     "bare": 5
   },
   "tokens": {
@@ -90,10 +90,6 @@
     },
     "--element-gap-sm": {
       "uses": 3,
-      "bare": 0
-    },
-    "--element-radius-sm": {
-      "uses": 1,
       "bare": 0
     },
     "--font-family-base": {
@@ -270,26 +266,6 @@
     },
     "--size-table-row-radius": {
       "uses": 2,
-      "bare": 0
-    },
-    "--space-050": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--space-100": {
-      "uses": 2,
-      "bare": 0
-    },
-    "--space-200": {
-      "uses": 5,
-      "bare": 0
-    },
-    "--space-300": {
-      "uses": 3,
-      "bare": 0
-    },
-    "--space-500": {
-      "uses": 3,
       "bare": 0
     },
     "--spacing-large-space-300": {
