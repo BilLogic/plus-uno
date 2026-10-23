@@ -659,6 +659,8 @@
       "Modal/width-modal-lg": "var(--layout-width-modal-lg)",
       "Modal/width-modal-md": "var(--layout-width-modal-md)",
       "Modal/width-modal-sm": "var(--layout-width-modal-sm)",
+      "Screen/max-width-screen": "var(--layout-max-width-screen)",
+      "Screen/min-width-screen": "var(--layout-min-width-screen)",
       "Screen/pad-x-screen": "var(--layout-pad-x-screen)",
       "Screen/width-screen": "var(--layout-width-screen)",
       "Sidebar/pad-left-container": "var(--layout-pad-left-container)",
@@ -733,11 +735,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 743,
+    "scssTokenCount": 745,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 582,
-      "resolved": 555,
+      "total": 584,
+      "resolved": 557,
       "percent": 95,
       "unresolved": [
         {
