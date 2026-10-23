@@ -241,6 +241,12 @@ MenuInsideModal.play = async ({ canvasElement }) => {
     await userEvent.click(doc.getByRole('combobox', { name: 'Subject' }));
     const listbox = await doc.findByRole('listbox');
     const option = within(listbox).getByRole('option', { name: 'Statistics' });
+    // A menu is on the popup layer (400), under a modal (510). Opened from a
+    // field inside one, it takes the modal's layer: it mounts in the modal's
+    // overlay, after the dialog.
+    const overlay = doc.getByText('Pick a subject').closest('.modal');
+    await expect(listbox.closest('.modal')).toBe(overlay);
+    await expect(getComputedStyle(listbox.closest('.plus-listbox')).zIndex).toBe('400');
     // The menu is drawn above the modal it opened from: the topmost element
     // at the option's center is the option, not the dialog under it.
     const box = option.getBoundingClientRect();

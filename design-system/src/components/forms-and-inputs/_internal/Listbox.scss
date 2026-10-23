@@ -9,12 +9,12 @@
     /*
      * Popover/max-height-menu 320: nine rows and the cut tenth that says the
      * list scrolls. There is no floor: a short list is as tall as its rows, so
-     * two options leave no empty band under them. The overlay layer sits
-     * above a modal, so a list opened from a field inside one is not covered
-     * by it.
+     * two options leave no empty band under them. A floating list is on the
+     * popup layer; one opened from a field inside a modal mounts in the
+     * modal's overlay and takes its layer, so the dialog never covers it.
      */
     --plus-listbox-max-height: var(--popover-max-height-menu);
-    --plus-listbox-z-index: var(--layout-z-index-overlay);
+    --plus-listbox-z-index: var(--layout-z-index-popup);
     /*
      * The popup placement rule: content grows a list past its field up to
      * Popover/max-width-menu 320. `min-width` (the field's width) wins over

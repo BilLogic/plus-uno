@@ -49,6 +49,20 @@ export function placePopup({ anchor, width, height, viewport, align = 'left', of
     };
 }
 
+/**
+ * Where a field's popup mounts: the page, or the modal its field sits in.
+ *
+ * A popup is on the popup layer (400), under a modal (510). One opened from a
+ * field inside a modal takes the modal's layer instead: it mounts inside the
+ * modal's overlay, so it draws above the dialog and stays inside its focus trap.
+ *
+ * @param {{current: Element | null} | undefined} anchorRef the field
+ * @returns {Element}
+ */
+export function popupLayerOf(anchorRef) {
+    return anchorRef?.current?.closest('.modal') ?? document.body;
+}
+
 const samePlace = (a, b) => Boolean(a && b)
     && a.placement === b.placement && a.side === b.side
     && a.top === b.top && a.left === b.left && a.minWidth === b.minWidth && a.shift === b.shift;

@@ -90,7 +90,7 @@ $dropdown-themes: (
         top: calc(100% + var(--popover-offset));
         left: 0;
         margin: 0;
-        z-index: 1000;
+        z-index: var(--layout-z-index-popup);
         box-sizing: border-box;
         // As wide as its rows, at least the toggle (the wrapper is its width),
         // and never under 160.

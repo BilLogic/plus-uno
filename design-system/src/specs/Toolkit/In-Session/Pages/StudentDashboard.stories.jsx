@@ -981,7 +981,7 @@ const RegularTutorViewRender = (args) => {
                         bottom: 'var(--size-section-gap-lg)',
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        zIndex: 1050,
+                        zIndex: 'var(--layout-z-index-flag)',
                         width: '672px',
                     }}>
                         {args.toastType === 'assignment-all' ? (
@@ -1140,7 +1140,7 @@ const LeadSupervisorViewRender = (args) => {
 
             {/* Toast — loaded state only; visibility driven by the `toast` arg. */}
             {viewState === 'loaded' && args.toast && (
-                <div style={{ position: 'fixed', bottom: 'var(--size-section-gap-lg)', left: '50%', transform: 'translateX(-50%)', zIndex: 1050, width: '672px' }}>
+                <div style={{ position: 'fixed', bottom: 'var(--size-section-gap-lg)', left: '50%', transform: 'translateX(-50%)', zIndex: 'var(--layout-z-index-flag)', width: '672px' }}>
                     {args.toastType === 'assignment-leads' ? (
                         <Toast style="secondary" title="Review Assignments" timestamp="11 mins ago" show autohide={false} onClose={() => {}} className="w-100">
                             <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>

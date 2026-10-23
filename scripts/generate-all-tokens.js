@@ -509,9 +509,9 @@ const CODE_ONLY_LAYOUT = {
  * modal 510, flag 600, spotlight 700, tooltip 800. A nested confirm reuses the
  * scrim and modal inside the first modal's layer rather than counting up.
  *
- * Popups, menus, flags and tooltips have not moved onto 400, 600 and 800 yet:
- * they still sit at the overlay layer and Bootstrap's own numbers, all above a
- * modal, so a list opened from a field inside a modal is not covered by it.
+ * A popup or menu (400) sits under a modal (510). One opened from a field
+ * inside a modal takes the modal's layer: it mounts inside the modal's
+ * overlay (`popupLayerOf` in forms-and-inputs/_internal/anchorPlacement.js).
  */
 const CODE_ONLY_LAYERS = {
     'layout-z-index-card': { value: 100, note: 'sticky headers and raised cards' },
@@ -523,7 +523,6 @@ const CODE_ONLY_LAYERS = {
     'layout-z-index-flag': { value: 600, note: 'flags, above a modal' },
     'layout-z-index-spotlight': { value: 700, note: 'onboarding spotlights' },
     'layout-z-index-tooltip': { value: 800, note: 'tooltips, above everything' },
-    'layout-z-index-overlay': { value: 1070, note: 'floating listboxes and menus until they move to the popup layer; above a modal' },
 };
 
 /**

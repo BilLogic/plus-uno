@@ -309,9 +309,28 @@ body {
     box-sizing: border-box;
 }
 
-// Bootstrap's position utilities, on the layer scale
-// Bootstrap puts `.sticky-top` at 1020 and `.fixed-top` at 1030, above a modal's
-// scrim (500). A sticky header is a card (100); a fixed bar is navigation (200).
+// Bootstrap's layers, on the layer scale
+// Bootstrap's own numbers (dropdown 1000, sticky 1020, fixed 1030, toast 1090,
+// popover 1070, tooltip 1080) sit above a modal's scrim (500). Each moves to
+// Atlassian's layer for what it is. Bootstrap's modal and backdrop are set by
+// the Modal component itself.
+.dropdown-menu {
+    --bs-dropdown-zindex: var(--layout-z-index-popup);
+}
+
+.toast-container {
+    --bs-toast-zindex: var(--layout-z-index-flag);
+}
+
+.popover {
+    --bs-popover-zindex: var(--layout-z-index-tooltip);
+}
+
+.tooltip {
+    --bs-tooltip-zindex: var(--layout-z-index-tooltip);
+}
+
+// A sticky header is a card (100); a fixed bar is navigation (200).
 .sticky-top,
 .sticky-bottom {
     z-index: var(--layout-z-index-card);
