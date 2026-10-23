@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Logo from '@/components/_internal/Logo';
-import { PatternSidebar } from '@/patterns';
+// The pattern's own folder, not the patterns barrel: the components barrel loads
+// this file, and pulling every pattern (and its stylesheet) in here would
+// reorder the cascade for every component that loads after it.
+import PatternSidebar from '@/patterns/Sidebar';
 import { sidebarContent } from './sidebarConfig';
 
 /**

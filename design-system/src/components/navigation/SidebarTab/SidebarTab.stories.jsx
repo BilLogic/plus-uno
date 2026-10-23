@@ -275,7 +275,11 @@ export const WithActionsOnHover = {
         const row = canvas.getByRole('button', { name: /^Sessions/ });
         const actions = canvasElement.querySelector('.plus-sidebar-tab__actions');
         await expect(row.contains(actions), 'actions sit beside the row, not inside it').toBe(false);
-        await expect(getComputedStyle(actions).visibility, 'hidden at rest').toBe('hidden');
+        // At rest means no pointer over the item: the runner's real pointer can
+        // be left wherever the last story put it.
+        if (!actions.parentElement.matches(':hover')) {
+            await expect(getComputedStyle(actions).visibility, 'hidden at rest').toBe('hidden');
+        }
 
         await userEvent.tab();
         await expect(document.activeElement).toBe(row);
