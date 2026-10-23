@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { expect, within } from 'storybook/test';
+import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import SidebarTab from '@/components/navigation/SidebarTab';
 
 export default {
@@ -75,6 +77,19 @@ export const InSidebar = () => {
 InSidebar.parameters = {
     docs: {
         disable: true
+    }
+};
+/** Each row is the 32 item height, pads 12 at the sides, and draws a 16 icon. */
+InSidebar.play = async ({ canvasElement }) => {
+    const rows = within(canvasElement).getAllByRole('button');
+    for (const row of rows) {
+        const style = getComputedStyle(row);
+        await expect(row.getBoundingClientRect().height, 'row height').toBeCloseTo(tokenLength(canvasElement, '--item-height-md'), 0);
+        await expect(px(style.paddingLeft), 'pad-x').toBeCloseTo(tokenLength(canvasElement, '--element-pad-x-md'), 0);
+        await expect(px(style.borderTopLeftRadius), 'radius').toBeCloseTo(tokenLength(canvasElement, '--element-radius-item-md'), 0);
+        const icon = row.querySelector('i');
+        await expect(icon.parentElement.getBoundingClientRect().width, 'icon box').toBeCloseTo(tokenLength(canvasElement, '--icon-md'), 0);
+        await expect(px(getComputedStyle(icon).fontSize), 'icon size').toBeCloseTo(tokenLength(canvasElement, '--icon-md'), 0);
     }
 };
 

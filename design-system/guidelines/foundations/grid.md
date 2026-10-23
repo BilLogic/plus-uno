@@ -20,12 +20,23 @@ Source of truth: `design-system/src/tokens/_layout.scss`.
 
 ## App shell tokens
 
+The frame `SurfaceContainer` draws, from `design-system/src/tokens/_frame_layers.scss`
+(values per Medium · Large · X-Large):
+
 | Token | Value | Description |
 |:---|:---|:---|
-| `--layout-sidebar-width` | 164px | SideNav fixed width (Large and up) |
-| `--layout-grid-gap` | 8px | Content-grid gutter; the `--col-*` spans assume it |
-| `--size-surface-pad-x` | 32px | Content surface horizontal padding |
-| `--size-surface-container-pad-x` | `--size-spacing-medium-space-300` | Outer layout horizontal padding |
+| `--layout-height-topbar` | 32 | Topbar height, with no vertical padding; it pads 8 on the left so the toggle sits at (8, 8) |
+| `--layout-width-sidebar` | 240 | Sidebar width; docked from Large, closed below |
+| `--layout-pad-left-container` | 8 · 0 · 0 | Left pad of the sidebar-and-surface row: 8 while the sidebar is closed, 0 once it docks |
+| `--surface-container-pad` / `--surface-container-stack` | 8 / 8 | Frame pad and the stack between topbar and row |
+| `--surface-pad` | 16 · 16 · 24 | Surface pad, the content grid's margin |
+| `--layout-columns` / `--layout-gutter` | 12 / 16 | The content grid |
+| `--layout-width-column` / `--layout-width-content` | derived | One column and the content width at the mode's minimum screen |
+| `--layout-max-width-content` / `--layout-max-width-reading` | 1232 / 864 | Content cap; centered past it |
+| `--layout-min-width-content` | 720 | Content minimum; the surface scrolls sideways under it |
+
+The older `--layout-sidebar-width`, `--layout-grid-gap` and `--col-*` below sit
+beside these while uses move.
 
 ## Column spans
 
@@ -62,17 +73,17 @@ variables — switch the frame's mode rather than hand-editing or detaching.
 | Style | Columns | Gutter | Margin / offset | Carried by |
 |:---|:---|:---|:---|:---|
 | `Grid/Viewport (adaptive)` | 12 | 12 / 16 / 16 | 16 / 32 / 32 | full-page frames without the shell |
-| `Grid/Adaptive (12-col)` | 12 | 8px (`--layout-grid-gap`) | offset = `Surface/pad-x` 32 | `Pattern/Surface container` — the content grid |
+| Content grid | 12 (`Grid/columns`) | 16 (`Grid/gutter`) | inside `Surface/pad` | `Pattern/Surface` Content frame — the content grid |
 
-Column spans come from `Columns/col-1…12` in Figma = `--col-*` in code, and they
-assume the 8px content gutter. Main content width at breakpoint minimums is
-672 / 748 / 1164 — at XL that is `1440 − 32 outer − 164 SideNav − 16 gap − 64 surface pad`.
+Content width at the mode minimums is 720 / 744 / 1144 (`--layout-width-content`) —
+at X-Large that is `1440 − 8 container pad − 240 sidebar − 2 × 24 surface pad`.
+The older `Columns/col-1…12` = `--col-*` spans assume the old 8px gutter.
 
 ## Ownership layering
 
-- The **page frame** owns width (bound to `Breakpoints/min width`) and the mode.
-- `Pattern/Surface container` runs on auto mode and **fills** the width it is given: `--color-surface`, Surface-tier pad 32/24, gap 24, radius 16. It carries the grid and the Content slot.
-- **SideNav** is 164px (`--layout-sidebar-width`); its visibility binds to the `Display/*` booleans and it collapses at MD.
+- The **page template** owns width (`Screen/width-screen`) and the `spacing / layout` mode.
+- `Pattern/Surface container` (`SurfaceContainer` in code) fills it: the topbar row, then the row with the sidebar and `Pattern/Surface`. The surface carries the 12-column grid and the Content slot.
+- The **sidebar** docks by `Layout/sidebar-docked` (false · true · true); behavior below Large is in `../composition/layout.md` § The frame.
 
 ## Grid rules
 

@@ -1,52 +1,180 @@
 /**
- * Surface container pattern (Patterns/Surface container)
- * The Main-region shell: `--color-surface` fill, Surface-tier padding/gap/radius,
- * fills the width it is given (the page/shell owns the width). Mirrors the
- * published `Pattern/Surface container` Figma component (auto mode + fill),
- * which carries the adaptive 12-column content grid and the Content slot.
+ * Surface container pattern (Patterns/Surface container): the app frame.
+ * Mirrors the Figma `Pattern/Surface container`, `_Topbar`, `_Sidebar` and
+ * `Pattern/Surface`. Every length is a Layout, Surface container or Surface
+ * token; the per-breakpoint values come from the tokens' own media queries.
  */
 
-.plus-pattern-surface-container {
+.plus-surface-container {
+    position: relative;
     display: flex;
     flex-direction: column;
-    width: 100%; /* fill the space the shell gives it — never a fixed width */
-    background-color: var(--color-surface);
+    gap: var(--surface-container-stack);
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+    // Pad 8 top, right and bottom and 0 on the left: the topbar pads its own
+    // left, so the toggle sits at (8, 8) whatever the sidebar is doing.
+    padding: var(--surface-container-pad) var(--surface-container-pad) var(--surface-container-pad) var(--space-0);
+    background-color: var(--surface-sunken);
     color: var(--color-on-surface);
 }
 
-/* Padding — Surface tier (matches Figma Surface/pad-x 32 / pad-y 24) */
-.plus-pattern-surface-container-pad-none {
+/* ------------------------------------------------------------- topbar */
+
+.plus-surface-container__topbar {
+    display: flex;
+    align-items: center;
+    gap: var(--element-inline-md);
+    flex-shrink: 0;
+    height: var(--layout-height-topbar);
+    padding-left: var(--surface-container-pad);
+    box-sizing: border-box;
+}
+
+.plus-surface-container__topbar-content {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+}
+
+.plus-surface-container__toggle {
+    // Above a floating sidebar, so it never moves and stays pressable.
+    position: relative;
+    z-index: calc(var(--layout-z-index-navigation) + 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--item-height-md);
+    height: var(--item-height-md);
     padding: 0;
+    border: 0;
+    border-radius: var(--element-radius-item-md);
+    background-color: transparent;
+    color: var(--color-on-surface-variant);
+    font-size: var(--icon-md);
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--color-on-surface-state-08);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-focus-ring);
+        outline-offset: -2px;
+    }
 }
 
-.plus-pattern-surface-container-pad-md {
-    padding: var(--size-surface-pad-y) var(--size-surface-pad-x);
+/* ------------------------------------------------------------- row */
+
+.plus-surface-container__row {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    // 8 while the sidebar is closed, 0 once it docks (the sidebar carries its own).
+    padding-left: var(--layout-pad-left-container);
 }
 
-/* Gap — Surface tier (Surface/gap-md 24) */
-.plus-pattern-surface-container-gap-none {
-    gap: 0;
+// The token assumes the width's default; these follow the user's choice instead.
+.plus-surface-container--docked-narrow .plus-surface-container__row {
+    padding-left: var(--space-0);
 }
 
-.plus-pattern-surface-container-gap-md {
-    gap: var(--size-surface-gap-md);
+.plus-surface-container--undocked-wide .plus-surface-container__row {
+    padding-left: var(--surface-container-pad);
 }
 
-/* Radius scale — md is the canonical surface radius (16); sm kept for nested uses */
-.plus-pattern-surface-container-radius-none {
-    border-radius: 0;
+/* ------------------------------------------------------------- sidebar */
+
+.plus-surface-container__sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-stack-sm);
+    width: var(--layout-width-sidebar);
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
-.plus-pattern-surface-container-radius-sm {
-    border-radius: var(--size-section-radius-md);
+.plus-surface-container__sidebar--docked {
+    position: static;
+    flex-shrink: 0;
+    padding: 0 var(--surface-container-pad);
 }
 
-.plus-pattern-surface-container-radius-md,
-.plus-pattern-surface-container-radius-lg {
-    border-radius: var(--size-surface-radius);
+// Floating: over the page, from the top of the frame, with a shadow and no scrim.
+// The fill and shadow are Figma's Surface roles/surface-overlay pairing. It is on
+// the navigation layer (200), under popups (400) and a modal's scrim (500); the
+// toggle (one above) and the hover edge (one below) sit either side of it.
+.plus-surface-container__sidebar--floating {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: var(--layout-z-index-navigation);
+    padding: var(--surface-container-pad);
+    background-color: var(--surface-overlay);
+    box-shadow: var(--surface-overlay-shadow);
 }
 
-/* Border */
-.plus-pattern-surface-container-bordered {
-    border: var(--size-surface-border) solid var(--color-outline-variant);
+// The toggle sits in this space, so the sidebar's first row starts under the topbar.
+.plus-surface-container__topbar-space {
+    flex-shrink: 0;
+    height: var(--layout-height-topbar);
+}
+
+// The hover strip that peeks a closed sidebar: the frame's left edge beside the
+// surface row. The topbar's corner belongs to the toggle, which peeks on its own,
+// so a pointer resting in the screen's top-left corner opens nothing.
+.plus-surface-container__edge {
+    position: absolute;
+    top: calc(var(--surface-container-pad) + var(--layout-height-topbar));
+    bottom: 0;
+    left: 0;
+    z-index: calc(var(--layout-z-index-navigation) - 1);
+    width: var(--surface-container-pad);
+}
+
+/* ------------------------------------------------------------- surface */
+
+.plus-surface-container__surface {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    box-sizing: border-box;
+    padding: var(--surface-pad);
+    overflow: auto;
+    border-radius: var(--surface-radius);
+    background-color: var(--surface-default);
+}
+
+// The 12-column content grid, capped and centered; never narrower than 720,
+// so a narrow surface scrolls sideways instead.
+.plus-surface-container__content {
+    display: grid;
+    grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
+    column-gap: var(--layout-gutter);
+    row-gap: var(--surface-stack-md);
+    align-content: start;
+    flex: 1 0 auto;
+    width: 100%;
+    min-width: var(--layout-min-width-content);
+    max-width: var(--layout-max-width-content);
+    margin-inline: auto;
+    box-sizing: border-box;
+
+    > * {
+        grid-column: 1 / -1;
+        min-width: 0;
+    }
+}
+
+.plus-surface-container__content--reading {
+    max-width: var(--layout-max-width-reading);
 }

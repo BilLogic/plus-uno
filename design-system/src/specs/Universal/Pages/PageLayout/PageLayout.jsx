@@ -1,24 +1,20 @@
 /**
  * PageLayout Component
- * 
- * App Outer Layout per Figma specs.
- * Figma Specs: 112-597 (Collapsed), 112-596 (Expanded)
+ *
+ * The app frame every spec page is laid out in: the SurfaceContainer pattern
+ * (32 topbar, 240 sidebar docking from 1024, the surface and its 12-column
+ * content grid) filled with the PLUS TopBar and Sidebar. The frame's sizes and
+ * the sidebar's dock, peek and float behavior live in SurfaceContainer; this
+ * component supplies the content and the page outline.
+ * Figma: BS4 Foundation `Pattern/Page template` and `Pattern/Surface container`.
  */
 
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { Skeleton } from '@/components';
+import { SurfaceContainer } from '@/patterns';
 import { TopBar, Sidebar } from '../../Sections';
 import { usePageLayoutShell } from './PageLayoutShellContext';
-
-/** Shared motion: sidebar + content grow/shrink in sync (Material-style decelerate, 280ms). */
-const SIDEBAR_TRANSITION = 'width 0.28s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1)';
-const CONTENT_TRANSITION = 'width 0.28s cubic-bezier(0.4, 0, 0.2, 1), flex-basis 0.28s cubic-bezier(0.4, 0, 0.2, 1)';
-
-/** SideNav width — matches the --layout-sidebar-width token (164px). Single source; do not hardcode elsewhere. */
-const SIDEBAR_WIDTH = 164;
-/** TopBar skeleton: left (toggle), center (breadcrumb), right (avatar). Same layout as TopBar for no CLS. */
-const TOPBAR_LEFT_COLLAPSED_WIDTH = 52;
-const TOPBAR_LEFT_EXPANDED_WIDTH = SIDEBAR_WIDTH;
 
 /**
  * The page's `<h1>` is off-screen, not `display: none` — a hidden-by-display
@@ -69,27 +65,20 @@ const PageLayout = ({
      * the `<h1>` instead and leaves this unset.
      */
     title,
-    /** When true, render children directly in content-wrapper without main (e.g. full-width chat). */
+    /** When true, render children straight into the surface, with no `<main>` content grid (e.g. full-width chat). */
     contentDirect = false,
     /** When true, show TopBar skeleton + Sidebar loading (shimmer). */
     shellLoading = false,
     /** When true, apply shell-reveal has-entered for entrance animation (TopBar + Sidebar). */
     shellEntered = false,
-    /** When true, keep sidebar hidden regardless of viewport size/toggle state. */
+    /** When true, there is no sidebar and no sidebar toggle. */
     sidebarHidden = false,
-    /** When true, force sidebar expanded (e.g. for Storybook/demos). Overrides breakpoint. */
+    /** When true, dock the sidebar at every width (e.g. for Storybook/demos). Overrides the breakpoint default. */
     sidebarExpanded = false,
 }) => {
     const pageShell = usePageLayoutShell();
     const forceExpanded = sidebarExpanded || Boolean(pageShell?.forceSidebarExpanded);
     const fullscreen = Boolean(pageShell?.fullscreen);
-    const [isSidebarVisible, setIsSidebarVisible] = useState(() => (forceExpanded || !sidebarHidden));
-    const containerRef = React.useRef(null);
-    /** When shell width is below lg, user-expanded sidebar must not be undone by ResizeObserver. */
-    const manualNarrowExpandRef = React.useRef(false);
-    const breakpoint = 1024; // lg-min breakpoint per DS schema — sidebar on at LG+; collapsed below
-
-    const showSidebar = !sidebarHidden && isSidebarVisible;
 
     /** Sidebar expects `activeTabId`; specs often pass `activeTab`. Strip both before spread. */
     const sidebarProps = { ...(sidebarConfig || {}) };
@@ -106,99 +95,6 @@ const PageLayout = ({
     delete sidebarProps.activeTab;
 
     /**
- * Read layout width using border-box so 1px borders don’t push LG (1024) under the threshold.
- * @param {Element | null} el
- * @param {ResizeObserverEntry} [entry]
- * @returns {number}
- */
-const readWidth = (el, entry) => {
-    const box = entry?.borderBoxSize?.[0];
-    if (box && typeof box.inlineSize === 'number') return box.inlineSize;
-    if (!el) return 0;
-    return el.getBoundingClientRect().width;
-};
-
-/**
- * Storybook ResponsiveFrame can set `data-plus-breakpoint` (md|lg|xl) so sidebar
- * follows the toolbar simulation even when the frame fills a wider docs column.
- * @param {Element | null} el
- * @returns {'md' | 'lg' | 'xl' | null}
- */
-const readForcedBreakpoint = (el) => {
-    const host = el?.closest?.('[data-plus-breakpoint]');
-    const bp = host?.getAttribute?.('data-plus-breakpoint');
-    if (bp === 'md' || bp === 'lg' || bp === 'xl') return bp;
-    return null;
-};
-
-/**
- * @param {number} width
- * @param {'md' | 'lg' | 'xl' | null} forced
- * @returns {boolean} Whether the sidebar should be visible by default
- */
-const sidebarVisibleFor = (width, forced) => {
-    if (forced === 'md') return false;
-    if (forced === 'lg' || forced === 'xl') return true;
-    return width >= breakpoint;
-};
-
-// Measure once synchronously BEFORE paint so a page mounted at a narrow width (docs previews,
-// MD breakpoint) starts with the Sidebar already collapsed — no expanded→collapsed flash.
-useLayoutEffect(() => {
-    if (sidebarHidden || forceExpanded || !containerRef.current) return;
-    const el = containerRef.current;
-    const forced = readForcedBreakpoint(el);
-    const w = readWidth(el);
-    setIsSidebarVisible(sidebarVisibleFor(w, forced));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []);
-
-useEffect(() => {
-    if (sidebarHidden) {
-        manualNarrowExpandRef.current = false;
-        setIsSidebarVisible(false);
-        return undefined;
-    }
-    if (forceExpanded) {
-        manualNarrowExpandRef.current = false;
-        setIsSidebarVisible(true);
-        return undefined;
-    }
-    if (!containerRef.current) return undefined;
-
-    const observer = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-            const forced = readForcedBreakpoint(entry.target);
-            const w = readWidth(entry.target, entry);
-            if (sidebarVisibleFor(w, forced)) {
-                manualNarrowExpandRef.current = false;
-                setIsSidebarVisible(true);
-            } else {
-                // Narrow / MD: respect user overlay-open; otherwise collapse.
-                setIsSidebarVisible(manualNarrowExpandRef.current);
-            }
-        }
-    });
-
-    observer.observe(containerRef.current);
-
-    return () => observer.disconnect();
-}, [sidebarHidden, forceExpanded]);
-
-    const handleSidebarToggle = (newMode) => {
-        if (sidebarHidden) return;
-        const expanded = newMode === 'expanded';
-        if (!expanded) {
-            manualNarrowExpandRef.current = false;
-            setIsSidebarVisible(false);
-            return;
-        }
-        const w = containerRef.current?.getBoundingClientRect().width ?? breakpoint;
-        manualNarrowExpandRef.current = w < breakpoint;
-        setIsSidebarVisible(true);
-    };
-
-    /**
      * First element inside `<main>`, so the outline's top is also the top of the
      * page's main content. Omitted entirely when no title is given — a page that
      * marks its own visible heading up as the `<h1>` must not get a second one.
@@ -207,10 +103,44 @@ useEffect(() => {
         ? <h1 className="plus-page-title" style={PAGE_TITLE_STYLE}>{title}</h1>
         : null;
 
+    const reveal = `shell-reveal${shellEntered ? ' has-entered' : ''}`;
+
+    // The topbar row is the frame's; this is what sits in it after the toggle.
+    const topbar = shellLoading ? (
+        <div
+            className="plus-topbar-skeleton"
+            aria-hidden="true"
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 'var(--element-inline-md)',
+                width: '100%',
+            }}
+        >
+            <Skeleton shape="text" width="var(--width-1000)" />
+            <Skeleton shape="circle" width="var(--item-height-md)" />
+        </div>
+    ) : (
+        <div className={reveal} style={{ display: 'flex', width: '100%', height: '100%' }}>
+            <TopBar breadcrumbs={topBarConfig.breadcrumbs} user={topBarConfig.user} />
+        </div>
+    );
+
+    const sidebar = sidebarHidden ? null : (
+        <div className={`plus-page-sidebar-wrapper${shellLoading ? '' : ` ${reveal}`}`}>
+            <Sidebar
+                {...sidebarProps}
+                activeTabId={sidebarActiveCombined}
+                visible={true}
+                loading={shellLoading}
+            />
+        </div>
+    );
+
     return (
         <div
             id={id}
-            ref={containerRef}
             className={`plus-page-layout${fullscreen ? ' plus-page-layout--fullscreen' : ''} ${className}`}
             style={{
                 position: 'relative',
@@ -220,141 +150,29 @@ useEffect(() => {
                 height: '100%',
                 minHeight: fullscreen ? 0 : undefined,
                 flex: fullscreen ? '1 1 auto' : undefined,
-                backgroundColor: 'var(--color-surface-container)',
-                overflow: 'hidden',
-                border: fullscreen ? 'none' : '1px solid var(--color-outline-variant)',
-                borderRadius: fullscreen ? 0 : '8px',
-                boxSizing: 'border-box',
-                padding: fullscreen
-                    ? 'var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-md, 16px)'
-                    : 'var(--size-element-pad-y-lg, 12px) var(--size-element-pad-x-md, 16px)',
-                gap: 'var(--size-element-gap-md, 16px)',
-                alignItems: 'flex-start',
-                ...style
+                ...style,
             }}
         >
-            {/* TopBar: skeleton when shellLoading, real TopBar when not; shell-reveal has-entered for entrance */}
-            {shellLoading ? (
-                <div
-                    className="plus-topbar-skeleton"
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        width: '100%',
-                        height: 52,
-                        flexShrink: 0,
-                        gap: 'var(--size-element-gap-md, 16px)',
-                        padding: '0 var(--size-element-pad-x-md, 16px)',
-                        boxSizing: 'border-box',
-                    }}
-                    aria-hidden="true"
-                >
-                    <div className="plus-skeleton-block" style={{ width: TOPBAR_LEFT_EXPANDED_WIDTH, height: 40, flexShrink: 0, borderRadius: 8 }} />
-                    <div className="plus-skeleton-block" style={{ flex: 1, minWidth: 0, height: 24, maxWidth: 320, borderRadius: 6 }} />
-                    <div className="plus-skeleton-block" style={{ width: 60, height: 40, flexShrink: 0, borderRadius: '50%' }} />
-                </div>
-            ) : (
-                <div className={`shell-reveal${shellEntered ? ' has-entered' : ''}`} style={{ width: '100%', flexShrink: 0 }}>
-                    <TopBar
-                        mode={showSidebar ? 'expanded' : 'collapsed'}
-                        onToggle={handleSidebarToggle}
-                        breadcrumbs={topBarConfig.breadcrumbs}
-                        user={topBarConfig.user}
-                    />
-                </div>
-            )}
+            <SurfaceContainer
+                topbar={topbar}
+                sidebar={sidebar}
+                sidebarDocked={forceExpanded ? true : undefined}
+                contentAs="main"
+                contentClassName={['plus-page-main', mainClassName].filter(Boolean).join(' ')}
+                surfaceDirect={contentDirect}
+                style={{ flex: '1 1 auto', minHeight: 0 }}
+            >
+                {pageTitle}
+                {children}
+            </SurfaceContainer>
 
-            {/* Main Container – flex so sidebar width animation drives content growth smoothly; gap only when sidebar visible to avoid misalignment when collapsed */}
-            <div className="plus-page-main-container" style={{
-                display: 'flex',
-                flex: 1,
-                minHeight: 0,
-                overflow: 'hidden',
-                position: 'relative',
-                width: '100%',
-                gap: showSidebar ? 'var(--size-element-gap-md, 16px)' : 0,
-                transition: 'gap 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
-                alignItems: 'stretch',
-            }}>
-                {/* Sidebar Wrapper – stays in flow; width 164↔0 so content area grows/shrinks with same timing; shell-reveal for entrance */}
-                <div
-                    className={`plus-page-sidebar-wrapper${!shellLoading ? ' shell-reveal' : ''}${!shellLoading && shellEntered ? ' has-entered' : ''}`}
-                    style={{
-                        position: 'relative',
-                        flexShrink: 0,
-                        height: '100%',
-                        overflow: 'hidden',
-                        borderRight: 'none',
-                        backgroundColor: 'var(--color-surface-container)',
-                        transition: SIDEBAR_TRANSITION,
-                        zIndex: 'var(--layout-z-index-navigation)',
-                        width: showSidebar ? SIDEBAR_WIDTH : 0,
-                        minWidth: showSidebar ? SIDEBAR_WIDTH : 0,
-                        pointerEvents: showSidebar ? 'auto' : 'none',
-                    }}
-                >
-                    <div style={{ width: SIDEBAR_WIDTH, minWidth: SIDEBAR_WIDTH, height: '100%', overflowX: 'hidden', overflowY: 'auto' }}>
-                        <Sidebar
-                            {...sidebarProps}
-                            activeTabId={sidebarActiveCombined}
-                            visible={true}
-                            loading={shellLoading}
-                        />
-                    </div>
-                </div>
-
-                {/* Content Wrapper – transitions width/flex-basis in sync with sidebar for smooth grow/shrink */}
-                <div className="plus-page-content-wrapper" style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    padding: 'var(--size-surface-pad-y, 24px) var(--size-surface-pad-x, 32px)',
-                    gap: 'var(--size-surface-gap-md, 24px)',
-                    flex: '1 0 0',
-                    alignItems: 'stretch',
-                    minWidth: 0,
-                    // Height comes from the parent's align-items:stretch + this flex track.
-                    // A redundant height:100% over-resolves at short viewports and grows the
-                    // layer past the shell, clipping the bottom under the shell's overflow:hidden.
-                    minHeight: 0,
-                    overflow: 'hidden',
-                    backgroundColor: 'var(--color-surface, #f9f9fc)',
-                    borderRadius: 'var(--size-surface-radius, 16px)',
-                    transition: CONTENT_TRANSITION,
-                }}>
-                    {contentDirect ? (
-                        <>
-                            {pageTitle}
-                            {children}
-                        </>
-                    ) : (
-                        <main
-                            className={['plus-page-main', mainClassName].filter(Boolean).join(' ')}
-                            style={{
-                                flex: 1,
-                                minHeight: 0,
-                                padding: 0,
-                                width: '100%',
-                                boxSizing: 'border-box',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                overflow: 'auto',
-                                position: 'relative'
-                            }}
-                        >
-                            {pageTitle}
-                            {children}
-                        </main>
-                    )}
-                </div>
-            </div>
-
-            {/* Floating content anchored to page frame (e.g. FAB): 48px right, 36px bottom */}
+            {/* Floating content anchored to page frame (e.g. FAB) */}
             {floatingContent && (
                 <div
                     style={{
                         position: 'absolute',
-                        bottom: 36,
-                        right: 48,
+                        bottom: 'var(--space-200)',
+                        right: 'var(--space-300)',
                         zIndex: 'var(--layout-z-index-navigation)',
                         pointerEvents: 'auto',
                     }}
