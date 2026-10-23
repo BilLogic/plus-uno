@@ -15,6 +15,8 @@ import path from 'path';
 import https from 'https';
 import dotenv from 'dotenv';
 
+import { FRAME_LAYER_COLLECTIONS, frameLayerFile, isFrameLayerCollection } from './lib/frame-layer-collections.mjs';
+
 // Load environment variables
 dotenv.config();
 
@@ -108,6 +110,11 @@ function transformToExistingFormat(variablesResponse) {
         'size _ semantics': { variables: [], modes: {} },
         'size _ layout': { variables: [], modes: {} }
     };
+    // The frame and layer collections are exported one file each, under the
+    // collection's own name. They are matched exactly, before the substring
+    // rules below, which would otherwise file `Layout` under `size _ layout`
+    // and `Card` or `Section` under `size _ semantics`.
+    for (const { name } of FRAME_LAYER_COLLECTIONS) organized[frameLayerFile(name).replace(/\.json$/, '')] = { variables: [], modes: {} };
 
     // Process each variable
     const variablesObj = variablesResponse?.meta?.variables || {};
@@ -121,7 +128,9 @@ function transformToExistingFormat(variablesResponse) {
         let targetFile = null;
 
         // Map collection names to file names
-        if (collectionName.includes('color') && (collectionName.includes('accent') || collectionName.includes('primary') || collectionName.includes('secondary'))) {
+        if (isFrameLayerCollection(collection.name)) {
+            targetFile = frameLayerFile(collection.name).replace(/\.json$/, '');
+        } else if (collectionName.includes('color') && (collectionName.includes('accent') || collectionName.includes('primary') || collectionName.includes('secondary'))) {
             targetFile = 'colors _ accent';
         } else if (collectionName.includes('color') && (collectionName.includes('neutral') || collectionName.includes('surface'))) {
             targetFile = 'colors _ neutral';
@@ -140,6 +149,8 @@ function transformToExistingFormat(variablesResponse) {
                 name: variable.name,
                 variableCollectionId: variable.variableCollectionId,
                 resolvedType: variable.resolvedType,
+                scopes: variable.scopes,
+                codeSyntax: variable.codeSyntax,
                 valuesByMode: {},
                 resolvedValuesByMode: {}
             };

@@ -2,7 +2,9 @@ import fs from 'fs';
 import path from 'path';
 
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
+import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { compare, refusals } from './token-generation.mjs';
+import { FRAME_LAYER_COLLECTIONS, frameLayerFile, frameLayerFolder, frameLayerToken } from './lib/frame-layer-collections.mjs';
 
 /**
  * The Figma exports the SCSS is generated FROM, and where the SCSS lands.
@@ -708,6 +710,162 @@ function generateScalesSCSS() {
     return `${scss}}\n`;
 }
 
+/*
+ * FRAME AND LAYER TOKENS
+ *
+ * The sets listed in `scripts/lib/frame-layer-collections.mjs`, which also
+ * says how a variable's code name is made. They sit beside the `size / *`
+ * tokens above under new names, so nothing that reads an old name changes
+ * until it is moved. Each variable's Figma code syntax has to name the same
+ * token, so the name a designer copies from Figma is the one code declares,
+ * and every alias resolves into the scales above.
+ */
+
+/** The modes `spacing / layout` takes, named as `size _ layout.json` names the breakpoint each starts at. */
+const FRAME_LAYER_MODES = ['Medium (768px)', 'Large (1024px)', 'X-Large (1440px)'];
+
+/**
+ * Figma variables with no CSS: the template switch that shows the docked
+ * sidebar layer. Code docks the sidebar with a media query instead.
+ */
+const FIGMA_ONLY_FRAME_LAYERS = new Set(['sidebar-docked']);
+
+/**
+ * Tokens code needs that Figma cannot hold: a height relative to the screen,
+ * and a popover's gap to its trigger, which Figma draws by hand. `figmaName`
+ * is the variable that would replace each one.
+ */
+const CODE_ONLY_FRAME_LAYERS = {
+    'layout-max-height-modal': {
+        value: 'calc(100dvh - 2 * var(--overlay-pad-y))',
+        note: 'a Hug modal grows to it; a Fill modal sits at it',
+        figmaName: 'Modal/max-height-modal (Spacing / Layout)',
+    },
+    'popover-offset': {
+        value: 'var(--space-025)',
+        note: 'gap from a popover to its trigger',
+        figmaName: 'Popover/Placement/offset',
+    },
+};
+
+/** Under this screen height the overlay pads 24 above and below, not 64. Code only. */
+const SHORT_SCREEN = { maxHeight: 639.98, token: 'overlay-pad-y', value: 'var(--space-150)' };
+
+/**
+ * Generate the frame and layer tokens SCSS
+ */
+function generateFrameLayersSCSS() {
+    // Aliases point into the scales; each is written as a var() of its
+    // target's code syntax, the way generateScalesSCSS writes its own.
+    const scaleName = {};
+    for (const { file } of SCALE_COLLECTIONS) {
+        for (const v of readSource(file).json.variables) scaleName[v.id] = webName(v.codeSyntax?.WEB);
+    }
+
+    const layout = readSource('size _ layout.json').json;
+    const minWidth = layout.variables.find((v) => v.name === 'Breakpoints/min width');
+    const layoutModeIds = Object.fromEntries(Object.entries(layout.modes).map(([id, name]) => [name, id]));
+    const startsAt = (mode) => {
+        const id = layoutModeIds[mode];
+        if (!id) throw new Error(`size _ layout.json: no "${mode}" mode.`);
+        return minWidth.resolvedValuesByMode[id];
+    };
+
+    const declared = new Map();
+    const blocks = new Map(); // breakpoint min-width -> lines
+    let root = '';
+
+    for (const { name: collection, heading } of FRAME_LAYER_COLLECTIONS) {
+        const file = frameLayerFile(collection);
+        const { json } = readSource(file);
+        const modes = Object.entries(json.modes).map(([id, name]) => {
+            if (Object.keys(json.modes).length > 1 && !FRAME_LAYER_MODES.includes(name)) {
+                throw new Error(`${file}: unknown mode "${name}". Modes are ${FRAME_LAYER_MODES.join(' · ')}.`);
+            }
+            return { id, name };
+        });
+        root += `\n    /* ${heading} */\n`;
+        let folder = null;
+
+        for (const v of json.variables) {
+            const leaf = v.name.split('/').pop();
+            if (v.resolvedType === 'BOOLEAN') {
+                if (!FIGMA_ONLY_FRAME_LAYERS.has(leaf)) {
+                    throw new Error(`${file}: ${v.name} is a boolean, which CSS cannot hold. List it in FIGMA_ONLY_FRAME_LAYERS.`);
+                }
+                continue;
+            }
+            const token = frameLayerToken(collection, v.name);
+            if (v.codeSyntax?.WEB !== `var(--${token})`) {
+                throw new Error(`${file}: ${v.name} has Figma code syntax ${v.codeSyntax?.WEB ?? '(none)'}, but code declares --${token}.`);
+            }
+            if (declared.has(token)) throw new Error(`${file}: ${v.name} and ${declared.get(token)} are both --${token}.`);
+            declared.set(token, `${file} ${v.name}`);
+            if (frameLayerFolder(v.name) !== folder) {
+                folder = frameLayerFolder(v.name);
+                root += `    /* ${folder} */\n`;
+            }
+
+            const css = (mode) => {
+                const val = v.valuesByMode[mode.id];
+                if (val?.type === 'VARIABLE_ALIAS') {
+                    if (!scaleName[val.id]) throw new Error(`${file}: ${v.name} aliases ${val.id}, which none of the scale exports holds.`);
+                    return `var(${scaleName[val.id]})`;
+                }
+                if (typeof val === 'number') return px(val);
+                if (val?.r !== undefined) return cssColor(val);
+                throw new Error(`${file}: ${v.name} has no value at ${mode.name}.`);
+            };
+            const values = modes.map(css);
+
+            root += `    --${token}: ${values[0]};\n`;
+            for (let i = 1; i < modes.length; i++) {
+                if (values[i] === values[i - 1]) continue;
+                const at = startsAt(modes[i].name);
+                if (!blocks.has(at)) blocks.set(at, '');
+                blocks.set(at, blocks.get(at) + `        --${token}: ${values[i]};\n`);
+            }
+        }
+    }
+
+    for (const [token, { figmaName }] of Object.entries(CODE_ONLY_FRAME_LAYERS)) {
+        if (declared.has(token)) stale('CODE_ONLY_FRAME_LAYERS', `Figma now has --${token} (${figmaName}); read it from the export.`);
+    }
+    if (!declared.has(SHORT_SCREEN.token)) {
+        stale('SHORT_SCREEN', `Figma no longer has --${SHORT_SCREEN.token}; the short-screen override has nothing to override.`);
+    }
+
+    let scss = `/**
+ * Frame and Layer Tokens
+ * Generated from the spacing / layout, spacing / patterns and color / patterns
+ * sets in Figma. spacing / layout has modes Medium (768px) · Large (1024px) ·
+ * X-Large (1440px): the Medium value is in :root, wider modes override below.
+ *
+ * The derived Layout rows (pad-left-container, width-content, width-column,
+ * width-modal-*) are each mode's value at its screen width, 768 · 1024 · 1440,
+ * the same numbers Figma's modes hold. Between those widths they step rather
+ * than follow the screen, so code that needs the exact width at any screen
+ * computes it from the rules instead of reading these.
+ */
+
+:root {
+${root.slice(1)}
+    /* Code only; not Figma variables (CODE_ONLY_FRAME_LAYERS) */
+${Object.entries(CODE_ONLY_FRAME_LAYERS).map(([token, { value, note }]) => `    --${token}: ${value}; /* ${note} */\n`).join('')}}
+`;
+    for (const at of [...blocks.keys()].sort((a, b) => a - b)) {
+        scss += `\n@media (min-width: ${px(at)}) {\n    :root {\n${blocks.get(at)}    }\n}\n`;
+    }
+    scss += `\n/* A short screen pads modals 24 above and below; code only (SHORT_SCREEN) */
+@media (max-height: ${px(SHORT_SCREEN.maxHeight)}) {
+    :root {
+        --${SHORT_SCREEN.token}: ${SHORT_SCREEN.value};
+    }
+}
+`;
+    return scss;
+}
+
 // Generate all files
 //
 // EVERY FILE IS BUILT IN MEMORY FIRST. This used to write each one as it was
@@ -727,10 +885,30 @@ try {
         { file: '_spacing_semantics.scss', generated: generateSemanticsSCSS() },
         { file: '_layout.scss', generated: generateLayoutSCSS() },
         { file: '_scales.scss', generated: generateScalesSCSS() },
+        { file: '_frame_layers.scss', generated: generateFrameLayersSCSS() },
     ];
 } catch (error) {
     console.error(`\n❌ Generation failed. ${error.message}\n   Nothing was written.\n`);
     process.exit(1);
+}
+
+/*
+ * One name, one file. The frame and layer tokens carry the spec's names with
+ * no family prefix, so nothing but this keeps one of them from landing on a
+ * name another generated file already declares; whichever loaded second would
+ * win silently.
+ */
+{
+    const owner = new Map();
+    for (const { file, generated: css } of generated) {
+        for (const [, name] of css.matchAll(tokenDeclarationPattern('--'))) {
+            if (owner.has(name) && owner.get(name) !== file) {
+                console.error(`\n❌ ${name} is declared in both ${owner.get(name)} and ${file}. Nothing was written.\n`);
+                process.exit(1);
+            }
+            owner.set(name, file);
+        }
+    }
 }
 
 if (staleExceptions.length) {

@@ -1,0 +1,137 @@
+/**
+ * Frame and Layer Tokens
+ * Generated from the spacing / layout, spacing / patterns and color / patterns
+ * sets in Figma. spacing / layout has modes Medium (768px) · Large (1024px) ·
+ * X-Large (1440px): the Medium value is in :root, wider modes override below.
+ *
+ * The derived Layout rows (pad-left-container, width-content, width-column,
+ * width-modal-*) are each mode's value at its screen width, 768 · 1024 · 1440,
+ * the same numbers Figma's modes hold. Between those widths they step rather
+ * than follow the screen, so code that needs the exact width at any screen
+ * computes it from the rules instead of reading these.
+ */
+
+:root {
+    /* spacing / layout: the frame and the surface, per breakpoint */
+    /* Topbar */
+    --layout-height-topbar: var(--height-200);
+    /* Sidebar */
+    --layout-width-sidebar: var(--width-1500);
+    --layout-pad-left-container: 8px;
+    /* Grid */
+    --layout-gutter: var(--space-100);
+    --layout-width-column: 45.33px;
+    /* Content */
+    --layout-max-width-content: var(--size-7700);
+    --layout-max-width-reading: var(--size-5400);
+    --layout-min-width-content: var(--size-4500);
+    --layout-width-content: 720px;
+    /* Modal */
+    --layout-width-modal-sm: 384px;
+    --layout-width-modal-md: 506.67px;
+    --layout-width-modal-lg: 629.33px;
+    /* Surface */
+    --surface-pad: var(--space-100);
+    --surface-stack-sm: var(--space-100);
+    --surface-stack-md: var(--space-150);
+    --surface-stack-lg: var(--space-250);
+    --surface-radius: var(--radius-100);
+
+    /* spacing / patterns */
+    /* Surface container */
+    --surface-container-pad: var(--space-050);
+    --surface-container-stack: var(--space-050);
+    /* Section */
+    --section-stack-sm: var(--space-050);
+    --section-stack-md: var(--space-100);
+    --section-stack-lg: var(--space-150);
+    --section-min-width-main: var(--width-3000);
+    --section-min-width-side: var(--width-1400);
+    /* Card */
+    --card-pad-sm: var(--space-100);
+    --card-pad-md: var(--space-125);
+    --card-pad-lg: var(--space-150);
+    --card-stack-sm: var(--space-025);
+    --card-stack-md: var(--space-050);
+    --card-stack-lg: var(--space-075);
+    --card-inline-sm: var(--space-025);
+    --card-inline-md: var(--space-050);
+    --card-inline-lg: var(--space-075);
+    --card-min-width-sm: var(--width-1400);
+    --card-min-width-md: var(--size-1900);
+    --card-min-width-lg: var(--width-3000);
+    --card-radius: var(--radius-100);
+    --card-radius-sm: var(--radius-075);
+    /* Table */
+    --table-pad-x-cell: var(--space-050);
+    --table-pad-y-cell: var(--space-025);
+    --table-indent: var(--space-150);
+    --table-radius: var(--radius-050);
+    /* Overlay */
+    --overlay-pad-x: var(--space-100);
+    --overlay-pad-y: var(--space-400);
+    /* Modal */
+    --modal-pad: var(--space-100);
+    --modal-stack-sm: var(--space-050);
+    --modal-stack-md: var(--space-100);
+    --modal-stack-lg: var(--space-150);
+    --modal-inline-sm: var(--space-050);
+    --modal-inline-md: var(--space-100);
+    --modal-inline-lg: var(--space-150);
+    --modal-radius: var(--radius-075);
+    /* Popover */
+    --popover-pad: var(--space-100);
+    --popover-width-sm: var(--width-2000);
+    --popover-width-md: var(--width-2500);
+    --popover-width-lg: var(--width-3000);
+    --popover-width-flag: var(--width-2500);
+    --popover-stack-flag: var(--space-100);
+    --popover-radius: var(--radius-075);
+    --popover-pad-menu: var(--space-025);
+    --popover-min-width-menu: var(--width-1000);
+    --popover-max-width-menu: var(--width-2000);
+    --popover-max-height-menu: var(--height-2000);
+    --popover-radius-menu-sm: var(--radius-0625);
+    --popover-radius-menu-md: var(--radius-075);
+    --popover-pad-y-tooltip: var(--space-025);
+    --popover-max-width-tooltip: var(--width-1500);
+    --popover-radius-tooltip: var(--radius-0375);
+    --popover-gap-screen: var(--space-050);
+
+    /* color / patterns */
+    /* Overlay */
+    --overlay-scrim: rgba(0, 0, 0, 0.38);
+
+    /* Code only; not Figma variables (CODE_ONLY_FRAME_LAYERS) */
+    --layout-max-height-modal: calc(100dvh - 2 * var(--overlay-pad-y)); /* a Hug modal grows to it; a Fill modal sits at it */
+    --popover-offset: var(--space-025); /* gap from a popover to its trigger */
+}
+
+@media (min-width: 1024px) {
+    :root {
+        --layout-pad-left-container: 0px;
+        --layout-width-column: 47.33px;
+        --layout-width-content: 744px;
+        --layout-width-modal-sm: 512px;
+        --layout-width-modal-md: 677.33px;
+        --layout-width-modal-lg: 842.67px;
+    }
+}
+
+@media (min-width: 1440px) {
+    :root {
+        --layout-width-column: 80.67px;
+        --layout-width-content: 1144px;
+        --layout-width-modal-sm: 640px;
+        --layout-width-modal-md: 848px;
+        --layout-width-modal-lg: 1056px;
+        --surface-pad: var(--space-150);
+    }
+}
+
+/* A short screen pads modals 24 above and below; code only (SHORT_SCREEN) */
+@media (max-height: 639.98px) {
+    :root {
+        --overlay-pad-y: var(--space-150);
+    }
+}

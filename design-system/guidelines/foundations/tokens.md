@@ -21,6 +21,12 @@ summary: Tokens — Overview & Decision Tree
 | Page region or column (sidebar, main content) | **section** | `--size-section-*` |
 | Tabular data (rows, cells, headers) | **table** | `--size-table-*` |
 | Overlay or dialog (confirmation, detail panel) | **modal** | `--size-modal-*` |
+| Page frame: topbar, sidebar, grid, content width, modal width | **layout** | `--layout-*` (per breakpoint) |
+| The frame around the content box, and the rounded content box | **surface container**, **surface** | `--surface-container-*`, `--surface-pad`, `--surface-stack-*`, `--surface-radius` |
+| Full-screen layer under a modal, and its scrim | **overlay** | `--overlay-*` |
+| Floating layer with no scrim (menu, popup, tooltip, flag) | **popover** | `--popover-*` |
+
+The frame and layer tokens (`_frame_layers.scss`) carry the spec's `Collection/property-variant` names with no family prefix: `--card-pad-sm`, `--modal-radius`, `--section-stack-md`. They sit beside the older `--size-*` names of the same layers while uses move to them pattern by pattern.
 
 ## Token References
 
