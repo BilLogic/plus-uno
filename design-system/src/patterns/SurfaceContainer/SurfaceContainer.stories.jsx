@@ -4,7 +4,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Breadcrumb, Sidebar } from '@/components';
 import SurfaceContainer from '@/patterns/SurfaceContainer';
 import { computedShadow, px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
-import { setTestViewport } from '@/storybook-docs/lib/test-viewport.js';
+import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 
 /**
  * `SurfaceContainer` — the app frame: a 32 topbar over a row holding the
@@ -122,15 +122,13 @@ const expectFloating = async (frame, aside, surface, surfaceLeftBefore) => {
     await expect(surface.contains(hit), 'nothing covers the page beside the floating sidebar').toBe(true);
 };
 
-/** Restores the runner's viewport, whatever the story did. */
-const atViewport = async (width, run) => {
-    const before = { w: window.innerWidth, h: window.innerHeight };
-    await setTestViewport(width, HEIGHT);
-    try {
-        await run();
-    } finally {
-        await setTestViewport(before.w, before.h);
-    }
+const atViewport = (width, run) => withTestViewport(width, HEIGHT, run);
+
+/** The topbar row and the sidebar-and-surface row stack 8 apart. */
+const expectRowStack = async (frame, surface) => {
+    const topbar = frame.querySelector('.plus-surface-container__topbar');
+    await expect(rect(surface).top - rect(topbar).bottom, 'stack between the rows')
+        .toBeCloseTo(tokenLength(frame, '--surface-container-stack'), 0);
 };
 
 /* ------------------------------------------------------------- stories */
@@ -151,7 +149,9 @@ export const Medium768 = {
         const pad = tokenLength(frame, '--surface-container-pad');
         await expect(offset(frame, surface).x, 'surface starts after the container pad').toBeCloseTo(pad, 0);
         await expect(surfacePad(surface), 'surface pad').toBeCloseTo(tokenLength(frame, '--surface-pad'), 0);
+        await expect(surfacePad(surface), 'surface pad below 1440').toBeCloseTo(tokenLength(frame, '--space-100'), 0);
         await expect(rect(content).width, 'content width').toBeCloseTo(tokenLength(frame, '--layout-width-content'), 0);
+        await expectRowStack(frame, surface);
 
         // Hover the toggle: the sidebar peeks, floating.
         const surfaceLeft = rect(surface).left;
@@ -183,6 +183,11 @@ export const Medium768 = {
         await expect(rect(content).width, 'content never goes under its minimum')
             .toBeCloseTo(tokenLength(frame, '--layout-min-width-content'), 0);
         await expect(surface.scrollWidth, 'the surface scrolls sideways').toBeGreaterThan(surface.clientWidth);
+        // Scrolled sideways, the topbar stays put.
+        const topbarLeft = rect(frame.querySelector('.plus-surface-container__topbar')).left;
+        surface.scrollLeft = surface.scrollWidth;
+        await expect(rect(frame.querySelector('.plus-surface-container__topbar')).left, 'the topbar stays put')
+            .toBeCloseTo(topbarLeft, 0);
         await expectToggleHome(frame, toggle);
 
         // Docked, an outside click leaves it docked.
@@ -201,7 +206,9 @@ export const Large1024 = {
         await expect(getComputedStyle(sidebar()).position).toBe('static');
         await expect(offset(frame, surface).x).toBeCloseTo(tokenLength(frame, '--layout-width-sidebar'), 0);
         await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--surface-pad'), 0);
+        await expect(surfacePad(surface), 'surface pad below 1440').toBeCloseTo(tokenLength(frame, '--space-100'), 0);
         await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--layout-width-content'), 0);
+        await expectRowStack(frame, surface);
 
         // The sidebar's rows are the 32 item height.
         const tab = within(sidebar()).getAllByRole('button')[0];

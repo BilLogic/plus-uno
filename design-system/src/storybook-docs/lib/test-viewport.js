@@ -70,3 +70,20 @@ export const setTestViewport = async (width, height) => {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     return true;
 };
+
+/**
+ * Runs `run` at `width` × `height`, then puts the runner's viewport back
+ * whatever `run` did, so the next story starts where it expects.
+ * @param {number} width
+ * @param {number} height
+ * @param {() => Promise<void>} run
+ */
+export const withTestViewport = async (width, height, run) => {
+    const before = { w: window.innerWidth, h: window.innerHeight };
+    await setTestViewport(width, height);
+    try {
+        await run();
+    } finally {
+        await setTestViewport(before.w, before.h);
+    }
+};

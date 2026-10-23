@@ -19,7 +19,7 @@ import Card from '@/components/layout-and-structure/Card/Card';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
-import { setTestViewport } from '@/storybook-docs/lib/test-viewport.js';
+import { setTestViewport, withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 
 export default {
     title: 'Specs/Universal/Pages/Page Layout',
@@ -112,7 +112,6 @@ export const Overview = {
 export const Frame = {
     ...Overview,
     play: async ({ canvasElement }) => {
-        const before = { w: window.innerWidth, h: window.innerHeight };
         const canvas = within(canvasElement);
         const sidebar = () => canvas.queryByRole('complementary', { name: 'Sidebar' });
         const check = async (width, docked) => {
@@ -130,14 +129,12 @@ export const Frame = {
             await waitFor(() => expect(Boolean(sidebar())).toBe(docked));
             await expect(canvas.getByRole('main')).toBeInTheDocument();
         };
-        try {
+        await withTestViewport(1024, 900, async () => {
             await check(1024, true);
             await check(768, false);
             await userEvent.click(canvas.getByRole('button', { name: /sidebar/i }));
             await waitFor(() => expect(sidebar()).toBeInTheDocument());
-        } finally {
-            await setTestViewport(before.w, before.h);
-        }
+        });
     },
 };
 

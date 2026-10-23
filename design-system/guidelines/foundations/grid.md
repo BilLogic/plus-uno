@@ -25,7 +25,7 @@ The frame `SurfaceContainer` draws, from `design-system/src/tokens/_frame_layers
 
 | Token | Value | Description |
 |:---|:---|:---|
-| `--layout-height-topbar` | 32 | Topbar height; the topbar has no padding of its own |
+| `--layout-height-topbar` | 32 | Topbar height, with no vertical padding; it pads 8 on the left so the toggle sits at (8, 8) |
 | `--layout-width-sidebar` | 240 | Sidebar width; docked from Large, closed below |
 | `--layout-pad-left-container` | 8 · 0 · 0 | Left pad of the sidebar-and-surface row: 8 while the sidebar is closed, 0 once it docks |
 | `--surface-container-pad` / `--surface-container-stack` | 8 / 8 | Frame pad and the stack between topbar and row |

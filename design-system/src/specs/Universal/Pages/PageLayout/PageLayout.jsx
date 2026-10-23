@@ -12,7 +12,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Skeleton } from '@/components';
-import SurfaceContainer from '@/patterns/SurfaceContainer';
+import { SurfaceContainer } from '@/patterns';
 import { TopBar, Sidebar } from '../../Sections';
 import { usePageLayoutShell } from './PageLayoutShellContext';
 

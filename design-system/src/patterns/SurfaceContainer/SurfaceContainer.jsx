@@ -37,7 +37,13 @@ const useWide = (ref) => {
         read();
         const mq = window.matchMedia?.(DOCK_QUERY);
         mq?.addEventListener?.('change', read);
-        return () => mq?.removeEventListener?.('change', read);
+        // A docs breakpoint switch changes the frame's width without a remount.
+        const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(read);
+        if (ref.current) ro?.observe(ref.current);
+        return () => {
+            mq?.removeEventListener?.('change', read);
+            ro?.disconnect();
+        };
     }, [ref]);
     return wide;
 };
@@ -125,7 +131,8 @@ const SurfaceContainer = ({
             setState('closed');
         };
         const onKeyDown = (e) => {
-            if (e.key !== 'Escape') return;
+            // A control that handled its own Escape (a menu, a field) keeps it.
+            if (e.key !== 'Escape' || e.defaultPrevented) return;
             setState('closed');
             toggleRef.current?.focus();
         };
