@@ -127,6 +127,11 @@
     height: fit-content;
 }
 
+// The page's h1: Heading/large 24/28, when the greeting tops the page outline.
+.plus-homepage-jumbotron-title--page {
+    font: var(--heading-large);
+}
+
 // Description
 .plus-homepage-jumbotron-description {
     font-family: var(--font-family-body);

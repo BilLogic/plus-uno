@@ -1,0 +1,67 @@
+/**
+ * Home on the new layout. The SurfaceContainer's content box is the
+ * 12-column grid; every length here is a Layout, Surface, Section or Card
+ * token. Spans come from the formulas in homeGrid.js.
+ */
+
+// A row is a subgrid of the content grid: its blocks sit on the page's own
+// columns and gutters, so nothing is measured twice.
+.plus-home-new__row {
+    display: grid;
+    grid-template-columns: subgrid;
+    row-gap: var(--surface-stack-md);
+    align-items: stretch;
+}
+
+.plus-home-new__block {
+    min-width: 0;
+}
+
+// Cards stretch to the tallest block in their row: the Your Impact section's
+// card takes the height its header leaves.
+.plus-home-new__impact {
+    .plus-pattern-section-content {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+
+        > * {
+            flex: 1 1 auto;
+        }
+    }
+}
+
+// The lesson strip: N cards per view, N from homeGrid.js, each on whole
+// columns because N divides 12 and the strip's gap is the grid gutter.
+.plus-home-new__lessons {
+    --plus-home-new-cards-per-view: 1;
+
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc(
+        (100% - (var(--plus-home-new-cards-per-view) - 1) * var(--layout-gutter))
+        / var(--plus-home-new-cards-per-view)
+    );
+    column-gap: var(--layout-gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.plus-home-new__lesson {
+    display: flex;
+    min-width: 0;
+    scroll-snap-align: start;
+
+    > * {
+        flex: 1 1 auto;
+    }
+}
