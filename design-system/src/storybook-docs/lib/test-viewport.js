@@ -66,8 +66,20 @@ export const setTestViewport = async (width, height) => {
     } finally {
         channel.close();
     }
-    // One frame for media queries and ResizeObservers to settle.
-    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    // `viewport:done` can arrive before the iframe has laid out at the new
+    // size (seen in CI, not locally), and a media-query change that lands after
+    // the story's next step undoes it. Wait for the page itself to agree.
+    const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+    const deadline = Date.now() + 5000;
+    while (!window.matchMedia(`(width: ${width}px) and (height: ${height}px)`).matches) {
+        if (Date.now() > deadline) {
+            throw new Error(`setTestViewport: the page is ${window.innerWidth}×${window.innerHeight}, not ${width}×${height}.`);
+        }
+        await frame();
+    }
+    // Then two frames for media-query listeners and ResizeObservers to run.
+    await frame();
+    await frame();
     return true;
 };
 

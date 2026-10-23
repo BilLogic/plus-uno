@@ -143,7 +143,7 @@ export const Medium768 = {
         const { frame, toggle, surface, content, sidebar, edge } = parts(canvasElement);
         await expectTopbar(frame);
         await expectToggleHome(frame, toggle);
-        await expect(sidebar(), 'closed below 1024').toBeNull();
+        await waitFor(() => expect(sidebar(), 'closed below 1024').toBeNull());
         await expect(toggle).toHaveAttribute('aria-expanded', 'false');
 
         const pad = tokenLength(frame, '--surface-container-pad');
@@ -202,7 +202,7 @@ export const Large1024 = {
         const { frame, toggle, surface, content, sidebar } = parts(canvasElement);
         await expectTopbar(frame);
         await expectToggleHome(frame, toggle);
-        await expect(sidebar(), 'docked from 1024').not.toBeNull();
+        await waitFor(() => expect(sidebar(), 'docked from 1024').not.toBeNull());
         await expect(getComputedStyle(sidebar()).position).toBe('static');
         await expect(offset(frame, surface).x).toBeCloseTo(tokenLength(frame, '--layout-width-sidebar'), 0);
         await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--surface-pad'), 0);
@@ -233,7 +233,7 @@ export const XLarge1440 = {
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const { frame, toggle, surface, content, sidebar } = parts(canvasElement);
         await expectToggleHome(frame, toggle);
-        await expect(sidebar()).not.toBeNull();
+        await waitFor(() => expect(sidebar()).not.toBeNull());
         await expect(surfacePad(surface), 'surface pad from 1440').toBeCloseTo(tokenLength(frame, '--surface-pad'), 0);
         await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--space-150'), 0);
         await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--layout-width-content'), 0);
