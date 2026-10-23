@@ -70,6 +70,7 @@ export default {
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
+            description: '`medium` 32 (default) · `small` 24 compact, for table rows and inline toolbars only · `large` deprecated, draws like `medium`',
             table: { category: 'Design' }
         },
         vertical: {

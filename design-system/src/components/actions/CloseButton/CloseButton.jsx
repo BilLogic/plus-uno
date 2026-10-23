@@ -4,7 +4,7 @@ import './CloseButton.scss';
 
 /**
  * The one dismiss control for surfaces that close as a whole — Alert, Toast,
- * Modal. A fixed 24×24 hit area holding a 16px xmark: it never scales with the
+ * Modal. A fixed 32×32 hit area holding a 16px xmark: it never scales with the
  * text around it, so placing it on a line of text is the parent's job.
  *
  * `tone="inverse"` is for colored or dark grounds. There is no disabled state

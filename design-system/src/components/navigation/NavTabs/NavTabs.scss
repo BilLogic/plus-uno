@@ -92,19 +92,21 @@
         justify-content: center;
         gap: var(--size-element-gap-md, 10px);
 
-        // Sizing
-        padding: var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-lg, 16px);
+        // Sizing: 32 like a medium button (`--item-height-md`), the bottom
+        // line included, with the label centered in it.
+        box-sizing: border-box;
+        height: var(--item-height-md);
+        padding: 0 var(--size-element-pad-x-lg, 16px);
 
         // Borders
         border: none;
         border-bottom: var(--size-element-stroke-sm, 1px) solid var(--color-outline-variant);
         border-radius: var(--size-element-radius-md, 4px) var(--size-element-radius-md, 4px) 0 0;
 
-        // Typography
-        font-family: var(--font-family-body);
-        font-size: var(--font-size-body1, 16px);
-        font-weight: var(--font-weight-normal, 400);
-        line-height: var(--font-line-height-body1, 1.5);
+        // Typography: a tab label is Body/default at the medium weight, like a
+        // button label.
+        font: var(--body-default);
+        font-weight: var(--type-weight-medium);
         text-decoration: none;
 
         // Default state
@@ -141,7 +143,7 @@
         &[aria-selected="true"],
         &[aria-current="page"],
         &[aria-current="true"] {
-            font-weight: var(--font-weight-body1-semibold);
+            font-weight: var(--type-weight-semibold);
             background-color: transparent !important;
             color: var(--color-secondary-text) !important;
             border-color: transparent transparent var(--color-primary-border) transparent !important;
@@ -185,15 +187,17 @@
             display: inline-flex;
             align-items: center;
             gap: var(--size-element-gap-md, 10px);
-            padding: var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-lg, 16px);
+            // The same 32 as a tab, so a dropdown tab lines up with its neighbors.
+            box-sizing: border-box;
+            height: var(--item-height-md);
+            padding: 0 var(--size-element-pad-x-lg, 16px);
             border: none;
             border-bottom: 2px solid transparent;
             border-radius: 0;
             background-color: transparent;
             color: var(--color-on-surface) !important;
-            font-family: var(--font-family-body);
-            font-size: var(--font-size-body1, 16px);
-            font-weight: var(--font-weight-normal, 400);
+            font: var(--body-default);
+            font-weight: var(--type-weight-medium);
 
             &:hover {
                 background-color: var(--color-on-surface-state-08);
