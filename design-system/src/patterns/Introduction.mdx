@@ -15,7 +15,7 @@ A pattern never renders your content for you. It answers exactly one question �
 
 - **The shell owns the frame.** Surface color, radius, elevation, border, padding, and gap come from design tokens and cannot drift. You choose from token-backed scales (`sm` / `md` / `lg`), never raw values.
 - **You own the slots.** `header`, `footer`, `actions`, `toolbar`, `pagination`, `emptyState`, and `children` accept any node. Fill them with core components (Button, Badge, Input…) or your own composition.
-- **Patterns nest by layer.** Surface → Surface container → Section → Card → Table/Modal content. Each layer's tokens are scoped to it (`--size-card-*`, `--size-section-*`, `--size-modal-*`, `--size-table-*`, `--size-surface-*`).
+- **Patterns nest by layer.** Surface container → Section → Card → Table/Modal content. Each layer's tokens are scoped to it (`--size-card-*`, `--size-section-*`, `--size-modal-*`, `--size-table-*`, `--size-surface-*`).
 
 </div>
 
@@ -41,7 +41,7 @@ A pattern never renders your content for you. It answers exactly one question �
     <tbody>
         {[
             ['Surfaces', 'Surface', '--color-surface (or any container level)', '0 (prop up to 5)'],
-            ['Surface container (Main region)', 'SurfaceContainer', '--color-surface — fills the width the shell gives it; carries the content grid', '0'],
+            ['Surface container (app frame)', 'SurfaceContainer', '--surface-sunken frame; the surface inside is --surface-default and carries the content grid', '0'],
             ['Section', 'PatternSection', 'no-fill (or --color-surface-container-low)', '0'],
             ['Card', 'PatternCard', '--color-surface-container-lowest', '1'],
             ['Table', 'PatternTable', 'no-fill (container owns the background)', '0'],
@@ -77,20 +77,18 @@ A pattern never renders your content for you. It answers exactly one question �
 Patterns are *shells*; core components are *finished furniture*. `PatternCard` gives you a tokenized frame with three slots, while the core `Card` component ships title/media/links/actions behavior. Reach for a pattern when you are composing something the core component does not cover — and never rebuild the frame by hand with raw divs and hex codes.
 
 ```jsx
-import { Surface, SurfaceContainer, PatternSection, PatternCard, PatternTable, PatternModal } from '@';
+import { SurfaceContainer, PatternSection, PatternCard, PatternTable } from '@';
 
-<Surface level="surface" padding="md">
-    <SurfaceContainer radius="md">
-        <PatternSection title="Team" actions={<Button text="Add" />}>
-            <PatternCard>
-                <PatternTable toolbar={...} pagination={...}>
-                    <thead>…</thead>
-                    <tbody>…</tbody>
-                </PatternTable>
-            </PatternCard>
-        </PatternSection>
-    </SurfaceContainer>
-</Surface>
+<SurfaceContainer topbar={<Breadcrumb items={...} />} sidebar={<Sidebar />}>
+    <PatternSection title="Team" actions={<Button text="Add" />}>
+        <PatternCard>
+            <PatternTable toolbar={...} pagination={...}>
+                <thead>…</thead>
+                <tbody>…</tbody>
+            </PatternTable>
+        </PatternCard>
+    </PatternSection>
+</SurfaceContainer>
 ```
 
 </div>

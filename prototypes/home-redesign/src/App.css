@@ -19,13 +19,13 @@
 /* Sidebar: no overrides – match reference tutor-training-progress-page exactly. */
 
 #home-redesign-page .plus-page-main,
-#home-redesign-page .plus-page-content-wrapper {
+#home-redesign-page .plus-surface-container__surface {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 
 #home-redesign-page .plus-page-main::-webkit-scrollbar,
-#home-redesign-page .plus-page-content-wrapper::-webkit-scrollbar {
+#home-redesign-page .plus-surface-container__surface::-webkit-scrollbar {
     display: none;
 }
 
@@ -264,11 +264,11 @@
 }
 
 /* Monthly report needs visible overflow for card elevation and horizontal training carousel */
-#home-redesign-page.monthly-report-page-scroller .plus-page-main-container {
+#home-redesign-page.monthly-report-page-scroller .plus-surface-container__row {
     overflow: visible;
 }
 
-#home-redesign-page.monthly-report-page-scroller .plus-page-content-wrapper {
+#home-redesign-page.monthly-report-page-scroller .plus-surface-container__surface {
     overflow: visible;
 }
 

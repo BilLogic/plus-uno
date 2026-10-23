@@ -545,7 +545,9 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // 623: the same three washes, now naming defined tokens, became comparable.
     // 615: the Popover took the Popup pattern's tokens, and its eight hex
     // fallbacks went with the dark header.
-    expect(comparable).toBe(615);
+    // 614: PageLayout moved onto the SurfaceContainer frame, and its surface
+    // fill's hex fallback went with the inline styles.
+    expect(comparable).toBe(614);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

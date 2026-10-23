@@ -1,14 +1,16 @@
 .plus-topbar {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--element-inline-md);
     width: 100%;
-    height: fit-content;
+    height: 100%;
+    min-height: var(--layout-height-topbar);
 
-    // Figma strict token usage for TopBar container if needed, 
-    // though usually handled by parent. 
-    // Assuming standard surface/padding from context, 
-    // but can add specific tokens here if known.
+    // The 32 topbar has no padding of its own, so the avatar drops its block
+    // padding to fit the row.
+    .plus-user-avatar {
+        padding-block: var(--space-0) !important;
+    }
 }
 
 // Specific override for the sidebar toggle button to match Figma node 111-227859
@@ -55,18 +57,17 @@
 .topbar-left-section {
     display: flex;
     align-items: center;
-    /* Same 280ms / easing as PageLayout sidebar so left section animates in sync */
-    transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .topbar-center-section {
     flex: 1;
     display: flex;
     align-items: center;
+    min-width: 0;
 }
 
 .topbar-right-section {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--element-inline-md);
 }
