@@ -49,13 +49,13 @@ body {
 
 /** Hide scrollbars on main content; scrolling still enabled (same as home-redesign). */
 #sessions-in-session-page .plus-page-main,
-#sessions-in-session-page .plus-page-content-wrapper {
+#sessions-in-session-page .plus-surface-container__surface {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
 #sessions-in-session-page .plus-page-main::-webkit-scrollbar,
-#sessions-in-session-page .plus-page-content-wrapper::-webkit-scrollbar {
+#sessions-in-session-page .plus-surface-container__surface::-webkit-scrollbar {
   display: none;
 }
 
