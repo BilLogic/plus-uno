@@ -18,6 +18,8 @@
     --layout-grid-gap: 8px; /* Figma Grid/content-gutter (= --size-element-gap-sm); col-* spans assume this */
 
     /* Stacking layers; not Figma variables (CODE_ONLY_LAYERS) */
+    --layout-z-index-scrim: 500; /* the scrim under a modal */
+    --layout-z-index-modal: 510; /* a modal, over its scrim */
     --layout-z-index-overlay: 1070; /* floating listboxes and menus; above a modal */
 
     /* Min and max heights — MD values where they differ by breakpoint */

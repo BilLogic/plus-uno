@@ -94,7 +94,7 @@ export const webAppSourceSnippets = {
     divider: snippet([
         '<div style={{ width: "100%", maxWidth: "600px" }}>',
         '  <p className="plus-body-1">Section above</p>',
-        '  <Divider size="md" style="light" />',
+        '  <Divider width="md" style="light" />',
         '  <p className="plus-body-1">Section below</p>',
         '</div>'
     ]),
@@ -136,9 +136,9 @@ export const webAppSourceSnippets = {
         '  renderAs="inline"',
         '  title="Modal title"',
         '  body="Modal body text goes here."',
-        '  type="default"',
+        '  width="sm"',
+        '  height="hug"',
         '  showBottomButtons',
-        '  width={340}',
         '  primaryButton={{ text: "Primary", style: "primary", fill: "filled" }}',
         '  secondaryButton={{ text: "Secondary", style: "secondary", fill: "tonal" }}',
         '  onClose={() => {}}',

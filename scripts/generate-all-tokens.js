@@ -502,11 +502,14 @@ const CODE_ONLY_LAYOUT = {
 
 /**
  * Stacking layers. Figma has no z-index, so these are code's alone and are
- * written unitless. The overlay layer sits above a modal (Bootstrap's 1055)
- * and level with its popovers, so a list opened from a field inside a modal
- * is not covered by it.
+ * written unitless. The scrim and the modal take Atlassian's numbers, 500 and
+ * 510; a nested confirm reuses them inside the first modal's layer rather than
+ * counting up. The overlay layer sits above a modal and level with Bootstrap's
+ * popovers, so a list opened from a field inside a modal is not covered by it.
  */
 const CODE_ONLY_LAYERS = {
+    'layout-z-index-scrim': { value: 500, note: 'the scrim under a modal' },
+    'layout-z-index-modal': { value: 510, note: 'a modal, over its scrim' },
     'layout-z-index-overlay': { value: 1070, note: 'floating listboxes and menus; above a modal' },
 };
 
