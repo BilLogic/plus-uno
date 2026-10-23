@@ -581,6 +581,50 @@
         "19378:2": 12,
         "19378:3": 12
       }
+    },
+    {
+      "id": "VariableID:19432:28",
+      "name": "Screen/min-width-screen",
+      "variableCollectionId": "VariableCollectionId:19378:46207",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--layout-min-width-screen)"
+      },
+      "valuesByMode": {
+        "19378:1": 768,
+        "19378:2": 1024,
+        "19378:3": 1440
+      },
+      "resolvedValuesByMode": {
+        "19378:1": 768,
+        "19378:2": 1024,
+        "19378:3": 1440
+      }
+    },
+    {
+      "id": "VariableID:19432:29",
+      "name": "Screen/max-width-screen",
+      "variableCollectionId": "VariableCollectionId:19378:46207",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--layout-max-width-screen)"
+      },
+      "valuesByMode": {
+        "19378:1": 1023,
+        "19378:2": 1439,
+        "19378:3": 1920
+      },
+      "resolvedValuesByMode": {
+        "19378:1": 1023,
+        "19378:2": 1439,
+        "19378:3": 1920
+      }
     }
   ]
 }

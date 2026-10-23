@@ -3,10 +3,10 @@
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "figmaFileName": "Design System - BS4 Foundation (Component LIbrary)",
   "capturedAt": "2026-10-23",
-  "totalVariables": 582,
+  "totalVariables": 584,
   "byType": {
     "COLOR": 232,
-    "FLOAT": 338,
+    "FLOAT": 340,
     "BOOLEAN": 9,
     "STRING": 3
   },
@@ -591,6 +591,8 @@
         "Modal/width-modal-lg",
         "Modal/width-modal-md",
         "Modal/width-modal-sm",
+        "Screen/max-width-screen",
+        "Screen/min-width-screen",
         "Screen/pad-x-screen",
         "Screen/width-screen",
         "Sidebar/pad-left-container",

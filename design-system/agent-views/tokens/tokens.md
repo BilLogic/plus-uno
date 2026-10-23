@@ -186,7 +186,9 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --layout-max-height-modal
 --layout-max-width-content
 --layout-max-width-reading
+--layout-max-width-screen
 --layout-min-width-content
+--layout-min-width-screen
 --layout-pad-left-container
 --layout-pad-x-screen
 --layout-width-column

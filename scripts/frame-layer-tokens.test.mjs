@@ -70,6 +70,8 @@ const LAYOUT = {
   '--layout-width-modal-md': ['507px', '677px', '848px'],
   '--layout-width-modal-lg': ['629px', '843px', '1056px'],
   '--layout-width-screen': ['768px', '1024px', '1440px'],
+  '--layout-min-width-screen': ['768px', '1024px', '1440px'],
+  '--layout-max-width-screen': ['1023px', '1439px', '1920px'],
   '--layout-pad-x-screen': ['24px', '24px', '32px'],
   '--layout-columns': ['12', '12', '12'],
 };
@@ -174,6 +176,15 @@ test('no modal width is fractional at any mode', () => {
       assert.match(atMode(`--layout-width-modal-${size}`, mode), /^\d+px$/, `${size} at ${mode}`);
     }
   }
+});
+
+test('each mode\'s screen range starts at its default width and ends a pixel before the next mode', () => {
+  const widths = Object.values(LAYOUT_MODES);
+  Object.keys(LAYOUT_MODES).forEach((mode, i) => {
+    assert.equal(atMode('--layout-min-width-screen', mode), atMode('--layout-width-screen', mode), mode);
+    const next = widths[i + 1];
+    if (next) assert.equal(atMode('--layout-max-width-screen', mode), `${next - 1}px`, mode);
+  });
 });
 
 test('the column count is a plain number, so a grid can repeat it', () => {

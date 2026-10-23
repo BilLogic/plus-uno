@@ -40,6 +40,8 @@
     /* Screen */
     --layout-width-screen: 768px;
     --layout-pad-x-screen: var(--space-150);
+    --layout-min-width-screen: 768px;
+    --layout-max-width-screen: 1023px;
 
     /* spacing / patterns */
     /* Surface container */
@@ -124,6 +126,8 @@
         --layout-width-modal-md: 677px;
         --layout-width-modal-lg: 843px;
         --layout-width-screen: 1024px;
+        --layout-min-width-screen: 1024px;
+        --layout-max-width-screen: 1439px;
     }
 }
 
@@ -137,6 +141,8 @@
         --surface-pad: var(--space-150);
         --layout-width-screen: 1440px;
         --layout-pad-x-screen: var(--space-200);
+        --layout-min-width-screen: 1440px;
+        --layout-max-width-screen: 1920px;
     }
 }
 
