@@ -23,20 +23,21 @@
 
     .form-check.form-switch {
         padding-left: 0;
-        min-height: var(--item-height-sm);
     }
 }
 
 .plus-form-switch {
     // A choice row is 24 at every size (`--item-height-sm`), its label 14/20.
     // Only a labeled control is a row: without a label React-Bootstrap drops
-    // `.form-check`, and the bare mark keeps its own size.
-    &.form-check {
-        min-height: var(--item-height-sm);
-    }
+    // `.form-check` (it keeps `.form-switch`), and the bare track keeps its own
+    // size; the `.form-switch.form-check` rule below holds the row.
 
     &.form-switch {
         padding-left: 0;
+        min-height: auto;
+    }
+
+    &.form-switch.form-check {
         min-height: var(--item-height-sm);
     }
 

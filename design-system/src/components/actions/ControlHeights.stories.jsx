@@ -167,6 +167,7 @@ export const ChoiceRows = () => (
                 <Switch size={size} label={`Switch ${size}`} />
             </div>
         ))}
+        <Switch inputProps={{ 'aria-label': 'Bare switch' }} />
     </div>
 );
 
@@ -184,6 +185,9 @@ ChoiceRows.play = async ({ canvasElement }) => {
             await expectLabel(line.querySelector('.form-check-label'), name, '400');
         }
     }
+    // Without a label it is not a row: the bare track keeps its own height.
+    const bare = canvas.getByRole('switch', { name: 'Bare switch' });
+    await expect(heightOf(bare.parentElement)).toBeLessThan(24);
 };
 
 /** Range is 32 at every size, label 14/20. */
@@ -230,7 +234,7 @@ Breadcrumbs.play = async ({ canvasElement }) => {
     }
 };
 
-/** Nav tabs and Nav pills follow the button: 32, labels 14/20 medium. */
+/** Nav tabs and Nav pills follow the button: 32, labels 14/20 medium; a selected tab is semibold. */
 export const Tabs = () => (
     <div style={stack}>
         <NavTabs activeKey="1" onSelect={() => {}} aria-label="Tabs">
@@ -250,6 +254,7 @@ Tabs.play = async ({ canvasElement }) => {
     for (const link of links) {
         await expect(heightOf(link), `${link.textContent} height`).toBe(32);
         const isActive = link.classList.contains('active');
-        await expectLabel(link, link.textContent, isActive ? '600' : '500');
+        const isTab = Boolean(link.closest('.plus-nav-tabs, .nav-tabs'));
+        await expectLabel(link, link.textContent, isActive && isTab ? '600' : '500');
     }
 };

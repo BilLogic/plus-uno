@@ -8,6 +8,10 @@ export default {
     component: Checkbox,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-23', kind: 'changed', summary: 'A labeled checkbox is a 24 row at every size, its label 14/20.' },
+            { date: '2026-10-23', kind: 'deprecated', summary: '`size="large"` was deprecated: it draws like `medium` and warns in development.' },
+        ],
         docs: {
             description: {
                 component:

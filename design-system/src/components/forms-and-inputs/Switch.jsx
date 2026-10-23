@@ -112,9 +112,8 @@ Switch.propTypes = {
     checked: PropTypes.bool,
     defaultChecked: PropTypes.bool,
     /**
-     * Every size draws a 24 row with a 14/20 label; `small` keeps its smaller
-     * mark. `large` is deprecated: it draws like `medium` and warns in
-     * development.
+     * Every size draws a 24 row with a 14/20 label and one track geometry.
+     * `large` is deprecated: it draws like `medium` and warns in development.
      */
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
