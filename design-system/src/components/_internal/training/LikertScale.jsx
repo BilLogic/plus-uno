@@ -22,6 +22,7 @@ const LikertScale = ({
         width: '100%'
     };
 
+    // The training form's lead label is 20/32, which no text style carries.
     const labelStyle = {
         fontFamily: 'var(--type-family-body)',
         fontSize: 'var(--font-size-125)',

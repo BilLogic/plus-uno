@@ -8,7 +8,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { MIN_FILES, literalSizes, run } from './check-font-size-literals.mjs';
+import { isLiteral, literalSizes, run } from './check-font-size-literals.mjs';
 
 const at = (text, file = 'design-system/src/components/x/X.scss') => literalSizes([{ path: file, text }]);
 
@@ -56,6 +56,8 @@ test('the components and patterns hold no literal font size', () => {
   assert.deepEqual(findings.map((f) => f.message), []);
 });
 
-test('the walk still reaches the population it was measured over', () => {
-  assert.ok(MIN_FILES > 100);
+test('a calc() that adds a length to a token still writes a size', () => {
+  assert.equal(isLiteral('calc(var(--icon-md) + 2px)'), true);
+  assert.equal(isLiteral('calc(var(--icon-md) * 0 + 12px)'), true);
+  assert.equal(isLiteral('calc(var(--icon-md) * 7 / 16)'), false);
 });

@@ -34,6 +34,17 @@ describe('the page outline', () => {
         expect(outline()).toEqual([['h1', 'Sessions'], ['h2', 'This week'], ['h3', 'Monday']]);
     });
 
+    it('keeps the level through a section with no title', () => {
+        render(
+            <Surface title="Sessions">
+                <PatternSection>
+                    <Card title="Wrapped" />
+                </PatternSection>
+            </Surface>,
+        );
+        expect(outline()).toEqual([['h1', 'Sessions'], ['h2', 'Wrapped']]);
+    });
+
     it('titles a card one level below its section', () => {
         render(
             <Surface title="Sessions">

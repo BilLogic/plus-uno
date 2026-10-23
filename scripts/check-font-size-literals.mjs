@@ -6,8 +6,8 @@
  * or, for an icon glyph, an icon size (`font-size: var(--icon-md)`). A number
  * written in the component is a size nothing else knows about: the type scale
  * can change in Figma and the generated tokens with it, and that text stays
- * where it was. The type scale's move to the Atlassian sizes found seven of
- * them — `font-size: 7px` on a tag's dot, `16px` / `14px` / `12px` in two
+ * where it was. The type scale's move to the Atlassian sizes found 27 of
+ * them — `font-size: 7px` on a tag's initials, `16px` / `14px` / `12px` in two
  * snackbars, `1.5em` and `0.8em` on icons — and each one had been reading as
  * part of the scale.
  *
@@ -44,7 +44,7 @@ import { documents } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ROOTS = ['design-system/src/components', 'design-system/src/patterns'];
+const ROOTS = ['design-system/src/components', 'design-system/src/patterns', 'design-system/src/styles'];
 const EXT = ['.scss', '.css', '.jsx', '.js', '.tsx'];
 const EXCLUDED = /\.(stories|test)\.[jt]sx?$/;
 
@@ -69,8 +69,12 @@ function stripComments(text, jsLike) {
 
 /** True when a declared value sets a size with a literal. */
 export function isLiteral(value) {
-  // A `calc()` that scales a token is a size derived from that token.
-  if (/^calc\(.*var\(--[\w-]+\)/.test(value) && !/var\(--[\w-]+\s*,/.test(value)) return false;
+  // A `calc()` that scales a token by a plain number is a size derived from
+  // that token; one that adds a length (`+ 2px`) still writes a size.
+  if (/^calc\(.*var\(--[\w-]+\)/.test(value) && !/var\(--[\w-]+\s*,/.test(value)) {
+    const rest = value.replace(/var\(\s*--[\w-]+\s*\)/g, '');
+    return /\d(px|r?em|%|pt|v[wh]|ch|ex)\b/.test(rest) || /\d%/.test(rest);
+  }
   const rest = value.replace(/var\(\s*--[\w-]+/g, '').replace(/#\{[^}]*\}/g, '');
   return NUMBER.test(rest) || KEYWORDS.test(rest);
 }

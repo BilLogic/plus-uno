@@ -87,7 +87,7 @@ const Sidebar = ({
             />
 
             {/* Sections: each is a group its title names. The title is a group
-                label, heading.xxsmall 12/16, and not a heading. */}
+                label, Heading/xxsmall 12/16, and not a heading. */}
             {categories.map((category, index) => (
                 <div
                     key={index}

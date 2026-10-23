@@ -71,6 +71,7 @@ const Jumbotron = ({
 };
 
 Jumbotron.propTypes = {
+    /** The page's title, rendered as its one h1: a page with a Jumbotron gives its Surface no `title`. */
     title: PropTypes.node,
     subtitle: PropTypes.node,
     children: PropTypes.node,

@@ -15,7 +15,9 @@ Component text takes a text style: `font: var(--heading-small)`, `var(--body-def
 - **Group labels** are Heading/xxsmall 12 and name a `role="group"` or a table head cell; they are never headings.
 - **Button and tab labels** are Body/default at `--type-weight-medium`.
 
-The classes below are the older layer, kept until every use moves.
+- **A Jumbotron's title is the page's `h1`**, so a page that has one gives its `Surface` no `title`.
+
+Still on the older layer: the deprecated Badge's `body*-txt` sizes, the `h5` brand mark in `DashboardLayout`, and the `h4` title `createModal` builds. The classes below are that layer, kept until every use moves.
 
 ## Font Families
 

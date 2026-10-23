@@ -345,7 +345,7 @@ export const CHECKS = [
     module: 'scripts/check-font-size-literals.mjs',
     floors: { MIN_FILES: 200 },
     guards:
-      "no component or pattern setting a raw font size. Text takes a text style (`font: var(--body-default)`) and an icon glyph an icon size (`--icon-md`); a number written in the component is a size the type scale cannot move. Moving to the Atlassian scale found 27: `font-size: 7px` on a tag's initials, 16 / 14 / 12 px in two snackbars, `1.5em` and `0.8em` on icons, and literal fallbacks such as `var(--font-size-body3, 12px)` that paint the old size whenever the token is missing. A `calc()` that scales a token is derived and passes; an identifier in a JSX style is a runtime value and is skipped. Hard gate, no baseline: the count is zero.",
+      "no component, pattern or shared style in `design-system/src/styles` setting a raw font size. Text takes a text style (`font: var(--body-default)`) and an icon glyph an icon size (`--icon-md`); a number written in the component is a size the type scale cannot move. Moving to the Atlassian scale found 27: `font-size: 7px` on a tag's initials, 16 / 14 / 12 px in two snackbars, `1.5em` and `0.8em` on icons, and literal fallbacks such as `var(--font-size-body3, 12px)` that paint the old size whenever the token is missing. A `calc()` that scales a token is derived and passes; an identifier in a JSX style is a runtime value and is skipped. Hard gate, no baseline: the count is zero.",
   },
   {
     name: 'check:figma-scopes',

@@ -37,7 +37,8 @@ const PatternSection = ({
     ].filter(Boolean).join(' ');
 
     const hasHeader = title || description || actions;
-    const level = useHeadingLevel() + 1;
+    const parentLevel = useHeadingLevel();
+    const level = parentLevel + 1;
     const Title = headingTag(level);
     const rank = level > 2 ? 'subsection' : 'section';
 
@@ -56,7 +57,8 @@ const PatternSection = ({
                     {actions && <div className="plus-pattern-section-actions">{actions}</div>}
                 </div>
             )}
-            <HeadingLevelContext.Provider value={level}>
+            {/* A section with no title is a wrapper: what it holds keeps the parent's level. */}
+            <HeadingLevelContext.Provider value={title ? level : parentLevel}>
                 <div className="plus-pattern-section-content">{children}</div>
             </HeadingLevelContext.Provider>
         </section>

@@ -391,6 +391,7 @@ const Dropdown = ({
                             <div id={labelId} className="dropdown-item dropdown-section-header">
                                 {group.header.text || group.header.label}
                             </div>
+                            {group.header.divider && <div className="pdropdown-divider"></div>}
                             {rows}
                         </div>
                     );

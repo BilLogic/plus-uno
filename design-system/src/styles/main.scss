@@ -324,7 +324,7 @@ body {
     align-items: center;
     justify-content: center;
     color: var(--color-on-surface-variant, #3f484a);
-    font-size: var(--font-size-body3, 10px);
+    font: var(--body-small);
     box-sizing: border-box;
 }
 
