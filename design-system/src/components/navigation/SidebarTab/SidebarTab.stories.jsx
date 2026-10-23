@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import { expect, within } from 'storybook/test';
-import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { probe, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { Button, Count, Status } from '@/components';
 import SidebarTab from '@/components/navigation/SidebarTab';
 
 export default {
@@ -21,6 +22,11 @@ export default {
         text: { control: 'text', table: { category: 'Content' } },
         leadingVisual: { control: 'boolean', table: { category: 'Content' } },
         trailingVisual: { control: 'boolean', table: { category: 'Content' } },
+        description: { control: 'text', table: { category: 'Content' } },
+        elemAfter: { control: false, table: { category: 'Content' } },
+        actionsOnHover: { control: false, table: { category: 'Content' } },
+        href: { control: 'text', table: { category: 'Behavior' } },
+        external: { control: 'boolean', table: { category: 'Behavior' } },
         id: {
             control: false,
             table: { disable: true, category: 'Development' }
@@ -121,6 +127,11 @@ export const Selected = {
         icon: 'home',
         state: 'selected',
     },
+    /** The selected row says which page you are on, not only how it looks. */
+    play: async ({ canvasElement }) => {
+        const row = within(canvasElement).getByRole('button', { name: 'Dashboard' });
+        await expect(row).toHaveAttribute('aria-current', 'page');
+    },
 };
 
 export const Hover = {
@@ -163,4 +174,153 @@ export const Interactive = {
         trailingVisual: false,
     },
     render: (args) => <SidebarTab {...args} />,
+};
+
+/* ------------------------------------------------------------- slots and behavior */
+
+/** A row that fits the 240 sidebar's 224 content width. */
+const sidebarWidth = { width: 'calc(var(--layout-width-sidebar) - 2 * var(--surface-container-pad))' };
+
+/** Tabbing onto a row draws the 2px focus ring in the focus-ring color. */
+export const KeyboardFocus = {
+    args: { text: 'Reports', icon: 'chart-bar' },
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        const row = within(canvasElement).getByRole('button', { name: 'Reports' });
+        await userEvent.tab();
+        await expect(document.activeElement).toBe(row);
+        await waitFor(() => expect(getComputedStyle(row).outlineStyle).toBe('solid'));
+        await expect(px(getComputedStyle(row).outlineWidth), 'ring width').toBe(2);
+        await expect(getComputedStyle(row).outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--color-focus-ring'));
+    },
+};
+
+/** A label longer than the row ends in an ellipsis; the row stays 32. */
+export const LongLabel = {
+    render: () => (
+        <div style={sidebarWidth}>
+            <SidebarTab text="Session reflections and post-session feedback for every student" icon="clipboard" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const row = within(canvasElement).getByRole('button');
+        const label = row.querySelector('.plus-sidebar-tab__label');
+        await expect(row.getBoundingClientRect().height, 'row height').toBeCloseTo(tokenLength(canvasElement, '--item-height-md'), 0);
+        await expect(getComputedStyle(label).textOverflow).toBe('ellipsis');
+        await expect(label.scrollWidth, 'the label overflows and is clipped').toBeGreaterThan(label.clientWidth);
+    },
+};
+
+/** An optional second line under the label, in Body small. */
+export const WithDescription = {
+    render: () => (
+        <div style={sidebarWidth}>
+            <SidebarTab text="Sessions" icon="calendar-alt" description="3 upcoming this week" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const row = within(canvasElement).getByRole('button', { name: /Sessions/ });
+        const description = within(row).getByText('3 upcoming this week');
+        await expect(description).toHaveClass('plus-sidebar-tab__description');
+        await expect(getComputedStyle(description).font, 'Body small').toBe(probe(canvasElement, 'font', 'var(--body-small)'));
+        // 2 + 20 + 16 + 2: the Figma row's min height 32 grows to 40.
+        await expect(row.getBoundingClientRect().height, 'grows to 40').toBeCloseTo(
+            2 * tokenLength(canvasElement, '--element-pad-y-sm') + tokenLength(canvasElement, '--line-height-125') + tokenLength(canvasElement, '--line-height-100'), 0,
+        );
+    },
+};
+
+/** `elemAfter` holds a count, a badge or a status at the end of the row. */
+export const WithElemAfter = {
+    render: () => (
+        <div style={{ ...sidebarWidth, display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+            <SidebarTab text="Sessions" icon="calendar-alt" elemAfter={<Count value={3} label="3 upcoming" />} />
+            <SidebarTab text="Students" icon="user-graduate" elemAfter={<Status style="success">Live</Status>} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const rows = within(canvasElement).getAllByRole('button');
+        for (const row of rows) {
+            await expect(row.getBoundingClientRect().height, 'row height').toBeCloseTo(tokenLength(canvasElement, '--item-height-md'), 0);
+            await expect(row.querySelector('.plus-sidebar-tab__after'), 'the slot renders').not.toBeNull();
+        }
+        await expect(within(rows[1]).getByText('Live')).toBeInTheDocument();
+    },
+};
+
+const onRowClick = fn();
+const onMore = fn();
+
+/**
+ * `actionsOnHover` shows on hover and while the row has focus. The actions are
+ * the row's siblings, not its children, so a button never nests in a button
+ * and pressing an action does not open the row.
+ */
+export const WithActionsOnHover = {
+    render: () => (
+        <div style={sidebarWidth}>
+            <SidebarTab
+                text="Sessions"
+                icon="calendar-alt"
+                onClick={onRowClick}
+                elemAfter={<Count value={3} label="3 upcoming" />}
+                actionsOnHover={<Button style="default" fill="ghost" size="small" leadingVisual="ellipsis" aria-label="More actions for Sessions" onClick={onMore} />}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        onRowClick.mockClear();
+        onMore.mockClear();
+        const canvas = within(canvasElement);
+        const row = canvas.getByRole('button', { name: /^Sessions/ });
+        const actions = canvasElement.querySelector('.plus-sidebar-tab__actions');
+        await expect(row.contains(actions), 'actions sit beside the row, not inside it').toBe(false);
+        // At rest means no pointer over the item: the runner's real pointer can
+        // be left wherever the last story put it.
+        if (!actions.parentElement.matches(':hover')) {
+            await expect(getComputedStyle(actions).visibility, 'hidden at rest').toBe('hidden');
+        }
+
+        await userEvent.tab();
+        await expect(document.activeElement).toBe(row);
+        await waitFor(() => expect(getComputedStyle(actions).visibility, 'shown while the row has focus').toBe('visible'));
+
+        await userEvent.tab();
+        const more = canvas.getByRole('button', { name: 'More actions for Sessions' });
+        await expect(document.activeElement).toBe(more);
+        await userEvent.click(more);
+        await expect(onMore).toHaveBeenCalledTimes(1);
+        await expect(onRowClick).not.toHaveBeenCalled();
+    },
+};
+
+/** An external destination is a link that opens a new tab, and says so. */
+export const ExternalLink = {
+    render: () => (
+        <div style={sidebarWidth}>
+            <SidebarTab text="Slack" icon="arrow-up-right-from-square" href="https://slack.com/" external />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const link = within(canvasElement).getByRole('link', { name: /Slack/ });
+        await expect(link).toHaveAttribute('href', 'https://slack.com/');
+        await expect(link).toHaveAttribute('target', '_blank');
+        await expect(link.getAttribute('rel')).toContain('noopener');
+        await expect(link).toHaveAccessibleName(/opens in a new tab/i);
+        await expect(link.getBoundingClientRect().height, 'row height').toBeCloseTo(tokenLength(canvasElement, '--item-height-md'), 0);
+    },
+};
+
+/** A disabled row is announced, takes no tab stop and ignores a press. */
+export const DisabledIsInert = {
+    render: () => <SidebarTab text="Settings" icon="cog" state="disabled" onClick={onRowClick} />,
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        onRowClick.mockClear();
+        const row = within(canvasElement).getByRole('button', { name: 'Settings' });
+        await expect(row).toHaveAttribute('aria-disabled', 'true');
+        await expect(row).toHaveAttribute('tabindex', '-1');
+        await userEvent.click(row);
+        await expect(onRowClick).not.toHaveBeenCalled();
+    },
 };

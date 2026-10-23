@@ -3,6 +3,8 @@
 
 # Sidebar
 
+The PLUS sidebar: the foundation Sidebar pattern (`@/patterns`) with the logo in its header and the Specs item list for the role (`sidebarConfig.js`). Figma Specs: node 111:227891; BS4 Foundation `_Sidebar`. Both roles come from one config. Home is selected when nothing else is.
+
 **Import:** `import { Sidebar } from '@/components';`
 
 **Source:** `design-system/src/components/_internal/Sidebar/Sidebar.jsx`
@@ -12,9 +14,12 @@
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `user` | enum | `'tutor'` | — |
-| `onHomeClick` | func | — | — |
-| `onTabClick` | func | — | — |
+| `onHomeClick` | func | — | Home's press; without it Home calls `onTabClick('home')` |
+| `onTabClick` | func | — | Called with the item id for every other item (external links excepted) |
 | `activeTabId` | string | — | Id of the tab to show as selected (e.g. 'sessions', 'home') |
+| `showItemsNotInSpecs` | bool | `false` | Also show the code-only items that are not in Specs: Toolkit › Reviews and Admin › Compliance |
+| `slackUrl` | string | — | Where Toolkit › Slack links; defaults to `SLACK_URL` |
+| `label` | string | `'Main'` | Accessible name of the navigation landmark |
 | `visible` | bool | `true` | — |
 | `className` | string | `''` | — |
 | `style` | object | — | — |

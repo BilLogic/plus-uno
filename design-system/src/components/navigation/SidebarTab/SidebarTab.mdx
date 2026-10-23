@@ -78,6 +78,31 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
+## Slots
+
+<DocsCanvasShell description={<>A description under the label; the row grows past 32 to hold it.</>}>
+    <DsCanvasQuiet of={SidebarTabStories.WithDescription} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A count or a status after the label, in <code>elemAfter</code>.</>}>
+    <DsCanvasQuiet of={SidebarTabStories.WithElemAfter} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Actions that show on hover and while the row has focus, in <code>actionsOnHover</code>.</>}>
+    <DsCanvasQuiet of={SidebarTabStories.WithActionsOnHover} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>An external link that opens a new tab, and a label that truncates.</>}>
+    <div className="flex flex-col gap-10 md:gap-12">
+        <DsCanvasQuiet of={SidebarTabStories.ExternalLink} />
+        <DsCanvasQuiet of={SidebarTabStories.LongLabel} />
+    </div>
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -135,13 +160,24 @@ width it is given: 224 inside the 240 sidebar.
 
 ### It is a row, not a list.
 
-The component renders one `div`. Wrap the set in a `nav` with an `aria-label`,
-and put each row in a list item, so the group has a name and a count.
+The component renders one row. Wrap the set in a `nav` with an `aria-label`,
+and put each row in a list item, so the group has a name and a count. The
+Sidebar pattern (`PatternSidebar`) does this for you.
 
-### It does not navigate.
+### A link when it has `href`.
 
-There is no `href` — activation is `onClick` only. If these rows change the URL,
-render an anchor inside, or use `NavPills` with real links.
+Without `href` the row is a `role="button"` and activates through `onClick`.
+With `href` it renders an anchor; add `external` for a destination outside the
+app, which opens a new tab and tells a screen reader so.
+
+### Slots go in `description`, `elemAfter` and `actionsOnHover`.
+
+`description` is a second line in Body/small, and the row grows past 32 to hold
+it. `elemAfter` takes a `Count`, a `Badge` or a `Status` at the end of the row;
+it replaces `trailingVisual`, which still draws its placeholder glyph when
+`elemAfter` is unset. `actionsOnHover` takes buttons that show on hover and
+while the row has focus. They render beside the row, never inside it, so a
+button never nests inside the row's button.
 
 </div>
 
@@ -149,9 +185,15 @@ render an anchor inside, or use `NavPills` with real links.
 
 ## Accessibility
 
-- **Enter and Space activate it.** The row is a `div` with `role="button"` and
+- **Enter and Space activate it.** Without `href`, the row is a `div` with `role="button"` and
   a key handler for both, so it is operable by keyboard as well as by pointer
   (#320). Space is prevented, so pressing it does not scroll the page.
+- **With `href` it is a link.** The row renders an anchor, which Enter follows
+  natively. With `external` it opens a new tab, carries `rel="noopener
+  noreferrer"`, and its name ends in "(opens in a new tab)".
+- **Hover actions are siblings, not children.** `actionsOnHover` renders
+  beside the row, so a button never nests inside the row's button or link. The
+  actions show while the row has focus, so Tab reaches them next.
 - **The selected row says so.** `state="selected"` carries `aria-current="page"`
   as well as the background and text color, so which section you are in is
   announced rather than only drawn.
