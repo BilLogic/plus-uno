@@ -6,6 +6,8 @@
 
 .plus-form-radio-wrapper {
     display: flex;
+    // The row's text style, which the label and the line box both take.
+    font: var(--body-default);
     align-items: center;
     width: 100%;
 
@@ -20,6 +22,12 @@
     // Ensure radio + label are flex-aligned horizontally
     display: flex;
     align-items: center;
+    // A choice row is 24 at every size (`--item-height-sm`), its label 14/20.
+    // Only a labeled control is a row: without a label React-Bootstrap drops
+    // `.form-check`, and the bare mark keeps its own size.
+    &.form-check {
+        min-height: var(--item-height-sm);
+    }
 
     // Target the Form.Check container
     .form-check-input {
@@ -124,8 +132,7 @@
         user-select: none;
         flex: 1;
         padding-left: 0;
-        font-family: var(--font-family-body);
-        font-weight: var(--font-weight-normal);
+        font: var(--body-default);
     }
 }
 
@@ -147,14 +154,4 @@
     }
 }
 
-.plus-form-radio-large {
-    .plus-form-radio .form-check-input {
-        width: 14px;
-        height: 14px;
-        min-width: 14px;
-        min-height: 14px;
-    }
-}
-
-
-
+// `large` is deprecated and draws like `medium`, so it has no rule of its own.

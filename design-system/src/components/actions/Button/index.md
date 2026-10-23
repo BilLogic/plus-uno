@@ -22,7 +22,7 @@ Universal interactive element slightly favoring Figma spec over Bootstrap defaul
 | `title` | string | — | — |
 | `style` | enum | `'primary'` | — |
 | `fill` | enum | `'filled'` | — |
-| `size` | enum | `'medium'` | — |
+| `size` | enum | `'medium'` | `medium` 32 (default) · `small` 24 compact, for table rows and inline toolbars only · `large` deprecated, draws like `medium` |
 | `block` | bool | `false` | Full width button |
 | `className` | string | — | — |
 | `onClick` | func | — | — |
@@ -50,7 +50,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface` · `--color-on-surface-state-12` · `--color-on-surface-variant` · `--color-outline` · `--color-secondary-text` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-radius-md`
+`--body-default` · `--color-on-surface` · `--color-on-surface-state-12` · `--color-on-surface-variant` · `--color-outline` · `--color-secondary-text` · `--element-pad-y-md` · `--icon-md` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-radius-md` · `--type-weight-medium`
 
 From `design-system/src/components/actions/Button/Button.scss`. Override these through the token layer, never with a literal.
 
@@ -67,7 +67,6 @@ Implemented as `ButtonContent`.
 | `leadingVisual` | string or node | — | — |
 | `trailingVisual` | string or node | — | — |
 | `vertical` | bool | — | — |
-| `typographyClass` | string | — | — |
 
 ## Related
 

@@ -25,7 +25,7 @@ Universal element component for navigation breadcrumbs. Uses React Bootstrap Bre
 
 ## Tokens touched
 
-`--bs-breadcrumb-divider` · `--color-on-surface-variant` · `--color-primary-text` · `--size-element-gap-sm`
+`--body-default` · `--bs-breadcrumb-divider` · `--color-on-surface-variant` · `--color-primary-text` · `--item-height-md` · `--size-element-gap-sm`
 
 From `design-system/src/components/navigation/Breadcrumb/Breadcrumb.scss`. Override these through the token layer, never with a literal.
 

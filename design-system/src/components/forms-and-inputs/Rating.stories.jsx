@@ -8,6 +8,9 @@ export default {
     component: Rating,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-23', kind: 'changed', summary: 'Each rating item is 32 with a 16 icon, down from 40 with a 20 icon.' },
+        ],
         docs: {
             description: {
                 component: 'Rating component for form inputs. Supports two variants: with "Comments" label below or with numeric labels (1-5) above each star. Provides interactive star selection from 0 to 5 stars.'

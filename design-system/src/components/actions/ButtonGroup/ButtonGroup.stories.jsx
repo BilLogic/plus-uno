@@ -8,6 +8,10 @@ export default {
     component: ButtonGroup,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-23', kind: 'changed', summary: 'Follows Button: a group is 32 at `medium` and 24 at `small`.' },
+            { date: '2026-10-23', kind: 'deprecated', summary: '`size="large"` was deprecated: it draws like `medium` and warns in development.' },
+        ],
         docs: {
             description: {
                 component: 'Button Group component for grouping related buttons together. Supports horizontal and vertical layouts with multiple sizes and styles. Uses tonal fill as the default per the design system specification.'
@@ -78,13 +82,6 @@ function ButtonGroupSizesDemos() {
                     <span className="plus-body-3" style={{ color: 'var(--color-on-surface)' }}>Medium (Default)</span>
                     <ButtonGroup
                         size="medium"
-                        buttons={[{ text: 'Left' }, { text: 'Right' }]}
-                    />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)' }}>Large</span>
-                    <ButtonGroup
-                        size="large"
                         buttons={[{ text: 'Left' }, { text: 'Right' }]}
                     />
                 </div>

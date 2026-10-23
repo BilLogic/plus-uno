@@ -3,7 +3,7 @@
 
 # CloseButton
 
-The one dismiss control for surfaces that close as a whole — Alert, Toast, Modal. A fixed 24×24 hit area holding a 16px xmark: it never scales with the text around it, so placing it on a line of text is the parent's job. `tone="inverse"` is for colored or dark grounds. There is no disabled state (a close control is never disabled) and no color variants (the × is neutral on every intent). Its name is "Close", or "Dismiss {what}" when `what` is passed.
+The one dismiss control for surfaces that close as a whole — Alert, Toast, Modal. A fixed 32×32 hit area holding a 16px xmark: it never scales with the text around it, so placing it on a line of text is the parent's job. `tone="inverse"` is for colored or dark grounds. There is no disabled state (a close control is never disabled) and no color variants (the × is neutral on every intent). Its name is "Close", or "Dismiss {what}" when `what` is passed.
 
 **Import:** `import { CloseButton } from '@/components';`
 
@@ -30,7 +30,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-focus-ring` · `--color-focus-ring-inverse` · `--color-on-surface-variant` · `--color-on-surface-variant-state-08` · `--color-on-surface-variant-state-12` · `--color-on-surface-variant-state-16` · `--color-surface` · `--color-surface-state-08` · `--color-surface-state-12` · `--color-surface-state-16` · `--font-size-fa-h5-solid` · `--size-element-radius-lg` · `--size-element-radius-md` · `--size-element-stroke-lg`
+`--color-focus-ring` · `--color-focus-ring-inverse` · `--color-on-surface-variant` · `--color-on-surface-variant-state-08` · `--color-on-surface-variant-state-12` · `--color-on-surface-variant-state-16` · `--color-surface` · `--color-surface-state-08` · `--color-surface-state-12` · `--color-surface-state-16` · `--icon-md` · `--item-height-md` · `--size-element-radius-lg` · `--size-element-radius-md` · `--size-element-stroke-lg`
 
 From `design-system/src/components/actions/CloseButton/CloseButton.scss`. Override these through the token layer, never with a literal.
 

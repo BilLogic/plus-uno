@@ -1,13 +1,10 @@
 /**
  * CloseButton — Figma: Button page, "Close button" set.
  *
- * The 24px box, the 2px ring offset and the 1 line height are raw on purpose:
- * the library has no control-size or focus-offset token, and Figma spells them
- * raw too. Everything else is a token.
- *
- * The 16px × borrows the type scale: there is no icon-size token, so it uses
- * `--font-size-fa-h5-solid`, which resolves to `--font-size-h6`. Retuning h6
- * changes the ×, and the FixedSize story's play function fails when it does.
+ * A 32 box (`--item-height-md`, the control height) drawing a 16 × (`--icon-md`).
+ * The 2px ring offset and the 1 line height are raw on purpose: the library
+ * has no focus-offset token, and Figma spells it raw too. Everything else is a
+ * token. The FixedSize story's play function holds the box and the ×.
  */
 
 .plus-close-btn {
@@ -16,8 +13,8 @@
     flex: none;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: var(--item-height-md);
+    height: var(--item-height-md);
     padding: 0;
     margin: 0;
     border: 0;
@@ -29,7 +26,7 @@
     // Specific enough to beat the typography classes' `.h4 .fa-solid` icon
     // sizing, which is what used to make the × grow with its surrounding text.
     .plus-close-btn__icon.fa-solid {
-        font-size: var(--font-size-fa-h5-solid);
+        font-size: var(--icon-md);
         line-height: 1;
         color: inherit;
     }
