@@ -1,5 +1,7 @@
-import React, { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import Topbar from '../Topbar';
+import { SidebarControlContext } from './SidebarControl';
 import './SurfaceContainer.scss';
 
 /** The sidebar docks from Large (1024), the same breakpoint the Layout tokens switch on. */
@@ -53,6 +55,9 @@ const useWide = (ref) => {
  * `Pattern/Surface container`: a 32 topbar over a row holding the sidebar and
  * the surface.
  *
+ * - The frame owns the sidebar state; the Topbar in the `topbar` slot draws the
+ *   one toggle from it (through `SidebarControlContext`). Without a `topbar`,
+ *   the frame renders a bare Topbar so the toggle is still there.
  * - The sidebar toggle sits at (8, 8) at every width and never moves.
  * - From 1024 the sidebar docks (240, in flow). Below 1024 it is closed.
  * - Hovering the toggle or the left edge peeks a closed sidebar: it floats over
@@ -118,10 +123,10 @@ const SurfaceContainer = ({
         }, PEEK_LEAVE_MS);
     }, [cancelLeave]);
 
-    const toggle = () => {
+    const toggle = useCallback(() => {
         cancelLeave();
         setState((s) => (s === 'docked' ? 'closed' : 'docked'));
-    };
+    }, [cancelLeave]);
 
     // A peek closes on an outside press or Escape; the toggle and the panel are inside.
     useEffect(() => {
@@ -169,26 +174,27 @@ const SurfaceContainer = ({
         </aside>
     );
 
+    const toggleProps = useMemo(() => ({
+        ref: toggleRef,
+        'aria-controls': docked || peeking ? sidebarId : undefined,
+        onClick: toggle,
+        onPointerEnter: peek,
+        onPointerLeave: leave,
+    }), [docked, peeking, sidebarId, toggle, peek, leave]);
+
+    const control = useMemo(() => (hasSidebar ? {
+        sidebar: docked || peeking ? 'open' : 'closed',
+        docked,
+        toggleProps,
+    } : null), [hasSidebar, docked, peeking, toggleProps]);
+
     return (
         <div id={id} ref={frameRef} className={classes} style={style} {...props}>
-            <div className="plus-surface-container__topbar">
-                {hasSidebar ? (
-                    <button
-                        ref={toggleRef}
-                        type="button"
-                        className="plus-surface-container__toggle"
-                        aria-label={docked ? 'Close sidebar' : 'Open sidebar'}
-                        aria-expanded={docked || peeking}
-                        aria-controls={docked || peeking ? sidebarId : undefined}
-                        onClick={toggle}
-                        onPointerEnter={peek}
-                        onPointerLeave={leave}
-                    >
-                        <i className="fa-solid fa-bars" aria-hidden="true" />
-                    </button>
-                ) : null}
-                <div className="plus-surface-container__topbar-content">{topbar}</div>
-            </div>
+            <SidebarControlContext.Provider value={control}>
+                <div className="plus-surface-container__topbar">
+                    {topbar ?? (hasSidebar ? <Topbar /> : null)}
+                </div>
+            </SidebarControlContext.Provider>
 
             {hasSidebar && state === 'closed' ? (
                 <div className="plus-surface-container__edge" aria-hidden="true" onPointerEnter={peek} />
@@ -217,7 +223,7 @@ const SurfaceContainer = ({
 
 SurfaceContainer.propTypes = {
     id: PropTypes.string,
-    /** Topbar content after the sidebar toggle, e.g. breadcrumbs and the account */
+    /** The topbar row: a `Topbar`, which draws the sidebar toggle from the frame's state. Defaults to a bare Topbar when there is a sidebar. */
     topbar: PropTypes.node,
     /** Sidebar content. Without it there is no sidebar and no toggle. */
     sidebar: PropTypes.node,

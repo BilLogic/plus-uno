@@ -1,0 +1,79 @@
+/**
+ * Topbar pattern (Patterns/Topbar): start · middle · end in a 32 row.
+ * Mirrors the Figma `_Topbar`. Every length is a Layout, Surface container,
+ * Item or Element token.
+ */
+
+.plus-topbar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    height: var(--layout-height-topbar);
+    box-sizing: border-box;
+}
+
+/* ------------------------------------------------------------- start */
+
+// Padded 8 on the left so the toggle sits at the container pad, and 12 on the
+// right so the breadcrumb follows the toggle.
+.plus-topbar__start {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    padding-left: var(--surface-container-pad);
+    padding-right: var(--element-inline-lg);
+}
+
+// Docked, the start area is the sidebar's width, so the breadcrumb starts where
+// the surface does.
+.plus-topbar--docked .plus-topbar__start {
+    width: var(--layout-width-sidebar);
+}
+
+/* ------------------------------------------------------------- middle */
+
+// The breadcrumb fills what is left and never wraps: each crumb shrinks and
+// ends in an ellipsis, so the end controls stay whole and on screen.
+.plus-topbar__middle {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+
+    .plus-breadcrumb {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .breadcrumb {
+        flex-wrap: nowrap;
+        min-width: 0;
+    }
+
+    .breadcrumb-item {
+        display: block;
+        flex: 0 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    // The current page keeps more of its name than the trail before it.
+    .plus-breadcrumb-current {
+        flex-shrink: 0.25;
+    }
+}
+
+/* ------------------------------------------------------------- end */
+
+.plus-topbar__end {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: var(--element-inline-lg);
+    padding-left: var(--element-inline-lg);
+}

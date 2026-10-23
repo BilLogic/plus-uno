@@ -3,7 +3,7 @@
 
 # UserAvatar
 
-Per Figma spec: node-id=111-227876 Colors: - Initial circle: primary-08 bg (rgba(4, 114, 168, 0.08)), primary-text color (#00547e) - Counter: danger-08 bg (rgba(186, 26, 26, 0.08)), danger-text color (#9b0606) - Hover: on-surface-08 overlay
+The signed-in user: an initial pill, the name, the role indicator ("Lead") and an optional notification counter. Per the Specs User Avatar (111-227876). - `size="md"` is 32 high (`--item-height-md`), for the 32 topbar. The name truncates at `--label-max-width`. - `size="lg"` pads `--size-element-pad-y-md` around a 32 pill, for table rows.
 
 **Import:** `import { UserAvatar } from '@/components';`
 
@@ -18,7 +18,8 @@ Per Figma spec: node-id=111-227876 Colors: - Initial circle: primary-08 bg (rgba
 | `counter` | bool | `true` | — |
 | `counterValue` | number | `2` | — |
 | `state` | enum | `'enabled'` | — |
-| `type` | enum | `'regular tutor'` | — |
+| `type` | enum | `'regular tutor'` | `lead tutor` shows the "Lead" role indicator; other types show none. |
+| `size` | enum | `'lg'` | `md` 32 high, for the topbar · `lg` the original padded row, for tables |
 | `id` | string | — | — |
 | `onClick` | func | — | — |
 | `className` | string | `''` | — |
@@ -29,7 +30,15 @@ Per Figma spec: node-id=111-227876 Colors: - Initial circle: primary-08 bg (rgba
 
 **`type`** — `regular tutor` · `lead tutor` · `admin`
 
+**`size`** — `md` · `lg`
+
 Anything not listed is not a valid value.
+
+## Tokens touched
+
+`--body-default` · `--body-small` · `--color-danger-state-08` · `--color-danger-text` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-primary-state-08` · `--color-primary-text` · `--color-surface-container-lowest` · `--element-inline-md` · `--element-pad-x-sm` · `--element-radius-full` · `--element-radius-item-md` · `--image-md` · `--image-sm` · `--item-height-md` · `--label-height-md` · `--label-max-width` · `--size-element-gap-md` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-md` · `--size-element-radius-md`
+
+From `design-system/src/components/_internal/UserAvatar/UserAvatar.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
