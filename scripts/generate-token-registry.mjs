@@ -199,6 +199,15 @@ export function deriveCandidates(collection, name) {
     return out;
   }
 
+  // The new scale collections carry their code names in Figma's code syntax,
+  // and those follow the spec names: a folder in the Size collection is the
+  // token's family ("Height/200" -> --height-200), a flat collection names
+  // the family itself ("Element" + "pad-x-sm" -> --element-pad-x-sm), and a
+  // Primitive is its leaf ("Space/space-025" -> --space-025, below).
+  if (collection !== 'Primitives') {
+    out.push(`--${slug(collection)}-${slug(name)}`);
+    if (parts.length > 1) out.push(`--${slug(name)}`);
+  }
   out.push(`--${slug(leaf)}`);
   return out;
 }

@@ -109,6 +109,12 @@ Figma export → design-system/src/tokens/source/*.json → npm run generate:tok
   carries `id`, `name`, `resolvedType`, `valuesByMode` (aliases kept as
   `VARIABLE_ALIAS`) and `resolvedValuesByMode` (every alias resolved to its
   final value).
+- The new scale collections (`Primitives.json`, `Element.json`, `Size.json`,
+  `Border.json`) sit beside the old size files and generate
+  `_scales.scss`. Their variables also carry `scopes` and `codeSyntax`, and
+  each variable's `codeSyntax.WEB` (`var(--element-pad-x-sm)`) is its CSS
+  name, so the generator refuses a variable without one instead of deriving
+  a name.
 - Known gap: `npm run sync:tokens` (`scripts/sync-figma-tokens.js`) writes to
   `new tokens/` and resolves only one alias level, so until it is fixed these
   files come from the MCP export.

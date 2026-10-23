@@ -15,6 +15,8 @@
 @use "../tokens/primitives" as *;
 @use "../tokens/spacing_semantics" as *;
 @use "../tokens/layout" as *;
+// The new scales, beside the old size tokens; see the header of _scales.scss.
+@use "../tokens/scales" as *;
 @use "../tokens/fonts" as *;
 @use "../tokens/elevation" as *;
 

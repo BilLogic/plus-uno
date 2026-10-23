@@ -1,0 +1,861 @@
+{
+  "modes": {
+    "19364:16": "Value"
+  },
+  "variables": [
+    {
+      "id": "VariableID:19364:264",
+      "name": "Height/100",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:227"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 16
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--height-100)"
+      }
+    },
+    {
+      "id": "VariableID:19364:265",
+      "name": "Height/125",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:228"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 20
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--height-125)"
+      }
+    },
+    {
+      "id": "VariableID:19364:266",
+      "name": "Height/150",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:229"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 24
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--height-150)"
+      }
+    },
+    {
+      "id": "VariableID:19364:267",
+      "name": "Height/200",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:230"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 32
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--height-200)"
+      }
+    },
+    {
+      "id": "VariableID:19364:268",
+      "name": "Height/250",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:231"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 40
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--height-250)"
+      }
+    },
+    {
+      "id": "VariableID:19364:269",
+      "name": "Height/300",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:232"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 48
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--height-300)"
+      }
+    },
+    {
+      "id": "VariableID:19364:270",
+      "name": "Height/500",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:233"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 80
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--height-500)"
+      }
+    },
+    {
+      "id": "VariableID:19364:271",
+      "name": "Height/750",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:234"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 120
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--height-750)"
+      }
+    },
+    {
+      "id": "VariableID:19364:272",
+      "name": "Height/2000",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:239"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 320
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--height-2000)"
+      }
+    },
+    {
+      "id": "VariableID:19364:273",
+      "name": "Width/500",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:233"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 80
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--width-500)"
+      },
+      "description": "table column minimum"
+    },
+    {
+      "id": "VariableID:19364:274",
+      "name": "Width/1000",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:235"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 160
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--width-1000)"
+      }
+    },
+    {
+      "id": "VariableID:19364:275",
+      "name": "Width/1400",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:236"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 224
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--width-1400)"
+      }
+    },
+    {
+      "id": "VariableID:19364:276",
+      "name": "Width/1500",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:237"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 240
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--width-1500)"
+      }
+    },
+    {
+      "id": "VariableID:19364:277",
+      "name": "Width/2000",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:239"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 320
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--width-2000)"
+      }
+    },
+    {
+      "id": "VariableID:19364:278",
+      "name": "Width/2500",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:240"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 400
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--width-2500)"
+      }
+    },
+    {
+      "id": "VariableID:19364:279",
+      "name": "Width/3000",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:241"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 480
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--width-3000)"
+      }
+    },
+    {
+      "id": "VariableID:19364:280",
+      "name": "Item/height-sm",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:266"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 24
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--item-height-sm)"
+      },
+      "description": "compact: inside table rows and inline toolbars only"
+    },
+    {
+      "id": "VariableID:19364:281",
+      "name": "Item/height-md",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:267"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 32
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--item-height-md)"
+      },
+      "description": "the default: button, tab, menu row, field, select"
+    },
+    {
+      "id": "VariableID:19364:282",
+      "name": "Row/height-sm",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:267"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 32
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--row-height-sm)"
+      },
+      "description": "dense table"
+    },
+    {
+      "id": "VariableID:19364:283",
+      "name": "Row/height-md",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:268"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 40
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--row-height-md)"
+      },
+      "description": "default table and list row"
+    },
+    {
+      "id": "VariableID:19364:284",
+      "name": "Row/height-lg",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:269"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 48
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--row-height-lg)"
+      },
+      "description": "rows with an avatar or two lines"
+    },
+    {
+      "id": "VariableID:19364:285",
+      "name": "Label/height-sm",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:264"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 16
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--label-height-sm)"
+      },
+      "description": "Count on an icon or avatar"
+    },
+    {
+      "id": "VariableID:19364:286",
+      "name": "Label/height-md",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:265"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 20
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--label-height-md)"
+      },
+      "description": "Tag, Status, Count"
+    },
+    {
+      "id": "VariableID:19364:287",
+      "name": "Label/max-width",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:274"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 160
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--label-max-width)"
+      },
+      "description": "Tag"
+    },
+    {
+      "id": "VariableID:19364:288",
+      "name": "Field/width-xs",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:273"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 80
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--field-width-xs)"
+      },
+      "description": "fixed field widths (Atlassian Text field)"
+    },
+    {
+      "id": "VariableID:19364:289",
+      "name": "Field/width-sm",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:274"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 160
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--field-width-sm)"
+      }
+    },
+    {
+      "id": "VariableID:19364:290",
+      "name": "Field/width-md",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:276"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 240
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--field-width-md)"
+      }
+    },
+    {
+      "id": "VariableID:19364:291",
+      "name": "Field/width-lg",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:277"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 320
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--field-width-lg)"
+      }
+    },
+    {
+      "id": "VariableID:19364:292",
+      "name": "Field/width-xl",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:279"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 480
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--field-width-xl)"
+      }
+    },
+    {
+      "id": "VariableID:19364:293",
+      "name": "Field/min-height-sm",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:270"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 80
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--field-min-height-sm)"
+      },
+      "description": "Text area"
+    },
+    {
+      "id": "VariableID:19364:294",
+      "name": "Field/min-height-lg",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:271"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 120
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--field-min-height-lg)"
+      },
+      "description": "Rich text editor"
+    },
+    {
+      "id": "VariableID:19364:295",
+      "name": "Icon/sm",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:226"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 12
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--icon-sm)"
+      },
+      "description": "chevrons, small glyphs"
+    },
+    {
+      "id": "VariableID:19364:296",
+      "name": "Icon/md",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:227"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 16
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--icon-md)"
+      },
+      "description": "inside every 24 and 32 control (drawn size)"
+    },
+    {
+      "id": "VariableID:19364:297",
+      "name": "Icon/lg",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:229"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 24
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--icon-lg)"
+      }
+    },
+    {
+      "id": "VariableID:19364:298",
+      "name": "Image/xxs",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:227"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 16
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--image-xxs)"
+      }
+    },
+    {
+      "id": "VariableID:19364:299",
+      "name": "Image/xs",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:228"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 20
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--image-xs)"
+      }
+    },
+    {
+      "id": "VariableID:19364:300",
+      "name": "Image/sm",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:229"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 24
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--image-sm)"
+      }
+    },
+    {
+      "id": "VariableID:19364:301",
+      "name": "Image/md",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:230"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 32
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--image-md)"
+      }
+    },
+    {
+      "id": "VariableID:19364:302",
+      "name": "Image/lg",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:231"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 40
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--image-lg)"
+      }
+    },
+    {
+      "id": "VariableID:19364:303",
+      "name": "Image/xl",
+      "variableCollectionId": "VariableCollectionId:19364:263",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:16": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:232"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:16": 48
+      },
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--image-xl)"
+      }
+    }
+  ]
+}

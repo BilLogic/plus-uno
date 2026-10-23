@@ -83,6 +83,23 @@ Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity 
 | Surface padding | `var(--size-surface-pad-{x\|y})` |
 | Table cell | `var(--size-table-cell-{x\|y\|gap})` |
 
+### Scale Tokens
+
+The Primitives, Element, Size and Border collections, beside the old `--size-*` tokens until every use moves. Each Figma variable's code syntax is its CSS name.
+
+| Figma Variable | PLUS CSS Token | Notes |
+|----------------|----------------|-------|
+| Primitives `Space/space-*`, `Radius/radius-*`, `Stroke/stroke-*`, `Size/size-*` | `var(--space-025)`, `var(--radius-050)`, `var(--stroke-1)`, `var(--size-200)` | Named by rem × 100 (`space-025` is 4). Hidden in Figma; semantic tokens point at them |
+| Element `pad-x-{xs\|sm\|md}`, `pad-y-{sm\|md}` | `var(--element-pad-x-sm)` | 4 · 8 · 12 and 2 · 6. The old `--size-element-pad-y-sm` is 4; the new one is 2 |
+| Element `stack-*`, `inline-*` | `var(--element-stack-md)`, `var(--element-inline-sm)` | 4 · 8 · 12 |
+| Element `radius-{sm\|md\|lg}`, `radius-item-{sm\|md}`, `radius-full` | `var(--element-radius-item-md)` | 2 · 4 · 8, items 6 · 8 |
+| Size `Height/*`, `Width/*` | `var(--height-200)`, `var(--width-1400)` | Common scales, named by rem × 100 |
+| Size `Item/height-{sm\|md}` | `var(--item-height-md)` | 24 · 32; there is no 40 Item |
+| Size `Row/height-{sm\|md\|lg}` | `var(--row-height-md)` | 32 · 40 · 48 |
+| Size `Label/*`, `Field/*` | `var(--label-height-md)`, `var(--field-width-md)` | Label 16 · 20, max 160; Field widths 80 … 480, min heights 80 · 120 |
+| Size `Icon/*`, `Image/*` | `var(--icon-md)`, `var(--image-sm)` | Icon 12 · 16 · 24; Image 16 … 48 |
+| Border `default`, `selected`, `focused` | `var(--border-default)` | 1 · 2 · 2 |
+
 ## Elevation Tokens
 
 | Figma Elevation Level | PLUS CSS Token |

@@ -1,0 +1,71 @@
+{
+  "modes": {
+    "19364:17": "Value"
+  },
+  "variables": [
+    {
+      "id": "VariableID:19364:305",
+      "name": "default",
+      "variableCollectionId": "VariableCollectionId:19364:304",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:17": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:224"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:17": 1
+      },
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--border-default)"
+      }
+    },
+    {
+      "id": "VariableID:19364:306",
+      "name": "selected",
+      "variableCollectionId": "VariableCollectionId:19364:304",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:17": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:225"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:17": 2
+      },
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--border-selected)"
+      }
+    },
+    {
+      "id": "VariableID:19364:307",
+      "name": "focused",
+      "variableCollectionId": "VariableCollectionId:19364:304",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:17": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:225"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:17": 2
+      },
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--border-focused)"
+      },
+      "description": "focus ring, drawn 2 outside"
+    }
+  ]
+}

@@ -110,7 +110,7 @@ export function createHome() {
         padding: 'lg',
         styles: {
             backgroundColor: 'white',
-            borderRadius: 'var(--element-radius-lg, 12px)'
+            borderRadius: 'var(--radius-075)'
         }
     });
 
