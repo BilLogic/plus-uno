@@ -1,3 +1,5 @@
+@use '../../status-and-loading/label-heights' as label;
+
 /**
  * _Field — one look for every text-like field.
  *
@@ -6,7 +8,17 @@
  * 2px ring (`--size-element-stroke-lg`) inside the box in the focus-ring
  * color; hover and focus are both blue, so the width is what tells them
  * apart. Figma draws its stroke inside the box, so the border is taken out of
- * the padding here and the heights match the library: 28 · 34 · 40.
+ * the padding here.
+ *
+ * A single-line field is one height, 32 (`--item-height-md`, the height a
+ * button shares), with its content centered and side padding 12. A button in
+ * a slot is the 24 compact button, centered, 4 from the box's edge. A
+ * multi-line field starts at 80 and grows; a field whose tags wrap starts at
+ * 32 and grows.
+ *
+ * `small` and `large` are deprecated and draw like `medium`; their classes
+ * stay so call sites that target them keep matching. Each host warns in
+ * development.
  */
 
 .plus-field-stack {
@@ -89,32 +101,28 @@
     cursor: text;
     transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
 
-    // Medium is the default.
-    padding:
-        calc(var(--size-element-pad-y-md) - var(--size-element-border))
-        calc(var(--size-element-pad-x-md) - var(--size-element-border));
+    // One height at every size: the content centers in it, so nothing pads
+    // the top and bottom.
+    height: var(--item-height-md);
+    padding: 0 calc(var(--element-pad-x-md) - var(--size-element-border));
     font-size: var(--font-size-body2);
     line-height: var(--font-line-height-body2);
 
-    &--small {
-        padding:
-            calc(var(--size-element-pad-y-sm) - var(--size-element-border))
-            calc(var(--size-element-pad-x-sm) - var(--size-element-border));
-        gap: var(--size-element-gap-sm);
-        font-size: var(--font-size-body3);
-        line-height: var(--font-line-height-body3);
-    }
-
-    &--large {
-        padding:
-            calc(var(--size-element-pad-y-lg) - var(--size-element-border))
-            calc(var(--size-element-pad-x-lg) - var(--size-element-border));
-        font-size: var(--font-size-body1);
-        line-height: var(--font-line-height-body1);
-    }
-
+    // Several lines (Text area): 80 at least, growing with its rows, and the
+    // first line sits where a single-line field's text does.
     &--multiline {
         align-items: flex-start;
+        height: auto;
+        min-height: var(--field-min-height-sm);
+        padding-block: calc(var(--element-pad-y-md) - var(--size-element-border));
+    }
+
+    // Tags that wrap (Tag field, a multi Select): one row of tags is 32, and
+    // each wrapped row adds to it.
+    &--grow {
+        height: auto;
+        min-height: var(--item-height-md);
+        padding-block: calc((var(--item-height-md) - #{label.$tag-height}) / 2 - var(--size-element-border));
     }
 }
 
@@ -125,34 +133,42 @@
     align-items: center;
 }
 
-// The slots are one text line high, whatever sits in them, so a stepper or an
-// addon button never makes the field taller than its text.
+// The text area fills the box, so its resize handle sits at the box's corner.
+.plus-field--multiline .plus-field__content {
+    align-self: stretch;
+    align-items: stretch;
+}
+
 .plus-field .plus-field__leading,
 .plus-field .plus-field__trailing {
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
     gap: var(--size-element-gap-xs);
-    height: 1lh;
     color: var(--color-on-surface-variant);
     white-space: nowrap;
 
-    // A small button in a slot is cut to the line: 22 high in a medium field,
-    // so the field stays 34. Figma does the same with a height override.
+    // A button in a slot is the 24 compact button, whatever size it was given.
     .plus-btn.btn {
-        height: 100%;
-        min-height: 0;
-        padding-top: 0;
-        padding-bottom: 0;
+        height: var(--item-height-sm);
     }
 
     // Steppers and icon-only buttons are square.
     .plus-btn.btn.plus-field-stepper,
     .plus-btn.btn.plus-btn--icon-only {
-        width: auto;
-        aspect-ratio: 1 / 1;
+        width: var(--item-height-sm);
         padding: 0;
     }
+}
+
+// A button at the box's edge sits 4 from it, as it does from the top and the
+// bottom: it takes back the rest of the side padding.
+.plus-field .plus-field__leading > .plus-btn:first-child {
+    margin-inline-start: calc(var(--element-pad-x-xs) - var(--element-pad-x-md));
+}
+
+.plus-field .plus-field__trailing > .plus-btn:last-child {
+    margin-inline-end: calc(var(--element-pad-x-xs) - var(--element-pad-x-md));
 }
 
 // The control fills the content slot and draws nothing of its own: the box is

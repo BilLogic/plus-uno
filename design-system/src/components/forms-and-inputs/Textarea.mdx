@@ -41,7 +41,7 @@ export const figmaMeta = {
       },
       "status": "verified",
       "verifiedAt": "2026-10-15",
-      "notes": "One set. Form Short Textarea was merged into it and deleted from the library; a short textarea is `rows={1}` in code and an instance resized to 34 high in Figma. `rows` is code-only: Figma sets the height by resizing the instance."
+      "notes": "One set. Form Short Textarea was merged into it and deleted from the library; a text area is 80 high at least and grows from there. `rows` is code-only: Figma sets the height by resizing the instance."
     },
     {
       "id": "field",
@@ -98,7 +98,7 @@ Use a textarea for free text over several lines.
 
 ## Sizes
 
-<DocsCanvasShell description={<>Small, medium and large type and padding.</>}>
+<DocsCanvasShell description={<>`small` and `large` are deprecated: they draw like `medium` and warn in development.</>}>
     <DsCanvasQuiet of={TextareaStories.Sizes} />
 </DocsCanvasShell>
 
@@ -163,9 +163,9 @@ Use a textarea for free text over several lines.
 ## When to use
 
 Use `Textarea` when the answer is prose the user writes in their own words —
-session notes, a reflection, a reason for canceling. `rows` (default 3) sets
-the visible height; a one-line note field is `rows={1}`, which is as tall as an
-`Input` of the same size.
+session notes, a reflection, a reason for canceling. The field is 80 high
+at least, and `rows` (default 3) grows it from there. A one-line answer is an
+`Input`, which is 32.
 
 </div>
 
