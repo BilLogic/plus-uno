@@ -1,0 +1,36 @@
+{
+  "modes": {
+    "19378:5": "Value"
+  },
+  "variables": [
+    {
+      "id": "VariableID:19378:46280",
+      "name": "Overlay/scrim",
+      "variableCollectionId": "VariableCollectionId:19378:46279",
+      "resolvedType": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--overlay-scrim)"
+      },
+      "valuesByMode": {
+        "19378:5": {
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "a": 0.3799999952316284
+        }
+      },
+      "resolvedValuesByMode": {
+        "19378:5": {
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "a": 0.3799999952316284
+        }
+      }
+    }
+  ]
+}

@@ -242,7 +242,7 @@ describe('the family map — one statement of which family a name is in', () => 
   });
 
   it('answers null rather than guessing for a name in no family', () => {
-    expect(familyOf('--table-cell-x')).toBe(null);
+    expect(familyOf('--dropdown-cell-x')).toBe(null);
     expect(familyOf('not-a-token')).toBe(null);
     expect(familyOf(undefined)).toBe(null);
   });
@@ -444,11 +444,13 @@ describe('the color key is finer than the normalizer it replaces', () => {
    * #f9f9fc and paired with the six surface overlays; 426 when the four
    * `--color-surface-default|overlay|raised|sunken` roles arrived as aliases
    * of solid neutrals already in the corpus and brought 15 pairs with their
-   * overlays, every one of the new pairs touching one of the four. The number is asserted
+   * overlays, every one of the new pairs touching one of the four; 430 when
+   * `--overlay-scrim` arrived as black at 38% beside the other black
+   * washes. The number is asserted
    * rather than logged because a migrating caller's exposure is this number,
    * and a drift in it is news either way.
    */
-  it('differs from the normalizer on 426 live token pairs', () => {
+  it('differs from the normalizer on 430 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
       .map((entry) => entry.value)
       .filter((value) => normalizeColor(value) !== null);
@@ -461,7 +463,7 @@ describe('the color key is finer than the normalizer it replaces', () => {
         pairs += 1;
       }
     }
-    expect(pairs).toBe(426);
+    expect(pairs).toBe(430);
   });
 
   /*

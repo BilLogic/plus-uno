@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 74,
-    "uses": 233,
+    "names": 73,
+    "uses": 231,
     "bare": 5
   },
   "tokens": {
@@ -25,10 +25,6 @@
       "bare": 0
     },
     "--card-pad-y-lg": {
-      "uses": 2,
-      "bare": 0
-    },
-    "--card-radius-sm": {
       "uses": 2,
       "bare": 0
     },

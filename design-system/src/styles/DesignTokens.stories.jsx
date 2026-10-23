@@ -28,6 +28,7 @@ export const Collections = () => (
                     ['colors / neutral', '_colors.scss', <>Surface, the surface-container ladder ({code('--color-surface-container-lowest')} → {code('-low')} → base → {code('-high')} → {code('-highest')}), on-surface/on-surface-variant, outline/outline-variant, inverse surface, plus state layers ({code('-state-08/12/16')})</>],
                     ['size / primitive', '_primitives.scss', <>Raw spacing steps ({code('--size-spacing-{small|medium|large}-space-*')}), border-radius and stroke primitives — never used directly</>],
                     ['size / semantics', '_spacing_semantics.scss', <>Per-context tokens: {code('--size-element-*')}, {code('--size-card-*')}, {code('--size-section-*')}, {code('--size-modal-*')}, {code('--size-surface-*')}, {code('--size-table-*')}</>],
+                    ['spacing / layout, spacing / patterns, color / patterns', '_frame_layers.scss', <>The page frame and the patterns on it, named for the folder with no family prefix: {code('--layout-*')} and {code('--surface-*')} (MD · LG · XL), {code('--card-*')}, {code('--popover-*')}, {code('--overlay-scrim')}. These sit beside the semantic tokens above until each use moves</>],
                 ].map((row, i) => (
                     <tr key={i} style={{ borderBottom: '1px solid var(--color-outline-variant)' }}>
                         <td className="body2-txt" style={{ padding: '10px 12px', wordBreak: 'break-word' }}>{row[0]}</td>

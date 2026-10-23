@@ -8,7 +8,7 @@
     flex-direction: column;
     gap: var(--card-gap-md, 16px);
     background-color: var(--color-surface-container-lowest, #ffffff);
-    border-radius: var(--card-radius-sm, 12px);
+    border-radius: var(--size-card-radius-sm);
     padding: var(--card-pad-y-lg, 24px) var(--card-pad-x-lg, 24px);
     width: 556px;
     max-width: 556px;

@@ -17,6 +17,7 @@
 @use "../tokens/layout" as *;
 // The new scales, beside the old size tokens; see the header of _scales.scss.
 @use "../tokens/scales" as *;
+@use "../tokens/frame_layers" as *;
 @use "../tokens/fonts" as *;
 @use "../tokens/elevation" as *;
 

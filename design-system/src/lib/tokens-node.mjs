@@ -242,7 +242,7 @@ export const FAMILIES = [
   {
     family: 'surface',
     prefix: '--surface-',
-    what: 'a surface: its color and, separately, its shadow',
+    what: 'a surface: its color and, separately, its shadow; the surface and surface container pad, stack and radius',
   },
   { family: 'font-size', prefix: '--font-size-', what: 'the type scale, icon sizes included' },
   { family: 'font-line-height', prefix: '--font-line-height-', what: 'line height per type step' },
@@ -270,6 +270,12 @@ export const FAMILIES = [
   { family: 'border', prefix: '--border-', what: 'stroke widths by state' },
   { family: 'elevation', prefix: '--elevation-', what: 'the shadow ladder' },
   { family: 'layout', prefix: '--layout-', what: 'app-shell measurements' },
+  { family: 'section', prefix: '--section-', what: 'a span of the page grid: its stacks and column minimums' },
+  { family: 'card', prefix: '--card-', what: 'card pad, stack, inline, minimum width and radius' },
+  { family: 'table', prefix: '--table-', what: 'table cell pad, tree indent and radius' },
+  { family: 'overlay', prefix: '--overlay-', what: 'the full-screen layer under a modal: its pad and scrim' },
+  { family: 'modal', prefix: '--modal-', what: 'modal dialog pad, stack, inline and radius' },
+  { family: 'popover', prefix: '--popover-', what: 'menus, popups, tooltips and flags: pad, widths, radii, placement' },
   { family: 'col', prefix: '--col-', what: 'grid column widths' },
   { family: 'breakpoint', prefix: '--breakpoint-', what: 'breakpoint minima' },
 ];
@@ -279,7 +285,7 @@ const BY_LENGTH = [...FAMILIES].sort((a, b) => b.prefix.length - a.prefix.length
 
 /**
  * Which family a token NAME is in, or null for a name in none — a
- * component-local custom property such as `--table-cell-x`, which is correct
+ * component-local custom property such as `--dropdown-cell-x`, which is correct
  * code and not a token (see `check:size-fallbacks` on why it is not a finding).
  *
  * @param {string} name
