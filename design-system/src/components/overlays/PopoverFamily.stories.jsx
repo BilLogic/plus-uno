@@ -2,8 +2,7 @@ import React from 'react';
 import { expect, waitFor, within } from 'storybook/test';
 
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
-import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
-import { Toast, ToastContainer } from '@/components/messaging/Toast/Toast';
+import { Dropdown, Toast, ToastContainer } from '@/components';
 import Popover from './Popover/Popover';
 import Tooltip from './Tooltip/Tooltip';
 

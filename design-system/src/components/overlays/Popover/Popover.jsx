@@ -2,26 +2,10 @@ import React, { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import './Popover.scss';
 import { Popover as BootstrapPopover, OverlayTrigger } from 'react-bootstrap';
-import { readAnchorGap, readScreenGap } from '../../forms-and-inputs/_internal/anchorPlacement';
+import { popoverOverlayProps } from '@/lib/popoverPlacement';
 
 /** The width tiers, Popover/width-sm · md · lg: 320 · 400 · 480. */
 const WIDTHS = ['sm', 'md', 'lg'];
-
-/**
- * Popper's rules for every popover in the family: it sits Popover/offset 4
- * from its trigger (unless the caller passes `offset`), and neither flipping
- * nor sliding along its edge brings it nearer than Popover/gap-screen 8 to the
- * edge of the screen.
- */
-export function popoverPopperConfig() {
-    const padding = readScreenGap();
-    return {
-        modifiers: [
-            { name: 'preventOverflow', options: { padding } },
-            { name: 'flip', options: { padding } },
-        ],
-    };
-}
 
 // Wrapper for the Popover content
 const PopoverContent = forwardRef(({
@@ -100,8 +84,9 @@ const Popover = ({
         ),
         defaultShow,
         container,
-        offset: offset ?? [0, readAnchorGap()],
-        popperConfig: popoverPopperConfig(),
+        // 4 from the trigger unless the caller passes `offset`, and never
+        // nearer than 8 to the screen's edge.
+        ...popoverOverlayProps(offset),
     };
 
     if (triggerType === 'manual') {

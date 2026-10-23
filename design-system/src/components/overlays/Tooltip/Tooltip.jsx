@@ -1,8 +1,7 @@
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { OverlayTrigger, Overlay, Tooltip as BSTooltip } from 'react-bootstrap';
-import { popoverPopperConfig } from '../Popover/Popover';
-import { readAnchorGap } from '../../forms-and-inputs/_internal/anchorPlacement';
+import { popoverOverlayProps } from '@/lib/popoverPlacement';
 import './Tooltip.scss';
 
 /**
@@ -58,8 +57,7 @@ const Tooltip = ({
                     target={targetElement}
                     show={show}
                     placement={placement}
-                    offset={[0, readAnchorGap()]}
-                    popperConfig={popoverPopperConfig()}
+                    {...popoverOverlayProps()}
                 >
                     {renderTooltip}
                 </Overlay>
@@ -73,8 +71,7 @@ const Tooltip = ({
             delay={{ show: delayShow, hide: delayHide }}
             overlay={renderTooltip}
             trigger={trigger}
-            offset={[0, readAnchorGap()]}
-            popperConfig={popoverPopperConfig()}
+            {...popoverOverlayProps()}
         >
             {children}
         </OverlayTrigger>

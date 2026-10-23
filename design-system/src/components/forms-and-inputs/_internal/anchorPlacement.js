@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { POPOVER_OFFSET, SCREEN_GAP, readPopoverOffset, readScreenGap } from '@/lib/popoverPlacement';
 
 /**
  * Where a popup opens against the field that opened it — the placement rule
@@ -13,40 +14,9 @@ import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
  *   right-aligns with the field instead.
  * - **Flip:** with no room below, it opens above, the same offset away.
  * - **Screen gap:** whatever the alignment, it stays `--popover-gap-screen`
- *   (8px) inside the left, right and top edges of the screen.
+ *   (8px) inside the left, right and top edges of the screen. A list taller
+ *   than the room below and above caps at its own max height and scrolls.
  */
-
-/** The offset in px when the token can't be read; matches `--popover-offset`. */
-export const ANCHOR_GAP = 4;
-
-/** The screen gap in px when the token can't be read; matches `--popover-gap-screen`. */
-export const SCREEN_GAP = 8;
-
-/** A length token's value in px, read from the document, or `fallback`. */
-function readPx(name, fallback) {
-    if (typeof window === 'undefined') return fallback;
-    const raw = window.getComputedStyle(document.documentElement).getPropertyValue(name);
-    const px = parseFloat(raw);
-    return Number.isFinite(px) ? px : fallback;
-}
-
-/**
- * The offset token's value in px, read from the document.
- *
- * @returns {number}
- */
-export function readAnchorGap() {
-    return readPx('--popover-offset', ANCHOR_GAP);
-}
-
-/**
- * The screen gap token's value in px, read from the document.
- *
- * @returns {number}
- */
-export function readScreenGap() {
-    return readPx('--popover-gap-screen', SCREEN_GAP);
-}
 
 /**
  * @param {object} options
@@ -55,13 +25,13 @@ export function readScreenGap() {
  * @param {number} options.height the popup's height
  * @param {{width: number, height: number}} options.viewport
  * @param {'left'|'center'|'right'} [options.align]
- * @param {number} [options.gap] the offset from the field
+ * @param {number} [options.offset] the distance from the field
  * @param {number} [options.screenGap] the least distance to the screen's edges
  * @returns {{placement: 'top'|'bottom', top: number, left: number, minWidth: number}}
  */
-export function placePopup({ anchor, width, height, viewport, align = 'left', gap = ANCHOR_GAP, screenGap = SCREEN_GAP }) {
-    const below = viewport.height - anchor.bottom - gap;
-    const above = anchor.top - gap;
+export function placePopup({ anchor, width, height, viewport, align = 'left', offset = POPOVER_OFFSET, screenGap = SCREEN_GAP }) {
+    const below = viewport.height - anchor.bottom - offset;
+    const above = anchor.top - offset;
     const flip = below < height && above > below;
 
     let left = anchor.left;
@@ -73,7 +43,7 @@ export function placePopup({ anchor, width, height, viewport, align = 'left', ga
 
     return {
         placement: flip ? 'top' : 'bottom',
-        top: flip ? Math.max(anchor.top - gap - height, screenGap) : anchor.bottom + gap,
+        top: flip ? Math.max(anchor.top - offset - height, screenGap) : anchor.bottom + offset,
         left,
         minWidth: anchor.width,
     };
@@ -123,7 +93,7 @@ export function useAnchoredPopup({ open, anchorRef, popupRef, align = 'left', on
             height: size.height,
             viewport: { width: document.documentElement.clientWidth, height: window.innerHeight },
             align,
-            gap: readAnchorGap(),
+            offset: readPopoverOffset(),
             screenGap: readScreenGap(),
         });
         const next = {

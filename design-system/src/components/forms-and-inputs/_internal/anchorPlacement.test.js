@@ -1,6 +1,6 @@
 // @vitest-environment node
-import { describe, it, expect, afterEach } from 'vitest';
-import { placePopup, readAnchorGap, readScreenGap } from './anchorPlacement';
+import { describe, it, expect } from 'vitest';
+import { placePopup } from './anchorPlacement';
 
 /** A field 200px wide and 34px tall, its top-left at (40, 100). */
 const field = { top: 100, bottom: 134, left: 40, right: 240, width: 200, height: 34 };
@@ -25,8 +25,8 @@ describe('placePopup', () => {
         expect(placePopup({ anchor: middle, width: 296, height: 600, viewport }).placement).toBe('bottom');
     });
 
-    it('honors a caller gap', () => {
-        expect(placePopup({ anchor: field, width: 296, height: 330, viewport, gap: 8 }).top).toBe(142);
+    it('honors a caller offset', () => {
+        expect(placePopup({ anchor: field, width: 296, height: 330, viewport, offset: 8 }).top).toBe(142);
     });
 
     it('centers or right-aligns on request', () => {
@@ -64,48 +64,5 @@ describe('placePopup keeps 8 from the screen edge', () => {
     it('honors a caller screen gap', () => {
         const flush = { ...field, left: 0, right: 200 };
         expect(placePopup({ anchor: flush, width: 300, height: 100, viewport, align: 'center', screenGap: 16 }).left).toBe(16);
-    });
-});
-
-describe('readAnchorGap', () => {
-    /** A window whose root computes `--popover-offset` to `value`. */
-    const stubWindow = (value) => {
-        globalThis.window = { getComputedStyle: () => ({ getPropertyValue: (name) => (name === '--popover-offset' ? value : '') }) };
-        globalThis.document = { documentElement: {} };
-    };
-    afterEach(() => { delete globalThis.window; delete globalThis.document; });
-
-    it('reads --popover-offset', () => {
-        stubWindow(' 6px');
-        expect(readAnchorGap()).toBe(6);
-    });
-
-    it('falls back to 4px when the token is missing', () => {
-        stubWindow('');
-        expect(readAnchorGap()).toBe(4);
-    });
-
-    it('is 4px outside a browser', () => {
-        expect(readAnchorGap()).toBe(4);
-    });
-});
-
-describe('readScreenGap', () => {
-    const stubWindow = (value) => {
-        globalThis.window = { getComputedStyle: () => ({ getPropertyValue: (name) => (name === '--popover-gap-screen' ? value : '') }) };
-        globalThis.document = { documentElement: {} };
-    };
-    afterEach(() => { delete globalThis.window; delete globalThis.document; });
-
-    it('reads --popover-gap-screen', () => {
-        stubWindow(' 12px');
-        expect(readScreenGap()).toBe(12);
-    });
-
-    it('falls back to 8px when the token is missing, and outside a browser', () => {
-        stubWindow('');
-        expect(readScreenGap()).toBe(8);
-        delete globalThis.window;
-        expect(readScreenGap()).toBe(8);
     });
 });

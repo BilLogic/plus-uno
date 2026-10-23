@@ -11,6 +11,19 @@ import './Toast.scss';
 export const FLAG_AUTO_CLOSE_MS = 8000;
 
 /**
+ * Each style's icon, as Pattern/Flag draws it, and whether it is urgent:
+ * an urgent flag interrupts a screen reader and stays until it is dismissed.
+ */
+const FLAG_STYLES = {
+    danger: { icon: 'fa-circle-exclamation', urgent: true },
+    warning: { icon: 'fa-triangle-exclamation', urgent: true },
+    success: { icon: 'fa-circle-check', urgent: false },
+    info: { icon: 'fa-circle-info', urgent: false },
+    primary: { icon: 'fa-circle-info', urgent: false },
+    secondary: { icon: 'fa-circle-info', urgent: false },
+};
+
+/**
  * The Popover family's Flag (Figma Pattern/Flag; the code name is still
  * Toast). One surface, 400 wide, padded 16: a 16 icon in the style's icon
  * color on the title's first line, the title and its message, and the close
@@ -32,19 +45,9 @@ export const Toast = ({
     timestamp, // '11 mins ago' etc
     ...props
 }) => {
-    // Icon mapping, one entry per style, as Pattern/Flag draws them.
-    const iconMap = {
-        'danger': 'fa-circle-exclamation',
-        'success': 'fa-circle-check',
-        'info': 'fa-circle-info',
-        'warning': 'fa-triangle-exclamation',
-        'primary': 'fa-circle-info',
-        'secondary': 'fa-circle-info',
-    };
-
     // A style outside the list falls back to the default, secondary.
-    const toastStyle = Object.hasOwn(iconMap, style) ? style : 'secondary';
-    const iconClass = iconMap[toastStyle];
+    const toastStyle = Object.hasOwn(FLAG_STYLES, style) ? style : 'secondary';
+    const { icon: iconClass, urgent: isUrgent } = FLAG_STYLES[toastStyle];
 
     /*
      * #325. Politeness follows the message. Every toast used to be
@@ -54,7 +57,6 @@ export const Toast = ({
      * everything else waits its turn. `role` and `aria-live` are set together
      * because a mismatched pair is worse than either alone.
      */
-    const isUrgent = toastStyle === 'danger' || toastStyle === 'warning';
     const liveRole = isUrgent ? 'alert' : 'status';
     const livePoliteness = isUrgent ? 'assertive' : 'polite';
 
