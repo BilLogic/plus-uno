@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import PropTypes from 'prop-types';
 import SidebarTab from '@/components/navigation/SidebarTab';
 import Logo from '@/components/_internal/Logo';
@@ -13,6 +13,7 @@ const Sidebar = ({
     className = '',
     style,
 }) => {
+    const sectionIdBase = useId();
     if (!visible) return null;
 
     const handleTabClick = (tabName) => {
@@ -85,9 +86,15 @@ const Sidebar = ({
                 onClick={onHomeClick}
             />
 
-            {/* Sections */}
+            {/* Sections: each is a group its title names. The title is a group
+                label, heading.xxsmall 12/16, and not a heading. */}
             {categories.map((category, index) => (
-                <div key={index} className="plus-sidebar-section" style={{
+                <div
+                    key={index}
+                    className="plus-sidebar-section"
+                    role="group"
+                    aria-labelledby={`${sectionIdBase}-${index}`}
+                    style={{
                     display: 'flex',
                     flexDirection: 'column',
                     gap: 'var(--element-stack-sm)'
@@ -95,8 +102,9 @@ const Sidebar = ({
                     <div className="plus-sidebar-section-title" style={{
                         padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md) 0 var(--size-element-pad-x-md)'
                     }}>
-                        <p className="body2-txt" style={{
-                            fontWeight: 'var(--font-weight-normal)',
+                        <p id={`${sectionIdBase}-${index}`} style={{
+                            font: 'var(--heading-xxsmall)',
+                            color: 'var(--color-on-surface-variant)',
                             margin: '0'
                         }}>
                             {category.title}

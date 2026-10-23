@@ -68,10 +68,9 @@ const UserAvatar = ({
                     }}
                 >
                     <span
-                        className="body2-txt"
                         style={{
+                            font: 'var(--body-default)',
                             color: 'var(--color-primary-text, #00547e)',
-                            fontWeight: 400,
                             lineHeight: 1,
                             textAlign: 'center'
                         }}
@@ -82,11 +81,11 @@ const UserAvatar = ({
 
                 {/* Name Text - hug content, no clipping */}
                 <p
-                    className="body2-txt plus-user-avatar__name"
+                    className="plus-user-avatar__name"
                     style={{
                         margin: 0,
+                        font: 'var(--body-default)',
                         color: 'var(--color-on-surface)',
-                        fontWeight: 300,
                         flex: '0 1 auto',
                         minWidth: 0,
                         width: 'fit-content'
@@ -112,10 +111,9 @@ const UserAvatar = ({
                     }}
                 >
                     <span
-                        className="body3-txt"
                         style={{
+                            font: 'var(--body-small)',
                             color: 'var(--color-danger-text)',
-                            fontWeight: 400,
                             textAlign: 'center'
                         }}
                     >

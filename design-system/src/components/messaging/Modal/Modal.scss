@@ -109,6 +109,12 @@
     color: var(--color-on-surface);
 }
 
+/* A string `body`: body.default 14/20. */
+.plus-modal-body-text {
+    font: var(--body-default);
+    color: var(--color-on-surface);
+}
+
 .plus-modal-description {
     margin: 0;
     font: var(--body-default);

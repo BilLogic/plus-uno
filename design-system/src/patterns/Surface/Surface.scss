@@ -96,3 +96,10 @@
 .plus-pattern-surface-elevation-5 {
     box-shadow: var(--elevation-light-5);
 }
+
+/* The page's h1: Heading/large 24/28, the top of the page outline. */
+.plus-pattern-surface-title {
+    margin: 0 0 var(--surface-stack-md);
+    font: var(--heading-large);
+    color: var(--color-on-surface);
+}

@@ -120,7 +120,7 @@
         .plus-badge-visual--trailing {
             margin-left: var(--size-element-gap-sm);
             cursor: pointer;
-            font-size: 0.8em; // Slightly smaller X
+            font-size: var(--icon-sm);
         }
     }
 
@@ -170,12 +170,10 @@
         align-items: center;
         justify-content: center;
 
-        // Constrain icon sizes based on badge size
-        // Use relative sizing so it scales with the badge text (h1-h6, b1-b3)
-        // 0.85em keeps it slightly smaller than text to avoid being "overly big"
+        // A badge's icon is the small icon size, 12, under its 14 text.
         i,
         svg {
-            font-size: 0.85em !important;
+            font-size: var(--icon-sm) !important;
         }
 
         // Icon gap
@@ -209,8 +207,8 @@
         min-width: 1.5em;
         height: 1.5em;
 
-        font-size: 0.75em; // Smaller than badge text
-        font-weight: var(--font-weight-bold);
+        font: var(--body-small);
+        font-weight: var(--type-weight-semibold);
         line-height: 1;
     }
 }

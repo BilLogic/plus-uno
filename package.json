@@ -80,6 +80,7 @@
     "check:size-fallbacks": "node scripts/check-size-fallbacks.mjs",
     "check:undefined-tokens": "node scripts/check-undefined-tokens.mjs",
     "check:font-families": "node scripts/check-font-families.mjs",
+    "check:font-size-literals": "node scripts/check-font-size-literals.mjs",
     "check:figma-scopes": "node scripts/check-figma-scopes.mjs",
     "check:intent-roles": "node scripts/check-intent-roles.mjs",
     "check:focus-ring": "node scripts/check-focus-ring.mjs",

@@ -14,7 +14,7 @@
 .plus-rating-label {
     margin-bottom: var(--size-element-gap-xs, 4px);
     color: var(--color-on-surface);
-    font-weight: var(--font-weight-normal);
+    font-weight: var(--type-weight-regular);
     
     .plus-rating-required {
         color: var(--color-danger);
@@ -36,6 +36,7 @@
 }
 
 .plus-rating-comments-label {
+    font: var(--body-default);
     color: var(--color-on-surface);
     text-align: left;
 }
@@ -49,8 +50,8 @@
 }
 
 .plus-rating-item-label {
+    font: var(--body-default);
     color: var(--color-on-surface);
-    font-weight: var(--font-weight-normal);
     text-align: center;
     min-width: 20px;
 }

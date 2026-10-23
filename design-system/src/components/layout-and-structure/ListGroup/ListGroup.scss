@@ -26,10 +26,7 @@
         background-color: transparent;
         border-bottom: 1px solid var(--color-outline-variant);
         color: var(--color-on-surface);
-        font-family: var(--font-family-body);
-        font-size: var(--font-size-body1);
-        font-weight: var(--font-weight-normal);
-        line-height: var(--font-line-height-body1);
+        font: var(--body-large);
         text-decoration: none;
         transition: background-color 0.15s ease;
 
@@ -80,18 +77,18 @@
             background-color: var(--color-on-surface);
             color: var(--color-surface);
             border-radius: var(--size-element-radius-full);
-            font-size: var(--font-size-body1);
-            font-weight: var(--font-weight-semibold-1);
-            line-height: var(--font-line-height-body1);
+            font: var(--body-large);
         }
 
         // --- SIZE VARIANTS ---
         &.plus-list-group-item--b1 {
+            font: var(--body-large);
             padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
             gap: var(--size-element-gap-lg);
         }
 
         &.plus-list-group-item--b2 {
+            font: var(--body-default);
             padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
             gap: var(--size-element-gap-md);
 
@@ -101,6 +98,7 @@
         }
 
         &.plus-list-group-item--b3 {
+            font: var(--body-small);
             padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
             gap: var(--size-element-gap-sm);
 

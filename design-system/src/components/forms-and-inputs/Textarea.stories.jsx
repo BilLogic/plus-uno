@@ -124,9 +124,9 @@ Rows.play = async ({ canvasElement }) => {
     await expect(canvasElement.querySelector('#textarea-rows-1').getAttribute('rows')).toBe('1');
     await expect(height(3)).toBeGreaterThan(height(1));
     await expect(height(6)).toBeGreaterThan(height(3));
-    // A one-row textarea is as tall as an Input of the same size: 34.
+    // A one-row textarea is as tall as an Input of the same size: 32.
     const box = canvasElement.querySelector('#textarea-rows-1').closest('.plus-field');
-    await expect(Math.round(box.getBoundingClientRect().height)).toBe(34);
+    await expect(Math.round(box.getBoundingClientRect().height)).toBe(32);
 };
 
 /** Sizes — small, medium and large type and padding, from `_Field`. */

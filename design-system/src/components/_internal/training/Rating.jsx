@@ -67,8 +67,8 @@ const RatingSingle = ({ value, status, onClick }) => {
         cursor: 'pointer',
         border: '1px solid',
         transition: 'all 0.2s ease',
-        fontFamily: 'var(--font-family-body)',
-        fontWeight: 'bold'
+        fontFamily: 'var(--type-family-body)',
+        fontWeight: 'var(--type-weight-semibold)'
     };
 
     const statusStyles = {

@@ -260,7 +260,7 @@ const RichTextEditor = ({
               * (#206). The editor points back at this id.
               */}
             {label && (
-                <span id={labelId} className="plus-rich-text-editor-label body2-txt">
+                <span id={labelId} className="plus-rich-text-editor-label">
                     {label}
                 </span>
             )}
@@ -294,7 +294,7 @@ const RichTextEditor = ({
                                         key={opt.value}
                                         eventKey={opt.value}
                                         active={blockFormat === opt.value}
-                                        className="body3-txt"
+                                        className="plus-rich-text-editor-block-option"
                                     >
                                         {opt.label}
                                     </Dropdown.Item>
@@ -321,7 +321,7 @@ const RichTextEditor = ({
             <div
                 ref={editorRef}
                 id={editorId}
-                className="plus-rich-text-editor-content body3-txt"
+                className="plus-rich-text-editor-content"
                 contentEditable={!readOnly && !disabled}
                 /*
                  * #329. `textbox` with `aria-multiline` is what a contentEditable

@@ -519,7 +519,7 @@ const DateAndTimePicker = ({
                     />
                 </Field>
                 {showCaption && (
-                    <div id={timeZoneId} className="plus-datetime-time-zone body3-txt">{caption}</div>
+                    <div id={timeZoneId} className="plus-datetime-time-zone">{caption}</div>
                 )}
             </div>
 

@@ -338,6 +338,16 @@ export const CHECKS = [
       "every font stack ending in a CSS generic, and every inline fallback naming the face its token names. A fallback only paints when the token fails to load, so a wrong one is wrong everywhere at once and invisible until then — the reasoning check:color-fallbacks applies to color, which nothing applied to type. Seven findings when it was written and all seven fixed: --font-family-display4 named one face and no generic; three files fell back from --font-family-body to Lato, which is the HEADER face, so body text would have rendered in the heading font; two fell back to a bare `Lato`. It also keeps #267's monospace rule, where --font-family-code fell back to sans-serif and the stack measured 171.13px against monospace's 480.08px.",
   },
   {
+    name: 'check:font-size-literals',
+    script: 'node scripts/check-font-size-literals.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-font-size-literals.mjs',
+    floors: { MIN_FILES: 200 },
+    guards:
+      "no component or pattern setting a raw font size. Text takes a text style (`font: var(--body-default)`) and an icon glyph an icon size (`--icon-md`); a number written in the component is a size the type scale cannot move. Moving to the Atlassian scale found 27: `font-size: 7px` on a tag's initials, 16 / 14 / 12 px in two snackbars, `1.5em` and `0.8em` on icons, and literal fallbacks such as `var(--font-size-body3, 12px)` that paint the old size whenever the token is missing. A `calc()` that scales a token is derived and passes; an identifier in a JSX style is a runtime value and is skipped. Hard gate, no baseline: the count is zero.",
+  },
+  {
     name: 'check:figma-scopes',
     script: 'node scripts/check-figma-scopes.mjs',
     pkg: 'root',

@@ -37,7 +37,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface` · `--color-surface-container-highest` · `--font-weight-bold` · `--size-border-radius-radius-150` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-radius-full` · `--size-element-radius-lg` · `--size-element-radius-md`
+`--body-small` · `--color-on-surface` · `--color-surface-container-highest` · `--icon-sm` · `--size-border-radius-radius-150` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-radius-full` · `--size-element-radius-lg` · `--size-element-radius-md` · `--type-weight-semibold`
 
 From `design-system/src/components/status-and-loading/Badge/Badge.scss`. Override these through the token layer, never with a literal.
 

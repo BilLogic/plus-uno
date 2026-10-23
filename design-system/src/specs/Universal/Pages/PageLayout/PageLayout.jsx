@@ -37,6 +37,8 @@ const PAGE_TITLE_STYLE = {
     clip: 'rect(0, 0, 0, 0)',
     whiteSpace: 'nowrap',
     border: 0,
+    // The page heading's style, Heading/large 24, for whatever reads it.
+    font: 'var(--heading-large)',
 };
 
 const PageLayout = ({

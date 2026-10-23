@@ -28,10 +28,10 @@ const Footer = ({
             }}
         >
             <p
-                className="body3-txt m-0"
+                className="m-0"
                 style={{
-                    color: 'var(--color-on-surface)',
-                    fontWeight: 300
+                    font: 'var(--body-small)',
+                    color: 'var(--color-on-surface)'
                 }}
             >
                 {version} | {copyright} | <a

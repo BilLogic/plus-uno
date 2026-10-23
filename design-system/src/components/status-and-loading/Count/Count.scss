@@ -127,6 +127,7 @@ $count-dot: (
  * line, and a line height of the pill keeps the digits from being clipped.
  */
 .plus-count .plus-count__value {
+    font: var(--body-small);
     line-height: var(--plus-count-size);
 }
 

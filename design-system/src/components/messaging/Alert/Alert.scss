@@ -41,11 +41,15 @@
 
 /* Typography & Layout Resets */
 
+/* A section message's title: heading.small 16/20, over body.default 14/20. */
 .plus-alert-title {
+    margin: 0;
+    font: var(--heading-small);
     white-space: pre-wrap;
 }
 
 .plus-alert-text {
+    font: var(--body-default);
     white-space: pre-wrap;
     margin: 0;
 
@@ -54,14 +58,14 @@
     a {
         color: inherit;
         text-decoration: underline;
-        font-weight: var(--font-weight-medium, 500);
+        font-weight: var(--type-weight-medium);
     }
 }
 
 /*
  * First-line columns — Figma's "Leading" and "Dismiss" wrappers. Each holds a
- * strut: an invisible character in the first line's text style (h4 with a
- * title, body2 without), so the column is exactly one line tall. The icon and
+ * strut: an invisible character in the first line's text style (the title's
+ * with a title, the text's without), so the column is exactly one line tall. The icon and
  * the CloseButton are centered on it, and the CloseButton may overhang a line
  * shorter than its 24px box.
  */
@@ -78,6 +82,14 @@
     margin: 0;
     overflow: hidden;
     visibility: hidden;
+}
+
+.plus-alert-strut--title {
+    font: var(--heading-small);
+}
+
+.plus-alert-strut--text {
+    font: var(--body-default);
 }
 
 .plus-alert-leading-icon,

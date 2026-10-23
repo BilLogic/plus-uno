@@ -16,6 +16,7 @@
 }
 
 .plus-choice-group-legend {
+    font: var(--body-default);
     float: none;
     width: auto;
     margin: 0;
@@ -48,6 +49,7 @@
 }
 
 .plus-choice-group-scale-end {
+    font: var(--body-default);
     color: var(--color-on-surface);
 }
 
@@ -82,5 +84,6 @@
 }
 
 .plus-choice-group-error {
+    font: var(--body-small);
     color: var(--color-danger);
 }

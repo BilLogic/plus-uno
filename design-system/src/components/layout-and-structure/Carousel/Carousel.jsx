@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import { Carousel as BootstrapCarousel } from 'react-bootstrap';
 import './Carousel.scss';
 
@@ -46,6 +47,8 @@ const Carousel = ({
     const defaultPrevIcon = <span aria-hidden="true" className="carousel-control-prev-icon plus-carousel-control-icon"><i className="fas fa-chevron-left"></i></span>;
     const defaultNextIcon = <span aria-hidden="true" className="carousel-control-next-icon plus-carousel-control-icon"><i className="fas fa-chevron-right"></i></span>;
 
+    // A slide's title is one level below the section the carousel sits in.
+    const SlideTitle = headingTag(useHeadingLevel() + 1);
     const content = children || slides.map((slide, index) => (
         <BootstrapCarousel.Item key={index} className="plus-carousel-item" interval={slide.interval}>
             {/* Handle content: string (img url) or node */}
@@ -72,7 +75,7 @@ const Carousel = ({
 
             {(slide.title || slide.caption) && (
                 <BootstrapCarousel.Caption className="plus-carousel-caption">
-                    {slide.title && <h5>{slide.title}</h5>}
+                    {slide.title && <SlideTitle className="plus-carousel-title">{slide.title}</SlideTitle>}
                     {slide.caption && <p>{slide.caption}</p>}
                 </BootstrapCarousel.Caption>
             )}

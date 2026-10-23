@@ -323,15 +323,15 @@ AddonsInSlots.play = async ({ canvasElement }) => {
         await expect(getComputedStyle(addon).borderTopStyle).toBe('none');
     }
 
-    // Two buttons in Trailing, small and 22 high, and the field stays 34.
+    // Two buttons in Trailing, small and cut to the 20 text line, and the field stays 32.
     const invite = box('Invite by email');
     const buttons = within(invite.querySelector('.plus-field__trailing')).getAllByRole('button');
     await expect(buttons.map((button) => button.textContent)).toEqual(['Copy', 'Send']);
     for (const button of buttons) {
         await expect(button.classList.contains('plus-btn--small')).toBe(true);
-        await expect(Math.round(button.getBoundingClientRect().height)).toBe(22);
+        await expect(Math.round(button.getBoundingClientRect().height)).toBe(20);
     }
-    await expect(Math.round(invite.getBoundingClientRect().height)).toBe(34);
+    await expect(Math.round(invite.getBoundingClientRect().height)).toBe(32);
 
     // A checkbox addon is named and sits in Leading.
     const agree = box('Agreement note');

@@ -52,6 +52,25 @@
     padding: 0 !important; // Remove RB default padding - padding is on .plus-card itself
 }
 
+// Card type: a Heading/small 16 container title over a Body/default 14
+// description; everything else in the card is Body/default.
+.plus-card {
+    font: var(--body-default);
+    color: var(--color-on-surface);
+}
+
+.plus-card .plus-card-title {
+    margin: 0;
+    font: var(--heading-small);
+    color: var(--color-on-surface);
+}
+
+.plus-card .plus-card-subtitle {
+    margin: 0 0 var(--element-stack-md);
+    font: var(--body-default);
+    color: var(--color-on-surface-variant);
+}
+
 // Image always flush to top/left/right edges regardless of card padding size
 .plus-card .plus-card-image {
     display: block;

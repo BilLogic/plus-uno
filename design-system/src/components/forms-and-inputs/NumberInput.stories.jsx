@@ -237,7 +237,7 @@ Interactive.args = {
 
 /**
  * Steppers — in the field's Trailing slot, minus before plus, named for the
- * field they change. Small buttons cut to 22, so the field stays 34 high.
+ * field they change. Small buttons cut to the 20 text line, so the field stays 32 high.
  */
 export const Steppers = () => (
     <div style={{ maxWidth: '320px' }}>
@@ -254,8 +254,8 @@ Steppers.play = async ({ canvasElement }) => {
     // Minus comes first in the DOM, as in Figma, and both sit in Trailing.
     await expect(decrease.compareDocumentPosition(increase) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     await expect(decrease.closest('.plus-field__trailing')).not.toBeNull();
-    await expect(Math.round(increase.getBoundingClientRect().height)).toBe(22);
-    await expect(Math.round(field.closest('.plus-field').getBoundingClientRect().height)).toBe(34);
+    await expect(Math.round(increase.getBoundingClientRect().height)).toBe(20);
+    await expect(Math.round(field.closest('.plus-field').getBoundingClientRect().height)).toBe(32);
 
     await userEvent.click(increase);
     await expect(field).toHaveValue('4');

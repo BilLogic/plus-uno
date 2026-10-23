@@ -74,7 +74,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-focus-ring` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-on-surface-variant` · `--color-outline` · `--color-primary` · `--color-primary-border` · `--color-secondary-text` · `--font-family-body` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body2` · `--font-size-body3` · `--font-size-fa-body2-solid` · `--font-size-fa-body3-solid` · `--font-weight-normal` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-sm` · `--size-element-stroke-lg`
+`--body-default` · `--body-small` · `--color-focus-ring` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-on-surface-variant` · `--color-outline` · `--color-primary` · `--color-primary-border` · `--color-secondary-text` · `--font-size-body2` · `--font-size-fa-body2-solid` · `--font-size-fa-body3-solid` · `--icon-sm` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-sm` · `--size-element-stroke-lg`
 
 From `design-system/src/components/forms-and-inputs/Select.scss`. Override these through the token layer, never with a literal.
 

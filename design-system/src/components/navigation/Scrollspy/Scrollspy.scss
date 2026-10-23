@@ -68,10 +68,7 @@
                 color 0.15s ease;
 
             .plus-nav-text {
-                font-family: var(--font-family-body);
-                font-size: var(--font-size-body1);
-                line-height: var(--font-line-height-body1);
-                font-weight: var(--font-weight-normal);
+                font: var(--body-large);
                 color: var(--color-on-surface);
             }
 
@@ -97,7 +94,7 @@
 
                 .plus-nav-text {
                     color: var(--color-primary-text);
-                    font-weight: var(--font-weight-normal);
+                    font-weight: var(--type-weight-regular);
                 }
 
                 .plus-nav-dropdown-icon {
@@ -112,7 +109,7 @@
 
             .plus-nav-text {
                 color: var(--color-primary-text);
-                font-weight: var(--font-weight-normal);
+                font-weight: var(--type-weight-regular);
             }
 
             .plus-nav-dropdown-icon {
@@ -131,7 +128,7 @@
 
         .plus-nav-link {
             /* ghost theme uses semibold on toggle; match nav weight */
-            font-weight: var(--font-weight-normal);
+            font-weight: var(--type-weight-regular);
         }
 
         .dropdown-menu {
@@ -149,7 +146,7 @@
 
             .plus-nav-text {
                 color: var(--color-on-primary);
-                font-weight: var(--font-weight-semibold-1);
+                font-weight: var(--type-weight-regular);
             }
 
             .plus-nav-dropdown-icon {

@@ -192,7 +192,7 @@ const ChoiceGroup = ({
             {...props}
         >
             {legend && (
-                <legend id={legendId} className="plus-choice-group-legend body2-txt">
+                <legend id={legendId} className="plus-choice-group-legend">
                     {legend}
                     {required && (
                         <>
@@ -205,17 +205,17 @@ const ChoiceGroup = ({
             {leadingText || trailingText ? (
                 <div className="plus-choice-group-scale">
                     {leadingText && (
-                        <span id={leadingId} className="plus-choice-group-scale-end body2-txt">{leadingText}</span>
+                        <span id={leadingId} className="plus-choice-group-scale-end">{leadingText}</span>
                     )}
                     {choices}
                     {trailingText && (
-                        <span id={trailingId} className="plus-choice-group-scale-end body2-txt">{trailingText}</span>
+                        <span id={trailingId} className="plus-choice-group-scale-end">{trailingText}</span>
                     )}
                 </div>
             ) : choices}
             {otherOption && renderOther()}
             {error && (
-                <div id={errorId} className="plus-choice-group-error body3-txt" role="alert">
+                <div id={errorId} className="plus-choice-group-error" role="alert">
                     {error}
                 </div>
             )}

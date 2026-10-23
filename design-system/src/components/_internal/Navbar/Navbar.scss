@@ -65,16 +65,14 @@
 
 .plus-navbar .navbar-brand,
 .plus-navbar-brand {
-    font-family: var(--font-family-header);
-    font-weight: var(--font-weight-bold);
-    font-size: var(--font-size-title-s, 20px);
+    font: var(--heading-medium);
     color: var(--color-on-surface);
     margin-right: var(--size-element-gap-lg);
 }
 
 .plus-navbar .nav-link {
     color: var(--color-primary);
-    font-weight: var(--font-weight-normal);
+    font-weight: var(--type-weight-regular);
     text-decoration: underline;
 }
 

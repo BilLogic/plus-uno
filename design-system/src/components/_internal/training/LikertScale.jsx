@@ -23,10 +23,10 @@ const LikertScale = ({
     };
 
     const labelStyle = {
-        fontFamily: 'var(--font-family-body)',
-        fontSize: 'var(--font-size-lead)',
-        fontWeight: 'var(--font-weight-normal)',
-        lineHeight: '1.6',
+        fontFamily: 'var(--type-family-body)',
+        fontSize: 'var(--font-size-125)',
+        fontWeight: 'var(--type-weight-regular)',
+        lineHeight: 'var(--line-height-200)',
         color: 'var(--color-primary-text)',
         minWidth: '198px',
         maxWidth: '198px',
