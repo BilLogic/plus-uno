@@ -1,7 +1,8 @@
 /**
  * The scale tokens the layout, token and type system adds beside the old
  * `--size-*` ones, as code reads them after generation from the BS4
- * Foundation export: the Primitives, Element, Size and Border collections.
+ * Foundation export: the Spacing / Primitives and Spacing / Foundations
+ * collections (Foundations holds the Size, Element and Border folders).
  *
  * - Primitives are named by rem × 100 (`--space-025` is 4) and the radius,
  *   stroke and small size steps point at Space.
@@ -172,20 +173,26 @@ test('one-property collections skip the property word', () => {
 const SOURCE = path.join(REPO_ROOT, 'design-system/src/tokens/source');
 const exported = (file) => JSON.parse(fs.readFileSync(path.join(SOURCE, file), 'utf8'));
 
-test('Primitives are hidden and offered for nothing; the other three are published', () => {
-  assert.equal(exported('Primitives.json').hiddenFromPublishing, true);
-  for (const file of ['Element.json', 'Size.json', 'Border.json']) {
-    assert.equal(exported(file).hiddenFromPublishing, false, file);
-  }
+const PRIMITIVES_FILE = 'Spacing _ Primitives.json';
+const FOUNDATIONS_FILE = 'Spacing _ Foundations.json';
+
+test('Primitives are hidden; Foundations is published', () => {
+  assert.equal(exported(PRIMITIVES_FILE).hiddenFromPublishing, true);
+  assert.equal(exported(FOUNDATIONS_FILE).hiddenFromPublishing, false);
+});
+
+test('Foundations holds exactly the Size, Element and Border folders', () => {
+  const folders = new Set(exported(FOUNDATIONS_FILE).variables.map((v) => v.name.split('/')[0]));
+  assert.deepEqual([...folders].sort(), ['Border', 'Element', 'Size']);
 });
 
 test('every scale variable has explicit scopes for its property', () => {
-  const expected = {
-    'Primitives.json': () => [],
-    'Element.json': (name) => (name.startsWith('radius') ? ['CORNER_RADIUS'] : ['GAP']),
-    'Size.json': () => ['WIDTH_HEIGHT'],
-    'Border.json': () => ['STROKE_FLOAT'],
+  const foundations = (name) => {
+    if (name.startsWith('Size/')) return ['WIDTH_HEIGHT'];
+    if (name.startsWith('Border/')) return ['STROKE_FLOAT'];
+    return name.startsWith('Element/radius') ? ['CORNER_RADIUS'] : ['GAP'];
   };
+  const expected = { [PRIMITIVES_FILE]: () => [], [FOUNDATIONS_FILE]: foundations };
   for (const [file, scopes] of Object.entries(expected)) {
     for (const v of exported(file).variables) {
       assert.deepEqual(v.scopes, scopes(v.name), `${file} ${v.name}`);

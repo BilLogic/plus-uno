@@ -1,12 +1,13 @@
 /**
  * Scale Tokens
- * Generated from the Primitives, Element, Size and Border collections in Figma.
+ * Generated from the Spacing / Primitives and Spacing / Foundations collections in Figma.
  * Each name is the variable's WEB code syntax; an alias is a var() of its target.
  */
 
 :root {
 
-    /* Primitives (hidden in Figma; point semantic tokens at these, not components) */
+    /* Spacing / Primitives (hidden in Figma; point semantic tokens at these, not components) */
+    /* Space */
     --space-0: 0px;
     --space-00625: 1px;
     --space-0125: 2px;
@@ -24,6 +25,7 @@
     --space-300: 48px;
     --space-400: 64px;
     --space-500: 80px;
+    /* Radius */
     --radius-0125: var(--space-0125);
     --radius-025: var(--space-025);
     --radius-0375: var(--space-0375);
@@ -33,8 +35,10 @@
     --radius-0875: var(--space-0875);
     --radius-100: var(--space-100);
     --radius-full: 9999px;
+    /* Stroke */
     --stroke-1: var(--space-00625);
     --stroke-2: var(--space-0125);
+    /* Size */
     --size-075: var(--space-075);
     --size-100: var(--space-100);
     --size-125: var(--space-125);
@@ -55,26 +59,8 @@
     --size-5400: 864px;
     --size-7700: 1232px;
 
-    /* Element: what the parts of components share */
-    --element-pad-x-xs: var(--space-025);
-    --element-pad-x-sm: var(--space-050);
-    --element-pad-x-md: var(--space-075);
-    --element-pad-y-sm: var(--space-0125);
-    --element-pad-y-md: var(--space-0375);
-    --element-stack-sm: var(--space-025);
-    --element-stack-md: var(--space-050);
-    --element-stack-lg: var(--space-075);
-    --element-inline-sm: var(--space-025);
-    --element-inline-md: var(--space-050);
-    --element-inline-lg: var(--space-075);
-    --element-radius-sm: var(--radius-0125);
-    --element-radius-md: var(--radius-025);
-    --element-radius-lg: var(--radius-050);
-    --element-radius-item-sm: var(--radius-0375);
-    --element-radius-item-md: var(--radius-050);
-    --element-radius-full: var(--radius-full);
-
-    /* Size: common Height and Width, then one folder per category */
+    /* Spacing / Foundations */
+    /* Size */
     --height-100: var(--size-100);
     --height-125: var(--size-125);
     --height-150: var(--size-150);
@@ -115,8 +101,25 @@
     --image-md: var(--size-200);
     --image-lg: var(--size-250);
     --image-xl: var(--size-300);
-
-    /* Border: stroke widths */
+    /* Element */
+    --element-pad-x-xs: var(--space-025);
+    --element-pad-x-sm: var(--space-050);
+    --element-pad-x-md: var(--space-075);
+    --element-pad-y-sm: var(--space-0125);
+    --element-pad-y-md: var(--space-0375);
+    --element-stack-sm: var(--space-025);
+    --element-stack-md: var(--space-050);
+    --element-stack-lg: var(--space-075);
+    --element-inline-sm: var(--space-025);
+    --element-inline-md: var(--space-050);
+    --element-inline-lg: var(--space-075);
+    --element-radius-sm: var(--radius-0125);
+    --element-radius-md: var(--radius-025);
+    --element-radius-lg: var(--radius-050);
+    --element-radius-item-sm: var(--radius-0375);
+    --element-radius-item-md: var(--radius-050);
+    --element-radius-full: var(--radius-full);
+    /* Border */
     --border-default: var(--stroke-1);
     --border-selected: var(--stroke-2);
     --border-focused: var(--stroke-2);

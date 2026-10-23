@@ -201,15 +201,12 @@ export function deriveCandidates(collection, name) {
 
   // The new scale collections carry their code names in Figma's code syntax,
   // which the snapshot does not record, so these candidates restate the rule
-  // that syntax follows: a folder in the Size collection is the token's family
-  // ("Height/200" -> --height-200), and a flat collection names the family
-  // itself ("Element" + "pad-x-sm" -> --element-pad-x-sm). A Primitive takes
-  // only the leaf candidate every collection ends with ("Space/space-025" ->
-  // --space-025). A candidate that misses shows up as unresolved.
-  if (collection !== 'Primitives') {
-    out.push(`--${slug(collection)}-${slug(name)}`);
-    if (parts.length > 1) out.push(`--${slug(name)}`);
-  }
+  // that syntax follows. A Spacing / Foundations variable is its path, minus
+  // the Size folder ("Element/pad-x-sm" -> --element-pad-x-sm,
+  // "Size/Height/200" -> --height-200); a Spacing / Primitives variable is its
+  // leaf ("Space/space-025" -> --space-025), the candidate every collection
+  // ends with. A candidate that misses shows up as unresolved.
+  if (collection === 'Spacing / Foundations') out.push(`--${slug(name.replace(/^Size\//, ''))}`);
   out.push(`--${slug(leaf)}`);
   return out;
 }
