@@ -87,6 +87,7 @@ const PageLayout = ({
         if (pageShell.user) sidebarProps.user = pageShell.user;
         if (pageShell.goHome) sidebarProps.onHomeClick = pageShell.goHome;
         if (pageShell.onTabClick) sidebarProps.onTabClick = pageShell.onTabClick;
+        if (pageShell.onOpenTabSelect) sidebarProps.onOpenTabSelect = pageShell.onOpenTabSelect;
     }
     const sidebarActiveCombined =
         (pageShell?.enabled && pageShell.activeTab ? pageShell.activeTab : null)

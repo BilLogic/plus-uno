@@ -70,3 +70,75 @@
     flex-shrink: 0;
     margin: var(--element-stack-sm) var(--element-pad-x-md);
 }
+
+/* ------------------------------------------------------------- open tabs */
+
+// An item with open tabs: its row, the "Close all" hover action (the row's
+// actionsOnHover) and the chevron. The chevron is the row's sibling, never its
+// child, so the disclosure button does not nest inside the row's button.
+.plus-pattern-sidebar__parent {
+    position: relative;
+    display: flex;
+    min-width: 0;
+
+    > .plus-sidebar-tab,
+    > .plus-sidebar-tab-item {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    // Room for the chevron at rest, so the label and elemAfter stop before it.
+    .plus-sidebar-tab {
+        padding-right: calc(var(--element-pad-x-xs) + var(--item-height-sm) + var(--element-inline-sm));
+    }
+
+    // "Close all" shows left of the chevron while the pointer is anywhere on
+    // the parent (the chevron included) or anything in it has focus.
+    .plus-sidebar-tab__actions {
+        right: calc(var(--element-pad-x-xs) + var(--item-height-sm) + var(--element-inline-sm));
+    }
+
+    &:hover,
+    &:focus-within {
+        > .plus-sidebar-tab-item > .plus-sidebar-tab {
+            // The chevron, a gap, and "Close all" (a small button, under 80).
+            padding-right: calc(var(--element-pad-x-xs) + var(--item-height-sm) + 2 * var(--element-inline-sm) + var(--width-500));
+        }
+
+        .plus-sidebar-tab__after {
+            visibility: hidden;
+        }
+
+        .plus-sidebar-tab__actions {
+            visibility: visible;
+        }
+    }
+
+    &:hover > .plus-sidebar-tab-item > .plus-sidebar-tab:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
+        background-color: var(--color-on-surface-state-08);
+    }
+}
+
+.plus-pattern-sidebar__chevron {
+    position: absolute;
+    top: 0;
+    right: var(--element-pad-x-xs);
+    bottom: 0;
+    display: flex;
+    align-items: center;
+}
+
+// The tabs sit 12 in from their parent (Atlassian's nesting indent). The list
+// keeps the 4 row gap of every other list.
+.plus-pattern-sidebar__tabs {
+    padding-left: var(--element-pad-x-md);
+
+    &[hidden] {
+        display: none;
+    }
+}
+
+// "Show N more" reads as a control, not a record: the muted text color.
+.plus-pattern-sidebar__more .plus-sidebar-tab {
+    color: var(--color-on-surface-variant);
+}

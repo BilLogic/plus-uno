@@ -6,6 +6,8 @@
  */
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { createOpenTabsStore, OpenTabsProvider } from '@/patterns';
 import StudentAdminPage from './StudentAdminPage';
 import './StudentAdminPage.scss';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
@@ -239,5 +241,56 @@ export const WithModalSessionsVariant = {
                 onModalChange={(open) => setModalOpen(open)}
             />
         );
+    },
+};
+
+/**
+ * Toolkit Students
+ * There is no tutor-facing student detail yet, so Toolkit › Students uses this
+ * page and its StudentModal as the stand-in. Opening a student adds an open tab
+ * under Toolkit › Students; closing the modal selects the parent, and pressing
+ * the tab opens the same student again. The URL never changes.
+ */
+export const ToolkitStudents = {
+    args: { breakpoint: 'native' },
+    render: () => {
+        const [store] = useState(() => {
+            try { sessionStorage.removeItem('story:toolkit-students'); } catch { /* blocked storage */ }
+            return createOpenTabsStore({ key: 'story:toolkit-students' });
+        });
+        return (
+            <OpenTabsProvider store={store}>
+                <StudentAdminPage
+                    students={defaultNineRows}
+                    containModal
+                    openTabParent="toolkit-students"
+                    openTabHref="/toolkit/students"
+                />
+            </OpenTabsProvider>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const url = window.location.href;
+        // Toolkit › Students; Admin › Students is the other "Students".
+        const nav = within(canvas.getByRole('navigation', { name: 'Main' })).getByRole('group', { name: 'Toolkit' });
+        await expect(within(nav).getByRole('button', { name: /^Students$/ })).toHaveAttribute('aria-current', 'page');
+
+        await userEvent.click(canvas.getByText('Chris Hudson'));
+        const tab = await within(nav).findByRole('link', { name: 'Chris Hudson' });
+        await expect(tab).toHaveAttribute('aria-current', 'page');
+        await expect(tab).toHaveAttribute('href', '/toolkit/students');
+        await expect(within(nav).getByRole('button', { name: 'Students tabs' })).toHaveAttribute('aria-expanded', 'true');
+        await expect(await canvas.findByRole('dialog')).toBeInTheDocument();
+
+        await userEvent.click(within(canvas.getByRole('dialog')).getAllByRole('button', { name: 'Close' })[0]);
+        await waitFor(() => expect(within(nav).getByRole('button', { name: /^Students$/ })).toHaveAttribute('aria-current', 'page'));
+        await waitFor(() => expect(canvas.queryByRole('dialog')).toBeNull());
+
+        await userEvent.click(within(nav).getByRole('link', { name: 'Chris Hudson' }));
+        await expect(await canvas.findByRole('dialog')).toHaveTextContent('Chris Hudson');
+        await expect(window.location.href, 'the tab does not route').toBe(url);
+        await userEvent.click(within(canvas.getByRole('dialog')).getAllByRole('button', { name: 'Close' })[0]);
+        await waitFor(() => expect(canvas.queryByRole('dialog')).toBeNull());
     },
 };

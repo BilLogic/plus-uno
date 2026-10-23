@@ -11,6 +11,7 @@ import React, { createContext, useContext } from 'react';
  * @property {string} [activeTab]
  * @property {() => void} [goHome]
  * @property {(tabId: string) => void} [onTabClick]
+ * @property {(tab: { id: string, parentId: string, recordId: string, href?: string }) => void} [onOpenTabSelect] Go to an open tab's record (its `href`)
  * @property {boolean} [fullscreen] Fill the viewport without the Specs card chrome
  */
 
