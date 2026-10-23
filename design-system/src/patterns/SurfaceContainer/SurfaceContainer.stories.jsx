@@ -1,8 +1,8 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Breadcrumb, Sidebar } from '@/components';
-import SurfaceContainer from '@/patterns/SurfaceContainer';
+import { Sidebar } from '@/components';
+import { SurfaceContainer, Topbar } from '@/patterns';
 import { computedShadow, px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 
@@ -39,7 +39,7 @@ const slot = (label, minHeight = 'var(--height-500)') => (
 const Frame = (args) => (
     <div style={{ height: '100vh' }}>
         <SurfaceContainer
-            topbar={<Breadcrumb items={[{ text: 'Home', href: '#' }, { text: 'Dashboard' }]} />}
+            topbar={<Topbar breadcrumbs={[{ text: 'Home', href: '#' }, { text: 'Dashboard' }]} user={{ name: 'John Doe', type: 'lead tutor' }} />}
             sidebar={<Sidebar user="tutor" activeTabId="home" />}
             {...args}
         >

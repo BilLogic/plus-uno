@@ -1,16 +1,102 @@
 /**
- * UserAvatar Styles
+ * UserAvatar: an initial pill, the name, the role indicator and a counter.
+ * `md` is the 32 topbar size; `lg` keeps the original padded table row.
  */
 
 .plus-user-avatar {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-md);
+    width: fit-content;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    border-radius: var(--size-element-radius-md);
+    background-color: var(--color-surface-container-lowest);
+    color: var(--color-on-surface);
     transition: background-color 0.15s ease;
 
-    &:hover {
-        background-color: rgba(25, 28, 30, 0.08);
+    &:hover,
+    &--hover {
+        background-color: var(--color-on-surface-state-08);
+    }
+
+    &--clickable {
+        cursor: pointer;
     }
 
     &--disabled {
         opacity: 0.5;
         pointer-events: none;
+    }
+}
+
+.plus-user-avatar__name-section {
+    display: flex;
+    align-items: center;
+    gap: var(--element-inline-md);
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.plus-user-avatar__initial {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--image-md);
+    height: var(--image-md);
+    border-radius: var(--element-radius-full);
+    background-color: var(--color-primary-state-08);
+    color: var(--color-primary-text);
+    font: var(--body-default);
+    line-height: 1;
+}
+
+.plus-user-avatar__name {
+    flex: 0 1 auto;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font: var(--body-default);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--color-on-surface);
+}
+
+.plus-user-avatar__role {
+    flex-shrink: 0;
+}
+
+.plus-user-avatar__counter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-width: var(--space-150);
+    padding: 0 var(--size-element-pad-x-sm);
+    border-radius: var(--element-radius-full);
+    background-color: var(--color-danger-state-08);
+    color: var(--color-danger-text);
+    font: var(--body-small);
+}
+
+/* ------------------------------------------------------------- md: 32 high */
+
+.plus-user-avatar--md {
+    gap: var(--element-inline-md);
+    height: var(--item-height-md);
+    padding: 0 var(--element-pad-x-sm);
+    border-radius: var(--element-radius-item-md);
+    background-color: transparent;
+
+    .plus-user-avatar__initial {
+        width: var(--image-sm);
+        height: var(--image-sm);
+    }
+
+    .plus-user-avatar__name {
+        max-width: var(--label-max-width);
     }
 }

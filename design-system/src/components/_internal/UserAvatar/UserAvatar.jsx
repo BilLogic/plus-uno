@@ -1,16 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Status from '../../status-and-loading/Status';
 import './UserAvatar.scss';
+
+/** The role a user type shows beside the name. Types not listed show none. */
+const ROLE_LABELS = {
+    'lead tutor': 'Lead',
+};
 
 /**
  * UserAvatar Component
- * 
- * Per Figma spec: node-id=111-227876
- * 
- * Colors:
- * - Initial circle: primary-08 bg (rgba(4, 114, 168, 0.08)), primary-text color (#00547e)
- * - Counter: danger-08 bg (rgba(186, 26, 26, 0.08)), danger-text color (#9b0606)
- * - Hover: on-surface-08 overlay
+ *
+ * The signed-in user: an initial pill, the name, the role indicator ("Lead")
+ * and an optional notification counter. Per the Specs User Avatar (111-227876).
+ *
+ * - `size="md"` is 32 high (`--item-height-md`), for the 32 topbar. The name
+ *   truncates at `--label-max-width`.
+ * - `size="lg"` is the original, padded `--size-element-pad-y-md` around a 32
+ *   pill, for table rows.
  */
 const UserAvatar = ({
     firstChar = 'J',
@@ -19,108 +26,36 @@ const UserAvatar = ({
     counterValue = 2,
     state = 'enabled',
     type = 'regular tutor',
+    size = 'lg',
     id,
     onClick,
     className = ''
 }) => {
-    const isHover = state === 'hover';
+    const role = ROLE_LABELS[type];
+    const classes = [
+        'plus-user-avatar',
+        `plus-user-avatar--${size}`,
+        `plus-user-avatar--${state}`,
+        onClick ? 'plus-user-avatar--clickable' : '',
+        className,
+    ].filter(Boolean).join(' ');
 
     return (
-        <div
-            className={`plus-user-avatar plus-user-avatar--${state} ${className}`}
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--size-element-gap-md)',
-                width: 'fit-content',
-                padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
-                borderRadius: 'var(--size-element-radius-md)',
-                backgroundColor: isHover ? 'var(--color-on-surface-state-08)' : 'var(--color-surface-container-lowest)',
-                cursor: onClick ? 'pointer' : 'default'
-            }}
-            onClick={onClick}
-            id={id}
-        >
-            {/* Name Section */}
-            <div
-                className="plus-user-avatar__name-section"
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px', // spacing/space-075
-                    flex: '1 1 0',
-                    minWidth: 0,
-                    width: 'fit-content'
-                }}
-            >
-                {/* Initial Badge - primary-08 bg, primary-text color */}
-                <div
-                    className="plus-user-avatar__initial"
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '32px',  // Forced width
-                        height: '32px', // Forced height to match
-                        borderRadius: '50%', // Perfect circle
-                        backgroundColor: 'var(--color-primary-state-08, rgba(4, 114, 168, 0.08))',
-                        flexShrink: 0
-                    }}
-                >
-                    <span
-                        className="body2-txt"
-                        style={{
-                            color: 'var(--color-primary-text, #00547e)',
-                            fontWeight: 400,
-                            lineHeight: 1,
-                            textAlign: 'center'
-                        }}
-                    >
-                        {firstChar}
-                    </span>
+        <div className={classes} onClick={onClick} id={id}>
+            <div className="plus-user-avatar__name-section">
+                <div className="plus-user-avatar__initial" aria-hidden="true">
+                    <span className="plus-user-avatar__initial-text">{firstChar}</span>
                 </div>
-
-                {/* Name Text - hug content, no clipping */}
-                <p
-                    className="body2-txt plus-user-avatar__name"
-                    style={{
-                        margin: 0,
-                        color: 'var(--color-on-surface)',
-                        fontWeight: 300,
-                        flex: '0 1 auto',
-                        minWidth: 0,
-                        width: 'fit-content'
-                    }}
-                >
-                    {name}
-                </p>
+                <p className="plus-user-avatar__name" title={name}>{name}</p>
             </div>
 
-            {/* Counter Badge - danger-08 bg, danger-text color */}
+            {role ? (
+                <Status style="info" className="plus-user-avatar__role">{role}</Status>
+            ) : null}
+
             {counter && (
-                <div
-                    className="plus-user-avatar__counter"
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        minWidth: '12px',
-                        padding: '0 var(--size-element-pad-x-sm)',
-                        borderRadius: '999px', // radius-full
-                        backgroundColor: 'var(--color-danger-state-08)',
-                        flexShrink: 0
-                    }}
-                >
-                    <span
-                        className="body3-txt"
-                        style={{
-                            color: 'var(--color-danger-text)',
-                            fontWeight: 400,
-                            textAlign: 'center'
-                        }}
-                    >
-                        {counterValue}
-                    </span>
+                <div className="plus-user-avatar__counter">
+                    <span className="plus-user-avatar__counter-text">{counterValue}</span>
                 </div>
             )}
         </div>
@@ -133,7 +68,10 @@ UserAvatar.propTypes = {
     counter: PropTypes.bool,
     counterValue: PropTypes.number,
     state: PropTypes.oneOf(['enabled', 'hover']),
+    /** `lead tutor` shows the "Lead" role indicator; other types show none. */
     type: PropTypes.oneOf(['regular tutor', 'lead tutor', 'admin']),
+    /** `md` 32 high, for the topbar · `lg` the original padded row, for tables */
+    size: PropTypes.oneOf(['md', 'lg']),
     id: PropTypes.string,
     onClick: PropTypes.func,
     className: PropTypes.string
