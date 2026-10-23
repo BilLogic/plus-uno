@@ -86,9 +86,9 @@
    ============================================ */
 
 .plus-datetime-am-pm-dropdown {
-    height: 100%;
+    height: var(--item-height-sm);
 
-    // The toggle is cut to the field's text line, like every Trailing control.
+    // The toggle is 24, like a button in a field's Trailing slot.
     > :not(.dropdown-menu) {
         height: 100%;
     }

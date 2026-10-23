@@ -56,7 +56,7 @@ Anatomy.play = async ({ canvasElement }) => {
     await expect(document.activeElement).toBe(input);
 };
 
-/** Small, medium and large: 28, 34 and 40 high, as in the library. */
+/** One height, 32. `small` and `large` are deprecated and draw like `medium`. */
 export const Sizes = () => (
     <div style={row}>
         {['small', 'medium', 'large'].map((size) => (
@@ -67,9 +67,9 @@ export const Sizes = () => (
 
 Sizes.play = async ({ canvasElement }) => {
     const height = (size) => px(getComputedStyle(within(canvasElement).getByTestId(size)).height);
-    await expect(height('small')).toBe(28);
-    await expect(height('medium')).toBe(34);
-    await expect(height('large')).toBe(40);
+    await expect(height('small')).toBe(32);
+    await expect(height('medium')).toBe(32);
+    await expect(height('large')).toBe(32);
 };
 
 const STATES = [

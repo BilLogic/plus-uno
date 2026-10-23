@@ -7,6 +7,10 @@ export default {
     component: DateAndTimePicker,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-23', kind: 'changed', summary: 'A single-line field is 32, its text centered, its side padding 12. The AM/PM menu is 24.' },
+            { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
+        ],
         docs: {
             description: {
                 component:

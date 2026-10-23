@@ -4,6 +4,7 @@ import Button from '../actions/Button/Button';
 import useFieldId from './useFieldId';
 import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
 import useInlineEdit from './_internal/useInlineEdit';
+import { useDeprecatedFieldSize } from '../../lib/useDeprecatedLargeSize';
 
 /** Older `state` names, kept for existing call sites. */
 const LEGACY_STATE = {
@@ -54,6 +55,7 @@ const Textarea = ({
     style,
     ...props
 }) => {
+    useDeprecatedFieldSize('Textarea', size);
     /** One id for the label and the control — see `useFieldId`. */
     const fieldId = useFieldId(id);
     const legacy = LEGACY_STATE[state];

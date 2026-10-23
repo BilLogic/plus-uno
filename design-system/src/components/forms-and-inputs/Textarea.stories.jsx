@@ -8,10 +8,14 @@ export default {
     component: Textarea,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-23', kind: 'changed', summary: 'The field is 80 high at least and grows with its rows.' },
+            { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
+        ],
         docs: {
             description: {
                 component:
-                    'Free text over several lines, on the same field as Input. `rows` sets the height; a one-line textarea is `rows={1}`.',
+                    'Free text over several lines, on the same field as Input. It is 80 high at least, and `rows` grows it from there.',
             },
         },
     },
@@ -107,7 +111,7 @@ Overview.parameters = {
     }
 };
 
-/** Rows — `rows` sets the height. One row replaces the old short textarea. */
+/** Rows — the field is 80 high at least, and `rows` grows it from there. */
 export const Rows = () => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', maxWidth: '1000px' }}>
         {[1, 3, 6].map((rows) => (
@@ -120,16 +124,17 @@ export const Rows = () => (
 );
 
 Rows.play = async ({ canvasElement }) => {
-    const height = (rows) => canvasElement.querySelector(`#textarea-rows-${rows}`).getBoundingClientRect().height;
+    const height = (rows) => Math.round(
+        canvasElement.querySelector(`#textarea-rows-${rows}`).closest('.plus-field').getBoundingClientRect().height,
+    );
     await expect(canvasElement.querySelector('#textarea-rows-1').getAttribute('rows')).toBe('1');
-    await expect(height(3)).toBeGreaterThan(height(1));
-    await expect(height(6)).toBeGreaterThan(height(3));
-    // A one-row textarea is as tall as an Input of the same size: 34.
-    const box = canvasElement.querySelector('#textarea-rows-1').closest('.plus-field');
-    await expect(Math.round(box.getBoundingClientRect().height)).toBe(34);
+    // One and three rows fit in the 80 minimum; six grow the field.
+    await expect(height(1)).toBe(80);
+    await expect(height(3)).toBe(80);
+    await expect(height(6)).toBeGreaterThan(80);
 };
 
-/** Sizes — small, medium and large type and padding, from `_Field`. */
+/** Sizes — `small` and `large` are deprecated and draw like `medium`, from `_Field`. */
 export const Sizes = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '600px' }}>
         {['small', 'medium', 'large'].map((size) => (

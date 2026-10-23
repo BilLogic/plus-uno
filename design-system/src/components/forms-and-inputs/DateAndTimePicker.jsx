@@ -10,6 +10,7 @@ import { formatIso } from './_internal/dates';
 import { knownZone, localTimeZone, timeZoneCaption, wallTimeToUtc } from './_internal/timeZones';
 import './_internal/Listbox.scss';
 import './DateAndTimePicker.scss';
+import { useDeprecatedFieldSize } from '../../lib/useDeprecatedLargeSize';
 
 const DateAndTimePicker = ({
     id,
@@ -57,6 +58,7 @@ const DateAndTimePicker = ({
      */
     ...props
 }) => {
+    useDeprecatedFieldSize('DateAndTimePicker', size);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
     const [viewDate, setViewDate] = useState(new Date());

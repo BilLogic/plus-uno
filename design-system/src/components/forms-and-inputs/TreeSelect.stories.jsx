@@ -6,6 +6,9 @@ export default {
     component: TreeSelect,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-23', kind: 'changed', summary: 'A single-line field is 32, its text centered, its side padding 12.' },
+        ],
         docs: {
             description: {
                 component:

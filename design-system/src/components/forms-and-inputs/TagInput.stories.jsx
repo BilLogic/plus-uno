@@ -18,6 +18,12 @@ export default {
     title: 'Components/Forms and inputs/Tag input',
     component: TagInput,
     tags: ['!dev', '!autodocs'],
+    parameters: {
+        changelog: [
+            { date: '2026-10-23', kind: 'changed', summary: 'The field is 32 with one row of tags and grows as they wrap.' },
+            { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
+        ],
+    },
 };
 
 const TOPICS = [
@@ -314,9 +320,9 @@ CollapsesWithoutFocus.play = async ({ canvasElement }) => {
 };
 
 /**
- * The small field fits its tags: every tag, "+n" included, is Tag's one
- * height, 22, and sits inside the field's border at any width, and the field
- * stays as tall as a small Input.
+ * The field fits its tags: every tag, "+n" included, is Tag's one height, 22,
+ * and sits inside the field's border at any width, and the field stays as tall
+ * as an Input. `small` is deprecated and draws like `medium`, so the two match.
  */
 const SMALL_WIDTHS = [160, 200, 240, 280, 360];
 
