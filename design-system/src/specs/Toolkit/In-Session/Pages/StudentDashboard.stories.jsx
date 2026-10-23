@@ -1162,14 +1162,14 @@ const LeadSupervisorViewRender = (args) => {
 
             {/* Scrim 1 — in-session pop-up modal; select via the `scrim1` arg. */}
             {Scrim1Modal && (
-                <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--size-section-pad-x-lg)', zIndex: 1000 }}>
+                <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--size-section-pad-x-lg)', zIndex: 'var(--layout-z-index-scrim)' }}>
                     <Scrim1Modal />
                 </div>
             )}
 
             {/* Scrim 2 — stacks on Scrim 1; select via the `scrim2` arg. */}
             {Scrim1Modal && Scrim2Modal && (
-                <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--size-section-pad-x-lg)', zIndex: 1100 }}>
+                <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--size-section-pad-x-lg)', zIndex: 'var(--layout-z-index-scrim)' }}>
                     <Scrim2Modal />
                 </div>
             )}

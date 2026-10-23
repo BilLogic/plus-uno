@@ -287,7 +287,7 @@ useEffect(() => {
                         borderRight: 'none',
                         backgroundColor: 'var(--color-surface-container)',
                         transition: SIDEBAR_TRANSITION,
-                        zIndex: 100,
+                        zIndex: 'var(--layout-z-index-navigation)',
                         width: showSidebar ? SIDEBAR_WIDTH : 0,
                         minWidth: showSidebar ? SIDEBAR_WIDTH : 0,
                         pointerEvents: showSidebar ? 'auto' : 'none',
@@ -355,7 +355,7 @@ useEffect(() => {
                         position: 'absolute',
                         bottom: 36,
                         right: 48,
-                        zIndex: 1200,
+                        zIndex: 'var(--layout-z-index-navigation)',
                         pointerEvents: 'auto',
                     }}
                 >

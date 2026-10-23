@@ -54,7 +54,7 @@ export function FloatingChatBubble({
         width: '100%',
         maxWidth: 560,
         padding: '0 var(--size-element-pad-x-lg, 16px)',
-        zIndex: 1000,
+        zIndex: 'var(--layout-z-index-navigation)',
       }}
     >
       {/* Suggested prompts */}

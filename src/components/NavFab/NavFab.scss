@@ -2,7 +2,7 @@
   position: fixed;
   bottom: var(--size-section-gap-sm, 24px);
   right: var(--size-section-gap-sm, 24px);
-  z-index: 1100;
+  z-index: var(--layout-z-index-navigation);
   display: flex;
   flex-direction: column-reverse;
   align-items: center;

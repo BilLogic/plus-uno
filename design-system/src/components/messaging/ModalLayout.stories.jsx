@@ -3,6 +3,8 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import Modal from './Modal';
 import { Select } from '@/components';
+// The app shell's floating nav: it has to sit under a modal's scrim like any page chrome.
+import NavFab from '../../../../src/components/NavFab/NavFab';
 
 /**
  * Where a `Modal` sits and how big it is.
@@ -244,6 +246,48 @@ MenuInsideModal.play = async ({ canvasElement }) => {
     const box = option.getBoundingClientRect();
     const hit = canvasElement.ownerDocument.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
     await expect(option.contains(hit)).toBe(true);
+};
+
+/**
+ * Page chrome sits under the scrim: a sticky table header (Bootstrap's
+ * `.sticky-top`, on the card layer) and the app's floating nav (navigation).
+ * Bootstrap had them at 1020 and 1100, above a modal at 510.
+ */
+export const ChromeUnderTheScrim = () => (
+    <div>
+        <div style={{ height: 'var(--size-2000)', overflow: 'auto' }}>
+            {/* Bootstrap's markup, as LessonsOverviewPage draws it. */}
+            <table className="table m-0">
+                <thead className="bg-light sticky-top" data-testid="sticky-head">
+                    <tr><th>Lesson</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    {OPTIONS.map(({ value, label }) => <tr key={value}><td>{label}</td><td>Open</td></tr>)}
+                </tbody>
+            </table>
+        </div>
+        <NavFab />
+        <Modal show title="Over the page chrome" body={SHORT} showBottomButtons={false} onClose={() => {}} />
+    </div>
+);
+
+ChromeUnderTheScrim.play = async ({ canvasElement }) => {
+    const doc = canvasElement.ownerDocument;
+    await dialogOf(canvasElement, 'Over the page chrome');
+    const scrim = doc.querySelector('.modal-backdrop');
+    const scrimLayer = Number(getComputedStyle(scrim).zIndex);
+    const head = within(canvasElement).getByTestId('sticky-head');
+    const fab = doc.querySelector('.nav-fab');
+    await expect(getComputedStyle(head).zIndex).toBe('100');
+    await expect(getComputedStyle(fab).zIndex).toBe('200');
+    for (const el of [head, fab]) {
+        await expect(Number(getComputedStyle(el).zIndex)).toBeLessThan(scrimLayer);
+        // Nothing of the chrome is the top element where it is drawn: the overlay covers it.
+        const box = el.getBoundingClientRect();
+        const hit = doc.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+        await expect(el.contains(hit)).toBe(false);
+        await expect(Boolean(hit.closest('.modal, .modal-backdrop'))).toBe(true);
+    }
 };
 
 /* -------------------------------------------------------------------------- */

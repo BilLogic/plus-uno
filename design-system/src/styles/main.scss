@@ -309,6 +309,19 @@ body {
     box-sizing: border-box;
 }
 
+// Bootstrap's position utilities, on the layer scale
+// Bootstrap puts `.sticky-top` at 1020 and `.fixed-top` at 1030, above a modal's
+// scrim (500). A sticky header is a card (100); a fixed bar is navigation (200).
+.sticky-top,
+.sticky-bottom {
+    z-index: var(--layout-z-index-card);
+}
+
+.fixed-top,
+.fixed-bottom {
+    z-index: var(--layout-z-index-navigation);
+}
+
 // Modal Boundary Utility
 // Contains a react-bootstrap Modal (and its backdrop) inside this element instead of
 // letting it cover the whole viewport. Used by page specs in Storybook (`containModal`

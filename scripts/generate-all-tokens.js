@@ -502,15 +502,28 @@ const CODE_ONLY_LAYOUT = {
 
 /**
  * Stacking layers. Figma has no z-index, so these are code's alone and are
- * written unitless. The scrim and the modal take Atlassian's numbers, 500 and
- * 510; a nested confirm reuses them inside the first modal's layer rather than
- * counting up. The overlay layer sits above a modal and level with Bootstrap's
- * popovers, so a list opened from a field inside a modal is not covered by it.
+ * written unitless. They are Atlassian's layer numbers, one scale for the whole
+ * product, so nothing outside a modal sits above its scrim:
+ * card 100 (sticky headers, raised cards), navigation 200 (sidebars, the page
+ * frame's floating buttons), dialog 300 (side panels), popup 400, scrim 500,
+ * modal 510, flag 600, spotlight 700, tooltip 800. A nested confirm reuses the
+ * scrim and modal inside the first modal's layer rather than counting up.
+ *
+ * Popups, menus, flags and tooltips have not moved onto 400, 600 and 800 yet:
+ * they still sit at the overlay layer and Bootstrap's own numbers, all above a
+ * modal, so a list opened from a field inside a modal is not covered by it.
  */
 const CODE_ONLY_LAYERS = {
+    'layout-z-index-card': { value: 100, note: 'sticky headers and raised cards' },
+    'layout-z-index-navigation': { value: 200, note: 'sidebars and floating page navigation' },
+    'layout-z-index-dialog': { value: 300, note: 'side panels and inline dialogs' },
+    'layout-z-index-popup': { value: 400, note: 'popups and menus' },
     'layout-z-index-scrim': { value: 500, note: 'the scrim under a modal' },
     'layout-z-index-modal': { value: 510, note: 'a modal, over its scrim' },
-    'layout-z-index-overlay': { value: 1070, note: 'floating listboxes and menus; above a modal' },
+    'layout-z-index-flag': { value: 600, note: 'flags, above a modal' },
+    'layout-z-index-spotlight': { value: 700, note: 'onboarding spotlights' },
+    'layout-z-index-tooltip': { value: 800, note: 'tooltips, above everything' },
+    'layout-z-index-overlay': { value: 1070, note: 'floating listboxes and menus until they move to the popup layer; above a modal' },
 };
 
 /**

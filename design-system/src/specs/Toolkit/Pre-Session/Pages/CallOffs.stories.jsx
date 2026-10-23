@@ -443,7 +443,7 @@ export const WithModals = (args) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: 'var(--size-section-pad-x-lg)',
-                    zIndex: 1000
+                    zIndex: 'var(--layout-z-index-scrim)'
                 }}>
                     {renderModal()}
                 </div>
