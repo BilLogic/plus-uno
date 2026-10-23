@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import useFieldId from './useFieldId';
+import { useDeprecatedLargeSize } from '../../lib/useDeprecatedLargeSize';
 import { choiceInputProps, choiceClasses, ChoiceDescription } from './choiceItem';
 import './Radio.scss';
 
@@ -57,8 +58,7 @@ const Radio = ({
      * A caller who passes `id` gets exactly that id back.
      */
     const fieldId = useFieldId(id);
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
-
+    useDeprecatedLargeSize('Radio', size);
     const { 'aria-describedby': describedBy, ...inputRest } = props;
     const { descriptionId, inputProps } = choiceInputProps({
         fieldId, description, readOnly, onChange, onClick, describedBy,
@@ -67,7 +67,6 @@ const Radio = ({
     const wrapperClasses = [
         'plus-form-radio-wrapper',
         `plus-form-radio-${size}`,
-        sizeClass,
         disabled ? 'plus-form-radio-disabled' : '',
         choiceClasses({ appearance, readOnly, description }),
         className
@@ -102,6 +101,11 @@ Radio.propTypes = {
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     checked: PropTypes.bool,
     defaultChecked: PropTypes.bool,
+    /**
+     * Every size draws a 24 row with a 14/20 label; `small` keeps its smaller
+     * mark. `large` is deprecated: it draws like `medium` and warns in
+     * development.
+     */
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
     readOnly: PropTypes.bool,

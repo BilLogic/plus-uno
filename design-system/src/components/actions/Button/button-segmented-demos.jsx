@@ -15,8 +15,11 @@ const inlineCode = (children) => (
 export function SizesDocDescription() {
     return (
         <>
-            Use the {inlineCode('size')} prop to change button scale: {inlineCode('small')},{' '}
-            {inlineCode('medium')}, or {inlineCode('large')}.
+            Two heights. {inlineCode('medium')} is 32 and the default, for every button on a page,
+            a card or a dialog. {inlineCode('small')} is 24 compact, only for buttons in table rows
+            and inline toolbars. Both set the label in Body/default (14/20, medium weight) and draw
+            icons at 16. {inlineCode('large')} is deprecated: it draws like {inlineCode('medium')}{' '}
+            and warns in development.
         </>
     );
 }
@@ -25,9 +28,8 @@ export function SizesDocDescription() {
 export function ButtonSizesFilledRowContainer() {
     return (
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <Button text="Small" size="small" style="primary" fill="filled" />
-            <Button text="Medium" size="medium" style="primary" fill="filled" />
-            <Button text="Large" size="large" style="primary" fill="filled" />
+            <Button text="Medium" size="medium" style="primary" fill="filled" leadingVisual="plus" />
+            <Button text="Small" size="small" style="primary" fill="filled" leadingVisual="plus" />
         </div>
     );
 }

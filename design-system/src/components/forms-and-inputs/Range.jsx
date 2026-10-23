@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import useFieldId from './useFieldId';
+import { useDeprecatedLargeSize } from '../../lib/useDeprecatedLargeSize';
 import './Range.scss';
 
 /**
@@ -32,6 +33,7 @@ const Range = ({
     const rangeRef = useRef(null);
     /** One id for the label and the slider — see `useFieldId` (#206). */
     const fieldId = useFieldId(id);
+    useDeprecatedLargeSize('Range', size);
 
     // Logic to update --value-percent CSS variable for track filling
     const updateValuePercent = () => {
@@ -126,6 +128,11 @@ Range.propTypes = {
     value: PropTypes.number,
     defaultValue: PropTypes.number,
     step: PropTypes.number,
+    /**
+     * Every size draws a 32 control with a 14/20 label; `small` keeps its
+     * thinner track. `large` is deprecated: it draws like `medium` and warns in
+     * development.
+     */
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     onChange: PropTypes.func,
     onInput: PropTypes.func,
