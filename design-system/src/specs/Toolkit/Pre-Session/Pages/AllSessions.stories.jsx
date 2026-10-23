@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import Button from '@/components/actions/Button/Button';
 import { PageLayout } from '@/specs/Universal/Pages';
-import { createOpenTabsStore, OpenTabsProvider, useOpenTabs } from '@/patterns';
+import { createOpenTabsStore, OPEN_TABS_STORAGE_KEY, OpenTabsProvider, useOpenTabs } from '@/patterns';
 import { SessionInfo_PostSignUp } from '../Modals/SessionDetailsAllUser/SessionDetails.stories';
 import { StatCard } from '../Cards/OverviewCard.stories';
 import { AllSessionsTableRow, AllSessionsTableHeaderRow } from '../Tables/AllSessionsTable.stories';
@@ -253,7 +253,39 @@ const OverviewPage = () => {
     );
 };
 
-export const Overview = () => <OverviewPage />;
+/*
+ * In Storybook each story keeps its open tabs in a store of its own, emptied
+ * when the story unmounts, so tabs opened here never reach another spec page.
+ * The live app renders `Overview.render` without the decorators, so its page
+ * uses the app's shared store, which is the one that should persist.
+ */
+const StoryOpenTabs = (Story, context) => {
+    const key = `story:${context.id}`;
+    const [store] = useState(() => {
+        try { sessionStorage.removeItem(key); } catch { /* blocked storage */ }
+        return createOpenTabsStore({ key });
+    });
+    useEffect(() => () => store.clear(), [store]);
+    return (
+        <OpenTabsProvider store={store}>
+            <Story />
+        </OpenTabsProvider>
+    );
+};
+
+export const Overview = {
+    render: () => <OverviewPage />,
+    decorators: [StoryOpenTabs],
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const shared = sessionStorage.getItem(OPEN_TABS_STORAGE_KEY);
+        await userEvent.click(canvas.getAllByRole('button', { name: 'Details' })[0]);
+        const toolkit = within(canvas.getByRole('navigation', { name: 'Main' })).getByRole('group', { name: 'Toolkit' });
+        await expect(await within(toolkit).findByRole('link', { name: /^Hogwarts · Tue, Sep 9 \(1\)/ })).toBeInTheDocument();
+        await expect(sessionStorage.getItem(OPEN_TABS_STORAGE_KEY), 'the app\'s shared store is untouched').toBe(shared);
+        await userEvent.keyboard('{Escape}');
+    },
+};
 
 /**
  * All Sessions Page - Interactive Version
@@ -318,6 +350,7 @@ const InteractiveRender = (args) => {
 
 export const Interactive = {
     render: InteractiveRender,
+    decorators: [StoryOpenTabs],
     argTypes: {
         alert: { control: 'boolean', name: 'Update alert', table: { category: 'State' } },
     },
