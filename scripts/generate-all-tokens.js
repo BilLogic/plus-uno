@@ -752,6 +752,13 @@ const FIGMA_ONLY_FRAME_LAYERS = new Set(['sidebar-docked']);
 const UNITLESS_FRAME_LAYERS = new Set(['columns']);
 
 /**
+ * Figma values that stand in for "no limit", which a variable cannot hold:
+ * every mode needs a number. Code writes `none` wherever the variable holds
+ * its stand-in, so X-Large has no maximum screen width.
+ */
+const NO_LIMIT_FRAME_LAYERS = { 'max-width-screen': 10000 };
+
+/**
  * Tokens code needs that Figma cannot hold: a height relative to the screen,
  * and a popover's gap to its trigger, which Figma draws by hand. `figmaName`
  * is the variable that would replace each one.
@@ -833,7 +840,10 @@ function generateFrameLayersSCSS() {
                     if (!scaleName[val.id]) throw new Error(`${file}: ${v.name} aliases ${val.id}, which none of the scale exports holds.`);
                     return `var(${scaleName[val.id]})`;
                 }
-                if (typeof val === 'number') return UNITLESS_FRAME_LAYERS.has(leaf) ? String(val) : px(val);
+                if (typeof val === 'number') {
+                    if (NO_LIMIT_FRAME_LAYERS[leaf] === val) return 'none';
+                    return UNITLESS_FRAME_LAYERS.has(leaf) ? String(val) : px(val);
+                }
                 if (val?.r !== undefined) return cssColor(val);
                 throw new Error(`${file}: ${v.name} has no value at ${mode.name}.`);
             };
@@ -851,6 +861,11 @@ function generateFrameLayersSCSS() {
 
     for (const [token, { figmaName }] of Object.entries(CODE_ONLY_FRAME_LAYERS)) {
         if (declared.has(token)) stale('CODE_ONLY_FRAME_LAYERS', `Figma now has --${token} (${figmaName}); read it from the export.`);
+    }
+    for (const leaf of Object.keys(NO_LIMIT_FRAME_LAYERS)) {
+        if (![...declared.values()].some((where) => where.endsWith(`/${leaf}`))) {
+            stale('NO_LIMIT_FRAME_LAYERS', `no variable ends in ${leaf}; its stand-in has nothing to stand in for.`);
+        }
     }
     if (!declared.has(SHORT_SCREEN.token)) {
         stale('SHORT_SCREEN', `Figma no longer has --${SHORT_SCREEN.token}; the short-screen override has nothing to override.`);
