@@ -4,19 +4,26 @@ import './SidebarTab.scss';
 
 /**
  * SidebarTab Component
- * 
- * Sidebar navigation tab with state-based styling.
- * Per Figma spec: node-id=111-227838
  *
- * A 32 row (`--item-height-md`) padded 12 at the sides, with a 16 icon box and
- * a Body/default 14/20 label, matching the BS4 Foundation `Sidebar Tab`.
- * 
- * Colors per Figma:
- * - enabled: transparent bg, on-surface text, ON-SURFACE-VARIANT icon (#3f484a)
- * - hover: primary-12 bg, primary-text color (#00547e), primary icon (#0472a8)
- * - selected: primary-16 bg, primary-text color (#00547e), primary icon (#0472a8)
- * - disabled: transparent bg, on-surface text, 0.38 opacity
- * - focus: primary-12 bg, primary-text color, 2px outline
+ * One row of a side navigation, matching the BS4 Foundation `Sidebar Tab`
+ * (node 17118:127). A 32 row (`--item-height-md`) padded 12 at the sides, with
+ * a 16 icon box and a Body/default 14/20 label that truncates.
+ *
+ * Slots, after Atlassian's side-nav item:
+ * - `description`: a second line in Body/small. The row grows past 32 to hold it.
+ * - `elemAfter`: a count, a badge or a status at the end of the row.
+ * - `actionsOnHover`: controls (⋯, ×) that show on hover and while the row has
+ *   focus. They render beside the row, never inside it, so a button does not
+ *   nest in a button and pressing an action does not open the row.
+ *
+ * `href` makes the row a link; `external` opens it in a new tab and says so.
+ *
+ * States, drawn by the stylesheet:
+ * - enabled: transparent, on-surface text, on-surface-variant icon
+ * - hover: on-surface-state-08 at runtime; primary-state-12 for the docs value
+ * - selected: primary-state-16, primary text and icon, `aria-current="page"`
+ * - focus: a 2px focus-ring outline
+ * - disabled: muted solid text (not an opacity, so it keeps AA), no tab stop
  *
  * `hover` AND `focus` ARE DOCUMENTATION VALUES, NOT BEHAVIOR (#320). They
  * exist so the design's five states can be laid out side by side in a docs
@@ -35,6 +42,11 @@ const SidebarTab = ({
     state = 'enabled',
     leadingVisual = true,
     trailingVisual = false,
+    description,
+    elemAfter,
+    actionsOnHover,
+    href,
+    external = false,
     id,
     onClick,
     className = '',
@@ -42,48 +54,63 @@ const SidebarTab = ({
 }) => {
     const disabled = state === 'disabled';
     const isSelected = state === 'selected';
-    const isHover = state === 'hover';
-    const isFocus = state === 'focus';
+    const isLink = Boolean(href) && !disabled;
 
-    // State-based colors per Figma spec
-    const stateStyles = {
-        enabled: {
-            backgroundColor: 'transparent',
-            color: 'var(--color-on-surface)',
-            iconColor: 'var(--color-on-surface-variant)' // FIX: changed from -primary-text to on-surface-variant
-        },
-        hover: {
-            backgroundColor: 'var(--color-primary-state-12)',
-            color: 'var(--color-primary-text)',
-            iconColor: 'var(--color-primary)'
-        },
-        selected: {
-            backgroundColor: 'var(--color-primary-state-16)',
-            color: 'var(--color-primary-text)',
-            iconColor: 'var(--color-primary)'
-        },
-        focus: {
-            backgroundColor: 'var(--color-primary-state-12)',
-            color: 'var(--color-primary-text)',
-            iconColor: 'var(--color-primary)',
-            outline: '2px solid var(--color-primary)',
-            outlineOffset: '-2px'
-        },
-        disabled: {
-            backgroundColor: 'transparent',
-            color: 'var(--color-on-surface-variant)',
-            iconColor: 'var(--color-on-surface-variant)',
-            // Prefer solid muted color over opacity so disabled text still meets WCAG AA
-        }
+    const classes = [
+        'plus-sidebar-tab',
+        `plus-sidebar-tab--${state}`,
+        description ? 'plus-sidebar-tab--with-description' : '',
+        className,
+    ].filter(Boolean).join(' ');
+
+    // `trailingVisual` is the older placeholder glyph; `elemAfter` is the slot that replaces it.
+    const after = elemAfter ?? (trailingVisual ? (
+        <span className="plus-sidebar-tab__icon" aria-hidden="true">
+            <i className="fas fa-icons" />
+        </span>
+    ) : null);
+
+    const content = (
+        <>
+            {leadingVisual && icon && (
+                <span className="plus-sidebar-tab__icon" aria-hidden="true">
+                    <i className={`fas fa-${icon}`} />
+                </span>
+            )}
+            <span className="plus-sidebar-tab__text">
+                <span className="plus-sidebar-tab__label">{text}</span>
+                {description ? <span className="plus-sidebar-tab__description">{description}</span> : null}
+            </span>
+            {isLink && external ? <span className="visually-hidden">(opens in a new tab)</span> : null}
+            {after ? <span className="plus-sidebar-tab__after">{after}</span> : null}
+        </>
+    );
+
+    const shared = {
+        id,
+        className: classes,
+        style,
+        /*
+         * #320. Which section you are in was a background color and nothing
+         * else. `aria-current="page"` is what says it to anyone not looking at
+         * the color.
+         */
+        'aria-current': isSelected ? 'page' : undefined,
     };
 
-    const currentStateStyle = stateStyles[state] || stateStyles.enabled;
-    const { iconColor, ...containerStyles } = currentStateStyle;
-
-    return (
+    const row = isLink ? (
+        <a
+            {...shared}
+            href={href}
+            target={external ? '_blank' : undefined}
+            rel={external ? 'noopener noreferrer' : undefined}
+            onClick={onClick}
+        >
+            {content}
+        </a>
+    ) : (
         <div
-            id={id}
-            className={`plus-sidebar-tab plus-sidebar-tab--${state} ${className}`}
+            {...shared}
             onClick={!disabled ? onClick : undefined}
             /*
              * #320. Enter and Space activate a `button` ELEMENT; they do not
@@ -100,78 +127,43 @@ const SidebarTab = ({
             } : undefined}
             role="button"
             aria-disabled={disabled || undefined}
-            /*
-             * #320. Which section you are in was a background color and
-             * nothing else. `aria-current="page"` is what says it to anyone
-             * not looking at the color.
-             */
-            aria-current={isSelected ? 'page' : undefined}
             tabIndex={disabled ? -1 : 0}
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                width: '100%',
-                height: 'var(--item-height-md)',
-                boxSizing: 'border-box',
-                padding: '0 var(--element-pad-x-md)',
-                gap: 'var(--element-inline-md)',
-                borderRadius: 'var(--element-radius-item-md)',
-                cursor: disabled ? 'not-allowed' : 'pointer',
-                transition: 'background-color 0.15s ease',
-                ...containerStyles,
-                ...style
-            }}
         >
-            {leadingVisual && icon && (
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: 'var(--icon-md)',
-                        height: 'var(--icon-md)',
-                        flexShrink: 0
-                    }}
-                >
-                    <i
-                        className={`fas fa-${icon}`}
-                        aria-hidden="true"
-                        style={{
-                            fontSize: 'var(--icon-md)',
-                            color: iconColor
-                        }}
-                    />
-                </div>
-            )}
+            {content}
+        </div>
+    );
 
-            <span
-                style={{
-                    flexGrow: 1,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    font: 'var(--body-default)',
-                    textAlign: 'left'
-                }}
-            >
-                {text}
-            </span>
+    if (!actionsOnHover || disabled) return row;
 
-            {trailingVisual && (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 'var(--icon-md)', height: 'var(--icon-md)', flexShrink: 0 }}>
-                    <i className="fas fa-icons" aria-hidden="true" style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--icon-md)' }} />
-                </div>
-            )}
+    return (
+        <div className="plus-sidebar-tab-item">
+            {row}
+            <div className="plus-sidebar-tab__actions">{actionsOnHover}</div>
         </div>
     );
 };
 
 SidebarTab.propTypes = {
+    /** The label. It truncates with an ellipsis past the row's width. */
     text: PropTypes.string.isRequired,
+    /** Font Awesome Free solid name for the 16 leading icon, e.g. `house` */
     icon: PropTypes.string,
+    /** `hover` and `focus` are documentation values; drive only `enabled`, `selected` and `disabled`. */
     state: PropTypes.oneOf(['enabled', 'hover', 'selected', 'disabled', 'focus']),
+    /** Show the leading icon */
     leadingVisual: PropTypes.bool,
+    /** Older placeholder glyph at the end of the row. Prefer `elemAfter`, which wins when both are set. */
     trailingVisual: PropTypes.bool,
+    /** A second line under the label, in Body/small */
+    description: PropTypes.node,
+    /** A count, badge or status at the end of the row */
+    elemAfter: PropTypes.node,
+    /** Controls shown on hover and focus, rendered beside the row (never inside it) */
+    actionsOnHover: PropTypes.node,
+    /** Makes the row a link */
+    href: PropTypes.string,
+    /** With `href`: open in a new tab, announced as "(opens in a new tab)" */
+    external: PropTypes.bool,
     id: PropTypes.string,
     onClick: PropTypes.func,
     className: PropTypes.string,

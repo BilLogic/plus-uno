@@ -1,0 +1,72 @@
+/**
+ * Sidebar pattern (Patterns/Sidebar): the header stays put and the body
+ * scrolls. Mirrors the Figma `_Sidebar` and `_Sidebar section`. Every length is
+ * an Item, Element or Layout token; the width is the frame's
+ * (`--layout-width-sidebar`, set by the Surface container).
+ */
+
+.plus-pattern-sidebar {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    gap: var(--element-stack-sm);
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    box-sizing: border-box;
+}
+
+// The logo: padded 6 / 8, outside the scroller so it never moves.
+.plus-pattern-sidebar__header {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: var(--element-inline-md);
+    padding: var(--element-pad-y-md) var(--element-pad-x-sm);
+}
+
+.plus-pattern-sidebar__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    gap: var(--element-stack-sm);
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.plus-pattern-sidebar__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-stack-sm);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.plus-pattern-sidebar__item {
+    min-width: 0;
+}
+
+.plus-pattern-sidebar__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-stack-sm);
+}
+
+// 12 semibold, padded 6 / 12: a group's name, not a heading. The type style is
+// Heading/xxsmall, as Atlassian's menu section heading is; the element is not.
+.plus-pattern-sidebar__section-label {
+    padding: var(--element-pad-y-md) var(--element-pad-x-md);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font: var(--heading-xxsmall);
+    color: var(--color-on-surface-variant);
+}
+
+.plus-pattern-sidebar__divider {
+    flex-shrink: 0;
+    margin: var(--element-stack-sm) var(--element-pad-x-md);
+}

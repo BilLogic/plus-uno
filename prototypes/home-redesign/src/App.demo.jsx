@@ -145,6 +145,8 @@ const ShellLayout = () => {
     const sidebarConfig = {
         user: userType,
         activeTabId: activeTab,
+        // Reviews is the demo's only way to Monthly Reports, so the demo keeps the code-only items.
+        showItemsNotInSpecs: true,
         onHomeClick: () => navigate('/home'),
         onTabClick: (id) => {
             if (id === 'home') navigate('/home');

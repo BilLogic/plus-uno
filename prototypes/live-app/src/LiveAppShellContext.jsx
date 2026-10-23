@@ -11,6 +11,8 @@ export const SIDEBAR_TAB_ROUTES = {
   lessons: '/training/lessons',
   onboarding: '/training/onboarding',
   sessions: '/toolkit/sessions',
+  // Toolkit › Students has no tutor page yet; the students list stands in.
+  'toolkit-students': '/admin/students',
   reviews: '/toolkit/post-session',
   tutors: '/admin/tutors/training',
   'admin-sessions': '/admin/sessions',
@@ -29,16 +31,8 @@ export function activeTabFromPath(pathname) {
   if (pathname.startsWith('/home')) return 'home';
   if (pathname.startsWith('/training/lessons')) return 'lessons';
   if (pathname.startsWith('/training/onboarding')) return 'onboarding';
-  if (pathname.startsWith('/toolkit/in-session')) return 'sessions';
-  if (
-    pathname.startsWith('/toolkit/post-session')
-    || pathname.startsWith('/toolkit/session-reflection')
-    || pathname.startsWith('/toolkit/student-reflection')
-    || pathname.startsWith('/toolkit/form-feedback')
-    || pathname.startsWith('/toolkit/self-reflection')
-  ) {
-    return 'reviews';
-  }
+  // Post-session and reflection pages sit under Toolkit › Sessions: the sidebar
+  // shows Reviews only with `showItemsNotInSpecs`, which the live app leaves off.
   if (pathname.startsWith('/toolkit')) return 'sessions';
   if (pathname.startsWith('/admin/tutors')) return 'tutors';
   if (pathname.startsWith('/admin/sessions')) return 'admin-sessions';

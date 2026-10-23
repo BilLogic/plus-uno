@@ -43,11 +43,6 @@
       "outline": 1,
       "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
     },
-    "design-system/src/components/navigation/SidebarTab/SidebarTab.scss": {
-      "border": 0,
-      "outline": 1,
-      "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
-    },
     "design-system/src/components/status-and-loading/AiLabel/AiLabel.scss": {
       "border": 0,
       "outline": 1,
