@@ -4,6 +4,18 @@ import { Toast as BootstrapToast, ToastContainer as BootstrapToastContainer } fr
 import CloseButton from '@/components/actions/CloseButton';
 import './Toast.scss';
 
+/**
+ * How long a success or info flag stays before it closes itself. Warning and
+ * error flags stay until they are dismissed: they ask for something to be done.
+ */
+export const FLAG_AUTO_CLOSE_MS = 8000;
+
+/**
+ * The Popover family's Flag (Figma Pattern/Flag; the code name is still
+ * Toast). One surface, 400 wide, padded 16: a 16 icon in the style's icon
+ * color on the title's first line, the title and its message, and the close
+ * button.
+ */
 export const Toast = ({
     id,
     style = 'secondary', // 'secondary' (default), 'success', 'danger', 'warning', 'info', 'primary'
@@ -12,27 +24,25 @@ export const Toast = ({
     dismissible = true,
     show,
     onClose,
-    delay = 5000,
-    autohide = true,
+    delay = FLAG_AUTO_CLOSE_MS,
+    autohide,
     className = '',
     headerClass = '',
     bodyClass = '',
     timestamp, // '11 mins ago' etc
     ...props
 }) => {
-    // Icon mapping, one entry per style.
+    // Icon mapping, one entry per style, as Pattern/Flag draws them.
     const iconMap = {
-        'danger': 'fa-triangle-exclamation',
+        'danger': 'fa-circle-exclamation',
         'success': 'fa-circle-check',
         'info': 'fa-circle-info',
-        'warning': 'fa-circle-exclamation',
-        'primary': 'fa-circle',
-        'secondary': 'fa-circle',
+        'warning': 'fa-triangle-exclamation',
+        'primary': 'fa-circle-info',
+        'secondary': 'fa-circle-info',
     };
 
-    // A style outside the list falls back to the default, secondary. The header
-    // is only filled for the listed styles, and the × is inverse, so an unknown
-    // style would otherwise draw a white × on a white header.
+    // A style outside the list falls back to the default, secondary.
     const toastStyle = Object.hasOwn(iconMap, style) ? style : 'secondary';
     const iconClass = iconMap[toastStyle];
 
@@ -72,6 +82,12 @@ export const Toast = ({
         node.setAttribute('aria-live', livePoliteness);
     }, [liveRole, livePoliteness]);
 
+    /*
+     * Success and info close themselves after 8 seconds; warning and error
+     * stay until they are dismissed. A caller's `autohide` or `delay` wins.
+     */
+    const closesItself = autohide ?? !isUrgent;
+
     return (
         <BootstrapToast
             ref={toastRef}
@@ -80,34 +96,33 @@ export const Toast = ({
             show={show}
             onClose={onClose}
             delay={delay}
-            autohide={delay > 0 && autohide}
+            autohide={delay > 0 && closesItself}
             {...props}
         >
-            <BootstrapToast.Header
-                closeButton={false}
-                className={`plus-toast-header ${headerClass}`}
-            >
-                <div className="plus-toast-icon">
-                    {/*
-                      * #325. Decorative, and now marked so — every other icon in
-                      * these components is `aria-hidden` and this one was not.
-                      * The title beside it carries the meaning.
-                      */}
-                    <i className={`fas ${iconClass}`} aria-hidden="true"></i>
-                </div>
-                <strong className="plus-toast-title">{title}</strong>
-                {timestamp && <small className="plus-toast-timestamp">{timestamp}</small>}
+            {/*
+              * The icon sits on the title's first line: a box one title line
+              * tall, so a wrapping title keeps it on line 1.
+              */}
+            <div className="plus-toast-icon">
                 {/*
-                  * The shared CloseButton, inverse on every header color: the
-                  * header is always a filled ground (see Toast.scss). Its name
-                  * stays "Close", the CloseButton default.
+                  * #325. Decorative, and marked so — every other icon in
+                  * these components is `aria-hidden`. The title beside it
+                  * carries the meaning.
                   */}
-                {dismissible && <CloseButton tone="inverse" onClick={onClose} />}
-            </BootstrapToast.Header>
-            <div className="plus-toast-divider"></div>
-            <BootstrapToast.Body className={`plus-toast-body ${bodyClass}`}>
-                {children}
-            </BootstrapToast.Body>
+                <i className={`fas ${iconClass}`} aria-hidden="true"></i>
+            </div>
+            <div className="plus-toast-content">
+                <div className={`plus-toast-header ${headerClass}`}>
+                    <strong className="plus-toast-title">{title}</strong>
+                    {timestamp && <small className="plus-toast-timestamp">{timestamp}</small>}
+                </div>
+                <div className={`plus-toast-body ${bodyClass}`}>
+                    {children}
+                </div>
+            </div>
+            {/* The shared CloseButton, default tone on the flag's surface. Its
+                name stays "Close", the CloseButton default. */}
+            {dismissible && <CloseButton onClick={onClose} />}
         </BootstrapToast>
     );
 };
@@ -120,7 +135,9 @@ Toast.propTypes = {
     dismissible: PropTypes.bool,
     show: PropTypes.bool,
     onClose: PropTypes.func,
+    /** How long it stays before closing itself, in ms. 8000 by default. */
     delay: PropTypes.number,
+    /** Close itself after `delay`. Defaults to true for success, info, primary and secondary, false for warning and danger. */
     autohide: PropTypes.bool,
     className: PropTypes.string,
     headerClass: PropTypes.string,
@@ -128,8 +145,13 @@ Toast.propTypes = {
     timestamp: PropTypes.node
 };
 
+/**
+ * Where flags sit: bottom-left by default, fixed to the screen,
+ * Popover/gap-screen 8 from its edges, stacking Popover/stack-flag 16 apart.
+ */
 export const ToastContainer = ({
-    position = 'top-end', // 'top-start', 'top-center', 'top-end', 'middle-start', etc.
+    position = 'bottom-start', // 'top-start', 'top-center', 'top-end', 'middle-start', etc.
+    containerPosition = 'fixed',
     className = '',
     children,
     ...props
@@ -146,6 +168,7 @@ export const ToastContainer = ({
     return (
         <BootstrapToastContainer
             position={mapPosition(position)}
+            containerPosition={containerPosition}
             className={`plus-toast-container ${className}`}
             {...props}
         >
@@ -156,6 +179,8 @@ export const ToastContainer = ({
 
 ToastContainer.propTypes = {
     position: PropTypes.string,
+    /** `fixed` (default) holds the stack to the screen; `absolute` or `static` to a parent. */
+    containerPosition: PropTypes.string,
     className: PropTypes.string,
     children: PropTypes.node
 };

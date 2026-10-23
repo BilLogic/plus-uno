@@ -327,9 +327,9 @@ InsideAModal.play = async ({ canvasElement }) => {
 
     const field = input.getBoundingClientRect();
     const surface = listbox.closest('.plus-listbox').getBoundingClientRect();
-    // At least as wide as the field, and no taller than 300px.
+    // At least as wide as the field, and no taller than max-height-menu 320.
     await expect(surface.width).toBeGreaterThanOrEqual(Math.floor(field.width));
-    await expect(surface.height).toBeLessThanOrEqual(300);
+    await expect(surface.height).toBeLessThanOrEqual(320);
 
     const physics = within(listbox).getByRole('option', { name: 'Physics' });
     physics.scrollIntoView({ block: 'nearest' });

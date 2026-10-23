@@ -1,7 +1,9 @@
 /*
- * Toast Component Styles
- * Per Figma specs - extends React Bootstrap Toast
- * Uses design system tokens - no hardcoded values
+ * Toast Component Styles: the Popover family's Flag (Figma Pattern/Flag).
+ * One surface, Popover/width-flag 400, pad Popover/pad 16, radius
+ * Popover/radius 12, Elevation Light/3. Icon, content and close button sit in
+ * a row Element/inline-lg 12 apart; the title and its message stack
+ * Element/stack-sm 4 apart. The style shows only in the icon's color.
  */
 
 @use '../../../styles/icon-glyph' as *;
@@ -9,231 +11,129 @@
 .plus-toast.toast,
 .plus-toast,
 .toast.plus-toast {
-    width: 300px;
-    background-color: var(--color-surface);
-    border-radius: var(--size-modal-radius-md);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-    border: none;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--element-inline-lg);
+    box-sizing: border-box;
+    width: var(--popover-width-flag);
+    max-width: calc(100vw - 2 * var(--popover-gap-screen));
+    padding: var(--popover-pad);
+    background-color: var(--color-surface-overlay);
+    border: var(--border-default) solid var(--color-outline-variant);
+    border-radius: var(--popover-radius);
+    box-shadow: var(--elevation-light-3);
 
-    // --- HEADER ---
-    .plus-toast-header,
-    .toast-header {
+    // Bootstrap hides a toast that is not `.show` with display: none; keep that.
+    &:not(.show) {
+        display: none;
+    }
+
+    // --- ICON: 16, in a box one title line tall ---
+    .plus-toast-icon {
         display: flex;
         align-items: center;
-        gap: var(--size-element-gap-sm);
-        padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
-        background-color: var(--color-surface);
-        border: none;
+        justify-content: center;
+        flex-shrink: 0;
+        width: var(--icon-md);
+        height: var(--label-height-md);
 
-        .plus-toast-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-
-            @include icon-glyph {
-                // @contrast: non-text
-                font-size: var(--font-size-fa-body1-solid);
-                color: var(--color-on-surface-variant);
-            }
+        @include icon-glyph {
+            // @contrast: non-text
+            font-size: var(--icon-md);
+            line-height: var(--icon-md);
+            color: var(--color-on-surface-variant);
         }
-
-        .plus-toast-title {
-            font-family: var(--font-family-body);
-            font-size: var(--font-size-body1);
-            font-weight: var(--font-weight-bold);
-            line-height: var(--font-line-height-body1);
-            color: var(--color-on-surface);
-            flex: 1;
-        }
-
-        .plus-toast-timestamp {
-            font-family: var(--font-family-body);
-            font-size: var(--font-size-body3);
-            font-weight: var(--font-weight-normal);
-            line-height: var(--font-line-height-body3);
-            color: var(--color-on-surface);
-            flex-shrink: 0;
-        }
-
-        // The × is the shared CloseButton (inverse tone), styled by its own
-        // stylesheet; the header's gap spaces it from the timestamp.
     }
 
-    // --- DIVIDER ---
-    .plus-toast-divider {
-        height: 1px;
-        width: 100%;
-        background-color: var(--color-surface-container-high);
+    // --- CONTENT: title, then the message ---
+    .plus-toast-content {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        gap: var(--element-stack-sm);
+        min-width: 0;
     }
 
-    // --- BODY ---
-    .plus-toast-body,
-    .toast-body {
-        padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
-        font-family: var(--font-family-body);
-        font-size: var(--font-size-body3);
-        font-weight: var(--font-weight-normal);
-        line-height: var(--font-line-height-body3);
+    .plus-toast-header {
+        display: flex;
+        align-items: baseline;
+        gap: var(--element-inline-md);
+    }
+
+    .plus-toast-title {
+        flex: 1 1 auto;
+        min-width: 0;
+        font: var(--heading-xsmall);
         color: var(--color-on-surface);
     }
 
-    // --- STYLE VARIANTS ---
-    // Each header is filled with its role, and its title, timestamp and icon
-    // are drawn in that role's on-color. `!important` overrides the base
-    // header styles above. One block per role, written out:
-    // check:text-contrast reads token names from source, so a loop that
-    // interpolated the role into the token name would hide every pair from it.
-    &.danger {
+    .plus-toast-timestamp {
+        flex-shrink: 0;
+        font: var(--body-small);
+        color: var(--color-on-surface-variant);
+    }
 
-        .plus-toast-header,
-        .toast-header {
-            background-color: var(--color-danger) !important;
+    .plus-toast-body {
+        font: var(--body-default);
+        color: var(--color-on-surface-variant);
+    }
 
-            .plus-toast-icon {
-                @include icon-glyph {
-                    // @contrast: non-text
-                    color: var(--color-on-danger) !important;
-                }
-            }
+    // The × is the shared CloseButton, styled by its own stylesheet.
+    .plus-close-btn {
+        flex-shrink: 0;
+    }
 
-            .plus-toast-title {
-                color: var(--color-on-danger) !important;
-            }
-
-            .plus-toast-timestamp {
-                color: var(--color-on-danger) !important;
-            }
+    // --- STYLE VARIANTS: the icon's color ---
+    // One block per role, written out: check:text-contrast reads token names
+    // from source, so a loop that interpolated the role would hide them.
+    &.danger .plus-toast-icon {
+        @include icon-glyph {
+            // @contrast: non-text
+            color: var(--color-danger-icon);
         }
     }
 
-    &.success {
-
-        .plus-toast-header,
-        .toast-header {
-            background-color: var(--color-success) !important;
-
-            .plus-toast-icon {
-                @include icon-glyph {
-                    // @contrast: non-text
-                    color: var(--color-on-success) !important;
-                }
-            }
-
-            .plus-toast-title {
-                color: var(--color-on-success) !important;
-            }
-
-            .plus-toast-timestamp {
-                color: var(--color-on-success) !important;
-            }
+    &.success .plus-toast-icon {
+        @include icon-glyph {
+            // @contrast: non-text
+            color: var(--color-success-icon);
         }
     }
 
-    // Title and timestamp: accepted contrast exception, recorded in the
-    // text-contrast baseline; do not darken.
-    &.warning {
-
-        .plus-toast-header,
-        .toast-header {
-            background-color: var(--color-warning) !important;
-
-            .plus-toast-icon {
-                @include icon-glyph {
-                    // @contrast: non-text
-                    color: var(--color-on-warning) !important;
-                }
-            }
-
-            .plus-toast-title {
-                color: var(--color-on-warning) !important;
-            }
-
-            .plus-toast-timestamp {
-                color: var(--color-on-warning) !important;
-            }
+    &.warning .plus-toast-icon {
+        @include icon-glyph {
+            // @contrast: non-text
+            color: var(--color-warning-icon);
         }
     }
 
-    &.info {
-
-        .plus-toast-header,
-        .toast-header {
-            background-color: var(--color-info) !important;
-
-            .plus-toast-icon {
-                @include icon-glyph {
-                    // @contrast: non-text
-                    color: var(--color-on-info) !important;
-                }
-            }
-
-            .plus-toast-title {
-                color: var(--color-on-info) !important;
-            }
-
-            .plus-toast-timestamp {
-                color: var(--color-on-info) !important;
-            }
+    &.info .plus-toast-icon {
+        @include icon-glyph {
+            // @contrast: non-text
+            color: var(--color-info-icon);
         }
     }
 
-    &.primary {
-
-        .plus-toast-header,
-        .toast-header {
-            background-color: var(--color-primary) !important;
-
-            .plus-toast-icon {
-                @include icon-glyph {
-                    // @contrast: non-text
-                    color: var(--color-on-primary) !important;
-                }
-            }
-
-            .plus-toast-title {
-                color: var(--color-on-primary) !important;
-            }
-
-            .plus-toast-timestamp {
-                color: var(--color-on-primary) !important;
-            }
-        }
-    }
-
-    &.secondary {
-
-        .plus-toast-header,
-        .toast-header {
-            background-color: var(--color-secondary) !important;
-
-            .plus-toast-icon {
-                @include icon-glyph {
-                    // @contrast: non-text
-                    color: var(--color-on-secondary) !important;
-                }
-            }
-
-            .plus-toast-title {
-                color: var(--color-on-secondary) !important;
-            }
-
-            .plus-toast-timestamp {
-                color: var(--color-on-secondary) !important;
-            }
+    &.primary .plus-toast-icon {
+        @include icon-glyph {
+            // @contrast: non-text
+            color: var(--color-primary-text);
         }
     }
 }
 
-// --- TOAST CONTAINER ---
+// --- TOAST CONTAINER: bottom-left, 8 from the screen edge, 16 apart ---
 .plus-toast-container,
 .toast-container {
     z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    gap: var(--popover-stack-flag);
+    padding: var(--popover-gap-screen);
 
-    .plus-toast+.plus-toast,
-    .toast+.toast {
-        margin-top: var(--size-element-gap-md);
+    // The stack's gap spaces flags; Bootstrap's own spacer margin goes.
+    > :not(:last-child) {
+        margin-bottom: 0;
     }
 }
 

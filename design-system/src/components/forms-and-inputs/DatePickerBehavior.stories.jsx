@@ -27,10 +27,10 @@ export default {
 const page = within(document.body);
 const calendar = () => document.body.querySelector('.plus-date-popup');
 const box = (input) => input.closest('.plus-field').getBoundingClientRect();
-
+/** The calendar opens 4px under the field, its left edge on the field's (the field sits clear of the 8 screen gap). */
 /** The calendar opens 4px under the field, its left edge on the field's. */
 export const CalendarOpensFourPixelsBelow = () => (
-    <div style={{ maxWidth: '296px' }}>
+    <div style={{ maxWidth: '296px', marginLeft: '16px' }}>
         <DatePicker aria-label="Session date" value="2026-10-21" />
     </div>
 );
