@@ -126,7 +126,7 @@ export const Frame = {
             const avatar = frame.querySelector('.plus-user-avatar');
             await expect(avatar.getBoundingClientRect().height, 'the avatar fits the topbar')
                 .toBeLessThanOrEqual(topbar.getBoundingClientRect().height + 0.5);
-            await waitFor(() => expect(Boolean(sidebar())).toBe(docked));
+            await waitFor(() => expect(Boolean(sidebar()), `sidebar at ${width} (found ${sidebar()?.className})`).toBe(docked));
             await expect(canvas.getByRole('main')).toBeInTheDocument();
         };
         await withTestViewport(1024, 900, async () => {

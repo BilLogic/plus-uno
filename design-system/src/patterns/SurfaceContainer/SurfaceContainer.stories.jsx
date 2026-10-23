@@ -143,7 +143,7 @@ export const Medium768 = {
         const { frame, toggle, surface, content, sidebar, edge } = parts(canvasElement);
         await expectTopbar(frame);
         await expectToggleHome(frame, toggle);
-        await waitFor(() => expect(sidebar(), 'closed below 1024').toBeNull());
+        await waitFor(() => expect(sidebar(), `closed below 1024 (found ${sidebar()?.className}, viewport ${window.innerWidth})`).toBeNull());
         await expect(toggle).toHaveAttribute('aria-expanded', 'false');
 
         const pad = tokenLength(frame, '--surface-container-pad');

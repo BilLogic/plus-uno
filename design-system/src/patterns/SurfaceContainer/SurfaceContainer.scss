@@ -126,10 +126,12 @@
     height: var(--layout-height-topbar);
 }
 
-// The hover strip that peeks a closed sidebar: the frame's left edge.
+// The hover strip that peeks a closed sidebar: the frame's left edge beside the
+// surface row. The topbar's corner belongs to the toggle, which peeks on its own,
+// so a pointer resting in the screen's top-left corner opens nothing.
 .plus-surface-container__edge {
     position: absolute;
-    top: 0;
+    top: calc(var(--surface-container-pad) + var(--layout-height-topbar));
     bottom: 0;
     left: 0;
     z-index: 199;
