@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import useFieldId from './useFieldId';
+import { useDeprecatedLargeSize } from '../../lib/useDeprecatedLargeSize';
 import { choiceInputProps, choiceClasses, ChoiceDescription } from './choiceItem';
 import './Checkbox.scss';
 
@@ -49,6 +50,7 @@ const Checkbox = ({
      * `name` is a form key, not an id, so it no longer stands in for one (#213).
      */
     const fieldId = useFieldId(id);
+    useDeprecatedLargeSize('Checkbox', size);
 
     // Callback ref to get the actual input element from Form.Check
     const setInputRef = useCallback((node) => {
@@ -66,8 +68,6 @@ const Checkbox = ({
         }
     }, [indeterminate]);
 
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
-
     const { 'aria-describedby': describedBy, ...inputRest } = props;
     const { descriptionId, inputProps } = choiceInputProps({
         fieldId, description, readOnly, onChange, onClick, describedBy,
@@ -76,7 +76,6 @@ const Checkbox = ({
     const wrapperClasses = [
         'plus-form-checkbox-wrapper',
         `plus-form-checkbox-${size}`,
-        sizeClass,
         indeterminate ? 'plus-form-checkbox-indeterminate' : '',
         disabled ? 'plus-form-checkbox-disabled' : '',
         required ? 'plus-form-checkbox-required' : '',
@@ -125,6 +124,11 @@ Checkbox.propTypes = {
     checked: PropTypes.bool,
     defaultChecked: PropTypes.bool,
     indeterminate: PropTypes.bool,
+    /**
+     * Every size draws a 24 row with a 14/20 label; `small` keeps its smaller
+     * mark. `large` is deprecated: it draws like `medium` and warns in
+     * development.
+     */
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
     readOnly: PropTypes.bool,

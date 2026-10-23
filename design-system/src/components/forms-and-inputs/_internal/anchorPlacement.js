@@ -1,32 +1,22 @@
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { POPOVER_OFFSET, SCREEN_GAP, readPopoverOffset, readScreenGap } from '@/lib/popoverPlacement';
 
 /**
  * Where a popup opens against the field that opened it — the placement rule
- * every field popup shares with `_Listbox`.
+ * every field popup shares with `_Listbox`, and the one the Popover family
+ * (menu, popup, tooltip, flag) follows.
  *
- * - **Gap:** `--size-element-gap-xs` (4px) between the field's edge and the
+ * - **Offset:** `--popover-offset` (4px) between the field's edge and the
  *   popup, never Bootstrap's 2px menu spacer.
  * - **Alignment:** the popup's left edge meets the field's, and it is at least
  *   as wide. `center` and `right` are for callers that ask (DatePicker's
  *   `calendarAlign`). A popup that would run off the right of the viewport
  *   right-aligns with the field instead.
- * - **Flip:** with no room below, it opens above, the same gap away.
+ * - **Flip:** with no room below, it opens above, the same offset away.
+ * - **Screen gap:** whatever the alignment, it stays `--popover-gap-screen`
+ *   (8px) inside the left, right and top edges of the screen. A list taller
+ *   than the room below and above caps at its own max height and scrolls.
  */
-
-/** The gap in px when the token can't be read; matches `--size-element-gap-xs`. */
-export const ANCHOR_GAP = 4;
-
-/**
- * The gap token's value in px, read from the document.
- *
- * @returns {number}
- */
-export function readAnchorGap() {
-    if (typeof window === 'undefined') return ANCHOR_GAP;
-    const raw = window.getComputedStyle(document.documentElement).getPropertyValue('--size-element-gap-xs');
-    const px = parseFloat(raw);
-    return Number.isFinite(px) ? px : ANCHOR_GAP;
-}
 
 /**
  * @param {object} options
@@ -35,23 +25,25 @@ export function readAnchorGap() {
  * @param {number} options.height the popup's height
  * @param {{width: number, height: number}} options.viewport
  * @param {'left'|'center'|'right'} [options.align]
- * @param {number} [options.gap]
+ * @param {number} [options.offset] the distance from the field
+ * @param {number} [options.screenGap] the least distance to the screen's edges
  * @returns {{placement: 'top'|'bottom', top: number, left: number, minWidth: number}}
  */
-export function placePopup({ anchor, width, height, viewport, align = 'left', gap = ANCHOR_GAP }) {
-    const below = viewport.height - anchor.bottom - gap;
-    const above = anchor.top - gap;
+export function placePopup({ anchor, width, height, viewport, align = 'left', offset = POPOVER_OFFSET, screenGap = SCREEN_GAP }) {
+    const below = viewport.height - anchor.bottom - offset;
+    const above = anchor.top - offset;
     const flip = below < height && above > below;
 
     let left = anchor.left;
     if (align === 'center') left = anchor.left + (anchor.width - width) / 2;
     if (align === 'right') left = anchor.right - width;
     if (left + width > viewport.width) left = anchor.right - width;
-    left = Math.max(left, 0);
+    left = Math.min(left, viewport.width - screenGap - width);
+    left = Math.max(left, screenGap);
 
     return {
         placement: flip ? 'top' : 'bottom',
-        top: flip ? Math.max(anchor.top - gap - height, 0) : anchor.bottom + gap,
+        top: flip ? Math.max(anchor.top - offset - height, screenGap) : anchor.bottom + offset,
         left,
         minWidth: anchor.width,
     };
@@ -59,7 +51,7 @@ export function placePopup({ anchor, width, height, viewport, align = 'left', ga
 
 const samePlace = (a, b) => Boolean(a && b)
     && a.placement === b.placement && a.side === b.side
-    && a.top === b.top && a.left === b.left && a.minWidth === b.minWidth;
+    && a.top === b.top && a.left === b.left && a.minWidth === b.minWidth && a.shift === b.shift;
 
 /**
  * Places an open popup against its field, and keeps it there on scroll,
@@ -78,8 +70,10 @@ const samePlace = (a, b) => Boolean(a && b)
  * @param {{current: HTMLElement|null}} options.popupRef the popup surface
  * @param {'left'|'center'|'right'} [options.align]
  * @param {(reason: string, event?: PointerEvent) => void} [options.onClose] an outside press passes its event
- * @returns {{placement: 'top'|'bottom', side: 'start'|'end', top: number, left: number, minWidth: number}|null}
+ * @returns {{placement: 'top'|'bottom', side: 'start'|'end', top: number, left: number, minWidth: number, shift: number}|null}
  *   `side` is `end` when the popup's right edge sits on the field's, `start` otherwise.
+ *   `shift` is how far the popup's left edge sits from the field's, so a popup
+ *   placed in place can honor the screen gap exactly.
  */
 export function useAnchoredPopup({ open, anchorRef, popupRef, align = 'left', onClose }) {
     const [place, setPlace] = useState(null);
@@ -89,16 +83,24 @@ export function useAnchoredPopup({ open, anchorRef, popupRef, align = 'left', on
         const popup = popupRef.current;
         if (!anchor || !popup) return;
         const box = anchor.getBoundingClientRect();
-        const width = popup.offsetWidth;
+        // The exact size, not `offsetWidth`: a width rounded down would let the
+        // popup's edge sit a fraction inside the screen gap.
+        const size = popup.getBoundingClientRect();
+        const { width } = size;
         const placed = placePopup({
             anchor: box,
             width,
-            height: popup.offsetHeight,
+            height: size.height,
             viewport: { width: document.documentElement.clientWidth, height: window.innerHeight },
             align,
-            gap: readAnchorGap(),
+            offset: readPopoverOffset(),
+            screenGap: readScreenGap(),
         });
-        const next = { ...placed, side: width > box.width && placed.left < box.left ? 'end' : 'start' };
+        const next = {
+            ...placed,
+            side: width > box.width && placed.left < box.left ? 'end' : 'start',
+            shift: placed.left - box.left,
+        };
         setPlace((prev) => (samePlace(prev, next) ? prev : next));
     }, [anchorRef, popupRef, align]);
 

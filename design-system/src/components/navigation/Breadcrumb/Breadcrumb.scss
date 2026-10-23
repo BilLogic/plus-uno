@@ -2,7 +2,11 @@
 
 /* breadcrumb override */
 .plus-breadcrumb {
+    // Body/default, 14/20, in a 32 row (`--item-height-md`), like every other control.
+    font: var(--body-default);
+
     .breadcrumb {
+        min-height: var(--item-height-md);
         margin-bottom: 0; // Remove default bootstrap margin if any
         background-color: transparent; // Ensure transparent background
         padding: 0; // Removing default bootstrap padding to let container handle it or being flush
@@ -10,8 +14,6 @@
         display: flex;
         align-items: center;
         gap: var(--size-element-gap-sm); // Figma: 8px gap
-
-        // Typography handled by body1-txt utility class in JSX
     }
 
     .breadcrumb-item {

@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { OverlayTrigger, Overlay, Tooltip as BSTooltip } from 'react-bootstrap';
+import { popoverOverlayProps } from '@/lib/popoverPlacement';
 import './Tooltip.scss';
 
 /**
@@ -10,7 +11,7 @@ import './Tooltip.scss';
  * @param {React.ReactNode} props.text - Tooltip body
  * @param {'top'|'bottom'|'left'|'right'} [props.placement='top']
  * @param {string|string[]} [props.trigger]
- * @param {'small'|'default'|'large'} [props.size='default']
+ * @param {'small'|'default'|'large'} [props.size='default'] - kept so no call site breaks; every size draws the one tooltip
  * @param {React.ReactElement} props.children - Single trigger element
  * @param {string} [props.id]
  * @param {string} [props.className]
@@ -52,7 +53,12 @@ const Tooltip = ({
         return (
             <>
                 {React.cloneElement(children, { ref: setTargetElement })}
-                <Overlay target={targetElement} show={show} placement={placement}>
+                <Overlay
+                    target={targetElement}
+                    show={show}
+                    placement={placement}
+                    {...popoverOverlayProps()}
+                >
                     {renderTooltip}
                 </Overlay>
             </>
@@ -65,6 +71,7 @@ const Tooltip = ({
             delay={{ show: delayShow, hide: delayHide }}
             overlay={renderTooltip}
             trigger={trigger}
+            {...popoverOverlayProps()}
         >
             {children}
         </OverlayTrigger>

@@ -22,6 +22,10 @@ export default {
     /** Hide CSF stories from the sidebar; docs live on Button.mdx (Canvas still embeds them). */
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-23', kind: 'changed', summary: '`medium` draws 32 and `small` draws 24 compact, for table rows and inline toolbars only. Every label is Body/default (14/20) at the medium weight, and every icon draws at 16.' },
+            { date: '2026-10-23', kind: 'deprecated', summary: '`size="large"` was deprecated: it draws like `medium` and warns in development.' },
+        ],
         docs: {
             toc: {
                 title: 'On this page'
@@ -70,6 +74,7 @@ export default {
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
+            description: '`medium` 32 (default) · `small` 24 compact, for table rows and inline toolbars only · `large` deprecated, draws like `medium`',
             table: { category: 'Design' }
         },
         vertical: {

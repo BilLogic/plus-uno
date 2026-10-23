@@ -7,6 +7,9 @@ export default {
     component: NavTabs,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-23', kind: 'changed', summary: 'Tabs and dropdown tabs are 32, with Body/default labels at the medium weight.' },
+        ],
         docs: {
             description: {
                 component: 'NavTabs provides tab-style navigation with support for individual items and dropdown menus. Uses React Bootstrap Nav under the hood with custom styling per Figma specs.'

@@ -1,12 +1,15 @@
 /**
  * Switch — Figma Form Switch Button (`82:16570`).
- * Track 25×12 · thumb 8 · pad 2 · gap-sm to label.
+ * Track 25×12 · thumb 8 · pad 2 · gap-sm to label, in a 24 row.
+ * One geometry at every size.
  * Off: surface + primary border + primary thumb.
  * On: primary fill + on-primary thumb.
  */
 
 .plus-form-switch-wrapper {
     display: flex;
+    // The row's text style, which the label and the line box both take.
+    font: var(--body-default);
     align-items: center;
     width: 100%;
 
@@ -20,14 +23,22 @@
 
     .form-check.form-switch {
         padding-left: 0;
-        min-height: auto;
     }
 }
 
 .plus-form-switch {
+    // A choice row is 24 at every size (`--item-height-sm`), its label 14/20.
+    // Only a labeled control is a row: without a label React-Bootstrap drops
+    // `.form-check` (it keeps `.form-switch`), and the bare track keeps its own
+    // size; the `.form-switch.form-check` rule below holds the row.
+
     &.form-switch {
         padding-left: 0;
         min-height: auto;
+    }
+
+    &.form-switch.form-check {
+        min-height: var(--item-height-sm);
     }
 
     .form-check-input[type="checkbox"],
@@ -160,8 +171,7 @@
         flex: 1;
         padding-left: 0;
         margin: 0;
-        font-family: var(--font-family-body);
-        font-weight: var(--font-weight-normal);
+        font: var(--body-default);
         display: flex;
         align-items: center;
         opacity: 1;
@@ -180,13 +190,4 @@
     }
 }
 
-/** Optional density — Figma Form Switch is a single geometry; size mainly affects label type. */
-.plus-form-switch-wrapper.plus-form-switch-large {
-    .plus-form-switch .form-check-input[type="checkbox"],
-    .plus-form-switch.form-switch .form-check-input {
-        --plus-switch-track-w: 36px;
-        --plus-switch-track-h: 20px;
-        --plus-switch-thumb: 16px;
-        --plus-switch-pad: 2px;
-    }
-}
+// `large` is deprecated and draws like `medium`: one geometry at every size.

@@ -6,6 +6,8 @@
 
 .plus-form-checkbox-wrapper {
     display: flex;
+    // The row's text style, which the label and the line box both take.
+    font: var(--body-default);
     align-items: center;
     width: 100%;
 
@@ -19,6 +21,12 @@
 }
 
 .plus-form-checkbox {
+    // A choice row is 24 at every size (`--item-height-sm`), its label 14/20.
+    // Only a labeled control is a row: without a label React-Bootstrap drops
+    // `.form-check`, and the bare mark keeps its own size.
+    &.form-check {
+        min-height: var(--item-height-sm);
+    }
 
     // Target the Form.Check container
     .form-check-input {
@@ -143,8 +151,7 @@
         flex: 1;
         padding-left: 0;
         margin: 0;
-        font-family: var(--font-family-body);
-        font-weight: var(--font-weight-normal);
+        font: var(--body-default);
         display: flex;
         align-items: center;
     }
@@ -185,21 +192,4 @@
     }
 }
 
-.plus-form-checkbox-large {
-    .plus-form-checkbox .form-check-input {
-        width: 20px;
-        height: 20px;
-        min-width: 20px;
-        min-height: 20px;
-
-        &::before {
-            width: calc(20px - 4px);
-            height: calc(20px - 4px);
-        }
-
-        &::after {
-            width: 12px;
-            height: 2px;
-        }
-    }
-}
+// `large` is deprecated and draws like `medium`, so it has no rule of its own.

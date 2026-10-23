@@ -465,9 +465,11 @@ side by side; the enum does not tell you which half you are in.
 ## Accessibility
 
 - **Icon-only sizing.** With no `text` and no children the component adds
-  `plus-btn--icon-only`, which sets a square box: 28×28 at `small`, 36×36 at
-  `medium`, 48×48 at `large`. Only `large` meets the 44×44 minimum in
-  `design-system/guidelines/foundations/accessibility.md`.
+  `plus-btn--icon-only`, which sets a square box: 32×32 at `medium` and 24×24
+  at `small`. `large` is deprecated and draws 32×32 like `medium`. No size
+  meets the 44×44 minimum in
+  `design-system/guidelines/foundations/accessibility.md`, so leave room
+  around an icon-only button, and give it a text label where touch matters.
 - **Icon-only naming.** A string `leadingVisual` / `trailingVisual` renders as
   `<i aria-hidden="true">`, so an icon-only button has no accessible name unless
   you pass `aria-label` or the `title` prop.
@@ -485,13 +487,14 @@ side by side; the enum does not tell you which half you are in.
 ### An icon-only button needs a name and needs room.
 
 ```jsx
-// Incorrect — no text and no children means icon-only, which renders 36×36
+// Incorrect — no text and no children means icon-only, which renders 32×32
 // at the default medium size with no accessible name at all.
 <Button leadingVisual="trash" style="danger" />
 
-// Correct — large is the only icon-only size that clears 44×44, and the
-// name has to be supplied by hand.
-<Button leadingVisual="trash" style="danger" size="large" aria-label="Delete session" />
+// Correct — the name is supplied by hand, and where touch matters the
+// button carries its label too.
+<Button leadingVisual="trash" style="danger" aria-label="Delete session" />
+<Button leadingVisual="trash" style="danger" text="Delete session" />
 ```
 
 ### A group of buttons is not a selection control.

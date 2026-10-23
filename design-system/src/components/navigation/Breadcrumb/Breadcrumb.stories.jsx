@@ -14,6 +14,9 @@ export default {
     component: Breadcrumb,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-23', kind: 'changed', summary: 'The trail is a 32 row in Body/default (14/20), down from body 1 (16/24).' },
+        ],
         layout: 'padded',
         docs: {
             description: {
