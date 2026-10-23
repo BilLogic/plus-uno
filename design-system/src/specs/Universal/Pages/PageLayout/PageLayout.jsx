@@ -67,7 +67,7 @@ const PageLayout = ({
     title,
     /** When true, render children straight into the surface, with no `<main>` content grid (e.g. full-width chat). */
     contentDirect = false,
-    /** When true, show TopBar skeleton + Sidebar loading (shimmer). */
+    /** When true, show the TopBar skeleton and hold the sidebar's entrance reveal. */
     shellLoading = false,
     /** When true, apply shell-reveal has-entered for entrance animation (TopBar + Sidebar). */
     shellEntered = false,
@@ -128,12 +128,16 @@ const PageLayout = ({
     );
 
     const sidebar = sidebarHidden ? null : (
-        <div className={`plus-page-sidebar-wrapper${shellLoading ? '' : ` ${reveal}`}`}>
+        // A flex column that fills the sidebar panel, so the pattern's body
+        // scrolls inside it while the logo stays put.
+        <div
+            className={`plus-page-sidebar-wrapper${shellLoading ? '' : ` ${reveal}`}`}
+            style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0 }}
+        >
             <Sidebar
                 {...sidebarProps}
                 activeTabId={sidebarActiveCombined}
                 visible={true}
-                loading={shellLoading}
             />
         </div>
     );
