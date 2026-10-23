@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import Field from '../_internal/Field';
 import Calendar from '../_internal/Calendar';
-import { useAnchoredPopup } from '../_internal/anchorPlacement';
+import { popupLayerOf, useAnchoredPopup } from '../_internal/anchorPlacement';
 import { formatDisplay, formatIso, outOfBounds, parseDate, parseTyped } from '../_internal/dates';
 import '../_internal/Listbox.scss';
 import './DatePicker.scss';
@@ -274,7 +274,7 @@ const DatePicker = ({
                         onPick={pick}
                     />
                 </div>,
-                document.body,
+                popupLayerOf(fieldRef),
             )}
         </>
     );

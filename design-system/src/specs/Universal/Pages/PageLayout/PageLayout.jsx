@@ -173,7 +173,7 @@ const PageLayout = ({
                         position: 'absolute',
                         bottom: 'var(--space-200)',
                         right: 'var(--space-300)',
-                        zIndex: 1200,
+                        zIndex: 'var(--layout-z-index-navigation)',
                         pointerEvents: 'auto',
                     }}
                 >

@@ -502,12 +502,27 @@ const CODE_ONLY_LAYOUT = {
 
 /**
  * Stacking layers. Figma has no z-index, so these are code's alone and are
- * written unitless. The overlay layer sits above a modal (Bootstrap's 1055)
- * and level with its popovers, so a list opened from a field inside a modal
- * is not covered by it.
+ * written unitless. They are Atlassian's layer numbers, one scale for the whole
+ * product, so nothing outside a modal sits above its scrim:
+ * card 100 (sticky headers, raised cards), navigation 200 (sidebars, the page
+ * frame's floating buttons), dialog 300 (side panels), popup 400, scrim 500,
+ * modal 510, flag 600, spotlight 700, tooltip 800. A nested confirm reuses the
+ * scrim and modal inside the first modal's layer rather than counting up.
+ *
+ * A popup or menu (400) sits under a modal (510). One opened from a field
+ * inside a modal takes the modal's layer: it mounts inside the modal's
+ * overlay (`popupLayerOf` in forms-and-inputs/_internal/anchorPlacement.js).
  */
 const CODE_ONLY_LAYERS = {
-    'layout-z-index-overlay': { value: 1070, note: 'floating listboxes and menus; above a modal' },
+    'layout-z-index-card': { value: 100, note: 'sticky headers and raised cards' },
+    'layout-z-index-navigation': { value: 200, note: 'sidebars and floating page navigation' },
+    'layout-z-index-dialog': { value: 300, note: 'side panels and inline dialogs' },
+    'layout-z-index-popup': { value: 400, note: 'popups and menus' },
+    'layout-z-index-scrim': { value: 500, note: 'the scrim under a modal' },
+    'layout-z-index-modal': { value: 510, note: 'a modal, over its scrim' },
+    'layout-z-index-flag': { value: 600, note: 'flags, above a modal' },
+    'layout-z-index-spotlight': { value: 700, note: 'onboarding spotlights' },
+    'layout-z-index-tooltip': { value: 800, note: 'tooltips, above everything' },
 };
 
 /**

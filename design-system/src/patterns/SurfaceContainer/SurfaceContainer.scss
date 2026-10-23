@@ -44,7 +44,7 @@
 .plus-surface-container__toggle {
     // Above a floating sidebar, so it never moves and stays pressable.
     position: relative;
-    z-index: 201;
+    z-index: calc(var(--layout-z-index-navigation) + 1);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -106,15 +106,15 @@
 }
 
 // Floating: over the page, from the top of the frame, with a shadow and no scrim.
-// The fill and shadow are Figma's Surface roles/surface-overlay pairing. z-index
-// 200 is Atlassian's floating-sidebar layer, below Bootstrap's 1000+ dropdown and
-// modal layers; the toggle (201) and the hover edge (199) sit either side of it.
+// The fill and shadow are Figma's Surface roles/surface-overlay pairing. It is on
+// the navigation layer (200), under popups (400) and a modal's scrim (500); the
+// toggle (one above) and the hover edge (one below) sit either side of it.
 .plus-surface-container__sidebar--floating {
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
-    z-index: 200;
+    z-index: var(--layout-z-index-navigation);
     padding: var(--surface-container-pad);
     background-color: var(--surface-overlay);
     box-shadow: var(--surface-overlay-shadow);
@@ -134,7 +134,7 @@
     top: calc(var(--surface-container-pad) + var(--layout-height-topbar));
     bottom: 0;
     left: 0;
-    z-index: 199;
+    z-index: calc(var(--layout-z-index-navigation) - 1);
     width: var(--surface-container-pad);
 }
 

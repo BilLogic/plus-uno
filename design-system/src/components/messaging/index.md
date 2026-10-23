@@ -8,7 +8,7 @@ authored half (#166), counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Alert](Alert/index.md) | 10 | ✅ | ✅ | ✅ |
-| [Modal](Modal/index.md) | 26 | ✅ | ✅ | ✅ |
+| [Modal](Modal/index.md) | 33 | ✅ | ✅ | ✅ |
 | [Toast](Toast/index.md) | 13 | ✅ | ✅ | ✅ |
 
 **Authored coverage:** When to use 3/3 (100%) · Correct/incorrect 3/3 (100%) · Accessibility 3/3 (100%)

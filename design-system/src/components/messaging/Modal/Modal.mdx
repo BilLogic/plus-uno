@@ -68,9 +68,39 @@ Add dialogs to your site for lightboxes, user notifications, or completely custo
 
 <div className="sb-ds-doc-section">
 
+## Width
+
+<DocsCanvasShell description={<>Width is 6 · 8 · 10 columns of the screen grid plus 2 × 16 — 384 · 507 · 629 at 768, 512 · 677 · 843 at 1024, 640 · 848 · 1056 from 1280. It grows with the screen, never shrinks, and ignores the sidebar. Drawn here at the 1024 screen.</>}>
+    <DsCanvasQuiet of={ModalStories.Sizes} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Height
+
+<DocsCanvasShell description={<>Hug (the default) grows with its content up to the screen less 2 × 64 (2 × 24 under 640 tall), then its body scrolls. Fill sits at that cap, for settings, editors and record peeks that should not jump. Drawn here against a 320 cap.</>}>
+    <DsCanvasQuiet of={ModalStories.Heights} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Header, dividers and loading
+
+<DocsCanvasShell description={<>The header holds the title, an optional description, optional icon actions and the 32 close button, which a dialog that has to be answered turns off. Dividers are optional. Loading draws skeleton bars where the body will be.</>}>
+    <DsCanvasQuiet of={ModalStories.Options} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Types
 
-<DocsCanvasShell description={<>Scrollable body with decorative scrollbar affordances for long content.</>}>
+<DocsCanvasShell description={<>Deprecated: <code>type="scrollable"</code> draws the old fixed box. A Hug modal now scrolls its own body past the cap.</>}>
     <DsCanvasQuiet of={ModalStories.Types} />
 </DocsCanvasShell>
 
@@ -110,7 +140,12 @@ that the user will close and return from. It is the only messaging component
 that takes focus away from the page, so use it when interrupting is the point.
 
 The footer is built in: pass `primaryButton` and `secondaryButton` as objects and
-the component renders the `Button` pair for you, with a divider above them.
+the component renders the `Button` pair for you, aligned right. Pass `footer` for
+other actions, such as a Delete on the left or a single primary.
+
+Pick a grid `width` for the content rather than a number: `sm` for a confirm, `md` for a
+short form, `lg` for a table or an editor. A confirm raised from a modal is the
+most that stacks — at most two overlays.
 
 </div>
 
@@ -118,23 +153,23 @@ the component renders the `Button` pair for you, with a divider above them.
 
 ## Usage notes
 
-### Width must be a length the component recognizes.
+### Size the modal by the grid, not by a number.
 
 ```jsx
-// Incorrect — `clamp(...)` is not in the allowlist, so this silently falls back
-// to 340px (with a console warning in development only).
-<Modal width="clamp(320px, 50vw, 640px)" title="Reschedule" show={open} onClose={close} />
-
-// Correct — a plain number, a px/rem/% length, or a CSS custom property.
+// Incorrect — a fixed width ignores the screen grid, so the dialog keeps one
+// size on every screen. Numbers are kept only for the callers that still pass one.
 <Modal width={480} title="Reschedule" show={open} onClose={close} />
+
+// Correct — a width from the screen grid, which grows with the screen.
+<Modal width="md" title="Reschedule" show={open} onClose={close} />
 ```
 
 ### The footer only appears when you give it a button.
 
 ```jsx
 // Incorrect — `showBottomButtons` defaults to true, but with neither button
-// supplied the footer and its divider are not rendered at all, so the dialog
-// ends with no way to confirm.
+// nor `footer` supplied the footer is not rendered at all, so the dialog ends
+// with no way to confirm.
 <Modal title="Reschedule" show={open} onClose={close}>{form}</Modal>
 
 // Correct — describe the actions; the component renders the Button pair.
@@ -160,14 +195,17 @@ the component renders the `Button` pair for you, with a divider above them.
   the only exit, so keep that button — it is only rendered when the modal is not
   in body-only mode (`title` absent *and* `showBottomButtons` false).
 - **The close button is labeled `Close modal`**, hard-coded. Its icon is
-  `aria-hidden`.
-- **The title is not the dialog's accessible name.** It renders as a styled div
-  inside the dialog, and the component does not spread unknown props, so there
-  is no way to pass `aria-labelledby` through it. Assume the dialog is announced
-  without a name and put the essential wording in the first line of the body.
-- **A scrollable body is focusable.** `type="scrollable"` sets `tabIndex={0}` on
-  the body so a keyboard user can scroll it — this is deliberate, and satisfies
-  the axe `scrollable-region-focusable` rule.
+  `aria-hidden`. `showCloseButton={false}` removes it; keep Escape or a footer
+  action as a way out.
+- **The title is the dialog's h1 and its accessible name**, through
+  `aria-labelledby`: the dialog reads as its own page. The `description`
+  describes it, through `aria-describedby`. A modal with no title takes
+  `ariaLabel`.
+- **A body that scrolls is focusable.** Once the content runs past the cap, the
+  body gets `tabIndex={0}` so a keyboard user can scroll it — the axe
+  `scrollable-region-focusable` rule. `type="scrollable"` sets it always.
+- **Loading is announced as busy.** `loading` sets `aria-busy` on the body while
+  the skeleton bars stand in for it.
 - **Focus handling comes from the underlying dialog.** `enforceFocus`,
   `autoFocus` and `restoreFocus` are forwarded untouched; leave them alone unless
   you have a specific reason, because the defaults are what trap focus inside the

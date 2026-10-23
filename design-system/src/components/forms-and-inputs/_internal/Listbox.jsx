@@ -12,7 +12,7 @@ import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import Spinner from '@/components/status-and-loading/Spinner/Spinner';
 import OptionRow from './OptionRow';
-import { useAnchoredPopup } from './anchorPlacement';
+import { popupLayerOf, useAnchoredPopup } from './anchorPlacement';
 import './Listbox.scss';
 
 /** Past this many options, only the rows on screen are drawn. */
@@ -64,6 +64,7 @@ const isTextEntry = (target) => target instanceof HTMLElement
  *   `rowActions` draws a row's own controls (a drag handle, a "…") over the
  *   highlighted row.
  * - **Placement:** with `anchorRef` it renders in a portal on `document.body`
+ *   (or in the modal its field sits in, so it takes the modal's layer)
  *   and follows the popup placement rule through `useAnchoredPopup`: at least
  *   as wide as the anchor, flipped above it when there isn't room below, and
  *   right-aligned when it would run past the viewport. Without one it renders
@@ -447,7 +448,7 @@ const Listbox = ({
 
     return (
         <>
-            {open && (anchorRef ? createPortal(surface, document.body) : surface)}
+            {open && (anchorRef ? createPortal(surface, popupLayerOf(anchorRef)) : surface)}
             <div className="visually-hidden" role="status" aria-live="polite">{open ? announcement : ''}</div>
         </>
     );

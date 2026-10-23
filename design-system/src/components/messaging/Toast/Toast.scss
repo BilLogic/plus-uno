@@ -125,7 +125,7 @@
 // --- TOAST CONTAINER: bottom-left, 8 from the screen edge, 16 apart ---
 .plus-toast-container,
 .toast-container {
-    z-index: 1050;
+    z-index: var(--layout-z-index-flag);
     display: flex;
     flex-direction: column;
     gap: var(--popover-stack-flag);

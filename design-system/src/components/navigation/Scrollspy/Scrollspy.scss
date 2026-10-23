@@ -136,7 +136,7 @@
 
         .dropdown-menu {
             /* keep menu above scrollable body */
-            z-index: 1080;
+            z-index: var(--layout-z-index-popup);
         }
     }
 

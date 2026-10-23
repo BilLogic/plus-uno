@@ -5,7 +5,7 @@ import Dropdown from './Dropdown/Dropdown';
 import useFieldId from './useFieldId';
 import Calendar from './_internal/Calendar';
 import Field, { FieldCaption, toneProps } from './_internal/Field';
-import { useAnchoredPopup } from './_internal/anchorPlacement';
+import { popupLayerOf, useAnchoredPopup } from './_internal/anchorPlacement';
 import { formatIso } from './_internal/dates';
 import { knownZone, localTimeZone, timeZoneCaption, wallTimeToUtc } from './_internal/timeZones';
 import './_internal/Listbox.scss';
@@ -469,7 +469,7 @@ const DateAndTimePicker = ({
                             onPick={handleDayClick}
                         />
                     </div>,
-                    document.body,
+                    popupLayerOf(dateFieldRef),
                 )}
             </div>}
 

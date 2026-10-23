@@ -162,7 +162,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                zIndex: 1200,
+                zIndex: 'var(--layout-z-index-scrim)',
                 padding: '24px',
                 pointerEvents: 'auto'
             }}
