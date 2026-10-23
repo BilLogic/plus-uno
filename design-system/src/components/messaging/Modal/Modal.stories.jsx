@@ -311,9 +311,16 @@ function ModalSizeDemos() {
     );
 }
 
-/** Hug and Fill against a 360 cap standing in for the screen less 128. */
+/** Hug and Fill against a 320 cap standing in for the screen less 128. */
 function ModalHeightDemos() {
-    const frame = { ...modalDocsHostStyle, '--layout-max-height-modal': '360px', display: 'flex', gap: 16, alignItems: 'flex-start', minHeight: 392 };
+    const frame = {
+        ...modalDocsHostStyle,
+        '--layout-max-height-modal': 'var(--size-2000)',
+        display: 'flex',
+        gap: 'var(--space-100)',
+        alignItems: 'flex-start',
+        minHeight: 'calc(var(--size-2000) + 2 * var(--space-100))',
+    };
     return (
         <div style={frame}>
             <Modal show renderAs="inline" height="hug" title="Hug, short" body="Short content hugs." primaryButton={{ text: 'Done' }} onClose={() => {}} />

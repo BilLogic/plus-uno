@@ -16,10 +16,16 @@
      * ignores the sidebar. Figma's Modal/width-modal-* per mode are this rule
      * at 768 · 1024 · 1440. `--plus-modal-screen` stands in for the screen when
      * an ancestor sets it, such as a docs frame drawn at a mode's width.
+     *
+     * The screen pad is Screen/pad-x-screen below 1440, 24. From 1440 it is 32,
+     * but there the grid is already at its 1232 cap with either pad, so the
+     * width is a function of the screen width alone and a stand-in frame gets
+     * the same width at any browser size.
      */
+    --plus-modal-screen-pad: var(--space-150);
     --plus-modal-grid: clamp(
         var(--layout-min-width-content),
-        var(--plus-modal-screen, 100vw) - 2 * var(--layout-pad-x-screen),
+        var(--plus-modal-screen, 100vw) - 2 * var(--plus-modal-screen-pad),
         var(--layout-max-width-content)
     );
     --plus-modal-column: calc((var(--plus-modal-grid) - (var(--layout-columns) - 1) * var(--layout-gutter)) / var(--layout-columns));
@@ -174,7 +180,7 @@
 .plus-modal-skeleton {
     display: flex;
     flex-direction: column;
-    gap: var(--space-050);
+    gap: var(--element-stack-md);
 }
 
 /* Footer actions align right, Modal/inline-sm 8 apart. */

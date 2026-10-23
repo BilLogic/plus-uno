@@ -142,8 +142,8 @@ WidthFromTheBrowser.play = async ({ canvasElement }) => {
     const doc = documentOf(canvasElement);
     const view = canvasElement.ownerDocument.defaultView;
     const dialog = (await doc.findByText('Read from the screen')).closest('.plus-modal');
-    const pad = lengthOf(canvasElement.ownerDocument, '--layout-pad-x-screen');
-    const grid = Math.min(1232, Math.max(720, view.innerWidth - 2 * pad));
+    // Screen pad 24: from 1440, where the pad is 32, the grid is capped either way.
+    const grid = Math.min(1232, Math.max(720, view.innerWidth - 2 * 24));
     const column = (grid - 11 * 16) / 12;
     await expect(widthOf(dialog)).toBe(Math.round(8 * column + 7 * 16 + 2 * 16));
 };

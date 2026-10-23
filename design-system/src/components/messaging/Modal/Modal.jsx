@@ -54,7 +54,7 @@ const OverlayContext = createContext(null);
  * True while an element's content is taller than its box.
  * A body that scrolls has to be a tab stop so a keyboard can scroll it.
  */
-function useOverflows(ref, watch) {
+function useOverflows(ref, show, loading) {
     const [overflows, setOverflows] = useState(false);
     useLayoutEffect(() => {
         const el = ref.current;
@@ -66,7 +66,7 @@ function useOverflows(ref, watch) {
         observer.observe(el);
         if (el.firstElementChild) observer.observe(el.firstElementChild);
         return () => observer.disconnect();
-    }, [ref, watch]);
+    }, [ref, show, loading]);
     return overflows;
 }
 
@@ -145,7 +145,7 @@ const Modal = ({
     const scrollable = type === 'scrollable';
     const hasFooter = showBottomButtons && Boolean(footer || primaryButton || secondaryButton);
     const bodyOnly = !title && !description && !headerActions && !showBottomButtons;
-    const overflows = useOverflows(bodyRef, `${show}${loading}`);
+    const overflows = useOverflows(bodyRef, show, loading);
 
     const classes = [
         'plus-modal',
@@ -174,7 +174,7 @@ const Modal = ({
                             <div className="plus-modal-heading">
                                 {title && <h1 className="plus-modal-title" id={titleId}>{title}</h1>}
                                 {description && (
-                                    <p className="plus-modal-description" id={descriptionId}>{description}</p>
+                                    <div className="plus-modal-description" id={descriptionId}>{description}</div>
                                 )}
                             </div>
                         )}

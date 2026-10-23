@@ -94,7 +94,7 @@ export const webAppSourceSnippets = {
     divider: snippet([
         '<div style={{ width: "100%", maxWidth: "600px" }}>',
         '  <p className="plus-body-1">Section above</p>',
-        '  <Divider width="md" style="light" />',
+        '  <Divider size="md" style="light" />',
         '  <p className="plus-body-1">Section below</p>',
         '</div>'
     ]),
