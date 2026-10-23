@@ -809,6 +809,22 @@
       "codeSyntax": {
         "WEB": "var(--size-7700)"
       }
+    },
+    {
+      "id": "VariableID:19413:28",
+      "name": "Size/size-4000",
+      "variableCollectionId": "VariableCollectionId:19364:197",
+      "resolvedType": "FLOAT",
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--size-4000)"
+      },
+      "valuesByMode": {
+        "19364:14": 640
+      },
+      "resolvedValuesByMode": {
+        "19364:14": 640
+      }
     }
   ]
 }

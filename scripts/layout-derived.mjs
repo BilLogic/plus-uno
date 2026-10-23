@@ -15,8 +15,10 @@
  * - The surface pads 16 below 1440 and 24 from 1440.
  * - Content is the surface's inner width, capped at 1232 and never under 720.
  * - The grid is 12 columns with gutter 16.
- * - A modal spans 6 · 8 · 10 columns of the SCREEN grid (the page grid with
- *   the sidebar closed) plus its own 16 pad on each side.
+ * - The screen side pad is the container pad plus the surface pad, so the
+ *   SCREEN grid (the page grid with the sidebar closed) starts there.
+ * - A modal spans 6 · 8 · 10 columns of the screen grid plus its own 16 pad
+ *   on each side, rounded to a whole pixel.
  *
  * The constants restate rules rather than read tokens on purpose: this is the
  * oracle the exported values are checked against, so it cannot take its
@@ -45,7 +47,8 @@ const span = (n, col) => n * col + (n - 1) * GUTTER;
 
 /**
  * @param {number} width the screen width a mode stands for
- * @returns {{ 'pad-left-container': number, 'width-content': number,
+ * @returns {{ 'width-screen': number, 'pad-x-screen': number,
+ *   'pad-left-container': number, 'width-content': number,
  *   'width-column': number, 'width-modal-sm': number, 'width-modal-md': number,
  *   'width-modal-lg': number }}
  */
@@ -54,9 +57,12 @@ export function deriveLayout(width) {
   const surfacePad = width >= WIDE_PAD_FROM ? WIDE_SURFACE_PAD : SURFACE_PAD;
   const surfaceX = docked ? SIDEBAR : CONTAINER_PAD;
   const content = clamp(width - surfaceX - CONTAINER_PAD - 2 * surfacePad);
-  const screenColumn = column(clamp(width - 2 * CONTAINER_PAD - 2 * surfacePad));
-  const modal = (n) => span(n, screenColumn) + 2 * MODAL_PAD;
+  const padXScreen = CONTAINER_PAD + surfacePad;
+  const screenColumn = column(clamp(width - 2 * padXScreen));
+  const modal = (n) => Math.round(span(n, screenColumn) + 2 * MODAL_PAD);
   return {
+    'width-screen': width,
+    'pad-x-screen': padXScreen,
     'pad-left-container': docked ? 0 : CONTAINER_PAD,
     'width-content': content,
     'width-column': column(content),

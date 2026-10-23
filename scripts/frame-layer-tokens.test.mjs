@@ -42,6 +42,17 @@ function atMode(name, mode) {
   return value;
 }
 
+/** A token's declared text at a mode, before any alias is followed. */
+function rawAtMode(name, mode) {
+  let raw = corpus.get(name)?.raw;
+  for (const width of Object.values(LAYOUT_MODES)) {
+    if (width <= LAYOUT_MODES['Medium (768px)'] || width > LAYOUT_MODES[mode]) continue;
+    const block = stylesheet.match(new RegExp(`@media \\(min-width: ${width}px\\) \\{([\\s\\S]*?)\\n\\}`))?.[1] ?? '';
+    for (const [, declared, value] of block.matchAll(tokenDeclarationPattern('--'))) if (declared === name) raw = value.trim();
+  }
+  return raw;
+}
+
 const px = (n) => `${+n.toFixed(2)}px`;
 
 /* Layout: one value per mode, Medium · Large · X-Large. */
@@ -56,8 +67,11 @@ const LAYOUT = {
   '--layout-min-width-content': ['720px', '720px', '720px'],
   '--layout-width-content': ['720px', '744px', '1144px'],
   '--layout-width-modal-sm': ['384px', '512px', '640px'],
-  '--layout-width-modal-md': ['506.67px', '677.33px', '848px'],
-  '--layout-width-modal-lg': ['629.33px', '842.67px', '1056px'],
+  '--layout-width-modal-md': ['507px', '677px', '848px'],
+  '--layout-width-modal-lg': ['629px', '843px', '1056px'],
+  '--layout-width-screen': ['768px', '1024px', '1440px'],
+  '--layout-pad-x-screen': ['24px', '24px', '32px'],
+  '--layout-columns': ['12', '12', '12'],
 };
 
 /* Surface has modes for its pad only. */
@@ -90,10 +104,14 @@ const FIXED = {
   '--card-min-width-lg': '480px',
   '--card-radius': '16px',
   '--card-radius-sm': '12px',
+  '--card-max-height-sm': '304px',
+  '--card-max-height-md': '400px',
+  '--card-max-height-lg': '640px',
   '--table-pad-x-cell': '8px',
   '--table-pad-y-cell': '4px',
   '--table-indent': '24px',
   '--table-radius': '8px',
+  '--table-stack': '8px',
   '--overlay-pad-x': '16px',
   '--overlay-pad-y': '64px',
   '--modal-pad': '16px',
@@ -139,6 +157,29 @@ test('the derived Layout rows are the frame rules worked at each mode width', ()
   }
 });
 
+test('the screen and container pads alias the space scale per mode', () => {
+  const RAW = {
+    '--layout-pad-left-container': ['var(--space-050)', 'var(--space-0)', 'var(--space-0)'],
+    '--layout-pad-x-screen': ['var(--space-150)', 'var(--space-150)', 'var(--space-200)'],
+  };
+  for (const [name, raws] of Object.entries(RAW)) {
+    const actual = Object.keys(LAYOUT_MODES).map((mode) => rawAtMode(name, mode));
+    assert.deepEqual(actual, raws, name);
+  }
+});
+
+test('no modal width is fractional at any mode', () => {
+  for (const size of ['sm', 'md', 'lg']) {
+    for (const mode of Object.keys(LAYOUT_MODES)) {
+      assert.match(atMode(`--layout-width-modal-${size}`, mode), /^\d+px$/, `${size} at ${mode}`);
+    }
+  }
+});
+
+test('the column count is a plain number, so a grid can repeat it', () => {
+  assert.equal(corpus.get('--layout-columns')?.raw, '12');
+});
+
 test('Surface/pad is 16 below 1440 and 24 from 1440', () => {
   const actual = Object.keys(LAYOUT_MODES).map((mode) => atMode('--surface-pad', mode));
   assert.deepEqual(actual, SURFACE_PAD);
@@ -175,7 +216,8 @@ test('Layout/sidebar-docked is false at Medium and true from Large, in the Figma
 });
 
 test('every exported variable offers itself only where it belongs: explicit scopes, never ALL_SCOPES', () => {
-  const EXPECTED = { GAP: /pad|stack|inline|gutter|indent|gap-screen/, CORNER_RADIUS: /radius/, WIDTH_HEIGHT: /height|width/ };
+  // Figma has no scope for a layout grid's count, so the column count takes GAP, the scope its gutter and offset take.
+  const EXPECTED = { GAP: /pad|stack|inline|gutter|indent|gap-screen|^columns$/, CORNER_RADIUS: /radius/, WIDTH_HEIGHT: /height|width/ };
   for (const file of ['spacing _ layout', 'spacing _ patterns', 'color _ patterns']) {
     const { variables } = JSON.parse(fs.readFileSync(path.join(SOURCE_DIR, `${file}.json`), 'utf8'));
     for (const v of variables) {
@@ -210,7 +252,13 @@ test('every alias lands on the scales, never on an old --size-* primitive', () =
     '--layout-max-width-content': 'var(--size-7700)',
     '--surface-pad': 'var(--space-100)',
     '--card-pad-md': 'var(--space-125)',
-    '--card-min-width-md': 'var(--size-1900)',
+    '--card-min-width-md': 'var(--width-1900)',
+    '--card-max-height-sm': 'var(--size-1900)',
+    '--card-max-height-md': 'var(--size-2500)',
+    '--card-max-height-lg': 'var(--size-4000)',
+    '--table-stack': 'var(--space-050)',
+    '--layout-pad-left-container': 'var(--space-050)',
+    '--layout-pad-x-screen': 'var(--space-150)',
     '--section-min-width-main': 'var(--width-3000)',
     '--modal-radius': 'var(--radius-075)',
     '--popover-radius-menu-sm': 'var(--radius-0625)',
