@@ -3,7 +3,7 @@
 
 # Sidebar
 
-The PLUS sidebar: the foundation Sidebar pattern (`@/patterns`) with the logo in its header and the Specs item list for the role (`sidebarConfig.js`). Figma Specs: node 111:227891; BS4 Foundation `_Sidebar`. Both roles come from one config. Home is selected when nothing else is.
+The PLUS sidebar: the foundation Sidebar pattern (`@/patterns`) with the logo in its header and the Specs item list for the role (`sidebarConfig.js`). Figma Specs: node 111:227891; BS4 Foundation `_Sidebar`. Both roles come from one config. Home is selected when nothing else is. Open tabs come from `useOpenTabs()`: a page that opens a record (a session, a student) calls `open(parentId, record)`, and the record shows here as a tab under that item. A tab is selected while its parent is the current page (`activeTabId`); elsewhere the page's own item is. Pressing a tab selects it and calls `onOpenTabSelect(tab)`, which is where an app goes to the record's route if it is not already there. Nothing here changes the URL.
 
 **Import:** `import { Sidebar } from '@/components';`
 
@@ -16,6 +16,7 @@ The PLUS sidebar: the foundation Sidebar pattern (`@/patterns`) with the logo in
 | `user` | enum | `'tutor'` | — |
 | `onHomeClick` | func | — | Home's press; without it Home calls `onTabClick('home')` |
 | `onTabClick` | func | — | Called with the item id for every other item (external links excepted) |
+| `onOpenTabSelect` | func | — | Called with the open tab (`{ id, parentId, recordId, title, href, status }`) when one is pressed |
 | `activeTabId` | string | — | Id of the tab to show as selected (e.g. 'sessions', 'home') |
 | `showItemsNotInSpecs` | bool | `false` | Also show the code-only items that are not in Specs: Toolkit › Reviews and Admin › Compliance |
 | `slackUrl` | string | — | Where Toolkit › Slack links; defaults to `SLACK_URL` |

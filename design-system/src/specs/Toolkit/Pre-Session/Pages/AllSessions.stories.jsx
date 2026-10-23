@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import Button from '@/components/actions/Button/Button';
 import { PageLayout } from '@/specs/Universal/Pages';
+import { createOpenTabsStore, OpenTabsProvider, useOpenTabs } from '@/patterns/Sidebar';
+import { SessionInfo_PostSignUp } from '../Modals/SessionDetailsAllUser/SessionDetails.stories';
 import { StatCard } from '../Cards/OverviewCard.stories';
 import { AllSessionsTableRow, AllSessionsTableHeaderRow } from '../Tables/AllSessionsTable.stories';
 import { NavHorizontal } from '../Tables/NavHorizontal.stories';
@@ -8,7 +11,68 @@ import { SessionStatusFilter } from '../Elements/Filters/SessionStatusFilter.sto
 import { TutorFilter } from '../Elements/Filters/TutorFilter/TutorFilter.stories';
 import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
 import { TimeframeFilter } from '../Elements/Filters/TimeframeFilter.stories';
-import { SectionTitle, UpdateAlert } from './_pageHelpers';
+import { SectionTitle, UpdateAlert, ModalScrim } from './_pageHelpers';
+
+/*
+ * Open tabs. "Details" on a row opens that session as a temporary tab under
+ * Toolkit › Sessions, and the selected session tab is what the page shows: the
+ * existing Session Details mock, over the page. Escape or a press on the scrim
+ * closes it and selects Sessions again; the tab stays open in the sidebar until
+ * its × closes it. Nothing here touches the URL.
+ */
+const SESSIONS = 'sessions';
+const SESSIONS_ROUTE = '/toolkit/sessions';
+
+/** Rows share a school and date in this mock, so a repeated title gets its row number. */
+const sessionTitles = (sessions) => sessions.map((s, i) => {
+    const base = `${s.school} · ${s.date}`;
+    const repeated = sessions.filter((other) => `${other.school} · ${other.date}` === base).length > 1;
+    return repeated ? `${base} (${i + 1})` : base;
+});
+
+const useSessionTabs = (sessions) => {
+    const tabs = useOpenTabs();
+    const titles = sessionTitles(sessions);
+    const openDetails = (index) => tabs.open(SESSIONS, {
+        id: `row-${index + 1}`,
+        title: titles[index],
+        href: SESSIONS_ROUTE,
+        status: sessions[index].status === 'in-progress' ? 'live' : undefined,
+    });
+    const shownId = tabs.selectedId?.startsWith(`${SESSIONS}:`) ? tabs.selectedId : null;
+    const { select } = tabs;
+    const closeDetails = useCallback(() => select(SESSIONS), [select]);
+    return { openDetails, shownId, closeDetails };
+};
+
+/** The opened session's details: the existing Session Details mock, over the page. */
+const OpenedSessionDetails = ({ shownId, onClose }) => {
+    const dialog = useRef(null);
+    useEffect(() => {
+        if (!shownId) return undefined;
+        dialog.current?.focus();
+        const onKey = (event) => { if (event.key === 'Escape') onClose(); };
+        document.addEventListener('keydown', onKey);
+        return () => document.removeEventListener('keydown', onKey);
+    }, [shownId, onClose]);
+    if (!shownId) return null;
+    return (
+        <div onClick={onClose}>
+            <ModalScrim open>
+                <div
+                    ref={dialog}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Session details"
+                    tabIndex={-1}
+                    onClick={(event) => event.stopPropagation()}
+                >
+                    <SessionInfo_PostSignUp />
+                </div>
+            </ModalScrim>
+        </div>
+    );
+};
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -147,8 +211,10 @@ const defaultFilters = {
  * Full layout using PageLayout component with sidebar and top bar
  * This is the supervisor view showing the All Sessions tab
  */
-export const Overview = () => (
-    <div style={{ maxWidth: '1440px', height: '100%', margin: '0 auto' }}>
+const OverviewPage = () => {
+    const { openDetails, shownId, closeDetails } = useSessionTabs(defaultSessions);
+    return (
+    <div style={{ position: 'relative', maxWidth: '1440px', height: '100%', margin: '0 auto' }}>
         <PageLayout
             title="Sessions"
             topBarConfig={{
@@ -173,11 +239,15 @@ export const Overview = () => (
                 sessions={defaultSessions}
                 filters={defaultFilters}
                 onFilterChange={() => {}}
-                onDetails={() => {}}
+                onDetails={openDetails}
             />
         </PageLayout>
+        <OpenedSessionDetails shownId={shownId} onClose={closeDetails} />
     </div>
-);
+    );
+};
+
+export const Overview = () => <OverviewPage />;
 
 /**
  * All Sessions Page - Interactive Version
@@ -196,9 +266,7 @@ const InteractiveRender = (args) => {
         setFilters(prev => ({ ...prev, [filterKey]: value }));
     };
 
-    const handleDetails = (index) => {
-        alert(`Viewing details for session ${index + 1}`);
-    };
+    const { openDetails: handleDetails, shownId, closeDetails } = useSessionTabs(defaultSessions);
 
     const tabs = [
         { id: 'my-sessions', label: 'My sessions', count: 3 },
@@ -237,6 +305,7 @@ const InteractiveRender = (args) => {
                     onDetails={handleDetails}
                 />
             </PageLayout>
+            <OpenedSessionDetails shownId={shownId} onClose={closeDetails} />
         </div>
     );
 };
@@ -247,4 +316,49 @@ export const Interactive = {
         alert: { control: 'boolean', name: 'Update alert', table: { category: 'State' } },
     },
     args: { alert: true },
+};
+
+/**
+ * Open session tabs: "Details" opens the session as a tab under Toolkit ›
+ * Sessions and shows its details; a live session's tab carries the Live dot.
+ * Escape closes the details and selects Sessions; pressing the tab shows them
+ * again. The URL never changes. The story keeps its tabs in its own store.
+ */
+export const OpenSessionTabs = {
+    render: () => {
+        const [store] = useState(() => {
+            try { sessionStorage.removeItem('story:all-sessions-tabs'); } catch { /* blocked storage */ }
+            return createOpenTabsStore({ key: 'story:all-sessions-tabs' });
+        });
+        return (
+            <OpenTabsProvider store={store}>
+                <OverviewPage />
+            </OpenTabsProvider>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const url = window.location.href;
+        const toolkit = within(canvas.getByRole('navigation', { name: 'Main' })).getByRole('group', { name: 'Toolkit' });
+
+        const details = canvas.getAllByRole('button', { name: 'Details' });
+        await userEvent.click(details[0]);
+        await userEvent.click(details[1]);
+        const first = await within(toolkit).findByRole('link', { name: /^Hogwarts · Tue, Sep 9 \(1\)/ });
+        const second = within(toolkit).getByRole('link', { name: /^Hogwarts · Tue, Sep 9 \(2\)/ });
+        await expect(second, 'the last opened is selected').toHaveAttribute('aria-current', 'page');
+        await expect(within(first).getByRole('img', { name: 'Live' }), 'an in-progress session is live').toBeInTheDocument();
+        await expect(canvas.getByRole('dialog', { name: 'Session details' })).toBeInTheDocument();
+
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(canvas.queryByRole('dialog')).toBeNull());
+        await expect(within(toolkit).getByRole('button', { name: /^Sessions$/ })).toHaveAttribute('aria-current', 'page');
+        await expect(within(toolkit).getAllByRole('link', { name: /^Hogwarts/ }), 'the tabs stay open').toHaveLength(2);
+
+        await userEvent.click(first);
+        await expect(await canvas.findByRole('dialog', { name: 'Session details' })).toBeInTheDocument();
+        await expect(first).toHaveAttribute('aria-current', 'page');
+        await expect(window.location.href, 'tabs never route').toBe(url);
+        await userEvent.keyboard('{Escape}');
+    },
 };
