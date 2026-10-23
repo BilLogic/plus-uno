@@ -143,7 +143,7 @@
         &[aria-selected="true"],
         &[aria-current="page"],
         &[aria-current="true"] {
-            font-weight: var(--type-weight-semibold);
+            // The label stays medium; the underline and the color carry selection.
             background-color: transparent !important;
             color: var(--color-secondary-text) !important;
             border-color: transparent transparent var(--color-primary-border) transparent !important;

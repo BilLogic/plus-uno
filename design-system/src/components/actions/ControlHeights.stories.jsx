@@ -253,8 +253,7 @@ Tabs.play = async ({ canvasElement }) => {
     await expect(links).toHaveLength(4);
     for (const link of links) {
         await expect(heightOf(link), `${link.textContent} height`).toBe(32);
-        const isActive = link.classList.contains('active');
-        const isTab = Boolean(link.closest('.plus-nav-tabs, .nav-tabs'));
-        await expectLabel(link, link.textContent, isActive && isTab ? '600' : '500');
+        // Selected or not, a label stays medium: the indicator and the color mark selection.
+        await expectLabel(link, link.textContent, '500');
     }
 };
