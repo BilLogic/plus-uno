@@ -1,7 +1,15 @@
+/* The type token set, generated from Figma's `typography` collection: the font
+   primitives (`--font-size-075` … and `--line-height-100` …), the
+   `--type-family-*` and `--type-weight-*` variables, and the text styles
+   (`--heading-*`, `--body-*`, `--metric-*`, `--code`). Pulled in here rather
+   than from `main.scss` so every entry point that loads this file gets it;
+   the prototypes `@use` this file directly. */
+@use "type";
+
 :root {
 
-    /* common font sizes */
-    --font-size-125: 1.25rem;
+    /* common font sizes: `--font-size-125` (1.25rem) is a font primitive in
+       `_type.scss`, and `--font-size-h5`, `-lead` and `-blockquote` alias it */
 
     /* common line heights */
     --font-line-height-140: 140%;
@@ -9,17 +17,12 @@
     --font-line-height-160: 160%;
 
     /* common font families*/
-    /* `sans-serif` on the end, for the same reason as the body stack (#314).
-       A single quoted family name is not a fallback chain: if Lato fails to
-       load, every heading in the system falls through to the browser default,
-       which is a serif. Body and code were fixed; this one was missed. */
-    --font-family-header: "Lato", sans-serif;
-    /* `sans-serif` UNQUOTED. A quoted generic is not the generic keyword — it is a
-       family name, and nothing is called that, so the chain simply ended. Measured
-       in the docs iframe at 40px: `"sans-serif"` renders 222.27px wide against
-       `sans-serif`'s 171.13px, and identically to `serif`. If both faces failed to
-       load, body text fell through to the browser default, which is a serif. */
-    --font-family-body: "Merriweather Sans", "Open Sans", sans-serif;
+    /* The two families under their older names. Each family is set once, in
+       its `--type-family-*` token, so a typeface change is one edit in Figma's
+       `Family/heading` or `Family/body`. The fallback chains are
+       `FAMILY_FALLBACKS` in `scripts/generate-all-tokens.js`. */
+    --font-family-header: var(--type-family-heading);
+    --font-family-body: var(--type-family-body);
 
     /*font weights*/
     --font-weight-normal: 300;

@@ -1,0 +1,51 @@
+/**
+ * Type Tokens
+ * Generated from the Figma `typography` collection and its bound text styles.
+ * A text style is a `font` shorthand: weight, size / line height, family.
+ */
+
+:root {
+    /* Font size primitives (hidden in Figma; named by rem × 100) */
+    --font-size-075: 0.75rem;
+    --font-size-0875: 0.875rem;
+    --font-size-100: 1rem;
+    --font-size-125: 1.25rem;
+    --font-size-150: 1.5rem;
+    --font-size-175: 1.75rem;
+    --font-size-200: 2rem;
+
+    /* Line height primitives (hidden in Figma; named by rem × 100) */
+    --line-height-100: 1rem;
+    --line-height-125: 1.25rem;
+    --line-height-150: 1.5rem;
+    --line-height-175: 1.75rem;
+    --line-height-200: 2rem;
+    --line-height-225: 2.25rem;
+
+    /* Families */
+    --type-family-heading: "Lato", sans-serif;
+    --type-family-body: "Merriweather Sans", "Open Sans", sans-serif;
+
+    /* Weights */
+    --type-weight-regular: 400;
+    --type-weight-medium: 500;
+    --type-weight-semibold: 600;
+
+    /* Text styles */
+    --heading-xxlarge: var(--type-weight-semibold) var(--font-size-200) / var(--line-height-225) var(--type-family-heading);
+    --heading-xlarge: var(--type-weight-semibold) var(--font-size-175) / var(--line-height-200) var(--type-family-heading);
+    --heading-large: var(--type-weight-semibold) var(--font-size-150) / var(--line-height-175) var(--type-family-heading);
+    --heading-medium: var(--type-weight-semibold) var(--font-size-125) / var(--line-height-150) var(--type-family-heading);
+    --heading-small: var(--type-weight-semibold) var(--font-size-100) / var(--line-height-125) var(--type-family-heading);
+    --heading-xsmall: var(--type-weight-semibold) var(--font-size-0875) / var(--line-height-125) var(--type-family-heading);
+    --heading-xxsmall: var(--type-weight-semibold) var(--font-size-075) / var(--line-height-100) var(--type-family-heading);
+    --body-large: var(--type-weight-regular) var(--font-size-100) / var(--line-height-150) var(--type-family-body);
+    --body-default: var(--type-weight-regular) var(--font-size-0875) / var(--line-height-125) var(--type-family-body);
+    --body-small: var(--type-weight-regular) var(--font-size-075) / var(--line-height-100) var(--type-family-body);
+    --metric-large: var(--type-weight-semibold) var(--font-size-175) / var(--line-height-200) var(--type-family-heading);
+    --metric-medium: var(--type-weight-semibold) var(--font-size-150) / var(--line-height-175) var(--type-family-heading);
+    --metric-small: var(--type-weight-semibold) var(--font-size-100) / var(--line-height-125) var(--type-family-heading);
+
+    /* Code only (CODE_ONLY_TYPE_STYLES) */
+    --code: var(--type-weight-regular) 0.875em / 1 var(--font-family-code);
+}

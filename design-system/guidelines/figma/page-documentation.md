@@ -82,7 +82,7 @@ Lay the variants out as a grid that matches the labels:
   (`layoutMode` `NONE`) to hold the empty cells.
 
 Inside the set: 20 padding, 20 between rows, 32 between columns. Row labels
-sit 24 left of the set, column labels 12 above it. Labels use Body/Special/Code
+sit 24 left of the set, column labels 12 above it. Labels use Legacy/Body/Special/Code
 in `on-surface-variant`.
 
 ### The 80 px gap
@@ -223,8 +223,8 @@ Bind every value inside the Docs frame to a semantic variable, as
 | Open-state examples | the field and its popup stacked in a vertical auto-layout frame, gap `Element/gap-xs`, placed by auto-layout alone |
 
 Text uses the library's text styles: Title/H4 for the page title, Title/H5 for
-section headings, Body/B2 for prose and table cells (Bold for table headers),
-Body/B3 for the Header's Figma line, Body/Special/Code for code and property
+section headings, Legacy/Body/B2 for prose and table cells (Bold for table headers),
+Legacy/Body/B3 for the Header's Figma line, Legacy/Body/Special/Code for code and property
 names. Color comes from `on-surface` and `on-surface-variant`.
 
 ## Done

@@ -20,6 +20,7 @@ import { tokenDeclarationPattern, varReferencePattern } from '../design-system/s
 import { TOKEN_DIR, tokenSources } from '../design-system/src/lib/tokens-node.mjs';
 import { isEntry } from './lib/findings.mjs';
 import { frameLayerToken, isFrameLayerCollection } from './lib/frame-layer-collections.mjs';
+import { TYPOGRAPHY_COLLECTION, typographyToken } from './lib/typography-collection.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -150,6 +151,7 @@ export function deriveCandidates(collection, name) {
   const out = [];
 
   if (isFrameLayerCollection(collection)) return [`--${frameLayerToken(collection, name)}`];
+  if (collection === TYPOGRAPHY_COLLECTION) return [typographyToken(name)].filter(Boolean);
 
   if (collection.startsWith('colors')) {
     // State layers land as `--color-<base>-state-<NN>` in code. Figma spells the

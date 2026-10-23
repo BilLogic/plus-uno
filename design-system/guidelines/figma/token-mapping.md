@@ -67,6 +67,26 @@ Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity 
 | Body 2 | `var(--font-size-body2)` |
 | Body 3 | `var(--font-size-body3)` |
 | Code | `var(--font-size-code)`, `var(--font-family-code)` |
+| Heading/xxlarge | `var(--heading-xxlarge)` |
+| Heading/xlarge | `var(--heading-xlarge)` |
+| Heading/large | `var(--heading-large)` |
+| Heading/medium | `var(--heading-medium)` |
+| Heading/small | `var(--heading-small)` |
+| Heading/xsmall | `var(--heading-xsmall)` |
+| Heading/xxsmall | `var(--heading-xxsmall)` |
+| Body/large | `var(--body-large)` |
+| Body/default | `var(--body-default)` |
+| Body/small | `var(--body-small)` |
+| Metric/large | `var(--metric-large)` |
+| Metric/medium | `var(--metric-medium)` |
+| Metric/small | `var(--metric-small)` |
+| Family/heading | `var(--type-family-heading)` |
+| Family/body | `var(--type-family-body)` |
+| Weight/regular | `var(--type-weight-regular)` |
+| Weight/medium | `var(--type-weight-medium)` |
+| Weight/semibold | `var(--type-weight-semibold)` |
+
+The `Heading/*`, `Body/*` and `Metric/*` styles are the type scale: each binds its family, size, line height and weight to the `typography` collection, and each CSS token is the matching `font` shorthand (`font: var(--heading-large)`). A button or tab label is `Body/default` with `Weight/medium`. The rows above them are the older styles, which sit under `Legacy/` in Figma where their folder collided (`Legacy/Body/B1/…`), kept until every use moves.
 
 ## Spacing Tokens
 

@@ -5,6 +5,7 @@ import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { compare, refusals } from './token-generation.mjs';
 import { FRAME_LAYER_COLLECTIONS, frameLayerFile, frameLayerFolder, frameLayerToken } from './lib/frame-layer-collections.mjs';
+import { TYPOGRAPHY_FILE, TYPOGRAPHY_FOLDERS, typographyFolder, typographyToken } from './lib/typography-collection.mjs';
 
 /**
  * The Figma exports the SCSS is generated FROM, and where the SCSS lands.
@@ -866,6 +867,142 @@ ${Object.entries(CODE_ONLY_FRAME_LAYERS).map(([token, { value, note }]) => `    
     return scss;
 }
 
+/*
+ * TYPE TOKENS
+ *
+ * The `typography` collection is one collection in four folders: `Font size/*`
+ * and `Line height/*` (hidden from publishing, named by rem × 100),
+ * `Family/*` and `Weight/*`. Beside it in the export are the text styles that
+ * bind every property to one of those variables. Code takes the plain spec
+ * names: `Weight/medium` is `--type-weight-medium`, and `Heading/large` is
+ * `--heading-large`, a `font` shorthand built from the same variables the
+ * style binds, so a family is written once, in its token.
+ */
+
+/** A size in rem, from Figma's px: `12` -> `0.75rem`. */
+const rem = (n) => `${+(Number(n) / 16).toFixed(4)}rem`;
+
+/** How each kind of typography value is written in CSS; families take their fallbacks below. */
+const TYPE_VALUE = { size: rem, weight: String, family: null };
+
+/**
+ * A type variable's CSS name and folder, from `scripts/lib/typography-collection.mjs`.
+ * The name is checked against the variable's own WEB code syntax, so Figma's
+ * Dev Mode and the stylesheet cannot name one token two ways.
+ */
+function typeToken(v) {
+    const folder = typographyFolder(v.name);
+    if (!folder) throw new Error(`${TYPOGRAPHY_FILE}: ${v.name} is none of ${TYPOGRAPHY_FOLDERS.map((f) => `${f.figma}*`).join(', ')}.`);
+    const token = typographyToken(v.name);
+    if (v.codeSyntax?.WEB !== `var(${token})`) {
+        throw new Error(`${TYPOGRAPHY_FILE}: ${v.name} has code syntax ${v.codeSyntax?.WEB}; it is written as var(${token}).`);
+    }
+    return { token, folder };
+}
+
+/**
+ * The faces after the Figma family in each stack. Figma holds one family name;
+ * a stylesheet needs a chain that ends in a CSS generic, UNQUOTED: a quoted
+ * `"sans-serif"` is a family nothing is called, so the chain simply ends
+ * (`check:font-families`). The body stack keeps the Open Sans step
+ * `--font-family-body` already had.
+ */
+const FAMILY_FALLBACKS = {
+    'Family/heading': ['sans-serif'],
+    'Family/body': ['"Open Sans"', 'sans-serif'],
+};
+
+/**
+ * Text styles code has and Figma does not. Code is relative to the text around
+ * it (Atlassian's `font.code`: 0.875em, weight 400, line height 1), which a
+ * Figma text style cannot express, so it is code only.
+ */
+const CODE_ONLY_TYPE_STYLES = {
+    'Code': 'var(--type-weight-regular) 0.875em / 1 var(--font-family-code)',
+};
+
+/** The style groups in the order they are written. */
+const TYPE_STYLE_GROUPS = ['Heading', 'Body', 'Metric'];
+
+/**
+ * Generate type tokens SCSS
+ */
+function generateTypeSCSS() {
+    const { json, modes: [mode] } = readSource(TYPOGRAPHY_FILE, { oneMode: true });
+    if (!Array.isArray(json.textStyles)) {
+        throw new Error(
+            `${TYPOGRAPHY_FILE}: no textStyles. The REST variables endpoint does not return styles; ` +
+            'export the collection with its bound text styles from the plugin.',
+        );
+    }
+    const byId = new Map(json.variables.map((v) => [v.id, v]));
+
+    const declarations = new Map(TYPOGRAPHY_FOLDERS.map((f) => [f, []]));
+    for (const v of json.variables) {
+        const { token, folder } = typeToken(v);
+        const raw = v.valuesByMode[mode];
+        const write = TYPE_VALUE[folder.kind];
+        let value;
+        if (write) {
+            value = write(raw);
+        } else {
+            const fallback = FAMILY_FALLBACKS[v.name];
+            if (!fallback) throw new Error(`${TYPOGRAPHY_FILE}: ${v.name} has no FAMILY_FALLBACKS entry.`);
+            value = [`"${raw}"`, ...fallback].join(', ');
+        }
+        declarations.get(folder).push({ token, value, px: raw });
+    }
+    for (const name of Object.keys(FAMILY_FALLBACKS)) {
+        if (!json.variables.some((v) => v.name === name)) stale('FAMILY_FALLBACKS', `Figma has no ${name}.`);
+    }
+
+    const styles = [];
+    for (const style of json.textStyles) {
+        const group = TYPE_STYLE_GROUPS.indexOf(style.name.split('/')[0]);
+        if (group < 0) throw new Error(`${TYPOGRAPHY_FILE}: ${style.name} is in no TYPE_STYLE_GROUPS group.`);
+        const part = (field) => {
+            const v = byId.get(style.boundVariables?.[field]);
+            if (!v) throw new Error(`${TYPOGRAPHY_FILE}: ${style.name} ${field} is not bound to a type variable.`);
+            return `var(${typeToken(v).token})`;
+        };
+        styles.push({
+            group,
+            token: `--${slug(style.name)}`,
+            value: `${part('fontWeight')} ${part('fontSize')} / ${part('lineHeight')} ${part('fontFamily')}`,
+        });
+    }
+    for (const name of Object.keys(CODE_ONLY_TYPE_STYLES)) {
+        if (json.textStyles.some((s) => s.name === name || s.name.startsWith(`${name}/`))) {
+            stale('CODE_ONLY_TYPE_STYLES', `Figma now has a ${name} style; read it from the export.`);
+        }
+    }
+
+    const block = (items) => items.map(({ token, value }) => `    ${token}: ${value};\n`).join('');
+    const [sizes, lineHeights, families, weights] = TYPOGRAPHY_FOLDERS.map((f) => declarations.get(f));
+    const bySize = (items) => [...items].sort((a, b) => a.px - b.px);
+
+    return `/**
+ * Type Tokens
+ * Generated from the Figma \`typography\` collection and its bound text styles.
+ * A text style is a \`font\` shorthand: weight, size / line height, family.
+ */
+
+:root {
+    /* Font size primitives (hidden in Figma; named by rem × 100) */
+${block(bySize(sizes))}
+    /* Line height primitives (hidden in Figma; named by rem × 100) */
+${block(bySize(lineHeights))}
+    /* Families */
+${block(families)}
+    /* Weights */
+${block(bySize(weights))}
+    /* Text styles */
+${block([...styles].sort((a, b) => a.group - b.group))}
+    /* Code only (CODE_ONLY_TYPE_STYLES) */
+${block(Object.entries(CODE_ONLY_TYPE_STYLES).map(([name, value]) => ({ token: `--${slug(name)}`, value })))}}
+`;
+}
+
 // Generate all files
 //
 // EVERY FILE IS BUILT IN MEMORY FIRST. This used to write each one as it was
@@ -886,6 +1023,7 @@ try {
         { file: '_layout.scss', generated: generateLayoutSCSS() },
         { file: '_scales.scss', generated: generateScalesSCSS() },
         { file: '_frame_layers.scss', generated: generateFrameLayersSCSS() },
+        { file: '_type.scss', generated: generateTypeSCSS() },
     ];
 } catch (error) {
     console.error(`\n❌ Generation failed. ${error.message}\n   Nothing was written.\n`);

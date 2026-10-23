@@ -108,7 +108,10 @@ function transformToExistingFormat(variablesResponse) {
         'colors _ neutral': { variables: [], modes: {} },
         'size _ primitive': { variables: [], modes: {} },
         'size _ semantics': { variables: [], modes: {} },
-        'size _ layout': { variables: [], modes: {} }
+        'size _ layout': { variables: [], modes: {} },
+        // Variables only: `typography.json` also carries the bound text styles,
+        // which this endpoint does not return, so export that one from the plugin.
+        'typography': { variables: [], modes: {} }
     };
     // The frame and layer collections are exported one file each, under the
     // collection's own name. They are matched exactly, before the substring
@@ -140,6 +143,8 @@ function transformToExistingFormat(variablesResponse) {
             targetFile = 'size _ semantics';
         } else if (collectionName.includes('layout') || collectionName.includes('breakpoint')) {
             targetFile = 'size _ layout';
+        } else if (collectionName === 'typography') {
+            targetFile = 'typography';
         }
 
         if (targetFile && organized[targetFile]) {

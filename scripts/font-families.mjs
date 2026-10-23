@@ -67,11 +67,18 @@ export function stack(value) {
     .filter(Boolean);
 }
 
-/** Every `--font-family-*: …` declaration in the token files. */
+/**
+ * The two names a family token goes by: `--type-family-*` is the type token
+ * set generated from Figma's `Type/family-*`, and `--font-family-*` the older
+ * names, most of which alias it.
+ */
+export const FAMILY_PREFIXES = ['--font-family-', '--type-family-'];
+
+/** Every `--font-family-*: …` or `--type-family-*: …` declaration in the token files. */
 export function familyTokens(files) {
   const out = new Map();
   for (const { path: file, text } of files) {
-    for (const m of text.matchAll(tokenDeclarationPattern('--font-family-'))) {
+    for (const m of FAMILY_PREFIXES.flatMap((prefix) => [...text.matchAll(tokenDeclarationPattern(prefix))])) {
       out.set(m[1], { value: m[2].trim(), file, line: text.slice(0, m.index).split('\n').length });
     }
   }
@@ -79,7 +86,7 @@ export function familyTokens(files) {
 }
 
 /**
- * Every `var(--font-family-*, …)` in the corpus. The name is the module's
+ * Every `var(--font-family-*, …)` or `var(--type-family-*, …)` in the corpus. The name is the module's
  * `varReferencePattern`; the fallback is the rest of that `var()` call, so a
  * nested `var()` inside it is one allowance and not a truncated name.
  *
@@ -88,7 +95,7 @@ export function familyTokens(files) {
 export function familyFallbacks(files) {
   const out = [];
   for (const { path: file, text } of files) {
-    for (const m of text.matchAll(varReferencePattern('--font-family-'))) {
+    for (const m of FAMILY_PREFIXES.flatMap((prefix) => [...text.matchAll(varReferencePattern(prefix))])) {
       let i = m.index + m[0].length;
       while (i < text.length && /\s/.test(text[i])) i += 1;
       if (text[i] !== ',') continue;
@@ -165,7 +172,7 @@ export function failures(files) {
   for (const use of familyFallbacks(files)) {
     const where = `${use.file}:${use.line} — var(${use.token}, …)`;
     // An alias to another family token is a fallback that cannot disagree.
-    if (new RegExp(`^${varReferencePattern('--font-family-').source}\\s*\\)?$`).test(use.fallback)) {
+    if (FAMILY_PREFIXES.some((prefix) => new RegExp(`^${varReferencePattern(prefix).source}\\s*\\)?$`).test(use.fallback))) {
       continue;
     }
 
