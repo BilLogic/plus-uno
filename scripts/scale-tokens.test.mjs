@@ -12,10 +12,14 @@
  * - The old tokens still resolve, at their old values, until every use moves.
  */
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import { tokenCorpus } from '../design-system/src/lib/tokens-node.mjs';
 
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const corpus = tokenCorpus();
 
 /** name -> [px, the token it points at, or null for a value of its own] */
@@ -157,6 +161,35 @@ test('there is no 40 Item, and no Width/250', () => {
 test('one-property collections skip the property word', () => {
   for (const name of ['--border-width-default', '--icon-size-md', '--image-size-sm']) {
     assert.equal(corpus.has(name), false, name);
+  }
+});
+
+/*
+ * The Figma side, as the exports record it: what each variable is offered for
+ * in the picker, and whether its collection reaches the published library.
+ * `check:figma-scopes` reads color scopes only, so these are pinned here.
+ */
+const SOURCE = path.join(REPO_ROOT, 'design-system/src/tokens/source');
+const exported = (file) => JSON.parse(fs.readFileSync(path.join(SOURCE, file), 'utf8'));
+
+test('Primitives are hidden and offered for nothing; the other three are published', () => {
+  assert.equal(exported('Primitives.json').hiddenFromPublishing, true);
+  for (const file of ['Element.json', 'Size.json', 'Border.json']) {
+    assert.equal(exported(file).hiddenFromPublishing, false, file);
+  }
+});
+
+test('every scale variable has explicit scopes for its property', () => {
+  const expected = {
+    'Primitives.json': () => [],
+    'Element.json': (name) => (name.startsWith('radius') ? ['CORNER_RADIUS'] : ['GAP']),
+    'Size.json': () => ['WIDTH_HEIGHT'],
+    'Border.json': () => ['STROKE_FLOAT'],
+  };
+  for (const [file, scopes] of Object.entries(expected)) {
+    for (const v of exported(file).variables) {
+      assert.deepEqual(v.scopes, scopes(v.name), `${file} ${v.name}`);
+    }
   }
 });
 

@@ -5,7 +5,7 @@
 
 .session-overview-section {
     display: flex;
-    gap: var(--space-050);
+    gap: var(--size-spacing-small-space-100);
     width: 100%;
     min-width: min-content;
     align-items: flex-start;
@@ -36,10 +36,10 @@
 .donut-chart {
     display: flex;
     flex-direction: column;
-    gap: var(--space-100);
+    gap: var(--size-spacing-medium-space-300);
     background-color: var(--color-surface-container-lowest, white);
     border-radius: 8px;
-    padding: var(--space-150);
+    padding: var(--size-spacing-medium-space-500);
     flex: 1 0 0;
     min-width: 275px;
     max-width: 444px;

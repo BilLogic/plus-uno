@@ -667,11 +667,13 @@ const webName = (syntax) => /^var\((--[a-z0-9-]+)\)$/.exec(syntax ?? '')?.[1] ??
 function generateScalesSCSS() {
     const sources = SCALE_COLLECTIONS.map(({ file, heading }) => ({ file, heading, ...readSource(file, { oneMode: true }) }));
     const nameById = {};
+    const seen = new Set();
     for (const { file, json } of sources) {
         for (const v of json.variables) {
             const name = webName(v.codeSyntax?.WEB);
             if (!name) throw new Error(`${file}: ${v.name} has no WEB code syntax of the form var(--name). Set it in Figma and export again.`);
-            if (Object.values(nameById).includes(name)) throw new Error(`${file}: ${name} is the code syntax of two variables.`);
+            if (seen.has(name)) throw new Error(`${file}: ${name} is the code syntax of two variables.`);
+            seen.add(name);
             nameById[v.id] = name;
         }
     }

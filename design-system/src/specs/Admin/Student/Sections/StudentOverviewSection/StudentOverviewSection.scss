@@ -27,7 +27,7 @@ $color-other: #807878;
 
 .student-overview-section {
     display: flex;
-    gap: var(--space-050);
+    gap: var(--size-spacing-small-space-100);
     width: 100%;
     min-width: min-content;
     align-items: flex-start;
@@ -61,7 +61,7 @@ $color-other: #807878;
     gap: 16px; // Direct flat gaps between Header, Graph, Legend
     background-color: var(--color-surface-container-lowest, white);
     border-radius: 8px;
-    padding: var(--space-150);
+    padding: var(--size-spacing-medium-space-500);
     width: 445px;
     height: auto;
     min-height: 376px;
@@ -262,7 +262,7 @@ $color-other: #807878;
     &__legend {
         display: flex;
         flex-wrap: wrap;
-        gap: var(--space-150);
+        gap: var(--size-spacing-medium-space-500);
         align-items: center;
         margin-top: auto; // Push to bottom if space available
         width: 100%;
@@ -271,7 +271,7 @@ $color-other: #807878;
     &__legend-item {
         display: flex;
         align-items: center;
-        gap: var(--space-025);
+        gap: var(--size-spacing-small-space-050);
 
         span:last-child {
             font-family: 'Merriweather Sans', sans-serif;
@@ -385,7 +385,7 @@ $color-other: #807878;
         }
 
         .stacked-bar-chart__legend {
-            gap: var(--space-050);
+            gap: var(--size-spacing-small-space-100);
             justify-content: center;
         }
     }
@@ -453,7 +453,7 @@ $color-other: #807878;
         }
 
         .stacked-bar-chart__legend {
-            gap: var(--space-050);
+            gap: var(--size-spacing-small-space-100);
             justify-content: center;
         }
     }
