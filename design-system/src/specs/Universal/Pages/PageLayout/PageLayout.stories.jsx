@@ -17,6 +17,9 @@ import React from 'react';
 import PageLayout from './PageLayout';
 import Card from '@/components/layout-and-structure/Card/Card';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { setTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 
 export default {
     title: 'Specs/Universal/Pages/Page Layout',
@@ -78,7 +81,7 @@ export const Overview = {
             <h2 className="h3">Page Title</h2>
             <p className="body2-txt mt-3" style={{ color: 'var(--color-on-surface-variant)' }}>
                 This demonstrates the PageLayout component with TopBar, Sidebar, and content area.
-                The sidebar automatically collapses at breakpoints below 1024px.
+                The sidebar docks from 1024px; below that, hover the menu control to peek it and click to dock it.
             </p>
 
             <div
@@ -99,6 +102,42 @@ export const Overview = {
     ),
     parameters: {
         layout: 'fullscreen',
+    },
+};
+
+/**
+ * The page sits in the SurfaceContainer frame: a 32 topbar the avatar fits in,
+ * the toggle at (8, 8), and the sidebar docked from 1024 and closed below.
+ */
+export const Frame = {
+    ...Overview,
+    play: async ({ canvasElement }) => {
+        const before = { w: window.innerWidth, h: window.innerHeight };
+        const canvas = within(canvasElement);
+        const sidebar = () => canvas.queryByRole('complementary', { name: 'Sidebar' });
+        const check = async (width, docked) => {
+            await setTestViewport(width, 900);
+            const frame = canvasElement.querySelector('.plus-surface-container');
+            const topbar = frame.querySelector('.plus-surface-container__topbar');
+            const toggle = canvas.getByRole('button', { name: /sidebar/i });
+            const pad = tokenLength(frame, '--surface-container-pad');
+            await expect(topbar.getBoundingClientRect().height).toBeCloseTo(tokenLength(frame, '--layout-height-topbar'), 0);
+            await expect(toggle.getBoundingClientRect().left - frame.getBoundingClientRect().left).toBeCloseTo(pad, 0);
+            await expect(toggle.getBoundingClientRect().top - frame.getBoundingClientRect().top).toBeCloseTo(pad, 0);
+            const avatar = frame.querySelector('.plus-user-avatar');
+            await expect(avatar.getBoundingClientRect().height, 'the avatar fits the topbar')
+                .toBeLessThanOrEqual(topbar.getBoundingClientRect().height + 0.5);
+            await waitFor(() => expect(Boolean(sidebar())).toBe(docked));
+            await expect(canvas.getByRole('main')).toBeInTheDocument();
+        };
+        try {
+            await check(1024, true);
+            await check(768, false);
+            await userEvent.click(canvas.getByRole('button', { name: /sidebar/i }));
+            await waitFor(() => expect(sidebar()).toBeInTheDocument());
+        } finally {
+            await setTestViewport(before.w, before.h);
+        }
     },
 };
 
@@ -129,8 +168,8 @@ export const Interactive = {
             <div style={{ padding: '24px' }}>
                 <h1 className="h2">Page Title</h1>
                 <p className="body1-txt mt-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    Use the MD / LG / XL toolbar above to simulate viewport width. The sidebar collapses
-                    below 1024px; open it with the menu control to test the narrow overlay behavior.
+                    Use the MD / LG / XL toolbar above to simulate viewport width. The sidebar docks from
+                    1024px; below that, hover the menu control to peek it over the page and click to dock it.
                 </p>
 
                 <div

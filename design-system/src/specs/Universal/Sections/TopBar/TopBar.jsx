@@ -1,7 +1,10 @@
 /**
  * TopBar Component
- * 
- * Top navigation bar with sidebar control, breadcrumbs, and user avatar.
+ *
+ * The topbar's content: breadcrumbs at the start, the user avatar at the end.
+ * Inside PageLayout it fills the 32 `--layout-height-topbar` row of the
+ * SurfaceContainer frame, which owns the sidebar toggle. Standalone, pass
+ * `onToggle` to draw its own toggle before the breadcrumbs.
  * Figma Spec: node-id=111-227860, 111-227866
  */
 
@@ -11,10 +14,6 @@ import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { UserAvatar } from '../../Elements';
 import Button from '@/components/actions/Button';
 import './TopBar.scss';
-
-/** Collapsed left section width (toggle button only); matches PageLayout motion. */
-const TOPBAR_LEFT_COLLAPSED_WIDTH = 52;
-const TOPBAR_LEFT_EXPANDED_WIDTH = 164; // matches --layout-sidebar-width / SideNav width
 
 const TopBar = ({
     mode = 'expanded',
@@ -31,20 +30,15 @@ const TopBar = ({
         }
     };
 
-    // Numeric width so CSS can transition; aligns with sidebar (164px when expanded).
-    const leftSectionWidth = mode === 'expanded' ? TOPBAR_LEFT_EXPANDED_WIDTH : TOPBAR_LEFT_COLLAPSED_WIDTH;
-
     return (
         <div
             className={`plus-topbar ${className}`}
             style={style}
             {...props}
         >
-            {/* Left: Sidebar Control */}
-            <div
-                className="topbar-left-section"
-                style={{ width: leftSectionWidth }}
-            >
+            {/* Left: Sidebar Control, only when this bar owns the toggle */}
+            {onToggle ? (
+            <div className="topbar-left-section">
                 <Button
                     className="topbar-toggle-btn"
                     style="primary" // Logic handled by class override, but keeping semantically primary
@@ -54,6 +48,7 @@ const TopBar = ({
                     aria-label={mode === 'expanded' ? "Collapse sidebar" : "Expand sidebar"}
                 />
             </div>
+            ) : null}
 
             {/* Center: Breadcrumbs */}
             <div className="topbar-center-section">
@@ -79,7 +74,7 @@ const TopBar = ({
 TopBar.propTypes = {
     /** Current sidebar mode */
     mode: PropTypes.oneOf(['expanded', 'collapsed']),
-    /** Callback when toggle button is clicked, receives new mode */
+    /** Callback when toggle button is clicked, receives new mode. Without it, no toggle is drawn. */
     onToggle: PropTypes.func,
     /** Breadcrumb items array */
     breadcrumbs: PropTypes.arrayOf(PropTypes.shape({

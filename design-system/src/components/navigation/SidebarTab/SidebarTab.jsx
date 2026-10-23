@@ -7,6 +7,9 @@ import './SidebarTab.scss';
  * 
  * Sidebar navigation tab with state-based styling.
  * Per Figma spec: node-id=111-227838
+ *
+ * A 32 row (`--item-height-md`) padded 12 at the sides, with a 16 icon box and
+ * a Body/default 14/20 label, matching the BS4 Foundation `Sidebar Tab`.
  * 
  * Colors per Figma:
  * - enabled: transparent bg, on-surface text, ON-SURFACE-VARIANT icon (#3f484a)
@@ -57,8 +60,7 @@ const SidebarTab = ({
         selected: {
             backgroundColor: 'var(--color-primary-state-16)',
             color: 'var(--color-primary-text)',
-            iconColor: 'var(--color-primary)',
-            fontWeight: 400
+            iconColor: 'var(--color-primary)'
         },
         focus: {
             backgroundColor: 'var(--color-primary-state-12)',
@@ -76,7 +78,7 @@ const SidebarTab = ({
     };
 
     const currentStateStyle = stateStyles[state] || stateStyles.enabled;
-    const { iconColor, fontWeight, ...containerStyles } = currentStateStyle;
+    const { iconColor, ...containerStyles } = currentStateStyle;
 
     return (
         <div
@@ -109,11 +111,11 @@ const SidebarTab = ({
                 display: 'flex',
                 alignItems: 'center',
                 width: '100%',
-                maxWidth: '164px',
+                height: 'var(--item-height-md)',
                 boxSizing: 'border-box',
-                padding: 'var(--size-element-pad-y-lg) var(--size-element-pad-x-lg)',
-                gap: 'var(--size-element-gap-md)',
-                borderRadius: 'var(--size-modal-radius-md)',
+                padding: '0 var(--element-pad-x-md)',
+                gap: 'var(--element-inline-md)',
+                borderRadius: 'var(--element-radius-item-md)',
                 cursor: disabled ? 'not-allowed' : 'pointer',
                 transition: 'background-color 0.15s ease',
                 ...containerStyles,
@@ -126,14 +128,16 @@ const SidebarTab = ({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: '11px',
+                        width: 'var(--icon-md)',
+                        height: 'var(--icon-md)',
                         flexShrink: 0
                     }}
                 >
                     <i
                         className={`fas fa-${icon}`}
+                        aria-hidden="true"
                         style={{
-                            fontSize: '12px',
+                            fontSize: 'var(--icon-md)',
                             color: iconColor
                         }}
                     />
@@ -141,13 +145,12 @@ const SidebarTab = ({
             )}
 
             <span
-                className="body2-txt"
                 style={{
                     flexGrow: 1,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
-                    fontWeight: fontWeight || 300,
+                    font: 'var(--body-default)',
                     textAlign: 'left'
                 }}
             >
@@ -155,8 +158,8 @@ const SidebarTab = ({
             </span>
 
             {trailingVisual && (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <i className="fas fa-icons" style={{ color: 'var(--color-on-surface-variant)', fontSize: '12px' }} />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 'var(--icon-md)', height: 'var(--icon-md)', flexShrink: 0 }}>
+                    <i className="fas fa-icons" aria-hidden="true" style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--icon-md)' }} />
                 </div>
             )}
         </div>

@@ -57,7 +57,7 @@ const Sidebar = ({
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-surface-gap-sm)',
+                gap: 'var(--element-stack-sm)',
                 width: '100%',
                 minWidth: 0,
                 height: '100%',
@@ -90,7 +90,7 @@ const Sidebar = ({
                 <div key={index} className="plus-sidebar-section" style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-element-gap-sm)'
+                    gap: 'var(--element-stack-sm)'
                 }}>
                     <div className="plus-sidebar-section-title" style={{
                         padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md) 0 var(--size-element-pad-x-md)'
