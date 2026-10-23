@@ -7,7 +7,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { createOpenTabsStore, OpenTabsProvider } from '@/patterns/Sidebar';
+import { createOpenTabsStore, OpenTabsProvider } from '@/patterns';
 import StudentAdminPage from './StudentAdminPage';
 import './StudentAdminPage.scss';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';

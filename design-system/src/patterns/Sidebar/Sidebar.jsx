@@ -57,16 +57,17 @@ const PatternSidebar = ({
     });
 
     // A parent opens on its own when one of its tabs is opened or brought to the
-    // front: its newest tab changes, or it has more tabs than it had.
+    // front: a tab newer than any it had, or more tabs than it had. Closing one
+    // is neither, so it leaves a collapsed parent collapsed.
     const seen = useRef({});
     useEffect(() => {
         const opened = [];
         for (const [parentId, tabs] of Object.entries(openTabs || {})) {
-            const newest = tabs?.[0];
-            const mark = newest ? `${newest.id}@${newest.openedAt ?? ''}` : '';
+            const count = tabs?.length ?? 0;
+            const newest = Math.max(0, ...(tabs ?? []).map((tab) => tab.openedAt ?? 0));
             const before = seen.current[parentId];
-            if (before && mark && (before.mark !== mark || tabs.length > before.count)) opened.push(parentId);
-            seen.current[parentId] = { mark, count: tabs?.length ?? 0 };
+            if (before && (newest > before.newest || count > before.count)) opened.push(parentId);
+            seen.current[parentId] = { newest: Math.max(newest, before?.newest ?? 0), count };
         }
         if (opened.length) {
             setCollapsed((prev) => {
@@ -158,21 +159,30 @@ const PatternSidebar = ({
         const expanded = !collapsed.has(item.id);
         const all = showingAll.has(item.id);
         const more = tabs.length - SIDEBAR_RECENT_TABS;
-        const shown = all || more <= 0 ? tabs : tabs.slice(0, SIDEBAR_RECENT_TABS);
+        const recent = all || more <= 0 ? tabs : tabs.slice(0, SIDEBAR_RECENT_TABS);
+        // The selected tab always shows, even when it is older than the five.
+        const selectedTab = tabs.find((tab) => tab.id === activeId);
+        const shown = selectedTab && !recent.includes(selectedTab) ? [...recent, selectedTab] : recent;
+        // A collapsed parent stands in for its selected tab, so something is selected.
+        const parentSelected = activeId === item.id || (!expanded && Boolean(selectedTab));
 
         return (
             <li key={item.id} className="plus-pattern-sidebar__item plus-pattern-sidebar__item--parent">
                 <div className="plus-pattern-sidebar__parent">
                     {row({
+                        state: item.disabled ? 'disabled' : (parentSelected ? 'selected' : 'enabled'),
                         actionsOnHover: (
-                            <Button
+                            <>
+                                {item.actionsOnHover}
+                                <Button
                                 style="default"
                                 fill="ghost"
                                 size="small"
                                 text="Close all"
                                 aria-label={`Close all ${item.text} tabs`}
                                 onClick={() => onTabsCloseAll?.(item)}
-                            />
+                                />
+                            </>
                         ),
                     })}
                     <span className="plus-pattern-sidebar__chevron">
@@ -255,7 +265,7 @@ const itemShape = PropTypes.shape({
     description: PropTypes.node,
     /** A count, badge or status at the end of the row */
     elemAfter: PropTypes.node,
-    /** Controls shown on hover and focus. An item with open tabs shows "Close all" here instead. */
+    /** Controls shown on hover and focus. An item with open tabs adds "Close all" after them. */
     actionsOnHover: PropTypes.node,
     /** Makes the row a link */
     href: PropTypes.string,

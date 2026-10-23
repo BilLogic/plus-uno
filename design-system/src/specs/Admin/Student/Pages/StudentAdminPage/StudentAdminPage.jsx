@@ -9,7 +9,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import ModalManager from '@restart/ui/ModalManager';
 import { PageLayout } from '@/specs/Universal/Pages';
-import { useOpenTabs } from '@/patterns/Sidebar';
+import { useOpenTabs } from '@/patterns';
 import Button from '@/components/actions/Button/Button';
 import Pagination from '@/components/navigation/Pagination/Pagination';
 import StudentsTable from '@/specs/Admin/Student/Tables/StudentsTable/StudentsTable';
@@ -103,6 +103,10 @@ const StudentAdminPage = ({
             setSelectedStudent(student);
             setShowModal(true);
             shownByTab.current = true;
+        } else if (openedId) {
+            // The tab names a student this list does not hold: nothing to show,
+            // so the selection goes back to the parent rather than hang.
+            openTabs.select(openTabParent);
         } else if (shownByTab.current) {
             setShowModal(false);
             shownByTab.current = false;

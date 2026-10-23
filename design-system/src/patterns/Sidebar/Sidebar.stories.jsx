@@ -615,3 +615,26 @@ export const OpenTabExtremes = {
         </div>
     ),
 };
+
+/** Collapsing the parent of the selected tab selects the parent, so the sidebar always shows a selection. */
+export const CollapsedKeepsSelection = {
+    render: () => <OpenTabsHarness storeKey="story:collapsed" seed={[sessionRecord(1, 'Hogwarts · Tue, Sep 9')]} select="sessions:s1" />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('button', { name: /^Sessions$/ })).not.toHaveAttribute('aria-current');
+        await userEvent.click(canvas.getByRole('button', { name: 'Sessions tabs' }));
+        await expect(canvas.getByRole('button', { name: /^Sessions$/ })).toHaveAttribute('aria-current', 'page');
+        await userEvent.click(canvas.getByRole('button', { name: 'Sessions tabs' }));
+        await expect(canvas.getByRole('link', { name: 'Hogwarts · Tue, Sep 9' })).toHaveAttribute('aria-current', 'page');
+    },
+};
+
+/** A selected tab older than the five most recent still shows, after them. */
+export const SelectedPastTheFive = {
+    render: () => <OpenTabsHarness storeKey="story:selected-old" seed={manySessions(7)} select="sessions:s1" />,
+    play: async ({ canvasElement }) => {
+        await expect(tabTitles(canvasElement)).toEqual(['Session 7', 'Session 6', 'Session 5', 'Session 4', 'Session 3', 'Session 1']);
+        await expect(within(canvasElement).getByRole('link', { name: 'Session 1' })).toHaveAttribute('aria-current', 'page');
+        await expect(within(canvasElement).getByRole('button', { name: 'Show 2 more' })).toBeInTheDocument();
+    },
+};

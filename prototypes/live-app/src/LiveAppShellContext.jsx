@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { PageLayoutShellProvider } from '@/specs/Universal/Pages/PageLayout/PageLayoutShellContext';
-import { clearOpenTabs } from '@/patterns/Sidebar';
+import { clearOpenTabs, getOpenTabsStore } from '@/patterns';
 
 /** The sign-in page. Reaching it means the person is signed out. */
 export const SIGN_IN_ROUTE = '/login';
@@ -61,6 +61,16 @@ export function LiveAppShellProvider({ children }) {
   // action, so arriving at sign-in is where they are cleared.
   useEffect(() => {
     if (location.pathname.startsWith(SIGN_IN_ROUTE)) clearOpenTabs();
+  }, [location.pathname]);
+
+  // A selected tab is the record on screen. Arriving anywhere other than its
+  // route (the replica nav, Back) hands the selection back to its parent, so a
+  // stale tab never stays highlighted or reopens its record later.
+  useEffect(() => {
+    const store = getOpenTabsStore();
+    const { tabs, selectedId } = store.getSnapshot();
+    const selected = tabs.find((tab) => tab.id === selectedId);
+    if (selected?.href && selected.href !== location.pathname) store.select(selected.parentId);
   }, [location.pathname]);
 
   const value = useMemo(

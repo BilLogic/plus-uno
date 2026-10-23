@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import Button from '@/components/actions/Button/Button';
 import { PageLayout } from '@/specs/Universal/Pages';
-import { createOpenTabsStore, OpenTabsProvider, useOpenTabs } from '@/patterns/Sidebar';
+import { createOpenTabsStore, OpenTabsProvider, useOpenTabs } from '@/patterns';
 import { SessionInfo_PostSignUp } from '../Modals/SessionDetailsAllUser/SessionDetails.stories';
 import { StatCard } from '../Cards/OverviewCard.stories';
 import { AllSessionsTableRow, AllSessionsTableHeaderRow } from '../Tables/AllSessionsTable.stories';
@@ -48,12 +48,19 @@ const useSessionTabs = (sessions) => {
 /** The opened session's details: the existing Session Details mock, over the page. */
 const OpenedSessionDetails = ({ shownId, onClose }) => {
     const dialog = useRef(null);
+    // Focus moves into the details and returns to whatever opened them (the
+    // row's Details button, or the sidebar tab) when they close. The mock is
+    // not a modal dialog, so it does not claim to be one: no aria-modal.
     useEffect(() => {
         if (!shownId) return undefined;
+        const opener = document.activeElement;
         dialog.current?.focus();
         const onKey = (event) => { if (event.key === 'Escape') onClose(); };
         document.addEventListener('keydown', onKey);
-        return () => document.removeEventListener('keydown', onKey);
+        return () => {
+            document.removeEventListener('keydown', onKey);
+            if (opener?.isConnected) opener.focus();
+        };
     }, [shownId, onClose]);
     if (!shownId) return null;
     return (
@@ -62,7 +69,6 @@ const OpenedSessionDetails = ({ shownId, onClose }) => {
                 <div
                     ref={dialog}
                     role="dialog"
-                    aria-modal="true"
                     aria-label="Session details"
                     tabIndex={-1}
                     onClick={(event) => event.stopPropagation()}
