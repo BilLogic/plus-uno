@@ -14,7 +14,7 @@
     height: 100%;
     min-height: 0;
     box-sizing: border-box;
-    // Pad 8 top, right and bottom and 0 on the left: the topbar pads its own
+    // Pad 8 top, right and bottom and 0 on the left: the Topbar pads its own
     // left, so the toggle sits at (8, 8) whatever the sidebar is doing.
     padding: var(--surface-container-pad) var(--surface-container-pad) var(--surface-container-pad) var(--space-0);
     background-color: var(--surface-sunken);
@@ -26,47 +26,18 @@
 .plus-surface-container__topbar {
     display: flex;
     align-items: center;
-    gap: var(--element-inline-md);
     flex-shrink: 0;
-    height: var(--layout-height-topbar);
-    padding-left: var(--surface-container-pad);
-    box-sizing: border-box;
-}
-
-.plus-surface-container__topbar-content {
-    display: flex;
-    align-items: center;
-    flex: 1 1 auto;
     min-width: 0;
-    height: 100%;
+    height: var(--layout-height-topbar);
 }
 
-.plus-surface-container__toggle {
-    // Above a floating sidebar, so it never moves and stays pressable.
+// The Topbar's start, which holds the toggle, stays above a floating sidebar,
+// so the toggle never moves and stays pressable. The layer goes on the start
+// area, not the button: a page-reveal transform on the start makes it a
+// stacking context, and a z-index inside one would not reach the sidebar.
+.plus-surface-container__topbar .plus-topbar__start {
     position: relative;
     z-index: calc(var(--layout-z-index-navigation) + 1);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    width: var(--item-height-md);
-    height: var(--item-height-md);
-    padding: 0;
-    border: 0;
-    border-radius: var(--element-radius-item-md);
-    background-color: transparent;
-    color: var(--color-on-surface-variant);
-    font-size: var(--icon-md);
-    cursor: pointer;
-
-    &:hover {
-        background-color: var(--color-on-surface-state-08);
-    }
-
-    &:focus-visible {
-        outline: 2px solid var(--color-focus-ring);
-        outline-offset: -2px;
-    }
 }
 
 /* ------------------------------------------------------------- row */

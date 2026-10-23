@@ -7,6 +7,7 @@ import { popupLayerOf, useAnchoredPopup } from '../_internal/anchorPlacement';
 import { formatDisplay, formatIso, outOfBounds, parseDate, parseTyped } from '../_internal/dates';
 import '../_internal/Listbox.scss';
 import './DatePicker.scss';
+import { useDeprecatedFieldSize } from '../../../lib/useDeprecatedLargeSize';
 
 /** Joins a range's two ends in the field: "10/19/2026 – 10/23/2026". */
 const RANGE_JOIN = ' – ';
@@ -82,6 +83,7 @@ const DatePicker = ({
     style,
     ...props
 }) => {
+    useDeprecatedFieldSize('DatePicker', size);
     const autoId = useId();
     const fieldId = id || name || `plus-date-picker-${autoId.replace(/:/g, '')}`;
     const popupId = `${fieldId}-calendar`;
@@ -270,7 +272,7 @@ const DatePicker = ({
                         rangeEnd={rangeEnd}
                         minDate={minDate}
                         maxDate={maxDate}
-                        size={size}
+                        size="medium"
                         onPick={pick}
                     />
                 </div>,

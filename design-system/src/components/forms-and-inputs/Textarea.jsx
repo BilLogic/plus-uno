@@ -4,6 +4,7 @@ import Button from '../actions/Button/Button';
 import useFieldId from './useFieldId';
 import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
 import useInlineEdit from './_internal/useInlineEdit';
+import { useDeprecatedFieldSize } from '../../lib/useDeprecatedLargeSize';
 
 /** Older `state` names, kept for existing call sites. */
 const LEGACY_STATE = {
@@ -19,7 +20,7 @@ const LEGACY_STATE = {
 /**
  * Textarea — free text over several lines, on `_Field`.
  *
- * `rows` sets the height; a one-line textarea is `rows={1}`. With
+ * The field is 80 high at least, and `rows` grows it from there. With
  * `maxLength`, the caption counts characters on the right. With `subtle`, it
  * reads as plain text until hovered or edited, shows Save and Cancel while
  * editing, and stays open when it loses focus.
@@ -54,6 +55,7 @@ const Textarea = ({
     style,
     ...props
 }) => {
+    useDeprecatedFieldSize('Textarea', size);
     /** One id for the label and the control — see `useFieldId`. */
     const fieldId = useFieldId(id);
     const legacy = LEGACY_STATE[state];

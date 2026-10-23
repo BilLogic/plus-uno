@@ -16,7 +16,7 @@ authored half (#166), counted rather than assumed.
 | [Sidebar](Sidebar/index.md) | 10 | ✕ | ✕ | ✕ |
 | [StaticBadgeSmart](StaticBadgeSmart/index.md) | 4 | ✕ | ✕ | ✕ |
 | [Table](Table/index.md) | 9 | ✕ | ✕ | ✕ |
-| [UserAvatar](UserAvatar/index.md) | 9 | ✕ | ✕ | ✕ |
+| [UserAvatar](UserAvatar/index.md) | 10 | ✕ | ✕ | ✕ |
 
 **Authored coverage:** When to use 0/10 (0%) · Correct/incorrect 0/10 (0%) · Accessibility 0/10 (0%)
 

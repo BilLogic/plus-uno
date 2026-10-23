@@ -4,6 +4,8 @@
 
 export { default as Surface, SURFACE_LEVELS } from './Surface';
 export { default as SurfaceContainer } from './SurfaceContainer';
+export { useSidebarControl } from './SurfaceContainer/SidebarControl';
+export { default as Topbar } from './Topbar';
 export { default as PatternSidebar } from './Sidebar';
 export { default as PatternCard } from './PatternCard';
 export { default as PatternSection } from './PatternSection';
