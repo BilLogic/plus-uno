@@ -3,7 +3,7 @@
 
 # UserAvatar
 
-The signed-in user: an initial pill, the name, the role indicator ("Lead") and an optional notification counter. Per the Specs User Avatar (111-227876). - `size="md"` is 32 high (`--item-height-md`), for the 32 topbar. The name truncates at `--label-max-width`. - `size="lg"` is the original, padded `--size-element-pad-y-md` around a 32 pill, for table rows.
+The signed-in user: an initial pill, the name, the role indicator ("Lead") and an optional notification counter. Per the Specs User Avatar (111-227876). - `size="md"` is 32 high (`--item-height-md`), for the 32 topbar. The name truncates at `--label-max-width`. - `size="lg"` pads `--size-element-pad-y-md` around a 32 pill, for table rows.
 
 **Import:** `import { UserAvatar } from '@/components';`
 
@@ -36,7 +36,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--color-danger-state-08` · `--color-danger-text` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-primary-state-08` · `--color-primary-text` · `--color-surface-container-lowest` · `--element-inline-md` · `--element-pad-x-sm` · `--element-radius-full` · `--element-radius-item-md` · `--image-md` · `--image-sm` · `--item-height-md` · `--label-max-width` · `--size-element-gap-md` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-md` · `--size-element-radius-md` · `--space-150`
+`--body-default` · `--body-small` · `--color-danger-state-08` · `--color-danger-text` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-primary-state-08` · `--color-primary-text` · `--color-surface-container-lowest` · `--element-inline-md` · `--element-pad-x-sm` · `--element-radius-full` · `--element-radius-item-md` · `--image-md` · `--image-sm` · `--item-height-md` · `--label-height-md` · `--label-max-width` · `--size-element-gap-md` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-md` · `--size-element-radius-md`
 
 From `design-system/src/components/_internal/UserAvatar/UserAvatar.scss`. Override these through the token layer, never with a literal.
 

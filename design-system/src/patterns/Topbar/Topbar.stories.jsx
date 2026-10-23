@@ -263,5 +263,38 @@ export const InSurfaceContainer = {
         await expectIcon(toggle, 'angles-left');
         await expect(toggle).toHaveAttribute('aria-expanded', 'true');
         await expect(rect(breadcrumb()).left, 'floating: the breadcrumb stays beside the toggle').toBeCloseTo(left, 0);
+        // A press docks a peeked sidebar, so the name says "Open".
+        await expect(toggle).toHaveAccessibleName('Open sidebar');
+        // The toggle stays above the floating sidebar and can still be pressed.
+        const t = rect(toggle);
+        const hit = document.elementFromPoint(t.left + t.width / 2, t.top + t.height / 2);
+        await expect(toggle.contains(hit), 'the floating sidebar does not cover the toggle').toBe(true);
+    }),
+};
+
+/**
+ * A page's entrance animation can leave a transform on the topbar's start
+ * area (the home-redesign prototype's reveal does), which makes it a stacking
+ * context. A peeked sidebar must still sit under the toggle.
+ */
+export const InSurfaceContainerWithTransformedStart = {
+    parameters: { layout: 'fullscreen' },
+    render: (args) => (
+        <div className="topbar-story-transformed-start" style={{ height: '100vh' }}>
+            <style>{'.topbar-story-transformed-start .plus-topbar__start { transform: translateY(0); }'}</style>
+            <SurfaceContainer
+                topbar={<Topbar breadcrumbs={args.breadcrumbs} user={args.user} />}
+                sidebar={<Sidebar user="tutor" activeTabId="home" />}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => withTestViewport(768, 800, async () => {
+        const canvas = within(canvasElement);
+        const toggle = canvas.getByRole('button', { name: /sidebar$/i });
+        await userEvent.hover(toggle);
+        await waitFor(() => expect(canvas.queryByRole('complementary', { name: 'Sidebar' })).not.toBeNull());
+        const t = rect(toggle);
+        const hit = document.elementFromPoint(t.left + t.width / 2, t.top + t.height / 2);
+        await expect(toggle.contains(hit), 'the floating sidebar does not cover the toggle').toBe(true);
     }),
 };

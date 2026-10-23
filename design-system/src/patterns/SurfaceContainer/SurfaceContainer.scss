@@ -31,9 +31,11 @@
     height: var(--layout-height-topbar);
 }
 
-// The Topbar's toggle stays above a floating sidebar, so it never moves and
-// stays pressable.
-.plus-surface-container__topbar .plus-topbar__toggle {
+// The Topbar's start, which holds the toggle, stays above a floating sidebar,
+// so the toggle never moves and stays pressable. The layer goes on the start
+// area, not the button: a page-reveal transform on the start makes it a
+// stacking context, and a z-index inside one would not reach the sidebar.
+.plus-surface-container__topbar .plus-topbar__start {
     position: relative;
     z-index: calc(var(--layout-z-index-navigation) + 1);
 }

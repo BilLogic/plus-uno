@@ -68,7 +68,7 @@ const Topbar = ({
 
             <div className="plus-topbar__middle">
                 {loading ? (
-                    <Skeleton shape="text" width="var(--width-1000)" />
+                    <Skeleton shape="text" width="var(--label-max-width)" />
                 ) : (
                     <Breadcrumb items={breadcrumbs} />
                 )}
