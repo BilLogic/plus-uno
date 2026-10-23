@@ -11,7 +11,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Skeleton } from '@/components';
 import { SurfaceContainer } from '@/patterns';
 import { TopBar, Sidebar } from '../../Sections';
 import { usePageLayoutShell } from './PageLayoutShellContext';
@@ -107,25 +106,17 @@ const PageLayout = ({
 
     const reveal = `shell-reveal${shellEntered ? ' has-entered' : ''}`;
 
-    // The topbar row is the frame's; this is what sits in it after the toggle.
-    const topbar = shellLoading ? (
-        <div
-            className="plus-topbar-skeleton"
-            aria-hidden="true"
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 'var(--element-inline-md)',
-                width: '100%',
-            }}
-        >
-            <Skeleton shape="text" width="var(--width-1000)" />
-            <Skeleton shape="circle" width="var(--item-height-md)" />
-        </div>
-    ) : (
-        <div className={reveal} style={{ display: 'flex', width: '100%', height: '100%' }}>
-            <TopBar breadcrumbs={topBarConfig.breadcrumbs} user={topBarConfig.user} />
+    // The topbar row is the frame's; the TopBar draws the sidebar toggle from the
+    // frame's state, so there is one toggle. Loading keeps it and shows skeletons.
+    const topbar = (
+        <div className={shellLoading ? undefined : reveal} style={{ display: 'flex', flex: '1 1 auto', minWidth: 0, height: '100%' }}>
+            <TopBar
+                breadcrumbs={topBarConfig.breadcrumbs}
+                user={topBarConfig.user}
+                onHelpClick={topBarConfig.onHelpClick}
+                helpHref={topBarConfig.helpHref}
+                loading={shellLoading}
+            />
         </div>
     );
 

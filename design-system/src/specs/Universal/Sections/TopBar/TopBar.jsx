@@ -1,75 +1,43 @@
 /**
  * TopBar Component
  *
- * The topbar's content: breadcrumbs at the start, the user avatar at the end.
- * Inside PageLayout it fills the 32 `--layout-height-topbar` row of the
- * SurfaceContainer frame, which owns the sidebar toggle. Standalone, pass
- * `onToggle` to draw its own toggle before the breadcrumbs.
+ * The Specs Top Bar on the foundation Topbar pattern (`@/patterns`): the
+ * sidebar toggle, the breadcrumb, Help Center and the user avatar, 32 high.
+ * This keeps the Specs prop names (`mode`, `onToggle`) and maps them onto the
+ * pattern. Inside PageLayout the SurfaceContainer owns the sidebar state and
+ * the toggle follows it; standalone, pass `onToggle` to draw the toggle.
  * Figma Spec: node-id=111-227860, 111-227866
  */
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import Breadcrumb from '@/components/navigation/Breadcrumb';
-import { UserAvatar } from '../../Elements';
-import Button from '@/components/actions/Button';
-import './TopBar.scss';
+import { Topbar } from '@/patterns';
 
 const TopBar = ({
     mode = 'expanded',
     onToggle,
     breadcrumbs = [{ text: 'Home', href: '#' }, { text: 'Page' }],
     user = null,
+    onHelpClick,
+    helpHref,
+    loading = false,
     className = '',
     style,
-    ...props
-}) => {
-    const handleToggle = () => {
-        if (onToggle) {
-            onToggle(mode === 'expanded' ? 'collapsed' : 'expanded');
-        }
-    };
-
-    return (
-        <div
-            className={`plus-topbar ${className}`}
-            style={style}
-            {...props}
-        >
-            {/* Left: Sidebar Control, only when this bar owns the toggle */}
-            {onToggle ? (
-            <div className="topbar-left-section">
-                <Button
-                    className="topbar-toggle-btn"
-                    style="primary" // Logic handled by class override, but keeping semantically primary
-                    fill="tonal"    // Logic handled by class override
-                    leadingVisual={<i className={`fas fa-${mode === 'expanded' ? 'angles-left' : 'bars'}`} />}
-                    onClick={handleToggle}
-                    aria-label={mode === 'expanded' ? "Collapse sidebar" : "Expand sidebar"}
-                />
-            </div>
-            ) : null}
-
-            {/* Center: Breadcrumbs */}
-            <div className="topbar-center-section">
-                <Breadcrumb items={breadcrumbs} />
-            </div>
-
-            {/* Right: User Avatar & Notification */}
-            <div className="topbar-right-section">
-                {user && (
-                    <UserAvatar
-                        firstChar={user.name?.charAt(0) || 'U'}
-                        name={user.name || 'User'}
-                        counter={user.counter}
-                        counterValue={user.counterValue}
-                        type={user.type}
-                    />
-                )}
-            </div>
-        </div>
-    );
-};
+    id,
+}) => (
+    <Topbar
+        id={id}
+        className={className}
+        style={style}
+        sidebar={mode === 'expanded' ? 'open' : 'closed'}
+        onToggle={onToggle ? () => onToggle(mode === 'expanded' ? 'collapsed' : 'expanded') : undefined}
+        breadcrumbs={breadcrumbs}
+        user={user}
+        onHelpClick={onHelpClick}
+        helpHref={helpHref}
+        loading={loading}
+    />
+);
 
 TopBar.propTypes = {
     /** Current sidebar mode */
@@ -88,8 +56,15 @@ TopBar.propTypes = {
         counterValue: PropTypes.number,
         type: PropTypes.oneOf(['regular tutor', 'lead tutor', 'admin'])
     }),
+    /** Called when Help Center is pressed */
+    onHelpClick: PropTypes.func,
+    /** Help Center link; opens in a new tab */
+    helpHref: PropTypes.string,
+    /** Skeletons in place of the breadcrumb and the account; the toggle stays */
+    loading: PropTypes.bool,
     className: PropTypes.string,
-    style: PropTypes.object
+    style: PropTypes.object,
+    id: PropTypes.string,
 };
 
 export default TopBar;

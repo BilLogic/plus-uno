@@ -1,7 +1,8 @@
 /**
  * TopBar - Universal Section
  * 
- * Top navigation bar with sidebar control, breadcrumbs, and user avatar.
+ * Top navigation bar with sidebar control, breadcrumbs, Help Center and user
+ * avatar, on the foundation Topbar pattern.
  * Figma Spec: node-id=111-227860, 111-227866
  */
 
@@ -15,10 +16,10 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: `Top navigation bar composed of:
-- **Button** (ghost) for sidebar control - click to toggle mode
-- **Breadcrumb** for navigation
-- **UserAvatar** for user info`
+                component: `The Specs Top Bar on the foundation Topbar pattern (Foundations/Patterns/Topbar), 32 high:
+- **Button** (primary tonal) for sidebar control: \`angles-left\` while expanded, \`bars\` while collapsed
+- **Breadcrumb** for navigation, truncating on one line
+- **Help Center** (secondary text button) and **UserAvatar** at 32`
             }
         }
     }
@@ -48,7 +49,7 @@ export const Overview = {
                                 { text: 'Home', href: '#' },
                                 { text: 'Dashboard' }
                             ]}
-                            user={{ name: 'John Doe', counter: true, counterValue: 2 }}
+                            user={{ name: 'John Doe', type: 'lead tutor' }}
                         />
                     </div>
                     <p className="body3-txt mt-2" style={{ color: 'var(--color-on-surface-variant)' }}>
