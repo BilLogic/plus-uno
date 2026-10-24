@@ -140,7 +140,8 @@ export function notedCardBlocks(card: PostedCard, note: string, button: "Review"
 export interface CardMessage {
   text: string;
   blocks: unknown[];
-  /** A decision report's tag, sent again with its redraw. */
+  /** The Worker's own tag: a decision report's, sent again with its redraw,
+   *  or a status post's (`status-tag.ts`). */
   metadata?: { event_type: string; event_payload: Record<string, unknown> };
 }
 

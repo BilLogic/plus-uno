@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { HeadingLevelContext } from '@/lib/headingLevel';
 import './PatternModal.scss';
 
 /**
@@ -10,6 +11,9 @@ import './PatternModal.scss';
  * modal radius/padding/gap tokens.
  * Mirrors the "Modal" slot component in the Figma design system file.
  * For a real overlay dialog (backdrop, focus trap), use the core Modal component.
+ *
+ * A dialog is its own page: the title is its h1, at Heading/medium 20, and a
+ * section inside it opens at h2.
  */
 const PatternModal = ({
     id,
@@ -62,7 +66,7 @@ const PatternModal = ({
             {...props}
         >
             <div className="plus-pattern-modal-header">
-                {title && <h2 id={titleId} className="plus-pattern-modal-title h5">{title}</h2>}
+                {title && <h1 id={titleId} className="plus-pattern-modal-title">{title}</h1>}
                 {onClose && (
                     <button
                         type="button"
@@ -74,7 +78,9 @@ const PatternModal = ({
                     </button>
                 )}
             </div>
-            <div className="plus-pattern-modal-body" tabIndex={bodyScrolls ? 0 : undefined}>{children}</div>
+            <HeadingLevelContext.Provider value={1}>
+                <div className="plus-pattern-modal-body" tabIndex={bodyScrolls ? 0 : undefined}>{children}</div>
+            </HeadingLevelContext.Provider>
             {footer && <div className="plus-pattern-modal-footer">{footer}</div>}
         </div>
     );
@@ -82,7 +88,7 @@ const PatternModal = ({
 
 PatternModal.propTypes = {
     id: PropTypes.string,
-    /** Modal title in the header row */
+    /** Modal title in the header row: the dialog's h1, at Heading/medium 20, and its name */
     title: PropTypes.node,
     /** Close handler — renders the close button when provided */
     onClose: PropTypes.func,

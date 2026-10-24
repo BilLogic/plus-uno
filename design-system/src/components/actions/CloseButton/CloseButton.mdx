@@ -21,7 +21,7 @@ export const figmaMeta = {
 <Meta of={CloseButtonStories} />
 
 <Title />
-The one dismiss control for surfaces that close as a whole: a fixed 24×24 hit area with a 16px ×.
+The one dismiss control for surfaces that close as a whole: a fixed 32×32 hit area with a 16px ×.
 
 <DocsTabs of={CloseButtonStories}>
 
@@ -40,7 +40,7 @@ The one dismiss control for surfaces that close as a whole: a fixed 24×24 hit a
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>A 24×24 box with a 16px × in <code>on-surface-variant</code>.</>}>
+<DocsCanvasShell attachSourceBelow description={<>A 32×32 box with a 16px × in <code>on-surface-variant</code>.</>}>
     <Canvas of={CloseButtonStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -93,8 +93,8 @@ The one dismiss control for surfaces that close as a whole: a fixed 24×24 hit a
 ## When to use
 
 Use `CloseButton` to close a surface as a whole — an `Alert`, a `Toast`, a
-`Modal`. It is a fixed 24×24 box with a 16px ×, the WCAG 2.2 minimum target
-size, and it keeps that size whatever text sits beside it. Where it sits on a
+`Modal`. It is a fixed 32×32 box with a 16px ×, the control height and above the
+WCAG 2.2 minimum target size, and it keeps that size whatever text sits beside it. Where it sits on a
 line of text is the parent's job: `Alert` centers it on its first line, and
 `Toast` places it at the end of its header.
 
@@ -131,7 +131,7 @@ available, and the × is neutral on every intent.
 
 ```jsx
 // Incorrect — a typography class on the button does nothing to the ×, and
-// wrapping it in one does not either; the box is fixed at 24×24.
+// wrapping it in one does not either; the box is fixed at 32×32.
 <CloseButton className="h4" onClick={close} />
 
 // Correct — place it, and let the parent align it to the line it belongs to.

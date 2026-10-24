@@ -19,18 +19,8 @@
     overflow: hidden;
     box-sizing: border-box;
 
-    &.plus-rich-text-editor-small {
-        --rte-content-pad-x: var(--size-element-pad-x-sm);
-        --rte-content-pad-y: var(--size-element-pad-y-sm);
-    }
-
-    &.plus-rich-text-editor-large {
-        --rte-toolbar-height: calc(
-            var(--size-spacing-medium-space-300) + var(--size-spacing-medium-space-400)
-        );
-        --rte-content-pad-x: var(--size-section-pad-x-md);
-        --rte-content-pad-y: var(--size-section-pad-y-md);
-    }
+    // `small` and `large` are deprecated and draw like `medium`; their classes
+    // stay so call sites that target them keep matching.
 
     &.plus-rich-text-editor--full {
         max-width: none;
@@ -67,10 +57,7 @@
     box-shadow: none;
     cursor: pointer;
     color: var(--color-on-surface);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-body3);
-    font-weight: var(--font-weight-normal);
-    line-height: var(--font-line-height-body3);
+    font: var(--body-small);
     border-radius: var(--size-element-radius-md);
 
     &:hover:not(:disabled) {
@@ -199,17 +186,17 @@
 }
 
 .plus-rich-text-editor-content {
+    font: var(--body-default);
     flex: 1 1 auto;
-    min-height: calc(
-        var(--size-spacing-large-space-900) + var(--size-spacing-large-space-600)
-    );
+    // 120 at least, growing with what is typed.
+    min-height: var(--field-min-height-lg);
     padding: var(--rte-content-pad-y) var(--rte-content-pad-x);
     outline: none;
     color: var(--color-on-surface);
     background-color: var(--color-surface);
     box-sizing: border-box;
     border: var(--size-border-stroke-stroke-150) solid var(--color-outline-variant);
-    font-weight: var(--font-weight-normal);
+    font-weight: var(--type-weight-regular);
 
     &:focus {
         outline: none;
@@ -223,7 +210,7 @@
     text-align: center;
     color: var(--color-on-surface-variant);
     pointer-events: none;
-    font-weight: var(--font-weight-normal);
+    font-weight: var(--type-weight-regular);
 }
 
 .plus-rich-text-editor-readonly .plus-rich-text-editor-content,
@@ -231,4 +218,10 @@
     background-color: var(--color-surface-container-low);
     color: var(--color-on-surface-variant);
     cursor: default;
+}
+
+/* The field's label, and the block menu's options: Body/default 14/20. */
+.plus-rich-text-editor-label,
+.plus-rich-text-editor-block-option {
+    font: var(--body-default);
 }

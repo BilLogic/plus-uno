@@ -52,7 +52,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface-variant` · `--layout-control-checkbox`
+`--color-on-surface-variant` · `--element-pad-x-md` · `--element-pad-x-xs` · `--item-height-sm` · `--layout-control-checkbox`
 
 From `design-system/src/components/forms-and-inputs/InputGroup/InputGroup.scss`. Override these through the token layer, never with a literal.
 

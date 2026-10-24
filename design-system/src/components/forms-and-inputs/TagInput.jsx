@@ -8,6 +8,7 @@ import useFieldId from './useFieldId';
 import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
 import Listbox, { ListboxMessage } from './_internal/Listbox';
 import './TagInput.scss';
+import { useDeprecatedFieldSize } from '../../lib/useDeprecatedLargeSize';
 
 /**
  * The status names the chips used to take, kept as deprecated aliases for the
@@ -140,6 +141,7 @@ const TagInput = ({
     style,
     ...props
 }) => {
+    useDeprecatedFieldSize('TagInput', size);
     const [internalTags, setInternalTags] = useState(defaultTags);
     const isControlled = Array.isArray(tags);
     const currentTags = isControlled ? tags : internalTags;
@@ -698,6 +700,7 @@ const TagInput = ({
             >
                 <Field
                     size={size}
+                    grow
                     disabled={disabled}
                     readOnly={readOnly}
                     {...toneProps(tone).field}

@@ -71,7 +71,7 @@ const Alert = ({
     // strut in that line's text style gives each column exactly one line of
     // height; the icon stays a 20px square (the column's width) and the button
     // 24×24 whatever the text size.
-    const firstLineClass = title ? 'h4' : 'body2-txt';
+    const firstLineClass = title ? 'plus-alert-strut--title' : 'plus-alert-strut--text';
     const strut = <span className={`plus-alert-strut ${firstLineClass}`} aria-hidden="true">{'\u200B'}</span>;
 
     // `true` (the default) is the style's own icon; a string is a Font Awesome
@@ -98,8 +98,8 @@ const Alert = ({
             )}
 
             <div className="plus-alert-content">
-                {title && <RBAlert.Heading className="plus-alert-title h4">{title}</RBAlert.Heading>}
-                <div className="plus-alert-text body2-txt">{children}</div>
+                {title && <RBAlert.Heading className="plus-alert-title">{title}</RBAlert.Heading>}
+                <div className="plus-alert-text">{children}</div>
             </div>
 
             {canDismiss && (

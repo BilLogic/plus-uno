@@ -112,62 +112,59 @@
     }
 
 
-    // --- SIZES CONFIGURATION ---
-    // Map: Size Name -> (Pad-Y, Pad-X, Radius, Gap, Icon-Size)
+    // --- SIZES ---
+    // Two heights: `medium` 32 and `small` 24 compact. `large` is deprecated and
+    // draws like `medium` (Button.jsx warns in development); its class stays so
+    // call sites that target `.plus-btn--large` keep matching.
+    //
+    // The height is set, not summed from padding: the 1px border every fill
+    // draws would otherwise make 2 + 20 + 2 a 26. Content centers in it.
+    // Map: Size Name -> (Height, Pad-X, Radius, Gap)
     $btn-sizes: (
-        'small': ('--size-element-pad-y-sm',
-            '--size-element-pad-x-sm',
-            '--size-element-radius-sm',
-            '--size-element-gap-sm',
-            '--font-size-fa-body3-solid' // 10px
-        ),
-        'medium': ('--size-element-pad-y-md',
-            '--size-element-pad-x-md',
-            '--size-element-radius-md',
-            '--size-element-gap-md', // Corrected to 10px (gap-md) per Figma
-            '--font-size-fa-h6-solid' // 14px
-        ),
-        'large': ('--size-element-pad-y-lg',
-            '--size-element-pad-x-lg',
-            '--size-element-radius-md',
-            '--size-element-gap-md',
-            '--font-size-fa-h3-solid' // 24px
-        )
+        'small': ('--item-height-sm', '--element-pad-x-sm', '--size-element-radius-sm', '--element-inline-sm'),
+        'medium': ('--item-height-md', '--element-pad-x-md', '--size-element-radius-md', '--element-inline-md'),
+        'large': ('--item-height-md', '--element-pad-x-md', '--size-element-radius-md', '--element-inline-md')
     );
 
 @each $size, $config in $btn-sizes {
     // RBButton adds `.btn` — include it so padding always wins over Bootstrap’s `.btn` rule.
     &.plus-btn--#{$size}.btn {
-        // Unquote variable names for var()
-        padding: var(string.unquote(list.nth($config, 1))) var(string.unquote(list.nth($config, 2)));
+        box-sizing: border-box;
+        height: var(string.unquote(list.nth($config, 1)));
+        padding: 0 var(string.unquote(list.nth($config, 2)));
         border-radius: var(string.unquote(list.nth($config, 3)));
         gap: var(string.unquote(list.nth($config, 4)));
+    }
 
-        .plus-btn-visual {
-            font-size: var(string.unquote(list.nth($config, 5)));
-        }
+    // An icon-only button is square.
+    &.plus-btn--icon-only.plus-btn--#{$size}.btn {
+        width: var(string.unquote(list.nth($config, 1)));
+    }
+}
+
+// Every label is Body/default at the medium weight, and every icon draws at
+// 16, at every size. The `.btn` in the selector beats the typography
+// classes' `.h3 .fa-solid` icon sizing, so a button inside a heading keeps
+// its 16 icon.
+&.btn .plus-btn-text {
+    font: var(--body-default);
+    font-weight: var(--type-weight-medium);
+}
+
+&.btn .plus-btn-visual {
+    font-size: var(--icon-md);
+
+    i,
+    .fa-solid,
+    .fa-regular,
+    .fa-brands {
+        font-size: inherit;
     }
 }
 
 // --- ICON ONLY ---
 &.plus-btn--icon-only.btn {
     padding: 0;
-
-    // Explicit square sizing based on size map roughly (overriding padding)
-    &.plus-btn--medium {
-        width: 36px;
-        height: 36px;
-    }
-
-    &.plus-btn--small {
-        width: 28px;
-        height: 28px;
-    }
-
-    &.plus-btn--large {
-        width: 48px;
-        height: 48px;
-    }
 
     .plus-btn-visual--leading,
     .plus-btn-visual--trailing {
@@ -327,13 +324,18 @@ $btn-themes: (
 
 // --- VERTICAL LAYOUT ---
 &.plus-btn--vertical.btn {
+    // A vertical button stacks its icon over its label, so it is not a
+    // single-line control and keeps the height its content gives it.
+    height: auto;
+    padding-top: var(--element-pad-y-md);
+    padding-bottom: var(--element-pad-y-md);
     flex-direction: column;
     gap: var(--size-element-gap-md);
 
     .plus-btn-visual--leading {
         margin-right: 0;
         margin-bottom: var(--size-element-gap-sm);
-        font-size: 1.5em;
+        font-size: var(--icon-lg);
     }
 }
 

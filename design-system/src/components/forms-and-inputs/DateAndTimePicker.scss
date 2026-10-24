@@ -14,9 +14,7 @@
 .plus-datetime-label {
     margin-bottom: 0;
     color: var(--color-on-surface);
-    font-weight: var(--font-weight-normal);
-    font-size: var(--font-size-body2);
-    line-height: var(--font-line-height-body2);
+    font: var(--body-default);
 
     .plus-datetime-required {
         color: var(--color-danger-text);
@@ -58,9 +56,8 @@
 
 .plus-datetime-section-label {
     color: var(--color-on-surface);
-    font-weight: var(--font-weight-medium, 500);
-    font-size: var(--font-size-body2);
-    line-height: var(--font-line-height-body2);
+    font: var(--body-default);
+    font-weight: var(--type-weight-medium);
     margin-bottom: var(--size-element-gap-xs);
 }
 
@@ -86,9 +83,9 @@
    ============================================ */
 
 .plus-datetime-am-pm-dropdown {
-    height: 100%;
+    height: var(--item-height-sm);
 
-    // The toggle is cut to the field's text line, like every Trailing control.
+    // The toggle is 24, like a button in a field's Trailing slot.
     > :not(.dropdown-menu) {
         height: 100%;
     }
@@ -105,7 +102,7 @@
     background: transparent;
     color: var(--color-primary-text);
     font: inherit;
-    font-weight: var(--font-weight-semibold-2, 600);
+    font-weight: var(--type-weight-semibold);
     cursor: pointer;
 
     .fa-caret-down {
@@ -151,5 +148,6 @@
 /* Time zone caption — Figma `_Form Caption` under the time: the viewer's zone,
    and the other person's time when theirs differs. */
 .plus-datetime-time-zone {
+    font: var(--body-small);
     color: var(--color-on-surface-variant);
 }

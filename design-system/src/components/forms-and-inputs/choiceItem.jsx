@@ -50,7 +50,7 @@ export function choiceClasses({ appearance, readOnly, description }) {
 export function ChoiceDescription({ id, children }) {
     if (!children) return null;
     return (
-        <div id={id} className="plus-choice-description body3-txt">
+        <div id={id} className="plus-choice-description">
             {children}
         </div>
     );

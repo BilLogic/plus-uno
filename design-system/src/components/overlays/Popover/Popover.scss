@@ -1,12 +1,10 @@
 /*
- * Popover Component Styles
- * Per Figma specs - Dark Header / Light Body with unified container
- * 
+ * Popover Component Styles: the Popover family's Popup.
+ *
  * STRUCTURE:
- * .popover (container - holds shadow, border-radius, overflow:visible for arrow)
- *   ├── .popover-header (dark background)
- *   └── .popover-body (light background)
- *   └── .popover-arrow (matches appropriate section)
+ * .popover (one surface: fill, border, radius, shadow, pad)
+ *   ├── .popover-header (the title, heading.xsmall)
+ *   └── .popover-body (body 14/20)
  */
 
 // Storybook Overview: inline panel next to trigger (not positioned by Popper)
@@ -16,8 +14,8 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    // Tight gap so the placement arrow reads as pointing at the trigger (see Figma BS4 popover)
-    gap: var(--size-element-gap-sm);
+    // The popup sits Popover/offset 4 from its trigger.
+    gap: var(--popover-offset);
     padding: var(--size-spacing-medium-space-400);
 
     .plus-popover.popover {
@@ -32,52 +30,48 @@
 }
 
 // ===== MAIN CONTAINER =====
-// Single elevation layer - no background here (header/body provide their own)
+// The Popover family's Popup (Figma Pattern/Popup): one surface, no scrim and
+// no arrow. Pad Popover/pad 16, radius Popover/radius 12, and a fixed width
+// tier, Popover/width-sm · md · lg (320 · 400 · 480). The title and body stack
+// Element/stack-md 8 apart on the popup's own fill.
 .popover,
 .plus-popover {
+    --bs-popover-max-width: none;
+
     // Reset Bootstrap defaults
-    border: none !important;
-    padding: 0 !important;
     margin: 0 !important;
+    box-sizing: border-box;
 
-    // Sizing
-    width: auto !important;
-    min-width: 200px;
-    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-stack-md);
+    width: var(--popover-width-sm) !important;
+    max-width: none;
+    padding: var(--popover-pad) !important;
 
-    // Container is transparent - header/body provide backgrounds
-    background-color: transparent !important;
+    background-color: var(--color-surface-overlay) !important;
+    border: var(--border-default) solid var(--color-outline-variant) !important;
+    border-radius: var(--popover-radius) !important;
+    box-shadow: var(--elevation-light-2) !important;
 
-    // Rounded shell; overflow visible so .popover-arrow (Popper + static) is not clipped
-    border-radius: var(--size-modal-radius-sm, 8px) !important;
-    overflow: visible !important;
+    &.plus-popover--md {
+        width: var(--popover-width-md) !important;
+    }
 
-    // SINGLE elevation shadow on container only
-    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3),
-        0px 2px 6px 2px rgba(0, 0, 0, 0.15) !important;
+    &.plus-popover--lg {
+        width: var(--popover-width-lg) !important;
+    }
 
-    // ===== HEADER - Dark Background =====
+    // ===== TITLE: heading.xsmall 14/20, on the popup's surface =====
     .popover-header,
     .plus-popover-title {
-        // Dark background per Figma
-        background-color: var(--color-inverse-surface, #2d2d2d) !important;
-        color: var(--color-inverse-on-surface, #ffffff) !important;
-
-        // Reset borders and margins
-        border: none !important;
+        padding: 0 !important;
         margin: 0 !important;
-
-        border-top-left-radius: var(--size-modal-radius-sm, 8px) !important;
-        border-top-right-radius: var(--size-modal-radius-sm, 8px) !important;
-
-        // Padding per Figma
-        padding: 8px 12px !important;
-
-        // Typography
-        font-family: var(--font-family-body, 'Merriweather Sans', sans-serif);
-        font-size: var(--font-size-body2, 14px);
-        font-weight: var(--font-weight-regular, 400);
-        line-height: 1.4;
+        border: none !important;
+        border-radius: 0 !important;
+        background-color: transparent !important;
+        color: var(--color-on-surface) !important;
+        font: var(--heading-xsmall);
 
         // Remove Bootstrap's ::before separator
         &::before {
@@ -85,135 +79,20 @@
         }
     }
 
-    // ===== BODY - Light Background =====
+    // ===== BODY: body 14/20 =====
     .popover-body,
     .plus-popover-body {
-        // Light background per Figma
-        background-color: var(--color-surface-container, #f5f5f5) !important;
-        color: var(--color-on-surface, #1a1a1a) !important;
-
-        // Fill full width
-        width: 100% !important;
-        box-sizing: border-box !important;
-
-        // Reset borders and margins
-        border: none !important;
+        padding: 0 !important;
         margin: 0 !important;
-
-        border-bottom-left-radius: var(--size-modal-radius-sm, 8px) !important;
-        border-bottom-right-radius: var(--size-modal-radius-sm, 8px) !important;
-
-        // Padding per Figma
-        padding: 8px 12px !important;
-
-        // Typography
-        font-family: var(--font-family-body, 'Merriweather Sans', sans-serif);
-        font-size: var(--font-size-body2, 14px);
-        font-weight: var(--font-weight-light, 300);
-        line-height: 1.4;
-    }
-}
-
-// ===== ARROW STYLING =====
-// Arrows sit outside the header/body fill; container uses overflow:visible
-.popover .popover-arrow,
-.plus-popover .popover-arrow {
-    display: block !important;
-    position: absolute;
-    width: 1rem;
-    height: 0.5rem;
-
-    &::before,
-    &::after {
-        position: absolute;
-        display: block;
-        content: "";
-        border-color: transparent;
-        border-style: solid;
-    }
-}
-
-// BOTTOM POPOVER (arrow at top, points to header)
-.popover.bs-popover-bottom .popover-arrow,
-.popover[data-popper-placement^="bottom"] .popover-arrow {
-    top: calc(-0.5rem + 1px);
-    left: 50%;
-    transform: translateX(-50%);
-
-    &::before {
-        top: 0;
-        border-width: 0 0.5rem 0.5rem 0.5rem;
-        border-bottom-color: rgba(0, 0, 0, 0.1);
+        border: none !important;
+        background-color: transparent !important;
+        color: var(--color-on-surface) !important;
+        font: var(--body-default);
     }
 
-    &::after {
-        top: 1px;
-        border-width: 0 0.5rem 0.5rem 0.5rem;
-        border-bottom-color: var(--color-inverse-surface, #2d2d2d);
-    }
-}
-
-// TOP POPOVER (arrow at bottom, points to body)
-.popover.bs-popover-top .popover-arrow,
-.popover[data-popper-placement^="top"] .popover-arrow {
-    bottom: calc(-0.5rem + 1px);
-    left: 50%;
-    transform: translateX(-50%);
-
-    &::before {
-        bottom: 0;
-        border-width: 0.5rem 0.5rem 0;
-        border-top-color: rgba(0, 0, 0, 0.1);
-    }
-
-    &::after {
-        bottom: 1px;
-        border-width: 0.5rem 0.5rem 0;
-        border-top-color: var(--color-surface-container, #f5f5f5);
-    }
-}
-
-// RIGHT POPOVER (arrow at left)
-.popover.bs-popover-end .popover-arrow,
-.popover[data-popper-placement^="right"] .popover-arrow {
-    left: calc(-0.5rem + 1px);
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0.5rem;
-    height: 1rem;
-
-    &::before {
-        left: 0;
-        border-width: 0.5rem 0.5rem 0.5rem 0;
-        border-right-color: rgba(0, 0, 0, 0.1);
-    }
-
-    &::after {
-        left: 1px;
-        border-width: 0.5rem 0.5rem 0.5rem 0;
-        border-right-color: var(--color-surface-container, #f5f5f5);
-    }
-}
-
-// LEFT POPOVER (arrow at right)
-.popover.bs-popover-start .popover-arrow,
-.popover[data-popper-placement^="left"] .popover-arrow {
-    right: calc(-0.5rem + 1px);
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0.5rem;
-    height: 1rem;
-
-    &::before {
-        right: 0;
-        border-width: 0.5rem 0 0.5rem 0.5rem;
-        border-left-color: rgba(0, 0, 0, 0.1);
-    }
-
-    &::after {
-        right: 1px;
-        border-width: 0.5rem 0 0.5rem 0.5rem;
-        border-left-color: var(--color-surface-container, #f5f5f5);
+    // No arrow: a popup sits Popover/offset 4 from its trigger instead.
+    .popover-arrow {
+        display: none !important;
     }
 }
 /*

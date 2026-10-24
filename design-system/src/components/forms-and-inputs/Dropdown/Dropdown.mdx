@@ -138,7 +138,13 @@ that item opts out.
 
 It is the only component in `forms-and-inputs` that places itself: the menu
 flips up when there is no room below and right-aligns when a left-aligned menu
-would run off the edge, remeasuring on scroll and resize.
+would run off the edge, never coming nearer than 8 to the screen's edge, and
+remeasures on scroll and resize.
+
+The menu is the Popover family's Menu: rows of 32 (24 with `size="small"`),
+inset 4, a menu 160 to 320 wide that stops at 320 tall and scrolls, its cut row
+showing there is more. An item's `description` adds a second line, and the row
+grows to hold it.
 
 </div>
 
@@ -220,11 +226,11 @@ would run off the edge, remeasuring on scroll and resize.
   Give it `multiSelectCheckbox` and `multiSelectChecked` to lead with the
   multi-select checkbox, which is decorative, since `aria-pressed` already
   says whether it is on.
-- **A selected row is not shown by color alone.** `selected` gives the row
-  the primary-container ground and a primary-container stroke on its left
-  edge, so the edge still marks it where the ground is hard to see. There is
-  no check mark: a row with no leading visual starts its words at the
-  padding.
+- **A selected row is shown by color.** `selected` gives the row the primary
+  state layer 08 and primary text, as Pattern/Menu draws it. Color is all
+  that marks it, so a row that switches on and off should also be an
+  `isToggle` item, which says so through `aria-pressed`. A row with no
+  leading visual starts its words at the padding.
 - **A static row is not a control.** An item with `isStatic` is a plain row
   with no button role: it is not focusable, and pressing it leaves the menu
   open. An item with `isBusy` (with `disabled`) is still working and reports

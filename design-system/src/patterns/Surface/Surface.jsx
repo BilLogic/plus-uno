@@ -16,6 +16,9 @@ export const SURFACE_LEVELS = [
  * Bare tokenized surface: pick a surface level, padding scale, radius scale,
  * border, and elevation — children fill the content slot.
  * Mirrors the "Surface" slot component in the Figma design system file.
+ *
+ * A surface that holds a page can carry the page's `title`: the page's one
+ * h1, at Heading/large 24, above the content. Sections inside it open at h2.
  */
 const Surface = ({
     id,
@@ -25,6 +28,7 @@ const Surface = ({
     border = false,
     elevation = 0,
     as: Component = 'div',
+    title,
     className = '',
     style,
     children,
@@ -42,6 +46,7 @@ const Surface = ({
 
     return (
         <Component id={id} className={classes} style={style} {...props}>
+            {title && <h1 className="plus-pattern-surface-title">{title}</h1>}
             {children}
         </Component>
     );
@@ -61,6 +66,8 @@ Surface.propTypes = {
     elevation: PropTypes.oneOf([0, 1, 2, 3, 4, 5]),
     /** Render element / component */
     as: PropTypes.elementType,
+    /** The page's title: its one h1, at Heading/large 24. Leave it unset on a surface that is not a page. */
+    title: PropTypes.node,
     className: PropTypes.string,
     style: PropTypes.object,
     /** Content slot */

@@ -242,7 +242,7 @@ export const FAMILIES = [
   {
     family: 'surface',
     prefix: '--surface-',
-    what: 'a surface: its color and, separately, its shadow',
+    what: 'a surface: its color and, separately, its shadow; the surface and surface container pad, stack and radius',
   },
   { family: 'font-size', prefix: '--font-size-', what: 'the type scale, icon sizes included' },
   { family: 'font-line-height', prefix: '--font-line-height-', what: 'line height per type step' },
@@ -253,10 +253,38 @@ export const FAMILIES = [
     prefix: '--font-letter-spacing-',
     what: 'tracking per type step',
   },
-  { family: 'type', prefix: '--type-', what: 'the `font` shorthand for a type step' },
-  { family: 'size', prefix: '--size-', what: 'spacing, radius, borders and component metrics' },
+  { family: 'line-height', prefix: '--line-height-', what: 'line height primitives, by rem × 100' },
+  { family: 'heading', prefix: '--heading-', what: 'a heading text style: the `font` shorthand' },
+  { family: 'body', prefix: '--body-', what: 'a body text style: the `font` shorthand' },
+  { family: 'metric', prefix: '--metric-', what: 'a metric text style: the `font` shorthand' },
+  { family: 'code', prefix: '--code', what: 'the code text style, relative to the text around it' },
+  {
+    family: 'type',
+    prefix: '--type-',
+    what: 'the typography family and weight variables, and the older `font` shorthands per type step',
+  },
+  { family: 'size', prefix: '--size-', what: 'the old spacing, radius, border and component metrics, and the size primitives (`--size-200`)' },
+  { family: 'space', prefix: '--space-', what: 'the space primitives, named by rem × 100' },
+  { family: 'radius', prefix: '--radius-', what: 'the radius primitives' },
+  { family: 'stroke', prefix: '--stroke-', what: 'the stroke-width primitives' },
+  { family: 'element', prefix: '--element-', what: 'what the parts of components share' },
+  { family: 'height', prefix: '--height-', what: 'the common height scale' },
+  { family: 'width', prefix: '--width-', what: 'the common width scale' },
+  { family: 'item', prefix: '--item-', what: 'control heights, 24 and 32' },
+  { family: 'row', prefix: '--row-height-', what: 'table and list row heights (not `--row-`, which a component-local `--row-index` uses)' },
+  { family: 'label', prefix: '--label-', what: 'Tag, Status and Count sizes' },
+  { family: 'field', prefix: '--field-', what: 'field widths and multi-line minimums' },
+  { family: 'icon', prefix: '--icon-', what: 'drawn icon sizes' },
+  { family: 'image', prefix: '--image-', what: 'avatar and tile sizes' },
+  { family: 'border', prefix: '--border-', what: 'stroke widths by state' },
   { family: 'elevation', prefix: '--elevation-', what: 'the shadow ladder' },
   { family: 'layout', prefix: '--layout-', what: 'app-shell measurements' },
+  { family: 'section', prefix: '--section-', what: 'a span of the page grid: its stacks and column minimums' },
+  { family: 'card', prefix: '--card-', what: 'card pad, stack, inline, minimum width and radius' },
+  { family: 'table', prefix: '--table-', what: 'table cell pad, tree indent and radius' },
+  { family: 'overlay', prefix: '--overlay-', what: 'the full-screen layer under a modal: its pad and scrim' },
+  { family: 'modal', prefix: '--modal-', what: 'modal dialog pad, stack, inline and radius' },
+  { family: 'popover', prefix: '--popover-', what: 'menus, popups, tooltips and flags: pad, widths, radii, placement' },
   { family: 'col', prefix: '--col-', what: 'grid column widths' },
   { family: 'breakpoint', prefix: '--breakpoint-', what: 'breakpoint minima' },
 ];
@@ -266,7 +294,7 @@ const BY_LENGTH = [...FAMILIES].sort((a, b) => b.prefix.length - a.prefix.length
 
 /**
  * Which family a token NAME is in, or null for a name in none — a
- * component-local custom property such as `--table-cell-x`, which is correct
+ * component-local custom property such as `--dropdown-cell-x`, which is correct
  * code and not a token (see `check:size-fallbacks` on why it is not a finding).
  *
  * @param {string} name
@@ -274,7 +302,11 @@ const BY_LENGTH = [...FAMILIES].sort((a, b) => b.prefix.length - a.prefix.length
  */
 export function familyOf(name) {
   if (typeof name !== 'string') return null;
-  const family = BY_LENGTH.find((f) => name.startsWith(f.prefix) && name.length > f.prefix.length);
+  // A prefix ending in `-` opens a family; one without names a family of one
+  // token, matched whole (`--code`).
+  const family = BY_LENGTH.find((f) =>
+    f.prefix.endsWith('-') ? name.startsWith(f.prefix) && name.length > f.prefix.length : name === f.prefix,
+  );
   return family ? family.family : null;
 }
 

@@ -270,7 +270,7 @@ export const RequestTutorOffCanvas = ({
                 flexDirection: 'column',
                 gap: 'var(--size-card-gap, 16px)',
                 padding: 'var(--size-card-pad-y-lg, 24px) var(--size-card-pad-x-lg, 24px)',
-                zIndex: 1200,
+                zIndex: 'var(--layout-z-index-dialog)',
                 boxSizing: 'border-box',
             }}
         >

@@ -37,7 +37,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-outline` · `--color-outline-variant` · `--color-secondary` · `--color-secondary-state-08` · `--color-secondary-state-12` · `--color-secondary-text` · `--color-surface` · `--font-family-body` · `--font-line-height-body1` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body1` · `--font-size-body2` · `--font-size-body3` · `--font-size-fa-body1` · `--font-size-fa-body2` · `--font-size-fa-body3` · `--font-weight-semibold-1` · `--size-border-radius-radius-1000` · `--size-border-stroke-stroke-100` · `--size-spacing-medium-space-300` · `--size-spacing-small-space-050` · `--size-spacing-small-space-075` · `--size-spacing-small-space-100` · `--size-spacing-small-space-150`
+`--body-default` · `--color-outline` · `--color-outline-variant` · `--color-secondary` · `--color-secondary-state-08` · `--color-secondary-state-12` · `--color-secondary-text` · `--color-surface` · `--font-size-fa-body1` · `--font-size-fa-body2` · `--font-size-fa-body3` · `--size-border-radius-radius-1000` · `--size-border-stroke-stroke-100` · `--size-spacing-medium-space-300` · `--size-spacing-small-space-050` · `--size-spacing-small-space-075` · `--size-spacing-small-space-100` · `--size-spacing-small-space-150` · `--type-weight-medium` · `--type-weight-semibold`
 
 From `design-system/src/components/navigation/Pagination/Pagination.scss`. Override these through the token layer, never with a literal.
 

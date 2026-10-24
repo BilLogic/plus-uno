@@ -110,7 +110,7 @@ const DonutChartSVG = ({
                         fontSize: 'var(--font-size-body3, 12px)',
                         fontFamily: 'var(--font-family-body)',
                         pointerEvents: 'none',
-                        zIndex: 1000,
+                        zIndex: 'var(--layout-z-index-tooltip)',
                         whiteSpace: 'nowrap',
                         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
                         textAlign: 'center'

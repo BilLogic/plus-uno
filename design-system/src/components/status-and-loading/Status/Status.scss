@@ -63,7 +63,7 @@
     }
 
     .plus-status__label {
-        font-weight: var(--font-weight-body2-semibold, 400);
+        font: var(--body-default);
     }
 }
 
@@ -75,23 +75,24 @@
     height: var(--plus-status-icon-box);
 
     > i {
-        font-size: var(--font-size-fa-body2, 0.75rem);
+        font-size: var(--icon-sm);
         line-height: 1;
     }
 }
 
 .plus-status--large .plus-status__visual > i {
-    font-size: var(--font-size-fa-h5, 1rem);
+    font-size: var(--icon-md);
 }
 
 /*
  * Past `maxWidth` the label ends in an ellipsis; the full text is a tooltip.
- * The weight is pinned: `.body3-txt` sets none, so a Status inside a `th` or a
- * heading would otherwise inherit bold. Large overrides it below.
+ * The label is body.small 12/16, and body.default 14/20 on a large status. The
+ * style sets the weight too, so a Status inside a `th` or a heading does not
+ * inherit bold.
  */
 .plus-status__label {
     min-width: 0;
-    font-weight: var(--font-weight-body3-regular, 300);
+    font: var(--body-small);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

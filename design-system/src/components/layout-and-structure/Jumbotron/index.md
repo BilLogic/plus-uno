@@ -40,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface` · `--color-on-surface-variant` · `--color-surface-container-low` · `--font-family-body` · `--font-family-header` · `--font-line-height-body1` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-line-height-h2` · `--font-line-height-h3` · `--font-line-height-h4` · `--font-size-body1` · `--font-size-body2` · `--font-size-body3` · `--font-size-h2` · `--font-size-h3` · `--font-size-h4` · `--font-weight-bold` · `--font-weight-normal` · `--size-element-gap-md` · `--size-section-gap-lg` · `--size-section-gap-md` · `--size-section-gap-sm` · `--size-section-pad-x-lg` · `--size-section-pad-x-md` · `--size-section-pad-x-sm` · `--size-section-pad-y-lg` · `--size-section-pad-y-md` · `--size-section-pad-y-sm` · `--size-section-radius-lg` · `--size-section-radius-md` · `--size-section-radius-sm`
+`--body-default` · `--body-large` · `--body-small` · `--color-on-surface` · `--color-on-surface-variant` · `--color-surface-container-low` · `--heading-large` · `--heading-xlarge` · `--heading-xxlarge` · `--size-element-gap-md` · `--size-section-gap-lg` · `--size-section-gap-md` · `--size-section-gap-sm` · `--size-section-pad-x-lg` · `--size-section-pad-x-md` · `--size-section-pad-x-sm` · `--size-section-pad-y-lg` · `--size-section-pad-y-md` · `--size-section-pad-y-sm` · `--size-section-radius-lg` · `--size-section-radius-md` · `--size-section-radius-sm`
 
 From `design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.scss`. Override these through the token layer, never with a literal.
 

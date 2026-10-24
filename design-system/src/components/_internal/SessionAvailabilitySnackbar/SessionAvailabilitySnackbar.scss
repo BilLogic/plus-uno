@@ -29,14 +29,12 @@
     }
 
     &__icon {
-        font-size: 16px;
+        font-size: var(--icon-md);
     }
 
     &__title {
-        font-family: var(--font-family-body);
-        font-size: 16px; // Body/B1/Bold
-        font-weight: 700;
-        line-height: 1.5;
+        // A flag's title: Heading/xsmall 14/20.
+        font: var(--heading-xsmall);
     }
 
     &__meta {
@@ -46,9 +44,7 @@
     }
 
     &__timestamp {
-        font-family: var(--font-family-body);
-        font-size: 12px;
-        font-weight: 300;
+        font: var(--body-small);
         opacity: 0.8;
     }
 
@@ -58,7 +54,7 @@
         color: inherit;
         cursor: pointer;
         padding: 0;
-        font-size: 14px;
+        font-size: var(--icon-md);
         opacity: 0.8;
         display: flex;
         align-items: center;
@@ -72,8 +68,6 @@
         padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg); // 8px 16px
         background-color: var(--color-surface);
         color: var(--color-on-surface);
-        font-family: var(--font-family-body);
-        font-size: 14px; // Body/B2
-        line-height: 1.5;
+        font: var(--body-default);
     }
 }

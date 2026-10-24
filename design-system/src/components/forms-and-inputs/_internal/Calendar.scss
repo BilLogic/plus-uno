@@ -56,6 +56,7 @@
 
 .plus-calendar-month {
     margin: 0;
+    font: var(--heading-small);
     color: var(--color-on-surface);
 }
 
@@ -67,12 +68,14 @@
 }
 
 .plus-calendar-weekday {
+    font: var(--body-small);
     text-align: center;
     color: var(--color-on-surface-variant);
-    font-weight: var(--font-weight-semibold-1);
+    font-weight: var(--type-weight-regular);
 }
 
 .plus-calendar-day {
+    font: var(--body-default);
     display: flex;
     align-items: center;
     justify-content: center;

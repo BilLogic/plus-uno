@@ -1,128 +1,95 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import SidebarTab from '@/components/navigation/SidebarTab';
 import Logo from '@/components/_internal/Logo';
+// The pattern's own folder, not the patterns barrel: the components barrel loads
+// this file, and pulling every pattern (and its stylesheet) in here would
+// reorder the cascade for every component that loads after it.
+import PatternSidebar, { useOpenTabs } from '@/patterns/Sidebar';
+import { sidebarContent } from './sidebarConfig';
 
+/**
+ * The PLUS sidebar: the foundation Sidebar pattern (`@/patterns`) with the
+ * logo in its header and the Specs item list for the role (`sidebarConfig.js`).
+ * Figma Specs: node 111:227891; BS4 Foundation `_Sidebar`.
+ *
+ * Both roles come from one config. Home is selected when nothing else is.
+ *
+ * Open tabs come from `useOpenTabs()`: a page that opens a record (a session, a
+ * student) calls `open(parentId, record)`, and the record shows here as a tab
+ * under that item. A tab is selected while its parent is the current page
+ * (`activeTabId`); elsewhere the page's own item is. Pressing a tab selects it
+ * and calls `onOpenTabSelect(tab)`, which is where an app goes to the record's
+ * route if it is not already there. Nothing here changes the URL.
+ */
 const Sidebar = ({
     user = 'tutor',
     onHomeClick,
     onTabClick,
+    onOpenTabSelect,
     /** When set, the tab with this id is shown as selected (anchored). e.g. 'sessions' for Sessions page */
     activeTabId,
+    showItemsNotInSpecs = false,
+    slackUrl,
+    label = 'Main',
     visible = true,
     className = '',
     style,
 }) => {
+    const openTabs = useOpenTabs();
     if (!visible) return null;
 
-    const handleTabClick = (tabName) => {
-        if (onTabClick) {
-            onTabClick(tabName);
+    const { items, sections } = sidebarContent(user, { showItemsNotInSpecs, slackUrl });
+
+    const page = activeTabId || 'home';
+    const selectedTab = openTabs.tabs.find((tab) => tab.id === openTabs.selectedId);
+    const activeId = selectedTab && selectedTab.parentId === page ? selectedTab.id : page;
+
+    const handleSelect = (id) => {
+        openTabs.select(id);
+        if (id === 'home' && onHomeClick) {
+            onHomeClick();
+            return;
         }
+        onTabClick?.(id);
     };
 
-    const categories = [
-        {
-            title: 'Training',
-            items: [
-                { text: 'Lessons', icon: 'book-open', id: 'lessons' },
-                { text: 'Onboarding', icon: 'clipboard', id: 'onboarding' }
-            ]
-        },
-        {
-            title: 'Toolkit',
-            items: [
-                { text: 'Sessions', icon: 'calendar-alt', id: 'sessions' },
-                { text: 'Reviews', icon: 'chart-bar', id: 'reviews' }
-            ]
-        }
-    ];
-
-    if (user === 'supervisor') {
-        categories.push({
-            title: 'Admin',
-            items: [
-                { text: 'Tutors', icon: 'chart-pie', id: 'tutors' },
-                { text: 'Sessions', icon: 'calendar-week', id: 'admin-sessions' },
-                { text: 'Students', icon: 'users', id: 'students' },
-                { text: 'Groups', icon: 'users-rectangle', id: 'groups' },
-                { text: 'Compliance', icon: 'clipboard-check', id: 'compliance-monitor' }
-            ]
-        });
-    }
-
     return (
-        <div
-            className={`plus-sidebar ${className}`}
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-surface-gap-sm)',
-                width: '100%',
-                minWidth: 0,
-                height: '100%',
-                boxSizing: 'border-box',
-                ...style
+        <PatternSidebar
+            className={['plus-sidebar', className].filter(Boolean).join(' ')}
+            style={style}
+            header={<Logo style="colored" size="XS" text={true} className="p-0" />}
+            items={items}
+            sections={sections}
+            activeId={activeId}
+            onSelect={handleSelect}
+            openTabs={openTabs.byParent}
+            onTabSelect={(tab) => {
+                openTabs.select(tab.id);
+                onOpenTabSelect?.(tab);
             }}
-        >
-            {/* Logo Section - per Figma: pad-x-sm (8px), pad-y-md (6px) */}
-            <div className="plus-sidebar-logo" style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--size-element-gap-md)',
-                padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-sm)',
-                borderRadius: '4px',
-                boxSizing: 'border-box'
-            }}>
-                <Logo style="colored" size="XS" text={true} className="p-0" />
-            </div>
-
-            {/* Home Tab */}
-            <SidebarTab
-                text="Home"
-                icon="house"
-                state={activeTabId === 'home' || !activeTabId ? 'selected' : 'enabled'}
-                onClick={onHomeClick}
-            />
-
-            {/* Sections */}
-            {categories.map((category, index) => (
-                <div key={index} className="plus-sidebar-section" style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--size-element-gap-sm)'
-                }}>
-                    <div className="plus-sidebar-section-title" style={{
-                        padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md) 0 var(--size-element-pad-x-md)'
-                    }}>
-                        <p className="body2-txt" style={{
-                            fontWeight: 'var(--font-weight-normal)',
-                            margin: '0'
-                        }}>
-                            {category.title}
-                        </p>
-                    </div>
-                    {category.items.map((item) => (
-                        <SidebarTab
-                            key={item.id}
-                            text={item.text}
-                            icon={item.icon}
-                            state={activeTabId === item.id ? 'selected' : 'enabled'}
-                            onClick={() => handleTabClick(item.id)}
-                        />
-                    ))}
-                </div>
-            ))}
-        </div>
+            onTabClose={(tab) => openTabs.close(tab.id)}
+            onTabsCloseAll={(item) => openTabs.closeAll(item.id)}
+            label={label}
+        />
     );
 };
 
 Sidebar.propTypes = {
     user: PropTypes.oneOf(['tutor', 'supervisor']),
+    /** Home's press; without it Home calls `onTabClick('home')` */
     onHomeClick: PropTypes.func,
+    /** Called with the item id for every other item (external links excepted) */
     onTabClick: PropTypes.func,
+    /** Called with the open tab (`{ id, parentId, recordId, title, href, status }`) when one is pressed */
+    onOpenTabSelect: PropTypes.func,
     /** Id of the tab to show as selected (e.g. 'sessions', 'home') */
     activeTabId: PropTypes.string,
+    /** Also show the code-only items that are not in Specs: Toolkit › Reviews and Admin › Compliance */
+    showItemsNotInSpecs: PropTypes.bool,
+    /** Where Toolkit › Slack links; defaults to `SLACK_URL` */
+    slackUrl: PropTypes.string,
+    /** Accessible name of the navigation landmark */
+    label: PropTypes.string,
     visible: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,

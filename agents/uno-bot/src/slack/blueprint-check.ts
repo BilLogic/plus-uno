@@ -66,11 +66,16 @@ import type { RunnerJobPayload } from "./types";
 import type { CardMessage } from "./proposal-render";
 import { escapeSlackText, SLACK_USER_ID, toPlainText } from "./mrkdwn";
 import type { TaskChunk } from "./api";
+import { statusTag } from "./status-tag";
 
 /** The Check it button's action id: also Check again and Try again. */
 export const CHECK_IT_ACTION_ID = "uno_blueprint_check";
 /** The Stop button's action id, on the checking line. */
 export const STOP_CHECK_ACTION_ID = "uno_blueprint_check_stop";
+
+/** Every message the check posts, tagged as a status post, so the DM sweep
+ *  never reads "I couldn't draft a proposal" as an answer (`status-tag.ts`). */
+const CHECK_TAG = statusTag("blueprint_check");
 
 const scenarioOf = (scenario: string) => `*${escapeSlackText(scenario)}*`;
 
@@ -101,6 +106,7 @@ export function checkOfferMessage(offer: CheckOfferNote): CardMessage {
       { type: "section", text: { type: "mrkdwn", text: words } },
       { type: "actions", elements: [button(CHECK_IT_ACTION_ID, "Check it", "check")] },
     ],
+    metadata: CHECK_TAG,
   };
 }
 
@@ -109,6 +115,7 @@ function line(text: string, action?: ReturnType<typeof button>): CardMessage {
   return {
     text,
     blocks: [{ type: "section", text: { type: "mrkdwn", text } }, ...(action ? [{ type: "actions", elements: [action] }] : [])],
+    metadata: CHECK_TAG,
   };
 }
 
@@ -476,7 +483,7 @@ export function resultsMessage(offerTs: string, results: CheckResults, after?: s
   }
   if (after) blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: after }] });
   const text = button ? results.text : after ? `${results.text}\n\n${after}` : results.text;
-  return { text, blocks };
+  return { text, blocks, metadata: CHECK_TAG };
 }
 
 /** Said to the presser alone when the offer no longer holds its results. */

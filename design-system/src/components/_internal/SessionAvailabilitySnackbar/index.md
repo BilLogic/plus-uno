@@ -25,7 +25,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface` · `--color-success` · `--color-surface` · `--font-family-body` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-y-lg` · `--size-modal-radius-md`
+`--body-default` · `--body-small` · `--color-on-surface` · `--color-success` · `--color-surface` · `--heading-xsmall` · `--icon-md` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-y-lg` · `--size-modal-radius-md`
 
 From `design-system/src/components/_internal/SessionAvailabilitySnackbar/SessionAvailabilitySnackbar.scss`. Override these through the token layer, never with a literal.
 

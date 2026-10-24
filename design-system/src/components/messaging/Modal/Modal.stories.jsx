@@ -1,6 +1,7 @@
 import React from 'react';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Modal from '@/components/messaging/Modal';
+import { Button } from '@/components';
 
 export default {
     title: 'Components/Messaging/Modal',
@@ -18,10 +19,32 @@ export default {
             control: 'text',
             table: { category: 'Content' },
         },
+        description: {
+            control: 'text',
+            table: { category: 'Content' },
+        },
+        height: {
+            control: 'select',
+            options: ['hug', 'fill'],
+            description: 'Hug grows to the screen less 128, then scrolls its body; Fill sits at that cap',
+            table: { category: 'Layout' },
+        },
+        dividers: {
+            control: 'boolean',
+            table: { category: 'Design' },
+        },
+        loading: {
+            control: 'boolean',
+            table: { category: 'Behavior' },
+        },
+        showCloseButton: {
+            control: 'boolean',
+            table: { category: 'Behavior' },
+        },
         type: {
             control: 'select',
             options: ['default', 'scrollable'],
-            description: 'Modal type',
+            description: 'Deprecated: use height',
             table: { category: 'Design' },
         },
         showBottomButtons: {
@@ -34,10 +57,13 @@ export default {
             table: { category: 'Behavior' },
         },
         width: {
-            control: 'number',
-            description: 'Modal width',
+            control: 'select',
+            options: ['sm', 'md', 'lg'],
+            description: '6 · 8 · 10 columns of the screen grid plus the modal pad; a number is a fixed width',
             table: { category: 'Layout' },
         },
+        headerActions: { table: { disable: true, category: 'Development' } },
+        footer: { table: { disable: true, category: 'Development' } },
         id: { control: false, table: { disable: true, category: 'Development' } },
         className: { control: false, table: { disable: true, category: 'Development' } },
         enforceFocus: { table: { disable: true, category: 'Development' } },
@@ -243,7 +269,6 @@ function ModalScrollableDemo() {
                     title="Scrollable modal"
                     body={scrollableBody}
                     type="scrollable"
-                    width={400}
                     showBottomButtons
                     primaryButton={{
                         text: 'Primary',
@@ -263,6 +288,74 @@ function ModalScrollableDemo() {
         />
     );
 }
+
+/** Three widths from the screen grid, drawn at the 1024 screen. */
+function ModalSizeDemos() {
+    return (
+        <div style={{ ...col, '--plus-modal-screen': '1024px', width: '100%' }}>
+            {['sm', 'md', 'lg'].map((size) => (
+                <Modal
+                    key={size}
+                    show
+                    renderAs="inline"
+                    width={size}
+                    title={`width="${size}"`}
+                    description={`${{ sm: 6, md: 8, lg: 10 }[size]} columns of the screen grid plus the modal pad.`}
+                    body="Modal body text goes here."
+                    secondaryButton={{ text: 'Cancel' }}
+                    primaryButton={{ text: 'Save' }}
+                    onClose={() => {}}
+                />
+            ))}
+        </div>
+    );
+}
+
+/** Hug and Fill against a 320 cap standing in for the screen less 128. */
+function ModalHeightDemos() {
+    const frame = {
+        ...modalDocsHostStyle,
+        '--layout-max-height-modal': 'var(--size-2000)',
+        display: 'flex',
+        gap: 'var(--space-100)',
+        alignItems: 'flex-start',
+        minHeight: 'calc(var(--size-2000) + 2 * var(--space-100))',
+    };
+    return (
+        <div style={frame}>
+            <Modal show renderAs="inline" height="hug" title="Hug, short" body="Short content hugs." primaryButton={{ text: 'Done' }} onClose={() => {}} />
+            <Modal show renderAs="inline" height="hug" title="Hug, long" body={scrollableBody.repeat(3)} primaryButton={{ text: 'Done' }} onClose={() => {}} />
+            <Modal show renderAs="inline" height="fill" title="Fill" body="Fill sits at the cap." primaryButton={{ text: 'Done' }} onClose={() => {}} />
+        </div>
+    );
+}
+
+/** Description, header actions, dividers, no close button, loading. */
+function ModalOptionDemos() {
+    return (
+        <div style={contentVariantGrid}>
+            <Modal
+                show
+                renderAs="inline"
+                title="Share report"
+                description="People with the link can view it."
+                headerActions={<Button style="secondary" fill="ghost" size="small" leadingVisual="link" title="Copy link" />}
+                dividers
+                body="Header actions sit before the close button; dividers rule off the header and footer."
+                primaryButton={{ text: 'Done' }}
+                onClose={() => {}}
+            />
+            <Modal show renderAs="inline" title="Uploading transcript" showCloseButton={false} body="A dialog that has to be answered drops the close button." primaryButton={{ text: 'Cancel upload' }} onClose={() => {}} />
+            <Modal show renderAs="inline" loading title="Session details" body="Loaded content" showBottomButtons={false} onClose={() => {}} />
+        </div>
+    );
+}
+
+export const Sizes = () => <ModalSizeDemos />;
+
+export const Heights = () => <ModalHeightDemos />;
+
+export const Options = () => <ModalOptionDemos />;
 
 export const Content = () => (
     <div style={col}>
@@ -288,9 +381,9 @@ export const Interactive = {
         show: true,
         title: 'Modal title',
         body: 'Modal body text goes here.',
-        type: 'default',
+        width: 'sm',
+        height: 'hug',
         showBottomButtons: true,
-        width: 340,
     },
     render: (args) => (
         <div style={modalDocsShellStyle}>

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import './Button.scss';
 import RBButton from 'react-bootstrap/Button';
+import { useDeprecatedLargeSize } from '../../../lib/useDeprecatedLargeSize';
 
 /**
  * Button Component
@@ -14,8 +15,7 @@ const ButtonContent = ({
     leadingVisual,
     trailingVisual,
     // Helps with styling context if needed, though mostly for layout
-    vertical = false,
-    typographyClass
+    vertical = false
 }) => {
     const content = text || children;
 
@@ -38,7 +38,7 @@ const ButtonContent = ({
     return (
         <>
             {renderVisual(leadingVisual, 'leading')}
-            {content && <span className={`plus-btn-text ${typographyClass || ''}`}>{content}</span>}
+            {content && <span className="plus-btn-text">{content}</span>}
             {renderVisual(trailingVisual, 'trailing')}
         </>
     );
@@ -49,8 +49,7 @@ ButtonContent.propTypes = {
     text: PropTypes.string,
     leadingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     trailingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    vertical: PropTypes.bool,
-    typographyClass: PropTypes.string
+    vertical: PropTypes.bool
 };
 
 /**
@@ -89,6 +88,7 @@ export const Button = ({
     id,
     ...props
 }) => {
+    useDeprecatedLargeSize('Button', size);
 
     // RBButton handles 'href' internally if passed (renders as anchor)
     // RBButton handles 'type' default to 'button'
@@ -109,19 +109,12 @@ export const Button = ({
         className
     );
 
-    const typographyClass = {
-        'small': 'body3-txt font-weight-semibold',
-        'medium': 'h6',
-        'large': 'h3'
-    }[size] || 'h6';
-
     const content = (
         <ButtonContent
             text={text}
             leadingVisual={leadingVisual}
             trailingVisual={trailingVisual}
             vertical={vertical}
-            typographyClass={typographyClass}
         >
             {children}
         </ButtonContent>
@@ -162,6 +155,11 @@ Button.propTypes = {
         'social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools'
     ]),
     fill: PropTypes.oneOf(['filled', 'tonal', 'outline', 'ghost', 'text']),
+    /**
+     * `medium` draws 32 and is the default. `small` draws 24 compact, for table
+     * rows and inline toolbars only. `large` is deprecated: it draws like
+     * `medium` and warns in development.
+     */
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     block: PropTypes.bool,
     className: PropTypes.string,

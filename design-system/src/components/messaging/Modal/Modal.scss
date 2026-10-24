@@ -1,46 +1,88 @@
 /**
  * PLUS Modal base styles.
- * Used by the Modal component (components/Modal/Modal.jsx).
+ * Used by the Modal component (components/messaging/Modal/Modal.jsx).
  * Import via main.scss so any app using the design system gets correct modal appearance.
+ *
+ * Matches the Figma pattern Modal and its Overlay: pad Modal/pad 16, stack
+ * Modal/stack-md 16, radius Modal/radius 12, centered in an overlay that pads
+ * Overlay/pad-x 16 at the sides and Overlay/pad-y 64 above and below.
  */
 
 .plus-modal {
-    background-color: var(--color-surface, #ffffff);
-    border-radius: var(--size-modal-radius-md, 16px);
-    box-shadow: var(--elevation-light-2);
+    /*
+     * The width comes from the SCREEN grid: 12 columns, gutter 16, inside the
+     * screen pad, never under 720 and capped at 1232 like content. So it grows
+     * with the screen, stops at 1280, never shrinks below the 768 screen and
+     * ignores the sidebar. Figma's Modal/width-modal-* per mode are this rule
+     * at 768 · 1024 · 1440. `--plus-modal-screen` stands in for the screen when
+     * an ancestor sets it, such as a docs frame drawn at a mode's width.
+     *
+     * The screen pad is Screen/pad-x-screen below 1440, 24. From 1440 it is 32,
+     * but there the grid is already at its 1232 cap with either pad, so the
+     * width is a function of the screen width alone and a stand-in frame gets
+     * the same width at any browser size.
+     */
+    --plus-modal-screen-pad: var(--space-150);
+    --plus-modal-grid: clamp(
+        var(--layout-min-width-content),
+        var(--plus-modal-screen, 100vw) - 2 * var(--plus-modal-screen-pad),
+        var(--layout-max-width-content)
+    );
+    --plus-modal-column: calc((var(--plus-modal-grid) - (var(--layout-columns) - 1) * var(--layout-gutter)) / var(--layout-columns));
+    --plus-modal-span: 6;
+
+    width: calc(var(--plus-modal-span) * var(--plus-modal-column) + (var(--plus-modal-span) - 1) * var(--layout-gutter) + 2 * var(--modal-pad));
+    flex-shrink: 0;
+    box-sizing: border-box;
+    background-color: var(--color-surface-overlay);
+    border-radius: var(--modal-radius);
+    box-shadow: var(--elevation-light-4);
     display: flex;
     flex-direction: column;
+    gap: var(--modal-stack-md);
+    padding: var(--modal-pad);
     overflow: hidden;
-    max-height: calc(100vh - 40px);
+    /* Hug: as tall as the content, up to the screen less the overlay pad above and below. */
+    max-height: var(--layout-max-height-modal);
 }
 
-.plus-modal.plus-modal-radius-sm {
-    border-radius: var(--size-modal-radius-sm, 6px);
+.plus-modal-width-md {
+    --plus-modal-span: 8;
 }
 
-.plus-modal.plus-modal-radius-md {
-    border-radius: var(--size-modal-radius-md, 16px);
+.plus-modal-width-lg {
+    --plus-modal-span: 10;
 }
 
-.plus-modal.plus-modal-radius-lg {
-    border-radius: var(--size-modal-radius-lg, 24px);
+/* Fill: at the cap whatever the content, so a settings or editor modal never jumps. */
+.plus-modal-height-fill {
+    height: var(--layout-max-height-modal);
 }
+
+/* Deprecated sizing props: the old Modal/* tokens, for the callers that still pass them. */
+.plus-modal.plus-modal-pad-sm { padding: var(--size-modal-pad-y-sm) var(--size-modal-pad-x-sm); }
+.plus-modal.plus-modal-pad-md { padding: var(--size-modal-pad-y-md) var(--size-modal-pad-x-md); }
+.plus-modal.plus-modal-pad-lg { padding: var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg); }
+.plus-modal.plus-modal-gap-sm { gap: var(--size-modal-gap-sm); }
+.plus-modal.plus-modal-gap-md { gap: var(--size-modal-gap-md); }
+.plus-modal.plus-modal-gap-lg { gap: var(--size-modal-gap-lg); }
+.plus-modal.plus-modal-radius-sm { border-radius: var(--size-modal-radius-sm); }
+.plus-modal.plus-modal-radius-md { border-radius: var(--size-modal-radius-md); }
+.plus-modal.plus-modal-radius-lg { border-radius: var(--size-modal-radius-lg); }
 
 .plus-modal.plus-modal-body-only {
     background-color: transparent;
     box-shadow: none;
     border-radius: 0;
+    padding: 0;
     overflow: visible;
 
     .plus-modal-body {
         overflow: visible;
     }
-
-    .plus-modal-content {
-        padding: 0;
-    }
 }
 
+/* Deprecated: the old fixed scrollable box. `height` replaces it. */
 .plus-modal-scrollable {
     height: 226px;
 }
@@ -48,114 +90,150 @@
 .plus-modal-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--size-element-gap-md);
-    padding: var(--size-modal-pad-y-md, 16px) var(--size-modal-pad-x-md, 16px);
+    gap: var(--modal-inline-sm);
     flex-shrink: 0;
 }
 
-.plus-modal-title {
+.plus-modal-heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-stack-sm);
     flex: 1;
-    margin: 0;
-    color: var(--color-on-surface, #191c1e);
-    font-weight: var(--font-weight-semibold-2, 600);
+    min-width: 0;
 }
 
+/* The dialog's h1, named by aria-labelledby: Heading/medium 20/24. */
+.plus-modal-title {
+    margin: 0;
+    font: var(--heading-medium);
+    color: var(--color-on-surface);
+}
+
+/* A string `body`: Body/default 14/20. */
+.plus-modal-body-text {
+    font: var(--body-default);
+    color: var(--color-on-surface);
+}
+
+.plus-modal-description {
+    margin: 0;
+    font: var(--body-default);
+    color: var(--color-on-surface-variant);
+}
+
+.plus-modal-header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--element-inline-sm);
+    flex-shrink: 0;
+}
+
+/* Close button 32 (Item/height-md) holding a 16 icon. */
 .plus-modal-close-btn {
     flex-shrink: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: var(--item-height-md);
+    height: var(--item-height-md);
     padding: 0;
     border: none;
-    border-radius: var(--size-element-radius-md, 8px);
+    border-radius: var(--element-radius-md);
     background-color: transparent;
-    color: var(--color-on-surface-variant, #3f484a);
+    color: var(--color-on-surface-variant);
+    font-size: var(--icon-md);
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .plus-modal-close-btn:hover {
-    background-color: var(--color-surface-container-highest, #e2e2e5);
-    color: var(--color-on-surface, #191c1e);
+    background-color: var(--color-surface-container-highest);
+    color: var(--color-on-surface);
 }
 
 .plus-modal-close-btn:focus-visible {
-    outline: 2px solid var(--color-primary, #0472a8);
-    outline-offset: 2px;
+    outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+    outline-offset: var(--size-element-stroke-lg);
 }
 
 .plus-modal-divider {
-    height: 1px;
-    background-color: var(--color-outline-variant, #e2e2e5);
+    height: var(--size-element-stroke-sm);
+    background-color: var(--color-outline-variant);
     flex-shrink: 0;
 }
 
+/* The body takes what the header and footer leave and scrolls past the cap. */
 .plus-modal-body {
-    flex: 1;
+    flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
 .plus-modal-body-scrollable {
-    overflow-y: auto;
+    display: flex;
     scrollbar-gutter: stable;
 }
 
 .plus-modal-content {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
     min-width: 0;
-    padding: var(--size-modal-pad-y-md, 16px) var(--size-modal-pad-x-md, 16px);
     box-sizing: border-box;
 }
 
-.plus-modal-pad-sm .plus-modal-content {
-    padding: var(--size-modal-pad-y-sm) var(--size-modal-pad-x-sm);
+/* Loading: three bars, the last shorter, where the body will be. */
+.plus-modal-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-stack-md);
 }
 
-.plus-modal-pad-lg .plus-modal-content {
-    padding: var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg);
-}
-
-.plus-modal-gap-sm .plus-modal-content {
-    gap: var(--size-modal-gap-sm);
-}
-
-.plus-modal-gap-md .plus-modal-content {
-    gap: var(--size-modal-gap-md);
-}
-
-.plus-modal-gap-lg .plus-modal-content {
-    gap: var(--size-modal-gap-lg);
-}
-
+/* Footer actions align right, Modal/inline-sm 8 apart. */
 .plus-modal-footer {
     flex-shrink: 0;
-    padding: var(--size-modal-pad-y-md) var(--size-modal-pad-x-md);
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+    gap: var(--modal-inline-sm);
 }
 
 .plus-modal-button-row {
     display: flex;
-    gap: var(--size-element-gap-md);
+    justify-content: flex-end;
+    gap: var(--modal-inline-sm);
     flex-wrap: wrap;
 }
 
-/* 
- * React-Bootstrap Overrides 
- * These classes strip away Bootstrap's default modal styling so our 
+/*
+ * The Overlay: react-bootstrap's `.modal` and its backdrop, on Atlassian's
+ * layers (scrim 500, modal 510) and the Overlay/scrim token. The dialog is
+ * centered with Overlay/pad-y above and below and Overlay/pad-x at the sides;
+ * a modal wider than a narrow screen keeps its width and the overlay scrolls.
+ */
+.modal.plus-modal-overlay {
+    --bs-modal-zindex: var(--layout-z-index-modal);
+    --bs-modal-margin: var(--overlay-pad-y);
+    overflow: auto;
+}
+
+.modal-backdrop.plus-modal-scrim {
+    --bs-backdrop-zindex: var(--layout-z-index-scrim);
+    --bs-backdrop-bg: var(--overlay-scrim);
+    --bs-backdrop-opacity: 1;
+}
+
+/*
+ * React-Bootstrap Overrides
+ * These classes strip away Bootstrap's default modal styling so our
  * .plus-modal class can perfectly control the box appearance.
  */
 .plus-bootstrap-modal-dialog-reset {
-    /* Allow the width prop on our inner div to define the modal width */
+    /* Allow the width of our inner div to define the modal width */
     max-width: none !important;
     width: fit-content !important;
-    margin-left: auto;
-    margin-right: auto;
+    margin: var(--overlay-pad-y) auto;
+    padding-inline: var(--overlay-pad-x);
 }
 
 .plus-bootstrap-modal-content-reset {

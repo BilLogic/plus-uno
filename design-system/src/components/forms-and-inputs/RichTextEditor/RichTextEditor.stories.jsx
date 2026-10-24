@@ -7,6 +7,10 @@ export default {
     component: RichTextEditor,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-23', kind: 'changed', summary: 'The editing area became 120 high at least, growing with what is typed.' },
+            { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
+        ],
         docs: {
             description: {
                 component: 'Rich text editor component with formatting toolbar. Supports bold, italic, lists, and more.'

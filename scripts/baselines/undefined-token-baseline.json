@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 80,
-    "uses": 248,
+    "names": 72,
+    "uses": 229,
     "bare": 5
   },
   "tokens": {
@@ -25,10 +25,6 @@
       "bare": 0
     },
     "--card-pad-y-lg": {
-      "uses": 2,
-      "bare": 0
-    },
-    "--card-radius-sm": {
       "uses": 2,
       "bare": 0
     },
@@ -92,10 +88,6 @@
       "uses": 3,
       "bare": 0
     },
-    "--element-radius-sm": {
-      "uses": 1,
-      "bare": 0
-    },
     "--font-family-base": {
       "uses": 1,
       "bare": 0
@@ -137,15 +129,11 @@
       "bare": 0
     },
     "--font-weight-light": {
-      "uses": 2,
+      "uses": 1,
       "bare": 0
     },
     "--font-weight-medium": {
       "uses": 3,
-      "bare": 0
-    },
-    "--font-weight-regular": {
-      "uses": 1,
       "bare": 0
     },
     "--line-height-h4": {
@@ -270,26 +258,6 @@
     },
     "--size-table-row-radius": {
       "uses": 2,
-      "bare": 0
-    },
-    "--space-050": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--space-100": {
-      "uses": 2,
-      "bare": 0
-    },
-    "--space-200": {
-      "uses": 5,
-      "bare": 0
-    },
-    "--space-300": {
-      "uses": 3,
-      "bare": 0
-    },
-    "--space-500": {
-      "uses": 3,
       "bare": 0
     },
     "--spacing-large-space-300": {

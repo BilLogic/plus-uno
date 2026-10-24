@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import { Accordion as RBAccordion } from 'react-bootstrap';
 import './Accordion.scss';
 
@@ -77,6 +78,8 @@ const AccordionItem = ({
     className = '',
     ...props
 }) => {
+    // The header's heading is one level below the section the accordion sits in.
+    const Heading = headingTag(useHeadingLevel() + 1);
     const itemClasses = [
         'plus-accordion-item',
         disabled ? 'plus-accordion-item--disabled' : '',
@@ -108,11 +111,11 @@ const AccordionItem = ({
               * `accordion-header` class is what `AccordionHeader` would have
               * added, kept so the stylesheet does not know the difference.
               */}
-            <h2 className="accordion-header plus-accordion-header">
+            <Heading className="accordion-header plus-accordion-header">
                 <RBAccordion.Button disabled={disabled}>
                     {header}
                 </RBAccordion.Button>
-            </h2>
+            </Heading>
             <RBAccordion.Body className="plus-accordion-body">
                 {children}
             </RBAccordion.Body>

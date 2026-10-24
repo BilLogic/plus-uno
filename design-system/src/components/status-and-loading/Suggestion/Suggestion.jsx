@@ -76,7 +76,7 @@ export const Suggestion = ({
             }}
         >
             <i className={`fa-solid ${ICONS[kind]} plus-suggestion__icon`} aria-hidden="true" />
-            <span className="plus-suggestion__label body3-txt">{label}</span>
+            <span className="plus-suggestion__label">{label}</span>
         </button>
     );
 };

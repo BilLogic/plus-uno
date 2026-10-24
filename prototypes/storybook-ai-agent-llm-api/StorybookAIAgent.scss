@@ -9,7 +9,7 @@
   position: fixed; /* Changed from absolute to fixed to prevent cutoff by #root overflow:hidden */
   bottom: 92px; /* Lifted up to prevent overlapping over the NavFab compass button */
   right: 16px;
-  z-index: 9999;
+  z-index: var(--layout-z-index-navigation);
   /* Not inherited: without this, the container (and its large layout box for the closed panel)
      still receives pointer events and blocks clicks on Storybook docs / inline Canvas below. */
   pointer-events: none;

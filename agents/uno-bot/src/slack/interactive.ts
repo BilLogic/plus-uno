@@ -27,6 +27,7 @@ import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
 import { restageFor, stageFromButtonFor } from "../turn/env-deps";
 import { conversationsOpen, deleteMessage, postMessage, postToResponseUrl, updateMessage, viewsOpen, viewsPush, viewsUpdate } from "./api";
+import { statusTag } from "./status-tag";
 import { executeVerdict, runVerdict } from "../agent/resolve-proposal";
 import { REVIEW_ACTION_ID } from "./proposal-render";
 import { OPEN_ACTION_ID } from "./card-block";
@@ -641,7 +642,7 @@ async function reviseFromReview(
   const thread = proposalReplyThread(proposal);
   await startRevision(request, {
     threadState: threadStateFor(env),
-    postInThread: async (text) => (await postMessage(env, { channel: proposal.channel, thread_ts: thread, text }))?.ts ?? null,
+    postInThread: async (text) => (await postMessage(env, { channel: proposal.channel, thread_ts: thread, text, metadata: statusTag("note") }))?.ts ?? null,
     queueTurn: async (noteTs) => {
       const event: SlackMessageEvent = {
         type: "message",

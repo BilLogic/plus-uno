@@ -19,6 +19,8 @@ import { fileURLToPath } from 'url';
 import { tokenDeclarationPattern, varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 import { TOKEN_DIR, tokenSources } from '../design-system/src/lib/tokens-node.mjs';
 import { isEntry } from './lib/findings.mjs';
+import { frameLayerToken, isFrameLayerCollection } from './lib/frame-layer-collections.mjs';
+import { TYPOGRAPHY_COLLECTION, typographyToken } from './lib/typography-collection.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -148,6 +150,9 @@ export function deriveCandidates(collection, name) {
   const head = parts[0].replace(/^_/, '');
   const out = [];
 
+  if (isFrameLayerCollection(collection)) return [`--${frameLayerToken(collection, name)}`];
+  if (collection === TYPOGRAPHY_COLLECTION) return [typographyToken(name)].filter(Boolean);
+
   if (collection.startsWith('colors')) {
     // State layers land as `--color-<base>-state-<NN>` in code. Figma spells the
     // same thing two ways: accent puts the tint in the leaf ("Advocacy 08"),
@@ -199,6 +204,14 @@ export function deriveCandidates(collection, name) {
     return out;
   }
 
+  // The new scale collections carry their code names in Figma's code syntax,
+  // which the snapshot does not record, so these candidates restate the rule
+  // that syntax follows. A spacing / foundations variable is its path, minus
+  // the Size folder ("Element/pad-x-sm" -> --element-pad-x-sm,
+  // "Size/Height/200" -> --height-200); a spacing / primitives variable is its
+  // leaf ("Space/space-025" -> --space-025), the candidate every collection
+  // ends with. A candidate that misses shows up as unresolved.
+  if (collection === 'spacing / foundations') out.push(`--${slug(name.replace(/^Size\//, ''))}`);
   out.push(`--${slug(leaf)}`);
   return out;
 }

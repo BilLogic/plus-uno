@@ -60,6 +60,18 @@ const SessionAdminPage = React.lazy(() =>
 const StudentAdminPage = React.lazy(() =>
   import('@/specs/Admin/Student/Pages/StudentAdminPage/StudentAdminPage'),
 );
+/**
+ * Toolkit › Students. There is no tutor-facing student page yet, so the admin
+ * students list and its StudentModal stand in; an opened student becomes an
+ * open tab under Toolkit › Students.
+ */
+const ToolkitStudentsPage = React.lazy(() =>
+  import('@/specs/Admin/Student/Pages/StudentAdminPage/StudentAdminPage').then(({ default: StudentAdminPage }) => ({
+    default: (props) => (
+      <StudentAdminPage openTabParent="toolkit-students" openTabHref="/toolkit/students" {...props} />
+    ),
+  })),
+);
 const GroupInfoPage = React.lazy(() =>
   import('@/specs/Admin/Group/Pages/GroupInfoPage/GroupInfoPage'),
 );
@@ -110,6 +122,7 @@ function LiveAppRouteElements() {
       <Route path="/training/onboarding/inner" element={<OnboardingInnerPage />} />
 
       <Route path="/toolkit/sessions" element={<AllSessionsPage />} />
+      <Route path="/toolkit/students" element={<ToolkitStudentsPage />} />
       <Route path="/toolkit/my-sessions" element={<MySessionsPage />} />
       <Route path="/toolkit/sign-ups" element={<SignUpsPage />} />
       <Route path="/toolkit/call-offs" element={<CallOffsPage />} />

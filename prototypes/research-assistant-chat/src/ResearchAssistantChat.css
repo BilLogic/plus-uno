@@ -97,17 +97,17 @@
 }
 
 /* TopBar Stagger (Rolls in after skeletons) */
-:is(#tutor-training-progress-page, #home-redesign-page) .shell-reveal.has-entered .plus-topbar .topbar-left-section {
+:is(#tutor-training-progress-page, #home-redesign-page) .shell-reveal.has-entered .plus-topbar .plus-topbar__start {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 0ms;
 }
 
-:is(#tutor-training-progress-page, #home-redesign-page) .shell-reveal.has-entered .plus-topbar .topbar-center-section {
+:is(#tutor-training-progress-page, #home-redesign-page) .shell-reveal.has-entered .plus-topbar .plus-topbar__middle {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 280ms;
 }
 
-:is(#tutor-training-progress-page, #home-redesign-page) .shell-reveal.has-entered .plus-topbar .topbar-right-section {
+:is(#tutor-training-progress-page, #home-redesign-page) .shell-reveal.has-entered .plus-topbar .plus-topbar__end {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 560ms;
 }

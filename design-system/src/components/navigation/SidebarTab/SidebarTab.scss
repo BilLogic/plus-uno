@@ -1,14 +1,173 @@
 /**
  * SidebarTab Styles
+ *
+ * The BS4 Foundation `Sidebar Tab`: 32 high (Item/height-md), pad-x 12
+ * (Element/pad-x-md), gap 8 (Element/inline-md), radius Element/radius-item-md,
+ * a 16 icon (Icon/md) and a Body/default label. Every length is a token.
  */
 
 .plus-sidebar-tab {
+    display: flex;
+    align-items: center;
+    gap: var(--element-inline-md);
+    width: 100%;
+    min-width: 0;
+    height: var(--item-height-md);
+    box-sizing: border-box;
+    padding: 0 var(--element-pad-x-md);
+    border-radius: var(--element-radius-item-md);
+    background-color: transparent;
+    color: var(--color-on-surface);
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+        color: var(--color-on-surface);
+        text-decoration: none;
+    }
+
     &:hover:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
-        background-color: var(--color-on-surface-state-08) !important;
+        background-color: var(--color-on-surface-state-08);
     }
 
     &:focus-visible:not(.plus-sidebar-tab--disabled) {
-        outline: 2px solid var(--color-primary);
+        outline: 2px solid var(--color-focus-ring);
         outline-offset: -2px;
     }
+}
+
+.plus-sidebar-tab__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--icon-md);
+    height: var(--icon-md);
+    color: var(--color-on-surface-variant);
+
+    i {
+        font-size: var(--icon-md);
+    }
+}
+
+.plus-sidebar-tab__text {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.plus-sidebar-tab__label,
+.plus-sidebar-tab__description {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.plus-sidebar-tab__label {
+    font: var(--body-default);
+}
+
+.plus-sidebar-tab__description {
+    font: var(--body-small);
+    color: var(--color-on-surface-variant);
+}
+
+// A description makes the row two lines: it grows past 32 to 40 (2 + 20 + 16 + 2),
+// as the Figma row does with its min height 32 and pad-y 2.
+.plus-sidebar-tab--with-description {
+    height: auto;
+    min-height: var(--item-height-md);
+    padding-top: var(--element-pad-y-sm);
+    padding-bottom: var(--element-pad-y-sm);
+}
+
+.plus-sidebar-tab__after {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* ------------------------------------------------------------- states */
+
+.plus-sidebar-tab--hover,
+.plus-sidebar-tab--focus,
+.plus-sidebar-tab--selected {
+    color: var(--color-primary-text);
+
+    &:hover {
+        color: var(--color-primary-text);
+    }
+
+    .plus-sidebar-tab__icon {
+        color: var(--color-primary);
+    }
+}
+
+.plus-sidebar-tab--hover,
+.plus-sidebar-tab--focus {
+    background-color: var(--color-primary-state-12);
+}
+
+.plus-sidebar-tab--selected {
+    background-color: var(--color-primary-state-16);
+}
+
+.plus-sidebar-tab--focus {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: -2px;
+}
+
+// A solid muted color rather than an opacity, so disabled text still meets AA.
+.plus-sidebar-tab--disabled {
+    color: var(--color-on-surface-variant);
+    cursor: not-allowed;
+
+    &:hover {
+        color: var(--color-on-surface-variant);
+    }
+}
+
+/* ------------------------------------------------------------- actions on hover */
+
+// The row and its actions are siblings in this wrapper, so the actions never
+// nest inside the row's button or link. They overlay the row's end and show
+// while the pointer is over the item or anything in it has focus.
+.plus-sidebar-tab-item {
+    position: relative;
+    display: flex;
+    min-width: 0;
+
+    &:hover > .plus-sidebar-tab:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
+        background-color: var(--color-on-surface-state-08);
+    }
+
+    &:hover,
+    &:focus-within {
+        // Room for the actions, so the label truncates before it reaches them.
+        > .plus-sidebar-tab {
+            padding-right: calc(var(--element-pad-x-sm) + var(--item-height-sm));
+        }
+
+        .plus-sidebar-tab__after {
+            visibility: hidden;
+        }
+
+        .plus-sidebar-tab__actions {
+            visibility: visible;
+        }
+    }
+}
+
+.plus-sidebar-tab__actions {
+    position: absolute;
+    top: 0;
+    right: var(--element-pad-x-xs);
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--element-inline-sm);
+    visibility: hidden;
 }

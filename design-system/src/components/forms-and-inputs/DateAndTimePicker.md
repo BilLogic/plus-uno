@@ -56,7 +56,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-danger` · `--color-danger-text` · `--color-focus-ring` · `--color-on-surface` · `--color-on-surface-variant` · `--color-primary` · `--color-primary-text` · `--color-success` · `--color-success-text` · `--font-line-height-body2` · `--font-size-body2` · `--font-weight-medium` · `--font-weight-normal` · `--font-weight-semibold-2` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-radius-sm` · `--size-element-stroke-lg`
+`--body-default` · `--body-small` · `--color-danger` · `--color-danger-text` · `--color-focus-ring` · `--color-on-surface` · `--color-on-surface-variant` · `--color-primary` · `--color-primary-text` · `--color-success` · `--color-success-text` · `--item-height-sm` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-radius-sm` · `--size-element-stroke-lg` · `--type-weight-medium` · `--type-weight-semibold`
 
 From `design-system/src/components/forms-and-inputs/DateAndTimePicker.scss`. Override these through the token layer, never with a literal.
 

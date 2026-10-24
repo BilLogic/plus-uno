@@ -1,6 +1,7 @@
 /*
- * OptionRow — the one row of every option list (Figma: Dropdown list Item).
- * The row fills its list's width, and every state's fill spans the whole row.
+ * OptionRow — the one row of every option list (Figma: Dropdown list Item,
+ * drawn as Pattern/Menu's row). An Item 32 that grows with a description
+ * line, inset in its list, with every state's fill on the row's own radius.
  */
 
 .plus-option-row {
@@ -10,19 +11,18 @@
 
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-md);
+    gap: var(--element-inline-md);
     box-sizing: border-box;
     width: 100%;
     min-width: 0;
-    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    min-height: var(--item-height-md);
+    padding: var(--element-pad-y-md) var(--element-pad-x-md);
     margin: 0;
     border: none;
+    border-radius: var(--element-radius-item-md);
     background-color: transparent;
     color: var(--color-on-surface);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-body2);
-    font-weight: var(--font-weight-normal);
-    line-height: var(--font-line-height-body2);
+    font: var(--body-default);
     text-align: left;
     cursor: pointer;
     user-select: none;
@@ -40,6 +40,11 @@
 
     &.is-selected {
         background-color: var(--color-primary-state-08);
+        color: var(--color-primary-text);
+
+        .plus-option-row-description {
+            color: var(--color-primary-text);
+        }
 
         &:hover:not(.is-disabled),
         &.is-highlighted:not(.is-disabled) {
@@ -97,11 +102,9 @@
 }
 
 .plus-option-row--group {
-    padding-top: var(--size-element-pad-y-lg);
+    min-height: 0;
     color: var(--color-on-surface-variant);
-    font-size: var(--font-size-body3);
-    font-weight: var(--font-weight-semibold-1);
-    line-height: var(--font-line-height-body3);
+    font: var(--heading-xxsmall);
     cursor: default;
 
     &:hover,
@@ -156,8 +159,7 @@
 
 .plus-option-row-description {
     color: var(--color-on-surface-variant);
-    font-size: var(--font-size-body3);
-    line-height: var(--font-line-height-body3);
+    font: var(--body-small);
 }
 
 .plus-option-row-selected-mark {
@@ -205,7 +207,7 @@
         i {
             // @grounds: --color-primary
             color: var(--color-on-primary);
-            font-size: var(--font-size-body3);
+            font-size: var(--icon-sm);
         }
     }
 

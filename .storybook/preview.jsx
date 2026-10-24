@@ -160,6 +160,7 @@ const preview = {
               "Introduction",
               "Surfaces",
               "Surface container",
+              "Sidebar",
               "Card",
               "Section",
               "Modal",

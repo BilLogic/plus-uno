@@ -15,6 +15,9 @@
 @use "../tokens/primitives" as *;
 @use "../tokens/spacing_semantics" as *;
 @use "../tokens/layout" as *;
+// The new scales, beside the old size tokens; see the header of _scales.scss.
+@use "../tokens/scales" as *;
+@use "../tokens/frame_layers" as *;
 @use "../tokens/fonts" as *;
 @use "../tokens/elevation" as *;
 
@@ -47,6 +50,25 @@
 
 .plus-card .plus-card-content {
     padding: 0 !important; // Remove RB default padding - padding is on .plus-card itself
+}
+
+// Card type: a Heading/small 16 container title over a Body/default 14
+// description; everything else in the card is Body/default.
+.plus-card {
+    font: var(--body-default);
+    color: var(--color-on-surface);
+}
+
+.plus-card .plus-card-title {
+    margin: 0;
+    font: var(--heading-small);
+    color: var(--color-on-surface);
+}
+
+.plus-card .plus-card-subtitle {
+    margin: 0 0 var(--element-stack-md);
+    font: var(--body-default);
+    color: var(--color-on-surface-variant);
 }
 
 // Image always flush to top/left/right edges regardless of card padding size
@@ -302,8 +324,40 @@ body {
     align-items: center;
     justify-content: center;
     color: var(--color-on-surface-variant, #3f484a);
-    font-size: var(--font-size-body3, 10px);
+    font: var(--body-small);
     box-sizing: border-box;
+}
+
+// Bootstrap's layers, on the layer scale
+// Bootstrap's own numbers (dropdown 1000, sticky 1020, fixed 1030, toast 1090,
+// popover 1070, tooltip 1080) sit above a modal's scrim (500). Each moves to
+// Atlassian's layer for what it is. Bootstrap's modal and backdrop are set by
+// the Modal component itself.
+.dropdown-menu {
+    --bs-dropdown-zindex: var(--layout-z-index-popup);
+}
+
+.toast-container {
+    --bs-toast-zindex: var(--layout-z-index-flag);
+}
+
+.popover {
+    --bs-popover-zindex: var(--layout-z-index-tooltip);
+}
+
+.tooltip {
+    --bs-tooltip-zindex: var(--layout-z-index-tooltip);
+}
+
+// A sticky header is a card (100); a fixed bar is navigation (200).
+.sticky-top,
+.sticky-bottom {
+    z-index: var(--layout-z-index-card);
+}
+
+.fixed-top,
+.fixed-bottom {
+    z-index: var(--layout-z-index-navigation);
 }
 
 // Modal Boundary Utility

@@ -36,8 +36,7 @@
     padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
     text-align: center;
     color: var(--color-on-surface);
-    font-family: var(--font-family-body);
-    font-weight: var(--font-weight-normal);
+    font: var(--body-default);
     background-color: var(--color-surface-container-low);
 }
 
@@ -46,8 +45,7 @@
     padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
     text-align: left;
     color: var(--color-on-surface);
-    font-family: var(--font-family-body);
-    font-weight: var(--font-weight-normal);
+    font: var(--body-default);
     background-color: var(--color-surface-container-low);
     white-space: nowrap;
 }

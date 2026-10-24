@@ -2,7 +2,10 @@ import fs from 'fs';
 import path from 'path';
 
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
+import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { compare, refusals } from './token-generation.mjs';
+import { FRAME_LAYER_COLLECTIONS, frameLayerFile, frameLayerFolder, frameLayerToken } from './lib/frame-layer-collections.mjs';
+import { TYPOGRAPHY_FILE, TYPOGRAPHY_FOLDERS, typographyFolder, typographyToken } from './lib/typography-collection.mjs';
 
 /**
  * The Figma exports the SCSS is generated FROM, and where the SCSS lands.
@@ -499,12 +502,27 @@ const CODE_ONLY_LAYOUT = {
 
 /**
  * Stacking layers. Figma has no z-index, so these are code's alone and are
- * written unitless. The overlay layer sits above a modal (Bootstrap's 1055)
- * and level with its popovers, so a list opened from a field inside a modal
- * is not covered by it.
+ * written unitless. They are Atlassian's layer numbers, one scale for the whole
+ * product, so nothing outside a modal sits above its scrim:
+ * card 100 (sticky headers, raised cards), navigation 200 (sidebars, the page
+ * frame's floating buttons), dialog 300 (side panels), popup 400, scrim 500,
+ * modal 510, flag 600, spotlight 700, tooltip 800. A nested confirm reuses the
+ * scrim and modal inside the first modal's layer rather than counting up.
+ *
+ * A popup or menu (400) sits under a modal (510). One opened from a field
+ * inside a modal takes the modal's layer: it mounts inside the modal's
+ * overlay (`popupLayerOf` in forms-and-inputs/_internal/anchorPlacement.js).
  */
 const CODE_ONLY_LAYERS = {
-    'layout-z-index-overlay': { value: 1070, note: 'floating listboxes and menus; above a modal' },
+    'layout-z-index-card': { value: 100, note: 'sticky headers and raised cards' },
+    'layout-z-index-navigation': { value: 200, note: 'sidebars and floating page navigation' },
+    'layout-z-index-dialog': { value: 300, note: 'side panels and inline dialogs' },
+    'layout-z-index-popup': { value: 400, note: 'popups and menus' },
+    'layout-z-index-scrim': { value: 500, note: 'the scrim under a modal' },
+    'layout-z-index-modal': { value: 510, note: 'a modal, over its scrim' },
+    'layout-z-index-flag': { value: 600, note: 'flags, above a modal' },
+    'layout-z-index-spotlight': { value: 700, note: 'onboarding spotlights' },
+    'layout-z-index-tooltip': { value: 800, note: 'tooltips, above everything' },
 };
 
 /**
@@ -635,6 +653,406 @@ ${columns(modes[0], '    ')}}
     return scss;
 }
 
+/*
+ * THE NEW SCALES
+ *
+ * The collections the layout, token and type system adds beside the old
+ * `size / *` ones: spacing / primitives (space, radius, stroke and size,
+ * hidden in Figma) and spacing / foundations, whose folders are Size (common
+ * Height/Width plus Item, Row, Label, Field, Icon, Image), Element and Border.
+ * They carry their own CSS names, so the old tokens keep resolving while each
+ * use moves across.
+ *
+ * Nothing here derives a name. Each variable's WEB code syntax in Figma is its
+ * CSS name, so a variable without one is a refusal rather than a guess, and
+ * an alias is written as a `var()` of its target's code syntax, which keeps
+ * "category tokens point at the common scales" true in the stylesheet too.
+ */
+
+/** The exports, in the order they are written; an alias may point at any of them. */
+const SCALE_COLLECTIONS = [
+    { file: 'spacing _ primitives.json', heading: 'spacing / primitives (hidden in Figma; point semantic tokens at these, not components)' },
+    { file: 'spacing _ foundations.json', heading: 'spacing / foundations' },
+];
+
+/**
+ * The variables with each folder kept together at every depth, folders in the
+ * order they first appear. Figma adds a new variable at the end of its
+ * collection, so without this `Size/Width/1900` would land after `Size/Image`
+ * instead of beside the other widths.
+ */
+function byFolder(variables, depth = 0) {
+    const groups = new Map();
+    for (const v of variables) {
+        const parts = v.name.split('/');
+        const key = depth < parts.length - 1 ? parts[depth].trim() : '';
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(v);
+    }
+    return [...groups].flatMap(([key, vs]) => (key ? byFolder(vs, depth + 1) : vs));
+}
+
+/** `var(--element-pad-x-sm)` -> `--element-pad-x-sm`, or `null` when it is not a `var()` of one name. */
+const webName = (syntax) => /^var\((--[a-z0-9-]+)\)$/.exec(syntax ?? '')?.[1] ?? null;
+
+/**
+ * Generate the new scales SCSS
+ */
+function generateScalesSCSS() {
+    const sources = SCALE_COLLECTIONS.map(({ file, heading }) => ({ file, heading, ...readSource(file, { oneMode: true }) }));
+    const nameById = {};
+    const seen = new Set();
+    for (const { file, json } of sources) {
+        for (const v of json.variables) {
+            const name = webName(v.codeSyntax?.WEB);
+            if (!name) throw new Error(`${file}: ${v.name} has no WEB code syntax of the form var(--name). Set it in Figma and export again.`);
+            if (seen.has(name)) throw new Error(`${file}: ${name} is the code syntax of two variables.`);
+            seen.add(name);
+            nameById[v.id] = name;
+        }
+    }
+
+    let scss = `/**
+ * Scale Tokens
+ * Generated from the spacing / primitives and spacing / foundations collections in Figma.
+ * Each name is the variable's WEB code syntax; an alias is a var() of its target.
+ */
+
+:root {
+`;
+    for (const { file, heading, json, modes: [mode] } of sources) {
+        scss += `\n    /* ${heading} */\n`;
+        let folder = null;
+        for (const v of byFolder(json.variables)) {
+            // A comment at each top-level folder (Space, Radius … Size, Element, Border).
+            const top = v.name.split('/')[0];
+            if (top !== folder) scss += `    /* ${(folder = top)} */\n`;
+            const value = v.valuesByMode[mode];
+            let css;
+            if (value?.type === 'VARIABLE_ALIAS') {
+                if (!nameById[value.id]) throw new Error(`${file}: ${v.name} aliases ${value.id}, which none of the scale exports holds.`);
+                css = `var(${nameById[value.id]})`;
+            } else if (typeof value === 'number') {
+                css = px(value);
+            } else {
+                throw new Error(`${file}: ${v.name} has neither an alias nor a number.`);
+            }
+            scss += `    ${nameById[v.id]}: ${css};\n`;
+        }
+    }
+    return `${scss}}\n`;
+}
+
+/*
+ * FRAME AND LAYER TOKENS
+ *
+ * The sets listed in `scripts/lib/frame-layer-collections.mjs`, which also
+ * says how a variable's code name is made. They sit beside the `size / *`
+ * tokens above under new names, so nothing that reads an old name changes
+ * until it is moved. Each variable's Figma code syntax has to name the same
+ * token, so the name a designer copies from Figma is the one code declares,
+ * and every alias resolves into the scales above.
+ */
+
+/** The modes `spacing / layout` takes, named as `size _ layout.json` names the breakpoint each starts at. */
+const FRAME_LAYER_MODES = ['Medium (768px)', 'Large (1024px)', 'X-Large (1440px)'];
+
+/**
+ * Figma variables with no CSS: the template switch that shows the docked
+ * sidebar layer. Code docks the sidebar with a media query instead.
+ */
+const FIGMA_ONLY_FRAME_LAYERS = new Set(['sidebar-docked']);
+
+/** Figma numbers that are counts, not lengths, so CSS takes them without a unit. */
+const UNITLESS_FRAME_LAYERS = new Set(['columns']);
+
+/**
+ * Figma values that stand in for "no limit", which a variable cannot hold:
+ * every mode needs a number. Code writes `none` wherever the variable holds
+ * its stand-in, so X-Large has no maximum screen width.
+ */
+const NO_LIMIT_FRAME_LAYERS = { 'max-width-screen': 10000 };
+
+/**
+ * Tokens code needs that Figma cannot hold: a height relative to the screen,
+ * and a popover's gap to its trigger, which Figma draws by hand. `figmaName`
+ * is the variable that would replace each one.
+ */
+const CODE_ONLY_FRAME_LAYERS = {
+    'layout-max-height-modal': {
+        value: 'calc(100dvh - 2 * var(--overlay-pad-y))',
+        note: 'a Hug modal grows to it; a Fill modal sits at it',
+        figmaName: 'Modal/max-height-modal (Spacing / Layout)',
+    },
+    'popover-offset': {
+        value: 'var(--space-025)',
+        note: 'gap from a popover to its trigger',
+        figmaName: 'Popover/Placement/offset',
+    },
+};
+
+/** Under this screen height the overlay pads 24 above and below, not 64. Code only. */
+const SHORT_SCREEN = { maxHeight: 639.98, token: 'overlay-pad-y', value: 'var(--space-150)' };
+
+/**
+ * Generate the frame and layer tokens SCSS
+ */
+function generateFrameLayersSCSS() {
+    // Aliases point into the scales; each is written as a var() of its
+    // target's code syntax, the way generateScalesSCSS writes its own.
+    const scaleName = {};
+    for (const { file } of SCALE_COLLECTIONS) {
+        for (const v of readSource(file).json.variables) scaleName[v.id] = webName(v.codeSyntax?.WEB);
+    }
+
+    const layout = readSource('size _ layout.json').json;
+    const minWidth = layout.variables.find((v) => v.name === 'Breakpoints/min width');
+    const layoutModeIds = Object.fromEntries(Object.entries(layout.modes).map(([id, name]) => [name, id]));
+    const startsAt = (mode) => {
+        const id = layoutModeIds[mode];
+        if (!id) throw new Error(`size _ layout.json: no "${mode}" mode.`);
+        return minWidth.resolvedValuesByMode[id];
+    };
+
+    const declared = new Map();
+    const blocks = new Map(); // breakpoint min-width -> lines
+    let root = '';
+
+    for (const { name: collection, heading } of FRAME_LAYER_COLLECTIONS) {
+        const file = frameLayerFile(collection);
+        const { json } = readSource(file);
+        const modes = Object.entries(json.modes).map(([id, name]) => {
+            if (Object.keys(json.modes).length > 1 && !FRAME_LAYER_MODES.includes(name)) {
+                throw new Error(`${file}: unknown mode "${name}". Modes are ${FRAME_LAYER_MODES.join(' · ')}.`);
+            }
+            return { id, name };
+        });
+        root += `\n    /* ${heading} */\n`;
+        let folder = null;
+
+        for (const v of byFolder(json.variables)) {
+            const leaf = v.name.split('/').pop();
+            if (v.resolvedType === 'BOOLEAN') {
+                if (!FIGMA_ONLY_FRAME_LAYERS.has(leaf)) {
+                    throw new Error(`${file}: ${v.name} is a boolean, which CSS cannot hold. List it in FIGMA_ONLY_FRAME_LAYERS.`);
+                }
+                continue;
+            }
+            const token = frameLayerToken(collection, v.name);
+            if (v.codeSyntax?.WEB !== `var(--${token})`) {
+                throw new Error(`${file}: ${v.name} has Figma code syntax ${v.codeSyntax?.WEB ?? '(none)'}, but code declares --${token}.`);
+            }
+            if (declared.has(token)) throw new Error(`${file}: ${v.name} and ${declared.get(token)} are both --${token}.`);
+            declared.set(token, `${file} ${v.name}`);
+            if (frameLayerFolder(v.name) !== folder) {
+                folder = frameLayerFolder(v.name);
+                root += `    /* ${folder} */\n`;
+            }
+
+            const css = (mode) => {
+                const val = v.valuesByMode[mode.id];
+                if (val?.type === 'VARIABLE_ALIAS') {
+                    if (!scaleName[val.id]) throw new Error(`${file}: ${v.name} aliases ${val.id}, which none of the scale exports holds.`);
+                    return `var(${scaleName[val.id]})`;
+                }
+                if (typeof val === 'number') {
+                    if (NO_LIMIT_FRAME_LAYERS[leaf] === val) return 'none';
+                    return UNITLESS_FRAME_LAYERS.has(leaf) ? String(val) : px(val);
+                }
+                if (val?.r !== undefined) return cssColor(val);
+                throw new Error(`${file}: ${v.name} has no value at ${mode.name}.`);
+            };
+            const values = modes.map(css);
+
+            root += `    --${token}: ${values[0]};\n`;
+            for (let i = 1; i < modes.length; i++) {
+                if (values[i] === values[i - 1]) continue;
+                const at = startsAt(modes[i].name);
+                if (!blocks.has(at)) blocks.set(at, '');
+                blocks.set(at, blocks.get(at) + `        --${token}: ${values[i]};\n`);
+            }
+        }
+    }
+
+    for (const [token, { figmaName }] of Object.entries(CODE_ONLY_FRAME_LAYERS)) {
+        if (declared.has(token)) stale('CODE_ONLY_FRAME_LAYERS', `Figma now has --${token} (${figmaName}); read it from the export.`);
+    }
+    for (const leaf of Object.keys(NO_LIMIT_FRAME_LAYERS)) {
+        if (![...declared.values()].some((where) => where.endsWith(`/${leaf}`))) {
+            stale('NO_LIMIT_FRAME_LAYERS', `no variable ends in ${leaf}; its stand-in has nothing to stand in for.`);
+        }
+    }
+    if (!declared.has(SHORT_SCREEN.token)) {
+        stale('SHORT_SCREEN', `Figma no longer has --${SHORT_SCREEN.token}; the short-screen override has nothing to override.`);
+    }
+
+    let scss = `/**
+ * Frame and Layer Tokens
+ * Generated from the spacing / layout, spacing / patterns and color / patterns
+ * sets in Figma. spacing / layout has modes Medium (768px) · Large (1024px) ·
+ * X-Large (1440px): the Medium value is in :root, wider modes override below.
+ *
+ * The derived Layout rows (pad-left-container, width-content, width-column,
+ * width-modal-*) are each mode's value at its screen width, 768 · 1024 · 1440,
+ * the same numbers Figma's modes hold. Between those widths they step rather
+ * than follow the screen, so code that needs the exact width at any screen
+ * computes it from the rules instead of reading these.
+ */
+
+:root {
+${root.slice(1)}
+    /* Code only; not Figma variables (CODE_ONLY_FRAME_LAYERS) */
+${Object.entries(CODE_ONLY_FRAME_LAYERS).map(([token, { value, note }]) => `    --${token}: ${value}; /* ${note} */\n`).join('')}}
+`;
+    for (const at of [...blocks.keys()].sort((a, b) => a - b)) {
+        scss += `\n@media (min-width: ${px(at)}) {\n    :root {\n${blocks.get(at)}    }\n}\n`;
+    }
+    scss += `\n/* A short screen pads modals 24 above and below; code only (SHORT_SCREEN) */
+@media (max-height: ${px(SHORT_SCREEN.maxHeight)}) {
+    :root {
+        --${SHORT_SCREEN.token}: ${SHORT_SCREEN.value};
+    }
+}
+`;
+    return scss;
+}
+
+/*
+ * TYPE TOKENS
+ *
+ * The `typography` collection is one collection in four folders: `Font size/*`
+ * and `Line height/*` (hidden from publishing, named by rem × 100),
+ * `Family/*` and `Weight/*`. Beside it in the export are the text styles that
+ * bind every property to one of those variables. Code takes the plain spec
+ * names: `Weight/medium` is `--type-weight-medium`, and `Heading/large` is
+ * `--heading-large`, a `font` shorthand built from the same variables the
+ * style binds, so a family is written once, in its token.
+ */
+
+/** A size in rem, from Figma's px: `12` -> `0.75rem`. */
+const rem = (n) => `${+(Number(n) / 16).toFixed(4)}rem`;
+
+/** How each kind of typography value is written in CSS; families take their fallbacks below. */
+const TYPE_VALUE = { size: rem, weight: String, family: null };
+
+/**
+ * A type variable's CSS name and folder, from `scripts/lib/typography-collection.mjs`.
+ * The name is checked against the variable's own WEB code syntax, so Figma's
+ * Dev Mode and the stylesheet cannot name one token two ways.
+ */
+function typeToken(v) {
+    const folder = typographyFolder(v.name);
+    if (!folder) throw new Error(`${TYPOGRAPHY_FILE}: ${v.name} is none of ${TYPOGRAPHY_FOLDERS.map((f) => `${f.figma}*`).join(', ')}.`);
+    const token = typographyToken(v.name);
+    if (v.codeSyntax?.WEB !== `var(${token})`) {
+        throw new Error(`${TYPOGRAPHY_FILE}: ${v.name} has code syntax ${v.codeSyntax?.WEB}; it is written as var(${token}).`);
+    }
+    return { token, folder };
+}
+
+/**
+ * The faces after the Figma family in each stack. Figma holds one family name;
+ * a stylesheet needs a chain that ends in a CSS generic, UNQUOTED: a quoted
+ * `"sans-serif"` is a family nothing is called, so the chain simply ends
+ * (`check:font-families`). The body stack keeps the Open Sans step
+ * `--font-family-body` already had.
+ */
+const FAMILY_FALLBACKS = {
+    'Family/heading': ['sans-serif'],
+    'Family/body': ['"Open Sans"', 'sans-serif'],
+};
+
+/**
+ * Text styles code has and Figma does not. Code is relative to the text around
+ * it (Atlassian's `font.code`: 0.875em, weight 400, line height 1), which a
+ * Figma text style cannot express, so it is code only.
+ */
+const CODE_ONLY_TYPE_STYLES = {
+    'Code': 'var(--type-weight-regular) 0.875em / 1 var(--font-family-code)',
+};
+
+/** The style groups in the order they are written. */
+const TYPE_STYLE_GROUPS = ['Heading', 'Body', 'Metric'];
+
+/**
+ * Generate type tokens SCSS
+ */
+function generateTypeSCSS() {
+    const { json, modes: [mode] } = readSource(TYPOGRAPHY_FILE, { oneMode: true });
+    if (!Array.isArray(json.textStyles)) {
+        throw new Error(
+            `${TYPOGRAPHY_FILE}: no textStyles. The REST variables endpoint does not return styles; ` +
+            'export the collection with its bound text styles from the plugin.',
+        );
+    }
+    const byId = new Map(json.variables.map((v) => [v.id, v]));
+
+    const declarations = new Map(TYPOGRAPHY_FOLDERS.map((f) => [f, []]));
+    for (const v of json.variables) {
+        const { token, folder } = typeToken(v);
+        const raw = v.valuesByMode[mode];
+        const write = TYPE_VALUE[folder.kind];
+        let value;
+        if (write) {
+            value = write(raw);
+        } else {
+            const fallback = FAMILY_FALLBACKS[v.name];
+            if (!fallback) throw new Error(`${TYPOGRAPHY_FILE}: ${v.name} has no FAMILY_FALLBACKS entry.`);
+            value = [`"${raw}"`, ...fallback].join(', ');
+        }
+        declarations.get(folder).push({ token, value, px: raw });
+    }
+    for (const name of Object.keys(FAMILY_FALLBACKS)) {
+        if (!json.variables.some((v) => v.name === name)) stale('FAMILY_FALLBACKS', `Figma has no ${name}.`);
+    }
+
+    const styles = [];
+    for (const style of json.textStyles) {
+        const group = TYPE_STYLE_GROUPS.indexOf(style.name.split('/')[0]);
+        if (group < 0) throw new Error(`${TYPOGRAPHY_FILE}: ${style.name} is in no TYPE_STYLE_GROUPS group.`);
+        const part = (field) => {
+            const v = byId.get(style.boundVariables?.[field]);
+            if (!v) throw new Error(`${TYPOGRAPHY_FILE}: ${style.name} ${field} is not bound to a type variable.`);
+            return `var(${typeToken(v).token})`;
+        };
+        styles.push({
+            group,
+            token: `--${slug(style.name)}`,
+            value: `${part('fontWeight')} ${part('fontSize')} / ${part('lineHeight')} ${part('fontFamily')}`,
+        });
+    }
+    for (const name of Object.keys(CODE_ONLY_TYPE_STYLES)) {
+        if (json.textStyles.some((s) => s.name === name || s.name.startsWith(`${name}/`))) {
+            stale('CODE_ONLY_TYPE_STYLES', `Figma now has a ${name} style; read it from the export.`);
+        }
+    }
+
+    const block = (items) => items.map(({ token, value }) => `    ${token}: ${value};\n`).join('');
+    const [sizes, lineHeights, families, weights] = TYPOGRAPHY_FOLDERS.map((f) => declarations.get(f));
+    const bySize = (items) => [...items].sort((a, b) => a.px - b.px);
+
+    return `/**
+ * Type Tokens
+ * Generated from the Figma \`typography\` collection and its bound text styles.
+ * A text style is a \`font\` shorthand: weight, size / line height, family.
+ */
+
+:root {
+    /* Font size primitives (hidden in Figma; named by rem × 100) */
+${block(bySize(sizes))}
+    /* Line height primitives (hidden in Figma; named by rem × 100) */
+${block(bySize(lineHeights))}
+    /* Families */
+${block(families)}
+    /* Weights */
+${block(bySize(weights))}
+    /* Text styles */
+${block([...styles].sort((a, b) => a.group - b.group))}
+    /* Code only (CODE_ONLY_TYPE_STYLES) */
+${block(Object.entries(CODE_ONLY_TYPE_STYLES).map(([name, value]) => ({ token: `--${slug(name)}`, value })))}}
+`;
+}
+
 // Generate all files
 //
 // EVERY FILE IS BUILT IN MEMORY FIRST. This used to write each one as it was
@@ -653,10 +1071,32 @@ try {
         { file: '_primitives.scss', generated: generatePrimitivesSCSS() },
         { file: '_spacing_semantics.scss', generated: generateSemanticsSCSS() },
         { file: '_layout.scss', generated: generateLayoutSCSS() },
+        { file: '_scales.scss', generated: generateScalesSCSS() },
+        { file: '_frame_layers.scss', generated: generateFrameLayersSCSS() },
+        { file: '_type.scss', generated: generateTypeSCSS() },
     ];
 } catch (error) {
     console.error(`\n❌ Generation failed. ${error.message}\n   Nothing was written.\n`);
     process.exit(1);
+}
+
+/*
+ * One name, one file. The frame and layer tokens carry the spec's names with
+ * no family prefix, so nothing but this keeps one of them from landing on a
+ * name another generated file already declares; whichever loaded second would
+ * win silently.
+ */
+{
+    const owner = new Map();
+    for (const { file, generated: css } of generated) {
+        for (const [, name] of css.matchAll(tokenDeclarationPattern('--'))) {
+            if (owner.has(name) && owner.get(name) !== file) {
+                console.error(`\n❌ ${name} is declared in both ${owner.get(name)} and ${file}. Nothing was written.\n`);
+                process.exit(1);
+            }
+            owner.set(name, file);
+        }
+    }
 }
 
 if (staleExceptions.length) {
