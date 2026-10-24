@@ -64,7 +64,7 @@
     padding: 0 !important; // Remove RB default padding - padding is on .plus-card itself
 }
 
-// Card type: a Heading/small 16 container title over a Body/default 14
+// Card type: a Heading/xsmall 14 container title over a Body/default 14
 // description; everything else in the card is Body/default.
 .plus-card {
     font: var(--body-default);
@@ -73,7 +73,7 @@
 
 .plus-card .plus-card-title {
     margin: 0;
-    font: var(--heading-small);
+    font: var(--heading-xsmall);
     color: var(--color-on-surface);
 }
 

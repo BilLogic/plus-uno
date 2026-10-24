@@ -10,9 +10,9 @@ import { PatternSection, Surface } from '@/patterns';
  * Heading/medium 20, a subsection's h3 is Heading/small 16.
  *
  * Container titles are fixed whatever level they sit at: a modal's is 20 (the
- * dialog's own h1, which names it), a card's is 16 over a 14 description, and a
- * popup's and a flag's are 14. A card's title tag is one level below its
- * section.
+ * dialog's own h1, which names it), and a card's, a popup's and a flag's are
+ * 14. A card's title sits over a 14 description, and its tag is one level
+ * below its section.
  *
  * Group labels are 12 semibold and are not headings: a menu's label names a
  * group, and a table's labels are column headers.
@@ -59,7 +59,7 @@ PageSectionSubsection.play = async ({ canvasElement }) => {
     await expectStyle(canvas.getByText('Every session you tutor from Monday to Sunday.'), 'section description', BODY_DEFAULT);
 };
 
-/** A card's title is 16 at every level; its tag is one below its section. */
+/** A card's title is 14 at every level; its tag is one below its section. */
 export const CardTitles = () => (
     <Surface title="Sessions">
         <PatternSection title="This week">
@@ -73,8 +73,8 @@ export const CardTitles = () => (
 
 CardTitles.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expectStyle(headingNamed(canvas, 3, 'Algebra I'), 'card in a section', HEADING_SMALL);
-    await expectStyle(headingNamed(canvas, 4, 'Geometry'), 'card in a subsection', HEADING_SMALL);
+    await expectStyle(headingNamed(canvas, 3, 'Algebra I'), 'card in a section', HEADING_XSMALL);
+    await expectStyle(headingNamed(canvas, 4, 'Geometry'), 'card in a subsection', HEADING_XSMALL);
     await expectStyle(canvas.getByText('Two students'), 'card description', BODY_DEFAULT);
     await expectStyle(canvas.getByText('Thursday at 4:00 PM.'), 'card body', BODY_DEFAULT);
 };
