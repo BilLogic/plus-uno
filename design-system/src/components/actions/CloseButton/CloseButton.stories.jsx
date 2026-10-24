@@ -13,6 +13,7 @@ export default {
     parameters: {
         layout: 'padded',
         changelog: [
+            { date: '2026-10-24', kind: 'changed', summary: 'A pressed × is the 12 step, not 16, and keyboard focus is the ring alone, with no fill.' },
             { date: '2026-09-29', kind: 'added', summary: 'The shared dismiss control: a fixed 24×24 box with a 16px ×, in default and inverse tones.' },
             { date: '2026-10-23', kind: 'changed', summary: 'The box grew to 32×32, the control height, with the × still at 16.' },
         ],
@@ -106,13 +107,13 @@ Tones.play = async ({ canvasElement }) => {
         await expect(getComputedStyle(inverse.querySelector('i')).color).toBe(surface);
     }
 
-    // Hover and press paint the tone's state layer: 8% and 16% of the ×'s own
+    // Hover and press paint the tone's state layer: 8% and 12% of the ×'s own
     // color. A synthetic event never sets :hover or :active, so each state is
     // forced and the browser's cascade decides what it looks like.
     const states = [
-        ['Dismiss default example', '--color-on-surface-variant-state-08', '--color-on-surface-variant-state-16'],
-        ['Dismiss inverse example on a dark ground', '--color-surface-state-08', '--color-surface-state-16'],
-        ['Dismiss inverse example on a colored ground', '--color-surface-state-08', '--color-surface-state-16'],
+        ['Dismiss default example', '--color-on-surface-variant-state-08', '--color-on-surface-variant-state-12'],
+        ['Dismiss inverse example on a dark ground', '--color-surface-state-08', '--color-surface-state-12'],
+        ['Dismiss inverse example on a colored ground', '--color-surface-state-08', '--color-surface-state-12'],
     ];
     for (const [name, hoverToken, pressedToken] of states) {
         const button = canvas.getByRole('button', { name });
@@ -221,10 +222,10 @@ export const Focus = () => (
 Focus.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const cases = [
-        ['Dismiss default focus example', '--color-focus-ring', '--color-on-surface-variant-state-12'],
-        ['Dismiss inverse focus example', '--color-focus-ring-inverse', '--color-surface-state-12'],
+        ['Dismiss default focus example', '--color-focus-ring'],
+        ['Dismiss inverse focus example', '--color-focus-ring-inverse'],
     ];
-    for (const [name, ringToken, layerToken] of cases) {
+    for (const [name, ringToken] of cases) {
         const button = canvas.getByRole('button', { name });
 
         // At rest: no ring.
@@ -242,11 +243,8 @@ Focus.play = async ({ canvasElement }) => {
         await expect(ring.top).toBe('-4px');
         await expect(ring.left).toBe('-4px');
 
-        const probe = canvasElement.ownerDocument.createElement('span');
-        probe.style.backgroundColor = `var(${layerToken})`;
-        canvasElement.appendChild(probe);
-        await expect(getComputedStyle(button).backgroundColor).toBe(getComputedStyle(probe).backgroundColor);
-        probe.remove();
+        // The ring alone shows focus: no fill, so it never reads as pressed.
+        await expect(getComputedStyle(button).backgroundColor, `${name} focus has no fill`).toBe('rgba(0, 0, 0, 0)');
 
         button.blur();
     }

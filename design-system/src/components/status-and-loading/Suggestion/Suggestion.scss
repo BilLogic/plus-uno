@@ -7,7 +7,8 @@
  *
  * DISCOVERY PURPLE. The border is dashed in Mastering Content's Border Subtle,
  * and the words and glyph are Mastering Content (Text). Hover is the hue's 08
- * state layer and pressed its 16, as the Figma set binds.
+ * state layer and pressed its 12, the steps color.md names; the Figma set
+ * still binds 16 for pressed.
  */
 .plus-suggestion {
     --plus-suggestion-height: 22px;
@@ -57,7 +58,7 @@
 }
 
 .plus-suggestion:active {
-    background-color: var(--color-mastering-content-state-16, rgba(134, 89, 169, 0.16));
+    background-color: var(--color-mastering-content-state-12, rgba(134, 89, 169, 0.12));
 }
 
 /*

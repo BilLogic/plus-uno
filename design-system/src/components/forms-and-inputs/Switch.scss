@@ -127,17 +127,16 @@
             border-color: var(--color-primary-border) !important;
         }
 
+        // Keyboard focus is the ring Checkbox and Radio draw: 2px of the
+        // focus-ring role, 2px off the track. A pointer focus draws none.
         &:focus {
             outline: none;
-            box-shadow: 0 0 0 2px var(--color-focus-ring);
+            box-shadow: none;
         }
 
         &:focus-visible {
-            outline: none;
-            box-shadow: 0 0 0 2px var(--color-focus-ring);
-        }
-
-        &:focus:not(:focus-visible) {
+            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline-offset: var(--size-element-stroke-lg);
             box-shadow: none;
         }
 

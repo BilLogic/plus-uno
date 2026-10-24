@@ -6,7 +6,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Meta of={PatternTableStories} />
 
 <Title />
-The table pattern is a shell for data presentation: a toolbar slot, the table content slot (you pass your own `thead`/`tbody`), a pagination slot, and an empty-state slot. The table itself is no-fill — the surrounding card or surface owns the background — and row interaction uses additive `on-surface` overlays, never replaced fills. It mirrors the Table slot component in Figma.
+The table pattern is a shell for data presentation: a toolbar slot, the table content slot (you pass your own `thead`/`tbody`), a pagination slot, and an empty-state slot. The table itself is no-fill — the surrounding card or surface owns the background — and row interaction uses additive `on-surface` overlays, never replaced fills: hover 08 and pressed 12. A table is a dense list, so a selected row is primary 08 rather than 16. Mark it with `aria-selected="true"`, which needs a `role="grid"` table. It mirrors the Table slot component in Figma.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"

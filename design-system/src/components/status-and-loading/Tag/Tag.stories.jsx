@@ -28,6 +28,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-10-24', kind: 'changed', summary: "A selected tag is the hue's 16 step, held on hover and press. A pressed × is 12, and a focused × shows the ring with no fill." },
             { date: '2026-09-29', kind: 'deprecated', summary: '`variant="operational"` started warning in development; a tag that opens something became `behavior="selectable"` with `aria-expanded`.' },
             { date: '2026-09-29', kind: 'changed', summary: 'A disabled tag that is not a button ended with visually hidden ", disabled" text, so a screen reader announced it as disabled.' },
             { date: '2026-09-29', kind: 'added', summary: '`resolveTagBehavior` was exported, so a container resolved a tag\'s behavior exactly as Tag did.' },
@@ -599,10 +600,10 @@ export const StateLayers = () => (
 );
 
 /**
- * Selectable: hover 08, pressed 12; selected is 12 with a full-hue border, and
- * 16 on hover or press. A link is 08 and 12, and its text underlines on hover
- * and press only. On a removable tag only the × reacts: 08 on hover, 16
- * pressed, and the tag's own ground never moves.
+ * Selectable: hover 08, pressed 12; selected is 16 with a full-hue border, and
+ * holds the 16 on hover or press. A link is 08 and 12, and its text underlines
+ * on hover and press only. On a removable tag only the × reacts: 08 on hover,
+ * 12 pressed, and the tag's own ground never moves.
  */
 StateLayers.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -617,13 +618,13 @@ StateLayers.play = async ({ canvasElement }) => {
     const selected = canvas.getByRole('button', { name: 'Selected' });
     await expect(getComputedStyle(selected).borderTopColor, 'selected border is the full hue')
         .toBe(t('--color-technology-tools'));
-    await expect(getComputedStyle(selected)[bg]).toBe(t('--color-technology-tools-state-12'));
+    await expect(getComputedStyle(selected)[bg]).toBe(t('--color-technology-tools-state-16'));
     await expect(whileForced(selected, ':hover', bg)).toBe(t('--color-technology-tools-state-16'));
     await expect(whileForced(selected, ':active', bg)).toBe(t('--color-technology-tools-state-16'));
 
     const gray = canvas.getByRole('button', { name: 'Gray selected' });
     await expect(getComputedStyle(gray).borderTopColor).toBe(t('--color-outline'));
-    await expect(getComputedStyle(gray)[bg]).toBe(t('--color-on-surface-variant-state-12'));
+    await expect(getComputedStyle(gray)[bg]).toBe(t('--color-on-surface-variant-state-16'));
 
     // A plain link: the tag is the link.
     const link = canvas.getByRole('link', { name: 'Link' });
@@ -651,7 +652,7 @@ StateLayers.play = async ({ canvasElement }) => {
     await expect(whileForced(removable, ':hover', bg), 'a removable tag itself never reacts').toBe(CLEAR);
     const x = canvas.getByRole('button', { name: 'Remove Removable' });
     await expect(whileForced(x, ':hover', bg)).toBe(t('--color-on-surface-variant-state-08'));
-    await expect(whileForced(x, ':active', bg)).toBe(t('--color-on-surface-variant-state-16'));
+    await expect(whileForced(x, ':active', bg)).toBe(t('--color-on-surface-variant-state-12'));
 };
 
 /* ---------------------------------------------------------------- removing */
@@ -771,8 +772,7 @@ FocusRing.play = async ({ canvasElement }) => {
     const x = canvas.getByRole('button', { name: 'Remove Chosen' });
     await expect(x).toHaveFocus();
     await expectRing(x, 'the ×');
-    await expect(getComputedStyle(x).backgroundColor, 'with the 12 fill under it')
-        .toBe(tokenColor(canvasElement, '--color-on-surface-variant-state-12'));
+    await expect(getComputedStyle(x).backgroundColor, 'with no fill under it').toBe(CLEAR);
 
     await userEvent.tab();
     const go = canvas.getByRole('link', { name: 'Go' });
@@ -1402,8 +1402,7 @@ ElevatedRemoveFocus.play = async ({ canvasElement }) => {
 
     const plain = await focusRemove('Remove Unit 4', 'the plain ×', 'none');
     await expectSquareCorners(plain, 'the plain ×');
-    await expect(getComputedStyle(plain).backgroundColor, 'with the 12 fill under it')
-        .toBe(tokenColor(canvasElement, '--color-on-surface-variant-state-12'));
+    await expect(getComputedStyle(plain).backgroundColor, 'with no fill under it').toBe(CLEAR);
 };
 
 /**
