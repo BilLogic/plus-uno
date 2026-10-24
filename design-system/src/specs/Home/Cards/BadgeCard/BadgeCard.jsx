@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Card from '@/components/layout-and-structure/Card';
-import Button from '@/components/actions/Button';
-import Tooltip from '@/components/overlays/Tooltip';
+import Button from '@/components/forms-and-inputs/Button';
+import Tooltip from '@/components/overlays-and-layering/Tooltip';
 import CertifiedTutorBadge from '@/specs/Home/Elements/CertifiedTutorBadge';
 import './BadgeCard.scss';
 

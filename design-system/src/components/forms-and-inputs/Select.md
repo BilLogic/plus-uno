@@ -80,6 +80,6 @@ From `design-system/src/components/forms-and-inputs/Select.scss`. Override these
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

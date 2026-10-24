@@ -1,6 +1,6 @@
 import React, { useId } from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 import Switch from '@/components/forms-and-inputs/Switch';
 import FileListItem from '@/specs/Toolkit/Post-Session/Elements/FileListItem/FileListItem';
 import NoRecordingReason from '@/specs/Toolkit/Post-Session/Elements/NoRecordingReason/NoRecordingReason';

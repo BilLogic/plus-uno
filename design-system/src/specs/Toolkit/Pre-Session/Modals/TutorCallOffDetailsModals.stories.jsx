@@ -1,7 +1,7 @@
 import React from 'react';
 import Modal from '@/components/messaging/Modal';
-import ButtonGroup from '@/components/actions/ButtonGroup';
-import Button from '@/components/actions/Button';
+import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
+import Button from '@/components/forms-and-inputs/Button';
 
 import {
     CloseButton,

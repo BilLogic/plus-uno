@@ -23,7 +23,7 @@
       "outline": 1,
       "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
     },
-    "design-system/src/components/status-and-loading/AiLabel/AiLabel.scss": {
+    "design-system/src/components/labels/AiLabel/AiLabel.scss": {
       "border": 0,
       "outline": 1,
       "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
@@ -58,7 +58,7 @@
       "mix": 2,
       "why": "Brightness filters on the Collapse trigger's hover and pressed states. Outside the 2026-10-24 audit's scope (the patterns, the Popover family, Button, Field and the controls). The fix Button and Dropdown took applies: lay --color-shadow-state-NN over the fill, which composites to the color the mix produced; compare the pixels before lowering this."
     },
-    "design-system/src/components/status-and-loading/Badge/Badge.scss": {
+    "design-system/src/components/labels/Badge/Badge.scss": {
       "mix": 1,
       "why": "A fallback inside var(--…-state-12, color-mix(…)), which paints only if the state token is undefined. Outside the 2026-10-24 audit's scope (the patterns, the Popover family, Button, Field and the controls). The fix Button and Dropdown took applies: lay --color-shadow-state-NN over the fill, which composites to the color the mix produced; compare the pixels before lowering this."
     }

@@ -672,8 +672,8 @@ describe("the source must have been read", () => {
 });
 
 describe("a GitHub file the turn read directly", () => {
-  const BUTTON = "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/components/actions/Button/Button.jsx";
-  const BUTTON_PATH = "design-system/src/components/actions/Button/Button.jsx";
+  const BUTTON = "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/components/forms-and-inputs/Button/Button.jsx";
+  const BUTTON_PATH = "design-system/src/components/forms-and-inputs/Button/Button.jsx";
   // What github_read itself returns for the read: the real tool, on fake GitHub.
   const readResult = (repo: string, path: string, ref?: string) =>
     readGithub(
@@ -759,7 +759,7 @@ describe("a GitHub file the turn read directly", () => {
     it("names the file by its last segment when the answer writes out its repo path", async () => {
       const { lines } = await searchedThenRead(() => `It comes in small, medium and large (\`${BUTTON_PATH}\`).`);
       assert.equal(lines.length, 1);
-      assert.match(lines[0] ?? "", /^Source: Button\.jsx — https:\/\/github\.com\/BilLogic\/plus-uno\/blob\/[^/]+\/design-system\/src\/components\/actions\/Button\/Button\.jsx$/);
+      assert.match(lines[0] ?? "", /^Source: Button\.jsx — https:\/\/github\.com\/BilLogic\/plus-uno\/blob\/[^/]+\/design-system\/src\/components\/forms-and-inputs\/Button\/Button\.jsx$/);
     });
   });
 
@@ -768,7 +768,7 @@ describe("a GitHub file the turn read directly", () => {
     const w = world({
       replies: [
         { text: "Reading the Button.", toolCalls: [{ name: "github_read", args: { path: BUTTON_PATH } }] },
-        { text: "It comes in small, medium and large (`design-system/src/components/actions/Button`)." },
+        { text: "It comes in small, medium and large (`design-system/src/components/forms-and-inputs/Button`)." },
       ],
       toolResultFor: (name) => (name === "github_read" ? read : PRD_FOUND),
     });

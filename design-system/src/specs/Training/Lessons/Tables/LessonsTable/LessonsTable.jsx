@@ -8,9 +8,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
-import Button from '@/components/actions/Button';
-import Badge from '@/components/status-and-loading/Badge';
-import Progress from '@/components/status-and-loading/Progress';
+import Button from '@/components/forms-and-inputs/Button';
+import Badge from '@/components/labels/Badge';
+import Progress from '@/components/loading/Progress';
 import { StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart';
 import AiIndicator from '@/specs/Training/Lessons/Elements/AiIndicator/AiIndicator';
 import StatusIndicators from '@/specs/Training/Onboarding/Elements/StatusIndicators/StatusIndicators';

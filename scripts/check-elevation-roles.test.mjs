@@ -135,8 +135,8 @@ test('the row that mentions modals is NOT claimed by a role', () => {
 const SURFACES = [
   { file: 'design-system/src/patterns/PatternCard/PatternCard.scss', rule: '.plus-pattern-card--dragging {', shadow: '--surface-raised-shadow' },
   { file: 'design-system/src/styles/main.scss', rule: '.plus-card--dragging {', shadow: '--surface-raised-shadow' },
-  { file: 'design-system/src/components/overlays/Popover/Popover.scss', rule: '.plus-popover {', shadow: '--surface-overlay-shadow' },
-  { file: 'design-system/src/components/overlays/Tooltip/Tooltip.scss', rule: '.tooltip-inner {', shadow: '--surface-overlay-shadow' },
+  { file: 'design-system/src/components/overlays-and-layering/Popover/Popover.scss', rule: '.plus-popover {', shadow: '--surface-overlay-shadow' },
+  { file: 'design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss', rule: '.tooltip-inner {', shadow: '--surface-overlay-shadow' },
   { file: 'design-system/src/components/messaging/Toast/Toast.scss', rule: '.plus-toast', shadow: '--surface-overlay-shadow' },
   { file: 'design-system/src/patterns/SurfaceContainer/SurfaceContainer.scss', rule: '.plus-surface-container__sidebar--floating {', shadow: '--surface-overlay-shadow', fill: '--surface-overlay' },
   { file: 'design-system/src/components/messaging/Modal/Modal.scss', rule: '.plus-modal', shadow: '--elevation-light-4', fill: '--color-surface-overlay' },

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import Count from '@/components/status-and-loading/Count/Count';
+import Count from '@/components/labels/Count/Count';
 import OptionRow from './OptionRow';
 
 /**

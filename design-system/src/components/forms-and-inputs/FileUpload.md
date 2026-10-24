@@ -47,6 +47,6 @@ From `design-system/src/components/forms-and-inputs/FileUpload.scss`. Override t
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

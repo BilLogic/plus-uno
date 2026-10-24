@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Badge from '@/components/status-and-loading/Badge';
+import Badge from '@/components/labels/Badge';
 
 const STATUS_CONFIG = {
     'not-started': {

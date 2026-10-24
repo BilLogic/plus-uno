@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Card from '@/components/layout-and-structure/Card';
 import Table from '@/components/_internal/Table';
-import Button from '@/components/actions/Button';
-import Badge from '@/components/status-and-loading/Badge';
+import Button from '@/components/forms-and-inputs/Button';
+import Badge from '@/components/labels/Badge';
 import './StudentsOverviewSection.scss';
 
 /**

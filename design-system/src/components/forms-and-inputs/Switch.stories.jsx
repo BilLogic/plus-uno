@@ -5,7 +5,7 @@ import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Switch from './Switch';
 
 export default {
-    title: 'Components/Forms and inputs/Switch',
+    title: 'Components/Forms and inputs/Toggle',
     component: Switch,
     tags: ['!dev', '!autodocs'],
     parameters: {

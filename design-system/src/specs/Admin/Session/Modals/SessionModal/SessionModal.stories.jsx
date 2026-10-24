@@ -7,7 +7,7 @@
 
 import React, { useState, useEffect } from 'react';
 import SessionModal from './SessionModal';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import './SessionModal.scss';
 
 const defaultStudents = [

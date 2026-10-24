@@ -33,15 +33,17 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const COMPONENTS_ROOT = path.join(REPO_ROOT, 'design-system/src/components');
 const CHECK = process.argv.includes('--check');
 
-/** Groups are the folders directly under components/, minus the barrel files. */
+/** Groups are the folders directly under components/, minus the barrel files,
+ * named and ordered after Atlassian's component categories. */
 const GROUP_TITLES = {
-  actions: 'Actions',
   'forms-and-inputs': 'Forms and inputs',
+  'images-and-icons': 'Images and icons',
+  labels: 'Labels',
   'layout-and-structure': 'Layout and structure',
+  loading: 'Loading',
   messaging: 'Messaging',
   navigation: 'Navigation',
-  overlays: 'Overlays',
-  'status-and-loading': 'Status and loading',
+  'overlays-and-layering': 'Overlays and layering',
   _internal: 'Internal',
 };
 

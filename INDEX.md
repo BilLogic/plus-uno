@@ -86,15 +86,15 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
-| [`design-system/guidelines/components/actions.md`](design-system/guidelines/components/actions.md) | Which action component to reach for — Button and ButtonGroup, and what neither of them is |
 | [`design-system/guidelines/components/changelog.md`](design-system/guidelines/components/changelog.md) | How a component records what changed about it — starting empty on 2026-08-26, never backfilled |
-| [`design-system/guidelines/components/forms-and-inputs.md`](design-system/guidelines/components/forms-and-inputs.md) | Which input to use, sorted by the shape of the answer, plus the id, validation and required rules that apply across the group |
+| [`design-system/guidelines/components/forms-and-inputs.md`](design-system/guidelines/components/forms-and-inputs.md) | Which input or button to use, sorted by the shape of the answer, plus the id, validation and required rules that apply across the group |
+| [`design-system/guidelines/components/labels.md`](design-system/guidelines/components/labels.md) | The label family — Status, Count, Tag, TagGroup, Suggestion and AI label — and the deprecated Badge it replaces |
 | [`design-system/guidelines/components/layout-and-structure.md`](design-system/guidelines/components/layout-and-structure.md) | Nine container components sorted by what is being contained, plus the three pairs that get confused |
+| [`design-system/guidelines/components/loading.md`](design-system/guidelines/components/loading.md) | Progress (Progress bar), Skeleton or Spinner — showing work in flight |
 | [`design-system/guidelines/components/messaging.md`](design-system/guidelines/components/messaging.md) | Alert, Toast or Modal — choosing by how long the message lives and whether it blocks |
 | [`design-system/guidelines/components/navigation.md`](design-system/guidelines/components/navigation.md) | Six navigation components sorted by what the user is moving between |
-| [`design-system/guidelines/components/overlays.md`](design-system/guidelines/components/overlays.md) | Tooltip or Popover — hover description versus click-triggered content |
+| [`design-system/guidelines/components/overlays-and-layering.md`](design-system/guidelines/components/overlays-and-layering.md) | Tooltip or Popover (Popup) — hover description versus click-triggered content |
 | [`design-system/guidelines/components/overview.md`](design-system/guidelines/components/overview.md) | What each component is for, when to reach for it, and how it composes |
-| [`design-system/guidelines/components/status-and-loading.md`](design-system/guidelines/components/status-and-loading.md) | Badge, Progress or Spinner — labeling state versus showing work in flight |
 | [`design-system/guidelines/composition/form-behavior.md`](design-system/guidelines/composition/form-behavior.md) | How a PLUS form behaves — when it validates, how errors surface on submit, required fields, disabled vs read-only, unsaved changes, dependent fields, and subtle vs standard fields |
 | [`design-system/guidelines/composition/forms.md`](design-system/guidelines/composition/forms.md) | How PLUS form elements compose inside surfaces |
 | [`design-system/guidelines/composition/hierarchy.md`](design-system/guidelines/composition/hierarchy.md) | Every PLUS surface sits at one of four context levels |

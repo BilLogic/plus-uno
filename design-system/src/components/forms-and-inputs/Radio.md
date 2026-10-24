@@ -51,7 +51,7 @@ From `design-system/src/components/forms-and-inputs/Radio.scss`. Override these 
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

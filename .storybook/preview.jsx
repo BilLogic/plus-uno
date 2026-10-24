@@ -169,30 +169,25 @@ const preview = {
             "Elevation",
             "Iconography",
             "Logos",
-            "Tile",
             "Imagery",
             "Design tokens",
             "Accessibility"
           ],
           "Components",
           [
-            "Actions",
+            "Forms and inputs",
             [
               "Button",
               "Button group",
-              "Close button"
-            ],
-            "Forms and inputs",
-            [
               "Cascader",
               "Checkbox",
               "Choice grid",
               "Choice group",
+              "Close button",
               "Date picker",
-              "Date & time picker",
-              "Dropdown",
+              "Date time picker",
+              "Dropdown menu",
               "File upload",
-              "Input",
               "Input group",
               "Label & caption",
               "Number input",
@@ -201,10 +196,25 @@ const preview = {
               "Rating",
               "Rich text editor",
               "Select",
-              "Switch",
               "Tag input",
-              "Textarea",
+              "Text area",
+              "Text field",
+              "Toggle",
               "Tree select"
+            ],
+            "Images and icons",
+            [
+              "Tile"
+            ],
+            "Labels",
+            [
+              "AI label",
+              "Count",
+              "Status",
+              "Suggestion",
+              "Tag",
+              "Tag group",
+              "Deprecated"
             ],
             "Layout and structure",
             [
@@ -218,42 +228,31 @@ const preview = {
               "Media object",
               "Scroll bar"
             ],
+            "Loading",
+            [
+              "Progress bar",
+              "Skeleton",
+              "Spinner"
+            ],
             "Messaging",
             [
-              "Alert",
+              "Flag",
               "Modal",
-              "Toast"
+              "Section message"
             ],
             "Navigation",
             [
-              "Breadcrumb",
+              "Breadcrumbs",
               "Nav pills",
-              "Nav tabs",
               "Pagination",
               "Scrollspy",
-              "Sidebar tab"
+              "Sidebar tab",
+              "Tabs"
             ],
-            "Overlays",
+            "Overlays and layering",
             [
-              "Popover",
+              "Popup",
               "Tooltip"
-            ],
-            "Status and loading",
-            [
-              "Status, Count & Tag",
-              [
-                "Status",
-                "Count",
-                "Tag",
-                "Tag group"
-              ],
-              "AI Label",
-              [
-                "AI label",
-                "Suggestion"
-              ],
-              "Progress",
-              "Loading"
             ]
           ],
           "Data visualizations",

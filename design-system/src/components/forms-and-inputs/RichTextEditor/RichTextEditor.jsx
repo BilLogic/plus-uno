@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import useFieldId from '@/components/forms-and-inputs/useFieldId';
 import { Dropdown } from 'react-bootstrap';
-import Button from '@/components/actions/Button/Button';
-import ButtonGroup from '@/components/actions/ButtonGroup/ButtonGroup';
+import Button from '@/components/forms-and-inputs/Button/Button';
+import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup/ButtonGroup';
 import './RichTextEditor.scss';
 import { useDeprecatedFieldSize } from '../../../lib/useDeprecatedLargeSize';
 

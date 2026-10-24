@@ -6,7 +6,8 @@ summary: Alert, Toast or Modal — choosing by how long the message lives and wh
 
 # Messaging — which component to reach for
 
-Three components: `Alert`, `Toast`, `Modal`. Generated facts are in
+Three components: `Alert`, `Toast`, `Modal`. Storybook and Figma title the
+first two with Atlassian's names, Section message and Flag. Generated facts are in
 `design-system/src/components/messaging/index.md`. The choice between them is
 not about severity — all three carry the same semantic palette — it is about how
 long the message lives and whether the user can keep working.
@@ -73,4 +74,4 @@ its established label instead, and `Toast` keeps the default "Close".
 
 - `design-system/src/components/messaging/index.md` — generated facts and coverage
 - `design-system/guidelines/components/forms-and-inputs.md` — where validation messages belong
-- `design-system/guidelines/components/overlays.md` — non-blocking overlays
+- `design-system/guidelines/components/overlays-and-layering.md` — non-blocking overlays

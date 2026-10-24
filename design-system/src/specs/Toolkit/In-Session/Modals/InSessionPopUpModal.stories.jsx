@@ -1,8 +1,8 @@
 import React from 'react';
 import Modal from '@/components/messaging/Modal';
-import Button from '@/components/actions/Button';
-import ButtonGroup from '@/components/actions/ButtonGroup';
-import Badge from '@/components/status-and-loading/Badge';
+import Button from '@/components/forms-and-inputs/Button';
+import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
+import Badge from '@/components/labels/Badge';
 import MATHiaGoalStatusBanner from '../Elements/MATHiaGoalStatusBanner';
 import { AttendanceDropdown } from '../Elements/AttendanceDropdown';
 import { SessionInfoCard } from '../Cards/SessionInfoCard.stories';

@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import BootstrapModal from 'react-bootstrap/Modal';
-import Button from '@/components/actions/Button';
-import Skeleton from '@/components/status-and-loading/Skeleton';
+import Button from '@/components/forms-and-inputs/Button';
+import Skeleton from '@/components/loading/Skeleton';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { openOverlay, reportFocusLost } from '@/lib/overlayStack';
 

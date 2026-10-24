@@ -130,7 +130,7 @@ test('Sidebar: an open-tab parent hovers at 08', () => {
 
 /* ─── Button ─────────────────────────────────────────────────────────────── */
 
-const BUTTON = 'components/actions/Button/Button.scss';
+const BUTTON = 'components/forms-and-inputs/Button/Button.scss';
 const INTENTS = ['primary', 'secondary', 'tertiary', 'success', 'warning', 'danger', 'info'];
 
 test('Button: filled and tonal lay the shadow 08 on hover and 12 when pressed', () => {
@@ -347,7 +347,7 @@ test('NavPills: hover 08, pressed 12, focus a ring with no fill, selected or not
 /* ─── CloseButton ────────────────────────────────────────────────────────── */
 
 test('CloseButton: hover 08, pressed 12, focus the ring alone, on both tones', () => {
-  const file = 'components/actions/CloseButton/CloseButton.scss';
+  const file = 'components/forms-and-inputs/CloseButton/CloseButton.scss';
   for (const [btn, role] of [
     ['.plus-close-btn', '--color-on-surface-variant'],
     ['.plus-close-btn--inverse', '--color-surface'],
@@ -386,7 +386,7 @@ test('Pagination: hover 08, pressed 12, current page 16, focus a ring with no fi
 /* ─── Tag ────────────────────────────────────────────────────────────────── */
 
 test("Tag: hover 08, pressed 12, selected 16 in the tag's hue; the × the same, focus a ring", () => {
-  const file = 'components/status-and-loading/Tag/Tag.scss';
+  const file = 'components/labels/Tag/Tag.scss';
   expectRule(file, '.plus-tag--selectable:hover', { 'background-color': layer('--plus-tag-08') });
   expectRule(file, '.plus-tag--selectable:active', { 'background-color': layer('--plus-tag-12') });
   for (const selected of ['.plus-tag--selected', '.plus-tag--selected:hover', '.plus-tag--selected:active']) {
@@ -446,7 +446,7 @@ test('PatternTable: rows hover 08, press 12, and a selected row is primary 08 (d
 /* ─── Suggestion ─────────────────────────────────────────────────────────── */
 
 test('Suggestion: hover 08, pressed 12, focus the ring alone', () => {
-  const file = 'components/status-and-loading/Suggestion/Suggestion.scss';
+  const file = 'components/labels/Suggestion/Suggestion.scss';
   expectRule(file, '.plus-suggestion:hover', { 'background-color': layer('--color-mastering-content-state-08') });
   expectRule(file, '.plus-suggestion:active', { 'background-color': layer('--color-mastering-content-state-12') });
   expectRule(file, '.plus-suggestion:focus-visible', RING_OUTSIDE);

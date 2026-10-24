@@ -4,10 +4,10 @@ import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Toast, { ToastContainer } from './Toast';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 
 export default {
-    title: 'Components/Messaging/Toast',
+    title: 'Components/Messaging/Flag',
     component: Toast,
     tags: ['!dev', '!autodocs'],
     parameters: {

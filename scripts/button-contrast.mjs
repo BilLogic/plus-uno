@@ -66,7 +66,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 
 export const TOKENS_FILE = `${TOKEN_DIR}/_colors.scss`;
-export const BUTTON_SCSS = 'design-system/src/components/actions/Button/Button.scss';
+export const BUTTON_SCSS = 'design-system/src/components/forms-and-inputs/Button/Button.scss';
 
 /** The page a button sits on when its own fill draws no ground. */
 export const PAGE_TOKEN = '--color-surface';

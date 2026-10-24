@@ -8,7 +8,7 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 import OnboardingModuleCard from '@/specs/Training/Onboarding/Cards/OnboardingModuleCard/OnboardingModuleCard';
 import OnboardingModulesTable from '@/specs/Training/Onboarding/Tables/OnboardingModulesTable/OnboardingModulesTable';
 import SortingDropdown from '@/specs/Training/Onboarding/Elements/SortingDropdown/SortingDropdown';

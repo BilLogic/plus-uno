@@ -1,5 +1,5 @@
 import React from 'react';
-import Badge from '@/components/status-and-loading/Badge/Badge';
+import Badge from '@/components/labels/Badge/Badge';
 import { AttendanceDropdown } from '../AttendanceDropdown.jsx';
 import { AttendanceBadge } from '../badges/AttendanceBadge.jsx';
 import { LeadBadge, CountBadge } from '../badges/TutorBadges.jsx';

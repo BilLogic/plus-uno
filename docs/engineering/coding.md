@@ -35,7 +35,7 @@ import '@/styles/globals.scss';
 - `design-system/src/components/forms-and-inputs/index.js` (also re-exported from the components barrel)
 
 **Out of new files:** file-level and category-folder paths
-(`@/components/actions/Button/Button`), `_internal/` paths, and the `@plus-ds`
+(`@/components/forms-and-inputs/Button/Button`), `_internal/` paths, and the `@plus-ds`
 alias.
 
 **What the code actually does**, so the rule is read for what it is rather than

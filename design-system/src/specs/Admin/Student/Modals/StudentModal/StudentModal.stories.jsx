@@ -7,7 +7,7 @@
 
 import React, { useState, useEffect } from 'react';
 import StudentModal from './StudentModal';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import './StudentModal.scss';
 
 export default {

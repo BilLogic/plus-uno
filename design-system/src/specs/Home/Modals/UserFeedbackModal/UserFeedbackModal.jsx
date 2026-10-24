@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Modal from '@/components/messaging/Modal';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 import Textarea from '@/components/forms-and-inputs/Textarea';
 import Divider from '@/components/layout-and-structure/Divider';
 import { ProductAreaDropdown } from '@/specs/Home/Elements/ProductAreaDropdown/ProductAreaDropdown';

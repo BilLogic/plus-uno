@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
 import NavTabs from '@/components/navigation/NavTabs/NavTabs';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import Pagination from '@/components/navigation/Pagination/Pagination';
 import GroupsTable from '@/specs/Admin/Group/Tables/GroupsTable/GroupsTable';
 import '@/specs/Admin/Group/Tables/GroupsTable/GroupsTable.scss';

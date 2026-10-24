@@ -518,7 +518,7 @@ a.sbdocs-a {
  * D1 of #263 — the props table is wider than its column, and Storybook's wrapper
  * does not scroll.
  *
- * Measured on Components/Actions/Button, the same page at four widths:
+ * Measured on Components/Forms and inputs/Button, the same page at four widths:
  *
  *   viewport   table   wrapper   docs body (scroll/client)
  *   1440px     749     750       1140 / 1140
@@ -937,7 +937,7 @@ a.sbdocs-a {
  * `margin-top: -40px` — so the card's bottom 40px is the buttons' band, not
  * breathing room.
  *
- * Measured on Components/Actions/Button, both attached roots:
+ * Measured on Components/Forms and inputs/Button, both attached roots:
  *
  *              actions row?   border T/R/B/L   radius        above/below demo
  *   Overview   yes            1/1/0/1          12/12/0/0     41px / 0px

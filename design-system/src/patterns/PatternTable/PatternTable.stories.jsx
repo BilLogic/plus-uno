@@ -1,7 +1,7 @@
 import React from 'react';
 import PatternTable from '@/patterns/PatternTable';
 import PatternCard from '@/patterns/PatternCard';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 
 const sampleRows = [
     { name: 'Jordan Blake', role: 'Tutor', status: 'Active' },

@@ -59,7 +59,7 @@ plus-vibe-coding-starting-kit/
 
 | Category | Count | Location |
 |----------|-------|----------|
-| UI components | 56 | `design-system/src/components/` — seven groups: actions, forms-and-inputs, layout-and-structure, messaging, navigation, overlays, status-and-loading (plus `_internal/`) |
+| UI components | 56 | `design-system/src/components/` — eight groups after Atlassian's categories: forms-and-inputs, images-and-icons, labels, layout-and-structure, loading, messaging, navigation, overlays-and-layering (plus `_internal/`) |
 | DataViz | 25 chart components | `design-system/src/dataviz/` — 6 categories |
 | Specs | 7 product areas | `design-system/src/specs/` (Home, Universal, Training, Admin, Profile, Toolkit, Login) |
 | Tokens | 6 SCSS files + `source/` | `design-system/src/tokens/` (generated — never hand-edit) |

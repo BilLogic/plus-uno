@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 import TrainingLessonStatusSelect from '@/specs/Training/Lessons/Elements/TrainingLessonStatusSelect/TrainingLessonStatusSelect';
 import SortControl from '@/specs/Training/Lessons/Elements/SortControl/SortControl';
 import LessonsTable from '@/specs/Training/Lessons/Tables/LessonsTable/LessonsTable';

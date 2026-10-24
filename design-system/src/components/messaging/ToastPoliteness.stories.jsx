@@ -23,7 +23,7 @@ import { Toast } from './Toast';
  */
 
 export default {
-    title: 'Components/Messaging/Toast politeness',
+    title: 'Components/Messaging/Flag politeness',
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {

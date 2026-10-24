@@ -56,7 +56,7 @@ const NOW = Number(FIRST_TS) * 1000 + 60_000;
 const REGISTRY: DevLinkRegistry = {
   components: {
     Button: {
-      code: { source: "design-system/src/components/actions/Button/Button.jsx", storybookId: "components-actions-button--docs" },
+      code: { source: "design-system/src/components/forms-and-inputs/Button/Button.jsx", storybookId: "components-forms-and-inputs-button--docs" },
       figma: {
         fileKey: LIB,
         sets: [
@@ -67,7 +67,7 @@ const REGISTRY: DevLinkRegistry = {
       },
     },
     Badge: {
-      code: { source: "design-system/src/components/status-and-loading/Badge/Badge.jsx", storybookId: "components-status-and-loading-badge--docs" },
+      code: { source: "design-system/src/components/labels/Badge/Badge.jsx", storybookId: "components-labels-deprecated-badge--docs" },
       figma: { fileKey: LIB, sets: [{ componentSetNodeId: "25:568", status: "verified" }] },
     },
     OptionChip: {
@@ -80,8 +80,8 @@ const REGISTRY: DevLinkRegistry = {
   },
 };
 
-const BUTTON_CODE = "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/components/actions/Button/Button.jsx";
-const BUTTON_STORYBOOK = "https://plus-uno.netlify.app/storybook/?path=/docs/components-actions-button--docs";
+const BUTTON_CODE = "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/components/forms-and-inputs/Button/Button.jsx";
+const BUTTON_STORYBOOK = "https://plus-uno.netlify.app/storybook/?path=/docs/components-forms-and-inputs-button--docs";
 
 interface Posted {
   text: string;
@@ -328,7 +328,7 @@ describe("only registry components", () => {
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);
       assert.match(code.storybookId ?? "", /^[a-z0-9-]+--[a-z0-9-]+$/, name);
     }
-    assert.equal(registry.components.Button!.code!.storybookId, "components-actions-button--docs");
+    assert.equal(registry.components.Button!.code!.storybookId, "components-forms-and-inputs-button--docs");
   });
 });
 
@@ -667,7 +667,7 @@ describe("Approve on the batch card", () => {
 describe("the morning's card, on the sweep's #plus-design message", () => {
   const DESIGN = "C0DESIGN";
   const DATE = "2026-10-14";
-  const BUTTON_FILE = "design-system/src/components/actions/Button/Button.jsx";
+  const BUTTON_FILE = "design-system/src/components/forms-and-inputs/Button/Button.jsx";
   const merged = (number: number, mergedAt: string): MergedPull => ({ number, url: `https://github.com/${REPO}/pull/${number}`, mergedAt });
   const START: SeenMark = { mergedAt: "2026-10-10T00:00:00Z", number: 1 };
 

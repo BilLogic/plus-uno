@@ -10,7 +10,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
-import Badge from '@/components/status-and-loading/Badge/Badge';
+import Badge from '@/components/labels/Badge/Badge';
 import './SessionBreakdownTable.scss';
 
 const SessionBreakdownTable = ({

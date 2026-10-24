@@ -8,7 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import NavTabs from '@/components/navigation/NavTabs/NavTabs';
 import Pagination from '@/components/navigation/Pagination/Pagination';
 import AdminDateRangeFilter from '@/specs/Admin/Tutor/Elements/AdminDateRangeFilter/AdminDateRangeFilter';

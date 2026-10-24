@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 
 import googleIcon from '@/assets/images/auth-providers/google-icon.svg';
 import cleverImage from '@/assets/images/auth-providers/clever-image.png';

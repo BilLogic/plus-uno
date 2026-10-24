@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
 import useFieldId from '@/components/forms-and-inputs/useFieldId';
 import Checkbox from '../Checkbox';

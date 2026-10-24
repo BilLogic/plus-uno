@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Badge from '@/components/status-and-loading/Badge/Badge';
+import Badge from '@/components/labels/Badge/Badge';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Tables/Nav Horizontal',

@@ -3,7 +3,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import NavTabs from './NavTabs';
 
 export default {
-    title: 'Components/Navigation/Nav tabs',
+    title: 'Components/Navigation/Tabs',
     component: NavTabs,
     tags: ['!dev', '!autodocs'],
     parameters: {

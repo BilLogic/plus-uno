@@ -10,7 +10,7 @@ import DateAndTimePicker from './DateAndTimePicker';
  * differs, the other person's time.
  */
 export default {
-    title: 'Components/Forms and inputs/Date and time picker behavior',
+    title: 'Components/Forms and inputs/Date time picker behavior',
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {

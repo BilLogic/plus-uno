@@ -7,7 +7,7 @@ import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import Card from '@/components/layout-and-structure/Card';
 import NavTabs from '@/components/navigation/NavTabs';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import chartTheme from '@/dataviz/chartTheme';
 import { RadarChart } from '@/dataviz';
 import './DataVisualization.scss';

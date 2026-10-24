@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import Tag, { TAG_ACCEPTED_COLORS, TAG_COLORS, resolveTagColor } from '@/components/status-and-loading/Tag';
-import TagGroup from '@/components/status-and-loading/TagGroup';
-import Button from '@/components/actions/Button';
+import Tag, { TAG_ACCEPTED_COLORS, TAG_COLORS, resolveTagColor } from '@/components/labels/Tag';
+import TagGroup from '@/components/labels/TagGroup';
+import Button from '@/components/forms-and-inputs/Button';
 import Input from './Input';
 import useFieldId from './useFieldId';
 import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
