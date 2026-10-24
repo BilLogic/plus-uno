@@ -1,17 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './PatternCard.scss';
 
 /**
- * Card pattern for PLUS design system.
- * Componentized card shell with baked-in tokens: `--color-surface-container-lowest`
- * background, elevation 1, card radius, and outline-variant border.
- * Slots: optional `header`, body `children`, optional `footer`.
- * Mirrors the "Card" slot component in the Figma design system file.
+ * Card pattern for PLUS design system. Mirrors Figma `Pattern/Card`:
+ * an optional image, then the content (the `_Card header` over the body), then
+ * an optional footer, on surface-container-lowest with an outline border.
+ *
+ * - **Header** (`_Card header`): `title` (Heading/small 16, one heading level
+ *   below its section) over an optional `description` (Body/default 14), with
+ *   `actions` at the end of the row. `header` replaces that block with custom
+ *   content, like the header's `custom` type, for tabs or a toolbar.
+ * - **Spacing** comes from the Card tokens: `padding` sets Card/pad-sm · md · lg,
+ *   the header sits Card/stack-md above the body (`gap` picks the stack step),
+ *   and the footer sits Card/stack-lg below. The footer is left-aligned.
+ * - The card hugs its content; in a row it stretches to the tallest card.
  */
 const PatternCard = ({
     id,
+    title,
+    description,
+    actions,
     header,
+    image,
     footer,
     padding = 'md',
     gap = 'md',
@@ -33,24 +45,49 @@ const PatternCard = ({
         minWidth: minWidth ?? style?.minWidth,
     };
 
+    const Title = headingTag(useHeadingLevel() + 1);
+    const hasHeading = title || description || actions;
+
     return (
         <div id={id} className={classes} style={cardStyle} {...props}>
-            {header && <div className="plus-pattern-card-header">{header}</div>}
-            <div className="plus-pattern-card-body">{children}</div>
-            {footer && <div className="plus-pattern-card-footer">{footer}</div>}
+            {image && <div className="plus-pattern-card-image">{image}</div>}
+            <div className="plus-pattern-card-inner">
+                <div className="plus-pattern-card-content">
+                    {header && <div className="plus-pattern-card-header">{header}</div>}
+                    {!header && hasHeading && (
+                        <div className="plus-pattern-card-header plus-pattern-card-header--default">
+                            <div className="plus-pattern-card-heading">
+                                {title && <Title className="plus-pattern-card-title">{title}</Title>}
+                                {description && <p className="plus-pattern-card-description">{description}</p>}
+                            </div>
+                            {actions && <div className="plus-pattern-card-actions">{actions}</div>}
+                        </div>
+                    )}
+                    {children != null && <div className="plus-pattern-card-body">{children}</div>}
+                </div>
+                {footer && <div className="plus-pattern-card-footer">{footer}</div>}
+            </div>
         </div>
     );
 };
 
 PatternCard.propTypes = {
     id: PropTypes.string,
-    /** Header slot (rendered above the body with an inner divider) */
+    /** The card's title: Heading/small 16, tagged one heading level below its section */
+    title: PropTypes.node,
+    /** Body/default 14 under the title */
+    description: PropTypes.node,
+    /** Actions at the end of the header row: buttons, a pager or an overflow */
+    actions: PropTypes.node,
+    /** Custom header that replaces title, description and actions (tabs, a toolbar) */
     header: PropTypes.node,
-    /** Footer slot (rendered below the body with an inner divider) */
+    /** Image slot above the content, full bleed */
+    image: PropTypes.node,
+    /** Footer slot: commit actions, left-aligned, Card/stack-lg below the body */
     footer: PropTypes.node,
-    /** Padding scale (card padding tokens) */
+    /** Padding scale: Card/pad-sm · md · lg (16 · 20 · 24) */
     padding: PropTypes.oneOf(['sm', 'md', 'lg']),
-    /** Gap scale between header, body, and footer (card gap tokens) */
+    /** Header-to-body stack: Card/stack-sm · md · lg (4 · 8 · 12) */
     gap: PropTypes.oneOf(['sm', 'md', 'lg']),
     /** Minimum width constraint (number of px or any CSS length) */
     minWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),

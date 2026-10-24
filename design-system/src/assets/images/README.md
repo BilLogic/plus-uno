@@ -6,6 +6,7 @@ This directory contains all static image assets for the PLUS Design System, orga
 
 - `auth-providers/` - Authentication provider images (Clever, Google, etc.)
 - `icons/` - Custom icon images (if not using Font Awesome)
+- `lessons/` - Training lesson illustrations for lesson card thumbnails (decorative, used with `alt=""`)
 
 **Note**: Logo images are handled by the Logo component (`design-system/src/assets/Logo/`), which uses inline SVG. For logo usage, use `<Logo />` from `@/assets/Logo` instead of static image files.
 

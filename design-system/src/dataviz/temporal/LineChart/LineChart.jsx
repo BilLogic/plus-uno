@@ -12,7 +12,9 @@ const LineChart = ({
     data,
     xAxisLabel,
     yAxisLabel,
-    height = 300
+    height = 300,
+    yDomain,
+    yTicks
 }) => {
     // data: Array of series objects: [{ name: 'Series 1', data: [1, 2, 3] }, ...]
 
@@ -43,7 +45,10 @@ const LineChart = ({
             title: {
                 ...chartTheme.yAxis.title,
                 text: yAxisLabel
-            }
+            },
+            // Optional: a fixed domain and ticks; without them Highcharts picks its own.
+            ...(yDomain ? { min: yDomain[0], max: yDomain[1] } : {}),
+            ...(yTicks ? { tickPositions: yTicks } : {})
         },
         plotOptions: {
             line: {
@@ -73,7 +78,11 @@ LineChart.propTypes = {
     })).isRequired,
     xAxisLabel: PropTypes.string,
     yAxisLabel: PropTypes.string,
-    height: PropTypes.number
+    height: PropTypes.number,
+    /** The y-axis domain as [min, max]; omitted, Highcharts fits it to the data */
+    yDomain: PropTypes.arrayOf(PropTypes.number),
+    /** The y-axis tick values, e.g. [0, 25, 50, 75, 100]; omitted, Highcharts picks them */
+    yTicks: PropTypes.arrayOf(PropTypes.number)
 };
 
 export default LineChart;

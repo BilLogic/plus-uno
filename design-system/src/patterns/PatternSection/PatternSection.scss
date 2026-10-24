@@ -50,8 +50,16 @@
     gap: var(--size-section-gap-lg);
 }
 
-/* Header row: heading block + actions slot */
+/* `_Section header`: the title row, then the tabs row when there is one */
 .plus-pattern-section-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-stack-sm);
+    min-width: 0;
+}
+
+/* Title row: heading block + actions slot */
+.plus-pattern-section-title-row {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -68,6 +76,11 @@
 .plus-pattern-section-title {
     margin: 0;
     color: var(--color-on-surface);
+}
+
+/* The page header: Heading/large 24. */
+.plus-pattern-section-title--page {
+    font: var(--heading-large);
 }
 
 /* A section on a page: Heading/medium 20/24. */
@@ -91,6 +104,10 @@
     align-items: center;
     gap: var(--size-element-gap-sm);
     flex-shrink: 0;
+}
+
+.plus-pattern-section-tabs {
+    min-width: 0;
 }
 
 .plus-pattern-section-content {
