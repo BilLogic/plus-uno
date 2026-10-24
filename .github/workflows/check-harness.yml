@@ -131,6 +131,8 @@ jobs:
               *) set -- "$dir" ;;
             esac
             for pkg in "$@"; do
+              # A scope npm left empty (the omitted @parcel one) matches nothing.
+              [ -e "$pkg" ] || continue
               name=${pkg#"$RUNNER_TEMP/grounds/node_modules/"}
               case " $pins " in
                 *" $name@"*) ;;
