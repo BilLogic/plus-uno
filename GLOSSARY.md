@@ -104,6 +104,18 @@ A fundamental design primitive (color palette, type scale, grid).
 A Figma frame a person makes to mirror a coded prototype: an optional link on its Marketplace row and in its share-out.
 _Avoid_: bare "replica", "screenshot"
 
+**Static table**:
+A fixed display grid people read, with nothing to do to the table itself: no sorting, filtering, selection, paging, row expansion, row actions or inline edits (a link in a cell is fine). Rows rest or are highlighted. Code: `StaticTable`. Choosing: a nesting row makes it a **Tree table**; anything people act on makes it a **Dynamic table**; otherwise it is this.
+_Avoid_: bare "table" for this type, "basic table", "data table"
+
+**Dynamic table**:
+Any table people interact with: sort, filter, select (including bulk actions), paginate, expand rows, row actions, a frozen column, or loading and empty states. Code: `DynamicTable`.
+_Avoid_: "data table", "interactive table"
+
+**Tree table**:
+A table whose rows nest under parent rows. Nesting wins: a table with any nested row is a Tree table even when people also act on it. Code: `TreeTable`.
+_Avoid_: "table tree", "nested table"
+
 ### Estates
 
 **uno-blueprint**:
