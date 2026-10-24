@@ -7,6 +7,7 @@ import Checkbox from '../Checkbox';
 import Radio from '../Radio';
 import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from '../_internal/Field';
 import './InputGroup.scss';
+import { useDeprecatedFieldSize } from '../../../lib/useDeprecatedLargeSize';
 
 /** One addon from a descriptor: a string, an object with a `type`, or a node. */
 const renderAddon = (addon, key) => {
@@ -99,6 +100,7 @@ const InputGroup = ({
     inputRef,
     ...props
 }) => {
+    useDeprecatedFieldSize('InputGroup', size);
     /** One id for the label and the input — see `useFieldId`. */
     const fieldId = useFieldId(id);
     const isReadOnly = readOnly !== undefined ? readOnly : Boolean(readonly);
@@ -254,8 +256,8 @@ InputGroupIcon.propTypes = {
 };
 
 /**
- * Button addon — always a small button, cut to the field's line so the field
- * keeps its height (22 in a medium field), as in Figma.
+ * Button addon — always the 24 compact button, centered in the 32 field with 4
+ * around it, as in Figma.
  */
 const InputGroupButton = ({
     children,

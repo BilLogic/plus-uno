@@ -14,11 +14,12 @@ export default {
         layout: 'padded',
         changelog: [
             { date: '2026-09-29', kind: 'added', summary: 'The shared dismiss control: a fixed 24×24 box with a 16px ×, in default and inverse tones.' },
+            { date: '2026-10-23', kind: 'changed', summary: 'The box grew to 32×32, the control height, with the × still at 16.' },
         ],
         docs: {
             description: {
                 component:
-                    'The one dismiss control for surfaces that close as a whole. A fixed 24×24 '
+                    'The one dismiss control for surfaces that close as a whole. A fixed 32×32 '
                     + 'hit area with a 16px ×, in a default and an inverse tone.',
             },
         },
@@ -153,14 +154,14 @@ FixedSize.play = async ({ canvasElement }) => {
     for (const button of buttons) {
         const name = button.getAttribute('aria-label');
         const { width, height } = box(button);
-        await expect(Math.round(width), `${name} width`).toBe(24);
-        await expect(Math.round(height), `${name} height`).toBe(24);
+        await expect(Math.round(width), `${name} width`).toBe(32);
+        await expect(Math.round(height), `${name} height`).toBe(32);
         const icon = button.querySelector('i');
         await expect(getComputedStyle(icon).fontSize, `${name} icon`).toBe('16px');
         // The glyph stays inside the hit area.
         const glyph = box(icon);
-        await expect(glyph.height).toBeLessThanOrEqual(24);
-        await expect(glyph.width).toBeLessThanOrEqual(24);
+        await expect(glyph.height).toBeLessThanOrEqual(32);
+        await expect(glyph.width).toBeLessThanOrEqual(32);
         await expect(getComputedStyle(button).borderRadius).toBe('4px');
     }
 };
@@ -237,7 +238,7 @@ Focus.play = async ({ canvasElement }) => {
         await expect(ring.borderTopWidth).toBe('2px');
         await expect(ring.borderTopColor).toBe(tokenColor(canvasElement, ringToken));
         await expect(ring.borderTopLeftRadius).toBe('8px');
-        // 2px stroke + 2px offset outside the 24px box.
+        // 2px stroke + 2px offset outside the 32px box.
         await expect(ring.top).toBe('-4px');
         await expect(ring.left).toBe('-4px');
 

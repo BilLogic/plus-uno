@@ -2509,7 +2509,7 @@
             },
             "status": "verified",
             "verifiedAt": "2026-10-15",
-            "notes": "One set. Form Short Textarea was merged into it and deleted from the library; a short textarea is `rows={1}` in code and an instance resized to 34 high in Figma. `rows` is code-only: Figma sets the height by resizing the instance."
+            "notes": "One set. Form Short Textarea was merged into it and deleted from the library; a text area is 80 high at least and grows from there. `rows` is code-only: Figma sets the height by resizing the instance."
           },
           {
             "id": "field",

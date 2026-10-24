@@ -1,0 +1,137 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SidebarStories from './Sidebar.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SidebarStories} />
+
+<Title />
+The sidebar is the app's **side navigation**: a header with the logo, the top-level items, then sections. A section is a group label, its items and an optional divider; every item is a `SidebarTab`. It mirrors the Figma `_Sidebar` and `_Sidebar section` in Patterns › Surface container, and `Sidebar` fills it with the PLUS content for each role.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46573"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Sidebar"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>The logo, Home, and two sections at the sidebar's 240 width.</>}>
+    <Canvas of={SidebarStories.Overview} story={{ inline: true }} sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Anatomy
+
+- **Frame** — fills the Surface container's sidebar panel (`--layout-width-sidebar` 240, padded `--surface-container-pad` 8), its rows `--element-stack-sm` 4 apart.
+- **Header** — the logo, padded `--element-pad-y-md` 6 / `--element-pad-x-sm` 8. It sits outside the scroller, so it stays put.
+- **Body** — the top-level items, then the sections. Past the frame's height it scrolls inside the sidebar.
+- **Section label** — `--heading-xxsmall` (12 semibold, Atlassian's menu section style), padded 6 / 12 (`--element-pad-y-md` / `--element-pad-x-md`). It names a `role="group"`; it is not a heading.
+- **Item** — a `SidebarTab`: `--item-height-md` 32, a 16 icon (`--icon-md`), a label that truncates, and the `description`, `elemAfter` and `actionsOnHover` slots.
+- **Divider** — optional, after a section: a `Divider` inset 12.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### States
+
+<DocsCanvasShell description={<>A selected item carries <code>aria-current="page"</code>; a disabled one is announced and skipped by Tab.</>}>
+    <DsCanvasQuiet of={SidebarStories.DisabledItem} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Extremes
+
+<DocsCanvasShell description={<>Long labels and long group labels end in an ellipsis, and the rows stay 32.</>}>
+    <DsCanvasQuiet of={SidebarStories.LongLabels} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Eight sections in an 864 frame: the body scrolls and the logo stays put.</>}>
+    <DsCanvasQuiet of={SidebarStories.ManySections} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={SidebarStories.Overview}
+    description={<>Edit the items and sections in the table below; press an item to select it.</>}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+- Content is data: pass `items` and `sections`. Which items a role sees belongs in the caller's config, never in a second copy of the markup.
+- A section label is a group's name. Never render it as a heading: the sidebar sits beside every page and would add the same headings to each one.
+- An external destination is an item with `href` and `external`. It opens a new tab, says so, and is never selected.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Open tabs
+
+An opened record, such as a session or a student, becomes a temporary tab under the item it belongs to. Several can be open at once, and each one can be closed. They are open records, not nested pages: Toolkit › Sessions and Toolkit › Students use them first.
+
+<DocsCanvasShell description={<>The tutor example: two open sessions, one of them live, and one open student.</>}>
+    <DsCanvasQuiet of={SidebarStories.OpenTabs} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>None, one, five, twenty and long titles. Past five, "Show N more" expands the rest.</>}>
+    <DsCanvasQuiet of={SidebarStories.OpenTabExtremes} />
+</DocsCanvasShell>
+
+- **Parent** — the item turns into an accordion. Its chevron is a disclosure button (`aria-expanded`, `aria-controls`) that hides and shows the tabs, and the list opens on its own when a tab is opened. The label still opens the item's own page. On hover or focus it shows "Close all".
+- **Tab** — a `SidebarTab` without an icon, `--item-height-md` 32 high and indented `--element-pad-x-md` 12. The title truncates. A live session shows the green `Count` dot, named "Live". On hover or focus it shows ×, named "Close" plus the title, and Delete or Backspace closes the focused tab.
+- **Overflow** — the 5 most recent tabs show, then a "Show N more" row.
+- **Selection** — opening a record selects its tab. Closing the selected tab selects its parent.
+- **Scope** — the tabs live in `sessionStorage`: they survive a reload and clear when the browser session ends. Call `clearOpenTabs()` at sign-out.
+- **No routing** — nothing in the model reads or writes the URL. Each record keeps its own route in `href`, and the tab links to it; `onTabSelect` gets a plain click, so an app can show the record without a page load.
+
+```jsx
+import PatternSidebar, { useOpenTabs } from '@/patterns/Sidebar';
+
+const tabs = useOpenTabs();
+// Wherever a page opens a record:
+tabs.open('sessions', { id: 's1', title: 'Hogwarts · Tue, Sep 9', href: '/toolkit/sessions', status: 'live' });
+
+<PatternSidebar
+    items={items}
+    sections={sections}
+    activeId={tabs.selectedId}
+    openTabs={tabs.byParent}
+    onTabSelect={(tab) => tabs.select(tab.id)}
+    onTabClose={(tab) => tabs.close(tab.id)}
+    onTabsCloseAll={(item) => tabs.closeAll(item.id)}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For the row itself, use `SidebarTab`.
+- For the frame it docks in, use `SurfaceContainer`.
+- For the PLUS sidebar with the role content, use `Sidebar`.
+
+</div>
+
+</div>

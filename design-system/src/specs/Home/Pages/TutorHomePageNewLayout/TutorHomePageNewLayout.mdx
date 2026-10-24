@@ -1,0 +1,65 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as HomeNewLayoutStories from './TutorHomePageNewLayout.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={HomeNewLayoutStories} />
+
+<Title />
+
+Today's tutor Home, the Skills (Home Page) frame, recomposed as a calm single-column page on the surface container, the tutor sidebar, the topbar and the 12-column content grid. It wears a one-off neutral palette, set in its own stylesheet for this review only. It imports none of the old Home components, which stay as they are beside it. Pick MD, LG or XL from the Breakpoint toolbar.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=19421-3065"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Home/Pages/TutorHomePageNewLayout"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page sb-ds-component-docs--page-fullbleed not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Full-page render with the Specs frame's content.</>}
+>
+    <Canvas
+        of={HomeNewLayoutStories.Overview}
+        story={{ inline: true }}
+        layout="fullscreen"
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### How the page is composed
+
+Four flat Sections are the content grid's children, one per row, so the reading order is the visual order at every width.
+
+- **Page header**: a page-level Section, the h1 with a one-line subtitle and the sign-up actions (under the title below 1024), and the badge as a slim callout row.
+- **Next session**: a Section with a tabs header; the tab's content sits on the plain surface.
+- **Your impact**: a Section with the pager in its header, a strip of three stats split by dividers (stacked below 1024), then the **Skills** subsection with its tabs and the chart on the surface.
+- **Personalized recommendations**: a Section with the pager in its header and the page's only cards, the lessons: flat, outlined, and lifted on hover. The strip shows the most of 4 · 3 · 2 · 1 per view that keeps each card at `--card-min-width-md`: 2 at 768 and 1024, 3 at 1440.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={HomeNewLayoutStories.Overview}
+    description={<>Edit the greeting name, account name and role inline.</>}
+/>
+
+</div>
+
+</div>

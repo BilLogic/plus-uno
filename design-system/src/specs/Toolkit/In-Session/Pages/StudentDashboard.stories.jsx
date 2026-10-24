@@ -981,7 +981,7 @@ const RegularTutorViewRender = (args) => {
                         bottom: 'var(--size-section-gap-lg)',
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        zIndex: 1050,
+                        zIndex: 'var(--layout-z-index-flag)',
                         width: '672px',
                     }}>
                         {args.toastType === 'assignment-all' ? (
@@ -1140,7 +1140,7 @@ const LeadSupervisorViewRender = (args) => {
 
             {/* Toast — loaded state only; visibility driven by the `toast` arg. */}
             {viewState === 'loaded' && args.toast && (
-                <div style={{ position: 'fixed', bottom: 'var(--size-section-gap-lg)', left: '50%', transform: 'translateX(-50%)', zIndex: 1050, width: '672px' }}>
+                <div style={{ position: 'fixed', bottom: 'var(--size-section-gap-lg)', left: '50%', transform: 'translateX(-50%)', zIndex: 'var(--layout-z-index-flag)', width: '672px' }}>
                     {args.toastType === 'assignment-leads' ? (
                         <Toast style="secondary" title="Review Assignments" timestamp="11 mins ago" show autohide={false} onClose={() => {}} className="w-100">
                             <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
@@ -1162,14 +1162,14 @@ const LeadSupervisorViewRender = (args) => {
 
             {/* Scrim 1 — in-session pop-up modal; select via the `scrim1` arg. */}
             {Scrim1Modal && (
-                <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--size-section-pad-x-lg)', zIndex: 1000 }}>
+                <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--size-section-pad-x-lg)', zIndex: 'var(--layout-z-index-scrim)' }}>
                     <Scrim1Modal />
                 </div>
             )}
 
             {/* Scrim 2 — stacks on Scrim 1; select via the `scrim2` arg. */}
             {Scrim1Modal && Scrim2Modal && (
-                <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--size-section-pad-x-lg)', zIndex: 1100 }}>
+                <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--size-section-pad-x-lg)', zIndex: 'var(--layout-z-index-scrim)' }}>
                     <Scrim2Modal />
                 </div>
             )}

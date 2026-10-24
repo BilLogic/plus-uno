@@ -18,7 +18,15 @@
     --layout-grid-gap: 8px; /* Figma Grid/content-gutter (= --size-element-gap-sm); col-* spans assume this */
 
     /* Stacking layers; not Figma variables (CODE_ONLY_LAYERS) */
-    --layout-z-index-overlay: 1070; /* floating listboxes and menus; above a modal */
+    --layout-z-index-card: 100; /* sticky headers and raised cards */
+    --layout-z-index-navigation: 200; /* sidebars and floating page navigation */
+    --layout-z-index-dialog: 300; /* side panels and inline dialogs */
+    --layout-z-index-popup: 400; /* popups and menus */
+    --layout-z-index-scrim: 500; /* the scrim under a modal */
+    --layout-z-index-modal: 510; /* a modal, over its scrim */
+    --layout-z-index-flag: 600; /* flags, above a modal */
+    --layout-z-index-spotlight: 700; /* onboarding spotlights */
+    --layout-z-index-tooltip: 800; /* tooltips, above everything */
 
     /* Min and max heights — MD values where they differ by breakpoint */
     --layout-max-height-listbox: 300px; /* Figma Max Heights/listbox */

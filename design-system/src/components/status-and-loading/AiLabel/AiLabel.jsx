@@ -117,9 +117,9 @@ export const AiLabel = ({
               * — announcing "wand" would add a shape, not information.
               */}
             <i className="fa-solid fa-wand-magic-sparkles plus-ai-label__mark" aria-hidden="true" />
-            <span className="plus-ai-label__text body3-txt">{label}</span>
+            <span className="plus-ai-label__text">{label}</span>
             {lowConfidence && (
-                <span className="plus-ai-label__note body3-txt">
+                <span className="plus-ai-label__note">
                     {/*
                       * The note is REQUIRED by propTypes when confidence is low,
                       * and defaulted here as well: a low-confidence mark with no

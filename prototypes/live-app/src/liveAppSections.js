@@ -22,6 +22,7 @@ export const LIVE_APP_SECTIONS = [
     group: 'Toolkit',
     items: [
       { to: '/toolkit/sessions', label: 'All sessions' },
+      { to: '/toolkit/students', label: 'Students' },
       { to: '/toolkit/my-sessions', label: 'My sessions' },
       { to: '/toolkit/sign-ups', label: 'Sign-ups' },
       { to: '/toolkit/call-offs', label: 'Call-offs' },

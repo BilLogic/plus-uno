@@ -1,5 +1,6 @@
 import React from 'react';
 import useFieldId from './useFieldId';
+import { useDeprecatedLargeSize } from '../../lib/useDeprecatedLargeSize';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import { choiceInputProps, choiceClasses } from './choiceItem';
@@ -17,7 +18,7 @@ import './Switch.scss';
  * @param {string|number} [props.value='on']
  * @param {boolean} [props.checked]
  * @param {boolean} [props.defaultChecked]
- * @param {'small'|'medium'|'large'} [props.size='medium'] - Label density; control geometry matches Figma (large scales up)
+ * @param {'small'|'medium'|'large'} [props.size='medium'] - Every size draws a 24 row with a 14/20 label; `large` is deprecated
  * @param {boolean} [props.disabled=false]
  * @param {boolean} [props.readOnly=false] - Shown, focusable and announced read-only; the state does not change
  * @param {(event: React.ChangeEvent) => void} [props.onChange]
@@ -48,15 +49,11 @@ const Switch = ({
     // so `id || name` collapses them onto one id and every label resolves to the
     // first. Same fix as Checkbox (#213) and Radio (#222).
     const fieldId = useFieldId(id);
+    useDeprecatedLargeSize('Switch', size);
     const isControlled = checked !== undefined;
-    const sizeClass = size === 'small'
-        ? 'body3-txt'
-        : (size === 'large' ? 'body1-txt' : 'body2-txt');
-
     const wrapperClasses = [
         'plus-form-switch-wrapper',
         `plus-form-switch-${size}`,
-        sizeClass,
         disabled ? 'plus-form-switch-disabled' : '',
         choiceClasses({ readOnly }),
         className,
@@ -114,6 +111,10 @@ Switch.propTypes = {
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     checked: PropTypes.bool,
     defaultChecked: PropTypes.bool,
+    /**
+     * Every size draws a 24 row with a 14/20 label and one track geometry.
+     * `large` is deprecated: it draws like `medium` and warns in development.
+     */
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
     readOnly: PropTypes.bool,

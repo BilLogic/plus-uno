@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 276 184" fill="none" aria-hidden="true">
+  <rect width="276" height="184" fill="rgba(0,92,189,0.12)"/>
+  <circle cx="138" cy="78" r="38" fill="var(--color-technology-tools,#005cbd)" opacity="0.35"/>
+  <circle cx="138" cy="78" r="22" fill="var(--color-technology-tools,#005cbd)" opacity="0.5"/>
+  <path d="M125 65 L138 55 L151 65 L145 82 L131 82 Z" fill="var(--color-technology-tools,#005cbd)" opacity="0.6"/>
+  <circle cx="95" cy="55" r="8" fill="var(--color-technology-tools,#005cbd)" opacity="0.3"/>
+  <circle cx="181" cy="60" r="12" fill="var(--color-technology-tools,#005cbd)" opacity="0.25"/>
+  <text x="138" y="155" text-anchor="middle" font-family="Lato,sans-serif" font-size="11" fill="var(--color-on-surface-variant,#3f484a)">Prompting Students to Explain</text>
+</svg>

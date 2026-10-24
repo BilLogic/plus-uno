@@ -142,7 +142,7 @@ const Rating = ({
                 })}
             </div>
             {variant === 'comments' && showCommentsLabel && (
-                <div className="plus-rating-comments-label body2-txt">
+                <div className="plus-rating-comments-label">
                     {commentsLabel}
                 </div>
             )}
@@ -192,7 +192,7 @@ const RatingItem = ({
     return (
         <div className="plus-rating-item-wrapper">
             {variant === 'numeric' && (
-                <div className="plus-rating-item-label body2-txt">
+                <div className="plus-rating-item-label">
                     {value}
                 </div>
             )}

@@ -28,11 +28,6 @@
       "outline": 1,
       "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
     },
-    "design-system/src/components/messaging/Modal/Modal.scss": {
-      "border": 0,
-      "outline": 1,
-      "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
-    },
     "design-system/src/components/navigation/NavPills/NavPills.scss": {
       "border": 0,
       "outline": 4,
@@ -44,11 +39,6 @@
       "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
     },
     "design-system/src/components/navigation/Scrollspy/Scrollspy.scss": {
-      "border": 0,
-      "outline": 1,
-      "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
-    },
-    "design-system/src/components/navigation/SidebarTab/SidebarTab.scss": {
       "border": 0,
       "outline": 1,
       "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
@@ -74,11 +64,6 @@
       "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
     },
     "design-system/src/specs/Training/Lessons/Elements/RatingSingle/RatingSingle.scss": {
-      "border": 0,
-      "outline": 1,
-      "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
-    },
-    "design-system/src/specs/Universal/Sections/TopBar/TopBar.scss": {
       "border": 0,
       "outline": 1,
       "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."

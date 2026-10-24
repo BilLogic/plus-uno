@@ -52,6 +52,8 @@ $tile-colors: (
     vertical-align: middle;
     background-color: var(--color-surface-container-high, #e7e8eb);
     color: var(--color-on-surface-variant, #3f484a);
+    // The 32 tile's inner size, for a tile with no size class.
+    --tile-inner: var(--font-size-fa-h5);
 }
 
 @each $size, $values in $tile-sizes {
@@ -67,13 +69,13 @@ $tile-colors: (
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: var(--tile-inner, 16px);
+    font-size: var(--tile-inner);
     line-height: 1;
 }
 
 /* Two classes deep, so the body's own Font Awesome size cannot win. */
 .plus-tile .plus-tile__icon > * {
-    font-size: var(--tile-inner, 16px);
+    font-size: var(--tile-inner);
     line-height: 1;
     color: inherit;
 }
@@ -107,7 +109,7 @@ $tile-colors: (
     justify-content: center;
     inline-size: var(--tile-inner, 16px);
     block-size: var(--tile-inner, 16px);
-    font-size: var(--tile-inner, 16px);
+    font-size: var(--tile-inner);
     line-height: 1;
     border-radius: var(--size-border-radius-radius-50, 2px);
     overflow: hidden;

@@ -256,13 +256,13 @@ html {
 .sbdocs .docs-story:has(.responsive-frame-root) {
     display: flex !important;
     flex-direction: column !important;
-    min-height: 720px !important;
+    min-height: 720px !important; /* the docs well height, not a design-system size */
 }
 
 .sbdocs .docs-story:has(.responsive-frame-root) > div[scale="1"] {
-    height: 720px !important;
-    min-height: 720px !important;
-    max-height: 720px !important;
+    height: 720px !important; /* the docs well height */
+    min-height: 720px !important; /* the docs well height */
+    max-height: 720px !important; /* the docs well height */
     padding: 0 !important;
     display: flex !important;
     flex-direction: column !important;

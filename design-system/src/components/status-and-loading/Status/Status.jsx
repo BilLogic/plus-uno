@@ -151,7 +151,7 @@ export const Status = ({
                     )}
                     <span
                         ref={labelRef}
-                        className={`plus-status__label ${size === 'large' ? 'body2-txt' : 'body3-txt'}`}
+                        className="plus-status__label"
                     >
                         {children}
                     </span>

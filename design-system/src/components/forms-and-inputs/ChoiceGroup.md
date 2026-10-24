@@ -52,7 +52,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-danger` · `--color-on-surface` · `--layout-control-checkbox` · `--layout-control-radio` · `--size-element-gap-md` · `--size-element-gap-sm`
+`--body-default` · `--body-small` · `--color-danger` · `--color-on-surface` · `--layout-control-checkbox` · `--layout-control-radio` · `--size-element-gap-md` · `--size-element-gap-sm`
 
 From `design-system/src/components/forms-and-inputs/ChoiceGroup.scss`. Override these through the token layer, never with a literal.
 

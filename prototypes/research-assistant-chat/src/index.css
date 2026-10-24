@@ -67,15 +67,15 @@ body {
 }
 
 /* Admin demo mode: hide sidebar and let content take full width. */
-#tutor-training-progress-page.admin-demo-layout .plus-page-main-container {
+#tutor-training-progress-page.admin-demo-layout .plus-surface-container__row {
   gap: 0 !important;
 }
 
-#tutor-training-progress-page.admin-demo-layout .plus-page-sidebar-wrapper {
+#tutor-training-progress-page.admin-demo-layout .plus-surface-container__sidebar {
   display: none !important;
 }
 
-#tutor-training-progress-page.admin-demo-layout .plus-page-content-wrapper {
+#tutor-training-progress-page.admin-demo-layout .plus-surface-container__surface {
   width: 100%;
   flex-basis: 100%;
 }
@@ -127,13 +127,13 @@ body {
 
 /** Hide scrollbars on main content area; scrolling still enabled. */
 #tutor-training-progress-page .plus-page-main,
-#tutor-training-progress-page .plus-page-content-wrapper {
+#tutor-training-progress-page .plus-surface-container__surface {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
 #tutor-training-progress-page .plus-page-main::-webkit-scrollbar,
-#tutor-training-progress-page .plus-page-content-wrapper::-webkit-scrollbar {
+#tutor-training-progress-page .plus-surface-container__surface::-webkit-scrollbar {
   display: none;
 }
 

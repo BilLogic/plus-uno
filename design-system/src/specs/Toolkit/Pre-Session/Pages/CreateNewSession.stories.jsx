@@ -188,7 +188,7 @@ export const Overview = () => (
                 bottom: 'var(--size-section-gap-lg)',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                zIndex: 1000
+                zIndex: 'var(--layout-z-index-flag)'
             }}
         >
             <SessionManagementSnackbar type="session created" timestamp="11 mins ago" />
@@ -285,7 +285,7 @@ const InteractiveRender = (args) => {
                         bottom: 'var(--size-section-gap-lg)',
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        zIndex: 1000
+                        zIndex: 'var(--layout-z-index-flag)'
                     }}
                 >
                     <SessionManagementSnackbar

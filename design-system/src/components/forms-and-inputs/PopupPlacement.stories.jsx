@@ -12,10 +12,11 @@ import TreeSelect from './TreeSelect';
  * shares it: `Select` and `TagInput` (the shared `Listbox`), `TreeSelect` and
  * `Cascader`. The `Dropdown` menu has its own placement stories beside it.
  *
- * - **Gap:** `--size-element-gap-xs` between the field and the popup, below
+ * - **Offset:** `--popover-offset` between the field and the popup, below
  *   it or, with no room below, above it.
  * - **Alignment:** left edges line up; a popup that would run past the
- *   viewport's right edge right-aligns to the field instead.
+ *   viewport's right edge right-aligns to the field instead, and none comes
+ *   nearer than `--popover-gap-screen` to the screen's edge.
  * - **Width:** at least the field's width, growing with its content up to
  *   320px; a field wider than that keeps its own width. `Cascader`'s columns
  *   are exempt from the 320px cap.
@@ -78,7 +79,7 @@ const openPopup = async (canvasElement, kind) => {
     return {
         field: field.getBoundingClientRect(),
         popup: surface.getBoundingClientRect(),
-        gap: tokenLength(canvasElement, '--size-element-gap-xs'),
+        gap: tokenLength(canvasElement, '--popover-offset'),
     };
 };
 
@@ -95,7 +96,8 @@ const expectAbove = async ({ field, popup, gap }) => {
 const expectRightAligned = async ({ field, popup }) => {
     await expect(popup.width, 'the popup is wider than the field').toBeGreaterThan(field.width);
     await expect(popup.right, 'right edges line up').toBeCloseTo(field.right, 0);
-    await expect(popup.right, 'inside the viewport').toBeLessThanOrEqual(document.documentElement.clientWidth);
+    await expect(popup.right, 'at least the screen gap inside the viewport')
+        .toBeLessThanOrEqual(document.documentElement.clientWidth - tokenLength(document.body, '--popover-gap-screen'));
 };
 
 /* --------------------------------------------------------------- layouts */
@@ -114,9 +116,12 @@ const AtBottom = ({ children }) => (
     </div>
 );
 
-/** A narrow field against the right edge, so a wide popup cannot fit left-aligned. */
+/**
+ * A narrow field near the right edge, so a wide popup cannot fit left-aligned.
+ * It sits the screen gap (8) in from the edge, the nearest a popup may come.
+ */
 const AtRightEdge = ({ children }) => (
-    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '24px 0 360px' }}>
+    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '24px 8px 360px' }}>
         <div style={{ width: 120 }}>{children}</div>
     </div>
 );

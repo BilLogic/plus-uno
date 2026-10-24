@@ -394,7 +394,7 @@ export const MenuKeepsActions = {
         // Waited for: the item's background eases in. The token is read once,
         // outside the wait: its probe element would otherwise wake the wait's
         // own mutation observer on every read.
-        const selectedGround = tokenColor(canvasElement, '--color-primary-container-state-16');
+        const selectedGround = tokenColor(canvasElement, '--color-primary-state-08');
         await waitFor(() => expect(
             getComputedStyle(canvas.getByRole('button', { name: 'Mathematics' })).backgroundColor,
             'the item shows the menu\'s selected state',

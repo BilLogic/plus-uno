@@ -23,25 +23,10 @@ export const ListGroupItem = ({
     as = 'div',
     ...props
 }) => {
-    // Font size based on size prop
-    const fontSizeMap = {
-        'b1': 'var(--font-size-body1)',
-        'b2': 'var(--font-size-body2)',
-        'b3': 'var(--font-size-body3)'
-    };
-    const fontSize = fontSizeMap[size] || fontSizeMap['b2'];
-
     // Determine the element type
     let Tag = as;
     if (href) Tag = 'a';
     else if (onClick || action) Tag = 'button';
-
-    // Map size to typography class
-    const sizeClass = {
-        'b1': 'body1-txt',
-        'b2': 'body2-txt',
-        'b3': 'body3-txt'
-    }[size] || 'body1-txt';
 
     const classes = [
         'list-group-item',
@@ -51,7 +36,6 @@ export const ListGroupItem = ({
         disabled ? 'disabled' : '',
         (href || onClick || action) ? 'list-group-item-action' : '',
         style ? `plus-list-group-item-${style}` : '',
-        sizeClass,
         className
     ].filter(Boolean).join(' ');
 
@@ -72,7 +56,7 @@ export const ListGroupItem = ({
     };
 
     return (
-        <Tag {...itemProps} style={{ fontSize, ...props.style }}>
+        <Tag {...itemProps} style={props.style}>
             <div className="plus-list-group-item-content">
                 {children}
             </div>

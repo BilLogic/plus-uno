@@ -102,16 +102,18 @@ export function textScale(repoRoot) {
   const declared = new Map(
     [...text.matchAll(tokenDeclarationPattern('--font-size-'))].map((m) => [m[1], m[2].trim()]),
   );
+  // Aliases resolve across every token file: `--font-size-h5` points at
+  // `--font-size-125`, a font primitive generated into `_type.scss`.
+  const everywhere = new Map([...tokenCorpus({ root: repoRoot })].map(([name, entry]) => [name, entry.raw]));
 
   const px = new Set();
   for (const [name, value] of declared) {
-    // Icon sizing is a separate scale with a separate job; `--font-size-125` is
-    // a primitive that three semantic tokens alias.
-    if (name.startsWith('--font-size-fa-') || name === '--font-size-125') continue;
+    // Icon sizing is a separate scale with a separate job.
+    if (name.startsWith('--font-size-fa-')) continue;
     // `resolveToken` follows the `var(--x)` chain, cycle-guarded rather than
     // depth-capped (#507). A name that resolves to nothing keeps its own value,
     // which is what the depth cap used to return.
-    const rem = /^([\d.]+)rem$/.exec(resolveToken(name, declared) ?? value);
+    const rem = /^([\d.]+)rem$/.exec(resolveToken(name, everywhere) ?? value);
     if (rem) px.add(Number(rem[1]) * 16);
   }
 

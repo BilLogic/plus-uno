@@ -29,7 +29,7 @@ const Breadcrumb = ({ items = [], id, separator = '/', className = '', style }) 
 
     return (
         <RBBreadcrumb
-            className={`plus-breadcrumb body1-txt ${className}`}
+            className={`plus-breadcrumb ${className}`}
             style={breadcrumbStyle}
         >
             {items.map((item, index) => {

@@ -304,7 +304,9 @@ EnterCreatesWhenNoMatch.play = async ({ canvasElement }) => {
 
 /**
  * Inside a modal the list renders in a portal above it, so neither the modal
- * nor its scroll area clips it, and a pointer reaches its rows.
+ * nor its scroll area clips it, and a pointer reaches its rows. The portal is
+ * the modal's overlay rather than the page, so the list takes the modal's
+ * layer and stays inside its focus trap.
  */
 export const InsideAModal = () => {
     const [show, setShow] = useState(true);
@@ -323,13 +325,15 @@ InsideAModal.play = async ({ canvasElement }) => {
 
     await userEvent.click(input);
     const listbox = await body.findByRole('listbox', { name: 'School options' });
-    await expect(dialog.contains(listbox)).toBe(false);
+    // Outside the dialog's panel, which clips, and inside its overlay.
+    await expect(dialog.querySelector('.plus-modal').contains(listbox)).toBe(false);
+    await expect(listbox.closest('.modal')).toBe(dialog.closest('.modal'));
 
     const field = input.getBoundingClientRect();
     const surface = listbox.closest('.plus-listbox').getBoundingClientRect();
-    // At least as wide as the field, and no taller than 300px.
+    // At least as wide as the field, and no taller than max-height-menu 320.
     await expect(surface.width).toBeGreaterThanOrEqual(Math.floor(field.width));
-    await expect(surface.height).toBeLessThanOrEqual(300);
+    await expect(surface.height).toBeLessThanOrEqual(320);
 
     const physics = within(listbox).getByRole('option', { name: 'Physics' });
     physics.scrollIntoView({ block: 'nearest' });

@@ -67,6 +67,26 @@ Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity 
 | Body 2 | `var(--font-size-body2)` |
 | Body 3 | `var(--font-size-body3)` |
 | Code | `var(--font-size-code)`, `var(--font-family-code)` |
+| Heading/xxlarge | `var(--heading-xxlarge)` |
+| Heading/xlarge | `var(--heading-xlarge)` |
+| Heading/large | `var(--heading-large)` |
+| Heading/medium | `var(--heading-medium)` |
+| Heading/small | `var(--heading-small)` |
+| Heading/xsmall | `var(--heading-xsmall)` |
+| Heading/xxsmall | `var(--heading-xxsmall)` |
+| Body/large | `var(--body-large)` |
+| Body/default | `var(--body-default)` |
+| Body/small | `var(--body-small)` |
+| Metric/large | `var(--metric-large)` |
+| Metric/medium | `var(--metric-medium)` |
+| Metric/small | `var(--metric-small)` |
+| Family/heading | `var(--type-family-heading)` |
+| Family/body | `var(--type-family-body)` |
+| Weight/regular | `var(--type-weight-regular)` |
+| Weight/medium | `var(--type-weight-medium)` |
+| Weight/semibold | `var(--type-weight-semibold)` |
+
+The `Heading/*`, `Body/*` and `Metric/*` styles are the type scale: each binds its family, size, line height and weight to the `typography` collection, and each CSS token is the matching `font` shorthand (`font: var(--heading-large)`). A button or tab label is `Body/default` with `Weight/medium`. The rows above them are the older styles, which sit under `Legacy/` in Figma where their folder collided (`Legacy/Body/B1/…`), kept until every use moves.
 
 ## Spacing Tokens
 
@@ -82,6 +102,23 @@ Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity 
 | Section padding | `var(--size-section-pad-{x\|y}-{sm\|md\|lg})` |
 | Surface padding | `var(--size-surface-pad-{x\|y})` |
 | Table cell | `var(--size-table-cell-{x\|y\|gap})` |
+
+### Scale Tokens
+
+The spacing / primitives and spacing / foundations collections (Foundations holds the Size, Element and Border folders), beside the old `--size-*` tokens until every use moves. Each Figma variable's code syntax is its CSS name.
+
+| Figma Variable | PLUS CSS Token | Notes |
+|----------------|----------------|-------|
+| spacing / primitives `Space/space-*`, `Radius/radius-*`, `Stroke/stroke-*`, `Size/size-*` | `var(--space-025)`, `var(--radius-050)`, `var(--stroke-1)`, `var(--size-200)` | Named by rem × 100 (`space-025` is 4). Hidden in Figma; semantic tokens point at them |
+| Foundations `Element/pad-x-{xs\|sm\|md}`, `pad-y-{sm\|md}` | `var(--element-pad-x-sm)` | 4 · 8 · 12 and 2 · 6. The old `--size-element-pad-y-sm` is 4; the new one is 2 |
+| Foundations `Element/stack-*`, `inline-*` | `var(--element-stack-md)`, `var(--element-inline-sm)` | 4 · 8 · 12 |
+| Foundations `Element/radius-{sm\|md\|lg}`, `radius-item-{sm\|md}`, `radius-full` | `var(--element-radius-item-md)` | 2 · 4 · 8, items 6 · 8 |
+| Foundations `Size/Height/*`, `Width/*` | `var(--height-200)`, `var(--width-1400)` | Common scales, named by rem × 100 |
+| Foundations `Size/Item/height-{sm\|md}` | `var(--item-height-md)` | 24 · 32; there is no 40 Item |
+| Foundations `Size/Row/height-{sm\|md\|lg}` | `var(--row-height-md)` | 32 · 40 · 48 |
+| Foundations `Size/Label/*`, `Field/*` | `var(--label-height-md)`, `var(--field-width-md)` | Label 16 · 20, max 160; Field widths 80 … 480, min heights 80 · 120 |
+| Foundations `Size/Icon/*`, `Image/*` | `var(--icon-md)`, `var(--image-sm)` | Icon 12 · 16 · 24; Image 16 … 48 |
+| Foundations `Border/default`, `selected`, `focused` | `var(--border-default)` | 1 · 2 · 2 |
 
 ## Elevation Tokens
 
@@ -101,7 +138,7 @@ Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity 
 | Max Heights/listbox | `var(--layout-max-height-listbox)` | 300 at every breakpoint, about eight rows; the body scrolls past it |
 | Min Heights/card-body | `var(--layout-min-height-card-body)` | 20 / 30 / 40 at MD / LG / XL |
 | Min Heights/modal-body | `var(--layout-min-height-modal-body)` | 40 / 50 / 60 at MD / LG / XL |
-| — (code only) | `var(--layout-z-index-overlay)` | 1070, the layer floating listboxes and menus draw on: above a modal, level with popovers. Figma has no z-index |
+| — (code only) | `var(--layout-z-index-card)` … `var(--layout-z-index-tooltip)` | Atlassian's layers: card 100, navigation 200, dialog 300, popup 400, scrim 500, modal 510, flag 600, spotlight 700, tooltip 800. A popup opened from a field inside a modal mounts in the modal's overlay and takes its layer. Figma has no z-index |
 | — (code only) | `var(--layout-max-width-listbox)` | 320, the widest a popup from a field or button grows. A popup with columns (Cascader, the calendar) is exempt |
 | — (code only) | `var(--layout-control-checkbox)` · `var(--layout-control-radio)` | 18 and 12, the checkbox box and radio dot; a description or reveal under the label indents by one plus the label gap |
 | — (code only) | `var(--layout-calendar-day-sm)` · `var(--layout-calendar-day-md)` · `var(--layout-calendar-day-lg)` · `var(--layout-calendar-nav)` | 28 / 36 / 44 calendar days by picker size, and the 32 month buttons |

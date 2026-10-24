@@ -44,7 +44,7 @@ const Table = ({
                                 const headerClass = !isString && header.className ? header.className : '';
 
                                 return (
-                                    <th key={index} style={headerStyle} className={headerClass}>
+                                    <th key={index} scope="col" style={headerStyle} className={headerClass}>
                                         {content}
                                     </th>
                                 );

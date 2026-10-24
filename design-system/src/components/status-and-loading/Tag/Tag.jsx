@@ -368,7 +368,7 @@ export const Tag = ({
     const labelSpan = (
         <span
             ref={labelRef}
-            className="plus-tag__label body3-txt"
+            className="plus-tag__label"
             tabIndex={!isControl && !isDisabled && truncated ? 0 : undefined}
         >
             {label}

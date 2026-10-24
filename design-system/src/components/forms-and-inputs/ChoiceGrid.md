@@ -40,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface` · `--color-on-surface-variant` · `--color-surface-container-low` · `--font-family-body` · `--font-weight-normal` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-radius-md`
+`--body-default` · `--color-on-surface` · `--color-on-surface-variant` · `--color-surface-container-low` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-radius-md`
 
 From `design-system/src/components/forms-and-inputs/ChoiceGrid.scss`. Override these through the token layer, never with a literal.
 

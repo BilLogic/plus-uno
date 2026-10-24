@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Button from '../actions/Button/Button';
 import useFieldId from './useFieldId';
 import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
+import { useDeprecatedFieldSize } from '../../lib/useDeprecatedLargeSize';
 
 const toText = (value) => (value === undefined || value === null ? '' : String(value));
 
@@ -52,6 +53,7 @@ const NumberInput = ({
     onDecrement,
     ...props
 }) => {
+    useDeprecatedFieldSize('NumberInput', size);
     /** One id for the label and the input — see `useFieldId`. */
     const fieldId = useFieldId(id);
     const isReadOnly = readOnly !== undefined ? readOnly : Boolean(readonly);

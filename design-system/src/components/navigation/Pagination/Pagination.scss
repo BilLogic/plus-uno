@@ -71,14 +71,9 @@
     border: none;
     border-radius: 0;
 
-    /* Typography - default (medium): Body/B2/Semibold */
-    font-family: var(--font-family-body);
-    font-weight: var(--font-weight-semibold-1);
-    /* 400 - Regular/Semibold */
-    font-size: var(--font-size-body2);
-    /* 14px */
-    line-height: var(--font-line-height-body2);
-    /* 1.571 (157.1%) */
+    /* A page number is a control label: body.default 14/20 at medium, every size */
+    font: var(--body-default);
+    font-weight: var(--type-weight-medium);
 
     /* Text color */
     color: var(--color-secondary-text) !important;
@@ -230,8 +225,8 @@
     color: var(--color-secondary-text) !important;
     /* #3b525f */
     cursor: default;
-    font-weight: var(--font-weight-semibold-1);
-    /* 400 */
+    /* The current page is semibold, as a selected tab is. */
+    font-weight: var(--type-weight-semibold);
     z-index: 3;
     border-right-color: var(--color-outline-variant);
 }
@@ -329,10 +324,6 @@
 .plus-pagination.plus-pagination-small .page-link {
     padding: var(--size-spacing-small-space-050) var(--size-spacing-small-space-100);
     /* 4px, 8px */
-    font-size: var(--font-size-body3);
-    /* 12px */
-    line-height: var(--font-line-height-body3);
-    /* 1.667 (166.7%) */
 }
 
 .plus-pagination.plus-pagination-small .page-item-icon .page-link {
@@ -359,10 +350,6 @@
     /* Text buttons: 16px horizontal, 8px vertical */
     padding: var(--size-spacing-small-space-100) var(--size-spacing-medium-space-300);
     /* 8px, 16px */
-    font-size: var(--font-size-body1);
-    /* 16px */
-    line-height: var(--font-line-height-body1);
-    /* 1.5 (150%) */
 }
 
 /* Large icon buttons: square cell matching large text vertical rhythm */

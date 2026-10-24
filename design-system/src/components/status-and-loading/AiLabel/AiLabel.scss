@@ -47,6 +47,7 @@
 }
 
 .plus-ai-label__text {
+    font: var(--body-small);
     min-width: 0;
 }
 
@@ -76,6 +77,7 @@
 }
 
 .plus-ai-label__note {
+    font: var(--body-small);
     color: inherit;
     opacity: 0.85;
 }

@@ -38,12 +38,13 @@
 
 .plus-suggestion__icon {
     flex: none;
-    font-size: var(--font-size-fa-body2, 12px);
+    font-size: var(--icon-sm);
     line-height: 1;
     color: inherit;
 }
 
 .plus-suggestion__label {
+    font: var(--body-small);
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;

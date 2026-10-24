@@ -64,8 +64,6 @@ const ChoiceGrid = ({
         className
     ].filter(Boolean).join(' ');
 
-    const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
-
     /*
      * One base per grid. It used to fall back to the literal 'choice-grid', so
      * two grids without an id shared every cell id and, in radio mode, every
@@ -87,7 +85,7 @@ const ChoiceGrid = ({
                             <th
                                 key={column.id}
                                 id={`${baseId}-col-${column.id}`}
-                                className={`plus-choice-grid-column-header ${sizeClass}`}
+                                className="plus-choice-grid-column-header"
                             >
                                 {column.label}
                             </th>
@@ -100,7 +98,7 @@ const ChoiceGrid = ({
 
                         return (
                             <tr key={row.id} className="plus-choice-grid-row">
-                                <td id={rowLabelId} className={`plus-choice-grid-row-label ${sizeClass}`}>
+                                <td id={rowLabelId} className="plus-choice-grid-row-label">
                                     {row.label}
                                 </td>
                                 {columns.map((column) => {
