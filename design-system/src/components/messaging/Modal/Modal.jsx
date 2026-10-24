@@ -1,15 +1,13 @@
-import React, { createContext, useContext, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useContext, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import BootstrapModal from 'react-bootstrap/Modal';
 import Button from '@/components/actions/Button';
 import Skeleton from '@/components/status-and-loading/Skeleton';
 import { HeadingLevelContext } from '@/lib/headingLevel';
+import { openOverlay, reportFocusLost } from '@/lib/overlayStack';
 
 /** Safe CSS length / custom-property patterns for Modal width. */
 const SAFE_WIDTH_RE = /^(?:\d+(?:\.\d+)?(?:px|rem|%)|var\(--[a-zA-Z0-9-]+(?:\s*,\s*[^)]+)?\))$/;
-
-/** A modal raised from a modal is the most that stacks: a nested confirm. */
-const MAX_OVERLAYS = 2;
 
 /** The widths from the screen grid: 6 · 8 · 10 columns plus the modal pad. */
 const GRID_WIDTHS = ['sm', 'md', 'lg'];
@@ -50,6 +48,44 @@ const resolveModalWidth = (width) => {
  * under the first modal (510).
  */
 const OverlayContext = createContext(null);
+
+/**
+ * Takes a place in the document's overlay stack while `active`.
+ *
+ * Opening one tells the app frame, which closes a floating sidebar. A third
+ * overlay gets no place: it stays closed and calls `onRefused`, so its owner's
+ * state says closed too and the trigger works again once there is room. The
+ * element that had focus is kept, so a trigger that left the page with the
+ * sidebar can be reported once the modal has closed.
+ *
+ * A layout effect, so the place is taken before the first paint and the modal
+ * does not flash closed.
+ *
+ * @param {boolean} active
+ * @param {() => void} [onRefused]
+ * @returns {[boolean, React.MutableRefObject<Element | null>]} whether it has a place, and its trigger
+ */
+function useOverlayPlace(active, onRefused) {
+    const [placed, setPlaced] = useState(false);
+    const trigger = useRef(null);
+    const refused = useRef(onRefused);
+    refused.current = onRefused;
+    useLayoutEffect(() => {
+        if (!active) return undefined;
+        trigger.current = typeof document === 'undefined' ? null : document.activeElement;
+        const handle = openOverlay();
+        if (!handle) {
+            refused.current?.();
+            return undefined;
+        }
+        setPlaced(true);
+        return () => {
+            handle.release();
+            setPlaced(false);
+        };
+    }, [active]);
+    return [placed, trigger];
+}
 
 /**
  * True while an element's content is taller than its box.
@@ -130,23 +166,28 @@ const Modal = ({
     const bodyRef = useRef(null);
 
     const parent = useContext(OverlayContext);
-    const depth = renderAs === 'modal' ? (parent?.depth ?? 0) + 1 : parent?.depth ?? 0;
+    // A modal raised from a modal waits for that modal's place, so when both
+    // mount open the outer one takes its place first.
+    const [placed, trigger] = useOverlayPlace(
+        show && renderAs === 'modal' && (parent ? parent.placed : true),
+        onClose,
+    );
+    const visible = renderAs === 'inline' ? show : show && placed;
     const overlay = useMemo(() => ({
-        depth,
+        placed: renderAs === 'inline' ? (parent ? parent.placed : true) : placed,
         element: () => panelRef.current?.closest('.modal') ?? null,
-    }), [depth]);
-
-    useEffect(() => {
-        if (show && renderAs === 'modal' && depth > MAX_OVERLAYS && process.env.NODE_ENV !== 'production') {
-            // eslint-disable-next-line no-console
-            console.warn(`[Modal] ${depth} overlays are open. At most ${MAX_OVERLAYS} stack: a modal and the confirm it raises.`);
-        }
-    }, [show, renderAs, depth]);
+    }), [renderAs, parent, placed]);
+    // Focus goes back to the trigger on close; one that has left the page
+    // cannot take it, so whoever removed it is told.
+    const onExited = () => {
+        if (trigger.current && !trigger.current.isConnected) reportFocusLost();
+        trigger.current = null;
+    };
 
     const scrollable = type === 'scrollable';
     const hasFooter = showBottomButtons && Boolean(footer || primaryButton || secondaryButton);
     const bodyOnly = !title && !description && !headerActions && !showBottomButtons;
-    const overflows = useOverflows(bodyRef, show, loading);
+    const overflows = useOverflows(bodyRef, visible, loading);
 
     const classes = [
         'plus-modal',
@@ -278,8 +319,9 @@ const Modal = ({
     return (
         <OverlayContext.Provider value={overlay}>
             <BootstrapModal
-                show={show}
+                show={visible}
                 onHide={onClose}
+                onExited={onExited}
                 backdrop={backdrop}
                 keyboard={keyboard}
                 centered={centered}
