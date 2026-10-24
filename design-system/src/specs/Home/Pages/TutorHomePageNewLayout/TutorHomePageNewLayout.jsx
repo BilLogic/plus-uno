@@ -62,6 +62,12 @@ const CATEGORY_COLOR = {
     'Technology Tools': 'blue',
 };
 
+/** The skills chart's score axis, 0 to 100 in quarters, as the Specs chart draws it. */
+const SCORE_DOMAIN = [0, 100];
+const SCORE_TICKS = [0, 25, 50, 75, 100];
+/** The score line's color: the Secondary role, as the Figma chart binds it. */
+const SCORE_COLOR = 'var(--color-secondary)';
+
 /** A block's grid placement as an inline style; before the first measure, every block spans the row. */
 const placed = (slot) => (slot ? { gridColumn: slot.column, gridRow: slot.row } : { gridColumn: '1 / -1' });
 
@@ -275,6 +281,50 @@ const TutorHomePageNewLayout = ({
                 </div>
             </PatternCard>
 
+            {/* Skills: Pattern/Card, `_Card header` custom, holding the tabs; the chart in the body. */}
+            <PatternCard
+                // The large card: Figma's small card stops at 304 tall, under the chart's 320.
+                padding="lg"
+                data-block="skills"
+                style={placed(layout?.skills)}
+                header={(
+                    <NavTabs mode="tabs" activeKey={skillsTab} onSelect={setSkillsTab} aria-label="Skills">
+                        <NavTabs.Item eventKey="skills-overview"><TabLabel after={infoGlyph}>Skills Overview</TabLabel></NavTabs.Item>
+                        <NavTabs.Item eventKey="skills-progress"><TabLabel after={infoGlyph}>Skills Progress</TabLabel></NavTabs.Item>
+                    </NavTabs>
+                )}
+            >
+                <div className="plus-home-new__chart">
+                    {skillsTab === 'skills-progress' ? (
+                        <>
+                            <LineChart
+                                height={chartHeight}
+                                yDomain={SCORE_DOMAIN}
+                                yTicks={SCORE_TICKS}
+                                data={[{
+                                    name: 'Average score',
+                                    data: skillsProgressData.averageScores,
+                                    categories: skillsProgressData.sessionRanges,
+                                    color: SCORE_COLOR,
+                                }]}
+                            />
+                            <p className="plus-home-new__caption">Each point represents the average score across 5 sessions.</p>
+                        </>
+                    ) : (
+                        <RadarChart
+                            height={chartHeight}
+                            filled
+                            yAxisMax={100}
+                            categories={skillsOverviewData.categories}
+                            series={[
+                                { name: 'Your performance', data: skillsOverviewData.yourPerformance },
+                                { name: 'Average tutor performance', data: skillsOverviewData.averagePerformance, dashStyle: 'Dash' },
+                            ]}
+                        />
+                    )}
+                </div>
+            </PatternCard>
+
             {/* Your Impact: Pattern/Card, `_Card header` default with the pager in its actions. */}
             <PatternCard
                 padding="sm"
@@ -302,47 +352,6 @@ const TutorHomePageNewLayout = ({
                         </ListGroup.Item>
                     ))}
                 </ListGroup>
-            </PatternCard>
-
-            {/* Skills: Pattern/Card, `_Card header` custom, holding the tabs; the chart in the body. */}
-            <PatternCard
-                // The large card: Figma's small card stops at 304 tall, under the chart's 320.
-                padding="lg"
-                data-block="skills"
-                style={placed(layout?.skills)}
-                header={(
-                    <NavTabs mode="tabs" activeKey={skillsTab} onSelect={setSkillsTab} aria-label="Skills">
-                        <NavTabs.Item eventKey="skills-overview"><TabLabel after={infoGlyph}>Skills Overview</TabLabel></NavTabs.Item>
-                        <NavTabs.Item eventKey="skills-progress"><TabLabel after={infoGlyph}>Skills Progress</TabLabel></NavTabs.Item>
-                    </NavTabs>
-                )}
-            >
-                <div className="plus-home-new__chart">
-                    {skillsTab === 'skills-progress' ? (
-                        <>
-                            <LineChart
-                                height={chartHeight}
-                                data={[{
-                                    name: 'Average score',
-                                    data: skillsProgressData.averageScores,
-                                    categories: skillsProgressData.sessionRanges,
-                                }]}
-                            />
-                            <p className="plus-home-new__caption">Each point represents the average score across 5 sessions.</p>
-                        </>
-                    ) : (
-                        <RadarChart
-                            height={chartHeight}
-                            filled
-                            yAxisMax={100}
-                            categories={skillsOverviewData.categories}
-                            series={[
-                                { name: 'Your performance', data: skillsOverviewData.yourPerformance },
-                                { name: 'Average tutor performance', data: skillsOverviewData.averagePerformance, dashStyle: 'Dash' },
-                            ]}
-                        />
-                    )}
-                </div>
             </PatternCard>
 
             {/* Recommendations: Pattern/Section, `_Section header` default with the pager; a row of Pattern/Cards. */}

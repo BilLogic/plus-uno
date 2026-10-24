@@ -79,8 +79,12 @@
         / var(--plus-home-new-cards-per-view)
     );
     column-gap: var(--layout-gutter);
-    margin: 0;
-    padding: 0;
+    // A scroller clips at its padding box. The padding gives each card room for
+    // its border and its elevation shadow (Light/2 reaches 10 below), and the
+    // equal negative margin keeps the cards on the grid's columns.
+    margin: calc(-1 * var(--card-stack-lg));
+    padding: var(--card-stack-lg);
+    scroll-padding-inline: var(--card-stack-lg);
     list-style: none;
     overflow-x: auto;
     overscroll-behavior-x: contain;

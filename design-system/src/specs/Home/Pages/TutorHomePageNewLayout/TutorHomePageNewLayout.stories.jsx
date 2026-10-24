@@ -89,6 +89,20 @@ const expectPatterns = async (canvasElement, list) => {
     }
     const nested = canvasElement.querySelectorAll('.plus-pattern-card .plus-pattern-card, .plus-pattern-card .card');
     await expect(nested.length, 'no card inside a card').toBe(0);
+    // One elevation for every card on the page: the Card pattern's level 1.
+    const shadows = new Set([...canvasElement.querySelectorAll('.plus-pattern-card')].map((c) => getComputedStyle(c).boxShadow));
+    await expect([...shadows].length, 'every card has the same elevation').toBe(1);
+    await expect([...shadows][0], 'and it is not flat').not.toBe('none');
+};
+
+/** Cards side by side stretch to the tallest in their row, as the Card pattern says; the badge hugs. */
+const expectRowHeights = async (list, stacked) => {
+    const block = (name) => rect(list.find((b) => b.name === name).el);
+    if (!stacked) await expect(block('impact').height, 'Your Impact takes the skills card\'s height').toBeCloseTo(block('skills').height, 0);
+    const badge = list.find((b) => b.name === 'badge').el;
+    // Hugging: its box is exactly its content, the cell's leftover height below it.
+    const inner = badge.querySelector('.plus-pattern-card-inner');
+    await expect(badge.clientHeight, 'My Badge hugs its content').toBeCloseTo(inner.getBoundingClientRect().height, 0);
 };
 
 /** The block sits where the formula put it: on column edges, `span` columns wide, inside the content box. */
@@ -148,7 +162,9 @@ const expectChartAxes = async (canvasElement) => {
     const chart = block.querySelector('.highcharts-container');
     const box = rect(chart);
     const yLabels = [...chart.querySelectorAll('.highcharts-yaxis-labels text')];
-    await expect(yLabels[0]?.textContent, 'the 0 row').toBe('0');
+    await expect(yLabels.map((t) => t.textContent), 'the score axis, 0 row included').toEqual(['0', '25', '50', '75', '100']);
+    await expect(getComputedStyle(chart.querySelector('.highcharts-graph')).stroke, 'the line is the Secondary role')
+        .toBe(getComputedStyle(document.documentElement).getPropertyValue('--color-secondary').trim().replace(/^#(..)(..)(..)$/, (_, r, g, b) => `rgb(${parseInt(r, 16)}, ${parseInt(g, 16)}, ${parseInt(b, 16)})`));
     for (const t of [...yLabels, ...chart.querySelectorAll('.highcharts-xaxis-labels text')]) {
         const r = rect(t);
         await expect(r.top >= box.top - 0.5 && r.bottom <= box.bottom + 0.5, `"${t.textContent}" inside the chart`).toBe(true);
@@ -181,6 +197,15 @@ const expectLessonsOnGrid = async (canvasElement, grid, perView) => {
         await expect(rect(card).width, `a lesson card spans ${span} columns`).toBeCloseTo(spanWidth(span, box.width, grid), 0);
     }
     await expect(getComputedStyle(strip).getPropertyValue('--plus-home-new-cards-per-view').trim()).toBe(String(perView));
+
+    // The strip scrolls, so it clips at its padding box: every card in view sits whole inside it.
+    const sb = rect(strip);
+    const clip = { left: sb.left + strip.clientLeft, top: sb.top + strip.clientTop, right: sb.left + strip.clientLeft + strip.clientWidth, bottom: sb.top + strip.clientTop + strip.clientHeight };
+    for (const li of [...strip.children].slice(0, perView)) {
+        const cb = rect(li.firstElementChild);
+        const inside = cb.left >= clip.left - 0.5 && cb.right <= clip.right + 0.5 && cb.top >= clip.top - 0.5 && cb.bottom <= clip.bottom + 0.5;
+        await expect(inside, 'a lesson card renders whole inside the strip').toBe(true);
+    }
 };
 
 /**
@@ -203,6 +228,7 @@ const atWidth = (width, expected) => async ({ canvasElement }) => withTestViewpo
     await waitFor(() => expect(list[0].el.style.gridColumn, 'the formulas have run').toBe(`1 / span ${expected.greeting[1]}`));
     for (const block of list) await expectPlaced(box, grid, block, expected[block.name]);
     await expectNoOverlap(list);
+    await expectRowHeights(list, expected.greeting[1] === grid.columns);
     await expectLessonsOnGrid(canvasElement, grid, expected.lessonsPerView);
     await expectChartAxes(canvasElement);
     await expectNoClippedText(list);
@@ -227,15 +253,15 @@ export const Overview = {};
 
 /**
  * 768: content is 720, too narrow for a main column of 480 beside a side of
- * 224, so the rows stack; My Badge and Your Impact share a row of two cards.
+ * 224, so the blocks stack one per row in reading order.
  */
 export const Medium768 = {
     play: atWidth(768, {
         greeting: [1, 12, 1],
-        badge: [1, 6, 2],
-        impact: [7, 6, 2],
+        badge: [1, 12, 2],
         skills: [1, 12, 3],
-        lessons: [1, 12, 4],
+        impact: [1, 12, 4],
+        lessons: [1, 12, 5],
         lessonsPerView: 2,
         sidebarDocked: false,
     }),

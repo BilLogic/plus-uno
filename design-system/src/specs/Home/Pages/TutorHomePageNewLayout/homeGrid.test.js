@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { cardsPerRow, columnWidth, homeLayout, spanWidth, splitRow } from './homeGrid';
+import { BLOCKS, cardsPerRow, columnWidth, homeLayout, spanWidth, splitRow } from './homeGrid';
 import { tokenCorpus } from '@/lib/tokens-node.mjs';
 
 /**
@@ -61,36 +61,36 @@ describe('a row with a side column', () => {
             stacked: false,
             greeting: { column: '1 / span 8', row: 1 },
             badge: { column: '9 / span 4', row: 1 },
-            impact: { column: '9 / span 4', row: 2 },
             skills: { column: '1 / span 8', row: 2 },
+            impact: { column: '9 / span 4', row: 2 },
             lessons: { column: '1 / span 12', row: 3 },
         });
         expect(homeLayout(width.xl, grid)).toMatchObject({
             greeting: { column: '1 / span 9', row: 1 },
             badge: { column: '10 / span 3', row: 1 },
-            impact: { column: '9 / span 4', row: 2 },
             skills: { column: '1 / span 8', row: 2 },
+            impact: { column: '9 / span 4', row: 2 },
         });
     });
 
-    it('stacks at 720, the badge and Your Impact sharing a row of two cards', () => {
+    it('stacks at 720, one block per row in reading order', () => {
         expect(homeLayout(width.md, grid)).toEqual({
             stacked: true,
             greeting: { column: '1 / span 12', row: 1 },
-            badge: { column: '1 / span 6', row: 2 },
-            impact: { column: '7 / span 6', row: 2 },
+            badge: { column: '1 / span 12', row: 2 },
             skills: { column: '1 / span 12', row: 3 },
-            lessons: { column: '1 / span 12', row: 4 },
+            impact: { column: '1 / span 12', row: 4 },
+            lessons: { column: '1 / span 12', row: 5 },
         });
     });
 
-    it('gives each side card its own row when two would fall under the card minimum', () => {
-        expect(homeLayout(500, grid)).toMatchObject({
-            badge: { column: '1 / span 12', row: 2 },
-            impact: { column: '1 / span 12', row: 3 },
-            skills: { row: 4 },
-            lessons: { row: 5 },
-        });
+    it('never places a block before one that precedes it in reading order', () => {
+        for (const w of [width.md, width.lg, width.xl]) {
+            const layout = homeLayout(w, grid);
+            const key = (b) => layout[b].row * 100 + parseInt(layout[b].column, 10);
+            const keys = BLOCKS.map(key);
+            expect(keys).toEqual([...keys].sort((x, y) => x - y));
+        }
     });
 });
 

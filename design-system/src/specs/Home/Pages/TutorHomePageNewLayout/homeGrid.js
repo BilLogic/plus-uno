@@ -56,8 +56,8 @@ export const cardsPerRow = (width, { gutter }, min) =>
 /** Preferred side spans: the badge takes 3 columns, Your Impact 4. */
 export const PREFERRED_SIDE = { greeting: 3, progress: 4 };
 
-/** The page's blocks, in reading order, as the content grid's direct children. */
-export const BLOCKS = ['greeting', 'badge', 'impact', 'skills', 'lessons'];
+/** The page's blocks, in reading order: the DOM order, which is also the visual order at every width. */
+export const BLOCKS = ['greeting', 'badge', 'skills', 'impact', 'lessons'];
 
 /** A block's place on the grid: CSS `grid-column` and `grid-row` values. */
 const place = (start, span, row) => ({ column: `${start} / span ${span}`, row });
@@ -68,10 +68,12 @@ const place = (start, span, row) => ({ column: `${start} / span ${span}`, row })
  * - **Both rows split** (Large and up): the greeting and the badge share row
  *   1, the skills chart and Your Impact row 2, each pair on `splitRow`'s spans;
  *   the recommendations take row 3.
- * - **Otherwise** the rows stack: the greeting and the skills chart span all
- *   12, and the two side cards, the badge and Your Impact, share a row of
- *   cards between them (`cardsPerRow`, at most 2), so neither stands alone in
- *   a row it leaves mostly empty.
+ * - **Otherwise** every block spans all 12, one per row, in reading order. The
+ *   badge card hugs its height, so a full-width badge is a short strip rather
+ *   than an empty box.
+ *
+ * Blocks only ever follow their reading order, left to right and top to
+ * bottom, so the tab order matches what a person sees.
  *
  * @returns {Record<typeof BLOCKS[number], { column: string, row: number }> & { stacked: boolean }}
  */
@@ -84,21 +86,14 @@ export const homeLayout = (width, grid) => {
             stacked: false,
             greeting: place(1, greeting.main, 1),
             badge: place(greeting.main + 1, greeting.side, 1),
-            impact: place(progress.main + 1, progress.side, 2),
             skills: place(1, progress.main, 2),
+            impact: place(progress.main + 1, progress.side, 2),
             lessons: place(1, all, 3),
         };
     }
-    const pair = Math.min(2, cardsPerRow(width, grid, grid.cardMin));
-    const span = all / pair;
-    const impactRow = pair === 2 ? 2 : 3;
     return {
         stacked: true,
-        greeting: place(1, all, 1),
-        badge: place(1, span, 2),
-        impact: place(pair === 2 ? span + 1 : 1, span, impactRow),
-        skills: place(1, all, impactRow + 1),
-        lessons: place(1, all, impactRow + 2),
+        ...Object.fromEntries(BLOCKS.map((block, i) => [block, place(1, all, i + 1)])),
     };
 };
 

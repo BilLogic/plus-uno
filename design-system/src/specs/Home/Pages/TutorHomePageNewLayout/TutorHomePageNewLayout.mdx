@@ -45,7 +45,7 @@ Today's tutor Home, the Skills (Home Page) frame, rebuilt from the patterns: the
 Every block is a direct child of the content grid, placed on whole columns by the formulas in `homeGrid.js`. With today's tokens the spans come out as below.
 
 - **Greeting** is a page-level Section with a tabs header; **My Badge**, **Your Impact** and **the skills chart** are Cards; **Personalized Recommendations** is a Section holding a row of lesson Cards.
-- The greeting and My Badge, and the skills chart and Your Impact, are a main column and a side column. The side takes its preferred span (3 for the badge, 4 for Your Impact), widened until it reaches `--section-min-width-side`; the main column keeps `--section-min-width-main`. When either row cannot split, both stack, and My Badge and Your Impact share a row of cards instead.
+- The greeting and My Badge, and the skills chart and Your Impact, are a main column and a side column. The side takes its preferred span (3 for the badge, 4 for Your Impact), widened until it reaches `--section-min-width-side`; the main column keeps `--section-min-width-main`. When either row cannot split, every block stacks, one per row, in reading order. Side-by-side cards stretch to the tallest in their row, as the Card pattern says; My Badge hugs its content.
 - Personalized Recommendations shows the most of 4 · 3 · 2 · 1 lesson cards per view that keeps each card at `--card-min-width-md`, and pages a view at a time.
 
 <table>
@@ -53,7 +53,7 @@ Every block is a direct child of the content grid, placed on whole columns by th
         <tr><th>Width</th><th>Content</th><th>Greeting + badge</th><th>Chart + Your Impact</th><th>Lessons per view</th></tr>
     </thead>
     <tbody>
-        <tr><td>Medium 768</td><td>720</td><td>stacked; badge 6 beside Your Impact 6</td><td>stacked</td><td>2</td></tr>
+        <tr><td>Medium 768</td><td>720</td><td>stacked, one block per row</td><td>stacked</td><td>2</td></tr>
         <tr><td>Large 1024</td><td>744</td><td>8 + 4</td><td>8 + 4</td><td>2</td></tr>
         <tr><td>X-Large 1440</td><td>1144</td><td>9 + 3</td><td>8 + 4</td><td>3</td></tr>
     </tbody>
