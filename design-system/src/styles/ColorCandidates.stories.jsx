@@ -4,18 +4,23 @@ import { expect } from 'storybook/test';
 import { contrast as contrastOf, parseColor } from '../lib/tokens.mjs';
 
 /**
- * The two color defects #312 measured, and what each one could become (#268).
+ * The two color defects #312 measured, the candidates #268 offered, and what
+ * was decided.
  *
- * WHAT THIS PAGE IS. A decision aid, in the same shape as
- * `AiIdentity.stories.jsx` and for the same reason: both questions are Bill's,
- * and shipping a default would make it the answer by inertia. Nothing here adds
- * a token. Every current value is READ FROM THE PAGE at render time, so this
- * cannot quietly describe a palette that has moved on; every candidate is a
- * local constant, labeled as one.
+ * DECIDED 2026-10-24. Filled warning takes candidate A: the yellow stays and
+ * `--color-on-warning` is the container ink, 4.62:1. Warning's icon and border
+ * are #715c00, 5.02:1 at worst. `info` keeps its `--color-tertiary` alias. A
+ * full color sweep comes later; these were settled on what reads best beside the
+ * current palette.
+ *
+ * WHAT THIS PAGE IS NOW. The record of a decision, in the same shape as
+ * `AiIdentity.stories.jsx`. Every current value is READ FROM THE PAGE at
+ * render time, so this cannot quietly describe a palette that has moved on;
+ * every candidate is a local constant, labeled as one.
  *
  * THE TWO FINDINGS, from #312's sweep of all 65 style x fill combinations:
  *
- *   1. `warning` filled is 3.70:1. The only one of the 65 below AA for text.
+ *   1. `warning` filled was 3.70:1. The only one of the 65 below AA for text.
  *      Every other bold ground clears comfortably — success 6.48, danger 6.46,
  *      primary 5.28, tertiary 4.76 — so this is the warning ground
  *      specifically, and it is the shape of the problem rather than an
@@ -100,7 +105,7 @@ const AA_TEXT = 4.5;
 /* ------------------------------------------------------------ candidates */
 
 /**
- * Three ways out of 3.70:1, and what each one costs.
+ * Three ways out of 3.70:1, and what each one costs. A was taken.
  *
  * `ink` and `white` are not new colors — they are the two label choices the
  * system already has. Only `darkened` invents a value, and it is the same hue
@@ -117,6 +122,7 @@ const WARNING_CANDIDATES = [
             'yellow dark enough for white text is no longer yellow. Costs no new color at all — ' +
             'the ink is --color-on-warning-container, which the system already has.',
         cost: 'Filled warning surfaces change from white text to dark. Visible, and only on warning.',
+        decided: true,
     },
     {
         id: 'B',
@@ -200,11 +206,12 @@ const Metric = ({ label, value, pass }) => (
 /* ---------------------------------------------------------------- stories */
 
 /**
- * `warning` filled is 3.70:1 — three ways out, measured against the real token.
+ * `warning` filled was 3.70:1 — three ways out, and the one taken.
  */
 export const WarningGround = () => {
     const warning = readToken('--color-warning') ?? '#9f8205';
     const ink = readToken('--color-on-warning-container') ?? '#231b00';
+    const shippedLabel = readToken('--color-on-warning') ?? ink;
     const options = {
         A: { ground: warning, label: ink },
         B: { ground: darken(warning, 0.85), label: '#ffffff' },
@@ -215,9 +222,14 @@ export const WarningGround = () => {
         <div style={{ maxWidth: '1000px', padding: '24px' }}>
             <h2 className="h4">A filled warning button, three ways</h2>
             <p className="body2-txt" style={{ maxWidth: '62ch' }}>
-                Every ratio below is computed from <code>--color-warning</code> as this page
-                renders it. <strong>None of these is a proposal.</strong> A and C keep the color
-                the system has; B moves it, and everything derived from it moves too.
+                <strong>Decided: A.</strong> The filled warning keeps its yellow and takes the
+                container ink as its label, so <code>--color-on-warning</code> is{' '}
+                <code data-shipped-label={shippedLabel}>{shippedLabel}</code> at{' '}
+                {contrast(warning, shippedLabel).toFixed(2)}:1. It costs no new color, and it is the
+                shape Atlassian uses: a bold warning is a light ground with dark text. B would have
+                moved the yellow toward olive and every color derived from it; C would have
+                removed an appearance the API offers. Every ratio below is computed from{' '}
+                <code>--color-warning</code> as this page renders it.
             </p>
 
             {WARNING_CANDIDATES.map((candidate) => {
@@ -247,6 +259,7 @@ export const WarningGround = () => {
                         <div>
                             <h3 className="h6" style={{ margin: '0 0 8px' }}>
                                 {candidate.id} — {candidate.name}
+                                {candidate.decided ? ' (decided)' : ' (not taken)'}
                             </h3>
                             <p className="body2-txt" style={{ margin: '0 0 8px', maxWidth: '58ch' }}>
                                 {candidate.argument}
@@ -270,10 +283,10 @@ export const WarningGround = () => {
  * `check:storybook` describes when it says to set a story's own `parameters.a11y`
  * and write the reason beside it.
  *
- * Candidate C renders the shipped pair — `--color-warning` with a white label,
- * 3.70:1 — on purpose. That IS the finding. axe is right about it, and a page
- * whose subject is a contrast failure cannot show its subject with the contrast
- * rule on. A and B are measured in `play` against the same 4.5 threshold axe
+ * Candidate C renders the pair that used to ship — `--color-warning` with a
+ * white label, 3.70:1 — on purpose. That WAS the finding. axe is right about
+ * it, and a page that records a contrast failure cannot show it with the
+ * contrast rule on. A and B are measured in `play` against the same 4.5 threshold axe
  * would apply, so the bar is still enforced here; it is enforced by the
  * assertions rather than by the scan.
  *
@@ -287,10 +300,21 @@ WarningGround.play = async () => {
     const warning = readToken('--color-warning');
     await expect(warning, 'the page must read the real token, not a literal').not.toBe(null);
 
-    // The finding itself. If this stops being true, warning was fixed
-    // elsewhere and this page is describing a palette that has moved on.
-    const shipped = contrast(warning, '#ffffff');
-    await expect(shipped, `white on ${warning}`).toBeLessThan(AA_TEXT);
+    // The decision. The shipped label is the container ink, and it clears AA
+    // on the yellow. If either stops being true, the page no longer describes
+    // what ships.
+    const shippedLabel = readToken('--color-on-warning');
+    await expect(shippedLabel, 'candidate A: on-warning is the container ink')
+        .toBe(readToken('--color-on-warning-container'));
+    await expect(contrast(warning, shippedLabel), `${shippedLabel} on ${warning}`)
+        .toBeGreaterThanOrEqual(AA_TEXT);
+
+    // Warning's icon and border are the one darker value, on every ground.
+    await expect(readToken('--color-warning-border')).toBe('#715c00');
+    await expect(readToken('--color-warning-icon')).toBe('#715c00');
+
+    // White on the yellow is the finding that started this, and it still fails.
+    await expect(contrast(warning, '#ffffff'), `white on ${warning}`).toBeLessThan(AA_TEXT);
 
     // A and B must actually clear the bar, or the page is offering a way out
     // that is not one.
@@ -325,6 +349,12 @@ export const InfoRegister = () => {
     return (
         <div style={{ maxWidth: '1000px', padding: '24px' }}>
             <h2 className="h4">Two names, one color</h2>
+            <p className="body2-txt" style={{ maxWidth: '62ch' }}>
+                <strong>Decided: info keeps its alias.</strong> <code>info</code> stays{' '}
+                <code>var(--color-tertiary)</code>, so the two render the same teal on purpose.
+                The blue candidate below was not taken. If a register distinct from tertiary is
+                needed later, it comes with the full color sweep.
+            </p>
             <div
                 data-finding="info-equals-tertiary"
                 data-same={String(same)}
@@ -404,10 +434,9 @@ InfoRegister.play = async () => {
     const tertiary = readToken('--color-tertiary');
     await expect(info, 'the page must read the real tokens').not.toBe(null);
 
-    // The finding. When someone re-points `info`, this goes red — which is the
-    // point: the page describes a decision that has not been made yet, and it
-    // must not keep saying so after it has.
-    await expect(info, 'info and tertiary are the same color (#312)').toBe(tertiary);
+    // The decision: info keeps the tertiary alias. When someone re-points
+    // `info`, this goes red, and the page has to be rewritten with it.
+    await expect(info, 'info keeps its alias of tertiary').toBe(tertiary);
 
     // The candidate has to be usable, or showing it is showing something that
     // could never ship.

@@ -135,9 +135,13 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   const idOf = (u) => `${u.file}:${u.line}:${u.token}`;
   // A declaration on N declared grounds is N measurements but one declaration.
   const declarations = new Set(uses.map(idOf)).size;
+  // A use this file cannot resolve (a role token, or a ground outside
+  // `_colors.scss`) has no ratio, and `null < n` reads as `0 < n`, so it would
+  // win the reduce and print as the worst. It is left out of the worst instead.
   const worstOf = (list) => list
     .map((u) => ({ ...u, ratio: ratio(u.token, values, u.ground) }))
-    .reduce((low, u) => (u.ratio < low.ratio ? u : low));
+    .filter((u) => u.ratio !== null)
+    .reduce((low, u) => (u.ratio < low.ratio ? u : low), { ratio: Infinity });
 
   const onDeclared = uses.filter((u) => u.declared?.tokens.length);
   let declared = '';

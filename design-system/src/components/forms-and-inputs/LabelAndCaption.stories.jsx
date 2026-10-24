@@ -304,7 +304,7 @@ export const Layout = () => (
                     readOnly
                     style={{
                         padding: '8px 12px',
-                        border: '1px solid var(--color-warning)',
+                        border: '1px solid var(--color-warning-border)',
                         borderRadius: '4px',
                         fontSize: '14px',
                         backgroundColor: 'var(--color-warning-state-08)',

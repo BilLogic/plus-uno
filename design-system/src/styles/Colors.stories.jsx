@@ -119,7 +119,7 @@ export const StatusColors = () => (
             rows={[
                 { token: '--color-warning', value: '#9f8205', description: 'Main warning color' },
                 { token: '--color-warning-text', value: '#5b4a00', description: 'Warning text color' },
-                { token: '--color-on-warning', value: '#ffffff', description: 'Content color on warning' },
+                { token: '--color-on-warning', value: '#231b00', description: 'Content color on warning (the container ink: white is 3.70:1 on the yellow)' },
                 { token: '--color-warning-container', value: '#ffe17a', description: 'Warning container background' },
                 { token: '--color-on-warning-container', value: '#231b00', description: 'Content color on warning container' },
             ]}

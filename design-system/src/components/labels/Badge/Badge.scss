@@ -92,7 +92,7 @@
     @include badge-theme('secondary', --color-secondary-state-08, --color-secondary-text, --color-secondary);
     @include badge-theme('tertiary', --color-tertiary-state-08, --color-tertiary-text, --color-tertiary);
     @include badge-theme('success', --color-success-state-08, --color-success-text, --color-success);
-    @include badge-theme('warning', --color-warning-state-08, --color-warning-text, --color-warning);
+    @include badge-theme('warning', --color-warning-state-08, --color-warning-text, --color-warning-border);
     @include badge-theme('danger', --color-danger-state-08, --color-danger-text, --color-danger);
     @include badge-theme('info', --color-info-state-08, --color-info-text, --color-info);
 
