@@ -446,11 +446,12 @@ describe('the color key is finer than the normalizer it replaces', () => {
    * of solid neutrals already in the corpus and brought 15 pairs with their
    * overlays, every one of the new pairs touching one of the four; 430 when
    * `--overlay-scrim` arrived as black at 38% beside the other black
-   * washes. The number is asserted
+   * washes; 427 when `--color-on-warning` left white for the solid container
+   * ink and took its three pairs with the white washes along. The number is asserted
    * rather than logged because a migrating caller's exposure is this number,
    * and a drift in it is news either way.
    */
-  it('differs from the normalizer on 430 live token pairs', () => {
+  it('differs from the normalizer on 427 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
       .map((entry) => entry.value)
       .filter((value) => normalizeColor(value) !== null);
@@ -463,7 +464,7 @@ describe('the color key is finer than the normalizer it replaces', () => {
         pairs += 1;
       }
     }
-    expect(pairs).toBe(430);
+    expect(pairs).toBe(427);
   });
 
   /*
