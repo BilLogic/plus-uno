@@ -13,15 +13,19 @@ import lessonPraise from '@/assets/images/lessons/training-praise.svg';
 import { cardsPerRow, useGridMeasure, useTokenLength } from './homeGrid';
 import './TutorHomePageNewLayout.scss';
 
-/** One picture per lesson card, so neighbors in the strip never repeat. */
-const LESSON_IMAGES = [lessonErrors, lessonExplain, lessonPraise, lessonMindset];
+/** The training lessons with art, each titled as its picture is. */
+const LESSONS = [
+    { title: 'Reacting to Errors', image: lessonErrors },
+    { title: 'Prompting Students to Explain', image: lessonExplain },
+    { title: 'Giving Effective Praise', image: lessonPraise },
+    { title: 'Supporting a Growth Mindset', image: lessonMindset },
+];
 
-/** Today's Home content, unchanged: the Skills (Home Page) frame in the Specs file. */
-const DEFAULT_LESSONS = [1, 2, 3].map((n) => ({
-    id: String(n),
-    image: LESSON_IMAGES[n - 1],
+/** Today's Home content: the Skills (Home Page) frame in the Specs file, with real lessons. */
+const DEFAULT_LESSONS = LESSONS.slice(0, 3).map((lesson, i) => ({
+    id: String(i + 1),
+    ...lesson,
     category: 'Mastering Content',
-    title: 'Lesson Title',
     duration: '12 mins',
     inProgress: true,
     aiRecommended: true,

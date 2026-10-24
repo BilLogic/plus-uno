@@ -175,9 +175,9 @@ const expectOutline = async (canvasElement) => {
         ['h2', 'Your impact'],
         ['h3', 'Skills'],
         ['h2', 'Personalized recommendations'],
-        ['h3', 'Lesson Title'],
-        ['h3', 'Lesson Title'],
-        ['h3', 'Lesson Title'],
+        ['h3', 'Reacting to Errors'],
+        ['h3', 'Prompting Students to Explain'],
+        ['h3', 'Giving Effective Praise'],
     ]);
 };
 
