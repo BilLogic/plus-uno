@@ -117,3 +117,58 @@ test('the row that mentions modals is NOT claimed by a role', () => {
     );
   }
 });
+
+/**
+ * THE STEP EACH SURFACE TAKES, read from the stylesheets that draw them.
+ *
+ * `foundations/elevation.md` assigns the levels by component — cards and
+ * dropdowns Light/2, popovers and toasts Light/3, modals Light/4 — and the
+ * role layer joins the first two to a fill. The 2026-10-24 audit found the
+ * Popover family's Popup on Light/2, a step below the toast beside it. Each
+ * row is one surface and the shadow its rule must name; a rule that names
+ * another level, or a literal shadow, fails.
+ */
+const SURFACES = [
+  { file: 'design-system/src/patterns/PatternCard/PatternCard.scss', rule: '.plus-pattern-card {', shadow: '--surface-raised-shadow', fill: '--surface-raised' },
+  { file: 'design-system/src/components/overlays/Popover/Popover.scss', rule: '.plus-popover {', shadow: '--surface-overlay-shadow' },
+  { file: 'design-system/src/components/messaging/Toast/Toast.scss', rule: '.plus-toast', shadow: '--surface-overlay-shadow' },
+  { file: 'design-system/src/patterns/SurfaceContainer/SurfaceContainer.scss', rule: '.plus-surface-container__sidebar--floating {', shadow: '--surface-overlay-shadow', fill: '--surface-overlay' },
+  { file: 'design-system/src/components/messaging/Modal/Modal.scss', rule: '.plus-modal', shadow: '--elevation-light-4' },
+  { file: 'design-system/src/patterns/PatternModal/PatternModal.scss', rule: '.plus-pattern-modal {', shadow: '--elevation-light-4' },
+  { file: 'design-system/src/components/forms-and-inputs/_internal/Listbox.scss', rule: '', shadow: '--elevation-light-2' },
+  { file: 'design-system/src/components/forms-and-inputs/Dropdown/Dropdown.scss', rule: '.dropdown-menu', shadow: '--elevation-light-2' },
+];
+
+/** The first value of `property` after the rule opens. */
+function firstAfter(source, rule, property) {
+  const from = rule ? source.indexOf(rule) : 0;
+  assert.ok(from >= 0, `rule "${rule}" is gone`);
+  const match = new RegExp(`(?:^|[\\s;{])${property}:\\s*([^;]+);`).exec(source.slice(from));
+  return match ? match[1].trim() : null;
+}
+
+for (const surface of SURFACES) {
+  test(`${path.basename(surface.file)} lifts its surface with ${surface.shadow}`, () => {
+    const source = fs.readFileSync(path.join(REPO_ROOT, surface.file), 'utf8');
+    const shadow = firstAfter(source, surface.rule, 'box-shadow');
+    assert.ok(shadow, `no box-shadow after "${surface.rule}" in ${surface.file}`);
+    assert.match(
+      shadow,
+      new RegExp(`^var\\(${surface.shadow}\\)( !important)?$`),
+      `${surface.file} lifts its surface with "${shadow}"; elevation.md and the role layer say var(${surface.shadow}).`,
+    );
+    if (surface.fill) {
+      assert.equal(firstAfter(source, surface.rule, 'background-color'), `var(${surface.fill})`);
+    }
+  });
+}
+
+test('no pattern or Popover-family stylesheet writes a literal shadow', () => {
+  // elevation.md rule 3: never hardcode shadows.
+  for (const { file } of SURFACES) {
+    const source = fs.readFileSync(path.join(REPO_ROOT, file), 'utf8');
+    for (const match of source.matchAll(/box-shadow:\s*([^;]+);/g)) {
+      assert.doesNotMatch(match[1], /rgba?\(|#[0-9a-f]{3,8}\b/i, `${file}: literal shadow "${match[1]}"`);
+    }
+  }
+});

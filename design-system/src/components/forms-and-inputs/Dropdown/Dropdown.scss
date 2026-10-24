@@ -9,16 +9,39 @@
 
 @use "sass:string";
 
+// The hover and pressed STATE LAYER (foundations/color.md rule 2): a shadow
+// state token laid over the fill as a gradient. A registered color property,
+// so the layer fades in over the toggle's 0.2s like the fill.
+@property --plus-dropdown-state-layer {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: transparent;
+}
+
+// Sets the layer, except on `default`: its theme tokens (`--color-neutral-*`)
+// are undefined, so its old mixed hover and pressed colors were invalid and
+// painted nothing. Keeping it layer-free keeps its pixels; the undefined theme
+// is its own finding.
+@mixin state-layer($theme, $token) {
+    @if $theme != 'default' {
+        --plus-dropdown-state-layer: var(#{$token});
+    }
+}
+
 // --- COLOR THEMES (mirrors Button.scss) ---
+// Index: 1:Main, 2:OnMain, 3:StateLayer, 4:TextSafe, 5:Border. An edge takes the
+// intent's `-border` role (`_color_roles.scss`), not its base. Warning keeps its
+// base for now: its border role is #715c00, a different color, and that value
+// is the open warning decision rather than a repoint.
 $dropdown-themes: (
-    'primary': ('--color-primary', '--color-on-primary', '--color-primary-state-08', '--color-primary-text'),
-    'secondary': ('--color-secondary', '--color-on-secondary', '--color-secondary-state-08', '--color-secondary-text'),
-    'tertiary': ('--color-tertiary', '--color-on-tertiary', '--color-tertiary-state-08', '--color-tertiary-text'),
-    'success': ('--color-success', '--color-on-success', '--color-success-state-08', '--color-success-text'),
-    'danger': ('--color-danger', '--color-on-danger', '--color-danger-state-08', '--color-danger-text'),
-    'warning': ('--color-warning', '--color-on-warning', '--color-warning-state-08', '--color-warning-text'),
-    'info': ('--color-info', '--color-on-info', '--color-info-state-08', '--color-info-text'),
-    'default': ('--color-neutral', '--color-on-neutral', '--color-neutral-state-08', '--color-neutral-text')
+    'primary': ('--color-primary', '--color-on-primary', '--color-primary-state-08', '--color-primary-text', '--color-primary-border'),
+    'secondary': ('--color-secondary', '--color-on-secondary', '--color-secondary-state-08', '--color-secondary-text', '--color-secondary-border'),
+    'tertiary': ('--color-tertiary', '--color-on-tertiary', '--color-tertiary-state-08', '--color-tertiary-text', '--color-tertiary-border'),
+    'success': ('--color-success', '--color-on-success', '--color-success-state-08', '--color-success-text', '--color-success-border'),
+    'danger': ('--color-danger', '--color-on-danger', '--color-danger-state-08', '--color-danger-text', '--color-danger-border'),
+    'warning': ('--color-warning', '--color-on-warning', '--color-warning-state-08', '--color-warning-text', '--color-warning'),
+    'info': ('--color-info', '--color-on-info', '--color-info-state-08', '--color-info-text', '--color-info-border'),
+    'default': ('--color-neutral', '--color-on-neutral', '--color-neutral-state-08', '--color-neutral-text', '--color-neutral')
 );
 
 // =============================================================================
@@ -41,9 +64,11 @@ $dropdown-themes: (
         border: var(--size-element-stroke-sm) solid transparent;
         border-radius: var(--size-element-radius-md);
         cursor: pointer;
+        background-image: linear-gradient(var(--plus-dropdown-state-layer), var(--plus-dropdown-state-layer));
         transition: background-color 0.2s ease,
             color 0.2s ease,
-            border-color 0.2s ease;
+            border-color 0.2s ease,
+            --plus-dropdown-state-layer 0.2s ease;
 
         // Caret icon - inherits color from parent to match text
         &::after {
@@ -150,14 +175,14 @@ $dropdown-themes: (
 
         // Focus-visible state
         &:focus-visible {
-            outline: 2px solid var(--color-primary);
+            outline: 2px solid var(--color-focus-ring);
             outline-offset: -2px;
             background-color: var(--color-on-surface-state-08);
         }
 
         // Pressed state
         &:active {
-            background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
+            background-color: var(--color-on-surface-state-12);
         }
 
         // Selected (JSX uses 'selected'), as Pattern/Menu's `state=selected`:
@@ -174,7 +199,7 @@ $dropdown-themes: (
         }
 
         &.disabled {
-            opacity: 0.38;
+            opacity: var(--color-disabled-opacity);
             pointer-events: none;
             cursor: not-allowed;
         }
@@ -394,7 +419,8 @@ $dropdown-themes: (
         border: var(--size-element-stroke-sm) solid transparent;
         border-radius: var(--size-element-radius-md) 0 0 var(--size-element-radius-md);
         cursor: pointer;
-        transition: background-color 0.2s ease, color 0.2s ease;
+        background-image: linear-gradient(var(--plus-dropdown-state-layer), var(--plus-dropdown-state-layer));
+        transition: background-color 0.2s ease, color 0.2s ease, --plus-dropdown-state-layer 0.2s ease;
     }
 
     // Toggle button (right side with caret) - MUST have ::after for caret
@@ -406,7 +432,8 @@ $dropdown-themes: (
         border: var(--size-element-stroke-sm) solid transparent;
         border-radius: 0 var(--size-element-radius-md) var(--size-element-radius-md) 0;
         cursor: pointer;
-        transition: background-color 0.2s ease, color 0.2s ease;
+        background-image: linear-gradient(var(--plus-dropdown-state-layer), var(--plus-dropdown-state-layer));
+        transition: background-color 0.2s ease, color 0.2s ease, --plus-dropdown-state-layer 0.2s ease;
         // Pull the toggle left by one stroke so its left border and the text button's right border
         // collapse into a single divider line — no phantom 1px gap / doubled "bar" between the halves.
         margin-left: calc(var(--size-element-stroke-sm) * -1);
@@ -430,6 +457,7 @@ $dropdown-themes: (
     $col-on-main: string.unquote(list.nth($config, 2));
     $col-state: string.unquote(list.nth($config, 3));
     $col-text: string.unquote(list.nth($config, 4));
+    $col-border: string.unquote(list.nth($config, 5));
 
     // Regular dropdown - COMPOUND selector .pdropdown.pdropdown-#{$theme}
     .pdropdown.pdropdown-#{$theme} {
@@ -447,14 +475,14 @@ $dropdown-themes: (
             }
 
             &:hover {
-                // Use color-mix instead of filter to avoid affecting icon colors
-                background-color: color-mix(in srgb, var($col-main), black 8%);
+                // The shadow state layer over the fill, not a filter, so the label and icon keep their color
+                @include state-layer($theme, '--color-shadow-state-08');
             }
 
             // PRESSED/ACTIVE STATE: Only background changes, NOT icon color
             &:active,
             &.active {
-                background-color: color-mix(in srgb, var($col-main), black 12%);
+                @include state-layer($theme, '--color-shadow-state-12');
 
                 // Ensure icon color stays the same on pressed
                 &::after {
@@ -469,6 +497,8 @@ $dropdown-themes: (
             .pdropdown-toggle,
             .pdropdown-default-toggle {
                 background-color: var($col-state);
+                // No hover or pressed layer from the filled rules above leaks onto this fill.
+                --plus-dropdown-state-layer: transparent;
                 color: var($col-text);
                 border-color: transparent;
 
@@ -478,13 +508,13 @@ $dropdown-themes: (
                 }
 
                 &:hover {
-                    background-color: color-mix(in srgb, var($col-state), black 12%);
+                    @include state-layer($theme, '--color-shadow-state-12');
                 }
 
                 // PRESSED/ACTIVE: Only background changes
                 &:active,
                 &.active {
-                    background-color: color-mix(in srgb, var($col-state), black 16%);
+                    @include state-layer($theme, '--color-shadow-state-16');
                 }
             }
         }
@@ -495,7 +525,9 @@ $dropdown-themes: (
             .pdropdown-toggle,
             .pdropdown-default-toggle {
                 background-color: transparent;
-                border-color: var($col-main);
+                // No hover or pressed layer from the filled rules above leaks onto this fill.
+                --plus-dropdown-state-layer: transparent;
+                border-color: var($col-border);
                 color: var($col-text);
 
                 // CRITICAL: Outline variant caret uses text color
@@ -510,7 +542,8 @@ $dropdown-themes: (
                 // PRESSED/ACTIVE: Only background changes
                 &:active,
                 &.active {
-                    background-color: color-mix(in srgb, var($col-state), black 8%);
+                    background-color: var($col-state);
+                    @include state-layer($theme, '--color-shadow-state-08');
                 }
             }
         }
@@ -521,6 +554,8 @@ $dropdown-themes: (
             .pdropdown-toggle,
             .pdropdown-default-toggle {
                 background-color: transparent;
+                // No hover or pressed layer from the filled rules above leaks onto this fill.
+                --plus-dropdown-state-layer: transparent;
                 border-color: transparent;
                 color: var($col-text);
 
@@ -536,7 +571,8 @@ $dropdown-themes: (
                 // PRESSED/ACTIVE: Only background changes
                 &:active,
                 &.active {
-                    background-color: color-mix(in srgb, var($col-state), black 8%);
+                    background-color: var($col-state);
+                    @include state-layer($theme, '--color-shadow-state-08');
                 }
             }
         }
@@ -554,14 +590,14 @@ $dropdown-themes: (
             color: var($col-on-main);
 
             &:hover {
-                // Use color-mix instead of filter to avoid affecting icon colors
-                background-color: color-mix(in srgb, var($col-main), black 8%);
+                // The shadow state layer over the fill, not a filter, so the label and icon keep their color
+                @include state-layer($theme, '--color-shadow-state-08');
             }
 
             // PRESSED/ACTIVE: Only background changes, NOT icon color
             &:active,
             &.active {
-                background-color: color-mix(in srgb, var($col-main), black 12%);
+                @include state-layer($theme, '--color-shadow-state-12');
             }
         }
 
@@ -580,16 +616,18 @@ $dropdown-themes: (
             .pdropdown-split-text-btn,
             .pdropdown-split-toggle-btn {
                 background-color: var($col-state);
+                // No hover or pressed layer from the filled rules above leaks onto this fill.
+                --plus-dropdown-state-layer: transparent;
                 color: var($col-text);
                 border-color: transparent;
 
                 &:hover {
-                    background-color: color-mix(in srgb, var($col-state), black 12%);
+                    @include state-layer($theme, '--color-shadow-state-12');
                 }
             }
 
             .pdropdown-split-toggle-btn {
-                border-left-color: var($col-main);
+                border-left-color: var($col-border);
 
                 // CRITICAL: Tonal split caret uses text color
                 &::after {
@@ -602,7 +640,9 @@ $dropdown-themes: (
         &.pdropdown-outline {
             .pdropdown-split-text-btn {
                 background-color: transparent;
-                border-color: var($col-main);
+                // No hover or pressed layer from the filled rules above leaks onto this fill.
+                --plus-dropdown-state-layer: transparent;
+                border-color: var($col-border);
                 color: var($col-text);
 
                 &:hover {
@@ -612,7 +652,9 @@ $dropdown-themes: (
 
             .pdropdown-split-toggle-btn {
                 background-color: transparent;
-                border-color: var($col-main);
+                // No hover or pressed layer from the filled rules above leaks onto this fill.
+                --plus-dropdown-state-layer: transparent;
+                border-color: var($col-border);
                 color: var($col-text);
 
                 // CRITICAL: Outline split caret uses text color
@@ -632,6 +674,8 @@ $dropdown-themes: (
             .pdropdown-split-text-btn,
             .pdropdown-split-toggle-btn {
                 background-color: transparent;
+                // No hover or pressed layer from the filled rules above leaks onto this fill.
+                --plus-dropdown-state-layer: transparent;
                 border-color: transparent;
                 color: var($col-text);
 

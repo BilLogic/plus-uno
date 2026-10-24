@@ -27,7 +27,7 @@
     }
 
     &--disabled {
-        opacity: 0.5;
+        opacity: var(--color-disabled-opacity);
         pointer-events: none;
     }
 }

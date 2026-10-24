@@ -52,7 +52,8 @@
     background-color: var(--color-surface-overlay) !important;
     border: var(--border-default) solid var(--color-outline-variant) !important;
     border-radius: var(--popover-radius) !important;
-    box-shadow: var(--elevation-light-2) !important;
+    // Popovers are Light/3 (elevation.md), the overlay role's shadow.
+    box-shadow: var(--surface-overlay-shadow) !important;
 
     &.plus-popover--md {
         width: var(--popover-width-md) !important;

@@ -130,7 +130,7 @@
 
         // Disabled state
         &:disabled {
-            opacity: 0.38;
+            opacity: var(--color-disabled-opacity);
             cursor: not-allowed;
             border-color: var(--color-outline-variant);
             background-color: var(--color-surface-variant);
@@ -159,7 +159,7 @@
 
 // Required indicator
 .plus-form-checkbox-required-asterisk {
-    color: var(--color-danger);
+    color: var(--color-danger-text);
     margin-left: 2px;
     font-weight: var(--type-weight-regular);
 }
@@ -167,7 +167,7 @@
 // Disabled wrapper state
 .plus-form-checkbox-disabled {
     .form-check-label {
-        opacity: 0.38;
+        opacity: var(--color-disabled-opacity);
         cursor: not-allowed;
     }
 }

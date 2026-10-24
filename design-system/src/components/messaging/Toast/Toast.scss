@@ -21,7 +21,7 @@
     background-color: var(--color-surface-overlay);
     border: var(--border-default) solid var(--color-outline-variant);
     border-radius: var(--popover-radius);
-    box-shadow: var(--elevation-light-3);
+    box-shadow: var(--surface-overlay-shadow);
 
     // Bootstrap hides a toast that is not `.show` with display: none; keep that.
     &:not(.show) {
@@ -117,7 +117,7 @@
     &.primary .plus-toast-icon {
         @include icon-glyph {
             // @contrast: non-text
-            color: var(--color-primary-text);
+            color: var(--color-primary-icon);
         }
     }
 }
@@ -142,7 +142,7 @@
     position: relative;
     box-sizing: border-box;
     min-height: 280px;
-    border: 1px solid var(--color-outline-variant);
+    border: var(--border-default) solid var(--color-outline-variant);
     background-color: var(--color-surface-container-lowest);
     border-radius: var(--size-element-radius-md);
     padding: var(--size-spacing-medium-space-400);

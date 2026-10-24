@@ -6,7 +6,7 @@ import test from 'node:test';
 
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { run } from './check-intent-roles.mjs';
-import { EDGE, INTENTS, counts, edgeUses, failures, stylesheets } from './intent-roles.mjs';
+import { EDGE, INTENTS, counts, edgeUses, failures, mixCounts, mixFailures, mixedUses, stylesheets } from './intent-roles.mjs';
 import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
 /** A throwaway corpus, so the tests describe the rule rather than today's code. */
@@ -150,6 +150,7 @@ const INTENT_BASELINE = JSON.stringify({
   recordedAt: '2026-09-18',
   migrated: 0,
   files: {},
+  mixedStates: {},
 });
 
 test('an intent base on an edge in a fixture tree is a finding', () => {
@@ -184,6 +185,55 @@ test('an empty token directory fires the sentinel floor, not a clean sweep', () 
     assert.ok(
       found.some((message) => /no longer defines --color-danger-border/.test(message)),
       `expected the vanished role, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
+});
+
+test('a hover color mixed by hand is a use: color-mix with black or white, or a brightness filter', () => {
+  const root = corpus({
+    'design-system/src/a.scss': [
+      '.a:hover { background-color: color-mix(in srgb, var(--color-primary), black 8%); }',
+      '.b:hover { filter: brightness(0.92); }',
+      '.c:active { background-color: color-mix(in srgb, var(--color-primary-state-08), white 12%); }',
+    ].join('\n'),
+  });
+  const uses = mixedUses(stylesheets(root), root);
+  assert.deepEqual(uses.map((u) => u.line), [1, 2, 3]);
+  assert.deepEqual(mixCounts(uses), { 'design-system/src/a.scss': { mix: 3 } });
+});
+
+test('a mix with transparent is an alpha, not a state color, and a comment is not a use', () => {
+  const root = corpus({
+    'design-system/src/a.scss': [
+      '.a { color: color-mix(in srgb, var(--color-secondary) 38%, transparent); }',
+      '// the old filter: brightness(0.92) dimmed the label',
+      '/* color-mix(in srgb, var(--color-primary), black 8%) */',
+      '.b:hover { background-image: linear-gradient(var(--color-shadow-state-08), var(--color-shadow-state-08)); }',
+    ].join('\n'),
+  });
+  assert.equal(mixedUses(stylesheets(root), root).length, 0);
+});
+
+test('a new hand-mixed file names its lines and the state layer to use', () => {
+  const uses = [{ file: 'x.scss', line: 4, kind: 'mix' }];
+  const [message] = mixFailures(uses, { failures: [{ kind: 'new', key: 'x.scss' }] });
+  assert.match(message, /x\.scss mixes a state color by hand.*line 4/);
+  assert.match(message, /--color-shadow-state-08\/12\/16/);
+});
+
+test('a hand-mixed hover in a fixture tree is a finding', () => {
+  const { root, done } = policyTree({
+    [`${TOKEN_DIR}/_color_roles.scss`]: ROLES_SCSS,
+    'design-system/src/a.scss': '.a:hover { filter: brightness(0.92); }\n',
+    'scripts/baselines/intent-role-adoption.json': INTENT_BASELINE,
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(
+      found.some((message) => /mixes a state color by hand/.test(message)),
+      `expected a planted mix finding, got:\n${found.join('\n')}`,
     );
   } finally {
     done();

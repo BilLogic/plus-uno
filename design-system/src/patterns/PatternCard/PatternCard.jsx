@@ -6,7 +6,7 @@ import './PatternCard.scss';
 /**
  * Card pattern for PLUS design system. Mirrors Figma `Pattern/Card`:
  * an optional image, then the content (the `_Card header` over the body), then
- * an optional footer, on surface-container-lowest with an outline border.
+ * an optional footer, on the raised surface role with an outline border.
  *
  * - **Header** (`_Card header`): `title` (Heading/small 16, one heading level
  *   below its section) over an optional `description` (Body/default 14), with
