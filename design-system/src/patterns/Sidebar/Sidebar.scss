@@ -135,8 +135,17 @@
 // state fill and the focus ring are the surface's, never the column's. The list
 // keeps the 4 row gap of every other list.
 .plus-pattern-sidebar__tabs {
+    // The same 4 gap between the parent and its first tab as between rows.
+    margin-top: var(--element-stack-sm);
+
     &[hidden] {
         display: none;
+    }
+
+    // The thread hangs from the parent: the first row's line runs up through
+    // the gap above it to the parent row's bottom edge.
+    > li:first-child::before {
+        top: calc(-1 * var(--element-stack-sm));
     }
 
     > li {

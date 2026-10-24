@@ -528,8 +528,14 @@ export const Thread = {
                 await expect(box.left + px(line.left), 'under the parent icon center').toBeCloseTo(parentIcon.left + parentIcon.width / 2, 0);
                 await expect(box.left, 'the row starts where the parent does').toBeCloseTo(parentRow.getBoundingClientRect().left, 0);
                 await expect(surface.getBoundingClientRect().left, 'the surface starts after the 28 thread column').toBeCloseTo(box.left + column, 0);
+                if (index === 0) {
+                    await expect(box.top + px(line.top), 'the thread hangs from the parent row, through the gap above the first tab')
+                        .toBeCloseTo(parentRow.getBoundingClientRect().bottom, 0);
+                    await expect(box.top - parentRow.getBoundingClientRect().bottom, 'the 4 gap above the first tab')
+                        .toBeCloseTo(tokenLength(canvasElement, '--element-stack-sm'), 0);
+                }
                 if (li === last) {
-                    await expect(px(line.height), 'the elbow stops at the row middle').toBeCloseTo(box.height / 2, 0);
+                    await expect(box.top + px(line.top) + px(line.height), 'the elbow stops at the row middle').toBeCloseTo(box.top + box.height / 2, 0);
                     await expect(px(line.borderBottomWidth), 'the elbow turns').toBeCloseTo(stroke, 1);
                     await expect(px(line.borderBottomLeftRadius), 'radius 6').toBeCloseTo(tokenLength(canvasElement, '--element-radius-item-sm'), 0);
                     await expect(box.left + px(line.left) + px(line.width), 'the stub ends 2 before the surface').toBeCloseTo(box.left + column - 2, 0);
