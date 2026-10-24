@@ -9,6 +9,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-10-24', kind: 'changed', summary: 'Hover lays the 08 state layer over the track: primary 08 when off, shadow 08 over the fill when on.' },
             { date: '2026-10-23', kind: 'changed', summary: 'A labeled switch is a 24 row at every size, its label 14/20, with one track geometry.' },
             { date: '2026-10-23', kind: 'deprecated', summary: '`size="large"` was deprecated: it draws like `medium` and warns in development.' },
         ],

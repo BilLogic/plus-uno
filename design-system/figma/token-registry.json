@@ -147,8 +147,8 @@
     },
     "elevation": {
       "Elevation Light/1 (subtle)": "var(--elevation-light-1)",
-      "Elevation Light/2 (cards, dropdowns)": "var(--elevation-light-2)",
-      "Elevation Light/3 (popovers, toasts)": "var(--elevation-light-3)",
+      "Elevation Light/2 (clickable cards on hover or drag)": "var(--elevation-light-2)",
+      "Elevation Light/3 (menus, popovers, tooltips, toasts, listboxes)": "var(--elevation-light-3)",
       "Elevation Light/4 (modals)": "var(--elevation-light-4)",
       "Elevation Light/5 (dialogs)": "var(--elevation-light-5)"
     }

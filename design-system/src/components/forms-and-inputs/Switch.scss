@@ -113,13 +113,17 @@
             background-color: var(--color-on-primary) !important;
         }
 
+        // Hover lays the 08 state layer over the track: the primary 08 over the
+        // off track, the shadow 08 over the on track's fill.
         &:hover:not(:disabled):not(:checked) {
             background-color: var(--color-surface) !important;
+            background-image: linear-gradient(var(--color-primary-state-08), var(--color-primary-state-08)) !important;
             border-color: var(--color-primary-border) !important;
         }
 
         &:checked:hover:not(:disabled) {
             background-color: var(--color-primary) !important;
+            background-image: linear-gradient(var(--color-shadow-state-08), var(--color-shadow-state-08)) !important;
             border-color: var(--color-primary-border) !important;
         }
 

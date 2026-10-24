@@ -10,6 +10,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-10-24', kind: 'changed', summary: 'The menu lifts on Light/3, as every floating layer without a scrim. A focused row shows the focus ring and no fill. Toggles take Button\'s steps: hover 08, pressed 12.' },
             { date: '2026-10-23', kind: 'changed', summary: 'The menu became the Popover family\'s Menu: rows of 32 (24 for `size="small"`) inset 4 on their own radius, 160 to 320 wide, at most 320 tall with a cut row, and 8 from the screen edge. A selected row is the primary state layer 08 with primary text; items took `description` for a second line.' },
             { date: '2026-09-29', kind: 'changed', summary: 'Menu rows matched Figma: the multi-select checkbox became the `_Form Checkbox Button` box, a selected row took the primary-container 16 ground with a stroke-xl left edge, and a row with no leading visual lost its leading gap.' },
             { date: '2026-09-29', kind: 'changed', summary: 'Escape inside an open menu closed it, returned focus to the toggle once it had closed, and stopped propagating, so an enclosing Modal no longer closed on the same key.' },

@@ -138,15 +138,16 @@ Never place `on-surface` colors on accent fills or vice versa — always use the
 <div className="sb-ds-doc-section">
 ### Focus states
 
-Per the Pattern System's universal interaction logic, focus is an **additive
-overlay** — it never replaces the base fill:
+Focus is shown by the **focus ring**, never by a fill:
 
-- Overlay `on-surface` at **12% opacity** (`--color-on-surface-state-12`) on top of the base fill.
-- Change the border to **Inverse Primary** (`--color-inverse-primary`).
+- A 2px outline in `--color-focus-ring` (`--size-element-stroke-lg`), 2px off a
+  control's edge (Button, Checkbox, Radio) or inside a row or tab.
+- The base fill stays as it is; no state layer is added for focus.
 - Component opacity stays at 100%.
 
-This gives every interactive element (buttons, cards, table rows, list items) a
-visible, consistent focus indicator in both themes.
+The ring holds 3:1 against the ground it sits on (`check:focus-ring`), so every
+interactive element (buttons, cards, table rows, list items) has a visible,
+consistent focus indicator.
 </div>
 
 <div className="sb-ds-doc-section">

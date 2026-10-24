@@ -79,14 +79,14 @@ export const TwoGrids = () => (
             rows={[
                 [
                     <strong>Screen grid</strong>,
-                    <>Across the screen, inside the screen pad ({code('--layout-pad-x-screen')}), centered and capped at 1232. It ignores the sidebar.</>,
+                    <>On the <strong>Overlay layer</strong> only, across the screen inside the screen pad ({code('--layout-pad-x-screen')}), centered and capped at 1232. It shows and hides with the overlay, and it ignores the sidebar.</>,
                     'Modals and overlays.',
                     '720 · 976 · 1232',
                     <>{code('--layout-width-column-screen')} 45.33 · 66.67 · 88</>,
                 ],
                 [
                     <strong>Content grid</strong>,
-                    <>Inside the surface, after the sidebar and {code('--surface-pad')}.</>,
+                    <>Inside the surface, after the sidebar and {code('--surface-pad')}. The only grid a page frame carries.</>,
                     'Page content: cards, tables, forms, charts and text blocks.',
                     <>{code('--layout-width-content')} 720 · 744 · 1144</>,
                     <>{code('--layout-width-column')} 45.33 · 47.33 · 80.67</>,
@@ -97,6 +97,7 @@ export const TwoGrids = () => (
             Both grids are 12 columns ({code('--layout-columns')}) with gutter 16 ({code('--layout-gutter')}),
             bound to <strong>spacing / layout</strong> variables. You never pick a per-breakpoint grid:
             <strong> switch the frame&rsquo;s spacing / layout mode</strong> and the grid and the frame width adapt together.
+            The grids are a design-file aid: code draws neither, and the Modal reads the screen-grid tokens to size itself.
         </p>
     </div>
 );
@@ -123,7 +124,7 @@ export const LayoutRegions = () => (
                 [<strong>TopNav</strong>, <>The <code>Topbar</code> pattern — 32 high ({code('--layout-height-topbar')}) across the top of the frame.</>],
                 [<strong>SideNav</strong>, <>The sidebar — 240 wide ({code('--layout-width-sidebar')}), docked from Large and closed below it.</>],
                 [<strong>Main</strong>, <>The surface inside the <code>Pattern/Surface container</code> component, which <strong>fills the width it is given</strong> and carries the content grid and the Content slot. <strong>The content grid applies here and only here.</strong></>],
-                [<strong>Overlays</strong>, <>Modals and their overlay sit above the frame on the <strong>screen grid</strong>, so they ignore the sidebar.</>],
+                [<strong>Overlays</strong>, <>Modals and their overlay sit above the frame on the <strong>Overlay layer</strong>, which carries the <strong>screen grid</strong>: the grid shows and hides with the overlay, and it ignores the sidebar.</>],
             ]}
         />
     </div>
@@ -257,6 +258,10 @@ const PAIRS = [
     {
         do: <>Lay page content on the content grid inside Main, and size modals from the screen grid.</>,
         dont: <>Span the content grid across SideNav or TopNav, or give a modal a fixed pixel width.</>,
+    },
+    {
+        do: <>Set the screen grid on the <strong>Overlay layer</strong>, so it shows and hides with the overlay.</>,
+        dont: <>Put the screen grid on a page frame — a page frame carries only the content grid.</>,
     },
 ];
 

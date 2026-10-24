@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Checkbox from './Checkbox';
 
 export default {
@@ -9,6 +11,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-10-24', kind: 'changed', summary: 'A checked box keeps its fill and check on hover, under the shadow 08 layer. Keyboard focus is the 2px focus ring 2px off the box; a pointer focus draws none.' },
             { date: '2026-10-23', kind: 'changed', summary: 'A labeled checkbox is a 24 row at every size, its label 14/20.' },
             { date: '2026-10-23', kind: 'deprecated', summary: '`size="large"` was deprecated: it draws like `medium` and warns in development.' },
         ],
@@ -260,4 +263,37 @@ DescriptionAndCard.play = async ({ canvasElement }) => {
     const box = canvas.getByRole('checkbox', { name: 'Email reminders' });
     const desc = canvasElement.ownerDocument.getElementById(box.getAttribute('aria-describedby'));
     await expect(desc.textContent).toBe('Sent the evening before.');
+};
+
+/** Keyboard focus: the focus-ring role, 2px wide and 2px off the box's edge. */
+export const KeyboardFocus = () => <Checkbox id="checkbox-focus" label="Send reminders" defaultChecked />;
+KeyboardFocus.parameters = { docs: { disable: true } };
+KeyboardFocus.play = async ({ canvasElement }) => {
+    const box = within(canvasElement).getByRole('checkbox', { name: 'Send reminders' });
+    box.style.transition = 'none';
+    await userEvent.tab();
+    await expect(document.activeElement).toBe(box);
+    const style = getComputedStyle(box);
+    await waitFor(() => expect(style.outlineStyle).toBe('solid'));
+    await expect(px(style.outlineWidth), 'ring width').toBe(2);
+    await expect(px(style.outlineOffset), 'ring gap').toBe(2);
+    await expect(style.outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--color-focus-ring'));
+};
+
+/** Hover on a checked box keeps its fill and check, under the shadow 08 layer. */
+export const HoverStep = () => <Checkbox id="checkbox-hover" label="Checked" defaultChecked />;
+HoverStep.parameters = { docs: { disable: true } };
+HoverStep.play = async ({ canvasElement }) => {
+    const box = within(canvasElement).getByRole('checkbox', { name: 'Checked' });
+    box.style.transition = 'none';
+    const check = () => getComputedStyle(box, '::before');
+    const resting = { transform: check().transform };
+    const hovered = withForcedPseudo(box, ':hover', () => {
+        const { backgroundColor, boxShadow } = getComputedStyle(box);
+        return { backgroundColor, boxShadow, transform: check().transform, color: check().backgroundColor };
+    });
+    await expect(hovered.backgroundColor, 'the checked fill stays').toBe(tokenColor(canvasElement, '--color-primary'));
+    await expect(hovered.boxShadow, 'the shadow 08 layer').toContain(tokenColor(canvasElement, '--color-shadow-state-08'));
+    await expect(hovered.transform, 'the check stays drawn at its resting size').toBe(resting.transform);
+    await expect(hovered.color, 'the check keeps its on-primary color').toBe(tokenColor(canvasElement, '--color-on-primary'));
 };

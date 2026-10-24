@@ -1,5 +1,8 @@
 import React from 'react';
+import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Card from '@/components/layout-and-structure/Card';
 
 const cardCol = { display: 'flex', flexDirection: 'column', gap: '24px' };
@@ -276,5 +279,35 @@ export const Interactive = {
                     : undefined}
             />
         );
+    },
+};
+
+/**
+ * A card rests flat on its 1px outline. Only a clickable card lifts, to the
+ * raised shadow (Light/2), while it is hovered or dragged.
+ */
+export const Elevation = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+            <Card title="Static" body="Sits on the page." />
+            <Card title="Clickable" body="Opens a session." onClick={() => {}} />
+            <Card title="Dragging" body="Being moved." dragging />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const card = (name) => within(canvasElement).getByText(name).closest('.plus-card');
+        const shadow = (el) => {
+            el.style.transition = 'none';
+            return getComputedStyle(el).boxShadow;
+        };
+        const raised = computedShadow(canvasElement, 'var(--surface-raised-shadow)');
+
+        await expect(shadow(card('Static')), 'a static card rests flat').toBe('none');
+        await expect(shadow(card('Clickable')), 'a clickable card rests flat').toBe('none');
+        await expect(withForcedPseudo(card('Static'), ':hover', () => shadow(card('Static'))), 'hovering a static card').toBe('none');
+        await expect(withForcedPseudo(card('Clickable'), ':hover', () => shadow(card('Clickable'))), 'hovering a clickable card').toBe(raised);
+        await expect(shadow(card('Dragging')), 'a dragged card').toBe(raised);
+        await expect(getComputedStyle(card('Static')).borderTopColor, 'the outline role').toBe(tokenColor(canvasElement, '--color-outline-variant'));
     },
 };

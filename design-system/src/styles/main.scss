@@ -45,7 +45,19 @@
     --plus-card-pad-y: 0px;
     margin: 0;
     overflow: hidden; // clip image to card border-radius
-    background-color: var(--color-surface-container-lowest);
+    // Flat at rest (elevation.md): the page's own fill on a 1px outline-variant
+    // border, and no shadow. The raised shadow is for a clickable card while it
+    // is hovered or dragged.
+    background-color: var(--surface-raised);
+    border-color: var(--color-outline-variant);
+    box-shadow: none;
+    transition: box-shadow 0.15s ease;
+}
+
+// The lift, Light/2 through the raised role's shadow.
+.plus-card--clickable:hover,
+.plus-card--dragging {
+    box-shadow: var(--surface-raised-shadow);
 }
 
 .plus-card .plus-card-content {

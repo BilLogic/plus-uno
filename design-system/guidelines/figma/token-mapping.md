@@ -34,8 +34,8 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 | Element/opacity-disabled | `var(--color-disabled-opacity)` | 0.38 on the whole disabled control. Figma files it in size / semantics as 38, because it reads an opacity variable as a percentage |
 | Surface roles/surface-default | `var(--color-surface-default)` | The page; aliases `--surface-default` |
 | Surface roles/surface-sunken | `var(--color-surface-sunken)` | The ground behind grouped things; aliases `--surface-sunken` |
-| Surface roles/surface-raised | `var(--color-surface-raised)` | A card that lifts; pair with `--surface-raised-shadow` |
-| Surface roles/surface-overlay | `var(--color-surface-overlay)` | Popovers and toasts; pair with `--surface-overlay-shadow` |
+| Surface roles/surface-raised | `var(--color-surface-raised)` | A card: flat at rest; a clickable card pairs it with `--surface-raised-shadow` on hover or drag |
+| Surface roles/surface-overlay | `var(--color-surface-overlay)` | Floating layers without a scrim (pair with `--surface-overlay-shadow`) and modals (with `--elevation-light-4`) |
 
 ### SMART Competency Colors
 | Figma | PLUS CSS Token |
@@ -125,8 +125,8 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 | Figma Elevation Level | PLUS CSS Token |
 |----------------------|----------------|
 | Elevation Light/1 (subtle) | `var(--elevation-light-1)` |
-| Elevation Light/2 (cards, dropdowns) | `var(--elevation-light-2)` |
-| Elevation Light/3 (popovers, toasts) | `var(--elevation-light-3)` |
+| Elevation Light/2 (clickable cards on hover or drag) | `var(--elevation-light-2)` |
+| Elevation Light/3 (menus, popovers, tooltips, toasts, listboxes) | `var(--elevation-light-3)` |
 | Elevation Light/4 (modals) | `var(--elevation-light-4)` |
 | Elevation Light/5 (dialogs) | `var(--elevation-light-5)` |
 

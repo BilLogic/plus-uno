@@ -20,9 +20,9 @@ import './SidebarTab.scss';
  *
  * States, drawn by the stylesheet:
  * - enabled: transparent, on-surface text, on-surface-variant icon
- * - hover: on-surface-state-08 at runtime; primary-state-12 for the docs value
+ * - hover: on-surface-state-08 at runtime; primary-state-08 for the docs value
  * - selected: primary-state-16, primary text and icon, `aria-current="page"`
- * - focus: a 2px focus-ring outline
+ * - focus: a 2px focus-ring outline and no fill
  * - disabled: muted solid text (not an opacity, so it keeps AA), no tab stop
  *
  * `hover` AND `focus` ARE DOCUMENTATION VALUES, NOT BEHAVIOR (#320). They

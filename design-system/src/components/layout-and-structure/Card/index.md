@@ -9,7 +9,7 @@ Universal card component for creating self-contained containers that display rel
 
 **Source:** `design-system/src/components/layout-and-structure/Card/Card.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Card/Card.stories.jsx` — Content, Actions, Layout, Overview, Interactive
+**Stories:** `design-system/src/components/layout-and-structure/Card/Card.stories.jsx` — Content, Actions, Layout, Overview, Interactive, Elevation
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Card/Card.mdx`
 
@@ -32,6 +32,7 @@ Universal card component for creating self-contained containers that display rel
 | `radiusSize` | enum | `'sm'` | Card border radius size |
 | `borderSize` | enum | `'sm'` | Card border size |
 | `showBorder` | bool | `true` | Show card border |
+| `dragging` | bool | `false` | The card is being dragged: it lifts to the raised shadow (Light/2) |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 | `onClick` | func | — | — |

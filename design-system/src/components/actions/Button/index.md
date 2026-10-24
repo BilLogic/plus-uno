@@ -9,7 +9,7 @@ Universal interactive element slightly favoring Figma spec over Bootstrap defaul
 
 **Source:** `design-system/src/components/actions/Button/Button.jsx`
 
-**Stories:** `design-system/src/components/actions/Button/Button.stories.jsx` — Overview, SizesFilledRow, Interactive
+**Stories:** `design-system/src/components/actions/Button/Button.stories.jsx` — Overview, SizesFilledRow, Interactive, StateSteps, KeyboardFocus
 
 **Storybook page:** `design-system/src/components/actions/Button/Button.mdx`
 
@@ -50,7 +50,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--color-disabled-opacity` · `--color-on-surface` · `--color-on-surface-state-12` · `--color-on-surface-variant` · `--color-outline` · `--color-secondary-text` · `--color-shadow-state-08` · `--element-pad-y-md` · `--icon-lg` · `--icon-md` · `--plus-btn-state-layer` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-radius-md` · `--type-weight-medium`
+`--body-default` · `--color-disabled-opacity` · `--color-focus-ring` · `--color-on-surface` · `--color-on-surface-state-12` · `--color-on-surface-variant` · `--color-outline` · `--color-secondary-text` · `--color-shadow-state-08` · `--color-shadow-state-12` · `--element-pad-y-md` · `--icon-lg` · `--icon-md` · `--plus-btn-state-layer` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--type-weight-medium`
 
 From `design-system/src/components/actions/Button/Button.scss`. Override these through the token layer, never with a literal.
 

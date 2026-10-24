@@ -2,10 +2,9 @@
  * The surface ROLES and the elevation mapping table must name the same level.
  *
  * WHY THIS EXISTS. `design-system/guidelines/figma/token-mapping.md` has carried
- * a five-row table for a long time — Light/1 subtle, Light/2 cards and
- * dropdowns, Light/3 popovers and toasts, Light/4 modals, Light/5 dialogs — and
- * the components follow it: `PatternCard.scss` sets `--elevation-light-2` and
- * cites the row in the rule.
+ * a five-row table — Light/1 subtle, Light/2 clickable cards on hover or drag,
+ * Light/3 every floating layer without a scrim, Light/4 modals, Light/5
+ * dialogs — and the components follow it through the surface roles.
  *
  * The role layer added for #268 then shipped `--surface-raised-shadow:
  * var(--elevation-light-1)`. A token whose entire purpose is to answer "which
@@ -21,10 +20,11 @@
  *
  *  1. WHETHER THE TABLE IS RIGHT. If Light/2 is the wrong shadow for a card,
  *     this passes happily. It checks agreement, not judgment.
- *  2. COMPONENTS THAT USE A LEVEL DIRECTLY. `PatternModal.scss` names
- *     `--elevation-light-4` and does not go through a role — correctly, since
- *     no `modal` role exists. Auditing every `box-shadow` against the table is
- *     a different check with a much larger corpus.
+ *  2. COMPONENTS THAT USE A LEVEL DIRECTLY. A modal sits on the overlay fill
+ *     but names `--elevation-light-4` itself, since no role carries the modal
+ *     shadow. The surfaces listed below are pinned one by one; auditing every
+ *     `box-shadow` against the table is a different check with a much larger
+ *     corpus.
  *  3. ROLES WITH NO ROW. `--surface-container` carries no shadow and appears in
  *     no elevation row; it is simply not covered here.
  *
@@ -36,6 +36,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import * as sass from 'sass';
+import postcss from 'postcss';
 
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 
@@ -54,7 +57,7 @@ const ROLES = [
   { token: '--surface-overlay-shadow', rowMatches: /popovers/i },
 ];
 
-/** `Elevation Light/2 (cards, dropdowns) | var(--elevation-light-2)` → level per row. */
+/** `Elevation Light/4 (modals) | var(--elevation-light-4)` → level per row. */
 export function mappingLevels(markdown) {
   const rows = [];
   for (const line of markdown.split('\n')) {
@@ -121,22 +124,35 @@ test('the row that mentions modals is NOT claimed by a role', () => {
 /**
  * THE STEP EACH SURFACE TAKES, read from the stylesheets that draw them.
  *
- * `foundations/elevation.md` assigns the levels by component — cards and
- * dropdowns Light/2, popovers and toasts Light/3, modals Light/4 — and the
- * role layer joins the first two to a fill. The 2026-10-24 audit found the
- * Popover family's Popup on Light/2, a step below the toast beside it. Each
- * row is one surface and the shadow its rule must name; a rule that names
- * another level, or a literal shadow, fails.
+ * `foundations/elevation.md` assigns the levels by component. Every floating
+ * layer without a scrim (menus and dropdowns, Popover, Tooltip, Toast and
+ * Listbox) takes Light/3 through the overlay role. A modal takes Light/4 on the
+ * overlay fill. A card is flat at rest and lifts to Light/2 only while a
+ * clickable card is hovered or dragged. Each row is one surface and the shadow
+ * its rule must name; a rule that names another level, or a literal shadow,
+ * fails.
  */
 const SURFACES = [
-  { file: 'design-system/src/patterns/PatternCard/PatternCard.scss', rule: '.plus-pattern-card {', shadow: '--surface-raised-shadow', fill: '--surface-raised' },
+  { file: 'design-system/src/patterns/PatternCard/PatternCard.scss', rule: '.plus-pattern-card--dragging {', shadow: '--surface-raised-shadow' },
+  { file: 'design-system/src/styles/main.scss', rule: '.plus-card--dragging {', shadow: '--surface-raised-shadow' },
   { file: 'design-system/src/components/overlays/Popover/Popover.scss', rule: '.plus-popover {', shadow: '--surface-overlay-shadow' },
+  { file: 'design-system/src/components/overlays/Tooltip/Tooltip.scss', rule: '.tooltip-inner {', shadow: '--surface-overlay-shadow' },
   { file: 'design-system/src/components/messaging/Toast/Toast.scss', rule: '.plus-toast', shadow: '--surface-overlay-shadow' },
   { file: 'design-system/src/patterns/SurfaceContainer/SurfaceContainer.scss', rule: '.plus-surface-container__sidebar--floating {', shadow: '--surface-overlay-shadow', fill: '--surface-overlay' },
-  { file: 'design-system/src/components/messaging/Modal/Modal.scss', rule: '.plus-modal', shadow: '--elevation-light-4' },
-  { file: 'design-system/src/patterns/PatternModal/PatternModal.scss', rule: '.plus-pattern-modal {', shadow: '--elevation-light-4' },
-  { file: 'design-system/src/components/forms-and-inputs/_internal/Listbox.scss', rule: '', shadow: '--elevation-light-2' },
-  { file: 'design-system/src/components/forms-and-inputs/Dropdown/Dropdown.scss', rule: '.dropdown-menu', shadow: '--elevation-light-2' },
+  { file: 'design-system/src/components/messaging/Modal/Modal.scss', rule: '.plus-modal', shadow: '--elevation-light-4', fill: '--color-surface-overlay' },
+  { file: 'design-system/src/patterns/PatternModal/PatternModal.scss', rule: '.plus-pattern-modal {', shadow: '--elevation-light-4', fill: '--surface-overlay' },
+  { file: 'design-system/src/components/forms-and-inputs/_internal/Listbox.scss', rule: '', shadow: '--surface-overlay-shadow', fill: '--color-surface-overlay' },
+  { file: 'design-system/src/components/forms-and-inputs/Dropdown/Dropdown.scss', rule: '.dropdown-menu', shadow: '--surface-overlay-shadow', fill: '--color-surface-overlay' },
+];
+
+/**
+ * A CARD AT REST IS FLAT: a 1px outline-variant border and no shadow. The lift
+ * belongs to a clickable card while it is hovered or dragged, so a page of
+ * cards reads as one plane until the pointer picks one up.
+ */
+const FLAT_CARDS = [
+  { file: 'design-system/src/patterns/PatternCard/PatternCard.scss', selector: '.plus-pattern-card', fill: '--surface-raised' },
+  { file: 'design-system/src/styles/main.scss', selector: '.plus-card', fill: '--surface-raised' },
 ];
 
 /** The first value of `property` after the rule opens. */
@@ -160,6 +176,71 @@ for (const surface of SURFACES) {
     if (surface.fill) {
       assert.equal(firstAfter(source, surface.rule, 'background-color'), `var(${surface.fill})`);
     }
+  });
+}
+
+test("elevation.md's hierarchy table says the same steps", () => {
+  const doc = fs.readFileSync(path.join(REPO_ROOT, 'design-system/guidelines/foundations/elevation.md'), 'utf8');
+  const hierarchy = doc.slice(doc.indexOf('## Elevation Hierarchy'));
+  const levelOf = (words) => {
+    const row = hierarchy.split('\n').find((line) => line.startsWith('|') && words.test(line));
+    assert.ok(row, `elevation.md's hierarchy table has no row matching ${words}`);
+    return Number(/--elevation-light-(\d)/.exec(row)[1]);
+  };
+  for (const floating of [/menus/i, /dropdowns/i, /popovers/i, /tooltips/i, /toasts/i, /listboxes/i]) {
+    assert.equal(levelOf(floating), 3, `elevation.md puts ${floating} somewhere other than Light/3`);
+  }
+  assert.equal(levelOf(/clickable cards on hover or drag/i), 2);
+  assert.equal(levelOf(/modals/i), 4);
+});
+
+/**
+ * The card rules are read from the COMPILED stylesheet, so a nested `&:hover`
+ * or a border shorthand is seen the way the browser sees it.
+ */
+const compiled = new Map();
+function compiledRules(file) {
+  if (!compiled.has(file)) {
+    const src = path.join(REPO_ROOT, 'design-system/src');
+    const { css } = sass.compile(path.join(REPO_ROOT, file), {
+      loadPaths: [path.join(src, 'components'), src],
+      logger: sass.Logger.silent,
+    });
+    compiled.set(file, postcss.parse(css));
+  }
+  return compiled.get(file);
+}
+
+/** The declarations every compiled rule listing exactly `selector` sets, in source order. */
+function compiledDecls(file, selector) {
+  const merged = {};
+  compiledRules(file).walkRules((rule) => {
+    if (!rule.selectors.map((s) => s.trim()).includes(selector)) return;
+    for (const node of rule.nodes) if (node.type === 'decl') merged[node.prop] = node.value;
+  });
+  return merged;
+}
+
+for (const card of FLAT_CARDS) {
+  test(`${path.basename(card.file)} draws a resting card flat, on its outline`, () => {
+    const rest = compiledDecls(card.file, card.selector);
+    assert.equal(rest['box-shadow'], 'none', `${card.file}: a resting card carries no shadow`);
+    assert.equal(rest['background-color'], `var(${card.fill})`);
+    assert.match(rest['border-color'] ?? rest.border ?? '', /var\(--color-outline-variant\)/, `${card.file}: the resting card's outline role`);
+  });
+
+  test(`${path.basename(card.file)} lifts only a clickable card on hover, or any card while dragged`, () => {
+    for (const lifted of [`${card.selector}--clickable:hover`, `${card.selector}--dragging`]) {
+      assert.equal(compiledDecls(card.file, lifted)['box-shadow'], 'var(--surface-raised-shadow)', `${card.file}: "${lifted}" does not lift`);
+    }
+    compiledRules(card.file).walkRules((rule) => {
+      for (const selector of rule.selectors) {
+        assert.ok(
+          !(selector.includes(`${card.selector}:hover`) && rule.nodes.some((n) => n.prop === 'box-shadow' && n.value !== 'none')),
+          `${card.file}: "${selector}" lifts every card on hover, not only a clickable one`,
+        );
+      }
+    });
   });
 }
 

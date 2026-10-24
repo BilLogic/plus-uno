@@ -16,6 +16,9 @@ import './PatternCard.scss';
  *   the header sits Card/stack-md above the body (`gap` picks the stack step),
  *   and the footer sits Card/stack-lg below. The footer is left-aligned.
  * - The card hugs its content; in a row it stretches to the tallest card.
+ * - **Elevation**: flat at rest, a 1px outline and no shadow. A card with an
+ *   `onClick` lifts to the raised shadow (Light/2) on hover, and `dragging`
+ *   lifts any card while it moves.
  */
 const PatternCard = ({
     id,
@@ -28,6 +31,7 @@ const PatternCard = ({
     padding = 'md',
     gap = 'md',
     minWidth,
+    dragging = false,
     className = '',
     style,
     children,
@@ -37,6 +41,8 @@ const PatternCard = ({
         'plus-pattern-card',
         `plus-pattern-card-pad-${padding}`,
         `plus-pattern-card-gap-${gap}`,
+        props.onClick ? 'plus-pattern-card--clickable' : '',
+        dragging ? 'plus-pattern-card--dragging' : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -91,6 +97,8 @@ PatternCard.propTypes = {
     gap: PropTypes.oneOf(['sm', 'md', 'lg']),
     /** Minimum width constraint (number of px or any CSS length) */
     minWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    /** The card is being dragged: it lifts to the raised shadow (Light/2) */
+    dragging: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,
     /** Body content slot */

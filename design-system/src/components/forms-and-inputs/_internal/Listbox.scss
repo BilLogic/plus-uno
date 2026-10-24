@@ -1,8 +1,8 @@
 /*
  * Listbox — the internal option list (Figma _Listbox), a Popover family Menu.
- * Surface roles/surface-overlay, an outline-variant border,
- * Popover/radius-menu-md and Elevation Light/2, with its options inset
- * Popover/pad-menu 4.
+ * Surface roles/surface-overlay and its shadow (Elevation Light/3, as every
+ * floating layer without a scrim), an outline-variant border and
+ * Popover/radius-menu-md, with its options inset Popover/pad-menu 4.
  */
 
 .plus-listbox {
@@ -33,7 +33,7 @@
     background-color: var(--color-surface-overlay);
     border: var(--size-element-border) solid var(--color-outline-variant);
     border-radius: var(--popover-radius-menu-md);
-    box-shadow: var(--elevation-light-2);
+    box-shadow: var(--surface-overlay-shadow);
 }
 
 /* In a portal: placed against its field by `useAnchoredPopup`, at least the

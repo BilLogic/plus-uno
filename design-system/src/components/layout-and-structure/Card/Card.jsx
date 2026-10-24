@@ -30,6 +30,7 @@ const Card = ({
     radiusSize = 'sm',
     borderSize = 'sm',
     showBorder = true,
+    dragging = false,
     className = '',
     style,
     onClick,
@@ -37,7 +38,8 @@ const Card = ({
     ...props
 }) => {
     // Construct custom classes for PLUS styling system (padding, gaps, borders)
-    // We append these to the RB Card
+    // We append these to the RB Card. A card rests flat; a clickable card lifts
+    // on hover, and any card lifts while it is dragged.
     const customClasses = [
         'plus-card',
         paddingSize ? `plus-card-pad-${paddingSize}` : '',
@@ -45,6 +47,8 @@ const Card = ({
         radiusSize ? `plus-card-radius-${radiusSize}` : '',
         showBorder && borderSize ? `plus-card-border-${borderSize}` : '',
         !showBorder ? 'border-0' : '', // RB class to remove border
+        onClick ? 'plus-card--clickable' : '',
+        dragging ? 'plus-card--dragging' : '',
         className
     ].filter(Boolean).join(' ');
 
@@ -191,6 +195,8 @@ Card.propTypes = {
     radiusSize: PropTypes.oneOf(['sm', 'md']),
     borderSize: PropTypes.oneOf(['sm', 'md', 'lg']),
     showBorder: PropTypes.bool,
+    /** The card is being dragged: it lifts to the raised shadow (Light/2) */
+    dragging: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,
     onClick: PropTypes.func,
