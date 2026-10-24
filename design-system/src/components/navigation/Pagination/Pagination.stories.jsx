@@ -7,6 +7,9 @@ export default {
     component: Pagination,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-24', kind: 'changed', summary: 'A pressed page is the secondary 12 step and the current page the 16. Keyboard focus is the 2px focus ring inside the page with no fill; a pointer focus draws none.' },
+        ],
         docs: {
             description: {
                 component: 'Pagination component for navigating through paginated content. Built on Bootstrap 4.6.2 with PLUS design token customizations. Pixel-accurate implementation matching Figma design exactly.'

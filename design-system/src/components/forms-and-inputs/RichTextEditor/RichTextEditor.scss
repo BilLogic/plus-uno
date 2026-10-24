@@ -165,9 +165,15 @@
         }
 
         // A menu is a dense list, so the current block is primary 08 (color.md).
+        // It holds the 08 under hover and press, as Dropdown's selected item does.
         &.active {
             background-color: var(--color-primary-state-08);
             color: var(--color-primary-text);
+        }
+
+        // Bootstrap fills a focused item; here focus is the ring alone.
+        &:focus:not(:hover):not(:active):not(.active) {
+            background-color: transparent;
         }
 
         &:focus {

@@ -321,11 +321,14 @@ test('NavPills: hover 08, pressed 12, focus a ring with no fill, selected or not
     expectRule(file, `${pill}:focus-visible${NOT}`, RING_OUTSIDE);
     expectNoFill(file, `${pill}:focus-visible${NOT}`);
 
-    // The primary border carries selection; the steps lay over it.
-    expectRule(file, `${pill}.active:hover`, { 'background-color': layer('--color-primary-state-08') });
-    expectRule(file, `${pill}.active:active`, { 'background-color': layer('--color-primary-state-12') });
-    expectRule(file, `${pill}.active:focus-visible`, RING_OUTSIDE);
-    expectNoFill(file, `${pill}.active:focus-visible`);
+    // The primary border carries selection, by class or by attribute; the
+    // steps lay over it.
+    for (const selected of ['.active', '[aria-selected=true]', '[aria-current=page]', '[aria-current=true]']) {
+      expectRule(file, `${pill}${selected}:hover`, { 'background-color': layer('--color-primary-state-08') });
+      expectRule(file, `${pill}${selected}:active`, { 'background-color': layer('--color-primary-state-12') });
+      expectRule(file, `${pill}${selected}:focus-visible`, RING_OUTSIDE);
+      expectNoFill(file, `${pill}${selected}:focus-visible`);
+    }
   }
 
   const item = '.plus-nav-pills .nav-item';
@@ -351,9 +354,18 @@ test('CloseButton: hover 08, pressed 12, focus the ring alone, on both tones', (
   ]) {
     expectRule(file, `${btn}:hover`, { 'background-color': layer(`${role}-state-08`) });
     expectRule(file, `${btn}:active`, { 'background-color': layer(`${role}-state-12`) });
-    const focus = declarations(sheet(file), `${btn}:focus-visible`);
-    assert.ok(!focus || !('background-color' in focus), `${btn}:focus-visible fills focus with ${focus?.['background-color']}`);
+    for (const focus of [`${btn}:focus`, `${btn}:focus-visible`]) {
+      const decls = declarations(sheet(file), focus);
+      assert.ok(!decls || !('background-color' in decls), `${focus} fills focus with ${decls?.['background-color']}`);
+    }
   }
+  // The ring itself is drawn on ::after, 2px outside the box.
+  expectRule(file, '.plus-close-btn:focus-visible::after', {
+    border: 'var(--size-element-stroke-lg) solid var(--color-focus-ring)',
+  });
+  expectRule(file, '.plus-close-btn--inverse:focus-visible::after', {
+    'border-color': layer('--color-focus-ring-inverse'),
+  });
 });
 
 /* ─── Pagination ─────────────────────────────────────────────────────────── */
@@ -416,6 +428,9 @@ test('RichTextEditor: toolbar buttons hover 08, press 12, select 16; the block m
   expectRule(file, `${item}:focus-visible`, RING_INSIDE);
   expectNoFill(file, `${item}:focus-visible`);
   expectNoFill(file, `${item}:focus`);
+  // Bootstrap's own `.dropdown-item:focus` fills the item, so a rule here
+  // must clear it.
+  expectRule(file, `${item}:focus:not(:hover):not(:active):not(.active)`, { 'background-color': 'transparent' });
 });
 
 /* ─── PatternTable rows ──────────────────────────────────────────────────── */

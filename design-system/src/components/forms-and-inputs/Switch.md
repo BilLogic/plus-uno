@@ -9,7 +9,7 @@ Form Switch — Foundations Form Switch Button (Figma `82:16570`). Controlled vi
 
 **Source:** `design-system/src/components/forms-and-inputs/Switch.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Switch.stories.jsx` — Overview, Content, Sizes, InteractionStates, Interactive, ReadOnly
+**Stories:** `design-system/src/components/forms-and-inputs/Switch.stories.jsx` — Overview, Content, Sizes, InteractionStates, Interactive, ReadOnly, KeyboardFocus
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Switch.mdx`
 
