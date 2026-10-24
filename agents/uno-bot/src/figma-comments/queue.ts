@@ -24,7 +24,7 @@ import type { DecisionDetector, DecisionRoute } from "./detector";
 import type { DecisionUpdate } from "./draft";
 import type { Section } from "./sections";
 import type { QuestionsHanded, TriagePorts } from "./triage";
-import type { FigmaPeople, NotionPeople, TeamRoles } from "../usage/roles";
+import { isActive, type ActivePeople, type FigmaPeople, type NotionPeople, type TeamRoles } from "../usage/roles";
 import type { DecisionRow, RowUpdate } from "../decisions-db/row";
 
 /** One decision waiting for its morning. */
@@ -56,8 +56,32 @@ export interface QueuedDecision {
 }
 
 /** Who a file's thread asks: the posting ladder's addressee — the card's
- *  design owner as a Slack id, else the file's creator by Figma handle. */
+ *  design owner as a Slack id, active on Team Members; with none, nobody. */
 export type FileOwner = Addressee;
+
+/**
+ * A queued owner as the morning may tag them: a Slack person still active,
+ * else nobody. An owner queued days earlier is checked again, and one queued
+ * by Figma handle before #1361 is nobody.
+ *
+ * @param owner - The owner the night queued
+ * @param active - Who is active this run
+ */
+export function activeOwner(owner: FileOwner | null | undefined, active: ActivePeople): FileOwner | null {
+  const slack = queuedSlackOf(owner);
+  return slack && isActive(slack, active) ? { slack } : null;
+}
+
+/** An owner as the queue stored it: a Slack person, or — in an entry queued
+ *  before #1361 — a Figma handle, which `FileOwner` no longer admits. */
+export type StoredOwner = FileOwner | { figma: string };
+
+/** The Slack id of a queued owner, or null for anything else: an older
+ *  entry's Figma handle names nobody (#1361). */
+export function queuedSlackOf(owner: StoredOwner | null | undefined): string | null {
+  const slack: unknown = owner && "slack" in owner ? owner.slack : undefined;
+  return typeof slack === "string" ? slack : null;
+}
 
 /** One file's decisions, waiting for the morning. */
 export interface QueuedFile {
@@ -126,7 +150,7 @@ export interface DecisionThread extends DecisionFile {
 
 /** The night's reads and the morning's posts, as the sweep hands them over. */
 export interface SweepFigmaComments extends FigmaCommentStores {
-  figma: Pick<FigmaClient, "comments" | "file" | "fileMeta" | "teamFolders" | "folderFiles">;
+  figma: Pick<FigmaClient, "comments" | "file" | "teamFolders" | "folderFiles">;
   /** Keys under a prefix of the notification route's KV notes, each with the
    *  time it records (null when it cannot be read). */
   notes: { list(prefix: string): Promise<Array<{ key: string; at: string | null }>> };

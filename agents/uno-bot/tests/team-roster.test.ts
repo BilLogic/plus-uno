@@ -38,6 +38,15 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
         },
         // A row from before the column existed.
         { properties: { Name: { type: "title", title: [{ plain_text: "Ana Pérez" }] } } },
+        // Someone who has left PLUS (#1361).
+        {
+          properties: {
+            Name: { type: "title", title: [{ plain_text: "Eli Fox" }] },
+            Group: { type: "select", select: { name: "Product Designer" } },
+            Affiliation: { type: "select", select: { name: "Past Collaborators" } },
+            "Slack ID": text("U0ELI0001"),
+          },
+        },
       ],
       has_more: false,
       next_cursor: null,
@@ -59,6 +68,7 @@ test("the roster reads a member's Figma User ID, trimmed; an empty or missing ce
       ["Cy Diaz", "1105000000000000003"],
       ["Dee Evans", undefined],
       ["Ana Pérez", undefined],
+      ["Eli Fox", undefined],
     ],
   );
 });
@@ -72,6 +82,22 @@ test("the roster reads a member's Notion Person as user ids; an empty or missing
       ["Cy Diaz", ["n-cy"]],
       ["Dee Evans", undefined],
       ["Ana Pérez", undefined],
+      ["Eli Fox", undefined],
     ],
   );
+});
+
+test("the roster keeps a Past Collaborators row for the sync, which skips it", async () => {
+  const { findTeamMembers } = await import("../src/integrations/notion.js");
+  const { members } = await findTeamMembers(ENV);
+  assert.deepEqual(members.find((m) => m.name === "Eli Fox")?.affiliation, "Past Collaborators");
+});
+
+test("a turn's team search never offers someone who has left PLUS to suggest or tag (#1361)", async () => {
+  const { executeNotionSearch } = await import("../src/tools/notion-search.js");
+  const result = JSON.parse(await executeNotionSearch(ENV, { scope: "team", query: "designer" })) as { ok: boolean; count: number; members: Array<{ name: string }> };
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.members.map((m) => m.name), ["Cy Diaz", "Dee Evans", "Ana Pérez"]);
+  assert.equal(result.count, 3);
+  assert.doesNotMatch(JSON.stringify(result), /Eli Fox|U0ELI0001/);
 });

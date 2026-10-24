@@ -29,9 +29,10 @@
 //      offering only its status, owner and timing fields, and the first card's
 //      PRD subpage as the PRD — a card with none has no PRD, and a behavior
 //      decision is then said in the thread, never written into the card's
-//      body. The confirmers are every card's Contributors; the owner asked is
-//      the card's design owner — the first Contributor the team's roles name a
-//      designer — else the file's creator (`/meta`), by Figma handle; and
+//      body. The confirmers are every card's Contributors active on Team
+//      Members; the owner asked is the card's design owner — the first of
+//      them the team's roles name a designer — else nobody, never the file's
+//      creator (#1361); and
 //      each card's Decisions DB rows, which a key decision's row is weighed
 //      against (`../decisions-db/row.ts`);
 //   4. its open questions — asked, unresolved, answered by nobody but the
@@ -334,11 +335,12 @@ async function readFile(
       // Only a PRD subpage is a PRD: a card's own body is not one.
       const sub = first.subpages?.find((s) => /^prd\b/i.test(s.title));
       prd = sub ? await readUsable(deps.sources, deps.config, `https://www.notion.so/${sub.id}`, "notion") : null;
+      // Only active Contributors (`contributorsOf`), so the owner is active
+      // too; with none, nobody is named — never the file's creator (#1361).
       confirmers = [...new Set(await contributorsOf(deps, cardPages.flatMap((p) => p.contributors), resolved))];
       const designer = await designOwnerOf(fc, confirmers);
       if (designer) owner = { slack: designer };
     }
-    owner ??= await creatorOf(fc, fileKey);
   } catch (err) {
     return failure("its card could not be read", err);
   }
@@ -438,18 +440,6 @@ async function designOwnerOf(fc: SweepFigmaComments, contributors: readonly stri
   return designerAmong(contributors, await fc.roles());
 }
 
-
-/** The file's creator by Figma handle, or null when the file's meta has none or cannot be read. */
-async function creatorOf(fc: SweepFigmaComments, fileKey: string): Promise<FileOwner | null> {
-  try {
-    const handle = (await fc.figma.fileMeta(fileKey)).file.creator?.handle;
-    return handle ? { figma: handle } : null;
-  } catch (err) {
-    rethrowIfBudget(err);
-    console.warn(`[figma-comments] ${fileKey}'s creator not read: ${err instanceof Error ? err.message : String(err)}`);
-    return null;
-  }
-}
 
 /** A card's fields the detector may change: its status, owner and timing fields, as it reads them. */
 export function fieldsOf(page: SweepSource): Record<string, string> {

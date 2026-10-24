@@ -71,6 +71,9 @@ import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door
 import { currentReport, itemProposal } from "../src/slack/decision-cards";
 import { ANSWER_ON_CARD } from "../src/follow-through/copy";
 import { notified } from "./helpers/notified";
+import { activeFrom, EVERYONE_ACTIVE } from "./helpers/team";
+import { NOBODY_ACTIVE, type ActivePeople } from "../src/usage/roles";
+import { activeOwnersOf } from "../src/follow-through/people";
 
 const SCAN: ScheduledJob = { key: "card-follow-through", kind: "card-follow-through" };
 const NUDGE: ScheduledJob = { key: "commitment-nudge", kind: "commitment-nudge" };
@@ -107,7 +110,7 @@ function card(over: Partial<ActiveCard> = {}): ActiveCard {
 const STATUSES = ["Need PRD / Under Playground", "Ready for Design", "WIP", "Under Review", "Under Dev", "Shipped", "Archived"];
 
 function roadmap(
-  opts: { cards?: ActiveCard[]; comments?: Record<string, number | null>; titles?: string[]; pillars?: string[]; statuses?: string[]; bot?: string } = {},
+  opts: { cards?: ActiveCard[]; comments?: Record<string, number | null>; titles?: string[]; pillars?: string[]; statuses?: string[]; bot?: string; active?: ActivePeople } = {},
 ) {
   const cards = new Map((opts.cards ?? []).map((c) => [c.pageId, c] as const));
   /** The follow-up reply marks, as KV would hold them. */
@@ -132,6 +135,7 @@ function roadmap(
       // A known name is searched as given; otherwise the Notion user's name is read.
       slackIdForNotionUser: async (id: string, name?: string) => slackByName[name ?? nameByNotion[id] ?? ""] ?? null,
       notionUserForSlack: async (id: string) => notionBySlack[id] ?? null,
+      active: async () => opts.active ?? EVERYONE_ACTIVE,
     },
   };
 }
@@ -1772,6 +1776,28 @@ describe("running notes", () => {
       assert.deepEqual([row.promiserId, ...(store.texts.get(row.id)!.text.mentions ?? [])], expected);
     }
   });
+
+  it("a note's to-do tags its assignee only while their Team Members row is active, else the takers (#1361)", async () => {
+    const takers = [BEA, ADE];
+    for (const [active, expected] of [
+      [activeFrom([{ name: "Maya Chen", slack: MAYA }]), [MAYA]],
+      [activeFrom([{ name: "Maya Chen", slack: MAYA, affiliation: "Past Collaborators" }]), takers],
+      [activeFrom([], [{ id: MAYA, real_name: "Maya Chen" }]), takers],
+    ] as const) {
+      const store = createInMemoryCommitmentStore();
+      const hook = cardTodoNoteHook({
+        detector: modelCardTodoDetector(fakeProvider({ generateReplies: [JSON.stringify({ todos: [{ message_ts: "1.000000", assignee: "Maya Chen", what: "the facelift last stage", confidence: 0.9 }] })] })),
+        store,
+        people: roadmap({ active }).people,
+        config: CONFIG,
+        now: () => EOD,
+        runDate: utcDay(EOD),
+      });
+      await hook({ pageId: NOTE_ID, url: `https://www.notion.so/${NOTE_ID}`, entries: [{ id: "n-todo", text: "Maya to create a card for the facelift last stage", at: at(29, 17) }], takers });
+      const row = only(store);
+      assert.deepEqual([row.promiserId, ...(store.texts.get(row.id)!.text.mentions ?? [])], expected);
+    }
+  });
 });
 
 describe("wiring", () => {
@@ -2123,6 +2149,71 @@ describe("tagging through the Team Members directory", () => {
     assert.equal(m.posts[0]!.cards[0]!.subtitle!.text, "<@U0MAYA> · Under Review · no comments for 3 weeks · not found in Slack: Kai Lo");
     assert.match(m.posts[0]!.text, /\n• Kai Lo — /, "named on their own bullet, not tagged");
     assert.deepEqual(notified(m.posts[0]!), [MAYA]);
+  });
+
+  it("tags a Contributor, or names one Slack cannot match, only while their Team Members row is active (#1361)", async () => {
+    const maya = { name: "Maya Chen", slack: MAYA };
+    for (const [active, tagged, kaiNamed] of [
+      [activeFrom([maya, { name: "Bea Ruiz", slack: BEA }, { name: "Kai Lo" }]), [MAYA, BEA], true],
+      [activeFrom([maya, { name: "Bea Ruiz", slack: BEA, affiliation: "Past Collaborators" }, { name: "Kai Lo", affiliation: "Past Collaborators" }]), [MAYA], false],
+      [activeFrom([maya], [{ id: BEA, real_name: "Bea Ruiz" }]), [MAYA], false],
+    ] as const) {
+      const store = createInMemoryCommitmentStore();
+      const rm = withDirectory(
+        roadmap({
+          active,
+          cards: [
+            card({
+              designStatus: "Under Review",
+              lastEditedAt: EOD - 22 * DAY,
+              contributors: [
+                { id: "n-maya", name: "Maya Chen" },
+                { id: "n-bea", name: "Bea Ruiz" },
+                { id: "n-kai", name: "Kai Lo" },
+              ],
+            }),
+          ],
+        }),
+      );
+      await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+      const m = morning(store, rm, at(35, 13));
+      await m.run();
+      assert.deepEqual(notified(m.posts[0]!), tagged);
+      assert.equal(/Kai Lo/.test(JSON.stringify(m.posts[0]!)), kaiNamed);
+      if (tagged.length === 1) assert.doesNotMatch(JSON.stringify(m.posts[0]!), /Bea/, "never named, even in plain text");
+    }
+  });
+
+  it("a blueprint revision's owners: tagged, or named by an active row, only while active (#1361)", async () => {
+    const contributors = [
+      { id: "n-maya", name: "Maya Chen" },
+      { id: "n-bea", name: "Bea Ruiz" },
+      { id: "n-kai", name: "Kai Lo" },
+    ];
+    const maya = { name: "Maya Chen", slack: MAYA };
+    const cases = [
+      [activeFrom([maya, { name: "Bea Ruiz", slack: BEA }, { name: "Kai Lo" }]), [{ slack: MAYA, name: "Maya Chen" }, { slack: BEA, name: "Bea Ruiz" }, { name: "Kai Lo" }]],
+      [activeFrom([maya, { name: "Bea Ruiz", slack: BEA, affiliation: "Past Collaborators" }, { name: "Kai Lo", affiliation: "Past Collaborators" }]), [{ slack: MAYA, name: "Maya Chen" }]],
+      [activeFrom([maya], [{ id: BEA, real_name: "Bea Ruiz" }]), [{ slack: MAYA, name: "Maya Chen" }]],
+      [NOBODY_ACTIVE, []],
+    ] as const;
+    for (const [active, owners] of cases) {
+      assert.deepEqual(await activeOwnersOf(contributors, roadmap({ active }).people), owners);
+    }
+  });
+
+  it("asks an unowned card's creator only while their Team Members row is active (#1361)", async () => {
+    for (const [active, asked] of [
+      [activeFrom([{ name: "Maya Chen", slack: MAYA }]), [MAYA]],
+      [activeFrom([{ name: "Maya Chen", slack: MAYA, affiliation: "Past Collaborators" }]), []],
+      [activeFrom([], [{ id: MAYA, real_name: "Maya Chen" }]), []],
+    ] as const) {
+      const store = createInMemoryCommitmentStore();
+      const rm = roadmap({ active, cards: [card({ creatorId: "n-maya" })] });
+      const report = await runCardFollowThroughScan(SCAN, scanDeps(store, rm));
+      assert.deepEqual(report.rows.map((r) => r.promiserId), asked);
+      if (!asked.length) assert.match(report.summary, /no creator (active on Team Members|found in Slack)/);
+    }
   });
 
   /** The lead's notes about Team Members gaps, over a stored map and 30-day marks kept across mornings. */

@@ -140,7 +140,7 @@ test("the probe dry-runs the named run's jobs", async () => {
   const body = report.body as { ok: boolean; run: string; planned: unknown[]; jobs: { key: string; outcome: string; subrequests: number }[] };
   assert.equal(body.ok, true);
   assert.equal(body.run, "morning");
-  assert.equal(body.planned.length, 12);
+  assert.equal(body.planned.length, 11);
   assert.deepEqual(body.jobs.map((j) => [j.key, j.outcome, j.subrequests]), [
     ["commitment-nudge", "handled", 0],
     ["ds-precedence-post", "handled", 0],
@@ -155,21 +155,23 @@ test("the probe dry-runs the named run's jobs", async () => {
     ["blueprint-revision-post", "handled", 0],
     ["blueprint-proposal-offer", "handled", 0],
     ["sweep-post", "handled", 0],
-    // No blueprint configured: no removal offered, nothing spent.
-    // No Notion key: the roster read refuses before spending anything.
-    ["team-roles-sync", "handled", 0],
     // No usage database bound: nothing to purge, nothing spent.
     ["usage-text-purge", "handled", 0],
   ]);
 });
 
-test("Monday's morning plans the role-map sync and no weekly gaps DM", async () => {
+test("Monday's end of day plans the role-map sync, and Monday's morning no weekly gaps DM", async () => {
+  const eod = new URL("https://w/debug/sweep?dry_run=1&run=end-of-day&weekday=mon");
+  const night = await runMetered(() => sweepProbe({} as Env, eod, new Request(eod)));
+  assert.ok("body" in night);
+  const planned = (night.body as { planned: { key: string }[] }).planned.map((j) => j.key);
+  assert.equal(planned.indexOf("team-roles-sync"), 2, planned.join(", "));
   const url = new URL("https://w/debug/sweep?dry_run=1&run=morning&weekday=mon");
   const report = await runMetered(() => sweepProbe({} as Env, url, new Request(url)));
   assert.ok("body" in report);
   const body = report.body as { jobs: { key: string; outcome: string; subrequests: number }[] };
   const keys = body.jobs.map((j) => j.key);
-  assert.ok(keys.includes("team-roles-sync"), keys.join(", "));
+  assert.equal(keys.includes("team-roles-sync"), false, keys.join(", "));
   assert.deepEqual(keys.filter((k) => /gap/.test(k)), []);
 });
 

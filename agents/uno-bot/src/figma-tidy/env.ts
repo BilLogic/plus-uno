@@ -25,8 +25,7 @@ import { figmaTeamsFrom } from "../figma-notify/teams";
 import { channelMembers } from "../slack/channel-members";
 import { queryRoadmapByNumbers, queryRoadmapCards } from "../integrations/notion";
 import { storedTeamRoles } from "../usage/production";
-import { roleOf, slackPersonOfNotion, type NotionPeople, type TeamRoles } from "../usage/roles";
-import { designerAmong } from "../usage/roles";
+import { activePeopleOf, designerAmong, isActive, roleOf, slackPersonOfNotion, type ActivePeople, type NotionPeople, type TeamRoles } from "../usage/roles";
 import { markSweepThread } from "../sweep/thread-mark";
 import { threadStateFor } from "../thread-state/production";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
@@ -61,16 +60,18 @@ type RoadmapFields = Pick<TidyCard, "number" | "title" | "url" | "designStatus" 
 /**
  * A Roadmap card as the checks read it: its design owner the first of its
  * Contributors the roles name a designer (`designerAmong`), and every such
- * Contributor's first name for a title's designers.
+ * Contributor's first name for a title's designers — each active on Team
+ * Members, so someone who has left PLUS is neither tagged nor written into a
+ * title (#1361).
  */
-function tidyCardOf(
+export function tidyCardOf(
   fields: RoadmapFields,
   contributors: ReadonlyArray<{ id: string; name: string }>,
-  team: { notionPeople?: NotionPeople; roles: TeamRoles },
+  team: { notionPeople?: NotionPeople; roles: TeamRoles; active: ActivePeople },
 ): TidyCard {
   const designers = contributors.flatMap((p) => {
     const slack = slackPersonOfNotion(p.id, team.notionPeople);
-    return slack && roleOf(slack, team.roles) === "design" ? [{ slack, name: p.name.trim() }] : [];
+    return slack && isActive(slack, team.active) && roleOf(slack, team.roles) === "design" ? [{ slack, name: p.name.trim() }] : [];
   });
   const owner = designerAmong(designers.map((d) => d.slack), team.roles);
   const ownerName = designers.find((d) => d.slack === owner)?.name;
@@ -123,7 +124,7 @@ export async function runTidyPostOnEnv(env: Env, ctx: JobContext): Promise<TidyP
   const kv = env.HARNESS_KV;
   if (!kv) return { posted: false, summary: "HARNESS_KV not bound — no listing" };
   const stored = await storedTeamRoles(env);
-  const team = { ...(stored?.notionPeople ? { notionPeople: stored.notionPeople } : {}), roles: stored?.roles ?? {} };
+  const team = { ...(stored?.notionPeople ? { notionPeople: stored.notionPeople } : {}), roles: stored?.roles ?? {}, active: activePeopleOf(stored) };
   return runTidyPost(
     {
       listing: tidyStore(env, "listing"),

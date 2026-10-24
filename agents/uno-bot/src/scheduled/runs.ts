@@ -84,8 +84,9 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * (src/figma-drift/).
  * The end-of-day `figma-backstop` jobs list every Figma team's folders and
  * queue a change no notification reported (src/figma-notify/backstop.ts).
- * The morning `team-roles-sync` rebuilds the kickoff role map from the Notion
- * Team Members database (src/usage/team-roles-sync.ts).
+ * The end-of-day `team-roles-sync` rebuilds the kickoff role map and the
+ * active list from the Notion Team Members database
+ * (src/usage/team-roles-sync.ts).
  * The end-of-day `card-follow-through` keeps a follow-up for each active
  * Roadmap card nobody owns or that has stopped moving; the morning
  * `commitment-nudge` asks about it — a card that stopped moving on Monday's
@@ -279,7 +280,6 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "blueprint-proposal-offer", kind: "blueprint-proposal-offer" },
     // After every hand-over: a job not planned today counts as done.
     { key: "sweep-post", kind: "sweep-post", after: [...MORNING_SECTIONS] },
-    { key: "team-roles-sync", kind: "team-roles-sync" },
     // Both runs purge, so no text outlives 14 days across a weekend and one
     // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).
     { key: "usage-text-purge", kind: "usage-text-purge" },
@@ -288,6 +288,10 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "figma-library-poll", kind: "figma-library-poll" },
     // Second, so a rehearsal reaches it before the batches spend the ceiling.
     { key: "ds-precedence-check", kind: "ds-precedence-check", weekday: MONDAY },
+    // Before every job that tags or names someone, in this run and the next
+    // morning's: who is active comes from this sync (#1361), so a deploy over
+    // a weekend still has a fresh list by Monday's first job that reads it.
+    { key: "team-roles-sync", kind: "team-roles-sync" },
     // Early too, for the same reason: one Roadmap read, a few lookups a card.
     { key: "card-follow-through", kind: "card-follow-through" },
     // Before the batches too: blueprint upkeep's matching, then its drafting,

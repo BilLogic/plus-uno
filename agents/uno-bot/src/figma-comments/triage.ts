@@ -9,7 +9,7 @@
 import { rethrowIfBudget } from "../net";
 import { workerCardEvent, type ProposalEvent } from "../usage/proposal-events";
 import type { FigmaClient, FigmaComment } from "../figma/client";
-import { slackPersonOfFigma, type FigmaPeople } from "../usage/roles";
+import { isActive, isActiveName, slackPersonOfFigma, type ActivePeople, type FigmaPeople } from "../usage/roles";
 import { asksUno, isOwnComment } from "../figma-ask/trigger";
 import { etDayOf, etHourOn } from "../sweep/schedule";
 import { escapeSlackText } from "../slack/mrkdwn";
@@ -18,7 +18,7 @@ import { escapeRegExp } from "../tools/slack-people";
 import { commentUrl } from "./draft";
 import { itemProposalKey } from "../slack/decision-cards";
 import { handedSection, type SectionHandOff, type SweepSection } from "../sweep/sections";
-import type { FileOwner } from "./queue";
+import { activeOwner, type FileOwner } from "./queue";
 import type { CommentThread } from "./threads";
 import type { Section } from "./sections";
 import { cardTtlMs } from "../card-expiry";
@@ -58,6 +58,8 @@ export interface WatchedFile {
   url: string;
   /** The Product Pillar values of the cards its title names; empty for none. */
   pillars: string[];
+  /** The card's design owner as the night read them; checked again before a
+   *  line names them (`activeOwner`). */
   owner: FileOwner | null;
   questions: WatchedQuestion[];
 }
@@ -78,6 +80,9 @@ export interface TriagePorts {
   fileTeam(fileKey: string): Promise<string | null>;
   /** The Team Members Figma map: Figma user id → Slack id. */
   people(): Promise<FigmaPeople>;
+  /** Who may be tagged or named (`../usage/roles.ts` `isActive`), read once
+   *  a run; nobody when the read fails. */
+  active(): Promise<ActivePeople>;
   /** The ladder's channel ids. */
   channels: ChannelIds;
   /** DM a person; whether it posted. */
@@ -199,6 +204,7 @@ export async function handOverUnanswered(
   const left = () => opts.meter?.headroom().subrequests ?? Number.POSITIVE_INFINITY;
   const byPlace = new Map<string, HandedQuestion[]>();
   let people: FigmaPeople | null = null;
+  let active: ActivePeople | null = null;
   for (const file of await ports.watch.list()) {
     const due = file.questions.filter((q) => dueAt(Date.parse(q.createdAt)) <= opts.now);
     if (!due.length) continue;
@@ -224,7 +230,13 @@ export async function handOverUnanswered(
         done.add(q.commentId);
         continue;
       }
-      people ??= await ports.people();
+      if (!people || !active) {
+        // Only active people are DMed: one the map has who is no longer
+        // active reads as unmapped, so the channel line is due (#1361).
+        const live = await ports.active();
+        active = live;
+        people = Object.fromEntries(Object.entries(await ports.people()).filter(([, slack]) => isActive(slack, live)));
+      }
       const named = namedIn(root.message, root.user.handle, people, comments);
       if (left() < named.mapped.length * DM_COST) {
         result.notes.push("the budget left could not raise every question, so some wait for tomorrow");
@@ -235,7 +247,7 @@ export async function handOverUnanswered(
         result.raised += 1;
         continue;
       }
-      const sent = await send(file, q, root, named, ports);
+      const sent = await send(file, q, root, named, ports, active);
       if (sent.raised) {
         await ports.raised.add(q.commentId);
         done.add(q.commentId);
@@ -383,6 +395,7 @@ async function send(
   root: FigmaComment,
   named: Named,
   ports: TriagePorts,
+  active: ActivePeople,
 ): Promise<{ raised: true } | { raised: false; question: WatchedQuestion; line?: { channel: string; question: HandedQuestion }; unplaced?: true }> {
   const link = commentUrl(file.fileKey, q.nodeId, q.commentId);
   const dmed = new Set(q.dmed ?? []);
@@ -398,24 +411,28 @@ async function send(
 
   // The file's team is read only when no card pillar has a channel: then it decides.
   const team = file.pillars.some((p) => teamNamed(p)) ? null : await ports.fileTeam(file.fileKey);
+  // The owner the night kept, only while still active; nobody else is named
+  // by handle but a teammate on an active row.
+  const designOwner = activeOwner(file.owner, active)?.slack ?? null;
   const { destination, addressee } = routeFinding({
     evidence: null,
-    card: file.pillars.length ? { pillars: file.pillars, designOwner: file.owner && "slack" in file.owner ? file.owner.slack : null } : null,
-    figmaFile: { team, creatorHandle: file.owner && "figma" in file.owner ? file.owner.figma : null },
+    card: file.pillars.length ? { pillars: file.pillars, designOwner } : null,
+    figmaFile: { team },
   });
   const where = resolveDestination(destination, ports.channels);
   if (!where) return { raised: false, question, unplaced: true };
+  const unmapped = named.unmapped.filter((handle) => isActiveName(handle, active));
   return {
     raised: false,
     question,
     line: {
       channel: where.channel,
-      question: { fileKey: file.fileKey, commentId: q.commentId, line: questionCard(file, q, root.message, link, addressee, named.unmapped), dmedAll: allDmed },
+      question: { fileKey: file.fileKey, commentId: q.commentId, line: questionCard(file, q, root.message, link, addressee, unmapped), dmedAll: allDmed },
     },
   };
 }
 
-/** The channel card: whom it is for, the file, the question, its asker and place, anyone unmapped, and the link. */
+/** The channel card: whom it is for, the file, the question, its asker and place, anyone unmapped (each on an active row), and the link. */
 export function questionCard(
   file: Pick<WatchedFile, "title" | "url">,
   q: Pick<WatchedQuestion, "by" | "section" | "page">,
@@ -424,7 +441,7 @@ export function questionCard(
   addressee: Addressee | null,
   unmapped: readonly string[],
 ): string {
-  const to = addressee ? ("slack" in addressee ? `<@${addressee.slack}>, a` : `${escapeSlackText(addressee.figma)}, a`) : "A";
+  const to = addressee ? `<@${addressee.slack}>, a` : "A";
   const names = unmapped.length ? ` It names ${listOf(unmapped.map(escapeSlackText))}, who ${unmapped.length === 1 ? "isn't" : "aren't"} matched to a Slack account yet.` : "";
   return `${to} question in ${fileLink(file)} has waited two workdays with no answer: “${quote(message)}” — ${escapeSlackText(q.by)}, ${place(q)}.${names} <${link}|Open comment>`;
 }

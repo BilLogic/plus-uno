@@ -12,8 +12,9 @@
 //     (`PATH_READ_COST`);
 //   • the model: the Worker's provider (`selectProvider`), one tier a call;
 //   • the owners: the card's Contributors, `MAX_OWNERS` at most, each through
-//     the Team Members directory then by name (card follow-ups' `peopleFor`);
-//     a Contributor Team Members maps to nobody in Slack is named, not tagged;
+//     the Team Members directory then by name (card follow-ups' `peopleFor`),
+//     and only those active there (`activeOwnersOf`, #1361); an active row
+//     that maps to nobody in Slack is named by its row's name, not tagged;
 //   • View slice: a saved slice citing the drafted path, one `slides` read
 //     (`sliceCiting`), else the first changed row's `?cell=` link;
 //   • the place: card follow-ups' ladder (`cardPlace`);
@@ -70,7 +71,6 @@ import type { SlackMessageEvent } from "../slack/types";
 import { ladderChannelsFor } from "../destination/env";
 import { redraftRevision } from "./revise";
 import { MAX_OWNERS } from "./budget";
-import type { CardOwner } from "../thread-state/index";
 import { selectProvider } from "../agent/run-agent";
 import { channelIdsFor } from "../destination/env";
 import { queryRowsWithAnyStatus, readNotionPage } from "../integrations/notion";
@@ -82,6 +82,7 @@ import { measured } from "../sweep/env";
 import { sectionHandOffIn, type SweepSection } from "../sweep/sections";
 import { cardPlace } from "../follow-through/run";
 import { peopleFor } from "../follow-through/env";
+import { activeOwnersOf } from "../follow-through/people";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
 import { proposalEventLogFor } from "../usage/production";
 import { threadStateFor } from "../thread-state/production";
@@ -325,18 +326,7 @@ function shippedDepsFor(env: Env): ShippedDeps | string {
       readPathById: (pathId) => measured(() => readPathById(env, pathId)),
       ...(proposals ? { proposals } : {}),
       provider,
-      async ownersOf(card) {
-        const owners: CardOwner[] = [];
-        for (const c of card.contributors.slice(0, MAX_OWNERS)) {
-          const slack = await people.slackIdForNotionUser(c.id, c.name).catch((err: unknown) => {
-            rethrowIfBudget(err);
-            return null;
-          });
-          if (slack) owners.push({ slack, ...(c.name ? { name: c.name } : {}) });
-          else if (c.name.trim()) owners.push({ name: c.name.trim() });
-        }
-        return owners;
-      },
+      ownersOf: (card) => activeOwnersOf(card.contributors.slice(0, MAX_OWNERS), people),
       views: {
         cell: (cellId) => cellUrl(env.BLUEPRINT_APP_URL, cellId),
         slice: (cellIds) => measured(() => sliceCiting(env, cellIds)),

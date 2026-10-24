@@ -43,7 +43,7 @@ THE standing-automation registry. An automation absent from the table below is u
 | DS precedence check | Monday's end-of-day run: `ds-precedence-check`; morning run: `ds-precedence-post` | Bill | [`ds-precedence`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) |
 | DM watch | per person who switched it on — end-of-day run: `dm-promise-read`; morning run: `dm-promise-nudge` | Bill | [`dm-watch`](../../agents/uno-bot/scheduled-actions/dm-watch/ACTION.md) |
 | DM Capture | per person who switched it on — end-of-day run: `dm-capture-read`; morning run: `dm-capture-post` | Bill | [`sweep`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) § Capture |
-| Usage record upkeep | end-of-day run: `usage-classify`, `ask-resolution`, `proposal-expiry`; morning run: `team-roles-sync`; both runs: `usage-text-purge` | Bill | [`agents/uno-bot/README.md`](../../agents/uno-bot/README.md) (usage record) |
+| Usage record upkeep | end-of-day run: `team-roles-sync` (third, before every job that tags someone), `usage-classify`, `ask-resolution`, `proposal-expiry`; both runs: `usage-text-purge` | Bill | [`agents/uno-bot/README.md`](../../agents/uno-bot/README.md) (usage record) |
 | Figma tidy-up | Monday's morning run: `figma-tidy-read` jobs, then `figma-tidy-post` | Bill | [`src/figma-tidy/`](../../agents/uno-bot/src/figma-tidy/) |
 | Blueprint embeddings refresh | nightly cron (07:00 UTC) | Bill | [`uno-bot-embed-blueprint.yml`](../../.github/workflows/uno-bot-embed-blueprint.yml) |
 | Harness gate | every `pull_request` + on demand | Bill | [`check-harness.yml`](../../.github/workflows/check-harness.yml) → [`scripts/check-harness.mjs`](../../scripts/check-harness.mjs) |

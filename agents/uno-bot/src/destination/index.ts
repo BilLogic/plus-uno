@@ -37,8 +37,9 @@ export type Destination =
   | { rung: "team"; team: Team; channel: TeamChannel }
   | { rung: "design"; channel: "plus-design" };
 
-/** Who a finding names: a Slack person, tagged, or a Figma handle, named. */
-export type Addressee = { slack: string } | { figma: string };
+/** Who a finding names: a Slack person, tagged — never a Figma handle, and
+ *  only someone active on Team Members (`../usage/roles.ts` `isActive`). */
+export type Addressee = { slack: string };
 
 /** What the ladder reads about a finding. */
 export interface FindingContext {
@@ -46,11 +47,11 @@ export interface FindingContext {
    *  record, a check that reads none). */
   evidence: { channel: string; channelKind: ChannelKind; threadTs: string | null } | null;
   /** The linked Roadmap card: its Product Pillar values, and its design owner
-   *  as a Slack id. */
+   *  as a Slack id — the caller passes one only when they are active. */
   card?: { pillars: readonly string[]; designOwner?: string | null } | null;
   /** The Figma file the finding is about: its team as `FIGMA_TEAM_IDS` names
-   *  it, and its creator's handle. */
-  figmaFile?: { team?: string | null; creatorHandle?: string | null } | null;
+   *  it. Its creator is never named (#1361). */
+  figmaFile?: { team?: string | null } | null;
 }
 
 /**
@@ -73,9 +74,9 @@ function destinationOf({ evidence, card, figmaFile }: FindingContext): Destinati
   return team ? { rung: "team", team, channel: PILLAR_CHANNELS[team] } : { rung: "design", channel: "plus-design" };
 }
 
-function addresseeOf({ card, figmaFile }: FindingContext): Addressee | null {
-  if (card?.designOwner) return { slack: card.designOwner };
-  return figmaFile?.creatorHandle ? { figma: figmaFile.creatorHandle } : null;
+// With no design owner nobody is named, and the channel triages.
+function addresseeOf({ card }: FindingContext): Addressee | null {
+  return card?.designOwner ? { slack: card.designOwner } : null;
 }
 
 /** The team a pillar or Figma team names, in any case, or null for none. */

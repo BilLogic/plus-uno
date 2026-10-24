@@ -371,6 +371,12 @@ LEAD_USER_ID = "U03FYQJRQHX"
 # Unset, a card's own set is the whole of it (src/slack/standing-confirmers.ts).
 #   Bill U03FYQJRQHX · Bryan U09E652SJ02
 STANDING_CONFIRMER_IDS = "U03FYQJRQHX,U09E652SJ02"
+# DS owners, in turn: the weekly DS precedence report tags one a week, the
+# first listed on Monday 26 Oct 2026, skipping anyone whose Team Members row
+# is missing or Past Collaborators. Unset, it tags nobody
+# (src/ds-precedence/jobs.ts `precedenceOwner`, #1361).
+#   Bill U03FYQJRQHX · Bryan U09E652SJ02 · Cynthia Lu U0A6UTECM5Y
+DS_OWNER_USER_IDS = "U03FYQJRQHX,U09E652SJ02,U0A6UTECM5Y"
 
 # Secrets are set via `npm run secrets:set` (or `wrangler secret put`).
 # GENERATED from scripts/secrets.mjs — edit there, then `npm run check:secrets -- --fix`.

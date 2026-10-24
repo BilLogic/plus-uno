@@ -31,7 +31,7 @@ import type { CardOwner, ReportItem, StatedCardWords } from "../thread-state/ind
 import type { ProposalCard } from "../turn/index";
 import { dayWords } from "../figma-drift/copy";
 import type { DecisionUpdate } from "./draft";
-import { operationsOf, type FileOwner, type QueuedDecision, type QueuedFile } from "./queue";
+import { operationsOf, type FileOwner, type QueuedDecision, type QueuedFile, queuedSlackOf } from "./queue";
 import { rowWords } from "../decisions-db/row";
 import { CARD_WINDOW_WORDS } from "../card-expiry";
 
@@ -66,10 +66,11 @@ export function noPrdLine(file: Pick<QueuedFile, "title" | "url">, count: number
   return `${what} <${file.url}|${fileName(file)}> ${reads} with no PRD page to draft on; the details are in this thread.`;
 }
 
-/** Whom a card is for: the owner as a Slack person, else by Figma handle. */
+/** Whom a card is for: the owner as a Slack person, else nobody — never a
+ *  Figma handle, even one an older queue entry still carries (#1361). */
 function ownerOf(owner: FileOwner | null): CardOwner[] {
-  if (owner && "slack" in owner) return [{ slack: owner.slack }];
-  return owner ? [{ name: owner.figma }] : [];
+  const slack = queuedSlackOf(owner);
+  return slack ? [{ slack }] : [];
 }
 
 /** When the comment was resolved or made. */
