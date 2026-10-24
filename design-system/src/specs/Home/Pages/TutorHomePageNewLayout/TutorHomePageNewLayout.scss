@@ -36,12 +36,11 @@
     --color-outline: rgba(55, 53, 47, 0.09);
     --color-outline-variant: rgba(55, 53, 47, 0.16);
 
-    // Text: primary, secondary, tertiary. Secondary is #6f6e69 rather than the
-    // brief's #787774, which is 4.17:1 on the frame and fails AA; #6f6e69 holds
-    // 4.5:1 on all three surfaces. Tertiary (2.6:1) is for decorative glyphs only.
+    // Text: primary and secondary. Secondary is #6f6e69 rather than the brief's
+    // #787774, which is 4.17:1 on the frame and fails AA; #6f6e69 holds 4.5:1
+    // on all three surfaces.
     --color-on-surface: #37352f;
     --color-on-surface-variant: #6f6e69;
-    --plus-home-new-text-tertiary: #9b9a97;
 
     // Neutral hover and press washes.
     --color-on-surface-state-08: rgba(55, 53, 47, 0.05);
@@ -143,10 +142,11 @@
     }
 }
 
-// Doubled class: a glyph rule elsewhere sets icons to 12.
-.plus-home-new__callout-icon.plus-home-new__callout-icon {
-    font-size: var(--icon-lg);
-    color: var(--color-on-surface-variant);
+// The badge art takes the row's height, the small button's.
+.plus-home-new__callout-art {
+    display: block;
+    block-size: var(--size-200);
+    inline-size: auto;
 }
 
 .plus-home-new__callout-title {
@@ -272,17 +272,11 @@
     }
 }
 
-// A lesson's thumbnail: 16:9 in the subtle fill, the book icon centered.
+// A lesson's picture fills the card's width at 16:9.
 .plus-home-new__thumb {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
+    inline-size: 100%;
     aspect-ratio: 16 / 9;
+    object-fit: cover;
     background-color: var(--color-surface-variant);
-    color: var(--plus-home-new-text-tertiary);
-
-    // Doubled class: a glyph rule elsewhere sets icons to 12.
-    > .fa-solid.fa-solid {
-        font-size: var(--size-200);
-    }
 }

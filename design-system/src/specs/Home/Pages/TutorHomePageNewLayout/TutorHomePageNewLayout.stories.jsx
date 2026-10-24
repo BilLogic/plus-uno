@@ -191,6 +191,15 @@ const expectLessonsOnGrid = async (canvasElement, grid, perView) => {
     }
     await expect(getComputedStyle(strip).getPropertyValue('--plus-home-new-cards-per-view').trim()).toBe(String(perView));
 
+    // Each card shows its own decorative picture at 16:9.
+    const pictures = [...strip.querySelectorAll('.plus-home-new__thumb')];
+    await expect(pictures.length, 'a picture per lesson').toBe(strip.children.length);
+    await expect(new Set(pictures.map((img) => img.getAttribute('src'))).size, 'no two lessons share a picture').toBe(pictures.length);
+    for (const img of pictures) {
+        await expect(img.getAttribute('alt'), 'the picture is decorative').toBe('');
+        await expect(rect(img).width / rect(img).height, 'the picture is 16:9').toBeCloseTo(16 / 9, 1);
+    }
+
     // The strip scrolls, so it clips at its padding box: every card in view sits whole inside it.
     const sb = rect(strip);
     const clip = { left: sb.left + strip.clientLeft, top: sb.top + strip.clientTop, right: sb.left + strip.clientLeft + strip.clientWidth, bottom: sb.top + strip.clientTop + strip.clientHeight };

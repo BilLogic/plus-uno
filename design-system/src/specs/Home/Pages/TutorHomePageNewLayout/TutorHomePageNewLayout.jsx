@@ -5,12 +5,21 @@ import { Alert, Button, Count, NavTabs, Select, Status, Tag } from '@/components
 import { LineChart, RadarChart } from '@/dataviz';
 import PatternCard from '@/patterns/PatternCard';
 import PatternSection from '@/patterns/PatternSection';
+import badgeThumbnail from '@/assets/images/tutor-badges/unclaimed-v1-thumbnail.png';
+import lessonErrors from '@/assets/images/lessons/training-errors.svg';
+import lessonExplain from '@/assets/images/lessons/training-explain.svg';
+import lessonMindset from '@/assets/images/lessons/training-mindset.svg';
+import lessonPraise from '@/assets/images/lessons/training-praise.svg';
 import { cardsPerRow, useGridMeasure, useTokenLength } from './homeGrid';
 import './TutorHomePageNewLayout.scss';
+
+/** One picture per lesson card, so neighbors in the strip never repeat. */
+const LESSON_IMAGES = [lessonErrors, lessonExplain, lessonPraise, lessonMindset];
 
 /** Today's Home content, unchanged: the Skills (Home Page) frame in the Specs file. */
 const DEFAULT_LESSONS = [1, 2, 3].map((n) => ({
     id: String(n),
+    image: LESSON_IMAGES[n - 1],
     category: 'Mastering Content',
     title: 'Lesson Title',
     duration: '12 mins',
@@ -210,7 +219,7 @@ const TutorHomePageNewLayout = ({
                 )}
             >
                 <div className="plus-home-new__callout">
-                    <i className="fa-solid fa-award plus-home-new__callout-icon" aria-hidden="true" />
+                    <img className="plus-home-new__callout-art" src={badgeThumbnail} alt="" />
                     <p className="plus-home-new__callout-title">Certified Tutor</p>
                     <p className="plus-home-new__secondary">20/20 lessons complete</p>
                     <Button text="Claim" style="primary" fill="tonal" size="small" className="plus-home-new__callout-action" />
@@ -361,11 +370,7 @@ const TutorHomePageNewLayout = ({
                             <PatternCard
                                 padding="sm"
                                 title={lesson.title}
-                                image={(
-                                    <div className="plus-home-new__thumb">
-                                        <i className="fa-solid fa-book-open" aria-hidden="true" />
-                                    </div>
-                                )}
+                                image={lesson.image && <img className="plus-home-new__thumb" src={lesson.image} alt="" />}
                                 footer={<Button text="Review" style="primary" fill="filled" size="small" onClick={() => onReviewLesson?.(lesson.id)} />}
                             >
                                 <div className="plus-home-new__inline plus-home-new__inline--wrap">
@@ -405,6 +410,8 @@ TutorHomePageNewLayout.propTypes = {
         category: PropTypes.oneOf(Object.keys(CATEGORY_COLOR)),
         title: PropTypes.string.isRequired,
         duration: PropTypes.string,
+        /** The card's picture, decorative (empty alt). */
+        image: PropTypes.string,
         inProgress: PropTypes.bool,
         aiRecommended: PropTypes.bool,
     })),
