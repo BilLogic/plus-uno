@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import RBAlert from 'react-bootstrap/Alert';
-import CloseButton from '@/components/actions/CloseButton';
+import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import './Alert.scss';
 
 /** The six styles, as the Figma Alert set names them. */

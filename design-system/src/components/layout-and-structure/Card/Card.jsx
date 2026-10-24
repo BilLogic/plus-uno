@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import RBCard from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup'; // Use ListGroup for items if applicable, or custom divs
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 
 /**

@@ -3,7 +3,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import DateAndTimePicker from './DateAndTimePicker';
 
 export default {
-    title: 'Components/Forms and inputs/Date & time picker',
+    title: 'Components/Forms and inputs/Date time picker',
     component: DateAndTimePicker,
     tags: ['!dev', '!autodocs'],
     parameters: {

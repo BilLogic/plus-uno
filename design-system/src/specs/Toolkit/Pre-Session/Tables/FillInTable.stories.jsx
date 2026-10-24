@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Button from '@/components/actions/Button/Button';
-import Badge from '@/components/status-and-loading/Badge';
+import Button from '@/components/forms-and-inputs/Button/Button';
+import Badge from '@/components/labels/Badge';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
 
 export default {

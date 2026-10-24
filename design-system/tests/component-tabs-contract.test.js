@@ -28,33 +28,33 @@ describe('componentIdentity', () => {
   it('reads a nested component out of its story path', () => {
     expect(
       componentIdentity({
-        title: 'Components/Actions/Button',
-        importPath: './design-system/src/components/actions/Button/Button.stories.jsx',
+        title: 'Components/Forms and inputs/Button',
+        importPath: './design-system/src/components/forms-and-inputs/Button/Button.stories.jsx',
       }),
     ).toEqual({
       name: 'Button',
-      group: 'actions',
-      dir: 'design-system/src/components/actions/Button',
-      source: 'design-system/src/components/actions/Button/Button.jsx',
-      generatedDoc: 'design-system/src/components/actions/Button/index.md',
-      groupIndex: 'design-system/src/components/actions/index.md',
-      entryFile: 'design-system/src/components/actions/Button/Button.stories.jsx',
+      group: 'forms-and-inputs',
+      dir: 'design-system/src/components/forms-and-inputs/Button',
+      source: 'design-system/src/components/forms-and-inputs/Button/Button.jsx',
+      generatedDoc: 'design-system/src/components/forms-and-inputs/Button/index.md',
+      groupIndex: 'design-system/src/components/forms-and-inputs/index.md',
+      entryFile: 'design-system/src/components/forms-and-inputs/Button/Button.stories.jsx',
     });
   });
 
   it('reads the same component out of its MDX page', () => {
     const fromMdx = componentIdentity({
-      title: 'Components/Actions/Button',
-      importPath: './design-system/src/components/actions/Button/Button.mdx',
+      title: 'Components/Forms and inputs/Button',
+      importPath: './design-system/src/components/forms-and-inputs/Button/Button.mdx',
     });
     expect(fromMdx.name).toBe('Button');
-    expect(fromMdx.generatedDoc).toBe('design-system/src/components/actions/Button/index.md');
+    expect(fromMdx.generatedDoc).toBe('design-system/src/components/forms-and-inputs/Button/index.md');
   });
 
   it('reads a flat component, whose generated doc is <Name>.md beside the source', () => {
     expect(
       componentIdentity({
-        title: 'Components/Forms and inputs/Switch',
+        title: 'Components/Forms and inputs/Toggle',
         importPath: './design-system/src/components/forms-and-inputs/Switch.stories.jsx',
       }),
     ).toEqual({
@@ -85,7 +85,7 @@ describe('componentIdentity', () => {
 
   it('returns null rather than guessing when there is no import path', () => {
     expect(componentIdentity(undefined)).toBeNull();
-    expect(componentIdentity({ title: 'Components/Actions/Button' })).toBeNull();
+    expect(componentIdentity({ title: 'Components/Forms and inputs/Button' })).toBeNull();
   });
 });
 

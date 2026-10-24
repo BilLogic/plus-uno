@@ -6,7 +6,7 @@
  * Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4282-2368&m=dev
  */
 import React from 'react';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 import placeholderAvatar from '@/assets/images/avatars/profile-placeholder.svg';
 import filledAvatar from '@/assets/images/avatars/profile-filled.svg';
 

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 import useFieldId from './useFieldId';
 import './FileUpload.scss';
 

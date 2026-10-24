@@ -84,15 +84,15 @@ describe("a task card's details, output and sources", () => {
   });
 
   it("names a GitHub file or folder by its last segment, from a search as from a read", async () => {
-    const BUTTON = "https://github.com/BilLogic/plus-uno/blob/HEAD/design-system/src/components/actions/Button/Button.jsx";
-    const FOLDER = "https://github.com/BilLogic/plus-uno/tree/HEAD/design-system/src/components/actions/Button";
+    const BUTTON = "https://github.com/BilLogic/plus-uno/blob/HEAD/design-system/src/components/forms-and-inputs/Button/Button.jsx";
+    const FOLDER = "https://github.com/BilLogic/plus-uno/tree/HEAD/design-system/src/components/forms-and-inputs/Button";
     const searched = await finishedCard("github_read", { search: "Button" }, {
       ok: true,
-      hits: [{ path: "design-system/src/components/actions/Button/Button.jsx", url: BUTTON }],
+      hits: [{ path: "design-system/src/components/forms-and-inputs/Button/Button.jsx", url: BUTTON }],
     });
-    const listed = await finishedCard("github_read", { path: "design-system/src/components/actions/Button" }, {
+    const listed = await finishedCard("github_read", { path: "design-system/src/components/forms-and-inputs/Button" }, {
       ok: true,
-      path: "design-system/src/components/actions/Button",
+      path: "design-system/src/components/forms-and-inputs/Button",
       url: FOLDER,
       kind: "dir",
       entries: [],

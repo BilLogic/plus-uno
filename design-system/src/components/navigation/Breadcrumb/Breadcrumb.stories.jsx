@@ -10,7 +10,7 @@ const sampleItems = [
 ];
 
 export default {
-    title: 'Components/Navigation/Breadcrumb',
+    title: 'Components/Navigation/Breadcrumbs',
     component: Breadcrumb,
     tags: ['!dev', '!autodocs'],
     parameters: {

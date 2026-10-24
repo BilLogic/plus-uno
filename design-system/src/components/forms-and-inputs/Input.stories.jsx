@@ -4,7 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import Input from './Input';
 
 export default {
-    title: 'Components/Forms and inputs/Input',
+    title: 'Components/Forms and inputs/Text field',
     component: Input,
     tags: ['!dev', '!autodocs'],
     parameters: {

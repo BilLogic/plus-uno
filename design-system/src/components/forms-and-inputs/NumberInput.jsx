@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '../actions/Button/Button';
+import Button from './Button/Button';
 import useFieldId from './useFieldId';
 import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
 import { useDeprecatedFieldSize } from '../../lib/useDeprecatedLargeSize';

@@ -22,7 +22,7 @@
  *     gone, which is why Code renders a real props table.
  *
  * THE URL. The addon tabs put the active tab in the MANAGER's query string —
- * `?path=/docs/components-actions-button--docs&tab=plus-usage`, with Examples
+ * `?path=/docs/components-forms-and-inputs-button--docs&tab=plus-usage`, with Examples
  * being the ABSENCE of the param. Measured, not assumed. Those URLs have been
  * shared, so this reads and writes that same param in that same window, and
  * `TABS` keeps the same `plus-*` ids. A `tab` value matching no registered addon
@@ -70,7 +70,7 @@ function readTabParam(win) {
 function writeTabParam(win, id) {
   try {
     // Edited as TEXT, not through `URLSearchParams`. Storybook writes
-    // `?path=/docs/components-actions-button--docs` with the slashes unencoded;
+    // `?path=/docs/components-forms-and-inputs-button--docs` with the slashes unencoded;
     // a round-trip through `URL` re-encodes them to `%2F`, and while the page
     // still loads, the link a reader copies stops matching the one Storybook
     // produced. Every parameter that is not `tab` keeps its exact bytes.

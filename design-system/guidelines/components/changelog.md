@@ -22,7 +22,7 @@ change to that component already touches:
 
 ```jsx
 const meta = {
-  title: 'Components/Actions/Button',
+  title: 'Components/Forms and inputs/Button',
   component: Button,
   parameters: {
     changelog: [

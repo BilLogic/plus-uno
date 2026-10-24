@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 
 /**
  * Non-interactive spec strip for login action buttons (enabled and disabled).

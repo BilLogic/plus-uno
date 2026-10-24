@@ -135,6 +135,6 @@ Implemented as `InputGroupDropdown`.
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

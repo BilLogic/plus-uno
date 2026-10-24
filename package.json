@@ -95,6 +95,7 @@
     "check:docs-tabs": "node scripts/check-docs-tabs.mjs",
     "check:docs-token-literals": "node scripts/check-docs-token-literals.mjs",
     "check:docs-dead-selectors": "node scripts/check-docs-dead-selectors.mjs",
+    "check:storybook-categories": "node scripts/check-storybook-categories.mjs",
     "check:page-outline": "node scripts/check-page-outline.mjs",
     "check:intake-fsm": "node .cursor/hooks/uno-prototype/test-fsm.mjs",
     "check:typography-classes": "node scripts/check-typography-classes.mjs",

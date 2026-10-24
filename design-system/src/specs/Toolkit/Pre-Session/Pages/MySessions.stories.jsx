@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { StatCard } from '../Cards/OverviewCard.stories';
 import { TableRow, TableHeaderRow } from '../Tables/MySessions.stories';

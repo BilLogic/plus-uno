@@ -33,15 +33,18 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const COMPONENTS_ROOT = path.join(REPO_ROOT, 'design-system/src/components');
 const CHECK = process.argv.includes('--check');
 
-/** Groups are the folders directly under components/, minus the barrel files. */
+/**
+ * Groups are the folders directly under components/, minus the barrel files.
+ * Each folder is a category from `storybook.taxonomy.json` in kebab case, so
+ * the title is read from there rather than listed a second time;
+ * `check:storybook-categories` holds folders and taxonomy together.
+ */
 const GROUP_TITLES = {
-  actions: 'Actions',
-  'forms-and-inputs': 'Forms and inputs',
-  'layout-and-structure': 'Layout and structure',
-  messaging: 'Messaging',
-  navigation: 'Navigation',
-  overlays: 'Overlays',
-  'status-and-loading': 'Status and loading',
+  ...Object.fromEntries(
+    Object.keys(
+      JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'storybook.taxonomy.json'), 'utf8')).componentGroups,
+    ).map((category) => [category.toLowerCase().replace(/ /g, '-'), category]),
+  ),
   _internal: 'Internal',
 };
 

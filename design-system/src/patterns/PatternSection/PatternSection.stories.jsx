@@ -1,7 +1,7 @@
 import React from 'react';
 import PatternSection from '@/patterns/PatternSection';
 import PatternCard from '@/patterns/PatternCard';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 
 const col = { display: 'flex', flexDirection: 'column', gap: '32px' };
 

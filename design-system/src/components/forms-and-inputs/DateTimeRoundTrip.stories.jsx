@@ -27,7 +27,7 @@ import DateAndTimePicker from './DateAndTimePicker';
  * why the cover is an interaction and a rendered value rather than a snapshot.
  */
 export default {
-    title: 'Components/Forms and Inputs/Date and time round trip',
+    title: 'Components/Forms and inputs/Date time round trip',
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {

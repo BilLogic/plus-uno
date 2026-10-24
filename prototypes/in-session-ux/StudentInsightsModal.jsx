@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { GaugeChart, HeatmapChart } from '@/dataviz';
-import Button from '@/components/actions/Button';
-import Badge from '@/components/status-and-loading/Badge';
-import ButtonGroup from '@/components/actions/ButtonGroup';
+import Button from '@/components/forms-and-inputs/Button';
+import Badge from '@/components/labels/Badge';
+import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
 import NavTabs from '@/components/navigation/NavTabs';
 import Accordion from '@/components/layout-and-structure/Accordion';
 

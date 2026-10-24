@@ -11,7 +11,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { INVERSE_GROUNDS } from '../../design-system/src/components/actions/CloseButton/inverseGrounds.js';
+import { INVERSE_GROUNDS } from '../../design-system/src/components/forms-and-inputs/CloseButton/inverseGrounds.js';
 import {
   GLYPH_PARTIAL,
   GLYPH_SELECTORS,
@@ -247,7 +247,7 @@ test('OverviewCard names no glyph by hand: each non-text color opens an icon-gly
 test("CloseButton's exported inverse grounds match the @grounds on its inverse tone", () => {
   const scss = path.resolve(
     path.dirname(fileURLToPath(import.meta.url)),
-    '../../design-system/src/components/actions/CloseButton/CloseButton.scss',
+    '../../design-system/src/components/forms-and-inputs/CloseButton/CloseButton.scss',
   );
   const tokens = groundsOfSelector(fs.readFileSync(scss, 'utf8'), '.plus-close-btn--inverse');
   assert.deepEqual(tokens, INVERSE_GROUNDS);

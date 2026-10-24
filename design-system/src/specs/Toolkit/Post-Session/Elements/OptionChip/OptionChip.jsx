@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/actions/Button';
-import Tooltip from '@/components/overlays/Tooltip';
+import Button from '@/components/forms-and-inputs/Button';
+import Tooltip from '@/components/overlays-and-layering/Tooltip';
 import './OptionChip.scss';
 
 /** Hover delay matching Figma Multi-Select annotation (≥2s). */

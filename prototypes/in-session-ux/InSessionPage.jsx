@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 /** Same layout as home-redesign reference: spec PageLayout (correct container: background, border, TopBar, Sidebar, content wrapper). */
 import { PageLayout } from '@/specs/Universal/Pages';
-import Button from '@/components/actions/Button';
-import Badge from '@/components/status-and-loading/Badge';
+import Button from '@/components/forms-and-inputs/Button';
+import Badge from '@/components/labels/Badge';
 import ManageAssignmentModal from './ManageAssignmentModal';
 
 import StudentInsightsModal from './StudentInsightsModal';

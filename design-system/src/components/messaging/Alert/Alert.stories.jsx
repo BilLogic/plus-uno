@@ -6,7 +6,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import Alert, { ALERT_ICONS, ALERT_STYLES } from './Alert';
 
 export default {
-    title: 'Components/Messaging/Alert',
+    title: 'Components/Messaging/Section message',
     component: Alert,
     tags: ['!dev', '!autodocs'],
     parameters: {

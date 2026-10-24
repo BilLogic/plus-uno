@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Status from '../../status-and-loading/Status';
+import Status from '../../labels/Status';
 import './UserAvatar.scss';
 
 /** The role a user type shows beside the name. Types not listed show none. */

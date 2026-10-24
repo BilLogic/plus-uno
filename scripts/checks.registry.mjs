@@ -524,6 +524,21 @@ export const CHECKS = [
       + 'that half is `check:docs-chrome`, in a browser.',
   },
   {
+    name: 'check:storybook-categories',
+    script: 'node scripts/check-storybook-categories.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-storybook-categories.mjs',
+    floors: { MIN_FILES: 90 },
+    guards:
+      "that component folders and Storybook titles keep Atlassian's categories. Every folder " +
+      'under `design-system/src/components/` is a category in kebab case (or `_internal`), every ' +
+      'component story is titled `Components/<category>/…` with its own folder\'s category, every ' +
+      'segment after it is sentence case, the taxonomy lists the categories in Atlassian\'s order, ' +
+      'and no tracked file names a retired folder. Storybook renders a stale title as a group of ' +
+      'its own, so a story copied from an older file would otherwise bring the old group back.',
+  },
+  {
     name: 'check:page-outline',
     script: 'node scripts/check-page-outline.mjs',
     pkg: 'root',

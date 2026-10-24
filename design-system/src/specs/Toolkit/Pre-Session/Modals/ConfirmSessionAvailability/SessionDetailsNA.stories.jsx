@@ -1,8 +1,8 @@
 import React from 'react';
 import Modal from '@/components/messaging/Modal';
-import ButtonGroup from '@/components/actions/ButtonGroup';
-import Button from '@/components/actions/Button';
-import Badge from '@/components/status-and-loading/Badge';
+import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
+import Button from '@/components/forms-and-inputs/Button';
+import Badge from '@/components/labels/Badge';
 import { SessionInfoCard } from '@/specs/Toolkit/Pre-Session/Cards/SessionInfoCard.stories';
 import { RequestCallOffButton, JoinSessionButton } from '@/specs/Toolkit/Pre-Session/Elements/CTATutorViewButtons.stories';
 import { SupervisorControlsDropdown } from '@/specs/Toolkit/Pre-Session/Elements/SupervisorControls/SupervisorControls.stories';

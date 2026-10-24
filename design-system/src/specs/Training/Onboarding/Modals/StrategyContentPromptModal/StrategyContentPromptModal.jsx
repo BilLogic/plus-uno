@@ -7,7 +7,7 @@
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 import Textarea from '@/components/forms-and-inputs/Textarea';
 import './StrategyContentPromptModal.scss';
 

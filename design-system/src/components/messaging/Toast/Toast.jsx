@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Toast as BootstrapToast, ToastContainer as BootstrapToastContainer } from 'react-bootstrap';
-import CloseButton from '@/components/actions/CloseButton';
+import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import './Toast.scss';
 
 /**

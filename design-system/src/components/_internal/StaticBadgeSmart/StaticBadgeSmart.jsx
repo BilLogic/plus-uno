@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Tag, { TAG_COLOR_OF_CURRICULUM } from '@/components/status-and-loading/Tag';
+import Tag, { TAG_COLOR_OF_CURRICULUM } from '@/components/labels/Tag';
 import { SMART_CONSTANTS } from '@/components/constants';
 
 /**

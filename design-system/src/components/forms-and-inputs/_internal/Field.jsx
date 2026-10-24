@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Tooltip from '../../overlays/Tooltip/Tooltip';
+import Tooltip from '../../overlays-and-layering/Tooltip/Tooltip';
 import './Field.scss';
 
 /**

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import { FilterSelect } from '@/specs/Toolkit/Pre-Session/Elements/Filters/FilterSelect';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { TableRow, TableHeaderRow } from '../Tables/StudentList.stories';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Tooltip from '@/components/overlays/Tooltip/Tooltip';
+import Tooltip from '@/components/overlays-and-layering/Tooltip/Tooltip';
 import './OptionRow.scss';
 
 /** The Figma row's Leading slot holds at most this many items. */

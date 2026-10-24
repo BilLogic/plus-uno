@@ -1,6 +1,6 @@
 import React from 'react';
 import PatternModal from '@/patterns/PatternModal';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 
 const modalFrame = { maxWidth: '480px', width: '100%' };
 

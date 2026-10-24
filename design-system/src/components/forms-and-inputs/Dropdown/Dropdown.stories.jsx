@@ -5,7 +5,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import Dropdown from './Dropdown';
 
 export default {
-    title: 'Components/Forms and inputs/Dropdown',
+    title: 'Components/Forms and inputs/Dropdown menu',
     component: Dropdown,
     tags: ['!dev', '!autodocs'],
     parameters: {

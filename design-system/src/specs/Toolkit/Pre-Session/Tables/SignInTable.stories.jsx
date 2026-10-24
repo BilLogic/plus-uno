@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 
 export default {
     tags: ['!dev', '!autodocs'],

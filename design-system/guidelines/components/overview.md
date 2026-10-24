@@ -8,17 +8,23 @@ summary: What each component is for, when to reach for it, and how it composes
 
 What each component is for, when to reach for it, and how it composes.
 
-## Start here — the seven group overviews
+## Start here — the group overviews
 
-"Which component do I reach for" is answered per group, not in one list:
+Groups follow Atlassian's component categories, in Atlassian's order, and
+"which component do I reach for" is answered per group, not in one list:
 
-- [Actions](actions.md) — `Button`, `ButtonGroup`
-- [Forms and inputs](forms-and-inputs.md) — 23 components, sorted by the shape of the answer
+- [Forms and inputs](forms-and-inputs.md) — fields sorted by the shape of the answer, then `Button`, `ButtonGroup` and `CloseButton`
+- Images and icons — `Tile` alone, so its docs page is the whole guidance
+- [Labels](labels.md) — `Status`, `Count`, `Tag`, `TagGroup`, `Suggestion`, `AiLabel`, and the deprecated `Badge`
 - [Layout and structure](layout-and-structure.md) — nine containers
+- [Loading](loading.md) — `Progress`, `Skeleton`, `Spinner`
 - [Messaging](messaging.md) — `Alert`, `Toast`, `Modal`
 - [Navigation](navigation.md) — six, sorted by what the user moves between
-- [Overlays](overlays.md) — `Tooltip`, `Popover`
-- [Status and loading](status-and-loading.md) — `Badge`, `Progress`, `Spinner`
+- [Overlays and layering](overlays-and-layering.md) — `Tooltip`, `Popover`
+
+Storybook titles components with Atlassian's display names (Text field,
+Toggle, Section message, Popup); code exports keep theirs. Each group
+overview names its own pairs.
 
 Facts about a single component — props, variants, defaults, tokens touched,
 related components — are generated from source into each component's own

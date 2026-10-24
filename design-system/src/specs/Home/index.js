@@ -7,7 +7,7 @@ import { createPageLayout } from '../Universal/Pages/PageLayout.js';
 import { createSection } from '@/components/_internal/Section/index.js';
 import { createCard } from '@/components/layout-and-structure/Card/index.js';
 import { createTable } from '@/components/_internal/Table/index.js';
-import { createButton } from '@/components/actions/Button/index.js';
+import { createButton } from '@/components/forms-and-inputs/Button/index.js';
 
 // Export Home Cards
 export * from './Cards';

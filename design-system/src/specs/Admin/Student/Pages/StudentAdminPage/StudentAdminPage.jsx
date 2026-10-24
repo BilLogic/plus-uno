@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import ModalManager from '@restart/ui/ModalManager';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { useOpenTabs } from '@/patterns';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import Pagination from '@/components/navigation/Pagination/Pagination';
 import StudentsTable from '@/specs/Admin/Student/Tables/StudentsTable/StudentsTable';
 import StudentOverviewSection from '@/specs/Admin/Student/Sections/StudentOverviewSection/StudentOverviewSection';

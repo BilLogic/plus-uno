@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import Button from '@/components/actions/Button/Button';
-import Badge from '@/components/status-and-loading/Badge/Badge';
+import Button from '@/components/forms-and-inputs/Button/Button';
+import Badge from '@/components/labels/Badge/Badge';
 import Alert from '@/components/messaging/Alert/Alert';
-import Progress from '@/components/status-and-loading/Progress/Progress';
+import Progress from '@/components/loading/Progress/Progress';
 import Accordion from '@/components/layout-and-structure/Accordion/Accordion';
 import Input from '@/components/forms-and-inputs/Input';
 import { RecommendedLessons } from '@/specs/Home/Cards';

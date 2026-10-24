@@ -44,7 +44,7 @@
  */
 import React, { useState } from 'react';
 import Range from '@/components/forms-and-inputs/Range';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 
 export default {
     title: 'Specs/Profile/Modals/Preview Image',

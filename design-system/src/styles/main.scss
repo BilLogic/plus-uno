@@ -28,13 +28,13 @@
 // Use @import to ensure global scope availability for @extend (e.g. Dropdown extends Checkbox)
 // Commented lines = no matching .scss in components/ or component lives elsewhere (e.g. forms/).
 // Prototypes and any app that imports main.scss get styles only for uncommented components.
-@import "../components/actions/Button/Button";
+@import "../components/forms-and-inputs/Button/Button";
 @import "../components/navigation/Breadcrumb/Breadcrumb";
-@import "../components/status-and-loading/Badge/Badge";
+@import "../components/labels/Badge/Badge";
 
 @import "../components/layout-and-structure/Divider/Divider";
 
-@import "../components/actions/ButtonGroup/ButtonGroup";
+@import "../components/forms-and-inputs/ButtonGroup/ButtonGroup";
 // @import "../components/Checkbox/Checkbox"; // no Checkbox component in components/
 @import "../components/forms-and-inputs/Dropdown/Dropdown";
 
@@ -155,12 +155,12 @@
 @import "../components/layout-and-structure/Collapse/Collapse";
 @import "../components/layout-and-structure/Jumbotron/Jumbotron";
 @import "../components/layout-and-structure/MediaObject/MediaObject";
-@import "../components/status-and-loading/Progress/Progress";
-@import "../components/status-and-loading/Spinner/Spinner";
+@import "../components/loading/Progress/Progress";
+@import "../components/loading/Spinner/Spinner";
 @import "../components/_internal/LoadingGif/LoadingGif";
-@import "../components/overlays/Popover/Popover";
+@import "../components/overlays-and-layering/Popover/Popover";
 @import "../components/navigation/Pagination/Pagination";
-@import "../components/overlays/Tooltip/Tooltip";
+@import "../components/overlays-and-layering/Tooltip/Tooltip";
 @import "../components/messaging/Toast/Toast";
 @import "../components/navigation/Scrollspy/Scrollspy";
 // @import "../components/forms-and-inputs/RichTextEditor/RichTextEditor"; // no RichTextEditor.scss in components/

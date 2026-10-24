@@ -48,8 +48,8 @@
  * - Save button gets set active upon any edits
  */
 import React from 'react';
-import Tooltip from '@/components/overlays/Tooltip/Tooltip';
-import Button from '@/components/actions/Button/Button';
+import Tooltip from '@/components/overlays-and-layering/Tooltip/Tooltip';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import { StudentTypeDropdown } from '../Elements/StudentTypeDropdown.stories';
 import { University } from '../Elements/University.stories';
 import { GradYearDropdown } from '../Elements/GradYearDropdown.stories';

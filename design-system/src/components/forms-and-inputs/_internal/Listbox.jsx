@@ -10,7 +10,7 @@ import React, {
 } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
-import Spinner from '@/components/status-and-loading/Spinner/Spinner';
+import Spinner from '@/components/loading/Spinner/Spinner';
 import OptionRow from './OptionRow';
 import { popupLayerOf, useAnchoredPopup } from './anchorPlacement';
 import './Listbox.scss';

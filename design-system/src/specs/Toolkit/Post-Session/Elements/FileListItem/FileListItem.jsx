@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 
 /**
  * Uploaded file row (Figma Elements · File List Item `10750:475180`).

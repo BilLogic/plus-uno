@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { createOpenTabsStore, OPEN_TABS_STORAGE_KEY, OpenTabsProvider, useOpenTabs } from '@/patterns';
 import { SessionInfo_PostSignUp } from '../Modals/SessionDetailsAllUser/SessionDetails.stories';

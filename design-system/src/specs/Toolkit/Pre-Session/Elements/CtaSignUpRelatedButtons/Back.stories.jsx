@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/CTA Sign-Up Related Buttons/Back',

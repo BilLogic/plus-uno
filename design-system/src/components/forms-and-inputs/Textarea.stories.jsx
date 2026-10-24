@@ -4,7 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import Textarea from './Textarea';
 
 export default {
-    title: 'Components/Forms and inputs/Textarea',
+    title: 'Components/Forms and inputs/Text area',
     component: Textarea,
     tags: ['!dev', '!autodocs'],
     parameters: {
