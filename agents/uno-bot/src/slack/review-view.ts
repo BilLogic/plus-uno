@@ -379,11 +379,10 @@ const REPLACED_CARD = "This proposal was replaced by a newer one. Review the new
  *  does (`decision-cards.ts` `shownAs`). */
 const ITEM_EXPIRED = "Closed, no decision.";
 
-/** When a card closed, as View says it: "Oct 19 at 09:13 ET" — the 24-hour
- *  clock the decided card's subtitle reads ("written 09:13"). */
+/** When a card closed, as View says it: "Oct 19 at 9:13 AM ET". */
 export function closedWhen(at: number): string {
   const part = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", ...opts }).format(new Date(at));
-  return `${part({ month: "short", day: "numeric" })} at ${part({ hour: "numeric", minute: "2-digit", hourCycle: "h23" })} ET`;
+  return `${part({ month: "short", day: "numeric" })} at ${part({ hour: "numeric", minute: "2-digit" })} ET`;
 }
 
 /** Words split at their first full stop: the outcome, and what follows it. */
@@ -397,13 +396,13 @@ function firstSentence(text: string): [string, string] {
  * then a rich text line with who closed it and when, and what else there is
  * to say. Decided: "Approved.", "Rejected.", "Answered." on a card with its
  * own answers, "Noted." or "Withdrawn.", over "Approved by @Bill on Oct 19 at
- * 09:13 ET to post in #channel." or "Noted by @Bill on Oct 19 at 09:13
+ * 9:13 AM ET to post in #channel." or "Noted by @Bill on Oct 19 at 9:13 AM
  * ET: deliberate.". Replaced or out of time, it says what Review says of such
  * a card, over when: "This proposal was replaced by a newer one." over
- * "Replaced on Oct 19 at 09:13 ET, after @Bill asked for changes. Review
+ * "Replaced on Oct 19 at 9:13 AM ET, after @Bill asked for changes. Review
  * the newest card in the thread instead.", or its expired words — a stated
  * card's own, a report item's "Closed, no decision." — over "Closed on Oct
- * 21 at 09:00 ET.". A card closed before the time was kept names no time.
+ * 21 at 9:00 AM ET.". A card closed before the time was kept names no time.
  */
 function decidedAlert(
   decided: NonNullable<DraftAccess["decided"]>,
