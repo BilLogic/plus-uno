@@ -42,6 +42,7 @@ The surface container is the **app frame**: a 32 topbar over a row holding the s
 ### Behavior
 
 - **Peek** — hovering the toggle or the frame's left edge opens a closed sidebar floating over the page: `--surface-overlay` with `--surface-overlay-shadow`, no scrim, and the page does not move. An outside click, Escape, or the pointer leaving closes it.
+- **Under a modal** — opening a modal closes a floating sidebar, and a docked one stays. While the modal is open the sidebar does not peek, and Escape closes the modal only. Focus goes back to what opened the modal, or to the toggle when that was inside the floating sidebar.
 - **Dock** — clicking the toggle docks a closed or peeking sidebar at any width, and closes a docked one. Docked below 1024, the surface is narrower than the content minimum, so it scrolls sideways while the topbar stays put.
 - Crossing 1024 returns the sidebar to that width's default.
 

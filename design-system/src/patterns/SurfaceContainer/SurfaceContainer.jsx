@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { openOverlayCount, subscribeOverlays } from '@/lib/overlayStack';
 import Topbar from '../Topbar';
 import { SidebarControlContext } from './SidebarControl';
 import './SurfaceContainer.scss';
@@ -63,6 +64,12 @@ const useWide = (ref) => {
  * - Hovering the toggle or the left edge peeks a closed sidebar: it floats over
  *   the page with a shadow and no scrim, so the page does not move. An outside
  *   click, Escape, or the pointer leaving closes the peek.
+ * - Opening a modal closes a floating sidebar and leaves a docked one alone,
+ *   and while a modal is open the sidebar does not peek. The frame hears it
+ *   from the document's overlay stack (`@/lib/overlayStack`), so a page does
+ *   not wire its modals to the frame. A modal opened from inside the floating
+ *   sidebar hands focus to the toggle when it closes, since its trigger left
+ *   with the sidebar.
  * - Clicking the toggle docks a closed or peeking sidebar, at any width, and
  *   closes a docked one. Docked below 1024, the surface is narrower than the
  *   content minimum (720), so the surface scrolls sideways.
@@ -112,6 +119,8 @@ const SurfaceContainer = ({
 
     const peek = useCallback(() => {
         cancelLeave();
+        // Under an open modal the sidebar stays put.
+        if (openOverlayCount() > 0) return;
         setState((s) => (s === 'closed' ? 'peek' : s));
     }, [cancelLeave]);
 
@@ -128,6 +137,23 @@ const SurfaceContainer = ({
         setState((s) => (s === 'docked' ? 'closed' : 'docked'));
     }, [cancelLeave]);
 
+    // Opening a modal closes a floating sidebar; a docked one stays. A modal
+    // opened from inside the floating sidebar loses its trigger with it, so
+    // once that modal closes, focus goes to the toggle.
+    const stateRef = useRef(state);
+    stateRef.current = state;
+    const focusToggleOnClose = useRef(false);
+    useEffect(() => subscribeOverlays((event) => {
+        if (event.type === 'open' && stateRef.current === 'peek') {
+            cancelLeave();
+            focusToggleOnClose.current = Boolean(sidebarRef.current?.contains(document.activeElement));
+            setState('closed');
+        } else if (event.type === 'focus-lost' && focusToggleOnClose.current) {
+            focusToggleOnClose.current = false;
+            toggleRef.current?.focus();
+        }
+    }), [cancelLeave]);
+
     // A peek closes on an outside press or Escape; the toggle and the panel are inside.
     useEffect(() => {
         if (state !== 'peek') return undefined;
@@ -136,8 +162,9 @@ const SurfaceContainer = ({
             setState('closed');
         };
         const onKeyDown = (e) => {
-            // A control that handled its own Escape (a menu, a field) keeps it.
-            if (e.key !== 'Escape' || e.defaultPrevented) return;
+            // A control that handled its own Escape (a menu, a field) keeps it,
+            // and so does an open modal.
+            if (e.key !== 'Escape' || e.defaultPrevented || openOverlayCount() > 0) return;
             setState('closed');
             toggleRef.current?.focus();
         };

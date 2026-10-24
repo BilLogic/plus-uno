@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Sidebar } from '@/components';
+import { Button, Modal, Sidebar } from '@/components';
 import { SurfaceContainer, Topbar } from '@/patterns';
 import { computedShadow, px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
@@ -286,5 +286,114 @@ export const ContentGrid = {
         const gutter = tokenLength(frame, '--layout-gutter');
         await expect(rect(four).width, 'four columns and three gutters').toBeCloseTo(4 * column + 3 * gutter, 0);
         await expect(rect(eight).left - rect(four).right, 'one gutter between').toBeCloseTo(gutter, 0);
+    }),
+};
+
+/* ------------------------------------------------------------- modals */
+
+/**
+ * A page with a modal. Opening a modal closes a floating sidebar and leaves a
+ * docked one alone; Escape then closes the modal only, and focus goes back to
+ * what opened it. A trigger inside the floating sidebar leaves with the
+ * sidebar, so focus goes to the sidebar toggle instead.
+ */
+const WithModal = (args) => {
+    const [open, setOpen] = useState(false);
+    const close = () => setOpen(false);
+    return (
+        <div style={{ height: '100vh' }}>
+            <SurfaceContainer
+                topbar={<Topbar breadcrumbs={[{ text: 'Home', href: '#' }, { text: 'Dashboard' }]} />}
+                sidebar={(
+                    <>
+                        <Sidebar user="tutor" activeTabId="home" />
+                        <Button text="Preferences" fill="outline" onClick={() => setOpen(true)} />
+                    </>
+                )}
+                {...args}
+            >
+                <div>
+                    <Button text="Page settings" onClick={() => setOpen(true)} />
+                </div>
+                {slot('Content slot')}
+            </SurfaceContainer>
+            <Modal
+                show={open}
+                width="sm"
+                title="Settings"
+                body="Opening this closed the floating sidebar."
+                primaryButton={{ text: 'Done', onClick: close }}
+                onClose={close}
+            />
+        </div>
+    );
+};
+
+const dialog = (canvasElement) => within(canvasElement.ownerDocument.body).queryByRole('dialog', { name: 'Settings' });
+
+/** Hover the toggle until the sidebar floats over the page. */
+const peekSidebar = async ({ toggle, sidebar }) => {
+    await userEvent.hover(toggle);
+    await waitFor(() => expect(sidebar()).not.toBeNull());
+    await expect(getComputedStyle(sidebar()).position, 'floating').toBe('absolute');
+};
+
+/** 768: a modal opened from the page closes the floating sidebar; Escape closes the modal only. */
+export const ModalClosesFloatingSidebar = {
+    render: WithModal,
+    play: async ({ canvasElement }) => atViewport(768, async () => {
+        const p = parts(canvasElement);
+        await peekSidebar(p);
+
+        // A keyboard press on a page button, so no outside click closes the peek first.
+        const trigger = p.canvas.getByRole('button', { name: 'Page settings' });
+        trigger.focus();
+        await userEvent.keyboard('{Enter}');
+        await waitFor(() => expect(dialog(canvasElement)).not.toBeNull());
+        await waitFor(() => expect(p.sidebar(), 'the floating sidebar closed').toBeNull());
+
+        // Escape closes the modal, and only the modal.
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(dialog(canvasElement)).toBeNull());
+        await expect(p.sidebar(), 'the sidebar stays closed').toBeNull();
+        await waitFor(() => expect(canvasElement.ownerDocument.activeElement, 'focus is back on the trigger').toBe(trigger));
+    }),
+};
+
+/** 768: a trigger inside the floating sidebar leaves with it; focus lands on the toggle. */
+export const ModalFromFloatingSidebar = {
+    render: WithModal,
+    play: async ({ canvasElement }) => atViewport(768, async () => {
+        const p = parts(canvasElement);
+        await peekSidebar(p);
+
+        await userEvent.click(within(p.sidebar()).getByRole('button', { name: 'Preferences' }));
+        await waitFor(() => expect(dialog(canvasElement)).not.toBeNull());
+        await waitFor(() => expect(p.sidebar(), 'the floating sidebar closed').toBeNull());
+
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(dialog(canvasElement)).toBeNull());
+        await expect(p.sidebar()).toBeNull();
+        await waitFor(() => expect(canvasElement.ownerDocument.activeElement, 'focus goes to the toggle').toBe(p.toggle));
+    }),
+};
+
+/** 1024: a docked sidebar stays docked under a modal. */
+export const ModalLeavesDockedSidebar = {
+    render: WithModal,
+    play: async ({ canvasElement }) => atViewport(1024, async () => {
+        const p = parts(canvasElement);
+        await waitFor(() => expect(p.sidebar(), 'docked from 1024').not.toBeNull());
+
+        const trigger = p.canvas.getByRole('button', { name: 'Page settings' });
+        await userEvent.click(trigger);
+        await waitFor(() => expect(dialog(canvasElement)).not.toBeNull());
+        await expect(p.sidebar(), 'still docked').not.toBeNull();
+        await expect(getComputedStyle(p.sidebar()).position).toBe('static');
+
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(dialog(canvasElement)).toBeNull());
+        await expect(p.sidebar(), 'still docked after Escape').not.toBeNull();
+        await waitFor(() => expect(canvasElement.ownerDocument.activeElement, 'focus is back on the trigger').toBe(trigger));
     }),
 };

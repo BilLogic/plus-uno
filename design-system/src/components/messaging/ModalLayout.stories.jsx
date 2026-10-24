@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import Modal from './Modal';
 import { Select } from '@/components';
@@ -350,6 +350,69 @@ NestedConfirm.play = async ({ canvasElement }) => {
     await waitFor(() => expect(doc.queryByText('Discard changes?')).toBeNull());
     await expect(doc.getByText('Edit session')).toBeInTheDocument();
     await expect(inner.isConnected).toBe(false);
+};
+
+/**
+ * At most two overlays stack. A third is refused rather than replacing the
+ * top one: it does not open, development builds warn, and the two below keep
+ * working.
+ */
+export const ThirdOverlayStaysClosed = () => {
+    const [confirming, setConfirming] = useState(false);
+    const [third, setThird] = useState(false);
+    return (
+        <Modal
+            show
+            width="md"
+            title="Edit session"
+            body="Discarding loses your changes."
+            secondaryButton={{ text: 'Discard', onClick: () => setConfirming(true) }}
+            primaryButton={{ text: 'Save' }}
+            onClose={() => {}}
+        >
+            <Modal
+                show={confirming}
+                width="sm"
+                title="Discard changes?"
+                body="This cannot be undone."
+                secondaryButton={{ text: 'Why?', onClick: () => setThird(true) }}
+                primaryButton={{ text: 'Keep editing', onClick: () => setConfirming(false) }}
+                onClose={() => setConfirming(false)}
+            >
+                <Modal
+                    show={third}
+                    width="sm"
+                    title="A third overlay"
+                    body="This should never show."
+                    showBottomButtons={false}
+                    onClose={() => setThird(false)}
+                />
+            </Modal>
+        </Modal>
+    );
+};
+
+ThirdOverlayStaysClosed.play = async ({ canvasElement }) => {
+    const doc = documentOf(canvasElement);
+    const warn = spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+        const outer = await dialogOf(canvasElement, 'Edit session');
+        await userEvent.click(within(outer).getByRole('button', { name: 'Discard' }));
+        const inner = await dialogOf(canvasElement, 'Discard changes?');
+        await userEvent.click(within(inner).getByRole('button', { name: 'Why?' }));
+
+        await waitFor(() => expect(warn).toHaveBeenCalledWith(expect.stringMatching(/At most 2 overlays stack/)));
+        await expect(doc.queryByText('A third overlay'), 'the third does not open').toBeNull();
+        await expect(canvasElement.ownerDocument.querySelectorAll('.modal-backdrop')).toHaveLength(2);
+
+        // The confirm still works: Escape closes it and leaves the first modal.
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(doc.queryByText('Discard changes?')).toBeNull());
+        await expect(doc.getByText('Edit session')).toBeInTheDocument();
+        await expect(canvasElement.ownerDocument.querySelectorAll('.modal-backdrop')).toHaveLength(1);
+    } finally {
+        warn.mockRestore();
+    }
 };
 
 /* -------------------------------------------------------------------------- */
