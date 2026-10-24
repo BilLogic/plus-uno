@@ -53,7 +53,8 @@ const OverlayContext = createContext(null);
  * Takes a place in the document's overlay stack while `active`.
  *
  * Opening one tells the app frame, which closes a floating sidebar. A third
- * overlay gets no place and stays closed (see `@/lib/overlayStack`). The
+ * overlay gets no place: it stays closed and calls `onRefused`, so its owner's
+ * state says closed too and the trigger works again once there is room. The
  * element that had focus is kept, so a trigger that left the page with the
  * sidebar can be reported once the modal has closed.
  *
@@ -61,16 +62,22 @@ const OverlayContext = createContext(null);
  * does not flash closed.
  *
  * @param {boolean} active
+ * @param {() => void} [onRefused]
  * @returns {[boolean, React.MutableRefObject<Element | null>]} whether it has a place, and its trigger
  */
-function useOverlayPlace(active) {
+function useOverlayPlace(active, onRefused) {
     const [placed, setPlaced] = useState(false);
     const trigger = useRef(null);
+    const refused = useRef(onRefused);
+    refused.current = onRefused;
     useLayoutEffect(() => {
         if (!active) return undefined;
         trigger.current = typeof document === 'undefined' ? null : document.activeElement;
         const handle = openOverlay();
-        if (!handle) return undefined;
+        if (!handle) {
+            refused.current?.();
+            return undefined;
+        }
         setPlaced(true);
         return () => {
             handle.release();
@@ -159,14 +166,17 @@ const Modal = ({
     const bodyRef = useRef(null);
 
     const parent = useContext(OverlayContext);
-    const depth = renderAs === 'modal' ? (parent?.depth ?? 0) + 1 : parent?.depth ?? 0;
-    const overlay = useMemo(() => ({
-        depth,
-        element: () => panelRef.current?.closest('.modal') ?? null,
-    }), [depth]);
-
-    const [placed, trigger] = useOverlayPlace(show && renderAs === 'modal');
+    // A modal raised from a modal waits for that modal's place, so when both
+    // mount open the outer one takes its place first.
+    const [placed, trigger] = useOverlayPlace(
+        show && renderAs === 'modal' && (parent ? parent.placed : true),
+        onClose,
+    );
     const visible = renderAs === 'inline' ? show : show && placed;
+    const overlay = useMemo(() => ({
+        placed: renderAs === 'inline' ? (parent ? parent.placed : true) : placed,
+        element: () => panelRef.current?.closest('.modal') ?? null,
+    }), [renderAs, parent, placed]);
     // Focus goes back to the trigger on close; one that has left the page
     // cannot take it, so whoever removed it is told.
     const onExited = () => {

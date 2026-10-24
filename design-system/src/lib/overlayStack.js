@@ -9,8 +9,9 @@
  *   does not have to sit under the frame in the tree, and a page should not
  *   have to thread a callback from the frame to each of its modals.
  * - **At most two overlays stack**: a modal and the confirm it raises. A third
- *   is refused: it does not open, and development builds warn. Replacing the
- *   top one instead would close a dialog its owner still thinks is open.
+ *   is refused: it does not open, development builds warn, and the Modal calls
+ *   its `onClose` so its owner's state says closed. Replacing the top one
+ *   instead would close a dialog its owner still thinks is open.
  *
  * Only an overlay counts: an inline modal (a docs preview, `PatternModal`) and
  * a popup are not overlays.
@@ -63,6 +64,7 @@ export const openOverlayCount = () => count;
 export const reportFocusLost = () => emit('focus-lost');
 
 /**
+ * Hears overlays open and close, and a closed one that lost its trigger.
  * @param {(event: { type: 'open' | 'close' | 'focus-lost', count: number }) => void} listener
  * @returns {() => void} unsubscribe
  */

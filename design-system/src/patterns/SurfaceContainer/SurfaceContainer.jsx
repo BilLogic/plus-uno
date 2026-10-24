@@ -144,6 +144,8 @@ const SurfaceContainer = ({
     stateRef.current = state;
     const focusToggleOnClose = useRef(false);
     useEffect(() => subscribeOverlays((event) => {
+        // The first overlay of a stack starts afresh; a confirm on top keeps the mark.
+        if (event.type === 'open' && event.count === 1) focusToggleOnClose.current = false;
         if (event.type === 'open' && stateRef.current === 'peek') {
             cancelLeave();
             focusToggleOnClose.current = Boolean(sidebarRef.current?.contains(document.activeElement));

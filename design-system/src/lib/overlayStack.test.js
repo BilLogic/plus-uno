@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { MAX_OVERLAYS, openOverlay, openOverlayCount, subscribeOverlays, reportFocusLost } from './overlayStack';
+import { openOverlay, openOverlayCount, subscribeOverlays, reportFocusLost } from './overlayStack';
 
 const opened = [];
 const open = () => {
@@ -16,7 +16,6 @@ afterEach(() => {
 
 describe('openOverlay', () => {
     it('stacks two overlays: a modal and the confirm it raises', () => {
-        expect(MAX_OVERLAYS).toBe(2);
         expect(open()).not.toBeNull();
         expect(open()).not.toBeNull();
         expect(openOverlayCount()).toBe(2);

@@ -397,3 +397,22 @@ export const ModalLeavesDockedSidebar = {
         await waitFor(() => expect(canvasElement.ownerDocument.activeElement, 'focus is back on the trigger').toBe(trigger));
     }),
 };
+
+/** 768: a sidebar the user docked stays docked under a modal too. */
+export const ModalLeavesDockedSidebarAt768 = {
+    render: WithModal,
+    play: async ({ canvasElement }) => atViewport(768, async () => {
+        const p = parts(canvasElement);
+        await userEvent.click(p.toggle);
+        await waitFor(() => expect(p.sidebar()).not.toBeNull());
+        await expect(getComputedStyle(p.sidebar()).position, 'docked').toBe('static');
+
+        await userEvent.click(p.canvas.getByRole('button', { name: 'Page settings' }));
+        await waitFor(() => expect(dialog(canvasElement)).not.toBeNull());
+        await expect(p.sidebar(), 'still docked').not.toBeNull();
+
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(dialog(canvasElement)).toBeNull());
+        await expect(p.sidebar(), 'still docked after Escape').not.toBeNull();
+    }),
+};

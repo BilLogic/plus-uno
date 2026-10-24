@@ -354,8 +354,8 @@ NestedConfirm.play = async ({ canvasElement }) => {
 
 /**
  * At most two overlays stack. A third is refused rather than replacing the
- * top one: it does not open, development builds warn, and the two below keep
- * working.
+ * top one: it does not open, development builds warn, it calls its `onClose`,
+ * and the two below keep working.
  */
 export const ThirdOverlayStaysClosed = () => {
     const [confirming, setConfirming] = useState(false);
@@ -404,6 +404,13 @@ ThirdOverlayStaysClosed.play = async ({ canvasElement }) => {
         await waitFor(() => expect(warn).toHaveBeenCalledWith(expect.stringMatching(/At most 2 overlays stack/)));
         await expect(doc.queryByText('A third overlay'), 'the third does not open').toBeNull();
         await expect(canvasElement.ownerDocument.querySelectorAll('.modal-backdrop')).toHaveLength(2);
+        await expect(inner.contains(canvasElement.ownerDocument.activeElement), 'focus stays in the confirm').toBe(true);
+
+        // The refused modal called its onClose, so its owner says closed and a
+        // second press tries again rather than doing nothing.
+        await userEvent.click(within(inner).getByRole('button', { name: 'Why?' }));
+        await waitFor(() => expect(warn).toHaveBeenCalledTimes(2));
+        await expect(doc.queryByText('A third overlay')).toBeNull();
 
         // The confirm still works: Escape closes it and leaves the first modal.
         await userEvent.keyboard('{Escape}');
