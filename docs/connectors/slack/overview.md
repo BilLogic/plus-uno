@@ -38,7 +38,9 @@ Every scheduled action sends a finding to the first rung that fits (`agents/uno-
 3. The team's channel, by the pillar → channel map above. The team is the linked Roadmap card's `Product Pillar`, else the Figma file's team; the card wins when one of its pillars has a channel, and when none does (Tutoring, Help Center) the Figma file's team decides. The library file is the Universal team's, and `design-system/` code and Storybook take the library's team.
 4. No team, or a pillar with no channel (Tutoring, Help Center) → #plus-design.
 
-The card's design owner is tagged. With no card, the Figma file's creator is named by handle, untagged. #uno-bot is off the ladder, and so is defaulting to the lead.
+The card's design owner is tagged. With none, the channel triages and nobody is named, the Figma file's creator included. #uno-bot is off the ladder, and so is defaulting to the lead.
+
+**Only active people are tagged or named.** Someone read from a roster (a card's Contributors, a design owner, the Team Members Figma or Notion map, a configured owner list) is tagged or named only while their Team Members row exists and its Affiliation isn't Past Collaborators. Someone with no row stays unnamed, Figma handle included (Bill, #1361). The daily role-map sync keeps the list; each job reads it once, and a failed read names nobody (`agents/uno-bot/src/usage/roles.ts`).
 
 ## Surfaces
 

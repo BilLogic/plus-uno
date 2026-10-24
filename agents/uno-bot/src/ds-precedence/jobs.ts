@@ -10,7 +10,8 @@
 //     intake — that week is skipped, logged once, and changes nothing kept.
 //   • the HAND-OVER — every morning run (`ds-precedence-post`), before the
 //     sweep's post: when a report is waiting, read #plus-universal's members
-//     (`precedenceChannel`) and hand the report to the sweep's morning
+//     (`precedenceChannel`), pick the week's DS owner to tag
+//     (`precedenceOwner`), and hand the report to the sweep's morning
 //     message there, as one section of it (`precedenceSection`,
 //     `../sweep/sections.ts`). It posts nothing of its own: the channel gets
 //     one message a morning. The section is a line with the rule linked, then
@@ -31,10 +32,10 @@
 //
 // Subrequest math (each job an alarm with a fresh 50; lookups stop at 38):
 //   check:     the index + the registry from GitHub + the library's
-//              /components and its meta (the creator the report names) from
-//              Figma = 4 external; the report is KV, the internal bucket.
-//   hand-over: members (at most 3 pages); the report and the hand-off are
-//              internal.
+//              /components from Figma = 3 external; the report is KV, the
+//              internal bucket.
+//   hand-over: members (at most 3 pages); the report, who is active and the
+//              hand-off are internal.
 //   section:   an edit when a card did not stage (1), on the sweep's post's
 //              budget; the thread record, each card's staging and its usage
 //              rows are internal.
@@ -47,8 +48,8 @@ import { renderProposalCard } from "../slack/proposal-render";
 import { itemProposal, markNotStaged, type ReportMessage, type ReportStore } from "../slack/decision-cards";
 import { handedSection, type SectionHandOff, type SweepSection } from "../sweep/sections";
 import { pickRoute, resolveDestination, type ChannelIds } from "../sweep/finding";
-import type { Addressee } from "../destination/index";
 import type { FigmaClient } from "../figma/client";
+import { isActive, type ActivePeople } from "../usage/roles";
 import type { JobContext } from "../scheduled/runs";
 import {
   findDisagreements,
@@ -80,30 +81,39 @@ import {
  * @param channels - The Worker's team channel ids
  */
 export function precedenceChannel(channels: ChannelIds): string | null {
-  return resolveDestination(precedenceRoute(null).destination, channels)?.channel ?? null;
-}
-
-/** Whom the weekly report names: the ladder's addressee for the library file. */
-export function precedenceAddressee(report: Pick<PrecedenceReport, "creatorHandle">): Addressee | null {
-  return precedenceRoute(report.creatorHandle ?? null).addressee;
-}
-
-function precedenceRoute(creatorHandle: string | null): ReturnType<typeof pickRoute> {
-  return pickRoute({
+  const { destination } = pickRoute({
     evidence: { channel: "", channelKind: "public", threadTs: null, messageTs: [], permalinks: [] },
-    target: { url: "", kind: "figma-library", writable: false, title: "", pillars: [], creatorHandle },
+    target: { url: "", kind: "figma-library", writable: false, title: "", pillars: [] },
   });
+  return resolveDestination(destination, channels)?.channel ?? null;
 }
 
-/** The library file's creator by handle; null when its meta cannot be read, which never stops the check. */
-async function creatorOf(deps: Pick<CheckDeps, "figma" | "fileKey">): Promise<string | null> {
-  try {
-    return (await deps.figma.fileMeta(deps.fileKey)).file.creator?.handle ?? null;
-  } catch (err) {
-    rethrowIfBudget(err);
-    console.warn(`[ds-precedence] the library's creator was not read: ${err instanceof Error ? err.message : String(err)}`);
-    return null;
+/** The first week of the rotation, as a report dates it — the Friday before
+ *  the Monday it posts (Mon 26 Oct 2026): the first DS owner listed takes it. */
+export const ROTATION_FROM = "2026-10-23";
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * Whom the week's report tags: the DS owners in turn, one a week by the week
+ * of the check, counted from `ROTATION_FROM` — never the library file's
+ * creator (#1361). An owner not active on Team Members is skipped, and the
+ * next active one in the list takes the week. Null when the list is empty or
+ * nobody on it is active, a failed read among the ways: the opener then tags
+ * nobody.
+ *
+ * @param owners - `DS_OWNER_USER_IDS`, in turn
+ * @param weekOf - The check's date, `YYYY-MM-DD`
+ * @param active - Who is active this run
+ */
+export function precedenceOwner(owners: readonly string[], weekOf: string, active: ActivePeople): string | null {
+  if (!owners.length) return null;
+  const weeks = Math.floor((Date.parse(`${weekOf}T00:00:00Z`) - Date.parse(`${ROTATION_FROM}T00:00:00Z`)) / WEEK_MS);
+  const start = Number.isFinite(weeks) ? ((weeks % owners.length) + owners.length) % owners.length : 0;
+  for (let i = 0; i < owners.length; i++) {
+    const id = owners[(start + i) % owners.length]!;
+    if (isActive(id, active)) return id;
   }
+  return null;
 }
 
 /** The share of indexed components the library must have for the check to
@@ -119,9 +129,6 @@ export interface PrecedenceReport {
    *  with. Absent from a report kept before it was recorded; `checkedAt`'s
    *  date stands in. */
   weekOf?: string;
-  /** The library file's creator by Figma handle: whom the report names, as
-   *  the ladder names a file with no card. Absent when the meta was unread. */
-  creatorHandle?: string | null;
   items: Disagreement[];
 }
 
@@ -145,8 +152,8 @@ export interface CheckDeps extends Pick<JobContext, "runDate"> {
     /** design-system/figma/component-registry.json */
     registry(): Promise<PrecedenceRegistry>;
   };
-  /** The Figma client: the library file's components, and its creator. */
-  figma: Pick<FigmaClient, "components" | "fileMeta">;
+  /** The Figma client: the library file's components. */
+  figma: Pick<FigmaClient, "components">;
   report: Store<PrecedenceReport | null>;
   fileKey: string;
   repo: string;
@@ -165,11 +172,10 @@ export interface CheckResult {
  * @param opts - `dryRun` compares and writes nothing
  */
 export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boolean } = {}): Promise<CheckResult> {
-  const [markdown, registry, components, creatorHandle] = await Promise.all([
+  const [markdown, registry, components] = await Promise.all([
     deps.github.indexMarkdown(),
     deps.github.registry(),
     deps.figma.components(deps.fileKey),
-    creatorOf(deps),
   ]);
   const index = parseComponentIndex(markdown);
   if (!index.length) throw new Error("the component index listed no components — refusing to report every one missing");
@@ -194,7 +200,7 @@ export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boole
   });
   if (!opts.dryRun) {
     await deps.report.write(
-      items.length ? { checkedAt: new Date(deps.now()).toISOString(), weekOf: deps.runDate, creatorHandle, items } : null,
+      items.length ? { checkedAt: new Date(deps.now()).toISOString(), weekOf: deps.runDate, items } : null,
     );
   }
   return {
@@ -206,20 +212,24 @@ export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boole
 /** The section's name on the sweep's morning post (`../sweep/sections.ts`). */
 export const PRECEDENCE_SECTION = "ds-precedence";
 
-/** What the morning hands the sweep's post: the week's report and who may
- *  decide its cards, read this morning. */
+/** What the morning hands the sweep's post: the week's report, who may
+ *  decide its cards and whom its line tags, read this morning. */
 export interface PrecedenceHanded {
   weekOf: string;
   items: Disagreement[];
   confirmers: string[];
-  /** The library file's creator by Figma handle, whom the line names. */
-  creatorHandle?: string | null;
+  /** The week's DS owner as a Slack id (`precedenceOwner`); null for nobody. */
+  owner?: string | null;
 }
 
 export interface HandOverDeps {
   report: Store<PrecedenceReport | null>;
   /** The channel's member ids, or null when Slack would not say. */
   members(): Promise<string[] | null>;
+  /** `DS_OWNER_USER_IDS`: the DS owners, in turn. */
+  owners: readonly string[];
+  /** Who is active, read once a run; nobody when the read fails. */
+  active(): Promise<ActivePeople>;
   /** The morning run's hand-off; absent on a rehearsal. */
   handOff?: SectionHandOff<PrecedenceHanded>;
   channel: string;
@@ -251,14 +261,12 @@ export async function handOverPrecedenceReport(deps: HandOverDeps, opts: { dryRu
     return { posted: false, summary: "kept: the channel's members unread" };
   }
   const components = byComponent(report.items).length;
-  if (opts.dryRun || !deps.handOff) return { posted: false, summary: `would hand ${components} component card(s) to the morning post` };
-  await deps.handOff.put(deps.date, { channel: deps.channel, threadTs: null }, {
-    weekOf: report.weekOf ?? report.checkedAt.slice(0, 10),
-    items: report.items,
-    confirmers: members,
-    creatorHandle: report.creatorHandle ?? null,
-  });
-  return { posted: false, summary: `handed ${components} component card(s) to the morning post` };
+  const weekOf = report.weekOf ?? report.checkedAt.slice(0, 10);
+  const owner = precedenceOwner(deps.owners, weekOf, await deps.active());
+  const tags = owner ? `, tagging ${owner}` : ", tagging nobody";
+  if (opts.dryRun || !deps.handOff) return { posted: false, summary: `would hand ${components} component card(s) to the morning post${tags}` };
+  await deps.handOff.put(deps.date, { channel: deps.channel, threadTs: null }, { weekOf, items: report.items, confirmers: members, owner });
+  return { posted: false, summary: `handed ${components} component card(s) to the morning post${tags}` };
 }
 
 export interface SectionDeps {
@@ -302,7 +310,7 @@ export function precedenceSection(deps: SectionDeps, handOff: SectionHandOff<Pre
         whole: true,
         // The cards that show, each a staging, and the edit when one did not stage.
         cost: (shown) => ({ subrequests: 1, d1Queries: shown.length * 3 }),
-        says: () => precedenceParent(findings.length, deps.ruleUrl, precedenceAddressee(value)),
+        says: () => precedenceParent(findings.length, deps.ruleUrl, value.owner ?? null),
       };
     },
     async posted(value, place, shown, report, progress) {

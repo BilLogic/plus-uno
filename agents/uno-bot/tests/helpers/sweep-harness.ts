@@ -26,7 +26,8 @@ import { createInMemoryProposalEventLog, type InMemoryProposalEventLog, type Pro
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../../src/usage/index";
 import type { InMemoryFigma } from "../../src/figma/in-memory";
 import type { DecisionRow } from "../../src/integrations/notion";
-import type { TeamRoles } from "../../src/usage/roles";
+import type { ActivePeople, TeamRoles } from "../../src/usage/roles";
+import { EVERYONE_ACTIVE } from "./team";
 import { modelDecisionDetector } from "../../src/figma-comments/detector";
 import type { DecisionThread, QueuedFile, SweepFigmaComments } from "../../src/figma-comments/queue";
 import { QUESTIONS_SECTION, type QuestionsHanded, type TriagePorts, type WatchedFile } from "../../src/figma-comments/triage";
@@ -219,6 +220,8 @@ export function sweepHarness(opts: {
   sources?: SweepSource[];
   detectorReplies?: string[];
   people?: Record<string, string>;
+  /** Who is active on Team Members (`./team.ts` `activeFrom`); everyone unless set. */
+  active?: ActivePeople;
   now: number;
   /** The date of the run the jobs were queued under; unset, the clock's UTC
    *  date whenever it is read. */
@@ -358,6 +361,7 @@ export function sweepHarness(opts: {
         },
         fileTeam: async (fileKey) => triageOpts.fileTeams?.[fileKey] ?? null,
         people: async () => triageOpts.people ?? {},
+        active: async () => opts.active ?? EVERYONE_ACTIVE,
         channels: ladder,
         dm: async (to, text) => {
           if (triageOpts.dmFails?.includes(to)) return false;
@@ -484,6 +488,7 @@ export function sweepHarness(opts: {
       async slackIdFor(name) {
         return opts.people?.[name] ?? null;
       },
+      active: async () => opts.active ?? EVERYONE_ACTIVE,
     },
     detector: modelDriftDetector(provider),
     ...(opts.capture ? { capture: modelCaptureDetector(provider) } : {}),

@@ -86,7 +86,7 @@ import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render
 import { refusedForBlocks } from "../slack/delivery";
 import { parseSlackCanvasId } from "../slack/canvas-reference";
 import { threadStateFor } from "../thread-state/production";
-import { notionPeopleFor, proposalEventLogFor, teamRolesFor } from "../usage/production";
+import { activePeopleFor, notionPeopleFor, proposalEventLogFor, teamRolesFor } from "../usage/production";
 import { executeReadSource } from "../tools/read-source";
 import { figmaCommentsFor } from "../figma-comments/env";
 import { FIGMA_DECISIONS_SECTION, type FigmaDecisionsHanded } from "../figma-comments/post";
@@ -263,6 +263,7 @@ async function sweepDepsFor(
           return null;
         }
       },
+      active: activePeopleFor(env),
     },
     detector: { detect: (input) => measured(() => detector.detect(input)) },
     capture: {

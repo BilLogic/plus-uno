@@ -5,7 +5,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  activePeopleOf,
   aimedAtOf,
+  isActive,
+  isActiveName,
   matchRoster,
   normalizeFigmaId,
   normalizePersonName,
@@ -23,7 +26,7 @@ import {
   type TeamRolesSyncDeps,
 } from "../src/usage/index";
 import { SubrequestBudgetError } from "../src/net";
-import { figmaPeopleFor, notionPeopleFor, teamRolesFor } from "../src/usage/production";
+import { activePeopleFor, figmaPeopleFor, notionPeopleFor, teamRolesFor } from "../src/usage/production";
 import type { Env } from "../src/types";
 
 const ROSTER: RosterRow[] = [
@@ -255,10 +258,10 @@ test("a sync reads every directory page and stores the map, reporting counts onl
   const report = await syncTeamRoles(deps, { dryRun: false });
   assert.equal(deps.pages, 2);
   assert.deepEqual(deps.written, [
-    { at: 1_000, roles: { U0ANA0001: "pm", U0BO00001: "dev", U0CY00001: "design" }, figmaPeople: {}, notionPeople: {}, gaps: [], noNotionPerson: ["Ana Pérez", "  bo   CHEN ", "Cy Diaz"], noFigmaId: ["Ana Pérez", "  bo   CHEN ", "Cy Diaz", "Dee Evans"] },
+    { at: 1_000, roles: { U0ANA0001: "pm", U0BO00001: "dev", U0CY00001: "design" }, figmaPeople: {}, notionPeople: {}, gaps: [], noNotionPerson: ["Ana Pérez", "  bo   CHEN ", "Cy Diaz"], noFigmaId: ["Ana Pérez", "  bo   CHEN ", "Cy Diaz", "Dee Evans"], active: ["U0ANA0001", "U0BO00001", "U0CY00001", "U0DEE0001"], activeNames: ["ana perez", "bo chen", "cy diaz", "dee evans"] },
   ]);
   assert.deepEqual(deps.ttls, [TEAM_ROLES_TTL_S]);
-  assert.deepEqual(report, { written: true, matched: 3, unmatched: 0, ambiguous: 0, summary: "3 matched, 0 unmatched, 0 ambiguous" });
+  assert.deepEqual(report, { written: true, matched: 3, unmatched: 0, ambiguous: 0, summary: "3 matched, 0 unmatched, 0 ambiguous, 4 active" });
 });
 
 test("a sync stores the Figma ids with the roles, so a webhook job never reads Notion", async () => {
@@ -270,7 +273,7 @@ test("a sync stores the Figma ids with the roles, so a webhook job never reads N
   });
   const report = await syncTeamRoles(deps, { dryRun: false });
   assert.deepEqual(deps.written[0]?.figmaPeople, { "1105000000000000004": "U0DEE0001" });
-  assert.equal(report.summary, "3 matched, 0 unmatched, 0 ambiguous, 1 Figma id");
+  assert.equal(report.summary, "3 matched, 0 unmatched, 0 ambiguous, 1 Figma id, 4 active");
   const kv = fakeKv(async (key) => (key === TEAM_ROLES_KV_KEY ? deps.written[0] : null));
   assert.equal(slackPersonOfFigma("1105000000000000004", await figmaPeopleFor(kv)), "U0DEE0001");
   assert.equal(slackPersonOfFigma("1105000000000000009", await figmaPeopleFor(kv)), null);
@@ -282,7 +285,7 @@ test("a sync counts Figma ids it cannot read, and a dry run names their rows", a
   );
   const deps = syncDeps({ roster: async () => ({ members: roster, truncated: false }) });
   const report = await syncTeamRoles(deps, { dryRun: false });
-  assert.equal(report.summary, "3 matched, 0 unmatched, 0 ambiguous, 1 unreadable Figma id, 1 Figma id");
+  assert.equal(report.summary, "3 matched, 0 unmatched, 0 ambiguous, 1 unreadable Figma id, 1 Figma id, 4 active");
   const dry = await syncTeamRoles(syncDeps({ roster: async () => ({ members: roster, truncated: false }) }), { dryRun: true });
   assert.deepEqual(dry.unreadableFigmaNames, ["Cy Diaz"]);
 });
@@ -293,7 +296,7 @@ test("a Figma id taken off its row stops mapping at the next sync, and a fall to
   const report = await syncTeamRoles(deps, { dryRun: false });
   assert.deepEqual(deps.written[0]?.figmaPeople, {});
   assert.equal(report.written, true);
-  assert.equal(report.summary, "3 matched, 0 unmatched, 0 ambiguous — warning: Figma ids fell from 1 to 0");
+  assert.equal(report.summary, "3 matched, 0 unmatched, 0 ambiguous, 4 active — warning: Figma ids fell from 1 to 0");
 });
 
 test("a map stored before Figma ids, no map, no KV or a failed read maps no Figma id", async () => {
@@ -317,7 +320,7 @@ test("a dry run lists the unmatched and ambiguous names and writes nothing", asy
   assert.equal(report.written, false);
   assert.deepEqual(report.unmatchedNames, ["Gus Hale"]);
   assert.deepEqual(report.ambiguousNames, []);
-  assert.match(report.summary, /^dry run, nothing written: 3 matched, 1 unmatched, 0 ambiguous$/);
+  assert.match(report.summary, /^dry run, nothing written: 3 matched, 1 unmatched, 0 ambiguous, 4 active$/);
 });
 
 test("a failed or short read writes nothing, so the last map is kept", async () => {
@@ -370,7 +373,7 @@ test("an empty read keeps a stored map that has entries", async () => {
   const report = await syncTeamRoles(deps, { dryRun: false });
   assert.deepEqual(deps.written.map((w) => w.roles), [storedOf(3).roles]);
   assert.equal(report.keptPrevious, true);
-  assert.equal(report.summary, "0 matched, 0 unmatched, 0 ambiguous — kept previous roles: new map had 0 of 3");
+  assert.equal(report.summary, "0 matched, 0 unmatched, 0 ambiguous, 4 active — kept previous roles: new map had 0 of 3");
 });
 
 test("a new map 60% smaller than the stored one keeps it", async () => {
@@ -393,7 +396,7 @@ test("a kept role map still takes the fresh Figma ids, and keeps its own expiry"
   const report = await syncTeamRoles(deps, { dryRun: false });
   assert.equal(report.keptPrevious, true);
   assert.deepEqual(deps.written, [
-    { at: 1_000, roles: previous.roles, figmaPeople: { "1105000000000000001": "U0ANA0001" }, notionPeople: {}, gaps: [], noNotionPerson: ["Ana Pérez"], noFigmaId: [] },
+    { at: 1_000, roles: previous.roles, figmaPeople: { "1105000000000000001": "U0ANA0001" }, notionPeople: {}, gaps: [], noNotionPerson: ["Ana Pérez"], noFigmaId: [], active: ["U0ANA0001"], activeNames: ["ana perez"] },
   ]);
   // The roles still lapse when they would have: the write does not renew them.
   assert.deepEqual(deps.ttls, [TEAM_ROLES_TTL_S - DAY_MS / 1000]);
@@ -414,7 +417,7 @@ test("a dry run reports a shrink the same way, and writes nothing", async () => 
   const report = await syncTeamRoles(deps, { dryRun: true });
   assert.deepEqual(deps.written, []);
   assert.equal(report.keptPrevious, true);
-  assert.equal(report.summary, "dry run, nothing written: 0 matched, 0 unmatched, 0 ambiguous — kept previous roles: new map had 0 of 4");
+  assert.equal(report.summary, "dry run, nothing written: 0 matched, 0 unmatched, 0 ambiguous, 0 active — kept previous roles: new map had 0 of 4");
 });
 
 // ── The stored map, as a turn reads it ──────────────────────────────────────
@@ -474,7 +477,7 @@ test("a sync stores the Notion people, the in-scope rows it could not match and 
   assert.deepEqual(deps.written[0]?.gaps, ["Gus Hale"]);
   assert.deepEqual(deps.written[0]?.noNotionPerson, ["Ana Pérez", "  bo   CHEN "], "matched, in scope, Notion Person empty");
   assert.deepEqual(deps.written[0]?.noFigmaId, ["Ana Pérez", "  bo   CHEN ", "Cy Diaz", "Dee Evans", "Gus Hale", "Hal Ito"], "every row on the team, with or without a role");
-  assert.equal(report.summary, "3 matched, 1 unmatched, 0 ambiguous, 1 Notion person");
+  assert.equal(report.summary, "3 matched, 1 unmatched, 0 ambiguous, 1 Notion person, 4 active");
   const kv = fakeKv(async (key) => (key === TEAM_ROLES_KV_KEY ? deps.written[0] : null));
   assert.deepEqual(await notionPeopleFor(kv), { "n-cy": "U0CY00001" });
   assert.deepEqual(await notionPeopleFor({}), {});
@@ -504,4 +507,70 @@ test("the gaps: no Slack match or more than one; never a role conflict or a deac
   assert.deepEqual(gaps, ["Gus Hale", "Twin Name", "Unknown Id"]);
   // Cy matched one person (two roles is a CMS fix, not a gap); Ana has a Notion Person.
   assert.deepEqual(noNotionPerson, ["Cy Diaz", "cy diaz"]);
+});
+
+// ── Who is active (#1361) ───────────────────────────────────────────────────
+
+test("an active row makes its Slack member and its name active; a Past Collaborators row and a missing row do not", () => {
+  const active = activePeopleOf(matchRoster(ROSTER, [...DIRECTORY, { id: "U0JADE001", real_name: "Jade Wang" }]));
+  // Active rows, whatever their group: Ana (Current Member), Bo (no affiliation), Dee (Researcher).
+  for (const id of ["U0ANA0001", "U0BO00001", "U0CY00001", "U0DEE0001"]) assert.equal(isActive(id, active), true, id);
+  assert.equal(isActive("U0ELI0001", active), false, "a Past Collaborators row");
+  assert.equal(isActive("U0JADE001", active), false, "in Slack, with no row");
+  assert.equal(isActiveName("ANA  perez", active), true);
+  assert.equal(isActiveName("Eli Fox", active), false);
+  assert.equal(isActiveName("Jade Wang", active), false);
+  assert.equal(isActive(null, active), false);
+  assert.equal(isActiveName("", active), false);
+});
+
+test("a row that matches nobody, or two members, makes no member active; its name still is", () => {
+  const { active, activeNames } = matchRoster(
+    [
+      { name: "Twin Name", group: "Researcher" },
+      { name: "Left Us", group: "Researcher" },
+    ],
+    [
+      { id: "U0TWIN001", real_name: "Twin Name" },
+      { id: "U0TWIN002", real_name: "Twin Name" },
+      { id: "U0LEFT001", real_name: "Left Us", deleted: true },
+    ],
+  );
+  assert.deepEqual(active, []);
+  assert.deepEqual(activeNames, ["twin name", "left us"]);
+});
+
+test("no map, a map stored before the list was kept, no KV or a failed read makes nobody active", async () => {
+  const kept = activePeopleOf({ active: ["U0ANA0001"], activeNames: ["ana perez"] });
+  assert.equal(isActive("U0ANA0001", kept), true);
+  const nobody = [
+    activePeopleOf(null),
+    activePeopleOf({}),
+    await activePeopleFor(fakeKv(async () => ({ at: 1, roles: { U0ANA0001: "pm" } })))(),
+    await activePeopleFor(fakeKv(async () => null))(),
+    await activePeopleFor({})(),
+    await activePeopleFor(fakeKv(async () => { throw new Error("kv down"); }))(),
+  ];
+  for (const active of nobody) assert.equal(isActive("U0ANA0001", active), false);
+  await assert.rejects(activePeopleFor(fakeKv(async () => { throw new SubrequestBudgetError(38); }))(), SubrequestBudgetError);
+});
+
+test("the stored map is read once for a run, however often it is asked", async () => {
+  let reads = 0;
+  const active = activePeopleFor(fakeKv(async () => (reads++, { at: 1, roles: {}, active: ["U0ANA0001"], activeNames: ["ana perez"] })));
+  const [a, b] = await Promise.all([active(), active()]);
+  await active();
+  assert.equal(reads, 1);
+  assert.equal(isActive("U0ANA0001", a), true);
+  assert.equal(a, b);
+});
+
+test("the active list is rebuilt from every good read, and a fall to none is called out", async () => {
+  const previous: StoredTeamRoles = { at: 1, roles: {}, active: ["U0ELI0001"], activeNames: ["eli fox"] };
+  const moved = await syncTeamRoles(syncDeps({ read: async () => previous }), { dryRun: false });
+  assert.equal(moved.written, true);
+  const emptied = syncDeps({ roster: async () => ({ members: [], truncated: false }), read: async () => previous });
+  const report = await syncTeamRoles(emptied, { dryRun: false });
+  assert.deepEqual(emptied.written[0]?.active, []);
+  assert.equal(report.summary, "0 matched, 0 unmatched, 0 ambiguous, 0 active — warning: active people fell from 1 to 0, so nobody is tagged");
 });

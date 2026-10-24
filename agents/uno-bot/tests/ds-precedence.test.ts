@@ -27,9 +27,11 @@ import {
   handOverPrecedenceReport,
   NOT_STAGED,
   precedenceChannel,
+  precedenceOwner,
   precedenceSection,
   runPrecedenceCheck,
   PRECEDENCE_SECTION,
+  ROTATION_FROM,
   type CheckDeps,
   type HandOverDeps,
   type PostedThread,
@@ -53,6 +55,8 @@ import { runReviewDecision, runReviewOpen, type ReviewDoorDeps } from "../src/sl
 import type { CardMessage } from "../src/slack/button-door";
 import { recordingDelivery } from "../src/turn/index";
 import { createInMemoryThreadState, type PendingProposal, type ThreadState } from "../src/thread-state/index";
+import { NOBODY_ACTIVE, type ActivePeople } from "../src/usage/roles";
+import { activeFrom } from "./helpers/team";
 
 const FILE_KEY = "zAecJNRdvJzAUOcjV32tRX";
 const REPO = "BilLogic/plus-uno";
@@ -450,13 +454,25 @@ function runStorage() {
  * A morning: the hand-over, then the sweep's post with the report as its
  * section, on one ThreadState. `posts` are the sweep's messages.
  */
-function postDeps(report: PrecedenceReport | null, store: ThreadState = createInMemoryThreadState({ now: () => NOW })) {
+function postDeps(
+  report: PrecedenceReport | null,
+  store: ThreadState = createInMemoryThreadState({ now: () => NOW }),
+  dsOwners: { owners: string[]; active: ActivePeople } = { owners: [], active: NOBODY_ACTIVE },
+) {
   const edits: Array<{ ts: string; message: { text: string; blocks?: unknown[] } }> = [];
   const staged: PendingProposal[] = [];
   const reportBox = kv<PrecedenceReport | null>(report);
   const recorded: PostedThread[] = [];
   const handOff = sectionHandOffIn<PrecedenceHanded>(runStorage(), PRECEDENCE_SECTION);
-  const hand: HandOverDeps = { report: reportBox.store, members: async () => [...MEMBERS], handOff, channel: CHANNEL, date: DATE };
+  const hand: HandOverDeps = {
+    report: reportBox.store,
+    members: async () => [...MEMBERS],
+    owners: dsOwners.owners,
+    active: async () => dsOwners.active,
+    handOff,
+    channel: CHANNEL,
+    date: DATE,
+  };
   const deps: SectionDeps = {
     report: reportBox.store,
     recordThread: async (thread) => void recorded.push(thread),
@@ -632,15 +648,45 @@ describe("the morning post", () => {
     assert.deepEqual(recorded, [{ channel: CHANNEL, ts: MSG, weekOf: "2026-10-02" }]);
   });
 
-  it("names the library file's creator by Figma handle, untagged: the library has no card", async () => {
-    const { deps: check, report } = checkDeps(LIBRARY, undefined, "Bryan <L>");
+  it("never names the library file's creator, and never reads who it is", async () => {
+    const { deps: check, report } = checkDeps(LIBRARY, undefined, "Jade Wang");
     await runPrecedenceCheck(check);
-    assert.equal(report.box.value!.creatorHandle, "Bryan <L>");
+    assert.equal("creatorHandle" in report.box.value!, false);
+    assert.deepEqual((check.figma as ReturnType<typeof createInMemoryFigma>).calls().map((c) => c.method), ["components"]);
     const { morning, posts } = postDeps(report.box.value);
     await morning();
-    const parent = JSON.stringify(posts[0]!.blocks![0]);
-    assert.match(parent, /Bryan &lt;L&gt;, code and the library disagree on 2 components\./, "named, escaped, and first");
-    assert.deepEqual(notified(posts[0]!), [], "a handle, never a tag");
+    assert.doesNotMatch(JSON.stringify(posts[0]!), /Jade/);
+    assert.match(JSON.stringify(posts[0]!.blocks![0]), /Code and the library disagree on 2 components\./, "nobody named, nobody tagged");
+    assert.deepEqual(notified(posts[0]!), []);
+  });
+
+  it("tags the week's DS owner first, and skips one whose row is Past Collaborators or missing", async () => {
+    // A report from the rotation's first week, which is the first owner's turn.
+    const week = { ...(await weekReport()), weekOf: ROTATION_FROM };
+    const active = activeFrom(
+      [
+        { name: "Bill Lead", slack: "U0BILL001" },
+        { name: "Jade Wang", slack: "U0JADE001", affiliation: "Past Collaborators" },
+      ],
+      [{ id: "U0GONE001", real_name: "Before The Database" }],
+    );
+    for (const first of ["U0JADE001", "U0GONE001"]) {
+      assert.equal(precedenceOwner([first, "U0BILL001"], ROTATION_FROM, activeFrom([{ name: "First", slack: first }])), first, "their turn");
+      const { hand, morning, posts } = postDeps(week, undefined, { owners: [first, "U0BILL001"], active });
+      assert.match((await handOverPrecedenceReport(hand, { dryRun: true })).summary, /tagging U0BILL001$/);
+      await morning();
+      assert.match(JSON.stringify(posts[0]!.blocks![0]), /<@U0BILL001>, code and the library disagree on 2 components\./);
+      assert.deepEqual(notified(posts[0]!), ["U0BILL001"], `${first} skipped`);
+    }
+  });
+
+  it("tags nobody when no DS owner is active, or the Team Members read failed", async () => {
+    for (const active of [NOBODY_ACTIVE, activeFrom([{ name: "Jade Wang", slack: "U0JADE001", affiliation: "Past Collaborators" }])]) {
+      const { morning, posts } = postDeps(await weekReport(), undefined, { owners: ["U0JADE001", "U0BILL001"], active });
+      await morning();
+      assert.match(JSON.stringify(posts[0]!.blocks![0]), /Code and the library disagree on 2 components\./);
+      assert.deepEqual(notified(posts[0]!), []);
+    }
   });
 
   it("stages each component as its own proposal: the week's intake, decided by the channel's members, for 24 weekday hours", async () => {
@@ -1029,5 +1075,45 @@ describe("the report's thread", () => {
     const reads: string[] = [];
     assert.equal(await isWeeklyPrecedenceThread(env(reads), "C0OTHER", MSG), false);
     assert.deepEqual(reads, [], "another channel reads nothing");
+  });
+});
+
+describe("the DS owner rotation (#1361)", () => {
+  const BILL = "U03FYQJRQHX";
+  const BRYAN = "U09E652SJ02";
+  const CYNTHIA = "U0CYNTHIA1";
+  const OWNERS = [BILL, BRYAN, CYNTHIA];
+  const week = (n: number) => new Date(Date.parse(`${ROTATION_FROM}T00:00:00Z`) + n * 7 * 86_400_000).toISOString().slice(0, 10);
+  const everyone = activeFrom([
+    { name: "Bill", slack: BILL },
+    { name: "Bryan", slack: BRYAN },
+    { name: "Cynthia", slack: CYNTHIA },
+  ]);
+
+  it("gives next Monday's report, dated Friday 23 October, to the first owner listed", () => {
+    assert.equal(precedenceOwner(OWNERS, "2026-10-23", everyone), BILL);
+    assert.equal(precedenceOwner(OWNERS, "2026-10-30", everyone), BRYAN);
+  });
+
+  it("takes one owner a week, in the listed order, from the rotation's first week", () => {
+    assert.deepEqual([0, 1, 2, 3, 4].map((n) => precedenceOwner(OWNERS, week(n), everyone)), [BILL, BRYAN, CYNTHIA, BILL, BRYAN]);
+    assert.equal(precedenceOwner(OWNERS, week(-1), everyone), CYNTHIA, "weeks before the first count back");
+    assert.equal(precedenceOwner(OWNERS, "2026-10-27", everyone), BILL, "any day of the week is that week");
+  });
+
+  it("skips an owner who is not active, so the next active one takes the week", () => {
+    const bryanLeft = activeFrom([
+      { name: "Bill", slack: BILL },
+      { name: "Bryan", slack: BRYAN, affiliation: "Past Collaborators" },
+      { name: "Cynthia", slack: CYNTHIA },
+    ]);
+    assert.deepEqual([0, 1, 2].map((n) => precedenceOwner(OWNERS, week(n), bryanLeft)), [BILL, CYNTHIA, CYNTHIA]);
+    const noCynthiaRow = activeFrom([{ name: "Bill", slack: BILL }, { name: "Bryan", slack: BRYAN }], [{ id: CYNTHIA, real_name: "Cynthia" }]);
+    assert.equal(precedenceOwner(OWNERS, week(2), noCynthiaRow), BILL, "no row is never active");
+  });
+
+  it("names nobody with no owners, nobody active, or a failed read", () => {
+    assert.equal(precedenceOwner([], week(0), everyone), null);
+    assert.equal(precedenceOwner(OWNERS, week(0), NOBODY_ACTIVE), null);
   });
 });

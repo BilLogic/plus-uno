@@ -53,6 +53,7 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
   assert.deepEqual(Object.keys(deps), ["enqueueRun"]);
   assert.deepEqual(planRun("end-of-day", END_OF_DAY).jobs.map((j) => j.kind), [
     "figma-library-poll",
+    "team-roles-sync",
     "card-follow-through",
     "blueprint-shipped",
     "blueprint-shipped",
@@ -209,8 +210,6 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
     ["blueprint-revision-post", "blueprint-revision-post"],
     ["blueprint-proposal-offer", "blueprint-proposal-offer"],
     ["sweep-post", "sweep-post"],
-    // A drawn proposal no Roadmap card took up in 30 days, offered for removal in its thread.
-    ["team-roles-sync", "team-roles-sync"],
     // Both runs purge, so text never outlives its 14 days over a weekend.
     ["usage-text-purge", "usage-text-purge"],
   ]);
@@ -218,6 +217,8 @@ test("each run is planned with its jobs, keyed by the ET day it is for", () => {
   assert.equal(endOfDay.date, "2026-09-29");
   assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind, j.after]), [
     ["figma-library-poll", "figma-library-poll", undefined],
+    // Before every job that tags someone: who is active.
+    ["team-roles-sync", "team-roles-sync", undefined],
     ["card-follow-through", "card-follow-through", undefined],
     // Blueprint upkeep's matching, then its drafting, cut into jobs by cost.
     ["blueprint-shipped-1", "blueprint-shipped", undefined],

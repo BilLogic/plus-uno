@@ -38,6 +38,9 @@ import type { Env } from "../src/types";
 import type { DecisionRow } from "../src/integrations/notion";
 import { at, DESIGN, notionPage, ROADMAP_DB, sweepHarness, type SweepHarness, type TriageOptions } from "./helpers/sweep-harness";
 import { mentionCount, notified } from "./helpers/notified";
+import { activeFrom } from "./helpers/team";
+import { NOBODY_ACTIVE, type ActivePeople } from "../src/usage/roles";
+import type { FileOwner } from "../src/figma-comments/queue";
 
 /** One card of a decision report, as Slack is handed it. */
 type Card = {
@@ -212,6 +215,7 @@ async function nightHarness(
     people?: { figma: Record<string, string>; notion: Record<string, string> };
     cards?: Record<number, { url: string; title: string; pillars?: string[] }>;
     triage?: TriageOptions;
+    active?: ActivePeople;
   } = {},
 ) {
   const client = over.figma ?? seededFigma();
@@ -219,6 +223,7 @@ async function nightHarness(
     channels: {},
     sources: over.sources ?? [CARD, PRD],
     people: { Meryem: "U0MERYEM", "Sarah K": "U0SARAH" },
+    ...(over.active ? { active: over.active } : {}),
     detectorReplies: over.replies ?? [REPLY],
     now: at(30, 10),
     figma: {
@@ -237,6 +242,15 @@ async function nightHarness(
   await h.store.saveCursor(COMMENTS_CURSOR, SWITCHED, SWITCH_ON);
   return { h, client };
 }
+
+/** Sarah's Team Members row, three ways (#1361): active, Past Collaborators,
+ *  and none at all. Meryem's row is active throughout. */
+const MERYEM_ROW = { name: "Meryem", slack: "U0MERYEM" };
+const SARAH_ROWS = {
+  active: activeFrom([MERYEM_ROW, { name: "Sarah K", slack: "U0SARAH" }]),
+  past: activeFrom([MERYEM_ROW, { name: "Sarah K", slack: "U0SARAH", affiliation: "Past Collaborators" }]),
+  missing: activeFrom([MERYEM_ROW], [{ id: "U0SARAH", real_name: "Sarah K" }]),
+} as const;
 
 describe("the night's read of Figma comments (#900)", () => {
   it("switches on the first night: it reads nothing, and keeps the watermark (AC 1)", async () => {
@@ -335,32 +349,49 @@ describe("the night's read of Figma comments (#900)", () => {
     assert.equal(await h.store.cursor(COMMENTS_CURSOR), `2026-09-29T10:00:00.000Z|2026-09-30T10:00:00.000Z||`, "the next night starts where this one ended");
   });
 
-  it("asks the card's design owner; with none in Slack, the file's creator; with neither, the card", async () => {
-    const night = async (roles: Record<string, "pm" | "dev" | "design">, creator?: string) => {
+  it("asks the card's design owner; with none, nobody — never the file's creator", async () => {
+    const night = async (roles: Record<string, "pm" | "dev" | "design">, active?: ActivePeople) => {
       const client = createInMemoryFigma();
       client.seedFile(FILE, {
         name: "Goal Setting / Card 2482 / Sarah",
         document: DOCUMENT,
         comments: COMMENTS,
-        ...(creator ? { creator: { id: `u-${creator}`, handle: creator } } : {}),
+        creator: { id: "u-jade", handle: "Jade Wang" },
       });
       const h = sweepHarness({
         channels: {},
         sources: [{ ...CARD, contributors: ["Nobody Mapped", "Meryem", "Sarah K"] }, PRD],
         people: { Meryem: "U0MERYEM", "Sarah K": "U0SARAH" },
+        ...(active ? { active } : {}),
         detectorReplies: [REPLY],
         now: at(30, 10),
         figma: { client, notes: NOTES, cards: { 2482: { url: CARD_URL, title: "Goal Setting" } }, roles },
       });
       await h.store.saveCursor(COMMENTS_CURSOR, SWITCHED, SWITCH_ON);
       await runSweepJob(NIGHT, h.deps);
+      assert.equal(client.calls().some((c) => c.method === "fileMeta"), false, "the file's creator is never read");
       return h.figma.queue.get(FILE)!;
     };
-    const designed = await night({ U0MERYEM: "pm", U0SARAH: "design" }, "sarah");
+    const designed = await night({ U0MERYEM: "pm", U0SARAH: "design" });
     assert.deepEqual(designed.owner, { slack: "U0SARAH" });
     assert.deepEqual(designed.confirmers, ["U0MERYEM", "U0SARAH"], "every Contributor in Slack still decides");
-    assert.deepEqual((await night({ U0MERYEM: "pm" }, "sarah")).owner, { figma: "sarah" }, "no designer among them: the file's creator");
+    assert.equal((await night({ U0MERYEM: "pm" })).owner, null, "no designer among them: nobody, never the file's creator");
     assert.equal((await night({})).owner, null, "neither: the parent asks someone on the card");
+  });
+
+  it("asks, and lets decide, only Contributors whose Team Members row is active (#1361)", async () => {
+    const cases = [
+      [SARAH_ROWS.active, { slack: "U0SARAH" }, ["U0MERYEM", "U0SARAH"]],
+      [SARAH_ROWS.past, null, ["U0MERYEM"]],
+      [SARAH_ROWS.missing, null, ["U0MERYEM"]],
+    ] as const;
+    for (const [active, owner, confirmers] of cases) {
+      const { h } = await nightHarness({ active });
+      await runSweepJob(NIGHT, h.deps);
+      const queued = h.figma.queue.get(FILE)!;
+      assert.deepEqual(queued.owner, owner);
+      assert.deepEqual(queued.confirmers, confirmers);
+    }
   });
 
   it("reads nothing on a night whose notes name no file, and nothing twice for one day's activity", async () => {
@@ -596,7 +627,7 @@ describe("the morning's decisions on the sweep's message in #plus-design (#900)"
     assert.equal(h.provider.generated.length, 1, "the carded thread's new reply asks the detector nothing");
   });
 
-  it("names a card-less file's creator by Figma handle, and #plus-design's members decide", async () => {
+  it("names nobody for a card-less file, never its creator, and #plus-design's members decide", async () => {
     const client = createInMemoryFigma();
     client.seedFile("LibFile1", {
       name: "Design System (S23)",
@@ -616,11 +647,42 @@ describe("the morning's decisions on the sweep's message in #plus-design (#900)"
       members: ["U0A", "U0B"],
     });
     await runSweepJob(NIGHT, h.deps);
-    assert.deepEqual(h.figma.queue.get("LibFile1")?.owner, { figma: "bea" });
+    assert.equal(h.figma.queue.get("LibFile1")?.owner, null);
     h.clock.now = at(30, 13);
     await morning(h);
-    assert.match(parentOf(h).text, /bea, 1 comment in <https:\/\/www\.figma\.com\/design\/LibFile1\|Design System \(S23\)> reads like a decision\./);
+    assert.match(parentOf(h).text, /^1 comment in <https:\/\/www\.figma\.com\/design\/LibFile1\|Design System \(S23\)> reads like a decision\./);
+    assert.deepEqual(notified(parentOf(h)), []);
     assert.deepEqual(h.staged[0]!.confirmers, ["U0A", "U0B"]);
+  });
+
+  it("checks a queued owner and confirmers again at the hand-over: one who has left since is neither tagged nor asked (#1361)", async () => {
+    for (const [active, tagged, confirmers] of [
+      [SARAH_ROWS.active, ["U0SARAH"], ["U0MERYEM", "U0SARAH"]],
+      [SARAH_ROWS.past, [], ["U0MERYEM"]],
+      [SARAH_ROWS.missing, [], ["U0MERYEM"]],
+    ] as const) {
+      const { h } = await nightHarness();
+      await runSweepJob(NIGHT, h.deps);
+      assert.deepEqual(h.figma.queue.get(FILE)?.owner, { slack: "U0SARAH" }, "everyone active at night");
+      h.deps.people.active = async () => active;
+      h.clock.now = at(30, 13);
+      await morning(h);
+      assert.deepEqual(notified(parentOf(h)), tagged);
+      for (const p of h.staged) assert.deepEqual(p.confirmers, confirmers);
+    }
+  });
+
+  it("names nobody for an owner queued by Figma handle before #1361, and falls back to the channel when no Contributor is active", async () => {
+    const { h } = await nightHarness({ members: ["U0A", "U0B"] });
+    await runSweepJob(NIGHT, h.deps);
+    const queued = h.figma.queue.get(FILE)!;
+    h.figma.queue.set(FILE, { ...queued, owner: { figma: "Jade Wang" } as unknown as FileOwner });
+    h.deps.people.active = async () => NOBODY_ACTIVE;
+    h.clock.now = at(30, 13);
+    await morning(h);
+    assert.doesNotMatch(JSON.stringify(h.posted), /Jade/);
+    assert.deepEqual(notified(parentOf(h)), []);
+    for (const p of h.staged) assert.deepEqual(p.confirmers, ["U0A", "U0B"], "a failed read names nobody: the channel decides");
   });
 
   it("keeps a decision whose card did not stage for the next morning, and says so on the card", async () => {
@@ -973,7 +1035,7 @@ describe("an unanswered question, raised after two workdays", () => {
     assert.match(posts(h)[0]!.text, /^<@U0SARAH>, a question/);
   });
 
-  it("with no card, goes to the Figma file's team channel and names its creator by handle, untagged", async () => {
+  it("with no card, goes to the Figma file's team channel and names nobody, never its creator", async () => {
     const client = createInMemoryFigma();
     client.seedFile("ToolFile1", {
       name: "Session notes",
@@ -988,12 +1050,46 @@ describe("an unanswered question, raised after two workdays", () => {
     await morning(h, FRIDAY);
     assert.equal(posts(h).length, 1);
     assert.equal(posts(h)[0]!.channel, TOOLKIT);
-    assert.match(posts(h)[0]!.text, /^bea, a question in <https:\/\/www\.figma\.com\/design\/ToolFile1\|Session notes> has waited/);
+    assert.match(posts(h)[0]!.text, /^A question in <https:\/\/www\.figma\.com\/design\/ToolFile1\|Session notes> has waited/);
+    assert.doesNotMatch(posts(h)[0]!.text, /bea/);
 
     const elsewhere = await nightHarness({ figma: client, notes, replies: [none], triage: { fileTeams: { ToolFile1: "MISC" } } });
     await runSweepJob(NIGHT, elsewhere.h.deps);
     await morning(elsewhere.h, FRIDAY);
     assert.equal(posts(elsewhere.h)[0]!.channel, DESIGN, "a team with no channel → #plus-design");
+  });
+
+  it("tags the design owner on a question's line only while their row is active (#1361)", async () => {
+    const tutoring = { 2482: { url: CARD_URL, title: "Goal Setting", pillars: ["Tutoring"] } };
+    for (const [active, opens] of [
+      [SARAH_ROWS.active, /^<@U0SARAH>, a question/],
+      [SARAH_ROWS.past, /^A question/],
+      [SARAH_ROWS.missing, /^A question/],
+    ] as const) {
+      const { h } = await nightHarness({ cards: tutoring, triage: { fileTeams: { [FILE]: "Toolkit" } } });
+      await runSweepJob(NIGHT, h.deps);
+      h.deps.figmaComments!.triage!.active = async () => active;
+      await morning(h, FRIDAY);
+      assert.match(posts(h)[0]!.text, opens);
+    }
+  });
+
+  it("DMs, or names on the line, a person a question names only while their row is active (#1361)", async () => {
+    for (const [active, dms, named] of [
+      [activeFrom([MERYEM_ROW, { name: "Sarah K", slack: "U0SARAH" }, { name: "bea" }]), ["U0SARAH"], true],
+      [activeFrom([MERYEM_ROW, { name: "Sarah K", slack: "U0SARAH", affiliation: "Past Collaborators" }, { name: "bea", affiliation: "Past Collaborators" }]), [], false],
+      [activeFrom([MERYEM_ROW]), [], false],
+    ] as const) {
+      const client = seededFigma();
+      client.seedFile(FILE, { comments: asking("@Sarah K @bea should the bar animate?") });
+      const { h } = await nightHarness({ figma: client, cards: TOOLKIT_CARD, triage: { people: { "u-Sarah K": "U0SARAH" } }, active });
+      await runSweepJob(NIGHT, h.deps);
+      await morning(h, FRIDAY);
+      assert.deepEqual(h.figma.triage.dms.map((d) => d.to), dms);
+      assert.equal(posts(h).length, 1, "someone named was not reached, so the channel triages");
+      if (named) assert.match(posts(h)[0]!.text, / It names bea, who isn't matched to a Slack account yet\. /);
+      else assert.doesNotMatch(posts(h)[0]!.text, /It names/);
+    }
   });
 
   it("counts workdays only: a Friday question waits Monday and Tuesday, and Wednesday's morning raises it", () => {

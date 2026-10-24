@@ -22,7 +22,6 @@
 import type { PrecedenceFacts, ProposalOperation, ReportItem, StatedCardWords } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import { escapeSlackText } from "../slack/mrkdwn";
-import type { Addressee } from "../destination/index";
 import { shortDate } from "../slack/copy-words";
 import { SOURCE_NAMES, type Disagreement, type DsSource } from "./compare";
 import { CARD_WINDOW_WORDS } from "../card-expiry";
@@ -93,17 +92,18 @@ function differs(finding: ComponentFinding): string {
 }
 
 /**
- * The report's parent line: how many components disagree, and the rule, in
- * plain words with the rule linked. mrkdwn.
+ * The report's parent line: the week's DS owner tagged, how many components
+ * disagree, and the rule, in plain words with the rule linked. Never a Figma
+ * handle. mrkdwn.
  *
  * @param components - How many components disagree, held-back ones included
  * @param ruleUrl - Where the precedence rule is written (`precedenceRuleUrl`)
+ * @param owner - The week's DS owner as a Slack id (`precedenceOwner`), or null
  */
-export function precedenceParent(components: number, ruleUrl: string, addressee: Addressee | null = null): string {
+export function precedenceParent(components: number, ruleUrl: string, owner: string | null = null): string {
   const what = components === 1 ? "1 component" : `${components} components`;
   const line = `ode and the library disagree on ${what}. <${ruleUrl}|Code wins> unless a difference is deliberate.`;
-  if (!addressee) return `C${line}`;
-  return `${"slack" in addressee ? `<@${addressee.slack}>` : escapeSlackText(addressee.figma)}, c${line}`;
+  return owner ? `<@${owner}>, c${line}` : `C${line}`;
 }
 
 /**

@@ -29,6 +29,7 @@ import {
   UNIVERSAL,
   type FakeChannel,
 } from "./helpers/sweep-harness";
+import { activeFrom } from "./helpers/team";
 
 const NOTES: ScheduledJob = { key: "sweep:notes", kind: "sweep-notes" };
 const CARDS: ScheduledJob = { key: "sweep:cards", kind: "sweep-cards" };
@@ -168,6 +169,51 @@ test("a Universal-pillar card's comment contradicting its PRD lands in #plus-uni
   assert.equal(h.posted.length, 1);
   assert.equal(h.posted[0]!.channel, UNIVERSAL);
   assert.match(JSON.stringify(h.posted[0]!.blocks), /"<@U0CY>, a card comment settled.*"<@U0CY> · from a card comment"/);
+});
+
+test("a card comment's decision is carded for its Contributor only while their Team Members row is active (#1361)", async () => {
+  const CARD_ID = "dddddddddddddddddddddddddddddddd";
+  const card = notionPage(CARD_ID, {
+    title: "Button refresh",
+    pillars: ["Universal"],
+    contributors: ["Cy Contributor"],
+    blocks: [{ id: "c-spec", lastEditedTime: OLD, text: "Buttons use the primary style." }],
+  });
+  for (const [active, tagged] of [
+    [activeFrom([{ name: "Cy Contributor", slack: "U0CY" }]), true],
+    [activeFrom([{ name: "Cy Contributor", slack: "U0CY", affiliation: "Past Collaborators" }]), false],
+    [activeFrom([], [{ id: "U0CY", real_name: "Cy Contributor" }]), false],
+  ] as const) {
+    const h = sweepHarness({
+      channels: quiet,
+      sources: [card],
+      capture: true,
+      notion: {
+        cards: [
+          {
+            id: CARD_ID,
+            url: card.url,
+            title: card.title,
+            lastEditedTime: TONIGHT,
+            parentDatabaseId: ROADMAP_DB,
+            properties: { "Product Pillar": "Universal", "Current Team": "Design" },
+            people: { Contributor: ["Cy Contributor"] },
+          },
+        ],
+        comments: { [CARD_ID]: [{ id: "cm-1", createdTime: TONIGHT, text: "Decided in crit: secondary style for buttons.", links: [], byBot: false }] },
+      },
+      people: PEOPLE,
+      active,
+      detectorReplies: [recordReply({ source: card, block: "c-spec", evidence: ["comment:cm-1"], replacement: "Buttons use the secondary style." })],
+      now: at(29, 22),
+    });
+    await runSweepJob(CARDS, h.deps);
+    h.clock.now = at(30, 14);
+    await runSweepJob(MORNING, h.deps);
+    // With nobody active to own it, nobody is named and nothing is carded.
+    assert.equal(h.posted.length, tagged ? 1 : 0);
+    if (tagged) assert.match(JSON.stringify(h.posted[0]!.blocks), /<@U0CY>/);
+  }
 });
 
 test("a card's design owner is tagged when the roles name a designer among its Contributors", async () => {

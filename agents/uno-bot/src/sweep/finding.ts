@@ -111,12 +111,9 @@ export interface FindingTarget {
   writable: boolean;
   title: string;
   pillars: string[];
-  /** The Roadmap card's design owner as a Slack id, when known: whom the
-   *  ladder tags. */
+  /** The Roadmap card's design owner as a Slack id, when known and active:
+   *  whom the ladder tags. */
   designOwner?: string | null;
-  /** The Figma file's creator by handle, when known: whom the ladder names
-   *  when there is no card. */
-  creatorHandle?: string | null;
   /** `search` when a search found the page, so the card says so. */
   foundBy?: "search";
 }
@@ -244,15 +241,11 @@ export const LIBRARY_TEAM = "Universal";
  * design-system code and Storybook are that library's code, so they take its
  * team. Any other target names no team.
  */
-function ladderTarget(
-  target: Pick<FindingTarget, "kind" | "pillars" | "designOwner" | "creatorHandle">,
-): Pick<FindingContext, "card" | "figmaFile"> {
-  const creatorHandle = target.creatorHandle ?? null;
+function ladderTarget(target: Pick<FindingTarget, "kind" | "pillars" | "designOwner">): Pick<FindingContext, "card" | "figmaFile"> {
   if (target.kind === "notion") return { card: { pillars: target.pillars, designOwner: target.designOwner ?? null } };
   if (target.kind === "figma-library" || target.kind === "design-system-code" || target.kind === "storybook") {
-    return { figmaFile: { team: LIBRARY_TEAM, creatorHandle } };
+    return { figmaFile: { team: LIBRARY_TEAM } };
   }
-  if (target.kind === "figma") return { figmaFile: { creatorHandle } };
   return {};
 }
 

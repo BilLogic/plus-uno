@@ -31,7 +31,8 @@ import { sectionHandOffIn } from "../src/sweep/sections";
 import { memoryRunStorage, sweepHarness } from "./helpers/sweep-harness";
 import { likelyCard, projectWords } from "../src/figma-tidy/checks";
 import { leaveAsIs } from "../src/figma-tidy/run";
-import { figmaReviewChannel } from "../src/figma-tidy/env";
+import { figmaReviewChannel, tidyCardOf } from "../src/figma-tidy/env";
+import { activeFrom } from "./helpers/team";
 import type { Env } from "../src/types";
 import { planRun, TIDY_JOBS } from "../src/scheduled/runs";
 import { itemProposal } from "../src/slack/decision-cards";
@@ -870,5 +871,30 @@ describe("the read", () => {
     const tuesday = planRun("morning", Date.parse("2026-10-13T13:00:00Z"));
     assert.deepEqual(tuesday.jobs.filter((j) => j.kind.startsWith("figma-tidy")).map((j) => j.key), ["figma-tidy-post"]);
     assert.equal(planRun("end-of-day", Date.parse("2026-10-13T10:00:00Z")).jobs.some((j) => j.kind.startsWith("figma-tidy")), false);
+  });
+});
+
+describe("a card's design owner and designers, as the checks read them (#1361)", () => {
+  const fields = { number: 2482, title: "Goal Setting", url: "https://www.notion.so/2482", designStatus: "WIP", devStatus: null };
+  const contributors = [
+    { id: "n-sarah", name: "Sarah Kim" },
+    { id: "n-jade", name: "Jade Wang" },
+  ];
+  const team = (active: ReturnType<typeof activeFrom>) => ({
+    notionPeople: { "n-sarah": "U0SARAH", "n-jade": "U0JADE" },
+    roles: { U0SARAH: "design", U0JADE: "design" } as const,
+    active,
+  });
+
+  it("tags, and writes into a title, only designers whose Team Members row is active", () => {
+    const both = tidyCardOf(fields, contributors, team(activeFrom([{ name: "Sarah Kim", slack: "U0SARAH" }, { name: "Jade Wang", slack: "U0JADE" }])));
+    assert.equal(both.owner, "U0SARAH");
+    assert.deepEqual(both.designers, ["Sarah", "Jade"]);
+    for (const jade of [{ name: "Jade Wang", slack: "U0JADE", affiliation: "Past Collaborators" }, null]) {
+      const card = tidyCardOf(fields, [...contributors].reverse(), team(activeFrom([{ name: "Sarah Kim", slack: "U0SARAH" }, ...(jade ? [jade] : [])])));
+      assert.equal(card.owner, "U0SARAH", "Jade, first on the card, is passed over");
+      assert.deepEqual(card.designers, ["Sarah"], "and left out of the title");
+    }
+    assert.equal(tidyCardOf(fields, contributors, team(activeFrom([]))).owner, null, "nobody active: nobody tagged");
   });
 });

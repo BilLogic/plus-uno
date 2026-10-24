@@ -48,6 +48,8 @@ import { renderGateNote } from "../src/slack/gate-note";
 import { proposalEvent, recordProposalEvents } from "../src/usage/index";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
 import { mentionCount, notified } from "./helpers/notified";
+import { activeFrom, EVERYONE_ACTIVE } from "./helpers/team";
+import type { ActivePeople } from "../src/usage/roles";
 import { at, DESIGN, memoryRunStorage, msg, notionPage, sweepHarness, ts, UNO_BOT, type SweepHarness } from "./helpers/sweep-harness";
 import { cardExpiresAt } from "../src/card-expiry";
 
@@ -215,7 +217,7 @@ const NOT_SHOWN = JSON.stringify({ shows: false, confidence: 0.9 });
 function morning(
   h: SweepHarness,
   drifts: InMemoryDriftStore,
-  opts: FileOpts & { options?: string[] | null; dryRun?: boolean; judge?: string[]; figmaPeople?: Record<string, string> } = {},
+  opts: FileOpts & { options?: string[] | null; dryRun?: boolean; judge?: string[]; figmaPeople?: Record<string, string>; active?: ActivePeople } = {},
 ): {
   deps: DriftPostDeps;
   run(): Promise<Awaited<ReturnType<typeof runDriftAsks>>>;
@@ -253,6 +255,7 @@ function morning(
     now: () => h.clock.now,
     ...(opts.dryRun ? { dryRun: true } : {}),
     ...(opts.figmaPeople ? { figmaPeople: async () => opts.figmaPeople! } : {}),
+    active: async () => opts.active ?? EVERYONE_ACTIVE,
   };
   const hooks: { stage: DriftSectionDeps["stage"] } = {
     async stage(proposal, channelKind) {
@@ -452,6 +455,43 @@ describe("a Figma drift at the morning run", () => {
     const [proposal] = await t.h.threadState.getProposalsByChannel(DESIGN);
     assert.deepEqual(proposal!.confirmers, ["U0BEA", "U0STARTER", "U0ADE"]);
     assert.match(JSON.stringify(proposal!.operations), /Last published by cy<designs>/);
+  });
+
+  it("names a publisher only while their Team Members row is active: never one who left, or one with no row (#1361)", async () => {
+    const publisher = { handle: "Cy Diaz", at: "2026-09-20T10:00:00Z", id: "1105000000000000003" };
+    for (const [active, onCard] of [
+      [activeFrom([{ name: "Cy Diaz", slack: "U0CY" }]), true],
+      [activeFrom([{ name: "Cy Diaz", slack: "U0CY", affiliation: "Past Collaborators" }]), false],
+      [activeFrom([], [{ id: "U0CY", real_name: "Cy Diaz" }]), false],
+    ] as const) {
+      const t = await sweptRecap();
+      const m = morning(t.h, t.drifts, { publisher, figmaPeople: { "1105000000000000003": "U0CY" }, active });
+      await m.run();
+      const [proposal] = await t.h.threadState.getProposalsByChannel(DESIGN);
+      if (onCard) {
+        assert.match(cardsOf(m.posted[0]!.blocks)[0]!.subtitle!.text, /published by Cy Diaz/);
+        assert.ok(proposal!.confirmers?.includes("U0CY"));
+        assert.match(JSON.stringify(proposal!.operations), /Last published by Cy Diaz/);
+      } else {
+        assert.doesNotMatch(JSON.stringify(m.posted), /Cy Diaz/, "not on the card");
+        assert.ok(!proposal!.confirmers?.includes("U0CY"), "and no say");
+        assert.doesNotMatch(JSON.stringify(proposal!.operations), /Last published by/, "not on the intake either");
+      }
+    }
+  });
+
+  it("names a publisher the directory does not map on the intake only by an active row's name", async () => {
+    for (const [active, named] of [
+      [activeFrom([{ name: "Cy Diaz" }]), true],
+      [activeFrom([{ name: "Cy Diaz", affiliation: "Past Collaborators" }]), false],
+      [activeFrom([]), false],
+    ] as const) {
+      const t = await sweptRecap();
+      const m = morning(t.h, t.drifts, { publisher: { handle: "Cy Diaz", at: "2026-09-20T10:00:00Z", id: "1105000000000000003" }, figmaPeople: {}, active });
+      await m.run();
+      const [proposal] = await t.h.threadState.getProposalsByChannel(DESIGN);
+      assert.equal(/Last published by Cy Diaz/.test(JSON.stringify(proposal!.operations)), named);
+    }
   });
 
   it("names no one for a file with no named version", async () => {
