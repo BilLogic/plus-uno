@@ -323,7 +323,7 @@ describe("[durable-object] the cut-off alarm", () => {
   // The daily sweep measures a card, and the execution it became, by the
   // card's own TTL: a 72 h card collected by the default hour would be gone
   // the first night.
-  it("the daily sweep keeps a 72 h record at 71 h and deletes it at 73 h", async () => {
+  it("the daily sweep keeps a 72 h card's execution until its deadline and the card itself DECIDED_TTL_MS past it", async () => {
     const HOUR_MS = 60 * 60 * 1000;
     const long: PendingProposal = { ...PROPOSAL, ttlMs: 72 * HOUR_MS };
     const keys = (stub: ReturnType<typeof namespace.get>) =>
@@ -332,12 +332,16 @@ describe("[durable-object] the cut-off alarm", () => {
         (await state.storage.get("exec:1700.2")) !== undefined,
       ]);
 
-    // A card past its deadline is kept while its "Expired" edit is owed
-    // (#1316) — a day, `CARD_EXPIRY_EDIT_GRACE_MS` — and its execution is not.
+    // A card past its deadline is kept for View `DECIDED_TTL_MS` past it
+    // (#1362), which outlasts the day its "Expired" edit is owed (#1316,
+    // `CARD_EXPIRY_EDIT_GRACE_MS`); its execution goes at the deadline.
+    const KEPT_HOURS = DECIDED_TTL_MS / HOUR_MS;
     for (const [ageHours, kept] of [
       [71, [true, true]],
       [73, [true, false]],
-      [72 + 24 + 1, [false, false]],
+      [72 + 24 + 1, [true, false]],
+      [72 + KEPT_HOURS - 1, [true, false]],
+      [72 + KEPT_HOURS + 1, [false, false]],
     ] as const) {
       const { store, stub, fire } = fresh(() => Date.now() - ageHours * HOUR_MS);
       await store.putProposal(long);

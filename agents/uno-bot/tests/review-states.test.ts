@@ -265,8 +265,8 @@ describe("the read-only view, for someone who can't decide", () => {
 });
 
 
-/** When a card closed, as View's line says it (`closedWhen`): "Oct 19 at 9:13 AM ET". */
-const WHEN = String.raw`[A-Z][a-z]{2} \d{1,2} at \d{1,2}:\d{2} [AP]M ET`;
+/** When a card closed, as View's line says it (`closedWhen`): "Oct 19 at 09:13 ET". */
+const WHEN = String.raw`[A-Z][a-z]{2} \d{1,2} at \d{2}:\d{2} ET`;
 
 describe("a decided card, opened from View", () => {
   async function decided(decision: "confirm" | "cancel", over: Partial<PendingProposal> = {}, note?: string) {
