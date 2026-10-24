@@ -119,7 +119,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/foundations/content/overview.md`](design-system/guidelines/foundations/content/overview.md) | Product copy rules |
 | [`design-system/guidelines/foundations/content/voice-and-tone.md`](design-system/guidelines/foundations/content/voice-and-tone.md) | Warm, direct, encouraging |
 | [`design-system/guidelines/foundations/elevation.md`](design-system/guidelines/foundations/elevation.md) | Elevation creates visual hierarchy through shadows |
-| [`design-system/guidelines/foundations/grid.md`](design-system/guidelines/foundations/grid.md) | The PLUS Design System uses a fluid 12-column grid that adapts to the container width |
+| [`design-system/guidelines/foundations/grid.md`](design-system/guidelines/foundations/grid.md) | PLUS lays pages on two 12-column grids with gutter 16 — the screen grid for modals and overlays, the content grid inside the surface |
 | [`design-system/guidelines/foundations/iconography.md`](design-system/guidelines/foundations/iconography.md) | This design system uses FontAwesome Free icons via the string shorthand |
 | [`design-system/guidelines/foundations/illustrations.md`](design-system/guidelines/foundations/illustrations.md) | Illustration style, when to reach for one, and where the assets live |
 | [`design-system/guidelines/foundations/logos.md`](design-system/guidelines/foundations/logos.md) | The PLUS marks, their clear space, and their permitted variants |

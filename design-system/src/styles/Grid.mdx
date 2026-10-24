@@ -5,9 +5,10 @@ import * as GridStories from './Grid.stories.jsx';
 <Meta of={GridStories} />
 
 <Title />
-The grid is the horizontal structure of every PLUS page. It divides the main
-content area into columns so that cards, tables, forms, and text blocks align
-consistently across screens — and across designers. The grid governs **where
+The grid is the horizontal structure of every PLUS page. There are two, both
+12 columns with gutter 16: the **screen grid**, which modals and overlays size
+from, and the **content grid** inside the surface, which cards, tables, forms
+and text blocks align to. The grid governs **where
 content containers sit**; the [spacing tokens](?path=/docs/foundations-spacing--docs)
 govern everything inside them. PLUS is a **desktop-only product**: the grid
 starts at **MD (768px)** — do not design or build below 768px.
@@ -22,8 +23,8 @@ starts at **MD (768px)** — do not design or build below 768px.
 <div className="sb-ds-doc-section">
 ### Grid anatomy
 
-The grid is made of three parts. Columns flex with the viewport; gutters and
-margins stay fixed per breakpoint.
+Each grid is made of three parts. Columns flex with the screen; gutters stay 16
+at every breakpoint.
 
 <GridStories.GridAnatomy />
 </div>
@@ -38,29 +39,28 @@ columns simply stretch. This supersedes the old Breakpoint component's
 min–max drag behavior, which is **deprecated**; the grid is now the source of
 truth for how layouts respond.
 
-In Figma, breakpoints are **modes** on the `size / layout` variable collection —
-Medium (768px) / Large (1024px) / X-Large (1440px). In code they are
-`--breakpoint-md-min` / `-lg-min` / `-xl-min` in
-`design-system/src/tokens/_layout.scss`.
+In Figma, breakpoints are **modes** on the `spacing / layout` variable
+collection — Medium (768px) / Large (1024px) / X-Large (1440px). In code they
+are `--breakpoint-md-min` / `-lg-min` / `-xl-min` in
+`design-system/src/tokens/_layout.scss`, and each mode's grid values are in
+`design-system/src/tokens/_frame_layers.scss`.
 
 <GridStories.Breakpoints />
 
 The column count is **12 at every breakpoint**. Because PLUS never renders on
 small screens, we never drop to 6 or 2 columns — a 4-column card row at XL is
-still a 4-column card row at MD, just narrower. The 32px viewport margin
-intentionally matches `--size-surface-pad-x`, so the grid margin and the page
-surface padding are the same edge.
+still a 4-column card row at MD, just narrower.
 </div>
 
 <div className="sb-ds-doc-section">
-### One grid, two contexts
+### Two grids
 
-There are exactly **two grid styles** in Figma, and neither is per-breakpoint:
-every value in them is bound to a `size / layout` variable, so a single style
-adapts when you switch the frame's mode. The **viewport grid** structures
-full-page frames; the **content grid** lives on the `Pattern/Surface container`
-component and is what page content actually aligns to — its 8px gutter is what
-the `Columns/col-*` spans (and the code `--col-*` tokens) are computed from.
+Neither grid is per-breakpoint: each is bound to `spacing / layout` variables,
+so it adapts when you switch the frame's mode. The **screen grid** spans the
+screen inside the screen pad, centered and capped at 1232, and ignores the
+sidebar; modals and overlays size from it. The **content grid** lives inside
+the surface of the `Pattern/Surface container` component and is what page
+content aligns to.
 
 <GridStories.TwoGrids />
 </div>
@@ -98,14 +98,21 @@ of Main after the shell has taken its share.
   avatars are positioned with spacing tokens (`--size-element-*`), not columns.
 - **Only the top level aligns**: inside a container, use spacing tokens for
   everything. The grid stops at the container's edge.
-- **Overlays float above the grid**: modals, dropdowns, tooltips, and toasts
-  are positioned relative to their trigger or the viewport, not to columns.
+- **Overlays float above the content grid**: modals take their width from the
+  screen grid; dropdowns, tooltips, and toasts are positioned relative to their
+  trigger or the screen, not to columns.
 </div>
 
 <div className="sb-ds-doc-section">
 ### Column reference
 
 <GridStories.ColumnReference />
+</div>
+
+<div className="sb-ds-doc-section">
+### Modal widths
+
+<GridStories.ModalWidths />
 </div>
 
 <div className="sb-ds-doc-section">

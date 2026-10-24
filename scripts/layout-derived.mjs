@@ -3,8 +3,8 @@
  * the Layout Grid Lab rather than typed in.
  *
  * Figma has no expressions, so `Layout/width-content`, `Layout/width-column`,
- * `Layout/width-modal-*` and `Layout/pad-left-container` are plain numbers per
- * mode. They were filled by running this arithmetic at each mode's screen
+ * `Layout/width-column-screen`, `Layout/width-modal-*` and
+ * `Layout/pad-left-container` are plain numbers per mode. They were filled by running this arithmetic at each mode's screen
  * width, and the token test checks the export against it, so a mode value that
  * drifts from the rules is caught instead of shipped.
  *
@@ -16,7 +16,8 @@
  * - Content is the surface's inner width, capped at 1232 and never under 720.
  * - The grid is 12 columns with gutter 16.
  * - The screen side pad is the container pad plus the surface pad, so the
- *   SCREEN grid (the page grid with the sidebar closed) starts there.
+ *   SCREEN grid (the page grid with the sidebar closed) starts there. It is
+ *   12 columns with gutter 16, centered, and capped at 1232 like content.
  * - A modal spans 6 · 8 · 10 columns of the screen grid plus its own 16 pad
  *   on each side, rounded to a whole pixel.
  *
@@ -49,7 +50,8 @@ const span = (n, col) => n * col + (n - 1) * GUTTER;
  * @param {number} width the screen width a mode stands for
  * @returns {{ 'width-screen': number, 'pad-x-screen': number,
  *   'pad-left-container': number, 'width-content': number,
- *   'width-column': number, 'width-modal-sm': number, 'width-modal-md': number,
+ *   'width-column': number, 'width-column-screen': number,
+ *   'width-modal-sm': number, 'width-modal-md': number,
  *   'width-modal-lg': number }}
  */
 export function deriveLayout(width) {
@@ -66,6 +68,7 @@ export function deriveLayout(width) {
     'pad-left-container': docked ? 0 : CONTAINER_PAD,
     'width-content': content,
     'width-column': column(content),
+    'width-column-screen': screenColumn,
     'width-modal-sm': modal(MODAL_SPANS.sm),
     'width-modal-md': modal(MODAL_SPANS.md),
     'width-modal-lg': modal(MODAL_SPANS.lg),

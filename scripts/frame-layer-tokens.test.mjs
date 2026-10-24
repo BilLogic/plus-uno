@@ -62,6 +62,7 @@ const LAYOUT = {
   '--layout-pad-left-container': ['8px', '0px', '0px'],
   '--layout-gutter': ['16px', '16px', '16px'],
   '--layout-width-column': ['45.33px', '47.33px', '80.67px'],
+  '--layout-width-column-screen': ['45.33px', '66.67px', '88px'],
   '--layout-max-width-content': ['1232px', '1232px', '1232px'],
   '--layout-max-width-reading': ['864px', '864px', '864px'],
   '--layout-min-width-content': ['720px', '720px', '720px'],
@@ -307,5 +308,51 @@ test('the old tokens the new ones sit beside still resolve, unchanged', () => {
   };
   for (const [name, value] of Object.entries(OLD)) {
     assert.equal(corpus.get(name)?.value, value, name);
+  }
+});
+
+/*
+ * Modal.scss works the modal width out from the screen width with one
+ * continuous formula, which is right between breakpoints too. At the three
+ * mode widths it has to land on what Figma draws: 6 · 8 · 10 screen columns,
+ * the gutters between them, and the modal pad on each side.
+ */
+const MODAL_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/components/messaging/Modal/Modal.scss'), 'utf8');
+
+/** The width Modal.scss computes for a span on a screen `width` wide, its tokens read at `mode`. */
+function modalWidth(span, width, mode) {
+  const block = MODAL_SCSS.match(/\n\.plus-modal \{([\s\S]*?)\n\}/)?.[1];
+  assert.ok(block, 'Modal.scss has no .plus-modal block');
+  const local = Object.fromEntries([...block.matchAll(tokenDeclarationPattern('--plus-modal-'))].map(([, n, v]) => [n, v.trim()]));
+  local['--plus-modal-span'] = String(span);
+  const formula = block.match(/\n\s*width:\s*([^;]+);/)?.[1];
+  assert.ok(formula, '.plus-modal declares no width');
+  const resolve = (expr, depth = 0) => {
+    assert.ok(depth < 10, `${expr} does not resolve`);
+    return expr
+      .replace(/var\(--plus-modal-screen,\s*100vw\)/g, String(width))
+      .replace(/var\((--[a-z0-9-]+)\)/g, (_, name) => {
+        if (name in local) return `(${resolve(local[name], depth + 1)})`;
+        return String(parseFloat(atMode(name, mode)));
+      });
+  };
+  const clamp = (lo, value, hi) => Math.max(lo, Math.min(value, hi));
+  const calc = (n) => n;
+  return new Function('clamp', 'calc', `return ${resolve(formula)};`)(clamp, calc);
+}
+
+test('Modal.scss widths at 768, 1024 and 1440 are 6 · 8 · 10 screen columns, their gutters and the modal pad', () => {
+  assert.match(MODAL_SCSS, /\.plus-modal-width-md \{\s*--plus-modal-span: 8;/);
+  assert.match(MODAL_SCSS, /\.plus-modal-width-lg \{\s*--plus-modal-span: 10;/);
+  const num = (name, mode) => parseFloat(atMode(name, mode));
+  for (const [mode, width] of Object.entries(LAYOUT_MODES)) {
+    for (const span of [6, 8, 10]) {
+      const expected = span * num('--layout-width-column-screen', mode)
+        + (span - 1) * num('--layout-gutter', mode)
+        + 2 * num('--modal-pad', mode);
+      // The token holds the column to two decimals, so ten columns drift by under a tenth of a pixel.
+      const actual = modalWidth(span, width, mode);
+      assert.ok(Math.abs(actual - expected) < 0.1, `${span} columns at ${mode}: Modal.scss ${actual}, Figma ${expected}`);
+    }
   }
 });
