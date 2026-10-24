@@ -68,8 +68,19 @@ export type FileOwner = Addressee;
  * @param active - Who is active this run
  */
 export function activeOwner(owner: FileOwner | null | undefined, active: ActivePeople): FileOwner | null {
-  const slack: unknown = (owner as { slack?: unknown } | null | undefined)?.slack;
-  return typeof slack === "string" && isActive(slack, active) ? { slack } : null;
+  const slack = queuedSlackOf(owner);
+  return slack && isActive(slack, active) ? { slack } : null;
+}
+
+/** An owner as the queue stored it: a Slack person, or — in an entry queued
+ *  before #1361 — a Figma handle, which `FileOwner` no longer admits. */
+export type StoredOwner = FileOwner | { figma: string };
+
+/** The Slack id of a queued owner, or null for anything else: an older
+ *  entry's Figma handle names nobody (#1361). */
+export function queuedSlackOf(owner: StoredOwner | null | undefined): string | null {
+  const slack: unknown = owner && "slack" in owner ? owner.slack : undefined;
+  return typeof slack === "string" ? slack : null;
 }
 
 /** One file's decisions, waiting for the morning. */

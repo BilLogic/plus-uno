@@ -342,7 +342,9 @@ async function scanCard(
   }
   if (!people.length) {
     // Never a default to the lead: nobody to ask is no message.
-    const none = missing.length || !inactive.length ? `found in Slack${missing.length ? `: ${missing.join(", ")}` : ""}` : "active on Team Members";
+    // Only people who have left: say so. Anyone else unmatched: not in Slack.
+    const onlyLeft = inactive.length > 0 && missing.length === 0;
+    const none = onlyLeft ? "active on Team Members" : `found in Slack${missing.length ? `: ${missing.join(", ")}` : ""}`;
     notes.push(`${card.pageId}: no ${who} ${none}`);
     skips[id] = now + SKIP_RECHECK_MS;
     return null;
@@ -433,7 +435,8 @@ async function ownersOf(
     if (id && isActivePerson(id, active)) {
       if (!ids.includes(id)) ids.push(id);
     } else if (name && isActiveName(name, active)) unmatched.push(name);
-    else if (name) inactive.push(name);
+    // Found in Slack but not active: logged as inactive, by name or by id.
+    else if (name || id) inactive.push(name || c.id);
     else unnamed.push(c.id);
   }
   return { people: ids, unmatched, unnamed, inactive };
@@ -631,8 +634,8 @@ export function cardTodoNoteHook(
         const entry = note.entries[Number(t.messageTs.split(".")[0]) - 1];
         if (!entry) continue;
         // An assignee who is not active is nobody: the note's takers are asked.
-        const found = t.assigneeName ? await deps.people.slackIdForName(t.assigneeName) : null;
-        const assignee = found && isActivePerson(found, await deps.people.active()) ? found : null;
+        const assigneeId = t.assigneeName ? await deps.people.slackIdForName(t.assigneeName) : null;
+        const assignee = assigneeId && isActivePerson(assigneeId, await deps.people.active()) ? assigneeId : null;
         todos.push({ blockId: entry.id, assignee, what: t.what });
       }
       const meetingAt = Math.min(...note.entries.map((e) => e.at).filter(Number.isFinite));

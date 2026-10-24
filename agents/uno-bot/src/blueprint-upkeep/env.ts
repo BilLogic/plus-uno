@@ -13,8 +13,8 @@
 //   • the model: the Worker's provider (`selectProvider`), one tier a call;
 //   • the owners: the card's Contributors, `MAX_OWNERS` at most, each through
 //     the Team Members directory then by name (card follow-ups' `peopleFor`),
-//     and only those active there (`activeOwnersOf`, #1361); one Team Members
-//     maps to nobody in Slack is named by their active row's name, not tagged;
+//     and only those active there (`activeOwnersOf`, #1361); an active row
+//     that maps to nobody in Slack is named by its row's name, not tagged;
 //   • View slice: a saved slice citing the drafted path, one `slides` read
 //     (`sliceCiting`), else the first changed row's `?cell=` link;
 //   • the place: card follow-ups' ladder (`cardPlace`);
