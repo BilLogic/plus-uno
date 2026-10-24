@@ -15,6 +15,7 @@
 
     /* App shell + content grid */
     --layout-sidebar-width: 164px; /* SideNav fixed width; not a Figma variable (CODE_ONLY_LAYOUT) */
+    /* Legacy spec-page grid: --layout-grid-gap and --col-* below serve the spec pages only; new work uses the screen and content grid tokens in _frame_layers.scss */
     --layout-grid-gap: 8px; /* Figma Grid/content-gutter (= --size-element-gap-sm); col-* spans assume this */
 
     /* Stacking layers; not Figma variables (CODE_ONLY_LAYERS) */

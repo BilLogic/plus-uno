@@ -2,11 +2,11 @@
   "note": "Snapshot of every variable in the PLUS Figma library, captured with figma.variables.getLocalVariableCollectionsAsync + getLocalVariablesAsync. Consumed by scripts/generate-token-registry.mjs to validate the Figma-variable -> CSS-token mapping, and held to a capture date by check:figma-snapshots. Refresh with `npm run snapshot:figma-variables`, which prints the probe to run in Figma, and `npm run snapshot:figma-variables -- --write <probe.json>`, which writes this file from what the probe returned.",
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "figmaFileName": "Design System - BS4 Foundation (Component LIbrary)",
-  "capturedAt": "2026-10-23",
-  "totalVariables": 584,
+  "capturedAt": "2026-10-24",
+  "totalVariables": 585,
   "byType": {
     "COLOR": 232,
-    "FLOAT": 340,
+    "FLOAT": 341,
     "BOOLEAN": 9,
     "STRING": 3
   },
@@ -588,6 +588,7 @@
         "Grid/columns",
         "Grid/gutter",
         "Grid/width-column",
+        "Grid/width-column-screen",
         "Modal/width-modal-lg",
         "Modal/width-modal-md",
         "Modal/width-modal-sm",

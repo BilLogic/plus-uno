@@ -14,7 +14,9 @@
      * screen pad, never under 720 and capped at 1232 like content. So it grows
      * with the screen, stops at 1280, never shrinks below the 768 screen and
      * ignores the sidebar. Figma's Modal/width-modal-* per mode are this rule
-     * at 768 · 1024 · 1440. `--plus-modal-screen` stands in for the screen when
+     * at 768 · 1024 · 1440, and its column there is Grid/width-column-screen
+     * (`--layout-width-column-screen`); scripts/frame-layer-tokens.test.mjs
+     * holds this formula to that token. `--plus-modal-screen` stands in for the screen when
      * an ancestor sets it, such as a docs frame drawn at a mode's width.
      *
      * The screen pad is Screen/pad-x-screen below 1440, 24. From 1440 it is 32,

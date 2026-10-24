@@ -626,6 +626,28 @@
         "19378:3": 10000
       },
       "description": "X-Large has no limit; 10000 is a stand-in."
+    },
+    {
+      "id": "VariableID:19560:76913",
+      "name": "Grid/width-column-screen",
+      "variableCollectionId": "VariableCollectionId:19378:46207",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--layout-width-column-screen)"
+      },
+      "valuesByMode": {
+        "19378:1": 45.33333206176758,
+        "19378:2": 66.66666412353516,
+        "19378:3": 88
+      },
+      "resolvedValuesByMode": {
+        "19378:1": 45.33333206176758,
+        "19378:2": 66.66666412353516,
+        "19378:3": 88
+      }
     }
   ]
 }

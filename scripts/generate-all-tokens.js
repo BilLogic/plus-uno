@@ -636,6 +636,7 @@ function generateLayoutSCSS() {
 ${Object.entries(breakpoints).map(([k, v]) => `    --breakpoint-${k}: ${px(v)};\n`).join('')}
     /* App shell + content grid */
 ${Object.entries(CODE_ONLY_LAYOUT).map(([token, { value, note }]) => `    --${token}: ${px(value)}; /* ${note}; not a Figma variable (CODE_ONLY_LAYOUT) */\n`).join('')}\
+    /* Legacy spec-page grid: --layout-grid-gap and --col-* below serve the spec pages only; new work uses the screen and content grid tokens in _frame_layers.scss */
     --layout-grid-gap: ${px(gridGap)}; /* Figma Grid/content-gutter (= --size-${GRID_GAP_EQUALS}); col-* spans assume this */
 
     /* Stacking layers; not Figma variables (CODE_ONLY_LAYERS) */
@@ -893,7 +894,7 @@ function generateFrameLayersSCSS() {
  * X-Large (1440px): the Medium value is in :root, wider modes override below.
  *
  * The derived Layout rows (pad-left-container, width-content, width-column,
- * width-modal-*) are each mode's value at its screen width, 768 · 1024 · 1440,
+ * width-column-screen, width-modal-*) are each mode's value at its screen width, 768 · 1024 · 1440,
  * the same numbers Figma's modes hold. Between those widths they step rather
  * than follow the screen, so code that needs the exact width at any screen
  * computes it from the rules instead of reading these.

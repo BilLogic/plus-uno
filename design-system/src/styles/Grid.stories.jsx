@@ -48,21 +48,26 @@ export const GridAnatomy = () => (
     </div>
 );
 
+const note = { color: 'var(--color-on-surface-variant)', marginTop: 'var(--space-050)' };
+
+/** Mode values, Medium · Large · X-Large, as `_frame_layers.scss` holds them. */
+const MODES = ['Medium (768)', 'Large (1024)', 'X-Large (1440)'];
+
 export const Breakpoints = () => (
     <div style={wrap}>
         <DocTable
-            headers={['Breakpoint', 'Min width', 'Columns', 'Viewport gutter', 'Viewport margin']}
-            aligns={['left', 'right', 'right', 'left', 'left']}
+            headers={['Breakpoint', 'Min width', 'Columns', 'Screen grid', 'Content grid']}
+            aligns={['left', 'right', 'right', 'right', 'right']}
             rows={[
-                [<strong>MD</strong>, '768px', '12', '12px', '16px'],
-                [<strong>LG</strong>, '1024px', '12', '16px', '32px'],
-                [<strong>XL</strong>, '1440px', '12', '16px', '32px'],
+                [<strong>Medium</strong>, '768px', '12', '720px', '720px'],
+                [<strong>Large</strong>, '1024px', '12', '976px', '744px'],
+                [<strong>X-Large</strong>, '1440px', '12', '1232px', '1144px'],
             ]}
         />
-        <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', marginTop: '8px' }}>
-            In Figma these live as mode-varying variables in the <strong>size / layout</strong> collection
-            ({code('Breakpoints/min width')}, {code('Grid/viewport-gutter')}, {code('Grid/viewport-margin')});
-            in code as {code('--breakpoint-md-min')} / {code('-lg-')} / {code('-xl-min')}.
+        <p className="body2-txt" style={note}>
+            In Figma these are the modes of the <strong>spacing / layout</strong> collection; in code the
+            breakpoints are {code('--breakpoint-md-min')} / {code('-lg-min')} / {code('-xl-min')} and the
+            mode values live in {code('_frame_layers.scss')}. Both grids have gutter 16 ({code('--layout-gutter')}).
         </p>
     </div>
 );
@@ -70,29 +75,28 @@ export const Breakpoints = () => (
 export const TwoGrids = () => (
     <div style={wrap}>
         <DocTable
-            headers={['Grid', 'Figma style', 'Applies to', 'Gutter', 'Margin / offset']}
+            headers={['Grid', 'Where it sits', 'Used for', 'Width', 'Column']}
             rows={[
                 [
-                    <strong>Viewport grid</strong>,
-                    code('Grid/Viewport (adaptive)'),
-                    'Full-page frames without the app shell (login, standalone flows) and the Breakpoint reference frames.',
-                    <>12 / 16 / 16px&nbsp;{code('Grid/viewport-gutter')}</>,
-                    <>16 / 32 / 32px&nbsp;{code('Grid/viewport-margin')}</>,
+                    <strong>Screen grid</strong>,
+                    <>Across the screen, inside the screen pad ({code('--layout-pad-x-screen')}), centered and capped at 1232. It ignores the sidebar.</>,
+                    'Modals and overlays.',
+                    '720 · 976 · 1232',
+                    <>{code('--layout-width-column-screen')} 45.33 · 66.67 · 88</>,
                 ],
                 [
                     <strong>Content grid</strong>,
-                    code('Grid/Adaptive (12-col)'),
-                    <>The <strong>Main region</strong> — carried by the {code('Pattern/Surface container')} component, so every page built on it inherits the grid automatically.</>,
-                    <>8px&nbsp;{code('--layout-grid-gap')}</>,
-                    <>32px&nbsp;{code('Surface/pad-x')} (columns align to the content box inside the surface padding)</>,
+                    <>Inside the surface, after the sidebar and {code('--surface-pad')}.</>,
+                    'Page content: cards, tables, forms, charts and text blocks.',
+                    <>{code('--layout-width-content')} 720 · 744 · 1144</>,
+                    <>{code('--layout-width-column')} 45.33 · 47.33 · 80.67</>,
                 ],
             ]}
         />
-        <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', marginTop: '8px' }}>
-            Both are <strong>single grid styles</strong> whose count/gutter/offset are bound to
-            variables in the <strong>size / layout</strong> collection. You never pick a per-breakpoint
-            style: <strong>switch the frame&rsquo;s size / layout mode</strong> (MD / LG / XL) and the grid,
-            the frame width, and the {code('Display/*')} visibility toggles all adapt together.
+        <p className="body2-txt" style={note}>
+            Both grids are 12 columns ({code('--layout-columns')}) with gutter 16 ({code('--layout-gutter')}),
+            bound to <strong>spacing / layout</strong> variables. You never pick a per-breakpoint grid:
+            <strong> switch the frame&rsquo;s spacing / layout mode</strong> and the grid and the frame width adapt together.
         </p>
     </div>
 );
@@ -100,11 +104,11 @@ export const TwoGrids = () => (
 export const FixedFluid = () => (
     <div style={wrap}>
         <DocTable
-            headers={['Mode', 'Max width (incl. margins)', 'Use for']}
+            headers={['Mode', 'Max width', 'Use for']}
             aligns={['left', 'right', 'left']}
             rows={[
-                [<strong>Fixed-wide</strong>, '1296px', 'Most experiences: dashboards, directories, search results, settings — anything with structured content.'],
-                [<strong>Fixed-narrow</strong>, '864px', 'Long-form reading: documentation, articles, review flows. Caps line length so text stays readable.'],
+                [<strong>Fixed-wide</strong>, <>1232px {code('--layout-max-width-content')}</>, 'Most experiences: dashboards, directories, search results, settings — anything with structured content.'],
+                [<strong>Fixed-narrow</strong>, <>864px {code('--layout-max-width-reading')}</>, 'Long-form reading: documentation, articles, review flows. Caps line length so text stays readable.'],
                 [<strong>Fluid</strong>, 'None (fills Main)', 'Content with no natural maximum width — boards, timelines, whiteboard-style canvases.'],
             ]}
         />
@@ -116,102 +120,103 @@ export const LayoutRegions = () => (
         <DocTable
             headers={['Region', 'PLUS today']}
             rows={[
-                [<strong>TopNav</strong>, <>The <code>TopBar</code> section spec — full-width bar at the top of the shell.</>],
-                [<strong>SideNav</strong>, <>The <code>Sidebar</code> section spec — fixed-width navigation on the left (164px, {code('--layout-sidebar-width')}).</>],
-                [<strong>Main</strong>, <>The content area — an instance of the <code>Pattern/Surface container</code> component, which <strong>fills the width it is given</strong> and carries the content grid + Content slot. <strong>The grid applies here and only here.</strong></>],
-                [<strong>Panel</strong>, 'Contextual surface on the right. In PLUS it currently functions as an off-canvas drawer rather than a docked region, but the region name is retained for future use.'],
+                [<strong>TopNav</strong>, <>The <code>Topbar</code> pattern — 32 high ({code('--layout-height-topbar')}) across the top of the frame.</>],
+                [<strong>SideNav</strong>, <>The sidebar — 240 wide ({code('--layout-width-sidebar')}), docked from Large and closed below it.</>],
+                [<strong>Main</strong>, <>The surface inside the <code>Pattern/Surface container</code> component, which <strong>fills the width it is given</strong> and carries the content grid and the Content slot. <strong>The content grid applies here and only here.</strong></>],
+                [<strong>Overlays</strong>, <>Modals and their overlay sit above the frame on the <strong>screen grid</strong>, so they ignore the sidebar.</>],
             ]}
         />
     </div>
 );
 
+const GridStrip = () => (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(var(--layout-columns), minmax(0, 1fr))', gap: 'var(--layout-gutter)', marginBottom: 'var(--space-150)' }}>
+        {Array.from({ length: 12 }, (_, i) => (
+            <div key={i} style={{
+                height: 'var(--space-200)',
+                backgroundColor: 'var(--color-surface-container-low)',
+                borderRadius: 'var(--radius-025)',
+                border: '1px dashed var(--color-outline-variant)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '0.75rem', color: 'var(--color-on-surface-variant)',
+            }}>{i + 1}</div>
+        ))}
+    </div>
+);
+
 export const ColumnReference = () => (
     <div style={wrap}>
-        <p className="body1-txt" style={{ marginBottom: '16px' }}>
-            The main content area is a <strong>12-column grid with an 8px gutter</strong>{' '}
-            (<code>--layout-grid-gap</code>) at every breakpoint. Columns flex with the viewport;
-            the spans below are measured at each breakpoint&rsquo;s <strong>minimum</strong> width and
-            match the <code>Columns/col-1…12</code> variables in Figma (12 × col-1 + 11 × 8px = the
-            Main content width).
+        <p className="body1-txt" style={{ marginBottom: 'var(--space-100)' }}>
+            Both grids are <strong>12 columns with gutter 16</strong>. The column tokens hold one column at
+            each mode&rsquo;s screen; between breakpoints they step, so lay content out on the grid itself
+            ({code('repeat(var(--layout-columns), minmax(0, 1fr))')} with {code('gap: var(--layout-gutter)')})
+            and span whole columns with {code('grid-column: span N')}.
         </p>
 
-        {/* Visual 12-column grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '8px', marginBottom: '24px' }}>
-            {Array.from({ length: 12 }, (_, i) => (
-                <div key={i} style={{
-                    height: '32px',
-                    backgroundColor: 'var(--color-surface-container-low)',
-                    borderRadius: '4px',
-                    border: '1px dashed var(--color-outline-variant)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '0.75rem', color: 'var(--color-on-surface-variant)',
-                }}>{i + 1}</div>
-            ))}
-        </div>
+        <GridStrip />
 
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '16px', border: '1px solid var(--color-outline-variant)' }}>
-            <thead>
-                <tr style={{ backgroundColor: 'var(--color-surface-container-low)', borderBottom: '2px solid var(--color-outline)' }}>
-                    <th className="body2-txt" style={{ padding: '10px 12px', textAlign: 'left' }}>Span</th>
-                    <th className="body2-txt" style={{ padding: '10px 12px', textAlign: 'right' }}>MD (768)</th>
-                    <th className="body2-txt" style={{ padding: '10px 12px', textAlign: 'right' }}>LG (1024)</th>
-                    <th className="body2-txt" style={{ padding: '10px 12px', textAlign: 'right' }}>XL (1440)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr style={{ borderBottom: '1px solid var(--color-outline-variant)', backgroundColor: 'var(--color-surface-container-lowest)' }}>
-                    <td className="body2-txt" style={{ padding: '10px 12px' }}><strong>Main content width</strong></td>
-                    <td style={{ padding: '10px 12px', textAlign: 'right', fontFamily: 'monospace' }}>672px</td>
-                    <td style={{ padding: '10px 12px', textAlign: 'right', fontFamily: 'monospace' }}>748px</td>
-                    <td style={{ padding: '10px 12px', textAlign: 'right', fontFamily: 'monospace' }}>1164px</td>
-                </tr>
-                {[
-                    { col: '--col-1', md: '48.67', lg: '55.00', xl: '89.67' },
-                    { col: '--col-2', md: '105.33', lg: '118.00', xl: '187.33' },
-                    { col: '--col-3', md: '162.00', lg: '181.00', xl: '285.00' },
-                    { col: '--col-4', md: '218.67', lg: '244.00', xl: '382.67' },
-                    { col: '--col-5', md: '275.33', lg: '307.00', xl: '480.33' },
-                    { col: '--col-6', md: '332.00', lg: '370.00', xl: '578.00' },
-                    { col: '--col-7', md: '388.67', lg: '433.00', xl: '675.67' },
-                    { col: '--col-8', md: '445.33', lg: '496.00', xl: '773.33' },
-                    { col: '--col-9', md: '502.00', lg: '559.00', xl: '871.00' },
-                    { col: '--col-10', md: '558.67', lg: '622.00', xl: '968.67' },
-                    { col: '--col-11', md: '615.33', lg: '685.00', xl: '1066.33' },
-                    { col: '--col-12', md: '672.00', lg: '748.00', xl: '1164.00' },
-                ].map((row, i) => (
-                    <tr key={i} style={{ borderBottom: '1px solid var(--color-outline-variant)' }}>
-                        <td style={{ padding: '10px 12px' }}><code style={{ fontSize: '0.85em' }}>{row.col}</code></td>
-                        <td style={{ padding: '10px 12px', textAlign: 'right', fontFamily: 'monospace' }}>{row.md}px</td>
-                        <td style={{ padding: '10px 12px', textAlign: 'right', fontFamily: 'monospace' }}>{row.lg}px</td>
-                        <td style={{ padding: '10px 12px', textAlign: 'right', fontFamily: 'monospace' }}>{row.xl}px</td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
+        <DocTable
+            headers={['Token', ...MODES]}
+            aligns={['left', 'right', 'right', 'right']}
+            rows={[
+                [code('--layout-width-column-screen'), '45.33px', '66.67px', '88px'],
+                [code('--layout-width-column'), '45.33px', '47.33px', '80.67px'],
+                [code('--layout-width-content'), '720px', '744px', '1144px'],
+                [code('--layout-gutter'), '16px', '16px', '16px'],
+            ]}
+        />
+        <p className="body2-txt" style={note}>
+            The older {code('--col-1')} … {code('--col-12')} and {code('--layout-grid-gap')} (8) are the legacy
+            spec-page grid on a 672 · 748 · 1164 width. Only the spec pages read them; new work uses the tokens above.
+        </p>
+    </div>
+);
+
+export const ModalWidths = () => (
+    <div style={wrap}>
+        <p className="body1-txt" style={{ marginBottom: 'var(--space-100)' }}>
+            A modal spans <strong>6 · 8 · 10 screen-grid columns</strong>, the gutters between them, and its
+            own pad of 16 ({code('--modal-pad')}) on each side:
+        </p>
+        <pre style={{ backgroundColor: 'var(--color-surface-container-low)', padding: 'var(--space-100)', borderRadius: 'var(--radius-050)', overflow: 'auto', marginBottom: 'var(--space-100)', lineHeight: 1.7 }}>
+{`width = n × --layout-width-column-screen + (n − 1) × --layout-gutter + 2 × --modal-pad`}
+        </pre>
+        <DocTable
+            headers={['Width', 'Columns', ...MODES, 'Token']}
+            aligns={['left', 'right', 'right', 'right', 'right', 'left']}
+            rows={[
+                [code('sm'), '6', '384px', '512px', '640px', code('--layout-width-modal-sm')],
+                [code('md'), '8', '507px', '677px', '848px', code('--layout-width-modal-md')],
+                [code('lg'), '10', '629px', '843px', '1056px', code('--layout-width-modal-lg')],
+            ]}
+        />
+        <p className="body2-txt" style={note}>
+            The tokens are rounded to a whole pixel. {code('Modal.scss')} works the formula out continuously from
+            the screen width, so a modal grows with the screen between breakpoints, stops past a 1280 screen and
+            ignores the sidebar. Pass {code('width="sm" | "md" | "lg"')} to {code('<Modal>')} rather than a pixel width.
+        </p>
     </div>
 );
 
 export const ShellMath = () => (
     <div style={wrap}>
-        <p className="body1-txt" style={{ marginBottom: '16px' }}>
-            Most PLUS pages render inside <code>PageLayout</code> (SideNav + TopNav + Main). The grid is
-            computed from the <strong>Main region&rsquo;s width</strong>, not the viewport, so at each
-            breakpoint minimum the usable content width is smaller than the viewport:
+        <p className="body1-txt" style={{ marginBottom: 'var(--space-100)' }}>
+            Pages render inside <code>SurfaceContainer</code>: the topbar row, then the sidebar and the surface.
+            The content grid is measured from the <strong>surface&rsquo;s inner width</strong>, not the screen:
         </p>
-        <pre style={{ backgroundColor: 'var(--color-surface-container-low)', padding: '16px', borderRadius: '8px', overflow: 'auto', marginBottom: '8px', lineHeight: 1.7 }}>
-{`MD  (768):  768 − 32 (outer) − 64 (surface padding)          =  672px
-LG (1024): 1024 − 32 − 164 (SideNav) − 16 (gap) − 64          =  748px
-XL (1440): 1440 − 32 − 164 (SideNav) − 16 (gap) − 64          = 1164px`}
+        <pre style={{ backgroundColor: 'var(--color-surface-container-low)', padding: 'var(--space-100)', borderRadius: 'var(--radius-050)', overflow: 'auto', marginBottom: 'var(--space-050)', lineHeight: 1.7 }}>
+{`Medium   (768):  768 − 8 container pad − 8 − 2 × 16 surface pad      =  720
+Large   (1024): 1024 − 240 sidebar − 8 − 2 × 16                        =  744
+X-Large (1440): 1440 − 240 sidebar − 8 − 2 × 24 surface pad            = 1144
+
+Screen grid:    clamp(720, screen − 2 × 24, 1232)  =  720 · 976 · 1232`}
         </pre>
         <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-            At MD the SideNav collapses (its visibility is bound to the <code>Display/*</code> booleans),
-            which is why it drops out of the MD calculation. The SideNav is <strong>164px</strong>{' '}
-            (<code>--layout-sidebar-width</code>) — the app shell, the Figma variable, and the grid math
-            all agree on this value. Ownership is layered: the <strong>page frame</strong> owns the width
-            (bound to <code>Breakpoints/min width</code>) and the size/layout <strong>mode</strong>; the{' '}
-            <strong>Surface container pattern</strong> runs on <em>auto mode</em>, inherits the page&rsquo;s
-            mode, and simply <strong>fills the space it is given</strong> — it carries the content grid
-            and the Content slot, nothing else.
+            The sidebar is 240 from the screen edge once it docks at Large; below Large it is closed and the
+            surface starts at the container pad. Content is capped at 1232 and never under 720. Ownership is
+            layered: the <strong>page frame</strong> owns the width ({code('Screen/width-screen')}) and the
+            spacing / layout <strong>mode</strong>; the <strong>Surface container pattern</strong> fills the
+            space it is given and carries the content grid and the Content slot.
         </p>
     </div>
 );
@@ -242,7 +247,7 @@ const PAIRS = [
         dont: <>Use fluid grids for structured content with a natural width — relationships fall apart when wide.</>,
     },
     {
-        do: <>Switch breakpoints in Figma through the frame&rsquo;s <strong>size / layout mode</strong> — grid, width, and visibility adapt together.</>,
+        do: <>Switch breakpoints in Figma through the frame&rsquo;s <strong>spacing / layout mode</strong> — grid, width, and visibility adapt together.</>,
         dont: <>Detach or hand-edit the grid styles — the variable bindings are what make one grid serve every breakpoint.</>,
     },
     {
@@ -250,8 +255,8 @@ const PAIRS = [
         dont: <>Design below 768px — PLUS has no small-screen tier.</>,
     },
     {
-        do: <>Keep the grid inside the Main region; compute columns from Main&rsquo;s width.</>,
-        dont: <>Span the grid across SideNav, TopNav, or Panel — those regions are fixed.</>,
+        do: <>Lay page content on the content grid inside Main, and size modals from the screen grid.</>,
+        dont: <>Span the content grid across SideNav or TopNav, or give a modal a fixed pixel width.</>,
     },
 ];
 
