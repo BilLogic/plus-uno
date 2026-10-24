@@ -1,11 +1,87 @@
 /**
- * Home on the new layout. The blocks are Section and Card patterns placed
- * straight on the SurfaceContainer's 12-column content grid; their spacing is
- * the patterns' own. What is left here sets the type of plain text in a slot
- * and lines up the primitives a slot holds, with Element and Card tokens.
+ * Home on the new layout: four flat Sections on the SurfaceContainer's
+ * 12-column content grid, one per row, and the lesson cards inside the last.
+ * The rules below the palette lay out what a Section's slots hold.
  */
 
-// Primitives side by side in a slot: buttons, a tile and its text, a tab's count.
+/* ===================================================================
+ * ONE-OFF EXPERIMENT: a neutral palette for this page only.
+ *
+ * Bill asked for the calm neutrals of Claude and Notion, as a one-time look
+ * for this review page: direct colors, not tokens. It overrides the custom
+ * properties the frame, Sidebar, Topbar, Tabs and Card read, on this page's
+ * root only, so nothing global or shared changes. Blue stays on primary
+ * buttons, the active tab, links and the chart line. Delete this block to
+ * return the page to the system palette.
+ * =================================================================== */
+.plus-home-new {
+    // Frame and app background; the content surface.
+    --surface-sunken: #f7f7f5;
+    --color-surface: #f7f7f5;
+    --color-surface-sunken: #f7f7f5;
+    --color-surface-container-low: #f7f7f5;
+    --surface-default: #ffffff;
+    --surface-raised: #ffffff;
+    --surface-overlay: #ffffff;
+    --color-surface-default: #ffffff;
+    --color-surface-raised: #ffffff;
+    --color-surface-overlay: #ffffff;
+    --color-surface-container-lowest: #ffffff;
+
+    // Subtle fill.
+    --color-surface-variant: #f1f1ef;
+    --color-surface-container: #f1f1ef;
+
+    // Lines.
+    --color-outline: rgba(55, 53, 47, 0.09);
+    --color-outline-variant: rgba(55, 53, 47, 0.16);
+
+    // Text: primary, secondary, tertiary. Secondary is #6f6e69 rather than the
+    // brief's #787774, which is 4.17:1 on the frame and fails AA; #6f6e69 holds
+    // 4.5:1 on all three surfaces. Tertiary (2.6:1) is for decorative glyphs only.
+    --color-on-surface: #37352f;
+    --color-on-surface-variant: #6f6e69;
+    --plus-home-new-text-tertiary: #9b9a97;
+
+    // Neutral hover and press washes.
+    --color-on-surface-state-08: rgba(55, 53, 47, 0.05);
+    --color-on-surface-state-12: rgba(55, 53, 47, 0.08);
+    --color-on-surface-state-16: rgba(55, 53, 47, 0.12);
+
+    // The content panel's edge, and the elevation of popups and lifted cards.
+    --surface-radius: 12px;
+    --plus-home-new-panel-edge: 0 0 0 1px rgba(15, 15, 15, 0.05), 0 1px 2px rgba(15, 15, 15, 0.04);
+    --plus-home-new-elevated: 0 0 0 1px rgba(15, 15, 15, 0.05), 0 4px 12px rgba(15, 15, 15, 0.08);
+    --surface-overlay-shadow: var(--plus-home-new-elevated);
+
+    // The sidebar's selected and hover rows are neutral, not blue.
+    .plus-surface-container__sidebar {
+        --color-primary-state-16: rgba(55, 53, 47, 0.08);
+        --color-primary-state-12: rgba(55, 53, 47, 0.05);
+        --color-primary-text: #37352f;
+        --color-primary: #37352f;
+    }
+
+    .plus-surface-container__surface {
+        box-shadow: var(--plus-home-new-panel-edge);
+    }
+}
+/* ======================================================= end one-off */
+
+// Rhythm: generous space between the sections, and no boxes around them.
+.plus-home-new .plus-surface-container__content {
+    row-gap: var(--surface-stack-lg);
+}
+
+// Page header: the actions sit right of the title, and under it below 1024.
+@media (max-width: 1023.98px) {
+    .plus-home-new__header > .plus-pattern-section-header .plus-pattern-section-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+// Primitives side by side in a slot.
 .plus-home-new__inline {
     display: flex;
     align-items: center;
@@ -13,42 +89,35 @@
     min-width: 0;
 }
 
+.plus-home-new__inline--tight {
+    gap: var(--element-inline-sm);
+}
+
 .plus-home-new__inline--wrap {
     flex-wrap: wrap;
 }
 
-// Primitives stacked in a slot.
+// Primitives stacked in a slot; a section's parts are further apart.
 .plus-home-new__stack {
     display: flex;
     flex-direction: column;
-    gap: var(--card-stack-lg);
+    gap: var(--section-stack-md);
     min-width: 0;
+}
+
+.plus-home-new__stack--section {
+    gap: var(--surface-stack-lg);
 }
 
 // Plain text in a slot, on the type styles.
-.plus-home-new__text {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--card-stack-sm);
-    min-width: 0;
-
-    p {
-        margin: 0;
-    }
-}
-
-.plus-home-new__strong {
-    font: var(--heading-xsmall);
+.plus-home-new__body {
+    margin: 0;
+    font: var(--body-default);
     color: var(--color-on-surface);
 }
 
-.plus-home-new__stat {
-    font: var(--metric-medium);
-    color: var(--color-on-surface);
-}
-
-.plus-home-new__label {
+.plus-home-new__secondary {
+    margin: 0;
     font: var(--body-default);
     color: var(--color-on-surface-variant);
 }
@@ -59,7 +128,93 @@
     color: var(--color-on-surface-variant);
 }
 
-// The skills chart: the chart takes the body's width, its caption follows.
+// The badge: a slim callout row under the page header.
+.plus-home-new__callout {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--element-inline-md);
+    padding: var(--space-075) var(--space-100);
+    border-radius: var(--radius-050);
+    background-color: var(--color-surface-variant);
+
+    p {
+        margin: 0;
+    }
+}
+
+// Doubled class: a glyph rule elsewhere sets icons to 12.
+.plus-home-new__callout-icon.plus-home-new__callout-icon {
+    font-size: var(--icon-lg);
+    color: var(--color-on-surface-variant);
+}
+
+.plus-home-new__callout-title {
+    font: var(--heading-xsmall);
+    color: var(--color-on-surface);
+}
+
+.plus-home-new__callout-action {
+    margin-inline-start: auto;
+}
+
+// Your impact: one strip of stats split by 1px dividers; they stack below 1024.
+.plus-home-new__stats {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.plus-home-new__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--card-stack-sm);
+    min-width: 0;
+    padding-inline: var(--space-150);
+
+    &:first-child {
+        padding-inline-start: 0;
+    }
+
+    & + & {
+        border-inline-start: 1px solid var(--color-outline);
+    }
+
+    p {
+        margin: 0;
+    }
+}
+
+@media (max-width: 1023.98px) {
+    .plus-home-new__stats {
+        grid-auto-flow: row;
+    }
+
+    .plus-home-new__stat {
+        padding-inline: 0;
+        padding-block: var(--space-075);
+
+        &:first-child {
+            padding-block-start: 0;
+        }
+
+        & + & {
+            border-inline-start: 0;
+            border-block-start: 1px solid var(--color-outline);
+        }
+    }
+}
+
+.plus-home-new__stat-value {
+    font: var(--metric-large);
+    color: var(--color-on-surface);
+}
+
+// Skills: the chart straight on the surface, its caption under it.
 .plus-home-new__chart {
     display: flex;
     flex-direction: column;
@@ -80,8 +235,8 @@
     );
     column-gap: var(--layout-gutter);
     // A scroller clips at its padding box. The padding gives each card room for
-    // its border and its elevation shadow (Light/2 reaches 10 below), and the
-    // equal negative margin keeps the cards on the grid's columns.
+    // its border and its hover lift, and the equal negative margin keeps the
+    // cards on the grid's columns.
     margin: calc(-1 * var(--card-stack-lg));
     padding: var(--card-stack-lg);
     scroll-padding-inline: var(--card-stack-lg);
@@ -103,5 +258,31 @@
 
     > * {
         flex: 1 1 auto;
+    }
+
+    // Lesson cards are flat, a divider-color line around them, and lift on hover.
+    .plus-pattern-card {
+        border-color: var(--color-outline);
+        box-shadow: none;
+        transition: box-shadow 0.15s ease;
+
+        &:hover {
+            box-shadow: var(--plus-home-new-elevated);
+        }
+    }
+}
+
+// A lesson's thumbnail: 16:9 in the subtle fill, the book icon centered.
+.plus-home-new__thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 16 / 9;
+    background-color: var(--color-surface-variant);
+    color: var(--plus-home-new-text-tertiary);
+
+    // Doubled class: a glyph rule elsewhere sets icons to 12.
+    > .fa-solid.fa-solid {
+        font-size: var(--size-200);
     }
 }

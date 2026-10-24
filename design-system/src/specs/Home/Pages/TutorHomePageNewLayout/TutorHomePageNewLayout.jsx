@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import { Alert, Button, Count, ListGroup, NavTabs, Select, Status, Tag, Tile } from '@/components';
+import { Alert, Button, Count, NavTabs, Select, Status, Tag } from '@/components';
 import { LineChart, RadarChart } from '@/dataviz';
 import PatternCard from '@/patterns/PatternCard';
 import PatternSection from '@/patterns/PatternSection';
-import { cardsPerRow, homeLayout, useGridMeasure, useTokenLength } from './homeGrid';
+import { cardsPerRow, useGridMeasure, useTokenLength } from './homeGrid';
 import './TutorHomePageNewLayout.scss';
 
 /** Today's Home content, unchanged: the Skills (Home Page) frame in the Specs file. */
@@ -36,7 +36,7 @@ const DEFAULT_OVERVIEW = {
     averagePerformance: [70, 70, 65, 75, 60, 70, 60],
 };
 
-/** Your Impact's pages, first to last, as today's Home holds them. */
+/** Your impact's pages, first to last, as today's Home holds them. */
 const IMPACT_PAGES = [
     [
         { value: '4.8', label: 'Student Interaction Rating', change: true },
@@ -65,30 +65,18 @@ const CATEGORY_COLOR = {
 /** The skills chart's score axis, 0 to 100 in quarters, as the Specs chart draws it. */
 const SCORE_DOMAIN = [0, 100];
 const SCORE_TICKS = [0, 25, 50, 75, 100];
-/** The score line's color: the Secondary role, as the Figma chart binds it. */
-const SCORE_COLOR = 'var(--color-secondary)';
-
-/** A block's grid placement as an inline style; before the first measure, every block spans the row. */
-const placed = (slot) => (slot ? { gridColumn: slot.column, gridRow: slot.row } : { gridColumn: '1 / -1' });
+/** The score line is one of the page's few blue marks: the Primary role. */
+const SCORE_COLOR = 'var(--color-primary)';
 
 /** How many lesson cards one view of the strip holds. */
 const lessonsPerView = (width, grid) => cardsPerRow(width, grid, grid.cardMin);
 
-/** The greeting's copy for each of its tabs, from today's Home. */
-const greetingCopy = (tab, name) => ({
-    'sign-up': {
-        title: `Sign up for your next session, ${name}!`,
-        description: 'Your students are counting on you! Click below to sign up for your next session and edit if needed.',
-    },
-    session: {
-        title: `Get ready to shine, ${name}.`,
-        description: "Your session links for today are ready. Select a session and click 'Join session' to begin.",
-    },
-    reflection: {
-        title: `How did your session go, ${name}?`,
-        description: 'Share your thoughts about the session to ensure a great experience for all.',
-    },
-})[tab];
+/** Each tab's body copy, from today's Home. */
+const SESSION_COPY = {
+    'sign-up': 'Your students are counting on you! Click below to sign up for your next session and edit if needed.',
+    session: "Your session links for today are ready. Select a session and click 'Join session' to begin.",
+    reflection: 'Share your thoughts about the session to ensure a great experience for all.',
+};
 
 /** Previous and next, for a paged block. */
 const PagerControls = ({ label, onPrevious, onNext, previousDisabled, nextDisabled }) => (
@@ -124,7 +112,7 @@ PagerControls.propTypes = {
 
 /** A tab label with a glyph or a count after it. */
 const TabLabel = ({ children, after }) => (
-    <span className="plus-home-new__inline">
+    <span className="plus-home-new__inline plus-home-new__inline--tight">
         {children}
         {after}
     </span>
@@ -134,24 +122,20 @@ TabLabel.propTypes = { children: PropTypes.node, after: PropTypes.node };
 
 const infoGlyph = <i className="fa-solid fa-circle-info" aria-hidden="true" />;
 
-/** The week-on-week change a stat carries. */
-const change = <Status style="success" leadingVisual="arrow-up">+{'{#}'}% since last week</Status>;
-
 /**
  * TutorHomePageNewLayout: today's tutor Home (the Specs "Skills (Home Page)"
- * frame, 563:207489) rebuilt from the patterns. A side-by-side "after" for
- * review; the Home pages beside it are the "before", and nothing here imports
- * their components.
+ * frame, 563:207489) recomposed as a calm, single-column page. A side-by-side
+ * "after" for review; the Home pages beside it are the "before", and nothing
+ * here imports their components.
  *
  * - The frame is PageLayout on the SurfaceContainer pattern: the topbar, the
  *   tutor sidebar with Home selected, and the surface's 12-column content grid.
- * - Every block is a direct child of that grid and is a Section or a Card
- *   pattern, whose header, body and footer slots hold design-system
- *   primitives. `homeGrid.js` places each on whole columns from the section
- *   and card minimums. Spacing comes from the patterns and the grid alone.
- * - The greeting is the page header (h1) with its tabs; My Badge and Your
- *   Impact are cards (h2), Personalized Recommendations a section (h2) whose
- *   lesson cards are h3s.
+ * - Four flat Sections are the grid's children, one per row, so the DOM order
+ *   is the visual order: the page header (h1) with the badge callout, Next
+ *   session with its tabs, Your impact with its stats and the Skills
+ *   subsection (h3), and Personalized recommendations, whose lesson cards are
+ *   the page's only cards.
+ * - The page wears a one-off neutral palette, set in its stylesheet.
  */
 const TutorHomePageNewLayout = ({
     id,
@@ -166,14 +150,10 @@ const TutorHomePageNewLayout = ({
     className = '',
     style,
 }) => {
-    // The formulas measure the content grid, which is the greeting's parent.
-    const gridRef = useRef(null);
-    const greetingRef = useCallback((node) => { gridRef.current = node?.parentElement ?? null; }, []);
     const stripRef = useRef(null);
-    const layout = useGridMeasure(gridRef, homeLayout);
     // The charts take a pixel height; it is the Size token, read at run time.
     const chartHeight = useTokenLength('--height-2000') ?? undefined;
-    const [greetingTab, setGreetingTab] = useState('sign-up');
+    const [sessionTab, setSessionTab] = useState('sign-up');
     const [skillsTab, setSkillsTab] = useState('skills-progress');
     const [impactIndex, setImpactIndex] = useState(0);
     const [edges, setEdges] = useState({ start: true, end: false });
@@ -201,7 +181,6 @@ const TutorHomePageNewLayout = ({
         el.scrollBy({ left: direction * (el.clientWidth + gutter), behavior: 'smooth' });
     };
 
-    const copy = greetingCopy(greetingTab, tutorName);
     const sessionOptions = sessionLinks.map((s) => ({ value: s.id, label: `${s.studentName}, ${s.time}, ${s.date}` }));
 
     return (
@@ -215,17 +194,36 @@ const TutorHomePageNewLayout = ({
             className={`plus-home-new ${className}`.trim()}
             style={style}
         >
-            {/* Greeting: Pattern/Section, page level, `_Section header` of the tabs type. */}
+            {/* Page header: Section at page level; the badge is a callout in its body. */}
             <PatternSection
-                ref={greetingRef}
                 level="page"
                 padding="none"
-                title={copy.title}
-                description={copy.description}
-                data-block="greeting"
-                style={placed(layout?.greeting)}
+                title={`Welcome back, ${tutorName}`}
+                description="Here's your tutoring at a glance."
+                data-block="header"
+                className="plus-home-new__header"
+                actions={(
+                    <>
+                        <Button text="Sign up now" style="primary" fill="filled" size="small" leadingVisual="paper-plane" />
+                        <Button text="View schedule" style="secondary" fill="tonal" size="small" />
+                    </>
+                )}
+            >
+                <div className="plus-home-new__callout">
+                    <i className="fa-solid fa-award plus-home-new__callout-icon" aria-hidden="true" />
+                    <p className="plus-home-new__callout-title">Certified Tutor</p>
+                    <p className="plus-home-new__secondary">20/20 lessons complete</p>
+                    <Button text="Claim" style="primary" fill="tonal" size="small" className="plus-home-new__callout-action" />
+                </div>
+            </PatternSection>
+
+            {/* Next session: a flat Section, `_Section header` of the tabs type. */}
+            <PatternSection
+                padding="none"
+                title="Next session"
+                data-block="session"
                 tabs={(
-                    <NavTabs mode="tabs" activeKey={greetingTab} onSelect={setGreetingTab} aria-label="Today">
+                    <NavTabs mode="tabs" activeKey={sessionTab} onSelect={setSessionTab} aria-label="Next session">
                         <NavTabs.Item eventKey="sign-up">Sign up / Edit</NavTabs.Item>
                         <NavTabs.Item eventKey="session">
                             <TabLabel after={<Count value={sessionLinks.length} size="small" />}>Session links</TabLabel>
@@ -234,103 +232,44 @@ const TutorHomePageNewLayout = ({
                     </NavTabs>
                 )}
             >
-                {greetingTab === 'sign-up' && (
-                    <div className="plus-home-new__inline">
-                        <Button text="Sign up now" style="primary" fill="filled" size="small" leadingVisual="paper-plane" />
-                        <Button text="View schedule" style="secondary" fill="tonal" size="small" />
-                    </div>
-                )}
-                {greetingTab === 'session' && (
-                    <div className="plus-home-new__stack">
+                <div className="plus-home-new__stack">
+                    <p className="plus-home-new__body">{SESSION_COPY[sessionTab]}</p>
+                    {sessionTab === 'sign-up' && (
                         <div className="plus-home-new__inline">
-                            <Select
-                                aria-label="Today's session"
-                                placeholder="Select a session"
-                                size="small"
-                                options={sessionOptions}
-                                value={selectedSession ?? ''}
-                                onChange={setSelectedSession}
-                            />
-                            <Button text="Join session" style="primary" fill="filled" size="small" disabled={!selectedSession} />
+                            <Button text="Edit sign-ups" style="primary" fill="outline" size="small" leadingVisual="pen" />
                         </div>
-                        <Alert style="warning" dismissible={false}>
-                            Session links will appear 5 minutes before your scheduled start time.
-                        </Alert>
-                    </div>
-                )}
-                {greetingTab === 'reflection' && (
-                    <Button text="Submit Your Reflection" style="primary" fill="filled" size="small" leadingVisual="paper-plane" />
-                )}
-            </PatternSection>
-
-            {/* My Badge: Pattern/Card, `_Card header` default; Claim in the footer. */}
-            <PatternCard
-                padding="sm"
-                title="My Badge"
-                data-block="badge"
-                // The badge card hugs its content rather than stretching to the row's tallest block.
-                style={{ ...placed(layout?.badge), alignSelf: 'start' }}
-                footer={<Button text="Claim" style="primary" fill="tonal" size="small" />}
-            >
-                <div className="plus-home-new__inline">
-                    <Tile content="icon" icon="award" size={48} color="gray" />
-                    <div className="plus-home-new__text">
-                        <p className="plus-home-new__strong">Certified Tutor</p>
-                        <p className="plus-home-new__caption">Complete 20/20 lessons to claim your badge.</p>
-                    </div>
-                </div>
-            </PatternCard>
-
-            {/* Skills: Pattern/Card, `_Card header` custom, holding the tabs; the chart in the body. */}
-            <PatternCard
-                // The large card: Figma's small card stops at 304 tall, under the chart's 320.
-                padding="lg"
-                data-block="skills"
-                style={placed(layout?.skills)}
-                header={(
-                    <NavTabs mode="tabs" activeKey={skillsTab} onSelect={setSkillsTab} aria-label="Skills">
-                        <NavTabs.Item eventKey="skills-overview"><TabLabel after={infoGlyph}>Skills Overview</TabLabel></NavTabs.Item>
-                        <NavTabs.Item eventKey="skills-progress"><TabLabel after={infoGlyph}>Skills Progress</TabLabel></NavTabs.Item>
-                    </NavTabs>
-                )}
-            >
-                <div className="plus-home-new__chart">
-                    {skillsTab === 'skills-progress' ? (
+                    )}
+                    {sessionTab === 'session' && (
                         <>
-                            <LineChart
-                                height={chartHeight}
-                                yDomain={SCORE_DOMAIN}
-                                yTicks={SCORE_TICKS}
-                                data={[{
-                                    name: 'Average score',
-                                    data: skillsProgressData.averageScores,
-                                    categories: skillsProgressData.sessionRanges,
-                                    color: SCORE_COLOR,
-                                }]}
-                            />
-                            <p className="plus-home-new__caption">Each point represents the average score across 5 sessions.</p>
+                            <div className="plus-home-new__inline">
+                                <Select
+                                    aria-label="Today's session"
+                                    placeholder="Select a session"
+                                    size="small"
+                                    options={sessionOptions}
+                                    value={selectedSession ?? ''}
+                                    onChange={setSelectedSession}
+                                />
+                                <Button text="Join session" style="primary" fill="filled" size="small" disabled={!selectedSession} />
+                            </div>
+                            <Alert style="warning" dismissible={false}>
+                                Session links will appear 5 minutes before your scheduled start time.
+                            </Alert>
                         </>
-                    ) : (
-                        <RadarChart
-                            height={chartHeight}
-                            filled
-                            yAxisMax={100}
-                            categories={skillsOverviewData.categories}
-                            series={[
-                                { name: 'Your performance', data: skillsOverviewData.yourPerformance },
-                                { name: 'Average tutor performance', data: skillsOverviewData.averagePerformance, dashStyle: 'Dash' },
-                            ]}
-                        />
+                    )}
+                    {sessionTab === 'reflection' && (
+                        <div className="plus-home-new__inline">
+                            <Button text="Submit Your Reflection" style="primary" fill="filled" size="small" leadingVisual="paper-plane" />
+                        </div>
                     )}
                 </div>
-            </PatternCard>
+            </PatternSection>
 
-            {/* Your Impact: Pattern/Card, `_Card header` default with the pager in its actions. */}
-            <PatternCard
-                padding="sm"
-                title="Your Impact"
+            {/* Your impact: a flat Section, the pager in its header; the stats strip, then the Skills subsection. */}
+            <PatternSection
+                padding="none"
+                title="Your impact"
                 data-block="impact"
-                style={placed(layout?.impact)}
                 actions={(
                     <PagerControls
                         label="impact page"
@@ -341,25 +280,66 @@ const TutorHomePageNewLayout = ({
                     />
                 )}
             >
-                <ListGroup flush as="ul">
-                    {IMPACT_PAGES[impactIndex].map((stat) => (
-                        <ListGroup.Item key={stat.label} as="li">
-                            <div className="plus-home-new__text">
-                                <p className="plus-home-new__stat">{stat.value}</p>
-                                <p className="plus-home-new__label">{stat.label}</p>
-                                {stat.change && change}
-                            </div>
-                        </ListGroup.Item>
-                    ))}
-                </ListGroup>
-            </PatternCard>
+                <div className="plus-home-new__stack plus-home-new__stack--section">
+                    <ul className="plus-home-new__stats">
+                        {IMPACT_PAGES[impactIndex].map((stat) => (
+                            <li key={stat.label} className="plus-home-new__stat">
+                                <p className="plus-home-new__stat-value">{stat.value}</p>
+                                <p className="plus-home-new__secondary">{stat.label}</p>
+                                {stat.change && <Status style="success" leadingVisual="arrow-up">+{'{#}'}% since last week</Status>}
+                            </li>
+                        ))}
+                    </ul>
 
-            {/* Recommendations: Pattern/Section, `_Section header` default with the pager; a row of Pattern/Cards. */}
+                    <PatternSection
+                        padding="none"
+                        title="Skills"
+                        data-block="skills"
+                        tabs={(
+                            <NavTabs mode="tabs" activeKey={skillsTab} onSelect={setSkillsTab} aria-label="Skills">
+                                <NavTabs.Item eventKey="skills-overview"><TabLabel after={infoGlyph}>Overview</TabLabel></NavTabs.Item>
+                                <NavTabs.Item eventKey="skills-progress"><TabLabel after={infoGlyph}>Progress</TabLabel></NavTabs.Item>
+                            </NavTabs>
+                        )}
+                    >
+                        <div className="plus-home-new__chart">
+                            {skillsTab === 'skills-progress' ? (
+                                <>
+                                    <LineChart
+                                        height={chartHeight}
+                                        yDomain={SCORE_DOMAIN}
+                                        yTicks={SCORE_TICKS}
+                                        data={[{
+                                            name: 'Average score',
+                                            data: skillsProgressData.averageScores,
+                                            categories: skillsProgressData.sessionRanges,
+                                            color: SCORE_COLOR,
+                                        }]}
+                                    />
+                                    <p className="plus-home-new__caption">Each point represents the average score across 5 sessions.</p>
+                                </>
+                            ) : (
+                                <RadarChart
+                                    height={chartHeight}
+                                    filled
+                                    yAxisMax={100}
+                                    categories={skillsOverviewData.categories}
+                                    series={[
+                                        { name: 'Your performance', data: skillsOverviewData.yourPerformance, color: SCORE_COLOR },
+                                        { name: 'Average tutor performance', data: skillsOverviewData.averagePerformance, dashStyle: 'Dash' },
+                                    ]}
+                                />
+                            )}
+                        </div>
+                    </PatternSection>
+                </div>
+            </PatternSection>
+
+            {/* Recommendations: a flat Section, the pager in its header; the lesson cards are the page's only cards. */}
             <PatternSection
-                title="Personalized Recommendations"
                 padding="none"
+                title="Personalized recommendations"
                 data-block="lessons"
-                style={placed(layout?.lessons)}
                 actions={(
                     <PagerControls
                         label="recommendations"
@@ -381,6 +361,11 @@ const TutorHomePageNewLayout = ({
                             <PatternCard
                                 padding="sm"
                                 title={lesson.title}
+                                image={(
+                                    <div className="plus-home-new__thumb">
+                                        <i className="fa-solid fa-book-open" aria-hidden="true" />
+                                    </div>
+                                )}
                                 footer={<Button text="Review" style="primary" fill="filled" size="small" onClick={() => onReviewLesson?.(lesson.id)} />}
                             >
                                 <div className="plus-home-new__inline plus-home-new__inline--wrap">
@@ -400,7 +385,7 @@ const TutorHomePageNewLayout = ({
 
 TutorHomePageNewLayout.propTypes = {
     id: PropTypes.string,
-    /** The name the greeting uses */
+    /** The name the header greets */
     tutorName: PropTypes.string,
     /** The account name in the topbar */
     userName: PropTypes.string,

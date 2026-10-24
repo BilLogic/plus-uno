@@ -22,13 +22,14 @@ import {
 const outline = () => screen.queryAllByRole('heading').map((h) => [h.tagName.toLowerCase(), h.textContent]);
 
 describe('Home (new layout)', () => {
-    it('is one h1, the greeting, with an h2 for each card and section and an h3 for each lesson', () => {
+    it('is one h1, the header, with an h2 per section, the Skills h3 and an h3 per lesson', () => {
         render(<TutorHomePageNewLayout />);
         expect(outline()).toEqual([
-            ['h1', 'Sign up for your next session, John!'],
-            ['h2', 'My Badge'],
-            ['h2', 'Your Impact'],
-            ['h2', 'Personalized Recommendations'],
+            ['h1', 'Welcome back, John'],
+            ['h2', 'Next session'],
+            ['h2', 'Your impact'],
+            ['h3', 'Skills'],
+            ['h2', 'Personalized recommendations'],
             ['h3', 'Lesson Title'],
             ['h3', 'Lesson Title'],
             ['h3', 'Lesson Title'],

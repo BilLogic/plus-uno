@@ -1,23 +1,22 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 
 /**
- * The layout formulas the Home page lays its blocks out with, on the
- * 12-column content grid. Every input is a token read from the page; no
- * width is written here.
+ * The layout arithmetic the Home page lays out with, on the 12-column content
+ * grid. Every input is a token read from the page; no width is written here.
  *
- * - A **row with a side column** (the greeting and badge; the skills chart and
- *   Your Impact) gives the side the fewest columns, from its preferred count,
- *   that keep it at `--section-min-width-side` while the main column keeps
- *   `--section-min-width-main`. When no split keeps both, the row stacks and
- *   each block spans all 12.
- * - A **row of cards** shows the most of 4 · 3 · 2 · 1 per row that keeps each
- *   card at its minimum (`--card-min-width-md`). Each of those counts divides
- *   12, so the cards land on whole columns.
+ * Every block spans the whole grid, one per row, so the DOM order is the
+ * visual order at every width. The one row that divides is the lesson strip:
+ * it shows the most of 4 · 3 · 2 · 1 cards per view that keeps each card at
+ * its minimum (`--card-min-width-md`). Each of those counts divides 12, so the
+ * cards land on whole columns.
  *
- * Column widths come from the measured row, not the `--col-*` spans: those are
- * per viewport and assume the older 8 gutter, and a column is relative to its
- * container (`grid.md` § Grid rules), which moves when the sidebar docks.
+ * Column widths come from the measured element, not the `--col-*` spans: those
+ * are per viewport and assume the older 8 gutter, and a column is relative to
+ * its container (grid.md, Grid rules), which moves when the sidebar docks.
  */
+
+/** The page's blocks, in reading order: the content grid's children, top to bottom. */
+export const BLOCKS = ['header', 'session', 'impact', 'lessons'];
 
 /** Column counts a row of cards may take, most first. Each divides 12. */
 export const CARD_COUNTS = [4, 3, 2, 1];
@@ -29,73 +28,12 @@ export const columnWidth = (width, { columns, gutter }) => (width - (columns - 1
 export const spanWidth = (span, width, grid) => span * columnWidth(width, grid) + (span - 1) * grid.gutter;
 
 /**
- * Splits a row into a main and a side column, or stacks it.
- * @param {number} width the row's width
- * @param {{ columns: number, gutter: number, mainMin: number, sideMin: number }} grid
- * @param {number} preferredSide the side column's span when it fits
- * @returns {{ main: number, side: number, stacked: boolean }}
- */
-export const splitRow = (width, grid, preferredSide) => {
-    for (let side = preferredSide; side <= grid.columns / 2; side += 1) {
-        const main = grid.columns - side;
-        if (spanWidth(side, width, grid) >= grid.sideMin && spanWidth(main, width, grid) >= grid.mainMin) {
-            return { main, side, stacked: false };
-        }
-    }
-    return { main: grid.columns, side: grid.columns, stacked: true };
-};
-
-/**
  * How many cards a row of `width` shows: the most of `CARD_COUNTS` that keeps
  * each card at `min`, gutters between them.
  * @returns {number}
  */
 export const cardsPerRow = (width, { gutter }, min) =>
     CARD_COUNTS.find((n) => (width - (n - 1) * gutter) / n >= min) ?? 1;
-
-/** Preferred side spans: the badge takes 3 columns, Your Impact 4. */
-export const PREFERRED_SIDE = { greeting: 3, progress: 4 };
-
-/** The page's blocks, in reading order: the DOM order, which is also the visual order at every width. */
-export const BLOCKS = ['greeting', 'badge', 'skills', 'impact', 'lessons'];
-
-/** A block's place on the grid: CSS `grid-column` and `grid-row` values. */
-const place = (start, span, row) => ({ column: `${start} / span ${span}`, row });
-
-/**
- * Where each block sits on the content grid at `width`.
- *
- * - **Both rows split** (Large and up): the greeting and the badge share row
- *   1, the skills chart and Your Impact row 2, each pair on `splitRow`'s spans;
- *   the recommendations take row 3.
- * - **Otherwise** every block spans all 12, one per row, in reading order. The
- *   badge card hugs its height, so a full-width badge is a short strip rather
- *   than an empty box.
- *
- * Blocks only ever follow their reading order, left to right and top to
- * bottom, so the tab order matches what a person sees.
- *
- * @returns {Record<typeof BLOCKS[number], { column: string, row: number }> & { stacked: boolean }}
- */
-export const homeLayout = (width, grid) => {
-    const greeting = splitRow(width, grid, PREFERRED_SIDE.greeting);
-    const progress = splitRow(width, grid, PREFERRED_SIDE.progress);
-    const all = grid.columns;
-    if (!greeting.stacked && !progress.stacked) {
-        return {
-            stacked: false,
-            greeting: place(1, greeting.main, 1),
-            badge: place(greeting.main + 1, greeting.side, 1),
-            skills: place(1, progress.main, 2),
-            impact: place(progress.main + 1, progress.side, 2),
-            lessons: place(1, all, 3),
-        };
-    }
-    return {
-        stacked: true,
-        ...Object.fromEntries(BLOCKS.map((block, i) => [block, place(1, all, i + 1)])),
-    };
-};
 
 /**
  * What a length token resolves to, in pixels, in `doc`'s cascade. The layout
@@ -133,8 +71,6 @@ export const readGrid = (el) => {
     return {
         columns: parseInt(root.getPropertyValue('--layout-columns'), 10),
         gutter: readLength(doc, '--layout-gutter'),
-        mainMin: readLength(doc, '--section-min-width-main'),
-        sideMin: readLength(doc, '--section-min-width-side'),
         cardMin: readLength(doc, '--card-min-width-md'),
     };
 };
@@ -162,10 +98,10 @@ export const useGridMeasure = (ref, measure, onResize) => {
             resized.current?.();
             const width = el.getBoundingClientRect().width;
             const grid = readGrid(el);
-            // Nothing laid out yet (or no stylesheet): keep the stacked default.
+            // Nothing laid out yet (or no stylesheet): keep the default.
             if (!width || !Number.isFinite(grid.columns)) return;
             const next = measure(width, grid);
-            // A resize that keeps the same spans does not re-render the page.
+            // A resize that keeps the same result does not re-render the page.
             const key = JSON.stringify(next);
             if (key === last.current) return;
             last.current = key;

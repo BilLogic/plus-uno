@@ -1,14 +1,15 @@
 /**
- * Home (new layout) stories: today's tutor Home on the new frame, grid and type.
+ * Home (new layout) stories: today's tutor Home recomposed on the new frame,
+ * grid and type, in a one-off neutral palette.
  * Figma: the "Home (tutor)" example in BS4 Foundation › Patterns › Page templates.
  *
  * THE TEST SEAM IS THIS FILE. Each width story sets the viewport first, since
  * the layout tokens switch on `@media (min-width: …)`, then asserts what a
- * person sees: every block is a Section or Card pattern placed straight on
- * the content grid, on whole columns where the formulas put it; no card sits
- * in a card; no text is clipped by its own box; the skills chart keeps its
- * axis labels and its 0 row; and the outline is one h1 with h2s and h3s
- * under it. Expected lengths are read from tokens, never typed in.
+ * person sees: every block is a flat Section on the content grid, in reading
+ * order; the lesson cards are the only cards, never nested, and render whole;
+ * no text is clipped by its own box; the skills chart keeps its axis labels;
+ * and the outline is one h1 with h2s and h3s under it. Expected lengths are
+ * read from tokens, never typed in.
  */
 
 import React from 'react';
@@ -80,51 +81,32 @@ const content = (canvasElement) => canvasElement.querySelector('.plus-surface-co
 /** The content grid's children: the blocks, by name. */
 const blocks = (canvasElement) => [...content(canvasElement).children].map((el) => ({ el, name: el.dataset.block || el.className }));
 
-/** Every block is a Section or Card pattern, straight on the grid, in reading order; no card holds a card. */
-const expectPatterns = async (canvasElement, list) => {
+/**
+ * Every block is a flat Section, straight on the grid, in reading order. The
+ * lesson cards are the page's only cards, and no card holds a card.
+ */
+const expectStructure = async (canvasElement, list) => {
     await expect(list.map((b) => b.name), 'the grid holds the blocks and nothing else').toEqual(BLOCKS);
     for (const { el, name } of list) {
-        const pattern = el.classList.contains('plus-pattern-section') || el.classList.contains('plus-pattern-card');
-        await expect(pattern, `${name} is a Section or Card pattern`).toBe(true);
+        await expect(el.classList.contains('plus-pattern-section'), `${name} is a Section`).toBe(true);
     }
-    const nested = canvasElement.querySelectorAll('.plus-pattern-card .plus-pattern-card, .plus-pattern-card .card');
-    await expect(nested.length, 'no card inside a card').toBe(0);
-    // One elevation for every card on the page: the Card pattern's level 1.
-    const shadows = new Set([...canvasElement.querySelectorAll('.plus-pattern-card')].map((c) => getComputedStyle(c).boxShadow));
-    await expect([...shadows].length, 'every card has the same elevation').toBe(1);
-    await expect([...shadows][0], 'and it is not flat').not.toBe('none');
+    const cards = [...canvasElement.querySelectorAll('.plus-pattern-card, .card')];
+    await expect(cards.length, 'a card for each lesson').toBe(3);
+    for (const card of cards) {
+        await expect(Boolean(card.closest('.plus-home-new__lesson')), 'only lessons are cards').toBe(true);
+        await expect(Boolean(card.parentElement.closest('.plus-pattern-card, .card')), 'no card inside a card').toBe(false);
+    }
 };
 
-/** Cards side by side stretch to the tallest in their row, as the Card pattern says; the badge hugs. */
-const expectRowHeights = async (list, stacked) => {
-    const block = (name) => rect(list.find((b) => b.name === name).el);
-    if (!stacked) await expect(block('impact').height, 'Your Impact takes the skills card\'s height').toBeCloseTo(block('skills').height, 0);
-    const badge = list.find((b) => b.name === 'badge').el;
-    // Hugging: its box is exactly its content, the cell's leftover height below it.
-    const inner = badge.querySelector('.plus-pattern-card-inner');
-    await expect(badge.clientHeight, 'My Badge hugs its content').toBeCloseTo(inner.getBoundingClientRect().height, 0);
-};
-
-/** The block sits where the formula put it: on column edges, `span` columns wide, inside the content box. */
-const expectPlaced = async (box, grid, { el, name }, [start, span, row]) => {
-    await expect(el.style.gridColumn, `${name}'s columns`).toBe(`${start} / span ${span}`);
-    await expect(el.style.gridRow, `${name}'s row`).toBe(String(row));
-    const r = rect(el);
-    const pitch = columnWidth(box.width, grid) + grid.gutter;
-    await expect(r.left - box.left, `${name} starts on column ${start}`).toBeCloseTo((start - 1) * pitch, 0);
-    await expect(r.width, `${name} spans ${span} columns`).toBeCloseTo(spanWidth(span, box.width, grid), 0);
-    await expect(r.right, `${name} inside the content's right edge`).toBeLessThanOrEqual(box.right + 0.5);
-};
-
-/** No two blocks overlap. */
-const expectNoOverlap = async (list) => {
-    for (let i = 0; i < list.length; i += 1) {
-        for (let j = i + 1; j < list.length; j += 1) {
-            const a = rect(list[i].el);
-            const b = rect(list[j].el);
-            const overlap = a.left < b.right - 0.5 && b.left < a.right - 0.5 && a.top < b.bottom - 0.5 && b.top < a.bottom - 0.5;
-            await expect(overlap, `${list[i].name} and ${list[j].name} overlap`).toBe(false);
-        }
+/** Each block spans the content width, and the blocks run top to bottom in DOM order. */
+const expectReadingOrder = async (box, list) => {
+    let bottom = -Infinity;
+    for (const { el, name } of list) {
+        const r = rect(el);
+        await expect(r.left, `${name} starts at the content's left edge`).toBeCloseTo(box.left, 0);
+        await expect(r.width, `${name} spans the content`).toBeCloseTo(box.width, 0);
+        await expect(r.top, `${name} sits below the block before it`).toBeGreaterThanOrEqual(bottom - 0.5);
+        bottom = r.bottom;
     }
 };
 
@@ -155,7 +137,17 @@ const expectNoClippedText = async (list) => {
     }
 };
 
-/** The skills chart keeps its 0 row and every x label, each inside the chart's box. */
+/** The resolved color a CSS custom property names, as computed styles print it. */
+const resolvedColor = (el, token) => {
+    const probe = document.createElement('span');
+    probe.style.color = `var(${token})`;
+    el.appendChild(probe);
+    const value = getComputedStyle(probe).color;
+    probe.remove();
+    return value;
+};
+
+/** The skills chart shows 0 to 100 in quarters and every x label, inside its box, in the Primary blue. */
 const expectChartAxes = async (canvasElement) => {
     const block = canvasElement.querySelector('[data-block="skills"]');
     await waitFor(() => expect(block.querySelectorAll('.highcharts-xaxis-labels text').length, 'every x label').toBe(5));
@@ -163,8 +155,8 @@ const expectChartAxes = async (canvasElement) => {
     const box = rect(chart);
     const yLabels = [...chart.querySelectorAll('.highcharts-yaxis-labels text')];
     await expect(yLabels.map((t) => t.textContent), 'the score axis, 0 row included').toEqual(['0', '25', '50', '75', '100']);
-    await expect(getComputedStyle(chart.querySelector('.highcharts-graph')).stroke, 'the line is the Secondary role')
-        .toBe(getComputedStyle(document.documentElement).getPropertyValue('--color-secondary').trim().replace(/^#(..)(..)(..)$/, (_, r, g, b) => `rgb(${parseInt(r, 16)}, ${parseInt(g, 16)}, ${parseInt(b, 16)})`));
+    await expect(getComputedStyle(chart.querySelector('.highcharts-graph')).stroke, 'the line is the Primary role')
+        .toBe(resolvedColor(block, '--color-primary'));
     for (const t of [...yLabels, ...chart.querySelectorAll('.highcharts-xaxis-labels text')]) {
         const r = rect(t);
         await expect(r.top >= box.top - 0.5 && r.bottom <= box.bottom + 0.5, `"${t.textContent}" inside the chart`).toBe(true);
@@ -174,21 +166,22 @@ const expectChartAxes = async (canvasElement) => {
     await expect(rect(frame).height, 'the chart holds its token height').toBeCloseTo(tokenLength(canvasElement, '--height-2000'), 0);
 };
 
-/** One h1, the greeting, then h2s for the cards and sections, and an h3 for each lesson. */
+/** One h1, the header, then an h2 per section, the Skills subsection's h3 and an h3 per lesson. */
 const expectOutline = async (canvasElement) => {
     const outline = [...canvasElement.querySelectorAll('h1, h2, h3, h4, h5, h6')].map((h) => [h.tagName.toLowerCase(), h.textContent]);
     await expect(outline).toEqual([
-        ['h1', 'Sign up for your next session, John!'],
-        ['h2', 'My Badge'],
-        ['h2', 'Your Impact'],
-        ['h2', 'Personalized Recommendations'],
+        ['h1', 'Welcome back, John'],
+        ['h2', 'Next session'],
+        ['h2', 'Your impact'],
+        ['h3', 'Skills'],
+        ['h2', 'Personalized recommendations'],
         ['h3', 'Lesson Title'],
         ['h3', 'Lesson Title'],
         ['h3', 'Lesson Title'],
     ]);
 };
 
-/** Each lesson card in view spans whole columns, and a whole number of them fill the strip. */
+/** Each lesson card in view spans whole columns, a whole number of them fill the strip, and none is clipped. */
 const expectLessonsOnGrid = async (canvasElement, grid, perView) => {
     const strip = canvasElement.querySelector('.plus-home-new__lessons');
     const box = rect(content(canvasElement));
@@ -208,11 +201,15 @@ const expectLessonsOnGrid = async (canvasElement, grid, perView) => {
     }
 };
 
-/**
- * The checks every width runs; `expected` is what the formulas give there,
- * as [start column, span, row] per block, so a change to the tokens or the
- * formulas shows up as a named difference.
- */
+/** Your impact's stats share one row from 1024, and stack below it. */
+const expectStats = async (canvasElement, inRow) => {
+    const stats = [...canvasElement.querySelectorAll('.plus-home-new__stat')].map(rect);
+    await expect(stats.length, 'three stats').toBe(3);
+    const sameRow = stats.every((r) => Math.abs(r.top - stats[0].top) < 1);
+    await expect(sameRow, inRow ? 'the stats share a row' : 'the stats stack').toBe(inRow);
+};
+
+/** The checks every width runs; `expected` is what the tokens give there. */
 const atWidth = (width, expected) => async ({ canvasElement }) => withTestViewport(width, HEIGHT, async () => {
     const canvas = within(canvasElement);
     await waitFor(() => expect(canvas.getByRole('heading', { level: 1 })).toBeTruthy());
@@ -222,19 +219,19 @@ const atWidth = (width, expected) => async ({ canvasElement }) => withTestViewpo
         columns: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--layout-columns'), 10),
     };
     await expect(box.width, 'content width').toBeCloseTo(tokenLength(canvasElement, '--layout-width-content'), 0);
+    await expect(columnWidth(box.width, grid), 'a column').toBeGreaterThan(0);
 
     const list = blocks(canvasElement);
-    await expectPatterns(canvasElement, list);
-    await waitFor(() => expect(list[0].el.style.gridColumn, 'the formulas have run').toBe(`1 / span ${expected.greeting[1]}`));
-    for (const block of list) await expectPlaced(box, grid, block, expected[block.name]);
-    await expectNoOverlap(list);
-    await expectRowHeights(list, expected.greeting[1] === grid.columns);
+    await expectStructure(canvasElement, list);
+    await expectReadingOrder(box, list);
+    await waitFor(() => expect(getComputedStyle(canvasElement.querySelector('.plus-home-new__lessons')).getPropertyValue('--plus-home-new-cards-per-view').trim()).toBe(String(expected.lessonsPerView)));
     await expectLessonsOnGrid(canvasElement, grid, expected.lessonsPerView);
+    await expectStats(canvasElement, expected.statsInRow);
     await expectChartAxes(canvasElement);
     await expectNoClippedText(list);
     await expectOutline(canvasElement);
 
-    // Your Impact opens on its first page, the ratings.
+    // Your impact opens on its first page, the ratings.
     await expect(within(list.find((b) => b.name === 'impact').el).getByText('Student Interaction Rating')).toBeTruthy();
 
     // The tutor sidebar, with Home selected, docks from 1024; below it is closed.
@@ -251,44 +248,17 @@ const atWidth = (width, expected) => async ({ canvasElement }) => withTestViewpo
 
 export const Overview = {};
 
-/**
- * 768: content is 720, too narrow for a main column of 480 beside a side of
- * 224, so the blocks stack one per row in reading order.
- */
+/** 768: content is 720; the header's actions and the stats stack, and two lessons fill a view. */
 export const Medium768 = {
-    play: atWidth(768, {
-        greeting: [1, 12, 1],
-        badge: [1, 12, 2],
-        skills: [1, 12, 3],
-        impact: [1, 12, 4],
-        lessons: [1, 12, 5],
-        lessonsPerView: 2,
-        sidebarDocked: false,
-    }),
+    play: atWidth(768, { lessonsPerView: 2, statsInRow: false, sidebarDocked: false }),
 };
 
-/** 1024: the sidebar docks; the badge takes 4 columns to reach 224, Your Impact 4, two lessons per view. */
+/** 1024: the sidebar docks; the stats share a row, two lessons per view. */
 export const Large1024 = {
-    play: atWidth(1024, {
-        greeting: [1, 8, 1],
-        badge: [9, 4, 1],
-        impact: [9, 4, 2],
-        skills: [1, 8, 2],
-        lessons: [1, 12, 3],
-        lessonsPerView: 2,
-        sidebarDocked: true,
-    }),
+    play: atWidth(1024, { lessonsPerView: 2, statsInRow: true, sidebarDocked: true }),
 };
 
-/** 1440: the badge fits in 3 columns, Your Impact in 4, and three lessons fill a view. */
+/** 1440: three lessons fill a view. */
 export const XLarge1440 = {
-    play: atWidth(1440, {
-        greeting: [1, 9, 1],
-        badge: [10, 3, 1],
-        impact: [9, 4, 2],
-        skills: [1, 8, 2],
-        lessons: [1, 12, 3],
-        lessonsPerView: 3,
-        sidebarDocked: true,
-    }),
+    play: atWidth(1440, { lessonsPerView: 3, statsInRow: true, sidebarDocked: true }),
 };
