@@ -335,7 +335,7 @@ const tabTitles = (canvasElement) => tabRows(canvasElement).map((row) => row.que
 /**
  * The tutor example: Sessions with two open sessions, one of them live, and
  * Students with one open student. Each parent is an open accordion; each tab is
- * 32 high and sits 12 in from its parent.
+ * 32 high, its surface past a 28 thread column.
  */
 export const OpenTabs = {
     render: () => <OpenTabsHarness storeKey="story:open-tabs" seed={tutorExample} select="sessions:s1" />,
@@ -356,8 +356,8 @@ export const OpenTabs = {
         for (const row of tabRows(canvasElement)) {
             await expect(row.getBoundingClientRect().height, 'tab row 32').toBeCloseTo(tokenLength(canvasElement, '--item-height-md'), 0);
         }
-        await expect(selected.getBoundingClientRect().left - parentRow.getBoundingClientRect().left, 'indent 12')
-            .toBeCloseTo(tokenLength(canvasElement, '--element-pad-x-md'), 0);
+        await expect(selected.getBoundingClientRect().left - parentRow.getBoundingClientRect().left, 'the surface sits past the 28 thread column')
+            .toBeCloseTo(tokenLength(canvasElement, '--element-pad-x-md') + tokenLength(canvasElement, '--icon-md'), 0);
     },
 };
 
@@ -494,6 +494,62 @@ export const Overflow = {
         await expect(tabRows(canvasElement)).toHaveLength(20);
         await userEvent.click(canvas.getByRole('button', { name: 'Show fewer' }));
         await expect(tabRows(canvasElement)).toHaveLength(5);
+    },
+};
+
+/**
+ * The thread ties the tabs to their parent. Each row is a 28 thread column and
+ * a surface: a 1 outline-variant line runs under the parent's icon center,
+ * unbroken through the gaps, and ends in a radius-6 elbow at the last row,
+ * which is "Show N more" when it shows. The surface pads 8, so labels line up
+ * with the parent's label, and every state fill starts at 28.
+ */
+export const Thread = {
+    render: () => <OpenTabsHarness storeKey="story:thread" seed={manySessions(20)} select="sessions:s20" boxHeight="var(--size-5400)" />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const outline = tokenColor(canvasElement, '--color-outline-variant');
+        const stroke = tokenLength(canvasElement, '--size-element-stroke-sm');
+        const thread = (li) => getComputedStyle(li, '::before');
+        const parentRow = canvas.getByRole('button', { name: /^Sessions$/ });
+        const parentIcon = parentRow.querySelector('.plus-sidebar-tab__icon').getBoundingClientRect();
+        const parentLabel = parentRow.querySelector('.plus-sidebar-tab__label').getBoundingClientRect();
+        const column = tokenLength(canvasElement, '--element-pad-x-md') + tokenLength(canvasElement, '--icon-md');
+        const check = async () => {
+            const rows = [...canvasElement.querySelectorAll('.plus-pattern-sidebar__tabs > li')];
+            const last = rows[rows.length - 1];
+            await expect(last, 'the last row is "Show N more" or "Show fewer"').toHaveClass('plus-pattern-sidebar__more');
+            for (const [index, li] of rows.entries()) {
+                const line = thread(li);
+                const box = li.getBoundingClientRect();
+                const surface = li.querySelector('.plus-sidebar-tab');
+                await expect(line.borderLeftColor, 'outline-variant').toBe(outline);
+                await expect(px(line.borderLeftWidth), 'a 1 stroke').toBeCloseTo(stroke, 1);
+                await expect(box.left + px(line.left), 'under the parent icon center').toBeCloseTo(parentIcon.left + parentIcon.width / 2, 0);
+                await expect(box.left, 'the row starts where the parent does').toBeCloseTo(parentRow.getBoundingClientRect().left, 0);
+                await expect(surface.getBoundingClientRect().left, 'the surface starts after the 28 thread column').toBeCloseTo(box.left + column, 0);
+                if (li === last) {
+                    await expect(px(line.height), 'the elbow stops at the row middle').toBeCloseTo(box.height / 2, 0);
+                    await expect(px(line.borderBottomWidth), 'the elbow turns').toBeCloseTo(stroke, 1);
+                    await expect(px(line.borderBottomLeftRadius), 'radius 6').toBeCloseTo(tokenLength(canvasElement, '--element-radius-item-sm'), 0);
+                    await expect(box.left + px(line.left) + px(line.width), 'the stub ends 2 before the surface').toBeCloseTo(box.left + column - 2, 0);
+                } else {
+                    await expect(box.top + px(line.top) + px(line.height), 'runs through the gap to the next row').toBeCloseTo(rows[index + 1].getBoundingClientRect().top, 0);
+                    await expect(px(line.borderBottomWidth), 'no elbow mid-thread').toBe(0);
+                }
+                const label = li.querySelector('.plus-sidebar-tab__label');
+                await expect(label.getBoundingClientRect().left, 'the label lines up with the parent label').toBeCloseTo(parentLabel.left, 0);
+            }
+            const selected = canvasElement.querySelector('.plus-pattern-sidebar__tabs [aria-current="page"]');
+            if (selected) {
+                await expect(getComputedStyle(selected).backgroundColor, 'selected fills the surface, Primary 16')
+                    .toBe(tokenColor(canvasElement, '--color-primary-state-16'));
+            }
+        };
+        await expect(canvas.getByRole('link', { name: 'Session 20' }), 'a selected tab').toHaveAttribute('aria-current', 'page');
+        await check();
+        await userEvent.click(canvas.getByRole('button', { name: 'Show 15 more' }));
+        await check();
     },
 };
 
