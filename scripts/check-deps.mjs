@@ -35,7 +35,6 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..
  */
 const ALLOWED = new Map([
   ["typescript", "the compiler. Invoked as `tsc` by typecheck and the test build; never imported."],
-  ["sass", "the SCSS compiler Vite reaches for. Named in vite.config's preprocessorOptions by behavior, not by specifier."],
   ["@cloudflare/workers-types", "the Worker runtime's ambient types. Loaded through tsconfig's `types`, which names it there rather than importing it."],
   ["@types/node", "ambient Node types for the Worker's build scripts. Same shape: a tsconfig entry, never an import."],
   ["@vitest/coverage-v8", "vitest loads it by convention when --coverage is passed; there is no import site."],
