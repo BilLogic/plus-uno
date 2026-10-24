@@ -41,7 +41,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--color-disabled-opacity` · `--color-focus-ring` · `--color-on-primary` · `--color-on-surface` · `--color-primary` · `--color-primary-border` · `--color-primary-container` · `--color-surface` · `--item-height-sm` · `--plus-switch-pad` · `--plus-switch-thumb` · `--plus-switch-track-h` · `--plus-switch-track-w` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-radius-full`
+`--body-default` · `--color-disabled-opacity` · `--color-focus-ring` · `--color-on-primary` · `--color-on-surface` · `--color-primary` · `--color-primary-border` · `--color-primary-container` · `--color-primary-state-08` · `--color-shadow-state-08` · `--color-surface` · `--item-height-sm` · `--plus-switch-pad` · `--plus-switch-thumb` · `--plus-switch-track-h` · `--plus-switch-track-w` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-radius-full`
 
 From `design-system/src/components/forms-and-inputs/Switch.scss`. Override these through the token layer, never with a literal.
 

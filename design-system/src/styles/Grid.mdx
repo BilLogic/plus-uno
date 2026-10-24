@@ -56,11 +56,12 @@ still a 4-column card row at MD, just narrower.
 ### Two grids
 
 Neither grid is per-breakpoint: each is bound to `spacing / layout` variables,
-so it adapts when you switch the frame's mode. The **screen grid** spans the
-screen inside the screen pad, centered and capped at 1232, and ignores the
-sidebar; modals and overlays size from it. The **content grid** lives inside
-the surface of the `Pattern/Surface container` component and is what page
-content aligns to.
+so it adapts when you switch the frame's mode. The **screen grid** lives on the
+Overlay layer only: it spans the screen inside the screen pad, centered and
+capped at 1232, ignores the sidebar, and shows and hides with the overlay.
+Modals and overlays size from it. The **content grid** lives inside the surface
+of the `Pattern/Surface container` component, is what page content aligns to,
+and is the only grid a page frame carries. Code draws neither grid.
 
 <GridStories.TwoGrids />
 </div>

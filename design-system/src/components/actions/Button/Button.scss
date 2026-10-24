@@ -75,6 +75,14 @@
         transform: translateY(1px);
     }
 
+    // Keyboard focus is the focus ring alone, 2px wide and 2px off the edge,
+    // the gap Checkbox and Radio keep. `.btn` in the selector outranks
+    // Bootstrap's `.btn:focus-visible`, which drops the outline.
+    &.btn:focus-visible {
+        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+        outline-offset: var(--size-element-stroke-lg);
+    }
+
     // Block logic
     &--block {
         display: flex;
@@ -231,6 +239,8 @@ $btn-themes: (
     $col-container: string.unquote(list.nth($config, 5));
     $col-on-container: string.unquote(list.nth($config, 6));
     $col-border: string.unquote(list.nth($config, 7));
+    // The pressed step of the same layer: `--color-x-state-08` → `-state-12`.
+    $col-state-pressed: string.unquote(string.slice($col-state, 1, -3) + '12');
 
     &--#{$theme} {
 
@@ -239,13 +249,15 @@ $btn-themes: (
             background-color: var($col-main);
             color: var($col-on-main);
 
-            // The shadow state layer over the fill: the 8% darkening the old
-            // brightness filter gave the ground, without dimming the label, the
-            // icon or the focus ring with it.
-            &:hover,
+            // The shadow state layer over the fill, hover 08 and pressed 12,
+            // without dimming the label, the icon or the focus ring with it.
+            &:hover {
+                --plus-btn-state-layer: var(--color-shadow-state-08);
+            }
+
             &.active,
             &:active {
-                --plus-btn-state-layer: var(--color-shadow-state-08);
+                --plus-btn-state-layer: var(--color-shadow-state-12);
             }
 
             &.plus-btn--loading::after {
@@ -262,18 +274,21 @@ $btn-themes: (
             }
         }
 
-        // 2. TONAL (state-layer bg at 8%, text-safe color)
+        // 2. TONAL (state-layer bg at 8%, text-safe color). The resting 08 is
+        // the documented tonal exception in foundations/color.md.
         &.plus-btn--tonal {
             background-color: var($col-state);
             border-color: transparent;
             color: var($col-text);
 
-            // The shadow state layer over the tonal fill. Composited, it is the
-            // exact color the old 8% black mix produced.
-            &:hover,
+            // The shadow state layer over the tonal fill, hover 08 and pressed 12.
+            &:hover {
+                --plus-btn-state-layer: var(--color-shadow-state-08);
+            }
+
             &.active,
             &:active {
-                --plus-btn-state-layer: var(--color-shadow-state-08);
+                --plus-btn-state-layer: var(--color-shadow-state-12);
             }
 
             &.plus-btn--loading::after {
@@ -295,10 +310,13 @@ $btn-themes: (
             border-color: var($col-border);
             color: var($col-text);
 
-            &:hover,
+            &:hover {
+                background-color: var($col-state);
+            }
+
             &.active,
             &:active {
-                background-color: var($col-state);
+                background-color: var($col-state-pressed);
             }
 
             &.plus-btn--loading::after {
@@ -321,10 +339,13 @@ $btn-themes: (
             border-color: transparent;
             color: var($col-text);
 
-            &:hover,
+            &:hover {
+                background-color: var($col-state);
+            }
+
             &.active,
             &:active {
-                background-color: var($col-state);
+                background-color: var($col-state-pressed);
             }
 
             &.plus-btn--loading::after {

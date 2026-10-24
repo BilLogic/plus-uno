@@ -1,4 +1,7 @@
 import React from 'react';
+import { expect, within } from 'storybook/test';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { computedShadow } from '@/storybook-docs/lib/style-probes.js';
 import PatternCard from '@/patterns/PatternCard';
 
 const cardCol = { display: 'flex', flexDirection: 'column', gap: '24px' };
@@ -182,4 +185,34 @@ export const Interactive = {
             {bodyCopy}
         </PatternCard>
     ),
+};
+
+/**
+ * A card rests flat on its outline. Only a clickable card lifts, to the raised
+ * shadow (Light/2), while it is hovered or dragged.
+ */
+export const Elevation = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+            <PatternCard title="Static" minWidth={200}>{bodyCopy}</PatternCard>
+            <PatternCard title="Clickable" minWidth={200} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
+            <PatternCard title="Dragging" minWidth={200} dragging>{bodyCopy}</PatternCard>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const card = (name) => within(canvasElement).getByText(name).closest('.plus-pattern-card');
+        const shadow = (el) => {
+            el.style.transition = 'none';
+            return getComputedStyle(el).boxShadow;
+        };
+        const raised = computedShadow(canvasElement, 'var(--surface-raised-shadow)');
+
+        await expect(shadow(card('Static')), 'a static card rests flat').toBe('none');
+        await expect(shadow(card('Clickable')), 'a clickable card rests flat').toBe('none');
+        await expect(withForcedPseudo(card('Static'), ':hover', () => shadow(card('Static'))), 'hovering a static card').toBe('none');
+        await expect(withForcedPseudo(card('Clickable'), ':hover', () => shadow(card('Clickable'))), 'hovering a clickable card').toBe(raised);
+        await expect(shadow(card('Dragging')), 'a dragged card').toBe(raised);
+        await expect(getComputedStyle(card('Static')).borderTopWidth, 'the 1px outline').toBe('1px');
+    },
 };

@@ -7,8 +7,9 @@ import './PatternModal.scss';
  * Modal pattern for PLUS design system.
  * Modal shell rendered inline (no portal/backdrop): header with title + close
  * button, body slot with internal scroll (`maxHeight`), and footer slot.
- * Baked-in tokens: `--color-surface-container-high` background, elevation 3,
- * modal radius/padding/gap tokens.
+ * Baked-in tokens: the white overlay surface (`--surface-overlay`) lifted by
+ * `--elevation-light-4`, as the Modal component draws it, and the modal
+ * radius/padding/gap tokens.
  * Mirrors the "Modal" slot component in the Figma design system file.
  * For a real overlay dialog (backdrop, focus trap), use the core Modal component.
  *

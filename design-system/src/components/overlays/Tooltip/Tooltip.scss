@@ -3,7 +3,8 @@
  * Pattern/Tooltip). body.small 12/16 on the inverse surface, pad-y
  * Popover/pad-y-tooltip 4, pad-x Element/pad-x-sm 8, radius
  * Popover/radius-tooltip 6, and it wraps past Popover/max-width-tooltip 240.
- * No arrow: it sits Popover/offset 4 from its trigger.
+ * No arrow: it sits Popover/offset 4 from its trigger, lifted by the overlay
+ * role's shadow (Light/3) like every floating layer without a scrim.
  *
  * Every size draws the one tooltip; `size` is kept so no call site breaks.
  */
@@ -33,10 +34,12 @@
             display: none;
         }
 
+        // A floating layer without a scrim: the overlay role's shadow, Light/3.
         .tooltip-inner {
             box-sizing: border-box;
             font: var(--body-small);
             text-align: left;
+            box-shadow: var(--surface-overlay-shadow);
         }
     }
 }

@@ -46,7 +46,7 @@ export const Overview = () => (
         <ul className="body2-txt" style={{ paddingLeft: '24px' }}>
             <li style={{ marginBottom: '8px' }}>Use elevation tokens: Always use elevation tokens instead of custom box-shadow values</li>
             <li style={{ marginBottom: '8px' }}>Match elevation to importance: Use higher elevation for more important/urgent content</li>
-            <li style={{ marginBottom: '8px' }}>Consider context: Modals typically use elevation 3-5, cards use elevation 1-2</li>
+            <li style={{ marginBottom: '8px' }}>Consider context: cards rest flat and lift to Light/2 only when clickable and hovered or dragged; floating layers without a scrim take Light/3; modals take Light/4</li>
         </ul>
     </div>
 );
@@ -59,27 +59,27 @@ export const AllElevations = () => (
                 {
                     token: '--elevation-light-1',
                     value: '0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3)',
-                    description: 'Subtle elevation, cards at rest'
+                    description: 'Subtle lift'
                 },
                 {
                     token: '--elevation-light-2',
                     value: '0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3)',
-                    description: 'Slightly raised elements, hover states'
+                    description: 'Clickable cards on hover or drag (a card at rest is flat)'
                 },
                 {
                     token: '--elevation-light-3',
                     value: '0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15)',
-                    description: 'Modals, dialogs, raised cards'
+                    description: 'Floating layers without a scrim: menus, dropdowns, popovers, tooltips, toasts, listboxes'
                 },
                 {
                     token: '--elevation-light-4',
                     value: '0px 2px 3px 0px rgba(0, 0, 0, 0.3), 0px 6px 10px 4px rgba(0, 0, 0, 0.15)',
-                    description: 'Prominent modals, important overlays'
+                    description: 'Modals'
                 },
                 {
                     token: '--elevation-light-5',
                     value: '0px 4px 4px 0px rgba(0, 0, 0, 0.3), 0px 8px 12px 6px rgba(0, 0, 0, 0.15)',
-                    description: 'Maximum elevation, critical dialogs'
+                    description: 'Dialogs'
                 },
             ]}
         />

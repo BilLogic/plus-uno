@@ -36,14 +36,14 @@
 
         &.pseudo-pressed>.nav-link:not(.disabled):not(:disabled):not(.active),
         &.pseudo-pressed>.plus-nav-link:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-on-surface-state-16);
+            background-color: var(--color-on-surface-state-12);
             border-bottom-color: var(--color-outline-variant);
         }
 
         &.pseudo-focus>.nav-link:not(.disabled):not(:disabled):not(.active),
         &.pseudo-focus>.plus-nav-link:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-on-surface-state-12);
-            outline: none;
+            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline-offset: calc(-1 * var(--size-element-stroke-lg));
         }
 
         &.pseudo-hover > .nav-link.active,
@@ -66,7 +66,7 @@
         &.pseudo-pressed > .plus-nav-link[aria-current="page"],
         &.pseudo-pressed > .nav-link[aria-current="true"],
         &.pseudo-pressed > .plus-nav-link[aria-current="true"] {
-            background-color: var(--color-primary-state-16) !important;
+            background-color: var(--color-primary-state-12) !important;
             border-bottom-color: var(--color-primary-border) !important;
         }
 
@@ -78,9 +78,9 @@
         &.pseudo-focus > .plus-nav-link[aria-current="page"],
         &.pseudo-focus > .nav-link[aria-current="true"],
         &.pseudo-focus > .plus-nav-link[aria-current="true"] {
-            background-color: var(--color-primary-state-12) !important;
             border-bottom-color: var(--color-primary-border) !important;
-            outline: none;
+            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline-offset: calc(-1 * var(--size-element-stroke-lg));
         }
     }
 
@@ -127,15 +127,14 @@
 
         // PRESSED state
         &:active:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-on-surface-state-16);
+            background-color: var(--color-on-surface-state-12);
             border-color: transparent transparent var(--color-outline-variant) transparent !important;
         }
 
-        // FOCUS state
+        // FOCUS state: the focus ring alone, inside the tab, and no fill
         &:focus-visible:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-on-surface-state-12);
-            border-color: transparent transparent var(--color-focus-ring) transparent !important;
-            outline: none;
+            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline-offset: calc(-1 * var(--size-element-stroke-lg));
         }
 
         // ACTIVE/SELECTED state - SECONDARY UNDERLINE
@@ -157,12 +156,12 @@
             }
 
             &:active {
-                background-color: var(--color-primary-state-16) !important;
+                background-color: var(--color-primary-state-12) !important;
             }
 
             &:focus-visible {
-                background-color: var(--color-primary-state-12) !important;
-                outline: none;
+                outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+                outline-offset: calc(-1 * var(--size-element-stroke-lg));
             }
         }
 
@@ -205,7 +204,7 @@
             }
 
             &:active {
-                background-color: var(--color-on-surface-state-16);
+                background-color: var(--color-on-surface-state-12);
                 border-bottom-color: var(--color-outline-variant);
             }
 

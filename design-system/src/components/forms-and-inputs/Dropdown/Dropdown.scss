@@ -124,10 +124,12 @@ $dropdown-themes: (
         overflow-y: auto;
         overscroll-behavior: contain;
         padding: var(--popover-pad-menu);
+        // The overlay role and its shadow (Light/3), as every floating layer
+        // without a scrim takes.
         background-color: var(--color-surface-overlay);
         border: var(--border-default) solid var(--color-outline-variant);
         border-radius: var(--popover-radius-menu-md);
-        box-shadow: var(--elevation-light-2);
+        box-shadow: var(--surface-overlay-shadow);
         display: none;
 
         &.show {
@@ -173,11 +175,10 @@ $dropdown-themes: (
             color: var(--color-on-surface);
         }
 
-        // Focus-visible state
+        // Focus-visible state: the ring alone, no fill
         &:focus-visible {
-            outline: 2px solid var(--color-focus-ring);
-            outline-offset: -2px;
-            background-color: var(--color-on-surface-state-08);
+            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline-offset: calc(-1 * var(--size-element-stroke-lg));
         }
 
         // Pressed state
@@ -187,7 +188,8 @@ $dropdown-themes: (
 
         // Selected (JSX uses 'selected'), as Pattern/Menu's `state=selected`:
         // the primary state layer 08 with primary text, label and description
-        // alike. There is no left bar.
+        // alike. There is no left bar. A menu is a dense list, so it selects at
+        // 08 rather than navigation's 16 (foundations/color.md).
         &.selected,
         &.active {
             background-color: var(--color-primary-state-08);
@@ -458,6 +460,9 @@ $dropdown-themes: (
     $col-state: string.unquote(list.nth($config, 3));
     $col-text: string.unquote(list.nth($config, 4));
     $col-border: string.unquote(list.nth($config, 5));
+    // The pressed step of the same layer: `--color-x-state-08` → `-state-12`.
+    // A toggle takes Button's steps: hover 08, pressed 12.
+    $col-state-pressed: string.unquote(string.slice($col-state, 1, -3) + '12');
 
     // Regular dropdown - COMPOUND selector .pdropdown.pdropdown-#{$theme}
     .pdropdown.pdropdown-#{$theme} {
@@ -508,13 +513,13 @@ $dropdown-themes: (
                 }
 
                 &:hover {
-                    @include state-layer($theme, '--color-shadow-state-12');
+                    @include state-layer($theme, '--color-shadow-state-08');
                 }
 
                 // PRESSED/ACTIVE: Only background changes
                 &:active,
                 &.active {
-                    @include state-layer($theme, '--color-shadow-state-16');
+                    @include state-layer($theme, '--color-shadow-state-12');
                 }
             }
         }
@@ -539,11 +544,11 @@ $dropdown-themes: (
                     background-color: var($col-state);
                 }
 
-                // PRESSED/ACTIVE: Only background changes
+                // PRESSED/ACTIVE: the intent's own 12, with no shadow layer on top
                 &:active,
                 &.active {
-                    background-color: var($col-state);
-                    @include state-layer($theme, '--color-shadow-state-08');
+                    background-color: var($col-state-pressed);
+                    --plus-dropdown-state-layer: transparent;
                 }
             }
         }
@@ -568,11 +573,11 @@ $dropdown-themes: (
                     background-color: var($col-state);
                 }
 
-                // PRESSED/ACTIVE: Only background changes
+                // PRESSED/ACTIVE: the intent's own 12, with no shadow layer on top
                 &:active,
                 &.active {
-                    background-color: var($col-state);
-                    @include state-layer($theme, '--color-shadow-state-08');
+                    background-color: var($col-state-pressed);
+                    --plus-dropdown-state-layer: transparent;
                 }
             }
         }
@@ -622,6 +627,11 @@ $dropdown-themes: (
                 border-color: transparent;
 
                 &:hover {
+                    @include state-layer($theme, '--color-shadow-state-08');
+                }
+
+                &:active,
+                &.active {
                     @include state-layer($theme, '--color-shadow-state-12');
                 }
             }
@@ -648,6 +658,11 @@ $dropdown-themes: (
                 &:hover {
                     background-color: var($col-state);
                 }
+
+                &:active,
+                &.active {
+                    background-color: var($col-state-pressed);
+                }
             }
 
             .pdropdown-split-toggle-btn {
@@ -665,6 +680,11 @@ $dropdown-themes: (
                 &:hover {
                     background-color: var($col-state);
                 }
+
+                &:active,
+                &.active {
+                    background-color: var($col-state-pressed);
+                }
             }
         }
 
@@ -681,6 +701,11 @@ $dropdown-themes: (
 
                 &:hover {
                     background-color: var($col-state);
+                }
+
+                &:active,
+                &.active {
+                    background-color: var($col-state-pressed);
                 }
             }
 

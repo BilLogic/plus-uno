@@ -98,13 +98,13 @@ export const RoleModel = () => (
                 label="--surface-raised"
                 fill="var(--surface-raised)"
                 shadow="var(--surface-raised-shadow)"
-                note="cards that lift — paired with --surface-raised-shadow"
+                note="cards: flat on an outline at rest; a clickable card lifts with --surface-raised-shadow on hover or drag"
             />
             <Swatch
                 label="--surface-overlay"
                 fill="var(--surface-overlay)"
                 shadow="var(--surface-overlay-shadow)"
-                note="popovers, toasts — paired with --surface-overlay-shadow. Modals name --elevation-light-4 directly."
+                note="menus, popovers, tooltips, toasts, listboxes, paired with --surface-overlay-shadow. A modal takes this fill and names --elevation-light-4 directly."
             />
             <Swatch label="--surface-container" fill="var(--surface-container)" note="a neutral well inside a card" />
         </Grid>

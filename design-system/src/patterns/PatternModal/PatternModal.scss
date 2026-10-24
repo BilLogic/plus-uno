@@ -1,16 +1,17 @@
 /**
  * Modal pattern (Patterns/Modal)
- * Inline modal shell — surface-container-high background, elevation 3,
- * modal radius/padding/gap tokens, internal body scroll.
+ * Inline modal shell, drawn as the Modal component draws one: the overlay
+ * surface (white) lifted by Elevation Light/4, modal radius/padding/gap
+ * tokens, internal body scroll.
  */
 
 .plus-pattern-modal {
     display: flex;
     flex-direction: column;
-    background-color: var(--color-surface-container-high);
+    background-color: var(--surface-overlay);
     color: var(--color-on-surface);
     border-radius: var(--size-modal-radius-md);
-    box-shadow: var(--elevation-light-4); /* semantic level 3 (modals) maps to Light/4 per token-mapping.md */
+    box-shadow: var(--elevation-light-4); /* modals take Light/4 (elevation.md); no role carries it */
     overflow: hidden; // keep scrolling body clipped to the radius
 }
 
@@ -73,7 +74,7 @@
     }
 
     &:active {
-        background-color: var(--color-on-surface-state-16);
+        background-color: var(--color-on-surface-state-12);
     }
 }
 

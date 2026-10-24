@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Radio from './Radio';
 
 export default {
@@ -9,6 +11,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-10-24', kind: 'changed', summary: 'Keyboard focus is the 2px focus-ring role 2px off the radio, replacing the inverse-primary halo. A checked radio keeps its fill and dot on hover.' },
             { date: '2026-10-23', kind: 'changed', summary: 'A labeled radio is a 24 row at every size, its label 14/20.' },
             { date: '2026-10-23', kind: 'deprecated', summary: '`size="large"` was deprecated: it draws like `medium` and warns in development.' },
         ],
@@ -312,4 +315,53 @@ DescriptionAndCard.play = async ({ canvasElement }) => {
     const weekly = canvas.getByRole('radio', { name: 'Weekly' });
     const desc = canvasElement.ownerDocument.getElementById(weekly.getAttribute('aria-describedby'));
     await expect(desc.textContent).toBe('Every week at the same time.');
+};
+
+/**
+ * Keyboard focus on a checked radio: the focus-ring role, 2px wide and 2px off
+ * the radio's edge, the gap Checkbox and Button keep. A ring touching the
+ * checked primary border merged into it and stopped reading as focus.
+ */
+export const KeyboardFocus = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+        <Radio id="radio-focus-1" name="radio-focus" label="Morning" value="morning" defaultChecked />
+        <Radio id="radio-focus-2" name="radio-focus" label="Evening" value="evening" />
+    </div>
+);
+KeyboardFocus.parameters = { docs: { disable: true } };
+KeyboardFocus.play = async ({ canvasElement }) => {
+    const radio = within(canvasElement).getByRole('radio', { name: 'Morning' });
+    radio.style.transition = 'none';
+    await userEvent.tab();
+    await expect(document.activeElement).toBe(radio);
+    const style = getComputedStyle(radio);
+    await waitFor(() => expect(style.outlineStyle).toBe('solid'));
+    await expect(px(style.outlineWidth), 'ring width').toBe(2);
+    await expect(px(style.outlineOffset), 'ring gap').toBe(2);
+    await expect(style.outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--color-focus-ring'));
+    await expect(style.backgroundColor, 'the checked fill stays').toBe(tokenColor(canvasElement, '--color-primary'));
+};
+
+/** Hover lays the 08 layer: over the page when unchecked, over the fill when checked. */
+export const HoverStep = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+        <Radio id="radio-hover-1" name="radio-hover" label="Checked" value="checked" defaultChecked />
+        <Radio id="radio-hover-2" name="radio-hover" label="Unchecked" value="unchecked" />
+    </div>
+);
+HoverStep.parameters = { docs: { disable: true } };
+HoverStep.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const hovered = (name) => {
+        const radio = canvas.getByRole('radio', { name });
+        radio.style.transition = 'none';
+        return withForcedPseudo(radio, ':hover', () => {
+            const { backgroundColor, backgroundImage } = getComputedStyle(radio);
+            return { backgroundColor, backgroundImage };
+        });
+    };
+    const checked = hovered('Checked');
+    await expect(checked.backgroundColor, 'the checked fill stays').toBe(tokenColor(canvasElement, '--color-primary'));
+    await expect(checked.backgroundImage).toContain(tokenColor(canvasElement, '--color-shadow-state-08'));
+    await expect(hovered('Unchecked').backgroundColor).toBe(tokenColor(canvasElement, '--color-primary-state-08'));
 };

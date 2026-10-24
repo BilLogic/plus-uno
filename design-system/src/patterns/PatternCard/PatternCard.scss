@@ -1,8 +1,8 @@
 /**
- * Card pattern (Patterns/Card), mirroring Figma `Pattern/Card`.
- * the raised surface role and its shadow, an outline-variant border, Card
- * radius. Image, then content (`_Card header` over the body), then footer.
- * Every length is a Card token.
+ * Card pattern (Patterns/Card), mirroring Figma `Pattern/Card`: the raised
+ * surface's fill on an outline-variant border, Card radius, flat at rest.
+ * Image, then content (`_Card header` over the body), then footer. Every
+ * length is a Card token.
  */
 
 .plus-pattern-card {
@@ -10,14 +10,25 @@
     flex-direction: column;
     box-sizing: border-box;
     min-width: 0;
-    // The raised surface role and its shadow, as a pair: the same fill as the
-    // page, lifted by Light/2 (cards, per elevation.md and token-mapping.md).
+    // Flat at rest (elevation.md): the page's own fill and a 1px outline. The
+    // raised shadow is for a clickable card while it is hovered or dragged.
     background-color: var(--surface-raised);
     color: var(--color-on-surface);
     border: var(--size-card-border-sm) solid var(--color-outline-variant);
     border-radius: var(--card-radius);
-    box-shadow: var(--surface-raised-shadow);
+    box-shadow: none;
     overflow: hidden; // clip the image to the card radius
+    transition: box-shadow 0.15s ease;
+}
+
+.plus-pattern-card--clickable {
+    cursor: pointer;
+}
+
+// The lift, Light/2 through the raised role's shadow.
+.plus-pattern-card--clickable:hover,
+.plus-pattern-card--dragging {
+    box-shadow: var(--surface-raised-shadow);
 }
 
 .plus-pattern-card-pad-sm {

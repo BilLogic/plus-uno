@@ -60,13 +60,26 @@ any new divergence.
 | `--color-surface` | Main surface background |
 | `--color-on-surface` | Text on surface |
 | `--color-surface-container` | Container backgrounds |
-| `--color-surface-container-high` | Elevated containers |
 | `--color-outline` | Borders and dividers |
 | `--color-outline-variant` | Subtle borders |
 
+The gray container fills (`--color-surface-container-*`) are for recessed or
+nested regions only: a sidebar column, a well inside a card. A surface lifts by
+shadow, not by a different gray. A raised card or an overlay keeps the page's
+own fill and takes its role's shadow, as the surface roles in
+`design-system/src/tokens/_elevation.scss` and `elevation.md` set out.
+
 ## State Layers
 
-Use state layer tokens for interactive states:
+An interaction state lays its role's state layer over the resting fill, and the
+step names the state:
+
+| State | Layer |
+|-------|-------|
+| Hover | `-state-08` |
+| Pressed | `-state-12` |
+| Selected, dragged | `-state-16` |
+| Focus | none: the focus ring shows it |
 
 ```css
 .my-element:hover {
@@ -77,17 +90,54 @@ Use state layer tokens for interactive states:
   background-color: var(--color-primary-state-12);
 }
 
-.my-element:focus {
+.my-element.is-selected {
   background-color: var(--color-primary-state-16);
 }
+
+.my-element:focus-visible {
+  outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+  outline-offset: var(--size-element-stroke-lg);
+}
 ```
+
+On a solid fill, such as a filled button or a checked box, the layer is
+`--color-shadow-state-NN` over the fill. The fill stays, so its label, check or
+dot stays readable.
 
 ## Rules
 
 1. **Use `-text` variants for text** - Always use `--color-{role}-text` for text content
-2. **Use state layers for interaction** - Never hardcode hover/active colors
+2. **Use state layers for interaction** - Hover 08, pressed 12, selected or dragged 16, from the table above; focus is the focus ring, never a fill
 3. **Use `-container` for backgrounds** - Container tokens for subtle background fills
 4. **Info equals Tertiary** - Info colors are aliases to Tertiary tokens
+
+### Exception: selection in dense lists
+
+A selected row in a dense list or a table, such as a menu item, a listbox
+option or a table row, rests on `--color-primary-state-08`, against the 16 in
+the table above. Selection repeats down a column of rows, and 16 would outweigh
+the content. Navigation keeps 16: a selected Sidebar item is
+`--color-primary-state-16`, because it marks where the person is.
+
+### Exception: the Sidebar's selected icon
+
+A selected SidebarTab draws its icon in `--color-primary`, the same color as its
+label, not in the darker `--color-primary-icon` role that intent glyphs
+take elsewhere. Navigation reads the icon and label as one mark.
+
+### Exception: tonal fills
+
+The tonal Button, the tonal Dropdown toggle, and the UserAvatar's initial and
+counter rest on their role's `-state-08`, against rule 3. The tonal look is
+that wash: a Container is a different, heavier color. Their hover and press lay
+`--color-shadow-state-08` and `-12` over it.
+
+### Exception: the Field hover border
+
+A Field's hover border is `--color-inverse-primary`, not `--color-primary-border`.
+The border role is the focus ring's color, so a hover border in it would read
+as focus. The hover border is a hint, not an indicator: focus is the 2px focus
+ring.
 
 ### Exception: gray team avatars
 

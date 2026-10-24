@@ -1,5 +1,5 @@
 ---
-summary: PLUS lays pages on two 12-column grids with gutter 16 — the screen grid for modals and overlays, the content grid inside the surface
+summary: PLUS lays pages on two 12-column grids with gutter 16 — the screen grid on the Overlay layer for modals and overlays, the content grid inside the surface and the only grid a page frame carries
 ---
 
 <!-- Tier: 2 -->
@@ -9,8 +9,10 @@ summary: PLUS lays pages on two 12-column grids with gutter 16 — the screen gr
 PLUS has **two grids**, both 12 columns (`--layout-columns`) with gutter 16
 (`--layout-gutter`):
 
-- **The screen grid** spans the screen. Modals and overlays size from it.
-- **The content grid** sits inside the surface. Page content aligns to it.
+- **The screen grid** spans the screen and lives on the Overlay layer only.
+  Modals and overlays size from it.
+- **The content grid** sits inside the surface. Page content aligns to it, and
+  it is the only grid a page frame carries.
 
 Source of truth: the `spacing / layout` collection in Figma, generated into
 `design-system/src/tokens/_frame_layers.scss`. Its modes are Medium (768px) ·
@@ -34,6 +36,11 @@ grid.
 Twelve columns across the screen, inside the screen pad, **centered and capped
 at 1232**. It ignores the sidebar, so an overlay sits in the same place whether
 the sidebar is docked or closed.
+
+The screen grid belongs to the **Overlay layer**: in a design file it is set on
+that layer, so it shows when the overlay shows and hides with it. A page frame
+carries the content grid alone. Code draws no grid at all; the Modal reads the
+screen-grid tokens below to size itself.
 
 | Token | Value | Description |
 |:---|:---|:---|
@@ -117,7 +124,8 @@ The frame `SurfaceContainer` draws, from the same file:
 - The **page template** owns width (`Screen/width-screen`) and the `spacing / layout` mode.
 - `Pattern/Surface container` (`SurfaceContainer` in code) fills it: the topbar row, then the row with the sidebar and `Pattern/Surface`. The surface carries the content grid and the Content slot.
 - The **sidebar** docks by `Sidebar/sidebar-docked` (false · true · true); behavior below Large is in `../composition/layout.md` § The frame.
-- Overlays sit on the screen grid, above the frame.
+- The **Overlay layer** sits above the frame and carries the screen grid; the
+  grid shows and hides with the overlay.
 
 ## The legacy spec-page grid
 

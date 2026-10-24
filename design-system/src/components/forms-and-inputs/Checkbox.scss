@@ -114,18 +114,26 @@
             background-color: var(--color-primary-state-08);
         }
 
-        &:checked:hover:not(:disabled):not(:indeterminate) {
-            background-color: var(--color-primary-state-12);
-        }
-
+        // A checked or mixed box keeps its fill and its mark on hover: the
+        // shadow 08 layer is an inset shadow over the primary fill, under the
+        // mark drawn by `::before` and `::after`, rather than a translucent
+        // wash replacing the fill.
+        &:checked:hover:not(:disabled):not(:indeterminate),
         &:indeterminate:hover:not(:disabled) {
-            background-color: var(--color-primary-state-12);
+            background-color: var(--color-primary);
+            box-shadow: inset 0 0 0 var(--layout-control-checkbox) var(--color-shadow-state-08);
         }
 
-        // Focus state
+        // Focus state: the focus ring, 2px wide and 2px off the box, as Button
+        // and Radio draw it. A pointer focus draws nothing.
         &:focus {
             outline: none;
-            box-shadow: 0 0 0 2px var(--color-focus-ring);
+            box-shadow: none;
+        }
+
+        &:focus-visible {
+            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline-offset: var(--size-element-stroke-lg);
         }
 
         // Disabled state

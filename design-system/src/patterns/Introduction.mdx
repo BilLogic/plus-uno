@@ -44,9 +44,9 @@ A pattern never renders your content for you. It answers exactly one question �
             ['Surface container (app frame)', 'SurfaceContainer', '--surface-sunken frame; the surface inside is --surface-default and carries the content grid', '0'],
             ['Sidebar (side navigation)', 'PatternSidebar', 'none: it sits on the Surface container frame (--surface-sunken), or --surface-overlay when floating', '0'],
             ['Section', 'PatternSection', 'no-fill (or --color-surface-container-low)', '0'],
-            ['Card', 'PatternCard', '--surface-raised, lifted by --surface-raised-shadow', '1'],
+            ['Card', 'PatternCard', '--surface-raised on a 1px --color-outline-variant border', '0 at rest; Light/2 while a clickable card is hovered or dragged'],
             ['Table', 'PatternTable', 'no-fill (container owns the background)', '0'],
-            ['Modal', 'PatternModal', '--color-surface-container-high', '3'],
+            ['Modal', 'PatternModal', '--surface-overlay (white), over a scrim', 'Light/4'],
         ].map((row, i) => (
             <tr key={i} style={{ borderBottom: '1px solid var(--color-outline-variant)' }}>
                 <td className="body2-txt" style={{ padding: '10px 12px' }}>{row[0]}</td>
@@ -67,7 +67,7 @@ A pattern never renders your content for you. It answers exactly one question �
 - **Primary text**: `--color-on-surface` — headings, primary data, active body text.
 - **Secondary text**: `--color-on-surface-variant` — subtitles, metadata, timestamps.
 - **Outer borders**: `--color-outline` / **inner dividers**: `--color-outline-variant`.
-- **Interaction states are additive overlays**: hover `--color-on-surface-state-08`, focus `-12`, pressed `-16` layered on top of the base fill — never replace the fill itself.
+- **Interaction states are additive overlays** laid on top of the base fill, never replacing it: hover `--color-on-surface-state-08`, pressed `-12`, selected or dragged `-16`. Focus is the focus ring, never a fill (`foundations/color.md` § State Layers).
 
 </div>
 
