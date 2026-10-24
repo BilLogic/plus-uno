@@ -218,6 +218,46 @@ const expectStats = async (canvasElement, inRow) => {
     await expect(sameRow, inRow ? 'the stats share a row' : 'the stats stack').toBe(inRow);
 };
 
+/**
+ * One button hierarchy: each block has at most one primary (filled) button;
+ * every text button is one height; the pagers are small icon-only buttons
+ * with names, the same variant both ways.
+ */
+const expectButtons = async (canvasElement, list) => {
+    for (const { el, name } of list) {
+        const primaries = el.querySelectorAll('.plus-btn--primary.plus-btn--filled');
+        await expect(primaries.length, `${name} has at most one primary`).toBeLessThanOrEqual(1);
+    }
+    const page = content(canvasElement);
+    const textButtons = [...page.querySelectorAll('.plus-btn:not(.plus-btn--icon-only)')];
+    const height = tokenLength(canvasElement, '--item-height-md');
+    for (const b of textButtons) {
+        await expect(rect(b).height, `"${b.textContent.trim()}" is a medium button`).toBeCloseTo(height, 0);
+    }
+    for (const b of page.querySelectorAll('.plus-btn--icon-only')) {
+        await expect(b.classList.contains('plus-btn--small') && b.classList.contains('plus-btn--outline'), 'a pager is small and outlined').toBe(true);
+        await expect(b.getAttribute('aria-label'), 'a pager has a name').toBeTruthy();
+    }
+};
+
+/**
+ * One icon set: every Font Awesome glyph draws in the 16 icon box, centered
+ * on its line within 1px. Status draws its own icon at the size its
+ * component prescribes for its height.
+ */
+const expectIcons = async (canvasElement) => {
+    const md = tokenLength(canvasElement, '--icon-md');
+    const sm = tokenLength(canvasElement, '--icon-sm');
+    for (const i of canvasElement.querySelectorAll('i[class*="fa-"]')) {
+        const label = i.className.split(' ').find((c) => c.startsWith('fa-') && c !== 'fa-solid');
+        const size = parseFloat(getComputedStyle(i).fontSize);
+        await expect(size, `${label} draws at its icon size`).toBeCloseTo(i.closest('.plus-status') ? sm : md, 0);
+        const r = rect(i);
+        const line = rect(i.parentElement);
+        await expect(Math.abs((r.top + r.height / 2) - (line.top + line.height / 2)), `${label} is centered on its line`).toBeLessThanOrEqual(1);
+    }
+};
+
 /** The checks every width runs; `expected` is what the tokens give there. */
 const atWidth = (width, expected) => async ({ canvasElement }) => withTestViewport(width, HEIGHT, async () => {
     const canvas = within(canvasElement);
@@ -239,6 +279,8 @@ const atWidth = (width, expected) => async ({ canvasElement }) => withTestViewpo
     await expectChartAxes(canvasElement);
     await expectNoClippedText(list);
     await expectOutline(canvasElement);
+    await expectButtons(canvasElement, list);
+    await expectIcons(canvasElement);
 
     // Your impact opens on its first page, the ratings.
     await expect(within(list.find((b) => b.name === 'impact').el).getByText('Student Interaction Rating')).toBeTruthy();

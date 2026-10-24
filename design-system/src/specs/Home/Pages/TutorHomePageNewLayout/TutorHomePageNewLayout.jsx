@@ -133,7 +133,7 @@ const TabLabel = ({ children, after }) => (
 
 TabLabel.propTypes = { children: PropTypes.node, after: PropTypes.node };
 
-const infoGlyph = <i className="fa-solid fa-circle-info" aria-hidden="true" />;
+const infoGlyph = <i className="fa-solid fa-circle-info plus-home-new__glyph" aria-hidden="true" />;
 
 /**
  * TutorHomePageNewLayout: today's tutor Home (the Specs "Skills (Home Page)"
@@ -217,8 +217,8 @@ const TutorHomePageNewLayout = ({
                 className="plus-home-new__header"
                 actions={(
                     <>
-                        <Button text="Sign up now" style="primary" fill="filled" size="small" leadingVisual="paper-plane" />
-                        <Button text="View schedule" style="secondary" fill="tonal" size="small" />
+                        <Button text="Sign up now" style="primary" fill="filled" leadingVisual="paper-plane" />
+                        <Button text="View schedule" style="secondary" fill="tonal" />
                     </>
                 )}
             >
@@ -226,7 +226,7 @@ const TutorHomePageNewLayout = ({
                     <img className="plus-home-new__callout-art" src={badgeThumbnail} alt="" />
                     <p className="plus-home-new__callout-title">Certified Tutor</p>
                     <p className="plus-home-new__secondary">20/20 lessons complete</p>
-                    <Button text="Claim" style="primary" fill="tonal" size="small" className="plus-home-new__callout-action" />
+                    <Button text="Claim" style="secondary" fill="tonal" className="plus-home-new__callout-action" />
                 </div>
             </PatternSection>
 
@@ -249,7 +249,7 @@ const TutorHomePageNewLayout = ({
                     <p className="plus-home-new__body">{SESSION_COPY[sessionTab]}</p>
                     {sessionTab === 'sign-up' && (
                         <div className="plus-home-new__inline">
-                            <Button text="Edit sign-ups" style="primary" fill="outline" size="small" leadingVisual="pen" />
+                            <Button text="Edit sign-ups" style="secondary" fill="tonal" leadingVisual="pen" />
                         </div>
                     )}
                     {sessionTab === 'session' && (
@@ -258,12 +258,11 @@ const TutorHomePageNewLayout = ({
                                 <Select
                                     aria-label="Today's session"
                                     placeholder="Select a session"
-                                    size="small"
                                     options={sessionOptions}
                                     value={selectedSession ?? ''}
                                     onChange={setSelectedSession}
                                 />
-                                <Button text="Join session" style="primary" fill="filled" size="small" disabled={!selectedSession} />
+                                <Button text="Join session" style="primary" fill="filled" disabled={!selectedSession} />
                             </div>
                             <Alert style="warning" dismissible={false}>
                                 Session links will appear 5 minutes before your scheduled start time.
@@ -272,7 +271,7 @@ const TutorHomePageNewLayout = ({
                     )}
                     {sessionTab === 'reflection' && (
                         <div className="plus-home-new__inline">
-                            <Button text="Submit Your Reflection" style="primary" fill="filled" size="small" leadingVisual="paper-plane" />
+                            <Button text="Submit Your Reflection" style="primary" fill="filled" leadingVisual="paper-plane" />
                         </div>
                     )}
                 </div>
@@ -375,7 +374,7 @@ const TutorHomePageNewLayout = ({
                                 padding="sm"
                                 title={lesson.title}
                                 image={lesson.image && <img className="plus-home-new__thumb" src={lesson.image} alt="" />}
-                                footer={<Button text="Review" style="primary" fill="filled" size="small" onClick={() => onReviewLesson?.(lesson.id)} />}
+                                footer={<Button text="Review" style="secondary" fill="tonal" aria-label={`Review ${lesson.title}`} onClick={() => onReviewLesson?.(lesson.id)} />}
                             >
                                 <div className="plus-home-new__inline plus-home-new__inline--wrap">
                                     <Tag color={CATEGORY_COLOR[lesson.category] ?? 'gray'}>{lesson.category}</Tag>

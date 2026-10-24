@@ -92,6 +92,19 @@
     gap: var(--element-inline-sm);
 }
 
+// A decorative glyph beside text (the tab info marks): the 16 icon box,
+// centered on the label. Doubled class: a glyph rule elsewhere sets icons to 12.
+.plus-home-new__glyph.plus-home-new__glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--icon-md);
+    block-size: var(--icon-md);
+    font-size: var(--icon-md);
+    line-height: 1;
+    color: var(--color-on-surface-variant);
+}
+
 .plus-home-new__inline--wrap {
     flex-wrap: wrap;
 }
