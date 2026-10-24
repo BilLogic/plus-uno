@@ -7,8 +7,7 @@ summary: The label family — Status, Count, Tag, TagGroup, Suggestion and AI la
 # Labels — which component to reach for
 
 The label family: `Status`, `Count`, `Tag`, `TagGroup`, `Suggestion` and
-`AiLabel`. They keep their own names in Storybook and Figma rather than
-Atlassian's. Generated facts are in `design-system/src/components/labels/index.md`;
+`AiLabel`. They keep their own names in Storybook rather than Atlassian's. Generated facts are in `design-system/src/components/labels/index.md`;
 when to use each is on its own docs page.
 
 `Badge` and `BadgeVariants` are deprecated in favor of `Status`, `Count` and

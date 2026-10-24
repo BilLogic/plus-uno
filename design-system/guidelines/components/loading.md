@@ -6,7 +6,7 @@ summary: Progress (Progress bar), Skeleton or Spinner — showing work in flight
 
 # Loading — which component to reach for
 
-Three components: `Progress`, which Storybook and Figma title Progress bar after
+Three components: `Progress`, which Storybook titles Progress bar after
 Atlassian, `Skeleton` and `Spinner`. Generated facts are in
 `design-system/src/components/loading/index.md`.
 

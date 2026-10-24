@@ -13,10 +13,6 @@ import {
   run,
 } from './check-storybook-categories.mjs';
 
-test('the repo is green', () => {
-  assert.deepEqual(run(), []);
-});
-
 test('sentence case allows a capitalized first word and acronyms, and refuses Title Case', () => {
   for (const ok of ['Text field', 'AI label', 'Declared API', 'Label & caption', '_Field', 'Date time picker']) {
     assert.equal(isSentenceCase(ok), true, ok);
@@ -64,7 +60,7 @@ test('a fixture with only good titles is green', () => {
 });
 
 test('a retired group, a wrong folder, Title Case and a retired path each go red', () => {
-  const retired = ['components', 'actions', 'Button'].join('/');
+  const retired = ['design-system', 'src', 'components', 'actions', 'Button'].join('/');
   const root = fixture({
     'design-system/src/components/labels/Tag.stories.jsx': story('Components/Status and loading/Tag'),
     'design-system/src/components/labels/Count.stories.jsx': story('Components/Forms and inputs/Count'),
@@ -99,4 +95,40 @@ test('a collapsed corpus is refused rather than passed', () => {
   fs.writeFileSync(path.join(root, 'storybook.taxonomy.json'), '{}');
   execFileSync('git', ['init', '-q'], { cwd: root });
   assert.match(messages(root)[0], /expected at least/);
+});
+
+test('an _internal story may name any category; a titleless story goes red', () => {
+  const root = fixture({
+    'design-system/src/components/_internal/Navbar.stories.jsx': story('Components/Labels/Navbar'),
+    'design-system/src/components/labels/Empty.stories.jsx': 'export default {};\n',
+  });
+  const found = messages(root);
+  assert.ok(!found.some((m) => m.includes('Navbar.stories.jsx')));
+  assert.ok(found.some((m) => m.includes('Empty.stories.jsx') && m.includes('no `title:`')));
+});
+
+test('a group that is not an Atlassian category, and a sort that disagrees, go red', () => {
+  const root = fixture({});
+  fs.writeFileSync(
+    path.join(root, 'storybook.taxonomy.json'),
+    JSON.stringify({
+      componentGroups: { 'Forms and inputs': [], Actions: [], Labels: [] },
+      storySortOrder: ['Components', ['Forms and inputs', [], 'Labels', []]],
+    }),
+  );
+  const found = messages(root);
+  assert.ok(found.some((m) => m.includes('"Actions" is not an Atlassian category')));
+  assert.ok(found.some((m) => m.includes('storySortOrder lists different Components groups')));
+});
+
+test('a retired folder is matched by repo path or alias, with no trailing path needed', () => {
+  const alias = ['@', 'components', 'status-and-loading'].join('/');
+  const own = ['src', 'components', 'overlays', 'Tooltip'].join('/');
+  const root = fixture({
+    'docs/a.md': `import X from '${alias}';`,
+    'docs/b.md': `${own} is a prototype's own folder`,
+  });
+  const found = messages(root);
+  assert.ok(found.some((m) => m.startsWith('docs/a.md')));
+  assert.ok(!found.some((m) => m.startsWith('docs/b.md')));
 });

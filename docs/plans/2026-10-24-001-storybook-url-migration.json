@@ -1,5 +1,5 @@
 {
-  "$comment": "Storybook ids and URLs that changed when components moved to Atlassian categories and display names. Old ids read from the live index.json before the change; new ids from Storybook's own id rule (scripts/lib/storybook-id.mjs). One row per docs page or story. Use it to rewrite links (Notion, Figma, Slack) that point at an old id.",
+  "$comment": "Storybook ids and URLs that changed when components moved to Atlassian categories and display names. Old ids read from the live index.json before the change; new ids from Storybook's own id rule (scripts/lib/storybook-id.mjs). One row per docs page or story. Use it to rewrite links (Notion, Figma, Slack) that point at an old id or name an old title (a title whose id did not change, such as Date & time picker, is in titles but not entries). Delete this file once those links are rewritten.",
   "generated": "2026-10-24",
   "base": "https://plus-uno.netlify.app/storybook/",
   "titles": {
@@ -7,6 +7,7 @@
     "Components/Actions/Button group": "Components/Forms and inputs/Button group",
     "Components/Actions/Close button": "Components/Forms and inputs/Close button",
     "Components/Actions/Control heights": "Components/Forms and inputs/Control heights",
+    "Components/Forms and inputs/Date & time picker": "Components/Forms and inputs/Date time picker",
     "Components/Forms and inputs/Date and time picker behavior": "Components/Forms and inputs/Date time picker behavior",
     "Components/Forms and Inputs/Date and time round trip": "Components/Forms and inputs/Date time round trip",
     "Components/Forms and inputs/Dropdown": "Components/Forms and inputs/Dropdown menu",

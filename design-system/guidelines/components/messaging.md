@@ -6,8 +6,8 @@ summary: Alert, Toast or Modal — choosing by how long the message lives and wh
 
 # Messaging — which component to reach for
 
-Three components: `Alert`, `Toast`, `Modal`. Storybook and Figma title the
-first two with Atlassian's names, Section message and Flag. Generated facts are in
+Three components: `Alert`, `Toast`, `Modal`. Storybook titles the first
+two with Atlassian's names, Section message and Flag. Generated facts are in
 `design-system/src/components/messaging/index.md`. The choice between them is
 not about severity — all three carry the same semantic palette — it is about how
 long the message lives and whether the user can keep working.

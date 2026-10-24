@@ -35,12 +35,8 @@ That pattern is implemented with colocated `*.mdx` files, shared docs layout pri
 4. **Stories-only outlier**
    Some forms still rely on a single story file and have no colocated MDX page yet. As of the 2026-07 Documentation IA migration there are no current examples — the last known outliers (`Rating`, `Input group`, `Scale`) have since gained colocated MDX pages under `Components/Forms and inputs/`.
 
-5. **Sidebar alias**
-   A few sidebar labels are more user-facing than the implementation name. Current examples:
-   - `Components/Forms and inputs/Text field` for `Input`
-   - `Components/Forms and inputs/Date time picker` for `DateAndTimePicker`
-
-These aliases are acceptable when intentional, but they should be rare and kept in sync with [`storySort`](../../../.storybook/preview.jsx).
+5. **Display name**
+   A sidebar label uses Atlassian's display name where Atlassian has the component, so it can differ from the export: `Components/Forms and inputs/Text field` for `Input`, `Components/Overlays and layering/Popup` for `Popover`. The rule is [`documentation-ia.md`](../../../design-system/guidelines/documentation-ia.md) § Naming; the sidebar order is [`storybook.taxonomy.json`](../../../storybook.taxonomy.json), from which the `storySort` literal is generated.
 
 ## Default section spine
 

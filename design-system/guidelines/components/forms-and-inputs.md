@@ -12,8 +12,8 @@ together on a surface is `design-system/guidelines/composition/forms.md`; this
 file is about picking one.
 
 The group follows Atlassian's Forms and inputs category, so it holds the
-buttons too. Storybook and Figma title components with Atlassian's display
-names, while the code export keeps its own: `Input` is Text field, `Textarea`
+buttons too. Storybook titles components with Atlassian's display names,
+while the code export keeps its own: `Input` is Text field, `Textarea`
 is Text area, `Switch` is Toggle, `Dropdown` is Dropdown menu, and
 `DateAndTimePicker` is Date time picker.
 
@@ -195,7 +195,7 @@ an action:
 | A menu of things to do | `Dropdown` | A Button that opens a div |
 | Switching between views | `NavTabs`, `NavPills` | A ButtonGroup of two |
 | A setting that applies now | `Switch` | A toggle Button |
-| A status on a row | `Badge` | A tiny disabled Button |
+| A status on a row | `Status` | A tiny disabled Button |
 
 `active` on a `Button` adds a CSS class and nothing else. A row of buttons where
 one is `active` looks like a segmented control and announces as three unrelated

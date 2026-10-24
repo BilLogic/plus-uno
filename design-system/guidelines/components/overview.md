@@ -22,8 +22,8 @@ Groups follow Atlassian's component categories, in Atlassian's order, and
 - [Navigation](navigation.md) — six, sorted by what the user moves between
 - [Overlays and layering](overlays-and-layering.md) — `Tooltip`, `Popover`
 
-Storybook and Figma title components with Atlassian's display names (Text
-field, Toggle, Section message, Popup); code exports keep theirs. Each group
+Storybook titles components with Atlassian's display names (Text field,
+Toggle, Section message, Popup); code exports keep theirs. Each group
 overview names its own pairs.
 
 Facts about a single component — props, variants, defaults, tokens touched,

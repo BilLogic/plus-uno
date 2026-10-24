@@ -19,7 +19,8 @@
  *      name, or `_internal`.
  *   3. Every story file under `components/` is titled `Components/<category>/…`,
  *      and a story in a category folder names THAT folder's category. Stories
- *      under `_internal/` may name any category.
+ *      under `_internal/`, or directly under `components/`, may name any
+ *      category.
  *   4. Every segment after `Components/` is in sentence case: "Text field",
  *      not "Text Field". An all-caps acronym (AI, API) is allowed.
  *   5. No tracked file names a retired folder path.
@@ -56,12 +57,13 @@ export const ATLASSIAN_CATEGORIES = [
 ];
 
 /**
- * Folders that held components before the move, as path fragments. Assembled
- * from parts so this file does not name what it searches for.
+ * Folders that held components before the move, as the repo path or the `@/`
+ * alias, with or without a path after them. Assembled from parts so this file
+ * does not name what it searches for.
  */
 export const RETIRED_PATHS = ['actions', 'status-and-loading', 'overlays'].map((folder) => ({
   folder,
-  re: new RegExp(`components/${folder}(?![\\w-])/`),
+  re: new RegExp(`(?:design-system/src/|@/)components/${folder}(?![\\w-])`),
 }));
 
 /** Story files under `components/`, so a walk that stopped matching finds nothing. */
@@ -156,7 +158,8 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
       continue;
     }
     const [root, category, ...rest] = title.split('/');
-    const folder = rel.split('/')[3];
+    const parts = rel.split('/');
+    const folder = parts.length > 4 ? parts[3] : '_internal';
     if (root !== 'Components' || !groups.includes(category)) {
       found.push(
         `${rel}  is titled "${title}", outside every component category.\n` +

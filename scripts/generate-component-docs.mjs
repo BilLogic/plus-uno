@@ -33,17 +33,18 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const COMPONENTS_ROOT = path.join(REPO_ROOT, 'design-system/src/components');
 const CHECK = process.argv.includes('--check');
 
-/** Groups are the folders directly under components/, minus the barrel files,
- * named and ordered after Atlassian's component categories. */
+/**
+ * Groups are the folders directly under components/, minus the barrel files.
+ * Each folder is a category from `storybook.taxonomy.json` in kebab case, so
+ * the title is read from there rather than listed a second time;
+ * `check:storybook-categories` holds folders and taxonomy together.
+ */
 const GROUP_TITLES = {
-  'forms-and-inputs': 'Forms and inputs',
-  'images-and-icons': 'Images and icons',
-  labels: 'Labels',
-  'layout-and-structure': 'Layout and structure',
-  loading: 'Loading',
-  messaging: 'Messaging',
-  navigation: 'Navigation',
-  'overlays-and-layering': 'Overlays and layering',
+  ...Object.fromEntries(
+    Object.keys(
+      JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'storybook.taxonomy.json'), 'utf8')).componentGroups,
+    ).map((category) => [category.toLowerCase().replace(/ /g, '-'), category]),
+  ),
   _internal: 'Internal',
 };
 

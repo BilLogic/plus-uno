@@ -6,8 +6,8 @@ summary: Tooltip or Popover (Popup) — hover description versus click-triggered
 
 # Overlays and layering — which component to reach for
 
-Two components: `Tooltip` and `Popover`, which Storybook and Figma title
-Popup after Atlassian. Generated facts are in
+Two components: `Tooltip` and `Popover`, which Storybook titles Popup
+after Atlassian. Generated facts are in
 `design-system/src/components/overlays-and-layering/index.md`. Both float content beside a
 trigger and both are built on the same positioning layer; the difference is what
 opens them and what you can put inside.
