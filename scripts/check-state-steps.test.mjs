@@ -47,6 +47,12 @@ function sheet(file) {
 
 const normalize = (selector) => selector.replace(/\s+/g, ' ').trim();
 
+/**
+ * `var(--token, fallback)` reads as `var(--token)`: the fallback is what a page
+ * without the token sheet draws, and the step is named by the token.
+ */
+const dropFallbacks = (value) => value.replace(/var\((--[\w-]+),(?:[^()]|\([^()]*\))*\)/g, 'var($1)');
+
 /** Every declaration the rules listing `selector` set, merged in source order. */
 export function declarations(root, selector) {
   const wanted = normalize(selector);
@@ -56,7 +62,7 @@ export function declarations(root, selector) {
     if (!rule.selectors.map(normalize).includes(wanted)) return;
     found = true;
     for (const node of rule.nodes) {
-      if (node.type === 'decl') merged[node.prop] = node.value.replace(/\s*!important$/, '');
+      if (node.type === 'decl') merged[node.prop] = dropFallbacks(node.value.replace(/\s*!important$/, ''));
     }
   });
   return found ? merged : null;
@@ -82,6 +88,11 @@ function expectNoFill(file, selector) {
     );
   }
 }
+
+const RING_OUTSIDE = {
+  outline: 'var(--size-element-stroke-lg) solid var(--color-focus-ring)',
+  'outline-offset': 'var(--size-element-stroke-lg)',
+};
 
 const RING_INSIDE = {
   outline: 'var(--size-element-stroke-lg) solid var(--color-focus-ring)',
@@ -258,7 +269,7 @@ test('Switch: hover lays the 08 over the track, on or off', () => {
 });
 
 /*
- * THE FOCUS GAP. Button, Checkbox and Radio draw the same keyboard ring: 2px
+ * THE FOCUS GAP. Button, Checkbox, Radio and Switch draw the same keyboard ring: 2px
  * of the focus-ring role, 2px off the control's edge. The Radio's ring was an
  * inverse-primary halo touching its border, and on a checked radio the two
  * merged into one thick primary edge that did not read as focus.
@@ -266,13 +277,13 @@ test('Switch: hover lays the 08 over the track, on or off', () => {
 for (const [name, file, selector] of [
   ['Checkbox', 'components/forms-and-inputs/Checkbox.scss', '.plus-form-checkbox .form-check-input:focus-visible'],
   ['Radio', 'components/forms-and-inputs/Radio.scss', '.plus-form-radio .form-check-input:focus-visible'],
+  ['Switch', 'components/forms-and-inputs/Switch.scss', '.plus-form-switch .form-check-input[type=checkbox]:focus-visible'],
 ]) {
   test(`${name}: keyboard focus is a 2px focus ring with a 2px gap`, () => {
-    expectRule(file, selector, {
-      outline: 'var(--size-element-stroke-lg) solid var(--color-focus-ring)',
-      'outline-offset': 'var(--size-element-stroke-lg)',
-    });
+    expectRule(file, selector, RING_OUTSIDE);
     expectNoFill(file, selector);
+    const { 'box-shadow': shadow } = declarations(sheet(file), selector);
+    assert.ok(shadow === undefined || shadow === 'none', `${name}: focus also draws a box-shadow ring: ${shadow}`);
   });
 }
 
@@ -292,4 +303,137 @@ test('Field: subtle hover 08, focus a ring, hover border inverse-primary (docume
   expectRule(file, '.plus-field--subtle.plus-field--hover', { 'background-color': layer('--color-on-surface-state-08') });
   expectRule(file, '.plus-field--focus', { outline: 'var(--size-element-stroke-lg) solid var(--color-focus-ring)' });
   expectNoFill(file, '.plus-field--focus');
+});
+
+/*
+ * THE SWEEP. The components below drifted the same way: pressed at 16, focus
+ * as a 12 fill, a selected state at 12, or no pressed step at all. Each block
+ * pins the steps the table in color.md names.
+ */
+
+/* ─── NavPills ───────────────────────────────────────────────────────────── */
+
+test('NavPills: hover 08, pressed 12, focus a ring with no fill, selected or not', () => {
+  const file = 'components/navigation/NavPills/NavPills.scss';
+  for (const pill of ['.plus-nav-pills .nav-link', '.nav-pills .plus-nav-item-pill']) {
+    expectRule(file, `${pill}:hover${NOT}`, { 'background-color': layer('--color-on-surface-state-08') });
+    expectRule(file, `${pill}:active${NOT}`, { 'background-color': layer('--color-on-surface-state-12') });
+    expectRule(file, `${pill}:focus-visible${NOT}`, RING_OUTSIDE);
+    expectNoFill(file, `${pill}:focus-visible${NOT}`);
+
+    // The primary border carries selection; the steps lay over it.
+    expectRule(file, `${pill}.active:hover`, { 'background-color': layer('--color-primary-state-08') });
+    expectRule(file, `${pill}.active:active`, { 'background-color': layer('--color-primary-state-12') });
+    expectRule(file, `${pill}.active:focus-visible`, RING_OUTSIDE);
+    expectNoFill(file, `${pill}.active:focus-visible`);
+  }
+
+  const item = '.plus-nav-pills .nav-item';
+  expectRule(file, `${item}.pseudo-pressed > .nav-link${NOT}`, { 'background-color': layer('--color-on-surface-state-12') });
+  expectNoFill(file, `${item}.pseudo-focus > .nav-link${NOT}`);
+  expectRule(file, `${item}.pseudo-focus > .nav-link${NOT}`, RING_OUTSIDE);
+  expectRule(file, `${item}.pseudo-pressed > .nav-link.active`, { 'background-color': layer('--color-primary-state-12') });
+  expectNoFill(file, `${item}.pseudo-focus > .nav-link.active`);
+  expectRule(file, `${item}.pseudo-focus > .nav-link.active`, RING_OUTSIDE);
+
+  expectRule(file, '.plus-nav-pills .dropdown .dropdown-toggle:active', {
+    'background-color': layer('--color-on-surface-state-12'),
+  });
+});
+
+/* ─── CloseButton ────────────────────────────────────────────────────────── */
+
+test('CloseButton: hover 08, pressed 12, focus the ring alone, on both tones', () => {
+  const file = 'components/actions/CloseButton/CloseButton.scss';
+  for (const [btn, role] of [
+    ['.plus-close-btn', '--color-on-surface-variant'],
+    ['.plus-close-btn--inverse', '--color-surface'],
+  ]) {
+    expectRule(file, `${btn}:hover`, { 'background-color': layer(`${role}-state-08`) });
+    expectRule(file, `${btn}:active`, { 'background-color': layer(`${role}-state-12`) });
+    const focus = declarations(sheet(file), `${btn}:focus-visible`);
+    assert.ok(!focus || !('background-color' in focus), `${btn}:focus-visible fills focus with ${focus?.['background-color']}`);
+  }
+});
+
+/* ─── Pagination ─────────────────────────────────────────────────────────── */
+
+test('Pagination: hover 08, pressed 12, current page 16, focus a ring with no fill', () => {
+  const file = 'components/navigation/Pagination/Pagination.scss';
+  const link = '.plus-pagination .page-item:not(.disabled):not(.active) .page-link';
+  expectRule(file, `${link}:hover`, { 'background-color': layer('--color-secondary-state-08') });
+  expectRule(file, `${link}:active`, { 'background-color': layer('--color-secondary-state-12') });
+  expectRule(file, `${link}:focus-visible`, RING_INSIDE);
+  expectNoFill(file, `${link}:focus-visible`);
+  assert.equal(declarations(sheet(file), `${link}:focus`), null, 'a pointer focus draws a state of its own');
+  expectRule(file, '.plus-pagination .page-item.active .page-link', {
+    'background-color': layer('--color-secondary-state-16'),
+  });
+});
+
+/* ─── Tag ────────────────────────────────────────────────────────────────── */
+
+test("Tag: hover 08, pressed 12, selected 16 in the tag's hue; the × the same, focus a ring", () => {
+  const file = 'components/status-and-loading/Tag/Tag.scss';
+  expectRule(file, '.plus-tag--selectable:hover', { 'background-color': layer('--plus-tag-08') });
+  expectRule(file, '.plus-tag--selectable:active', { 'background-color': layer('--plus-tag-12') });
+  for (const selected of ['.plus-tag--selected', '.plus-tag--selected:hover', '.plus-tag--selected:active']) {
+    expectRule(file, selected, { 'background-color': layer('--plus-tag-16') });
+  }
+  expectRule(file, '.plus-tag:focus-visible', RING_OUTSIDE);
+  expectNoFill(file, '.plus-tag:focus-visible');
+
+  expectRule(file, '.plus-tag__remove:hover', { 'background-color': layer('--color-on-surface-variant-state-08') });
+  expectRule(file, '.plus-tag__remove:active', { 'background-color': layer('--color-on-surface-variant-state-12') });
+  for (const remove of ['.plus-tag__remove:focus-visible', '.plus-tag--elevated .plus-tag__remove:focus-visible']) {
+    expectRule(file, remove, RING_OUTSIDE);
+    expectNoFill(file, remove);
+  }
+});
+
+/* ─── RichTextEditor toolbar ─────────────────────────────────────────────── */
+
+test('RichTextEditor: toolbar buttons hover 08, press 12, select 16; the block menu selects at 08', () => {
+  const file = 'components/forms-and-inputs/RichTextEditor/RichTextEditor.scss';
+  const btn = '.plus-rich-text-editor:not(.plus-rich-text-editor--full) .plus-rich-text-editor-toolbar .plus-btn.btn';
+  expectRule(file, `${btn}:hover:not(:disabled):not(.active)`, { 'background-color': layer('--color-secondary-state-08') });
+  expectRule(file, `${btn}:active:not(:disabled):not(.active)`, { 'background-color': layer('--color-secondary-state-12') });
+  expectRule(file, `${btn}.active`, { 'background-color': layer('--color-primary-state-16') });
+  expectRule(file, `${btn}:focus-visible`, RING_OUTSIDE);
+  expectNoFill(file, `${btn}:focus-visible`);
+
+  const toggle = '.plus-rich-text-editor-block-toggle';
+  expectRule(file, `${toggle}:hover:not(:disabled)`, { 'background-color': layer('--color-on-surface-state-08') });
+  expectRule(file, `${toggle}:active:not(:disabled)`, { 'background-color': layer('--color-on-surface-state-12') });
+  expectRule(file, `${toggle}:focus-visible`, RING_OUTSIDE);
+  expectNoFill(file, `${toggle}:focus-visible`);
+
+  // The block menu is a dense list, so it selects at primary 08 (color.md).
+  const item = '.plus-rich-text-editor-block-menu .dropdown-item';
+  expectRule(file, `${item}:hover`, { 'background-color': layer('--color-on-surface-state-08') });
+  expectRule(file, `${item}:active`, { 'background-color': layer('--color-on-surface-state-12') });
+  expectRule(file, `${item}.active`, { 'background-color': layer('--color-primary-state-08') });
+  expectRule(file, `${item}:focus-visible`, RING_INSIDE);
+  expectNoFill(file, `${item}:focus-visible`);
+  expectNoFill(file, `${item}:focus`);
+});
+
+/* ─── PatternTable rows ──────────────────────────────────────────────────── */
+
+test('PatternTable: rows hover 08, press 12, and a selected row is primary 08 (dense list)', () => {
+  const file = 'patterns/PatternTable/PatternTable.scss';
+  const row = '.plus-pattern-table-table tbody tr';
+  expectRule(file, `${row}:hover`, { 'background-color': layer('--color-on-surface-state-08') });
+  expectRule(file, `${row}:active`, { 'background-color': layer('--color-on-surface-state-12') });
+  expectRule(file, `${row}[aria-selected=true]`, { 'background-color': layer('--color-primary-state-08') });
+});
+
+/* ─── Suggestion ─────────────────────────────────────────────────────────── */
+
+test('Suggestion: hover 08, pressed 12, focus the ring alone', () => {
+  const file = 'components/status-and-loading/Suggestion/Suggestion.scss';
+  expectRule(file, '.plus-suggestion:hover', { 'background-color': layer('--color-mastering-content-state-08') });
+  expectRule(file, '.plus-suggestion:active', { 'background-color': layer('--color-mastering-content-state-12') });
+  expectRule(file, '.plus-suggestion:focus-visible', RING_OUTSIDE);
+  expectNoFill(file, '.plus-suggestion:focus-visible');
 });

@@ -30,15 +30,14 @@
         &.pseudo-pressed > .nav-link:not(.disabled):not(:disabled):not(.active),
         &.pseudo-pressed > .plus-nav-link:not(.disabled):not(:disabled):not(.active),
         &.pseudo-pressed > .plus-nav-item-pill:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-on-surface-state-16);
+            background-color: var(--color-on-surface-state-12);
         }
 
         &.pseudo-focus > .nav-link:not(.disabled):not(:disabled):not(.active),
         &.pseudo-focus > .plus-nav-link:not(.disabled):not(:disabled):not(.active),
         &.pseudo-focus > .plus-nav-item-pill:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-on-surface-state-12);
-            outline: 2px solid var(--color-primary);
-            outline-offset: 2px;
+            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline-offset: var(--size-element-stroke-lg);
         }
 
         &.pseudo-hover > .nav-link.active,
@@ -62,7 +61,7 @@
         &.pseudo-pressed > .nav-link[aria-current="page"],
         &.pseudo-pressed > .plus-nav-link[aria-current="page"],
         &.pseudo-pressed > .plus-nav-item-pill[aria-current="page"] {
-            background-color: var(--color-primary-state-16) !important;
+            background-color: var(--color-primary-state-12) !important;
         }
 
         &.pseudo-focus > .nav-link.active,
@@ -74,9 +73,8 @@
         &.pseudo-focus > .nav-link[aria-current="page"],
         &.pseudo-focus > .plus-nav-link[aria-current="page"],
         &.pseudo-focus > .plus-nav-item-pill[aria-current="page"] {
-            background-color: var(--color-primary-state-12) !important;
-            outline: 2px solid var(--color-primary) !important;
-            outline-offset: 2px !important;
+            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring) !important;
+            outline-offset: var(--size-element-stroke-lg) !important;
         }
     }
 
@@ -127,17 +125,20 @@
 
         // PRESSED state
         &:active:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-on-surface-state-16);
+            background-color: var(--color-on-surface-state-12);
         }
 
-        // FOCUS state
+        // FOCUS state: the ring alone, 2px off the pill.
         &:focus-visible:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-on-surface-state-12);
-            outline: 2px solid var(--color-primary);
-            outline-offset: 2px;
+            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline-offset: var(--size-element-stroke-lg);
         }
 
         // ACTIVE/SELECTED state - PRIMARY PILL OUTLINE + PRIMARY STATE LAYERS (Figma)
+        //
+        // The primary border carries selection, as the underline does on a
+        // tab, so a selected pill rests unfilled and takes the hover and
+        // pressed steps over that.
         //
         // React-Bootstrap sometimes marks selected state via attributes (aria-selected / aria-current),
         // depending on usage (tabs vs links vs pills). Style all of them.
@@ -158,13 +159,14 @@
             }
 
             &:active {
-                background-color: var(--color-primary-state-16) !important;
+                background-color: var(--color-primary-state-12) !important;
             }
 
+            // The ring beats the `outline: none` above, or a selected pill
+            // would show no focus at all.
             &:focus-visible {
-                background-color: var(--color-primary-state-12) !important;
-                outline: 2px solid var(--color-primary);
-                outline-offset: 2px;
+                outline: var(--size-element-stroke-lg) solid var(--color-focus-ring) !important;
+                outline-offset: var(--size-element-stroke-lg) !important;
             }
         }
 
@@ -202,7 +204,7 @@
             }
 
             &:active {
-                background-color: var(--color-on-surface-state-16);
+                background-color: var(--color-on-surface-state-12);
             }
 
             &.show,

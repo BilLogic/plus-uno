@@ -208,20 +208,33 @@
     z-index: 2;
 }
 
-/* Focus state */
-.plus-pagination .page-item:not(.disabled):not(.active) .page-link:focus {
-    outline: none;
+/* Pressed state */
+.plus-pagination .page-item:not(.disabled):not(.active) .page-link:active {
     background-color: var(--color-secondary-state-12);
-    /* rgba(68,92,106,0.12) */
     color: var(--color-secondary-text) !important;
     z-index: 2;
-    box-shadow: inset 0 0 0 2px var(--color-outline);
 }
 
-/* Active state */
+/*
+ * Focus: the ring alone, inside the page's edge so the segments beside it do
+ * not cover it. A pointer focus draws nothing.
+ */
+.plus-pagination .page-link:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.plus-pagination .page-item:not(.disabled):not(.active) .page-link:focus-visible,
+.plus-pagination .page-item.active .page-link:focus-visible {
+    outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+    outline-offset: calc(-1 * var(--size-element-stroke-lg));
+    color: var(--color-secondary-text) !important;
+    z-index: 2;
+}
+
+/* Current page: selected, so the 16 step. */
 .plus-pagination .page-item.active .page-link {
-    background-color: var(--color-secondary-state-08);
-    /* rgba(68,92,106,0.08) */
+    background-color: var(--color-secondary-state-16);
     color: var(--color-secondary-text) !important;
     /* #3b525f */
     cursor: default;

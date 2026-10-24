@@ -279,16 +279,14 @@ $tag-colors: (
 }
 
 /*
- * Selected is a full-color border as well as a fill, so the choice is not
- * carried by a change of lightness alone.
+ * Selected is a full-color border as well as the 16 fill, so the choice is not
+ * carried by a change of lightness alone. It holds the 16 under hover and
+ * press: the selectable steps above would otherwise lighten it.
  */
-.plus-tag--selected {
-    border-color: var(--plus-tag-hue);
-    background-color: var(--plus-tag-12);
-}
-
+.plus-tag--selected,
 .plus-tag--selected:hover,
 .plus-tag--selected:active {
+    border-color: var(--plus-tag-hue);
     background-color: var(--plus-tag-16);
 }
 
@@ -359,7 +357,7 @@ $tag-colors: (
 }
 
 .plus-tag__remove:active {
-    background-color: var(--color-on-surface-variant-state-16, rgba(63, 72, 74, 0.16));
+    background-color: var(--color-on-surface-variant-state-12, rgba(63, 72, 74, 0.12));
 }
 
 /* Round on a person tag, as its host is. */
@@ -367,9 +365,8 @@ $tag-colors: (
     border-radius: var(--size-element-radius-full, 999px);
 }
 
-/* Focus: the 12 fill plus a 2px Focus Ring 2px outside the ×. */
+/* Focus: a 2px Focus Ring 2px outside the ×, and no fill. */
 .plus-tag__remove:focus-visible {
-    background-color: var(--color-on-surface-variant-state-12, rgba(63, 72, 74, 0.12));
     outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
     outline-offset: var(--size-element-stroke-lg, 2px);
 }
@@ -544,10 +541,9 @@ $tag-colors: (
 /*
  * The × of an elevated link takes the same gap on focus: 2px of the surface
  * color between the × and its ring, so the ring reads on a dark picture. The
- * ring and the 12 fill are restated for check:focus-ring, as above.
+ * ring is restated for check:focus-ring, as above.
  */
 .plus-tag--elevated .plus-tag__remove:focus-visible {
-    background-color: var(--color-on-surface-variant-state-12, rgba(63, 72, 74, 0.12));
     outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
     outline-offset: var(--size-element-stroke-lg, 2px);
     box-shadow: 0 0 0 var(--size-element-stroke-lg, 2px) var(--color-surface-container-lowest, #ffffff);

@@ -30,7 +30,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-focus-ring` · `--color-focus-ring-inverse` · `--color-on-surface-variant` · `--color-on-surface-variant-state-08` · `--color-on-surface-variant-state-12` · `--color-on-surface-variant-state-16` · `--color-surface` · `--color-surface-state-08` · `--color-surface-state-12` · `--color-surface-state-16` · `--icon-md` · `--item-height-md` · `--size-element-radius-lg` · `--size-element-radius-md` · `--size-element-stroke-lg`
+`--color-focus-ring` · `--color-focus-ring-inverse` · `--color-on-surface-variant` · `--color-on-surface-variant-state-08` · `--color-on-surface-variant-state-12` · `--color-surface` · `--color-surface-state-08` · `--color-surface-state-12` · `--icon-md` · `--item-height-md` · `--size-element-radius-lg` · `--size-element-radius-md` · `--size-element-stroke-lg`
 
 From `design-system/src/components/actions/CloseButton/CloseButton.scss`. Override these through the token layer, never with a literal.
 

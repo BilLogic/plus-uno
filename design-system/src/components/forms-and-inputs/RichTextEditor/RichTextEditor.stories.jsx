@@ -8,6 +8,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-10-24', kind: 'changed', summary: 'Toolbar buttons hover at secondary 08 and press at 12, the block toggle at on-surface 08 and 12; focus is the 2px focus ring. The block menu selects at primary 08 and shows keyboard focus as a ring.' },
             { date: '2026-10-23', kind: 'changed', summary: 'The editing area became 120 high at least, growing with what is typed.' },
             { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
         ],

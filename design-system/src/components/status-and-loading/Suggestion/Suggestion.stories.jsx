@@ -31,6 +31,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-10-24', kind: 'changed', summary: 'A pressed suggestion is the Mastering Content 12 step, not 16.' },
             { date: '2026-09-29', kind: 'added', summary: 'Suggestion carried a public `Suggestion.isSuggestion` marker that TagGroup used to keep it out of `+n` and at the end of the row, a wrapper had to copy it, and a disabled TagGroup disabled the Suggestions in it.' },
         ],
         docs: {
@@ -182,7 +183,7 @@ Callbacks.play = async ({ canvasElement, args }) => {
     await expect(args.onPrompt).toHaveBeenCalledTimes(1);
 };
 
-/** Rest is outlined only; hover is the 08 state layer, pressed the 16. */
+/** Rest is outlined only; hover is the 08 state layer, pressed the 12. */
 export const StateLayers = () => (
     <div style={row}>
         <Suggestion label="Relationships" onAccept={() => {}} />
@@ -200,8 +201,8 @@ StateLayers.play = async ({ canvasElement }) => {
         await expect(getComputedStyle(el)[bg], `${name}: rest has no fill`).toBe(CLEAR);
         await expect(whileForced(el, ':hover', bg), `${name}: hover 08`)
             .toBe(t('--color-mastering-content-state-08'));
-        await expect(whileForced(el, ':active', bg), `${name}: pressed 16`)
-            .toBe(t('--color-mastering-content-state-16'));
+        await expect(whileForced(el, ':active', bg), `${name}: pressed 12`)
+            .toBe(t('--color-mastering-content-state-12'));
         // The box never moves between states.
         await expect(px(whileForced(el, ':active', 'height'))).toBe(22);
     }

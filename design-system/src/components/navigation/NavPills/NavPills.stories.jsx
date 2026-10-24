@@ -8,6 +8,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-10-24', kind: 'changed', summary: 'A pressed pill is the 12 step, not 16. Keyboard focus is the 2px focus ring 2px off the pill with no fill, selected or not.' },
             { date: '2026-10-23', kind: 'changed', summary: 'Pills and dropdown pills are 32, with Body/default labels at the medium weight.' },
         ],
         docs: {

@@ -61,7 +61,11 @@
     border-radius: var(--size-element-radius-md);
 
     &:hover:not(:disabled) {
-        background-color: var(--color-surface-container-high-state-08);
+        background-color: var(--color-on-surface-state-08);
+    }
+
+    &:active:not(:disabled) {
+        background-color: var(--color-on-surface-state-12);
     }
 
     &:disabled {
@@ -70,8 +74,8 @@
     }
 
     &:focus-visible {
-        outline: var(--size-border-stroke-stroke-150) solid var(--color-primary);
-        outline-offset: 2px;
+        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+        outline-offset: var(--size-element-stroke-lg);
     }
 }
 
@@ -95,8 +99,14 @@
         box-shadow: none;
         background-color: transparent;
 
+        // The steps of a secondary ghost button, whose icons these are: the
+        // transparent rest above would otherwise drop Button's own.
         &:hover:not(:disabled):not(.active) {
-            background-color: var(--color-surface-container-high-state-08);
+            background-color: var(--color-secondary-state-08);
+        }
+
+        &:active:not(:disabled):not(.active) {
+            background-color: var(--color-secondary-state-12);
         }
 
         &.active {
@@ -105,8 +115,8 @@
         }
 
         &:focus-visible {
-            outline: var(--size-border-stroke-stroke-150) solid var(--color-primary);
-            outline-offset: 2px;
+            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline-offset: var(--size-element-stroke-lg);
         }
 
         &:disabled,
@@ -146,14 +156,27 @@
         padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
         color: var(--color-on-surface);
 
-        &:hover,
-        &:focus {
+        &:hover {
             background-color: var(--color-on-surface-state-08);
         }
 
+        &:active {
+            background-color: var(--color-on-surface-state-12);
+        }
+
+        // A menu is a dense list, so the current block is primary 08 (color.md).
         &.active {
-            background-color: var(--color-primary-state-16);
+            background-color: var(--color-primary-state-08);
             color: var(--color-primary-text);
+        }
+
+        &:focus {
+            outline: none;
+        }
+
+        &:focus-visible {
+            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline-offset: calc(-1 * var(--size-element-stroke-lg));
         }
     }
 }

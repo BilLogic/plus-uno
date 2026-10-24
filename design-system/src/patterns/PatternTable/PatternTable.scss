@@ -46,7 +46,12 @@
     }
 
     tbody tr:active {
-        background-color: var(--color-on-surface-state-16);
+        background-color: var(--color-on-surface-state-12);
+    }
+
+    /* A table is a dense list, so a selected row is primary 08 (color.md). */
+    tbody tr[aria-selected=true] {
+        background-color: var(--color-primary-state-08);
     }
 }
 

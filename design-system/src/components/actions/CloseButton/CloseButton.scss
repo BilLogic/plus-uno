@@ -36,17 +36,14 @@
     }
 
     &:active {
-        background-color: var(--color-on-surface-variant-state-16);
+        background-color: var(--color-on-surface-variant-state-12);
     }
 
     &:focus {
         outline: none;
     }
 
-    &:focus-visible {
-        background-color: var(--color-on-surface-variant-state-12);
-    }
-
+    // Focus is the ring alone: no fill, so it never reads as pressed.
     // The ring sits 2px outside the box with its own, larger radius — an
     // outline would inherit the box's radius, so it is drawn as a pseudo-element.
     &:focus-visible::after {
@@ -78,10 +75,6 @@
     }
 
     &:active {
-        background-color: var(--color-surface-state-16);
-    }
-
-    &:focus-visible {
         background-color: var(--color-surface-state-12);
     }
 
