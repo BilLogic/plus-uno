@@ -56,10 +56,40 @@ describe('a row with a side column', () => {
         expect(splitRow(width.xl, grid, 4)).toEqual({ main: 8, side: 4, stacked: false });
     });
 
-    it('lays the whole page out from those', () => {
+    it('places the blocks side by side once both rows split: 8 + 4 at 744', () => {
         expect(homeLayout(width.lg, grid)).toEqual({
-            greeting: { main: 8, side: 4, stacked: false },
-            progress: { main: 8, side: 4, stacked: false },
+            stacked: false,
+            greeting: { column: '1 / span 8', row: 1 },
+            badge: { column: '9 / span 4', row: 1 },
+            impact: { column: '9 / span 4', row: 2 },
+            skills: { column: '1 / span 8', row: 2 },
+            lessons: { column: '1 / span 12', row: 3 },
+        });
+        expect(homeLayout(width.xl, grid)).toMatchObject({
+            greeting: { column: '1 / span 9', row: 1 },
+            badge: { column: '10 / span 3', row: 1 },
+            impact: { column: '9 / span 4', row: 2 },
+            skills: { column: '1 / span 8', row: 2 },
+        });
+    });
+
+    it('stacks at 720, the badge and Your Impact sharing a row of two cards', () => {
+        expect(homeLayout(width.md, grid)).toEqual({
+            stacked: true,
+            greeting: { column: '1 / span 12', row: 1 },
+            badge: { column: '1 / span 6', row: 2 },
+            impact: { column: '7 / span 6', row: 2 },
+            skills: { column: '1 / span 12', row: 3 },
+            lessons: { column: '1 / span 12', row: 4 },
+        });
+    });
+
+    it('gives each side card its own row when two would fall under the card minimum', () => {
+        expect(homeLayout(500, grid)).toMatchObject({
+            badge: { column: '1 / span 12', row: 2 },
+            impact: { column: '1 / span 12', row: 3 },
+            skills: { row: 4 },
+            lessons: { row: 5 },
         });
     });
 });

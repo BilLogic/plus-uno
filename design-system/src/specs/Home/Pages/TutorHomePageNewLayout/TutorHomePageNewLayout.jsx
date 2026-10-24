@@ -1,20 +1,20 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import { HomepageJumbotron } from '@/specs/Home/Sections';
-import { BadgeCard, DataVisualizationSkillsProgress, MetricsCard, RecommendedLessons } from '@/specs/Home/Cards';
-import { Button } from '@/components';
+import { Alert, Button, Count, ListGroup, NavTabs, Select, Status, Tag, Tile } from '@/components';
+import { LineChart, RadarChart } from '@/dataviz';
+import PatternCard from '@/patterns/PatternCard';
 import PatternSection from '@/patterns/PatternSection';
-import { cardsPerRow, homeLayout, useGridMeasure } from './homeGrid';
+import { cardsPerRow, homeLayout, useGridMeasure, useTokenLength } from './homeGrid';
 import './TutorHomePageNewLayout.scss';
 
 /** Today's Home content, unchanged: the Skills (Home Page) frame in the Specs file. */
 const DEFAULT_LESSONS = [1, 2, 3].map((n) => ({
     id: String(n),
-    badgeType: 'mastering-content',
+    category: 'Mastering Content',
     title: 'Lesson Title',
     duration: '12 mins',
-    status: 'in-progress',
+    inProgress: true,
     aiRecommended: true,
 }));
 
@@ -30,20 +30,59 @@ const DEFAULT_PROGRESS = {
     averageScores: [30, 55, 12, 25, 65],
 };
 
-/** MetricsCard's pages; the third holds the three rating tiles the Specs frame shows. */
-const IMPACT_PAGES = 3;
+const DEFAULT_OVERVIEW = {
+    categories: ['Teaching Math', 'Communicating Clearly', 'Motivating Students', 'Staying Positive', 'Managing Time', 'Fostering Participation', 'Building Rapport'],
+    yourPerformance: [60, 55, 80, 90, 70, 85, 75],
+    averagePerformance: [70, 70, 65, 75, 60, 70, 60],
+};
 
-/** Before the first measure, every block spans the row. */
-const STACKED = { main: null, side: null };
+/** Your Impact's pages, first to last, as today's Home holds them. */
+const IMPACT_PAGES = [
+    [
+        { value: '4.8', label: 'Student Interaction Rating', change: true },
+        { value: '4.8', label: 'Session Rating', change: true },
+        { value: '4.8', label: 'Self Performance Rating', change: true },
+    ],
+    [
+        { value: '100', label: 'Total Sessions Completed' },
+        { value: '75 hr', label: 'Total Tutoring Time' },
+        { value: '95%', label: 'Reflection Completion', change: true },
+    ],
+    [
+        { value: '2/3', label: 'Sessions Completed This Week' },
+    ],
+];
 
-/** A grid item spanning `span` of the content grid's columns, or the whole row. */
-const spanStyle = (span) => ({ gridColumn: span ? `span ${span}` : '1 / -1' });
+/** The curriculum categories' Tag colors, as today's lesson badges show them. */
+const CATEGORY_COLOR = {
+    'Mastering Content': 'purple',
+    'Socio-Emotional': 'magenta',
+    Advocacy: 'yellow',
+    Relationships: 'teal',
+    'Technology Tools': 'blue',
+};
 
-/** A reused card sized by its grid cell or strip track rather than by its own fixed width. */
-const FILL_CELL = { width: 'auto', maxWidth: 'none', height: '100%' };
+/** A block's grid placement as an inline style; before the first measure, every block spans the row. */
+const placed = (slot) => (slot ? { gridColumn: slot.column, gridRow: slot.row } : { gridColumn: '1 / -1' });
 
 /** How many lesson cards one view of the strip holds. */
 const lessonsPerView = (width, grid) => cardsPerRow(width, grid, grid.cardMin);
+
+/** The greeting's copy for each of its tabs, from today's Home. */
+const greetingCopy = (tab, name) => ({
+    'sign-up': {
+        title: `Sign up for your next session, ${name}!`,
+        description: 'Your students are counting on you! Click below to sign up for your next session and edit if needed.',
+    },
+    session: {
+        title: `Get ready to shine, ${name}.`,
+        description: "Your session links for today are ready. Select a session and click 'Join session' to begin.",
+    },
+    reflection: {
+        title: `How did your session go, ${name}?`,
+        description: 'Share your thoughts about the session to ensure a great experience for all.',
+    },
+})[tab];
 
 /** Previous and next, for a paged block. */
 const PagerControls = ({ label, onPrevious, onNext, previousDisabled, nextDisabled }) => (
@@ -77,26 +116,43 @@ PagerControls.propTypes = {
     nextDisabled: PropTypes.bool,
 };
 
+/** A tab label with a glyph or a count after it. */
+const TabLabel = ({ children, after }) => (
+    <span className="plus-home-new__inline">
+        {children}
+        {after}
+    </span>
+);
+
+TabLabel.propTypes = { children: PropTypes.node, after: PropTypes.node };
+
+const infoGlyph = <i className="fa-solid fa-circle-info" aria-hidden="true" />;
+
+/** The week-on-week change a stat carries. */
+const change = <Status style="success" leadingVisual="arrow-up">+{'{#}'}% since last week</Status>;
+
 /**
  * TutorHomePageNewLayout: today's tutor Home (the Specs "Skills (Home Page)"
- * frame, 563:207489) rebuilt on the new frame, grid and type. A side-by-side
- * "after" for review; the Home pages beside it are the "before".
+ * frame, 563:207489) rebuilt from the patterns. A side-by-side "after" for
+ * review; the Home pages beside it are the "before", and nothing here imports
+ * their components.
  *
- * - The frame is PageLayout on the SurfaceContainer pattern: the 32 topbar, the
+ * - The frame is PageLayout on the SurfaceContainer pattern: the topbar, the
  *   tutor sidebar with Home selected, and the surface's 12-column content grid.
- * - Each row is a subgrid of that grid, and each block spans whole columns,
- *   chosen by the formulas in `homeGrid.js` from the section and card
- *   minimums. A row too narrow to split stacks.
- * - The greeting is the page's h1. Your Impact and Personalized
- *   Recommendations are sections (h2), and the My Badge card's title is an h2,
- *   one level below the page it sits on.
+ * - Every block is a direct child of that grid and is a Section or a Card
+ *   pattern, whose header, body and footer slots hold design-system
+ *   primitives. `homeGrid.js` places each on whole columns from the section
+ *   and card minimums. Spacing comes from the patterns and the grid alone.
+ * - The greeting is the page header (h1) with its tabs; My Badge and Your
+ *   Impact are cards (h2), Personalized Recommendations a section (h2) whose
+ *   lesson cards are h3s.
  */
 const TutorHomePageNewLayout = ({
     id,
     tutorName = 'John',
     userName = 'John Doe',
     userBadge = 'Lead',
-    skillsOverviewData,
+    skillsOverviewData = DEFAULT_OVERVIEW,
     skillsProgressData = DEFAULT_PROGRESS,
     recommendedLessons = DEFAULT_LESSONS,
     sessionLinks = DEFAULT_SESSIONS,
@@ -104,15 +160,18 @@ const TutorHomePageNewLayout = ({
     className = '',
     style,
 }) => {
-    const rowRef = useRef(null);
+    // The formulas measure the content grid, which is the greeting's parent.
+    const gridRef = useRef(null);
+    const greetingRef = useCallback((node) => { gridRef.current = node?.parentElement ?? null; }, []);
     const stripRef = useRef(null);
-    const layout = useGridMeasure(rowRef, homeLayout);
-    const [impactPage, setImpactPage] = useState(IMPACT_PAGES);
+    const layout = useGridMeasure(gridRef, homeLayout);
+    // The charts take a pixel height; it is the Size token, read at run time.
+    const chartHeight = useTokenLength('--height-2000') ?? undefined;
+    const [greetingTab, setGreetingTab] = useState('sign-up');
+    const [skillsTab, setSkillsTab] = useState('skills-progress');
+    const [impactIndex, setImpactIndex] = useState(0);
     const [edges, setEdges] = useState({ start: true, end: false });
     const [selectedSession, setSelectedSession] = useState(sessionLinks[0]?.id);
-
-    const greeting = layout?.greeting ?? STACKED;
-    const progress = layout?.progress ?? STACKED;
 
     const readEdges = useCallback(() => {
         const el = stripRef.current;
@@ -136,6 +195,9 @@ const TutorHomePageNewLayout = ({
         el.scrollBy({ left: direction * (el.clientWidth + gutter), behavior: 'smooth' });
     };
 
+    const copy = greetingCopy(greetingTab, tutorName);
+    const sessionOptions = sessionLinks.map((s) => ({ value: s.id, label: `${s.studentName}, ${s.time}, ${s.date}` }));
+
     return (
         <PageLayout
             id={id}
@@ -147,62 +209,148 @@ const TutorHomePageNewLayout = ({
             className={`plus-home-new ${className}`.trim()}
             style={style}
         >
-            <div ref={rowRef} className="plus-home-new__row" data-row="greeting">
-                <HomepageJumbotron
-                    titleLevel={1}
-                    tutorName={tutorName}
-                    sessionLinks={sessionLinks}
-                    selectedSession={selectedSession}
-                    onSessionSelect={setSelectedSession}
-                    className="plus-home-new__block"
-                    style={spanStyle(greeting.main)}
-                />
-                <div className="plus-home-new__block" style={spanStyle(greeting.side)}>
-                    <BadgeCard
-                        titleLevel={2}
-                        size="M"
-                        badgeType="unclaimed"
-                        buttonText="Claim"
-                        tooltipText="Complete 20/20 lessons to claim your badge"
-                        style={FILL_CELL}
-                    />
-                </div>
-            </div>
+            {/* Greeting: Pattern/Section, page level, `_Section header` of the tabs type. */}
+            <PatternSection
+                ref={greetingRef}
+                level="page"
+                padding="none"
+                title={copy.title}
+                description={copy.description}
+                data-block="greeting"
+                style={placed(layout?.greeting)}
+                tabs={(
+                    <NavTabs mode="tabs" activeKey={greetingTab} onSelect={setGreetingTab} aria-label="Today">
+                        <NavTabs.Item eventKey="sign-up">Sign up / Edit</NavTabs.Item>
+                        <NavTabs.Item eventKey="session">
+                            <TabLabel after={<Count value={sessionLinks.length} size="small" />}>Session links</TabLabel>
+                        </NavTabs.Item>
+                        <NavTabs.Item eventKey="reflection">Reflection</NavTabs.Item>
+                    </NavTabs>
+                )}
+            >
+                {greetingTab === 'sign-up' && (
+                    <div className="plus-home-new__inline">
+                        <Button text="Sign up now" style="primary" fill="filled" size="small" leadingVisual="paper-plane" />
+                        <Button text="View schedule" style="secondary" fill="tonal" size="small" />
+                    </div>
+                )}
+                {greetingTab === 'session' && (
+                    <div className="plus-home-new__stack">
+                        <div className="plus-home-new__inline">
+                            <Select
+                                aria-label="Today's session"
+                                placeholder="Select a session"
+                                size="small"
+                                options={sessionOptions}
+                                value={selectedSession ?? ''}
+                                onChange={setSelectedSession}
+                            />
+                            <Button text="Join session" style="primary" fill="filled" size="small" disabled={!selectedSession} />
+                        </div>
+                        <Alert style="warning" dismissible={false}>
+                            Session links will appear 5 minutes before your scheduled start time.
+                        </Alert>
+                    </div>
+                )}
+                {greetingTab === 'reflection' && (
+                    <Button text="Submit Your Reflection" style="primary" fill="filled" size="small" leadingVisual="paper-plane" />
+                )}
+            </PatternSection>
 
-            <div className="plus-home-new__row" data-row="progress">
-                <div className="plus-home-new__block" style={spanStyle(progress.main)}>
-                    <DataVisualizationSkillsProgress
-                        skillsOverviewData={skillsOverviewData}
-                        skillsProgressData={skillsProgressData}
-                        defaultActiveTab="skills-progress"
-                    />
+            {/* My Badge: Pattern/Card, `_Card header` default; Claim in the footer. */}
+            <PatternCard
+                padding="sm"
+                title="My Badge"
+                data-block="badge"
+                // The badge card hugs its content rather than stretching to the row's tallest block.
+                style={{ ...placed(layout?.badge), alignSelf: 'start' }}
+                footer={<Button text="Claim" style="primary" fill="tonal" size="small" />}
+            >
+                <div className="plus-home-new__inline">
+                    <Tile content="icon" icon="award" size={48} color="gray" />
+                    <div className="plus-home-new__text">
+                        <p className="plus-home-new__strong">Certified Tutor</p>
+                        <p className="plus-home-new__caption">Complete 20/20 lessons to claim your badge.</p>
+                    </div>
                 </div>
-                <PatternSection
-                    title="Your Impact"
-                    padding="none"
-                    gap="sm"
-                    className="plus-home-new__block plus-home-new__impact"
-                    style={spanStyle(progress.side)}
-                    actions={(
-                        <PagerControls
-                            label="impact page"
-                            onPrevious={() => setImpactPage((p) => Math.max(1, p - 1))}
-                            onNext={() => setImpactPage((p) => Math.min(IMPACT_PAGES, p + 1))}
-                            previousDisabled={impactPage === 1}
-                            nextDisabled={impactPage === IMPACT_PAGES}
+            </PatternCard>
+
+            {/* Your Impact: Pattern/Card, `_Card header` default with the pager in its actions. */}
+            <PatternCard
+                padding="sm"
+                title="Your Impact"
+                data-block="impact"
+                style={placed(layout?.impact)}
+                actions={(
+                    <PagerControls
+                        label="impact page"
+                        onPrevious={() => setImpactIndex((i) => Math.max(0, i - 1))}
+                        onNext={() => setImpactIndex((i) => Math.min(IMPACT_PAGES.length - 1, i + 1))}
+                        previousDisabled={impactIndex === 0}
+                        nextDisabled={impactIndex === IMPACT_PAGES.length - 1}
+                    />
+                )}
+            >
+                <ListGroup flush as="ul">
+                    {IMPACT_PAGES[impactIndex].map((stat) => (
+                        <ListGroup.Item key={stat.label} as="li">
+                            <div className="plus-home-new__text">
+                                <p className="plus-home-new__stat">{stat.value}</p>
+                                <p className="plus-home-new__label">{stat.label}</p>
+                                {stat.change && change}
+                            </div>
+                        </ListGroup.Item>
+                    ))}
+                </ListGroup>
+            </PatternCard>
+
+            {/* Skills: Pattern/Card, `_Card header` custom, holding the tabs; the chart in the body. */}
+            <PatternCard
+                // The large card: Figma's small card stops at 304 tall, under the chart's 320.
+                padding="lg"
+                data-block="skills"
+                style={placed(layout?.skills)}
+                header={(
+                    <NavTabs mode="tabs" activeKey={skillsTab} onSelect={setSkillsTab} aria-label="Skills">
+                        <NavTabs.Item eventKey="skills-overview"><TabLabel after={infoGlyph}>Skills Overview</TabLabel></NavTabs.Item>
+                        <NavTabs.Item eventKey="skills-progress"><TabLabel after={infoGlyph}>Skills Progress</TabLabel></NavTabs.Item>
+                    </NavTabs>
+                )}
+            >
+                <div className="plus-home-new__chart">
+                    {skillsTab === 'skills-progress' ? (
+                        <>
+                            <LineChart
+                                height={chartHeight}
+                                data={[{
+                                    name: 'Average score',
+                                    data: skillsProgressData.averageScores,
+                                    categories: skillsProgressData.sessionRanges,
+                                }]}
+                            />
+                            <p className="plus-home-new__caption">Each point represents the average score across 5 sessions.</p>
+                        </>
+                    ) : (
+                        <RadarChart
+                            height={chartHeight}
+                            filled
+                            yAxisMax={100}
+                            categories={skillsOverviewData.categories}
+                            series={[
+                                { name: 'Your performance', data: skillsOverviewData.yourPerformance },
+                                { name: 'Average tutor performance', data: skillsOverviewData.averagePerformance, dashStyle: 'Dash' },
+                            ]}
                         />
                     )}
-                >
-                    <MetricsCard page={impactPage} onPageChange={setImpactPage} />
-                </PatternSection>
-            </div>
+                </div>
+            </PatternCard>
 
+            {/* Recommendations: Pattern/Section, `_Section header` default with the pager; a row of Pattern/Cards. */}
             <PatternSection
                 title="Personalized Recommendations"
                 padding="none"
-                gap="sm"
-                className="plus-home-new__block"
-                data-row="recommendations"
+                data-block="lessons"
+                style={placed(layout?.lessons)}
                 actions={(
                     <PagerControls
                         label="recommendations"
@@ -221,15 +369,18 @@ const TutorHomePageNewLayout = ({
                 >
                     {recommendedLessons.map((lesson) => (
                         <li key={lesson.id} className="plus-home-new__lesson">
-                            <RecommendedLessons
-                                badgeType={lesson.badgeType}
+                            <PatternCard
+                                padding="sm"
                                 title={lesson.title}
-                                duration={lesson.duration}
-                                status={lesson.status}
-                                aiRecommended={lesson.aiRecommended}
-                                style={FILL_CELL}
-                                onReviewClick={() => onReviewLesson?.(lesson.id)}
-                            />
+                                footer={<Button text="Review" style="primary" fill="filled" size="small" onClick={() => onReviewLesson?.(lesson.id)} />}
+                            >
+                                <div className="plus-home-new__inline plus-home-new__inline--wrap">
+                                    <Tag color={CATEGORY_COLOR[lesson.category] ?? 'gray'}>{lesson.category}</Tag>
+                                    {lesson.duration && <span className="plus-home-new__caption">{lesson.duration}</span>}
+                                    {lesson.inProgress && <Status style="warning" leadingVisual="spinner">In progress</Status>}
+                                    {lesson.aiRecommended && <Status style="info" leadingVisual="wand-magic-sparkles">AI recommended</Status>}
+                                </div>
+                            </PatternCard>
                         </li>
                     ))}
                 </ul>
@@ -257,10 +408,10 @@ TutorHomePageNewLayout.propTypes = {
     }),
     recommendedLessons: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.string.isRequired,
-        badgeType: PropTypes.string,
+        category: PropTypes.oneOf(Object.keys(CATEGORY_COLOR)),
         title: PropTypes.string.isRequired,
         duration: PropTypes.string,
-        status: PropTypes.string,
+        inProgress: PropTypes.bool,
         aiRecommended: PropTypes.bool,
     })),
     /** Today's session links, which the Session links tab counts and lists */

@@ -6,7 +6,6 @@ import Divider from '@/components/layout-and-structure/Divider';
 import Badge from '@/components/status-and-loading/Badge';
 import { ButtonContainer } from '@/specs/Home/Elements/ButtonContainer';
 import './HomepageJumbotron.scss';
-import { headingTag } from '@/lib/headingLevel';
 
 /**
  * HomepageJumbotron component for Home page
@@ -25,7 +24,6 @@ const HomepageJumbotron = ({
     onSignUp,
     onViewSchedule,
     onSubmitReflection,
-    titleLevel = 2,
     className = '',
     style
 }) => {
@@ -48,13 +46,6 @@ const HomepageJumbotron = ({
     }));
     
     const isSessionEnabled = !!selectedSession && sessionLinks.length > 0;
-
-    // Level 1 makes the greeting the page's h1, at Heading/large; level 2 keeps
-    // the h2 the Home pages have always drawn.
-    const Title = headingTag(titleLevel);
-    const titleClass = titleLevel === 1
-        ? 'plus-homepage-jumbotron-title plus-homepage-jumbotron-title--page'
-        : 'plus-homepage-jumbotron-title h2';
 
     return (
         <div
@@ -102,9 +93,9 @@ const HomepageJumbotron = ({
             <div className="plus-homepage-jumbotron-content">
                 {currentTab === 'sign-up' && (
                     <>
-                        <Title className={titleClass}>
+                        <h2 className="plus-homepage-jumbotron-title h2">
                             Sign up for your next session, {tutorName}!
-                        </Title>
+                        </h2>
                         <p className="plus-homepage-jumbotron-description body1-txt">
                             Your students are counting on you! Click below to sign up for your next session and edit if needed.
                         </p>
@@ -130,9 +121,9 @@ const HomepageJumbotron = ({
 
                 {currentTab === 'session' && (
                     <>
-                        <Title className={titleClass}>
+                        <h2 className="plus-homepage-jumbotron-title h2">
                             Get ready to shine, {tutorName}.
-                        </Title>
+                        </h2>
                         <p className="plus-homepage-jumbotron-description body1-txt">
                             Your session links for today are ready. Select a session and click 'Join session' to begin.
                         </p>
@@ -151,9 +142,9 @@ const HomepageJumbotron = ({
 
                 {currentTab === 'reflection' && (
                     <>
-                        <Title className={titleClass}>
+                        <h2 className="plus-homepage-jumbotron-title h2">
                             How did your session go, {tutorName}?
-                        </Title>
+                        </h2>
                         <p className="plus-homepage-jumbotron-description body1-txt">
                             Share your thoughts about the session to ensure a great experience for all.
                         </p>
@@ -191,8 +182,6 @@ HomepageJumbotron.propTypes = {
     onSignUp: PropTypes.func,
     onViewSchedule: PropTypes.func,
     onSubmitReflection: PropTypes.func,
-    /** 1: the greeting is the page's h1, at Heading/large 24. 2 (default): an h2 in the older h2 style. */
-    titleLevel: PropTypes.oneOf([1, 2]),
     className: PropTypes.string,
     style: PropTypes.object
 };

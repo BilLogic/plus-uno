@@ -4,8 +4,10 @@
  *
  * THE TEST SEAM IS THIS FILE. Each width story sets the viewport first, since
  * the layout tokens switch on `@media (min-width: …)`, then asserts what a
- * person sees: every block starts and ends on a column of the content grid,
- * nothing runs past the content width, and the outline is one h1 with h2s
+ * person sees: every block is a Section or Card pattern placed straight on
+ * the content grid, on whole columns where the formulas put it; no card sits
+ * in a card; no text is clipped by its own box; the skills chart keeps its
+ * axis labels and its 0 row; and the outline is one h1 with h2s and h3s
  * under it. Expected lengths are read from tokens, never typed in.
  */
 
@@ -13,7 +15,7 @@ import React from 'react';
 import { expect, waitFor, within } from 'storybook/test';
 
 import TutorHomePageNewLayout from './TutorHomePageNewLayout';
-import { columnWidth } from './homeGrid';
+import { BLOCKS, columnWidth, spanWidth } from './homeGrid';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 
@@ -75,28 +77,29 @@ const rect = (el) => el.getBoundingClientRect();
 
 const content = (canvasElement) => canvasElement.querySelector('.plus-surface-container__content');
 
-/** Every block the page lays on the grid, with a name for the failure message. */
-const blocks = (canvasElement) => [...canvasElement.querySelectorAll('.plus-home-new__block')].map((el) => ({
-    el,
-    name: el.querySelector('h1, h2')?.textContent || el.className.split(' ').find((c) => c.startsWith('plus-') && !c.startsWith('plus-home-new')) || el.className,
-}));
+/** The content grid's children: the blocks, by name. */
+const blocks = (canvasElement) => [...content(canvasElement).children].map((el) => ({ el, name: el.dataset.block || el.className }));
 
-/**
- * The block starts and ends on a column edge of the content grid, and stays
- * inside the content box; its contents do not run past its own edges.
- */
-const expectOnGrid = async (box, gutter, columns, { el, name }) => {
-    const col = columnWidth(box.width, { columns, gutter });
-    const pitch = col + gutter;
+/** Every block is a Section or Card pattern, straight on the grid, in reading order; no card holds a card. */
+const expectPatterns = async (canvasElement, list) => {
+    await expect(list.map((b) => b.name), 'the grid holds the blocks and nothing else').toEqual(BLOCKS);
+    for (const { el, name } of list) {
+        const pattern = el.classList.contains('plus-pattern-section') || el.classList.contains('plus-pattern-card');
+        await expect(pattern, `${name} is a Section or Card pattern`).toBe(true);
+    }
+    const nested = canvasElement.querySelectorAll('.plus-pattern-card .plus-pattern-card, .plus-pattern-card .card');
+    await expect(nested.length, 'no card inside a card').toBe(0);
+};
+
+/** The block sits where the formula put it: on column edges, `span` columns wide, inside the content box. */
+const expectPlaced = async (box, grid, { el, name }, [start, span, row]) => {
+    await expect(el.style.gridColumn, `${name}'s columns`).toBe(`${start} / span ${span}`);
+    await expect(el.style.gridRow, `${name}'s row`).toBe(String(row));
     const r = rect(el);
-    const start = (r.left - box.left) / pitch;
-    const end = (r.right - box.left + gutter) / pitch;
-    await expect(Math.abs(start - Math.round(start)) * pitch, `${name} starts on a column`).toBeLessThan(1);
-    await expect(Math.abs(end - Math.round(end)) * pitch, `${name} ends on a column`).toBeLessThan(1);
-    await expect(r.left, `${name} inside the content's left edge`).toBeGreaterThanOrEqual(box.left - 0.5);
+    const pitch = columnWidth(box.width, grid) + grid.gutter;
+    await expect(r.left - box.left, `${name} starts on column ${start}`).toBeCloseTo((start - 1) * pitch, 0);
+    await expect(r.width, `${name} spans ${span} columns`).toBeCloseTo(spanWidth(span, box.width, grid), 0);
     await expect(r.right, `${name} inside the content's right edge`).toBeLessThanOrEqual(box.right + 0.5);
-    await expect(el.scrollWidth, `${name} does not overflow its width`).toBeLessThanOrEqual(el.clientWidth + 1);
-    await expect(el.scrollHeight, `${name} does not overflow its height`).toBeLessThanOrEqual(el.clientHeight + 1);
 };
 
 /** No two blocks overlap. */
@@ -111,7 +114,51 @@ const expectNoOverlap = async (list) => {
     }
 };
 
-/** One h1, the greeting, then h2s: My Badge, Your Impact, Personalized Recommendations. */
+/**
+ * No text is clipped by its own box: every element in a block that holds text
+ * of its own and lays out as a box fits its content in both directions. Text
+ * kept for screen readers only (the chart's description) is clipped by design.
+ */
+const screenReaderOnly = (el, block) => {
+    for (let node = el; node && node !== block; node = node.parentElement) {
+        const css = getComputedStyle(node);
+        if (css.position === 'absolute' && css.clip !== 'auto') return true;
+    }
+    return false;
+};
+const expectNoClippedText = async (list) => {
+    for (const { el: block, name } of list) {
+        const holders = [block, ...block.querySelectorAll('*')].filter((el) => !(el instanceof SVGElement)
+            && !screenReaderOnly(el, block)
+            && [...el.childNodes].some((n) => n.nodeType === Node.TEXT_NODE && n.textContent.trim())
+            && getComputedStyle(el).display !== 'inline'
+            && el.clientWidth > 0);
+        for (const el of holders) {
+            const label = `${name}: "${el.textContent.trim().slice(0, 40)}"`;
+            await expect(el.scrollWidth, `${label} fits its width`).toBeLessThanOrEqual(el.clientWidth + 1);
+            await expect(el.scrollHeight, `${label} fits its height`).toBeLessThanOrEqual(el.clientHeight + 1);
+        }
+    }
+};
+
+/** The skills chart keeps its 0 row and every x label, each inside the chart's box. */
+const expectChartAxes = async (canvasElement) => {
+    const block = canvasElement.querySelector('[data-block="skills"]');
+    await waitFor(() => expect(block.querySelectorAll('.highcharts-xaxis-labels text').length, 'every x label').toBe(5));
+    const chart = block.querySelector('.highcharts-container');
+    const box = rect(chart);
+    const yLabels = [...chart.querySelectorAll('.highcharts-yaxis-labels text')];
+    await expect(yLabels[0]?.textContent, 'the 0 row').toBe('0');
+    for (const t of [...yLabels, ...chart.querySelectorAll('.highcharts-xaxis-labels text')]) {
+        const r = rect(t);
+        await expect(r.top >= box.top - 0.5 && r.bottom <= box.bottom + 0.5, `"${t.textContent}" inside the chart`).toBe(true);
+    }
+    // LineChart's own box takes the height the page reads from the Size token.
+    const frame = block.querySelector('.plus-home-new__chart > div');
+    await expect(rect(frame).height, 'the chart holds its token height').toBeCloseTo(tokenLength(canvasElement, '--height-2000'), 0);
+};
+
+/** One h1, the greeting, then h2s for the cards and sections, and an h3 for each lesson. */
 const expectOutline = async (canvasElement) => {
     const outline = [...canvasElement.querySelectorAll('h1, h2, h3, h4, h5, h6')].map((h) => [h.tagName.toLowerCase(), h.textContent]);
     await expect(outline).toEqual([
@@ -119,42 +166,50 @@ const expectOutline = async (canvasElement) => {
         ['h2', 'My Badge'],
         ['h2', 'Your Impact'],
         ['h2', 'Personalized Recommendations'],
+        ['h3', 'Lesson Title'],
+        ['h3', 'Lesson Title'],
+        ['h3', 'Lesson Title'],
     ]);
 };
 
 /** Each lesson card in view spans whole columns, and a whole number of them fill the strip. */
-const expectLessonsOnGrid = async (canvasElement, gutter, columns, perView) => {
+const expectLessonsOnGrid = async (canvasElement, grid, perView) => {
     const strip = canvasElement.querySelector('.plus-home-new__lessons');
     const box = rect(content(canvasElement));
-    const cards = [...strip.children];
-    const col = columnWidth(box.width, { columns, gutter });
-    const span = columns / perView;
-    for (const card of cards.slice(0, perView)) {
-        await expect(rect(card).width, `a lesson card spans ${span} columns`).toBeCloseTo(span * col + (span - 1) * gutter, 0);
+    const span = grid.columns / perView;
+    for (const card of [...strip.children].slice(0, perView)) {
+        await expect(rect(card).width, `a lesson card spans ${span} columns`).toBeCloseTo(spanWidth(span, box.width, grid), 0);
     }
     await expect(getComputedStyle(strip).getPropertyValue('--plus-home-new-cards-per-view').trim()).toBe(String(perView));
 };
 
 /**
- * The checks every width runs; `expected` is what the formulas give there, so
- * a change to the tokens or the formulas shows up as a named difference.
+ * The checks every width runs; `expected` is what the formulas give there,
+ * as [start column, span, row] per block, so a change to the tokens or the
+ * formulas shows up as a named difference.
  */
 const atWidth = (width, expected) => async ({ canvasElement }) => withTestViewport(width, HEIGHT, async () => {
     const canvas = within(canvasElement);
     await waitFor(() => expect(canvas.getByRole('heading', { level: 1 })).toBeTruthy());
     const box = rect(content(canvasElement));
-    const gutter = tokenLength(canvasElement, '--layout-gutter');
-    const columns = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--layout-columns'), 10);
+    const grid = {
+        gutter: tokenLength(canvasElement, '--layout-gutter'),
+        columns: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--layout-columns'), 10),
+    };
     await expect(box.width, 'content width').toBeCloseTo(tokenLength(canvasElement, '--layout-width-content'), 0);
 
     const list = blocks(canvasElement);
-    await waitFor(() => expect(rect(list[0].el).width, 'the greeting').toBeCloseTo(
-        expected.greetingMain * columnWidth(box.width, { columns, gutter }) + (expected.greetingMain - 1) * gutter, 0,
-    ));
-    for (const block of list) await expectOnGrid(box, gutter, columns, block);
+    await expectPatterns(canvasElement, list);
+    await waitFor(() => expect(list[0].el.style.gridColumn, 'the formulas have run').toBe(`1 / span ${expected.greeting[1]}`));
+    for (const block of list) await expectPlaced(box, grid, block, expected[block.name]);
     await expectNoOverlap(list);
-    await expectLessonsOnGrid(canvasElement, gutter, columns, expected.lessonsPerView);
+    await expectLessonsOnGrid(canvasElement, grid, expected.lessonsPerView);
+    await expectChartAxes(canvasElement);
+    await expectNoClippedText(list);
     await expectOutline(canvasElement);
+
+    // Your Impact opens on its first page, the ratings.
+    await expect(within(list.find((b) => b.name === 'impact').el).getByText('Student Interaction Rating')).toBeTruthy();
 
     // The tutor sidebar, with Home selected, docks from 1024; below it is closed.
     const sidebar = canvas.queryByRole('complementary', { name: 'Sidebar' });
@@ -170,17 +225,44 @@ const atWidth = (width, expected) => async ({ canvasElement }) => withTestViewpo
 
 export const Overview = {};
 
-/** 768: content is 720, too narrow for a main column of 480 beside a side of 224, so both rows stack. */
+/**
+ * 768: content is 720, too narrow for a main column of 480 beside a side of
+ * 224, so the rows stack; My Badge and Your Impact share a row of two cards.
+ */
 export const Medium768 = {
-    play: atWidth(768, { greetingMain: 12, lessonsPerView: 2, sidebarDocked: false }),
+    play: atWidth(768, {
+        greeting: [1, 12, 1],
+        badge: [1, 6, 2],
+        impact: [7, 6, 2],
+        skills: [1, 12, 3],
+        lessons: [1, 12, 4],
+        lessonsPerView: 2,
+        sidebarDocked: false,
+    }),
 };
 
 /** 1024: the sidebar docks; the badge takes 4 columns to reach 224, Your Impact 4, two lessons per view. */
 export const Large1024 = {
-    play: atWidth(1024, { greetingMain: 8, lessonsPerView: 2, sidebarDocked: true }),
+    play: atWidth(1024, {
+        greeting: [1, 8, 1],
+        badge: [9, 4, 1],
+        impact: [9, 4, 2],
+        skills: [1, 8, 2],
+        lessons: [1, 12, 3],
+        lessonsPerView: 2,
+        sidebarDocked: true,
+    }),
 };
 
 /** 1440: the badge fits in 3 columns, Your Impact in 4, and three lessons fill a view. */
 export const XLarge1440 = {
-    play: atWidth(1440, { greetingMain: 9, lessonsPerView: 3, sidebarDocked: true }),
+    play: atWidth(1440, {
+        greeting: [1, 9, 1],
+        badge: [10, 3, 1],
+        impact: [9, 4, 2],
+        skills: [1, 8, 2],
+        lessons: [1, 12, 3],
+        lessonsPerView: 3,
+        sidebarDocked: true,
+    }),
 };

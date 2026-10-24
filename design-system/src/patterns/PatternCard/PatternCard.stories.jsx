@@ -19,16 +19,23 @@ function PatternCardSlotsDemos() {
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">HEADER + BODY</span>
-                <PatternCard header={<span className="h5" style={{ margin: 0 }}>Header slot</span>}>
+                <PatternCard title="Card title" description="A line that says what the card holds.">
                     {bodyCopy}
                 </PatternCard>
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">HEADER + BODY + FOOTER</span>
                 <PatternCard
-                    header={<span className="h5" style={{ margin: 0 }}>Header slot</span>}
+                    title="Card title"
+                    actions={<span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>Actions slot</span>}
                     footer={<span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>Footer slot</span>}
                 >
+                    {bodyCopy}
+                </PatternCard>
+            </div>
+            <div>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CUSTOM HEADER</span>
+                <PatternCard header={<span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>Custom header slot: tabs or a toolbar</span>}>
                     {bodyCopy}
                 </PatternCard>
             </div>
@@ -72,9 +79,29 @@ export default {
     argTypes: {
         children: { table: { disable: true } },
         style: { table: { disable: true } },
+        title: {
+            control: 'text',
+            description: 'Card title (Heading/small)',
+            table: { category: 'Content' },
+        },
+        description: {
+            control: 'text',
+            description: 'Description under the title',
+            table: { category: 'Content' },
+        },
+        actions: {
+            control: 'text',
+            description: 'Actions at the end of the header row',
+            table: { category: 'Slots' },
+        },
         header: {
             control: 'text',
-            description: 'Header slot',
+            description: 'Custom header that replaces title, description and actions',
+            table: { category: 'Slots' },
+        },
+        image: {
+            control: false,
+            description: 'Image slot above the content',
             table: { category: 'Slots' },
         },
         footer: {
@@ -91,7 +118,7 @@ export default {
         gap: {
             control: 'select',
             options: ['sm', 'md', 'lg'],
-            description: 'Gap between slots',
+            description: 'Header-to-body stack',
             table: { category: 'Design' },
         },
         minWidth: {
@@ -112,7 +139,7 @@ export default {
 
 export const Overview = () => (
     <div style={{ maxWidth: '400px', width: '100%' }}>
-        <PatternCard header={<span className="h5" style={{ margin: 0 }}>Header slot</span>}>
+        <PatternCard title="Card title" description="A line that says what the card holds.">
             {bodyCopy}
         </PatternCard>
     </div>
@@ -132,7 +159,10 @@ export const Constraints = () => (
 
 export const Interactive = {
     args: {
-        header: 'Header slot',
+        title: 'Card title',
+        description: 'A line that says what the card holds.',
+        actions: '',
+        header: '',
         footer: 'Footer slot',
         padding: 'md',
         gap: 'md',
@@ -140,6 +170,9 @@ export const Interactive = {
     },
     render: (args) => (
         <PatternCard
+            title={args.title || undefined}
+            description={args.description || undefined}
+            actions={args.actions || undefined}
             header={args.header || undefined}
             footer={args.footer || undefined}
             padding={args.padding}

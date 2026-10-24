@@ -56,15 +56,51 @@ export const cardsPerRow = (width, { gutter }, min) =>
 /** Preferred side spans: the badge takes 3 columns, Your Impact 4. */
 export const PREFERRED_SIDE = { greeting: 3, progress: 4 };
 
+/** The page's blocks, in reading order, as the content grid's direct children. */
+export const BLOCKS = ['greeting', 'badge', 'impact', 'skills', 'lessons'];
+
+/** A block's place on the grid: CSS `grid-column` and `grid-row` values. */
+const place = (start, span, row) => ({ column: `${start} / span ${span}`, row });
+
 /**
- * The whole page's layout at a content width.
- * @param {number} width the content grid's width
- * @param {{ columns: number, gutter: number, mainMin: number, sideMin: number, cardMin: number }} grid
+ * Where each block sits on the content grid at `width`.
+ *
+ * - **Both rows split** (Large and up): the greeting and the badge share row
+ *   1, the skills chart and Your Impact row 2, each pair on `splitRow`'s spans;
+ *   the recommendations take row 3.
+ * - **Otherwise** the rows stack: the greeting and the skills chart span all
+ *   12, and the two side cards, the badge and Your Impact, share a row of
+ *   cards between them (`cardsPerRow`, at most 2), so neither stands alone in
+ *   a row it leaves mostly empty.
+ *
+ * @returns {Record<typeof BLOCKS[number], { column: string, row: number }> & { stacked: boolean }}
  */
-export const homeLayout = (width, grid) => ({
-    greeting: splitRow(width, grid, PREFERRED_SIDE.greeting),
-    progress: splitRow(width, grid, PREFERRED_SIDE.progress),
-});
+export const homeLayout = (width, grid) => {
+    const greeting = splitRow(width, grid, PREFERRED_SIDE.greeting);
+    const progress = splitRow(width, grid, PREFERRED_SIDE.progress);
+    const all = grid.columns;
+    if (!greeting.stacked && !progress.stacked) {
+        return {
+            stacked: false,
+            greeting: place(1, greeting.main, 1),
+            badge: place(greeting.main + 1, greeting.side, 1),
+            impact: place(progress.main + 1, progress.side, 2),
+            skills: place(1, progress.main, 2),
+            lessons: place(1, all, 3),
+        };
+    }
+    const pair = Math.min(2, cardsPerRow(width, grid, grid.cardMin));
+    const span = all / pair;
+    const impactRow = pair === 2 ? 2 : 3;
+    return {
+        stacked: true,
+        greeting: place(1, all, 1),
+        badge: place(1, span, 2),
+        impact: place(pair === 2 ? span + 1 : 1, span, impactRow),
+        skills: place(1, all, impactRow + 1),
+        lessons: place(1, all, impactRow + 2),
+    };
+};
 
 /**
  * What a length token resolves to, in pixels, in `doc`'s cascade. The layout
@@ -77,6 +113,21 @@ const readLength = (doc, token) => {
     doc.body.appendChild(probe);
     const value = probe.getBoundingClientRect().width;
     probe.remove();
+    return value;
+};
+
+/**
+ * A length token's value in pixels, for a component that takes a number
+ * rather than a CSS length (a chart's height). Null until the first read.
+ * @param {string} token e.g. `--height-2000`
+ * @returns {number | null}
+ */
+export const useTokenLength = (token) => {
+    const [value, setValue] = useState(null);
+    useLayoutEffect(() => {
+        const px = readLength(document, token);
+        if (px) setValue(px);
+    }, [token]);
     return value;
 };
 

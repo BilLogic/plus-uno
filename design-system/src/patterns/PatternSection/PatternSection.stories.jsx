@@ -79,6 +79,8 @@ export default {
         children: { table: { disable: true } },
         style: { table: { disable: true } },
         actions: { table: { disable: true } },
+        tabs: { table: { disable: true } },
+        level: { control: false, table: { category: 'Design' } },
         title: {
             control: 'text',
             description: 'Section title',

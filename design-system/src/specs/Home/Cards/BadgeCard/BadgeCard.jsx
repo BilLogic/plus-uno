@@ -5,7 +5,6 @@ import Button from '@/components/actions/Button';
 import Tooltip from '@/components/overlays/Tooltip';
 import CertifiedTutorBadge from '@/specs/Home/Elements/CertifiedTutorBadge';
 import './BadgeCard.scss';
-import { headingTag } from '@/lib/headingLevel';
 
 /**
  * BadgeCard — Home “My Badge” overview card (Figma Overview Card / Training Progress badge variants).
@@ -21,7 +20,6 @@ import { headingTag } from '@/lib/headingLevel';
  * @param {string} [props.buttonText]
  * @param {string} [props.tooltipText]
  * @param {() => void} [props.onButtonClick]
- * @param {2|3} [props.titleLevel=3] The title's heading level: 3 under the Home pages' h2 greeting, 2 on a page whose greeting is the h1
  * @param {string} [props.className]
  * @param {React.CSSProperties} [props.style]
  */
@@ -35,12 +33,10 @@ const BadgeCard = ({
     buttonText,
     tooltipText,
     onButtonClick,
-    titleLevel = 3,
     className = '',
     style,
 }) => {
     const sizeClass = size === 'M' ? 'plus-badge-card--m' : 'plus-badge-card--gt-m';
-    const Title = headingTag(titleLevel);
 
     return (
         <Card
@@ -54,7 +50,7 @@ const BadgeCard = ({
         >
             <div className="plus-badge-card__inner">
                 <div className="plus-badge-card__title">
-                    <Title className="h6 font-weight-semibold plus-badge-card__title-text">{title}</Title>
+                    <h3 className="h6 font-weight-semibold plus-badge-card__title-text">{title}</h3>
                     {tooltipText ? (
                         <Tooltip text={tooltipText} placement="top" size="default">
                             <button type="button" className="plus-badge-card__info" aria-label="More information">
@@ -112,8 +108,6 @@ BadgeCard.propTypes = {
     buttonText: PropTypes.string,
     tooltipText: PropTypes.string,
     onButtonClick: PropTypes.func,
-    /** The title's heading level, one below what the card sits under: 3 (default) or 2 */
-    titleLevel: PropTypes.oneOf([2, 3]),
     className: PropTypes.string,
     style: PropTypes.object,
 };

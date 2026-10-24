@@ -13,13 +13,19 @@ import './PatternSection.scss';
  * Its title is one heading level below what holds it, and one size smaller:
  * a section on a page is an h2 at Heading/medium 20, a section inside a
  * section is a subsection, an h3 at Heading/small 16. Deeper sections keep
- * the subsection size.
+ * the subsection size. `level="page"` makes it the page header instead: an h1
+ * at Heading/large 24, and the sections it holds are h2s.
+ *
+ * `tabs` adds the `_Section header` tabs row under the title row, Section/
+ * stack-sm below it, like the header's `tabs` type.
  */
 const PatternSection = ({
     id,
     title,
     description,
     actions,
+    tabs,
+    level: rankProp,
     padding = 'md',
     gap = 'md',
     background = 'none',
@@ -36,25 +42,29 @@ const PatternSection = ({
         className,
     ].filter(Boolean).join(' ');
 
-    const hasHeader = title || description || actions;
+    const hasHeader = title || description || actions || tabs;
     const parentLevel = useHeadingLevel();
-    const level = parentLevel + 1;
+    const isPage = rankProp === 'page';
+    const level = isPage ? 1 : parentLevel + 1;
     const Title = headingTag(level);
-    const rank = level > 2 ? 'subsection' : 'section';
+    const rank = isPage ? 'page' : level > 2 ? 'subsection' : 'section';
 
     return (
         <section id={id} className={classes} style={style} {...props}>
             {hasHeader && (
                 <div className="plus-pattern-section-header">
-                    <div className="plus-pattern-section-heading">
-                        {title && (
-                            <Title className={`plus-pattern-section-title plus-pattern-section-title--${rank}`}>{title}</Title>
-                        )}
-                        {description && (
-                            <p className="plus-pattern-section-description">{description}</p>
-                        )}
+                    <div className="plus-pattern-section-title-row">
+                        <div className="plus-pattern-section-heading">
+                            {title && (
+                                <Title className={`plus-pattern-section-title plus-pattern-section-title--${rank}`}>{title}</Title>
+                            )}
+                            {description && (
+                                <p className="plus-pattern-section-description">{description}</p>
+                            )}
+                        </div>
+                        {actions && <div className="plus-pattern-section-actions">{actions}</div>}
                     </div>
-                    {actions && <div className="plus-pattern-section-actions">{actions}</div>}
+                    {tabs && <div className="plus-pattern-section-tabs">{tabs}</div>}
                 </div>
             )}
             {/* A section with no title is a wrapper: what it holds keeps the parent's level. */}
@@ -73,6 +83,10 @@ PatternSection.propTypes = {
     description: PropTypes.node,
     /** Actions slot, aligned to the end of the title row */
     actions: PropTypes.node,
+    /** Tabs row under the title row (the header's `tabs` type) */
+    tabs: PropTypes.node,
+    /** `page` makes the title the page's h1 at Heading/large 24; by default it nests one level down */
+    level: PropTypes.oneOf(['page']),
     /** Padding scale (section padding tokens) */
     padding: PropTypes.oneOf(['none', 'sm', 'md', 'lg']),
     /** Gap scale between header and content (section gap tokens) */

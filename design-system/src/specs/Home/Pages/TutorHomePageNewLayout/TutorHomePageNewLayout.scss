@@ -1,34 +1,70 @@
 /**
- * Home on the new layout. The SurfaceContainer's content box is the
- * 12-column grid; every length here is a Layout, Surface, Section or Card
- * token. Spans come from the formulas in homeGrid.js.
+ * Home on the new layout. The blocks are Section and Card patterns placed
+ * straight on the SurfaceContainer's 12-column content grid; their spacing is
+ * the patterns' own. What is left here sets the type of plain text in a slot
+ * and lines up the primitives a slot holds, with Element and Card tokens.
  */
 
-// A row is a subgrid of the content grid: its blocks sit on the page's own
-// columns and gutters, so nothing is measured twice.
-.plus-home-new__row {
-    display: grid;
-    grid-template-columns: subgrid;
-    row-gap: var(--surface-stack-md);
-    align-items: stretch;
-}
-
-.plus-home-new__block {
+// Primitives side by side in a slot: buttons, a tile and its text, a tab's count.
+.plus-home-new__inline {
+    display: flex;
+    align-items: center;
+    gap: var(--element-inline-md);
     min-width: 0;
 }
 
-// Cards stretch to the tallest block in their row: the Your Impact section's
-// card takes the height its header leaves.
-.plus-home-new__impact {
-    .plus-pattern-section-content {
-        display: flex;
-        flex-direction: column;
-        flex: 1 1 auto;
+.plus-home-new__inline--wrap {
+    flex-wrap: wrap;
+}
 
-        > * {
-            flex: 1 1 auto;
-        }
+// Primitives stacked in a slot.
+.plus-home-new__stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--card-stack-lg);
+    min-width: 0;
+}
+
+// Plain text in a slot, on the type styles.
+.plus-home-new__text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--card-stack-sm);
+    min-width: 0;
+
+    p {
+        margin: 0;
     }
+}
+
+.plus-home-new__strong {
+    font: var(--heading-xsmall);
+    color: var(--color-on-surface);
+}
+
+.plus-home-new__stat {
+    font: var(--metric-medium);
+    color: var(--color-on-surface);
+}
+
+.plus-home-new__label {
+    font: var(--body-default);
+    color: var(--color-on-surface-variant);
+}
+
+.plus-home-new__caption {
+    margin: 0;
+    font: var(--body-small);
+    color: var(--color-on-surface-variant);
+}
+
+// The skills chart: the chart takes the body's width, its caption follows.
+.plus-home-new__chart {
+    display: flex;
+    flex-direction: column;
+    gap: var(--card-stack-lg);
+    min-width: 0;
 }
 
 // The lesson strip: N cards per view, N from homeGrid.js, each on whole
