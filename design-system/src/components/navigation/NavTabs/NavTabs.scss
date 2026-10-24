@@ -171,7 +171,7 @@
         &:disabled {
             background-color: transparent;
             color: var(--color-on-surface) !important;
-            opacity: 0.38;
+            opacity: var(--color-disabled-opacity);
             pointer-events: none;
             cursor: not-allowed;
             border-bottom-color: transparent;
@@ -237,7 +237,7 @@
     padding-top: var(--size-section-gap-sm, 16px);
 
     &:focus-visible {
-        outline: var(--size-element-stroke-md, 2px) solid var(--color-primary);
+        outline: var(--size-element-stroke-md, 2px) solid var(--color-focus-ring);
         outline-offset: var(--size-element-stroke-sm, 1px);
     }
 }

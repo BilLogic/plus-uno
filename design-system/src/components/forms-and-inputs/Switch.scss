@@ -146,7 +146,7 @@
         &:disabled:not(:checked) {
             background-color: var(--color-surface) !important;
             border-color: var(--color-on-surface) !important;
-            opacity: var(--color-disabled-opacity, 0.38);
+            opacity: var(--color-disabled-opacity);
         }
 
         &:disabled:not(:checked)::after {
@@ -154,8 +154,8 @@
         }
 
         &:disabled:checked {
-            background-color: var(--color-primary-container, #a8d1ed) !important;
-            border-color: var(--color-primary-container, #a8d1ed) !important;
+            background-color: var(--color-primary-container) !important;
+            border-color: var(--color-primary-container) !important;
             opacity: 1;
         }
 
@@ -179,7 +179,7 @@
     }
 
     .form-check-input:disabled ~ .form-check-label {
-        opacity: var(--color-disabled-opacity, 0.38);
+        opacity: var(--color-disabled-opacity);
         cursor: not-allowed;
     }
 }

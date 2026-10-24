@@ -111,7 +111,7 @@
 
         // Disabled state
         &:disabled {
-            opacity: 0.38;
+            opacity: var(--color-disabled-opacity);
             cursor: not-allowed;
             border-color: var(--color-outline-variant) !important;
             background-color: var(--color-surface-variant) !important;
@@ -139,7 +139,7 @@
 // Disabled wrapper state
 .plus-form-radio-disabled {
     .form-check-label {
-        opacity: 0.38;
+        opacity: var(--color-disabled-opacity);
         cursor: not-allowed;
     }
 }

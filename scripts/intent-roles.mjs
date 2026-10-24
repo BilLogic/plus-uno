@@ -107,6 +107,80 @@ export function edgeUses(files, root = REPO_ROOT) {
   return uses;
 }
 
+/**
+ * A STATE COLOR MIXED BY HAND (`foundations/color.md` rule 2: "Use state
+ * layers for interaction — never hardcode hover/active colors").
+ *
+ * `color-mix(in srgb, var(--color-primary), black 8%)` and
+ * `filter: brightness(0.92)` are both a hover color computed at the call site.
+ * The system already names that darkening: `--color-shadow-state-08/12/16`
+ * are the black washes at 8, 12 and 16%, and laid over the fill as a
+ * `background-image` they composite to the same color the mix produced. A
+ * mix with `transparent` is an alpha, not a darkening, and is not counted.
+ * Comments are stripped first, so a sentence about the old mix is not a use.
+ */
+export const MIXED = /color-mix\([^;{}]*?(?<![-\w])(?:black|white)(?![-\w(])|filter\s*:\s*brightness\(/g;
+
+/**
+ * Blank out comments, keeping every newline so line numbers hold. A `//`
+ * after `:` or `(` is a URL (`https://`, `url(//cdn…)`), not a comment.
+ */
+const stripComments = (source) =>
+  source
+    .replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, ' '))
+    .replace(/(^|[^:(])\/\/[^\n]*/g, (c, lead) => lead + ' '.repeat(c.length - lead.length));
+
+/** Hand-mixed state colors, one entry per occurrence. */
+export function mixedUses(files, root = REPO_ROOT) {
+  const uses = [];
+  for (const file of files) {
+    const source = stripComments(fs.readFileSync(path.join(root, file), 'utf8'));
+    for (const match of source.matchAll(MIXED)) {
+      uses.push({ file, line: source.slice(0, match.index).split('\n').length, kind: 'mix' });
+    }
+  }
+  return uses;
+}
+
+/** `{ [file]: { mix } }` — what the `mixedStates` record is compared against. */
+export function mixCounts(uses) {
+  const out = {};
+  for (const use of uses) {
+    out[use.file] = out[use.file] ?? { mix: 0 };
+    out[use.file].mix += 1;
+  }
+  return out;
+}
+
+/** The verdicts on the `mixedStates` set, worded. */
+export function mixFailures(uses, { failures: verdicts = [], stale = [], unreviewed = [] } = {}) {
+  const found = [];
+  for (const verdict of verdicts) {
+    if (verdict.kind === 'new') {
+      const lines = uses.filter((u) => u.file === verdict.key).map((u) => u.line);
+      found.push(
+        `${verdict.key} mixes a state color by hand and is not in the baseline: line ${lines.join(', ')}. ` +
+          'Lay `--color-shadow-state-08/12/16` (or the role\'s own `-state-NN`) over the fill instead.',
+      );
+      continue;
+    }
+    const lines = uses.filter((u) => u.file === verdict.key).map((u) => u.line).join(', ');
+    found.push(
+      verdict.kind === 'rose'
+        ? `${verdict.key} has ${verdict.count} hand-mixed state color(s), up from ${verdict.recorded} (line ${lines}). Use a state layer.`
+        : `${verdict.key} has ${verdict.count} hand-mixed state color(s), down from ${verdict.recorded} — ` +
+          'the ratchet moved and the record did not. Lower the baseline to match.',
+    );
+  }
+  for (const { key } of stale) {
+    found.push(`${key} is recorded under mixedStates and no longer mixes a state color. Delete its entry.`);
+  }
+  for (const key of unreviewed) {
+    found.push(`${key} is recorded under mixedStates without a reason. Say why, or move it onto a state layer.`);
+  }
+  return found;
+}
+
 /** `{ [file]: { border, outline } }` — what the baseline is compared against. */
 export function counts(uses) {
   const out = {};

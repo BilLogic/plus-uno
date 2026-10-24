@@ -8,6 +8,15 @@
  * extensive Style x Variant matrix.
  */
 
+// The hover and pressed STATE LAYER (foundations/color.md rule 2): a shadow
+// state token laid over the fill as a gradient. A registered color property,
+// so the layer fades in over the same 0.2s the fill used to.
+@property --plus-btn-state-layer {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: transparent;
+}
+
 .plus-btn {
     // Layout
     display: inline-flex;
@@ -35,7 +44,8 @@
     text-decoration: none;
 
     cursor: pointer;
-    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, filter 0.2s;
+    background-image: linear-gradient(var(--plus-btn-state-layer), var(--plus-btn-state-layer));
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, --plus-btn-state-layer 0.2s;
 
     // --- STATES ---
 
@@ -53,7 +63,7 @@
     // on the color it was designed against.
     &:disabled:not(.plus-btn--loading),
     &.disabled:not(.plus-btn--loading) {
-        opacity: 0.38;
+        opacity: var(--color-disabled-opacity);
         pointer-events: none;
         cursor: not-allowed;
     }
@@ -175,16 +185,20 @@
 
 // --- COLOR THEMES CONFIGURATION ---
 // Using EXPLICIT STRINGS to avoid Sass interpretation issues
-// Index: 1:Main, 2:OnMain, 3:StateLayer, 4:TextSafe, 5:Container, 6:OnContainer
+// Index: 1:Main, 2:OnMain, 3:StateLayer, 4:TextSafe, 5:Container, 6:OnContainer, 7:Border
+// An outline takes the intent's `-border` role (`_color_roles.scss`), not its
+// base. Warning keeps its base for now: its border role is #715c00, a different
+// color, and that value is the open warning decision rather than a repoint.
+// `default` and the five category styles have no border role and keep the base.
 $btn-themes: (
-    'primary': ('--color-primary', '--color-on-primary', '--color-primary-state-08', '--color-primary-text', '--color-primary-container', '--color-on-primary-container'),
-    'secondary': ('--color-secondary', '--color-on-secondary', '--color-secondary-state-08', '--color-secondary-text', '--color-secondary-container', '--color-on-secondary-container'),
-    'tertiary': ('--color-tertiary', '--color-on-tertiary', '--color-tertiary-state-08', '--color-tertiary-text', '--color-tertiary-container', '--color-on-tertiary-container'),
-    'success': ('--color-success', '--color-on-success', '--color-success-state-08', '--color-success-text', '--color-success-container', '--color-on-success-container'),
-    'warning': ('--color-warning', '--color-on-warning', '--color-warning-state-08', '--color-warning-text', '--color-warning-container', '--color-on-warning-container'),
-    'danger': ('--color-danger', '--color-on-danger', '--color-danger-state-08', '--color-danger-text', '--color-danger-container', '--color-on-danger-container'),
-    'info': ('--color-info', '--color-on-info', '--color-info-state-08', '--color-info-text', '--color-info-container', '--color-on-info-container'),
-    'default': ('--color-surface-container-high', '--color-on-surface', '--color-surface-container-state-08', '--color-on-surface', '--color-surface-container', '--color-on-surface'),
+    'primary': ('--color-primary', '--color-on-primary', '--color-primary-state-08', '--color-primary-text', '--color-primary-container', '--color-on-primary-container', '--color-primary-border'),
+    'secondary': ('--color-secondary', '--color-on-secondary', '--color-secondary-state-08', '--color-secondary-text', '--color-secondary-container', '--color-on-secondary-container', '--color-secondary-border'),
+    'tertiary': ('--color-tertiary', '--color-on-tertiary', '--color-tertiary-state-08', '--color-tertiary-text', '--color-tertiary-container', '--color-on-tertiary-container', '--color-tertiary-border'),
+    'success': ('--color-success', '--color-on-success', '--color-success-state-08', '--color-success-text', '--color-success-container', '--color-on-success-container', '--color-success-border'),
+    'warning': ('--color-warning', '--color-on-warning', '--color-warning-state-08', '--color-warning-text', '--color-warning-container', '--color-on-warning-container', '--color-warning'),
+    'danger': ('--color-danger', '--color-on-danger', '--color-danger-state-08', '--color-danger-text', '--color-danger-container', '--color-on-danger-container', '--color-danger-border'),
+    'info': ('--color-info', '--color-on-info', '--color-info-state-08', '--color-info-text', '--color-info-container', '--color-on-info-container', '--color-info-border'),
+    'default': ('--color-surface-container-high', '--color-on-surface', '--color-surface-container-state-08', '--color-on-surface', '--color-surface-container', '--color-on-surface', '--color-surface-container-high'),
 
     // The five category styles (#304). `Button.jsx` has advertised all thirteen
     // in its `oneOf` since it was written, while this map implemented eight — so
@@ -199,11 +213,11 @@ $btn-themes: (
     // thing. Badge is also the working precedent that these tokens render.
     //
     // No new tokens: every one of the thirty slots below already existed.
-    'social-emotional': ('--color-social-emotional', '--color-on-social-emotional', '--color-social-emotional-state-08', '--color-social-emotional-text', '--color-social-emotional-container', '--color-on-social-emotional-container'),
-    'mastering-content': ('--color-mastering-content', '--color-on-mastering-content', '--color-mastering-content-state-08', '--color-mastering-content-text', '--color-mastering-content-container', '--color-on-mastering-content-container'),
-    'advocacy': ('--color-advocacy', '--color-on-advocacy', '--color-advocacy-state-08', '--color-advocacy-text', '--color-advocacy-container', '--color-on-advocacy-container'),
-    'relationship': ('--color-relationship', '--color-on-relationship', '--color-relationship-state-08', '--color-relationship-text', '--color-relationship-container', '--color-on-relationship-container'),
-    'technology-tools': ('--color-technology-tools', '--color-on-technology-tools', '--color-technology-tools-state-08', '--color-technology-tools-text', '--color-technology-tools-container', '--color-on-technology-tools-container')
+    'social-emotional': ('--color-social-emotional', '--color-on-social-emotional', '--color-social-emotional-state-08', '--color-social-emotional-text', '--color-social-emotional-container', '--color-on-social-emotional-container', '--color-social-emotional'),
+    'mastering-content': ('--color-mastering-content', '--color-on-mastering-content', '--color-mastering-content-state-08', '--color-mastering-content-text', '--color-mastering-content-container', '--color-on-mastering-content-container', '--color-mastering-content'),
+    'advocacy': ('--color-advocacy', '--color-on-advocacy', '--color-advocacy-state-08', '--color-advocacy-text', '--color-advocacy-container', '--color-on-advocacy-container', '--color-advocacy'),
+    'relationship': ('--color-relationship', '--color-on-relationship', '--color-relationship-state-08', '--color-relationship-text', '--color-relationship-container', '--color-on-relationship-container', '--color-relationship'),
+    'technology-tools': ('--color-technology-tools', '--color-on-technology-tools', '--color-technology-tools-state-08', '--color-technology-tools-text', '--color-technology-tools-container', '--color-on-technology-tools-container', '--color-technology-tools')
 );
 
 // --- VARIANTS (Fill Types) ---
@@ -216,6 +230,7 @@ $btn-themes: (
     $col-text: string.unquote(list.nth($config, 4));
     $col-container: string.unquote(list.nth($config, 5));
     $col-on-container: string.unquote(list.nth($config, 6));
+    $col-border: string.unquote(list.nth($config, 7));
 
     &--#{$theme} {
 
@@ -224,10 +239,13 @@ $btn-themes: (
             background-color: var($col-main);
             color: var($col-on-main);
 
+            // The shadow state layer over the fill: the 8% darkening the old
+            // brightness filter gave the ground, without dimming the label, the
+            // icon or the focus ring with it.
             &:hover,
             &.active,
             &:active {
-                filter: brightness(0.92);
+                --plus-btn-state-layer: var(--color-shadow-state-08);
             }
 
             &.plus-btn--loading::after {
@@ -240,7 +258,7 @@ $btn-themes: (
                 background-color: var(--color-on-surface-state-12);
                 border-color: transparent;
                 color: var(--color-secondary-text);
-                filter: none;
+                --plus-btn-state-layer: transparent;
             }
         }
 
@@ -250,10 +268,12 @@ $btn-themes: (
             border-color: transparent;
             color: var($col-text);
 
+            // The shadow state layer over the tonal fill. Composited, it is the
+            // exact color the old 8% black mix produced.
             &:hover,
             &.active,
             &:active {
-                background-color: color-mix(in srgb, var($col-state), black 8%);
+                --plus-btn-state-layer: var(--color-shadow-state-08);
             }
 
             &.plus-btn--loading::after {
@@ -264,6 +284,7 @@ $btn-themes: (
             &:disabled:not(.plus-btn--loading),
             &.disabled:not(.plus-btn--loading) {
                 background-color: var(--color-on-surface-state-12);
+                --plus-btn-state-layer: transparent;
                 color: var(--color-on-surface-variant);
             }
         }
@@ -271,7 +292,7 @@ $btn-themes: (
         // 3. OUTLINE
         &.plus-btn--outline {
             background-color: transparent;
-            border-color: var($col-main);
+            border-color: var($col-border);
             color: var($col-text);
 
             &:hover,

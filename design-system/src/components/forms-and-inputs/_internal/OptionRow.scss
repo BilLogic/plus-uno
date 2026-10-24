@@ -65,14 +65,14 @@
 
 /*
  * Reordering (Figma state=dragging and `drop indicator?`): the lifted row on
- * Elevation Light/3 with an outline-variant border, and a primary line on the
+ * the overlay role's shadow (Elevation Light/3) with an outline-variant border, and a primary line on the
  * edge where the dragged row lands.
  */
 .plus-option-row.is-dragging {
     position: relative;
     z-index: 1;
     background-color: var(--color-surface-overlay);
-    box-shadow: var(--elevation-light-3);
+    box-shadow: var(--surface-overlay-shadow);
     outline: var(--size-element-border) solid var(--color-outline-variant);
     outline-offset: calc(-1 * var(--size-element-border));
     cursor: grabbing;
@@ -88,7 +88,7 @@
         right: 0;
         left: 0;
         height: var(--size-element-stroke-lg);
-        background-color: var(--color-primary);
+        background-color: var(--color-primary-border);
         pointer-events: none;
     }
 }
@@ -163,7 +163,7 @@
 }
 
 .plus-option-row-selected-mark {
-    color: var(--color-primary);
+    color: var(--color-primary-icon);
 }
 
 .plus-option-row-indent {

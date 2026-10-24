@@ -3,11 +3,6 @@
   "recordedAt": "2026-08-29",
   "migrated": 111,
   "files": {
-    "design-system/src/components/forms-and-inputs/Dropdown/Dropdown.scss": {
-      "border": 0,
-      "outline": 1,
-      "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
-    },
     "design-system/src/components/forms-and-inputs/Rating.scss": {
       "border": 0,
       "outline": 1,
@@ -31,11 +26,6 @@
     "design-system/src/components/navigation/NavPills/NavPills.scss": {
       "border": 0,
       "outline": 4,
-      "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
-    },
-    "design-system/src/components/navigation/NavTabs/NavTabs.scss": {
-      "border": 0,
-      "outline": 1,
       "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
     },
     "design-system/src/components/navigation/Scrollspy/Scrollspy.scss": {
@@ -68,5 +58,20 @@
       "outline": 1,
       "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
     }
-  }
+  },
+  "mixedStates": {
+    "design-system/src/components/layout-and-structure/Accordion/Accordion.scss": {
+      "mix": 2,
+      "why": "An 8% black mix over the primary state layer on the open header's hover. Outside the 2026-10-24 audit's scope (the patterns, the Popover family, Button, Field and the controls). The fix Button and Dropdown took applies: lay --color-shadow-state-NN over the fill, which composites to the color the mix produced; compare the pixels before lowering this."
+    },
+    "design-system/src/components/layout-and-structure/Collapse/Collapse.scss": {
+      "mix": 2,
+      "why": "Brightness filters on the Collapse trigger's hover and pressed states. Outside the 2026-10-24 audit's scope (the patterns, the Popover family, Button, Field and the controls). The fix Button and Dropdown took applies: lay --color-shadow-state-NN over the fill, which composites to the color the mix produced; compare the pixels before lowering this."
+    },
+    "design-system/src/components/status-and-loading/Badge/Badge.scss": {
+      "mix": 1,
+      "why": "A fallback inside var(--…-state-12, color-mix(…)), which paints only if the state token is undefined. Outside the 2026-10-24 audit's scope (the patterns, the Popover family, Button, Field and the controls). The fix Button and Dropdown took applies: lay --color-shadow-state-NN over the fill, which composites to the color the mix produced; compare the pixels before lowering this."
+    }
+  },
+  "mixedStatesNote": "Hover and pressed colors mixed by hand (color-mix with black or white, or a brightness filter) where foundations/color.md rule 2 asks for a state layer. Read by check:intent-roles as its second set; a count may only fall, and a fallen count is lowered here in the same commit."
 }

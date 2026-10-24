@@ -255,7 +255,7 @@ textarea.plus-field__control {
     &:hover:not(.plus-field--disabled):not(.plus-field--readonly),
     &.plus-field--hover {
         border-color: transparent;
-        background-color: var(--color-surface-container);
+        background-color: var(--color-on-surface-state-08);
 
         .plus-field__trailing {
             visibility: visible;

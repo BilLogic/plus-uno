@@ -1,6 +1,6 @@
 /**
  * Card pattern (Patterns/Card), mirroring Figma `Pattern/Card`.
- * surface-container-lowest, an outline-variant border, elevation 1, Card
+ * the raised surface role and its shadow, an outline-variant border, Card
  * radius. Image, then content (`_Card header` over the body), then footer.
  * Every length is a Card token.
  */
@@ -10,11 +10,13 @@
     flex-direction: column;
     box-sizing: border-box;
     min-width: 0;
-    background-color: var(--color-surface-container-lowest);
+    // The raised surface role and its shadow, as a pair: the same fill as the
+    // page, lifted by Light/2 (cards, per elevation.md and token-mapping.md).
+    background-color: var(--surface-raised);
     color: var(--color-on-surface);
     border: var(--size-card-border-sm) solid var(--color-outline-variant);
     border-radius: var(--card-radius);
-    box-shadow: var(--elevation-light-2); /* semantic level 1 (cards) maps to Light/2 per token-mapping.md */
+    box-shadow: var(--surface-raised-shadow);
     overflow: hidden; // clip the image to the card radius
 }
 
