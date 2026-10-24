@@ -34,6 +34,9 @@ import { verdictEvents } from "../src/usage/index";
 import { recordingViews, type RecordingViews } from "./helpers/recording-slack";
 import { cardWords } from "./helpers/card-message";
 
+
+/** When a card closed, as View's line says it (`closedWhen`): "Oct 19 at 09:13 ET". */
+const WHEN = String.raw`[A-Z][a-z]{2} \d{1,2} at \d{2}:\d{2} ET`;
 const CHANNEL = "C1";
 const THREAD = "1700000000.000100";
 const CARD_TS = "1700000000.000195";
@@ -310,15 +313,17 @@ describe("Review opens the draft", () => {
     assert.deepEqual(actionIds(views.calls[1]!.view), DECISION_ROW);
   });
 
-  it("says an expired proposal expired, and offers no decision", async () => {
+  it("says an expired proposal expired, shows the draft it closed on, and offers no decision", async () => {
     let clock = 1_000_000;
     const threadState = await staged({}, () => clock);
     clock += cardTtlMs(clock) + 1;
     const { deps, views } = harness(threadState);
     await runReviewOpen(open(), deps);
-    const view = views.calls[1]!.view;
-    assert.match(viewText(view), /Expired/);
-    assert.doesNotMatch(viewText(view), /Reflection redesign/);
+    const view = views.calls[1]!.view as { blocks: Array<{ type: string; level?: string; text?: { text: string } }>; submit?: unknown };
+    assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level, view.blocks[0]!.text!.text], ["alert", "warning", "Expired."]);
+    assert.match(richWords(view.blocks[1]), new RegExp(String.raw`^Closed on ${WHEN}\. Ask again for a fresh card\.$`));
+    assert.match(viewText(view), /Reflection redesign/, "the draft is kept for View (#1362)");
+    assert.equal(view.submit, undefined);
     assert.deepEqual(actionIds(view), []);
   });
 
@@ -537,6 +542,30 @@ describe("Needs changes in the pop-up", () => {
 
     assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "superseded");
     assert.deepEqual((await react(threadState, "white_check_mark")).filter((v) => v.execute), []);
+  });
+
+  it("keeps the replaced card's draft, and View draws it read-only under who asked for the change and when (#1362)", async () => {
+    const threadState = await staged();
+    const { deps, views } = harness(threadState);
+    deps.revise = async ({ proposal }) => {
+      await threadState.putProposal({ ...proposal, proposalTs: "1700000000.000295", input: { title: "Reflection v2" } });
+    };
+    await runReviewDecision(decide("revise", "Call it Reflection v2", "U0BILL0001"), deps);
+    const look = await threadState.getProposalByTs(CARD_TS);
+    assert.ok(look.state === "superseded" && look.decided, "the replaced draft is kept");
+    assert.equal(look.decided.decision, "replaced");
+    await runReviewOpen(open("U0OTHER001"), deps);
+    const view = views.calls.at(-1)!.view as { blocks: Array<{ type: string; level?: string; text?: { text: string } }>; submit?: unknown };
+    assert.deepEqual([view.blocks[0]!.level, view.blocks[0]!.text!.text], ["warning", "This proposal was replaced by a newer one."]);
+    assert.match(
+      richWords(view.blocks[1]),
+      new RegExp(String.raw`^Replaced on ${WHEN}, after <@U0BILL0001> asked for changes\. Review the newest card in the thread instead\.$`),
+    );
+    const json = viewText(view);
+    assert.match(json, /Reflection redesign/, "the draft it replaced");
+    assert.doesNotMatch(json, /Reflection v2/, "not the revision");
+    assert.equal(view.submit, undefined);
+    assert.deepEqual(actionIds(view), []);
   });
 
   it("locks the card while it is revised: no door approves, rejects or revises it again", async () => {
@@ -798,7 +827,7 @@ describe("a decided card", () => {
     assert.equal(view.blocks[0]!.type, "alert");
     assert.equal(view.blocks[0]!.level, "success");
     assert.equal(view.blocks[0]!.text!.text, "Approved.");
-    assert.equal(richWords(view.blocks[1]), "Approved by <@U0BILL0001>.");
+    assert.match(richWords(view.blocks[1]), new RegExp(String.raw`^Approved by <@U0BILL0001> on ${WHEN}\.$`), "who decided, and when");
     assert.match(viewText(view), /Reflection redesign/, "the draft, not the card's text");
     assert.doesNotMatch(viewText(view), /the decided card/);
     assert.equal(view.submit, undefined);
@@ -814,7 +843,7 @@ describe("a decided card", () => {
     const view = views.calls.at(-1)!.view as { blocks: Array<{ type: string; level?: string; text?: { text: string } }> };
     assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level], ["alert", "info"]);
     assert.equal(view.blocks[0]!.text!.text, "Rejected.");
-    assert.equal(richWords(view.blocks[1]), "Rejected by <@U0BILL0001>: Not this week.");
+    assert.match(richWords(view.blocks[1]), new RegExp(String.raw`^Rejected by <@U0BILL0001> on ${WHEN}: Not this week\.$`));
     assert.match(viewText(view), /Reflection redesign/);
   });
 

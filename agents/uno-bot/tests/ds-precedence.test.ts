@@ -51,7 +51,7 @@ import { notified } from "./helpers/notified";
 import { recordingViews } from "./helpers/recording-slack";
 import type { OperationOutcome } from "../src/gate/run-batch";
 import { itemProposal } from "../src/slack/decision-cards";
-import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
+import { runReviewDecision, runReviewOpen, type ReviewDoorDeps } from "../src/slack/review-door";
 import type { CardMessage } from "../src/slack/button-door";
 import { recordingDelivery } from "../src/turn/index";
 import { createInMemoryThreadState, type PendingProposal, type ThreadState } from "../src/thread-state/index";
@@ -887,6 +887,15 @@ describe("the week's intake", () => {
   });
 });
 
+
+/** When a card closed, as View's line says it (`closedWhen`): "Oct 19 at 09:13 ET". */
+const WHEN = String.raw`[A-Z][a-z]{2} \d{1,2} at \d{2}:\d{2} ET`;
+
+/** A rich text block's words, with a user pill as its mention. */
+function richWords(block: unknown): string {
+  const sections = ((block as { elements?: Array<{ elements?: Array<{ type: string; text?: string; user_id?: string }> }> }).elements ?? []);
+  return sections.flatMap((s) => s.elements ?? []).map((e) => (e.type === "user" ? `<@${e.user_id}>` : (e.text ?? ""))).join("");
+}
 // ── Deciding a card ──────────────────────────────────────────────────────────
 
 describe("deciding a weekly card in its Review", () => {
@@ -933,7 +942,7 @@ describe("deciding a weekly card in its Review", () => {
         { viewId: "V1", channel: CHANNEL, messageTs: itemProposal(MSG, id).proposalTs, userId, decision, ...(note ? { note } : {}) },
         deps,
       );
-    return { decide, gh, updates, said, views, store: posted.store };
+    return { decide, deps, gh, updates, said, views, store: posted.store };
   }
 
   it("Approve on one card files the week's intake, Approve on the next comments on it, and each card says who decided", async () => {
@@ -986,6 +995,37 @@ describe("deciding a weekly card in its Review", () => {
     await decide("ds-TreeSelect", "revise", MEMBERS[1]!, "the library is right, code is behind");
     assert.equal(gh.created.length, 1);
     assert.deepEqual(gh.comments.map((c) => c.comment), ["**TreeSelect**: disputed by Bill — the library is right, code is behind"]);
+  });
+
+  it("View on a decided card draws the finding it was decided on, read-only, under how it closed (#1362)", async () => {
+    const cases = [
+      ["revise", "ghost is library-only on purpose", "Noted.", String.raw`^Noted by <@U0MEMBER1> on ${WHEN}: ghost is library-only on purpose\.$`],
+      ["confirm", undefined, "Approved.", String.raw`^Approved by <@U0MEMBER1> on ${WHEN}\.$`],
+      ["cancel", "deliberate", "Rejected.", String.raw`^Rejected by <@U0MEMBER1> on ${WHEN}: deliberate\.$`],
+    ] as const;
+    for (const [decision, note, alert, line] of cases) {
+      const { decide, deps, views, store } = await decided();
+      await decide("ds-Button", decision, MEMBERS[0]!, note);
+      const key = itemProposal(MSG, "ds-Button").proposalTs;
+      const look = await store.getProposalByTs(key);
+      assert.ok(look.state === "none" && look.decided, `${decision}: the decided draft is kept`);
+      assert.equal(look.decided.by, MEMBERS[0]);
+      await runReviewOpen({ triggerId: "T", channel: CHANNEL, messageTs: key, userId: MEMBERS[1]!, item: { messageTs: MSG, id: "ds-Button" } }, deps);
+      const view = views.calls.at(-1)!.view as { blocks: Array<{ type: string; text?: { text: string }; elements?: unknown[] }>; submit?: unknown };
+      assert.equal(view.blocks[0]!.text!.text, alert, decision);
+      assert.match(richWords(view.blocks[1]), new RegExp(line), decision);
+      const json = JSON.stringify(view);
+      // The finding itself: what differs, and its code and library.
+      assert.match(json, /What differs/, decision);
+      assert.match(json, /"text":"Code has one "/, decision);
+      assert.match(json, /the library splits it into 4 components/, decision);
+      assert.match(json, /"text":"Code"/, decision);
+      assert.match(json, /"text":"Figma"/, decision);
+      // Never the card's after-state words in place of it.
+      assert.doesNotMatch(json, /Note: ghost|Written: added/, decision);
+      assert.equal(view.submit, undefined, decision);
+      assert.equal(view.blocks.filter((b) => b.type === "input").length, 0, decision);
+    }
   });
 
   it("a dispute that does not reach the intake puts the card back to open and says so", async () => {

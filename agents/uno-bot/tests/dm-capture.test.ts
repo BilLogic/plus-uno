@@ -422,6 +422,10 @@ describe("the switch", () => {
     // The card says why, with nothing left to review.
     const entry = (await w.threadState.getReport(w.posts[0]!.ts))?.entries[0];
     assert.deepEqual(entry?.state, { kind: "not-staged", note: DM_CARD_SWITCHED_OFF });
+    // Its draft is kept as withdrawn, with why, so it is never lost (#1362).
+    const look = await w.threadState.getProposalByTs(`${w.posts[0]!.ts}#${id}`);
+    assert.ok(look.state === "none" && look.decided);
+    assert.deepEqual([look.decided.decision, look.decided.reason], ["withdrawn", DM_CARD_SWITCHED_OFF]);
   });
 
   it("turning it off still withdraws a card posted before the shared card", async () => {

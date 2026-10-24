@@ -936,8 +936,9 @@ export interface DriftRecheckDeps {
   figma?: Pick<FigmaClient, "versions" | "nodes">;
   /** Without one, no decision is ever found shown. */
   judge?: FrameJudge;
-  /** Take a card's proposal out of reach; false when it was no longer live. */
-  retire(proposalTs: string): Promise<boolean>;
+  /** Take a card's proposal out of reach, closed as withdrawn with `why`, so
+   *  View still draws it; false when it was no longer live. */
+  retire(proposalTs: string, why: string): Promise<boolean>;
   /** Edit a message in place: a report redrawn, or the pointers' new text. */
   edit(channel: string, ts: string, message: ReportMessage): Promise<void>;
   /** Where each report's record is kept, and its cards' states land. */
@@ -1123,7 +1124,7 @@ async function withdrawCard(
   const key = itemProposalKey(item.messageTs, item.id);
   let retired = false;
   try {
-    retired = await deps.retire(key);
+    retired = await deps.retire(key, note);
   } catch (err) {
     swallowed(err, "retire");
     // Looked at again next run, rather than kept as caught up with its card
@@ -1165,7 +1166,7 @@ async function withdrawLegacyCard(ask: LiveAsk, deps: DriftRecheckDeps, withdraw
   let retired = false;
   try {
     card = await deps.legacyCard(ask.channel, ask.threadTs);
-    if (card) retired = await deps.retire(card.proposalTs);
+    if (card) retired = await deps.retire(card.proposalTs, text);
   } catch (err) {
     swallowed(err, "legacy card");
     return;

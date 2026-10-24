@@ -43,6 +43,7 @@ import {
   unfinishedOperations,
   type DecisionReportRecord,
   type PendingProposal,
+  type ProposalLookup,
   type ReportItemState,
   type ThreadState,
   type ThreadStateDeps,
@@ -72,6 +73,14 @@ const OTHER = { channel: "C1", thread: "1700.9" } as const;
 
 /** The batch `proposal()` stages, as a replaced or expired lookup names it. */
 const STAGED = [{ toolName: "notion_create", input: { title: "Onboarding checklist" } }];
+
+/** A lookup without the draft a replaced or expired card keeps for View
+ *  (#1362), for the cases about everything else it answers. */
+function withoutKept(lookup: ProposalLookup): ProposalLookup {
+  if (lookup.state !== "superseded" && lookup.state !== "expired") return lookup;
+  const { decided: _, ...rest } = lookup;
+  return rest;
+}
 
 /** A card on a fixed hour, so the suite's TTL assertions read the same on any
  *  weekday it runs: the store stamps the expiry rule only on a card staged
@@ -432,7 +441,12 @@ export function runThreadStateConformance(
     await store.putProposal(proposal({ proposalTs: "1700.3" }));
     clock.advance(PROPOSAL_TTL_MS + 1);
     assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
-    // And the delete happened: the second read has nothing left to find.
+    // Kept for View past its close (#1362), so a second read still finds it.
+    assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
+    // And once that has passed too, the delete happens: the next read has
+    // nothing left to find.
+    clock.advance(DECIDED_TTL_MS);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
     assert.equal((await store.getProposalByTs("1700.2")).state, "none");
   });
 
@@ -739,6 +753,100 @@ export function runThreadStateConformance(
     const look = await store.getProposalByTs("1700.2");
     assert.ok(look.state === "none" && look.decided);
     assert.deepEqual([look.decided.decision, look.decided.reason], ["cancel", "Not this week"]);
+  });
+
+  // ── Every way a card closes keeps its draft for View (#1362) ──────────────
+
+  it("a decided card says when it was decided", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    clock.advance(5_000);
+    const decidedAt = clock.now();
+    assert.equal(await store.claimProposal("1700.2", { decision: "confirm", by: "U2" }), true);
+    clock.advance(5_000);
+    const look = await store.getProposalByTs("1700.2");
+    assert.ok(look.state === "none" && look.decided);
+    assert.equal(look.decided.at, decidedAt);
+  });
+
+  it("a retire with a mark closes the card as decided, kept for View, even under a Needs changes mark", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", proposalBlocks: [{ type: "section" }] }));
+    assert.equal(await store.markRevising("1700.2", "U2"), "marked");
+    const notedAt = clock.now();
+    assert.deepEqual(await store.retireProposal("1700.2", { decision: "noted", by: "U2", reason: "Deliberate." }), { retired: true });
+    const look = await store.getProposalByTs("1700.2");
+    assert.ok(look.state === "none" && look.decided, "kept, decided");
+    assert.deepEqual([look.decided.decision, look.decided.by, look.decided.reason, look.decided.at], ["noted", "U2", "Deliberate.", notedAt]);
+    assert.equal(look.decided.proposal.proposalText, "Create the card?");
+    assert.equal(look.decided.proposal.revising, undefined, "the mark is not part of the draft");
+    assert.equal(look.decided.proposal.proposalBlocks, undefined);
+    // Out of reach of everything else, as a won claim's card is.
+    assert.equal(await store.claimProposal("1700.2", { decision: "confirm", by: "U3" }), false);
+    assert.deepEqual(await store.retireProposal("1700.2", { decision: "withdrawn" }), { retired: false });
+    assert.equal(await store.getProposalByThread(THREAD), null);
+    // And gone, like a decided card, `DECIDED_TTL_MS` after it closed.
+    clock.advance(DECIDED_TTL_MS + 1);
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "none" });
+  });
+
+  it("a card a job takes back is kept as withdrawn, with why", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.retireProposal("1700.2", { decision: "withdrawn", reason: "The file caught up." });
+    const look = await store.getProposalByTs("1700.2");
+    assert.ok(look.state === "none" && look.decided);
+    assert.deepEqual([look.decided.decision, look.decided.by, look.decided.reason], ["withdrawn", undefined, "The file caught up."]);
+  });
+
+  it("a card replaced by its revision keeps its draft for View, with who asked for the change and when", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    assert.equal(await store.markRevising("1700.2", "U2"), "marked");
+    clock.advance(1_000);
+    const replacedAt = clock.now();
+    await store.retireProposal("1700.2");
+    clock.advance(1_000);
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    const look = await store.getProposalByTs("1700.2");
+    assert.equal(look.state, "superseded");
+    assert.ok(look.state === "superseded" && look.decided, "the replaced draft is kept");
+    assert.deepEqual([look.decided.decision, look.decided.by, look.decided.at], ["replaced", "U2", replacedAt]);
+    assert.deepEqual(proposalOperations(look.decided.proposal), STAGED);
+    assert.equal(look.decided.proposal.revising, undefined);
+    // Past its own deadline it still reads as replaced, while kept.
+    clock.advance(PROPOSAL_TTL_MS * 2);
+    const later = await store.getProposalByTs("1700.2");
+    assert.ok(later.state === "expired" && later.decided);
+    assert.equal(later.decided.decision, "replaced");
+  });
+
+  it("a card replaced with no Needs changes keeps its draft, naming nobody", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    clock.advance(1_000);
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    const look = await store.getProposalByTs("1700.2");
+    assert.ok(look.state === "superseded" && look.decided);
+    assert.deepEqual([look.decided.decision, look.decided.by, look.decided.at], ["replaced", undefined, clock.now()]);
+  });
+
+  it("a card whose time ran out keeps its draft for View until `DECIDED_TTL_MS` past its deadline", async () => {
+    const { store, clock } = setup();
+    const stagedAt = clock.now();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    const look = await store.getProposalByTs("1700.2");
+    assert.ok(look.state === "expired" && look.decided);
+    assert.deepEqual([look.decided.decision, look.decided.by, look.decided.at], ["expired", undefined, stagedAt + PROPOSAL_TTL_MS]);
+    assert.equal(look.decided.proposal.proposalText, "Create the card?");
+    clock.advance(DECIDED_TTL_MS - 2);
+    const kept = await store.getProposalByTs("1700.2");
+    assert.ok(kept.state === "expired" && kept.decided, "still kept a moment before");
+    clock.advance(2);
+    const last = await store.getProposalByTs("1700.2");
+    assert.ok(last.state === "expired" && !last.decided, "no longer kept");
+    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "none" });
   });
 
   it("keeps the decided card for its own lifetime, measured from the decision, not from staging", async () => {
@@ -1540,7 +1648,7 @@ export function runThreadStateConformance(
     clock.advance(ttl - PROPOSAL_TTL_MS - 2);
     assert.equal((await store.getProposalByTs("1700.2")).state, "found");
     clock.advance(2);
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "expired", ttlMs: ttl, proposalText: "Create the card?", operations: STAGED });
+    assert.deepEqual(withoutKept(await store.getProposalByTs("1700.2")), { state: "expired", ttlMs: ttl, proposalText: "Create the card?", operations: STAGED });
   });
 
   // The successor's own TTL decides whether it is still live to point at.
@@ -1563,7 +1671,7 @@ export function runThreadStateConformance(
     const stated = { cancelled: "Rejected, nothing filed", expired: "That card closed after 3 days with no decision." };
     await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: LONG_TTL_MS, stated }));
     await store.putProposal(proposal({ proposalTs: "1700.3", ttlMs: LONG_TTL_MS }));
-    assert.deepEqual(await store.getProposalByTs("1700.2"), {
+    assert.deepEqual(withoutKept(await store.getProposalByTs("1700.2")), {
       state: "superseded",
       stated,
       proposalText: "Create the card?",
@@ -1571,7 +1679,7 @@ export function runThreadStateConformance(
       replacedBy: { proposalTs: "1700.3", operations: STAGED },
     });
     clock.advance(LONG_TTL_MS + HOUR_MS);
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "expired", ttlMs: LONG_TTL_MS, stated, proposalText: "Create the card?", operations: STAGED });
+    assert.deepEqual(withoutKept(await store.getProposalByTs("1700.2")), { state: "expired", ttlMs: LONG_TTL_MS, stated, proposalText: "Create the card?", operations: STAGED });
   });
 
   // With several live cards in a thread, "the newest card" may be another
@@ -1607,13 +1715,13 @@ export function runThreadStateConformance(
     const stated = { cancelled: "Nothing filed this week", expired: "That card closed after 6 days with no decision." };
     await store.putProposal(proposal({ proposalTs: "1700.2", stated }));
     await store.retireProposal("1700.2");
-    assert.deepEqual(await store.getProposalByTs("1700.2"), { state: "superseded", stated, proposalText: "Create the card?", operations: STAGED });
+    assert.deepEqual(withoutKept(await store.getProposalByTs("1700.2")), { state: "superseded", stated, proposalText: "Create the card?", operations: STAGED });
     await store.putProposal(proposal({ proposalTs: "1700.4", threadTs: OTHER.thread }));
     await store.retireProposal("1700.4");
-    assert.deepEqual(await store.getProposalByTs("1700.4"), { state: "superseded", proposalText: "Create the card?", operations: STAGED });
+    assert.deepEqual(withoutKept(await store.getProposalByTs("1700.4")), { state: "superseded", proposalText: "Create the card?", operations: STAGED });
     await store.putProposal(proposal({ proposalTs: "1700.6", threadTs: "1700.5" }));
     clock.advance(PROPOSAL_TTL_MS + 1);
-    assert.deepEqual(await store.getProposalByTs("1700.6"), { state: "expired", ttlMs: PROPOSAL_TTL_MS, proposalText: "Create the card?", operations: STAGED });
+    assert.deepEqual(withoutKept(await store.getProposalByTs("1700.6")), { state: "expired", ttlMs: PROPOSAL_TTL_MS, proposalText: "Create the card?", operations: STAGED });
   });
 
   it("an execution of a proposal with its own TTL is takeable at 71 h and gone at 73 h", async () => {

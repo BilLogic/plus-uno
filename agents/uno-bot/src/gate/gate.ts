@@ -660,9 +660,10 @@ function notAConfirmer(
 export type ProposalLook =
   /** `kept` is the picks this person kept on the card's Review pop-up. */
   | { state: "live"; proposal: PendingProposal; mayDecide: boolean; confirmers: string[]; kept: Readonly<Record<string, string>> }
-  /** `operations` (both answers) is the card's batch, for its pop-up's title. */
-  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[]; operations?: ProposalOperation[] }
-  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[]; operations?: ProposalOperation[] }
+  /** `operations` (both answers) is the card's batch, for its pop-up's title;
+   *  `decided` (both) is the card as it was replaced or ran out, kept for View. */
+  | { state: "superseded"; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[]; operations?: ProposalOperation[]; decided?: DecidedProposal }
+  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[]; operations?: ProposalOperation[]; decided?: DecidedProposal }
   /** Decided, cut off, or never a card: nothing here is waiting on anyone.
    *  `decided` is the card as it was decided, while its record keeps it. */
   | { state: "gone"; decided?: DecidedProposal };
@@ -714,17 +715,15 @@ async function claim(
   // ahead" runs two handlers that each loaded this same record. Whoever loses
   // here must not post the winner's narrative and above all must not execute.
   // The claim keeps what was decided on the card's record, for View
-  // (`claimProposal`): who, which way, and the batch as approved. Not for an
-  // item of a decision report, whose View reads its words and its outcome off
-  // the report's own record, which outlives the item's.
-  const decided = proposal.item
-    ? undefined
-    : {
-        decision,
-        ...(userId ? { by: userId } : {}),
-        ...(rejected?.reason ? { reason: rejected.reason } : {}),
-        ...(opts.edits?.length ? { operations: opts.edits } : {}),
-      };
+  // (`claimProposal`): who, which way, and the batch as approved — an item of
+  // a decision report as much as a card of its own, so View always draws the
+  // draft that was decided (#1362).
+  const decided = {
+    decision,
+    ...(userId ? { by: userId } : {}),
+    ...(rejected?.reason ? { reason: rejected.reason } : {}),
+    ...(opts.edits?.length ? { operations: opts.edits } : {}),
+  };
   if (!(await deps.threadState.claimProposal(proposal.proposalTs, decided))) {
     console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs} was not claimable`);
     // WHY the claim was refused decides what to say, and the store is the only

@@ -1441,7 +1441,8 @@ export type ProposalLookup =
    *  moment of retirement, and for the rest of its TTL if the revision it made
    *  way for never lands. `stated` is a stated card's own words. */
   /** `replacedBy` is the live card at the end of its revision chain, when
-   *  there is one: its ts and batch, which name it. */
+   *  there is one: its ts and batch, which name it. `decided` is the card as
+   *  it was replaced, kept for View (`closedKept`). */
   | {
       state: "superseded";
       stated?: StatedCardWords;
@@ -1449,6 +1450,7 @@ export type ProposalLookup =
       proposalBlocks?: unknown[];
       operations?: ProposalOperation[];
       replacedBy?: ReplacingCard;
+      decided?: DecidedProposal;
     }
   /** `ttlMs` is the card's own lifetime when it set one, so the person can be
    *  told how long it was live; absent, it lived the default hour. `stated` is
@@ -1456,12 +1458,32 @@ export type ProposalLookup =
    *  `proposalText` and `proposalBlocks` (both answers) are the card as
    *  posted, so the note about it can be edited onto it, and `operations`
    *  (both answers) its batch, so its pop-up is titled for its tool. */
-  | { state: "expired"; ttlMs?: number; stated?: StatedCardWords; proposalText?: string; proposalBlocks?: unknown[]; operations?: ProposalOperation[] }
+  /** `decided` is the card as its time ran out (or, retired and then aged
+   *  out, as it was replaced), kept for View (`closedKept`). */
+  | {
+      state: "expired";
+      ttlMs?: number;
+      stated?: StatedCardWords;
+      proposalText?: string;
+      proposalBlocks?: unknown[];
+      operations?: ProposalOperation[];
+      decided?: DecidedProposal;
+    }
   /** Claimed, aged out or never staged: nothing to decide. `decided` is the
    *  card as it was decided, kept for `DECIDED_TTL_MS` from the decision so
    *  Review's View can draw it (`DecidedProposal`); absent once that lifetime
    *  ends, and on every card decided before the record was kept. */
   | { state: "none"; decided?: DecidedProposal };
+
+/**
+ * How a card closed, as View says it (#1362): a claim's Approve (`confirm`)
+ * or Reject (`cancel`) — a card's own answer is one of the two — and the
+ * closes no claim makes: a DS precedence card disputed (`noted`), a card
+ * taken back by the job that posted it (`withdrawn`), one replaced by its
+ * revision (`replaced`), one whose time ran out (`expired`). Every one keeps
+ * the card for `DECIDED_TTL_MS`, so View can always draw what was decided.
+ */
+export type CardClose = "confirm" | "cancel" | "noted" | "withdrawn" | "replaced" | "expired";
 
 /**
  * What a claim keeps of the card it won: the decision, who made it, and the
@@ -1483,19 +1505,39 @@ export interface DecidedMark {
   operations?: ProposalOperation[];
 }
 
-/** A decided card, as its record hands it back (`ProposalLookup` "none"). */
+/**
+ * A close no claim makes, kept the way a claim keeps its card
+ * (`retireProposal` with a mark): a DS precedence card disputed, with the
+ * note, or a card its job took back, with what the card now says.
+ */
+export interface ClosedMark {
+  decision: "noted" | "withdrawn";
+  /** Who closed it, when a person did. */
+  by?: string;
+  /** The note, or why it was taken back. */
+  reason?: string;
+}
+
+/** A decided card, as its record hands it back (`ProposalLookup` "none", and
+ *  a replaced or expired card's `decided`). */
 export interface DecidedProposal {
   /** The card as decided: its edited batch in place, its posted blocks not
    *  kept. */
   proposal: PendingProposal;
-  decision: "confirm" | "cancel";
+  decision: CardClose;
   by?: string;
   reason?: string;
+  /** When it closed, epoch ms. Absent on a card decided before it was kept. */
+  at?: number;
 }
 
 /** How a decided record stores its decision: the mark, less the batch, which
  *  is written into the payload (`decidedPayload`). */
-export type DecidedNote = Omit<DecidedMark, "operations">;
+export interface DecidedNote {
+  decision: "confirm" | "cancel" | "noted" | "withdrawn";
+  by?: string;
+  reason?: string;
+}
 
 /**
  * The card a claim keeps: the decided batch in place of the staged one, and
@@ -1505,20 +1547,82 @@ export type DecidedNote = Omit<DecidedMark, "operations">;
  * @param proposal - The card's record as staged
  * @param mark - What the claim decided
  */
-export function decidedPayload(proposal: PendingProposal, mark: DecidedMark): PendingProposal {
+export function decidedPayload(proposal: PendingProposal, mark: Pick<DecidedMark, "operations">): PendingProposal {
   const { proposalBlocks: _blocks, revising: _revising, ...kept } = proposal;
   const [first] = mark.operations ?? [];
   return first ? { ...kept, operations: mark.operations, toolName: first.toolName, input: first.input } : kept;
 }
 
 /** The mark as a decided record stores it beside its payload. */
-export function decidedNoteOf(mark: DecidedMark): DecidedNote {
+export function decidedNoteOf(mark: DecidedMark | ClosedMark): DecidedNote {
   return { decision: mark.decision, ...(mark.by ? { by: mark.by } : {}), ...(mark.reason ? { reason: mark.reason } : {}) };
 }
 
-/** A decided record read back: its payload and the note beside it. */
-export function decidedOf(proposal: PendingProposal, note: DecidedNote): DecidedProposal {
-  return { proposal, ...note };
+/** A decided record read back: its payload, the note beside it, and when it
+ *  was decided. */
+export function decidedOf(proposal: PendingProposal, note: DecidedNote, at?: number): DecidedProposal {
+  return { proposal, ...note, ...(at !== undefined ? { at } : {}) };
+}
+
+/** What a record that closed without a claim keeps of how it closed: retired
+ *  or replaced (`retired`, `supersededBy`), and when (`closedAt`). */
+export interface ClosedMarks {
+  createdAt: number;
+  retired?: boolean;
+  supersededBy?: string;
+  /** When it was retired or replaced. Absent on a card still pending, and on
+   *  one retired before the time was stamped: its own deadline stands in. */
+  closedAt?: number;
+}
+
+/**
+ * When a card closed without a claim: when it was retired or replaced, else
+ * at its own deadline.
+ *
+ * @param rec - The record's marks
+ * @param proposal - The card, for its own `ttlMs`
+ */
+export function closedAtOf(rec: ClosedMarks, proposal: Pick<PendingProposal, "ttlMs">): number {
+  return rec.closedAt ?? rec.createdAt + proposalTtlMs(proposal);
+}
+
+/**
+ * Whether a record is still kept (#1362): a decided one for `DECIDED_TTL_MS`
+ * from its decision (`decidedLive`); any other — live, replaced or expired —
+ * for `DECIDED_TTL_MS` past its close, so View can draw a replaced or expired
+ * card's draft for as long as it draws a decided one's.
+ *
+ * @param rec - The record's marks, and its decision when it has one
+ * @param proposal - The card it holds
+ * @param at - The store's now
+ */
+export function recordKept(
+  rec: ClosedMarks & { decided?: unknown; decidedAt?: number },
+  proposal: Pick<PendingProposal, "ttlMs">,
+  at: number,
+): boolean {
+  if (rec.decided) return decidedLive(rec, proposal, at);
+  return at - closedAtOf(rec, proposal) <= DECIDED_TTL_MS;
+}
+
+/**
+ * A card that closed without a claim, as View draws it: replaced by its
+ * revision — by whoever asked for the change, when the Needs changes mark
+ * says — or out of time. Kept like a decided card: the card as posted, less
+ * its posted blocks and the mark.
+ *
+ * @param rec - The record's marks
+ * @param proposal - The card it holds
+ */
+export function closedKept(rec: ClosedMarks, proposal: PendingProposal): DecidedProposal {
+  const replaced = !!(rec.retired || rec.supersededBy);
+  const by = replaced ? proposal.revising?.userId : undefined;
+  return {
+    proposal: decidedPayload(proposal, {}),
+    decision: replaced ? "replaced" : "expired",
+    ...(by ? { by } : {}),
+    at: closedAtOf(rec, proposal),
+  };
 }
 
 /**
@@ -1659,9 +1763,18 @@ export interface ThreadState {
    * `retired` is true only when THIS call took a live card out of reach: a
    * card already claimed (so gone), already retired or replaced, or aged out
    * answers false — nothing was replaced by this revision.
-
+   *
+   * **WITH A MARK, IT CLOSES THE CARD AS DECIDED** (#1362): a DS precedence
+   * card disputed, or a card its job took back. The record is rewritten in
+   * the same transaction as a decided one (`decidedPayload`, `closed` as its
+   * note), as a won claim's is: View draws it read-only for `DECIDED_TTL_MS`,
+   * and every lookup answers "none" with it. Unlike a claim it closes a card
+   * under a Needs changes mark, which a dispute holds while it writes.
+   * Without a mark, the retired record keeps the time it was retired
+   * (`closedAt`), and is kept for View for `DECIDED_TTL_MS` past it
+   * (`recordKept`, `closedKept`).
    */
-  retireProposal(proposalTs: string): Promise<{ retired: boolean }>;
+  retireProposal(proposalTs: string, closed?: ClosedMark): Promise<{ retired: boolean }>;
 
   /**
    * Mark a live card as being revised: Needs changes, accepted.

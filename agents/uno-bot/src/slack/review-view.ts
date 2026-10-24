@@ -196,10 +196,10 @@ export interface DraftAccess {
   /** When an item of a decision report closes undecided: its card shows
    *  neither who decides nor when, so the decision's own pop-up says both. */
   closesAt?: number;
-  /** A decided card, opened from View: which way it went and who decided.
-   *  Drawn read-only under an alert saying so, without its where line and
-   *  caveats, which were about a decision now made. */
-  decided?: Pick<DecidedProposal, "decision" | "by" | "reason">;
+  /** A decided card, opened from View: how it closed, who closed it and
+   *  when. Drawn read-only under an alert saying so, without its where line
+   *  and caveats, which were about a decision now made. */
+  decided?: Pick<DecidedProposal, "decision" | "by" | "reason" | "at">;
 }
 
 /** How `draftView` draws the draft beyond who may decide it. */
@@ -362,12 +362,48 @@ function settled(anatomy: DraftAnatomy): DraftAnatomy {
   return own ?? rest;
 }
 
+/** How a decision reads at the top of View: the alert, its level, and the
+ *  verb its line opens with. A card's own answers read "Answered" for an
+ *  Approve or a Reject alike. */
+const DECISIONS: Record<"confirm" | "cancel" | "noted" | "withdrawn", { alert: string; level: DraftAlert["level"]; verb: string }> = {
+  confirm: { alert: "Approved.", level: "success", verb: "Approved" },
+  cancel: { alert: "Rejected.", level: "info", verb: "Rejected" },
+  noted: { alert: "Noted.", level: "info", verb: "Noted" },
+  withdrawn: { alert: "Withdrawn.", level: "info", verb: "Withdrawn" },
+};
+
+/** What a replaced card says, in View and on Review alike. */
+const REPLACED_CARD = "This proposal was replaced by a newer one. Review the newest card in the thread instead.";
+
+/** What a report's item whose time ran out says, as its card on the report
+ *  does (`decision-cards.ts` `shownAs`). */
+const ITEM_EXPIRED = "Closed, no decision.";
+
+/** When a card closed, as View says it: "Oct 19 at 09:13 ET" — the 24-hour
+ *  clock the decided card's subtitle reads ("written 09:13"). */
+export function closedWhen(at: number): string {
+  const part = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", ...opts }).format(new Date(at));
+  return `${part({ month: "short", day: "numeric" })} at ${part({ hour: "numeric", minute: "2-digit", hourCycle: "h23" })} ET`;
+}
+
+/** Words split at their first full stop: the outcome, and what follows it. */
+function firstSentence(text: string): [string, string] {
+  const split = /^(.+?[.!?])\s+(\S.*)$/s.exec(text.trim());
+  return split ? [split[1]!, split[2]!] : [text.trim(), ""];
+}
+
 /**
- * What a decided card says at the top: the outcome as an alert —
- * "Approved.", "Rejected." or, on a card with its own answers, "Answered." —
- * `success` for an Approve and `info` otherwise; then, where there is
- * someone or somewhere to name, a rich text line with the pills: "Approved by
- * @Bill to post in #channel.", "Rejected by @Bill: not this week.".
+ * What a decided card says at the top (#1362): how it closed, as an alert,
+ * then a rich text line with who closed it and when, and what else there is
+ * to say. Decided: "Approved.", "Rejected.", "Answered." on a card with its
+ * own answers, "Noted." or "Withdrawn.", over "Approved by @Bill on Oct 19 at
+ * 09:13 ET to post in #channel." or "Noted by @Bill on Oct 19 at 09:13
+ * ET: deliberate.". Replaced or out of time, it says what Review says of such
+ * a card, over when: "This proposal was replaced by a newer one." over
+ * "Replaced on Oct 19 at 09:13 ET, after @Bill asked for changes. Review
+ * the newest card in the thread instead.", or its expired words — a stated
+ * card's own, a report item's "Closed, no decision." — over "Closed on Oct
+ * 21 at 09:00 ET.". A card closed before the time was kept names no time.
  */
 function decidedAlert(
   decided: NonNullable<DraftAccess["decided"]>,
@@ -375,17 +411,37 @@ function decidedAlert(
   reading: DraftAnatomy | null,
 ): unknown[] {
   const who = decided.by && SLACK_USER_ID.test(decided.by) ? decided.by : undefined;
-  const by = who ? [{ type: "text", text: " by " }, { type: "user", user_id: who }] : [];
-  const level = decided.decision === "confirm" ? "success" : "info";
-  const outcome = proposal.choices?.length ? "Answered" : decided.decision === "cancel" ? "Rejected" : "Approved";
-  const reason = decided.decision === "cancel" && !proposal.choices?.length ? (decided.reason?.trim() ?? "") : "";
-  const where = outcome === "Approved" && reading?.destination ? [{ type: "text", text: " to " }, ...richElements(reading.destination)] : [];
-  const tail = reason ? [{ type: "text", text: `: ${clip(reason, RICH_TEXT_CHARS - 2)}` }] : [];
-  const alert = stateAlert(level, `${outcome}.`);
-  // Nobody and nowhere to name: the alert says it all.
-  if (!by.length && !where.length && !tail.length) return [alert];
-  const stop = /[.!?]$/.test(reason) ? [] : [{ type: "text", text: "." }];
-  return [alert, richLine([{ type: "text", text: outcome }, ...by, ...where, ...tail, ...stop])];
+  const user = who ? [{ type: "user", user_id: who }] : [];
+  const when = decided.at !== undefined ? [{ type: "text", text: ` on ${closedWhen(decided.at)}` }] : [];
+  const text = (t: string) => ({ type: "text", text: t });
+
+  if (decided.decision === "replaced") {
+    const [outcome, next] = firstSentence(REPLACED_CARD);
+    const asked = user.length ? [text(", after "), ...user, text(" asked for changes")] : [];
+    return [stateAlert("warning", outcome), richLine([text("Replaced"), ...when, ...asked, text(`. ${next}`)])];
+  }
+  if (decided.decision === "expired") {
+    // A stated card's own words; a report's item as its card says it; any
+    // other card as Review says it.
+    const [outcome, next] = firstSentence(proposal.stated?.expired ?? (proposal.item ? ITEM_EXPIRED : EXPIRED_CARD));
+    const alert = stateAlert("warning", outcome);
+    if (!when.length && !next) return [alert];
+    const closed = when.length ? [text("Closed"), ...when, text(next ? `. ${next}` : ".")] : [text(next)];
+    return [alert, richLine(closed)];
+  }
+
+  const close = DECISIONS[decided.decision];
+  const answered = !!proposal.choices?.length && (decided.decision === "confirm" || decided.decision === "cancel");
+  const verb = answered ? "Answered" : close.verb;
+  const alert = stateAlert(close.level, answered ? "Answered." : close.alert);
+  const by = user.length ? [text(" by "), ...user] : [];
+  const reason = answered || decided.decision === "confirm" ? "" : (decided.reason?.trim() ?? "");
+  const where = verb === "Approved" && reading?.destination ? [text(" to "), ...richElements(reading.destination)] : [];
+  const tail = reason ? [text(`: ${clip(reason, RICH_TEXT_CHARS - 2)}`)] : [];
+  // Nobody, no time and nowhere to name: the alert says it all.
+  if (!by.length && !when.length && !where.length && !tail.length) return [alert];
+  const stop = /[.!?]$/.test(reason) ? [] : [text(".")];
+  return [alert, richLine([text(verb), ...by, ...when, ...where, ...tail, ...stop])];
 }
 
 /** The keys of the fields the draft holds as inputs in place: every text
@@ -577,9 +633,10 @@ function reviewNoteOf(state: unknown): string {
 }
 
 /**
- * An item of a decision report, decided and opened from View, when its card's
- * record no longer keeps the decided draft: its words off the report's
- * record, read-only, outcome included.
+ * An item of a decision report, closed before its record kept the decided
+ * draft (#1362) and opened from View: its words off the report's record,
+ * read-only, outcome included. Every item closed since keeps its draft, which
+ * View draws instead (`draftView` with `decided`).
  */
 export function decidedView(card: ReviewedCard, cardText: string, title?: string): View {
   return modal(
@@ -625,7 +682,7 @@ function outcomeOf(cardText: string): { level: DraftAlert["level"]; text: string
 
 /**
  * A decided card opened from View when its record keeps no draft — decided
- * before the record was kept, or past the card's lifetime: the outcome the
+ * before the record was kept, or past its `DECIDED_TTL_MS`: the outcome the
  * card's message ends with, under an alert at the level its words mean
  * (the line names who decided, so it is rich text, not the alert), and a line
  * saying the draft is gone. A message with no outcome line reads as decided,
@@ -697,7 +754,7 @@ export function closedView(
     case "expired":
       return stateView(card, "warning", why.stated?.expired ?? EXPIRED_CARD, title);
     case "superseded":
-      return stateView(card, "warning", "This proposal was replaced by a newer one. Review the newest card in the thread instead.", title);
+      return stateView(card, "warning", REPLACED_CARD, title);
     case "gone":
       return stateView(card, "info", "This proposal has already been decided. Its outcome is on the card in the thread.", title);
   }
