@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import Input from './Input';
 import TagInput from './TagInput';
 
@@ -438,6 +439,21 @@ Invalid.play = async ({ canvasElement }) => {
     await expect(input).toHaveAttribute('aria-invalid', 'true');
     await expect(input).toHaveAccessibleDescription('Pick at least one topic');
     await expect(canvas.getByRole('alert')).toHaveTextContent('Pick at least one topic');
+
+    const box = input.closest('.plus-field');
+    const message = canvasElement.querySelector('.plus-field-caption__message--invalid');
+    await userEvent.click(input);
+    const hint = await waitFor(() => {
+        const el = document.querySelector('.plus-tag-input__hint');
+        if (!el) throw new Error('the list has not opened');
+        return el;
+    });
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(box).borderTopColor, `${mode}: invalid border`).toBe(token('--ds-border-danger'));
+        await expect(getComputedStyle(message).color, `${mode}: invalid message`).toBe(token('--ds-text-danger'));
+        await expect(getComputedStyle(hint).color, `${mode}: the list's hint`).toBe(token('--ds-text-subtle'));
+    });
+    await userEvent.keyboard('{Escape}');
 };
 
 /** Disabled: every tag is disabled, with no × and no entry. */

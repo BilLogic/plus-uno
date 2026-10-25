@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
+import Calendar from '../_internal/Calendar';
 import DatePicker from './DatePicker';
 
 export default {
@@ -90,7 +93,7 @@ Overview.parameters = {
 
 export const Sizes = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '300px' }}>
-        <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+        <p className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
             Small, medium, and large trigger and calendar.
         </p>
         <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
@@ -112,7 +115,7 @@ export const Sizes = () => (
 
 export const InteractionStates = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '300px' }}>
-        <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+        <p className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
             Empty, with value, disabled, and read-only.
         </p>
         <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
@@ -142,7 +145,7 @@ export const PickDate = () => {
     return (
         <div style={{ paddingBottom: '300px', maxWidth: '300px' }}>
             <h6 style={{ marginBottom: '16px' }}>Select a Single Date</h6>
-            <p style={{ fontSize: '14px', color: 'var(--color-on-surface-variant)', marginBottom: '16px' }}>
+            <p style={{ fontSize: '14px', color: 'var(--ds-text-subtle)', marginBottom: '16px' }}>
                 Click on the input to open the calendar and select a date.
             </p>
             <DatePicker value={date} onChange={setDate} placeholder="Select a date" />
@@ -151,7 +154,7 @@ export const PickDate = () => {
                     style={{
                         marginTop: '16px',
                         padding: '12px',
-                        backgroundColor: 'var(--color-surface-container)',
+                        backgroundColor: 'var(--ds-surface-container)',
                         borderRadius: '4px',
                     }}
                 >
@@ -179,7 +182,7 @@ export const PickRange = () => {
     return (
         <div style={{ paddingBottom: '300px', maxWidth: '320px' }}>
             <h6 style={{ marginBottom: '16px' }}>Select a Date Range</h6>
-            <p style={{ fontSize: '14px', color: 'var(--color-on-surface-variant)', marginBottom: '16px' }}>
+            <p style={{ fontSize: '14px', color: 'var(--ds-text-subtle)', marginBottom: '16px' }}>
                 Click a first day, then a last day. The days between are marked.
             </p>
             <DatePicker range value={range} onChange={setRange} />
@@ -188,7 +191,7 @@ export const PickRange = () => {
                     style={{
                         marginTop: '16px',
                         padding: '12px',
-                        backgroundColor: 'var(--color-surface-container)',
+                        backgroundColor: 'var(--ds-surface-container)',
                         borderRadius: '4px',
                     }}
                 >
@@ -248,4 +251,38 @@ Interactive.args = {
     size: 'medium',
     disabled: false,
     readOnly: false,
+};
+
+/**
+ * The calendar's colors: a picked day is the Lagoon checked fill with
+ * `text.inverse`, the days between a range's ends neutral selection, days of
+ * the next and last month `text.subtle`.
+ */
+export const CalendarColors = () => (
+    <Calendar
+        viewDate={new Date(2020, 2, 1)}
+        onViewDateChange={() => {}}
+        rangeStart="2020-03-09"
+        rangeEnd="2020-03-13"
+        onPick={() => {}}
+    />
+);
+CalendarColors.parameters = { docs: { disable: true } };
+CalendarColors.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const picked = canvas.getByRole('button', { name: /March 9, 2020/ });
+    const between = canvas.getByRole('button', { name: /March 11, 2020/ });
+    const plain = canvas.getByRole('button', { name: /March 20, 2020/ });
+    const outside = canvasElement.querySelector('.plus-calendar-day--outside');
+    const month = canvasElement.querySelector('.plus-calendar-month');
+    await expect(picked).toHaveClass('plus-calendar-day--selected');
+    await expect(between).toHaveClass('plus-calendar-day--in-range');
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(picked).backgroundColor, `${mode}: picked day`).toBe(token('--ds-background-selected-bold'));
+        await expect(getComputedStyle(picked).color, `${mode}: picked day text`).toBe(token('--ds-text-inverse'));
+        await expect(getComputedStyle(between).backgroundColor, `${mode}: in-range day`).toBe(token('--ds-background-selected'));
+        await expect(getComputedStyle(plain).color, `${mode}: day text`).toBe(token('--ds-text'));
+        await expect(getComputedStyle(outside).color, `${mode}: outside day`).toBe(token('--ds-text-subtle'));
+        await expect(getComputedStyle(month).color, `${mode}: month`).toBe(token('--ds-text'));
+    });
 };

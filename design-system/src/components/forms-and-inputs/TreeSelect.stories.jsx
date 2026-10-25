@@ -118,14 +118,14 @@ export const Content = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SINGLE SELECT</span>
-                <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
                     Clicking any node selects it and closes the panel.
                 </p>
                 <TreeSelect id="tree-select-single" value={single} options={sampleOptions} onChange={setSingle} />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MULTIPLE WITH PRE-SELECTED BRANCH</span>
-                <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
                     Checking a parent cascades to its children; partially checked branches show an indeterminate state.
                 </p>
                 <TreeSelect id="tree-select-multi" value={multi} options={sampleOptions} onChange={setMulti} multiple />
@@ -139,7 +139,7 @@ export const Layout = () => {
 
     return (
         <div style={{ maxWidth: '800px' }}>
-            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
                 Each hierarchy level is indented beneath its parent; carets expand and collapse branches in place.
             </p>
             <TreeSelect id="tree-select-layout" value={value} options={sampleOptions} onChange={setValue} multiple />
@@ -188,7 +188,7 @@ export const Interactive = (args) => {
                 placeholder={args.placeholder}
             />
             {selectionSummary && (
-                <p className="body3-txt" style={{ marginTop: '16px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body3-txt" style={{ marginTop: '16px', color: 'var(--ds-text-subtle)' }}>
                     Selected: {selectionSummary}
                 </p>
             )}

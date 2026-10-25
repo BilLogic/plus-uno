@@ -58,7 +58,7 @@ const isTextEntry = (target) => target instanceof HTMLElement
  * Listbox — the internal option list (Figma `_Listbox`). It is the panel under
  * a field for picking a value, and it is not exported from the barrel.
  *
- * - **Surface:** `--color-surface-overlay`, as tall as its rows up to 300px, then the body scrolls.
+ * - **Surface:** `elevation.surface.overlay` with `elevation.shadow.overlay`, as tall as its rows up to 300px, then the body scrolls.
  * - **Slots:** `header` (a hint or a search field), the body of rows, and `footer`.
  * - **Rows:** `OptionRow` for every option, group heading and the Create row.
  *   `rowActions` draws a row's own controls (a drag handle, a "…") over the
