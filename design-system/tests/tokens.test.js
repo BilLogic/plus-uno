@@ -30,6 +30,7 @@ import {
   resolveToken,
   toHex,
   tokenDeclarationPattern,
+  tokenNamePattern,
   varReferencePattern,
 } from '../src/lib/tokens.mjs';
 
@@ -90,6 +91,21 @@ describe('the token grammar', () => {
   it('builds a var() reference pattern that reads the token out of a fallback', () => {
     const found = [...'color: var(--color-warning, #9f8205);'.matchAll(varReferencePattern())];
     expect(found.map((m) => m[1])).toEqual(['--color-warning']);
+  });
+
+  it('reads a list of prefixes as one alternation, with the same group numbers', () => {
+    const source = 'a: var(--ds-text); b: var(--color-primary, #000); c: var(--space-2);';
+    const found = [...source.matchAll(varReferencePattern(['--color-', '--ds-']))].map((m) => m[1]);
+    expect(found).toEqual(['--ds-text', '--color-primary']);
+  });
+
+  it('matches a whole bare token name, escaped, for one prefix or several', () => {
+    const name = tokenNamePattern(['--color-', '--ds-']);
+    expect(name.test('--ds-text')).toBe(true);
+    expect(name.test('--color-primary')).toBe(true);
+    expect(name.test('--palette-teal-100')).toBe(false);
+    expect(name.test('--ds-text extra')).toBe(false);
+    expect(tokenNamePattern('--a.b-').test('--aXb-c')).toBe(false);
   });
 });
 

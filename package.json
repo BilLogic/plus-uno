@@ -79,6 +79,7 @@
     "check:button-contrast": "node scripts/check-button-contrast.mjs",
     "check:token-collision": "node scripts/check-token-collision.mjs",
     "check:color-fallbacks": "node scripts/check-color-fallbacks.mjs",
+    "check:ds-fallbacks": "node scripts/check-ds-fallbacks.mjs",
     "check:size-fallbacks": "node scripts/check-size-fallbacks.mjs",
     "check:undefined-tokens": "node scripts/check-undefined-tokens.mjs",
     "check:font-families": "node scripts/check-font-families.mjs",

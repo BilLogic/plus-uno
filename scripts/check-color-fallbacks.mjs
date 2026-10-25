@@ -19,22 +19,26 @@
  *   npm run check:color-fallbacks -- --report  print the whole audit, and gate
  */
 
+import { COLOR_PREFIXES } from '../design-system/src/lib/tokens-node.mjs';
 import { fallbackCheck } from './lib/fallback-check.mjs';
 import { main } from './lib/findings.mjs';
 
 /**
- * The color family. It is selected BY NAME — `--color-*` is one namespace and
- * the whole of it — and an undefined name here is a real defect: there is no
- * component-local population of them, so the fallback IS the color and the
- * token is fiction.
+ * The color family. It is selected BY NAME — `--color-*` and `--ds-*`, the
+ * legacy roles and the Atlassian-shaped tokens generated into `tokens/color/`,
+ * read together while they coexist — and an undefined name here is a real
+ * defect: there is no component-local population of them, so the fallback IS
+ * the color and the token is fiction. A `--ds-*` token should carry no fallback
+ * at all, which is `check:ds-fallbacks`' rule; this check still compares one
+ * that slipped through, and still catches a misspelled `--ds-*` name.
  */
 const COLOR = fallbackCheck({
   check: 'check:color-fallbacks',
   label: '[color]',
   baseline: 'scripts/baselines/color-fallback-baseline.json',
   noun: 'color',
-  absent: '--color-*',
-  prefix: '--color-',
+  absent: '--color-* or --ds-*',
+  prefix: COLOR_PREFIXES,
   reportUndefined: true,
   why:
     'Literal fallbacks that disagree with their own token (#268). Keyed on ' +
