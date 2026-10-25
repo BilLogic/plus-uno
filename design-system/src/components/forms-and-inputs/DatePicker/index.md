@@ -9,7 +9,7 @@ Built from the shared parts: the field is `_Field` with the calendar icon in Tra
 
 **Source:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Sizes, InteractionStates, PickDate, PickRange, Bounds, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Sizes, InteractionStates, PickDate, PickRange, Bounds, Interactive, CalendarColors
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx`
 
@@ -46,7 +46,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface-variant`
+`--ds-icon-subtle` · `--ds-text-subtlest`
 
 From `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.scss`. Override these through the token layer, never with a literal.
 

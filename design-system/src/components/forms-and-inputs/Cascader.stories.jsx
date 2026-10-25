@@ -117,14 +117,14 @@ export const Content = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">EMPTY SELECTION</span>
-                <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
                     Opens the menu and builds a path from the hierarchy.
                 </p>
                 <Cascader id="cascader-basic" value={value1} options={sampleOptions} onChange={setValue1} />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">PRE-SELECTED PATH</span>
-                <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
                     Value shown in the field; opening reveals columns up to the current level.
                 </p>
                 <Cascader id="cascader-preselected" value={value2} options={sampleOptions} onChange={setValue2} />
@@ -135,7 +135,7 @@ export const Content = () => {
 
 export const Layout = () => (
     <div style={{ maxWidth: '800px' }}>
-        <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+        <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
             Each level opens as an additional column to the right of the previous one.
         </p>
         <Cascader id="cascader-layout" value={[]} options={sampleOptions} onChange={() => {}} />
@@ -182,7 +182,7 @@ export const Interactive = (args) => {
                 placeholder={args.placeholder}
             />
             {value.length > 0 && (
-                <p className="body3-txt" style={{ marginTop: '16px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body3-txt" style={{ marginTop: '16px', color: 'var(--ds-text-subtle)' }}>
                     Selected path: {value.join(' → ')}
                 </p>
             )}

@@ -16,10 +16,10 @@ own fill (`color.md` § Surface Colors).
 |-------|-------|
 | `--elevation-light-1` | Subtle lift |
 | `--elevation-light-2` | Clickable cards on hover or drag |
-| `--elevation-light-3` | Floating layers still on legacy tokens (listboxes, the floating sidebar) |
+| `--elevation-light-3` | Floating layers still on legacy tokens (the floating sidebar) |
 | `--elevation-light-4` | Legacy, unused |
 | `--elevation-light-5` | Dialogs |
-| `--ds-surface-overlay` + `--ds-shadow-overlay` | Modals, menus, popovers, tooltips and toasts: `elevation.surface.overlay` + `elevation.shadow.overlay` |
+| `--ds-surface-overlay` + `--ds-shadow-overlay` | Modals, menus, listboxes, popovers, tooltips and toasts: `elevation.surface.overlay` + `elevation.shadow.overlay` |
 
 ## Shadow Values
 
@@ -74,13 +74,13 @@ so it draws no border.
 |----------------|----------------------|
 | Cards at rest | none: a 1px outline-variant border |
 | Clickable cards on hover or drag | `--elevation-light-2` |
-| Modals, menus, dropdowns, popovers, tooltips, toasts | `--ds-surface-overlay` + `--ds-shadow-overlay` |
-| Listboxes and the floating sidebar, until they move to the new tokens | `--elevation-light-3` |
+| Modals, menus, dropdowns, listboxes, popovers, tooltips, toasts | `--ds-surface-overlay` + `--ds-shadow-overlay` |
+| The floating sidebar, until it moves to the new tokens | `--elevation-light-3` |
 | Dialogs | `--elevation-light-5` |
 
 Every floating layer takes the overlay pair, `elevation.surface.overlay` with
-`elevation.shadow.overlay`: menus and dropdowns, Popover, Tooltip, Toast and
-Flag, and modals. A modal is set apart from a menu by the blanket under it
+`elevation.shadow.overlay`: menus and dropdowns, Listbox, Popover, Tooltip,
+Toast and Flag, and modals. A modal is set apart from a menu by the blanket under it
 (`--ds-blanket`), not by a heavier shadow.
 
 ## Rules

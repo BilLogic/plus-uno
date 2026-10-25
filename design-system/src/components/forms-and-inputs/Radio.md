@@ -45,7 +45,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--color-disabled-opacity` · `--color-focus-ring` · `--color-on-primary` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-state-08` · `--color-shadow-state-08` · `--color-surface-variant` · `--item-height-sm` · `--layout-control-radio` · `--size-element-gap-sm` · `--size-element-radius-full` · `--size-element-stroke-lg`
+`--body-default` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-border-brand` · `--ds-border-disabled` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-opacity-disabled` · `--ds-text` · `--item-height-sm` · `--layout-control-radio` · `--size-element-gap-sm` · `--size-element-radius-full` · `--size-element-stroke-lg`
 
 From `design-system/src/components/forms-and-inputs/Radio.scss`. Override these through the token layer, never with a literal.
 

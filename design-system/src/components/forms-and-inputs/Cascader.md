@@ -26,7 +26,7 @@
 
 ## Tokens touched
 
-`--color-outline-variant` · `--plus-listbox-viewport-width` · `--size-element-border`
+`--ds-border` · `--plus-listbox-viewport-width` · `--size-element-border`
 
 From `design-system/src/components/forms-and-inputs/Cascader.scss`. Override these through the token layer, never with a literal.
 

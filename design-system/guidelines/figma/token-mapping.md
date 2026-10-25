@@ -133,11 +133,11 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 |----------------------|----------------|
 | Elevation Light/1 (subtle) | `var(--elevation-light-1)` |
 | Elevation Light/2 (clickable cards on hover or drag) | `var(--elevation-light-2)` |
-| Elevation Light/3 (floating layers still on legacy tokens: listboxes, the floating sidebar) | `var(--elevation-light-3)` |
+| Elevation Light/3 (floating layers still on legacy tokens: the floating sidebar) | `var(--elevation-light-3)` |
 | Elevation Light/4 (legacy, unused) | `var(--elevation-light-4)` |
 | Elevation Light/5 (dialogs) | `var(--elevation-light-5)` |
-| Overlay surface (modals, menus, popovers, tooltips, toasts) | `var(--ds-surface-overlay)` |
-| Overlay shadow (modals, menus, popovers, tooltips, toasts) | `var(--ds-shadow-overlay)` |
+| Overlay surface (modals, menus, listboxes, popovers, tooltips, toasts) | `var(--ds-surface-overlay)` |
+| Overlay shadow (modals, menus, listboxes, popovers, tooltips, toasts) | `var(--ds-shadow-overlay)` |
 
 ## Layout Tokens
 
