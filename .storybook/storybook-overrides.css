@@ -1144,3 +1144,26 @@ a.sbdocs-a {
     color: var(--color-on-surface-variant, #43474e);
     font-size: var(--font-size-body2, 14px);
 }
+
+/*
+ * Color modes: the canvas follows the mode.
+ *
+ * The Color mode toolbar sets `data-color-mode` on <html> (see
+ * design-system/src/storybook-docs/lib/color-modes.js). A story that paints no
+ * background of its own would otherwise sit on white in dark mode, so in dark
+ * (chosen, or auto under an OS dark preference) the preview body and each
+ * docs-page story block take the page surface. The docs page paints its own
+ * background over the body, so its prose stays as it is. Light is untouched:
+ * these selectors match nothing there.
+ */
+html[data-color-mode="dark"] body,
+html[data-color-mode="dark"] .docs-story {
+  background: var(--ds-surface) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-color-mode="auto"] body,
+  html[data-color-mode="auto"] .docs-story {
+    background: var(--ds-surface) !important;
+  }
+}

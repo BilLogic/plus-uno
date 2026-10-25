@@ -7,6 +7,7 @@ import '../design-system/src/storybook-docs/storybook-tailwind.css';
 import './storybook-overrides.css';
 import StorybookAIAgent from '../prototypes/storybook-ai-agent-llm-api/StorybookAIAgent';
 import ResponsiveFrame from '../design-system/src/specs/Universal/ResponsiveFrame';
+import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storybook-docs/lib/color-modes.js';
 
 /**
  * Storybook preview configuration for PLUS Design System
@@ -100,6 +101,23 @@ if (!globalThis.__PLUS_STORYBOOK_CONSOLE_PATCHED__) {
     originalError(...args);
   };
 }
+
+// ---- Color and contrast modes -----------------------------------------------
+// The toolbar's Color mode and Contrast globals become attributes on <html>;
+// see design-system/src/storybook-docs/lib/color-modes.js.
+
+/** Applies the modes before the story renders, and tracks the OS while on auto. */
+const ColorModes = ({ colorMode, contrastMode, children }) => {
+  applyColorModes(colorMode, contrastMode);
+  useEffect(() => {
+    if (colorMode !== 'auto' || !window.matchMedia) return undefined;
+    const query = window.matchMedia(COLOR_SCHEME_QUERY);
+    const onChange = () => applyColorModes(colorMode, contrastMode);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, [colorMode, contrastMode]);
+  return children;
+};
 
 // Cleanup functions - using dummy no-ops as legacy components are being phased out or moved
 const cleanupFunctions = {
@@ -507,9 +525,44 @@ const preview = {
         dynamicTitle: true,
       },
     },
+    plusColorMode: {
+      description: 'Color mode, set as data-color-mode on <html>; auto follows the OS',
+      toolbar: {
+        title: 'Color mode',
+        icon: 'mirror',
+        items: [
+          { value: 'light', title: 'Light' },
+          { value: 'dark', title: 'Dark' },
+          { value: 'auto', title: 'Auto (follow the OS)' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+    plusContrastMode: {
+      description: 'Contrast mode, set as data-contrast-mode on <html>; auto follows the OS',
+      toolbar: {
+        title: 'Contrast',
+        icon: 'contrast',
+        items: [
+          { value: 'no-preference', title: 'Standard contrast' },
+          { value: 'more', title: 'More contrast' },
+          { value: 'auto', title: 'Auto (follow the OS)' },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
 
   decorators: [
+    // Color and contrast modes from the toolbar, on <html> (see applyColorModes).
+    (Story, context) => (
+      <ColorModes
+        colorMode={context.globals.plusColorMode || 'light'}
+        contrastMode={context.globals.plusContrastMode || 'no-preference'}
+      >
+        <Story />
+      </ColorModes>
+    ),
     // Global PLUS breakpoint toggle: constrains every Specs story (pages, sections,
     // cards, elements) to the selected width so responsive behavior can be inspected
     // from the toolbar — in docs pages and in canvas view alike. Complements the
@@ -577,7 +630,9 @@ const preview = {
   initialGlobals: {
     backgrounds: {
       value: 'light'
-    }
+    },
+    plusColorMode: 'light',
+    plusContrastMode: 'no-preference',
   },
 
   tags: ['autodocs']
