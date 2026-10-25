@@ -95,7 +95,7 @@ What PLUS takes from these: the foreground-pairing idea (Atlassian's `text.inver
 ### 2.5 Notion
 
 - The API's color enum has ten text colors and nine backgrounds: default, gray, brown, orange, yellow, green, blue, purple, pink and red, with no teal ([rich-text reference](https://developers.notion.com/reference/rich-text)).
-- **Notion's tag palette** (app stylesheet, read 2026-10-25 signed in) has ten colors: gray, brown, orange, yellow, green, teal, blue, purple, pink and red. Tags use `BacTer` as the tint and `TexSec` as the text (blue `#cee3f7` and `#387dc9`). The tints are soft (L 0.90–0.95, chroma about 0.035). The bold colors are uneven: cool hues are muted (blue chroma 0.10, green 0.085, teal 0.09) while warm ones stay vivid (red 0.18, pink 0.16, orange 0.16). Several of its text colors fall below 4.5:1 on white (orange 3.2:1, yellow 2.7:1). Dark-theme values are in the same file, which settles part of what iteration 2 left unverified.
+- **Notion's tag palette** (app stylesheet, read 2026-10-25 signed in) has ten colors: gray, brown, orange, yellow, green, teal, blue, purple, pink and red. The tints are soft (L 0.90–0.95, chroma about 0.035). Database tags pair a translucent tint (about `BacTer`) with dark `TexPri` text (blue `#264a72`, about 9:1). Every hue sits on one ladder: tints near chroma 0.035, tag text L 0.40 and chroma 0.08, accents near 0.155; green, teal and brown run lower. The mid-tone `TexSec` colors are uneven and several fall below 4.5:1 (orange 3.2:1, yellow 2.7:1); they are not the tag colors. Dark-theme values are in the same file, which settles part of what iteration 2 left unverified.
 - The served app CSS (read on a public notion.site page) has about 740 light-mode custom properties in a compressed grammar, `--c-{hue}{Property}{Rank}`: property is `Tex`, `Ico`, `Bor` or `Bac`, rank is `Pri`, `Sec` or `Ter`, and a `--ca-` prefix marks alpha values, e.g. `--c-bluTexSec`, `--ca-pinBacTerTra`. A numbered `pal*` palette sits underneath, and a teal family exists in the CSS though not in the API. Neutrals are warm: `--c-texPri #2c2c2b`, `--c-texSec #7d7a75`, `--c-borPri #e6e5e3`, `--c-bacSec #f9f8f7`. Colored text (`TexSec`) is the same value in both modes; blue text is `#387dc9`, teal `#2c8b9e`. A blue link renders as `var(--c-bluTexSec)` on the page. Source: [public notion.site page](https://johandahlberg.notion.site/Solid-Text-Color-Formating-fc39346030924c7a8865ec17a9110acd), served CSS. No official post on a 2024–25 Notion color update was found (**unverified**).
 
 **What Claude and Notion teach, read together.** Both use a two-layer system (numbered primitives under role tokens), neither uses OKLCH, and both put a low-chroma gray under a single brand hue. Their accents differ more than their grays: Notion's are dusty and earthy, Claude's clean and saturated. That warmth is the concrete trait behind "the vibe of Notion and Claude", and it is the basis for open decision 2.
@@ -236,26 +236,29 @@ The full ramps, with hex and contrast for every step, are in Appendix A and in t
 - **Brown** is the one color Notion has and Atlassian lacks. It gives SMART categories and tags an eleventh, quiet option, and costs one ramp.
 - **Accent teal gets its own ramp** (`aqua`, 190° in Plan A, 170° in Plan B) instead of aliasing Lagoon at 205°. Notion's teal sits at 212°, which would read as the brand; Claude's aqua at 170° shows the way out. Without the split, a teal tag would look like a brand button.
 
-**Accents per plan.** Iteration 2 shared one set of hue ramps across both plans, so the plans differed only in grays and shadows. The accents now follow each benchmark too. The generator is unchanged: each step keeps its contrast target, and only hue, chroma cap and tint softness move.
+**Accents per plan.** Iteration 2 shared one set of hue ramps across both plans, so the plans differed only in grays and shadows. The accents, and Lagoon's tints, now follow each benchmark. The generator is unchanged: each step keeps its contrast target, and only hue and chroma move. The tag columns are the PLUS pair `background.accent.*.subtler` + `text.accent.*` against each app's real tag.
 
-| Family | Role | Plan A hue / cap | A 200 · 700 | Notion tag tint · color | Plan B hue / cap | B 200 · 700 | Claude tint · fill |
+| Family | Role | Plan A hue | A tag: 200 · 850 | Notion tag: tint · text | Plan B hue / cap | B tag: 200 · 850 | Claude tag: tint · text |
 |---|---|---|---|---|---|---|---|
-| blue | information | 245° / 0.10 | `#d1e6f8` · `#3a74a2` | `#cee3f7` · `#337ea9` | 256° / 0.16 | `#d3e5fe` · `#2b6fc6` | `#cde2fb` · `#2a78d6` |
-| aqua | accent teal | 190° / 0.09 | `#cde9e7` · `#1c7c77` | `#cae9f0` · `#2c8b9e` | 170° / 0.12 | `#c5ebdd` · `#147f63` | `#bfebdb` · `#138e65` |
-| green | success | 158° / 0.085 | `#d4e8db` · `#407a5b` | `#d7e6dd` · `#448361` | 145° / 0.16 | `#c9ecc9` · `#1e802c` | `#caeac7` · `#009300` |
-| lime | accent | 120° / 0.085 | `#e0e5d1` · `#68743d` | — | 124° / 0.15 | `#dae9c0` · `#5e7911` | — |
-| yellow | warning | 80° (92° pale) / 0.12 | `#ede3c6` · `#916812` | `#f2e3b7` · `#cb912f` | 74° (84° pale) / 0.15 | `#f6e1ba` · `#966612` | `#f9dca4` · `#a66a00` |
-| orange | accent | 58° (64° pale) / 0.15 | `#fdddc3` · `#a75c12` | `#f3ddcb` · `#d9730d` | 45° (55° pale) / 0.16 | `#feddca` · `#b85014` | `#f7d8cb` · `#c25124` |
-| red | danger | 27° / 0.16 | `#fedcd7` · `#bd4941` | `#f7d9d5` · `#cd3c3a` | 25° / 0.17 | `#fedcd8` · `#c14543` | `#fad6d6` · `#d03b3b` |
-| magenta | accent | 350° / 0.15 | `#fedae9` · `#af4d80` | `#f4d8e4` · `#c14c8a` | 358° / 0.16 | `#fedbe5` · `#b74875` | `#f9d4e2` · `#c04873` |
-| purple | discovery | 308° / 0.115 | `#ecdef9` · `#8560a3` | `#e8dbf2` · `#9065b0` | 288° / 0.17 | `#e2e0fe` · `#715fca` | `#dfdbfd` · `#7161e0` |
-| brown | accent (new) | 52° / 0.075 | `#f2e0d5` · `#92654a` | `#ebdfd7` · `#9f6b53` | 48° / 0.09 | `#f8ded2` · `#9a6144` | — |
+| teal | brand (Lagoon) | 205° | `#c8e9ed` · `#0a545a` | — | 205° / 0.15 | `#b6edf3` · `#0a545a` | — |
+| blue | information | 250° | `#d2e5fa` · `#224d77` | `#cee3f7` · `#264a72` | 256° / 0.16 | `#d3e5fe` · `#1a4b89` | `#cde2fb` · `#184f95` |
+| aqua | accent teal | 190° | `#c8eae7` · `#135450` | `#cae9f0` · `#18505b` | 170° / 0.12 | `#c5ebdd` · `#0a5542` | `#bfebdb` · `#065f49` |
+| green | success | 158° | `#d8e7de` · `#27533b` | `#d7e6dd` · `#2a533c` | 145° / 0.16 | `#c9ecc9` · `#11571b` | `#caeac7` · `#006300` |
+| lime | accent | 122° | `#e0e5d4` · `#444f23` | — | 124° / 0.15 | `#dae9c0` · `#3f5108` | — |
+| yellow | warning | 86° (94° pale) | `#f1e3b6` · `#5e4810` | `#f2e3b7` · `#655121` | 74° (84° pale) / 0.15 | `#f6e1ba` · `#674409` | `#f9dca4` · `#734500` |
+| orange | accent | 60° | `#f7dfce` · `#6b411d` | `#f3ddcb` · `#6a4222` | 45° (55° pale) / 0.16 | `#feddca` · `#7f3409` | `#f7d8cb` · `#863311` |
+| red | danger | 27° | `#fbdcd8` · `#753a34` | `#f7d9d5` · `#6d3531` | 25° / 0.17 | `#fedcd8` · `#852d2b` | `#fad6d6` · `#8e2626` |
+| magenta | accent | 350° | `#f8dce8` · `#703955` | `#f4d8e4` · `#68354e` | 358° / 0.16 | `#fedbe5` · `#7e2f4f` | `#f9d4e2` · `#862a4c` |
+| purple | discovery | 310° | `#ecdef6` · `#5c3f70` | `#e8dbf2` · `#553b69` | 288° / 0.17 | `#e2e0fe` · `#4d3f8c` | `#dfdbfd` · `#4a3aa7` |
+| brown | accent (new) | 55° | `#ede1d9` · `#5c4738` | `#ebdfd7` · `#584437` | 48° / 0.09 | `#f8ded2` · `#6a412d` | — |
 
-- **Plan A, toward Notion.** Cool hues muted (blue 0.10, green 0.085), warm hues vivid (red 0.16, magenta 0.15, orange 0.15), as Notion's own palette is. Ochre yellow, steel blue, sage green. Tints at 1.1× the default curve, close to Notion's tag tints. Lagoon (chroma 0.087 at 700) stays the most saturated cool color on screen.
-- **Plan B, toward Claude.** Every hue at 0.15–0.17, with richer tints (1.25×). Hues follow Claude's: amber yellow 74°, grass green 145°, violet 288°, a redder orange at 45°. The cost: accents outshout Lagoon, as Claude's accents outshout its clay. Plan B's accents need to be used sparingly.
-- **The 700 steps still sit at 5.00:1 on white in both plans**, so a red and a teal tag carry the same weight and only hue differs. PLUS text on tags is darker than Notion's because PLUS keeps 4.5:1.
+- **Plan A follows Notion's ladder.** Read from its stylesheet, Notion uses the same ladder for every hue: tints at chroma about 0.035 (L 0.91), borders about 0.05, accents about 0.155 and tag text dark and quiet (L 0.40, chroma 0.08, about 9:1). Green, teal and brown run lower, and yellow's tints higher. Plan A copies that ladder in absolute chroma, so its tags are near-identical to Notion's. An earlier pass compared against Notion's mid-tone secondary text (`TexSec`) instead of its tag text; that made the warm hues too saturated and the tints too strong.
+- **Plan B follows Claude:** every hue at 0.15–0.17, tints 1.25× richer, Claude's hues (amber yellow 74°, grass green 145°, violet 288°, a redder orange at 45°). Accents outshout Lagoon, as Claude's outshout its clay.
+- **Lagoon keeps hue 205° in both plans** but takes each plan's chroma: soft tints in Plan A (step 200 `#c8e9ed`), richer in Plan B (`#b6edf3`). Its bold step is at the sRGB limit (chroma 0.087) in both, so buttons look the same.
+- **Tag text is step 850, not Atlassian's 800**, in both plans: Notion's tag text is about 9:1 and Claude's about 8:1, against 6.4:1 at 800. Gray tags use neutral 900.
+- **The 700 steps still sit at 5.00:1 on white in both plans**, so a red and a teal tag carry the same weight and only hue differs.
 
-Iteration 2's tuning (even spacing at step 700, warmer pale yellow and orange, caps of 0.13–0.15) is now the starting point both plans move from, kept in `build.py`.
+Iteration 2's tuning (even spacing at step 700, warmer pale yellow and orange, caps of 0.13–0.15) stays in `build.py` as the neutral baseline; Plan B starts from it, Plan A replaces it with Notion's ladder.
 
 **Accent contrast.** Atlassian's pairings for every family, light / dark, then increased contrast (IC). Bars: 4.5:1 for text and 3:1 for icons; 7:1 and 4.5:1 with increased contrast. All pass in both plans. Two PLUS fixes were needed, both found by the check:
 
@@ -429,6 +432,30 @@ For each view, the probe recorded:
 - backgrounds by area;
 - every border, radius and box shadow;
 - text colors and type.
+
+**Neutrals, fitted role by role.** Both plans now use the apps' own grays: Notion's `--c-*` roles and `palGra` ladder, and Claude's `--cds-gray` ramp with its alpha text roles. Each gray sits on the Atlassian step for its role (100 sunken, 300 border, 500 input border, 700 subtlest text, 800 subtle text, 1000 text; in dark 0 sunken, 100 surface, 250 overlay, 600 input border). Notion's own ladder lands almost one to one on those steps. Where an app falls under AA, PLUS takes the nearest value that passes:
+
+- **Tertiary text.** Notion's is 2.6:1 and Claude's 3.6:1. PLUS uses Notion's `palGra500` `#73726e` (4.8:1) and Claude's gray between muted and secondary, `#707070` (4.9:1).
+- **Input borders.** Both apps draw fields at about 1.2–1.5:1. PLUS keeps 3:1 (WCAG 1.4.11): Notion's `#8e8b86` and Claude's `#878787`.
+- **Dark sunken.** Notion's dark sidebar is lighter than its page. Atlassian's sunken level is darker, so Plan A uses `#141413` under a `#191919` surface. Claude's dark frame is already darker (`#0b0b0b` under `#151515`).
+
+Values with contrast on each plan's surface:
+
+| Role (token) | Notion light | Plan A light | Claude light | Plan B light | Notion dark | Plan A dark | Claude dark | Plan B dark |
+|---|---|---|---|---|---|---|---|---|
+| Surface (page) (`elevation.surface`) | `#ffffff` 1.0 | `#ffffff` 1.0 | `#ffffff` 1.0 | `#ffffff` 1.0 | `#191919` 1.0 | `#191919` 1.0 | `#151515` 1.0 | `#151515` 1.0 |
+| Frame, sidebar (sunken) (`elevation.surface.sunken`) | `#f9f8f7` 1.1 | `#f9f8f7` 1.1 | `#f9f9f9` 1.1 | `#f9f9f9` 1.1 | `#202020` 1.1 | `#141413` 1.0 | `#0b0b0b` 1.1 | `#0b0b0b` 1.1 |
+| Overlay (menu, modal) (`elevation.surface.overlay`) | `#ffffff` 1.0 | `#ffffff` 1.0 | `#ffffff` 1.0 | `#ffffff` 1.0 | `#202020` 1.1 | `#262626` 1.2 | `#202020` 1.1 | `#202020` 1.1 |
+| Text (`color.text`) | `#2c2c2b` 14.0 | `#2c2c2b` 14.0 | `#1a1a1a` 17.4 | `#1a1a1a` 17.4 | `#f0efed` 15.3 | `#f0efed` 15.3 | `#efefef` 15.9 | `#efefef` 15.9 |
+| Subtle text (`color.text.subtle`) | `#7d7a75` 4.3 | `#5f5e5b` 6.5 | `#666666` 5.7 | `#666666` 5.7 | `#ada9a3` 7.5 | `#ada9a3` 7.5 | `#c2c2c2` 10.3 | `#c2c2c2` 10.3 |
+| Subtlest text (`color.text.subtlest`) | `#a19e99` 2.7 | `#73726e` 4.8 | `#878787` 3.6 | `#707070` 5.0 | `#7d7a75` 4.1 | `#8e8b86` 5.2 | `#878787` 5.1 | `#878787` 5.1 |
+| Disabled text (`color.text.disabled`) | `#bcbab6` 1.9 | `#b9b8b7` 2.0 | `#a7a7a7` 2.4 | `#b3b3b3` 2.1 | `#5f5e59` 2.7 | `#575756` 2.4 | `#5e5e5e` 2.8 | `#545454` 2.4 |
+| Border (hairline) (`color.border`) | `#e6e5e3` 1.3 | `#ededed` 1.2 | `#ebebeb` 1.2 | `#e1e1e1` 1.3 | `#383836` 1.5 | `#30302f` 1.3 | `#2b2b2b` 1.3 | `#2c2c2c` 1.3 |
+| Input border (`color.border.input`) | `#d4d3cf` 1.5 | `#8e8b86` 3.4 | `#ebebeb` 1.2 | `#878787` 3.6 | `#5f5e59` 2.7 | `#7d7a75` 4.1 | `#2b2b2b` 1.3 | `#6b6b6b` 3.4 |
+| Neutral fill (`color.background.neutral`) | `#f0efed` 1.1 | `#f2f2f1` 1.1 | `#f3f3f3` 1.1 | `#f1f1f1` 1.1 | `#383836` 1.5 | `#2a2a2a` 1.2 | `#232323` 1.2 | `#272727` 1.2 |
+| Bold neutral (dark button) (`color.background.neutral.bold`) | `#2c2c2b` 14.0 | `#2c2c2b` 14.0 | `#191919` 17.6 | `#1a1a1a` 17.4 | `#f0efed` 15.3 | `#f0efed` 15.3 | `#efefef` 15.9 | `#efefef` 15.9 |
+
+Notion's dark grays come from its stylesheet's dark-theme block, so they are read, not measured on screen.
 
 **What the two apps share.** This is the pattern to copy, whichever plan wins.
 
@@ -705,6 +732,8 @@ Spacing, Radius, Border and Responsive follow the same pattern. PLUS already has
 
 ### 4.11 Increased contrast
 
+**Is it needed in dark too?** Atlassian ships both: color mode (light, dark, auto) and contrast (more, no preference, auto) are separate switches, so increased contrast exists for light and for dark. Its token package has `light-increased-contrast` and `dark-increased-contrast` themes. PLUS could ship only light plus increased contrast, but dark increased contrast costs nothing extra to generate, and someone who needs more contrast and prefers dark would otherwise get no help. *Recommend both.*
+
 **What it is.** An override on top of light and dark, for people who need stronger edges and text: low vision, glare, a cheap screen. Atlassian ships it as `data-contrast-mode`, with three settings: more, no preference, and auto, which follows the operating system's `prefers-contrast: more`. Its token package carries an increased-contrast value for every token, so PLUS generates the mode from those references instead of hand-picking.
 
 **What changes.** 263 of 469 tokens change in light and 233 in dark, the same in both plans:
@@ -791,7 +820,7 @@ The core tokens that change, Plan A (Plan B uses the same steps on its own ramps
 
 Each needs Bill's call, and each has a recommendation. The brand hue is settled: Lagoon, 205°.
 
-1. **Plan A (Paper) or Plan B (Neutral).** Each is now a whole direction: grays, lines, shadows and the accent palette (§4.2, §4.6). *Recommend A*, or a hybrid with Plan B's soft shadows on cards and overlays. Plan A's accents also keep Lagoon the most saturated cool color, which fits a teal brand; Plan B's would outshout it. The plans' grays and accents can be mixed, since token names are shared. Compare them on the same screen in the artifact before deciding.
+1. **Plan A (Paper) or Plan B (Neutral).** Each is now a whole direction: grays fitted role by role, lines, shadows, Lagoon's tints and the accent palette (§4.2, §4.6). *Recommend A*, or a hybrid with Plan B's soft shadows on cards and overlays. Plan A's soft tints and quiet tag text let Lagoon's buttons lead; Plan B's vivid accents compete with it. The plans' grays and accents can be mixed, since token names are shared. Compare them on the same screen in the artifact before deciding.
 2. **Selection color.** Both plans now select in neutral ink, as Notion, today's Claude and Atlassian's Finesse override do. The alternative is the teal tint, Atlassian's default. *Recommend neutral.* It keeps Lagoon for actions, links and focus.
 3. **Modal elevation.** Collapse "modals use light-4" into the single `overlay` level, as Atlassian does, or keep a separate modal shadow. *Recommend collapsing.* The blanket already separates a modal from a menu. This reverses a ruling.
 4. **Dragged items.** Overlay, as Atlassian specifies, or raised. *Recommend overlay.* A dragged card is above everything else on the page.
@@ -836,35 +865,35 @@ Each step is its own ticket; step 4 splits per pattern.
 
 | Step | teal | blue | aqua | green | lime | yellow |
 |---|---|---|---|---|---|---|
-| 100 | `#e6f9fc` 1.09 | `#eff7ff` 1.08 | `#ebf9f7` 1.08 | `#eff8f2` 1.08 | `#f5f7ee` 1.08 | `#faf6e9` 1.08 |
-| 200 | `#c0ebf0` 1.28 | `#d1e6f8` 1.28 | `#cde9e7` 1.28 | `#d4e8db` 1.28 | `#e0e5d1` 1.29 | `#ede3c6` 1.28 |
-| 250 | `#9cdae1` 1.55 | `#b7d3ec` 1.55 | `#b0d7d4` 1.55 | `#bad6c5` 1.55 | `#cbd3b7` 1.55 | `#dfcea7` 1.55 |
-| 300 | `#70c9d4` 1.91 | `#9ac0e2` 1.91 | `#8fc6c2` 1.90 | `#9ec5ad` 1.90 | `#b6c09a` 1.91 | `#d3b984` 1.90 |
-| 400 | `#23b5c2` 2.48 | `#77a8d3` 2.52 | `#67b0ac` 2.51 | `#7caf91` 2.50 | `#9da978` 2.51 | `#c39e59` 2.51 |
-| 500 | `#1d9eab` 3.22 | `#5895c8` 3.21 | `#3e9e99` 3.20 | `#5e9c79` 3.23 | `#88965a` 3.20 | `#b7872b` 3.22 |
-| 600 | `#198f9a` 3.86 | `#4886b8` 3.91 | `#2a8e89` 3.94 | `#4f8d6b` 3.92 | `#79874c` 3.90 | `#a77916` 3.90 |
-| 700 | `#147b84` 5.00 | `#3a74a2` 5.00 | `#1c7c77` 5.00 | `#407a5b` 5.06 | `#68743d` 5.06 | `#916812` 5.01 |
-| 800 | `#106972` 6.39 | `#31628a` 6.47 | `#166965` 6.48 | `#36684d` 6.47 | `#586334` 6.46 | `#7c590d` 6.38 |
-| 850 | `#0a545a` 8.65 | `#254e6f` 8.76 | `#0f5451` 8.72 | `#2a533d` 8.74 | `#464f28` 8.72 | `#644609` 8.67 |
-| 900 | `#063e43` 11.81 | `#1a3a54` 11.82 | `#063e3c` 11.92 | `#1d3e2c` 11.81 | `#333a1b` 11.92 | `#4a3405` 11.77 |
-| 1000 | `#043236` 13.86 | `#182d3f` 14.13 | `#10302f` 14.13 | `#1b3024` 14.05 | `#292e1a` 14.00 | `#39290b` 14.04 |
+| 100 | `#ecf8fa` 1.08 | `#f0f7ff` 1.08 | `#ecf8f7` 1.09 | `#f2f7f4` 1.08 | `#f4f7f0` 1.08 | `#fbf6e6` 1.08 |
+| 200 | `#c8e9ed` 1.29 | `#d2e5fa` 1.29 | `#c8eae7` 1.28 | `#d8e7de` 1.28 | `#e0e5d4` 1.29 | `#f1e3b6` 1.28 |
+| 250 | `#aed7db` 1.55 | `#bbd2eb` 1.55 | `#afd7d4` 1.56 | `#c2d4c8` 1.55 | `#cbd2bd` 1.56 | `#e2ce99` 1.55 |
+| 300 | `#93c4ca` 1.91 | `#a3bfdc` 1.90 | `#94c5c2` 1.90 | `#acc1b4` 1.90 | `#b7bfa6` 1.91 | `#d3b979` 1.91 |
+| 400 | `#44b2be` 2.51 | `#70a8e3` 2.50 | `#71aeaa` 2.52 | `#79af90` 2.52 | `#9aaa72` 2.51 | `#bba15f` 2.51 |
+| 500 | `#1d9eab` 3.22 | `#3e94e4` 3.20 | `#3e9e99` 3.20 | `#4f9f74` 3.21 | `#829846` 3.22 | `#b28a1c` 3.21 |
+| 600 | `#198f9a` 3.86 | `#1984dc` 3.91 | `#198f8a` 3.93 | `#339163` 3.91 | `#728a29` 3.90 | `#a17c16` 3.88 |
+| 700 | `#147b84` 5.00 | `#2272ba` 5.02 | `#1e7b77` 5.05 | `#327c56` 5.06 | `#63762b` 5.05 | `#8b6b11` 4.99 |
+| 800 | `#106972` 6.39 | `#25619a` 6.45 | `#106b66` 6.33 | `#2c6a4a` 6.43 | `#556528` 6.41 | `#775b0d` 6.39 |
+| 850 | `#0a545a` 8.65 | `#224d77` 8.76 | `#135450` 8.71 | `#27533b` 8.80 | `#444f23` 8.79 | `#5e4810` 8.71 |
+| 900 | `#063e43` 11.81 | `#18395a` 11.85 | `#0b3e3c` 11.87 | `#1c3e2c` 11.83 | `#323b19` 11.83 | `#463509` 11.84 |
+| 1000 | `#043236` 13.86 | `#152d46` 14.04 | `#0e312f` 14.01 | `#173122` 14.01 | `#272e15` 14.11 | `#372a0b` 14.01 |
 
 **Plan A hue ramps, part 2** (hex · contrast on white)
 
 | Step | orange | red | magenta | purple | brown |
 |---|---|---|---|---|---|
-| 100 | `#fff4ec` 1.08 | `#fff4f2` 1.08 | `#fff3f8` 1.08 | `#f9f4ff` 1.08 | `#fdf4f0` 1.08 |
-| 200 | `#fdddc3` 1.29 | `#fedcd7` 1.28 | `#fedae9` 1.28 | `#ecdef9` 1.28 | `#f2e0d5` 1.28 |
-| 250 | `#f3c7a3` 1.55 | `#fdc2ba` 1.54 | `#f7c0d9` 1.56 | `#dbc8ed` 1.56 | `#e4cabc` 1.56 |
-| 300 | `#ecaf7e` 1.91 | `#fba69c` 1.90 | `#f0a6c8` 1.91 | `#ccb2e3` 1.90 | `#d7b5a2` 1.91 |
-| 400 | `#df9252` 2.51 | `#ef867b` 2.51 | `#e387b4` 2.50 | `#b797d4` 2.50 | `#c59b82` 2.50 |
-| 500 | `#d5781c` 3.21 | `#e7685e` 3.21 | `#d86ba3` 3.21 | `#a77fca` 3.22 | `#b78566` 3.20 |
-| 600 | `#c16b16` 3.90 | `#d6584f` 3.91 | `#c75c93` 3.90 | `#9870ba` 3.92 | `#a77659` 3.90 |
-| 700 | `#a75c12` 5.02 | `#bd4941` 5.01 | `#af4d80` 5.00 | `#8560a3` 5.00 | `#92654a` 5.02 |
-| 800 | `#904e0e` 6.40 | `#a23e37` 6.40 | `#96416e` 6.41 | `#71518c` 6.45 | `#7d563f` 6.41 |
-| 850 | `#733e09` 8.67 | `#82302a` 8.73 | `#793257` 8.73 | `#5a4070` 8.74 | `#644431` 8.70 |
-| 900 | `#562d05` 11.84 | `#63221e` 11.81 | `#5b2441` 11.84 | `#432f55` 11.82 | `#4b3222` 11.81 |
-| 1000 | `#442307` 14.10 | `#4a1e1b` 14.07 | `#451f32` 14.05 | `#342640` 14.03 | `#39281e` 14.04 |
+| 100 | `#fdf4ee` 1.09 | `#fff4f2` 1.08 | `#fef3f8` 1.08 | `#f9f4fe` 1.08 | `#faf5f2` 1.08 |
+| 200 | `#f7dfce` 1.28 | `#fbdcd8` 1.29 | `#f8dce8` 1.28 | `#ecdef6` 1.28 | `#ede1d9` 1.28 |
+| 250 | `#e6cab5` 1.56 | `#ecc7c2` 1.55 | `#e9c6d5` 1.56 | `#d9cae6` 1.55 | `#dcccc3` 1.56 |
+| 300 | `#d6b69c` 1.90 | `#ddb2ac` 1.90 | `#d9b1c3` 1.90 | `#c8b5d7` 1.90 | `#cab8ad` 1.91 |
+| 400 | `#cd996e` 2.51 | `#e28d84` 2.51 | `#d78eb0` 2.50 | `#b996d5` 2.50 | `#bd9d89` 2.52 |
+| 500 | `#c87f3e` 3.20 | `#e16c62` 3.22 | `#d26fa1` 3.22 | `#ad7bd2` 3.21 | `#b2866a` 3.23 |
+| 600 | `#bd6d1c` 3.91 | `#d7574e` 3.92 | `#c75c93` 3.90 | `#a169c9` 3.90 | `#a57757` 3.91 |
+| 700 | `#a06022` 5.01 | `#b64f46` 5.00 | `#a9527e` 5.01 | `#8a5caa` 5.01 | `#8e674d` 5.00 |
+| 800 | `#89511d` 6.44 | `#97463f` 6.43 | `#90466c` 6.41 | `#754f90` 6.41 | `#755945` 6.42 |
+| 850 | `#6b411d` 8.75 | `#753a34` 8.71 | `#703955` 8.73 | `#5c3f70` 8.75 | `#5c4738` 8.70 |
+| 900 | `#503013` 11.84 | `#582a25` 11.85 | `#55293f` 11.83 | `#452e55` 11.83 | `#453429` 11.82 |
+| 1000 | `#3f2611` 14.03 | `#45211e` 14.10 | `#422132` 14.04 | `#352542` 14.05 | `#362921` 14.04 |
 
 **Plan B hue ramps, part 1** (hex · contrast on white)
 
@@ -904,48 +933,48 @@ Each step is its own ticket; step 4 splits per pattern.
 
 | Step | A dark | B dark | A light | B light |
 |---|---|---|---|---|
-| 0 | `#181716` 17.90 | `#171717` 17.93 | `#ffffff` 1.00 | `#ffffff` 1.00 |
-| 100 | `#1e1e1d` 16.68 | `#1e1e1e` 16.67 | `#f9f8f7` 1.06 | `#f8f8f8` 1.06 |
-| 200 | `#252423` 15.49 | `#242424` 15.52 | `#f3f1ef` 1.13 | `#f1f1f1` 1.13 |
-| 250 | `#2c2b2a` 14.13 | `#2b2b2b` 14.16 |  |  |
-| 300 | `#313130` 13.02 | `#313131` 13.01 | `#e0dedc` 1.34 | `#dedede` 1.35 |
-| 350 | `#3f3e3d` 10.67 | `#3e3e3e` 10.70 |  |  |
-| 400 | `#4d4d4c` 8.46 | `#4d4d4d` 8.45 | `#bab8b5` 1.98 | `#b8b8b8` 1.98 |
-| 500 | `#656564` 5.84 | `#656565` 5.83 | `#928f8a` 3.22 | `#8f8f8f` 3.23 |
-| 600 | `#828281` 3.85 | `#828282` 3.84 | `#827f7b` 3.98 | `#7f7f7f` 4.00 |
-| 700 | `#9a9998` 2.84 | `#999999` 2.85 | `#706d69` 5.15 | `#6d6d6d` 5.17 |
-| 800 | `#acabaa` 2.29 | `#ababab` 2.30 | `#555350` 7.67 | `#535353` 7.69 |
-| 900 | `#c1c0bf` 1.82 | `#c0c0c0` 1.82 | `#3f3d3b` 10.81 | `#3d3d3d` 10.86 |
-| 1000 | `#d0cfce` 1.56 | `#cfcfcf` 1.56 | `#2c2b2a` 14.13 | `#2b2b2b` 14.16 |
-| 1100 | `#e4e3e2` 1.28 | `#e3e3e3` 1.28 | `#1f1e1e` 16.63 | `#1e1e1e` 16.67 |
+| 0 | `#141413` 18.43 | `#0b0b0b` 19.68 | `#ffffff` 1.00 | `#ffffff` 1.00 |
+| 100 | `#191919` 17.58 | `#151515` 18.26 | `#f9f8f7` 1.06 | `#f9f9f9` 1.05 |
+| 200 | `#202020` 16.29 | `#191919` 17.58 | `#f0efed` 1.15 | `#efefef` 1.15 |
+| 250 | `#262626` 15.13 | `#202020` 16.29 |  |  |
+| 300 | `#2c2c2b` 13.98 | `#2c2c2c` 13.97 | `#e6e5e3` 1.26 | `#e0e0e0` 1.32 |
+| 350 | `#383836` 11.75 | `#383838` 11.73 |  |  |
+| 400 | `#4a4946` 9.00 | `#444444` 9.74 | `#bcbab6` 1.94 | `#c2c2c2` 1.78 |
+| 500 | `#5f5e59` 6.50 | `#5e5e5e` 6.48 | `#8e8b86` 3.39 | `#878787` 3.59 |
+| 600 | `#7d7a75` 4.27 | `#6b6b6b` 5.33 | `#7d7a75` 4.27 | `#7f7f7f` 4.00 |
+| 700 | `#8e8b86` 3.39 | `#878787` 3.59 | `#73726e` 4.82 | `#707070` 4.95 |
+| 800 | `#ada9a3` 2.34 | `#c2c2c2` 1.78 | `#5f5e5b` 6.48 | `#666666` 5.74 |
+| 900 | `#d4d3cf` 1.50 | `#e0e0e0` 1.32 | `#484743` 9.30 | `#383838` 11.73 |
+| 1000 | `#f0efed` 1.15 | `#efefef` 1.15 | `#2c2c2b` 13.98 | `#1a1a1a` 17.40 |
+| 1100 | `#f7f6f5` 1.08 | `#f9f9f9` 1.05 | `#1d1b16` 17.20 | `#0b0b0b` 19.68 |
 
 **OKLCH source values: Lagoon and both light neutrals**
 
 | Step | teal (Lagoon) | neutral A | neutral B |
 |---|---|---|---|
 | 0 |  | `oklch(1.000 0.000 90)` | `oklch(1.000 0.000 90)` |
-| 100 | `oklch(0.969 0.020 208)` | `oklch(0.980 0.002 68)` | `oklch(0.979 0.000 90)` |
-| 200 | `oklch(0.911 0.045 205)` | `oklch(0.959 0.003 68)` | `oklch(0.958 0.000 90)` |
-| 300 | `oklch(0.784 0.087 206)` | `oklch(0.902 0.003 68)` | `oklch(0.901 0.000 90)` |
-| 400 | `oklch(0.708 0.115 204)` | `oklch(0.783 0.005 78)` | `oklch(0.783 0.000 90)` |
-| 500 | `oklch(0.641 0.104 206)` | `oklch(0.651 0.008 81)` | `oklch(0.650 0.000 90)` |
-| 600 | `oklch(0.595 0.097 205)` | `oklch(0.598 0.007 75)` | `oklch(0.596 0.000 90)` |
-| 700 | `oklch(0.534 0.087 204)` | `oklch(0.536 0.007 75)` | `oklch(0.535 0.000 90)` |
-| 800 | `oklch(0.477 0.077 206)` | `oklch(0.443 0.006 78)` | `oklch(0.442 0.000 90)` |
-| 900 | `oklch(0.333 0.054 204)` | `oklch(0.361 0.004 68)` | `oklch(0.360 0.000 90)` |
-| 1000 | `oklch(0.290 0.047 204)` | `oklch(0.290 0.002 68)` | `oklch(0.289 0.000 90)` |
-| 1100 |  | `oklch(0.236 0.002 17)` | `oklch(0.235 0.000 90)` |
+| 100 | `oklch(0.971 0.013 209)` | `oklch(0.980 0.002 68)` | `oklch(0.982 0.000 90)` |
+| 200 | `oklch(0.911 0.035 205)` | `oklch(0.952 0.003 85)` | `oklch(0.952 0.000 90)` |
+| 300 | `oklch(0.788 0.052 206)` | `oklch(0.922 0.003 85)` | `oklch(0.907 0.000 90)` |
+| 400 | `oklch(0.706 0.100 205)` | `oklch(0.789 0.006 85)` | `oklch(0.814 0.000 90)` |
+| 500 | `oklch(0.641 0.104 206)` | `oklch(0.638 0.008 81)` | `oklch(0.623 0.000 90)` |
+| 600 | `oklch(0.595 0.097 205)` | `oklch(0.581 0.008 81)` | `oklch(0.596 0.000 90)` |
+| 700 | `oklch(0.534 0.087 204)` | `oklch(0.552 0.006 95)` | `oklch(0.545 0.000 90)` |
+| 800 | `oklch(0.477 0.077 206)` | `oklch(0.482 0.005 91)` | `oklch(0.510 0.000 90)` |
+| 900 | `oklch(0.333 0.054 204)` | `oklch(0.398 0.007 95)` | `oklch(0.341 0.000 90)` |
+| 1000 | `oklch(0.290 0.047 204)` | `oklch(0.293 0.002 107)` | `oklch(0.218 0.000 90)` |
+| 1100 |  | `oklch(0.223 0.010 89)` | `oklch(0.150 0.000 90)` |
 
 **Alpha neutrals** (ink in light, paper in dark)
 
 | Step | A light | A dark | B light | B dark |
 |---|---|---|---|---|
-| 100A | `#1f1e1e08` | `#e4e3e20a` | `#1e1e1e08` | `#e3e3e30a` |
-| 200A | `#1f1e1e0f` | `#e4e3e214` | `#1e1e1e0f` | `#e3e3e314` |
-| 250A |  | `#e4e3e21a` |  | `#e3e3e31a` |
-| 300A | `#1f1e1e24` | `#e4e3e229` | `#1e1e1e24` | `#e3e3e329` |
-| 400A | `#1f1e1e4f` | `#e4e3e247` | `#1e1e1e4f` | `#e3e3e347` |
-| 500A | `#1f1e1e7d` | `#e4e3e280` | `#1e1e1e7d` | `#e3e3e380` |
+| 100A | `#1d1b1608` | `#f7f6f50a` | `#0b0b0b08` | `#f9f9f90a` |
+| 200A | `#1d1b160f` | `#f7f6f514` | `#0b0b0b0f` | `#f9f9f914` |
+| 250A |  | `#f7f6f51a` |  | `#f9f9f91a` |
+| 300A | `#1d1b1624` | `#f7f6f529` | `#0b0b0b24` | `#f9f9f929` |
+| 400A | `#1d1b164f` | `#f7f6f547` | `#0b0b0b4f` | `#f9f9f947` |
+| 500A | `#1d1b167d` | `#f7f6f580` | `#0b0b0b7d` | `#f9f9f980` |
 
 ## Appendix B: Semantic tokens, light and dark, both plans
 
@@ -956,161 +985,161 @@ Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Pla
 
 | Token | For | Plan A light / dark | Plan B light / dark |
 |---|---|---|---|
-| `color.text` | Primary text, such as body copy, sentence case headers, and buttons | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
-| `color.text.disabled` | Text in a disabled state | neutralAlpha.400 `#1f1e1e4f` / darkNeutralAlpha.400 `#e4e3e247` | neutralAlpha.400 `#1e1e1e4f` / darkNeutralAlpha.400 `#e3e3e347` |
-| `color.text.inverse` | Text on bold backgrounds | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1d` | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1e` |
-| `color.text.selected` | Text that communicates selection, such as the active tab or a selected navigation item, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.text.inverse instead. Do not use for unselected links, brand emphasis, or hover alone. Keep the selected text treatment when the element also has focus *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
-| `color.text.brand` | Text that reinforces our brand | teal.700 `#147b84` / teal.400 `#23b5c2` | same as A |
-| `color.text.danger` | Critical text, such as input field error messaging | red.800 `#a23e37` / red.300 `#fba69c` | red.800 `#a53a37` / red.300 `#fca59e` |
-| `color.text.danger.bolder` | Text on top of danger semantic labels to ensure accessibility and desired visual appearance | red.900 `#63221e` / red.200 `#fedcd7` | red.900 `#651f1e` / red.200 `#fedcd8` |
-| `color.text.warning` | Text to emphasize caution, such as in moved lozenges | yellow.800 `#7c590d` / yellow.300 `#d3b984` | yellow.800 `#81560d` / yellow.300 `#e4b469` |
-| `color.text.warning.inverse` | Text when on bold warning backgrounds | neutral.1000 `#2c2b2a` / darkNeutral.100 `#1e1e1d` | neutral.1000 `#2b2b2b` / darkNeutral.100 `#1e1e1e` |
-| `color.text.warning.bolder` | Text on top of warning semantic labels to ensure accessibility and desired visual appearance | yellow.900 `#4a3405` / yellow.200 `#ede3c6` | yellow.900 `#4e3205` / yellow.200 `#f6e1ba` |
-| `color.text.success` | Text to communicate a favorable outcome, such as input field success messaging | green.800 `#36684d` / green.300 `#9ec5ad` | green.800 `#186d24` / green.300 `#88cc8a` |
-| `color.text.success.bolder` | Text on top of success semantic labels to ensure accessibility and desired visual appearance | green.900 `#1d3e2c` / green.200 `#d4e8db` | green.900 `#084111` / green.200 `#c9ecc9` |
-| `color.text.discovery` | Text to emphasize change or something new, such as in new lozenges | purple.800 `#71518c` / purple.300 `#ccb2e3` | purple.800 `#6150ae` / purple.300 `#bbb5fc` |
-| `color.text.discovery.bolder` | Text on top of discovery semantic labels to ensure accessibility and desired visual appearance | purple.900 `#432f55` / purple.200 `#ecdef9` | purple.900 `#392e6b` / purple.200 `#e2e0fe` |
-| `color.text.information` | Informative text or to communicate something is in progress, such as in-progress lozenges | blue.800 `#31628a` / blue.300 `#9ac0e2` | blue.800 `#235ea9` / blue.300 `#91befc` |
-| `color.text.information.bolder` | Text on top of information semantic labels to ensure accessibility and desired visual appearance | blue.900 `#1a3a54` / blue.200 `#d1e6f8` | blue.900 `#103768` / blue.200 `#d3e5fe` |
-| `color.text.subtlest` | Tertiary text, such as meta-data, breadcrumbs, input field placeholder and helper text | neutral.700 `#706d69` / darkNeutral.700 `#9a9998` | neutral.700 `#6d6d6d` / darkNeutral.700 `#999999` |
-| `color.text.subtle` | Secondary text, such as navigation, subtle button links, input field labels, and all caps subheadings | neutral.800 `#555350` / darkNeutral.800 `#acabaa` | neutral.800 `#535353` / darkNeutral.800 `#ababab` |
+| `color.text` | Primary text, such as body copy, sentence case headers, and buttons | neutral.1000 `#2c2c2b` / darkNeutral.1000 `#f0efed` | neutral.1000 `#1a1a1a` / darkNeutral.1000 `#efefef` |
+| `color.text.disabled` | Text in a disabled state | neutralAlpha.400 `#1d1b164f` / darkNeutralAlpha.400 `#f7f6f547` | neutralAlpha.400 `#0b0b0b4f` / darkNeutralAlpha.400 `#f9f9f947` |
+| `color.text.inverse` | Text on bold backgrounds | neutral.0 `#ffffff` / darkNeutral.100 `#191919` | neutral.0 `#ffffff` / darkNeutral.100 `#151515` |
+| `color.text.selected` | Text that communicates selection, such as the active tab or a selected navigation item, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.text.inverse instead. Do not use for unselected links, brand emphasis, or hover alone. Keep the selected text treatment when the element also has focus *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2c2b` / darkNeutral.1000 `#f0efed` | neutral.1000 `#1a1a1a` / darkNeutral.1000 `#efefef` |
+| `color.text.brand` | Text that reinforces our brand | teal.700 `#147b84` / teal.400 `#44b2be` | teal.700 `#147b84` / teal.400 `#23b5c2` |
+| `color.text.danger` | Critical text, such as input field error messaging | red.800 `#97463f` / red.300 `#ddb2ac` | red.800 `#a53a37` / red.300 `#fca59e` |
+| `color.text.danger.bolder` | Text on top of danger semantic labels to ensure accessibility and desired visual appearance | red.900 `#582a25` / red.200 `#fbdcd8` | red.900 `#651f1e` / red.200 `#fedcd8` |
+| `color.text.warning` | Text to emphasize caution, such as in moved lozenges | yellow.800 `#775b0d` / yellow.300 `#d3b979` | yellow.800 `#81560d` / yellow.300 `#e4b469` |
+| `color.text.warning.inverse` | Text when on bold warning backgrounds | neutral.1000 `#2c2c2b` / darkNeutral.100 `#191919` | neutral.1000 `#1a1a1a` / darkNeutral.100 `#151515` |
+| `color.text.warning.bolder` | Text on top of warning semantic labels to ensure accessibility and desired visual appearance | yellow.900 `#463509` / yellow.200 `#f1e3b6` | yellow.900 `#4e3205` / yellow.200 `#f6e1ba` |
+| `color.text.success` | Text to communicate a favorable outcome, such as input field success messaging | green.800 `#2c6a4a` / green.300 `#acc1b4` | green.800 `#186d24` / green.300 `#88cc8a` |
+| `color.text.success.bolder` | Text on top of success semantic labels to ensure accessibility and desired visual appearance | green.900 `#1c3e2c` / green.200 `#d8e7de` | green.900 `#084111` / green.200 `#c9ecc9` |
+| `color.text.discovery` | Text to emphasize change or something new, such as in new lozenges | purple.800 `#754f90` / purple.300 `#c8b5d7` | purple.800 `#6150ae` / purple.300 `#bbb5fc` |
+| `color.text.discovery.bolder` | Text on top of discovery semantic labels to ensure accessibility and desired visual appearance | purple.900 `#452e55` / purple.200 `#ecdef6` | purple.900 `#392e6b` / purple.200 `#e2e0fe` |
+| `color.text.information` | Informative text or to communicate something is in progress, such as in-progress lozenges | blue.800 `#25619a` / blue.300 `#a3bfdc` | blue.800 `#235ea9` / blue.300 `#91befc` |
+| `color.text.information.bolder` | Text on top of information semantic labels to ensure accessibility and desired visual appearance | blue.900 `#18395a` / blue.200 `#d2e5fa` | blue.900 `#103768` / blue.200 `#d3e5fe` |
+| `color.text.subtlest` | Tertiary text, such as meta-data, breadcrumbs, input field placeholder and helper text | neutral.700 `#73726e` / darkNeutral.700 `#8e8b86` | neutral.700 `#707070` / darkNeutral.700 `#878787` |
+| `color.text.subtle` | Secondary text, such as navigation, subtle button links, input field labels, and all caps subheadings | neutral.800 `#5f5e5b` / darkNeutral.800 `#ada9a3` | neutral.800 `#666666` / darkNeutral.800 `#c2c2c2` |
 
 #### Icon
 
 | Token | For | Plan A light / dark | Plan B light / dark |
 |---|---|---|---|
-| `color.icon` | Icon-only buttons, or icons paired with color.text | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
-| `color.icon.disabled` | Icons in a disabled state | neutralAlpha.400 `#1f1e1e4f` / darkNeutralAlpha.400 `#e4e3e247` | neutralAlpha.400 `#1e1e1e4f` / darkNeutralAlpha.400 `#e3e3e347` |
-| `color.icon.inverse` | Icons on bold backgrounds | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1d` | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1e` |
-| `color.icon.selected` | Icons that communicate selection, such as icons in selected navigation items, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.icon.inverse instead. Do not use for brand emphasis or hover alone. Keep the selected icon treatment when the element also has focus *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
-| `color.icon.brand` | Icons that reinforce our brand | teal.700 `#147b84` / teal.400 `#23b5c2` | same as A |
-| `color.icon.danger` | Icons communicating critical information, such as those used in error handing | red.700 `#bd4941` / red.500 `#e7685e` | red.700 `#c14543` / red.500 `#ec645f` |
-| `color.icon.warning` | Icons communicating caution, such as those used in warning section messages | yellow.600 `#a77916` / yellow.300 `#d3b984` | yellow.600 `#ae7616` / yellow.300 `#e4b469` |
-| `color.icon.warning.inverse` | Icons when on bold warning backgrounds | neutral.1000 `#2c2b2a` / darkNeutral.100 `#1e1e1d` | neutral.1000 `#2b2b2b` / darkNeutral.100 `#1e1e1e` |
-| `color.icon.success` | Icons communicating a favorable outcome, such as those used in success section messaged | green.600 `#4f8d6b` / green.500 `#5e9c79` | green.600 `#2c9338` / green.500 `#3fa348` |
-| `color.icon.discovery` | Icons communicating change or something new, such as discovery section messages | purple.600 `#9870ba` / purple.500 `#a77fca` | purple.600 `#836fe4` / purple.500 `#917ff5` |
-| `color.icon.information` | Icons communicating information or something in-progress, such as information section messages | blue.600 `#4886b8` / blue.500 `#5895c8` | blue.600 `#3881df` / blue.500 `#4790f0` |
-| `color.icon.subtlest` | Icons paired with color.text.subtlest | neutral.700 `#706d69` / darkNeutral.700 `#9a9998` | neutral.700 `#6d6d6d` / darkNeutral.700 `#999999` |
-| `color.icon.subtle` | Icons paired with color.text.subtle | neutral.800 `#555350` / darkNeutral.800 `#acabaa` | neutral.800 `#535353` / darkNeutral.800 `#ababab` |
+| `color.icon` | Icon-only buttons, or icons paired with color.text | neutral.1000 `#2c2c2b` / darkNeutral.1000 `#f0efed` | neutral.1000 `#1a1a1a` / darkNeutral.1000 `#efefef` |
+| `color.icon.disabled` | Icons in a disabled state | neutralAlpha.400 `#1d1b164f` / darkNeutralAlpha.400 `#f7f6f547` | neutralAlpha.400 `#0b0b0b4f` / darkNeutralAlpha.400 `#f9f9f947` |
+| `color.icon.inverse` | Icons on bold backgrounds | neutral.0 `#ffffff` / darkNeutral.100 `#191919` | neutral.0 `#ffffff` / darkNeutral.100 `#151515` |
+| `color.icon.selected` | Icons that communicate selection, such as icons in selected navigation items, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.icon.inverse instead. Do not use for brand emphasis or hover alone. Keep the selected icon treatment when the element also has focus *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2c2b` / darkNeutral.1000 `#f0efed` | neutral.1000 `#1a1a1a` / darkNeutral.1000 `#efefef` |
+| `color.icon.brand` | Icons that reinforce our brand | teal.700 `#147b84` / teal.400 `#44b2be` | teal.700 `#147b84` / teal.400 `#23b5c2` |
+| `color.icon.danger` | Icons communicating critical information, such as those used in error handing | red.700 `#b64f46` / red.500 `#e16c62` | red.700 `#c14543` / red.500 `#ec645f` |
+| `color.icon.warning` | Icons communicating caution, such as those used in warning section messages | yellow.600 `#a17c16` / yellow.300 `#d3b979` | yellow.600 `#ae7616` / yellow.300 `#e4b469` |
+| `color.icon.warning.inverse` | Icons when on bold warning backgrounds | neutral.1000 `#2c2c2b` / darkNeutral.100 `#191919` | neutral.1000 `#1a1a1a` / darkNeutral.100 `#151515` |
+| `color.icon.success` | Icons communicating a favorable outcome, such as those used in success section messaged | green.600 `#339163` / green.500 `#4f9f74` | green.600 `#2c9338` / green.500 `#3fa348` |
+| `color.icon.discovery` | Icons communicating change or something new, such as discovery section messages | purple.600 `#a169c9` / purple.500 `#ad7bd2` | purple.600 `#836fe4` / purple.500 `#917ff5` |
+| `color.icon.information` | Icons communicating information or something in-progress, such as information section messages | blue.600 `#1984dc` / blue.500 `#3e94e4` | blue.600 `#3881df` / blue.500 `#4790f0` |
+| `color.icon.subtlest` | Icons paired with color.text.subtlest | neutral.700 `#73726e` / darkNeutral.700 `#8e8b86` | neutral.700 `#707070` / darkNeutral.700 `#878787` |
+| `color.icon.subtle` | Icons paired with color.text.subtle | neutral.800 `#5f5e5b` / darkNeutral.800 `#ada9a3` | neutral.800 `#666666` / darkNeutral.800 `#c2c2c2` |
 
 #### Border
 
 | Token | For | Plan A light / dark | Plan B light / dark |
 |---|---|---|---|
-| `color.border` | Use to visually group or separate UI elements, such as flat cards or side panel dividers *Plan A: Notion draws dividers and table grids at about 7% warm ink (#f0efed on white); 8% here. Plan B: claude.ai draws rules and card edges at 8-12% black and dark borders at 10% white.* | ink @8% `#1f1e1e14` / paper @10% `#e4e3e21a` | ink @12% `#1e1e1e1f` / paper @10% `#e3e3e31a` |
-| `color.border.disabled` | Borders of elements in a disabled state | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1e1e1e0f` / darkNeutralAlpha.200 `#e3e3e314` |
-| `color.border.focused` | The focus ring or border of an element that currently has keyboard or input focus. Do not use to indicate selection or hover alone. When an element is both selected and focused, keep its selected treatment and add a separate focus indicator *One step darker than Atlassian (500), for margin: 3.9:1 on white instead of 3.2:1.* | teal.600 `#198f9a` / teal.300 `#70c9d4` | same as A |
-| `color.border.input` | Borders of form UI elements, such as text fields, checkboxes, and radio buttons | neutral.500 `#928f8a` / darkNeutral.600 `#828281` | neutral.500 `#8f8f8f` / darkNeutral.600 `#828282` |
-| `color.border.input.search` | The border of search inputs | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.300 `#1e1e1e24` / darkNeutralAlpha.300 `#e3e3e329` |
-| `color.border.inverse` | Borders on bold backgrounds | neutral.0 `#ffffff` / darkNeutral.0 `#181716` | neutral.0 `#ffffff` / darkNeutral.0 `#171717` |
-| `color.border.selected` | Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a dropdown trigger. Do not use as a keyboard focus indicator; use color.border.focused for focus and preserve the selected treatment when both states apply *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
-| `color.border.brand` | Borders or visual indicators of elements that reinforce our brand, such as logos or primary buttons | teal.700 `#147b84` / teal.400 `#23b5c2` | same as A |
-| `color.border.danger` | Borders communicating critical information, such as the borders on invalid text fields | red.600 `#d6584f` / red.500 `#e7685e` | red.600 `#da5450` / red.500 `#ec645f` |
-| `color.border.danger.subtle` | Decorative danger borders that do not need to meet 3:1 contrast requirements | red.300 `#fba69c` / red.800 `#a23e37` | red.300 `#fca59e` / red.800 `#a53a37` |
-| `color.border.warning` | Borders communicating caution | yellow.600 `#a77916` / yellow.500 `#b7872b` | yellow.600 `#ae7616` / yellow.500 `#c1841a` |
-| `color.border.warning.subtle` | Decorative warning borders that do not need to meet 3:1 contrast requirements | yellow.300 `#d3b984` / yellow.800 `#7c590d` | yellow.300 `#e4b469` / yellow.800 `#81560d` |
-| `color.border.success` | Borders communicating a favorable outcome, such as the borders on validated text fields | green.600 `#4f8d6b` / green.500 `#5e9c79` | green.600 `#2c9338` / green.500 `#3fa348` |
-| `color.border.success.subtle` | Decorative success borders that do not need to meet 3:1 contrast requirements | green.300 `#9ec5ad` / green.800 `#36684d` | green.300 `#88cc8a` / green.800 `#186d24` |
-| `color.border.discovery` | Borders communicating change or something new, such as the borders in onboarding spotlights | purple.600 `#9870ba` / purple.500 `#a77fca` | purple.600 `#836fe4` / purple.500 `#917ff5` |
-| `color.border.discovery.subtle` | Decorative discovery borders that do not need to meet 3:1 contrast requirements | purple.300 `#ccb2e3` / purple.800 `#71518c` | purple.300 `#bbb5fc` / purple.800 `#6150ae` |
-| `color.border.information` | Borders communicating information or something in-progress | blue.600 `#4886b8` / blue.500 `#5895c8` | blue.600 `#3881df` / blue.500 `#4790f0` |
-| `color.border.information.subtle` | Decorative information borders that do not need to meet 3:1 contrast requirements | blue.300 `#9ac0e2` / blue.800 `#31628a` | blue.300 `#91befc` / blue.800 `#235ea9` |
-| `color.border.bold` | A neutral border option that passes min 3:1 contrast ratios | neutral.600 `#827f7b` / darkNeutral.600 `#828281` | neutral.600 `#7f7f7f` / darkNeutral.600 `#828282` |
-| `color.border.focused.inverse` | PLUS addition. Focus ring on a bold or colored ground (today --color-focus-ring-inverse). *today's Focus Ring Inverse* | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1d` | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1e` |
+| `color.border` | Use to visually group or separate UI elements, such as flat cards or side panel dividers *Plan A: Notion draws dividers and table grids at about 7% warm ink (#f0efed on white); 8% here. Plan B: claude.ai draws rules and card edges at 8-12% black and dark borders at 10% white.* | ink @8% `#1d1b1614` / paper @10% `#f7f6f51a` | ink @12% `#0b0b0b1f` / paper @10% `#f9f9f91a` |
+| `color.border.disabled` | Borders of elements in a disabled state | neutralAlpha.200 `#1d1b160f` / darkNeutralAlpha.200 `#f7f6f514` | neutralAlpha.200 `#0b0b0b0f` / darkNeutralAlpha.200 `#f9f9f914` |
+| `color.border.focused` | The focus ring or border of an element that currently has keyboard or input focus. Do not use to indicate selection or hover alone. When an element is both selected and focused, keep its selected treatment and add a separate focus indicator *One step darker than Atlassian (500), for margin: 3.9:1 on white instead of 3.2:1.* | teal.600 `#198f9a` / teal.300 `#93c4ca` | teal.600 `#198f9a` / teal.300 `#52ccda` |
+| `color.border.input` | Borders of form UI elements, such as text fields, checkboxes, and radio buttons | neutral.500 `#8e8b86` / darkNeutral.600 `#7d7a75` | neutral.500 `#878787` / darkNeutral.600 `#6b6b6b` |
+| `color.border.input.search` | The border of search inputs | neutralAlpha.300 `#1d1b1624` / darkNeutralAlpha.300 `#f7f6f529` | neutralAlpha.300 `#0b0b0b24` / darkNeutralAlpha.300 `#f9f9f929` |
+| `color.border.inverse` | Borders on bold backgrounds | neutral.0 `#ffffff` / darkNeutral.0 `#141413` | neutral.0 `#ffffff` / darkNeutral.0 `#0b0b0b` |
+| `color.border.selected` | Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a dropdown trigger. Do not use as a keyboard focus indicator; use color.border.focused for focus and preserve the selected treatment when both states apply *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2c2b` / darkNeutral.1000 `#f0efed` | neutral.1000 `#1a1a1a` / darkNeutral.1000 `#efefef` |
+| `color.border.brand` | Borders or visual indicators of elements that reinforce our brand, such as logos or primary buttons | teal.700 `#147b84` / teal.400 `#44b2be` | teal.700 `#147b84` / teal.400 `#23b5c2` |
+| `color.border.danger` | Borders communicating critical information, such as the borders on invalid text fields | red.600 `#d7574e` / red.500 `#e16c62` | red.600 `#da5450` / red.500 `#ec645f` |
+| `color.border.danger.subtle` | Decorative danger borders that do not need to meet 3:1 contrast requirements | red.300 `#ddb2ac` / red.800 `#97463f` | red.300 `#fca59e` / red.800 `#a53a37` |
+| `color.border.warning` | Borders communicating caution | yellow.600 `#a17c16` / yellow.500 `#b28a1c` | yellow.600 `#ae7616` / yellow.500 `#c1841a` |
+| `color.border.warning.subtle` | Decorative warning borders that do not need to meet 3:1 contrast requirements | yellow.300 `#d3b979` / yellow.800 `#775b0d` | yellow.300 `#e4b469` / yellow.800 `#81560d` |
+| `color.border.success` | Borders communicating a favorable outcome, such as the borders on validated text fields | green.600 `#339163` / green.500 `#4f9f74` | green.600 `#2c9338` / green.500 `#3fa348` |
+| `color.border.success.subtle` | Decorative success borders that do not need to meet 3:1 contrast requirements | green.300 `#acc1b4` / green.800 `#2c6a4a` | green.300 `#88cc8a` / green.800 `#186d24` |
+| `color.border.discovery` | Borders communicating change or something new, such as the borders in onboarding spotlights | purple.600 `#a169c9` / purple.500 `#ad7bd2` | purple.600 `#836fe4` / purple.500 `#917ff5` |
+| `color.border.discovery.subtle` | Decorative discovery borders that do not need to meet 3:1 contrast requirements | purple.300 `#c8b5d7` / purple.800 `#754f90` | purple.300 `#bbb5fc` / purple.800 `#6150ae` |
+| `color.border.information` | Borders communicating information or something in-progress | blue.600 `#1984dc` / blue.500 `#3e94e4` | blue.600 `#3881df` / blue.500 `#4790f0` |
+| `color.border.information.subtle` | Decorative information borders that do not need to meet 3:1 contrast requirements | blue.300 `#a3bfdc` / blue.800 `#25619a` | blue.300 `#91befc` / blue.800 `#235ea9` |
+| `color.border.bold` | A neutral border option that passes min 3:1 contrast ratios | neutral.600 `#7d7a75` / darkNeutral.600 `#7d7a75` | neutral.600 `#7f7f7f` / darkNeutral.600 `#6b6b6b` |
+| `color.border.focused.inverse` | PLUS addition. Focus ring on a bold or colored ground (today --color-focus-ring-inverse). *today's Focus Ring Inverse* | neutral.0 `#ffffff` / darkNeutral.100 `#191919` | neutral.0 `#ffffff` / darkNeutral.100 `#151515` |
 
 #### Background: neutral, input, inverse, disabled, selected, brand
 
 | Token | For | Plan A light / dark | Plan B light / dark |
 |---|---|---|---|
-| `color.background.disabled` | Backgrounds of elements in a disabled state | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.200 `#1e1e1e0f` / darkNeutralAlpha.300 `#e3e3e329` |
-| `color.background.input` | Background of form UI elements, such as text fields, checkboxes, and radio buttons | neutral.0 `#ffffff` / darkNeutral.200 `#252423` | neutral.0 `#ffffff` / darkNeutral.200 `#242424` |
-| `color.background.input.hovered` | Hovered state for color.background.input | neutral.100 `#f9f8f7` / darkNeutral.250 `#2c2b2a` | neutral.100 `#f8f8f8` / darkNeutral.250 `#2b2b2b` |
-| `color.background.input.pressed` | Pressed state for color.background.input | neutral.0 `#ffffff` / darkNeutral.200 `#252423` | neutral.0 `#ffffff` / darkNeutral.200 `#242424` |
-| `color.background.inverse.subtle` | Backgrounds of elements on a bold background, such as in the buttons on spotlight cards | ink @16% `#1f1e1e29` / paper @16% `#e4e3e229` | ink @16% `#1e1e1e29` / paper @16% `#e3e3e329` |
-| `color.background.inverse.subtle.hovered` | The hovered state of color.background.inverse.subtle | ink @24% `#1f1e1e3d` / paper @24% `#e4e3e23d` | ink @24% `#1e1e1e3d` / paper @24% `#e3e3e33d` |
-| `color.background.inverse.subtle.pressed` | The pressed state of color.background.inverse.subtle | ink @32% `#1f1e1e52` / paper @32% `#e4e3e252` | ink @32% `#1e1e1e52` / paper @32% `#e3e3e352` |
-| `color.background.neutral` | The default background for neutral elements, such as default buttons | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1e1e1e0f` / darkNeutralAlpha.200 `#e3e3e314` |
-| `color.background.neutral.hovered` | Hovered state for color.background.neutral | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.300 `#1e1e1e24` / darkNeutralAlpha.300 `#e3e3e329` |
-| `color.background.neutral.pressed` | Pressed state for color.background.neutral | neutralAlpha.400 `#1f1e1e4f` / darkNeutralAlpha.400 `#e4e3e247` | neutralAlpha.400 `#1e1e1e4f` / darkNeutralAlpha.400 `#e3e3e347` |
+| `color.background.disabled` | Backgrounds of elements in a disabled state | neutralAlpha.200 `#1d1b160f` / darkNeutralAlpha.300 `#f7f6f529` | neutralAlpha.200 `#0b0b0b0f` / darkNeutralAlpha.300 `#f9f9f929` |
+| `color.background.input` | Background of form UI elements, such as text fields, checkboxes, and radio buttons | neutral.0 `#ffffff` / darkNeutral.200 `#202020` | neutral.0 `#ffffff` / darkNeutral.200 `#191919` |
+| `color.background.input.hovered` | Hovered state for color.background.input | neutral.100 `#f9f8f7` / darkNeutral.250 `#262626` | neutral.100 `#f9f9f9` / darkNeutral.250 `#202020` |
+| `color.background.input.pressed` | Pressed state for color.background.input | neutral.0 `#ffffff` / darkNeutral.200 `#202020` | neutral.0 `#ffffff` / darkNeutral.200 `#191919` |
+| `color.background.inverse.subtle` | Backgrounds of elements on a bold background, such as in the buttons on spotlight cards | ink @16% `#1d1b1629` / paper @16% `#f7f6f529` | ink @16% `#0b0b0b29` / paper @16% `#f9f9f929` |
+| `color.background.inverse.subtle.hovered` | The hovered state of color.background.inverse.subtle | ink @24% `#1d1b163d` / paper @24% `#f7f6f53d` | ink @24% `#0b0b0b3d` / paper @24% `#f9f9f93d` |
+| `color.background.inverse.subtle.pressed` | The pressed state of color.background.inverse.subtle | ink @32% `#1d1b1652` / paper @32% `#f7f6f552` | ink @32% `#0b0b0b52` / paper @32% `#f9f9f952` |
+| `color.background.neutral` | The default background for neutral elements, such as default buttons | neutralAlpha.200 `#1d1b160f` / darkNeutralAlpha.200 `#f7f6f514` | neutralAlpha.200 `#0b0b0b0f` / darkNeutralAlpha.200 `#f9f9f914` |
+| `color.background.neutral.hovered` | Hovered state for color.background.neutral | neutralAlpha.300 `#1d1b1624` / darkNeutralAlpha.300 `#f7f6f529` | neutralAlpha.300 `#0b0b0b24` / darkNeutralAlpha.300 `#f9f9f929` |
+| `color.background.neutral.pressed` | Pressed state for color.background.neutral | neutralAlpha.400 `#1d1b164f` / darkNeutralAlpha.400 `#f7f6f547` | neutralAlpha.400 `#0b0b0b4f` / darkNeutralAlpha.400 `#f9f9f947` |
 | `color.background.neutral.subtle` | The background of elements that appear to have no background in a resting state, such as subtle buttons and menu items | transparent `#00000000` / transparent `#00000000` | same as A |
-| `color.background.neutral.subtle.hovered` | Hovered state for color.background.neutral.subtle | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1e1e1e0f` / darkNeutralAlpha.200 `#e3e3e314` |
-| `color.background.neutral.subtle.pressed` | Pressed state for color.background.neutral.subtle | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.300 `#1e1e1e24` / darkNeutralAlpha.300 `#e3e3e329` |
-| `color.background.neutral.bold` | A vibrant background option for neutral UI elements, such as announcement banners | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
-| `color.background.neutral.bold.hovered` | Hovered state of color.background.neutral.bold | neutral.900 `#3f3d3b` / darkNeutral.900 `#c1c0bf` | neutral.900 `#3d3d3d` / darkNeutral.900 `#c0c0c0` |
-| `color.background.neutral.bold.pressed` | Pressed state of color.background.neutral.bold | neutral.800 `#555350` / darkNeutral.800 `#acabaa` | neutral.800 `#535353` / darkNeutral.800 `#ababab` |
-| `color.background.selected` | The background of an element that communicates selection, such as a selected navigation item, or the opened state of a dropdown trigger. Use color.background.selected.hovered or color.background.selected.pressed when interacting with a selected element. Selection is distinct from keyboard focus and hover alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: claude.ai marks the selected sidebar item with black at 10%.* | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | ink @10% `#1e1e1e1a` / paper @10% `#e3e3e31a` |
-| `color.background.selected.hovered` | The background of an element that is selected and hovered. This preserves selection while showing pointer hover; do not use for an unselected element or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.300 `#1e1e1e24` / darkNeutralAlpha.300 `#e3e3e329` |
-| `color.background.selected.pressed` | The background of an element that is selected and being pressed. Return to color.background.selected or color.background.selected.hovered when the press ends and the element remains selected. Do not use for an unselected element or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutralAlpha.400 `#1f1e1e4f` / darkNeutralAlpha.400 `#e4e3e247` | neutralAlpha.400 `#1e1e1e4f` / darkNeutralAlpha.400 `#e3e3e347` |
-| `color.background.selected.bold` | The bold background of selected controls, such as checked checkboxes and selected radio buttons. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for primary actions or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
-| `color.background.selected.bold.hovered` | The background of a selected control that uses color.background.selected.bold while it is hovered, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.900 `#3f3d3b` / darkNeutral.900 `#c1c0bf` | neutral.900 `#3d3d3d` / darkNeutral.900 `#c0c0c0` |
-| `color.background.selected.bold.pressed` | The background of a selected control that uses color.background.selected.bold while it is being pressed, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.800 `#555350` / darkNeutral.800 `#acabaa` | neutral.800 `#535353` / darkNeutral.800 `#ababab` |
-| `color.background.brand.subtlest` | The background of elements used to reinforce our brand, but with less emphasis | teal.100 `#e6f9fc` / teal.1000 `#043236` | same as A |
-| `color.background.brand.subtlest.hovered` | Hovered state of color.background.brand.subtlest | teal.200 `#c0ebf0` / teal.900 `#063e43` | same as A |
-| `color.background.brand.subtlest.pressed` | Pressed state of color.background.brand.subtlest | teal.250 `#9cdae1` / teal.850 `#0a545a` | same as A |
-| `color.background.brand.bold` | The background of elements used to reinforce our brand, but with more emphasis | teal.700 `#147b84` / teal.400 `#23b5c2` | same as A |
-| `color.background.brand.bold.hovered` | Hovered state of color.background.brand.bold | teal.800 `#106972` / teal.300 `#70c9d4` | same as A |
-| `color.background.brand.bold.pressed` | Pressed state of color.background.brand.bold | teal.850 `#0a545a` / teal.250 `#9cdae1` | same as A |
-| `color.background.brand.boldest` | The background of elements used to reinforce our brand, that need to stand out a lot | teal.1000 `#043236` / teal.100 `#e6f9fc` | same as A |
-| `color.background.brand.boldest.hovered` | Hovered state of color.background.brand.boldest | teal.900 `#063e43` / teal.200 `#c0ebf0` | same as A |
-| `color.background.brand.boldest.pressed` | Pressed state of color.background.brand.boldest | teal.850 `#0a545a` / teal.250 `#9cdae1` | same as A |
+| `color.background.neutral.subtle.hovered` | Hovered state for color.background.neutral.subtle | neutralAlpha.200 `#1d1b160f` / darkNeutralAlpha.200 `#f7f6f514` | neutralAlpha.200 `#0b0b0b0f` / darkNeutralAlpha.200 `#f9f9f914` |
+| `color.background.neutral.subtle.pressed` | Pressed state for color.background.neutral.subtle | neutralAlpha.300 `#1d1b1624` / darkNeutralAlpha.300 `#f7f6f529` | neutralAlpha.300 `#0b0b0b24` / darkNeutralAlpha.300 `#f9f9f929` |
+| `color.background.neutral.bold` | A vibrant background option for neutral UI elements, such as announcement banners | neutral.1000 `#2c2c2b` / darkNeutral.1000 `#f0efed` | neutral.1000 `#1a1a1a` / darkNeutral.1000 `#efefef` |
+| `color.background.neutral.bold.hovered` | Hovered state of color.background.neutral.bold | neutral.900 `#484743` / darkNeutral.900 `#d4d3cf` | neutral.900 `#383838` / darkNeutral.900 `#e0e0e0` |
+| `color.background.neutral.bold.pressed` | Pressed state of color.background.neutral.bold | neutral.800 `#5f5e5b` / darkNeutral.800 `#ada9a3` | neutral.800 `#666666` / darkNeutral.800 `#c2c2c2` |
+| `color.background.selected` | The background of an element that communicates selection, such as a selected navigation item, or the opened state of a dropdown trigger. Use color.background.selected.hovered or color.background.selected.pressed when interacting with a selected element. Selection is distinct from keyboard focus and hover alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: claude.ai marks the selected sidebar item with black at 10%.* | neutralAlpha.200 `#1d1b160f` / darkNeutralAlpha.200 `#f7f6f514` | ink @10% `#0b0b0b1a` / paper @10% `#f9f9f91a` |
+| `color.background.selected.hovered` | The background of an element that is selected and hovered. This preserves selection while showing pointer hover; do not use for an unselected element or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutralAlpha.300 `#1d1b1624` / darkNeutralAlpha.300 `#f7f6f529` | neutralAlpha.300 `#0b0b0b24` / darkNeutralAlpha.300 `#f9f9f929` |
+| `color.background.selected.pressed` | The background of an element that is selected and being pressed. Return to color.background.selected or color.background.selected.hovered when the press ends and the element remains selected. Do not use for an unselected element or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutralAlpha.400 `#1d1b164f` / darkNeutralAlpha.400 `#f7f6f547` | neutralAlpha.400 `#0b0b0b4f` / darkNeutralAlpha.400 `#f9f9f947` |
+| `color.background.selected.bold` | The bold background of selected controls, such as checked checkboxes and selected radio buttons. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for primary actions or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2c2b` / darkNeutral.1000 `#f0efed` | neutral.1000 `#1a1a1a` / darkNeutral.1000 `#efefef` |
+| `color.background.selected.bold.hovered` | The background of a selected control that uses color.background.selected.bold while it is hovered, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.900 `#484743` / darkNeutral.900 `#d4d3cf` | neutral.900 `#383838` / darkNeutral.900 `#e0e0e0` |
+| `color.background.selected.bold.pressed` | The background of a selected control that uses color.background.selected.bold while it is being pressed, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.800 `#5f5e5b` / darkNeutral.800 `#ada9a3` | neutral.800 `#666666` / darkNeutral.800 `#c2c2c2` |
+| `color.background.brand.subtlest` | The background of elements used to reinforce our brand, but with less emphasis | teal.100 `#ecf8fa` / teal.1000 `#043236` | teal.100 `#e2fafd` / teal.1000 `#043236` |
+| `color.background.brand.subtlest.hovered` | Hovered state of color.background.brand.subtlest | teal.200 `#c8e9ed` / teal.900 `#063e43` | teal.200 `#b6edf3` / teal.900 `#063e43` |
+| `color.background.brand.subtlest.pressed` | Pressed state of color.background.brand.subtlest | teal.250 `#aed7db` / teal.850 `#0a545a` | teal.250 `#8ddce6` / teal.850 `#0a545a` |
+| `color.background.brand.bold` | The background of elements used to reinforce our brand, but with more emphasis | teal.700 `#147b84` / teal.400 `#44b2be` | teal.700 `#147b84` / teal.400 `#23b5c2` |
+| `color.background.brand.bold.hovered` | Hovered state of color.background.brand.bold | teal.800 `#106972` / teal.300 `#93c4ca` | teal.800 `#106972` / teal.300 `#52ccda` |
+| `color.background.brand.bold.pressed` | Pressed state of color.background.brand.bold | teal.850 `#0a545a` / teal.250 `#aed7db` | teal.850 `#0a545a` / teal.250 `#8ddce6` |
+| `color.background.brand.boldest` | The background of elements used to reinforce our brand, that need to stand out a lot | teal.1000 `#043236` / teal.100 `#ecf8fa` | teal.1000 `#043236` / teal.100 `#e2fafd` |
+| `color.background.brand.boldest.hovered` | Hovered state of color.background.brand.boldest | teal.900 `#063e43` / teal.200 `#c8e9ed` | teal.900 `#063e43` / teal.200 `#b6edf3` |
+| `color.background.brand.boldest.pressed` | Pressed state of color.background.brand.boldest | teal.850 `#0a545a` / teal.250 `#aed7db` | teal.850 `#0a545a` / teal.250 `#8ddce6` |
 
 #### Background: danger (warning, success, information and discovery follow the same shape)
 
 | Token | For | Plan A light / dark | Plan B light / dark |
 |---|---|---|---|
-| `color.background.danger` | Backgrounds communicating critical information, such in error section messages | red.100 `#fff4f2` / red.1000 `#4a1e1b` | red.100 `#fff4f2` / red.1000 `#4c1d1b` |
-| `color.background.danger.hovered` | Hovered state for color.background.danger | red.200 `#fedcd7` / red.900 `#63221e` | red.200 `#fedcd8` / red.900 `#651f1e` |
-| `color.background.danger.pressed` | Pressed state for color.background.danger | red.250 `#fdc2ba` / red.850 `#82302a` | red.250 `#fdc2bc` / red.850 `#852d2b` |
-| `color.background.danger.subtler` | Backgrounds of danger lozenges and badges to ensure accessibility and desired visual appearance | red.200 `#fedcd7` / red.900 `#63221e` | red.200 `#fedcd8` / red.900 `#651f1e` |
-| `color.background.danger.subtler.hovered` | Hovered state of color.background.danger.subtler | red.250 `#fdc2ba` / red.850 `#82302a` | red.250 `#fdc2bc` / red.850 `#852d2b` |
-| `color.background.danger.subtler.pressed` | Pressed state of color.background.danger.subtler | red.300 `#fba69c` / red.800 `#a23e37` | red.300 `#fca59e` / red.800 `#a53a37` |
-| `color.background.danger.subtle` | Background color for non-interactive elements communicating critical danger information (e.g. semantic badges, status pills, callout chips). Sits between subtler and bold in visual emphasis. Not for interactive surfaces — see color.background.danger.bold or color.background.danger.subtler for interactive states | red.300 `#fba69c` / red.800 `#a23e37` | red.300 `#fca59e` / red.800 `#a53a37` |
-| `color.background.danger.bold` | A vibrant background option for communicating critical information, such as in danger buttons and error banners | red.700 `#bd4941` / red.400 `#ef867b` | red.700 `#c14543` / red.400 `#f4837c` |
-| `color.background.danger.bold.hovered` | Hovered state of color.background.danger.bold | red.800 `#a23e37` / red.300 `#fba69c` | red.800 `#a53a37` / red.300 `#fca59e` |
-| `color.background.danger.bold.pressed` | Pressed state of color.background.danger.bold | red.850 `#82302a` / red.250 `#fdc2ba` | red.850 `#852d2b` / red.250 `#fdc2bc` |
+| `color.background.danger` | Backgrounds communicating critical information, such in error section messages | red.100 `#fff4f2` / red.1000 `#45211e` | red.100 `#fff4f2` / red.1000 `#4c1d1b` |
+| `color.background.danger.hovered` | Hovered state for color.background.danger | red.200 `#fbdcd8` / red.900 `#582a25` | red.200 `#fedcd8` / red.900 `#651f1e` |
+| `color.background.danger.pressed` | Pressed state for color.background.danger | red.250 `#ecc7c2` / red.850 `#753a34` | red.250 `#fdc2bc` / red.850 `#852d2b` |
+| `color.background.danger.subtler` | Backgrounds of danger lozenges and badges to ensure accessibility and desired visual appearance | red.200 `#fbdcd8` / red.900 `#582a25` | red.200 `#fedcd8` / red.900 `#651f1e` |
+| `color.background.danger.subtler.hovered` | Hovered state of color.background.danger.subtler | red.250 `#ecc7c2` / red.850 `#753a34` | red.250 `#fdc2bc` / red.850 `#852d2b` |
+| `color.background.danger.subtler.pressed` | Pressed state of color.background.danger.subtler | red.300 `#ddb2ac` / red.800 `#97463f` | red.300 `#fca59e` / red.800 `#a53a37` |
+| `color.background.danger.subtle` | Background color for non-interactive elements communicating critical danger information (e.g. semantic badges, status pills, callout chips). Sits between subtler and bold in visual emphasis. Not for interactive surfaces — see color.background.danger.bold or color.background.danger.subtler for interactive states | red.300 `#ddb2ac` / red.800 `#97463f` | red.300 `#fca59e` / red.800 `#a53a37` |
+| `color.background.danger.bold` | A vibrant background option for communicating critical information, such as in danger buttons and error banners | red.700 `#b64f46` / red.400 `#e28d84` | red.700 `#c14543` / red.400 `#f4837c` |
+| `color.background.danger.bold.hovered` | Hovered state of color.background.danger.bold | red.800 `#97463f` / red.300 `#ddb2ac` | red.800 `#a53a37` / red.300 `#fca59e` |
+| `color.background.danger.bold.pressed` | Pressed state of color.background.danger.bold | red.850 `#753a34` / red.250 `#ecc7c2` | red.850 `#852d2b` / red.250 `#fdc2bc` |
 
 #### Link, interaction, skeleton, blanket
 
 | Token | For | Plan A light / dark | Plan B light / dark |
 |---|---|---|---|
-| `color.link` | Links in a default or hovered state. Add an underline for hovered states | teal.700 `#147b84` / teal.400 `#23b5c2` | same as A |
-| `color.link.pressed` | Links in a pressed state | teal.800 `#106972` / teal.300 `#70c9d4` | same as A |
-| `color.link.visited` | Visited links | purple.800 `#71518c` / purple.300 `#ccb2e3` | purple.800 `#6150ae` / purple.300 `#bbb5fc` |
-| `color.link.visited.pressed` | Visited links in a pressed state | purple.900 `#432f55` / purple.200 `#ecdef9` | purple.900 `#392e6b` / purple.200 `#e2e0fe` |
-| `color.interaction.hovered` | A background overlay for elements in a hovered state when their background color cannot change, such as avatars *PLUS state-layer ruling (2026-10-24): hover is an 8% overlay. Atlassian uses 16%.* | neutralAlpha ink @8% `#1f1e1e14` / paper @8% `#e4e3e214` | neutralAlpha ink @8% `#1e1e1e14` / paper @8% `#e3e3e314` |
-| `color.interaction.pressed` | A background overlay for elements in a pressed state when their background color cannot change, such as avatars *PLUS ruling: pressed is a 12% overlay. Atlassian uses 32%.* | neutralAlpha ink @12% `#1f1e1e1f` / paper @12% `#e4e3e21f` | neutralAlpha ink @12% `#1e1e1e1f` / paper @12% `#e3e3e31f` |
-| `color.skeleton` | Skeleton loading states | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1e1e1e0f` / darkNeutralAlpha.200 `#e3e3e314` |
-| `color.skeleton.subtle` | The pulse or shimmer effect in skeleton loading states | neutralAlpha.100 `#1f1e1e08` / darkNeutralAlpha.100 `#e4e3e20a` | neutralAlpha.100 `#1e1e1e08` / darkNeutralAlpha.100 `#e3e3e30a` |
-| `color.blanket` | The screen overlay that appears with modal dialogs *Keeps today's 0.32 scrim (#383). Atlassian is ~46%.* | ink @32% `#1f1e1e52` / black @60% `#00000099` | ink @32% `#1e1e1e52` / black @60% `#00000099` |
+| `color.link` | Links in a default or hovered state. Add an underline for hovered states | teal.700 `#147b84` / teal.400 `#44b2be` | teal.700 `#147b84` / teal.400 `#23b5c2` |
+| `color.link.pressed` | Links in a pressed state | teal.800 `#106972` / teal.300 `#93c4ca` | teal.800 `#106972` / teal.300 `#52ccda` |
+| `color.link.visited` | Visited links | purple.800 `#754f90` / purple.300 `#c8b5d7` | purple.800 `#6150ae` / purple.300 `#bbb5fc` |
+| `color.link.visited.pressed` | Visited links in a pressed state | purple.900 `#452e55` / purple.200 `#ecdef6` | purple.900 `#392e6b` / purple.200 `#e2e0fe` |
+| `color.interaction.hovered` | A background overlay for elements in a hovered state when their background color cannot change, such as avatars *PLUS state-layer ruling (2026-10-24): hover is an 8% overlay. Atlassian uses 16%.* | neutralAlpha ink @8% `#1d1b1614` / paper @8% `#f7f6f514` | neutralAlpha ink @8% `#0b0b0b14` / paper @8% `#f9f9f914` |
+| `color.interaction.pressed` | A background overlay for elements in a pressed state when their background color cannot change, such as avatars *PLUS ruling: pressed is a 12% overlay. Atlassian uses 32%.* | neutralAlpha ink @12% `#1d1b161f` / paper @12% `#f7f6f51f` | neutralAlpha ink @12% `#0b0b0b1f` / paper @12% `#f9f9f91f` |
+| `color.skeleton` | Skeleton loading states | neutralAlpha.200 `#1d1b160f` / darkNeutralAlpha.200 `#f7f6f514` | neutralAlpha.200 `#0b0b0b0f` / darkNeutralAlpha.200 `#f9f9f914` |
+| `color.skeleton.subtle` | The pulse or shimmer effect in skeleton loading states | neutralAlpha.100 `#1d1b1608` / darkNeutralAlpha.100 `#f7f6f50a` | neutralAlpha.100 `#0b0b0b08` / darkNeutralAlpha.100 `#f9f9f90a` |
+| `color.blanket` | The screen overlay that appears with modal dialogs *Keeps today's 0.32 scrim (#383). Atlassian is ~46%.* | ink @32% `#1d1b1652` / black @60% `#00000099` | ink @32% `#0b0b0b52` / black @60% `#00000099` |
 | `color.blanket.selected` | A translucent blanket to communicate selection when changing the background of the selected content is not possible, such as selected Editor blocks. The content beneath remains visible. Do not use to indicate keyboard focus or hover alone | teal.500 @8% `#1d9eab14` / teal.600 @8% `#198f9a14` | same as A |
-| `color.blanket.danger` | An overlay to communicate danger states when a simple background color change isn't possible, such as deletion of Editor block elements | red.500 @8% `#e7685e14` / red.600 @8% `#d6584f14` | red.500 @8% `#ec645f14` / red.600 @8% `#da545014` |
-| `color.interaction.dragged` | PLUS addition. Selected-or-dragged overlay, the 16% step of the state-layer ruling. *PLUS ruling 2026-10-24* | ink @16% `#1f1e1e29` / paper @16% `#e4e3e229` | ink @16% `#1e1e1e29` / paper @16% `#e3e3e329` |
+| `color.blanket.danger` | An overlay to communicate danger states when a simple background color change isn't possible, such as deletion of Editor block elements | red.500 @8% `#e16c6214` / red.600 @8% `#d7574e14` | red.500 @8% `#ec645f14` / red.600 @8% `#da545014` |
+| `color.interaction.dragged` | PLUS addition. Selected-or-dragged overlay, the 16% step of the state-layer ruling. *PLUS ruling 2026-10-24* | ink @16% `#1d1b1629` / paper @16% `#f7f6f529` | ink @16% `#0b0b0b29` / paper @16% `#f9f9f929` |
 
 #### Elevation surfaces
 
 | Token | For | Plan A light / dark | Plan B light / dark |
 |---|---|---|---|
-| `elevation.surface` | The primary background for the UI | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1d` | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1e` |
-| `elevation.surface.hovered` | Hovered state of elevation.surface | neutral.200 `#f3f1ef` / darkNeutral.200 `#252423` | neutral.200 `#f1f1f1` / darkNeutral.200 `#242424` |
-| `elevation.surface.pressed` | Pressed state of elevation.surface | neutral.300 `#e0dedc` / darkNeutral.250 `#2c2b2a` | neutral.300 `#dedede` / darkNeutral.250 `#2b2b2b` |
-| `elevation.surface.container` | A neutral container surface background | neutralAlpha.100 `#1f1e1e08` / darkNeutralAlpha.100 `#e4e3e20a` | neutralAlpha.100 `#1e1e1e08` / darkNeutralAlpha.100 `#e3e3e30a` |
-| `elevation.surface.container.hovered` | Hovered state of elevation.surface.container | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1e1e1e0f` / darkNeutralAlpha.200 `#e3e3e314` |
-| `elevation.surface.container.pressed` | Pressed state of elevation.surface.container | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.250 `#e4e3e21a` | neutralAlpha.300 `#1e1e1e24` / darkNeutralAlpha.250 `#e3e3e31a` |
-| `elevation.surface.overlay` | The background of elements that sit on top of they UI, such as modals, dialogs, dropdown menus, floating toolbars, and floating single-action buttons. Also use for the background of raised cards in a dragged state. Combine with elevation.shadow.overlay | neutral.0 `#ffffff` / darkNeutral.250 `#2c2b2a` | neutral.0 `#ffffff` / darkNeutral.250 `#2b2b2b` |
-| `elevation.surface.overlay.hovered` | Hovered state of elevation.surface.overlay | neutral.200 `#f3f1ef` / darkNeutral.300 `#313130` | neutral.200 `#f1f1f1` / darkNeutral.300 `#313131` |
-| `elevation.surface.overlay.pressed` | Pressed state of elevation.surface.overlay | neutral.300 `#e0dedc` / darkNeutral.350 `#3f3e3d` | neutral.300 `#dedede` / darkNeutral.350 `#3e3e3e` |
-| `elevation.surface.raised` | The background of cards that can be moved, such as Jira cards on a Kanban board. Combine with elevation.shadow.raised | neutral.0 `#ffffff` / darkNeutral.200 `#252423` | neutral.0 `#ffffff` / darkNeutral.200 `#242424` |
-| `elevation.surface.raised.hovered` | Hovered state of elevation.surface.raised | neutral.200 `#f3f1ef` / darkNeutral.250 `#2c2b2a` | neutral.200 `#f1f1f1` / darkNeutral.250 `#2b2b2b` |
-| `elevation.surface.raised.pressed` | Pressed state of elevation.surface.raised | neutral.300 `#e0dedc` / darkNeutral.300 `#313130` | neutral.300 `#dedede` / darkNeutral.300 `#313131` |
-| `elevation.surface.sunken` | A secondary background for the UI commonly used for grouping items, such as Jira cards in columns | neutral.100 `#f9f8f7` / darkNeutral.0 `#181716` | neutral.100 `#f8f8f8` / darkNeutral.0 `#171717` |
+| `elevation.surface` | The primary background for the UI | neutral.0 `#ffffff` / darkNeutral.100 `#191919` | neutral.0 `#ffffff` / darkNeutral.100 `#151515` |
+| `elevation.surface.hovered` | Hovered state of elevation.surface | neutral.200 `#f0efed` / darkNeutral.200 `#202020` | neutral.200 `#efefef` / darkNeutral.200 `#191919` |
+| `elevation.surface.pressed` | Pressed state of elevation.surface | neutral.300 `#e6e5e3` / darkNeutral.250 `#262626` | neutral.300 `#e0e0e0` / darkNeutral.250 `#202020` |
+| `elevation.surface.container` | A neutral container surface background | neutralAlpha.100 `#1d1b1608` / darkNeutralAlpha.100 `#f7f6f50a` | neutralAlpha.100 `#0b0b0b08` / darkNeutralAlpha.100 `#f9f9f90a` |
+| `elevation.surface.container.hovered` | Hovered state of elevation.surface.container | neutralAlpha.200 `#1d1b160f` / darkNeutralAlpha.200 `#f7f6f514` | neutralAlpha.200 `#0b0b0b0f` / darkNeutralAlpha.200 `#f9f9f914` |
+| `elevation.surface.container.pressed` | Pressed state of elevation.surface.container | neutralAlpha.300 `#1d1b1624` / darkNeutralAlpha.250 `#f7f6f51a` | neutralAlpha.300 `#0b0b0b24` / darkNeutralAlpha.250 `#f9f9f91a` |
+| `elevation.surface.overlay` | The background of elements that sit on top of they UI, such as modals, dialogs, dropdown menus, floating toolbars, and floating single-action buttons. Also use for the background of raised cards in a dragged state. Combine with elevation.shadow.overlay | neutral.0 `#ffffff` / darkNeutral.250 `#262626` | neutral.0 `#ffffff` / darkNeutral.250 `#202020` |
+| `elevation.surface.overlay.hovered` | Hovered state of elevation.surface.overlay | neutral.200 `#f0efed` / darkNeutral.300 `#2c2c2b` | neutral.200 `#efefef` / darkNeutral.300 `#2c2c2c` |
+| `elevation.surface.overlay.pressed` | Pressed state of elevation.surface.overlay | neutral.300 `#e6e5e3` / darkNeutral.350 `#383836` | neutral.300 `#e0e0e0` / darkNeutral.350 `#383838` |
+| `elevation.surface.raised` | The background of cards that can be moved, such as Jira cards on a Kanban board. Combine with elevation.shadow.raised | neutral.0 `#ffffff` / darkNeutral.200 `#202020` | neutral.0 `#ffffff` / darkNeutral.200 `#191919` |
+| `elevation.surface.raised.hovered` | Hovered state of elevation.surface.raised | neutral.200 `#f0efed` / darkNeutral.250 `#262626` | neutral.200 `#efefef` / darkNeutral.250 `#202020` |
+| `elevation.surface.raised.pressed` | Pressed state of elevation.surface.raised | neutral.300 `#e6e5e3` / darkNeutral.300 `#2c2c2b` | neutral.300 `#e0e0e0` / darkNeutral.300 `#2c2c2c` |
+| `elevation.surface.sunken` | A secondary background for the UI commonly used for grouping items, such as Jira cards in columns | neutral.100 `#f9f8f7` / darkNeutral.0 `#141413` | neutral.100 `#f9f9f9` / darkNeutral.0 `#0b0b0b` |
 
 | Emphasis | warning (yellow) | success (green) | information (blue) | discovery (purple) |
 |---|---|---|---|---|
-| `[default]` | `#faf6e9` / `#39290b` | `#eff8f2` / `#1b3024` | `#eff7ff` / `#182d3f` | `#f9f4ff` / `#342640` |
-| `.subtler` | `#ede3c6` / `#4a3405` | `#d4e8db` / `#1d3e2c` | `#d1e6f8` / `#1a3a54` | `#ecdef9` / `#432f55` |
-| `.subtle` | `#dfcea7` / `#7c590d` | `#9ec5ad` / `#36684d` | `#9ac0e2` / `#31628a` | `#ccb2e3` / `#71518c` |
-| `.bold` | `#d3b984` / `#d3b984` | `#407a5b` / `#7caf91` | `#3a74a2` / `#77a8d3` | `#8560a3` / `#b797d4` |
-| `.bold.hovered` | `#c39e59` / `#c39e59` | `#36684d` / `#9ec5ad` | `#31628a` / `#9ac0e2` | `#71518c` / `#ccb2e3` |
+| `[default]` | `#fbf6e6` / `#372a0b` | `#f2f7f4` / `#173122` | `#f0f7ff` / `#152d46` | `#f9f4fe` / `#352542` |
+| `.subtler` | `#f1e3b6` / `#463509` | `#d8e7de` / `#1c3e2c` | `#d2e5fa` / `#18395a` | `#ecdef6` / `#452e55` |
+| `.subtle` | `#e2ce99` / `#775b0d` | `#acc1b4` / `#2c6a4a` | `#a3bfdc` / `#25619a` | `#c8b5d7` / `#754f90` |
+| `.bold` | `#d3b979` / `#d3b979` | `#327c56` / `#79af90` | `#2272ba` / `#70a8e3` | `#8a5caa` / `#b996d5` |
+| `.bold.hovered` | `#bba15f` / `#bba15f` | `#2c6a4a` / `#acc1b4` | `#25619a` / `#a3bfdc` | `#754f90` / `#c8b5d7` |
 
 #### Accent pattern (repeat for blue, teal, green, lime, yellow, orange, red, magenta, purple, brown; gray uses the neutrals)
 
@@ -1132,7 +1161,7 @@ Steps shown for blue. Teal aliases the accent-teal ramp (`aqua`), not Lagoon. In
 | `color.background.accent.{f}.bolder.pressed` | Pressed state of color.background.accent.blue.bolder | 850 | 250 | 1000 | 200 |
 | `color.border.accent.{f}` | Blue borders on non-bold backgrounds when there is no meaning tied to the color | 600 | 500 | 800 | 300 |
 | `color.border.accent.{f}.subtle` | Decorative borders that do not need to meet 3:1 contrast requirements | 300 | 800 | 300 | 800 |
-| `color.text.accent.{f}` | Blue text on subtlest and subtler accent backgrounds when there is no meaning tied to the color | 800 | 300 | 900 | 200 |
+| `color.text.accent.{f}` | Blue text on subtlest and subtler accent backgrounds when there is no meaning tied to the color | 850 | 300 | 1000 | 200 |
 | `color.text.accent.{f}.bolder` | Blue text on subtle accent backgrounds when there is no meaning tied to the color | 900 | 200 | 1000 | 100 |
 | `color.icon.accent.{f}` | Blue icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons | 600 | 500 | 800 | 300 |
 
@@ -1140,29 +1169,29 @@ Steps shown for blue. Teal aliases the accent-teal ramp (`aqua`), not Lagoon. In
 
 | Token | Plan A light / dark | Plan B light / dark | IC (A) light / dark |
 |---|---|---|---|
-| `color.chart.categorical.1` | blue.600 `#4886b8` / blue.500 `#5895c8` | blue.600 `#3881df` / blue.500 `#4790f0` | aqua.800 / aqua.300 |
-| `color.chart.categorical.2` | lime.500 `#88965a` / lime.400 `#9da978` | lime.500 `#7a9b1d` / lime.400 `#91ae53` | lime.500 / lime.400 |
-| `color.chart.categorical.3` | purple.500 `#a77fca` / purple.400 `#b797d4` | purple.500 `#917ff5` / purple.400 `#a397f9` | orange.800 / orange.300 |
-| `color.chart.categorical.4` | orange.500 `#d5781c` / orange.400 `#df9252` | orange.500 `#e26f35` / orange.400 `#ea8b5b` | orange.500 / orange.400 |
-| `color.chart.categorical.5` | blue.800 `#31628a` / blue.800 `#31628a` | blue.800 `#235ea9` / blue.800 `#235ea9` | blue.800 / blue.800 |
-| `color.chart.categorical.6` | purple.700 `#8560a3` / purple.700 `#8560a3` | purple.700 `#715fca` / purple.700 `#715fca` | purple.800 / purple.300 |
+| `color.chart.categorical.1` | blue.600 `#1984dc` / blue.500 `#3e94e4` | blue.600 `#3881df` / blue.500 `#4790f0` | aqua.800 / aqua.300 |
+| `color.chart.categorical.2` | lime.500 `#829846` / lime.400 `#9aaa72` | lime.500 `#7a9b1d` / lime.400 `#91ae53` | lime.500 / lime.400 |
+| `color.chart.categorical.3` | purple.500 `#ad7bd2` / purple.400 `#b996d5` | purple.500 `#917ff5` / purple.400 `#a397f9` | orange.800 / orange.300 |
+| `color.chart.categorical.4` | orange.500 `#c87f3e` / orange.400 `#cd996e` | orange.500 `#e26f35` / orange.400 `#ea8b5b` | orange.500 / orange.400 |
+| `color.chart.categorical.5` | blue.800 `#25619a` / blue.800 `#25619a` | blue.800 `#235ea9` / blue.800 `#235ea9` | blue.800 / blue.800 |
+| `color.chart.categorical.6` | purple.700 `#8a5caa` / purple.700 `#8a5caa` | purple.700 `#715fca` / purple.700 `#715fca` | purple.800 / purple.300 |
 | `color.chart.categorical.7` | aqua.500 `#3e9e99` / aqua.500 `#3e9e99` | aqua.500 `#1da380` / aqua.500 `#1da380` | aqua.500 / aqua.500 |
-| `color.chart.categorical.8` | orange.700 `#a75c12` / orange.600 `#c16b16` | orange.700 `#b85014` / orange.600 `#d15f22` | orange.700 / orange.600 |
-| `color.chart.neutral` | neutral.500 `#928f8a` / darkNeutral.600 `#828281` | neutral.500 `#8f8f8f` / darkNeutral.600 `#828282` | neutral.700 / darkNeutral.700 |
-| `color.chart.blue.bold` | blue.500 `#5895c8` / blue.600 `#4886b8` | blue.500 `#4790f0` / blue.600 `#3881df` | blue.800 / blue.300 |
-| `color.chart.blue.bolder` | blue.600 `#4886b8` / blue.500 `#5895c8` | blue.600 `#3881df` / blue.500 `#4790f0` | blue.900 / blue.200 |
-| `color.chart.blue.boldest` | blue.800 `#31628a` / blue.300 `#9ac0e2` | blue.800 `#235ea9` / blue.300 `#91befc` | blue.1000 / blue.100 |
+| `color.chart.categorical.8` | orange.700 `#a06022` / orange.600 `#bd6d1c` | orange.700 `#b85014` / orange.600 `#d15f22` | orange.700 / orange.600 |
+| `color.chart.neutral` | neutral.500 `#8e8b86` / darkNeutral.600 `#7d7a75` | neutral.500 `#878787` / darkNeutral.600 `#6b6b6b` | neutral.700 / darkNeutral.700 |
+| `color.chart.blue.bold` | blue.500 `#3e94e4` / blue.600 `#1984dc` | blue.500 `#4790f0` / blue.600 `#3881df` | blue.800 / blue.300 |
+| `color.chart.blue.bolder` | blue.600 `#1984dc` / blue.500 `#3e94e4` | blue.600 `#3881df` / blue.500 `#4790f0` | blue.900 / blue.200 |
+| `color.chart.blue.boldest` | blue.800 `#25619a` / blue.300 `#a3bfdc` | blue.800 `#235ea9` / blue.300 `#91befc` | blue.1000 / blue.100 |
 | `color.chart.brand` | teal.600 `#198f9a` / teal.500 `#1d9eab` | teal.600 `#198f9a` / teal.500 `#1d9eab` | teal.700 / teal.400 |
-| `color.chart.danger` | red.600 `#d6584f` / red.600 `#d6584f` | red.600 `#da5450` / red.600 `#da5450` | red.700 / red.400 |
-| `color.chart.danger.bold` | red.850 `#82302a` / red.250 `#fdc2ba` | red.850 `#852d2b` / red.250 `#fdc2bc` | red.900 / red.250 |
-| `color.chart.warning` | yellow.500 `#b7872b` / yellow.500 `#b7872b` | yellow.500 `#c1841a` / yellow.500 `#c1841a` | yellow.800 / yellow.500 |
-| `color.chart.warning.bold` | yellow.700 `#916812` / yellow.300 `#d3b984` | yellow.700 `#966612` / yellow.300 `#e4b469` | yellow.900 / yellow.300 |
-| `color.chart.success` | green.500 `#5e9c79` / green.500 `#5e9c79` | green.500 `#3fa348` / green.500 `#3fa348` | green.800 / green.500 |
-| `color.chart.success.bold` | green.700 `#407a5b` / green.300 `#9ec5ad` | green.700 `#1e802c` / green.300 `#88cc8a` | green.900 / green.300 |
-| `color.chart.discovery` | purple.500 `#a77fca` / purple.500 `#a77fca` | purple.500 `#917ff5` / purple.500 `#917ff5` | purple.700 / purple.400 |
-| `color.chart.discovery.bold` | purple.800 `#71518c` / purple.300 `#ccb2e3` | purple.800 `#6150ae` / purple.300 `#bbb5fc` | purple.900 / purple.300 |
-| `color.chart.information` | blue.600 `#4886b8` / blue.500 `#5895c8` | blue.600 `#3881df` / blue.500 `#4790f0` | blue.700 / blue.400 |
-| `color.chart.information.bold` | blue.800 `#31628a` / blue.300 `#9ac0e2` | blue.800 `#235ea9` / blue.300 `#91befc` | blue.900 / blue.300 |
+| `color.chart.danger` | red.600 `#d7574e` / red.600 `#d7574e` | red.600 `#da5450` / red.600 `#da5450` | red.700 / red.400 |
+| `color.chart.danger.bold` | red.850 `#753a34` / red.250 `#ecc7c2` | red.850 `#852d2b` / red.250 `#fdc2bc` | red.900 / red.250 |
+| `color.chart.warning` | yellow.500 `#b28a1c` / yellow.500 `#b28a1c` | yellow.500 `#c1841a` / yellow.500 `#c1841a` | yellow.800 / yellow.500 |
+| `color.chart.warning.bold` | yellow.700 `#8b6b11` / yellow.300 `#d3b979` | yellow.700 `#966612` / yellow.300 `#e4b469` | yellow.900 / yellow.300 |
+| `color.chart.success` | green.500 `#4f9f74` / green.500 `#4f9f74` | green.500 `#3fa348` / green.500 `#3fa348` | green.800 / green.500 |
+| `color.chart.success.bold` | green.700 `#327c56` / green.300 `#acc1b4` | green.700 `#1e802c` / green.300 `#88cc8a` | green.900 / green.300 |
+| `color.chart.discovery` | purple.500 `#ad7bd2` / purple.500 `#ad7bd2` | purple.500 `#917ff5` / purple.500 `#917ff5` | purple.700 / purple.400 |
+| `color.chart.discovery.bold` | purple.800 `#754f90` / purple.300 `#c8b5d7` | purple.800 `#6150ae` / purple.300 `#bbb5fc` | purple.900 / purple.300 |
+| `color.chart.information` | blue.600 `#1984dc` / blue.500 `#3e94e4` | blue.600 `#3881df` / blue.500 `#4790f0` | blue.700 / blue.400 |
+| `color.chart.information.bold` | blue.800 `#25619a` / blue.300 `#a3bfdc` | blue.800 `#235ea9` / blue.300 `#91befc` | blue.900 / blue.300 |
 
 Every hue has `color.chart.{hue}.bold`, `.bolder` and `.boldest`, with `.hovered` for each, following blue; every token above also has `.hovered`.
 
