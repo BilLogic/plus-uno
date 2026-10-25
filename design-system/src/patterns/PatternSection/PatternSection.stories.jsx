@@ -5,6 +5,15 @@ import Button from '@/components/forms-and-inputs/Button';
 
 const col = { display: 'flex', flexDirection: 'column', gap: '32px' };
 
+/** A demo's caption: a group name in the subtle text color. */
+const demoLabel = {
+    display: 'block',
+    marginBottom: 'var(--element-stack-md)',
+    font: 'var(--heading-xxsmall)',
+    textTransform: 'uppercase',
+    color: 'var(--ds-text-subtle)',
+};
+
 const slotContent = (label) => (
     <div
         style={{
@@ -12,9 +21,9 @@ const slotContent = (label) => (
             alignItems: 'center',
             justifyContent: 'center',
             minHeight: '96px',
-            border: 'var(--size-element-border) dashed var(--color-outline)',
+            border: 'var(--size-element-border) dashed var(--ds-border-bold)',
             borderRadius: 'var(--size-element-radius-md)',
-            color: 'var(--color-on-surface-variant)',
+            color: 'var(--ds-text-subtle)',
         }}
         className="body1-txt"
     >
@@ -27,13 +36,13 @@ function PatternSectionSlotsDemos() {
     return (
         <div style={col}>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TITLE ONLY</span>
+                <span style={demoLabel}>TITLE ONLY</span>
                 <PatternSection title="Section title" padding="sm">
                     {slotContent('Content slot')}
                 </PatternSection>
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TITLE + DESCRIPTION + ACTIONS</span>
+                <span style={demoLabel}>TITLE + DESCRIPTION + ACTIONS</span>
                 <PatternSection
                     title="Section title"
                     description="Optional description that explains what this section contains."
@@ -51,11 +60,11 @@ function PatternSectionSlotsDemos() {
 function PatternSectionCompositionDemo() {
     return (
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FILLED SECTION WITH CARDS</span>
+            <span style={demoLabel}>FILLED SECTION WITH CARDS</span>
             <PatternSection
                 title="Section title"
                 description="Sections group related cards, tables, or forms on a page."
-                background="surface-container-low"
+                background="container"
                 padding="sm"
             >
                 <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', flexWrap: 'wrap' }}>
@@ -105,7 +114,7 @@ export default {
         },
         background: {
             control: 'select',
-            options: ['none', 'surface-container-low'],
+            options: ['none', 'container'],
             description: 'Section background token',
             table: { category: 'Design' },
         },

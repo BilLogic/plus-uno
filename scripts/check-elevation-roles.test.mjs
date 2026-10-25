@@ -138,7 +138,7 @@ const SURFACES = [
   { file: 'design-system/src/components/overlays-and-layering/Popover/Popover.scss', rule: '.plus-popover {', shadow: '--surface-overlay-shadow' },
   { file: 'design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss', rule: '.tooltip-inner {', shadow: '--surface-overlay-shadow' },
   { file: 'design-system/src/components/messaging/Toast/Toast.scss', rule: '.plus-toast', shadow: '--surface-overlay-shadow' },
-  { file: 'design-system/src/patterns/SurfaceContainer/SurfaceContainer.scss', rule: '.plus-surface-container__sidebar--floating {', shadow: '--surface-overlay-shadow', fill: '--surface-overlay' },
+  { file: 'design-system/src/patterns/Frame/Frame.scss', rule: '.plus-frame__sidebar--floating {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
   { file: 'design-system/src/components/messaging/Modal/Modal.scss', rule: '.plus-modal', shadow: '--elevation-light-4', fill: '--color-surface-overlay' },
   { file: 'design-system/src/patterns/PatternModal/PatternModal.scss', rule: '.plus-pattern-modal {', shadow: '--elevation-light-4', fill: '--surface-overlay' },
   { file: 'design-system/src/components/forms-and-inputs/_internal/Listbox.scss', rule: '', shadow: '--surface-overlay-shadow', fill: '--color-surface-overlay' },

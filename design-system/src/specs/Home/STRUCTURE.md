@@ -34,7 +34,7 @@ design-system/src/specs/Home/
     ├── TutorHomePageSkillsOverview/
     ├── TutorHomePageSkillsProgress/
     ├── TutorHomePageSkillsOverviewDifferentLayout/
-    └── TutorHomePageNewLayout/  # Home (new layout): the same content on the surface container and content grid
+    └── TutorHomePageNewLayout/  # Home (new layout): the same content on the Frame and content grid
 ```
 
 ## Figma mapping

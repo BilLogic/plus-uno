@@ -48,10 +48,10 @@ export default {
 
 const sidebarSurface = {
     display: 'inline-flex',
-    backgroundColor: 'var(--color-surface-container)',
+    backgroundColor: 'var(--ds-surface-sunken)',
     padding: '12px',
     borderRadius: '12px',
-    border: '1px solid var(--color-outline-variant)',
+    border: '1px solid var(--ds-border)',
 };
 
 export const InSidebar = () => {
@@ -181,7 +181,7 @@ export const Interactive = {
 /** A row that fits the 240 sidebar's 224 content width. */
 const sidebarWidth = { width: 'calc(var(--layout-width-sidebar) - 2 * var(--surface-container-pad))' };
 
-/** Tabbing onto a row draws the 2px focus ring in the focus-ring color. */
+/** Tabbing onto a row draws the 2px focused ring, 2px outside the row. */
 export const KeyboardFocus = {
     args: { text: 'Reports', icon: 'chart-bar' },
     parameters: { docs: { disable: true } },
@@ -191,7 +191,8 @@ export const KeyboardFocus = {
         await expect(document.activeElement).toBe(row);
         await waitFor(() => expect(getComputedStyle(row).outlineStyle).toBe('solid'));
         await expect(px(getComputedStyle(row).outlineWidth), 'ring width').toBe(2);
-        await expect(getComputedStyle(row).outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--color-focus-ring'));
+        await expect(getComputedStyle(row).outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        await expect(px(getComputedStyle(row).outlineOffset), 'ring offset, outside the row').toBe(2);
     },
 };
 

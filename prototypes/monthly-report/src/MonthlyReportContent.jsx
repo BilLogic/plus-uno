@@ -322,18 +322,18 @@ export default function MonthlyReportContent() {
             style.id = styleId;
             style.textContent = `
                 #spa-shell .plus-page-main::-webkit-scrollbar,
-                #spa-shell .plus-surface-container__surface::-webkit-scrollbar,
+                #spa-shell .plus-frame__surface::-webkit-scrollbar,
                 #home-redesign-page .plus-page-main::-webkit-scrollbar,
-                #home-redesign-page .plus-surface-container__surface::-webkit-scrollbar,
+                #home-redesign-page .plus-frame__surface::-webkit-scrollbar,
                 .monthly-report-page-scroller::-webkit-scrollbar {
                     display: none !important;
                     width: 0 !important;
                     background: transparent !important;
                 }
                 #spa-shell .plus-page-main,
-                #spa-shell .plus-surface-container__surface,
+                #spa-shell .plus-frame__surface,
                 #home-redesign-page .plus-page-main,
-                #home-redesign-page .plus-surface-container__surface,
+                #home-redesign-page .plus-frame__surface,
                 .monthly-report-page-scroller {
                     scrollbar-width: none !important;
                     -ms-overflow-style: none !important;

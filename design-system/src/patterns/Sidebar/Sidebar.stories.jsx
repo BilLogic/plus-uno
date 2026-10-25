@@ -29,7 +29,7 @@ const SIDEBAR_BOX = {
     width: 'calc(var(--layout-width-sidebar) - 2 * var(--surface-container-pad))',
     boxSizing: 'content-box',
     padding: 'var(--surface-container-pad)',
-    backgroundColor: 'var(--surface-sunken)',
+    backgroundColor: 'var(--ds-surface-sunken)',
 };
 
 const header = <Logo style="colored" size="XS" text={true} className="p-0" />;
@@ -159,7 +159,8 @@ export const KeyboardFocus = {
         await userEvent.tab();
         await expect(document.activeElement).toBe(first);
         await waitFor(() => expect(getComputedStyle(first).outlineStyle).toBe('solid'));
-        await expect(getComputedStyle(first).outlineColor).toBe(tokenColor(canvasElement, '--color-focus-ring'));
+        await expect(getComputedStyle(first).outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        await expect(px(getComputedStyle(first).outlineOffset), 'the ring sits outside the row').toBeCloseTo(tokenLength(canvasElement, '--size-element-stroke-lg'), 0);
     },
 };
 
@@ -369,7 +370,7 @@ export const LiveDot = {
         const dots = canvas.getAllByRole('img', { name: 'Live' });
         await expect(dots, 'one live session').toHaveLength(1);
         await expect(canvas.getByRole('link', { name: /^Hogwarts/ })).toContainElement(dots[0]);
-        await expect(getComputedStyle(dots[0]).backgroundColor).toBe(tokenColor(canvasElement, '--color-success'));
+        await expect(dots[0], 'the success dot').toHaveClass('plus-count--dot', 'plus-count--success');
         await expect(canvas.getByRole('link', { name: /^Hogwarts.*Live$/ }), 'the row is announced as live').toBeInTheDocument();
     },
 };
@@ -499,7 +500,7 @@ export const Overflow = {
 
 /**
  * The thread ties the tabs to their parent. Each row is a 28 thread column and
- * a surface: a 1 outline-variant line runs under the parent's icon center,
+ * a surface: a 1 border-color line runs under the parent's icon center,
  * unbroken through the gaps, and ends in a radius-6 elbow at the last row,
  * which is "Show N more" when it shows. The surface pads 8, so labels line up
  * with the parent's label, and every state fill starts at 28.
@@ -508,7 +509,7 @@ export const Thread = {
     render: () => <OpenTabsHarness storeKey="story:thread" seed={manySessions(20)} select="sessions:s20" boxHeight="var(--size-5400)" />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const outline = tokenColor(canvasElement, '--color-outline-variant');
+        const outline = tokenColor(canvasElement, '--ds-border');
         const stroke = tokenLength(canvasElement, '--size-element-stroke-sm');
         const thread = (li) => getComputedStyle(li, '::before');
         const parentRow = canvas.getByRole('button', { name: /^Sessions$/ });
@@ -523,7 +524,7 @@ export const Thread = {
                 const line = thread(li);
                 const box = li.getBoundingClientRect();
                 const surface = li.querySelector('.plus-sidebar-tab');
-                await expect(line.borderLeftColor, 'outline-variant').toBe(outline);
+                await expect(line.borderLeftColor, 'the border color').toBe(outline);
                 await expect(px(line.borderLeftWidth), 'a 1 stroke').toBeCloseTo(stroke, 1);
                 await expect(box.left + px(line.left), 'under the parent icon center').toBeCloseTo(parentIcon.left + parentIcon.width / 2, 0);
                 await expect(box.left, 'the row starts where the parent does').toBeCloseTo(parentRow.getBoundingClientRect().left, 0);
@@ -538,8 +539,8 @@ export const Thread = {
                     await expect(box.top + px(line.top) + px(line.height), 'the elbow stops at the row middle').toBeCloseTo(box.top + box.height / 2, 0);
                     await expect(px(line.borderBottomWidth), 'the elbow turns').toBeCloseTo(stroke, 1);
                     await expect(px(line.borderBottomLeftRadius), 'radius 6').toBeCloseTo(tokenLength(canvasElement, '--element-radius-item-sm'), 0);
-                    await expect(box.left + px(line.left) + px(line.width), 'the stub stops one focus-ring stroke short of the surface')
-                        .toBeCloseTo(box.left + column - tokenLength(canvasElement, '--size-element-stroke-lg'), 0);
+                    await expect(box.left + px(line.left) + px(line.width), 'the stub stops short of a focused surface\'s ring')
+                        .toBeCloseTo(box.left + column - 2 * tokenLength(canvasElement, '--size-element-stroke-lg'), 0);
                 } else {
                     await expect(box.top + px(line.top) + px(line.height), 'runs through the gap to the next row').toBeCloseTo(rows[index + 1].getBoundingClientRect().top, 0);
                     await expect(px(line.borderBottomWidth), 'no elbow mid-thread').toBe(0);
@@ -549,8 +550,10 @@ export const Thread = {
             }
             const selected = canvasElement.querySelector('.plus-pattern-sidebar__tabs [aria-current="page"]');
             if (selected) {
-                await expect(getComputedStyle(selected).backgroundColor, 'selected fills the surface, Primary 16')
-                    .toBe(tokenColor(canvasElement, '--color-primary-state-16'));
+                await expect(getComputedStyle(selected).backgroundColor, 'selected fills the surface, neutral')
+                    .toBe(tokenColor(canvasElement, '--ds-background-selected'));
+                await expect(getComputedStyle(selected).boxShadow, 'and draws the leading bar')
+                    .toContain(tokenColor(canvasElement, '--ds-border-selected'));
             }
         };
         await expect(canvas.getByRole('link', { name: 'Session 20' }), 'a selected tab').toHaveAttribute('aria-current', 'page');

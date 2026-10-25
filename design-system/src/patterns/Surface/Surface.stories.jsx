@@ -10,9 +10,9 @@ const slotContent = (label) => (
             alignItems: 'center',
             justifyContent: 'center',
             minHeight: '96px',
-            border: 'var(--size-element-border) dashed var(--color-outline)',
+            border: 'var(--size-element-border) dashed var(--ds-border-bold)',
             borderRadius: 'var(--size-element-radius-md)',
-            color: 'var(--color-on-surface-variant)',
+            color: 'var(--ds-text-subtle)',
         }}
         className="body1-txt"
     >
@@ -20,35 +20,30 @@ const slotContent = (label) => (
     </div>
 );
 
-/** Every surface level token, side by side — docs section only */
+const levelLabel = {
+    display: 'block',
+    marginBottom: 'var(--element-stack-md)',
+    font: 'var(--heading-xxsmall)',
+    color: 'var(--ds-text-subtle)',
+};
+
+/** What each level pairs: its fill, and the shadow that goes with it. */
+const PAIRS = {
+    sunken: '--ds-surface-sunken, no shadow',
+    default: '--ds-surface, edged by --ds-border-surface',
+    raised: '--ds-surface-raised + --ds-shadow-raised',
+    overlay: '--ds-surface-overlay + --ds-shadow-overlay',
+};
+
+/** Every elevation level, lowest to highest, on the frame's sunken backdrop — docs section only */
 function SurfaceLevelsDemo() {
     return (
-        <div style={col}>
+        <div style={{ ...col, padding: 'var(--surface-pad)', backgroundColor: 'var(--ds-surface-sunken)' }}>
             {SURFACE_LEVELS.map((level) => (
                 <div key={level}>
-                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">
-                        {level.toUpperCase()}
-                    </span>
-                    <Surface level={level} padding="sm" radius="md" border>
-                        {slotContent(`--color-${level}`)}
-                    </Surface>
-                </div>
-            ))}
-        </div>
-    );
-}
-
-/** Elevation steps on a surface */
-function SurfaceElevationDemo() {
-    return (
-        <div style={col}>
-            {[0, 1, 2, 3].map((elevation) => (
-                <div key={elevation}>
-                    <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">
-                        {`ELEVATION ${elevation}`}
-                    </span>
-                    <Surface level="surface-container-lowest" padding="sm" radius="md" elevation={elevation}>
-                        {slotContent(elevation === 0 ? 'Flat' : `--elevation-light-${elevation}`)}
+                    <span style={levelLabel}>{level}</span>
+                    <Surface level={level} padding="sm" radius="md">
+                        {slotContent(PAIRS[level])}
                     </Surface>
                 </div>
             ))}
@@ -67,7 +62,7 @@ export default {
         level: {
             control: 'select',
             options: SURFACE_LEVELS,
-            description: 'Surface color token',
+            description: 'Elevation level: a fill and its shadow',
             table: { category: 'Design' },
         },
         padding: {
@@ -84,13 +79,7 @@ export default {
         },
         border: {
             control: 'boolean',
-            description: 'Outline border',
-            table: { category: 'Design' },
-        },
-        elevation: {
-            control: 'select',
-            options: [0, 1, 2, 3, 4, 5],
-            description: 'Elevation level',
+            description: 'A bold border',
             table: { category: 'Design' },
         },
         id: {
@@ -105,22 +94,19 @@ export default {
 };
 
 export const Overview = () => (
-    <Surface level="surface" padding="md" radius="lg" border>
+    <Surface padding="md" radius="lg">
         {slotContent('Content slot')}
     </Surface>
 );
 
 export const Levels = () => <SurfaceLevelsDemo />;
 
-export const Elevation = () => <SurfaceElevationDemo />;
-
 export const Interactive = {
     args: {
-        level: 'surface',
+        level: 'default',
         padding: 'md',
         radius: 'lg',
-        border: true,
-        elevation: 0,
+        border: false,
     },
     render: (args) => (
         <Surface {...args}>

@@ -29,7 +29,7 @@ The topbar is the app frame's top row, 32 high: the **sidebar toggle** at the st
 
 ### Anatomy
 
-- **Row** — `--layout-height-topbar` 32. It has no fill of its own; the frame's `--surface-sunken` shows through.
+- **Row** — `--layout-height-topbar` 32. It has no fill of its own; the frame's `--ds-surface-sunken` shows through.
 - **Start** — padded `--surface-container-pad` 8 on the left, so the toggle sits at the container pad. Docked, it is `--layout-width-sidebar` 240 wide; otherwise it hugs the toggle and pads `--element-inline-lg` 12 before the breadcrumb.
 - **Toggle** — a primary tonal Button at the 32 size, icon only.
 - **Middle** — a Breadcrumb that fills what is left. It stays on one line, and its crumbs end in an ellipsis rather than wrap.
@@ -43,7 +43,7 @@ The topbar is the app frame's top row, 32 high: the **sidebar toggle** at the st
 
 - It shows `angles-left` while the sidebar is open, docked or floating, and `bars` while it is closed.
 - Its name says what a press does: "Close sidebar" while docked, "Open sidebar" otherwise. `aria-expanded` says whether the sidebar is showing.
-- Inside a surface container, the frame owns the sidebar state and hands it to the topbar, so there is one toggle. Standalone, pass `sidebar`, `docked` and `onToggle`; without `onToggle` there is no toggle.
+- Inside a Frame, the frame owns the sidebar state and hands it to the topbar, so there is one toggle. Standalone, pass `sidebar`, `docked` and `onToggle`; without `onToggle` there is no toggle.
 
 <DocsCanvasShell description={<>Closed: `bars`, and the breadcrumb follows the toggle.</>}>
     <DsCanvasQuiet of={TopbarStories.Closed} />
@@ -89,7 +89,7 @@ The topbar is the app frame's top row, 32 high: the **sidebar toggle** at the st
 
 ## Related
 
-- For the frame it sits in, and the sidebar state it reads, use `SurfaceContainer`.
+- For the frame it sits in, and the sidebar state it reads, use `Frame`.
 - For a whole page, use `PageLayout`, whose TopBar renders this pattern.
 - For the trail itself, see `Breadcrumb`; for the account, `UserAvatar`.
 

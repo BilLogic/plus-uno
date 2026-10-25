@@ -1,17 +1,17 @@
 /**
  * PageLayout Component
  *
- * The app frame every spec page is laid out in: the SurfaceContainer pattern
+ * The app frame every spec page is laid out in: the Frame pattern
  * (32 topbar, 240 sidebar docking from 1024, the surface and its 12-column
  * content grid) filled with the PLUS TopBar and Sidebar. The frame's sizes and
- * the sidebar's dock, peek and float behavior live in SurfaceContainer; this
+ * the sidebar's dock, peek and float behavior live in Frame; this
  * component supplies the content and the page outline.
  * Figma: BS4 Foundation `Pattern/Page template` and `Pattern/Surface container`.
  */
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { SurfaceContainer } from '@/patterns';
+import { Frame } from '@/patterns';
 import { TopBar, Sidebar } from '../../Sections';
 import { usePageLayoutShell } from './PageLayoutShellContext';
 
@@ -151,7 +151,7 @@ const PageLayout = ({
                 ...style,
             }}
         >
-            <SurfaceContainer
+            <Frame
                 topbar={topbar}
                 sidebar={sidebar}
                 sidebarDocked={forceExpanded ? true : undefined}
@@ -162,7 +162,7 @@ const PageLayout = ({
             >
                 {pageTitle}
                 {children}
-            </SurfaceContainer>
+            </Frame>
 
             {/* Floating content anchored to page frame (e.g. FAB) */}
             {floatingContent && (

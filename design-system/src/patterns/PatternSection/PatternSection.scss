@@ -1,13 +1,13 @@
 /**
  * Section pattern (Patterns/Section)
- * Large structural page block — no-fill or surface-container-low, section
- * padding/gap tokens, never elevated.
+ * Large structural page block — no fill, or the translucent container well,
+ * section padding/gap tokens, never elevated.
  */
 
 .plus-pattern-section {
     display: flex;
     flex-direction: column;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 /* Background */
@@ -15,8 +15,9 @@
     background-color: transparent;
 }
 
-.plus-pattern-section-bg-surface-container-low {
-    background-color: var(--color-surface-container-low);
+// A well: translucent, so it reads on whatever surface it sits on.
+.plus-pattern-section-bg-container {
+    background-color: var(--ds-surface-container);
     border-radius: var(--size-section-radius-md);
 }
 
@@ -75,7 +76,7 @@
 
 .plus-pattern-section-title {
     margin: 0;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 /* The page header: Heading/large 24. */
@@ -96,7 +97,7 @@
 .plus-pattern-section-description {
     margin: 0;
     font: var(--body-default);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 .plus-pattern-section-actions {

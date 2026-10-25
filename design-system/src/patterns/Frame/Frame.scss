@@ -1,11 +1,11 @@
 /**
- * Surface container pattern (Patterns/Surface container): the app frame.
+ * Frame pattern (Patterns/Frame): the app frame.
  * Mirrors the Figma `Pattern/Surface container`, `_Topbar`, `_Sidebar` and
  * `Pattern/Surface`. Every length is a Layout, Surface container or Surface
  * token; the per-breakpoint values come from the tokens' own media queries.
  */
 
-.plus-surface-container {
+.plus-frame {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -17,13 +17,13 @@
     // Pad 8 top, right and bottom and 0 on the left: the Topbar pads its own
     // left, so the toggle sits at (8, 8) whatever the sidebar is doing.
     padding: var(--surface-container-pad) var(--surface-container-pad) var(--surface-container-pad) var(--space-0);
-    background-color: var(--surface-sunken);
-    color: var(--color-on-surface);
+    background-color: var(--ds-surface-sunken);
+    color: var(--ds-text);
 }
 
 /* ------------------------------------------------------------- topbar */
 
-.plus-surface-container__topbar {
+.plus-frame__topbar {
     display: flex;
     align-items: center;
     flex-shrink: 0;
@@ -35,14 +35,14 @@
 // so the toggle never moves and stays pressable. The layer goes on the start
 // area, not the button: a page-reveal transform on the start makes it a
 // stacking context, and a z-index inside one would not reach the sidebar.
-.plus-surface-container__topbar .plus-topbar__start {
+.plus-frame__topbar .plus-topbar__start {
     position: relative;
     z-index: calc(var(--layout-z-index-navigation) + 1);
 }
 
 /* ------------------------------------------------------------- row */
 
-.plus-surface-container__row {
+.plus-frame__row {
     display: flex;
     flex: 1 1 auto;
     min-height: 0;
@@ -51,17 +51,17 @@
 }
 
 // The token assumes the width's default; these follow the user's choice instead.
-.plus-surface-container--docked-narrow .plus-surface-container__row {
+.plus-frame--docked-narrow .plus-frame__row {
     padding-left: var(--space-0);
 }
 
-.plus-surface-container--undocked-wide .plus-surface-container__row {
+.plus-frame--undocked-wide .plus-frame__row {
     padding-left: var(--surface-container-pad);
 }
 
 /* ------------------------------------------------------------- sidebar */
 
-.plus-surface-container__sidebar {
+.plus-frame__sidebar {
     display: flex;
     flex-direction: column;
     gap: var(--element-stack-sm);
@@ -70,7 +70,7 @@
     overflow-y: auto;
 }
 
-.plus-surface-container__sidebar--docked {
+.plus-frame__sidebar--docked {
     position: static;
     flex-shrink: 0;
     padding: 0 var(--surface-container-pad);
@@ -80,19 +80,19 @@
 // The fill and shadow are Figma's Surface roles/surface-overlay pairing. It is on
 // the navigation layer (200), under popups (400) and a modal's scrim (500); the
 // toggle (one above) and the hover edge (one below) sit either side of it.
-.plus-surface-container__sidebar--floating {
+.plus-frame__sidebar--floating {
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     z-index: var(--layout-z-index-navigation);
     padding: var(--surface-container-pad);
-    background-color: var(--surface-overlay);
-    box-shadow: var(--surface-overlay-shadow);
+    background-color: var(--ds-surface-overlay);
+    box-shadow: var(--ds-shadow-overlay);
 }
 
 // The toggle sits in this space, so the sidebar's first row starts under the topbar.
-.plus-surface-container__topbar-space {
+.plus-frame__topbar-space {
     flex-shrink: 0;
     height: var(--layout-height-topbar);
 }
@@ -100,7 +100,7 @@
 // The hover strip that peeks a closed sidebar: the frame's left edge beside the
 // surface row. The topbar's corner belongs to the toggle, which peeks on its own,
 // so a pointer resting in the screen's top-left corner opens nothing.
-.plus-surface-container__edge {
+.plus-frame__edge {
     position: absolute;
     top: calc(var(--surface-container-pad) + var(--layout-height-topbar));
     bottom: 0;
@@ -111,7 +111,7 @@
 
 /* ------------------------------------------------------------- surface */
 
-.plus-surface-container__surface {
+.plus-frame__surface {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -122,12 +122,16 @@
     padding: var(--surface-pad);
     overflow: auto;
     border-radius: var(--surface-radius);
-    background-color: var(--surface-default);
+    background-color: var(--ds-surface);
+    // The surface's edge: transparent, except where increased contrast turns the
+    // frame white and the surface needs a line to stand on. A ring, so it takes
+    // no room from the pad.
+    box-shadow: 0 0 0 var(--size-surface-border) var(--ds-border-surface);
 }
 
 // The 12-column content grid, capped and centered; never narrower than 720,
 // so a narrow surface scrolls sideways instead.
-.plus-surface-container__content {
+.plus-frame__content {
     display: grid;
     grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
     column-gap: var(--layout-gutter);
@@ -146,6 +150,6 @@
     }
 }
 
-.plus-surface-container__content--reading {
+.plus-frame__content--reading {
     max-width: var(--layout-max-width-reading);
 }
