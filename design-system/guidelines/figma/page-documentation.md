@@ -92,6 +92,13 @@ in `on-surface-variant`.
 Section's edge and its content, and between Sections. A Section has no
 auto-layout, so the gap is placed by hand rather than bound; the scan holds it.
 
+**Every Section hugs its content**: exactly 80 from its nearest node on all
+four sides, with no slack and no spill. That holds for the zone Sections inside
+a family Section too (Components, Docs, Playground). Each zone takes its own
+height, so zones side by side end at different depths, sitting 80 apart. After
+any edit that grows or shrinks content, fit the innermost Section first, then
+its parent.
+
 **Nothing overlaps.** No two top-level Sections, no two nodes inside one
 Section, and no two variants inside one set share any area, and every node sits
 wholly inside its Section.
@@ -102,7 +109,7 @@ wholly inside its Section.
    the matrix frame to its labels and set.
 2. Move each node below the matrix, and the Docs frame to its right, so each
    gap is 80 again.
-3. Resize the Section to its content plus 80 on every side.
+3. Fit each Section to its content plus 80 on every side, innermost first.
 4. Move every Section to the right of it by the same growth.
 5. Re-run the scan; it reads zero overlaps, tight gaps, spills and unlabeled
    sets.
@@ -222,10 +229,12 @@ Bind every value inside the Docs frame to a semantic variable, as
 | Table rows | gap `Table/cell-gap`; vertical padding `Element/gap-sm`; stroke `outline-variant` |
 | Open-state examples | the field and its popup stacked in a vertical auto-layout frame, gap `Element/gap-xs`, placed by auto-layout alone |
 
-Text uses the library's text styles: Title/H4 for the page title, Title/H5 for
-section headings, Legacy/Body/B2 for prose and table cells (Bold for table headers),
-Legacy/Body/B3 for the Header's Figma line, Legacy/Body/Special/Code for code and property
-names. Color comes from `on-surface` and `on-surface-variant`.
+Text uses the current text styles: Heading/large for the page title,
+Heading/medium for section headings, Heading/small for subsections, Body/default
+for prose and table cells (semibold weight for table headers), and Body/small for
+the Header's Figma line. Code and property names carry no style; they bind the
+type variables as `token-mapping.md` § Text that carries no style says. Color
+comes from `on-surface` and `on-surface-variant`.
 
 ## Done
 
@@ -235,6 +244,7 @@ A page is done when a read-only scan of it finds:
   `Docs / <Component>` with all seven sections in order;
 - zero overlaps, gaps under 80 px, spills past a Section's edge, and nodes
   outside a Section;
+- every Section, zones included, exactly 80 from its content on all four sides;
 - every set of two or more variants in a labeled variant matrix, public sets
   above parts, and the Docs frame rightmost;
 - no annotation on a set, variant or part; every annotation on a layer inside
