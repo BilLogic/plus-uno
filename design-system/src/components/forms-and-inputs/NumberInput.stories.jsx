@@ -116,7 +116,7 @@ export const Content = () => {
 
     return (
         <div style={{ maxWidth: '800px' }}>
-            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
                 Placeholder and typing in the default field.
             </p>
             <NumberInput

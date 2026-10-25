@@ -42,9 +42,9 @@
         padding: 0;
         margin: 0;
         margin-right: var(--size-element-gap-sm, 8px); // Spacing between checkbox and label
-        border: var(--size-element-stroke-md, 2px) solid var(--color-primary-border);
+        border: var(--size-element-stroke-md, 2px) solid var(--ds-border-input);
         border-radius: var(--size-element-radius-sm, 2px);
-        background-color: var(--color-surface-container-lowest);
+        background-color: var(--ds-background-input);
         cursor: pointer;
         transition: all 0.2s;
         position: relative;
@@ -61,7 +61,7 @@
             height: calc(var(--layout-control-checkbox) - 4px);
             clip-path: polygon(26% 43%, 14% 57%, 49% 85%, 90% 26%, 75% 16%, 46% 59%);
             transform: translate(-50%, -50%) scale(0);
-            background-color: var(--color-on-primary);
+            background-color: var(--ds-icon-inverse);
             transition: transform 0.2s;
         }
 
@@ -74,20 +74,21 @@
             width: 10px;
             height: 2px;
             transform: translate(-50%, -50%) scale(0);
-            background-color: var(--color-on-primary);
+            background-color: var(--ds-icon-inverse);
             transition: transform 0.2s;
         }
 
         // Unchecked state
         &:not(:checked):not(:indeterminate) {
-            background-color: var(--color-surface-container-lowest);
-            border-color: var(--color-outline-variant);
+            background-color: var(--ds-background-input);
+            border-color: var(--ds-border-input);
         }
 
-        // Checked state
+        // Checked state: Lagoon, the checked-control fill, edged in
+        // `border.selected`, the same color, so the box reads as one shape.
         &:checked:not(:indeterminate) {
-            background-color: var(--color-primary);
-            border-color: var(--color-primary-border);
+            background-color: var(--ds-background-selected-bold);
+            border-color: var(--ds-border-selected);
         }
 
         &:checked:not(:indeterminate)::before {
@@ -96,8 +97,8 @@
 
         // Indeterminate state (dash/minus)
         &:indeterminate {
-            background-color: var(--color-primary);
-            border-color: var(--color-primary-border);
+            background-color: var(--ds-background-selected-bold);
+            border-color: var(--ds-border-selected);
         }
 
         &:indeterminate::after {
@@ -108,20 +109,21 @@
             transform: translate(-50%, -50%) scale(0);
         }
 
-        // Hover state
+        // Hover state: the input's hovered fill, edged in the brand border.
         &:hover:not(:disabled):not(:indeterminate) {
-            border-color: var(--color-primary-border);
-            background-color: var(--color-primary-state-08);
+            border-color: var(--ds-border-brand);
+            background-color: var(--ds-background-input-hovered);
         }
 
-        // A checked or mixed box keeps its fill and its mark on hover: the
-        // shadow 08 layer is an inset shadow over the primary fill, under the
-        // mark drawn by `::before` and `::after`, rather than a translucent
-        // wash replacing the fill.
+        // A checked or mixed box keeps its mark on hover, and its fill steps to
+        // the named hovered step, opaque, under the mark drawn by `::before`
+        // and `::after`. The edge takes the same step: there is no hovered
+        // border role, and `check:intent-roles` bars only the resting `.bold`
+        // fill from an edge.
         &:checked:hover:not(:disabled):not(:indeterminate),
         &:indeterminate:hover:not(:disabled) {
-            background-color: var(--color-primary);
-            box-shadow: inset 0 0 0 var(--layout-control-checkbox) var(--color-shadow-state-08);
+            background-color: var(--ds-background-selected-bold-hovered);
+            border-color: var(--ds-background-selected-bold-hovered);
         }
 
         // Focus state: the focus ring, 2px wide and 2px off the box, as Button
@@ -132,28 +134,35 @@
         }
 
         &:focus-visible {
-            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
             outline-offset: var(--size-element-stroke-lg);
         }
 
-        // Disabled state
+        // Disabled state: Atlassian's disabled colors, under the disabled fade.
         &:disabled {
-            opacity: var(--color-disabled-opacity);
+            opacity: var(--ds-opacity-disabled);
             cursor: not-allowed;
-            border-color: var(--color-outline-variant);
-            background-color: var(--color-surface-variant);
+            border-color: var(--ds-border-disabled);
+            background-color: var(--ds-background-disabled);
         }
 
+        // A disabled checked or mixed box keeps the disabled fill and edge;
+        // its mark is `icon.disabled`.
         &:disabled:checked,
         &:disabled:indeterminate {
-            background-color: var(--color-outline-variant);
-            border-color: var(--color-outline-variant);
+            background-color: var(--ds-background-disabled);
+            border-color: var(--ds-border-disabled);
+
+            &::before,
+            &::after {
+                background-color: var(--ds-icon-disabled);
+            }
         }
     }
 
     // Label styling
     .form-check-label {
-        color: var(--color-on-surface);
+        color: var(--ds-text);
         cursor: pointer;
         user-select: none;
         flex: 1;
@@ -167,7 +176,7 @@
 
 // Required indicator
 .plus-form-checkbox-required-asterisk {
-    color: var(--color-danger-text);
+    color: var(--ds-text-danger);
     margin-left: 2px;
     font-weight: var(--type-weight-regular);
 }
@@ -175,7 +184,7 @@
 // Disabled wrapper state
 .plus-form-checkbox-disabled {
     .form-check-label {
-        opacity: var(--color-disabled-opacity);
+        opacity: var(--ds-opacity-disabled);
         cursor: not-allowed;
     }
 }
