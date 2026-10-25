@@ -578,34 +578,66 @@ The generator makes that cheap. Increased contrast is the same token map pointed
 - [ADS Components](https://www.figma.com/community/file/1527532229258392178/ads-components);
 - [ADS Iconography](https://www.figma.com/community/file/1592321163746398016/ads-iconography).
 
-All three are CC BY 4.0, and each replaces a "(Legacy)" file. Atlassian's own page says the libraries carry tokens "built-in as styles and in components", and that an employee-only plugin converts designs to dark mode ([use tokens in design](https://atlassian.design/foundations/tokens/use-tokens-in-design)). How the Foundations file splits variables, styles, collections and modes is **unverified**: reading it means opening it in a Figma account, which this pass did not do.
+All three are CC BY 4.0, and each replaces a "(Legacy)" file.
 
-**Typography tokens, from the same package** ([atlassian-typography](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/esm/artifacts/themes/atlassian-typography.js)). Twenty-three tokens. Each composite token is one CSS `font` shorthand: weight, size and line height together.
+**How ADS Foundations is built.** Read 2026-10-25, read-only, from Bill's duplicate of the community file. It is not a palette file: it holds the semantic layer and aliases into a separate primitives library that the community copy does not include. Seven variable collections:
 
-| Group | Tokens | Size / line height |
-|---|---|---|
-| Heading (weight 653) | `font.heading.xxlarge` … `.xxsmall` | 32/36, 28/32, 24/28, 20/24, 16/20, 14/20, 12/16 |
-| Body (400) | `font.body.large`, `font.body`, `font.body.small` | 16/24, 14/20, 12/16 |
-| Metric (653) | `font.metric.large`, `.medium`, `.small` | 28/32, 24/28, 16/20 |
-| Code | `font.code` | 0.875em, Atlassian Mono |
-| Weight | `font.weight.regular` / `.medium` / `.semibold` / `.bold` | 400 / 500 / 600 / 653 |
-| Family | `font.family.heading` / `.body` / `.code` / `.brand.heading` / `.brand.body` | Atlassian Sans, Atlassian Mono, Charlie Display / Text |
+| Collection | Modes | Count | Holds |
+|---|---|---|---|
+| 🌮 Color | Light, Dark | 601 color | `color/text…`, `color/icon…`, `color/border…`, `color/background…` (196), `color/chart…` (100), `color/link`, `color/blanket`, `color/interaction`, `color/skeleton`, `elevation/surface…` (10), `elevation/shadow…` (10); plus 190 under `color/⛔️ DST team only/…` for logos and lozenge internals |
+| 🌮 Typography | Default (Atlassian fonts), Legacy (system fonts) | 4 strings | font family per role: Heading, Body, Code, Metric |
+| 🌮 Typography text styles | one | 42 numbers | font size, line height, weight and paragraph spacing per style |
+| 🌮 Spacing | one | 14 | `space/0` … `space/1000`, scoped to gap |
+| 🌮 Radius | one | 19 | xs to xxl, full round, a matching **focus** radius per size, and tile radii per tile size; each has a usage description |
+| 🌮 Border | one | 3 | border widths: default, selected, focused |
+| 🌮 Responsive | six breakpoints, XL 1768+ down to XXS 320 | 28 | breakpoint booleans, grid columns, gutter, margin, nav widths |
 
-What carries over to PLUS, which has already adopted Atlassian's type structure with its own families:
+What the file shows:
 
-1. **Composite tokens per role, not per property.** A heading is one token, so size and line height never drift apart.
-2. **Families as tokens.** Swapping a typeface is one edit.
-3. **Metric** is a separate role for numbers in dashboards. This matters for tutor stats.
-4. **Bold is 653**, a variable-font weight. PLUS's families would map bold to the nearest weight they ship.
+1. **Two color modes only.** Light and Dark. Increased contrast exists in code but not in Figma.
+2. **Primitives are a separate, hidden library.** Every semantic token aliases a remote primitive named like `Blue/Blue700` or `Neutral/Opaque/Neutral0`. Designers can only pick semantics.
+3. **Paths mirror the code name**, with `default` as the leaf for the unqualified token: `color/text/accent/red/default`. Every variable carries code syntax, such as `token('color.text.accent.red')`, so Dev Mode shows the code name.
+4. **Shadows are split in two:**
+   - **Effect styles, one set per mode:** `Light/elevation.shadow.raised`, `Dark/elevation.shadow.overlay`, and so on. Effect styles cannot switch modes, so the mode is in the style name.
+   - **Shadow color variables per layer:** `elevation/shadow/raised/spread`, `…/perimeter`, `…/inner`. These are mode-aware, so the colors follow the theme even though the geometry does not.
+5. **Text styles are fully bound.** All 20 (`Heading/XXL` to `XXS`; `Body/L`, `M (Default)` and `S`, each in Regular, Medium and Bold; `Metric/L`, `M` and `S`; `Code`) bind size, line height, weight, paragraph spacing and family to variables. Swapping the Typography mode swaps every style's typeface at once.
+6. **No color paint styles.** The 189 paint styles are illustrations, not colors. Color lives only in variables.
+7. **Gaps not to copy:**
+   - 598 of 601 color variables are left at `ALL_SCOPES`, so every color shows in every picker.
+   - Only one variable has a description.
+8. **Visible conventions.** 🌮 marks published collections and styles; 🔒 marks internal parts.
 
-**Recommended PLUS Figma setup**, mirroring the token source:
+**Recommended PLUS Figma setup**, aligned with ADS Foundations and fixing its two gaps:
 
-| Collection | Modes | Holds |
-|---|---|---|
-| Primitives | one | the nine hue ramps, both neutral ramps and the alphas, hidden from publishing so designers pick semantics |
-| Color | Light, Dark (Increased contrast later) | the semantic `color.*` and `elevation.surface.*` tokens, each aliasing a primitive |
-| Shadows | — | effect styles `elevation.shadow.raised / overlay / overflow`, one per mode, because Figma variables cannot hold shadows |
-| Typography | — | text styles named like the tokens (`font/heading/large`), with size, line height and weight as number variables underneath |
+| Collection or style | Modes | Holds | Differs from ADS |
+|---|---|---|---|
+| Primitives (hidden from publishing) | one | nine hue ramps, both neutral ramps, alphas, named `teal/teal700` | ADS keeps these in a separate library; one hidden collection is simpler for one team |
+| Color | Light, Dark (Increased contrast later as two more modes) | semantic `color/…/default` and `elevation/surface/…`, with WEB code syntax `var(--ds-…)` | **scoped** (text colors to text fill, borders to stroke, backgrounds to fills) and **described** |
+| Shadow colors | inside Color | `elevation/shadow/{raised,overlay,overflow}/…` | same as ADS |
+| Effect styles | — | `Light/elevation.shadow.raised` … `Dark/…` | same as ADS |
+| Typography | Default, plus a fallback mode | font family per role | same pattern, PLUS families |
+| Type scale | one | size, line height, weight per style | same as ADS |
+| Text styles | — | `Heading/…`, `Body/{L,M,S}/{Regular,Medium,Bold}`, `Metric/…`, `Code`, all bound | same as ADS |
+
+**Type, in brief.** Atlassian's type scale is the same in code ([atlassian-typography](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/esm/artifacts/themes/atlassian-typography.js)) and in Figma:
+
+| Role | Sizes (size / line height) |
+|---|---|
+| Heading XXL–XXS | 32/36, 28/32, 24/28, 20/24, 16/20, 14/20, 12/16 |
+| Body L, M, S | 16/24, 14/20, 12/16 |
+| Metric L, M, S | 28/32, 24/28, 16/20 |
+| Code | 12/20 in Figma |
+
+Weights are 400, 500, 600 and 653, where 653 is a variable-font bold.
+
+Four things carry over to PLUS, which already follows Atlassian's type structure with its own families:
+
+1. Composite tokens per role, so size and line height never drift apart.
+2. Families as tokens, so a typeface swap is one mode change.
+3. A separate Metric role for dashboard numbers.
+4. Bold mapped to the nearest weight PLUS's families ship.
+
+Spacing, Radius, Border and Responsive follow the same pattern. PLUS already has its own tokens there, so they are listed for completeness, not proposed here. One idea worth borrowing later is radius: a focus-ring radius paired with each corner radius, so the ring stays concentric.
 
 ## 5. Open decisions for Bill
 
