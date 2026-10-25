@@ -109,19 +109,21 @@
             transform: translate(-50%, -50%) scale(0);
         }
 
-        // Hover state: the input's hovered fill.
+        // Hover state: the input's hovered fill, edged in the brand border.
         &:hover:not(:disabled):not(:indeterminate) {
-            border-color: var(--ds-border-input);
+            border-color: var(--ds-border-brand);
             background-color: var(--ds-background-input-hovered);
         }
 
         // A checked or mixed box keeps its mark on hover, and its fill steps to
         // the named hovered step, opaque, under the mark drawn by `::before`
-        // and `::after`.
+        // and `::after`. The edge takes the same step: there is no hovered
+        // border role, and `check:intent-roles` bars only the resting `.bold`
+        // fill from an edge.
         &:checked:hover:not(:disabled):not(:indeterminate),
         &:indeterminate:hover:not(:disabled) {
             background-color: var(--ds-background-selected-bold-hovered);
-            border-color: var(--ds-border-selected);
+            border-color: var(--ds-background-selected-bold-hovered);
         }
 
         // Focus state: the focus ring, 2px wide and 2px off the box, as Button
@@ -136,20 +138,25 @@
             outline-offset: var(--size-element-stroke-lg);
         }
 
-        // Disabled state
+        // Disabled state: Atlassian's disabled colors, under the disabled fade.
         &:disabled {
             opacity: var(--ds-opacity-disabled);
             cursor: not-allowed;
-            border-color: var(--ds-border-input);
-            background-color: var(--ds-background-neutral);
+            border-color: var(--ds-border-disabled);
+            background-color: var(--ds-background-disabled);
         }
 
-        // A disabled checked box is neutral, its mark still `icon.inverse`,
-        // and the box fades with the rest of the control.
+        // A disabled checked or mixed box keeps the disabled fill and edge;
+        // its mark is `icon.disabled`.
         &:disabled:checked,
         &:disabled:indeterminate {
-            background-color: var(--ds-background-neutral-bold);
-            border-color: var(--ds-background-neutral-bold);
+            background-color: var(--ds-background-disabled);
+            border-color: var(--ds-border-disabled);
+
+            &::before,
+            &::after {
+                background-color: var(--ds-icon-disabled);
+            }
         }
     }
 

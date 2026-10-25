@@ -43,13 +43,13 @@
         background-color: var(--ds-background-selected);
         color: var(--ds-text-selected);
 
+        .plus-option-row-description {
+            color: var(--ds-text-selected);
+        }
+
         &:hover:not(.is-disabled),
         &.is-highlighted:not(.is-disabled) {
             background-color: var(--ds-background-selected-hovered);
-        }
-
-        &:active:not(.is-disabled) {
-            background-color: var(--ds-background-selected-pressed);
         }
     }
 

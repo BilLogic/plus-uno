@@ -50,11 +50,16 @@
         border-color: var(--ds-border-input) !important;
         background-color: var(--ds-background-input) !important;
 
-        // Checked state: Lagoon, the checked-control fill, edged in `border.selected`.
+        // Checked state: Lagoon, the checked-control fill, edged in
+        // `border.selected`. The dot is drawn here in `icon.inverse` (half the
+        // radius, as Bootstrap's dot image, with a one-pixel soft edge at 12),
+        // not Bootstrap's image, so it follows every color mode as Checkbox's
+        // mark does.
         &:checked {
             background-color: var(--ds-background-selected-bold) !important;
             border-color: var(--ds-border-selected) !important;
             accent-color: var(--ds-background-selected-bold) !important;
+            background-image: radial-gradient(circle closest-side, var(--ds-icon-inverse) 42%, transparent 58%) !important;
         }
 
         // Focus state, keyboard only: the focus-ring role, 2px wide and 2px off
@@ -64,42 +69,50 @@
         &:focus-visible {
             outline: var(--size-element-stroke-lg) solid var(--ds-border-focused) !important;
             outline-offset: var(--size-element-stroke-lg);
+            border-color: var(--ds-border-brand) !important;
+            accent-color: var(--ds-background-selected-bold) !important;
             box-shadow: none !important;
         }
 
-        // Regular :focus state: no focus ring
+        // Regular :focus state - update colors but don't show focus ring
         &:focus:not(:focus-visible) {
             outline: none !important;
+            border-color: var(--ds-border-brand) !important;
+            accent-color: var(--ds-background-selected-bold) !important;
             box-shadow: none !important;
         }
 
         // Hover state: the input's hovered fill when unchecked; the named
-        // hovered step, opaque, when checked. A checked radio keeps
-        // Bootstrap's dot image, so the dot stays.
+        // hovered step, opaque, when checked, edged in the same step. The dot
+        // keeps its `icon.inverse` drawing from the checked rule.
         &:hover:not(:disabled):not(:checked) {
-            border-color: var(--ds-border-input) !important;
+            border-color: var(--ds-border-brand) !important;
+            accent-color: var(--ds-background-selected-bold) !important;
             background-color: var(--ds-background-input-hovered) !important;
         }
 
         &:hover:not(:disabled):checked {
+            border-color: var(--ds-background-selected-bold-hovered) !important;
             accent-color: var(--ds-background-selected-bold-hovered) !important;
             background-color: var(--ds-background-selected-bold-hovered) !important;
         }
 
-        // Disabled state
+        // Disabled state: Atlassian's disabled colors, under the disabled fade.
         &:disabled {
             opacity: var(--ds-opacity-disabled);
             cursor: not-allowed;
-            border-color: var(--ds-border-input) !important;
-            background-color: var(--ds-background-neutral) !important;
-            accent-color: var(--ds-border-input) !important;
+            border-color: var(--ds-border-disabled) !important;
+            background-color: var(--ds-background-disabled) !important;
+            accent-color: var(--ds-border-disabled) !important;
         }
 
-        // A disabled checked radio is neutral, its dot still the inverse ink.
+        // A disabled checked radio keeps the disabled fill and edge; its dot
+        // is `icon.disabled`.
         &:disabled:checked {
-            background-color: var(--ds-background-neutral-bold) !important;
-            border-color: var(--ds-background-neutral-bold) !important;
-            accent-color: var(--ds-background-neutral-bold) !important;
+            background-color: var(--ds-background-disabled) !important;
+            border-color: var(--ds-border-disabled) !important;
+            accent-color: var(--ds-border-disabled) !important;
+            background-image: radial-gradient(circle closest-side, var(--ds-icon-disabled) 42%, transparent 58%) !important;
         }
     }
 

@@ -4,10 +4,10 @@
  * _Field — one look for every text-like field.
  *
  * One 1px border (`--size-element-border`) in `border.input` on one fill,
- * `background.input`. Hover steps the fill to `background.input.hovered`.
- * Focus draws the focus ring, 2px (`--size-element-stroke-lg`) and 2px off
- * the box onto the surface, in `border.focused`: the ring is never drawn
- * inset. Invalid is `border.danger` with `text.danger` in the caption,
+ * `background.input`. Hover turns the border `border.focused`. Focus draws
+ * the focus ring, 2px (`--size-element-stroke-lg`) and 2px off the box onto
+ * the surface, in `border.focused`: the ring is never drawn inset. Hover and
+ * focus share the color, so the width and the gap tell them apart. Invalid is `border.danger` with `text.danger` in the caption,
  * placeholder `text.subtlest`, helper text `text.subtle`, read-only
  * `background.neutral`. Figma draws its stroke inside the box, so the border
  * is taken out of the padding here.
@@ -206,10 +206,9 @@ textarea.plus-field__control {
 
 // ── States ──────────────────────────────────────────────────────────────────
 
-// A subtle field takes its own hover fill, below.
-.plus-field:hover:not(.plus-field--subtle):not(.plus-field--disabled):not(.plus-field--readonly):not(.plus-field--invalid):not(.plus-field--valid),
+.plus-field:hover:not(.plus-field--disabled):not(.plus-field--readonly):not(.plus-field--invalid):not(.plus-field--valid),
 .plus-field--hover {
-    background-color: var(--ds-background-input-hovered);
+    border-color: var(--ds-border-focused);
 }
 
 .plus-field:focus-within,

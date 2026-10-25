@@ -13,7 +13,7 @@
 .plus-choice-description {
     font: var(--body-small);
     padding-left: var(--plus-choice-indent);
-    color: var(--ds-text-subtle);
+    color: var(--color-on-surface-variant);
 }
 
 .plus-form-checkbox-wrapper {
@@ -26,19 +26,17 @@
 
 .plus-choice-card {
     padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
-    border: var(--size-element-stroke-sm) solid var(--ds-border);
+    border: var(--size-element-stroke-sm) solid var(--color-outline-variant);
     border-radius: var(--size-element-radius-md);
-    background-color: var(--ds-background-input);
+    background-color: var(--color-surface-container-lowest);
 
-    // Selected is neutral ink with a Lagoon edge, the checked control inside
-    // carrying the Lagoon fill.
     &:has(input:checked) {
-        border-color: var(--ds-border-selected);
-        background-color: var(--ds-background-selected);
+        border-color: var(--color-primary-border);
+        background-color: var(--color-primary-state-08);
     }
 
     &:has(input:focus-visible) {
-        border-color: var(--ds-border-selected);
+        border-color: var(--color-primary-border);
     }
 }
 
