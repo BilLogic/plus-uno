@@ -304,7 +304,17 @@ export const CHECKS = [
     module: 'scripts/check-color-fallbacks.mjs',
     baseline: 'scripts/baselines/color-fallback-baseline.json',
     guards:
-      'the literal beside a color token agreeing with that token (#268). `var(--color-on-surface-variant, #5c5c5c)` reads as one decision and is two — that token is `#3f484a`, and it carries TEN different fallbacks across its uses, none of them the token. 191 of 473 comparable fallbacks disagree, so the recorded set is ratcheted and only a NEW one fails. It also holds 27 `--color-*` names that are referenced and defined nowhere, where the fallback IS the color. Static and sub-second, which is why it composes here while the browser checks do not.',
+      'the literal beside a color token agreeing with that token (#268). `var(--color-on-surface-variant, #5c5c5c)` reads as one decision and is two — that token is `#3f484a`, and it carries TEN different fallbacks across its uses, none of them the token. 191 of 473 comparable fallbacks disagree, so the recorded set is ratcheted and only a NEW one fails. It also holds 27 `--color-*` names that are referenced and defined nowhere, where the fallback IS the color. It reads the generated `--ds-*` set beside `--color-*`, so a misspelled `--ds-*` name is caught the same way; that a `--ds-*` token carries no fallback at all is the rule of check:ds-fallbacks. Static and sub-second, which is why it composes here while the browser checks do not.',
+  },
+  {
+    name: 'check:ds-fallbacks',
+    script: 'node scripts/check-ds-fallbacks.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-ds-fallbacks.mjs',
+    floors: { MIN_FILES: 1500 },
+    guards:
+      "no `--ds-*` color token written with a fallback — `var(--ds-text, #172b4d)`, `var(--ds-surface, white)` or `var(--ds-border, var(--color-outline-variant))` alike. The legacy `--color-*` set carries its fallbacks as recorded debt, which check:color-fallbacks can only stop growing; the Atlassian-shaped set (ADR-035) starts with none, so the count starts at zero and every fallback fails. A `--ds-*` token has a value in each of four modes, and a fallback is a fifth, unmoded color that paints only when the token sheet has already failed. Searches what check:color-fallbacks searches, skipping the generated color files that define the tokens.",
   },
   {
     name: 'check:size-fallbacks',

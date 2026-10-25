@@ -49,6 +49,8 @@ import { documents, text } from '../../scripts/lib/corpus.mjs';
 import { fallbackUsages } from '../../scripts/token-fallbacks.mjs';
 import { parseColor, toHex } from '../src/lib/tokens.mjs';
 import {
+  COLOR_PREFIXES,
+  COLOR_TOKEN_DIR,
   FAMILIES,
   TOKEN_DIR,
   colorKey,
@@ -159,9 +161,37 @@ describe('the corpus — where tokens live, answered once and read through the o
 
   it('does not read `tokens/source/`, the Figma export the SCSS is generated from', () => {
     for (const source of tokenSources()) {
-      expect(source.file).not.toMatch(/\//);
-      expect(source.file).toMatch(/\.(scss|css)$/);
+      // The one directory read below the flat sheets is the generated color set.
+      expect(source.file).toMatch(/^(color\/)?[^/]+\.(scss|css)$/);
+      expect(source.file.startsWith('source/')).toBe(false);
     }
+  });
+
+  it('reads the generated color tokens, and not the Bootstrap bridge that consumes them', () => {
+    const files = tokenSources().map((s) => s.file);
+    expect(files).toContain('color/_semantic.scss');
+    expect(files).toContain('color/_palette.scss');
+    expect(files).not.toContain('color/_bootstrap-bridge.scss');
+
+    const corpus = tokenCorpus({ prefix: COLOR_PREFIXES });
+    // A `--ds-` token is an alias of a ramp step, followed to its hex.
+    expect(corpus.get('--ds-border-focused').raw).toMatch(/^var\(--palette-/);
+    expect(corpus.get('--ds-border-focused').value).toMatch(/^#[0-9a-f]{6}$/);
+    expect(corpus.get('--ds-border-focused').file).toBe('color/_semantic.scss');
+    expect(corpus.has('--color-primary')).toBe(true);
+    expect([...corpus.keys()].some((name) => name.startsWith('--bs-'))).toBe(false);
+    expect(tokenCorpus({ prefix: '--palette-' }).values().next().value.primitive).toBe(true);
+  });
+
+  it('reads the color directory from the root it is given', () => {
+    const root = mkdtempSync(join(tmpdir(), 'tokens-node-color-'));
+    mkdirSync(join(root, COLOR_TOKEN_DIR), { recursive: true });
+    writeFileSync(join(root, COLOR_TOKEN_DIR, '_palette.scss'), ':root { --palette-teal-700: #147d6a; }');
+    writeFileSync(join(root, COLOR_TOKEN_DIR, '_semantic.scss'), ':root { --ds-text-brand: var(--palette-teal-700); }');
+    writeFileSync(join(root, COLOR_TOKEN_DIR, '_bootstrap-bridge.scss'), ':root { --bs-primary: var(--ds-text-brand); }');
+
+    expect(tokenSources({ root }).map((s) => s.file)).toEqual(['color/_palette.scss', 'color/_semantic.scss']);
+    expect(tokenCorpus({ root }).get('--ds-text-brand').value).toBe('#147d6a');
   });
 
   /*
@@ -450,9 +480,17 @@ describe('the color key is finer than the normalizer it replaces', () => {
    * ink and took its three pairs with the white washes along. The number is asserted
    * rather than logged because a migrating caller's exposure is this number,
    * and a drift in it is news either way.
+   *
+   * THE GENERATED COLOR SET IS LEFT OUT. When `tokens/color/` joined the corpus
+   * its `--ds-` and `--palette-` tokens took the count to 1543, and that number
+   * moves with every plan regenerated. Their exposure is nil: a `--ds-` token
+   * is never written with a fallback (`check:ds-fallbacks`), so no comparison
+   * either fallback check makes can reach one. What is counted is the legacy
+   * set, which is the set the exposure is about.
    */
   it('differs from the normalizer on 427 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
+      .filter((entry) => !entry.file.startsWith('color/'))
       .map((entry) => entry.value)
       .filter((value) => normalizeColor(value) !== null);
 

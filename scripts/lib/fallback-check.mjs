@@ -70,8 +70,9 @@ const SEARCH_ROOTS = ['design-system/src', '.storybook', 'prototypes'];
  *           for — a name pattern for color, a kind for dimensions.
  * @property {string} [census]   the word before `token(s)` in the green line.
  *           Absent for the family whose whole namespace is its own name.
- * @property {string} prefix     the name `tokenCorpus` narrows to, and the one
- *           `fallbackUsages` scans for. Stated by both families rather than
+ * @property {string|string[]} prefix  the name `tokenCorpus` narrows to, and
+ *           the one `fallbackUsages` scans for — or a list of them, which is
+ *           how the color family reads `--color-*` and `--ds-*` at once. Stated by both families rather than
  *           defaulted: `--color-` used to be the default of two separate
  *           functions, which made the color family's most load-bearing fact
  *           the one thing its descriptor did not say.

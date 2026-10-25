@@ -149,7 +149,7 @@ const FALLBACK = `(?<literal>${NESTED_VAR}|${COLOR_FUNCTION_SOURCE}|[^),]+)`;
  * deliberately stops at the name.
  *
  * @param {{path: string, text: string}[]} files
- * @param {{prefix?: string}} [options]
+ * @param {{prefix?: string|string[]}} [options] one prefix or a list of them
  */
 export function fallbackUsages(files, { prefix = '--color-' } = {}) {
   const uses = [];

@@ -55,6 +55,7 @@ const INTENTS = ['primary', 'secondary', 'tertiary', 'danger', 'success', 'warni
 export const REMEDY =
   '  -> An intent color on an edge names the role: `var(--color-danger-border)`,\n' +
   `     not \`var(--color-danger)\`. The roles are defined in ${ROLES_FILE}.\n` +
+  '     In the --ds- words: `var(--ds-border-danger)`, not `var(--ds-background-danger-bold)`.\n' +
   `     If a call site genuinely needs the base, record it in ${BASELINE} with a reason.`;
 
 // The corpus walk, the edge uses and the roles file are the same read for both

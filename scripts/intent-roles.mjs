@@ -73,7 +73,30 @@ export const EDGE = new RegExp(
   'g',
 );
 
-const BASE = new RegExp(`var\\(\\s*(--color-(?:${INTENTS.join('|')}))\\s*[,)]`, 'g');
+/**
+ * The same rule in the `--ds-` vocabulary (ADR-035). Atlassian names a role's
+ * fill and its edge separately — `--ds-background-danger-bold` and
+ * `--ds-border-danger` — so the fill on an edge is the base standing in for the
+ * role, exactly as `--color-danger` is. Only the bold fill counts: a subtle
+ * fill on an edge is a different (pale) color, not a role skipped, and its
+ * `-hovered` / `-pressed` steps are states of the fill. `neutral` has no
+ * `--ds-border-neutral` role to name, so it is not one of these.
+ */
+export const DS_ROLES = ['brand', 'danger', 'success', 'warning', 'information', 'discovery', 'selected'];
+
+/** The PLUS intent a theme-map row is keyed by, to the `--ds-` role it became. */
+export const DS_ROLE_OF = { primary: 'brand', danger: 'danger', success: 'success', warning: 'warning', info: 'information' };
+
+const BASE = new RegExp(
+  `var\\(\\s*(--color-(?:${INTENTS.join('|')})|--ds-background-(?:${DS_ROLES.join('|')})-bold)\\s*[,)]`,
+  'g',
+);
+
+/** The edge role a base stands in for: `--color-danger-border`, `--ds-border-danger`. */
+export function roleOf(token) {
+  const ds = /^--ds-background-([a-z]+)-bold$/.exec(token);
+  return ds ? `--ds-border-${ds[1]}` : `${token}-border`;
+}
 
 export function stylesheets(root = REPO_ROOT, dir = CORPUS) {
   // `tokens/` DEFINES the roles; `--color-danger-border: var(--color-danger)`
@@ -99,7 +122,7 @@ export function edgeUses(files, root = REPO_ROOT) {
           property,
           kind,
           token: token[1],
-          role: `${token[1]}-border`,
+          role: roleOf(token[1]),
         });
       }
     }
@@ -183,7 +206,8 @@ export function mixFailures(uses, { failures: verdicts = [], stale = [], unrevie
 
 /**
  * A ROLE SLOT IN A THEME MAP. Button and Dropdown carry their intent colors as
- * quoted Sass maps — `'danger': ('--color-danger', …, '--color-danger-border')`
+ * quoted Sass maps — `'danger': ('--color-danger', …, '--color-danger-border')`,
+ * or in the new words `('--ds-background-danger-bold', …, '--ds-border-danger')`
  * — and the edge is painted from `var(#{$col-border})` far from the name, so
  * `edgeUses` cannot see which token a map row hands its edge. The map says
  * which slot is the edge: a slot where any intent row names its own `-border`
@@ -203,16 +227,19 @@ export function themeMapUses(files, root = REPO_ROOT) {
       const slots = [...match[2].matchAll(/'([^']*)'/g)].map((m) => m[1].trim());
       rows.push({ intent: match[1], slots, line: source.slice(0, match.index).split('\n').length });
     }
+    // Either vocabulary names the edge: `--color-danger-border` or `--ds-border-danger`.
+    const ds = (intent) => DS_ROLE_OF[intent];
     const edgeSlots = new Set();
     for (const { intent, slots } of rows) {
       slots.forEach((slot, i) => {
-        if (slot === `--color-${intent}-border`) edgeSlots.add(i);
+        if (slot === `--color-${intent}-border` || (ds(intent) && slot === `--ds-border-${ds(intent)}`)) edgeSlots.add(i);
       });
     }
     for (const { intent, slots, line } of rows) {
+      const bases = [`--color-${intent}`, ...(ds(intent) ? [`--ds-background-${ds(intent)}-bold`] : [])];
       for (const i of edgeSlots) {
-        if (slots[i] === `--color-${intent}`) {
-          uses.push({ file, line, intent, slot: i + 1, token: slots[i], role: `${slots[i]}-border` });
+        if (bases.includes(slots[i])) {
+          uses.push({ file, line, intent, slot: i + 1, token: slots[i], role: roleOf(slots[i]) });
         }
       }
     }

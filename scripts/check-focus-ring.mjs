@@ -32,7 +32,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
+import { COLOR_TOKEN_DIR, TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import {
   REPO_ROOT,
   colors,
@@ -49,6 +49,9 @@ import { openRatchet } from './lib/ratchet.mjs';
 const RECORD = 'scripts/baselines/focus-ring.json';
 const ROLES_FILE = `${TOKEN_DIR}/_color_roles.scss`;
 
+/** The `--ds-*` focus role, generated into the color directory (ADR-035). */
+export const DS_FOCUS_RING = '--ds-border-focused';
+
 /*
  * Floors. A resolver that stopped finding stylesheets, or a selector scan that
  * stopped recognizing `:focus`, would report a clean sweep — which is the one
@@ -60,10 +63,10 @@ export const MIN_RULES = 50;
 export const REMEDY =
   `  -> A focus indicator is held to ${NON_TEXT}:1 against what it sits on (WCAG 1.4.11),\n` +
   '     and it is the only thing telling a keyboard user where they are. Use\n' +
-  '     `var(--color-focus-ring)` — 5.02:1 on the page — rather than a state tint or\n' +
-  '     an inverse color meant for dark grounds. A ring drawn on a ground its caller\n' +
-  '     paints declares that ground (`// @grounds: --color-…` in its block) and is\n' +
-  '     measured on each one.';
+  '     `var(--ds-border-focused)` (or, until it is retired, `var(--color-focus-ring)`)\n' +
+  '     rather than a state tint or an inverse color meant for dark grounds. A ring\n' +
+  '     drawn on a ground its caller paints declares that ground\n' +
+  '     (`// @grounds: --ds-…` or `--color-…` in its block) and is measured on each one.';
 
 // The sweep — the corpus walk, the token values and the measured rules — is the
 // same for both questions, so it happens once per root.
@@ -74,6 +77,8 @@ const inputs = byRoot((repoRoot) => {
   const raw = focusRules(files, repoRoot);
   return {
     files,
+    raw,
+    values,
     rules: indicators(raw, values),
     declarations: declarationErrors(files, repoRoot, values),
     // A vanished roles file is the floor case, not a crash (#611).
@@ -83,7 +88,7 @@ const inputs = byRoot((repoRoot) => {
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
-  const { files, rules, roles, declarations } = inputs(repoRoot);
+  const { files, rules, roles, declarations, values, raw } = inputs(repoRoot);
   const found = [];
 
   // A `@grounds` list that names nothing, or a token nobody defines, measures
@@ -110,6 +115,20 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   if (!/--color-focus-ring:/.test(roles)) {
     found.push({
       message: `${ROLES_FILE} no longer defines --color-focus-ring, which every fixed focus rule resolves through.`,
+    });
+  }
+
+  /*
+   * The same for the `--ds-*` role, once a rule names it. It is asserted on use
+   * rather than always, because the generated color set is wired in separately
+   * from this check, and a tree no rule has moved onto it yet is not broken.
+   */
+  const dsUses = raw.filter((rule) => rule.tokens.includes(DS_FOCUS_RING));
+  if (dsUses.length && !values.has(DS_FOCUS_RING)) {
+    found.push({
+      message:
+        `${COLOR_TOKEN_DIR}/ no longer defines ${DS_FOCUS_RING}, which ${dsUses.length} focus rule(s) resolve ` +
+        `through (first: ${dsUses[0].file}:${dsUses[0].line}).`,
     });
   }
 

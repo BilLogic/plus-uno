@@ -7,6 +7,12 @@
  * is reported (and fails `--check`). That guard is exactly what would have caught the
  * bogus `--size-spacing-between-components-3` mapping.
  *
+ * The generated color set (ADR-035) is the exception to deriving a name: its
+ * Figma spec, `design-system/src/tokens/color/figma-spec.json`, carries each
+ * variable's code syntax (`var(--ds-text-brand)`), so those collections are
+ * read from it rather than guessed from the path. The legacy `colors / *`
+ * collections keep their derived `--color-*` names until they are retired.
+ *
  * Usage:
  *   node scripts/generate-token-registry.mjs          (write)
  *   node scripts/generate-token-registry.mjs --check  (CI: fail if stale or unknown tokens)
@@ -17,7 +23,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { tokenDeclarationPattern, varReferencePattern } from '../design-system/src/lib/tokens.mjs';
-import { TOKEN_DIR, tokenSources } from '../design-system/src/lib/tokens-node.mjs';
+import { COLOR_TOKEN_DIR, TOKEN_DIR, tokenSources } from '../design-system/src/lib/tokens-node.mjs';
 import { isEntry } from './lib/findings.mjs';
 import { frameLayerToken, isFrameLayerCollection } from './lib/frame-layer-collections.mjs';
 import { TYPOGRAPHY_COLLECTION, typographyToken } from './lib/typography-collection.mjs';
@@ -27,6 +33,35 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const MD_SOURCE = path.join(REPO_ROOT, 'design-system/guidelines/figma/token-mapping.md');
 const VARIABLES_SNAPSHOT = path.join(REPO_ROOT, 'scripts/figma-variables-snapshot.json');
 const OUT = path.join(REPO_ROOT, 'design-system/figma/token-registry.json');
+
+/** The generated color set's Figma spec: the variables Figma will hold, with their code syntax. */
+export const COLOR_SPEC_PATH = `${COLOR_TOKEN_DIR}/figma-spec.json`;
+export const COLOR_SPEC = path.join(REPO_ROOT, COLOR_SPEC_PATH);
+
+/** `var(--ds-text-brand)` → `--ds-text-brand`; anything else → null. */
+const WEB_SYNTAX = /^var\(\s*(--[a-z0-9-]+)\s*\)$/;
+
+/**
+ * Each spec collection's code syntax, as `collection → (variable path → token)`.
+ * A variable with no web code syntax — a shadow layer's color, offset or
+ * blur, which only an effect style binds — is left out, and a collection with
+ * none at all (the hidden primitives) is not listed.
+ *
+ * @param {{collections: {name: string, variables: {name: string, codeSyntax?: {WEB?: string}}[]}[]}} spec
+ * @returns {Map<string, Map<string, string>>}
+ */
+export function specCodeSyntax(spec) {
+  const out = new Map();
+  for (const collection of spec?.collections ?? []) {
+    const names = new Map();
+    for (const variable of collection.variables ?? []) {
+      const token = WEB_SYNTAX.exec(variable.codeSyntax?.WEB ?? '');
+      if (token) names.set(variable.name, token[1]);
+    }
+    if (names.size) out.set(collection.name, names);
+  }
+  return out;
+}
 
 const STATIC = {
   figmaFileKey: 'zAecJNRdvJzAUOcjV32tRX',
@@ -140,11 +175,17 @@ function slug(text) {
  * cannot realistically enumerate every variable (it reached 51 of 460). Naming
  * on both sides is systematic, so the bulk mapping is derived instead — the
  * collection decides the token family, then the path tail becomes the suffix.
+ * A collection whose variables carry their code syntax is not derived at all:
+ * the syntax IS the name, so it is the one candidate.
+ *
  * @param {string} collection
  * @param {string} name full Figma variable path, e.g. "Card/pad-x-md"
+ * @param {{codeSyntax?: Map<string, string>}} [options] this collection's
+ *        code syntax, from `specCodeSyntax`, where it has one
  * @returns {string[]}
  */
-export function deriveCandidates(collection, name) {
+export function deriveCandidates(collection, name, { codeSyntax } = {}) {
+  if (codeSyntax?.has(name)) return [codeSyntax.get(name)];
   const parts = name.split('/').map((p) => p.trim());
   const leaf = parts[parts.length - 1];
   const head = parts[0].replace(/^_/, '');
@@ -230,21 +271,33 @@ function buildFigmaVariableMappings(scssTokens) {
     return { resolved: {}, unresolved: [], total: 0, snapshotMissing: true };
   }
   const snapshot = JSON.parse(fs.readFileSync(VARIABLES_SNAPSHOT, 'utf8'));
+  const syntax = fs.existsSync(COLOR_SPEC)
+    ? specCodeSyntax(JSON.parse(fs.readFileSync(COLOR_SPEC, 'utf8')))
+    : new Map();
   /** @type {Record<string, Record<string, string>>} */
   const resolved = {};
   /** @type {Array<{ collection: string; figmaVariable: string; tried: string[] }>} */
   const unresolved = [];
   let total = 0;
 
-  for (const [collection, data] of Object.entries(snapshot.collections)) {
+  const map = (collection, names) => {
     resolved[collection] = {};
-    for (const name of data.variables) {
+    const codeSyntax = syntax.get(collection);
+    for (const name of names) {
       total += 1;
-      const candidates = deriveCandidates(collection, name);
+      const candidates = deriveCandidates(collection, name, { codeSyntax });
       const hit = candidates.find((c) => scssTokens.has(c));
       if (hit) resolved[collection][name] = `var(${hit})`;
       else unresolved.push({ collection, figmaVariable: name, tried: candidates });
     }
+  };
+
+  for (const [collection, data] of Object.entries(snapshot.collections)) map(collection, data.variables);
+  // A spec collection Figma does not hold yet is still the lookup an agent will
+  // need the day it is pushed, and its names are the spec's, not a guess — so it
+  // is mapped from the spec, and held to the token sheets like every other one.
+  for (const [collection, names] of syntax) {
+    if (!(collection in snapshot.collections)) map(collection, names.keys());
   }
   return { resolved, unresolved, total, snapshotMissing: false };
 }
@@ -303,10 +356,12 @@ function build() {
     generated: true,
     generatedBy: 'scripts/generate-token-registry.mjs',
     note:
-      'DO NOT EDIT BY HAND. Two inputs: design-system/guidelines/figma/token-mapping.md (curated semantics, authoritative) and scripts/figma-variables-snapshot.json (bulk, derived mechanically). ' +
-      `Every token in both is validated against ${TOKEN_DIR}/*.scss. Run \`npm run generate:token-registry\`.`,
+      'DO NOT EDIT BY HAND. Three inputs: design-system/guidelines/figma/token-mapping.md (curated semantics, authoritative), scripts/figma-variables-snapshot.json (bulk, derived mechanically) and ' +
+      `${COLOR_SPEC_PATH} (the generated --ds- color variables, read by their code syntax). ` +
+      `Every token in all three is validated against ${TOKEN_DIR}/*.scss and ${COLOR_TOKEN_DIR}/*.scss. Run \`npm run generate:token-registry\`.`,
     ...STATIC,
     variablesSnapshot: 'scripts/figma-variables-snapshot.json',
+    colorSpec: COLOR_SPEC_PATH,
     mappings: { colors, typography, spacing, elevation },
     // Exact Figma variable path -> CSS token. This is the lookup an agent needs
     // for round-trip work, because `get_variable_defs` reports these paths.
