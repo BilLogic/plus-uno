@@ -1,7 +1,7 @@
 ---
 title: "Color system: research and proposal"
 type: research
-status: proposal, iteration 2; brand decided (Lagoon), Plan A vs Plan B and other calls awaiting Bill
+status: proposal, iteration 3; brand decided (Lagoon), Plan A vs Plan B and other calls awaiting Bill
 date: 2026-10-25
 repos: plus-uno (design-system/src/tokens, BS4 Foundation Figma library)
 artifact: https://claude.ai/artifact/SWQGFicTN9bV6HcF3fS3sk
@@ -9,15 +9,21 @@ artifact: https://claude.ai/artifact/SWQGFicTN9bV6HcF3fS3sk
 
 # Color system: research and proposal
 
-PLUS should replace its Material 3 color roles with an Atlassian-shaped token set. Underneath: nine OKLCH hue ramps and two gray ramps of numbered steps. On top: about 160 semantic tokens named `color.property.role.emphasis.state`, plus Atlassian's elevation tokens (surfaces, shadows, opacity), all in light and dark. Bill has chosen the brand: **Lagoon**, a greener teal at hue 205° (`#147b84`). The ramps are generated, not hand-picked: each step number is a contrast promise against white, so step 700 and darker always carry text and 500 and darker always clear 3:1.
+PLUS should replace its Material 3 color roles with an Atlassian-shaped token set. Underneath: OKLCH hue ramps and gray ramps of numbered steps. On top: 469 semantic tokens named `color.property.role.emphasis.state` (Atlassian's full color set, plus brown), and Atlassian's elevation tokens (surfaces, shadows, opacity), in four modes: light, dark, and an increased-contrast override of each. Bill has chosen the brand: **Lagoon**, a greener teal at hue 205° (`#147b84`). The ramps are generated, not hand-picked: each step number is a contrast promise against white, so step 700 and darker always carry text and 500 and darker always clear 3:1.
 
-Iteration 2 adds three things to the first draft:
+Iteration 3 adds three things:
+
+- **The full Atlassian color set.** Iteration 2 emitted accents only as a pattern and skipped charts and code syntax. All ten accent families (gray included), 106 chart tokens and 17 code-syntax tokens are now generated and checked. **Brown** is added, from Notion, and the accent **teal** gets its own ramp, apart from Lagoon (§4.2).
+- **Accents tuned per plan.** The hue ramps are no longer shared: Plan A fits hue and chroma to Notion's palette, Plan B to Claude's, both measured live. Step contrast is unchanged, so every pairing still passes (§4.2).
+- **Increased contrast, specified.** Two more modes, generated from Atlassian's own increased-contrast references and checked against 7:1 for text and 4.5:1 for icons and borders (§4.11).
+
+Iteration 2 added three things to the first draft:
 
 - **All nine Atlassian accent families, tuned to sit with Lagoon.** Hues are spaced for even perceptual distance and capped in chroma so no accent outshouts the brand (§4.2).
 - **Elevation in Atlassian's language**, mapped onto the UI patterns PLUS has already defined: the frame, the surface, sections, cards, tables, popovers and modals (§4.4, §4.5).
-- **Two directions for the neutrals and surfaces**, to explore before committing: **Plan A, Paper**, toward Notion, and **Plan B, Neutral**, toward Claude as served today. They share every hue ramp and every token name, and differ only in the grays and in drawing structure with borders or with tone and soft shadow (§4.6).
+- **Two directions for the neutrals and surfaces**, to explore before committing: **Plan A, Paper**, toward Notion, and **Plan B, Neutral**, toward Claude as served today. They share every token name. Iteration 2 made them differ in grays, lines and shadows (§4.6); iteration 3 adds the accent palette (§4.2).
 
-This is research and a proposal only. No token, component or Figma variable has changed. The visual companion is the artifact linked above. It renders both plans as a working PLUS screen in light and dark, plus every ramp and every semantic token. Section 5 lists the decisions only Bill can make, each with a recommendation.
+This is research and a proposal only. No token, component or Figma variable has changed. The visual companion is the artifact linked above. It renders both plans as a working PLUS screen in all four modes, the accent tags beside Notion's and Claude's, every ramp and every token. Section 5 lists the decisions only Bill can make, each with a recommendation.
 
 The generator and the data behind every table here are reproducible. They are small Python scripts with no dependencies (OKLab math from [Ottosson](https://bottosson.github.io/posts/oklab/)), kept with this doc's copy in `~/Documents/Claude/Projects/PLUS/color-system/`.
 
@@ -83,14 +89,16 @@ What PLUS takes from these: the foreground-pairing idea (Atlassian's `text.inver
   - **v2 with the `color` flag, pure gray.** `data-cds-fizzy-lake="color"` overrides that ramp with pure grays (`#f9f9f9`, `#e0e0e0`, `#6b6b6b`). This is what Bill's account is served today: a `#fafafa` sidebar on a white page, no borders on content, selection at ink 5%, a near-black `#191919` primary button. One blue accent (`#257de0`) handles interaction, and the clay brand (`#d97757`) appears only in the mark.
   - Whether the flag is rolled out to everyone is **unverified**. Both v2 states are near-neutral, so the direction is the same either way.
   - **Shadows.** v2 shadows are soft and diffuse, for example `--cds-shadow-sm: 0 1px 2px` at 6% plus `0 2px 8px` at 8%, and `--cds-shadow-popover: 0 8px 24px` at 12% plus `0 2px 6px` at 8%. Dark mode starts at `#0b0b0b` and its surfaces get lighter as they rise (`gray-850`, `-830`, `-800`), as Atlassian's do.
+- **claude.ai's accent palette** (`--cds-*`, read 2026-10-25) has eight hue ramps of about 40 steps each: red, orange, yellow, green, aqua, blue, violet and magenta, plus the clay brand (`#d97757`, emphasized `#c6613f`). Tags use step 100 as the tint and step 600 as the text (`--cds-bg-tint-blue` `#cde2fb`, `--cds-text-tint-blue` `#184f95`); fills use 450 (`#2a78d6`). The tints are fairly rich (OKLCH L 0.91, chroma 0.04–0.08) and the fills vivid (chroma 0.12–0.20). There is no brown, lime or gray accent.
 - **anthropic.com** serves hex, with no `oklch()` or `hsl()` in its CSS. Grays run `--color-gray-000…1000` in steps of 50 (`050 #faf9f5`, `500 #87867f`, `950 #141413`), and sections switch themes through `--theme-{background|foreground|border}-{primary…quaternary}` ([anthropic.com](https://www.anthropic.com/) served CSS). Anthropic's own brand-guidelines skill lists the same values: dark `#141413`, light `#faf9f5`, orange `#d97757`, blue `#6a9bcc`, green `#788c5d` ([brand-guidelines SKILL.md](https://raw.githubusercontent.com/anthropics/skills/main/skills/brand-guidelines/SKILL.md)). The names "Book Cloth", "Kraft" and "Manilla" are **unverified**: they appear in no served CSS or official source.
 
 ### 2.5 Notion
 
 - The API's color enum has ten text colors and nine backgrounds: default, gray, brown, orange, yellow, green, blue, purple, pink and red, with no teal ([rich-text reference](https://developers.notion.com/reference/rich-text)).
+- **Notion's tag palette** (app stylesheet, read 2026-10-25 signed in) has ten colors: gray, brown, orange, yellow, green, teal, blue, purple, pink and red. Tags use `BacTer` as the tint and `TexSec` as the text (blue `#cee3f7` and `#387dc9`). The tints are soft (L 0.90–0.95, chroma about 0.035). The bold colors are uneven: cool hues are muted (blue chroma 0.10, green 0.085, teal 0.09) while warm ones stay vivid (red 0.18, pink 0.16, orange 0.16). Several of its text colors fall below 4.5:1 on white (orange 3.2:1, yellow 2.7:1). Dark-theme values are in the same file, which settles part of what iteration 2 left unverified.
 - The served app CSS (read on a public notion.site page) has about 740 light-mode custom properties in a compressed grammar, `--c-{hue}{Property}{Rank}`: property is `Tex`, `Ico`, `Bor` or `Bac`, rank is `Pri`, `Sec` or `Ter`, and a `--ca-` prefix marks alpha values, e.g. `--c-bluTexSec`, `--ca-pinBacTerTra`. A numbered `pal*` palette sits underneath, and a teal family exists in the CSS though not in the API. Neutrals are warm: `--c-texPri #2c2c2b`, `--c-texSec #7d7a75`, `--c-borPri #e6e5e3`, `--c-bacSec #f9f8f7`. Colored text (`TexSec`) is the same value in both modes; blue text is `#387dc9`, teal `#2c8b9e`. A blue link renders as `var(--c-bluTexSec)` on the page. Source: [public notion.site page](https://johandahlberg.notion.site/Solid-Text-Color-Formating-fc39346030924c7a8865ec17a9110acd), served CSS. No official post on a 2024–25 Notion color update was found (**unverified**).
 
-**What Claude and Notion teach, read together.** Both use a two-layer system (numbered primitives under role tokens), neither uses OKLCH, and both put a warm, low-chroma gray under a single brand hue. That warmth is the concrete trait behind "the vibe of Notion and Claude", and it is the basis for open decision 2.
+**What Claude and Notion teach, read together.** Both use a two-layer system (numbered primitives under role tokens), neither uses OKLCH, and both put a low-chroma gray under a single brand hue. Their accents differ more than their grays: Notion's are dusty and earthy, Claude's clean and saturated. That warmth is the concrete trait behind "the vibe of Notion and Claude", and it is the basis for open decision 2.
 
 ### 2.6 OKLCH in the browser
 
@@ -138,7 +146,7 @@ What PLUS takes from these: the foreground-pairing idea (Atlassian's `text.inver
 
 The set has three parts:
 
-- **Nine hue families**, each with Atlassian's twelve steps: 100, 200, 250, 300, 400, 500, 600, 700, 800, 850, 900 and 1000.
+- **Hue families**, each with Atlassian's twelve steps (Lagoon plus ten accent ramps per plan): 100, 200, 250, 300, 400, 500, 600, 700, 800, 850, 900 and 1000.
 - **Two neutral ramps**: a light ramp from 0 to 1100, and a dark ramp from 0 to 1100 that adds 250 and 350.
 - **Alpha neutrals**: five per theme in light, six in dark.
 
@@ -210,45 +218,74 @@ The full ramps, with hex and contrast for every step, are in Appendix A and in t
 | hover / text (800) | `#106972` | `#106b66` | `#10687f` | `#00547e` text |
 | White on bold | 5.00:1 | 4.96:1 | 5.00:1 | 5.28:1 |
 
-**Accents.** PLUS keeps all nine of Atlassian's hue families: blue, teal, green, lime, yellow, orange, red, magenta and purple. Gray comes from the neutrals. Out of the box, Atlassian's accents are built around a vivid blue brand, and three problems showed up against Lagoon:
+**Accents: the full set.** Iteration 2 had all nine of Atlassian's hue ramps but emitted their accent tokens only as a pattern, and skipped chart and code-syntax colors. Every family and token is now generated:
 
-1. **Chroma.** sRGB caps Lagoon at about 0.09 chroma at step 700, while Atlassian's blues and reds run near 0.19–0.21. At equal lightness, any accent with much more chroma than the brand reads louder than the brand.
-2. **Uneven spacing.** Hue angles alone hide uneven perceptual distance. Measured in OKLab at step 700, some neighbors nearly touched while others sat far apart.
-3. **Drift in the pale steps.** Pale yellow and orange go green-gray if their hue is held constant.
+| Family | Atlassian | Notion | Claude | PLUS |
+|---|---|---|---|---|
+| blue, green, yellow, orange, red, purple | yes | yes | yes (purple is violet) | yes |
+| magenta | yes | pink | yes | yes |
+| teal | yes | yes | aqua | yes, on its own ramp (below) |
+| lime | yes | no | no | yes, to keep Atlassian's set and its charts whole |
+| gray | yes | yes | no | yes, from each plan's neutrals |
+| brown | no | yes | no | **added** |
+| AI | Rovo tokens | no | clay brand | out of scope (#269) |
 
-The fixes, one per problem:
+- **Tokens per family: 17.** Background subtlest, subtler, subtle and bolder, each with hovered and pressed; text and bolder text; icon; border and subtle border. Eleven families make 187.
+- **Charts: 106.** Categorical 1–8, `bold`, `bolder` and `boldest` per hue, and a chart color per role (brand, danger, warning, success, discovery, information, neutral), each with a hovered state.
+- **Code syntax: 17**, for code blocks in docs and prototypes.
+- **Brown** is the one color Notion has and Atlassian lacks. It gives SMART categories and tags an eleventh, quiet option, and costs one ramp.
+- **Accent teal gets its own ramp** (`aqua`, 190° in Plan A, 170° in Plan B) instead of aliasing Lagoon at 205°. Notion's teal sits at 212°, which would read as the brand; Claude's aqua at 170° shows the way out. Without the split, a teal tag would look like a brand button.
 
-| Family | Role | Hue | Chroma cap | 700 | White on 700 |
-|---|---|---|---|---|---|
-| teal | brand | 205° | 0.15 (sRGB binds at 0.087) | `#147b84` | 5.00 |
-| blue | information | 258° | 0.13 | `#406fb6` | 5.00 |
-| green | success | 158° | 0.13 | `#148051` | 5.00 |
-| lime | accent | 122° | 0.13 | `#627713` | 5.00 |
-| yellow | warning | 88°, 94° at the pale end | 0.14 | `#8a6b11` | 5.00 |
-| orange | accent | 56°, 64° at the pale end | 0.14 | `#a95b12` | 5.00 |
-| red | danger | 25° | 0.15 | `#b84d48` | 5.00 |
-| magenta | accent | 350° | 0.14 | `#ab507f` | 5.00 |
-| purple | discovery | 300° | 0.13 | `#7f60af` | 5.00 |
+**Accents per plan.** Iteration 2 shared one set of hue ramps across both plans, so the plans differed only in grays and shadows. The accents now follow each benchmark too. The generator is unchanged: each step keeps its contrast target, and only hue, chroma cap and tint softness move.
 
-- **Caps lowered from 0.15–0.17 to 0.13–0.15.** No accent's 700 carries more than 0.141 chroma. That keeps the palette in the pastel register Bill asked for and leaves Lagoon the most saturated thing a user sees only where it is a fill.
-- **Hues re-spaced for even distance.** Tuned at step 700, the closest neighbors moved from 0.061 to 0.067 apart in OKLab, and the widest gap closed from 0.142 to 0.106. Blue moved from 255° to 258°, green from 155° to 158°, lime from 128° to 122°, yellow from 86° to 88°, orange from 50° to 56°, red from 27° to 25° and purple from 292° to 300°; magenta stayed at 350°. The tuner is `tune.py`.
-- **Equal lightness per step.** Every family's 700 is 5.00:1 on white, so a red tag and a teal tag sit at the same visual weight and only hue differs.
+| Family | Role | Plan A hue / cap | A 200 · 700 | Notion tag tint · color | Plan B hue / cap | B 200 · 700 | Claude tint · fill |
+|---|---|---|---|---|---|---|---|
+| blue | information | 245° / 0.10 | `#d1e6f8` · `#3a74a2` | `#cee3f7` · `#337ea9` | 256° / 0.16 | `#d3e5fe` · `#2b6fc6` | `#cde2fb` · `#2a78d6` |
+| aqua | accent teal | 190° / 0.09 | `#cde9e7` · `#1c7c77` | `#cae9f0` · `#2c8b9e` | 170° / 0.12 | `#c5ebdd` · `#147f63` | `#bfebdb` · `#138e65` |
+| green | success | 158° / 0.085 | `#d4e8db` · `#407a5b` | `#d7e6dd` · `#448361` | 145° / 0.16 | `#c9ecc9` · `#1e802c` | `#caeac7` · `#009300` |
+| lime | accent | 120° / 0.085 | `#e0e5d1` · `#68743d` | — | 124° / 0.15 | `#dae9c0` · `#5e7911` | — |
+| yellow | warning | 80° (92° pale) / 0.12 | `#ede3c6` · `#916812` | `#f2e3b7` · `#cb912f` | 74° (84° pale) / 0.15 | `#f6e1ba` · `#966612` | `#f9dca4` · `#a66a00` |
+| orange | accent | 58° (64° pale) / 0.15 | `#fdddc3` · `#a75c12` | `#f3ddcb` · `#d9730d` | 45° (55° pale) / 0.16 | `#feddca` · `#b85014` | `#f7d8cb` · `#c25124` |
+| red | danger | 27° / 0.16 | `#fedcd7` · `#bd4941` | `#f7d9d5` · `#cd3c3a` | 25° / 0.17 | `#fedcd8` · `#c14543` | `#fad6d6` · `#d03b3b` |
+| magenta | accent | 350° / 0.15 | `#fedae9` · `#af4d80` | `#f4d8e4` · `#c14c8a` | 358° / 0.16 | `#fedbe5` · `#b74875` | `#f9d4e2` · `#c04873` |
+| purple | discovery | 308° / 0.115 | `#ecdef9` · `#8560a3` | `#e8dbf2` · `#9065b0` | 288° / 0.17 | `#e2e0fe` · `#715fca` | `#dfdbfd` · `#7161e0` |
+| brown | accent (new) | 52° / 0.075 | `#f2e0d5` · `#92654a` | `#ebdfd7` · `#9f6b53` | 48° / 0.09 | `#f8ded2` · `#9a6144` | — |
 
-One tradeoff remains. Information blue at 700 carries 0.122 chroma against Lagoon's 0.087, so an info section message reads slightly more vivid than a brand tint. It is acceptable because information is rare and never a primary action; open decision 8 offers a lower cap.
+- **Plan A, toward Notion.** Cool hues muted (blue 0.10, green 0.085), warm hues vivid (red 0.16, magenta 0.15, orange 0.15), as Notion's own palette is. Ochre yellow, steel blue, sage green. Tints at 1.1× the default curve, close to Notion's tag tints. Lagoon (chroma 0.087 at 700) stays the most saturated cool color on screen.
+- **Plan B, toward Claude.** Every hue at 0.15–0.17, with richer tints (1.25×). Hues follow Claude's: amber yellow 74°, grass green 145°, violet 288°, a redder orange at 45°. The cost: accents outshout Lagoon, as Claude's accents outshout its clay. Plan B's accents need to be used sparingly.
+- **The 700 steps still sit at 5.00:1 on white in both plans**, so a red and a teal tag carry the same weight and only hue differs. PLUS text on tags is darker than Notion's because PLUS keeps 4.5:1.
 
-**Accent contrast.** Atlassian's accent pairings, for every family, as light / dark ratios. Text needs 4.5:1 and icons 3:1. All pass.
+Iteration 2's tuning (even spacing at step 700, warmer pale yellow and orange, caps of 0.13–0.15) is now the starting point both plans move from, kept in `build.py`.
 
-| Family | text (800) on subtlest | text (800) on subtler | bolder (900) on subtle | inverse on bolder | icon (600) on surface |
-|---|---|---|---|---|---|
-| teal | 5.88 / 7.26 | 4.99 / 6.18 | 4.76 / 4.99 | 5.00 / 6.72 | 3.86 / 5.18 |
-| blue | 5.90 / 7.39 | 4.97 / 6.27 | 4.74 / 4.97 | 5.04 / 6.63 | 3.92 / 5.21 |
-| green | 5.97 / 7.37 | 5.04 / 6.14 | 4.68 / 5.04 | 4.96 / 6.66 | 3.90 / 5.18 |
-| lime | 5.93 / 7.33 | 5.01 / 6.12 | 4.67 / 5.01 | 5.04 / 6.65 | 3.91 / 5.19 |
-| yellow | 5.87 / 7.37 | 4.96 / 6.15 | 4.68 / 4.96 | 5.01 / 6.66 | 3.88 / 5.20 |
-| orange | 5.90 / 7.34 | 4.96 / 6.18 | 4.73 / 4.96 | 5.01 / 6.67 | 3.91 / 5.20 |
-| red | 5.94 / 7.32 | 5.02 / 6.20 | 4.73 / 5.02 | 5.01 / 6.64 | 3.90 / 5.20 |
-| magenta | 5.95 / 7.40 | 5.01 / 6.22 | 4.71 / 5.01 | 5.02 / 6.63 | 3.90 / 5.20 |
-| purple | 5.95 / 7.37 | 5.04 / 6.18 | 4.71 / 5.04 | 5.01 / 6.65 | 3.90 / 5.17 |
+**Accent contrast.** Atlassian's pairings for every family, light / dark, then increased contrast (IC). Bars: 4.5:1 for text and 3:1 for icons; 7:1 and 4.5:1 with increased contrast. All pass in both plans. Two PLUS fixes were needed, both found by the check:
+
+1. Gray accent text in dark: Atlassian's pairing (DarkNeutral800 on DarkNeutral400) gives 3.7:1 on PLUS's dark ramp. The text moves one step lighter.
+2. Dark accent fills in increased contrast: text on `subtle` and inverse text on `bolder` reached only about 6:1. Those fills move one step further from their text.
+
+| Family | Plan | text on subtlest | text on subtler | bolder text on subtle | inverse on bolder | icon on surface |
+|---|---|---|---|---|---|---|
+| blue | A | 6.0 / 7.4 · IC 10.9 / 11.0 | 5.0 / 6.2 · IC 9.2 / 9.2 | 4.7 / 5.0 · IC 7.4 / 10.9 | 5.0 / 6.6 · IC 11.8 / 8.8 | 3.9 / 5.2 · IC 6.5 / 8.8 |
+|  | B | 6.0 / 7.3 · IC 10.9 / 11.0 | 5.1 / 6.2 · IC 9.3 / 9.3 | 4.8 / 5.1 · IC 7.3 / 10.9 | 5.0 / 6.7 · IC 11.9 / 8.7 | 3.9 / 5.2 · IC 6.5 / 8.7 |
+| teal | A | 6.0 / 7.4 · IC 11.0 / 11.0 | 5.1 / 6.3 · IC 9.3 / 9.3 | 4.8 / 5.1 · IC 7.4 / 11.0 | 5.0 / 6.7 · IC 11.9 / 8.8 | 3.9 / 5.2 · IC 6.5 / 8.8 |
+|  | B | 6.0 / 7.4 · IC 11.0 / 10.9 | 5.0 / 6.3 · IC 9.2 / 9.2 | 4.8 / 5.0 · IC 7.4 / 11.0 | 5.0 / 6.7 · IC 11.9 / 8.8 | 3.9 / 5.2 · IC 6.5 / 8.8 |
+| green | A | 6.0 / 7.4 · IC 10.9 / 10.9 | 5.0 / 6.2 · IC 9.2 / 9.2 | 4.7 / 5.0 · IC 7.4 / 10.9 | 5.1 / 6.7 · IC 11.8 / 8.8 | 3.9 / 5.2 · IC 6.5 / 8.8 |
+|  | B | 6.0 / 7.4 · IC 10.9 / 11.0 | 5.0 / 6.2 · IC 9.2 / 9.2 | 4.7 / 5.0 · IC 7.4 / 10.9 | 5.0 / 6.7 · IC 11.8 / 8.8 | 3.9 / 5.2 · IC 6.5 / 8.8 |
+| lime | A | 6.0 / 7.3 · IC 11.0 / 10.9 | 5.0 / 6.2 · IC 9.2 / 9.2 | 4.8 / 5.0 · IC 7.3 / 11.0 | 5.1 / 6.7 · IC 11.9 / 8.7 | 3.9 / 5.2 · IC 6.5 / 8.7 |
+|  | B | 6.0 / 7.4 · IC 11.0 / 11.0 | 5.0 / 6.2 · IC 9.3 / 9.3 | 4.8 / 5.0 · IC 7.4 / 11.0 | 5.0 / 6.7 · IC 11.9 / 8.7 | 3.9 / 5.2 · IC 6.5 / 8.7 |
+| yellow | A | 5.9 / 7.4 · IC 10.9 / 11.0 | 5.0 / 6.2 · IC 9.2 / 9.2 | 6.2 / 5.0 · IC 7.4 / 10.9 | 5.0 / 6.6 · IC 11.8 / 8.8 | 3.9 / 8.8 · IC 6.4 / 8.8 |
+|  | B | 5.9 / 7.4 · IC 10.9 / 11.0 | 5.0 / 6.2 · IC 9.2 / 9.2 | 6.2 / 5.0 · IC 7.4 / 10.9 | 5.0 / 6.6 · IC 11.8 / 8.8 | 3.9 / 8.8 · IC 6.4 / 8.8 |
+| orange | A | 5.9 / 7.4 · IC 10.9 / 10.9 | 5.0 / 6.2 · IC 9.2 / 9.2 | 4.7 / 5.0 · IC 7.4 / 10.9 | 5.0 / 6.7 · IC 11.8 / 8.7 | 3.9 / 5.2 · IC 6.4 / 8.7 |
+|  | B | 6.0 / 7.3 · IC 10.9 / 10.9 | 5.0 / 6.2 · IC 9.2 / 9.2 | 4.7 / 5.0 · IC 7.3 / 10.9 | 5.0 / 6.6 · IC 11.8 / 8.8 | 3.9 / 5.2 · IC 6.4 / 8.8 |
+| red | A | 5.9 / 7.4 · IC 10.9 / 11.0 | 5.0 / 6.2 · IC 9.2 / 9.2 | 4.7 / 5.0 · IC 9.1 / 10.9 | 5.0 / 6.7 · IC 11.8 / 8.8 | 5.0 / 4.3 · IC 6.4 / 8.8 |
+|  | B | 6.0 / 7.3 · IC 11.0 / 11.0 | 5.0 / 6.2 · IC 9.3 / 9.3 | 4.7 / 5.0 · IC 9.1 / 11.0 | 5.0 / 6.7 · IC 11.9 / 8.7 | 5.0 / 4.3 · IC 6.4 / 8.7 |
+| magenta | A | 5.9 / 7.3 · IC 10.9 / 11.0 | 5.0 / 6.2 · IC 9.3 / 9.3 | 4.7 / 5.0 · IC 7.3 / 10.9 | 5.0 / 6.7 · IC 11.8 / 8.7 | 3.9 / 5.2 · IC 6.4 / 8.7 |
+|  | B | 6.0 / 7.3 · IC 10.9 / 11.0 | 5.0 / 6.2 · IC 9.3 / 9.3 | 4.7 / 5.0 · IC 7.3 / 10.9 | 5.0 / 6.7 · IC 11.8 / 8.7 | 3.9 / 5.2 · IC 6.4 / 8.7 |
+| purple | A | 6.0 / 7.4 · IC 10.9 / 10.9 | 5.0 / 6.2 · IC 9.2 / 9.2 | 4.7 / 5.0 · IC 7.4 / 10.9 | 5.0 / 6.7 · IC 11.8 / 8.8 | 3.9 / 5.2 · IC 6.5 / 8.8 |
+|  | B | 6.0 / 7.4 · IC 10.9 / 10.9 | 5.0 / 6.3 · IC 9.2 / 9.2 | 4.7 / 5.0 · IC 7.4 / 10.9 | 5.0 / 6.6 · IC 11.8 / 8.8 | 3.9 / 5.2 · IC 6.4 / 8.8 |
+| gray | A | 6.8 / 7.2 · IC 9.6 / 8.4 | 5.7 / 4.7 · IC 8.1 / 9.1 | 5.2 / 4.5 · IC 7.1 / 10.2 | 5.2 / 5.9 · IC 7.7 / 7.3 | 4.0 / 4.3 · IC 7.7 / 7.3 |
+|  | B | 6.8 / 7.2 · IC 9.6 / 8.3 | 5.7 / 4.7 · IC 8.1 / 9.1 | 5.2 / 4.5 · IC 7.1 / 10.1 | 5.2 / 5.8 · IC 7.7 / 7.3 | 4.0 / 4.3 · IC 7.7 / 7.3 |
+| brown | A | 5.9 / 7.4 · IC 10.9 / 11.0 | 5.0 / 6.2 · IC 9.2 / 9.2 | 4.7 / 5.0 · IC 7.4 / 10.9 | 5.0 / 6.7 · IC 11.8 / 8.8 | 3.9 / 5.2 · IC 6.4 / 8.8 |
+|  | B | 5.9 / 7.4 · IC 11.0 / 10.9 | 5.0 / 6.2 · IC 9.2 / 9.2 | 4.7 / 5.0 · IC 7.4 / 11.0 | 5.0 / 6.7 · IC 11.8 / 8.8 | 3.9 / 5.2 · IC 6.4 / 8.8 |
 
 ### 4.3 Semantic layer
 
@@ -462,62 +499,60 @@ A cheap hybrid is Plan A's warm ink with Plan B's raised shadow for clickable ca
 
 ### 4.7 Contrast of the key pairs
 
-WCAG 2 ratios on opaque values, computed from the generated hex. Alpha tokens are composited over their surface first. Text needs 4.5:1; icons and borders need 3:1. Every pair clears its bar in both themes and both plans.
+WCAG 2 ratios on opaque values, computed from the generated hex. Alpha tokens are composited over their surface first. Text needs 4.5:1 and icons and borders 3:1; with increased contrast (IC), 7:1 and 4.5:1. Every pair clears its bar in all four modes and both plans.
 
-| Foreground | Background | Bar | A light | A dark | B light | B dark |
-|---|---|---|---|---|---|---|
-| `color.text.subtlest` | `elevation.surface.raised` | 4.5 | 5.15 | 5.45 | 5.17 | 5.45 |
-| `color.text.subtle` | `elevation.surface.sunken` | 4.5 | 7.23 | 7.81 | 7.24 | 7.81 |
-| `color.text` | `elevation.surface.sunken` | 4.5 | 13.32 | 11.51 | 13.33 | 11.51 |
-| `color.border.input` | `color.background.input` | 3 | 3.22 | 4.03 | 3.23 | 4.04 |
-| `color.text` | `elevation.surface` | 4.5 | 14.13 | 10.72 | 14.16 | 10.70 |
-| `color.text.subtle` | `elevation.surface` | 4.5 | 7.67 | 7.28 | 7.69 | 7.26 |
-| `color.text.subtlest` | `elevation.surface` | 4.5 | 5.15 | 5.87 | 5.17 | 5.85 |
-| `color.text.subtlest` | `elevation.surface.sunken` | 4.5 | 4.85 | 6.29 | 4.87 | 6.29 |
-| `color.text` | `elevation.surface.overlay` | 4.5 | 14.13 | 9.08 | 14.16 | 9.09 |
-| `color.text.brand` | `elevation.surface` | 4.5 | 5.00 | 6.72 | 5.00 | 6.72 |
-| `color.link` | `elevation.surface` | 4.5 | 5.00 | 6.72 | 5.00 | 6.72 |
-| `color.text.inverse` | `color.background.brand.bold` | 4.5 | 5.00 | 6.72 | 5.00 | 6.72 |
-| `color.text.inverse` | `color.background.selected.bold` | 4.5 | 14.13 | 10.72 | 14.16 | 10.70 |
-| `color.text.inverse` | `color.background.danger.bold` | 4.5 | 5.01 | 6.65 | 5.01 | 6.65 |
-| `color.text.inverse` | `color.background.success.bold` | 4.5 | 4.96 | 6.66 | 4.96 | 6.66 |
-| `color.text.inverse` | `color.background.information.bold` | 4.5 | 5.04 | 6.64 | 5.04 | 6.63 |
-| `color.text.inverse` | `color.background.discovery.bold` | 4.5 | 5.01 | 6.65 | 5.01 | 6.65 |
-| `color.text.inverse` | `color.background.neutral.bold` | 4.5 | 14.13 | 10.72 | 14.16 | 10.70 |
-| `color.text.warning.inverse` | `color.background.warning.bold` | 4.5 | 7.41 | 8.75 | 7.42 | 8.74 |
-| `color.text.selected` | `color.background.selected` | 4.5 | 12.62 | 8.83 | 12.65 | 8.84 |
-| `color.text.brand` | `color.background.brand.subtlest` | 4.5 | 4.60 | 5.59 | 4.60 | 5.59 |
-| `color.text.danger` | `color.background.danger` | 4.5 | 5.94 | 7.32 | 5.94 | 7.32 |
-| `color.text.warning` | `color.background.warning` | 4.5 | 5.87 | 7.37 | 5.87 | 7.37 |
-| `color.text.success` | `color.background.success` | 4.5 | 5.97 | 7.37 | 5.97 | 7.37 |
-| `color.text.information` | `color.background.information` | 4.5 | 5.90 | 7.39 | 5.90 | 7.39 |
-| `color.text.discovery` | `color.background.discovery` | 4.5 | 5.95 | 7.37 | 5.95 | 7.37 |
-| `color.text.danger.bolder` | `color.background.danger.subtler` | 4.5 | 9.29 | 9.29 | 9.29 | 9.29 |
-| `color.text.warning.bolder` | `color.background.warning.subtler` | 4.5 | 9.16 | 9.16 | 9.16 | 9.16 |
-| `color.text.success.bolder` | `color.background.success.subtler` | 4.5 | 9.14 | 9.14 | 9.14 | 9.14 |
-| `color.text.information.bolder` | `color.background.information.subtler` | 4.5 | 9.25 | 9.25 | 9.25 | 9.25 |
-| `color.text.danger` | `elevation.surface` | 4.5 | 6.41 | 8.72 | 6.41 | 8.72 |
-| `color.text.warning` | `elevation.surface` | 4.5 | 6.35 | 8.75 | 6.35 | 8.74 |
-| `color.text.success` | `elevation.surface` | 4.5 | 6.46 | 8.74 | 6.46 | 8.74 |
-| `color.text.information` | `elevation.surface` | 4.5 | 6.40 | 8.77 | 6.40 | 8.77 |
-| `color.icon` | `elevation.surface` | 3 | 14.13 | 10.72 | 14.16 | 10.70 |
-| `color.icon.subtle` | `elevation.surface` | 3 | 7.67 | 7.28 | 7.69 | 7.26 |
-| `color.icon.brand` | `elevation.surface` | 3 | 5.00 | 6.72 | 5.00 | 6.72 |
-| `color.icon.danger` | `elevation.surface` | 3 | 5.01 | 5.21 | 5.01 | 5.21 |
-| `color.icon.warning` | `elevation.surface` | 3 | 3.88 | 8.75 | 3.88 | 8.74 |
-| `color.icon.success` | `elevation.surface` | 3 | 3.90 | 5.18 | 3.90 | 5.18 |
-| `color.icon.information` | `elevation.surface` | 3 | 3.92 | 5.21 | 3.92 | 5.21 |
-| `color.icon.discovery` | `elevation.surface` | 3 | 3.90 | 5.17 | 3.90 | 5.17 |
-| `color.border.input` | `elevation.surface` | 3 | 3.22 | 4.34 | 3.23 | 4.34 |
-| `color.border.bold` | `elevation.surface` | 3 | 3.98 | 4.34 | 4.00 | 4.34 |
-| `color.border.focused` | `elevation.surface` | 3 | 3.86 | 8.73 | 3.86 | 8.73 |
-| `color.border.danger` | `elevation.surface` | 3 | 3.90 | 5.21 | 3.90 | 5.21 |
-| `color.border.warning` | `elevation.surface` | 3 | 3.88 | 5.21 | 3.88 | 5.20 |
-| `color.border.success` | `elevation.surface` | 3 | 3.90 | 5.18 | 3.90 | 5.18 |
-| `color.border.brand` | `elevation.surface` | 3 | 5.00 | 6.72 | 5.00 | 6.72 |
-| `color.border.selected` | `elevation.surface` | 3 | 14.13 | 10.72 | 14.16 | 10.70 |
-
-Today's equivalents fail: `--color-primary` is 4.08:1 on `surface-container-highest`, and `--color-tertiary` (info) fails 4.5:1 on four of five surfaces.
+| Foreground | Background | Bar (IC bar) | A light | A dark | A light IC | A dark IC | B light | B dark | B light IC | B dark IC |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `color.text.subtlest` | `elevation.surface.raised` | 4.5 (7) | 5.15 | 5.45 | 10.81 | 8.53 | 5.17 | 5.45 | 10.86 | 8.53 |
+| `color.text.subtle` | `elevation.surface.sunken` | 4.5 (7) | 7.23 | 7.81 | 14.13 | 11.51 | 7.24 | 7.81 | 14.16 | 11.51 |
+| `color.text` | `elevation.surface.sunken` | 4.5 (7) | 13.32 | 11.51 | 16.63 | 13.97 | 13.33 | 11.51 | 16.67 | 13.97 |
+| `color.border.input` | `color.background.input` | 3 (4.5) | 3.22 | 4.03 | 7.67 | 6.76 | 3.23 | 4.04 | 7.69 | 6.76 |
+| `color.text` | `elevation.surface` | 4.5 (7) | 14.13 | 10.72 | 16.63 | 13.02 | 14.16 | 10.70 | 16.67 | 12.99 |
+| `color.text.subtle` | `elevation.surface` | 4.5 (7) | 7.67 | 7.28 | 14.13 | 10.72 | 7.69 | 7.26 | 14.16 | 10.70 |
+| `color.text.subtlest` | `elevation.surface` | 4.5 (7) | 5.15 | 5.87 | 10.81 | 9.18 | 5.17 | 5.85 | 10.86 | 9.16 |
+| `color.text.subtlest` | `elevation.surface.sunken` | 4.5 (7) | 4.85 | 6.29 | 10.81 | 9.85 | 4.87 | 6.29 | 10.86 | 9.85 |
+| `color.text` | `elevation.surface.overlay` | 4.5 (7) | 14.13 | 9.08 | 16.63 | 11.03 | 14.16 | 9.09 | 16.67 | 11.03 |
+| `color.text.brand` | `elevation.surface` | 4.5 (7) | 5.00 | 6.72 | 11.81 | 13.02 | 5.00 | 6.72 | 11.81 | 13.01 |
+| `color.link` | `elevation.surface` | 4.5 (7) | 5.00 | 6.72 | 11.81 | 13.02 | 5.00 | 6.72 | 11.81 | 13.01 |
+| `color.text.inverse` | `color.background.brand.bold` | 4.5 (7) | 5.00 | 6.72 | 11.81 | 13.02 | 5.00 | 6.72 | 11.81 | 13.01 |
+| `color.text.inverse` | `color.background.selected.bold` | 4.5 (7) | 14.13 | 10.72 | 14.13 | 10.72 | 14.16 | 10.70 | 14.16 | 10.70 |
+| `color.text.inverse` | `color.background.danger.bold` | 4.5 (7) | 5.01 | 6.65 | 11.81 | 13.06 | 5.00 | 6.66 | 11.88 | 13.05 |
+| `color.text.inverse` | `color.background.success.bold` | 4.5 (7) | 5.06 | 6.67 | 11.81 | 13.00 | 5.02 | 6.67 | 11.83 | 12.96 |
+| `color.text.inverse` | `color.background.information.bold` | 4.5 (7) | 5.00 | 6.62 | 11.82 | 13.02 | 5.01 | 6.67 | 11.88 | 13.03 |
+| `color.text.inverse` | `color.background.discovery.bold` | 4.5 (7) | 5.00 | 6.67 | 11.82 | 13.02 | 5.01 | 6.63 | 11.82 | 12.96 |
+| `color.text.inverse` | `color.background.neutral.bold` | 4.5 (7) | 14.13 | 10.72 | 14.13 | 10.72 | 14.16 | 10.70 | 14.16 | 10.70 |
+| `color.text.warning.inverse` | `color.background.warning.bold` | 4.5 (7) | 7.43 | 8.77 | 11.77 | 13.98 | 7.44 | 8.76 | 11.78 | 14.00 |
+| `color.text.selected` | `color.background.selected` | 4.5 (7) | 12.62 | 8.83 | 14.86 | 10.72 | 11.56 | 8.23 | 13.61 | 9.99 |
+| `color.text.brand` | `color.background.brand.subtlest` | 4.5 (7) | 4.60 | 5.59 | 10.87 | 10.82 | 4.60 | 5.59 | 10.87 | 10.82 |
+| `color.text.danger` | `color.background.danger` | 4.5 (7) | 5.94 | 7.39 | 10.95 | 11.01 | 5.97 | 7.35 | 11.01 | 10.97 |
+| `color.text.warning` | `color.background.warning` | 4.5 (7) | 5.90 | 7.38 | 10.88 | 10.97 | 5.94 | 7.37 | 10.90 | 10.96 |
+| `color.text.success` | `color.background.success` | 4.5 (7) | 5.97 | 7.39 | 10.90 | 10.95 | 5.95 | 7.42 | 10.91 | 10.96 |
+| `color.text.information` | `color.background.information` | 4.5 (7) | 5.98 | 7.41 | 10.93 | 11.03 | 5.97 | 7.33 | 10.95 | 10.96 |
+| `color.text.discovery` | `color.background.discovery` | 4.5 (7) | 5.96 | 7.38 | 10.93 | 10.94 | 5.95 | 7.43 | 10.93 | 10.90 |
+| `color.text.danger.bolder` | `color.background.danger.subtler` | 4.5 (7) | 9.24 | 9.24 | 11.01 | 10.95 | 9.30 | 9.30 | 10.97 | 11.01 |
+| `color.text.warning.bolder` | `color.background.warning.subtler` | 4.5 (7) | 9.19 | 9.19 | 10.97 | 10.88 | 9.20 | 9.20 | 10.96 | 10.90 |
+| `color.text.success.bolder` | `color.background.success.subtler` | 4.5 (7) | 9.21 | 9.21 | 10.95 | 10.90 | 9.20 | 9.20 | 10.96 | 10.91 |
+| `color.text.information.bolder` | `color.background.information.subtler` | 4.5 (7) | 9.22 | 9.22 | 11.03 | 10.93 | 9.28 | 9.28 | 10.96 | 10.95 |
+| `color.text.danger` | `elevation.surface` | 4.5 (7) | 6.40 | 8.77 | 11.81 | 13.06 | 6.44 | 8.74 | 11.88 | 13.05 |
+| `color.text.warning` | `elevation.surface` | 4.5 (7) | 6.38 | 8.77 | 11.77 | 13.03 | 6.42 | 8.76 | 11.78 | 13.02 |
+| `color.text.success` | `elevation.surface` | 4.5 (7) | 6.47 | 8.77 | 11.81 | 13.00 | 6.46 | 8.77 | 11.83 | 12.96 |
+| `color.text.information` | `elevation.surface` | 4.5 (7) | 6.47 | 8.75 | 11.82 | 13.02 | 6.47 | 8.71 | 11.88 | 13.03 |
+| `color.icon` | `elevation.surface` | 3 (4.5) | 14.13 | 10.72 | 14.13 | 10.72 | 14.16 | 10.70 | 14.16 | 10.70 |
+| `color.icon.subtle` | `elevation.surface` | 3 (4.5) | 7.67 | 7.28 | 10.81 | 9.18 | 7.69 | 7.26 | 10.86 | 9.16 |
+| `color.icon.brand` | `elevation.surface` | 3 (4.5) | 5.00 | 6.72 | 6.39 | 8.73 | 5.00 | 6.72 | 6.39 | 8.73 |
+| `color.icon.danger` | `elevation.surface` | 3 (4.5) | 5.01 | 5.20 | 5.01 | 6.65 | 5.00 | 5.20 | 5.00 | 6.66 |
+| `color.icon.warning` | `elevation.surface` | 3 (4.5) | 3.90 | 8.77 | 6.38 | 8.77 | 3.89 | 8.76 | 6.42 | 8.76 |
+| `color.icon.success` | `elevation.surface` | 3 (4.5) | 3.92 | 5.17 | 6.47 | 8.77 | 3.93 | 5.19 | 6.46 | 8.77 |
+| `color.icon.information` | `elevation.surface` | 3 (4.5) | 3.91 | 5.20 | 6.47 | 8.75 | 3.91 | 5.17 | 6.47 | 8.71 |
+| `color.icon.discovery` | `elevation.surface` | 3 (4.5) | 3.92 | 5.19 | 5.00 | 6.67 | 3.92 | 5.21 | 5.01 | 6.63 |
+| `color.border.input` | `elevation.surface` | 3 (4.5) | 3.22 | 4.34 | 7.67 | 7.28 | 3.23 | 4.34 | 7.69 | 7.26 |
+| `color.border.bold` | `elevation.surface` | 3 (4.5) | 3.98 | 4.34 | 7.67 | 7.28 | 4.00 | 4.34 | 7.69 | 7.26 |
+| `color.border.focused` | `elevation.surface` | 3 (4.5) | 3.86 | 8.73 | 6.39 | 8.73 | 3.86 | 8.73 | 6.39 | 8.73 |
+| `color.border.danger` | `elevation.surface` | 3 (4.5) | 3.91 | 5.20 | 5.01 | 6.65 | 3.91 | 5.20 | 5.00 | 6.66 |
+| `color.border.warning` | `elevation.surface` | 3 (4.5) | 3.90 | 5.18 | 6.38 | 8.77 | 3.89 | 5.23 | 6.42 | 8.76 |
+| `color.border.success` | `elevation.surface` | 3 (4.5) | 3.92 | 5.17 | 6.47 | 8.77 | 3.93 | 5.19 | 6.46 | 8.77 |
+| `color.border.brand` | `elevation.surface` | 3 (4.5) | 5.00 | 6.72 | 6.39 | 8.73 | 5.00 | 6.72 | 6.39 | 8.73 |
+| `color.border.selected` | `elevation.surface` | 3 (4.5) | 14.13 | 10.72 | 16.63 | 13.02 | 14.16 | 10.70 | 16.67 | 12.99 |
 
 ### 4.8 Naming convention
 
@@ -599,12 +634,7 @@ Reference counts are from `design-system/` and `prototypes/` today. The new name
 
 ### 4.10 Color modes and the Figma setup
 
-**Modes.** Atlassian ships two color modes, light and dark. Increased contrast is not a third mode but a second axis: `light-increased-contrast` and `dark-increased-contrast` extend their base theme and override about half its variables (§2.2). PLUS should mirror that shape:
-
-- define **Light** and **Dark** now, as two modes of one Semantic collection;
-- leave **increased contrast** as a later override layer on text, icons, borders and bold fills.
-
-The generator makes that cheap. Increased contrast is the same token map pointed one or two steps darker (light) or lighter (dark), so no new primitives are needed.
+**Modes.** Atlassian ships two color modes, light and dark. Increased contrast is not a third mode but a second axis: `light-increased-contrast` and `dark-increased-contrast` extend their base theme and override about half its variables (§2.2). PLUS mirrors that shape: **Light** and **Dark**, each with an **increased-contrast** override, specified in §4.11.
 
 **Atlassian's public Figma libraries.** Atlassian publishes three current community files:
 
@@ -628,7 +658,7 @@ All three are CC BY 4.0, and each replaces a "(Legacy)" file.
 
 What the file shows:
 
-1. **Two color modes only.** Light and Dark. Increased contrast exists in code but not in Figma.
+1. **Two color modes only.** Light and Dark. Increased contrast exists in code but not in Figma. PLUS adds the two IC modes to its Color collection, since Figma modes are cheap and designers should see them.
 2. **Primitives are a separate, hidden library.** Every semantic token aliases a remote primitive named like `Blue/Blue700` or `Neutral/Opaque/Neutral0`. Designers can only pick semantics.
 3. **Paths mirror the code name**, with `default` as the leaf for the unqualified token: `color/text/accent/red/default`. Every variable carries code syntax, such as `token('color.text.accent.red')`, so Dev Mode shows the code name.
 4. **Shadows are split in two:**
@@ -645,10 +675,10 @@ What the file shows:
 
 | Collection or style | Modes | Holds | Differs from ADS |
 |---|---|---|---|
-| Primitives (hidden from publishing) | one | nine hue ramps, both neutral ramps, alphas, named `teal/teal700` | ADS keeps these in a separate library; one hidden collection is simpler for one team |
-| Color | Light, Dark (Increased contrast later as two more modes) | semantic `color/…/default` and `elevation/surface/…`, with WEB code syntax `var(--ds-…)` | **scoped** (text colors to text fill, borders to stroke, backgrounds to fills) and **described** |
+| Primitives (hidden from publishing) | one | Lagoon, the eleven accent ramps of the chosen plan, both neutral ramps, alphas, named `teal/teal700` | ADS keeps these in a separate library; one hidden collection is simpler for one team |
+| Color | Light, Dark, Light IC, Dark IC | semantic `color/…/default` and `elevation/surface/…`, with WEB code syntax `var(--ds-…)` | **scoped** (text colors to text fill, borders to stroke, backgrounds to fills) and **described** |
 | Shadow colors | inside Color | `elevation/shadow/{raised,overlay,overflow}/…` | same as ADS |
-| Effect styles | — | `Light/elevation.shadow.raised` … `Dark/…` | same as ADS |
+| Effect styles | — | `Light/elevation.shadow.raised` … `Dark/…`, plus `Light IC/…` and `Dark IC/…` for raised and overlay, whose ring changes | ADS has no IC styles |
 | Typography | Default, plus a fallback mode | font family per role | same pattern, PLUS families |
 | Type scale | one | size, line height, weight per style | same as ADS |
 | Text styles | — | `Heading/…`, `Body/{L,M,S}/{Regular,Medium,Bold}`, `Metric/…`, `Code`, all bound | same as ADS |
@@ -673,18 +703,102 @@ Four things carry over to PLUS, which already follows Atlassian's type structure
 
 Spacing, Radius, Border and Responsive follow the same pattern. PLUS already has its own tokens there, so they are listed for completeness, not proposed here. One idea worth borrowing later is radius: a focus-ring radius paired with each corner radius, so the ring stays concentric.
 
+### 4.11 Increased contrast
+
+**What it is.** An override on top of light and dark, for people who need stronger edges and text: low vision, glare, a cheap screen. Atlassian ships it as `data-contrast-mode`, with three settings: more, no preference, and auto, which follows the operating system's `prefers-contrast: more`. Its token package carries an increased-contrast value for every token, so PLUS generates the mode from those references instead of hand-picking.
+
+**What changes.** 263 of 469 tokens change in light and 233 in dark, the same in both plans:
+
+- **Text and icons** step darker in light and lighter in dark: `text.subtle` 800 → 1000, `text.subtlest` 700 → 900, colored text 800 → 900.
+- **Borders** that carry meaning reach 4.5:1 or more: `border.input` and `border.bold` 500–600 → 800. The translucent hairline `color.border` (8% ink in Plan A, 12% in Plan B) becomes ink at 49%, which clears 3:1.
+- **Bold fills** step two darker in light (brand 700 → 900) and two lighter in dark, so inverse text on them clears 7:1.
+- **Selection** stays neutral; its text, icon and border go to full ink.
+- **Focus** goes from teal 600 to teal 800 in light.
+- **Shadows.** The 1px ring on raised and overlay layers uses the 3:1 hairline, so cards and menus keep a visible edge.
+- **The sunken frame turns white**, as in Atlassian. The surface then needs an edge, so the Surface pattern draws `color.border` in this mode.
+
+**What stays.** Tints and subtle backgrounds, surfaces, the blanket, the interaction overlays and the categorical chart colors (except where Atlassian swaps a hue for legibility).
+
+**Bars, all met.** 7:1 for text and 4.5:1 for icons, borders and focus, for every pair in §4.7 and every accent family in §4.2, in both plans and both themes.
+
+**Switching.** Default to the operating system setting, with a manual override in settings: the same three options Atlassian offers. Ship it with the theme toggle, after the component sweep (decision 11).
+
+The core tokens that change, Plan A (Plan B uses the same steps on its own ramps):
+
+| Token | Light → light IC | Dark → dark IC |
+|---|---|---|
+| `color.background.brand.bold` | teal.700 → teal.900 | teal.400 → teal.200 |
+| `color.background.brand.bold.hovered` | teal.800 → teal.1000 | teal.300 → teal.100 |
+| `color.background.brand.bold.pressed` | teal.850 → teal.1000 | teal.250 → darkNeutral.1100 |
+| `color.background.danger.bold` | red.700 → red.900 | red.400 → red.200 |
+| `color.background.danger.bold.hovered` | red.800 → red.1000 | red.300 → red.100 |
+| `color.background.danger.bold.pressed` | red.850 → red.1000 | red.250 → darkNeutral.1100 |
+| `color.background.warning.bold` | yellow.300 → yellow.900 | yellow.300 → yellow.200 |
+| `color.background.warning.bold.hovered` | yellow.400 → yellow.1000 | yellow.400 → yellow.100 |
+| `color.background.warning.bold.pressed` | yellow.500 → yellow.1000 | yellow.500 → darkNeutral.1100 |
+| `color.background.success.bold` | green.700 → green.900 | green.400 → green.200 |
+| `color.background.success.bold.hovered` | green.800 → green.1000 | green.300 → green.100 |
+| `color.background.success.bold.pressed` | green.850 → green.1000 | green.250 → darkNeutral.1100 |
+| `color.background.discovery.bold` | purple.700 → purple.900 | purple.400 → purple.200 |
+| `color.background.discovery.bold.hovered` | purple.800 → purple.1000 | purple.300 → purple.100 |
+| `color.background.discovery.bold.pressed` | purple.850 → purple.1000 | purple.250 → darkNeutral.1100 |
+| `color.background.information.bold` | blue.700 → blue.900 | blue.400 → blue.200 |
+| `color.background.information.bold.hovered` | blue.800 → blue.1000 | blue.300 → blue.100 |
+| `color.background.information.bold.pressed` | blue.850 → blue.1000 | blue.250 → darkNeutral.1100 |
+| `color.border` | ink @8% → neutralAlpha.500 | paper @10% → darkNeutralAlpha.500 |
+| `color.border.disabled` | neutralAlpha.200 → neutralAlpha.300 | darkNeutralAlpha.200 → darkNeutralAlpha.300 |
+| `color.border.focused` | teal.600 → teal.800 | teal.300 → teal.300 |
+| `color.border.input` | neutral.500 → neutral.800 | darkNeutral.600 → darkNeutral.800 |
+| `color.border.selected` | neutral.1000 → neutral.1100 | darkNeutral.1000 → darkNeutral.1100 |
+| `color.border.brand` | teal.700 → teal.800 | teal.400 → teal.300 |
+| `color.border.danger` | red.600 → red.700 | red.500 → red.400 |
+| `color.border.warning` | yellow.600 → yellow.800 | yellow.500 → yellow.300 |
+| `color.border.success` | green.600 → green.800 | green.500 → green.300 |
+| `color.border.discovery` | purple.600 → purple.700 | purple.500 → purple.400 |
+| `color.border.information` | blue.600 → blue.800 | blue.500 → blue.300 |
+| `color.border.bold` | neutral.600 → neutral.800 | darkNeutral.600 → darkNeutral.800 |
+| `color.text` | neutral.1000 → neutral.1100 | darkNeutral.1000 → darkNeutral.1100 |
+| `color.text.selected` | neutral.1000 → neutral.1100 | darkNeutral.1000 → darkNeutral.1100 |
+| `color.text.brand` | teal.700 → teal.900 | teal.400 → teal.200 |
+| `color.text.danger` | red.800 → red.900 | red.300 → red.200 |
+| `color.text.danger.bolder` | red.900 → red.1000 | red.200 → red.100 |
+| `color.text.warning` | yellow.800 → yellow.900 | yellow.300 → yellow.200 |
+| `color.text.warning.inverse` | neutral.1000 → neutral.0 | darkNeutral.100 → darkNeutral.0 |
+| `color.text.warning.bolder` | yellow.900 → yellow.1000 | yellow.200 → yellow.100 |
+| `color.text.success` | green.800 → green.900 | green.300 → green.200 |
+| `color.text.success.bolder` | green.900 → green.1000 | green.200 → green.100 |
+| `color.text.discovery` | purple.800 → purple.900 | purple.300 → purple.200 |
+| `color.text.discovery.bolder` | purple.900 → purple.1000 | purple.200 → purple.100 |
+| `color.text.information` | blue.800 → blue.900 | blue.300 → blue.200 |
+| `color.text.information.bolder` | blue.900 → blue.1000 | blue.200 → blue.100 |
+| `color.text.subtlest` | neutral.700 → neutral.900 | darkNeutral.700 → darkNeutral.900 |
+| `color.text.subtle` | neutral.800 → neutral.1000 | darkNeutral.800 → darkNeutral.1000 |
+| `color.icon.selected` | neutral.1000 → neutral.1100 | darkNeutral.1000 → darkNeutral.1100 |
+| `color.icon.brand` | teal.700 → teal.800 | teal.400 → teal.300 |
+| `color.icon.danger` | red.700 → red.700 | red.500 → red.400 |
+| `color.icon.warning` | yellow.600 → yellow.800 | yellow.300 → yellow.300 |
+| `color.icon.warning.inverse` | neutral.1000 → neutral.0 | darkNeutral.100 → darkNeutral.0 |
+| `color.icon.success` | green.600 → green.800 | green.500 → green.300 |
+| `color.icon.discovery` | purple.600 → purple.700 | purple.500 → purple.400 |
+| `color.icon.information` | blue.600 → blue.800 | blue.500 → blue.300 |
+| `color.icon.subtlest` | neutral.700 → neutral.900 | darkNeutral.700 → darkNeutral.900 |
+| `color.icon.subtle` | neutral.800 → neutral.900 | darkNeutral.800 → darkNeutral.900 |
+| `color.link` | teal.700 → teal.900 | teal.400 → teal.200 |
+| `color.link.pressed` | teal.800 → teal.900 | teal.300 → teal.200 |
+| `elevation.surface.sunken` | neutral.100 → neutral.0 | darkNeutral.0 → darkNeutral.0 |
+
 ## 5. Open decisions for Bill
 
 Each needs Bill's call, and each has a recommendation. The brand hue is settled: Lagoon, 205°.
 
-1. **Plan A (Paper) or Plan B (Neutral).** *Recommend A*, or a hybrid with Plan B's soft shadows on cards and overlays (§4.6). Compare the two on the same screen in the artifact before deciding.
+1. **Plan A (Paper) or Plan B (Neutral).** Each is now a whole direction: grays, lines, shadows and the accent palette (§4.2, §4.6). *Recommend A*, or a hybrid with Plan B's soft shadows on cards and overlays. Plan A's accents also keep Lagoon the most saturated cool color, which fits a teal brand; Plan B's would outshout it. The plans' grays and accents can be mixed, since token names are shared. Compare them on the same screen in the artifact before deciding.
 2. **Selection color.** Both plans now select in neutral ink, as Notion, today's Claude and Atlassian's Finesse override do. The alternative is the teal tint, Atlassian's default. *Recommend neutral.* It keeps Lagoon for actions, links and focus.
 3. **Modal elevation.** Collapse "modals use light-4" into the single `overlay` level, as Atlassian does, or keep a separate modal shadow. *Recommend collapsing.* The blanket already separates a modal from a menu. This reverses a ruling.
 4. **Dragged items.** Overlay, as Atlassian specifies, or raised. *Recommend overlay.* A dragged card is above everything else on the page.
 5. **Secondary and tertiary.** Drop both as roles. *Recommend dropping.* Secondary becomes `text.subtle` and `background.neutral`; tertiary becomes an accent. Bill's Atlassian model (one brand, functional colors, accents) already implies this.
 6. **"Surface container" name clash.** PLUS's frame pattern versus Atlassian's `elevation.surface.container` well. *Recommend renaming PLUS's pattern* to "Frame" in docs and keeping Atlassian's token name, so Atlassian's guidance reads across unchanged. The alternative is to rename the token `elevation.surface.well`.
 7. **Information hue.** Move info from the teal tertiary to blue. *Recommend blue.* With a Lagoon brand, a teal info reads as brand. This reverses the 2026-10-24 ruling.
-8. **Information blue's chroma.** Keep blue's cap at 0.13, so info reads slightly more vivid than Lagoon, or lower it to about 0.10 to match. *Recommend keeping 0.13.* Lower makes info blue look gray beside red and green.
+8. **Information blue's chroma.** Now set per plan: 0.10 in Plan A, close to Lagoon, as Notion's blue is muted; 0.16 in Plan B, as Claude's. *Recommend following the plan.* Iteration 2's shared 0.13 was a compromise between the two.
 9. **SMART category colors.** Add a thin product layer `color.smart.{subject}.*` aliasing the accents. *Recommend the alias layer:*
    - mastering-content → purple;
    - relationship → magenta;
@@ -695,16 +809,20 @@ Each needs Bill's call, and each has a recommendation. The brand hue is settled:
 11. **Scope.** *Recommend:*
     - sRGB only, no P3;
     - Light and Dark modes defined in the tokens now, but no theme toggle shipped until the component sweep is done;
-    - increased contrast as a later override, as Atlassian does it (§4.10);
+    - all four modes defined in the tokens and in Figma now, including increased contrast (§4.11), and shipped together with the theme toggle after the sweep;
     - the generator in the repo as the source of truth, emitting SCSS and the Figma collections in §4.10;
     - the `--ds-` CSS prefix.
 
-Still out of scope and still Bill's: the AI hue (#269). Atlassian's discovery purple is where it would go if he wants one.
+12. **Brown.** Add it as an eleventh accent, from Notion. *Recommend adding.* It is a quiet, warm option for tags and categories, and costs one ramp and 23 tokens.
+13. **Accent teal on its own ramp.** Atlassian's accent teal shares the brand's hue family; with Lagoon as brand, a teal tag would read as a brand control. *Recommend the separate ramp* (190° in Plan A, 170° in Plan B). The alternative is dropping accent teal, which breaks Atlassian's set.
+14. **Lime.** Neither Notion nor Claude has it. *Recommend keeping it*, so Atlassian's accent and chart tokens stay complete and charts have an eighth distinct hue.
+
+Still out of scope and still Bill's: the AI hue (#269). Atlassian's discovery purple is where it would go if he wants one; Claude uses its clay brand and Atlassian its Rovo tokens, which this proposal leaves out.
 
 ## 6. If approved: the work, in order
 
-1. Commit the generator and its tests, emitting `_palette.scss`, `_semantic.scss` and `_elevation.scss` beside today's files, for the chosen plan.
-2. Push Primitives and Semantic collections, and the shadow styles, to the BS4 Foundation library, unpublished until Bill publishes.
+1. Commit the generator and its tests, emitting `_palette.scss`, `_semantic.scss` and `_elevation.scss` beside today's files, for the chosen plan, with light, dark and both increased-contrast modes.
+2. Push Primitives and Color collections (four modes), and the shadow styles, to the BS4 Foundation library, unpublished until Bill publishes.
 3. Alias today's `--color-*` and `--elevation-light-*` tokens to the new ones, so nothing changes visually except brand, neutrals and shadows.
 4. Sweep components onto `--ds-*` names by pattern, from the frame down to the layers, retiring the 117 state-layer tokens and the hard-coded shadows as they empty.
 5. Update `design-system/guidelines/foundations/` color and elevation docs and the generated agent views.
@@ -714,39 +832,73 @@ Each step is its own ticket; step 4 splits per pattern.
 ## Appendix A: Primitive ramps
 
 
-**Hue ramps, part 1** (hex · contrast on white)
+**Plan A hue ramps, part 1 (teal is Lagoon, shared by both plans; aqua is the accent teal)** (hex · contrast on white)
 
-| Step | teal | blue | green | lime | yellow |
+| Step | teal | blue | aqua | green | lime | yellow |
+|---|---|---|---|---|---|---|
+| 100 | `#e6f9fc` 1.09 | `#eff7ff` 1.08 | `#ebf9f7` 1.08 | `#eff8f2` 1.08 | `#f5f7ee` 1.08 | `#faf6e9` 1.08 |
+| 200 | `#c0ebf0` 1.28 | `#d1e6f8` 1.28 | `#cde9e7` 1.28 | `#d4e8db` 1.28 | `#e0e5d1` 1.29 | `#ede3c6` 1.28 |
+| 250 | `#9cdae1` 1.55 | `#b7d3ec` 1.55 | `#b0d7d4` 1.55 | `#bad6c5` 1.55 | `#cbd3b7` 1.55 | `#dfcea7` 1.55 |
+| 300 | `#70c9d4` 1.91 | `#9ac0e2` 1.91 | `#8fc6c2` 1.90 | `#9ec5ad` 1.90 | `#b6c09a` 1.91 | `#d3b984` 1.90 |
+| 400 | `#23b5c2` 2.48 | `#77a8d3` 2.52 | `#67b0ac` 2.51 | `#7caf91` 2.50 | `#9da978` 2.51 | `#c39e59` 2.51 |
+| 500 | `#1d9eab` 3.22 | `#5895c8` 3.21 | `#3e9e99` 3.20 | `#5e9c79` 3.23 | `#88965a` 3.20 | `#b7872b` 3.22 |
+| 600 | `#198f9a` 3.86 | `#4886b8` 3.91 | `#2a8e89` 3.94 | `#4f8d6b` 3.92 | `#79874c` 3.90 | `#a77916` 3.90 |
+| 700 | `#147b84` 5.00 | `#3a74a2` 5.00 | `#1c7c77` 5.00 | `#407a5b` 5.06 | `#68743d` 5.06 | `#916812` 5.01 |
+| 800 | `#106972` 6.39 | `#31628a` 6.47 | `#166965` 6.48 | `#36684d` 6.47 | `#586334` 6.46 | `#7c590d` 6.38 |
+| 850 | `#0a545a` 8.65 | `#254e6f` 8.76 | `#0f5451` 8.72 | `#2a533d` 8.74 | `#464f28` 8.72 | `#644609` 8.67 |
+| 900 | `#063e43` 11.81 | `#1a3a54` 11.82 | `#063e3c` 11.92 | `#1d3e2c` 11.81 | `#333a1b` 11.92 | `#4a3405` 11.77 |
+| 1000 | `#043236` 13.86 | `#182d3f` 14.13 | `#10302f` 14.13 | `#1b3024` 14.05 | `#292e1a` 14.00 | `#39290b` 14.04 |
+
+**Plan A hue ramps, part 2** (hex · contrast on white)
+
+| Step | orange | red | magenta | purple | brown |
 |---|---|---|---|---|---|
-| 100 | `#e6f9fc` 1.09 | `#f1f6ff` 1.08 | `#ecf9f1` 1.08 | `#f3f8eb` 1.08 | `#faf6e8` 1.08 |
-| 200 | `#c0ebf0` 1.28 | `#d3e4fe` 1.29 | `#ceead8` 1.28 | `#dee7cb` 1.28 | `#ede3c5` 1.28 |
-| 250 | `#9cdae1` 1.55 | `#bad1f4` 1.55 | `#b0d9c0` 1.55 | `#c8d4ad` 1.56 | `#ddcfa4` 1.55 |
-| 300 | `#70c9d4` 1.91 | `#9ebeed` 1.90 | `#90c8a7` 1.91 | `#b2c28c` 1.91 | `#d0ba7f` 1.91 |
-| 400 | `#23b5c2` 2.48 | `#7aa5e6` 2.51 | `#61b487` 2.50 | `#97ac5e` 2.51 | `#c1a047` 2.50 |
-| 500 | `#1d9eab` 3.22 | `#5c91de` 3.20 | `#32a26c` 3.22 | `#819934` 3.21 | `#b08b1a` 3.20 |
-| 600 | `#198f9a` 3.86 | `#4e81ce` 3.92 | `#1b935e` 3.90 | `#728a22` 3.91 | `#9f7d16` 3.88 |
-| 700 | `#147b84` 5.00 | `#406fb6` 5.04 | `#148051` 4.96 | `#627713` 5.04 | `#8a6b11` 5.01 |
-| 800 | `#106972` 6.39 | `#365f9d` 6.40 | `#0f6c44` 6.46 | `#536610` 6.41 | `#765c0d` 6.35 |
-| 850 | `#0a545a` 8.65 | `#294b7e` 8.74 | `#0a5635` 8.77 | `#425109` 8.70 | `#5e4908` 8.63 |
-| 900 | `#063e43` 11.81 | `#1c375f` 11.92 | `#064126` 11.72 | `#303d05` 11.70 | `#463605` 11.73 |
-| 1000 | `#043236` 13.86 | `#1a2c47` 14.05 | `#0d3220` 14.05 | `#272f0e` 14.01 | `#372a03` 14.05 |
+| 100 | `#fff4ec` 1.08 | `#fff4f2` 1.08 | `#fff3f8` 1.08 | `#f9f4ff` 1.08 | `#fdf4f0` 1.08 |
+| 200 | `#fdddc3` 1.29 | `#fedcd7` 1.28 | `#fedae9` 1.28 | `#ecdef9` 1.28 | `#f2e0d5` 1.28 |
+| 250 | `#f3c7a3` 1.55 | `#fdc2ba` 1.54 | `#f7c0d9` 1.56 | `#dbc8ed` 1.56 | `#e4cabc` 1.56 |
+| 300 | `#ecaf7e` 1.91 | `#fba69c` 1.90 | `#f0a6c8` 1.91 | `#ccb2e3` 1.90 | `#d7b5a2` 1.91 |
+| 400 | `#df9252` 2.51 | `#ef867b` 2.51 | `#e387b4` 2.50 | `#b797d4` 2.50 | `#c59b82` 2.50 |
+| 500 | `#d5781c` 3.21 | `#e7685e` 3.21 | `#d86ba3` 3.21 | `#a77fca` 3.22 | `#b78566` 3.20 |
+| 600 | `#c16b16` 3.90 | `#d6584f` 3.91 | `#c75c93` 3.90 | `#9870ba` 3.92 | `#a77659` 3.90 |
+| 700 | `#a75c12` 5.02 | `#bd4941` 5.01 | `#af4d80` 5.00 | `#8560a3` 5.00 | `#92654a` 5.02 |
+| 800 | `#904e0e` 6.40 | `#a23e37` 6.40 | `#96416e` 6.41 | `#71518c` 6.45 | `#7d563f` 6.41 |
+| 850 | `#733e09` 8.67 | `#82302a` 8.73 | `#793257` 8.73 | `#5a4070` 8.74 | `#644431` 8.70 |
+| 900 | `#562d05` 11.84 | `#63221e` 11.81 | `#5b2441` 11.84 | `#432f55` 11.82 | `#4b3222` 11.81 |
+| 1000 | `#442307` 14.10 | `#4a1e1b` 14.07 | `#451f32` 14.05 | `#342640` 14.03 | `#39281e` 14.04 |
 
-**Hue ramps, part 2** (hex · contrast on white)
+**Plan B hue ramps, part 1** (hex · contrast on white)
 
-| Step | orange | red | magenta | purple |
-|---|---|---|---|---|
-| 100 | `#fff4ec` 1.08 | `#fff4f2` 1.08 | `#fff3f8` 1.08 | `#f8f4ff` 1.08 |
-| 200 | `#f9dec8` 1.29 | `#fedcd8` 1.28 | `#fcdae9` 1.28 | `#e8dffc` 1.28 |
-| 250 | `#eec8aa` 1.56 | `#f9c2bd` 1.56 | `#f1c3d8` 1.55 | `#d6c9f0` 1.56 |
-| 300 | `#e5b189` 1.91 | `#f2a9a3` 1.91 | `#e9aac7` 1.90 | `#c5b3e8` 1.91 |
-| 400 | `#dd935b` 2.50 | `#eb8881` 2.51 | `#df89b2` 2.51 | `#b197e0` 2.51 |
-| 500 | `#d37930` 3.21 | `#e36b65` 3.20 | `#d46ea2` 3.21 | `#a07fd7` 3.22 |
-| 600 | `#c26a1c` 3.91 | `#d15c57` 3.90 | `#c35f93` 3.90 | `#9171c6` 3.90 |
-| 700 | `#a95b12` 5.01 | `#b84d48` 5.01 | `#ab507f` 5.02 | `#7f60af` 5.01 |
-| 800 | `#924d0e` 6.38 | `#9e413d` 6.41 | `#93436d` 6.43 | `#6c5196` 6.45 |
-| 850 | `#743d09` 8.70 | `#7f322f` 8.75 | `#763456` 8.77 | `#564079` 8.73 |
-| 900 | `#582c05` 11.81 | `#612321` 11.86 | `#5a2540` 11.84 | `#402f5c` 11.80 |
-| 1000 | `#43240c` 14.03 | `#48201d` 14.00 | `#432032` 14.08 | `#312644` 14.08 |
+| Step | blue | aqua | green | lime | yellow |
+|---|---|---|---|---|---|
+| 100 | `#f1f6ff` 1.08 | `#e9faf3` 1.08 | `#eafaea` 1.08 | `#f1f9e6` 1.08 | `#fff5e4` 1.08 |
+| 200 | `#d3e5fe` 1.28 | `#c5ebdd` 1.29 | `#c9ecc9` 1.29 | `#dae9c0` 1.28 | `#f6e1ba` 1.28 |
+| 250 | `#b3d2fd` 1.55 | `#a4dbc7` 1.55 | `#aadcab` 1.55 | `#c3d79f` 1.55 | `#eccb95` 1.55 |
+| 300 | `#91befc` 1.91 | `#7dcbb1` 1.90 | `#88cc8a` 1.90 | `#abc576` 1.91 | `#e4b469` 1.90 |
+| 400 | `#6ba6f5` 2.50 | `#59b496` 2.50 | `#67b56b` 2.50 | `#91ae53` 2.50 | `#d19941` 2.52 |
+| 500 | `#4790f0` 3.22 | `#1da380` 3.18 | `#3fa348` 3.21 | `#7a9b1d` 3.21 | `#c1841a` 3.19 |
+| 600 | `#3881df` 3.91 | `#199173` 3.93 | `#2c9338` 3.93 | `#6d8c15` 3.88 | `#ae7616` 3.89 |
+| 700 | `#2b6fc6` 5.01 | `#147f63` 4.95 | `#1e802c` 5.02 | `#5e7911` 4.98 | `#966612` 4.99 |
+| 800 | `#235ea9` 6.47 | `#106b54` 6.46 | `#186d24` 6.46 | `#50660d` 6.47 | `#81560d` 6.42 |
+| 850 | `#1a4b89` 8.71 | `#0a5542` 8.78 | `#11571b` 8.74 | `#3f5108` 8.78 | `#674409` 8.72 |
+| 900 | `#103768` 11.88 | `#063f30` 11.92 | `#084111` 11.83 | `#2e3c05` 11.90 | `#4e3205` 11.78 |
+| 1000 | `#142c4d` 14.03 | `#083227` 14.04 | `#113213` 14.10 | `#242f07` 14.14 | `#3e2703` 14.03 |
+
+**Plan B hue ramps, part 2** (hex · contrast on white)
+
+| Step | orange | red | magenta | purple | brown |
+|---|---|---|---|---|---|
+| 100 | `#fff4ee` 1.08 | `#fff4f2` 1.08 | `#fff3f7` 1.08 | `#f6f5ff` 1.08 | `#fff4f0` 1.08 |
+| 200 | `#feddca` 1.28 | `#fedcd8` 1.28 | `#fedbe5` 1.27 | `#e2e0fe` 1.29 | `#f8ded2` 1.28 |
+| 250 | `#fdc4a3` 1.54 | `#fdc2bc` 1.54 | `#fdbed2` 1.56 | `#cecafd` 1.56 | `#ecc8b7` 1.55 |
+| 300 | `#fca87b` 1.90 | `#fca59e` 1.91 | `#fca1c0` 1.91 | `#bbb5fc` 1.89 | `#e1b299` 1.90 |
+| 400 | `#ea8b5b` 2.52 | `#f4837c` 2.50 | `#ea84a9` 2.51 | `#a397f9` 2.51 | `#cd987e` 2.50 |
+| 500 | `#e26f35` 3.20 | `#ec645f` 3.20 | `#e16696` 3.21 | `#917ff5` 3.20 | `#c08161` 3.20 |
+| 600 | `#d15f22` 3.91 | `#da5450` 3.91 | `#cf5787` 3.91 | `#836fe4` 3.92 | `#b07253` 3.90 |
+| 700 | `#b85014` 5.01 | `#c14543` 5.00 | `#b74875` 5.00 | `#715fca` 5.01 | `#9a6144` 5.04 |
+| 800 | `#9e430f` 6.43 | `#a53a37` 6.44 | `#9d3c63` 6.44 | `#6150ae` 6.43 | `#84533a` 6.40 |
+| 850 | `#7f3409` 8.76 | `#852d2b` 8.72 | `#7e2f4f` 8.73 | `#4d3f8c` 8.73 | `#6a412d` 8.73 |
+| 900 | `#602605` 11.82 | `#651f1e` 11.88 | `#60213b` 11.81 | `#392e6b` 11.82 | `#4f301f` 11.83 |
+| 1000 | `#48210e` 14.01 | `#4c1d1b` 14.01 | `#481e2d` 14.01 | `#2c264f` 14.03 | `#3c271c` 14.01 |
 
 **Neutral ramps, Plan A (Paper) and Plan B (Neutral)** (hex · contrast on white)
 
@@ -797,7 +949,7 @@ Each step is its own ticket; step 4 splits per pattern.
 
 ## Appendix B: Semantic tokens, light and dark, both plans
 
-Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Plan A's values.
+Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Plan A's values. Accent, chart and code tokens are summarized at the end; the full set of 469 in all four modes is in `semantics_A.json` and `semantics_B.json` with the generator. Shadows are in §4.4; raised and overlay also have increased-contrast variants whose 1px ring is ink at 49%.
 
 
 #### Text
@@ -809,17 +961,17 @@ Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Pla
 | `color.text.inverse` | Text on bold backgrounds | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1d` | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1e` |
 | `color.text.selected` | Text that communicates selection, such as the active tab or a selected navigation item, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.text.inverse instead. Do not use for unselected links, brand emphasis, or hover alone. Keep the selected text treatment when the element also has focus *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
 | `color.text.brand` | Text that reinforces our brand | teal.700 `#147b84` / teal.400 `#23b5c2` | same as A |
-| `color.text.danger` | Critical text, such as input field error messaging | red.800 `#9e413d` / red.300 `#f2a9a3` | same as A |
-| `color.text.danger.bolder` | Text on top of danger semantic labels to ensure accessibility and desired visual appearance | red.900 `#612321` / red.200 `#fedcd8` | same as A |
-| `color.text.warning` | Text to emphasize caution, such as in moved lozenges | yellow.800 `#765c0d` / yellow.300 `#d0ba7f` | same as A |
+| `color.text.danger` | Critical text, such as input field error messaging | red.800 `#a23e37` / red.300 `#fba69c` | red.800 `#a53a37` / red.300 `#fca59e` |
+| `color.text.danger.bolder` | Text on top of danger semantic labels to ensure accessibility and desired visual appearance | red.900 `#63221e` / red.200 `#fedcd7` | red.900 `#651f1e` / red.200 `#fedcd8` |
+| `color.text.warning` | Text to emphasize caution, such as in moved lozenges | yellow.800 `#7c590d` / yellow.300 `#d3b984` | yellow.800 `#81560d` / yellow.300 `#e4b469` |
 | `color.text.warning.inverse` | Text when on bold warning backgrounds | neutral.1000 `#2c2b2a` / darkNeutral.100 `#1e1e1d` | neutral.1000 `#2b2b2b` / darkNeutral.100 `#1e1e1e` |
-| `color.text.warning.bolder` | Text on top of warning semantic labels to ensure accessibility and desired visual appearance | yellow.900 `#463605` / yellow.200 `#ede3c5` | same as A |
-| `color.text.success` | Text to communicate a favorable outcome, such as input field success messaging | green.800 `#0f6c44` / green.300 `#90c8a7` | same as A |
-| `color.text.success.bolder` | Text on top of success semantic labels to ensure accessibility and desired visual appearance | green.900 `#064126` / green.200 `#ceead8` | same as A |
-| `color.text.discovery` | Text to emphasize change or something new, such as in new lozenges | purple.800 `#6c5196` / purple.300 `#c5b3e8` | same as A |
-| `color.text.discovery.bolder` | Text on top of discovery semantic labels to ensure accessibility and desired visual appearance | purple.900 `#402f5c` / purple.200 `#e8dffc` | same as A |
-| `color.text.information` | Informative text or to communicate something is in progress, such as in-progress lozenges | blue.800 `#365f9d` / blue.300 `#9ebeed` | same as A |
-| `color.text.information.bolder` | Text on top of information semantic labels to ensure accessibility and desired visual appearance | blue.900 `#1c375f` / blue.200 `#d3e4fe` | same as A |
+| `color.text.warning.bolder` | Text on top of warning semantic labels to ensure accessibility and desired visual appearance | yellow.900 `#4a3405` / yellow.200 `#ede3c6` | yellow.900 `#4e3205` / yellow.200 `#f6e1ba` |
+| `color.text.success` | Text to communicate a favorable outcome, such as input field success messaging | green.800 `#36684d` / green.300 `#9ec5ad` | green.800 `#186d24` / green.300 `#88cc8a` |
+| `color.text.success.bolder` | Text on top of success semantic labels to ensure accessibility and desired visual appearance | green.900 `#1d3e2c` / green.200 `#d4e8db` | green.900 `#084111` / green.200 `#c9ecc9` |
+| `color.text.discovery` | Text to emphasize change or something new, such as in new lozenges | purple.800 `#71518c` / purple.300 `#ccb2e3` | purple.800 `#6150ae` / purple.300 `#bbb5fc` |
+| `color.text.discovery.bolder` | Text on top of discovery semantic labels to ensure accessibility and desired visual appearance | purple.900 `#432f55` / purple.200 `#ecdef9` | purple.900 `#392e6b` / purple.200 `#e2e0fe` |
+| `color.text.information` | Informative text or to communicate something is in progress, such as in-progress lozenges | blue.800 `#31628a` / blue.300 `#9ac0e2` | blue.800 `#235ea9` / blue.300 `#91befc` |
+| `color.text.information.bolder` | Text on top of information semantic labels to ensure accessibility and desired visual appearance | blue.900 `#1a3a54` / blue.200 `#d1e6f8` | blue.900 `#103768` / blue.200 `#d3e5fe` |
 | `color.text.subtlest` | Tertiary text, such as meta-data, breadcrumbs, input field placeholder and helper text | neutral.700 `#706d69` / darkNeutral.700 `#9a9998` | neutral.700 `#6d6d6d` / darkNeutral.700 `#999999` |
 | `color.text.subtle` | Secondary text, such as navigation, subtle button links, input field labels, and all caps subheadings | neutral.800 `#555350` / darkNeutral.800 `#acabaa` | neutral.800 `#535353` / darkNeutral.800 `#ababab` |
 
@@ -832,12 +984,12 @@ Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Pla
 | `color.icon.inverse` | Icons on bold backgrounds | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1d` | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1e` |
 | `color.icon.selected` | Icons that communicate selection, such as icons in selected navigation items, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.icon.inverse instead. Do not use for brand emphasis or hover alone. Keep the selected icon treatment when the element also has focus *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
 | `color.icon.brand` | Icons that reinforce our brand | teal.700 `#147b84` / teal.400 `#23b5c2` | same as A |
-| `color.icon.danger` | Icons communicating critical information, such as those used in error handing | red.700 `#b84d48` / red.500 `#e36b65` | same as A |
-| `color.icon.warning` | Icons communicating caution, such as those used in warning section messages | yellow.600 `#9f7d16` / yellow.300 `#d0ba7f` | same as A |
+| `color.icon.danger` | Icons communicating critical information, such as those used in error handing | red.700 `#bd4941` / red.500 `#e7685e` | red.700 `#c14543` / red.500 `#ec645f` |
+| `color.icon.warning` | Icons communicating caution, such as those used in warning section messages | yellow.600 `#a77916` / yellow.300 `#d3b984` | yellow.600 `#ae7616` / yellow.300 `#e4b469` |
 | `color.icon.warning.inverse` | Icons when on bold warning backgrounds | neutral.1000 `#2c2b2a` / darkNeutral.100 `#1e1e1d` | neutral.1000 `#2b2b2b` / darkNeutral.100 `#1e1e1e` |
-| `color.icon.success` | Icons communicating a favorable outcome, such as those used in success section messaged | green.600 `#1b935e` / green.500 `#32a26c` | same as A |
-| `color.icon.discovery` | Icons communicating change or something new, such as discovery section messages | purple.600 `#9171c6` / purple.500 `#a07fd7` | same as A |
-| `color.icon.information` | Icons communicating information or something in-progress, such as information section messages | blue.600 `#4e81ce` / blue.500 `#5c91de` | same as A |
+| `color.icon.success` | Icons communicating a favorable outcome, such as those used in success section messaged | green.600 `#4f8d6b` / green.500 `#5e9c79` | green.600 `#2c9338` / green.500 `#3fa348` |
+| `color.icon.discovery` | Icons communicating change or something new, such as discovery section messages | purple.600 `#9870ba` / purple.500 `#a77fca` | purple.600 `#836fe4` / purple.500 `#917ff5` |
+| `color.icon.information` | Icons communicating information or something in-progress, such as information section messages | blue.600 `#4886b8` / blue.500 `#5895c8` | blue.600 `#3881df` / blue.500 `#4790f0` |
 | `color.icon.subtlest` | Icons paired with color.text.subtlest | neutral.700 `#706d69` / darkNeutral.700 `#9a9998` | neutral.700 `#6d6d6d` / darkNeutral.700 `#999999` |
 | `color.icon.subtle` | Icons paired with color.text.subtle | neutral.800 `#555350` / darkNeutral.800 `#acabaa` | neutral.800 `#535353` / darkNeutral.800 `#ababab` |
 
@@ -853,16 +1005,16 @@ Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Pla
 | `color.border.inverse` | Borders on bold backgrounds | neutral.0 `#ffffff` / darkNeutral.0 `#181716` | neutral.0 `#ffffff` / darkNeutral.0 `#171717` |
 | `color.border.selected` | Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a dropdown trigger. Do not use as a keyboard focus indicator; use color.border.focused for focus and preserve the selected treatment when both states apply *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
 | `color.border.brand` | Borders or visual indicators of elements that reinforce our brand, such as logos or primary buttons | teal.700 `#147b84` / teal.400 `#23b5c2` | same as A |
-| `color.border.danger` | Borders communicating critical information, such as the borders on invalid text fields | red.600 `#d15c57` / red.500 `#e36b65` | same as A |
-| `color.border.danger.subtle` | Decorative danger borders that do not need to meet 3:1 contrast requirements | red.300 `#f2a9a3` / red.800 `#9e413d` | same as A |
-| `color.border.warning` | Borders communicating caution | yellow.600 `#9f7d16` / yellow.500 `#b08b1a` | same as A |
-| `color.border.warning.subtle` | Decorative warning borders that do not need to meet 3:1 contrast requirements | yellow.300 `#d0ba7f` / yellow.800 `#765c0d` | same as A |
-| `color.border.success` | Borders communicating a favorable outcome, such as the borders on validated text fields | green.600 `#1b935e` / green.500 `#32a26c` | same as A |
-| `color.border.success.subtle` | Decorative success borders that do not need to meet 3:1 contrast requirements | green.300 `#90c8a7` / green.800 `#0f6c44` | same as A |
-| `color.border.discovery` | Borders communicating change or something new, such as the borders in onboarding spotlights | purple.600 `#9171c6` / purple.500 `#a07fd7` | same as A |
-| `color.border.discovery.subtle` | Decorative discovery borders that do not need to meet 3:1 contrast requirements | purple.300 `#c5b3e8` / purple.800 `#6c5196` | same as A |
-| `color.border.information` | Borders communicating information or something in-progress | blue.600 `#4e81ce` / blue.500 `#5c91de` | same as A |
-| `color.border.information.subtle` | Decorative information borders that do not need to meet 3:1 contrast requirements | blue.300 `#9ebeed` / blue.800 `#365f9d` | same as A |
+| `color.border.danger` | Borders communicating critical information, such as the borders on invalid text fields | red.600 `#d6584f` / red.500 `#e7685e` | red.600 `#da5450` / red.500 `#ec645f` |
+| `color.border.danger.subtle` | Decorative danger borders that do not need to meet 3:1 contrast requirements | red.300 `#fba69c` / red.800 `#a23e37` | red.300 `#fca59e` / red.800 `#a53a37` |
+| `color.border.warning` | Borders communicating caution | yellow.600 `#a77916` / yellow.500 `#b7872b` | yellow.600 `#ae7616` / yellow.500 `#c1841a` |
+| `color.border.warning.subtle` | Decorative warning borders that do not need to meet 3:1 contrast requirements | yellow.300 `#d3b984` / yellow.800 `#7c590d` | yellow.300 `#e4b469` / yellow.800 `#81560d` |
+| `color.border.success` | Borders communicating a favorable outcome, such as the borders on validated text fields | green.600 `#4f8d6b` / green.500 `#5e9c79` | green.600 `#2c9338` / green.500 `#3fa348` |
+| `color.border.success.subtle` | Decorative success borders that do not need to meet 3:1 contrast requirements | green.300 `#9ec5ad` / green.800 `#36684d` | green.300 `#88cc8a` / green.800 `#186d24` |
+| `color.border.discovery` | Borders communicating change or something new, such as the borders in onboarding spotlights | purple.600 `#9870ba` / purple.500 `#a77fca` | purple.600 `#836fe4` / purple.500 `#917ff5` |
+| `color.border.discovery.subtle` | Decorative discovery borders that do not need to meet 3:1 contrast requirements | purple.300 `#ccb2e3` / purple.800 `#71518c` | purple.300 `#bbb5fc` / purple.800 `#6150ae` |
+| `color.border.information` | Borders communicating information or something in-progress | blue.600 `#4886b8` / blue.500 `#5895c8` | blue.600 `#3881df` / blue.500 `#4790f0` |
+| `color.border.information.subtle` | Decorative information borders that do not need to meet 3:1 contrast requirements | blue.300 `#9ac0e2` / blue.800 `#31628a` | blue.300 `#91befc` / blue.800 `#235ea9` |
 | `color.border.bold` | A neutral border option that passes min 3:1 contrast ratios | neutral.600 `#827f7b` / darkNeutral.600 `#828281` | neutral.600 `#7f7f7f` / darkNeutral.600 `#828282` |
 | `color.border.focused.inverse` | PLUS addition. Focus ring on a bold or colored ground (today --color-focus-ring-inverse). *today's Focus Ring Inverse* | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1d` | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1e` |
 
@@ -906,16 +1058,16 @@ Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Pla
 
 | Token | For | Plan A light / dark | Plan B light / dark |
 |---|---|---|---|
-| `color.background.danger` | Backgrounds communicating critical information, such in error section messages | red.100 `#fff4f2` / red.1000 `#48201d` | same as A |
-| `color.background.danger.hovered` | Hovered state for color.background.danger | red.200 `#fedcd8` / red.900 `#612321` | same as A |
-| `color.background.danger.pressed` | Pressed state for color.background.danger | red.250 `#f9c2bd` / red.850 `#7f322f` | same as A |
-| `color.background.danger.subtler` | Backgrounds of danger lozenges and badges to ensure accessibility and desired visual appearance | red.200 `#fedcd8` / red.900 `#612321` | same as A |
-| `color.background.danger.subtler.hovered` | Hovered state of color.background.danger.subtler | red.250 `#f9c2bd` / red.850 `#7f322f` | same as A |
-| `color.background.danger.subtler.pressed` | Pressed state of color.background.danger.subtler | red.300 `#f2a9a3` / red.800 `#9e413d` | same as A |
-| `color.background.danger.subtle` | Background color for non-interactive elements communicating critical danger information (e.g. semantic badges, status pills, callout chips). Sits between subtler and bold in visual emphasis. Not for interactive surfaces — see color.background.danger.bold or color.background.danger.subtler for interactive states | red.300 `#f2a9a3` / red.800 `#9e413d` | same as A |
-| `color.background.danger.bold` | A vibrant background option for communicating critical information, such as in danger buttons and error banners | red.700 `#b84d48` / red.400 `#eb8881` | same as A |
-| `color.background.danger.bold.hovered` | Hovered state of color.background.danger.bold | red.800 `#9e413d` / red.300 `#f2a9a3` | same as A |
-| `color.background.danger.bold.pressed` | Pressed state of color.background.danger.bold | red.850 `#7f322f` / red.250 `#f9c2bd` | same as A |
+| `color.background.danger` | Backgrounds communicating critical information, such in error section messages | red.100 `#fff4f2` / red.1000 `#4a1e1b` | red.100 `#fff4f2` / red.1000 `#4c1d1b` |
+| `color.background.danger.hovered` | Hovered state for color.background.danger | red.200 `#fedcd7` / red.900 `#63221e` | red.200 `#fedcd8` / red.900 `#651f1e` |
+| `color.background.danger.pressed` | Pressed state for color.background.danger | red.250 `#fdc2ba` / red.850 `#82302a` | red.250 `#fdc2bc` / red.850 `#852d2b` |
+| `color.background.danger.subtler` | Backgrounds of danger lozenges and badges to ensure accessibility and desired visual appearance | red.200 `#fedcd7` / red.900 `#63221e` | red.200 `#fedcd8` / red.900 `#651f1e` |
+| `color.background.danger.subtler.hovered` | Hovered state of color.background.danger.subtler | red.250 `#fdc2ba` / red.850 `#82302a` | red.250 `#fdc2bc` / red.850 `#852d2b` |
+| `color.background.danger.subtler.pressed` | Pressed state of color.background.danger.subtler | red.300 `#fba69c` / red.800 `#a23e37` | red.300 `#fca59e` / red.800 `#a53a37` |
+| `color.background.danger.subtle` | Background color for non-interactive elements communicating critical danger information (e.g. semantic badges, status pills, callout chips). Sits between subtler and bold in visual emphasis. Not for interactive surfaces — see color.background.danger.bold or color.background.danger.subtler for interactive states | red.300 `#fba69c` / red.800 `#a23e37` | red.300 `#fca59e` / red.800 `#a53a37` |
+| `color.background.danger.bold` | A vibrant background option for communicating critical information, such as in danger buttons and error banners | red.700 `#bd4941` / red.400 `#ef867b` | red.700 `#c14543` / red.400 `#f4837c` |
+| `color.background.danger.bold.hovered` | Hovered state of color.background.danger.bold | red.800 `#a23e37` / red.300 `#fba69c` | red.800 `#a53a37` / red.300 `#fca59e` |
+| `color.background.danger.bold.pressed` | Pressed state of color.background.danger.bold | red.850 `#82302a` / red.250 `#fdc2ba` | red.850 `#852d2b` / red.250 `#fdc2bc` |
 
 #### Link, interaction, skeleton, blanket
 
@@ -923,15 +1075,15 @@ Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Pla
 |---|---|---|---|
 | `color.link` | Links in a default or hovered state. Add an underline for hovered states | teal.700 `#147b84` / teal.400 `#23b5c2` | same as A |
 | `color.link.pressed` | Links in a pressed state | teal.800 `#106972` / teal.300 `#70c9d4` | same as A |
-| `color.link.visited` | Visited links | purple.800 `#6c5196` / purple.300 `#c5b3e8` | same as A |
-| `color.link.visited.pressed` | Visited links in a pressed state | purple.900 `#402f5c` / purple.200 `#e8dffc` | same as A |
+| `color.link.visited` | Visited links | purple.800 `#71518c` / purple.300 `#ccb2e3` | purple.800 `#6150ae` / purple.300 `#bbb5fc` |
+| `color.link.visited.pressed` | Visited links in a pressed state | purple.900 `#432f55` / purple.200 `#ecdef9` | purple.900 `#392e6b` / purple.200 `#e2e0fe` |
 | `color.interaction.hovered` | A background overlay for elements in a hovered state when their background color cannot change, such as avatars *PLUS state-layer ruling (2026-10-24): hover is an 8% overlay. Atlassian uses 16%.* | neutralAlpha ink @8% `#1f1e1e14` / paper @8% `#e4e3e214` | neutralAlpha ink @8% `#1e1e1e14` / paper @8% `#e3e3e314` |
 | `color.interaction.pressed` | A background overlay for elements in a pressed state when their background color cannot change, such as avatars *PLUS ruling: pressed is a 12% overlay. Atlassian uses 32%.* | neutralAlpha ink @12% `#1f1e1e1f` / paper @12% `#e4e3e21f` | neutralAlpha ink @12% `#1e1e1e1f` / paper @12% `#e3e3e31f` |
 | `color.skeleton` | Skeleton loading states | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1e1e1e0f` / darkNeutralAlpha.200 `#e3e3e314` |
 | `color.skeleton.subtle` | The pulse or shimmer effect in skeleton loading states | neutralAlpha.100 `#1f1e1e08` / darkNeutralAlpha.100 `#e4e3e20a` | neutralAlpha.100 `#1e1e1e08` / darkNeutralAlpha.100 `#e3e3e30a` |
 | `color.blanket` | The screen overlay that appears with modal dialogs *Keeps today's 0.32 scrim (#383). Atlassian is ~46%.* | ink @32% `#1f1e1e52` / black @60% `#00000099` | ink @32% `#1e1e1e52` / black @60% `#00000099` |
 | `color.blanket.selected` | A translucent blanket to communicate selection when changing the background of the selected content is not possible, such as selected Editor blocks. The content beneath remains visible. Do not use to indicate keyboard focus or hover alone | teal.500 @8% `#1d9eab14` / teal.600 @8% `#198f9a14` | same as A |
-| `color.blanket.danger` | An overlay to communicate danger states when a simple background color change isn't possible, such as deletion of Editor block elements | red.500 @8% `#e36b6514` / red.600 @8% `#d15c5714` | same as A |
+| `color.blanket.danger` | An overlay to communicate danger states when a simple background color change isn't possible, such as deletion of Editor block elements | red.500 @8% `#e7685e14` / red.600 @8% `#d6584f14` | red.500 @8% `#ec645f14` / red.600 @8% `#da545014` |
 | `color.interaction.dragged` | PLUS addition. Selected-or-dragged overlay, the 16% step of the state-layer ruling. *PLUS ruling 2026-10-24* | ink @16% `#1f1e1e29` / paper @16% `#e4e3e229` | ink @16% `#1e1e1e29` / paper @16% `#e3e3e329` |
 
 #### Elevation surfaces
@@ -954,30 +1106,86 @@ Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Pla
 
 | Emphasis | warning (yellow) | success (green) | information (blue) | discovery (purple) |
 |---|---|---|---|---|
-| `[default]` | `#faf6e8` / `#372a03` | `#ecf9f1` / `#0d3220` | `#f1f6ff` / `#1a2c47` | `#f8f4ff` / `#312644` |
-| `.subtler` | `#ede3c5` / `#463605` | `#ceead8` / `#064126` | `#d3e4fe` / `#1c375f` | `#e8dffc` / `#402f5c` |
-| `.subtle` | `#ddcfa4` / `#765c0d` | `#90c8a7` / `#0f6c44` | `#9ebeed` / `#365f9d` | `#c5b3e8` / `#6c5196` |
-| `.bold` | `#d0ba7f` / `#d0ba7f` | `#148051` / `#61b487` | `#406fb6` / `#7aa5e6` | `#7f60af` / `#b197e0` |
-| `.bold.hovered` | `#c1a047` / `#c1a047` | `#0f6c44` / `#90c8a7` | `#365f9d` / `#9ebeed` | `#6c5196` / `#c5b3e8` |
+| `[default]` | `#faf6e9` / `#39290b` | `#eff8f2` / `#1b3024` | `#eff7ff` / `#182d3f` | `#f9f4ff` / `#342640` |
+| `.subtler` | `#ede3c6` / `#4a3405` | `#d4e8db` / `#1d3e2c` | `#d1e6f8` / `#1a3a54` | `#ecdef9` / `#432f55` |
+| `.subtle` | `#dfcea7` / `#7c590d` | `#9ec5ad` / `#36684d` | `#9ac0e2` / `#31628a` | `#ccb2e3` / `#71518c` |
+| `.bold` | `#d3b984` / `#d3b984` | `#407a5b` / `#7caf91` | `#3a74a2` / `#77a8d3` | `#8560a3` / `#b797d4` |
+| `.bold.hovered` | `#c39e59` / `#c39e59` | `#36684d` / `#9ec5ad` | `#31628a` / `#9ac0e2` | `#71518c` / `#ccb2e3` |
 
-#### Accent pattern (repeat for teal, blue, green, lime, yellow, orange, red, magenta, purple; gray uses the neutrals)
+#### Accent pattern (repeat for blue, teal, green, lime, yellow, orange, red, magenta, purple, brown; gray uses the neutrals)
 
-| Token | For | Light step | Dark step |
+Steps shown for blue. Teal aliases the accent-teal ramp (`aqua`), not Lagoon. Increased contrast (IC) differs from the base where shown.
+
+| Token | For | Light | Dark | Light IC | Dark IC |
+|---|---|---|---|---|---|
+| `color.background.accent.{f}.subtlest` | Blue backgrounds when there is no meaning tied to the color. Reserved for when you only want a hint of color | 100 | 1000 | 100 | 1000 |
+| `color.background.accent.{f}.subtlest.hovered` | Hovered state of color.background.accent.blue.subtlest | 200 | 900 | 200 | 900 |
+| `color.background.accent.{f}.subtlest.pressed` | Pressed state of color.background.accent.blue.subtlest | 250 | 850 | 250 | 850 |
+| `color.background.accent.{f}.subtler` | Blue backgrounds when there is no meaning tied to the color, such as colored tags | 200 | 900 | 200 | 900 |
+| `color.background.accent.{f}.subtler.hovered` | Hovered state of color.background.accent.blue.subtler | 250 | 850 | 250 | 850 |
+| `color.background.accent.{f}.subtler.pressed` | Pressed state of color.background.accent.blue.subtler | 300 | 800 | 300 | 800 |
+| `color.background.accent.{f}.subtle` | Vibrant backgrounds when there is no meaning tied to the color, such as colored tags | 400 | 800 | 300 | 900 |
+| `color.background.accent.{f}.subtle.hovered` | Hovered state of color.background.accent.blue.subtle | 300 | 850 | 200 | 1000 |
+| `color.background.accent.{f}.subtle.pressed` | Pressed state of color.background.accent.blue.subtle | 250 | 900 | 100 | 1000 |
+| `color.background.accent.{f}.bolder` | Blue backgrounds when there is no meaning tied to the color, and the background needs to pass min 3:1 contrast requirements | 700 | 400 | 900 | 300 |
+| `color.background.accent.{f}.bolder.hovered` | Hovered state of color.background.accent.blue.bolder | 800 | 300 | 1000 | 250 |
+| `color.background.accent.{f}.bolder.pressed` | Pressed state of color.background.accent.blue.bolder | 850 | 250 | 1000 | 200 |
+| `color.border.accent.{f}` | Blue borders on non-bold backgrounds when there is no meaning tied to the color | 600 | 500 | 800 | 300 |
+| `color.border.accent.{f}.subtle` | Decorative borders that do not need to meet 3:1 contrast requirements | 300 | 800 | 300 | 800 |
+| `color.text.accent.{f}` | Blue text on subtlest and subtler accent backgrounds when there is no meaning tied to the color | 800 | 300 | 900 | 200 |
+| `color.text.accent.{f}.bolder` | Blue text on subtle accent backgrounds when there is no meaning tied to the color | 900 | 200 | 1000 | 100 |
+| `color.icon.accent.{f}` | Blue icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons | 600 | 500 | 800 | 300 |
+
+#### Charts
+
+| Token | Plan A light / dark | Plan B light / dark | IC (A) light / dark |
 |---|---|---|---|
-| `color.background.accent.{f}.subtlest` | Blue backgrounds when there is no meaning tied to the color. Reserved for when you only want a hint of color | 100 | 1000 |
-| `color.background.accent.{f}.subtlest.hovered` | Hovered state of color.background.accent.blue.subtlest | 200 | 900 |
-| `color.background.accent.{f}.subtlest.pressed` | Pressed state of color.background.accent.blue.subtlest | 250 | 850 |
-| `color.background.accent.{f}.subtler` | Blue backgrounds when there is no meaning tied to the color, such as colored tags | 200 | 900 |
-| `color.background.accent.{f}.subtler.hovered` | Hovered state of color.background.accent.blue.subtler | 250 | 850 |
-| `color.background.accent.{f}.subtler.pressed` | Pressed state of color.background.accent.blue.subtler | 300 | 800 |
-| `color.background.accent.{f}.subtle` | Vibrant blue backgrounds when there is no meaning tied to the color, such as colored tags | 400 | 800 |
-| `color.background.accent.{f}.subtle.hovered` | Hovered state of color.background.accent.blue.subtle | 300 | 850 |
-| `color.background.accent.{f}.subtle.pressed` | Pressed state of color.background.accent.blue.subtle | 250 | 900 |
-| `color.background.accent.{f}.bolder` | Blue backgrounds when there is no meaning tied to the color, and the background needs to pass min 3:1 contrast requirements | 700 | 400 |
-| `color.background.accent.{f}.bolder.hovered` | Hovered state of color.background.accent.blue.bolder | 800 | 300 |
-| `color.background.accent.{f}.bolder.pressed` | Pressed state of color.background.accent.blue.bolder | 850 | 250 |
-| `color.border.accent.{f}` | Blue borders on non-bold backgrounds when there is no meaning tied to the color | 600 | 500 |
-| `color.border.accent.{f}.subtle` | Decorative blue borders that do not need to meet 3:1 contrast requirements | 300 | 800 |
-| `color.text.accent.{f}` | Blue text on subtlest and subtler blue accent backgrounds when there is no meaning tied to the color | 800 | 300 |
-| `color.text.accent.{f}.bolder` | Blue text on subtle blue accent backgrounds when there is no meaning tied to the color | 900 | 200 |
-| `color.icon.accent.{f}` | Blue icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons | 600 | 500 |
+| `color.chart.categorical.1` | blue.600 `#4886b8` / blue.500 `#5895c8` | blue.600 `#3881df` / blue.500 `#4790f0` | aqua.800 / aqua.300 |
+| `color.chart.categorical.2` | lime.500 `#88965a` / lime.400 `#9da978` | lime.500 `#7a9b1d` / lime.400 `#91ae53` | lime.500 / lime.400 |
+| `color.chart.categorical.3` | purple.500 `#a77fca` / purple.400 `#b797d4` | purple.500 `#917ff5` / purple.400 `#a397f9` | orange.800 / orange.300 |
+| `color.chart.categorical.4` | orange.500 `#d5781c` / orange.400 `#df9252` | orange.500 `#e26f35` / orange.400 `#ea8b5b` | orange.500 / orange.400 |
+| `color.chart.categorical.5` | blue.800 `#31628a` / blue.800 `#31628a` | blue.800 `#235ea9` / blue.800 `#235ea9` | blue.800 / blue.800 |
+| `color.chart.categorical.6` | purple.700 `#8560a3` / purple.700 `#8560a3` | purple.700 `#715fca` / purple.700 `#715fca` | purple.800 / purple.300 |
+| `color.chart.categorical.7` | aqua.500 `#3e9e99` / aqua.500 `#3e9e99` | aqua.500 `#1da380` / aqua.500 `#1da380` | aqua.500 / aqua.500 |
+| `color.chart.categorical.8` | orange.700 `#a75c12` / orange.600 `#c16b16` | orange.700 `#b85014` / orange.600 `#d15f22` | orange.700 / orange.600 |
+| `color.chart.neutral` | neutral.500 `#928f8a` / darkNeutral.600 `#828281` | neutral.500 `#8f8f8f` / darkNeutral.600 `#828282` | neutral.700 / darkNeutral.700 |
+| `color.chart.blue.bold` | blue.500 `#5895c8` / blue.600 `#4886b8` | blue.500 `#4790f0` / blue.600 `#3881df` | blue.800 / blue.300 |
+| `color.chart.blue.bolder` | blue.600 `#4886b8` / blue.500 `#5895c8` | blue.600 `#3881df` / blue.500 `#4790f0` | blue.900 / blue.200 |
+| `color.chart.blue.boldest` | blue.800 `#31628a` / blue.300 `#9ac0e2` | blue.800 `#235ea9` / blue.300 `#91befc` | blue.1000 / blue.100 |
+| `color.chart.brand` | teal.600 `#198f9a` / teal.500 `#1d9eab` | teal.600 `#198f9a` / teal.500 `#1d9eab` | teal.700 / teal.400 |
+| `color.chart.danger` | red.600 `#d6584f` / red.600 `#d6584f` | red.600 `#da5450` / red.600 `#da5450` | red.700 / red.400 |
+| `color.chart.danger.bold` | red.850 `#82302a` / red.250 `#fdc2ba` | red.850 `#852d2b` / red.250 `#fdc2bc` | red.900 / red.250 |
+| `color.chart.warning` | yellow.500 `#b7872b` / yellow.500 `#b7872b` | yellow.500 `#c1841a` / yellow.500 `#c1841a` | yellow.800 / yellow.500 |
+| `color.chart.warning.bold` | yellow.700 `#916812` / yellow.300 `#d3b984` | yellow.700 `#966612` / yellow.300 `#e4b469` | yellow.900 / yellow.300 |
+| `color.chart.success` | green.500 `#5e9c79` / green.500 `#5e9c79` | green.500 `#3fa348` / green.500 `#3fa348` | green.800 / green.500 |
+| `color.chart.success.bold` | green.700 `#407a5b` / green.300 `#9ec5ad` | green.700 `#1e802c` / green.300 `#88cc8a` | green.900 / green.300 |
+| `color.chart.discovery` | purple.500 `#a77fca` / purple.500 `#a77fca` | purple.500 `#917ff5` / purple.500 `#917ff5` | purple.700 / purple.400 |
+| `color.chart.discovery.bold` | purple.800 `#71518c` / purple.300 `#ccb2e3` | purple.800 `#6150ae` / purple.300 `#bbb5fc` | purple.900 / purple.300 |
+| `color.chart.information` | blue.600 `#4886b8` / blue.500 `#5895c8` | blue.600 `#3881df` / blue.500 `#4790f0` | blue.700 / blue.400 |
+| `color.chart.information.bold` | blue.800 `#31628a` / blue.300 `#9ac0e2` | blue.800 `#235ea9` / blue.300 `#91befc` | blue.900 / blue.300 |
+
+Every hue has `color.chart.{hue}.bold`, `.bolder` and `.boldest`, with `.hovered` for each, following blue; every token above also has `.hovered`.
+
+#### Code syntax
+
+| Token | Light / dark (A) |
+|---|---|
+| `color.background.code.added.highlight` | green.100 / green.1000 |
+| `color.background.code.added.line` | green.200 @40% / green.900 @70% |
+| `color.background.code.default` | neutral.0 / darkNeutral.100 |
+| `color.background.code.gutter` | neutral.200 / darkNeutral.200 |
+| `color.background.code.highlight` | neutral.200 / darkNeutral.200 |
+| `color.background.code.removed.highlight` | red.100 / red.1000 |
+| `color.background.code.removed.line` | red.200 @40% / red.900 @70% |
+| `color.border.code` | neutralAlpha.300 / darkNeutralAlpha.300 |
+| `color.text.code.accent.1` | magenta.800 / magenta.300 |
+| `color.text.code.accent.2` | blue.800 / blue.300 |
+| `color.text.code.comments` | neutral.800 / darkNeutral.800 |
+| `color.text.code.default` | neutral.800 / darkNeutral.800 |
+| `color.text.code.functions` | green.800 / green.300 |
+| `color.text.code.gutter` | neutral.700 / darkNeutral.700 |
+| `color.text.code.keywords` | red.800 / red.300 |
+| `color.text.code.numbers` | yellow.800 / yellow.300 |
+| `color.text.code.operators` | neutral.1000 / darkNeutral.1000 |
+| `color.text.code.strings` | lime.800 / lime.300 |
+| `color.text.code.tags` | orange.800 / orange.400 |
