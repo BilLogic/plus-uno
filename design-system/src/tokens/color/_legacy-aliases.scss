@@ -2,31 +2,16 @@
 :root,
 [data-color-mode],
 [data-contrast-mode] {
-  --color-primary-text: var(--ds-text-brand);
   --color-primary-border: var(--ds-border-brand);
-  --color-primary-icon: var(--ds-icon-brand);
-  --color-primary-container: var(--ds-background-brand-subtlest);
-  --color-secondary-text: var(--ds-text-subtle);
-  --color-secondary-border: var(--ds-border);
-  --color-secondary-container: var(--ds-background-neutral);
-  --color-surface-variant: var(--ds-background-neutral);
-  --color-surface-bright: var(--ds-surface);
-  --color-surface-overlay: var(--ds-surface-overlay);
   --color-scrim: var(--ds-blanket);
   --color-disabled-opacity: var(--ds-opacity-disabled);
   --color-inverse-surface: var(--ds-background-neutral-bold);
   --color-inverse-on-surface: var(--ds-text-inverse);
   --color-focus-ring: var(--ds-border-focused);
   --color-focus-ring-inverse: var(--ds-border-focused-inverse);
-  --surface-default: var(--ds-surface);
-  --surface-raised: var(--ds-surface-raised);
-  --surface-overlay: var(--ds-surface-overlay);
-  --surface-sunken: var(--ds-surface-sunken);
   --surface-raised-shadow: var(--ds-shadow-raised);
   --surface-overlay-shadow: var(--ds-shadow-overlay);
   --elevation-light-1: var(--ds-shadow-raised);
   --elevation-light-2: var(--ds-shadow-raised);
   --elevation-light-3: var(--ds-shadow-overlay);
-  --elevation-light-4: var(--ds-shadow-overlay);
-  --elevation-light-5: var(--ds-shadow-overlay);
 }

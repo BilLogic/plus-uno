@@ -15,7 +15,9 @@
  *   teal vs Lagoon      the accent teal never reads as the brand
  *   plan parity         plans differ in primitive values only, never in a semantic mapping
  *   legacy map          every legacy color name used in design-system/ and prototypes/ has a
- *                       migration-map row, and every alias in it names a token the generator emits
+ *                       migration-map row, every alias in it names a token the generator emits,
+ *                       and partners (a foreground and its grounds) are aliased together, to a
+ *                       pair that passes 4.5:1 in light, or not at all
  *
  * Light, dark and both increased-contrast modes; increased contrast raises the
  * bar to 7:1 for text and 4.5:1 for icons and borders. Each finding names the
@@ -27,7 +29,9 @@ import { REPO_ROOT } from './lib/corpus.mjs';
 import { buildAllPlans, buildPlan } from './lib/color/build.mjs';
 import { ACTIVE_PLAN } from './lib/color/plans.mjs';
 import { colorFailures } from './lib/color/failures.mjs';
-import { ALIASES, legacyCoverage, missingTargets } from './lib/color/legacy-map.mjs';
+import { composite } from './lib/color/checks.mjs';
+import { ALIASES, legacyCoverage, missingTargets, pairFailures } from './lib/color/legacy-map.mjs';
+import { contrast } from './lib/color/oklch.mjs';
 import { main } from './lib/findings.mjs';
 
 export const REMEDY =
@@ -45,7 +49,13 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   for (const [name, uses] of legacyCoverage({ root: repoRoot }).unmapped) {
     findings.push({ message: `legacy map: ${name} (${uses} use${uses === 1 ? '' : 's'}) has no migration-map row` });
   }
-  for (const failure of missingTargets(buildPlan(ACTIVE_PLAN, { root: repoRoot }).semantics)) findings.push({ message: `legacy map: ${failure}` });
+  const { semantics } = buildPlan(ACTIVE_PLAN, { root: repoRoot });
+  const missing = missingTargets(semantics);
+  for (const failure of missing) findings.push({ message: `legacy map: ${failure}` });
+  if (!missing.length) {
+    const names = legacyCoverage({ root: repoRoot }).used.keys();
+    for (const failure of pairFailures(names, semantics, contrast, composite)) findings.push({ message: `legacy map: ${failure}` });
+  }
   return findings;
 }
 

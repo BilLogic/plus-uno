@@ -11,9 +11,9 @@
 
     /* Primary Colors */
     --color-primary: #0472a8;
-    --color-primary-text: #00547e; // overridden by color/_legacy-aliases.scss
+    --color-primary-text: #00547e;
     --color-on-primary: #ffffff;
-    --color-primary-container: #61b5cf; // overridden by color/_legacy-aliases.scss
+    --color-primary-container: #61b5cf;
     --color-on-primary-container: #001e2e;
     --color-inverse-primary: #84cfff;
 
@@ -27,9 +27,9 @@
 
     /* Secondary Colors */
     --color-secondary: #445c6a;
-    --color-secondary-text: #3b525f; // overridden by color/_legacy-aliases.scss
+    --color-secondary-text: #3b525f;
     --color-on-secondary: #ffffff;
-    --color-secondary-container: #5e849b; // overridden by color/_legacy-aliases.scss
+    --color-secondary-container: #5e849b;
     --color-on-secondary-container: #09171f;
 
     /* Secondary State Layers */
@@ -211,7 +211,7 @@
     --color-on-surface: #191c1e;
 
     /* Surface Variant */
-    --color-surface-variant: #dde3ea; // overridden by color/_legacy-aliases.scss
+    --color-surface-variant: #dde3ea;
     --color-on-surface-variant: #3f484a;
 
     /* Outline */
@@ -227,7 +227,7 @@
 
     /* Alternative Surfaces */
     --color-surface-dim: #d9dadd;
-    --color-surface-bright: #f9f9fc; // overridden by color/_legacy-aliases.scss
+    --color-surface-bright: #f9f9fc;
     --color-scrim: rgba(0, 0, 0, 0.32); // overridden by color/_legacy-aliases.scss
     --color-disabled-opacity: 0.38; // overridden by color/_legacy-aliases.scss
     --color-inverse-surface: #2e3133; // overridden by color/_legacy-aliases.scss

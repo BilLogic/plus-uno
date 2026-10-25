@@ -13,8 +13,15 @@
  * what the element is (state layers) waits for the component sweep, which
  * reads `proposed`.
  *
- * Two judgement calls narrow `aliases` beyond "one target":
- *
+ * Three rules narrow `aliases` beyond "one target":
+ *   - Partners move together (`PAIRS`). A foreground and the grounds it is
+ *     drawn on — on-X with X, a container with its on-container, the text on
+ *     a surface, the text on a state layer — are aliased together, to a pair
+ *     that passes 4.5:1 in light, or not at all. Aliasing one side alone
+ *     pairs a new color with a legacy one nobody chose: brand text on the
+ *     legacy 16% primary selection fell to 4.44:1. So the brand text and icon,
+ *     the brand and secondary containers, secondary text and the surfaces wait
+ *     for the sweep with the partners whose targets depend on use.
  *   - Status, info, tertiary and SMART families stay put even where a name
  *     has one target (`--color-danger-text` → `color.text.danger`). Their hues
  *     move under the new ramps, and this step promises a visible change in
@@ -40,21 +47,18 @@ const SMART = '(mastering-content|relationship|technology-tools|advocacy|social-
 export const ROWS = [
   { today: '--color-primary (background)', match: /^--color-primary$/, proposed: 'color.background.brand.bold', note: 'One M3 role splits by property: fill here, edge and link below.' },
   { today: '--color-primary (border / text)', match: null, proposed: 'color.border.brand · color.link', note: 'Same name used as an edge or a link color.' },
-  { today: '--color-primary-text', match: /^--color-primary-text$/, proposed: 'color.text.brand', note: 'Lagoon 800 for brand text.',
-    aliases: { '--color-primary-text': 'color.text.brand' } },
+  { today: '--color-primary-text', match: /^--color-primary-text$/, proposed: 'color.text.brand', note: 'Lagoon 800 for brand text.' },
   { today: '--color-primary-border · -icon', match: /^--color-primary-(border|icon)$/, proposed: 'color.border.brand · color.icon.brand', note: '38 border uses today.',
-    aliases: { '--color-primary-border': 'color.border.brand', '--color-primary-icon': 'color.icon.brand' } },
+    aliases: { '--color-primary-border': 'color.border.brand' } },
   { today: '--color-on-primary', match: /^--color-on-primary$/, proposed: 'color.text.inverse · color.icon.inverse', note: 'Shared by every bold fill, not per intent.' },
-  { today: '--color-primary-container', match: /^--color-primary-container$/, proposed: 'color.background.brand.subtlest', note: '',
-    aliases: { '--color-primary-container': 'color.background.brand.subtlest' } },
+  { today: '--color-primary-container', match: /^--color-primary-container$/, proposed: 'color.background.brand.subtlest', note: '' },
   { today: '--color-on-primary-container', match: /^--color-on-primary-container$/, proposed: 'color.text (or color.text.brand)', note: '' },
   { today: '--color-inverse-primary', match: /^--color-inverse-primary$/, proposed: 'color.border.focused (dark value) · Field hover exception: decide', note: '' },
   { today: '--color-primary-state-08 / 12 / 16, by role', match: /^--color-primary(-container)?-state-\d+$/,
     proposed: 'on aria-selected, aria-current, active, expanded: color.background.selected · hover on selected: .selected.hovered · otherwise background.neutral.subtle.hovered / .pressed',
     note: 'Mapped by what the element is, not by step: a 16% primary slab on a selected tab would become a 31% one under a step-for-step swap.' },
   { today: '--color-secondary · -text · -border · -container', match: /^--color-(on-)?secondary(-text|-border|-container)?$/,
-    proposed: 'color.text.subtle · color.border · color.background.neutral', note: 'Atlassian has no secondary role; secondary-text is subdued text.',
-    aliases: { '--color-secondary-text': 'color.text.subtle', '--color-secondary-border': 'color.border', '--color-secondary-container': 'color.background.neutral' } },
+    proposed: 'color.text.subtle · color.border · color.background.neutral', note: 'Atlassian has no secondary role; secondary-text is subdued text. secondary-border waits for the sweep: Alert holds it to 3:1 as an edge, and color.border is a decorative line.' },
   { today: '--color-secondary-state-*', match: /^--color-secondary(-container)?-state-\d+$/, proposed: 'background.neutral.subtle.hovered / .pressed', note: '' },
   { today: '--color-tertiary family', match: /^--color-(on-)?tertiary(-[a-z]+)*(-state-\d+)?$/, proposed: 'color.*.accent.teal', note: 'Tertiary stops being a role.' },
   { today: '--color-info family', match: /^--color-(on-)?info(-[a-z]+)*(-state-\d+)?$/, proposed: 'color.*.information (blue)', note: 'Info moves to blue so it stops reading as brand.' },
@@ -73,8 +77,7 @@ export const ROWS = [
   { today: '--color-surface-container · -low · -high · -highest', match: /^--color-surface-container(-low|-high|-highest)?$/,
     proposed: 'elevation.surface.container · .hovered · color.background.neutral', note: '300 uses collapse to translucent container fills; gray stays for recessed areas.' },
   { today: '--color-surface-variant · -bright · -overlay', match: /^--color-surface-(variant|bright|overlay|dim)$/,
-    proposed: 'color.background.neutral · elevation.surface · elevation.surface.overlay', note: '',
-    aliases: { '--color-surface-variant': 'color.background.neutral', '--color-surface-bright': 'elevation.surface', '--color-surface-overlay': 'elevation.surface.overlay' } },
+    proposed: 'color.background.neutral · elevation.surface · elevation.surface.overlay', note: '' },
   { today: '--color-surface(-container)-state-*', match: /^--color-(surface|surface-container(-[a-z]+)*|surface-variant|surface-bright|surface-dim)-state-\d+$/,
     proposed: 'color.interaction.inverse.hovered / .pressed (dark or colored grounds)', note: 'PLUS addition: white 8/12% in light, ink in dark.' },
   { today: '--color-on-surface', match: /^--color-on-surface$/, proposed: 'color.text · color.icon', note: '657 uses, the most-used color token.' },
@@ -97,20 +100,77 @@ export const ROWS = [
   { today: '--color-shadow-state-08 / 12', match: /^--color-shadow-state-\d+$/, proposed: "the role's .bold.hovered / .bold.pressed", note: 'Overlays over bold fills become opaque steps.' },
   { today: '--color-focus-ring / -inverse', match: /^--color-focus-ring(-inverse)?$/, proposed: 'color.border.focused / color.border.focused.inverse', note: 'Inverse is a PLUS addition.',
     aliases: { '--color-focus-ring': 'color.border.focused', '--color-focus-ring-inverse': 'color.border.focused.inverse' } },
-  { today: '--surface-default / raised / overlay / sunken', match: /^--surface-(default|raised|overlay|sunken)$/, proposed: 'elevation.surface / .raised / .overlay / .sunken', note: 'Already Atlassian-shaped.',
-    aliases: { '--surface-default': 'elevation.surface', '--surface-raised': 'elevation.surface.raised', '--surface-overlay': 'elevation.surface.overlay', '--surface-sunken': 'elevation.surface.sunken' } },
+  { today: '--surface-default / raised / overlay / sunken', match: /^--surface-(default|raised|overlay|sunken)$/, proposed: 'elevation.surface / .raised / .overlay / .sunken', note: 'Already Atlassian-shaped.' },
   { today: '--surface-raised-shadow / -overlay-shadow', match: /^--surface-(raised|overlay)-shadow$/, proposed: 'elevation.shadow.raised / .overlay', note: '',
     aliases: { '--surface-raised-shadow': 'elevation.shadow.raised', '--surface-overlay-shadow': 'elevation.shadow.overlay' } },
   { today: '--surface-container, -pad, -stack, -radius', match: /^--surface-(container|pad|stack|radius)(-[a-z0-9]+)*$/, proposed: 'unchanged: spacing and radius, not color', note: 'Out of scope for the color set.' },
   { today: '--elevation-light-1 · -2', match: /^--elevation-light-[12]$/, proposed: 'elevation.shadow.raised', note: 'Pair with elevation.surface.raised.',
     aliases: { '--elevation-light-1': 'elevation.shadow.raised', '--elevation-light-2': 'elevation.shadow.raised' } },
-  { today: '--elevation-light-3 · -4 · -5', match: /^--elevation-light-[345]$/, proposed: 'elevation.shadow.overlay', note: 'Pair with elevation.surface.overlay.',
-    aliases: { '--elevation-light-3': 'elevation.shadow.overlay', '--elevation-light-4': 'elevation.shadow.overlay', '--elevation-light-5': 'elevation.shadow.overlay' } },
+  { today: '--elevation-light-3 · -4 · -5', match: /^--elevation-light-[345]$/, proposed: 'elevation.shadow.overlay', note: 'Pair with elevation.surface.overlay. Level 3 only for now: the modal levels 4 and 5 keep their own shadow, distinct from floating layers, until the sweep moves modals.',
+    aliases: { '--elevation-light-3': 'elevation.shadow.overlay' } },
   { today: '~15 hard-coded box-shadow literals', match: null, proposed: 'elevation.shadow.raised · .overlay · .overflow', note: 'Swept with the components.' },
 ];
 
 /** Legacy name -> new token name, in row order. */
 export const ALIASES = Object.fromEntries(ROWS.flatMap((row) => Object.entries(row.aliases ?? {})));
+
+/**
+ * Foregrounds and the grounds they are drawn on, by legacy name or pattern.
+ * Within a group, every name in use is aliased or none is; when all are, each
+ * foreground clears 4.5:1 on each ground in light (`pairFailures`).
+ *
+ * @type {{label: string, fg: (string|RegExp)[], bg: (string|RegExp)[]}[]}
+ */
+export const PAIRS = [
+  { label: 'brand: text and icon on the brand container and the primary state layers',
+    fg: ['--color-primary-text', '--color-primary-icon', '--color-on-primary-container'],
+    bg: ['--color-primary-container', /^--color-primary(-container)?-state-\d+$/] },
+  { label: 'secondary: text on the secondary container and the neutral state layers',
+    fg: ['--color-secondary-text', '--color-on-secondary-container'],
+    bg: ['--color-secondary-container', /^--color-secondary(-container)?-state-\d+$/, /^--color-on-surface(-variant)?-state-\d+$/] },
+  { label: 'surfaces: on-surface text on every surface',
+    fg: ['--color-on-surface', '--color-on-surface-variant'],
+    bg: ['--color-surface', /^--color-surface-(variant|bright|overlay|dim|container(-[a-z]+)*)$/, /^--surface-(default|raised|overlay|sunken)$/] },
+  { label: 'inverse: inverse text on the inverse surface',
+    fg: ['--color-inverse-on-surface'],
+    bg: ['--color-inverse-surface'] },
+];
+
+const matches = (spec, name) => (typeof spec === 'string' ? spec === name : spec.test(name));
+const members = (specs, names) => names.filter((n) => specs.some((spec) => matches(spec, n)));
+
+/**
+ * @param {Iterable<string>} names  the legacy names in play (in use, or defined)
+ * @param {{rows: {name: string, light: string}[]}} semantics
+ * @param {(a: string, b: string) => number} contrastOf  hex contrast ratio
+ * @param {(hex: string, ground: string) => string} compositeOf  alpha over an opaque ground
+ * @param {Record<string, string>} [aliases]
+ * @returns {string[]}
+ */
+export function pairFailures(names, semantics, contrastOf, compositeOf, aliases = ALIASES) {
+  const all = [...new Set([...names, ...Object.keys(aliases)])];
+  const light = Object.fromEntries(semantics.rows.map((r) => [r.name, r.light]));
+  const out = [];
+  for (const group of PAIRS) {
+    const fg = members(group.fg, all);
+    const bg = members(group.bg, all);
+    const aliased = [...fg, ...bg].filter((n) => aliases[n]);
+    if (!aliased.length) continue;
+    const bare = [...fg, ...bg].filter((n) => !aliases[n]);
+    if (bare.length) {
+      out.push(`${group.label}: ${aliased.join(', ')} aliased but ${bare.join(', ')} not; alias partners together or not at all`);
+      continue;
+    }
+    for (const f of fg) {
+      for (const b of bg) {
+        const ground = compositeOf(light[aliases[b]], '#ffffff');
+        const ratio = contrastOf(compositeOf(light[aliases[f]], ground), ground);
+        if (ratio < 4.5) out.push(`${group.label}: ${f} on ${b} is ${ratio.toFixed(2)}:1 in light`);
+      }
+    }
+  }
+  return out;
+}
 
 /** The row a legacy name falls under, or undefined. */
 export const rowFor = (name) => ROWS.find((row) => row.match?.test(name));

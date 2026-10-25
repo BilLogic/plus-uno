@@ -111,8 +111,8 @@ States.play = async ({ canvasElement }) => {
     await expect(style('hover').borderTopColor).not.toBe(style('default').borderTopColor);
     // One fill, and read-only's own.
     await expect(style('read-only').backgroundColor).not.toBe(style('default').backgroundColor);
-    // The disabled box fades once.
-    await expect(Number(style('disabled').opacity)).toBeCloseTo(0.38, 2);
+    // The disabled box fades once, by the disabled opacity token (0.4, Atlassian's opacity.disabled).
+    await expect(Number(style('disabled').opacity)).toBeCloseTo(0.4, 2);
     // Invalid and valid each own a border color.
     await expect(style('invalid').borderTopColor).not.toBe(style('default').borderTopColor);
     await expect(style('valid').borderTopColor).not.toBe(style('invalid').borderTopColor);
