@@ -202,6 +202,11 @@ export default defineConfig({
               // forced-colors rules from the stylesheet instead.
               emulateReducedMotion: async ({ page }, value) => {
                 await page.emulateMedia({ reducedMotion: value });
+              },
+              // The OS color scheme and contrast, for the `auto` color and
+              // contrast modes. Same rule: pass `null` for each to restore.
+              emulateColorPreferences: async ({ page }, colorScheme, contrast) => {
+                await page.emulateMedia({ colorScheme, contrast });
               }
             }
           },

@@ -101,6 +101,46 @@ if (!globalThis.__PLUS_STORYBOOK_CONSOLE_PATCHED__) {
   };
 }
 
+// ---- Color and contrast modes -----------------------------------------------
+// The generated color tokens key every mode off attributes on <html>:
+// `data-color-mode` (light, dark, auto) and `data-contrast-mode` (more,
+// no-preference, auto). Bootstrap keys its own light and dark off
+// `data-bs-theme`, which has no `auto`, so for auto it follows the OS's
+// `prefers-color-scheme`, read when the story renders and again on change.
+
+const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
+
+/**
+ * Sets the mode attributes on <html> for the toolbar's choices.
+ * @param {string} colorMode light | dark | auto
+ * @param {string} contrastMode no-preference | more | auto
+ */
+const applyColorModes = (colorMode, contrastMode) => {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement;
+  root.setAttribute('data-color-mode', colorMode);
+  root.setAttribute('data-contrast-mode', contrastMode);
+  const osDark =
+    typeof window !== 'undefined' && window.matchMedia
+      ? window.matchMedia(COLOR_SCHEME_QUERY).matches
+      : false;
+  const bsTheme = colorMode === 'auto' ? (osDark ? 'dark' : 'light') : colorMode;
+  root.setAttribute('data-bs-theme', bsTheme);
+};
+
+/** Applies the modes before the story renders, and tracks the OS while on auto. */
+const ColorModes = ({ colorMode, contrastMode, children }) => {
+  applyColorModes(colorMode, contrastMode);
+  useEffect(() => {
+    if (colorMode !== 'auto' || !window.matchMedia) return undefined;
+    const query = window.matchMedia(COLOR_SCHEME_QUERY);
+    const onChange = () => applyColorModes(colorMode, contrastMode);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, [colorMode, contrastMode]);
+  return children;
+};
+
 // Cleanup functions - using dummy no-ops as legacy components are being phased out or moved
 const cleanupFunctions = {
   clearAllToasts: () => { },
@@ -507,9 +547,44 @@ const preview = {
         dynamicTitle: true,
       },
     },
+    plusColorMode: {
+      description: 'Color mode, set as data-color-mode on <html>; auto follows the OS',
+      toolbar: {
+        title: 'Color mode',
+        icon: 'mirror',
+        items: [
+          { value: 'light', title: 'Light' },
+          { value: 'dark', title: 'Dark' },
+          { value: 'auto', title: 'Auto (follow the OS)' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+    plusContrastMode: {
+      description: 'Contrast mode, set as data-contrast-mode on <html>; auto follows the OS',
+      toolbar: {
+        title: 'Contrast',
+        icon: 'contrast',
+        items: [
+          { value: 'no-preference', title: 'Standard contrast' },
+          { value: 'more', title: 'More contrast' },
+          { value: 'auto', title: 'Auto (follow the OS)' },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
 
   decorators: [
+    // Color and contrast modes from the toolbar, on <html> (see applyColorModes).
+    (Story, context) => (
+      <ColorModes
+        colorMode={context.globals.plusColorMode || 'light'}
+        contrastMode={context.globals.plusContrastMode || 'no-preference'}
+      >
+        <Story />
+      </ColorModes>
+    ),
     // Global PLUS breakpoint toggle: constrains every Specs story (pages, sections,
     // cards, elements) to the selected width so responsive behavior can be inspected
     // from the toolbar — in docs pages and in canvas view alike. Complements the
@@ -577,7 +652,9 @@ const preview = {
   initialGlobals: {
     backgrounds: {
       value: 'light'
-    }
+    },
+    plusColorMode: 'light',
+    plusContrastMode: 'no-preference',
   },
 
   tags: ['autodocs']
