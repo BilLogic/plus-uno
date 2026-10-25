@@ -13,11 +13,15 @@
  *
  * WHAT IT WRITES. The active plan (`ACTIVE_PLAN`, Plan A) into
  * `design-system/src/tokens/color/`: `_palette.scss`, `_semantic.scss`,
- * `_elevation.scss`, `_bootstrap-bridge.scss` and `figma-spec.json`.
- * `design-system/src/styles/main.scss` loads the four SCSS files. The token
+ * `_elevation.scss`, `_bootstrap-bridge.scss`, `_legacy-aliases.scss` and
+ * `figma-spec.json`. `_legacy-aliases.scss` points each legacy name the
+ * migration map gives one target (`scripts/lib/color/legacy-map.mjs`) at its
+ * `--ds-*` token. `design-system/src/styles/main.scss` loads the five SCSS
+ * files, the aliases last so they win over the legacy definitions. The token
  * checks read the palette, semantic and elevation files as definitions
  * (`COLOR_TOKEN_FILES` in `tokens-node.mjs`); the bridge only consumes
- * `--ds-*`, so they leave it out.
+ * `--ds-*`, and the alias sheet adds no names and would hide the legacy
+ * values the legacy checks read, so they leave both out.
  *
  * It refuses to write when any color check or plan parity fails
  * (`check:color-system` runs the same checks), so a plan that breaks a

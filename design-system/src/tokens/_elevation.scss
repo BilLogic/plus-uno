@@ -7,13 +7,13 @@
 :root {
     /* Elevation Light - Material Design 3 */
     /* Elevation 1 - Figma: Elevation Light/1 */
-    --elevation-light-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+    --elevation-light-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3); // overridden by color/_legacy-aliases.scss
 
     /* Elevation 2 - Figma: Elevation Light/2 */
-    --elevation-light-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+    --elevation-light-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3); // overridden by color/_legacy-aliases.scss
 
     /* Elevation 3 - Figma: Elevation Light/3 */
-    --elevation-light-3: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+    --elevation-light-3: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15); // overridden by color/_legacy-aliases.scss
 
     /* Elevation 4 - Figma: Elevation Light/4 */
     --elevation-light-4: 0px 2px 3px 0px rgba(0, 0, 0, 0.3), 0px 6px 10px 4px rgba(0, 0, 0, 0.15);
@@ -83,7 +83,7 @@
      * `scripts/check-elevation-roles.test.mjs` reads both.
      */
     --surface-raised: var(--color-surface-container-lowest);
-    --surface-raised-shadow: var(--elevation-light-2);
+    --surface-raised-shadow: var(--elevation-light-2); // overridden by color/_legacy-aliases.scss
 
     /**
      * Every floating layer that sits ON TOP of the UI without a scrim: menus
@@ -98,7 +98,7 @@
      * carries the modal shadow.
      */
     --surface-overlay: var(--color-surface-container-lowest);
-    --surface-overlay-shadow: var(--elevation-light-3);
+    --surface-overlay-shadow: var(--elevation-light-3); // overridden by color/_legacy-aliases.scss
 
     /**
      * A neutral well INSIDE a card — a code block, a quiet panel, a summary

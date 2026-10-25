@@ -86,7 +86,7 @@
 
     /* Primary — border base 4.08 at worst. */
     --color-primary-icon: var(--color-primary-text);
-    --color-primary-border: var(--color-primary);
+    --color-primary-border: var(--color-primary); // overridden by color/_legacy-aliases.scss
 
     /* Secondary — border base 5.44. */
     --color-secondary-icon: var(--color-secondary-text);
@@ -140,7 +140,7 @@
      * without hunting 29 call sites, and so `check:focus-ring` has one name to
      * hold them to.
      */
-    --color-focus-ring: var(--color-primary);
+    --color-focus-ring: var(--color-primary); // overridden by color/_legacy-aliases.scss
 
     /*
      * THE FOCUS RING ON A COLORED GROUND — Figma `Focus/Focus Ring Inverse`.
@@ -157,7 +157,7 @@
      * Colors/surface) but is not yet in figma-variables-snapshot.json; refresh
      * with `npm run snapshot:figma-variables`.
      */
-    --color-focus-ring-inverse: var(--color-surface);
+    --color-focus-ring-inverse: var(--color-surface); // overridden by color/_legacy-aliases.scss
 
     /*
      * SURFACE ROLES UNDER THEIR FIGMA NAMES — `Surface roles/surface-*`.
