@@ -18,6 +18,7 @@ Iteration 4 is an audit. Thirteen reviewers read both plans against Figma variab
 - **Every check passes in all four modes.** Text on hovered, selected and pressed rows; status tints against the frame; chart series under color-vision deficiency; no hovered or pressed state that equals its rest state (§4.7). Links are one step darker to get there, and the selection ladder is shorter (decisions 15 and 16).
 - **One spelling.** `lagoon` is the brand ramp and `teal` the accent teal; alphas are named by their opacity, `neutralAlpha.8` (§4.8).
 - **Patterns complete.** Session tabs, alerts, toasts, progress, charts, skeletons, avatars, dividers and empty states get rows; selection always carries a 2px bar, not fill alone (§4.5). Specs for emission, the Bootstrap bridge, tables, buttons, links and focus are new (§4.12).
+- **Bill's rulings, 2026-10-25.** Checked controls and the selected bar in Lagoon; cards on Atlassian's raised pair, styled per plan; Plan A's accent teal moved to a mint 176° so it stays apart from Lagoon; buttons take Atlassian's appearances; both plans' SCSS and Figma configuration generated, Plan A the default (decisions 17–21).
 - **Home, on the new tokens.** The artifact's first section rebuilds the redesigned Home with nothing but these tokens, in both plans and all four modes.
 
 Iteration 3 added three things:
@@ -243,7 +244,7 @@ The full ramps, with hex and contrast for every step, are in Appendix A and in t
 - **Charts: 106.** Categorical 1–8, `bold`, `bolder` and `boldest` per hue, and a chart color per role (brand, danger, warning, success, discovery, information, neutral), each with a hovered state. PLUS reorders categorical 1–4 to blue, yellow, magenta and brown: the set that stays apart under protan and deutan simulation in both plans (color distance 5 or more), with no red (it reads as danger) and no teal (it reads as the brand).
 - **Code syntax: 17**, for code blocks in docs and prototypes.
 - **Brown** is the one color Notion has and Atlassian lacks. It gives SMART categories and tags an eleventh, quiet option, and costs one ramp.
-- **Accent teal gets its own ramp** (`teal`, 190° in Plan A, 170° in Plan B; the brand ramp is `lagoon`) instead of aliasing Lagoon at 205°. Notion's teal sits at 212°, which would read as the brand; Claude's aqua at 170° shows the way out. Without the split, a teal tag would look like a brand button.
+- **Accent teal gets its own ramp** (`teal`, 176° in Plan A, 170° in Plan B; the brand ramp is `lagoon`) instead of aliasing Lagoon at 205°. Plan A's teal is a mint teal with slightly richer tints than Notion's ladder, because at Notion's chroma any hue between green and Lagoon reads as one of them (decision 19). A check keeps teal and Lagoon a color distance of at least 3 apart at the tint and tag-text steps and 4 at the fills, in both plans. Notion's teal sits at 212°, which would read as the brand; Claude's aqua at 170° shows the way out. Without the split, a teal tag would look like a brand button.
 
 **Accents per plan.** Iteration 2 shared one set of hue ramps across both plans, so the plans differed only in grays and shadows. The accents, and Lagoon's tints, now follow each benchmark. The generator is unchanged: each step keeps its contrast target, and only hue and chroma move. The tag columns are the PLUS pair `background.accent.*.subtler` + `text.accent.*` against each app's real tag.
 
@@ -251,7 +252,7 @@ The full ramps, with hex and contrast for every step, are in Appendix A and in t
 |---|---|---|---|---|---|---|---|
 | lagoon | brand | 205° | `#c8e9ed` · `#0a545a` | — | 205° / 0.15 | `#b6edf3` · `#0a545a` | — |
 | blue | information | 250° | `#d2e5fa` · `#224d77` | `#cee3f7` · `#264a72` | 256° / 0.16 | `#d3e5fe` · `#1a4b89` | `#cde2fb` · `#184f95` |
-| teal | accent teal | 190° | `#c8eae7` · `#135450` | `#cae9f0` · `#18505b` | 170° / 0.12 | `#c5ebdd` · `#0a5542` | `#bfebdb` · `#065f49` |
+| teal | accent teal | 176° (tints ×1.6) | `#baeedf` · `#0a5648` | `#cae9f0` · `#18505b` | 170° / 0.12 | `#c5ebdd` · `#0a5542` | `#bfebdb` · `#065f49` |
 | green | success | 158° | `#d8e7de` · `#27533b` | `#d7e6dd` · `#2a533c` | 145° / 0.16 | `#c9ecc9` · `#11571b` | `#caeac7` · `#006300` |
 | lime | accent | 122° | `#e0e5d4` · `#444f23` | — | 124° / 0.15 | `#dae9c0` · `#3f5108` | — |
 | yellow | warning | 86° (94° pale) | `#f1e3b6` · `#5e4810` | `#f2e3b7` · `#655121` | 74° (84° pale) / 0.15 | `#f6e1ba` · `#674409` | `#f9dca4` · `#734500` |
@@ -279,7 +280,7 @@ Iteration 2's tuning (even spacing at step 700, warmer pale yellow and orange, c
 |---|---|---|---|---|---|---|
 | blue | A | 7.8 / 9.0 · IC 12.4 / 12.4 | 6.8 / 7.6 · IC 10.9 / 10.5 | 4.7 / 5.0 · IC 7.4 / 10.5 | 5.0 / 7.0 · IC 11.8 / 9.2 | 3.9 / 5.5 · IC 6.5 / 9.2 |
 |  | B | 7.7 / 9.1 · IC 12.4 / 12.4 | 6.8 / 7.7 · IC 11.0 / 10.5 | 4.8 / 5.1 · IC 7.3 / 10.5 | 5.0 / 7.3 · IC 11.9 / 9.5 | 3.9 / 5.7 · IC 6.5 / 9.5 |
-| teal | A | 7.7 / 9.0 · IC 12.3 / 12.3 | 6.8 / 7.6 · IC 10.9 / 10.4 | 4.7 / 4.9 · IC 7.4 / 10.4 | 5.0 / 7.0 · IC 11.8 / 9.2 | 3.9 / 5.5 · IC 6.3 / 9.2 |
+| teal | A | 7.6 / 9.0 · IC 12.4 / 12.4 | 6.7 / 7.6 · IC 10.9 / 10.5 | 4.7 / 4.9 · IC 7.3 / 10.5 | 5.0 / 7.0 · IC 11.8 / 9.2 | 3.9 / 5.5 · IC 6.3 / 9.2 |
 |  | B | 7.8 / 9.1 · IC 12.4 / 12.4 | 6.8 / 7.7 · IC 10.9 / 10.5 | 4.8 / 5.0 · IC 7.4 / 10.5 | 5.0 / 7.3 · IC 11.9 / 9.6 | 3.9 / 5.7 · IC 6.5 / 9.6 |
 | green | A | 7.8 / 9.0 · IC 12.3 / 12.3 | 6.9 / 7.7 · IC 10.9 / 10.5 | 4.7 / 5.0 · IC 7.4 / 10.5 | 5.1 / 7.0 · IC 11.9 / 9.2 | 3.9 / 5.5 · IC 6.4 / 9.2 |
 |  | B | 7.7 / 9.1 · IC 12.4 / 12.4 | 6.8 / 7.6 · IC 11.0 / 10.4 | 4.7 / 5.0 · IC 7.4 / 10.4 | 5.0 / 7.3 · IC 11.8 / 9.6 | 3.9 / 5.7 · IC 6.5 / 9.6 |
@@ -326,7 +327,7 @@ The semantic layer copies Atlassian's token list and its step references, and sw
 | `color.interaction.inverse.hovered` / `.pressed` | none | New: paper at 8% / 12% in light, ink in dark | Overlays on dark or colored grounds (a close button on a toast); today's surface-state colors. |
 | `color.border.surface` | none | New: transparent, except ink at 49% in light increased contrast | The Surface's edge when increased contrast turns the frame white. |
 | `color.blanket` | Neutral500A, about 46% | ink at 32% | Lighter, in the pastel register; open to tuning on the specimen. |
-| Selection | Blue tint | Neutral ink: 10 / 14 / 16% in Plan A, 10 / 12 / 14% in Plan B (increased contrast 12 / 16 / 24%), always with a 2px bar in `border.selected` | Both benchmarks select in neutral, as does Atlassian's FY27 Finesse override (§4.6). Decision 16, applied: pressed stops below Atlassian's 31% so subtle text and links on it keep 4.5:1. Selection never rests on fill alone. |
+| Selection | Blue tint | Neutral ink: 10 / 14 / 16% in Plan A, 10 / 12 / 14% in Plan B (increased contrast 12 / 16 / 24%), always with a 2px bar in `border.selected`, which is Lagoon, as are checked controls (decision 17) | Both benchmarks select in neutral, as does Atlassian's FY27 Finesse override (§4.6). Decision 16, applied: pressed stops below Atlassian's 31% so subtle text and links on it keep 4.5:1. Selection never rests on fill alone. |
 
 The full list, with each token's use and its light and dark values in both plans, is in Appendix B. The artifact shows every token as a swatch in both themes.
 
@@ -413,9 +414,9 @@ Atlassian went through the same exercise when it moved its products onto elevati
 | Sidebar item: hovered / selected | Navigation state. | background.neutral.subtle.hovered / background.selected + text.selected, plus a 2px leading bar in color.border.selected, so selection never rests on fill alone | Same tokens (selected is ink at 10%, as claude.ai), plus a 2px leading bar in color.border.selected, so selection never rests on fill alone |
 | Sidebar peek (below 1024, floating, no scrim) | A layer over the page. | elevation.surface.overlay + elevation.shadow.overlay | elevation.surface.overlay + elevation.shadow.overlay |
 | Surface (the inner box) | Where the work happens; the surface radius token. | elevation.surface, no border; the docked sidebar ends in color.border | elevation.surface, no border; the sidebar ends in color.border |
-| Session tab | A temporary tab on the frame (Toolkit IA). | active: elevation.surface, continuous with the Surface; inactive: transparent + text.subtle; hovered: background.neutral.subtle.hovered; indicator per decision 17 | Same tokens |
+| Session tab | A temporary tab on the frame (Toolkit IA). | active: elevation.surface, continuous with the Surface; inactive: transparent + text.subtle; hovered: background.neutral.subtle.hovered; indicator border.selected (Lagoon, decision 17) | Same tokens |
 | Section | Groups content inside the surface. | No fill; color.border divider when needed | No fill; color.border rule, as claude.ai settings rows |
-| Card, at rest | A flat container (ruling 2026-10-24); pending decision 18. | elevation.surface.raised + elevation.shadow.raised: a light ring and a wide soft blur, no border (Notion home cards) | elevation.surface.raised + elevation.shadow.raised: a firmer ring and a soft drop, no border (claude.ai cards and composer) |
+| Card, at rest | Atlassian's raised pair, styled per plan (decision 18). | elevation.surface.raised + elevation.shadow.raised: a light ring and a wide soft blur, no border (Notion home cards) | elevation.surface.raised + elevation.shadow.raised: a firmer ring and a soft drop, no border (claude.ai cards and composer) |
 | Card, clickable: hovered / pressed / dragged | Lift on interaction only. | elevation.surface.raised.hovered + elevation.shadow.overlay / .raised.pressed + shadow.raised / overlay pair | Same tokens |
 | Well inside a card (summary strip) | Recessed area. | elevation.surface.container | elevation.surface.container |
 | Code block | Monospace content. | background.code.default + border.code | background.code.default + border.code |
@@ -439,7 +440,7 @@ Atlassian went through the same exercise when it moved its products onto elevati
 
 **Two consequences for existing rulings:**
 
-- **Cards.** "Cards are flat at rest" holds in spirit: both benchmarks give resting cards no border, only a 1px translucent ring with a faint shadow. In Plan A the shadow is almost invisible, so the card still reads flat; in Plan B it is a soft lift. Atlassian's own resting card is flat on `elevation.surface` with a border, so the ringed card is a PLUS deviation (decision 18). A clickable card lifts to the overlay shadow on hover in both plans.
+- **Cards** (decision 18). A card uses Atlassian's pair, `elevation.surface.raised` with `elevation.shadow.raised`, and the shadow takes each benchmark's look: no border, only a 1px translucent ring with a faint shadow. In Plan A the shadow is almost invisible, so the card still reads flat; in Plan B it is a soft lift. A clickable card lifts to the overlay shadow on hover in both plans.
 - **Modals.** "Floating layers use light-3, modals use light-4" collapses into a single `overlay` level, as in Atlassian. The blanket under a modal already sets it apart from a menu. This reverses a ruling, so it is open decision 3.
 
 **Name clash to settle.** PLUS calls the frame the "Surface container"; Atlassian's `elevation.surface.container` is a translucent well *inside* a card. Same words, opposite ends of the stack. Open decision 6.
@@ -569,7 +570,7 @@ WCAG 2 ratios on opaque values, computed from the generated hex. Alpha tokens ar
 | `color.text.brand` | `elevation.surface` | 4.5 (7) | 6.39 | 9.20 | 13.86 | 15.50 | 6.39 | 9.57 | 13.86 | 16.08 |
 | `color.link` | `elevation.surface` | 4.5 (7) | 6.39 | 9.20 | 13.86 | 15.50 | 6.39 | 9.57 | 13.86 | 16.08 |
 | `color.text.inverse` | `color.background.brand.bold` | 4.5 (7) | 5.00 | 7.08 | 11.81 | 13.68 | 5.00 | 7.36 | 11.81 | 14.26 |
-| `color.text.inverse` | `color.background.selected.bold` | 4.5 (7) | 13.98 | 15.30 | 13.98 | 15.30 | 17.40 | 15.88 | 17.40 | 15.88 |
+| `color.text.inverse` | `color.background.selected.bold` | 4.5 (7) | 5.00 | 7.08 | 11.81 | 13.68 | 5.00 | 7.36 | 11.81 | 14.26 |
 | `color.text.inverse` | `color.background.danger.bold` | 4.5 (7) | 5.00 | 7.01 | 11.83 | 13.67 | 5.00 | 7.29 | 11.88 | 14.30 |
 | `color.text.inverse` | `color.background.success.bold` | 4.5 (7) | 5.06 | 6.99 | 11.93 | 13.73 | 5.02 | 7.30 | 11.83 | 14.20 |
 | `color.text.inverse` | `color.background.information.bold` | 4.5 (7) | 5.02 | 7.03 | 11.83 | 13.67 | 5.01 | 7.30 | 11.88 | 14.27 |
@@ -606,7 +607,7 @@ WCAG 2 ratios on opaque values, computed from the generated hex. Alpha tokens ar
 | `color.border.warning` | `elevation.surface` | 3 (4.5) | 3.88 | 5.48 | 6.39 | 9.22 | 3.89 | 5.72 | 6.42 | 9.59 |
 | `color.border.success` | `elevation.surface` | 3 (4.5) | 3.91 | 5.48 | 6.43 | 9.24 | 3.93 | 5.69 | 6.46 | 9.61 |
 | `color.border.brand` | `elevation.surface` | 3 (4.5) | 5.00 | 7.08 | 6.39 | 9.20 | 5.00 | 7.36 | 6.39 | 9.57 |
-| `color.border.selected` | `elevation.surface` | 3 (4.5) | 13.98 | 15.30 | 17.20 | 16.29 | 17.40 | 15.88 | 19.68 | 17.34 |
+| `color.border.selected` | `elevation.surface` | 3 (4.5) | 5.00 | 7.08 | 11.81 | 13.68 | 5.00 | 7.36 | 11.81 | 14.26 |
 <!-- /gen:CONTRAST -->
 
 **Checks beyond the pairs**, run by `contrast.py` on every build, all passing in both plans and all four modes:
@@ -787,7 +788,7 @@ Spacing, Radius, Border and Responsive follow the same pattern. PLUS already has
 **What it is.** An override on top of light and dark, for people who need stronger edges and text: low vision, glare, a cheap screen. Atlassian ships it as `data-contrast-mode`, with three settings: more, no preference, and auto, which follows the operating system's `prefers-contrast: more`. Its token package carries an increased-contrast value for every token, so PLUS generates the mode from those references instead of hand-picking.
 
 <!-- gen:IC_COUNT -->
-**What changes.** 278 of 473 tokens change in light and 249 in dark, the same in both plans:
+**What changes.** 281 of 473 tokens change in light and 252 in dark, the same in both plans:
 <!-- /gen:IC_COUNT -->
 
 - **Text and icons** step darker in light and lighter in dark: `text.subtle` 800 → 1000, `text.subtlest` 700 → 900, colored text 800 → 900.
@@ -813,6 +814,9 @@ The core tokens that change, Plan A (Plan B uses the same steps on its own ramps
 | `color.background.selected` | neutralAlpha.10 → neutralAlpha.12 | darkNeutralAlpha.10 → darkNeutralAlpha.12 |
 | `color.background.selected.hovered` | neutralAlpha.14 → neutralAlpha.16 | darkNeutralAlpha.14 → darkNeutralAlpha.16 |
 | `color.background.selected.pressed` | neutralAlpha.16 → neutralAlpha.24 | darkNeutralAlpha.16 → darkNeutralAlpha.24 |
+| `color.background.selected.bold` | lagoon.700 → lagoon.900 | lagoon.400 → lagoon.200 |
+| `color.background.selected.bold.hovered` | lagoon.800 → lagoon.1000 | lagoon.300 → lagoon.100 |
+| `color.background.selected.bold.pressed` | lagoon.850 → lagoon.1100 | lagoon.250 → darkNeutral.1100 |
 | `color.background.brand.bold` | lagoon.700 → lagoon.900 | lagoon.400 → lagoon.200 |
 | `color.background.brand.bold.hovered` | lagoon.800 → lagoon.1000 | lagoon.300 → lagoon.100 |
 | `color.background.brand.bold.pressed` | lagoon.850 → lagoon.1100 | lagoon.250 → darkNeutral.1100 |
@@ -840,7 +844,7 @@ The core tokens that change, Plan A (Plan B uses the same steps on its own ramps
 | `color.border.disabled` | neutralAlpha.6 → neutralAlpha.14 | darkNeutralAlpha.8 → darkNeutralAlpha.16 |
 | `color.border.focused` | lagoon.700 → lagoon.800 | lagoon.300 → lagoon.300 |
 | `color.border.input` | neutral.600 → neutral.800 | darkNeutral.600 → darkNeutral.800 |
-| `color.border.selected` | neutral.1000 → neutral.1100 | darkNeutral.1000 → darkNeutral.1100 |
+| `color.border.selected` | lagoon.700 → lagoon.900 | lagoon.400 → lagoon.200 |
 | `color.border.brand` | lagoon.700 → lagoon.800 | lagoon.400 → lagoon.300 |
 | `color.border.danger` | red.600 → red.700 | red.500 → red.400 |
 | `color.border.warning` | yellow.600 → yellow.800 | yellow.500 → yellow.300 |
@@ -900,19 +904,34 @@ What the build and the components need beyond the token values. Each is written 
 - Row states are layered over that fill, not swapped for it: `background-image: linear-gradient(var(--ds-background-selected), var(--ds-background-selected))` on the cells of a hovered or `aria-selected` row, so an opaque sticky cell keeps the highlight. This keeps the table pattern's rule: additive overlays, never replace the base fill.
 - The sticky header is the surface with a `border.bold` rule, and takes `shadow.overflow` only while scrolled. No zebra by default.
 
-**Buttons.**
+**Buttons follow Atlassian's Button** (decision 20). The `style` and `fill` props become Atlassian's `appearance`, `isSelected` and `spacing`; the old props stay as deprecated aliases for one release, then a codemod moves the call sites.
 
-| Style | Fill | Text | Notes |
+| Appearance | Fill | Text and icon | Use |
 |---|---|---|---|
-| Filled | `background.{role}.bold`, `.hovered`, `.pressed` | `text.inverse` (warning: `text.warning.inverse`) | named steps replace today's shadow-state overlays |
-| Tonal | `background.{role}`, `.hovered`, `.pressed` | `text.{role}` | |
-| Outline | transparent; hover `background.neutral.subtle.hovered` | `text.{role}` | edge `border.{role}` |
-| Ghost and text | `background.neutral.subtle` and its states | `text.{role}` or `color.link` | |
-| Default | `background.neutral` and its states | `color.text` | |
-| SMART | `color.smart.*` (decision 9) | | |
-| Disabled | `background.disabled` | `text.disabled` | one recipe for every style; `opacity.disabled` is for images only |
+| `primary` | `background.brand.bold`, `.hovered`, `.pressed` | `text.inverse` | the one main action in a view |
+| `default` | `background.neutral`, `.hovered`, `.pressed` | `color.text`, `icon` | every other action |
+| `subtle` | `background.neutral.subtle`, `.hovered`, `.pressed` | `color.text`, `icon.subtle` | toolbars, low-emphasis and icon-only actions |
+| `warning` | `background.warning.bold`, `.hovered`, `.pressed` | `text.warning.inverse` | an action with consequences |
+| `danger` | `background.danger.bold`, `.hovered`, `.pressed` | `text.inverse` | a destructive action |
+| `discovery` | `background.discovery.bold`, `.hovered`, `.pressed` | `text.inverse` | a new feature or an onboarding prompt |
+| `isSelected` | `background.selected`, `.hovered`, `.pressed` | `text.selected`, `icon.selected` | a toggled button |
+| `isDisabled` | `background.disabled` (`subtle`: transparent) | `text.disabled` | one recipe for every appearance; `opacity.disabled` is for images only |
 
-Loading keeps its own ground, as today. The button theme map is rebuilt from role tokens.
+`spacing="default"` is today's medium (32) and `spacing="compact"` today's small (24). A link styled as a button is Atlassian's `LinkButton`; a plain text action is a `subtle` button or a link.
+
+**Today's usage, mapped** (532 buttons in `design-system/` and `prototypes/`):
+
+| Today | Uses | Becomes |
+|---|---|---|
+| `primary` filled (and the default) | 252 | `primary` |
+| `primary` outline or tonal | 137 | `default`: Atlassian has no outline or tonal button, so a secondary action is a neutral fill. **The largest visual change of the sweep**: outlined teal buttons turn gray. |
+| `secondary`, `default`, `info`, `success` (any fill but ghost and text) | 88 | `default` (success and info have no button appearance; their meaning moves to an icon or the surrounding message) |
+| any style, `ghost` or `text` | 37 | `subtle` |
+| `danger` filled / outline | 5 / 9 | `danger` / `subtle`, with the destructive action confirmed in a modal's `danger` button |
+| `warning` | 4 | `warning` |
+| SMART subject styles | 0 as buttons | dropped from Button; subjects are tags and lozenges |
+
+Loading keeps its own ground, as today. The button theme map is rebuilt from these rows, and the named `.hovered` and `.pressed` steps replace today's shadow-state overlays.
 
 **Links.** `color.link` is about 2.2:1 against body text, so color alone does not mark a link. Links in running text are underlined at rest (1px, offset about 0.15em) and thicker on hover. The underline may drop only where context already says "link": navigation, menus, buttons and card titles. This replaces Atlassian's "underline on hover", and it is the condition for decision 15.
 
@@ -945,18 +964,18 @@ Each needs Bill's call, and each has a recommendation. The brand hue is settled:
     - the `--ds-` CSS prefix.
 
 12. **Brown.** Add it as an eleventh accent, from Notion. *Recommend adding.* It is a quiet, warm option for tags and categories, and costs one ramp and 23 tokens.
-13. **Accent teal on its own ramp.** Atlassian's accent teal shares the brand's hue family; with Lagoon as brand, a teal tag would read as a brand control. *Recommend the separate ramp* (190° in Plan A, 170° in Plan B). The alternative is dropping accent teal, which breaks Atlassian's set.
+13. **Accent teal on its own ramp.** Atlassian's accent teal shares the brand's hue family; with Lagoon as brand, a teal tag would read as a brand control. *Recommend the separate ramp* (176° in Plan A, 170° in Plan B). The alternative is dropping accent teal, which breaks Atlassian's set.
 14. **Lime.** Neither Notion nor Claude has it. *Recommend keeping it*, so Atlassian's accent and chart tokens stay complete and charts have an eighth distinct hue.
 
 **From the iteration 4 audit.** Four are applied by default, so the artifact shows them; each is one line to reverse.
 
 15. **Links one step darker** (applied). `color.link` and `color.text.brand` move from lagoon.700 to lagoon.800 (pressed 900), because 700 falls to 3.8–4.5:1 on the hovered, selected and brand-tint grounds links sit on. Link against body text then drops to about 2.2:1, so links in running text are underlined at rest (§4.12). `brand.bold`, `border.brand` and `icon.brand` stay at 700. *Recommend keeping.*
 16. **Selection ladder** (applied). Selected, hovered and pressed are ink at 10 / 14 / 16% in Plan A and 10 / 12 / 14% in Plan B (12 / 16 / 24% with increased contrast), against Atlassian's 31% pressed, which drops subtle text to 2.6:1. Selection always carries a 2px bar in `border.selected`, because a few points of alpha never carry meaning alone. This also settles how far the 08/12/16 ruling reaches: it governs `color.interaction.*`; fills keep Atlassian's named hovered and pressed steps. *Recommend keeping.*
-17. **Checked controls and the active tab indicator: ink or Lagoon.** `background.selected.bold` and `border.selected` are ink in both plans today, so a checked checkbox, a switch and a tab underline turn near-black. *Recommend Lagoon* (lagoon.700, 5.0:1 with a white check; hovered 800), keeping highlight selection neutral. Decision 2 covered highlight selection only.
-18. **Card at rest.** Atlassian's flat card (`elevation.surface` plus `color.border`) and the 2026-10-24 ruling, or the ringed raised card both benchmarks show. *Recommend the ringed card*, recorded as a deviation, with the dark ring so it holds in dark mode.
-19. **Plan A accent teal.** At Notion's chroma, Plan A's accent teal sits a color distance of 2.1 from Lagoon at step 700 and 1.0 from the brand tint at 200, so the separate ramp buys little there. *Recommend aliasing accent teal to Lagoon in Plan A only*, and keeping the split in Plan B, where it holds (5.8). This reopens decision 13 for Plan A.
-20. **Component style names.** `style="secondary"` (136 uses), `"info"` (56), `"default"` (25) and `"tertiary"` (9) carry the old roles. *Recommend* primary → brand, secondary → neutral (the default), info → information, tertiary removed (aliased to subtle for one release), SMART names → `color.smart.*`, with the old values kept as deprecated aliases for one release.
-21. **Re-pointing the Figma library.** Re-point the legacy `colors / accent` (165) and `colors / neutral` (67) variables to the new foundations, which gives every BS4 component Dark and increased contrast at once but changes its light rendering. *Recommend doing it only after the plan is chosen and a scratch file verifies it* (§6 step 3), with one plan in primitives; compare plans in the artifact, not in Figma.
+17. **Checked controls and the active tab indicator** — *decided: Lagoon.* `background.selected.bold` and `border.selected` take the brand steps (lagoon.700, hovered 800, pressed 850; dark 400, 300, 250), so a checked checkbox, a switch, the active tab underline and the 2px selected bar are Lagoon. Highlight selection (`background.selected`, `text.selected`) stays neutral ink.
+18. **Card at rest** — *decided: Atlassian's tokens, each plan's style.* A card is `elevation.surface.raised` with `elevation.shadow.raised`, as Atlassian pairs them; the shadow takes its benchmark's look: Plan A Notion's faint ring and wide blur, Plan B Claude's firmer ring and soft drop. A clickable card lifts to `shadow.overlay` on hover. The 2026-10-24 "flat at rest" ruling now reads: no border, no visible lift at rest.
+19. **Plan A accent teal** — *decided: keep it apart from Lagoon.* Plan A's teal moves from 190° to a mint 176° with tints 1.6× Notion's ladder, which puts it as far from Lagoon as Plan B's teal is (color distance 3.2 at the tint, 4.4 at 700, 3.4 at tag text) while staying clear of green. `contrast.py` now fails the build if teal and Lagoon drift closer, in either plan.
+20. **Button style names** — *decided: Atlassian's Button.* `appearance` (`default`, `primary`, `subtle`, `warning`, `danger`, `discovery`), `isSelected` and `spacing` replace `style` and `fill` (§4.12, with today's usage mapped). The same rule holds for every component the sweep touches: its props take the Atlassian component's names.
+21. **Re-pointing the Figma library** — *decided: later, after the plan is chosen.* Meanwhile the configuration for both plans is generated and ready (`out/A/` and `out/B/`: palette, semantic, elevation and Bootstrap-bridge SCSS, and the Figma spec), with Plan A as the default build. Switching plans is switching the folder.
 22. **Plan B departures from claude.ai** (light applied). Light `text.subtle` is `#555555` instead of Claude's `#666666`, because Claude's subtle and subtlest are nearly the same (5.7 vs 5.0:1). Still open: dark subtle `#a6a6a6` instead of `#c2c2c2`, and a dark raised ladder of `#1d1d1d` / `#242424` / `#2e2e2e` instead of Claude's tighter steps. *Recommend taking both.*
 23. **Plan A dark brand states** (applied). Dark hover and pressed take the brand ramp's 300 and 250 (`#70c9d4`, brighter) instead of Plan A's softened tints, which faded toward gray and read as disabled. *Recommend keeping.*
 24. **Suggestion chip.** Today's dashed suggestion chip uses the mastering-content purple. *Recommend discovery* as a placeholder for the AI hue, so the SMART purple stays a subject color.
@@ -966,7 +985,7 @@ Still out of scope and still Bill's: the AI hue (#269). Atlassian's discovery pu
 ## 6. If approved: the work, in order
 
 0. **Harness first.** Teach the checks the `--ds-` prefix before any component moves: button contrast, focus ring, color fallbacks and intent roles read both prefixes; the token registry reads each variable's code syntax; `tokens.md` and the registry regenerate in the same change (a token missing from `tokens.md` does not exist for agents). Add a ratchet that forbids `var(--ds-*, #hex)` fallbacks.
-1. **Generator, no visual change.** Commit the generator with its checks, emitting `_palette.scss`, `_semantic.scss` and `_elevation.scss` beside today's files for the chosen plan, all four modes (§4.12), plus the Figma spec (§4.10). The doc's generated tables come from the same run, and a drift check fails the build when they differ.
+1. **Generator, no visual change.** Commit the generator with its checks. It already emits `_palette.scss`, `_semantic.scss`, `_elevation.scss` and `_bootstrap-bridge.scss` for each plan in all four modes (§4.12), plus the Figma spec (§4.10); the chosen plan's set lands beside today's files. The doc's generated tables come from the same run, and a drift check fails the build when they differ.
 2. **Figma.** Push to a scratch file first and verify, then add `color / primitives`, `color / foundations` and the three shadow styles to the BS4 Foundation library, unpublished until Bill publishes. Confirm the team's plan allows four modes.
 3. **Re-point the legacy Figma variables** (decision 21, Bill's go-ahead): `colors / accent` and `colors / neutral` alias their §4.9 targets, with each old value recorded in its description.
 4. **Bootstrap bridge** (§4.12), so react-bootstrap's modal, dropdown, toast and form controls follow the mode.
@@ -982,19 +1001,19 @@ Each step is its own ticket; step 5 splits per pattern.
 
 | Step | lagoon | blue | teal | green | lime | yellow |
 |---|---|---|---|---|---|---|
-| 100 | `#e2f4f7` 1.13 | `#e8f2fe` 1.13 | `#e2f4f3` 1.14 | `#e6f4eb` 1.13 | `#eef3e4` 1.13 | `#f5f1e1` 1.13 |
-| 200 | `#c8e9ed` 1.29 | `#d2e5fa` 1.29 | `#c8eae7` 1.28 | `#d8e7de` 1.28 | `#e0e5d4` 1.29 | `#f1e3b6` 1.28 |
-| 250 | `#9cdae1` 1.55 | `#bbd2eb` 1.55 | `#afd7d4` 1.56 | `#c2d4c8` 1.55 | `#cbd2bd` 1.56 | `#e5ce8a` 1.55 |
-| 300 | `#70c9d4` 1.91 | `#a3bfdc` 1.90 | `#94c5c2` 1.90 | `#acc1b4` 1.90 | `#b7bfa6` 1.91 | `#dbb85a` 1.91 |
-| 400 | `#23b5c2` 2.48 | `#70a8e3` 2.50 | `#71aeaa` 2.52 | `#79af90` 2.52 | `#9aaa72` 2.51 | `#c49f40` 2.51 |
-| 500 | `#1d9eab` 3.22 | `#3e94e4` 3.20 | `#3e9e99` 3.20 | `#4f9f74` 3.21 | `#829846` 3.22 | `#b28a1c` 3.21 |
-| 600 | `#198f9a` 3.86 | `#1984dc` 3.91 | `#198f8a` 3.93 | `#339163` 3.91 | `#728a29` 3.90 | `#a17c16` 3.88 |
-| 700 | `#147b84` 5.00 | `#2272ba` 5.02 | `#1e7b77` 5.05 | `#327c56` 5.06 | `#63762b` 5.05 | `#8b6b11` 4.99 |
-| 800 | `#106972` 6.39 | `#25619a` 6.45 | `#106b66` 6.33 | `#2c6a4a` 6.43 | `#556528` 6.41 | `#775b0d` 6.39 |
-| 850 | `#0a545a` 8.65 | `#224d77` 8.76 | `#135450` 8.71 | `#27533b` 8.80 | `#444f23` 8.79 | `#5e4810` 8.71 |
-| 900 | `#063e43` 11.81 | `#223952` 11.83 | `#1c3d3a` 11.81 | `#243c2e` 11.93 | `#333a22` 11.87 | `#42361a` 11.84 |
-| 1000 | `#043236` 13.86 | `#1a2d42` 14.02 | `#15302f` 14.04 | `#1c3025` 14.01 | `#282e1a` 14.04 | `#352a13` 14.08 |
-| 1100 | `#022326` 16.52 | `#101f30` 16.66 | `#0c2120` 16.75 | `#112118` 16.74 | `#1c2010` 16.62 | `#261d0a` 16.63 |
+| 100 | `#e2f4f7` 1.13 | `#e8f2fe` 1.13 | `#e3f5ef` 1.13 | `#e6f4eb` 1.13 | `#eef3e4` 1.13 | `#f5f1e1` 1.13 |
+| 200 | `#c8e9ed` 1.29 | `#d2e5fa` 1.29 | `#baeedf` 1.28 | `#d8e7de` 1.28 | `#e0e5d4` 1.29 | `#f1e3b6` 1.28 |
+| 250 | `#9cdae1` 1.55 | `#bbd2eb` 1.55 | `#9ddccb` 1.55 | `#c2d4c8` 1.55 | `#cbd2bd` 1.56 | `#e5ce8a` 1.55 |
+| 300 | `#70c9d4` 1.91 | `#a3bfdc` 1.90 | `#7ccab7` 1.91 | `#acc1b4` 1.90 | `#b7bfa6` 1.91 | `#dbb85a` 1.91 |
+| 400 | `#23b5c2` 2.48 | `#70a8e3` 2.50 | `#51b49e` 2.51 | `#79af90` 2.52 | `#9aaa72` 2.51 | `#c49f40` 2.51 |
+| 500 | `#1d9eab` 3.22 | `#3e94e4` 3.20 | `#1da289` 3.19 | `#4f9f74` 3.21 | `#829846` 3.22 | `#b28a1c` 3.21 |
+| 600 | `#198f9a` 3.86 | `#1984dc` 3.91 | `#19927b` 3.86 | `#339163` 3.91 | `#728a29` 3.90 | `#a17c16` 3.88 |
+| 700 | `#147b84` 5.00 | `#2272ba` 5.02 | `#147d6a` 5.03 | `#327c56` 5.06 | `#63762b` 5.05 | `#8b6b11` 4.99 |
+| 800 | `#106972` 6.39 | `#25619a` 6.45 | `#106c5a` 6.34 | `#2c6a4a` 6.43 | `#556528` 6.41 | `#775b0d` 6.39 |
+| 850 | `#0a545a` 8.65 | `#224d77` 8.76 | `#0a5648` 8.62 | `#27533b` 8.80 | `#444f23` 8.79 | `#5e4810` 8.71 |
+| 900 | `#063e43` 11.81 | `#223952` 11.83 | `#093f35` 11.84 | `#243c2e` 11.93 | `#333a22` 11.87 | `#42361a` 11.84 |
+| 1000 | `#043236` 13.86 | `#1a2d42` 14.02 | `#06322a` 14.02 | `#1c3025` 14.01 | `#282e1a` 14.04 | `#352a13` 14.08 |
+| 1100 | `#022326` 16.52 | `#101f30` 16.66 | `#02241d` 16.50 | `#112118` 16.74 | `#1c2010` 16.62 | `#261d0a` 16.63 |
 
 **Plan A hue ramps, part 2** (hex · contrast on white)
 
@@ -1167,7 +1186,7 @@ Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Pla
 | `color.border.input` | Borders of form UI elements, such as text fields, checkboxes, and radio buttons *One step darker than Atlassian (500) so a field edge keeps 3:1 on hovered grounds and overlays.* | neutral.600 `#7d7a75` / darkNeutral.600 `#7d7a75` | neutral.600 `#7f7f7f` / darkNeutral.700 `#878787` |
 | `color.border.input.search` | The border of search inputs | neutralAlpha.14 `#1d1b1624` / darkNeutralAlpha.16 `#f7f6f529` | neutralAlpha.14 `#0b0b0b24` / darkNeutralAlpha.16 `#f9f9f929` |
 | `color.border.inverse` | Borders on bold backgrounds | neutral.0 `#ffffff` / darkNeutral.0 `#141413` | neutral.0 `#ffffff` / darkNeutral.0 `#0b0b0b` |
-| `color.border.selected` | Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a dropdown trigger. Do not use as a keyboard focus indicator; use color.border.focused for focus and preserve the selected treatment when both states apply *Selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Ink 10/12/14% (its ink is near-black, so pressed stops at 14% to keep links at 4.5:1), a step past hover (6%); always paired with a non-color cue (a leading bar or a check). Selection is neutral, as on claude.ai (ink 10%) and in Atlassian's FY27 Finesse override. Ink 10/12/14% (its ink is near-black, so pressed stops at 14% to keep links at 4.5:1), a step past hover (6%); always paired with a non-color cue.* | neutral.1000 `#2c2c2b` / darkNeutral.1000 `#f0efed` | neutral.1000 `#1a1a1a` / darkNeutral.1000 `#efefef` |
+| `color.border.selected` | Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a dropdown trigger. Do not use as a keyboard focus indicator; use color.border.focused for focus and preserve the selected treatment when both states apply *Decision 17: checked checkboxes, radios, switches, the active tab indicator and the selected bar are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.* | lagoon.700 `#147b84` / lagoon.400 `#23b5c2` | same as A |
 | `color.border.brand` | Borders or visual indicators of elements that reinforce our brand, such as logos or primary buttons | lagoon.700 `#147b84` / lagoon.400 `#23b5c2` | same as A |
 | `color.border.danger` | Borders communicating critical information, such as the borders on invalid text fields | red.600 `#d7574e` / red.500 `#e16c62` | red.600 `#da5450` / red.500 `#ec645f` |
 | `color.border.danger.subtle` | Decorative danger borders that do not need to meet 3:1 contrast requirements | red.300 `#ddb2ac` / red.800 `#97463f` | red.300 `#fca59e` / red.800 `#a53a37` |
@@ -1206,9 +1225,9 @@ Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Pla
 | `color.background.selected` | The background of an element that communicates selection, such as a selected navigation item, or the opened state of a dropdown trigger. Use color.background.selected.hovered or color.background.selected.pressed when interacting with a selected element. Selection is distinct from keyboard focus and hover alone *Selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Ink 10/12/14% (its ink is near-black, so pressed stops at 14% to keep links at 4.5:1), a step past hover (6%); always paired with a non-color cue (a leading bar or a check). Selection is neutral, as on claude.ai (ink 10%) and in Atlassian's FY27 Finesse override. Ink 10/12/14% (its ink is near-black, so pressed stops at 14% to keep links at 4.5:1), a step past hover (6%); always paired with a non-color cue.* | neutralAlpha.10 `#1d1b161a` / darkNeutralAlpha.10 `#f7f6f51a` | neutralAlpha.10 `#0b0b0b1a` / darkNeutralAlpha.10 `#f9f9f91a` |
 | `color.background.selected.hovered` | The background of an element that is selected and hovered. This preserves selection while showing pointer hover; do not use for an unselected element or keyboard focus alone *Selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Ink 10/12/14% (its ink is near-black, so pressed stops at 14% to keep links at 4.5:1), a step past hover (6%); always paired with a non-color cue (a leading bar or a check). Selection is neutral, as on claude.ai (ink 10%) and in Atlassian's FY27 Finesse override. Ink 10/12/14% (its ink is near-black, so pressed stops at 14% to keep links at 4.5:1), a step past hover (6%); always paired with a non-color cue.* | neutralAlpha.14 `#1d1b1624` / darkNeutralAlpha.14 `#f7f6f524` | neutralAlpha.12 `#0b0b0b1f` / darkNeutralAlpha.14 `#f9f9f924` |
 | `color.background.selected.pressed` | The background of an element that is selected and being pressed. Return to color.background.selected or color.background.selected.hovered when the press ends and the element remains selected. Do not use for an unselected element or keyboard focus alone *Selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Ink 10/12/14% (its ink is near-black, so pressed stops at 14% to keep links at 4.5:1), a step past hover (6%); always paired with a non-color cue (a leading bar or a check). Pressed is capped at 16% in Plan A and 14% in Plan B (Atlassian 31%) so subtle text and links on it keep 4.5:1. Selection is neutral, as on claude.ai (ink 10%) and in Atlassian's FY27 Finesse override. Ink 10/12/14% (its ink is near-black, so pressed stops at 14% to keep links at 4.5:1), a step past hover (6%); always paired with a non-color cue. Pressed is capped at 16% in Plan A and 14% in Plan B (Atlassian 31%) so subtle text and links on it keep 4.5:1.* | neutralAlpha.16 `#1d1b1629` / darkNeutralAlpha.16 `#f7f6f529` | neutralAlpha.14 `#0b0b0b24` / darkNeutralAlpha.16 `#f9f9f929` |
-| `color.background.selected.bold` | The bold background of selected controls, such as checked checkboxes and selected radio buttons. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for primary actions or keyboard focus alone *Selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Ink 10/12/14% (its ink is near-black, so pressed stops at 14% to keep links at 4.5:1), a step past hover (6%); always paired with a non-color cue (a leading bar or a check). Selection is neutral, as on claude.ai (ink 10%) and in Atlassian's FY27 Finesse override. Ink 10/12/14% (its ink is near-black, so pressed stops at 14% to keep links at 4.5:1), a step past hover (6%); always paired with a non-color cue.* | neutral.1000 `#2c2c2b` / darkNeutral.1000 `#f0efed` | neutral.1000 `#1a1a1a` / darkNeutral.1000 `#efefef` |
-| `color.background.selected.bold.hovered` | The background of a selected control that uses color.background.selected.bold while it is hovered, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone *Selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Ink 10/12/14% (its ink is near-black, so pressed stops at 14% to keep links at 4.5:1), a step past hover (6%); always paired with a non-color cue (a leading bar or a check). Selection is neutral, as on claude.ai (ink 10%) and in Atlassian's FY27 Finesse override. Ink 10/12/14% (its ink is near-black, so pressed stops at 14% to keep links at 4.5:1), a step past hover (6%); always paired with a non-color cue.* | neutral.900 `#484743` / darkNeutral.900 `#d4d3cf` | neutral.900 `#383838` / darkNeutral.900 `#e0e0e0` |
-| `color.background.selected.bold.pressed` | The background of a selected control that uses color.background.selected.bold while it is being pressed, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone *Selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Ink 10/12/14% (its ink is near-black, so pressed stops at 14% to keep links at 4.5:1), a step past hover (6%); always paired with a non-color cue (a leading bar or a check). Selection is neutral, as on claude.ai (ink 10%) and in Atlassian's FY27 Finesse override. Ink 10/12/14% (its ink is near-black, so pressed stops at 14% to keep links at 4.5:1), a step past hover (6%); always paired with a non-color cue.* | neutral.800 `#5f5e5b` / darkNeutral.800 `#ada9a3` | neutral.800 `#555555` / darkNeutral.800 `#c2c2c2` |
+| `color.background.selected.bold` | The bold background of selected controls, such as checked checkboxes and selected radio buttons. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for primary actions or keyboard focus alone *Decision 17: checked checkboxes, radios, switches, the active tab indicator and the selected bar are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.* | lagoon.700 `#147b84` / lagoon.400 `#23b5c2` | same as A |
+| `color.background.selected.bold.hovered` | The background of a selected control that uses color.background.selected.bold while it is hovered, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone *Decision 17: checked checkboxes, radios, switches, the active tab indicator and the selected bar are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.* | lagoon.800 `#106972` / lagoon.300 `#70c9d4` | lagoon.800 `#106972` / lagoon.300 `#52ccda` |
+| `color.background.selected.bold.pressed` | The background of a selected control that uses color.background.selected.bold while it is being pressed, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone *Decision 17: checked checkboxes, radios, switches, the active tab indicator and the selected bar are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.* | lagoon.850 `#0a545a` / lagoon.250 `#9cdae1` | lagoon.850 `#0a545a` / lagoon.250 `#8ddce6` |
 | `color.background.brand.subtlest` | The background of elements used to reinforce our brand, but with less emphasis | lagoon.100 `#e2f4f7` / lagoon.1000 `#043236` | lagoon.100 `#ddf5f8` / lagoon.1000 `#043236` |
 | `color.background.brand.subtlest.hovered` | Hovered state of color.background.brand.subtlest | lagoon.200 `#c8e9ed` / lagoon.900 `#063e43` | lagoon.200 `#b6edf3` / lagoon.900 `#063e43` |
 | `color.background.brand.subtlest.pressed` | Pressed state of color.background.brand.subtlest | lagoon.250 `#9cdae1` / lagoon.850 `#0a545a` | lagoon.250 `#8ddce6` / lagoon.850 `#0a545a` |
