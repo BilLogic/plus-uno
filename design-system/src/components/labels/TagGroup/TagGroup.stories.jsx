@@ -601,8 +601,8 @@ OverflowTag.play = async ({ canvasElement }) => {
 
     const bg = (pseudo) => withForcedPseudo(more, pseudo, () => getComputedStyle(more).backgroundColor);
     await expect(getComputedStyle(more).backgroundColor, 'rest is clear').toBe('rgba(0, 0, 0, 0)');
-    await expect(bg(':hover')).toBe(tokenColor(canvasElement, '--color-on-surface-variant-state-08'));
-    await expect(bg(':active')).toBe(tokenColor(canvasElement, '--color-on-surface-variant-state-12'));
+    await expect(bg(':hover')).toBe(tokenColor(canvasElement, '--ds-background-accent-gray-subtlest'));
+    await expect(bg(':active')).toBe(tokenColor(canvasElement, '--ds-background-accent-gray-subtlest-pressed'));
 };
 
 const MANY = Array.from({ length: 14 }, (_, i) => `T${i + 1}`);

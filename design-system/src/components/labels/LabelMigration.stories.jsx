@@ -35,9 +35,9 @@ export default {
 const row = { display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' };
 
 /**
- * Each SMART area, its label, and the curriculum token its hue is drawn from.
- * The Tag color comes from `SMART_TAG_COLORS`, the one map the component uses,
- * and the token is what the test checks that color against.
+ * Each SMART area, its label, and the SMART subject its colors come from. The
+ * Tag beside it is `SMART_TAG_COLORS`' accent, the one the subject's tokens
+ * alias, for comparison.
  */
 const SMART = [
     ['socio-emotional', 'Social-Emotional Learning', 'social-emotional'],
@@ -71,21 +71,29 @@ export const SmartAreas = () => (
 );
 
 /**
- * A SMART area is a read-only Tag in its curriculum color: 22 tall, outlined
- * in the hue's subtle border, the hue on the swatch, neutral text, and nothing
- * to press.
+ * A SMART area is a read-only Tag filled in its subject's SMART colors: 22
+ * tall, the tag's shape and type, `background.smart.{subject}` for the ground,
+ * `text.smart.{subject}` for the words, `icon.smart.{subject}` on the swatch,
+ * a clear border, and nothing to press.
  */
 SmartAreas.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     for (const [type, text, token] of SMART) {
         const smart = canvas.getByTestId(`smart-${type}`);
         await expect(smart.textContent, `${type} says its area`).toBe(text);
-        await expect(look(smart), `${type} looks like a ${token} tag`).toEqual(look(canvas.getByTestId(`tag-${type}`)));
-        await expect(px(getComputedStyle(smart).height), `${type} is 22 tall`).toBe(22);
-        await expect(getComputedStyle(smart).borderTopColor, `${type} is outlined in its hue`)
-            .toBe(tokenColor(canvasElement, `--color-${token}-border-subtle`));
-        await expect(getComputedStyle(swatchOf(smart)).backgroundColor, `${type} carries its hue on the swatch`)
-            .toBe(tokenColor(canvasElement, `--color-${token}`));
+        const s = getComputedStyle(smart);
+        const tag = getComputedStyle(canvas.getByTestId(`tag-${type}`));
+        for (const p of ['height', 'borderTopLeftRadius', 'fontSize', 'paddingLeft']) {
+            await expect(s[p], `${type} has a tag's ${p}`).toBe(tag[p]);
+        }
+        await expect(px(s.height), `${type} is 22 tall`).toBe(22);
+        await expect(s.backgroundColor, `${type} is filled in its subject's ground`)
+            .toBe(tokenColor(canvasElement, `--ds-background-smart-${token}`));
+        await expect(s.color, `${type} words are its subject's ink`)
+            .toBe(tokenColor(canvasElement, `--ds-text-smart-${token}`));
+        await expect(s.borderTopColor, `${type} has a clear border`).toBe('rgba(0, 0, 0, 0)');
+        await expect(getComputedStyle(swatchOf(smart)).backgroundColor, `${type} carries its subject on the swatch`)
+            .toBe(tokenColor(canvasElement, `--ds-icon-smart-${token}`));
     }
     await expect(canvas.queryByRole('button')).toBeNull();
 };
@@ -135,7 +143,7 @@ export const TagInputChips = {
         <TagInput
             label="Topics"
             options={[]}
-            tags={['Algebra', { text: 'Geometry', color: 'success' }, { text: 'Fractions', color: 'purple' }, { text: 'Ratios', color: 'lime' }]}
+            tags={['Algebra', { text: 'Geometry', color: 'success' }, { text: 'Fractions', color: 'purple' }, { text: 'Ratios', color: 'red' }]}
             onRemove={onRemove}
         />
     ),
@@ -153,13 +161,13 @@ export const TagInputChips = {
         const tagOf = (text) => within(group).getByText(text).parentElement;
         await expect(px(getComputedStyle(tagOf('Algebra')).height), 'a chip is a 22 tag').toBe(22);
         await expect(getComputedStyle(tagOf('Geometry')).borderTopColor, 'success is green')
-            .toBe(tokenColor(canvasElement, '--color-advocacy-border-subtle'));
+            .toBe(tokenColor(canvasElement, '--ds-border-accent-green-subtle'));
         await expect(getComputedStyle(tagOf('Fractions')).borderTopColor, 'a Tag color is taken as given')
-            .toBe(tokenColor(canvasElement, '--color-mastering-content-border-subtle'));
+            .toBe(tokenColor(canvasElement, '--ds-border-accent-purple-subtle'));
         await expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('[TagInput] color "success" is deprecated; use "green"'));
         await expect(getComputedStyle(tagOf('Ratios')).borderTopColor, 'an unknown color is gray')
             .toBe(getComputedStyle(tagOf('Algebra')).borderTopColor);
-        await expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('[TagInput] color "lime" is not a Tag color; it falls back to gray.'));
+        await expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('[TagInput] color "red" is not a Tag color; it falls back to gray.'));
 
         await userEvent.click(within(group).getByRole('button', { name: 'Remove Geometry' }));
         await expect(onRemove).toHaveBeenCalledWith(1, { text: 'Geometry', color: 'success' });

@@ -118,7 +118,7 @@ category.
     <DsCanvasQuiet of={TagStories.Selecting} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>States use the hue's state layers: hover 08, pressed 12, and selected 16, which a selected tag holds on hover and press. On a removable tag only the × reacts.</>}>
+<DocsCanvasShell description={<>States use the accent's own steps: hover is subtlest, pressed subtlest pressed, and selected the subtler step, which a selected tag holds on hover and press. On a removable tag only the × reacts.</>}>
     <DsCanvasQuiet of={TagStories.StateLayers} />
 </DocsCanvasShell>
 
@@ -146,7 +146,7 @@ category.
 
 ## On images
 
-<DocsCanvasShell description={<><code>isElevated</code> lifts a read-only or link tag onto a photo, a thumbnail or a video: a solid surface fill, no border, the Elevation 2 shadow and neutral text, with the hue kept on the swatch. Place it 8 from the image corner, never centered over a face or text.</>}>
+<DocsCanvasShell description={<><code>isElevated</code> lifts a read-only or link tag onto a photo, a thumbnail or a video: the overlay surface and its shadow, no border and neutral text, with the hue kept on the swatch. Place it 8 from the image corner, never centered over a face or text.</>}>
     <DsCanvasQuiet of={TagStories.OnImages} />
 </DocsCanvasShell>
 
@@ -154,7 +154,7 @@ category.
     <DsCanvasQuiet of={TagStories.ElevatedAvatarTypes} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>In a disabled field an elevated tag keeps its solid ground and Elevation 2, since the translucent disabled fill would sink into the picture. Only the content turns Secondary (Text): the label, the swatch, and the avatar as any disabled avatar. No hover or press.</>}>
+<DocsCanvasShell description={<>In a disabled field an elevated tag keeps its solid ground and shadow, since the translucent disabled fill would sink into the picture. Only the content turns subdued: the label, the swatch, and the avatar as any disabled avatar. No hover or press.</>}>
     <DsCanvasQuiet of={TagStories.ElevatedDisabled} />
 </DocsCanvasShell>
 
@@ -272,7 +272,7 @@ Status lands, a state is a `BadgeVariants` status.
 // A person: round, with their photo or their initials.
 <Tag type="person" avatar={user.photoUrl}>Rosa Chen</Tag>
 
-// An agent: a hexagon on the hue's Container, so it never reads as a person.
+// An agent: a hexagon on the accent's subtler step, so it never reads as a person.
 <Tag type="agent" color="purple">PLUS AI</Tag>
 
 // A team: a square avatar.
@@ -314,9 +314,10 @@ and every tag inside follows:
 
 ### Renamed props.
 
-`variant` is now `behavior` (`dismissible` is `removable`), `orange` is now
-`yellow`, and `grey` is now `gray`. The old names still work and warn in
-development. `operational` has
+`variant` is now `behavior` (`dismissible` is `removable`) and `grey` is now
+`gray`. The old names still work and warn in development. `orange` was an
+alias for `yellow`; it is now the orange accent, so an old `orange` tag turns
+orange. `operational` has
 no direct replacement: a tag that opens something is `behavior="selectable"`
 with `aria-expanded`.
 

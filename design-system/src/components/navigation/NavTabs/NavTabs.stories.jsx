@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { expect, within } from 'storybook/test';
+
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import NavTabs from './NavTabs';
 
@@ -8,6 +11,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-10-25', kind: 'changed', summary: 'Colors moved to the --ds- tokens: an unselected tab is `text.subtle`, the selected one `text.selected` over the `border.selected` bar (Lagoon), hover and press the neutral subtle steps on every tab, and disabled `text.disabled` instead of a faded opacity.' },
             { date: '2026-10-24', kind: 'changed', summary: 'Pressed is the 12 state layer, not 16. Keyboard focus is a 2px focus ring inside the tab, with no fill.' },
             { date: '2026-10-23', kind: 'changed', summary: 'Tabs and dropdown tabs are 32, with Body/default labels at the medium weight.' },
             { date: '2026-10-23', kind: 'changed', summary: 'The selected tab keeps the medium weight; the underline and the color mark it.' },
@@ -106,7 +110,7 @@ function NavTabsInteractionStatesDemos() {
     return (
         <section>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INTERACTION STATES</span>
-            <p className="body2-txt" style={{ marginBottom: '24px', color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt" style={{ marginBottom: '24px', color: 'var(--ds-text-subtle)' }}>
                 States below are artificially forced for demonstration.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -166,6 +170,28 @@ Overview.parameters = {
     docs: {
         source: { language: 'jsx', code: webAppSourceSnippets.navTabs }
     }
+};
+
+/**
+ * The selected tab is `text.selected` over the `border.selected` bar, the
+ * Lagoon indicator; an unselected tab is `text.subtle` on the 1px
+ * `color.border` baseline. Selection rests on the bar and the ink, never on a
+ * fill.
+ */
+Overview.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const selected = canvas.getByText('Home');
+    const other = canvas.getByText('Profile');
+
+    const s = getComputedStyle(selected);
+    await expect(s.borderBottomColor, 'the selected bar').toBe(tokenColor(canvasElement, '--ds-border-selected'));
+    await expect(s.color, 'selected ink').toBe(tokenColor(canvasElement, '--ds-text-selected'));
+    await expect(s.backgroundColor, 'and no fill').toBe('rgba(0, 0, 0, 0)');
+
+    const o = getComputedStyle(other);
+    await expect(o.color, 'an unselected tab is subtle').toBe(tokenColor(canvasElement, '--ds-text-subtle'));
+    await expect(o.borderBottomColor, 'on the baseline').toBe(tokenColor(canvasElement, '--ds-border'));
+    await expect(px(o.borderBottomWidth)).toBe(1);
 };
 
 /**

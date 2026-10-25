@@ -2,13 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Tag, { TAG_COLOR_OF_CURRICULUM } from '@/components/labels/Tag';
 import { SMART_CONSTANTS } from '@/components/constants';
+import './StaticBadgeSmart.scss';
 
 /**
  * SmartBadges Component
  *
- * A SMART competency area, as a read-only Tag in the area's curriculum color.
- * An area is a category, so it is outlined like every other Tag rather than
- * filled like a Status.
+ * A SMART competency area, as a read-only Tag filled in the area's SMART
+ * subject colors: `background.smart.{subject}` for the ground,
+ * `text.smart.{subject}` for the words and `icon.smart.{subject}` for the
+ * swatch. Each subject aliases an accent no role uses, so the fill never reads
+ * as a Status. The fill lives in `StaticBadgeSmart.scss`.
  *
  * Types:
  * - socio-emotional (S)
@@ -27,7 +30,7 @@ const TEXT_OF = {
     'technology-tools': SMART_CONSTANTS.CA_TT,
 };
 
-/** Each area's curriculum hue, by the token name the hue is stored under. */
+/** Each area's SMART subject, by the token name the subject is stored under. */
 const CURRICULUM_OF = {
     'socio-emotional': 'social-emotional',
     'mastering-content': 'mastering-content',
@@ -36,7 +39,7 @@ const CURRICULUM_OF = {
     'technology-tools': 'technology-tools',
 };
 
-/** Each area's Tag color: the color that borrows the area's curriculum hue. */
+/** Each area's Tag color: the accent the area's SMART tokens alias. */
 export const SMART_TAG_COLORS = Object.freeze(Object.fromEntries(
     Object.entries(CURRICULUM_OF).map(([area, hue]) => [area, TAG_COLOR_OF_CURRICULUM[hue]]),
 ));
@@ -69,7 +72,7 @@ const SmartBadges = ({
         <Tag
             id={id}
             color={SMART_TAG_COLORS[area]}
-            className={`plus-smart-badge ${className}`.trim()}
+            className={`plus-smart-badge plus-smart-badge--${CURRICULUM_OF[area]} ${className}`.trim()}
             {...rest}
         >
             {TEXT_OF[area]}

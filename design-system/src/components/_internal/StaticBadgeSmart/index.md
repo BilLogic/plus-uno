@@ -26,6 +26,12 @@
 
 Anything not listed is not a valid value.
 
+## Tokens touched
+
+`--ds-background-smart-advocacy` · `--ds-background-smart-mastering-content` · `--ds-background-smart-relationship` · `--ds-background-smart-social-emotional` · `--ds-background-smart-technology-tools` · `--ds-border-smart-advocacy` · `--ds-border-smart-mastering-content` · `--ds-border-smart-relationship` · `--ds-border-smart-social-emotional` · `--ds-border-smart-technology-tools` · `--ds-icon-smart-advocacy` · `--ds-icon-smart-mastering-content` · `--ds-icon-smart-relationship` · `--ds-icon-smart-social-emotional` · `--ds-icon-smart-technology-tools` · `--ds-text-smart-advocacy` · `--ds-text-smart-mastering-content` · `--ds-text-smart-relationship` · `--ds-text-smart-social-emotional` · `--ds-text-smart-technology-tools` · `--plus-smart-edge` · `--plus-smart-ground` · `--plus-smart-ink` · `--plus-smart-mark`
+
+From `design-system/src/components/_internal/StaticBadgeSmart/StaticBadgeSmart.scss`. Override these through the token layer, never with a literal.
+
 ## Related
 
 Same group: `CompetencyBadge` · `Footer` · `LoadingGif` · `Navbar` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Sidebar` · `Table` · `UserAvatar`
