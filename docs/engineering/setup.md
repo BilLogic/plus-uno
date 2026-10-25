@@ -139,6 +139,15 @@ plan file in `scripts/lib/color/plans/` and the vendored Atlassian reference in
 another step changes `scripts/lib/color/semantics.mjs`, which every plan shares.
 The generator refuses to write while `check:color-system` fails.
 
+Figma follows the repo for color. `npm run push:figma-color` turns the
+generated `figma-spec.json` into Plugin API scripts that upsert the collections
+and shadow styles by name and leave everything else in the file as it is;
+`-- --probe` prints the read-only drift check and `-- --diff FILE` names what
+its result found. Both run inside the target file through the Figma MCP's
+`use_figma` or a plugin console, since only the Plugin API writes variables on
+this plan, so the drift check is a manual command and sits outside the harness
+gate. Run against a scratch file before a library.
+
 ## Generated skill surfaces
 
 `skills/<name>/SKILL.md` is canonical, and `skills/` is a discovery path for
