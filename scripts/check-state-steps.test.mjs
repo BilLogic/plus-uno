@@ -297,9 +297,9 @@ test('Switch: hover lays the 08 over the track, on or off', () => {
  * THE FOCUS GAP. Button, Checkbox, Radio and Switch draw the same keyboard ring: 2px
  * of the focus-ring role, 2px off the control's edge. The Radio's ring was an
  * inverse-primary halo touching its border, and on a checked radio the two
- * merged into one thick primary edge that did not read as focus.
+ * merged into one thick primary edge that did not read as focus. The ring is
+ * DS_RING_OUTSIDE, defined with the SidebarTab rules above.
  */
-const DS_RING_OUTSIDE = { ...RING_OUTSIDE, outline: 'var(--size-element-stroke-lg) solid var(--ds-border-focused)' };
 
 for (const [name, file, selector, ring] of [
   ['Checkbox', 'components/forms-and-inputs/Checkbox.scss', '.plus-form-checkbox .form-check-input:focus-visible', DS_RING_OUTSIDE],
