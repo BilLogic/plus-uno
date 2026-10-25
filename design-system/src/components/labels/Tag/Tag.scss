@@ -153,7 +153,7 @@ $tag-colors: (
      */
     margin: 0;
     padding: 0 var(--size-element-pad-x-xs, 4px);
-    border: var(--size-element-border, 1px) solid var(--plus-tag-border);
+    border: var(--size-element-border, 1px) solid var(--plus-tag-border-rest);
     border-radius: var(--size-element-radius-md, 4px);
     background-color: transparent;
     appearance: none;
@@ -171,9 +171,9 @@ $tag-colors: (
  * leaves the avatar fill alone, for the avatar types' neutral border below.
  */
 @mixin tag-color-vars($tokens, $with-avatar: true) {
-    --plus-tag-border: #{nth($tokens, 1)};
+    --plus-tag-border-rest: #{nth($tokens, 1)};
     --plus-tag-hue: #{nth($tokens, 2)};
-    --plus-tag-edge: #{nth($tokens, 3)};
+    --plus-tag-border-selected: #{nth($tokens, 3)};
     --plus-tag-hovered: #{nth($tokens, 4)};
     --plus-tag-pressed: #{nth($tokens, 5)};
     --plus-tag-selected: #{nth($tokens, 6)};
@@ -337,7 +337,7 @@ $tag-colors: (
 .plus-tag--selected,
 .plus-tag--selected:hover,
 .plus-tag--selected:active {
-    border-color: var(--plus-tag-edge);
+    border-color: var(--plus-tag-border-selected);
     background-color: var(--plus-tag-selected);
 }
 
@@ -488,27 +488,25 @@ $tag-colors: (
 /* -------------------------------------------------------------- disabled */
 
 /*
- * Disabled comes from the field: background.disabled, text.subtle for the
- * words, icon.subtle on the swatch, no border unless selected, no ×, and no
- * focus. The tag is a span, or a disabled button.
- *
- * The words are text.subtle, not text.disabled, on purpose. A read-only tag
- * is a span, which nothing marks as an inactive control, so its words are
- * held to 4.5:1 like any text; text.disabled is about 2:1 on the disabled
- * ground. The migration map moves the old Secondary (Text) to text.subtle.
- * A selected tag keeps a border.bold edge, so the choice still shows.
+ * Disabled comes from the field: the one disabled recipe, background.disabled
+ * with text.disabled words, icon.disabled on the swatch, no border unless
+ * selected, no ×, and no focus. The tag is a disabled button, or a span that
+ * Tag marks `aria-disabled`, so it reads as an inactive component, which
+ * WCAG exempts from text contrast. opacity.disabled is for images only, so a
+ * photo avatar stays whole. A selected tag keeps a border.bold edge, so the
+ * choice still shows.
  */
 .plus-tag--disabled,
 .plus-tag--disabled:hover,
 .plus-tag--disabled:active {
     border-color: transparent;
     background-color: var(--ds-background-disabled);
-    color: var(--ds-text-subtle);
+    color: var(--ds-text-disabled);
     cursor: default;
 }
 
 .plus-tag--disabled .plus-tag__swatch {
-    background-color: var(--ds-icon-subtle);
+    background-color: var(--ds-icon-disabled);
 }
 
 .plus-tag--disabled.plus-tag--selected {
@@ -528,7 +526,7 @@ $tag-colors: (
 }
 
 .plus-tag--disabled .plus-tag__initials {
-    color: var(--ds-text-subtle);
+    color: var(--ds-text-disabled);
 }
 
 /* -------------------------------------------------------------- on images */

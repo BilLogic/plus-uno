@@ -501,15 +501,18 @@ export const Tag = ({
 
     return (
         <>
-            <span {...shared}>
+            <span {...shared} aria-disabled={isDisabled ? 'true' : undefined}>
                 {lead}
                 {labelNode}
                 {removeButton}
                 {/*
-                  * A span has no disabled state a screen reader announces
-                  * (ARIA 1.2 does not support aria-disabled on a generic element), so a
-                  * disabled tag that is not a button says it in words: its
-                  * text is read as "Science, disabled".
+                  * A span has no disabled state a screen reader reliably
+                  * announces (ARIA 1.2 does not support aria-disabled on a
+                  * generic element), so a disabled tag that is not a button
+                  * says it in words: its text is read as "Science, disabled".
+                  * `aria-disabled` is set as well, as NavTabs sets it on a
+                  * disabled tab, so the tag reads as inactive to tools: its
+                  * words are text.disabled, which an inactive component may be.
                   */}
                 {isDisabled && <span className="visually-hidden">, disabled</span>}
             </span>

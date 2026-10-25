@@ -29,7 +29,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-10-25', kind: 'changed', summary: 'Colors moved to the accent tokens: hover is the subtlest step, pressed subtlest pressed and selected the subtler step. Orange, lime and brown, the accents SMART subjects alias, became colors Tag draws (outside the palette a picker offers), so `orange` stopped being an alias for `yellow`.' },
+            { date: '2026-10-25', kind: 'changed', summary: 'Colors moved to the accent tokens: hover is the subtlest step, pressed subtlest pressed and selected the subtler step. Orange, lime and brown, the accents SMART subjects alias, became colors Tag draws (outside the palette a picker offers), so `<Tag color="orange">` renders orange where it was yellow with a deprecation warning. A disabled tag is `text.disabled` on `background.disabled`, and a disabled span tag carries `aria-disabled`.' },
             { date: '2026-10-24', kind: 'changed', summary: "A selected tag is the hue's 16 step, held on hover and press. A pressed × is 12, and a focused × shows the ring with no fill." },
             { date: '2026-09-29', kind: 'deprecated', summary: '`variant="operational"` started warning in development; a tag that opens something became `behavior="selectable"` with `aria-expanded`.' },
             { date: '2026-09-29', kind: 'changed', summary: 'A disabled tag that is not a button ended with visually hidden ", disabled" text, so a screen reader announced it as disabled.' },
@@ -830,8 +830,9 @@ export const LinkWithRemove = {
 
 /**
  * Disabled comes from the field, through `TagContext`: background.disabled
- * with text.subtle words (a read-only tag is a span, so its words keep 4.5:1),
- * no ×, nothing to focus, and no hover.
+ * with text.disabled words, no ×, nothing to focus, and no hover. A tag that
+ * is a span carries `aria-disabled`, so it reads as an inactive component; a
+ * selectable one is a disabled button.
  */
 export const DisabledInField = () => (
     <div style={row}>
@@ -858,13 +859,19 @@ DisabledInField.play = async ({ canvasElement }) => {
     await expect(canvas.getByRole('button', { name: 'After' }), 'no tag takes focus').toHaveFocus();
 
     const fill = tokenColor(canvasElement, '--ds-background-disabled');
-    const text = tokenColor(canvasElement, '--ds-text-subtle');
+    const text = tokenColor(canvasElement, '--ds-text-disabled');
     for (const id of ['read-only', 'removable', 'selectable', 'selected', 'link']) {
         const tag = canvas.getByTestId(id);
         await expect(getComputedStyle(tag).backgroundColor, `${id} fill`).toBe(fill);
         await expect(getComputedStyle(tag).color, `${id} text`).toBe(text);
         await expect(px(getComputedStyle(tag).height)).toBe(22);
     }
+
+    // A span tag says it is inactive; a selectable one is a disabled button.
+    for (const id of ['read-only', 'removable', 'link']) {
+        await expect(canvas.getByTestId(id), `${id} is aria-disabled`).toHaveAttribute('aria-disabled', 'true');
+    }
+    await expect(canvas.getByTestId('selectable')).toBeDisabled();
 
     // Selected stays visible when disabled, as a border.bold edge.
     await expect(getComputedStyle(canvas.getByTestId('selected')).borderTopColor)
@@ -1159,7 +1166,7 @@ OnImages.play = async ({ canvasElement }) => {
     const disabled = canvas.getByTestId('disabled');
     await expect(getComputedStyle(disabled).backgroundColor).toBe(ground);
     await expect(getComputedStyle(disabled).boxShadow).toBe(shadow);
-    await expect(getComputedStyle(disabled).color).toBe(t('--ds-text-subtle'));
+    await expect(getComputedStyle(disabled).color).toBe(t('--ds-text-disabled'));
     await expect(whileForced(disabled, ':hover', 'backgroundColor')).toBe(ground);
 
     // Hover and press: the state layer sits over the solid fill, which stays.
@@ -1260,9 +1267,9 @@ ElevatedAvatarTypes.play = async ({ canvasElement }) => {
 /**
  * An elevated tag in a disabled field keeps its solid ground and the overlay
  * shadow, since the translucent disabled fill would sink into the picture.
- * Only its content turns subdued: text.subtle for the label, icon.subtle for
+ * Only its content turns disabled: text.disabled for the label, icon.disabled for
  * the swatch, and an avatar drawn as any disabled avatar (background.disabled,
- * text.subtle initials). No
+ * text.disabled initials). No
  * hover, no press, nothing to focus. Plain read-only and link on every color,
  * and the three avatar types.
  */
@@ -1296,8 +1303,8 @@ ElevatedDisabled.play = async ({ canvasElement }) => {
     const t = (token) => tokenColor(canvasElement, token);
     const ground = t('--ds-surface-overlay');
     const shadow = computedShadow(canvasElement, 'var(--ds-shadow-overlay)');
-    const secondary = t('--ds-text-subtle');
-    const disabledMark = t('--ds-icon-subtle');
+    const secondary = t('--ds-text-disabled');
+    const disabledMark = t('--ds-icon-disabled');
 
     await expect(canvas.queryByRole('link'), 'a disabled link is not a link').toBeNull();
 
@@ -1307,7 +1314,7 @@ ElevatedDisabled.play = async ({ canvasElement }) => {
         await expect(s.backgroundColor, `${what} keeps the solid fill`).toBe(ground);
         await expect(s.borderTopColor, `${what} has no border`).toBe(CLEAR);
         await expect(s.boxShadow, `${what} keeps the overlay shadow`).toBe(shadow);
-        await expect(s.color, `${what} text is subdued`).toBe(secondary);
+        await expect(s.color, `${what} text is disabled`).toBe(secondary);
         for (const pseudo of [':hover', ':active']) {
             await expect(whileForced(tag, pseudo, 'backgroundColor'), `${what} ${pseudo} fill`).toBe(ground);
             await expect(whileForced(tag, pseudo, 'backgroundImage'), `${what} ${pseudo} has no layer`).toBe('none');
@@ -1319,7 +1326,7 @@ ElevatedDisabled.play = async ({ canvasElement }) => {
         for (const id of [`read-only-${color}`, `link-${color}`]) {
             const tag = canvas.getByTestId(id);
             await expectGround(tag, id);
-            await expect(getComputedStyle(avatarOf(tag)).backgroundColor, `${id} swatch is subdued`)
+            await expect(getComputedStyle(avatarOf(tag)).backgroundColor, `${id} swatch is disabled`)
                 .toBe(disabledMark);
         }
         const label = within(canvas.getByTestId(`link-${color}`)).getByText(`${color} link`);

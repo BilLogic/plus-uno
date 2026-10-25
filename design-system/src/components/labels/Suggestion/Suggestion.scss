@@ -9,8 +9,9 @@
  * discovery's job: a dashed edge in `border.discovery`, the words in
  * `text.discovery` and the glyph in `icon.discovery`. Hover is
  * `background.discovery` and pressed `background.discovery.hovered`, the next
- * step, since the rest ground is clear. The Figma set still binds Mastering
- * Content, which now belongs to the SMART subjects alone.
+ * step, since the rest ground is clear: the color proposal's Suggestion chip
+ * row (§4.5, "pressed: background.discovery.hovered"). The Figma set still
+ * binds Mastering Content, which now belongs to the SMART subjects alone.
  */
 .plus-suggestion {
     --plus-suggestion-height: 22px;
@@ -85,10 +86,10 @@
 .plus-suggestion:disabled:active {
     border-color: var(--ds-border);
     background-color: var(--ds-background-disabled);
-    color: var(--ds-text-subtle);
+    color: var(--ds-text-disabled);
     cursor: default;
 }
 
 .plus-suggestion:disabled .plus-suggestion__icon {
-    color: var(--ds-icon-subtle);
+    color: var(--ds-icon-disabled);
 }

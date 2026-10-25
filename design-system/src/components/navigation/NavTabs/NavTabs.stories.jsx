@@ -187,7 +187,6 @@ Overview.play = async ({ canvasElement }) => {
     for (const tab of [selected, other]) tab.style.transition = 'none';
 
     await inEveryColorMode(async () => {
-
         const s = getComputedStyle(selected);
         await expect(s.borderBottomColor, 'the selected bar').toBe(tokenColor(canvasElement, '--ds-border-selected'));
         await expect(s.color, 'selected ink').toBe(tokenColor(canvasElement, '--ds-text-selected'));

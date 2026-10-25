@@ -11,7 +11,7 @@ import './Badge.scss';
  *
  * Every render warns in development with the replacement for the props it was
  * given, so a call moves by copying what the console says: a status style is a
- * Status, a curriculum style is a Tag in the color that borrows that hue, a
+ * Status, a curriculum style is the SMART area (`StaticBadgeSmart`), a
  * dismissible badge is a removable Tag, and a counter moves to the
  * replacement's `count`.
  */
@@ -19,14 +19,24 @@ import './Badge.scss';
 /** The four status styles, which keep their names on Status. */
 const STATUS_STYLES = ['success', 'warning', 'danger', 'info'];
 
+/** Each curriculum style, named for its SMART subject, and the SMART area key it becomes. */
+const SMART_AREA_OF = {
+    'social-emotional': 'socio-emotional',
+    'mastering-content': 'mastering-content',
+    advocacy: 'advocacy',
+    relationship: 'relationships',
+    'technology-tools': 'technology-tools',
+};
+
 /** The replacement for a Badge with these props, written as the call to make. */
 const replacementFor = ({ style, dismissible, counter }) => {
-    // The curriculum styles are named for their hue's token, which is how Tag
-    // keys the color that borrows it.
+    // A curriculum style is a SMART subject, so it becomes the SMART area,
+    // which reads the subject's own tokens. A removable one is a removable Tag
+    // in the accent those tokens alias, since a SMART area is read-only.
     const tagColor = Object.hasOwn(TAG_COLOR_OF_CURRICULUM, style) ? TAG_COLOR_OF_CURRICULUM[style] : null;
     const color = tagColor ? ` color="${tagColor}"` : '';
     if (dismissible) return `<Tag behavior="removable"${color}>`;
-    if (color) return `<Tag${color}>`;
+    if (tagColor) return `<StaticBadgeSmart type="${SMART_AREA_OF[style]}">`;
     // `count` takes a number, so the call names the one this badge shows.
     const n = String(counter ?? '').trim() === '' ? NaN : Number(counter);
     const count = counter === undefined ? '' : ` count={${Number.isFinite(n) ? n : '…'}}`;

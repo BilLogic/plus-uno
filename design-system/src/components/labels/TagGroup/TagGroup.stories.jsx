@@ -3,6 +3,7 @@ import { expect, fn, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import Tag from '../Tag';
 import Suggestion from '../Suggestion';
 import TagGroup from './TagGroup';
@@ -600,9 +601,16 @@ OverflowTag.play = async ({ canvasElement }) => {
     );
 
     const bg = (pseudo) => withForcedPseudo(more, pseudo, () => getComputedStyle(more).backgroundColor);
-    await expect(getComputedStyle(more).backgroundColor, 'rest is clear').toBe('rgba(0, 0, 0, 0)');
-    await expect(bg(':hover')).toBe(tokenColor(canvasElement, '--ds-background-accent-gray-subtlest'));
-    await expect(bg(':active')).toBe(tokenColor(canvasElement, '--ds-background-accent-gray-subtlest-pressed'));
+    // A gray tag's colors, in every color mode.
+    await inEveryColorMode(async (mode) => {
+        await expect(getComputedStyle(more).backgroundColor, `${mode}: rest is clear`).toBe('rgba(0, 0, 0, 0)');
+        await expect(getComputedStyle(more).borderTopColor, `${mode}: the gray subtle border`)
+            .toBe(tokenColor(canvasElement, '--ds-border-accent-gray-subtle'));
+        await expect(getComputedStyle(more).color, `${mode}: neutral words`).toBe(tokenColor(canvasElement, '--ds-text'));
+        await expect(bg(':hover'), `${mode}: hover`).toBe(tokenColor(canvasElement, '--ds-background-accent-gray-subtlest'));
+        await expect(bg(':active'), `${mode}: pressed`)
+            .toBe(tokenColor(canvasElement, '--ds-background-accent-gray-subtlest-pressed'));
+    });
 };
 
 const MANY = Array.from({ length: 14 }, (_, i) => `T${i + 1}`);
@@ -813,14 +821,15 @@ export const Disabled = {
 
         // Every tag is inert and says so itself: no ×, no link, a disabled
         // toggle, and each tag that is not a button reads "<label>, disabled"
-        // (a generic span has no disabled state a screen reader announces).
+        // (a generic span has no disabled state a screen reader reliably
+        // announces), and carries `aria-disabled` so it reads as inactive.
         await expect(within(group).queryByRole('button', { name: /^Remove/ })).toBeNull();
         await expect(within(group).queryByRole('link')).toBeNull();
         await expect(within(group).getByRole('button', { name: 'Selectable' })).toBeDisabled();
         for (const [id, words] of [['read-only', 'Read only'], ['removable', 'Removable'], ['link', 'Link']]) {
             const tag = canvas.getByTestId(id);
             await expect(tag, `${id} is read as disabled`).toHaveTextContent(`${words}, disabled`);
-            await expect(tag).not.toHaveAttribute('aria-disabled');
+            await expect(tag, `${id} is marked inactive`).toHaveAttribute('aria-disabled', 'true');
             // The words are for a screen reader only: nothing on screen changes.
             const extra = within(tag).getByText(', disabled');
             await expect(px(getComputedStyle(extra).width)).toBeLessThanOrEqual(1);

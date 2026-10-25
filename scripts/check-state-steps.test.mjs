@@ -102,8 +102,9 @@ const RING_INSIDE = {
 const layer = (token) => `var(${token})`;
 
 /** The same rings on the --ds- focus token, for components already moved onto it. */
-const DS_RING_OUTSIDE = { ...RING_OUTSIDE, outline: 'var(--size-element-stroke-lg) solid var(--ds-border-focused)' };
-const DS_RING_INSIDE_OUTLINE = 'var(--size-element-stroke-lg) solid var(--ds-border-focused)';
+const DS_RING = RING_OUTSIDE.outline.replace('--color-focus-ring', '--ds-border-focused');
+const DS_RING_OUTSIDE = { ...RING_OUTSIDE, outline: DS_RING };
+const DS_RING_INSIDE_OUTLINE = DS_RING;
 
 /* ─── SidebarTab and the Sidebar's open tabs ─────────────────────────────── */
 

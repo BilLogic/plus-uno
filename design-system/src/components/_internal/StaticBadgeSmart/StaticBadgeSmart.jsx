@@ -39,7 +39,12 @@ const CURRICULUM_OF = {
     'technology-tools': 'technology-tools',
 };
 
-/** Each area's Tag color: the accent the area's SMART tokens alias. */
+/**
+ * Each area's Tag color: the accent the area's SMART tokens alias, for a plain
+ * outlined Tag in the area's hue. The area itself passes no Tag color: its
+ * stylesheet sets every color it shows from the SMART layer, so a passed hue
+ * would only feed states a read-only area never reaches.
+ */
 export const SMART_TAG_COLORS = Object.freeze(Object.fromEntries(
     Object.entries(CURRICULUM_OF).map(([area, hue]) => [area, TAG_COLOR_OF_CURRICULUM[hue]]),
 ));
@@ -71,7 +76,6 @@ const SmartBadges = ({
     return (
         <Tag
             id={id}
-            color={SMART_TAG_COLORS[area]}
             className={`plus-smart-badge plus-smart-badge--${CURRICULUM_OF[area]} ${className}`.trim()}
             {...rest}
         >

@@ -278,8 +278,8 @@ DisabledBesideTags.play = async ({ canvasElement, args }) => {
     const t = (token) => tokenColor(canvasElement, token);
     const fill = t('--ds-background-disabled');
     const edge = t('--ds-border');
-    const ink = t('--ds-text-subtle');
-    const mark = t('--ds-icon-subtle');
+    const ink = t('--ds-text-disabled');
+    const mark = t('--ds-icon-disabled');
     const tag = canvas.getByTestId('tag');
 
     const names = ['Add Relationships, suggested', 'Summarize, suggested'];
@@ -294,10 +294,10 @@ DisabledBesideTags.play = async ({ canvasElement, args }) => {
             .toBe(getComputedStyle(tag).backgroundColor);
         await expect(s.borderTopStyle, `${name}: still dashed`).toBe('dashed');
         await expect(s.borderTopColor, `${name}: color.border edge`).toBe(edge);
-        await expect(s.color, `${name}: text.subtle words`).toBe(ink);
+        await expect(s.color, `${name}: text.disabled words`).toBe(ink);
         await expect(s.color, `${name}: the disabled Tag's words`)
             .toBe(getComputedStyle(tag).color);
-        await expect(getComputedStyle(el.querySelector('i')).color, `${name}: and an icon.subtle glyph`).toBe(mark);
+        await expect(getComputedStyle(el.querySelector('i')).color, `${name}: and an icon.disabled glyph`).toBe(mark);
         await expect(px(s.height), `${name}: the box does not move`).toBe(22);
 
         // No hover or press: the ground never changes under a pointer.

@@ -56,11 +56,11 @@
 /* The subject's mark and edge, in every state: an elevated area keeps it on the swatch. */
 .plus-tag.plus-smart-badge {
     --plus-tag-hue: var(--plus-smart-mark);
-    --plus-tag-edge: var(--plus-smart-edge);
+    --plus-tag-border-selected: var(--plus-smart-edge);
 }
 
 .plus-tag.plus-smart-badge:not(.plus-tag--disabled):not(.plus-tag--elevated) {
-    --plus-tag-border: transparent;
+    --plus-tag-border-rest: transparent;
 
     background-color: var(--plus-smart-ground);
     color: var(--plus-smart-ink);

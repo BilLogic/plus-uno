@@ -6,7 +6,7 @@ import CompetencyBadge from '@/components/_internal/CompetencyBadge';
 import StaticBadgeSmart, { SMART_TAG_COLORS } from '@/components/_internal/StaticBadgeSmart';
 import TagInput from '@/components/forms-and-inputs/TagInput';
 
-import Tag from './Tag';
+import Tag, { TAG_COLOR_OF_CURRICULUM } from './Tag';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 
 /**
@@ -98,6 +98,31 @@ SmartAreas.play = async ({ canvasElement }) => {
                 .toBe(tokenColor(canvasElement, `--ds-icon-smart-${token}`));
         }
         await expect(canvas.queryByRole('button')).toBeNull();
+    });
+};
+
+/**
+ * The subject-to-accent pairing is written twice: in the tokens (each
+ * `color.*.smart.{subject}` aliases an accent) and in `TAG_COLOR_OF_CURRICULUM`
+ * (which a SMART area's `SMART_TAG_COLORS` and Badge's migration hint read).
+ * They must name the same accent, in every mode: the subject's ground, ink,
+ * mark and edge each compute to that accent's own step.
+ */
+export const SmartPairing = () => <div />;
+
+SmartPairing.play = async ({ canvasElement }) => {
+    await inEveryColorMode(async (mode) => {
+        for (const [subject, hue] of Object.entries(TAG_COLOR_OF_CURRICULUM)) {
+            for (const [smart, accent] of [
+                [`--ds-background-smart-${subject}`, `--ds-background-accent-${hue}-subtler`],
+                [`--ds-text-smart-${subject}`, `--ds-text-accent-${hue}`],
+                [`--ds-icon-smart-${subject}`, `--ds-icon-accent-${hue}`],
+                [`--ds-border-smart-${subject}`, `--ds-border-accent-${hue}`],
+            ]) {
+                await expect(tokenColor(canvasElement, smart), `${mode}: ${smart} is ${accent}`)
+                    .toBe(tokenColor(canvasElement, accent));
+            }
+        }
     });
 };
 
