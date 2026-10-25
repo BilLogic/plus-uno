@@ -48,7 +48,7 @@ const ReconfirmTutorAvailabilityModalBody = () => (
                 style={{
                     fontSize: 'var(--font-size-fa-huge-solid, 8rem)',
                     lineHeight: 1,
-                    color: 'var(--color-warning)',
+                    color: 'var(--color-warning-icon)',
                 }}
             />
 
@@ -121,7 +121,7 @@ const ReconfirmTutorAvailabilityModalBody = () => (
  * - Modal gap: --size-modal-gap-lg (between sections), --size-modal-gap-md (content)
  * - Modal radius: --size-modal-radius-lg
  * - Background: --color-surface-container-high
- * - Icon color: --color-warning
+ * - Icon color: --color-warning-icon
  * - Title: h4, --color-on-surface
  * - Close icon: fa-xmark, --font-size-fa-h4-solid, --color-on-surface-variant
  */

@@ -163,7 +163,7 @@ export const PreReview_WithdrawRequest = () => (
                         style={{
                             fontSize: 'var(--font-size-fa-huge-solid, 8rem)',
                             lineHeight: 1,
-                            color: 'var(--color-warning)'
+                            color: 'var(--color-warning-icon)'
                         }}
                     />
 

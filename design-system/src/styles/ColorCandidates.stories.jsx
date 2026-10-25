@@ -311,7 +311,7 @@ WarningGround.play = async () => {
 
     // Warning's icon and border are the one darker value, on every ground.
     await expect(readToken('--color-warning-border')).toBe('#715c00');
-    await expect(readToken('--color-warning-icon')).toBe('#715c00');
+    await expect(readToken('--color-warning-icon'), 'the icon aliases the border').toBe(readToken('--color-warning-border'));
 
     // White on the yellow is the finding that started this, and it still fails.
     await expect(contrast(warning, '#ffffff'), `white on ${warning}`).toBeLessThan(AA_TEXT);

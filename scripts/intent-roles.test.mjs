@@ -6,7 +6,7 @@ import test from 'node:test';
 
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { run } from './check-intent-roles.mjs';
-import { EDGE, INTENTS, counts, edgeUses, failures, mixCounts, mixFailures, mixedUses, stylesheets } from './intent-roles.mjs';
+import { EDGE, INTENTS, counts, edgeUses, failures, mixCounts, mixFailures, mixedUses, stylesheets, themeMapUses } from './intent-roles.mjs';
 import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
 /** A throwaway corpus, so the tests describe the rule rather than today's code. */
@@ -234,6 +234,43 @@ test('a hand-mixed hover in a fixture tree is a finding', () => {
     assert.ok(
       found.some((message) => /mixes a state color by hand/.test(message)),
       `expected a planted mix finding, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
+});
+
+const THEME_MAP = (warningEdge) => `$themes: (
+    'danger': ('--color-danger', '--color-on-danger', '--color-danger-border'),
+    'warning': ('--color-warning', '--color-on-warning', '${warningEdge}'),
+    'default': ('--color-neutral', '--color-on-neutral', '--color-neutral')
+);
+`;
+
+test('a theme-map row that hands its edge slot the base is a use', () => {
+  const root = corpus({ 'design-system/src/a.scss': THEME_MAP('--color-warning') });
+  const uses = themeMapUses(stylesheets(root), root);
+  assert.deepEqual(uses.map(({ intent, slot, token, role, line }) => ({ intent, slot, token, role, line })), [
+    { intent: 'warning', slot: 3, token: '--color-warning', role: '--color-warning-border', line: 3 },
+  ]);
+});
+
+test('the role in the edge slot, a non-intent row, and the base in a fill slot are not uses', () => {
+  const root = corpus({ 'design-system/src/a.scss': THEME_MAP('--color-warning-border') });
+  assert.deepEqual(themeMapUses(stylesheets(root), root), []);
+});
+
+test('a theme-map edge slot holding the base fails the check, with no record to hide in', () => {
+  const { root, done } = policyTree({
+    [`${TOKEN_DIR}/_color_roles.scss`]: ROLES_SCSS,
+    'design-system/src/a.scss': THEME_MAP('--color-warning'),
+    'scripts/baselines/intent-role-adoption.json': INTENT_BASELINE,
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(
+      found.some((message) => /'warning' row of a theme map puts --color-warning in its edge slot/.test(message)),
+      `expected a theme-map finding, got:\n${found.join('\n')}`,
     );
   } finally {
     done();

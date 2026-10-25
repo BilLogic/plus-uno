@@ -4,7 +4,7 @@
     "design-system/src/components/_internal/SessionManagementSnackbar/SessionManagementSnackbar.scss|--color-surface|--color-surface": {
       "count": 1,
       "ratio": 1,
-      "why": "NOT A DEFECT — the check's blind spot 1. The header's ground is set by child modifiers (&--created is --color-success, &--updated --color-info, &--canceled --color-warning), which this reads as the page. White on those three is 6.17 / 4.53 / 3.52:1; the last is a white label on the gold fill, which the filled warning no longer uses (--color-on-warning is the ink, 4.62:1)."
+      "why": "NOT A DEFECT — the check's blind spot 1. The header's ground is set by child modifiers (&--created is --color-success, &--updated --color-info, &--canceled --color-warning), which this reads as the page. White on the first two is 6.17 / 4.53:1. &--canceled sets its own label, --color-on-warning (the ink, 4.62:1), because white on the yellow is 3.52:1."
     },
     "design-system/src/components/forms-and-inputs/Rating.scss|--color-outline-variant|--color-surface": {
       "count": 1,

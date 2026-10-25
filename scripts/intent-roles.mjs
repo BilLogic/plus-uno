@@ -181,6 +181,45 @@ export function mixFailures(uses, { failures: verdicts = [], stale = [], unrevie
   return found;
 }
 
+/**
+ * A ROLE SLOT IN A THEME MAP. Button and Dropdown carry their intent colors as
+ * quoted Sass maps — `'danger': ('--color-danger', …, '--color-danger-border')`
+ * — and the edge is painted from `var(#{$col-border})` far from the name, so
+ * `edgeUses` cannot see which token a map row hands its edge. The map says
+ * which slot is the edge: a slot where any intent row names its own `-border`
+ * role. An intent row that puts its BASE in that slot is a use, and each one is
+ * a finding outright. There is no record of these, and none is expected,
+ * because a map row is one string to change.
+ */
+const MAP_ROW = /'([\w-]+)'\s*:\s*\(([^()]*)\)/g;
+
+export function themeMapUses(files, root = REPO_ROOT) {
+  const uses = [];
+  for (const file of files) {
+    const source = stripComments(fs.readFileSync(path.join(root, file), 'utf8'));
+    const rows = [];
+    for (const match of source.matchAll(MAP_ROW)) {
+      if (!INTENTS.includes(match[1])) continue;
+      const slots = [...match[2].matchAll(/'([^']*)'/g)].map((m) => m[1].trim());
+      rows.push({ intent: match[1], slots, line: source.slice(0, match.index).split('\n').length });
+    }
+    const edgeSlots = new Set();
+    for (const { intent, slots } of rows) {
+      slots.forEach((slot, i) => {
+        if (slot === `--color-${intent}-border`) edgeSlots.add(i);
+      });
+    }
+    for (const { intent, slots, line } of rows) {
+      for (const i of edgeSlots) {
+        if (slots[i] === `--color-${intent}`) {
+          uses.push({ file, line, intent, slot: i + 1, token: slots[i], role: `${slots[i]}-border` });
+        }
+      }
+    }
+  }
+  return uses;
+}
+
 /** `{ [file]: { border, outline } }` — what the baseline is compared against. */
 export function counts(uses) {
   const out = {};
