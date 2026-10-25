@@ -459,12 +459,27 @@ test('RichTextEditor: toolbar buttons hover 08, press 12, select 16; the block m
 
 /* ─── PatternTable rows ──────────────────────────────────────────────────── */
 
-test('PatternTable: rows hover 08, press 12, and a selected row is primary 08 (dense list)', () => {
+test('PatternTable: row states are layered over the cell fill — neutral subtle hover and press, the selected ladder with a Lagoon bar', () => {
   const file = 'patterns/PatternTable/PatternTable.scss';
-  const row = '.plus-pattern-table-table tbody tr';
-  expectRule(file, `${row}:hover`, { 'background-color': layer('--color-on-surface-state-08') });
-  expectRule(file, `${row}:active`, { 'background-color': layer('--color-on-surface-state-12') });
-  expectRule(file, `${row}[aria-selected=true]`, { 'background-color': layer('--color-primary-state-08') });
+  const table = '.plus-pattern-table-table';
+  const row = `${table} tbody tr`;
+  const state = '--plus-pattern-table-row-state';
+  const over = (token) => `linear-gradient(${layer(token)}, ${layer(token)})`;
+  // Every cell draws the row's state as an image over its fill, never as the fill.
+  expectRule(file, `${table} th`, { 'background-image': over(state) });
+  expectRule(file, `${table} td`, { 'background-image': over(state) });
+  expectRule(file, `${row}:hover`, { [state]: layer('--ds-background-neutral-subtle-hovered') });
+  expectRule(file, `${row}:active`, { [state]: layer('--ds-background-neutral-subtle-pressed') });
+  expectRule(file, `${row}[aria-selected=true]`, { [state]: layer('--ds-background-selected') });
+  expectRule(file, `${row}[aria-selected=true]:hover`, { [state]: layer('--ds-background-selected-hovered') });
+  expectRule(file, `${row}[aria-selected=true]:active`, { [state]: layer('--ds-background-selected-pressed') });
+  expectRule(file, `${row}[aria-selected=true] > :first-child`, {
+    'background-image': `${over('--ds-border-selected')}, ${over(state)}`,
+    'background-size': 'var(--size-element-stroke-lg) 100%, 100% 100%',
+  });
+  for (const selector of [`${row}:hover`, `${row}:active`, `${row}[aria-selected=true]`]) {
+    assert.ok(!('background-color' in declarations(sheet(file), selector)), `${file}: "${selector}" swaps the fill`);
+  }
 });
 
 /* ─── Suggestion ─────────────────────────────────────────────────────────── */
