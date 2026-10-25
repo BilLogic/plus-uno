@@ -42,6 +42,17 @@ Use `<Table>` inside a `<Card>`. Never write raw `<table>` HTML.
 <Table columns={columns} data={data} />
 ```
 
+### Choosing a table
+
+Pick the type before the parts. A row that nests under another makes a
+**Tree table**, even when people also act on it. Otherwise, anything people do
+to the table makes it a **Dynamic table**: sort, filter, select (bulk actions
+included), paginate, expand a row, use a row action, freeze a column, or wait
+through loading and empty states. Everything else is a **Static table**: a fixed
+grid people read, where a link in a cell is fine and rows rest or are
+highlighted. Hover, pressed, focus and selected rows belong to Dynamic and Tree
+tables.
+
 ## Modals
 
 Three variants, one component:
