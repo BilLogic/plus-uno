@@ -26,6 +26,7 @@
     "generate:component-registry": "node scripts/generate-component-registry-from-storybook.js",
     "generate:figma-links": "node scripts/generate-figma-links-spreadsheet.js",
     "snapshot:figma-variables": "node scripts/snapshot-figma-variables.mjs",
+    "push:figma-color": "node scripts/push-figma-color.mjs",
     "snapshot:figma-components": "node scripts/snapshot-figma-components.mjs",
     "generate:token-registry": "node scripts/generate-token-registry.mjs",
     "generate:knowledge-components": "node scripts/generate-knowledge-components.js",

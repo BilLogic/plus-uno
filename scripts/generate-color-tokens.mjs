@@ -16,11 +16,12 @@
  * `_elevation.scss`, `_bootstrap-bridge.scss`, `_legacy-aliases.scss` and
  * `figma-spec.json`. `_legacy-aliases.scss` points each legacy name the
  * migration map gives one target (`scripts/lib/color/legacy-map.mjs`) at its
- * `--ds-*` token. `design-system/src/styles/main.scss` loads the palette,
- * semantic, elevation and alias sheets, the aliases last so they win over the
- * legacy definitions. The token corpus (`tokenSources`) reads the palette,
- * semantic and elevation files by name and leaves the alias sheet out: it
- * adds no names, and the legacy checks keep reading the legacy values.
+ * `--ds-*` token. `design-system/src/styles/main.scss` loads the five SCSS
+ * files, the aliases last so they win over the legacy definitions. The token
+ * checks read the palette, semantic and elevation files as definitions
+ * (`COLOR_TOKEN_FILES` in `tokens-node.mjs`); the bridge only consumes
+ * `--ds-*`, and the alias sheet adds no names and would hide the legacy
+ * values the legacy checks read, so they leave both out.
  *
  * It refuses to write when any color check or plan parity fails
  * (`check:color-system` runs the same checks), so a plan that breaks a

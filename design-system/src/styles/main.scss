@@ -24,11 +24,14 @@
 // beside the old ones until the components move over. Each mode is a selector
 // on <html>: `data-color-mode` (light, dark, auto) and `data-contrast-mode`
 // (more, no-preference, auto); no attribute is light at standard contrast. The
-// Bootstrap bridge is not loaded here yet. Regenerate, never edit:
-// `npm run generate:color-tokens`.
+// Bootstrap bridge points Bootstrap's root `--bs-*` variables at these roles, so
+// react-bootstrap follows the mode; it overrides Bootstrap's own `:root` block,
+// so every entry imports Bootstrap's compiled CSS before this file. Regenerate,
+// never edit: `npm run generate:color-tokens`.
 @use "../tokens/color/palette" as *;
 @use "../tokens/color/semantic" as *;
 @use "../tokens/color/elevation" as *;
+@use "../tokens/color/bootstrap-bridge" as *;
 // Legacy names the migration map gives one target, pointed at the `--ds-*`
 // token so untouched components follow the palette and the modes. Must follow
 // the legacy token files above, so the alias wins; names that split by CSS
