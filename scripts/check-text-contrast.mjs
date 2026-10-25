@@ -135,14 +135,20 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   const idOf = (u) => `${u.file}:${u.line}:${u.token}`;
   // A declaration on N declared grounds is N measurements but one declaration.
   const declarations = new Set(uses.map(idOf)).size;
+  // A use this file cannot resolve (a role token, or a ground outside
+  // `_colors.scss`) has no ratio, and `null < n` reads as `0 < n`, so it would
+  // win the reduce and print as the worst. It is left out of the worst instead,
+  // and a list where nothing resolves has no worst: null, and no clause.
   const worstOf = (list) => list
     .map((u) => ({ ...u, ratio: ratio(u.token, values, u.ground) }))
-    .reduce((low, u) => (u.ratio < low.ratio ? u : low));
+    .filter((u) => u.ratio !== null)
+    .reduce((low, u) => (low === null || u.ratio < low.ratio ? u : low), null);
 
   const onDeclared = uses.filter((u) => u.declared?.tokens.length);
   let declared = '';
-  if (onDeclared.length) {
-    const worst = worstOf(onDeclared);
+  const worstDeclared = worstOf(onDeclared);
+  if (worstDeclared) {
+    const worst = worstDeclared;
     const count = new Set(onDeclared.map(idOf)).size;
     const grounds = new Set(onDeclared.map((u) => u.ground)).size;
     declared = ` ${count} measured on declared @grounds (${grounds} ground${grounds === 1 ? '' : 's'}, worst ` +
@@ -152,8 +158,9 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   // above never quietly absorbs a 3:1 one.
   const glyphs = uses.filter((u) => u.nonText);
   let nonText = '';
-  if (glyphs.length) {
-    const worst = worstOf(glyphs);
+  const worstGlyph = worstOf(glyphs);
+  if (worstGlyph) {
+    const worst = worstGlyph;
     const count = new Set(glyphs.map(idOf)).size;
     nonText = ` ${count} non-text glyph color${count === 1 ? '' : 's'} (@contrast: non-text) held to ${NON_TEXT}:1, ` +
       `worst ${worst.ratio.toFixed(2)}:1 on ${worst.ground}.`;

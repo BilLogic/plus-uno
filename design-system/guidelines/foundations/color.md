@@ -38,6 +38,14 @@ any new divergence.
 | **Danger** | `--color-danger` | `--color-danger-text` | Error states, destructive actions |
 | **Info** | `--color-info` | `--color-info-text` | Informational (aliases to Tertiary) |
 
+**Warning is the one intent whose edge and glyph differ from its fill.** The yellow `--color-warning` (#9f8205) is a ground, and it measures 2.87:1 on the darkest surface. So:
+
+- An icon takes `--color-warning-icon` and an edge takes `--color-warning-border`. Both are #715c00, which measures 6.50:1 on white and 5.02:1 on `--color-surface-container-highest`.
+- A label on a filled warning takes `--color-on-warning`, the dark container ink #231b00, at 4.62:1. White on the yellow is 3.70:1.
+- Do: `border-color: var(--color-warning-border)`. Don't: `border-color: var(--color-warning)`.
+
+`info` is an alias of `tertiary` on purpose, so the two render the same teal.
+
 ## SMART Framework Colors
 
 | Competency | Token Prefix | Theme |

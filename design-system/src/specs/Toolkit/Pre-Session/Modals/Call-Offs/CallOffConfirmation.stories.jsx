@@ -30,7 +30,7 @@ export default {
  * - Modal padding: --size-modal-pad-y-lg, --size-modal-pad-x-lg
  * - Modal radius: --size-modal-radius-lg
  * - Background: --color-surface-container-high
- * - Icon color: --color-warning (clock icon)
+ * - Icon color: --color-warning-icon (clock icon)
  * - Typography: h4, h5, body2-txt
  */
 export const CallOff_Confirmation = () => (
@@ -68,7 +68,7 @@ export const CallOff_Confirmation = () => (
                         style={{
                             fontSize: 'var(--font-size-fa-huge-solid, 8rem)',
                             lineHeight: 1,
-                            color: 'var(--color-warning)'
+                            color: 'var(--color-warning-icon)'
                         }}
                     />
 

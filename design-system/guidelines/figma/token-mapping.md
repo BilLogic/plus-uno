@@ -88,6 +88,13 @@ Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity 
 
 The `Heading/*`, `Body/*` and `Metric/*` styles are the type scale: each binds its family, size, line height and weight to the `typography` collection, and each CSS token is the matching `font` shorthand (`font: var(--heading-large)`). A button or tab label is `Body/default` with `Weight/medium`. The rows above them are the older styles, which sit under `Legacy/` in Figma where their folder collided (`Legacy/Body/B1/…`), kept until every use moves.
 
+### Text that carries no style
+
+Two kinds of text node carry no text style, and each binds its type variables directly so a token change still reaches it:
+
+- **A weighted label or run** (a button or Tab group label at `Weight/medium`, a semibold run inside body text): a weight change drops a node's text style, so the node binds `Font size/0875`, `Line height/125`, `Family/body` and the `Weight/*` it needs. Create no medium or semibold style for it.
+- **A code sample in docs**: `Code` has no Figma style, so the sample is Source Code Pro bound to `Font size/0875` and `Line height/125`.
+
 ## Spacing Tokens
 
 | Figma Spacing Context | PLUS CSS Token Pattern |

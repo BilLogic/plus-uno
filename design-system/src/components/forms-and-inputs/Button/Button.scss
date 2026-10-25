@@ -195,15 +195,15 @@
 // Using EXPLICIT STRINGS to avoid Sass interpretation issues
 // Index: 1:Main, 2:OnMain, 3:StateLayer, 4:TextSafe, 5:Container, 6:OnContainer, 7:Border
 // An outline takes the intent's `-border` role (`_color_roles.scss`), not its
-// base. Warning keeps its base for now: its border role is #715c00, a different
-// color, and that value is the open warning decision rather than a repoint.
+// base. Warning's border role is #715c00 rather than its base, so a warning
+// outline is the one whose edge differs from its fill.
 // `default` and the five category styles have no border role and keep the base.
 $btn-themes: (
     'primary': ('--color-primary', '--color-on-primary', '--color-primary-state-08', '--color-primary-text', '--color-primary-container', '--color-on-primary-container', '--color-primary-border'),
     'secondary': ('--color-secondary', '--color-on-secondary', '--color-secondary-state-08', '--color-secondary-text', '--color-secondary-container', '--color-on-secondary-container', '--color-secondary-border'),
     'tertiary': ('--color-tertiary', '--color-on-tertiary', '--color-tertiary-state-08', '--color-tertiary-text', '--color-tertiary-container', '--color-on-tertiary-container', '--color-tertiary-border'),
     'success': ('--color-success', '--color-on-success', '--color-success-state-08', '--color-success-text', '--color-success-container', '--color-on-success-container', '--color-success-border'),
-    'warning': ('--color-warning', '--color-on-warning', '--color-warning-state-08', '--color-warning-text', '--color-warning-container', '--color-on-warning-container', '--color-warning'),
+    'warning': ('--color-warning', '--color-on-warning', '--color-warning-state-08', '--color-warning-text', '--color-warning-container', '--color-on-warning-container', '--color-warning-border'),
     'danger': ('--color-danger', '--color-on-danger', '--color-danger-state-08', '--color-danger-text', '--color-danger-container', '--color-on-danger-container', '--color-danger-border'),
     'info': ('--color-info', '--color-on-info', '--color-info-state-08', '--color-info-text', '--color-info-container', '--color-on-info-container', '--color-info-border'),
     'default': ('--color-surface-container-high', '--color-on-surface', '--color-surface-container-state-08', '--color-on-surface', '--color-surface-container', '--color-on-surface', '--color-surface-container-high'),
