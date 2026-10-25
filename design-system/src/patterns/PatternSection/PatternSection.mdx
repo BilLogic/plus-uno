@@ -39,7 +39,7 @@ The section pattern is a large structural block for page layout: a title, option
 
 ### Composition
 
-<DocsCanvasShell description={<>A filled section (<code>--color-surface-container-low</code>) grouping card shells.</>}>
+<DocsCanvasShell description={<>A filled section (<code>background="container"</code>, the translucent <code>--ds-surface-container</code> well) grouping card shells.</>}>
     <DsCanvasQuiet of={PatternSectionStories.Composition} />
 </DocsCanvasShell>
 
@@ -67,7 +67,7 @@ The section pattern is a large structural block for page layout: a title, option
 ## Related
 
 - For one object rather than a region, use `Card`.
-- For a region that needs a fill of its own, give it `--surface-container` — see `Surface`. A section is transparent by default and the page shows through.
+- For a region that needs a fill of its own, give it `background="container"` (`--ds-surface-container`), or see `Surface`. A section is transparent by default and the page shows through.
 - For how a section's content lines up across breakpoints, see **Layout & Grid**; the section carries the padding, the grid carries the columns.
 
 </div>

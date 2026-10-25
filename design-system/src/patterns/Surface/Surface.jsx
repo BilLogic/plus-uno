@@ -2,19 +2,24 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './Surface.scss';
 
-export const SURFACE_LEVELS = [
-    'surface',
-    'surface-container-lowest',
-    'surface-container-low',
-    'surface-container',
-    'surface-container-high',
-    'surface-container-highest',
-];
+/**
+ * The elevation levels, lowest to highest. A level is a pair: its fill and the
+ * shadow that goes with it, so a surface never wears one without the other.
+ */
+export const SURFACE_LEVELS = ['sunken', 'default', 'raised', 'overlay'];
+
+/**
+ * The default surface's edge, as the `surface-edge` mixin in
+ * `styles/_surface-edge.scss` draws it. For the stories that measure it.
+ */
+export const SURFACE_EDGE = '0 0 0 var(--size-surface-border) var(--ds-border-surface)';
 
 /**
  * Surface pattern for PLUS design system.
- * Bare tokenized surface: pick a surface level, padding scale, radius scale,
- * border, and elevation — children fill the content slot.
+ * Bare tokenized surface: pick an elevation level, padding scale, radius scale
+ * and border — children fill the content slot. The level sets the fill and its
+ * shadow together: sunken (the frame's backdrop), default (the page, edged by
+ * the surface border), raised (a card) and overlay (anything over the UI).
  * Mirrors the "Surface" slot component in the Figma design system file.
  *
  * A surface that holds a page can carry the page's `title`: the page's one
@@ -22,11 +27,10 @@ export const SURFACE_LEVELS = [
  */
 const Surface = ({
     id,
-    level = 'surface',
+    level = 'default',
     padding = 'md',
     radius = 'none',
     border = false,
-    elevation = 0,
     as: Component = 'div',
     title,
     className = '',
@@ -40,7 +44,6 @@ const Surface = ({
         `plus-pattern-surface-pad-${padding}`,
         `plus-pattern-surface-radius-${radius}`,
         border ? 'plus-pattern-surface-bordered' : '',
-        elevation ? `plus-pattern-surface-elevation-${elevation}` : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -54,16 +57,14 @@ const Surface = ({
 
 Surface.propTypes = {
     id: PropTypes.string,
-    /** Surface color token: surface, surface-container, or a container low/high step */
+    /** Elevation level: its fill and its shadow, as a pair */
     level: PropTypes.oneOf(SURFACE_LEVELS),
     /** Padding scale (md maps to the canonical surface padding tokens) */
     padding: PropTypes.oneOf(['none', 'sm', 'md', 'lg']),
     /** Radius scale */
     radius: PropTypes.oneOf(['none', 'sm', 'md', 'lg']),
-    /** Outline border on/off */
+    /** A bold border on/off */
     border: PropTypes.bool,
-    /** Elevation level (0 = flat; maps to --elevation-light-N) */
-    elevation: PropTypes.oneOf([0, 1, 2, 3, 4, 5]),
     /** Render element / component */
     as: PropTypes.elementType,
     /** The page's title: its one h1, at Heading/large 24. Leave it unset on a surface that is not a page. */

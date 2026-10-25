@@ -109,7 +109,7 @@ docs.
 
 ## App shell tokens
 
-The frame `SurfaceContainer` draws, from the same file:
+The `Frame` pattern draws, from the same file:
 
 | Token | Value | Description |
 |:---|:---|:---|
@@ -122,7 +122,7 @@ The frame `SurfaceContainer` draws, from the same file:
 ## Ownership layering
 
 - The **page template** owns width (`Screen/width-screen`) and the `spacing / layout` mode.
-- `Pattern/Surface container` (`SurfaceContainer` in code) fills it: the topbar row, then the row with the sidebar and `Pattern/Surface`. The surface carries the content grid and the Content slot.
+- `Pattern/Surface container` (`Frame` in code) fills it: the topbar row, then the row with the sidebar and `Pattern/Surface`. The surface carries the content grid and the Content slot.
 - The **sidebar** docks by `Sidebar/sidebar-docked` (false · true · true); behavior below Large is in `../composition/layout.md` § The frame.
 - The **Overlay layer** sits above the frame and carries the screen grid; the
   grid shows and hides with the overlay.

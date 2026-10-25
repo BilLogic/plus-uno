@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { probe, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { Button, Count, Status } from '@/components';
 import SidebarTab from '@/components/navigation/SidebarTab';
 
@@ -48,10 +50,10 @@ export default {
 
 const sidebarSurface = {
     display: 'inline-flex',
-    backgroundColor: 'var(--color-surface-container)',
+    backgroundColor: 'var(--ds-surface-sunken)',
     padding: '12px',
     borderRadius: '12px',
-    border: '1px solid var(--color-outline-variant)',
+    border: 'var(--size-element-border) solid var(--ds-border)',
 };
 
 export const InSidebar = () => {
@@ -181,7 +183,7 @@ export const Interactive = {
 /** A row that fits the 240 sidebar's 224 content width. */
 const sidebarWidth = { width: 'calc(var(--layout-width-sidebar) - 2 * var(--surface-container-pad))' };
 
-/** Tabbing onto a row draws the 2px focus ring in the focus-ring color. */
+/** Tabbing onto a row draws the 2px focused ring, 2px outside the row. */
 export const KeyboardFocus = {
     args: { text: 'Reports', icon: 'chart-bar' },
     parameters: { docs: { disable: true } },
@@ -191,7 +193,49 @@ export const KeyboardFocus = {
         await expect(document.activeElement).toBe(row);
         await waitFor(() => expect(getComputedStyle(row).outlineStyle).toBe('solid'));
         await expect(px(getComputedStyle(row).outlineWidth), 'ring width').toBe(2);
-        await expect(getComputedStyle(row).outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--color-focus-ring'));
+        await expect(getComputedStyle(row).outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        await expect(px(getComputedStyle(row).outlineOffset), 'ring offset, outside the row').toBe(2);
+    },
+};
+
+/**
+ * In every color mode, on the frame's sunken backdrop: a resting row is the
+ * subtle text and icon, hovering moves it to the neutral subtle step, a
+ * selected row is the neutral selected fill with the selected text and icon
+ * and a leading bar in the selected border, a disabled row the disabled text,
+ * and focus the focused ring 2px outside.
+ */
+export const ColorModes = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={{ ...sidebarSurface, ...sidebarWidth, flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+            <SidebarTab text="Dashboard" icon="house" />
+            <SidebarTab text="Lessons" icon="book-open" state="selected" />
+            <SidebarTab text="Settings" icon="gear" state="disabled" />
+            <SidebarTab text="Reports" icon="chart-bar" state="focus" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const row = (name) => {
+            const el = within(canvasElement).getByText(name).closest('.plus-sidebar-tab');
+            el.style.transition = 'none';
+            return el;
+        };
+        const icon = (el) => el.querySelector('.plus-sidebar-tab__icon');
+        const [rest, selected, disabled, focus] = ['Dashboard', 'Lessons', 'Settings', 'Reports'].map(row);
+        await inEveryColorMode(async (mode) => {
+            const color = (token) => tokenColor(canvasElement, token);
+            await expect(getComputedStyle(rest).color, `${mode}: resting text`).toBe(color('--ds-text-subtle'));
+            await expect(getComputedStyle(icon(rest)).color, `${mode}: resting icon`).toBe(color('--ds-icon-subtle'));
+            await expect(withForcedPseudo(rest, ':hover', () => getComputedStyle(rest).backgroundColor), `${mode}: hover`)
+                .toBe(color('--ds-background-neutral-subtle-hovered'));
+            await expect(getComputedStyle(selected).backgroundColor, `${mode}: selected fill`).toBe(color('--ds-background-selected'));
+            await expect(getComputedStyle(selected).color, `${mode}: selected text`).toBe(color('--ds-text-selected'));
+            await expect(getComputedStyle(icon(selected)).color, `${mode}: selected icon`).toBe(color('--ds-icon-selected'));
+            await expect(getComputedStyle(selected).boxShadow, `${mode}: selected bar`).toContain(color('--ds-border-selected'));
+            await expect(getComputedStyle(disabled).color, `${mode}: disabled text`).toBe(color('--ds-text-disabled'));
+            await expect(getComputedStyle(focus).outlineColor, `${mode}: focus ring`).toBe(color('--ds-border-focused'));
+        });
     },
 };
 

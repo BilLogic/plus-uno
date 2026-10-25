@@ -55,13 +55,13 @@ export default function MonthlyReportsListPage() {
             style.id = styleId;
             style.textContent = `
                 #monthly-reports-list-page .plus-page-main::-webkit-scrollbar,
-                #monthly-reports-list-page .plus-surface-container__surface::-webkit-scrollbar {
+                #monthly-reports-list-page .plus-frame__surface::-webkit-scrollbar {
                     display: none !important;
                     width: 0 !important;
                     background: transparent !important;
                 }
                 #monthly-reports-list-page .plus-page-main,
-                #monthly-reports-list-page .plus-surface-container__surface {
+                #monthly-reports-list-page .plus-frame__surface {
                     scrollbar-width: none !important;
                     -ms-overflow-style: none !important;
                 }

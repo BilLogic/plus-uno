@@ -91,7 +91,7 @@ navigation through it, so there is one navigation surface.
 
 ## The frame
 
-`PageLayout` sits in the `SurfaceContainer` pattern (`@/patterns/SurfaceContainer`,
+`PageLayout` sits in the `Frame` pattern (`@/patterns/Frame`,
 Figma `Pattern/Surface container`), which owns every frame size and the sidebar's
 behavior:
 
