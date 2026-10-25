@@ -16,8 +16,10 @@ import './PatternTable.scss';
  * - **Sticky cells**: `stickyHeader` pins the head row and `stickyColumn` the
  *   first column. They paint the current surface, so they match the page or
  *   the card they sit in, and take the overflow shadow only while content is
- *   scrolled under them. `maxHeight` bounds the scroll region, so a sticky
- *   header has something to stick within.
+ *   scrolled under them. `stickyHeader` pairs with `maxHeight`: only a
+ *   bounded region scrolls vertically, so without `maxHeight` the header is
+ *   not pinned. A bounded region, or one with a sticky column, takes keyboard
+ *   focus so it can be scrolled without a pointer.
  *
  * Mirrors the "Table" slot component in the Figma design system file.
  */
@@ -42,18 +44,24 @@ const PatternTable = ({
         setScrolled((prev) => (prev.x === next.x && prev.y === next.y ? prev : next));
     }, []);
 
+    // Only a bounded region scrolls vertically, so a sticky header needs
+    // `maxHeight`; without it the head row would have nothing to stick within.
+    const bounded = maxHeight != null && maxHeight !== '';
+    const pinsHeader = stickyHeader && bounded;
+
     const classes = [
         'plus-pattern-table',
-        stickyHeader ? 'plus-pattern-table--sticky-header' : '',
+        pinsHeader ? 'plus-pattern-table--sticky-header' : '',
         stickyColumn ? 'plus-pattern-table--sticky-column' : '',
         className,
     ].filter(Boolean).join(' ');
 
     const showEmptyState = empty && emptyState;
-    const tracksScroll = stickyHeader || stickyColumn;
-    // A region that scrolls must be reachable by keyboard, so a bounded or
-    // sticky table's scroll region takes focus.
-    const scrollable = tracksScroll || maxHeight != null;
+    const tracksScroll = pinsHeader || stickyColumn;
+    // A region that scrolls must be reachable by keyboard: a bounded region
+    // scrolls vertically, and a sticky column exists for a table that scrolls
+    // sideways. A plain table that only might overflow gets no tab stop.
+    const scrollable = bounded || stickyColumn;
 
     return (
         <div id={id} className={classes} style={style} {...props}>
@@ -63,7 +71,7 @@ const PatternTable = ({
             ) : (
                 <div
                     className="plus-pattern-table-scroll"
-                    style={maxHeight != null ? { maxHeight } : undefined}
+                    style={bounded ? { maxHeight } : undefined}
                     tabIndex={scrollable ? 0 : undefined}
                     onScroll={tracksScroll ? onScroll : undefined}
                     data-scrolled-x={tracksScroll && scrolled.x ? '' : undefined}
@@ -89,11 +97,11 @@ PatternTable.propTypes = {
     emptyState: PropTypes.node,
     /** Show the empty-state slot instead of the table */
     empty: PropTypes.bool,
-    /** Pin the head row while the rows scroll under it */
+    /** Pin the head row while the rows scroll under it; needs `maxHeight`, since only a bounded region scrolls vertically */
     stickyHeader: PropTypes.bool,
     /** Pin the first column while the other columns scroll under it */
     stickyColumn: PropTypes.bool,
-    /** Bound the scroll region's height (number of px or any CSS length) */
+    /** Bound the scroll region's height (number of px or any CSS length); a sticky header pins only within it */
     maxHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     className: PropTypes.string,
     style: PropTypes.object,

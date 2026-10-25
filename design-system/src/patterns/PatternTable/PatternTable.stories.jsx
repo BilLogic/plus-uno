@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, waitFor, within } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { alpha, computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
-import { applyColorModes } from '@/storybook-docs/lib/color-modes.js';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import PatternTable from '@/patterns/PatternTable';
 import PatternCard from '@/patterns/PatternCard';
 import Button from '@/components/forms-and-inputs/Button';
@@ -123,7 +123,7 @@ export default {
         },
         stickyHeader: {
             control: 'boolean',
-            description: 'Pin the head row while the rows scroll under it',
+            description: 'Pin the head row while the rows scroll under it; set maxHeight too, or there is nothing to scroll',
             table: { category: 'Design' },
         },
         stickyColumn: {
@@ -133,7 +133,7 @@ export default {
         },
         maxHeight: {
             control: 'text',
-            description: 'Bound the scroll region height',
+            description: 'Bound the scroll region height (e.g. 160px); stickyHeader pins only within it',
             table: { category: 'Design' },
         },
         id: {
@@ -179,28 +179,6 @@ export const Interactive = {
     ),
 };
 
-/** Light, dark, and each at more contrast: the four modes a table is held in. */
-const MODES = [
-    ['light', 'no-preference'],
-    ['dark', 'no-preference'],
-    ['light', 'more'],
-    ['dark', 'more'],
-];
-
-/** Runs `check` once per mode, then puts <html> back as the toolbar left it. */
-const inEveryMode = async (check) => {
-    const root = document.documentElement;
-    const saved = ['data-color-mode', 'data-contrast-mode', 'data-bs-theme'].map((name) => [name, root.getAttribute(name)]);
-    try {
-        for (const [colorMode, contrastMode] of MODES) {
-            applyColorModes(colorMode, contrastMode);
-            await check(`${colorMode}, ${contrastMode} contrast`);
-        }
-    } finally {
-        saved.forEach(([name, value]) => (value === null ? root.removeAttribute(name) : root.setAttribute(name, value)));
-    }
-};
-
 /**
  * Row states, layered over each cell's fill: hovered and pressed rows take the
  * neutral subtle steps, and a selected row the selected ladder with a 2px
@@ -233,7 +211,7 @@ export const RowStates = {
         const color = (token) => tokenColor(canvasElement, token);
         const layers = (el) => getComputedStyle(el).backgroundImage;
 
-        await inEveryMode(async (mode) => {
+        await inEveryColorMode(async (mode) => {
             const head = canvas.getByText('Name');
             const rest = canvas.getByText('Jordan Blake');
             const selected = canvas.getByText('Casey Rivera');
@@ -285,7 +263,7 @@ export const Sticky = {
         const shadow = (el) => getComputedStyle(el).boxShadow;
 
         try {
-            await inEveryMode(async (mode) => {
+            await inEveryColorMode(async (mode) => {
                 scroller.scrollTo(0, 0);
                 await waitFor(() => expect(scroller.hasAttribute('data-scrolled-y')).toBe(false));
                 await expect(getComputedStyle(head).position, `${mode}: the head row is sticky`).toBe('sticky');
@@ -307,5 +285,24 @@ export const Sticky = {
         } finally {
             scroller.scrollTo(0, 0);
         }
+    },
+};
+
+/**
+ * `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls
+ * vertically, so without it the header is not pinned and the region takes no
+ * tab stop it could not use.
+ */
+export const StickyHeaderNeedsMaxHeight = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <PatternTable stickyHeader>
+            {tableContent}
+        </PatternTable>
+    ),
+    play: async ({ canvasElement }) => {
+        const scroller = canvasElement.querySelector('.plus-pattern-table-scroll');
+        await expect(getComputedStyle(within(canvasElement).getByText('Role')).position, 'an unbounded header is not pinned').not.toBe('sticky');
+        await expect(scroller.hasAttribute('tabindex'), 'an unbounded region takes no tab stop').toBe(false);
     },
 };

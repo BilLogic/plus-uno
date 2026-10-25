@@ -6,6 +6,18 @@
  */
 
 .plus-pattern-table {
+    // How far past a sticky edge `clip-path` lets the overflow shadow reach.
+    // It must cover `--ds-shadow-overflow`'s blur (12px in dark, the widest
+    // mode), so it is a length of its own, with room to spare, rather than a
+    // multiple of the cell padding, which a density change would shrink until
+    // the shadow clipped. Raise it if the overflow shadow's blur grows.
+    --pattern-table-overflow-reach: var(--size-spacing-medium-space-500);
+    // Sticky cells stack only inside the scroll region (which isolates), so
+    // these are local orders on the card layer: a sticky row or column rides
+    // over the body, and the corner cell over both.
+    --pattern-table-z-sticky: var(--layout-z-index-card);
+    --pattern-table-z-corner: calc(var(--pattern-table-z-sticky) + 1);
+
     display: flex;
     flex-direction: column;
     gap: var(--size-table-cell-gap);
@@ -109,34 +121,34 @@
 .plus-pattern-table--sticky-header thead th {
     position: sticky;
     top: 0;
-    z-index: var(--layout-z-index-card);
+    z-index: var(--pattern-table-z-sticky);
     background-color: var(--ds-utility-elevation-surface-current);
 }
 
 .plus-pattern-table--sticky-column :is(th, td):first-child {
     position: sticky;
     left: 0;
-    z-index: var(--layout-z-index-card);
+    z-index: var(--pattern-table-z-sticky);
     background-color: var(--ds-utility-elevation-surface-current);
 }
 
 // The corner cell rides over both the sticky row and the sticky column.
 .plus-pattern-table--sticky-header.plus-pattern-table--sticky-column thead th:first-child {
-    z-index: calc(var(--layout-z-index-card) + 1);
+    z-index: var(--pattern-table-z-corner);
 }
 
 .plus-pattern-table--sticky-header .plus-pattern-table-scroll[data-scrolled-y] thead th {
     box-shadow: var(--ds-shadow-overflow);
-    clip-path: inset(0 0 calc(-2 * var(--size-table-cell-y)) 0);
+    clip-path: inset(0 0 calc(-1 * var(--pattern-table-overflow-reach)) 0);
 }
 
 .plus-pattern-table--sticky-column .plus-pattern-table-scroll[data-scrolled-x] :is(th, td):first-child {
     box-shadow: var(--ds-shadow-overflow);
-    clip-path: inset(0 calc(-2 * var(--size-table-cell-x)) 0 0);
+    clip-path: inset(0 calc(-1 * var(--pattern-table-overflow-reach)) 0 0);
 }
 
 .plus-pattern-table--sticky-header.plus-pattern-table--sticky-column .plus-pattern-table-scroll[data-scrolled-x][data-scrolled-y] thead th:first-child {
-    clip-path: inset(0 calc(-2 * var(--size-table-cell-x)) calc(-2 * var(--size-table-cell-y)) 0);
+    clip-path: inset(0 calc(-1 * var(--pattern-table-overflow-reach)) calc(-1 * var(--pattern-table-overflow-reach)) 0);
 }
 
 .plus-pattern-table-empty {

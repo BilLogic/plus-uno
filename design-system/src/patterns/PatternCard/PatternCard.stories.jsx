@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, within } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
-import { applyColorModes } from '@/storybook-docs/lib/color-modes.js';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import PatternCard from '@/patterns/PatternCard';
 
 const cardCol = { display: 'flex', flexDirection: 'column', gap: '24px' };
@@ -188,28 +188,6 @@ export const Interactive = {
     ),
 };
 
-/** Light, dark, and each at more contrast: the four modes a card is held in. */
-const MODES = [
-    ['light', 'no-preference'],
-    ['dark', 'no-preference'],
-    ['light', 'more'],
-    ['dark', 'more'],
-];
-
-/** Runs `check` once per mode, then puts <html> back as the toolbar left it. */
-const inEveryMode = async (check) => {
-    const root = document.documentElement;
-    const saved = ['data-color-mode', 'data-contrast-mode', 'data-bs-theme'].map((name) => [name, root.getAttribute(name)]);
-    try {
-        for (const [colorMode, contrastMode] of MODES) {
-            applyColorModes(colorMode, contrastMode);
-            await check(`${colorMode}, ${contrastMode} contrast`);
-        }
-    } finally {
-        saved.forEach(([name, value]) => (value === null ? root.removeAttribute(name) : root.setAttribute(name, value)));
-    }
-};
-
 /**
  * A card rests on Atlassian's raised pair: the raised surface and its shadow,
  * whose ring is the edge, with no border. A clickable card lifts while hovered
@@ -242,7 +220,7 @@ export const Elevation = {
         });
         const lightRaised = tokenColor(canvasElement, '--ds-surface-raised');
 
-        await inEveryMode(async (mode) => {
+        await inEveryColorMode(async (mode) => {
             const raised = pair('--ds-surface-raised', '--ds-shadow-raised');
             const static_ = card('Static');
             const clickable = card('Clickable');
