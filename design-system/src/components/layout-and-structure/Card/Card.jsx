@@ -10,7 +10,7 @@ import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
  * Universal card component for creating self-contained containers that display related information.
  * Uses React Bootstrap Card as base.
  *
- * The title is a container title: Heading/small 16 at every level, over a
+ * The title is a container title: Heading/xsmall 14 at every level, over a
  * Body/default 14 description. Its tag is one heading level below the section
  * the card sits in — an h3 in a section, an h2 straight on a page.
  */
@@ -163,7 +163,7 @@ const Card = ({
 Card.propTypes = {
     id: PropTypes.string,
     image: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    /** The card's title: Heading/small 16, one heading level below its section. */
+    /** The card's title: Heading/xsmall 14, one heading level below its section. */
     title: PropTypes.string,
     /** A Body/default 14 description under the title. */
     subtitle: PropTypes.string,

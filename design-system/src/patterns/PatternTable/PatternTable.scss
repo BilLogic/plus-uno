@@ -33,10 +33,13 @@
         padding: var(--size-table-cell-y) var(--size-table-cell-x);
         text-align: left;
         border-bottom: var(--size-element-border) solid var(--color-outline-variant);
+        font: var(--body-default);
         color: var(--color-on-surface);
     }
 
+    // A head cell is a group label, not a heading: Heading/xxsmall.
     thead th {
+        font: var(--heading-xxsmall);
         color: var(--color-on-surface-variant);
     }
 

@@ -8,7 +8,7 @@ import './PatternCard.scss';
  * an optional image, then the content (the `_Card header` over the body), then
  * an optional footer, on the raised surface role with an outline border.
  *
- * - **Header** (`_Card header`): `title` (Heading/small 16, one heading level
+ * - **Header** (`_Card header`): `title` (Heading/xsmall 14, one heading level
  *   below its section) over an optional `description` (Body/default 14), with
  *   `actions` at the end of the row. `header` replaces that block with custom
  *   content, like the header's `custom` type, for tabs or a toolbar.
@@ -79,7 +79,7 @@ const PatternCard = ({
 
 PatternCard.propTypes = {
     id: PropTypes.string,
-    /** The card's title: Heading/small 16, tagged one heading level below its section */
+    /** The card's title: Heading/xsmall 14, tagged one heading level below its section */
     title: PropTypes.node,
     /** Body/default 14 under the title */
     description: PropTypes.node,
